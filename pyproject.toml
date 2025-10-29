@@ -1,0 +1,120 @@
+[project]
+name = "spec-driver"
+version = "0.1.0"
+description = "Specification-driven development toolkit with multi-language spec sync and documentation generation"
+authors = [
+    { name = "David Lee", email = "david@supekku.dev" }
+]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml>=6.0.3",
+    "python-frontmatter>=1.1.0",
+]
+keywords = ["specification", "documentation", "adr", "architecture-decision-records", "spec-sync"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/davidlee/spec-driver"
+Repository = "https://github.com/davidlee/spec-driver"
+Issues = "https://github.com/davidlee/spec-driver/issues"
+
+[project.scripts]
+spec-driver-sync = "supekku.scripts.sync_specs:main"
+spec-driver-adr = "supekku.scripts.decision_registry:main"
+spec-driver-delta = "supekku.scripts.create_delta:main"
+spec-driver-delta-complete = "supekku.scripts.complete_delta:main"
+spec-driver-delta-list = "supekku.scripts.list_deltas:main"
+spec-driver-change-registry = "supekku.scripts.change_registry:main"
+spec-driver-change-list = "supekku.scripts.list_changes:main"
+spec-driver-spec = "supekku.scripts.create_new_spec:main"
+spec-driver-spec-list = "supekku.scripts.list_specs:main"
+spec-driver-spec-sync = "supekku.scripts.sync_tech_specs:main"
+spec-driver-requirement = "supekku.scripts.create_requirement:main"
+spec-driver-requirements = "supekku.scripts.requirements:main"
+spec-driver-revision = "supekku.scripts.create_revision:main"
+spec-driver-validate-revision = "supekku.scripts.validate_revision_blocks:main"
+spec-driver-validate-workspace = "supekku.scripts.validate_workspace:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["supekku"]
+exclude = [
+    "supekku/CLAUDE.md",
+    ".direnv/",
+    ".envrc",
+    ".venv/",
+    "flake.nix",
+    "flake.lock",
+    ".uv-",
+    ".uv-cache/",
+    ".pytest_cache/",
+    "**/__pycache__/",
+    "**/*.pyc",
+    "**/*.pyo",
+    "about/",
+]
+# Force-include lib/ since it's in .gitignore (meant for build artifacts, not source)
+#force-include = { "supekku/scripts/lib" = "supekku/scripts/lib" }
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "supekku/CLAUDE.md",
+    ".direnv/",
+    ".envrc",
+    ".venv/",
+    "flake.nix",
+    "flake.lock",
+    ".uv-",
+    ".uv-cache/",
+    ".pytest_cache/",
+    "**/__pycache__/",
+    "**/*.pyc",
+    "**/*.pyo",
+    "about/", ## fixme
+]
+#force-include = { "supekku/scripts/lib" = "supekku/scripts/lib" }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "ruff>=0.14.0",
+    "pylint>=3.3.9",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra"
+testpaths = [
+    "supekku/scripts",
+    "supekku/scripts/lib",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP"]
+ignore = []
+
+[tool.pylint.main]
+disable = [
+    "C0114",  # missing-module-docstring
+    "C0116",  # missing-function-docstring
+]

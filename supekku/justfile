@@ -1,0 +1,10 @@
+set unstable
+set working-directory := '..'
+
+import "just/py.just"
+import "just/spec.just"
+import "just/reqs.just"
+import "just/backlog.just"
+import "just/registry.just"
+import "just/validate.just"
+

@@ -31,6 +31,21 @@ def install(
       help="Target directory to initialize (default: current directory)",
     ),
   ] = None,
+  dry_run: Annotated[
+    bool,
+    typer.Option(
+      "--dry-run",
+      help="Show what would be done without making changes",
+    ),
+  ] = False,
+  auto_yes: Annotated[
+    bool,
+    typer.Option(
+      "--yes",
+      "-y",
+      help="Automatically confirm all prompts",
+    ),
+  ] = False,
 ) -> None:
   """Initialize spec-driver workspace structure and registry files.
 
@@ -39,8 +54,9 @@ def install(
   """
   target_path = target_dir if target_dir else Path.cwd()
   try:
-    initialize_workspace(target_path)
-    typer.echo(f"Workspace initialized in {target_path.resolve()}")
+    initialize_workspace(target_path, dry_run=dry_run, auto_yes=auto_yes)
+    if not dry_run:
+      typer.echo(f"Workspace initialized in {target_path.resolve()}")
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
     typer.echo(f"Error: {e}", err=True)

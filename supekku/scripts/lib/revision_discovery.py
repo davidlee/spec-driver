@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .revision_blocks import load_revision_blocks
 from .spec_utils import load_markdown_file
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+    from pathlib import Path
 
 
 @dataclass(frozen=True)

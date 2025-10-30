@@ -18,7 +18,7 @@ from .variants import VariantCoordinator
 
 
 def calculate_content_hash(content: str) -> str:
-    """Calculate SHA256 hash of content for comparison"""
+    """Calculate SHA256 hash of content for comparison."""
     return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
 

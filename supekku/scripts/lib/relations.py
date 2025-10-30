@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .frontmatter_schema import Relation
 from .spec_utils import dump_markdown_file, load_markdown_file
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 RelationDict = dict[str, Any]
 
@@ -15,13 +17,16 @@ RelationDict = dict[str, Any]
 def _ensure_relations(frontmatter: dict[str, Any]) -> list[RelationDict]:
     value = frontmatter.setdefault("relations", [])
     if not isinstance(value, list):
-        raise TypeError("frontmatter['relations'] must be a list of mapping objects")
+        msg = "frontmatter['relations'] must be a list of mapping objects"
+        raise TypeError(msg)
     for index, item in enumerate(value):
         if not isinstance(item, Mapping):
-            raise TypeError(f"frontmatter['relations'][{index}] must be a mapping")
+            msg = f"frontmatter['relations'][{index}] must be a mapping"
+            raise TypeError(msg)
         if "type" not in item or "target" not in item:
+            msg = f"frontmatter['relations'][{index}] missing required keys 'type'/'target'"
             raise ValueError(
-                f"frontmatter['relations'][{index}] missing required keys 'type'/'target'",
+                msg,
             )
     return value  # type: ignore[return-value]
 
@@ -59,7 +64,8 @@ def add_relation(
     relation_type = relation_type.strip()
     target = target.strip()
     if not relation_type or not target:
-        raise ValueError("relation_type and target must be non-empty strings")
+        msg = "relation_type and target must be non-empty strings"
+        raise ValueError(msg)
 
     for existing in relations:
         if (
@@ -84,7 +90,8 @@ def remove_relation(path: Path | str, *, relation_type: str, target: str) -> boo
     relation_type = relation_type.strip()
     target = target.strip()
     if not relation_type or not target:
-        raise ValueError("relation_type and target must be non-empty strings")
+        msg = "relation_type and target must be non-empty strings"
+        raise ValueError(msg)
 
     initial_len = len(relations)
     relations[:] = [

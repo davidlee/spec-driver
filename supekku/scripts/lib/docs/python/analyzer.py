@@ -14,7 +14,7 @@ class DeterministicPythonModuleAnalyzer:
         file_path: Path,
         base_path: Path | None = None,
         cache: ParseCache | None = None,
-    ):
+    ) -> None:
         self.file_path = file_path
         self.base_path = base_path
         self.cache = cache
@@ -26,7 +26,7 @@ class DeterministicPythonModuleAnalyzer:
         self.comment_extractor = CommentExtractor(self.source_code)
 
     def analyze(self) -> dict:
-        """Analyze the Python file and extract documentation info with caching"""
+        """Analyze the Python file and extract documentation info with caching."""
         # Try cache first
         if self.cache:
             cached_result = self.cache.get(self.file_path)
@@ -37,9 +37,8 @@ class DeterministicPythonModuleAnalyzer:
         try:
             tree = ast.parse(self.source_code)
         except SyntaxError as e:
-            error_result = {"error": f"Syntax error in {self.file_path}: {e}"}
+            return {"error": f"Syntax error in {self.file_path}: {e}"}
             # Don't cache error results
-            return error_result
 
         analysis = {
             "module_name": self.module_name,
@@ -87,7 +86,7 @@ class DeterministicPythonModuleAnalyzer:
         return analysis
 
     def _get_module_level_comments(self, tree: ast.AST) -> list[str]:
-        """Get comments that appear before the first significant statement"""
+        """Get comments that appear before the first significant statement."""
         comments = []
         first_stmt_line = None
 
@@ -103,9 +102,8 @@ class DeterministicPythonModuleAnalyzer:
                     ast.ImportFrom,
                     ast.Assign,
                 ),
-            ):
-                if first_stmt_line is None or node.lineno < first_stmt_line:
-                    first_stmt_line = node.lineno
+            ) and (first_stmt_line is None or node.lineno < first_stmt_line):
+                first_stmt_line = node.lineno
 
         # Collect comments before first statement
         for line_num, comment in sorted(self.comment_extractor.comments.items()):
@@ -115,7 +113,7 @@ class DeterministicPythonModuleAnalyzer:
         return comments
 
     def _analyze_class(self, node: ast.ClassDef) -> dict:
-        """Analyze a class definition"""
+        """Analyze a class definition."""
         methods = []
         for item in node.body:
             if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -137,7 +135,7 @@ class DeterministicPythonModuleAnalyzer:
         }
 
     def _analyze_function(self, node: ast.FunctionDef) -> dict:
-        """Analyze a function definition"""
+        """Analyze a function definition."""
         args_info = []
         for arg in node.args.args:
             arg_info = {"name": arg.arg}
@@ -176,7 +174,7 @@ class DeterministicPythonModuleAnalyzer:
         }
 
     def _analyze_assignment(self, node: ast.Assign) -> list[dict]:
-        """Analyze variable assignments"""
+        """Analyze variable assignments."""
         variables = []
         comment = self.comment_extractor.get_comment_for_line(node.lineno)
 
@@ -200,7 +198,7 @@ class DeterministicPythonModuleAnalyzer:
         return variables
 
     def _analyze_import(self, node) -> dict:
-        """Analyze import statements"""
+        """Analyze import statements."""
         if isinstance(node, ast.Import):
             return {
                 "type": "import",
@@ -214,9 +212,10 @@ class DeterministicPythonModuleAnalyzer:
                 "names": sorted([alias.name for alias in node.names]),  # Sorted
                 "line_number": node.lineno,
             }
+        return None
 
     def _get_name(self, node) -> str:
-        """Get the name of an AST node with improved handling"""
+        """Get the name of an AST node with improved handling."""
         if isinstance(node, ast.Name):
             return node.id
         if isinstance(node, ast.Attribute):

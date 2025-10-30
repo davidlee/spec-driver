@@ -38,10 +38,10 @@ class BacklogLibraryTest(unittest.TestCase):
 
         path = create_backlog_entry("issue", "Investigate feature flag")
 
-        self.assertTrue(path.exists())
+        assert path.exists()
         text = path.read_text(encoding="utf-8")
-        self.assertIn("id: ISSUE-001", text)
-        self.assertIn("name: Investigate feature flag", text)
+        assert "id: ISSUE-001" in text
+        assert "name: Investigate feature flag" in text
 
     def test_append_backlog_summary_appends_missing_entries(self) -> None:
         root = self._make_repo()
@@ -49,17 +49,17 @@ class BacklogLibraryTest(unittest.TestCase):
 
         additions = append_backlog_summary()
 
-        self.assertEqual(len(additions), 1)
+        assert len(additions) == 1
         summary = (root / "backlog" / "backlog.md").read_text(encoding="utf-8")
-        self.assertIn("ISSUE-001", summary)
-        self.assertIn(entry.relative_to(root / "backlog").as_posix(), summary)
+        assert "ISSUE-001" in summary
+        assert entry.relative_to(root / "backlog").as_posix() in summary
 
     def test_find_repo_root_resolves_from_nested_path(self) -> None:
         root = self._make_repo()
         nested = root / "backlog" / "issues"
         os.chdir(nested)
         resolved = find_repo_root()
-        self.assertEqual(resolved, root)
+        assert resolved == root
 
 
 if __name__ == "__main__":

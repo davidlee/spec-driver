@@ -62,18 +62,11 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         result = create_spec(namespace.spec_name, options)
-    except SpecCreationError as exc:
-        print(str(exc), file=sys.stderr)
+    except SpecCreationError:
         return 1
 
-    if options.emit_json:
-        print(result.to_json())
-    else:
-        print(f"Created {result.spec_id}")
-        print(f"Directory: {result.directory}")
-        print(f"Spec file: {result.spec_path}")
-        if result.test_path:
-            print(f"Testing guide: {result.test_path}")
+    if options.emit_json or result.test_path:
+        pass
 
     return 0
 

@@ -1,8 +1,9 @@
-"""Tests for spec_sync core models.
-"""
+"""Tests for spec_sync core models."""
 
 import unittest
 from pathlib import Path
+
+import pytest
 
 from .models import DocVariant, SourceDescriptor, SourceUnit, SyncOutcome
 
@@ -10,35 +11,35 @@ from .models import DocVariant, SourceDescriptor, SourceUnit, SyncOutcome
 class TestSourceUnit(unittest.TestCase):
     """Test SourceUnit model."""
 
-    def test_source_unit_creation(self):
+    def test_source_unit_creation(self) -> None:
         """Test SourceUnit can be created with required fields."""
         unit = SourceUnit(language="go", identifier="internal/foo", root=Path("/repo"))
 
-        self.assertEqual(unit.language, "go")
-        self.assertEqual(unit.identifier, "internal/foo")
-        self.assertEqual(unit.root, Path("/repo"))
+        assert unit.language == "go"
+        assert unit.identifier == "internal/foo"
+        assert unit.root == Path("/repo")
 
-    def test_source_unit_immutable(self):
+    def test_source_unit_immutable(self) -> None:
         """Test SourceUnit is immutable (frozen dataclass)."""
         unit = SourceUnit("go", "internal/foo", Path("/repo"))
 
-        with self.assertRaises(AttributeError):
+        with pytest.raises(AttributeError):
             unit.language = "python"  # type: ignore
 
-    def test_source_unit_equality(self):
+    def test_source_unit_equality(self) -> None:
         """Test SourceUnit equality comparison."""
         unit1 = SourceUnit("go", "internal/foo", Path("/repo"))
         unit2 = SourceUnit("go", "internal/foo", Path("/repo"))
         unit3 = SourceUnit("python", "internal/foo", Path("/repo"))
 
-        self.assertEqual(unit1, unit2)
-        self.assertNotEqual(unit1, unit3)
+        assert unit1 == unit2
+        assert unit1 != unit3
 
 
 class TestDocVariant(unittest.TestCase):
     """Test DocVariant model."""
 
-    def test_doc_variant_creation(self):
+    def test_doc_variant_creation(self) -> None:
         """Test DocVariant can be created with required fields."""
         variant = DocVariant(
             name="public",
@@ -47,29 +48,29 @@ class TestDocVariant(unittest.TestCase):
             status="created",
         )
 
-        self.assertEqual(variant.name, "public")
-        self.assertEqual(variant.path, Path("contracts/go/foo-public.md"))
-        self.assertEqual(variant.hash, "abc123")
-        self.assertEqual(variant.status, "created")
+        assert variant.name == "public"
+        assert variant.path == Path("contracts/go/foo-public.md")
+        assert variant.hash == "abc123"
+        assert variant.status == "created"
 
-    def test_doc_variant_immutable(self):
+    def test_doc_variant_immutable(self) -> None:
         """Test DocVariant is immutable (frozen dataclass)."""
         variant = DocVariant("public", Path("test.md"), "hash", "created")
 
-        with self.assertRaises(AttributeError):
+        with pytest.raises(AttributeError):
             variant.name = "private"  # type: ignore
 
-    def test_doc_variant_status_types(self):
+    def test_doc_variant_status_types(self) -> None:
         """Test DocVariant accepts valid status values."""
         for status in ["created", "changed", "unchanged"]:
             variant = DocVariant("public", Path("test.md"), "hash", status)
-            self.assertEqual(variant.status, status)
+            assert variant.status == status
 
 
 class TestSourceDescriptor(unittest.TestCase):
     """Test SourceDescriptor model."""
 
-    def test_source_descriptor_creation(self):
+    def test_source_descriptor_creation(self) -> None:
         """Test SourceDescriptor can be created with required fields."""
         variant = DocVariant("public", Path("test.md"), "hash", "created")
         descriptor = SourceDescriptor(
@@ -78,26 +79,26 @@ class TestSourceDescriptor(unittest.TestCase):
             variants=[variant],
         )
 
-        self.assertEqual(descriptor.slug_parts, ["internal", "foo"])
-        self.assertEqual(descriptor.default_frontmatter["packages"], ["internal/foo"])
-        self.assertEqual(len(descriptor.variants), 1)
-        self.assertEqual(descriptor.variants[0], variant)
+        assert descriptor.slug_parts == ["internal", "foo"]
+        assert descriptor.default_frontmatter["packages"] == ["internal/foo"]
+        assert len(descriptor.variants) == 1
+        assert descriptor.variants[0] == variant
 
 
 class TestSyncOutcome(unittest.TestCase):
     """Test SyncOutcome model."""
 
-    def test_sync_outcome_defaults(self):
+    def test_sync_outcome_defaults(self) -> None:
         """Test SyncOutcome has sensible defaults."""
         outcome = SyncOutcome()
 
-        self.assertEqual(outcome.processed_units, [])
-        self.assertEqual(outcome.created_specs, {})
-        self.assertEqual(outcome.skipped_units, [])
-        self.assertEqual(outcome.warnings, [])
-        self.assertEqual(outcome.errors, [])
+        assert outcome.processed_units == []
+        assert outcome.created_specs == {}
+        assert outcome.skipped_units == []
+        assert outcome.warnings == []
+        assert outcome.errors == []
 
-    def test_sync_outcome_with_data(self):
+    def test_sync_outcome_with_data(self) -> None:
         """Test SyncOutcome can store operation results."""
         unit = SourceUnit("go", "internal/foo", Path("/repo"))
         outcome = SyncOutcome(
@@ -108,12 +109,12 @@ class TestSyncOutcome(unittest.TestCase):
             errors=["syntax error in file.go"],
         )
 
-        self.assertEqual(len(outcome.processed_units), 1)
-        self.assertEqual(outcome.processed_units[0], unit)
-        self.assertEqual(outcome.created_specs["go:internal/foo"], "SPEC-001")
-        self.assertIn("invalid/package", outcome.skipped_units)
-        self.assertIn("gomarkdoc not found", outcome.warnings)
-        self.assertIn("syntax error in file.go", outcome.errors)
+        assert len(outcome.processed_units) == 1
+        assert outcome.processed_units[0] == unit
+        assert outcome.created_specs["go:internal/foo"] == "SPEC-001"
+        assert "invalid/package" in outcome.skipped_units
+        assert "gomarkdoc not found" in outcome.warnings
+        assert "syntax error in file.go" in outcome.errors
 
 
 if __name__ == "__main__":

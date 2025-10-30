@@ -31,7 +31,6 @@ SKIP_KEYWORDS = {"mock", "mocks", "generated"}
 
 def default_log(message: str) -> None:
     """Default logging function that prints to stdout."""
-    print(message)
 
 
 def default_run(cmd: list[str]) -> CompletedProcess[str]:
@@ -154,7 +153,8 @@ class TechSpecSyncEngine:
 
         gomarkdoc_missing = not self._gomarkdoc_available()
         if gomarkdoc_missing and options.check:
-            raise GomarkdocNotAvailableError("gomarkdoc required for --check mode")
+            msg = "gomarkdoc required for --check mode"
+            raise GomarkdocNotAvailableError(msg)
         if gomarkdoc_missing and not options.check:
             warnings.append("gomarkdoc not found; documentation generation skipped")
             self.log("warning: gomarkdoc not found; documentation generation skipped")
@@ -258,9 +258,12 @@ class TechSpecSyncEngine:
             return languages.get("go", {})
 
         # Legacy v1 format no longer supported - should be migrated
-        raise ValueError(
+        msg = (
             f"Registry at {self.registry_path} is in v1 format. "
-            "Please migrate to v2 using: just supekku::migrate-registry",
+            "Please migrate to v2 using: just supekku::migrate-registry"
+        )
+        raise ValueError(
+            msg,
         )
 
     def save_registry(self, registry: Mapping[str, str]) -> None:
@@ -375,7 +378,8 @@ class TechSpecSyncEngine:
         for entry in self.tech_dir.iterdir():
             if entry.is_dir() and entry.name.startswith(spec_id + "-"):
                 return entry
-        raise FileNotFoundError(f"Spec directory for {spec_id} not found")
+        msg = f"Spec directory for {spec_id} not found"
+        raise FileNotFoundError(msg)
 
     @staticmethod
     def normalize_package(pkg: str, module: str) -> str:
@@ -394,9 +398,7 @@ class TechSpecSyncEngine:
             lower = part.lower()
             if any(keyword in lower for keyword in SKIP_KEYWORDS):
                 return True
-        if pkg.endswith("_test"):
-            return True
-        return False
+        return bool(pkg.endswith("_test"))
 
     @staticmethod
     def determine_slug(package: str) -> str:
@@ -421,7 +423,7 @@ class TechSpecSyncEngine:
                     targets.append(f"{module}/{rel}")
             return targets
         if options.existing:
-            return [f"{module}/{rel}" for rel in registry.keys()]
+            return [f"{module}/{rel}" for rel in registry]
         result = self.run_cmd(["go", "list", "./..."])
         return result.stdout.splitlines()
 

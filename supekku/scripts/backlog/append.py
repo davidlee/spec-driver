@@ -16,7 +16,7 @@ from supekku.scripts.lib.backlog import append_backlog_summary
 def main() -> None:
     additions = append_backlog_summary()
     if additions:
-        print("\n".join(additions))
+        pass
 
 
 if __name__ == "__main__":

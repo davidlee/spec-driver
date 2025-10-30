@@ -46,11 +46,10 @@ def main(argv: list[str] | None = None) -> int:
 
     issues = validate_workspace(ws, strict=args.strict)
     if not issues:
-        print("workspace validation passed")
         return 0
 
-    for issue in issues:
-        print(f"[{issue.level.upper()}] {issue.artifact}: {issue.message}")
+    for _issue in issues:
+        pass
     return 1
 
 

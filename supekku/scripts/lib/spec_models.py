@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-from .frontmatter_schema import FrontmatterValidationResult
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from .frontmatter_schema import FrontmatterValidationResult
 
 
 @dataclass(frozen=True)

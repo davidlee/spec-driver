@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 RELATIONSHIPS_MARKER = "supekku:delta.relationships@v1"
 RELATIONSHIPS_SCHEMA = "supekku.delta.relationships"
@@ -52,7 +54,7 @@ class DeltaRelationshipsValidator:
         if requirements is not None and not isinstance(requirements, dict):
             errors.append("delta relationships requirements must be a mapping")
 
-        for section, expected_type in ((specs, list), (requirements, list)):
+        for section, _expected_type in ((specs, list), (requirements, list)):
             if not isinstance(section, dict):
                 continue
             for key, value in section.items():
@@ -92,9 +94,11 @@ def extract_delta_relationships(text: str) -> DeltaRelationshipsBlock | None:
     try:
         data = yaml.safe_load(raw) or {}
     except yaml.YAMLError as exc:  # pragma: no cover
-        raise ValueError(f"invalid delta relationships YAML: {exc}") from exc
+        msg = f"invalid delta relationships YAML: {exc}"
+        raise ValueError(msg) from exc
     if not isinstance(data, dict):
-        raise ValueError("delta relationships block must parse to mapping")
+        msg = "delta relationships block must parse to mapping"
+        raise ValueError(msg)
     return DeltaRelationshipsBlock(raw_yaml=raw, data=data)
 
 

@@ -1,14 +1,20 @@
-"""Python language adapter for specification synchronization.
-"""
+"""Python language adapter for specification synchronization."""
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from pathlib import Path
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
-from ..models import DocVariant, SourceDescriptor, SourceUnit
+from supekku.scripts.lib.spec_sync.models import (
+    DocVariant,
+    SourceDescriptor,
+    SourceUnit,
+)
+
 from .base import LanguageAdapter
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class PythonAdapter(LanguageAdapter):
@@ -189,7 +195,7 @@ class PythonAdapter(LanguageAdapter):
         self._validate_unit_language(unit)
 
         # Import here to avoid circular imports
-        from ...docs.python import VariantSpec, generate_docs
+        from supekku.scripts.lib.docs.python import VariantSpec, generate_docs
 
         # Convert unit to absolute path
         module_path = self.repo_root / unit.identifier

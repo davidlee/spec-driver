@@ -4,13 +4,16 @@ from __future__ import annotations
 
 import os
 import unittest
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.relations import add_relation
 from supekku.scripts.lib.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
 from supekku.scripts.lib.validator import validate_workspace
 from supekku.scripts.lib.workspace import Workspace
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class WorkspaceValidatorTest(RepoTestCase):
@@ -105,14 +108,14 @@ class WorkspaceValidatorTest(RepoTestCase):
         ws = Workspace(root)
         ws.sync_requirements()
         issues = validate_workspace(ws)
-        self.assertEqual(issues, [])
+        assert issues == []
 
         # Break requirement link
         ws.requirements.records["SPEC-300.FR-300"].implemented_by = ["DE-999"]
         ws.requirements.save()
         issues = validate_workspace(ws)
-        self.assertEqual(len(issues), 1)
-        self.assertIn("DE-999", issues[0].message)
+        assert len(issues) == 1
+        assert "DE-999" in issues[0].message
 
     def test_validator_checks_change_relations(self) -> None:
         root = self._create_repo()
@@ -124,15 +127,15 @@ class WorkspaceValidatorTest(RepoTestCase):
         ws = Workspace(root)
         ws.sync_requirements()
         issues = validate_workspace(ws)
-        self.assertEqual(len(issues), 1)
-        self.assertIn("SPEC-999.FR-999", issues[0].message)
+        assert len(issues) == 1
+        assert "SPEC-999.FR-999" in issues[0].message
 
     def _write_adr(
         self,
         root: Path,
         adr_id: str,
         status: str = "accepted",
-        related_decisions: list[str] = None,
+        related_decisions: list[str] | None = None,
     ) -> Path:
         """Helper to create ADR files for testing."""
         if related_decisions is None:
@@ -180,9 +183,9 @@ class WorkspaceValidatorTest(RepoTestCase):
             for issue in issues
             if issue.level == "error" and "ADR-999" in issue.message
         ]
-        self.assertEqual(len(error_issues), 1)
-        self.assertEqual(error_issues[0].artifact, "ADR-002")
-        self.assertIn("does not exist", error_issues[0].message)
+        assert len(error_issues) == 1
+        assert error_issues[0].artifact == "ADR-002"
+        assert "does not exist" in error_issues[0].message
 
     def test_validator_checks_adr_status_compatibility(self) -> None:
         """Test that validator warns about referencing deprecated/superseded ADRs in strict mode."""
@@ -200,26 +203,26 @@ class WorkspaceValidatorTest(RepoTestCase):
         # Non-strict mode: no warnings
         issues = validate_workspace(ws, strict=False)
         warning_issues = [issue for issue in issues if issue.level == "warning"]
-        self.assertEqual(len(warning_issues), 0)
+        assert len(warning_issues) == 0
 
         # Strict mode: warnings expected
         issues = validate_workspace(ws, strict=True)
         warning_issues = [issue for issue in issues if issue.level == "warning"]
-        self.assertEqual(len(warning_issues), 2)
+        assert len(warning_issues) == 2
 
         # Check specific warnings
-        deprecated_warning = [
+        deprecated_warning = next(
             issue for issue in warning_issues if "deprecated" in issue.message
-        ][0]
-        superseded_warning = [
+        )
+        superseded_warning = next(
             issue for issue in warning_issues if "superseded" in issue.message
-        ][0]
+        )
 
-        self.assertEqual(deprecated_warning.artifact, "ADR-003")
-        self.assertIn("ADR-001", deprecated_warning.message)
+        assert deprecated_warning.artifact == "ADR-003"
+        assert "ADR-001" in deprecated_warning.message
 
-        self.assertEqual(superseded_warning.artifact, "ADR-003")
-        self.assertIn("ADR-002", superseded_warning.message)
+        assert superseded_warning.artifact == "ADR-003"
+        assert "ADR-002" in superseded_warning.message
 
     def test_validator_adr_validation_no_issues_when_valid(self) -> None:
         """Test that validator finds no issues with valid ADR references."""
@@ -241,7 +244,7 @@ class WorkspaceValidatorTest(RepoTestCase):
             for issue in issues
             if "ADR" in issue.message or issue.artifact.startswith("ADR")
         ]
-        self.assertEqual(len(adr_issues), 0)
+        assert len(adr_issues) == 0
 
     def test_validator_no_warning_deprecated_referencing_deprecated(self) -> None:
         """Test deprecated/superseded ADRs referencing deprecated don't warn in strict."""
@@ -267,14 +270,14 @@ class WorkspaceValidatorTest(RepoTestCase):
         # Non-strict: no warnings at all
         issues = validate_workspace(ws, strict=False)
         warning_issues = [issue for issue in issues if issue.level == "warning"]
-        self.assertEqual(len(warning_issues), 0)
+        assert len(warning_issues) == 0
 
         # Strict mode: only 1 warning (ADR-007 -> ADR-001)
         issues = validate_workspace(ws, strict=True)
         warning_issues = [issue for issue in issues if issue.level == "warning"]
-        self.assertEqual(len(warning_issues), 1)
-        self.assertEqual(warning_issues[0].artifact, "ADR-007")
-        self.assertIn("ADR-001", warning_issues[0].message)
+        assert len(warning_issues) == 1
+        assert warning_issues[0].artifact == "ADR-007"
+        assert "ADR-001" in warning_issues[0].message
 
     def test_validator_adr_mixed_validation_scenarios(self) -> None:
         """Test validator with mix of valid and invalid ADR scenarios in strict mode."""
@@ -306,11 +309,11 @@ class WorkspaceValidatorTest(RepoTestCase):
         warning_issues = [issue for issue in adr_issues if issue.level == "warning"]
 
         # Should have 2 errors (ADR-999 and ADR-888 missing)
-        self.assertEqual(len(error_issues), 2)
+        assert len(error_issues) == 2
         missing_refs = {issue.message.split()[-4] for issue in error_issues}
-        self.assertEqual(missing_refs, {"ADR-999", "ADR-888"})
+        assert missing_refs == {"ADR-999", "ADR-888"}
         # No warnings in non-strict mode
-        self.assertEqual(len(warning_issues), 0)
+        assert len(warning_issues) == 0
 
         # Strict mode: errors + warnings
         issues = validate_workspace(ws, strict=True)
@@ -323,11 +326,11 @@ class WorkspaceValidatorTest(RepoTestCase):
         warning_issues = [issue for issue in adr_issues if issue.level == "warning"]
 
         # Should still have 2 errors (ADR-999 and ADR-888 missing)
-        self.assertEqual(len(error_issues), 2)
+        assert len(error_issues) == 2
         # Should have 2 warnings (ADR-002 deprecated, referenced by ADR-004 and ADR-006)
-        self.assertEqual(len(warning_issues), 2)
+        assert len(warning_issues) == 2
         warning_artifacts = {issue.artifact for issue in warning_issues}
-        self.assertEqual(warning_artifacts, {"ADR-004", "ADR-006"})
+        assert warning_artifacts == {"ADR-004", "ADR-006"}
 
     def test_validator_adr_with_empty_related_decisions(self) -> None:
         """Test that validator handles ADRs with no related_decisions correctly."""
@@ -346,7 +349,7 @@ class WorkspaceValidatorTest(RepoTestCase):
             for issue in issues
             if "decision" in issue.message.lower() or issue.artifact.startswith("ADR")
         ]
-        self.assertEqual(len(adr_issues), 0)
+        assert len(adr_issues) == 0
 
 
 if __name__ == "__main__":

@@ -8,6 +8,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import pytest
+
 from supekku.scripts.lib.create_spec import (
     CreateSpecOptions,
     RepositoryRootNotFoundError,
@@ -58,20 +60,20 @@ class CreateSpecTest(unittest.TestCase):
             CreateSpecOptions(spec_type="tech", include_testing=True),
         )
 
-        self.assertEqual(result.spec_id, "SPEC-001")
-        self.assertTrue(result.test_path)
+        assert result.spec_id == "SPEC-001"
+        assert result.test_path
 
         frontmatter, body = load_markdown_file(result.spec_path)
-        self.assertEqual(frontmatter["name"], "Search Service")
-        self.assertEqual(frontmatter["status"], "draft")
-        self.assertEqual(frontmatter["kind"], "spec")
-        self.assertTrue(frontmatter["slug"].startswith("search"))
-        self.assertEqual(body, "# Tech Body\n")
+        assert frontmatter["name"] == "Search Service"
+        assert frontmatter["status"] == "draft"
+        assert frontmatter["kind"] == "spec"
+        assert frontmatter["slug"].startswith("search")
+        assert body == "# Tech Body\n"
 
         test_frontmatter, test_body = load_markdown_file(result.test_path)
-        self.assertTrue(test_frontmatter["id"].endswith(".TESTS"))
-        self.assertEqual(test_frontmatter["kind"], "guidance")
-        self.assertEqual(test_body, "# Test Body\n")
+        assert test_frontmatter["id"].endswith(".TESTS")
+        assert test_frontmatter["kind"] == "guidance"
+        assert test_body == "# Test Body\n"
 
     def test_create_product_spec_without_testing_doc(self) -> None:
         self._setup_repo()
@@ -81,14 +83,14 @@ class CreateSpecTest(unittest.TestCase):
             CreateSpecOptions(spec_type="product", include_testing=False),
         )
 
-        self.assertEqual(result.spec_id, "PROD-001")
-        self.assertIsNone(result.test_path)
+        assert result.spec_id == "PROD-001"
+        assert result.test_path is None
 
     def test_missing_templates_raise_error(self) -> None:
         root = self._setup_repo()
         (root / "supekku" / "templates" / "tech-spec-template.md").unlink()
 
-        with self.assertRaises(TemplateNotFoundError):
+        with pytest.raises(TemplateNotFoundError):
             create_spec("Missing Template", CreateSpecOptions())
 
     def test_repository_root_not_found(self) -> None:
@@ -96,15 +98,15 @@ class CreateSpecTest(unittest.TestCase):
         self.addCleanup(tmpdir.cleanup)
         os.chdir(tmpdir.name)
 
-        with self.assertRaises(RepositoryRootNotFoundError):
+        with pytest.raises(RepositoryRootNotFoundError):
             create_spec("No Repo", CreateSpecOptions())
 
     def test_json_output_matches_structure(self) -> None:
         self._setup_repo()
         result = create_spec("Example", CreateSpecOptions())
         payload = json.loads(result.to_json())
-        self.assertEqual(payload["id"], "SPEC-001")
-        self.assertIn("spec_file", payload)
+        assert payload["id"] == "SPEC-001"
+        assert "spec_file" in payload
 
 
 if __name__ == "__main__":

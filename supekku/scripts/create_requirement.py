@@ -32,13 +32,12 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    path = create_requirement_breakout(
+    create_requirement_breakout(
         args.spec,
         args.requirement,
         title=args.title,
         kind=args.kind,
     )
-    print(f"Created requirement file at {path}")
     return 0
 
 

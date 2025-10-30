@@ -1,13 +1,15 @@
-"""Multi-language specification synchronization engine.
-"""
+"""Multi-language specification synchronization engine."""
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .adapters import GoAdapter, LanguageAdapter, PythonAdapter, TypeScriptAdapter
 from .models import SourceUnit, SyncOutcome
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+    from pathlib import Path
 
 
 class SpecSyncEngine:
@@ -22,7 +24,7 @@ class SpecSyncEngine:
         repo_root: Path,
         tech_dir: Path,
         adapters: Mapping[str, LanguageAdapter] | None = None,
-    ):
+    ) -> None:
         """Initialize the multi-language spec sync engine.
 
         Args:

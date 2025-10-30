@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import os
 import unittest
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.spec_models import Spec
 from supekku.scripts.lib.spec_registry import SpecRegistry
 from supekku.scripts.lib.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class SpecRegistryTest(RepoTestCase):
@@ -55,20 +58,20 @@ class SpecRegistryTest(RepoTestCase):
         registry = SpecRegistry(root)
 
         spec = registry.get("SPEC-001")
-        self.assertIsInstance(spec, Spec)
-        self.assertEqual(spec.slug, "sample-tech")
-        self.assertEqual(spec.packages, ["internal/sample"])
+        assert isinstance(spec, Spec)
+        assert spec.slug == "sample-tech"
+        assert spec.packages == ["internal/sample"]
 
         prod = registry.get("PROD-001")
-        self.assertIsNotNone(prod)
-        self.assertEqual(prod.kind, "prod")
+        assert prod is not None
+        assert prod.kind == "prod"
 
     def test_find_by_package(self) -> None:
         root = self._make_repo()
         registry = SpecRegistry(root)
 
         matches = registry.find_by_package("internal/sample")
-        self.assertEqual([spec.id for spec in matches], ["SPEC-001"])
+        assert [spec.id for spec in matches] == ["SPEC-001"]
 
     def test_reload_refreshes_registry(self) -> None:
         root = self._make_repo()
@@ -89,7 +92,7 @@ class SpecRegistryTest(RepoTestCase):
         dump_markdown_file(new_spec, frontmatter, "# Extra\n")
 
         registry.reload()
-        self.assertIsNotNone(registry.get("SPEC-002"))
+        assert registry.get("SPEC-002") is not None
 
 
 if __name__ == "__main__":

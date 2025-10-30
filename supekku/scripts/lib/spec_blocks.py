@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 RELATIONSHIPS_MARKER = "supekku:spec.relationships@v1"
 RELATIONSHIPS_SCHEMA = "supekku.spec.relationships"
@@ -89,9 +91,11 @@ def extract_relationships(block: str) -> RelationshipsBlock | None:
     try:
         data = yaml.safe_load(raw) or {}
     except yaml.YAMLError as exc:  # pragma: no cover
-        raise ValueError(f"invalid relationships YAML: {exc}") from exc
+        msg = f"invalid relationships YAML: {exc}"
+        raise ValueError(msg) from exc
     if not isinstance(data, dict):
-        raise ValueError("relationships block must parse to mapping")
+        msg = "relationships block must parse to mapping"
+        raise ValueError(msg)
     return RelationshipsBlock(raw_yaml=raw, data=data)
 
 

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run pytest:*)",
+      "Bash(source .venv/bin/activate)",
+      "Bash(ruff check:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

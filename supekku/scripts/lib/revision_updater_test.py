@@ -44,7 +44,7 @@ requirements:
 """
 
 
-def test_update_requirement_lifecycle_status_updates_status():
+def test_update_requirement_lifecycle_status_updates_status() -> None:
     """Test successful status update."""
     with TemporaryDirectory() as tmpdir:
         revision_file = Path(tmpdir) / "RE-001.md"
@@ -67,7 +67,7 @@ def test_update_requirement_lifecycle_status_updates_status():
         assert "status: pending" not in content
 
 
-def test_update_requirement_lifecycle_status_returns_false_when_no_change():
+def test_update_requirement_lifecycle_status_returns_false_when_no_change() -> None:
     """Test that function returns False when status already matches."""
     with TemporaryDirectory() as tmpdir:
         revision_file = Path(tmpdir) / "RE-001.md"
@@ -85,7 +85,7 @@ def test_update_requirement_lifecycle_status_returns_false_when_no_change():
         assert changed is False
 
 
-def test_update_requirement_lifecycle_status_validates_status():
+def test_update_requirement_lifecycle_status_validates_status() -> None:
     """Test that invalid status values are rejected."""
     with TemporaryDirectory() as tmpdir:
         revision_file = Path(tmpdir) / "RE-001.md"
@@ -102,7 +102,7 @@ def test_update_requirement_lifecycle_status_validates_status():
             )
 
 
-def test_update_requirement_lifecycle_status_validates_requirement_id():
+def test_update_requirement_lifecycle_status_validates_requirement_id() -> None:
     """Test that mismatched requirement ID raises error."""
     with TemporaryDirectory() as tmpdir:
         revision_file = Path(tmpdir) / "RE-001.md"
@@ -119,7 +119,7 @@ def test_update_requirement_lifecycle_status_validates_requirement_id():
             )
 
 
-def test_update_requirement_lifecycle_status_validates_block_index():
+def test_update_requirement_lifecycle_status_validates_block_index() -> None:
     """Test that out-of-range block index raises error."""
     with TemporaryDirectory() as tmpdir:
         revision_file = Path(tmpdir) / "RE-001.md"
@@ -136,7 +136,7 @@ def test_update_requirement_lifecycle_status_validates_block_index():
             )
 
 
-def test_update_requirement_lifecycle_status_validates_requirement_index():
+def test_update_requirement_lifecycle_status_validates_requirement_index() -> None:
     """Test that out-of-range requirement index raises error."""
     with TemporaryDirectory() as tmpdir:
         revision_file = Path(tmpdir) / "RE-001.md"
@@ -155,7 +155,7 @@ def test_update_requirement_lifecycle_status_validates_requirement_index():
             )
 
 
-def test_update_requirement_lifecycle_status_creates_lifecycle_if_missing():
+def test_update_requirement_lifecycle_status_creates_lifecycle_if_missing() -> None:
     """Test that lifecycle section is created if it doesn't exist."""
     revision_without_lifecycle = """---
 id: RE-002

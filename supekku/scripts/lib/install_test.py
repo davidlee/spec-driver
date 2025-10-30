@@ -10,7 +10,7 @@ import yaml
 from supekku.scripts.install import get_package_root, initialize_workspace
 
 
-def test_get_package_root():
+def test_get_package_root() -> None:
     """Test that get_package_root returns the supekku directory."""
     root = get_package_root()
     assert root.name == "supekku"
@@ -18,7 +18,7 @@ def test_get_package_root():
     assert (root / "about").exists()
 
 
-def test_initialize_workspace_creates_directories(tmp_path: Path):
+def test_initialize_workspace_creates_directories(tmp_path: Path) -> None:
     """Test that initialize_workspace creates the expected directory structure."""
     initialize_workspace(tmp_path)
 
@@ -40,7 +40,7 @@ def test_initialize_workspace_creates_directories(tmp_path: Path):
         assert (tmp_path / dir_path).is_dir(), f"Directory {dir_path} not created"
 
 
-def test_initialize_workspace_creates_registry_files(tmp_path: Path):
+def test_initialize_workspace_creates_registry_files(tmp_path: Path) -> None:
     """Test that initialize_workspace creates registry files with correct content."""
     initialize_workspace(tmp_path)
 
@@ -63,7 +63,7 @@ def test_initialize_workspace_creates_registry_files(tmp_path: Path):
         assert content == expected_content, f"Registry {filename} has wrong content"
 
 
-def test_initialize_workspace_copies_templates(tmp_path: Path):
+def test_initialize_workspace_copies_templates(tmp_path: Path) -> None:
     """Test that initialize_workspace copies template files."""
     initialize_workspace(tmp_path)
 
@@ -78,7 +78,7 @@ def test_initialize_workspace_copies_templates(tmp_path: Path):
     assert (template_dir / "ADR.md").exists()
 
 
-def test_initialize_workspace_copies_about_files(tmp_path: Path):
+def test_initialize_workspace_copies_about_files(tmp_path: Path) -> None:
     """Test that initialize_workspace copies about documentation."""
     initialize_workspace(tmp_path)
 
@@ -90,7 +90,7 @@ def test_initialize_workspace_copies_about_files(tmp_path: Path):
     assert len(about_files) > 0, "No about files were copied"
 
 
-def test_initialize_workspace_copies_agents_when_claude_exists(tmp_path: Path):
+def test_initialize_workspace_copies_agents_when_claude_exists(tmp_path: Path) -> None:
     """Test that initialize_workspace copies agents if .claude exists."""
     # Create .claude directory before installing
     claude_dir = tmp_path / ".claude"
@@ -106,7 +106,7 @@ def test_initialize_workspace_copies_agents_when_claude_exists(tmp_path: Path):
     assert len(agent_files) > 0, "No agent files were copied"
 
 
-def test_initialize_workspace_skips_agents_when_no_claude(tmp_path: Path):
+def test_initialize_workspace_skips_agents_when_no_claude(tmp_path: Path) -> None:
     """Test that initialize_workspace skips agents if .claude doesn't exist."""
     initialize_workspace(tmp_path)
 
@@ -115,7 +115,7 @@ def test_initialize_workspace_skips_agents_when_no_claude(tmp_path: Path):
     assert not claude_dir.exists()
 
 
-def test_initialize_workspace_skips_existing_files(tmp_path: Path):
+def test_initialize_workspace_skips_existing_files(tmp_path: Path) -> None:
     """Test that initialize_workspace doesn't overwrite existing files."""
     registry_dir = tmp_path / "supekku" / "registry"
     registry_dir.mkdir(parents=True)
@@ -132,7 +132,7 @@ def test_initialize_workspace_skips_existing_files(tmp_path: Path):
     assert content == custom_content
 
 
-def test_initialize_workspace_fails_on_nonexistent_directory():
+def test_initialize_workspace_fails_on_nonexistent_directory() -> None:
     """Test that initialize_workspace exits if target directory doesn't exist."""
     nonexistent = Path("/tmp/definitely-does-not-exist-12345")
 

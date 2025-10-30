@@ -5,8 +5,7 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
@@ -23,8 +22,12 @@ from .revision_blocks import (
     load_revision_blocks,
 )
 from .spec_blocks import RelationshipsBlockValidator, extract_relationships
-from .spec_registry import SpecRegistry
 from .spec_utils import load_markdown_file
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from .spec_registry import SpecRegistry
 
 _REQUIREMENT_LINE = re.compile(
     r"^\s*[-*]\s*\*{0,2}\s*(FR|NF)-(\d{3})\s*\*{0,2}\s*[:\-–]\s*(.+)$",
@@ -50,7 +53,7 @@ class RequirementRecord:
 
     def merge(self, other: RequirementRecord) -> RequirementRecord:
         """Merge data from another record, preserving lifecycle fields."""
-        merged = RequirementRecord(
+        return RequirementRecord(
             uid=self.uid,
             label=self.label,
             title=other.title,
@@ -63,7 +66,6 @@ class RequirementRecord:
             verified_by=list(self.verified_by),
             path=other.path or self.path,
         )
-        return merged
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -699,19 +701,22 @@ class RequirementsRegistry:
         introduced_by: str | None = None,
     ) -> str:
         if uid not in self.records:
-            raise KeyError(f"Requirement {uid} not found")
+            msg = f"Requirement {uid} not found"
+            raise KeyError(msg)
         record = self.records.pop(uid)
         label = record.label
         new_uid = f"{new_spec_id}.{label}"
         if new_uid in self.records:
-            raise ValueError(f"Requirement {new_uid} already exists")
+            msg = f"Requirement {new_uid} already exists"
+            raise ValueError(msg)
 
         old_primary = record.primary_spec
 
         if spec_registry:
             spec = spec_registry.get(new_spec_id)
             if spec is None:
-                raise ValueError(f"Spec {new_spec_id} not found")
+                msg = f"Spec {new_spec_id} not found"
+                raise ValueError(msg)
             try:
                 record.path = spec.path.relative_to(spec_registry.root).as_posix()
             except ValueError:
@@ -757,7 +762,7 @@ class RequirementsRegistry:
             if verified_by and verified_by not in record.verified_by:
                 continue
             if query_norm:
-                haystack = " ".join([record.uid, record.label, record.title]).lower()
+                haystack = f"{record.uid} {record.label} {record.title}".lower()
                 if query_norm not in haystack:
                     continue
             results.append(record)
@@ -765,13 +770,15 @@ class RequirementsRegistry:
 
     def set_status(self, uid: str, status: RequirementStatus) -> None:
         if status not in VALID_STATUSES:
+            msg = f"Invalid status {status!r}; must be one of {sorted(VALID_STATUSES)}"
             raise ValueError(
-                f"Invalid status {status!r}; must be one of {sorted(VALID_STATUSES)}",
+                msg,
             )
         try:
             record = self.records[uid]
         except KeyError as exc:
-            raise KeyError(f"Requirement {uid} not found") from exc
+            msg = f"Requirement {uid} not found"
+            raise KeyError(msg) from exc
         record.status = status
 
 

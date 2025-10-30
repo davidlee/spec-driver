@@ -129,18 +129,15 @@ def main(argv: list[str] | None = None) -> int:
             continue
 
         # Print status header
-        print(f"## {status_key.upper()}")
-        print()
 
         # Print deltas
-        for delta in deltas:
+        for _delta in deltas:
             if args.details:
-                print(format_delta_with_details(delta))
+                pass
             else:
-                print(format_delta_basic(delta))
+                pass
 
         # Blank line between groups
-        print()
 
     return 0
 

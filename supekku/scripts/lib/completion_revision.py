@@ -133,11 +133,13 @@ def create_completion_revision(
     for req_id in requirements:
         req = req_registry.records.get(req_id)
         if not req:
-            raise ValueError(f"Requirement {req_id} not found in registry")
+            msg = f"Requirement {req_id} not found in registry"
+            raise ValueError(msg)
 
         spec_id = req.primary_spec or (req.specs[0] if req.specs else "")
         if not spec_id:
-            raise ValueError(f"Requirement {req_id} has no associated spec")
+            msg = f"Requirement {req_id} has no associated spec"
+            raise ValueError(msg)
 
         specs_set.add(spec_id)
         req_data.append((req_id, spec_id, req.title))

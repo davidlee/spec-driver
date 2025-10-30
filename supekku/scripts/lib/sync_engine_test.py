@@ -8,6 +8,8 @@ import unittest
 from pathlib import Path
 from subprocess import CompletedProcess
 
+import pytest
+
 from supekku.scripts.lib.spec_utils import load_markdown_file
 from supekku.scripts.lib.sync_engine import (
     GomarkdocNotAvailableError,
@@ -45,7 +47,8 @@ class TechSpecSyncEngineTest(unittest.TestCase):
             if cmd == ["go", "list", "./..."]:
                 stdout = "\n".join(run_packages) + ("\n" if run_packages else "")
                 return CompletedProcess(cmd, 0, stdout=stdout, stderr="")
-            raise AssertionError(f"Unexpected command: {cmd}")
+            msg = f"Unexpected command: {cmd}"
+            raise AssertionError(msg)
 
         def gomarkdoc() -> bool:
             return gomarkdoc_available
@@ -87,18 +90,15 @@ class TechSpecSyncEngineTest(unittest.TestCase):
 
             result = engine.synchronize(SyncOptions())
 
-            self.assertEqual(result.created_specs, {"internal/foo": "SPEC-001"})
-            self.assertEqual(len(generate_calls), 2)
-            self.assertIn(
-                (True, False),
-                {(call[2], call[3]) for call in generate_calls},
-            )
+            assert result.created_specs == {"internal/foo": "SPEC-001"}
+            assert len(generate_calls) == 2
+            assert (True, False) in {(call[2], call[3]) for call in generate_calls}
 
             spec_dir = root / "specify" / "tech" / "SPEC-001"
             spec_file = spec_dir / "SPEC-001.md"
-            self.assertTrue(spec_file.exists())
+            assert spec_file.exists()
             frontmatter, _ = load_markdown_file(spec_file)
-            self.assertIn("internal/foo", frontmatter.get("packages", []))
+            assert "internal/foo" in frontmatter.get("packages", [])
 
     def test_synchronize_check_mode_requires_existing_spec(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -128,12 +128,12 @@ class TechSpecSyncEngineTest(unittest.TestCase):
 
             result = engine.synchronize(SyncOptions(existing=True, check=True))
 
-            self.assertEqual(result.created_specs, {})
-            self.assertEqual(len(generate_calls), 0)
-            self.assertEqual(len(result.skipped_packages), 1)
+            assert result.created_specs == {}
+            assert len(generate_calls) == 0
+            assert len(result.skipped_packages) == 1
             skipped = result.skipped_packages[0]
-            self.assertEqual(skipped.package, "internal/foo")
-            self.assertEqual(skipped.reason, "missing spec stub")
+            assert skipped.package == "internal/foo"
+            assert skipped.reason == "missing spec stub"
 
     def test_synchronize_warns_when_gomarkdoc_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -155,11 +155,8 @@ class TechSpecSyncEngineTest(unittest.TestCase):
 
             result = engine.synchronize(SyncOptions())
 
-            self.assertEqual(
-                result.warnings,
-                ["gomarkdoc not found; documentation generation skipped"],
-            )
-            self.assertEqual(generate_calls, [])
+            assert result.warnings == ["gomarkdoc not found; documentation generation skipped"]
+            assert generate_calls == []
 
     def test_check_mode_raises_when_gomarkdoc_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -177,7 +174,7 @@ class TechSpecSyncEngineTest(unittest.TestCase):
                 registry_path=registry_path,
             )
 
-            with self.assertRaises(GomarkdocNotAvailableError):
+            with pytest.raises(GomarkdocNotAvailableError):
                 engine.synchronize(SyncOptions(check=True))
 
     def test_allow_missing_go_creates_spec(self) -> None:
@@ -203,11 +200,9 @@ class TechSpecSyncEngineTest(unittest.TestCase):
                 ),
             )
 
-            self.assertIn("concept/group", result.processed_packages)
+            assert "concept/group" in result.processed_packages
             spec_dir = root / "specify" / "tech"
-            self.assertTrue(
-                any(path.name.startswith("SPEC-") for path in spec_dir.iterdir()),
-            )
+            assert any(path.name.startswith("SPEC-") for path in spec_dir.iterdir())
 
 
 if __name__ == "__main__":

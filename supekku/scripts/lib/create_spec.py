@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import MutableMapping
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .spec_utils import dump_markdown_file
+
+if TYPE_CHECKING:
+    from collections.abc import MutableMapping
 
 
 @dataclass(frozen=True)
@@ -69,7 +72,8 @@ class SpecTemplateConfig:
 def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
     spec_name = spec_name.strip()
     if not spec_name:
-        raise SpecCreationError("spec name must be provided")
+        msg = "spec name must be provided"
+        raise SpecCreationError(msg)
 
     repo_root = find_repository_root(Path.cwd())
     today = date.today().isoformat()
@@ -140,8 +144,9 @@ def find_repository_root(start: Path) -> Path:
     for path in [start, *start.parents]:
         if (path / ".git").exists() or (path / "supekku" / "templates").exists():
             return path
+    msg = "Could not determine repository root (missing .git or supekku/templates)"
     raise RepositoryRootNotFoundError(
-        "Could not determine repository root (missing .git or supekku/templates)",
+        msg,
     )
 
 
@@ -164,7 +169,8 @@ def build_template_config(repo_root: Path, spec_type: str) -> SpecTemplateConfig
             template_path=templates_dir / "product-spec-template.md",
             testing_template_path=None,
         )
-    raise SpecCreationError(f"Unsupported spec type: {spec_type}")
+    msg = f"Unsupported spec type: {spec_type}"
+    raise SpecCreationError(msg)
 
 
 def determine_next_identifier(base_dir: Path, prefix: str) -> str:
@@ -184,13 +190,13 @@ def determine_next_identifier(base_dir: Path, prefix: str) -> str:
 
 
 def slugify(name: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
-    return slug
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
 def extract_template_body(path: Path) -> str:
     if not path.exists():
-        raise TemplateNotFoundError(f"Template not found: {path}")
+        msg = f"Template not found: {path}"
+        raise TemplateNotFoundError(msg)
     content = path.read_text(encoding="utf-8")
     match = re.search(r"```markdown\s*(.*?)```", content, re.DOTALL)
     if match:

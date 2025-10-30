@@ -42,7 +42,7 @@ class SpecIndexBuilder:
                 if entry.is_symlink() or entry.is_file():
                     entry.unlink()
             for entry in sorted(
-                set(p.parent for p in self.package_dir.glob("**/*") if p.is_dir()),
+                {p.parent for p in self.package_dir.glob("**/*") if p.is_dir()},
                 reverse=True,
             ):
                 if entry != self.package_dir and not any(entry.iterdir()):
@@ -56,7 +56,7 @@ class SpecIndexBuilder:
                 if entry.is_symlink() or entry.is_file():
                     entry.unlink()
             for entry in sorted(
-                set(p.parent for p in self.language_dir.glob("**/*") if p.is_dir()),
+                {p.parent for p in self.language_dir.glob("**/*") if p.is_dir()},
                 reverse=True,
             ):
                 if entry != self.language_dir and not any(entry.iterdir()):

@@ -220,3 +220,4 @@ __marimo__/
 !supekku/
 !supekku/**
 __pycache__
+/supekku/docs

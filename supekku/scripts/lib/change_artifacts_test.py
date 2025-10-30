@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.change_artifacts import load_change_artifact
 from supekku.scripts.lib.spec_utils import dump_markdown_file
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def _write_delta(tmp_path: Path, body: str) -> Path:
@@ -71,7 +74,8 @@ phases:
     }
     assert {r["type"] for r in artifact.relations} == {"introduces"}
     introduces = [r for r in artifact.relations if r["type"] == "introduces"]
-    assert introduces and introduces[0]["target"] == "RE-123"
+    assert introduces
+    assert introduces[0]["target"] == "RE-123"
 
 
 def test_plan_and_phase_overview_included(tmp_path: Path) -> None:

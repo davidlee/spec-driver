@@ -65,12 +65,12 @@ class RequirementsRegistryTest(unittest.TestCase):
         )
         registry.save()
 
-        self.assertEqual(stats.created, 2)
-        self.assertEqual(stats.updated, 0)
-        self.assertTrue(registry_path.exists())
+        assert stats.created == 2
+        assert stats.updated == 0
+        assert registry_path.exists()
         records = registry.search()
-        self.assertEqual(len(records), 2)
-        self.assertEqual(records[0].status, STATUS_PENDING)
+        assert len(records) == 2
+        assert records[0].status == STATUS_PENDING
 
     def _create_change_bundle(
         self, root: Path, bundle: str, file_id: str, kind: str,
@@ -122,20 +122,14 @@ class RequirementsRegistryTest(unittest.TestCase):
         registry.save()
 
         record = registry.records["SPEC-001.FR-001"]
-        self.assertEqual(record.implemented_by, ["DE-001"])
-        self.assertEqual(record.introduced, "RE-001")
-        self.assertEqual(record.verified_by, ["AUD-001"])
+        assert record.implemented_by == ["DE-001"]
+        assert record.introduced == "RE-001"
+        assert record.verified_by == ["AUD-001"]
 
         results = registry.search(implemented_by="DE-001")
-        self.assertEqual([r.uid for r in results], ["SPEC-001.FR-001"])
-        self.assertEqual(
-            [r.uid for r in registry.search(introduced_by="RE-001")],
-            ["SPEC-001.FR-001"],
-        )
-        self.assertEqual(
-            [r.uid for r in registry.search(verified_by="AUD-001")],
-            ["SPEC-001.FR-001"],
-        )
+        assert [r.uid for r in results] == ["SPEC-001.FR-001"]
+        assert [r.uid for r in registry.search(introduced_by="RE-001")] == ["SPEC-001.FR-001"]
+        assert [r.uid for r in registry.search(verified_by="AUD-001")] == ["SPEC-001.FR-001"]
 
     def test_sync_preserves_status(self) -> None:
         root = self._make_repo()
@@ -161,8 +155,8 @@ class RequirementsRegistryTest(unittest.TestCase):
         )
         registry.save()
 
-        self.assertEqual(stats.created, 1)
-        self.assertEqual(registry.records["SPEC-001.FR-001"].status, STATUS_LIVE)
+        assert stats.created == 1
+        assert registry.records["SPEC-001.FR-001"].status == STATUS_LIVE
 
     def test_search_filters(self) -> None:
         root = self._make_repo()
@@ -174,8 +168,8 @@ class RequirementsRegistryTest(unittest.TestCase):
         )
 
         results = registry.search(query="non functional")
-        self.assertEqual(len(results), 1)
-        self.assertTrue(results[0].label.startswith("NF-"))
+        assert len(results) == 1
+        assert results[0].label.startswith("NF-")
 
     def test_move_requirement_updates_primary_spec(self) -> None:
         root = self._make_repo()
@@ -199,11 +193,11 @@ class RequirementsRegistryTest(unittest.TestCase):
         )
         registry.save()
 
-        self.assertNotIn("SPEC-001.FR-001", registry.records)
-        self.assertEqual(new_uid, "SPEC-002.FR-001")
+        assert "SPEC-001.FR-001" not in registry.records
+        assert new_uid == "SPEC-002.FR-001"
         moved = registry.records[new_uid]
-        self.assertEqual(moved.primary_spec, "SPEC-002")
-        self.assertEqual(moved.path, "specify/tech/spec-002-example/SPEC-002.md")
+        assert moved.primary_spec == "SPEC-002"
+        assert moved.path == "specify/tech/spec-002-example/SPEC-002.md"
 
     def test_relationship_block_adds_collaborators(self) -> None:
         root = self._make_repo()
@@ -234,9 +228,9 @@ interactions: []
         )
 
         record = registry.records["SPEC-001.FR-001"]
-        self.assertEqual(record.primary_spec, "SPEC-001")
-        self.assertIn("SPEC-002", record.specs)
-        self.assertIn("SPEC-001", record.specs)
+        assert record.primary_spec == "SPEC-001"
+        assert "SPEC-002" in record.specs
+        assert "SPEC-001" in record.specs
 
     def test_delta_relationships_block_marks_implemented_by(self) -> None:
         root = self._make_repo()
@@ -289,7 +283,7 @@ interactions: []
         )
 
         record = registry.records["SPEC-001.FR-001"]
-        self.assertIn("DE-002", record.implemented_by)
+        assert "DE-002" in record.implemented_by
 
     def _write_revision_with_block(
         self,
@@ -371,14 +365,14 @@ requirements:
         )
         registry.save()
 
-        self.assertGreaterEqual(stats.updated, 1)
-        self.assertNotIn("SPEC-001.FR-001", registry.records)
+        assert stats.updated >= 1
+        assert "SPEC-001.FR-001" not in registry.records
         record = registry.records["SPEC-002.FR-001"]
-        self.assertEqual(record.primary_spec, "SPEC-002")
-        self.assertEqual(record.specs, ["SPEC-002", "SPEC-003"])
-        self.assertEqual(record.status, "in-progress")
-        self.assertEqual(record.introduced, "RE-002")
-        self.assertEqual(record.path, "specify/tech/spec-002-example/SPEC-002.md")
+        assert record.primary_spec == "SPEC-002"
+        assert record.specs == ["SPEC-002", "SPEC-003"]
+        assert record.status == "in-progress"
+        assert record.introduced == "RE-002"
+        assert record.path == "specify/tech/spec-002-example/SPEC-002.md"
 
 
 if __name__ == "__main__":

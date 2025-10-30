@@ -9,7 +9,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from ..lib.docs.python import VariantSpec, generate_docs
+from supekku.scripts.lib.docs.python import VariantSpec, generate_docs
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -59,31 +59,24 @@ def create_parser() -> argparse.ArgumentParser:
 
 def _handle_error_result(result) -> int:
     """Handle error result and return error count."""
-    print(f"✗ {result.module_identifier}: {result.error_message}", file=sys.stderr)
     return 1
 
 
 def _handle_check_result(result) -> int:
     """Handle check mode result and return error count."""
     if result.status == "unchanged":
-        print(f"✓ {result.path.name}: check passed")
         return 0
 
-    print(
-        f"✗ {result.path.name}: check failed (would be {result.status})",
-        file=sys.stderr,
-    )
     return 1
 
 
 def _handle_normal_result(result) -> tuple:
     """Handle normal result and return (created, changed, unchanged) counts."""
-    status_symbol = {
+    {
         "created": "+",
         "changed": "~",
         "unchanged": "=",
     }[result.status]
-    print(f"{status_symbol} {result.path.name}: {result.status}")
 
     counts = {"created": 0, "changed": 0, "unchanged": 0}
     counts[result.status] = 1
@@ -97,7 +90,7 @@ def _print_summary(
     if not results or any(hasattr(r, "check") and r.check for r in results):
         return
 
-    total = len(results)
+    len(results)
     summary_parts = []
     if created_count:
         summary_parts.append(f"{created_count} created")
@@ -106,8 +99,7 @@ def _print_summary(
     if unchanged_count:
         summary_parts.append(f"{unchanged_count} unchanged")
 
-    summary = ", ".join(summary_parts)
-    print(f"\nSummary: {summary} ({total} files total)")
+    ", ".join(summary_parts)
 
 
 def format_status_output(results: list) -> None:
@@ -162,14 +154,11 @@ def main() -> None:
         # Process results and show output
         format_status_output(results)
 
-    except FileNotFoundError as e:
-        print(f"Error: File not found - {e}", file=sys.stderr)
+    except FileNotFoundError:
         sys.exit(1)
-    except PermissionError as e:
-        print(f"Error: Permission denied - {e}", file=sys.stderr)
+    except PermissionError:
         sys.exit(1)
-    except ValueError as e:
-        print(f"Error: Invalid input - {e}", file=sys.stderr)
+    except ValueError:
         sys.exit(1)
 
 

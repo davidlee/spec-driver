@@ -26,7 +26,7 @@ from supekku.scripts.lib.docs.python import (
 def check_mode_comparison(
     existing_file: Path, new_content: str,
 ) -> tuple[bool, str, str]:
-    """Compare existing file with new content. Returns (is_same, existing_hash, new_hash)"""
+    """Compare existing file with new content. Returns (is_same, existing_hash, new_hash)."""
     new_hash = calculate_content_hash(new_content)
 
     if not existing_file.exists():
@@ -40,7 +40,7 @@ def check_mode_comparison(
 
 
 def write_mode_comparison(output_file: Path, new_content: str) -> tuple[str, str, str]:
-    """Write file and return status. Returns (status, old_hash, new_hash)"""
+    """Write file and return status. Returns (status, old_hash, new_hash)."""
     new_hash = calculate_content_hash(new_content)
 
     if not output_file.exists():
@@ -134,7 +134,7 @@ def print_summary(results: list[DocResult], check_mode: bool = False) -> None:
         print(f"Errors: {error_count}")
 
 
-def main():
+def main() -> None:
     """Main CLI entry point using the refactored API."""
     parser = argparse.ArgumentParser(
         description="Generate deterministic Python module documentation",

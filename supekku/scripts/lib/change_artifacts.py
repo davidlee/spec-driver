@@ -3,14 +3,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .change_lifecycle import VALID_STATUSES, normalize_status
 from .delta_blocks import DeltaRelationshipsValidator, extract_delta_relationships
 from .plan_blocks import extract_phase_overview, extract_plan_overview
 from .relations import list_relations
 from .spec_utils import load_markdown_file
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -59,8 +61,9 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
     # Validate status against known values
     if status and status not in VALID_STATUSES:
         valid_list = ", ".join(sorted(VALID_STATUSES))
+        msg = f"Invalid status '{status}' in {path}\nValid statuses: {valid_list}"
         raise ValueError(
-            f"Invalid status '{status}' in {path}\nValid statuses: {valid_list}",
+            msg,
         )
 
     name = str(frontmatter.get("name", artifact_id))

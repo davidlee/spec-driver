@@ -18,7 +18,7 @@ from supekku.scripts.lib.ast_doc_test_fixtures import SIMPLE_CLASS, TEST_MODULE
 class JustfileIntegrationTest(unittest.TestCase):
     """Test justfile command integration for AST documentation."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -40,7 +40,7 @@ class JustfileIntegrationTest(unittest.TestCase):
         self.docs_dir = self.temp_path / "docs" / "deterministic"
         self.docs_dir.mkdir(parents=True)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Clean up test environment."""
         os.chdir(self.original_cwd)
 
@@ -64,62 +64,59 @@ class JustfileIntegrationTest(unittest.TestCase):
 
         return subprocess.run(cmd, capture_output=True, text=True, check=False)
 
-    def test_docs_deterministic_public_command(self):
+    def test_docs_deterministic_public_command(self) -> None:
         """Test the docs-deterministic-public equivalent command."""
         result = self._run_ast_generator("public")
 
         # Should succeed
-        self.assertEqual(result.returncode, 0, f"Command failed: {result.stderr}")
+        assert result.returncode == 0, f"Command failed: {result.stderr}"
 
         # Should create public documentation files
         expected_file = self.docs_dir / "calculator-public.md"
         if expected_file.exists():
             content = expected_file.read_text()
-            self.assertIn("Calculator", content)
+            assert "Calculator" in content
             # Should not include private methods in public docs
-            self.assertNotIn("_private_method", content)
+            assert "_private_method" not in content
 
-    def test_docs_deterministic_all_command(self):
+    def test_docs_deterministic_all_command(self) -> None:
         """Test the docs-deterministic-all equivalent command."""
         result = self._run_ast_generator("all")
 
         # Should succeed
-        self.assertEqual(result.returncode, 0, f"Command failed: {result.stderr}")
+        assert result.returncode == 0, f"Command failed: {result.stderr}"
 
         # Check output indicates file creation/changes
         output = result.stdout
-        self.assertTrue(
-            "created" in output or "changed" in output or "unchanged" in output,
-            f"Expected status indicators in output: {output}",
-        )
+        assert "created" in output or "changed" in output or "unchanged" in output, f"Expected status indicators in output: {output}"
 
-    def test_docs_deterministic_tests_command(self):
+    def test_docs_deterministic_tests_command(self) -> None:
         """Test the docs-deterministic-tests equivalent command."""
         result = self._run_ast_generator("tests")
 
         # Should succeed
-        self.assertEqual(result.returncode, 0, f"Command failed: {result.stderr}")
+        assert result.returncode == 0, f"Command failed: {result.stderr}"
 
         # Should only process test files
         expected_file = self.docs_dir / "calculator_test-tests.md"
         if expected_file.exists():
             content = expected_file.read_text()
-            self.assertIn("TestCalculator", content)
+            assert "TestCalculator" in content
 
-    def test_docs_check_mode_up_to_date(self):
+    def test_docs_check_mode_up_to_date(self) -> None:
         """Test check mode when documentation is current."""
         # First generate current documentation
         result = self._run_ast_generator("public")
-        self.assertEqual(result.returncode, 0)
+        assert result.returncode == 0
 
         # Then check if it's up to date (should pass)
         result = self._run_ast_generator("public", check=True)
-        self.assertEqual(result.returncode, 0, f"Check mode failed: {result.stderr}")
+        assert result.returncode == 0, f"Check mode failed: {result.stderr}"
 
         output = result.stdout
-        self.assertIn("✓", output, f"Expected success indicator in output: {output}")
+        assert "✓" in output, f"Expected success indicator in output: {output}"
 
-    def test_docs_check_mode_outdated(self):
+    def test_docs_check_mode_outdated(self) -> None:
         """Test check mode when documentation is outdated."""
         # First ensure the docs directory exists in the temp location
         docs_dir = self.temp_path / "supekku" / "docs" / "deterministic"
@@ -146,29 +143,25 @@ class JustfileIntegrationTest(unittest.TestCase):
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
 
         # Check mode should fail when docs are outdated
-        self.assertNotEqual(
-            result.returncode,
-            0,
-            f"Check mode should fail for outdated docs. Output: {result.stdout}, Stderr: {result.stderr}",
-        )
+        assert result.returncode != 0, f"Check mode should fail for outdated docs. Output: {result.stdout}, Stderr: {result.stderr}"
 
         output = result.stdout
-        self.assertIn("✗", output, f"Expected failure indicator in output: {output}")
+        assert "✗" in output, f"Expected failure indicator in output: {output}"
 
-    def test_deterministic_output_consistency(self):
+    def test_deterministic_output_consistency(self) -> None:
         """Test that running the same command twice produces identical output."""
         # Run the generator twice
         result1 = self._run_ast_generator("all")
         result2 = self._run_ast_generator("all")
 
         # Both should succeed
-        self.assertEqual(result1.returncode, 0)
-        self.assertEqual(result2.returncode, 0)
+        assert result1.returncode == 0
+        assert result2.returncode == 0
 
         # The second run should show files as "unchanged"
-        self.assertIn("unchanged", result2.stdout)
+        assert "unchanged" in result2.stdout
 
-    def test_invalid_type_parameter(self):
+    def test_invalid_type_parameter(self) -> None:
         """Test handling of invalid documentation type."""
         project_root = Path(__file__).parent.parent.parent.parent
         os.chdir(project_root)
@@ -183,10 +176,10 @@ class JustfileIntegrationTest(unittest.TestCase):
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
 
         # Should fail with appropriate error
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("invalid", result.stderr.lower())
+        assert result.returncode != 0
+        assert "invalid" in result.stderr.lower()
 
-    def test_nonexistent_package_directory(self):
+    def test_nonexistent_package_directory(self) -> None:
         """Test handling of nonexistent package directory."""
         project_root = Path(__file__).parent.parent.parent.parent
         os.chdir(project_root)
@@ -202,13 +195,13 @@ class JustfileIntegrationTest(unittest.TestCase):
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
 
         # Should fail gracefully
-        self.assertNotEqual(result.returncode, 0)
+        assert result.returncode != 0
 
 
 class EndToEndWorkflowTest(unittest.TestCase):
     """Test the complete end-to-end workflow scenarios."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -216,11 +209,11 @@ class EndToEndWorkflowTest(unittest.TestCase):
 
         self.original_cwd = os.getcwd()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Clean up test environment."""
         os.chdir(self.original_cwd)
 
-    def test_complete_documentation_workflow(self):
+    def test_complete_documentation_workflow(self) -> None:
         """Test the complete workflow from code to documentation."""
         # Create a realistic package
         package_dir = self.temp_path / "my_project" / "lib"
@@ -253,16 +246,11 @@ CONSTANT_VALUE = 42
             ]
             result = subprocess.run(cmd, capture_output=True, text=True, check=False)
 
-            self.assertEqual(
-                result.returncode, 0, f"Failed for type {doc_type}: {result.stderr}",
-            )
+            assert result.returncode == 0, f"Failed for type {doc_type}: {result.stderr}"
 
             # Check that appropriate status messages are shown
             output = result.stdout
-            self.assertTrue(
-                any(indicator in output for indicator in ["+", "~", "="]),
-                f"No status indicators found in output for {doc_type}: {output}",
-            )
+            assert any(indicator in output for indicator in ["+", "~", "="]), f"No status indicators found in output for {doc_type}: {output}"
 
         # Verify check mode passes for all generated docs
         for doc_type in ["public", "all", "tests"]:
@@ -276,13 +264,9 @@ CONSTANT_VALUE = 42
             ]
             result = subprocess.run(cmd, capture_output=True, text=True, check=False)
 
-            self.assertEqual(
-                result.returncode,
-                0,
-                f"Check failed for type {doc_type}: {result.stderr}",
-            )
+            assert result.returncode == 0, f"Check failed for type {doc_type}: {result.stderr}"
 
-    def test_development_workflow_simulation(self):
+    def test_development_workflow_simulation(self) -> None:
         """Simulate a typical development workflow with documentation updates."""
         # Create initial package
         package_dir = self.temp_path / "evolving_project"
@@ -312,15 +296,9 @@ class MyClass:
             "public",
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-        self.assertEqual(result.returncode, 0)
+        assert result.returncode == 0
         # The first run should show status output (created, changed, or unchanged)
-        self.assertTrue(
-            any(
-                status in result.stdout
-                for status in ["created", "changed", "unchanged"]
-            ),
-            f"Expected status indicator in output: {result.stdout}",
-        )
+        assert any(status in result.stdout for status in ["created", "changed", "unchanged"]), f"Expected status indicator in output: {result.stdout}"
 
         # Verify check mode passes
         cmd = [
@@ -332,7 +310,7 @@ class MyClass:
             "--check",
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-        self.assertEqual(result.returncode, 0)
+        assert result.returncode == 0
 
         # Modify the code (add new method)
         updated_code = '''
@@ -360,8 +338,8 @@ class MyClass:
             "--check",
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("✗", result.stdout)
+        assert result.returncode != 0
+        assert "✗" in result.stdout
 
         # Regenerate documentation
         cmd = [
@@ -372,8 +350,8 @@ class MyClass:
             "public",
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-        self.assertEqual(result.returncode, 0)
-        self.assertIn("changed", result.stdout)
+        assert result.returncode == 0
+        assert "changed" in result.stdout
 
         # Check mode should now pass again
         cmd = [
@@ -385,7 +363,7 @@ class MyClass:
             "--check",
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
-        self.assertEqual(result.returncode, 0)
+        assert result.returncode == 0
 
 
 if __name__ == "__main__":

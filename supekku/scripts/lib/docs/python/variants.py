@@ -19,8 +19,9 @@ class VariantCoordinator:
     def get_preset(cls, name: str) -> VariantSpec:
         """Get a predefined variant preset by name."""
         if name not in cls.PRESETS:
+            msg = f"Unknown variant preset: {name}. Available: {list(cls.PRESETS.keys())}"
             raise ValueError(
-                f"Unknown variant preset: {name}. Available: {list(cls.PRESETS.keys())}",
+                msg,
             )
         return cls.PRESETS[name]
 
@@ -31,7 +32,8 @@ class VariantCoordinator:
             return [path]
 
         if not path.is_dir():
-            raise FileNotFoundError(f"Path does not exist: {path}")
+            msg = f"Path does not exist: {path}"
+            raise FileNotFoundError(msg)
 
         if variant_spec.variant_type == VariantType.TESTS:
             # For tests variant, only include test files

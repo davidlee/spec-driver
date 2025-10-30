@@ -33,13 +33,8 @@ def run_spec_sync() -> bool:
             text=True,
             check=False,
         )
-        if result.returncode == 0:
-            print("✓ Spec sync complete")
-            return True
-        print(f"✗ Spec sync failed:\n{result.stderr}", file=sys.stderr)
-        return False
-    except Exception as exc:  # pylint: disable=broad-except
-        print(f"✗ Spec sync error: {exc}", file=sys.stderr)
+        return result.returncode == 0
+    except Exception:  # pylint: disable=broad-except
         return False
 
 
@@ -54,7 +49,6 @@ def prompt_yes_no(question: str, default: bool = False) -> bool:
             return True
         if response in ("n", "no"):
             return False
-        print("Please answer 'y' or 'n'")
 
 
 def validate_delta_status(
@@ -67,15 +61,9 @@ def validate_delta_status(
     if delta.status == "completed":
         return True, True
 
-    if delta.status != "draft":
-        print(
-            f"Warning: Delta {delta_id} has status '{delta.status}' (expected 'draft')",
-            file=sys.stderr,
-        )
-        if not force and not dry_run:
-            if not prompt_yes_no("Continue anyway?", default=False):
-                print("Aborted.", file=sys.stderr)
-                return False, False
+    if delta.status != "draft" and not force and not dry_run:
+        if not prompt_yes_no("Continue anyway?", default=False):
+            return False, False
     return True, False
 
 
@@ -86,10 +74,7 @@ def collect_requirements_to_update(delta_id: str, delta, workspace):
     """
     req_ids = delta.applies_to.get("requirements", [])
     if not req_ids:
-        print(
-            f"Warning: Delta {delta_id} has no associated requirements",
-            file=sys.stderr,
-        )
+        pass
 
     requirements_registry = workspace.requirements
     requirements_to_update = []
@@ -97,37 +82,23 @@ def collect_requirements_to_update(delta_id: str, delta, workspace):
     for req_id in req_ids:
         req = requirements_registry.records.get(req_id)
         if not req:
-            print(
-                f"Warning: Requirement {req_id} not found in registry", file=sys.stderr,
-            )
             continue
         if req.status == "retired":
-            print(
-                f"Error: Requirement {req_id} is retired and cannot be updated",
-                file=sys.stderr,
-            )
             return None, True
         requirements_to_update.append((req_id, req))
 
     return requirements_to_update, False
 
 
-def display_preview(delta_id: str, delta, requirements_to_update, dry_run: bool):
+def display_preview(delta_id: str, delta, requirements_to_update, dry_run: bool) -> None:
     """Display preview of changes to be made."""
-    print()
     if dry_run:
-        print("[Preview only - no changes will be made]")
-        print()
+        pass
 
-    print(f"Delta: {delta_id} - {delta.name}")
-    print(f"Current status: {delta.status}")
-    print()
 
     if requirements_to_update:
-        print("This delta implements:")
-        for req_id, req in requirements_to_update:
-            print(f"  - {req_id} ({req.status})")
-        print()
+        for _req_id, _req in requirements_to_update:
+            pass
 
 
 def prompt_spec_sync(skip_sync: bool, dry_run: bool, force: bool) -> bool:
@@ -138,47 +109,33 @@ def prompt_spec_sync(skip_sync: bool, dry_run: bool, force: bool) -> bool:
     if skip_sync or dry_run:
         return True
 
-    print("Pre-completion checklist:")
-    print("  [ ] Have you synced specs to ensure contracts match implementation?")
-    print("      Run: just supekku::sync-specs")
-    print()
 
     if not force:
         sync_now = prompt_yes_no("Sync specs now?", default=False)
-        if sync_now:
-            print("\nSyncing specifications...")
-            if not run_spec_sync():
-                print("\nError: Spec sync failed. Aborting.", file=sys.stderr)
-                return False
-            print()
+        if sync_now and not run_spec_sync():
+            return False
     return True
 
 
-def display_actions(delta, requirements_to_update, update_requirements: bool):
+def display_actions(delta, requirements_to_update, update_requirements: bool) -> None:
     """Display actions that will be performed."""
-    print("Actions:")
-    print(f"  ✓ Update delta status: {delta.status} → completed")
     if update_requirements and requirements_to_update:
-        count = len(requirements_to_update)
-        print(f"  ✓ Update {count} requirement(s) → live")
+        len(requirements_to_update)
     elif requirements_to_update:
-        print(f"  ✓ Sync {len(requirements_to_update)} requirement(s) in registry")
-    print()
+        pass
 
 
-def display_dry_run_requirements(requirements_to_update, update_requirements: bool):
+def display_dry_run_requirements(requirements_to_update, update_requirements: bool) -> None:
     """Display requirements that would be updated in dry-run mode."""
     if not requirements_to_update:
         return
 
     if update_requirements:
-        print("Requirements to update:")
-        for req_id, req in requirements_to_update:
-            print(f"  - {req_id}: {req.status} → live")
+        for _req_id, _req in requirements_to_update:
+            pass
     else:
-        print("Requirements to sync in registry:")
-        for req_id, req in requirements_to_update:
-            print(f"  - {req_id} (current: {req.status})")
+        for _req_id, _req in requirements_to_update:
+            pass
 
 
 def update_delta_frontmatter(delta_path: Path, delta_id: str) -> bool:
@@ -187,7 +144,6 @@ def update_delta_frontmatter(delta_path: Path, delta_id: str) -> bool:
     Returns True if successful, False otherwise.
     """
     if not delta_path.exists():
-        print(f"Error: Delta file not found: {delta_path}", file=sys.stderr)
         return False
 
     content = delta_path.read_text(encoding="utf-8")
@@ -211,27 +167,23 @@ def update_delta_frontmatter(delta_path: Path, delta_id: str) -> bool:
             updated_lines.append(line)
 
     if not status_updated:
-        print(
-            f"Warning: Could not find 'status:' field in {delta_path}", file=sys.stderr,
-        )
         return False
 
     # Write updated delta file
     delta_path.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
-    print(f"✓ Updated delta {delta_id} → completed")
     return True
 
 
 def update_requirements_status(
     requirements_to_update, requirements_registry, silent=False,
-):
+) -> None:
     """Update requirement statuses to live (registry only - ephemeral)."""
     for req_id, _req in requirements_to_update:
         requirements_registry.set_status(req_id, STATUS_LIVE)
 
     requirements_registry.save()
     if requirements_to_update and not silent:
-        print(f"✓ Updated {len(requirements_to_update)} requirement(s) → live")
+        pass
 
 
 # pylint: disable=too-many-locals,too-many-branches
@@ -266,30 +218,21 @@ def update_requirements_in_revision_sources(
                 files_map[source.revision_file] = []
             files_map[source.revision_file].append(req_id)
 
-        print("\nRequirements in existing revisions:")
-        for rev_file, reqs in sorted(files_map.items(), key=lambda x: x[0].name):
-            print(f"  {rev_file.name}:")
+        for _rev_file, reqs in sorted(files_map.items(), key=lambda x: x[0].name):
             for req_id in reqs:
-                current_status = workspace.requirements.records[req_id].status
-                print(f"    - {req_id}: {current_status} → live")
+                workspace.requirements.records[req_id].status
 
     if untracked:
-        print(f"\n{len(untracked)} requirement(s) without lifecycle tracking:")
         for req_id in sorted(untracked):
-            print(f"  - {req_id}")
-        print(f"\nWill create new revision documenting {delta_id} completion")
+            pass
 
-    print()
 
     if dry_run:
-        print("[Dry-run mode] No changes will be made.")
         return True
 
     if not force and not prompt_yes_no("Proceed with updates?", default=True):
-        print("Aborted.")
         return False
 
-    print()
 
     # Update tracked requirements in revision files
     if tracked:
@@ -304,28 +247,22 @@ def update_requirements_in_revision_sources(
                     requirement_index=source.requirement_index,
                 )
                 if changed:
-                    print(f"  ✓ Updated {req_id} in {source.revision_file.name}")
-        except RevisionUpdateError as exc:
-            print(f"\n✗ Error updating revision files: {exc}", file=sys.stderr)
+                    pass
+        except RevisionUpdateError:
             return False
 
         if tracked:
-            print(f"✓ Updated {len(tracked)} requirement(s) in revision files")
+            pass
 
     # Create completion revision for untracked requirements
     if untracked:
         try:
-            new_revision_id = create_completion_revision(
+            create_completion_revision(
                 delta_id=delta_id,
                 requirements=sorted(untracked),
                 workspace=workspace,
             )
-            print(f"✓ Created {new_revision_id} for {len(untracked)} requirement(s)")
-        except (ValueError, OSError) as exc:
-            print(
-                f"\n✗ Error creating completion revision: {exc}",
-                file=sys.stderr,
-            )
+        except (ValueError, OSError):
             return False
 
     return True
@@ -346,9 +283,6 @@ def handle_already_completed_delta(
     Ensures requirements are in the correct state (idempotent operation).
     Returns exit code.
     """
-    print(f"Delta {delta_id} is already completed.")
-    print()
-
     # Check if requirements need fixing
     needs_fixing = [
         (req_id, req)
@@ -357,24 +291,17 @@ def handle_already_completed_delta(
     ]
 
     if not needs_fixing:
-        print("All requirements are already in 'live' status.")
-        print("Nothing to do.")
         return 0
 
-    print(f"Found {len(needs_fixing)} requirement(s) not in 'live' status:")
-    for req_id, req in needs_fixing:
-        print(f"  - {req_id}: {req.status}")
-    print()
+    for _req_id, _req in needs_fixing:
+        pass
 
     if dry_run:
-        print("[Dry-run mode] Would update requirements to 'live' status.")
         return 0
 
     if not force:
         if not prompt_yes_no("Update requirements to 'live' status?", default=True):
-            print("No changes made.")
             return 0
-        print()
 
     # Use persistent updates if flag is set, otherwise registry-only
     if update_requirements:
@@ -387,19 +314,13 @@ def handle_already_completed_delta(
             force=True,  # Already confirmed above
         )
         if not success:
-            print("\n✗ Failed to update revision sources", file=sys.stderr)
             return 1
 
         # Sync from source files
-        print("\nSyncing requirements from source files...")
         workspace.sync_requirements()
-        print("✓ Requirements synchronized from revision sources")
     else:
         # Old behavior: registry-only (ephemeral)
         update_requirements_status(needs_fixing, workspace.requirements, silent=True)
-        print(f"✓ Updated {len(needs_fixing)} requirement(s) → live (registry only)")
-        print()
-        print("Requirements synchronized successfully.")
 
     return 0
 
@@ -437,9 +358,7 @@ def complete_delta(
     delta_artifacts = delta_registry.collect()
 
     if delta_id not in delta_artifacts:
-        print(f"Error: Delta {delta_id} not found", file=sys.stderr)
-        available = ", ".join(sorted(delta_artifacts.keys()))
-        print(f"Available deltas: {available}", file=sys.stderr)
+        ", ".join(sorted(delta_artifacts.keys()))
         return 1
 
     delta = delta_artifacts[delta_id]
@@ -485,11 +404,8 @@ def complete_delta(
         return 0
 
     # Confirm unless force mode
-    if not force:
-        if not prompt_yes_no("Proceed with completion?", default=False):
-            print("Aborted.", file=sys.stderr)
-            return 1
-        print()
+    if not force and not prompt_yes_no("Proceed with completion?", default=False):
+        return 1
 
     # Update requirement statuses if flag is set
     # NEW: Persist to revision source files instead of just registry
@@ -503,14 +419,10 @@ def complete_delta(
             force=force,
         )
         if not success:
-            print("\n✗ Failed to update revision sources", file=sys.stderr)
             return 1
 
         # Sync requirements from source files to pick up changes
-        print("\nSyncing requirements from source files...")
         workspace.sync_requirements()
-        print("✓ Requirements synchronized from revision sources")
-        print()
 
     # Perform delta updates
     if not update_delta_frontmatter(delta.path, delta_id):
@@ -518,14 +430,11 @@ def complete_delta(
 
     # Sync delta registry to reflect changes
     delta_registry.sync()
-    print("✓ Validated workspace consistency")
-    print()
 
     if update_requirements:
-        print(f"Delta {delta_id} completed successfully.")
-        print("All requirement lifecycle changes persisted to revision files.")
+        pass
     else:
-        print(f"Delta {delta_id} marked as completed (requirements not updated).")
+        pass
 
     return 0
 

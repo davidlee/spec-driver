@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .spec_utils import dump_markdown_file, load_markdown_file
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping
 
 BACKLOG_ID_PATTERN = re.compile(r"^(ISSUE|IMPR|PROB|RISK)-(\d{3,})\.md$")
 
@@ -70,8 +73,9 @@ def find_repo_root(start: Path | None = None) -> Path:
     for candidate in [current, *current.parents]:
         if (candidate / ".git").exists() or (candidate / "supekku").exists():
             return candidate
+    msg = "Could not locate repository root (missing .git or supekku directory)"
     raise RuntimeError(
-        "Could not locate repository root (missing .git or supekku directory)",
+        msg,
     )
 
 
@@ -103,7 +107,8 @@ def create_backlog_entry(
 ) -> Path:
     template = TEMPLATES.get(kind)
     if template is None:
-        raise ValueError(f"Unsupported backlog kind: {kind}")
+        msg = f"Unsupported backlog kind: {kind}"
+        raise ValueError(msg)
 
     repo_root = find_repo_root(repo_root)
     base_dir = backlog_root(repo_root) / template.subdir

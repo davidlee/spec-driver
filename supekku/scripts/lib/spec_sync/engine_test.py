@@ -1,5 +1,4 @@
-"""Tests for the multi-language SpecSyncEngine.
-"""
+"""Tests for the multi-language SpecSyncEngine."""
 
 import unittest
 from pathlib import Path
@@ -12,7 +11,7 @@ from .models import DocVariant, SourceDescriptor, SourceUnit
 class TestSpecSyncEngine(unittest.TestCase):
     """Test SpecSyncEngine functionality."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test fixtures."""
         self.repo_root = Path("/test/repo")
         self.tech_dir = Path("/test/repo/specify/tech")
@@ -35,52 +34,52 @@ class TestSpecSyncEngine(unittest.TestCase):
             repo_root=self.repo_root, tech_dir=self.tech_dir, adapters=self.adapters,
         )
 
-    def test_initialization_with_default_adapters(self):
+    def test_initialization_with_default_adapters(self) -> None:
         """Test engine initialization with default adapters."""
         engine = SpecSyncEngine(repo_root=self.repo_root, tech_dir=self.tech_dir)
 
         # Should have default Go, Python, and TypeScript adapters
-        self.assertIn("go", engine.adapters)
-        self.assertIn("python", engine.adapters)
-        self.assertIn("typescript", engine.adapters)
-        self.assertEqual(len(engine.adapters), 3)
+        assert "go" in engine.adapters
+        assert "python" in engine.adapters
+        assert "typescript" in engine.adapters
+        assert len(engine.adapters) == 3
 
-    def test_initialization_with_custom_adapters(self):
+    def test_initialization_with_custom_adapters(self) -> None:
         """Test engine initialization with custom adapters."""
-        self.assertEqual(self.engine.repo_root, self.repo_root)
-        self.assertEqual(self.engine.tech_dir, self.tech_dir)
-        self.assertEqual(len(self.engine.adapters), 2)
-        self.assertIn("go", self.engine.adapters)
-        self.assertIn("python", self.engine.adapters)
+        assert self.engine.repo_root == self.repo_root
+        assert self.engine.tech_dir == self.tech_dir
+        assert len(self.engine.adapters) == 2
+        assert "go" in self.engine.adapters
+        assert "python" in self.engine.adapters
 
-    def test_get_supported_languages(self):
+    def test_get_supported_languages(self) -> None:
         """Test getting list of supported languages."""
         languages = self.engine.get_supported_languages()
-        self.assertIn("go", languages)
-        self.assertIn("python", languages)
-        self.assertEqual(len(languages), 2)
+        assert "go" in languages
+        assert "python" in languages
+        assert len(languages) == 2
 
-    def test_get_adapter(self):
+    def test_get_adapter(self) -> None:
         """Test getting adapter for specific language."""
         go_adapter = self.engine.get_adapter("go")
         python_adapter = self.engine.get_adapter("python")
         unknown_adapter = self.engine.get_adapter("typescript")
 
-        self.assertEqual(go_adapter, self.mock_go_adapter)
-        self.assertEqual(python_adapter, self.mock_python_adapter)
-        self.assertIsNone(unknown_adapter)
+        assert go_adapter == self.mock_go_adapter
+        assert python_adapter == self.mock_python_adapter
+        assert unknown_adapter is None
 
-    def test_add_adapter(self):
+    def test_add_adapter(self) -> None:
         """Test adding new adapter."""
         mock_ts_adapter = Mock()
         mock_ts_adapter.language = "typescript"
 
         self.engine.add_adapter("typescript", mock_ts_adapter)
 
-        self.assertIn("typescript", self.engine.adapters)
-        self.assertEqual(self.engine.get_adapter("typescript"), mock_ts_adapter)
+        assert "typescript" in self.engine.adapters
+        assert self.engine.get_adapter("typescript") == mock_ts_adapter
 
-    def test_supports_identifier(self):
+    def test_supports_identifier(self) -> None:
         """Test identifier support detection."""
         # Setup mock responses
         self.mock_go_adapter.supports_identifier.side_effect = lambda x: x.startswith(
@@ -92,17 +91,17 @@ class TestSpecSyncEngine(unittest.TestCase):
 
         # Test Go identifier
         go_result = self.engine.supports_identifier("internal/package")
-        self.assertEqual(go_result, "go")
+        assert go_result == "go"
 
         # Test Python identifier
         python_result = self.engine.supports_identifier("module.py")
-        self.assertEqual(python_result, "python")
+        assert python_result == "python"
 
         # Test unsupported identifier
         unknown_result = self.engine.supports_identifier("unknown.xyz")
-        self.assertIsNone(unknown_result)
+        assert unknown_result is None
 
-    def test_synchronize_all_languages(self):
+    def test_synchronize_all_languages(self) -> None:
         """Test synchronization across all languages."""
         # Setup mock source units
         go_unit = SourceUnit("go", "internal/test", self.repo_root)
@@ -134,10 +133,10 @@ class TestSpecSyncEngine(unittest.TestCase):
         result = self.engine.synchronize()
 
         # Verify results
-        self.assertEqual(len(result.processed_units), 2)
-        self.assertEqual(len(result.created_specs), 2)
-        self.assertIn("go:internal/test", result.created_specs)
-        self.assertIn("python:module.py", result.created_specs)
+        assert len(result.processed_units) == 2
+        assert len(result.created_specs) == 2
+        assert "go:internal/test" in result.created_specs
+        assert "python:module.py" in result.created_specs
 
         # Verify adapter calls
         self.mock_go_adapter.discover_targets.assert_called_once()
@@ -149,7 +148,7 @@ class TestSpecSyncEngine(unittest.TestCase):
             python_unit, check=False,
         )
 
-    def test_synchronize_specific_languages(self):
+    def test_synchronize_specific_languages(self) -> None:
         """Test synchronization with specific language filter."""
         # Setup mock
         go_unit = SourceUnit("go", "internal/test", self.repo_root)
@@ -166,7 +165,7 @@ class TestSpecSyncEngine(unittest.TestCase):
         self.mock_go_adapter.discover_targets.assert_called_once()
         self.mock_python_adapter.discover_targets.assert_not_called()
 
-    def test_synchronize_with_targets(self):
+    def test_synchronize_with_targets(self) -> None:
         """Test synchronization with specific targets."""
         # Setup mock
         go_unit = SourceUnit("go", "internal/test", self.repo_root)
@@ -185,7 +184,7 @@ class TestSpecSyncEngine(unittest.TestCase):
             self.repo_root, requested=["internal/test"],
         )
 
-    def test_synchronize_with_auto_detected_targets(self):
+    def test_synchronize_with_auto_detected_targets(self) -> None:
         """Test synchronization with auto-detected language targets."""
         # Setup mock for language detection
         self.mock_go_adapter.supports_identifier.return_value = True
@@ -208,7 +207,7 @@ class TestSpecSyncEngine(unittest.TestCase):
             self.repo_root, requested=["internal/test"],
         )
 
-    def test_synchronize_check_mode(self):
+    def test_synchronize_check_mode(self) -> None:
         """Test synchronization in check mode."""
         # Setup mock
         go_unit = SourceUnit("go", "internal/test", self.repo_root)
@@ -225,9 +224,9 @@ class TestSpecSyncEngine(unittest.TestCase):
         self.mock_go_adapter.generate.assert_called_once_with(go_unit, check=True)
 
         # Verify no specs were "created" in check mode
-        self.assertEqual(len(result.created_specs), 0)
+        assert len(result.created_specs) == 0
 
-    def test_synchronize_handles_no_source_units(self):
+    def test_synchronize_handles_no_source_units(self) -> None:
         """Test synchronization when no source units are found."""
         # Setup mock to return no units
         self.mock_go_adapter.discover_targets.return_value = []
@@ -237,12 +236,12 @@ class TestSpecSyncEngine(unittest.TestCase):
         result = self.engine.synchronize()
 
         # Verify warnings are generated
-        self.assertEqual(len(result.processed_units), 0)
-        self.assertEqual(len(result.warnings), 2)
-        self.assertIn("No source units found for language: go", result.warnings)
-        self.assertIn("No source units found for language: python", result.warnings)
+        assert len(result.processed_units) == 0
+        assert len(result.warnings) == 2
+        assert "No source units found for language: go" in result.warnings
+        assert "No source units found for language: python" in result.warnings
 
-    def test_synchronize_handles_adapter_errors(self):
+    def test_synchronize_handles_adapter_errors(self) -> None:
         """Test synchronization handles adapter errors gracefully."""
         # Setup mock to raise exception
         self.mock_go_adapter.discover_targets.side_effect = Exception(
@@ -254,11 +253,11 @@ class TestSpecSyncEngine(unittest.TestCase):
         result = self.engine.synchronize()
 
         # Verify error handling
-        self.assertEqual(len(result.processed_units), 0)
-        self.assertEqual(len(result.errors), 1)
-        self.assertIn("Error processing language go: Go adapter error", result.errors)
+        assert len(result.processed_units) == 0
+        assert len(result.errors) == 1
+        assert "Error processing language go: Go adapter error" in result.errors
 
-    def test_synchronize_handles_unit_processing_errors(self):
+    def test_synchronize_handles_unit_processing_errors(self) -> None:
         """Test synchronization handles individual unit processing errors."""
         # Setup mock - only test Go to avoid Python warning
         go_unit = SourceUnit("go", "internal/test", self.repo_root)
@@ -269,12 +268,10 @@ class TestSpecSyncEngine(unittest.TestCase):
         result = self.engine.synchronize(languages=["go"])
 
         # Verify error handling
-        self.assertEqual(len(result.processed_units), 0)
-        self.assertEqual(len(result.errors), 1)
-        self.assertIn(
-            "Error processing internal/test: Description error", result.errors,
-        )
-        self.assertIn("internal/test (error)", result.skipped_units)
+        assert len(result.processed_units) == 0
+        assert len(result.errors) == 1
+        assert "Error processing internal/test: Description error" in result.errors
+        assert "internal/test (error)" in result.skipped_units
 
 
 if __name__ == "__main__":

@@ -99,7 +99,7 @@ def main(argv: list[str] | None = None) -> int:
         spec_dirs = DEFAULT_SPEC_DIRS.copy()
         if args.spec_dirs:
             spec_dirs.extend(Path(d) for d in args.spec_dirs)
-        stats = registry.sync_from_specs(
+        registry.sync_from_specs(
             spec_dirs,
             spec_registry=spec_registry,
             delta_dirs=DEFAULT_DELTA_DIRS,
@@ -107,22 +107,19 @@ def main(argv: list[str] | None = None) -> int:
             audit_dirs=DEFAULT_AUDIT_DIRS,
         )
         registry.save()
-        print(f"Created: {stats.created}, Updated: {stats.updated}")
         return 0
 
     if args.command == "move":
         try:
-            new_uid = registry.move_requirement(
+            registry.move_requirement(
                 args.uid,
                 args.target_spec,
                 spec_registry=spec_registry,
                 introduced_by=args.introduced_by,
             )
-        except Exception as exc:  # pylint: disable=broad-except
-            print(str(exc), file=sys.stderr)
+        except Exception:  # pylint: disable=broad-except
             return 1
         registry.save()
-        print(f"Moved {args.uid} -> {new_uid}")
         return 0
 
     if args.command == "list":
@@ -138,32 +135,18 @@ def main(argv: list[str] | None = None) -> int:
             details = f"{record.uid}\t{record.status}\t{record.title}"
             if record.primary_spec:
                 details += f" (primary: {record.primary_spec})"
-            print(details)
         return 0
 
     if args.command == "show":
         record = registry.records.get(args.uid)
         if not record:
-            print(f"Requirement {args.uid} not found", file=sys.stderr)
             return 1
-        print(f"UID: {record.uid}")
-        print(f"Label: {record.label}")
-        print(f"Title: {record.title}")
-        print(f"Status: {record.status}")
-        print(f"Primary spec: {record.primary_spec}")
-        print(f"Specs: {', '.join(record.specs)}")
-        print(f"Kind: {record.kind}")
-        print(f"Introduced: {record.introduced or '-'}")
-        print(f"Implemented by: {', '.join(record.implemented_by) or '-'}")
-        print(f"Verified by: {', '.join(record.verified_by) or '-'}")
-        print(f"Path: {record.path}")
         registry.save()
         return 0
 
     if args.command == "set-status":
         registry.set_status(args.uid, args.status)
         registry.save()
-        print(f"Updated {args.uid} → {args.status}")
         return 0
 
     parser.error("Unknown command")

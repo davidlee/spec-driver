@@ -66,19 +66,17 @@ def main() -> None:
         sys.exit(str(exc))
 
     if result.created_specs:
-        print("New specs created:")
-        for pkg, spec_id in sorted(result.created_specs.items()):
-            print(f"  {spec_id}: {pkg}")
+        for _pkg, _spec_id in sorted(result.created_specs.items()):
+            pass
     else:
-        print("No new specs created.")
+        pass
 
     if result.skipped_packages:
-        print("Skipped packages:")
-        for skipped in result.skipped_packages:
-            print(f"  {skipped.package}: {skipped.reason}")
+        for _skipped in result.skipped_packages:
+            pass
 
-    for warning in result.warnings:
-        print(f"warning: {warning}")
+    for _warning in result.warnings:
+        pass
 
 
 if __name__ == "__main__":

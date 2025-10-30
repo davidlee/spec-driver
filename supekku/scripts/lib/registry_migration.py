@@ -121,7 +121,7 @@ class RegistryV2:
 class LanguageDetector:
     """Detects language from source identifiers using SpecSyncEngine adapters."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize with language adapters for detection."""
         try:
             # Try relative import first (when used as module)

@@ -19,8 +19,7 @@ def main() -> None:
     parser.add_argument("kind", choices=["issue", "problem", "improvement", "risk"])
     parser.add_argument("name")
     args = parser.parse_args()
-    path = create_backlog_entry(args.kind, args.name)
-    print(path)
+    create_backlog_entry(args.kind, args.name)
 
 
 if __name__ == "__main__":

@@ -60,15 +60,18 @@ def parse_yaml_block(match: Match[str], block_name: str) -> dict[str, Any]:
 
     """
     if not match:
-        raise ValueError(f"No {block_name} block found")
+        msg = f"No {block_name} block found"
+        raise ValueError(msg)
 
     raw = match.group(1)
     try:
         data = yaml.safe_load(raw) or {}
     except yaml.YAMLError as exc:  # pragma: no cover
-        raise ValueError(f"invalid {block_name} YAML: {exc}") from exc
+        msg = f"invalid {block_name} YAML: {exc}"
+        raise ValueError(msg) from exc
 
     if not isinstance(data, dict):
-        raise ValueError(f"{block_name} block must parse to mapping")
+        msg = f"{block_name} block must parse to mapping"
+        raise ValueError(msg)
 
     return data

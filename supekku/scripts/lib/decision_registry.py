@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
 from .backlog import find_repo_root
 from .spec_utils import load_markdown_file
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 @dataclass
@@ -115,8 +117,7 @@ class DecisionRegistry:
     @classmethod
     def load(cls, root: Path | None = None) -> DecisionRegistry:
         """Load existing registry from YAML file."""
-        registry = cls(root=root)
-        return registry
+        return cls(root=root)
 
     def collect(self) -> dict[str, DecisionRecord]:
         """Collect all ADR files and parse them into DecisionRecords."""
@@ -131,9 +132,8 @@ class DecisionRegistry:
                 decision = self._parse_adr_file(adr_file)
                 if decision:
                     decisions[decision.id] = decision
-            except (ValueError, KeyError, FileNotFoundError) as e:
+            except (ValueError, KeyError, FileNotFoundError):
                 # Log error but continue processing other files
-                print(f"Warning: Failed to parse {adr_file}: {e}")
                 continue
 
         return decisions

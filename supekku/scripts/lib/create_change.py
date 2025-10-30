@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .create_spec import extract_template_body, find_repository_root, slugify
 from .spec_registry import SpecRegistry
 from .spec_utils import dump_markdown_file
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 TEMPLATE_DIR = REPO_ROOT / "supekku" / "templates"
@@ -383,7 +386,8 @@ def create_requirement_breakout(
     spec_registry = SpecRegistry(repo)
     spec = spec_registry.get(spec_id)
     if spec is None:
-        raise ValueError(f"Spec {spec_id} not found")
+        msg = f"Spec {spec_id} not found"
+        raise ValueError(msg)
 
     requirement_kind = kind or (
         "functional" if requirement_id.startswith("FR-") else "non-functional"

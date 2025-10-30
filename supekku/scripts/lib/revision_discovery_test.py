@@ -55,7 +55,7 @@ Test revision.
 """
 
 
-def test_find_requirement_sources_locates_single_requirement():
+def test_find_requirement_sources_locates_single_requirement() -> None:
     """Test finding a single requirement in a revision file."""
     with TemporaryDirectory() as tmpdir:
         # Create revision directory structure
@@ -85,7 +85,7 @@ def test_find_requirement_sources_locates_single_requirement():
         assert source.requirement_index == 0
 
 
-def test_find_requirement_sources_locates_multiple_requirements():
+def test_find_requirement_sources_locates_multiple_requirements() -> None:
     """Test finding multiple requirements in the same revision file."""
     with TemporaryDirectory() as tmpdir:
         revision_dir = Path(tmpdir) / "revisions"
@@ -113,7 +113,7 @@ def test_find_requirement_sources_locates_multiple_requirements():
         assert source1.revision_file == source2.revision_file
 
 
-def test_find_requirement_sources_returns_empty_for_not_found():
+def test_find_requirement_sources_returns_empty_for_not_found() -> None:
     """Test that non-existent requirements return empty results."""
     with TemporaryDirectory() as tmpdir:
         revision_dir = Path(tmpdir) / "revisions"
@@ -132,7 +132,7 @@ def test_find_requirement_sources_returns_empty_for_not_found():
         assert len(sources) == 0
 
 
-def test_find_requirement_sources_handles_empty_directory():
+def test_find_requirement_sources_handles_empty_directory() -> None:
     """Test handling of empty revision directory."""
     with TemporaryDirectory() as tmpdir:
         revision_dir = Path(tmpdir) / "revisions"
@@ -146,7 +146,7 @@ def test_find_requirement_sources_handles_empty_directory():
         assert len(sources) == 0
 
 
-def test_find_requirement_sources_handles_non_existent_directory():
+def test_find_requirement_sources_handles_non_existent_directory() -> None:
     """Test handling of non-existent directory."""
     sources = find_requirement_sources(
         ["SPEC-150.FR-001"],
@@ -156,7 +156,7 @@ def test_find_requirement_sources_handles_non_existent_directory():
     assert len(sources) == 0
 
 
-def test_find_requirement_sources_skips_malformed_files():
+def test_find_requirement_sources_skips_malformed_files() -> None:
     """Test that malformed revision files are skipped gracefully."""
     with TemporaryDirectory() as tmpdir:
         revision_dir = Path(tmpdir) / "revisions"

@@ -21,7 +21,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--kind",
-        choices=KINDS + ["all"],
+        choices=[*KINDS, "all"],
         default="all",
         help="Which registry to regenerate (default: all)",
     )

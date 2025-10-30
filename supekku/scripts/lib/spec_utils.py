@@ -8,15 +8,17 @@ from typing import Any
 try:
     import yaml
 except ImportError as exc:
+    msg = "PyYAML is required for spec tooling. Install with `pip install PyYAML`."
     raise SystemExit(
-        "PyYAML is required for spec tooling. Install with `pip install PyYAML`.",
+        msg,
     ) from exc
 
 try:
     import frontmatter
 except ImportError as exc:
+    msg = "python-frontmatter is required for spec tooling. Install with `pip install python-frontmatter`."
     raise SystemExit(
-        "python-frontmatter is required for spec tooling. Install with `pip install python-frontmatter`.",
+        msg,
     ) from exc
 
 from .frontmatter_schema import (
@@ -54,8 +56,9 @@ def ensure_list_entry(frontmatter: dict[str, Any], key: str) -> list[Any]:
     """Ensure a frontmatter key contains a list value."""
     value = frontmatter.setdefault(key, [])
     if not isinstance(value, list):
+        msg = f"frontmatter[{key!r}] expected list, got {type(value).__name__}"
         raise TypeError(
-            f"frontmatter[{key!r}] expected list, got {type(value).__name__}",
+            msg,
         )
     return value
 

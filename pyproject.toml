@@ -113,30 +113,60 @@ target-version = "py312"
 
 [tool.ruff.lint]
 # select = ["E", "F", "W", "I", "N", "UP"]
-select = ["ALL"]
+# select = ["ALL"]
 extend-select = [
-    "F",        # Pyflakes rules
-    "W",        # PyCodeStyle warnings
-    "E",        # PyCodeStyle errors
-    "I",        # Sort imports properly
-    "UP",       # Warn if certain things can changed due to newer Python versions
-    "C4",       # Catch incorrect use of comprehensions, dict, list, etc
-    "FA",       # Enforce from __future__ import annotations
-    "ISC",      # Good use of string concatenation
-    "ICN",      # Use common import conventions
-    "RET",      # Good return practices
-    "SIM",      # Common simplification rules
-    "TID",      # Some good import practices
-    "TC",       # Enforce importing certain types in a TYPE_CHECKING block
-    "PTH",      # Use pathlib instead of os.path
-    "TD",       # Be diligent with TODO comments
-    "A",        # detect shadowed builtins
-    "BLE",      # disallow catch-all exceptions
-    "COM",      # enforce trailing comma rules
-    "DTZ",      # require strict timezone manipulation with datetime
-    "FBT",      # detect boolean traps
-    "N",        # enforce naming conventions, e.g. ClassName vs function_name
+      "F",    # Pyflakes
+      "E",    # pycodestyle errors
+      "W",    # pycodestyle warnings
+      "I",    # isort
+      "N",    # pep8-naming
+      "UP",   # pyupgrade
+      "B",    # flake8-bugbear
+      "A",    # flake8-builtins
+      "C4",   # flake8-comprehensions
+      "ICN",  # import conventions
+      "RET",  # return values
+      "PTH",  # Use pathlib instead of os.path
+      "COM",  # enforce trailing comma rules
+      "TID",  # Some good import practices
+      "RET",  # Good return practices
+      "FA",   # Enforce from __future__ import annotations
+      "SIM",  # simplify
+      "PL",   # pylint (selective)
 ]
+
+ignore = [
+      "T201",   # print (CLI tools need it)
+      "S101",   # assert (pytest needs it)
+      "PLR0912", "PLR0915", "PLR0913", "PLR0911", "C901",  # Complexity (use pylint)
+      "FBT001", "FBT002",  # Boolean args
+      "PLR2004",  # Magic values - I have my doubts but ...
+      "D",        # All pydocstyle (handle separately if wanted)
+      "PTH123",   # Allow open() - sometimes clearer
+]
+# extend-select = [
+#     "F",        # Pyflakes rules
+#     "W",        # PyCodeStyle warnings
+#     "E",        # PyCodeStyle errors
+#     "I",        # Sort imports properly
+#     "UP",       # Warn if certain things can changed due to newer Python versions
+#     "C4",       # Catch incorrect use of comprehensions, dict, list, etc
+#     "FA",       # Enforce from __future__ import annotations
+#     "ISC",      # Good use of string concatenation
+#     "ICN",      # Use common import conventions
+#     "RET",      # Good return practices
+#     "SIM",      # Common simplification rules
+#     "TID",      # Some good import practices
+#     "TC",       # Enforce importing certain types in a TYPE_CHECKING block
+#     "PTH",      # Use pathlib instead of os.path
+#     "TD",       # Be diligent with TODO comments
+#     "A",        # detect shadowed builtins
+#     "BLE",      # disallow catch-all exceptions
+#     "COM",      # enforce trailing comma rules
+#     "DTZ",      # require strict timezone manipulation with datetime
+#     "FBT",      # detect boolean traps
+#     "N",        # enforce naming conventions, e.g. ClassName vs function_name
+# ]
 
 fixable = ["ALL"]
 unfixable = []
@@ -163,8 +193,3 @@ skip-magic-trailing-comma = false
 [tool.ruff.lint.per-file-ignores]
 "supekku/scripts/**/*.py" = ["E402"]
 
-[tool.pylint.main]
-disable = [
-    "C0114",  # missing-module-docstring
-    "C0116",  # missing-function-docstring
-]

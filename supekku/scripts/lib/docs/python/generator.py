@@ -5,7 +5,7 @@
 def generate_deterministic_markdown_spec(
     analysis: dict, spec_type: str = "public",
 ) -> str:
-    """Generate deterministic markdown documentation from analysis"""
+    """Generate deterministic markdown documentation from analysis."""
     if "error" in analysis:
         return f"# Error\n\n{analysis['error']}\n"
 

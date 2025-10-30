@@ -5,15 +5,19 @@ from __future__ import annotations
 
 import argparse
 import sys
-from collections.abc import Iterable
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from typing import TYPE_CHECKING
+
 from supekku.scripts.lib.change_registry import ChangeRegistry  # type: ignore
 from supekku.scripts.lib.cli_utils import add_root_argument
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 KIND_CHOICES = ["delta", "revision", "audit", "all"]
 
@@ -67,8 +71,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def iter_artifacts(root: Path, kinds: Iterable[str]):
     for kind in kinds:
         registry = ChangeRegistry(root=root, kind=kind)
-        for artifact in registry.collect().values():
-            yield artifact
+        yield from registry.collect().values()
 
 
 def matches_filters(

@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 PLAN_MARKER = "supekku:plan.overview@v1"
 PHASE_MARKER = "supekku:phase.overview@v1"
@@ -81,7 +83,8 @@ def extract_plan_overview(
         context = _format_yaml_error(e, raw, source_path, "plan overview")
         raise ValueError(context) from e
     if not isinstance(data, dict):
-        raise ValueError("plan overview block must parse to mapping")
+        msg = "plan overview block must parse to mapping"
+        raise ValueError(msg)
     return PlanOverviewBlock(raw_yaml=raw, data=data)
 
 
@@ -99,7 +102,8 @@ def extract_phase_overview(
         context = _format_yaml_error(e, raw, source_path, "phase overview")
         raise ValueError(context) from e
     if not isinstance(data, dict):
-        raise ValueError("phase overview block must parse to mapping")
+        msg = "phase overview block must parse to mapping"
+        raise ValueError(msg)
     return PhaseOverviewBlock(raw_yaml=raw, data=data)
 
 

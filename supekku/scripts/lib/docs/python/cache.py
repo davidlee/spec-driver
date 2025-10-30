@@ -12,7 +12,7 @@ from .path_utils import PathNormalizer
 class ParseCache:
     """File-based caching for AST parsing with mtime and hash validation."""
 
-    def __init__(self, cache_dir: Path | None = None):
+    def __init__(self, cache_dir: Path | None = None) -> None:
         """Initialize cache with optional custom directory."""
         if cache_dir:
             self.cache_dir = cache_dir

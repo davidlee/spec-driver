@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .backlog import find_repo_root
 from .change_registry import ChangeRegistry
 from .decision_registry import DecisionRegistry
 from .requirements import RequirementsRegistry
 from .spec_registry import SpecRegistry
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 @dataclass
@@ -99,7 +102,8 @@ class Workspace:
             elif kind == "audit":
                 self.audit_registry.sync()
             else:
-                raise ValueError(f"Unsupported change registry kind: {kind}")
+                msg = f"Unsupported change registry kind: {kind}"
+                raise ValueError(msg)
 
 
 __all__ = ["Workspace"]

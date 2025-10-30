@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import os
 import unittest
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
 from supekku.scripts.lib.workspace import Workspace
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class WorkspaceTest(RepoTestCase):
@@ -42,11 +45,11 @@ class WorkspaceTest(RepoTestCase):
 
         ws = Workspace(root)
         spec = ws.specs.get("SPEC-200")
-        self.assertIsNotNone(spec)
+        assert spec is not None
 
         ws.sync_requirements()
         registry = ws.requirements
-        self.assertIn("SPEC-200.FR-200", registry.records)
+        assert "SPEC-200.FR-200" in registry.records
 
     def test_sync_change_registries(self) -> None:
         root = self._create_repo()
@@ -68,7 +71,7 @@ class WorkspaceTest(RepoTestCase):
         ws = Workspace(root)
         ws.sync_change_registries(kinds=["delta"])
         output = root / "supekku" / "registry" / "deltas.yaml"
-        self.assertTrue(output.exists())
+        assert output.exists()
 
     def test_workspace_decisions_property(self) -> None:
         """Test that workspace.decisions property returns DecisionRegistry."""
@@ -77,13 +80,13 @@ class WorkspaceTest(RepoTestCase):
 
         # Access decisions property
         decisions = ws.decisions
-        self.assertIsNotNone(decisions)
+        assert decisions is not None
         # Verify it's the correct type
         from supekku.scripts.lib.decision_registry import DecisionRegistry
 
-        self.assertIsInstance(decisions, DecisionRegistry)
+        assert isinstance(decisions, DecisionRegistry)
         # Verify it's cached (same instance on multiple access)
-        self.assertIs(decisions, ws.decisions)
+        assert decisions is ws.decisions
 
     def test_workspace_decisions_collect_and_access(self) -> None:
         """Test accessing ADRs through workspace.decisions."""
@@ -117,10 +120,10 @@ We decided to test.
         decisions_dict = ws.decisions.collect()
 
         # Verify ADR was collected
-        self.assertIn("ADR-001", decisions_dict)
+        assert "ADR-001" in decisions_dict
         decision = decisions_dict["ADR-001"]
-        self.assertEqual(decision.title, "Test Decision")
-        self.assertEqual(decision.status, "accepted")
+        assert decision.title == "Test Decision"
+        assert decision.status == "accepted"
 
     def test_workspace_sync_decisions(self) -> None:
         """Test workspace.sync_decisions creates registry and symlinks."""
@@ -162,32 +165,34 @@ status: draft
 
         # Verify YAML registry was created
         yaml_path = registry_dir / "decisions.yaml"
-        self.assertTrue(yaml_path.exists())
+        assert yaml_path.exists()
 
         # Verify content of YAML
         import yaml
 
         with yaml_path.open("r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-        self.assertIn("decisions", data)
-        self.assertIn("ADR-001", data["decisions"])
-        self.assertIn("ADR-002", data["decisions"])
+        assert "decisions" in data
+        assert "ADR-001" in data["decisions"]
+        assert "ADR-002" in data["decisions"]
 
         # Verify symlinks were created
         accepted_dir = decisions_dir / "accepted"
         draft_dir = decisions_dir / "draft"
-        self.assertTrue(accepted_dir.exists())
-        self.assertTrue(draft_dir.exists())
+        assert accepted_dir.exists()
+        assert draft_dir.exists()
 
         # Verify symlink files
         accepted_link = accepted_dir / "ADR-001-accepted.md"
         draft_link = draft_dir / "ADR-002-draft.md"
-        self.assertTrue(accepted_link.exists() and accepted_link.is_symlink())
-        self.assertTrue(draft_link.exists() and draft_link.is_symlink())
+        assert accepted_link.exists()
+        assert accepted_link.is_symlink()
+        assert draft_link.exists()
+        assert draft_link.is_symlink()
 
         # Verify symlinks point to correct files
-        self.assertEqual(accepted_link.resolve(), adr1.resolve())
-        self.assertEqual(draft_link.resolve(), adr2.resolve())
+        assert accepted_link.resolve() == adr1.resolve()
+        assert draft_link.resolve() == adr2.resolve()
 
     def test_workspace_decisions_integration_with_existing_data(self) -> None:
         """Test decisions integration when data already exists."""
@@ -219,11 +224,12 @@ status: accepted
         ws.sync_decisions()
 
         # Verify old symlink was removed
-        self.assertFalse(old_link.exists())
+        assert not old_link.exists()
 
         # Verify new symlink was created
         new_link = accepted_dir / "ADR-001-new.md"
-        self.assertTrue(new_link.exists() and new_link.is_symlink())
+        assert new_link.exists()
+        assert new_link.is_symlink()
 
 
 if __name__ == "__main__":

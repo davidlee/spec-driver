@@ -41,13 +41,12 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    result = create_revision(
+    create_revision(
         args.name,
         source_specs=args.source_specs,
         destination_specs=args.destination_specs,
         requirements=args.requirements,
     )
-    print(f"Created {result.artifact_id} at {result.directory}")
     return 0
 
 

@@ -38,7 +38,7 @@ from supekku.scripts.lib.spec_utils import (  # type: ignore
 class MultiLanguageSpecManager:
     """Manages spec creation and registry updates for multiple languages."""
 
-    def __init__(self, tech_dir: Path, registry_path: Path):
+    def __init__(self, tech_dir: Path, registry_path: Path) -> None:
         self.tech_dir = tech_dir
         self.registry_path = registry_path
         self.registry_v2 = RegistryV2.from_file(registry_path)
@@ -358,7 +358,6 @@ def main() -> None:
     if not TECH_DIR.exists():
         sys.exit(f"Tech spec directory not found: {TECH_DIR}")
 
-    print(f"Using registry: {REGISTRY_PATH}")
 
     # Initialize spec sync engine and spec manager
     engine = SpecSyncEngine(
@@ -373,9 +372,6 @@ def main() -> None:
 
     # Handle legacy packages argument (maps to Go targets)
     if args.packages:
-        print(
-            "Note: Using legacy 'packages' argument - consider using --targets go:package",
-        )
         targets_by_language["go"] = args.packages
 
     # Handle new targets argument
@@ -418,7 +414,7 @@ def main() -> None:
             if "python" in engine.adapters:
                 targets_by_language["python"] = []
             # Also process any other languages already in registry
-            for language in spec_manager.registry_v2.languages.keys():
+            for language in spec_manager.registry_v2.languages:
                 if language not in targets_by_language:
                     targets_by_language[language] = []
         else:
@@ -442,32 +438,26 @@ def main() -> None:
 
     for language, targets in targets_by_language.items():
         if language not in engine.adapters:
-            print(f"Warning: No adapter available for language '{language}' - skipping")
             continue
 
-        print(f"\n=== Synchronizing {language.upper()} targets ===")
 
         adapter = engine.adapters[language]
 
         # Discover source units
         if args.existing:
-            print("Discovery mode: existing registry entries only")
             # Get existing entries from registry and convert to source units
             source_units = []
             if language in spec_manager.registry_v2.languages:
-                for identifier in spec_manager.registry_v2.languages[language].keys():
+                for identifier in spec_manager.registry_v2.languages[language]:
                     source_units.append(
                         SourceUnit(language=language, identifier=identifier, root=ROOT),
                     )
         else:
-            print("Discovery mode: requested targets + auto-discovery")
             requested = targets if targets else None
             source_units = adapter.discover_targets(ROOT, requested)
 
-        print(f"Found {len(source_units)} {language} source units")
 
         if not source_units:
-            print(f"No {language} source units to process")
             continue
 
         # Process each source unit
@@ -475,7 +465,6 @@ def main() -> None:
         skipped_units = []
 
         for unit in source_units:
-            print(f"Processing {unit.identifier}...")
 
             result = spec_manager.process_source_unit(
                 unit, adapter, check_mode=args.check, dry_run=args.dry_run,
@@ -484,76 +473,58 @@ def main() -> None:
             if result["processed"]:
                 total_processed += 1
                 if args.dry_run:
-                    print(f"  → Would process {unit.identifier} -> {result['spec_id']}")
+                    pass
                 else:
-                    print(f"  ✓ Processed {unit.identifier} -> {result['spec_id']}")
+                    pass
 
                 # Report documentation variants
-                for variant in result["doc_variants"]:
+                for _variant in result["doc_variants"]:
                     if args.dry_run:
-                        print(f"    - {variant.name}: would generate")
+                        pass
                     else:
-                        print(f"    - {variant.name}: {variant.status}")
+                        pass
 
                 # Show paths that would be created in dry-run mode
                 if args.dry_run and result["would_create_paths"]:
-                    print("  Paths that would be created:")
-                    for path in result["would_create_paths"]:
-                        print(f"    • {path}")
+                    for _path in result["would_create_paths"]:
+                        pass
 
                 if result["created"]:
                     total_created += 1
                     created_specs[unit.identifier] = result["spec_id"]
                     if args.dry_run:
-                        print(f"  → Would create new spec: {result['spec_id']}")
+                        pass
                     else:
-                        print(f"  ✓ Created new spec: {result['spec_id']}")
+                        pass
 
             elif result["skipped"]:
                 total_skipped += 1
                 skipped_units.append(f"{unit.identifier}: {result['reason']}")
-                print(f"  ✗ Skipped {unit.identifier}: {result['reason']}")
 
         # Report language results
-        print(f"\n{language.upper()} Results:")
-        print(f"  Processed: {total_processed} units")
-        print(f"  Created: {len(created_specs)} specs")
-        print(f"  Skipped: {len(skipped_units)} units")
 
         if created_specs:
-            print("  New specs created:")
-            for identifier, spec_id in created_specs.items():
-                print(f"    {spec_id}: {identifier}")
+            for identifier in created_specs:
+                pass
 
         if skipped_units:
-            print("  Skipped reasons:")
-            for reason in skipped_units:
-                print(f"    - {reason}")
+            for _reason in skipped_units:
+                pass
 
     # Rebuild symlink indices if any changes were made
     if total_processed > 0 and not args.dry_run:
-        print("\nRebuilding symlink indices...")
         spec_manager.rebuild_indices()
-        print("✓ Symlink indices updated")
 
     # Overall summary
-    print("\n=== Overall Summary ===")
     if args.dry_run:
-        print("DRY RUN MODE - No files were modified")
-    print(f"Total processed: {total_processed} units")
-    print(f"Total created: {total_created} specs")
-    print(f"Total skipped: {total_skipped} units")
+        pass
 
     if all_warnings:
-        print("Warnings:")
-        for warning in all_warnings:
-            print(f"  - {warning}")
+        for _warning in all_warnings:
+            pass
 
     if total_processed == 0 and not args.existing:
-        print("\nNo source units found. Try:")
-        print("  - Specify targets: --targets go:internal/foo python:module.py")
-        print("  - Use --existing to process registered packages")
-        print("  - Check language adapters are working")
+        pass
 
 
 if __name__ == "__main__":

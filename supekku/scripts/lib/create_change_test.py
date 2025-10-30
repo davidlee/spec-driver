@@ -48,11 +48,11 @@ class CreateChangeTest(unittest.TestCase):
             requirements=["SPEC-100.FR-100"],
             repo_root=root,
         )
-        self.assertIsInstance(result, ChangeArtifactCreated)
-        self.assertTrue(result.primary_path.exists())
+        assert isinstance(result, ChangeArtifactCreated)
+        assert result.primary_path.exists()
         frontmatter, _ = load_markdown_file(result.primary_path)
-        self.assertEqual(frontmatter["kind"], "revision")
-        self.assertIn("SPEC-100", frontmatter.get("source_specs", []))
+        assert frontmatter["kind"] == "revision"
+        assert "SPEC-100" in frontmatter.get("source_specs", [])
 
     def test_create_delta(self) -> None:
         root = self._make_repo()
@@ -62,11 +62,11 @@ class CreateChangeTest(unittest.TestCase):
             requirements=["SPEC-100.FR-100"],
             repo_root=root,
         )
-        self.assertTrue(result.primary_path.exists())
+        assert result.primary_path.exists()
         frontmatter, _ = load_markdown_file(result.primary_path)
-        self.assertEqual(frontmatter["kind"], "delta")
+        assert frontmatter["kind"] == "delta"
         plan_files = [p for p in result.extras if p.name.startswith("IP-")]
-        self.assertTrue(plan_files)
+        assert plan_files
 
     def test_create_requirement_breakout(self) -> None:
         root = self._make_repo()
@@ -76,10 +76,10 @@ class CreateChangeTest(unittest.TestCase):
             title="Handle edge cases",
             repo_root=root,
         )
-        self.assertTrue(path.exists())
+        assert path.exists()
         frontmatter, _ = load_markdown_file(path)
-        self.assertEqual(frontmatter["kind"], "requirement")
-        self.assertEqual(frontmatter["spec"], "SPEC-100")
+        assert frontmatter["kind"] == "requirement"
+        assert frontmatter["spec"] == "SPEC-100"
 
 
 if __name__ == "__main__":

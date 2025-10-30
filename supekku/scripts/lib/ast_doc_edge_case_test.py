@@ -40,7 +40,7 @@ from supekku.scripts.lib.docs.python.generator import (
 class PathNormalizerTest(unittest.TestCase):
     """Test cross-platform path normalization."""
 
-    def test_normalize_path_for_id_consistency(self):
+    def test_normalize_path_for_id_consistency(self) -> None:
         """Test that path normalization is consistent across platforms."""
         # Create temporary files with various path structures
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -58,16 +58,16 @@ class PathNormalizerTest(unittest.TestCase):
             normalized_2 = PathNormalizer.normalize_path_for_id(test_file, temp_path)
 
             # Should be identical
-            self.assertEqual(normalized_1, normalized_2)
+            assert normalized_1 == normalized_2
 
             # Should use forward slashes regardless of platform
-            self.assertNotIn("\\", normalized_1)
+            assert "\\" not in normalized_1
 
             # Should be relative path
-            self.assertFalse(normalized_1.startswith("/"))
-            self.assertTrue(normalized_1.startswith("src/"))
+            assert not normalized_1.startswith("/")
+            assert normalized_1.startswith("src/")
 
-    def test_get_module_name_consistency(self):
+    def test_get_module_name_consistency(self) -> None:
         """Test module name generation consistency."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -79,16 +79,16 @@ class PathNormalizerTest(unittest.TestCase):
             module_name = PathNormalizer.get_module_name(test_file, temp_path)
 
             # Should use dots for module separation
-            self.assertEqual(module_name, "package.submodule")
+            assert module_name == "package.submodule"
 
             # Test without .py extension
             no_ext_file = temp_path / "package" / "noext"
             no_ext_file.write_text("# Test")
 
             module_name_no_ext = PathNormalizer.get_module_name(no_ext_file, temp_path)
-            self.assertEqual(module_name_no_ext, "package.noext")
+            assert module_name_no_ext == "package.noext"
 
-    def test_get_output_filename_stability(self):
+    def test_get_output_filename_stability(self) -> None:
         """Test output filename generation stability."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -101,16 +101,16 @@ class PathNormalizerTest(unittest.TestCase):
             )
 
             # Should handle special characters safely
-            self.assertTrue(filename.endswith("-public.md"))
-            self.assertNotIn(".", filename.replace("-public.md", ""))
+            assert filename.endswith("-public.md")
+            assert "." not in filename.replace("-public.md", "")
 
     @patch("os.name", "nt")  # Mock Windows
-    def test_windows_path_handling(self):
+    def test_windows_path_handling(self) -> None:
         """Test Windows-specific path handling."""
         # This test may need adjustment based on actual Windows behavior
         # but demonstrates the approach for platform-specific testing
 
-    def test_edge_case_paths(self):
+    def test_edge_case_paths(self) -> None:
         """Test edge cases in path handling."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -124,16 +124,16 @@ class PathNormalizerTest(unittest.TestCase):
 
             # Should handle without crashing
             normalized = PathNormalizer.normalize_path_for_id(special_file, temp_path)
-            self.assertIsInstance(normalized, str)
+            assert isinstance(normalized, str)
 
             module_name = PathNormalizer.get_module_name(special_file, temp_path)
-            self.assertIsInstance(module_name, str)
+            assert isinstance(module_name, str)
 
 
 class ParseCacheTest(unittest.TestCase):
     """Test parsing cache functionality."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -149,15 +149,15 @@ class ParseCacheTest(unittest.TestCase):
         file_path.write_text(content)
         return file_path
 
-    def test_cache_miss_and_hit(self):
+    def test_cache_miss_and_hit(self) -> None:
         """Test cache miss followed by cache hit."""
         file_path = self._create_test_file("def test(): pass")
 
         # First access should be a miss
         result = self.cache.get(file_path)
-        self.assertIsNone(result)
-        self.assertEqual(self.cache.stats["misses"], 1)
-        self.assertEqual(self.cache.stats["hits"], 0)
+        assert result is None
+        assert self.cache.stats["misses"] == 1
+        assert self.cache.stats["hits"] == 0
 
         # Store something in cache
         test_analysis = {"module_name": "test", "functions": []}
@@ -165,10 +165,10 @@ class ParseCacheTest(unittest.TestCase):
 
         # Second access should be a hit
         result = self.cache.get(file_path)
-        self.assertEqual(result, test_analysis)
-        self.assertEqual(self.cache.stats["hits"], 1)
+        assert result == test_analysis
+        assert self.cache.stats["hits"] == 1
 
-    def test_cache_invalidation_on_file_change(self):
+    def test_cache_invalidation_on_file_change(self) -> None:
         """Test that cache is invalidated when file changes."""
         file_path = self._create_test_file("def original(): pass")
 
@@ -178,7 +178,7 @@ class ParseCacheTest(unittest.TestCase):
 
         # Verify cache hit
         result = self.cache.get(file_path)
-        self.assertEqual(result, initial_analysis)
+        assert result == initial_analysis
 
         # Modify file (ensure different mtime)
         time.sleep(0.01)
@@ -186,10 +186,10 @@ class ParseCacheTest(unittest.TestCase):
 
         # Should be cache miss due to file change
         result = self.cache.get(file_path)
-        self.assertIsNone(result)
-        self.assertEqual(self.cache.stats["invalidations"], 1)
+        assert result is None
+        assert self.cache.stats["invalidations"] == 1
 
-    def test_cache_stats(self):
+    def test_cache_stats(self) -> None:
         """Test cache statistics calculation."""
         file_path = self._create_test_file("def test(): pass")
 
@@ -201,12 +201,12 @@ class ParseCacheTest(unittest.TestCase):
 
         stats = self.cache.get_stats()
 
-        self.assertEqual(stats["hits"], 2)
-        self.assertEqual(stats["misses"], 1)
-        self.assertEqual(stats["total_requests"], 3)
-        self.assertEqual(stats["hit_rate_percent"], 66.7)
+        assert stats["hits"] == 2
+        assert stats["misses"] == 1
+        assert stats["total_requests"] == 3
+        assert stats["hit_rate_percent"] == 66.7
 
-    def test_cache_corruption_handling(self):
+    def test_cache_corruption_handling(self) -> None:
         """Test handling of corrupted cache files."""
         file_path = self._create_test_file("def test(): pass")
 
@@ -218,13 +218,13 @@ class ParseCacheTest(unittest.TestCase):
 
         # Should handle corruption gracefully
         result = self.cache.get(file_path)
-        self.assertIsNone(result)
-        self.assertEqual(self.cache.stats["misses"], 1)
+        assert result is None
+        assert self.cache.stats["misses"] == 1
 
         # Corrupted file should be removed
-        self.assertFalse(corrupt_cache_file.exists())
+        assert not corrupt_cache_file.exists()
 
-    def test_cache_clear(self):
+    def test_cache_clear(self) -> None:
         """Test cache clearing functionality."""
         file_path = self._create_test_file("def test(): pass")
 
@@ -237,30 +237,30 @@ class ParseCacheTest(unittest.TestCase):
 
         # Cache should be empty and stats reset
         result = self.cache.get(file_path)
-        self.assertIsNone(result)
+        assert result is None
 
         stats = self.cache.get_stats()
-        self.assertEqual(stats["hits"], 0)
-        self.assertEqual(stats["misses"], 1)  # From the get after clear
+        assert stats["hits"] == 0
+        assert stats["misses"] == 1  # From the get after clear
 
 
 class EdgeCaseCommentExtractionTest(unittest.TestCase):
     """Test comment extraction with complex edge cases."""
 
-    def test_multiline_comment_patterns(self):
+    def test_multiline_comment_patterns(self) -> None:
         """Test extraction of various multiline comment patterns."""
         extractor = CommentExtractor(MULTILINE_COMMENTS)
 
         # Should find hash-style multiline comments
         found_multiline = False
-        for line_num, comment in extractor.comments.items():
+        for comment in extractor.comments.values():
             if "multiple lines using hash symbols" in comment:
                 found_multiline = True
                 break
 
-        self.assertTrue(found_multiline, "Should find multiline hash comments")
+        assert found_multiline, "Should find multiline hash comments"
 
-    def test_comments_vs_string_literals(self):
+    def test_comments_vs_string_literals(self) -> None:
         """Test distinguishing comments from string literals with #."""
         source = '''
 def test():
@@ -278,7 +278,7 @@ def test():
             for comment in extractor.comments.values()
             if "Real comment" in comment
         ]
-        self.assertEqual(len(real_comments), 1)
+        assert len(real_comments) == 1
 
         # Should also find the line comment
         line_comments = [
@@ -286,9 +286,9 @@ def test():
             for comment in extractor.comments.values()
             if "This is a real comment" in comment
         ]
-        self.assertEqual(len(line_comments), 1)
+        assert len(line_comments) == 1
 
-    def test_unicode_comments(self):
+    def test_unicode_comments(self) -> None:
         """Test handling of Unicode characters in comments."""
         extractor = CommentExtractor(UNICODE_EDGE_CASES)
 
@@ -298,9 +298,9 @@ def test():
             for comment in extractor.comments.values()
             if any(ord(char) > 127 for char in comment)
         ]
-        self.assertGreater(len(unicode_comments), 0, "Should find Unicode comments")
+        assert len(unicode_comments) > 0, "Should find Unicode comments"
 
-    def test_complex_inline_comments(self):
+    def test_complex_inline_comments(self) -> None:
         """Test complex inline comment scenarios."""
         source = """
 x = "string with # hash"  # Comment with émoji 🐍
@@ -311,19 +311,17 @@ z = {'key#1': 'value'}  # Dict with # in key
 
         # Should extract all inline comments
         comments = list(extractor.comments.values())
-        self.assertGreater(len(comments), 0)
+        assert len(comments) > 0
 
         # Should handle Unicode in comments
         unicode_comment_found = any("émoji" in comment for comment in comments)
-        self.assertTrue(
-            unicode_comment_found, "Should handle Unicode in inline comments",
-        )
+        assert unicode_comment_found, "Should handle Unicode in inline comments"
 
 
 class ComplexTypingAnalysisTest(unittest.TestCase):
     """Test analysis of complex type annotations."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -337,7 +335,7 @@ class ComplexTypingAnalysisTest(unittest.TestCase):
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
         return analyzer.analyze()
 
-    def test_complex_generic_types(self):
+    def test_complex_generic_types(self) -> None:
         """Test parsing of complex generic type annotations."""
         analysis = self._analyze_content(COMPLEX_TYPING)
 
@@ -346,20 +344,20 @@ class ComplexTypingAnalysisTest(unittest.TestCase):
         complex_generic = next(
             (c for c in classes if c["name"] == "ComplexGeneric"), None,
         )
-        self.assertIsNotNone(complex_generic, "Should find ComplexGeneric class")
+        assert complex_generic is not None, "Should find ComplexGeneric class"
 
         # Should parse methods with complex signatures
         complex_method = next(
             (m for m in complex_generic["methods"] if m["name"] == "complex_method"),
             None,
         )
-        self.assertIsNotNone(complex_method, "Should find complex_method")
+        assert complex_method is not None, "Should find complex_method"
 
         # Should capture some type information
         args_detailed = complex_method["args_detailed"]
-        self.assertGreater(len(args_detailed), 0, "Should capture argument details")
+        assert len(args_detailed) > 0, "Should capture argument details"
 
-    def test_forward_references(self):
+    def test_forward_references(self) -> None:
         """Test handling of forward references in type annotations."""
         analysis = self._analyze_content(COMPLEX_TYPING)
 
@@ -368,24 +366,24 @@ class ComplexTypingAnalysisTest(unittest.TestCase):
         recursive_func = next(
             (f for f in functions if f["name"] == "recursive_function"), None,
         )
-        self.assertIsNotNone(recursive_func, "Should find recursive_function")
+        assert recursive_func is not None, "Should find recursive_function"
 
         # Should capture return type with forward reference
         return_type = recursive_func.get("return_type")
-        self.assertIsNotNone(return_type, "Should capture return type")
+        assert return_type is not None, "Should capture return type"
 
-    def test_literal_and_final_types(self):
+    def test_literal_and_final_types(self) -> None:
         """Test handling of Literal and Final type annotations."""
         analysis = self._analyze_content(COMPLEX_TYPING)
 
         # Should handle these advanced typing constructs without errors
-        self.assertNotIn("error", analysis)
+        assert "error" not in analysis
 
 
 class ComplexDecoratorAnalysisTest(unittest.TestCase):
     """Test analysis of complex decorator patterns."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -399,7 +397,7 @@ class ComplexDecoratorAnalysisTest(unittest.TestCase):
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
         return analyzer.analyze()
 
-    def test_decorators_with_arguments(self):
+    def test_decorators_with_arguments(self) -> None:
         """Test parsing decorators with complex arguments."""
         analysis = self._analyze_content(COMPLEX_DECORATORS)
 
@@ -408,7 +406,7 @@ class ComplexDecoratorAnalysisTest(unittest.TestCase):
         showcase_class = next(
             (c for c in classes if c["name"] == "DecoratorShowcase"), None,
         )
-        self.assertIsNotNone(showcase_class)
+        assert showcase_class is not None
 
         heavily_decorated = next(
             (
@@ -418,29 +416,29 @@ class ComplexDecoratorAnalysisTest(unittest.TestCase):
             ),
             None,
         )
-        self.assertIsNotNone(heavily_decorated)
+        assert heavily_decorated is not None
 
         # Should capture multiple decorators
         decorators = heavily_decorated.get("decorators", [])
-        self.assertGreater(len(decorators), 1, "Should capture multiple decorators")
+        assert len(decorators) > 1, "Should capture multiple decorators"
 
         # Should include decorator arguments in some form
         # Note: This may depend on implementation details
 
-    def test_custom_decorator_classes(self):
+    def test_custom_decorator_classes(self) -> None:
         """Test handling of custom decorator classes."""
         analysis = self._analyze_content(COMPLEX_DECORATORS)
 
         # Should find the retry decorator function
         functions = analysis["functions"]
         retry_func = next((f for f in functions if f["name"] == "retry"), None)
-        self.assertIsNotNone(retry_func)
+        assert retry_func is not None
 
         # Should capture the decorator implementation properly
-        self.assertIsNotNone(retry_func.get("docstring"))
-        self.assertEqual(retry_func["name"], "retry")
+        assert retry_func.get("docstring") is not None
+        assert retry_func["name"] == "retry"
 
-    def test_stacked_decorators(self):
+    def test_stacked_decorators(self) -> None:
         """Test handling of multiple stacked decorators."""
         analysis = self._analyze_content(COMPLEX_DECORATORS)
 
@@ -454,17 +452,17 @@ class ComplexDecoratorAnalysisTest(unittest.TestCase):
             (m for m in showcase_class["methods"] if m["name"] == "cached_property"),
             None,
         )
-        self.assertIsNotNone(cached_property)
+        assert cached_property is not None
 
         # Should capture multiple decorators
         decorators = cached_property.get("decorators", [])
-        self.assertGreaterEqual(len(decorators), 2, "Should capture stacked decorators")
+        assert len(decorators) >= 2, "Should capture stacked decorators"
 
 
 class AsyncPatternAnalysisTest(unittest.TestCase):
     """Test analysis of async/await patterns."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -478,7 +476,7 @@ class AsyncPatternAnalysisTest(unittest.TestCase):
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
         return analyzer.analyze()
 
-    def test_async_method_detection(self):
+    def test_async_method_detection(self) -> None:
         """Test detection of async methods."""
         analysis = self._analyze_content(ASYNC_PATTERNS)
 
@@ -487,20 +485,20 @@ class AsyncPatternAnalysisTest(unittest.TestCase):
         async_processor = next(
             (c for c in classes if c["name"] == "AsyncProcessor"), None,
         )
-        self.assertIsNotNone(async_processor)
+        assert async_processor is not None
 
         # Find async methods
         async_methods = [m for m in async_processor["methods"] if m.get("is_async")]
-        self.assertGreater(len(async_methods), 0, "Should find async methods")
+        assert len(async_methods) > 0, "Should find async methods"
 
         # Verify specific async method
         simple_async = next(
             (m for m in async_methods if m["name"] == "simple_async_method"), None,
         )
-        self.assertIsNotNone(simple_async)
-        self.assertTrue(simple_async["is_async"])
+        assert simple_async is not None
+        assert simple_async["is_async"]
 
-    def test_async_context_manager_methods(self):
+    def test_async_context_manager_methods(self) -> None:
         """Test detection of async context manager methods."""
         analysis = self._analyze_content(ASYNC_PATTERNS)
 
@@ -508,14 +506,14 @@ class AsyncPatternAnalysisTest(unittest.TestCase):
         async_processor = next(
             (c for c in classes if c["name"] == "AsyncProcessor"), None,
         )
-        self.assertIsNotNone(async_processor)
+        assert async_processor is not None
 
         # Should find __aenter__ and __aexit__ methods
         method_names = [m["name"] for m in async_processor["methods"]]
-        self.assertIn("__aenter__", method_names)
-        self.assertIn("__aexit__", method_names)
+        assert "__aenter__" in method_names
+        assert "__aexit__" in method_names
 
-    def test_complex_async_inheritance(self):
+    def test_complex_async_inheritance(self) -> None:
         """Test async classes with inheritance."""
         analysis = self._analyze_content(ASYNC_PATTERNS)
 
@@ -523,20 +521,20 @@ class AsyncPatternAnalysisTest(unittest.TestCase):
         async_processor = next(
             (c for c in classes if c["name"] == "AsyncProcessor"), None,
         )
-        self.assertIsNotNone(async_processor)
+        assert async_processor is not None
 
         # Should capture the class properly
-        self.assertEqual(async_processor["name"], "AsyncProcessor")
+        assert async_processor["name"] == "AsyncProcessor"
 
         # Should have async methods
         async_methods = [m for m in async_processor["methods"] if m.get("is_async")]
-        self.assertGreater(len(async_methods), 0, "Should have async methods")
+        assert len(async_methods) > 0, "Should have async methods"
 
 
 class UnicodeHandlingTest(unittest.TestCase):
     """Test Unicode and special character handling."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -551,19 +549,19 @@ class UnicodeHandlingTest(unittest.TestCase):
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
         return analyzer.analyze()
 
-    def test_unicode_in_docstrings(self):
+    def test_unicode_in_docstrings(self) -> None:
         """Test handling of Unicode characters in docstrings."""
         analysis = self._analyze_content(UNICODE_EDGE_CASES)
 
         # Should parse without errors
-        self.assertNotIn("error", analysis)
+        assert "error" not in analysis
 
         # Should capture Unicode docstrings
         classes = analysis["classes"]
         unicode_processor = next(
             (c for c in classes if c["name"] == "UnicodeProcessor"), None,
         )
-        self.assertIsNotNone(unicode_processor)
+        assert unicode_processor is not None
 
         # Should find method with Unicode in docstring
         unicode_method = next(
@@ -574,16 +572,13 @@ class UnicodeHandlingTest(unittest.TestCase):
             ),
             None,
         )
-        self.assertIsNotNone(unicode_method)
+        assert unicode_method is not None
 
         # Method docstring should contain Unicode
         docstring = unicode_method.get("docstring", "")
-        self.assertTrue(
-            any(ord(char) > 127 for char in docstring),
-            "Should preserve Unicode in docstrings",
-        )
+        assert any(ord(char) > 127 for char in docstring), "Should preserve Unicode in docstrings"
 
-    def test_unicode_in_comments(self):
+    def test_unicode_in_comments(self) -> None:
         """Test handling of Unicode in comments."""
         extractor = CommentExtractor(UNICODE_EDGE_CASES)
 
@@ -593,35 +588,35 @@ class UnicodeHandlingTest(unittest.TestCase):
             for comment in extractor.comments.values()
             if any(ord(char) > 127 for char in comment)
         ]
-        self.assertGreater(len(unicode_comments), 0, "Should find Unicode comments")
+        assert len(unicode_comments) > 0, "Should find Unicode comments"
 
-    def test_unicode_constant_names(self):
+    def test_unicode_constant_names(self) -> None:
         """Test handling of Unicode in constant names and values."""
         analysis = self._analyze_content(UNICODE_EDGE_CASES)
 
         # Should handle Unicode constant values without errors
-        self.assertNotIn("error", analysis)
+        assert "error" not in analysis
         # Unicode might be in values, which we may or may not capture depending on implementation
 
-    def test_raw_strings_and_escapes(self):
+    def test_raw_strings_and_escapes(self) -> None:
         """Test handling of raw strings and escape sequences."""
         analysis = self._analyze_content(RAW_STRING_PATTERNS)
 
         # Should parse without errors
-        self.assertNotIn("error", analysis)
+        assert "error" not in analysis
 
         # Should handle complex string patterns
         classes = analysis["classes"]
         string_processor = next(
             (c for c in classes if c["name"] == "StringProcessor"), None,
         )
-        self.assertIsNotNone(string_processor)
+        assert string_processor is not None
 
 
 class DeterministicOutputTest(unittest.TestCase):
     """Test deterministic output across various edge cases."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -641,37 +636,34 @@ class DeterministicOutputTest(unittest.TestCase):
 
         return results
 
-    def test_deterministic_complex_typing(self):
+    def test_deterministic_complex_typing(self) -> None:
         """Test deterministic output with complex type annotations."""
         results = self._generate_docs_multiple_times(COMPLEX_TYPING)
 
         # All results should be identical
         for i in range(1, len(results)):
-            self.assertEqual(results[0], results[i], f"Run {i} differs from run 0")
+            assert results[0] == results[i], f"Run {i} differs from run 0"
 
-    def test_deterministic_complex_decorators(self):
+    def test_deterministic_complex_decorators(self) -> None:
         """Test deterministic output with complex decorators."""
         results = self._generate_docs_multiple_times(COMPLEX_DECORATORS)
 
         # All results should be identical
         for i in range(1, len(results)):
-            self.assertEqual(results[0], results[i], f"Run {i} differs from run 0")
+            assert results[0] == results[i], f"Run {i} differs from run 0"
 
-    def test_deterministic_unicode_content(self):
+    def test_deterministic_unicode_content(self) -> None:
         """Test deterministic output with Unicode content."""
         results = self._generate_docs_multiple_times(UNICODE_EDGE_CASES)
 
         # All results should be identical
         for i in range(1, len(results)):
-            self.assertEqual(results[0], results[i], f"Run {i} differs from run 0")
+            assert results[0] == results[i], f"Run {i} differs from run 0"
 
         # Verify Unicode is preserved in output
-        self.assertTrue(
-            any(ord(char) > 127 for char in results[0]),
-            "Unicode should be preserved in output",
-        )
+        assert any(ord(char) > 127 for char in results[0]), "Unicode should be preserved in output"
 
-    def test_deterministic_hash_consistency(self):
+    def test_deterministic_hash_consistency(self) -> None:
         """Test that content hashes are consistent."""
         results = self._generate_docs_multiple_times(COMPLEX_INHERITANCE)
 
@@ -680,13 +672,13 @@ class DeterministicOutputTest(unittest.TestCase):
 
         # All hashes should be identical
         for i in range(1, len(hashes)):
-            self.assertEqual(hashes[0], hashes[i], f"Hash {i} differs from hash 0")
+            assert hashes[0] == hashes[i], f"Hash {i} differs from hash 0"
 
 
 class IntegrationWithCacheTest(unittest.TestCase):
     """Test integration of all features with caching."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -695,7 +687,7 @@ class IntegrationWithCacheTest(unittest.TestCase):
         self.cache_dir = self.temp_path / "cache"
         self.cache = ParseCache(self.cache_dir)
 
-    def test_cache_with_complex_content(self):
+    def test_cache_with_complex_content(self) -> None:
         """Test caching behavior with complex content."""
         file_path = self.temp_path / "complex.py"
         file_path.write_text(COMPLEX_TYPING, encoding="utf-8")
@@ -704,19 +696,19 @@ class IntegrationWithCacheTest(unittest.TestCase):
         analyzer1 = DeterministicPythonModuleAnalyzer(file_path, cache=self.cache)
         analysis1 = analyzer1.analyze()
 
-        self.assertEqual(self.cache.stats["misses"], 1)
-        self.assertEqual(self.cache.stats["hits"], 0)
+        assert self.cache.stats["misses"] == 1
+        assert self.cache.stats["hits"] == 0
 
         # Second analysis - should be cache hit
         analyzer2 = DeterministicPythonModuleAnalyzer(file_path, cache=self.cache)
         analysis2 = analyzer2.analyze()
 
-        self.assertEqual(self.cache.stats["hits"], 1)
+        assert self.cache.stats["hits"] == 1
 
         # Results should be identical
-        self.assertEqual(analysis1, analysis2)
+        assert analysis1 == analysis2
 
-    def test_cache_invalidation_with_unicode_changes(self):
+    def test_cache_invalidation_with_unicode_changes(self) -> None:
         """Test cache invalidation when Unicode content changes."""
         file_path = self.temp_path / "unicode.py"
 
@@ -745,8 +737,8 @@ def test():
         analyzer2 = DeterministicPythonModuleAnalyzer(file_path, cache=self.cache)
         analysis2 = analyzer2.analyze()
 
-        self.assertEqual(self.cache.stats["invalidations"], 1)
-        self.assertNotEqual(analysis1, analysis2)
+        assert self.cache.stats["invalidations"] == 1
+        assert analysis1 != analysis2
 
 
 if __name__ == "__main__":

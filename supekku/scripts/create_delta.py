@@ -46,9 +46,8 @@ def main(argv: list[str] | None = None) -> int:
         requirements=args.requirements,
         allow_missing_plan=args.allow_missing_plan,
     )
-    print(f"Created {result.artifact_id} at {result.directory}")
-    for extra in result.extras:
-        print(f"  -> {extra}")
+    for _extra in result.extras:
+        pass
     return 0
 
 

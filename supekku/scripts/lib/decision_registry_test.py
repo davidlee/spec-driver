@@ -15,7 +15,7 @@ from .decision_registry import DecisionRecord, DecisionRegistry
 class TestDecisionRecord(unittest.TestCase):
     """Tests for DecisionRecord dataclass."""
 
-    def test_to_dict_minimal(self):
+    def test_to_dict_minimal(self) -> None:
         """Test serialization with minimal fields."""
         record = DecisionRecord(id="ADR-001", title="Test Decision", status="accepted")
 
@@ -27,7 +27,7 @@ class TestDecisionRecord(unittest.TestCase):
         assert result["summary"] == ""
         assert "authors" not in result  # Empty lists are omitted
 
-    def test_to_dict_full(self):
+    def test_to_dict_full(self) -> None:
         """Test serialization with all fields populated."""
         record = DecisionRecord(
             id="ADR-002",
@@ -74,7 +74,7 @@ class TestDecisionRegistry(unittest.TestCase):
         (root / ".git").mkdir()
         return root
 
-    def test_init(self):
+    def test_init(self) -> None:
         """Test registry initialization."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -86,7 +86,7 @@ class TestDecisionRegistry(unittest.TestCase):
                 registry.output_path == root / "supekku" / "registry" / "decisions.yaml"
             )
 
-    def test_collect_empty_directory(self):
+    def test_collect_empty_directory(self) -> None:
         """Test collecting from empty directory."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -95,7 +95,7 @@ class TestDecisionRegistry(unittest.TestCase):
             decisions = registry.collect()
             assert len(decisions) == 0
 
-    def test_collect_with_adr_files(self):
+    def test_collect_with_adr_files(self) -> None:
         """Test collecting ADR files."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -144,7 +144,7 @@ We decided to test.
             assert decision.tags == ["api", "security"]
             assert decision.summary == "A test decision"
 
-    def test_parse_adr_file_no_frontmatter(self):
+    def test_parse_adr_file_no_frontmatter(self) -> None:
         """Test parsing ADR file without frontmatter."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -167,7 +167,7 @@ This has no frontmatter.
             assert decision.title == "# ADR-002: No Frontmatter Decision"
             assert decision.status == "draft"  # default status
 
-    def test_write_and_sync(self):
+    def test_write_and_sync(self) -> None:
         """Test writing registry to YAML file."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -200,7 +200,7 @@ status: accepted
             assert data["decisions"]["ADR-003"]["title"] == "Write Test"
             assert data["decisions"]["ADR-003"]["status"] == "accepted"
 
-    def test_find(self):
+    def test_find(self) -> None:
         """Test finding specific decision."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -228,7 +228,7 @@ title: "Find Test"
             missing = registry.find("ADR-999")
             assert missing is None
 
-    def test_filter(self):
+    def test_filter(self) -> None:
         """Test filtering decisions."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -276,7 +276,7 @@ specs: [SPEC-200]
             empty_results = registry.filter(tag="nonexistent")
             assert len(empty_results) == 0
 
-    def test_iter_with_status_filter(self):
+    def test_iter_with_status_filter(self) -> None:
         """Test iterating with status filter."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -322,7 +322,7 @@ status: draft
             assert len(drafts) == 1
             assert drafts[0].id == "ADR-008"
 
-    def test_parse_date_formats(self):
+    def test_parse_date_formats(self) -> None:
         """Test parsing various date formats."""
         registry = DecisionRegistry()
 
@@ -340,7 +340,7 @@ status: draft
         test_date = date(2024, 1, 1)
         assert registry.parse_date(test_date) == test_date
 
-    def test_rebuild_status_symlinks_creates_directories(self):
+    def test_rebuild_status_symlinks_creates_directories(self) -> None:
         """Test that rebuild_status_symlinks creates status directories and symlinks."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -376,20 +376,24 @@ status: draft
             # Verify status directories were created
             accepted_dir = decisions_dir / "accepted"
             draft_dir = decisions_dir / "draft"
-            assert accepted_dir.exists() and accepted_dir.is_dir()
-            assert draft_dir.exists() and draft_dir.is_dir()
+            assert accepted_dir.exists()
+            assert accepted_dir.is_dir()
+            assert draft_dir.exists()
+            assert draft_dir.is_dir()
 
             # Verify symlinks were created
             accepted_link = accepted_dir / "ADR-001-accepted.md"
             draft_link = draft_dir / "ADR-002-draft.md"
-            assert accepted_link.exists() and accepted_link.is_symlink()
-            assert draft_link.exists() and draft_link.is_symlink()
+            assert accepted_link.exists()
+            assert accepted_link.is_symlink()
+            assert draft_link.exists()
+            assert draft_link.is_symlink()
 
             # Verify symlinks point to correct files
             assert accepted_link.resolve() == adr1.resolve()
             assert draft_link.resolve() == adr2.resolve()
 
-    def test_rebuild_status_symlinks_cleans_existing(self):
+    def test_rebuild_status_symlinks_cleans_existing(self) -> None:
         """Test that rebuild_status_symlinks cleans up existing symlinks."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -420,9 +424,10 @@ status: accepted
             assert not old_link.exists()
             # Verify new symlink was created
             new_link = accepted_dir / "ADR-001-test.md"
-            assert new_link.exists() and new_link.is_symlink()
+            assert new_link.exists()
+            assert new_link.is_symlink()
 
-    def test_rebuild_status_symlinks_handles_missing_files(self):
+    def test_rebuild_status_symlinks_handles_missing_files(self) -> None:
         """Test that rebuild_status_symlinks skips ADRs with missing files."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -459,7 +464,7 @@ status: accepted
             # Restore original method
             registry.collect = original_collect
 
-    def test_sync_with_symlinks_integration(self):
+    def test_sync_with_symlinks_integration(self) -> None:
         """Test sync_with_symlinks performs both sync and symlink rebuild."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -490,9 +495,10 @@ status: accepted
             # Verify symlinks were created
             accepted_dir = decisions_dir / "accepted"
             link = accepted_dir / "ADR-001-test.md"
-            assert link.exists() and link.is_symlink()
+            assert link.exists()
+            assert link.is_symlink()
 
-    def test_cleanup_all_status_directories(self):
+    def test_cleanup_all_status_directories(self) -> None:
         """Test _cleanup_all_status_directories removes all symlinks."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -516,7 +522,7 @@ status: accepted
                 assert status_dir.exists()  # Directory still exists
                 assert len(list(status_dir.iterdir())) == 0  # But no symlinks
 
-    def test_rebuild_status_directory_relative_paths(self):
+    def test_rebuild_status_directory_relative_paths(self) -> None:
         """Test _rebuild_status_directory creates relative symlinks."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -542,7 +548,7 @@ status: accepted
             # The symlink target should be relative
             assert str(link.readlink()) == "../ADR-001-test.md"
 
-    def test_status_transition_updates_symlinks(self):
+    def test_status_transition_updates_symlinks(self) -> None:
         """Test that changing ADR status moves symlinks between directories."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -567,7 +573,8 @@ status: draft
             # Verify initial symlink in draft directory
             draft_dir = decisions_dir / "draft"
             draft_link = draft_dir / "ADR-001-test.md"
-            assert draft_link.exists() and draft_link.is_symlink()
+            assert draft_link.exists()
+            assert draft_link.is_symlink()
 
             # Update status to accepted
             adr.write_text(
@@ -586,12 +593,13 @@ status: accepted
             # Verify symlink moved to accepted directory
             accepted_dir = decisions_dir / "accepted"
             accepted_link = accepted_dir / "ADR-001-test.md"
-            assert accepted_link.exists() and accepted_link.is_symlink()
+            assert accepted_link.exists()
+            assert accepted_link.is_symlink()
 
             # Verify old symlink was removed
             assert not draft_link.exists()
 
-    def test_edge_case_invalid_status_values(self):
+    def test_edge_case_invalid_status_values(self) -> None:
         """Test handling of ADRs with invalid/non-standard status values."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -617,9 +625,10 @@ status: unknown-status
             status_dir = decisions_dir / "unknown-status"
             assert status_dir.exists()
             link = status_dir / "ADR-001-test.md"
-            assert link.exists() and link.is_symlink()
+            assert link.exists()
+            assert link.is_symlink()
 
-    def test_edge_case_broken_symlinks_cleanup(self):
+    def test_edge_case_broken_symlinks_cleanup(self) -> None:
         """Test that broken symlinks are properly cleaned up."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -656,9 +665,10 @@ status: accepted
 
             # Verify valid symlink was created
             valid_link = accepted_dir / "ADR-001-test.md"
-            assert valid_link.exists() and valid_link.is_symlink()
+            assert valid_link.exists()
+            assert valid_link.is_symlink()
 
-    def test_edge_case_concurrent_directory_operations(self):
+    def test_edge_case_concurrent_directory_operations(self) -> None:
         """Test robustness when directories are modified during operations."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -690,9 +700,10 @@ status: accepted
 
             # Verify symlink was still created
             link = accepted_dir / "ADR-001-test.md"
-            assert link.exists() and link.is_symlink()
+            assert link.exists()
+            assert link.is_symlink()
 
-    def test_edge_case_empty_decisions_directory(self):
+    def test_edge_case_empty_decisions_directory(self) -> None:
         """Test symlink rebuild with no ADR files."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -715,7 +726,7 @@ status: accepted
                 assert status_dir.exists()
                 assert len(list(status_dir.iterdir())) == 0
 
-    def test_edge_case_permission_errors_handling(self):
+    def test_edge_case_permission_errors_handling(self) -> None:
         """Test graceful handling when symlink creation might fail."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)
@@ -745,12 +756,13 @@ status: accepted
                 registry.rebuild_status_symlinks()
                 # If we reach here, symlink creation succeeded
                 link = accepted_dir / "ADR-001-test.md"
-                assert link.exists() and link.is_symlink()
+                assert link.exists()
+                assert link.is_symlink()
             except PermissionError:
                 # This is acceptable behavior - the system handled the error gracefully
                 pass
 
-    def test_multiple_adrs_same_status_grouping(self):
+    def test_multiple_adrs_same_status_grouping(self) -> None:
         """Test that multiple ADRs with same status are properly grouped."""
         with tempfile.TemporaryDirectory() as tmpdir:
             root = self._setup_test_repo(tmpdir)

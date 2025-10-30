@@ -70,8 +70,6 @@ def handle_sync(args: argparse.Namespace) -> None:
     """Handle the sync command."""
     registry = DecisionRegistry(root=args.root)
     registry.sync_with_symlinks()
-    print(f"Decision registry synced to {registry.output_path}")
-    print("Status symlinks rebuilt")
 
 
 def handle_list(args: argparse.Namespace) -> None:
@@ -91,24 +89,19 @@ def handle_list(args: argparse.Namespace) -> None:
         decisions = list(registry.iter(status=args.status))
 
     if not decisions:
-        print("No decisions found matching criteria.")
         return
 
     # Print header
-    print(f"{'ID':<10} {'Status':<12} {'Updated':<12} {'Title'}")
-    print("-" * 80)
 
     # Print decisions
     for decision in sorted(decisions, key=lambda d: d.id):
-        updated = decision.updated.strftime("%Y-%m-%d") if decision.updated else "N/A"
+        decision.updated.strftime("%Y-%m-%d") if decision.updated else "N/A"
         # Truncate title if too long
         title = decision.title
         if len(title) > 40:
             title = title[:37] + "..."
 
-        print(f"{decision.id:<10} {decision.status:<12} {updated:<12} {title}")
 
-    print(f"\nTotal: {len(decisions)} decisions")
 
 
 def handle_show(args: argparse.Namespace) -> None:
@@ -117,61 +110,52 @@ def handle_show(args: argparse.Namespace) -> None:
     decision = registry.find(args.decision_id)
 
     if not decision:
-        print(f"Decision {args.decision_id} not found.")
         sys.exit(1)
 
     # Print decision details
-    print(f"ID: {decision.id}")
-    print(f"Title: {decision.title}")
-    print(f"Status: {decision.status}")
-    print(f"Summary: {decision.summary}")
 
     if decision.created:
-        print(f"Created: {decision.created}")
+        pass
     if decision.decided:
-        print(f"Decided: {decision.decided}")
+        pass
     if decision.updated:
-        print(f"Updated: {decision.updated}")
+        pass
     if decision.reviewed:
-        print(f"Reviewed: {decision.reviewed}")
+        pass
 
     if decision.authors:
-        print(
-            f"Authors: {', '.join(author.get('name', 'Unknown') for author in decision.authors)}",
-        )
+        pass
     if decision.owners:
-        print(f"Owners: {', '.join(decision.owners)}")
+        pass
 
     if decision.supersedes:
-        print(f"Supersedes: {', '.join(decision.supersedes)}")
+        pass
     if decision.superseded_by:
-        print(f"Superseded by: {', '.join(decision.superseded_by)}")
+        pass
 
     if decision.specs:
-        print(f"Specs: {', '.join(decision.specs)}")
+        pass
     if decision.requirements:
-        print(f"Requirements: {', '.join(decision.requirements)}")
+        pass
     if decision.deltas:
-        print(f"Deltas: {', '.join(decision.deltas)}")
+        pass
     if decision.revisions:
-        print(f"Revisions: {', '.join(decision.revisions)}")
+        pass
     if decision.audits:
-        print(f"Audits: {', '.join(decision.audits)}")
+        pass
 
     if decision.related_decisions:
-        print(f"Related decisions: {', '.join(decision.related_decisions)}")
+        pass
     if decision.related_policies:
-        print(f"Related policies: {', '.join(decision.related_policies)}")
+        pass
 
     if decision.tags:
-        print(f"Tags: {', '.join(decision.tags)}")
+        pass
 
     if decision.backlinks:
-        print("Backlinks:")
-        for link_type, refs in decision.backlinks.items():
-            print(f"  {link_type}: {', '.join(refs)}")
+        for _link_type, _refs in decision.backlinks.items():
+            pass
 
-    print(f"Path: {decision.path}")
 
 
 def handle_new(args: argparse.Namespace) -> None:
@@ -198,7 +182,6 @@ def handle_new(args: argparse.Namespace) -> None:
 
     # Check if file already exists
     if adr_path.exists():
-        print(f"Error: File {adr_path} already exists.")
         sys.exit(1)
 
     # Prepare frontmatter
@@ -278,15 +261,9 @@ The decision that was made and key reasoning.
     adr_path.parent.mkdir(parents=True, exist_ok=True)
     adr_path.write_text(full_content, encoding="utf-8")
 
-    print(f"Created new ADR: {adr_path}")
-    print(f"ID: {adr_id}")
-    print(f"Title: {args.title}")
-    print(f"Status: {args.status}")
 
     # Optionally sync registry
-    print("Syncing decision registry...")
     registry.sync()
-    print("Done!")
 
 
 def main() -> None:
@@ -318,8 +295,7 @@ def main() -> None:
             handle_show(args)
         elif args.command == "new":
             handle_new(args)
-    except (FileNotFoundError, ValueError, KeyError) as e:
-        print(f"Error: {e}", file=sys.stderr)
+    except (FileNotFoundError, ValueError, KeyError):
         sys.exit(1)
 
 

@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import os
 import unittest
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.change_registry import ChangeRegistry
 from supekku.scripts.lib.relations import add_relation
 from supekku.scripts.lib.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class ChangeRegistryTest(RepoTestCase):
@@ -54,14 +57,14 @@ class ChangeRegistryTest(RepoTestCase):
 
         registry = ChangeRegistry(root=root, kind="delta")
         artifacts = registry.collect()
-        self.assertIn("DE-101", artifacts)
+        assert "DE-101" in artifacts
         artifact = artifacts["DE-101"]
-        self.assertEqual(artifact.relations[0]["target"], "SPEC-010.FR-001")
+        assert artifact.relations[0]["target"] == "SPEC-010.FR-001"
 
         registry.sync()
         output = (root / "supekku" / "registry" / "deltas.yaml").read_text()
-        self.assertIn("DE-101", output)
-        self.assertIn("SPEC-010.FR-001", output)
+        assert "DE-101" in output
+        assert "SPEC-010.FR-001" in output
 
 
 if __name__ == "__main__":

@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .revision_blocks import (
     REVISION_BLOCK_MARKER,
     RevisionBlockValidator,
     extract_revision_blocks,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 SAMPLE_VALID_YAML = """schema: supekku.revision.change
 version: 1
@@ -36,7 +39,7 @@ def _wrap_block(inner: str) -> str:
     return f"intro\n```yaml {REVISION_BLOCK_MARKER}\n{inner}```\n<!-- id: block -->\n"
 
 
-def test_extract_revision_block_identifies_marker():
+def test_extract_revision_block_identifies_marker() -> None:
     content = _wrap_block(SAMPLE_VALID_YAML)
     blocks = extract_revision_blocks(content)
     assert len(blocks) == 1
@@ -47,7 +50,7 @@ def test_extract_revision_block_identifies_marker():
     assert block.yaml_content.startswith("schema:")
 
 
-def test_validator_accepts_minimal_valid_payload():
+def test_validator_accepts_minimal_valid_payload() -> None:
     validator = RevisionBlockValidator()
     content = _wrap_block(SAMPLE_VALID_YAML)
     block = extract_revision_blocks(content)[0]
@@ -56,7 +59,7 @@ def test_validator_accepts_minimal_valid_payload():
     assert messages == []
 
 
-def test_validator_flags_missing_destination_for_move():
+def test_validator_flags_missing_destination_for_move() -> None:
     validator = RevisionBlockValidator()
     invalid_yaml = """schema: supekku.revision.change
 version: 1
@@ -77,7 +80,7 @@ requirements:
     assert any("destination" in msg.render_path() for msg in messages)
 
 
-def test_validator_flags_invalid_additional_specs():
+def test_validator_flags_invalid_additional_specs() -> None:
     validator = RevisionBlockValidator()
     invalid = """schema: supekku.revision.change
 version: 1
@@ -100,7 +103,7 @@ requirements:
     assert any("additional_specs" in msg.render_path() for msg in messages)
 
 
-def test_formatting_rewrites_inline_mappings(tmp_path: Path):
+def test_formatting_rewrites_inline_mappings(tmp_path: Path) -> None:
     inline_yaml = """schema: supekku.revision.change
 version: 1
 metadata: {revision: RE-321}

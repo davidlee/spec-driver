@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from .lifecycle import VALID_STATUSES
 from .revision_blocks import (
     RevisionBlockValidator,
     load_revision_blocks,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class RevisionUpdateError(Exception):
@@ -46,27 +49,31 @@ def update_requirement_lifecycle_status(
     """
     # Validate status value
     if new_status not in VALID_STATUSES:
+        msg = f"Invalid status {new_status!r}; must be one of {sorted(VALID_STATUSES)}"
         raise ValueError(
-            f"Invalid status {new_status!r}; must be one of {sorted(VALID_STATUSES)}",
+            msg,
         )
 
     # Read file content
     try:
         original_content = revision_file.read_text(encoding="utf-8")
     except OSError as exc:
-        raise RevisionUpdateError(f"Failed to read {revision_file}: {exc}") from exc
+        msg = f"Failed to read {revision_file}: {exc}"
+        raise RevisionUpdateError(msg) from exc
 
     # Load blocks
     try:
         blocks = load_revision_blocks(revision_file)
     except ValueError as exc:
+        msg = f"Failed to parse revision blocks in {revision_file}: {exc}"
         raise RevisionUpdateError(
-            f"Failed to parse revision blocks in {revision_file}: {exc}",
+            msg,
         ) from exc
 
     if block_index >= len(blocks):
+        msg = f"Block index {block_index} out of range (file has {len(blocks)} blocks)"
         raise RevisionUpdateError(
-            f"Block index {block_index} out of range (file has {len(blocks)} blocks)",
+            msg,
         )
 
     block = blocks[block_index]
@@ -75,33 +82,42 @@ def update_requirement_lifecycle_status(
     try:
         data = block.parse()
     except ValueError as exc:
+        msg = f"Failed to parse block {block_index} YAML: {exc}"
         raise RevisionUpdateError(
-            f"Failed to parse block {block_index} YAML: {exc}",
+            msg,
         ) from exc
 
     # Navigate to requirement
     requirements = data.get("requirements", [])
     if not isinstance(requirements, list):
-        raise RevisionUpdateError(f"Block {block_index} 'requirements' is not a list")
+        msg = f"Block {block_index} 'requirements' is not a list"
+        raise RevisionUpdateError(msg)
 
     if requirement_index >= len(requirements):
-        raise RevisionUpdateError(
+        msg = (
             f"Requirement index {requirement_index} out of range "
-            f"(block has {len(requirements)} requirements)",
+            f"(block has {len(requirements)} requirements)"
+        )
+        raise RevisionUpdateError(
+            msg,
         )
 
     requirement = requirements[requirement_index]
     if not isinstance(requirement, dict):
+        msg = f"Requirement {requirement_index} in block {block_index} is not a dict"
         raise RevisionUpdateError(
-            f"Requirement {requirement_index} in block {block_index} is not a dict",
+            msg,
         )
 
     # Validate requirement ID matches
     actual_req_id = requirement.get("requirement_id")
     if actual_req_id != requirement_id:
-        raise RevisionUpdateError(
+        msg = (
             f"Requirement ID mismatch: expected {requirement_id!r}, "
-            f"found {actual_req_id!r}",
+            f"found {actual_req_id!r}"
+        )
+        raise RevisionUpdateError(
+            msg,
         )
 
     # Check if update needed
@@ -135,13 +151,15 @@ def update_requirement_lifecycle_status(
         new_yaml = block.formatted_yaml(data)
         new_content = block.replace_content(original_content, new_yaml)
     except (ValueError, KeyError) as exc:
-        raise RevisionUpdateError(f"Failed to format updated YAML: {exc}") from exc
+        msg = f"Failed to format updated YAML: {exc}"
+        raise RevisionUpdateError(msg) from exc
 
     # Write back to file
     try:
         revision_file.write_text(new_content, encoding="utf-8")
     except OSError as exc:
-        raise RevisionUpdateError(f"Failed to write {revision_file}: {exc}") from exc
+        msg = f"Failed to write {revision_file}: {exc}"
+        raise RevisionUpdateError(msg) from exc
 
     return True
 

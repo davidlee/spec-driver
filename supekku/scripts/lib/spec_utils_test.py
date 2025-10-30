@@ -7,6 +7,8 @@ import textwrap
 import unittest
 from pathlib import Path
 
+import pytest
+
 from supekku.scripts.lib.frontmatter_schema import FrontmatterValidationError
 from supekku.scripts.lib.spec_utils import (
     append_unique,
@@ -42,15 +44,8 @@ class SpecUtilsTestCase(unittest.TestCase):
 
             frontmatter, body = load_markdown_file(path)
 
-        self.assertEqual(
-            frontmatter,
-            {
-                "id": "SPEC-001",
-                "name": "Example Spec",
-                "kind": "spec",
-            },
-        )
-        self.assertEqual(body, "Body line\n---\nExtra body line\n")
+        assert frontmatter == {"id": "SPEC-001", "name": "Example Spec", "kind": "spec"}
+        assert body == "Body line\n---\nExtra body line\n"
 
     def test_dump_markdown_file_round_trip(self) -> None:
         frontmatter = {"id": "SPEC-010", "name": "Round Trip", "kind": "spec"}
@@ -62,33 +57,33 @@ class SpecUtilsTestCase(unittest.TestCase):
 
             reloaded_frontmatter, reloaded_body = load_markdown_file(path)
 
-        self.assertEqual(reloaded_frontmatter, frontmatter)
-        self.assertEqual(reloaded_body, body)
+        assert reloaded_frontmatter == frontmatter
+        assert reloaded_body == body
 
     def test_ensure_list_entry_returns_existing_list(self) -> None:
         data = {"owners": ["alice"]}
         result = ensure_list_entry(data, "owners")
-        self.assertIs(result, data["owners"])
+        assert result is data["owners"]
 
         result.append("bob")
-        self.assertEqual(data["owners"], ["alice", "bob"])
+        assert data["owners"] == ["alice", "bob"]
 
     def test_ensure_list_entry_raises_for_non_list(self) -> None:
         data = {"owners": "alice"}
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             ensure_list_entry(data, "owners")
 
     def test_append_unique_appends_when_missing(self) -> None:
         values = ["alice"]
         modified = append_unique(values, "bob")
-        self.assertTrue(modified)
-        self.assertEqual(values, ["alice", "bob"])
+        assert modified
+        assert values == ["alice", "bob"]
 
     def test_append_unique_skips_existing_item(self) -> None:
         values = ["alice", "bob"]
         modified = append_unique(values, "alice")
-        self.assertFalse(modified)
-        self.assertEqual(values, ["alice", "bob"])
+        assert not modified
+        assert values == ["alice", "bob"]
 
     def test_validate_frontmatter_success(self) -> None:
         frontmatter = {
@@ -111,17 +106,15 @@ class SpecUtilsTestCase(unittest.TestCase):
 
         result = validate_frontmatter(frontmatter)
 
-        self.assertEqual(result.id, "SPEC-200")
-        self.assertEqual(result.created.isoformat(), "2024-06-01")
-        self.assertEqual(len(result.relations), 1)
+        assert result.id == "SPEC-200"
+        assert result.created.isoformat() == "2024-06-01"
+        assert len(result.relations) == 1
         relation = result.relations[0]
-        self.assertEqual(relation.type, "implements")
-        self.assertEqual(relation.target, "FR-100")
-        self.assertEqual(
-            result.data["relations"][0]["annotation"], "covers primary requirement",
-        )
-        self.assertIsNot(result.data, frontmatter)
-        self.assertEqual(frontmatter["owners"], ["alice"])
+        assert relation.type == "implements"
+        assert relation.target == "FR-100"
+        assert result.data["relations"][0]["annotation"] == "covers primary requirement"
+        assert result.data is not frontmatter
+        assert frontmatter["owners"] == ["alice"]
 
     def test_validate_frontmatter_missing_required_field(self) -> None:
         frontmatter = {
@@ -133,7 +126,7 @@ class SpecUtilsTestCase(unittest.TestCase):
             "updated": "2024-07-01",
         }
 
-        with self.assertRaises(FrontmatterValidationError):
+        with pytest.raises(FrontmatterValidationError):
             validate_frontmatter(frontmatter)
 
     def test_validate_frontmatter_invalid_relations(self) -> None:
@@ -148,7 +141,7 @@ class SpecUtilsTestCase(unittest.TestCase):
             "relations": ["not-a-mapping"],
         }
 
-        with self.assertRaises(FrontmatterValidationError):
+        with pytest.raises(FrontmatterValidationError):
             validate_frontmatter(frontmatter)
 
     def test_load_validated_markdown_file_round_trip(self) -> None:
@@ -169,8 +162,8 @@ class SpecUtilsTestCase(unittest.TestCase):
 
             result, loaded_body = load_validated_markdown_file(path)
 
-        self.assertEqual(result.slug, "load-validated")
-        self.assertEqual(loaded_body, body)
+        assert result.slug == "load-validated"
+        assert loaded_body == body
 
 
 if __name__ == "__main__":

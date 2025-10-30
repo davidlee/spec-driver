@@ -14,7 +14,7 @@ from .spec_index import SpecIndexBuilder, SpecIndexEntry
 class TestSpecIndexEntry(unittest.TestCase):
     """Test SpecIndexEntry data class."""
 
-    def test_creation(self):
+    def test_creation(self) -> None:
         """Test creating a SpecIndexEntry."""
         entry = SpecIndexEntry(
             spec_id="SPEC-001",
@@ -23,13 +23,13 @@ class TestSpecIndexEntry(unittest.TestCase):
             spec_path=Path("/test/SPEC-001/SPEC-001.md"),
         )
 
-        self.assertEqual(entry.spec_id, "SPEC-001")
-        self.assertEqual(entry.slug, "test-spec")
-        self.assertEqual(entry.packages, ["internal/test"])
-        self.assertEqual(entry.spec_path, Path("/test/SPEC-001/SPEC-001.md"))
-        self.assertIsNone(entry.tests_path)
+        assert entry.spec_id == "SPEC-001"
+        assert entry.slug == "test-spec"
+        assert entry.packages == ["internal/test"]
+        assert entry.spec_path == Path("/test/SPEC-001/SPEC-001.md")
+        assert entry.tests_path is None
 
-    def test_creation_with_tests_path(self):
+    def test_creation_with_tests_path(self) -> None:
         """Test creating a SpecIndexEntry with tests path."""
         tests_path = Path("/test/SPEC-001/tests.md")
         entry = SpecIndexEntry(
@@ -40,19 +40,19 @@ class TestSpecIndexEntry(unittest.TestCase):
             tests_path=tests_path,
         )
 
-        self.assertEqual(entry.tests_path, tests_path)
+        assert entry.tests_path == tests_path
 
 
 class TestSpecIndexBuilder(unittest.TestCase):
     """Test SpecIndexBuilder functionality."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test fixtures."""
         self.temp_dir = TemporaryDirectory()
         self.base_dir = Path(self.temp_dir.name)
         self.builder = SpecIndexBuilder(self.base_dir)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Clean up test fixtures."""
         self.temp_dir.cleanup()
 
@@ -71,22 +71,22 @@ class TestSpecIndexBuilder(unittest.TestCase):
         spec_file.write_text(content)
         return spec_file
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test SpecIndexBuilder initialization."""
-        self.assertEqual(self.builder.base_dir, self.base_dir)
-        self.assertEqual(self.builder.slug_dir, self.base_dir / "by-slug")
-        self.assertEqual(self.builder.package_dir, self.base_dir / "by-package")
-        self.assertEqual(self.builder.language_dir, self.base_dir / "by-language")
+        assert self.builder.base_dir == self.base_dir
+        assert self.builder.slug_dir == self.base_dir / "by-slug"
+        assert self.builder.package_dir == self.base_dir / "by-package"
+        assert self.builder.language_dir == self.base_dir / "by-language"
 
-    def test_rebuild_creates_directories(self):
+    def test_rebuild_creates_directories(self) -> None:
         """Test that rebuild creates necessary directories."""
         self.builder.rebuild()
 
-        self.assertTrue(self.builder.slug_dir.exists())
-        self.assertTrue(self.builder.package_dir.exists())
-        self.assertTrue(self.builder.language_dir.exists())
+        assert self.builder.slug_dir.exists()
+        assert self.builder.package_dir.exists()
+        assert self.builder.language_dir.exists()
 
-    def test_rebuild_with_slug_symlinks(self):
+    def test_rebuild_with_slug_symlinks(self) -> None:
         """Test rebuild creates slug-based symlinks."""
         # Create a spec with slug
         self._create_spec_with_frontmatter(
@@ -97,11 +97,11 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
         # Check slug symlink was created
         slug_link = self.builder.slug_dir / "test-authentication"
-        self.assertTrue(slug_link.exists())
-        self.assertTrue(slug_link.is_symlink())
-        self.assertEqual(slug_link.readlink(), Path("../SPEC-001"))
+        assert slug_link.exists()
+        assert slug_link.is_symlink()
+        assert slug_link.readlink() == Path("../SPEC-001")
 
-    def test_rebuild_with_package_symlinks(self):
+    def test_rebuild_with_package_symlinks(self) -> None:
         """Test rebuild creates package-based symlinks."""
         # Create a spec with packages
         self._create_spec_with_frontmatter(
@@ -120,15 +120,15 @@ class TestSpecIndexBuilder(unittest.TestCase):
         )
         cmd_git_link = self.builder.package_dir / "cmd/git/spec"
 
-        self.assertTrue(git_service_link.exists())
-        self.assertTrue(git_service_link.is_symlink())
-        self.assertEqual(git_service_link.readlink(), Path("../../../../../SPEC-002"))
+        assert git_service_link.exists()
+        assert git_service_link.is_symlink()
+        assert git_service_link.readlink() == Path("../../../../../SPEC-002")
 
-        self.assertTrue(cmd_git_link.exists())
-        self.assertTrue(cmd_git_link.is_symlink())
-        self.assertEqual(cmd_git_link.readlink(), Path("../../../SPEC-002"))
+        assert cmd_git_link.exists()
+        assert cmd_git_link.is_symlink()
+        assert cmd_git_link.readlink() == Path("../../../SPEC-002")
 
-    def test_rebuild_with_language_symlinks_go(self):
+    def test_rebuild_with_language_symlinks_go(self) -> None:
         """Test rebuild creates by-language symlinks for Go sources."""
         # Create a spec with Go sources
         self._create_spec_with_frontmatter(
@@ -156,11 +156,11 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
         # Check by-language symlink was created
         go_cmd_link = self.builder.language_dir / "go/cmd/spec"
-        self.assertTrue(go_cmd_link.exists())
-        self.assertTrue(go_cmd_link.is_symlink())
-        self.assertEqual(go_cmd_link.readlink(), Path("../../../SPEC-003"))
+        assert go_cmd_link.exists()
+        assert go_cmd_link.is_symlink()
+        assert go_cmd_link.readlink() == Path("../../../SPEC-003")
 
-    def test_rebuild_with_language_symlinks_python(self):
+    def test_rebuild_with_language_symlinks_python(self) -> None:
         """Test rebuild creates by-language symlinks for Python sources."""
         # Create a spec with Python sources
         self._create_spec_with_frontmatter(
@@ -193,13 +193,11 @@ class TestSpecIndexBuilder(unittest.TestCase):
         python_sync_link = (
             self.builder.language_dir / "python/supekku/scripts/lib/sync_engine.py/spec"
         )
-        self.assertTrue(python_sync_link.exists())
-        self.assertTrue(python_sync_link.is_symlink())
-        self.assertEqual(
-            python_sync_link.readlink(), Path("../../../../../../SPEC-004"),
-        )
+        assert python_sync_link.exists()
+        assert python_sync_link.is_symlink()
+        assert python_sync_link.readlink() == Path("../../../../../../SPEC-004")
 
-    def test_rebuild_with_mixed_language_sources(self):
+    def test_rebuild_with_mixed_language_sources(self) -> None:
         """Test rebuild handles specs with multiple language sources."""
         # Create a spec with both Go and Python sources
         self._create_spec_with_frontmatter(
@@ -232,20 +230,20 @@ class TestSpecIndexBuilder(unittest.TestCase):
         go_link = self.builder.language_dir / "go/internal/multi/spec"
         python_link = self.builder.language_dir / "python/multi_module.py/spec"
 
-        self.assertTrue(go_link.exists())
-        self.assertTrue(go_link.is_symlink())
-        self.assertEqual(go_link.readlink(), Path("../../../../SPEC-005"))
+        assert go_link.exists()
+        assert go_link.is_symlink()
+        assert go_link.readlink() == Path("../../../../SPEC-005")
 
-        self.assertTrue(python_link.exists())
-        self.assertTrue(python_link.is_symlink())
-        self.assertEqual(python_link.readlink(), Path("../../../SPEC-005"))
+        assert python_link.exists()
+        assert python_link.is_symlink()
+        assert python_link.readlink() == Path("../../../SPEC-005")
 
         # Also check that package symlink was created (for backwards compatibility)
         package_link = self.builder.package_dir / "internal/multi/spec"
-        self.assertTrue(package_link.exists())
-        self.assertTrue(package_link.is_symlink())
+        assert package_link.exists()
+        assert package_link.is_symlink()
 
-    def test_rebuild_skips_sources_without_language_or_identifier(self):
+    def test_rebuild_skips_sources_without_language_or_identifier(self) -> None:
         """Test rebuild skips sources missing language or identifier."""
         # Create a spec with incomplete source entries
         self._create_spec_with_frontmatter(
@@ -282,15 +280,15 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
         # Only the valid source should have a symlink
         valid_link = self.builder.language_dir / "python/valid_module.py/spec"
-        self.assertTrue(valid_link.exists())
+        assert valid_link.exists()
 
         # Invalid sources should not have symlinks
         go_dir = self.builder.language_dir / "go"
         if go_dir.exists():
             # Should be empty since the Go source was invalid
-            self.assertEqual(len(list(go_dir.rglob("*"))), 0)
+            assert len(list(go_dir.rglob("*"))) == 0
 
-    def test_rebuild_cleans_existing_symlinks(self):
+    def test_rebuild_cleans_existing_symlinks(self) -> None:
         """Test rebuild cleans up existing symlinks before creating new ones."""
         # Create initial spec
         self._create_spec_with_frontmatter(
@@ -312,8 +310,8 @@ class TestSpecIndexBuilder(unittest.TestCase):
         # Verify initial symlinks
         old_slug_link = self.builder.slug_dir / "old-spec"
         old_lang_link = self.builder.language_dir / "go/old/package/spec"
-        self.assertTrue(old_slug_link.exists())
-        self.assertTrue(old_lang_link.exists())
+        assert old_slug_link.exists()
+        assert old_lang_link.exists()
 
         # Update the spec
         self._create_spec_with_frontmatter(
@@ -333,16 +331,16 @@ class TestSpecIndexBuilder(unittest.TestCase):
         self.builder.rebuild()
 
         # Old symlinks should be gone
-        self.assertFalse(old_slug_link.exists())
-        self.assertFalse(old_lang_link.exists())
+        assert not old_slug_link.exists()
+        assert not old_lang_link.exists()
 
         # New symlinks should exist
         new_slug_link = self.builder.slug_dir / "updated-spec"
         new_lang_link = self.builder.language_dir / "go/new/package/spec"
-        self.assertTrue(new_slug_link.exists())
-        self.assertTrue(new_lang_link.exists())
+        assert new_slug_link.exists()
+        assert new_lang_link.exists()
 
-    def test_rebuild_creates_nested_directory_structure(self):
+    def test_rebuild_creates_nested_directory_structure(self) -> None:
         """Test rebuild creates nested directories for complex identifiers."""
         # Create spec with deeply nested identifier
         self._create_spec_with_frontmatter(
@@ -368,16 +366,14 @@ class TestSpecIndexBuilder(unittest.TestCase):
             self.builder.language_dir
             / "go/internal/application/services/authentication/oauth/spec"
         )
-        self.assertTrue(oauth_link.exists())
-        self.assertTrue(oauth_link.is_symlink())
-        self.assertEqual(oauth_link.readlink(), Path("../../../../../../../SPEC-008"))
+        assert oauth_link.exists()
+        assert oauth_link.is_symlink()
+        assert oauth_link.readlink() == Path("../../../../../../../SPEC-008")
 
         # Verify parent directories exist
-        self.assertTrue(
-            (self.builder.language_dir / "go/internal/application/services").exists(),
-        )
+        assert (self.builder.language_dir / "go/internal/application/services").exists()
 
-    def test_rebuild_handles_missing_spec_files(self):
+    def test_rebuild_handles_missing_spec_files(self) -> None:
         """Test rebuild gracefully handles missing spec files."""
         # Create spec directory without the actual spec file
         spec_dir = self.base_dir / "SPEC-999"
@@ -387,10 +383,10 @@ class TestSpecIndexBuilder(unittest.TestCase):
         self.builder.rebuild()
 
         # No symlinks should be created for missing spec
-        self.assertEqual(len(list(self.builder.slug_dir.iterdir())), 0)
-        self.assertEqual(len(list(self.builder.language_dir.rglob("*"))), 0)
+        assert len(list(self.builder.slug_dir.iterdir())) == 0
+        assert len(list(self.builder.language_dir.rglob("*"))) == 0
 
-    def test_rebuild_handles_malformed_frontmatter(self):
+    def test_rebuild_handles_malformed_frontmatter(self) -> None:
         """Test rebuild handles specs with malformed frontmatter."""
         # Create spec with invalid YAML
         spec_dir = self.base_dir / "SPEC-010"
@@ -408,14 +404,14 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
         # Check that warning was printed
         output = captured_output.getvalue()
-        self.assertIn("Warning: Malformed YAML frontmatter", output)
-        self.assertIn("SPEC-010.md", output)
+        assert "Warning: Malformed YAML frontmatter" in output
+        assert "SPEC-010.md" in output
 
         # No symlinks should be created for malformed spec
-        self.assertEqual(len(list(self.builder.slug_dir.iterdir())), 0)
-        self.assertEqual(len(list(self.builder.language_dir.rglob("*"))), 0)
+        assert len(list(self.builder.slug_dir.iterdir())) == 0
+        assert len(list(self.builder.language_dir.rglob("*"))) == 0
 
-    def test_rebuild_handles_empty_frontmatter(self):
+    def test_rebuild_handles_empty_frontmatter(self) -> None:
         """Test rebuild handles specs with empty frontmatter."""
         # Create spec with empty frontmatter
         spec_dir = self.base_dir / "SPEC-011"
@@ -427,10 +423,10 @@ class TestSpecIndexBuilder(unittest.TestCase):
         self.builder.rebuild()
 
         # No symlinks should be created for empty frontmatter
-        self.assertEqual(len(list(self.builder.slug_dir.iterdir())), 0)
-        self.assertEqual(len(list(self.builder.language_dir.rglob("*"))), 0)
+        assert len(list(self.builder.slug_dir.iterdir())) == 0
+        assert len(list(self.builder.language_dir.rglob("*"))) == 0
 
-    def test_read_frontmatter_valid_yaml(self):
+    def test_read_frontmatter_valid_yaml(self) -> None:
         """Test _read_frontmatter with valid YAML."""
         spec_file = self._create_spec_with_frontmatter(
             "SPEC-TEST", {"slug": "test", "packages": ["test/pkg"]},
@@ -438,10 +434,10 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
         frontmatter = self.builder._read_frontmatter(spec_file)
 
-        self.assertEqual(frontmatter["slug"], "test")
-        self.assertEqual(frontmatter["packages"], ["test/pkg"])
+        assert frontmatter["slug"] == "test"
+        assert frontmatter["packages"] == ["test/pkg"]
 
-    def test_read_frontmatter_no_frontmatter(self):
+    def test_read_frontmatter_no_frontmatter(self) -> None:
         """Test _read_frontmatter with file without frontmatter."""
         spec_dir = self.base_dir / "SPEC-NO-FM"
         spec_dir.mkdir()
@@ -450,9 +446,9 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
         frontmatter = self.builder._read_frontmatter(spec_file)
 
-        self.assertEqual(frontmatter, {})
+        assert frontmatter == {}
 
-    def test_read_frontmatter_incomplete_delimiters(self):
+    def test_read_frontmatter_incomplete_delimiters(self) -> None:
         """Test _read_frontmatter with incomplete frontmatter delimiters."""
         spec_dir = self.base_dir / "SPEC-INCOMPLETE"
         spec_dir.mkdir()
@@ -461,7 +457,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
         frontmatter = self.builder._read_frontmatter(spec_file)
 
-        self.assertEqual(frontmatter, {})
+        assert frontmatter == {}
 
 
 if __name__ == "__main__":

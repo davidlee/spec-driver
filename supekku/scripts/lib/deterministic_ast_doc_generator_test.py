@@ -41,7 +41,7 @@ from supekku.scripts.lib.docs.python.generator import (
 class CommentExtractorTest(unittest.TestCase):
     """Test the CommentExtractor class."""
 
-    def test_extract_basic_comments(self):
+    def test_extract_basic_comments(self) -> None:
         """Test extraction of basic comments."""
         source = """# Module comment
 def func():
@@ -51,14 +51,14 @@ def func():
 """
         extractor = CommentExtractor(source)
 
-        self.assertEqual(extractor.comments[1], "Module comment")
-        self.assertEqual(extractor.comments[3], "Function comment")
+        assert extractor.comments[1] == "Module comment"
+        assert extractor.comments[3] == "Function comment"
 
         # For inline comments, the extractor may only catch whole-line comments
         # Test that we found at least the first two comments
-        self.assertGreaterEqual(len(extractor.comments), 2)
+        assert len(extractor.comments) >= 2
 
-    def test_ignore_shebang(self):
+    def test_ignore_shebang(self) -> None:
         """Test that shebang lines are ignored."""
         source = """#!/usr/bin/env python3
 # Real comment
@@ -67,10 +67,10 @@ def func():
 """
         extractor = CommentExtractor(source)
 
-        self.assertNotIn(1, extractor.comments)  # Shebang ignored
-        self.assertEqual(extractor.comments[2], "Real comment")
+        assert 1 not in extractor.comments  # Shebang ignored
+        assert extractor.comments[2] == "Real comment"
 
-    def test_get_comment_for_line_direct(self):
+    def test_get_comment_for_line_direct(self) -> None:
         """Test getting comment for exact line."""
         source = """def func():
     # Direct comment
@@ -79,9 +79,9 @@ def func():
         extractor = CommentExtractor(source)
 
         comment = extractor.get_comment_for_line(2)
-        self.assertEqual(comment, "Direct comment")
+        assert comment == "Direct comment"
 
-    def test_get_comment_for_line_nearby(self):
+    def test_get_comment_for_line_nearby(self) -> None:
         """Test getting comment from nearby lines."""
         source = """def func():
     # Comment for next line
@@ -92,9 +92,9 @@ def func():
 
         # Should find comment from line 2 when asking for line 4
         comment = extractor.get_comment_for_line(4, context=2)
-        self.assertEqual(comment, "Comment for next line")
+        assert comment == "Comment for next line"
 
-    def test_get_comment_for_line_none(self):
+    def test_get_comment_for_line_none(self) -> None:
         """Test when no comment is found."""
         source = """def func():
     return True
@@ -102,13 +102,13 @@ def func():
         extractor = CommentExtractor(source)
 
         comment = extractor.get_comment_for_line(2)
-        self.assertIsNone(comment)
+        assert comment is None
 
 
 class DeterministicPythonModuleAnalyzerTest(unittest.TestCase):
     """Test the DeterministicPythonModuleAnalyzer class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -121,37 +121,37 @@ class DeterministicPythonModuleAnalyzerTest(unittest.TestCase):
             f.write(content)
         return file_path
 
-    def test_simple_class_parsing(self):
+    def test_simple_class_parsing(self) -> None:
         """Test parsing a simple class with methods."""
         file_path = self._write_temp_file(SIMPLE_CLASS)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
         analysis = analyzer.analyze()
 
         classes = analysis["classes"]
-        self.assertEqual(len(classes), 1)
+        assert len(classes) == 1
 
         calc_class = classes[0]
-        self.assertEqual(calc_class["name"], "Calculator")
-        self.assertEqual(calc_class["docstring"], "A simple calculator class.")
+        assert calc_class["name"] == "Calculator"
+        assert calc_class["docstring"] == "A simple calculator class."
 
         # Should have __init__, add, and _private_method
         methods = calc_class["methods"]
         method_names = [m["name"] for m in methods]
-        self.assertIn("__init__", method_names)
-        self.assertIn("add", method_names)
-        self.assertIn("_private_method", method_names)
+        assert "__init__" in method_names
+        assert "add" in method_names
+        assert "_private_method" in method_names
 
-    def test_complex_type_annotations(self):
+    def test_complex_type_annotations(self) -> None:
         """Test parsing complex type annotations."""
         file_path = self._write_temp_file(COMPLEX_TYPES)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
         analysis = analyzer.analyze()
 
         classes = analysis["classes"]
-        self.assertGreater(len(classes), 0)
+        assert len(classes) > 0
 
         processor_class = next(c for c in classes if c["name"] == "DataProcessor")
-        self.assertEqual(processor_class["name"], "DataProcessor")
+        assert processor_class["name"] == "DataProcessor"
 
         methods = processor_class["methods"]
         process_method = next(m for m in methods if m["name"] == "process")
@@ -169,9 +169,9 @@ class DeterministicPythonModuleAnalyzerTest(unittest.TestCase):
         if return_type and ("List" in return_type or "Tuple" in return_type):
             found_complex_types = True
 
-        self.assertTrue(found_complex_types, "Should capture complex type annotations")
+        assert found_complex_types, "Should capture complex type annotations"
 
-    def test_decorator_parsing(self):
+    def test_decorator_parsing(self) -> None:
         """Test parsing of decorators."""
         file_path = self._write_temp_file(DECORATOR_HEAVY)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
@@ -185,9 +185,9 @@ class DeterministicPythonModuleAnalyzerTest(unittest.TestCase):
 
         # Should capture decorators in some form
         decorators = static_method.get("decorators", [])
-        self.assertGreater(len(decorators), 0)
+        assert len(decorators) > 0
 
-    def test_functions_and_constants(self):
+    def test_functions_and_constants(self) -> None:
         """Test parsing standalone functions and constants."""
         file_path = self._write_temp_file(FUNCTIONS_AND_CONSTANTS)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
@@ -198,15 +198,15 @@ class DeterministicPythonModuleAnalyzerTest(unittest.TestCase):
 
         # Check functions
         function_names = [f["name"] for f in functions]
-        self.assertIn("calculate_area", function_names)
-        self.assertIn("format_name", function_names)
+        assert "calculate_area" in function_names
+        assert "format_name" in function_names
 
         # Check constants
         constant_names = [c["name"] for c in constants]
-        self.assertIn("MAX_SIZE", constant_names)
-        self.assertIn("DEFAULT_NAME", constant_names)
+        assert "MAX_SIZE" in constant_names
+        assert "DEFAULT_NAME" in constant_names
 
-    def test_inheritance_hierarchy(self):
+    def test_inheritance_hierarchy(self) -> None:
         """Test parsing inheritance relationships."""
         file_path = self._write_temp_file(INHERITANCE_EXAMPLE)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
@@ -216,29 +216,29 @@ class DeterministicPythonModuleAnalyzerTest(unittest.TestCase):
         class_dict = {c["name"]: c for c in classes}
 
         # Check inheritance
-        self.assertIn("BaseProcessor", class_dict)
-        self.assertIn("TextProcessor", class_dict)
-        self.assertIn("AdvancedTextProcessor", class_dict)
+        assert "BaseProcessor" in class_dict
+        assert "TextProcessor" in class_dict
+        assert "AdvancedTextProcessor" in class_dict
 
         # Check that base classes are captured
         text_processor = class_dict["TextProcessor"]
-        self.assertIn("bases", text_processor)
+        assert "bases" in text_processor
 
-    def test_comment_association(self):
+    def test_comment_association(self) -> None:
         """Test that comments are properly associated with code elements."""
         file_path = self._write_temp_file(COMMENT_VARIATIONS)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
         analysis = analyzer.analyze()
 
         # Should successfully parse without errors
-        self.assertIn("classes", analysis)
-        self.assertGreater(len(analysis["classes"]), 0)
+        assert "classes" in analysis
+        assert len(analysis["classes"]) > 0
 
 
 class DocumentationGenerationTest(unittest.TestCase):
     """Test the documentation generation functions."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -251,7 +251,7 @@ class DocumentationGenerationTest(unittest.TestCase):
             f.write(content)
         return file_path
 
-    def test_public_documentation_generation(self):
+    def test_public_documentation_generation(self) -> None:
         """Test generation of public-only documentation."""
         file_path = self._write_temp_file(SIMPLE_CLASS)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
@@ -260,14 +260,14 @@ class DocumentationGenerationTest(unittest.TestCase):
         doc_content = generate_deterministic_markdown_spec(analysis, "public")
 
         # Should include public methods
-        self.assertIn("add", doc_content)
+        assert "add" in doc_content
         # Note: __init__ might be excluded from public docs in some implementations
         # self.assertIn("__init__", doc_content)
 
         # Should exclude private methods in public docs
-        self.assertNotIn("_private_method", doc_content)
+        assert "_private_method" not in doc_content
 
-    def test_all_documentation_generation(self):
+    def test_all_documentation_generation(self) -> None:
         """Test generation of complete documentation."""
         file_path = self._write_temp_file(SIMPLE_CLASS)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
@@ -276,10 +276,10 @@ class DocumentationGenerationTest(unittest.TestCase):
         doc_content = generate_deterministic_markdown_spec(analysis, "all")
 
         # Should include all methods including private
-        self.assertIn("add", doc_content)
-        self.assertIn("_private_method", doc_content)
+        assert "add" in doc_content
+        assert "_private_method" in doc_content
 
-    def test_deterministic_output(self):
+    def test_deterministic_output(self) -> None:
         """Test that output is deterministic across multiple runs."""
         file_path = self._write_temp_file(SIMPLE_CLASS)
 
@@ -297,10 +297,10 @@ class DocumentationGenerationTest(unittest.TestCase):
         result3 = generate_deterministic_markdown_spec(analysis3, "all")
 
         # All results should be identical
-        self.assertEqual(result1, result2)
-        self.assertEqual(result2, result3)
+        assert result1 == result2
+        assert result2 == result3
 
-    def test_deterministic_hash_consistency(self):
+    def test_deterministic_hash_consistency(self) -> None:
         """Test that content hashes are consistent."""
         file_path = self._write_temp_file(SIMPLE_CLASS)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
@@ -311,9 +311,9 @@ class DocumentationGenerationTest(unittest.TestCase):
         hash1 = calculate_content_hash(content)
         hash2 = calculate_content_hash(content)
 
-        self.assertEqual(hash1, hash2)
+        assert hash1 == hash2
 
-    def test_empty_module_handling(self):
+    def test_empty_module_handling(self) -> None:
         """Test handling of empty or minimal modules."""
         file_path = self._write_temp_file(MINIMAL_MODULE)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
@@ -321,9 +321,9 @@ class DocumentationGenerationTest(unittest.TestCase):
 
         # Should handle empty module without errors
         doc_content = generate_deterministic_markdown_spec(analysis, "all")
-        self.assertIn("test_module", doc_content)
+        assert "test_module" in doc_content
 
-    def test_syntax_error_handling(self):
+    def test_syntax_error_handling(self) -> None:
         """Test graceful handling of syntax errors."""
         file_path = self._write_temp_file(SYNTAX_ERROR_MODULE)
 
@@ -333,12 +333,12 @@ class DocumentationGenerationTest(unittest.TestCase):
             analysis = analyzer.analyze()
             if "error" in analysis:
                 doc_content = generate_deterministic_markdown_spec(analysis, "all")
-                self.assertIn("Error", doc_content)
+                assert "Error" in doc_content
         except Exception as e:
             # If exception occurs, it should be a specific parsing error
-            self.assertIn("syntax", str(e).lower())
+            assert "syntax" in str(e).lower()
 
-    def test_write_mode_comparison(self):
+    def test_write_mode_comparison(self) -> None:
         """Test the write_mode_comparison function."""
         file_path = self._write_temp_file(SIMPLE_CLASS)
         analyzer = DeterministicPythonModuleAnalyzer(file_path)
@@ -350,21 +350,21 @@ class DocumentationGenerationTest(unittest.TestCase):
         # Test file creation
         status, old_hash, new_hash = write_mode_comparison(output_file, content)
 
-        self.assertEqual(status, "created")
-        self.assertEqual(old_hash, "")
-        self.assertIsNotNone(new_hash)
+        assert status == "created"
+        assert old_hash == ""
+        assert new_hash is not None
 
         # Test file unchanged (run again)
         status, old_hash, new_hash = write_mode_comparison(output_file, content)
 
-        self.assertEqual(status, "unchanged")
-        self.assertEqual(old_hash, new_hash)
+        assert status == "unchanged"
+        assert old_hash == new_hash
 
 
 class CheckModeTest(unittest.TestCase):
     """Test check mode functionality."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
@@ -387,7 +387,7 @@ class CheckModeTest(unittest.TestCase):
             f.write(content)
         return file_path
 
-    def test_check_mode_up_to_date(self):
+    def test_check_mode_up_to_date(self) -> None:
         """Test check mode when docs are up to date."""
         # Create source file
         file_path = self._write_temp_file(SIMPLE_CLASS, "calculator.py")
@@ -405,10 +405,10 @@ class CheckModeTest(unittest.TestCase):
         output_file = self.docs_dir / "calculator-public.md"
         result, old_hash, new_hash = check_mode_comparison(output_file, current_content)
 
-        self.assertTrue(result)  # Should be True when files match
-        self.assertEqual(old_hash, new_hash)
+        assert result  # Should be True when files match
+        assert old_hash == new_hash
 
-    def test_check_mode_outdated(self):
+    def test_check_mode_outdated(self) -> None:
         """Test check mode when docs are outdated."""
         # Create source file
         file_path = self._write_temp_file(SIMPLE_CLASS, "calculator.py")
@@ -426,20 +426,20 @@ class CheckModeTest(unittest.TestCase):
         output_file = self.docs_dir / "calculator-public.md"
         result, old_hash, new_hash = check_mode_comparison(output_file, current_content)
 
-        self.assertFalse(result)  # Should be False when files don't match
-        self.assertNotEqual(old_hash, new_hash)
+        assert not result  # Should be False when files don't match
+        assert old_hash != new_hash
 
 
 class IntegrationTest(unittest.TestCase):
     """Integration tests for the full documentation generation workflow."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
         self.temp_path = Path(self.temp_dir.name)
 
-    def test_full_workflow_simple(self):
+    def test_full_workflow_simple(self) -> None:
         """Test a simple workflow with individual file analysis."""
         # Create a test file
         file_path = self.temp_path / "calculator.py"
@@ -454,11 +454,11 @@ class IntegrationTest(unittest.TestCase):
         result_all = generate_deterministic_markdown_spec(analysis, "all")
 
         # Both should be non-empty and different
-        self.assertGreater(len(result_public), 0)
-        self.assertGreater(len(result_all), 0)
-        self.assertNotEqual(result_public, result_all)
+        assert len(result_public) > 0
+        assert len(result_all) > 0
+        assert result_public != result_all
 
-    def test_sorting_consistency(self):
+    def test_sorting_consistency(self) -> None:
         """Test that sorting is consistent across different runs."""
         mixed_order = """
 class ZebraClass:
@@ -485,8 +485,8 @@ def alpha_function(): pass
             results.append(result)
 
         # All results should be identical
-        self.assertEqual(results[0], results[1])
-        self.assertEqual(results[1], results[2])
+        assert results[0] == results[1]
+        assert results[1] == results[2]
 
 
 if __name__ == "__main__":

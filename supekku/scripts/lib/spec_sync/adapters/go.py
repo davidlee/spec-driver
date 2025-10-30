@@ -1,16 +1,22 @@
-"""Go language adapter for specification synchronization.
-"""
+"""Go language adapter for specification synchronization."""
 
 from __future__ import annotations
 
 import hashlib
 import subprocess
-from collections.abc import Sequence
 from pathlib import Path
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
-from ..models import DocVariant, SourceDescriptor, SourceUnit
+from supekku.scripts.lib.spec_sync.models import (
+    DocVariant,
+    SourceDescriptor,
+    SourceUnit,
+)
+
 from .base import LanguageAdapter
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class GoAdapter(LanguageAdapter):
@@ -38,7 +44,7 @@ class GoAdapter(LanguageAdapter):
 
         """
         # Import at runtime to avoid circular imports
-        from ...sync_engine import TechSpecSyncEngine
+        from supekku.scripts.lib.sync_engine import TechSpecSyncEngine
 
         # Create temporary engine to use existing discovery logic
         temp_engine = TechSpecSyncEngine(
@@ -156,7 +162,7 @@ class GoAdapter(LanguageAdapter):
         self._validate_unit_language(unit)
 
         # Import at runtime to avoid circular imports
-        from ...sync_engine import TechSpecSyncEngine
+        from supekku.scripts.lib.sync_engine import TechSpecSyncEngine
 
         # Get module name for full package path
         temp_engine = TechSpecSyncEngine(
@@ -400,7 +406,4 @@ class GoAdapter(LanguageAdapter):
             return True
 
         # Allow simple paths with reasonable characters
-        if all(c.isalnum() or c in "/-_." for c in identifier):
-            return True
-
-        return False
+        return bool(all(c.isalnum() or c in "/-_." for c in identifier))

@@ -30,13 +30,8 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
     target_root = target_root.resolve()
 
     if not target_root.exists():
-        print(
-            f"Error: Target directory {target_root} does not exist",
-            file=sys.stderr,
-        )
         sys.exit(1)
 
-    print(f"Installing spec-driver workspace in {target_root}")
 
     # Create directory structure
     directories = [
@@ -55,7 +50,6 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
     for dir_path in directories:
         full_path = target_root / dir_path
         full_path.mkdir(parents=True, exist_ok=True)
-        print(f"  Created {dir_path}/")
 
     # Initialize empty registry files
     registry_dir = target_root / "supekku" / "registry"
@@ -74,9 +68,8 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
                 yaml.safe_dump(initial_content, sort_keys=False),
                 encoding="utf-8",
             )
-            print(f"  Initialized {registry_file}")
         else:
-            print(f"  Skipped {registry_file} (already exists)")
+            pass
 
     # Copy templates from package to target
     package_root = get_package_root()
@@ -84,21 +77,18 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
     template_dest = target_root / "supekku" / "templates"
 
     if template_src.exists():
-        print("  Copying templates...")
         for template_file in template_src.glob("*.md"):
             dest_file = template_dest / template_file.name
             if not dest_file.exists():
                 shutil.copy2(template_file, dest_file)
-                print(f"    Copied {template_file.name}")
             else:
-                print(f"    Skipped {template_file.name} (already exists)")
+                pass
 
     # Copy about files from package to target
     about_src = package_root / "about"
     about_dest = target_root / "supekku" / "about"
 
     if about_src.exists():
-        print("  Copying about documentation...")
         for about_file in about_src.rglob("*"):
             if about_file.is_file():
                 relative_path = about_file.relative_to(about_src)
@@ -106,14 +96,12 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
                 dest_file.parent.mkdir(parents=True, exist_ok=True)
                 if not dest_file.exists():
                     shutil.copy2(about_file, dest_file)
-                    print(f"    Copied {relative_path}")
                 else:
-                    print(f"    Skipped {relative_path} (already exists)")
+                    pass
 
     # Copy agent files to .claude/commands/ if .claude exists
     claude_dir = target_root / ".claude"
     if claude_dir.exists() and claude_dir.is_dir():
-        print("  Found .claude directory, copying agent commands...")
         commands_dir = claude_dir / "commands"
         commands_dir.mkdir(parents=True, exist_ok=True)
 
@@ -123,17 +111,11 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
                 dest_file = commands_dir / agent_file.name
                 if not dest_file.exists():
                     shutil.copy2(agent_file, dest_file)
-                    print(f"    Copied {agent_file.name}")
                 else:
-                    print(f"    Skipped {agent_file.name} (already exists)")
+                    pass
     else:
-        print("  No .claude directory found, skipping agent installation")
+        pass
 
-    print("\nWorkspace initialized successfully!")
-    print("\nNext steps:")
-    print("  - Create your first spec with: spec-driver-spec")
-    print("  - Create an ADR with: spec-driver-adr")
-    print("  - See all commands with: spec-driver-* (tab completion)")
 
 
 def main() -> None:

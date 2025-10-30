@@ -15,7 +15,6 @@ if str(ROOT) not in sys.path:
 from supekku.scripts.lib.backlog import find_repo_root  # type: ignore
 from supekku.scripts.lib.cli_utils import add_root_argument
 from supekku.scripts.lib.revision_blocks import (  # type: ignore
-    REVISION_BLOCK_MARKER,
     RevisionBlockValidator,
     RevisionChangeBlock,
     ValidationMessage,
@@ -96,7 +95,6 @@ def main(argv: list[str] | None = None) -> int:
     files = discover_revision_files(root, list(args.paths), args.scan_all)
 
     if not files:
-        print("no revision files matched", file=sys.stderr)
         return 1
 
     validator = RevisionBlockValidator()
@@ -105,27 +103,24 @@ def main(argv: list[str] | None = None) -> int:
     for path in files:
         try:
             content = path.read_text(encoding="utf-8")
-        except OSError as exc:
-            print(f"[ERROR] {path}: {exc}")
+        except OSError:
             exit_code = 1
             continue
 
         blocks = extract_revision_blocks(content, source=path)
         if not blocks:
             if args.strict:
-                print(f"[ERROR] {path}: missing {REVISION_BLOCK_MARKER} block")
                 exit_code = 1
             else:
-                print(f"[WARN] {path}: no {REVISION_BLOCK_MARKER} block found")
+                pass
             continue
 
         updates: list[tuple[RevisionChangeBlock, str]] = []
         file_has_error = False
-        for index, block in enumerate(blocks):
+        for _index, block in enumerate(blocks):
             try:
                 data = block.parse()
-            except ValueError as exc:
-                print(f"[ERROR] {path} block#{index + 1}: {exc}")
+            except ValueError:
                 exit_code = 1
                 file_has_error = True
                 continue
@@ -146,25 +141,21 @@ def main(argv: list[str] | None = None) -> int:
             updated_content = format_file(content, updates)
             if updated_content != content:
                 path.write_text(updated_content, encoding="utf-8")
-                print(f"[UPDATED] {path}")
         elif not file_has_error:
-            print(f"[OK] {path}")
+            pass
 
     return exit_code
 
 
 def _emit_messages(path: Path, messages: list[ValidationMessage]) -> None:
     for message in messages:
-        loc = message.render_path()
-        print(f"[ERROR] {path}:{loc}: {message.message}")
+        message.render_path()
 
 
 def _print_schema() -> None:
-    import json
 
-    from supekku.scripts.lib.revision_blocks import REVISION_BLOCK_JSON_SCHEMA
+    pass
 
-    print(json.dumps(REVISION_BLOCK_JSON_SCHEMA, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

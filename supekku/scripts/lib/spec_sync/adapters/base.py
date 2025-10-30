@@ -1,16 +1,21 @@
-"""Abstract base class for language adapters.
-"""
+"""Abstract base class for language adapters."""
 
 from __future__ import annotations
 
 import subprocess
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
 from pathlib import Path
 from shutil import which
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
-from ..models import DocVariant, SourceDescriptor, SourceUnit
+from supekku.scripts.lib.spec_sync.models import (
+    DocVariant,
+    SourceDescriptor,
+    SourceUnit,
+)
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class LanguageAdapter(ABC):
@@ -25,7 +30,7 @@ class LanguageAdapter(ABC):
 
     language: ClassVar[str]  # Language identifier (e.g., "go", "python", "typescript")
 
-    def __init__(self, repo_root: Path):
+    def __init__(self, repo_root: Path) -> None:
         """Initialize adapter with repository root."""
         self.repo_root = repo_root
         self._git_tracked_files: set[Path] | None = None
@@ -107,8 +112,9 @@ class LanguageAdapter(ABC):
 
         """
         if unit.language != self.language:
+            msg = f"{self.__class__.__name__} cannot process {unit.language} units"
             raise ValueError(
-                f"{self.__class__.__name__} cannot process {unit.language} units",
+                msg,
             )
 
     def _create_doc_variant(

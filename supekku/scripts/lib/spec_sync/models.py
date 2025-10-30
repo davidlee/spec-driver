@@ -1,11 +1,12 @@
-"""Core data models for multi-language specification synchronization.
-"""
+"""Core data models for multi-language specification synchronization."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -41,8 +42,7 @@ class DocVariant:
 
 @dataclass(frozen=True)
 class SourceDescriptor:
-    """Metadata describing how a source unit should be processed.
-    """
+    """Metadata describing how a source unit should be processed."""
 
     slug_parts: list[str]  # parts for generating spec slug
     default_frontmatter: dict[str, Any]  # frontmatter defaults for spec
@@ -51,8 +51,7 @@ class SourceDescriptor:
 
 @dataclass
 class SyncOutcome:
-    """Results from a specification synchronization operation.
-    """
+    """Results from a specification synchronization operation."""
 
     processed_units: list[SourceUnit] = field(default_factory=list)
     created_specs: dict[str, str] = field(default_factory=dict)  # unit_key -> spec_id

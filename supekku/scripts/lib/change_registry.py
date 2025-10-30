@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
 
 from .backlog import find_repo_root
 from .change_artifacts import ChangeArtifact, load_change_artifact
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _KIND_TO_DIR = {
     "delta": "deltas",
@@ -28,7 +30,8 @@ class ChangeRegistry:
 
     def __init__(self, *, root: Path | None = None, kind: str) -> None:
         if kind not in _KIND_TO_DIR:
-            raise ValueError(f"Unsupported change artifact kind: {kind}")
+            msg = f"Unsupported change artifact kind: {kind}"
+            raise ValueError(msg)
         self.kind = kind
         self.root = find_repo_root(root)
         self.directory = self.root / "change" / _KIND_TO_DIR[kind]
@@ -59,9 +62,8 @@ class ChangeRegistry:
                 continue
             try:
                 artifact = load_change_artifact(selected)
-            except ValueError as exc:
+            except ValueError:
                 # Print validation error and continue with remaining artifacts
-                print(f"Error loading {selected}: {exc}", file=sys.stderr)
                 continue
             if not artifact:
                 continue

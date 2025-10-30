@@ -6,12 +6,19 @@ Currently returns not implemented errors for all operations.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from pathlib import Path
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
-from ..models import DocVariant, SourceDescriptor, SourceUnit
+from supekku.scripts.lib.spec_sync.models import (
+    DocVariant,
+    SourceDescriptor,
+    SourceUnit,
+)
+
 from .base import LanguageAdapter
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
 
 
 class TypeScriptAdapter(LanguageAdapter):
@@ -30,7 +37,7 @@ class TypeScriptAdapter(LanguageAdapter):
 
     language: ClassVar[str] = "typescript"
 
-    def __init__(self, repo_root: Path):
+    def __init__(self, repo_root: Path) -> None:
         """Initialize TypeScript adapter.
 
         Args:
@@ -71,9 +78,12 @@ class TypeScriptAdapter(LanguageAdapter):
         # TODO: Implement TypeScript file discovery (.ts, .tsx files)
         # TODO: Handle node_modules exclusion
         # TODO: Support TypeScript project structure (src/, lib/, etc.)
-        raise NotImplementedError(
+        msg = (
             "TypeScript auto-discovery not yet implemented. "
-            "Use explicit targets with typescript:path/to/file.ts syntax.",
+            "Use explicit targets with typescript:path/to/file.ts syntax."
+        )
+        raise NotImplementedError(
+            msg,
         )
 
     def describe(self, unit: SourceUnit) -> SourceDescriptor:
@@ -159,9 +169,12 @@ class TypeScriptAdapter(LanguageAdapter):
         # 3. TSDoc comment extraction
         # 4. Integration with existing TypeScript tooling
 
-        raise NotImplementedError(
+        msg = (
             f"TypeScript documentation generation not yet implemented for {unit.identifier}. "
-            "This is a placeholder adapter - see TODO items in typescript.py",
+            "This is a placeholder adapter - see TODO items in typescript.py"
+        )
+        raise NotImplementedError(
+            msg,
         )
 
     def supports_identifier(self, identifier: str) -> bool:

@@ -1,5 +1,4 @@
-"""Language adapters for specification synchronization.
-"""
+"""Language adapters for specification synchronization."""
 
 from .base import LanguageAdapter
 from .go import GoAdapter

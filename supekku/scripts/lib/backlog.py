@@ -69,11 +69,14 @@ TEMPLATES: Mapping[str, BacklogTemplate] = {
 
 
 def find_repo_root(start: Path | None = None) -> Path:
+    # Import here to avoid circular dependency with paths.py
+    from .paths import SPEC_DRIVER_DIR  # noqa: PLC0415
+
     current = (start or Path.cwd()).resolve()
     for candidate in [current, *current.parents]:
-        if (candidate / ".git").exists() or (candidate / "supekku").exists():
+        if (candidate / ".git").exists() or (candidate / SPEC_DRIVER_DIR).exists():
             return candidate
-    msg = "Could not locate repository root (missing .git or supekku directory)"
+    msg = f"Could not locate repository root (missing .git or {SPEC_DRIVER_DIR} directory)"
     raise RuntimeError(
         msg,
     )

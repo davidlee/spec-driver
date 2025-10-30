@@ -117,8 +117,7 @@ class DeterministicPythonModuleAnalyzerTest(unittest.TestCase):
     def _write_temp_file(self, content: str, filename: str = "test_module.py") -> Path:
         """Write content to a temporary file."""
         file_path = self.temp_path / filename
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(content)
+        file_path.write_text(content, encoding="utf-8")
         return file_path
 
     def test_simple_class_parsing(self) -> None:
@@ -247,8 +246,7 @@ class DocumentationGenerationTest(unittest.TestCase):
     def _write_temp_file(self, content: str, filename: str = "test_module.py") -> Path:
         """Write content to a temporary file."""
         file_path = self.temp_path / filename
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(content)
+        file_path.write_text(content, encoding="utf-8")
         return file_path
 
     def test_public_documentation_generation(self) -> None:
@@ -376,15 +374,13 @@ class CheckModeTest(unittest.TestCase):
     def _write_temp_file(self, content: str, filename: str = "test_module.py") -> Path:
         """Write content to a temporary file."""
         file_path = self.temp_path / filename
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(content)
+        file_path.write_text(content, encoding="utf-8")
         return file_path
 
     def _write_doc_file(self, content: str, filename: str) -> Path:
         """Write content to a documentation file."""
         file_path = self.docs_dir / filename
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(content)
+        file_path.write_text(content, encoding="utf-8")
         return file_path
 
     def test_check_mode_up_to_date(self) -> None:

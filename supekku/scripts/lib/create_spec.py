@@ -9,6 +9,7 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from .paths import SPEC_DRIVER_DIR, get_templates_dir
 from .spec_utils import dump_markdown_file
 
 if TYPE_CHECKING:
@@ -142,9 +143,12 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
 
 def find_repository_root(start: Path) -> Path:
     for path in [start, *start.parents]:
-        if (path / ".git").exists() or (path / "supekku" / "templates").exists():
+        # Check for .git or spec-driver templates directory
+        if (path / ".git").exists():
             return path
-    msg = "Could not determine repository root (missing .git or supekku/templates)"
+        if (path / SPEC_DRIVER_DIR / "templates").exists():
+            return path
+    msg = "Could not determine repository root (missing .git or spec-driver templates)"
     raise RepositoryRootNotFoundError(
         msg,
     )
@@ -152,7 +156,7 @@ def find_repository_root(start: Path) -> Path:
 
 def build_template_config(repo_root: Path, spec_type: str) -> SpecTemplateConfig:
     spec_type = spec_type.lower()
-    templates_dir = repo_root / "supekku" / "templates"
+    templates_dir = get_templates_dir(repo_root)
     if spec_type == "tech":
         return SpecTemplateConfig(
             base_dir=repo_root / "specify" / "tech",

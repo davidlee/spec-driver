@@ -20,7 +20,7 @@ class CreateChangeTest(unittest.TestCase):
     """Test cases for create_change module functionality."""
 
     def setUp(self) -> None:
-        self._cwd = os.getcwd()
+        self._cwd = Path.cwd()
 
     def tearDown(self) -> None:
         os.chdir(self._cwd)

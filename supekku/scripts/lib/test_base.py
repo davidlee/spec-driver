@@ -11,7 +11,7 @@ class RepoTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         """Save current directory for restoration in tearDown."""
-        self._cwd = os.getcwd()
+        self._cwd = Path.cwd()
 
     def tearDown(self) -> None:
         """Restore original directory."""

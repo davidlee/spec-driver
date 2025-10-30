@@ -110,11 +110,11 @@ class TestGoAdapter(unittest.TestCase):
         assert "GoAdapter cannot process python units" in str(context.value)
 
     @patch("subprocess.run")
-    @patch("builtins.open")
+    @patch("pathlib.Path.read_text")
     @patch("pathlib.Path.exists")
     @patch("pathlib.Path.mkdir")
     def test_generate_creates_variants(
-        self, _mock_mkdir, mock_exists, mock_open, mock_subprocess,
+        self, _mock_mkdir, mock_exists, mock_read_text, mock_subprocess,
     ) -> None:
         """Test generate method creates documentation variants."""
         # Setup mocks
@@ -122,9 +122,7 @@ class TestGoAdapter(unittest.TestCase):
         mock_subprocess.return_value = Mock(returncode=0, stdout="", stderr="")
 
         # Mock file content for hash calculation
-        mock_file = Mock()
-        mock_file.read.return_value = "# Documentation content"
-        mock_open.return_value.__enter__.return_value = mock_file
+        mock_read_text.return_value = "# Documentation content"
 
         # Mock TechSpecSyncEngine
         with patch(

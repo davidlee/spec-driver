@@ -10,6 +10,7 @@ from pathlib import Path
 import yaml
 
 from .decision_registry import DecisionRecord, DecisionRegistry
+from .paths import get_registry_dir
 
 
 class TestDecisionRecord(unittest.TestCase):
@@ -83,7 +84,7 @@ class TestDecisionRegistry(unittest.TestCase):
             assert registry.root == root
             assert registry.directory == root / "specify" / "decisions"
             assert (
-                registry.output_path == root / "supekku" / "registry" / "decisions.yaml"
+                registry.output_path == get_registry_dir(root) / "decisions.yaml"
             )
 
     def test_collect_empty_directory(self) -> None:
@@ -470,7 +471,7 @@ status: accepted
             root = self._setup_test_repo(tmpdir)
             decisions_dir = root / "specify" / "decisions"
             decisions_dir.mkdir(parents=True)
-            registry_dir = root / "supekku" / "registry"
+            registry_dir = get_registry_dir(root)
             registry_dir.mkdir(parents=True)
 
             # Create ADR

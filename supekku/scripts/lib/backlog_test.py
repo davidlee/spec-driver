@@ -18,7 +18,7 @@ class BacklogLibraryTest(unittest.TestCase):
     """Test cases for backlog management functionality."""
 
     def setUp(self) -> None:
-        self._cwd = os.getcwd()
+        self._cwd = Path.cwd()
 
     def tearDown(self) -> None:
         os.chdir(self._cwd)

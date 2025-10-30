@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 from supekku.scripts.lib.lifecycle import STATUS_LIVE, STATUS_PENDING
+from supekku.scripts.lib.paths import get_registry_dir
 from supekku.scripts.lib.relations import add_relation
 from supekku.scripts.lib.requirements import RequirementsRegistry
 from supekku.scripts.lib.spec_registry import SpecRegistry
@@ -18,7 +19,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     """Test cases for RequirementsRegistry functionality."""
 
     def setUp(self) -> None:
-        self._cwd = os.getcwd()
+        self._cwd = Path.cwd()
 
     def tearDown(self) -> None:
         os.chdir(self._cwd)
@@ -56,7 +57,7 @@ class RequirementsRegistryTest(unittest.TestCase):
 
     def test_sync_creates_entries(self) -> None:
         root = self._make_repo()
-        registry_path = root / "supekku" / "registry" / "requirements.yaml"
+        registry_path = get_registry_dir(root) / "requirements.yaml"
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
 
@@ -109,7 +110,7 @@ class RequirementsRegistryTest(unittest.TestCase):
         )
         add_relation(audit_path, relation_type="verifies", target="SPEC-001.FR-001")
 
-        registry_path = root / "supekku" / "registry" / "requirements.yaml"
+        registry_path = get_registry_dir(root) / "requirements.yaml"
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         registry.sync_from_specs(
@@ -133,7 +134,7 @@ class RequirementsRegistryTest(unittest.TestCase):
 
     def test_sync_preserves_status(self) -> None:
         root = self._make_repo()
-        registry_path = root / "supekku" / "registry" / "requirements.yaml"
+        registry_path = get_registry_dir(root) / "requirements.yaml"
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         registry.sync_from_specs(
@@ -160,7 +161,7 @@ class RequirementsRegistryTest(unittest.TestCase):
 
     def test_search_filters(self) -> None:
         root = self._make_repo()
-        registry_path = root / "supekku" / "registry" / "requirements.yaml"
+        registry_path = get_registry_dir(root) / "requirements.yaml"
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         registry.sync_from_specs(
@@ -179,7 +180,7 @@ class RequirementsRegistryTest(unittest.TestCase):
             "# SPEC-002\n\n- FR-002: Second requirement\n",
         )
 
-        registry_path = root / "supekku" / "registry" / "requirements.yaml"
+        registry_path = get_registry_dir(root) / "requirements.yaml"
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         registry.sync_from_specs(
@@ -219,7 +220,7 @@ interactions: []
 """
         self._write_spec(root, "SPEC-002", collaborator_body)
 
-        registry_path = root / "supekku" / "registry" / "requirements.yaml"
+        registry_path = get_registry_dir(root) / "requirements.yaml"
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         spec_registry.reload()
@@ -273,7 +274,7 @@ interactions: []
         )
         dump_markdown_file(delta_path, frontmatter, body)
 
-        registry_path = root / "supekku" / "registry" / "requirements.yaml"
+        registry_path = get_registry_dir(root) / "requirements.yaml"
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         registry.sync_from_specs(
@@ -326,7 +327,7 @@ interactions: []
             "# SPEC-003\n",
         )
 
-        registry_path = root / "supekku" / "registry" / "requirements.yaml"
+        registry_path = get_registry_dir(root) / "requirements.yaml"
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         registry.sync_from_specs(

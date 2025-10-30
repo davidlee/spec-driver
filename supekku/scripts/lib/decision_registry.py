@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any
 import yaml
 
 from .backlog import find_repo_root
+from .paths import get_registry_dir
 from .spec_utils import load_markdown_file
 
 if TYPE_CHECKING:
@@ -112,7 +113,7 @@ class DecisionRegistry:
     def __init__(self, *, root: Path | None = None) -> None:
         self.root = find_repo_root(root)
         self.directory = self.root / "specify" / "decisions"
-        self.output_path = self.root / "supekku" / "registry" / "decisions.yaml"
+        self.output_path = get_registry_dir(self.root) / "decisions.yaml"
 
     @classmethod
     def load(cls, root: Path | None = None) -> DecisionRegistry:
@@ -361,7 +362,7 @@ class DecisionRegistry:
     def sync_with_symlinks(self) -> None:
         """Sync registry and rebuild symlinks in one operation."""
         self.collect()  # Ensure data is loaded
-        self.write(self.root / "supekku" / "registry" / "decisions.yaml")
+        self.write(self.output_path)
         self.rebuild_status_symlinks()
 
 

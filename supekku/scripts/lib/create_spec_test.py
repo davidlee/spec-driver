@@ -16,6 +16,7 @@ from supekku.scripts.lib.create_spec import (
     TemplateNotFoundError,
     create_spec,
 )
+from supekku.scripts.lib.paths import get_templates_dir
 from supekku.scripts.lib.spec_utils import load_markdown_file
 
 
@@ -23,7 +24,7 @@ class CreateSpecTest(unittest.TestCase):
     """Test cases for create_spec functionality."""
 
     def setUp(self) -> None:
-        self._cwd = os.getcwd()
+        self._cwd = Path.cwd()
 
     def tearDown(self) -> None:
         os.chdir(self._cwd)
@@ -33,7 +34,7 @@ class CreateSpecTest(unittest.TestCase):
         self.addCleanup(tmpdir.cleanup)
         root = Path(tmpdir.name)
         (root / ".git").mkdir()
-        templates = root / "supekku" / "templates"
+        templates = get_templates_dir(root)
         templates.mkdir(parents=True)
         (root / "specify" / "tech").mkdir(parents=True)
         (root / "specify" / "product").mkdir(parents=True)
@@ -88,7 +89,7 @@ class CreateSpecTest(unittest.TestCase):
 
     def test_missing_templates_raise_error(self) -> None:
         root = self._setup_repo()
-        (root / "supekku" / "templates" / "tech-spec-template.md").unlink()
+        (get_templates_dir(root) / "tech-spec-template.md").unlink()
 
         with pytest.raises(TemplateNotFoundError):
             create_spec("Missing Template", CreateSpecOptions())

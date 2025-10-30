@@ -218,8 +218,7 @@ class GoAdapter(LanguageAdapter):
                     existed_before = public_output.exists()
                     old_hash = None
                     if existed_before:
-                        with open(public_output, encoding="utf-8") as f:
-                            old_content = f.read()
+                        old_content = public_output.read_text(encoding="utf-8")
                         old_hash = hashlib.sha256(
                             old_content.encode("utf-8"),
                         ).hexdigest()
@@ -238,8 +237,7 @@ class GoAdapter(LanguageAdapter):
                     # Determine status by checking if file changed
                     content_hash = ""
                     if public_output.exists():
-                        with open(public_output, encoding="utf-8") as f:
-                            content = f.read()
+                        content = public_output.read_text(encoding="utf-8")
                         content_hash = hashlib.sha256(
                             content.encode("utf-8"),
                         ).hexdigest()
@@ -309,8 +307,7 @@ class GoAdapter(LanguageAdapter):
                     existed_before = internal_output.exists()
                     old_hash = None
                     if existed_before:
-                        with open(internal_output, encoding="utf-8") as f:
-                            old_content = f.read()
+                        old_content = internal_output.read_text(encoding="utf-8")
                         old_hash = hashlib.sha256(
                             old_content.encode("utf-8"),
                         ).hexdigest()
@@ -327,8 +324,7 @@ class GoAdapter(LanguageAdapter):
                     subprocess.run(cmd, check=True, capture_output=True, text=True)
 
                     if internal_output.exists():
-                        with open(internal_output, encoding="utf-8") as f:
-                            content = f.read()
+                        content = internal_output.read_text(encoding="utf-8")
                         content_hash = hashlib.sha256(
                             content.encode("utf-8"),
                         ).hexdigest()

@@ -18,6 +18,13 @@ from .frontmatter_schema import (
     Relation,
     validate_frontmatter,
 )
+from .paths import (
+    SPEC_DRIVER_DIR,
+    get_about_dir,
+    get_registry_dir,
+    get_spec_driver_root,
+    get_templates_dir,
+)
 from .relations import (
     add_relation,
     list_relations,
@@ -41,6 +48,7 @@ __all__ = [
     "FrontmatterValidationError",
     "FrontmatterValidationResult",
     "Relation",
+    "SPEC_DRIVER_DIR",
     "Spec",
     "SpecCreationError",
     "SpecRegistry",
@@ -53,6 +61,10 @@ __all__ = [
     "dump_markdown_file",
     "ensure_list_entry",
     "find_repo_root",
+    "get_about_dir",
+    "get_registry_dir",
+    "get_spec_driver_root",
+    "get_templates_dir",
     "list_relations",
     "load_markdown_file",
     "load_validated_markdown_file",

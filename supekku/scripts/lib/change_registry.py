@@ -8,6 +8,7 @@ import yaml
 
 from .backlog import find_repo_root
 from .change_artifacts import ChangeArtifact, load_change_artifact
+from .paths import get_registry_dir
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -35,9 +36,7 @@ class ChangeRegistry:
         self.kind = kind
         self.root = find_repo_root(root)
         self.directory = self.root / "change" / _KIND_TO_DIR[kind]
-        self.output_path = (
-            self.root / "supekku" / "registry" / f"{_KIND_TO_DIR[kind]}.yaml"
-        )
+        self.output_path = get_registry_dir(self.root) / f"{_KIND_TO_DIR[kind]}.yaml"
 
     def collect(self) -> dict[str, ChangeArtifact]:
         artifacts: dict[str, ChangeArtifact] = {}

@@ -8,7 +8,7 @@ If you were not given a filename, requirement code or other information that wou
 
 You need to add a `supekku:revision.change@v1` block to a revision document. This block formally tracks changes to specifications and requirements in a structured format.
 
-Refer to `supekku/about/README.md` and `supekku/about/glossary.md` for a general understanding of the framework before proceeding if you are unfamiliar with it.
+Refer to `.spec-driver/about/README.md` and `.spec-driver/about/glossary.md` for a general understanding of the framework before proceeding if you are unfamiliar with it.
 
 ## Commands to Run
 

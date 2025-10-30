@@ -32,9 +32,7 @@ def check_mode_comparison(
     if not existing_file.exists():
         return False, "", new_hash
 
-    with open(existing_file, encoding="utf-8") as f:
-        existing_content = f.read()
-
+    existing_content = existing_file.read_text(encoding="utf-8")
     existing_hash = calculate_content_hash(existing_content)
     return existing_hash == new_hash, existing_hash, new_hash
 
@@ -46,22 +44,18 @@ def write_mode_comparison(output_file: Path, new_content: str) -> tuple[str, str
     if not output_file.exists():
         # File doesn't exist - will be created
         output_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(new_content)
+        output_file.write_text(new_content, encoding="utf-8")
         return "created", "", new_hash
 
     # File exists - check if content changed
-    with open(output_file, encoding="utf-8") as f:
-        existing_content = f.read()
-
+    existing_content = output_file.read_text(encoding="utf-8")
     existing_hash = calculate_content_hash(existing_content)
 
     if existing_hash == new_hash:
         # Content unchanged
         return "unchanged", existing_hash, new_hash
     # Content changed - write new content
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(new_content)
+    output_file.write_text(new_content, encoding="utf-8")
     return "changed", existing_hash, new_hash
 
 

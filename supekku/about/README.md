@@ -44,18 +44,3 @@ The Supekku workflow follows a structured, iterative loop:
 8.  **Archive**: Once complete, the Delta and its related artifacts are archived, and the evergreen specs now reflect the new state of the system.
 
 See `processes.md` for a more detailed breakdown of the commands and steps for each stage.
-
-## Tooling & Automation
-
-This implementation relies on a few key scripts to automate the workflow:
-
--   `supekku/scripts/create_spec.py` (via `just supekku::new-spec`): Bootstraps new `SPEC` or `PROD` bundles from templates and refreshes index symlinks.
--   `supekku/scripts/sync_specs.py`: Multi-language documentation synchronization engine. Supports Go (gomarkdoc), Python (AST analysis), and TypeScript (stub). Use `--language` to target specific languages, `--targets` for explicit identifiers, `--existing` for current sources only, or `--check` for CI verification.
--   `supekku/scripts/migrate_spec_registry_v2.py`: Migrates specification registry from v1 (Go-only) to v2 (multi-language) format with backwards compatibility.
--   `supekku/scripts/sync_tech_specs.py`: Legacy Go-only synchronization (maintained for backwards compatibility).
--   `supekku/scripts/create_revision.py`, `create_delta.py`, `create_requirement.py`: Scaffold spec revisions, delta bundles, and breakout requirement files. Delta bundles include structured metadata blocks (`supekku:delta.relationships@v1`, `supekku:plan.overview@v1`, `supekku:phase.overview@v1`) so registries stay in sync.
--   `supekku/scripts/requirements.py`: Maintains the central requirements registry with `sync`, `list`, `show`, `move`, and `set-status` commands. Lifecycle links (`introduced`, `implemented_by`, `verified_by`) flow from specs and change bundles.
--   `supekku/scripts/change_registry.py` and `list_changes.py`: Rebuild and inspect YAML indexes for deltas, revisions, and audits—including plan metadata via `--plan`.
--   `supekku/scripts/validate_workspace.py`: Runs holistic validation across specs, requirements, deltas, revisions, and audits, leveraging the `Workspace` facade for consistent state.
-
-Together, this tooling keeps the documentation, registries, and implementation aligned so specs remain a reliable source of truth.

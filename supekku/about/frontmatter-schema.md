@@ -204,7 +204,7 @@ verification_refs:
   - VH-044
 ```
 
-Lifecycle metadata such as `status`, `introduced`, `implemented_by`, and `verified_by` is managed in the generated requirements registry (`supekku/registry/requirements.yaml`). Those fields are derived from specs, deltas, revisions, and audits rather than stored directly in requirement frontmatter.
+Lifecycle metadata such as `status`, `introduced`, `implemented_by`, and `verified_by` is managed in the generated requirements registry (`.spec-driver/registry/requirements.yaml`). Those fields are derived from specs, deltas, revisions, and audits rather than stored directly in requirement frontmatter.
 
 ## Verification Artefacts (`kind: verification`)
 

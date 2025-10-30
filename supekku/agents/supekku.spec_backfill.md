@@ -58,9 +58,9 @@ responsibilities:
 
 ## 4. Body Structure
 
-- Follow the sections from the Tech Spec template (`supekku/templates/tech-spec-template.md`). You can copy section scaffolding with:
+- Follow the sections from the Tech Spec template (`.spec-driver/templates/tech-spec-template.md`). You can copy section scaffolding with:
   ```bash
-  rg "^##" supekku/templates/tech-spec-template.md
+  rg "^##" .spec-driver/templates/tech-spec-template.md
   ```
 - Cover intent, responsibilities, interfaces, invariants, testing, and change history.
 - Link to supporting artefacts (requirements, deltas, audits) when available.

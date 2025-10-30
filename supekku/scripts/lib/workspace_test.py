@@ -6,6 +6,7 @@ import os
 import unittest
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.paths import get_registry_dir
 from supekku.scripts.lib.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
 from supekku.scripts.lib.workspace import Workspace
@@ -70,7 +71,7 @@ class WorkspaceTest(RepoTestCase):
 
         ws = Workspace(root)
         ws.sync_change_registries(kinds=["delta"])
-        output = root / "supekku" / "registry" / "deltas.yaml"
+        output = get_registry_dir(root) / "deltas.yaml"
         assert output.exists()
 
     def test_workspace_decisions_property(self) -> None:
@@ -157,7 +158,7 @@ status: draft
         )
 
         # Create registry directory
-        registry_dir = root / "supekku" / "registry"
+        registry_dir = get_registry_dir(root)
         registry_dir.mkdir(parents=True)
 
         ws = Workspace(root)

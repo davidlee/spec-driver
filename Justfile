@@ -1,3 +1,5 @@
+check: lint test pylint
+
 test:
   uv run pytest supekku
 

@@ -8,6 +8,7 @@ import pytest
 import yaml
 
 from supekku.scripts.install import get_package_root, initialize_workspace
+from supekku.scripts.lib.paths import SPEC_DRIVER_DIR
 
 
 def test_get_package_root() -> None:
@@ -31,9 +32,9 @@ def test_initialize_workspace_creates_directories(tmp_path: Path) -> None:
         "specify/policies",
         "specify/product",
         "specify/tech",
-        "supekku/registry",
-        "supekku/templates",
-        "supekku/about",
+        f"{SPEC_DRIVER_DIR}/registry",
+        f"{SPEC_DRIVER_DIR}/templates",
+        f"{SPEC_DRIVER_DIR}/about",
     ]
 
     for dir_path in expected_dirs:
@@ -44,7 +45,7 @@ def test_initialize_workspace_creates_registry_files(tmp_path: Path) -> None:
     """Test that initialize_workspace creates registry files with correct content."""
     initialize_workspace(tmp_path)
 
-    registry_dir = tmp_path / "supekku" / "registry"
+    registry_dir = tmp_path / SPEC_DRIVER_DIR / "registry"
 
     # Check each registry file
     expected_registries = {
@@ -67,7 +68,7 @@ def test_initialize_workspace_copies_templates(tmp_path: Path) -> None:
     """Test that initialize_workspace copies template files."""
     initialize_workspace(tmp_path)
 
-    template_dir = tmp_path / "supekku" / "templates"
+    template_dir = tmp_path / SPEC_DRIVER_DIR / "templates"
     assert template_dir.exists()
 
     # Check that at least some template files were copied
@@ -82,7 +83,7 @@ def test_initialize_workspace_copies_about_files(tmp_path: Path) -> None:
     """Test that initialize_workspace copies about documentation."""
     initialize_workspace(tmp_path)
 
-    about_dir = tmp_path / "supekku" / "about"
+    about_dir = tmp_path / SPEC_DRIVER_DIR / "about"
     assert about_dir.exists()
 
     # Check that about files were copied
@@ -117,7 +118,7 @@ def test_initialize_workspace_skips_agents_when_no_claude(tmp_path: Path) -> Non
 
 def test_initialize_workspace_skips_existing_files(tmp_path: Path) -> None:
     """Test that initialize_workspace doesn't overwrite existing files."""
-    registry_dir = tmp_path / "supekku" / "registry"
+    registry_dir = tmp_path / SPEC_DRIVER_DIR / "registry"
     registry_dir.mkdir(parents=True)
 
     # Create a registry file with custom content

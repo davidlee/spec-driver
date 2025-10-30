@@ -28,7 +28,3 @@ Prioritisation lives in dedicated Markdown lists (e.g. `backlog/backlog.md`). Th
 3. Use prioritised lists to decide sequencing.
 4. Promote issues into Deltas and Design Revisions as scope clarifies.
 5. Update backlog entries as deltas close gaps; upstream learnings into PROD/SPEC/Constitution where needed.
-
-
-**CLI helpers**
-- `just --list supekku`

@@ -11,13 +11,14 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from supekku.scripts.lib.paths import get_registry_dir  # type: ignore
 from supekku.scripts.lib.requirements import (  # type: ignore
     VALID_STATUSES,
     RequirementsRegistry,
 )
 from supekku.scripts.lib.spec_registry import SpecRegistry  # type: ignore
 
-REGISTRY_PATH = ROOT / "supekku" / "registry" / "requirements.yaml"
+REGISTRY_PATH = get_registry_dir(ROOT) / "requirements.yaml"
 DEFAULT_SPEC_DIRS = [ROOT / "specify" / "tech", ROOT / "specify" / "product"]
 DEFAULT_DELTA_DIRS = [ROOT / "change" / "deltas"]
 DEFAULT_REVISION_DIRS = [ROOT / "change" / "revisions"]

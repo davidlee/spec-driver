@@ -7,6 +7,7 @@ import unittest
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.change_registry import ChangeRegistry
+from supekku.scripts.lib.paths import get_registry_dir
 from supekku.scripts.lib.relations import add_relation
 from supekku.scripts.lib.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
@@ -62,7 +63,7 @@ class ChangeRegistryTest(RepoTestCase):
         assert artifact.relations[0]["target"] == "SPEC-010.FR-001"
 
         registry.sync()
-        output = (root / "supekku" / "registry" / "deltas.yaml").read_text()
+        output = (get_registry_dir(root) / "deltas.yaml").read_text()
         assert "DE-101" in output
         assert "SPEC-010.FR-001" in output
 

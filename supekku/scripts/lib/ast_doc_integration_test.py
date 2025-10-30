@@ -25,7 +25,7 @@ class JustfileIntegrationTest(unittest.TestCase):
         self.temp_path = Path(self.temp_dir.name)
 
         # Store original working directory
-        self.original_cwd = os.getcwd()
+        self.original_cwd = Path.cwd()
 
         # Create test package structure
         self.package_dir = self.temp_path / "test_lib"
@@ -207,7 +207,7 @@ class EndToEndWorkflowTest(unittest.TestCase):
         self.addCleanup(self.temp_dir.cleanup)
         self.temp_path = Path(self.temp_dir.name)
 
-        self.original_cwd = os.getcwd()
+        self.original_cwd = Path.cwd()
 
     def tearDown(self) -> None:
         """Clean up test environment."""

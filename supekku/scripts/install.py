@@ -13,6 +13,9 @@ from pathlib import Path
 
 import yaml
 
+# Import after path setup to avoid circular imports
+from supekku.scripts.lib.paths import SPEC_DRIVER_DIR
+
 
 def get_package_root() -> Path:
     """Find the root directory of the installed spec-driver package."""
@@ -42,9 +45,9 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
         "specify/policies",
         "specify/product",
         "specify/tech",
-        "supekku/registry",
-        "supekku/templates",
-        "supekku/about",
+        f"{SPEC_DRIVER_DIR}/registry",
+        f"{SPEC_DRIVER_DIR}/templates",
+        f"{SPEC_DRIVER_DIR}/about",
     ]
 
     for dir_path in directories:
@@ -52,7 +55,7 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
         full_path.mkdir(parents=True, exist_ok=True)
 
     # Initialize empty registry files
-    registry_dir = target_root / "supekku" / "registry"
+    registry_dir = target_root / SPEC_DRIVER_DIR / "registry"
     registries = {
         "deltas.yaml": {"deltas": {}},
         "revisions.yaml": {"revisions": {}},
@@ -74,7 +77,7 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
     # Copy templates from package to target
     package_root = get_package_root()
     template_src = package_root / "templates"
-    template_dest = target_root / "supekku" / "templates"
+    template_dest = target_root / SPEC_DRIVER_DIR / "templates"
 
     if template_src.exists():
         for template_file in template_src.glob("*.md"):
@@ -86,7 +89,7 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
 
     # Copy about files from package to target
     about_src = package_root / "about"
-    about_dest = target_root / "supekku" / "about"
+    about_dest = target_root / SPEC_DRIVER_DIR / "about"
 
     if about_src.exists():
         for about_file in about_src.rglob("*"):

@@ -1,10 +1,10 @@
 # Agent Playbook: Complete Initial Spec (Claude Sonnet)
 
 ## Purpose
-You are filling out a brand-new SPEC (tech or product) using the templates under `supekku/templates/`. Your job is to extract the current behaviour from the codebase and produce a plausible, traceable description that humans and other agents can refine.
+You are filling out a brand-new SPEC (tech or product) using the templates under `.spec-driver/templates/`. Your job is to extract the current behaviour from the codebase and produce a plausible, traceable description that humans and other agents can refine.
 
 ## Inputs
-- Spec directory scaffolded via `supekku/scripts/create-new-spec.py Name Here`.
+- Spec directory scaffolded via `.spec-driver/scripts/create-new-spec.py Name Here`.
 - Newly created spec file, e.g. `doc/specify/tech/SPEC-XYZ-*/SPEC-XYZ.md` (and `SPEC-XYZ.tests.md` when present).
 - Reference corpus under `doc/reference/`, existing PROD/SPEC docs, ADRs, policies, backlog notes.
 - Source code (Go) and tests (`internal/`, `cmd/`, `test/`, etc.).
@@ -80,8 +80,8 @@ Before finishing:
 ## Tooling Tips
 - Use `rg` / `fd` / `go list ./...` to explore code quickly.
 - Generate diagrams with D2 (save to `SPEC-XYZ` directory).
-- Reference templates in `supekku/templates/` for structure cues.
-- Consult `supekku/about/frontmatter-schema.md` for frontmatter rules.
+- Reference templates in `.spec-driver/templates/` for structure cues.
+- Consult `.spec-driver/about/frontmatter-schema.md` for frontmatter rules.
 
 ## Handover
 - Commit spec changes or stage for review per project norms (no branch automation here).

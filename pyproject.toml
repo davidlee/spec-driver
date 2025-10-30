@@ -11,6 +11,7 @@ requires-python = ">=3.10"
 dependencies = [
     "pyyaml>=6.0.3",
     "python-frontmatter>=1.1.0",
+    "typer[all]>=0.15.0",
 ]
 keywords = ["specification", "documentation", "adr", "architecture-decision-records", "spec-sync"]
 classifiers = [
@@ -32,22 +33,7 @@ Repository = "https://github.com/davidlee/spec-driver"
 Issues = "https://github.com/davidlee/spec-driver/issues"
 
 [project.scripts]
-spec-driver-install = "supekku.scripts.install:main"
-spec-driver-sync = "supekku.scripts.sync_specs:main"
-spec-driver-adr = "supekku.scripts.decision_registry:main"
-spec-driver-delta = "supekku.scripts.create_delta:main"
-spec-driver-delta-complete = "supekku.scripts.complete_delta:main"
-spec-driver-delta-list = "supekku.scripts.list_deltas:main"
-spec-driver-change-registry = "supekku.scripts.change_registry:main"
-spec-driver-change-list = "supekku.scripts.list_changes:main"
-spec-driver-spec = "supekku.scripts.create_new_spec:main"
-spec-driver-spec-list = "supekku.scripts.list_specs:main"
-spec-driver-spec-sync = "supekku.scripts.sync_tech_specs:main"
-spec-driver-requirement = "supekku.scripts.create_requirement:main"
-spec-driver-requirements = "supekku.scripts.requirements:main"
-spec-driver-revision = "supekku.scripts.create_revision:main"
-spec-driver-validate-revision = "supekku.scripts.validate_revision_blocks:main"
-spec-driver-validate-workspace = "supekku.scripts.validate_workspace:main"
+spec-driver = "supekku.cli.main:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -192,4 +178,5 @@ skip-magic-trailing-comma = false
 
 [tool.ruff.lint.per-file-ignores]
 "supekku/scripts/**/*.py" = ["E402"]
+"supekku/cli/**/*.py" = ["E402", "PLC0415"]
 

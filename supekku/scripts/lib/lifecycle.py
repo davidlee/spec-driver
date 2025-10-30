@@ -10,17 +10,17 @@ STATUS_LIVE: RequirementStatus = "live"
 STATUS_RETIRED: RequirementStatus = "retired"
 
 VALID_STATUSES: set[RequirementStatus] = {
-    STATUS_PENDING,
-    STATUS_IN_PROGRESS,
-    STATUS_LIVE,
-    STATUS_RETIRED,
+  STATUS_PENDING,
+  STATUS_IN_PROGRESS,
+  STATUS_LIVE,
+  STATUS_RETIRED,
 }
 
 __all__ = [
-    "STATUS_IN_PROGRESS",
-    "STATUS_LIVE",
-    "STATUS_PENDING",
-    "STATUS_RETIRED",
-    "VALID_STATUSES",
-    "RequirementStatus",
+  "STATUS_IN_PROGRESS",
+  "STATUS_LIVE",
+  "STATUS_PENDING",
+  "STATUS_RETIRED",
+  "VALID_STATUSES",
+  "RequirementStatus",
 ]

@@ -7,38 +7,38 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pathlib import Path
+  from pathlib import Path
 
-    from .frontmatter_schema import FrontmatterValidationResult
+  from .frontmatter_schema import FrontmatterValidationResult
 
 
 @dataclass(frozen=True)
 class Spec:
-    """In-memory representation of a specification artefact."""
+  """In-memory representation of a specification artefact."""
 
-    id: str
-    path: Path
-    frontmatter: FrontmatterValidationResult
-    body: str
+  id: str
+  path: Path
+  frontmatter: FrontmatterValidationResult
+  body: str
 
-    @property
-    def packages(self) -> list[str]:
-        packages = self.frontmatter.data.get("packages", [])
-        if isinstance(packages, Iterable) and not isinstance(packages, (str, bytes)):
-            return [str(item) for item in packages]
-        return []
+  @property
+  def packages(self) -> list[str]:
+    packages = self.frontmatter.data.get("packages", [])
+    if isinstance(packages, Iterable) and not isinstance(packages, (str, bytes)):
+      return [str(item) for item in packages]
+    return []
 
-    @property
-    def slug(self) -> str:
-        return str(self.frontmatter.data.get("slug", ""))
+  @property
+  def slug(self) -> str:
+    return str(self.frontmatter.data.get("slug", ""))
 
-    @property
-    def name(self) -> str:
-        return str(self.frontmatter.data.get("name", self.id))
+  @property
+  def name(self) -> str:
+    return str(self.frontmatter.data.get("name", self.id))
 
-    @property
-    def kind(self) -> str:
-        return str(self.frontmatter.data.get("kind", ""))
+  @property
+  def kind(self) -> str:
+    return str(self.frontmatter.data.get("kind", ""))
 
 
 __all__ = ["Spec"]

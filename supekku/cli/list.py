@@ -364,11 +364,7 @@ def list_changes(
         if applies_to:
           match = applies_to.lower()
           applies_list = []
-          reqs = (
-            artifact.applies_to.get("requirements")
-            if artifact.applies_to
-            else []
-          )
+          reqs = artifact.applies_to.get("requirements") if artifact.applies_to else []
           if isinstance(reqs, list):
             applies_list.extend(str(item).lower() for item in reqs)
           for relation in artifact.relations:
@@ -389,8 +385,7 @@ def list_changes(
 
         if relations and artifact.relations:
           rel_str = ", ".join(
-            f"{r.get('type', '?')}:{r.get('target', '?')}"
-            for r in artifact.relations
+            f"{r.get('type', '?')}:{r.get('target', '?')}" for r in artifact.relations
           )
           line += f"\t{rel_str}"
 

@@ -11,73 +11,77 @@ from supekku.scripts.lib.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
 
 if TYPE_CHECKING:
-    from pathlib import Path
+  from pathlib import Path
 
 
 class RelationsTest(RepoTestCase):
-    """Test cases for relations management functionality."""
+  """Test cases for relations management functionality."""
 
-    def _make_spec(self) -> Path:
-        root = super()._make_repo()
-        spec_path = root / "SPEC-001.md"
-        frontmatter = {
-            "id": "SPEC-001",
-            "slug": "example",
-            "name": "Example Spec",
-            "created": "2024-06-01",
-            "updated": "2024-06-01",
-            "status": "draft",
-            "kind": "spec",
-        }
-        dump_markdown_file(spec_path, frontmatter, "# Example\n")
-        os.chdir(root)
-        return spec_path
+  def _make_spec(self) -> Path:
+    root = super()._make_repo()
+    spec_path = root / "SPEC-001.md"
+    frontmatter = {
+      "id": "SPEC-001",
+      "slug": "example",
+      "name": "Example Spec",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+    }
+    dump_markdown_file(spec_path, frontmatter, "# Example\n")
+    os.chdir(root)
+    return spec_path
 
-    def test_list_relations_empty(self) -> None:
-        spec_path = self._make_spec()
-        relations = list_relations(spec_path)
-        assert relations == []
+  def test_list_relations_empty(self) -> None:
+    spec_path = self._make_spec()
+    relations = list_relations(spec_path)
+    assert relations == []
 
-    def test_add_relation(self) -> None:
-        spec_path = self._make_spec()
-        added = add_relation(
-            spec_path,
-            relation_type="implements",
-            target="FR-001",
-            annotation="test",
-        )
-        assert added
-        relations = list_relations(spec_path)
-        assert len(relations) == 1
-        relation = relations[0]
-        assert relation.type == "implements"
-        assert relation.target == "FR-001"
-        assert relation.attributes.get("annotation") == "test"
+  def test_add_relation(self) -> None:
+    spec_path = self._make_spec()
+    added = add_relation(
+      spec_path,
+      relation_type="implements",
+      target="FR-001",
+      annotation="test",
+    )
+    assert added
+    relations = list_relations(spec_path)
+    assert len(relations) == 1
+    relation = relations[0]
+    assert relation.type == "implements"
+    assert relation.target == "FR-001"
+    assert relation.attributes.get("annotation") == "test"
 
-    def test_add_relation_avoids_duplicates(self) -> None:
-        spec_path = self._make_spec()
-        add_relation(spec_path, relation_type="implements", target="FR-001")
-        added = add_relation(spec_path, relation_type="implements", target="FR-001")
-        assert not added
-        relations = list_relations(spec_path)
-        assert len(relations) == 1
+  def test_add_relation_avoids_duplicates(self) -> None:
+    spec_path = self._make_spec()
+    add_relation(spec_path, relation_type="implements", target="FR-001")
+    added = add_relation(spec_path, relation_type="implements", target="FR-001")
+    assert not added
+    relations = list_relations(spec_path)
+    assert len(relations) == 1
 
-    def test_remove_relation(self) -> None:
-        spec_path = self._make_spec()
-        add_relation(spec_path, relation_type="implements", target="FR-001")
-        removed = remove_relation(
-            spec_path, relation_type="implements", target="FR-001",
-        )
-        assert removed
-        assert list_relations(spec_path) == []
+  def test_remove_relation(self) -> None:
+    spec_path = self._make_spec()
+    add_relation(spec_path, relation_type="implements", target="FR-001")
+    removed = remove_relation(
+      spec_path,
+      relation_type="implements",
+      target="FR-001",
+    )
+    assert removed
+    assert list_relations(spec_path) == []
 
-    def test_remove_missing_relation_returns_false(self) -> None:
-        spec_path = self._make_spec()
-        removed = remove_relation(
-            spec_path, relation_type="implements", target="FR-999",
-        )
-        assert not removed
+  def test_remove_missing_relation_returns_false(self) -> None:
+    spec_path = self._make_spec()
+    removed = remove_relation(
+      spec_path,
+      relation_type="implements",
+      target="FR-999",
+    )
+    assert not removed
 
 
 if __name__ == "__main__":
-    unittest.main()
+  unittest.main()

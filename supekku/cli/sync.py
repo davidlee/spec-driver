@@ -199,10 +199,7 @@ def _sync_specs(
       if go_targets:
         targets_by_language["go"] = go_targets
 
-    if (
-      language in ["all", "python"]
-      and "python" in spec_manager.registry_v2.languages
-    ):
+    if language in ["all", "python"] and "python" in spec_manager.registry_v2.languages:
       python_targets = list(spec_manager.registry_v2.languages["python"].keys())
       if python_targets:
         targets_by_language["python"] = python_targets

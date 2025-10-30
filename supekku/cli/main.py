@@ -19,7 +19,6 @@ app = typer.Typer(
 def version_callback(value: bool | None = None) -> None:
   """Handle version option."""
   # Version is handled by common.VersionOption
-  pass
 
 
 # Top-level commands

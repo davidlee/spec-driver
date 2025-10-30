@@ -9,251 +9,253 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 
 from supekku.scripts.lib.spec_sync.models import (
-    DocVariant,
-    SourceDescriptor,
-    SourceUnit,
+  DocVariant,
+  SourceDescriptor,
+  SourceUnit,
 )
 
 from .base import LanguageAdapter
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from pathlib import Path
+  from collections.abc import Sequence
+  from pathlib import Path
 
 
 class TypeScriptAdapter(LanguageAdapter):
-    """Language adapter for TypeScript modules (STUB IMPLEMENTATION).
+  """Language adapter for TypeScript modules (STUB IMPLEMENTATION).
 
-    This is a placeholder implementation that provides the interface
-    for TypeScript support but does not yet implement documentation
-    generation. Future implementation should integrate with TypeDoc
-    or a custom AST-based documentation generator.
+  This is a placeholder implementation that provides the interface
+  for TypeScript support but does not yet implement documentation
+  generation. Future implementation should integrate with TypeDoc
+  or a custom AST-based documentation generator.
 
-    TODO: Implement actual TypeScript documentation generation
-    TODO: Evaluate TypeDoc vs custom AST solution
-    TODO: Define variant mapping (public/internal/tests)
-    TODO: Implement source discovery patterns
+  TODO: Implement actual TypeScript documentation generation
+  TODO: Evaluate TypeDoc vs custom AST solution
+  TODO: Define variant mapping (public/internal/tests)
+  TODO: Implement source discovery patterns
+  """
+
+  language: ClassVar[str] = "typescript"
+
+  def __init__(self, repo_root: Path) -> None:
+    """Initialize TypeScript adapter.
+
+    Args:
+        repo_root: Root directory of the repository
+
     """
+    self.repo_root = repo_root
 
-    language: ClassVar[str] = "typescript"
+  def discover_targets(
+    self,
+    repo_root: Path,
+    requested: Sequence[str] | None = None,
+  ) -> list[SourceUnit]:
+    """Discover TypeScript modules for documentation.
 
-    def __init__(self, repo_root: Path) -> None:
-        """Initialize TypeScript adapter.
+    Args:
+        repo_root: Root directory of the repository
+        requested: Optional list of specific module paths to process
 
-        Args:
-            repo_root: Root directory of the repository
+    Returns:
+        List of SourceUnit objects for TypeScript modules
 
-        """
-        self.repo_root = repo_root
+    Raises:
+        NotImplementedError: TypeScript discovery not yet implemented
 
-    def discover_targets(
-        self,
-        repo_root: Path,
-        requested: Sequence[str] | None = None,
-    ) -> list[SourceUnit]:
-        """Discover TypeScript modules for documentation.
+    """
+    if requested:
+      # For now, just create placeholder units for requested identifiers
+      # This allows testing the adapter interface
+      source_units = []
+      for identifier in requested:
+        if self.supports_identifier(identifier):
+          unit = SourceUnit("typescript", identifier, repo_root)
+          source_units.append(unit)
+      return source_units
 
-        Args:
-            repo_root: Root directory of the repository
-            requested: Optional list of specific module paths to process
+    # Auto-discovery not yet implemented
+    # TODO: Implement TypeScript file discovery (.ts, .tsx files)
+    # TODO: Handle node_modules exclusion
+    # TODO: Support TypeScript project structure (src/, lib/, etc.)
+    msg = (
+      "TypeScript auto-discovery not yet implemented. "
+      "Use explicit targets with typescript:path/to/file.ts syntax."
+    )
+    raise NotImplementedError(
+      msg,
+    )
 
-        Returns:
-            List of SourceUnit objects for TypeScript modules
+  def describe(self, unit: SourceUnit) -> SourceDescriptor:
+    """Describe how a TypeScript source unit should be processed.
 
-        Raises:
-            NotImplementedError: TypeScript discovery not yet implemented
+    Args:
+        unit: Source unit to describe
 
-        """
-        if requested:
-            # For now, just create placeholder units for requested identifiers
-            # This allows testing the adapter interface
-            source_units = []
-            for identifier in requested:
-                if self.supports_identifier(identifier):
-                    unit = SourceUnit("typescript", identifier, repo_root)
-                    source_units.append(unit)
-            return source_units
+    Returns:
+        SourceDescriptor with placeholder metadata
 
-        # Auto-discovery not yet implemented
-        # TODO: Implement TypeScript file discovery (.ts, .tsx files)
-        # TODO: Handle node_modules exclusion
-        # TODO: Support TypeScript project structure (src/, lib/, etc.)
-        msg = (
-            "TypeScript auto-discovery not yet implemented. "
-            "Use explicit targets with typescript:path/to/file.ts syntax."
-        )
-        raise NotImplementedError(
-            msg,
-        )
+    Raises:
+        ValueError: If unit is not a TypeScript unit
 
-    def describe(self, unit: SourceUnit) -> SourceDescriptor:
-        """Describe how a TypeScript source unit should be processed.
+    """
+    self._validate_unit_language(unit)
 
-        Args:
-            unit: Source unit to describe
+    # Create slug parts from identifier path
+    # Remove .ts/.tsx extension and convert to slug parts
+    identifier = unit.identifier
+    if identifier.endswith((".ts", ".tsx")):
+      identifier = identifier.rsplit(".", 1)[0]
 
-        Returns:
-            SourceDescriptor with placeholder metadata
+    slug_parts = identifier.replace("/", "-").split("-")
+    slug_parts = [part for part in slug_parts if part]  # Remove empty parts
 
-        Raises:
-            ValueError: If unit is not a TypeScript unit
+    # Create placeholder variants
+    # TODO: Define appropriate variants for TypeScript
+    # Possible variants: public, internal, tests, types
+    variants = [
+      self._create_doc_variant("public", slug_parts, "typescript"),
+      self._create_doc_variant("internal", slug_parts, "typescript"),
+      self._create_doc_variant("types", slug_parts, "typescript"),
+    ]
 
-        """
-        self._validate_unit_language(unit)
+    # Create frontmatter with TypeScript-specific metadata
+    frontmatter = {
+      "sources": [
+        {
+          "language": "typescript",
+          "identifier": unit.identifier,
+          "variants": [
+            {
+              "name": variant.name,
+              "path": str(variant.path),
+            }
+            for variant in variants
+          ],
+        },
+      ],
+    }
 
-        # Create slug parts from identifier path
-        # Remove .ts/.tsx extension and convert to slug parts
-        identifier = unit.identifier
-        if identifier.endswith((".ts", ".tsx")):
-            identifier = identifier.rsplit(".", 1)[0]
+    return SourceDescriptor(
+      slug_parts=slug_parts,
+      default_frontmatter=frontmatter,
+      variants=variants,
+    )
 
-        slug_parts = identifier.replace("/", "-").split("-")
-        slug_parts = [part for part in slug_parts if part]  # Remove empty parts
+  def generate(
+    self,
+    unit: SourceUnit,
+    *,
+    spec_dir: Path,
+    check: bool = False,
+  ) -> list[DocVariant]:
+    """Generate documentation variants for a TypeScript source unit.
 
-        # Create placeholder variants
-        # TODO: Define appropriate variants for TypeScript
-        # Possible variants: public, internal, tests, types
-        variants = [
-            self._create_doc_variant("public", slug_parts, "typescript"),
-            self._create_doc_variant("internal", slug_parts, "typescript"),
-            self._create_doc_variant("types", slug_parts, "typescript"),
-        ]
+    Args:
+        unit: Source unit to generate documentation for
+        spec_dir: Specification directory to write documentation to
+        check: If True, only check if docs would change
 
-        # Create frontmatter with TypeScript-specific metadata
-        frontmatter = {
-            "sources": [
-                {
-                    "language": "typescript",
-                    "identifier": unit.identifier,
-                    "variants": [
-                        {
-                            "name": variant.name,
-                            "path": str(variant.path),
-                        }
-                        for variant in variants
-                    ],
-                },
-            ],
-        }
+    Returns:
+        List of DocVariant objects with generation results
 
-        return SourceDescriptor(
-            slug_parts=slug_parts,
-            default_frontmatter=frontmatter,
-            variants=variants,
-        )
+    Raises:
+        ValueError: If unit is not a TypeScript unit
+        NotImplementedError: TypeScript generation not yet implemented
 
-    def generate(
-        self, unit: SourceUnit, *, spec_dir: Path, check: bool = False,
-    ) -> list[DocVariant]:
-        """Generate documentation variants for a TypeScript source unit.
+    """
+    self._validate_unit_language(unit)
 
-        Args:
-            unit: Source unit to generate documentation for
-            spec_dir: Specification directory to write documentation to
-            check: If True, only check if docs would change
+    # TODO: Implement TypeScript documentation generation
+    # Options to evaluate:
+    # 1. TypeDoc integration
+    # 2. Custom TypeScript AST parser
+    # 3. TSDoc comment extraction
+    # 4. Integration with existing TypeScript tooling
 
-        Returns:
-            List of DocVariant objects with generation results
+    msg = (
+      f"TypeScript documentation generation not yet implemented for "
+      f"{unit.identifier}. This is a placeholder adapter - see TODO "
+      "items in typescript.py"
+    )
+    raise NotImplementedError(
+      msg,
+    )
 
-        Raises:
-            ValueError: If unit is not a TypeScript unit
-            NotImplementedError: TypeScript generation not yet implemented
+  def supports_identifier(self, identifier: str) -> bool:
+    """Check if this adapter can handle TypeScript identifiers.
 
-        """
-        self._validate_unit_language(unit)
+    Args:
+        identifier: Source identifier to check
 
-        # TODO: Implement TypeScript documentation generation
-        # Options to evaluate:
-        # 1. TypeDoc integration
-        # 2. Custom TypeScript AST parser
-        # 3. TSDoc comment extraction
-        # 4. Integration with existing TypeScript tooling
+    Returns:
+        True if identifier looks like a TypeScript file path
 
-        msg = (
-            f"TypeScript documentation generation not yet implemented for {unit.identifier}. "
-            "This is a placeholder adapter - see TODO items in typescript.py"
-        )
-        raise NotImplementedError(
-            msg,
-        )
+    """
+    # Handle empty string
+    if not identifier:
+      return False
 
-    def supports_identifier(self, identifier: str) -> bool:
-        """Check if this adapter can handle TypeScript identifiers.
+    # Support TypeScript file extensions (most reliable indicator)
+    if identifier.endswith((".ts", ".tsx", ".d.ts")):
+      return True
 
-        Args:
-            identifier: Source identifier to check
+    # Exclude obvious non-TypeScript patterns
+    exclude_patterns = [
+      # Python patterns
+      ".py",
+      ".pyc",
+      "__pycache__",
+      # Go patterns
+      ".go",
+      # Other non-TypeScript files
+      ".txt",
+      ".md",
+      ".json",
+      ".yaml",
+      ".yml",
+      ".xml",
+      ".html",
+      ".css",
+      ".scss",
+      ".less",
+      ".jpg",
+      ".png",
+      ".gif",
+      ".svg",
+      "Dockerfile",
+      "Makefile",
+      "LICENSE",
+      "README",
+    ]
 
-        Returns:
-            True if identifier looks like a TypeScript file path
+    if any(pattern in identifier for pattern in exclude_patterns):
+      return False
 
-        """
-        # Handle empty string
-        if not identifier:
-            return False
+    # Support TypeScript-style module paths (without extension)
+    # Be more conservative - only support if it has clear TypeScript indicators
+    typescript_indicators = [
+      "src/",
+      "lib/",
+      "dist/",
+      "types/",
+      "components/",
+      "services/",
+      "utils/",
+      "helpers/",
+      "hooks/",
+      "node_modules/",
+      "@types/",
+      ".component",
+      ".service",
+      ".module",
+      ".spec",
+      ".test",
+    ]
 
-        # Support TypeScript file extensions (most reliable indicator)
-        if identifier.endswith((".ts", ".tsx", ".d.ts")):
-            return True
-
-        # Exclude obvious non-TypeScript patterns
-        exclude_patterns = [
-            # Python patterns
-            ".py",
-            ".pyc",
-            "__pycache__",
-            # Go patterns
-            ".go",
-            # Other non-TypeScript files
-            ".txt",
-            ".md",
-            ".json",
-            ".yaml",
-            ".yml",
-            ".xml",
-            ".html",
-            ".css",
-            ".scss",
-            ".less",
-            ".jpg",
-            ".png",
-            ".gif",
-            ".svg",
-            "Dockerfile",
-            "Makefile",
-            "LICENSE",
-            "README",
-        ]
-
-        if any(pattern in identifier for pattern in exclude_patterns):
-            return False
-
-        # Support TypeScript-style module paths (without extension)
-        # Be more conservative - only support if it has clear TypeScript indicators
-        typescript_indicators = [
-            "src/",
-            "lib/",
-            "dist/",
-            "types/",
-            "components/",
-            "services/",
-            "utils/",
-            "helpers/",
-            "hooks/",
-            "node_modules/",
-            "@types/",
-            ".component",
-            ".service",
-            ".module",
-            ".spec",
-            ".test",
-        ]
-
-        # If it has TypeScript-style indicators and no clear non-TS patterns
-        if any(indicator in identifier for indicator in typescript_indicators):
-            return True
-
-        # Default to False for ambiguous cases to avoid conflicts with Go adapter
-        return False
+    # Return True if it has TypeScript-style indicators
+    # Default to False for ambiguous cases to avoid conflicts with Go adapter
+    return any(indicator in identifier for indicator in typescript_indicators)
 
 
 __all__ = ["TypeScriptAdapter"]

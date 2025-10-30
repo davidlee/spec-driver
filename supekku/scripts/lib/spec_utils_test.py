@@ -11,21 +11,21 @@ import pytest
 
 from supekku.scripts.lib.frontmatter_schema import FrontmatterValidationError
 from supekku.scripts.lib.spec_utils import (
-    append_unique,
-    dump_markdown_file,
-    ensure_list_entry,
-    load_markdown_file,
-    load_validated_markdown_file,
-    validate_frontmatter,
+  append_unique,
+  dump_markdown_file,
+  ensure_list_entry,
+  load_markdown_file,
+  load_validated_markdown_file,
+  validate_frontmatter,
 )
 
 
 class SpecUtilsTestCase(unittest.TestCase):
-    """Test cases for spec_utils module functionality."""
+  """Test cases for spec_utils module functionality."""
 
-    def test_load_markdown_file_parses_frontmatter_and_body(self) -> None:
-        content = textwrap.dedent(
-            """
+  def test_load_markdown_file_parses_frontmatter_and_body(self) -> None:
+    content = textwrap.dedent(
+      """
             ---
             id: SPEC-001
             name: Example Spec
@@ -36,135 +36,135 @@ class SpecUtilsTestCase(unittest.TestCase):
             ---
             Extra body line
             """,
-        ).lstrip("\n")
+    ).lstrip("\n")
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            path = Path(tmpdir) / "spec.md"
-            path.write_text(content, encoding="utf-8")
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = Path(tmpdir) / "spec.md"
+      path.write_text(content, encoding="utf-8")
 
-            frontmatter, body = load_markdown_file(path)
+      frontmatter, body = load_markdown_file(path)
 
-        assert frontmatter == {"id": "SPEC-001", "name": "Example Spec", "kind": "spec"}
-        assert body == "Body line\n---\nExtra body line\n"
+    assert frontmatter == {"id": "SPEC-001", "name": "Example Spec", "kind": "spec"}
+    assert body == "Body line\n---\nExtra body line\n"
 
-    def test_dump_markdown_file_round_trip(self) -> None:
-        frontmatter = {"id": "SPEC-010", "name": "Round Trip", "kind": "spec"}
-        body = "Round trip body\n"
+  def test_dump_markdown_file_round_trip(self) -> None:
+    frontmatter = {"id": "SPEC-010", "name": "Round Trip", "kind": "spec"}
+    body = "Round trip body\n"
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            path = Path(tmpdir) / "spec.md"
-            dump_markdown_file(path, frontmatter, body)
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = Path(tmpdir) / "spec.md"
+      dump_markdown_file(path, frontmatter, body)
 
-            reloaded_frontmatter, reloaded_body = load_markdown_file(path)
+      reloaded_frontmatter, reloaded_body = load_markdown_file(path)
 
-        assert reloaded_frontmatter == frontmatter
-        assert reloaded_body == body
+    assert reloaded_frontmatter == frontmatter
+    assert reloaded_body == body
 
-    def test_ensure_list_entry_returns_existing_list(self) -> None:
-        data = {"owners": ["alice"]}
-        result = ensure_list_entry(data, "owners")
-        assert result is data["owners"]
+  def test_ensure_list_entry_returns_existing_list(self) -> None:
+    data = {"owners": ["alice"]}
+    result = ensure_list_entry(data, "owners")
+    assert result is data["owners"]
 
-        result.append("bob")
-        assert data["owners"] == ["alice", "bob"]
+    result.append("bob")
+    assert data["owners"] == ["alice", "bob"]
 
-    def test_ensure_list_entry_raises_for_non_list(self) -> None:
-        data = {"owners": "alice"}
-        with pytest.raises(TypeError):
-            ensure_list_entry(data, "owners")
+  def test_ensure_list_entry_raises_for_non_list(self) -> None:
+    data = {"owners": "alice"}
+    with pytest.raises(TypeError):
+      ensure_list_entry(data, "owners")
 
-    def test_append_unique_appends_when_missing(self) -> None:
-        values = ["alice"]
-        modified = append_unique(values, "bob")
-        assert modified
-        assert values == ["alice", "bob"]
+  def test_append_unique_appends_when_missing(self) -> None:
+    values = ["alice"]
+    modified = append_unique(values, "bob")
+    assert modified
+    assert values == ["alice", "bob"]
 
-    def test_append_unique_skips_existing_item(self) -> None:
-        values = ["alice", "bob"]
-        modified = append_unique(values, "alice")
-        assert not modified
-        assert values == ["alice", "bob"]
+  def test_append_unique_skips_existing_item(self) -> None:
+    values = ["alice", "bob"]
+    modified = append_unique(values, "alice")
+    assert not modified
+    assert values == ["alice", "bob"]
 
-    def test_validate_frontmatter_success(self) -> None:
-        frontmatter = {
-            "id": "SPEC-200",
-            "name": "Validated Spec",
-            "slug": "validated-spec",
-            "kind": "spec",
-            "status": "draft",
-            "created": "2024-06-01",
-            "updated": "2024-07-01",
-            "owners": ["alice"],
-            "relations": [
-                {
-                    "type": "implements",
-                    "target": "FR-100",
-                    "annotation": "covers primary requirement",
-                },
-            ],
-        }
+  def test_validate_frontmatter_success(self) -> None:
+    frontmatter = {
+      "id": "SPEC-200",
+      "name": "Validated Spec",
+      "slug": "validated-spec",
+      "kind": "spec",
+      "status": "draft",
+      "created": "2024-06-01",
+      "updated": "2024-07-01",
+      "owners": ["alice"],
+      "relations": [
+        {
+          "type": "implements",
+          "target": "FR-100",
+          "annotation": "covers primary requirement",
+        },
+      ],
+    }
 
-        result = validate_frontmatter(frontmatter)
+    result = validate_frontmatter(frontmatter)
 
-        assert result.id == "SPEC-200"
-        assert result.created.isoformat() == "2024-06-01"
-        assert len(result.relations) == 1
-        relation = result.relations[0]
-        assert relation.type == "implements"
-        assert relation.target == "FR-100"
-        assert result.data["relations"][0]["annotation"] == "covers primary requirement"
-        assert result.data is not frontmatter
-        assert frontmatter["owners"] == ["alice"]
+    assert result.id == "SPEC-200"
+    assert result.created.isoformat() == "2024-06-01"
+    assert len(result.relations) == 1
+    relation = result.relations[0]
+    assert relation.type == "implements"
+    assert relation.target == "FR-100"
+    assert result.data["relations"][0]["annotation"] == "covers primary requirement"
+    assert result.data is not frontmatter
+    assert frontmatter["owners"] == ["alice"]
 
-    def test_validate_frontmatter_missing_required_field(self) -> None:
-        frontmatter = {
-            "name": "Missing Id",
-            "slug": "missing-id",
-            "kind": "spec",
-            "status": "draft",
-            "created": "2024-06-01",
-            "updated": "2024-07-01",
-        }
+  def test_validate_frontmatter_missing_required_field(self) -> None:
+    frontmatter = {
+      "name": "Missing Id",
+      "slug": "missing-id",
+      "kind": "spec",
+      "status": "draft",
+      "created": "2024-06-01",
+      "updated": "2024-07-01",
+    }
 
-        with pytest.raises(FrontmatterValidationError):
-            validate_frontmatter(frontmatter)
+    with pytest.raises(FrontmatterValidationError):
+      validate_frontmatter(frontmatter)
 
-    def test_validate_frontmatter_invalid_relations(self) -> None:
-        frontmatter = {
-            "id": "SPEC-201",
-            "name": "Bad Relations",
-            "slug": "bad-relations",
-            "kind": "spec",
-            "status": "draft",
-            "created": "2024-06-01",
-            "updated": "2024-07-01",
-            "relations": ["not-a-mapping"],
-        }
+  def test_validate_frontmatter_invalid_relations(self) -> None:
+    frontmatter = {
+      "id": "SPEC-201",
+      "name": "Bad Relations",
+      "slug": "bad-relations",
+      "kind": "spec",
+      "status": "draft",
+      "created": "2024-06-01",
+      "updated": "2024-07-01",
+      "relations": ["not-a-mapping"],
+    }
 
-        with pytest.raises(FrontmatterValidationError):
-            validate_frontmatter(frontmatter)
+    with pytest.raises(FrontmatterValidationError):
+      validate_frontmatter(frontmatter)
 
-    def test_load_validated_markdown_file_round_trip(self) -> None:
-        frontmatter = {
-            "id": "SPEC-202",
-            "name": "Load Validated",
-            "slug": "load-validated",
-            "kind": "spec",
-            "status": "draft",
-            "created": "2024-06-01",
-            "updated": "2024-07-01",
-        }
-        body = "Some content\n"
+  def test_load_validated_markdown_file_round_trip(self) -> None:
+    frontmatter = {
+      "id": "SPEC-202",
+      "name": "Load Validated",
+      "slug": "load-validated",
+      "kind": "spec",
+      "status": "draft",
+      "created": "2024-06-01",
+      "updated": "2024-07-01",
+    }
+    body = "Some content\n"
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            path = Path(tmpdir) / "spec.md"
-            dump_markdown_file(path, frontmatter, body)
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = Path(tmpdir) / "spec.md"
+      dump_markdown_file(path, frontmatter, body)
 
-            result, loaded_body = load_validated_markdown_file(path)
+      result, loaded_body = load_validated_markdown_file(path)
 
-        assert result.slug == "load-validated"
-        assert loaded_body == body
+    assert result.slug == "load-validated"
+    assert loaded_body == body
 
 
 if __name__ == "__main__":
-    unittest.main()
+  unittest.main()

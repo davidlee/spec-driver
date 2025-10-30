@@ -66,8 +66,8 @@ def get_about_dir(repo_root: Path | None = None) -> Path:
 
 __all__ = [
   "SPEC_DRIVER_DIR",
-  "get_spec_driver_root",
-  "get_registry_dir",
-  "get_templates_dir",
   "get_about_dir",
+  "get_registry_dir",
+  "get_spec_driver_root",
+  "get_templates_dir",
 ]

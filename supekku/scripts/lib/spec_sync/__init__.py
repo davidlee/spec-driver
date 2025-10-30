@@ -8,9 +8,9 @@ from .engine import SpecSyncEngine
 from .models import DocVariant, SourceDescriptor, SourceUnit, SyncOutcome
 
 __all__ = [
-    "DocVariant",
-    "SourceDescriptor",
-    "SourceUnit",
-    "SpecSyncEngine",
-    "SyncOutcome",
+  "DocVariant",
+  "SourceDescriptor",
+  "SourceUnit",
+  "SpecSyncEngine",
+  "SyncOutcome",
 ]

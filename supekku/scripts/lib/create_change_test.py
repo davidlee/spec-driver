@@ -8,79 +8,83 @@ import unittest
 from pathlib import Path
 
 from supekku.scripts.lib.create_change import (
-    ChangeArtifactCreated,
-    create_delta,
-    create_requirement_breakout,
-    create_revision,
+  ChangeArtifactCreated,
+  create_delta,
+  create_requirement_breakout,
+  create_revision,
 )
 from supekku.scripts.lib.spec_utils import load_markdown_file
 
 
 class CreateChangeTest(unittest.TestCase):
-    """Test cases for create_change module functionality."""
+  """Test cases for create_change module functionality."""
 
-    def setUp(self) -> None:
-        self._cwd = Path.cwd()
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
 
-    def tearDown(self) -> None:
-        os.chdir(self._cwd)
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
 
-    def _make_repo(self) -> Path:
-        tmpdir = tempfile.TemporaryDirectory()
-        self.addCleanup(tmpdir.cleanup)
-        root = Path(tmpdir.name)
-        (root / ".git").mkdir()
-        spec_dir = root / "specify" / "tech" / "spec-100-example"
-        spec_dir.mkdir(parents=True, exist_ok=True)
-        (spec_dir / "SPEC-100.md").write_text(
-            "---\nid: SPEC-100\nslug: spec-100\nname: Spec 100\ncreated: 2024-01-01\nupdated: 2024-01-01\nstatus: draft\nkind: spec\n---\n\n- FR-100: Example\n",
-            encoding="utf-8",
-        )
-        os.chdir(root)
-        return root
+  def _make_repo(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    spec_dir = root / "specify" / "tech" / "spec-100-example"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    (spec_dir / "SPEC-100.md").write_text(
+      (
+        "---\nid: SPEC-100\nslug: spec-100\nname: Spec 100\n"
+        "created: 2024-01-01\nupdated: 2024-01-01\nstatus: draft\n"
+        "kind: spec\n---\n\n- FR-100: Example\n"
+      ),
+      encoding="utf-8",
+    )
+    os.chdir(root)
+    return root
 
-    def test_create_revision(self) -> None:
-        root = self._make_repo()
-        result = create_revision(
-            "Move FR",
-            source_specs=["SPEC-100"],
-            destination_specs=["SPEC-101"],
-            requirements=["SPEC-100.FR-100"],
-            repo_root=root,
-        )
-        assert isinstance(result, ChangeArtifactCreated)
-        assert result.primary_path.exists()
-        frontmatter, _ = load_markdown_file(result.primary_path)
-        assert frontmatter["kind"] == "revision"
-        assert "SPEC-100" in frontmatter.get("source_specs", [])
+  def test_create_revision(self) -> None:
+    root = self._make_repo()
+    result = create_revision(
+      "Move FR",
+      source_specs=["SPEC-100"],
+      destination_specs=["SPEC-101"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    assert isinstance(result, ChangeArtifactCreated)
+    assert result.primary_path.exists()
+    frontmatter, _ = load_markdown_file(result.primary_path)
+    assert frontmatter["kind"] == "revision"
+    assert "SPEC-100" in frontmatter.get("source_specs", [])
 
-    def test_create_delta(self) -> None:
-        root = self._make_repo()
-        result = create_delta(
-            "Implement ignore handling",
-            specs=["SPEC-100"],
-            requirements=["SPEC-100.FR-100"],
-            repo_root=root,
-        )
-        assert result.primary_path.exists()
-        frontmatter, _ = load_markdown_file(result.primary_path)
-        assert frontmatter["kind"] == "delta"
-        plan_files = [p for p in result.extras if p.name.startswith("IP-")]
-        assert plan_files
+  def test_create_delta(self) -> None:
+    root = self._make_repo()
+    result = create_delta(
+      "Implement ignore handling",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    assert result.primary_path.exists()
+    frontmatter, _ = load_markdown_file(result.primary_path)
+    assert frontmatter["kind"] == "delta"
+    plan_files = [p for p in result.extras if p.name.startswith("IP-")]
+    assert plan_files
 
-    def test_create_requirement_breakout(self) -> None:
-        root = self._make_repo()
-        path = create_requirement_breakout(
-            "SPEC-100",
-            "FR-200",
-            title="Handle edge cases",
-            repo_root=root,
-        )
-        assert path.exists()
-        frontmatter, _ = load_markdown_file(path)
-        assert frontmatter["kind"] == "requirement"
-        assert frontmatter["spec"] == "SPEC-100"
+  def test_create_requirement_breakout(self) -> None:
+    root = self._make_repo()
+    path = create_requirement_breakout(
+      "SPEC-100",
+      "FR-200",
+      title="Handle edge cases",
+      repo_root=root,
+    )
+    assert path.exists()
+    frontmatter, _ = load_markdown_file(path)
+    assert frontmatter["kind"] == "requirement"
+    assert frontmatter["spec"] == "SPEC-100"
 
 
 if __name__ == "__main__":
-    unittest.main()
+  unittest.main()

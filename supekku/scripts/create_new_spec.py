@@ -9,67 +9,67 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+  sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
 from supekku.scripts.lib.create_spec import (  # type: ignore
-    CreateSpecOptions,
-    SpecCreationError,
-    create_spec,
+  CreateSpecOptions,
+  SpecCreationError,
+  create_spec,
 )
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "spec_name",
-        nargs=argparse.REMAINDER,
-        help="Name of the spec to create",
-    )
-    parser.add_argument(
-        "--type",
-        choices=["tech", "product"],
-        default="tech",
-        help="Spec type (tech or product)",
-    )
-    parser.add_argument(
-        "--json",
-        action="store_true",
-        help="Emit machine-readable JSON output",
-    )
-    parser.add_argument(
-        "--no-testing",
-        dest="testing",
-        action="store_false",
-        help="Skip companion testing guide (tech specs only)",
-    )
-    parser.set_defaults(testing=True)
+  parser = argparse.ArgumentParser(description=__doc__)
+  parser.add_argument(
+    "spec_name",
+    nargs=argparse.REMAINDER,
+    help="Name of the spec to create",
+  )
+  parser.add_argument(
+    "--type",
+    choices=["tech", "product"],
+    default="tech",
+    help="Spec type (tech or product)",
+  )
+  parser.add_argument(
+    "--json",
+    action="store_true",
+    help="Emit machine-readable JSON output",
+  )
+  parser.add_argument(
+    "--no-testing",
+    dest="testing",
+    action="store_false",
+    help="Skip companion testing guide (tech specs only)",
+  )
+  parser.set_defaults(testing=True)
 
-    args = parser.parse_args(argv)
-    if not args.spec_name:
-        parser.error("spec name is required")
-    args.spec_name = " ".join(args.spec_name).strip()
-    return args
+  args = parser.parse_args(argv)
+  if not args.spec_name:
+    parser.error("spec name is required")
+  args.spec_name = " ".join(args.spec_name).strip()
+  return args
 
 
 def main(argv: list[str] | None = None) -> int:
-    namespace = parse_args(argv or sys.argv[1:])
-    options = CreateSpecOptions(
-        spec_type=namespace.type,
-        include_testing=namespace.testing,
-        emit_json=namespace.json,
-    )
+  namespace = parse_args(argv or sys.argv[1:])
+  options = CreateSpecOptions(
+    spec_type=namespace.type,
+    include_testing=namespace.testing,
+    emit_json=namespace.json,
+  )
 
-    try:
-        result = create_spec(namespace.spec_name, options)
-    except SpecCreationError:
-        return 1
+  try:
+    result = create_spec(namespace.spec_name, options)
+  except SpecCreationError:
+    return 1
 
-    if options.emit_json or result.test_path:
-        pass
+  if options.emit_json or result.test_path:
+    pass
 
-    return 0
+  return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+  raise SystemExit(main())

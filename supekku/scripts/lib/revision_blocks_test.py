@@ -5,13 +5,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .revision_blocks import (
-    REVISION_BLOCK_MARKER,
-    RevisionBlockValidator,
-    extract_revision_blocks,
+  REVISION_BLOCK_MARKER,
+  RevisionBlockValidator,
+  extract_revision_blocks,
 )
 
 if TYPE_CHECKING:
-    from pathlib import Path
+  from pathlib import Path
 
 SAMPLE_VALID_YAML = """schema: supekku.revision.change
 version: 1
@@ -36,32 +36,32 @@ requirements:
 
 
 def _wrap_block(inner: str) -> str:
-    return f"intro\n```yaml {REVISION_BLOCK_MARKER}\n{inner}```\n<!-- id: block -->\n"
+  return f"intro\n```yaml {REVISION_BLOCK_MARKER}\n{inner}```\n<!-- id: block -->\n"
 
 
 def test_extract_revision_block_identifies_marker() -> None:
-    content = _wrap_block(SAMPLE_VALID_YAML)
-    blocks = extract_revision_blocks(content)
-    assert len(blocks) == 1
-    block = blocks[0]
-    assert block.marker == REVISION_BLOCK_MARKER
-    assert block.language == "yaml"
-    assert block.content_start < block.content_end
-    assert block.yaml_content.startswith("schema:")
+  content = _wrap_block(SAMPLE_VALID_YAML)
+  blocks = extract_revision_blocks(content)
+  assert len(blocks) == 1
+  block = blocks[0]
+  assert block.marker == REVISION_BLOCK_MARKER
+  assert block.language == "yaml"
+  assert block.content_start < block.content_end
+  assert block.yaml_content.startswith("schema:")
 
 
 def test_validator_accepts_minimal_valid_payload() -> None:
-    validator = RevisionBlockValidator()
-    content = _wrap_block(SAMPLE_VALID_YAML)
-    block = extract_revision_blocks(content)[0]
-    data = block.parse()
-    messages = validator.validate(data)
-    assert messages == []
+  validator = RevisionBlockValidator()
+  content = _wrap_block(SAMPLE_VALID_YAML)
+  block = extract_revision_blocks(content)[0]
+  data = block.parse()
+  messages = validator.validate(data)
+  assert messages == []
 
 
 def test_validator_flags_missing_destination_for_move() -> None:
-    validator = RevisionBlockValidator()
-    invalid_yaml = """schema: supekku.revision.change
+  validator = RevisionBlockValidator()
+  invalid_yaml = """schema: supekku.revision.change
 version: 1
 metadata:
   revision: RE-321
@@ -74,15 +74,15 @@ requirements:
       - kind: requirement
         ref: SPEC-001.FR-001
 """
-    block = extract_revision_blocks(_wrap_block(invalid_yaml))[0]
-    data = block.parse()
-    messages = validator.validate(data)
-    assert any("destination" in msg.render_path() for msg in messages)
+  block = extract_revision_blocks(_wrap_block(invalid_yaml))[0]
+  data = block.parse()
+  messages = validator.validate(data)
+  assert any("destination" in msg.render_path() for msg in messages)
 
 
 def test_validator_flags_invalid_additional_specs() -> None:
-    validator = RevisionBlockValidator()
-    invalid = """schema: supekku.revision.change
+  validator = RevisionBlockValidator()
+  invalid = """schema: supekku.revision.change
 version: 1
 metadata:
   revision: RE-777
@@ -97,29 +97,29 @@ requirements:
         - SPEC-FOO
         - SPEC-002
 """
-    block = extract_revision_blocks(_wrap_block(invalid))[0]
-    data = block.parse()
-    messages = validator.validate(data)
-    assert any("additional_specs" in msg.render_path() for msg in messages)
+  block = extract_revision_blocks(_wrap_block(invalid))[0]
+  data = block.parse()
+  messages = validator.validate(data)
+  assert any("additional_specs" in msg.render_path() for msg in messages)
 
 
 def test_formatting_rewrites_inline_mappings(tmp_path: Path) -> None:
-    inline_yaml = """schema: supekku.revision.change
+  inline_yaml = """schema: supekku.revision.change
 version: 1
 metadata: {revision: RE-321}
 specs: []
 requirements: []
 """
-    original = _wrap_block(inline_yaml)
-    path = tmp_path / "sample.md"
-    path.write_text(original)
+  original = _wrap_block(inline_yaml)
+  path = tmp_path / "sample.md"
+  path.write_text(original)
 
-    block = extract_revision_blocks(original)[0]
-    data = block.parse()
-    formatted = block.formatted_yaml(data)
-    assert "metadata:\n  revision:" in formatted
-    updated = block.replace_content(original, formatted)
-    path.write_text(updated)
-    after = path.read_text()
-    assert "metadata:\n  revision: RE-321" in after
-    assert after.endswith("<!-- id: block -->\n")
+  block = extract_revision_blocks(original)[0]
+  data = block.parse()
+  formatted = block.formatted_yaml(data)
+  assert "metadata:\n  revision:" in formatted
+  updated = block.replace_content(original, formatted)
+  path.write_text(updated)
+  after = path.read_text()
+  assert "metadata:\n  revision: RE-321" in after
+  assert after.endswith("<!-- id: block -->\n")

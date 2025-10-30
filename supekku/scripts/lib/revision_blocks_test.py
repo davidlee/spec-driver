@@ -10,7 +10,6 @@ from .revision_blocks import (
     extract_revision_blocks,
 )
 
-
 SAMPLE_VALID_YAML = """schema: supekku.revision.change
 version: 1
 metadata:

@@ -44,14 +44,14 @@ def normalize_status(status: str) -> str:
 
 
 __all__ = [
-    "ChangeStatus",
-    "STATUS_DRAFT",
-    "STATUS_PENDING",
-    "STATUS_IN_PROGRESS",
+    "CANONICAL_STATUS_MAP",
+    "STATUS_COMPLETE",
     "STATUS_COMPLETED",
     "STATUS_DEFERRED",
-    "STATUS_COMPLETE",
+    "STATUS_DRAFT",
+    "STATUS_IN_PROGRESS",
+    "STATUS_PENDING",
     "VALID_STATUSES",
-    "CANONICAL_STATUS_MAP",
+    "ChangeStatus",
     "normalize_status",
 ]

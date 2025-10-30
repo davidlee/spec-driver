@@ -1,5 +1,4 @@
-"""
-Tests for TypeScript language adapter (STUB).
+"""Tests for TypeScript language adapter (STUB).
 """
 
 import unittest
@@ -105,7 +104,7 @@ class TestTypeScriptAdapter(unittest.TestCase):
             self.adapter.discover_targets(self.repo_root)
 
         self.assertIn(
-            "TypeScript auto-discovery not yet implemented", str(context.exception)
+            "TypeScript auto-discovery not yet implemented", str(context.exception),
         )
         self.assertIn("explicit targets", str(context.exception))
 
@@ -158,7 +157,7 @@ class TestTypeScriptAdapter(unittest.TestCase):
             Path(f"contracts/typescript/{expected_slug}-internal.md"),
         )
         self.assertEqual(
-            types_variant.path, Path(f"contracts/typescript/{expected_slug}-types.md")
+            types_variant.path, Path(f"contracts/typescript/{expected_slug}-types.md"),
         )
 
     def test_describe_typescript_module_without_extension(self):
@@ -182,7 +181,7 @@ class TestTypeScriptAdapter(unittest.TestCase):
             self.adapter.describe(unit)
 
         self.assertIn(
-            "TypeScriptAdapter cannot process python units", str(context.exception)
+            "TypeScriptAdapter cannot process python units", str(context.exception),
         )
 
     def test_generate_rejects_non_typescript_unit(self):
@@ -194,7 +193,7 @@ class TestTypeScriptAdapter(unittest.TestCase):
             self.adapter.generate(unit, spec_dir=spec_dir)
 
         self.assertIn(
-            "TypeScriptAdapter cannot process python units", str(context.exception)
+            "TypeScriptAdapter cannot process python units", str(context.exception),
         )
 
     def test_generate_not_implemented(self):

@@ -1,5 +1,4 @@
-"""
-Tests for spec_sync core models.
+"""Tests for spec_sync core models.
 """
 
 import unittest

@@ -1,5 +1,4 @@
-"""
-TypeScript language adapter for specification synchronization (STUB).
+"""TypeScript language adapter for specification synchronization (STUB).
 
 This is a placeholder implementation for future TypeScript support.
 Currently returns not implemented errors for all operations.
@@ -7,16 +6,16 @@ Currently returns not implemented errors for all operations.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
-from typing import ClassVar, List, Sequence
+from typing import ClassVar
 
 from ..models import DocVariant, SourceDescriptor, SourceUnit
 from .base import LanguageAdapter
 
 
 class TypeScriptAdapter(LanguageAdapter):
-    """
-    Language adapter for TypeScript modules (STUB IMPLEMENTATION).
+    """Language adapter for TypeScript modules (STUB IMPLEMENTATION).
 
     This is a placeholder implementation that provides the interface
     for TypeScript support but does not yet implement documentation
@@ -32,11 +31,11 @@ class TypeScriptAdapter(LanguageAdapter):
     language: ClassVar[str] = "typescript"
 
     def __init__(self, repo_root: Path):
-        """
-        Initialize TypeScript adapter.
+        """Initialize TypeScript adapter.
 
         Args:
             repo_root: Root directory of the repository
+
         """
         self.repo_root = repo_root
 
@@ -44,9 +43,8 @@ class TypeScriptAdapter(LanguageAdapter):
         self,
         repo_root: Path,
         requested: Sequence[str] | None = None,
-    ) -> List[SourceUnit]:
-        """
-        Discover TypeScript modules for documentation.
+    ) -> list[SourceUnit]:
+        """Discover TypeScript modules for documentation.
 
         Args:
             repo_root: Root directory of the repository
@@ -57,6 +55,7 @@ class TypeScriptAdapter(LanguageAdapter):
 
         Raises:
             NotImplementedError: TypeScript discovery not yet implemented
+
         """
         if requested:
             # For now, just create placeholder units for requested identifiers
@@ -74,12 +73,11 @@ class TypeScriptAdapter(LanguageAdapter):
         # TODO: Support TypeScript project structure (src/, lib/, etc.)
         raise NotImplementedError(
             "TypeScript auto-discovery not yet implemented. "
-            "Use explicit targets with typescript:path/to/file.ts syntax."
+            "Use explicit targets with typescript:path/to/file.ts syntax.",
         )
 
     def describe(self, unit: SourceUnit) -> SourceDescriptor:
-        """
-        Describe how a TypeScript source unit should be processed.
+        """Describe how a TypeScript source unit should be processed.
 
         Args:
             unit: Source unit to describe
@@ -89,6 +87,7 @@ class TypeScriptAdapter(LanguageAdapter):
 
         Raises:
             ValueError: If unit is not a TypeScript unit
+
         """
         self._validate_unit_language(unit)
 
@@ -123,8 +122,8 @@ class TypeScriptAdapter(LanguageAdapter):
                         }
                         for variant in variants
                     ],
-                }
-            ]
+                },
+            ],
         }
 
         return SourceDescriptor(
@@ -134,10 +133,9 @@ class TypeScriptAdapter(LanguageAdapter):
         )
 
     def generate(
-        self, unit: SourceUnit, *, spec_dir: Path, check: bool = False
-    ) -> List[DocVariant]:
-        """
-        Generate documentation variants for a TypeScript source unit.
+        self, unit: SourceUnit, *, spec_dir: Path, check: bool = False,
+    ) -> list[DocVariant]:
+        """Generate documentation variants for a TypeScript source unit.
 
         Args:
             unit: Source unit to generate documentation for
@@ -150,6 +148,7 @@ class TypeScriptAdapter(LanguageAdapter):
         Raises:
             ValueError: If unit is not a TypeScript unit
             NotImplementedError: TypeScript generation not yet implemented
+
         """
         self._validate_unit_language(unit)
 
@@ -162,18 +161,18 @@ class TypeScriptAdapter(LanguageAdapter):
 
         raise NotImplementedError(
             f"TypeScript documentation generation not yet implemented for {unit.identifier}. "
-            "This is a placeholder adapter - see TODO items in typescript.py"
+            "This is a placeholder adapter - see TODO items in typescript.py",
         )
 
     def supports_identifier(self, identifier: str) -> bool:
-        """
-        Check if this adapter can handle TypeScript identifiers.
+        """Check if this adapter can handle TypeScript identifiers.
 
         Args:
             identifier: Source identifier to check
 
         Returns:
             True if identifier looks like a TypeScript file path
+
         """
         # Handle empty string
         if not identifier:

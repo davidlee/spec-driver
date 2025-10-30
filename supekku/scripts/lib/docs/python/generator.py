@@ -1,10 +1,9 @@
 """Markdown documentation generator."""
 
-from typing import Dict
 
 
 def generate_deterministic_markdown_spec(
-    analysis: Dict, spec_type: str = "public"
+    analysis: dict, spec_type: str = "public",
 ) -> str:
     """Generate deterministic markdown documentation from analysis"""
     if "error" in analysis:
@@ -70,7 +69,7 @@ def generate_deterministic_markdown_spec(
                 comment_info = f" - {func['comment']}" if func.get("comment") else ""
 
                 lines.append(
-                    f"- {decorators}`{signature}`{docstring_info}{comment_info}"
+                    f"- {decorators}`{signature}`{docstring_info}{comment_info}",
                 )
             lines.append("")
 
@@ -135,7 +134,7 @@ def generate_deterministic_markdown_spec(
                     )
 
                     lines.append(
-                        f"- {decorators}`{signature}`{docstring_info}{comment_info}"
+                        f"- {decorators}`{signature}`{docstring_info}{comment_info}",
                     )
 
                 lines.append("")

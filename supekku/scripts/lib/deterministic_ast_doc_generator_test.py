@@ -1,5 +1,4 @@
-"""
-Tests for the deterministic AST documentation generator.
+"""Tests for the deterministic AST documentation generator.
 
 This module tests the core functionality of the AST-based documentation
 system including parsing, comment extraction, deterministic output,
@@ -8,37 +7,34 @@ and check mode functionality.
 
 from __future__ import annotations
 
+# Import the modules we're testing
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-# Import the modules we're testing
-import sys
-
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-
-from supekku.scripts.lib.docs.python import calculate_content_hash
-from supekku.scripts.lib.docs.python.analyzer import DeterministicPythonModuleAnalyzer
-from supekku.scripts.lib.docs.python.comments import CommentExtractor
-from supekku.scripts.lib.docs.python.generator import (
-    generate_deterministic_markdown_spec,
-)
 
 # Import backward compatibility functions from CLI module
 from supekku.scripts.cli.deterministic_ast_doc_generator import (
     check_mode_comparison,
     write_mode_comparison,
 )
-
 from supekku.scripts.lib.ast_doc_test_fixtures import (
-    SIMPLE_CLASS,
+    COMMENT_VARIATIONS,
     COMPLEX_TYPES,
     DECORATOR_HEAVY,
-    COMMENT_VARIATIONS,
-    INHERITANCE_EXAMPLE,
     FUNCTIONS_AND_CONSTANTS,
+    INHERITANCE_EXAMPLE,
     MINIMAL_MODULE,
+    SIMPLE_CLASS,
     SYNTAX_ERROR_MODULE,
+)
+from supekku.scripts.lib.docs.python import calculate_content_hash
+from supekku.scripts.lib.docs.python.analyzer import DeterministicPythonModuleAnalyzer
+from supekku.scripts.lib.docs.python.comments import CommentExtractor
+from supekku.scripts.lib.docs.python.generator import (
+    generate_deterministic_markdown_spec,
 )
 
 

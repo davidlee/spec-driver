@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 from .frontmatter_schema import Relation
 from .spec_utils import dump_markdown_file, load_markdown_file
@@ -20,7 +21,7 @@ def _ensure_relations(frontmatter: dict[str, Any]) -> list[RelationDict]:
             raise TypeError(f"frontmatter['relations'][{index}] must be a mapping")
         if "type" not in item or "target" not in item:
             raise ValueError(
-                f"frontmatter['relations'][{index}] missing required keys 'type'/'target'"
+                f"frontmatter['relations'][{index}] missing required keys 'type'/'target'",
             )
     return value  # type: ignore[return-value]
 
@@ -101,7 +102,7 @@ def remove_relation(path: Path | str, *, relation_type: str, target: str) -> boo
 
 
 __all__ = [
-    "list_relations",
     "add_relation",
+    "list_relations",
     "remove_relation",
 ]

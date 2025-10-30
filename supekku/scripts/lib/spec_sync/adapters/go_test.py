@@ -1,5 +1,4 @@
-"""
-Tests for Go language adapter.
+"""Tests for Go language adapter.
 """
 
 import unittest
@@ -122,7 +121,7 @@ class TestGoAdapter(unittest.TestCase):
     @patch("pathlib.Path.exists")
     @patch("pathlib.Path.mkdir")
     def test_generate_creates_variants(
-        self, _mock_mkdir, mock_exists, mock_open, mock_subprocess
+        self, _mock_mkdir, mock_exists, mock_open, mock_subprocess,
     ):
         """Test generate method creates documentation variants."""
         # Setup mocks
@@ -136,7 +135,7 @@ class TestGoAdapter(unittest.TestCase):
 
         # Mock TechSpecSyncEngine
         with patch(
-            "supekku.scripts.lib.sync_engine.TechSpecSyncEngine"
+            "supekku.scripts.lib.sync_engine.TechSpecSyncEngine",
         ) as mock_engine_class:
             mock_engine = Mock()
             mock_engine.go_module_name.return_value = "github.com/test/repo"
@@ -166,7 +165,7 @@ class TestGoAdapter(unittest.TestCase):
         mock_subprocess.return_value = Mock(returncode=0)  # Check passes
 
         with patch(
-            "supekku.scripts.lib.sync_engine.TechSpecSyncEngine"
+            "supekku.scripts.lib.sync_engine.TechSpecSyncEngine",
         ) as mock_engine_class:
             mock_engine = Mock()
             mock_engine.go_module_name.return_value = "github.com/test/repo"

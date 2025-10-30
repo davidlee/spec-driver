@@ -4,9 +4,8 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
-
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -14,7 +13,6 @@ if str(ROOT) not in sys.path:
 
 from supekku.scripts.lib.change_registry import ChangeRegistry
 from supekku.scripts.lib.cli_utils import add_root_argument
-
 
 KINDS = ["delta", "revision", "audit"]
 

@@ -5,8 +5,8 @@ from __future__ import annotations
 
 import argparse
 import sys
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -72,7 +72,7 @@ def iter_artifacts(root: Path, kinds: Iterable[str]):
 
 
 def matches_filters(
-    artifact, *, substring: str | None, status: str | None, applies_to: str | None
+    artifact, *, substring: str | None, status: str | None, applies_to: str | None,
 ) -> bool:
     if substring:
         text = substring.lower()
@@ -169,7 +169,7 @@ def main(argv: list[str] | None = None) -> int:
 
     for artifact in artifacts:
         if not matches_filters(
-            artifact, substring=substring, status=status, applies_to=applies_to
+            artifact, substring=substring, status=status, applies_to=applies_to,
         ):
             continue
         print(
@@ -180,7 +180,7 @@ def main(argv: list[str] | None = None) -> int:
                 include_relations=args.relations,
                 include_applies=args.applies,
                 include_plan=args.plan,
-            )
+            ),
         )
     return 0
 

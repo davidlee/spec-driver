@@ -1,19 +1,17 @@
-"""
-Multi-language specification synchronization engine.
+"""Multi-language specification synchronization engine.
 """
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Dict, List, Mapping, Optional, Sequence
 
 from .adapters import GoAdapter, LanguageAdapter, PythonAdapter, TypeScriptAdapter
 from .models import SourceUnit, SyncOutcome
 
 
 class SpecSyncEngine:
-    """
-    Engine for synchronizing technical specifications across multiple languages.
+    """Engine for synchronizing technical specifications across multiple languages.
 
     Orchestrates language adapters to discover source units, generate documentation,
     and maintain registry mappings for Go, Python, and other supported languages.
@@ -23,16 +21,16 @@ class SpecSyncEngine:
         self,
         repo_root: Path,
         tech_dir: Path,
-        adapters: Optional[Mapping[str, LanguageAdapter]] = None,
+        adapters: Mapping[str, LanguageAdapter] | None = None,
     ):
-        """
-        Initialize the multi-language spec sync engine.
+        """Initialize the multi-language spec sync engine.
 
         Args:
             repo_root: Root directory of the repository
             tech_dir: Directory containing technical specifications
             adapters: Optional mapping of language -> adapter. If not provided,
                      default adapters for Go and Python will be used.
+
         """
         self.repo_root = repo_root
         self.tech_dir = tech_dir
@@ -50,12 +48,11 @@ class SpecSyncEngine:
     def synchronize(
         self,
         *,
-        languages: Optional[Sequence[str]] = None,
-        targets: Optional[Sequence[str]] = None,
+        languages: Sequence[str] | None = None,
+        targets: Sequence[str] | None = None,
         check: bool = False,
     ) -> SyncOutcome:
-        """
-        Synchronize specifications across multiple languages.
+        """Synchronize specifications across multiple languages.
 
         Args:
             languages: Optional list of languages to process. If None, processes all.
@@ -64,6 +61,7 @@ class SpecSyncEngine:
 
         Returns:
             SyncOutcome with results of the synchronization operation
+
         """
         active_languages = self._determine_active_languages(languages)
         language_targets = self._parse_targets(targets, active_languages)
@@ -83,24 +81,24 @@ class SpecSyncEngine:
 
         for language in languages_to_process:
             self._process_language(
-                language, language_targets.get(language), check, outcome
+                language, language_targets.get(language), check, outcome,
             )
 
         return outcome
 
     def _determine_active_languages(
-        self, languages: Optional[Sequence[str]]
-    ) -> List[str]:
+        self, languages: Sequence[str] | None,
+    ) -> list[str]:
         """Determine which languages to process."""
         if languages is None:
             return list(self.adapters.keys())
         return [lang for lang in languages if lang in self.adapters]
 
     def _parse_targets(
-        self, targets: Optional[Sequence[str]], active_languages: List[str]
-    ) -> Dict[str, List[str]]:
+        self, targets: Sequence[str] | None, active_languages: list[str],
+    ) -> dict[str, list[str]]:
         """Parse targets into language-specific lists."""
-        language_targets: Dict[str, List[str]] = {}
+        language_targets: dict[str, list[str]] = {}
 
         if not targets:
             return language_targets
@@ -113,8 +111,8 @@ class SpecSyncEngine:
     def _add_target_to_language_map(
         self,
         target: str,
-        active_languages: List[str],
-        language_targets: Dict[str, List[str]],
+        active_languages: list[str],
+        language_targets: dict[str, list[str]],
     ) -> None:
         """Add a target to the appropriate language in the target map."""
         if ":" in target:
@@ -125,8 +123,8 @@ class SpecSyncEngine:
     def _add_explicit_target(
         self,
         target: str,
-        active_languages: List[str],
-        language_targets: Dict[str, List[str]],
+        active_languages: list[str],
+        language_targets: dict[str, list[str]],
     ) -> None:
         """Add target with explicit language prefix."""
         lang, identifier = target.split(":", 1)
@@ -138,8 +136,8 @@ class SpecSyncEngine:
     def _add_auto_detected_target(
         self,
         target: str,
-        active_languages: List[str],
-        language_targets: Dict[str, List[str]],
+        active_languages: list[str],
+        language_targets: dict[str, list[str]],
     ) -> None:
         """Add target by auto-detecting language from identifier patterns."""
         for lang in active_languages:
@@ -153,7 +151,7 @@ class SpecSyncEngine:
     def _process_language(
         self,
         language: str,
-        lang_targets: Optional[List[str]],
+        lang_targets: list[str] | None,
         check: bool,
         outcome: SyncOutcome,
     ) -> None:
@@ -162,12 +160,12 @@ class SpecSyncEngine:
 
         try:
             source_units = adapter.discover_targets(
-                self.repo_root, requested=lang_targets
+                self.repo_root, requested=lang_targets,
             )
 
             if not source_units:
                 outcome.warnings.append(
-                    f"No source units found for language: {language}"
+                    f"No source units found for language: {language}",
                 )
                 return
 
@@ -175,7 +173,7 @@ class SpecSyncEngine:
                 self._process_source_unit(unit, adapter, check, outcome)
 
         except Exception as e:
-            outcome.errors.append(f"Error processing language {language}: {str(e)}")
+            outcome.errors.append(f"Error processing language {language}: {e!s}")
 
     def _process_source_unit(
         self,
@@ -202,49 +200,49 @@ class SpecSyncEngine:
                 outcome.created_specs[unit_key] = spec_id
 
         except Exception as e:
-            outcome.errors.append(f"Error processing {unit.identifier}: {str(e)}")
+            outcome.errors.append(f"Error processing {unit.identifier}: {e!s}")
             outcome.skipped_units.append(f"{unit.identifier} (error)")
 
-    def get_supported_languages(self) -> List[str]:
-        """
-        Get list of supported languages.
+    def get_supported_languages(self) -> list[str]:
+        """Get list of supported languages.
 
         Returns:
             List of language identifiers
+
         """
         return list(self.adapters.keys())
 
-    def get_adapter(self, language: str) -> Optional[LanguageAdapter]:
-        """
-        Get adapter for a specific language.
+    def get_adapter(self, language: str) -> LanguageAdapter | None:
+        """Get adapter for a specific language.
 
         Args:
             language: Language identifier
 
         Returns:
             Language adapter or None if not supported
+
         """
         return self.adapters.get(language)
 
     def add_adapter(self, language: str, adapter: LanguageAdapter) -> None:
-        """
-        Add or replace adapter for a language.
+        """Add or replace adapter for a language.
 
         Args:
             language: Language identifier
             adapter: Language adapter to add
+
         """
         self.adapters[language] = adapter
 
-    def supports_identifier(self, identifier: str) -> Optional[str]:
-        """
-        Determine which language (if any) supports the given identifier.
+    def supports_identifier(self, identifier: str) -> str | None:
+        """Determine which language (if any) supports the given identifier.
 
         Args:
             identifier: Source identifier to check
 
         Returns:
             Language name if supported, None otherwise
+
         """
         for language, adapter in self.adapters.items():
             if adapter.supports_identifier(identifier):

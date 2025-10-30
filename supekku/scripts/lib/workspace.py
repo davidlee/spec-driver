@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 from .backlog import find_repo_root
 from .change_registry import ChangeRegistry
@@ -18,12 +17,12 @@ class Workspace:
     """Unified facade over project registries."""
 
     root: Path
-    _specs: Optional[SpecRegistry] = None
-    _requirements: Optional[RequirementsRegistry] = None
-    _decisions: Optional[DecisionRegistry] = None
-    _delta_registry: Optional[ChangeRegistry] = None
-    _revision_registry: Optional[ChangeRegistry] = None
-    _audit_registry: Optional[ChangeRegistry] = None
+    _specs: SpecRegistry | None = None
+    _requirements: RequirementsRegistry | None = None
+    _decisions: DecisionRegistry | None = None
+    _delta_registry: ChangeRegistry | None = None
+    _revision_registry: ChangeRegistry | None = None
+    _audit_registry: ChangeRegistry | None = None
 
     @classmethod
     def from_cwd(cls) -> Workspace:
@@ -45,7 +44,7 @@ class Workspace:
     def requirements(self) -> RequirementsRegistry:
         if self._requirements is None:
             self._requirements = RequirementsRegistry(
-                self.root / "supekku" / "registry" / "requirements.yaml"
+                self.root / "supekku" / "registry" / "requirements.yaml",
             )
         return self._requirements
 
@@ -90,7 +89,7 @@ class Workspace:
             self._audit_registry = ChangeRegistry(root=self.root, kind="audit")
         return self._audit_registry
 
-    def sync_change_registries(self, *, kinds: Optional[list[str]] = None) -> None:
+    def sync_change_registries(self, *, kinds: list[str] | None = None) -> None:
         kinds = kinds or ["delta", "revision", "audit"]
         for kind in kinds:
             if kind == "delta":

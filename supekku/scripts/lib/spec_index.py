@@ -132,4 +132,4 @@ class SpecIndexBuilder:
             return {}
 
 
-__all__ = ["SpecIndexEntry", "SpecIndexBuilder"]
+__all__ = ["SpecIndexBuilder", "SpecIndexEntry"]

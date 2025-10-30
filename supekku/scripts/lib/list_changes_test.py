@@ -6,11 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from supekku.scripts.list_changes import main as list_changes_main
 from supekku.scripts.lib.spec_utils import dump_markdown_file
+from supekku.scripts.list_changes import main as list_changes_main
 
 
-@pytest.fixture()
+@pytest.fixture
 def temp_repo(tmp_path: Path) -> Path:
     root = tmp_path
     (root / ".git").mkdir()
@@ -136,7 +136,7 @@ def test_filters_by_applies_and_includes_metadata(temp_repo: Path) -> None:
         root=temp_repo,
     )
     assert lines == [
-        "RE-050\trevision\tdraft\tre-050\tSPEC-001.FR-001\tintroduces:SPEC-001.FR-001"
+        "RE-050\trevision\tdraft\tre-050\tSPEC-001.FR-001\tintroduces:SPEC-001.FR-001",
     ]
 
 
@@ -169,7 +169,7 @@ phases:
 ```
 
 # IP-010 – Example Plan
-"""
+""",
     )
 
     phase_body = dedent(
@@ -191,7 +191,7 @@ risks: []
 ```
 
 # Phase 01
-"""
+""",
     )
 
     _write_change(
@@ -204,5 +204,5 @@ risks: []
 
     lines = _run(["--kind", "delta", "--plan"], root=temp_repo)
     assert lines == [
-        "DE-010\tdelta\tdraft\tde-010\tIP-010 [IP-010.PHASE-01:Build MVP.]"
+        "DE-010\tdelta\tdraft\tde-010\tIP-010 [IP-010.PHASE-01:Build MVP.]",
     ]

@@ -7,11 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from supekku.scripts.list_specs import main as list_specs_main
 from supekku.scripts.lib.spec_utils import dump_markdown_file
+from supekku.scripts.list_specs import main as list_specs_main
 
 
-@pytest.fixture()
+@pytest.fixture
 def temp_repo(tmp_path: Path) -> Path:
     root = tmp_path
     (root / ".git").mkdir()
@@ -19,7 +19,7 @@ def temp_repo(tmp_path: Path) -> Path:
 
 
 def _write_spec(
-    root: Path, spec_id: str, slug: str, packages: list[str], name: str
+    root: Path, spec_id: str, slug: str, packages: list[str], name: str,
 ) -> Path:
     directory = root / "specify" / "tech" / f"{spec_id.lower()}-bundle"
     directory.mkdir(parents=True, exist_ok=True)
@@ -58,7 +58,7 @@ def test_package_filter(temp_repo: Path) -> None:
 
 def test_for_path_filters_using_cwd(temp_repo: Path) -> None:
     spec_path = _write_spec(
-        temp_repo, "SPEC-300", "spec-300", ["internal/shared/pkg"], "Pkg"
+        temp_repo, "SPEC-300", "spec-300", ["internal/shared/pkg"], "Pkg",
     )
     working_dir = temp_repo / "internal" / "shared" / "pkg"
     working_dir.mkdir(parents=True, exist_ok=True)

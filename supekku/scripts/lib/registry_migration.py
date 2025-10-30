@@ -6,13 +6,12 @@ import json
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple
+from typing import Any
 
 
 @dataclass
 class RegistryV2:
-    """
-    v2 registry model - language-aware structure.
+    """v2 registry model - language-aware structure.
 
     Format: {
         "version": 2,
@@ -25,8 +24,8 @@ class RegistryV2:
     """
 
     version: int
-    languages: Dict[str, Dict[str, str]]
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    languages: dict[str, dict[str, str]]
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def create_empty(cls) -> RegistryV2:
@@ -40,7 +39,7 @@ class RegistryV2:
         )
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> RegistryV2:
+    def from_dict(cls, data: dict[str, Any]) -> RegistryV2:
         """Create v2 registry from dictionary."""
         return cls(
             version=data.get("version", 2),
@@ -81,13 +80,12 @@ class RegistryV2:
             self.languages[language] = {}
         self.languages[language][identifier] = spec_id
 
-    def get_spec_id(self, language: str, identifier: str) -> Optional[str]:
+    def get_spec_id(self, language: str, identifier: str) -> str | None:
         """Get spec ID for a specific language and identifier."""
         return self.languages.get(language, {}).get(identifier)
 
-    def get_spec_id_compat(self, identifier: str) -> Optional[str]:
-        """
-        Get spec ID with backwards compatibility.
+    def get_spec_id_compat(self, identifier: str) -> str | None:
+        """Get spec ID with backwards compatibility.
 
         Searches all languages, with Go as default/fallback for ambiguous cases.
         """
@@ -103,7 +101,7 @@ class RegistryV2:
 
         return None
 
-    def get_all_source_units(self) -> Dict[Tuple[str, str], str]:
+    def get_all_source_units(self) -> dict[tuple[str, str], str]:
         """Get all source units as (language, identifier) -> spec_id mapping."""
         result = {}
         for language, mappings in self.languages.items():
@@ -111,7 +109,7 @@ class RegistryV2:
                 result[(language, identifier)] = spec_id
         return result
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
             "version": self.version,
@@ -140,8 +138,7 @@ class LanguageDetector:
         self.python_adapter = PythonAdapter(temp_root)
 
     def detect_language(self, identifier: str) -> str:
-        """
-        Detect language from identifier using adapter support checks.
+        """Detect language from identifier using adapter support checks.
 
         Uses refined logic for disambiguation when multiple adapters match.
 
@@ -150,6 +147,7 @@ class LanguageDetector:
 
         Returns:
             Language name ("go", "python", etc.)
+
         """
         # Clear Python indicators (file extensions)
         if identifier.endswith(".py"):
@@ -174,6 +172,6 @@ class LanguageDetector:
 
 
 __all__ = [
-    "RegistryV2",
     "LanguageDetector",
+    "RegistryV2",
 ]

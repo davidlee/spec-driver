@@ -1,16 +1,14 @@
 """Cross-platform path normalization utilities."""
 
 from pathlib import Path, PurePath
-from typing import Optional
 
 
 class PathNormalizer:
     """Handles cross-platform path normalization for stable identifiers."""
 
     @staticmethod
-    def normalize_path_for_id(file_path: Path, base_path: Optional[Path] = None) -> str:
-        """
-        Convert file path to a stable, cross-platform identifier.
+    def normalize_path_for_id(file_path: Path, base_path: Path | None = None) -> str:
+        """Convert file path to a stable, cross-platform identifier.
 
         Uses forward slashes and relative paths to ensure consistency
         across Windows/Unix and different Python versions.
@@ -37,20 +35,19 @@ class PathNormalizer:
             return file_path.stem
 
     @staticmethod
-    def get_module_name(file_path: Path, base_path: Optional[Path] = None) -> str:
+    def get_module_name(file_path: Path, base_path: Path | None = None) -> str:
         """Convert file path to Python module name with cross-platform stability."""
         normalized = PathNormalizer.normalize_path_for_id(file_path, base_path)
 
         # Remove .py extension if present
-        if normalized.endswith(".py"):
-            normalized = normalized[:-3]
+        normalized = normalized.removesuffix(".py")
 
         # Convert path separators to dots for module name
         return normalized.replace("/", ".")
 
     @staticmethod
     def get_output_filename(
-        file_path: Path, doc_type: str, base_path: Optional[Path] = None
+        file_path: Path, doc_type: str, base_path: Path | None = None,
     ) -> str:
         """Generate stable output filename for documentation."""
         module_name = PathNormalizer.get_module_name(file_path, base_path)

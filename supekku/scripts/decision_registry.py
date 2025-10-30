@@ -22,7 +22,7 @@ from supekku.scripts.lib.decision_registry import DecisionRegistry  # type: igno
 def create_sync_parser(subparsers: argparse._SubParsersAction) -> None:
     """Create the sync command parser."""
     sync_parser = subparsers.add_parser(
-        "sync", help="Sync decision registry from ADR files"
+        "sync", help="Sync decision registry from ADR files",
     )
     add_root_argument(sync_parser)
 
@@ -30,11 +30,11 @@ def create_sync_parser(subparsers: argparse._SubParsersAction) -> None:
 def create_list_parser(subparsers: argparse._SubParsersAction) -> None:
     """Create the list command parser."""
     list_parser = subparsers.add_parser(
-        "list", help="List decisions with optional filtering"
+        "list", help="List decisions with optional filtering",
     )
     add_root_argument(list_parser)
     list_parser.add_argument(
-        "--status", help="Filter by status (accepted, draft, deprecated, etc.)"
+        "--status", help="Filter by status (accepted, draft, deprecated, etc.)",
     )
     list_parser.add_argument("--tag", help="Filter by tag")
     list_parser.add_argument("--spec", help="Filter by spec reference")
@@ -46,7 +46,7 @@ def create_list_parser(subparsers: argparse._SubParsersAction) -> None:
 def create_show_parser(subparsers: argparse._SubParsersAction) -> None:
     """Create the show command parser."""
     show_parser = subparsers.add_parser(
-        "show", help="Show detailed information about a specific decision"
+        "show", help="Show detailed information about a specific decision",
     )
     add_root_argument(show_parser)
     show_parser.add_argument("decision_id", help="Decision ID (e.g., ADR-001)")
@@ -55,12 +55,12 @@ def create_show_parser(subparsers: argparse._SubParsersAction) -> None:
 def create_new_parser(subparsers: argparse._SubParsersAction) -> None:
     """Create the new command parser."""
     new_parser = subparsers.add_parser(
-        "new", help="Create a new ADR with the next available ID"
+        "new", help="Create a new ADR with the next available ID",
     )
     add_root_argument(new_parser)
     new_parser.add_argument("title", help="Title for the new ADR")
     new_parser.add_argument(
-        "--status", default="draft", help="Initial status (default: draft)"
+        "--status", default="draft", help="Initial status (default: draft)",
     )
     new_parser.add_argument("--author", help="Author name")
     new_parser.add_argument("--author-email", help="Author email")
@@ -137,7 +137,7 @@ def handle_show(args: argparse.Namespace) -> None:
 
     if decision.authors:
         print(
-            f"Authors: {', '.join(author.get('name', 'Unknown') for author in decision.authors)}"
+            f"Authors: {', '.join(author.get('name', 'Unknown') for author in decision.authors)}",
         )
     if decision.owners:
         print(f"Owners: {', '.join(decision.owners)}")
@@ -176,7 +176,6 @@ def handle_show(args: argparse.Namespace) -> None:
 
 def handle_new(args: argparse.Namespace) -> None:
     """Handle the new command."""
-
     registry = DecisionRegistry(root=args.root)
 
     # Find the next available ADR ID
@@ -238,7 +237,7 @@ def handle_new(args: argparse.Namespace) -> None:
             "related_policies": [],
             "tags": [],
             "summary": "",
-        }
+        },
     )
 
     # Create content

@@ -13,7 +13,6 @@ from .revision_updater import (
     update_requirement_lifecycle_status,
 )
 
-
 SAMPLE_REVISION_MD = """---
 id: RE-001
 name: Test Revision
@@ -145,7 +144,7 @@ def test_update_requirement_lifecycle_status_validates_requirement_index():
 
         # Try invalid requirement index
         with pytest.raises(
-            RevisionUpdateError, match="Requirement index .* out of range"
+            RevisionUpdateError, match="Requirement index .* out of range",
         ):
             update_requirement_lifecycle_status(
                 revision_file,

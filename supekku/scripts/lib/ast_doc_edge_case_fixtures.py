@@ -1,5 +1,4 @@
-"""
-Additional test fixtures for edge cases in AST documentation generation.
+"""Additional test fixtures for edge cases in AST documentation generation.
 Covers multiline comments, complex typing, decorators with arguments, and other edge cases.
 """
 

@@ -1,5 +1,4 @@
-"""
-Tests for Python language adapter.
+"""Tests for Python language adapter.
 """
 
 import unittest
@@ -69,7 +68,7 @@ class TestPythonAdapter(unittest.TestCase):
 
         # Check slug parts
         self.assertEqual(
-            descriptor.slug_parts, ["supekku", "scripts", "lib", "workspace"]
+            descriptor.slug_parts, ["supekku", "scripts", "lib", "workspace"],
         )
 
         # Check frontmatter structure

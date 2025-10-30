@@ -6,11 +6,11 @@ import os
 import unittest
 from pathlib import Path
 
-from supekku.scripts.lib.spec_utils import dump_markdown_file
 from supekku.scripts.lib.relations import add_relation
+from supekku.scripts.lib.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
-from supekku.scripts.lib.workspace import Workspace
 from supekku.scripts.lib.validator import validate_workspace
+from supekku.scripts.lib.workspace import Workspace
 
 
 class WorkspaceValidatorTest(RepoTestCase):
@@ -59,7 +59,7 @@ class WorkspaceValidatorTest(RepoTestCase):
         return delta_path
 
     def _write_revision(
-        self, root: Path, revision_id: str, requirement_uid: str
+        self, root: Path, revision_id: str, requirement_uid: str,
     ) -> Path:
         revision_dir = root / "change" / "revisions" / f"{revision_id}-sample"
         revision_dir.mkdir(parents=True)
@@ -168,7 +168,7 @@ class WorkspaceValidatorTest(RepoTestCase):
         self._write_adr(root, "ADR-001", "accepted")
         # ADR-999 doesn't exist
         self._write_adr(
-            root, "ADR-002", "accepted", related_decisions=["ADR-001", "ADR-999"]
+            root, "ADR-002", "accepted", related_decisions=["ADR-001", "ADR-999"],
         )
 
         ws = Workspace(root)
@@ -192,7 +192,7 @@ class WorkspaceValidatorTest(RepoTestCase):
         self._write_adr(root, "ADR-001", "deprecated")
         self._write_adr(root, "ADR-002", "superseded")
         self._write_adr(
-            root, "ADR-003", "accepted", related_decisions=["ADR-001", "ADR-002"]
+            root, "ADR-003", "accepted", related_decisions=["ADR-001", "ADR-002"],
         )
 
         ws = Workspace(root)
@@ -229,7 +229,7 @@ class WorkspaceValidatorTest(RepoTestCase):
         self._write_adr(root, "ADR-001", "accepted")
         self._write_adr(root, "ADR-002", "accepted")
         self._write_adr(
-            root, "ADR-003", "accepted", related_decisions=["ADR-001", "ADR-002"]
+            root, "ADR-003", "accepted", related_decisions=["ADR-001", "ADR-002"],
         )
 
         ws = Workspace(root)

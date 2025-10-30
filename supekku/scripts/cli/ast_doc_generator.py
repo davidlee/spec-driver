@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-CLI wrapper for the Python AST documentation generator.
+"""CLI wrapper for the Python AST documentation generator.
 
 Provides backward compatibility with the original CLI interface while
 using the new modular library API underneath.
@@ -9,19 +8,18 @@ using the new modular library API underneath.
 import argparse
 import sys
 from pathlib import Path
-from typing import List
 
-from ..lib.docs.python import generate_docs, VariantSpec
+from ..lib.docs.python import VariantSpec, generate_docs
 
 
 def create_parser() -> argparse.ArgumentParser:
     """Create argument parser matching original CLI interface."""
     parser = argparse.ArgumentParser(
-        description="Generate deterministic Python documentation from AST"
+        description="Generate deterministic Python documentation from AST",
     )
 
     parser.add_argument(
-        "path", type=Path, help="Path to Python file or package directory to document"
+        "path", type=Path, help="Path to Python file or package directory to document",
     )
 
     parser.add_argument(
@@ -53,7 +51,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-cache", action="store_true", help="Disable caching")
 
     parser.add_argument(
-        "--cache-stats", action="store_true", help="Show cache performance statistics"
+        "--cache-stats", action="store_true", help="Show cache performance statistics",
     )
 
     return parser
@@ -93,7 +91,7 @@ def _handle_normal_result(result) -> tuple:
 
 
 def _print_summary(
-    results: List, created_count: int, changed_count: int, unchanged_count: int
+    results: list, created_count: int, changed_count: int, unchanged_count: int,
 ) -> None:
     """Print summary if not in check mode."""
     if not results or any(hasattr(r, "check") and r.check for r in results):
@@ -112,7 +110,7 @@ def _print_summary(
     print(f"\nSummary: {summary} ({total} files total)")
 
 
-def format_status_output(results: List) -> None:
+def format_status_output(results: list) -> None:
     """Format and display status output for results."""
     created_count = 0
     changed_count = 0

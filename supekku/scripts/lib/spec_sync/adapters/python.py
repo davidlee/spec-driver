@@ -1,19 +1,18 @@
-"""
-Python language adapter for specification synchronization.
+"""Python language adapter for specification synchronization.
 """
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
-from typing import ClassVar, List, Sequence
+from typing import ClassVar
 
 from ..models import DocVariant, SourceDescriptor, SourceUnit
 from .base import LanguageAdapter
 
 
 class PythonAdapter(LanguageAdapter):
-    """
-    Language adapter for Python modules using AST documentation workflow.
+    """Language adapter for Python modules using AST documentation workflow.
 
     Uses the existing deterministic AST documentation system to generate
     specification variants for Python source files.
@@ -25,9 +24,8 @@ class PythonAdapter(LanguageAdapter):
         self,
         repo_root: Path,
         requested: Sequence[str] | None = None,
-    ) -> List[SourceUnit]:
-        """
-        Discover Python modules for documentation.
+    ) -> list[SourceUnit]:
+        """Discover Python modules for documentation.
 
         Args:
             repo_root: Root directory of the repository
@@ -35,6 +33,7 @@ class PythonAdapter(LanguageAdapter):
 
         Returns:
             List of SourceUnit objects for Python modules
+
         """
         if requested:
             # Process specific requested modules
@@ -65,7 +64,7 @@ class PythonAdapter(LanguageAdapter):
                                 language=self.language,
                                 identifier=identifier,
                                 root=repo_root,
-                            )
+                            ),
                         )
             return source_units
 
@@ -88,21 +87,21 @@ class PythonAdapter(LanguageAdapter):
 
                 source_units.append(
                     SourceUnit(
-                        language=self.language, identifier=identifier, root=repo_root
-                    )
+                        language=self.language, identifier=identifier, root=repo_root,
+                    ),
                 )
 
         return sorted(source_units, key=lambda u: u.identifier)
 
     def describe(self, unit: SourceUnit) -> SourceDescriptor:
-        """
-        Describe how a Python module should be processed.
+        """Describe how a Python module should be processed.
 
         Args:
             unit: Python module source unit
 
         Returns:
             SourceDescriptor with Python-specific metadata
+
         """
         self._validate_unit_language(unit)
 
@@ -141,8 +140,8 @@ class PythonAdapter(LanguageAdapter):
                             "path": "contracts/tests.md",
                         },
                     ],
-                }
-            ]
+                },
+            ],
         }
 
         # Document variants that will be generated
@@ -174,10 +173,9 @@ class PythonAdapter(LanguageAdapter):
         )
 
     def generate(
-        self, unit: SourceUnit, *, spec_dir: Path, check: bool = False
-    ) -> List[DocVariant]:
-        """
-        Generate documentation for a Python module using AST analysis.
+        self, unit: SourceUnit, *, spec_dir: Path, check: bool = False,
+    ) -> list[DocVariant]:
+        """Generate documentation for a Python module using AST analysis.
 
         Args:
             unit: Python module source unit
@@ -186,11 +184,12 @@ class PythonAdapter(LanguageAdapter):
 
         Returns:
             List of DocVariant objects with generation results
+
         """
         self._validate_unit_language(unit)
 
         # Import here to avoid circular imports
-        from ...docs.python import generate_docs, VariantSpec
+        from ...docs.python import VariantSpec, generate_docs
 
         # Convert unit to absolute path
         module_path = self.repo_root / unit.identifier
@@ -198,7 +197,7 @@ class PythonAdapter(LanguageAdapter):
         if not module_path.exists():
             # Return error variant
             return [
-                DocVariant(name="error", path=Path(""), hash="", status="unchanged")
+                DocVariant(name="error", path=Path(), hash="", status="unchanged"),
             ]
 
         # Create variant specifications
@@ -243,7 +242,7 @@ class PythonAdapter(LanguageAdapter):
                         path=actual_path.relative_to(spec_dir),
                         hash=result.hash,
                         status=result.status,
-                    )
+                    ),
                 )
 
             return doc_variants
@@ -260,20 +259,20 @@ class PythonAdapter(LanguageAdapter):
                         path=Path(f"contracts/{variant_name}.md"),
                         hash="",
                         status="unchanged",  # Error status handled at higher level
-                    )
+                    ),
                 )
 
             return error_variants
 
     def supports_identifier(self, identifier: str) -> bool:
-        """
-        Check if identifier looks like a Python module or file path.
+        """Check if identifier looks like a Python module or file path.
 
         Args:
             identifier: Identifier to check
 
         Returns:
             True if identifier appears to be a Python module path
+
         """
         if not identifier:
             return False
@@ -319,14 +318,14 @@ class PythonAdapter(LanguageAdapter):
         return False
 
     def _should_skip_file(self, file_path: Path) -> bool:
-        """
-        Check if a Python file should be skipped during discovery.
+        """Check if a Python file should be skipped during discovery.
 
         Args:
             file_path: Path to the Python file
 
         Returns:
             True if the file should be skipped
+
         """
         # Use base adapter checks (symlinks, gitignored, documentation directories)
         if self._should_skip_path(file_path):

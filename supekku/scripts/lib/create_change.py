@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Iterable, List, Optional
 
 from .create_spec import extract_template_body, find_repository_root, slugify
 from .spec_registry import SpecRegistry
@@ -27,7 +27,7 @@ class ChangeArtifactCreated:
     artifact_id: str
     directory: Path
     primary_path: Path
-    extras: List[Path]
+    extras: list[Path]
 
 
 def _next_identifier(base_dir: Path, prefix: str) -> str:
@@ -67,7 +67,7 @@ def _render_plan_overview_block(
 ) -> str:
     specs_block = _yaml_list("primary", sorted({s for s in specs if s}), level=1)
     requirements_block = _yaml_list(
-        "targets", sorted({r for r in requirements if r}), level=1
+        "targets", sorted({r for r in requirements if r}), level=1,
     )
     lines = [
         "```yaml supekku:plan.overview@v1",
@@ -128,7 +128,7 @@ def _render_delta_relationship_block(
 ) -> str:
     spec_lines = _yaml_list("primary", sorted({s for s in specs if s}), level=1)
     requirement_lines = _yaml_list(
-        "implements", sorted({r for r in requirements if r}), level=1
+        "implements", sorted({r for r in requirements if r}), level=1,
     )
     lines = [
         "```yaml supekku:delta.relationships@v1",
@@ -152,24 +152,24 @@ def _render_delta_relationship_block(
 
 
 _PLAN_OVERVIEW_PATTERN = re.compile(
-    r"```yaml supekku:plan.overview@v1.*?```", re.DOTALL
+    r"```yaml supekku:plan.overview@v1.*?```", re.DOTALL,
 )
 _PHASE_OVERVIEW_PATTERN = re.compile(
-    r"```yaml supekku:phase.overview@v1.*?```", re.DOTALL
+    r"```yaml supekku:phase.overview@v1.*?```", re.DOTALL,
 )
 _DELTA_RELATIONSHIPS_PATTERN = re.compile(
-    r"```yaml supekku:delta.relationships@v1.*?```", re.DOTALL
+    r"```yaml supekku:delta.relationships@v1.*?```", re.DOTALL,
 )
 
 
 def create_revision(
     name: str,
     *,
-    summary: Optional[str] = None,
-    source_specs: Optional[Iterable[str]] = None,
-    destination_specs: Optional[Iterable[str]] = None,
-    requirements: Optional[Iterable[str]] = None,
-    repo_root: Optional[Path] = None,
+    summary: str | None = None,
+    source_specs: Iterable[str] | None = None,
+    destination_specs: Iterable[str] | None = None,
+    requirements: Iterable[str] | None = None,
+    repo_root: Path | None = None,
 ) -> ChangeArtifactCreated:
     repo = find_repository_root(repo_root or Path.cwd())
     base_dir = repo / "change" / "revisions"
@@ -241,9 +241,9 @@ def create_revision(
 def create_delta(
     name: str,
     *,
-    specs: Optional[Iterable[str]] = None,
-    requirements: Optional[Iterable[str]] = None,
-    repo_root: Optional[Path] = None,
+    specs: Iterable[str] | None = None,
+    requirements: Iterable[str] | None = None,
+    repo_root: Path | None = None,
     allow_missing_plan: bool = False,
 ) -> ChangeArtifactCreated:
     repo = find_repository_root(repo_root or Path.cwd())
@@ -272,7 +272,7 @@ def create_delta(
     }
 
     relationships_block = _render_delta_relationship_block(
-        delta_id, specs or [], requirements or []
+        delta_id, specs or [], requirements or [],
     )
 
     body = f"""{relationships_block}
@@ -301,7 +301,7 @@ def create_delta(
     delta_path = delta_dir / f"{delta_id}.md"
     dump_markdown_file(delta_path, frontmatter, body)
 
-    extras: List[Path] = []
+    extras: list[Path] = []
     plan_id = delta_id.replace("DE", "IP")
     if not allow_missing_plan:
         plan_body = extract_template_body(PLAN_TEMPLATE)
@@ -375,7 +375,7 @@ def create_requirement_breakout(
     *,
     title: str,
     kind: str | None = None,
-    repo_root: Optional[Path] = None,
+    repo_root: Path | None = None,
 ) -> Path:
     spec_id = spec_id.upper()
     requirement_id = requirement_id.upper()
@@ -426,8 +426,8 @@ def create_requirement_breakout(
 
 
 __all__ = [
-    "create_revision",
+    "ChangeArtifactCreated",
     "create_delta",
     "create_requirement_breakout",
-    "ChangeArtifactCreated",
+    "create_revision",
 ]

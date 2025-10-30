@@ -1,21 +1,20 @@
-"""
-Abstract base class for language adapters.
+"""Abstract base class for language adapters.
 """
 
 from __future__ import annotations
 
 import subprocess
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from pathlib import Path
 from shutil import which
-from typing import ClassVar, List, Sequence, Set
+from typing import ClassVar
 
 from ..models import DocVariant, SourceDescriptor, SourceUnit
 
 
 class LanguageAdapter(ABC):
-    """
-    Abstract interface for language-specific source discovery and documentation.
+    """Abstract interface for language-specific source discovery and documentation.
 
     Each language adapter is responsible for:
     1. Discovering source units (packages, modules, files) for its language
@@ -29,14 +28,14 @@ class LanguageAdapter(ABC):
     def __init__(self, repo_root: Path):
         """Initialize adapter with repository root."""
         self.repo_root = repo_root
-        self._git_tracked_files: Set[Path] | None = None
+        self._git_tracked_files: set[Path] | None = None
 
-    def _get_git_tracked_files(self) -> Set[Path]:
-        """
-        Get set of git-tracked files (cached).
+    def _get_git_tracked_files(self) -> set[Path]:
+        """Get set of git-tracked files (cached).
 
         Returns:
             Set of absolute paths to git-tracked files
+
         """
         if self._git_tracked_files is not None:
             return self._git_tracked_files
@@ -70,14 +69,14 @@ class LanguageAdapter(ABC):
         return tracked_files
 
     def _should_skip_path(self, path: Path) -> bool:
-        """
-        Check if a path should be skipped (shared across all adapters).
+        """Check if a path should be skipped (shared across all adapters).
 
         Args:
             path: Path to check
 
         Returns:
             True if the path should be skipped
+
         """
         # Skip symlinks (documentation indices, etc.)
         if path.is_symlink():
@@ -98,25 +97,24 @@ class LanguageAdapter(ABC):
         return False
 
     def _validate_unit_language(self, unit: SourceUnit) -> None:
-        """
-        Validate that the unit language matches this adapter.
+        """Validate that the unit language matches this adapter.
 
         Args:
             unit: Source unit to validate
 
         Raises:
             ValueError: If unit language doesn't match adapter language
+
         """
         if unit.language != self.language:
             raise ValueError(
-                f"{self.__class__.__name__} cannot process {unit.language} units"
+                f"{self.__class__.__name__} cannot process {unit.language} units",
             )
 
     def _create_doc_variant(
-        self, name: str, slug_parts: List[str], language_subdir: str
+        self, name: str, slug_parts: list[str], language_subdir: str,
     ) -> DocVariant:
-        """
-        Create a DocVariant with standard placeholder values.
+        """Create a DocVariant with standard placeholder values.
 
         Args:
             name: Variant name (e.g., "public", "api", "tests")
@@ -125,6 +123,7 @@ class LanguageAdapter(ABC):
 
         Returns:
             DocVariant with placeholder hash and status
+
         """
         filename = f"{'-'.join(slug_parts)}-{name}.md"
         return DocVariant(
@@ -139,9 +138,8 @@ class LanguageAdapter(ABC):
         self,
         repo_root: Path,
         requested: Sequence[str] | None = None,
-    ) -> List[SourceUnit]:
-        """
-        Discover source units for this language.
+    ) -> list[SourceUnit]:
+        """Discover source units for this language.
 
         Args:
             repo_root: Root directory of the repository
@@ -149,26 +147,26 @@ class LanguageAdapter(ABC):
 
         Returns:
             List of SourceUnit objects representing discoverable targets
+
         """
 
     @abstractmethod
     def describe(self, unit: SourceUnit) -> SourceDescriptor:
-        """
-        Describe how a source unit should be processed.
+        """Describe how a source unit should be processed.
 
         Args:
             unit: Source unit to describe
 
         Returns:
             SourceDescriptor with slug parts, frontmatter defaults, and variants
+
         """
 
     @abstractmethod
     def generate(
-        self, unit: SourceUnit, *, spec_dir: Path, check: bool = False
-    ) -> List[DocVariant]:
-        """
-        Generate documentation variants for a source unit.
+        self, unit: SourceUnit, *, spec_dir: Path, check: bool = False,
+    ) -> list[DocVariant]:
+        """Generate documentation variants for a source unit.
 
         Args:
             unit: Source unit to generate documentation for
@@ -177,16 +175,17 @@ class LanguageAdapter(ABC):
 
         Returns:
             List of DocVariant objects with generation results
+
         """
 
     @abstractmethod
     def supports_identifier(self, identifier: str) -> bool:
-        """
-        Check if this adapter can handle the given identifier format.
+        """Check if this adapter can handle the given identifier format.
 
         Args:
             identifier: Source identifier to check
 
         Returns:
             True if this adapter can process the identifier
+
         """

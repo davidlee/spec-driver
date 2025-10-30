@@ -7,7 +7,6 @@ from tempfile import TemporaryDirectory
 
 from .revision_discovery import RequirementSource, find_requirement_sources
 
-
 SAMPLE_REVISION_MD = """---
 id: RE-001
 name: Test Revision
@@ -167,7 +166,7 @@ def test_find_requirement_sources_skips_malformed_files():
         # Write malformed revision file
         bad_file = bundle_dir / "RE-002.md"
         bad_file.write_text(
-            "This is not valid markdown with YAML blocks", encoding="utf-8"
+            "This is not valid markdown with YAML blocks", encoding="utf-8",
         )
 
         sources = find_requirement_sources(

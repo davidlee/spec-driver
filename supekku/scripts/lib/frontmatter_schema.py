@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping, MutableMapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date
 from types import MappingProxyType
-from typing import Any, Mapping, MutableMapping, Sequence
+from typing import Any
 
 
 class FrontmatterValidationError(ValueError):
@@ -43,11 +44,11 @@ class FrontmatterValidationResult:
 
 
 def validate_frontmatter(
-    frontmatter: Mapping[str, Any], *, kind: str | None = None
+    frontmatter: Mapping[str, Any], *, kind: str | None = None,
 ) -> FrontmatterValidationResult:
     if not isinstance(frontmatter, Mapping):
         raise FrontmatterValidationError(
-            "frontmatter must be a mapping of keys to values"
+            "frontmatter must be a mapping of keys to values",
         )
 
     payload = dict(frontmatter)
@@ -59,7 +60,7 @@ def validate_frontmatter(
     missing = [field for field in required_fields if field not in payload]
     if missing:
         raise FrontmatterValidationError(
-            f"frontmatter missing required field(s): {', '.join(sorted(missing))}"
+            f"frontmatter missing required field(s): {', '.join(sorted(missing))}",
         )
 
     id_value = _require_str(payload, "id")
@@ -99,7 +100,7 @@ def _require_str(payload: MutableMapping[str, Any], field: str) -> str:
     value = payload.get(field)
     if not isinstance(value, str) or not value.strip():
         raise FrontmatterValidationError(
-            f"frontmatter.{field} must be a non-empty string"
+            f"frontmatter.{field} must be a non-empty string",
         )
     return value
 
@@ -112,10 +113,10 @@ def _parse_iso_date(value: Any, *, field_name: str) -> date:
             return date.fromisoformat(value)
         except ValueError as exc:
             raise FrontmatterValidationError(
-                f"frontmatter.{field_name} must be an ISO-8601 date string"
+                f"frontmatter.{field_name} must be an ISO-8601 date string",
             ) from exc
     raise FrontmatterValidationError(
-        f"frontmatter.{field_name} must be an ISO-8601 date string"
+        f"frontmatter.{field_name} must be an ISO-8601 date string",
     )
 
 
@@ -126,13 +127,13 @@ def _ensure_str_list(payload: MutableMapping[str, Any], field: str) -> list[str]
         return []
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
         raise FrontmatterValidationError(
-            f"frontmatter.{field} must be a list of strings"
+            f"frontmatter.{field} must be a list of strings",
         )
     result: list[str] = []
     for index, item in enumerate(value):
         if not isinstance(item, str) or not item:
             raise FrontmatterValidationError(
-                f"frontmatter.{field}[{index}] must be a non-empty string"
+                f"frontmatter.{field}[{index}] must be a non-empty string",
             )
         result.append(item)
     payload[field] = list(result)
@@ -146,10 +147,10 @@ def _normalize_relations(
     if raw_relations is None:
         return [], tuple()
     if not isinstance(raw_relations, Sequence) or isinstance(
-        raw_relations, (str, bytes)
+        raw_relations, (str, bytes),
     ):
         raise FrontmatterValidationError(
-            "frontmatter.relations must be a list of mapping objects"
+            "frontmatter.relations must be a list of mapping objects",
         )
 
     normalized: list[dict[str, Any]] = []
@@ -157,22 +158,22 @@ def _normalize_relations(
     for index, relation in enumerate(raw_relations):
         if not isinstance(relation, Mapping):
             raise FrontmatterValidationError(
-                f"frontmatter.relations[{index}] must be a mapping"
+                f"frontmatter.relations[{index}] must be a mapping",
             )
         try:
             relation_type = relation["type"]
             relation_target = relation["target"]
         except KeyError as missing_key:
             raise FrontmatterValidationError(
-                f"frontmatter.relations[{index}] missing required key: {missing_key.args[0]}"
+                f"frontmatter.relations[{index}] missing required key: {missing_key.args[0]}",
             ) from None
         if not isinstance(relation_type, str) or not relation_type.strip():
             raise FrontmatterValidationError(
-                f"frontmatter.relations[{index}].type must be a non-empty string"
+                f"frontmatter.relations[{index}].type must be a non-empty string",
             )
         if not isinstance(relation_target, str) or not relation_target.strip():
             raise FrontmatterValidationError(
-                f"frontmatter.relations[{index}].target must be a non-empty string"
+                f"frontmatter.relations[{index}].target must be a non-empty string",
             )
         extras = {
             key: value
@@ -192,7 +193,7 @@ def _normalize_relations(
                 attributes=MappingProxyType(dict(extras))
                 if extras
                 else MappingProxyType({}),
-            )
+            ),
         )
     return normalized, tuple(relation_objs)
 

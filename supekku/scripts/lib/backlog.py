@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Iterable, Mapping
 
 from .spec_utils import dump_markdown_file, load_markdown_file
 
@@ -71,7 +71,7 @@ def find_repo_root(start: Path | None = None) -> Path:
         if (candidate / ".git").exists() or (candidate / "supekku").exists():
             return candidate
     raise RuntimeError(
-        "Could not locate repository root (missing .git or supekku directory)"
+        "Could not locate repository root (missing .git or supekku directory)",
     )
 
 
@@ -99,7 +99,7 @@ def next_identifier(entries: Iterable[Path], prefix: str) -> str:
 
 
 def create_backlog_entry(
-    kind: str, name: str, *, repo_root: Path | None = None
+    kind: str, name: str, *, repo_root: Path | None = None,
 ) -> Path:
     template = TEMPLATES.get(kind)
     if template is None:
@@ -172,7 +172,7 @@ def append_backlog_summary(*, repo_root: Path | None = None) -> list[str]:
 
 
 __all__ = [
-    "create_backlog_entry",
     "append_backlog_summary",
+    "create_backlog_entry",
     "find_repo_root",
 ]

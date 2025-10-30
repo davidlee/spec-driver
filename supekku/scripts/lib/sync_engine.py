@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import json
 import subprocess
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 from shutil import which
 from subprocess import CompletedProcess
-from typing import Callable, Iterable, Mapping, Sequence
 
 from .spec_index import SpecIndexBuilder
 from .spec_utils import (
@@ -45,7 +45,7 @@ def default_gomarkdoc_available() -> bool:
 
 
 def default_generate_docs(
-    spec_dir: Path, module_pkg: str, include_unexported: bool, check: bool
+    spec_dir: Path, module_pkg: str, include_unexported: bool, check: bool,
 ) -> None:
     """Generate documentation using gomarkdoc."""
     contracts_dir = spec_dir / CONTRACTS_DIRNAME
@@ -70,7 +70,7 @@ def default_generate_docs(
         [
             "--output",
             str(output),
-        ]
+        ],
     )
     if include_unexported:
         cmd.append("--include-unexported")
@@ -168,7 +168,7 @@ class TechSpecSyncEngine:
                 if options.allow_missing_go:
                     skip_docs = True
                     self.log(
-                        f"No Go files detected for {rel_pkg}; proceeding due to allow-missing-go"
+                        f"No Go files detected for {rel_pkg}; proceeding due to allow-missing-go",
                     )
                 else:
                     reason = "no non-test Go files"
@@ -195,7 +195,7 @@ class TechSpecSyncEngine:
                 created_specs[rel_pkg] = spec_id
 
             spec_file = self.ensure_spec_stub(
-                spec_dir, spec_id, slug, rel_pkg, allow_create=not options.check
+                spec_dir, spec_id, slug, rel_pkg, allow_create=not options.check,
             )
             if spec_file is None:
                 skipped.append(SkippedPackage(rel_pkg, "missing spec stub"))
@@ -206,22 +206,22 @@ class TechSpecSyncEngine:
             if options.check:
                 self.log(f"Checking docs for {rel_pkg} -> {spec_dir}")
                 self.generate_docs(
-                    spec_dir, module_pkg, include_unexported=False, check=True
+                    spec_dir, module_pkg, include_unexported=False, check=True,
                 )
                 self.generate_docs(
-                    spec_dir, module_pkg, include_unexported=True, check=True
+                    spec_dir, module_pkg, include_unexported=True, check=True,
                 )
             elif not gomarkdoc_missing and not skip_docs:
                 self.log(f"Generating docs for {rel_pkg} -> {spec_dir}")
                 self.generate_docs(
-                    spec_dir, module_pkg, include_unexported=False, check=False
+                    spec_dir, module_pkg, include_unexported=False, check=False,
                 )
                 self.generate_docs(
-                    spec_dir, module_pkg, include_unexported=True, check=False
+                    spec_dir, module_pkg, include_unexported=True, check=False,
                 )
             elif skip_docs:
                 self.log(
-                    f"Skipping documentation generation for {rel_pkg} (no Go files)"
+                    f"Skipping documentation generation for {rel_pkg} (no Go files)",
                 )
 
             processed.append(rel_pkg)
@@ -260,7 +260,7 @@ class TechSpecSyncEngine:
         # Legacy v1 format no longer supported - should be migrated
         raise ValueError(
             f"Registry at {self.registry_path} is in v1 format. "
-            "Please migrate to v2 using: just supekku::migrate-registry"
+            "Please migrate to v2 using: just supekku::migrate-registry",
         )
 
     def save_registry(self, registry: Mapping[str, str]) -> None:
@@ -428,8 +428,8 @@ class TechSpecSyncEngine:
 
 __all__ = [
     "GomarkdocNotAvailableError",
-    "SyncOptions",
     "SkippedPackage",
+    "SyncOptions",
     "SyncResult",
     "TechSpecSyncEngine",
 ]

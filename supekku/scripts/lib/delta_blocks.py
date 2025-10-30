@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-import re
 
 import yaml
 
@@ -26,13 +26,13 @@ class DeltaRelationshipsValidator:
     """Validator for delta relationships blocks."""
 
     def validate(
-        self, block: DeltaRelationshipsBlock, *, delta_id: str | None = None
+        self, block: DeltaRelationshipsBlock, *, delta_id: str | None = None,
     ) -> list[str]:
         errors: list[str] = []
         data = block.data
         if data.get("schema") != RELATIONSHIPS_SCHEMA:
             errors.append(
-                "delta relationships block must declare schema supekku.delta.relationships"
+                "delta relationships block must declare schema supekku.delta.relationships",
             )
         if data.get("version") != RELATIONSHIPS_VERSION:
             errors.append("delta relationships block must declare version 1")
@@ -42,7 +42,7 @@ class DeltaRelationshipsValidator:
             errors.append("delta relationships block missing delta id")
         elif delta_id and delta_value != delta_id:
             errors.append(
-                f"delta relationships block id {delta_value} does not match expected {delta_id}"
+                f"delta relationships block id {delta_value} does not match expected {delta_id}",
             )
 
         specs = data.get("specs")
@@ -80,7 +80,7 @@ class DeltaRelationshipsValidator:
 
 
 _BLOCK_PATTERN = re.compile(
-    r"```(?:yaml|yml)\s+" + re.escape(RELATIONSHIPS_MARKER) + r"\n(.*?)```", re.DOTALL
+    r"```(?:yaml|yml)\s+" + re.escape(RELATIONSHIPS_MARKER) + r"\n(.*?)```", re.DOTALL,
 )
 
 
@@ -104,9 +104,9 @@ def load_delta_relationships(path: Path) -> DeltaRelationshipsBlock | None:
 
 
 __all__ = [
+    "RELATIONSHIPS_MARKER",
     "DeltaRelationshipsBlock",
     "DeltaRelationshipsValidator",
     "extract_delta_relationships",
     "load_delta_relationships",
-    "RELATIONSHIPS_MARKER",
 ]

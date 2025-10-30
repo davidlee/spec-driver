@@ -5,7 +5,6 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 from .path_utils import PathNormalizer
 
@@ -13,7 +12,7 @@ from .path_utils import PathNormalizer
 class ParseCache:
     """File-based caching for AST parsing with mtime and hash validation."""
 
-    def __init__(self, cache_dir: Optional[Path] = None):
+    def __init__(self, cache_dir: Path | None = None):
         """Initialize cache with optional custom directory."""
         if cache_dir:
             self.cache_dir = cache_dir
@@ -39,7 +38,7 @@ class ParseCache:
         cache_key = self._get_cache_key(file_path)
         return self.cache_dir / f"{cache_key}.json"
 
-    def _get_file_info(self, file_path: Path) -> Tuple[float, str]:
+    def _get_file_info(self, file_path: Path) -> tuple[float, str]:
         """Get file modification time and content hash."""
         stat = file_path.stat()
         mtime = stat.st_mtime
@@ -50,7 +49,7 @@ class ParseCache:
 
         return mtime, content_hash
 
-    def get(self, file_path: Path) -> Optional[Dict]:
+    def get(self, file_path: Path) -> dict | None:
         """Get cached analysis if valid, None otherwise."""
         cache_file = self._get_cache_file(file_path)
 
@@ -67,7 +66,7 @@ class ParseCache:
             current_mtime, current_hash = self._get_file_info(file_path)
 
             # Load cached data
-            with open(cache_file, "r", encoding="utf-8") as f:
+            with open(cache_file, encoding="utf-8") as f:
                 cached_data = json.load(f)
 
             cached_mtime = cached_data.get("mtime")
@@ -77,11 +76,10 @@ class ParseCache:
             if cached_mtime == current_mtime and cached_hash == current_hash:
                 self.stats["hits"] += 1
                 return cached_data.get("analysis")
-            else:
-                self.stats["invalidations"] += 1
-                # Remove stale cache
-                cache_file.unlink(missing_ok=True)
-                return None
+            self.stats["invalidations"] += 1
+            # Remove stale cache
+            cache_file.unlink(missing_ok=True)
+            return None
 
         except (json.JSONDecodeError, KeyError, OSError):
             self.stats["misses"] += 1
@@ -89,7 +87,7 @@ class ParseCache:
             cache_file.unlink(missing_ok=True)
             return None
 
-    def put(self, file_path: Path, analysis: Dict) -> None:
+    def put(self, file_path: Path, analysis: dict) -> None:
         """Store analysis in cache with metadata."""
         try:
             mtime, content_hash = self._get_file_info(file_path)
@@ -117,7 +115,7 @@ class ParseCache:
                 cache_file.unlink(missing_ok=True)
         self.stats = {"hits": 0, "misses": 0, "invalidations": 0}
 
-    def get_stats(self) -> Dict[str, int]:
+    def get_stats(self) -> dict[str, int]:
         """Get cache performance statistics."""
         total = self.stats["hits"] + self.stats["misses"]
         hit_rate = (self.stats["hits"] / total * 100) if total > 0 else 0

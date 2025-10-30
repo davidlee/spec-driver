@@ -33,7 +33,7 @@ class SpecUtilsTestCase(unittest.TestCase):
             Body line
             ---
             Extra body line
-            """
+            """,
         ).lstrip("\n")
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -105,7 +105,7 @@ class SpecUtilsTestCase(unittest.TestCase):
                     "type": "implements",
                     "target": "FR-100",
                     "annotation": "covers primary requirement",
-                }
+                },
             ],
         }
 
@@ -118,7 +118,7 @@ class SpecUtilsTestCase(unittest.TestCase):
         self.assertEqual(relation.type, "implements")
         self.assertEqual(relation.target, "FR-100")
         self.assertEqual(
-            result.data["relations"][0]["annotation"], "covers primary requirement"
+            result.data["relations"][0]["annotation"], "covers primary requirement",
         )
         self.assertIsNot(result.data, frontmatter)
         self.assertEqual(frontmatter["owners"], ["alice"])

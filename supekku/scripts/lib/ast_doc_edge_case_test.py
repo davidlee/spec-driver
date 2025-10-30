@@ -1,5 +1,4 @@
-"""
-Comprehensive edge case tests for the deterministic AST documentation generator.
+"""Comprehensive edge case tests for the deterministic AST documentation generator.
 
 Tests multiline comments, complex typing, decorators with arguments,
 caching behavior, path normalization, and other edge cases.
@@ -7,37 +6,34 @@ caching behavior, path normalization, and other edge cases.
 
 from __future__ import annotations
 
-import tempfile
-import unittest
-import time
-from pathlib import Path
-from typing import List
-from unittest.mock import patch
-
 # Import the modules we're testing
 import sys
+import tempfile
+import time
+import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
+from supekku.scripts.lib.ast_doc_edge_case_fixtures import (
+    ASYNC_PATTERNS,
+    COMPLEX_DECORATORS,
+    COMPLEX_INHERITANCE,
+    COMPLEX_TYPING,
+    MULTILINE_COMMENTS,
+    RAW_STRING_PATTERNS,
+    UNICODE_EDGE_CASES,
+)
 from supekku.scripts.lib.docs.python import (
-    PathNormalizer,
     ParseCache,
+    PathNormalizer,
     calculate_content_hash,
 )
 from supekku.scripts.lib.docs.python.analyzer import DeterministicPythonModuleAnalyzer
 from supekku.scripts.lib.docs.python.comments import CommentExtractor
 from supekku.scripts.lib.docs.python.generator import (
     generate_deterministic_markdown_spec,
-)
-
-from supekku.scripts.lib.ast_doc_edge_case_fixtures import (
-    MULTILINE_COMMENTS,
-    COMPLEX_TYPING,
-    COMPLEX_DECORATORS,
-    COMPLEX_INHERITANCE,
-    ASYNC_PATTERNS,
-    UNICODE_EDGE_CASES,
-    RAW_STRING_PATTERNS,
 )
 
 
@@ -101,7 +97,7 @@ class PathNormalizerTest(unittest.TestCase):
             test_file.write_text("# Test")
 
             filename = PathNormalizer.get_output_filename(
-                test_file, "public", temp_path
+                test_file, "public", temp_path,
             )
 
             # Should handle special characters safely
@@ -113,7 +109,6 @@ class PathNormalizerTest(unittest.TestCase):
         """Test Windows-specific path handling."""
         # This test may need adjustment based on actual Windows behavior
         # but demonstrates the approach for platform-specific testing
-        pass
 
     def test_edge_case_paths(self):
         """Test edge cases in path handling."""
@@ -321,7 +316,7 @@ z = {'key#1': 'value'}  # Dict with # in key
         # Should handle Unicode in comments
         unicode_comment_found = any("émoji" in comment for comment in comments)
         self.assertTrue(
-            unicode_comment_found, "Should handle Unicode in inline comments"
+            unicode_comment_found, "Should handle Unicode in inline comments",
         )
 
 
@@ -349,7 +344,7 @@ class ComplexTypingAnalysisTest(unittest.TestCase):
         # Should parse classes with complex generics
         classes = analysis["classes"]
         complex_generic = next(
-            (c for c in classes if c["name"] == "ComplexGeneric"), None
+            (c for c in classes if c["name"] == "ComplexGeneric"), None,
         )
         self.assertIsNotNone(complex_generic, "Should find ComplexGeneric class")
 
@@ -371,7 +366,7 @@ class ComplexTypingAnalysisTest(unittest.TestCase):
         # Should parse functions with forward references
         functions = analysis["functions"]
         recursive_func = next(
-            (f for f in functions if f["name"] == "recursive_function"), None
+            (f for f in functions if f["name"] == "recursive_function"), None,
         )
         self.assertIsNotNone(recursive_func, "Should find recursive_function")
 
@@ -411,7 +406,7 @@ class ComplexDecoratorAnalysisTest(unittest.TestCase):
         # Find the heavily decorated method
         classes = analysis["classes"]
         showcase_class = next(
-            (c for c in classes if c["name"] == "DecoratorShowcase"), None
+            (c for c in classes if c["name"] == "DecoratorShowcase"), None,
         )
         self.assertIsNotNone(showcase_class)
 
@@ -451,7 +446,7 @@ class ComplexDecoratorAnalysisTest(unittest.TestCase):
 
         classes = analysis["classes"]
         showcase_class = next(
-            (c for c in classes if c["name"] == "DecoratorShowcase"), None
+            (c for c in classes if c["name"] == "DecoratorShowcase"), None,
         )
 
         # Find method with stacked decorators
@@ -490,7 +485,7 @@ class AsyncPatternAnalysisTest(unittest.TestCase):
         # Should identify async methods
         classes = analysis["classes"]
         async_processor = next(
-            (c for c in classes if c["name"] == "AsyncProcessor"), None
+            (c for c in classes if c["name"] == "AsyncProcessor"), None,
         )
         self.assertIsNotNone(async_processor)
 
@@ -500,7 +495,7 @@ class AsyncPatternAnalysisTest(unittest.TestCase):
 
         # Verify specific async method
         simple_async = next(
-            (m for m in async_methods if m["name"] == "simple_async_method"), None
+            (m for m in async_methods if m["name"] == "simple_async_method"), None,
         )
         self.assertIsNotNone(simple_async)
         self.assertTrue(simple_async["is_async"])
@@ -511,7 +506,7 @@ class AsyncPatternAnalysisTest(unittest.TestCase):
 
         classes = analysis["classes"]
         async_processor = next(
-            (c for c in classes if c["name"] == "AsyncProcessor"), None
+            (c for c in classes if c["name"] == "AsyncProcessor"), None,
         )
         self.assertIsNotNone(async_processor)
 
@@ -526,7 +521,7 @@ class AsyncPatternAnalysisTest(unittest.TestCase):
 
         classes = analysis["classes"]
         async_processor = next(
-            (c for c in classes if c["name"] == "AsyncProcessor"), None
+            (c for c in classes if c["name"] == "AsyncProcessor"), None,
         )
         self.assertIsNotNone(async_processor)
 
@@ -566,7 +561,7 @@ class UnicodeHandlingTest(unittest.TestCase):
         # Should capture Unicode docstrings
         classes = analysis["classes"]
         unicode_processor = next(
-            (c for c in classes if c["name"] == "UnicodeProcessor"), None
+            (c for c in classes if c["name"] == "UnicodeProcessor"), None,
         )
         self.assertIsNotNone(unicode_processor)
 
@@ -618,7 +613,7 @@ class UnicodeHandlingTest(unittest.TestCase):
         # Should handle complex string patterns
         classes = analysis["classes"]
         string_processor = next(
-            (c for c in classes if c["name"] == "StringProcessor"), None
+            (c for c in classes if c["name"] == "StringProcessor"), None,
         )
         self.assertIsNotNone(string_processor)
 
@@ -632,7 +627,7 @@ class DeterministicOutputTest(unittest.TestCase):
         self.addCleanup(self.temp_dir.cleanup)
         self.temp_path = Path(self.temp_dir.name)
 
-    def _generate_docs_multiple_times(self, content: str, runs: int = 3) -> List[str]:
+    def _generate_docs_multiple_times(self, content: str, runs: int = 3) -> list[str]:
         """Generate docs multiple times and return results."""
         file_path = self.temp_path / "test.py"
         file_path.write_text(content, encoding="utf-8")

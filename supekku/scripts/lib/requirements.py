@@ -3,27 +3,28 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable, Iterator, Mapping, Optional
+from typing import Any
 
 import yaml
 
 from .backlog import find_repo_root
+from .delta_blocks import DeltaRelationshipsValidator, extract_delta_relationships
+from .lifecycle import (
+    STATUS_PENDING,
+    VALID_STATUSES,
+    RequirementStatus,
+)
 from .relations import list_relations
-from .spec_registry import SpecRegistry
-from .spec_utils import load_markdown_file
 from .revision_blocks import (
     RevisionBlockValidator,
     load_revision_blocks,
 )
-from .delta_blocks import extract_delta_relationships, DeltaRelationshipsValidator
-from .spec_blocks import extract_relationships, RelationshipsBlockValidator
-from .lifecycle import (
-    RequirementStatus,
-    STATUS_PENDING,
-    VALID_STATUSES,
-)
+from .spec_blocks import RelationshipsBlockValidator, extract_relationships
+from .spec_registry import SpecRegistry
+from .spec_utils import load_markdown_file
 
 _REQUIREMENT_LINE = re.compile(
     r"^\s*[-*]\s*\*{0,2}\s*(FR|NF)-(\d{3})\s*\*{0,2}\s*[:\-–]\s*(.+)$",
@@ -125,7 +126,7 @@ class RequirementsRegistry:
         payload = {
             "requirements": {
                 uid: record.to_dict() for uid, record in sorted(self.records.items())
-            }
+            },
         }
         self.registry_path.parent.mkdir(parents=True, exist_ok=True)
         text = yaml.safe_dump(payload, sort_keys=False, allow_unicode=False)
@@ -134,9 +135,9 @@ class RequirementsRegistry:
     # ------------------------------------------------------------------
     def sync_from_specs(
         self,
-        spec_dirs: Optional[Iterable[Path]] = None,
+        spec_dirs: Iterable[Path] | None = None,
         *,
-        spec_registry: Optional[SpecRegistry] = None,
+        spec_registry: SpecRegistry | None = None,
         delta_dirs: Iterable[Path] | None = None,
         revision_dirs: Iterable[Path] | None = None,
         audit_dirs: Iterable[Path] | None = None,
@@ -158,7 +159,7 @@ class RequirementsRegistry:
                         spec.body,
                         spec.path,
                         repo_root,
-                    )
+                    ),
                 )
                 for record in records:
                     seen.add(record.uid)
@@ -188,8 +189,8 @@ class RequirementsRegistry:
                     continue
                 records = list(
                     self._records_from_content(
-                        spec_id, frontmatter, body, spec_file, repo_root
-                    )
+                        spec_id, frontmatter, body, spec_file, repo_root,
+                    ),
                 )
                 for record in records:
                     seen.add(record.uid)
@@ -216,7 +217,7 @@ class RequirementsRegistry:
         delta_validator = DeltaRelationshipsValidator()
         if delta_dirs:
             self._apply_delta_relations(
-                delta_dirs, repo_root, validator=delta_validator
+                delta_dirs, repo_root, validator=delta_validator,
             )
         if revision_dirs:
             self._apply_revision_relations(revision_dirs)
@@ -336,7 +337,7 @@ class RequirementsRegistry:
         self,
         revision_dirs: Iterable[Path],
         *,
-        spec_registry: Optional[SpecRegistry],
+        spec_registry: SpecRegistry | None,
         stats: SyncStats,
     ) -> None:
         validator = RevisionBlockValidator()
@@ -417,7 +418,7 @@ class RequirementsRegistry:
         self,
         payload: Mapping[str, Any],
         *,
-        spec_registry: Optional[SpecRegistry],
+        spec_registry: SpecRegistry | None,
     ) -> tuple[int, int]:
         created = 0
         updated = 0
@@ -433,7 +434,7 @@ class RequirementsRegistry:
             return created, updated
 
         target_uid = str(
-            destination.get("requirement_id") or payload.get("requirement_id") or ""
+            destination.get("requirement_id") or payload.get("requirement_id") or "",
         ).strip()
         if not target_uid:
             return created, updated
@@ -473,7 +474,7 @@ class RequirementsRegistry:
         additional_specs = destination.get("additional_specs")
         additional_set: set[str] = set()
         if isinstance(additional_specs, Iterable) and not isinstance(
-            additional_specs, (str, bytes)
+            additional_specs, (str, bytes),
         ):
             for spec_id in additional_specs:
                 spec_value = str(spec_id).strip()
@@ -511,7 +512,7 @@ class RequirementsRegistry:
 
         implemented_by = lifecycle_map.get("implemented_by")
         if isinstance(implemented_by, Iterable) and not isinstance(
-            implemented_by, (str, bytes)
+            implemented_by, (str, bytes),
         ):
             merged = {value for value in record.implemented_by if value}
             merged.update(
@@ -524,7 +525,7 @@ class RequirementsRegistry:
 
         verified_by = lifecycle_map.get("verified_by")
         if isinstance(verified_by, Iterable) and not isinstance(
-            verified_by, (str, bytes)
+            verified_by, (str, bytes),
         ):
             merged = {value for value in record.verified_by if value}
             merged.update(
@@ -551,8 +552,8 @@ class RequirementsRegistry:
         return created, updated
 
     def _find_record_from_origin(
-        self, payload: Mapping[str, Any]
-    ) -> Optional[RequirementRecord]:
+        self, payload: Mapping[str, Any],
+    ) -> RequirementRecord | None:
         origins = payload.get("origin")
         if not isinstance(origins, Iterable) or isinstance(origins, (str, bytes)):
             return None
@@ -572,7 +573,7 @@ class RequirementsRegistry:
         spec_id: str,
         payload: Mapping[str, Any],
         *,
-        spec_registry: Optional[SpecRegistry],
+        spec_registry: SpecRegistry | None,
         lifecycle: Mapping[str, Any],
     ) -> RequirementRecord:
         label = uid.split(".", 1)[-1] if "." in uid else uid
@@ -611,7 +612,7 @@ class RequirementsRegistry:
     def _resolve_spec_path(
         self,
         spec_id: str,
-        spec_registry: Optional[SpecRegistry],
+        spec_registry: SpecRegistry | None,
     ) -> str:
         if not spec_registry:
             return ""
@@ -646,7 +647,7 @@ class RequirementsRegistry:
         mapping = dict(data) if isinstance(data, Mapping) else {}
         mapping.setdefault("id", spec_id)
         yield from self._records_from_content(
-            spec_id, mapping, body, spec_path, repo_root
+            spec_id, mapping, body, spec_path, repo_root,
         )
 
     def _records_from_content(
@@ -681,11 +682,11 @@ class RequirementsRegistry:
             )
 
     def _requirements_from_spec(
-        self, spec_path: Path, spec_id: str, repo_root: Path
+        self, spec_path: Path, spec_id: str, repo_root: Path,
     ) -> Iterator[RequirementRecord]:
         frontmatter, body = load_markdown_file(spec_path)
         yield from self._records_from_content(
-            spec_id, frontmatter, body, spec_path, repo_root
+            spec_id, frontmatter, body, spec_path, repo_root,
         )
 
     # ------------------------------------------------------------------
@@ -694,7 +695,7 @@ class RequirementsRegistry:
         uid: str,
         new_spec_id: str,
         *,
-        spec_registry: Optional[SpecRegistry] = None,
+        spec_registry: SpecRegistry | None = None,
         introduced_by: str | None = None,
     ) -> str:
         if uid not in self.records:
@@ -765,7 +766,7 @@ class RequirementsRegistry:
     def set_status(self, uid: str, status: RequirementStatus) -> None:
         if status not in VALID_STATUSES:
             raise ValueError(
-                f"Invalid status {status!r}; must be one of {sorted(VALID_STATUSES)}"
+                f"Invalid status {status!r}; must be one of {sorted(VALID_STATUSES)}",
             )
         try:
             record = self.records[uid]

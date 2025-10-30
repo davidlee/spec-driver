@@ -7,10 +7,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from supekku.scripts.lib.requirements import RequirementsRegistry
 from supekku.scripts.lib.lifecycle import STATUS_LIVE, STATUS_PENDING
-from supekku.scripts.lib.spec_registry import SpecRegistry
 from supekku.scripts.lib.relations import add_relation
+from supekku.scripts.lib.requirements import RequirementsRegistry
+from supekku.scripts.lib.spec_registry import SpecRegistry
 from supekku.scripts.lib.spec_utils import dump_markdown_file
 
 
@@ -61,7 +61,7 @@ class RequirementsRegistryTest(unittest.TestCase):
         spec_registry = SpecRegistry(root)
 
         stats = registry.sync_from_specs(
-            [root / "specify" / "tech"], spec_registry=spec_registry
+            [root / "specify" / "tech"], spec_registry=spec_registry,
         )
         registry.save()
 
@@ -73,7 +73,7 @@ class RequirementsRegistryTest(unittest.TestCase):
         self.assertEqual(records[0].status, STATUS_PENDING)
 
     def _create_change_bundle(
-        self, root: Path, bundle: str, file_id: str, kind: str
+        self, root: Path, bundle: str, file_id: str, kind: str,
     ) -> Path:
         bundle_dir = root / "change" / bundle
         bundle_dir.mkdir(parents=True, exist_ok=True)
@@ -94,18 +94,18 @@ class RequirementsRegistryTest(unittest.TestCase):
     def test_sync_collects_change_relations(self) -> None:
         root = self._make_repo()
         delta_path = self._create_change_bundle(
-            root, "deltas/DE-001-example", "DE-001", "delta"
+            root, "deltas/DE-001-example", "DE-001", "delta",
         )
         revision_path = self._create_change_bundle(
-            root, "revisions/RE-001-example", "RE-001", "revision"
+            root, "revisions/RE-001-example", "RE-001", "revision",
         )
         audit_path = self._create_change_bundle(
-            root, "audits/AUD-001-example", "AUD-001", "audit"
+            root, "audits/AUD-001-example", "AUD-001", "audit",
         )
 
         add_relation(delta_path, relation_type="implements", target="SPEC-001.FR-001")
         add_relation(
-            revision_path, relation_type="introduces", target="SPEC-001.FR-001"
+            revision_path, relation_type="introduces", target="SPEC-001.FR-001",
         )
         add_relation(audit_path, relation_type="verifies", target="SPEC-001.FR-001")
 
@@ -143,7 +143,7 @@ class RequirementsRegistryTest(unittest.TestCase):
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         registry.sync_from_specs(
-            [root / "specify" / "tech"], spec_registry=spec_registry
+            [root / "specify" / "tech"], spec_registry=spec_registry,
         )
         registry.set_status("SPEC-001.FR-001", STATUS_LIVE)
         registry.save()
@@ -157,7 +157,7 @@ class RequirementsRegistryTest(unittest.TestCase):
         registry = RequirementsRegistry(registry_path)
         spec_registry.reload()
         stats = registry.sync_from_specs(
-            [root / "specify" / "tech"], spec_registry=spec_registry
+            [root / "specify" / "tech"], spec_registry=spec_registry,
         )
         registry.save()
 
@@ -170,7 +170,7 @@ class RequirementsRegistryTest(unittest.TestCase):
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         registry.sync_from_specs(
-            [root / "specify" / "tech"], spec_registry=spec_registry
+            [root / "specify" / "tech"], spec_registry=spec_registry,
         )
 
         results = registry.search(query="non functional")
@@ -189,7 +189,7 @@ class RequirementsRegistryTest(unittest.TestCase):
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         registry.sync_from_specs(
-            [root / "specify" / "tech"], spec_registry=spec_registry
+            [root / "specify" / "tech"], spec_registry=spec_registry,
         )
 
         new_uid = registry.move_requirement(
@@ -230,7 +230,7 @@ interactions: []
         spec_registry = SpecRegistry(root)
         spec_registry.reload()
         registry.sync_from_specs(
-            [root / "specify" / "tech"], spec_registry=spec_registry
+            [root / "specify" / "tech"], spec_registry=spec_registry,
         )
 
         record = registry.records["SPEC-001.FR-001"]
@@ -336,7 +336,7 @@ interactions: []
         registry = RequirementsRegistry(registry_path)
         spec_registry = SpecRegistry(root)
         registry.sync_from_specs(
-            [root / "specify" / "tech"], spec_registry=spec_registry
+            [root / "specify" / "tech"], spec_registry=spec_registry,
         )
         registry.save()
 

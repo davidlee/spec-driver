@@ -3,8 +3,8 @@
 import unittest
 
 from .registry_migration import (
-    RegistryV2,
     LanguageDetector,
+    RegistryV2,
 )
 
 

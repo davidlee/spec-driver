@@ -12,8 +12,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from supekku.scripts.lib.requirements import (  # type: ignore
-    RequirementsRegistry,
     VALID_STATUSES,
+    RequirementsRegistry,
 )
 from supekku.scripts.lib.spec_registry import SpecRegistry  # type: ignore
 
@@ -29,7 +29,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     sync_parser = subparsers.add_parser(
-        "sync", help="Synchronise requirements registry"
+        "sync", help="Synchronise requirements registry",
     )
     sync_parser.add_argument(
         "--spec-dir",
@@ -75,12 +75,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     show_parser = subparsers.add_parser(
-        "show", help="Show full record for a requirement"
+        "show", help="Show full record for a requirement",
     )
     show_parser.add_argument("uid", help="Requirement UID (e.g. SPEC-002.FR-001)")
 
     status_parser = subparsers.add_parser(
-        "set-status", help="Update lifecycle status for a requirement"
+        "set-status", help="Update lifecycle status for a requirement",
     )
     status_parser.add_argument("uid", help="Requirement UID")
     status_parser.add_argument("status", choices=sorted(VALID_STATUSES))

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-import re
 
 import yaml
 
@@ -30,15 +30,15 @@ class PhaseOverviewBlock:
 
 
 _PLAN_PATTERN = re.compile(
-    r"```(?:yaml|yml)\s+" + re.escape(PLAN_MARKER) + r"\n(.*?)```", re.DOTALL
+    r"```(?:yaml|yml)\s+" + re.escape(PLAN_MARKER) + r"\n(.*?)```", re.DOTALL,
 )
 _PHASE_PATTERN = re.compile(
-    r"```(?:yaml|yml)\s+" + re.escape(PHASE_MARKER) + r"\n(.*?)```", re.DOTALL
+    r"```(?:yaml|yml)\s+" + re.escape(PHASE_MARKER) + r"\n(.*?)```", re.DOTALL,
 )
 
 
 def _format_yaml_error(
-    error: yaml.YAMLError, yaml_content: str, source_path: Path | None, block_type: str
+    error: yaml.YAMLError, yaml_content: str, source_path: Path | None, block_type: str,
 ) -> str:
     """Format a YAML error with helpful context about the file and offending content."""
     lines = yaml_content.splitlines()
@@ -68,7 +68,7 @@ def _format_yaml_error(
 
 
 def extract_plan_overview(
-    text: str, source_path: Path | None = None
+    text: str, source_path: Path | None = None,
 ) -> PlanOverviewBlock | None:
     """Extract and parse plan overview YAML block from markdown text."""
     match = _PLAN_PATTERN.search(text)
@@ -86,7 +86,7 @@ def extract_plan_overview(
 
 
 def extract_phase_overview(
-    text: str, source_path: Path | None = None
+    text: str, source_path: Path | None = None,
 ) -> PhaseOverviewBlock | None:
     """Extract and parse phase overview YAML block from markdown text."""
     match = _PHASE_PATTERN.search(text)
@@ -114,12 +114,12 @@ def load_phase_overview(path: Path) -> PhaseOverviewBlock | None:
 
 
 __all__ = [
-    "PlanOverviewBlock",
-    "PhaseOverviewBlock",
-    "extract_plan_overview",
-    "extract_phase_overview",
-    "load_plan_overview",
-    "load_phase_overview",
-    "PLAN_MARKER",
     "PHASE_MARKER",
+    "PLAN_MARKER",
+    "PhaseOverviewBlock",
+    "PlanOverviewBlock",
+    "extract_phase_overview",
+    "extract_plan_overview",
+    "load_phase_overview",
+    "load_plan_overview",
 ]

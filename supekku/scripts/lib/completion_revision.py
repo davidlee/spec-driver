@@ -19,8 +19,7 @@ def _render_revision_change_block(
     delta_id: str,
     requirements: list[tuple[str, str, str]],  # (req_id, spec_id, summary)
 ) -> str:
-    """
-    Render a revision.change YAML block documenting requirement lifecycle transitions.
+    """Render a revision.change YAML block documenting requirement lifecycle transitions.
 
     Args:
         revision_id: Revision ID (e.g., RE-042)
@@ -29,6 +28,7 @@ def _render_revision_change_block(
 
     Returns:
         Formatted YAML block as a string
+
     """
     # Group requirements by spec
     specs_data: dict[str, dict] = {}
@@ -60,7 +60,7 @@ def _render_revision_change_block(
                     "implemented_by": [delta_id],
                     "status": STATUS_LIVE,
                 },
-            }
+            },
         )
 
     # Build complete block structure
@@ -103,8 +103,7 @@ def create_completion_revision(
     *,
     revision_name: str | None = None,
 ) -> str:
-    """
-    Create a completion revision documenting delta lifecycle transitions.
+    """Create a completion revision documenting delta lifecycle transitions.
 
     This revision documents requirements that were implemented by a delta
     but didn't have prior lifecycle tracking in revision files.
@@ -120,6 +119,7 @@ def create_completion_revision(
 
     Raises:
         ValueError: If requirements not found in registry
+
     """
     # Default name
     if not revision_name:

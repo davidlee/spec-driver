@@ -17,10 +17,10 @@ VALID_STATUSES: set[RequirementStatus] = {
 }
 
 __all__ = [
-    "RequirementStatus",
-    "STATUS_PENDING",
     "STATUS_IN_PROGRESS",
     "STATUS_LIVE",
+    "STATUS_PENDING",
     "STATUS_RETIRED",
     "VALID_STATUSES",
+    "RequirementStatus",
 ]

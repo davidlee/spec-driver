@@ -11,7 +11,9 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from supekku.scripts.lib.create_change import create_requirement_breakout  # type: ignore
+from supekku.scripts.lib.create_change import (
+    create_requirement_breakout,  # type: ignore
+)
 
 
 def build_parser() -> argparse.ArgumentParser:

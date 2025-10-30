@@ -1,9 +1,10 @@
 """Data models for Python documentation generation API."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Optional
 from enum import Enum
+from pathlib import Path
 
 
 class VariantType(Enum):
@@ -23,17 +24,17 @@ class VariantSpec:
     include_tests: bool = False
 
     @classmethod
-    def public(cls) -> "VariantSpec":
+    def public(cls) -> VariantSpec:
         """Create PUBLIC variant spec."""
         return cls(VariantType.PUBLIC, include_private=False, include_tests=False)
 
     @classmethod
-    def all_symbols(cls) -> "VariantSpec":
+    def all_symbols(cls) -> VariantSpec:
         """Create ALL variant spec."""
         return cls(VariantType.ALL, include_private=True, include_tests=False)
 
     @classmethod
-    def tests(cls) -> "VariantSpec":
+    def tests(cls) -> VariantSpec:
         """Create TESTS variant spec."""
         return cls(VariantType.TESTS, include_private=True, include_tests=True)
 
@@ -47,7 +48,7 @@ class DocResult:
     hash: str
     status: str  # "created", "changed", "unchanged", "error"
     module_identifier: str  # normalized module path (e.g. "src.module")
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
     @property
     def success(self) -> bool:

@@ -2,7 +2,8 @@
 
 import argparse
 from pathlib import Path
-from typing import Any, Match
+from re import Match
+from typing import Any
 
 import yaml
 
@@ -16,6 +17,7 @@ def add_root_argument(
     Args:
         parser: The ArgumentParser to add the argument to
         help_text: Custom help text for the --root argument
+
     """
     parser.add_argument(
         "--root",
@@ -26,7 +28,7 @@ def add_root_argument(
 
 
 def create_parser_with_root(
-    description: str, help_text: str = "Repository root (auto-detected if omitted)"
+    description: str, help_text: str = "Repository root (auto-detected if omitted)",
 ) -> argparse.ArgumentParser:
     """Create an ArgumentParser with standard --root argument.
 
@@ -36,6 +38,7 @@ def create_parser_with_root(
 
     Returns:
         ArgumentParser with --root argument added
+
     """
     parser = argparse.ArgumentParser(description=description)
     add_root_argument(parser, help_text)
@@ -54,6 +57,7 @@ def parse_yaml_block(match: Match[str], block_name: str) -> dict[str, Any]:
 
     Raises:
         ValueError: If YAML parsing fails or result is not a dict
+
     """
     if not match:
         raise ValueError(f"No {block_name} block found")

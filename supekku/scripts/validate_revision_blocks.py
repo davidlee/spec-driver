@@ -58,7 +58,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def discover_revision_files(
-    root: Path, explicit: list[Path], scan_all: bool
+    root: Path, explicit: list[Path], scan_all: bool,
 ) -> list[Path]:
     if explicit:
         resolved = []
@@ -80,7 +80,7 @@ def discover_revision_files(
 def format_file(content: str, updates: list[tuple[RevisionChangeBlock, str]]) -> str:
     updated = content
     for block, replacement in sorted(
-        updates, key=lambda item: item[0].content_start, reverse=True
+        updates, key=lambda item: item[0].content_start, reverse=True,
     ):
         updated = block.replace_content(updated, replacement)
     return updated
@@ -160,9 +160,9 @@ def _emit_messages(path: Path, messages: list[ValidationMessage]) -> None:
 
 
 def _print_schema() -> None:
-    from supekku.scripts.lib.revision_blocks import REVISION_BLOCK_JSON_SCHEMA
-
     import json
+
+    from supekku.scripts.lib.revision_blocks import REVISION_BLOCK_JSON_SCHEMA
 
     print(json.dumps(REVISION_BLOCK_JSON_SCHEMA, indent=2, sort_keys=True))
 

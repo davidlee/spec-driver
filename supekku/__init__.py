@@ -1,5 +1,4 @@
-"""
-Supekku: Specification-driven development toolkit.
+"""Supekku: Specification-driven development toolkit.
 
 Multi-language specification sync and documentation generation.
 """

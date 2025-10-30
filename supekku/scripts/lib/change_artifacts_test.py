@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-
 from supekku.scripts.lib.change_artifacts import load_change_artifact
 from supekku.scripts.lib.spec_utils import dump_markdown_file
 

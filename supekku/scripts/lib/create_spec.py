@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import MutableMapping
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import MutableMapping
 
 from .spec_utils import dump_markdown_file
 
@@ -48,13 +48,11 @@ class SpecCreationError(RuntimeError):
 class TemplateNotFoundError(SpecCreationError):
     """Raised when a specification template cannot be found."""
 
-    pass
 
 
 class RepositoryRootNotFoundError(SpecCreationError):
     """Raised when the repository root cannot be located."""
 
-    pass
 
 
 @dataclass
@@ -143,7 +141,7 @@ def find_repository_root(start: Path) -> Path:
         if (path / ".git").exists() or (path / "supekku" / "templates").exists():
             return path
     raise RepositoryRootNotFoundError(
-        "Could not determine repository root (missing .git or supekku/templates)"
+        "Could not determine repository root (missing .git or supekku/templates)",
     )
 
 
@@ -224,8 +222,8 @@ def build_frontmatter(
 __all__ = [
     "CreateSpecOptions",
     "CreateSpecResult",
+    "RepositoryRootNotFoundError",
     "SpecCreationError",
     "TemplateNotFoundError",
-    "RepositoryRootNotFoundError",
     "create_spec",
 ]

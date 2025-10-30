@@ -3,20 +3,20 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Tuple, Any
+from typing import Any
 
 try:
     import yaml
 except ImportError as exc:
     raise SystemExit(
-        "PyYAML is required for spec tooling. Install with `pip install PyYAML`."
+        "PyYAML is required for spec tooling. Install with `pip install PyYAML`.",
     ) from exc
 
 try:
     import frontmatter
 except ImportError as exc:
     raise SystemExit(
-        "python-frontmatter is required for spec tooling. Install with `pip install python-frontmatter`."
+        "python-frontmatter is required for spec tooling. Install with `pip install python-frontmatter`.",
     ) from exc
 
 from .frontmatter_schema import (
@@ -25,7 +25,7 @@ from .frontmatter_schema import (
 )
 
 
-def load_markdown_file(path: Path | str) -> Tuple[dict[str, Any], str]:
+def load_markdown_file(path: Path | str) -> tuple[dict[str, Any], str]:
     """Load markdown file and extract frontmatter and content."""
     path = Path(path)
     text = path.read_text(encoding="utf-8")
@@ -38,7 +38,7 @@ def load_markdown_file(path: Path | str) -> Tuple[dict[str, Any], str]:
 
 
 def dump_markdown_file(
-    path: Path | str, frontmatter: dict[str, Any], body: str
+    path: Path | str, frontmatter: dict[str, Any], body: str,
 ) -> None:
     """Write frontmatter and content to a markdown file."""
     path = Path(path)
@@ -55,7 +55,7 @@ def ensure_list_entry(frontmatter: dict[str, Any], key: str) -> list[Any]:
     value = frontmatter.setdefault(key, [])
     if not isinstance(value, list):
         raise TypeError(
-            f"frontmatter[{key!r}] expected list, got {type(value).__name__}"
+            f"frontmatter[{key!r}] expected list, got {type(value).__name__}",
         )
     return value
 
@@ -69,7 +69,7 @@ def append_unique(values: list[Any], item: Any) -> bool:
 
 
 def load_validated_markdown_file(
-    path: Path | str, *, kind: str | None = None
+    path: Path | str, *, kind: str | None = None,
 ) -> tuple[FrontmatterValidationResult, str]:
     """Load a markdown file and validate its frontmatter against the schema.
 

@@ -74,7 +74,7 @@ class ChangeRegistry:
             _KIND_TO_DIR[self.kind]: {
                 artifact_id: artifact.to_dict(self.root)
                 for artifact_id, artifact in sorted(artifacts.items())
-            }
+            },
         }
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
         text = yaml.safe_dump(serialised, sort_keys=False)

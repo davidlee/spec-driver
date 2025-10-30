@@ -6,11 +6,10 @@ import os
 import unittest
 from pathlib import Path
 
-from supekku.scripts.lib.test_base import RepoTestCase
-
 from supekku.scripts.lib.change_registry import ChangeRegistry
-from supekku.scripts.lib.spec_utils import dump_markdown_file
 from supekku.scripts.lib.relations import add_relation
+from supekku.scripts.lib.spec_utils import dump_markdown_file
+from supekku.scripts.lib.test_base import RepoTestCase
 
 
 class ChangeRegistryTest(RepoTestCase):
@@ -38,7 +37,7 @@ class ChangeRegistryTest(RepoTestCase):
             "created": "2024-06-01",
             "updated": "2024-06-02",
             "status": "draft",
-            "kind": kind[:-1] if kind.endswith("s") else kind,
+            "kind": kind.removesuffix("s"),
             "relations": [],
             "applies_to": {"requirements": ["SPEC-010.FR-001"]},
         }
@@ -50,7 +49,7 @@ class ChangeRegistryTest(RepoTestCase):
     def test_collect_and_sync_delta_registry(self) -> None:
         root = self._create_repo()
         self._write_change(
-            root, "deltas", "DE-101", [("implements", "SPEC-010.FR-001")]
+            root, "deltas", "DE-101", [("implements", "SPEC-010.FR-001")],
         )
 
         registry = ChangeRegistry(root=root, kind="delta")

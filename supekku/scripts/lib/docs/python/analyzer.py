@@ -2,7 +2,6 @@
 
 import ast
 from pathlib import Path
-from typing import Dict, List, Optional
 
 from .cache import ParseCache
 from .comments import CommentExtractor
@@ -13,20 +12,20 @@ class DeterministicPythonModuleAnalyzer:
     def __init__(
         self,
         file_path: Path,
-        base_path: Optional[Path] = None,
-        cache: Optional[ParseCache] = None,
+        base_path: Path | None = None,
+        cache: ParseCache | None = None,
     ):
         self.file_path = file_path
         self.base_path = base_path
         self.cache = cache
         self.module_name = PathNormalizer.get_module_name(file_path, base_path)
 
-        with open(self.file_path, "r", encoding="utf-8") as f:
+        with open(self.file_path, encoding="utf-8") as f:
             self.source_code = f.read()
 
         self.comment_extractor = CommentExtractor(self.source_code)
 
-    def analyze(self) -> Dict:
+    def analyze(self) -> dict:
         """Analyze the Python file and extract documentation info with caching"""
         # Try cache first
         if self.cache:
@@ -45,7 +44,7 @@ class DeterministicPythonModuleAnalyzer:
         analysis = {
             "module_name": self.module_name,
             "file_path": PathNormalizer.normalize_path_for_id(
-                self.file_path, self.base_path
+                self.file_path, self.base_path,
             ),
             "docstring": ast.get_docstring(tree),
             "classes": [],
@@ -74,7 +73,7 @@ class DeterministicPythonModuleAnalyzer:
         analysis["functions"].sort(key=lambda x: x["name"])
         analysis["constants"].sort(key=lambda x: x["name"])
         analysis["imports"].sort(
-            key=lambda x: (x.get("module", ""), str(x.get("names", [])))
+            key=lambda x: (x.get("module", ""), str(x.get("names", []))),
         )
 
         # Sort methods within each class
@@ -87,7 +86,7 @@ class DeterministicPythonModuleAnalyzer:
 
         return analysis
 
-    def _get_module_level_comments(self, tree: ast.AST) -> List[str]:
+    def _get_module_level_comments(self, tree: ast.AST) -> list[str]:
         """Get comments that appear before the first significant statement"""
         comments = []
         first_stmt_line = None
@@ -115,7 +114,7 @@ class DeterministicPythonModuleAnalyzer:
 
         return comments
 
-    def _analyze_class(self, node: ast.ClassDef) -> Dict:
+    def _analyze_class(self, node: ast.ClassDef) -> dict:
         """Analyze a class definition"""
         methods = []
         for item in node.body:
@@ -130,14 +129,14 @@ class DeterministicPythonModuleAnalyzer:
             "comment": comment,
             "bases": sorted([self._get_name(base) for base in node.bases]),  # Sorted
             "decorators": sorted(
-                [self._get_name(dec) for dec in node.decorator_list]
+                [self._get_name(dec) for dec in node.decorator_list],
             ),  # Sorted
             "methods": methods,  # Will be sorted later
             "is_private": node.name.startswith("_"),
             "line_number": node.lineno,
         }
 
-    def _analyze_function(self, node: ast.FunctionDef) -> Dict:
+    def _analyze_function(self, node: ast.FunctionDef) -> dict:
         """Analyze a function definition"""
         args_info = []
         for arg in node.args.args:
@@ -160,7 +159,7 @@ class DeterministicPythonModuleAnalyzer:
             "args_detailed": args_info,
             "return_type": return_type,
             "decorators": sorted(
-                [self._get_name(dec) for dec in node.decorator_list]
+                [self._get_name(dec) for dec in node.decorator_list],
             ),  # Sorted
             "is_private": node.name.startswith("_"),
             "is_async": isinstance(node, ast.AsyncFunctionDef),
@@ -176,7 +175,7 @@ class DeterministicPythonModuleAnalyzer:
             "line_number": node.lineno,
         }
 
-    def _analyze_assignment(self, node: ast.Assign) -> List[Dict]:
+    def _analyze_assignment(self, node: ast.Assign) -> list[dict]:
         """Analyze variable assignments"""
         variables = []
         comment = self.comment_extractor.get_comment_for_line(node.lineno)
@@ -195,12 +194,12 @@ class DeterministicPythonModuleAnalyzer:
                         "comment": comment,
                         "is_private": target.id.startswith("_"),
                         "line_number": node.lineno,
-                    }
+                    },
                 )
 
         return variables
 
-    def _analyze_import(self, node) -> Dict:
+    def _analyze_import(self, node) -> dict:
         """Analyze import statements"""
         if isinstance(node, ast.Import):
             return {
@@ -208,7 +207,7 @@ class DeterministicPythonModuleAnalyzer:
                 "names": sorted([alias.name for alias in node.names]),  # Sorted
                 "line_number": node.lineno,
             }
-        elif isinstance(node, ast.ImportFrom):
+        if isinstance(node, ast.ImportFrom):
             return {
                 "type": "from_import",
                 "module": node.module,
@@ -220,21 +219,21 @@ class DeterministicPythonModuleAnalyzer:
         """Get the name of an AST node with improved handling"""
         if isinstance(node, ast.Name):
             return node.id
-        elif isinstance(node, ast.Attribute):
+        if isinstance(node, ast.Attribute):
             return f"{self._get_name(node.value)}.{node.attr}"
-        elif isinstance(node, ast.Constant):
+        if isinstance(node, ast.Constant):
             return str(node.value)
-        elif isinstance(node, ast.Subscript):
+        if isinstance(node, ast.Subscript):
             return f"{self._get_name(node.value)}[{self._get_name(node.slice)}]"
-        elif isinstance(node, ast.Tuple):
+        if isinstance(node, ast.Tuple):
             # Handle tuple type annotations like Tuple[str, int]
             elts = [self._get_name(elt) for elt in node.elts]
             return f"Tuple[{', '.join(elts)}]"
-        elif isinstance(node, ast.List):
+        if isinstance(node, ast.List):
             # Handle list type annotations
             elts = [self._get_name(elt) for elt in node.elts]
             return f"List[{', '.join(elts)}]"
-        elif isinstance(node, ast.Call):
+        if isinstance(node, ast.Call):
             # Handle complex decorator calls like @property, @staticmethod, etc.
             func_name = self._get_name(node.func)
             if node.args or node.keywords:
@@ -246,8 +245,7 @@ class DeterministicPythonModuleAnalyzer:
                 all_args = args + kwargs
                 return f"{func_name}({', '.join(all_args)})"
             return func_name
-        elif hasattr(node, "__class__"):
+        if hasattr(node, "__class__"):
             # For any other AST node, use the class name instead of object reference
             return f"<{node.__class__.__name__}>"
-        else:
-            return "Unknown"
+        return "Unknown"

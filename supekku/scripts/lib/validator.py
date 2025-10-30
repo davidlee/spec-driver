@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, List
 
 from .change_artifacts import ChangeArtifact
 from .workspace import Workspace
@@ -23,10 +23,10 @@ class WorkspaceValidator:
 
     def __init__(self, workspace: Workspace, strict: bool = False) -> None:
         self.workspace = workspace
-        self.issues: List[ValidationIssue] = []
+        self.issues: list[ValidationIssue] = []
         self.strict = strict
 
-    def validate(self) -> List[ValidationIssue]:
+    def validate(self) -> list[ValidationIssue]:
         self.issues.clear()
         self.workspace.specs  # Access but don't assign
         requirements = self.workspace.requirements
@@ -115,16 +115,16 @@ class WorkspaceValidator:
 
     def _error(self, artifact: str, message: str) -> None:
         self.issues.append(
-            ValidationIssue(level="error", artifact=artifact, message=message)
+            ValidationIssue(level="error", artifact=artifact, message=message),
         )
 
     def _warning(self, artifact: str, message: str) -> None:
         self.issues.append(
-            ValidationIssue(level="warning", artifact=artifact, message=message)
+            ValidationIssue(level="warning", artifact=artifact, message=message),
         )
 
     def _validate_decision_references(
-        self, decisions: dict, decision_ids: set[str]
+        self, decisions: dict, decision_ids: set[str],
     ) -> None:
         """Validate that all related_decisions references point to existing ADRs."""
         for decision_id, decision in decisions.items():
@@ -132,7 +132,7 @@ class WorkspaceValidator:
             for related_id in decision.related_decisions:
                 if related_id not in decision_ids:
                     self._error(
-                        decision_id, f"Related decision {related_id} does not exist"
+                        decision_id, f"Related decision {related_id} does not exist",
                     )
 
     def _validate_decision_status_compatibility(self, decisions: dict) -> None:
@@ -156,8 +156,8 @@ class WorkspaceValidator:
 
 
 def validate_workspace(
-    workspace: Workspace, strict: bool = False
-) -> List[ValidationIssue]:
+    workspace: Workspace, strict: bool = False,
+) -> list[ValidationIssue]:
     validator = WorkspaceValidator(workspace, strict=strict)
     return validator.validate()
 

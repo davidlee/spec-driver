@@ -1,5 +1,4 @@
-"""
-Tests for the multi-language SpecSyncEngine.
+"""Tests for the multi-language SpecSyncEngine.
 """
 
 import unittest
@@ -33,7 +32,7 @@ class TestSpecSyncEngine(unittest.TestCase):
         }
 
         self.engine = SpecSyncEngine(
-            repo_root=self.repo_root, tech_dir=self.tech_dir, adapters=self.adapters
+            repo_root=self.repo_root, tech_dir=self.tech_dir, adapters=self.adapters,
         )
 
     def test_initialization_with_default_adapters(self):
@@ -85,10 +84,10 @@ class TestSpecSyncEngine(unittest.TestCase):
         """Test identifier support detection."""
         # Setup mock responses
         self.mock_go_adapter.supports_identifier.side_effect = lambda x: x.startswith(
-            "internal/"
+            "internal/",
         )
         self.mock_python_adapter.supports_identifier.side_effect = lambda x: x.endswith(
-            ".py"
+            ".py",
         )
 
         # Test Go identifier
@@ -115,10 +114,10 @@ class TestSpecSyncEngine(unittest.TestCase):
 
         # Setup mock describe responses
         go_descriptor = SourceDescriptor(
-            slug_parts=["internal", "test"], default_frontmatter={}, variants=[]
+            slug_parts=["internal", "test"], default_frontmatter={}, variants=[],
         )
         python_descriptor = SourceDescriptor(
-            slug_parts=["module"], default_frontmatter={}, variants=[]
+            slug_parts=["module"], default_frontmatter={}, variants=[],
         )
 
         self.mock_go_adapter.describe.return_value = go_descriptor
@@ -147,7 +146,7 @@ class TestSpecSyncEngine(unittest.TestCase):
         self.mock_python_adapter.describe.assert_called_once_with(python_unit)
         self.mock_go_adapter.generate.assert_called_once_with(go_unit, check=False)
         self.mock_python_adapter.generate.assert_called_once_with(
-            python_unit, check=False
+            python_unit, check=False,
         )
 
     def test_synchronize_specific_languages(self):
@@ -156,7 +155,7 @@ class TestSpecSyncEngine(unittest.TestCase):
         go_unit = SourceUnit("go", "internal/test", self.repo_root)
         self.mock_go_adapter.discover_targets.return_value = [go_unit]
         self.mock_go_adapter.describe.return_value = SourceDescriptor(
-            slug_parts=["internal", "test"], default_frontmatter={}, variants=[]
+            slug_parts=["internal", "test"], default_frontmatter={}, variants=[],
         )
         self.mock_go_adapter.generate.return_value = []
 
@@ -173,7 +172,7 @@ class TestSpecSyncEngine(unittest.TestCase):
         go_unit = SourceUnit("go", "internal/test", self.repo_root)
         self.mock_go_adapter.discover_targets.return_value = [go_unit]
         self.mock_go_adapter.describe.return_value = SourceDescriptor(
-            slug_parts=["internal", "test"], default_frontmatter={}, variants=[]
+            slug_parts=["internal", "test"], default_frontmatter={}, variants=[],
         )
         self.mock_go_adapter.generate.return_value = []
 
@@ -183,7 +182,7 @@ class TestSpecSyncEngine(unittest.TestCase):
 
         # Verify adapter was called with correct targets
         self.mock_go_adapter.discover_targets.assert_called_once_with(
-            self.repo_root, requested=["internal/test"]
+            self.repo_root, requested=["internal/test"],
         )
 
     def test_synchronize_with_auto_detected_targets(self):
@@ -196,7 +195,7 @@ class TestSpecSyncEngine(unittest.TestCase):
         go_unit = SourceUnit("go", "internal/test", self.repo_root)
         self.mock_go_adapter.discover_targets.return_value = [go_unit]
         self.mock_go_adapter.describe.return_value = SourceDescriptor(
-            slug_parts=["internal", "test"], default_frontmatter={}, variants=[]
+            slug_parts=["internal", "test"], default_frontmatter={}, variants=[],
         )
         self.mock_go_adapter.generate.return_value = []
 
@@ -206,7 +205,7 @@ class TestSpecSyncEngine(unittest.TestCase):
 
         # Verify Go adapter was called with the target
         self.mock_go_adapter.discover_targets.assert_called_once_with(
-            self.repo_root, requested=["internal/test"]
+            self.repo_root, requested=["internal/test"],
         )
 
     def test_synchronize_check_mode(self):
@@ -215,7 +214,7 @@ class TestSpecSyncEngine(unittest.TestCase):
         go_unit = SourceUnit("go", "internal/test", self.repo_root)
         self.mock_go_adapter.discover_targets.return_value = [go_unit]
         self.mock_go_adapter.describe.return_value = SourceDescriptor(
-            slug_parts=["internal", "test"], default_frontmatter={}, variants=[]
+            slug_parts=["internal", "test"], default_frontmatter={}, variants=[],
         )
         self.mock_go_adapter.generate.return_value = []
 
@@ -247,7 +246,7 @@ class TestSpecSyncEngine(unittest.TestCase):
         """Test synchronization handles adapter errors gracefully."""
         # Setup mock to raise exception
         self.mock_go_adapter.discover_targets.side_effect = Exception(
-            "Go adapter error"
+            "Go adapter error",
         )
         self.mock_python_adapter.discover_targets.return_value = []
 
@@ -273,7 +272,7 @@ class TestSpecSyncEngine(unittest.TestCase):
         self.assertEqual(len(result.processed_units), 0)
         self.assertEqual(len(result.errors), 1)
         self.assertIn(
-            "Error processing internal/test: Description error", result.errors
+            "Error processing internal/test: Description error", result.errors,
         )
         self.assertIn("internal/test (error)", result.skipped_units)
 

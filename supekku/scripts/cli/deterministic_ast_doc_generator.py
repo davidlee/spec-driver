@@ -1,24 +1,22 @@
 #!/usr/bin/env python3
-"""
-CLI wrapper for deterministic AST-based documentation generator.
+"""CLI wrapper for deterministic AST-based documentation generator.
 Uses the refactored API from supekku.scripts.lib.docs.python package.
 """
 
 import argparse
 import sys
 from pathlib import Path
-from typing import List
 
 ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from supekku.scripts.lib.docs.python import (
-    generate_docs,
     DocResult,
-    VariantCoordinator,
     ParseCache,
+    VariantCoordinator,
     calculate_content_hash,
+    generate_docs,
 )
 
 # Re-export classes for backward compatibility with tests
@@ -26,7 +24,7 @@ from supekku.scripts.lib.docs.python import (
 
 # Backward compatibility functions for tests
 def check_mode_comparison(
-    existing_file: Path, new_content: str
+    existing_file: Path, new_content: str,
 ) -> tuple[bool, str, str]:
     """Compare existing file with new content. Returns (is_same, existing_hash, new_hash)"""
     new_hash = calculate_content_hash(new_content)
@@ -34,7 +32,7 @@ def check_mode_comparison(
     if not existing_file.exists():
         return False, "", new_hash
 
-    with open(existing_file, "r", encoding="utf-8") as f:
+    with open(existing_file, encoding="utf-8") as f:
         existing_content = f.read()
 
     existing_hash = calculate_content_hash(existing_content)
@@ -53,7 +51,7 @@ def write_mode_comparison(output_file: Path, new_content: str) -> tuple[str, str
         return "created", "", new_hash
 
     # File exists - check if content changed
-    with open(output_file, "r", encoding="utf-8") as f:
+    with open(output_file, encoding="utf-8") as f:
         existing_content = f.read()
 
     existing_hash = calculate_content_hash(existing_content)
@@ -61,15 +59,14 @@ def write_mode_comparison(output_file: Path, new_content: str) -> tuple[str, str
     if existing_hash == new_hash:
         # Content unchanged
         return "unchanged", existing_hash, new_hash
-    else:
-        # Content changed - write new content
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(new_content)
-        return "changed", existing_hash, new_hash
+    # Content changed - write new content
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(new_content)
+    return "changed", existing_hash, new_hash
 
 
 def format_results(
-    results: List[DocResult], check_mode: bool = False, verbose: bool = False
+    results: list[DocResult], check_mode: bool = False, verbose: bool = False,
 ) -> str:
     """Format results for CLI output."""
     lines = []
@@ -105,7 +102,7 @@ def get_status_symbol(status: str, check_mode: bool = False) -> str:
     return symbols.get(status, "?")
 
 
-def print_summary(results: List[DocResult], check_mode: bool = False) -> None:
+def print_summary(results: list[DocResult], check_mode: bool = False) -> None:
     """Print summary statistics."""
     if not results:
         return
@@ -140,7 +137,7 @@ def print_summary(results: List[DocResult], check_mode: bool = False) -> None:
 def main():
     """Main CLI entry point using the refactored API."""
     parser = argparse.ArgumentParser(
-        description="Generate deterministic Python module documentation"
+        description="Generate deterministic Python module documentation",
     )
     parser.add_argument("path", help="Path to Python file or package directory")
     parser.add_argument(
@@ -160,12 +157,12 @@ def main():
         help="Check mode: verify that generated docs match existing files",
     )
     parser.add_argument(
-        "--verbose", action="store_true", help="Verbose output showing file hashes"
+        "--verbose", action="store_true", help="Verbose output showing file hashes",
     )
     parser.add_argument("--no-cache", action="store_true", help="Disable parsing cache")
     parser.add_argument("--cache-dir", type=Path, help="Custom cache directory")
     parser.add_argument(
-        "--cache-stats", action="store_true", help="Show cache performance statistics"
+        "--cache-stats", action="store_true", help="Show cache performance statistics",
     )
 
     args = parser.parse_args()
@@ -212,7 +209,7 @@ def main():
         stats = cache.get_stats()
         print(
             f"\nCache Stats: {stats['hits']} hits, {stats['misses']} misses, "
-            f"{stats['invalidations']} invalidations ({stats['hit_rate_percent']}% hit rate)"
+            f"{stats['invalidations']} invalidations ({stats['hit_rate_percent']}% hit rate)",
         )
 
     # Exit with error code if any results failed

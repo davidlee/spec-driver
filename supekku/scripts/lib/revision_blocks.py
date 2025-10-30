@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, List, Sequence, Tuple
-import re
+from typing import Any
 
 import yaml
 
@@ -237,21 +238,20 @@ REVISION_BLOCK_JSON_SCHEMA: dict[str, Any] = {
 class ValidationMessage:
     """A validation message with path context for error reporting."""
 
-    path: Tuple[Any, ...]
+    path: tuple[Any, ...]
     message: str
 
     def render_path(self) -> str:
         if not self.path:
             return "<root>"
-        formatted: List[str] = []
+        formatted: list[str] = []
         for element in self.path:
             if isinstance(element, int):
                 formatted.append(f"[{element}]")
+            elif formatted:
+                formatted.append(f".{element}")
             else:
-                if formatted:
-                    formatted.append(f".{element}")
-                else:
-                    formatted.append(str(element))
+                formatted.append(str(element))
         return "".join(formatted)
 
 
@@ -329,7 +329,7 @@ def _is_backlog_id(value: str) -> bool:
 def _disallow_extra_keys(
     mapping: dict[str, Any],
     allowed_keys: Sequence[str],
-    path: Tuple[Any, ...],
+    path: tuple[Any, ...],
     messages: list[ValidationMessage],
 ) -> None:
     allowed_set = set(allowed_keys)
@@ -347,7 +347,7 @@ class RevisionBlockValidator:
         return messages
 
     def _check_root(
-        self, data: dict[str, Any], messages: list[ValidationMessage]
+        self, data: dict[str, Any], messages: list[ValidationMessage],
     ) -> None:
         if not isinstance(data, dict):
             messages.append(ValidationMessage((), "block must be a mapping"))
@@ -356,7 +356,7 @@ class RevisionBlockValidator:
         self._require_key(data, "schema", messages)
         if data.get("schema") != REVISION_BLOCK_SCHEMA_ID:
             messages.append(
-                ValidationMessage(("schema",), "must equal 'supekku.revision.change'")
+                ValidationMessage(("schema",), "must equal 'supekku.revision.change'"),
             )
 
         self._require_key(data, "version", messages)
@@ -386,7 +386,7 @@ class RevisionBlockValidator:
         else:
             for index, requirement in enumerate(requirements):
                 self._validate_requirement(
-                    requirement, messages, path=("requirements", index)
+                    requirement, messages, path=("requirements", index),
                 )
 
     def _require_key(
@@ -401,7 +401,7 @@ class RevisionBlockValidator:
             messages.append(ValidationMessage(tuple(path) + (key,), "is required"))
 
     def _validate_metadata(
-        self, metadata: dict[str, Any], messages: list[ValidationMessage]
+        self, metadata: dict[str, Any], messages: list[ValidationMessage],
     ) -> None:
         if "revision" not in metadata:
             messages.append(ValidationMessage(("metadata", "revision"), "is required"))
@@ -410,7 +410,7 @@ class RevisionBlockValidator:
             if not isinstance(revision, str) or not _is_revision_id(revision):
                 messages.append(
                     ValidationMessage(
-                        ("metadata", "revision"), "must match pattern RE-###"
+                        ("metadata", "revision"), "must match pattern RE-###",
                     ),
                 )
         for optional_key in ("prepared_by", "generated_at"):
@@ -427,7 +427,7 @@ class RevisionBlockValidator:
         spec: Any,
         messages: list[ValidationMessage],
         *,
-        path: Tuple[Any, ...],
+        path: tuple[Any, ...],
     ) -> None:
         if not isinstance(spec, dict):
             messages.append(ValidationMessage(path, "must be an object"))
@@ -446,7 +446,7 @@ class RevisionBlockValidator:
         if spec_id is not None:
             if not isinstance(spec_id, str) or not _is_spec_id(spec_id):
                 messages.append(
-                    ValidationMessage(path + ("spec_id",), "must be a SPEC identifier")
+                    ValidationMessage(path + ("spec_id",), "must be a SPEC identifier"),
                 )
 
         action = spec.get("action")
@@ -454,7 +454,7 @@ class RevisionBlockValidator:
             if action not in {"created", "updated", "retired"}:
                 messages.append(
                     ValidationMessage(
-                        path + ("action",), "must be one of created/updated/retired"
+                        path + ("action",), "must be one of created/updated/retired",
                     ),
                 )
 
@@ -465,7 +465,7 @@ class RevisionBlockValidator:
         if flow is not None:
             if not isinstance(flow, dict):
                 messages.append(
-                    ValidationMessage(path + ("requirement_flow",), "must be an object")
+                    ValidationMessage(path + ("requirement_flow",), "must be an object"),
                 )
             else:
                 _disallow_extra_keys(
@@ -481,8 +481,8 @@ class RevisionBlockValidator:
                     if not isinstance(value, list):
                         messages.append(
                             ValidationMessage(
-                                path + ("requirement_flow", key), "must be an array"
-                            )
+                                path + ("requirement_flow", key), "must be an array",
+                            ),
                         )
                         continue
                     for idx, item in enumerate(value):
@@ -498,14 +498,14 @@ class RevisionBlockValidator:
         if section_changes is not None:
             if not isinstance(section_changes, list):
                 messages.append(
-                    ValidationMessage(path + ("section_changes",), "must be an array")
+                    ValidationMessage(path + ("section_changes",), "must be an array"),
                 )
             else:
                 for idx, change in enumerate(section_changes):
                     change_path = path + ("section_changes", idx)
                     if not isinstance(change, dict):
                         messages.append(
-                            ValidationMessage(change_path, "must be an object")
+                            ValidationMessage(change_path, "must be an object"),
                         )
                         continue
                     _disallow_extra_keys(
@@ -520,8 +520,8 @@ class RevisionBlockValidator:
                     if not isinstance(change.get("section"), str):
                         messages.append(
                             ValidationMessage(
-                                change_path + ("section",), "must be a string"
-                            )
+                                change_path + ("section",), "must be a string",
+                            ),
                         )
 
                     allowed = {"added", "removed", "modified", "renamed"}
@@ -537,8 +537,8 @@ class RevisionBlockValidator:
                         if field in change and not isinstance(change[field], str):
                             messages.append(
                                 ValidationMessage(
-                                    change_path + (field,), "must be a string"
-                                )
+                                    change_path + (field,), "must be a string",
+                                ),
                             )
 
     def _validate_requirement(
@@ -546,7 +546,7 @@ class RevisionBlockValidator:
         requirement: Any,
         messages: list[ValidationMessage],
         *,
-        path: Tuple[Any, ...],
+        path: tuple[Any, ...],
     ) -> None:
         if not isinstance(requirement, dict):
             messages.append(ValidationMessage(path, "must be an object"))
@@ -579,23 +579,23 @@ class RevisionBlockValidator:
         ):
             messages.append(
                 ValidationMessage(
-                    path + ("requirement_id",), "must be a requirement identifier"
-                )
+                    path + ("requirement_id",), "must be a requirement identifier",
+                ),
             )
 
         kind = requirement.get("kind")
         if kind not in {"functional", "non-functional"}:
             messages.append(
                 ValidationMessage(
-                    path + ("kind",), "must be functional or non-functional"
-                )
+                    path + ("kind",), "must be functional or non-functional",
+                ),
             )
 
         action = requirement.get("action")
         if action not in {"introduce", "modify", "move", "retire"}:
             messages.append(
                 ValidationMessage(
-                    path + ("action",), "must be one of introduce/modify/move/retire"
+                    path + ("action",), "must be one of introduce/modify/move/retire",
                 ),
             )
 
@@ -610,75 +610,74 @@ class RevisionBlockValidator:
             if origin_required:
                 messages.append(
                     ValidationMessage(
-                        path + ("origin",), "is required when action is move"
-                    )
+                        path + ("origin",), "is required when action is move",
+                    ),
                 )
+        elif not isinstance(origin, list):
+            messages.append(
+                ValidationMessage(path + ("origin",), "must be an array"),
+            )
         else:
-            if not isinstance(origin, list):
-                messages.append(
-                    ValidationMessage(path + ("origin",), "must be an array")
-                )
-            else:
-                for idx, item in enumerate(origin):
-                    origin_path = path + ("origin", idx)
-                    if not isinstance(item, dict):
-                        messages.append(
-                            ValidationMessage(origin_path, "must be an object")
-                        )
-                        continue
-                    _disallow_extra_keys(
-                        item,
-                        ("kind", "ref", "notes"),
-                        origin_path,
-                        messages,
+            for idx, item in enumerate(origin):
+                origin_path = path + ("origin", idx)
+                if not isinstance(item, dict):
+                    messages.append(
+                        ValidationMessage(origin_path, "must be an object"),
                     )
-                    self._require_key(item, "kind", messages, path=origin_path)
-                    self._require_key(item, "ref", messages, path=origin_path)
+                    continue
+                _disallow_extra_keys(
+                    item,
+                    ("kind", "ref", "notes"),
+                    origin_path,
+                    messages,
+                )
+                self._require_key(item, "kind", messages, path=origin_path)
+                self._require_key(item, "ref", messages, path=origin_path)
 
-                    kind_value = item.get("kind")
-                    if kind_value not in {"spec", "requirement", "backlog", "external"}:
+                kind_value = item.get("kind")
+                if kind_value not in {"spec", "requirement", "backlog", "external"}:
+                    messages.append(
+                        ValidationMessage(
+                            origin_path + ("kind",),
+                            "must be one of spec/requirement/backlog/external",
+                        ),
+                    )
+                ref_value = item.get("ref")
+                if not isinstance(ref_value, str):
+                    messages.append(
+                        ValidationMessage(
+                            origin_path + ("ref",), "must be a string",
+                        ),
+                    )
+                else:
+                    if kind_value == "requirement" and not _is_requirement_id(
+                        ref_value,
+                    ):
                         messages.append(
                             ValidationMessage(
-                                origin_path + ("kind",),
-                                "must be one of spec/requirement/backlog/external",
+                                origin_path + ("ref",),
+                                "must be a requirement identifier",
                             ),
                         )
-                    ref_value = item.get("ref")
-                    if not isinstance(ref_value, str):
+                    if kind_value == "spec" and not _is_spec_id(ref_value):
                         messages.append(
                             ValidationMessage(
-                                origin_path + ("ref",), "must be a string"
-                            )
+                                origin_path + ("ref",), "must be a SPEC identifier",
+                            ),
                         )
-                    else:
-                        if kind_value == "requirement" and not _is_requirement_id(
-                            ref_value
-                        ):
-                            messages.append(
-                                ValidationMessage(
-                                    origin_path + ("ref",),
-                                    "must be a requirement identifier",
-                                ),
-                            )
-                        if kind_value == "spec" and not _is_spec_id(ref_value):
-                            messages.append(
-                                ValidationMessage(
-                                    origin_path + ("ref",), "must be a SPEC identifier"
-                                )
-                            )
-                        if kind_value == "backlog" and not _is_backlog_id(ref_value):
-                            messages.append(
-                                ValidationMessage(
-                                    origin_path + ("ref",),
-                                    "should look like BACKLOG-ID",
-                                )
-                            )
-                    if "notes" in item and not isinstance(item["notes"], str):
+                    if kind_value == "backlog" and not _is_backlog_id(ref_value):
                         messages.append(
                             ValidationMessage(
-                                origin_path + ("notes",), "must be a string"
-                            )
+                                origin_path + ("ref",),
+                                "should look like BACKLOG-ID",
+                            ),
                         )
+                if "notes" in item and not isinstance(item["notes"], str):
+                    messages.append(
+                        ValidationMessage(
+                            origin_path + ("notes",), "must be a string",
+                        ),
+                    )
 
         destination = requirement.get("destination")
         if destination is None:
@@ -689,70 +688,69 @@ class RevisionBlockValidator:
                         "is required when action is introduce/modify/move",
                     ),
                 )
+        elif not isinstance(destination, dict):
+            messages.append(
+                ValidationMessage(path + ("destination",), "must be an object"),
+            )
         else:
-            if not isinstance(destination, dict):
+            _disallow_extra_keys(
+                destination,
+                ("spec", "requirement_id", "path", "additional_specs"),
+                path + ("destination",),
+                messages,
+            )
+            self._require_key(
+                destination, "spec", messages, path=path + ("destination",),
+            )
+            spec_value = destination.get("spec")
+            if spec_value is not None and (
+                not isinstance(spec_value, str) or not _is_spec_id(spec_value)
+            ):
                 messages.append(
-                    ValidationMessage(path + ("destination",), "must be an object")
+                    ValidationMessage(
+                        path + ("destination", "spec"), "must be a SPEC identifier",
+                    ),
                 )
-            else:
-                _disallow_extra_keys(
-                    destination,
-                    ("spec", "requirement_id", "path", "additional_specs"),
-                    path + ("destination",),
-                    messages,
+            req_value = destination.get("requirement_id")
+            if req_value is not None and (
+                not isinstance(req_value, str) or not _is_requirement_id(req_value)
+            ):
+                messages.append(
+                    ValidationMessage(
+                        path + ("destination", "requirement_id"),
+                        "must be a requirement identifier",
+                    ),
                 )
-                self._require_key(
-                    destination, "spec", messages, path=path + ("destination",)
+            if "path" in destination and not isinstance(destination["path"], str):
+                messages.append(
+                    ValidationMessage(
+                        path + ("destination", "path"), "must be a string",
+                    ),
                 )
-                spec_value = destination.get("spec")
-                if spec_value is not None and (
-                    not isinstance(spec_value, str) or not _is_spec_id(spec_value)
-                ):
+            additional = destination.get("additional_specs")
+            if additional is not None:
+                if not isinstance(additional, list):
                     messages.append(
                         ValidationMessage(
-                            path + ("destination", "spec"), "must be a SPEC identifier"
-                        )
-                    )
-                req_value = destination.get("requirement_id")
-                if req_value is not None and (
-                    not isinstance(req_value, str) or not _is_requirement_id(req_value)
-                ):
-                    messages.append(
-                        ValidationMessage(
-                            path + ("destination", "requirement_id"),
-                            "must be a requirement identifier",
+                            path + ("destination", "additional_specs"),
+                            "must be an array",
                         ),
                     )
-                if "path" in destination and not isinstance(destination["path"], str):
-                    messages.append(
-                        ValidationMessage(
-                            path + ("destination", "path"), "must be a string"
-                        )
-                    )
-                additional = destination.get("additional_specs")
-                if additional is not None:
-                    if not isinstance(additional, list):
-                        messages.append(
-                            ValidationMessage(
-                                path + ("destination", "additional_specs"),
-                                "must be an array",
-                            ),
-                        )
-                    else:
-                        for idx, spec in enumerate(additional):
-                            if not isinstance(spec, str) or not _is_spec_id(spec):
-                                messages.append(
-                                    ValidationMessage(
-                                        path + ("destination", "additional_specs", idx),
-                                        "must be a SPEC identifier",
-                                    ),
-                                )
+                else:
+                    for idx, spec in enumerate(additional):
+                        if not isinstance(spec, str) or not _is_spec_id(spec):
+                            messages.append(
+                                ValidationMessage(
+                                    path + ("destination", "additional_specs", idx),
+                                    "must be a SPEC identifier",
+                                ),
+                            )
 
         lifecycle = requirement.get("lifecycle")
         if lifecycle is not None:
             if not isinstance(lifecycle, dict):
                 messages.append(
-                    ValidationMessage(path + ("lifecycle",), "must be an object")
+                    ValidationMessage(path + ("lifecycle",), "must be an object"),
                 )
             else:
                 _disallow_extra_keys(
@@ -803,7 +801,7 @@ class RevisionBlockValidator:
                     if not isinstance(verified_by, list):
                         messages.append(
                             ValidationMessage(
-                                path + ("lifecycle", "verified_by"), "must be an array"
+                                path + ("lifecycle", "verified_by"), "must be an array",
                             ),
                         )
                     else:
@@ -820,7 +818,7 @@ class RevisionBlockValidator:
         if text_changes is not None:
             if not isinstance(text_changes, dict):
                 messages.append(
-                    ValidationMessage(path + ("text_changes",), "must be an object")
+                    ValidationMessage(path + ("text_changes",), "must be an object"),
                 )
             else:
                 _disallow_extra_keys(
@@ -831,17 +829,17 @@ class RevisionBlockValidator:
                 )
                 for field in ("before_excerpt", "after_excerpt", "diff_ref"):
                     if field in text_changes and not isinstance(
-                        text_changes[field], str
+                        text_changes[field], str,
                     ):
                         messages.append(
                             ValidationMessage(
-                                path + ("text_changes", field), "must be a string"
-                            )
+                                path + ("text_changes", field), "must be a string",
+                            ),
                         )
 
 
 def extract_revision_blocks(
-    markdown: str, *, source: Path | None = None
+    markdown: str, *, source: Path | None = None,
 ) -> list[RevisionChangeBlock]:
     lines = markdown.splitlines(keepends=True)
     blocks: list[RevisionChangeBlock] = []
@@ -863,7 +861,7 @@ def extract_revision_blocks(
         info_parts = info.split()
         language = info_parts[0]
         marker = next(
-            (part for part in info_parts[1:] if part.startswith("supekku:")), ""
+            (part for part in info_parts[1:] if part.startswith("supekku:")), "",
         )
         if language not in {"yaml", "yml"} or marker != REVISION_BLOCK_MARKER:
             idx += 1
@@ -908,11 +906,11 @@ def load_revision_blocks(path: Path) -> list[RevisionChangeBlock]:
 
 
 __all__ = [
-    "RevisionChangeBlock",
-    "RevisionBlockValidator",
-    "ValidationMessage",
     "REVISION_BLOCK_JSON_SCHEMA",
     "REVISION_BLOCK_MARKER",
+    "RevisionBlockValidator",
+    "RevisionChangeBlock",
+    "ValidationMessage",
     "extract_revision_blocks",
     "load_revision_blocks",
 ]

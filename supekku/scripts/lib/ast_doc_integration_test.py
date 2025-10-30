@@ -1,5 +1,4 @@
-"""
-Integration tests for AST documentation generation justfile commands.
+"""Integration tests for AST documentation generation justfile commands.
 
 Tests the actual justfile commands and end-to-end workflow including
 file I/O, command line argument parsing, and real documentation generation.
@@ -46,7 +45,7 @@ class JustfileIntegrationTest(unittest.TestCase):
         os.chdir(self.original_cwd)
 
     def _run_ast_generator(
-        self, doc_type: str, check: bool = False
+        self, doc_type: str, check: bool = False,
     ) -> subprocess.CompletedProcess:
         """Run the AST generator script with given parameters."""
         # Change to the project root directory where the script is located
@@ -255,7 +254,7 @@ CONSTANT_VALUE = 42
             result = subprocess.run(cmd, capture_output=True, text=True, check=False)
 
             self.assertEqual(
-                result.returncode, 0, f"Failed for type {doc_type}: {result.stderr}"
+                result.returncode, 0, f"Failed for type {doc_type}: {result.stderr}",
             )
 
             # Check that appropriate status messages are shown

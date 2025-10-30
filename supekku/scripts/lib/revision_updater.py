@@ -25,8 +25,7 @@ def update_requirement_lifecycle_status(
     block_index: int,
     requirement_index: int,
 ) -> bool:
-    """
-    Update lifecycle.status for a requirement in a revision block.
+    """Update lifecycle.status for a requirement in a revision block.
 
     Uses RevisionChangeBlock utilities for safe YAML updates.
     Validates schema before and after modification.
@@ -43,11 +42,12 @@ def update_requirement_lifecycle_status(
 
     Raises:
         RevisionUpdateError: If update fails validation or I/O error
+
     """
     # Validate status value
     if new_status not in VALID_STATUSES:
         raise ValueError(
-            f"Invalid status {new_status!r}; must be one of {sorted(VALID_STATUSES)}"
+            f"Invalid status {new_status!r}; must be one of {sorted(VALID_STATUSES)}",
         )
 
     # Read file content
@@ -61,12 +61,12 @@ def update_requirement_lifecycle_status(
         blocks = load_revision_blocks(revision_file)
     except ValueError as exc:
         raise RevisionUpdateError(
-            f"Failed to parse revision blocks in {revision_file}: {exc}"
+            f"Failed to parse revision blocks in {revision_file}: {exc}",
         ) from exc
 
     if block_index >= len(blocks):
         raise RevisionUpdateError(
-            f"Block index {block_index} out of range (file has {len(blocks)} blocks)"
+            f"Block index {block_index} out of range (file has {len(blocks)} blocks)",
         )
 
     block = blocks[block_index]
@@ -76,7 +76,7 @@ def update_requirement_lifecycle_status(
         data = block.parse()
     except ValueError as exc:
         raise RevisionUpdateError(
-            f"Failed to parse block {block_index} YAML: {exc}"
+            f"Failed to parse block {block_index} YAML: {exc}",
         ) from exc
 
     # Navigate to requirement
@@ -87,13 +87,13 @@ def update_requirement_lifecycle_status(
     if requirement_index >= len(requirements):
         raise RevisionUpdateError(
             f"Requirement index {requirement_index} out of range "
-            f"(block has {len(requirements)} requirements)"
+            f"(block has {len(requirements)} requirements)",
         )
 
     requirement = requirements[requirement_index]
     if not isinstance(requirement, dict):
         raise RevisionUpdateError(
-            f"Requirement {requirement_index} in block {block_index} is not a dict"
+            f"Requirement {requirement_index} in block {block_index} is not a dict",
         )
 
     # Validate requirement ID matches
@@ -101,7 +101,7 @@ def update_requirement_lifecycle_status(
     if actual_req_id != requirement_id:
         raise RevisionUpdateError(
             f"Requirement ID mismatch: expected {requirement_id!r}, "
-            f"found {actual_req_id!r}"
+            f"found {actual_req_id!r}",
         )
 
     # Check if update needed
@@ -127,7 +127,7 @@ def update_requirement_lifecycle_status(
             f"{err.render_path()}: {err.message}" for err in validation_errors
         ]
         raise RevisionUpdateError(
-            "Updated block failed validation:\n" + "\n".join(error_msgs)
+            "Updated block failed validation:\n" + "\n".join(error_msgs),
         )
 
     # Format and replace YAML
@@ -149,8 +149,7 @@ def update_requirement_lifecycle_status(
 def update_multiple_requirements(
     updates: dict[Path, list[tuple[int, int, str, str]]],
 ) -> dict[Path, bool]:
-    """
-    Batch update multiple requirements across revision files.
+    """Batch update multiple requirements across revision files.
 
     Each file is updated atomically (all updates succeed or file is unchanged).
 
@@ -162,6 +161,7 @@ def update_multiple_requirements(
 
     Raises:
         RevisionUpdateError: If any update fails
+
     """
     results: dict[Path, bool] = {}
 
@@ -186,6 +186,6 @@ def update_multiple_requirements(
 
 __all__ = [
     "RevisionUpdateError",
-    "update_requirement_lifecycle_status",
     "update_multiple_requirements",
+    "update_requirement_lifecycle_status",
 ]

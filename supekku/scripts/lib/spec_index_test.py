@@ -90,7 +90,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
         """Test rebuild creates slug-based symlinks."""
         # Create a spec with slug
         self._create_spec_with_frontmatter(
-            "SPEC-001", {"slug": "test-authentication", "packages": ["cmd/auth"]}
+            "SPEC-001", {"slug": "test-authentication", "packages": ["cmd/auth"]},
         )
 
         self.builder.rebuild()
@@ -147,7 +147,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
                                 "path": "contracts/go/cmd-internal.md",
                             },
                         ],
-                    }
+                    },
                 ],
             },
         )
@@ -182,7 +182,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
                                 "path": "contracts/python/sync-engine-implementation.md",
                             },
                         ],
-                    }
+                    },
                 ],
             },
         )
@@ -196,7 +196,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
         self.assertTrue(python_sync_link.exists())
         self.assertTrue(python_sync_link.is_symlink())
         self.assertEqual(
-            python_sync_link.readlink(), Path("../../../../../../SPEC-004")
+            python_sync_link.readlink(), Path("../../../../../../SPEC-004"),
         )
 
     def test_rebuild_with_mixed_language_sources(self):
@@ -212,14 +212,14 @@ class TestSpecIndexBuilder(unittest.TestCase):
                         "language": "go",
                         "identifier": "internal/multi",
                         "variants": [
-                            {"name": "public", "path": "contracts/go/multi-public.md"}
+                            {"name": "public", "path": "contracts/go/multi-public.md"},
                         ],
                     },
                     {
                         "language": "python",
                         "identifier": "multi_module.py",
                         "variants": [
-                            {"name": "api", "path": "contracts/python/multi-api.md"}
+                            {"name": "api", "path": "contracts/python/multi-api.md"},
                         ],
                     },
                 ],
@@ -257,21 +257,21 @@ class TestSpecIndexBuilder(unittest.TestCase):
                         "language": "go",
                         # Missing identifier
                         "variants": [
-                            {"name": "public", "path": "contracts/go/test.md"}
+                            {"name": "public", "path": "contracts/go/test.md"},
                         ],
                     },
                     {
                         # Missing language
                         "identifier": "some/module",
                         "variants": [
-                            {"name": "api", "path": "contracts/python/test.md"}
+                            {"name": "api", "path": "contracts/python/test.md"},
                         ],
                     },
                     {
                         "language": "python",
                         "identifier": "valid_module.py",
                         "variants": [
-                            {"name": "api", "path": "contracts/python/valid.md"}
+                            {"name": "api", "path": "contracts/python/valid.md"},
                         ],
                     },
                 ],
@@ -302,7 +302,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
                         "language": "go",
                         "identifier": "old/package",
                         "variants": [{"name": "public", "path": "contracts/go/old.md"}],
-                    }
+                    },
                 ],
             },
         )
@@ -325,7 +325,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
                         "language": "go",
                         "identifier": "new/package",
                         "variants": [{"name": "public", "path": "contracts/go/new.md"}],
-                    }
+                    },
                 ],
             },
         )
@@ -354,9 +354,9 @@ class TestSpecIndexBuilder(unittest.TestCase):
                         "language": "go",
                         "identifier": "internal/application/services/authentication/oauth",
                         "variants": [
-                            {"name": "public", "path": "contracts/go/oauth.md"}
+                            {"name": "public", "path": "contracts/go/oauth.md"},
                         ],
-                    }
+                    },
                 ],
             },
         )
@@ -374,7 +374,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
         # Verify parent directories exist
         self.assertTrue(
-            (self.builder.language_dir / "go/internal/application/services").exists()
+            (self.builder.language_dir / "go/internal/application/services").exists(),
         )
 
     def test_rebuild_handles_missing_spec_files(self):
@@ -397,7 +397,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
         spec_dir.mkdir()
         spec_file = spec_dir / "SPEC-010.md"
         spec_file.write_text(
-            "---\ninvalid: yaml: [\n---\n\n# SPEC-010\n\nMalformed spec."
+            "---\ninvalid: yaml: [\n---\n\n# SPEC-010\n\nMalformed spec.",
         )
 
         # Capture warning output
@@ -433,7 +433,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
     def test_read_frontmatter_valid_yaml(self):
         """Test _read_frontmatter with valid YAML."""
         spec_file = self._create_spec_with_frontmatter(
-            "SPEC-TEST", {"slug": "test", "packages": ["test/pkg"]}
+            "SPEC-TEST", {"slug": "test", "packages": ["test/pkg"]},
         )
 
         frontmatter = self.builder._read_frontmatter(spec_file)

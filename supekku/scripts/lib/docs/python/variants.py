@@ -1,7 +1,6 @@
 """Variant coordination for different documentation types."""
 
 from pathlib import Path
-from typing import Dict, List
 
 from .models import VariantSpec, VariantType
 
@@ -10,7 +9,7 @@ class VariantCoordinator:
     """Coordinates different documentation variants (PUBLIC, ALL, TESTS)."""
 
     # Predefined variant presets
-    PRESETS: Dict[str, VariantSpec] = {
+    PRESETS: dict[str, VariantSpec] = {
         "public": VariantSpec.public(),
         "all": VariantSpec.all_symbols(),
         "tests": VariantSpec.tests(),
@@ -21,12 +20,12 @@ class VariantCoordinator:
         """Get a predefined variant preset by name."""
         if name not in cls.PRESETS:
             raise ValueError(
-                f"Unknown variant preset: {name}. Available: {list(cls.PRESETS.keys())}"
+                f"Unknown variant preset: {name}. Available: {list(cls.PRESETS.keys())}",
             )
         return cls.PRESETS[name]
 
     @classmethod
-    def get_files_for_variant(cls, path: Path, variant_spec: VariantSpec) -> List[Path]:
+    def get_files_for_variant(cls, path: Path, variant_spec: VariantSpec) -> list[Path]:
         """Get list of files to process for a given variant."""
         if path.is_file():
             return [path]
@@ -37,35 +36,33 @@ class VariantCoordinator:
         if variant_spec.variant_type == VariantType.TESTS:
             # For tests variant, only include test files
             return sorted(
-                [f for f in path.rglob("*.py") if f.name.endswith("_test.py")]
+                [f for f in path.rglob("*.py") if f.name.endswith("_test.py")],
             )
-        else:
-            # For public/all variants, exclude test files and __init__.py
-            return sorted(
-                [
-                    f
-                    for f in path.rglob("*.py")
-                    if not f.name.endswith("_test.py") and f.name != "__init__.py"
-                ]
-            )
+        # For public/all variants, exclude test files and __init__.py
+        return sorted(
+            [
+                f
+                for f in path.rglob("*.py")
+                if not f.name.endswith("_test.py") and f.name != "__init__.py"
+            ],
+        )
 
     @classmethod
     def should_include_symbol(
-        cls, symbol_info: Dict, variant_spec: VariantSpec
+        cls, symbol_info: dict, variant_spec: VariantSpec,
     ) -> bool:
         """Determine if a symbol should be included based on variant rules."""
         is_private = symbol_info.get("is_private", False)
 
         if variant_spec.variant_type == VariantType.PUBLIC:
             return not is_private
-        else:
-            # ALL and TESTS variants include private symbols
-            return True
+        # ALL and TESTS variants include private symbols
+        return True
 
     @classmethod
     def filter_analysis_for_variant(
-        cls, analysis: Dict, variant_spec: VariantSpec
-    ) -> Dict:
+        cls, analysis: dict, variant_spec: VariantSpec,
+    ) -> dict:
         """Filter analysis results based on variant specification."""
         if "error" in analysis:
             return analysis

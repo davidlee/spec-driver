@@ -14,7 +14,6 @@ import argparse
 import sys
 from datetime import date
 from pathlib import Path
-from typing import List
 
 ROOT = Path(__file__).resolve().parents[2]
 TECH_DIR = ROOT / "specify" / "tech"
@@ -91,7 +90,7 @@ class MultiLanguageSpecManager:
         return highest + 1
 
     def _create_spec_directory_and_file(
-        self, spec_id: str, source_unit, descriptor
+        self, spec_id: str, source_unit, descriptor,
     ) -> Path:
         """Create spec directory and markdown file."""
         spec_dir = self.tech_dir / spec_id
@@ -131,7 +130,7 @@ class MultiLanguageSpecManager:
     def _update_registry(self, source_unit, spec_id: str) -> None:
         """Update the registry with new mapping."""
         self.registry_v2.add_source_unit(
-            source_unit.language, source_unit.identifier, spec_id
+            source_unit.language, source_unit.identifier, spec_id,
         )
         self.registry_v2.save_to_file(self.registry_path)
 
@@ -170,7 +169,7 @@ class MultiLanguageSpecManager:
                 dump_markdown_file(spec_file, frontmatter, body)
 
     def process_source_unit(
-        self, source_unit, adapter, check_mode: bool = False, dry_run: bool = False
+        self, source_unit, adapter, check_mode: bool = False, dry_run: bool = False,
     ) -> dict:
         """Process a single source unit - create spec, update registry, generate docs."""
         result = {
@@ -191,7 +190,7 @@ class MultiLanguageSpecManager:
 
             # Check if already in registry
             spec_id = self.registry_v2.get_spec_id(
-                source_unit.language, source_unit.identifier
+                source_unit.language, source_unit.identifier,
             )
 
             # Create new spec if needed
@@ -213,7 +212,7 @@ class MultiLanguageSpecManager:
                 else:
                     # Create spec directory and file
                     spec_file = self._create_spec_directory_and_file(
-                        spec_id, source_unit, descriptor
+                        spec_id, source_unit, descriptor,
                     )
 
                     # Update registry
@@ -236,7 +235,7 @@ class MultiLanguageSpecManager:
 
                 # Generate documentation
                 doc_variants = adapter.generate(
-                    source_unit, spec_dir=spec_dir, check=check_mode
+                    source_unit, spec_dir=spec_dir, check=check_mode,
                 )
                 result["doc_variants"] = doc_variants
             else:
@@ -266,9 +265,8 @@ class MultiLanguageSpecManager:
         self.registry_v2.save_to_file(self.registry_path)
 
 
-def parse_language_targets(targets: List[str]) -> dict[str, List[str]]:
-    """
-    Parse language-prefixed targets into language-specific lists.
+def parse_language_targets(targets: list[str]) -> dict[str, list[str]]:
+    """Parse language-prefixed targets into language-specific lists.
 
     Args:
         targets: List of targets, optionally prefixed with language
@@ -276,6 +274,7 @@ def parse_language_targets(targets: List[str]) -> dict[str, List[str]]:
 
     Returns:
         Dictionary mapping language to list of identifiers
+
     """
     language_targets = {}
 
@@ -299,7 +298,7 @@ def parse_language_targets(targets: List[str]) -> dict[str, List[str]]:
 def main() -> None:
     """Main entry point for multi-language spec synchronization."""
     parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
     # Language selection
@@ -375,7 +374,7 @@ def main() -> None:
     # Handle legacy packages argument (maps to Go targets)
     if args.packages:
         print(
-            "Note: Using legacy 'packages' argument - consider using --targets go:package"
+            "Note: Using legacy 'packages' argument - consider using --targets go:package",
         )
         targets_by_language["go"] = args.packages
 
@@ -458,7 +457,7 @@ def main() -> None:
             if language in spec_manager.registry_v2.languages:
                 for identifier in spec_manager.registry_v2.languages[language].keys():
                     source_units.append(
-                        SourceUnit(language=language, identifier=identifier, root=ROOT)
+                        SourceUnit(language=language, identifier=identifier, root=ROOT),
                     )
         else:
             print("Discovery mode: requested targets + auto-discovery")
@@ -479,7 +478,7 @@ def main() -> None:
             print(f"Processing {unit.identifier}...")
 
             result = spec_manager.process_source_unit(
-                unit, adapter, check_mode=args.check, dry_run=args.dry_run
+                unit, adapter, check_mode=args.check, dry_run=args.dry_run,
             )
 
             if result["processed"]:

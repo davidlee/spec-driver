@@ -54,7 +54,7 @@ class TestDecisionRecord(unittest.TestCase):
         assert result["updated"] == "2024-01-03"
         assert result["reviewed"] == "2024-01-04"
         assert result["authors"] == [
-            {"name": "Jane Doe", "contact": "jane@example.com"}
+            {"name": "Jane Doe", "contact": "jane@example.com"},
         ]
         assert result["owners"] == ["team-alpha"]
         assert result["supersedes"] == ["ADR-001"]
@@ -139,7 +139,7 @@ We decided to test.
             assert decision.created == date(2024, 1, 1)
             assert decision.updated == date(2024, 1, 2)
             assert decision.authors == [
-                {"name": "Jane Doe", "contact": "jane@example.com"}
+                {"name": "Jane Doe", "contact": "jane@example.com"},
             ]
             assert decision.tags == ["api", "security"]
             assert decision.summary == "A test decision"
@@ -529,7 +529,7 @@ status: accepted
 
             # Create decision record
             decision = DecisionRecord(
-                id="ADR-001", title="Test", status="accepted", path=str(adr)
+                id="ADR-001", title="Test", status="accepted", path=str(adr),
             )
 
             registry = DecisionRegistry(root=root)

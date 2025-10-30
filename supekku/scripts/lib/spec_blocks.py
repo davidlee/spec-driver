@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-import re
 
 import yaml
 
@@ -26,13 +26,13 @@ class RelationshipsBlockValidator:
     """Validator for specification relationships blocks."""
 
     def validate(
-        self, block: RelationshipsBlock, *, spec_id: str | None = None
+        self, block: RelationshipsBlock, *, spec_id: str | None = None,
     ) -> list[str]:
         errors: list[str] = []
         data = block.data
         if data.get("schema") != RELATIONSHIPS_SCHEMA:
             errors.append(
-                "relationships block must declare schema supekku.spec.relationships"
+                "relationships block must declare schema supekku.spec.relationships",
             )
         if data.get("version") != RELATIONSHIPS_VERSION:
             errors.append("relationships block must declare version 1")
@@ -42,7 +42,7 @@ class RelationshipsBlockValidator:
             errors.append("relationships block missing spec id")
         elif spec_id and spec_value != spec_id:
             errors.append(
-                f"relationships block spec {spec_value} does not match expected {spec_id}"
+                f"relationships block spec {spec_value} does not match expected {spec_id}",
             )
 
         requirements = data.get("requirements")
@@ -77,7 +77,7 @@ class RelationshipsBlockValidator:
 
 
 _RELATIONSHIPS_PATTERN = re.compile(
-    r"```(?:yaml|yml)\s+" + re.escape(RELATIONSHIPS_MARKER) + r"\n(.*?)```", re.DOTALL
+    r"```(?:yaml|yml)\s+" + re.escape(RELATIONSHIPS_MARKER) + r"\n(.*?)```", re.DOTALL,
 )
 
 
@@ -101,9 +101,9 @@ def load_relationships_from_file(path: Path) -> RelationshipsBlock | None:
 
 
 __all__ = [
+    "RELATIONSHIPS_MARKER",
     "RelationshipsBlock",
     "RelationshipsBlockValidator",
     "extract_relationships",
     "load_relationships_from_file",
-    "RELATIONSHIPS_MARKER",
 ]

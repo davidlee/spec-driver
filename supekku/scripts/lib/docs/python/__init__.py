@@ -1,13 +1,13 @@
-"""
-Python documentation generation API.
+"""Python documentation generation API.
 
 This package provides a clean API for generating documentation from Python AST,
 designed for integration with multi-language specification sync adapters.
 """
 
 import hashlib
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable, List, Optional
+from typing import List, Optional
 
 from .analyzer import DeterministicPythonModuleAnalyzer
 from .cache import ParseCache
@@ -29,7 +29,7 @@ def check_file_status(output_file: Path, new_content: str) -> str:
     if not output_file.exists():
         return "created"
 
-    with open(output_file, "r", encoding="utf-8") as f:
+    with open(output_file, encoding="utf-8") as f:
         existing_content = f.read()
 
     existing_hash = calculate_content_hash(existing_content)
@@ -54,11 +54,10 @@ def generate_docs(
     *,
     check: bool = False,
     output_root: Path,
-    cache_dir: Optional[Path] = None,
-    base_path: Optional[Path] = None,
-) -> List[DocResult]:
-    """
-    Generate documentation for Python code unit.
+    cache_dir: Path | None = None,
+    base_path: Path | None = None,
+) -> list[DocResult]:
+    """Generate documentation for Python code unit.
 
     Args:
       unit: Path to Python file or package directory
@@ -70,6 +69,7 @@ def generate_docs(
 
     Returns:
       List of DocResult objects with generation results and metadata
+
     """
     # Initialize cache
     cache = ParseCache(cache_dir) if cache_dir else ParseCache()
@@ -84,7 +84,7 @@ def generate_docs(
         # Get files to process for this variant
         try:
             files_to_process = VariantCoordinator.get_files_for_variant(
-                unit, variant_spec
+                unit, variant_spec,
             )
         except FileNotFoundError as e:
             results.append(
@@ -95,13 +95,13 @@ def generate_docs(
                     status="error",
                     module_identifier="",
                     error_message=str(e),
-                )
+                ),
             )
             continue
 
         # Sort files for deterministic processing order
         files_to_process.sort(
-            key=lambda p: PathNormalizer.normalize_path_for_id(p, base_path)
+            key=lambda p: PathNormalizer.normalize_path_for_id(p, base_path),
         )
 
         # Process each file for this variant
@@ -109,7 +109,7 @@ def generate_docs(
             try:
                 # Analyze file
                 analyzer = DeterministicPythonModuleAnalyzer(
-                    file_path, base_path, cache
+                    file_path, base_path, cache,
                 )
                 analysis = analyzer.analyze()
 
@@ -121,26 +121,26 @@ def generate_docs(
                             hash="",
                             status="error",
                             module_identifier=PathNormalizer.get_module_name(
-                                file_path, base_path
+                                file_path, base_path,
                             ),
                             error_message=analysis["error"],
-                        )
+                        ),
                     )
                     continue
 
                 # Filter analysis for variant
                 filtered_analysis = VariantCoordinator.filter_analysis_for_variant(
-                    analysis, variant_spec
+                    analysis, variant_spec,
                 )
 
                 # Generate markdown
                 markdown = generate_deterministic_markdown_spec(
-                    filtered_analysis, variant_spec.variant_type.value
+                    filtered_analysis, variant_spec.variant_type.value,
                 )
 
                 # Calculate output path
                 output_filename = PathNormalizer.get_output_filename(
-                    file_path, variant_spec.variant_type.value, base_path
+                    file_path, variant_spec.variant_type.value, base_path,
                 )
                 output_file = output_root / output_filename
 
@@ -166,7 +166,7 @@ def generate_docs(
                         hash=content_hash,
                         status=status,
                         module_identifier=module_identifier,
-                    )
+                    ),
                 )
 
             except Exception as e:
@@ -177,10 +177,10 @@ def generate_docs(
                         hash="",
                         status="error",
                         module_identifier=PathNormalizer.get_module_name(
-                            file_path, base_path
+                            file_path, base_path,
                         ),
                         error_message=str(e),
-                    )
+                    ),
                 )
 
     return results
@@ -188,10 +188,10 @@ def generate_docs(
 
 # Export main API components
 __all__ = [
-    "generate_docs",
     "DocResult",
-    "VariantSpec",
-    "VariantCoordinator",
-    "PathNormalizer",
     "ParseCache",
+    "PathNormalizer",
+    "VariantCoordinator",
+    "VariantSpec",
+    "generate_docs",
 ]

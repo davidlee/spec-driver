@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Iterator
 
 from .revision_blocks import load_revision_blocks
 from .spec_utils import load_markdown_file
@@ -38,8 +38,7 @@ def find_requirement_sources(
     requirement_ids: list[str],
     revision_dirs: Iterable[Path],
 ) -> dict[str, RequirementSource]:
-    """
-    Find source locations for requirements in revision files.
+    """Find source locations for requirements in revision files.
 
     Scans all revision files in the given directories and locates
     requirements in their YAML blocks.
@@ -51,6 +50,7 @@ def find_requirement_sources(
     Returns:
         Mapping of requirement_id -> RequirementSource for found requirements.
         Only includes requirements found in revision blocks.
+
     """
     requirement_set = set(requirement_ids)
     sources: dict[str, RequirementSource] = {}

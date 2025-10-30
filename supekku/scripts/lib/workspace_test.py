@@ -33,7 +33,7 @@ class WorkspaceTest(RepoTestCase):
             "kind": "spec",
         }
         dump_markdown_file(
-            spec_path, frontmatter, "# Spec\n- FR-200: Sample requirement\n"
+            spec_path, frontmatter, "# Spec\n- FR-200: Sample requirement\n",
         )
 
     def test_workspace_loads_specs_and_syncs_requirements(self) -> None:

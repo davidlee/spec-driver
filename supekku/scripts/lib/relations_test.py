@@ -63,7 +63,7 @@ class RelationsTest(RepoTestCase):
         spec_path = self._make_spec()
         add_relation(spec_path, relation_type="implements", target="FR-001")
         removed = remove_relation(
-            spec_path, relation_type="implements", target="FR-001"
+            spec_path, relation_type="implements", target="FR-001",
         )
         self.assertTrue(removed)
         self.assertEqual(list_relations(spec_path), [])
@@ -71,7 +71,7 @@ class RelationsTest(RepoTestCase):
     def test_remove_missing_relation_returns_false(self) -> None:
         spec_path = self._make_spec()
         removed = remove_relation(
-            spec_path, relation_type="implements", target="FR-999"
+            spec_path, relation_type="implements", target="FR-999",
         )
         self.assertFalse(removed)
 

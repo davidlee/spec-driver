@@ -1,6 +1,5 @@
 """Comment extraction from Python source code."""
 
-from typing import Dict, Optional
 
 
 class CommentExtractor:
@@ -10,7 +9,7 @@ class CommentExtractor:
         self.lines = source_code.splitlines()
         self.comments = self._extract_comments()
 
-    def _extract_comments(self) -> Dict[int, str]:
+    def _extract_comments(self) -> dict[int, str]:
         """Extract comments mapped by line number"""
         comments = {}
 
@@ -29,7 +28,7 @@ class CommentExtractor:
                         comments[i] = comment
         return comments
 
-    def _find_comment_start(self, line: str) -> Optional[int]:
+    def _find_comment_start(self, line: str) -> int | None:
         """Find the position of # that starts a comment (not inside quotes)"""
         in_single_quote = False
         in_double_quote = False
@@ -53,7 +52,7 @@ class CommentExtractor:
 
         return None
 
-    def get_comment_for_line(self, line_num: int, context: int = 2) -> Optional[str]:
+    def get_comment_for_line(self, line_num: int, context: int = 2) -> str | None:
         """Get comment for a specific line, checking nearby lines"""
         if line_num in self.comments:
             return self.comments[line_num]

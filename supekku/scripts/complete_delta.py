@@ -7,21 +7,20 @@ import argparse
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
-from supekku.scripts.lib.workspace import Workspace
+from supekku.scripts.lib.completion_revision import create_completion_revision
 from supekku.scripts.lib.lifecycle import STATUS_LIVE
 from supekku.scripts.lib.revision_discovery import find_requirement_sources
 from supekku.scripts.lib.revision_updater import (
     RevisionUpdateError,
     update_requirement_lifecycle_status,
 )
-from supekku.scripts.lib.completion_revision import create_completion_revision
+from supekku.scripts.lib.workspace import Workspace
 
 
 def run_spec_sync() -> bool:
@@ -59,10 +58,9 @@ def prompt_yes_no(question: str, default: bool = False) -> bool:
 
 
 def validate_delta_status(
-    delta_id: str, delta, force: bool, dry_run: bool
+    delta_id: str, delta, force: bool, dry_run: bool,
 ) -> tuple[bool, bool]:
-    """
-    Validate delta status is appropriate for completion.
+    """Validate delta status is appropriate for completion.
 
     Returns tuple of (should_continue, already_completed).
     """
@@ -82,8 +80,7 @@ def validate_delta_status(
 
 
 def collect_requirements_to_update(delta_id: str, delta, workspace):
-    """
-    Collect and validate requirements associated with the delta.
+    """Collect and validate requirements associated with the delta.
 
     Returns tuple of (requirements_to_update, error_occurred).
     """
@@ -101,7 +98,7 @@ def collect_requirements_to_update(delta_id: str, delta, workspace):
         req = requirements_registry.records.get(req_id)
         if not req:
             print(
-                f"Warning: Requirement {req_id} not found in registry", file=sys.stderr
+                f"Warning: Requirement {req_id} not found in registry", file=sys.stderr,
             )
             continue
         if req.status == "retired":
@@ -134,8 +131,7 @@ def display_preview(delta_id: str, delta, requirements_to_update, dry_run: bool)
 
 
 def prompt_spec_sync(skip_sync: bool, dry_run: bool, force: bool) -> bool:
-    """
-    Prompt for spec sync and optionally run it.
+    """Prompt for spec sync and optionally run it.
 
     Returns True if successful or skipped, False if sync failed.
     """
@@ -186,8 +182,7 @@ def display_dry_run_requirements(requirements_to_update, update_requirements: bo
 
 
 def update_delta_frontmatter(delta_path: Path, delta_id: str) -> bool:
-    """
-    Update delta status in frontmatter to 'completed'.
+    """Update delta status in frontmatter to 'completed'.
 
     Returns True if successful, False otherwise.
     """
@@ -217,7 +212,7 @@ def update_delta_frontmatter(delta_path: Path, delta_id: str) -> bool:
 
     if not status_updated:
         print(
-            f"Warning: Could not find 'status:' field in {delta_path}", file=sys.stderr
+            f"Warning: Could not find 'status:' field in {delta_path}", file=sys.stderr,
         )
         return False
 
@@ -228,7 +223,7 @@ def update_delta_frontmatter(delta_path: Path, delta_id: str) -> bool:
 
 
 def update_requirements_status(
-    requirements_to_update, requirements_registry, silent=False
+    requirements_to_update, requirements_registry, silent=False,
 ):
     """Update requirement statuses to live (registry only - ephemeral)."""
     for req_id, _req in requirements_to_update:
@@ -249,8 +244,7 @@ def update_requirements_in_revision_sources(
     dry_run: bool = False,
     force: bool = False,
 ) -> bool:
-    """
-    Update requirement lifecycle status in revision source files (persistent).
+    """Update requirement lifecycle status in revision source files (persistent).
 
     Returns True if successful, False on error.
     """
@@ -347,8 +341,7 @@ def handle_already_completed_delta(
     force: bool,
     update_requirements: bool,
 ) -> int:
-    """
-    Handle the case where delta is already completed.
+    """Handle the case where delta is already completed.
 
     Ensures requirements are in the correct state (idempotent operation).
     Returns exit code.
@@ -421,8 +414,7 @@ def complete_delta(
     skip_sync: bool = False,
     update_requirements: bool = True,
 ) -> int:
-    """
-    Complete a delta and transition requirements to live status.
+    """Complete a delta and transition requirements to live status.
 
     Args:
         delta_id: Delta identifier (e.g., DE-004)
@@ -436,6 +428,7 @@ def complete_delta(
 
     Returns:
         Exit code (0 for success, non-zero for errors)
+
     """
     workspace = Workspace.from_cwd()
 
@@ -453,14 +446,14 @@ def complete_delta(
 
     # Validate delta status
     should_continue, already_completed = validate_delta_status(
-        delta_id, delta, force, dry_run
+        delta_id, delta, force, dry_run,
     )
     if not should_continue:
         return 1
 
     # Collect requirements to update
     requirements_to_update, error = collect_requirements_to_update(
-        delta_id, delta, workspace
+        delta_id, delta, workspace,
     )
     if error:
         return 1
@@ -565,7 +558,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     """Main entry point."""
     parser = build_parser()
     args = parser.parse_args(argv)

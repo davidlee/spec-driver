@@ -1,24 +1,20 @@
-"""
-Go language adapter for specification synchronization.
+"""Go language adapter for specification synchronization.
 """
 
 from __future__ import annotations
 
 import hashlib
 import subprocess
+from collections.abc import Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar, List, Sequence
+from typing import ClassVar
 
 from ..models import DocVariant, SourceDescriptor, SourceUnit
 from .base import LanguageAdapter
 
-if TYPE_CHECKING:
-    pass
-
 
 class GoAdapter(LanguageAdapter):
-    """
-    Language adapter for Go packages using existing gomarkdoc workflow.
+    """Language adapter for Go packages using existing gomarkdoc workflow.
 
     Wraps the existing TechSpecSyncEngine logic to provide consistent interface
     with other language adapters while maintaining full backward compatibility.
@@ -30,9 +26,8 @@ class GoAdapter(LanguageAdapter):
         self,
         repo_root: Path,
         requested: Sequence[str] | None = None,
-    ) -> List[SourceUnit]:
-        """
-        Discover Go packages using `go list`.
+    ) -> list[SourceUnit]:
+        """Discover Go packages using `go list`.
 
         Args:
             repo_root: Root directory of the repository
@@ -40,6 +35,7 @@ class GoAdapter(LanguageAdapter):
 
         Returns:
             List of SourceUnit objects for Go packages
+
         """
         # Import at runtime to avoid circular imports
         from ...sync_engine import TechSpecSyncEngine
@@ -79,21 +75,21 @@ class GoAdapter(LanguageAdapter):
             if pkg_path.exists():
                 source_units.append(
                     SourceUnit(
-                        language=self.language, identifier=rel_pkg, root=repo_root
-                    )
+                        language=self.language, identifier=rel_pkg, root=repo_root,
+                    ),
                 )
 
         return source_units
 
     def describe(self, unit: SourceUnit) -> SourceDescriptor:
-        """
-        Describe how a Go package should be processed.
+        """Describe how a Go package should be processed.
 
         Args:
             unit: Go package source unit
 
         Returns:
             SourceDescriptor with Go-specific metadata
+
         """
         self._validate_unit_language(unit)
 
@@ -117,7 +113,7 @@ class GoAdapter(LanguageAdapter):
                             "path": "contracts/internals.md",
                         },
                     ],
-                }
+                },
             ],
         }
 
@@ -144,10 +140,9 @@ class GoAdapter(LanguageAdapter):
         )
 
     def generate(
-        self, unit: SourceUnit, *, spec_dir: Path, check: bool = False
-    ) -> List[DocVariant]:
-        """
-        Generate documentation for a Go package using gomarkdoc.
+        self, unit: SourceUnit, *, spec_dir: Path, check: bool = False,
+    ) -> list[DocVariant]:
+        """Generate documentation for a Go package using gomarkdoc.
 
         Args:
             unit: Go package source unit
@@ -156,6 +151,7 @@ class GoAdapter(LanguageAdapter):
 
         Returns:
             List of DocVariant objects with generation results
+
         """
         self._validate_unit_language(unit)
 
@@ -188,7 +184,7 @@ class GoAdapter(LanguageAdapter):
                         path=public_output.relative_to(spec_dir),
                         hash="",
                         status="created",  # Would be created
-                    )
+                    ),
                 )
             else:
                 # Generate or check public docs
@@ -216,10 +212,10 @@ class GoAdapter(LanguageAdapter):
                     existed_before = public_output.exists()
                     old_hash = None
                     if existed_before:
-                        with open(public_output, "r", encoding="utf-8") as f:
+                        with open(public_output, encoding="utf-8") as f:
                             old_content = f.read()
                         old_hash = hashlib.sha256(
-                            old_content.encode("utf-8")
+                            old_content.encode("utf-8"),
                         ).hexdigest()
 
                     # Generate mode
@@ -236,10 +232,10 @@ class GoAdapter(LanguageAdapter):
                     # Determine status by checking if file changed
                     content_hash = ""
                     if public_output.exists():
-                        with open(public_output, "r", encoding="utf-8") as f:
+                        with open(public_output, encoding="utf-8") as f:
                             content = f.read()
                         content_hash = hashlib.sha256(
-                            content.encode("utf-8")
+                            content.encode("utf-8"),
                         ).hexdigest()
 
                         if not existed_before:
@@ -257,7 +253,7 @@ class GoAdapter(LanguageAdapter):
                         path=public_output.relative_to(spec_dir),
                         hash=content_hash if not check else "",
                         status=status,
-                    )
+                    ),
                 )
 
         except subprocess.CalledProcessError:
@@ -267,10 +263,10 @@ class GoAdapter(LanguageAdapter):
                     name="public",
                     path=public_output.relative_to(spec_dir)
                     if public_output
-                    else Path(""),
+                    else Path(),
                     hash="",
                     status="unchanged",  # Error status would be handled at higher level
-                )
+                ),
             )
 
         # Generate internal docs (with unexported symbols)
@@ -282,7 +278,7 @@ class GoAdapter(LanguageAdapter):
                         path=internal_output.relative_to(spec_dir),
                         hash="",
                         status="created",
-                    )
+                    ),
                 )
             else:
                 content_hash = ""
@@ -307,10 +303,10 @@ class GoAdapter(LanguageAdapter):
                     existed_before = internal_output.exists()
                     old_hash = None
                     if existed_before:
-                        with open(internal_output, "r", encoding="utf-8") as f:
+                        with open(internal_output, encoding="utf-8") as f:
                             old_content = f.read()
                         old_hash = hashlib.sha256(
-                            old_content.encode("utf-8")
+                            old_content.encode("utf-8"),
                         ).hexdigest()
 
                     cmd = [
@@ -325,10 +321,10 @@ class GoAdapter(LanguageAdapter):
                     subprocess.run(cmd, check=True, capture_output=True, text=True)
 
                     if internal_output.exists():
-                        with open(internal_output, "r", encoding="utf-8") as f:
+                        with open(internal_output, encoding="utf-8") as f:
                             content = f.read()
                         content_hash = hashlib.sha256(
-                            content.encode("utf-8")
+                            content.encode("utf-8"),
                         ).hexdigest()
 
                         if not existed_before:
@@ -346,7 +342,7 @@ class GoAdapter(LanguageAdapter):
                         path=internal_output.relative_to(spec_dir),
                         hash=content_hash if not check else "",
                         status=status,
-                    )
+                    ),
                 )
 
         except subprocess.CalledProcessError:
@@ -355,23 +351,23 @@ class GoAdapter(LanguageAdapter):
                     name="internal",
                     path=internal_output.relative_to(spec_dir)
                     if internal_output
-                    else Path(""),
+                    else Path(),
                     hash="",
                     status="unchanged",
-                )
+                ),
             )
 
         return variants
 
     def supports_identifier(self, identifier: str) -> bool:
-        """
-        Check if identifier looks like a Go package path.
+        """Check if identifier looks like a Go package path.
 
         Args:
             identifier: Identifier to check
 
         Returns:
             True if identifier appears to be a Go package path
+
         """
         # Go package paths typically:
         # - Use forward slashes as separators

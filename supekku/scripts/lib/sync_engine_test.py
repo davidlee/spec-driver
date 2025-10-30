@@ -51,7 +51,7 @@ class TechSpecSyncEngineTest(unittest.TestCase):
             return gomarkdoc_available
 
         def generate_docs(
-            spec_dir: Path, module_pkg: str, include_unexported: bool, check: bool
+            spec_dir: Path, module_pkg: str, include_unexported: bool, check: bool,
         ) -> None:
             generate_calls.append((spec_dir, module_pkg, include_unexported, check))
 
@@ -200,13 +200,13 @@ class TechSpecSyncEngineTest(unittest.TestCase):
                 SyncOptions(
                     packages=["example.com/app/concept/group"],
                     allow_missing_go=True,
-                )
+                ),
             )
 
             self.assertIn("concept/group", result.processed_packages)
             spec_dir = root / "specify" / "tech"
             self.assertTrue(
-                any(path.name.startswith("SPEC-") for path in spec_dir.iterdir())
+                any(path.name.startswith("SPEC-") for path in spec_dir.iterdir()),
             )
 
 

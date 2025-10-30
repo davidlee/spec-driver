@@ -6,11 +6,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from .change_lifecycle import VALID_STATUSES, normalize_status
+from .delta_blocks import DeltaRelationshipsValidator, extract_delta_relationships
+from .plan_blocks import extract_phase_overview, extract_plan_overview
 from .relations import list_relations
 from .spec_utils import load_markdown_file
-from .delta_blocks import extract_delta_relationships, DeltaRelationshipsValidator
-from .plan_blocks import extract_plan_overview, extract_phase_overview
-from .change_lifecycle import normalize_status, VALID_STATUSES
 
 
 @dataclass(frozen=True)
@@ -60,7 +60,7 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
     if status and status not in VALID_STATUSES:
         valid_list = ", ".join(sorted(VALID_STATUSES))
         raise ValueError(
-            f"Invalid status '{status}' in {path}\nValid statuses: {valid_list}"
+            f"Invalid status '{status}' in {path}\nValid statuses: {valid_list}",
         )
 
     name = str(frontmatter.get("name", artifact_id))
@@ -78,7 +78,7 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
         except ValueError:
             block = None
         if block and not DeltaRelationshipsValidator().validate(
-            block, delta_id=artifact_id
+            block, delta_id=artifact_id,
         ):
             specs = block.data.get("specs") or {}
             primary_specs = specs.get("primary") or []
@@ -121,7 +121,7 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
         if plan_path.exists():
             try:
                 plan_block = extract_plan_overview(
-                    plan_path.read_text(encoding="utf-8"), source_path=plan_path
+                    plan_path.read_text(encoding="utf-8"), source_path=plan_path,
                 )
             except ValueError:
                 plan_block = None
@@ -138,7 +138,7 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
             for phase_file in sorted(phases_dir.glob("*.md")):
                 try:
                     phase_block = extract_phase_overview(
-                        phase_file.read_text(encoding="utf-8"), source_path=phase_file
+                        phase_file.read_text(encoding="utf-8"), source_path=phase_file,
                     )
                 except ValueError:
                     continue

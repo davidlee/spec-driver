@@ -1,12 +1,11 @@
 """Supekku library modules for spec management and documentation generation."""
 
-from .spec_utils import (
-    load_markdown_file,
-    dump_markdown_file,
-    ensure_list_entry,
-    append_unique,
-    load_validated_markdown_file,
+from .backlog import (
+    append_backlog_summary,
+    create_backlog_entry,
+    find_repo_root,
 )
+from .change_registry import ChangeRegistry
 from .create_spec import (
     CreateSpecOptions,
     CreateSpecResult,
@@ -19,11 +18,6 @@ from .frontmatter_schema import (
     Relation,
     validate_frontmatter,
 )
-from .backlog import (
-    append_backlog_summary,
-    create_backlog_entry,
-    find_repo_root,
-)
 from .relations import (
     add_relation,
     list_relations,
@@ -31,31 +25,37 @@ from .relations import (
 )
 from .spec_models import Spec
 from .spec_registry import SpecRegistry
-from .change_registry import ChangeRegistry
+from .spec_utils import (
+    append_unique,
+    dump_markdown_file,
+    ensure_list_entry,
+    load_markdown_file,
+    load_validated_markdown_file,
+)
 from .workspace import Workspace
 
 __all__ = [
-    "load_markdown_file",
-    "dump_markdown_file",
-    "ensure_list_entry",
-    "append_unique",
-    "load_validated_markdown_file",
+    "ChangeRegistry",
     "CreateSpecOptions",
     "CreateSpecResult",
-    "SpecCreationError",
-    "create_spec",
-    "append_backlog_summary",
-    "create_backlog_entry",
-    "find_repo_root",
-    "add_relation",
-    "list_relations",
-    "remove_relation",
-    "Spec",
-    "SpecRegistry",
-    "ChangeRegistry",
-    "Workspace",
     "FrontmatterValidationError",
     "FrontmatterValidationResult",
     "Relation",
+    "Spec",
+    "SpecCreationError",
+    "SpecRegistry",
+    "Workspace",
+    "add_relation",
+    "append_backlog_summary",
+    "append_unique",
+    "create_backlog_entry",
+    "create_spec",
+    "dump_markdown_file",
+    "ensure_list_entry",
+    "find_repo_root",
+    "list_relations",
+    "load_markdown_file",
+    "load_validated_markdown_file",
+    "remove_relation",
     "validate_frontmatter",
 ]

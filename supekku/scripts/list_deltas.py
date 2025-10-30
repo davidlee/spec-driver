@@ -13,12 +13,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
-from supekku.scripts.lib.change_registry import ChangeRegistry  # type: ignore
-from supekku.scripts.lib.cli_utils import add_root_argument
 from supekku.scripts.lib.change_lifecycle import (  # type: ignore
     VALID_STATUSES,
     normalize_status,
 )
+from supekku.scripts.lib.change_registry import ChangeRegistry  # type: ignore
+from supekku.scripts.lib.cli_utils import add_root_argument
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -43,7 +43,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def matches_filters(
-    artifact, *, delta_ids: list[str] | None, status: str | None
+    artifact, *, delta_ids: list[str] | None, status: str | None,
 ) -> bool:
     """Check if artifact matches the given filters."""
     if delta_ids and artifact.id not in delta_ids:

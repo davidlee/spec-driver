@@ -1,5 +1,4 @@
-"""
-Test fixtures for AST documentation generator tests.
+"""Test fixtures for AST documentation generator tests.
 Contains various Python code patterns to test parsing functionality.
 """
 

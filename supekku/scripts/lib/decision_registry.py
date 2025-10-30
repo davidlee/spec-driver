@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 import yaml
 
@@ -50,6 +51,7 @@ class DecisionRecord:
 
         Returns:
             Dictionary representation suitable for YAML serialization
+
         """
         data = {
             "id": self.id,
@@ -244,7 +246,7 @@ class DecisionRegistry:
             "decisions": {
                 decision_id: decision.to_dict(self.root)
                 for decision_id, decision in sorted(decisions.items())
-            }
+            },
         }
 
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -341,7 +343,7 @@ class DecisionRegistry:
                         item.unlink()
 
     def _rebuild_status_directory(
-        self, status_dir: Path, decisions: list[DecisionRecord]
+        self, status_dir: Path, decisions: list[DecisionRecord],
     ) -> None:
         """Rebuild a single status directory with symlinks."""
         # Create directory if it doesn't exist

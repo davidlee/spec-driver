@@ -171,7 +171,10 @@ class MultiLanguageSpecManager:
     def process_source_unit(
         self, source_unit, adapter, check_mode: bool = False, dry_run: bool = False,
     ) -> dict:
-        """Process a single source unit - create spec, update registry, generate docs."""
+        """Process a single source unit.
+
+        Create spec, update registry, generate docs.
+        """
         result = {
             "processed": False,
             "created": False,
@@ -405,20 +408,23 @@ def main() -> None:
     # Handle --existing mode - populate targets from registry
     # Default to existing mode if no targets specified
     if (args.existing or not targets_by_language) and not targets_by_language:
-        # If no specific targets provided but --existing requested, get all from registry
+        # If no specific targets provided but --existing requested,
+        # get all from registry
         if args.language == "all":
             # Process all languages from registry
-            # Auto-discover Go (bounded by go.mod) and Python (now with test filtering)
+            # Auto-discover Go (bounded by go.mod) and Python
+            # (now with test filtering)
             if "go" in engine.adapters:
                 targets_by_language["go"] = []
             if "python" in engine.adapters:
                 targets_by_language["python"] = []
-            # Also process any other languages already in registry
+            # Process any other languages already in registry
             for language in spec_manager.registry_v2.languages:
                 if language not in targets_by_language:
                     targets_by_language[language] = []
         else:
-            # Process specific language from registry (or auto-discover if adapter exists)
+            # Process specific language from registry
+            # (or auto-discover if adapter exists)
             targets_by_language[args.language] = []
 
     # Filter by requested language
@@ -504,7 +510,7 @@ def main() -> None:
         # Report language results
 
         if created_specs:
-            for identifier in created_specs:
+            for _identifier in created_specs:
                 pass
 
         if skipped_units:

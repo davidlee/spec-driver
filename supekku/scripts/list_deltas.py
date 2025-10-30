@@ -48,11 +48,11 @@ def matches_filters(
     """Check if artifact matches the given filters."""
     if delta_ids and artifact.id not in delta_ids:
         return False
-    if status:
-        # Normalize both statuses for comparison to handle variants like "complete" vs "completed"
-        if normalize_status(artifact.status) != normalize_status(status):
-            return False
-    return True
+    # Normalize both statuses for comparison to handle variants
+    # like "complete" vs "completed"
+    return not (
+        status and normalize_status(artifact.status) != normalize_status(status)
+    )
 
 
 def format_delta_basic(artifact) -> str:
@@ -105,7 +105,9 @@ def main(argv: list[str] | None = None) -> int:
     artifacts = list(registry.collect().values())
 
     # Filter artifacts
-    delta_ids = [id.strip().upper() for id in args.ids] if args.ids else None
+    delta_ids = (
+        [delta_id.strip().upper() for delta_id in args.ids] if args.ids else None
+    )
     status = (args.status or "").strip() or None
 
     filtered = [

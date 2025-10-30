@@ -3,7 +3,9 @@
     "allow": [
       "Bash(uv run pytest:*)",
       "Bash(source .venv/bin/activate)",
-      "Bash(ruff check:*)"
+      "Bash(ruff check:*)",
+      "Bash(just lint:*)",
+      "Bash(just test:*)"
     ],
     "deny": [],
     "ask": []

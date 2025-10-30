@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from supekku.scripts.lib.backlog import find_repo_root
 from supekku.scripts.lib.cli_utils import add_root_argument
 from supekku.scripts.lib.validator import validate_workspace  # type: ignore
 from supekku.scripts.lib.workspace import Workspace  # type: ignore
@@ -53,10 +54,8 @@ def main(argv: list[str] | None = None) -> int:
     return 1
 
 
-def find_repo_root(start: Path) -> Path:
-    from supekku.scripts.lib.backlog import find_repo_root as _find
-
-    return _find(start)
+def get_repo_root(start: Path) -> Path:
+    return find_repo_root(start)
 
 
 if __name__ == "__main__":

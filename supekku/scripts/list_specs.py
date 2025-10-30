@@ -38,7 +38,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--package-path",
         dest="package_path",
-        help="Exact package path to resolve via by-package index (e.g. internal/infrastructure/git)",
+        help=(
+            "Exact package path to resolve via by-package index "
+            "(e.g. internal/infrastructure/git)"
+        ),
     )
     parser.add_argument(
         "--for-path",
@@ -46,7 +49,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         const=".",
         metavar="PATH",
         default=None,
-        help="Filter specs whose packages include PATH (defaults to the current working directory)",
+        help=(
+            "Filter specs whose packages include PATH "
+            "(defaults to the current working directory)"
+        ),
     )
     parser.add_argument(
         "--paths",

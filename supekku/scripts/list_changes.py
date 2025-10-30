@@ -43,7 +43,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--applies-to",
         dest="applies_to",
-        help="Filter artefacts that reference a requirement (applies_to or relation target)",
+        help=(
+            "Filter artefacts that reference a requirement "
+            "(applies_to or relation target)"
+        ),
     )
     parser.add_argument(
         "--paths",

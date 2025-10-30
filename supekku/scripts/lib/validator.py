@@ -31,7 +31,7 @@ class WorkspaceValidator:
 
     def validate(self) -> list[ValidationIssue]:
         self.issues.clear()
-        self.workspace.specs  # Access but don't assign
+        _ = self.workspace.specs  # Access but don't assign
         requirements = self.workspace.requirements
         decisions = self.workspace.decisions.collect()
         delta_registry = self.workspace.delta_registry.collect()
@@ -55,7 +55,8 @@ class WorkspaceValidator:
             if record.introduced and record.introduced not in revision_ids:
                 self._error(
                     req_id,
-                    f"Requirement introduced_by references missing revision {record.introduced}",
+                    f"Requirement introduced_by references missing revision "
+                    f"{record.introduced}",
                 )
             for audit_id in record.verified_by:
                 if audit_id not in audit_ids:
@@ -105,7 +106,8 @@ class WorkspaceValidator:
                 if target not in requirement_ids:
                     self._error(
                         artifact.id,
-                        f"Relation {rel_type} -> {target} does not match any known requirement",
+                        f"Relation {rel_type} -> {target} does not match "
+                        f"any known requirement",
                     )
             applies = artifact.applies_to.get("requirements", [])
             if applies:
@@ -139,7 +141,10 @@ class WorkspaceValidator:
                     )
 
     def _validate_decision_status_compatibility(self, decisions: dict) -> None:
-        """Warn if active ADR references deprecated or superseded ADRs (strict mode only)."""
+        """Warn if active ADR references deprecated or superseded ADRs.
+
+        Only applies in strict mode.
+        """
         if not self.strict:
             return
 
@@ -150,12 +155,15 @@ class WorkspaceValidator:
 
             for related_id in decision.related_decisions:
                 related_decision = decisions.get(related_id)
-                if related_decision:
-                    if related_decision.status in ["deprecated", "superseded"]:
-                        self._warning(
-                            decision_id,
-                            f"References {related_decision.status} decision {related_id}",
-                        )
+                if related_decision and related_decision.status in [
+                    "deprecated",
+                    "superseded",
+                ]:
+                    self._warning(
+                        decision_id,
+                        f"References {related_decision.status} decision "
+                        f"{related_id}",
+                    )
 
 
 def validate_workspace(

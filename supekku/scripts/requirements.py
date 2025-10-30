@@ -36,7 +36,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--spec-dir",
         dest="spec_dirs",
         action="append",
-        help="Additional spec directory to scan (defaults include specify/tech and specify/product)",
+        help=(
+            "Additional spec directory to scan "
+            "(defaults include specify/tech and specify/product)"
+        ),
     )
 
     list_parser = subparsers.add_parser("list", help="List requirements")

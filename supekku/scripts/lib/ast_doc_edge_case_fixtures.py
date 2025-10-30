@@ -1,5 +1,7 @@
 """Additional test fixtures for edge cases in AST documentation generation.
-Covers multiline comments, complex typing, decorators with arguments, and other edge cases.
+
+Covers multiline comments, complex typing, decorators with arguments,
+and other edge cases.
 """
 
 # Multiline comments and docstrings with edge cases
@@ -451,10 +453,19 @@ class StringProcessor:
 
     def triple_quote_strings(self) -> str:
         """Method with triple-quoted strings."""
-        # Using escaped quotes to avoid breaking the surrounding string literal
-        single_quotes = "This is a triple-quoted string\\nwith single quotes that can contain \\"double quotes\\"\\nand even more 'single quotes' inside."
+        # Using escaped quotes to avoid breaking the surrounding
+        # string literal
+        single_quotes = (
+            "This is a triple-quoted string\\nwith single quotes that "
+            "can contain \\"double quotes\\"\\nand even more 'single "
+            "quotes' inside."
+        )
 
-        double_quotes = 'This is a triple-quoted string\\nwith double quotes that can contain \\'single quotes\\'\\nand even "more double quotes" inside.'
+        double_quotes = (
+            'This is a triple-quoted string\\nwith double quotes that '
+            'can contain \\'single quotes\\'\\nand even "more double '
+            'quotes" inside.'
+        )
 
         return single_quotes + double_quotes
 

@@ -26,7 +26,10 @@ from supekku.scripts.lib.docs.python import (
 def check_mode_comparison(
     existing_file: Path, new_content: str,
 ) -> tuple[bool, str, str]:
-    """Compare existing file with new content. Returns (is_same, existing_hash, new_hash)."""
+    """Compare existing file with new content.
+
+    Returns (is_same, existing_hash, new_hash).
+    """
     new_hash = calculate_content_hash(new_content)
 
     if not existing_file.exists():
@@ -203,7 +206,8 @@ def main() -> None:
         stats = cache.get_stats()
         print(
             f"\nCache Stats: {stats['hits']} hits, {stats['misses']} misses, "
-            f"{stats['invalidations']} invalidations ({stats['hit_rate_percent']}% hit rate)",
+            f"{stats['invalidations']} invalidations "
+            f"({stats['hit_rate_percent']}% hit rate)",
         )
 
     # Exit with error code if any results failed

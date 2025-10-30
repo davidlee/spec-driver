@@ -76,7 +76,10 @@ def find_repo_root(start: Path | None = None) -> Path:
     for candidate in [current, *current.parents]:
         if (candidate / ".git").exists() or (candidate / SPEC_DRIVER_DIR).exists():
             return candidate
-    msg = f"Could not locate repository root (missing .git or {SPEC_DRIVER_DIR} directory)"
+    msg = (
+        f"Could not locate repository root "
+        f"(missing .git or {SPEC_DRIVER_DIR} directory)"
+    )
     raise RuntimeError(
         msg,
     )

@@ -61,9 +61,13 @@ def validate_delta_status(
     if delta.status == "completed":
         return True, True
 
-    if delta.status != "draft" and not force and not dry_run:
-        if not prompt_yes_no("Continue anyway?", default=False):
-            return False, False
+    if (
+        delta.status != "draft"
+        and not force
+        and not dry_run
+        and not prompt_yes_no("Continue anyway?", default=False)
+    ):
+        return False, False
     return True, False
 
 
@@ -90,7 +94,9 @@ def collect_requirements_to_update(delta_id: str, delta, workspace):
     return requirements_to_update, False
 
 
-def display_preview(delta_id: str, delta, requirements_to_update, dry_run: bool) -> None:
+def display_preview(
+    delta_id: str, delta, requirements_to_update, dry_run: bool,
+) -> None:
     """Display preview of changes to be made."""
     if dry_run:
         pass
@@ -125,7 +131,9 @@ def display_actions(delta, requirements_to_update, update_requirements: bool) ->
         pass
 
 
-def display_dry_run_requirements(requirements_to_update, update_requirements: bool) -> None:
+def display_dry_run_requirements(
+    requirements_to_update, update_requirements: bool,
+) -> None:
     """Display requirements that would be updated in dry-run mode."""
     if not requirements_to_update:
         return
@@ -187,7 +195,8 @@ def update_requirements_status(
 
 
 # pylint: disable=too-many-locals,too-many-branches
-# Rationale: Complex workflow with discovery, categorization, user interaction, and updates
+# Rationale: Complex workflow with discovery, categorization,
+# user interaction, and updates
 def update_requirements_in_revision_sources(
     delta_id: str,
     requirement_ids: list[str],
@@ -219,11 +228,11 @@ def update_requirements_in_revision_sources(
             files_map[source.revision_file].append(req_id)
 
         for _rev_file, reqs in sorted(files_map.items(), key=lambda x: x[0].name):
-            for req_id in reqs:
-                workspace.requirements.records[req_id].status
+            for _req_id in reqs:
+                pass
 
     if untracked:
-        for req_id in sorted(untracked):
+        for _req_id in sorted(untracked):
             pass
 
 
@@ -299,9 +308,10 @@ def handle_already_completed_delta(
     if dry_run:
         return 0
 
-    if not force:
-        if not prompt_yes_no("Update requirements to 'live' status?", default=True):
-            return 0
+    if not force and not prompt_yes_no(
+        "Update requirements to 'live' status?", default=True,
+    ):
+        return 0
 
     # Use persistent updates if flag is set, otherwise registry-only
     if update_requirements:

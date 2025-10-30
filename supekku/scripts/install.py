@@ -45,6 +45,10 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
         "specify/policies",
         "specify/product",
         "specify/tech",
+        "backlog/improvements",
+        "backlog/issues",
+        "backlog/problems",
+        "backlog/risks",
         f"{SPEC_DRIVER_DIR}/registry",
         f"{SPEC_DRIVER_DIR}/templates",
         f"{SPEC_DRIVER_DIR}/about",
@@ -53,6 +57,20 @@ def initialize_workspace(target_root: Path) -> None:  # pylint: disable=too-many
     for dir_path in directories:
         full_path = target_root / dir_path
         full_path.mkdir(parents=True, exist_ok=True)
+
+    # Create empty backlog/backlog.md file
+    backlog_file = target_root / "backlog" / "backlog.md"
+    if not backlog_file.exists():
+        backlog_file.write_text(
+            "# Backlog\n\n"
+            "Track improvements, issues, problems, and risks here.\n\n"
+            "## Structure\n\n"
+            "- `improvements/` - Enhancement ideas and feature requests\n"
+            "- `issues/` - Known issues and bugs\n"
+            "- `problems/` - Current problems requiring attention\n"
+            "- `risks/` - Identified risks and mitigation strategies\n",
+            encoding="utf-8",
+        )
 
     # Initialize empty registry files
     registry_dir = target_root / SPEC_DRIVER_DIR / "registry"

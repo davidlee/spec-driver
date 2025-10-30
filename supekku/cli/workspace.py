@@ -37,7 +37,7 @@ def install(
   Creates the necessary directory structure and initializes registry files
   for a new spec-driver workspace.
   """
-  target_path = target_dir if target_dir else Path()
+  target_path = target_dir if target_dir else Path.cwd()
   try:
     initialize_workspace(target_path)
     typer.echo(f"Workspace initialized in {target_path.resolve()}")

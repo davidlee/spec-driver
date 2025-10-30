@@ -32,6 +32,10 @@ def test_initialize_workspace_creates_directories(tmp_path: Path) -> None:
         "specify/policies",
         "specify/product",
         "specify/tech",
+        "backlog/improvements",
+        "backlog/issues",
+        "backlog/problems",
+        "backlog/risks",
         f"{SPEC_DRIVER_DIR}/registry",
         f"{SPEC_DRIVER_DIR}/templates",
         f"{SPEC_DRIVER_DIR}/about",
@@ -39,6 +43,15 @@ def test_initialize_workspace_creates_directories(tmp_path: Path) -> None:
 
     for dir_path in expected_dirs:
         assert (tmp_path / dir_path).is_dir(), f"Directory {dir_path} not created"
+
+    # Verify backlog.md was created
+    backlog_file = tmp_path / "backlog" / "backlog.md"
+    assert backlog_file.exists(), "backlog/backlog.md not created"
+
+    # Verify content
+    content = backlog_file.read_text()
+    assert "# Backlog" in content
+    assert "improvements/" in content
 
 
 def test_initialize_workspace_creates_registry_files(tmp_path: Path) -> None:

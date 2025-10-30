@@ -8,7 +8,9 @@ Why?
 - The combination of markdown and YAML is a surprisingly powerful platform for structured, legible data 
 - Tooling joins related entities through a registry for fast lookup, validation, and relational data propagation
 - Stop banging rocks together
- 
+
+![workflow diagram](https://supekku.dev/assets/img/simple.svg)
+
 ## Status
 
 **Alpha** - Under active development. API and CLI may change.

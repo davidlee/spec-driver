@@ -17,10 +17,10 @@ Specification-driven development toolkit with multi-language spec sync and docum
 
 ## Features
 
-- **Multi-language spec sync**: Automatically sync specifications with Go and Python codebases
+- **Multi-language spec sync**: Automatically sync specifications with Go, Python & TypeScript/JS codebases
 - **Architecture Decision Records (ADRs)**: Manage and track architectural decisions
 - **Delta/Change tracking**: Relate specification changes, requirements, deltas, implementation plans and revisions
-- **Documentation generation**: Generate compact, legible markdown documentation from code (Go, Python, JavaScript/TypeScript/TSX)
+- **Documentation generation**: Generate compact, legible, deterministic markdown documentation from code 
 - **Workspace validation**: Ensure consistency across specification artifacts
 - **Orphan detection**: Safely remove specs for deleted source files
 
@@ -258,6 +258,12 @@ spec-driver validate
 This package is under active development and cli API stability is not even hinted at. 
 
 I'll aim not to make breaking changes to data formats, though.
+
+## Related
+[PyPi project](https://pypi.org/project/spec-driver/)
+[npm dependency for TS doc gen](https://www.npmjs.com/package/ts-doc-extract)
+[sort of a website](https://supekku.dev)
+
 
 ## License
 

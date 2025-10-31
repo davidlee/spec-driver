@@ -15,3 +15,11 @@ pylint:
     --fail-under={{pylint_threshold}} \
     --output-format=colorized --reports y \
     --indent-string "  "
+
+publish:
+  rm -fr dist/
+  uv build
+  rm dist/.gitignore
+  uv publish
+
+

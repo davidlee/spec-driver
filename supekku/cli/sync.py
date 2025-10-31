@@ -157,6 +157,10 @@ def sync(
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
+  except Exception as e:
+    # Catch other errors including language-specific toolchain errors
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
 
 
 def _sync_specs(
@@ -255,24 +259,29 @@ def _sync_specs(
 
     # Discover source units
     orphaned_units = []
-    if existing:
-      typer.echo("Discovery mode: existing registry entries only")
-      source_units = []
-      if lang_name in spec_manager.registry_v2.languages:
-        for identifier in spec_manager.registry_v2.languages[lang_name]:
-          unit = SourceUnit(language=lang_name, identifier=identifier, root=root)
+    try:
+      if existing:
+        typer.echo("Discovery mode: existing registry entries only")
+        source_units = []
+        if lang_name in spec_manager.registry_v2.languages:
+          for identifier in spec_manager.registry_v2.languages[lang_name]:
+            unit = SourceUnit(language=lang_name, identifier=identifier, root=root)
 
-          # Validate source exists
-          validation = adapter.validate_source_exists(unit)
-          if validation["status"] == "missing":
-            orphaned_units.append(unit)
-            typer.echo(f"  ⚠ Orphaned: {identifier} (source file deleted)", err=True)
-          else:
-            source_units.append(unit)
-    else:
-      typer.echo("Discovery mode: requested targets + auto-discovery")
-      requested = target_list if target_list else None
-      source_units = adapter.discover_targets(root, requested)
+            # Validate source exists
+            validation = adapter.validate_source_exists(unit)
+            if validation["status"] == "missing":
+              orphaned_units.append(unit)
+              typer.echo(f"  ⚠ Orphaned: {identifier} (source file deleted)", err=True)
+            else:
+              source_units.append(unit)
+      else:
+        typer.echo("Discovery mode: requested targets + auto-discovery")
+        requested = target_list if target_list else None
+        source_units = adapter.discover_targets(root, requested)
+    except Exception as e:
+      typer.echo(f"Error discovering {lang_name} targets: {e}", err=True)
+      typer.echo(f"Skipping {lang_name} synchronization", err=True)
+      continue
 
     typer.echo(f"Found {len(source_units)} {lang_name} source units")
     if orphaned_units:

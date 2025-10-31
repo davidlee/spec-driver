@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import subprocess
 from pathlib import Path
+from shutil import which
 from typing import TYPE_CHECKING, ClassVar
 
 from supekku.scripts.lib.spec_sync.models import (
@@ -19,6 +20,14 @@ if TYPE_CHECKING:
   from collections.abc import Sequence
 
 
+class GoToolchainNotAvailableError(RuntimeError):
+  """Raised when Go toolchain is required but not available."""
+
+
+class GomarkdocNotAvailableError(RuntimeError):
+  """Raised when gomarkdoc is required but not available."""
+
+
 class GoAdapter(LanguageAdapter):
   """Language adapter for Go packages using existing gomarkdoc workflow.
 
@@ -27,6 +36,16 @@ class GoAdapter(LanguageAdapter):
   """
 
   language: ClassVar[str] = "go"
+
+  @staticmethod
+  def is_go_available() -> bool:
+    """Check if Go toolchain is available in PATH."""
+    return which("go") is not None
+
+  @staticmethod
+  def is_gomarkdoc_available() -> bool:
+    """Check if gomarkdoc is available in PATH."""
+    return which("gomarkdoc") is not None
 
   def discover_targets(
     self,
@@ -42,7 +61,17 @@ class GoAdapter(LanguageAdapter):
     Returns:
         List of SourceUnit objects for Go packages
 
+    Raises:
+        GoToolchainNotAvailableError: If Go toolchain is not available
+
     """
+    # Check if Go toolchain is available
+    if not self.is_go_available():
+      raise GoToolchainNotAvailableError(
+        "Go toolchain not found in PATH. Please install Go from https://go.dev/dl/ "
+        "or ensure it is in your PATH."
+      )
+
     # Import at runtime to avoid circular imports
     from supekku.scripts.lib.sync_engine import (  # noqa: PLC0415
       TechSpecSyncEngine,
@@ -166,8 +195,26 @@ class GoAdapter(LanguageAdapter):
     Returns:
         List of DocVariant objects with generation results
 
+    Raises:
+        GoToolchainNotAvailableError: If Go toolchain is not available
+        GomarkdocNotAvailableError: If gomarkdoc is not available
+
     """
     self._validate_unit_language(unit)
+
+    # Check if Go toolchain is available
+    if not self.is_go_available():
+      raise GoToolchainNotAvailableError(
+        "Go toolchain not found in PATH. Please install Go from https://go.dev/dl/ "
+        "or ensure it is in your PATH."
+      )
+
+    # Check if gomarkdoc is available
+    if not self.is_gomarkdoc_available():
+      raise GomarkdocNotAvailableError(
+        "gomarkdoc not found in PATH. Please install it with: "
+        "go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest"
+      )
 
     # Import at runtime to avoid circular imports
     from supekku.scripts.lib.sync_engine import (  # noqa: PLC0415

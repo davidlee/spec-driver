@@ -348,6 +348,17 @@ def _sync_specs(
         typer.echo(f"\n  Pruning {len(orphaned_units)} orphaned specs...")
         executor = DeletionExecutor(root)
 
+        # Build set of orphaned spec IDs for cross-reference validation
+        orphaned_spec_ids: set[str] = set()
+        for orphaned_unit in orphaned_units:
+          spec_id = spec_manager.registry_v2.get_spec_id(
+            orphaned_unit.language,
+            orphaned_unit.identifier,
+          )
+          if spec_id:
+            orphaned_spec_ids.add(spec_id)
+
+        # Delete each orphaned spec with validation
         for orphaned_unit in orphaned_units:
           # Get spec_id from registry
           spec_id = spec_manager.registry_v2.get_spec_id(
@@ -356,6 +367,22 @@ def _sync_specs(
           )
 
           if spec_id:
+            # Validate deletion with orphan context
+            plan = executor.validator.validate_spec_deletion(
+              spec_id,
+              orphaned_specs=orphaned_spec_ids,
+            )
+
+            # Display warnings if deletion blocked
+            if not plan.is_safe:
+              msg = f"    ⚠ Cannot prune {spec_id}"
+              msg += f" ({orphaned_unit.identifier}):"
+              typer.echo(msg, err=True)
+              for warning in plan.warnings:
+                typer.echo(f"      → {warning}", err=True)
+              continue
+
+            # Proceed with deletion
             if dry_run:
               typer.echo(f"    → Would delete {spec_id} ({orphaned_unit.identifier})")
             else:

@@ -6,7 +6,12 @@ from tempfile import TemporaryDirectory
 
 import yaml
 
-from .deletion import DeletionExecutor, DeletionPlan, DeletionValidator
+from .deletion import (
+  DeletionExecutor,
+  DeletionPlan,
+  DeletionValidator,
+  RegistryScanner,
+)
 from .registry_migration import RegistryV2
 
 
@@ -494,6 +499,381 @@ class TestDeletionExecutor(unittest.TestCase):
 
     assert plan.is_safe is True
     assert not (self.tech_dir / "SPEC-001").exists()
+
+
+class TestRegistryScanner(unittest.TestCase):
+  """Test RegistryScanner cross-reference detection."""
+
+  def setUp(self) -> None:
+    """Set up test environment."""
+    self.temp_dir = TemporaryDirectory()
+    self.root = Path(self.temp_dir.name)
+    self.registry_dir = self.root / ".spec-driver" / "registry"
+    self.registry_dir.mkdir(parents=True, exist_ok=True)
+
+    self.scanner = RegistryScanner(self.root)
+
+  def tearDown(self) -> None:
+    """Clean up test environment."""
+    self.temp_dir.cleanup()
+
+  def _write_registry(self, filename: str, data: dict) -> None:
+    """Write a registry YAML file."""
+    registry_path = self.registry_dir / filename
+    text = yaml.safe_dump(data, sort_keys=False)
+    registry_path.write_text(text, encoding="utf-8")
+
+  def test_find_spec_references_no_registries(self) -> None:
+    """Test finding references when no registries exist."""
+    # Don't create any registry files
+    references = self.scanner.find_spec_references("SPEC-001")
+
+    assert references == {
+      "requirements": [],
+      "deltas": [],
+      "revisions": [],
+      "decisions": [],
+    }
+
+  def test_find_spec_references_empty_registries(self) -> None:
+    """Test finding references in empty registries."""
+    self._write_registry("requirements.yaml", {"requirements": {}})
+    self._write_registry("deltas.yaml", {"deltas": {}})
+    self._write_registry("revisions.yaml", {"revisions": {}})
+    self._write_registry("decisions.yaml", {"decisions": {}})
+
+    references = self.scanner.find_spec_references("SPEC-001")
+
+    assert references == {
+      "requirements": [],
+      "deltas": [],
+      "revisions": [],
+      "decisions": [],
+    }
+
+  def test_find_spec_in_requirements(self) -> None:
+    """Test finding spec referenced in requirements."""
+    self._write_registry(
+      "requirements.yaml",
+      {
+        "requirements": {
+          "SPEC-001.FR-001": {
+            "specs": ["SPEC-001"],
+            "kind": "functional",
+          },
+          "SPEC-001.FR-002": {
+            "specs": ["SPEC-001"],
+            "kind": "functional",
+          },
+          "SPEC-002.FR-001": {
+            "specs": ["SPEC-002"],
+            "kind": "functional",
+          },
+        },
+      },
+    )
+
+    references = self.scanner.find_spec_references("SPEC-001")
+
+    assert len(references["requirements"]) == 2
+    assert "SPEC-001.FR-001" in references["requirements"]
+    assert "SPEC-001.FR-002" in references["requirements"]
+
+  def test_find_spec_in_deltas(self) -> None:
+    """Test finding spec referenced in deltas."""
+    self._write_registry(
+      "deltas.yaml",
+      {
+        "deltas": {
+          "DE-001": {
+            "applies_to": {
+              "specs": ["SPEC-001", "SPEC-002"],
+            },
+          },
+          "DE-002": {
+            "applies_to": {
+              "specs": ["SPEC-003"],
+            },
+          },
+        },
+      },
+    )
+
+    references = self.scanner.find_spec_references("SPEC-001")
+
+    assert len(references["deltas"]) == 1
+    assert "DE-001" in references["deltas"]
+
+  def test_find_spec_in_revisions(self) -> None:
+    """Test finding spec referenced in revisions."""
+    self._write_registry(
+      "revisions.yaml",
+      {
+        "revisions": {
+          "RE-001": {
+            "relations": [
+              {"type": "updates", "target": "SPEC-001"},
+              {"type": "updates", "target": "SPEC-002"},
+            ],
+          },
+          "RE-002": {
+            "relations": [
+              {"type": "updates", "target": "SPEC-003"},
+            ],
+          },
+        },
+      },
+    )
+
+    references = self.scanner.find_spec_references("SPEC-001")
+
+    assert len(references["revisions"]) == 1
+    assert "RE-001" in references["revisions"]
+
+  def test_find_spec_in_decisions_specs_list(self) -> None:
+    """Test finding spec in decisions specs list."""
+    self._write_registry(
+      "decisions.yaml",
+      {
+        "decisions": {
+          "ADR-001": {
+            "specs": ["SPEC-001", "SPEC-002"],
+          },
+          "ADR-002": {
+            "specs": ["SPEC-003"],
+          },
+        },
+      },
+    )
+
+    references = self.scanner.find_spec_references("SPEC-001")
+
+    assert len(references["decisions"]) == 1
+    assert "ADR-001" in references["decisions"]
+
+  def test_find_spec_in_decisions_requirements_list(self) -> None:
+    """Test finding spec extracted from requirements in decisions."""
+    self._write_registry(
+      "decisions.yaml",
+      {
+        "decisions": {
+          "ADR-001": {
+            "requirements": ["SPEC-001.FR-001", "SPEC-001.NFR-002"],
+          },
+          "ADR-002": {
+            "requirements": ["SPEC-002.FR-001"],
+          },
+        },
+      },
+    )
+
+    references = self.scanner.find_spec_references("SPEC-001")
+
+    assert len(references["decisions"]) == 1
+    assert "ADR-001" in references["decisions"]
+
+  def test_find_spec_multiple_registries(self) -> None:
+    """Test finding spec referenced across multiple registries."""
+    self._write_registry(
+      "requirements.yaml",
+      {"requirements": {"SPEC-001.FR-001": {"specs": ["SPEC-001"]}}},
+    )
+    self._write_registry(
+      "deltas.yaml",
+      {"deltas": {"DE-001": {"applies_to": {"specs": ["SPEC-001"]}}}},
+    )
+    self._write_registry(
+      "revisions.yaml",
+      {"revisions": {"RE-001": {"relations": [{"target": "SPEC-001"}]}}},
+    )
+    self._write_registry(
+      "decisions.yaml",
+      {"decisions": {"ADR-001": {"specs": ["SPEC-001"]}}},
+    )
+
+    references = self.scanner.find_spec_references("SPEC-001")
+
+    assert len(references["requirements"]) == 1
+    assert len(references["deltas"]) == 1
+    assert len(references["revisions"]) == 1
+    assert len(references["decisions"]) == 1
+
+  def test_malformed_yaml_handled_gracefully(self) -> None:
+    """Test that malformed YAML is handled without errors."""
+    # Write malformed YAML
+    yaml_path = self.registry_dir / "requirements.yaml"
+    yaml_path.write_text("invalid: yaml: ::::", encoding="utf-8")
+
+    references = self.scanner.find_spec_references("SPEC-001")
+
+    # Should return empty results without crashing
+    assert references["requirements"] == []
+
+  def test_extract_spec_from_requirement(self) -> None:
+    """Test extracting spec ID from requirement ID."""
+    assert (
+      RegistryScanner._extract_spec_from_requirement("SPEC-001.FR-001")
+      == "SPEC-001"
+    )
+    assert (
+      RegistryScanner._extract_spec_from_requirement("SPEC-042.NFR-005")
+      == "SPEC-042"
+    )
+    assert (
+      RegistryScanner._extract_spec_from_requirement("PROD-002.FR-001")
+      == "PROD-002"
+    )
+    assert RegistryScanner._extract_spec_from_requirement("SPEC-001") is None
+    assert RegistryScanner._extract_spec_from_requirement("invalid") is None
+
+
+class TestCrossReferenceValidation(unittest.TestCase):
+  """Test cross-reference validation in DeletionValidator."""
+
+  def setUp(self) -> None:
+    """Set up test environment."""
+    self.temp_dir = TemporaryDirectory()
+    self.root = Path(self.temp_dir.name)
+    self.tech_dir = self.root / "specify" / "tech"
+    self.tech_dir.mkdir(parents=True, exist_ok=True)
+    self.registry_dir = self.root / ".spec-driver" / "registry"
+    self.registry_dir.mkdir(parents=True, exist_ok=True)
+
+    self.validator = DeletionValidator(self.root)
+
+  def tearDown(self) -> None:
+    """Clean up test environment."""
+    self.temp_dir.cleanup()
+
+  def _create_spec(self, spec_id: str) -> None:
+    """Create a minimal spec directory."""
+    spec_dir = self.tech_dir / spec_id
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    (spec_dir / f"{spec_id}.md").write_text("# Test spec", encoding="utf-8")
+
+  def _write_registry(self, filename: str, data: dict) -> None:
+    """Write a registry YAML file."""
+    registry_path = self.registry_dir / filename
+    text = yaml.safe_dump(data, sort_keys=False)
+    registry_path.write_text(text, encoding="utf-8")
+
+  def test_no_cross_references(self) -> None:
+    """Test deletion when there are no cross-references."""
+    self._create_spec("SPEC-001")
+    self._write_registry("requirements.yaml", {"requirements": {}})
+    self._write_registry("deltas.yaml", {"deltas": {}})
+    self._write_registry("revisions.yaml", {"revisions": {}})
+    self._write_registry("decisions.yaml", {"decisions": {}})
+
+    plan = self.validator.validate_spec_deletion("SPEC-001")
+
+    assert plan.is_safe is True
+    assert len(plan.warnings) == 0
+
+  def test_blocked_by_requirement(self) -> None:
+    """Test deletion blocked by requirement reference."""
+    self._create_spec("SPEC-001")
+    self._write_registry(
+      "requirements.yaml",
+      {"requirements": {"SPEC-001.FR-001": {"specs": ["SPEC-001"]}}},
+    )
+    self._write_registry("deltas.yaml", {"deltas": {}})
+    self._write_registry("revisions.yaml", {"revisions": {}})
+    self._write_registry("decisions.yaml", {"decisions": {}})
+
+    plan = self.validator.validate_spec_deletion("SPEC-001")
+
+    assert plan.is_safe is False
+    assert len(plan.warnings) == 1
+    assert "requirement SPEC-001.FR-001" in plan.warnings[0]
+
+  def test_blocked_by_delta(self) -> None:
+    """Test deletion blocked by delta reference."""
+    self._create_spec("SPEC-001")
+    self._write_registry("requirements.yaml", {"requirements": {}})
+    self._write_registry(
+      "deltas.yaml",
+      {"deltas": {"DE-005": {"applies_to": {"specs": ["SPEC-001"]}}}},
+    )
+    self._write_registry("revisions.yaml", {"revisions": {}})
+    self._write_registry("decisions.yaml", {"decisions": {}})
+
+    plan = self.validator.validate_spec_deletion("SPEC-001")
+
+    assert plan.is_safe is False
+    assert len(plan.warnings) == 1
+    assert "delta DE-005" in plan.warnings[0]
+
+  def test_blocked_by_revision(self) -> None:
+    """Test deletion blocked by revision reference."""
+    self._create_spec("SPEC-001")
+    self._write_registry("requirements.yaml", {"requirements": {}})
+    self._write_registry("deltas.yaml", {"deltas": {}})
+    self._write_registry(
+      "revisions.yaml",
+      {"revisions": {"RE-003": {"relations": [{"target": "SPEC-001"}]}}},
+    )
+    self._write_registry("decisions.yaml", {"decisions": {}})
+
+    plan = self.validator.validate_spec_deletion("SPEC-001")
+
+    assert plan.is_safe is False
+    assert len(plan.warnings) == 1
+    assert "revision RE-003" in plan.warnings[0]
+
+  def test_blocked_by_decision(self) -> None:
+    """Test deletion blocked by decision reference."""
+    self._create_spec("SPEC-001")
+    self._write_registry("requirements.yaml", {"requirements": {}})
+    self._write_registry("deltas.yaml", {"deltas": {}})
+    self._write_registry("revisions.yaml", {"revisions": {}})
+    self._write_registry(
+      "decisions.yaml",
+      {"decisions": {"ADR-042": {"specs": ["SPEC-001"]}}},
+    )
+
+    plan = self.validator.validate_spec_deletion("SPEC-001")
+
+    assert plan.is_safe is False
+    assert len(plan.warnings) == 1
+    assert "decision ADR-042" in plan.warnings[0]
+
+  def test_blocked_by_multiple_references(self) -> None:
+    """Test deletion blocked by multiple types of references."""
+    self._create_spec("SPEC-001")
+    self._write_registry(
+      "requirements.yaml",
+      {"requirements": {"SPEC-001.FR-001": {"specs": ["SPEC-001"]}}},
+    )
+    self._write_registry(
+      "deltas.yaml",
+      {"deltas": {"DE-005": {"applies_to": {"specs": ["SPEC-001"]}}}},
+    )
+    self._write_registry("revisions.yaml", {"revisions": {}})
+    self._write_registry("decisions.yaml", {"decisions": {}})
+
+    plan = self.validator.validate_spec_deletion("SPEC-001")
+
+    assert plan.is_safe is False
+    assert len(plan.warnings) == 2
+    assert any("requirement" in w for w in plan.warnings)
+    assert any("delta" in w for w in plan.warnings)
+
+  def test_orphaned_specs_parameter_accepted(self) -> None:
+    """Test that orphaned_specs parameter is accepted."""
+    self._create_spec("SPEC-001")
+    self._write_registry("requirements.yaml", {"requirements": {}})
+    self._write_registry("deltas.yaml", {"deltas": {}})
+    self._write_registry("revisions.yaml", {"revisions": {}})
+    self._write_registry("decisions.yaml", {"decisions": {}})
+
+    # Should not raise error
+    plan = self.validator.validate_spec_deletion(
+      "SPEC-001",
+      orphaned_specs={"SPEC-001", "SPEC-002"},
+    )
+
+    assert plan.is_safe is True
 
 
 if __name__ == "__main__":

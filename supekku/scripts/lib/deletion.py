@@ -6,10 +6,13 @@ of registries, symlinks, and cross-references.
 
 from __future__ import annotations
 
+import re
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
+import yaml
 
 from .registry_migration import RegistryV2
 from .spec_index import SpecIndexBuilder
@@ -68,6 +71,214 @@ class DeletionPlan:
     self.cross_references[from_id].append(to_id)
 
 
+class RegistryScanner:
+  """Scans YAML registries for cross-references to specs.
+
+  Loads and parses requirements, deltas, revisions, and decisions registries
+  to find which artifacts reference a given spec.
+  """
+
+  def __init__(self, repo_root: Path) -> None:
+    """Initialize scanner.
+
+    Args:
+        repo_root: Repository root directory
+
+    """
+    self.repo_root = repo_root
+    self.registry_dir = repo_root / ".spec-driver" / "registry"
+
+  def find_spec_references(self, spec_id: str) -> dict[str, list[str]]:
+    """Find all artifacts that reference a spec.
+
+    Args:
+        spec_id: Spec ID to search for (e.g., "SPEC-001")
+
+    Returns:
+        Dictionary mapping artifact type to list of artifact IDs:
+        {
+          "requirements": ["SPEC-001.FR-001", "SPEC-001.NFR-002"],
+          "deltas": ["DE-005"],
+          "revisions": ["RE-003"],
+          "decisions": ["ADR-042"]
+        }
+
+    """
+    references: dict[str, list[str]] = {
+      "requirements": [],
+      "deltas": [],
+      "revisions": [],
+      "decisions": [],
+    }
+
+    # Check requirements.yaml
+    self._scan_requirements(spec_id, references)
+
+    # Check deltas.yaml
+    self._scan_deltas(spec_id, references)
+
+    # Check revisions.yaml
+    self._scan_revisions(spec_id, references)
+
+    # Check decisions.yaml
+    self._scan_decisions(spec_id, references)
+
+    return references
+
+  def _load_registry(self, filename: str) -> dict[str, Any] | None:
+    """Load a registry YAML file.
+
+    Args:
+        filename: Name of the registry file (e.g., "requirements.yaml")
+
+    Returns:
+        Parsed YAML data or None if file missing/malformed
+
+    """
+    registry_path = self.registry_dir / filename
+    if not registry_path.exists():
+      return None
+
+    try:
+      with registry_path.open(encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+        return data if isinstance(data, dict) else None
+    except (yaml.YAMLError, OSError):
+      # Malformed YAML or read error - treat as no references
+      return None
+
+  def _scan_requirements(
+    self,
+    spec_id: str,
+    references: dict[str, list[str]],
+  ) -> None:
+    """Scan requirements.yaml for references to spec_id.
+
+    Args:
+        spec_id: Spec ID to search for
+        references: Dictionary to populate with found references
+
+    """
+    data = self._load_registry("requirements.yaml")
+    if not data or "requirements" not in data:
+      return
+
+    for req_id, req_data in data["requirements"].items():
+      if not isinstance(req_data, dict):
+        continue
+
+      # Check if this requirement references the spec
+      specs = req_data.get("specs", [])
+      if isinstance(specs, list) and spec_id in specs:
+        references["requirements"].append(req_id)
+
+  def _scan_deltas(
+    self,
+    spec_id: str,
+    references: dict[str, list[str]],
+  ) -> None:
+    """Scan deltas.yaml for references to spec_id.
+
+    Args:
+        spec_id: Spec ID to search for
+        references: Dictionary to populate with found references
+
+    """
+    data = self._load_registry("deltas.yaml")
+    if not data or "deltas" not in data:
+      return
+
+    for delta_id, delta_data in data["deltas"].items():
+      if not isinstance(delta_data, dict):
+        continue
+
+      # Check applies_to.specs
+      applies_to = delta_data.get("applies_to", {})
+      if isinstance(applies_to, dict):
+        specs = applies_to.get("specs", [])
+        if isinstance(specs, list) and spec_id in specs:
+          references["deltas"].append(delta_id)
+
+  def _scan_revisions(
+    self,
+    spec_id: str,
+    references: dict[str, list[str]],
+  ) -> None:
+    """Scan revisions.yaml for references to spec_id.
+
+    Args:
+        spec_id: Spec ID to search for
+        references: Dictionary to populate with found references
+
+    """
+    data = self._load_registry("revisions.yaml")
+    if not data or "revisions" not in data:
+      return
+
+    for revision_id, revision_data in data["revisions"].items():
+      if not isinstance(revision_data, dict):
+        continue
+
+      # Check relations[].target
+      relations = revision_data.get("relations", [])
+      if isinstance(relations, list):
+        for relation in relations:
+          if isinstance(relation, dict):
+            target = relation.get("target")
+            if target == spec_id:
+              references["revisions"].append(revision_id)
+              break  # Only add revision once even if multiple relations
+
+  def _scan_decisions(
+    self,
+    spec_id: str,
+    references: dict[str, list[str]],
+  ) -> None:
+    """Scan decisions.yaml for references to spec_id.
+
+    Args:
+        spec_id: Spec ID to search for
+        references: Dictionary to populate with found references
+
+    """
+    data = self._load_registry("decisions.yaml")
+    if not data or "decisions" not in data:
+      return
+
+    for decision_id, decision_data in data["decisions"].items():
+      if not isinstance(decision_data, dict):
+        continue
+
+      # Check specs list
+      specs = decision_data.get("specs", [])
+      if isinstance(specs, list) and spec_id in specs:
+        references["decisions"].append(decision_id)
+        continue
+
+      # Check requirements list (extract spec from SPEC-XXX.FR-YYY)
+      requirements = decision_data.get("requirements", [])
+      if isinstance(requirements, list):
+        for req_id in requirements:
+          extracted = self._extract_spec_from_requirement(req_id)
+          if isinstance(req_id, str) and extracted == spec_id:
+            references["decisions"].append(decision_id)
+            break
+
+  @staticmethod
+  def _extract_spec_from_requirement(req_id: str) -> str | None:
+    """Extract spec ID from requirement ID.
+
+    Args:
+        req_id: Requirement ID (e.g., "SPEC-042.FR-001")
+
+    Returns:
+        Spec ID (e.g., "SPEC-042") or None if no match
+
+    """
+    match = re.match(r"^(SPEC-\d+|PROD-\d+)\..*", req_id)
+    return match.group(1) if match else None
+
+
 class DeletionValidator:
   """Validates deletion safety and identifies cleanup requirements.
 
@@ -85,12 +296,21 @@ class DeletionValidator:
     self.repo_root = repo_root
     self.tech_dir = repo_root / "specify" / "tech"
     self.change_dir = repo_root / "change"
+    self.scanner = RegistryScanner(repo_root)
 
-  def validate_spec_deletion(self, spec_id: str) -> DeletionPlan:
+  def validate_spec_deletion(
+    self,
+    spec_id: str,
+    *,
+    orphaned_specs: set[str] | None = None,
+  ) -> DeletionPlan:
     """Validate deletion of a spec.
 
     Args:
         spec_id: Spec ID (e.g., "SPEC-001")
+        orphaned_specs: Set of spec IDs known to be orphaned (for context).
+                       If provided, cross-references from other orphaned specs
+                       will not block deletion.
 
     Returns:
         DeletionPlan describing what would be deleted
@@ -117,8 +337,47 @@ class DeletionValidator:
     # Check registry entries (would need to parse registry_v2.json)
     plan.add_registry_update("registry_v2.json", spec_id)
 
-    # TODO: Find cross-references in deltas, revisions, requirements
-    # This requires parsing YAML/markdown files
+    # Find cross-references in registries
+    references = self.scanner.find_spec_references(spec_id)
+
+    # Process cross-references
+    # Note: orphaned_specs parameter reserved for future orphan-to-orphan logic
+    for ref_type, ref_ids in references.items():
+      if not ref_ids:
+        continue
+
+      if ref_type == "requirements":
+        # Requirements reference specs - always block deletion
+        for req_id in ref_ids:
+          plan.add_cross_reference(req_id, spec_id)
+          plan.is_safe = False
+          plan.add_warning(f"Referenced by requirement {req_id}")
+
+      elif ref_type == "deltas":
+        # Deltas reference specs - always block deletion
+        for delta_id in ref_ids:
+          plan.add_cross_reference(delta_id, spec_id)
+          plan.is_safe = False
+          plan.add_warning(f"Referenced by delta {delta_id}")
+
+      elif ref_type == "revisions":
+        # Revisions reference specs - always block deletion
+        for revision_id in ref_ids:
+          plan.add_cross_reference(revision_id, spec_id)
+          plan.is_safe = False
+          plan.add_warning(f"Referenced by revision {revision_id}")
+
+      elif ref_type == "decisions":
+        # Decisions reference specs - always block deletion
+        for decision_id in ref_ids:
+          plan.add_cross_reference(decision_id, spec_id)
+          plan.is_safe = False
+          plan.add_warning(f"Referenced by decision {decision_id}")
+
+    # Note: We could add logic to check if requirements are from orphaned specs,
+    # but requirements are typically tied to specific spec IDs (SPEC-XXX.FR-YYY)
+    # and should persist even if the source is deleted, so we block all
+    # requirement references unconditionally.
 
     return plan
 
@@ -251,4 +510,5 @@ __all__ = [
   "DeletionPlan",
   "DeletionValidator",
   "DeletionExecutor",
+  "RegistryScanner",
 ]

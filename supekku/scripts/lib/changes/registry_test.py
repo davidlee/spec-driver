@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.paths import get_registry_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
-from supekku.scripts.lib.relations import add_relation
+from supekku.scripts.lib.relations.manager import add_relation
 from supekku.scripts.lib.test_base import RepoTestCase
 
 if TYPE_CHECKING:

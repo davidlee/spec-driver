@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import argparse
 
-from supekku.scripts.lib.backlog import create_backlog_entry
+from supekku.scripts.lib.backlog.registry import create_backlog_entry
 
 
 def main() -> None:

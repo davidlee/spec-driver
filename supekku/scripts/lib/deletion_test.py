@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 
 import yaml
 
-from .deletion import (
+from .deletion.executor import (
   DeletionExecutor,
   DeletionPlan,
   DeletionValidator,

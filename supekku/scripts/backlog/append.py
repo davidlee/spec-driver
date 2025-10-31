@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from supekku.scripts.lib.backlog import append_backlog_summary
+from supekku.scripts.lib.backlog.registry import append_backlog_summary
 
 
 def main() -> None:

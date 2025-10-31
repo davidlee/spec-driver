@@ -10,7 +10,7 @@ import typer
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
 from supekku.scripts.install import initialize_workspace
 from supekku.scripts.lib.core.repo import find_repo_root
-from supekku.scripts.lib.validator import validate_workspace as validate_ws
+from supekku.scripts.lib.validation.validator import validate_workspace as validate_ws
 from supekku.scripts.lib.workspace import Workspace
 
 app = typer.Typer(help="Workspace management commands")

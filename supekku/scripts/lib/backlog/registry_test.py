@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from supekku.scripts.lib.backlog import (
+from supekku.scripts.lib.backlog.registry import (
   append_backlog_summary,
   create_backlog_entry,
   find_repo_root,

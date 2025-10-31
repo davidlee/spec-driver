@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 from typing import TYPE_CHECKING, Any
 
-from .core.frontmatter_schema import Relation
-from .core.spec_utils import dump_markdown_file, load_markdown_file
+from supekku.scripts.lib.core.frontmatter_schema import Relation
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 
 if TYPE_CHECKING:
   from pathlib import Path

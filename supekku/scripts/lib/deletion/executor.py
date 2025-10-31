@@ -14,8 +14,8 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from .registry_migration import RegistryV2
-from .specs.index import SpecIndexBuilder
+from supekku.scripts.lib.registry_migration import RegistryV2
+from supekku.scripts.lib.specs.index import SpecIndexBuilder
 
 if TYPE_CHECKING:
   pass

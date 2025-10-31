@@ -7,7 +7,7 @@ import argparse
 from pathlib import Path
 
 from supekku.scripts.lib.core.paths import get_registry_dir  # type: ignore
-from supekku.scripts.lib.requirements import (  # type: ignore
+from supekku.scripts.lib.requirements.registry import (  # type: ignore
   VALID_STATUSES,
   RequirementsRegistry,
 )

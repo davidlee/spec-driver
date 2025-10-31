@@ -9,28 +9,31 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from .changes.blocks.delta import (
+from supekku.scripts.lib.changes.blocks.delta import (
   DeltaRelationshipsValidator,
   extract_delta_relationships,
 )
-from .changes.blocks.revision import (
+from supekku.scripts.lib.changes.blocks.revision import (
   RevisionBlockValidator,
   load_revision_blocks,
 )
-from .core.repo import find_repo_root
-from .core.spec_utils import load_markdown_file
-from .lifecycle import (
+from supekku.scripts.lib.core.repo import find_repo_root
+from supekku.scripts.lib.core.spec_utils import load_markdown_file
+from supekku.scripts.lib.lifecycle import (
   STATUS_PENDING,
   VALID_STATUSES,
   RequirementStatus,
 )
-from .relations import list_relations
-from .specs.blocks import RelationshipsBlockValidator, extract_relationships
+from supekku.scripts.lib.relations.manager import list_relations
+from supekku.scripts.lib.specs.blocks import (
+  RelationshipsBlockValidator,
+  extract_relationships,
+)
 
 if TYPE_CHECKING:
   from pathlib import Path
 
-  from .specs.registry import SpecRegistry
+  from supekku.scripts.lib.specs.registry import SpecRegistry
 
 _REQUIREMENT_LINE = re.compile(
   r"^\s*[-*]\s*\*{0,2}\s*(FR|NF)-(\d{3})\s*\*{0,2}\s*[:\-–]\s*(.+)$",

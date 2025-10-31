@@ -9,7 +9,7 @@ from .changes.registry import ChangeRegistry
 from .core.paths import get_registry_dir
 from .core.repo import find_repo_root
 from .decisions.registry import DecisionRegistry
-from .requirements import RequirementsRegistry
+from .requirements.registry import RequirementsRegistry
 from .specs.registry import SpecRegistry
 
 if TYPE_CHECKING:

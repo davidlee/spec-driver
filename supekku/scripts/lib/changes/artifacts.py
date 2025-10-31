@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
-from supekku.scripts.lib.relations import list_relations
+from supekku.scripts.lib.relations.manager import list_relations
 
 from .blocks.delta import DeltaRelationshipsValidator, extract_delta_relationships
 from .blocks.plan import extract_phase_overview, extract_plan_overview

@@ -336,7 +336,7 @@ def _sync_specs(
       orphaned_count += len(orphaned_units)
 
       if prune:
-        from supekku.scripts.lib.deletion import DeletionExecutor
+        from supekku.scripts.lib.deletion.executor import DeletionExecutor
 
         typer.echo(f"\n  Pruning {len(orphaned_units)} orphaned specs...")
         executor = DeletionExecutor(root)

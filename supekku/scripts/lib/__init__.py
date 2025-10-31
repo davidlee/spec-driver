@@ -1,6 +1,6 @@
 """Supekku library modules for spec management and documentation generation."""
 
-from .backlog import (
+from .backlog.registry import (
   append_backlog_summary,
   create_backlog_entry,
   find_repo_root,
@@ -26,7 +26,7 @@ from .core.spec_utils import (
   load_markdown_file,
   load_validated_markdown_file,
 )
-from .relations import (
+from .relations.manager import (
   add_relation,
   list_relations,
   remove_relation,

@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
   from pathlib import Path
 
-  from supekku.scripts.lib.spec_models import Spec
+  from supekku.scripts.lib.specs.models import Spec
 
 
 def format_package_list(packages: list[str]) -> str:

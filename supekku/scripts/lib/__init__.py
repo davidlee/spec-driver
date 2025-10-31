@@ -6,12 +6,6 @@ from .backlog import (
   find_repo_root,
 )
 from .change_registry import ChangeRegistry
-from .create_spec import (
-  CreateSpecOptions,
-  CreateSpecResult,
-  SpecCreationError,
-  create_spec,
-)
 from .core.frontmatter_schema import (
   FrontmatterValidationError,
   FrontmatterValidationResult,
@@ -25,13 +19,6 @@ from .core.paths import (
   get_spec_driver_root,
   get_templates_dir,
 )
-from .relations import (
-  add_relation,
-  list_relations,
-  remove_relation,
-)
-from .spec_models import Spec
-from .spec_registry import SpecRegistry
 from .core.spec_utils import (
   append_unique,
   dump_markdown_file,
@@ -39,6 +26,19 @@ from .core.spec_utils import (
   load_markdown_file,
   load_validated_markdown_file,
 )
+from .relations import (
+  add_relation,
+  list_relations,
+  remove_relation,
+)
+from .specs.creation import (
+  CreateSpecOptions,
+  CreateSpecResult,
+  SpecCreationError,
+  create_spec,
+)
+from .specs.models import Spec
+from .specs.registry import SpecRegistry
 from .workspace import Workspace
 
 __all__ = [

@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any
 import yaml
 
 from .registry_migration import RegistryV2
-from .spec_index import SpecIndexBuilder
+from .specs.index import SpecIndexBuilder
 
 if TYPE_CHECKING:
   pass

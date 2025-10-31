@@ -6,8 +6,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.cli_utils import add_root_argument
+from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.validator import validate_workspace  # type: ignore
 from supekku.scripts.lib.workspace import Workspace  # type: ignore
 

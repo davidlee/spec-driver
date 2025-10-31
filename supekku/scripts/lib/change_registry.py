@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING
 
 import yaml
 
-from .core.repo import find_repo_root
 from .change_artifacts import ChangeArtifact, load_change_artifact
 from .core.paths import get_registry_dir
+from .core.repo import find_repo_root
 
 if TYPE_CHECKING:
   from pathlib import Path

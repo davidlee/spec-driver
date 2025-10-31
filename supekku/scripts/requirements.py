@@ -11,7 +11,7 @@ from supekku.scripts.lib.requirements import (  # type: ignore
   VALID_STATUSES,
   RequirementsRegistry,
 )
-from supekku.scripts.lib.spec_registry import SpecRegistry  # type: ignore
+from supekku.scripts.lib.specs.registry import SpecRegistry  # type: ignore
 
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = get_registry_dir(ROOT) / "requirements.yaml"

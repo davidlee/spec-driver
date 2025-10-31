@@ -10,9 +10,9 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from .core.repo import find_repo_root
-from .core.paths import get_registry_dir
-from .core.spec_utils import load_markdown_file
+from supekku.scripts.lib.core.paths import get_registry_dir
+from supekku.scripts.lib.core.repo import find_repo_root
+from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 if TYPE_CHECKING:
   from collections.abc import Iterator

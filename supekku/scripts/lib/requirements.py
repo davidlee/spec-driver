@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any
 import yaml
 
 from .core.repo import find_repo_root
+from .core.spec_utils import load_markdown_file
 from .delta_blocks import DeltaRelationshipsValidator, extract_delta_relationships
 from .lifecycle import (
   STATUS_PENDING,
@@ -21,13 +22,12 @@ from .revision_blocks import (
   RevisionBlockValidator,
   load_revision_blocks,
 )
-from .spec_blocks import RelationshipsBlockValidator, extract_relationships
-from .core.spec_utils import load_markdown_file
+from .specs.blocks import RelationshipsBlockValidator, extract_relationships
 
 if TYPE_CHECKING:
   from pathlib import Path
 
-  from .spec_registry import SpecRegistry
+  from .specs.registry import SpecRegistry
 
 _REQUIREMENT_LINE = re.compile(
   r"^\s*[-*]\s*\*{0,2}\s*(FR|NF)-(\d{3})\s*\*{0,2}\s*[:\-–]\s*(.+)$",

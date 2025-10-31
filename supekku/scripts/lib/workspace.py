@@ -5,12 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from .core.repo import find_repo_root
 from .change_registry import ChangeRegistry
-from .decision_registry import DecisionRegistry
 from .core.paths import get_registry_dir
+from .core.repo import find_repo_root
+from .decisions.registry import DecisionRegistry
 from .requirements import RequirementsRegistry
-from .spec_registry import SpecRegistry
+from .specs.registry import SpecRegistry
 
 if TYPE_CHECKING:
   from pathlib import Path

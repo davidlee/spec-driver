@@ -1,26 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(uv run pytest:*)",
-      "Bash(source .venv/bin/activate)",
-      "Bash(ruff check:*)",
-      "Bash(just lint:*)",
-      "Bash(just test:*)",
-      "Read(//home/david/dev/vice/.spec-driver/registry/**)",
-      "Bash(uv run ruff check:*)",
-      "Bash(uv run:*)",
-      "Bash(uv run python:*)",
-      "Bash(just pylint:*)",
-      "Bash(just pylint-only:*)",
-      "Bash(python:*)",
-      "Bash(git mv:*)",
-      "Bash(for file in __init__.py workspace.py create_spec.py create_change.py decision_registry.py spec_registry.py backlog.py relations.py change_artifacts.py revision_discovery.py decision_registry_test.py sync_engine.py change_registry.py spec_models.py requirements.py)",
-      "Bash(do)",
-      "Bash(if [ -f \"$file\" ])",
-      "Bash(then)",
-      "Bash(echo:*)",
-      "Bash(fi)",
-      "Bash(done)"
+      "Bash(for file in supekku/cli/adr.py supekku/cli/create.py supekku/cli/show.py supekku/cli/sync.py supekku/scripts/decision_registry.py supekku/scripts/lib/decisions/creation.py supekku/scripts/lib/formatters/decision_formatters_test.py supekku/scripts/lib/workspace_test.py)"
     ],
     "deny": [],
     "ask": []

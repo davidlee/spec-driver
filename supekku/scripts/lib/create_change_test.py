@@ -7,13 +7,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.create_change import (
   ChangeArtifactCreated,
   create_delta,
   create_requirement_breakout,
   create_revision,
 )
-from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 
 class CreateChangeTest(unittest.TestCase):

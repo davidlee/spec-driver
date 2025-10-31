@@ -25,16 +25,16 @@ if str(ROOT) not in sys.path:
   sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
-from supekku.scripts.lib.registry_migration import RegistryV2  # type: ignore
-from supekku.scripts.lib.spec_index import SpecIndexBuilder  # type: ignore
-from supekku.scripts.lib.spec_sync.engine import SpecSyncEngine  # type: ignore
-from supekku.scripts.lib.spec_sync.models import SourceUnit  # type: ignore
 from supekku.scripts.lib.core.spec_utils import (  # type: ignore
   append_unique,
   dump_markdown_file,
   ensure_list_entry,
   load_markdown_file,
 )
+from supekku.scripts.lib.registry_migration import RegistryV2  # type: ignore
+from supekku.scripts.lib.spec_sync.engine import SpecSyncEngine  # type: ignore
+from supekku.scripts.lib.spec_sync.models import SourceUnit  # type: ignore
+from supekku.scripts.lib.specs.index import SpecIndexBuilder  # type: ignore
 
 
 class MultiLanguageSpecManager:

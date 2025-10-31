@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from supekku.scripts.lib.decision_registry import DecisionRegistry
+from supekku.scripts.lib.decisions.registry import DecisionRegistry
 
 # ADR template content
 ADR_TEMPLATE = """# {adr_id}: {title}

@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
   from pathlib import Path
 
-  from .core.frontmatter_schema import FrontmatterValidationResult
+  from supekku.scripts.lib.core.frontmatter_schema import FrontmatterValidationResult
 
 
 @dataclass(frozen=True)

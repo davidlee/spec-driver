@@ -20,7 +20,7 @@ from supekku.scripts.lib.core.cli_utils import add_root_argument
 from supekku.scripts.lib.formatters.spec_formatters import (  # type: ignore
   format_spec_list_item,
 )
-from supekku.scripts.lib.spec_registry import SpecRegistry  # type: ignore
+from supekku.scripts.lib.specs.registry import SpecRegistry  # type: ignore
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:

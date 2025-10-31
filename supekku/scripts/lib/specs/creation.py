@@ -9,8 +9,8 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from .core.paths import SPEC_DRIVER_DIR, get_templates_dir
-from .core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, get_templates_dir
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 
 if TYPE_CHECKING:
   from collections.abc import MutableMapping

@@ -12,7 +12,7 @@ if str(ROOT) not in sys.path:
   sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
-from supekku.scripts.lib.create_spec import (  # type: ignore
+from supekku.scripts.lib.specs.creation import (  # type: ignore
   CreateSpecOptions,
   SpecCreationError,
   create_spec,

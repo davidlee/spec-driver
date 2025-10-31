@@ -13,21 +13,21 @@ from supekku.scripts.lib.create_change import (
   create_requirement_breakout,
   create_revision,
 )
-from supekku.scripts.lib.create_spec import (
-  CreateSpecOptions,
-  SpecCreationError,
-)
-from supekku.scripts.lib.create_spec import (
-  create_spec as create_spec_impl,
-)
-from supekku.scripts.lib.decision_creation import (
+from supekku.scripts.lib.decisions.creation import (
   ADRAlreadyExistsError,
   ADRCreationOptions,
 )
-from supekku.scripts.lib.decision_creation import (
+from supekku.scripts.lib.decisions.creation import (
   create_adr as create_adr_impl,
 )
-from supekku.scripts.lib.decision_registry import DecisionRegistry
+from supekku.scripts.lib.decisions.registry import DecisionRegistry
+from supekku.scripts.lib.specs.creation import (
+  CreateSpecOptions,
+  SpecCreationError,
+)
+from supekku.scripts.lib.specs.creation import (
+  create_spec as create_spec_impl,
+)
 
 app = typer.Typer(help="Create new artifacts")
 

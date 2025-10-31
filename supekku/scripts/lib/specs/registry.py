@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .core.repo import find_repo_root
-from .spec_models import Spec
-from .core.spec_utils import load_validated_markdown_file
+from supekku.scripts.lib.core.repo import find_repo_root
+from supekku.scripts.lib.core.spec_utils import load_validated_markdown_file
+
+from .models import Spec
 
 if TYPE_CHECKING:
   from collections.abc import Iterator

@@ -6,8 +6,8 @@ import os
 import unittest
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.relations import add_relation
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.relations import add_relation
 from supekku.scripts.lib.test_base import RepoTestCase
 from supekku.scripts.lib.validator import validate_workspace
 from supekku.scripts.lib.workspace import Workspace

@@ -8,9 +8,9 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from .create_spec import extract_template_body, find_repository_root, slugify
-from .spec_registry import SpecRegistry
 from .core.spec_utils import dump_markdown_file
+from .specs.creation import extract_template_body, find_repository_root, slugify
+from .specs.registry import SpecRegistry
 
 if TYPE_CHECKING:
   from collections.abc import Iterable

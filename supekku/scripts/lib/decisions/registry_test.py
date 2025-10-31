@@ -9,8 +9,9 @@ from pathlib import Path
 
 import yaml
 
-from .decision_registry import DecisionRecord, DecisionRegistry
-from .core.paths import get_registry_dir
+from supekku.scripts.lib.core.paths import get_registry_dir
+
+from .registry import DecisionRecord, DecisionRegistry
 
 
 class TestDecisionRecord(unittest.TestCase):

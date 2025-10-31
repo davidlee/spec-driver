@@ -16,7 +16,7 @@ from supekku.scripts.lib.change_lifecycle import VALID_STATUSES, normalize_statu
 from supekku.scripts.lib.change_registry import ChangeRegistry
 from supekku.scripts.lib.formatters.change_formatters import format_change_with_context
 from supekku.scripts.lib.formatters.spec_formatters import format_spec_list_item
-from supekku.scripts.lib.spec_registry import SpecRegistry
+from supekku.scripts.lib.specs.registry import SpecRegistry
 
 app = typer.Typer(help="List artifacts")
 

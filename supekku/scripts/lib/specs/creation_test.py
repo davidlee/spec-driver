@@ -10,14 +10,14 @@ from pathlib import Path
 
 import pytest
 
-from supekku.scripts.lib.create_spec import (
+from supekku.scripts.lib.core.paths import get_templates_dir
+from supekku.scripts.lib.core.spec_utils import load_markdown_file
+from supekku.scripts.lib.specs.creation import (
   CreateSpecOptions,
   RepositoryRootNotFoundError,
   TemplateNotFoundError,
   create_spec,
 )
-from supekku.scripts.lib.core.paths import get_templates_dir
-from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 
 class CreateSpecTest(unittest.TestCase):

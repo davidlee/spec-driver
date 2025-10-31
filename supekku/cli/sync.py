@@ -423,7 +423,7 @@ def _sync_specs(
 
 def _sync_adr(root: Path) -> dict:
   """Execute ADR registry synchronization."""
-  from supekku.scripts.lib.decision_registry import DecisionRegistry
+  from supekku.scripts.lib.decisions.registry import DecisionRegistry
 
   registry = DecisionRegistry(root=root)
   registry.sync_with_symlinks()

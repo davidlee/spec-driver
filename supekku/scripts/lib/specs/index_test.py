@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 
 import yaml
 
-from .spec_index import SpecIndexBuilder, SpecIndexEntry
+from .index import SpecIndexBuilder, SpecIndexEntry
 
 
 class TestSpecIndexEntry(unittest.TestCase):

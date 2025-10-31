@@ -6,9 +6,9 @@ import os
 import unittest
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.spec_models import Spec
-from supekku.scripts.lib.spec_registry import SpecRegistry
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.specs.models import Spec
+from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.test_base import RepoTestCase
 
 if TYPE_CHECKING:

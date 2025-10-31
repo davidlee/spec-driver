@@ -7,12 +7,12 @@ import argparse
 import sys
 
 from supekku.scripts.lib.core.cli_utils import add_root_argument  # type: ignore
-from supekku.scripts.lib.decision_creation import (  # type: ignore
+from supekku.scripts.lib.decisions.creation import (  # type: ignore
   ADRAlreadyExistsError,
   ADRCreationOptions,
   create_adr,
 )
-from supekku.scripts.lib.decision_registry import DecisionRegistry  # type: ignore
+from supekku.scripts.lib.decisions.registry import DecisionRegistry  # type: ignore
 
 
 def create_sync_parser(subparsers: argparse._SubParsersAction) -> None:

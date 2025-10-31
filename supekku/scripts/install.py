@@ -13,13 +13,14 @@ from pathlib import Path
 
 import yaml
 
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
+
 # Import after path setup to avoid circular imports
 from supekku.scripts.lib.file_ops import (
   format_change_summary,
   format_detailed_changes,
   scan_directory_changes,
 )
-from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
 
 
 def get_package_root() -> Path:

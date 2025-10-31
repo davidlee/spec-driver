@@ -5,7 +5,7 @@ from __future__ import annotations
 import unittest
 from datetime import date
 
-from supekku.scripts.lib.decision_registry import DecisionRecord
+from supekku.scripts.lib.decisions.registry import DecisionRecord
 from supekku.scripts.lib.formatters.decision_formatters import format_decision_details
 
 

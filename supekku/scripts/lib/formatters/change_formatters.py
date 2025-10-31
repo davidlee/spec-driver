@@ -41,7 +41,7 @@ def format_phase_summary(phase: dict[str, Any], max_objective_len: int = 60) -> 
   # Take first line only and truncate if needed
   objective = objective.splitlines()[0]
   if len(objective) > max_objective_len:
-    objective = objective[:max_objective_len - 3] + "..."
+    objective = objective[: max_objective_len - 3] + "..."
 
   return f"{phase_id}: {objective}"
 

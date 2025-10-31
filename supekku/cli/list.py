@@ -15,6 +15,7 @@ from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
 from supekku.scripts.lib.change_lifecycle import VALID_STATUSES, normalize_status
 from supekku.scripts.lib.change_registry import ChangeRegistry
 from supekku.scripts.lib.formatters.change_formatters import format_change_with_context
+from supekku.scripts.lib.formatters.spec_formatters import format_spec_list_item
 from supekku.scripts.lib.spec_registry import SpecRegistry
 
 app = typer.Typer(help="List artifacts")
@@ -159,18 +160,12 @@ def list_specs(
     for spec in specs:
       if not normalise_kind(kind, spec.id):
         continue
-      line = spec.id
-      if paths:
-        try:
-          rel = spec.path.relative_to(registry.root)
-        except ValueError:
-          rel = spec.path
-        line += f"\t{rel.as_posix()}"
-      else:
-        line += f"\t{spec.slug}"
-      if packages:
-        pkg_list = ",".join(spec.packages)
-        line += f"\t{pkg_list}"
+      line = format_spec_list_item(
+        spec,
+        include_path=paths,
+        include_packages=packages,
+        root=registry.root,
+      )
       typer.echo(line)
 
     raise typer.Exit(EXIT_SUCCESS)

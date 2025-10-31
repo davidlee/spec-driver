@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""List SPEC/PROD artefacts with optional substring filtering."""
+"""List SPEC/PROD artefacts with optional substring filtering.
+
+Thin script layer: parse args → load registry → filter → format → output
+Display formatting is delegated to supekku.scripts.lib.formatters
+"""
 
 from __future__ import annotations
 
@@ -13,6 +17,9 @@ if str(ROOT) not in sys.path:
 
 # pylint: disable=wrong-import-position
 from supekku.scripts.lib.cli_utils import add_root_argument
+from supekku.scripts.lib.formatters.spec_formatters import (  # type: ignore
+  format_spec_list_item,
+)
 from supekku.scripts.lib.spec_registry import SpecRegistry  # type: ignore
 
 
@@ -173,18 +180,12 @@ def main(argv: list[str] | None = None) -> int:
   for spec in specs:
     if not normalise_kind(args.kind, spec.id):
       continue
-    line = spec.id
-    if args.paths:
-      try:
-        rel = spec.path.relative_to(registry.root)
-      except ValueError:
-        rel = spec.path
-      line += f"\t{rel.as_posix()}"
-    else:
-      line += f"\t{spec.slug}"
-    if args.packages:
-      packages = ",".join(spec.packages)
-      line += f"\t{packages}"
+    line = format_spec_list_item(
+      spec,
+      include_path=args.paths,
+      include_packages=args.packages,
+      root=registry.root,
+    )
     print(line)
   return 0
 

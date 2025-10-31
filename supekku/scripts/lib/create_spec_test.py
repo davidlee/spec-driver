@@ -16,8 +16,8 @@ from supekku.scripts.lib.create_spec import (
   TemplateNotFoundError,
   create_spec,
 )
-from supekku.scripts.lib.paths import get_templates_dir
-from supekku.scripts.lib.spec_utils import load_markdown_file
+from supekku.scripts.lib.core.paths import get_templates_dir
+from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 
 class CreateSpecTest(unittest.TestCase):

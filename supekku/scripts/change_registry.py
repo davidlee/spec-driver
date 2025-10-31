@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 
 from supekku.scripts.lib.change_registry import ChangeRegistry
-from supekku.scripts.lib.cli_utils import add_root_argument
+from supekku.scripts.lib.core.cli_utils import add_root_argument
 
 KINDS = ["delta", "revision", "audit"]
 

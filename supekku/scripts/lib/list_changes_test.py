@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from supekku.scripts.lib.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.list_changes import main as list_changes_main
 
 if TYPE_CHECKING:

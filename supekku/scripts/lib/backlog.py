@@ -8,7 +8,8 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from .spec_utils import dump_markdown_file, load_markdown_file
+from .core.repo import find_repo_root
+from .core.spec_utils import dump_markdown_file, load_markdown_file
 
 if TYPE_CHECKING:
   from collections.abc import Iterable, Mapping
@@ -66,33 +67,6 @@ TEMPLATES: Mapping[str, BacklogTemplate] = {
     },
   ),
 }
-
-
-def find_repo_root(start: Path | None = None) -> Path:
-  """Find repository root from starting path.
-
-  Args:
-    start: Path to start searching from. Defaults to current directory.
-
-  Returns:
-    Repository root path.
-
-  Raises:
-    RuntimeError: If repository root cannot be found.
-  """
-  # Import here to avoid circular dependency with paths.py
-  from .paths import SPEC_DRIVER_DIR  # noqa: PLC0415
-
-  current = (start or Path.cwd()).resolve()
-  for candidate in [current, *current.parents]:
-    if (candidate / ".git").exists() or (candidate / SPEC_DRIVER_DIR).exists():
-      return candidate
-  msg = (
-    f"Could not locate repository root (missing .git or {SPEC_DRIVER_DIR} directory)"
-  )
-  raise RuntimeError(
-    msg,
-  )
 
 
 def backlog_root(repo_root: Path) -> Path:

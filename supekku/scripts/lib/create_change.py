@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from .create_spec import extract_template_body, find_repository_root, slugify
 from .spec_registry import SpecRegistry
-from .spec_utils import dump_markdown_file
+from .core.spec_utils import dump_markdown_file
 
 if TYPE_CHECKING:
   from collections.abc import Iterable

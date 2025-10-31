@@ -22,7 +22,7 @@ from supekku.scripts.lib.change_lifecycle import (  # type: ignore
   normalize_status,
 )
 from supekku.scripts.lib.change_registry import ChangeRegistry  # type: ignore
-from supekku.scripts.lib.cli_utils import add_root_argument
+from supekku.scripts.lib.core.cli_utils import add_root_argument
 from supekku.scripts.lib.formatters.change_formatters import (  # type: ignore
   format_change_list_item,
   format_change_with_context,

@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 from supekku.scripts.install import get_package_root, initialize_workspace
-from supekku.scripts.lib.paths import SPEC_DRIVER_DIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
 
 
 def test_get_package_root() -> None:

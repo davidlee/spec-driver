@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .backlog import find_repo_root
+from .repo import find_repo_root
 
 # Directory name - single source of truth
 # Changed from "supekku" to ".spec-driver" for cleaner repo root

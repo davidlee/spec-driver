@@ -10,7 +10,7 @@ from pathlib import Path
 import yaml
 
 from .decision_registry import DecisionRecord, DecisionRegistry
-from .paths import get_registry_dir
+from .core.paths import get_registry_dir
 
 
 class TestDecisionRecord(unittest.TestCase):

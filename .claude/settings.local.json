@@ -12,7 +12,15 @@
       "Bash(uv run python:*)",
       "Bash(just pylint:*)",
       "Bash(just pylint-only:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(git mv:*)",
+      "Bash(for file in __init__.py workspace.py create_spec.py create_change.py decision_registry.py spec_registry.py backlog.py relations.py change_artifacts.py revision_discovery.py decision_registry_test.py sync_engine.py change_registry.py spec_models.py requirements.py)",
+      "Bash(do)",
+      "Bash(if [ -f \"$file\" ])",
+      "Bash(then)",
+      "Bash(echo:*)",
+      "Bash(fi)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

@@ -12,13 +12,13 @@ from .create_spec import (
   SpecCreationError,
   create_spec,
 )
-from .frontmatter_schema import (
+from .core.frontmatter_schema import (
   FrontmatterValidationError,
   FrontmatterValidationResult,
   Relation,
   validate_frontmatter,
 )
-from .paths import (
+from .core.paths import (
   SPEC_DRIVER_DIR,
   get_about_dir,
   get_registry_dir,
@@ -32,7 +32,7 @@ from .relations import (
 )
 from .spec_models import Spec
 from .spec_registry import SpecRegistry
-from .spec_utils import (
+from .core.spec_utils import (
   append_unique,
   dump_markdown_file,
   ensure_list_entry,

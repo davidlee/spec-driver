@@ -16,7 +16,7 @@ if str(ROOT) not in sys.path:
   sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
-from supekku.scripts.lib.cli_utils import add_root_argument
+from supekku.scripts.lib.core.cli_utils import add_root_argument
 from supekku.scripts.lib.formatters.spec_formatters import (  # type: ignore
   format_spec_list_item,
 )

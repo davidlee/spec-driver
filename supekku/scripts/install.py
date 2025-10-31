@@ -19,7 +19,7 @@ from supekku.scripts.lib.file_ops import (
   format_detailed_changes,
   scan_directory_changes,
 )
-from supekku.scripts.lib.paths import SPEC_DRIVER_DIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
 
 
 def get_package_root() -> Path:

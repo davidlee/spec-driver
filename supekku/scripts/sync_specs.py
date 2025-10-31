@@ -29,7 +29,7 @@ from supekku.scripts.lib.registry_migration import RegistryV2  # type: ignore
 from supekku.scripts.lib.spec_index import SpecIndexBuilder  # type: ignore
 from supekku.scripts.lib.spec_sync.engine import SpecSyncEngine  # type: ignore
 from supekku.scripts.lib.spec_sync.models import SourceUnit  # type: ignore
-from supekku.scripts.lib.spec_utils import (  # type: ignore
+from supekku.scripts.lib.core.spec_utils import (  # type: ignore
   append_unique,
   dump_markdown_file,
   ensure_list_entry,

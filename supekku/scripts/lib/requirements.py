@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from .backlog import find_repo_root
+from .core.repo import find_repo_root
 from .delta_blocks import DeltaRelationshipsValidator, extract_delta_relationships
 from .lifecycle import (
   STATUS_PENDING,
@@ -22,7 +22,7 @@ from .revision_blocks import (
   load_revision_blocks,
 )
 from .spec_blocks import RelationshipsBlockValidator, extract_relationships
-from .spec_utils import load_markdown_file
+from .core.spec_utils import load_markdown_file
 
 if TYPE_CHECKING:
   from pathlib import Path

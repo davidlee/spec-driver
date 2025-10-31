@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .backlog import find_repo_root
+from .core.repo import find_repo_root
 from .spec_models import Spec
-from .spec_utils import load_validated_markdown_file
+from .core.spec_utils import load_validated_markdown_file
 
 if TYPE_CHECKING:
   from collections.abc import Iterator

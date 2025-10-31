@@ -10,9 +10,9 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from .backlog import find_repo_root
-from .paths import get_registry_dir
-from .spec_utils import load_markdown_file
+from .core.repo import find_repo_root
+from .core.paths import get_registry_dir
+from .core.spec_utils import load_markdown_file
 
 if TYPE_CHECKING:
   from collections.abc import Iterator

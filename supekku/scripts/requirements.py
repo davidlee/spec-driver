@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from supekku.scripts.lib.paths import get_registry_dir  # type: ignore
+from supekku.scripts.lib.core.paths import get_registry_dir  # type: ignore
 from supekku.scripts.lib.requirements import (  # type: ignore
   VALID_STATUSES,
   RequirementsRegistry,

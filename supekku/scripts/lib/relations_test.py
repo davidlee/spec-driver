@@ -7,7 +7,7 @@ import unittest
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.relations import add_relation, list_relations, remove_relation
-from supekku.scripts.lib.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
 
 if TYPE_CHECKING:

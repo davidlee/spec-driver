@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from supekku.scripts.lib.cli_utils import add_root_argument  # type: ignore
+from supekku.scripts.lib.core.cli_utils import add_root_argument  # type: ignore
 from supekku.scripts.lib.decision_creation import (  # type: ignore
   ADRAlreadyExistsError,
   ADRCreationOptions,

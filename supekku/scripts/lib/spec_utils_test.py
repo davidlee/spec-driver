@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from supekku.scripts.lib.frontmatter_schema import FrontmatterValidationError
-from supekku.scripts.lib.spec_utils import (
+from supekku.scripts.lib.core.frontmatter_schema import FrontmatterValidationError
+from supekku.scripts.lib.core.spec_utils import (
   append_unique,
   dump_markdown_file,
   ensure_list_entry,

@@ -8,11 +8,11 @@ import unittest
 from pathlib import Path
 
 from supekku.scripts.lib.lifecycle import STATUS_LIVE, STATUS_PENDING
-from supekku.scripts.lib.paths import get_registry_dir
+from supekku.scripts.lib.core.paths import get_registry_dir
 from supekku.scripts.lib.relations import add_relation
 from supekku.scripts.lib.requirements import RequirementsRegistry
 from supekku.scripts.lib.spec_registry import SpecRegistry
-from supekku.scripts.lib.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 
 
 class RequirementsRegistryTest(unittest.TestCase):

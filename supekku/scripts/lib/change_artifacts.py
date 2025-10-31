@@ -9,7 +9,7 @@ from .change_lifecycle import VALID_STATUSES, normalize_status
 from .delta_blocks import DeltaRelationshipsValidator, extract_delta_relationships
 from .plan_blocks import extract_phase_overview, extract_plan_overview
 from .relations import list_relations
-from .spec_utils import load_markdown_file
+from .core.spec_utils import load_markdown_file
 
 if TYPE_CHECKING:
   from pathlib import Path

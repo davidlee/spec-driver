@@ -10,7 +10,7 @@ from subprocess import CompletedProcess
 
 import pytest
 
-from supekku.scripts.lib.spec_utils import load_markdown_file
+from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.sync_engine import (
   GomarkdocNotAvailableError,
   SyncOptions,

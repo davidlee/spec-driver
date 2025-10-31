@@ -9,8 +9,8 @@ from typing import TYPE_CHECKING
 import yaml
 
 from supekku.scripts.lib.decision_registry import DecisionRegistry
-from supekku.scripts.lib.paths import get_registry_dir
-from supekku.scripts.lib.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.paths import get_registry_dir
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
 from supekku.scripts.lib.workspace import Workspace
 

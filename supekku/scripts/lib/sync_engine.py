@@ -12,7 +12,7 @@ from shutil import which
 from subprocess import CompletedProcess
 
 from .spec_index import SpecIndexBuilder
-from .spec_utils import (
+from .core.spec_utils import (
   append_unique,
   dump_markdown_file,
   ensure_list_entry,

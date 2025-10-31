@@ -8,7 +8,7 @@ from typing import Annotated
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
-from supekku.scripts.lib.backlog import find_repo_root
+from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.spec_sync.engine import SpecSyncEngine
 from supekku.scripts.lib.spec_sync.models import SourceUnit
 from supekku.scripts.sync_specs import (

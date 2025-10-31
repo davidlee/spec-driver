@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from supekku.scripts.lib.spec_index import SpecIndexBuilder
-from supekku.scripts.lib.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.list_specs import main as list_specs_main
 
 

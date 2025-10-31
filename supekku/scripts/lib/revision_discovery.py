@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from .revision_blocks import load_revision_blocks
-from .spec_utils import load_markdown_file
+from .core.spec_utils import load_markdown_file
 
 if TYPE_CHECKING:
   from collections.abc import Iterable, Iterator

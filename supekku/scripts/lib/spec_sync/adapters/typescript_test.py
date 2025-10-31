@@ -1,17 +1,19 @@
-"""Tests for TypeScript language adapter (STUB)."""
+"""Tests for TypeScript language adapter."""
 
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
 from supekku.scripts.lib.spec_sync.models import SourceUnit
 
-from .typescript import TypeScriptAdapter
+from .typescript import NodeRuntimeNotAvailableError, TypeScriptAdapter
 
 
 class TestTypeScriptAdapter(unittest.TestCase):
-  """Test TypeScriptAdapter stub functionality."""
+  """Test TypeScriptAdapter functionality."""
 
   def setUp(self) -> None:
     """Set up test fixtures."""
@@ -31,7 +33,8 @@ class TestTypeScriptAdapter(unittest.TestCase):
       "components/Button.tsx",
       "services/api.ts",
       "types/User.ts",
-      "test/helpers.ts",
+      "test/helpers.mts",
+      "dist/output.cts",
     ]
 
     for identifier in valid_identifiers:
@@ -40,12 +43,14 @@ class TestTypeScriptAdapter(unittest.TestCase):
         assert self.adapter.supports_identifier(identifier), msg
 
   def test_supports_identifier_typescript_modules(self) -> None:
-    """Test supports_identifier returns True for TypeScript-style module paths."""
+    """Test supports_identifier returns True for TypeScript-style paths."""
     valid_identifiers = [
-      "src/components",  # TypeScript module path
-      "lib/services.api",  # Dotted notation
-      "node_modules/@types/react",  # npm style
-      "src/utils",  # Common TypeScript pattern
+      "src/components",
+      "lib/services",
+      "node_modules/@types/react",
+      "@scope/package-name",
+      "packages/core",
+      "apps/web",
     ]
 
     for identifier in valid_identifiers:
@@ -56,12 +61,12 @@ class TestTypeScriptAdapter(unittest.TestCase):
   def test_supports_identifier_rejects_non_typescript(self) -> None:
     """Test supports_identifier returns False for non-TypeScript identifiers."""
     invalid_identifiers = [
-      "",  # empty
-      "module.py",  # Python file
-      "package.go",  # Go file
-      "__pycache__/module.pyc",  # Python cache
-      "internal/application/services",  # Go-style package (no TS indicators)
-      "cmd/vice",  # Go command package
+      "",
+      "module.py",
+      "package.go",
+      "__pycache__/module.pyc",
+      "internal/application/services",  # Go-style, no TS indicators
+      "cmd/vice",
     ]
 
     for identifier in invalid_identifiers:
@@ -69,100 +74,158 @@ class TestTypeScriptAdapter(unittest.TestCase):
         msg = f"Should not support identifier: {identifier}"
         assert not self.adapter.supports_identifier(identifier), msg
 
-  def test_discover_targets_with_requested_identifiers(self) -> None:
-    """Test discover_targets processes requested TypeScript identifiers."""
-    requested = ["src/index.ts", "lib/utils.tsx", "types/User.ts"]
-    units = self.adapter.discover_targets(self.repo_root, requested)
+  def test_supports_identifier_edge_cases(self) -> None:
+    """Test edge cases for identifier support."""
+    # Should reject Python/Go files even in TypeScript-like directories
+    assert not self.adapter.supports_identifier("src/main.go")
+    assert not self.adapter.supports_identifier("lib/utils.py")
 
-    # Should create units for all requested TypeScript identifiers
-    assert len(units) == 3
-    identifiers = [unit.identifier for unit in units]
-    assert identifiers == requested
+    # Should accept scoped packages
+    assert self.adapter.supports_identifier("@angular/core")
+    assert self.adapter.supports_identifier("@types/node")
 
-    # All units should be TypeScript units
-    for unit in units:
-      assert unit.language == "typescript"
-      assert unit.root == self.repo_root
+  def test_is_node_available(self) -> None:
+    """Test is_node_available correctly detects Node presence."""
+    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+      # Test when Node is available
+      mock_which.return_value = "/usr/bin/node"
+      assert TypeScriptAdapter.is_node_available()
 
-  def test_discover_targets_filters_non_typescript_requests(self) -> None:
-    """Test discover_targets filters out non-TypeScript identifiers."""
-    requested = ["src/index.ts", "module.py", "lib/utils.tsx", "internal/go/pkg"]
-    units = self.adapter.discover_targets(self.repo_root, requested)
+      # Test when Node is not available
+      mock_which.return_value = None
+      assert not TypeScriptAdapter.is_node_available()
 
-    # Should only create units for TypeScript identifiers
-    assert len(units) == 2
-    identifiers = [unit.identifier for unit in units]
-    assert identifiers == ["src/index.ts", "lib/utils.tsx"]
+  def test_is_npm_available(self) -> None:
+    """Test is_npm_available correctly detects npm presence."""
+    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+      # Test when npm is available
+      mock_which.return_value = "/usr/bin/npm"
+      assert TypeScriptAdapter.is_npm_available()
 
-  def test_discover_targets_auto_discovery(self) -> None:
-    """Test auto-discovery returns empty list (noop until TS files exist)."""
-    # Auto-discovery should work but return empty list for non-existent files
-    result = self.adapter.discover_targets(self.repo_root)
-    assert isinstance(result, list)
-    # Will be empty since self.repo_root doesn't have actual .ts files
+      # Test when npm is not available
+      mock_which.return_value = None
+      assert not TypeScriptAdapter.is_npm_available()
 
-  def test_describe_typescript_file(self) -> None:
-    """Test describe method for TypeScript files."""
-    unit = SourceUnit("typescript", "src/components/Button.tsx", self.repo_root)
+  def test_is_bun_available(self) -> None:
+    """Test is_bun_available correctly detects Bun presence."""
+    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+      # Test when Bun is available
+      mock_which.return_value = "/usr/bin/bun"
+      assert TypeScriptAdapter.is_bun_available()
+
+      # Test when Bun is not available
+      mock_which.return_value = None
+      assert not TypeScriptAdapter.is_bun_available()
+
+  def test_is_pnpm_available(self) -> None:
+    """Test is_pnpm_available correctly detects pnpm presence."""
+    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+      # Test when pnpm is available
+      mock_which.return_value = "/usr/bin/pnpm"
+      assert TypeScriptAdapter.is_pnpm_available()
+
+      # Test when pnpm is not available
+      mock_which.return_value = None
+      assert not TypeScriptAdapter.is_pnpm_available()
+
+  def test_get_runtime_command_prefers_bun(self) -> None:
+    """Test _get_runtime_command prefers Bun when available."""
+    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+
+      def which_side_effect(cmd: str) -> str | None:
+        if cmd == "bun":
+          return "/usr/bin/bun"
+        if cmd in ("node", "npm"):
+          return f"/usr/bin/{cmd}"
+        return None
+
+      mock_which.side_effect = which_side_effect
+
+      cmd = self.adapter._get_runtime_command()
+      assert cmd == ["bunx", "--bun"]
+
+  def test_get_runtime_command_falls_back_to_npx(self) -> None:
+    """Test _get_runtime_command uses npx when Bun unavailable."""
+    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+
+      def which_side_effect(cmd: str) -> str | None:
+        if cmd == "bun":
+          return None
+        if cmd in ("node", "npm"):
+          return f"/usr/bin/{cmd}"
+        return None
+
+      mock_which.side_effect = which_side_effect
+
+      cmd = self.adapter._get_runtime_command()
+      assert cmd == ["npx", "--yes"]
+
+  def test_get_runtime_command_raises_when_nothing_available(self) -> None:
+    """Test _get_runtime_command raises when no runtime available."""
+    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+      mock_which.return_value = None
+
+      with pytest.raises(NodeRuntimeNotAvailableError) as context:
+        self.adapter._get_runtime_command()
+
+      assert "No JavaScript runtime found" in str(context.value)
+
+  def test_get_runtime_command_prefers_pnpm_when_lockfile_exists(self) -> None:
+    """Test _get_runtime_command uses pnpm dlx when pnpm-lock.yaml exists."""
+    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+      mock_which.return_value = "/usr/bin/pnpm"
+
+      # Create a temporary directory with pnpm-lock.yaml
+      with tempfile.TemporaryDirectory() as tmpdir:
+        pkg_dir = Path(tmpdir)
+        (pkg_dir / "pnpm-lock.yaml").touch()
+
+        cmd = self.adapter._get_runtime_command(pkg_dir)
+        assert cmd == ["pnpm", "dlx"]
+
+  @patch("supekku.scripts.lib.spec_sync.adapters.typescript.which")
+  def test_discover_targets_raises_when_no_runtime(self, mock_which) -> None:
+    """Test discover_targets raises when no JS runtime available."""
+    mock_which.return_value = None
+
+    with pytest.raises(NodeRuntimeNotAvailableError) as context:
+      self.adapter.discover_targets(self.repo_root)
+
+    assert "No JavaScript runtime found" in str(context.value)
+
+  @patch("supekku.scripts.lib.spec_sync.adapters.typescript.which")
+  def test_generate_raises_when_no_runtime(self, mock_which) -> None:
+    """Test generate raises when no JS runtime available."""
+    mock_which.return_value = None
+
+    unit = SourceUnit("typescript", "src", self.repo_root)
+    spec_dir = Path("/test/spec/SPEC-001")
+
+    with pytest.raises(NodeRuntimeNotAvailableError) as context:
+      self.adapter.generate(unit, spec_dir=spec_dir)
+
+    assert "No JavaScript runtime found" in str(context.value)
+
+  def test_describe_typescript_package(self) -> None:
+    """Test describe method generates correct metadata for TS packages."""
+    unit = SourceUnit("typescript", "packages/core", self.repo_root)
     descriptor = self.adapter.describe(unit)
 
-    # Check slug parts (should strip .tsx extension)
-    assert descriptor.slug_parts == ["src", "components", "Button"]
+    # Check slug parts
+    assert descriptor.slug_parts == ["packages", "core"]
 
-    # Check frontmatter structure
+    # Check frontmatter
     assert "sources" in descriptor.default_frontmatter
     sources = descriptor.default_frontmatter["sources"]
     assert len(sources) == 1
+    assert sources[0]["language"] == "typescript"
+    assert sources[0]["identifier"] == "packages/core"
 
-    source = sources[0]
-    assert source["language"] == "typescript"
-    assert source["identifier"] == "src/components/Button.tsx"
-
-    # Check variants in frontmatter
-    assert "variants" in source
-    variants = source["variants"]
-    assert len(variants) == 3
-
-    variant_names = [v["name"] for v in variants]
+    # Check variants
+    assert len(descriptor.variants) == 2
+    variant_names = [v.name for v in descriptor.variants]
     assert "public" in variant_names
     assert "internal" in variant_names
-    assert "types" in variant_names
-
-    # Check descriptor variants
-    assert len(descriptor.variants) == 3
-    descriptor_variant_names = [v.name for v in descriptor.variants]
-    assert "public" in descriptor_variant_names
-    assert "internal" in descriptor_variant_names
-    assert "types" in descriptor_variant_names
-
-    # Check variant paths
-    public_variant = next(v for v in descriptor.variants if v.name == "public")
-    internal_variant = next(v for v in descriptor.variants if v.name == "internal")
-    types_variant = next(v for v in descriptor.variants if v.name == "types")
-
-    expected_slug = "src-components-Button"
-    assert public_variant.path == Path(
-      f"contracts/typescript/{expected_slug}-public.md",
-    )
-    assert internal_variant.path == Path(
-      f"contracts/typescript/{expected_slug}-internal.md",
-    )
-    assert types_variant.path == Path(
-      f"contracts/typescript/{expected_slug}-types.md",
-    )
-
-  def test_describe_typescript_module_without_extension(self) -> None:
-    """Test describe method for TypeScript modules without file extension."""
-    unit = SourceUnit("typescript", "src/utils/helpers", self.repo_root)
-    descriptor = self.adapter.describe(unit)
-
-    # Should handle path without extension
-    assert descriptor.slug_parts == ["src", "utils", "helpers"]
-
-    # Should still create TypeScript source metadata
-    sources = descriptor.default_frontmatter["sources"]
-    source = sources[0]
-    assert source["identifier"] == "src/utils/helpers"
 
   def test_describe_rejects_non_typescript_unit(self) -> None:
     """Test describe method rejects non-TypeScript source units."""
@@ -183,98 +246,50 @@ class TestTypeScriptAdapter(unittest.TestCase):
 
     assert "TypeScriptAdapter cannot process python units" in str(context.value)
 
-  def test_generate_noop(self) -> None:
-    """Test generate method returns skipped variants (noop)."""
-    unit = SourceUnit("typescript", "src/index.ts", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
-
-    variants = self.adapter.generate(unit, spec_dir=spec_dir)
-
-    # Should return list of variants with 'skipped' status
-    assert isinstance(variants, list)
-    assert len(variants) == 3  # public, internal, types
-    for variant in variants:
-      assert variant.status == "skipped"
-      assert variant.hash == ""
-
-  def test_generate_check_mode_noop(self) -> None:
-    """Test generate method in check mode also returns skipped variants."""
-    unit = SourceUnit("typescript", "src/index.ts", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
-
-    variants = self.adapter.generate(unit, spec_dir=spec_dir, check=True)
-
-    # Should return list of variants with 'skipped' status
-    assert isinstance(variants, list)
-    assert all(v.status == "skipped" for v in variants)
-
-  def test_supports_identifier_edge_cases(self) -> None:
-    """Test supports_identifier with edge cases."""
-    # Test with paths that could be ambiguous
-    test_cases = [
-      # Should support
-      ("src/components/Button.component.ts", True),
-      ("packages/core/index.ts", True),
-      ("libs/shared.tsx", True),
-      ("app.ts", True),
-      ("src/types/index.d.ts", True),  # TypeScript declaration files
-      # Should not support (clearer non-TS patterns)
-      ("main.go", False),
-      ("requirements.txt", False),
-      ("Dockerfile", False),
-      ("package.json", False),  # Not TypeScript source
-    ]
-
-    for identifier, expected in test_cases:
-      with self.subTest(identifier=identifier):
-        result = self.adapter.supports_identifier(identifier)
-        msg = f"Expected {identifier} to be {expected}, got {result}"
-        assert result == expected, msg
-
 
 class TestTypeScriptAdapterIntegration(unittest.TestCase):
-  """Integration tests for TypeScript adapter in engine context."""
+  """Integration tests for TypeScript adapter."""
 
   def test_adapter_can_be_imported_and_instantiated(self) -> None:
-    """Test that TypeScript adapter can be imported and used."""
-    # pylint: disable=import-outside-toplevel
-    from supekku.scripts.lib.spec_sync.adapters import (  # noqa: PLC0415
-      TypeScriptAdapter as TSAdapter,
+    """Test that TypeScript adapter can be imported and instantiated."""
+    from supekku.scripts.lib.spec_sync.adapters.typescript import (  # noqa: PLC0415
+      TypeScriptAdapter,
     )
 
-    adapter = TSAdapter(Path("/test"))
+    repo_root = Path("/test/repo")
+    adapter = TypeScriptAdapter(repo_root)
+
     assert adapter.language == "typescript"
+    assert adapter.repo_root == repo_root
 
   def test_adapter_available_in_engine_defaults(self) -> None:
-    """Test that TypeScript adapter is available in engine defaults."""
-    # pylint: disable=import-outside-toplevel
-    from supekku.scripts.lib.spec_sync.engine import (  # noqa: PLC0415
-      SpecSyncEngine,
+    """Test that TypeScript adapter is available in default engine adapters."""
+    from supekku.scripts.lib.spec_sync.engine import SpecSyncEngine  # noqa: PLC0415
+
+    engine = SpecSyncEngine(
+      repo_root=Path("/test/repo"),
+      tech_dir=Path("/test/repo/specify/tech"),
     )
 
-    engine = SpecSyncEngine(Path("/test"), Path("/test/specs"))
-
-    # Should have TypeScript adapter in defaults
     assert "typescript" in engine.adapters
-    assert engine.adapters["typescript"].language == "typescript"
+    assert isinstance(engine.adapters["typescript"], TypeScriptAdapter)
 
   def test_engine_can_detect_typescript_support(self) -> None:
-    """Test that engine can detect TypeScript identifier support."""
-    # pylint: disable=import-outside-toplevel
-    from supekku.scripts.lib.spec_sync.engine import (  # noqa: PLC0415
-      SpecSyncEngine,
+    """Test that engine can check for TypeScript support."""
+    from supekku.scripts.lib.spec_sync.engine import SpecSyncEngine  # noqa: PLC0415
+
+    engine = SpecSyncEngine(
+      repo_root=Path("/test/repo"),
+      tech_dir=Path("/test/repo/specify/tech"),
     )
 
-    engine = SpecSyncEngine(Path("/test"), Path("/test/specs"))
+    # Should have TypeScript adapter
+    assert "typescript" in engine.adapters
 
-    # Should detect TypeScript support
-    result = engine.supports_identifier("src/index.ts")
-    assert result == "typescript"
-
-    # Should detect non-support
-    result = engine.supports_identifier("internal/go/package")
-    # Could be "go" or None depending on Go adapter logic
-    assert result != "typescript"
+    # Should be able to check identifier support
+    ts_adapter = engine.adapters["typescript"]
+    assert ts_adapter.supports_identifier("src/index.ts")
+    assert not ts_adapter.supports_identifier("main.go")
 
 
 if __name__ == "__main__":

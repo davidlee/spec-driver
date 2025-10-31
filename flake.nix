@@ -28,6 +28,7 @@
               python3Packages.python-lsp-ruff
 
               nodejs_latest
+              bun
               go
 
               # treesitter

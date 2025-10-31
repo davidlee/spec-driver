@@ -19,7 +19,7 @@ from supekku.scripts.lib.specs.registry import SpecRegistry
 if TYPE_CHECKING:
   from collections.abc import Iterable
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 TEMPLATE_DIR = REPO_ROOT / "supekku" / "templates"
 
 REVISION_TEMPLATE = TEMPLATE_DIR / "spec-revision-template.md"

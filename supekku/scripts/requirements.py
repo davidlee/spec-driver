@@ -4,12 +4,7 @@
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-  sys.path.insert(0, str(ROOT))
 
 from supekku.scripts.lib.paths import get_registry_dir  # type: ignore
 from supekku.scripts.lib.requirements import (  # type: ignore
@@ -18,6 +13,7 @@ from supekku.scripts.lib.requirements import (  # type: ignore
 )
 from supekku.scripts.lib.spec_registry import SpecRegistry  # type: ignore
 
+ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = get_registry_dir(ROOT) / "requirements.yaml"
 DEFAULT_SPEC_DIRS = [ROOT / "specify" / "tech", ROOT / "specify" / "product"]
 DEFAULT_DELTA_DIRS = [ROOT / "change" / "deltas"]

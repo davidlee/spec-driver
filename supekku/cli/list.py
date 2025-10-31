@@ -2,19 +2,12 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Annotated
 
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
-
-# Add parent to path for imports
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-  sys.path.insert(0, str(ROOT))
-
 from supekku.scripts.lib.change_lifecycle import VALID_STATUSES, normalize_status
 from supekku.scripts.lib.change_registry import ChangeRegistry
 from supekku.scripts.lib.spec_registry import SpecRegistry

@@ -7,15 +7,10 @@ and check mode functionality.
 
 from __future__ import annotations
 
-# Import the modules we're testing
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-
-# Import backward compatibility functions from CLI module
 from supekku.scripts.cli.deterministic_ast_doc_generator import (
   check_mode_comparison,
   write_mode_comparison,

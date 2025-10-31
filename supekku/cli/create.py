@@ -2,19 +2,12 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Annotated
 
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
-
-# Add parent to path for imports
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-  sys.path.insert(0, str(ROOT))
-
 from supekku.scripts.lib.create_change import (
   create_delta,
   create_requirement_breakout,

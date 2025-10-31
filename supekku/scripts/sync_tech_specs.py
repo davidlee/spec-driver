@@ -7,17 +7,15 @@ import argparse
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-TECH_DIR = ROOT / "specify" / "tech"
-REGISTRY_PATH = TECH_DIR / "registry_v2.json"
-
-if str(ROOT) not in sys.path:
-  sys.path.insert(0, str(ROOT))
 from supekku.scripts.lib.sync_engine import (  # type: ignore
   GomarkdocNotAvailableError,
   SyncOptions,
   TechSpecSyncEngine,
 )
+
+ROOT = Path(__file__).resolve().parents[2]
+TECH_DIR = ROOT / "specify" / "tech"
+REGISTRY_PATH = TECH_DIR / "registry_v2.json"
 
 
 def main() -> None:

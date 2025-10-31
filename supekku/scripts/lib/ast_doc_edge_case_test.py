@@ -6,15 +6,11 @@ caching behavior, path normalization, and other edge cases.
 
 from __future__ import annotations
 
-# Import the modules we're testing
-import sys
 import tempfile
 import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from supekku.scripts.lib.ast_doc_edge_case_fixtures import (
   ASYNC_PATTERNS,

@@ -4,18 +4,19 @@
 from __future__ import annotations
 
 import argparse
-import re
 import sys
-from datetime import date
 from pathlib import Path
-
-import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
   sys.path.insert(0, str(ROOT))
 
 from supekku.scripts.lib.cli_utils import add_root_argument  # type: ignore
+from supekku.scripts.lib.decision_creation import (  # type: ignore
+  ADRAlreadyExistsError,
+  ADRCreationOptions,
+  create_adr,
+)
 from supekku.scripts.lib.decision_registry import DecisionRegistry  # type: ignore
 
 
@@ -163,109 +164,19 @@ def handle_show(args: argparse.Namespace) -> None:
 
 def handle_new(args: argparse.Namespace) -> None:
   """Handle the new command."""
-  registry = DecisionRegistry(root=args.root)
+  try:
+    registry = DecisionRegistry(root=args.root)
+    options = ADRCreationOptions(
+      title=args.title,
+      status=args.status,
+      author=args.author if hasattr(args, "author") else None,
+      author_email=args.author_email if hasattr(args, "author_email") else None,
+    )
 
-  # Find the next available ADR ID
-  decisions = registry.collect()
-  max_id = 0
-  for decision_id in decisions:
-    match = re.match(r"ADR-(\d+)", decision_id)
-    if match:
-      max_id = max(max_id, int(match.group(1)))
-
-  next_id = max_id + 1
-  adr_id = f"ADR-{next_id:03d}"
-
-  # Create slug from title
-  title_slug = re.sub(r"[^a-zA-Z0-9]+", "-", args.title.lower()).strip("-")
-  filename = f"{adr_id}-{title_slug}.md"
-
-  # Create file path
-  adr_path = registry.directory / filename
-
-  # Check if file already exists
-  if adr_path.exists():
+    result = create_adr(registry, options, sync_registry=True)
+    print(f"Created ADR: {result.path}")
+  except ADRAlreadyExistsError:
     sys.exit(1)
-
-  # Prepare frontmatter
-  today = date.today().isoformat()
-  frontmatter = {
-    "id": adr_id,
-    "title": f"{adr_id}: {args.title}",
-    "status": args.status,
-    "created": today,
-    "updated": today,
-    "reviewed": today,
-  }
-
-  # Add author info if provided
-  if args.author or args.author_email:
-    author = {}
-    if args.author:
-      author["name"] = args.author
-    if args.author_email:
-      author["contact"] = f"mailto:{args.author_email}"
-    frontmatter["authors"] = [author]
-
-  # Add other empty fields for the new schema
-  frontmatter.update(
-    {
-      "owners": [],
-      "supersedes": [],
-      "superseded_by": [],
-      "policies": [],
-      "specs": [],
-      "requirements": [],
-      "deltas": [],
-      "revisions": [],
-      "audits": [],
-      "related_decisions": [],
-      "related_policies": [],
-      "tags": [],
-      "summary": "",
-    },
-  )
-
-  # Create content
-  content = f"""# {adr_id}: {args.title}
-
-## Context
-
-**Brief** description of the problem or situation that requires a decision.
-
-## Decision
-
-The decision that was made and key reasoning.
-
-## Consequences
-
-### Positive
-- Benefits of this decision
-
-### Negative
-- Trade-offs or downsides
-
-### Neutral
-- Other impacts to be aware of
-
-## Verification
-- Required test suites, monitoring, or audits ensuring compliance.
-
-## References
-- [Design artefact link]
-- [External research]
-"""
-
-  # Write the file
-  frontmatter_yaml = yaml.safe_dump(frontmatter, sort_keys=False)
-  full_content = f"---\n{frontmatter_yaml}---\n\n{content}"
-
-  # Ensure directory exists
-  adr_path.parent.mkdir(parents=True, exist_ok=True)
-  adr_path.write_text(full_content, encoding="utf-8")
-
-  # Optionally sync registry
-  registry.sync()
 
 
 def main() -> None:

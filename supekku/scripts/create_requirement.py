@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import argparse
 
-from supekku.scripts.lib.create_change import (
+from supekku.scripts.lib.changes.creation import (
   create_requirement_breakout,  # type: ignore
 )
 

@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 import yaml
 
 from .creation import create_revision
-from .lifecycle import STATUS_LIVE
+from ..lifecycle import STATUS_LIVE
 
 if TYPE_CHECKING:
   from .workspace import Workspace

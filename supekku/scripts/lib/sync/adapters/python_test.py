@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from supekku.scripts.lib.spec_sync.models import SourceUnit
+from supekku.scripts.lib.sync.models import SourceUnit
 
 from .python import PythonAdapter
 

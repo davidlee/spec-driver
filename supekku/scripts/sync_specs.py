@@ -32,8 +32,8 @@ from supekku.scripts.lib.core.spec_utils import (  # type: ignore
   load_markdown_file,
 )
 from supekku.scripts.lib.registry_migration import RegistryV2  # type: ignore
-from supekku.scripts.lib.spec_sync.engine import SpecSyncEngine  # type: ignore
-from supekku.scripts.lib.spec_sync.models import SourceUnit  # type: ignore
+from supekku.scripts.lib.sync.engine import SpecSyncEngine  # type: ignore
+from supekku.scripts.lib.sync.models import SourceUnit  # type: ignore
 from supekku.scripts.lib.specs.index import SpecIndexBuilder  # type: ignore
 
 

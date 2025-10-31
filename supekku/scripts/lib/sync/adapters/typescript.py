@@ -13,7 +13,7 @@ from pathlib import Path
 from shutil import which
 from typing import TYPE_CHECKING, ClassVar
 
-from supekku.scripts.lib.spec_sync.models import (
+from supekku.scripts.lib.sync.models import (
   DocVariant,
   SourceDescriptor,
   SourceUnit,

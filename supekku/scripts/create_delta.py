@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import argparse
 
-from supekku.scripts.lib.create_change import create_delta  # type: ignore
+from supekku.scripts.lib.changes.creation import create_delta  # type: ignore
 
 
 def build_parser() -> argparse.ArgumentParser:

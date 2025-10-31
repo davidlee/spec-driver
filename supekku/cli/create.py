@@ -8,7 +8,7 @@ from typing import Annotated
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
-from supekku.scripts.lib.create_change import (
+from supekku.scripts.lib.changes.creation import (
   create_delta,
   create_requirement_breakout,
   create_revision,

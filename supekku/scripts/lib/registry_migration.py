@@ -176,7 +176,7 @@ class LanguageDetector:
     try:
       # Try relative import first (when used as module)
       # pylint: disable=import-outside-toplevel
-      from .spec_sync.adapters import (  # noqa: PLC0415
+      from .sync.adapters import (  # noqa: PLC0415
         GoAdapter,
         PythonAdapter,
       )

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(for file in supekku/cli/adr.py supekku/cli/create.py supekku/cli/show.py supekku/cli/sync.py supekku/scripts/decision_registry.py supekku/scripts/lib/decisions/creation.py supekku/scripts/lib/formatters/decision_formatters_test.py supekku/scripts/lib/workspace_test.py)",
       "Bash(for file in supekku/cli/list.py supekku/scripts/change_registry.py supekku/scripts/lib/changes/artifacts_test.py supekku/scripts/lib/changes/registry_test.py supekku/scripts/lib/formatters/change_formatters.py supekku/scripts/lib/formatters/change_formatters_test.py supekku/scripts/list_changes.py supekku/scripts/list_deltas.py supekku/scripts/validate_revision_blocks.py)",
-      "Bash(for file in supekku/scripts/lib/requirements/registry_test.py supekku/scripts/requirements.py)"
+      "Bash(for file in supekku/scripts/lib/requirements/registry_test.py supekku/scripts/requirements.py)",
+      "Bash(for file in supekku/scripts/create_revision.py supekku/scripts/create_requirement.py supekku/scripts/create_delta.py supekku/cli/create.py)"
     ],
     "deny": [],
     "ask": []

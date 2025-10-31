@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
 
-from supekku.scripts.lib.spec_sync.models import SourceDescriptor, SourceUnit
+from supekku.scripts.lib.sync.models import SourceDescriptor, SourceUnit
 
 from .base import LanguageAdapter
 

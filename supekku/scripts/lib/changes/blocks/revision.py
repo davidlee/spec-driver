@@ -8,7 +8,9 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES
+from supekku.scripts.lib.lifecycle import (
+  VALID_STATUSES as REQUIREMENT_VALID_STATUSES,
+)
 
 if TYPE_CHECKING:
   from collections.abc import Sequence
@@ -202,7 +204,7 @@ REVISION_BLOCK_JSON_SCHEMA: dict[str, Any] = {
             "properties": {
               "status": {
                 "type": "string",
-                "enum": sorted(VALID_STATUSES),
+                "enum": sorted(REQUIREMENT_VALID_STATUSES),
               },
               "introduced_by": {
                 "type": "string",
@@ -839,11 +841,11 @@ class RevisionBlockValidator:
           messages,
         )
         status = lifecycle.get("status")
-        if status is not None and status not in VALID_STATUSES:
+        if status is not None and status not in REQUIREMENT_VALID_STATUSES:
           messages.append(
             ValidationMessage(
               (*path, "lifecycle", "status"),
-              f"must be one of {sorted(VALID_STATUSES)}",
+              f"must be one of {sorted(REQUIREMENT_VALID_STATUSES)}",
             ),
           )
         introduced_by = lifecycle.get("introduced_by")

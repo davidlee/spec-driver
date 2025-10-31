@@ -13,10 +13,10 @@ if str(ROOT) not in sys.path:
   sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
-from supekku.scripts.lib.completion_revision import create_completion_revision
+from supekku.scripts.lib.changes.completion import create_completion_revision
 from supekku.scripts.lib.lifecycle import STATUS_LIVE
-from supekku.scripts.lib.revision_discovery import find_requirement_sources
-from supekku.scripts.lib.revision_updater import (
+from supekku.scripts.lib.changes.discovery import find_requirement_sources
+from supekku.scripts.lib.changes.updater import (
   RevisionUpdateError,
   update_requirement_lifecycle_status,
 )

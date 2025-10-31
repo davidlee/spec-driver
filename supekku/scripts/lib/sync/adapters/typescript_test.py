@@ -10,7 +10,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from supekku.scripts.lib.spec_sync.models import SourceUnit
+from supekku.scripts.lib.sync.models import SourceUnit
 
 from .typescript import (
   NodeRuntimeNotAvailableError,
@@ -34,7 +34,7 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
 
   def test_is_node_available(self) -> None:
     """Test Node.js availability detection."""
-    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+    with patch("supekku.scripts.lib.sync.adapters.typescript.which") as mock_which:
       # Test Node.js available
       mock_which.return_value = "/usr/bin/node"
       assert TypeScriptAdapter.is_node_available()
@@ -45,7 +45,7 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
 
   def test_is_pnpm_available(self) -> None:
     """Test pnpm availability detection."""
-    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+    with patch("supekku.scripts.lib.sync.adapters.typescript.which") as mock_which:
       # Test pnpm available
       mock_which.return_value = "/usr/bin/pnpm"
       assert TypeScriptAdapter.is_pnpm_available()
@@ -56,7 +56,7 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
 
   def test_is_bun_available(self) -> None:
     """Test bun availability detection."""
-    with patch("supekku.scripts.lib.spec_sync.adapters.typescript.which") as mock_which:
+    with patch("supekku.scripts.lib.sync.adapters.typescript.which") as mock_which:
       # Test bun available
       mock_which.return_value = "/usr/bin/bun"
       assert TypeScriptAdapter.is_bun_available()

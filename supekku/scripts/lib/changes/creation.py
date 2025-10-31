@@ -8,9 +8,13 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from .core.spec_utils import dump_markdown_file
-from .specs.creation import extract_template_body, find_repository_root, slugify
-from .specs.registry import SpecRegistry
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.specs.creation import (
+  extract_template_body,
+  find_repository_root,
+  slugify,
+)
+from supekku.scripts.lib.specs.registry import SpecRegistry
 
 if TYPE_CHECKING:
   from collections.abc import Iterable

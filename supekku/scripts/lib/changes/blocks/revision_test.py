@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .revision_blocks import (
+from .revision import (
   REVISION_BLOCK_MARKER,
   RevisionBlockValidator,
   extract_revision_blocks,

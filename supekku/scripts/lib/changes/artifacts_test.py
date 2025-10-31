@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.change_artifacts import load_change_artifact
+from supekku.scripts.lib.changes.artifacts import load_change_artifact
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 
 if TYPE_CHECKING:

@@ -5,7 +5,7 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from supekku.scripts.lib.change_artifacts import ChangeArtifact
+from supekku.scripts.lib.changes.artifacts import ChangeArtifact
 from supekku.scripts.lib.formatters.change_formatters import (
   format_change_list_item,
   format_change_with_context,

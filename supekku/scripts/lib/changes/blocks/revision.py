@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from .lifecycle import VALID_STATUSES
+from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES
 
 if TYPE_CHECKING:
   from collections.abc import Sequence

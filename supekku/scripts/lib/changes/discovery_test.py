@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from .revision_discovery import RequirementSource, find_requirement_sources
+from .discovery import RequirementSource, find_requirement_sources
 
 SAMPLE_REVISION_MD = """---
 id: RE-001

@@ -12,8 +12,8 @@ from typing import Annotated
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
-from supekku.scripts.lib.change_lifecycle import VALID_STATUSES, normalize_status
-from supekku.scripts.lib.change_registry import ChangeRegistry
+from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_status
+from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.formatters.change_formatters import format_change_with_context
 from supekku.scripts.lib.formatters.spec_formatters import format_spec_list_item
 from supekku.scripts.lib.specs.registry import SpecRegistry

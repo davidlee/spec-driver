@@ -5,7 +5,7 @@ from .backlog import (
   create_backlog_entry,
   find_repo_root,
 )
-from .change_registry import ChangeRegistry
+from .changes.registry import ChangeRegistry
 from .core.frontmatter_schema import (
   FrontmatterValidationError,
   FrontmatterValidationResult,

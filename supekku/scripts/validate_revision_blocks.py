@@ -12,14 +12,14 @@ if str(ROOT) not in sys.path:
   sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
-from supekku.scripts.lib.core.cli_utils import add_root_argument
-from supekku.scripts.lib.core.repo import find_repo_root  # type: ignore
-from supekku.scripts.lib.revision_blocks import (  # type: ignore
+from supekku.scripts.lib.changes.blocks.revision import (  # type: ignore
   RevisionBlockValidator,
   RevisionChangeBlock,
   ValidationMessage,
   extract_revision_blocks,
 )
+from supekku.scripts.lib.core.cli_utils import add_root_argument
+from supekku.scripts.lib.core.repo import find_repo_root  # type: ignore
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:

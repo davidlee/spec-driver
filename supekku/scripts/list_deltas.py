@@ -17,11 +17,11 @@ if str(ROOT) not in sys.path:
   sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
-from supekku.scripts.lib.change_lifecycle import (  # type: ignore
+from supekku.scripts.lib.changes.lifecycle import (  # type: ignore
   VALID_STATUSES,
   normalize_status,
 )
-from supekku.scripts.lib.change_registry import ChangeRegistry  # type: ignore
+from supekku.scripts.lib.changes.registry import ChangeRegistry  # type: ignore
 from supekku.scripts.lib.core.cli_utils import add_root_argument
 from supekku.scripts.lib.formatters.change_formatters import (  # type: ignore
   format_change_list_item,

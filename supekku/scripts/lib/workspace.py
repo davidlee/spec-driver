@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from .change_registry import ChangeRegistry
+from .changes.registry import ChangeRegistry
 from .core.paths import get_registry_dir
 from .core.repo import find_repo_root
 from .decisions.registry import DecisionRegistry

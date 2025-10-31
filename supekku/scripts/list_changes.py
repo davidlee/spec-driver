@@ -7,7 +7,7 @@ import argparse
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.change_registry import ChangeRegistry  # type: ignore
+from supekku.scripts.lib.changes.registry import ChangeRegistry  # type: ignore
 from supekku.scripts.lib.core.cli_utils import add_root_argument
 
 if TYPE_CHECKING:

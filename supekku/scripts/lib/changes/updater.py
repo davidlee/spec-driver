@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .lifecycle import VALID_STATUSES
-from .revision_blocks import (
+from supekku.scripts.lib.lifecycle import VALID_STATUSES
+
+from .blocks.revision import (
   RevisionBlockValidator,
   load_revision_blocks,
 )

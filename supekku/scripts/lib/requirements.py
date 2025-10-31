@@ -9,19 +9,22 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
+from .changes.blocks.delta import (
+  DeltaRelationshipsValidator,
+  extract_delta_relationships,
+)
+from .changes.blocks.revision import (
+  RevisionBlockValidator,
+  load_revision_blocks,
+)
 from .core.repo import find_repo_root
 from .core.spec_utils import load_markdown_file
-from .delta_blocks import DeltaRelationshipsValidator, extract_delta_relationships
 from .lifecycle import (
   STATUS_PENDING,
   VALID_STATUSES,
   RequirementStatus,
 )
 from .relations import list_relations
-from .revision_blocks import (
-  RevisionBlockValidator,
-  load_revision_blocks,
-)
 from .specs.blocks import RelationshipsBlockValidator, extract_relationships
 
 if TYPE_CHECKING:

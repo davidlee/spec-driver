@@ -7,8 +7,9 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from .lifecycle import STATUS_LIVE, STATUS_PENDING
-from .revision_updater import (
+from supekku.scripts.lib.lifecycle import STATUS_LIVE, STATUS_PENDING
+
+from .updater import (
   RevisionUpdateError,
   update_requirement_lifecycle_status,
 )

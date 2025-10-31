@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
   from collections.abc import Iterable
 
-  from .change_artifacts import ChangeArtifact
+  from .changes.artifacts import ChangeArtifact
   from .workspace import Workspace
 
 

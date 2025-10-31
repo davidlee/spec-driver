@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 import yaml
 
-from .create_change import create_revision
+from .creation import create_revision
 from .lifecycle import STATUS_LIVE
 
 if TYPE_CHECKING:

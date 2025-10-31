@@ -5,8 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from .core.spec_utils import load_markdown_file
-from .revision_blocks import load_revision_blocks
+from supekku.scripts.lib.core.spec_utils import load_markdown_file
+
+from .blocks.revision import load_revision_blocks
 
 if TYPE_CHECKING:
   from collections.abc import Iterable, Iterator

@@ -7,7 +7,7 @@ Formatters take ChangeArtifact objects and return formatted strings for display.
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-  from supekku.scripts.lib.change_artifacts import ChangeArtifact
+  from supekku.scripts.lib.changes.artifacts import ChangeArtifact
 
 
 def format_change_list_item(artifact: "ChangeArtifact") -> str:

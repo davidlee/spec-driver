@@ -1,12 +1,12 @@
-"""Tests for decision_formatting module."""
+"""Tests for decision_formatters module."""
 
 from __future__ import annotations
 
 import unittest
 from datetime import date
 
-from .decision_formatting import format_decision_details
-from .decision_registry import DecisionRecord
+from supekku.scripts.lib.decision_registry import DecisionRecord
+from supekku.scripts.lib.formatters.decision_formatters import format_decision_details
 
 
 class TestFormatDecisionDetails(unittest.TestCase):

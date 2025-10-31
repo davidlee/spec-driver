@@ -9,13 +9,8 @@ lint:
 format:
   uv run ruff format supekku
 
-#pylint_threshold := "9.97"
-
 pylint:
   uv run pylint supekku
-
-pylint-complex:
-  uv run pylint supekku --disable=all --extension-pkg-allow-list=pylint.extensions.mccabe --enable=too-complex
 
 pylint-only *args:
   uv run pylint supekku --disable=all --extension-pkg-allow-list=pylint.extensions.mccabe --enable={{args}}
@@ -26,4 +21,5 @@ publish:
   rm dist/.gitignore
   uv publish
 
-
+sort-size:
+  @fd '[^_test].py' supekku | xargs wc -l --total=never| tr ' ' 0 | sed -E 's/0s/ s/' | sort | sed -E 's/^0+//'

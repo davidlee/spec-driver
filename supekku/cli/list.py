@@ -1,4 +1,8 @@
-"""List commands for specs, deltas, and changes."""
+"""List commands for specs, deltas, and changes.
+
+Thin CLI layer: parse args → load registry → filter → format → output
+Display formatting is delegated to supekku.scripts.lib.formatters
+"""
 
 from __future__ import annotations
 
@@ -10,6 +14,7 @@ import typer
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
 from supekku.scripts.lib.change_lifecycle import VALID_STATUSES, normalize_status
 from supekku.scripts.lib.change_registry import ChangeRegistry
+from supekku.scripts.lib.formatters.change_formatters import format_change_with_context
 from supekku.scripts.lib.spec_registry import SpecRegistry
 
 app = typer.Typer(help="List artifacts")
@@ -217,9 +222,9 @@ def list_deltas(
       if status and normalize_status(artifact.status) != normalize_status(status):
         continue
 
-      # Format output
+      # Format and output
       if details:
-        output = _format_delta_with_details(artifact)
+        output = format_change_with_context(artifact)
       else:
         output = f"{artifact.id}\t{artifact.status}\t{artifact.name}"
       typer.echo(output)
@@ -228,42 +233,6 @@ def list_deltas(
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
-
-
-def _format_delta_with_details(artifact) -> str:
-  """Format delta with related specs, requirements, and phases."""
-  lines = [f"{artifact.id}\t{artifact.status}\t{artifact.name}"]
-
-  # Related specs
-  specs = artifact.applies_to.get("specs", []) if artifact.applies_to else []
-  if specs:
-    lines.append(f"  specs: {', '.join(str(s) for s in specs)}")
-
-  # Requirements
-  reqs = artifact.applies_to.get("requirements", []) if artifact.applies_to else []
-  if reqs:
-    lines.append(f"  requirements: {', '.join(str(r) for r in reqs)}")
-
-  # Phases
-  if artifact.plan and artifact.plan.get("phases"):
-    phases = artifact.plan["phases"]
-    phase_summaries = []
-    for phase in phases:
-      phase_id = phase.get("phase") or phase.get("id") or "?"
-      objective = str(phase.get("objective", "")).strip()
-      if objective:
-        objective = objective.splitlines()[0]
-        if len(objective) > 60:
-          objective = objective[:57] + "..."
-        phase_summaries.append(f"{phase_id}: {objective}")
-      else:
-        phase_summaries.append(phase_id)
-    if phase_summaries:
-      lines.append("  phases:")
-      for summary in phase_summaries:
-        lines.append(f"    {summary}")
-
-  return "\n".join(lines)
 
 
 @app.command("changes")

@@ -7,8 +7,8 @@ from typing import Annotated
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
-from supekku.scripts.lib.decision_formatting import format_decision_details
 from supekku.scripts.lib.decision_registry import DecisionRegistry
+from supekku.scripts.lib.formatters.decision_formatters import format_decision_details
 
 app = typer.Typer(help="Show detailed artifact information")
 

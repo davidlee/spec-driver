@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""List deltas with optional filtering and status grouping."""
+"""List deltas with optional filtering and status grouping.
+
+Thin script layer: parse args → load registry → filter → format → output
+Display formatting is delegated to supekku.scripts.lib.formatters
+"""
 
 from __future__ import annotations
 
@@ -19,6 +23,10 @@ from supekku.scripts.lib.change_lifecycle import (  # type: ignore
 )
 from supekku.scripts.lib.change_registry import ChangeRegistry  # type: ignore
 from supekku.scripts.lib.cli_utils import add_root_argument
+from supekku.scripts.lib.formatters.change_formatters import (  # type: ignore
+  format_change_list_item,
+  format_change_with_context,
+)
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -56,47 +64,6 @@ def matches_filters(
   return not (status and normalize_status(artifact.status) != normalize_status(status))
 
 
-def format_delta_basic(artifact) -> str:
-  """Format delta as: id status name."""
-  return f"{artifact.id}\t{artifact.status}\t{artifact.name}"
-
-
-def format_delta_with_details(artifact) -> str:
-  """Format delta with related specs, requirements, and phases."""
-  lines = [format_delta_basic(artifact)]
-
-  # Related specs
-  specs = artifact.applies_to.get("specs", []) if artifact.applies_to else []
-  if specs:
-    lines.append(f"  specs: {', '.join(str(s) for s in specs)}")
-
-  # Requirements
-  reqs = artifact.applies_to.get("requirements", []) if artifact.applies_to else []
-  if reqs:
-    lines.append(f"  requirements: {', '.join(str(r) for r in reqs)}")
-
-  # Phases
-  if artifact.plan and artifact.plan.get("phases"):
-    phases = artifact.plan["phases"]
-    phase_summaries = []
-    for phase in phases:
-      phase_id = phase.get("phase") or phase.get("id") or "?"
-      objective = str(phase.get("objective", "")).strip()
-      if objective:
-        objective = objective.splitlines()[0]
-        if len(objective) > 60:
-          objective = objective[:57] + "..."
-        phase_summaries.append(f"{phase_id}: {objective}")
-      else:
-        phase_summaries.append(phase_id)
-    if phase_summaries:
-      lines.append("  phases:")
-      for summary in phase_summaries:
-        lines.append(f"    {summary}")
-
-  return "\n".join(lines)
-
-
 def main(argv: list[str] | None = None) -> int:
   """Main entry point for listing deltas."""
   args = parse_args(argv)
@@ -129,16 +96,12 @@ def main(argv: list[str] | None = None) -> int:
     if not deltas:
       continue
 
-    # Print status header
-
     # Print deltas
-    for _delta in deltas:
+    for delta in deltas:
       if args.details:
-        pass
+        print(format_change_with_context(delta))
       else:
-        pass
-
-    # Blank line between groups
+        print(format_change_list_item(delta))
 
   return 0
 

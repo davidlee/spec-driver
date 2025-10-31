@@ -12,8 +12,8 @@ from supekku.scripts.lib.decision_creation import (
   ADRCreationOptions,
   create_adr,
 )
-from supekku.scripts.lib.decision_formatting import format_decision_details
 from supekku.scripts.lib.decision_registry import DecisionRegistry
+from supekku.scripts.lib.formatters.decision_formatters import format_decision_details
 
 app = typer.Typer(help="ADR management commands")
 

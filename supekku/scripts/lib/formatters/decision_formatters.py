@@ -1,6 +1,7 @@
-"""Shared decision formatting utilities for CLI commands.
+"""Decision/ADR display formatters.
 
-Provides display formatting for decision/ADR objects.
+Pure formatting functions with no business logic.
+Formatters take DecisionRecord objects and return formatted strings for display.
 """
 
 from typing import TYPE_CHECKING

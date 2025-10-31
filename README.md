@@ -1,11 +1,11 @@
 # spec-driver
 
-Specification-driven agentic development toolkit with multi-language spec sync and documentation generation.
+Specification-driven development toolkit with multi-language spec sync and documentation generation.
 
-Why? 
+**Why?**
 - Maintain verifiably accurate, evergreen specs covering your _entire system_
 - Use cheap, fast, deterministically generated docs to complement and audit the work of messy, stochastic agents
-- The combination of markdown and YAML is a surprisingly powerful platform for structured, legible data 
+- The combination of markdown and YAML is a surprisingly powerful platform for structured, legible data
 - Tooling joins related entities through a registry for fast lookup, validation, and relational data propagation
 - Stop banging rocks together
 
@@ -19,97 +19,245 @@ Why?
 
 - **Multi-language spec sync**: Automatically sync specifications with Go and Python codebases
 - **Architecture Decision Records (ADRs)**: Manage and track architectural decisions
-- **Delta/Change tracking**: Track and manage specification changes and revisions
-- **Documentation generation**: Generate documentation from code using AST analysis
+- **Delta/Change tracking**: Relate specification changes, requirements, deltas, implementation plans and revisions
+- **Documentation generation**: Generate compact, legible markdown documentation from code (Go, Python, JavaScript/TypeScript/TSX)
 - **Workspace validation**: Ensure consistency across specification artifacts
+- **Orphan detection**: Safely remove specs for deleted source files
 
 ## Installation
+
+### PyPi package
+
+```bash
+# try before you buy (no install)
+uvx spec-driver --help
+
+# Or settle in with it 
+uv init
+uv add speec-driver
+uv run spec-driver --help
+```
 
 ### From GitHub (Development)
 
 ```bash
 # Install from latest commit
+uv init 
 uv add git+https://github.com/davidlee/spec-driver
+uv run spec-driver --help
 
-# Or use with uvx (no installation)
-uvx --from git+https://github.com/davidlee/spec-driver spec-driver-sync --help
+# Or use it right off the tubes
+uvx --from git+https://github.com/davidlee/spec-driver spec-driver --help
 ```
 
-### From PyPI (Future)
+## Quick Start
 
 ```bash
-uv add spec-driver
+# Initialize workspace in your project
+spec-driver install
+
+# Sync specs with your codebase
+spec-driver sync
+
+# List all specs
+spec-driver list specs
+
+# Create a new spec
+spec-driver create spec --kind tech
+
+# Create a new delta
+spec-driver create delta 
 ```
 
 ## Usage
 
-spec-driver provides multiple CLI commands:
+All commands are accessed through the unified `spec-driver` CLI.
 
-### Specification Sync
+### Installation & Setup
 
 ```bash
-# Sync specifications with codebase
-spec-driver-sync
+# Initialize spec-driver workspace structure
+spec-driver install
 
-# Dry run to see what would be synced
-spec-driver-sync --dry-run
+# This creates:
+# - specify/ directory (for specs, ADRs)
+# - change/ directory (for deltas, revisions)
+# - .spec-driver/registry/ (for YAML registries)
+# - Templates and configuration files
+```
+
+### Synchronization
+
+```bash
+# Sync all specs with source code (auto-discovery)
+spec-driver sync
+
+# Sync only existing registered specs
+spec-driver sync --existing
 
 # Sync specific language
-spec-driver-sync --language python
+spec-driver sync --language python
+
+# Sync specific targets
+spec-driver sync go:internal/foo python:module.py
+
+# Dry run to preview changes
+spec-driver sync --dry-run
+
+# Check if docs are up-to-date (CI-friendly)
+spec-driver sync --check
+
+# Remove specs for deleted source files
+spec-driver sync --existing --prune
+
+# Sync ADR registry
+spec-driver sync --adr
+```
+
+### Creating Artifacts
+
+```bash
+# Create a new technical spec
+spec-driver create spec --kind tech
+
+# Create a new product spec
+spec-driver create spec --kind product
+
+# Create a new delta (change proposal)
+spec-driver create delta
+
+# Create a requirement breakout
+spec-driver create requirement
+
+# Create a spec revision
+spec-driver create revision
+
+# Create an ADR
+spec-driver create adr
+```
+
+### Listing Artifacts
+
+```bash
+# List all specs
+spec-driver list specs
+
+# List specs for specific package
+spec-driver list specs --package internal/foo
+
+# List specs with package details
+spec-driver list specs --packages
+
+# List deltas
+spec-driver list deltas
+
+# List deltas by status
+spec-driver list deltas --status active
+
+# List all changes (deltas, revisions, audits)
+spec-driver list changes
+
+# List changes by kind
+spec-driver list changes --kind delta
 ```
 
 ### Architecture Decision Records
 
 ```bash
 # Create new ADR
-spec-driver-adr new "Use event sourcing for audit trail"
+spec-driver create adr
 
 # List ADRs
-spec-driver-adr list
+spec-driver adr list
+
+# List ADRs by status
+spec-driver adr list --status accepted
 
 # Show ADR details
-spec-driver-adr show ADR-001
+spec-driver adr show ADR-001
+
+# Sync ADR registry
+spec-driver sync --adr
 ```
 
-### Deltas and Changes
+### Validation
 
 ```bash
-# Create delta
-spec-driver-delta
-
-# List deltas
-spec-driver-delta-list
-
-# Complete delta
-spec-driver-delta-complete DELTA-001
+# Validate workspace consistency
+spec-driver validate
 ```
 
-### Other Commands
+### Completing Work
 
-- `spec-driver-spec` - Create new specification
-- `spec-driver-spec-list` - List specifications
-- `spec-driver-requirement` - Manage requirements
-- `spec-driver-revision` - Create revision blocks
-- `spec-driver-validate-workspace` - Validate workspace consistency
+```bash
+# Mark delta as completed
+spec-driver complete delta DE-001
+```
 
 ## Project Integration
 
-spec-driver is designed to be integrated into projects using:
+spec-driver integrates into your project using:
 
-1. **Directory structure**: `specify/` and `change/` directories for artifacts
-2. **Justfile module**: Integration with project build tools
-3. **Agent instructions**: Claude Code integration via agent files
+1. **Directory structure**: `specify/` and `change/` directories
+2. **Registry files**: `.spec-driver/registry/*.yaml` for cross-references
+3. **Templates**: `.spec-driver/templates/` for consistent artifact creation
+4. **Agent instructions**: `.claude/commands` for AI-assisted development
 
-Installation script (future):
+## Common Workflows
+
+### Daily Development
+
 ```bash
-uvx spec-driver install
+# 1. Create a delta for your change
+spec-driver create delta
+
+# 2. Write code, update specs as needed
+
+# 3. Sync specs with code
+spec-driver sync
+
+# 4. Validate consistency
+spec-driver validate
+
+# 5. Mark delta complete
+spec-driver complete delta DE-XXX
+```
+
+### Onboarding New Code
+
+```bash
+# Auto-discover and create specs for existing code
+spec-driver sync --language python
+
+# Review what would be created first
+spec-driver sync --dry-run
+```
+
+### Cleaning Up
+
+```bash
+# Find orphaned specs (source files deleted)
+spec-driver sync --existing --prune --dry-run
+
+# Remove them
+spec-driver sync --existing --prune
+```
+
+### Continuous Integration
+
+```bash
+# Verify specs are up-to-date
+spec-driver sync --check
+
+# Validate workspace
+spec-driver validate
 ```
 
 ## Development
 
-This package is under active development and API stability is not yet guaranteed.
+This package is under active development and cli API stability is not even hinted at. 
 
-Current development happens in the [vice](https://github.com/davidlee/vice) repository.
+I'll aim not to make breaking changes to data formats, though.
 
 ## License
 

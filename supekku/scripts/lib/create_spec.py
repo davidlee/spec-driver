@@ -35,6 +35,11 @@ class CreateSpecResult:
   test_path: Path | None
 
   def to_json(self) -> str:
+    """Serialize result to JSON format.
+
+    Returns:
+      JSON string representation of the result.
+    """
     payload = {
       "id": self.spec_id,
       "dir": str(self.directory),
@@ -140,6 +145,17 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
 
 
 def find_repository_root(start: Path) -> Path:
+  """Find repository root by searching for .git or spec-driver templates.
+
+  Args:
+    start: Path to start searching from.
+
+  Returns:
+    Repository root path.
+
+  Raises:
+    RepositoryRootNotFoundError: If repository root cannot be found.
+  """
   for path in [start, *start.parents]:
     # Check for .git or spec-driver templates directory
     if (path / ".git").exists():
@@ -153,6 +169,18 @@ def find_repository_root(start: Path) -> Path:
 
 
 def build_template_config(repo_root: Path, spec_type: str) -> SpecTemplateConfig:
+  """Build template configuration for the specified spec type.
+
+  Args:
+    repo_root: Repository root path.
+    spec_type: Type of spec ("tech" or "product").
+
+  Returns:
+    SpecTemplateConfig with paths and settings.
+
+  Raises:
+    SpecCreationError: If spec type is not supported.
+  """
   spec_type = spec_type.lower()
   templates_dir = get_templates_dir(repo_root)
   if spec_type == "tech":
@@ -176,6 +204,15 @@ def build_template_config(repo_root: Path, spec_type: str) -> SpecTemplateConfig
 
 
 def determine_next_identifier(base_dir: Path, prefix: str) -> str:
+  """Determine next sequential spec identifier.
+
+  Args:
+    base_dir: Directory containing existing specs.
+    prefix: Identifier prefix (e.g., "SPEC", "PROD").
+
+  Returns:
+    Next available identifier (e.g., "SPEC-042").
+  """
   highest = 0
   if base_dir.exists():
     for entry in base_dir.iterdir():
@@ -192,10 +229,29 @@ def determine_next_identifier(base_dir: Path, prefix: str) -> str:
 
 
 def slugify(name: str) -> str:
+  """Convert name to URL-friendly slug.
+
+  Args:
+    name: Human-readable name.
+
+  Returns:
+    Lowercase slug with hyphens.
+  """
   return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
 def extract_template_body(path: Path) -> str:
+  """Extract markdown body from template file.
+
+  Args:
+    path: Path to template file.
+
+  Returns:
+    Extracted markdown content.
+
+  Raises:
+    TemplateNotFoundError: If template file doesn't exist.
+  """
   if not path.exists():
     msg = f"Template not found: {path}"
     raise TemplateNotFoundError(msg)
@@ -215,6 +271,18 @@ def build_frontmatter(
   kind: str,
   created: str,
 ) -> MutableMapping[str, object]:
+  """Build YAML frontmatter dictionary for spec file.
+
+  Args:
+    spec_id: Unique spec identifier.
+    slug: URL-friendly slug.
+    name: Human-readable spec name.
+    kind: Spec kind/type.
+    created: Creation date (ISO format).
+
+  Returns:
+    Frontmatter dictionary.
+  """
   return {
     "id": spec_id,
     "slug": slug,

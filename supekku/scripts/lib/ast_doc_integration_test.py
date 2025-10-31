@@ -20,7 +20,7 @@ class JustfileIntegrationTest(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up test environment."""
-    self.temp_dir = tempfile.TemporaryDirectory()
+    self.temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.addCleanup(self.temp_dir.cleanup)
     self.temp_path = Path(self.temp_dir.name)
 
@@ -210,7 +210,7 @@ class EndToEndWorkflowTest(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up test environment."""
-    self.temp_dir = tempfile.TemporaryDirectory()
+    self.temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.addCleanup(self.temp_dir.cleanup)
     self.temp_path = Path(self.temp_dir.name)
 

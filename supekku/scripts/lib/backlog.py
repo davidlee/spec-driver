@@ -69,6 +69,17 @@ TEMPLATES: Mapping[str, BacklogTemplate] = {
 
 
 def find_repo_root(start: Path | None = None) -> Path:
+  """Find repository root from starting path.
+
+  Args:
+    start: Path to start searching from. Defaults to current directory.
+
+  Returns:
+    Repository root path.
+
+  Raises:
+    RuntimeError: If repository root cannot be found.
+  """
   # Import here to avoid circular dependency with paths.py
   from .paths import SPEC_DRIVER_DIR  # noqa: PLC0415
 
@@ -85,15 +96,40 @@ def find_repo_root(start: Path | None = None) -> Path:
 
 
 def backlog_root(repo_root: Path) -> Path:
+  """Get backlog directory path.
+
+  Args:
+    repo_root: Repository root path.
+
+  Returns:
+    Backlog directory path.
+  """
   return repo_root / "backlog"
 
 
 def slugify(value: str) -> str:
+  """Convert value to URL-friendly slug.
+
+  Args:
+    value: String to slugify.
+
+  Returns:
+    Lowercase slug with hyphens.
+  """
   slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
   return slug or "item"
 
 
 def next_identifier(entries: Iterable[Path], prefix: str) -> str:
+  """Determine next sequential identifier.
+
+  Args:
+    entries: Existing entry paths.
+    prefix: Identifier prefix.
+
+  Returns:
+    Next available identifier.
+  """
   highest = 0
   pattern = re.compile(rf"{re.escape(prefix)}[-_](\d+)")
   for entry in entries:
@@ -113,6 +149,19 @@ def create_backlog_entry(
   *,
   repo_root: Path | None = None,
 ) -> Path:
+  """Create a new backlog entry.
+
+  Args:
+    kind: Entry kind (issue, problem, improvement, risk).
+    name: Entry name/title.
+    repo_root: Optional repository root. Auto-detected if not provided.
+
+  Returns:
+    Path to created entry file.
+
+  Raises:
+    ValueError: If kind is not supported.
+  """
   template = TEMPLATES.get(kind)
   if template is None:
     msg = f"Unsupported backlog kind: {kind}"
@@ -143,6 +192,14 @@ def create_backlog_entry(
 
 
 def extract_title(path: Path) -> str:
+  """Extract title from backlog entry file.
+
+  Args:
+    path: Path to backlog entry.
+
+  Returns:
+    Entry title from frontmatter or first heading.
+  """
   frontmatter, body = load_markdown_file(path)
   title = frontmatter.get("name")
   if isinstance(title, str) and title.strip():
@@ -154,6 +211,14 @@ def extract_title(path: Path) -> str:
 
 
 def append_backlog_summary(*, repo_root: Path | None = None) -> list[str]:
+  """Append new entries to backlog summary file.
+
+  Args:
+    repo_root: Optional repository root. Auto-detected if not provided.
+
+  Returns:
+    List of newly added summary lines.
+  """
   repo_root = find_repo_root(repo_root)
   root = backlog_root(repo_root)
   summary_path = root / "backlog.md"

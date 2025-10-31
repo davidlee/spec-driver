@@ -15,6 +15,11 @@ from supekku.scripts.lib.create_change import create_revision  # type: ignore
 
 
 def build_parser() -> argparse.ArgumentParser:
+  """Build argument parser for revision creation.
+
+  Returns:
+    Configured ArgumentParser instance.
+  """
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument("name", help="Revision title (summary)")
   parser.add_argument(
@@ -39,6 +44,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+  """Create a Spec Revision bundle.
+
+  Args:
+    argv: Optional command-line arguments.
+
+  Returns:
+    Exit code: 0 on success.
+  """
   parser = build_parser()
   args = parser.parse_args(argv)
   create_revision(

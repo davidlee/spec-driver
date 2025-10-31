@@ -48,7 +48,7 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up test fixtures."""
-    self.temp_dir = TemporaryDirectory()
+    self.temp_dir = TemporaryDirectory()  # pylint: disable=consider-using-with
     self.base_dir = Path(self.temp_dir.name)
     self.builder = SpecIndexBuilder(self.base_dir)
 

@@ -1,4 +1,5 @@
 """Tests for TypeScript/JavaScript language adapter."""
+# pylint: disable=protected-access
 
 import json
 import shutil
@@ -18,7 +19,7 @@ from .typescript import (
 )
 
 
-class TestTypeScriptAdapter(unittest.TestCase):
+class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-public-methods
   """Test TypeScriptAdapter functionality."""
 
   def setUp(self) -> None:

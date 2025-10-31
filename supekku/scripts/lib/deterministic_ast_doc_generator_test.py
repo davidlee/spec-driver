@@ -110,7 +110,7 @@ class DeterministicPythonModuleAnalyzerTest(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up test environment."""
-    self.temp_dir = tempfile.TemporaryDirectory()
+    self.temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.addCleanup(self.temp_dir.cleanup)
     self.temp_path = Path(self.temp_dir.name)
 
@@ -239,7 +239,7 @@ class DocumentationGenerationTest(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up test environment."""
-    self.temp_dir = tempfile.TemporaryDirectory()
+    self.temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.addCleanup(self.temp_dir.cleanup)
     self.temp_path = Path(self.temp_dir.name)
 
@@ -332,7 +332,7 @@ class DocumentationGenerationTest(unittest.TestCase):
       if "error" in analysis:
         doc_content = generate_deterministic_markdown_spec(analysis, "all")
         assert "Error" in doc_content
-    except Exception as e:
+    except (SyntaxError, ValueError) as e:
       # If exception occurs, it should be a specific parsing error
       assert "syntax" in str(e).lower()
 
@@ -364,7 +364,7 @@ class CheckModeTest(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up test environment."""
-    self.temp_dir = tempfile.TemporaryDirectory()
+    self.temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.addCleanup(self.temp_dir.cleanup)
     self.temp_path = Path(self.temp_dir.name)
 
@@ -431,7 +431,7 @@ class IntegrationTest(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up test environment."""
-    self.temp_dir = tempfile.TemporaryDirectory()
+    self.temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.addCleanup(self.temp_dir.cleanup)
     self.temp_path = Path(self.temp_dir.name)
 

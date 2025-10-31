@@ -215,11 +215,11 @@ def list_deltas(
     if not artifacts:
       raise typer.Exit(EXIT_SUCCESS)
 
-    delta_ids = ids if ids else None
+    delta_ids = set(ids) if ids else None
 
     for artifact in artifacts.values():
       # Check filters
-      if delta_ids and artifact.id not in delta_ids:
+      if delta_ids is not None and artifact.id not in delta_ids:
         continue
       if status and normalize_status(artifact.status) != normalize_status(status):
         continue

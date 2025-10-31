@@ -9,7 +9,8 @@
       "Read(//home/david/dev/vice/.spec-driver/registry/**)",
       "Bash(uv run ruff check:*)",
       "Bash(uv run:*)",
-      "Bash(uv run python:*)"
+      "Bash(uv run python:*)",
+      "Bash(just pylint:*)"
     ],
     "deny": [],
     "ask": []

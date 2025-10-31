@@ -24,7 +24,7 @@ class BacklogLibraryTest(unittest.TestCase):
     os.chdir(self._cwd)
 
   def _make_repo(self) -> Path:
-    tmpdir = tempfile.TemporaryDirectory()
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.addCleanup(tmpdir.cleanup)
     root = Path(tmpdir.name)
     (root / ".git").mkdir()

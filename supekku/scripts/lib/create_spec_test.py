@@ -30,7 +30,7 @@ class CreateSpecTest(unittest.TestCase):
     os.chdir(self._cwd)
 
   def _setup_repo(self) -> Path:
-    tmpdir = tempfile.TemporaryDirectory()
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.addCleanup(tmpdir.cleanup)
     root = Path(tmpdir.name)
     (root / ".git").mkdir()
@@ -95,7 +95,7 @@ class CreateSpecTest(unittest.TestCase):
       create_spec("Missing Template", CreateSpecOptions())
 
   def test_repository_root_not_found(self) -> None:
-    tmpdir = tempfile.TemporaryDirectory()
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.addCleanup(tmpdir.cleanup)
     os.chdir(tmpdir.name)
 

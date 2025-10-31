@@ -15,6 +15,11 @@ from supekku.scripts.lib.create_change import create_delta  # type: ignore
 
 
 def build_parser() -> argparse.ArgumentParser:
+  """Build argument parser for delta creation.
+
+  Returns:
+    Configured ArgumentParser instance.
+  """
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument("name", help="Delta title")
   parser.add_argument(
@@ -38,6 +43,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+  """Create a Delta bundle with optional plan scaffolding.
+
+  Args:
+    argv: Optional command-line arguments.
+
+  Returns:
+    Exit code: 0 on success.
+  """
   parser = build_parser()
   args = parser.parse_args(argv)
   result = create_delta(

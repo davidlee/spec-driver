@@ -156,3 +156,14 @@ skip-magic-trailing-comma = false
 "supekku/scripts/**/*.py" = ["E402"]
 "supekku/cli/**/*.py" = ["E402", "PLC0415"]
 
+[tool.pylint.format]
+indent-string = "  "
+expected-line-ending-format = "LF"
+
+[tool.pylint.messages_control]
+disable = [
+  "bad-indentation",  # Project uses 2-space indentation
+  "wrong-import-position",  # Typer CLI patterns require delayed imports
+  "too-many-locals",  # CLI commands naturally have many parameters
+]
+

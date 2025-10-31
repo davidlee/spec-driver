@@ -18,6 +18,14 @@ KINDS = ["delta", "revision", "audit"]
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+  """Parse command-line arguments for change registry generation.
+
+  Args:
+    argv: Optional list of command-line arguments.
+
+  Returns:
+    Parsed argument namespace.
+  """
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument(
     "--kind",
@@ -30,6 +38,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+  """Generate registries for change artefacts.
+
+  Args:
+    argv: Optional command-line arguments.
+
+  Returns:
+    Exit code: 0 on success.
+  """
   args = parse_args(argv)
   kinds = KINDS if args.kind == "all" else [args.kind]
   for kind in kinds:

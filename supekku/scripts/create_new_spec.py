@@ -20,6 +20,17 @@ from supekku.scripts.lib.create_spec import (  # type: ignore
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
+  """Parse command-line arguments for spec creation.
+
+  Args:
+    argv: List of command-line arguments.
+
+  Returns:
+    Parsed argument namespace with spec_name joined as a single string.
+
+  Raises:
+    SystemExit: If spec_name is not provided.
+  """
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument(
     "spec_name",
@@ -53,6 +64,14 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+  """Create a new SPEC or PROD document bundle.
+
+  Args:
+    argv: Optional command-line arguments. Defaults to sys.argv[1:].
+
+  Returns:
+    Exit code: 0 on success, 1 on error.
+  """
   namespace = parse_args(argv or sys.argv[1:])
   options = CreateSpecOptions(
     spec_type=namespace.type,

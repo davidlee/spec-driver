@@ -18,6 +18,14 @@ from supekku.scripts.lib.workspace import Workspace  # type: ignore
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+  """Parse command-line arguments for workspace validation.
+
+  Args:
+    argv: Optional list of command-line arguments.
+
+  Returns:
+    Parsed argument namespace.
+  """
   parser = argparse.ArgumentParser(description=__doc__)
   add_root_argument(parser, "Repository root (auto-detected if not provided)")
   parser.add_argument(
@@ -34,6 +42,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+  """Validate workspace metadata and relationships.
+
+  Args:
+    argv: Optional command-line arguments.
+
+  Returns:
+    Exit code: 0 if validation passes, 1 if issues found.
+  """
   args = parse_args(argv)
   ws = (
     Workspace(find_repo_root(args.root))
@@ -55,6 +71,14 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def get_repo_root(start: Path) -> Path:
+  """Get repository root from starting path.
+
+  Args:
+    start: Starting path to search from.
+
+  Returns:
+    Repository root path.
+  """
   return find_repo_root(start)
 
 

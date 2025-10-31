@@ -50,11 +50,11 @@ def version_callback(value: bool) -> None:
 
   """
   if value:
-    from importlib.metadata import version
+    from importlib.metadata import PackageNotFoundError, version
 
     try:
       pkg_version = version("spec-driver")
-    except Exception:  # pragma: no cover
+    except PackageNotFoundError:  # pragma: no cover
       pkg_version = "unknown"
     typer.echo(f"spec-driver {pkg_version}")
     raise typer.Exit(EXIT_SUCCESS)

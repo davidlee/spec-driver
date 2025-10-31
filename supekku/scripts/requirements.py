@@ -26,6 +26,11 @@ DEFAULT_AUDIT_DIRS = [ROOT / "change" / "audits"]
 
 
 def build_parser() -> argparse.ArgumentParser:
+  """Build argument parser for requirements registry management.
+
+  Returns:
+    Configured ArgumentParser with subcommands.
+  """
   parser = argparse.ArgumentParser(description=__doc__)
   subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -96,6 +101,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+  """Manage requirements registry: sync, list, search, and update status.
+
+  Args:
+    argv: Optional command-line arguments.
+
+  Returns:
+    Exit code: 0 on success, 1 on error.
+  """
   parser = build_parser()
   args = parser.parse_args(argv)
 

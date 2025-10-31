@@ -260,9 +260,9 @@ This package is under active development and cli API stability is not even hinte
 I'll aim not to make breaking changes to data formats, though.
 
 ## Related
-[PyPi project](https://pypi.org/project/spec-driver/)
-[npm dependency for TS doc gen](https://www.npmjs.com/package/ts-doc-extract)
-[sort of a website](https://supekku.dev)
+- [PyPi project](https://pypi.org/project/spec-driver/)
+- [npm dependency for TS doc gen](https://www.npmjs.com/package/ts-doc-extract)
+- [sort of a website](https://supekku.dev)
 
 
 ## License

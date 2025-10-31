@@ -23,6 +23,14 @@ KIND_CHOICES = ["delta", "revision", "audit", "all"]
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+  """Parse command-line arguments for listing change artefacts.
+
+  Args:
+    argv: Optional list of command-line arguments.
+
+  Returns:
+    Parsed argument namespace.
+  """
   parser = argparse.ArgumentParser(description=__doc__)
   add_root_argument(parser)
   parser.add_argument(
@@ -71,6 +79,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def iter_artifacts(root: Path, kinds: Iterable[str]):
+  """Iterate through change artefacts of specified kinds.
+
+  Args:
+    root: Repository root path.
+    kinds: Iterable of artefact kinds to include.
+
+  Yields:
+    Change artefacts from registries.
+  """
   for kind in kinds:
     registry = ChangeRegistry(root=root, kind=kind)
     yield from registry.collect().values()
@@ -83,6 +100,17 @@ def matches_filters(
   status: str | None,
   applies_to: str | None,
 ) -> bool:
+  """Check if artefact matches all specified filters.
+
+  Args:
+    artifact: Change artefact to filter.
+    substring: Optional substring to match in ID, slug, or name.
+    status: Optional status to match.
+    applies_to: Optional requirement reference to match.
+
+  Returns:
+    True if artefact matches all filters.
+  """
   if substring:
     text = substring.lower()
     if not (
@@ -117,6 +145,19 @@ def format_artifact(
   include_applies: bool,
   include_plan: bool,
 ) -> str:
+  """Format artefact as tab-separated output.
+
+  Args:
+    artifact: Change artefact to format.
+    root: Repository root for relative path calculation.
+    include_paths: Whether to include file paths.
+    include_relations: Whether to include relations.
+    include_applies: Whether to include applies_to requirements.
+    include_plan: Whether to include plan overview.
+
+  Returns:
+    Tab-separated string representation.
+  """
   fields: list[str] = [artifact.id, artifact.kind, artifact.status, artifact.slug]
   if include_paths:
     try:
@@ -164,6 +205,14 @@ def format_artifact(
 
 
 def main(argv: list[str] | None = None) -> int:
+  """List change artefacts with optional filters.
+
+  Args:
+    argv: Optional command-line arguments.
+
+  Returns:
+    Exit code: 0 on success.
+  """
   args = parse_args(argv)
   root = args.root
 

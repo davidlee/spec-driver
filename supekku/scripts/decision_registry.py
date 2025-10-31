@@ -102,7 +102,6 @@ def handle_list(args: argparse.Namespace) -> None:
 
   # Print decisions
   for decision in sorted(decisions, key=lambda d: d.id):
-    decision.updated.strftime("%Y-%m-%d") if decision.updated else "N/A"
     # Truncate title if too long
     title = decision.title
     if len(title) > 40:

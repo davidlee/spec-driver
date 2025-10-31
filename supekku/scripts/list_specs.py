@@ -17,6 +17,14 @@ from supekku.scripts.lib.spec_registry import SpecRegistry  # type: ignore
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+  """Parse command-line arguments for spec listing.
+
+  Args:
+    argv: Optional list of command-line arguments.
+
+  Returns:
+    Parsed argument namespace.
+  """
   parser = argparse.ArgumentParser(description=__doc__)
   add_root_argument(parser)
   parser.add_argument(
@@ -68,6 +76,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def normalise_kind(requested: str, spec_id: str) -> bool:
+  """Check if spec ID matches the requested kind filter.
+
+  Args:
+    requested: Kind filter ("all", "tech", or "product").
+    spec_id: Spec identifier to check.
+
+  Returns:
+    True if spec matches the filter, False otherwise.
+  """
   if requested == "all":
     return True
   if requested == "tech":
@@ -78,6 +95,14 @@ def normalise_kind(requested: str, spec_id: str) -> bool:
 
 
 def main(argv: list[str] | None = None) -> int:
+  """List SPEC/PROD artifacts with filtering and formatting options.
+
+  Args:
+    argv: Optional command-line arguments.
+
+  Returns:
+    Exit code: 0 on success.
+  """
   args = parse_args(argv)
   registry = SpecRegistry(args.root)
   substring = (args.substring or "").strip().lower()
@@ -92,6 +117,7 @@ def main(argv: list[str] | None = None) -> int:
     package_filters.append(args.package_filter.strip().lower())
 
   def resolve_package_path(package_path: str) -> None:
+    """Resolve package path to spec ID via by-package index."""
     node = package_index_root / Path(package_path) / "spec"
     if node.exists():
       try:

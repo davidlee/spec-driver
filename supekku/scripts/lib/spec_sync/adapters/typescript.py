@@ -263,6 +263,7 @@ class TypeScriptAdapter(LanguageAdapter):
 
     # Skip test files
     filename_lower = file_path.name.lower()
+    # pylint: disable=too-many-boolean-expressions
     if (
       ".test." in filename_lower
       or ".spec." in filename_lower
@@ -608,7 +609,7 @@ class TypeScriptAdapter(LanguageAdapter):
 
     return doc_variants
 
-  def _generate_markdown(self, ast_data: dict, variant: str) -> str:
+  def _generate_markdown(self, ast_data: dict, _variant: str) -> str:
     """Generate token-efficient markdown from AST data.
 
     Format optimized for AI agents:
@@ -741,6 +742,7 @@ class TypeScriptAdapter(LanguageAdapter):
         lines.append("")
 
     # Classes
+    # pylint: disable=too-many-nested-blocks
     if classes:
       lines.append("## Classes")
       lines.append("")

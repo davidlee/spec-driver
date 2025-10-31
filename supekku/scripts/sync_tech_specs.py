@@ -21,6 +21,11 @@ from supekku.scripts.lib.sync_engine import (  # type: ignore
 
 
 def main() -> None:
+  """Synchronise tech specs with Go packages and generate interface documentation.
+
+  Raises:
+    SystemExit: If tech spec directory not found or gomarkdoc unavailable.
+  """
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument(
     "packages",

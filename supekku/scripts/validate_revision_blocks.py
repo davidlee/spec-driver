@@ -23,6 +23,14 @@ from supekku.scripts.lib.revision_blocks import (  # type: ignore
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+  """Parse command-line arguments for revision block validation.
+
+  Args:
+    argv: Optional list of command-line arguments. Defaults to sys.argv.
+
+  Returns:
+    Parsed argument namespace.
+  """
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument(
     "paths",
@@ -61,6 +69,16 @@ def discover_revision_files(
   explicit: list[Path],
   scan_all: bool,
 ) -> list[Path]:
+  """Discover revision markdown files to validate.
+
+  Args:
+    root: Repository root path.
+    explicit: List of explicitly specified file or directory paths.
+    scan_all: Whether to scan all revision files automatically.
+
+  Returns:
+    Sorted list of revision file paths to validate.
+  """
   if explicit:
     resolved = []
     for entry in explicit:
@@ -79,6 +97,15 @@ def discover_revision_files(
 
 
 def format_file(content: str, updates: list[tuple[RevisionChangeBlock, str]]) -> str:
+  """Apply formatting updates to file content.
+
+  Args:
+    content: Original file content.
+    updates: List of (block, replacement) tuples to apply.
+
+  Returns:
+    Updated file content with replacements applied.
+  """
   updated = content
   for block, replacement in sorted(
     updates,
@@ -90,6 +117,14 @@ def format_file(content: str, updates: list[tuple[RevisionChangeBlock, str]]) ->
 
 
 def main(argv: list[str] | None = None) -> int:
+  """Validate and optionally format revision block YAML in markdown files.
+
+  Args:
+    argv: Optional command-line arguments.
+
+  Returns:
+    Exit code: 0 on success, 1 on validation errors.
+  """
   args = parse_args(argv)
   if args.print_schema:
     _print_schema()

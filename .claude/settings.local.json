@@ -6,10 +6,10 @@
       "Bash(ruff check:*)",
       "Bash(just lint:*)",
       "Bash(just test:*)",
-      "Read(//home/david/dev/vice/change/revisions/RE-001-refit-git-requirements-to-git-go-strategy/**)",
-      "Read(//home/david/dev/vice/specify/product/PROD-002/**)",
       "Read(//home/david/dev/vice/.spec-driver/registry/**)",
-      "Bash(uv run ruff check:*)"
+      "Bash(uv run ruff check:*)",
+      "Bash(uv run:*)",
+      "Bash(uv run python:*)"
     ],
     "deny": [],
     "ask": []

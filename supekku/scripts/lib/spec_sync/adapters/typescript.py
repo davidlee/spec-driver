@@ -1,10 +1,13 @@
-"""TypeScript language adapter for specification synchronization."""
+"""TypeScript/JavaScript language adapter using AST-based documentation.
+
+This adapter uses ts-morph (via ts-doc-extract npm package) to generate
+deterministic, token-efficient documentation from TypeScript and JavaScript source.
+"""
 
 from __future__ import annotations
 
 import hashlib
 import json
-import shutil
 import subprocess
 from pathlib import Path
 from shutil import which
@@ -22,329 +25,400 @@ if TYPE_CHECKING:
   from collections.abc import Sequence
 
 
+class TypeScriptExtractionError(RuntimeError):
+  """Raised when ts-doc-extract fails to extract AST."""
+
+
 class NodeRuntimeNotAvailableError(RuntimeError):
-  """Raised when Node runtime is required but not available."""
-
-
-class TypeDocGenerationError(RuntimeError):
-  """Raised when TypeDoc generation fails."""
+  """Raised when Node.js runtime is required but not available."""
 
 
 class TypeScriptAdapter(LanguageAdapter):
-  """Language adapter for TypeScript packages using TypeDoc.
+  """AST-based TypeScript/JavaScript adapter using ts-morph.
 
-  Uses TypeDoc via npx for zero-install documentation generation.
-  Supports both Node.js and Bun runtimes.
+  Mirrors the Python adapter architecture:
+  1. Discover logical modules (not just packages)
+  2. Extract AST via ts-doc-extract (Node.js subprocess)
+  3. Generate token-efficient markdown from AST JSON
+
+  Supports: .ts, .tsx, .js, .jsx files
+  Package managers: npm, pnpm, bun
   """
 
   language: ClassVar[str] = "typescript"
 
   @staticmethod
   def is_node_available() -> bool:
-    """Check if Node.js runtime is available in PATH."""
+    """Check if Node.js is available in PATH."""
     return which("node") is not None
-
-  @staticmethod
-  def is_npm_available() -> bool:
-    """Check if npm is available (provides npx)."""
-    return which("npm") is not None
-
-  @staticmethod
-  def is_bun_available() -> bool:
-    """Check if Bun runtime is available in PATH."""
-    return which("bun") is not None
 
   @staticmethod
   def is_pnpm_available() -> bool:
     """Check if pnpm is available in PATH."""
     return which("pnpm") is not None
 
-  def _detect_package_manager(self, repo_root: Path) -> str | None:
-    """Detect which package manager the project uses.
-
-    Args:
-        repo_root: Root directory of the repository
-
-    Returns:
-        Package manager name ('pnpm', 'yarn', 'npm', 'bun') or None
-
-    """
-    # Check for lockfiles in order of preference
-    if (repo_root / "pnpm-lock.yaml").exists():
-      return "pnpm"
-    if (repo_root / "bun.lockb").exists():
-      return "bun"
-    if (repo_root / "yarn.lock").exists():
-      return "yarn"
-    if (repo_root / "package-lock.json").exists():
-      return "npm"
-
-    return None
-
-  def _get_runtime_command(self, pkg_dir: Path | None = None) -> list[str]:
-    """Determine which JS runtime to use for package execution.
-
-    Priority:
-    1. Detected package manager (pnpm/bun/yarn/npm)
-    2. Bun (if available, faster)
-    3. Node + npx (standard)
-
-    Args:
-        pkg_dir: Optional package directory to detect package manager from
-
-    Returns:
-        Command prefix for executing npm packages
-
-    Raises:
-        NodeRuntimeNotAvailableError: If no JS runtime is available
-
-    """
-    # Try to detect package manager from lockfile if pkg_dir provided
-    if pkg_dir:
-      detected_pm = self._detect_package_manager(pkg_dir)
-
-      # Use detected package manager if available
-      if detected_pm == "pnpm" and self.is_pnpm_available():
-        return ["pnpm", "dlx"]
-      if detected_pm == "bun" and self.is_bun_available():
-        return ["bunx", "--bun"]
-      if detected_pm == "yarn" and which("yarn"):
-        return ["yarn", "dlx"]
-      if detected_pm == "npm" and self.is_npm_available():
-        return ["npx", "--yes"]
-
-    # Fallback to runtime availability
-    if self.is_bun_available():
-      return ["bunx", "--bun"]
-    if self.is_node_available() and self.is_npm_available():
-      return ["npx", "--yes"]
-
-    raise NodeRuntimeNotAvailableError(
-      "No JavaScript runtime found. Please install Node.js from "
-      "https://nodejs.org/ or Bun from https://bun.sh/"
-    )
+  @staticmethod
+  def is_bun_available() -> bool:
+    """Check if bun is available in PATH."""
+    return which("bun") is not None
 
   def discover_targets(
     self,
     repo_root: Path,
     requested: Sequence[str] | None = None,
   ) -> list[SourceUnit]:
-    """Discover TypeScript packages for documentation.
+    """Discover TypeScript/JavaScript modules.
+
+    Strategy:
+    1. Find all TypeScript/JavaScript packages (package.json with TS/JS)
+    2. Within each package, find logical modules:
+       - Directories with index.ts/index.js
+       - Standalone significant .ts/.js files
+       - Top-level src/ subdirectories
 
     Args:
-        repo_root: Root directory of the repository
-        requested: Optional list of specific package paths to process
+        repo_root: Repository root directory
+        requested: Optional list of specific modules to process
 
     Returns:
-        List of SourceUnit objects for TypeScript packages
-
-    Raises:
-        NodeRuntimeNotAvailableError: If no JS runtime is available
+        List of SourceUnit objects for each logical module
 
     """
-    # Check runtime availability
-    if not (self.is_node_available() or self.is_bun_available()):
-      raise NodeRuntimeNotAvailableError(
-        "No JavaScript runtime found. Please install Node.js from "
-        "https://nodejs.org/ or Bun from https://bun.sh/"
-      )
-
     if requested:
-      # Process specific requested targets
-      return self._discover_requested_targets(repo_root, requested)
+      return self._discover_requested(repo_root, requested)
 
-    # Auto-discover TypeScript packages
-    return self._auto_discover_packages(repo_root)
+    source_units = []
 
-  def _discover_requested_targets(
+    # Find all TypeScript/JavaScript packages
+    for package_root in self._find_typescript_packages(repo_root):
+      # Find logical modules within this package
+      for module_path in self._find_logical_modules(package_root):
+        identifier = str(module_path.relative_to(repo_root))
+
+        source_units.append(
+          SourceUnit(
+            language=self.language,
+            identifier=identifier,
+            root=repo_root,
+          ),
+        )
+
+    return sorted(source_units, key=lambda u: u.identifier)
+
+  def _discover_requested(
     self,
     repo_root: Path,
     requested: Sequence[str],
   ) -> list[SourceUnit]:
-    """Process specific requested targets.
-
-    Args:
-        repo_root: Root directory of the repository
-        requested: List of requested identifiers
-
-    Returns:
-        List of SourceUnit objects for requested targets
-
-    """
+    """Discover specific requested modules."""
     source_units = []
 
     for identifier in requested:
       if not self.supports_identifier(identifier):
         continue
 
-      # Resolve identifier to package directory
-      pkg_dir = repo_root / identifier
-      if not pkg_dir.exists():
-        # Try as direct path
-        pkg_dir = Path(identifier)
-        if not pkg_dir.exists():
-          continue
+      # Convert identifier to path
+      module_path = repo_root / identifier
 
-      # Verify it's a TypeScript package
-      if self._is_typescript_package(pkg_dir):
-        try:
-          relative_path = pkg_dir.relative_to(repo_root)
-          unit_id = str(relative_path) if str(relative_path) != "." else "root"
-
-          source_units.append(
-            SourceUnit(
-              language=self.language,
-              identifier=unit_id,
-              root=repo_root,
-            ),
-          )
-        except ValueError:
-          # Path not relative to repo_root
-          continue
+      if module_path.exists():
+        source_units.append(
+          SourceUnit(
+            language=self.language,
+            identifier=identifier,
+            root=repo_root,
+          ),
+        )
 
     return source_units
 
-  def _auto_discover_packages(self, repo_root: Path) -> list[SourceUnit]:
-    """Auto-discover TypeScript packages in repository.
-
-    Strategy:
-    1. Find all package.json files
-    2. Check if they have TypeScript (tsconfig.json or .ts files)
-    3. Create SourceUnit for each TS package
+  def _find_typescript_packages(self, repo_root: Path) -> list[Path]:
+    """Find all package.json directories containing TypeScript/JavaScript.
 
     Args:
-        repo_root: Root directory of the repository
+        repo_root: Repository root
 
     Returns:
-        List of SourceUnit objects for discovered packages
+        List of package directories
 
     """
-    source_units = []
+    packages = []
 
-    exclude_dirs = {
-      "node_modules",
-      ".git",
-      "dist",
-      "build",
-      "coverage",
-      ".next",
-      ".nuxt",
-      "out",
-      ".cache",
-      "target",
-      "tmp",
-      "temp",
-      "__pycache__",
-      ".pytest_cache",
-      ".venv",
-      "venv",
-      ".uv-cache",
-    }
+    for package_json in repo_root.glob("**/package.json"):
+      package_dir = package_json.parent
 
-    # Find all package.json files
-    for pkg_json in repo_root.rglob("package.json"):
-      # Skip excluded directories
-      if any(excluded in pkg_json.parts for excluded in exclude_dirs):
+      # Skip specific directories (not using _should_skip_path for directories)
+      # because git only tracks files, not directories
+      path_str = str(package_dir)
+      skip_dirs = {
+        "node_modules",
+        ".next",
+        "dist",
+        "build",
+        "out",
+        ".git",
+        "specify",
+        "change",
+      }
+
+      if any(
+        f"/{skip}/" in path_str or path_str.endswith(f"/{skip}") for skip in skip_dirs
+      ):
         continue
 
-      # Skip if not git-tracked
-      if self._should_skip_path(pkg_json):
-        continue
+      # Check if package contains TypeScript or JavaScript
+      has_ts = (
+        (package_dir / "tsconfig.json").exists()
+        or any(package_dir.glob("**/*.ts"))
+        or any(package_dir.glob("**/*.tsx"))
+        or any(package_dir.glob("**/*.js"))
+        or any(package_dir.glob("**/*.jsx"))
+      )
 
-      pkg_dir = pkg_json.parent
+      if has_ts:
+        packages.append(package_dir)
 
-      # Check if this is a TypeScript package
-      if self._is_typescript_package(pkg_dir):
+    return packages
+
+  def _find_logical_modules(self, package_root: Path) -> list[Path]:
+    """Find logical modules within a package.
+
+    A logical module is:
+    1. A directory with index.ts/index.tsx/index.js/index.jsx
+    2. A standalone significant .ts/.tsx/.js/.jsx file
+    3. A top-level src/ subdirectory with multiple files
+
+    Args:
+        package_root: Package directory containing package.json
+
+    Returns:
+        List of module paths (files or directories)
+
+    """
+    modules = []
+    src_dir = package_root / "src"
+
+    if not src_dir.exists():
+      # No src/ directory - look for top-level TS/JS files
+      for pattern in ["*.ts", "*.tsx", "*.js", "*.jsx"]:
+        for file in package_root.glob(pattern):
+          if not self._should_skip_file(file):
+            modules.append(file)
+      return modules
+
+    # Find directories with index files
+    indexed_dirs = set()
+    for pattern in ["**/index.ts", "**/index.tsx", "**/index.js", "**/index.jsx"]:
+      for index_file in src_dir.glob(pattern):
+        module_dir = index_file.parent
+        if not self._should_skip_path(module_dir):
+          modules.append(module_dir)
+          indexed_dirs.add(module_dir)
+
+    # Find significant standalone files (not in indexed directories)
+    for pattern in ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]:
+      for file in src_dir.glob(pattern):
+        if self._should_skip_file(file):
+          continue
+
+        # Skip if file is in an indexed directory
+        if any(file.is_relative_to(d) for d in indexed_dirs):
+          continue
+
+        # Skip index files themselves
+        if file.stem == "index":
+          continue
+
+        # Check if this is a "significant" file
+        # Heuristic: files in top 2 levels of src/ or in important directories
         try:
-          relative_path = pkg_dir.relative_to(repo_root)
-          identifier = str(relative_path) if str(relative_path) != "." else "root"
+          rel_path = file.relative_to(src_dir)
+          depth = len(rel_path.parents) - 1
+          important_dirs = {"lib", "utils", "db", "api", "services", "components"}
 
-          source_units.append(
-            SourceUnit(
-              language=self.language,
-              identifier=identifier,
-              root=repo_root,
-            ),
+          is_significant = (
+            depth <= 1  # Top 2 levels
+            or any(part in important_dirs for part in rel_path.parts)
           )
+
+          if is_significant:
+            modules.append(file)
         except ValueError:
           continue
 
-    return source_units
+    return modules
 
-  def _is_typescript_package(self, pkg_dir: Path) -> bool:
-    """Check if directory is a TypeScript package.
+  def _should_skip_file(self, file_path: Path) -> bool:
+    """Check if a TypeScript/JavaScript file should be skipped.
 
     Args:
-        pkg_dir: Directory to check
+        file_path: File path to check
 
     Returns:
-        True if directory contains TypeScript configuration or files
+        True if file should be skipped
 
     """
-    # Check for tsconfig.json
-    if (pkg_dir / "tsconfig.json").exists():
+    # Use base adapter checks
+    if self._should_skip_path(file_path):
       return True
 
-    # Check for TypeScript files
-    ts_extensions = ["*.ts", "*.tsx", "*.mts", "*.cts"]
-    for ext in ts_extensions:
-      if list(pkg_dir.glob(ext)) or list(pkg_dir.glob(f"src/{ext}")):
-        return True
+    # Skip test files
+    filename_lower = file_path.name.lower()
+    if (
+      ".test." in filename_lower
+      or ".spec." in filename_lower
+      or filename_lower.startswith("test_")
+      or filename_lower.endswith("_test.ts")
+      or filename_lower.endswith("_test.js")
+      or filename_lower.endswith("_test.tsx")
+      or filename_lower.endswith("_test.jsx")
+    ):
+      return True
 
-    return False
+    # Skip build/dist directories
+    skip_dirs = {"dist", "build", ".next", "out", "node_modules"}
+    return any(part in skip_dirs for part in file_path.parts)
 
-  def _find_entry_point(self, pkg_dir: Path) -> Path | None:
-    """Find the best entry point for TypeDoc.
+  @staticmethod
+  def _detect_package_manager(path: Path) -> str:
+    """Detect package manager from lockfile.
+
+    Walks up directory tree to find lockfile.
+    Priority: pnpm > bun > npm
 
     Args:
-        pkg_dir: Package directory
+        path: Starting path (file or directory)
 
     Returns:
-        Path to entry point file, or None if not found
+        Package manager name: 'pnpm', 'bun', or 'npm'
 
     """
-    # Common entry point files in priority order
-    entry_candidates = [
-      "src/index.ts",
-      "src/index.tsx",
-      "index.ts",
-      "index.tsx",
-      "src/main.ts",
-      "src/main.tsx",
-      "main.ts",
-      "main.tsx",
-    ]
+    current = path if path.is_dir() else path.parent
 
-    for candidate in entry_candidates:
-      entry_path = pkg_dir / candidate
-      if entry_path.exists():
-        return entry_path
+    while current != current.parent:
+      if (current / "pnpm-lock.yaml").exists():
+        return "pnpm"
+      if (current / "bun.lockb").exists():
+        return "bun"
+      if (current / "package-lock.json").exists() or (current / "yarn.lock").exists():
+        return "npm"
+      current = current.parent
 
-    # Check package.json for entry points
-    package_json = pkg_dir / "package.json"
-    if package_json.exists():
-      try:
-        pkg_data = json.loads(package_json.read_text(encoding="utf-8"))
+    # Default to npm
+    return "npm"
 
-        # Check common entry point fields
-        for field in ["source", "main", "module", "types"]:
-          if field in pkg_data:
-            entry = pkg_data[field]
-            if isinstance(entry, str) and entry.endswith((".ts", ".tsx")):
-              entry_path = pkg_dir / entry
-              if entry_path.exists():
-                return entry_path
-
-      except (json.JSONDecodeError, OSError):
-        pass
-
-    return None
-
-  def describe(self, unit: SourceUnit) -> SourceDescriptor:
-    """Describe how a TypeScript package should be processed.
+  def _get_npx_command(self, package_root: Path) -> list[str]:
+    """Get the appropriate npx command based on package manager.
 
     Args:
-        unit: TypeScript package source unit
+        package_root: Package root directory
+
+    Returns:
+        Command to run npx equivalent (pnpm dlx, bunx, or npx)
+
+    """
+    pm = self._detect_package_manager(package_root)
+
+    if pm == "pnpm" and self.is_pnpm_available():
+      return ["pnpm", "dlx"]
+    if pm == "bun" and self.is_bun_available():
+      return ["bunx"]
+
+    # Default to npx (works with npm and yarn)
+    return ["npx"]
+
+  def _find_package_root(self, file_path: Path) -> Path:
+    """Find nearest package.json directory.
+
+    Args:
+        file_path: Starting file or directory path
+
+    Returns:
+        Directory containing package.json
+
+    Raises:
+        TypeScriptExtractionError: If no package.json found
+
+    """
+    current = file_path if file_path.is_dir() else file_path.parent
+
+    while current != current.parent:
+      if (current / "package.json").exists():
+        return current
+      current = current.parent
+
+    msg = f"No package.json found for: {file_path}"
+    raise TypeScriptExtractionError(msg)
+
+  def _extract_ast(self, file_path: Path, variant: str = "public") -> dict:
+    """Extract AST data from TypeScript/JavaScript file via ts-doc-extract.
+
+    Args:
+        file_path: Path to .ts/.tsx/.js/.jsx file or directory with index file
+        variant: 'public' or 'internal'
+
+    Returns:
+        Parsed JSON from ts-doc-extract
+
+    Raises:
+        TypeScriptExtractionError: If extraction fails
+
+    """
+    # Determine actual file to extract
+    if file_path.is_dir():
+      # Look for index file
+      for name in ["index.ts", "index.tsx", "index.js", "index.jsx"]:
+        index_file = file_path / name
+        if index_file.exists():
+          file_path = index_file
+          break
+      else:
+        msg = f"No index file found in directory: {file_path}"
+        raise TypeScriptExtractionError(msg)
+
+    # Get package root and npx command
+    try:
+      package_root = self._find_package_root(file_path)
+    except TypeScriptExtractionError:
+      # If no package.json, use parent directory
+      package_root = file_path.parent
+
+    npx_cmd = self._get_npx_command(package_root)
+
+    # Build command
+    cmd = [
+      *npx_cmd,
+      "ts-doc-extract",
+      str(file_path),
+      f"--variant={variant}",
+    ]
+
+    try:
+      result = subprocess.run(
+        cmd,
+        cwd=package_root,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=True,
+      )
+
+      return json.loads(result.stdout)
+
+    except subprocess.CalledProcessError as e:
+      msg = f"ts-doc-extract failed: {e.stderr}"
+      raise TypeScriptExtractionError(msg) from e
+    except json.JSONDecodeError as e:
+      msg = f"Invalid JSON from ts-doc-extract: {e}"
+      raise TypeScriptExtractionError(msg) from e
+    except subprocess.TimeoutExpired as e:
+      msg = f"ts-doc-extract timed out after 30s: {file_path}"
+      raise TypeScriptExtractionError(msg) from e
+
+  def describe(self, unit: SourceUnit) -> SourceDescriptor:
+    """Describe how a TypeScript/JavaScript module should be processed.
+
+    Args:
+        unit: TypeScript/JavaScript module source unit
 
     Returns:
         SourceDescriptor with TypeScript-specific metadata
@@ -352,18 +426,36 @@ class TypeScriptAdapter(LanguageAdapter):
     """
     self._validate_unit_language(unit)
 
-    # Generate slug parts from identifier
-    # Convert path separators and special chars to slug-friendly format
-    slug_parts = (
-      unit.identifier.replace("@", "").replace("/", "-").replace("\\", "-").split("-")
-    )
-    slug_parts = [part for part in slug_parts if part]
+    # Generate slug from module path
+    module_path = Path(unit.identifier)
 
-    # Define variants
+    # Remove extension if it's a file
+    if module_path.suffix in {".ts", ".tsx", ".js", ".jsx"}:
+      module_path = module_path.with_suffix("")
+
+    slug_parts = list(module_path.parts)
+
+    # Generate module name for frontmatter (dotted notation)
+    module_name = ".".join(slug_parts)
+
+    default_frontmatter = {
+      "sources": [
+        {
+          "language": "typescript",
+          "identifier": unit.identifier,
+          "module": module_name,
+          "variants": [
+            {"name": "api", "path": "contracts/api.md"},
+            {"name": "internal", "path": "contracts/internal.md"},
+          ],
+        },
+      ],
+    }
+
     variants = [
       DocVariant(
-        name="public",
-        path=Path("contracts/public.md"),
+        name="api",
+        path=Path("contracts/api.md"),
         hash="",
         status="unchanged",
       ),
@@ -374,23 +466,6 @@ class TypeScriptAdapter(LanguageAdapter):
         status="unchanged",
       ),
     ]
-
-    # Frontmatter
-    default_frontmatter = {
-      "sources": [
-        {
-          "language": "typescript",
-          "identifier": unit.identifier,
-          "variants": [
-            {
-              "name": variant.name,
-              "path": str(variant.path),
-            }
-            for variant in variants
-          ],
-        },
-      ],
-    }
 
     return SourceDescriptor(
       slug_parts=slug_parts,
@@ -405,10 +480,10 @@ class TypeScriptAdapter(LanguageAdapter):
     spec_dir: Path,
     check: bool = False,
   ) -> list[DocVariant]:
-    """Generate documentation for TypeScript package using TypeDoc.
+    """Generate documentation for a TypeScript/JavaScript module.
 
     Args:
-        unit: TypeScript package source unit
+        unit: TypeScript/JavaScript module source unit
         spec_dir: Specification directory to write documentation to
         check: If True, only check if docs would change
 
@@ -416,358 +491,368 @@ class TypeScriptAdapter(LanguageAdapter):
         List of DocVariant objects with generation results
 
     Raises:
-        NodeRuntimeNotAvailableError: If no JS runtime is available
-        TypeDocGenerationError: If TypeDoc generation fails
+        NodeRuntimeNotAvailableError: If Node.js is not available
 
     """
     self._validate_unit_language(unit)
 
-    # Check runtime availability
-    if not (self.is_node_available() or self.is_bun_available()):
+    # Check if Node.js is available
+    if not self.is_node_available():
       raise NodeRuntimeNotAvailableError(
-        "No JavaScript runtime found. Please install Node.js from "
-        "https://nodejs.org/ or Bun from https://bun.sh/"
+        "Node.js runtime not found in PATH. Please install Node.js from "
+        "https://nodejs.org/ or ensure it is in your PATH."
       )
 
-    # Resolve package directory
-    if unit.identifier == "root":
-      pkg_dir = self.repo_root
-    else:
-      pkg_dir = self.repo_root / unit.identifier
+    # Convert unit to absolute path
+    module_path = self.repo_root / unit.identifier
 
-    if not pkg_dir.exists():
-      msg = f"Package directory not found: {pkg_dir}"
-      raise ValueError(msg)
-
-    contracts_dir = spec_dir / "contracts"
-    variants = []
-
-    # Generate public API docs
-    variants.append(
-      self._generate_variant(
-        pkg_dir=pkg_dir,
-        output_dir=contracts_dir,
-        variant_name="public",
-        include_private=False,
-        check=check,
-        spec_dir=spec_dir,
-      ),
-    )
-
-    # Generate internal docs (with private members)
-    variants.append(
-      self._generate_variant(
-        pkg_dir=pkg_dir,
-        output_dir=contracts_dir,
-        variant_name="internal",
-        include_private=True,
-        check=check,
-        spec_dir=spec_dir,
-      ),
-    )
-
-    return variants
-
-  def _generate_variant(
-    self,
-    pkg_dir: Path,
-    output_dir: Path,
-    variant_name: str,
-    include_private: bool,
-    check: bool,
-    spec_dir: Path,
-  ) -> DocVariant:
-    """Generate a single documentation variant using TypeDoc.
-
-    Args:
-        pkg_dir: Package directory
-        output_dir: Output directory for documentation
-        variant_name: Name of the variant (public/internal)
-        include_private: Whether to include private members
-        check: If True, only check if docs would change
-        spec_dir: Specification directory (for relative paths)
-
-    Returns:
-        DocVariant with generation results
-
-    Raises:
-        TypeDocGenerationError: If generation fails
-
-    """
-    output_file = output_dir / f"{variant_name}.md"
-    temp_dir = output_dir / f".typedoc-{variant_name}"
-
-    # Try to use local TypeDoc installation from workspace
-    # This is important for monorepos with workspace-specific tsconfig
-    local_typedoc = None
-
-    # Check for local typedoc in node_modules
-    # Walk up from pkg_dir to find node_modules with typedoc
-    check_dir = pkg_dir
-    for _ in range(5):  # Check up to 5 levels up
-      node_modules = check_dir / "node_modules"
-      if (node_modules / ".bin" / "typedoc").exists():
-        local_typedoc = node_modules / ".bin" / "typedoc"
-        break
-      if (node_modules / "typedoc").exists():
-        # Found typedoc package, can use npx from this directory
-        local_typedoc = "typedoc"
-        break
-      parent = check_dir.parent
-      if parent == check_dir:  # Reached filesystem root
-        break
-      check_dir = parent
-
-    # Construct TypeDoc command
-    if local_typedoc and local_typedoc != "typedoc":
-      # Use local binary directly
-      cmd = [str(local_typedoc)]
-    elif local_typedoc == "typedoc":
-      # Use package manager to run local typedoc
-      pm = self._detect_package_manager(pkg_dir)
-      if pm == "pnpm":
-        cmd = ["pnpm", "exec", "typedoc"]
-      elif pm == "yarn":
-        cmd = ["yarn", "typedoc"]
-      elif pm == "bun":
-        cmd = ["bun", "run", "typedoc"]
-      else:
-        cmd = ["npx", "typedoc"]
-    else:
-      # Fall back to npx with temporary install
-      runtime_cmd = (
-        ["npx", "--yes"] if self.is_npm_available() else ["bunx", "--bun"]
-      )
-      cmd = [
-        *runtime_cmd,
-        "-p",
-        "typedoc",
-        "-p",
-        "typedoc-plugin-markdown",
-        "typedoc",
+    if not module_path.exists():
+      # Return error variants
+      return [
+        DocVariant(
+          name="api",
+          path=Path("contracts/api.md"),
+          hash="",
+          status="unchanged",
+        ),
+        DocVariant(
+          name="internal",
+          path=Path("contracts/internal.md"),
+          hash="",
+          status="unchanged",
+        ),
       ]
 
-    # Add plugin option (local installs should have plugin in node_modules)
-    cmd.extend([
-      "--plugin",
-      "typedoc-plugin-markdown",
-      "--out",
-      str(temp_dir),
-      "--exclude",
-      "**/node_modules/**",
-      "--exclude",
-      "**/*.test.ts",
-      "--exclude",
-      "**/*.spec.ts",
-      "--exclude",
-      "**/*.test.tsx",
-      "--exclude",
-      "**/*.spec.tsx",
-      "--exclude",
-      "**/dist/**",
-      "--exclude",
-      "**/.next/**",
-      "--exclude",
-      "**/build/**",
-    ])
+    # Map variant names
+    variant_mapping = {
+      "api": "public",  # Our 'api' maps to ts-doc-extract's 'public'
+      "internal": "internal",
+    }
 
-    if include_private:
-      cmd.extend(
-        [
-          "--excludePrivate",
-          "false",
-          "--excludeProtected",
-          "false",
-          "--excludeInternal",
-          "false",
-        ],
-      )
+    output_root = spec_dir / "contracts"
+    doc_variants = []
 
-    # Determine entry point for TypeDoc
-    # Try to find a reasonable entry point instead of just src/
-    entry_point = self._find_entry_point(pkg_dir)
-    if entry_point:
-      cmd.append(str(entry_point))
-    else:
-      # Fallback to src directory or package directory
-      src_dir = pkg_dir / "src" if (pkg_dir / "src").exists() else pkg_dir
-      cmd.append(str(src_dir))
+    for our_variant, ts_variant in variant_mapping.items():
+      try:
+        # Extract AST
+        ast_data = self._extract_ast(module_path, ts_variant)
 
-    try:
-      # Check if output already exists for comparison
-      old_hash = None
-      if output_file.exists():
-        old_content = output_file.read_text(encoding="utf-8")
-        old_hash = hashlib.sha256(old_content.encode("utf-8")).hexdigest()
+        # Generate markdown
+        markdown = self._generate_markdown(ast_data, our_variant)
 
-      if check and not output_file.exists():
-        # In check mode, if file doesn't exist, it would be created
-        return DocVariant(
-          name=variant_name,
-          path=output_file.relative_to(spec_dir),
-          hash="",
-          status="created",
-        )
+        # Calculate output path
+        output_file = output_root / f"{our_variant}.md"
 
-      # Execute TypeDoc
-      result = subprocess.run(
-        cmd,
-        cwd=pkg_dir,
-        check=True,
-        capture_output=True,
-        text=True,
-        timeout=120,
-      )
+        # Calculate hash
+        content_hash = hashlib.sha256(markdown.encode("utf-8")).hexdigest()
 
-      # Check if temp directory was created
-      if not temp_dir.exists():
-        raise TypeDocGenerationError(
-          f"TypeDoc did not generate output directory: {temp_dir}. "
-          f"stdout: {result.stdout}, stderr: {result.stderr}"
-        )
-
-      # Combine TypeDoc output into single markdown
-      combined_md = self._combine_typedoc_output(temp_dir, variant_name)
-
-      # Check if we got any content
-      if not combined_md or len(combined_md.strip()) < 50:
-        raise TypeDocGenerationError(
-          f"TypeDoc generated empty or minimal output. "
-          f"Directory: {temp_dir}, Content length: {len(combined_md)}"
-        )
-
-      # Calculate hash
-      content_hash = hashlib.sha256(combined_md.encode("utf-8")).hexdigest()
-
-      if check:
-        # Check mode - compare hashes
-        status = "unchanged" if content_hash == old_hash else "changed"
-      else:
-        # Generate mode - write file
-        output_dir.mkdir(parents=True, exist_ok=True)
-        output_file.write_text(combined_md, encoding="utf-8")
-
-        # Determine status
-        if old_hash is None:
-          status = "created"
-        elif content_hash != old_hash:
-          status = "changed"
+        # Write file (unless check mode)
+        if check:
+          # Check if file exists and content matches
+          if output_file.exists():
+            with open(output_file, encoding="utf-8") as f:
+              existing = f.read()
+            existing_hash = hashlib.sha256(existing.encode("utf-8")).hexdigest()
+            status = "unchanged" if existing_hash == content_hash else "error"
+          else:
+            status = "error"  # Missing file in check mode
         else:
+          # Write mode
           status = "unchanged"
+          if output_file.exists():
+            with open(output_file, encoding="utf-8") as f:
+              existing = f.read()
+            existing_hash = hashlib.sha256(existing.encode("utf-8")).hexdigest()
+            if existing_hash != content_hash:
+              status = "changed"
+          else:
+            status = "created"
 
-      # Clean up temp directory
-      if temp_dir.exists():
-        shutil.rmtree(temp_dir)
+          # Write file
+          output_file.parent.mkdir(parents=True, exist_ok=True)
+          with open(output_file, "w", encoding="utf-8") as f:
+            f.write(markdown)
 
-      return DocVariant(
-        name=variant_name,
-        path=output_file.relative_to(spec_dir),
-        hash=content_hash if not check else "",
-        status=status,
-      )
+        doc_variants.append(
+          DocVariant(
+            name=our_variant,
+            path=output_file.relative_to(spec_dir),
+            hash=content_hash,
+            status=status,
+          ),
+        )
 
-    except subprocess.CalledProcessError as e:
-      raise TypeDocGenerationError(
-        f"TypeDoc generation failed for {pkg_dir}: {e.stderr}"
-      ) from e
-    except subprocess.TimeoutExpired as e:
-      raise TypeDocGenerationError(
-        f"TypeDoc generation timed out for {pkg_dir}"
-      ) from e
+      except TypeScriptExtractionError:
+        # Return error variant
+        doc_variants.append(
+          DocVariant(
+            name=our_variant,
+            path=Path(f"contracts/{our_variant}.md"),
+            hash="",
+            status="unchanged",
+          ),
+        )
 
-  def _combine_typedoc_output(self, typedoc_out_dir: Path, variant_name: str) -> str:
-    """Combine TypeDoc's multi-file output into single markdown.
+    # If both variants exist and are identical, remove internal.md
+    if (
+      not check
+      and len(doc_variants) == 2
+      and doc_variants[0].hash
+      and doc_variants[0].hash == doc_variants[1].hash
+    ):
+      internal_file = output_root / "internal.md"
+      if internal_file.exists():
+        internal_file.unlink()
+      # Remove internal variant from list
+      doc_variants = [v for v in doc_variants if v.name != "internal"]
 
-    TypeDoc generates multiple markdown files. We combine them into
-    a single document similar to gomarkdoc output.
+    return doc_variants
+
+  def _generate_markdown(self, ast_data: dict, variant: str) -> str:
+    """Generate token-efficient markdown from AST data.
+
+    Format optimized for AI agents:
+    - Hierarchical structure
+    - Inline type signatures
+    - Comments preserved but condensed
+    - No redundancy
 
     Args:
-        typedoc_out_dir: TypeDoc output directory
-        variant_name: Variant name for header
+        ast_data: AST data from ts-doc-extract
+        variant: 'api' or 'internal'
 
     Returns:
-        Combined markdown content
+        Generated markdown string
 
     """
-    combined = []
+    lines = []
 
-    # Add header
-    combined.append("<!-- Code generated by TypeDoc. DO NOT EDIT -->\n\n")
+    # Module header
+    lines.append(f"# {ast_data['module']}")
+    lines.append("")
 
-    # Read main README if exists
-    readme = typedoc_out_dir / "README.md"
-    if readme.exists():
-      content = readme.read_text(encoding="utf-8")
-      # Strip title if it's just "README"
-      if content.startswith("# README\n"):
-        content = content[len("# README\n") :]
-      combined.append(content)
-      combined.append("\n")
+    exports = ast_data.get("exports", [])
 
-    # Collect all other markdown files (sorted for consistency)
-    md_files = sorted(typedoc_out_dir.rglob("*.md"))
-    md_files = [f for f in md_files if f.name != "README.md"]
+    # Group by kind
+    types = [e for e in exports if e["kind"] in ("type", "interface")]
+    constants = [e for e in exports if e["kind"] == "const"]
+    functions = [e for e in exports if e["kind"] == "function"]
+    classes = [e for e in exports if e["kind"] == "class"]
+    enums = [e for e in exports if e["kind"] == "enum"]
 
-    for md_file in md_files:
-      # Add content
-      content = md_file.read_text(encoding="utf-8")
-      combined.append(content)
-      combined.append("\n")
+    # Types & Interfaces
+    if types:
+      lines.append("## Types")
+      lines.append("")
+      for t in types:
+        lines.append(f"### {t['name']}")
+        lines.append("")
+        lines.append("```typescript")
+        lines.append(t["signature"])
+        lines.append("```")
 
-    return "".join(combined)
+        # JSDoc description
+        if t.get("jsDoc", {}).get("description"):
+          lines.append("")
+          lines.append(t["jsDoc"]["description"])
+
+        # Non-JSDoc comments
+        non_jsdoc = [c for c in t.get("leadingComments", []) if c["type"] != "jsdoc"]
+        if non_jsdoc:
+          lines.append("")
+          for comment in non_jsdoc:
+            # Clean comment text (remove // or /* */)
+            text = comment["text"].strip()
+            if text.startswith("//"):
+              text = text[2:].strip()
+            elif text.startswith("/*") and text.endswith("*/"):
+              text = text[2:-2].strip()
+            lines.append(f"*{text}*")
+
+        lines.append("")
+
+    # Constants
+    if constants:
+      lines.append("## Constants")
+      lines.append("")
+      for const in constants:
+        sig = const["signature"]
+        jsdoc = const.get("jsDoc") or {}
+        doc = jsdoc.get("description", "")
+        comment = ""
+        if const.get("leadingComments"):
+          text = const["leadingComments"][0]["text"].strip()
+          if text.startswith("//"):
+            comment = text[2:].strip()
+          elif text.startswith("/*") and text.endswith("*/"):
+            comment = text[2:-2].strip()
+
+        if doc:
+          lines.append(f"- `{sig}` - {doc}")
+        elif comment:
+          lines.append(f"- `{sig}` - {comment}")
+        else:
+          lines.append(f"- `{sig}`")
+      lines.append("")
+
+    # Functions
+    if functions:
+      lines.append("## Functions")
+      lines.append("")
+      for func in functions:
+        lines.append(f"### {func['name']}")
+        lines.append("")
+
+        # Build signature
+        params = ", ".join(
+          f"{p['name']}: {p.get('type', 'any')}" for p in func.get("parameters", [])
+        )
+        ret = func.get("returnType", "void")
+        sig = f"{func['name']}({params}): {ret}"
+
+        lines.append("```typescript")
+        if func.get("isAsync"):
+          lines.append(f"async {sig}")
+        else:
+          lines.append(sig)
+        lines.append("```")
+
+        # JSDoc
+        if func.get("jsDoc"):
+          jsdoc = func["jsDoc"]
+          if jsdoc.get("description"):
+            lines.append("")
+            lines.append(jsdoc["description"])
+
+          # Parameters
+          param_tags = [t for t in jsdoc.get("tags", []) if t["name"] == "param"]
+          if param_tags:
+            lines.append("")
+            lines.append("**Parameters:**")
+            for tag in param_tags:
+              lines.append(f"- {tag['text']}")
+
+          # Returns
+          returns_tags = [t for t in jsdoc.get("tags", []) if t["name"] == "returns"]
+          if returns_tags:
+            lines.append("")
+            lines.append(f"**Returns:** {returns_tags[0]['text']}")
+
+        lines.append("")
+
+    # Classes
+    if classes:
+      lines.append("## Classes")
+      lines.append("")
+
+      for cls in classes:
+        lines.append(f"### {cls['name']}")
+        lines.append("")
+
+        # Base class / interfaces
+        if cls.get("baseClass"):
+          lines.append(f"**Extends:** `{cls['baseClass']}`")
+          lines.append("")
+        if cls.get("interfaces"):
+          lines.append(
+            f"**Implements:** {', '.join(f'`{i}`' for i in cls['interfaces'])}"
+          )
+          lines.append("")
+
+        # JSDoc
+        if cls.get("jsDoc", {}).get("description"):
+          lines.append(cls["jsDoc"]["description"])
+          lines.append("")
+
+        # Members
+        if cls.get("members"):
+          # Properties
+          props = [m for m in cls["members"] if m["kind"] == "property"]
+          if props:
+            lines.append("**Properties:**")
+            for prop in props:
+              vis = f"{prop['visibility']} " if prop["visibility"] != "public" else ""
+              static = "static " if prop.get("isStatic") else ""
+              lines.append(f"- {vis}{static}`{prop['signature']}`")
+            lines.append("")
+
+          # Methods
+          methods = [m for m in cls["members"] if m["kind"] == "method"]
+          if methods:
+            lines.append("**Methods:**")
+            for method in methods:
+              vis = (
+                f"{method['visibility']} " if method["visibility"] != "public" else ""
+              )
+              static = "static " if method.get("isStatic") else ""
+              async_kw = "async " if method.get("isAsync") else ""
+
+              # Description from JSDoc
+              desc = method.get("jsDoc", {}).get("description", "")
+
+              if desc:
+                lines.append(
+                  f"- {vis}{static}{async_kw}`{method['signature']}` - {desc}"
+                )
+              else:
+                lines.append(f"- {vis}{static}{async_kw}`{method['signature']}`")
+            lines.append("")
+
+        lines.append("")
+
+    # Enums
+    if enums:
+      lines.append("## Enums")
+      lines.append("")
+      for enum in enums:
+        lines.append(f"### {enum['name']}")
+        lines.append("")
+        for val in enum.get("enumValues", []):
+          lines.append(f"- `{val['name']}` = `{val['value']}`")
+        lines.append("")
+
+    return "\n".join(lines)
 
   def supports_identifier(self, identifier: str) -> bool:
-    """Check if identifier looks like a TypeScript package/module.
+    """Check if identifier looks like a TypeScript/JavaScript module.
 
     Args:
-        identifier: Source identifier to check
+        identifier: Identifier to check
 
     Returns:
-        True if identifier appears to be TypeScript-related
+        True if identifier appears to be a TypeScript/JavaScript path
 
     """
     if not identifier:
       return False
 
-    # TypeScript file extensions
-    if identifier.endswith((".ts", ".tsx", ".mts", ".cts")):
-      return True
-
-    # Exclude obvious non-TypeScript patterns
-    exclude_patterns = [
-      ".py",
-      ".pyc",
-      ".go",
-      ".java",
-      ".rb",
-      ".php",
-      "__pycache__",
-      ".pytest_cache",
-    ]
-
-    if any(pattern in identifier for pattern in exclude_patterns):
+    # Basic sanity checks
+    if " " in identifier or "\n" in identifier or "\t" in identifier:
       return False
 
-    # TypeScript-specific indicators
-    ts_indicators = [
-      "src/",
-      "lib/",
-      "packages/",
-      "apps/",
-      "components/",
-      "services/",
-      "utils/",
-      "helpers/",
-      "hooks/",
-      "@types/",
-      "node_modules/@",
-    ]
-
-    if any(indicator in identifier for indicator in ts_indicators):
+    # TypeScript/JavaScript files
+    if any(
+      identifier.endswith(ext)
+      for ext in [".ts", ".tsx", ".js", ".jsx", ".mts", ".mjs", ".cjs"]
+    ):
       return True
 
-    # Scoped package pattern (@scope/name)
-    return identifier.startswith("@") and "/" in identifier
+    # Exclude non-TS/JS extensions
+    non_ts_extensions = [".py", ".go", ".java", ".cpp", ".c", ".h"]
+    if any(identifier.endswith(ext) for ext in non_ts_extensions):
+      return False
 
+    # Common TS/JS directory patterns
+    ts_patterns = [
+      "src/",
+      "lib/",
+      "components/",
+      "pages/",
+      "app/",
+    ]
 
-__all__ = ["TypeScriptAdapter"]
+    if any(identifier.startswith(pattern) for pattern in ts_patterns):
+      return True
+
+    # Simple paths that could be TS/JS
+    return all(c.isalnum() or c in "/-_." for c in identifier)

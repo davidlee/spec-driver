@@ -1,68 +1,81 @@
 # supekku.scripts.lib.spec_sync.adapters.typescript
 
-TypeScript language adapter for specification synchronization (STUB).
+TypeScript/JavaScript language adapter using AST-based documentation.
 
-This is a placeholder implementation for future TypeScript support.
-Currently returns not implemented errors for all operations.
+This adapter uses ts-morph (via ts-doc-extract npm package) to generate
+deterministic, token-efficient documentation from TypeScript and JavaScript source.
 
 ## Classes
 
+### NodeRuntimeNotAvailableError
+
+Raised when Node.js runtime is required but not available.
+
+**Inherits from:** RuntimeError
+
 ### TypeScriptAdapter
 
-Language adapter for TypeScript modules (STUB IMPLEMENTATION).
+AST-based TypeScript/JavaScript adapter using ts-morph.
 
-This is a placeholder implementation that provides the interface
-for TypeScript support but does not yet implement documentation
-generation. Future implementation should integrate with TypeDoc
-or a custom AST-based documentation generator.
+Mirrors the Python adapter architecture:
+1. Discover logical modules (not just packages)
+2. Extract AST via ts-doc-extract (Node.js subprocess)
+3. Generate token-efficient markdown from AST JSON
 
-TODO: Implement actual TypeScript documentation generation
-TODO: Evaluate TypeDoc vs custom AST solution
-TODO: Define variant mapping (public/internal/tests)
-TODO: Implement source discovery patterns
+Supports: .ts, .tsx, .js, .jsx files
+Package managers: npm, pnpm, bun
 
 **Inherits from:** LanguageAdapter
 
 #### Methods
 
-- `describe(self, unit) -> SourceDescriptor`: Describe how a TypeScript source unit should be processed.
+- `describe(self, unit) -> SourceDescriptor`: Describe how a TypeScript/JavaScript module should be processed.
 
 Args:
-    unit: Source unit to describe
+    unit: TypeScript/JavaScript module source unit
 
 Returns:
-    SourceDescriptor with placeholder metadata
+    SourceDescriptor with TypeScript-specific metadata
+- `discover_targets(self, repo_root, requested) -> list[SourceUnit]`: Discover TypeScript/JavaScript modules.
 
-Raises:
-    ValueError: If unit is not a TypeScript unit
-- `discover_targets(self, repo_root, requested) -> list[SourceUnit]`: Discover TypeScript modules for documentation.
+Strategy:
+1. Find all TypeScript/JavaScript packages (package.json with TS/JS)
+2. Within each package, find logical modules:
+   - Directories with index.ts/index.js
+   - Standalone significant .ts/.js files
+   - Top-level src/ subdirectories
 
 Args:
-    repo_root: Root directory of the repository
-    requested: Optional list of specific module paths to process
+    repo_root: Repository root directory
+    requested: Optional list of specific modules to process
 
 Returns:
-    List of SourceUnit objects for TypeScript modules
-- `generate(self, unit) -> list[DocVariant]`: Generate documentation variants for a TypeScript source unit (NOOP).
-
-This is a placeholder implementation that skips actual documentation
-generation. It returns placeholder variants marked as 'skipped' until
-the AST-based doc generator is implemented.
+    List of SourceUnit objects for each logical module
+- `generate(self, unit) -> list[DocVariant]`: Generate documentation for a TypeScript/JavaScript module.
 
 Args:
-    unit: Source unit to generate documentation for
+    unit: TypeScript/JavaScript module source unit
     spec_dir: Specification directory to write documentation to
     check: If True, only check if docs would change
 
 Returns:
-    List of DocVariant objects with 'skipped' status
+    List of DocVariant objects with generation results
 
 Raises:
-    ValueError: If unit is not a TypeScript unit
-- `supports_identifier(self, identifier) -> bool`: Check if this adapter can handle TypeScript identifiers.
+    NodeRuntimeNotAvailableError: If Node.js is not available
+- @staticmethod `is_bun_available() -> bool`: Check if bun is available in PATH.
+- @staticmethod `is_node_available() -> bool`: Check if Node.js is available in PATH.
+- @staticmethod `is_pnpm_available() -> bool`: Check if pnpm is available in PATH.
+- `supports_identifier(self, identifier) -> bool`: Check if identifier looks like a TypeScript/JavaScript module.
 
 Args:
-    identifier: Source identifier to check
+    identifier: Identifier to check
 
 Returns:
-    True if identifier looks like a TypeScript file path
+    True if identifier appears to be a TypeScript/JavaScript path
+
+### TypeScriptExtractionError
+
+Raised when ts-doc-extract fails to extract AST.
+
+**Inherits from:** RuntimeError

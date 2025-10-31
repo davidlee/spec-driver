@@ -712,16 +712,13 @@ class TestRegistryScanner(unittest.TestCase):
   def test_extract_spec_from_requirement(self) -> None:
     """Test extracting spec ID from requirement ID."""
     assert (
-      RegistryScanner._extract_spec_from_requirement("SPEC-001.FR-001")
-      == "SPEC-001"
+      RegistryScanner._extract_spec_from_requirement("SPEC-001.FR-001") == "SPEC-001"
     )
     assert (
-      RegistryScanner._extract_spec_from_requirement("SPEC-042.NFR-005")
-      == "SPEC-042"
+      RegistryScanner._extract_spec_from_requirement("SPEC-042.NFR-005") == "SPEC-042"
     )
     assert (
-      RegistryScanner._extract_spec_from_requirement("PROD-002.FR-001")
-      == "PROD-002"
+      RegistryScanner._extract_spec_from_requirement("PROD-002.FR-001") == "PROD-002"
     )
     assert RegistryScanner._extract_spec_from_requirement("SPEC-001") is None
     assert RegistryScanner._extract_spec_from_requirement("invalid") is None

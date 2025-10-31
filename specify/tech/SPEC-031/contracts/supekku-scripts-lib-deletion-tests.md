@@ -73,6 +73,9 @@ symlinks, and validates that deletion is safe to proceed.
 
 Args:
     spec_id: Spec ID (e.g., "SPEC-001")
+    orphaned_specs: Set of spec IDs known to be orphaned (for context).
+                   If provided, cross-references from other orphaned specs
+                   will not block deletion.
 
 Returns:
     DeletionPlan describing what would be deleted
@@ -87,3 +90,64 @@ Args:
 
 Returns:
     List of symlink paths
+
+### RegistryScanner
+
+Scans YAML registries for cross-references to specs.
+
+Loads and parses requirements, deltas, revisions, and decisions registries
+to find which artifacts reference a given spec.
+
+#### Methods
+
+- `find_spec_references(self, spec_id) -> dict[Tuple[str, list[str]]]`: Find all artifacts that reference a spec.
+
+Args:
+    spec_id: Spec ID to search for (e.g., "SPEC-001")
+
+Returns:
+    Dictionary mapping artifact type to list of artifact IDs:
+    {
+      "requirements": ["SPEC-001.FR-001", "SPEC-001.NFR-002"],
+      "deltas": ["DE-005"],
+      "revisions": ["RE-003"],
+      "decisions": ["ADR-042"]
+    }
+- `__init__(self, repo_root) -> None`: Initialize scanner.
+
+Args:
+    repo_root: Repository root directory
+- @staticmethod `_extract_spec_from_requirement(req_id) -> <BinOp>`: Extract spec ID from requirement ID.
+
+Args:
+    req_id: Requirement ID (e.g., "SPEC-042.FR-001")
+
+Returns:
+    Spec ID (e.g., "SPEC-042") or None if no match
+- `_load_registry(self, filename) -> <BinOp>`: Load a registry YAML file.
+
+Args:
+    filename: Name of the registry file (e.g., "requirements.yaml")
+
+Returns:
+    Parsed YAML data or None if file missing/malformed
+- `_scan_decisions(self, spec_id, references) -> None`: Scan decisions.yaml for references to spec_id.
+
+Args:
+    spec_id: Spec ID to search for
+    references: Dictionary to populate with found references - Only add revision once even if multiple relations
+- `_scan_deltas(self, spec_id, references) -> None`: Scan deltas.yaml for references to spec_id.
+
+Args:
+    spec_id: Spec ID to search for
+    references: Dictionary to populate with found references
+- `_scan_requirements(self, spec_id, references) -> None`: Scan requirements.yaml for references to spec_id.
+
+Args:
+    spec_id: Spec ID to search for
+    references: Dictionary to populate with found references
+- `_scan_revisions(self, spec_id, references) -> None`: Scan revisions.yaml for references to spec_id.
+
+Args:
+    spec_id: Spec ID to search for
+    references: Dictionary to populate with found references

@@ -60,6 +60,32 @@ symlinks, and validates that deletion is safe to proceed.
 
 Args:
     spec_id: Spec ID (e.g., "SPEC-001")
+    orphaned_specs: Set of spec IDs known to be orphaned (for context).
+                   If provided, cross-references from other orphaned specs
+                   will not block deletion.
 
 Returns:
     DeletionPlan describing what would be deleted
+
+### RegistryScanner
+
+Scans YAML registries for cross-references to specs.
+
+Loads and parses requirements, deltas, revisions, and decisions registries
+to find which artifacts reference a given spec.
+
+#### Methods
+
+- `find_spec_references(self, spec_id) -> dict[Tuple[str, list[str]]]`: Find all artifacts that reference a spec.
+
+Args:
+    spec_id: Spec ID to search for (e.g., "SPEC-001")
+
+Returns:
+    Dictionary mapping artifact type to list of artifact IDs:
+    {
+      "requirements": ["SPEC-001.FR-001", "SPEC-001.NFR-002"],
+      "deltas": ["DE-005"],
+      "revisions": ["RE-003"],
+      "decisions": ["ADR-042"]
+    }

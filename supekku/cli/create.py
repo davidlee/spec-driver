@@ -126,7 +126,7 @@ def create_delta_cmd(
       requirements=requirements,
       allow_missing_plan=allow_missing_plan,
     )
-    typer.echo(f"Delta created: {result.delta_id}")
+    typer.echo(f"Delta created: {result.artifact_id}")
     for extra in result.extras:
       typer.echo(f"  Created: {extra}")
     raise typer.Exit(EXIT_SUCCESS)
@@ -204,7 +204,7 @@ def create_revision_cmd(
       destination_specs=destination_specs,
       requirements=requirements,
     )
-    typer.echo(f"Revision created: {result.revision_id}")
+    typer.echo(f"Revision created: {result.artifact_id}")
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating revision: {e}", err=True)

@@ -27,6 +27,9 @@
               python3Packages.python-lsp-server
               python3Packages.python-lsp-ruff
 
+              nodejs_latest
+              go
+
               # treesitter
               tree-sitter
               tree-sitter-grammars.tree-sitter-python

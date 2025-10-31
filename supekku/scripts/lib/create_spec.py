@@ -74,6 +74,7 @@ class SpecTemplateConfig:
 
 
 def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
+  """Create a new spec, generating necessary files from templates."""
   spec_name = spec_name.strip()
   if not spec_name:
     msg = "spec name must be provided"

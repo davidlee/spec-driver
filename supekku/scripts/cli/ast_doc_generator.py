@@ -61,7 +61,7 @@ def create_parser() -> argparse.ArgumentParser:
   return parser
 
 
-def _handle_error_result(result) -> int:
+def _handle_error_result(_result) -> int:
   """Handle error result and return error count."""
   return 1
 

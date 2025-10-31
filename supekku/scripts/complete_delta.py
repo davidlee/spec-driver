@@ -52,7 +52,7 @@ def prompt_yes_no(question: str, default: bool = False) -> bool:
 
 
 def validate_delta_status(
-  delta_id: str,
+  _delta_id: str,
   delta,
   force: bool,
   dry_run: bool,
@@ -74,7 +74,7 @@ def validate_delta_status(
   return True, False
 
 
-def collect_requirements_to_update(delta_id: str, delta, workspace):
+def collect_requirements_to_update(_delta_id: str, delta, workspace):
   """Collect and validate requirements associated with the delta.
 
   Returns tuple of (requirements_to_update, error_occurred).
@@ -98,8 +98,8 @@ def collect_requirements_to_update(delta_id: str, delta, workspace):
 
 
 def display_preview(
-  delta_id: str,
-  delta,
+  _delta_id: str,
+  _delta,
   requirements_to_update,
   dry_run: bool,
 ) -> None:
@@ -127,7 +127,7 @@ def prompt_spec_sync(skip_sync: bool, dry_run: bool, force: bool) -> bool:
   return True
 
 
-def display_actions(delta, requirements_to_update, update_requirements: bool) -> None:
+def display_actions(_delta, requirements_to_update, update_requirements: bool) -> None:
   """Display actions that will be performed."""
   if update_requirements and requirements_to_update:
     len(requirements_to_update)
@@ -151,7 +151,7 @@ def display_dry_run_requirements(
       pass
 
 
-def update_delta_frontmatter(delta_path: Path, delta_id: str) -> bool:
+def update_delta_frontmatter(delta_path: Path, _delta_id: str) -> bool:
   """Update delta status in frontmatter to 'completed'.
 
   Returns True if successful, False otherwise.

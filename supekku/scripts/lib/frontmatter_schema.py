@@ -48,6 +48,7 @@ def validate_frontmatter(
   *,
   kind: str | None = None,
 ) -> FrontmatterValidationResult:
+  """Validate frontmatter against schema, optionally checking for specific kind."""
   if not isinstance(frontmatter, Mapping):
     msg = "frontmatter must be a mapping of keys to values"
     raise FrontmatterValidationError(

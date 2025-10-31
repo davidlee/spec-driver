@@ -46,6 +46,7 @@ class WorkspaceTest(RepoTestCase):
     )
 
   def test_workspace_loads_specs_and_syncs_requirements(self) -> None:
+    """Test that workspace loads specs and syncs requirements correctly."""
     root = self._create_repo()
     self._write_spec(root)
 
@@ -58,6 +59,7 @@ class WorkspaceTest(RepoTestCase):
     assert "SPEC-200.FR-200" in registry.records
 
   def test_sync_change_registries(self) -> None:
+    """Test syncing change registries collects delta, revision, audit."""
     root = self._create_repo()
     change_dir = root / "change" / "deltas" / "DE-200-sample"
     change_dir.mkdir(parents=True)

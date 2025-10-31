@@ -92,11 +92,11 @@ class TestSyncOutcome(unittest.TestCase):
     """Test SyncOutcome has sensible defaults."""
     outcome = SyncOutcome()
 
-    assert outcome.processed_units == []
-    assert outcome.created_specs == {}
-    assert outcome.skipped_units == []
-    assert outcome.warnings == []
-    assert outcome.errors == []
+    assert not outcome.processed_units
+    assert not outcome.created_specs
+    assert not outcome.skipped_units
+    assert not outcome.warnings
+    assert not outcome.errors
 
   def test_sync_outcome_with_data(self) -> None:
     """Test SyncOutcome can store operation results."""

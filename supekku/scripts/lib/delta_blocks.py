@@ -33,6 +33,7 @@ class DeltaRelationshipsValidator:
     *,
     delta_id: str | None = None,
   ) -> list[str]:
+    """Validate delta relationships block structure and content."""
     errors: list[str] = []
     data = block.data
     if data.get("schema") != RELATIONSHIPS_SCHEMA:
@@ -92,6 +93,7 @@ _BLOCK_PATTERN = re.compile(
 
 
 def extract_delta_relationships(text: str) -> DeltaRelationshipsBlock | None:
+  """Extract delta relationships block from markdown text."""
   match = _BLOCK_PATTERN.search(text)
   if not match:
     return None
@@ -108,6 +110,7 @@ def extract_delta_relationships(text: str) -> DeltaRelationshipsBlock | None:
 
 
 def load_delta_relationships(path: Path) -> DeltaRelationshipsBlock | None:
+  """Load and extract delta relationships block from file."""
   text = path.read_text(encoding="utf-8")
   return extract_delta_relationships(text)
 

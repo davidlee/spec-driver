@@ -39,6 +39,11 @@ class ChangeRegistry:
     self.output_path = get_registry_dir(self.root) / f"{_KIND_TO_DIR[kind]}.yaml"
 
   def collect(self) -> dict[str, ChangeArtifact]:
+    """Collect all change artifacts from directory.
+
+    Returns:
+      Dictionary mapping artifact IDs to ChangeArtifact objects.
+    """
     artifacts: dict[str, ChangeArtifact] = {}
     if not self.directory.exists():
       return artifacts
@@ -70,6 +75,7 @@ class ChangeRegistry:
     return artifacts
 
   def sync(self) -> None:
+    """Synchronize registry file with artifacts found in directory."""
     artifacts = self.collect()
     serialised = {
       _KIND_TO_DIR[self.kind]: {

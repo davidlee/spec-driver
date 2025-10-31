@@ -44,6 +44,7 @@ class CreateChangeTest(unittest.TestCase):
     return root
 
   def test_create_revision(self) -> None:
+    """Test creating a revision change artifact with source and destination specs."""
     root = self._make_repo()
     result = create_revision(
       "Move FR",
@@ -59,6 +60,7 @@ class CreateChangeTest(unittest.TestCase):
     assert "SPEC-100" in frontmatter.get("source_specs", [])
 
   def test_create_delta(self) -> None:
+    """Test creating a delta change artifact with associated implementation plan."""
     root = self._make_repo()
     result = create_delta(
       "Implement ignore handling",
@@ -73,6 +75,7 @@ class CreateChangeTest(unittest.TestCase):
     assert plan_files
 
   def test_create_requirement_breakout(self) -> None:
+    """Test creating a requirement breakout artifact for a spec."""
     root = self._make_repo()
     path = create_requirement_breakout(
       "SPEC-100",

@@ -24,12 +24,12 @@ class TestDeletionPlan(unittest.TestCase):
 
     assert plan.artifact_id == "SPEC-001"
     assert plan.artifact_type == "spec"
-    assert plan.files_to_delete == []
-    assert plan.symlinks_to_remove == []
-    assert plan.registry_updates == {}
-    assert plan.cross_references == {}
+    assert not plan.files_to_delete
+    assert not plan.symlinks_to_remove
+    assert not plan.registry_updates
+    assert not plan.cross_references
     assert plan.is_safe is True
-    assert plan.warnings == []
+    assert not plan.warnings
 
   def test_add_warning(self) -> None:
     """Test adding warnings to a plan."""
@@ -707,7 +707,7 @@ class TestRegistryScanner(unittest.TestCase):
     references = self.scanner.find_spec_references("SPEC-001")
 
     # Should return empty results without crashing
-    assert references["requirements"] == []
+    assert not references["requirements"]
 
   def test_extract_spec_from_requirement(self) -> None:
     """Test extracting spec ID from requirement ID."""

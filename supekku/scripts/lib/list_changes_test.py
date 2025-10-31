@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 
 @pytest.fixture
 def temp_repo(tmp_path: Path) -> Path:
+  """Create temporary git repository for testing."""
   root = tmp_path
   (root / ".git").mkdir()
   return root
@@ -102,6 +103,7 @@ def _run(args: list[str], *, root: Path) -> list[str]:
 
 
 def test_lists_all_kinds(temp_repo: Path) -> None:
+  """Test listing changes of all kinds."""
   _write_change(temp_repo, "delta", "DE-010")
   _write_change(temp_repo, "revision", "RE-020")
 
@@ -110,6 +112,7 @@ def test_lists_all_kinds(temp_repo: Path) -> None:
 
 
 def test_filters_by_kind_and_status(temp_repo: Path) -> None:
+  """Test filtering changes by kind and status."""
   _write_change(temp_repo, "delta", "DE-001", status="draft")
   _write_change(temp_repo, "delta", "DE-002", status="pending")
 
@@ -118,6 +121,7 @@ def test_filters_by_kind_and_status(temp_repo: Path) -> None:
 
 
 def test_filters_by_applies_and_includes_metadata(temp_repo: Path) -> None:
+  """Test filtering by applies_to and including metadata in output."""
   _write_change(
     temp_repo,
     "revision",
@@ -142,6 +146,7 @@ def test_filters_by_applies_and_includes_metadata(temp_repo: Path) -> None:
 
 
 def test_plan_flag_outputs_plan_summary(temp_repo: Path) -> None:
+  """Test plan flag outputs plan summary information."""
   plan_block = dedent(
     """```yaml supekku:plan.overview@v1
 schema: supekku.plan.overview

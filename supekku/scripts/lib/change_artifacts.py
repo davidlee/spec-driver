@@ -31,6 +31,14 @@ class ChangeArtifact:
   plan: dict[str, Any] | None = None
 
   def to_dict(self, repo_root: Path) -> dict[str, Any]:
+    """Convert artifact to dictionary for registry serialization.
+
+    Args:
+      repo_root: Repository root for computing relative paths.
+
+    Returns:
+      Dictionary representation of the artifact.
+    """
     relative_path = self.path.relative_to(repo_root).as_posix()
     data: dict[str, Any] = {
       "kind": self.kind,
@@ -50,6 +58,17 @@ class ChangeArtifact:
 
 
 def load_change_artifact(path: Path) -> ChangeArtifact | None:
+  """Load and parse a change artifact from markdown file.
+
+  Args:
+    path: Path to artifact markdown file.
+
+  Returns:
+    Parsed ChangeArtifact or None if ID is missing.
+
+  Raises:
+    ValueError: If status is invalid.
+  """
   frontmatter, body = load_markdown_file(path)
   artifact_id = str(frontmatter.get("id", "")).strip()
   if not artifact_id:

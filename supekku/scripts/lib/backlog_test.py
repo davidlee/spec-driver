@@ -34,6 +34,7 @@ class BacklogLibraryTest(unittest.TestCase):
     return root
 
   def test_create_backlog_entry_writes_frontmatter(self) -> None:
+    """Test that creating a backlog entry writes correct frontmatter."""
     self._make_repo()
 
     path = create_backlog_entry("issue", "Investigate feature flag")
@@ -44,6 +45,7 @@ class BacklogLibraryTest(unittest.TestCase):
     assert "name: Investigate feature flag" in text
 
   def test_append_backlog_summary_appends_missing_entries(self) -> None:
+    """Test that appending to backlog summary adds missing entries."""
     root = self._make_repo()
     entry = create_backlog_entry("issue", "Investigate feature flag")
 
@@ -55,6 +57,7 @@ class BacklogLibraryTest(unittest.TestCase):
     assert entry.relative_to(root / "backlog").as_posix() in summary
 
   def test_find_repo_root_resolves_from_nested_path(self) -> None:
+    """Test that find_repo_root resolves correctly from nested directories."""
     root = self._make_repo()
     nested = root / "backlog" / "issues"
     os.chdir(nested)

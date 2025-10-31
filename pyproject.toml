@@ -12,6 +12,7 @@ dependencies = [
     "pyyaml>=6.0.3",
     "python-frontmatter>=1.1.0",
     "typer[all]>=0.15.0",
+    "pylint-per-file-ignores>=3.1.0",
 ]
 keywords = ["specification", "documentation", "adr", "architecture-decision-records", "spec-sync"]
 classifiers = [
@@ -81,7 +82,7 @@ exclude = [
 dev = [
     "pytest>=8.4.2",
     "ruff>=0.14.0",
-    "pylint>=3.3.9",
+    "pylint>=4.0.2",
 ]
 
 [tool.pytest.ini_options]
@@ -139,7 +140,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 convention = "google"
 
 [lint.per-file-ignores]
-"test_*.py" = [
+"*test*.py" = [
     "S101",    # asserts allowed in tests...
     "ARG",     # Unused function args -> fixtures nevertheless are functionally relevant...
     "FBT",     # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
@@ -153,17 +154,55 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 
 [tool.ruff.lint.per-file-ignores]
-"supekku/scripts/**/*.py" = ["E402"]
-"supekku/cli/**/*.py" = ["E402", "PLC0415"]
+"supekku/scripts/**/*.py" = [
+    "E402"  # ??
+]
+"supekku/cli/**/*.py" = [
+    "E402",    # ??
+    "PLC0415"  # ??
+]
+
+#
+# PyLint :: main
+#
+[tool.pylint.main]
+fail-under = 0.70 ## FAIL-UNDER ##
+reports = true
+output-format = "colorized"
+indent-string = "  "
+load-plugins = [
+    "pylint_per_file_ignores",
+    "pylint.extensions.docstyle",
+    "pylint.extensions.docparams",
+    "pylint.extensions.mccabe",
+]
+
+[tool.pylint.parameter_documentation]
+default-docstring-type = "google"
 
 [tool.pylint.format]
 indent-string = "  "
 expected-line-ending-format = "LF"
 
-[tool.pylint.messages_control]
-disable = [
-  "bad-indentation",  # Project uses 2-space indentation
-  "wrong-import-position",  # Typer CLI patterns require delayed imports
-  "too-many-locals",  # CLI commands naturally have many parameters
+
+[tool.pylint.'messages control']
+per-file-ignores = [
+    "*_test.py:protected-access",
+    "*_test.py:missing-function-docstring",
 ]
 
+[tool.pylint.design]
+exclude-too-few-public-methods = []
+ignored-parents = []
+max-args = 5
+max-attributes = 7
+max-bool-expr = 5
+max-branches = 12
+# max-complexity = 10
+max-locals = 15
+max-parents = 7
+max-positional-arguments = 5
+max-public-methods = 20
+max-returns = 6
+max-statements = 50
+min-public-methods = 2

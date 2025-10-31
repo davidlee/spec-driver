@@ -9,12 +9,16 @@ lint:
 format:
   uv run ruff format supekku
 
-pylint_threshold := "9.63"
+#pylint_threshold := "9.97"
+
 pylint:
-  uv run pylint supekku \
-    --fail-under={{pylint_threshold}} \
-    --output-format=colorized --reports y \
-    --indent-string "  "
+  uv run pylint supekku
+
+pylint-complex:
+  uv run pylint supekku --disable=all --extension-pkg-allow-list=pylint.extensions.mccabe --enable=too-complex
+
+pylint-only *args:
+  uv run pylint supekku --disable=all --extension-pkg-allow-list=pylint.extensions.mccabe --enable={{args}}
 
 publish:
   rm -fr dist/

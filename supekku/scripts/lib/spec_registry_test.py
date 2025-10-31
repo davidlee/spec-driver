@@ -54,6 +54,7 @@ class SpecRegistryTest(RepoTestCase):
     return root
 
   def test_registry_loads_specs(self) -> None:
+    """Test that registry correctly loads both tech and product specs."""
     root = self._make_repo()
     registry = SpecRegistry(root)
 
@@ -67,6 +68,7 @@ class SpecRegistryTest(RepoTestCase):
     assert prod.kind == "prod"
 
   def test_find_by_package(self) -> None:
+    """Test finding specs by package name."""
     root = self._make_repo()
     registry = SpecRegistry(root)
 
@@ -74,6 +76,7 @@ class SpecRegistryTest(RepoTestCase):
     assert [spec.id for spec in matches] == ["SPEC-001"]
 
   def test_reload_refreshes_registry(self) -> None:
+    """Test that reloading the registry picks up newly added specs."""
     root = self._make_repo()
     registry = SpecRegistry(root)
 

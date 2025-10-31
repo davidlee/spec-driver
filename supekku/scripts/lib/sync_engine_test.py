@@ -75,6 +75,7 @@ class TechSpecSyncEngineTest(unittest.TestCase):
     )
 
   def test_synchronize_creates_spec_and_generates_docs(self) -> None:
+    """Test that synchronizing creates spec and generates documentation."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = Path(tmpdir)
       pkg_path = root / "internal" / "foo"
@@ -104,6 +105,7 @@ class TechSpecSyncEngineTest(unittest.TestCase):
       assert "internal/foo" in frontmatter.get("packages", [])
 
   def test_synchronize_check_mode_requires_existing_spec(self) -> None:
+    """Test that check mode skips packages without existing spec stubs."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = Path(tmpdir)
       pkg_path = root / "internal" / "foo"
@@ -131,7 +133,7 @@ class TechSpecSyncEngineTest(unittest.TestCase):
 
       result = engine.synchronize(SyncOptions(existing=True, check=True))
 
-      assert result.created_specs == {}
+      assert not result.created_specs
       assert len(generate_calls) == 0
       assert len(result.skipped_packages) == 1
       skipped = result.skipped_packages[0]
@@ -139,6 +141,7 @@ class TechSpecSyncEngineTest(unittest.TestCase):
       assert skipped.reason == "missing spec stub"
 
   def test_synchronize_warns_when_gomarkdoc_missing(self) -> None:
+    """Test that synchronization warns when gomarkdoc tool is not available."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = Path(tmpdir)
       pkg_path = root / "pkg"
@@ -161,9 +164,10 @@ class TechSpecSyncEngineTest(unittest.TestCase):
       assert result.warnings == [
         "gomarkdoc not found; documentation generation skipped",
       ]
-      assert generate_calls == []
+      assert not generate_calls
 
   def test_check_mode_raises_when_gomarkdoc_missing(self) -> None:
+    """Test that check mode raises an error when gomarkdoc is unavailable."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = Path(tmpdir)
       pkg_path = root / "pkg"
@@ -183,6 +187,7 @@ class TechSpecSyncEngineTest(unittest.TestCase):
         engine.synchronize(SyncOptions(check=True))
 
   def test_allow_missing_go_creates_spec(self) -> None:
+    """Test that allowing missing go files still creates spec for package."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = Path(tmpdir)
       pkg_path = root / "concept" / "group"

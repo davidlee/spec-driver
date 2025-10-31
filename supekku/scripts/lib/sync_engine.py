@@ -29,7 +29,7 @@ PRIVATE_DOC = "internals.md"
 SKIP_KEYWORDS = {"mock", "mocks", "generated"}
 
 
-def default_log(message: str) -> None:
+def default_log(_message: str) -> None:
   """Default logging function that prints to stdout."""
 
 

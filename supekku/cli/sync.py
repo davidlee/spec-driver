@@ -172,7 +172,7 @@ def _sync_specs(
   existing: bool,
   check: bool,
   dry_run: bool,
-  allow_missing_source: list[str],
+  _allow_missing_source: list[str],
   prune: bool,
 ) -> dict:
   """Execute spec synchronization."""

@@ -30,6 +30,7 @@ class WorkspaceValidator:
     self.strict = strict
 
   def validate(self) -> list[ValidationIssue]:
+    """Validate workspace for missing references and inconsistencies."""
     self.issues.clear()
     _ = self.workspace.specs  # Access but don't assign
     requirements = self.workspace.requirements
@@ -170,6 +171,7 @@ def validate_workspace(
   workspace: Workspace,
   strict: bool = False,
 ) -> list[ValidationIssue]:
+  """Validate the given workspace and return a list of validation issues."""
   validator = WorkspaceValidator(workspace, strict=strict)
   return validator.validate()
 

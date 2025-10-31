@@ -175,12 +175,25 @@ _DELTA_RELATIONSHIPS_PATTERN = re.compile(
 def create_revision(
   name: str,
   *,
-  summary: str | None = None,
+  _summary: str | None = None,
   source_specs: Iterable[str] | None = None,
   destination_specs: Iterable[str] | None = None,
   requirements: Iterable[str] | None = None,
   repo_root: Path | None = None,
 ) -> ChangeArtifactCreated:
+  """Create a new spec revision artifact.
+
+  Args:
+    name: Revision name/title.
+    summary: Optional summary text.
+    source_specs: Spec IDs being revised from.
+    destination_specs: Spec IDs being revised to.
+    requirements: Requirement IDs affected.
+    repo_root: Optional repository root. Auto-detected if not provided.
+
+  Returns:
+    ChangeArtifactCreated with revision details.
+  """
   repo = find_repository_root(repo_root or Path.cwd())
   base_dir = repo / "change" / "revisions"
   _ensure_directory(base_dir)
@@ -256,6 +269,18 @@ def create_delta(
   repo_root: Path | None = None,
   allow_missing_plan: bool = False,
 ) -> ChangeArtifactCreated:
+  """Create a new delta artifact with optional implementation plan.
+
+  Args:
+    name: Delta name/title.
+    specs: Spec IDs impacted.
+    requirements: Requirement IDs impacted.
+    repo_root: Optional repository root. Auto-detected if not provided.
+    allow_missing_plan: If True, skip creating implementation plan and phases.
+
+  Returns:
+    ChangeArtifactCreated with delta details and optional plan/phase paths.
+  """
   repo = find_repository_root(repo_root or Path.cwd())
   base_dir = repo / "change" / "deltas"
   _ensure_directory(base_dir)
@@ -389,6 +414,21 @@ def create_requirement_breakout(
   kind: str | None = None,
   repo_root: Path | None = None,
 ) -> Path:
+  """Create a breakout requirement file under a spec.
+
+  Args:
+    spec_id: Parent spec identifier.
+    requirement_id: Requirement code (e.g., FR-010).
+    title: Requirement title.
+    kind: Optional requirement kind. Defaults based on requirement_id prefix.
+    repo_root: Optional repository root. Auto-detected if not provided.
+
+  Returns:
+    Path to created requirement file.
+
+  Raises:
+    ValueError: If spec is not found.
+  """
   spec_id = spec_id.upper()
   requirement_id = requirement_id.upper()
   repo = find_repository_root(repo_root or Path.cwd())

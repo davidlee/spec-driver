@@ -56,6 +56,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     return root
 
   def test_sync_creates_entries(self) -> None:
+    """Test that syncing from specs creates registry entries for requirements."""
     root = self._make_repo()
     registry_path = get_registry_dir(root) / "requirements.yaml"
     registry = RequirementsRegistry(registry_path)
@@ -98,6 +99,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     return file_path
 
   def test_sync_collects_change_relations(self) -> None:
+    """Test syncing collects relations from delta, revision, audit artifacts."""
     root = self._make_repo()
     delta_path = self._create_change_bundle(
       root,
@@ -153,6 +155,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     ]
 
   def test_sync_preserves_status(self) -> None:
+    """Test that re-syncing preserves manually set requirement statuses."""
     root = self._make_repo()
     registry_path = get_registry_dir(root) / "requirements.yaml"
     registry = RequirementsRegistry(registry_path)
@@ -182,6 +185,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     assert registry.records["SPEC-001.FR-001"].status == STATUS_LIVE
 
   def test_search_filters(self) -> None:
+    """Test that search can filter requirements by text query."""
     root = self._make_repo()
     registry_path = get_registry_dir(root) / "requirements.yaml"
     registry = RequirementsRegistry(registry_path)
@@ -196,6 +200,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     assert results[0].label.startswith("NF-")
 
   def test_move_requirement_updates_primary_spec(self) -> None:
+    """Test that moving a requirement updates its primary spec and UID."""
     root = self._make_repo()
     self._write_spec(
       root,
@@ -225,6 +230,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     assert moved.path == "specify/tech/spec-002-example/SPEC-002.md"
 
   def test_relationship_block_adds_collaborators(self) -> None:
+    """Test that spec relationship blocks add collaborator specs to requirements."""
     root = self._make_repo()
     collaborator_body = """```yaml supekku:spec.relationships@v1
 schema: supekku.spec.relationships
@@ -259,6 +265,7 @@ interactions: []
     assert "SPEC-001" in record.specs
 
   def test_delta_relationships_block_marks_implemented_by(self) -> None:
+    """Test that delta relationship blocks mark requirements as implemented."""
     root = self._make_repo()
 
     delta_dir = root / "change" / "deltas" / "DE-002-example"
@@ -334,6 +341,7 @@ interactions: []
     return revision_path
 
   def test_revision_block_moves_requirement_and_sets_collaborators(self) -> None:
+    """Test that revision blocks can move requirements and set collaborator specs."""
     root = self._make_repo()
     # Additional specs to support destination/collaborator lookups
     self._write_spec(

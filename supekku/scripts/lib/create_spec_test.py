@@ -54,6 +54,7 @@ class CreateSpecTest(unittest.TestCase):
     return root
 
   def test_create_tech_spec_generates_spec_and_testing_doc(self) -> None:
+    """Test creating a tech spec with testing documentation."""
     self._setup_repo()
 
     result = create_spec(
@@ -77,6 +78,7 @@ class CreateSpecTest(unittest.TestCase):
     assert test_body == "# Test Body\n"
 
   def test_create_product_spec_without_testing_doc(self) -> None:
+    """Test creating a product spec without testing documentation."""
     self._setup_repo()
 
     result = create_spec(
@@ -88,6 +90,7 @@ class CreateSpecTest(unittest.TestCase):
     assert result.test_path is None
 
   def test_missing_templates_raise_error(self) -> None:
+    """Test that missing templates raise TemplateNotFoundError."""
     root = self._setup_repo()
     (get_templates_dir(root) / "tech-spec-template.md").unlink()
 
@@ -95,14 +98,19 @@ class CreateSpecTest(unittest.TestCase):
       create_spec("Missing Template", CreateSpecOptions())
 
   def test_repository_root_not_found(self) -> None:
-    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    """Test that operations outside a repository raise RepositoryRootNotFoundError."""
+    # Create temp dir that's NOT under /tmp to avoid finding stray .spec-driver dirs
+    tmpdir = tempfile.TemporaryDirectory(dir=Path.home())  # pylint: disable=consider-using-with
     self.addCleanup(tmpdir.cleanup)
-    os.chdir(tmpdir.name)
+    test_dir = Path(tmpdir.name) / "nested" / "deep"
+    test_dir.mkdir(parents=True)
+    os.chdir(test_dir)
 
     with pytest.raises(RepositoryRootNotFoundError):
       create_spec("No Repo", CreateSpecOptions())
 
   def test_json_output_matches_structure(self) -> None:
+    """Test that JSON output from create_spec has expected structure."""
     self._setup_repo()
     result = create_spec("Example", CreateSpecOptions())
     payload = json.loads(result.to_json())

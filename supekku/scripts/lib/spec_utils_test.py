@@ -24,6 +24,7 @@ class SpecUtilsTestCase(unittest.TestCase):
   """Test cases for spec_utils module functionality."""
 
   def test_load_markdown_file_parses_frontmatter_and_body(self) -> None:
+    """Test loading markdown file parses YAML frontmatter and body."""
     content = textwrap.dedent(
       """
             ---
@@ -48,6 +49,7 @@ class SpecUtilsTestCase(unittest.TestCase):
     assert body == "Body line\n---\nExtra body line\n"
 
   def test_dump_markdown_file_round_trip(self) -> None:
+    """Test dump and reload round trip preserves content."""
     frontmatter = {"id": "SPEC-010", "name": "Round Trip", "kind": "spec"}
     body = "Round trip body\n"
 
@@ -61,6 +63,7 @@ class SpecUtilsTestCase(unittest.TestCase):
     assert reloaded_body == body
 
   def test_ensure_list_entry_returns_existing_list(self) -> None:
+    """Test ensure_list_entry returns existing list from dict."""
     data = {"owners": ["alice"]}
     result = ensure_list_entry(data, "owners")
     assert result is data["owners"]
@@ -69,23 +72,27 @@ class SpecUtilsTestCase(unittest.TestCase):
     assert data["owners"] == ["alice", "bob"]
 
   def test_ensure_list_entry_raises_for_non_list(self) -> None:
+    """Test ensure_list_entry raises TypeError for non-list values."""
     data = {"owners": "alice"}
     with pytest.raises(TypeError):
       ensure_list_entry(data, "owners")
 
   def test_append_unique_appends_when_missing(self) -> None:
+    """Test append_unique adds item when not present."""
     values = ["alice"]
     modified = append_unique(values, "bob")
     assert modified
     assert values == ["alice", "bob"]
 
   def test_append_unique_skips_existing_item(self) -> None:
+    """Test append_unique skips item that already exists."""
     values = ["alice", "bob"]
     modified = append_unique(values, "alice")
     assert not modified
     assert values == ["alice", "bob"]
 
   def test_validate_frontmatter_success(self) -> None:
+    """Test frontmatter validation succeeds with valid data."""
     frontmatter = {
       "id": "SPEC-200",
       "name": "Validated Spec",
@@ -117,6 +124,7 @@ class SpecUtilsTestCase(unittest.TestCase):
     assert frontmatter["owners"] == ["alice"]
 
   def test_validate_frontmatter_missing_required_field(self) -> None:
+    """Test validation fails when required field is missing."""
     frontmatter = {
       "name": "Missing Id",
       "slug": "missing-id",
@@ -130,6 +138,7 @@ class SpecUtilsTestCase(unittest.TestCase):
       validate_frontmatter(frontmatter)
 
   def test_validate_frontmatter_invalid_relations(self) -> None:
+    """Test validation fails for malformed relations."""
     frontmatter = {
       "id": "SPEC-201",
       "name": "Bad Relations",
@@ -145,6 +154,7 @@ class SpecUtilsTestCase(unittest.TestCase):
       validate_frontmatter(frontmatter)
 
   def test_load_validated_markdown_file_round_trip(self) -> None:
+    """Test loading and dumping with validation preserves data."""
     frontmatter = {
       "id": "SPEC-202",
       "name": "Load Validated",

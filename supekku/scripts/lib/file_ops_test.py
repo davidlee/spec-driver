@@ -62,9 +62,9 @@ def test_scan_directory_changes_nonexistent_source(tmp_path):
 
   changes = scan_directory_changes(source, dest)
 
-  assert changes.new_files == []
-  assert changes.existing_files == []
-  assert changes.unchanged_files == []
+  assert not changes.new_files
+  assert not changes.existing_files
+  assert not changes.unchanged_files
 
 
 def test_scan_directory_changes_all_new(tmp_path):
@@ -82,8 +82,8 @@ def test_scan_directory_changes_all_new(tmp_path):
   assert len(changes.new_files) == 2
   assert Path("file1.txt") in changes.new_files
   assert Path("file2.txt") in changes.new_files
-  assert changes.existing_files == []
-  assert changes.unchanged_files == []
+  assert not changes.existing_files
+  assert not changes.unchanged_files
 
 
 def test_scan_directory_changes_all_existing_modified(tmp_path):
@@ -100,11 +100,11 @@ def test_scan_directory_changes_all_existing_modified(tmp_path):
 
   changes = scan_directory_changes(source, dest, "*.txt")
 
-  assert changes.new_files == []
+  assert not changes.new_files
   assert len(changes.existing_files) == 2
   assert Path("file1.txt") in changes.existing_files
   assert Path("file2.txt") in changes.existing_files
-  assert changes.unchanged_files == []
+  assert not changes.unchanged_files
 
 
 def test_scan_directory_changes_all_existing_unchanged(tmp_path):
@@ -121,8 +121,8 @@ def test_scan_directory_changes_all_existing_unchanged(tmp_path):
 
   changes = scan_directory_changes(source, dest, "*.txt")
 
-  assert changes.new_files == []
-  assert changes.existing_files == []
+  assert not changes.new_files
+  assert not changes.existing_files
   assert len(changes.unchanged_files) == 2
   assert Path("file1.txt") in changes.unchanged_files
   assert Path("file2.txt") in changes.unchanged_files

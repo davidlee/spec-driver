@@ -16,7 +16,7 @@ class TestRegistryV2(unittest.TestCase):
     registry = RegistryV2.create_empty()
 
     assert registry.version == 2
-    assert registry.languages == {}
+    assert not registry.languages
     assert "created" in registry.metadata
 
   def test_load_from_dict(self) -> None:

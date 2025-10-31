@@ -9,6 +9,8 @@ from .path_utils import PathNormalizer
 
 
 class DeterministicPythonModuleAnalyzer:
+  """Analyzes Python module AST to extract documentation information."""
+
   def __init__(
     self,
     file_path: Path,

@@ -16,6 +16,7 @@ from supekku.scripts.list_specs import main as list_specs_main
 
 @pytest.fixture
 def temp_repo(tmp_path: Path) -> Path:
+  """Create a temporary git repository for testing."""
   root = tmp_path
   (root / ".git").mkdir()
   return root
@@ -53,6 +54,7 @@ def _run(args: list[str], *, root: Path) -> list[str]:
 
 
 def test_package_filter(temp_repo: Path) -> None:
+  """Test filtering specs by package name substring."""
   _write_spec(temp_repo, "SPEC-100", "spec-100", ["internal/foo"], "Foo")
   _write_spec(temp_repo, "SPEC-200", "spec-200", ["internal/bar"], "Bar")
 
@@ -61,6 +63,7 @@ def test_package_filter(temp_repo: Path) -> None:
 
 
 def test_for_path_filters_using_cwd(temp_repo: Path) -> None:
+  """Test that --for-path finds specs matching the current working directory."""
   spec_path = _write_spec(
     temp_repo,
     "SPEC-300",
@@ -84,6 +87,7 @@ def test_for_path_filters_using_cwd(temp_repo: Path) -> None:
 
 
 def test_packages_flag_includes_package_list(temp_repo: Path) -> None:
+  """Test that --packages flag includes package list in output."""
   _write_spec(
     temp_repo,
     "SPEC-400",
@@ -97,6 +101,7 @@ def test_packages_flag_includes_package_list(temp_repo: Path) -> None:
 
 
 def test_package_path_filter_uses_symlink_index(temp_repo: Path) -> None:
+  """Test filtering by exact package path using symlink index."""
   _write_spec(temp_repo, "SPEC-500", "spec-500", ["internal/app/foo"], "Foo")
 
   # Rebuild index manually

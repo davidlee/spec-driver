@@ -51,6 +51,7 @@ class ChangeRegistryTest(RepoTestCase):
         add_relation(path, relation_type=relation_type, target=target)
 
   def test_collect_and_sync_delta_registry(self) -> None:
+    """Test collecting and syncing delta artifacts into the registry."""
     root = self._create_repo()
     self._write_change(
       root,

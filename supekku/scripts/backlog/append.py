@@ -14,6 +14,7 @@ from supekku.scripts.lib.backlog import append_backlog_summary
 
 
 def main() -> None:
+  """Append missing entries to backlog summary."""
   additions = append_backlog_summary()
   if additions:
     pass

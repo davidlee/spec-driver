@@ -40,6 +40,7 @@ def _wrap_block(inner: str) -> str:
 
 
 def test_extract_revision_block_identifies_marker() -> None:
+  """Test extracting revision block identifies marker and structure."""
   content = _wrap_block(SAMPLE_VALID_YAML)
   blocks = extract_revision_blocks(content)
   assert len(blocks) == 1
@@ -51,15 +52,17 @@ def test_extract_revision_block_identifies_marker() -> None:
 
 
 def test_validator_accepts_minimal_valid_payload() -> None:
+  """Test validator accepts minimal valid revision block."""
   validator = RevisionBlockValidator()
   content = _wrap_block(SAMPLE_VALID_YAML)
   block = extract_revision_blocks(content)[0]
   data = block.parse()
   messages = validator.validate(data)
-  assert messages == []
+  assert not messages
 
 
 def test_validator_flags_missing_destination_for_move() -> None:
+  """Test validator flags move action missing destination."""
   validator = RevisionBlockValidator()
   invalid_yaml = """schema: supekku.revision.change
 version: 1
@@ -81,6 +84,7 @@ requirements:
 
 
 def test_validator_flags_invalid_additional_specs() -> None:
+  """Test validator flags invalid additional_specs."""
   validator = RevisionBlockValidator()
   invalid = """schema: supekku.revision.change
 version: 1
@@ -104,6 +108,7 @@ requirements:
 
 
 def test_formatting_rewrites_inline_mappings(tmp_path: Path) -> None:
+  """Test formatting rewrites inline YAML mappings to block style."""
   inline_yaml = """schema: supekku.revision.change
 version: 1
 metadata: {revision: RE-321}

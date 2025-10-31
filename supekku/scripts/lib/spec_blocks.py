@@ -33,6 +33,15 @@ class RelationshipsBlockValidator:
     *,
     spec_id: str | None = None,
   ) -> list[str]:
+    """Validate relationships block against schema.
+
+    Args:
+      block: Parsed relationships block to validate.
+      spec_id: Optional expected spec ID to match against.
+
+    Returns:
+      List of error messages (empty if valid).
+    """
     errors: list[str] = []
     data = block.data
     if data.get("schema") != RELATIONSHIPS_SCHEMA:
@@ -88,6 +97,17 @@ _RELATIONSHIPS_PATTERN = re.compile(
 
 
 def extract_relationships(block: str) -> RelationshipsBlock | None:
+  """Extract and parse relationships block from markdown content.
+
+  Args:
+    block: Markdown content containing relationships block.
+
+  Returns:
+    Parsed RelationshipsBlock or None if not found.
+
+  Raises:
+    ValueError: If YAML is invalid or doesn't parse to a mapping.
+  """
   match = _RELATIONSHIPS_PATTERN.search(block)
   if not match:
     return None
@@ -104,6 +124,14 @@ def extract_relationships(block: str) -> RelationshipsBlock | None:
 
 
 def load_relationships_from_file(path: Path) -> RelationshipsBlock | None:
+  """Load and extract relationships block from file.
+
+  Args:
+    path: Path to markdown file.
+
+  Returns:
+    Parsed RelationshipsBlock or None if not found.
+  """
   text = path.read_text(encoding="utf-8")
   return extract_relationships(text)
 

@@ -57,7 +57,7 @@ class TestWorkspaceCommands:
   def test_install_creates_workspace(self):
     """Test install command creates workspace structure."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      result = runner.invoke(app, ["install", tmpdir])
+      result = runner.invoke(app, ["install", tmpdir, "--yes"])
       assert result.exit_code == 0
       assert "Workspace initialized" in result.stdout
 

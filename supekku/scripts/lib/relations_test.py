@@ -34,11 +34,13 @@ class RelationsTest(RepoTestCase):
     return spec_path
 
   def test_list_relations_empty(self) -> None:
+    """Test listing relations returns empty list when no relations exist."""
     spec_path = self._make_spec()
     relations = list_relations(spec_path)
-    assert relations == []
+    assert not relations
 
   def test_add_relation(self) -> None:
+    """Test adding a relation with attributes to a spec."""
     spec_path = self._make_spec()
     added = add_relation(
       spec_path,
@@ -55,6 +57,7 @@ class RelationsTest(RepoTestCase):
     assert relation.attributes.get("annotation") == "test"
 
   def test_add_relation_avoids_duplicates(self) -> None:
+    """Test that adding duplicate relations is prevented."""
     spec_path = self._make_spec()
     add_relation(spec_path, relation_type="implements", target="FR-001")
     added = add_relation(spec_path, relation_type="implements", target="FR-001")
@@ -63,6 +66,7 @@ class RelationsTest(RepoTestCase):
     assert len(relations) == 1
 
   def test_remove_relation(self) -> None:
+    """Test removing an existing relation from a spec."""
     spec_path = self._make_spec()
     add_relation(spec_path, relation_type="implements", target="FR-001")
     removed = remove_relation(
@@ -71,9 +75,10 @@ class RelationsTest(RepoTestCase):
       target="FR-001",
     )
     assert removed
-    assert list_relations(spec_path) == []
+    assert not list_relations(spec_path)
 
   def test_remove_missing_relation_returns_false(self) -> None:
+    """Test that attempting to remove a non-existent relation returns False."""
     spec_path = self._make_spec()
     removed = remove_relation(
       spec_path,

@@ -32,6 +32,14 @@ def _ensure_relations(frontmatter: dict[str, Any]) -> list[RelationDict]:
 
 
 def list_relations(path: Path | str) -> list[Relation]:
+  """List relations from markdown file frontmatter.
+
+  Args:
+    path: Path to markdown file.
+
+  Returns:
+    List of parsed Relation objects.
+  """
   frontmatter, _ = load_markdown_file(path)
   relations_raw = frontmatter.get("relations")
   if not isinstance(relations_raw, Iterable):
@@ -58,6 +66,21 @@ def add_relation(
   target: str,
   **attributes: Any,
 ) -> bool:
+  """Add a relation to markdown file frontmatter.
+
+  Args:
+    path: Path to markdown file.
+    relation_type: Type of relation (e.g., "implements", "supersedes").
+    target: Target identifier.
+    **attributes: Additional relation attributes.
+
+  Returns:
+    True if relation was added, False if it already existed.
+
+  Raises:
+    ValueError: If relation_type or target are empty.
+    TypeError: If frontmatter relations are malformed.
+  """
   frontmatter, body = load_markdown_file(path)
   relations = _ensure_relations(frontmatter)
 
@@ -84,6 +107,20 @@ def add_relation(
 
 
 def remove_relation(path: Path | str, *, relation_type: str, target: str) -> bool:
+  """Remove a relation from markdown file frontmatter.
+
+  Args:
+    path: Path to markdown file.
+    relation_type: Type of relation to remove.
+    target: Target identifier.
+
+  Returns:
+    True if relation was removed, False if it wasn't found.
+
+  Raises:
+    ValueError: If relation_type or target are empty.
+    TypeError: If frontmatter relations are malformed.
+  """
   frontmatter, body = load_markdown_file(path)
   relations = _ensure_relations(frontmatter)
 

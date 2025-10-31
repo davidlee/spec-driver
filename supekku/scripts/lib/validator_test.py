@@ -103,6 +103,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     return audit_path
 
   def test_validator_reports_missing_relation_targets(self) -> None:
+    """Test validator detects relation targets referencing missing artifacts."""
     root = self._create_repo()
     self._write_spec(root, "SPEC-300", "FR-300")
     delta_path = self._write_delta(root, "DE-300", "SPEC-300.FR-300")
@@ -111,7 +112,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     ws = Workspace(root)
     ws.sync_requirements()
     issues = validate_workspace(ws)
-    assert issues == []
+    assert not issues
 
     # Break requirement link
     ws.requirements.records["SPEC-300.FR-300"].implemented_by = ["DE-999"]
@@ -121,6 +122,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     assert "DE-999" in issues[0].message
 
   def test_validator_checks_change_relations(self) -> None:
+    """Test validator verifies change relations point to valid requirements."""
     root = self._create_repo()
     requirement_uid = "SPEC-301.FR-301"
     self._write_spec(root, "SPEC-301", "FR-301")

@@ -15,6 +15,7 @@ from supekku.scripts.lib.backlog import create_backlog_entry
 
 
 def main() -> None:
+  """Create new backlog entry with specified kind and name."""
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument("kind", choices=["issue", "problem", "improvement", "risk"])
   parser.add_argument("name")

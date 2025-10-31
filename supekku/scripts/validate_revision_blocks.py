@@ -186,7 +186,7 @@ def main(argv: list[str] | None = None) -> int:
   return exit_code
 
 
-def _emit_messages(path: Path, messages: list[ValidationMessage]) -> None:
+def _emit_messages(_path: Path, messages: list[ValidationMessage]) -> None:
   for message in messages:
     message.render_path()
 

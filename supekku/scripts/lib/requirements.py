@@ -68,6 +68,7 @@ class RequirementRecord:
     )
 
   def to_dict(self) -> dict[str, object]:
+    """Convert requirement record to dictionary for serialization."""
     return {
       "label": self.label,
       "title": self.title,
@@ -83,6 +84,7 @@ class RequirementRecord:
 
   @classmethod
   def from_dict(cls, uid: str, data: dict[str, object]) -> RequirementRecord:
+    """Create requirement record from dictionary."""
     return cls(
       uid=uid,
       label=str(data.get("label", "")),
@@ -125,6 +127,7 @@ class RequirementsRegistry:
       self.records[uid] = record
 
   def save(self) -> None:
+    """Save requirements registry to YAML file."""
     payload = {
       "requirements": {
         uid: record.to_dict() for uid, record in sorted(self.records.items())
@@ -144,6 +147,7 @@ class RequirementsRegistry:
     revision_dirs: Iterable[Path] | None = None,
     audit_dirs: Iterable[Path] | None = None,
   ) -> SyncStats:
+    """Sync requirements from specs and change artifacts, updating registry."""
     repo_root = spec_registry.root if spec_registry else find_repo_root()
     stats = SyncStats()
     seen: set[str] = set()
@@ -270,7 +274,7 @@ class RequirementsRegistry:
   def _apply_delta_relations(
     self,
     delta_dirs: Iterable[Path],
-    repo_root: Path,
+    _repo_root: Path,
     *,
     validator: DeltaRelationshipsValidator,
   ) -> None:
@@ -658,7 +662,7 @@ class RequirementsRegistry:
   def _records_from_content(
     self,
     spec_id: str,
-    frontmatter: Mapping[str, Any],
+    _frontmatter: Mapping[str, Any],
     body: str,
     spec_path: Path,
     repo_root: Path,
@@ -710,6 +714,7 @@ class RequirementsRegistry:
     spec_registry: SpecRegistry | None = None,
     introduced_by: str | None = None,
   ) -> str:
+    """Move requirement to different spec, returning new UID."""
     if uid not in self.records:
       msg = f"Requirement {uid} not found"
       raise KeyError(msg)
@@ -758,6 +763,7 @@ class RequirementsRegistry:
     introduced_by: str | None = None,
     verified_by: str | None = None,
   ) -> list[RequirementRecord]:
+    """Search requirements by query text and various filters."""
     query_norm = query.lower() if query else None
     results: list[RequirementRecord] = []
     for record in self.records.values():
@@ -779,6 +785,7 @@ class RequirementsRegistry:
     return sorted(results, key=lambda r: r.uid)
 
   def set_status(self, uid: str, status: RequirementStatus) -> None:
+    """Set the status of a requirement."""
     if status not in VALID_STATUSES:
       msg = f"Invalid status {status!r}; must be one of {sorted(VALID_STATUSES)}"
       raise ValueError(

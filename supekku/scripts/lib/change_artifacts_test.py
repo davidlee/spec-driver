@@ -29,15 +29,17 @@ def _write_delta(tmp_path: Path, body: str) -> Path:
 
 
 def test_loads_frontmatter_when_no_structured_block(tmp_path: Path) -> None:
+  """Test loading change artifact with only frontmatter and no structured block."""
   path = _write_delta(tmp_path, "# DE-010\n")
   artifact = load_change_artifact(path)
   assert artifact
   assert artifact.id == "DE-010"
-  assert artifact.applies_to == {}
-  assert artifact.relations == []
+  assert not artifact.applies_to
+  assert not artifact.relations
 
 
 def test_structured_delta_updates_applies_and_relations(tmp_path: Path) -> None:
+  """Test that structured delta blocks update applies_to and relations metadata."""
   body = """```yaml supekku:delta.relationships@v1
 schema: supekku.delta.relationships
 version: 1
@@ -79,6 +81,7 @@ phases:
 
 
 def test_plan_and_phase_overview_included(tmp_path: Path) -> None:
+  """Test that plan and phase overviews are included in change artifact."""
   delta_dir = tmp_path / "DE-020"
   delta_dir.mkdir()
   delta_body = (

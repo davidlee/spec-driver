@@ -23,6 +23,7 @@ class Spec:
 
   @property
   def packages(self) -> list[str]:
+    """Return list of package paths associated with this spec."""
     packages = self.frontmatter.data.get("packages", [])
     if isinstance(packages, Iterable) and not isinstance(packages, (str, bytes)):
       return [str(item) for item in packages]
@@ -30,14 +31,17 @@ class Spec:
 
   @property
   def slug(self) -> str:
+    """Return URL-friendly slug for this spec."""
     return str(self.frontmatter.data.get("slug", ""))
 
   @property
   def name(self) -> str:
+    """Return human-readable name for this spec."""
     return str(self.frontmatter.data.get("name", self.id))
 
   @property
   def kind(self) -> str:
+    """Return the kind/type of this spec (e.g., 'spec', 'prod')."""
     return str(self.frontmatter.data.get("kind", ""))
 
 

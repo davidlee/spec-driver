@@ -165,6 +165,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pylint-per-file-ignores"
+version = "3.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pylint" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6a/dc/4588e9affbb7bbac3f14d11a7617db8e3f31669f319da03271f7f0332b09/pylint_per_file_ignores-3.1.0.tar.gz", hash = "sha256:a11db907f74cfbd8956365c36b0d453daa20448e2aaada1033c52ba6f621c7d7", size = 6616, upload-time = "2025-10-13T08:21:51.403Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9d/16/c1054ad8f355749eef83a2b176fc545cc27b08b5dc2bf21420174325676e/pylint_per_file_ignores-3.1.0-py3-none-any.whl", hash = "sha256:57cde138807a28a98f33edf85e687d88df3660d37c8d5d5d46de1f1e6fcc665d", size = 5666, upload-time = "2025-10-13T08:21:50.42Z" },
+]
+
+[[package]]
 name = "pytest"
 version = "8.4.2"
 source = { registry = "https://pypi.org/simple" }
@@ -311,6 +323,7 @@ name = "spec-driver"
 version = "0.2.1"
 source = { editable = "." }
 dependencies = [
+    { name = "pylint-per-file-ignores" },
     { name = "python-frontmatter" },
     { name = "pyyaml" },
     { name = "typer" },
@@ -325,6 +338,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "pylint-per-file-ignores", specifier = ">=3.1.0" },
     { name = "python-frontmatter", specifier = ">=1.1.0" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "typer", extras = ["all"], specifier = ">=0.15.0" },
@@ -332,7 +346,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "pylint", specifier = ">=3.3.9" },
+    { name = "pylint", specifier = ">=4.0.2" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "ruff", specifier = ">=0.14.0" },
 ]

@@ -11,14 +11,14 @@ import typer
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
 
 # Add parent to path for imports
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-  sys.path.insert(0, str(ROOT))
+SCRIPT_ROOT = Path(__file__).resolve().parents[2]
+if str(SCRIPT_ROOT) not in sys.path:
+  sys.path.insert(0, str(SCRIPT_ROOT))
 
+from supekku.scripts.lib.backlog import find_repo_root
 from supekku.scripts.lib.spec_sync.engine import SpecSyncEngine
+from supekku.scripts.lib.spec_sync.models import SourceUnit
 from supekku.scripts.sync_specs import (
-  REGISTRY_PATH,
-  TECH_DIR,
   MultiLanguageSpecManager,
   parse_language_targets,
 )
@@ -86,6 +86,13 @@ def sync(
       help="Synchronize ADR/decision registry",
     ),
   ] = False,
+  prune: Annotated[
+    bool,
+    typer.Option(
+      "--prune",
+      help="Remove specs for deleted source files (use with --existing)",
+    ),
+  ] = False,
 ) -> None:
   """Synchronize specifications and registries with source code.
 
@@ -97,9 +104,14 @@ def sync(
   By default, only syncs specs. Use --adr to also sync ADR registry.
   """
   try:
+    # Auto-discover repository root
+    root = find_repo_root()
+    tech_dir = root / "specify" / "tech"
+    registry_path = tech_dir / "registry_v2.json"
+
     # Validate directory structure
-    if not TECH_DIR.exists():
-      typer.echo(f"Tech spec directory not found: {TECH_DIR}", err=True)
+    if not tech_dir.exists():
+      typer.echo(f"Tech spec directory not found: {tech_dir}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
     if language not in ["go", "python", "all"]:
@@ -115,19 +127,23 @@ def sync(
     if specs:
       typer.echo("Synchronizing tech specs...")
       spec_result = _sync_specs(
+        root=root,
+        tech_dir=tech_dir,
+        registry_path=registry_path,
         targets=targets or [],
         language=language,
         existing=existing,
         check=check,
         dry_run=dry_run,
         allow_missing_source=allow_missing_source or [],
+        prune=prune,
       )
       results["specs"] = spec_result
 
     # Sync ADRs if requested
     if adr:
       typer.echo("Synchronizing ADR registry...")
-      adr_result = _sync_adr()
+      adr_result = _sync_adr(root=root)
       results["adr"] = adr_result
 
     # Report overall results
@@ -144,21 +160,25 @@ def sync(
 
 
 def _sync_specs(
+  root: Path,
+  tech_dir: Path,
+  registry_path: Path,
   targets: list[str],
   language: str,
   existing: bool,
   check: bool,
   dry_run: bool,
   allow_missing_source: list[str],
+  prune: bool,
 ) -> dict:
   """Execute spec synchronization."""
   # Initialize spec sync engine and spec manager
   engine = SpecSyncEngine(
-    repo_root=ROOT,
-    tech_dir=TECH_DIR,
+    repo_root=root,
+    tech_dir=tech_dir,
   )
 
-  spec_manager = MultiLanguageSpecManager(TECH_DIR, REGISTRY_PATH)
+  spec_manager = MultiLanguageSpecManager(tech_dir, registry_path)
 
   # Process target specifications
   targets_by_language = {}
@@ -191,23 +211,35 @@ def _sync_specs(
         else:
           targets_by_language[lang_name] = resolved_targets
 
-  # If no targets specified and --existing flag is used,
-  # fetch targets from registry
-  if not targets_by_language and existing:
-    if language in ["all", "go"] and "go" in spec_manager.registry_v2.languages:
-      go_targets = list(spec_manager.registry_v2.languages["go"].keys())
-      if go_targets:
-        targets_by_language["go"] = go_targets
+  # Handle default mode when no targets specified
+  if not targets_by_language:
+    if existing:
+      # --existing mode: fetch targets from registry
+      if language in ["all", "go"] and "go" in spec_manager.registry_v2.languages:
+        go_targets = list(spec_manager.registry_v2.languages["go"].keys())
+        if go_targets:
+          targets_by_language["go"] = go_targets
 
-    if language in ["all", "python"] and "python" in spec_manager.registry_v2.languages:
-      python_targets = list(spec_manager.registry_v2.languages["python"].keys())
-      if python_targets:
-        targets_by_language["python"] = python_targets
+      if (
+        language in ["all", "python"] and "python" in spec_manager.registry_v2.languages
+      ):
+        python_targets = list(spec_manager.registry_v2.languages["python"].keys())
+        if python_targets:
+          targets_by_language["python"] = python_targets
+    # Auto-discovery mode: discover from source code
+    elif language == "all":
+      # Enable all available adapters for auto-discovery
+      for lang_name in engine.adapters:
+        targets_by_language[lang_name] = []
+    # Enable specific language for auto-discovery
+    elif language in engine.adapters:
+      targets_by_language[language] = []
 
   # Process results and return summary
   processed_count = 0
   skipped_count = 0
   created_count = 0
+  orphaned_count = 0
 
   # Execute synchronization
   for lang_name, target_list in targets_by_language.items():
@@ -219,29 +251,152 @@ def _sync_specs(
       typer.echo(f"No adapter for language: {lang_name}", err=True)
       continue
 
-    for _target in target_list:
-      # Process each target
-      processed_count += 1
-      # Placeholder for actual processing logic
-      # This would call into the sync engine and spec manager
+    typer.echo(f"\n=== Synchronizing {lang_name.upper()} targets ===")
 
-  if not dry_run:
+    # Discover source units
+    orphaned_units = []
+    if existing:
+      typer.echo("Discovery mode: existing registry entries only")
+      source_units = []
+      if lang_name in spec_manager.registry_v2.languages:
+        for identifier in spec_manager.registry_v2.languages[lang_name]:
+          unit = SourceUnit(language=lang_name, identifier=identifier, root=root)
+
+          # Validate source exists
+          validation = adapter.validate_source_exists(unit)
+          if validation["status"] == "missing":
+            orphaned_units.append(unit)
+            typer.echo(f"  ⚠ Orphaned: {identifier} (source file deleted)", err=True)
+          else:
+            source_units.append(unit)
+    else:
+      typer.echo("Discovery mode: requested targets + auto-discovery")
+      requested = target_list if target_list else None
+      source_units = adapter.discover_targets(root, requested)
+
+    typer.echo(f"Found {len(source_units)} {lang_name} source units")
+    if orphaned_units:
+      typer.echo(f"Found {len(orphaned_units)} orphaned specs", err=True)
+
+    if not source_units and not orphaned_units:
+      typer.echo(f"No {lang_name} source units to process")
+      continue
+
+    # Process each source unit
+    created_specs = {}
+    skipped_units = []
+
+    for unit in source_units:
+      typer.echo(f"Processing {unit.identifier}...")
+
+      result = spec_manager.process_source_unit(
+        unit,
+        adapter,
+        check_mode=check,
+        dry_run=dry_run,
+      )
+
+      if result["processed"]:
+        processed_count += 1
+        if dry_run:
+          typer.echo(f"  → Would process {unit.identifier} -> {result['spec_id']}")
+        else:
+          typer.echo(f"  ✓ Processed {unit.identifier} -> {result['spec_id']}")
+
+        # Report documentation variants
+        for variant in result["doc_variants"]:
+          if dry_run:
+            typer.echo(f"    - {variant.name}: would generate")
+          else:
+            typer.echo(f"    - {variant.name}: {variant.status}")
+
+        # Show paths that would be created in dry-run mode
+        if dry_run and result["would_create_paths"]:
+          typer.echo("  Paths that would be created:")
+          for path in result["would_create_paths"]:
+            typer.echo(f"    • {path}")
+
+        if result["created"]:
+          created_count += 1
+          created_specs[unit.identifier] = result["spec_id"]
+          if dry_run:
+            typer.echo(f"  → Would create new spec: {result['spec_id']}")
+          else:
+            typer.echo(f"  ✓ Created new spec: {result['spec_id']}")
+
+      elif result["skipped"]:
+        skipped_count += 1
+        skipped_units.append(f"{unit.identifier}: {result['reason']}")
+        typer.echo(f"  ✗ Skipped {unit.identifier}: {result['reason']}")
+
+    # Handle orphaned specs
+    if orphaned_units:
+      orphaned_count += len(orphaned_units)
+
+      if prune:
+        from supekku.scripts.lib.deletion import DeletionExecutor
+
+        typer.echo(f"\n  Pruning {len(orphaned_units)} orphaned specs...")
+        executor = DeletionExecutor(root)
+
+        for orphaned_unit in orphaned_units:
+          # Get spec_id from registry
+          spec_id = spec_manager.registry_v2.get_spec_id(
+            orphaned_unit.language,
+            orphaned_unit.identifier,
+          )
+
+          if spec_id:
+            if dry_run:
+              typer.echo(f"    → Would delete {spec_id} ({orphaned_unit.identifier})")
+            else:
+              try:
+                executor.delete_spec(spec_id, dry_run=False)
+                typer.echo(f"    ✓ Deleted {spec_id} ({orphaned_unit.identifier})")
+              except Exception as e:
+                typer.echo(f"    ✗ Failed to delete {spec_id}: {e}", err=True)
+
+    # Report language results
+    typer.echo(f"\n{lang_name.upper()} Results:")
+    typer.echo(f"  Processed: {processed_count} units")
+    typer.echo(f"  Created: {len(created_specs)} specs")
+    typer.echo(f"  Skipped: {len(skipped_units)} units")
+    if orphaned_count > 0:
+      typer.echo(f"  Orphaned: {orphaned_count} units", err=True)
+      if not prune:
+        typer.echo("    (use --prune to remove)", err=True)
+
+    if created_specs:
+      typer.echo("  New specs created:")
+      for identifier, spec_id in created_specs.items():
+        typer.echo(f"    {spec_id}: {identifier}")
+
+    if skipped_units:
+      typer.echo("  Skipped reasons:")
+      for reason in skipped_units:
+        typer.echo(f"    - {reason}")
+
+  # Rebuild symlink indices if any changes were made
+  if processed_count > 0 and not dry_run:
+    typer.echo("\nRebuilding symlink indices...")
     spec_manager.rebuild_indices()
     spec_manager.save_registry()
+    typer.echo("✓ Symlink indices updated")
 
   return {
     "success": True,
     "processed": processed_count,
     "created": created_count,
     "skipped": skipped_count,
+    "orphaned": orphaned_count,
   }
 
 
-def _sync_adr() -> dict:
+def _sync_adr(root: Path) -> dict:
   """Execute ADR registry synchronization."""
   from supekku.scripts.lib.decision_registry import DecisionRegistry
 
-  registry = DecisionRegistry(root=ROOT)
+  registry = DecisionRegistry(root=root)
   registry.sync_with_symlinks()
 
   return {"success": True}

@@ -67,6 +67,73 @@ class TestRegistryV2(unittest.TestCase):
     assert registry.get_spec_id_compat("cmd") == "SPEC-003"
     assert registry.get_spec_id_compat("nonexistent") is None
 
+  def test_remove_source_unit(self) -> None:
+    """Test removing a source unit from the registry."""
+    registry = RegistryV2.create_empty()
+    registry.add_source_unit("go", "cmd", "SPEC-003")
+    registry.add_source_unit("python", "module.py", "SPEC-200")
+
+    # Remove existing unit
+    assert registry.remove_source_unit("go", "cmd") is True
+    assert registry.get_spec_id("go", "cmd") is None
+    assert registry.get_spec_id("python", "module.py") == "SPEC-200"
+
+    # Remove nonexistent unit
+    assert registry.remove_source_unit("go", "nonexistent") is False
+
+    # Remove from nonexistent language
+    assert registry.remove_source_unit("rust", "something") is False
+
+  def test_remove_source_unit_cleans_empty_language(self) -> None:
+    """Test that removing last unit in a language removes the language dict."""
+    registry = RegistryV2.create_empty()
+    registry.add_source_unit("go", "cmd", "SPEC-003")
+
+    assert "go" in registry.languages
+
+    registry.remove_source_unit("go", "cmd")
+
+    # Language dict should be removed when empty
+    assert "go" not in registry.languages
+
+  def test_remove_spec_single_source(self) -> None:
+    """Test removing a spec with a single source unit."""
+    registry = RegistryV2.create_empty()
+    registry.add_source_unit("go", "cmd", "SPEC-003")
+    registry.add_source_unit("python", "module.py", "SPEC-200")
+
+    removed = registry.remove_spec("SPEC-003")
+
+    assert removed == 1
+    assert registry.get_spec_id("go", "cmd") is None
+    assert registry.get_spec_id("python", "module.py") == "SPEC-200"
+
+  def test_remove_spec_multiple_sources(self) -> None:
+    """Test removing a spec with multiple source units."""
+    registry = RegistryV2.create_empty()
+    registry.add_source_unit("go", "cmd", "SPEC-003")
+    registry.add_source_unit("go", "internal/cmd", "SPEC-003")
+    registry.add_source_unit("python", "module.py", "SPEC-003")
+    registry.add_source_unit("python", "other.py", "SPEC-200")
+
+    removed = registry.remove_spec("SPEC-003")
+
+    assert removed == 3
+    assert registry.get_spec_id("go", "cmd") is None
+    assert registry.get_spec_id("go", "internal/cmd") is None
+    assert registry.get_spec_id("python", "module.py") is None
+    assert registry.get_spec_id("python", "other.py") == "SPEC-200"
+
+  def test_remove_spec_nonexistent(self) -> None:
+    """Test removing a spec that doesn't exist."""
+    registry = RegistryV2.create_empty()
+    registry.add_source_unit("go", "cmd", "SPEC-003")
+
+    removed = registry.remove_spec("SPEC-999")
+
+    assert removed == 0
+    assert registry.get_spec_id("go", "cmd") == "SPEC-003"
+
 
 class TestLanguageDetector(unittest.TestCase):
   """Test language detection logic."""

@@ -94,13 +94,12 @@ class TestTypeScriptAdapter(unittest.TestCase):
     identifiers = [unit.identifier for unit in units]
     assert identifiers == ["src/index.ts", "lib/utils.tsx"]
 
-  def test_discover_targets_auto_discovery_not_implemented(self) -> None:
-    """Test auto-discovery raises NotImplementedError."""
-    with pytest.raises(NotImplementedError) as context:
-      self.adapter.discover_targets(self.repo_root)
-
-    assert "TypeScript auto-discovery not yet implemented" in str(context.value)
-    assert "explicit targets" in str(context.value)
+  def test_discover_targets_auto_discovery(self) -> None:
+    """Test auto-discovery returns empty list (noop until TS files exist)."""
+    # Auto-discovery should work but return empty list for non-existent files
+    result = self.adapter.discover_targets(self.repo_root)
+    assert isinstance(result, list)
+    # Will be empty since self.repo_root doesn't have actual .ts files
 
   def test_describe_typescript_file(self) -> None:
     """Test describe method for TypeScript files."""
@@ -184,31 +183,30 @@ class TestTypeScriptAdapter(unittest.TestCase):
 
     assert "TypeScriptAdapter cannot process python units" in str(context.value)
 
-  def test_generate_not_implemented(self) -> None:
-    """Test generate method raises NotImplementedError."""
+  def test_generate_noop(self) -> None:
+    """Test generate method returns skipped variants (noop)."""
     unit = SourceUnit("typescript", "src/index.ts", self.repo_root)
     spec_dir = Path("/test/spec/SPEC-001")
 
-    with pytest.raises(NotImplementedError) as context:
-      self.adapter.generate(unit, spec_dir=spec_dir)
+    variants = self.adapter.generate(unit, spec_dir=spec_dir)
 
-    assert "TypeScript documentation generation not yet implemented" in str(
-      context.value,
-    )
-    assert "src/index.ts" in str(context.value)
-    assert "placeholder adapter" in str(context.value)
+    # Should return list of variants with 'skipped' status
+    assert isinstance(variants, list)
+    assert len(variants) == 3  # public, internal, types
+    for variant in variants:
+      assert variant.status == "skipped"
+      assert variant.hash == ""
 
-  def test_generate_check_mode_not_implemented(self) -> None:
-    """Test generate method in check mode also raises NotImplementedError."""
+  def test_generate_check_mode_noop(self) -> None:
+    """Test generate method in check mode also returns skipped variants."""
     unit = SourceUnit("typescript", "src/index.ts", self.repo_root)
     spec_dir = Path("/test/spec/SPEC-001")
 
-    with pytest.raises(NotImplementedError) as context:
-      self.adapter.generate(unit, spec_dir=spec_dir, check=True)
+    variants = self.adapter.generate(unit, spec_dir=spec_dir, check=True)
 
-    assert "TypeScript documentation generation not yet implemented" in str(
-      context.value,
-    )
+    # Should return list of variants with 'skipped' status
+    assert isinstance(variants, list)
+    assert all(v.status == "skipped" for v in variants)
 
   def test_supports_identifier_edge_cases(self) -> None:
     """Test supports_identifier with edge cases."""

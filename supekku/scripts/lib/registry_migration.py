@@ -80,6 +80,56 @@ class RegistryV2:
       self.languages[language] = {}
     self.languages[language][identifier] = spec_id
 
+  def remove_source_unit(self, language: str, identifier: str) -> bool:
+    """Remove a source unit mapping from the registry.
+
+    Args:
+        language: Language of the source unit
+        identifier: Source identifier
+
+    Returns:
+        True if the entry was removed, False if it didn't exist
+
+    """
+    if language not in self.languages:
+      return False
+
+    if identifier not in self.languages[language]:
+      return False
+
+    del self.languages[language][identifier]
+
+    # Clean up empty language dict
+    if not self.languages[language]:
+      del self.languages[language]
+
+    return True
+
+  def remove_spec(self, spec_id: str) -> int:
+    """Remove all source units that map to a specific spec ID.
+
+    Args:
+        spec_id: Spec ID to remove (e.g., "SPEC-001")
+
+    Returns:
+        Number of source units removed
+
+    """
+    removed_count = 0
+
+    for language in list(self.languages.keys()):
+      identifiers_to_remove = [
+        identifier
+        for identifier, sid in self.languages[language].items()
+        if sid == spec_id
+      ]
+
+      for identifier in identifiers_to_remove:
+        if self.remove_source_unit(language, identifier):
+          removed_count += 1
+
+    return removed_count
+
   def get_spec_id(self, language: str, identifier: str) -> str | None:
     """Get spec ID for a specific language and identifier."""
     return self.languages.get(language, {}).get(identifier)

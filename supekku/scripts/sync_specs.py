@@ -15,6 +15,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
+import typer
+
 ROOT = Path(__file__).resolve().parents[2]
 TECH_DIR = ROOT / "specify" / "tech"
 REGISTRY_PATH = TECH_DIR / "registry_v2.json"
@@ -456,12 +458,16 @@ def main() -> None:
 
   for language, targets in targets_by_language.items():
     if language not in engine.adapters:
+      typer.echo(f"Warning: No adapter available for language '{language}' - skipping")
       continue
+
+    typer.echo(f"\n=== Synchronizing {language.upper()} targets ===")
 
     adapter = engine.adapters[language]
 
     # Discover source units
     if args.existing:
+      typer.echo("Discovery mode: existing registry entries only")
       # Get existing entries from registry and convert to source units
       source_units = []
       if language in spec_manager.registry_v2.languages:
@@ -470,10 +476,14 @@ def main() -> None:
             SourceUnit(language=language, identifier=identifier, root=ROOT),
           )
     else:
+      typer.echo("Discovery mode: requested targets + auto-discovery")
       requested = targets if targets else None
       source_units = adapter.discover_targets(ROOT, requested)
 
+    typer.echo(f"Found {len(source_units)} {language} source units")
+
     if not source_units:
+      typer.echo(f"No {language} source units to process")
       continue
 
     # Process each source unit
@@ -481,6 +491,8 @@ def main() -> None:
     skipped_units = []
 
     for unit in source_units:
+      typer.echo(f"Processing {unit.identifier}...")
+
       result = spec_manager.process_source_unit(
         unit,
         adapter,
@@ -491,58 +503,77 @@ def main() -> None:
       if result["processed"]:
         total_processed += 1
         if args.dry_run:
-          pass
+          typer.echo(f"  → Would process {unit.identifier} -> {result['spec_id']}")
         else:
-          pass
+          typer.echo(f"  ✓ Processed {unit.identifier} -> {result['spec_id']}")
 
         # Report documentation variants
-        for _variant in result["doc_variants"]:
+        for variant in result["doc_variants"]:
           if args.dry_run:
-            pass
+            typer.echo(f"    - {variant.name}: would generate")
           else:
-            pass
+            typer.echo(f"    - {variant.name}: {variant.status}")
 
         # Show paths that would be created in dry-run mode
         if args.dry_run and result["would_create_paths"]:
-          for _path in result["would_create_paths"]:
-            pass
+          typer.echo("  Paths that would be created:")
+          for path in result["would_create_paths"]:
+            typer.echo(f"    • {path}")
 
         if result["created"]:
           total_created += 1
           created_specs[unit.identifier] = result["spec_id"]
           if args.dry_run:
-            pass
+            typer.echo(f"  → Would create new spec: {result['spec_id']}")
           else:
-            pass
+            typer.echo(f"  ✓ Created new spec: {result['spec_id']}")
 
       elif result["skipped"]:
         total_skipped += 1
         skipped_units.append(f"{unit.identifier}: {result['reason']}")
+        typer.echo(f"  ✗ Skipped {unit.identifier}: {result['reason']}")
 
     # Report language results
+    typer.echo(f"\n{language.upper()} Results:")
+    typer.echo(f"  Processed: {total_processed} units")
+    typer.echo(f"  Created: {len(created_specs)} specs")
+    typer.echo(f"  Skipped: {len(skipped_units)} units")
 
     if created_specs:
-      for _identifier in created_specs:
-        pass
+      typer.echo("  New specs created:")
+      for identifier, spec_id in created_specs.items():
+        typer.echo(f"    {spec_id}: {identifier}")
 
     if skipped_units:
-      for _reason in skipped_units:
-        pass
+      typer.echo("  Skipped reasons:")
+      for reason in skipped_units:
+        typer.echo(f"    - {reason}")
 
   # Rebuild symlink indices if any changes were made
   if total_processed > 0 and not args.dry_run:
+    typer.echo("\nRebuilding symlink indices...")
     spec_manager.rebuild_indices()
+    typer.echo("✓ Symlink indices updated")
 
   # Overall summary
+  typer.echo("\n=== Overall Summary ===")
   if args.dry_run:
-    pass
+    typer.echo("DRY RUN MODE - No files were modified")
+
+  typer.echo(f"Total processed: {total_processed} units")
+  typer.echo(f"Total created: {total_created} specs")
+  typer.echo(f"Total skipped: {total_skipped} units")
 
   if all_warnings:
-    for _warning in all_warnings:
-      pass
+    typer.echo("Warnings:")
+    for warning in all_warnings:
+      typer.echo(f"  - {warning}")
 
   if total_processed == 0 and not args.existing:
-    pass
+    typer.echo("\nNo source units found. Try:")
+    typer.echo("  - Specify targets: --targets go:internal/foo python:module.py")
+    typer.echo("  - Use --existing to process registered packages")
+    typer.echo("  - Check language adapters are working")
 
 
 if __name__ == "__main__":

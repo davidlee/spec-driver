@@ -60,9 +60,6 @@ class TypeScriptAdapter(LanguageAdapter):
     Returns:
         List of SourceUnit objects for TypeScript modules
 
-    Raises:
-        NotImplementedError: TypeScript discovery not yet implemented
-
     """
     if requested:
       # For now, just create placeholder units for requested identifiers
@@ -74,17 +71,56 @@ class TypeScriptAdapter(LanguageAdapter):
           source_units.append(unit)
       return source_units
 
-    # Auto-discovery not yet implemented
-    # TODO: Implement TypeScript file discovery (.ts, .tsx files)
-    # TODO: Handle node_modules exclusion
-    # TODO: Support TypeScript project structure (src/, lib/, etc.)
-    msg = (
-      "TypeScript auto-discovery not yet implemented. "
-      "Use explicit targets with typescript:path/to/file.ts syntax."
-    )
-    raise NotImplementedError(
-      msg,
-    )
+    # Auto-discovery: find TypeScript files
+    # Exclude common directories we don't want to document
+    exclude_dirs = {
+      "node_modules",
+      ".git",
+      "dist",
+      "build",
+      "coverage",
+      ".next",
+      ".nuxt",
+      "out",
+      "__pycache__",
+      ".pytest_cache",
+      ".venv",
+      "venv",
+      ".uv-cache",
+      ".cache",
+      "target",
+      "tmp",
+      "temp",
+    }
+
+    source_units = []
+
+    # Find all .ts, .tsx files (excluding .d.ts for now)
+    for ext in ["*.ts", "*.tsx"]:
+      for ts_file in repo_root.rglob(ext):
+        # Skip if in excluded directory
+        if any(excluded in ts_file.parts for excluded in exclude_dirs):
+          continue
+
+        # Skip type definition files for now
+        if ts_file.name.endswith(".d.ts"):
+          continue
+
+        # Use base class helper to skip non-git-tracked files
+        if self._should_skip_path(ts_file):
+          continue
+
+        # Get relative path from repo root
+        try:
+          relative_path = ts_file.relative_to(repo_root)
+          identifier = str(relative_path)
+          unit = SourceUnit("typescript", identifier, repo_root)
+          source_units.append(unit)
+        except ValueError:
+          # File not relative to repo_root, skip
+          continue
+
+    return source_units
 
   def describe(self, unit: SourceUnit) -> SourceDescriptor:
     """Describe how a TypeScript source unit should be processed.
@@ -149,7 +185,11 @@ class TypeScriptAdapter(LanguageAdapter):
     spec_dir: Path,
     check: bool = False,
   ) -> list[DocVariant]:
-    """Generate documentation variants for a TypeScript source unit.
+    """Generate documentation variants for a TypeScript source unit (NOOP).
+
+    This is a placeholder implementation that skips actual documentation
+    generation. It returns placeholder variants marked as 'skipped' until
+    the AST-based doc generator is implemented.
 
     Args:
         unit: Source unit to generate documentation for
@@ -157,30 +197,28 @@ class TypeScriptAdapter(LanguageAdapter):
         check: If True, only check if docs would change
 
     Returns:
-        List of DocVariant objects with generation results
+        List of DocVariant objects with 'skipped' status
 
     Raises:
         ValueError: If unit is not a TypeScript unit
-        NotImplementedError: TypeScript generation not yet implemented
 
     """
     self._validate_unit_language(unit)
 
-    # TODO: Implement TypeScript documentation generation
-    # Options to evaluate:
-    # 1. TypeDoc integration
-    # 2. Custom TypeScript AST parser
-    # 3. TSDoc comment extraction
-    # 4. Integration with existing TypeScript tooling
+    # Get the descriptor to know what variants would be created
+    descriptor = self.describe(unit)
 
-    msg = (
-      f"TypeScript documentation generation not yet implemented for "
-      f"{unit.identifier}. This is a placeholder adapter - see TODO "
-      "items in typescript.py"
-    )
-    raise NotImplementedError(
-      msg,
-    )
+    # Return placeholder variants with 'skipped' status
+    # This allows the sync to proceed without generating docs
+    return [
+      DocVariant(
+        name=variant.name,
+        path=variant.path,
+        hash="",  # Empty hash for skipped generation
+        status="skipped",
+      )
+      for variant in descriptor.variants
+    ]
 
   def supports_identifier(self, identifier: str) -> bool:
     """Check if this adapter can handle TypeScript identifiers.

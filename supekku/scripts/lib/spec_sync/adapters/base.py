@@ -98,6 +98,71 @@ class LanguageAdapter(ABC):
     # Non-empty set means git worked; return True if not in tracked files
     return bool(tracked_files and path.resolve() not in tracked_files)
 
+  def validate_source_exists(self, unit: SourceUnit) -> dict[str, bool | str]:
+    """Validate that source file exists and is git-tracked.
+
+    Args:
+        unit: Source unit to validate
+
+    Returns:
+        Dictionary with validation results:
+          - exists: Whether source file exists on disk
+          - git_tracked: Whether file is tracked by git (None if can't determine)
+          - status: "valid", "missing", or "untracked"
+          - message: Human-readable status message
+
+    """
+    result = {
+      "exists": False,
+      "git_tracked": None,
+      "status": "missing",
+      "message": "",
+    }
+
+    # Build source path - subclasses should override if needed
+    source_path = self._get_source_path(unit)
+
+    if source_path is None:
+      result["message"] = f"Cannot determine source path for {unit.identifier}"
+      return result
+
+    # Check if file exists
+    if not source_path.exists():
+      result["message"] = f"Source file not found: {source_path}"
+      return result
+
+    result["exists"] = True
+
+    # Check if git-tracked
+    tracked_files = self._get_git_tracked_files()
+    if tracked_files:
+      is_tracked = source_path.resolve() in tracked_files
+      result["git_tracked"] = is_tracked
+
+      if not is_tracked:
+        result["status"] = "untracked"
+        result["message"] = f"Source exists but not git-tracked: {source_path}"
+        return result
+
+    result["status"] = "valid"
+    result["message"] = f"Source file valid: {source_path}"
+    return result
+
+  def _get_source_path(self, unit: SourceUnit) -> Path | None:
+    """Get filesystem path for a source unit.
+
+    Default implementation assumes identifier is relative path from repo root.
+    Subclasses should override for language-specific path resolution.
+
+    Args:
+        unit: Source unit
+
+    Returns:
+        Path to source file, or None if cannot be determined
+
+    """
+    return self.repo_root / unit.identifier
+
   def _validate_unit_language(self, unit: SourceUnit) -> None:
     """Validate that the unit language matches this adapter.
 

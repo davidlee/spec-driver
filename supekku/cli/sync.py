@@ -139,6 +139,11 @@ def sync(
       adr_result = _sync_adr(root=root)
       results["adr"] = adr_result
 
+    # Always sync requirements from specs
+    typer.echo("Synchronizing requirements registry...")
+    req_result = _sync_requirements(root=root)
+    results["requirements"] = req_result
+
     # Report overall results
     if all(r.get("success", True) for r in results.values()):
       typer.echo("Sync completed successfully")
@@ -440,6 +445,26 @@ def _sync_adr(root: Path) -> dict:
   registry.sync_with_symlinks()
 
   return {"success": True}
+
+
+def _sync_requirements(root: Path) -> dict:
+  """Execute requirements registry synchronization from specs."""
+  from supekku.scripts.lib.core.paths import get_registry_dir
+  from supekku.scripts.lib.requirements.registry import RequirementsRegistry
+  from supekku.scripts.lib.specs.registry import SpecRegistry
+
+  spec_registry = SpecRegistry(root)
+  requirements_path = get_registry_dir(root) / "requirements.yaml"
+  req_registry = RequirementsRegistry(requirements_path)
+
+  stats = req_registry.sync_from_specs(spec_registry=spec_registry)
+  req_registry.save()
+
+  typer.echo(
+    f"  Requirements: {stats.created} created, {stats.updated} updated",
+  )
+
+  return {"success": True, "created": stats.created, "updated": stats.updated}
 
 
 # For direct testing

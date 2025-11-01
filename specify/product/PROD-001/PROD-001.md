@@ -253,7 +253,10 @@ And requirements are traceable to code and tests
 - User wants to update existing spec → Out of scope (different workflow/command)
 
 **Non-goals**:
-- Editing/updating existing specs (separate `/supekku.refine-spec` command, future)
+- **Editing/updating existing specs** (separate `/supekku.refine-spec` or `/supekku.complete-spec` command, see RISK-007)
+  - Use case: User manually created spec or sync generated placeholder tech spec
+  - Need: Complete existing spec without re-running full creation workflow
+  - Scope: Out of PROD-001; requires separate command/workflow
 - Generating specs from code (code-first workflow, see SPEC-072 sync engine)
 - Multi-spec bulk operations (team leads use scripting, not interactive workflow)
 - Real-time collaborative spec editing (version control handles this)
@@ -286,35 +289,35 @@ See capabilities YAML block above for complete capability definitions. Key behav
 
 ### Functional Requirements
 
-**PROD-001.FR-001**: Claude Command Provides Complete Workflow
-- **Statement**: The `.claude/commands/supekku.specify.md` command file contains all instructions necessary for an agent to guide a user from feature description to validated, registry-synced specification without external documentation.
-- **Verification**: VT-001 - Test agent follows command from start to finish with zero external lookups
+- **FR-001**: Claude Command Provides Complete Workflow
+  The `.claude/commands/supekku.specify.md` command file contains all instructions necessary for an agent to guide a user from feature description to validated, registry-synced specification without external documentation.
+  *Verification*: VT-001 - Test agent follows command from start to finish with zero external lookups
 
-**PROD-001.FR-002**: Agent Completes All YAML Blocks Without Manual Editing
-- **Statement**: The workflow instructs agents to fetch schema documentation via `spec-driver schema show` and use it to generate valid YAML blocks for `spec.relationships`, `spec.capabilities`, and `verification.coverage` without requiring users to manually edit YAML syntax.
-- **Verification**: VT-002 - Validate 100 generated specs have valid YAML blocks with zero manual corrections
+- **FR-002**: Agent Completes All YAML Blocks Without Manual Editing
+  The workflow instructs agents to fetch schema documentation via `spec-driver schema show` and use it to generate valid YAML blocks for `spec.relationships`, `spec.capabilities`, and `verification.coverage` without requiring users to manually edit YAML syntax.
+  *Verification*: VT-002 - Validate 100 generated specs have valid YAML blocks with zero manual corrections
 
-**PROD-001.FR-003**: Clarification Questions Limited to Critical Decisions
-- **Statement**: Agents ask maximum 3 clarification questions, prioritized by scope > security > UX impact, making informed assumptions for all other details and documenting those assumptions in the spec's Intent & Summary section.
-- **Verification**: VT-003 - Analyze 50 spec creation sessions, confirm ≤3 questions asked, all assumptions documented
+- **FR-003**: Clarification Questions Limited to Critical Decisions
+  Agents ask maximum 3 clarification questions, prioritized by scope > security > UX impact, making informed assumptions for all other details and documenting those assumptions in the spec's Intent & Summary section.
+  *Verification*: VT-003 - Analyze 50 spec creation sessions, confirm ≤3 questions asked, all assumptions documented
 
-**PROD-001.FR-004**: Spec Type Determines Section Content Adaptation
-- **Statement**: Product specs emphasize user personas, journeys, and business value; tech specs emphasize architecture, components, and integration contracts. The workflow instructs agents to adapt section content appropriately based on `--kind` flag.
-- **Verification**: Manual review of 20 product specs and 20 tech specs confirms appropriate content focus
+- **FR-004**: Spec Type Determines Section Content Adaptation
+  Product specs emphasize user personas, journeys, and business value; tech specs emphasize architecture, components, and integration contracts. The workflow instructs agents to adapt section content appropriately based on `--kind` flag.
+  *Verification*: Manual review of 20 product specs and 20 tech specs confirms appropriate content focus
 
-**PROD-001.FR-005**: Validation Integrated Before Workflow Completion
-- **Statement**: The workflow requires agents to run `spec-driver sync` and `spec-driver validate` commands before declaring spec creation complete, catching errors (invalid relationships, missing requirements, YAML syntax issues) before user moves to next task.
-- **Verification**: VT-002 - Confirm validation catches all common error types (tested via intentional error injection)
+- **FR-005**: Validation Integrated Before Workflow Completion
+  The workflow requires agents to run `spec-driver sync` and `spec-driver validate` commands before declaring spec creation complete, catching errors (invalid relationships, missing requirements, YAML syntax issues) before user moves to next task.
+  *Verification*: VT-002 - Confirm validation catches all common error types (tested via intentional error injection)
 
 ### Non-Functional Requirements
 
-**PROD-001.NF-001**: First-Time User Experience Requires Minimal Cognitive Load
-- **Statement**: Users with zero spec-driver experience can complete their first spec creation in under 1 hour with zero "what do I do now?" friction points.
-- **Measurement**: VA-001 - User testing with 10 first-time users, measure time-to-completion and friction point incidents (target: 0 critical friction points)
+- **NF-001**: First-Time User Experience Requires Minimal Cognitive Load
+  Users with zero spec-driver experience can complete their first spec creation in under 1 hour with zero "what do I do now?" friction points.
+  *Measurement*: VA-001 - User testing with 10 first-time users, measure time-to-completion and friction point incidents (target: 0 critical friction points)
 
-**PROD-001.NF-002**: Registry Sync Success Rate >95% on First Attempt
-- **Statement**: Specs created through this workflow sync to the registry without errors on first attempt in >95% of cases, indicating validation catches errors early.
-- **Measurement**: VA-002 - Track sync success rate over 200 spec creations across diverse projects
+- **NF-002**: Registry Sync Success Rate >95% on First Attempt
+  Specs created through this workflow sync to the registry without errors on first attempt in >95% of cases, indicating validation catches errors early.
+  *Measurement*: VA-002 - Track sync success rate over 200 spec creations across diverse projects
 
 ### Success Metrics / Signals
 
@@ -643,12 +646,19 @@ Must achieve before declaring feature complete:
 - **Mitigation**: Installer script must prompt user to add `@supekku/INIT.md` to project CLAUDE.md; provide copy-paste instructions; verify reference exists before proceeding; create `spec-driver doctor` command to check setup
 - **Status**: BLOCKER for FR-001 - must implement in installer
 
+**RISK-007**: No workflow for completing existing/vestigial specs
+- **Likelihood**: Very High (users manually create specs, sync creates placeholder tech specs)
+- **Impact**: High (current workflow assumes new spec creation; user must manually sync 3 different commands)
+- **Mitigation**: Create separate `/supekku.refine-spec` or `/supekku.complete-spec` command that: (a) detects existing spec file, (b) skips `create spec` invocation, (c) fills incomplete sections, (d) same validation/sync workflow
+- **Status**: HIGH PRIORITY - common use case not supported by PROD-001 scope
+- **Alternative**: Make `/supekku.specify` detect existing spec and adapt workflow automatically
+
 ### Known Gaps / Debt
 
 **Gaps**:
 - Multi-agent platform testing not yet conducted → test on Codex, Gemini beyond Claude
 - Relationship discovery heuristics basic → could leverage NLP/semantic search for better suggestions
-- No spec update/refinement workflow → separate command needed for editing existing specs
+- **HIGH PRIORITY**: No spec refinement/completion workflow → users with existing specs (manual or sync-generated) can't use guided workflow
 - Policy/constitution framework barely defined → need ADR/policy structure for team-specific preferences
 - **CRITICAL**: No `supekku/INIT.md` file exists yet → must create with spec-driver invocation patterns
 - **CRITICAL**: Installer doesn't guide CLAUDE.md setup → agents won't know how to invoke CLI
@@ -658,10 +668,10 @@ Must achieve before declaring feature complete:
 - `ISSUE-003`: Create supekku/INIT.md with invocation patterns for agents (CRITICAL)
 - `ISSUE-004`: Enhance installer to prompt CLAUDE.md setup with verification (BLOCKER)
 - `ISSUE-005`: Implement orphan detection protection for manual specs (CRITICAL)
+- `ISSUE-006`: Create spec refinement/completion workflow for existing specs (HIGH PRIORITY)
 - TODO: Test workflow on Codex and Gemini platforms
 - TODO: Implement semantic search for relationship discovery
 - TODO: Create `PROB-002` - Policy framework undefined (blocks git/planning tool integration)
-- TODO: Create future PROD - Spec update/refinement workflow (separate from creation)
 
 ### Open Decisions / Questions
 

@@ -14,12 +14,12 @@ if str(ROOT) not in sys.path:
 
 # pylint: disable=wrong-import-position
 from supekku.scripts.lib.changes.completion import create_completion_revision
-from supekku.scripts.lib.lifecycle import STATUS_LIVE
 from supekku.scripts.lib.changes.discovery import find_requirement_sources
 from supekku.scripts.lib.changes.updater import (
   RevisionUpdateError,
   update_requirement_lifecycle_status,
 )
+from supekku.scripts.lib.requirements.lifecycle import STATUS_LIVE
 from supekku.scripts.lib.workspace import Workspace
 
 

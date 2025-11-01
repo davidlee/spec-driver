@@ -10,8 +10,9 @@ from typing import TYPE_CHECKING
 
 import yaml
 
+from supekku.scripts.lib.requirements.lifecycle import STATUS_LIVE
+
 from .creation import create_revision
-from ..lifecycle import STATUS_LIVE
 
 if TYPE_CHECKING:
   from .workspace import Workspace

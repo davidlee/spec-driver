@@ -6,13 +6,14 @@ from tempfile import TemporaryDirectory
 
 import yaml
 
-from .deletion.executor import (
+from supekku.scripts.lib.registry_migration import RegistryV2
+
+from .executor import (
   DeletionExecutor,
   DeletionPlan,
   DeletionValidator,
   RegistryScanner,
 )
-from .registry_migration import RegistryV2
 
 
 class TestDeletionPlan(unittest.TestCase):

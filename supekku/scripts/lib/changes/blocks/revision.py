@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from supekku.scripts.lib.lifecycle import (
+from supekku.scripts.lib.requirements.lifecycle import (
   VALID_STATUSES as REQUIREMENT_VALID_STATUSES,
 )
 

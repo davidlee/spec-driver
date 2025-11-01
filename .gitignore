@@ -233,3 +233,4 @@ __pycache__
 /.spec-driver/
 /.claude/commands
 !/.spec-driver/registry
+/kanban

@@ -8,6 +8,12 @@ from pathlib import Path
 from shutil import which
 from typing import TYPE_CHECKING, ClassVar
 
+from supekku.scripts.lib.core.go_utils import (
+  get_go_module_name,
+  is_go_available,
+  normalize_go_package,
+  run_go_list,
+)
 from supekku.scripts.lib.sync.models import (
   DocVariant,
   SourceDescriptor,
@@ -38,11 +44,6 @@ class GoAdapter(LanguageAdapter):
   language: ClassVar[str] = "go"
 
   @staticmethod
-  def is_go_available() -> bool:
-    """Check if Go toolchain is available in PATH."""
-    return which("go") is not None
-
-  @staticmethod
   def is_gomarkdoc_available() -> bool:
     """Check if gomarkdoc is available in PATH."""
     return which("gomarkdoc") is not None
@@ -66,27 +67,15 @@ class GoAdapter(LanguageAdapter):
 
     """
     # Check if Go toolchain is available
-    if not self.is_go_available():
+    if not is_go_available():
       raise GoToolchainNotAvailableError(
         "Go toolchain not found in PATH. Please install Go from https://go.dev/dl/ "
         "or ensure it is in your PATH."
       )
 
-    # Import at runtime to avoid circular imports
-    from supekku.scripts.lib.sync_engine import (  # noqa: PLC0415
-      TechSpecSyncEngine,
-    )
+    module = get_go_module_name(repo_root)
 
-    # Create temporary engine to use existing discovery logic
-    temp_engine = TechSpecSyncEngine(
-      root=repo_root,
-      tech_dir=repo_root / "specify" / "tech",
-      registry_path=repo_root / "specify" / "tech" / "registry_v2.json",
-    )
-
-    module = temp_engine.go_module_name()
-
-    # Use existing target resolution logic
+    # Resolve package targets
     if requested:
       targets = []
       for item in requested:
@@ -96,16 +85,22 @@ class GoAdapter(LanguageAdapter):
           rel = item.strip("./")
           targets.append(f"{module}/{rel}")
     else:
-      result = temp_engine.run_cmd(["go", "list", "./..."])
-      targets = result.stdout.splitlines()
+      targets = run_go_list(repo_root)
 
     # Filter and normalize packages
     source_units = []
+    skip_keywords = {"mock", "mocks", "generated"}
+
     for module_pkg in targets:
-      if temp_engine.should_skip(module_pkg):
+      # Skip vendor, test packages, and packages with skip keywords
+      if "/vendor/" in module_pkg or module_pkg.endswith("_test"):
         continue
 
-      rel_pkg = temp_engine.normalize_package(module_pkg, module)
+      parts = module_pkg.split("/")
+      if any(keyword in part.lower() for part in parts for keyword in skip_keywords):
+        continue
+
+      rel_pkg = normalize_go_package(module_pkg, module)
       pkg_path = repo_root / rel_pkg
 
       # Only include if package directory exists
@@ -203,7 +198,7 @@ class GoAdapter(LanguageAdapter):
     self._validate_unit_language(unit)
 
     # Check if Go toolchain is available
-    if not self.is_go_available():
+    if not is_go_available():
       raise GoToolchainNotAvailableError(
         "Go toolchain not found in PATH. Please install Go from https://go.dev/dl/ "
         "or ensure it is in your PATH."
@@ -216,18 +211,8 @@ class GoAdapter(LanguageAdapter):
         "go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest"
       )
 
-    # Import at runtime to avoid circular imports
-    from supekku.scripts.lib.sync_engine import (  # noqa: PLC0415
-      TechSpecSyncEngine,
-    )
-
     # Get module name for full package path
-    temp_engine = TechSpecSyncEngine(
-      root=self.repo_root,
-      tech_dir=self.repo_root / "specify" / "tech",
-      registry_path=self.repo_root / "specify" / "tech" / "registry_v2.json",
-    )
-    module = temp_engine.go_module_name()
+    module = get_go_module_name(self.repo_root)
     module_pkg = f"{module}/{unit.identifier}"
 
     # Determine output paths within spec directory

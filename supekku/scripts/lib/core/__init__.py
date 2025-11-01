@@ -6,6 +6,7 @@ This package contains foundational utilities depended upon by all other domains:
 - frontmatter_schema: YAML frontmatter validation
 - cli_utils: CLI helper functions
 - repo: Repository root discovery
+- go_utils: Go toolchain utilities
 """
 
 from __future__ import annotations

@@ -19,15 +19,16 @@ from supekku.scripts.lib.changes.blocks.revision import (
 )
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
-from supekku.scripts.lib.lifecycle import (
-  STATUS_PENDING,
-  VALID_STATUSES,
-  RequirementStatus,
-)
 from supekku.scripts.lib.relations.manager import list_relations
 from supekku.scripts.lib.specs.blocks import (
   RelationshipsBlockValidator,
   extract_relationships,
+)
+
+from .lifecycle import (
+  STATUS_PENDING,
+  VALID_STATUSES,
+  RequirementStatus,
 )
 
 if TYPE_CHECKING:

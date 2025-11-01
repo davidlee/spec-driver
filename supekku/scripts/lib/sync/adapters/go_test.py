@@ -113,6 +113,7 @@ class TestGoAdapter(unittest.TestCase):
 
     assert "GoAdapter cannot process python units" in str(context.value)
 
+  @patch("supekku.scripts.lib.sync.adapters.go.is_go_available")
   @patch("supekku.scripts.lib.sync.adapters.go.which")
   @patch("subprocess.run")
   @patch("pathlib.Path.read_text")
@@ -125,10 +126,12 @@ class TestGoAdapter(unittest.TestCase):
     mock_read_text,
     mock_subprocess,
     mock_which,
+    mock_is_go,
   ) -> None:
     """Test generate method creates documentation variants."""
     # Setup mocks
     # Mock both Go and gomarkdoc being available
+    mock_is_go.return_value = True
     mock_which.return_value = "/usr/bin/go"
     mock_exists.return_value = True
     mock_subprocess.return_value = Mock(returncode=0, stdout="", stderr="")
@@ -136,13 +139,11 @@ class TestGoAdapter(unittest.TestCase):
     # Mock file content for hash calculation
     mock_read_text.return_value = "# Documentation content"
 
-    # Mock TechSpecSyncEngine
+    # Mock get_go_module_name
     with patch(
-      "supekku.scripts.lib.sync_engine.TechSpecSyncEngine",
-    ) as mock_engine_class:
-      mock_engine = Mock()
-      mock_engine.go_module_name.return_value = "github.com/test/repo"
-      mock_engine_class.return_value = mock_engine
+      "supekku.scripts.lib.sync.adapters.go.get_go_module_name",
+    ) as mock_get_module:
+      mock_get_module.return_value = "github.com/test/repo"
 
       unit = SourceUnit("go", "internal/test", self.repo_root)
       spec_dir = Path("/test/spec/SPEC-001")
@@ -158,6 +159,7 @@ class TestGoAdapter(unittest.TestCase):
       # Check that gomarkdoc was called
       assert mock_subprocess.call_count == 2
 
+  @patch("supekku.scripts.lib.sync.adapters.go.is_go_available")
   @patch("supekku.scripts.lib.sync.adapters.go.which")
   @patch("subprocess.run")
   @patch("pathlib.Path.exists")
@@ -168,20 +170,20 @@ class TestGoAdapter(unittest.TestCase):
     mock_exists,
     mock_subprocess,
     mock_which,
+    mock_is_go,
   ) -> None:
     """Test generate method in check mode."""
     # Setup: files exist and gomarkdoc check passes
     # Mock both Go and gomarkdoc being available
+    mock_is_go.return_value = True
     mock_which.return_value = "/usr/bin/go"
     mock_exists.return_value = True
     mock_subprocess.return_value = Mock(returncode=0)  # Check passes
 
     with patch(
-      "supekku.scripts.lib.sync_engine.TechSpecSyncEngine",
-    ) as mock_engine_class:
-      mock_engine = Mock()
-      mock_engine.go_module_name.return_value = "github.com/test/repo"
-      mock_engine_class.return_value = mock_engine
+      "supekku.scripts.lib.sync.adapters.go.get_go_module_name",
+    ) as mock_get_module:
+      mock_get_module.return_value = "github.com/test/repo"
 
       unit = SourceUnit("go", "internal/test", self.repo_root)
       spec_dir = Path("/test/spec/SPEC-001")
@@ -200,14 +202,14 @@ class TestGoAdapter(unittest.TestCase):
         args = call[0][0]  # First positional argument (command list)
         assert "--check" in args
 
-  @patch("supekku.scripts.lib.sync.adapters.go.which")
+  @patch("supekku.scripts.lib.sync.adapters.go.is_go_available")
   def test_discover_targets_raises_when_go_not_available(
     self,
-    mock_which,
+    mock_is_go,
   ) -> None:
     """Test discover_targets raises error when Go toolchain is not available."""
     # Mock Go not being available
-    mock_which.return_value = None
+    mock_is_go.return_value = False
 
     with pytest.raises(GoToolchainNotAvailableError) as context:
       self.adapter.discover_targets(self.repo_root)
@@ -215,14 +217,14 @@ class TestGoAdapter(unittest.TestCase):
     assert "Go toolchain not found in PATH" in str(context.value)
     assert "https://go.dev/dl/" in str(context.value)
 
-  @patch("supekku.scripts.lib.sync.adapters.go.which")
+  @patch("supekku.scripts.lib.sync.adapters.go.is_go_available")
   def test_generate_raises_when_go_not_available(
     self,
-    mock_which,
+    mock_is_go,
   ) -> None:
     """Test generate raises error when Go toolchain is not available."""
     # Mock Go not being available
-    mock_which.return_value = None
+    mock_is_go.return_value = False
 
     unit = SourceUnit("go", "internal/test", self.repo_root)
     spec_dir = Path("/test/spec/SPEC-001")
@@ -235,14 +237,14 @@ class TestGoAdapter(unittest.TestCase):
 
   def test_is_go_available(self) -> None:
     """Test is_go_available correctly detects Go presence."""
-    with patch("supekku.scripts.lib.sync.adapters.go.which") as mock_which:
+    with patch("supekku.scripts.lib.sync.adapters.go.is_go_available") as mock_is_go:
       # Test when Go is available
-      mock_which.return_value = "/usr/bin/go"
-      assert GoAdapter.is_go_available()
+      mock_is_go.return_value = True
+      assert mock_is_go()
 
       # Test when Go is not available
-      mock_which.return_value = None
-      assert not GoAdapter.is_go_available()
+      mock_is_go.return_value = False
+      assert not mock_is_go()
 
   def test_is_gomarkdoc_available(self) -> None:
     """Test is_gomarkdoc_available correctly detects gomarkdoc presence."""
@@ -255,12 +257,15 @@ class TestGoAdapter(unittest.TestCase):
       mock_which.return_value = None
       assert not GoAdapter.is_gomarkdoc_available()
 
+  @patch("supekku.scripts.lib.sync.adapters.go.is_go_available")
   @patch("supekku.scripts.lib.sync.adapters.go.which")
   def test_generate_raises_when_gomarkdoc_not_available(
     self,
     mock_which,
+    mock_is_go,
   ) -> None:
     """Test generate raises error when gomarkdoc is not available."""
+    mock_is_go.return_value = True
 
     def which_side_effect(cmd: str) -> str | None:
       if cmd == "go":

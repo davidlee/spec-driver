@@ -60,7 +60,10 @@ def list_schemas() -> None:
 
 @app.command("show")
 def show_schema(
-  block_type: Annotated[str, typer.Argument(help="Block type to show")],
+  block_type: Annotated[
+    str | None,
+    typer.Argument(help="Block type to show (omit to list all)"),
+  ] = None,
   format_type: Annotated[
     str,
     typer.Option(
@@ -76,6 +79,11 @@ def show_schema(
     block_type: Block type identifier (e.g., 'delta.relationships')
     format_type: Output format (markdown, json, yaml-example)
   """
+  # If no block_type provided, show the list
+  if not block_type:
+    list_schemas()
+    return
+
   schema = get_block_schema(block_type)
   if not schema:
     console.print(f"[red]Unknown block type: {block_type}[/red]")

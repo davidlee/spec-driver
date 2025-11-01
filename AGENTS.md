@@ -1,11 +1,11 @@
 # SpecDriver Architecture Guide
 
+@supekku/INIT.md
+
 Quick reference for agents maintaining architectural integrity.
 
 **Project**: Python spec-driven development framework
 **Docs**: http://github.com/davidlee/spec-driver/
-
----
 
 ## Core Principles
 
@@ -71,8 +71,6 @@ class PhaseFormatter:
     return ...
 ```
 
----
-
 ## Package Structure
 
 ```
@@ -101,8 +99,6 @@ CLI dependency direction: CLI → Formatters → Domain → Core
 - Display formatting? → `formatters/`
 - Working with requirements? → `requirements/`
 - Shared utility? → `core/`
-
----
 
 ## Common Patterns
 
@@ -158,7 +154,13 @@ def list_items(filters):
     print(output)
 ```
 
----
+## Consistency & Reuse
+
+Always seek to promote reuse and improvement. Never implement functionality which could exist without first checking if it does.
+
+Pay attention to naming and locating code to promote discovery and improve cohesion.
+
+This is *MUCH MORE IMPORTANT* than quickly finishing your assigned task.
 
 ## Quality Standards
 
@@ -190,8 +192,6 @@ You CANNOT bypass lint rules without:
 
 Under NO CIRCUMSTANCES modify `pyproject.toml` to relax lint rules.
 
----
-
 ## When Breaking Rules
 
 Sometimes you need to deviate. When you do:
@@ -208,20 +208,28 @@ Sometimes you need to deviate. When you do:
 
 **Invalid reasons**:
 - "It's easier this way"
-- "I prefer this pattern"
-- "This is how I usually do it"
-
----
+- "I'm short on time"
+- "I haven't evaluated better ideas"
 
 ## Quick Checks
+
+Before beginning implementation:
+
+- [ ] No code without an approved written plan
+- [ ] You will write your plan to a file before executing it
+- [ ] Research as necessary to ensure it is informed by existing code
+
+When coding:
+
+- [ ] lint and test as you go
+- [ ] CLI files thin (<150 lines), delegate to domain
+- [ ] Pure functions used where possible
+- [ ] No premature abstraction - specific before generic
+- [ ] Look for opportunities to consolidate and simplify
 
 Before submitting work:
 
 - [ ] Tests written and passing (`just test`)
 - [ ] Both linters passing (`just lint` + `just pylint`)
+- [ ] All of the above (fail-fast): `just` 
 - [ ] Display logic in `formatters/`, not in domain packages
-- [ ] CLI files thin (<150 lines), delegate to domain
-- [ ] Pure functions used where possible
-- [ ] No premature abstraction - specific before generic
-
----

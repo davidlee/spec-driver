@@ -8,7 +8,8 @@
       "Bash(uv run ruff check:*)",
       "Bash(uv run pytest:*)",
       "Bash(uv run pylint:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(uv run:*)"
     ],
     "deny": [],
     "ask": []

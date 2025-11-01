@@ -71,13 +71,13 @@ def show_schema(
       "-f",
       help="Output format (markdown, json, json-schema, yaml-example)",
     ),
-  ] = "markdown",
+  ] = "json-schema",
 ) -> None:
   """Show schema details for a specific block type.
 
   Args:
     block_type: Block type identifier (e.g., 'delta.relationships')
-    format_type: Output format (markdown, json, json-schema, yaml-example)
+    format_type: Output format (default: json-schema)
   """
   # If no block_type provided, show the list
   if not block_type:

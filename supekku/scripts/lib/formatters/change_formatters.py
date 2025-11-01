@@ -4,13 +4,27 @@ Pure formatting functions with no business logic.
 Formatters take ChangeArtifact objects and return formatted strings for display.
 """
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
+from supekku.scripts.lib.formatters.table_utils import (
+  add_row_with_truncation,
+  calculate_column_widths,
+  create_table,
+  format_as_json,
+  format_as_tsv,
+  get_terminal_width,
+  render_table,
+)
+
 if TYPE_CHECKING:
+  from collections.abc import Sequence
+
   from supekku.scripts.lib.changes.artifacts import ChangeArtifact
 
 
-def format_change_list_item(artifact: "ChangeArtifact") -> str:
+def format_change_list_item(artifact: ChangeArtifact) -> str:
   """Format change artifact as basic list item: id, kind, status, name.
 
   Args:
@@ -46,7 +60,7 @@ def format_phase_summary(phase: dict[str, Any], max_objective_len: int = 60) -> 
   return f"{phase_id}: {objective}"
 
 
-def format_change_with_context(artifact: "ChangeArtifact") -> str:
+def format_change_with_context(artifact: ChangeArtifact) -> str:
   """Format change artifact with related specs, requirements, and phases.
 
   Provides detailed context including:
@@ -84,3 +98,75 @@ def format_change_with_context(artifact: "ChangeArtifact") -> str:
         lines.append(f"    {summary}")
 
   return "\n".join(lines)
+
+
+def format_change_list_table(
+  changes: Sequence[ChangeArtifact],
+  format_type: str = "table",
+  no_truncate: bool = False,
+) -> str:
+  """Format change artifacts as table, JSON, or TSV.
+
+  Args:
+    changes: List of ChangeArtifact objects to format
+    format_type: Output format (table|json|tsv)
+    no_truncate: If True, don't truncate long fields
+
+  Returns:
+    Formatted string in requested format
+  """
+  if format_type == "json":
+    return format_change_list_json(changes)
+
+  if format_type == "tsv":
+    rows = []
+    for change in changes:
+      rows.append([change.id, change.kind, change.status, change.name])
+    return format_as_tsv(rows)
+
+  # table format
+  table = create_table(
+    columns=["ID", "Kind", "Status", "Name"],
+    title="Change Artifacts",
+  )
+
+  terminal_width = get_terminal_width()
+  max_widths = calculate_column_widths(terminal_width, num_columns=4)
+
+  for change in changes:
+    add_row_with_truncation(
+      table,
+      [change.id, change.kind, change.status, change.name],
+      max_widths=max_widths if not no_truncate else None,
+    )
+
+  return render_table(table)
+
+
+def format_change_list_json(changes: Sequence[ChangeArtifact]) -> str:
+  """Format change artifacts as JSON array.
+
+  Args:
+    changes: List of ChangeArtifact objects
+
+  Returns:
+    JSON string with structure: {"items": [...]}
+  """
+  items = []
+  for change in changes:
+    item = {
+      "id": change.id,
+      "kind": change.kind,
+      "status": change.status,
+      "name": change.name,
+      "slug": change.slug,
+    }
+    # Add optional fields
+    if change.applies_to:
+      item["applies_to"] = change.applies_to
+    if change.relations:
+      item["relations"] = change.relations
+
+    items.append(item)
+
+  return format_as_json(items)

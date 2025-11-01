@@ -65,10 +65,21 @@ uv run spec-driver create spec <short-name> --kind <product|tech> --json
 Before filling in YAML blocks, fetch schema documentation for guidance:
 
 ```bash
-uvx spec-driver schema show 
+uv run spec-driver schema show spec.relationships
+uv run spec-driver schema show spec.capabilities
+uv run spec-driver schema show verification.coverage
 ```
 
 Use these to understand required and optional fields in the structured blocks.
+
+**Template includes examples**: The generated spec file contains helpful examples for:
+- Functional requirements (FR) format: `- **FR-001**: Requirement statement`
+- Non-functional requirements (NF) format: `- **NF-001**: Performance/quality constraint`
+- Product vs tech spec differences (user-facing vs technical focus)
+- Verification linkage examples
+- [NEEDS CLARIFICATION] markers for uncertain requirements (max 3)
+
+Follow these examples closely to ensure requirements are parseable by the registry.
 
 ### 4. Fill the Specification
 

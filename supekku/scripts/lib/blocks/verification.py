@@ -283,3 +283,21 @@ __all__ = [
   "load_coverage_blocks",
   "render_verification_coverage_block",
 ]
+
+
+# Register schema
+from .schema_registry import BlockSchema, register_block_schema  # noqa: E402
+
+register_block_schema(
+  "verification.coverage",
+  BlockSchema(
+    name="verification.coverage",
+    marker=COVERAGE_MARKER,
+    version=COVERAGE_VERSION,
+    renderer=render_verification_coverage_block,
+    description=(
+      "Tracks verification artifacts (tests, analyses, histories) "
+      "for requirements"
+    ),
+  ),
+)

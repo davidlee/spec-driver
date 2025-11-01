@@ -177,3 +177,21 @@ __all__ = [
   "load_delta_relationships",
   "render_delta_relationships_block",
 ]
+
+
+# Register schema
+from .schema_registry import BlockSchema, register_block_schema  # noqa: E402
+
+register_block_schema(
+  "delta.relationships",
+  BlockSchema(
+    name="delta.relationships",
+    marker=RELATIONSHIPS_MARKER,
+    version=RELATIONSHIPS_VERSION,
+    renderer=render_delta_relationships_block,
+    description=(
+      "Tracks delta relationships to specs, requirements, "
+      "phases, and revisions"
+    ),
+  ),
+)

@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import inspect
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 
 @dataclass
@@ -33,8 +34,8 @@ class BlockSchema:
         continue
       params[name] = {
         "required": param.default == inspect.Parameter.empty
-        and param.kind != inspect.Parameter.VAR_KEYWORD
-        and param.kind != inspect.Parameter.VAR_POSITIONAL,
+        and param.kind
+        not in {inspect.Parameter.VAR_KEYWORD, inspect.Parameter.VAR_POSITIONAL},
         "type": (
           param.annotation
           if param.annotation != inspect.Parameter.empty

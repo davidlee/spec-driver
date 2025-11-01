@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import typer
 
-from supekku.cli import complete, create, show, sync, workspace
+from supekku.cli import complete, create, schema, show, sync, workspace
 from supekku.cli import list as list_module
 from supekku.cli.common import VersionOption
 
@@ -60,6 +60,12 @@ app.add_typer(
   complete.app,
   name="complete",
   help="Complete artifacts (mark deltas as completed)",
+)
+
+app.add_typer(
+  schema.app,
+  name="schema",
+  help="Show YAML block schemas",
 )
 
 

@@ -253,3 +253,29 @@ __all__ = [
   "render_phase_overview_block",
   "render_plan_overview_block",
 ]
+
+
+# Register schemas
+from .schema_registry import BlockSchema, register_block_schema  # noqa: E402
+
+register_block_schema(
+  "plan.overview",
+  BlockSchema(
+    name="plan.overview",
+    marker=PLAN_MARKER,
+    version=1,
+    renderer=render_plan_overview_block,
+    description="Defines implementation plan with phases, specs, and requirements",
+  ),
+)
+
+register_block_schema(
+  "phase.overview",
+  BlockSchema(
+    name="phase.overview",
+    marker=PHASE_MARKER,
+    version=1,
+    renderer=render_phase_overview_block,
+    description="Defines a phase within a plan with objectives, criteria, and tasks",
+  ),
+)

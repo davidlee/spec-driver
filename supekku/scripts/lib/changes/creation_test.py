@@ -36,10 +36,9 @@ class CreateChangeTest(unittest.TestCase):
     templates_dir.mkdir(parents=True, exist_ok=True)
 
     # Delta template (Jinja2, no frontmatter)
+    # Uses {{ delta_relationships_block }} variable for YAML block
     (templates_dir / "delta.md").write_text(
-      "# {{ delta_id }} – {{ name }}\n\n"
-      "```yaml supekku:delta.relationships@v1\n"
-      "delta: {{ delta_id }}\n```\n",
+      "# {{ delta_id }} – {{ name }}\n\n{{ delta_relationships_block }}\n",
       encoding="utf-8",
     )
 
@@ -50,16 +49,16 @@ class CreateChangeTest(unittest.TestCase):
     )
 
     # Plan template (Jinja2, no frontmatter)
+    # Uses {{ plan_overview_block }} variable for YAML block
     (templates_dir / "plan.md").write_text(
-      "```yaml supekku:plan.overview@v1\n"
-      "plan: {{ plan_id }}\ndelta: {{ delta_id }}\n```\n",
+      "{{ plan_overview_block }}\n",
       encoding="utf-8",
     )
 
     # Phase template (Jinja2, no frontmatter)
+    # Uses {{ phase_overview_block }} variable for YAML block
     (templates_dir / "phase.md").write_text(
-      "```yaml supekku:phase.overview@v1\n"
-      "phase: {{ phase_id }}\nplan: {{ plan_id }}\ndelta: {{ delta_id }}\n```\n",
+      "{{ phase_overview_block }}\n",
       encoding="utf-8",
     )
 

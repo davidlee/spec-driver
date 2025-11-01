@@ -1,21 +1,6 @@
 # {{ delta_id }} – {{ name }}
 
-```yaml supekku:delta.relationships@v1
-schema: supekku.delta.relationships
-version: 1
-delta: {{ delta_id }}
-revision_links:
-  introduces: []
-  supersedes: []
-specs:
-  primary: []
-  collaborators: []
-requirements:
-  implements: []
-  updates: []
-  verifies: []
-phases: []
-```
+{{ delta_relationships_block }}
 
 ## 1. Summary & Context
 - **Product Spec(s)**: PROD-XXX – <link and summary>

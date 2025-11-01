@@ -1,19 +1,4 @@
-```yaml supekku:phase.overview@v1
-schema: supekku.phase.overview
-version: 1
-phase: {{ phase_id }}
-plan: {{ plan_id }}
-delta: {{ delta_id }}
-objective: >-
-  Short statement of what this phase achieves.
-entrance_criteria: []
-exit_criteria: []
-verification:
-  tests: []
-  evidence: []
-tasks: []
-risks: []
-```
+{{ phase_overview_block }}
 
 # Phase N - <Name>
 

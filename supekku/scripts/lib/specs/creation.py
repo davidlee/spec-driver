@@ -11,6 +11,11 @@ from typing import TYPE_CHECKING
 
 from jinja2 import Template
 
+from supekku.scripts.lib.blocks.relationships import (
+  render_spec_capabilities_block,
+  render_spec_relationships_block,
+)
+from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, get_templates_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 
@@ -95,9 +100,48 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
   spec_dir.mkdir(parents=True, exist_ok=True)
 
   spec_path = spec_dir / f"{next_id}.md"
+
+  # Render YAML blocks
+  spec_relationships_block = render_spec_relationships_block(
+    next_id,
+    primary_requirements=["<FR/NF codes owned by this spec>"],
+  )
+  spec_capabilities_block = render_spec_capabilities_block(
+    next_id,
+    capabilities=[{
+      "id": "<kebab-case-id>",
+      "name": "<Human-readable capability>",
+      "responsibilities": [],
+      "requirements": [],
+      "summary": "<Short paragraph describing what this capability ensures.>",
+      "success_criteria": ["<How you know this capability is upheld.>"],
+    }],
+  )
+  spec_verification_block = render_verification_coverage_block(
+    next_id,
+    entries=[{
+      "artefact": "VT-XXX",
+      "kind": "VT",
+      "requirement": f"{next_id}.FR-001",
+      "status": "planned",
+      "notes": (
+        "Optional context or evidence pointer "
+        "(link to CI job, audit finding, etc.)."
+      ),
+    }],
+  )
+
+  # Render template
   template_body = extract_template_body(config.template_path)
   template = Template(template_body)
-  spec_body = template.render(spec_id=next_id, name=spec_name, kind=config.kind)
+  spec_body = template.render(
+    spec_id=next_id,
+    name=spec_name,
+    kind=config.kind,
+    spec_relationships_block=spec_relationships_block,
+    spec_capabilities_block=spec_capabilities_block,
+    spec_verification_block=spec_verification_block,
+  )
   frontmatter = build_frontmatter(
     spec_id=next_id,
     slug=slug,

@@ -1,3 +1,5 @@
+{{ revision_change_block }}
+
 ## 1. Context
 - **Why**: <reason for the change>
 - **Source Specs**: SPEC-AAA, ...

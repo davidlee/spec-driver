@@ -32,18 +32,7 @@ next_actions:
     id: ISSUE-052
 ---
 
-```yaml supekku:verification.coverage@v1
-schema: supekku.verification.coverage
-version: 1
-subject: AUD-XXX
-entries:
-  - artefact: VT-210
-    kind: VT|VA|VH
-    requirement: SPEC-101.FR-001
-    status: verified|failed|blocked
-    notes: >-
-      Capture audit evidence or link to failing scenario.
-```
+{{ audit_verification_block }}
 
 ## Observations
 - …

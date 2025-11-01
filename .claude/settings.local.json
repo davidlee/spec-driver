@@ -7,7 +7,8 @@
       "Bash(for file in supekku/scripts/create_revision.py supekku/scripts/create_requirement.py supekku/scripts/create_delta.py supekku/cli/create.py)",
       "Bash(uv run ruff check:*)",
       "Bash(uv run pytest:*)",
-      "Bash(uv run pylint:*)"
+      "Bash(uv run pylint:*)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []

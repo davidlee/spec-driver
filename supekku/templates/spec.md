@@ -1,43 +1,10 @@
 # {{ spec_id }} – {{ name }}
 
-```yaml supekku:spec.relationships@v1
-schema: supekku.spec.relationships
-version: 1
-spec: {{ spec_id }}
-requirements:
-  primary:
-    - <FR/NF codes owned by this spec>
-  collaborators: []
-interactions: []
-```
+{{ spec_relationships_block }}
 
-```yaml supekku:spec.capabilities@v1
-schema: supekku.spec.capabilities
-version: 1
-spec: {{ spec_id }}
-capabilities:
-  - id: <kebab-case-id>
-    name: <Human-readable capability>
-    responsibilities: []
-    requirements: []
-    summary: >-
-      <Short paragraph describing what this capability ensures.>
-    success_criteria:
-      - <How you know this capability is upheld.>
-```
+{{ spec_capabilities_block }}
 
-```yaml supekku:verification.coverage@v1
-schema: supekku.verification.coverage
-version: 1
-subject: {{ spec_id }}
-entries:
-  - artefact: VT-XXX
-    kind: VT|VA|VH
-    requirement: {{ spec_id }}.FR-001
-    status: planned|in-progress|verified
-    notes: >-
-      Optional context or evidence pointer (link to CI job, audit finding, etc.).
-```
+{{ spec_verification_block }}
 
 ## 1. Intent & Summary
 {% if kind == 'prod' -%}

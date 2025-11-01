@@ -10,6 +10,12 @@ from typing import TYPE_CHECKING
 
 from jinja2 import Template
 
+from supekku.scripts.lib.blocks.delta import render_delta_relationships_block
+from supekku.scripts.lib.blocks.plan import (
+  render_phase_overview_block,
+  render_plan_overview_block,
+)
+from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
 from supekku.scripts.lib.core.paths import get_templates_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.specs.creation import (
@@ -55,126 +61,8 @@ def _ensure_directory(path: Path) -> None:
   path.mkdir(parents=True, exist_ok=True)
 
 
-def _yaml_list(key: str, values: Iterable[str], level: int = 0) -> str:
-  indent = "  " * level
-  items = [str(v) for v in values if v]
-  if not items:
-    return f"{indent}{key}: []"
-  child_indent = "  " * (level + 1)
-  lines = [f"{indent}{key}:"]
-  lines.extend(f"{child_indent}- {item}" for item in items)
-  return "\n".join(lines)
-
-
-def _render_plan_overview_block(
-  plan_id: str,
-  delta_id: str,
-  specs: Iterable[str],
-  requirements: Iterable[str],
-  first_phase_id: str,
-) -> str:
-  specs_block = _yaml_list("primary", sorted({s for s in specs if s}), level=1)
-  requirements_block = _yaml_list(
-    "targets",
-    sorted({r for r in requirements if r}),
-    level=1,
-  )
-  lines = [
-    "```yaml supekku:plan.overview@v1",
-    "schema: supekku.plan.overview",
-    "version: 1",
-    f"plan: {plan_id}",
-    f"delta: {delta_id}",
-    "revision_links:",
-    "  aligns_with: []",
-    "specs:",
-    specs_block,
-    _yaml_list("collaborators", [], level=1),
-    "requirements:",
-    requirements_block,
-    _yaml_list("dependencies", [], level=1),
-    "phases:",
-    f"  - id: {first_phase_id}",
-    "    name: Phase 01 - Initial delivery",
-    "    objective: >-",
-    "      Deliver the foundational work for this delta.",
-    "    entrance_criteria: []",
-    "    exit_criteria: []",
-    "```",
-  ]
-  return "\n".join(lines)
-
-
-def _render_phase_overview_block(
-  phase_id: str,
-  plan_id: str,
-  delta_id: str,
-) -> str:
-  lines = [
-    "```yaml supekku:phase.overview@v1",
-    "schema: supekku.phase.overview",
-    "version: 1",
-    f"phase: {phase_id}",
-    f"plan: {plan_id}",
-    f"delta: {delta_id}",
-    "objective: >-",
-    "  Describe the outcome for this phase.",
-    "entrance_criteria: []",
-    "exit_criteria: []",
-    "verification:",
-    "  tests: []",
-    "  evidence: []",
-    "tasks: []",
-    "risks: []",
-    "```",
-  ]
-  return "\n".join(lines)
-
-
-def _render_delta_relationship_block(
-  delta_id: str,
-  specs: Iterable[str],
-  requirements: Iterable[str],
-) -> str:
-  spec_lines = _yaml_list("primary", sorted({s for s in specs if s}), level=1)
-  requirement_lines = _yaml_list(
-    "implements",
-    sorted({r for r in requirements if r}),
-    level=1,
-  )
-  lines = [
-    "```yaml supekku:delta.relationships@v1",
-    "schema: supekku.delta.relationships",
-    "version: 1",
-    f"delta: {delta_id}",
-    "revision_links:",
-    "  introduces: []",
-    "  supersedes: []",
-    "specs:",
-    spec_lines,
-    _yaml_list("collaborators", [], level=1),
-    "requirements:",
-    requirement_lines,
-    _yaml_list("updates", [], level=1),
-    _yaml_list("verifies", [], level=1),
-    "phases: []",
-    "```",
-  ]
-  return "\n".join(lines)
-
-
-_PLAN_OVERVIEW_PATTERN = re.compile(
-  r"```yaml supekku:plan.overview@v1.*?```",
-  re.DOTALL,
-)
-_PHASE_OVERVIEW_PATTERN = re.compile(
-  r"```yaml supekku:phase.overview@v1.*?```",
-  re.DOTALL,
-)
-_DELTA_RELATIONSHIPS_PATTERN = re.compile(
-  r"```yaml supekku:delta.relationships@v1.*?```",
-  re.DOTALL,
-)
+# Old rendering functions and regex patterns removed.
+# Block rendering now uses canonical functions from blocks package.
 
 
 def create_revision(
@@ -292,22 +180,23 @@ def create_delta(
     },
   }
 
+  # Render YAML blocks
+  relationships_block = render_delta_relationships_block(
+    delta_id,
+    primary_specs=list(specs or []),
+    implements_requirements=list(requirements or []),
+  )
+
   # Load template and render with Jinja2
   template_path = _get_template_path("delta.md", repo)
   template_body = extract_template_body(template_path)
   template = Template(template_body)
-  body = template.render(delta_id=delta_id, name=name, created=today, updated=today)
-
-  # Replace the delta.relationships block with populated data
-  relationships_block = _render_delta_relationship_block(
-    delta_id,
-    specs or [],
-    requirements or [],
-  )
-  body = _DELTA_RELATIONSHIPS_PATTERN.sub(
-    relationships_block,
-    body,
-    count=1,
+  body = template.render(
+    delta_id=delta_id,
+    name=name,
+    created=today,
+    updated=today,
+    delta_relationships_block=relationships_block,
   )
 
   delta_path = delta_dir / f"{delta_id}.md"
@@ -316,20 +205,41 @@ def create_delta(
   extras: list[Path] = []
   plan_id = delta_id.replace("DE", "IP")
   if not allow_missing_plan:
+    # Render YAML blocks
+    first_phase_id = f"{plan_id}.PHASE-01"
+    plan_overview_block = render_plan_overview_block(
+      plan_id,
+      delta_id,
+      primary_specs=list(specs or []),
+      target_requirements=list(requirements or []),
+      first_phase_id=first_phase_id,
+    )
+
+    # Render verification block for plan
+    first_req = (
+      list(requirements or [])[0] if requirements else "SPEC-YYY.FR-001"
+    )
+    plan_verification_block = render_verification_coverage_block(
+      plan_id,
+      entries=[{
+        "artefact": "VT-XXX",
+        "kind": "VT",
+        "requirement": first_req,
+        "phase": first_phase_id,
+        "status": "planned",
+        "notes": "Link to evidence (test run, audit, validation artefact).",
+      }],
+    )
+
+    # Load and render template
     plan_template_path = _get_template_path("plan.md", repo)
     plan_template_body = extract_template_body(plan_template_path)
     plan_template = Template(plan_template_body)
-    plan_body = plan_template.render(plan_id=plan_id, delta_id=delta_id)
-    plan_body = _PLAN_OVERVIEW_PATTERN.sub(
-      _render_plan_overview_block(
-        plan_id,
-        delta_id,
-        specs or [],
-        requirements or [],
-        f"{plan_id}.PHASE-01",
-      ),
-      plan_body,
-      count=1,
+    plan_body = plan_template.render(
+      plan_id=plan_id,
+      delta_id=delta_id,
+      plan_overview_block=plan_overview_block,
+      plan_verification_block=plan_verification_block,
     )
     plan_frontmatter = {
       "id": plan_id,
@@ -347,19 +257,24 @@ def create_delta(
 
     phases_dir = delta_dir / "phases"
     _ensure_directory(phases_dir)
+
+    # Render YAML blocks for phase
+    phase_id = f"{plan_id}.PHASE-01"
+    phase_overview_block = render_phase_overview_block(
+      phase_id,
+      plan_id,
+      delta_id,
+    )
+
+    # Load and render phase template
     phase_template_path = _get_template_path("phase.md", repo)
     phase_template_body = extract_template_body(phase_template_path)
     phase_template = Template(phase_template_body)
-    phase_id = f"{plan_id}.PHASE-01"
     phase_body = phase_template.render(
       phase_id=phase_id,
       plan_id=plan_id,
       delta_id=delta_id,
-    )
-    phase_body = _PHASE_OVERVIEW_PATTERN.sub(
-      _render_phase_overview_block(phase_id, plan_id, delta_id),
-      phase_body,
-      count=1,
+      phase_overview_block=phase_overview_block,
     )
     phase_path = phases_dir / "phase-01.md"
     dump_markdown_file(

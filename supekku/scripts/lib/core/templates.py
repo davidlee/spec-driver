@@ -2,9 +2,16 @@
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader, Template, TemplateNotFound
+from jinja2 import (
+  ChoiceLoader,
+  Environment,
+  FileSystemLoader,
+  Template,
+  TemplateNotFound,
+)
 
 from .paths import get_templates_dir
 
@@ -13,8 +20,25 @@ class TemplateNotFoundError(Exception):
   """Raised when a template file cannot be found."""
 
 
+def get_package_templates_dir() -> Path:
+  """Get the package templates directory (built-in templates).
+
+  Returns:
+    Path to package templates directory (supekku/templates/).
+  """
+  # This file is in supekku/scripts/lib/core/templates.py
+  # Package templates are in supekku/templates/
+  return Path(__file__).parent.parent.parent.parent / "templates"
+
+
 def get_template_environment(repo_root: Path | None = None) -> Environment:
   """Create and configure a Jinja2 environment for templates.
+
+  Uses a fallback strategy:
+  1. First tries user templates from .spec-driver/templates/
+  2. Falls back to package templates from supekku/templates/
+
+  A warning is issued when user templates directory doesn't exist.
 
   Args:
     repo_root: Repository root path. If None, will auto-discover.
@@ -22,9 +46,28 @@ def get_template_environment(repo_root: Path | None = None) -> Environment:
   Returns:
     Configured Jinja2 Environment.
   """
-  templates_dir = get_templates_dir(repo_root)
+  user_templates_dir = get_templates_dir(repo_root)
+  package_templates_dir = get_package_templates_dir()
+
+  # Build list of loaders, prioritizing user templates
+  loaders = []
+
+  # Add user templates if directory exists
+  if user_templates_dir.exists():
+    loaders.append(FileSystemLoader(user_templates_dir))
+  else:
+    warnings.warn(
+      f"User templates directory not found: {user_templates_dir}. "
+      f"Using package templates from {package_templates_dir}",
+      UserWarning,
+      stacklevel=2,
+    )
+
+  # Always add package templates as fallback
+  loaders.append(FileSystemLoader(package_templates_dir))
+
   return Environment(
-    loader=FileSystemLoader(templates_dir),
+    loader=ChoiceLoader(loaders),
     autoescape=False,  # Markdown templates don't need autoescaping
     keep_trailing_newline=True,
   )
@@ -110,6 +153,7 @@ def extract_template_body(template_path: Path) -> str:
 __all__ = [
   "TemplateNotFoundError",
   "extract_template_body",
+  "get_package_templates_dir",
   "get_template_environment",
   "load_template",
   "render_template",

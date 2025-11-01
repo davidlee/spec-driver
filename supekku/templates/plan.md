@@ -1,37 +1,6 @@
-```yaml supekku:plan.overview@v1
-schema: supekku.plan.overview
-version: 1
-plan: {{ plan_id }}
-delta: {{ delta_id }}
-revision_links:
-  aligns_with: []
-specs:
-  primary: []
-  collaborators: []
-requirements:
-  targets: []
-phases:
-  - id: {{ plan_id }}.PHASE-01
-    name: Phase 01 - <Working Title>
-    objective: >-
-      Short description of the phase outcome.
-    entrance_criteria: []
-    exit_criteria: []
-```
+{{ plan_overview_block }}
 
-```yaml supekku:verification.coverage@v1
-schema: supekku.verification.coverage
-version: 1
-subject: {{ plan_id }}
-entries:
-  - artefact: VT-XXX
-    kind: VT|VA|VH
-    requirement: SPEC-YYY.FR-001
-    phase: {{ plan_id }}.PHASE-01
-    status: planned|in-progress|verified
-    notes: >-
-      Link to evidence (test run, audit, validation artefact).
-```
+{{ plan_verification_block }}
 
 ## 1. Summary
 - **Delta**: {{ delta_id }} - <title>

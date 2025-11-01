@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 import yaml
@@ -1008,12 +1009,87 @@ def load_revision_blocks(path: Path) -> list[RevisionChangeBlock]:
   return extract_revision_blocks(content, source=path)
 
 
+def render_revision_change_block(
+  revision_id: str,
+  *,
+  specs: list[dict[str, Any]] | None = None,
+  requirements: list[dict[str, Any]] | None = None,
+  prepared_by: str | None = None,
+  generated_at: str | None = None,
+) -> str:
+  """Render a revision change YAML block with given values.
+
+  This is the canonical source for the block structure. Templates and
+  creation code should use this instead of hardcoding the structure.
+
+  Note: This generates a minimal but valid revision block. For complex revisions,
+  consider building the dict structure and using yaml.safe_dump directly.
+
+  Args:
+    revision_id: The revision ID (e.g., "RE-001").
+    specs: List of spec change dicts with:
+      - spec_id: str
+      - action: str ("created", "updated", "retired")
+      - summary: str (optional)
+      - requirement_flow: dict (optional)
+      - section_changes: list (optional)
+    requirements: List of requirement change dicts with:
+      - requirement_id: str
+      - kind: str ("functional", "non-functional")
+      - action: str ("introduce", "modify", "move", "retire")
+      - summary: str (optional)
+      - destination: dict (optional)
+      - origin: list (optional)
+      - lifecycle: dict (optional)
+    prepared_by: Optional preparer identifier.
+    generated_at: Optional generation timestamp.
+
+  Returns:
+    Formatted YAML code block as string.
+  """
+  # Build metadata
+  metadata: dict[str, Any] = {"revision": revision_id}
+  if prepared_by:
+    metadata["prepared_by"] = prepared_by
+  if generated_at:
+    metadata["generated_at"] = generated_at
+  elif not prepared_by:  # Only add default timestamp if neither field provided
+    metadata["generated_at"] = datetime.now().isoformat() + "Z"
+
+  # Build the block data structure
+  data: dict[str, Any] = {
+    "schema": REVISION_BLOCK_SCHEMA_ID,
+    "version": REVISION_BLOCK_VERSION,
+    "metadata": metadata,
+    "specs": specs or [],
+    "requirements": requirements or [],
+  }
+
+  # Render as YAML
+  yaml_content = yaml.safe_dump(
+    data,
+    sort_keys=False,
+    indent=2,
+    default_flow_style=False,
+  )
+
+  lines = [
+    f"```yaml {REVISION_BLOCK_MARKER}",
+    yaml_content.rstrip("\n"),
+    "```",
+  ]
+  return "\n".join(lines)
+
+
 __all__ = [
   "REVISION_BLOCK_JSON_SCHEMA",
   "REVISION_BLOCK_MARKER",
+  "REVISION_BLOCK_SCHEMA_ID",
+  "REVISION_BLOCK_VERSION",
   "RevisionBlockValidator",
   "RevisionChangeBlock",
   "ValidationMessage",
   "extract_revision_blocks",
   "load_revision_blocks",
+  "render_revision_change_block",
 ]

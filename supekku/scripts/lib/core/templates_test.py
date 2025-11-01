@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -10,6 +11,7 @@ import pytest
 from supekku.scripts.lib.core.templates import (
   TemplateNotFoundError,
   extract_template_body,
+  get_package_templates_dir,
   get_template_environment,
   load_template,
   render_template,
@@ -167,3 +169,113 @@ def test_extract_template_body_preserves_placeholders(tmp_path: Path) -> None:
 
   assert "{{ title }}" in body
   assert "{{ description }}" in body
+
+
+def test_get_package_templates_dir() -> None:
+  """Test that get_package_templates_dir returns correct path."""
+  package_dir = get_package_templates_dir()
+
+  assert package_dir.exists()
+  assert package_dir.name == "templates"
+  assert package_dir.parent.name == "supekku"
+  # Verify some expected templates exist
+  assert (package_dir / "spec.md").exists()
+  assert (package_dir / "delta.md").exists()
+
+
+@patch("supekku.scripts.lib.core.templates.get_templates_dir")
+@patch("supekku.scripts.lib.core.templates.get_package_templates_dir")
+def test_fallback_to_package_templates_when_user_dir_missing(
+  mock_get_package_dir: MagicMock,
+  mock_get_templates_dir: MagicMock,
+  tmp_path: Path,
+) -> None:
+  """Test that package templates are used when user templates dir doesn't exist."""
+  # Set up user templates dir that doesn't exist
+  user_templates_dir = tmp_path / "user_templates"
+  mock_get_templates_dir.return_value = user_templates_dir
+
+  # Set up package templates dir with a template
+  package_templates_dir = tmp_path / "package_templates"
+  package_templates_dir.mkdir()
+  (package_templates_dir / "test.md").write_text("Package: {{ var }}", encoding="utf-8")
+  mock_get_package_dir.return_value = package_templates_dir
+
+  # Should warn about missing user templates
+  with warnings.catch_warnings(record=True) as w:
+    warnings.simplefilter("always")
+    env = get_template_environment()
+
+    assert len(w) == 1
+    assert issubclass(w[0].category, UserWarning)
+    assert "User templates directory not found" in str(w[0].message)
+    assert str(user_templates_dir) in str(w[0].message)
+
+  # Should still be able to load from package templates
+  template = env.get_template("test.md")
+  assert template.render(var="value") == "Package: value"
+
+
+@patch("supekku.scripts.lib.core.templates.get_templates_dir")
+@patch("supekku.scripts.lib.core.templates.get_package_templates_dir")
+def test_user_templates_override_package_templates(
+  mock_get_package_dir: MagicMock,
+  mock_get_templates_dir: MagicMock,
+  tmp_path: Path,
+) -> None:
+  """Test that user templates take precedence over package templates."""
+  # Set up user templates dir with custom template
+  user_templates_dir = tmp_path / "user_templates"
+  user_templates_dir.mkdir()
+  (user_templates_dir / "test.md").write_text("User: {{ var }}", encoding="utf-8")
+  mock_get_templates_dir.return_value = user_templates_dir
+
+  # Set up package templates dir with same template
+  package_templates_dir = tmp_path / "package_templates"
+  package_templates_dir.mkdir()
+  (package_templates_dir / "test.md").write_text("Package: {{ var }}", encoding="utf-8")
+  mock_get_package_dir.return_value = package_templates_dir
+
+  # Should not warn when user templates exist
+  with warnings.catch_warnings(record=True) as w:
+    warnings.simplefilter("always")
+    env = get_template_environment()
+    assert len(w) == 0
+
+  # Should load from user templates (not package)
+  template = env.get_template("test.md")
+  assert template.render(var="value") == "User: value"
+
+
+@patch("supekku.scripts.lib.core.templates.get_templates_dir")
+@patch("supekku.scripts.lib.core.templates.get_package_templates_dir")
+def test_fallback_to_package_for_missing_user_template(
+  mock_get_package_dir: MagicMock,
+  mock_get_templates_dir: MagicMock,
+  tmp_path: Path,
+) -> None:
+  """Test fallback to package template when specific template missing from user dir."""
+  # Set up user templates dir with one template
+  user_templates_dir = tmp_path / "user_templates"
+  user_templates_dir.mkdir()
+  (user_templates_dir / "custom.md").write_text("Custom: {{ var }}", encoding="utf-8")
+  mock_get_templates_dir.return_value = user_templates_dir
+
+  # Set up package templates dir with different template
+  package_templates_dir = tmp_path / "package_templates"
+  package_templates_dir.mkdir()
+  (package_templates_dir / "standard.md").write_text(
+    "Standard: {{ var }}",
+    encoding="utf-8",
+  )
+  mock_get_package_dir.return_value = package_templates_dir
+
+  env = get_template_environment()
+
+  # Should load user template when available
+  custom_template = env.get_template("custom.md")
+  assert custom_template.render(var="value") == "Custom: value"
+
+  # Should fall back to package template when not in user dir
+  standard_template = env.get_template("standard.md")
+  assert standard_template.render(var="value") == "Standard: value"

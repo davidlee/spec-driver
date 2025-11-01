@@ -204,6 +204,73 @@ def load_coverage_blocks(path: Path) -> list[VerificationCoverageBlock]:
   return extract_coverage_blocks(text)
 
 
+def render_verification_coverage_block(
+  subject_id: str,
+  *,
+  entries: list[dict[str, Any]] | None = None,
+) -> str:
+  """Render a verification coverage YAML block with given values.
+
+  This is the canonical source for the block structure. Templates and
+  creation code should use this instead of hardcoding the structure.
+
+  Args:
+    subject_id: The subject ID (SPEC, PROD, IP, or AUD).
+    entries: List of verification entries. Each entry is a dict with:
+      - artefact: str (e.g., "VT-001")
+      - kind: str (VT, VA, or VH)
+      - requirement: str (e.g., "SPEC-100.FR-001")
+      - status: str (planned, in-progress, verified, failed, blocked)
+      - phase: str | None (optional, e.g., "IP-001.PHASE-01")
+      - notes: str | None (optional)
+
+  Returns:
+    Formatted YAML code block as string.
+
+  Example:
+    >>> block = render_verification_coverage_block(
+    ...   "SPEC-100",
+    ...   entries=[{
+    ...     "artefact": "VT-001",
+    ...     "kind": "VT",
+    ...     "requirement": "SPEC-100.FR-001",
+    ...     "status": "planned",
+    ...   }]
+    ... )
+  """
+  lines = [
+    f"```yaml {COVERAGE_MARKER}",
+    f"schema: {COVERAGE_SCHEMA}",
+    f"version: {COVERAGE_VERSION}",
+    f"subject: {subject_id}",
+    "entries:",
+  ]
+
+  # Add entries or empty array
+  if not entries:
+    lines[-1] = "entries: []"
+  else:
+    for entry in entries:
+      lines.append(f"  - artefact: {entry['artefact']}")
+      lines.append(f"    kind: {entry['kind']}")
+      lines.append(f"    requirement: {entry['requirement']}")
+      if "phase" in entry and entry["phase"]:
+        lines.append(f"    phase: {entry['phase']}")
+      lines.append(f"    status: {entry['status']}")
+      if "notes" in entry and entry["notes"]:
+        # Handle multi-line notes with >- folded scalar
+        notes_text = entry["notes"].strip()
+        if "\n" in notes_text:
+          lines.append("    notes: >-")
+          for note_line in notes_text.splitlines():
+            lines.append(f"      {note_line}")
+        else:
+          lines.append(f"    notes: {notes_text}")
+
+  lines.append("```")
+  return "\n".join(lines)
+
+
 __all__ = [
   "COVERAGE_MARKER",
   "COVERAGE_SCHEMA",
@@ -214,4 +281,5 @@ __all__ = [
   "VerificationCoverageValidator",
   "extract_coverage_blocks",
   "load_coverage_blocks",
+  "render_verification_coverage_block",
 ]

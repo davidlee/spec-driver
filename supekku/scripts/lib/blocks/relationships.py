@@ -8,12 +8,18 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
+from .yaml_utils import format_yaml_list
+
 if TYPE_CHECKING:
   from pathlib import Path
 
 RELATIONSHIPS_MARKER = "supekku:spec.relationships@v1"
 RELATIONSHIPS_SCHEMA = "supekku.spec.relationships"
 RELATIONSHIPS_VERSION = 1
+
+CAPABILITIES_MARKER = "supekku:spec.capabilities@v1"
+CAPABILITIES_SCHEMA = "supekku.spec.capabilities"
+CAPABILITIES_VERSION = 1
 
 
 @dataclass(frozen=True)
@@ -136,10 +142,141 @@ def load_relationships_from_file(path: Path) -> RelationshipsBlock | None:
   return extract_relationships(text)
 
 
+def render_spec_relationships_block(
+  spec_id: str,
+  *,
+  primary_requirements: list[str] | None = None,
+  collaborator_requirements: list[str] | None = None,
+  interactions: list[dict[str, str]] | None = None,
+) -> str:
+  """Render a spec relationships YAML block with given values.
+
+  This is the canonical source for the block structure. Templates and
+  creation code should use this instead of hardcoding the structure.
+
+  Args:
+    spec_id: The specification ID.
+    primary_requirements: List of primary requirement codes
+      (e.g., ["FR-001", "FR-002"]).
+    collaborator_requirements: List of collaborator requirement codes.
+    interactions: List of interaction dicts with 'type' and 'spec' keys.
+
+  Returns:
+    Formatted YAML code block as string.
+  """
+  lines = [
+    f"```yaml {RELATIONSHIPS_MARKER}",
+    f"schema: {RELATIONSHIPS_SCHEMA}",
+    f"version: {RELATIONSHIPS_VERSION}",
+    f"spec: {spec_id}",
+    "requirements:",
+    format_yaml_list("primary", primary_requirements, level=1),
+    format_yaml_list("collaborators", collaborator_requirements, level=1),
+  ]
+
+  # Add interactions
+  if not interactions:
+    lines.append("interactions: []")
+  else:
+    lines.append("interactions:")
+    for interaction in interactions:
+      lines.append(f"  - type: {interaction['type']}")
+      lines.append(f"    spec: {interaction['spec']}")
+      if "notes" in interaction:
+        lines.append(f"    notes: {interaction['notes']}")
+
+  lines.append("```")
+  return "\n".join(lines)
+
+
+def render_spec_capabilities_block(
+  spec_id: str,
+  *,
+  capabilities: list[dict[str, Any]] | None = None,
+) -> str:
+  """Render a spec capabilities YAML block with given values.
+
+  This is the canonical source for the block structure. Templates and
+  creation code should use this instead of hardcoding the structure.
+
+  Args:
+    spec_id: The specification ID.
+    capabilities: List of capability dicts with:
+      - id: str (kebab-case identifier)
+      - name: str (human-readable name)
+      - responsibilities: list[str] | None
+      - requirements: list[str] | None
+      - summary: str
+      - success_criteria: list[str] | None
+
+  Returns:
+    Formatted YAML code block as string.
+  """
+  lines = [
+    f"```yaml {CAPABILITIES_MARKER}",
+    f"schema: {CAPABILITIES_SCHEMA}",
+    f"version: {CAPABILITIES_VERSION}",
+    f"spec: {spec_id}",
+  ]
+
+  # Add capabilities
+  if not capabilities:
+    lines.append("capabilities: []")
+  else:
+    lines.append("capabilities:")
+    for cap in capabilities:
+      lines.append(f"  - id: {cap['id']}")
+      lines.append(f"    name: {cap['name']}")
+
+      # Responsibilities
+      responsibilities = cap.get("responsibilities", [])
+      if not responsibilities:
+        lines.append("    responsibilities: []")
+      else:
+        lines.append("    responsibilities:")
+        for resp in responsibilities:
+          lines.append(f"      - {resp}")
+
+      # Requirements
+      requirements = cap.get("requirements", [])
+      if not requirements:
+        lines.append("    requirements: []")
+      else:
+        lines.append("    requirements:")
+        for req in requirements:
+          lines.append(f"      - {req}")
+
+      # Summary (use folded scalar >- for multi-line)
+      summary = cap.get("summary", "")
+      if summary:
+        lines.append("    summary: >-")
+        for summary_line in summary.strip().splitlines():
+          lines.append(f"      {summary_line}")
+
+      # Success criteria
+      success_criteria = cap.get("success_criteria", [])
+      if not success_criteria:
+        lines.append("    success_criteria: []")
+      else:
+        lines.append("    success_criteria:")
+        for criterion in success_criteria:
+          lines.append(f"      - {criterion}")
+
+  lines.append("```")
+  return "\n".join(lines)
+
+
 __all__ = [
+  "CAPABILITIES_MARKER",
+  "CAPABILITIES_SCHEMA",
+  "CAPABILITIES_VERSION",
   "RELATIONSHIPS_MARKER",
+  "RELATIONSHIPS_SCHEMA",
+  "RELATIONSHIPS_VERSION",
   "RelationshipsBlock",
   "RelationshipsBlockValidator",
   "extract_relationships",
   "load_relationships_from_file",
+  "render_spec_capabilities_block",
+  "render_spec_relationships_block",
 ]

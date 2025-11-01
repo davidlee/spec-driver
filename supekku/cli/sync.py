@@ -83,7 +83,7 @@ def sync(
     bool,
     typer.Option(
       "--prune",
-      help="Remove specs for deleted source files (use with --existing)",
+      help="Remove specs for deleted source files",
     ),
   ] = False,
 ) -> None:
@@ -271,6 +271,17 @@ def _sync_specs(
         typer.echo("Discovery mode: requested targets + auto-discovery")
         requested = target_list if target_list else None
         source_units = adapter.discover_targets(root, requested)
+
+        # Detect orphaned specs when pruning in discovery mode
+        if prune and lang_name in spec_manager.registry_v2.languages:
+          registered_ids = set(spec_manager.registry_v2.languages[lang_name].keys())
+          discovered_ids = {unit.identifier for unit in source_units}
+          orphaned_ids = registered_ids - discovered_ids
+
+          for orphaned_id in orphaned_ids:
+            unit = SourceUnit(language=lang_name, identifier=orphaned_id, root=root)
+            orphaned_units.append(unit)
+            typer.echo(f"  ⚠ Orphaned: {orphaned_id} (source file deleted)", err=True)
     except Exception as e:
       typer.echo(f"Error discovering {lang_name} targets: {e}", err=True)
       typer.echo(f"Skipping {lang_name} synchronization", err=True)

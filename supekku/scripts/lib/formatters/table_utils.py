@@ -10,8 +10,11 @@ import os
 import shutil
 from typing import TYPE_CHECKING, Any
 
+from rich import box
 from rich.console import Console
 from rich.table import Table
+
+from supekku.scripts.lib.formatters.theme import SPEC_DRIVER_THEME
 
 if TYPE_CHECKING:
   from collections.abc import Sequence
@@ -108,6 +111,8 @@ def create_table(
     show_lines=False,
     pad_edge=False,
     collapse_padding=True,
+    box=box.ROUNDED,
+    border_style="table.border",
   )
 
   for col in columns:
@@ -143,7 +148,7 @@ def add_row_with_truncation(
 
 
 def render_table(table: Table) -> str:
-  """Render a rich Table to string.
+  """Render a rich Table to string with spec-driver theme.
 
   Args:
     table: Rich Table instance
@@ -151,7 +156,7 @@ def render_table(table: Table) -> str:
   Returns:
     Rendered table as string
   """
-  console = Console()
+  console = Console(theme=SPEC_DRIVER_THEME)
   with console.capture() as capture:
     console.print(table)
   return capture.get()

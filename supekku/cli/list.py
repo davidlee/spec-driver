@@ -11,11 +11,20 @@ from typing import Annotated
 
 import typer
 
-from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
+from supekku.cli.common import (
+  EXIT_FAILURE,
+  EXIT_SUCCESS,
+  FormatOption,
+  RootOption,
+  TruncateOption,
+)
 from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_status
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.change_formatters import format_change_with_context
+from supekku.scripts.lib.formatters.decision_formatters import (
+  format_decision_list_table,
+)
 from supekku.scripts.lib.formatters.spec_formatters import format_spec_list_item
 from supekku.scripts.lib.specs.registry import SpecRegistry
 
@@ -416,8 +425,15 @@ def list_adrs(
       help="Filter by policy reference",
     ),
   ] = None,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
 ) -> None:
   """List Architecture Decision Records (ADRs) with optional filtering."""
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
   try:
     registry = DecisionRegistry(root=root)
 
@@ -436,17 +452,10 @@ def list_adrs(
     if not decisions:
       raise typer.Exit(EXIT_SUCCESS)
 
-    # Print decisions
-    for decision in sorted(decisions, key=lambda d: d.id):
-      updated_date = (
-        decision.updated.strftime("%Y-%m-%d") if decision.updated else "N/A"
-      )
-      # Truncate title if too long
-      title = decision.title
-      if len(title) > 40:
-        title = title[:37] + "..."
-
-      typer.echo(f"{decision.id}\t{decision.status}\t{title}\t{updated_date}")
+    # Sort and format
+    decisions_sorted = sorted(decisions, key=lambda d: d.id)
+    output = format_decision_list_table(decisions_sorted, format_type, truncate)
+    typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:

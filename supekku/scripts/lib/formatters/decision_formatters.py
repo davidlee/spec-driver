@@ -6,17 +6,18 @@ Formatters take DecisionRecord objects and return formatted strings for display.
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.formatters.table_utils import (
   add_row_with_truncation,
-  calculate_column_widths,
   create_table,
   format_as_json,
   format_as_tsv,
   get_terminal_width,
   render_table,
 )
+from supekku.scripts.lib.formatters.theme import get_adr_status_style
 
 if TYPE_CHECKING:
   from collections.abc import Sequence
@@ -96,14 +97,14 @@ def format_decision_details(decision: Decision) -> str:
 def format_decision_list_table(
   decisions: Sequence[Decision],
   format_type: str = "table",
-  no_truncate: bool = False,
+  truncate: bool = False,
 ) -> str:
   """Format decisions as table, JSON, or TSV.
 
   Args:
     decisions: List of Decision objects to format
     format_type: Output format (table|json|tsv)
-    no_truncate: If True, don't truncate long fields
+    truncate: If True, truncate long fields (default: False, show full content)
 
   Returns:
     Formatted string in requested format
@@ -120,21 +121,50 @@ def format_decision_list_table(
       rows.append([decision.id, decision.status, decision.title, updated_date])
     return format_as_tsv(rows)
 
-  # table format
+  # table format - reordered columns: ID, Title, Status, Updated
   table = create_table(
-    columns=["ID", "Status", "Title", "Updated"],
+    columns=["ID", "Title", "Status", "Updated"],
     title="Architecture Decision Records",
   )
 
   terminal_width = get_terminal_width()
-  max_widths = calculate_column_widths(terminal_width, num_columns=4)
+
+  # Custom column widths: ID (10), Status (12), Updated (10), rest for Title
+  # Reserve space for borders/padding (~10 chars total)
+  reserved = 10
+  id_width = 10
+  status_width = 12
+  updated_width = 10
+  title_width = max(
+    terminal_width - id_width - status_width - updated_width - reserved,
+    20,  # minimum title width
+  )
+
+  max_widths = {
+    0: id_width,
+    1: title_width,
+    2: status_width,
+    3: updated_width,
+  }
 
   for decision in decisions:
-    updated_date = decision.updated.strftime("%Y-%m-%d") if decision.updated else "N/A"
+    # Remove "ADR-XXX: " prefix from title for display
+    title = re.sub(r"^ADR-\d+:\s*", "", decision.title)
+
+    # Use em dash for missing dates in table format
+    updated_date = (
+      decision.updated.strftime("%Y-%m-%d") if decision.updated else "—"
+    )
+
+    # Apply styling with rich markup
+    decision_id = f"[adr.id]{decision.id}[/adr.id]"
+    status_style = get_adr_status_style(decision.status)
+    status_styled = f"[{status_style}]{decision.status}[/{status_style}]"
+
     add_row_with_truncation(
       table,
-      [decision.id, decision.status, decision.title, updated_date],
-      max_widths=max_widths if not no_truncate else None,
+      [decision_id, title, status_styled, updated_date],
+      max_widths=max_widths if truncate else None,
     )
 
   return render_table(table)

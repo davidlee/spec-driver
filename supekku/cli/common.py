@@ -6,7 +6,7 @@ This module provides reusable CLI option types for consistent flag behavior.
 
 Across all list commands, we use consistent flag patterns:
 - `--format`: Output format (table|json|tsv)
-- `--no-truncate`: Disable field truncation in table output
+- `--truncate`: Enable field truncation in table output (default: off, full content)
 - `--filter`: Substring filter (case-insensitive)
 - `--status`: Filter by status (entity-specific values)
 - `--root`: Repository root directory
@@ -93,10 +93,10 @@ FormatOption = Annotated[
   ),
 ]
 
-NoTruncateOption = Annotated[
+TruncateOption = Annotated[
   bool,
   typer.Option(
-    "--no-truncate",
-    help="Don't truncate long fields (show full content)",
+    "--truncate",
+    help="Truncate long fields to fit terminal width",
   ),
 ]

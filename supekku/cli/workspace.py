@@ -13,7 +13,7 @@ from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.validation.validator import validate_workspace as validate_ws
 from supekku.scripts.lib.workspace import Workspace
 
-app = typer.Typer(help="Workspace management commands")
+app = typer.Typer(help="Workspace management commands", no_args_is_help=True)
 
 
 @app.command("install")

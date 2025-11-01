@@ -16,7 +16,7 @@ from supekku.scripts.sync_specs import (
   parse_language_targets,
 )
 
-app = typer.Typer(help="Synchronization commands")
+app = typer.Typer(help="Synchronization commands", no_args_is_help=True)
 
 
 @app.command()

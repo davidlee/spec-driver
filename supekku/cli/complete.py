@@ -9,7 +9,7 @@ import typer
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
 from supekku.scripts.complete_delta import complete_delta as complete_delta_impl
 
-app = typer.Typer(help="Complete artifacts")
+app = typer.Typer(help="Complete artifacts", no_args_is_help=True)
 
 
 @app.command("delta")

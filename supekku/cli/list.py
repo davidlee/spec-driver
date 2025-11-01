@@ -25,14 +25,24 @@ from supekku.cli.common import (
 from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_status
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
-from supekku.scripts.lib.formatters.change_formatters import format_change_with_context
+from supekku.scripts.lib.formatters.backlog_formatters import format_backlog_list_table
+from supekku.scripts.lib.formatters.change_formatters import (
+  format_change_list_table,
+  format_change_with_context,
+)
 from supekku.scripts.lib.formatters.decision_formatters import (
   format_decision_list_table,
 )
-from supekku.scripts.lib.formatters.spec_formatters import format_spec_list_item
+from supekku.scripts.lib.formatters.requirement_formatters import (
+  format_requirement_list_table,
+)
+from supekku.scripts.lib.formatters.spec_formatters import (
+  format_spec_list_item,
+  format_spec_list_table,
+)
 from supekku.scripts.lib.specs.registry import SpecRegistry
 
-app = typer.Typer(help="List artifacts")
+app = typer.Typer(help="List artifacts", no_args_is_help=True)
 
 
 @app.command("specs")
@@ -78,11 +88,13 @@ def list_specs(
   ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
   paths: Annotated[
     bool,
     typer.Option(
       "--paths",
-      help="Include relative file paths in the output",
+      help="Include relative file paths in the output (TSV format only)",
     ),
   ] = False,
   packages: Annotated[
@@ -100,6 +112,11 @@ def list_specs(
   """
   if kind not in ["tech", "product", "all"]:
     typer.echo(f"Error: invalid kind: {kind}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
     raise typer.Exit(EXIT_FAILURE)
 
   try:
@@ -178,8 +195,7 @@ def list_specs(
         )
       ]
 
-    specs.sort(key=lambda spec: spec.id)
-
+    # Filter by kind
     def normalise_kind(requested: str, spec_id: str) -> bool:
       if requested == "all":
         return True
@@ -189,16 +205,32 @@ def list_specs(
         return spec_id.startswith("PROD-")
       return True
 
-    for spec in specs:
-      if not normalise_kind(kind, spec.id):
-        continue
-      line = format_spec_list_item(
-        spec,
-        include_path=paths,
+    specs = [spec for spec in specs if normalise_kind(kind, spec.id)]
+
+    if not specs:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Sort and format
+    specs.sort(key=lambda spec: spec.id)
+
+    # For TSV with paths, use old formatter; otherwise use new table formatter
+    if format_type == "tsv" and paths:
+      for spec in specs:
+        line = format_spec_list_item(
+          spec,
+          include_path=paths,
+          include_packages=packages,
+          root=registry.root,
+        )
+        typer.echo(line)
+    else:
+      output = format_spec_list_table(
+        specs,
+        format_type=format_type,
+        no_truncate=not truncate,
         include_packages=packages,
-        root=registry.root,
       )
-      typer.echo(line)
+      typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
@@ -225,12 +257,14 @@ def list_deltas(
   ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
   details: Annotated[
     bool,
     typer.Option(
       "--details",
       "-d",
-      help="Show related specs, requirements, and phases",
+      help="Show related specs, requirements, and phases (TSV format only)",
     ),
   ] = False,
 ) -> None:
@@ -238,6 +272,11 @@ def list_deltas(
 
   The --regexp flag filters on ID, name, and slug fields.
   """
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
   try:
     registry = ChangeRegistry(root=root, kind="delta")
     artifacts = registry.collect()
@@ -271,12 +310,21 @@ def list_deltas(
 
       filtered_artifacts.append(artifact)
 
+    if not filtered_artifacts:
+      raise typer.Exit(EXIT_SUCCESS)
+
     # Format and output
-    for artifact in filtered_artifacts:
-      if details:
+    # For TSV with details, use old formatter; otherwise use new table formatter
+    if format_type == "tsv" and details:
+      for artifact in filtered_artifacts:
         output = format_change_with_context(artifact)
-      else:
-        output = f"{artifact.id}\t{artifact.status}\t{artifact.name}"
+        typer.echo(output)
+    else:
+      output = format_change_list_table(
+        filtered_artifacts,
+        format_type=format_type,
+        no_truncate=not truncate,
+      )
       typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
@@ -322,32 +370,34 @@ def list_changes(
   ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
   paths: Annotated[
     bool,
     typer.Option(
       "--paths",
-      help="Include relative file paths",
+      help="Include relative file paths (TSV format only)",
     ),
   ] = False,
   relations: Annotated[
     bool,
     typer.Option(
       "--relations",
-      help="Include relation tuples (type:target)",
+      help="Include relation tuples (type:target) (TSV format only)",
     ),
   ] = False,
   applies: Annotated[
     bool,
     typer.Option(
       "--applies",
-      help="Include applies_to.requirements list",
+      help="Include applies_to.requirements list (TSV format only)",
     ),
   ] = False,
   plan: Annotated[
     bool,
     typer.Option(
       "--plan",
-      help="Include plan overview for deltas",
+      help="Include plan overview for deltas (TSV format only)",
     ),
   ] = False,
 ) -> None:
@@ -360,8 +410,14 @@ def list_changes(
     typer.echo(f"Error: invalid kind: {kind}", err=True)
     raise typer.Exit(EXIT_FAILURE)
 
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
   try:
     kinds = ["delta", "revision", "audit"] if kind == "all" else [kind]
+    all_artifacts = []
 
     for current_kind in kinds:
       registry = ChangeRegistry(root=root, kind=current_kind)
@@ -408,7 +464,16 @@ def list_changes(
           if match not in applies_list:
             continue
 
-        # Format output
+        all_artifacts.append((current_kind, artifact))
+
+    if not all_artifacts:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Format and output
+    # For TSV with extra columns, use old formatter; otherwise use new table formatter
+    has_extra_columns = paths or relations or applies or plan
+    if format_type == "tsv" and has_extra_columns:
+      for current_kind, artifact in all_artifacts:
         line = f"{artifact.id}\t{artifact.name}"
 
         if paths and hasattr(artifact, "path"):
@@ -436,6 +501,15 @@ def list_changes(
           line += f"\t{plan_id}\t{phase_count} phases"
 
         typer.echo(line)
+    else:
+      # Extract just the artifacts
+      artifacts_only = [artifact for _, artifact in all_artifacts]
+      output = format_change_list_table(
+        artifacts_only,
+        format_type=format_type,
+        no_truncate=not truncate,
+      )
+      typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
@@ -540,6 +614,265 @@ def list_adrs(
     # Sort and format
     decisions_sorted = sorted(decisions, key=lambda d: d.id)
     output = format_decision_list_table(decisions_sorted, format_type, truncate)
+    typer.echo(output)
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("requirements")
+def list_requirements(
+  root: RootOption = None,
+  spec: Annotated[
+    str | None,
+    typer.Option("--spec", "-s", help="Filter by spec ID"),
+  ] = None,
+  status: Annotated[
+    str | None,
+    typer.Option("--status", help="Filter by status"),
+  ] = None,
+  kind: Annotated[
+    str | None,
+    typer.Option("--kind", "-k", help="Filter by kind (FR|NF)"),
+  ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on label or title (case-insensitive)",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
+) -> None:
+  """List requirements with optional filtering.
+
+  The --filter flag does substring matching (case-insensitive).
+  The --regexp flag does pattern matching on UID, label, and title fields.
+  """
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    from pathlib import Path
+
+    from supekku.scripts.lib.core.paths import get_registry_dir
+    from supekku.scripts.lib.requirements.registry import RequirementsRegistry
+
+    repo_root = Path(root) if root else Path.cwd()
+    registry_path = get_registry_dir(repo_root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    requirements = list(registry.records.values())
+
+    # Apply filters
+    if spec:
+      requirements = [r for r in requirements if spec.upper() in r.specs]
+    if status:
+      requirements = [r for r in requirements if r.status.lower() == status.lower()]
+    if kind:
+      kind_prefix = kind.upper()
+      requirements = [r for r in requirements if r.label.startswith(kind_prefix)]
+    if substring:
+      filter_lower = substring.lower()
+      requirements = [
+        r
+        for r in requirements
+        if filter_lower in r.label.lower() or filter_lower in r.title.lower()
+      ]
+
+    # Apply regexp filter on uid, label, title
+    if regexp:
+      try:
+        requirements = [
+          r
+          for r in requirements
+          if matches_regexp(regexp, [r.uid, r.label, r.title], case_insensitive)
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
+
+    if not requirements:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Sort and format
+    requirements.sort(key=lambda r: r.uid)
+    output = format_requirement_list_table(requirements, format_type, truncate)
+    typer.echo(output)
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("revisions")
+def list_revisions(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  spec: Annotated[
+    str | None,
+    typer.Option("--spec", help="Filter by spec reference"),
+  ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on ID or name (case-insensitive)",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
+) -> None:
+  """List revisions with optional filtering.
+
+  The --filter flag does substring matching (case-insensitive).
+  The --regexp flag does pattern matching on ID, slug, and name fields.
+  """
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    registry = ChangeRegistry(root=root, kind="revision")
+    revisions = list(registry.collect().values())
+
+    # Apply filters
+    if status:
+      revisions = [r for r in revisions if r.status.lower() == status.lower()]
+    if spec:
+      spec_upper = spec.upper()
+      revisions = [
+        r
+        for r in revisions
+        if r.relations
+        and any(
+          spec_upper in str(rel.get("target", "")).upper() for rel in r.relations
+        )
+      ]
+    if substring:
+      filter_lower = substring.lower()
+      revisions = [
+        r
+        for r in revisions
+        if filter_lower in r.id.lower() or filter_lower in r.name.lower()
+      ]
+
+    # Apply regexp filter on id, slug, name
+    if regexp:
+      try:
+        revisions = [
+          r
+          for r in revisions
+          if matches_regexp(regexp, [r.id, r.slug, r.name], case_insensitive)
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
+
+    if not revisions:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Sort and format
+    revisions.sort(key=lambda r: r.id)
+    output = format_change_list_table(revisions, format_type, not truncate)
+    typer.echo(output)
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("backlog")
+def list_backlog(
+  root: RootOption = None,
+  kind: Annotated[
+    str,
+    typer.Option(
+      "--kind",
+      "-k",
+      help="Filter by kind (issue|problem|improvement|risk|all)",
+    ),
+  ] = "all",
+  status: Annotated[
+    str | None,
+    typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on title (case-insensitive)",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
+) -> None:
+  """List backlog items with optional filtering.
+
+  The --filter flag does substring matching (case-insensitive).
+  The --regexp flag does pattern matching on ID and title fields.
+  """
+  if kind not in ["issue", "problem", "improvement", "risk", "all"]:
+    typer.echo(f"Error: invalid kind: {kind}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    from pathlib import Path
+
+    from supekku.scripts.lib.backlog.registry import discover_backlog_items
+
+    repo_root = Path(root) if root else None
+    items = discover_backlog_items(root=repo_root, kind=kind)
+
+    # Apply filters
+    if status:
+      items = [i for i in items if i.status.lower() == status.lower()]
+    if substring:
+      filter_lower = substring.lower()
+      items = [i for i in items if filter_lower in i.title.lower()]
+
+    # Apply regexp filter on id, title
+    if regexp:
+      try:
+        items = [
+          i
+          for i in items
+          if matches_regexp(regexp, [i.id, i.title], case_insensitive)
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
+
+    if not items:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Format and output
+    output = format_backlog_list_table(items, format_type, truncate)
     typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)

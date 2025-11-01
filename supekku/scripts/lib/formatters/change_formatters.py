@@ -17,6 +17,7 @@ from supekku.scripts.lib.formatters.table_utils import (
   get_terminal_width,
   render_table,
 )
+from supekku.scripts.lib.formatters.theme import get_change_status_style
 
 if TYPE_CHECKING:
   from collections.abc import Sequence
@@ -121,22 +122,27 @@ def format_change_list_table(
   if format_type == "tsv":
     rows = []
     for change in changes:
-      rows.append([change.id, change.kind, change.status, change.name])
+      rows.append([change.id, change.status, change.name])
     return format_as_tsv(rows)
 
   # table format
   table = create_table(
-    columns=["ID", "Kind", "Status", "Name"],
+    columns=["ID", "Status", "Name"],
     title="Change Artifacts",
   )
 
   terminal_width = get_terminal_width()
-  max_widths = calculate_column_widths(terminal_width, num_columns=4)
+  max_widths = calculate_column_widths(terminal_width, num_columns=3)
 
   for change in changes:
+    # Apply styling
+    styled_id = f"[change.id]{change.id}[/change.id]"
+    status_style = get_change_status_style(change.status)
+    styled_status = f"[{status_style}]{change.status}[/{status_style}]"
+
     add_row_with_truncation(
       table,
-      [change.id, change.kind, change.status, change.name],
+      [styled_id, styled_status, change.name],
       max_widths=max_widths if not no_truncate else None,
     )
 

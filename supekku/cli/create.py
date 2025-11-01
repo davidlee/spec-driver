@@ -29,7 +29,7 @@ from supekku.scripts.lib.specs.creation import (
   create_spec as create_spec_impl,
 )
 
-app = typer.Typer(help="Create new artifacts")
+app = typer.Typer(help="Create new artifacts", no_args_is_help=True)
 
 
 @app.command("spec")

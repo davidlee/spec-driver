@@ -91,7 +91,6 @@ FormatOption = Annotated[
   str,
   typer.Option(
     "--format",
-    "-f",
     help="Output format: table (rich), json (structured), or tsv (tabs)",
   ),
 ]

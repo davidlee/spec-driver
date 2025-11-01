@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import re
+import sys
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.backlog.models import BacklogItem
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 
@@ -223,8 +225,105 @@ def append_backlog_summary(*, repo_root: Path | None = None) -> list[str]:
   return additions
 
 
+def discover_backlog_items(
+  *,
+  root: Path | None = None,
+  kind: str = "all",
+) -> list[BacklogItem]:
+  """Discover all backlog items in workspace.
+
+  Args:
+    root: Repository root (auto-detected if None)
+    kind: Filter by kind (issue|problem|improvement|risk|all)
+
+  Returns:
+    List of BacklogItem objects
+  """
+  repo_root = find_repo_root(root)
+  backlog_dir = backlog_root(repo_root)
+
+  if not backlog_dir.exists():
+    return []
+
+  items: list[BacklogItem] = []
+  kind_dirs: list[str] = []
+
+  if kind == "all":
+    kind_dirs = ["issues", "problems", "improvements", "risks"]
+  elif kind == "issue":
+    kind_dirs = ["issues"]
+  elif kind == "problem":
+    kind_dirs = ["problems"]
+  elif kind == "improvement":
+    kind_dirs = ["improvements"]
+  elif kind == "risk":
+    kind_dirs = ["risks"]
+  else:
+    return []
+
+  for kind_dir in kind_dirs:
+    kind_path = backlog_dir / kind_dir
+    if not kind_path.exists():
+      continue
+
+    for entry_dir in kind_path.iterdir():
+      if not entry_dir.is_dir():
+        continue
+
+      # Find markdown file with pattern ISSUE-001.md, PROB-001.md, etc.
+      for md_file in entry_dir.glob("*.md"):
+        match = BACKLOG_ID_PATTERN.match(md_file.name)
+        if not match:
+          continue
+
+        prefix = match.group(1)
+        number = match.group(2)
+        item_id = f"{prefix}-{number}"
+
+        # Load frontmatter - skip if YAML parsing fails
+        try:
+          frontmatter, _ = load_markdown_file(md_file)
+        except Exception as e:  # noqa: BLE001
+          # Warn about files with invalid YAML frontmatter and skip
+          print(
+            f"Warning: Skipping {md_file.relative_to(repo_root)}: "
+            f"Invalid YAML frontmatter - {e}",
+            file=sys.stderr,
+          )
+          continue
+
+        # Extract fields
+        item_kind = str(frontmatter.get("kind", "")).lower() or kind_dir.rstrip("s")
+        status = str(frontmatter.get("status", "")).lower() or "unknown"
+        title = str(frontmatter.get("name", "")).strip()
+
+        if not title:
+          # Fallback to first heading in body if name not in frontmatter
+          title = extract_title(md_file)
+
+        # Create BacklogItem with kind-specific fields
+        item = BacklogItem(
+          id=item_id,
+          kind=item_kind,
+          status=status,
+          title=title,
+          path=md_file,
+          frontmatter=dict(frontmatter),
+          severity=str(frontmatter.get("severity", "")),
+          categories=list(frontmatter.get("categories", [])),
+          impact=str(frontmatter.get("impact", "")),
+          likelihood=float(frontmatter.get("likelihood", 0.0)),
+          created=str(frontmatter.get("created", "")),
+          updated=str(frontmatter.get("updated", "")),
+        )
+        items.append(item)
+
+  return sorted(items, key=lambda x: x.id)
+
+
 __all__ = [
   "append_backlog_summary",
   "create_backlog_entry",
+  "discover_backlog_items",
   "find_repo_root",
 ]

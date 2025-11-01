@@ -234,3 +234,5 @@ __pycache__
 /.claude/commands
 !/.spec-driver/registry
 /kanban
+/next_action.md
+

@@ -10,7 +10,7 @@ from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.decision_formatters import format_decision_details
 
-app = typer.Typer(help="Show detailed artifact information")
+app = typer.Typer(help="Show detailed artifact information", no_args_is_help=True)
 
 
 @app.command("adr")

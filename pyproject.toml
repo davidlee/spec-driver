@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 dependencies = [
     "pyyaml>=6.0.3",
     "python-frontmatter>=1.1.0",
-    "typer[all]>=0.15.0",
+    "typer>=0.15.0",
     "pylint-per-file-ignores>=3.1.0",
 ]
 keywords = ["specification", "documentation", "adr", "architecture-decision-records", "spec-sync"]

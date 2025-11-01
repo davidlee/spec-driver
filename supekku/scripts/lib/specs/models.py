@@ -44,5 +44,10 @@ class Spec:
     """Return the kind/type of this spec (e.g., 'spec', 'prod')."""
     return str(self.frontmatter.data.get("kind", ""))
 
+  @property
+  def status(self) -> str:
+    """Return the status of this spec (e.g., 'draft', 'active')."""
+    return str(self.frontmatter.data.get("status", "draft"))
+
 
 __all__ = ["Spec"]

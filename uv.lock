@@ -341,7 +341,7 @@ requires-dist = [
     { name = "pylint-per-file-ignores", specifier = ">=3.1.0" },
     { name = "python-frontmatter", specifier = ">=1.1.0" },
     { name = "pyyaml", specifier = ">=6.0.3" },
-    { name = "typer", extras = ["all"], specifier = ">=0.15.0" },
+    { name = "typer", specifier = ">=0.15.0" },
 ]
 
 [package.metadata.requires-dev]

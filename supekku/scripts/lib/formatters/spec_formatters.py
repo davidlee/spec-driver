@@ -17,6 +17,7 @@ from supekku.scripts.lib.formatters.table_utils import (
   get_terminal_width,
   render_table,
 )
+from supekku.scripts.lib.formatters.theme import get_spec_status_style
 
 if TYPE_CHECKING:
   from collections.abc import Sequence
@@ -99,14 +100,14 @@ def format_spec_list_table(
   if format_type == "tsv":
     rows = []
     for spec in specs:
-      row = [spec.id, spec.slug]
+      row = [spec.id, spec.name, spec.status]
       if include_packages:
         row.append(format_package_list(spec.packages))
       rows.append(row)
     return format_as_tsv(rows)
 
   # table format
-  columns = ["ID", "Slug"]
+  columns = ["ID", "Name", "Status"]
   if include_packages:
     columns.append("Packages")
 
@@ -117,7 +118,12 @@ def format_spec_list_table(
   max_widths = calculate_column_widths(terminal_width, num_columns=num_cols)
 
   for spec in specs:
-    row_data = [spec.id, spec.slug]
+    # Apply styling
+    styled_id = f"[spec.id]{spec.id}[/spec.id]"
+    status_style = get_spec_status_style(spec.status)
+    styled_status = f"[{status_style}]{spec.status}[/{status_style}]"
+
+    row_data = [styled_id, spec.name, styled_status]
     if include_packages:
       row_data.append(format_package_list(spec.packages))
 
@@ -145,6 +151,7 @@ def format_spec_list_json(specs: Sequence[Spec]) -> str:
       "id": spec.id,
       "slug": spec.slug,
       "name": spec.name,
+      "status": spec.status,
       "packages": spec.packages if spec.packages else [],
     }
     items.append(item)

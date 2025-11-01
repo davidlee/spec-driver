@@ -5,11 +5,17 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from supekku.scripts.lib.blocks.delta import (
+  DeltaRelationshipsValidator,
+  extract_delta_relationships,
+)
+from supekku.scripts.lib.blocks.plan import (
+  extract_phase_overview,
+  extract_plan_overview,
+)
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
 
-from .blocks.delta import DeltaRelationshipsValidator, extract_delta_relationships
-from .blocks.plan import extract_phase_overview, extract_plan_overview
 from .lifecycle import VALID_STATUSES, normalize_status
 
 if TYPE_CHECKING:

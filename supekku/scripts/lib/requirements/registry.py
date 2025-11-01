@@ -9,21 +9,21 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from supekku.scripts.lib.changes.blocks.delta import (
+from supekku.scripts.lib.blocks.delta import (
   DeltaRelationshipsValidator,
   extract_delta_relationships,
 )
-from supekku.scripts.lib.changes.blocks.revision import (
+from supekku.scripts.lib.blocks.relationships import (
+  RelationshipsBlockValidator,
+  extract_relationships,
+)
+from supekku.scripts.lib.blocks.revision import (
   RevisionBlockValidator,
   load_revision_blocks,
 )
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
-from supekku.scripts.lib.specs.blocks import (
-  RelationshipsBlockValidator,
-  extract_relationships,
-)
 
 from .lifecycle import (
   STATUS_PENDING,

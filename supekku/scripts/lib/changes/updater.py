@@ -4,12 +4,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.requirements.lifecycle import VALID_STATUSES
-
-from .blocks.revision import (
+from supekku.scripts.lib.blocks.revision import (
   RevisionBlockValidator,
   load_revision_blocks,
 )
+from supekku.scripts.lib.requirements.lifecycle import VALID_STATUSES
 
 if TYPE_CHECKING:
   from pathlib import Path

@@ -189,6 +189,31 @@ packages:
 - `assumptions` note beliefs that need validation; `hypotheses` and `decisions` track the evolution of those beliefs.
 
 Specifications continue to hold detailed requirements and verification notes inside the document body. Frontmatter only advertises the existence of related artefacts (via `relations`) or critical guard rails (`constraints`).
+
+## Verification Coverage Blocks
+
+Structured verification maps live outside frontmatter using embedded YAML blocks so artefacts can evolve without schema churn. The shared schema is:
+
+```text
+```yaml supekku:verification.coverage@v1
+schema: supekku.verification.coverage
+version: 1
+subject: SPEC-123  # Spec, product spec, implementation plan, audit, etc.
+entries:
+  - artefact: VT-210
+    kind: VT|VA|VH
+    requirement: SPEC-123.FR-001
+    phase: IP-123.PHASE-02        # Optional: link to implementation plan phase
+    status: planned|in-progress|verified|failed|blocked
+    notes: >-
+      Optional context, evidence links, or validation results.
+```
+```
+
+- `subject` references the owning artefact (`SPEC-`, `PROD-`, `IP-`, `AUD-`, etc.).
+- Each entry ties a verification artefact (test, validation activity, human review) to the requirement it covers.
+- `phase` connects planned verification back to implementation phases when relevant.
+- Consumers should treat this block as the source of truth for VT/VA/VH status and evidence.
 ## Requirements (`kind: requirement|standard/*`)
 
 ```yaml
@@ -353,10 +378,6 @@ patch_level:
   - artefact: SPEC-101
     status: aligned|divergent|unknown
     notes: Implementation matches responsibilities except for schema validation.
-verification_status:
-  - verification: VT-210
-    result: pass|fail|missing
-    notes: Needs new scenario covering strict mode.
 next_actions:
   - type: delta
     id: DE-021
@@ -365,6 +386,7 @@ next_actions:
 ```
 
 Audits (or patch-level reports) capture the outcome of comparing reality against PROD/SPEC truths. They document scope, relevant artefacts, findings, and recommended next actions so drift feeds directly into the backlog/delta pipeline.
+Keep `supekku:verification.coverage@v1` alongside the audit body to record VT/VA/VH evidence gathered during review.
 
 ## Risk Artefacts (`kind: risk`)
 

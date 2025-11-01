@@ -42,16 +42,25 @@ patch_level:
     notes: Implementation missing strict mode path.
   - artefact: PROD-020
     status: aligned
-verification_status:
-  - verification: VT-210
-    result: fail
-    notes: Missing strict-mode scenario.
 next_actions:
   - type: delta
     id: DE-021
   - type: issue
     id: ISSUE-052
 ---
+
+```yaml supekku:verification.coverage@v1
+schema: supekku.verification.coverage
+version: 1
+subject: AUD-XXX
+entries:
+  - artefact: VT-210
+    kind: VT|VA|VH
+    requirement: SPEC-101.FR-001
+    status: verified|failed|blocked
+    notes: >-
+      Capture audit evidence or link to failing scenario.
+```
 
 ## Observations
 - …
@@ -67,4 +76,4 @@ next_actions:
 - Kick these off after major merges, before releases, or when specs/product intents change.
 - Every non-aligned finding should link to the backlog (issues/problems) or directly spawn a delta.
 - Patch-level entries provide a quick “at a glance” view of alignment so you can assess drift over time.
-
+- Update `supekku:verification.coverage@v1` entries as you gather VT/VA/VH evidence.

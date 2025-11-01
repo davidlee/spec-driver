@@ -11,6 +11,7 @@ Guidance for authoring and updating delta implementation plans (`IP-xxx.md`) and
 - Plans include a `supekku:plan.overview@v1` YAML block immediately after the frontmatter.
   - Update `delta`, `specs.primary`, `requirements.targets`, and `phases` entries as the plan evolves.
   - Append new phase entries as you elaborate future phases.
+- Plans also carry a `supekku:verification.coverage@v1` block tying requirements to VT/VA/VH artefacts; keep status and evidence current.
 - Each phase sheet includes a `supekku:phase.overview@v1` block. Keep `objective`, `entrance_criteria`, `exit_criteria`, and `verification` aligned with the prose sections.
 - Edit the YAML directly; avoid hand-editing any markdown tables generated from it (if/when renderers are introduced).
 

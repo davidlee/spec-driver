@@ -2,7 +2,7 @@
 __pycache__/
 *.py[codz]
 *$py.class
-
+/.uv-cache
 # C extensions
 *.so
 
@@ -236,3 +236,6 @@ __pycache__
 /kanban
 /next_action.md
 
+/spec-kit
+/vice
+.mcp.json

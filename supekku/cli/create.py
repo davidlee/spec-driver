@@ -8,6 +8,7 @@ from typing import Annotated
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
+from supekku.scripts.lib.backlog.registry import create_backlog_entry
 from supekku.scripts.lib.changes.creation import (
   create_delta,
   create_requirement_breakout,
@@ -263,6 +264,90 @@ def create_adr(
     raise typer.Exit(EXIT_FAILURE) from e
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating ADR: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("issue")
+def create_issue(
+  title: Annotated[str, typer.Argument(help="Issue title")],
+  root: Annotated[
+    Path | None,
+    typer.Option(
+      "--root",
+      help="Repository root (auto-detected if omitted)",
+    ),
+  ] = None,
+) -> None:
+  """Create a new issue backlog entry."""
+  try:
+    path = create_backlog_entry("issue", title, repo_root=root)
+    typer.echo(f"Issue created: {path}")
+    raise typer.Exit(EXIT_SUCCESS)
+  except (ValueError, FileNotFoundError) as e:
+    typer.echo(f"Error creating issue: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("problem")
+def create_problem(
+  title: Annotated[str, typer.Argument(help="Problem title")],
+  root: Annotated[
+    Path | None,
+    typer.Option(
+      "--root",
+      help="Repository root (auto-detected if omitted)",
+    ),
+  ] = None,
+) -> None:
+  """Create a new problem backlog entry."""
+  try:
+    path = create_backlog_entry("problem", title, repo_root=root)
+    typer.echo(f"Problem created: {path}")
+    raise typer.Exit(EXIT_SUCCESS)
+  except (ValueError, FileNotFoundError) as e:
+    typer.echo(f"Error creating problem: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("improvement")
+def create_improvement(
+  title: Annotated[str, typer.Argument(help="Improvement title")],
+  root: Annotated[
+    Path | None,
+    typer.Option(
+      "--root",
+      help="Repository root (auto-detected if omitted)",
+    ),
+  ] = None,
+) -> None:
+  """Create a new improvement backlog entry."""
+  try:
+    path = create_backlog_entry("improvement", title, repo_root=root)
+    typer.echo(f"Improvement created: {path}")
+    raise typer.Exit(EXIT_SUCCESS)
+  except (ValueError, FileNotFoundError) as e:
+    typer.echo(f"Error creating improvement: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("risk")
+def create_risk(
+  title: Annotated[str, typer.Argument(help="Risk title")],
+  root: Annotated[
+    Path | None,
+    typer.Option(
+      "--root",
+      help="Repository root (auto-detected if omitted)",
+    ),
+  ] = None,
+) -> None:
+  """Create a new risk backlog entry."""
+  try:
+    path = create_backlog_entry("risk", title, repo_root=root)
+    typer.echo(f"Risk created: {path}")
+    raise typer.Exit(EXIT_SUCCESS)
+  except (ValueError, FileNotFoundError) as e:
+    typer.echo(f"Error creating risk: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
 

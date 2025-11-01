@@ -18,6 +18,7 @@ Use this when preparing an `IP-XXX.md` for a delta. Plans stay under `change/del
 - ✅ Reference the delta (`DE-XXX`) and impacted SPEC/PROD documents up front.
 - ✅ Define clear entrance/exit criteria and verification gates per phase.
 - ✅ Plan phases first; detailed task breakdown lives in separate phase sheets.
+- ✅ Keep the verification coverage block current with VT/VA/VH artefacts and planned evidence.
 - ❌ Do not invent new scope-everything must trace back to the delta/spec.
 - 🧪 Call out required tests and tooling updates so agents know how to validate.
 
@@ -41,6 +42,20 @@ phases:
       Short description of the phase outcome.
     entrance_criteria: []
     exit_criteria: []
+```
+
+```yaml supekku:verification.coverage@v1
+schema: supekku.verification.coverage
+version: 1
+subject: IP-XXX
+entries:
+  - artefact: VT-XXX
+    kind: VT|VA|VH
+    requirement: SPEC-YYY.FR-001
+    phase: IP-XXX.PHASE-01
+    status: planned|in-progress|verified
+    notes: >-
+      Link to evidence (test run, audit, validation artefact).
 ```
 
 ## 1. Summary
@@ -80,11 +95,12 @@ phases:
 - **Parallelisable Work**: Flag tasks with `[P]` inside phase sheets
 - **Plan Updates**: Update this plan when phase outcomes change (new risks, scope adjustments)
 
-## 6. Testing Plan
+## 6. Testing & Verification Plan
 - **Updated Suites**: <list unit/integration/system tests>
 - **New Cases**: <outline key scenarios>
 - **Tooling/Fixtures**: <mention new helpers/mocks>
 - **Rollback Plan**: <if applicable>
+- **Verification Coverage**: Cross-check `supekku:verification.coverage@v1` entries against phases and requirements.
 
 ## 7. Risks & Mitigations
 | Risk | Mitigation | Owner |

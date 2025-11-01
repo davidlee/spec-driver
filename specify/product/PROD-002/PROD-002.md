@@ -1,20 +1,23 @@
 ---
 id: PROD-002
-slug: streamline-creation-and-refinement-of-deltas
-name: streamline creation and refinement of deltas
+slug: streamline-spec-creation
+name: streamline spec creation
 created: '2025-11-01'
 updated: '2025-11-01'
 status: draft
 kind: prod
 aliases: []
+relations: []
+guiding_principles: []
+assumptions: []
 ---
 
-# SPEC/PROD-XXX – Descriptive Capability Name
+# PROD-002 – streamline spec creation
 
 ```yaml supekku:spec.relationships@v1
 schema: supekku.spec.relationships
 version: 1
-spec: SPEC-OR-PROD-XXX
+spec: PROD-002
 requirements:
   primary:
     - <FR/NF codes owned by this spec>
@@ -25,7 +28,7 @@ interactions: []
 ```yaml supekku:spec.capabilities@v1
 schema: supekku.spec.capabilities
 version: 1
-spec: SPEC-OR-PROD-XXX
+spec: PROD-002
 capabilities:
   - id: <kebab-case-id>
     name: <Human-readable capability>
@@ -40,47 +43,43 @@ capabilities:
 ```yaml supekku:verification.coverage@v1
 schema: supekku.verification.coverage
 version: 1
-subject: SPEC-OR-PROD-XXX
+subject: PROD-002
 entries:
   - artefact: VT-XXX
-    kind: VT|VA|VH
-    requirement: SPEC-OR-PROD-XXX.FR-001
-    status: planned|in-progress|verified
-    notes: >-
-      Optional context or evidence pointer (link to CI job, audit finding, etc.).
+    kind: VT
+    requirement: PROD-002.FR-001
+    status: planned
+    notes: Optional context or evidence pointer (link to CI job, audit finding, etc.).
 ```
 
 ## 1. Intent & Summary
-- **Problem / Purpose** *(product)*: <Why this exists for users, market, or business.>
-- **Scope / Boundaries** *(tech)*: <What systems/components are in or out.>
+- **Problem / Purpose**: <Why this exists for users, market, or business.>
 - **Value Signals**: <Key outcomes, success metrics, or operational targets.>
+- **Guiding Principles**: <Heuristics, applicable wisdom, what to optimise for.>
 - **Change History**: <Latest delta/audit/revision influencing this spec.>
 
 ## 2. Stakeholders & Journeys
-- **Personas / Actors** *(product)*: <Role – goals, pains, expectations.>
-- **Systems / Integrations** *(tech)*: <External systems, contracts, constraints.>
+- **Personas / Actors**: <Role – goals, pains, expectations.>
 - **Primary Journeys / Flows**: Given–When–Then narratives or sequence steps.
 - **Edge Cases & Non-goals**: <Scenarios we deliberately exclude; failure/guard rails.>
 
 ## 3. Responsibilities & Requirements
 - **Capability Overview**: Expand each capability in the YAML block (behaviour, FR/NF links).
-- **Functional Requirements (FR)**: `SPEC-XXX.FR-001` / `PROD-XXX.FR-001` – statement – verification.
+- **Functional Requirements (FR)**: `PROD-002.FR-001` – statement – verification.
 - **Non-Functional Requirements (NF)**: code – statement – measurement.
-- **Success Metrics / Signals** *(product)* or **Operational Targets** *(tech)*: <Quantifiable indicators.>
+- **Success Metrics / Signals**: <Quantifiable indicators.>
 
 ## 4. Solution Outline
-- **User Experience / Outcomes** *(product)*: <Desired behaviours, storyboards, acceptance notes.>
-- **Architecture / Components** *(tech)*: tables or diagrams covering components, interfaces, data/state.
+- **User Experience / Outcomes**: <Desired behaviours, storyboards, acceptance notes.>
 - **Data & Contracts**: Key entities, schemas, API/interface snippets relevant to both audiences.
 
 ## 5. Behaviour & Scenarios
 - **Primary Flows**: Step lists linking actors/components/requirements.
 - **Error Handling / Guards**: Edge-case branching, fallback behaviour, recovery expectations.
-- **State Transitions** *(tech)*: Diagrams or tables if stateful.
 
 ## 6. Quality & Verification
 - **Testing Strategy**: Mapping of requirements/capabilities to test levels; reference testing companion if present.
-- **Research / Validation** *(product)*: UX research, experiments, hypothesis tracking.
+- **Research / Validation**: UX research, experiments, hypothesis tracking.
 - **Observability & Analysis**: Metrics, telemetry, analytics dashboards, alerting.
 - **Security & Compliance**: Authn/z, data handling, privacy, regulatory notes.
 - **Verification Coverage**: Keep `supekku:verification.coverage@v1` entries aligned with FR/NF ownership and evidence.

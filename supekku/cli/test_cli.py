@@ -101,7 +101,7 @@ class TestCreateCommands:
     result = runner.invoke(app, ["create", "spec", "--help"])
     assert result.exit_code == 0
     assert "Create a new SPEC or PROD document" in result.stdout
-    assert "--type" in result.stdout
+    assert "--kind" in result.stdout
     assert "--testing" in result.stdout
 
   def test_create_delta_help(self):

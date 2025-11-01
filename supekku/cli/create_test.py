@@ -33,8 +33,8 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    assert "Issue created:" in result.stdout
-    assert "ISSUE-001" in result.stdout
+    assert "Issue created: ISSUE-001" in result.stdout
+    assert "ISSUE-001.md" in result.stdout
 
     # Verify file exists
     issue_dir = self.root / "backlog" / "issues"
@@ -58,8 +58,8 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    assert "Problem created:" in result.stdout
-    assert "PROB-001" in result.stdout
+    assert "Problem created: PROB-001" in result.stdout
+    assert "PROB-001.md" in result.stdout
 
     # Verify file exists
     problem_dir = self.root / "backlog" / "problems"
@@ -82,8 +82,8 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    assert "Improvement created:" in result.stdout
-    assert "IMPR-001" in result.stdout
+    assert "Improvement created: IMPR-001" in result.stdout
+    assert "IMPR-001.md" in result.stdout
 
     # Verify file exists
     improvement_dir = self.root / "backlog" / "improvements"
@@ -106,8 +106,8 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    assert "Risk created:" in result.stdout
-    assert "RISK-001" in result.stdout
+    assert "Risk created: RISK-001" in result.stdout
+    assert "RISK-001.md" in result.stdout
 
     # Verify file exists
     risk_dir = self.root / "backlog" / "risks"

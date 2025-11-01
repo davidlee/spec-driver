@@ -13,6 +13,7 @@
 - **Scope / Boundaries**: <What systems/components are in or out.>
 {% endif -%}
 - **Value Signals**: <Key outcomes, success metrics, or operational targets.>
+- **Guiding Principles**: <Heuristics, applicable wisdom, what to optimise for.>
 - **Change History**: <Latest delta/audit/revision influencing this spec.>
 
 ## 2. Stakeholders & Journeys

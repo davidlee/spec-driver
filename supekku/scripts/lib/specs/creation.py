@@ -18,6 +18,12 @@ from supekku.scripts.lib.blocks.relationships import (
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, get_templates_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.templates import (
+  extract_template_body as extract_template_body_fallback,
+)
+from supekku.scripts.lib.core.templates import (
+  get_package_templates_dir,
+)
 
 if TYPE_CHECKING:
   from collections.abc import MutableMapping
@@ -294,6 +300,8 @@ def slugify(name: str) -> str:
 def extract_template_body(path: Path) -> str:
   """Extract markdown body from template file after frontmatter.
 
+  Falls back to package templates if local template is missing.
+
   Args:
     path: Path to template file.
 
@@ -301,10 +309,15 @@ def extract_template_body(path: Path) -> str:
     Extracted markdown content (body after frontmatter).
 
   Raises:
-    TemplateNotFoundError: If template file doesn't exist.
+    TemplateNotFoundError: If template file doesn't exist in both locations.
   """
   if not path.exists():
-    msg = f"Template not found: {path}"
+    # Try fallback to package templates
+    package_templates_dir = get_package_templates_dir()
+    fallback_path = package_templates_dir / path.name
+    if fallback_path.exists():
+      return extract_template_body_fallback(fallback_path)
+    msg = f"Template not found: {path} (also checked package templates)"
     raise TemplateNotFoundError(msg)
   content = path.read_text(encoding="utf-8")
 

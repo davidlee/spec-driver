@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Annotated
 
 import typer
 
-from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
+from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
 from supekku.scripts.lib.backlog.registry import create_backlog_entry
 from supekku.scripts.lib.changes.creation import (
   create_delta,
@@ -42,9 +41,9 @@ def create_spec(
   spec_type: Annotated[
     str,
     typer.Option(
-      "--type",
-      "-t",
-      help="Spec type (tech or product)",
+      "--kind",
+      "-k",
+      help="Spec kind (tech or product)",
     ),
   ] = "tech",
   testing: Annotated[
@@ -69,7 +68,7 @@ def create_spec(
 
   name = " ".join(spec_name).strip()
   if spec_type not in ["tech", "product"]:
-    typer.echo(f"Error: invalid spec type: {spec_type}", err=True)
+    typer.echo(f"Error: invalid spec kind: {spec_type}", err=True)
     raise typer.Exit(EXIT_FAILURE)
 
   options = CreateSpecOptions(
@@ -83,6 +82,7 @@ def create_spec(
     if options.emit_json or result.test_path:
       pass  # JSON output handled by create_spec_impl
     typer.echo(f"Spec created: {result.spec_id}")
+    typer.echo(str(result.spec_path))
     raise typer.Exit(EXIT_SUCCESS)
   except SpecCreationError as e:
     typer.echo(f"Error creating spec: {e}", err=True)
@@ -96,7 +96,6 @@ def create_delta_cmd(
     list[str] | None,
     typer.Option(
       "--spec",
-      "-s",
       help="Spec ID impacted (repeatable)",
     ),
   ] = None,
@@ -127,6 +126,7 @@ def create_delta_cmd(
     typer.echo(f"Delta created: {result.artifact_id}")
     for extra in result.extras:
       typer.echo(f"  Created: {extra}")
+    typer.echo(str(result.primary_path))
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating delta: {e}", err=True)
@@ -153,13 +153,14 @@ def create_requirement(
     raise typer.Exit(EXIT_FAILURE)
 
   try:
-    create_requirement_breakout(
+    path = create_requirement_breakout(
       spec,
       requirement,
       title=title,
       kind=kind,
     )
     typer.echo(f"Requirement created: {requirement} under {spec}")
+    typer.echo(str(path))
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating requirement: {e}", err=True)
@@ -173,7 +174,6 @@ def create_revision_cmd(
     list[str] | None,
     typer.Option(
       "--source",
-      "-s",
       help="Source spec ID (repeatable)",
     ),
   ] = None,
@@ -203,6 +203,7 @@ def create_revision_cmd(
       requirements=requirements,
     )
     typer.echo(f"Revision created: {result.artifact_id}")
+    typer.echo(str(result.primary_path))
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating revision: {e}", err=True)
@@ -236,18 +237,11 @@ def create_adr(
       help="Author email",
     ),
   ] = None,
-  root: Annotated[
-    Path | None,
-    typer.Option(
-      "--root",
-      help="Repository root (auto-detected if omitted)",
-    ),
-  ] = None,
+  root: RootOption = None,
 ) -> None:
   """Create a new ADR with the next available ID."""
   try:
-    repo_root = root if root else Path.cwd()
-    registry = DecisionRegistry(root=repo_root)
+    registry = DecisionRegistry(root=root)
     options = ADRCreationOptions(
       title=title,
       status=status,
@@ -256,7 +250,8 @@ def create_adr(
     )
 
     result = create_adr_impl(registry, options, sync_registry=True)
-    typer.echo(f"Created ADR: {result.path}")
+    typer.echo(f"Created ADR: {result.adr_id}")
+    typer.echo(str(result.path))
     raise typer.Exit(EXIT_SUCCESS)
 
   except ADRAlreadyExistsError as e:
@@ -270,18 +265,15 @@ def create_adr(
 @app.command("issue")
 def create_issue(
   title: Annotated[str, typer.Argument(help="Issue title")],
-  root: Annotated[
-    Path | None,
-    typer.Option(
-      "--root",
-      help="Repository root (auto-detected if omitted)",
-    ),
-  ] = None,
+  root: RootOption = None,
 ) -> None:
   """Create a new issue backlog entry."""
   try:
     path = create_backlog_entry("issue", title, repo_root=root)
-    typer.echo(f"Issue created: {path}")
+    # Extract ID from filename (e.g., ISSUE-001.md -> ISSUE-001)
+    issue_id = path.stem
+    typer.echo(f"Issue created: {issue_id}")
+    typer.echo(str(path))
     raise typer.Exit(EXIT_SUCCESS)
   except (ValueError, FileNotFoundError) as e:
     typer.echo(f"Error creating issue: {e}", err=True)
@@ -291,18 +283,15 @@ def create_issue(
 @app.command("problem")
 def create_problem(
   title: Annotated[str, typer.Argument(help="Problem title")],
-  root: Annotated[
-    Path | None,
-    typer.Option(
-      "--root",
-      help="Repository root (auto-detected if omitted)",
-    ),
-  ] = None,
+  root: RootOption = None,
 ) -> None:
   """Create a new problem backlog entry."""
   try:
     path = create_backlog_entry("problem", title, repo_root=root)
-    typer.echo(f"Problem created: {path}")
+    # Extract ID from filename (e.g., PROB-001.md -> PROB-001)
+    problem_id = path.stem
+    typer.echo(f"Problem created: {problem_id}")
+    typer.echo(str(path))
     raise typer.Exit(EXIT_SUCCESS)
   except (ValueError, FileNotFoundError) as e:
     typer.echo(f"Error creating problem: {e}", err=True)
@@ -312,18 +301,15 @@ def create_problem(
 @app.command("improvement")
 def create_improvement(
   title: Annotated[str, typer.Argument(help="Improvement title")],
-  root: Annotated[
-    Path | None,
-    typer.Option(
-      "--root",
-      help="Repository root (auto-detected if omitted)",
-    ),
-  ] = None,
+  root: RootOption = None,
 ) -> None:
   """Create a new improvement backlog entry."""
   try:
     path = create_backlog_entry("improvement", title, repo_root=root)
-    typer.echo(f"Improvement created: {path}")
+    # Extract ID from filename (e.g., IMPR-001.md -> IMPR-001)
+    improvement_id = path.stem
+    typer.echo(f"Improvement created: {improvement_id}")
+    typer.echo(str(path))
     raise typer.Exit(EXIT_SUCCESS)
   except (ValueError, FileNotFoundError) as e:
     typer.echo(f"Error creating improvement: {e}", err=True)
@@ -333,18 +319,15 @@ def create_improvement(
 @app.command("risk")
 def create_risk(
   title: Annotated[str, typer.Argument(help="Risk title")],
-  root: Annotated[
-    Path | None,
-    typer.Option(
-      "--root",
-      help="Repository root (auto-detected if omitted)",
-    ),
-  ] = None,
+  root: RootOption = None,
 ) -> None:
   """Create a new risk backlog entry."""
   try:
     path = create_backlog_entry("risk", title, repo_root=root)
-    typer.echo(f"Risk created: {path}")
+    # Extract ID from filename (e.g., RISK-001.md -> RISK-001)
+    risk_id = path.stem
+    typer.echo(f"Risk created: {risk_id}")
+    typer.echo(str(path))
     raise typer.Exit(EXIT_SUCCESS)
   except (ValueError, FileNotFoundError) as e:
     typer.echo(f"Error creating risk: {e}", err=True)

@@ -5,7 +5,11 @@ Utilities for parsing structured plan and phase overview YAML blocks.
 ## Constants
 
 - `PHASE_MARKER`
+- `PHASE_SCHEMA`
+- `PHASE_VERSION`
 - `PLAN_MARKER`
+- `PLAN_SCHEMA`
+- `PLAN_VERSION`
 - `_PHASE_PATTERN`
 - `_PLAN_PATTERN`
 - `__all__`
@@ -62,6 +66,34 @@ Returns:
 
 Parsed YAML block containing phase overview information.
 
+### PhaseOverviewValidator
+
+Validator for phase overview blocks.
+
+#### Methods
+
+- `validate(self, block) -> list[str]`: Validate phase overview block against schema.
+
+Args:
+  block: Parsed phase overview block to validate.
+
+Returns:
+  List of error messages (empty if valid).
+
 ### PlanOverviewBlock
 
 Parsed YAML block containing plan overview information.
+
+### PlanOverviewValidator
+
+Validator for plan overview blocks.
+
+#### Methods
+
+- `validate(self, block) -> list[str]`: Validate plan overview block against schema.
+
+Args:
+  block: Parsed plan overview block to validate.
+
+Returns:
+  List of error messages (empty if valid).

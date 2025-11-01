@@ -25,6 +25,11 @@ Returns:
 
 Args:
   schema: BlockSchema instance to render
+- `_render_json_schema(block_type, schema) -> None`: Render JSON Schema (Draft 2020-12) for metadata-driven blocks.
+
+Args:
+  block_type: Block type identifier (e.g., 'verification.coverage')
+  schema: BlockSchema instance to render
 - `_render_markdown(schema) -> None`: Render schema as markdown documentation.
 
 Args:

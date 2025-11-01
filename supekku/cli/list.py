@@ -6,6 +6,7 @@ Display formatting is delegated to supekku.scripts.lib.formatters
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Annotated
 
@@ -14,9 +15,12 @@ import typer
 from supekku.cli.common import (
   EXIT_FAILURE,
   EXIT_SUCCESS,
+  CaseInsensitiveOption,
   FormatOption,
+  RegexpOption,
   RootOption,
   TruncateOption,
+  matches_regexp,
 )
 from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_status
 from supekku.scripts.lib.changes.registry import ChangeRegistry
@@ -72,6 +76,8 @@ def list_specs(
       help="Filter specs whose packages include PATH",
     ),
   ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
   paths: Annotated[
     bool,
     typer.Option(
@@ -87,7 +93,11 @@ def list_specs(
     ),
   ] = False,
 ) -> None:
-  """List SPEC/PROD artifacts with optional filtering."""
+  """List SPEC/PROD artifacts with optional filtering.
+
+  The --filter flag does substring matching (case-insensitive).
+  The --regexp flag does pattern matching on ID, slug, and name fields.
+  """
   if kind not in ["tech", "product", "all"]:
     typer.echo(f"Error: invalid kind: {kind}", err=True)
     raise typer.Exit(EXIT_FAILURE)
@@ -141,6 +151,18 @@ def list_specs(
         or filter_substring in spec.slug.lower()
         or filter_substring in spec.name.lower()
       ]
+
+    # Apply regexp filter on id, slug, name
+    if regexp:
+      try:
+        specs = [
+          spec
+          for spec in specs
+          if matches_regexp(regexp, [spec.id, spec.slug, spec.name], case_insensitive)
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
 
     if package_exact:
       specs = [spec for spec in specs if spec.id in package_exact]
@@ -201,6 +223,8 @@ def list_deltas(
       help=f"Filter by status. Valid: {', '.join(sorted(VALID_STATUSES))}",
     ),
   ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
   details: Annotated[
     bool,
     typer.Option(
@@ -210,7 +234,10 @@ def list_deltas(
     ),
   ] = False,
 ) -> None:
-  """List deltas with optional filtering and status grouping."""
+  """List deltas with optional filtering and status grouping.
+
+  The --regexp flag filters on ID, name, and slug fields.
+  """
   try:
     registry = ChangeRegistry(root=root, kind="delta")
     artifacts = registry.collect()
@@ -220,14 +247,32 @@ def list_deltas(
 
     delta_ids = set(ids) if ids else None
 
+    # Apply filters
+    filtered_artifacts = []
     for artifact in artifacts.values():
-      # Check filters
+      # Check ID filter
       if delta_ids is not None and artifact.id not in delta_ids:
         continue
+      # Check status filter
       if status and normalize_status(artifact.status) != normalize_status(status):
         continue
+      # Check regexp filter on id, name, slug
+      if regexp:
+        try:
+          if not matches_regexp(
+            regexp,
+            [artifact.id, artifact.name, artifact.slug],
+            case_insensitive,
+          ):
+            continue
+        except re.error as e:
+          typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+          raise typer.Exit(EXIT_FAILURE) from e
 
-      # Format and output
+      filtered_artifacts.append(artifact)
+
+    # Format and output
+    for artifact in filtered_artifacts:
       if details:
         output = format_change_with_context(artifact)
       else:
@@ -275,6 +320,8 @@ def list_changes(
       help="Filter artifacts that reference a requirement",
     ),
   ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
   paths: Annotated[
     bool,
     typer.Option(
@@ -304,7 +351,11 @@ def list_changes(
     ),
   ] = False,
 ) -> None:
-  """List change artifacts (deltas, revisions, audits) with optional filters."""
+  """List change artifacts (deltas, revisions, audits) with optional filters.
+
+  The --filter flag does substring matching (case-insensitive).
+  The --regexp flag does pattern matching on ID, slug, and name fields.
+  """
   if kind not in ["delta", "revision", "audit", "all"]:
     typer.echo(f"Error: invalid kind: {kind}", err=True)
     raise typer.Exit(EXIT_FAILURE)
@@ -317,7 +368,7 @@ def list_changes(
       artifacts = registry.collect()
 
       for artifact in artifacts.values():
-        # Check filters
+        # Check substring filter
         if substring:
           text = substring.lower()
           if not (
@@ -326,8 +377,25 @@ def list_changes(
             or text in artifact.name.lower()
           ):
             continue
+
+        # Check regexp filter
+        if regexp:
+          try:
+            if not matches_regexp(
+              regexp,
+              [artifact.id, artifact.slug, artifact.name],
+              case_insensitive,
+            ):
+              continue
+          except re.error as e:
+            typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+            raise typer.Exit(EXIT_FAILURE) from e
+
+        # Check status filter
         if status and artifact.status.lower() != status.lower():
           continue
+
+        # Check applies_to filter
         if applies_to:
           match = applies_to.lower()
           applies_list = []
@@ -409,11 +477,10 @@ def list_adrs(
       help="Filter by delta reference",
     ),
   ] = None,
-  requirement: Annotated[
+  requirement_filter: Annotated[
     str | None,
     typer.Option(
       "--requirement",
-      "-r",
       help="Filter by requirement reference",
     ),
   ] = None,
@@ -425,10 +492,16 @@ def list_adrs(
       help="Filter by policy reference",
     ),
   ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
 ) -> None:
-  """List Architecture Decision Records (ADRs) with optional filtering."""
+  """List Architecture Decision Records (ADRs) with optional filtering.
+
+  The --regexp flag filters on title and summary fields.
+  Other flags filter on specific structured fields (status, tags, references).
+  """
   # Validate format
   if format_type not in ["table", "json", "tsv"]:
     typer.echo(f"Error: invalid format: {format_type}", err=True)
@@ -437,17 +510,29 @@ def list_adrs(
   try:
     registry = DecisionRegistry(root=root)
 
-    # Apply filters
-    if any([tag, spec, delta, requirement, policy]):
+    # Apply structured filters
+    if any([tag, spec, delta, requirement_filter, policy]):
       decisions = registry.filter(
         tag=tag,
         spec=spec,
         delta=delta,
-        requirement=requirement,
+        requirement=requirement_filter,
         policy=policy,
       )
     else:
       decisions = list(registry.iter(status=status))
+
+    # Apply regexp filter on title and summary
+    if regexp:
+      try:
+        decisions = [
+          d
+          for d in decisions
+          if matches_regexp(regexp, [d.title, d.summary], case_insensitive)
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
 
     if not decisions:
       raise typer.Exit(EXIT_SUCCESS)

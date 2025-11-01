@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import re
 import tempfile
 from pathlib import Path
 
 import pytest
 from typer.testing import CliRunner
 
+from supekku.cli.common import matches_regexp
 from supekku.cli.main import app
 
 runner = CliRunner()
@@ -308,6 +310,97 @@ class TestErrorHandling:
     result = runner.invoke(app, ["create", "requirement"])
     # Should fail because spec, requirement, and title are required
     assert result.exit_code != 0
+
+
+class TestRegexpFiltering:
+  """Test regexp filtering utility and CLI flags."""
+
+  def test_matches_regexp_none_pattern(self):
+    """Test that None pattern matches everything."""
+    assert matches_regexp(None, ["foo", "bar"], False)
+    assert matches_regexp(None, [], False)
+
+  def test_matches_regexp_basic_match(self):
+    """Test basic pattern matching."""
+    assert matches_regexp(r"foo", ["foo", "bar"], False)
+    assert matches_regexp(r"bar", ["foo", "bar"], False)
+    assert not matches_regexp(r"baz", ["foo", "bar"], False)
+
+  def test_matches_regexp_case_sensitive(self):
+    """Test case-sensitive matching."""
+    assert matches_regexp(r"Foo", ["Foo", "bar"], False)
+    assert not matches_regexp(r"Foo", ["foo", "bar"], False)
+    assert not matches_regexp(r"FOO", ["foo", "bar"], False)
+
+  def test_matches_regexp_case_insensitive(self):
+    """Test case-insensitive matching."""
+    assert matches_regexp(r"foo", ["Foo", "bar"], True)
+    assert matches_regexp(r"FOO", ["foo", "bar"], True)
+    assert matches_regexp(r"BaR", ["foo", "bar"], True)
+
+  def test_matches_regexp_partial_match(self):
+    """Test that patterns match substrings."""
+    assert matches_regexp(r"Decision", ["Architecture Decision Record"], False)
+    assert matches_regexp(r"ADR-\d+", ["ADR-001: Some Decision"], False)
+    assert matches_regexp(r"decision", ["Architecture Decision Record"], True)
+
+  def test_matches_regexp_multiple_fields(self):
+    """Test matching across multiple fields."""
+    assert matches_regexp(r"test", ["foo", "bar", "test"], False)
+    assert matches_regexp(r"test", ["test", "bar"], False)
+    assert not matches_regexp(r"test", ["foo", "bar"], False)
+
+  def test_matches_regexp_empty_fields(self):
+    """Test handling of empty/None fields."""
+    assert matches_regexp(r"foo", ["foo", None, ""], False)
+    assert not matches_regexp(r"foo", [None, "", "bar"], False)
+
+  def test_matches_regexp_invalid_pattern(self):
+    """Test invalid regexp pattern raises error."""
+    with pytest.raises(re.error):
+      matches_regexp(r"[invalid(", ["foo"], False)
+
+  def test_matches_regexp_complex_patterns(self):
+    """Test complex regexp patterns."""
+    # Word boundary
+    assert matches_regexp(r"\bADR\b", ["ADR-001"], False)
+    assert not matches_regexp(r"\bADR\b", ["ADRIFT"], False)
+
+    # Alternation
+    assert matches_regexp(r"accepted|rejected", ["status: accepted"], False)
+    assert matches_regexp(r"accepted|rejected", ["status: rejected"], False)
+
+    # Character class
+    assert matches_regexp(r"SPEC-[0-9]{3}", ["SPEC-001"], False)
+    assert not matches_regexp(r"SPEC-[0-9]{3}", ["SPEC-1"], False)
+
+  def test_list_adrs_regexp_flag(self):
+    """Test list adrs command has --regexp flag."""
+    result = runner.invoke(app, ["list", "adrs", "--help"])
+    assert result.exit_code == 0
+    assert "--regexp" in result.stdout
+    assert "--case-insensitive" in result.stdout
+
+  def test_list_specs_regexp_flag(self):
+    """Test list specs command has --regexp flag."""
+    result = runner.invoke(app, ["list", "specs", "--help"])
+    assert result.exit_code == 0
+    assert "--regexp" in result.stdout
+    assert "--case-insensitive" in result.stdout
+
+  def test_list_deltas_regexp_flag(self):
+    """Test list deltas command has --regexp flag."""
+    result = runner.invoke(app, ["list", "deltas", "--help"])
+    assert result.exit_code == 0
+    assert "--regexp" in result.stdout
+    assert "--case-insensitive" in result.stdout
+
+  def test_list_changes_regexp_flag(self):
+    """Test list changes command has --regexp flag."""
+    result = runner.invoke(app, ["list", "changes", "--help"])
+    assert result.exit_code == 0
+    assert "--regexp" in result.stdout
+    assert "--case-insensitive" in result.stdout
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ Specification-driven development toolkit with multi-language spec sync and docum
 - Tooling joins related entities through a registry for fast lookup, validation, and relational data propagation
 - Stop banging rocks together
 
-![workflow diagram](https://supekku.dev/assets/img/simple.svg)
+![workflow diagram](./assets/simple.svg)
 
 ## Status
 
@@ -23,6 +23,8 @@ Specification-driven development toolkit with multi-language spec sync and docum
 - **Documentation generation**: Generate compact, legible, deterministic markdown documentation from code 
 - **Workspace validation**: Ensure consistency across specification artifacts
 - **Orphan detection**: Safely remove specs for deleted source files
+
+![ADR list](./assets/adr-list.png)
 
 ## Installation
 

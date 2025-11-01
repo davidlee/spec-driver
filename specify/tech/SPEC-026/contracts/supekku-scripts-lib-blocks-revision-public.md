@@ -25,6 +25,35 @@ Args:
 
 Returns:
   List of parsed RevisionChangeBlock objects.
+- `render_revision_change_block(revision_id) -> str`: Render a revision change YAML block with given values.
+
+This is the canonical source for the block structure. Templates and
+creation code should use this instead of hardcoding the structure.
+
+Note: This generates a minimal but valid revision block. For complex revisions,
+consider building the dict structure and using yaml.safe_dump directly.
+
+Args:
+  revision_id: The revision ID (e.g., "RE-001").
+  specs: List of spec change dicts with:
+    - spec_id: str
+    - action: str ("created", "updated", "retired")
+    - summary: str (optional)
+    - requirement_flow: dict (optional)
+    - section_changes: list (optional)
+  requirements: List of requirement change dicts with:
+    - requirement_id: str
+    - kind: str ("functional", "non-functional")
+    - action: str ("introduce", "modify", "move", "retire")
+    - summary: str (optional)
+    - destination: dict (optional)
+    - origin: list (optional)
+    - lifecycle: dict (optional)
+  prepared_by: Optional preparer identifier.
+  generated_at: Optional generation timestamp.
+
+Returns:
+  Formatted YAML code block as string.
 
 ## Classes
 

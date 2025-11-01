@@ -4,6 +4,9 @@ Utilities for parsing structured spec YAML blocks.
 
 ## Constants
 
+- `CAPABILITIES_MARKER`
+- `CAPABILITIES_SCHEMA`
+- `CAPABILITIES_VERSION`
 - `RELATIONSHIPS_MARKER`
 - `RELATIONSHIPS_SCHEMA`
 - `RELATIONSHIPS_VERSION`
@@ -29,6 +32,37 @@ Args:
 
 Returns:
   Parsed RelationshipsBlock or None if not found.
+- `render_spec_capabilities_block(spec_id) -> str`: Render a spec capabilities YAML block with given values.
+
+This is the canonical source for the block structure. Templates and
+creation code should use this instead of hardcoding the structure.
+
+Args:
+  spec_id: The specification ID.
+  capabilities: List of capability dicts with:
+    - id: str (kebab-case identifier)
+    - name: str (human-readable name)
+    - responsibilities: list[str] | None
+    - requirements: list[str] | None
+    - summary: str
+    - success_criteria: list[str] | None
+
+Returns:
+  Formatted YAML code block as string.
+- `render_spec_relationships_block(spec_id) -> str`: Render a spec relationships YAML block with given values.
+
+This is the canonical source for the block structure. Templates and
+creation code should use this instead of hardcoding the structure.
+
+Args:
+  spec_id: The specification ID.
+  primary_requirements: List of primary requirement codes
+    (e.g., ["FR-001", "FR-002"]).
+  collaborator_requirements: List of collaborator requirement codes.
+  interactions: List of interaction dicts with 'type' and 'spec' keys.
+
+Returns:
+  Formatted YAML code block as string.
 
 ## Classes
 

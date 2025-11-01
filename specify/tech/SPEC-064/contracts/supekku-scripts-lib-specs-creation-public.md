@@ -37,6 +37,8 @@ Returns:
   Next available identifier (e.g., "SPEC-042").
 - `extract_template_body(path) -> str`: Extract markdown body from template file after frontmatter.
 
+Falls back to package templates if local template is missing.
+
 Args:
   path: Path to template file.
 
@@ -44,7 +46,7 @@ Returns:
   Extracted markdown content (body after frontmatter).
 
 Raises:
-  TemplateNotFoundError: If template file doesn't exist.
+  TemplateNotFoundError: If template file doesn't exist in both locations.
 - `find_repository_root(start) -> Path`: Find repository root by searching for .git or spec-driver templates.
 
 Args:

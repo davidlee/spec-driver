@@ -24,7 +24,9 @@ VALID_STATUSES = {"planned", "in-progress", "verified", "failed", "blocked"}
 # ID patterns for validation
 _VERIFICATION_ID = re.compile(r"^V[TAH]-\d{3,}$")
 _SUBJECT_ID = re.compile(r"^(SPEC|PROD|IP|AUD)-\d{3,}(?:-[A-Z0-9]+)*$")
-_REQUIREMENT_ID = re.compile(r"^(SPEC|PROD)-\d{3,}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$")
+_REQUIREMENT_ID = re.compile(
+  r"^(SPEC|PROD)-\d{3,}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$",
+)
 _PHASE_ID = re.compile(r"^IP-\d{3,}(?:-[A-Z0-9]+)*\.PHASE-\d{2}$")
 
 

@@ -9,37 +9,9 @@ from pathlib import Path
 
 import yaml
 
+from supekku.scripts.lib.core.paths import get_templates_dir
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
-
-# ADR template content
-ADR_TEMPLATE = """# {adr_id}: {title}
-
-## Context
-
-**Brief** description of the problem or situation that requires a decision.
-
-## Decision
-
-The decision that was made and key reasoning.
-
-## Consequences
-
-### Positive
-- Benefits of this decision
-
-### Negative
-- Trade-offs or downsides
-
-### Neutral
-- Other impacts to be aware of
-
-## Verification
-- Required test suites, monitoring, or audits ensuring compliance.
-
-## References
-- [Design artefact link]
-- [External research]
-"""
+from supekku.scripts.lib.specs.creation import extract_template_body
 
 
 @dataclass
@@ -198,8 +170,10 @@ def create_adr(
     options.author_email,
   )
 
-  # Create content
-  content = ADR_TEMPLATE.format(adr_id=adr_id, title=options.title)
+  # Load template and create content
+  template_path = get_templates_dir(registry.root) / "ADR.md"
+  template_body = extract_template_body(template_path)
+  content = template_body.format(adr_id=adr_id, title=options.title)
 
   # Write file
   frontmatter_yaml = yaml.safe_dump(frontmatter, sort_keys=False)

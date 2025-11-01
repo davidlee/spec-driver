@@ -1,4 +1,21 @@
 ---
+id: TEMPLATE-spec-revision
+slug: spec-revision-template
+name: Spec Revision Template
+created: 2024-06-08
+updated: 2024-06-08
+status: draft
+kind: guidance
+aliases:
+  - Spec Revision Template
+---
+
+# Spec Revision Template
+
+Use this when adjusting specifications (e.g., moving FRs between specs, redefining responsibilities). Revisions live under `change/revisions/` and link to any follow-up deltas if code work is required.
+
+```markdown
+---
 id: RE-XXX
 slug: short-slug
 name: Spec Revision - <Summary>
@@ -39,3 +56,4 @@ aliases: []
 
 ## 6. Notes
 - Additional comments, research links, future revisions
+```

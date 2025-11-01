@@ -1,4 +1,21 @@
 ---
+id: TEMPLATE-audit
+slug: audit-template
+name: Audit Template
+created: 2024-06-08
+updated: 2024-06-08
+status: draft
+kind: guidance
+aliases:
+  - Audit Template
+---
+
+# Audit Template
+
+Use this template when running an agent-assisted or manual review to compare code against PROD/SPEC truths.
+
+```markdown
+---
 id: AUD-XXX
 kind: audit
 status: draft|in-review|complete
@@ -53,3 +70,10 @@ entries:
 
 ## Recommendations
 - …
+```
+
+**Workflow Notes**
+- Kick these off after major merges, before releases, or when specs/product intents change.
+- Every non-aligned finding should link to the backlog (issues/problems) or directly spawn a delta.
+- Patch-level entries provide a quick “at a glance” view of alignment so you can assess drift over time.
+- Update `supekku:verification.coverage@v1` entries as you gather VT/VA/VH evidence.

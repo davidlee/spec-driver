@@ -26,19 +26,7 @@ summary: >-
   Brief summary of the decision and its impact.
 ---
 
-# ADR-XXX: Title
-
-## Related Reading
-
-**Related ADRs**:
- - [title](/specify/decisions/status/path.md) - Title, brief description of relationship
-
-**Related Specifications**:
- - [title](/doc/specifications/path.md) - Title, brief description of relationship
-
-**Related Tasks**:
- - [TXXX/X.X] - Brief task description
- - [title](/doc/design-artefacts/path.md) - Title, brief description of relationship
+# {adr_id}: {title}
 
 ## Context
 
@@ -58,3 +46,10 @@ The decision that was made and key reasoning.
 
 ### Neutral
 - Other impacts to be aware of
+
+## Verification
+- Required test suites, monitoring, or audits ensuring compliance.
+
+## References
+- [Design artefact link]
+- [External research]

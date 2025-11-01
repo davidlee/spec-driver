@@ -39,15 +39,15 @@ class CreateSpecTest(unittest.TestCase):
     (root / "specify" / "tech").mkdir(parents=True)
     (root / "specify" / "product").mkdir(parents=True)
     (templates / "tech-spec-template.md").write_text(
-      """```markdown\n# Tech Body\n```\n""",
+      """---\nid: TEMPLATE\n---\n\n# Tech Body\n""",
       encoding="utf-8",
     )
     (templates / "product-spec-template.md").write_text(
-      """```markdown\n# Product Body\n```\n""",
+      """---\nid: TEMPLATE\n---\n\n# Product Body\n""",
       encoding="utf-8",
     )
     (templates / "tech-testing-template.md").write_text(
-      """```markdown\n# Test Body\n```\n""",
+      """---\nid: TEMPLATE\n---\n\n# Test Body\n""",
       encoding="utf-8",
     )
     os.chdir(root)

@@ -10,6 +10,11 @@ aliases:
   - Tech Testing Template
 ---
 
+# Tech Spec Testing Companion Template
+
+Use this template when a SPEC requires a dedicated testing document. It complements Section 7 of the system spec and can live alongside the SPEC bundle (e.g. `SPEC-101.tests.md`).
+
+```markdown
 # SPEC-XXX Testing Guide
 
 ## 1. Overview
@@ -58,3 +63,9 @@ For each suite/file:
 ## 9. Appendices (Optional)
 - Advanced troubleshooting tips.
 - Links to dashboards or CI job definitions.
+```
+
+**Usage Notes**
+- Keep plain-language descriptions so agents can translate scenarios into code.
+- When updating the SPEC’s Section 7, link to this document if it contains the detailed inventory.
+- Ensure any new test helper/library is documented here to guide future implementation agents.

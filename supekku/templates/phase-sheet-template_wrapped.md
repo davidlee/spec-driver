@@ -10,6 +10,18 @@ aliases:
   - Phase Sheet Template
 ---
 
+# Phase Sheet Template
+
+Create one sheet per phase under `change/deltas/DE-XXX/phases/phase-0N.md`. Flesh out the current phase just before execution. Keep earlier/later phases blank or stubs until needed.
+
+## ⚡ Quick Guidance
+- ✅ Start from the implementation plan’s entrance/exit criteria.
+- ✅ Capture success criteria (“Done When”) and verification in detail.
+- ✅ List tasks with status; mark parallelisable work with `[P]`.
+- ✅ Document assumptions, decisions, and STOP conditions for agents.
+- ❌ Avoid planning future phases here; create a new sheet when the next phase starts.
+
+```markdown
 ```yaml supekku:phase.overview@v1
 schema: supekku.phase.overview
 version: 1
@@ -87,3 +99,4 @@ risks: []
 - [ ] Verification evidence stored
 - [ ] Spec/Delta/Plan updated with lessons
 - [ ] Hand-off notes to next phase (if any)
+```

@@ -30,6 +30,38 @@ class CreateChangeTest(unittest.TestCase):
     self.addCleanup(tmpdir.cleanup)
     root = Path(tmpdir.name)
     (root / ".git").mkdir()
+
+    # Create .spec-driver/templates directory with template files
+    templates_dir = root / ".spec-driver" / "templates"
+    templates_dir.mkdir(parents=True, exist_ok=True)
+
+    # Delta template
+    (templates_dir / "delta.md").write_text(
+      "---\nid: DE-XXX\n---\n\n# DE-XXX – Descriptive Change Title\n\n"
+      "```yaml supekku:delta.relationships@v1\n```\n",
+      encoding="utf-8",
+    )
+
+    # Revision template
+    (templates_dir / "spec-revision-template.md").write_text(
+      "---\nid: RE-XXX\n---\n\n# RE-XXX - <Summary>\n",
+      encoding="utf-8",
+    )
+
+    # Plan template
+    (templates_dir / "implementation-plan-template.md").write_text(
+      "---\nid: IP-XXX\n---\n\n# IP-XXX\n\n"
+      "```yaml supekku:plan.overview@v1\n```\n",
+      encoding="utf-8",
+    )
+
+    # Phase template
+    (templates_dir / "phase-sheet-template.md").write_text(
+      "---\nid: PHASE-XXX\n---\n\n# PHASE-XXX\n\n"
+      "```yaml supekku:phase.overview@v1\n```\n",
+      encoding="utf-8",
+    )
+
     spec_dir = root / "specify" / "tech" / "spec-100-example"
     spec_dir.mkdir(parents=True, exist_ok=True)
     (spec_dir / "SPEC-100.md").write_text(

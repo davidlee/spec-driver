@@ -8,6 +8,7 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.core.paths import get_templates_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.specs.creation import (
   extract_template_body,
@@ -19,12 +20,10 @@ from supekku.scripts.lib.specs.registry import SpecRegistry
 if TYPE_CHECKING:
   from collections.abc import Iterable
 
-REPO_ROOT = Path(__file__).resolve().parents[4]
-TEMPLATE_DIR = REPO_ROOT / "supekku" / "templates"
 
-REVISION_TEMPLATE = TEMPLATE_DIR / "spec-revision-template.md"
-PLAN_TEMPLATE = TEMPLATE_DIR / "implementation-plan-template.md"
-PHASE_TEMPLATE = TEMPLATE_DIR / "phase-sheet-template.md"
+def _get_template_path(name: str, repo_root: Path | None = None) -> Path:
+  """Get path to template file in user's .spec-driver/templates directory."""
+  return get_templates_dir(repo_root) / name
 
 
 @dataclass(frozen=True)
@@ -225,35 +224,11 @@ def create_revision(
   if requirements:
     frontmatter["requirements"] = sorted(set(requirements))
 
-  body = f"""# {revision_id} - {name}
-
-## 1. Context
-- **Why**: TODO
-- **Source Specs**: {", ".join(source_specs or []) or "TODO"}
-- **Destination Specs**: {", ".join(destination_specs or []) or "TODO"}
-- **Requirements Affected**: {", ".join(requirements or []) or "TODO"}
-
-## 2. Related Artefacts
-- **Commits**: TODO
-- **Issues / Problems / Improvements**: TODO
-- **Decisions / ADRs**: TODO
-- **Follow-up Deltas**: TODO
-
-## 3. Summary of Changes
-- TODO
-
-## 4. Consequences
-- TODO
-
-## 5. Actions
-- [ ] Update source spec change history
-- [ ] Update destination spec change history
-- [ ] Notify relevant owners (if needed)
-- [ ] Trigger follow-up delta (if applicable)
-
-## 6. Notes
-- TODO
-"""
+  # Load template and replace placeholders
+  template_path = _get_template_path("spec-revision-template.md", repo)
+  body = extract_template_body(template_path)
+  body = body.replace("RE-XXX", revision_id)
+  body = body.replace("<Summary>", name)
 
   revision_path = revision_dir / f"{revision_id}.md"
   dump_markdown_file(revision_path, frontmatter, body)
@@ -310,34 +285,23 @@ def create_delta(
     },
   }
 
+  # Load template and replace placeholders
+  template_path = _get_template_path("delta.md", repo)
+  body = extract_template_body(template_path)
+  body = body.replace("DE-XXX", delta_id)
+  body = body.replace("Descriptive Change Title", name)
+
+  # Replace the delta.relationships block with populated data
   relationships_block = _render_delta_relationship_block(
     delta_id,
     specs or [],
     requirements or [],
   )
-
-  body = f"""{relationships_block}
-
-# {delta_id} - {name}
-
-## Motivation
-> TODO
-
-## Scope
-> TODO
-
-## Out of Scope
-> TODO
-
-## Verification Strategy
-> TODO
-
-## Follow-up / Tracking
-> TODO
-
-## Notes
-> TODO
-"""
+  body = _DELTA_RELATIONSHIPS_PATTERN.sub(
+    relationships_block,
+    body,
+    count=1,
+  )
 
   delta_path = delta_dir / f"{delta_id}.md"
   dump_markdown_file(delta_path, frontmatter, body)
@@ -345,7 +309,8 @@ def create_delta(
   extras: list[Path] = []
   plan_id = delta_id.replace("DE", "IP")
   if not allow_missing_plan:
-    plan_body = extract_template_body(PLAN_TEMPLATE)
+    plan_template_path = _get_template_path("implementation-plan-template.md", repo)
+    plan_body = extract_template_body(plan_template_path)
     plan_body = plan_body.replace("IP-XXX", plan_id).replace("DE-XXX", delta_id)
     plan_body = _PLAN_OVERVIEW_PATTERN.sub(
       _render_plan_overview_block(
@@ -374,7 +339,8 @@ def create_delta(
 
     phases_dir = delta_dir / "phases"
     _ensure_directory(phases_dir)
-    phase_body = extract_template_body(PHASE_TEMPLATE)
+    phase_template_path = _get_template_path("phase-sheet-template.md", repo)
+    phase_body = extract_template_body(phase_template_path)
     phase_body = phase_body.replace("PHASE-XXX", f"{plan_id}.PHASE-01")
     phase_body = _PHASE_OVERVIEW_PATTERN.sub(
       _render_phase_overview_block(f"{plan_id}.PHASE-01", plan_id, delta_id),

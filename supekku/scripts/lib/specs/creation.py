@@ -242,13 +242,13 @@ def slugify(name: str) -> str:
 
 
 def extract_template_body(path: Path) -> str:
-  """Extract markdown body from template file.
+  """Extract markdown body from template file after frontmatter.
 
   Args:
     path: Path to template file.
 
   Returns:
-    Extracted markdown content.
+    Extracted markdown content (body after frontmatter).
 
   Raises:
     TemplateNotFoundError: If template file doesn't exist.
@@ -257,11 +257,13 @@ def extract_template_body(path: Path) -> str:
     msg = f"Template not found: {path}"
     raise TemplateNotFoundError(msg)
   content = path.read_text(encoding="utf-8")
-  match = re.search(r"```markdown\s*(.*?)```", content, re.DOTALL)
-  if match:
-    body = match.group(1).strip()
-    return body + "\n"
-  return "# TODO: Fill spec body\n"
+
+  # If template has frontmatter, extract body after it
+  if content.startswith("---"):
+    parts = content.split("---", 2)
+    return parts[2].lstrip("\n") if len(parts) >= 3 else content
+
+  return content
 
 
 def build_frontmatter(

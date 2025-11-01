@@ -12,6 +12,17 @@ aliases:
 
 # Implementation Plan Template
 
+Use this when preparing an `IP-XXX.md` for a delta. Plans stay under `change/deltas/DE-XXX/` and map the work required to bring the code in line with the spec.
+
+## ⚡ Quick Guidance
+- ✅ Reference the delta (`DE-XXX`) and impacted SPEC/PROD documents up front.
+- ✅ Define clear entrance/exit criteria and verification gates per phase.
+- ✅ Plan phases first; detailed task breakdown lives in separate phase sheets.
+- ✅ Keep the verification coverage block current with VT/VA/VH artefacts and planned evidence.
+- ❌ Do not invent new scope-everything must trace back to the delta/spec.
+- 🧪 Call out required tests and tooling updates so agents know how to validate.
+
+```markdown
 ```yaml supekku:plan.overview@v1
 schema: supekku.plan.overview
 version: 1

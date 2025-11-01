@@ -145,3 +145,11 @@ Use prose to elaborate on items defined in the `supekku:spec.capabilities@v1` bl
 - Glossary
 - Detailed API examples
 - Migration notes or historical context
+```
+
+**Authoring Guidance**
+- Frontmatter should already capture IDs, scope, guiding principles, assumptions, hypotheses, decisions, and relations.
+- Use concise prose but be explicit about behaviours, state transitions, and contracts; agents rely on this granularity to infer implementation details.
+- Keep diagrams lightweight (D2/mermaid) so they are easy to diff and regenerate.
+- When sections don’t apply, remove them rather than leaving placeholders.
+- Cross-link requirements, issues, deltas, and audits so navigation stays rich.

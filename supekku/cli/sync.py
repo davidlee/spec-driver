@@ -272,8 +272,8 @@ def _sync_specs(
         requested = target_list if target_list else None
         source_units = adapter.discover_targets(root, requested)
 
-        # Detect orphaned specs when pruning in discovery mode
-        if prune and lang_name in spec_manager.registry_v2.languages:
+        # Always detect orphaned specs in discovery mode
+        if lang_name in spec_manager.registry_v2.languages:
           registered_ids = set(spec_manager.registry_v2.languages[lang_name].keys())
           discovered_ids = {unit.identifier for unit in source_units}
           orphaned_ids = registered_ids - discovered_ids

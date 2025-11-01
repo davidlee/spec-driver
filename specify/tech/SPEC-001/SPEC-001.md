@@ -1,17 +1,17 @@
 ---
 id: SPEC-001
-slug: supekku-cli-adr
-name: supekku/cli/adr.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-cli-common
+name: supekku/cli/common.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/cli/adr.py
-  module: supekku.cli.adr
+  identifier: supekku/cli/common.py
+  module: supekku.cli.common
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-001 – supekku/cli/adr.py
+# SPEC-001 – supekku/cli/common.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

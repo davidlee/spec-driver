@@ -1,17 +1,17 @@
 ---
 id: SPEC-040
-slug: supekku-scripts-lib-file_ops
-name: supekku/scripts/lib/file_ops.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-lib-core-spec_utils
+name: supekku/scripts/lib/core/spec_utils.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/file_ops.py
-  module: supekku.scripts.lib.file_ops
+  identifier: supekku/scripts/lib/core/spec_utils.py
+  module: supekku.scripts.lib.core.spec_utils
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-040 – supekku/scripts/lib/file_ops.py
+# SPEC-040 – supekku/scripts/lib/core/spec_utils.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

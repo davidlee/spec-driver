@@ -1,7 +1,7 @@
 ---
 id: SPEC-077
-slug: supekku-scripts-lib-changes-blocks-revision
-name: supekku/scripts/lib/changes/blocks/revision.py Specification
+slug: supekku-scripts-list_deltas
+name: supekku/scripts/list_deltas.py Specification
 created: '2025-11-01'
 updated: '2025-11-01'
 status: draft
@@ -10,8 +10,8 @@ responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/changes/blocks/revision.py
-  module: supekku.scripts.lib.changes.blocks.revision
+  identifier: supekku/scripts/list_deltas.py
+  module: supekku.scripts.list_deltas
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-077 – supekku/scripts/lib/changes/blocks/revision.py
+# SPEC-077 – supekku/scripts/list_deltas.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

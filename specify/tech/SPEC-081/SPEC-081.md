@@ -1,7 +1,7 @@
 ---
 id: SPEC-081
-slug: supekku-scripts-lib-changes-lifecycle
-name: supekku/scripts/lib/changes/lifecycle.py Specification
+slug: supekku-scripts-validate_revision_blocks
+name: supekku/scripts/validate_revision_blocks.py Specification
 created: '2025-11-01'
 updated: '2025-11-01'
 status: draft
@@ -10,8 +10,8 @@ responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/changes/lifecycle.py
-  module: supekku.scripts.lib.changes.lifecycle
+  identifier: supekku/scripts/validate_revision_blocks.py
+  module: supekku.scripts.validate_revision_blocks
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-081 – supekku/scripts/lib/changes/lifecycle.py
+# SPEC-081 – supekku/scripts/validate_revision_blocks.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

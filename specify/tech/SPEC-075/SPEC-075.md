@@ -1,7 +1,7 @@
 ---
 id: SPEC-075
-slug: supekku-scripts-lib-changes-blocks-delta
-name: supekku/scripts/lib/changes/blocks/delta.py Specification
+slug: supekku-scripts-lib-workspace
+name: supekku/scripts/lib/workspace.py Specification
 created: '2025-11-01'
 updated: '2025-11-01'
 status: draft
@@ -10,8 +10,8 @@ responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/changes/blocks/delta.py
-  module: supekku.scripts.lib.changes.blocks.delta
+  identifier: supekku/scripts/lib/workspace.py
+  module: supekku.scripts.lib.workspace
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-075 – supekku/scripts/lib/changes/blocks/delta.py
+# SPEC-075 – supekku/scripts/lib/workspace.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

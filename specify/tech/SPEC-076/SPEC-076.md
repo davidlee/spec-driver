@@ -1,7 +1,7 @@
 ---
 id: SPEC-076
-slug: supekku-scripts-lib-changes-blocks-plan
-name: supekku/scripts/lib/changes/blocks/plan.py Specification
+slug: supekku-scripts-list_changes
+name: supekku/scripts/list_changes.py Specification
 created: '2025-11-01'
 updated: '2025-11-01'
 status: draft
@@ -10,8 +10,8 @@ responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/changes/blocks/plan.py
-  module: supekku.scripts.lib.changes.blocks.plan
+  identifier: supekku/scripts/list_changes.py
+  module: supekku.scripts.list_changes
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-076 – supekku/scripts/lib/changes/blocks/plan.py
+# SPEC-076 – supekku/scripts/list_changes.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

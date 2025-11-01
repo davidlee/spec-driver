@@ -1,7 +1,7 @@
 ---
 id: SPEC-082
-slug: supekku-scripts-lib-changes-registry
-name: supekku/scripts/lib/changes/registry.py Specification
+slug: supekku-scripts-validate_workspace
+name: supekku/scripts/validate_workspace.py Specification
 created: '2025-11-01'
 updated: '2025-11-01'
 status: draft
@@ -10,8 +10,8 @@ responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/changes/registry.py
-  module: supekku.scripts.lib.changes.registry
+  identifier: supekku/scripts/validate_workspace.py
+  module: supekku.scripts.validate_workspace
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-082 – supekku/scripts/lib/changes/registry.py
+# SPEC-082 – supekku/scripts/validate_workspace.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

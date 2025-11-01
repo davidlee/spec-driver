@@ -1,17 +1,17 @@
 ---
 id: SPEC-066
-slug: supekku-scripts-list_deltas
-name: supekku/scripts/list_deltas.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-lib-specs-models
+name: supekku/scripts/lib/specs/models.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/list_deltas.py
-  module: supekku.scripts.list_deltas
+  identifier: supekku/scripts/lib/specs/models.py
+  module: supekku.scripts.lib.specs.models
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-066 – supekku/scripts/list_deltas.py
+# SPEC-066 – supekku/scripts/lib/specs/models.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

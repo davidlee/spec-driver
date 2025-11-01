@@ -1,17 +1,17 @@
 ---
 id: SPEC-013
-slug: supekku-scripts-cli-ast_doc_generator
-name: supekku/scripts/cli/ast_doc_generator.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-cli-deterministic_ast_doc_generator
+name: supekku/scripts/cli/deterministic_ast_doc_generator.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/cli/ast_doc_generator.py
-  module: supekku.scripts.cli.ast_doc_generator
+  identifier: supekku/scripts/cli/deterministic_ast_doc_generator.py
+  module: supekku.scripts.cli.deterministic_ast_doc_generator
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-013 – supekku/scripts/cli/ast_doc_generator.py
+# SPEC-013 – supekku/scripts/cli/deterministic_ast_doc_generator.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

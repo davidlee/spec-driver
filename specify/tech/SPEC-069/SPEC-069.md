@@ -1,17 +1,17 @@
 ---
 id: SPEC-069
-slug: supekku-scripts-sync_specs
-name: supekku/scripts/sync_specs.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-lib-sync-adapters-go
+name: supekku/scripts/lib/sync/adapters/go.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/sync_specs.py
-  module: supekku.scripts.sync_specs
+  identifier: supekku/scripts/lib/sync/adapters/go.py
+  module: supekku.scripts.lib.sync.adapters.go
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-069 – supekku/scripts/sync_specs.py
+# SPEC-069 – supekku/scripts/lib/sync/adapters/go.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

@@ -1,17 +1,17 @@
 ---
 id: SPEC-034
-slug: supekku-scripts-lib-docs-python-cache
-name: supekku/scripts/lib/docs/python/cache.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-lib-changes-updater
+name: supekku/scripts/lib/changes/updater.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/docs/python/cache.py
-  module: supekku.scripts.lib.docs.python.cache
+  identifier: supekku/scripts/lib/changes/updater.py
+  module: supekku.scripts.lib.changes.updater
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-034 – supekku/scripts/lib/docs/python/cache.py
+# SPEC-034 – supekku/scripts/lib/changes/updater.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

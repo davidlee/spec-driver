@@ -1,17 +1,17 @@
 ---
 id: SPEC-039
-slug: supekku-scripts-lib-docs-python-variants
-name: supekku/scripts/lib/docs/python/variants.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-lib-core-repo
+name: supekku/scripts/lib/core/repo.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/docs/python/variants.py
-  module: supekku.scripts.lib.docs.python.variants
+  identifier: supekku/scripts/lib/core/repo.py
+  module: supekku.scripts.lib.core.repo
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-039 – supekku/scripts/lib/docs/python/variants.py
+# SPEC-039 – supekku/scripts/lib/core/repo.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

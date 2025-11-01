@@ -1,17 +1,17 @@
 ---
 id: SPEC-033
-slug: supekku-scripts-lib-docs-python-analyzer
-name: supekku/scripts/lib/docs/python/analyzer.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-lib-changes-registry
+name: supekku/scripts/lib/changes/registry.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/docs/python/analyzer.py
-  module: supekku.scripts.lib.docs.python.analyzer
+  identifier: supekku/scripts/lib/changes/registry.py
+  module: supekku.scripts.lib.changes.registry
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-033 – supekku/scripts/lib/docs/python/analyzer.py
+# SPEC-033 – supekku/scripts/lib/changes/registry.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

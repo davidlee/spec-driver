@@ -1,7 +1,7 @@
 ---
 id: SPEC-078
-slug: supekku-scripts-lib-changes-completion
-name: supekku/scripts/lib/changes/completion.py Specification
+slug: supekku-scripts-list_specs
+name: supekku/scripts/list_specs.py Specification
 created: '2025-11-01'
 updated: '2025-11-01'
 status: draft
@@ -10,8 +10,8 @@ responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/changes/completion.py
-  module: supekku.scripts.lib.changes.completion
+  identifier: supekku/scripts/list_specs.py
+  module: supekku.scripts.list_specs
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-078 – supekku/scripts/lib/changes/completion.py
+# SPEC-078 – supekku/scripts/list_specs.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

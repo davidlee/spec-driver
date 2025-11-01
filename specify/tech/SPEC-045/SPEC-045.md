@@ -1,17 +1,17 @@
 ---
 id: SPEC-045
-slug: supekku-scripts-lib-registry_migration
-name: supekku/scripts/lib/registry_migration.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-lib-docs-python-analyzer
+name: supekku/scripts/lib/docs/python/analyzer.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/registry_migration.py
-  module: supekku.scripts.lib.registry_migration
+  identifier: supekku/scripts/lib/docs/python/analyzer.py
+  module: supekku.scripts.lib.docs.python.analyzer
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-045 – supekku/scripts/lib/registry_migration.py
+# SPEC-045 – supekku/scripts/lib/docs/python/analyzer.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

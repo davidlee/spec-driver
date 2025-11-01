@@ -1,17 +1,17 @@
 ---
 id: SPEC-003
-slug: supekku-cli-complete
-name: supekku/cli/complete.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-cli-create
+name: supekku/cli/create.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/cli/complete.py
-  module: supekku.cli.complete
+  identifier: supekku/cli/create.py
+  module: supekku.cli.create
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-003 – supekku/cli/complete.py
+# SPEC-003 – supekku/cli/create.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

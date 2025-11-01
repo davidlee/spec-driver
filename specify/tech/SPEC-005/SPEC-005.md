@@ -1,17 +1,17 @@
 ---
 id: SPEC-005
-slug: supekku-cli-list
-name: supekku/cli/list.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-cli-main
+name: supekku/cli/main.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/cli/list.py
-  module: supekku.cli.list
+  identifier: supekku/cli/main.py
+  module: supekku.cli.main
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-005 – supekku/cli/list.py
+# SPEC-005 – supekku/cli/main.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

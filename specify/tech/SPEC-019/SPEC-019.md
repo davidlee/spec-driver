@@ -1,17 +1,17 @@
 ---
 id: SPEC-019
-slug: supekku-scripts-create_revision
-name: supekku/scripts/create_revision.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-decision_registry
+name: supekku/scripts/decision_registry.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/create_revision.py
-  module: supekku.scripts.create_revision
+  identifier: supekku/scripts/decision_registry.py
+  module: supekku.scripts.decision_registry
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-019 – supekku/scripts/create_revision.py
+# SPEC-019 – supekku/scripts/decision_registry.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

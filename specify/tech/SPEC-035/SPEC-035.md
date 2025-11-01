@@ -1,17 +1,17 @@
 ---
 id: SPEC-035
-slug: supekku-scripts-lib-docs-python-comments
-name: supekku/scripts/lib/docs/python/comments.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-lib-core-cli_utils
+name: supekku/scripts/lib/core/cli_utils.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/docs/python/comments.py
-  module: supekku.scripts.lib.docs.python.comments
+  identifier: supekku/scripts/lib/core/cli_utils.py
+  module: supekku.scripts.lib.core.cli_utils
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-035 – supekku/scripts/lib/docs/python/comments.py
+# SPEC-035 – supekku/scripts/lib/core/cli_utils.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

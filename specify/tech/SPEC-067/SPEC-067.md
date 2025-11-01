@@ -1,17 +1,17 @@
 ---
 id: SPEC-067
-slug: supekku-scripts-list_specs
-name: supekku/scripts/list_specs.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-lib-specs-registry
+name: supekku/scripts/lib/specs/registry.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/list_specs.py
-  module: supekku.scripts.list_specs
+  identifier: supekku/scripts/lib/specs/registry.py
+  module: supekku.scripts.lib.specs.registry
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-067 – supekku/scripts/list_specs.py
+# SPEC-067 – supekku/scripts/lib/specs/registry.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

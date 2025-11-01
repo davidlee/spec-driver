@@ -1,7 +1,7 @@
 ---
 id: SPEC-073
-slug: supekku-scripts-lib-backlog-registry
-name: supekku/scripts/lib/backlog/registry.py Specification
+slug: supekku-scripts-lib-sync-models
+name: supekku/scripts/lib/sync/models.py Specification
 created: '2025-11-01'
 updated: '2025-11-01'
 status: draft
@@ -10,8 +10,8 @@ responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/backlog/registry.py
-  module: supekku.scripts.lib.backlog.registry
+  identifier: supekku/scripts/lib/sync/models.py
+  module: supekku.scripts.lib.sync.models
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-073 – supekku/scripts/lib/backlog/registry.py
+# SPEC-073 – supekku/scripts/lib/sync/models.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

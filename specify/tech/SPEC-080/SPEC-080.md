@@ -1,7 +1,7 @@
 ---
 id: SPEC-080
-slug: supekku-scripts-lib-changes-discovery
-name: supekku/scripts/lib/changes/discovery.py Specification
+slug: supekku-scripts-sync_specs
+name: supekku/scripts/sync_specs.py Specification
 created: '2025-11-01'
 updated: '2025-11-01'
 status: draft
@@ -10,8 +10,8 @@ responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/changes/discovery.py
-  module: supekku.scripts.lib.changes.discovery
+  identifier: supekku/scripts/sync_specs.py
+  module: supekku.scripts.sync_specs
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-080 – supekku/scripts/lib/changes/discovery.py
+# SPEC-080 – supekku/scripts/sync_specs.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

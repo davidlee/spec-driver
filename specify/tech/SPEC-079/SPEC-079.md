@@ -1,7 +1,7 @@
 ---
 id: SPEC-079
-slug: supekku-scripts-lib-changes-creation
-name: supekku/scripts/lib/changes/creation.py Specification
+slug: supekku-scripts-requirements
+name: supekku/scripts/requirements.py Specification
 created: '2025-11-01'
 updated: '2025-11-01'
 status: draft
@@ -10,8 +10,8 @@ responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/changes/creation.py
-  module: supekku.scripts.lib.changes.creation
+  identifier: supekku/scripts/requirements.py
+  module: supekku.scripts.requirements
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-079 – supekku/scripts/lib/changes/creation.py
+# SPEC-079 – supekku/scripts/requirements.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

@@ -1,17 +1,17 @@
 ---
 id: SPEC-064
-slug: supekku-scripts-lib-workspace
-name: supekku/scripts/lib/workspace.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-lib-specs-creation
+name: supekku/scripts/lib/specs/creation.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/lib/workspace.py
-  module: supekku.scripts.lib.workspace
+  identifier: supekku/scripts/lib/specs/creation.py
+  module: supekku.scripts.lib.specs.creation
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-064 – supekku/scripts/lib/workspace.py
+# SPEC-064 – supekku/scripts/lib/specs/creation.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

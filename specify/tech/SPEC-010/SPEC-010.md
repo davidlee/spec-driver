@@ -1,17 +1,17 @@
 ---
 id: SPEC-010
-slug: supekku-scripts-backlog-append
-name: supekku/scripts/backlog/append.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-backlog-create_entry
+name: supekku/scripts/backlog/create_entry.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/scripts/backlog/append.py
-  module: supekku.scripts.backlog.append
+  identifier: supekku/scripts/backlog/create_entry.py
+  module: supekku.scripts.backlog.create_entry
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-010 – supekku/scripts/backlog/append.py
+# SPEC-010 – supekku/scripts/backlog/create_entry.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

@@ -1,17 +1,17 @@
 ---
 id: SPEC-009
-slug: supekku-cli-workspace
-name: supekku/cli/workspace.py Specification
-created: '2025-10-31'
-updated: '2025-10-31'
+slug: supekku-scripts-backlog-append
+name: supekku/scripts/backlog/append.py Specification
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: spec
 responsibilities: []
 aliases: []
 sources:
 - language: python
-  identifier: supekku/cli/workspace.py
-  module: supekku.cli.workspace
+  identifier: supekku/scripts/backlog/append.py
+  module: supekku.scripts.backlog.append
   variants:
   - name: api
     path: contracts/api.md
@@ -21,6 +21,6 @@ sources:
     path: contracts/tests.md
 ---
 
-# SPEC-009 – supekku/cli/workspace.py
+# SPEC-009 – supekku/scripts/backlog/append.py
 
 > TODO: Populate responsibilities, behaviour, quality requirements, and testing strategy.

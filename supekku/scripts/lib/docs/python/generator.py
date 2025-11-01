@@ -73,10 +73,9 @@ def generate_deterministic_markdown_spec(
     if spec_type == "public":
       classes_to_show = [c for c in classes_to_show if not c["is_private"]]
 
-    for class_info in classes_to_show:
+    if classes_to_show:
       lines.append("## Classes")
       lines.append("")
-      break
 
     for class_info in classes_to_show:
       lines.append(f"### {class_info['name']}")

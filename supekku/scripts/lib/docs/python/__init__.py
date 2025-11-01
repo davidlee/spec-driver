@@ -7,7 +7,6 @@ designed for integration with multi-language specification sync adapters.
 import hashlib
 from collections.abc import Iterable
 from pathlib import Path
-from typing import List, Optional
 
 from .analyzer import DeterministicPythonModuleAnalyzer
 from .cache import ParseCache

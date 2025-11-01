@@ -3,6 +3,9 @@ check: format lint test pylint
 test:
   uv run pytest supekku
 
+quickcheck: && lint
+  uv run pytest -qx
+
 lint:
   uv run ruff check --fix supekku
 

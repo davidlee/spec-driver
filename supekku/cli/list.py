@@ -761,9 +761,7 @@ def list_revisions(
         r
         for r in revisions
         if r.relations
-        and any(
-          spec_upper in str(rel.get("target", "")).upper() for rel in r.relations
-        )
+        and any(spec_upper in str(rel.get("target", "")).upper() for rel in r.relations)
       ]
     if substring:
       filter_lower = substring.lower()
@@ -860,9 +858,7 @@ def list_backlog(
     if regexp:
       try:
         items = [
-          i
-          for i in items
-          if matches_regexp(regexp, [i.id, i.title], case_insensitive)
+          i for i in items if matches_regexp(regexp, [i.id, i.title], case_insensitive)
         ]
       except re.error as e:
         typer.echo(f"Error: invalid regexp pattern: {e}", err=True)

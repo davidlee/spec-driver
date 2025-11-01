@@ -42,7 +42,6 @@ class TestMainApp:
     assert "list" in result.stdout
     assert "show" in result.stdout
     assert "complete" in result.stdout
-    assert "adr" in result.stdout
 
 
 class TestWorkspaceCommands:
@@ -170,6 +169,18 @@ class TestListCommands:
     assert "--filter" in result.stdout
     assert "--status" in result.stdout
 
+  def test_list_adrs_help(self):
+    """Test list adrs command help."""
+    result = runner.invoke(app, ["list", "adrs", "--help"])
+    assert result.exit_code == 0
+    assert "List Architecture Decision Records" in result.stdout
+    assert "--status" in result.stdout
+    assert "--tag" in result.stdout
+    assert "--spec" in result.stdout
+    assert "--delta" in result.stdout
+    assert "--requirement" in result.stdout
+    assert "--policy" in result.stdout
+
 
 class TestShowCommands:
   """Test show command group."""
@@ -204,44 +215,6 @@ class TestCompleteCommands:
     assert "--dry-run" in result.stdout
     assert "--force" in result.stdout
     assert "--skip-sync" in result.stdout
-
-
-class TestAdrCommands:
-  """Test ADR command group."""
-
-  def test_adr_help(self):
-    """Test adr command group help."""
-    result = runner.invoke(app, ["adr", "--help"])
-    assert result.exit_code == 0
-    assert "Manage Architecture Decision Records" in result.stdout
-
-  def test_adr_sync_help(self):
-    """Test adr sync command help."""
-    result = runner.invoke(app, ["adr", "sync", "--help"])
-    assert result.exit_code == 0
-    assert "Sync decision registry" in result.stdout
-
-  def test_adr_list_help(self):
-    """Test adr list command help."""
-    result = runner.invoke(app, ["adr", "list", "--help"])
-    assert result.exit_code == 0
-    assert "List decisions" in result.stdout
-    assert "--status" in result.stdout
-    assert "--tag" in result.stdout
-
-  def test_adr_show_help(self):
-    """Test adr show command help."""
-    result = runner.invoke(app, ["adr", "show", "--help"])
-    assert result.exit_code == 0
-    assert "Show detailed information about a specific decision" in result.stdout
-
-  def test_adr_new_help(self):
-    """Test adr new command help."""
-    result = runner.invoke(app, ["adr", "new", "--help"])
-    assert result.exit_code == 0
-    assert "Create a new ADR" in result.stdout
-    assert "--status" in result.stdout
-    assert "--author" in result.stdout
 
 
 class TestSyncCommand:
@@ -283,12 +256,6 @@ class TestCommonOptions:
     assert result.exit_code == 0
     assert "--root" in result.stdout
 
-  def test_root_option_in_adr_sync(self):
-    """Test --root option is available."""
-    result = runner.invoke(app, ["adr", "sync", "--help"])
-    assert result.exit_code == 0
-    assert "--root" in result.stdout
-
 
 class TestCommandStructure:
   """Test command structure follows verb-noun pattern."""
@@ -305,12 +272,13 @@ class TestCommandStructure:
 
   def test_list_follows_verb_noun(self):
     """Test list commands follow verb-noun pattern."""
-    # list specs, list deltas, etc.
+    # list specs, list deltas, list adrs, etc.
     result = runner.invoke(app, ["list", "--help"])
     assert result.exit_code == 0
     assert "specs" in result.stdout
     assert "deltas" in result.stdout
     assert "changes" in result.stdout
+    assert "adrs" in result.stdout
 
   def test_show_follows_verb_noun(self):
     """Test show commands follow verb-noun pattern."""

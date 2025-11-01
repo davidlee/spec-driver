@@ -14,6 +14,7 @@ import typer
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
 from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_status
 from supekku.scripts.lib.changes.registry import ChangeRegistry
+from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.change_formatters import format_change_with_context
 from supekku.scripts.lib.formatters.spec_formatters import format_spec_list_item
 from supekku.scripts.lib.specs.registry import SpecRegistry
@@ -358,6 +359,94 @@ def list_changes(
           line += f"\t{plan_id}\t{phase_count} phases"
 
         typer.echo(line)
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("adrs")
+def list_adrs(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option(
+      "--status",
+      "-s",
+      help="Filter by status (accepted, draft, deprecated, etc.)",
+    ),
+  ] = None,
+  tag: Annotated[
+    str | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag",
+    ),
+  ] = None,
+  spec: Annotated[
+    str | None,
+    typer.Option(
+      "--spec",
+      help="Filter by spec reference",
+    ),
+  ] = None,
+  delta: Annotated[
+    str | None,
+    typer.Option(
+      "--delta",
+      "-d",
+      help="Filter by delta reference",
+    ),
+  ] = None,
+  requirement: Annotated[
+    str | None,
+    typer.Option(
+      "--requirement",
+      "-r",
+      help="Filter by requirement reference",
+    ),
+  ] = None,
+  policy: Annotated[
+    str | None,
+    typer.Option(
+      "--policy",
+      "-p",
+      help="Filter by policy reference",
+    ),
+  ] = None,
+) -> None:
+  """List Architecture Decision Records (ADRs) with optional filtering."""
+  try:
+    registry = DecisionRegistry(root=root)
+
+    # Apply filters
+    if any([tag, spec, delta, requirement, policy]):
+      decisions = registry.filter(
+        tag=tag,
+        spec=spec,
+        delta=delta,
+        requirement=requirement,
+        policy=policy,
+      )
+    else:
+      decisions = list(registry.iter(status=status))
+
+    if not decisions:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Print decisions
+    for decision in sorted(decisions, key=lambda d: d.id):
+      updated_date = (
+        decision.updated.strftime("%Y-%m-%d") if decision.updated else "N/A"
+      )
+      # Truncate title if too long
+      title = decision.title
+      if len(title) > 40:
+        title = title[:37] + "..."
+
+      typer.echo(f"{decision.id}\t{decision.status}\t{title}\t{updated_date}")
 
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:

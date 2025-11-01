@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import typer
 
-from supekku.cli import adr, complete, create, show, sync, workspace
+from supekku.cli import complete, create, show, sync, workspace
 from supekku.cli import list as list_module
 from supekku.cli.common import VersionOption
 
@@ -47,7 +47,7 @@ app.add_typer(
 app.add_typer(
   list_module.app,
   name="list",
-  help="List artifacts (specs, deltas, changes)",
+  help="List artifacts (specs, deltas, changes, adrs)",
 )
 
 app.add_typer(
@@ -60,13 +60,6 @@ app.add_typer(
   complete.app,
   name="complete",
   help="Complete artifacts (mark deltas as completed)",
-)
-
-# ADR command group (noun-verb pattern as special case)
-app.add_typer(
-  adr.app,
-  name="adr",
-  help="Manage Architecture Decision Records (ADRs)",
 )
 
 

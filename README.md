@@ -168,13 +168,13 @@ spec-driver list changes --kind delta
 spec-driver create adr
 
 # List ADRs
-spec-driver adr list
+spec-driver list adrs
 
 # List ADRs by status
-spec-driver adr list --status accepted
+spec-driver list adrs --status accepted
 
 # Show ADR details
-spec-driver adr show ADR-001
+spec-driver show adr ADR-001
 
 # Sync ADR registry
 spec-driver sync --adr

@@ -6,6 +6,8 @@ AST-based Python module analyzer.
 
 ### DeterministicPythonModuleAnalyzer
 
+Analyzes Python module AST to extract documentation information.
+
 #### Methods
 
 - `analyze(self) -> dict`: Analyze the Python file and extract documentation info with caching.

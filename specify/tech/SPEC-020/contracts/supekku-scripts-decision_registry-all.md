@@ -2,10 +2,6 @@
 
 CLI tool for managing decision (ADR) registry operations.
 
-## Constants
-
-- `ROOT`
-
 ## Functions
 
 - `create_list_parser(subparsers) -> None`: Create the list command parser.

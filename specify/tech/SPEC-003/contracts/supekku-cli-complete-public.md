@@ -4,7 +4,6 @@ Complete commands for marking deltas as completed.
 
 ## Constants
 
-- `ROOT` - Add parent to path for imports
 - `app`
 
 ## Functions

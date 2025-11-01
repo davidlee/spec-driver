@@ -8,7 +8,7 @@ using the new modular library API underneath.
 ## Functions
 
 - `_handle_check_result(result) -> int`: Handle check mode result and return error count.
-- `_handle_error_result(result) -> int`: Handle error result and return error count.
+- `_handle_error_result(_result) -> int`: Handle error result and return error count.
 - `_handle_normal_result(result) -> tuple`: Handle normal result and return (created, changed, unchanged) counts.
 - `_print_summary(results, created_count, changed_count, unchanged_count) -> None`: Print summary if not in check mode.
 - `create_parser() -> argparse.ArgumentParser`: Create argument parser matching original CLI interface.

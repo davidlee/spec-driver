@@ -4,7 +4,6 @@ Workspace-level commands: install and validate.
 
 ## Constants
 
-- `ROOT` - Add parent to path for imports
 - `app`
 
 ## Functions

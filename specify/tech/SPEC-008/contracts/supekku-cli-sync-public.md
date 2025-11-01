@@ -4,7 +4,6 @@ Unified synchronization command for specs, ADRs, and registries.
 
 ## Constants
 
-- `SCRIPT_ROOT` - Add parent to path for imports
 - `app`
 
 ## Functions

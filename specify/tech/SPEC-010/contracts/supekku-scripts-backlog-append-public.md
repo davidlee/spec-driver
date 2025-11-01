@@ -2,10 +2,6 @@
 
 Append backlog entries to backlog/backlog.md if missing.
 
-## Constants
-
-- `ROOT`
-
 ## Functions
 
-- `main() -> None`
+- `main() -> None`: Append missing entries to backlog summary.

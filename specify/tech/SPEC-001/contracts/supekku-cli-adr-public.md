@@ -4,7 +4,6 @@ ADR (Architecture Decision Record) management commands.
 
 ## Constants
 
-- `ROOT` - Add parent to path for imports
 - `app`
 
 ## Functions

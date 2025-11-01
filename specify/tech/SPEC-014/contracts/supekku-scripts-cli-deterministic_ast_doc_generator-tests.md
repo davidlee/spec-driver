@@ -3,10 +3,6 @@
 CLI wrapper for deterministic AST-based documentation generator.
 Uses the refactored API from supekku.scripts.lib.docs.python package.
 
-## Constants
-
-- `ROOT`
-
 ## Functions
 
 - `check_mode_comparison(existing_file, new_content) -> tuple[Tuple[bool, str, str]]`: Compare existing file with new content.

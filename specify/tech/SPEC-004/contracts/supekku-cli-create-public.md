@@ -4,7 +4,6 @@ Create commands for specs, deltas, requirements, revisions, and ADRs.
 
 ## Constants
 
-- `ROOT` - Add parent to path for imports
 - `app`
 
 ## Functions

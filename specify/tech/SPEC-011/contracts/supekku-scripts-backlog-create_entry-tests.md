@@ -2,10 +2,6 @@
 
 Create backlog artefact (issue/problem/improvement) with next sequential ID.
 
-## Constants
-
-- `ROOT`
-
 ## Functions
 
-- `main() -> None`
+- `main() -> None`: Create new backlog entry with specified kind and name.

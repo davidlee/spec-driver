@@ -2,9 +2,11 @@
 
 List commands for specs, deltas, and changes.
 
+Thin CLI layer: parse args → load registry → filter → format → output
+Display formatting is delegated to supekku.scripts.lib.formatters
+
 ## Constants
 
-- `ROOT` - Add parent to path for imports
 - `app`
 
 ## Functions

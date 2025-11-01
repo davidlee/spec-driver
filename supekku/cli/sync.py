@@ -128,7 +128,7 @@ def sync(
         existing=existing,
         check=check,
         dry_run=dry_run,
-        allow_missing_source=allow_missing_source or [],
+        _allow_missing_source=allow_missing_source or [],
         prune=prune,
       )
       results["specs"] = spec_result

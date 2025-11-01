@@ -1,4 +1,16 @@
-"""Common utilities, options, and callbacks for CLI commands."""
+"""Common utilities, options, and callbacks for CLI commands.
+
+This module provides reusable CLI option types for consistent flag behavior.
+
+## Standardized Flags
+
+Across all list commands, we use consistent flag patterns:
+- `--format`: Output format (table|json|tsv)
+- `--no-truncate`: Disable field truncation in table output
+- `--filter`: Substring filter (case-insensitive)
+- `--status`: Filter by status (entity-specific values)
+- `--root`: Repository root directory
+"""
 
 from __future__ import annotations
 
@@ -68,5 +80,23 @@ VersionOption = Annotated[
     callback=version_callback,
     is_eager=True,
     help="Show version and exit",
+  ),
+]
+
+# Standardized list command options
+FormatOption = Annotated[
+  str,
+  typer.Option(
+    "--format",
+    "-f",
+    help="Output format: table (rich), json (structured), or tsv (tabs)",
+  ),
+]
+
+NoTruncateOption = Annotated[
+  bool,
+  typer.Option(
+    "--no-truncate",
+    help="Don't truncate long fields (show full content)",
   ),
 ]

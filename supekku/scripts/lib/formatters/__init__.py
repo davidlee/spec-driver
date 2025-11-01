@@ -16,12 +16,24 @@ from .change_formatters import (
 )
 from .decision_formatters import format_decision_details
 from .spec_formatters import format_package_list, format_spec_list_item
+from .table_utils import (
+  create_table,
+  format_as_json,
+  format_as_tsv,
+  get_terminal_width,
+  render_table,
+)
 
 __all__ = [
+  "create_table",
+  "format_as_json",
+  "format_as_tsv",
   "format_change_list_item",
   "format_change_with_context",
   "format_decision_details",
   "format_package_list",
   "format_phase_summary",
   "format_spec_list_item",
+  "get_terminal_width",
+  "render_table",
 ]

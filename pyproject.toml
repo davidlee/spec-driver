@@ -122,9 +122,13 @@ extend-select = [
 ]
 
 ignore = [
-      "T201",   # print (CLI tools need it)
-      "S101",   # assert (pytest needs it)
-      "PLR0912", "PLR0915", "PLR0913", "PLR0911", "C901",  # Complexity (use pylint)
+      "T201",    # print (CLI tools need it)
+      "S101",    # assert (pytest needs it)
+      "PLR0911", # too-many-return-statements
+      "PLR0912", # too-many-branches
+      "PLR0913", # too-many-arguments
+      "PLR0915", # too-many-statements
+      "C901",    # complex-structure
       "FBT001", "FBT002",  # Boolean args
       "PLR2004",  # Magic values - I have my doubts but ...
       "D",        # All pydocstyle (handle separately if wanted)

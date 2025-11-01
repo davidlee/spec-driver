@@ -23,9 +23,7 @@ def metadata_to_json_schema(metadata: BlockMetadata) -> dict[str, Any]:
   schema_id = metadata.schema_id.replace(".", "-")
   schema: dict[str, Any] = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": (
-      f"https://vice.supekku.dev/schemas/{schema_id}@v{metadata.version}.json"
-    ),
+    "$id": (f"https://vice.supekku.dev/schemas/{schema_id}@v{metadata.version}.json"),
     "title": f"Supekku {metadata.schema_id} Block",
     "type": "object",
   }

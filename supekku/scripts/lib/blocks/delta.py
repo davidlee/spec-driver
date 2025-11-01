@@ -190,8 +190,7 @@ register_block_schema(
     version=RELATIONSHIPS_VERSION,
     renderer=render_delta_relationships_block,
     description=(
-      "Tracks delta relationships to specs, requirements, "
-      "phases, and revisions"
+      "Tracks delta relationships to specs, requirements, phases, and revisions"
     ),
   ),
 )

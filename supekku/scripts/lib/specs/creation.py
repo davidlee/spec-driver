@@ -114,27 +114,30 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
   )
   spec_capabilities_block = render_spec_capabilities_block(
     next_id,
-    capabilities=[{
-      "id": "<kebab-case-id>",
-      "name": "<Human-readable capability>",
-      "responsibilities": [],
-      "requirements": [],
-      "summary": "<Short paragraph describing what this capability ensures.>",
-      "success_criteria": ["<How you know this capability is upheld.>"],
-    }],
+    capabilities=[
+      {
+        "id": "<kebab-case-id>",
+        "name": "<Human-readable capability>",
+        "responsibilities": [],
+        "requirements": [],
+        "summary": "<Short paragraph describing what this capability ensures.>",
+        "success_criteria": ["<How you know this capability is upheld.>"],
+      }
+    ],
   )
   spec_verification_block = render_verification_coverage_block(
     next_id,
-    entries=[{
-      "artefact": "VT-XXX",
-      "kind": "VT",
-      "requirement": f"{next_id}.FR-001",
-      "status": "planned",
-      "notes": (
-        "Optional context or evidence pointer "
-        "(link to CI job, audit finding, etc.)."
-      ),
-    }],
+    entries=[
+      {
+        "artefact": "VT-XXX",
+        "kind": "VT",
+        "requirement": f"{next_id}.FR-001",
+        "status": "planned",
+        "notes": (
+          "Optional context or evidence pointer (link to CI job, audit finding, etc.)."
+        ),
+      }
+    ],
   )
 
   # Render template

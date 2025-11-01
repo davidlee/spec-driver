@@ -216,19 +216,19 @@ def create_delta(
     )
 
     # Render verification block for plan
-    first_req = (
-      list(requirements or [])[0] if requirements else "SPEC-YYY.FR-001"
-    )
+    first_req = list(requirements or [])[0] if requirements else "SPEC-YYY.FR-001"
     plan_verification_block = render_verification_coverage_block(
       plan_id,
-      entries=[{
-        "artefact": "VT-XXX",
-        "kind": "VT",
-        "requirement": first_req,
-        "phase": first_phase_id,
-        "status": "planned",
-        "notes": "Link to evidence (test run, audit, validation artefact).",
-      }],
+      entries=[
+        {
+          "artefact": "VT-XXX",
+          "kind": "VT",
+          "requirement": first_req,
+          "phase": first_phase_id,
+          "status": "planned",
+          "notes": "Link to evidence (test run, audit, validation artefact).",
+        }
+      ],
     )
 
     # Load and render template

@@ -193,9 +193,7 @@ class MetadataValidator:
         )
       elif field_meta.properties:
         # Recursively validate nested object
-        errors.extend(
-          self._validate_fields(value, field_meta.properties, field_path)
-        )
+        errors.extend(self._validate_fields(value, field_meta.properties, field_path))
 
     elif field_meta.type == "array":
       if not isinstance(value, list):
@@ -234,9 +232,7 @@ class MetadataValidator:
 
     return errors
 
-  def _validate_conditional_rules(
-    self, data: dict[str, Any]
-  ) -> list[ValidationError]:
+  def _validate_conditional_rules(self, data: dict[str, Any]) -> list[ValidationError]:
     """Validate conditional rules (if/then logic)."""
     errors: list[ValidationError] = []
 

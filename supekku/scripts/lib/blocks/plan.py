@@ -14,7 +14,12 @@ if TYPE_CHECKING:
   from pathlib import Path
 
 PLAN_MARKER = "supekku:plan.overview@v1"
+PLAN_SCHEMA = "supekku.plan.overview"
+PLAN_VERSION = 1
+
 PHASE_MARKER = "supekku:phase.overview@v1"
+PHASE_SCHEMA = "supekku.phase.overview"
+PHASE_VERSION = 1
 
 
 @dataclass(frozen=True)
@@ -31,6 +36,189 @@ class PhaseOverviewBlock:
 
   raw_yaml: str
   data: dict[str, Any]
+
+
+class PlanOverviewValidator:
+  """Validator for plan overview blocks."""
+
+  def validate(self, block: PlanOverviewBlock) -> list[str]:
+    """Validate plan overview block against schema.
+
+    Args:
+      block: Parsed plan overview block to validate.
+
+    Returns:
+      List of error messages (empty if valid).
+    """
+    errors: list[str] = []
+    data = block.data
+
+    # Validate schema and version
+    if data.get("schema") != PLAN_SCHEMA:
+      errors.append(f"plan overview block must declare schema {PLAN_SCHEMA}")
+    if data.get("version") != PLAN_VERSION:
+      errors.append(f"plan overview block must declare version {PLAN_VERSION}")
+
+    # Validate plan ID (required)
+    if not data.get("plan"):
+      errors.append("plan overview block missing plan id")
+    elif not isinstance(data.get("plan"), str):
+      errors.append("plan id must be a string")
+
+    # Validate delta ID (required)
+    if not data.get("delta"):
+      errors.append("plan overview block missing delta id")
+    elif not isinstance(data.get("delta"), str):
+      errors.append("delta id must be a string")
+
+    # Validate revision_links (optional object with arrays)
+    revision_links = data.get("revision_links")
+    if revision_links is not None:
+      if not isinstance(revision_links, dict):
+        errors.append("revision_links must be an object")
+      else:
+        aligns_with = revision_links.get("aligns_with")
+        if aligns_with is not None:
+          if not isinstance(aligns_with, list):
+            errors.append("revision_links.aligns_with must be an array")
+          elif not all(isinstance(item, str) for item in aligns_with):
+            errors.append("revision_links.aligns_with items must be strings")
+
+    # Validate specs (optional object with arrays)
+    specs = data.get("specs")
+    if specs is not None:
+      if not isinstance(specs, dict):
+        errors.append("specs must be an object")
+      else:
+        for field_name in ["primary", "collaborators"]:
+          field = specs.get(field_name)
+          if field is not None:
+            if not isinstance(field, list):
+              errors.append(f"specs.{field_name} must be an array")
+            elif not all(isinstance(item, str) for item in field):
+              errors.append(f"specs.{field_name} items must be strings")
+
+    # Validate requirements (optional object with arrays)
+    requirements = data.get("requirements")
+    if requirements is not None:
+      if not isinstance(requirements, dict):
+        errors.append("requirements must be an object")
+      else:
+        for field_name in ["targets", "dependencies"]:
+          field = requirements.get(field_name)
+          if field is not None:
+            if not isinstance(field, list):
+              errors.append(f"requirements.{field_name} must be an array")
+            elif not all(isinstance(item, str) for item in field):
+              errors.append(f"requirements.{field_name} items must be strings")
+
+    # Validate phases (required array of objects)
+    phases = data.get("phases")
+    if not phases:
+      errors.append("plan overview block missing phases")
+    elif not isinstance(phases, list):
+      errors.append("phases must be an array")
+    elif len(phases) == 0:
+      errors.append("phases array must not be empty")
+    else:
+      for idx, phase in enumerate(phases):
+        if not isinstance(phase, dict):
+          errors.append(f"phases[{idx}] must be an object")
+          continue
+
+        # Each phase must have an id
+        if not phase.get("id"):
+          errors.append(f"phases[{idx}] missing id")
+        elif not isinstance(phase.get("id"), str):
+          errors.append(f"phases[{idx}] id must be a string")
+
+        # name is optional but must be string
+        if "name" in phase and not isinstance(phase.get("name"), str):
+          errors.append(f"phases[{idx}] name must be a string")
+
+        # objective is optional but must be string
+        if "objective" in phase and not isinstance(phase.get("objective"), str):
+          errors.append(f"phases[{idx}] objective must be a string")
+
+        # entrance_criteria and exit_criteria are optional arrays of strings
+        for criteria_field in ["entrance_criteria", "exit_criteria"]:
+          criteria = phase.get(criteria_field)
+          if criteria is not None:
+            if not isinstance(criteria, list):
+              errors.append(f"phases[{idx}] {criteria_field} must be an array")
+            elif not all(isinstance(item, str) for item in criteria):
+              errors.append(f"phases[{idx}] {criteria_field} items must be strings")
+
+    return errors
+
+
+class PhaseOverviewValidator:
+  """Validator for phase overview blocks."""
+
+  def validate(self, block: PhaseOverviewBlock) -> list[str]:
+    """Validate phase overview block against schema.
+
+    Args:
+      block: Parsed phase overview block to validate.
+
+    Returns:
+      List of error messages (empty if valid).
+    """
+    errors: list[str] = []
+    data = block.data
+
+    # Validate schema and version
+    if data.get("schema") != PHASE_SCHEMA:
+      errors.append(f"phase overview block must declare schema {PHASE_SCHEMA}")
+    if data.get("version") != PHASE_VERSION:
+      errors.append(f"phase overview block must declare version {PHASE_VERSION}")
+
+    # Validate phase ID (required)
+    if not data.get("phase"):
+      errors.append("phase overview block missing phase id")
+    elif not isinstance(data.get("phase"), str):
+      errors.append("phase id must be a string")
+
+    # Validate plan ID (required)
+    if not data.get("plan"):
+      errors.append("phase overview block missing plan id")
+    elif not isinstance(data.get("plan"), str):
+      errors.append("plan id must be a string")
+
+    # Validate delta ID (required)
+    if not data.get("delta"):
+      errors.append("phase overview block missing delta id")
+    elif not isinstance(data.get("delta"), str):
+      errors.append("delta id must be a string")
+
+    # Validate objective (optional but must be string)
+    if "objective" in data and not isinstance(data.get("objective"), str):
+      errors.append("objective must be a string")
+
+    # Validate entrance_criteria and exit_criteria (optional arrays)
+    for field_name in ["entrance_criteria", "exit_criteria", "tasks", "risks"]:
+      field = data.get(field_name)
+      if field is not None:
+        if not isinstance(field, list):
+          errors.append(f"{field_name} must be an array")
+        elif not all(isinstance(item, str) for item in field):
+          errors.append(f"{field_name} items must be strings")
+
+    # Validate verification (optional object with arrays)
+    verification = data.get("verification")
+    if verification is not None:
+      if not isinstance(verification, dict):
+        errors.append("verification must be an object")
+      else:
+        for field_name in ["tests", "evidence"]:
+          field = verification.get(field_name)
+          if field is not None:
+            if not isinstance(field, list):
+              errors.append(f"verification.{field_name} must be an array")
+            elif not all(isinstance(item, str) for item in field):
+              errors.append(f"verification.{field_name} items must be strings")
+
+    return errors
 
 
 _PLAN_PATTERN = re.compile(
@@ -243,9 +431,15 @@ def render_phase_overview_block(
 
 __all__ = [
   "PHASE_MARKER",
+  "PHASE_SCHEMA",
+  "PHASE_VERSION",
   "PLAN_MARKER",
+  "PLAN_SCHEMA",
+  "PLAN_VERSION",
   "PhaseOverviewBlock",
+  "PhaseOverviewValidator",
   "PlanOverviewBlock",
+  "PlanOverviewValidator",
   "extract_phase_overview",
   "extract_plan_overview",
   "load_phase_overview",

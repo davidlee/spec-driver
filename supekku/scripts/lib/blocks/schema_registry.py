@@ -37,9 +37,7 @@ class BlockSchema:
         and param.kind
         not in {inspect.Parameter.VAR_KEYWORD, inspect.Parameter.VAR_POSITIONAL},
         "type": (
-          param.annotation
-          if param.annotation != inspect.Parameter.empty
-          else "Any"
+          param.annotation if param.annotation != inspect.Parameter.empty else "Any"
         ),
         "default": (
           param.default if param.default != inspect.Parameter.empty else None

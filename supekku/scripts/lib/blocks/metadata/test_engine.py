@@ -51,9 +51,7 @@ class StringFieldValidationTest(unittest.TestCase):
     metadata = BlockMetadata(
       version=1,
       schema_id="test.schema",
-      fields={
-        "id": FieldMetadata(type="string", required=True, pattern=r"^DE-\d{3}$")
-      },
+      fields={"id": FieldMetadata(type="string", required=True, pattern=r"^DE-\d{3}$")},
     )
     validator = MetadataValidator(metadata)
     errors = validator.validate({"id": "DE-001"})
@@ -64,9 +62,7 @@ class StringFieldValidationTest(unittest.TestCase):
     metadata = BlockMetadata(
       version=1,
       schema_id="test.schema",
-      fields={
-        "id": FieldMetadata(type="string", required=True, pattern=r"^DE-\d{3}$")
-      },
+      fields={"id": FieldMetadata(type="string", required=True, pattern=r"^DE-\d{3}$")},
     )
     validator = MetadataValidator(metadata)
     errors = validator.validate({"id": "INVALID"})
@@ -610,9 +606,7 @@ class JSONSchemaGenerationTest(unittest.TestCase):
     metadata = BlockMetadata(
       version=1,
       schema_id="test.schema",
-      fields={
-        "id": FieldMetadata(type="string", required=True, pattern=r"^DE-\d{3}$")
-      },
+      fields={"id": FieldMetadata(type="string", required=True, pattern=r"^DE-\d{3}$")},
     )
     schema = metadata_to_json_schema(metadata)
 

@@ -69,7 +69,7 @@ def show_schema(
     typer.Option(
       "--format",
       "-f",
-      help="Output format",
+      help="Output format (markdown, json, json-schema, yaml-example)",
     ),
   ] = "markdown",
 ) -> None:
@@ -77,7 +77,7 @@ def show_schema(
 
   Args:
     block_type: Block type identifier (e.g., 'delta.relationships')
-    format_type: Output format (markdown, json, yaml-example)
+    format_type: Output format (markdown, json, json-schema, yaml-example)
   """
   # If no block_type provided, show the list
   if not block_type:
@@ -95,11 +95,13 @@ def show_schema(
     _render_markdown(schema)
   elif format_type == "json":
     _render_json(schema)
+  elif format_type == "json-schema":
+    _render_json_schema(block_type, schema)
   elif format_type == "yaml-example":
     _render_yaml_example(schema)
   else:
     console.print(f"[red]Unknown format: {format_type}[/red]")
-    console.print("Available formats: markdown, json, yaml-example")
+    console.print("Available formats: markdown, json, json-schema, yaml-example")
     raise typer.Exit(code=1)
 
 
@@ -169,6 +171,53 @@ def _render_json(schema) -> None:
   json_output = json.dumps(schema_dict, indent=2)
   syntax = Syntax(json_output, "json", theme="monokai")
   console.print(syntax)
+
+
+def _render_json_schema(block_type: str, schema) -> None:
+  """Render JSON Schema (Draft 2020-12) for metadata-driven blocks.
+
+  Args:
+    block_type: Block type identifier (e.g., 'verification.coverage')
+    schema: BlockSchema instance to render
+  """
+  # Map block types to their metadata definitions
+  metadata_registry = {
+    "verification.coverage": "supekku.scripts.lib.blocks.verification_metadata",
+    "delta.relationships": "supekku.scripts.lib.blocks.delta_metadata",
+    "plan.overview": "supekku.scripts.lib.blocks.plan_metadata",
+    "phase.overview": "supekku.scripts.lib.blocks.plan_metadata",
+  }
+
+  if block_type not in metadata_registry:
+    console.print(f"[yellow]JSON Schema not yet available for {block_type}[/yellow]")
+    console.print("This block has not been migrated to metadata-driven validation yet.")
+    console.print("Use --format=json for parameter info instead.")
+    return
+
+  # Import and get metadata
+  try:
+    module_path = metadata_registry[block_type]
+
+    # Import the module
+    import importlib
+
+    module = importlib.import_module(module_path)
+    metadata = getattr(module, f"{block_type.upper().replace('.', '_')}_METADATA")
+
+    # Generate JSON Schema
+    from supekku.scripts.lib.blocks.metadata import metadata_to_json_schema
+
+    json_schema = metadata_to_json_schema(metadata)
+
+    # Pretty print
+    json_output = json.dumps(json_schema, indent=2)
+    syntax = Syntax(json_output, "json", theme="monokai")
+    console.print(
+      Panel(syntax, title=f"JSON Schema: {block_type}", expand=False),
+    )
+  except (ImportError, AttributeError) as e:
+    console.print(f"[red]Error loading metadata for {block_type}: {e}[/red]")
+    console.print("This may be a bug - please report it.")
 
 
 def _generate_placeholder_value(  # pylint: disable=too-many-return-statements,too-complex

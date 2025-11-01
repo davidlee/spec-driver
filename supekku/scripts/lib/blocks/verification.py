@@ -296,8 +296,7 @@ register_block_schema(
     version=COVERAGE_VERSION,
     renderer=render_verification_coverage_block,
     description=(
-      "Tracks verification artifacts (tests, analyses, histories) "
-      "for requirements"
+      "Tracks verification artifacts (tests, analyses, histories) for requirements"
     ),
   ),
 )

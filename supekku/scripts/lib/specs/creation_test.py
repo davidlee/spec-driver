@@ -15,7 +15,6 @@ from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.specs.creation import (
   CreateSpecOptions,
   RepositoryRootNotFoundError,
-  TemplateNotFoundError,
   create_spec,
 )
 
@@ -87,13 +86,16 @@ class CreateSpecTest(unittest.TestCase):
     assert result.spec_id == "PROD-001"
     assert result.test_path is None
 
-  def test_missing_templates_raise_error(self) -> None:
-    """Test that missing templates raise TemplateNotFoundError."""
+  def test_missing_templates_use_fallback(self) -> None:
+    """Test that missing local templates fall back to package templates."""
     root = self._setup_repo()
-    (get_templates_dir(root) / "spec.md").unlink()
+    local_template = get_templates_dir(root) / "spec.md"
+    local_template.unlink()
 
-    with pytest.raises(TemplateNotFoundError):
-      create_spec("Missing Template", CreateSpecOptions())
+    # Should succeed using package template fallback
+    result = create_spec("Fallback Template Test", CreateSpecOptions())
+    assert result.spec_id == "SPEC-001"
+    assert result.spec_path.exists()
 
   def test_repository_root_not_found(self) -> None:
     """Test that operations outside a repository raise RepositoryRootNotFoundError."""

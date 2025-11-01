@@ -216,6 +216,15 @@ def _render_json_schema(block_type: str, schema) -> None:
     console.print(
       Panel(syntax, title=f"JSON Schema: {block_type}", expand=False),
     )
+
+    # Print helpful hint about yaml-example
+    console.print()
+    console.print(
+      "[dim]💡 Tip: See a complete YAML example with:[/dim]",
+    )
+    console.print(
+      f"[cyan]  schema show {block_type} --format=yaml-example[/cyan]",
+    )
   except (ImportError, AttributeError) as e:
     console.print(f"[red]Error loading metadata for {block_type}: {e}[/red]")
     console.print("This may be a bug - please report it.")
@@ -261,11 +270,47 @@ def _generate_placeholder_value(  # pylint: disable=too-many-return-statements,t
 
 
 def _render_yaml_example(schema) -> None:
-  """Render example YAML block by calling renderer with minimal args.
+  """Render example YAML block using metadata examples or renderer.
 
   Args:
     schema: BlockSchema instance to render
   """
+  # Map block types to their metadata definitions
+  metadata_registry = {
+    "verification.coverage": "supekku.scripts.lib.blocks.verification_metadata",
+    "delta.relationships": "supekku.scripts.lib.blocks.delta_metadata",
+    "plan.overview": "supekku.scripts.lib.blocks.plan_metadata",
+    "phase.overview": "supekku.scripts.lib.blocks.plan_metadata",
+    "revision.change": "supekku.scripts.lib.blocks.revision_metadata",
+  }
+
+  # Try to use metadata example first for migrated validators
+  if schema.name in metadata_registry:
+    try:
+      import importlib
+
+      import yaml as yaml_lib
+
+      module_path = metadata_registry[schema.name]
+      module = importlib.import_module(module_path)
+      metadata = getattr(module, f"{schema.name.upper().replace('.', '_')}_METADATA")
+
+      if metadata.examples and len(metadata.examples) > 0:
+        example_data = metadata.examples[0]
+        example_yaml = (
+          f"```yaml {schema.marker}\n"
+          f"{yaml_lib.dump(example_data, default_flow_style=False, sort_keys=False)}"
+          f"```"
+        )
+        syntax = Syntax(example_yaml, "yaml", theme="monokai")
+        console.print(
+          Panel(syntax, title=f"Example: {schema.name}", expand=False),
+        )
+        return
+    except (ImportError, AttributeError, IndexError):
+      pass  # Fall through to renderer-based approach
+
+  # Fall back to renderer-based approach for non-migrated validators
   params = schema.get_parameters()
 
   # Build minimal args to call renderer

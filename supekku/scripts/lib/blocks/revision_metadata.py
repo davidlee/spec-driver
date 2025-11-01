@@ -344,26 +344,93 @@ REVISION_CHANGE_METADATA = BlockMetadata(
       "version": REVISION_BLOCK_VERSION,
       "metadata": {
         "revision": "RE-001",
-        "prepared_by": "system",
+        "prepared_by": "alice@example.com",
         "generated_at": "2025-01-15T10:00:00Z",
       },
       "specs": [
         {
           "spec_id": "SPEC-100",
           "action": "created",
-          "summary": "Initial specification creation",
-        }
+          "summary": "Initial authentication specification",
+          "requirement_flow": {
+            "added": ["SPEC-100.FR-AUTH", "SPEC-100.NFR-SECURITY"],
+          },
+          "section_changes": [
+            {
+              "section": "Security Requirements",
+              "change": "added",
+              "notes": "Added comprehensive security section",
+            }
+          ],
+        },
+        {
+          "spec_id": "SPEC-200",
+          "action": "updated",
+          "summary": "Enhanced user management spec",
+          "requirement_flow": {
+            "moved_in": ["SPEC-100.FR-USER-001"],
+            "removed": ["SPEC-200.FR-DEPRECATED"],
+          },
+        },
       ],
       "requirements": [
         {
-          "requirement_id": "SPEC-100.FR-001",
+          "requirement_id": "SPEC-100.FR-AUTH",
           "kind": "functional",
           "action": "introduce",
-          "summary": "New functional requirement",
+          "summary": "Implement OAuth2 authentication flow",
+          "destination": {
+            "spec": "SPEC-100",
+            "path": "/security/authentication",
+            "additional_specs": ["SPEC-200"],
+          },
+          "lifecycle": {
+            "status": "pending",
+            "introduced_by": "RE-001",
+          },
+        },
+        {
+          "requirement_id": "SPEC-100.FR-USER-001",
+          "kind": "functional",
+          "action": "move",
+          "summary": "Move user profile requirement to auth spec",
+          "origin": [
+            {
+              "kind": "spec",
+              "ref": "SPEC-200",
+              "notes": "Originally in user management spec",
+            }
+          ],
+          "destination": {
+            "spec": "SPEC-100",
+            "requirement_id": "SPEC-100.FR-USER-001",
+          },
+          "lifecycle": {
+            "status": "in-progress",
+            "introduced_by": "RE-001",
+            "implemented_by": ["DE-001"],
+          },
+          "text_changes": {
+            "before_excerpt": "User shall have profile data",
+            "after_excerpt": "Authenticated user shall have profile data",
+            "diff_ref": "commit-abc123",
+          },
+        },
+        {
+          "requirement_id": "SPEC-100.NFR-SECURITY",
+          "kind": "non-functional",
+          "action": "introduce",
+          "summary": "Security compliance requirement",
           "destination": {
             "spec": "SPEC-100",
           },
-        }
+          "lifecycle": {
+            "status": "live",
+            "introduced_by": "RE-001",
+            "implemented_by": ["DE-001", "DE-002"],
+            "verified_by": ["AUD-001"],
+          },
+        },
       ],
     }
   ],

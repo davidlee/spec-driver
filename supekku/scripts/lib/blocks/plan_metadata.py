@@ -142,24 +142,48 @@ PLAN_OVERVIEW_METADATA = BlockMetadata(
       "plan": "PLN-001",
       "delta": "DE-001",
       "revision_links": {
-        "aligns_with": ["RE-001"],
+        "aligns_with": ["RE-001", "RE-002"],
       },
       "specs": {
         "primary": ["SPEC-100"],
-        "collaborators": ["SPEC-200"],
+        "collaborators": ["SPEC-200", "SPEC-300"],
       },
       "requirements": {
-        "targets": ["SPEC-100.FR-001", "SPEC-100.FR-002"],
-        "dependencies": ["SPEC-200.FR-005"],
+        "targets": [
+          "SPEC-100.FR-AUTH",
+          "SPEC-100.FR-USER-001",
+          "SPEC-100.NFR-SECURITY",
+        ],
+        "dependencies": ["SPEC-200.FR-PROFILE"],
       },
       "phases": [
         {
           "id": "PLN-001-P01",
-          "name": "Phase 01 - Initial delivery",
-          "objective": "Deliver the foundational work for this delta.",
-          "entrance_criteria": [],
-          "exit_criteria": [],
-        }
+          "name": "Phase 01 - Foundation",
+          "objective": "Establish core authentication infrastructure",
+          "entrance_criteria": [
+            "Requirements finalized in RE-001",
+            "Architecture review completed",
+          ],
+          "exit_criteria": [
+            "OAuth2 provider integrated",
+            "Unit tests passing",
+            "Security audit completed",
+          ],
+        },
+        {
+          "id": "PLN-001-P02",
+          "name": "Phase 02 - Integration",
+          "objective": "Integrate authentication with user management",
+          "entrance_criteria": [
+            "Phase 01 complete",
+            "User management spec ready",
+          ],
+          "exit_criteria": [
+            "E2E tests passing",
+            "Documentation updated",
+          ],
+        },
       ],
     }
   ],
@@ -254,15 +278,42 @@ PHASE_OVERVIEW_METADATA = BlockMetadata(
       "phase": "PLN-001-P01",
       "plan": "PLN-001",
       "delta": "DE-001",
-      "objective": "Describe the outcome for this phase.",
-      "entrance_criteria": [],
-      "exit_criteria": [],
+      "objective": (
+        "Establish core authentication infrastructure with OAuth2 integration"
+      ),
+      "entrance_criteria": [
+        "Requirements finalized in RE-001",
+        "Architecture review completed",
+        "Development environment setup complete",
+      ],
+      "exit_criteria": [
+        "OAuth2 provider integrated and configured",
+        "All unit tests passing with >80% coverage",
+        "Security audit completed with no critical issues",
+        "API documentation published",
+      ],
       "verification": {
-        "tests": ["VT-001"],
-        "evidence": ["Documentation updated"],
+        "tests": ["VT-AUTH-001", "VT-AUTH-002", "VT-SECURITY-001"],
+        "evidence": [
+          "OAuth2 integration test results",
+          "Security audit report",
+          "Code coverage report",
+          "API documentation review",
+        ],
       },
-      "tasks": [],
-      "risks": [],
+      "tasks": [
+        "Set up OAuth2 provider configuration",
+        "Implement token generation and validation",
+        "Add authentication middleware",
+        "Write comprehensive unit tests",
+        "Conduct security audit",
+        "Update API documentation",
+      ],
+      "risks": [
+        "OAuth2 provider rate limiting may impact testing",
+        "Token expiry edge cases need careful handling",
+        "Security audit may reveal blocking issues",
+      ],
     }
   ],
 )

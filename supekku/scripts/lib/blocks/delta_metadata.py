@@ -125,17 +125,25 @@ DELTA_RELATIONSHIPS_METADATA = BlockMetadata(
       "version": RELATIONSHIPS_VERSION,
       "delta": "DE-001",
       "revision_links": {
-        "introduces": ["RE-001"],
+        "introduces": ["RE-001", "RE-002"],
+        "supersedes": ["RE-000"],
       },
       "specs": {
         "primary": ["SPEC-100"],
-        "collaborators": ["SPEC-200"],
+        "collaborators": ["SPEC-200", "SPEC-300"],
       },
       "requirements": {
-        "implements": ["SPEC-100.FR-001", "SPEC-100.FR-002"],
+        "implements": [
+          "SPEC-100.FR-AUTH",
+          "SPEC-100.FR-USER-001",
+          "SPEC-100.NFR-SECURITY",
+        ],
+        "updates": ["SPEC-200.FR-PROFILE"],
+        "verifies": ["SPEC-100.NFR-PERFORMANCE"],
       },
       "phases": [
         {"id": "IP-001.PHASE-01"},
+        {"id": "IP-001.PHASE-02"},
       ],
     }
   ],

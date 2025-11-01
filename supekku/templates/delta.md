@@ -1,24 +1,9 @@
----
-id: DE-XXX
-slug: descriptive-kebab-case-name
-name: "Delta – Descriptive Change Title"
-created: 'YYYY-MM-DD'
-updated: 'YYYY-MM-DD'
-status: draft
-kind: delta
-aliases: []
-relations: []
-applies_to:
-  specs: []
-  requirements: []
----
-
-# DE-XXX – Descriptive Change Title
+# {{ delta_id }} – {{ name }}
 
 ```yaml supekku:delta.relationships@v1
 schema: supekku.delta.relationships
 version: 1
-delta: DE-XXX
+delta: {{ delta_id }}
 revision_links:
   introduces: []
   supersedes: []

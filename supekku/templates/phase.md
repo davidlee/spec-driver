@@ -1,21 +1,9 @@
----
-id: TEMPLATE-phase
-slug: phase-sheet-template
-name: Phase Sheet Template
-created: 2024-06-08
-updated: 2024-06-08
-status: draft
-kind: guidance
-aliases:
-  - Phase Sheet Template
----
-
 ```yaml supekku:phase.overview@v1
 schema: supekku.phase.overview
 version: 1
-phase: IP-XXX.PHASE-0N
-plan: IP-XXX
-delta: DE-XXX
+phase: {{ phase_id }}
+plan: {{ plan_id }}
+delta: {{ delta_id }}
 objective: >-
   Short statement of what this phase achieves.
 entrance_criteria: []
@@ -33,7 +21,7 @@ risks: []
 <What this phase achieves>
 
 ## 2. Links & References
-- **Delta**: DE-XXX
+- **Delta**: {{ delta_id }}
 - **Design Revision Sections**: <bullets>
 - **Specs / PRODs**: <list requirement IDs>
 - **Support Docs**: <links to reference material>

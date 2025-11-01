@@ -1,22 +1,8 @@
----
-id: TEMPLATE-plan
-slug: implementation-plan-template
-name: Implementation Plan Template
-created: 2024-06-08
-updated: 2024-06-08
-status: draft
-kind: guidance
-aliases:
-  - Implementation Plan Template
----
-
-# Implementation Plan Template
-
 ```yaml supekku:plan.overview@v1
 schema: supekku.plan.overview
 version: 1
-plan: IP-XXX
-delta: DE-XXX
+plan: {{ plan_id }}
+delta: {{ delta_id }}
 revision_links:
   aligns_with: []
 specs:
@@ -25,7 +11,7 @@ specs:
 requirements:
   targets: []
 phases:
-  - id: IP-XXX.PHASE-01
+  - id: {{ plan_id }}.PHASE-01
     name: Phase 01 - <Working Title>
     objective: >-
       Short description of the phase outcome.
@@ -36,19 +22,19 @@ phases:
 ```yaml supekku:verification.coverage@v1
 schema: supekku.verification.coverage
 version: 1
-subject: IP-XXX
+subject: {{ plan_id }}
 entries:
   - artefact: VT-XXX
     kind: VT|VA|VH
     requirement: SPEC-YYY.FR-001
-    phase: IP-XXX.PHASE-01
+    phase: {{ plan_id }}.PHASE-01
     status: planned|in-progress|verified
     notes: >-
       Link to evidence (test run, audit, validation artefact).
 ```
 
 ## 1. Summary
-- **Delta**: DE-XXX - <title>
+- **Delta**: {{ delta_id }} - <title>
 - **Specs Impacted**: SPEC-002, PROD-YYY
 - **Problems / Issues**: ISSUE-123, PROB-456
 - **Desired Outcome**: <one-line description of the end state>
@@ -78,8 +64,8 @@ entries:
 *Adjust/add phases as needed; every phase must have clear gates. Phase sheets are authored one at a time using `supekku/templates/phase-sheet-template.md`.*
 
 ## 5. Phase Detail Snapshot
-- **Research Notes**: `DE-XXX/notes.md` (Phase 0 output)
-- **Design Revision**: `DE-XXX/DR-XXX.md`
+- **Research Notes**: `{{ delta_id }}/notes.md` (Phase 0 output)
+- **Design Revision**: `{{ delta_id }}/DR-XXX.md`
 - **Active Phase Sheet**: <link once created>
 - **Parallelisable Work**: Flag tasks with `[P]` inside phase sheets
 - **Plan Updates**: Update this plan when phase outcomes change (new risks, scope adjustments)

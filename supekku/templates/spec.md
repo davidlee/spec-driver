@@ -1,24 +1,9 @@
----
-id: SPEC-OR-PROD-XXX
-slug: descriptive-kebab-case-name
-name: "Descriptive Capability Name"
-created: 'YYYY-MM-DD'
-updated: 'YYYY-MM-DD'
-status: draft
-kind: product|spec
-aliases: []
-relations: []
-guiding_principles:
-  - <Principle 1>
-assumptions: []
----
-
-# SPEC/PROD-XXX – Descriptive Capability Name
+# {{ spec_id }} – {{ name }}
 
 ```yaml supekku:spec.relationships@v1
 schema: supekku.spec.relationships
 version: 1
-spec: SPEC-OR-PROD-XXX
+spec: {{ spec_id }}
 requirements:
   primary:
     - <FR/NF codes owned by this spec>
@@ -29,7 +14,7 @@ interactions: []
 ```yaml supekku:spec.capabilities@v1
 schema: supekku.spec.capabilities
 version: 1
-spec: SPEC-OR-PROD-XXX
+spec: {{ spec_id }}
 capabilities:
   - id: <kebab-case-id>
     name: <Human-readable capability>
@@ -44,47 +29,62 @@ capabilities:
 ```yaml supekku:verification.coverage@v1
 schema: supekku.verification.coverage
 version: 1
-subject: SPEC-OR-PROD-XXX
+subject: {{ spec_id }}
 entries:
   - artefact: VT-XXX
     kind: VT|VA|VH
-    requirement: SPEC-OR-PROD-XXX.FR-001
+    requirement: {{ spec_id }}.FR-001
     status: planned|in-progress|verified
     notes: >-
       Optional context or evidence pointer (link to CI job, audit finding, etc.).
 ```
 
 ## 1. Intent & Summary
-- **Problem / Purpose** *(product)*: <Why this exists for users, market, or business.>
-- **Scope / Boundaries** *(tech)*: <What systems/components are in or out.>
+{% if kind == 'prod' -%}
+- **Problem / Purpose**: <Why this exists for users, market, or business.>
+{% else -%}
+- **Scope / Boundaries**: <What systems/components are in or out.>
+{% endif -%}
 - **Value Signals**: <Key outcomes, success metrics, or operational targets.>
 - **Change History**: <Latest delta/audit/revision influencing this spec.>
 
 ## 2. Stakeholders & Journeys
-- **Personas / Actors** *(product)*: <Role – goals, pains, expectations.>
-- **Systems / Integrations** *(tech)*: <External systems, contracts, constraints.>
+{% if kind == 'prod' -%}
+- **Personas / Actors**: <Role – goals, pains, expectations.>
+{% else -%}
+- **Systems / Integrations**: <External systems, contracts, constraints.>
+{% endif -%}
 - **Primary Journeys / Flows**: Given–When–Then narratives or sequence steps.
 - **Edge Cases & Non-goals**: <Scenarios we deliberately exclude; failure/guard rails.>
 
 ## 3. Responsibilities & Requirements
 - **Capability Overview**: Expand each capability in the YAML block (behaviour, FR/NF links).
-- **Functional Requirements (FR)**: `SPEC-XXX.FR-001` / `PROD-XXX.FR-001` – statement – verification.
+- **Functional Requirements (FR)**: `{{ spec_id }}.FR-001` – statement – verification.
 - **Non-Functional Requirements (NF)**: code – statement – measurement.
-- **Success Metrics / Signals** *(product)* or **Operational Targets** *(tech)*: <Quantifiable indicators.>
-
+{% if kind == 'prod' -%}
+- **Success Metrics / Signals**: <Quantifiable indicators.>
+{% else -%}
+- **Operational Targets**: <Quantifiable indicators.>
+{% endif %}
 ## 4. Solution Outline
-- **User Experience / Outcomes** *(product)*: <Desired behaviours, storyboards, acceptance notes.>
-- **Architecture / Components** *(tech)*: tables or diagrams covering components, interfaces, data/state.
+{% if kind == 'prod' -%}
+- **User Experience / Outcomes**: <Desired behaviours, storyboards, acceptance notes.>
+{% else -%}
+- **Architecture / Components**: tables or diagrams covering components, interfaces, data/state.
+{% endif -%}
 - **Data & Contracts**: Key entities, schemas, API/interface snippets relevant to both audiences.
 
 ## 5. Behaviour & Scenarios
 - **Primary Flows**: Step lists linking actors/components/requirements.
 - **Error Handling / Guards**: Edge-case branching, fallback behaviour, recovery expectations.
-- **State Transitions** *(tech)*: Diagrams or tables if stateful.
-
+{% if kind == 'spec' -%}
+- **State Transitions**: Diagrams or tables if stateful.
+{% endif %}
 ## 6. Quality & Verification
 - **Testing Strategy**: Mapping of requirements/capabilities to test levels; reference testing companion if present.
-- **Research / Validation** *(product)*: UX research, experiments, hypothesis tracking.
+{% if kind == 'prod' -%}
+- **Research / Validation**: UX research, experiments, hypothesis tracking.
+{% endif -%}
 - **Observability & Analysis**: Metrics, telemetry, analytics dashboards, alerting.
 - **Security & Compliance**: Authn/z, data handling, privacy, regulatory notes.
 - **Verification Coverage**: Keep `supekku:verification.coverage@v1` entries aligned with FR/NF ownership and evidence.

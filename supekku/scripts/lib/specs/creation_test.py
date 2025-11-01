@@ -38,16 +38,12 @@ class CreateSpecTest(unittest.TestCase):
     templates.mkdir(parents=True)
     (root / "specify" / "tech").mkdir(parents=True)
     (root / "specify" / "product").mkdir(parents=True)
-    (templates / "tech-spec-template.md").write_text(
-      """---\nid: TEMPLATE\n---\n\n# Tech Body\n""",
+    (templates / "spec.md").write_text(
+      """# {{ spec_id }} – {{ name }}\n\nSpec body content\n""",
       encoding="utf-8",
     )
-    (templates / "product-spec-template.md").write_text(
-      """---\nid: TEMPLATE\n---\n\n# Product Body\n""",
-      encoding="utf-8",
-    )
-    (templates / "tech-testing-template.md").write_text(
-      """---\nid: TEMPLATE\n---\n\n# Test Body\n""",
+    (templates / "tech-spec.testing.md").write_text(
+      """# {{ spec_id }} Testing Guide\n\nTest body content\n""",
       encoding="utf-8",
     )
     os.chdir(root)
@@ -70,12 +66,14 @@ class CreateSpecTest(unittest.TestCase):
     assert frontmatter["status"] == "draft"
     assert frontmatter["kind"] == "spec"
     assert frontmatter["slug"].startswith("search")
-    assert body == "# Tech Body\n"
+    assert "# SPEC-001 – Search Service" in body
+    assert "Spec body content" in body
 
     test_frontmatter, test_body = load_markdown_file(result.test_path)
     assert test_frontmatter["id"].endswith(".TESTS")
     assert test_frontmatter["kind"] == "guidance"
-    assert test_body == "# Test Body\n"
+    assert "# SPEC-001 Testing Guide" in test_body
+    assert "Test body content" in test_body
 
   def test_create_product_spec_without_testing_doc(self) -> None:
     """Test creating a product spec without testing documentation."""
@@ -92,7 +90,7 @@ class CreateSpecTest(unittest.TestCase):
   def test_missing_templates_raise_error(self) -> None:
     """Test that missing templates raise TemplateNotFoundError."""
     root = self._setup_repo()
-    (get_templates_dir(root) / "tech-spec-template.md").unlink()
+    (get_templates_dir(root) / "spec.md").unlink()
 
     with pytest.raises(TemplateNotFoundError):
       create_spec("Missing Template", CreateSpecOptions())

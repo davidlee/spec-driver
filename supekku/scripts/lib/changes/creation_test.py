@@ -35,30 +35,31 @@ class CreateChangeTest(unittest.TestCase):
     templates_dir = root / ".spec-driver" / "templates"
     templates_dir.mkdir(parents=True, exist_ok=True)
 
-    # Delta template
+    # Delta template (Jinja2, no frontmatter)
     (templates_dir / "delta.md").write_text(
-      "---\nid: DE-XXX\n---\n\n# DE-XXX – Descriptive Change Title\n\n"
-      "```yaml supekku:delta.relationships@v1\n```\n",
+      "# {{ delta_id }} – {{ name }}\n\n"
+      "```yaml supekku:delta.relationships@v1\n"
+      "delta: {{ delta_id }}\n```\n",
       encoding="utf-8",
     )
 
-    # Revision template
-    (templates_dir / "spec-revision-template.md").write_text(
-      "---\nid: RE-XXX\n---\n\n# RE-XXX - <Summary>\n",
+    # Revision template (Jinja2, no frontmatter)
+    (templates_dir / "revision.md").write_text(
+      "## 1. Context\n- **Why**: Change reason\n",
       encoding="utf-8",
     )
 
-    # Plan template
-    (templates_dir / "implementation-plan-template.md").write_text(
-      "---\nid: IP-XXX\n---\n\n# IP-XXX\n\n"
-      "```yaml supekku:plan.overview@v1\n```\n",
+    # Plan template (Jinja2, no frontmatter)
+    (templates_dir / "plan.md").write_text(
+      "```yaml supekku:plan.overview@v1\n"
+      "plan: {{ plan_id }}\ndelta: {{ delta_id }}\n```\n",
       encoding="utf-8",
     )
 
-    # Phase template
-    (templates_dir / "phase-sheet-template.md").write_text(
-      "---\nid: PHASE-XXX\n---\n\n# PHASE-XXX\n\n"
-      "```yaml supekku:phase.overview@v1\n```\n",
+    # Phase template (Jinja2, no frontmatter)
+    (templates_dir / "phase.md").write_text(
+      "```yaml supekku:phase.overview@v1\n"
+      "phase: {{ phase_id }}\nplan: {{ plan_id }}\ndelta: {{ delta_id }}\n```\n",
       encoding="utf-8",
     )
 

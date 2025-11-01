@@ -35,8 +35,7 @@ entries:
 
 def _wrap_block(inner: str) -> str:
   return (
-    f"# Test Document\n\n```yaml {COVERAGE_MARKER}\n"
-    f"{inner}```\n\n## More content\n"
+    f"# Test Document\n\n```yaml {COVERAGE_MARKER}\n{inner}```\n\n## More content\n"
   )
 
 

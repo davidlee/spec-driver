@@ -78,8 +78,7 @@ class VerificationCoverageValidator:
       )
     elif subject_id and subject_value != subject_id:
       errors.append(
-        f"coverage block subject {subject_value} does not match "
-        f"expected {subject_id}",
+        f"coverage block subject {subject_value} does not match expected {subject_id}",
       )
 
     # Validate entries
@@ -102,8 +101,7 @@ class VerificationCoverageValidator:
           errors.append(f"entry[{idx}] artefact must be a string")
         elif not _VERIFICATION_ID.match(artefact):
           errors.append(
-            f"entry[{idx}] artefact '{artefact}' does not match "
-            "pattern V[TAH]-###",
+            f"entry[{idx}] artefact '{artefact}' does not match pattern V[TAH]-###",
           )
 
         # Validate kind
@@ -137,8 +135,7 @@ class VerificationCoverageValidator:
             errors.append(f"entry[{idx}] phase must be a string")
           elif not _PHASE_ID.match(phase):
             errors.append(
-              f"entry[{idx}] phase '{phase}' does not match "
-              "pattern IP-###.PHASE-##",
+              f"entry[{idx}] phase '{phase}' does not match pattern IP-###.PHASE-##",
             )
 
         # Validate status

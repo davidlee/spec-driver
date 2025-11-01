@@ -8,10 +8,11 @@ from datetime import date
 from pathlib import Path
 
 import yaml
+from jinja2 import Template
 
 from supekku.scripts.lib.core.paths import get_templates_dir
+from supekku.scripts.lib.core.templates import extract_template_body
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
-from supekku.scripts.lib.specs.creation import extract_template_body
 
 
 @dataclass
@@ -170,10 +171,11 @@ def create_adr(
     options.author_email,
   )
 
-  # Load template and create content
+  # Load template body and render with Jinja2
   template_path = get_templates_dir(registry.root) / "ADR.md"
   template_body = extract_template_body(template_path)
-  content = template_body.format(adr_id=adr_id, title=options.title)
+  template = Template(template_body)
+  content = template.render(adr_id=adr_id, title=options.title)
 
   # Write file
   frontmatter_yaml = yaml.safe_dump(frontmatter, sort_keys=False)

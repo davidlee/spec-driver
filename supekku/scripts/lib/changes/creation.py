@@ -8,6 +8,8 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from jinja2 import Template
+
 from supekku.scripts.lib.core.paths import get_templates_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.specs.creation import (
@@ -224,11 +226,16 @@ def create_revision(
   if requirements:
     frontmatter["requirements"] = sorted(set(requirements))
 
-  # Load template and replace placeholders
-  template_path = _get_template_path("spec-revision-template.md", repo)
-  body = extract_template_body(template_path)
-  body = body.replace("RE-XXX", revision_id)
-  body = body.replace("<Summary>", name)
+  # Load template and render with Jinja2
+  template_path = _get_template_path("revision.md", repo)
+  template_body = extract_template_body(template_path)
+  template = Template(template_body)
+  body = template.render(
+    revision_id=revision_id,
+    name=name,
+    created=today,
+    updated=today,
+  )
 
   revision_path = revision_dir / f"{revision_id}.md"
   dump_markdown_file(revision_path, frontmatter, body)
@@ -285,11 +292,11 @@ def create_delta(
     },
   }
 
-  # Load template and replace placeholders
+  # Load template and render with Jinja2
   template_path = _get_template_path("delta.md", repo)
-  body = extract_template_body(template_path)
-  body = body.replace("DE-XXX", delta_id)
-  body = body.replace("Descriptive Change Title", name)
+  template_body = extract_template_body(template_path)
+  template = Template(template_body)
+  body = template.render(delta_id=delta_id, name=name, created=today, updated=today)
 
   # Replace the delta.relationships block with populated data
   relationships_block = _render_delta_relationship_block(
@@ -309,9 +316,10 @@ def create_delta(
   extras: list[Path] = []
   plan_id = delta_id.replace("DE", "IP")
   if not allow_missing_plan:
-    plan_template_path = _get_template_path("implementation-plan-template.md", repo)
-    plan_body = extract_template_body(plan_template_path)
-    plan_body = plan_body.replace("IP-XXX", plan_id).replace("DE-XXX", delta_id)
+    plan_template_path = _get_template_path("plan.md", repo)
+    plan_template_body = extract_template_body(plan_template_path)
+    plan_template = Template(plan_template_body)
+    plan_body = plan_template.render(plan_id=plan_id, delta_id=delta_id)
     plan_body = _PLAN_OVERVIEW_PATTERN.sub(
       _render_plan_overview_block(
         plan_id,
@@ -339,11 +347,17 @@ def create_delta(
 
     phases_dir = delta_dir / "phases"
     _ensure_directory(phases_dir)
-    phase_template_path = _get_template_path("phase-sheet-template.md", repo)
-    phase_body = extract_template_body(phase_template_path)
-    phase_body = phase_body.replace("PHASE-XXX", f"{plan_id}.PHASE-01")
+    phase_template_path = _get_template_path("phase.md", repo)
+    phase_template_body = extract_template_body(phase_template_path)
+    phase_template = Template(phase_template_body)
+    phase_id = f"{plan_id}.PHASE-01"
+    phase_body = phase_template.render(
+      phase_id=phase_id,
+      plan_id=plan_id,
+      delta_id=delta_id,
+    )
     phase_body = _PHASE_OVERVIEW_PATTERN.sub(
-      _render_phase_overview_block(f"{plan_id}.PHASE-01", plan_id, delta_id),
+      _render_phase_overview_block(phase_id, plan_id, delta_id),
       phase_body,
       count=1,
     )

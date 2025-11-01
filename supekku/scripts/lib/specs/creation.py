@@ -9,6 +9,8 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from jinja2 import Template
+
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, get_templates_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 
@@ -93,7 +95,9 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
   spec_dir.mkdir(parents=True, exist_ok=True)
 
   spec_path = spec_dir / f"{next_id}.md"
-  spec_body = extract_template_body(config.template_path)
+  template_body = extract_template_body(config.template_path)
+  template = Template(template_body)
+  spec_body = template.render(spec_id=next_id, name=spec_name, kind=config.kind)
   frontmatter = build_frontmatter(
     spec_id=next_id,
     slug=slug,
@@ -109,7 +113,9 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
     and options.include_testing
     and config.testing_template_path is not None
   ):
-    test_body = extract_template_body(config.testing_template_path)
+    test_template_body = extract_template_body(config.testing_template_path)
+    test_template = Template(test_template_body)
+    test_body = test_template.render(spec_id=next_id, name=spec_name)
     test_path = spec_dir / f"{next_id}.tests.md"
     test_frontmatter = build_frontmatter(
       spec_id=f"{next_id}.TESTS",
@@ -189,15 +195,15 @@ def build_template_config(repo_root: Path, spec_type: str) -> SpecTemplateConfig
       base_dir=repo_root / "specify" / "tech",
       prefix="SPEC",
       kind="spec",
-      template_path=templates_dir / "tech-spec-template.md",
-      testing_template_path=templates_dir / "tech-testing-template.md",
+      template_path=templates_dir / "spec.md",
+      testing_template_path=templates_dir / "tech-spec.testing.md",
     )
   if spec_type == "product":
     return SpecTemplateConfig(
       base_dir=repo_root / "specify" / "product",
       prefix="PROD",
       kind="prod",
-      template_path=templates_dir / "product-spec-template.md",
+      template_path=templates_dir / "spec.md",
       testing_template_path=None,
     )
   msg = f"Unsupported spec type: {spec_type}"
@@ -295,6 +301,9 @@ def build_frontmatter(
     "status": "draft",
     "kind": kind,
     "aliases": [],
+    "relations": [],
+    "guiding_principles": [],
+    "assumptions": [],
   }
 
 

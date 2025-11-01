@@ -1,14 +1,3 @@
----
-id: RE-XXX
-slug: short-slug
-name: Spec Revision - <Summary>
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
-status: draft
-kind: revision
-aliases: []
----
-
 ## 1. Context
 - **Why**: <reason for the change>
 - **Source Specs**: SPEC-AAA, ...

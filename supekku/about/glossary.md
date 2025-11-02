@@ -26,3 +26,6 @@
 | **ADR Status Directories** | Symlink directories organizing ADRs by status (`accepted/`, `draft/`, `deprecated/`, etc.). Automatically maintained by registry sync. | `specify/decisions/<status>/` |
 | **ADR CLI** | Command-line interface for ADR management: creation, listing, filtering, and registry synchronization. | `just .spec-driver::decision-registry {sync,list,show,new}` |
 | **Backlog Helper Scripts** | CLI helpers for creating backlog entries: `just create-backlog-issue\|problem\|improvement\|risk`. | `.spec-driver/scripts/backlog/create_entry.py` |
+| **VT (Verification Test)** | Automated test artifact providing test coverage for requirements. Typically unit or integration tests that prove functionality. | Implementation plan verification blocks, test files |
+| **VH (Verification by Human)** | Manual verification artifact requiring user testing or attestation. Records human judgment, usability testing, or acceptance. | Implementation plan verification blocks, audit records |
+| **VA (Verification by Agent)** | Automated agent-generated test report or analysis artifact. AI/tooling validates behavior, performs design review, or analyzes stability. | Implementation plan verification blocks, analysis documents |

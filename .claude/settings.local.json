@@ -9,7 +9,13 @@
       "Bash(uv run pytest:*)",
       "Bash(uv run pylint:*)",
       "Bash(git mv:*)",
-      "Bash(uv run:*)"
+      "Bash(uv run:*)",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(uv run python3:*)",
+      "Bash(find:*)",
+      "Bash(while read -r dir)",
+      "Bash(do if ! find \"$dir\" -mindepth 1 -maxdepth 1 -type d -exec test -f {}/__init__.py)",
+      "Bash(then echo \"$dir\" fi done)"
     ],
     "deny": [],
     "ask": []

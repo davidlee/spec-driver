@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.specs.models import Spec
+from supekku.scripts.lib.specs.package_utils import find_package_for_file
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.test_base import RepoTestCase
 
@@ -96,6 +97,78 @@ class SpecRegistryTest(RepoTestCase):
 
     registry.reload()
     assert registry.get("SPEC-002") is not None
+
+  def test_file_to_package_resolution(self) -> None:
+    """VT-004: Test file-to-package resolution for spec queries.
+
+    Verifies that files in a package resolve to the correct package-level
+    spec, supporting --for-path queries at various depths.
+    """
+    root = self._make_repo()
+
+    # Create leaf package structure (no child packages)
+    # Files at various depths within the same package
+    pkg_root = root / "internal" / "sample"
+    pkg_root.mkdir(parents=True, exist_ok=True)
+    (pkg_root / "__init__.py").write_text("# Package init\n")
+    (pkg_root / "module.py").write_text("def foo(): pass\n")
+
+    # Create subdirectories without __init__.py (not packages, just dirs)
+    nested = pkg_root / "sub"
+    nested.mkdir(exist_ok=True)
+    (nested / "nested_module.py").write_text("def bar(): pass\n")
+
+    deep = nested / "deep"
+    deep.mkdir(exist_ok=True)
+    (deep / "deep_module.py").write_text("def baz(): pass\n")
+
+    # Initialize registry with package-level spec
+    registry = SpecRegistry(root)
+
+    # Test 1: Package root __init__.py resolves to package
+    file1 = pkg_root / "__init__.py"
+    package1 = find_package_for_file(file1)
+    assert package1 is not None, f"Failed to find package for {file1}"
+    rel_pkg1 = str(package1.relative_to(root))
+    specs1 = registry.find_by_package(rel_pkg1)
+    assert len(specs1) == 1, f"Expected 1 spec for package, got {len(specs1)}"
+    assert specs1[0].id == "SPEC-001"
+
+    # Test 2: Module in package root resolves to same package
+    file2 = pkg_root / "module.py"
+    package2 = find_package_for_file(file2)
+    assert package2 is not None
+    rel_pkg2 = str(package2.relative_to(root))
+    specs2 = registry.find_by_package(rel_pkg2)
+    assert len(specs2) == 1
+    assert specs2[0].id == "SPEC-001"
+
+    # Test 3: Nested module resolves to same package (leaf package)
+    file3 = nested / "nested_module.py"
+    package3 = find_package_for_file(file3)
+    assert package3 is not None
+    rel_pkg3 = str(package3.relative_to(root))
+    specs3 = registry.find_by_package(rel_pkg3)
+    assert len(specs3) == 1
+    assert specs3[0].id == "SPEC-001"
+
+    # Test 4: Deeply nested module resolves to same package
+    file4 = deep / "deep_module.py"
+    package4 = find_package_for_file(file4)
+    assert package4 is not None
+    rel_pkg4 = str(package4.relative_to(root))
+    specs4 = registry.find_by_package(rel_pkg4)
+    assert len(specs4) == 1
+    assert specs4[0].id == "SPEC-001"
+
+    # Test 5: All files in same package resolve to same spec
+    packages = [rel_pkg1, rel_pkg2, rel_pkg3, rel_pkg4]
+    assert len(set(packages)) == 1, "All files should resolve to same package"
+
+    # Test 6: Non-existent file handling
+    nonexistent = root / "does_not_exist.py"
+    package_none = find_package_for_file(nonexistent)
+    assert package_none is None, "Non-existent file should return None"
 
 
 if __name__ == "__main__":

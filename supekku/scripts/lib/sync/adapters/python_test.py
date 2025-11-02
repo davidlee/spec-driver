@@ -1,5 +1,6 @@
 """Tests for Python language adapter."""
 
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -320,6 +321,93 @@ class TestPythonAdapter(unittest.TestCase):
       with self.subTest(file_path=file_path):
         msg = f"Should skip __init__.py file: {file_path}"
         assert self.adapter._should_skip_file(file_path), msg
+
+
+  def test_sync_package_level_integration(self) -> None:
+    """VT-003: Integration test for sync with package-level specs.
+
+    Tests that PythonAdapter correctly discovers, describes, and syncs
+    package-level specs with proper frontmatter structure.
+    """
+    with tempfile.TemporaryDirectory() as tmpdir:
+      tmp_path = Path(tmpdir)
+
+      # Create test repository structure with 5 leaf packages under supekku/
+      test_packages = [
+        "supekku/pkg_a",
+        "supekku/pkg_b",
+        "supekku/nested/pkg_c",
+        "supekku/nested/deep/pkg_d",
+        "supekku/other/pkg_e",
+      ]
+
+      for pkg_path in test_packages:
+        pkg_dir = tmp_path / pkg_path
+        pkg_dir.mkdir(parents=True, exist_ok=True)
+        (pkg_dir / "__init__.py").write_text("# Package init\n")
+        (pkg_dir / "module.py").write_text("def foo(): pass\n")
+
+      # Also create parent __init__.py files to make supekku a package
+      (tmp_path / "supekku" / "__init__.py").write_text("")
+      (tmp_path / "supekku" / "nested" / "__init__.py").write_text("")
+      (tmp_path / "supekku" / "nested" / "deep" / "__init__.py").write_text("")
+      (tmp_path / "supekku" / "other" / "__init__.py").write_text("")
+
+      # Initialize adapter with test repo
+      adapter = PythonAdapter(tmp_path)
+
+      # Discover packages (simulate auto-discovery)
+      units = adapter.discover_targets(tmp_path)
+
+      # Should discover exactly 5 packages
+      assert len(units) == 5, f"Expected 5 packages, got {len(units)}"
+
+      # Verify package identifiers
+      identifiers = sorted([unit.identifier for unit in units])
+      expected = sorted(test_packages)
+      assert identifiers == expected, f"Expected {expected}, got {identifiers}"
+
+      # Test describe() for each package - verify frontmatter structure
+      for unit in units:
+        descriptor = adapter.describe(unit)
+        frontmatter = descriptor.default_frontmatter
+
+        # Verify packages field exists and is populated
+        msg = f"Missing 'packages' field for {unit.identifier}"
+        assert "packages" in frontmatter, msg
+        assert frontmatter["packages"] == [
+          unit.identifier
+        ], f"Expected packages=['{unit.identifier}']"
+
+        # Verify sources structure
+        assert "sources" in frontmatter, "Missing 'sources' field"
+        assert len(frontmatter["sources"]) == 1, "Expected 1 source entry"
+
+        source = frontmatter["sources"][0]
+        assert source["language"] == "python"
+        assert source["identifier"] == unit.identifier
+        assert "module" in source, "Missing 'module' field"
+
+        # Verify module name is dotted notation
+        expected_module = unit.identifier.replace("/", ".")
+        assert source["module"] == expected_module, \
+          f"Expected module='{expected_module}', got '{source['module']}'"
+
+        # Verify variants exist
+        assert "variants" in source, "Missing 'variants' field"
+        assert len(source["variants"]) == 3, "Expected 3 variants"
+
+        variant_names = [v["name"] for v in source["variants"]]
+        assert variant_names == ["api", "implementation", "tests"], \
+          f"Expected ['api', 'implementation', 'tests'], got {variant_names}"
+
+      # Test deterministic ordering - run discovery twice
+      units_first = adapter.discover_targets(tmp_path)
+      units_second = adapter.discover_targets(tmp_path)
+
+      ids_first = [u.identifier for u in units_first]
+      ids_second = [u.identifier for u in units_second]
+      assert ids_first == ids_second, "Discovery ordering must be deterministic"
 
 
 if __name__ == "__main__":

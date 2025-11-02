@@ -1,10 +1,10 @@
 ---
 id: IP-006.PHASE-01
 slug: standardize-cli-json-output-support-phase-01
-name: IP-006 Phase 01
+name: IP-006 Phase 01 - Add JSON support to CLI commands
 created: '2025-11-02'
 updated: '2025-11-02'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -15,14 +15,36 @@ phase: IP-006.PHASE-01
 plan: IP-006
 delta: DE-006
 objective: >-
-  Describe the outcome for this phase.
-entrance_criteria: []
-exit_criteria: []
+  Add --json flag to create and list CLI commands with standardized output format
+entrance_criteria:
+  - Delta DE-006 approved
+  - Existing --json pattern understood (create.py lines 58-79)
+  - Standard JSON schema defined
+exit_criteria:
+  - All create subcommands (issue, problem, improvement, risk) support --json
+  - List specs command supports --json shorthand
+  - All tests passing (69 CLI tests)
+  - Ruff and Pylint passing
+  - ISSUE-007 resolved
 verification:
-  tests: []
-  evidence: []
-tasks: []
-risks: []
+  tests:
+    - test_create_issue_json_output
+    - test_create_problem_json_output
+    - test_create_risk_json_output
+  evidence:
+    - Git commit 8f388ea
+    - All 69 CLI tests passing
+    - Ruff 100% clean
+    - Pylint 10/10 score
+tasks:
+  - Add --json to create issue, problem, improvement, risk
+  - Add --json shorthand to list specs
+  - Write JSON output tests
+  - Run full test suite
+  - Resolve ISSUE-007
+risks:
+  - Breaking text output (mitigated - --json is opt-in)
+  - Inconsistent JSON schema (mitigated - standard format defined)
 ```
 
 # Phase N - <Name>

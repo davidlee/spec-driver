@@ -96,29 +96,29 @@ def sync(
 
   By default, only syncs specs. Use --adr to also sync ADR registry.
   """
-  try:
-    # Auto-discover repository root
-    root = find_repo_root()
-    tech_dir = root / "specify" / "tech"
-    registry_path = tech_dir / "registry_v2.json"
+  # Auto-discover repository root
+  root = find_repo_root()
+  tech_dir = root / "specify" / "tech"
+  registry_path = tech_dir / "registry_v2.json"
 
-    # Validate directory structure
-    if not tech_dir.exists():
-      typer.echo(f"Tech spec directory not found: {tech_dir}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
+  # Validate directory structure
+  if not tech_dir.exists():
+    typer.echo(f"Tech spec directory not found: {tech_dir}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
 
-    if language not in ["go", "python", "all"]:
-      typer.echo(
-        f"Invalid language: {language}. Must be go, python, or all",
-        err=True,
-      )
-      raise typer.Exit(EXIT_FAILURE)
+  if language not in ["go", "python", "all"]:
+    typer.echo(
+      f"Invalid language: {language}. Must be go, python, or all",
+      err=True,
+    )
+    raise typer.Exit(EXIT_FAILURE)
 
-    results = {}
+  results = {}
 
-    # Sync specs if requested
-    if specs:
-      typer.echo("Synchronizing tech specs...")
+  # Sync specs if requested
+  if specs:
+    typer.echo("Synchronizing tech specs...")
+    try:
       spec_result = _sync_specs(
         root=root,
         tech_dir=tech_dir,
@@ -132,33 +132,36 @@ def sync(
         prune=prune,
       )
       results["specs"] = spec_result
+    except (FileNotFoundError, ValueError, KeyError) as e:
+      typer.echo(f"Error: {e}", err=True)
+      raise typer.Exit(EXIT_FAILURE) from e
 
-    # Sync ADRs if requested
-    if adr:
-      typer.echo("Synchronizing ADR registry...")
+  # Sync ADRs if requested
+  if adr:
+    typer.echo("Synchronizing ADR registry...")
+    try:
       adr_result = _sync_adr(root=root)
       results["adr"] = adr_result
+    except Exception as e:
+      typer.echo(f"Error syncing ADRs: {e}", err=True)
+      raise typer.Exit(EXIT_FAILURE) from e
 
-    # Always sync requirements from specs
-    typer.echo("Synchronizing requirements registry...")
+  # Always sync requirements from specs
+  typer.echo("Synchronizing requirements registry...")
+  try:
     req_result = _sync_requirements(root=root)
     results["requirements"] = req_result
-
-    # Report overall results
-    if all(r.get("success", True) for r in results.values()):
-      typer.echo("Sync completed successfully")
-      raise typer.Exit(EXIT_SUCCESS)
-
-    typer.echo("Sync completed with errors", err=True)
-    raise typer.Exit(EXIT_FAILURE)
-
-  except (FileNotFoundError, ValueError, KeyError) as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
   except Exception as e:
-    # Catch other errors including language-specific toolchain errors
-    typer.echo(f"Error: {e}", err=True)
+    typer.echo(f"Error syncing requirements: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
+
+  # Report overall results
+  if all(r.get("success", True) for r in results.values()):
+    typer.echo("Sync completed successfully")
+    raise typer.Exit(EXIT_SUCCESS)
+
+  typer.echo("Sync completed with errors", err=True)
+  raise typer.Exit(EXIT_FAILURE)
 
 
 def _sync_specs(
@@ -288,8 +291,32 @@ def _sync_specs(
             orphaned_units.append(unit)
             typer.echo(f"  ⚠ Orphaned: {orphaned_id} (source file deleted)", err=True)
     except Exception as e:
-      typer.echo(f"Error discovering {lang_name} targets: {e}", err=True)
-      typer.echo(f"Skipping {lang_name} synchronization", err=True)
+      # Check if this language has existing specs in the registry
+      has_existing_specs = lang_name in spec_manager.registry_v2.languages and bool(
+        spec_manager.registry_v2.languages[lang_name]
+      )
+
+      if has_existing_specs:
+        # Language has specs but toolchain failed - this is an error
+        typer.echo(f"Error discovering {lang_name} targets: {e}", err=True)
+        spec_count = len(spec_manager.registry_v2.languages[lang_name])
+        typer.echo(
+          f"Cannot sync {lang_name}: toolchain unavailable but "
+          f"{spec_count} specs exist in registry",
+          err=True,
+        )
+        # Return early with failure
+        return {
+          "success": False,
+          "error": f"{lang_name} toolchain unavailable with existing specs",
+          "processed": processed_count,
+          "created": created_count,
+          "skipped": skipped_count,
+          "orphaned": orphaned_count,
+        }
+      # No existing specs - toolchain unavailability is just a warning
+      typer.echo(f"Warning: {lang_name} toolchain unavailable: {e}")
+      typer.echo(f"Skipping {lang_name} synchronization (no existing specs)")
       continue
 
     typer.echo(f"Found {len(source_units)} {lang_name} source units")

@@ -4,7 +4,7 @@ slug: python-package-level-specs
 name: Python Package-Level Specs
 created: '2025-11-02'
 updated: '2025-11-02'
-status: draft
+status: active
 kind: prod
 aliases: []
 relations:

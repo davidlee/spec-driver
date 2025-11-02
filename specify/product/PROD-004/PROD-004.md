@@ -149,8 +149,8 @@ entries:
   - artefact: VT-004
     kind: VT
     requirement: PROD-004.FR-004
-    status: planned
-    notes: CLI integration tests for schema show frontmatter.* commands
+    status: passed
+    notes: CLI integration tests for schema show frontmatter.* commands - 23 schema tests passing (8 new), implemented in DE-003
   - artefact: VT-005
     kind: VT
     requirement: PROD-004.FR-005

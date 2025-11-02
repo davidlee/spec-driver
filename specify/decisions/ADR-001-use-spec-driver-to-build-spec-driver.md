@@ -1,7 +1,7 @@
 ---
 id: ADR-001
 title: 'ADR-001: use spec-driver to build spec-driver'
-status: draft
+status: accepted
 created: '2025-11-01'
 updated: '2025-11-01'
 reviewed: '2025-11-01'

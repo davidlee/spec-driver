@@ -49,14 +49,14 @@ Args:
 
 Returns:
     True if this adapter can process the identifier
-- `validate_source_exists(self, unit) -> dict[Tuple[str, <BinOp>]]`: Validate that source file exists and is git-tracked.
+- `validate_source_exists(self, unit) -> dict[Tuple[str, <BinOp>]]`: Validate that source exists and is git-tracked.
 
 Args:
     unit: Source unit to validate
 
 Returns:
     Dictionary with validation results:
-      - exists: Whether source file exists on disk
-      - git_tracked: Whether file is tracked by git (None if can't determine)
+      - exists: Whether source (file or directory) exists on disk
+      - git_tracked: Whether source is tracked by git (None if can't determine)
       - status: "valid", "missing", or "untracked"
       - message: Human-readable status message

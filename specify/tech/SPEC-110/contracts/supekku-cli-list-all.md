@@ -34,7 +34,7 @@ The --regexp flag does pattern matching on UID, label, and title fields.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
-- @app.command(specs) `list_specs(root, kind, substring, package_filter, package_path, for_path, regexp, case_insensitive, format_type, truncate, paths, packages) -> None`: List SPEC/PROD artifacts with optional filtering.
+- @app.command(specs) `list_specs(root, kind, substring, package_filter, package_path, for_path, regexp, case_insensitive, format_type, json_output, truncate, paths, packages) -> None`: List SPEC/PROD artifacts with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.

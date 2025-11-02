@@ -149,7 +149,7 @@ entries:
 **Journey 1: Solo developer elevates single spec**
 
 Given Sarah ran `spec-driver sync` and has placeholder spec SPEC-042 for her new `auth` package
-1. Sarah types `/supekku.elevate SPEC-042`
+1. Sarah types `/supekku.bacfill SPEC-042`
 2. Agent reads existing placeholder spec
 3. Agent reads auto-generated contracts (API documentation) for `auth` package
 4. Agent asks 2 questions: "Should this document internal helpers or only public API?" and "Any security considerations beyond standard auth?"
@@ -172,14 +172,14 @@ Given Marcus has 50 placeholder specs from recent sync operation
 6. After 15 minutes: "47/50 completed; 3 failed (contracts missing)"
 7. Marcus reviews summary, addresses 3 failures individually
 
-Then Marcus has 47 specs elevated automatically
+Then Marcus has 47 specs backfilled non-interactively
 And can focus manual effort on the 3 edge cases
 
 ### Edge Cases & Non-goals
 
 **Edge Cases**:
-- Spec has partial manual content → preserve it, complete only placeholders
-- Contracts missing for package → complete with limited context, mark for review
+- Spec has partial manual content → preserve / skip
+- Contracts missing for package → complete with limited context OR verify existence of code files, mark for review
 - User wants to restart failed batch → support resuming from failures
 
 **Non-goals**:
@@ -191,7 +191,7 @@ And can focus manual effort on the 3 edge cases
 
 ### Capability Overview
 
-**Effortless Spec Completion** enables users to elevate placeholder specs through a guided workflow that asks minimal questions, uses existing code documentation (contracts) for context, and preserves any manually-created content.
+**Effortless Spec Completion** enables users to backfill placeholder specs through a guided workflow that asks minimal questions, uses existing code documentation (contracts) for context, and preserves any manually-created content.
 
 **Bulk Spec Elevation** supports batch operations across multiple specs with progress reporting, error isolation, and configurable automation levels (interactive vs. automated).
 

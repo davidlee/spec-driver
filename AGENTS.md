@@ -233,3 +233,8 @@ Before submitting work:
 - [ ] Both linters passing (`just lint` + `just pylint`)
 - [ ] All of the above (fail-fast): `just` 
 - [ ] Display logic in `formatters/`, not in domain packages
+
+## RULES
+
+- never delete a file with uncommitted/unstaged changes without user approval
+- never git attempt to git checkout a file without explicit user approval

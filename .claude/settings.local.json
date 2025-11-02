@@ -15,7 +15,8 @@
       "Bash(find:*)",
       "Bash(while read -r dir)",
       "Bash(do if ! find \"$dir\" -mindepth 1 -maxdepth 1 -type d -exec test -f {}/__init__.py)",
-      "Bash(then echo \"$dir\" fi done)"
+      "Bash(then echo \"$dir\" fi done)",
+      "Bash(just lint:*)"
     ],
     "deny": [],
     "ask": []

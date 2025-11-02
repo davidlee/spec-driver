@@ -29,3 +29,7 @@ Test PythonAdapter functionality.
 - `test_should_skip_init_files(self) -> None`: Test __init__.py files are skipped.
 - `test_supports_identifier_invalid_identifiers(self) -> None`: Test supports_identifier returns False for non-Python identifiers.
 - `test_supports_identifier_valid_python_modules(self) -> None`: Test supports_identifier returns True for valid Python identifiers.
+- `test_sync_package_level_integration(self) -> None`: VT-003: Integration test for sync with package-level specs.
+
+Tests that PythonAdapter correctly discovers, describes, and syncs
+package-level specs with proper frontmatter structure.

@@ -22,18 +22,22 @@ Given that spec description, create a complete, high-quality specification follo
 
 From the feature description:
 
+- **Determine spec kind from prefix**:
+  - If description starts with `prod:` → Product spec (`--kind product`)
+  - If description starts with `tech:` → Tech spec (`--kind tech`)
+  - No prefix → Infer from content:
+    - Product spec: User-facing features, business requirements, UX flows, user value
+    - Tech spec (default): Architecture, components, implementation details, system design
+
 - **Extract a concise short name** (2-5 words):
+  - Remove the `prod:` or `tech:` prefix if present
   - Analyze description and extract meaningful keywords
   - Use action-noun format when possible (e.g., "User Authentication", "Payment Processing")
   - Preserve technical terms (OAuth2, API, GraphQL, etc.)
   - Examples:
-    - "Add user authentication with OAuth" → "User OAuth"
-    - "Implement payment processing" → "Payment Processing"
-    - "Create analytics dashboard" → "Analytics Dashboard"
-
-- **Determine spec kind**:
-  - Product spec (`--kind product`): User-facing features, business requirements, UX flows
-  - Tech spec (`--kind tech`, default): Architecture, components, implementation details
+    - "prod: Add user authentication with OAuth" → "User OAuth" (product spec)
+    - "tech: Implement payment processing service" → "Payment Processing" (tech spec)
+    - "Create analytics dashboard" → "Analytics Dashboard" (infer: product)
 
 ### 2. Create the Spec Bundle
 

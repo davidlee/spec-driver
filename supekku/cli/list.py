@@ -89,6 +89,13 @@ def list_specs(
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   truncate: TruncateOption = False,
   paths: Annotated[
     bool,
@@ -110,6 +117,10 @@ def list_specs(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID, slug, and name fields.
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   if kind not in ["tech", "product", "all"]:
     typer.echo(f"Error: invalid kind: {kind}", err=True)
     raise typer.Exit(EXIT_FAILURE)

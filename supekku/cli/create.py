@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Annotated
 
 import typer
@@ -284,6 +285,13 @@ def create_adr(
 @app.command("issue")
 def create_issue(
   title: Annotated[str, typer.Argument(help="Issue title")],
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON",
+    ),
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Create a new issue backlog entry."""
@@ -291,8 +299,18 @@ def create_issue(
     path = create_backlog_entry("issue", title, repo_root=root)
     # Extract ID from filename (e.g., ISSUE-001.md -> ISSUE-001)
     issue_id = path.stem
-    typer.echo(f"Issue created: {issue_id}")
-    typer.echo(str(path))
+
+    if json_output:
+      result = {
+        "id": issue_id,
+        "path": str(path),
+        "kind": "issue",
+        "status": "open",
+      }
+      typer.echo(json.dumps(result, indent=2))
+    else:
+      typer.echo(f"Issue created: {issue_id}")
+      typer.echo(str(path))
     raise typer.Exit(EXIT_SUCCESS)
   except (ValueError, FileNotFoundError) as e:
     typer.echo(f"Error creating issue: {e}", err=True)
@@ -302,6 +320,13 @@ def create_issue(
 @app.command("problem")
 def create_problem(
   title: Annotated[str, typer.Argument(help="Problem title")],
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON",
+    ),
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Create a new problem backlog entry."""
@@ -309,8 +334,18 @@ def create_problem(
     path = create_backlog_entry("problem", title, repo_root=root)
     # Extract ID from filename (e.g., PROB-001.md -> PROB-001)
     problem_id = path.stem
-    typer.echo(f"Problem created: {problem_id}")
-    typer.echo(str(path))
+
+    if json_output:
+      result = {
+        "id": problem_id,
+        "path": str(path),
+        "kind": "problem",
+        "status": "open",
+      }
+      typer.echo(json.dumps(result, indent=2))
+    else:
+      typer.echo(f"Problem created: {problem_id}")
+      typer.echo(str(path))
     raise typer.Exit(EXIT_SUCCESS)
   except (ValueError, FileNotFoundError) as e:
     typer.echo(f"Error creating problem: {e}", err=True)
@@ -320,6 +355,13 @@ def create_problem(
 @app.command("improvement")
 def create_improvement(
   title: Annotated[str, typer.Argument(help="Improvement title")],
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON",
+    ),
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Create a new improvement backlog entry."""
@@ -327,8 +369,18 @@ def create_improvement(
     path = create_backlog_entry("improvement", title, repo_root=root)
     # Extract ID from filename (e.g., IMPR-001.md -> IMPR-001)
     improvement_id = path.stem
-    typer.echo(f"Improvement created: {improvement_id}")
-    typer.echo(str(path))
+
+    if json_output:
+      result = {
+        "id": improvement_id,
+        "path": str(path),
+        "kind": "improvement",
+        "status": "open",
+      }
+      typer.echo(json.dumps(result, indent=2))
+    else:
+      typer.echo(f"Improvement created: {improvement_id}")
+      typer.echo(str(path))
     raise typer.Exit(EXIT_SUCCESS)
   except (ValueError, FileNotFoundError) as e:
     typer.echo(f"Error creating improvement: {e}", err=True)
@@ -338,6 +390,13 @@ def create_improvement(
 @app.command("risk")
 def create_risk(
   title: Annotated[str, typer.Argument(help="Risk title")],
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON",
+    ),
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Create a new risk backlog entry."""
@@ -345,8 +404,18 @@ def create_risk(
     path = create_backlog_entry("risk", title, repo_root=root)
     # Extract ID from filename (e.g., RISK-001.md -> RISK-001)
     risk_id = path.stem
-    typer.echo(f"Risk created: {risk_id}")
-    typer.echo(str(path))
+
+    if json_output:
+      result = {
+        "id": risk_id,
+        "path": str(path),
+        "kind": "risk",
+        "status": "open",
+      }
+      typer.echo(json.dumps(result, indent=2))
+    else:
+      typer.echo(f"Risk created: {risk_id}")
+      typer.echo(str(path))
     raise typer.Exit(EXIT_SUCCESS)
   except (ValueError, FileNotFoundError) as e:
     typer.echo(f"Error creating risk: {e}", err=True)

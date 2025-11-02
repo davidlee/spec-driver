@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -146,6 +147,56 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     dirs = list(issue_dir.iterdir())
     assert len(dirs) == 1
     assert "complex-issue-title-with-spaces" in dirs[0].name
+
+  def test_create_issue_json_output(self) -> None:
+    """Test creating an issue with --json flag returns valid JSON."""
+    result = self.runner.invoke(
+      app,
+      ["issue", "Test JSON issue", "--json", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+
+    # Parse JSON output
+    output = json.loads(result.stdout)
+    assert "id" in output
+    assert "path" in output
+    assert "kind" in output
+    assert "status" in output
+    assert output["id"] == "ISSUE-001"
+    assert output["kind"] == "issue"
+    assert output["status"] == "open"
+    assert "ISSUE-001.md" in output["path"]
+
+  def test_create_problem_json_output(self) -> None:
+    """Test creating a problem with --json flag returns valid JSON."""
+    result = self.runner.invoke(
+      app,
+      ["problem", "Test JSON problem", "--json", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+
+    # Parse JSON output
+    output = json.loads(result.stdout)
+    assert output["id"] == "PROB-001"
+    assert output["kind"] == "problem"
+    assert output["status"] == "open"
+
+  def test_create_risk_json_output(self) -> None:
+    """Test creating a risk with --json flag returns valid JSON."""
+    result = self.runner.invoke(
+      app,
+      ["risk", "Test JSON risk", "--json", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+
+    # Parse JSON output
+    output = json.loads(result.stdout)
+    assert output["id"] == "RISK-001"
+    assert output["kind"] == "risk"
+    assert output["status"] == "open"
 
 
 if __name__ == "__main__":

@@ -9,7 +9,9 @@ import typer
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
 from supekku.scripts.lib.backlog.registry import create_backlog_entry
 from supekku.scripts.lib.changes.creation import (
+  PhaseCreationError,
   create_delta,
+  create_phase,
   create_requirement_breakout,
   create_revision,
 )
@@ -130,6 +132,23 @@ def create_delta_cmd(
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating delta: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("phase")
+def create_phase_cmd(
+  name: Annotated[str, typer.Argument(help="Phase name")],
+  plan: Annotated[str, typer.Option("--plan", help="Plan ID (e.g., IP-002)")],
+  root: RootOption = None,
+) -> None:
+  """Create a new phase for an implementation plan."""
+  try:
+    result = create_phase(name, plan, repo_root=root)
+    typer.echo(f"Phase created: {result.phase_id}")
+    typer.echo(str(result.phase_path))
+    raise typer.Exit(EXIT_SUCCESS)
+  except PhaseCreationError as e:
+    typer.echo(f"Error creating phase: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
 

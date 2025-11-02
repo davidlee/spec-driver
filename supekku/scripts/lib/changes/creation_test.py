@@ -9,7 +9,9 @@ from pathlib import Path
 
 from supekku.scripts.lib.changes.creation import (
   ChangeArtifactCreated,
+  PhaseCreationError,
   create_delta,
+  create_phase,
   create_requirement_breakout,
   create_revision,
 )
@@ -119,6 +121,106 @@ class CreateChangeTest(unittest.TestCase):
     frontmatter, _ = load_markdown_file(path)
     assert frontmatter["kind"] == "requirement"
     assert frontmatter["spec"] == "SPEC-100"
+
+  def test_create_phase_first_in_sequence(self) -> None:
+    """Test creating the first phase for a plan."""
+    root = self._make_repo()
+    # Create a delta with plan first
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    # Extract plan ID from extras (IP-001.md)
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    assert plan_files, "Plan file should be created with delta"
+    plan_id = plan_files[0].stem  # Get "IP-001" from "IP-001.md"
+
+    # Remove the default phase-01.md that delta creation made
+    phases_dir = delta_result.directory / "phases"
+    default_phase = phases_dir / "phase-01.md"
+    if default_phase.exists():
+      default_phase.unlink()
+
+    # Now create first phase
+    result = create_phase("Phase 01 - Foundation", plan_id, repo_root=root)
+    assert result.phase_id == f"{plan_id}.PHASE-01"
+    assert result.plan_id == plan_id
+    assert result.phase_path.exists()
+    assert result.phase_path.name == "phase-01.md"
+
+    # Verify frontmatter
+    frontmatter, _ = load_markdown_file(result.phase_path)
+    assert frontmatter["kind"] == "phase"
+    assert frontmatter["id"] == f"{plan_id}.PHASE-01"
+
+  def test_create_phase_auto_increment(self) -> None:
+    """Test phase numbering automatically increments."""
+    root = self._make_repo()
+    # Create delta with plan
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_id = plan_files[0].stem
+
+    # Create second phase (phase-01 already exists from delta creation)
+    result = create_phase("Phase 02 - Next", plan_id, repo_root=root)
+    assert result.phase_id == f"{plan_id}.PHASE-02"
+    assert result.phase_path.name == "phase-02.md"
+
+    # Create third phase
+    result2 = create_phase("Phase 03 - Final", plan_id, repo_root=root)
+    assert result2.phase_id == f"{plan_id}.PHASE-03"
+    assert result2.phase_path.name == "phase-03.md"
+
+  def test_create_phase_invalid_plan(self) -> None:
+    """Test error when plan does not exist."""
+    root = self._make_repo()
+    with self.assertRaises(PhaseCreationError) as ctx:
+      create_phase("Phase 01", "IP-999", repo_root=root)
+    assert "not found" in str(ctx.exception).lower()
+
+  def test_create_phase_empty_name(self) -> None:
+    """Test error when phase name is empty."""
+    root = self._make_repo()
+    with self.assertRaises(PhaseCreationError) as ctx:
+      create_phase("", "IP-001", repo_root=root)
+    assert "cannot be empty" in str(ctx.exception).lower()
+
+  def test_create_phase_metadata_population(self) -> None:
+    """Test phase metadata is correctly populated."""
+    root = self._make_repo()
+    # Create delta with plan
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_id = plan_files[0].stem
+    delta_id = delta_result.artifact_id
+
+    # Create phase (will be PHASE-02 since delta creates PHASE-01)
+    result = create_phase("Phase 02 - Test", plan_id, repo_root=root)
+
+    # Verify all metadata fields
+    frontmatter, body = load_markdown_file(result.phase_path)
+    assert frontmatter["id"] == f"{plan_id}.PHASE-02"
+    assert frontmatter["kind"] == "phase"
+    assert frontmatter["status"] == "draft"
+    assert "created" in frontmatter
+    assert "updated" in frontmatter
+
+    # Check YAML block in body contains correct IDs
+    assert f"phase: {plan_id}.PHASE-02" in body
+    assert f"plan: {plan_id}" in body
+    assert f"delta: {delta_id}" in body
 
 
 if __name__ == "__main__":

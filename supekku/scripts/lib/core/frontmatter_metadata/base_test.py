@@ -369,9 +369,7 @@ class BaseFrontmatterDualValidationTest(unittest.TestCase):
     }
     new_validator = MetadataValidator(BASE_FRONTMATTER_METADATA)
     new_errors = new_validator.validate(data)
-    self.assertNotEqual(
-      new_errors, [], "New validator should reject invalid lifecycle"
-    )
+    self.assertNotEqual(new_errors, [], "New validator should reject invalid lifecycle")
 
   def test_invalid_relation_type_value(self) -> None:
     """Both validators reject invalid relation type."""

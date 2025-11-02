@@ -218,9 +218,7 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
     "packages": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Package path"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Package path"),
       description="Legacy Go package tracking (deprecated, use sources instead)",
     ),
   },

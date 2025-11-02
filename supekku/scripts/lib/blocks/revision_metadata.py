@@ -224,8 +224,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
                   type="string",
                   required=True,
                   description=(
-                    "Reference ID "
-                    "(pattern depends on kind, see validator for details)"
+                    "Reference ID (pattern depends on kind, see validator for details)"
                   ),
                 ),
                 "notes": FieldMetadata(

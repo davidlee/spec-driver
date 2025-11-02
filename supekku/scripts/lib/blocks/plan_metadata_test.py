@@ -565,12 +565,10 @@ class PhaseDualValidationTest(unittest.TestCase):
 
     old_errors, new_errors = self._validate_both(data)
     assert any(
-      "entrance_criteria" in err.lower() or "array" in err.lower()
-      for err in old_errors
+      "entrance_criteria" in err.lower() or "array" in err.lower() for err in old_errors
     )
     assert any(
-      "entrance_criteria" in err.lower() or "array" in err.lower()
-      for err in new_errors
+      "entrance_criteria" in err.lower() or "array" in err.lower() for err in new_errors
     )
 
   def test_exit_criteria_wrong_type(self):

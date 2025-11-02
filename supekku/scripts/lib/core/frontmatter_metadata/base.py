@@ -42,11 +42,13 @@ BASE_FRONTMATTER_METADATA = BlockMetadata(
         "delta",
         "design_revision",
         "issue",
-        "plan",
         "phase",
+        "plan",
+        "policy",
         "problem",
         "requirement",
         "spec",
+        "standard",
         "task",
         "verification",
       ],
@@ -85,9 +87,7 @@ BASE_FRONTMATTER_METADATA = BlockMetadata(
     "owners": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Owner identifier"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Owner identifier"),
       description="Responsible owners",
     ),
     "auditers": FieldMetadata(

@@ -25,9 +25,7 @@ DELTA_FRONTMATTER_METADATA = BlockMetadata(
         "specs": FieldMetadata(
           type="array",
           required=False,
-          items=FieldMetadata(
-            type="string", pattern=r".+", description="Spec ID"
-          ),
+          items=FieldMetadata(type="string", pattern=r".+", description="Spec ID"),
           description="Specification IDs this delta applies to",
         ),
         "prod": FieldMetadata(

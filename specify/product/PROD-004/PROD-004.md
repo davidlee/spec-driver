@@ -9,8 +9,10 @@ kind: prod
 aliases: []
 relations:
   - type: implements
-    target: SPEC-036
-    nature: Replaces imperative validation with metadata-driven validation
+    target: SPEC-116
+    nature: >-
+      Replaces imperative validation with metadata-driven validation
+      in core/frontmatter_metadata package
   - type: enables
     target: PROD-003
     nature: Provides validation infrastructure for policy/standard frontmatter
@@ -45,7 +47,7 @@ requirements:
     - PROD-004.NF-003
   collaborators: []
 interactions:
-  - with: SPEC-036
+  - with: SPEC-116
     nature: Replaces imperative frontmatter_schema.py validator with metadata-driven system
   - with: PROD-003
     nature: Provides validation foundation for policy and standard frontmatter schemas
@@ -726,7 +728,7 @@ Aligned with `supekku:verification.coverage@v1` YAML block above.
 
 ### Related Specs / PROD
 
-- **SPEC-036** (`supekku/scripts/lib/core/frontmatter_schema.py`): Current imperative validator being replaced
+- **SPEC-116** (supekku/scripts/lib/core/frontmatter_metadata): Package containing frontmatter validation logic
 - **PROD-003** (Policy and Standard Management): Relies on frontmatter metadata validation for policy/standard frontmatter schemas
 
 ### Risks & Mitigations

@@ -9,14 +9,11 @@ kind: prod
 aliases: []
 relations:
   - type: extends
-    target: SPEC-003
-    nature: CLI create commands
-  - type: extends
-    target: SPEC-004
-    nature: CLI list commands
+    target: SPEC-110
+    nature: CLI create and list commands
   - type: collaborates
-    target: SPEC-043
-    nature: Registry pattern reuse
+    target: SPEC-117
+    nature: Registry pattern reuse from decisions package
 guiding_principles:
   - Policies enforce hard rules; standards provide flexible guidance
   - Bidirectional traceability between policies, standards, and decisions
@@ -47,12 +44,10 @@ requirements:
     - PROD-003.NF-002
   collaborators: []
 interactions:
-  - with: SPEC-003
-    nature: Extends CLI create commands to support policies and standards
-  - with: SPEC-004
-    nature: Extends CLI list commands to support policies and standards
-  - with: SPEC-043
-    nature: Reuses registry pattern from decisions (ADRs)
+  - with: SPEC-110
+    nature: Extends CLI create and list commands for policies and standards
+  - with: SPEC-117
+    nature: Reuses registry pattern from decisions package
 ```
 
 ```yaml supekku:spec.capabilities@v1
@@ -628,12 +623,9 @@ Before feature launch:
 
 ### Related Specs / PROD
 
-- **SPEC-003** (supekku/cli/create.py): Extends create commands to support `policy` and `standard` subcommands
-- **SPEC-004** (supekku/cli/list.py): Extends list commands to support `policies` and `standards` subcommands
-- **SPEC-006** (supekku/cli/show.py): Extends show commands to support policy/standard details
-- **SPEC-043** (decisions/registry.py): Reuses registry pattern; extends DecisionRecord with `standards:` field
-- **SPEC-042** (decisions/creation.py): Pattern for creation logic; extends frontmatter building
-- **SPEC-055** (decision_formatters.py): Pattern for formatter implementation
+- **SPEC-110** (supekku/cli): Extends CLI create, list, show commands for policies/standards
+- **SPEC-117** (supekku/scripts/lib/decisions): Reuses decision registry and creation patterns
+- **SPEC-111** (supekku/scripts/lib/formatters): Reuses formatter patterns
 
 **Interaction nature**:
 - **Extends**: Policies/standards add new commands to existing CLI modules

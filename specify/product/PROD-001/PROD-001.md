@@ -29,12 +29,8 @@ requirements:
     - PROD-001.NF-002
   collaborators: []
 interactions:
-  - with: SPEC-003
-    nature: Uses create.py CLI for spec bundle generation
-  - with: SPEC-041
-    nature: Relies on templates.py for spec template rendering
-  - with: SPEC-085
-    nature: Depends on schema.py for YAML block documentation
+  - with: SPEC-110
+    nature: Uses CLI package (create, templates, schema) for spec workflows
 ```
 
 ```yaml supekku:spec.capabilities@v1
@@ -598,13 +594,10 @@ Must achieve before declaring feature complete:
 ### Related Specs / PROD
 
 **Direct Dependencies**:
-- **SPEC-003** (create.py CLI): Provides `spec-driver create spec` command for bundle generation
-- **SPEC-041** (templates.py): Supplies Jinja2 template rendering for spec file creation
-- **SPEC-085** (schema.py): Offers `spec-driver schema show` for YAML block documentation
+- **SPEC-110** (supekku/cli): CLI package providing create, templates, schema commands
 
 **Collaborators**:
-- **SPEC-007** (sync.py): Handles registry synchronization after spec creation
-- **SPEC-008** (workspace.py): Provides `validate` command for metadata consistency checks
+- **SPEC-110** (supekku/cli): CLI package with sync and validate commands
 
 **Future Integration Candidates** (noted for policies/ADRs):
 - Version control workflow integration (git branch creation, commit automation)

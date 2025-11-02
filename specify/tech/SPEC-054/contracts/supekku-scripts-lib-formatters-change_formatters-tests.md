@@ -7,6 +7,13 @@ Formatters take ChangeArtifact objects and return formatted strings for display.
 
 ## Functions
 
+- `_format_affects(artifact) -> list[str]`: Format affects section for revisions (similar to applies_to for deltas).
+- `_format_applies_to(artifact) -> list[str]`: Format applies_to section if present.
+- `_format_change_basic_fields(artifact) -> list[str]`: Format basic change artifact fields.
+- `_format_file_path_for_change(artifact, root) -> list[str]`: Format file path section for change artifact.
+- `_format_plan_overview(artifact) -> list[str]`: Format plan overview section if present.
+- `_format_relations(artifact) -> list[str]`: Format relations section if present.
+- `_format_revision_basic_fields(artifact) -> list[str]`: Format basic revision artifact fields.
 - `format_change_list_item(artifact) -> str`: Format change artifact as basic list item: id, kind, status, name.
 
 Args:
@@ -43,6 +50,14 @@ Args:
 
 Returns:
   Multi-line formatted string with indented context
+- `format_delta_details(artifact, root) -> str`: Format delta details as multi-line string for display.
+
+Args:
+  artifact: ChangeArtifact to format
+  root: Repository root for relative path calculation (optional)
+
+Returns:
+  Formatted string with all delta details
 - `format_phase_summary(phase, max_objective_len) -> str`: Format a single phase with truncated objective.
 
 Args:
@@ -51,3 +66,11 @@ Args:
 
 Returns:
   Formatted string: "{phase_id}" or "{phase_id}: {objective}"
+- `format_revision_details(artifact, root) -> str`: Format revision details as multi-line string for display.
+
+Args:
+  artifact: ChangeArtifact to format (must be kind='revision')
+  root: Repository root for relative path calculation (optional)
+
+Returns:
+  Formatted string with all revision details

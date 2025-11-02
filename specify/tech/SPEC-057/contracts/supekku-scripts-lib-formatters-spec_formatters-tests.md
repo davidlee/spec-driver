@@ -7,6 +7,9 @@ Formatters take Spec objects and return formatted strings for display.
 
 ## Functions
 
+- `_format_basic_fields(spec) -> list[str]`: Format basic spec fields (id, name, slug, kind, status).
+- `_format_file_path(spec, root) -> list[str]`: Format file path section.
+- `_format_packages(spec) -> list[str]`: Format packages section if packages exist.
 - `format_package_list(packages) -> str`: Format list of packages as comma-separated string.
 
 Args:
@@ -14,6 +17,14 @@ Args:
 
 Returns:
   Comma-separated string of packages
+- `format_spec_details(spec, root) -> str`: Format spec details as multi-line string for display.
+
+Args:
+  spec: Specification object to format
+  root: Repository root for relative path calculation (optional)
+
+Returns:
+  Formatted string with all spec details
 - `format_spec_list_item(spec) -> str`: Format spec as tab-separated list item with optional columns.
 
 Args:

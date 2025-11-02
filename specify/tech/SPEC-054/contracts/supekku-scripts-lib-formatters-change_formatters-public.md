@@ -43,6 +43,14 @@ Args:
 
 Returns:
   Multi-line formatted string with indented context
+- `format_delta_details(artifact, root) -> str`: Format delta details as multi-line string for display.
+
+Args:
+  artifact: ChangeArtifact to format
+  root: Repository root for relative path calculation (optional)
+
+Returns:
+  Formatted string with all delta details
 - `format_phase_summary(phase, max_objective_len) -> str`: Format a single phase with truncated objective.
 
 Args:
@@ -51,3 +59,11 @@ Args:
 
 Returns:
   Formatted string: "{phase_id}" or "{phase_id}: {objective}"
+- `format_revision_details(artifact, root) -> str`: Format revision details as multi-line string for display.
+
+Args:
+  artifact: ChangeArtifact to format (must be kind='revision')
+  root: Repository root for relative path calculation (optional)
+
+Returns:
+  Formatted string with all revision details

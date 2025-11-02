@@ -14,6 +14,14 @@ Args:
 
 Returns:
   Comma-separated string of packages
+- `format_spec_details(spec, root) -> str`: Format spec details as multi-line string for display.
+
+Args:
+  spec: Specification object to format
+  root: Repository root for relative path calculation (optional)
+
+Returns:
+  Formatted string with all spec details
 - `format_spec_list_item(spec) -> str`: Format spec as tab-separated list item with optional columns.
 
 Args:

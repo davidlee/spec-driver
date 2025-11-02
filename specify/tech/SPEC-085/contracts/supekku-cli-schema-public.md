@@ -16,4 +16,4 @@ Thin CLI layer: parse args → load registry → format → output
 
 Args:
   block_type: Block type identifier (e.g., 'delta.relationships')
-  format_type: Output format (markdown, json, yaml-example)
+  format_type: Output format (default: json-schema)

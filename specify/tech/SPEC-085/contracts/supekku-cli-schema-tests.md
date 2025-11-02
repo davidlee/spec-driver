@@ -34,7 +34,7 @@ Args:
 
 Args:
   schema: BlockSchema instance to render
-- `_render_yaml_example(schema) -> None`: Render example YAML block by calling renderer with minimal args.
+- `_render_yaml_example(schema) -> None`: Render example YAML block using metadata examples or renderer.
 
 Args:
   schema: BlockSchema instance to render
@@ -43,4 +43,4 @@ Args:
 
 Args:
   block_type: Block type identifier (e.g., 'delta.relationships')
-  format_type: Output format (markdown, json, yaml-example)
+  format_type: Output format (default: json-schema)

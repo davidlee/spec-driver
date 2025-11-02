@@ -140,8 +140,10 @@ def main() -> None:
     for spec_id, error in results["errors"]:
       print(f"  ✗ {spec_id}: {error}", file=sys.stderr)
 
-  print(f"\n{'Would migrate' if dry_run else 'Migrated'} {len(results['migrated'])} "
-        f"draft specs to stub status")
+  print(
+    f"\n{'Would migrate' if dry_run else 'Migrated'} {len(results['migrated'])} "
+    f"draft specs to stub status"
+  )
 
   if dry_run:
     print("\nRun without --dry-run to apply changes")

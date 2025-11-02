@@ -240,7 +240,8 @@ class TestSyncCommand:
     result = runner.invoke(app, ["sync", "--help"])
     assert result.exit_code == 0
     assert "--prune" in result.stdout
-    assert "deleted source files" in result.stdout
+    assert "deleted source" in result.stdout
+    assert "--force" in result.stdout
 
 
 class TestCommonOptions:

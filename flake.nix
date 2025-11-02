@@ -26,6 +26,7 @@
               uv
               python3Packages.python-lsp-server
               python3Packages.python-lsp-ruff
+              watchexec
 
               nodejs_latest
               bun
@@ -48,6 +49,19 @@
               # d2
             ]
             ++ lib.optionals stdenv.isLinux [];
+
+          # shellHook = ''
+          #   alias sd="uv run spec-driver"
+          # '';
+          commands = [
+            {
+              name = "sd";
+              help = "uv spec-driver ...";
+              command = ''
+                uv run spec-driver $@
+              '';
+            }
+          ];
         };
       };
     };

@@ -34,9 +34,7 @@ PLAN_FRONTMATTER_METADATA = BlockMetadata(
     "exit_criteria": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Exit criterion"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Exit criterion"),
       description="Conditions that must be met to complete",
     ),
   },

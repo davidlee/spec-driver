@@ -75,8 +75,7 @@ RISK_FRONTMATTER_METADATA = BlockMetadata(
       "updated": "2025-01-15",
       "owners": ["reliability-team"],
       "summary": (
-        "External payment API may become unavailable, "
-        "blocking checkout functionality"
+        "External payment API may become unavailable, blocking checkout functionality"
       ),
       "tags": ["availability", "dependencies", "payment"],
       "risk_kind": "systemic",

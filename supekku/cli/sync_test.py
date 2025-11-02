@@ -64,8 +64,7 @@ class SyncCommandTest(unittest.TestCase):
 
     # Should exit 0
     assert result.exit_code == 0, (
-      f"Expected exit code 0, got {result.exit_code}. "
-      f"Output: {result.stdout}"
+      f"Expected exit code 0, got {result.exit_code}. Output: {result.stdout}"
     )
     assert "Sync completed successfully" in result.stdout
 
@@ -96,8 +95,7 @@ class SyncCommandTest(unittest.TestCase):
 
     # Should exit 1
     assert result.exit_code == 1, (
-      f"Expected exit code 1, got {result.exit_code}. "
-      f"Output: {result.stdout}"
+      f"Expected exit code 1, got {result.exit_code}. Output: {result.stdout}"
     )
     # Error messages may go to stdout or stderr depending on typer config
     output = result.stdout + (result.stderr or "")

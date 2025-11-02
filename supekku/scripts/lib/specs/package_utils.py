@@ -147,8 +147,7 @@ def find_all_leaf_packages(root: Path) -> list[Path]:
   for pkg in all_packages:
     # Check if any other package is a child of this one
     has_child = any(
-      other != pkg and _is_relative_to(other, pkg)
-      for other in all_packages
+      other != pkg and _is_relative_to(other, pkg) for other in all_packages
     )
     if not has_child:
       leaf_packages.append(pkg)

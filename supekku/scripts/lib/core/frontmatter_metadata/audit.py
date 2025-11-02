@@ -20,17 +20,13 @@ AUDIT_FRONTMATTER_METADATA = BlockMetadata(
     "spec_refs": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Spec ID"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Spec ID"),
       description="Referenced specification IDs",
     ),
     "prod_refs": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Product spec ID"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Product spec ID"),
       description="Referenced product specification IDs",
     ),
     "code_scope": FieldMetadata(
@@ -199,9 +195,7 @@ AUDIT_FRONTMATTER_METADATA = BlockMetadata(
         {
           "artefact": "SPEC-101",
           "status": "divergent",
-          "notes": (
-            "Implementation matches responsibilities except schema validation"
-          ),
+          "notes": ("Implementation matches responsibilities except schema validation"),
         }
       ],
       "next_actions": [

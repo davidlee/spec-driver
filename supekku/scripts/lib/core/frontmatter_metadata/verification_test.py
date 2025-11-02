@@ -171,9 +171,7 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
     }
     new_validator = MetadataValidator(VERIFICATION_FRONTMATTER_METADATA)
     new_errors = new_validator.validate(data)
-    self.assertNotEqual(
-      new_errors, [], "Should reject invalid verification_kind"
-    )
+    self.assertNotEqual(new_errors, [], "Should reject invalid verification_kind")
 
   def test_covers_not_array(self) -> None:
     """New validator rejects covers when not an array."""

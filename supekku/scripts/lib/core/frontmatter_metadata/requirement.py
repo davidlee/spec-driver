@@ -51,9 +51,7 @@ REQUIREMENT_FRONTMATTER_METADATA = BlockMetadata(
     "verification_refs": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Verification ID"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Verification ID"),
       description="References to verification artifacts",
     ),
   },

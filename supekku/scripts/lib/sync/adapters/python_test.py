@@ -240,27 +240,33 @@ class TestPythonAdapter(unittest.TestCase):
       assert variant.name in ["api", "implementation", "tests"]
       assert variant.status == "unchanged"
 
-  @patch("pathlib.Path.glob")
-  def test_discover_targets_auto_discovery(self, mock_glob) -> None:
-    """Test discover_targets auto-discovers Python files."""
-    # Mock glob results
-    mock_files = [
-      Path("/test/repo/module1.py"),
-      Path("/test/repo/subdir/module2.py"),
-      Path("/test/repo/package/__init__.py"),
+  @patch("pathlib.Path.exists")
+  @patch("supekku.scripts.lib.sync.adapters.python.find_all_leaf_packages")
+  def test_discover_targets_auto_discovery(
+    self,
+    mock_find_packages,
+    mock_exists,
+  ) -> None:
+    """Test discover_targets auto-discovers Python packages."""
+    # Mock exists to return True for python_root
+    mock_exists.return_value = True
+
+    # Mock package discovery to return leaf packages
+    mock_packages = [
+      Path("/test/repo/supekku/cli"),
+      Path("/test/repo/supekku/scripts/lib/formatters"),
+      Path("/test/repo/supekku/scripts/lib/specs"),
     ]
-    mock_glob.return_value = mock_files
+    mock_find_packages.return_value = mock_packages
 
-    # Mock _should_skip_file to return False for all files
-    with patch.object(self.adapter, "_should_skip_file", return_value=False):
-      units = self.adapter.discover_targets(self.repo_root)
+    units = self.adapter.discover_targets(self.repo_root)
 
-    # Should discover all files
+    # Should discover all packages (relative paths)
     assert len(units) == 3
     identifiers = [unit.identifier for unit in units]
-    assert "module1.py" in identifiers
-    assert "subdir/module2.py" in identifiers
-    assert "package/__init__.py" in identifiers
+    assert "supekku/cli" in identifiers
+    assert "supekku/scripts/lib/formatters" in identifiers
+    assert "supekku/scripts/lib/specs" in identifiers
 
   @patch("pathlib.Path.exists")
   def test_discover_targets_requested_modules(self, mock_exists) -> None:

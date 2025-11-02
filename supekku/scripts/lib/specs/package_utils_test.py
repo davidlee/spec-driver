@@ -200,8 +200,7 @@ class TestFindAllLeafPackages:
 
     # Should find all leaf packages under lib/
     expected = {
-      pkg for pkg in KNOWN_LEAF_PACKAGES
-      if pkg.startswith("supekku/scripts/lib/")
+      pkg for pkg in KNOWN_LEAF_PACKAGES if pkg.startswith("supekku/scripts/lib/")
     }
     assert result_set == expected
 

@@ -244,9 +244,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
     }
     new_validator = MetadataValidator(REQUIREMENT_FRONTMATTER_METADATA)
     new_errors = new_validator.validate(data)
-    self.assertNotEqual(
-      new_errors, [], "Should reject invalid requirement_kind"
-    )
+    self.assertNotEqual(new_errors, [], "Should reject invalid requirement_kind")
 
   def test_invalid_rfc2119_level(self) -> None:
     """New validator rejects invalid rfc2119_level."""

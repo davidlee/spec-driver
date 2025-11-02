@@ -20,9 +20,7 @@ ISSUE_FRONTMATTER_METADATA = BlockMetadata(
     "categories": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Issue category"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Issue category"),
       description=(
         "Issue categories (e.g., regression, verification_gap, enhancement)"
       ),
@@ -42,33 +40,25 @@ ISSUE_FRONTMATTER_METADATA = BlockMetadata(
     "problem_refs": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Problem ID"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Problem ID"),
       description="Related problem statement IDs",
     ),
     "related_requirements": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Requirement ID"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Requirement ID"),
       description="Related requirement IDs",
     ),
     "affected_verifications": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Verification ID"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Verification ID"),
       description="Affected verification artifact IDs",
     ),
     "linked_deltas": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Delta ID"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Delta ID"),
       description="Related delta IDs",
     ),
   },
@@ -94,9 +84,7 @@ ISSUE_FRONTMATTER_METADATA = BlockMetadata(
       "created": "2024-11-05",
       "updated": "2025-01-15",
       "owners": ["auth-team"],
-      "summary": (
-        "OAuth2 token refresh fails when network latency exceeds 5 seconds"
-      ),
+      "summary": ("OAuth2 token refresh fails when network latency exceeds 5 seconds"),
       "tags": ["auth", "reliability", "networking"],
       "categories": ["regression", "verification_gap"],
       "severity": "p2",

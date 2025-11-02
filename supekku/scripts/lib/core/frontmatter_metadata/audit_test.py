@@ -158,9 +158,7 @@ class AuditFrontmatterValidationTest(unittest.TestCase):
     }
     new_validator = MetadataValidator(AUDIT_FRONTMATTER_METADATA)
     new_errors = new_validator.validate(data)
-    self.assertNotEqual(
-      new_errors, [], "Should reject audit_window missing start"
-    )
+    self.assertNotEqual(new_errors, [], "Should reject audit_window missing start")
 
   def test_audit_window_missing_end(self) -> None:
     """New validator rejects audit_window missing end."""

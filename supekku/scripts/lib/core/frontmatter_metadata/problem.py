@@ -56,9 +56,7 @@ PROBLEM_FRONTMATTER_METADATA = BlockMetadata(
     "related_requirements": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Requirement ID"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Requirement ID"),
       description="Requirements affected by or related to this problem",
     ),
   },

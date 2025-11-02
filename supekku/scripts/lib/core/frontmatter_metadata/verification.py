@@ -26,9 +26,7 @@ VERIFICATION_FRONTMATTER_METADATA = BlockMetadata(
     "covers": FieldMetadata(
       type="array",
       required=False,
-      items=FieldMetadata(
-        type="string", pattern=r".+", description="Requirement ID"
-      ),
+      items=FieldMetadata(type="string", pattern=r".+", description="Requirement ID"),
       description="Requirement IDs that this verification covers",
     ),
     "procedure": FieldMetadata(

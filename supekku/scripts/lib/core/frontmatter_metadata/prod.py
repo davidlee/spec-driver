@@ -182,12 +182,8 @@ PROD_FRONTMATTER_METADATA = BlockMetadata(
       "scope": "Reduce sync latency for all sync operations",
       "problems": ["PROB-012"],
       "value_proposition": "Faster sync improves user retention",
-      "guiding_principles": [
-        "Resolve user pain without sacrificing offline mode"
-      ],
-      "assumptions": [
-        "Users are comfortable with 5s sync delays"
-      ],
+      "guiding_principles": ["Resolve user pain without sacrificing offline mode"],
+      "assumptions": ["Users are comfortable with 5s sync delays"],
       "hypotheses": [
         {
           "id": "PROD-020.HYP-01",
@@ -209,7 +205,7 @@ PROD_FRONTMATTER_METADATA = BlockMetadata(
         {
           "code": "PROD-020.NF-01",
           "statement": "Sync success rate ≥ 99%",
-        }
+        },
       ],
       "verification_strategy": [
         {"research": "UX-023"},

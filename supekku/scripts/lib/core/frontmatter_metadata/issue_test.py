@@ -213,9 +213,7 @@ class IssueFrontmatterValidationTest(unittest.TestCase):
     }
     new_validator = MetadataValidator(ISSUE_FRONTMATTER_METADATA)
     new_errors = new_validator.validate(data)
-    self.assertNotEqual(
-      new_errors, [], "Should reject empty string in categories"
-    )
+    self.assertNotEqual(new_errors, [], "Should reject empty string in categories")
 
   def test_empty_string_in_problem_refs(self) -> None:
     """New validator rejects empty strings in problem_refs."""
@@ -231,9 +229,7 @@ class IssueFrontmatterValidationTest(unittest.TestCase):
     }
     new_validator = MetadataValidator(ISSUE_FRONTMATTER_METADATA)
     new_errors = new_validator.validate(data)
-    self.assertNotEqual(
-      new_errors, [], "Should reject empty string in problem_refs"
-    )
+    self.assertNotEqual(new_errors, [], "Should reject empty string in problem_refs")
 
   def test_empty_string_in_related_requirements(self) -> None:
     """New validator rejects empty strings in related_requirements."""
@@ -285,9 +281,7 @@ class IssueFrontmatterValidationTest(unittest.TestCase):
     }
     new_validator = MetadataValidator(ISSUE_FRONTMATTER_METADATA)
     new_errors = new_validator.validate(data)
-    self.assertNotEqual(
-      new_errors, [], "Should reject empty string in linked_deltas"
-    )
+    self.assertNotEqual(new_errors, [], "Should reject empty string in linked_deltas")
 
 
 if __name__ == "__main__":

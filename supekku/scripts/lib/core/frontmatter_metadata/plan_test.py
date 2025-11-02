@@ -197,9 +197,7 @@ class PlanFrontmatterValidationTest(unittest.TestCase):
     }
     new_validator = MetadataValidator(PLAN_FRONTMATTER_METADATA)
     new_errors = new_validator.validate(data)
-    self.assertNotEqual(
-      new_errors, [], "Should reject empty string in exit_criteria"
-    )
+    self.assertNotEqual(new_errors, [], "Should reject empty string in exit_criteria")
 
 
 if __name__ == "__main__":

@@ -189,7 +189,7 @@ DESIGN_REVISION_FRONTMATTER_METADATA = BlockMetadata(
           "path": "internal/content/schema_repo.go",
           "current_state": "Single transaction per update",
           "target_state": "Retry logic with exponential backoff",
-        }
+        },
       ],
       "verification_alignment": [
         {"verification": "VT-210", "impact": "regression"},

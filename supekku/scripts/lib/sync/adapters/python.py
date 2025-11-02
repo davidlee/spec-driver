@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 
+from supekku.scripts.lib.specs.package_utils import find_all_leaf_packages
 from supekku.scripts.lib.sync.models import (
   DocVariant,
   SourceDescriptor,
@@ -77,22 +78,24 @@ class PythonAdapter(LanguageAdapter):
             )
       return source_units
 
-    # Auto-discover Python files
+    # Auto-discover Python packages (package-level granularity)
     source_units = []
 
-    # Look for Python files in common locations
-    search_patterns = [
-      "**/*.py",
+    # Find all leaf packages under common Python directories
+    python_roots = [
+      repo_root / "supekku",
     ]
 
-    for pattern in search_patterns:
-      for py_file in repo_root.glob(pattern):
-        # Skip test files, __pycache__, and other unwanted files
-        if self._should_skip_file(py_file):
-          continue
+    for python_root in python_roots:
+      if not python_root.exists():
+        continue
 
+      # Find all leaf packages (packages with no child packages)
+      leaf_packages = find_all_leaf_packages(python_root)
+
+      for package_path in leaf_packages:
         # Convert to relative path for identifier
-        identifier = str(py_file.relative_to(repo_root))
+        identifier = str(package_path.relative_to(repo_root))
 
         source_units.append(
           SourceUnit(
@@ -117,22 +120,34 @@ class PythonAdapter(LanguageAdapter):
     self._validate_unit_language(unit)
 
     # Generate slug parts from module path
-    # Convert path like "supekku/scripts/lib/workspace.py" to
-    # ["supekku", "scripts", "lib", "workspace"]
+    # Package-level: "supekku/scripts/lib/formatters"
+    #   -> ["supekku", "scripts", "lib", "formatters"]
+    # File-level (legacy): "supekku/scripts/lib/workspace.py"
+    #   -> ["supekku", "scripts", "lib", "workspace"]
     path_parts = Path(unit.identifier).with_suffix("").parts
     slug_parts = list(path_parts)
 
+    # Check if this is a package (directory) or file
+    unit_path = self.repo_root / unit.identifier
+    is_package = unit_path.is_dir()
+
     # Generate module name for frontmatter (dotted notation)
-    if unit.identifier.endswith("__init__.py"):
-      # Package: "supekku/scripts/lib/__init__.py" -> "supekku.scripts.lib"
+    if is_package:
+      # Package: "supekku/scripts/lib/formatters"
+      #   -> "supekku.scripts.lib.formatters"
+      module_name = ".".join(path_parts)
+    elif unit.identifier.endswith("__init__.py"):
+      # Package __init__: "supekku/scripts/lib/__init__.py"
+      #   -> "supekku.scripts.lib"
       module_name = ".".join(path_parts[:-1])  # Remove __init__
     else:
-      # Module: "supekku/scripts/lib/workspace.py" ->
-      # "supekku.scripts.lib.workspace"
+      # Module file: "supekku/scripts/lib/workspace.py"
+      #   -> "supekku.scripts.lib.workspace"
       module_name = ".".join(path_parts)
 
-    # Default frontmatter for Python modules
+    # Default frontmatter for Python modules/packages
     default_frontmatter = {
+      "packages": [unit.identifier] if is_package else [],
       "sources": [
         {
           "language": "python",

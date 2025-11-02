@@ -136,6 +136,60 @@ def format_spec_list_table(
   return render_table(table)
 
 
+def _format_basic_fields(spec: Spec) -> list[str]:
+  """Format basic spec fields (id, name, slug, kind, status)."""
+  return [
+    f"ID: {spec.id}",
+    f"Name: {spec.name}",
+    f"Slug: {spec.slug}",
+    f"Kind: {spec.kind}",
+    f"Status: {spec.status}",
+  ]
+
+
+def _format_packages(spec: Spec) -> list[str]:
+  """Format packages section if packages exist."""
+  if not spec.packages:
+    return []
+
+  lines = ["", "Packages:"]
+  for package in spec.packages:
+    lines.append(f"  - {package}")
+  return lines
+
+
+def _format_file_path(spec: Spec, root: Path | None = None) -> list[str]:
+  """Format file path section."""
+  if root:
+    try:
+      rel_path = spec.path.relative_to(root)
+      return ["", f"File: {rel_path.as_posix()}"]
+    except ValueError:
+      pass
+  return ["", f"File: {spec.path.as_posix()}"]
+
+
+def format_spec_details(spec: Spec, root: Path | None = None) -> str:
+  """Format spec details as multi-line string for display.
+
+  Args:
+    spec: Specification object to format
+    root: Repository root for relative path calculation (optional)
+
+  Returns:
+    Formatted string with all spec details
+  """
+  sections = [
+    _format_basic_fields(spec),
+    _format_packages(spec),
+    _format_file_path(spec, root),
+  ]
+
+  # Flatten all non-empty sections
+  lines = [line for section in sections for line in section]
+  return "\n".join(lines)
+
+
 def format_spec_list_json(specs: Sequence[Spec]) -> str:
   """Format specs as JSON array.
 

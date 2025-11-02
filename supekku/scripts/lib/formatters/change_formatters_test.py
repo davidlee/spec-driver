@@ -9,7 +9,9 @@ from supekku.scripts.lib.changes.artifacts import ChangeArtifact
 from supekku.scripts.lib.formatters.change_formatters import (
   format_change_list_item,
   format_change_with_context,
+  format_delta_details,
   format_phase_summary,
+  format_revision_details,
 )
 
 
@@ -275,6 +277,263 @@ class TestFormatChangeWithContext(unittest.TestCase):
     # Should not include "phases:" header
     assert result == "DE-007\tdelta\tdraft\tEmpty Phases"
     assert "phases:" not in result
+
+
+class TestFormatRevisionDetails(unittest.TestCase):
+  """Tests for format_revision_details function."""
+
+  def test_minimal_revision(self) -> None:
+    """Test formatting revision with minimal fields."""
+    artifact = ChangeArtifact(
+      id="RE-001",
+      kind="revision",
+      status="draft",
+      name="Test Revision",
+      slug="test-revision",
+      path=Path("/repo/change/revisions/RE-001/RE-001.md"),
+      updated=None,
+    )
+    root = Path("/repo")
+
+    result = format_revision_details(artifact, root=root)
+
+    assert "Revision: RE-001" in result
+    assert "Name: Test Revision" in result
+    assert "Status: draft" in result
+    assert "Kind: revision" in result
+    assert "File: change/revisions/RE-001/RE-001.md" in result
+
+  def test_revision_with_applies_to(self) -> None:
+    """Test formatting revision with applies_to specs and requirements."""
+    artifact = ChangeArtifact(
+      id="RE-002",
+      kind="revision",
+      status="completed",
+      name="API Schema Changes",
+      slug="api-schema-changes",
+      path=Path("/repo/change/revisions/RE-002/RE-002.md"),
+      updated="2024-10-20",
+      applies_to={
+        "specs": ["SPEC-009", "SPEC-010"],
+        "requirements": ["SPEC-009.FR-001", "SPEC-010.FR-001"],
+      },
+    )
+
+    result = format_revision_details(artifact)
+
+    assert "Affects:" in result
+    assert "Specs: SPEC-009, SPEC-010" in result
+    assert "Requirements:" in result
+    assert "SPEC-009.FR-001" in result
+    assert "SPEC-010.FR-001" in result
+
+  def test_revision_with_relations(self) -> None:
+    """Test formatting revision with relations."""
+    artifact = ChangeArtifact(
+      id="RE-003",
+      kind="revision",
+      status="draft",
+      name="Related Revision",
+      slug="related",
+      path=Path("/repo/test.md"),
+      updated=None,
+      relations=[
+        {"kind": "documents", "target": "DE-003"},
+        {"kind": "affects", "target": "SPEC-009"},
+      ],
+    )
+
+    result = format_revision_details(artifact)
+
+    assert "Relations:" in result
+    assert "documents: DE-003" in result
+    assert "affects: SPEC-009" in result
+
+  def test_complete_revision(self) -> None:
+    """Test formatting revision with all fields populated."""
+    artifact = ChangeArtifact(
+      id="RE-099",
+      kind="revision",
+      status="completed",
+      name="Complete Revision",
+      slug="complete-rev",
+      path=Path("/repo/change/revisions/RE-099/RE-099.md"),
+      updated="2024-11-01",
+      applies_to={
+        "specs": ["SPEC-100", "SPEC-101"],
+        "requirements": ["SPEC-100.FR-001", "SPEC-101.NF-001"],
+      },
+      relations=[
+        {"kind": "documents", "target": "DE-100"},
+        {"kind": "affects", "target": "SPEC-100"},
+      ],
+    )
+    root = Path("/repo")
+
+    result = format_revision_details(artifact, root=root)
+
+    # Verify all sections
+    assert "Revision: RE-099" in result
+    assert "Complete Revision" in result
+    assert "completed" in result
+    assert "Affects:" in result
+    assert "SPEC-100" in result
+    assert "Relations:" in result
+    assert "File: change/revisions/RE-099/RE-099.md" in result
+
+
+class TestFormatDeltaDetails(unittest.TestCase):
+  """Tests for format_delta_details function."""
+
+  def test_minimal_delta(self) -> None:
+    """Test formatting delta with minimal fields."""
+    artifact = ChangeArtifact(
+      id="DE-001",
+      kind="delta",
+      status="draft",
+      name="Test Delta",
+      slug="test-delta",
+      path=Path("/repo/change/deltas/DE-001/DE-001.md"),
+      updated=None,
+    )
+    root = Path("/repo")
+
+    result = format_delta_details(artifact, root=root)
+
+    assert "Delta: DE-001" in result
+    assert "Name: Test Delta" in result
+    assert "Status: draft" in result
+    assert "Kind: delta" in result
+    assert "File: change/deltas/DE-001/DE-001.md" in result
+
+  def test_delta_with_applies_to(self) -> None:
+    """Test formatting delta with applies_to specs and requirements."""
+    artifact = ChangeArtifact(
+      id="DE-003",
+      kind="delta",
+      status="completed",
+      name="Feature Implementation",
+      slug="feature-impl",
+      path=Path("/repo/change/deltas/DE-003/DE-003.md"),
+      updated="2024-10-15",
+      applies_to={
+        "specs": ["SPEC-150"],
+        "requirements": ["SPEC-150.FR-001", "SPEC-150.FR-002"],
+      },
+    )
+
+    result = format_delta_details(artifact)
+
+    assert "Applies To:" in result
+    assert "Specs: SPEC-150" in result
+    assert "Requirements:" in result
+    assert "SPEC-150.FR-001" in result
+    assert "SPEC-150.FR-002" in result
+
+  def test_delta_with_plan(self) -> None:
+    """Test formatting delta with plan phases."""
+    artifact = ChangeArtifact(
+      id="DE-003",
+      kind="delta",
+      status="draft",
+      name="Multi-phase Delta",
+      slug="multi-phase",
+      path=Path("/repo/test.md"),
+      updated=None,
+      plan={
+        "id": "IP-003",
+        "phases": [
+          {"phase": 0, "objective": "Foundation & Prerequisites"},
+          {"phase": 1, "objective": "Core Implementation"},
+          {"phase": 2, "objective": "Testing & Validation"},
+        ],
+      },
+    )
+
+    result = format_delta_details(artifact)
+
+    assert "Plan: IP-003 (3 phases)" in result
+    assert "0: Foundation & Prerequisites" in result
+    assert "1: Core Implementation" in result
+    assert "2: Testing & Validation" in result
+
+  def test_delta_with_relations(self) -> None:
+    """Test formatting delta with relations."""
+    artifact = ChangeArtifact(
+      id="DE-005",
+      kind="delta",
+      status="draft",
+      name="Related Delta",
+      slug="related",
+      path=Path("/repo/test.md"),
+      updated=None,
+      relations=[
+        {"kind": "implements", "target": "SPEC-150"},
+        {"kind": "documented_by", "target": "RE-003"},
+      ],
+    )
+
+    result = format_delta_details(artifact)
+
+    assert "Relations:" in result
+    assert "implements: SPEC-150" in result
+    assert "documented_by: RE-003" in result
+
+  def test_delta_without_root(self) -> None:
+    """Test formatting delta without root shows absolute path."""
+    artifact = ChangeArtifact(
+      id="DE-001",
+      kind="delta",
+      status="draft",
+      name="Test",
+      slug="test",
+      path=Path("/repo/change/deltas/DE-001/DE-001.md"),
+      updated=None,
+    )
+
+    result = format_delta_details(artifact)
+
+    assert "File: /repo/change/deltas/DE-001/DE-001.md" in result
+
+  def test_complete_delta(self) -> None:
+    """Test formatting delta with all fields populated."""
+    artifact = ChangeArtifact(
+      id="DE-099",
+      kind="delta",
+      status="completed",
+      name="Complete Implementation",
+      slug="complete-impl",
+      path=Path("/repo/change/deltas/DE-099/DE-099.md"),
+      updated="2024-11-01",
+      applies_to={
+        "specs": ["SPEC-100", "SPEC-101"],
+        "requirements": ["SPEC-100.FR-001", "SPEC-100.FR-002", "SPEC-101.NF-001"],
+      },
+      plan={
+        "id": "IP-099",
+        "phases": [
+          {"phase": 0, "objective": "Setup"},
+          {"phase": 1, "objective": "Implementation"},
+        ],
+      },
+      relations=[
+        {"kind": "implements", "target": "SPEC-100"},
+        {"kind": "documented_by", "target": "RE-010"},
+      ],
+    )
+    root = Path("/repo")
+
+    result = format_delta_details(artifact, root=root)
+
+    # Verify all sections
+    assert "Delta: DE-099" in result
+    assert "Complete Implementation" in result
+    assert "completed" in result
+    assert "Applies To:" in result
+    assert "SPEC-100" in result
+    assert "Plan: IP-099 (2 phases)" in result
+    assert "Relations:" in result
+    assert "File: change/deltas/DE-099/DE-099.md" in result
 
 
 if __name__ == "__main__":

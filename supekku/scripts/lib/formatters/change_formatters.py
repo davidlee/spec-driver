@@ -6,6 +6,7 @@ Formatters take ChangeArtifact objects and return formatted strings for display.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.formatters.table_utils import (
@@ -47,7 +48,13 @@ def format_phase_summary(phase: dict[str, Any], max_objective_len: int = 60) -> 
   Returns:
     Formatted string: "{phase_id}" or "{phase_id}: {objective}"
   """
-  phase_id = phase.get("phase") or phase.get("id") or "?"
+  # Handle phase 0 explicitly since 0 is falsy
+  if "phase" in phase:
+    phase_id = str(phase["phase"])
+  elif "id" in phase:
+    phase_id = str(phase["id"])
+  else:
+    phase_id = "?"
   objective = str(phase.get("objective", "")).strip()
 
   if not objective:
@@ -147,6 +154,176 @@ def format_change_list_table(
     )
 
   return render_table(table)
+
+
+def _format_change_basic_fields(artifact: ChangeArtifact) -> list[str]:
+  """Format basic change artifact fields."""
+  return [
+    f"Delta: {artifact.id}",
+    f"Name: {artifact.name}",
+    f"Status: {artifact.status}",
+    f"Kind: {artifact.kind}",
+  ]
+
+
+def _format_applies_to(artifact: ChangeArtifact) -> list[str]:
+  """Format applies_to section if present."""
+  if not artifact.applies_to:
+    return []
+
+  specs = artifact.applies_to.get("specs", [])
+  requirements = artifact.applies_to.get("requirements", [])
+
+  # Only show section if there's actual content
+  if not specs and not requirements:
+    return []
+
+  lines = ["", "Applies To:"]
+
+  if specs:
+    specs_str = ", ".join(str(s) for s in specs)
+    lines.append(f"  Specs: {specs_str}")
+
+  if requirements:
+    lines.append("  Requirements:")
+    for req in requirements:
+      lines.append(f"    - {req}")
+
+  return lines
+
+
+def _format_plan_overview(artifact: ChangeArtifact) -> list[str]:
+  """Format plan overview section if present."""
+  if not artifact.plan:
+    return []
+
+  plan_id = artifact.plan.get("id", "")
+  phases = artifact.plan.get("phases", [])
+
+  if not phases:
+    return []
+
+  lines = ["", f"Plan: {plan_id} ({len(phases)} phases)"]
+  for phase in phases:
+    phase_summary = format_phase_summary(phase)
+    lines.append(f"  {phase_summary}")
+
+  return lines
+
+
+def _format_relations(artifact: ChangeArtifact) -> list[str]:
+  """Format relations section if present."""
+  if not artifact.relations:
+    return []
+
+  lines = ["", "Relations:"]
+  for relation in artifact.relations:
+    kind = relation.get("kind", "")
+    target = relation.get("target", "")
+    lines.append(f"  - {kind}: {target}")
+
+  return lines
+
+
+def _format_file_path_for_change(
+  artifact: ChangeArtifact,
+  root: Path | None = None,
+) -> list[str]:
+  """Format file path section for change artifact."""
+  if root:
+    try:
+      rel_path = artifact.path.relative_to(root)
+      return ["", f"File: {rel_path.as_posix()}"]
+    except ValueError:
+      pass
+  return ["", f"File: {artifact.path.as_posix()}"]
+
+
+def format_delta_details(
+  artifact: ChangeArtifact,
+  root: Path | None = None,
+) -> str:
+  """Format delta details as multi-line string for display.
+
+  Args:
+    artifact: ChangeArtifact to format
+    root: Repository root for relative path calculation (optional)
+
+  Returns:
+    Formatted string with all delta details
+  """
+  sections = [
+    _format_change_basic_fields(artifact),
+    _format_applies_to(artifact),
+    _format_plan_overview(artifact),
+    _format_relations(artifact),
+    _format_file_path_for_change(artifact, root),
+  ]
+
+  # Flatten all non-empty sections
+  lines = [line for section in sections for line in section]
+  return "\n".join(lines)
+
+
+def _format_revision_basic_fields(artifact: ChangeArtifact) -> list[str]:
+  """Format basic revision artifact fields."""
+  return [
+    f"Revision: {artifact.id}",
+    f"Name: {artifact.name}",
+    f"Status: {artifact.status}",
+    f"Kind: {artifact.kind}",
+  ]
+
+
+def _format_affects(artifact: ChangeArtifact) -> list[str]:
+  """Format affects section for revisions (similar to applies_to for deltas)."""
+  if not artifact.applies_to:
+    return []
+
+  specs = artifact.applies_to.get("specs", [])
+  requirements = artifact.applies_to.get("requirements", [])
+
+  # Only show section if there's actual content
+  if not specs and not requirements:
+    return []
+
+  lines = ["", "Affects:"]
+
+  if specs:
+    specs_str = ", ".join(str(s) for s in specs)
+    lines.append(f"  Specs: {specs_str}")
+
+  if requirements:
+    lines.append("  Requirements:")
+    for req in requirements:
+      lines.append(f"    - {req}")
+
+  return lines
+
+
+def format_revision_details(
+  artifact: ChangeArtifact,
+  root: Path | None = None,
+) -> str:
+  """Format revision details as multi-line string for display.
+
+  Args:
+    artifact: ChangeArtifact to format (must be kind='revision')
+    root: Repository root for relative path calculation (optional)
+
+  Returns:
+    Formatted string with all revision details
+  """
+  sections = [
+    _format_revision_basic_fields(artifact),
+    _format_affects(artifact),
+    _format_relations(artifact),
+    _format_file_path_for_change(artifact, root),
+  ]
+
+  # Flatten all non-empty sections
+  lines = [line for section in sections for line in section]
+  return "\n".join(lines)
 
 
 def format_change_list_json(changes: Sequence[ChangeArtifact]) -> str:

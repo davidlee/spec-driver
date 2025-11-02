@@ -4,7 +4,7 @@ slug: supekku-scripts-lib-validation
 name: supekku/scripts/lib/validation Specification
 created: '2025-11-02'
 updated: '2025-11-02'
-status: draft
+status: stub
 kind: spec
 responsibilities: []
 aliases: []

@@ -40,7 +40,8 @@ SPEC_DRIVER_THEME = Theme(
     "change.status.deferred": "#cc241d",  # red
     # Spec status colors
     "spec.status.active": "#8ec07c",  # green
-    "spec.status.draft": "#7c7876",  # mid grey
+    "spec.status.draft": "#cecdcd",  # light grey
+    "spec.status.stub": "#7c7876",  # mid grey
     "spec.status.deprecated": "#cc241d",  # red
     "spec.status.archived": "#3c3836",  # dark grey
     # Requirement status colors

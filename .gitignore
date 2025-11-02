@@ -225,12 +225,10 @@ __pycache__
 /scratch
 
 # spec-driver workspace directories (in case installer is run in repo root during testing)
-/.spec-driver/
 #/backlog/
 #/change/
 #/specify/
 
-/.spec-driver/
 /.claude/commands
 !/.spec-driver/registry
 /kanban

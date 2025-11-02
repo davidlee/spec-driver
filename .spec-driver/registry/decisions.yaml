@@ -1,0 +1,29 @@
+decisions:
+  ADR-001:
+    id: ADR-001
+    title: 'ADR-001: use spec-driver to build spec-driver'
+    status: accepted
+    path: specify/decisions/ADR-001-use-spec-driver-to-build-spec-driver.md
+    summary: ''
+    created: '2025-11-01'
+    updated: '2025-11-01'
+    reviewed: '2025-11-01'
+  ADR-002:
+    id: ADR-002
+    title: 'ADR-002: Do not store backlinks in frontmatter'
+    status: accepted
+    path: specify/decisions/ADR-002-do-not-store-backlinks-in-frontmatter.md
+    summary: Backlinks between artifacts must be computed at runtime from forward
+      references, not stored in frontmatter, to prevent data consistency issues and
+      maintain single source of truth.
+    created: '2025-11-02'
+    updated: '2025-11-02'
+    reviewed: '2025-11-02'
+    specs:
+    - PROD-003
+    related_decisions:
+    - ADR-001
+    tags:
+    - architecture
+    - data-model
+    - governance

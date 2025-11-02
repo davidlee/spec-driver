@@ -1,0 +1,646 @@
+requirements:
+  PROD-001.FR-001:
+    label: FR-001
+    title: Claude Command Provides Complete Workflow
+    specs:
+    - PROD-001
+    primary_spec: PROD-001
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-001/PROD-001.md
+  PROD-001.FR-002:
+    label: FR-002
+    title: Agent Completes All YAML Blocks Without Manual Editing
+    specs:
+    - PROD-001
+    primary_spec: PROD-001
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-001/PROD-001.md
+  PROD-001.FR-003:
+    label: FR-003
+    title: Clarification Questions Limited to Critical Decisions
+    specs:
+    - PROD-001
+    primary_spec: PROD-001
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-001/PROD-001.md
+  PROD-001.FR-004:
+    label: FR-004
+    title: Spec Type Determines Section Content Adaptation
+    specs:
+    - PROD-001
+    primary_spec: PROD-001
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-001/PROD-001.md
+  PROD-001.FR-005:
+    label: FR-005
+    title: Validation Integrated Before Workflow Completion
+    specs:
+    - PROD-001
+    primary_spec: PROD-001
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-001/PROD-001.md
+  PROD-001.NF-001:
+    label: NF-001
+    title: First-Time User Experience Requires Minimal Cognitive Load
+    specs:
+    - PROD-001
+    primary_spec: PROD-001
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-001/PROD-001.md
+  PROD-001.NF-002:
+    label: NF-002
+    title: Registry Sync Success Rate >95% on First Attempt
+    specs:
+    - PROD-001
+    primary_spec: PROD-001
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-001/PROD-001.md
+  PROD-002.FR-001:
+    label: FR-001
+    title: Agent Command Provides Complete Workflow Guidance
+    specs:
+    - PROD-002
+    primary_spec: PROD-002
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-002/PROD-002.md
+  PROD-002.FR-002:
+    label: FR-002
+    title: Default Behavior Creates Complete Delta Bundle
+    specs:
+    - PROD-002
+    primary_spec: PROD-002
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-002/PROD-002.md
+  PROD-002.FR-003:
+    label: FR-003
+    title: Users Can Provide Known Relationships Explicitly
+    specs:
+    - PROD-002
+    primary_spec: PROD-002
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-002/PROD-002.md
+  PROD-002.FR-004:
+    label: FR-004
+    title: Agent Discovers and Suggests Additional Relationships
+    specs:
+    - PROD-002
+    primary_spec: PROD-002
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-002/PROD-002.md
+  PROD-002.FR-005:
+    label: FR-005
+    title: Clear Error Messages Guide Users to Corrections
+    specs:
+    - PROD-002
+    primary_spec: PROD-002
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-002/PROD-002.md
+  PROD-002.NF-001:
+    label: NF-001
+    title: First-Time Users Complete Delta Creation in Under 5 Minutes
+    specs:
+    - PROD-002
+    primary_spec: PROD-002
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-002/PROD-002.md
+  PROD-002.NF-002:
+    label: NF-002
+    title: Creation Success Rate Exceeds 95% on First Attempt
+    specs:
+    - PROD-002
+    primary_spec: PROD-002
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-002/PROD-002.md
+  PROD-003.FR-001:
+    label: FR-001
+    title: System MUST enable creation of policies with unique POL-XXX identifiers
+    specs:
+    - PROD-003
+    primary_spec: PROD-003
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-003/PROD-003.md
+  PROD-003.FR-002:
+    label: FR-002
+    title: 'System MUST support policy lifecycle statuses: draft, required, deprecated'
+    specs:
+    - PROD-003
+    primary_spec: PROD-003
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-003/PROD-003.md
+  PROD-003.FR-003:
+    label: FR-003
+    title: System MUST enable creation of standards with unique STD-XXX identifiers
+    specs:
+    - PROD-003
+    primary_spec: PROD-003
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-003/PROD-003.md
+  PROD-003.FR-004:
+    label: FR-004
+    title: 'System MUST support standard statuses: draft, required, default, deprecated
+      (where "default" indicates recommended unless justified)'
+    specs:
+    - PROD-003
+    primary_spec: PROD-003
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-003/PROD-003.md
+  PROD-003.FR-005:
+    label: FR-005
+    title: System MUST provide CLI commands to list policies and standards with filtering
+      (by status, tags, references)
+    specs:
+    - PROD-003
+    primary_spec: PROD-003
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-003/PROD-003.md
+  PROD-003.FR-006:
+    label: FR-006
+    title: System MUST provide CLI commands to display full policy/standard details
+      including metadata and cross-references
+    specs:
+    - PROD-003
+    primary_spec: PROD-003
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-003/PROD-003.md
+  PROD-003.FR-007:
+    label: FR-007
+    title: System MUST support bidirectional cross-references between policies and
+      standards (policies can reference standards and vice versa)
+    specs:
+    - PROD-003
+    primary_spec: PROD-003
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-003/PROD-003.md
+  PROD-003.FR-008:
+    label: FR-008
+    title: System MUST allow ADRs, specs, deltas, and other artifacts to reference
+      policies and standards via frontmatter fields
+    specs:
+    - PROD-003
+    primary_spec: PROD-003
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-003/PROD-003.md
+  PROD-003.NF-001:
+    label: NF-001
+    title: Policies and standards MUST use consistent template structure (Statement,
+      Rationale, Scope, Verification) for predictable authoring experience
+    specs:
+    - PROD-003
+    primary_spec: PROD-003
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-003/PROD-003.md
+  PROD-003.NF-002:
+    label: NF-002
+    title: CLI commands for policies/standards MUST follow existing spec-driver UX
+      patterns (argument structure, output formats, filtering semantics)
+    specs:
+    - PROD-003
+    primary_spec: PROD-003
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-003/PROD-003.md
+  PROD-004.FR-001:
+    label: FR-001
+    title: System MUST validate frontmatter for all 11 kinds using metadata definitions
+    specs:
+    - PROD-004
+    primary_spec: PROD-004
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-004/PROD-004.md
+  PROD-004.FR-002:
+    label: FR-002
+    title: System MUST enforce kind-specific required fields and constraints
+    specs:
+    - PROD-004
+    primary_spec: PROD-004
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-004/PROD-004.md
+  PROD-004.FR-003:
+    label: FR-003
+    title: System MUST generate JSON Schema from frontmatter metadata definitions
+    specs:
+    - PROD-004
+    primary_spec: PROD-004
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-004/PROD-004.md
+  PROD-004.FR-004:
+    label: FR-004
+    title: CLI MUST support `schema show frontmatter.{kind}` commands for all kinds
+    specs:
+    - PROD-004
+    primary_spec: PROD-004
+    kind: functional
+    status: implemented
+    introduced: null
+    implemented_by:
+    - DE-003
+    verified_by: []
+    path: specify/product/PROD-004/PROD-004.md
+  PROD-004.FR-005:
+    label: FR-005
+    title: System MUST maintain backward compatibility during migration
+    specs:
+    - PROD-004
+    primary_spec: PROD-004
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-004/PROD-004.md
+  PROD-004.FR-006:
+    label: FR-006
+    title: System MUST support gradual per-call-site opt-in migration
+    specs:
+    - PROD-004
+    primary_spec: PROD-004
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-004/PROD-004.md
+  PROD-004.NF-001:
+    label: NF-001
+    title: Validation behavior MUST match imperative validator (zero regressions)
+    specs:
+    - PROD-004
+    primary_spec: PROD-004
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-004/PROD-004.md
+  PROD-004.NF-002:
+    label: NF-002
+    title: JSON Schema generation MUST complete in <100ms per kind
+    specs:
+    - PROD-004
+    primary_spec: PROD-004
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-004/PROD-004.md
+  PROD-004.NF-003:
+    label: NF-003
+    title: Migration MUST not break existing code at any point
+    specs:
+    - PROD-004
+    primary_spec: PROD-004
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-004/PROD-004.md
+  PROD-005.FR-001:
+    label: FR-001
+    title: Leaf Python Package Identification
+    specs:
+    - PROD-005
+    primary_spec: PROD-005
+    kind: functional
+    status: implemented
+    introduced: null
+    implemented_by:
+    - DE-002
+    verified_by: []
+    path: specify/product/PROD-005/PROD-005.md
+  PROD-005.FR-002:
+    label: FR-002
+    title: Deterministic File Ordering Within Packages
+    specs:
+    - PROD-005
+    primary_spec: PROD-005
+    kind: functional
+    status: implemented
+    introduced: null
+    implemented_by:
+    - DE-002
+    verified_by: []
+    path: specify/product/PROD-005/PROD-005.md
+  PROD-005.FR-003:
+    label: FR-003
+    title: Sync Operation Package Support
+    specs:
+    - PROD-005
+    primary_spec: PROD-005
+    kind: functional
+    status: implemented
+    introduced: null
+    implemented_by:
+    - DE-002
+    verified_by: []
+    path: specify/product/PROD-005/PROD-005.md
+  PROD-005.FR-004:
+    label: FR-004
+    title: File-to-Package Resolution
+    specs:
+    - PROD-005
+    primary_spec: PROD-005
+    kind: functional
+    status: implemented
+    introduced: null
+    implemented_by:
+    - DE-002
+    verified_by: []
+    path: specify/product/PROD-005/PROD-005.md
+  PROD-005.NF-001:
+    label: NF-001
+    title: Git Diff Stability
+    specs:
+    - PROD-005
+    primary_spec: PROD-005
+    kind: non-functional
+    status: implemented
+    introduced: null
+    implemented_by:
+    - DE-002
+    verified_by: []
+    path: specify/product/PROD-005/PROD-005.md
+  PROD-005.NF-002:
+    label: NF-002
+    title: Design Extensibility
+    specs:
+    - PROD-005
+    primary_spec: PROD-005
+    kind: non-functional
+    status: implemented
+    introduced: null
+    implemented_by:
+    - DE-002
+    verified_by: []
+    path: specify/product/PROD-005/PROD-005.md
+  PROD-006.FR-001:
+    label: FR-001
+    title: System MUST create phase markdown files from template with valid `phase.overview`
+      frontmatter block
+    specs:
+    - PROD-006
+    primary_spec: PROD-006
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-006/PROD-006.md
+  PROD-006.FR-002:
+    label: FR-002
+    title: System MUST automatically determine next phase number by examining existing
+      phases for the given plan
+    specs:
+    - PROD-006
+    primary_spec: PROD-006
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-006/PROD-006.md
+  PROD-006.FR-003:
+    label: FR-003
+    title: System MUST enhance delta display to show plan ID, phase count, and phase
+      summaries with objectives
+    specs:
+    - PROD-006
+    primary_spec: PROD-006
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-006/PROD-006.md
+  PROD-006.FR-004:
+    label: FR-004
+    title: System MUST auto-populate phase metadata including phase ID, plan ID, and
+      delta ID from plan context
+    specs:
+    - PROD-006
+    primary_spec: PROD-006
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-006/PROD-006.md
+  PROD-006.FR-005:
+    label: FR-005
+    title: System MUST validate phase.overview schema during sync and report validation
+      errors
+    specs:
+    - PROD-006
+    primary_spec: PROD-006
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-006/PROD-006.md
+  PROD-006.NF-001:
+    label: NF-001
+    title: Phase creation command MUST complete in <2 seconds for plans with up to
+      20 existing phases
+    specs:
+    - PROD-006
+    primary_spec: PROD-006
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-006/PROD-006.md
+  PROD-006.NF-002:
+    label: NF-002
+    title: Delta display MUST remain readable with up to 10 phases without truncation
+      loss of critical information
+    specs:
+    - PROD-006
+    primary_spec: PROD-006
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-006/PROD-006.md
+  PROD-007.FR-001:
+    label: FR-001
+    title: Users MUST be able to complete placeholder specs through guided agent workflow
+    specs:
+    - PROD-007
+    primary_spec: PROD-007
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-007/PROD-007.md
+  PROD-007.FR-002:
+    label: FR-002
+    title: System MUST preserve manually-created spec content during completion
+    specs:
+    - PROD-007
+    primary_spec: PROD-007
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-007/PROD-007.md
+  PROD-007.FR-003:
+    label: FR-003
+    title: Users MUST be able to complete multiple specs in batch mode
+    specs:
+    - PROD-007
+    primary_spec: PROD-007
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-007/PROD-007.md
+  PROD-007.FR-004:
+    label: FR-004
+    title: Users MUST be able to choose automation level for batch operations
+    specs:
+    - PROD-007
+    primary_spec: PROD-007
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-007/PROD-007.md
+  PROD-007.NF-001:
+    label: NF-001
+    title: Batch operations MUST show clear progress and complete in reasonable time
+    specs:
+    - PROD-007
+    primary_spec: PROD-007
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-007/PROD-007.md
+  PROD-007.NF-002:
+    label: NF-002
+    title: Interactive mode MUST minimize user questions
+    specs:
+    - PROD-007
+    primary_spec: PROD-007
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-007/PROD-007.md

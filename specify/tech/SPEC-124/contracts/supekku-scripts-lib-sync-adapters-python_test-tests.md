@@ -16,7 +16,7 @@ Test PythonAdapter functionality.
 - `test_describe_python_module(self) -> None`: Test describe method generates correct metadata for Python modules.
 - `test_describe_python_package_init(self) -> None`: Test describe method handles __init__.py files correctly.
 - `test_describe_rejects_non_python_unit(self) -> None`: Test describe method rejects non-Python source units.
-- @patch(pathlib.Path.glob) `test_discover_targets_auto_discovery(self, mock_glob) -> None`: Test discover_targets auto-discovers Python files.
+- @patch(pathlib.Path.exists) @patch(supekku.scripts.lib.sync.adapters.python.find_all_leaf_packages) `test_discover_targets_auto_discovery(self, mock_find_packages, mock_exists) -> None`: Test discover_targets auto-discovers Python packages.
 - @patch(pathlib.Path.exists) `test_discover_targets_requested_modules(self, mock_exists) -> None`: Test discover_targets processes requested modules.
 - @patch(pathlib.Path.exists) @patch(supekku.scripts.lib.docs.python.generate_docs) `test_generate_check_mode(self, mock_generate_docs, mock_exists) -> None`: Test generate method in check mode.
 - @patch(pathlib.Path.exists) @patch(supekku.scripts.lib.docs.python.generate_docs) `test_generate_creates_variants(self, mock_generate_docs, mock_exists) -> None`: Test generate method creates documentation variants.

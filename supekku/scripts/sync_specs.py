@@ -111,7 +111,7 @@ class MultiLanguageSpecManager:
       "name": f"{source_unit.identifier} Specification",
       "created": today,
       "updated": today,
-      "status": "draft",
+      "status": "stub",
       "kind": "spec",
       "responsibilities": [],
       "aliases": [],

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import typer
 
-from supekku.cli import complete, create, schema, show, sync, workspace
+from supekku.cli import backfill, complete, create, schema, show, sync, workspace
 from supekku.cli import list as list_module
 from supekku.cli.common import VersionOption
 
@@ -66,6 +66,12 @@ app.add_typer(
   schema.app,
   name="schema",
   help="Show YAML block schemas",
+)
+
+app.add_typer(
+  backfill.app,
+  name="backfill",
+  help="Backfill incomplete stub specifications",
 )
 
 

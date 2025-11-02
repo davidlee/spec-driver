@@ -99,15 +99,15 @@ class LanguageAdapter(ABC):
     return bool(tracked_files and path.resolve() not in tracked_files)
 
   def validate_source_exists(self, unit: SourceUnit) -> dict[str, bool | str]:
-    """Validate that source file exists and is git-tracked.
+    """Validate that source exists and is git-tracked.
 
     Args:
         unit: Source unit to validate
 
     Returns:
         Dictionary with validation results:
-          - exists: Whether source file exists on disk
-          - git_tracked: Whether file is tracked by git (None if can't determine)
+          - exists: Whether source (file or directory) exists on disk
+          - git_tracked: Whether source is tracked by git (None if can't determine)
           - status: "valid", "missing", or "untracked"
           - message: Human-readable status message
 
@@ -126,9 +126,9 @@ class LanguageAdapter(ABC):
       result["message"] = f"Cannot determine source path for {unit.identifier}"
       return result
 
-    # Check if file exists
+    # Check if source exists (file or directory)
     if not source_path.exists():
-      result["message"] = f"Source file not found: {source_path}"
+      result["message"] = f"Source not found: {source_path}"
       return result
 
     result["exists"] = True
@@ -145,7 +145,7 @@ class LanguageAdapter(ABC):
         return result
 
     result["status"] = "valid"
-    result["message"] = f"Source file valid: {source_path}"
+    result["message"] = f"Source valid: {source_path}"
     return result
 
   def _get_source_path(self, unit: SourceUnit) -> Path | None:

@@ -24,3 +24,9 @@ If you're later working on anything which may intersect with an accepted ADR, yo
 ## Policies & Standards
 
 Not yet implemented.
+
+## Workflow
+
+@about/glossary.md
+
+Deltas and their associated documents (IP, Phase sheets) are the focus for all implementation planning and recording implementation progress.

@@ -83,7 +83,14 @@ def sync(
     bool,
     typer.Option(
       "--prune",
-      help="Remove specs for deleted source files",
+      help="Remove stub specs for deleted source (use --force for non-stubs)",
+    ),
+  ] = False,
+  force: Annotated[
+    bool,
+    typer.Option(
+      "--force",
+      help="Allow pruning of non-stub specs (requires --prune)",
     ),
   ] = False,
 ) -> None:
@@ -130,6 +137,7 @@ def sync(
         dry_run=dry_run,
         _allow_missing_source=allow_missing_source or [],
         prune=prune,
+        force=force,
       )
       results["specs"] = spec_result
     except (FileNotFoundError, ValueError, KeyError) as e:
@@ -175,6 +183,7 @@ def _sync_specs(
   dry_run: bool,
   _allow_missing_source: list[str],
   prune: bool,
+  force: bool,
 ) -> dict:
   """Execute spec synchronization."""
   # Initialize spec sync engine and spec manager
@@ -272,7 +281,7 @@ def _sync_specs(
             validation = adapter.validate_source_exists(unit)
             if validation["status"] == "missing":
               orphaned_units.append(unit)
-              typer.echo(f"  ⚠ Orphaned: {identifier} (source file deleted)", err=True)
+              typer.echo(f"  ⚠ Orphaned: {identifier} (source deleted)", err=True)
             else:
               source_units.append(unit)
       else:
@@ -289,7 +298,7 @@ def _sync_specs(
           for orphaned_id in orphaned_ids:
             unit = SourceUnit(language=lang_name, identifier=orphaned_id, root=root)
             orphaned_units.append(unit)
-            typer.echo(f"  ⚠ Orphaned: {orphaned_id} (source file deleted)", err=True)
+            typer.echo(f"  ⚠ Orphaned: {orphaned_id} (source deleted)", err=True)
     except Exception as e:
       # Check if this language has existing specs in the registry
       has_existing_specs = lang_name in spec_manager.registry_v2.languages and bool(
@@ -403,6 +412,21 @@ def _sync_specs(
           )
 
           if spec_id:
+            # Check if spec is a stub (stubs can be pruned without --force)
+            from supekku.scripts.lib.specs.detection import is_stub_spec
+            from supekku.scripts.lib.specs.registry import SpecRegistry
+
+            spec_registry = SpecRegistry(root=root)
+            spec = spec_registry.get(spec_id)
+
+            if spec and not is_stub_spec(spec.path) and not force:
+              typer.echo(
+                f"    ⚠ Skipping {spec_id} ({orphaned_unit.identifier}): "
+                f"non-stub spec (use --force to prune)",
+                err=True,
+              )
+              continue
+
             # Validate deletion with orphan context
             plan = executor.validator.validate_spec_deletion(
               spec_id,

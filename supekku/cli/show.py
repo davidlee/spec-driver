@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Annotated
 
 import typer
@@ -9,6 +10,7 @@ import typer
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.repo import find_repo_root
+from supekku.scripts.lib.core.templates import TemplateNotFoundError, render_template
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.change_formatters import (
   format_delta_details,
@@ -131,6 +133,55 @@ def show_adr(
     typer.echo(format_decision_details(decision))
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("template")
+def show_template(
+  kind: Annotated[str, typer.Argument(help="Spec kind: 'tech' or 'product'")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  root: RootOption = None,
+) -> None:
+  """Show the specification template for a given kind."""
+  try:
+    # Validate kind
+    if kind not in ("tech", "product"):
+      typer.echo(
+        f"Error: Invalid kind '{kind}'. Must be 'tech' or 'product'.",
+        err=True,
+      )
+      raise typer.Exit(EXIT_FAILURE)
+
+    # Map kind to template variable value
+    template_kind = "prod" if kind == "product" else "spec"
+
+    # Render template with placeholder variables
+    variables = {
+      "spec_id": "SPEC-XXX" if kind == "tech" else "PROD-XXX",
+      "name": "specification name",
+      "kind": template_kind,
+      "spec_relationships_block": "",
+      "spec_capabilities_block": "",
+      "spec_verification_block": "",
+    }
+
+    template_content = render_template("spec.md", variables, root)
+
+    if json_output:
+      output = {
+        "kind": kind,
+        "template": template_content,
+      }
+      typer.echo(json.dumps(output, indent=2))
+    else:
+      typer.echo(template_content)
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except TemplateNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except (FileNotFoundError, ValueError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 

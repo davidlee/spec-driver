@@ -322,7 +322,6 @@ class TestPythonAdapter(unittest.TestCase):
         msg = f"Should skip __init__.py file: {file_path}"
         assert self.adapter._should_skip_file(file_path), msg
 
-
   def test_sync_package_level_integration(self) -> None:
     """VT-003: Integration test for sync with package-level specs.
 
@@ -375,9 +374,9 @@ class TestPythonAdapter(unittest.TestCase):
         # Verify packages field exists and is populated
         msg = f"Missing 'packages' field for {unit.identifier}"
         assert "packages" in frontmatter, msg
-        assert frontmatter["packages"] == [
-          unit.identifier
-        ], f"Expected packages=['{unit.identifier}']"
+        assert frontmatter["packages"] == [unit.identifier], (
+          f"Expected packages=['{unit.identifier}']"
+        )
 
         # Verify sources structure
         assert "sources" in frontmatter, "Missing 'sources' field"
@@ -390,16 +389,18 @@ class TestPythonAdapter(unittest.TestCase):
 
         # Verify module name is dotted notation
         expected_module = unit.identifier.replace("/", ".")
-        assert source["module"] == expected_module, \
+        assert source["module"] == expected_module, (
           f"Expected module='{expected_module}', got '{source['module']}'"
+        )
 
         # Verify variants exist
         assert "variants" in source, "Missing 'variants' field"
         assert len(source["variants"]) == 3, "Expected 3 variants"
 
         variant_names = [v["name"] for v in source["variants"]]
-        assert variant_names == ["api", "implementation", "tests"], \
+        assert variant_names == ["api", "implementation", "tests"], (
           f"Expected ['api', 'implementation', 'tests'], got {variant_names}"
+        )
 
       # Test deterministic ordering - run discovery twice
       units_first = adapter.discover_targets(tmp_path)

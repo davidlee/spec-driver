@@ -21,9 +21,14 @@ import supekku.scripts.lib.blocks.plan  # noqa: F401  # pylint: disable=unused-i
 import supekku.scripts.lib.blocks.relationships  # noqa: F401  # pylint: disable=unused-import
 import supekku.scripts.lib.blocks.revision  # noqa: F401  # pylint: disable=unused-import
 import supekku.scripts.lib.blocks.verification  # noqa: F401  # pylint: disable=unused-import
+from supekku.scripts.lib.blocks.metadata import metadata_to_json_schema
 from supekku.scripts.lib.blocks.schema_registry import (
   get_block_schema,
   list_block_types,
+)
+from supekku.scripts.lib.core.frontmatter_metadata import (
+  FRONTMATTER_METADATA_REGISTRY,
+  get_frontmatter_metadata,
 )
 
 app = typer.Typer(help="Show YAML block schemas", no_args_is_help=True)
@@ -31,38 +36,83 @@ console = Console()
 
 
 @app.command("list")
-def list_schemas() -> None:
-  """List all available block schemas."""
-  block_types = list_block_types()
+def list_schemas(
+  schema_type: Annotated[
+    str | None,
+    typer.Argument(help="Schema type: 'blocks', 'frontmatter', or omit for both"),
+  ] = None,
+) -> None:
+  """List all available block schemas and/or frontmatter schemas.
 
-  if not block_types:
-    console.print("[yellow]No block schemas registered[/yellow]")
-    return
+  Examples:
+    schema list              # List all schemas (blocks and frontmatter)
+    schema list blocks       # List only block schemas
+    schema list frontmatter  # List only frontmatter schemas
+  """
+  show_blocks = schema_type in (None, "blocks")
+  show_frontmatter = schema_type in (None, "frontmatter")
 
-  table = Table(title="Available Block Schemas")
-  table.add_column("Block Type", style="cyan", no_wrap=True)
-  table.add_column("Marker", style="green")
-  table.add_column("Version", style="yellow", justify="center")
-  table.add_column("Description", style="white")
+  if schema_type and not (show_blocks or show_frontmatter):
+    console.print(f"[red]Unknown schema type: {schema_type}[/red]")
+    console.print("Available types: blocks, frontmatter")
+    raise typer.Exit(code=1)
 
-  for block_type in block_types:
-    schema = get_block_schema(block_type)
-    if schema:
-      table.add_row(
-        block_type,
-        schema.marker,
-        str(schema.version),
-        schema.description,
-      )
+  # List block schemas
+  if show_blocks:
+    block_types = list_block_types()
 
-  console.print(table)
+    if not block_types:
+      console.print("[yellow]No block schemas registered[/yellow]")
+    else:
+      table = Table(title="Available Block Schemas")
+      table.add_column("Block Type", style="cyan", no_wrap=True)
+      table.add_column("Marker", style="green")
+      table.add_column("Version", style="yellow", justify="center")
+      table.add_column("Description", style="white")
+
+      for block_type in block_types:
+        schema = get_block_schema(block_type)
+        if schema:
+          table.add_row(
+            block_type,
+            schema.marker,
+            str(schema.version),
+            schema.description,
+          )
+
+      console.print(table)
+
+  # List frontmatter schemas
+  if show_frontmatter:
+    if show_blocks:
+      console.print()  # Add spacing between tables
+
+    frontmatter_kinds = sorted(FRONTMATTER_METADATA_REGISTRY.keys())
+
+    if not frontmatter_kinds:
+      console.print("[yellow]No frontmatter schemas registered[/yellow]")
+    else:
+      table = Table(title="Available Frontmatter Schemas")
+      table.add_column("Kind", style="cyan", no_wrap=True)
+      table.add_column("Schema ID", style="green")
+      table.add_column("Description", style="white")
+
+      for kind in frontmatter_kinds:
+        metadata = get_frontmatter_metadata(kind)
+        table.add_row(
+          f"frontmatter.{kind}",
+          metadata.schema_id,
+          metadata.description,
+        )
+
+      console.print(table)
 
 
 @app.command("show")
 def show_schema(
   block_type: Annotated[
     str | None,
-    typer.Argument(help="Block type to show (omit to list all)"),
+    typer.Argument(help="Block type (e.g., 'delta.relationships', 'frontmatter.prod')"),
   ] = None,
   format_type: Annotated[
     str,
@@ -73,10 +123,15 @@ def show_schema(
     ),
   ] = "json-schema",
 ) -> None:
-  """Show schema details for a specific block type.
+  """Show schema details for a specific block type or frontmatter kind.
+
+  Examples:
+    schema show delta.relationships --format=json-schema
+    schema show frontmatter.prod --format=json-schema
+    schema show frontmatter.delta --format=yaml-example
 
   Args:
-    block_type: Block type identifier (e.g., 'delta.relationships')
+    block_type: Block type identifier (e.g., 'delta.relationships', 'frontmatter.prod')
     format_type: Output format (default: json-schema)
   """
   # If no block_type provided, show the list
@@ -84,11 +139,20 @@ def show_schema(
     list_schemas()
     return
 
+  # Check if this is a frontmatter schema request
+  if block_type.startswith("frontmatter."):
+    _show_frontmatter_schema(block_type, format_type)
+    return
+
+  # Otherwise, handle as a block schema
   schema = get_block_schema(block_type)
   if not schema:
     console.print(f"[red]Unknown block type: {block_type}[/red]")
     available = ", ".join(list_block_types())
     console.print(f"Available types: {available}")
+    console.print("\nFor frontmatter schemas, use: frontmatter.<kind>")
+    fm_kinds = ", ".join(sorted(FRONTMATTER_METADATA_REGISTRY.keys()))
+    console.print(f"Available frontmatter kinds: {fm_kinds}")
     raise typer.Exit(code=1)
 
   if format_type == "markdown":
@@ -103,6 +167,74 @@ def show_schema(
     console.print(f"[red]Unknown format: {format_type}[/red]")
     console.print("Available formats: markdown, json, json-schema, yaml-example")
     raise typer.Exit(code=1)
+
+
+def _show_frontmatter_schema(block_type: str, format_type: str) -> None:
+  """Show frontmatter schema for a specific kind.
+
+  Args:
+    block_type: Frontmatter block type (e.g., 'frontmatter.prod')
+    format_type: Output format ('json-schema' or 'yaml-example')
+  """
+  # Extract kind from block_type (e.g., 'frontmatter.prod' -> 'prod')
+  kind = block_type.replace("frontmatter.", "")
+
+  # Validate kind
+  if kind not in FRONTMATTER_METADATA_REGISTRY:
+    console.print(f"[red]Unknown frontmatter kind: {kind}[/red]")
+    available = ", ".join(sorted(FRONTMATTER_METADATA_REGISTRY.keys()))
+    console.print(f"Available kinds: {available}")
+    raise typer.Exit(code=1)
+
+  # Get metadata
+  metadata = get_frontmatter_metadata(kind)
+
+  # Render based on format
+  if format_type == "json-schema":
+    _render_frontmatter_json_schema(kind, metadata)
+  elif format_type == "yaml-example":
+    _render_frontmatter_yaml_example(kind, metadata)
+  else:
+    console.print(f"[red]Unsupported format for frontmatter: {format_type}[/red]")
+    console.print("Available formats for frontmatter: json-schema, yaml-example")
+    raise typer.Exit(code=1)
+
+
+def _render_frontmatter_json_schema(kind: str, metadata) -> None:
+  """Render frontmatter JSON Schema (Draft 2020-12).
+
+  Args:
+    kind: Frontmatter kind (e.g., 'prod')
+    metadata: FrontmatterMetadata instance
+  """
+  json_schema = metadata_to_json_schema(metadata)
+  json_output = json.dumps(json_schema, indent=2)
+  syntax = Syntax(json_output, "json", theme="monokai")
+  console.print(
+    Panel(syntax, title=f"JSON Schema: frontmatter.{kind}", expand=False),
+  )
+
+
+def _render_frontmatter_yaml_example(kind: str, metadata) -> None:
+  """Render frontmatter YAML example.
+
+  Args:
+    kind: Frontmatter kind (e.g., 'prod')
+    metadata: FrontmatterMetadata instance
+  """
+  import yaml as yaml_lib
+
+  if not metadata.examples or len(metadata.examples) == 0:
+    console.print(f"[yellow]No examples available for frontmatter.{kind}[/yellow]")
+    raise typer.Exit(code=1)
+
+  # Use first example (minimal by convention)
+  example_data = metadata.examples[0]
+  example_yaml = yaml_lib.dump(example_data, default_flow_style=False, sort_keys=False)
+  syntax = Syntax(example_yaml, "yaml", theme="monokai")
+  console.print(
+    Panel(syntax, title=f"Example: frontmatter.{kind}", expand=False),
+  )
 
 
 def _render_markdown(schema) -> None:

@@ -521,8 +521,7 @@ def create_phase(
 
   if not delta_id or not delta_id.startswith("DE-"):
     msg = (
-      f"Plan {plan_id} does not specify delta ID "
-      "in frontmatter or plan.overview block"
+      f"Plan {plan_id} does not specify delta ID in frontmatter or plan.overview block"
     )
     raise PhaseCreationError(msg)
 

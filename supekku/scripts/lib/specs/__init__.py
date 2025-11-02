@@ -29,10 +29,20 @@ from supekku.scripts.lib.blocks.relationships import (
 from supekku.scripts.lib.blocks.relationships import (
   load_relationships_from_file as load_spec_relationships,
 )
+from supekku.scripts.lib.specs.package_utils import (
+  find_all_leaf_packages,
+  find_package_for_file,
+  is_leaf_package,
+  validate_package_path,
+)
 
 __all__ = [
   "SPEC_RELATIONSHIPS_MARKER",
   "SpecRelationshipsBlock",
   "extract_spec_relationships",
+  "find_all_leaf_packages",
+  "find_package_for_file",
+  "is_leaf_package",
   "load_spec_relationships",
+  "validate_package_path",
 ]

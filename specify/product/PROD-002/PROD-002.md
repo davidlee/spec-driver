@@ -7,7 +7,10 @@ updated: '2025-11-02'
 status: draft
 kind: prod
 aliases: []
-relations: []
+relations:
+  - type: informs
+    target: ADR-002
+    nature: Follows proven workflow pattern from spec creation
 guiding_principles:
   - Mirror PROD-001 pattern for consistency
   - Automate scaffolding

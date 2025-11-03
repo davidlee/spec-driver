@@ -31,6 +31,7 @@
               nodejs_latest
               bun
               go
+              pyright
 
               marksman # for serena
 

@@ -117,6 +117,8 @@ def format_requirement_list_json(requirements: Sequence[RequirementRecord]) -> s
       item["introduced"] = req.introduced
     if req.implemented_by:
       item["implemented_by"] = req.implemented_by
+    if req.coverage_evidence:
+      item["coverage_evidence"] = req.coverage_evidence
     if req.verified_by:
       item["verified_by"] = req.verified_by
     if req.path:
@@ -156,6 +158,8 @@ def format_requirement_details(requirement: RequirementRecord) -> str:
     lines.append(f"Introduced: {requirement.introduced}")
   if requirement.implemented_by:
     lines.append(f"Implemented by: {', '.join(requirement.implemented_by)}")
+  if requirement.coverage_evidence:
+    lines.append(f"Coverage evidence: {', '.join(requirement.coverage_evidence)}")
   if requirement.verified_by:
     lines.append(f"Verified by: {', '.join(requirement.verified_by)}")
 

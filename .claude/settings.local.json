@@ -16,7 +16,18 @@
       "Bash(while read -r dir)",
       "Bash(do if ! find \"$dir\" -mindepth 1 -maxdepth 1 -type d -exec test -f {}/__init__.py)",
       "Bash(then echo \"$dir\" fi done)",
-      "Bash(just lint:*)"
+      "Bash(just lint:*)",
+      "Bash(for delta in DE-001 DE-002 DE-003 DE-004 DE-005)",
+      "Bash(do echo \"=== $delta ===\" grep -A 2 \"^status:\" change/deltas/$delta*//$delta.md)",
+      "mcp__serena__activate_project",
+      "mcp__serena__initial_instructions",
+      "mcp__serena__list_dir",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__find_symbol",
+      "mcp__serena__find_file",
+      "mcp__serena__think_about_collected_information",
+      "Bash(cat:*)",
+      "mcp__serena__write_memory"
     ],
     "deny": [],
     "ask": []

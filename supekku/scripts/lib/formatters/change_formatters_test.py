@@ -536,5 +536,114 @@ class TestFormatDeltaDetails(unittest.TestCase):
     assert "File: change/deltas/DE-099/DE-099.md" in result
 
 
+class TestFormatDeltaPhasesVTPHASE003(unittest.TestCase):
+  """VT-PHASE-003: Tests for phase display in delta formatter.
+
+  Verifies PROD-006.FR-003: Enhanced delta display shows phases.
+  """
+
+  def test_delta_with_zero_phases(self) -> None:
+    """Test delta with plan but no phases shows plan ID."""
+    artifact = ChangeArtifact(
+      id="DE-010",
+      kind="delta",
+      status="draft",
+      name="No Phases Delta",
+      slug="no-phases",
+      path=Path("/repo/change/deltas/DE-010/DE-010.md"),
+      updated=None,
+      plan={"id": "IP-010", "phases": []},
+    )
+
+    result = format_delta_details(artifact)
+
+    # Plan should not be shown if no phases
+    assert "Plan: IP-010" not in result
+
+  def test_delta_with_three_phases(self) -> None:
+    """Test delta with 3 phases shows all with proper formatting."""
+    artifact = ChangeArtifact(
+      id="DE-011",
+      kind="delta",
+      status="draft",
+      name="Three Phase Delta",
+      slug="three-phase",
+      path=Path("/repo/change/deltas/DE-011/DE-011.md"),
+      updated=None,
+      plan={
+        "id": "IP-011",
+        "phases": [
+          {"id": "IP-011.PHASE-01", "name": "Phase 01", "objective": "First phase"},
+          {"id": "IP-011.PHASE-02", "name": "Phase 02", "objective": "Second phase"},
+          {"id": "IP-011.PHASE-03", "name": "Phase 03", "objective": "Third phase"},
+        ],
+      },
+    )
+
+    result = format_delta_details(artifact)
+
+    assert "Plan: IP-011 (3 phases)" in result
+    assert "IP-011.PHASE-01" in result
+    assert "IP-011.PHASE-02" in result
+    assert "IP-011.PHASE-03" in result
+
+  def test_delta_phase_objective_truncation(self) -> None:
+    """Test that long objectives are truncated appropriately."""
+    long_objective = "A" * 120  # 120 character objective
+    artifact = ChangeArtifact(
+      id="DE-012",
+      kind="delta",
+      status="draft",
+      name="Long Objective Delta",
+      slug="long-obj",
+      path=Path("/repo/change/deltas/DE-012/DE-012.md"),
+      updated=None,
+      plan={
+        "id": "IP-012",
+        "phases": [
+          {"id": "IP-012.PHASE-01", "objective": long_objective},
+        ],
+      },
+    )
+
+    result = format_delta_details(artifact)
+
+    # Objective should be truncated (default: 60 chars in format_phase_summary)
+    assert "Plan: IP-012 (1 phases)" in result
+    # Should contain truncated version with ellipsis
+    assert "..." in result
+    # Should not contain full 120 character string
+    assert "A" * 120 not in result
+
+  def test_delta_phase_id_and_name_formatted(self) -> None:
+    """Test phase ID and name are formatted correctly in output."""
+    artifact = ChangeArtifact(
+      id="DE-013",
+      kind="delta",
+      status="draft",
+      name="Format Test Delta",
+      slug="format-test",
+      path=Path("/repo/change/deltas/DE-013/DE-013.md"),
+      updated=None,
+      plan={
+        "id": "IP-013",
+        "phases": [
+          {
+            "id": "IP-013.PHASE-01",
+            "name": "Phase 01 - Setup",
+            "objective": "Initial setup and configuration",
+          },
+        ],
+      },
+    )
+
+    result = format_delta_details(artifact)
+
+    # Verify phase ID appears in standard format
+    assert "IP-013.PHASE-01" in result
+    # Verify objective appears
+    assert "Initial setup and configuration" in result
+
+
 if __name__ == "__main__":
   unittest.main()

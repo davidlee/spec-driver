@@ -17,7 +17,7 @@
 | **Testing Companion** | Supplemental document (`SPEC-xxx.tests.md`) capturing deep testing strategy and suite inventory. | Same directory as SPEC |
 | **Spec Revision (RE)** | Documented change to one or more specs without immediate code work; tracks moved requirements/responsibilities. | `change/revisions/RE-xxx.md` (template: `.spec-driver/templates/spec-revision-template.md`) |
 | **Phase Sheet** | Per-phase runsheet detailing tasks, assumptions, verification; created just-in-time during execution. | `change/deltas/DE-xxx/phases/phase-0N.md` (template: `.spec-driver/templates/phase-sheet-template.md`) |
-| **Requirements Registry** | Generated catalogue of every requirement with lifecycle metadata (status, introduced/implemented/verified-by). | `.spec-driver/registry/requirements.yaml` |
+| **Requirements Registry** | Generated catalogue of every requirement with lifecycle metadata (status, introduced/implemented/verified-by/coverage-evidence). | `.spec-driver/registry/requirements.yaml` |
 | **Change Registry** | Generated YAML index of deltas, revisions, and audits capturing frontmatter summaries and paths. | `.spec-driver/registry/{deltas,revisions,audits}.yaml` |
 | **Workspace** | High-level facade combining spec, requirements, and change registries plus validation helpers. | `.spec-driver/scripts/lib/workspace.py` |
 | **Workspace Validator** | Automated integrity checks across relations, lifecycle links, and registries. | `.spec-driver/scripts/lib/validator.py` / `just validate-workspace` |

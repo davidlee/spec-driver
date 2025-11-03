@@ -197,6 +197,22 @@ class TestFormatRequirementListJson(unittest.TestCase):
     data = json.loads(result)
     assert data["items"][0]["path"] == "specify/tech/SPEC-001/SPEC-001.md"
 
+  def test_format_requirement_with_coverage_evidence(self) -> None:
+    """Test formatting requirement with coverage_evidence in JSON."""
+    req = RequirementRecord(
+      uid="SPEC-002.FR-002",
+      label="FR-002",
+      title="Data validation",
+      status="baseline",
+      coverage_evidence=["VT-100", "VT-101", "VA-050"],
+      verified_by=["AUD-002"],
+    )
+    result = format_requirement_list_json([req])
+    data = json.loads(result)
+    assert "coverage_evidence" in data["items"][0]
+    assert data["items"][0]["coverage_evidence"] == ["VT-100", "VT-101", "VA-050"]
+    assert data["items"][0]["verified_by"] == ["AUD-002"]
+
 
 class TestFormatRequirementDetails(unittest.TestCase):
   """Tests for format_requirement_details function."""
@@ -245,3 +261,22 @@ class TestFormatRequirementDetails(unittest.TestCase):
     assert "Implemented by: DE-001, DE-002" in result
     assert "Verified by: AUD-001" in result
     assert "Path: specify/tech/SPEC-001/SPEC-001.md" in result
+
+  def test_format_requirement_with_coverage_evidence(self) -> None:
+    """Test formatting requirement with coverage_evidence field."""
+    req = RequirementRecord(
+      uid="SPEC-002.FR-002",
+      label="FR-002",
+      title="Data validation",
+      status="baseline",
+      coverage_evidence=["VT-100", "VT-101", "VA-050"],
+      verified_by=["AUD-002"],
+    )
+    result = format_requirement_details(req)
+    assert "UID: SPEC-002.FR-002" in result
+    assert "Coverage evidence: VT-100, VT-101, VA-050" in result
+    assert "Verified by: AUD-002" in result
+    # Coverage evidence should appear before verified_by in output
+    cov_idx = result.index("Coverage evidence")
+    ver_idx = result.index("Verified by")
+    assert cov_idx < ver_idx

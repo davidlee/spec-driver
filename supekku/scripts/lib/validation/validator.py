@@ -57,13 +57,29 @@ class WorkspaceValidator:
         self._error(
           req_id,
           f"Requirement introduced_by references missing revision {record.introduced}",
-        )
+          )
       for audit_id in record.verified_by:
         if audit_id not in audit_ids:
           self._error(
             req_id,
             f"Requirement references missing audit {audit_id}",
           )
+
+      # Validation warning: coverage evidence without proper status
+      valid_statuses = ("baseline", "active", "verified")
+      if record.coverage_evidence and record.status not in valid_statuses:
+        self._warning(
+          req_id,
+          f"Requirement has coverage evidence but status is '{record.status}' "
+          f"(expected baseline/active/verified)",
+        )
+
+      # Validation warning: missing audit verification
+      # (placeholder for grace period logic)
+      # TODO: Implement grace period check based on introduced date
+      # if not record.verified_by and record.introduced:
+      #   # Check if >30 days since introduced
+      #   pass
 
     # Change artifact relation checks
     self._validate_change_relations(

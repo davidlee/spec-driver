@@ -365,6 +365,39 @@ class WorkspaceValidatorTest(RepoTestCase):
     ]
     assert len(adr_issues) == 0
 
+  def test_validator_warns_coverage_without_baseline_status(self) -> None:
+    """Test validator warns when requirement has coverage but wrong status (VT-912)."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-400", "FR-400")
+
+    ws = Workspace(root)
+    ws.sync_requirements()
+
+    # Manually add coverage_evidence to a pending requirement
+    req_uid = "SPEC-400.FR-400"
+    record = ws.requirements.records[req_uid]
+    assert record.status == "pending"  # Default status
+
+    # Add coverage evidence
+    record.coverage_evidence = ["VT-001", "VT-002"]
+    ws.requirements.save()
+
+    # Validate - should produce warning
+    issues = validate_workspace(ws)
+    warnings = [issue for issue in issues if issue.level == "warning"]
+
+    assert len(warnings) == 1
+    assert req_uid in warnings[0].artifact
+    assert "coverage evidence" in warnings[0].message
+    assert "pending" in warnings[0].message
+
+    # Fix by changing status to baseline
+    record.status = "baseline"
+    ws.requirements.save()
+    issues = validate_workspace(ws)
+    warnings = [issue for issue in issues if issue.level == "warning"]
+    assert len(warnings) == 0
+
 
 if __name__ == "__main__":
   unittest.main()

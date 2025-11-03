@@ -37,7 +37,7 @@ List the delta directory contents. It may contain additional files relevant to i
 
 ### Pre-flight
 
-User: look at DE-005/1.4
+User: DE-005/1.4
 Agent:
 - That's task 1.4 in phase 1 - likely a handover of work already in progress
 - assume the intent is to continue implementation from 1.4
@@ -70,6 +70,7 @@ Agent:
 - ensure phase metadata is accurate, and complete
 - review & revise IP metadata and content for accuracy, update if required
 - if additional phases remain, suggest creating a new phase sheet, or review the next phase sheet
+- if required, use `uv run spec-driver create phase --plan IP-XXX` to create the next phase sheet
 
 ### When delta is completed
 

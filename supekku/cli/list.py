@@ -324,6 +324,9 @@ def list_deltas(
     if not filtered_artifacts:
       raise typer.Exit(EXIT_SUCCESS)
 
+    # Sort by ID (alphabetical order)
+    filtered_artifacts.sort(key=lambda x: x.id)
+
     # Format and output
     # For TSV with details, use old formatter; otherwise use new table formatter
     if format_type == "tsv" and details:
@@ -479,6 +482,9 @@ def list_changes(
 
     if not all_artifacts:
       raise typer.Exit(EXIT_SUCCESS)
+
+    # Sort by ID (alphabetical order)
+    all_artifacts.sort(key=lambda x: x[1].id)
 
     # Format and output
     # For TSV with extra columns, use old formatter; otherwise use new table formatter

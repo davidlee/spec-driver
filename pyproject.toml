@@ -172,7 +172,7 @@ skip-magic-trailing-comma = false
 # PyLint :: main
 #
 [tool.pylint.main]
-fail-under = 0.73 ## FAIL-UNDER ##
+fail-under = 0.75 ## FAIL-UNDER ##
 reports = true
 output-format = "colorized"
 indent-string = "  "

@@ -1264,11 +1264,22 @@ def list_backlog(
       help="Order by ID (chronological) instead of priority",
     ),
   ] = False,
+  prioritize: Annotated[
+    bool,
+    typer.Option(
+      "--prioritize/--no-prioritize",
+      "--prioritise/--no-prioritise",
+      help="Open filtered items in editor for reordering",
+    ),
+  ] = False,
 ) -> None:
   """List backlog items with optional filtering.
 
   By default, items are sorted by priority (registry order → severity → ID).
   Use --order-by-id to sort chronologically by ID instead.
+
+  Use --prioritize to open the filtered items in your editor for interactive reordering.
+  After saving, the registry will be updated with your new ordering.
 
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID and title fields.
@@ -1285,14 +1296,23 @@ def list_backlog(
   try:
     from pathlib import Path
 
-    from supekku.scripts.lib.backlog.priority import sort_by_priority
+    from supekku.scripts.lib.backlog.priority import (
+      edit_backlog_ordering,
+      sort_by_priority,
+    )
     from supekku.scripts.lib.backlog.registry import (
       discover_backlog_items,
       load_backlog_registry,
+      save_backlog_registry,
+    )
+    from supekku.scripts.lib.core.editor import (
+      EditorInvocationError,
+      EditorNotFoundError,
     )
 
     repo_root = Path(root) if root else None
-    items = discover_backlog_items(root=repo_root, kind=kind)
+    all_items = discover_backlog_items(root=repo_root, kind=kind)
+    items = all_items.copy()
 
     # Apply filters
     if status:
@@ -1313,6 +1333,34 @@ def list_backlog(
 
     if not items:
       raise typer.Exit(EXIT_SUCCESS)
+
+    # Interactive prioritization mode
+    if prioritize:
+      ordering = load_backlog_registry(root=repo_root)
+      try:
+        new_ordering = edit_backlog_ordering(all_items, items, ordering)
+        if new_ordering is None:
+          typer.echo("Prioritization cancelled (no changes made).", err=True)
+          raise typer.Exit(EXIT_SUCCESS)
+
+        save_backlog_registry(new_ordering, root=repo_root)
+        count = len(items)
+        typer.echo(f"✓ Updated backlog priority ordering ({count} items reordered)")
+        raise typer.Exit(EXIT_SUCCESS)
+
+      except EditorNotFoundError as err:
+        typer.echo(
+          "Error: No editor found. Set $EDITOR or $VISUAL environment variable.",
+          err=True,
+        )
+        raise typer.Exit(EXIT_FAILURE) from err
+      except EditorInvocationError as err:
+        typer.echo(f"Error invoking editor: {err}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from err
+      except ValueError as err:
+        typer.echo(f"Error parsing editor output: {err}", err=True)
+        typer.echo("No changes made to registry.", err=True)
+        raise typer.Exit(EXIT_FAILURE) from err
 
     # Apply priority ordering (unless --order-by-id specified)
     if not order_by_id:

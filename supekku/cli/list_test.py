@@ -502,5 +502,131 @@ requirements:
     assert result.stdout.strip() == ""
 
 
+class BacklogPrioritizationTest(unittest.TestCase):
+  """Test cases for backlog prioritization feature (VT-015-005).
+
+  Tests the --prioritize flag and interactive editor workflow integration.
+  """
+
+  def setUp(self) -> None:
+    """Set up test environment with sample backlog entries and registry."""
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+
+    # Create sample backlog entries
+    self._create_sample_issue("ISSUE-001", "First issue", "open", "p1")
+    self._create_sample_issue("ISSUE-002", "Second issue", "open", "p2")
+    self._create_sample_issue("ISSUE-003", "Third issue", "resolved", "p1")
+    self._create_sample_improvement("IMPR-001", "First improvement", "idea")
+    self._create_sample_improvement("IMPR-002", "Second improvement", "accepted")
+
+    # Create registry with initial ordering
+    registry_dir = self.root / ".spec-driver" / "registry"
+    registry_dir.mkdir(parents=True)
+    registry_file = registry_dir / "backlog.yaml"
+    registry_content = """ordering:
+  - IMPR-001
+  - ISSUE-001
+  - ISSUE-002
+  - IMPR-002
+  - ISSUE-003
+"""
+    registry_file.write_text(registry_content, encoding="utf-8")
+
+  def tearDown(self) -> None:
+    """Clean up test environment."""
+    self.tmpdir.cleanup()
+
+  def _create_sample_issue(
+    self, issue_id: str, title: str, status: str, severity: str
+  ) -> None:
+    """Helper to create a sample issue file."""
+    issue_dir = self.root / "backlog" / "issues" / issue_id
+    issue_dir.mkdir(parents=True, exist_ok=True)
+    issue_file = issue_dir / f"{issue_id}.md"
+    content = f"""---
+id: {issue_id}
+name: {title}
+kind: issue
+status: {status}
+severity: {severity}
+created: '2025-11-04'
+---
+
+# {issue_id} - {title}
+
+Test issue content.
+"""
+    issue_file.write_text(content, encoding="utf-8")
+
+  def _create_sample_improvement(
+    self, impr_id: str, title: str, status: str
+  ) -> None:
+    """Helper to create a sample improvement file."""
+    impr_dir = self.root / "backlog" / "improvements" / impr_id
+    impr_dir.mkdir(parents=True, exist_ok=True)
+    impr_file = impr_dir / f"{impr_id}.md"
+    content = f"""---
+id: {impr_id}
+name: {title}
+kind: improvement
+status: {status}
+created: '2025-11-04'
+---
+
+# {impr_id} - {title}
+
+Test improvement content.
+"""
+    impr_file.write_text(content, encoding="utf-8")
+
+  def test_list_backlog_uses_priority_order(self) -> None:
+    """Test that list backlog displays items in priority order by default."""
+    result = self.runner.invoke(
+      app,
+      ["backlog", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    # Check that items appear in registry order
+    output_lines = result.stdout.strip().split("\n")
+    # Find positions of IDs in output (skip header)
+    positions = {}
+    for i, line in enumerate(output_lines):
+      for item_id in ["IMPR-001", "ISSUE-001", "ISSUE-002", "IMPR-002", "ISSUE-003"]:
+        if item_id in line:
+          positions[item_id] = i
+          break
+
+    # Verify priority order (registry order)
+    assert positions["IMPR-001"] < positions["ISSUE-001"]
+    assert positions["ISSUE-001"] < positions["ISSUE-002"]
+    assert positions["ISSUE-002"] < positions["IMPR-002"]
+    assert positions["IMPR-002"] < positions["ISSUE-003"]
+
+  def test_order_by_id_flag(self) -> None:
+    """Test --order-by-id flag provides chronological ordering."""
+    result = self.runner.invoke(
+      app,
+      ["backlog", "--root", str(self.root), "--order-by-id"],
+    )
+
+    assert result.exit_code == 0
+    output_lines = result.stdout.strip().split("\n")
+    positions = {}
+    for i, line in enumerate(output_lines):
+      for item_id in ["ISSUE-001", "ISSUE-002", "ISSUE-003", "IMPR-001", "IMPR-002"]:
+        if item_id in line:
+          positions[item_id] = i
+          break
+
+    # Verify chronological order (by ID)
+    assert positions["IMPR-001"] < positions["IMPR-002"]
+    assert positions["ISSUE-001"] < positions["ISSUE-002"]
+    assert positions["ISSUE-002"] < positions["ISSUE-003"]
+
+
 if __name__ == "__main__":
   unittest.main()

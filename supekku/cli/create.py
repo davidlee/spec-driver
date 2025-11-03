@@ -110,7 +110,7 @@ def create_spec(
 
 @app.command("delta")
 def create_delta_cmd(
-  name: Annotated[str, typer.Argument(help="Delta title")],
+  name: Annotated[str | None, typer.Argument(help="Delta title")] = None,
   specs: Annotated[
     list[str] | None,
     typer.Option(
@@ -133,9 +133,53 @@ def create_delta_cmd(
       help="Skip implementation plan and phase scaffolding",
     ),
   ] = False,
+  from_backlog: Annotated[
+    str | None,
+    typer.Option(
+      "--from-backlog",
+      help="Create delta from backlog item (pre-populate with item context)",
+    ),
+  ] = None,
 ) -> None:
-  """Create a Delta bundle with optional plan scaffolding."""
+  """Create a Delta bundle with optional plan scaffolding.
+
+  Can create from scratch with a title, or populate from a backlog item
+  using --from-backlog.
+  """
   try:
+    # If --from-backlog specified, fetch the item and pre-populate fields
+    if from_backlog:
+      from supekku.scripts.lib.backlog.registry import discover_backlog_items
+
+      # Discover all backlog items
+      items = discover_backlog_items(root=None, kind="all")
+      item = next((i for i in items if i.id == from_backlog), None)
+
+      if not item:
+        typer.echo(f"Error: backlog item '{from_backlog}' not found", err=True)
+        raise typer.Exit(EXIT_FAILURE)
+
+      # Use item title as delta name if not provided
+      if not name:
+        name = item.title
+
+      # Extract related requirements from frontmatter if available
+      if not requirements and item.frontmatter:
+        related_reqs = item.frontmatter.get("related_requirements", [])
+        if related_reqs:
+          requirements = related_reqs
+
+      typer.echo(f"Creating delta from backlog item: {item.id}")
+      typer.echo(f"  Title: {item.title}")
+      if requirements:
+        typer.echo(f"  Requirements: {', '.join(requirements)}")
+      typer.echo("")
+
+    # Name is required
+    if not name:
+      typer.echo("Error: delta name is required (or use --from-backlog)", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
     result = create_delta(
       name,
       specs=specs,

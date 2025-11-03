@@ -2,12 +2,20 @@
 
 VT-015-001: Head-tail partition algorithm tests
 VT-015-003: Priority ordering sort function tests
+VT-015-004: Editor utility and markdown functions tests
 """
 
 import unittest
+from pathlib import Path
 
 from .models import BacklogItem
-from .priority import build_partitions, merge_ordering, sort_by_priority
+from .priority import (
+  build_partitions,
+  generate_markdown_list,
+  merge_ordering,
+  parse_markdown_list,
+  sort_by_priority,
+)
 
 
 class HeadTailPartitionTest(unittest.TestCase):
@@ -242,6 +250,154 @@ class PrioritySortTest(unittest.TestCase):
     sorted_items = sort_by_priority(items, [])
 
     self.assertEqual(['B', 'A', 'C'], [item.id for item in sorted_items])
+
+
+class TestGenerateMarkdownList(unittest.TestCase):
+  """Test generate_markdown_list function."""
+
+  def test_basic_list_generation(self) -> None:
+    """Test generating markdown list from backlog items."""
+
+    items = [
+      BacklogItem(id='ISSUE-001', kind='issue', status='open', title='Fix bug', path=Path()),  # noqa: E501
+      BacklogItem(id='IMPR-002', kind='improvement', status='idea', title='Add feature', path=Path()),  # noqa: E501
+    ]
+
+    result = generate_markdown_list(items)
+
+    expected = "- [ ] ISSUE-001: Fix bug\n- [ ] IMPR-002: Add feature"
+    self.assertEqual(expected, result)
+
+  def test_with_severity(self) -> None:
+    """Test markdown generation includes severity."""
+
+    items = [
+      BacklogItem(id='ISSUE-001', kind='issue', status='open', title='Bug', path=Path(), severity='p1'),  # noqa: E501
+      BacklogItem(id='ISSUE-002', kind='issue', status='open', title='Minor', path=Path(), severity='p3'),  # noqa: E501
+    ]
+
+    result = generate_markdown_list(items)
+
+    assert "ISSUE-001 (p1):" in result
+    assert "ISSUE-002 (p3):" in result
+
+  def test_long_title_truncation(self) -> None:
+    """Test that long titles are truncated."""
+
+    long_title = "A" * 100
+    items = [BacklogItem(id='ISSUE-001', kind='issue', status='open', title=long_title, path=Path())]  # noqa: E501
+
+    result = generate_markdown_list(items)
+
+    assert len(result.split(': ', 1)[1]) <= 83  # 80 chars + "..."
+    assert result.endswith("...")
+
+  def test_empty_list(self) -> None:
+    """Test generating markdown from empty list."""
+
+    result = generate_markdown_list([])
+
+    self.assertEqual("", result)
+
+
+class TestParseMarkdownList(unittest.TestCase):
+  """Test parse_markdown_list function."""
+
+  def test_basic_parsing(self) -> None:
+    """Test parsing markdown list with checkboxes."""
+
+    markdown = """- [ ] ISSUE-003: Fix bug
+- [ ] IMPR-002: Add feature
+- [ ] ISSUE-005: Another fix"""
+
+    result = parse_markdown_list(markdown)
+
+    self.assertEqual(['ISSUE-003', 'IMPR-002', 'ISSUE-005'], result)
+
+  def test_with_severity(self) -> None:
+    """Test parsing handles severity in parentheses."""
+
+    markdown = "- [ ] ISSUE-003 (p1): Critical bug\n- [ ] IMPR-002 (p2): Enhancement"
+
+    result = parse_markdown_list(markdown)
+
+    self.assertEqual(['ISSUE-003', 'IMPR-002'], result)
+
+  def test_without_checkbox(self) -> None:
+    """Test parsing items without checkbox syntax."""
+
+    markdown = "ISSUE-003: Fix bug\nIMPR-002: Add feature"
+
+    result = parse_markdown_list(markdown)
+
+    self.assertEqual(['ISSUE-003', 'IMPR-002'], result)
+
+  def test_ignores_blank_lines(self) -> None:
+    """Test that blank lines are ignored."""
+
+    markdown = """ISSUE-003: Fix
+
+IMPR-002: Add
+
+"""
+
+    result = parse_markdown_list(markdown)
+
+    self.assertEqual(['ISSUE-003', 'IMPR-002'], result)
+
+  def test_ignores_comments(self) -> None:
+    """Test that comment lines are ignored."""
+
+    markdown = """# This is a header
+ISSUE-003: Fix
+# Another comment
+IMPR-002: Add"""
+
+    result = parse_markdown_list(markdown)
+
+    self.assertEqual(['ISSUE-003', 'IMPR-002'], result)
+
+  def test_duplicate_ids_kept_first(self) -> None:
+    """Test that duplicate IDs keep only first occurrence."""
+
+    markdown = """ISSUE-003: First
+ISSUE-003: Duplicate
+IMPR-002: Second"""
+
+    result = parse_markdown_list(markdown)
+
+    self.assertEqual(['ISSUE-003', 'IMPR-002'], result)
+
+  def test_empty_markdown_raises(self) -> None:
+    """Test that empty markdown raises ValueError."""
+
+    with self.assertRaises(ValueError) as cm:
+      parse_markdown_list("")
+
+    self.assertIn("No valid backlog item IDs", str(cm.exception))
+
+  def test_no_ids_raises(self) -> None:
+    """Test that markdown with no IDs raises ValueError."""
+
+    markdown = "Some text without any IDs\nJust random content"
+
+    with self.assertRaises(ValueError) as cm:
+      parse_markdown_list(markdown)
+
+    self.assertIn("No valid backlog item IDs", str(cm.exception))
+
+  def test_mixed_formats(self) -> None:
+    """Test parsing various markdown formats together."""
+
+    markdown = """# Priority Order
+- [ ] ISSUE-003: Fix critical bug
+IMPR-002 (p2): Enhancement
+- ISSUE-005: Another issue
+"""
+
+    result = parse_markdown_list(markdown)
+
+    self.assertEqual(['ISSUE-003', 'IMPR-002', 'ISSUE-005'], result)
 
 
 if __name__ == '__main__':

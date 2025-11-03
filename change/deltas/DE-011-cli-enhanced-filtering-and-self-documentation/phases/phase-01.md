@@ -257,7 +257,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 | [x] | 1.2 | Create core/filters.py module | [ ] | Completed - pylint 10/10 |
 | [x] | 1.3 | Write multi-value filter tests | [x] | Completed - 24 tests |
 | [x] | 1.4 | Implement multi-value filters | [ ] | Completed - 6 commands updated |
-| [ ] | 1.5 | Write reverse query tests | [x] | Can parallelize with 1.3 |
+| [x] | 1.5 | Write reverse query tests | [x] | Completed - 49 tests (TDD red) |
 | [ ] | 1.6 | Add reverse query methods to registries | [ ] | After 1.5 |
 | [ ] | 1.7 | Implement reverse query flags | [ ] | After 1.6 |
 | [ ] | 1.8 | Add glob pattern support | [ ] | After 1.7 |
@@ -664,14 +664,23 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Manual testing confirms: `list specs -k "prod,tech"` returns both PROD and SPEC specs
   - Manual testing confirms: `list deltas -s "draft,in-progress"` returns DE-010, DE-011
 
+- ✅ **Task 1.5**: Write tests for reverse relationship queries (TDD) - COMPLETED
+  - Created 49 comprehensive tests across 4 test files
+  - Registry tests: ChangeRegistry (11), RequirementsRegistry (13), SpecRegistry (10)
+  - CLI tests: TestReverseRelationshipQueries class (15 tests)
+  - All tests FAIL as expected (TDD red phase) - AttributeError for missing methods
+  - Linters: ruff clean, pylint scores acceptable for test files
+  - Tests cover: exact match, glob patterns, None/empty, nonexistent IDs, case sensitivity
+  - Key insight: `find_by_verified_by` searches both `verified_by` and `coverage_evidence` fields
+
 **Next Tasks (Ready to Start):**
-- 🔜 **Task 1.5**: Write tests for reverse relationship queries (TDD)
-  - Write tests for registry reverse query methods (to be implemented in 1.6)
-  - Write tests for CLI reverse query flags (to be implemented in 1.7)
-  - Tests should FAIL initially (TDD red phase)
-  - Example: `list deltas --implements PROD-010.FR-004`
-  - Example: `list requirements --verified-by VT-CLI-001`
-  - Example: `list specs --informed-by ADR-001`
+- 🔜 **Task 1.6**: Add reverse query methods to registries
+  - Implement `ChangeRegistry.find_by_implements(req_id)` method
+  - Implement `RequirementsRegistry.find_by_verified_by(artifact_pattern)` with glob support
+  - Implement `SpecRegistry.find_by_informed_by(adr_id)` method
+  - Use Python `fnmatch` for glob pattern matching
+  - Filter in-memory (no indexing for now)
+  - Run tests from Task 1.5 - registry tests should PASS (TDD green phase)
 
 **Important Context for Next Developer:**
 1. **TDD Discipline**: Task 1.3 must write tests BEFORE Task 1.4 implementation
@@ -704,5 +713,11 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 
 **Files Modified So Far:**
 - `change/deltas/DE-011-.../phases/phase-01.md` - research findings, task updates
-- `supekku/scripts/lib/core/filters.py` - NEW pure filter utility
-- `supekku/scripts/lib/core/__init__.py` - export parse_multi_value_filter
+- `supekku/scripts/lib/core/filters.py` - NEW pure filter utility (Task 1.2)
+- `supekku/scripts/lib/core/__init__.py` - export parse_multi_value_filter (Task 1.2)
+- `supekku/scripts/lib/core/filters_test.py` - NEW 18 utility tests (Task 1.3)
+- `supekku/cli/list.py` - multi-value filter support in 6 commands (Task 1.4)
+- `supekku/cli/test_cli.py` - 21 CLI tests (6 multi-value + 15 reverse query) (Tasks 1.3, 1.5)
+- `supekku/scripts/lib/changes/registry_test.py` - NEW 11 reverse query tests (Task 1.5)
+- `supekku/scripts/lib/requirements/registry_test.py` - NEW 13 reverse query tests (Task 1.5)
+- `supekku/scripts/lib/specs/registry_test.py` - NEW 10 reverse query tests (Task 1.5)

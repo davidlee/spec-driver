@@ -17,6 +17,11 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
     # Spec-specific fields (all optional)
+    "category": FieldMetadata(
+      type="string",
+      required=False,
+      description="Optional categorization for requirements (freeform)",
+    ),
     "c4_level": FieldMetadata(
       type="enum",
       required=False,

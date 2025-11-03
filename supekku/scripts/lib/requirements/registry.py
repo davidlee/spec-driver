@@ -49,7 +49,7 @@ logger = logging.getLogger(__name__)
 # - **PROD-010.FR-001**: Fully-qualified format (current standard)
 _REQUIREMENT_LINE = re.compile(
   r"^\s*[-*]\s*\*{0,2}\s*(?:[A-Z]+-\d{3}\.)?("
-  r"FR|NF)-(\d{3})\s*\*{0,2}\s*[:\-–]\s*(.+)$",
+  r"FR|NF)-(\d{3})\s*\*{0,2}\s*(?:\(([^)]+)\))?\s*[:\-–]\s*(.+)$",
   re.IGNORECASE,
 )
 
@@ -64,6 +64,7 @@ class RequirementRecord:
   specs: list[str] = field(default_factory=list)
   primary_spec: str = ""
   kind: str = "functional"
+  category: str | None = None
   status: RequirementStatus = STATUS_PENDING
   introduced: str | None = None
   implemented_by: list[str] = field(default_factory=list)
@@ -80,6 +81,7 @@ class RequirementRecord:
       specs=sorted(set(self.specs) | set(other.specs)),
       primary_spec=other.primary_spec or self.primary_spec,
       kind=other.kind or self.kind,
+      category=other.category or self.category,
       status=self.status,
       introduced=self.introduced,
       implemented_by=list(self.implemented_by),
@@ -98,6 +100,7 @@ class RequirementRecord:
       "specs": self.specs,
       "primary_spec": self.primary_spec,
       "kind": self.kind,
+      "category": self.category,
       "status": self.status,
       "introduced": self.introduced,
       "implemented_by": self.implemented_by,
@@ -116,6 +119,7 @@ class RequirementRecord:
       specs=list(data.get("specs", [])),
       primary_spec=str(data.get("primary_spec", "")),
       kind=str(data.get("kind", "functional")),
+      category=data.get("category"),
       status=str(data.get("status", STATUS_PENDING)),
       introduced=data.get("introduced"),
       implemented_by=list(data.get("implemented_by", [])),
@@ -989,10 +993,18 @@ class RequirementsRegistry:
         continue
 
       extracted_count += 1
-      prefix, number, title = match.groups()
+      prefix, number, category, title = match.groups()
       label = f"{prefix.upper()}-{number}"
       uid = f"{spec_id}.{label}"
       kind = "functional" if label.startswith("FR-") else "non-functional"
+
+      # Extract category from inline syntax (strip whitespace if present)
+      inline_category = category.strip() if category else None
+
+      # Check frontmatter for category (body precedence: inline > frontmatter)
+      frontmatter_category = _frontmatter.get("category")
+      final_category = inline_category or frontmatter_category
+
       yield RequirementRecord(
         uid=uid,
         label=label,
@@ -1000,6 +1012,7 @@ class RequirementsRegistry:
         specs=[spec_id],
         primary_spec=spec_id,
         kind=kind,
+        category=final_category,
         status=STATUS_PENDING,
         path=path,
       )

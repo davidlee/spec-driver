@@ -8,6 +8,7 @@ This package handles all change artifact functionality:
 - completion: Completing/finalizing revisions
 - discovery: Discovering revision relationships
 - updater: Updating revision metadata
+- coverage_check: Coverage completeness enforcement
 - blocks/: Parsing change-specific markdown blocks
 """
 

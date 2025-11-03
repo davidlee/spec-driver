@@ -1,6 +1,7 @@
 # SpecDriver Architecture Guide
 
 @supekku/INIT.md
+@supekku/about/glossary.md
 
 Quick reference for agents maintaining architectural integrity.
 
@@ -231,8 +232,15 @@ Before submitting work:
 
 - [ ] Tests written and passing (`just test`)
 - [ ] Both linters passing (`just lint` + `just pylint`)
-- [ ] All of the above (fail-fast): `just` 
+- [ ] All of the above (fail-fast): `just`
 - [ ] Display logic in `formatters/`, not in domain packages
+
+Before completing a delta:
+
+- [ ] All verification artifacts (VT/VA/VH) executed and results documented
+- [ ] Parent spec coverage blocks updated with `status: verified` for implemented requirements
+- [ ] `uv run spec-driver complete delta DE-XXX` succeeds without `--force`
+- [ ] If using `--force`: document reason and create follow-up task for coverage updates
 
 ## RULES
 

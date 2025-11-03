@@ -14,6 +14,11 @@ if str(ROOT) not in sys.path:
 
 # pylint: disable=wrong-import-position
 from supekku.scripts.lib.changes.completion import create_completion_revision
+from supekku.scripts.lib.changes.coverage_check import (
+  check_coverage_completeness,
+  display_coverage_error,
+  is_coverage_enforcement_enabled,
+)
 from supekku.scripts.lib.changes.discovery import find_requirement_sources
 from supekku.scripts.lib.changes.updater import (
   RevisionUpdateError,
@@ -421,6 +426,17 @@ def complete_delta(
   if dry_run:
     display_dry_run_requirements(requirements_to_update, update_requirements)
     return 0
+
+  # Coverage enforcement check (before confirmation)
+  if is_coverage_enforcement_enabled():
+    if not force:
+      is_complete, missing = check_coverage_completeness(delta_id, workspace)
+      if not is_complete:
+        display_coverage_error(delta_id, missing, workspace.root)
+        return 1
+  else:
+    # Log that enforcement is disabled
+    print("Note: Coverage enforcement is disabled via SPEC_DRIVER_ENFORCE_COVERAGE")
 
   # Confirm unless force mode
   if not force and not prompt_yes_no("Proceed with completion?", default=False):

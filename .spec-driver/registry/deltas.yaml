@@ -1746,6 +1746,7 @@ deltas:
         - id: IP-015.PHASE-02
         - id: IP-015.PHASE-03
         - id: IP-015.PHASE-04
+        - id: IP-015.PHASE-02
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -1777,8 +1778,39 @@ deltas:
         - 1.5 Run lint and fix issues
         risks:
         - Registry file conflicts with concurrent edits (low impact, document limitation)
-      - id: IP-015.PHASE-02
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-015.PHASE-02
+        plan: IP-015
+        delta: DE-015
+        objective: Implement priority ordering and display logic so backlog items
+          are shown in registry order with severity/ID fallback
+        entrance_criteria:
+        - Phase 1 complete (registry infrastructure working)
+        - Registry contains item ordering
+        exit_criteria:
+        - Head-tail partition algorithm implemented and tested
+        - Priority sort function implemented
+        - list backlog command uses priority ordering by default
+        - VT-015-001 and VT-015-003 tests passing
+        - Lint checks pass
+        verification:
+          tests:
+          - VT-015-001
+          - VT-015-003
+          evidence:
+          - list command output showing priority order
+          - test results
+        tasks:
+        - 2.1 Implement head-tail partition algorithm
+        - 2.2 Implement priority sort function
+        - 2.3 Update discover_backlog_items to use registry ordering
+        - 2.4 Update formatters to display in priority order
+        - 2.5 Write comprehensive tests
+        - 2.6 Run lint and fix issues
+        risks:
+        - Sort function complexity with multiple fallback levels (mitigate with clear
+          tests)
       - id: IP-015.PHASE-03
         phase: IP-015.PHASE-03
       - id: IP-015.PHASE-04
@@ -1818,7 +1850,7 @@ deltas:
         phase: IP-016.PHASE-01
   DE-017:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Add category support to requirements
     slug: add-category-support-to-requirements
     updated: '2025-11-04'
@@ -1848,6 +1880,7 @@ deltas:
           dependencies: []
         phases:
         - id: IP-017.PHASE-01
+        - id: IP-017.PHASE-02
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -1899,3 +1932,88 @@ deltas:
         risks:
         - risk: Regex complexity introduces parsing bugs
           mitigation: Comprehensive edge case testing
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-017.PHASE-02
+        plan: IP-017
+        delta: DE-017
+        objective: Add category filtering to CLI list command, create requirement_formatters
+          module with category column display, implement integration tests for filtering
+          and display.
+        entrance_criteria:
+        - Phase 1 complete (data model and parser working)
+        - Category field tested and working in registry
+        - VT-017-001 and VT-017-002 passing
+        exit_criteria:
+        - requirement_formatters.py module created with category formatting
+        - CLI list command supports --category filter (substring match)
+        - Existing -r (regexp) and -i (case-insensitive) filters work with category
+          field
+        - Category column appears in list output
+        - VT-017-003 and VT-017-004 passing (integration tests)
+        - Linters passing (ruff + pylint)
+        verification:
+          tests:
+          - VT-017-003 (integration tests for CLI category filtering)
+          - VT-017-004 (integration tests for category column display)
+          evidence:
+          - Test output showing filtering scenarios pass
+          - CLI output showing category column
+          - Lint output showing zero warnings
+        tasks:
+        - id: '2.1'
+          description: Create requirement_formatters.py module
+        - id: '2.2'
+          description: Implement format_requirement_list_item with category column
+        - id: '2.3'
+          description: Add --category filter option to list requirements CLI
+        - id: '2.4'
+          description: Extend existing regexp/case-insensitive filters to include
+            category
+        - id: '2.5'
+          description: Update CLI to use formatter for requirement display
+        - id: '2.6'
+          description: Write VT-017-003 integration tests for category filtering
+        - id: '2.7'
+          description: Write VT-017-004 integration tests for category display
+        - id: '2.8'
+          description: Run linters and fix any issues
+        risks:
+        - risk: CLI output formatting breaks existing scripts
+          mitigation: Keep backward compatible default format
+        - risk: Filter logic complexity
+          mitigation: Follow existing filter patterns in codebase
+  DE-018:
+    kind: delta
+    status: draft
+    name: Delta - Add Tags column to list table output for all artifact types
+    slug: add-tags-column-to-list-table-output-for-all-artifact-types
+    updated: '2025-11-04'
+    path: change/deltas/DE-018-add-tags-column-to-list-table-output-for-all-artifact-types/DE-018.md
+    applies_to:
+      specs:
+      - SPEC-110
+      - SPEC-120
+      requirements: []
+    plan:
+      id: IP-018
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-018
+        delta: DE-018
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-110
+          - SPEC-120
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-018-P01
+      phases:
+      - id: IP-018-P01
+        phase: IP-018-P01

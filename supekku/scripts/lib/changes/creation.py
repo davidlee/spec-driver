@@ -17,6 +17,7 @@ from supekku.scripts.lib.blocks.plan import (
   PLAN_MARKER,
   extract_plan_overview,
   render_phase_overview_block,
+  render_phase_tracking_block,
   render_plan_overview_block,
 )
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
@@ -527,6 +528,51 @@ def _update_plan_overview_phases(
   plan_path.write_text(new_content, encoding="utf-8")
 
 
+def _extract_phase_metadata_from_plan(
+  plan_content: str,
+  phase_id: str,
+) -> dict[str, str | list[str]]:
+  """Extract phase metadata from plan.overview block.
+
+  Args:
+    plan_content: Full plan file content.
+    phase_id: Phase ID to look for (e.g., "IP-012.PHASE-01").
+
+  Returns:
+    Dictionary with optional keys: objective, entrance_criteria, exit_criteria.
+    Returns empty dict if plan.overview not found or phase not in phases array.
+  """
+  # Try to extract plan.overview block
+  block = extract_plan_overview(plan_content)
+  if not block:
+    return {}
+
+  # Look for the phase in the phases array
+  phases = block.data.get("phases", [])
+  if not isinstance(phases, list):
+    return {}
+
+  for phase in phases:
+    if not isinstance(phase, dict):
+      continue
+    if phase.get("id") != phase_id:
+      continue
+
+    # Found the phase - extract optional metadata
+    metadata: dict[str, str | list[str]] = {}
+    if "objective" in phase:
+      metadata["objective"] = phase["objective"]
+    if "entrance_criteria" in phase and isinstance(phase["entrance_criteria"], list):
+      metadata["entrance_criteria"] = phase["entrance_criteria"]
+    if "exit_criteria" in phase and isinstance(phase["exit_criteria"], list):
+      metadata["exit_criteria"] = phase["exit_criteria"]
+
+    return metadata
+
+  # Phase ID not found in phases array
+  return {}
+
+
 def create_phase(
   name: str,
   plan_id: str,
@@ -615,11 +661,38 @@ def create_phase(
   # Get slug from delta directory name
   slug = delta_dir.name.split("-", 1)[1] if "-" in delta_dir.name else "phase"
 
-  # Render phase overview block (with empty defaults for user to fill in)
+  # Extract phase metadata from plan.overview if available
+  phase_metadata = _extract_phase_metadata_from_plan(content, phase_id)
+
+  # Render phase overview block with metadata from IP (or defaults)
   phase_overview_block = render_phase_overview_block(
     phase_id,
     plan_id,
     delta_id,
+    objective=phase_metadata.get("objective"),
+    entrance_criteria=phase_metadata.get("entrance_criteria"),
+    exit_criteria=phase_metadata.get("exit_criteria"),
+  )
+
+  # Render phase tracking block with criteria from IP
+  # Convert criteria strings to tracking format {item, completed}
+  tracking_entrance = None
+  tracking_exit = None
+  if phase_metadata.get("entrance_criteria"):
+    tracking_entrance = [
+      {"item": criterion, "completed": False}
+      for criterion in phase_metadata["entrance_criteria"]
+    ]
+  if phase_metadata.get("exit_criteria"):
+    tracking_exit = [
+      {"item": criterion, "completed": False}
+      for criterion in phase_metadata["exit_criteria"]
+    ]
+
+  phase_tracking_block = render_phase_tracking_block(
+    phase_id,
+    entrance_criteria=tracking_entrance,
+    exit_criteria=tracking_exit,
   )
 
   # Load and render phase template
@@ -631,6 +704,7 @@ def create_phase(
     plan_id=plan_id,
     delta_id=delta_id,
     phase_overview_block=phase_overview_block,
+    phase_tracking_block=phase_tracking_block,
   )
 
   # Create phase file

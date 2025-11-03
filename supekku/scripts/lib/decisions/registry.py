@@ -304,6 +304,7 @@ class DecisionRegistry:
     delta: str | None = None,
     requirement: str | None = None,
     policy: str | None = None,
+    standard: str | None = None,
   ) -> list[DecisionRecord]:
     """Filter decisions by various criteria."""
     decisions = list(self.iter())
@@ -321,6 +322,8 @@ class DecisionRegistry:
       if requirement and requirement not in decision.requirements:
         matches = False
       if policy and policy not in decision.policies:
+        matches = False
+      if standard and standard not in decision.standards:
         matches = False
 
       if matches:

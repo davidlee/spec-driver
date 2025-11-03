@@ -276,6 +276,47 @@ specs: [SPEC-200]
       empty_results = registry.filter(tag="nonexistent")
       assert len(empty_results) == 0
 
+  def test_filter_by_standard(self) -> None:
+    """Test filtering decisions by standard reference."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+      root = self._setup_test_repo(tmpdir)
+      decisions_dir = root / "specify" / "decisions"
+      decisions_dir.mkdir(parents=True)
+
+      # Create ADR with standard reference
+      adr1 = decisions_dir / "ADR-010-with-standard.md"
+      adr1.write_text(
+        """---
+id: ADR-010
+standards: [STD-001, STD-002]
+---
+# Test with standards
+""",
+        encoding="utf-8",
+      )
+
+      # Create ADR without standard reference
+      adr2 = decisions_dir / "ADR-011-without-standard.md"
+      adr2.write_text(
+        """---
+id: ADR-011
+---
+# Test without standards
+""",
+        encoding="utf-8",
+      )
+
+      registry = DecisionRegistry(root=root)
+
+      # Filter by standard
+      std_decisions = registry.filter(standard="STD-001")
+      assert len(std_decisions) == 1
+      assert std_decisions[0].id == "ADR-010"
+
+      # Filter by non-existent standard
+      empty_results = registry.filter(standard="STD-999")
+      assert len(empty_results) == 0
+
   def test_iter_with_status_filter(self) -> None:
     """Test iterating with status filter."""
     with tempfile.TemporaryDirectory() as tmpdir:

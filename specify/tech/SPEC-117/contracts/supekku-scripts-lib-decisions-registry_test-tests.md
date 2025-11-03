@@ -32,6 +32,7 @@ Tests for DecisionRegistry class.
 - `test_edge_case_invalid_status_values(self) -> None`: Test handling of ADRs with invalid/non-standard status values.
 - `test_edge_case_permission_errors_handling(self) -> None`: Test graceful handling when symlink creation might fail.
 - `test_filter(self) -> None`: Test filtering decisions.
+- `test_filter_by_standard(self) -> None`: Test filtering decisions by standard reference.
 - `test_find(self) -> None`: Test finding specific decision.
 - `test_init(self) -> None`: Test registry initialization.
 - `test_iter_with_status_filter(self) -> None`: Test iterating with status filter.

@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import yaml
+from rich.console import Console
 
 from supekku.scripts.lib.core.paths import get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
@@ -67,8 +68,11 @@ class ChangeRegistry:
         continue
       try:
         artifact = load_change_artifact(selected)
-      except ValueError:
+      except ValueError as e:
         # Print validation error and continue with remaining artifacts
+        console = Console(stderr=True)
+        rel_path = selected.relative_to(self.root)
+        console.print(f"[yellow]WARNING:[/yellow] Skipping {rel_path}: {e}")
         continue
       if not artifact:
         continue

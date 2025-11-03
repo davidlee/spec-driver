@@ -18,6 +18,7 @@ Tests for format_standard_details function.
 - `test_format_minimal_standard(self) -> None`: Test formatting with minimal required fields.
 - `test_format_preserves_order(self) -> None`: Test that output maintains logical field ordering.
 - `test_format_with_backlinks(self) -> None`: Test formatting with backlinks.
+- `test_format_with_decision_and_policy_backlinks(self) -> None`: Test formatting standards with decision and policy backlinks.
 - `test_format_with_multiple_owners(self) -> None`: Test formatting with multiple owners.
 
 ### TestFormatStandardListJson

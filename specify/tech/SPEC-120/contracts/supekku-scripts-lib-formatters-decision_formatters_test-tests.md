@@ -17,3 +17,5 @@ Tests for format_decision_details function.
 - `test_format_preserves_order(self) -> None`: Test that output maintains logical field ordering.
 - `test_format_with_backlinks(self) -> None`: Test formatting with backlinks.
 - `test_format_with_multiple_authors(self) -> None`: Test formatting with multiple authors.
+- `test_format_with_policies_and_standards(self) -> None`: Test formatting decisions with policy and standard cross-references.
+- `test_format_without_policies_or_standards(self) -> None`: Test that policies and standards are omitted when empty.

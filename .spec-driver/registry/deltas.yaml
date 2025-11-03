@@ -1244,7 +1244,7 @@ deltas:
         phase: IP-010.PHASE-05
   DE-011:
     kind: delta
-    status: draft
+    status: in-progress
     name: Delta - CLI enhanced filtering and self-documentation
     slug: cli-enhanced-filtering-and-self-documentation
     updated: '2025-11-03'
@@ -1376,3 +1376,84 @@ deltas:
           mitigation: Quote patterns in examples; document shell escaping requirements
       - id: IP-011.PHASE-02
         phase: IP-011.PHASE-02
+  DE-012:
+    kind: delta
+    status: completed
+    name: Delta - Restore Entry/Exit Criteria to IP Schema
+    slug: restore-entry-exit-criteria-to-ip-schema
+    updated: '2025-11-03'
+    path: change/deltas/DE-012-restore-entry-exit-criteria-to-ip-schema/DE-012.md
+    applies_to:
+      specs:
+      - PROD-006
+      - SPEC-110
+      - SPEC-114
+      requirements: []
+    plan:
+      id: IP-012
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-012
+        delta: DE-012
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-006
+          - SPEC-110
+          - SPEC-114
+          collaborators: []
+        requirements:
+          targets:
+          - ISSUE-013.FR-013.001
+          - ISSUE-013.FR-013.002
+          - ISSUE-013.NF-013.001
+          dependencies: []
+        phases:
+        - id: IP-012.PHASE-01
+          name: Schema Restoration & Phase Creation Enhancement
+          objective: Restore entry/exit criteria fields to plan.overview schema and
+            update create_phase to copy criteria from IP to phase sheets
+          entrance_criteria:
+          - DE-012 delta reviewed and accepted
+          - ISSUE-013 requirements understood
+          - DE-004 phase creation code reviewed for patterns
+          exit_criteria:
+          - plan_metadata.py schema updated with optional fields
+          - create_phase() copies criteria to phase.overview and phase.tracking
+          - VT-SCHEMA-013-001 passing (schema validation tests)
+          - VT-CREATE-013-002 passing (phase creation tests)
+          - VT-COMPAT-013-001 passing (backward compatibility tests)
+          - All existing tests pass (1200+ tests)
+          - Both ruff and pylint clean
+        - id: IP-012.PHASE-02
+        - id: IP-012.PHASE-01
+        - id: IP-012.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-012.PHASE-01
+        plan: IP-012
+        delta: DE-012
+        objective: Restore entry/exit criteria fields to plan.overview schema and
+          update create_phase to copy criteria from IP to phase sheets
+        entrance_criteria:
+        - DE-004 phase creation code reviewed for patterns
+        - DE-012 delta reviewed and accepted
+        - ISSUE-013 requirements understood
+        exit_criteria:
+        - All existing tests pass (1200+ tests)
+        - Both ruff and pylint clean
+        - VT-COMPAT-013-001 passing (backward compatibility tests)
+        - VT-CREATE-013-002 passing (phase creation tests)
+        - VT-SCHEMA-013-001 passing (schema validation tests)
+        - create_phase() copies criteria to phase.overview and phase.tracking
+        - plan_metadata.py schema updated with optional fields
+        verification:
+          tests: []
+          evidence: []
+        tasks: []
+        risks: []
+      - id: IP-012.PHASE-02
+        phase: IP-012.PHASE-02

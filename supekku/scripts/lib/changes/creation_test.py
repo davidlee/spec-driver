@@ -6,6 +6,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from textwrap import dedent
 
 from supekku.scripts.lib.changes.creation import (
   ChangeArtifactCreated,
@@ -58,9 +59,9 @@ class CreateChangeTest(unittest.TestCase):
     )
 
     # Phase template (Jinja2, no frontmatter)
-    # Uses {{ phase_overview_block }} variable for YAML block
+    # Uses {{ phase_overview_block }} and {{ phase_tracking_block }} variables
     (templates_dir / "phase.md").write_text(
-      "{{ phase_overview_block }}\n",
+      "{{ phase_overview_block }}\n\n{{ phase_tracking_block }}\n",
       encoding="utf-8",
     )
 
@@ -286,6 +287,176 @@ class CreateChangeTest(unittest.TestCase):
     # Verify structure still valid (phases as list)
     assert "phases:" in content_after
     assert content_after.count("- id: ") == 3
+
+  def test_create_phase_copies_criteria_from_plan(self) -> None:
+    """VT-CREATE-013-002: Test phase criteria copied from IP metadata."""
+    root = self._make_repo()
+    # Create delta with plan
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+
+    # Manually edit plan to add full phase metadata
+    plan_content = plan_path.read_text(encoding="utf-8")
+    # Replace the phases section with full metadata
+    replacement = dedent(f"""\
+      - id: {plan_id}.PHASE-01
+        name: Foundation Phase
+        objective: Build the foundation
+        entrance_criteria:
+        - Requirement 1 satisfied
+        - Design approved
+        exit_criteria:
+        - Tests passing
+        - Code reviewed""")
+    updated_plan = plan_content.replace(f"  - id: {plan_id}.PHASE-01", replacement)
+    plan_path.write_text(updated_plan, encoding="utf-8")
+
+    # Remove default phase-01 to test creation from scratch
+    phases_dir = delta_result.directory / "phases"
+    default_phase = phases_dir / "phase-01.md"
+    if default_phase.exists():
+      default_phase.unlink()
+
+    # Create phase from plan with metadata
+    result = create_phase("Foundation Phase", plan_id, repo_root=root)
+
+    # Verify phase file content
+    phase_content = result.phase_path.read_text(encoding="utf-8")
+
+    # Check phase.overview block has criteria (may use YAML block scalars)
+    assert "Build the foundation" in phase_content
+    assert "entrance_criteria:" in phase_content
+    assert "Requirement 1 satisfied" in phase_content
+    assert "Design approved" in phase_content
+    assert "exit_criteria:" in phase_content
+    assert "Tests passing" in phase_content
+    assert "Code reviewed" in phase_content
+
+    # Check phase.tracking block has criteria
+    assert "phase.tracking" in phase_content
+    has_entrance = (
+      'item: "Requirement 1 satisfied"' in phase_content
+      or 'item: "Design approved"' in phase_content
+    )
+    has_exit = (
+      'item: "Tests passing"' in phase_content
+      or 'item: "Code reviewed"' in phase_content
+    )
+    assert has_entrance
+    assert has_exit
+
+  def test_create_phase_id_only_format_graceful_fallback(self) -> None:
+    """VT-CREATE-013-002: Test create_phase works with ID-only format."""
+    root = self._make_repo()
+    # Create delta with plan
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+
+    # Plan already has ID-only format by default
+    plan_content = plan_path.read_text(encoding="utf-8")
+    assert f"- id: {plan_id}.PHASE-01" in plan_content
+    # Verify no metadata (just ID)
+    assert "entrance_criteria:" not in plan_content.split("phases:")[1].split("```")[0]
+
+    # Remove default phase-01
+    phases_dir = delta_result.directory / "phases"
+    default_phase = phases_dir / "phase-01.md"
+    if default_phase.exists():
+      default_phase.unlink()
+
+    # Create phase - should work without errors
+    result = create_phase("Phase 01 - Minimal", plan_id, repo_root=root)
+
+    # Verify phase created successfully
+    assert result.phase_path.exists()
+    phase_content = result.phase_path.read_text(encoding="utf-8")
+    assert f"phase: {plan_id}.PHASE-01" in phase_content
+
+  def test_create_phase_partial_metadata_handles_correctly(self) -> None:
+    """VT-CREATE-013-002: Test partial metadata (some fields present)."""
+    root = self._make_repo()
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+
+    # Add partial metadata (only entrance_criteria, no exit_criteria or objective)
+    plan_content = plan_path.read_text(encoding="utf-8")
+    updated_plan = plan_content.replace(
+      f"  - id: {plan_id}.PHASE-01",
+      f"""  - id: {plan_id}.PHASE-01
+    entrance_criteria:
+    - Entry criterion only""",
+    )
+    plan_path.write_text(updated_plan, encoding="utf-8")
+
+    # Remove default phase
+    phases_dir = delta_result.directory / "phases"
+    (phases_dir / "phase-01.md").unlink()
+
+    # Create phase
+    result = create_phase("Partial Metadata Phase", plan_id, repo_root=root)
+
+    # Verify entrance criteria copied but no exit criteria
+    phase_content = result.phase_path.read_text(encoding="utf-8")
+    assert 'item: "Entry criterion only"' in phase_content
+    # phase.tracking should have entrance but empty exit
+    assert "entrance_criteria:" in phase_content
+
+  def test_create_phase_empty_criteria_arrays_handled(self) -> None:
+    """VT-CREATE-013-002: Test empty criteria arrays handled correctly."""
+    root = self._make_repo()
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+
+    # Add empty criteria arrays
+    plan_content = plan_path.read_text(encoding="utf-8")
+    updated_plan = plan_content.replace(
+      f"  - id: {plan_id}.PHASE-01",
+      f"""  - id: {plan_id}.PHASE-01
+    objective: Test empty arrays
+    entrance_criteria: []
+    exit_criteria: []""",
+    )
+    plan_path.write_text(updated_plan, encoding="utf-8")
+
+    # Remove default phase
+    phases_dir = delta_result.directory / "phases"
+    (phases_dir / "phase-01.md").unlink()
+
+    # Create phase - should not fail
+    result = create_phase("Empty Arrays Phase", plan_id, repo_root=root)
+
+    # Verify phase created
+    assert result.phase_path.exists()
+    phase_content = result.phase_path.read_text(encoding="utf-8")
+    assert "Test empty arrays" in phase_content
 
 
 if __name__ == "__main__":

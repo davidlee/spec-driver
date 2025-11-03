@@ -641,6 +641,199 @@ class PhaseDualValidationTest(unittest.TestCase):
     assert any("risks" in err.lower() or "array" in err.lower() for err in new_errors)
 
 
+class PlanPhasesMetadataTest(unittest.TestCase):
+  """VT-SCHEMA-013-001: Test phase metadata fields in plan.overview (DE-012)."""
+
+  def test_plan_with_full_phase_metadata(self):
+    """Plan accepts phases with all optional metadata fields."""
+    data = {
+      "schema": PLAN_SCHEMA,
+      "version": PLAN_VERSION,
+      "plan": "IP-012",
+      "delta": "DE-012",
+      "phases": [
+        {
+          "id": "IP-012.PHASE-01",
+          "name": "Schema Restoration",
+          "objective": "Restore entry/exit criteria to plan.overview schema",
+          "entrance_criteria": ["DE-012 approved", "ISSUE-013 understood"],
+          "exit_criteria": ["Schema updated", "Tests passing"],
+        }
+      ],
+    }
+
+    validator = MetadataValidator(PLAN_OVERVIEW_METADATA)
+    errors = validator.validate(data)
+    assert errors == [], f"Expected no errors, got: {errors}"
+
+  def test_plan_with_id_only_phases(self):
+    """Plan accepts phases with only required ID field (backward compat)."""
+    data = {
+      "schema": PLAN_SCHEMA,
+      "version": PLAN_VERSION,
+      "plan": "IP-012",
+      "delta": "DE-012",
+      "phases": [
+        {"id": "IP-012.PHASE-01"},
+        {"id": "IP-012.PHASE-02"},
+      ],
+    }
+
+    validator = MetadataValidator(PLAN_OVERVIEW_METADATA)
+    errors = validator.validate(data)
+    assert errors == [], f"Expected no errors, got: {errors}"
+
+  def test_plan_with_mixed_phase_formats(self):
+    """Plan accepts mix of full metadata and ID-only phases."""
+    data = {
+      "schema": PLAN_SCHEMA,
+      "version": PLAN_VERSION,
+      "plan": "IP-012",
+      "delta": "DE-012",
+      "phases": [
+        {
+          "id": "IP-012.PHASE-01",
+          "name": "Full metadata phase",
+          "objective": "Has all fields",
+          "entrance_criteria": ["Entry 1"],
+          "exit_criteria": ["Exit 1"],
+        },
+        {"id": "IP-012.PHASE-02"},  # ID-only
+        {
+          "id": "IP-012.PHASE-03",
+          "name": "Partial metadata",
+          "entrance_criteria": ["Entry 3"],
+        },
+      ],
+    }
+
+    validator = MetadataValidator(PLAN_OVERVIEW_METADATA)
+    errors = validator.validate(data)
+    assert errors == [], f"Expected no errors, got: {errors}"
+
+  def test_plan_with_empty_criteria_arrays(self):
+    """Plan accepts empty entrance_criteria and exit_criteria arrays."""
+    data = {
+      "schema": PLAN_SCHEMA,
+      "version": PLAN_VERSION,
+      "plan": "IP-012",
+      "delta": "DE-012",
+      "phases": [
+        {
+          "id": "IP-012.PHASE-01",
+          "name": "Empty criteria",
+          "objective": "Test empty arrays",
+          "entrance_criteria": [],
+          "exit_criteria": [],
+        }
+      ],
+    }
+
+    validator = MetadataValidator(PLAN_OVERVIEW_METADATA)
+    errors = validator.validate(data)
+    assert errors == [], f"Expected no errors, got: {errors}"
+
+  def test_plan_phase_name_wrong_type(self):
+    """Plan rejects phase name of wrong type."""
+    data = {
+      "schema": PLAN_SCHEMA,
+      "version": PLAN_VERSION,
+      "plan": "IP-012",
+      "delta": "DE-012",
+      "phases": [
+        {
+          "id": "IP-012.PHASE-01",
+          "name": 123,  # Should be string
+        }
+      ],
+    }
+
+    validator = MetadataValidator(PLAN_OVERVIEW_METADATA)
+    errors = validator.validate(data)
+    assert len(errors) > 0
+    assert any("name" in str(err).lower() for err in errors)
+
+  def test_plan_phase_objective_wrong_type(self):
+    """Plan rejects phase objective of wrong type."""
+    data = {
+      "schema": PLAN_SCHEMA,
+      "version": PLAN_VERSION,
+      "plan": "IP-012",
+      "delta": "DE-012",
+      "phases": [
+        {
+          "id": "IP-012.PHASE-01",
+          "objective": ["not", "a", "string"],  # Should be string
+        }
+      ],
+    }
+
+    validator = MetadataValidator(PLAN_OVERVIEW_METADATA)
+    errors = validator.validate(data)
+    assert len(errors) > 0
+    assert any("objective" in str(err).lower() for err in errors)
+
+  def test_plan_phase_entrance_criteria_wrong_type(self):
+    """Plan rejects entrance_criteria of wrong type."""
+    data = {
+      "schema": PLAN_SCHEMA,
+      "version": PLAN_VERSION,
+      "plan": "IP-012",
+      "delta": "DE-012",
+      "phases": [
+        {
+          "id": "IP-012.PHASE-01",
+          "entrance_criteria": "not an array",  # Should be array
+        }
+      ],
+    }
+
+    validator = MetadataValidator(PLAN_OVERVIEW_METADATA)
+    errors = validator.validate(data)
+    assert len(errors) > 0
+    assert any("entrance_criteria" in str(err).lower() for err in errors)
+
+  def test_plan_phase_exit_criteria_wrong_type(self):
+    """Plan rejects exit_criteria of wrong type."""
+    data = {
+      "schema": PLAN_SCHEMA,
+      "version": PLAN_VERSION,
+      "plan": "IP-012",
+      "delta": "DE-012",
+      "phases": [
+        {
+          "id": "IP-012.PHASE-01",
+          "exit_criteria": {"key": "value"},  # Should be array
+        }
+      ],
+    }
+
+    validator = MetadataValidator(PLAN_OVERVIEW_METADATA)
+    errors = validator.validate(data)
+    assert len(errors) > 0
+    assert any("exit_criteria" in str(err).lower() for err in errors)
+
+  def test_plan_phase_criteria_items_must_be_strings(self):
+    """Plan rejects criteria arrays with non-string items."""
+    data = {
+      "schema": PLAN_SCHEMA,
+      "version": PLAN_VERSION,
+      "plan": "IP-012",
+      "delta": "DE-012",
+      "phases": [
+        {
+          "id": "IP-012.PHASE-01",
+          # Has non-string item
+          "entrance_criteria": ["Valid string", 123, "Another string"],
+        }
+      ],
+    }
+
+    validator = MetadataValidator(PLAN_OVERVIEW_METADATA)
+    errors = validator.validate(data)
+    assert len(errors) > 0
+
+
 class JSONSchemaGenerationTest(unittest.TestCase):
   """Test JSON Schema generation for plan and phase metadata."""
 
@@ -664,6 +857,33 @@ class JSONSchemaGenerationTest(unittest.TestCase):
     # Check phases is array with min items
     assert schema["properties"]["phases"]["type"] == "array"
     assert schema["properties"]["phases"]["minItems"] == 1
+
+  def test_plan_phases_optional_fields_in_json_schema(self):
+    """Plan JSON Schema includes optional phase metadata fields."""
+    schema = metadata_to_json_schema(PLAN_OVERVIEW_METADATA)
+
+    # Get phase items schema
+    phase_items = schema["properties"]["phases"]["items"]
+    phase_props = phase_items["properties"]
+
+    # Check that optional fields are present
+    assert "name" in phase_props
+    assert "objective" in phase_props
+    assert "entrance_criteria" in phase_props
+    assert "exit_criteria" in phase_props
+
+    # Check field types
+    assert phase_props["name"]["type"] == "string"
+    assert phase_props["objective"]["type"] == "string"
+    assert phase_props["entrance_criteria"]["type"] == "array"
+    assert phase_props["exit_criteria"]["type"] == "array"
+
+    # Check only ID is required in phase items
+    assert "id" in phase_items["required"]
+    assert "name" not in phase_items.get("required", [])
+    assert "objective" not in phase_items.get("required", [])
+    assert "entrance_criteria" not in phase_items.get("required", [])
+    assert "exit_criteria" not in phase_items.get("required", [])
 
   def test_phase_metadata_generates_json_schema(self):
     """Phase metadata can be converted to JSON Schema."""

@@ -39,4 +39,11 @@ Registry for managing Policies.
 - `sync(self) -> None`: Sync registry by collecting policies and writing to YAML.
 - `write(self, path) -> None`: Write registry to YAML file.
 - `__init__(self) -> None`
+- `_build_backlinks(self, policies) -> None`: Build backlinks from decisions that reference policies.
+
+Per ADR-002, backlinks are computed at runtime from forward references,
+not stored in frontmatter.
+
+Args:
+    policies: Dictionary of PolicyRecords to populate with backlinks
 - `_parse_policy_file(self, policy_path) -> <BinOp>`: Parse an individual policy file into a PolicyRecord.

@@ -1,49 +1,6 @@
 {{ phase_overview_block }}
 
-```yaml supekku:phase.tracking@v1
-# OPTIONAL: Structured progress tracking (recommended for accurate status)
-# When present, this block takes precedence over markdown checkboxes for completion calculation.
-schema: supekku.phase.tracking
-version: 1
-phase: {{ phase_id }}
-files:  # OPTIONAL: Phase-level file references
-  references:
-    - "path/to/reference/doc.md"  # Research/reference materials
-    - "path/to/exemplar/code.py"  # Example code patterns
-  context:
-    - "path/to/similar/phase.md"  # Related phases, similar implementations
-entrance_criteria:
-  - item: "Describe entrance criterion 1"
-    completed: false
-  - item: "Describe entrance criterion 2"
-    completed: false
-exit_criteria:
-  - item: "Describe exit criterion 1"
-    completed: false
-  - item: "Describe exit criterion 2"
-    completed: false
-tasks:
-  - id: "1.1"
-    description: "Task description"
-    status: pending  # pending | in_progress | completed | blocked
-    files:  # OPTIONAL: Track which files changed in this task
-      added:
-        - "path/to/new/file.py"
-      modified:
-        - "path/to/modified/file.py"
-      removed: []
-      tests:
-        - "path/to/test_file.py"
-  - id: "1.2"
-    description: "Another task"
-    status: pending
-    files:
-      added: []
-      modified:
-        - "path/to/another/file.py"
-      removed: []
-      tests: []
-```
+{{ phase_tracking_block }}
 
 # Phase N - <Name>
 

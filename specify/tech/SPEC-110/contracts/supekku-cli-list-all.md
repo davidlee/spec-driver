@@ -11,7 +11,7 @@ Display formatting is delegated to supekku.scripts.lib.formatters
 
 ## Functions
 
-- @app.command(adrs) `list_adrs(root, status, tag, spec, delta, requirement_filter, policy, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List Architecture Decision Records (ADRs) with optional filtering.
+- @app.command(adrs) `list_adrs(root, status, tag, spec, delta, requirement_filter, policy, standard, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List Architecture Decision Records (ADRs) with optional filtering.
 
 The --regexp flag filters on title and summary fields.
 Other flags filter on specific structured fields (status, tags, references).

@@ -17,6 +17,7 @@ Tests for format_policy_details function.
 - `test_format_minimal_policy(self) -> None`: Test formatting with minimal required fields.
 - `test_format_preserves_order(self) -> None`: Test that output maintains logical field ordering.
 - `test_format_with_backlinks(self) -> None`: Test formatting with backlinks.
+- `test_format_with_decision_backlinks(self) -> None`: Test formatting policies with decision backlinks.
 - `test_format_with_multiple_owners(self) -> None`: Test formatting with multiple owners.
 
 ### TestFormatPolicyListJson

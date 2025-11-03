@@ -47,4 +47,11 @@ Registry for managing Standards.
 - `sync(self) -> None`: Sync registry by collecting standards and writing to YAML.
 - `write(self, path) -> None`: Write registry to YAML file.
 - `__init__(self) -> None`
+- `_build_backlinks(self, standards) -> None`: Build backlinks from decisions and policies that reference standards.
+
+Per ADR-002, backlinks are computed at runtime from forward references,
+not stored in frontmatter.
+
+Args:
+    standards: Dictionary of StandardRecords to populate with backlinks
 - `_parse_standard_file(self, standard_path) -> <BinOp>`: Parse an individual standard file into a StandardRecord.

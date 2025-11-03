@@ -627,6 +627,13 @@ def list_adrs(
       help="Filter by policy reference",
     ),
   ] = None,
+  standard: Annotated[
+    str | None,
+    typer.Option(
+      "--standard",
+      help="Filter by standard reference",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -657,13 +664,14 @@ def list_adrs(
     registry = DecisionRegistry(root=root)
 
     # Apply structured filters
-    if any([tag, spec, delta, requirement_filter, policy]):
+    if any([tag, spec, delta, requirement_filter, policy, standard]):
       decisions = registry.filter(
         tag=tag,
         spec=spec,
         delta=delta,
         requirement=requirement_filter,
         policy=policy,
+        standard=standard,
       )
     else:
       decisions = list(registry.iter(status=status))

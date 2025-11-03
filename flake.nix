@@ -32,6 +32,8 @@
               bun
               go
 
+              marksman # for serena
+
               # treesitter
               tree-sitter
               tree-sitter-grammars.tree-sitter-python

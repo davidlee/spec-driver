@@ -8,11 +8,12 @@ Unified synchronization command for specs, ADRs, and registries.
 
 ## Functions
 
-- @app.command `sync(targets, language, existing, check, dry_run, allow_missing_source, specs, adr, prune, force) -> None`: Synchronize specifications and registries with source code.
+- @app.command `sync(targets, language, existing, check, dry_run, allow_missing_source, specs, adr, backlog, prune, force) -> None`: Synchronize specifications and registries with source code.
 
 Unified command for multi-language spec synchronization. Supports:
 - Go (via gomarkdoc)
 - Python (via AST analysis)
 - ADR/decision registry synchronization
+- Backlog priority registry synchronization
 
-By default, only syncs specs. Use --adr to also sync ADR registry.
+By default, only syncs specs. Use --adr or --backlog to sync registries.

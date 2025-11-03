@@ -171,5 +171,174 @@ class SpecRegistryTest(RepoTestCase):
     assert package_none is None, "Non-existent file should return None"
 
 
+class TestSpecRegistryReverseQueries(RepoTestCase):
+  """Test reverse relationship query methods for SpecRegistry."""
+
+  def _make_repo(self) -> Path:
+    root = super()._make_repo()
+    os.chdir(root)
+    return root
+
+  def _write_spec_with_adrs(self, root: Path, spec_id: str, adr_ids: list[str]) -> None:
+    """Write a spec that references specific ADRs."""
+    kind = "tech" if spec_id.startswith("SPEC-") else "product"
+    spec_dir = root / "specify" / kind / f"{spec_id.lower()}-sample"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / f"{spec_id}.md"
+
+    # Create frontmatter with informed_by field
+    frontmatter = {
+      "id": spec_id,
+      "slug": spec_id.lower(),
+      "name": f"Spec {spec_id}",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec" if kind == "tech" else "prod",
+      "informed_by": adr_ids,
+    }
+    dump_markdown_file(spec_path, frontmatter, f"# {spec_id}\n")
+
+  def test_find_by_informed_by_single_adr(self) -> None:
+    """Test finding specs informed by a specific ADR."""
+    root = self._make_repo()
+    self._write_spec_with_adrs(root, "SPEC-001", ["ADR-001"])
+    self._write_spec_with_adrs(root, "SPEC-002", ["ADR-002"])
+
+    registry = SpecRegistry(root)
+
+    specs = registry.find_by_informed_by("ADR-001")
+
+    assert isinstance(specs, list)
+    assert len(specs) == 1
+    assert specs[0].id == "SPEC-001"
+
+  def test_find_by_informed_by_multiple_specs_same_adr(self) -> None:
+    """Test finding multiple specs informed by same ADR."""
+    root = self._make_repo()
+    self._write_spec_with_adrs(root, "SPEC-001", ["ADR-010"])
+    self._write_spec_with_adrs(root, "SPEC-002", ["ADR-010", "ADR-011"])
+    self._write_spec_with_adrs(root, "PROD-001", ["ADR-010"])
+
+    registry = SpecRegistry(root)
+
+    specs = registry.find_by_informed_by("ADR-010")
+
+    assert isinstance(specs, list)
+    assert len(specs) == 3
+    spec_ids = {s.id for s in specs}
+    assert "SPEC-001" in spec_ids
+    assert "SPEC-002" in spec_ids
+    assert "PROD-001" in spec_ids
+
+  def test_find_by_informed_by_nonexistent_adr(self) -> None:
+    """Test finding specs for non-existent ADR returns empty list."""
+    root = self._make_repo()
+    self._write_spec_with_adrs(root, "SPEC-001", ["ADR-001"])
+
+    registry = SpecRegistry(root)
+
+    specs = registry.find_by_informed_by("ADR-999")
+
+    assert isinstance(specs, list)
+    assert len(specs) == 0
+
+  def test_find_by_informed_by_none(self) -> None:
+    """Test find_by_informed_by with None returns empty list."""
+    root = self._make_repo()
+
+    registry = SpecRegistry(root)
+
+    specs = registry.find_by_informed_by(None)
+
+    assert isinstance(specs, list)
+    assert len(specs) == 0
+
+  def test_find_by_informed_by_empty_string(self) -> None:
+    """Test find_by_informed_by with empty string returns empty list."""
+    root = self._make_repo()
+
+    registry = SpecRegistry(root)
+
+    specs = registry.find_by_informed_by("")
+
+    assert isinstance(specs, list)
+    assert len(specs) == 0
+
+  def test_find_by_informed_by_returns_spec_objects(self) -> None:
+    """Test that find_by_informed_by returns proper Spec objects."""
+    root = self._make_repo()
+    self._write_spec_with_adrs(root, "SPEC-001", ["ADR-001"])
+
+    registry = SpecRegistry(root)
+
+    specs = registry.find_by_informed_by("ADR-001")
+
+    assert len(specs) == 1
+    spec = specs[0]
+
+    # Verify it's a Spec with expected attributes
+    assert isinstance(spec, Spec)
+    assert spec.id == "SPEC-001"
+    assert hasattr(spec, "slug")
+    assert hasattr(spec, "kind")
+    assert "ADR-001" in spec.informed_by
+
+  def test_find_by_informed_by_case_sensitive(self) -> None:
+    """Test that ADR ID matching is case-sensitive."""
+    root = self._make_repo()
+    self._write_spec_with_adrs(root, "SPEC-001", ["ADR-001"])
+
+    registry = SpecRegistry(root)
+
+    # Correct case
+    specs_upper = registry.find_by_informed_by("ADR-001")
+    # Wrong case
+    specs_lower = registry.find_by_informed_by("adr-001")
+
+    assert len(specs_upper) == 1
+    assert len(specs_lower) == 0
+
+  def test_find_by_informed_by_spec_without_informed_by_field(self) -> None:
+    """Test that specs without informed_by field are not returned."""
+    root = self._make_repo()
+
+    # Create spec WITHOUT informed_by field
+    spec_dir = root / "specify" / "tech" / "spec-003-sample"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / "SPEC-003.md"
+    frontmatter = {
+      "id": "SPEC-003",
+      "slug": "spec-003",
+      "name": "Spec 003",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+    }
+    dump_markdown_file(spec_path, frontmatter, "# SPEC-003\n")
+
+    registry = SpecRegistry(root)
+
+    specs = registry.find_by_informed_by("ADR-001")
+
+    assert isinstance(specs, list)
+    assert len(specs) == 0
+
+  def test_find_by_informed_by_works_with_prod_specs(self) -> None:
+    """Test finding PROD specs by ADR."""
+    root = self._make_repo()
+    self._write_spec_with_adrs(root, "PROD-005", ["ADR-020"])
+
+    registry = SpecRegistry(root)
+
+    specs = registry.find_by_informed_by("ADR-020")
+
+    assert isinstance(specs, list)
+    assert len(specs) == 1
+    assert specs[0].id == "PROD-005"
+    assert specs[0].kind == "prod"
+
+
 if __name__ == "__main__":
   unittest.main()

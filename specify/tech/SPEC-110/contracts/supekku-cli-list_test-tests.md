@@ -29,3 +29,27 @@ Test cases for backlog listing shortcut commands.
 - `_create_sample_issue(self, issue_id, title, status) -> None`: Helper to create a sample issue file.
 - `_create_sample_problem(self, prob_id, title, status) -> None`: Helper to create a sample problem file.
 - `_create_sample_risk(self, risk_id, title, status) -> None`: Helper to create a sample risk file.
+
+### ListRequirementsCategoryFilterTest
+
+Test cases for requirements listing with category filtering (VT-017-003, VT-017-004).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`: Set up test environment with requirements registry including categories.
+- `tearDown(self) -> None`: Clean up test environment.
+- `test_category_column_in_json_output(self) -> None`: VT-017-004: Test category field in JSON format. - category should be present
+- `test_category_column_in_table_output(self) -> None`: VT-017-004: Test category column appears in table output.
+- `test_category_column_in_tsv_output(self) -> None`: VT-017-004: Test category column in TSV format.
+- `test_category_filter_case_insensitive(self) -> None`: VT-017-003: Test --category with -i flag for case-insensitive matching.
+- `test_category_filter_case_sensitive(self) -> None`: VT-017-003: Test --category filter is case-sensitive by default.
+- `test_category_filter_combined_with_other_filters(self) -> None`: VT-017-003: Test --category combined with --kind filter.
+- `test_category_filter_exact_match(self) -> None`: VT-017-003: Test --category filter with exact match.
+- `test_category_filter_excludes_uncategorized(self) -> None`: VT-017-003: Test --category filter excludes requirements with null category.
+- `test_category_filter_substring_match(self) -> None`: VT-017-003: Test --category filter with substring matching. - performance, not auth
+- `test_empty_result_with_category_filter(self) -> None`: VT-017-003: Test category filter with no matches returns empty gracefully.
+- `test_regexp_filter_category_case_insensitive(self) -> None`: VT-017-003: Test -r with -i flag makes category search case-insensitive. - category: security
+- `test_regexp_filter_includes_category(self) -> None`: VT-017-003: Test -r regexp filter searches category field.
+- `test_uncategorized_requirements_show_placeholder(self) -> None`: VT-017-004: Test uncategorized requirements display correctly.

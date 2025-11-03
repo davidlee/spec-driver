@@ -858,5 +858,245 @@ requirements:
     assert restored_no_cat.category is None
 
 
+class TestRequirementsRegistryReverseQueries(unittest.TestCase):
+  """Test reverse relationship query methods for RequirementsRegistry."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def _make_repo(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+    return root
+
+  def _write_spec_with_requirements(self, root: Path, spec_id: str, requirements: list[str]) -> None:
+    """Write a spec file with specific requirements."""
+    spec_dir = root / "specify" / "tech" / f"{spec_id.lower()}-example"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / f"{spec_id}.md"
+
+    req_lines = "\n".join(f"- {req}" for req in requirements)
+    body = (
+      f"# {spec_id}\n\n"
+      "## 6. Quality & Operational Requirements\n\n"
+      f"{req_lines}\n"
+    )
+
+    frontmatter = {
+      "id": spec_id,
+      "slug": spec_id.lower(),
+      "name": f"Spec {spec_id}",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+    }
+    dump_markdown_file(spec_path, frontmatter, body)
+
+  def _create_registry_with_verification(self, root: Path) -> RequirementsRegistry:
+    """Create requirements registry and manually add verification metadata."""
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+
+    registry.sync_from_specs([root / "specify" / "tech"], spec_registry=spec_registry)
+
+    # Manually add verification metadata to requirements
+    # This simulates what would happen after coverage blocks are processed
+    if "SPEC-001.FR-001" in registry.records:
+      registry.records["SPEC-001.FR-001"].verified_by = ["VT-CLI-001"]
+      registry.records["SPEC-001.FR-001"].coverage_evidence = ["VT-PROD010-001"]
+
+    if "SPEC-001.FR-002" in registry.records:
+      registry.records["SPEC-001.FR-002"].verified_by = ["VA-REVIEW-001"]
+      registry.records["SPEC-001.FR-002"].coverage_evidence = []
+
+    if "SPEC-001.NF-020" in registry.records:
+      registry.records["SPEC-001.NF-020"].verified_by = []
+      registry.records["SPEC-001.NF-020"].coverage_evidence = ["VT-CLI-001", "VT-CLI-002"]
+
+    return registry
+
+  def test_find_by_verified_by_exact_match(self) -> None:
+    """Test finding requirements verified by specific artifact (exact match)."""
+    root = self._make_repo()
+    self._write_spec_with_requirements(root, "SPEC-001", ["FR-001: First requirement", "FR-002: Second requirement"])
+
+    registry = self._create_registry_with_verification(root)
+
+    # Find requirement verified by VT-CLI-001
+    requirements = registry.find_by_verified_by("VT-CLI-001")
+
+    assert isinstance(requirements, list)
+    assert len(requirements) == 1
+    assert requirements[0].uid == "SPEC-001.FR-001"
+
+  def test_find_by_verified_by_searches_both_fields(self) -> None:
+    """Test that find_by_verified_by searches both verified_by and coverage_evidence."""
+    root = self._make_repo()
+    self._write_spec_with_requirements(
+      root,
+      "SPEC-001",
+      ["FR-001: First requirement", "NF-020: Performance requirement"],
+    )
+
+    registry = self._create_registry_with_verification(root)
+
+    # VT-CLI-001 appears in verified_by for FR-001 and coverage_evidence for NF-020
+    requirements = registry.find_by_verified_by("VT-CLI-001")
+
+    assert isinstance(requirements, list)
+    assert len(requirements) == 2
+    uids = {r.uid for r in requirements}
+    assert "SPEC-001.FR-001" in uids
+    assert "SPEC-001.NF-020" in uids
+
+  def test_find_by_verified_by_glob_pattern(self) -> None:
+    """Test finding requirements with glob pattern matching."""
+    root = self._make_repo()
+    self._write_spec_with_requirements(
+      root,
+      "SPEC-001",
+      ["FR-001: First requirement", "FR-002: Second requirement", "NF-020: Performance"],
+    )
+
+    registry = self._create_registry_with_verification(root)
+
+    # Find all requirements verified by VT-CLI-* pattern
+    requirements = registry.find_by_verified_by("VT-CLI-*")
+
+    assert isinstance(requirements, list)
+    assert len(requirements) == 2  # FR-001 and NF-020 have VT-CLI artifacts
+    uids = {r.uid for r in requirements}
+    assert "SPEC-001.FR-001" in uids
+    assert "SPEC-001.NF-020" in uids
+
+  def test_find_by_verified_by_va_pattern(self) -> None:
+    """Test finding requirements with VA (agent validation) artifacts."""
+    root = self._make_repo()
+    self._write_spec_with_requirements(root, "SPEC-001", ["FR-002: Second requirement"])
+
+    registry = self._create_registry_with_verification(root)
+
+    # Find requirements with VA artifacts
+    requirements = registry.find_by_verified_by("VA-*")
+
+    assert isinstance(requirements, list)
+    assert len(requirements) == 1
+    assert requirements[0].uid == "SPEC-001.FR-002"
+
+  def test_find_by_verified_by_vt_prefix_pattern(self) -> None:
+    """Test finding requirements with VT-PROD prefix."""
+    root = self._make_repo()
+    self._write_spec_with_requirements(root, "SPEC-001", ["FR-001: First requirement"])
+
+    registry = self._create_registry_with_verification(root)
+
+    # Find requirements verified by VT-PROD* artifacts
+    requirements = registry.find_by_verified_by("VT-PROD*")
+
+    assert isinstance(requirements, list)
+    assert len(requirements) == 1
+    assert requirements[0].uid == "SPEC-001.FR-001"
+
+  def test_find_by_verified_by_nonexistent_artifact(self) -> None:
+    """Test finding requirements for non-existent artifact returns empty list."""
+    root = self._make_repo()
+    self._write_spec_with_requirements(root, "SPEC-001", ["FR-001: First requirement"])
+
+    registry = self._create_registry_with_verification(root)
+
+    requirements = registry.find_by_verified_by("NONEXISTENT-ARTIFACT")
+
+    assert isinstance(requirements, list)
+    assert len(requirements) == 0
+
+  def test_find_by_verified_by_none(self) -> None:
+    """Test find_by_verified_by with None returns empty list."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    requirements = registry.find_by_verified_by(None)
+
+    assert isinstance(requirements, list)
+    assert len(requirements) == 0
+
+  def test_find_by_verified_by_empty_string(self) -> None:
+    """Test find_by_verified_by with empty string returns empty list."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    requirements = registry.find_by_verified_by("")
+
+    assert isinstance(requirements, list)
+    assert len(requirements) == 0
+
+  def test_find_by_verified_by_returns_requirement_records(self) -> None:
+    """Test that find_by_verified_by returns proper RequirementRecord objects."""
+    root = self._make_repo()
+    self._write_spec_with_requirements(root, "SPEC-001", ["FR-001: First requirement"])
+
+    registry = self._create_registry_with_verification(root)
+
+    requirements = registry.find_by_verified_by("VT-CLI-001")
+
+    assert len(requirements) == 1
+    req = requirements[0]
+
+    # Verify it's a RequirementRecord with expected attributes
+    assert isinstance(req, RequirementRecord)
+    assert hasattr(req, "uid")
+    assert hasattr(req, "label")
+    assert hasattr(req, "title")
+    assert hasattr(req, "verified_by")
+    assert hasattr(req, "coverage_evidence")
+
+  def test_find_by_verified_by_case_sensitive(self) -> None:
+    """Test that artifact ID matching is case-sensitive."""
+    root = self._make_repo()
+    self._write_spec_with_requirements(root, "SPEC-001", ["FR-001: First requirement"])
+
+    registry = self._create_registry_with_verification(root)
+
+    # Correct case
+    requirements_upper = registry.find_by_verified_by("VT-CLI-001")
+    # Wrong case
+    requirements_lower = registry.find_by_verified_by("vt-cli-001")
+
+    assert len(requirements_upper) == 1
+    assert len(requirements_lower) == 0
+
+  def test_find_by_verified_by_glob_wildcard_positions(self) -> None:
+    """Test glob patterns with wildcards in different positions."""
+    root = self._make_repo()
+    self._write_spec_with_requirements(
+      root,
+      "SPEC-001",
+      ["FR-001: First", "FR-002: Second", "NF-020: Third"],
+    )
+
+    registry = self._create_registry_with_verification(root)
+
+    # Test *-001 pattern (wildcard at start)
+    requirements = registry.find_by_verified_by("*-001")
+    uids = {r.uid for r in requirements}
+    assert "SPEC-001.FR-001" in uids  # VT-CLI-001
+    assert "SPEC-001.FR-002" in uids  # VA-REVIEW-001
+
+    # Test VT-* pattern (wildcard at end)
+    requirements = registry.find_by_verified_by("VT-*")
+    uids = {r.uid for r in requirements}
+    assert "SPEC-001.FR-001" in uids
+    assert "SPEC-001.NF-020" in uids
+
+
 if __name__ == "__main__":
   unittest.main()

@@ -39,10 +39,12 @@ Other flags filter on specific structured fields (status, tags, references).
 - @app.command(problems) `list_problems(root, status, substring, regexp, case_insensitive, format_type, truncate) -> None`: List backlog problems with optional filtering.
 
 Shortcut for: list backlog --kind problem
-- @app.command(requirements) `list_requirements(root, spec, status, kind, substring, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List requirements with optional filtering.
+- @app.command(requirements) `list_requirements(root, spec, status, kind, category, substring, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List requirements with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
-The --regexp flag does pattern matching on UID, label, and title fields.
+The --regexp flag does pattern matching on UID, label, title, and category fields.
+The --category flag does substring matching on category field.
+Use --case-insensitive (-i) to make regexp and category filters case-insensitive.
 - @app.command(revisions) `list_revisions(root, status, spec, substring, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List revisions with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).

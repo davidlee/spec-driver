@@ -239,5 +239,268 @@ Test risk content.
     assert "ISSUE-001" in result.stdout
 
 
+class ListRequirementsCategoryFilterTest(unittest.TestCase):
+  """Test cases for requirements with category filtering.
+
+  VT-017-003: Category filtering tests
+  VT-017-004: Category display tests
+  """
+
+  def setUp(self) -> None:
+    """Set up test environment with requirements registry including categories."""
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+
+    # Create registry directory and requirements.yaml with categorized requirements
+    registry_dir = self.root / ".spec-driver" / "registry"
+    registry_dir.mkdir(parents=True)
+    registry_file = registry_dir / "requirements.yaml"
+
+    # Sample requirements with various categories
+    registry_content = """---
+requirements:
+  SPEC-001:FR-001:
+    uid: SPEC-001:FR-001
+    label: FR-001
+    title: Authentication flow must validate tokens
+    kind: FR
+    status: pending
+    specs:
+      - SPEC-001
+    primary_spec: SPEC-001
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-001/SPEC-001.md
+    category: auth
+  SPEC-001:FR-002:
+    uid: SPEC-001:FR-002
+    label: FR-002
+    title: Security headers must be present
+    kind: FR
+    status: pending
+    specs:
+      - SPEC-001
+    primary_spec: SPEC-001
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-001/SPEC-001.md
+    category: security
+  SPEC-001:NF-001:
+    uid: SPEC-001:NF-001
+    label: NF-001
+    title: Response time must be under 200ms
+    kind: NF
+    status: pending
+    specs:
+      - SPEC-001
+    primary_spec: SPEC-001
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-001/SPEC-001.md
+    category: performance
+  SPEC-001:FR-003:
+    uid: SPEC-001:FR-003
+    label: FR-003
+    title: User authorization checks required
+    kind: FR
+    status: pending
+    specs:
+      - SPEC-001
+    primary_spec: SPEC-001
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-001/SPEC-001.md
+    category: auth
+  SPEC-001:FR-004:
+    uid: SPEC-001:FR-004
+    label: FR-004
+    title: Data validation without category
+    kind: FR
+    status: pending
+    specs:
+      - SPEC-001
+    primary_spec: SPEC-001
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-001/SPEC-001.md
+    category: null
+"""
+    registry_file.write_text(registry_content, encoding="utf-8")
+
+  def tearDown(self) -> None:
+    """Clean up test environment."""
+    self.tmpdir.cleanup()
+
+  def test_category_filter_exact_match(self) -> None:
+    """VT-017-003: Test --category filter with exact match."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--category", "auth"],
+    )
+
+    assert result.exit_code == 0
+    assert "FR-001" in result.stdout
+    assert "FR-003" in result.stdout
+    assert "FR-002" not in result.stdout  # security, not auth
+    assert "NF-001" not in result.stdout  # performance, not auth
+
+  def test_category_filter_substring_match(self) -> None:
+    """VT-017-003: Test --category filter with substring matching."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--category", "sec"],
+    )
+
+    assert result.exit_code == 0
+    assert "FR-002" in result.stdout  # security contains 'sec'
+    assert "FR-001" not in result.stdout
+    assert "NF-001" not in result.stdout
+
+  def test_category_filter_case_sensitive(self) -> None:
+    """VT-017-003: Test --category filter is case-sensitive by default."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--category", "AUTH"],
+    )
+
+    # Case-sensitive: AUTH should not match 'auth'
+    assert result.exit_code == 0
+    assert "FR-001" not in result.stdout
+    assert "FR-003" not in result.stdout
+
+  def test_category_filter_case_insensitive(self) -> None:
+    """VT-017-003: Test --category with -i flag for case-insensitive matching."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--category", "AUTH", "-i"],
+    )
+
+    assert result.exit_code == 0
+    assert "FR-001" in result.stdout
+    assert "FR-003" in result.stdout
+
+  def test_category_filter_excludes_uncategorized(self) -> None:
+    """VT-017-003: Test --category filter excludes requirements with null category."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--category", "validation"],
+    )
+
+    assert result.exit_code == 0
+    # FR-004 has null category, should not appear
+    assert "FR-004" not in result.stdout
+
+  def test_regexp_filter_includes_category(self) -> None:
+    """VT-017-003: Test -r regexp filter searches category field."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "-r", "auth|perf"],
+    )
+
+    assert result.exit_code == 0
+    assert "FR-001" in result.stdout  # category: auth
+    assert "FR-003" in result.stdout  # category: auth
+    assert "NF-001" in result.stdout  # category: performance (matches 'perf')
+    assert "FR-002" not in result.stdout  # category: security
+
+  def test_regexp_filter_category_case_insensitive(self) -> None:
+    """VT-017-003: Test -r with -i flag makes category search case-insensitive."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "-r", "AUTH", "-i"],
+    )
+
+    assert result.exit_code == 0
+    assert "FR-001" in result.stdout
+    assert "FR-003" in result.stdout
+
+  def test_category_column_in_table_output(self) -> None:
+    """VT-017-004: Test category column appears in table output."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--category", "auth"],
+    )
+
+    assert result.exit_code == 0
+    # Check for table header with Category column
+    assert "Category" in result.stdout
+    # Check for category values in output
+    assert "auth" in result.stdout
+
+  def test_category_column_in_tsv_output(self) -> None:
+    """VT-017-004: Test category column in TSV format."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--format", "tsv"],
+    )
+
+    assert result.exit_code == 0
+    assert "\t" in result.stdout
+    # TSV format should include category column
+    lines = result.stdout.strip().split("\n")
+    # Check that lines have category field (between label and title)
+    # Format: spec\tlabel\tcategory\ttitle\tstatus
+    for line in lines:
+      if "FR-001" in line:
+        parts = line.split("\t")
+        assert len(parts) >= 5
+        assert "auth" in parts  # category should be present
+
+  def test_category_column_in_json_output(self) -> None:
+    """VT-017-004: Test category field in JSON format."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--category", "auth", "--json"],
+    )
+
+    assert result.exit_code == 0
+    # JSON output should include category field
+    assert '"category":' in result.stdout or "'category':" in result.stdout
+    assert "auth" in result.stdout
+
+  def test_uncategorized_requirements_show_placeholder(self) -> None:
+    """VT-017-004: Test uncategorized requirements display correctly."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    # Should show all requirements including uncategorized
+    assert "FR-004" in result.stdout
+    # Category column should show placeholder for null (likely "—" or "-")
+    assert result.stdout.count("—") > 0 or result.stdout.count("-") > 0
+
+  def test_category_filter_combined_with_other_filters(self) -> None:
+    """VT-017-003: Test --category combined with --kind filter."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--category", "auth", "--kind", "FR"],
+    )
+
+    assert result.exit_code == 0
+    assert "FR-001" in result.stdout
+    assert "FR-003" in result.stdout
+    # NF-001 has category but wrong kind
+    assert "NF-001" not in result.stdout
+
+  def test_empty_result_with_category_filter(self) -> None:
+    """VT-017-003: Test category filter with no matches returns empty gracefully."""
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--category", "nonexistent"],
+    )
+
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
+
+
 if __name__ == "__main__":
   unittest.main()

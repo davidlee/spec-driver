@@ -213,6 +213,9 @@ class PolicyRegistry:
 
     policies = self.collect()
 
+    # Build backlinks from decisions that reference policies
+    self._build_backlinks(policies)
+
     registry_data = {
       "policies": {
         policy_id: policy.to_dict(self.root)
@@ -223,6 +226,41 @@ class PolicyRegistry:
     path.parent.mkdir(parents=True, exist_ok=True)
     text = yaml.safe_dump(registry_data, sort_keys=False)
     path.write_text(text, encoding="utf-8")
+
+  def _build_backlinks(self, policies: dict[str, PolicyRecord]) -> None:
+    """Build backlinks from decisions that reference policies.
+
+    Per ADR-002, backlinks are computed at runtime from forward references,
+    not stored in frontmatter.
+
+    Args:
+        policies: Dictionary of PolicyRecords to populate with backlinks
+
+    """
+    # Lazy import to avoid circular dependencies at module load time
+    from supekku.scripts.lib.decisions.registry import (  # noqa: PLC0415
+      DecisionRegistry,
+    )
+
+    # Clear existing backlinks (fresh computation each sync per ADR-002)
+    for policy in policies.values():
+      policy.backlinks = {}
+
+    # Build backlinks from decisions
+    try:
+      decision_registry = DecisionRegistry(root=self.root)
+      decisions = decision_registry.collect()
+
+      for decision in decisions.values():
+        # For each policy this decision references, add backlink
+        for policy_id in decision.policies:
+          if policy_id in policies:
+            policies[policy_id].backlinks.setdefault("decisions", []).append(
+              decision.id
+            )
+    except (FileNotFoundError, ValueError):
+      # Decisions directory might not exist yet
+      pass
 
   def sync(self) -> None:
     """Sync registry by collecting policies and writing to YAML."""

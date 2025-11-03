@@ -222,6 +222,9 @@ class StandardRegistry:
 
     standards = self.collect()
 
+    # Build backlinks from decisions and policies that reference standards
+    self._build_backlinks(standards)
+
     registry_data = {
       "standards": {
         standard_id: standard.to_dict(self.root)
@@ -232,6 +235,60 @@ class StandardRegistry:
     path.parent.mkdir(parents=True, exist_ok=True)
     text = yaml.safe_dump(registry_data, sort_keys=False)
     path.write_text(text, encoding="utf-8")
+
+  def _build_backlinks(self, standards: dict[str, StandardRecord]) -> None:
+    """Build backlinks from decisions and policies that reference standards.
+
+    Per ADR-002, backlinks are computed at runtime from forward references,
+    not stored in frontmatter.
+
+    Args:
+        standards: Dictionary of StandardRecords to populate with backlinks
+
+    """
+    # Lazy imports to avoid circular dependencies at module load time
+    from supekku.scripts.lib.decisions.registry import (  # noqa: PLC0415
+      DecisionRegistry,
+    )
+    from supekku.scripts.lib.policies.registry import (  # noqa: PLC0415
+      PolicyRegistry,
+    )
+
+    # Clear existing backlinks (fresh computation each sync per ADR-002)
+    for standard in standards.values():
+      standard.backlinks = {}
+
+    # Build backlinks from decisions
+    try:
+      decision_registry = DecisionRegistry(root=self.root)
+      decisions = decision_registry.collect()
+
+      for decision in decisions.values():
+        # For each standard this decision references, add backlink
+        for standard_id in decision.standards:
+          if standard_id in standards:
+            standards[standard_id].backlinks.setdefault("decisions", []).append(
+              decision.id
+            )
+    except (FileNotFoundError, ValueError):
+      # Decisions directory might not exist yet
+      pass
+
+    # Build backlinks from policies
+    try:
+      policy_registry = PolicyRegistry(root=self.root)
+      policies = policy_registry.collect()
+
+      for policy in policies.values():
+        # For each standard this policy references, add backlink
+        for standard_id in policy.standards:
+          if standard_id in standards:
+            standards[standard_id].backlinks.setdefault("policies", []).append(
+              policy.id
+            )
+    except (FileNotFoundError, ValueError):
+      # Policies directory might not exist yet
+      pass
 
   def sync(self) -> None:
     """Sync registry by collecting standards and writing to YAML."""

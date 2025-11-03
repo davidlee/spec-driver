@@ -4,7 +4,7 @@ slug: 010-policy-and-standard-management-phase-04
 name: IP-010 Phase 04
 created: '2025-11-03'
 updated: '2025-11-03'
-status: draft
+status: in-progress
 kind: phase
 ---
 
@@ -111,7 +111,7 @@ exit_criteria:
 tasks:
   - id: "4.1"
     description: "Add standards field to DecisionRecord model"
-    status: pending
+    status: completed
     files:
       added: []
       modified:
@@ -120,7 +120,7 @@ tasks:
       tests: []
   - id: "4.2"
     description: "Update DecisionRegistry.sync() for policy/standard backlinks"
-    status: pending
+    status: completed
     files:
       added: []
       modified:
@@ -129,7 +129,7 @@ tasks:
       tests: []
   - id: "4.3"
     description: "Update PolicyRegistry.sync() for decision backlinks"
-    status: pending
+    status: completed
     files:
       added: []
       modified:
@@ -138,7 +138,7 @@ tasks:
       tests: []
   - id: "4.4"
     description: "Update StandardRegistry.sync() for decision/policy backlinks"
-    status: pending
+    status: completed
     files:
       added: []
       modified:
@@ -310,16 +310,16 @@ uv run just test
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 4.1 | Add standards field to DecisionRecord | [ ] | 5 mins - simple model extension |
-| [ ] | 4.2 | Update DecisionRegistry.sync() for backlinks | [ ] | 20 mins - follow existing pattern |
-| [ ] | 4.3 | Update PolicyRegistry.sync() for backlinks | [x] | Can parallelize with 4.2 |
-| [ ] | 4.4 | Update StandardRegistry.sync() for backlinks | [x] | Can parallelize with 4.2/4.3 |
-| [ ] | 4.5 | Add cross-refs to decision_formatters | [ ] | 15 mins - show policies/standards |
-| [ ] | 4.6 | Add backlinks to policy_formatters | [x] | Can parallelize with 4.5 |
-| [ ] | 4.7 | Add backlinks to standard_formatters | [x] | Can parallelize with 4.5/4.6 |
-| [ ] | 4.8 | Add --standard flag to list adrs | [ ] | 10 mins - follow existing pattern |
-| [ ] | 4.9 | Write cross-reference integrity tests | [ ] | 45 mins - comprehensive testing |
-| [ ] | 4.10 | Lint and test all code | [ ] | Final verification |
+| [x] | 4.1 | Add standards field to DecisionRecord | [ ] | ✅ Complete - field added to model, to_dict, parsing |
+| [x] | 4.2 | Update DecisionRegistry.sync() for backlinks | [ ] | ✅ Complete - placeholder for future backlinks |
+| [x] | 4.3 | Update PolicyRegistry.sync() for backlinks | [x] | ✅ Complete - builds backlinks from decisions |
+| [x] | 4.4 | Update StandardRegistry.sync() for backlinks | [x] | ✅ Complete - builds backlinks from decisions + policies |
+| [ ] | 4.5 | Add cross-refs to decision_formatters | [ ] | Pending - show policies/standards in details |
+| [ ] | 4.6 | Add backlinks to policy_formatters | [x] | Pending - show decision backlinks |
+| [ ] | 4.7 | Add backlinks to standard_formatters | [x] | Pending - show decision/policy backlinks |
+| [ ] | 4.8 | Add --standard flag to list adrs | [ ] | Pending - follow --policy pattern |
+| [ ] | 4.9 | Write cross-reference integrity tests | [ ] | Pending - comprehensive testing |
+| [ ] | 4.10 | Lint and test all code | [ ] | Pending - final verification |
 
 ### Task Details
 
@@ -429,6 +429,44 @@ uv run just test
 - Registry YAML is source of truth for backlinks
 
 ## 10. Findings / Research Notes
+
+### Implementation Progress (2025-11-03)
+
+**Tasks 4.1-4.4 Complete** (40 mins)
+
+✅ **Task 4.1**: Added `standards: list[str]` field to DecisionRecord
+- Updated dataclass, `to_dict()`, and `_parse_adr_file()`
+- Backward compatible - defaults to empty list
+- Lint passing
+
+✅ **Task 4.2**: Updated DecisionRegistry with backlink infrastructure
+- Added `_build_backlinks()` method called from `write()`
+- Clears existing backlinks per ADR-002 (derived data)
+- Placeholder for future extensibility (specs/requirements referencing decisions)
+
+✅ **Task 4.3**: PolicyRegistry builds backlinks from decisions
+- Iterates through decisions, finds policies referenced
+- Builds `backlinks["decisions"]` list for each policy
+- Uses lazy import (`noqa: PLC0415`) to avoid circular dependencies
+- Lint passing
+
+✅ **Task 4.4**: StandardRegistry builds backlinks from decisions AND policies
+- Two backlink sources: decisions.standards and policies.standards
+- Populates `backlinks["decisions"]` and `backlinks["policies"]`
+- Handles both artifact types correctly
+- Lint passing
+
+**Key Observations**:
+- Lazy imports with `# noqa: PLC0415` work cleanly for circular dependency avoidance
+- ADR-002 pattern (compute backlinks at runtime, don't persist in frontmatter) followed correctly
+- Backlinks cleared on each sync - fresh computation from forward references
+- All three registries now support cross-reference backlink generation
+
+**Remaining Work** (estimated 1.5-2 hours):
+- Formatter updates (4.5-4.7) - display cross-refs and backlinks
+- CLI flag addition (4.8) - `--standard` for list adrs
+- Integration tests (4.9) - verify backlink integrity
+- Final lint/test (4.10)
 
 ### Pre-flight Analysis (2025-11-03)
 

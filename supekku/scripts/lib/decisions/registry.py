@@ -34,6 +34,7 @@ class DecisionRecord:
   supersedes: list[str] = field(default_factory=list)
   superseded_by: list[str] = field(default_factory=list)
   policies: list[str] = field(default_factory=list)
+  standards: list[str] = field(default_factory=list)
   specs: list[str] = field(default_factory=list)
   requirements: list[str] = field(default_factory=list)
   deltas: list[str] = field(default_factory=list)
@@ -85,6 +86,8 @@ class DecisionRecord:
       data["superseded_by"] = self.superseded_by
     if self.policies:
       data["policies"] = self.policies
+    if self.standards:
+      data["standards"] = self.standards
     if self.specs:
       data["specs"] = self.specs
     if self.requirements:
@@ -203,6 +206,7 @@ class DecisionRegistry:
       supersedes=frontmatter.get("supersedes", []),
       superseded_by=frontmatter.get("superseded_by", []),
       policies=frontmatter.get("policies", []),
+      standards=frontmatter.get("standards", []),
       specs=frontmatter.get("specs", []),
       requirements=frontmatter.get("requirements", []),
       deltas=frontmatter.get("deltas", []),
@@ -243,6 +247,9 @@ class DecisionRegistry:
 
     decisions = self.collect()
 
+    # Build backlinks from policies and standards
+    self._build_backlinks(decisions)
+
     registry_data = {
       "decisions": {
         decision_id: decision.to_dict(self.root)
@@ -253,6 +260,25 @@ class DecisionRegistry:
     path.parent.mkdir(parents=True, exist_ok=True)
     text = yaml.safe_dump(registry_data, sort_keys=False)
     path.write_text(text, encoding="utf-8")
+
+  def _build_backlinks(self, decisions: dict[str, DecisionRecord]) -> None:
+    """Build backlinks for decisions.
+
+    Currently decisions don't receive backlinks from policies/standards,
+    but this method is provided for future extensibility (e.g., specs or
+    requirements referencing decisions).
+
+    Args:
+        decisions: Dictionary of DecisionRecords to populate with backlinks
+
+    """
+    # Clear existing backlinks (fresh computation each sync per ADR-002)
+    for decision in decisions.values():
+      decision.backlinks = {}
+
+    # Note: Decisions contain forward references to policies and standards.
+    # Policies and Standards build their own backlinks to decisions.
+    # If in future we need to show "referenced by" on decisions, add logic here.
 
   def sync(self) -> None:
     """Sync registry by collecting decisions and writing to YAML."""

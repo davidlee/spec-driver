@@ -20,6 +20,7 @@ Test cases for workspace validation functionality.
 - `test_validator_checks_change_relations(self) -> None`: Test validator verifies change relations point to valid requirements.
 - `test_validator_no_warning_deprecated_referencing_deprecated(self) -> None`: Test deprecated ADRs referencing deprecated don't warn.
 - `test_validator_reports_missing_relation_targets(self) -> None`: Test validator detects relation targets referencing missing artifacts.
+- `test_validator_warns_coverage_without_baseline_status(self) -> None`: Test validator warns when requirement has coverage but wrong status (VT-912).
 - `_create_repo(self) -> Path`
 - `_write_adr(self, root, adr_id, status, related_decisions) -> Path`: Helper to create ADR files for testing.
 - `_write_audit(self, root, audit_id, requirement_uid) -> Path`

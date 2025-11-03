@@ -388,7 +388,9 @@ class WorkspaceValidatorTest(RepoTestCase):
 
     assert len(warnings) == 1
     assert req_uid in warnings[0].artifact
-    assert "coverage evidence" in warnings[0].message
+    assert "coverage evidence" in warnings[0].message.lower()
+    assert "VT-001" in warnings[0].message  # Should mention specific artifacts
+    assert "VT-002" in warnings[0].message
     assert "pending" in warnings[0].message
 
     # Fix by changing status to baseline

@@ -16,6 +16,9 @@ Test cases for RequirementsRegistry functionality.
 - `tearDown(self) -> None`
 - `test_compute_status_from_coverage(self) -> None`: Unit test for status computation from coverage entries.
 - `test_coverage_drift_detection(self) -> None`: Registry emits warnings for coverage conflicts. - Planned
+- `test_coverage_evidence_field_serialization(self) -> None`: VT-910: RequirementRecord with coverage_evidence serializes correctly.
+- `test_coverage_evidence_merge(self) -> None`: VT-910: RequirementRecord.merge() combines coverage_evidence correctly.
+- `test_coverage_sync_populates_coverage_evidence(self) -> None`: VT-911: Coverage sync populates coverage_evidence, not verified_by.
 - `test_delta_relationships_block_marks_implemented_by(self) -> None`: Test that delta relationship blocks mark requirements as implemented.
 - `test_move_requirement_updates_primary_spec(self) -> None`: Test that moving a requirement updates its primary spec and UID.
 - `test_relationship_block_adds_collaborators(self) -> None`: Test that spec relationship blocks add collaborator specs to requirements.

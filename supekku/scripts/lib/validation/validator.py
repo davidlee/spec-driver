@@ -68,10 +68,12 @@ class WorkspaceValidator:
       # Validation warning: coverage evidence without proper status
       valid_statuses = ("baseline", "active", "verified")
       if record.coverage_evidence and record.status not in valid_statuses:
+        artifacts = ", ".join(record.coverage_evidence)
         self._warning(
           req_id,
-          f"Requirement has coverage evidence but status is '{record.status}' "
-          f"(expected baseline/active/verified)",
+          f"Has coverage evidence ({artifacts}) but status is '{record.status}'. "
+          f"Expected: baseline/active/verified. "
+          f"Update requirement status to reflect coverage or remove stale artifacts.",
         )
 
       # Validation warning: missing audit verification

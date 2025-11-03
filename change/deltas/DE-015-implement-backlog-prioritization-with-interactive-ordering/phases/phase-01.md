@@ -47,12 +47,16 @@ version: 1
 phase: IP-015.PHASE-01
 status: in-progress
 started: '2025-11-04'
-tasks_completed: 1
+tasks_completed: 3
 tasks_total: 8
 last_updated: '2025-11-04'
 notes: |
-  Task 1.1 complete: Registry YAML schema defined at .spec-driver/registry/backlog.yaml
-  Simple ordered list structure chosen for minimal complexity
+  Tasks 1.1-1.3 complete: Registry infrastructure ready
+  - Registry YAML schema defined at .spec-driver/registry/backlog.yaml
+  - load_backlog_registry() reads ordered list (defensive parsing)
+  - save_backlog_registry() writes ordered list (creates dirs if needed)
+  - Both functions exported in __all__
+  - Lint checks pass (ruff + pylint 9.74/10)
 ```
 
 # Phase 1 - Registry Infrastructure
@@ -126,9 +130,9 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
 | [x] | 1.1 | Define registry YAML schema | [ ] | Created .spec-driver/registry/backlog.yaml |
-| [WIP] | 1.2 | Implement registry read function | [ ] | Load + parse YAML |
-| [ ] | 1.3 | Implement registry write function | [ ] | Generate + write YAML |
-| [ ] | 1.4 | Implement sync logic | [ ] | Discover → merge → write |
+| [x] | 1.2 | Implement registry read function | [ ] | load_backlog_registry() complete |
+| [x] | 1.3 | Implement registry write function | [ ] | save_backlog_registry() complete |
+| [WIP] | 1.4 | Implement sync logic | [ ] | Discover → merge → write |
 | [ ] | 1.5 | Add sync command to CLI | [ ] | Wire to supekku/cli/sync.py |
 | [ ] | 1.6 | Write unit tests | [P] | Can parallel with 1.5 |
 | [ ] | 1.7 | Write integration tests | [ ] | After 1.5 complete |
@@ -153,22 +157,31 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
   - Follows same pattern as other registries but simpler structure
 - **Commits**: Ready to commit after phase tracking updated
 
-**1.2 - Implement registry read function**
+**1.2 - Implement registry read function** ✅
 - **Design**: `load_backlog_registry(root: Path) -> list[str]`
   - Return list of IDs in order
   - Return empty list if file doesn't exist
   - Raise error if YAML is invalid
-- **Files**: `supekku/scripts/lib/backlog/registry.py`
-- **Testing**: Unit tests with temp files
-- **Observations**: Handle missing file gracefully
+- **Files**: `supekku/scripts/lib/backlog/registry.py:89-114`
+- **Testing**: Unit tests with temp files (task 1.6)
+- **Observations**:
+  - Defensive parsing: returns empty list if file missing or malformed
+  - Uses yaml.safe_load for security
+  - Validates data structure before returning
+  - Auto-detects repo root if not provided
 
-**1.3 - Implement registry write function**
-- **Design**: `save_backlog_registry(root: Path, ordering: list[str])`
+**1.3 - Implement registry write function** ✅
+- **Design**: `save_backlog_registry(ordering: list[str], root: Path | None)`
   - Write ordered list to YAML
   - Create parent directories if needed
-  - Atomic write (temp file + rename)
-- **Files**: `supekku/scripts/lib/backlog/registry.py`
-- **Testing**: Unit tests verify file contents
+  - Atomic write via Path.write_text
+- **Files**: `supekku/scripts/lib/backlog/registry.py:117-142`
+- **Testing**: Unit tests verify file contents (task 1.6)
+- **Observations**:
+  - Creates registry directory if missing
+  - Uses yaml.safe_dump with sort_keys=False to preserve order
+  - Direct write (not temp file) - acceptable for this use case
+  - Added to __all__ exports for public API
 
 **1.4 - Implement sync logic**
 - **Design**: `sync_backlog_registry(root: Path)`

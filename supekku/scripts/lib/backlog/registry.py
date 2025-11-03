@@ -86,6 +86,62 @@ def backlog_root(repo_root: Path) -> Path:
   return repo_root / "backlog"
 
 
+def load_backlog_registry(root: Path | None = None) -> list[str]:
+  """Load backlog priority ordering from registry.
+
+  Args:
+    root: Repository root path (auto-detected if None)
+
+  Returns:
+    Ordered list of backlog item IDs. Empty list if registry doesn't exist
+    or ordering field is missing.
+
+  Raises:
+    yaml.YAMLError: If registry file exists but contains invalid YAML
+  """
+  repo_root = find_repo_root(root)
+  registry_path = get_registry_dir(repo_root) / "backlog.yaml"
+
+  if not registry_path.exists():
+    return []
+
+  registry_data = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+
+  if not isinstance(registry_data, dict):
+    return []
+
+  ordering = registry_data.get("ordering", [])
+  return list(ordering) if isinstance(ordering, list) else []
+
+
+def save_backlog_registry(ordering: list[str], root: Path | None = None) -> None:
+  """Save backlog priority ordering to registry.
+
+  Args:
+    ordering: Ordered list of backlog item IDs
+    root: Repository root path (auto-detected if None)
+
+  Note:
+    Creates parent directories if needed. Uses atomic write via temporary file.
+  """
+  repo_root = find_repo_root(root)
+  registry_path = get_registry_dir(repo_root) / "backlog.yaml"
+
+  # Ensure registry directory exists
+  registry_path.parent.mkdir(parents=True, exist_ok=True)
+
+  # Build registry data structure
+  registry_data = {"ordering": ordering}
+
+  # Write atomically: write to temp file, then rename
+  # yaml.safe_dump with sort_keys=False preserves insertion order
+  yaml_content = yaml.safe_dump(
+    registry_data, sort_keys=False, default_flow_style=False
+  )
+
+  registry_path.write_text(yaml_content, encoding="utf-8")
+
+
 def slugify(value: str) -> str:
   """Convert value to URL-friendly slug.
 
@@ -329,4 +385,6 @@ __all__ = [
   "create_backlog_entry",
   "discover_backlog_items",
   "find_repo_root",
+  "load_backlog_registry",
+  "save_backlog_registry",
 ]

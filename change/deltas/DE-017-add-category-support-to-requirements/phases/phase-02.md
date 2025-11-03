@@ -158,8 +158,8 @@ just pylint supekku/scripts/lib/formatters/requirement_formatters.py
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Create requirement_formatters.py module | [ ] | Pure functions, no business logic |
-| [ ] | 2.2 | Implement format_requirement_list_item | [ ] | Include category column |
+| [x] | 2.1 | Create requirement_formatters.py module | [ ] | Module already existed |
+| [x] | 2.2 | Add category to all formatters | [ ] | TSV, table, JSON, details updated |
 | [ ] | 2.3 | Add --category filter to CLI | [ ] | Substring match on category field |
 | [ ] | 2.4 | Extend regexp/case-insensitive filters | [ ] | Include category in search fields |
 | [ ] | 2.5 | Update CLI to use formatter | [ ] | Replace inline formatting |
@@ -172,16 +172,25 @@ just pylint supekku/scripts/lib/formatters/requirement_formatters.py
 **2.1 Create requirement_formatters.py module**
 - **Design / Approach**: Follow pattern from `decision_formatters.py` and `change_formatters.py`
 - **Files / Components**:
-  - Create `supekku/scripts/lib/formatters/requirement_formatters.py`
-  - Update `supekku/scripts/lib/formatters/__init__.py` with exports
+  - `supekku/scripts/lib/formatters/requirement_formatters.py` (already existed)
+  - `supekku/scripts/lib/formatters/__init__.py` (already had exports)
 - **Testing**: Import test in `requirement_formatters_test.py`
-- **Observations & AI Notes**: TBD
+- **Observations & AI Notes**: Module already existed with table/JSON/TSV/details formatters. Updated to add category support.
 
-**2.2 Implement format_requirement_list_item**
-- **Design / Approach**: Pure function signature: `format_requirement_list_item(req: RequirementRecord, options: dict) -> str`
-- **Files / Components**: `requirement_formatters.py`
-- **Testing**: Unit tests for various category values (present, None, special chars)
-- **Observations & AI Notes**: Return tab-separated: `{label}\t{status}\t{category}\t{title}`, display "-" for None category
+**2.2 Add category to all formatters**
+- **Design / Approach**: Add category column/field to all existing formatter functions
+- **Files / Components**:
+  - `supekku/scripts/lib/formatters/requirement_formatters.py`
+  - `supekku/scripts/lib/formatters/requirement_formatters_test.py`
+- **Testing**: Updated existing tests to expect new column order
+- **Observations & AI Notes**:
+  - TSV format: `spec\tlabel\tcategory\ttitle\tstatus`
+  - Table: 5 columns with category between label and title
+  - JSON: added `category` field in output (always present, null if None)
+  - Details: conditional display only when category is present
+  - Category displays as "-" when None (uncategorized requirements)
+  - 1352 tests passing after updates
+  - Commit: a126386
 
 **2.3 Add --category filter to CLI**
 - **Design / Approach**: Add `--category` option, filter records where category substring matches
@@ -223,37 +232,54 @@ just pylint supekku/scripts/lib/formatters/requirement_formatters.py
 
 | Risk | Mitigation | Status |
 | --- | --- | --- |
-| CLI output format change breaks existing scripts | Keep backward compatible, add category as additional column | Not started |
+| CLI output format change breaks existing scripts | Keep backward compatible, add category as additional column | ⚠️ Partial - added column, may break parsers |
 | Filter logic complexity introduces bugs | Follow existing filter patterns, comprehensive integration tests | Not started |
-| Formatter module structure unclear | Review existing formatters as templates, follow AGENTS.md patterns | Not started |
+| Formatter module structure unclear | Review existing formatters as templates, follow AGENTS.md patterns | ✓ Resolved - followed existing pattern |
 | Cannot locate list requirements CLI command | Use `grep -r "list.*requirement"` to find command entry point | Not started |
 
 ## 9. Decisions & Outcomes
 
 - `2025-11-04` - Phase 2 scope: CLI filtering + formatters only (defer CLI command structure changes)
+- `2025-11-04` - Category column added between Label and Title for logical grouping
+- `2025-11-04` - JSON output always includes category field (even when null) for consistency
 
 ## 10. Findings / Research Notes
+
+**Formatter Implementation** (completed):
+- Module `requirement_formatters.py` already existed with full suite of formatters
+- Added category column to all formatters:
+  - TSV: New column order `spec\tlabel\tcategory\ttitle\tstatus`
+  - Table: 5 columns, category gets 12 char width
+  - JSON: category field always present (null if None)
+  - Details: conditional display only when category is not None
+- Updated 2 existing tests that validated TSV output format
+- Column widths: Spec(10), Label(8), Category(12), Status(12), Title(remaining)
+- Category displays as "—" (em dash) in table format, "-" in TSV for None values
 
 **CLI Command Location** (to be confirmed):
 - Likely `supekku/scripts/requirements.py` or `supekku/cli/list.py`
 - Use `uv run spec-driver list requirements --help` to verify current implementation
 - Check `grep -r "def.*list.*requirement" supekku/` for command definition
 
-**Formatter Pattern** (from existing code):
-- Pure functions: `def format_X_list_item(artifact: Model) -> str`
-- No business logic, only display formatting
-- Export via `__init__.py` `__all__` list
-- Comprehensive tests in `formatters/X_formatters_test.py`
-
 **Filter Pattern** (to research):
 - Check existing decision/change list commands for filter examples
 - Likely uses list comprehension: `[r for r in records if matches(r, filters)]`
 - Regexp filter typically uses `re.search(pattern, field, re.IGNORECASE if -i else 0)`
 
+**Breaking Change Note**:
+- Adding category column changes TSV/table output format
+- Existing scripts parsing output may break
+- JSON output is backward compatible (new field added)
+- Mitigation: Could add `--no-category` flag in future if needed
+
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied (all 9 items)
+- [ ] Exit criteria satisfied (2/9 items complete)
 - [ ] VT-017-003 and VT-017-004 evidence captured
+- [x] Tasks 2.1-2.2 complete (formatters updated)
+- [ ] Tasks 2.3-2.5 complete (CLI filtering)
+- [ ] Tasks 2.6-2.7 complete (integration tests)
+- [ ] Task 2.8 complete (linters)
 - [ ] Lint output captured (zero warnings)
 - [ ] IP-017 updated with any plan changes
 - [ ] Hand-off notes to Phase 3 (Verification & Polish)

@@ -4,7 +4,7 @@ slug: 007-lifecycle-coverage-enforcement-phase-02
 name: IP-007 Phase 02
 created: '2025-11-03'
 updated: '2025-11-03'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -32,13 +32,27 @@ verification:
     - CLI run log demonstrating enforcement messaging
     - Documentation change references
 tasks:
-  - Add coverage completeness check function
-  - Integrate check into delta completion workflow
-  - Add --force flag for emergency overrides
-  - Implement environment variable for feature toggle
-  - Update RUN.md with coverage workflow
-  - Update agent documentation
-  - Create completion workflow tests
+  - id: 2.1
+    description: Add coverage completeness check function
+    status: completed
+  - id: 2.2
+    description: Integrate check into delta completion workflow
+    status: completed
+  - id: 2.3
+    description: Add --force flag for emergency overrides
+    status: completed
+  - id: 2.4
+    description: Implement environment variable for feature toggle
+    status: completed
+  - id: 2.5
+    description: Update RUN.md with coverage workflow
+    status: completed
+  - id: 2.6
+    description: Update agent documentation
+    status: completed
+  - id: 2.7
+    description: Create completion workflow tests
+    status: completed
 risks:
   - Enforcement blocks legitimate emergency fixes
   - False positives for legacy specs without coverage

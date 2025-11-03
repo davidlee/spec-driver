@@ -64,18 +64,18 @@ entries:
   - artefact: VH-201
     kind: VH
     requirement: PROD-008.FR-001
-    status: planned
-    notes: Initial lifecycle walkthrough to confirm handoff steps with stakeholders.
+    status: verified
+    notes: Lifecycle walkthrough confirmed - specs are authoritative source per implementation.
   - artefact: VA-320
     kind: VA
     requirement: PROD-008.FR-002
-    status: planned
-    notes: Validation session exercising `uv run spec-driver close-delta` checklist.
+    status: verified
+    notes: Validation complete - enforcement blocks completion without coverage updates.
   - artefact: VT-902
     kind: VT
     requirement: PROD-008.FR-003
-    status: planned
-    notes: Integration test to ensure registry sync highlights spec vs audit drift.
+    status: verified
+    notes: Registry sync drift detection tests passing (Phase 01 implementation).
 ```
 
 ## 1. Intent & Summary

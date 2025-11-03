@@ -77,7 +77,6 @@ deltas:
           - Documentation updated
           - VA-001 confirms zero spurious diffs
           - All acceptance gates met
-        - id: IP-002.PHASE-04
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -133,8 +132,6 @@ deltas:
         - VA-001 complete (git diff stability analysis)
         - Documentation updated
         - All acceptance gates met
-      - id: IP-002.PHASE-04
-        phase: IP-002.PHASE-04
   DE-003:
     kind: delta
     status: completed
@@ -295,6 +292,21 @@ deltas:
           - VT-PHASE-006 passing (plan metadata update tests)
           - Manual test - create phase updates JSON output
           - All tests + linters passing
+        - id: IP-004.PHASE-05
+          name: Phase 05 - Structured Progress Tracking
+          objective: Implement phase.tracking@v1 YAML block for structured completion
+            tracking of entrance/exit criteria and tasks, replacing regex-based progress
+            parsing.
+          entrance_criteria:
+          - Phases 01, 02, 04 complete
+          - User approval for structured tracking design
+          exit_criteria:
+          - phase.tracking@v1 schema defined
+          - Parser/validator implemented
+          - Formatter updated to use tracking data
+          - Phase template includes tracking block
+          - VT-PHASE-007 passing
+          - Backward compatibility maintained
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -361,6 +373,44 @@ deltas:
         risks:
         - YAML block manipulation may be fragile
         - Race conditions if multiple phases created simultaneously
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-004.PHASE-05
+        plan: IP-004
+        delta: DE-004
+        name: Phase 05 - Structured Progress Tracking
+        objective: Implement phase.tracking@v1 YAML block for structured completion
+          tracking of entrance/exit criteria and tasks, replacing regex-based progress
+          parsing.
+        entrance_criteria:
+        - Phases 01, 02, 04 complete (core functionality working)
+        - Understanding of existing phase.overview block structure
+        - User approval for structured tracking design
+        exit_criteria:
+        - phase.tracking@v1 schema defined and documented
+        - Parser/validator for tracking block implemented
+        - Formatter updated to use structured data instead of regex
+        - Phase template includes new tracking block
+        - VT-PHASE-007 passing (tracking block tests)
+        - Backward compatibility maintained (tracking block optional)
+        verification:
+          tests:
+          - VT-PHASE-007
+          evidence:
+          - Test output showing tracking block parsing/validation
+          - Manual test with phase-05.md tracking block
+          - Backward compat test with existing phases (no tracking block)
+        tasks:
+        - Define phase.tracking@v1 schema
+        - Implement parser and validator
+        - Update formatter to use tracking data
+        - Update phase template
+        - Write comprehensive tests
+        - Add migration guide for existing phases
+        risks:
+        - Breaking changes to existing phase files
+        - Complex data structure may be harder to maintain manually
+        - Need to support both tracking block and markdown checkboxes
       - id: IP-004.PHASE-02
         name: Phase 02 - Enhanced Display & Validation
         objective: Enhance delta display formatter to show phases. Add schema validation
@@ -655,7 +705,7 @@ deltas:
         - False positives for legacy specs without coverage
   DE-008:
     kind: delta
-    status: draft
+    status: completed
     name: Separate coverage evidence from audit verification
     slug: add-coverage-evidence
     updated: '2025-11-03'
@@ -705,14 +755,15 @@ deltas:
           name: Phase 02 - Validation & display
           objective: Implement validation warnings for coverage edge cases and update
             all display/formatting to distinguish coverage from audit verification.
-          entrance_criteria: &id005
+          entrance_criteria:
           - Phase 01 exit criteria met
-          exit_criteria: &id006
+          exit_criteria:
           - Validation warnings trigger for coverage without baseline status
           - Validation warnings trigger for missing audits after grace period
           - CLI/JSON output shows both fields separately
           - All tests passing, linters clean
           - Documentation updated
+        - id: IP-008.PHASE-02
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -754,10 +805,170 @@ deltas:
         risks:
         - description: Breaking existing code that accesses RequirementRecord
           mitigation: Comprehensive test coverage before changes
-      - id: IP-008.PHASE-02
-        name: Phase 02 - Validation & display
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-008.PHASE-02
+        plan: IP-008
+        delta: DE-008
         objective: Implement validation warnings for coverage edge cases and update
           all display/formatting to distinguish coverage from audit verification.
-        entrance_criteria: *id005
-        exit_criteria: *id006
-        phase: IP-008.PHASE-02
+        entrance_criteria:
+        - Phase 01 exit criteria met
+        exit_criteria:
+        - Validation warnings trigger for coverage without baseline status
+        - Validation warnings trigger for missing audits after grace period
+        - CLI/JSON output shows both fields separately
+        - All tests passing, linters clean
+        - Documentation updated
+        verification:
+          tests:
+          - VT-912
+          - VT-913
+          - VT-914
+          - VA-321
+          - VH-202
+          evidence:
+          - Test run output showing validation warnings
+          - CLI output showing coverage_evidence and verified_by separately
+          - Updated documentation
+        tasks:
+        - id: '2.1'
+          description: Add validation warnings for coverage without baseline status
+        - id: '2.2'
+          description: Add validation warnings for missing audits after grace period
+        - id: '2.3'
+          description: Update requirement formatters to display coverage_evidence
+        - id: '2.4'
+          description: Update CLI JSON output for coverage_evidence
+        - id: '2.5'
+          description: Write tests for validation warnings (VT-912, VT-913)
+        - id: '2.6'
+          description: Write tests for formatter updates
+        - id: '2.7'
+          description: Run integration test for complete workflow (VT-914)
+        - id: '2.8'
+          description: Update glossary documentation
+        - id: '2.9'
+          description: Run full test suite and lint
+        risks:
+        - description: Validation warning thresholds may be unclear
+          mitigation: Use 30-day default for grace period, make configurable
+  DE-009:
+    kind: delta
+    status: draft
+    name: Delta - CLI JSON consistency fixes
+    slug: cli-json-consistency-fixes
+    updated: '2025-11-03'
+    path: change/deltas/DE-009-cli-json-consistency-fixes/DE-009.md
+    applies_to:
+      specs:
+      - SPEC-110
+      requirements:
+      - PROD-010.FR-001
+      - PROD-010.FR-002
+      - PROD-010.FR-003
+      - PROD-010.NF-003
+    relations:
+    - type: implements
+      target: PROD-010
+      attributes:
+        description: Implements Priority 1 requirements for CLI agent UX consistency
+    plan:
+      id: IP-009
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-009
+        delta: DE-009
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-009.PHASE-01
+          name: Phase 01 - Initial delivery
+          objective: Deliver the foundational work for this delta.
+          entrance_criteria: []
+          exit_criteria: []
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-009.PHASE-01
+        plan: IP-009
+        delta: DE-009
+        objective: 'Implement Priority 1 CLI consistency fixes: standardize --json
+          flag across all list/show commands, add status filter to specs, ensure backward
+          compatibility, and validate against UX research findings.'
+        entrance_criteria:
+        - Development environment set up with uv and dependencies installed
+        - Existing CLI test suite passing (just test)
+        - Both linters passing (just lint, just pylint)
+        - Familiarity with CLAUDE.md skinny CLI patterns and formatter separation
+        - UX research report reviewed (docs/ux-research-cli-2025-11-03.md)
+        exit_criteria:
+        - All list commands support both --json and --format=json flags
+        - All show commands support --json flag with documented behavior
+        - list specs command supports -s/--status filter matching other commands
+        - All unit tests passing with new test coverage for changes
+        - Both linters passing with zero warnings
+        - Help text updated and accurate for all modified commands
+        - JSON output schemas validated as stable (no breaking changes)
+        - Manual agent workflow testing confirms consistency improvements
+        verification:
+          tests:
+          - VT-CLI-JSON-CONSISTENCY
+          - VT-CLI-STATUS-SPECS
+          - VT-CLI-REGRESSION
+          evidence:
+          - VT-PROD010-JSON-001
+          - VT-PROD010-JSON-002
+          - VT-PROD010-FILTER-001
+          - VH-PROD010-UX-001
+        tasks:
+        - id: '1.1'
+          description: Research existing JSON flag implementations and status filtering
+            patterns
+          status: pending
+        - id: '1.2'
+          description: Write tests for --json flag on all list commands (TDD)
+          status: pending
+        - id: '1.3'
+          description: Implement --json shorthand for list commands (deltas, adrs,
+            requirements, revisions, changes)
+          status: pending
+        - id: '1.4'
+          description: Write tests for --json flag on show commands (TDD)
+          status: pending
+        - id: '1.5'
+          description: Implement --json support for show commands (spec, delta, adr,
+            requirement, revision)
+          status: pending
+        - id: '1.6'
+          description: Write tests for status filter on specs command (TDD)
+          status: pending
+        - id: '1.7'
+          description: Implement status filter for list specs command
+          status: pending
+        - id: '1.8'
+          description: Update help text for all modified commands
+          status: pending
+        - id: '1.9'
+          description: Run full test suite and linters, fix any issues
+          status: pending
+        - id: '1.10'
+          description: Manual validation against UX research Priority 1 findings
+          status: pending
+        risks:
+        - description: Breaking changes to JSON schemas disrupt agent workflows
+          likelihood: low
+          impact: high
+          mitigation: Comprehensive regression tests validate schema stability before
+            and after changes
+        - description: Status filter implementation differs from other commands
+          likelihood: medium
+          impact: medium
+          mitigation: Reuse exact patterns from list_deltas; test for behavioral parity

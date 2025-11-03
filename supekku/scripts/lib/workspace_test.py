@@ -255,6 +255,34 @@ status: accepted
       encoding="utf-8",
     )
 
+    # Create policy
+    policies_dir = root / "specify" / "policies"
+    policies_dir.mkdir(parents=True)
+    policy_path = policies_dir / "POL-001-test-policy.md"
+    policy_path.write_text(
+      """---
+id: POL-001
+title: "POL-001: Test Policy"
+status: required
+---
+# Test Policy""",
+      encoding="utf-8",
+    )
+
+    # Create standard
+    standards_dir = root / "specify" / "standards"
+    standards_dir.mkdir(parents=True)
+    standard_path = standards_dir / "STD-001-test-standard.md"
+    standard_path.write_text(
+      """---
+id: STD-001
+title: "STD-001: Test Standard"
+status: default
+---
+# Test Standard""",
+      encoding="utf-8",
+    )
+
     # Create delta
     delta_dir = root / "change" / "deltas" / "DE-099-test"
     delta_dir.mkdir(parents=True)
@@ -290,6 +318,23 @@ applies_to:
     # Verify decisions were synced (registry created)
     yaml_path = registry_dir / "decisions.yaml"
     assert yaml_path.exists()
+
+    # Verify policies were synced (registry created)
+    policies_yaml = registry_dir / "policies.yaml"
+    assert policies_yaml.exists()
+    with policies_yaml.open("r", encoding="utf-8") as f:
+      policies_data = yaml.safe_load(f)
+    assert "policies" in policies_data
+    assert "POL-001" in policies_data["policies"]
+
+    # Verify standards were synced (registry created)
+    standards_yaml = registry_dir / "standards.yaml"
+    assert standards_yaml.exists()
+    with standards_yaml.open("r", encoding="utf-8") as f:
+      standards_data = yaml.safe_load(f)
+    assert "standards" in standards_data
+    assert "STD-001" in standards_data["standards"]
+    assert standards_data["standards"]["STD-001"]["status"] == "default"
 
     # Verify change registries were synced
     delta_registry = ws.delta_registry.collect()

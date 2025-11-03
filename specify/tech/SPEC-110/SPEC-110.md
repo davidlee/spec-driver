@@ -3,7 +3,7 @@ id: SPEC-110
 slug: supekku-cli
 name: supekku/cli Specification
 created: '2025-11-02'
-updated: '2025-11-02'
+updated: '2025-11-03'
 status: draft
 kind: spec
 responsibilities:
@@ -131,19 +131,21 @@ capabilities:
   - id: standardized-flag-patterns
     name: Standardized Flag Patterns
     responsibilities:
-      - Enforce consistent flag naming across all list commands (--format, --filter, --regexp, etc.)
-      - Provide reusable option types (FormatOption, RootOption, etc.)
-      - Support common filtering patterns (substring, regexp, case-sensitive/insensitive)
-      - Enable automation-friendly output via --format=json
+      - Enforce consistent flag naming across all list commands (--format, --json, --filter, --regexp, etc.)
+      - Provide reusable option types (FormatOption, JsonOutputOption, StatusOption, RootOption, etc.)
+      - Support common filtering patterns (substring, regexp, case-sensitive/insensitive, status)
+      - Enable automation-friendly output via --format=json or --json shorthand
     requirements:
       - SPEC-110.FR-005
       - SPEC-110.FR-006
       - SPEC-110.FR-007
     summary: |
       Ensures consistent user experience by standardizing flag patterns across all commands.
-      Users learn flag patterns once and apply them everywhere.
+      Users learn flag patterns once and apply them everywhere. The --json shorthand improves
+      CLI ergonomics for automation workflows, and status filtering enables focused artifact exploration.
     success_criteria:
-      - All list commands support --format, --filter, --regexp
+      - All list commands support --format, --json, --filter, --regexp
+      - List specs supports --status/-s for status filtering
       - JSON output parseable and stable across versions
       - Regexp filtering works consistently across all artifact types
 
@@ -311,6 +313,38 @@ entries:
     notes: |
       supekku/cli/test_cli.py::TestWorkspaceCommands - Install and validate tests
       Tests workspace initialization and integrity validation
+
+  - artefact: VT-CLI-JSON-001
+    kind: VT
+    requirement: SPEC-110.FR-005
+    status: verified
+    notes: |
+      supekku/cli/test_cli.py::TestJSONFlagConsistency - 13 tests for --json flag across all list commands
+      Tests --json flag equivalence to --format=json and help documentation
+
+  - artefact: VT-CLI-STATUS-FILTER-001
+    kind: VT
+    requirement: SPEC-110.FR-006
+    status: verified
+    notes: |
+      supekku/cli/test_cli.py::TestStatusFilterParity - 7 tests for --status/-s filter on list specs
+      Tests status filtering (draft, active, deprecated, superseded) and JSON integration
+
+  - artefact: VT-CLI-JSON-SCHEMA-001
+    kind: VT
+    requirement: SPEC-110.FR-006
+    status: verified
+    notes: |
+      supekku/cli/test_cli.py::TestJSONSchemaRegression - 2 tests for JSON output schema stability
+      Tests backward compatibility of JSON output structure for specs and deltas
+
+  - artefact: VT-CLI-SHOW-JSON-001
+    kind: VT
+    requirement: SPEC-110.FR-009
+    status: verified
+    notes: |
+      supekku/cli/test_cli.py::TestShowCommandJSON - 8 tests for --json flag on show commands
+      Tests --json flag on show spec, show adr, show requirement, show revision, show delta
 ```
 
 ## 1. Intent & Summary
@@ -445,18 +479,20 @@ The CLI module provides five core capabilities as defined in the YAML block abov
   *Rationale*: Thin CLI layer orchestrates; adapters implement language-specific logic; ADR sync is opt-in
   *Verification*: VT-CLI-SYNC-001 - Sync delegation tests, ADR sync flag tests
 
-- **SPEC-110.FR-005**: All list commands MUST support consistent flag patterns (--format, --filter, --regexp, --case-insensitive, --root) and MUST apply regexp filtering to artifact-specific fields:
+- **SPEC-110.FR-005**: All list commands MUST support consistent flag patterns (--format, --json, --filter, --regexp, --case-insensitive, --root) and MUST apply regexp filtering to artifact-specific fields:
   - ADRs: title, summary
   - Backlog items: ID, title
   - Changes (deltas/revisions/audits): ID, slug, name
   - Requirements: UID, label, title
   - Specs: ID, slug, name
-  *Rationale*: Consistent UX enables muscle memory; field-specific filtering ensures relevant matches
-  *Verification*: VT-CLI-COMMON-001, VT-CLI-FILTER-001, VT-CLI-REGEXP-001 - Flag pattern and filtering tests
 
-- **SPEC-110.FR-006**: All list commands MUST support output formats: table (default), json, tsv
-  *Rationale*: JSON output enables automation; table output optimizes human readability
-  *Verification*: VT-CLI-FORMAT-001 - Output format tests verify JSON is parseable and stable
+  The --json flag is a shorthand for --format=json and takes precedence when both are specified.
+  *Rationale*: Consistent UX enables muscle memory; field-specific filtering ensures relevant matches; --json shorthand improves CLI ergonomics
+  *Verification*: VT-CLI-COMMON-001, VT-CLI-FILTER-001, VT-CLI-REGEXP-001, VT-CLI-JSON-001 - Flag pattern and filtering tests
+
+- **SPEC-110.FR-006**: All list commands MUST support output formats: table (default), json, tsv; list specs command MUST additionally support --status/-s filter for filtering by spec status (draft, active, deprecated, superseded)
+  *Rationale*: JSON output enables automation; table output optimizes human readability; status filtering enables focused spec exploration
+  *Verification*: VT-CLI-FORMAT-001, VT-CLI-STATUS-FILTER-001, VT-CLI-JSON-SCHEMA-001 - Output format tests verify JSON is parseable and stable, status filtering works correctly
 
 - **SPEC-110.FR-007**: Schema commands MUST list block schemas and frontmatter schemas separately (via `schema list blocks|frontmatter|all`) and MUST display schema details in json-schema or yaml-example formats
   *Rationale*: Self-documentation reduces external documentation burden; separate listing enables focused exploration
@@ -519,9 +555,11 @@ User Input → Typer Parse → Load Registry → Apply Filters → Delegate Form
 
 ### Data & Contracts
 
-**Standard Option Types** (defined in `common.py`):
+**Standard Option Types** (defined in `common.py` and list commands):
 ```python
 FormatOption = Annotated[str, typer.Option(..., help="Output format: table|json|tsv")]
+JsonOutputOption = Annotated[bool, typer.Option("--json", help="Output as JSON (shorthand for --format=json)")]
+StatusOption = Annotated[str | None, typer.Option("--status", "-s", help="Filter by status")]
 RootOption = Annotated[Path | None, typer.Option(..., callback=root_option_callback)]
 RegexpOption = Annotated[str | None, typer.Option(..., help="Regexp pattern")]
 CaseInsensitiveOption = Annotated[bool, typer.Option(..., help="Case-insensitive matching")]
@@ -621,11 +659,14 @@ All requirements verified at **unit and integration test levels**:
 | FR-002 | `test_cli.py`, per-command tests | Unit + Integration |
 | FR-003 | `backfill_test.py` | Unit |
 | FR-004 | `sync_test.py` | Unit |
-| FR-005, FR-006 | `test_cli.py` | Integration |
+| FR-005 | `test_cli.py` (TestJSONFlagConsistency, TestRegexpFiltering) | Integration |
+| FR-006 | `test_cli.py` (TestStatusFilterParity, TestJSONSchemaRegression) | Integration |
 | FR-007 | `schema_test.py` | Unit |
 | FR-008 | `create_test.py` | Unit |
-| FR-009 | `show_test.py` | Unit |
+| FR-009 | `show_test.py`, `test_cli.py` (TestShowCommandJSON) | Unit + Integration |
+| FR-010 | `test_cli.py` (TestCompleteCommands) | Integration |
 | NF-001 | `test_cli.py` | Integration (timing) |
+| NF-002 | Static analysis | N/A |
 
 **Test Strategy**:
 - Use temporary directories for filesystem operations

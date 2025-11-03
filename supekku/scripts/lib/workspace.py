@@ -9,8 +9,10 @@ from .changes.registry import ChangeRegistry
 from .core.paths import get_registry_dir
 from .core.repo import find_repo_root
 from .decisions.registry import DecisionRegistry
+from .policies.registry import PolicyRegistry
 from .requirements.registry import RequirementsRegistry
 from .specs.registry import SpecRegistry
+from .standards.registry import StandardRegistry
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -24,6 +26,8 @@ class Workspace:
   _specs: SpecRegistry | None = None
   _requirements: RequirementsRegistry | None = None
   _decisions: DecisionRegistry | None = None
+  _policies: PolicyRegistry | None = None
+  _standards: StandardRegistry | None = None
   _delta_registry: ChangeRegistry | None = None
   _revision_registry: ChangeRegistry | None = None
   _audit_registry: ChangeRegistry | None = None
@@ -97,6 +101,40 @@ class Workspace:
     registry = self.decisions
     registry.sync_with_symlinks()
 
+  # Policies ---------------------------------------------------
+  @property
+  def policies(self) -> PolicyRegistry:
+    """Get or create policy registry.
+
+    Returns:
+      PolicyRegistry instance for this workspace.
+    """
+    if self._policies is None:
+      self._policies = PolicyRegistry(root=self.root)
+    return self._policies
+
+  def sync_policies(self) -> None:
+    """Synchronize policy registry to YAML."""
+    registry = self.policies
+    registry.sync()
+
+  # Standards --------------------------------------------------
+  @property
+  def standards(self) -> StandardRegistry:
+    """Get or create standard registry.
+
+    Returns:
+      StandardRegistry instance for this workspace.
+    """
+    if self._standards is None:
+      self._standards = StandardRegistry(root=self.root)
+    return self._standards
+
+  def sync_standards(self) -> None:
+    """Synchronize standard registry to YAML."""
+    registry = self.standards
+    registry.sync()
+
   # Change registries ------------------------------------------
   @property
   def delta_registry(self) -> ChangeRegistry:
@@ -161,11 +199,15 @@ class Workspace:
     Syncs in order:
     1. Specs (reload from disk)
     2. Decisions/ADRs (sync symlinks)
-    3. Change registries (deltas, revisions, audits)
-    4. Requirements (sync from specs and changes)
+    3. Policies (sync to YAML)
+    4. Standards (sync to YAML)
+    5. Change registries (deltas, revisions, audits)
+    6. Requirements (sync from specs and changes)
     """
     self.reload_specs()
     self.sync_decisions()
+    self.sync_policies()
+    self.sync_standards()
     self.sync_change_registries()
     self.sync_requirements()
 

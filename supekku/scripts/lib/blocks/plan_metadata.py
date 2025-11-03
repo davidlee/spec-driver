@@ -99,37 +99,17 @@ PLAN_OVERVIEW_METADATA = BlockMetadata(
       type="array",
       required=True,
       min_items=1,
-      description="Implementation phases for this plan",
+      description=(
+        "Ordered list of phase IDs (metadata in phase.overview blocks)"
+      ),
       items=FieldMetadata(
         type="object",
-        description="A single phase entry",
+        description="Phase ID reference",
         properties={
           "id": FieldMetadata(
             type="string",
             required=True,
-            description="Phase ID (e.g., PLN-001-P01)",
-          ),
-          "name": FieldMetadata(
-            type="string",
-            required=False,
-            description="Phase name",
-          ),
-          "objective": FieldMetadata(
-            type="string",
-            required=False,
-            description="Phase objective statement",
-          ),
-          "entrance_criteria": FieldMetadata(
-            type="array",
-            required=False,
-            description="Criteria that must be met before starting phase",
-            items=FieldMetadata(type="string", description="Criterion"),
-          ),
-          "exit_criteria": FieldMetadata(
-            type="array",
-            required=False,
-            description="Criteria that must be met to complete phase",
-            items=FieldMetadata(type="string", description="Criterion"),
+            description="Phase ID (e.g., IP-001.PHASE-01)",
           ),
         },
       ),
@@ -157,33 +137,9 @@ PLAN_OVERVIEW_METADATA = BlockMetadata(
         "dependencies": ["SPEC-200.FR-PROFILE"],
       },
       "phases": [
-        {
-          "id": "PLN-001-P01",
-          "name": "Phase 01 - Foundation",
-          "objective": "Establish core authentication infrastructure",
-          "entrance_criteria": [
-            "Requirements finalized in RE-001",
-            "Architecture review completed",
-          ],
-          "exit_criteria": [
-            "OAuth2 provider integrated",
-            "Unit tests passing",
-            "Security audit completed",
-          ],
-        },
-        {
-          "id": "PLN-001-P02",
-          "name": "Phase 02 - Integration",
-          "objective": "Integrate authentication with user management",
-          "entrance_criteria": [
-            "Phase 01 complete",
-            "User management spec ready",
-          ],
-          "exit_criteria": [
-            "E2E tests passing",
-            "Documentation updated",
-          ],
-        },
+        {"id": "PLN-001-P01"},
+        {"id": "PLN-001-P02"},
+        {"id": "PLN-001-P03"},
       ],
     }
   ],

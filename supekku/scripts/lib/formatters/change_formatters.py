@@ -12,6 +12,7 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from supekku.scripts.lib.blocks.plan import extract_phase_tracking
 from supekku.scripts.lib.formatters.table_utils import (
   add_row_with_truncation,
   calculate_column_widths,
@@ -202,6 +203,9 @@ def _enrich_phase_data(
 ) -> dict[str, Any]:
   """Enrich phase data with file path and task completion stats.
 
+  Checks for phase.tracking@v1 block first (structured data), then falls back
+  to regex-based checkbox parsing for backward compatibility.
+
   Args:
     phase: Phase dictionary
     artifact: Parent delta artifact
@@ -245,11 +249,23 @@ def _enrich_phase_data(
   # Extract task completion stats
   try:
     phase_content = phase_file.read_text(encoding="utf-8")
-    completed = len(re.findall(r"^- \[x\]", phase_content, re.MULTILINE))
-    total = len(re.findall(r"^- \[(x| )\]", phase_content, re.MULTILINE))
-    if total > 0:
-      enriched["tasks_completed"] = completed
-      enriched["tasks_total"] = total
+
+    # Try structured tracking block first
+    tracking_block = extract_phase_tracking(phase_content, phase_file)
+    if tracking_block:
+      # Calculate completion from tracking data
+      tasks = tracking_block.data.get("tasks", [])
+      if tasks:
+        completed = sum(1 for t in tasks if t.get("status") == "completed")
+        enriched["tasks_completed"] = completed
+        enriched["tasks_total"] = len(tasks)
+    else:
+      # Fallback to regex-based checkbox parsing (backward compat)
+      completed = len(re.findall(r"^- \[x\]", phase_content, re.MULTILINE))
+      total = len(re.findall(r"^- \[(x| )\]", phase_content, re.MULTILINE))
+      if total > 0:
+        enriched["tasks_completed"] = completed
+        enriched["tasks_total"] = total
   except (OSError, UnicodeDecodeError):
     pass
 

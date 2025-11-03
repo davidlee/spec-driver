@@ -271,20 +271,6 @@ class PlanDualValidationTest(unittest.TestCase):
     assert any("id" in err.lower() or "string" in err.lower() for err in old_errors)
     assert any("id" in err.lower() or "string" in err.lower() for err in new_errors)
 
-  def test_phase_entry_name_wrong_type(self):
-    """Both validators reject phase entry with name of wrong type."""
-    data = {
-      "schema": PLAN_SCHEMA,
-      "version": PLAN_VERSION,
-      "plan": "PLN-001",
-      "delta": "DE-001",
-      "phases": [{"id": "PLN-001-P01", "name": 123}],
-    }
-
-    old_errors, new_errors = self._validate_both(data)
-    assert any("name" in err.lower() or "string" in err.lower() for err in old_errors)
-    assert any("name" in err.lower() or "string" in err.lower() for err in new_errors)
-
   def test_revision_links_wrong_type(self):
     """Both validators reject revision_links of wrong type."""
     data = {

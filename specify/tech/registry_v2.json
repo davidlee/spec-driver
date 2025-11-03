@@ -13,9 +13,11 @@
       "supekku/scripts/lib/deletion": "SPEC-118",
       "supekku/scripts/lib/docs/python": "SPEC-119",
       "supekku/scripts/lib/formatters": "SPEC-120",
+      "supekku/scripts/lib/policies": "SPEC-126",
       "supekku/scripts/lib/relations": "SPEC-121",
       "supekku/scripts/lib/requirements": "SPEC-122",
       "supekku/scripts/lib/specs": "SPEC-123",
+      "supekku/scripts/lib/standards": "SPEC-127",
       "supekku/scripts/lib/sync/adapters": "SPEC-124",
       "supekku/scripts/lib/validation": "SPEC-125"
     }

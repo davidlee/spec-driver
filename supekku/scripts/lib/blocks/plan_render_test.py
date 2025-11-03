@@ -39,18 +39,17 @@ def test_render_plan_overview_block_with_specs_and_requirements() -> None:
 
 
 def test_render_plan_overview_block_with_custom_phase() -> None:
-  """Test rendering plan overview block with custom first phase."""
+  """Test rendering plan overview block with custom first phase ID."""
   result = render_plan_overview_block(
     "IP-001",
     "DE-001",
     first_phase_id="IP-001.PHASE-CUSTOM",
-    first_phase_name="Custom Phase",
-    first_phase_objective="Custom objective",
   )
 
   assert "id: IP-001.PHASE-CUSTOM" in result
-  assert "name: Custom Phase" in result
-  assert "Custom objective" in result
+  # Phase metadata (name, objective) lives in phase.overview, not plan.overview
+  assert "name:" not in result
+  assert "objective:" not in result
 
 
 def test_render_phase_overview_block_minimal() -> None:

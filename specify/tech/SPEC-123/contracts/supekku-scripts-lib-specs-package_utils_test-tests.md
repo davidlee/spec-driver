@@ -13,7 +13,7 @@ Test Coverage:
 
 ## Constants
 
-- `KNOWN_LEAF_PACKAGES` - Known leaf packages in supekku/ (as of 2025-11-02)
+- `KNOWN_LEAF_PACKAGES` - Known leaf packages in supekku/ (as of 2025-11-03)
 - `KNOWN_PARENT_PACKAGES` - Known parent packages (not leaves)
 
 ## Classes
@@ -36,7 +36,7 @@ Test find_all_leaf_packages() function.
 #### Methods
 
 - `test_excludes_parent_packages(self) -> None`: Test that parent packages are not included in results.
-- `test_finds_all_16_leaf_packages_in_supekku(self) -> None`: Test that all 16 known leaf packages are discovered.
+- `test_finds_all_18_leaf_packages_in_supekku(self) -> None`: Test that all 18 known leaf packages are discovered.
 - `test_handles_nonexistent_root(self) -> None`: Test that non-existent root returns empty list.
 - `test_handles_single_leaf_package_tree(self) -> None`: Test discovery in a subtree with one leaf package.
 - `test_handles_tree_with_multiple_levels(self) -> None`: Test discovery in complex nested structure.

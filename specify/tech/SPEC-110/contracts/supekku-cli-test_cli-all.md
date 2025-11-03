@@ -59,6 +59,36 @@ Test error handling in CLI commands.
 - `test_invalid_command(self)`: Test invalid command returns error.
 - `test_missing_required_argument(self)`: Test missing required argument returns error.
 
+### TestJSONFlagConsistency
+
+Test --json flag consistency across list and show commands (DE-009).
+
+#### Methods
+
+- `test_list_adrs_json_equals_format_json(self)`: Test --json produces same output as --format=json for adrs.
+- `test_list_adrs_json_flag(self)`: Test list adrs accepts --json flag.
+- `test_list_adrs_json_help_documents_flag(self)`: Test list adrs help mentions --json flag.
+- `test_list_changes_json_equals_format_json(self)`: Test --json produces same output as --format=json for changes.
+- `test_list_changes_json_flag(self)`: Test list changes accepts --json flag.
+- `test_list_deltas_json_equals_format_json(self)`: Test --json produces same output as --format=json for deltas.
+- `test_list_deltas_json_flag(self)`: Test list deltas accepts --json flag.
+- `test_list_deltas_json_help_documents_flag(self)`: Test list deltas help mentions --json flag.
+- `test_list_requirements_json_equals_format_json(self)`: Test --json produces same output as --format=json for requirements.
+- `test_list_requirements_json_flag(self)`: Test list requirements accepts --json flag.
+- `test_list_revisions_json_equals_format_json(self)`: Test --json produces same output as --format=json for revisions.
+- `test_list_revisions_json_flag(self)`: Test list revisions accepts --json flag.
+- `test_list_specs_json_flag_already_exists(self)`: Test list specs --json flag (should already work).
+- `test_list_specs_json_help_documents_flag(self)`: Test list specs help mentions --json flag.
+
+### TestJSONSchemaRegression
+
+Test JSON output schema stability (DE-009 backward compatibility).
+
+#### Methods
+
+- `test_list_deltas_json_schema_stable(self)`: Test list deltas JSON output maintains expected structure.
+- `test_list_specs_json_schema_stable(self)`: Test list specs JSON output maintains expected structure.
+
 ### TestListCommands
 
 Test list command group.
@@ -101,6 +131,20 @@ Test regexp filtering utility and CLI flags.
 - `test_matches_regexp_none_pattern(self)`: Test that None pattern matches everything.
 - `test_matches_regexp_partial_match(self)`: Test that patterns match substrings.
 
+### TestShowCommandJSON
+
+Test --json flag on show commands (DE-009).
+
+#### Methods
+
+- `test_show_adr_json_flag(self)`: Test show adr accepts --json flag.
+- `test_show_adr_json_help_documents_flag(self)`: Test show adr help mentions --json flag.
+- `test_show_delta_json_flag_already_exists(self)`: Test show delta --json flag (should already work).
+- `test_show_requirement_json_flag(self)`: Test show requirement accepts --json flag.
+- `test_show_revision_json_flag(self)`: Test show revision accepts --json flag.
+- `test_show_spec_json_flag(self)`: Test show spec accepts --json flag.
+- `test_show_spec_json_help_documents_flag(self)`: Test show spec help mentions --json flag.
+
 ### TestShowCommands
 
 Test show command group.
@@ -109,6 +153,20 @@ Test show command group.
 
 - `test_show_adr_help(self)`: Test show adr command help.
 - `test_show_help(self)`: Test show command group help.
+
+### TestStatusFilterParity
+
+Test status filter consistency across list commands (DE-009).
+
+#### Methods
+
+- `test_list_specs_status_filter_active(self)`: Test list specs filters by active status.
+- `test_list_specs_status_filter_deprecated(self)`: Test list specs filters by deprecated status.
+- `test_list_specs_status_filter_flag(self)`: Test list specs accepts --status/-s flag.
+- `test_list_specs_status_filter_short_flag(self)`: Test list specs accepts -s short flag.
+- `test_list_specs_status_filter_superseded(self)`: Test list specs filters by superseded status.
+- `test_list_specs_status_filter_with_json(self)`: Test status filter works with JSON output.
+- `test_list_specs_status_help_documents_flag(self)`: Test list specs help mentions --status/-s flag.
 
 ### TestSyncCommand
 

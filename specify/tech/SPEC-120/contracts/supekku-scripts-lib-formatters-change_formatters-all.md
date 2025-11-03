@@ -9,6 +9,9 @@ Formatters take ChangeArtifact objects and return formatted strings for display.
 
 - `_enrich_phase_data(phase, artifact, root) -> dict[Tuple[str, Any]]`: Enrich phase data with file path and task completion stats.
 
+Checks for phase.tracking@v1 block first (structured data), then falls back
+to regex-based checkbox parsing for backward compatibility.
+
 Args:
   phase: Phase dictionary
   artifact: Parent delta artifact

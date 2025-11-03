@@ -27,7 +27,13 @@
       "mcp__serena__find_file",
       "mcp__serena__think_about_collected_information",
       "Bash(cat:*)",
-      "mcp__serena__write_memory"
+      "mcp__serena__write_memory",
+      "Bash(python3:*)",
+      "Bash(just pylint:*)",
+      "Bash(just test:*)",
+      "Bash(for f in change/deltas/*/IP-*.md)",
+      "Bash(do if grep -A 5 \"phases:\" \"$f\")",
+      "Bash(then echo \"$f\" fi done)"
     ],
     "deny": [],
     "ask": []

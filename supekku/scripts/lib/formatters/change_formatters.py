@@ -279,8 +279,11 @@ def _format_plan_overview(
 
   lines = ["", f"Plan: {plan_id} ({len(phases)} phases)", f"  File: {plan_path_str}"]
 
+  # Sort phases by ID for consistent ordering
+  sorted_phases = sorted(phases, key=lambda p: p.get("id", ""))
+
   # Format each phase with enriched data
-  for phase in phases:
+  for phase in sorted_phases:
     enriched_phase = _enrich_phase_data(phase, artifact, root)
     phase_summary = format_phase_summary(enriched_phase)
 

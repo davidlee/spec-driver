@@ -77,6 +77,7 @@ deltas:
           - Documentation updated
           - VA-001 confirms zero spurious diffs
           - All acceptance gates met
+        - id: IP-002.PHASE-04
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -132,6 +133,8 @@ deltas:
         - VA-001 complete (git diff stability analysis)
         - Documentation updated
         - All acceptance gates met
+      - id: IP-002.PHASE-04
+        phase: IP-002.PHASE-04
   DE-003:
     kind: delta
     status: completed
@@ -280,6 +283,18 @@ deltas:
           - VA-PHASE-002 (UX review) complete
           - All tests + linters passing
           - Documentation updated
+        - id: IP-004.PHASE-04
+          name: Phase 04 - Plan Metadata Auto-Update
+          objective: Implement automatic plan frontmatter updates when creating phases,
+            ensuring `show delta --json` reflects newly created phases immediately.
+          entrance_criteria:
+          - Phase 01 complete
+          - Understanding of plan.overview block structure
+          exit_criteria:
+          - create_phase() updates plan.overview phases array
+          - VT-PHASE-006 passing (plan metadata update tests)
+          - Manual test - create phase updates JSON output
+          - All tests + linters passing
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -314,6 +329,38 @@ deltas:
         risks:
         - Phase numbering logic may be complex
         - Template rendering may need escaping
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-004.PHASE-04
+        plan: IP-004
+        delta: DE-004
+        name: Phase 04 - Plan Metadata Auto-Update
+        objective: Implement automatic plan frontmatter updates when creating phases,
+          ensuring show delta --json reflects newly created phases immediately.
+        entrance_criteria:
+        - Phase 01 complete
+        - Understanding of plan.overview block structure
+        exit_criteria:
+        - create_phase() updates plan.overview phases array
+        - VT-PHASE-006 passing (plan metadata update tests)
+        - Manual test - create phase updates JSON output
+        - All tests + linters passing
+        verification:
+          tests:
+          - VT-PHASE-006
+          evidence:
+          - Test output showing plan metadata update tests passing
+          - Manual test showing phase in JSON output after creation
+          - Lint output (ruff + pylint) passing
+        tasks:
+        - Research plan.overview block update pattern
+        - Implement update_plan_metadata() helper function
+        - Integrate into create_phase() function
+        - Write VT-PHASE-006 tests
+        - Manual verification with IP-002
+        risks:
+        - YAML block manipulation may be fragile
+        - Race conditions if multiple phases created simultaneously
       - id: IP-004.PHASE-02
         name: Phase 02 - Enhanced Display & Validation
         objective: Enhance delta display formatter to show phases. Add schema validation
@@ -510,7 +557,7 @@ deltas:
         - Inconsistent JSON schema (mitigated - standard format defined)
   DE-007:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Lifecycle coverage enforcement
     slug: lifecycle-coverage-enforcement
     updated: '2025-11-03'
@@ -560,3 +607,157 @@ deltas:
         risks:
         - Registry regression affecting existing specs
         - Performance impact from additional parsing
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-007.PHASE-02
+        plan: IP-007
+        delta: DE-007
+        objective: Enforce coverage hand-back in the delta completion workflow and
+          document the updated process for agents.
+        entrance_criteria:
+        - Phase 01 exit criteria met
+        - CLI fixtures prepared for completion workflow tests
+        exit_criteria:
+        - spec-driver complete delta blocks when coverage entries missing
+        - RUN.md / CLAUDE command docs updated with enforcement guidance
+        - VA-320 and VH-201 verification complete
+        verification:
+          tests:
+          - VA-320
+          - VH-201
+          evidence:
+          - CLI run log demonstrating enforcement messaging
+          - Documentation change references
+        tasks:
+        - id: 2.1
+          description: Add coverage completeness check function
+          status: completed
+        - id: 2.2
+          description: Integrate check into delta completion workflow
+          status: completed
+        - id: 2.3
+          description: Add --force flag for emergency overrides
+          status: completed
+        - id: 2.4
+          description: Implement environment variable for feature toggle
+          status: completed
+        - id: 2.5
+          description: Update RUN.md with coverage workflow
+          status: completed
+        - id: 2.6
+          description: Update agent documentation
+          status: completed
+        - id: 2.7
+          description: Create completion workflow tests
+          status: completed
+        risks:
+        - Enforcement blocks legitimate emergency fixes
+        - False positives for legacy specs without coverage
+  DE-008:
+    kind: delta
+    status: draft
+    name: Separate coverage evidence from audit verification
+    slug: add-coverage-evidence
+    updated: '2025-11-03'
+    path: change/deltas/DE-008-add-coverage-evidence/DE-008.md
+    applies_to:
+      specs:
+      - SPEC-122
+      - SPEC-125
+      requirements: []
+    relations:
+    - type: addresses
+      target: ISSUE-012
+      attributes:
+        description: Separates coverage artifacts from verified_by field
+    plan:
+      id: IP-008
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-008
+        delta: DE-008
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-122
+          collaborators:
+          - SPEC-125
+          - SPEC-120
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-008.PHASE-01
+          name: Phase 01 - Schema & sync foundation
+          objective: Add coverage_evidence field to RequirementRecord and update sync
+            logic to populate it instead of verified_by for VT/VA/VH artifacts.
+          entrance_criteria:
+          - SPEC-122 guidance reviewed
+          - Test fixtures identified
+          exit_criteria:
+          - RequirementRecord serialization includes coverage_evidence
+          - Coverage sync populates coverage_evidence, not verified_by
+          - Unit tests passing for schema and sync
+          - Zero regressions
+        - id: IP-008.PHASE-02
+          name: Phase 02 - Validation & display
+          objective: Implement validation warnings for coverage edge cases and update
+            all display/formatting to distinguish coverage from audit verification.
+          entrance_criteria: &id005
+          - Phase 01 exit criteria met
+          exit_criteria: &id006
+          - Validation warnings trigger for coverage without baseline status
+          - Validation warnings trigger for missing audits after grace period
+          - CLI/JSON output shows both fields separately
+          - All tests passing, linters clean
+          - Documentation updated
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-008.PHASE-01
+        plan: IP-008
+        delta: DE-008
+        objective: Add coverage_evidence field to RequirementRecord and update sync
+          logic to populate it instead of verified_by for VT/VA/VH artifacts.
+        entrance_criteria:
+        - SPEC-122 guidance reviewed
+        - Test fixtures identified
+        exit_criteria:
+        - RequirementRecord serialization includes coverage_evidence
+        - Coverage sync populates coverage_evidence, not verified_by
+        - Unit tests passing for schema and sync
+        - Zero regressions
+        verification:
+          tests:
+          - VT-910
+          - VT-911
+          evidence:
+          - Test run output showing coverage_evidence serialization
+          - Test run output showing sync logic
+        tasks:
+        - id: '1.1'
+          description: Add coverage_evidence field to RequirementRecord dataclass
+        - id: '1.2'
+          description: Update RequirementRecord serialization methods
+        - id: '1.3'
+          description: Update coverage sync logic to populate coverage_evidence
+        - id: '1.4'
+          description: Write unit tests for schema changes
+        - id: '1.5'
+          description: Write unit tests for sync logic
+        - id: '1.6'
+          description: Run full test suite and verify zero regressions
+        - id: '1.7'
+          description: Lint and fix any issues
+        risks:
+        - description: Breaking existing code that accesses RequirementRecord
+          mitigation: Comprehensive test coverage before changes
+      - id: IP-008.PHASE-02
+        name: Phase 02 - Validation & display
+        objective: Implement validation warnings for coverage edge cases and update
+          all display/formatting to distinguish coverage from audit verification.
+        entrance_criteria: *id005
+        exit_criteria: *id006
+        phase: IP-008.PHASE-02

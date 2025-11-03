@@ -60,10 +60,10 @@ Returns:
 - `get_requirement_status_style(status) -> str`: Get the style name for a requirement status.
 
 Args:
-  status: Status string (e.g., "live", "pending")
+  status: Status string (e.g., "active", "pending")
 
 Returns:
-  Style name from theme (e.g., "requirement.status.live")
+  Style name from theme (e.g., "requirement.status.active")
 - `get_spec_status_style(status) -> str`: Get the style name for a spec status.
 
 Args:

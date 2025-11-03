@@ -4,7 +4,7 @@ slug: phase-management-implementation-phase-01
 name: IP-004 Phase 01
 created: '2025-11-02'
 updated: '2025-11-02'
-status: in-progress
+status: completed
 kind: phase
 ---
 
@@ -234,14 +234,27 @@ Implement the core `spec-driver create phase` command that enables automated pha
 - `2025-11-02` - Gaps in numbering: warn but allow (flexibility over strictness)
 - `2025-11-02` - Function location: `creation.py` (alongside create_delta)
 
+## 9. Decisions & Outcomes (continued)
+- `2025-11-03` - Scope expansion: Plan metadata updates moved from "out of scope" to new Phase 04
+  - Rationale: `show delta --json` relies on plan frontmatter, manual sync causes inconsistency
+  - Impact: Phase 01 complete as-is; new phase needed for automatic updates
+
 ## 10. Findings / Research Notes
-[To be filled as research progresses]
+
+**2025-11-03 - Phase 01 Completion Review**:
+- All code already implemented prior to phase start (create_phase function, CLI command, tests)
+- 5/5 phase-specific tests passing (VT-PHASE-001, VT-PHASE-002, VT-PHASE-004 coverage complete)
+- Full test suite: 1161 tests passing
+- Linters: ruff clean, pylint 9.86/10
+- Manual test: Successfully created phase-04 for IP-002, verified metadata correctness
+- **Gap identified**: Phase appears in text display but not JSON output (plan frontmatter not updated)
+- **Decision**: Add Phase 04 to scope for automatic plan metadata updates
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] All tests passing (VT-PHASE-001, VT-PHASE-002, VT-PHASE-004)
-- [ ] Linters passing (ruff + pylint)
-- [ ] Manual test successful
-- [ ] Code committed with clear message
-- [ ] IP-004 plan updated with progress
-- [ ] Hand-off notes: Phase 02 can begin (formatter + validation)
+- [x] Exit criteria satisfied (all original criteria met)
+- [x] All tests passing (VT-PHASE-001, VT-PHASE-002, VT-PHASE-004)
+- [x] Linters passing (ruff + pylint)
+- [x] Manual test successful
+- [ ] Code committed with clear message (pending - code pre-existing)
+- [ ] IP-004 plan updated with Phase 04
+- [x] Hand-off notes: Phase 02 can begin, but scope expansion requires Phase 04 addition first

@@ -7,11 +7,21 @@ Formatters take ChangeArtifact objects and return formatted strings for display.
 
 ## Functions
 
+- `_enrich_phase_data(phase, artifact, root) -> dict[Tuple[str, Any]]`: Enrich phase data with file path and task completion stats.
+
+Args:
+  phase: Phase dictionary
+  artifact: Parent delta artifact
+  root: Repository root for relative paths
+
+Returns:
+  Enriched phase dictionary
 - `_format_affects(artifact) -> list[str]`: Format affects section for revisions (similar to applies_to for deltas).
 - `_format_applies_to(artifact) -> list[str]`: Format applies_to section if present.
 - `_format_change_basic_fields(artifact) -> list[str]`: Format basic change artifact fields.
 - `_format_file_path_for_change(artifact, root) -> list[str]`: Format file path section for change artifact.
-- `_format_plan_overview(artifact) -> list[str]`: Format plan overview section if present.
+- `_format_other_files(artifact, root) -> list[str]`: Format other files in delta bundle.
+- `_format_plan_overview(artifact, root) -> list[str]`: Format plan overview section if present.
 - `_format_relations(artifact) -> list[str]`: Format relations section if present.
 - `_format_revision_basic_fields(artifact) -> list[str]`: Format basic revision artifact fields.
 - `format_change_list_item(artifact) -> str`: Format change artifact as basic list item: id, kind, status, name.
@@ -58,6 +68,14 @@ Args:
 
 Returns:
   Formatted string with all delta details
+- `format_delta_details_json(artifact, root) -> str`: Format delta details as JSON with all file paths included.
+
+Args:
+  artifact: ChangeArtifact to format
+  root: Repository root for relative path calculation (optional)
+
+Returns:
+  JSON string with complete delta information including all paths
 - `format_phase_summary(phase, max_objective_len) -> str`: Format a single phase with truncated objective.
 
 Args:

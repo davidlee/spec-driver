@@ -14,6 +14,8 @@ Test cases for RequirementsRegistry functionality.
 
 - `setUp(self) -> None`
 - `tearDown(self) -> None`
+- `test_compute_status_from_coverage(self) -> None`: Unit test for status computation from coverage entries.
+- `test_coverage_drift_detection(self) -> None`: Registry emits warnings for coverage conflicts. - Planned
 - `test_delta_relationships_block_marks_implemented_by(self) -> None`: Test that delta relationship blocks mark requirements as implemented.
 - `test_move_requirement_updates_primary_spec(self) -> None`: Test that moving a requirement updates its primary spec and UID.
 - `test_relationship_block_adds_collaborators(self) -> None`: Test that spec relationship blocks add collaborator specs to requirements.
@@ -22,6 +24,7 @@ Test cases for RequirementsRegistry functionality.
 - `test_sync_collects_change_relations(self) -> None`: Test syncing collects relations from delta, revision, audit artifacts.
 - `test_sync_creates_entries(self) -> None`: Test that syncing from specs creates registry entries for requirements.
 - `test_sync_preserves_status(self) -> None`: Test that re-syncing preserves manually set requirement statuses.
+- `test_sync_processes_coverage_blocks(self) -> None`: VT-902: Registry sync updates lifecycle from coverage blocks.
 - `_create_change_bundle(self, root, bundle, file_id, kind) -> Path`
 - `_make_repo(self) -> Path`
 - `_write_revision_with_block(self, root, revision_id, block_yaml) -> Path`

@@ -74,7 +74,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 - [x] Auto-created specs use status='stub' (Task 1.5.1 complete)
 - [x] Existing stub specs migrated (Task 1.5.2 complete - 16 migrated)
 - [x] Status theming added (Task 1.5.3 complete)
-- [ ] JSON outputs include path/kind fields (Task 1.5.4 - optional enhancement)
+- [x] JSON outputs include path/kind fields (Task 1.5.4 - complete)
 - [x] Backfill workflow commands fixed (Task 1.5.4 - jq commands work with find approach)
 - [x] Schema commands documented in workflow (Task 1.5.5 complete)
 - [x] Status field management documented (Task 1.5.6 complete)
@@ -118,7 +118,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 | [x] | 1.5.1 | Set auto-created specs to status='stub' | [x] | Complete: sync_specs.py:114 + orphan messages + --prune safety |
 | [x] | 1.5.2 | Migrate existing stub specs | [x] | Complete: 16 specs migrated (migrate_stub_status.py) |
 | [x] | 1.5.3 | Add stub status theming to formatters | [x] | Complete: stub=mid-grey, draft=light-grey |
-| [ ] | 1.5.4 | Add path/kind to list/show JSON outputs | [ ] | Fix jq commands in backfill workflow |
+| [x] | 1.5.4 | Add path/kind to list/show JSON outputs | [x] | Complete: Added kind+path to specs, path to changes/decisions |
 | [x] | 1.5.5 | Add schema reference commands to backfill workflow | [x] | Complete: schema show commands documented |
 | [x] | 1.5.6 | Add status field management to backfill workflow | [x] | Complete: automated validation with jq |
 | [x] | 1.5.7 | Enhance collaboration analysis guidance | [x] | Complete: import-based analysis prompts |
@@ -847,10 +847,10 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 
 ## 11. Wrap-up Checklist
 
-- [x] Exit criteria satisfied (except Task 1.6 integration testing)
-- [x] Verification evidence: 17 tests passing, all linters clean
-- [ ] DE-005 delta updated with implementation notes
-- [ ] PROD-007 updated if requirements clarified during implementation
+- [x] Exit criteria satisfied (all tasks complete)
+- [x] Verification evidence: 1161 tests passing, all linters clean
+- [x] DE-005 delta updated with implementation notes (comprehensive phase documentation)
+- [x] PROD-007 updated if requirements clarified during implementation (N/A - no clarifications needed)
 - [x] Hand-off notes documented (see Section 12)
 
 ## 12. Handover Notes (2025-11-02)
@@ -882,11 +882,12 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 - ✅ Collaboration analysis guidance effective
 - ✅ All quality checks passing
 
-**Optional Enhancement (Task 1.5.4)**:
-- Add `path` and `kind` fields to JSON formatters for consistency
-- Currently working via `find` approach (functional but less elegant)
-- Can be deferred to Phase 02 or separate enhancement work
-- See `JQ_VALIDATION_REPORT.md` for analysis and implementation details
+**Task 1.5.4 Complete**:
+- ✅ Added `kind` and `path` fields to spec JSON formatter
+- ✅ Added `path` field to change JSON formatter
+- ✅ Added `path` field to decision JSON formatter
+- ✅ All tests passing (1161 tests)
+- ✅ Both linters clean (ruff: pass, pylint: 9.89/10)
 
 **Phase 02 (Batch Mode)** - Deferred:
 - Batch processing (PROD-007.FR-003, FR-004)

@@ -6,3 +6,47 @@ revisions:
     slug: test-revision
     updated: '2025-11-01'
     path: change/revisions/RE-001-test-revision/RE-001.md
+  RE-002:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-007 completion
+    slug: delta-de-007-completion
+    updated: '2025-11-03'
+    path: change/revisions/RE-002-delta-de-007-completion/RE-002.md
+    relations:
+    - type: documents
+      target: DE-007
+      attributes: {}
+  RE-003:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-005 completion
+    slug: delta-de-005-completion
+    updated: '2025-11-03'
+    path: change/revisions/RE-003-delta-de-005-completion/RE-003.md
+    relations:
+    - type: documents
+      target: DE-005
+      attributes: {}
+  RE-004:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-002 completion
+    slug: delta-de-002-completion
+    updated: '2025-11-03'
+    path: change/revisions/RE-004-delta-de-002-completion/RE-004.md
+    relations:
+    - type: documents
+      target: DE-002
+      attributes: {}
+  RE-005:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-003 completion
+    slug: delta-de-003-completion
+    updated: '2025-11-03'
+    path: change/revisions/RE-005-delta-de-003-completion/RE-005.md
+    relations:
+    - type: documents
+      target: DE-003
+      attributes: {}

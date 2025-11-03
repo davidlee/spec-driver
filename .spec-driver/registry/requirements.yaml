@@ -6,11 +6,12 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    status: verified
+    status: pending
     introduced: null
     implemented_by: []
     verified_by:
     - AUD-001
+    - VT-001
     path: specify/product/PROD-001/PROD-001.md
   PROD-001.FR-002:
     label: FR-002
@@ -19,11 +20,12 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    status: verified
+    status: pending
     introduced: null
     implemented_by: []
     verified_by:
     - AUD-001
+    - VT-002
     path: specify/product/PROD-001/PROD-001.md
   PROD-001.FR-003:
     label: FR-003
@@ -32,11 +34,12 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    status: verified
+    status: pending
     introduced: null
     implemented_by: []
     verified_by:
     - AUD-001
+    - VT-003
     path: specify/product/PROD-001/PROD-001.md
   PROD-001.FR-004:
     label: FR-004
@@ -71,11 +74,12 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: non-functional
-    status: verified
+    status: pending
     introduced: null
     implemented_by: []
     verified_by:
     - AUD-001
+    - VA-001
     path: specify/product/PROD-001/PROD-001.md
   PROD-001.NF-002:
     label: NF-002
@@ -84,11 +88,12 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: non-functional
-    status: verified
+    status: pending
     introduced: null
     implemented_by: []
     verified_by:
     - AUD-001
+    - VA-002
     path: specify/product/PROD-001/PROD-001.md
   PROD-002.FR-001:
     label: FR-001
@@ -97,10 +102,11 @@ requirements:
     - PROD-002
     primary_spec: PROD-002
     kind: functional
-    status: verified
+    status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-001
     path: specify/product/PROD-002/PROD-002.md
   PROD-002.FR-002:
     label: FR-002
@@ -112,7 +118,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-002
     path: specify/product/PROD-002/PROD-002.md
   PROD-002.FR-003:
     label: FR-003
@@ -124,7 +131,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-003
     path: specify/product/PROD-002/PROD-002.md
   PROD-002.FR-004:
     label: FR-004
@@ -136,7 +144,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-004
     path: specify/product/PROD-002/PROD-002.md
   PROD-002.FR-005:
     label: FR-005
@@ -148,7 +157,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-005
     path: specify/product/PROD-002/PROD-002.md
   PROD-002.NF-001:
     label: NF-001
@@ -160,7 +170,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VA-001
     path: specify/product/PROD-002/PROD-002.md
   PROD-002.NF-002:
     label: NF-002
@@ -172,7 +183,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VA-002
     path: specify/product/PROD-002/PROD-002.md
   PROD-003.FR-001:
     label: FR-001
@@ -184,7 +196,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-PROD-003-001
     path: specify/product/PROD-003/PROD-003.md
   PROD-003.FR-002:
     label: FR-002
@@ -196,7 +209,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-PROD-003-002
     path: specify/product/PROD-003/PROD-003.md
   PROD-003.FR-003:
     label: FR-003
@@ -208,7 +222,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-PROD-003-003
     path: specify/product/PROD-003/PROD-003.md
   PROD-003.FR-004:
     label: FR-004
@@ -221,7 +236,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-PROD-003-004
     path: specify/product/PROD-003/PROD-003.md
   PROD-003.FR-005:
     label: FR-005
@@ -234,7 +250,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-PROD-003-005
     path: specify/product/PROD-003/PROD-003.md
   PROD-003.FR-006:
     label: FR-006
@@ -247,7 +264,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-PROD-003-006
     path: specify/product/PROD-003/PROD-003.md
   PROD-003.FR-007:
     label: FR-007
@@ -260,7 +278,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-PROD-003-007
     path: specify/product/PROD-003/PROD-003.md
   PROD-003.FR-008:
     label: FR-008
@@ -273,7 +292,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-PROD-003-008
     path: specify/product/PROD-003/PROD-003.md
   PROD-003.NF-001:
     label: NF-001
@@ -286,7 +306,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-PROD-003-009
     path: specify/product/PROD-003/PROD-003.md
   PROD-003.NF-002:
     label: NF-002
@@ -299,7 +320,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VA-PROD-003-001
     path: specify/product/PROD-003/PROD-003.md
   PROD-004.FR-001:
     label: FR-001
@@ -311,7 +333,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-001
     path: specify/product/PROD-004/PROD-004.md
   PROD-004.FR-002:
     label: FR-002
@@ -323,7 +346,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-002
     path: specify/product/PROD-004/PROD-004.md
   PROD-004.FR-003:
     label: FR-003
@@ -335,7 +359,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-003
     path: specify/product/PROD-004/PROD-004.md
   PROD-004.FR-004:
     label: FR-004
@@ -344,11 +369,12 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: functional
-    status: implemented
+    status: active
     introduced: null
     implemented_by:
     - DE-003
-    verified_by: []
+    verified_by:
+    - VT-004
     path: specify/product/PROD-004/PROD-004.md
   PROD-004.FR-005:
     label: FR-005
@@ -360,7 +386,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-005
     path: specify/product/PROD-004/PROD-004.md
   PROD-004.FR-006:
     label: FR-006
@@ -384,7 +411,8 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-006
     path: specify/product/PROD-004/PROD-004.md
   PROD-004.NF-002:
     label: NF-002
@@ -417,12 +445,13 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
-    status: implemented
+    status: active
     introduced: null
     implemented_by:
     - DE-002
     verified_by:
     - AUD-002
+    - VT-001
     path: specify/product/PROD-005/PROD-005.md
   PROD-005.FR-002:
     label: FR-002
@@ -431,11 +460,12 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
-    status: implemented
+    status: active
     introduced: null
     implemented_by:
     - DE-002
-    verified_by: []
+    verified_by:
+    - VT-002
     path: specify/product/PROD-005/PROD-005.md
   PROD-005.FR-003:
     label: FR-003
@@ -444,11 +474,12 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
-    status: implemented
+    status: active
     introduced: null
     implemented_by:
     - DE-002
-    verified_by: []
+    verified_by:
+    - VT-003
     path: specify/product/PROD-005/PROD-005.md
   PROD-005.FR-004:
     label: FR-004
@@ -457,11 +488,12 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
-    status: implemented
+    status: active
     introduced: null
     implemented_by:
     - DE-002
-    verified_by: []
+    verified_by:
+    - VT-004
     path: specify/product/PROD-005/PROD-005.md
   PROD-005.NF-001:
     label: NF-001
@@ -470,11 +502,12 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: non-functional
-    status: implemented
+    status: active
     introduced: null
     implemented_by:
     - DE-002
-    verified_by: []
+    verified_by:
+    - VA-001
     path: specify/product/PROD-005/PROD-005.md
   PROD-005.NF-002:
     label: NF-002
@@ -483,11 +516,12 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: non-functional
-    status: implemented
+    status: active
     introduced: null
     implemented_by:
     - DE-002
-    verified_by: []
+    verified_by:
+    - VA-002
     path: specify/product/PROD-005/PROD-005.md
   PROD-006.FR-001:
     label: FR-001
@@ -501,7 +535,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
-    verified_by: []
+    verified_by:
+    - VT-PHASE-001
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.FR-002:
     label: FR-002
@@ -515,7 +550,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
-    verified_by: []
+    verified_by:
+    - VT-PHASE-002
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.FR-003:
     label: FR-003
@@ -529,7 +565,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
-    verified_by: []
+    verified_by:
+    - VT-PHASE-003
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.FR-004:
     label: FR-004
@@ -543,7 +580,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
-    verified_by: []
+    verified_by:
+    - VT-PHASE-004
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.FR-005:
     label: FR-005
@@ -557,7 +595,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
-    verified_by: []
+    verified_by:
+    - VT-PHASE-005
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.NF-001:
     label: NF-001
@@ -571,7 +610,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
-    verified_by: []
+    verified_by:
+    - VA-PHASE-001
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.NF-002:
     label: NF-002
@@ -585,7 +625,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
-    verified_by: []
+    verified_by:
+    - VA-PHASE-002
     path: specify/product/PROD-006/PROD-006.md
   PROD-007.FR-001:
     label: FR-001
@@ -598,7 +639,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-005
-    verified_by: []
+    verified_by:
+    - VT-001
     path: specify/product/PROD-007/PROD-007.md
   PROD-007.FR-002:
     label: FR-002
@@ -611,7 +653,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-005
-    verified_by: []
+    verified_by:
+    - VT-002
     path: specify/product/PROD-007/PROD-007.md
   PROD-007.FR-003:
     label: FR-003
@@ -624,7 +667,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-005
-    verified_by: []
+    verified_by:
+    - VT-003
     path: specify/product/PROD-007/PROD-007.md
   PROD-007.FR-004:
     label: FR-004
@@ -650,7 +694,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-005
-    verified_by: []
+    verified_by:
+    - VA-001
     path: specify/product/PROD-007/PROD-007.md
   PROD-007.NF-002:
     label: NF-002
@@ -663,7 +708,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-005
-    verified_by: []
+    verified_by:
+    - VA-002
     path: specify/product/PROD-007/PROD-007.md
   PROD-008.FR-001:
     label: FR-001
@@ -674,11 +720,12 @@ requirements:
     - PROD-009
     primary_spec: PROD-008
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-007
-    verified_by: []
+    verified_by:
+    - VH-201
     path: specify/product/PROD-008/PROD-008.md
   PROD-008.FR-002:
     label: FR-002
@@ -690,11 +737,12 @@ requirements:
     - PROD-009
     primary_spec: PROD-008
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-007
-    verified_by: []
+    verified_by:
+    - VA-320
     path: specify/product/PROD-008/PROD-008.md
   PROD-008.FR-003:
     label: FR-003
@@ -705,11 +753,12 @@ requirements:
     - PROD-008
     primary_spec: PROD-008
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-007
-    verified_by: []
+    verified_by:
+    - VT-902
     path: specify/product/PROD-008/PROD-008.md
   PROD-008.NF-001:
     label: NF-001
@@ -745,10 +794,11 @@ requirements:
     - PROD-009
     primary_spec: PROD-009
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VH-330
     path: specify/product/PROD-009/PROD-009.md
   PROD-009.FR-002:
     label: FR-002
@@ -759,11 +809,12 @@ requirements:
     - PROD-009
     primary_spec: PROD-009
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-007
-    verified_by: []
+    verified_by:
+    - VA-421
     path: specify/product/PROD-009/PROD-009.md
   PROD-009.FR-003:
     label: FR-003
@@ -773,11 +824,12 @@ requirements:
     - PROD-009
     primary_spec: PROD-009
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-007
-    verified_by: []
+    verified_by:
+    - VT-940
     path: specify/product/PROD-009/PROD-009.md
   PROD-009.NF-001:
     label: NF-001
@@ -849,10 +901,11 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-REQ-RECORD-001
     path: specify/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-002:
     label: FR-002
@@ -861,10 +914,11 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-REQ-LIFECYCLE-001
     path: specify/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-003:
     label: FR-003
@@ -887,10 +941,11 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-REQ-SYNC-001
     path: specify/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-005:
     label: FR-005
@@ -913,10 +968,11 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-REQ-CHANGE-001
     path: specify/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-007:
     label: FR-007
@@ -952,10 +1008,11 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - VT-REQ-SEARCH-001
     path: specify/tech/SPEC-122/SPEC-122.md
   SPEC-122.NF-001:
     label: NF-001

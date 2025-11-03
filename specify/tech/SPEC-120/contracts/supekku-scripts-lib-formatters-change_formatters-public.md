@@ -51,6 +51,14 @@ Args:
 
 Returns:
   Formatted string with all delta details
+- `format_delta_details_json(artifact, root) -> str`: Format delta details as JSON with all file paths included.
+
+Args:
+  artifact: ChangeArtifact to format
+  root: Repository root for relative path calculation (optional)
+
+Returns:
+  JSON string with complete delta information including all paths
 - `format_phase_summary(phase, max_objective_len) -> str`: Format a single phase with truncated objective.
 
 Args:

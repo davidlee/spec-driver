@@ -47,17 +47,17 @@ version: 1
 phase: IP-015.PHASE-01
 status: in-progress
 started: '2025-11-04'
-tasks_completed: 5
+tasks_completed: 6
 tasks_total: 8
 last_updated: '2025-11-04'
 notes: |
-  Tasks 1.1-1.5 complete: CLI integration done
-  - Registry YAML schema at .spec-driver/registry/backlog.yaml
-  - load/save/sync functions implemented in backlog/registry.py
-  - CLI --backlog flag added to spec-driver sync command
-  - Manual test successful: synced 18 backlog items ✓
-  - Lint checks pass (ruff ✓, pylint 9.12/10)
-  - Ready for comprehensive testing (tasks 1.6-1.7)
+  Tasks 1.1-1.6 complete: Unit tests passing
+  - Registry infrastructure complete and tested
+  - 9 new unit tests added (VT-015-002)
+  - All 12 tests passing in 0.07s ✓
+  - Test coverage: load, save, sync (init, preserve, append, prune, mixed)
+  - Pylint score: 10.00/10 ✓
+  - Ready for CLI integration tests (task 1.7) or final lint (task 1.8)
 ```
 
 # Phase 1 - Registry Infrastructure
@@ -78,12 +78,12 @@ Create the foundational backlog registry system that stores an ordered list of b
 - [x] Current backlog code structure understood
 
 ## 4. Exit Criteria / Done When
-- [ ] Registry file `.spec-driver/registry/backlog.yaml` created with schema
-- [ ] `sync backlog` command implemented and working
+- [x] Registry file `.spec-driver/registry/backlog.yaml` created with schema
+- [x] `sync backlog` command implemented and working (via `spec-driver sync --backlog`)
 - [ ] Registry read/write functions tested
 - [ ] All tests passing (`just test`)
 - [ ] Lint checks passing (`just lint`, `just pylint`)
-- [ ] Registry correctly handles: new items (append), deleted items (prune), existing items (preserve order)
+- [x] Registry correctly handles: new items (append), deleted items (prune), existing items (preserve order)
 
 ## 5. Verification
 
@@ -135,7 +135,7 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 | [x] | 1.3 | Implement registry write function | [ ] | save_backlog_registry() complete |
 | [x] | 1.4 | Implement sync logic | [ ] | sync_backlog_registry() complete |
 | [x] | 1.5 | Add sync command to CLI | [ ] | --backlog flag added to sync |
-| [ ] | 1.6 | Write unit tests | [P] | Can parallel with 1.5 |
+| [x] | 1.6 | Write unit tests | [P] | 9 new tests, all passing |
 | [ ] | 1.7 | Write integration tests | [ ] | After 1.5 complete |
 | [ ] | 1.8 | Run lint and fix issues | [ ] | Final cleanup |
 
@@ -216,15 +216,23 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
   - Command: `spec-driver sync --backlog`
   - Registry file generated at .spec-driver/registry/backlog.yaml
 
-**1.6 - Write unit tests**
-- **Design**: `supekku/scripts/lib/backlog/registry_test.py`
-  - Test read/write functions
-  - Test sync merge logic
-  - Test orphan pruning
-  - Test edge cases (empty, missing file, corrupt YAML)
+**1.6 - Write unit tests** ✅
+- **Design**: Comprehensive unit tests for VT-015-002
+  - Test load/save roundtrip
+  - Test malformed YAML handling
+  - Test sync initialization (empty registry)
+  - Test sync preserves existing order
+  - Test sync appends new items
+  - Test sync prunes orphaned items
+  - Test sync with mixed changes
 - **Files**: `supekku/scripts/lib/backlog/registry_test.py`
-- **Testing**: `just test`
-- **Parallel**: Yes, can write tests while implementing CLI
+- **Testing**: 9 new tests added (12 total, all passing) ✓
+- **Observations**:
+  - Uses existing _make_repo() test fixture
+  - Tests cover all edge cases: empty, malformed, wrong structure
+  - Validates merge algorithm thoroughly
+  - Pylint score: 10.00/10 ✓
+  - pytest: 12/12 passed in 0.07s ✓
 
 **1.7 - Write integration tests**
 - **Design**: `supekku/cli/sync_test.py` - add backlog sync tests

@@ -54,12 +54,15 @@ relations:
 ## Practical Workflows
 
 ### Prospective (Delta-driven)
-1. Create delta: `uv run spec-driver create delta <slug>`
-2. Add `implements` relations in delta frontmatter
-3. Complete implementation work
-4. Mark delta complete: `status: completed` in frontmatter
-5. **Manually edit** `.spec-driver/registry/requirements.yaml`: `status: implemented`
-6. Run `uv run spec-driver sync` → populates `implemented_by[]`
+1. Create delta: `uv run spec-driver create delta <slug>` (scaffolds delta, design revision, implementation plan, first phase, notes)
+2. Populate the design revision (architecture intent, code impacts, verification alignment)
+3. Add `implements` relations in delta frontmatter
+4. Complete implementation work
+
+FIXME: no longer necessary - instead run `spec-driver delta complete`
+> 5. Mark delta complete: `status: completed` in frontmatter
+> 6. **Manually edit** `.spec-driver/registry/requirements.yaml`: `status: implemented`
+7. Run `uv run spec-driver validate --sync` → populates `implemented_by[]`
 
 ### Retrospective (Audit-driven)
 1. Code already exists (no delta was created)
@@ -108,7 +111,7 @@ PROD-001.FR-001:
 |--------|---------|--------------------------|----------------------|
 | `pending` | Not started | `[]` | `[]` |
 | `in_progress` | Delta assigned, work ongoing | `[DE-XXX]` (draft/in-progress) | `[]` |
-| `implemented` | Delta complete, code deployed | `[DE-XXX]` (completed) | `[]` or `[AUD-XXX]` |
+| `active` | Delta complete, code deployed | `[DE-XXX]` (completed) | `[]` or `[AUD-XXX]` |
 | `verified` | Audit confirms alignment | `[DE-XXX]` or `[]` | `[AUD-XXX]` |
 
 ## Complete Example
@@ -116,7 +119,7 @@ PROD-001.FR-001:
 ```yaml
 # After prospective implementation:
 PROD-005.FR-001:
-  status: implemented       # Manual: You set this
+  status: active            
   implemented_by: [DE-002]  # Auto: sync found DE-002's "implements" relation
   verified_by: []           # Auto: no audits yet
 

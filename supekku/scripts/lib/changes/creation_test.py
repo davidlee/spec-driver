@@ -106,8 +106,39 @@ class CreateChangeTest(unittest.TestCase):
     assert result.primary_path.exists()
     frontmatter, _ = load_markdown_file(result.primary_path)
     assert frontmatter["kind"] == "delta"
+    design_revision_files = [p for p in result.extras if p.name.startswith("DR-")]
+    assert design_revision_files, "Design revision file should be created with delta"
+    design_revision_path = design_revision_files[0]
+    dr_frontmatter, _ = load_markdown_file(design_revision_path)
+    assert dr_frontmatter["kind"] == "design_revision"
+    assert dr_frontmatter["delta_ref"] == result.artifact_id
+    assert dr_frontmatter.get("relations") == [
+      {"type": "implements", "target": result.artifact_id},
+    ]
     plan_files = [p for p in result.extras if p.name.startswith("IP-")]
     assert plan_files
+
+  def test_create_delta_without_plan_still_adds_design_revision(self) -> None:
+    """Delta creation without plan still scaffolds a design revision."""
+    root = self._make_repo()
+    result = create_delta(
+      "Documentation-only delta",
+      specs=["SPEC-100"],
+      requirements=None,
+      repo_root=root,
+      allow_missing_plan=True,
+    )
+    design_revision_files = [p for p in result.extras if p.name.startswith("DR-")]
+    assert design_revision_files, "Design revision created even when plan is skipped"
+    design_revision_path = design_revision_files[0]
+    assert design_revision_path.exists()
+    frontmatter, _ = load_markdown_file(design_revision_path)
+    assert frontmatter["delta_ref"] == result.artifact_id
+    assert frontmatter.get("relations") == [
+      {"type": "implements", "target": result.artifact_id},
+    ]
+    plan_files = [p for p in result.extras if p.name.startswith("IP-")]
+    assert plan_files == []
 
   def test_create_requirement_breakout(self) -> None:
     """Test creating a requirement breakout artifact for a spec."""

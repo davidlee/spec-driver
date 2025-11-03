@@ -14,8 +14,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -216,7 +216,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 
-# But include our source code in supekku/
+# include OUR lib!
 !supekku/
 !supekku/**
 __pycache__
@@ -224,13 +224,10 @@ __pycache__
 
 /scratch
 
-# spec-driver workspace directories (in case installer is run in repo root during testing)
-#/backlog/
-#/change/
-#/specify/
 
+# we install over these
 /.claude/commands
-!/.spec-driver/registry
+
 /kanban
 /next_action.md
 

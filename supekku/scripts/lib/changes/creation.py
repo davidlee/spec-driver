@@ -208,6 +208,46 @@ def create_delta(
   dump_markdown_file(delta_path, frontmatter, body)
 
   extras: list[Path] = []
+
+  design_revision_id = delta_id.replace("DE", "DR", 1)
+  design_revision_frontmatter = {
+    "id": design_revision_id,
+    "slug": slug,
+    "name": f"Design Revision - {name}",
+    "created": today,
+    "updated": today,
+    "status": "draft",
+    "kind": "design_revision",
+    "aliases": [],
+    "owners": [],
+    "relations": [
+      {"type": "implements", "target": delta_id},
+    ],
+    "delta_ref": delta_id,
+    "source_context": [],
+    "code_impacts": [],
+    "verification_alignment": [],
+    "design_decisions": [],
+    "open_questions": [],
+  }
+  design_revision_template_path = _get_template_path("design_revision.md", repo)
+  design_revision_template_body = extract_template_body(design_revision_template_path)
+  design_revision_template = Template(design_revision_template_body)
+  design_revision_body = design_revision_template.render(
+    design_revision_id=design_revision_id,
+    delta_id=delta_id,
+    name=name,
+    created=today,
+    updated=today,
+  )
+  design_revision_path = delta_dir / f"{design_revision_id}.md"
+  dump_markdown_file(
+    design_revision_path,
+    design_revision_frontmatter,
+    design_revision_body,
+  )
+  extras.append(design_revision_path)
+
   plan_id = delta_id.replace("DE", "IP")
   if not allow_missing_plan:
     # Render YAML blocks

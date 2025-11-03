@@ -256,7 +256,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 | [x] | 1.1 | Research existing patterns | [ ] | Completed - see Section 10 |
 | [x] | 1.2 | Create core/filters.py module | [ ] | Completed - pylint 10/10 |
 | [x] | 1.3 | Write multi-value filter tests | [x] | Completed - 24 tests |
-| [WIP] | 1.4 | Implement multi-value filters | [ ] | After 1.3 |
+| [x] | 1.4 | Implement multi-value filters | [ ] | Completed - 6 commands updated |
 | [ ] | 1.5 | Write reverse query tests | [x] | Can parallelize with 1.3 |
 | [ ] | 1.6 | Add reverse query methods to registries | [ ] | After 1.5 |
 | [ ] | 1.7 | Implement reverse query flags | [ ] | After 1.6 |
@@ -338,19 +338,26 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Total test count: 108 tests (18 new filter utility + 6 new CLI + 84 existing)
 - **Commits / References**: Next commit
 
-#### **1.4 Implement multi-value filters**
+#### **1.4 Implement multi-value filters** ✅
 - **Design / Approach**:
-  - Implement `parse_multi_value_filter()` in `core/filters.py`
-  - Update all list commands to use utility for status, kind filters
+  - Update all list commands to use `parse_multi_value_filter()` for status, kind filters
   - Modify filter logic: `status in parse_multi_value_filter(status_arg)`
   - Maintain backward compatibility: single values work as before
-  - Commands to update: list_deltas, list_adrs, list_specs, list_requirements, list_revisions, list_changes
+  - Commands updated: list_deltas, list_specs, list_requirements, list_changes, list_revisions
+  - Note: list_adrs already supported multi-value via DecisionRegistry.iter()
 - **Files / Components**:
-  - `supekku/scripts/lib/core/filters.py` - implement utility
-  - `supekku/cli/list.py` - update all list commands
-- **Testing**: Run tests from 1.3; all should now PASS (TDD green phase)
-- **Observations & AI Notes**: *Record implementation challenges*
-- **Commits / References**: *Commit hash after implementation*
+  - `supekku/cli/list.py` - updated 6 list commands (added import, updated filtering logic)
+  - `supekku/cli/test_cli.py` - updated test to verify multi-value kind works
+- **Testing**: All 24 new tests PASS, all 92 existing CLI tests PASS ✅
+- **Observations & AI Notes**:
+  - Fixed `list specs` kind validation to accept comma-separated values (was rejecting "prod,tech")
+  - Multi-value filters use OR logic: `-s "draft,in-progress"` returns items with either status
+  - Backward compatibility confirmed: single values like `-s draft` still work unchanged
+  - Kind filter for specs now accepts: tech, product, prod, all (plus comma combinations)
+  - All linters passing: ruff clean, pylint clean
+  - Manual testing: `list specs -k "prod,tech"` returns both PROD and SPEC specs
+  - Manual testing: `list deltas -s "draft,in-progress"` returns DE-010 and DE-011
+- **Commits / References**: Next commit
 
 #### **1.5 Write reverse query tests (TDD)**
 - **Design / Approach**:
@@ -636,13 +643,26 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Key discovery: `list specs -k "prod,tech"` currently errors with "invalid kind" (expected)
   - Backward compatibility tests confirm single-value filters work unchanged
 
+- ✅ **Task 1.4**: Implement multi-value filters in CLI commands
+  - Updated 6 list commands: deltas, specs, requirements, changes, revisions (adrs already supported)
+  - Added import to `supekku/cli/list.py`: `from supekku.scripts.lib.core.filters import parse_multi_value_filter`
+  - Pattern used: `status_normalized = [normalize(s) for s in parse_multi_value_filter(status)]`
+  - Filter logic: `if status_normalized and artifact.status not in status_normalized: continue`
+  - Fixed `list specs` kind validation to accept comma-separated values
+  - All 24 new tests PASS (TDD green phase achieved) ✅
+  - All 92 existing CLI tests PASS ✅
+  - Linters: ruff clean, pylint clean ✅
+  - Manual testing confirms: `list specs -k "prod,tech"` returns both PROD and SPEC specs
+  - Manual testing confirms: `list deltas -s "draft,in-progress"` returns DE-010, DE-011
+
 **Next Tasks (Ready to Start):**
-- 🔜 **Task 1.4**: Implement multi-value filters in CLI commands
-  - Update `list_deltas`, `list_requirements`, `list_specs`, `list_adrs`, etc.
-  - Replace single-value status checks with multi-value logic
-  - Pattern: `if status and artifact.status not in parse_multi_value_filter(status)`
-  - Tests from 1.3 should then PASS (TDD green phase)
-  - Fix validation error for `list specs -k` to accept comma-separated values
+- 🔜 **Task 1.5**: Write tests for reverse relationship queries (TDD)
+  - Write tests for registry reverse query methods (to be implemented in 1.6)
+  - Write tests for CLI reverse query flags (to be implemented in 1.7)
+  - Tests should FAIL initially (TDD red phase)
+  - Example: `list deltas --implements PROD-010.FR-004`
+  - Example: `list requirements --verified-by VT-CLI-001`
+  - Example: `list specs --informed-by ADR-001`
 
 **Important Context for Next Developer:**
 1. **TDD Discipline**: Task 1.3 must write tests BEFORE Task 1.4 implementation

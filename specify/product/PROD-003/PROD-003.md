@@ -140,52 +140,52 @@ entries:
   - artefact: VT-PROD-003-001
     kind: VT
     requirement: PROD-003.FR-001
-    status: planned
+    status: verified
     notes: E2E test - create policy via CLI, verify file and registry
   - artefact: VT-PROD-003-002
     kind: VT
     requirement: PROD-003.FR-002
-    status: planned
+    status: verified
     notes: Integration test - policy status transitions and supersession
   - artefact: VT-PROD-003-003
     kind: VT
     requirement: PROD-003.FR-003
-    status: planned
+    status: verified
     notes: E2E test - create standard via CLI, verify file and registry
   - artefact: VT-PROD-003-004
     kind: VT
     requirement: PROD-003.FR-004
-    status: planned
+    status: verified
     notes: Unit test - validate "default" status behavior
   - artefact: VT-PROD-003-005
     kind: VT
     requirement: PROD-003.FR-005
-    status: planned
+    status: verified
     notes: Integration test - list policies/standards with various filters
   - artefact: VT-PROD-003-006
     kind: VT
     requirement: PROD-003.FR-006
-    status: planned
+    status: verified
     notes: Integration test - show policy/standard with full details
   - artefact: VT-PROD-003-007
     kind: VT
     requirement: PROD-003.FR-007
-    status: planned
+    status: verified
     notes: Integration test - bidirectional policy ↔ standard references
   - artefact: VT-PROD-003-008
     kind: VT
     requirement: PROD-003.FR-008
-    status: planned
+    status: verified
     notes: Integration test - policy/standard references in ADRs
   - artefact: VT-PROD-003-009
     kind: VT
     requirement: PROD-003.NF-001
-    status: planned
+    status: verified
     notes: Template validation - policies/standards follow consistent structure
   - artefact: VA-PROD-003-001
     kind: VA
     requirement: PROD-003.NF-002
-    status: planned
+    status: verified
     notes: UX review - CLI discoverability and navigation patterns
 ```
 

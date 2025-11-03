@@ -41,6 +41,10 @@ requirements:
     - PROD-010.FR-008
     - PROD-010.FR-009
     - PROD-010.FR-010
+    - PROD-010.FR-011
+    - PROD-010.FR-012
+    - PROD-010.FR-013
+    - PROD-010.FR-014
     - PROD-010.NF-001
     - PROD-010.NF-002
     - PROD-010.NF-003
@@ -230,6 +234,36 @@ entries:
     status: planned
     notes: Test error message quality (suggestions, valid values, examples)
 
+  - artefact: VT-PROD010-BACKLOG-001
+    kind: VT
+    requirement: PROD-010.FR-011
+    status: planned
+    notes: Test kind-specific backlog list shortcuts (issues, problems, improvements, risks) with all filter options
+
+  - artefact: VT-PROD010-HELP-001
+    kind: VT
+    requirement: PROD-010.FR-012
+    status: planned
+    notes: Test help command displays core concepts, workflows, conventions from markdown
+
+  - artefact: VT-PROD010-HELP-002
+    kind: VT
+    requirement: PROD-010.FR-013
+    status: planned
+    notes: Test help command distinguishes immutable (core) vs customizable (project) docs
+
+  - artefact: VT-PROD010-HELP-003
+    kind: VT
+    requirement: PROD-010.FR-014
+    status: planned
+    notes: Test installing help templates to project directory
+
+  - artefact: VT-PROD010-VALIDATE-001
+    kind: VT
+    requirement: PROD-010.FR-015
+    status: planned
+    notes: Test per-file validation of frontmatter and YAML blocks
+
   - artefact: VA-PROD010-TOKEN-001
     kind: VA
     requirement: PROD-010.NF-001
@@ -346,13 +380,15 @@ entries:
 
 ### Capability Overview
 
-The CLI Agent UX improvements provide five core capabilities:
+The CLI Agent UX improvements provide seven core capabilities:
 
 1. **Consistent JSON Output** (FR-001, FR-002): Universal JSON support across all list/show commands with stable schemas
 2. **Universal Filtering** (FR-003, FR-004, FR-005): Status filters everywhere, multi-value selections, reverse relationship queries
 3. **Schema Introspection** (FR-006, FR-007): Discoverable enum values, output format documentation
-4. **Machine-Readable Mode** (FR-008, FR-009, NF-001): Unified flag for agent-optimized output with pagination
-5. **Improved Error Guidance** (FR-010, NF-002): Actionable error messages with valid alternatives and examples
+4. **Discoverable Help System** (FR-012, FR-013, FR-014, FR-015): Built-in docs, workflows, validation without external references
+5. **Machine-Readable Mode** (FR-008, FR-009, NF-001): Unified flag for agent-optimized output with pagination
+6. **Improved Error Guidance** (FR-010, NF-002): Actionable error messages with valid alternatives and examples
+7. **Command Consistency** (FR-011): Kind-specific shortcuts aligned with create commands
 
 ### Functional Requirements
 
@@ -403,6 +439,30 @@ The CLI Agent UX improvements provide five core capabilities:
   *Current Gap*: Format differences undocumented
   *Verification*: VT-PROD010-SCHEMA-002 - Validate help text includes format documentation
 
+- **PROD-010.FR-012**: CLI MUST provide help command showing core concepts, workflows, and conventions from markdown sources
+  *Rationale*: Agents and users need discoverable help without consulting external docs or web searches
+  *Commands*: `help concepts`, `help workflows`, `help conventions`
+  *Current Gap*: No built-in help system; users must read GitHub docs or local files manually
+  *Verification*: VT-PROD010-HELP-001 - Test help command displays markdown content correctly
+
+- **PROD-010.FR-013**: Help system MUST distinguish between immutable (spec-driver core) and customizable (project-specific) documentation
+  *Rationale*: Users need to know what they can modify vs what represents framework fundamentals
+  *Implementation*: Immutable docs from package, customizable docs from project directory
+  *Current Gap*: No distinction between framework docs and project docs
+  *Verification*: VT-PROD010-HELP-002 - Test help command shows source type (core vs project)
+
+- **PROD-010.FR-014**: CLI MUST support installing customizable help docs to project for user modification
+  *Rationale*: Projects need to document their own workflows and conventions alongside framework docs
+  *Commands*: `help install workflows` or `install help-templates`
+  *Current Gap*: No mechanism to bootstrap project-specific help docs
+  *Verification*: VT-PROD010-HELP-003 - Test installing help templates to project
+
+- **PROD-010.FR-015**: CLI MUST support per-file validation of frontmatter and YAML blocks
+  *Rationale*: Users need to validate individual files during authoring without running full workspace validation
+  *Commands*: `validate file <path>` validates frontmatter schema and all embedded YAML blocks
+  *Current Gap*: Only workspace-level validation exists; no targeted file validation
+  *Verification*: VT-PROD010-VALIDATE-001 - Test file validation catches schema errors, invalid blocks
+
 **Priority 4: Machine-Readable Mode (Token efficiency)**
 
 - **PROD-010.FR-008**: All commands MUST support `--machine-readable` flag that implies:
@@ -430,6 +490,15 @@ The CLI Agent UX improvements provide five core capabilities:
   *Rationale*: Enables agent self-correction without user intervention
   *Current Gap*: Errors like "invalid format: xml" don't show valid formats
   *Verification*: VT-PROD010-ERROR-001 - Test error message quality across scenarios
+
+**Priority 6: Command Consistency (Reduces cognitive load)**
+
+- **PROD-010.FR-011**: CLI MUST provide kind-specific backlog list shortcuts (issues/problems/improvements/risks)
+  *Rationale*: Consistent with other artifact patterns (specs/deltas/adrs/requirements); reduces cognitive load
+  *Commands*: list issues, list problems, list improvements, list risks (equivalent to list backlog with kind filter)
+  *Current Gap*: Must use list backlog -k kind for type-specific views; inconsistent with create commands
+  *Consistency*: Matches create pattern with list pattern
+  *Verification*: VT-PROD010-BACKLOG-001 - Test all four kind-specific list commands with filters
 
 ### Non-Functional Requirements
 

@@ -51,7 +51,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    status: verified
+    status: pending
     introduced: null
     implemented_by: []
     verified_by:
@@ -65,7 +65,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    status: verified
+    status: pending
     introduced: null
     implemented_by: []
     verified_by:
@@ -97,8 +97,7 @@ requirements:
     status: pending
     introduced: null
     implemented_by: []
-    verified_by:
-    - AUD-001
+    verified_by: []
     coverage_evidence:
     - VA-002
     path: specify/product/PROD-001/PROD-001.md
@@ -207,7 +206,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-010
@@ -222,7 +221,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-010
@@ -237,7 +236,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-010
@@ -253,7 +252,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-010
@@ -269,7 +268,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-010
@@ -285,7 +284,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-010
@@ -301,7 +300,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-010
@@ -317,7 +316,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-010
@@ -333,7 +332,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: non-functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-010
@@ -349,7 +348,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: non-functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-010
@@ -406,7 +405,7 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: functional
-    status: active
+    status: pending
     introduced: null
     implemented_by:
     - DE-003
@@ -488,7 +487,7 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
-    status: active
+    status: pending
     introduced: null
     implemented_by:
     - DE-002
@@ -504,7 +503,7 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
-    status: active
+    status: pending
     introduced: null
     implemented_by:
     - DE-002
@@ -519,7 +518,7 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
-    status: active
+    status: pending
     introduced: null
     implemented_by:
     - DE-002
@@ -534,7 +533,7 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
-    status: active
+    status: pending
     introduced: null
     implemented_by:
     - DE-002
@@ -549,10 +548,9 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: non-functional
-    status: active
+    status: pending
     introduced: null
-    implemented_by:
-    - DE-002
+    implemented_by: []
     verified_by: []
     coverage_evidence:
     - VA-001
@@ -564,10 +562,9 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: non-functional
-    status: active
+    status: pending
     introduced: null
-    implemented_by:
-    - DE-002
+    implemented_by: []
     verified_by: []
     coverage_evidence:
     - VA-002
@@ -1078,6 +1075,79 @@ requirements:
     coverage_evidence:
     - VT-PROD010-ERROR-001
     path: specify/product/PROD-010/PROD-010.md
+  PROD-010.FR-011:
+    label: FR-011
+    title: CLI MUST provide kind-specific backlog list shortcuts (issues/problems/improvements/risks)
+    specs:
+    - PROD-010
+    primary_spec: PROD-010
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-PROD010-BACKLOG-001
+    path: specify/product/PROD-010/PROD-010.md
+  PROD-010.FR-012:
+    label: FR-012
+    title: CLI MUST provide help command showing core concepts, workflows, and conventions
+      from markdown sources
+    specs:
+    - PROD-010
+    primary_spec: PROD-010
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-PROD010-HELP-001
+    path: specify/product/PROD-010/PROD-010.md
+  PROD-010.FR-013:
+    label: FR-013
+    title: Help system MUST distinguish between immutable (spec-driver core) and customizable
+      (project-specific) documentation
+    specs:
+    - PROD-010
+    primary_spec: PROD-010
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-PROD010-HELP-002
+    path: specify/product/PROD-010/PROD-010.md
+  PROD-010.FR-014:
+    label: FR-014
+    title: CLI MUST support installing customizable help docs to project for user
+      modification
+    specs:
+    - PROD-010
+    primary_spec: PROD-010
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-PROD010-HELP-003
+    path: specify/product/PROD-010/PROD-010.md
+  PROD-010.FR-015:
+    label: FR-015
+    title: CLI MUST support per-file validation of frontmatter and YAML blocks
+    specs:
+    - PROD-010
+    primary_spec: PROD-010
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-PROD010-VALIDATE-001
+    path: specify/product/PROD-010/PROD-010.md
   PROD-010.NF-001:
     label: NF-001
     title: Token efficiency final validation
@@ -1121,6 +1191,450 @@ requirements:
     coverage_evidence:
     - VH-PROD010-UX-001
     path: specify/product/PROD-010/PROD-010.md
+  SPEC-110.FR-001:
+    label: FR-001
+    title: CLI MUST provide single unified entry point (`spec-driver`) routing to
+      all subcommand groups (list, show, create, sync, schema, backfill, complete,
+      workspace)
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-STRUCTURE-001
+    - VT-CLI-WORKSPACE-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.FR-002:
+    label: FR-002
+    title: List commands MUST delegate all data access to registries and all formatting
+      to formatters (zero business logic in CLI)
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-LIST-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.FR-003:
+    label: FR-003
+    title: "Backfill command MUST detect stub specs (status='stub' or \u226430 lines)\
+      \ and replace body with template while preserving frontmatter"
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-BACKFILL-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.FR-004:
+    label: FR-004
+    title: Sync command MUST delegate to sync adapters for multi-language code-to-spec
+      synchronization (Python, Go, TypeScript) and MUST support separate ADR registry
+      synchronization via `--adr` flag
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-SYNC-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.FR-005:
+    label: FR-005
+    title: 'All list commands MUST support consistent flag patterns (--format, --json,
+      --filter, --regexp, --case-insensitive, --root) and MUST apply regexp filtering
+      to artifact-specific fields:'
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-COMMON-001
+    - VT-CLI-FILTER-001
+    - VT-CLI-JSON-001
+    - VT-CLI-REGEXP-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.FR-006:
+    label: FR-006
+    title: 'All list commands MUST support output formats: table (default), json,
+      tsv; list specs command MUST additionally support --status/-s filter for filtering
+      by spec status (draft, active, deprecated, superseded)'
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-FORMAT-001
+    - VT-CLI-JSON-SCHEMA-001
+    - VT-CLI-STATUS-FILTER-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.FR-007:
+    label: FR-007
+    title: Schema commands MUST list block schemas and frontmatter schemas separately
+      (via `schema list blocks|frontmatter|all`) and MUST display schema details in
+      json-schema or yaml-example formats
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-SCHEMA-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.FR-008:
+    label: FR-008
+    title: 'Create commands MUST support all artifact types using templates:'
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-CREATE-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.FR-009:
+    label: FR-009
+    title: Show commands MUST display detailed artifact information for all major
+      types (specs, deltas, revisions, ADRs, requirements) and MUST include `show
+      template` for displaying spec templates
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-SHOW-001
+    - VT-CLI-SHOW-JSON-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.FR-010:
+    label: FR-010
+    title: Complete delta command MUST mark delta as completed AND update associated
+      requirement statuses to 'live' in revision source files
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-COMPLETE-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.NF-001:
+    label: NF-001
+    title: CLI commands MUST complete typical operations (list, show, create) in <2
+      seconds on standard hardware
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: non-functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-INTEGRATION-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-110.NF-002:
+    label: NF-002
+    title: CLI modules MUST average <200 lines per file to maintain thin orchestration
+      pattern
+    specs:
+    - SPEC-110
+    primary_spec: SPEC-110
+    kind: non-functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CLI-ERROR-001
+    path: specify/tech/SPEC-110/SPEC-110.md
+  SPEC-112.FR-001:
+    label: FR-001
+    title: CLI MUST accept a path argument (file or directory) and validate it exists
+      before processing
+    specs:
+    - SPEC-112
+    primary_spec: SPEC-112
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-001
+    path: specify/tech/SPEC-112/SPEC-112.md
+  SPEC-112.FR-002:
+    label: FR-002
+    title: 'CLI MUST support `--type` argument with choices: `public` (default), `all`,
+      `tests` to control documentation variants'
+    specs:
+    - SPEC-112
+    primary_spec: SPEC-112
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-002
+    path: specify/tech/SPEC-112/SPEC-112.md
+  SPEC-112.FR-003:
+    label: FR-003
+    title: CLI MUST exit with code 1 for invalid inputs (missing path, permission
+      errors, invalid arguments) and print clear error messages
+    specs:
+    - SPEC-112
+    primary_spec: SPEC-112
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-003
+    path: specify/tech/SPEC-112/SPEC-112.md
+  SPEC-112.FR-004:
+    label: FR-004
+    title: CLI MUST support `--check` mode that verifies documentation matches code
+      without writing files, exiting 0 if unchanged or 1 if changes detected
+    specs:
+    - SPEC-112
+    primary_spec: SPEC-112
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-004
+    path: specify/tech/SPEC-112/SPEC-112.md
+  SPEC-112.FR-005:
+    label: FR-005
+    title: "CLI MUST format results with status symbols: `+` (created), `~` (changed),\
+      \ `=` (unchanged), `\u2717` (error), with `\u2713`/`\u2717` in check mode"
+    specs:
+    - SPEC-112
+    primary_spec: SPEC-112
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-005
+    path: specify/tech/SPEC-112/SPEC-112.md
+  SPEC-112.FR-006:
+    label: FR-006
+    title: CLI MUST print summary statistics showing counts by status (created, changed,
+      unchanged, errors) after processing multiple files
+    specs:
+    - SPEC-112
+    primary_spec: SPEC-112
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-006
+    path: specify/tech/SPEC-112/SPEC-112.md
+  SPEC-112.FR-007:
+    label: FR-007
+    title: CLI MUST maintain backward compatibility with original interface including
+      all argument names, default values, and exit codes
+    specs:
+    - SPEC-112
+    primary_spec: SPEC-112
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-007
+    path: specify/tech/SPEC-112/SPEC-112.md
+  SPEC-112.NF-001:
+    label: NF-001
+    title: "CLI MUST complete documentation generation for typical package (\u2264\
+      100 files) in \u22645 seconds (wall time) on modern hardware"
+    specs:
+    - SPEC-112
+    primary_spec: SPEC-112
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VA-001
+    path: specify/tech/SPEC-112/SPEC-112.md
+  SPEC-112.NF-002:
+    label: NF-002
+    title: CLI MUST preserve all original argument names, defaults, and behaviors
+      to ensure zero-modification migration for existing scripts
+    specs:
+    - SPEC-112
+    primary_spec: SPEC-112
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VH-001
+    path: specify/tech/SPEC-112/SPEC-112.md
+  SPEC-114.FR-001:
+    label: FR-001
+    title: Schema Definition API
+    specs:
+    - SPEC-114
+    primary_spec: SPEC-114
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-114/SPEC-114.md
+  SPEC-114.FR-002:
+    label: FR-002
+    title: Field Constraints
+    specs:
+    - SPEC-114
+    primary_spec: SPEC-114
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-114/SPEC-114.md
+  SPEC-114.FR-003:
+    label: FR-003
+    title: Runtime Validation
+    specs:
+    - SPEC-114
+    primary_spec: SPEC-114
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-114/SPEC-114.md
+  SPEC-114.FR-004:
+    label: FR-004
+    title: Validation Errors
+    specs:
+    - SPEC-114
+    primary_spec: SPEC-114
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-114/SPEC-114.md
+  SPEC-114.FR-005:
+    label: FR-005
+    title: JSON Schema Generation
+    specs:
+    - SPEC-114
+    primary_spec: SPEC-114
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-114/SPEC-114.md
+  SPEC-114.FR-006:
+    label: FR-006
+    title: Conditional Rules in JSON Schema
+    specs:
+    - SPEC-114
+    primary_spec: SPEC-114
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-114/SPEC-114.md
+  SPEC-114.NF-001:
+    label: NF-001
+    title: Immutability
+    specs:
+    - SPEC-114
+    primary_spec: SPEC-114
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-114/SPEC-114.md
+  SPEC-114.NF-002:
+    label: NF-002
+    title: Error Quality
+    specs:
+    - SPEC-114
+    primary_spec: SPEC-114
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-114/SPEC-114.md
+  SPEC-114.NF-003:
+    label: NF-003
+    title: Standards Compliance
+    specs:
+    - SPEC-114
+    primary_spec: SPEC-114
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-114/SPEC-114.md
   SPEC-116.NF-001:
     label: NF-001
     title: Fast Metadata Lookup**
@@ -1329,3 +1843,285 @@ requirements:
     verified_by: []
     coverage_evidence: []
     path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-124.FR-001:
+    label: FR-001
+    title: LanguageAdapter base class MUST define abstract methods for `discover_targets()`,
+      `describe()`, `generate()`, and `supports_identifier()`
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-001
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.FR-002:
+    label: FR-002
+    title: LanguageAdapter MUST provide `validate_source_exists()` to check file/directory
+      existence and git tracking status
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-002
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.FR-003:
+    label: FR-003
+    title: PythonAdapter MUST discover Python modules using package structure and
+      `__init__.py` detection
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-003
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.FR-004:
+    label: FR-004
+    title: PythonAdapter MUST generate AST-based documentation preserving docstring
+      formatting (including indentation)
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-004
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.FR-005:
+    label: FR-005
+    title: GoAdapter MUST discover Go packages using `go list` command
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-005
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.FR-006:
+    label: FR-006
+    title: GoAdapter MUST validate Go toolchain and gomarkdoc availability before
+      generation
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-006
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.FR-007:
+    label: FR-007
+    title: TypeScriptAdapter MUST discover logical modules (directories with index.ts/js,
+      standalone files, src/ subdirectories)
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-007
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.FR-008:
+    label: FR-008
+    title: TypeScriptAdapter MUST extract AST using ts-morph via ts-doc-extract subprocess
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-008
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.FR-009:
+    label: FR-009
+    title: TypeScriptAdapter MUST detect and support npm, pnpm, and bun package managers
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-009
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.NF-001:
+    label: NF-001
+    title: "All adapters MUST generate deterministic output (same input \u2192 same\
+      \ output)"
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-010
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.NF-002:
+    label: NF-002
+    title: Adapters MUST fail gracefully with descriptive errors when required toolchains
+      are unavailable
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-011
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-124.NF-003:
+    label: NF-003
+    title: TypeScriptAdapter MUST support multiple package managers without requiring
+      explicit configuration
+    specs:
+    - SPEC-124
+    primary_spec: SPEC-124
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-012
+    path: specify/tech/SPEC-124/SPEC-124.md
+  SPEC-125.FR-001:
+    label: FR-001
+    title: Validator MUST validate all requirement lifecycle links (implemented_by,
+      introduced_by, verified_by) point to existing artifacts
+    specs:
+    - SPEC-125
+    primary_spec: SPEC-125
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-VALIDATOR-001
+    path: specify/tech/SPEC-125/SPEC-125.md
+  SPEC-125.FR-002:
+    label: FR-002
+    title: Validator MUST detect when change artifact relations reference non-existent
+      requirements
+    specs:
+    - SPEC-125
+    primary_spec: SPEC-125
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-VALIDATOR-002
+    path: specify/tech/SPEC-125/SPEC-125.md
+  SPEC-125.FR-003:
+    label: FR-003
+    title: Validator MUST validate change artifact `applies_to.requirements` fields
+      reference existing requirements
+    specs:
+    - SPEC-125
+    primary_spec: SPEC-125
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-VALIDATOR-003
+    path: specify/tech/SPEC-125/SPEC-125.md
+  SPEC-125.FR-004:
+    label: FR-004
+    title: Validator MUST validate all ADR `related_decisions` references point to
+      existing decision IDs
+    specs:
+    - SPEC-125
+    primary_spec: SPEC-125
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-VALIDATOR-004
+    path: specify/tech/SPEC-125/SPEC-125.md
+  SPEC-125.FR-005:
+    label: FR-005
+    title: Validator MUST warn (in strict mode) when active ADRs reference deprecated
+      or superseded ADRs
+    specs:
+    - SPEC-125
+    primary_spec: SPEC-125
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-VALIDATOR-005
+    path: specify/tech/SPEC-125/SPEC-125.md
+  SPEC-125.FR-006:
+    label: FR-006
+    title: Validator MUST return structured ValidationIssue objects with level, artifact,
+      and message
+    specs:
+    - SPEC-125
+    primary_spec: SPEC-125
+    kind: functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-VALIDATOR-006
+    path: specify/tech/SPEC-125/SPEC-125.md
+  SPEC-125.NF-001:
+    label: NF-001
+    title: Validator MUST complete full workspace validation in <5 seconds for typical
+      workspace size (100 specs, 500 requirements, 50 changes, 30 ADRs)
+    specs:
+    - SPEC-125
+    primary_spec: SPEC-125
+    kind: non-functional
+    status: active
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-VALIDATOR-007
+    path: specify/tech/SPEC-125/SPEC-125.md

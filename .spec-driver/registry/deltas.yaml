@@ -1077,7 +1077,7 @@ deltas:
             top-level structure
   DE-010:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Policy and Standard Management
     slug: policy-and-standard-management
     updated: '2025-11-03'

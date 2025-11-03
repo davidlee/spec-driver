@@ -2,6 +2,10 @@
 
 Requirements management and processing utilities.
 
+## Constants
+
+- `logger`
+
 ## Classes
 
 ### RequirementRecord

@@ -4,8 +4,9 @@ Requirements management and processing utilities.
 
 ## Constants
 
-- `_REQUIREMENT_LINE`
+- `_REQUIREMENT_LINE` - - **PROD-010.FR-001**: Fully-qualified format (current standard)
 - `__all__`
+- `logger`
 
 ## Classes
 
@@ -61,10 +62,16 @@ Returns None if no entries or unable to determine.
 - `_iter_plan_files(self, dirs) -> Iterator[Path]`: Iterate over implementation plan files in directories.
 - `_iter_spec_files(self, spec_dirs) -> Iterator[Path]`
 - `_load(self) -> None` - ------------------------------------------------------------------
-- `_records_from_content(self, spec_id, _frontmatter, body, spec_path, repo_root) -> Iterator[RequirementRecord]`
+- `_records_from_content(self, spec_id, _frontmatter, body, spec_path, repo_root) -> Iterator[RequirementRecord]`: Extract requirement records from spec body content.
+
+Logs warnings if requirement-like lines are found but not extracted.
 - `_records_from_frontmatter(self, spec_id, frontmatter, body, spec_path, repo_root) -> Iterator[RequirementRecord]`
 - `_requirements_from_spec(self, spec_path, spec_id, repo_root) -> Iterator[RequirementRecord]`
 - `_resolve_spec_path(self, spec_id, spec_registry) -> str`
+- `_validate_extraction(self, spec_registry, seen) -> None`: Validate extraction results and warn about potential issues.
+
+Checks for specs with zero extracted requirements, which may indicate
+format issues or extraction failures.
 
 ### SyncStats
 

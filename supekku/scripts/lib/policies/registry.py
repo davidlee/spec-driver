@@ -100,7 +100,7 @@ class PolicyRegistry:
   """Registry for managing Policies."""
 
   def __init__(self, *, root: Path | None = None) -> None:
-    self.root = find_repo_root(root)
+    self.root = root if root is not None else find_repo_root(None)
     self.directory = self.root / "specify" / "policies"
     self.output_path = get_registry_dir(self.root) / "policies.yaml"
 

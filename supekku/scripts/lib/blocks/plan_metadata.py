@@ -99,9 +99,7 @@ PLAN_OVERVIEW_METADATA = BlockMetadata(
       type="array",
       required=True,
       min_items=1,
-      description=(
-        "Ordered list of phase IDs (metadata in phase.overview blocks)"
-      ),
+      description=("Ordered list of phase IDs (metadata in phase.overview blocks)"),
       items=FieldMetadata(
         type="object",
         description="Phase ID reference",

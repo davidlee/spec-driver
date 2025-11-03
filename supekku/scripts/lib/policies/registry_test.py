@@ -72,7 +72,7 @@ class TestPolicyRegistry(unittest.TestCase):
     self.policies_dir = self.root / "specify" / "policies"
     self.policies_dir.mkdir(parents=True)
 
-    self.registry_dir = self.root / "specify" / ".registry"
+    self.registry_dir = self.root / ".spec-driver" / "registry"
     self.registry_dir.mkdir(parents=True)
 
   def test_init(self) -> None:
@@ -124,8 +124,7 @@ All production code must be accompanied by automated tests.
     assert policy.status == "required"
     assert policy.created == date(2024, 1, 1)
     assert (
-      policy.summary
-      == "All production code must be accompanied by automated tests"
+      policy.summary == "All production code must be accompanied by automated tests"
     )
     assert policy.tags == ["quality", "testing"]
 

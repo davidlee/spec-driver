@@ -322,6 +322,7 @@ class TestJSONFlagConsistency:
     assert result.exit_code == 0
     # Output should be valid JSON
     import json
+
     try:
       data = json.loads(result.stdout)
       assert isinstance(data, dict)
@@ -341,6 +342,7 @@ class TestJSONFlagConsistency:
     result = runner.invoke(app, ["list", "adrs", "--json"])
     assert result.exit_code == 0
     import json
+
     try:
       data = json.loads(result.stdout)
       assert isinstance(data, dict)
@@ -360,6 +362,7 @@ class TestJSONFlagConsistency:
     result = runner.invoke(app, ["list", "requirements", "--json"])
     assert result.exit_code == 0
     import json
+
     try:
       data = json.loads(result.stdout)
       assert isinstance(data, dict)
@@ -379,6 +382,7 @@ class TestJSONFlagConsistency:
     result = runner.invoke(app, ["list", "revisions", "--json"])
     assert result.exit_code == 0
     import json
+
     try:
       data = json.loads(result.stdout)
       assert isinstance(data, dict)
@@ -398,6 +402,7 @@ class TestJSONFlagConsistency:
     result = runner.invoke(app, ["list", "changes", "--json"])
     assert result.exit_code == 0
     import json
+
     try:
       data = json.loads(result.stdout)
       assert isinstance(data, dict)
@@ -417,6 +422,7 @@ class TestJSONFlagConsistency:
     result = runner.invoke(app, ["list", "specs", "--json"])
     assert result.exit_code == 0
     import json
+
     try:
       data = json.loads(result.stdout)
       assert isinstance(data, dict)
@@ -454,6 +460,7 @@ class TestShowCommandJSON:
     assert result.exit_code in [0, 1]
     if result.exit_code == 0:
       import json
+
       try:
         data = json.loads(result.stdout)
         assert isinstance(data, dict)
@@ -466,6 +473,7 @@ class TestShowCommandJSON:
     assert result.exit_code in [0, 1]
     if result.exit_code == 0:
       import json
+
       try:
         data = json.loads(result.stdout)
         assert isinstance(data, dict)
@@ -478,6 +486,7 @@ class TestShowCommandJSON:
     assert result.exit_code in [0, 1]
     if result.exit_code == 0:
       import json
+
       try:
         data = json.loads(result.stdout)
         assert isinstance(data, dict)
@@ -490,6 +499,7 @@ class TestShowCommandJSON:
     assert result.exit_code in [0, 1]
     if result.exit_code == 0:
       import json
+
       try:
         data = json.loads(result.stdout)
         assert isinstance(data, dict)
@@ -502,6 +512,7 @@ class TestShowCommandJSON:
     assert result.exit_code in [0, 1]
     if result.exit_code == 0:
       import json
+
       try:
         data = json.loads(result.stdout)
         assert isinstance(data, dict)
@@ -560,6 +571,7 @@ class TestStatusFilterParity:
     result = runner.invoke(app, ["list", "specs", "--status", "active", "--json"])
     assert result.exit_code == 0
     import json
+
     try:
       data = json.loads(result.stdout)
       assert isinstance(data, dict)
@@ -580,6 +592,7 @@ class TestJSONSchemaRegression:
     result = runner.invoke(app, ["list", "specs", "--json"])
     assert result.exit_code == 0
     import json
+
     data = json.loads(result.stdout)
     # Should have items key
     assert "items" in data
@@ -590,6 +603,7 @@ class TestJSONSchemaRegression:
     result = runner.invoke(app, ["list", "deltas", "--format", "json"])
     assert result.exit_code == 0
     import json
+
     data = json.loads(result.stdout)
     # Should have expected top-level structure
     assert isinstance(data, dict)
@@ -684,6 +698,93 @@ class TestRegexpFiltering:
     assert result.exit_code == 0
     assert "--regexp" in result.stdout
     assert "--case-insensitive" in result.stdout
+
+
+class TestPolicyCommands:
+  """Test policy-related CLI commands."""
+
+  def test_list_policies_help(self):
+    """Test list policies command help."""
+    result = runner.invoke(app, ["list", "policies", "--help"])
+    assert result.exit_code == 0
+    assert "List policies with optional filtering" in result.stdout
+    assert "--status" in result.stdout
+    assert "--tag" in result.stdout
+    assert "--spec" in result.stdout
+
+  def test_list_policies_json_flag(self):
+    """Test list policies supports --json flag."""
+    result = runner.invoke(app, ["list", "policies", "--help"])
+    assert result.exit_code == 0
+    assert "--json" in result.stdout
+    assert "--format" in result.stdout
+
+  def test_list_policies_empty_succeeds(self):
+    """Test list policies with no policies exits successfully."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+      # Initialize workspace
+      runner.invoke(app, ["install", tmpdir, "--yes"])
+      result = runner.invoke(app, ["list", "policies", "--root", tmpdir])
+      assert result.exit_code == 0
+
+  def test_show_policy_help(self):
+    """Test show policy command help."""
+    result = runner.invoke(app, ["show", "policy", "--help"])
+    assert result.exit_code == 0
+    assert "Show detailed information about a specific policy" in result.stdout
+    assert "--json" in result.stdout
+
+  def test_create_policy_help(self):
+    """Test create policy command help."""
+    result = runner.invoke(app, ["create", "policy", "--help"])
+    assert result.exit_code == 0
+    assert "Create a new policy with the next available ID" in result.stdout
+    assert "--status" in result.stdout
+    assert "--author" in result.stdout
+
+
+class TestStandardCommands:
+  """Test standard-related CLI commands."""
+
+  def test_list_standards_help(self):
+    """Test list standards command help."""
+    result = runner.invoke(app, ["list", "standards", "--help"])
+    assert result.exit_code == 0
+    assert "List standards with optional filtering" in result.stdout
+    assert "--status" in result.stdout
+    # Check that status help mentions all standard statuses
+    assert "Filter by status" in result.stdout
+
+  def test_list_standards_json_flag(self):
+    """Test list standards supports --json flag."""
+    result = runner.invoke(app, ["list", "standards", "--help"])
+    assert result.exit_code == 0
+    assert "--json" in result.stdout
+    assert "--format" in result.stdout
+
+  def test_list_standards_empty_succeeds(self):
+    """Test list standards with no standards exits successfully."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+      # Initialize workspace
+      runner.invoke(app, ["install", tmpdir, "--yes"])
+      result = runner.invoke(app, ["list", "standards", "--root", tmpdir])
+      assert result.exit_code == 0
+
+  def test_show_standard_help(self):
+    """Test show standard command help."""
+    result = runner.invoke(app, ["show", "standard", "--help"])
+    assert result.exit_code == 0
+    assert "Show detailed information about a specific standard" in result.stdout
+    assert "--json" in result.stdout
+
+  def test_create_standard_help(self):
+    """Test create standard command help."""
+    result = runner.invoke(app, ["create", "standard", "--help"])
+    assert result.exit_code == 0
+    assert "Create a new standard with the next available ID" in result.stdout
+    assert "--status" in result.stdout
+    # Check that status help mentions standard can be draft/required/default
+    assert "Initial status" in result.stdout
 
 
 if __name__ == "__main__":

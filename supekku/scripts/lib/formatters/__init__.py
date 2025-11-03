@@ -27,6 +27,11 @@ from .decision_formatters import (
   format_decision_list_json,
   format_decision_list_table,
 )
+from .policy_formatters import (
+  format_policy_details,
+  format_policy_list_json,
+  format_policy_list_table,
+)
 from .requirement_formatters import (
   format_requirement_details,
   format_requirement_list_json,
@@ -37,6 +42,11 @@ from .spec_formatters import (
   format_spec_list_item,
   format_spec_list_json,
   format_spec_list_table,
+)
+from .standard_formatters import (
+  format_standard_details,
+  format_standard_list_json,
+  format_standard_list_table,
 )
 from .table_utils import (
   create_table,
@@ -63,12 +73,18 @@ __all__ = [
   "format_delta_details_json",
   "format_package_list",
   "format_phase_summary",
+  "format_policy_details",
+  "format_policy_list_json",
+  "format_policy_list_table",
   "format_requirement_details",
   "format_requirement_list_json",
   "format_requirement_list_table",
   "format_spec_list_item",
   "format_spec_list_json",
   "format_spec_list_table",
+  "format_standard_details",
+  "format_standard_list_json",
+  "format_standard_list_table",
   "get_terminal_width",
   "render_table",
 ]

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -43,20 +44,17 @@ class TestCreateStandard(unittest.TestCase):
     self.standards_dir = self.root / "specify" / "standards"
     self.standards_dir.mkdir(parents=True)
 
-    # Create templates directory
-    templates_dir = self.root / "supekku" / "templates"
+    # Create .spec-driver/templates directory and copy standard template
+    templates_dir = self.root / ".spec-driver" / "templates"
     templates_dir.mkdir(parents=True)
 
-    template_content = """# {{ standard_id }}: {{ title }}
-
-## Statement
-
-Standard statement goes here.
-"""
-    (templates_dir / "standard-template.md").write_text(
-      template_content,
-      encoding="utf-8",
-    )
+    # Copy the actual standard template from the package
+    package_templates = Path(__file__).parent.parent.parent.parent / "templates"
+    if (package_templates / "standard-template.md").exists():
+      shutil.copy(
+        package_templates / "standard-template.md",
+        templates_dir / "standard-template.md",
+      )
 
   def test_create_standard_with_default_status(self) -> None:
     """Test creating a standard with 'default' status."""

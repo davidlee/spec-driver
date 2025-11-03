@@ -338,9 +338,7 @@ class PhaseTrackingValidator:
               errors.append(f"tasks[{idx}].status must be a string")
             elif task.get("status") not in self.VALID_TASK_STATUSES:
               valid_str = ", ".join(sorted(self.VALID_TASK_STATUSES))
-              errors.append(
-                f"tasks[{idx}].status must be one of: {valid_str}"
-              )
+              errors.append(f"tasks[{idx}].status must be one of: {valid_str}")
 
             # Validate task files (optional object with added/modified/removed/tests)
             task_files = task.get("files")
@@ -352,9 +350,7 @@ class PhaseTrackingValidator:
                   file_list = task_files.get(file_field)
                   if file_list is not None:
                     if not isinstance(file_list, list):
-                      errors.append(
-                        f"tasks[{idx}].files.{file_field} must be an array"
-                      )
+                      errors.append(f"tasks[{idx}].files.{file_field} must be an array")
                     elif not all(isinstance(item, str) for item in file_list):
                       errors.append(
                         f"tasks[{idx}].files.{file_field} items must be strings"
@@ -639,22 +635,22 @@ def render_phase_tracking_block(
   if entrance_criteria:
     lines.append("entrance_criteria:")
     for criterion in entrance_criteria:
-      lines.append(f"  - item: \"{criterion.get('item', '')}\"")
+      lines.append(f'  - item: "{criterion.get("item", "")}"')
       lines.append(f"    completed: {str(criterion.get('completed', False)).lower()}")
 
   # Add exit_criteria
   if exit_criteria:
     lines.append("exit_criteria:")
     for criterion in exit_criteria:
-      lines.append(f"  - item: \"{criterion.get('item', '')}\"")
+      lines.append(f'  - item: "{criterion.get("item", "")}"')
       lines.append(f"    completed: {str(criterion.get('completed', False)).lower()}")
 
   # Add tasks
   if tasks:
     lines.append("tasks:")
     for task in tasks:
-      lines.append(f"  - id: \"{task.get('id', '')}\"")
-      lines.append(f"    description: \"{task.get('description', '')}\"")
+      lines.append(f'  - id: "{task.get("id", "")}"')
+      lines.append(f'    description: "{task.get("description", "")}"')
       lines.append(f"    status: {task.get('status', 'pending')}")
       task_files = task.get("files", {})
       if task_files:

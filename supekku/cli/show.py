@@ -18,12 +18,16 @@ from supekku.scripts.lib.formatters.change_formatters import (
   format_revision_details,
 )
 from supekku.scripts.lib.formatters.decision_formatters import format_decision_details
+from supekku.scripts.lib.formatters.policy_formatters import format_policy_details
 from supekku.scripts.lib.formatters.requirement_formatters import (
   format_requirement_details,
 )
 from supekku.scripts.lib.formatters.spec_formatters import format_spec_details
+from supekku.scripts.lib.formatters.standard_formatters import format_standard_details
+from supekku.scripts.lib.policies.registry import PolicyRegistry
 from supekku.scripts.lib.requirements.registry import RequirementsRegistry
 from supekku.scripts.lib.specs.registry import SpecRegistry
+from supekku.scripts.lib.standards.registry import StandardRegistry
 
 app = typer.Typer(help="Show detailed artifact information", no_args_is_help=True)
 
@@ -44,11 +48,7 @@ def show_spec(
       raise typer.Exit(EXIT_FAILURE)
 
     if json_output:
-      output = (
-        spec.to_dict()
-        if hasattr(spec, "to_dict")
-        else {"id": spec.id}
-      )
+      output = spec.to_dict() if hasattr(spec, "to_dict") else {"id": spec.id}
       typer.echo(json.dumps(output, indent=2))
     else:
       typer.echo(format_spec_details(spec, root=root))
@@ -104,9 +104,7 @@ def show_revision(
 
     if json_output:
       output = (
-        artifact.to_dict()
-        if hasattr(artifact, "to_dict")
-        else {"id": artifact.id}
+        artifact.to_dict() if hasattr(artifact, "to_dict") else {"id": artifact.id}
       )
       typer.echo(json.dumps(output, indent=2))
     else:
@@ -138,9 +136,7 @@ def show_requirement(
 
     if json_output:
       output = (
-        requirement.to_dict()
-        if hasattr(requirement, "to_dict")
-        else {"uid": req_id}
+        requirement.to_dict() if hasattr(requirement, "to_dict") else {"uid": req_id}
       )
       typer.echo(json.dumps(output, indent=2))
     else:
@@ -169,13 +165,67 @@ def show_adr(
 
     if json_output:
       output = (
-        decision.to_dict()
-        if hasattr(decision, "to_dict")
-        else {"id": decision.id}
+        decision.to_dict() if hasattr(decision, "to_dict") else {"id": decision.id}
       )
       typer.echo(json.dumps(output, indent=2))
     else:
       typer.echo(format_decision_details(decision))
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("policy")
+def show_policy(
+  policy_id: Annotated[str, typer.Argument(help="Policy ID (e.g., POL-001)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about a specific policy."""
+  try:
+    registry = PolicyRegistry(root=root)
+    policy = registry.find(policy_id)
+
+    if not policy:
+      typer.echo(f"Error: Policy not found: {policy_id}", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
+    if json_output:
+      output = policy.to_dict() if hasattr(policy, "to_dict") else {"id": policy.id}
+      typer.echo(json.dumps(output, indent=2))
+    else:
+      typer.echo(format_policy_details(policy))
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("standard")
+def show_standard(
+  standard_id: Annotated[str, typer.Argument(help="Standard ID (e.g., STD-001)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about a specific standard."""
+  try:
+    registry = StandardRegistry(root=root)
+    standard = registry.find(standard_id)
+
+    if not standard:
+      typer.echo(f"Error: Standard not found: {standard_id}", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
+    if json_output:
+      output = (
+        standard.to_dict() if hasattr(standard, "to_dict") else {"id": standard.id}
+      )
+      typer.echo(json.dumps(output, indent=2))
+    else:
+      typer.echo(format_standard_details(standard))
 
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:

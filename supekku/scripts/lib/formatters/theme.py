@@ -31,6 +31,19 @@ SPEC_DRIVER_THEME = Theme(
     "adr.status.draft": "#7c7876",  # mid grey
     # ADR display
     "adr.id": "#458588",  # blue
+    # Policy status colors
+    "policy.status.draft": "#7c7876",  # mid grey
+    "policy.status.active": "#8ec07c",  # green
+    "policy.status.deprecated": "#cc241d",  # red
+    # Policy display
+    "policy.id": "#458588",  # blue
+    # Standard status colors
+    "standard.status.draft": "#7c7876",  # mid grey
+    "standard.status.required": "#8ec07c",  # green
+    "standard.status.default": "#00b8ff",  # sky blue
+    "standard.status.deprecated": "#cc241d",  # red
+    # Standard display
+    "standard.id": "#458588",  # blue
     # Change artifact status colors
     "change.status.completed": "#8ec07c",  # green
     "change.status.complete": "#8ec07c",  # green (legacy)
@@ -151,3 +164,29 @@ def get_backlog_status_style(kind: str, status: str) -> str:
   kind_lower = kind.lower()
   status_lower = status.lower().replace(" ", "-")
   return f"backlog.{kind_lower}.{status_lower}"
+
+
+def get_policy_status_style(status: str) -> str:
+  """Get the style name for a policy status.
+
+  Args:
+    status: Status string (e.g., "active", "draft")
+
+  Returns:
+    Style name from theme (e.g., "policy.status.active")
+  """
+  status_lower = status.lower().replace(" ", "-")
+  return f"policy.status.{status_lower}"
+
+
+def get_standard_status_style(status: str) -> str:
+  """Get the style name for a standard status.
+
+  Args:
+    status: Status string (e.g., "required", "default")
+
+  Returns:
+    Style name from theme (e.g., "standard.status.required")
+  """
+  status_lower = status.lower().replace(" ", "-")
+  return f"standard.status.{status_lower}"

@@ -59,6 +59,11 @@ def format_phase_summary(phase: dict[str, Any], max_objective_len: int = 60) -> 
     phase_id = str(phase["id"])
   else:
     phase_id = "?"
+
+  # Strip IP-XXX. prefix for cleaner display
+  if "." in phase_id and phase_id.count(".") == 1:
+    phase_id = phase_id.split(".", 1)[1]
+
   objective = str(phase.get("objective", "")).strip()
 
   if not objective:
@@ -212,7 +217,7 @@ def _enrich_phase_data(
     root: Repository root for relative paths
 
   Returns:
-    Enriched phase dictionary
+    Enriched phase dictionary with tasks/criteria in checkbox format
   """
   enriched = phase.copy()
 
@@ -253,12 +258,56 @@ def _enrich_phase_data(
     # Try structured tracking block first
     tracking_block = extract_phase_tracking(phase_content, phase_file)
     if tracking_block:
-      # Calculate completion from tracking data
+      # Extract tasks with checkbox-style status
       tasks = tracking_block.data.get("tasks", [])
       if tasks:
-        completed = sum(1 for t in tasks if t.get("status") == "completed")
-        enriched["tasks_completed"] = completed
-        enriched["tasks_total"] = len(tasks)
+        task_list = []
+        status_counts = {
+          "pending": 0,
+          "in_progress": 0,
+          "completed": 0,
+          "blocked": 0,
+          "total": len(tasks),
+        }
+
+        for task in tasks:
+          status = task.get("status", "pending")
+          description = task.get("description", "")
+
+          # Map status to checkbox format:
+          # [x]=completed, [/]=in_progress, [!]=blocked, [ ]=pending
+          if status == "completed":
+            checkbox = "[x]"
+            status_counts["completed"] += 1
+          elif status == "in_progress":
+            checkbox = "[/]"
+            status_counts["in_progress"] += 1
+          elif status == "blocked":
+            checkbox = "[!]"
+            status_counts["blocked"] += 1
+          else:  # pending
+            checkbox = "[ ]"
+            status_counts["pending"] += 1
+
+          task_list.append(f"{checkbox} {description}")
+
+        enriched["tasks"] = task_list
+        enriched["task_status"] = status_counts
+
+      # Extract entrance/exit criteria with completion status
+      entrance = tracking_block.data.get("entrance_criteria", [])
+      if entrance:
+        enriched["entrance_criteria"] = [
+          f"[{'x' if c.get('completed', False) else ' '}] {c.get('item', '')}"
+          for c in entrance
+        ]
+
+      exit_crit = tracking_block.data.get("exit_criteria", [])
+      if exit_crit:
+        enriched["exit_criteria"] = [
+          f"[{'x' if c.get('completed', False) else ' '}] {c.get('item', '')}"
+          for c in exit_crit
+        ]
     else:
       # Fallback to regex-based checkbox parsing (backward compat)
       completed = len(re.findall(r"^- \[x\]", phase_content, re.MULTILINE))
@@ -298,23 +347,66 @@ def _format_plan_overview(
   # Sort phases by ID for consistent ordering
   sorted_phases = sorted(phases, key=lambda p: p.get("id", ""))
 
-  # Format each phase with enriched data
-  for phase in sorted_phases:
-    enriched_phase = _enrich_phase_data(phase, artifact, root)
-    phase_summary = format_phase_summary(enriched_phase)
+  # Enrich all phases
+  enriched_phases = [
+    _enrich_phase_data(phase, artifact, root) for phase in sorted_phases
+  ]
 
-    # Add task completion stats if available
-    tasks_completed = enriched_phase.get("tasks_completed")
-    tasks_total = enriched_phase.get("tasks_total")
-    if tasks_completed is not None and tasks_total is not None:
-      pct = int((tasks_completed / tasks_total) * 100) if tasks_total > 0 else 0
-      phase_summary += f" [{tasks_completed}/{tasks_total} tasks - {pct}%]"
+  # Create Rich table for phases
+  table = create_table(columns=["Phase", "Status", "Objective"], show_header=True)
 
-    lines.append(f"  {phase_summary}")
+  # Add each phase as table row
+  for enriched_phase in enriched_phases:
+    # Phase ID (stripped)
+    phase_id = enriched_phase.get("phase") or enriched_phase.get("id", "?")
+    phase_id = str(phase_id)  # Convert to string (might be int)
+    if "." in phase_id and phase_id.count(".") == 1:
+      phase_id = phase_id.split(".", 1)[1]
 
-    # Add phase file path if available
-    if "path" in enriched_phase:
-      lines.append(f"    File: {enriched_phase['path']}")
+    # Status column
+    status_parts = []
+
+    # Phase status if available
+    phase_status = enriched_phase.get("status")
+    if phase_status:
+      status_parts.append(phase_status)
+
+    # Task breakdown if tracking block present
+    task_status = enriched_phase.get("task_status")
+    if task_status:
+      total = task_status.get("total", 0)
+      if total > 0:
+        parts = []
+        if task_status.get("completed", 0) > 0:
+          parts.append(f"{task_status['completed']}✓")
+        if task_status.get("in_progress", 0) > 0:
+          parts.append(f"{task_status['in_progress']}→")
+        if task_status.get("blocked", 0) > 0:
+          parts.append(f"{task_status['blocked']}!")
+        if task_status.get("pending", 0) > 0:
+          parts.append(f"{task_status['pending']}○")
+
+        if parts:
+          status_parts.append(" ".join(parts))
+    else:
+      # Fallback to old format for backward compatibility
+      tasks_completed = enriched_phase.get("tasks_completed")
+      tasks_total = enriched_phase.get("tasks_total")
+      if tasks_completed is not None and tasks_total is not None:
+        pct = int((tasks_completed / tasks_total) * 100) if tasks_total > 0 else 0
+        status_parts.append(f"{tasks_completed}/{tasks_total} ({pct}%)")
+
+    status_str = ", ".join(status_parts) if status_parts else "-"
+
+    # Objective (no truncation for now - rich will handle wrapping)
+    objective = str(enriched_phase.get("objective", "")).strip()
+    objective = objective.splitlines()[0] if objective else "-"
+
+    table.add_row(phase_id, status_str, objective)
+
+  # Render table to string and add to lines
+  table_output = render_table(table)
+  lines.append(table_output.rstrip())
 
   return lines
 

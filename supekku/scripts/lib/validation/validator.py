@@ -57,7 +57,7 @@ class WorkspaceValidator:
         self._error(
           req_id,
           f"Requirement introduced_by references missing revision {record.introduced}",
-          )
+        )
       for audit_id in record.verified_by:
         if audit_id not in audit_ids:
           self._error(

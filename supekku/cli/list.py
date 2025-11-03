@@ -33,6 +33,7 @@ from supekku.scripts.lib.formatters.change_formatters import (
 from supekku.scripts.lib.formatters.decision_formatters import (
   format_decision_list_table,
 )
+from supekku.scripts.lib.formatters.policy_formatters import format_policy_list_table
 from supekku.scripts.lib.formatters.requirement_formatters import (
   format_requirement_list_table,
 )
@@ -40,7 +41,12 @@ from supekku.scripts.lib.formatters.spec_formatters import (
   format_spec_list_item,
   format_spec_list_table,
 )
+from supekku.scripts.lib.formatters.standard_formatters import (
+  format_standard_list_table,
+)
+from supekku.scripts.lib.policies.registry import PolicyRegistry
 from supekku.scripts.lib.specs.registry import SpecRegistry
+from supekku.scripts.lib.standards.registry import StandardRegistry
 
 app = typer.Typer(help="List artifacts", no_args_is_help=True)
 
@@ -184,9 +190,7 @@ def list_specs(
     if status:
       status_normalized = normalize_status(status)
       specs = [
-        spec
-        for spec in specs
-        if normalize_status(spec.status) == status_normalized
+        spec for spec in specs if normalize_status(spec.status) == status_normalized
       ]
 
     if filter_substring:
@@ -682,6 +686,233 @@ def list_adrs(
     # Sort and format
     decisions_sorted = sorted(decisions, key=lambda d: d.id)
     output = format_decision_list_table(decisions_sorted, format_type, truncate)
+    typer.echo(output)
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("policies")
+def list_policies(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option(
+      "--status",
+      "-s",
+      help="Filter by status (draft, required, deprecated)",
+    ),
+  ] = None,
+  tag: Annotated[
+    str | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag",
+    ),
+  ] = None,
+  spec: Annotated[
+    str | None,
+    typer.Option(
+      "--spec",
+      help="Filter by spec reference",
+    ),
+  ] = None,
+  delta: Annotated[
+    str | None,
+    typer.Option(
+      "--delta",
+      "-d",
+      help="Filter by delta reference",
+    ),
+  ] = None,
+  requirement_filter: Annotated[
+    str | None,
+    typer.Option(
+      "--requirement",
+      help="Filter by requirement reference",
+    ),
+  ] = None,
+  standard: Annotated[
+    str | None,
+    typer.Option(
+      "--standard",
+      help="Filter by standard reference",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
+  truncate: TruncateOption = False,
+) -> None:
+  """List policies with optional filtering.
+
+  The --regexp flag filters on title and summary fields.
+  Other flags filter on specific structured fields (status, tags, references).
+  """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    registry = PolicyRegistry(root=root)
+
+    # Apply structured filters
+    if any([tag, spec, delta, requirement_filter, standard]):
+      policies = registry.filter(
+        tag=tag,
+        spec=spec,
+        delta=delta,
+        requirement=requirement_filter,
+        standard=standard,
+      )
+    else:
+      policies = list(registry.iter(status=status))
+
+    # Apply regexp filter on title
+    if regexp:
+      try:
+        policies = [
+          p for p in policies if matches_regexp(regexp, [p.title], case_insensitive)
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
+
+    if not policies:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Sort and format
+    policies_sorted = sorted(policies, key=lambda p: p.id)
+    output = format_policy_list_table(policies_sorted, format_type, truncate)
+    typer.echo(output)
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("standards")
+def list_standards(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option(
+      "--status",
+      "-s",
+      help="Filter by status (draft, required, default, deprecated)",
+    ),
+  ] = None,
+  tag: Annotated[
+    str | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag",
+    ),
+  ] = None,
+  spec: Annotated[
+    str | None,
+    typer.Option(
+      "--spec",
+      help="Filter by spec reference",
+    ),
+  ] = None,
+  delta: Annotated[
+    str | None,
+    typer.Option(
+      "--delta",
+      "-d",
+      help="Filter by delta reference",
+    ),
+  ] = None,
+  requirement_filter: Annotated[
+    str | None,
+    typer.Option(
+      "--requirement",
+      help="Filter by requirement reference",
+    ),
+  ] = None,
+  policy: Annotated[
+    str | None,
+    typer.Option(
+      "--policy",
+      "-p",
+      help="Filter by policy reference",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
+  truncate: TruncateOption = False,
+) -> None:
+  """List standards with optional filtering.
+
+  The --regexp flag filters on title and summary fields.
+  Other flags filter on specific structured fields (status, tags, references).
+  """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    registry = StandardRegistry(root=root)
+
+    # Apply structured filters
+    if any([tag, spec, delta, requirement_filter, policy]):
+      standards = registry.filter(
+        tag=tag,
+        spec=spec,
+        delta=delta,
+        requirement=requirement_filter,
+        policy=policy,
+      )
+    else:
+      standards = list(registry.iter(status=status))
+
+    # Apply regexp filter on title
+    if regexp:
+      try:
+        standards = [
+          s for s in standards if matches_regexp(regexp, [s.title], case_insensitive)
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
+
+    if not standards:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Sort and format
+    standards_sorted = sorted(standards, key=lambda s: s.id)
+    output = format_standard_list_table(standards_sorted, format_type, truncate)
     typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)

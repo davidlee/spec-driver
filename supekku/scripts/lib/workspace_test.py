@@ -235,7 +235,6 @@ status: accepted
     assert new_link.exists()
     assert new_link.is_symlink()
 
-
   def test_workspace_sync_all_registries(self) -> None:
     """Test that sync_all_registries syncs all registries in correct order."""
     root = self._create_repo()

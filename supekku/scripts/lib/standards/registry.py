@@ -109,7 +109,7 @@ class StandardRegistry:
   """Registry for managing Standards."""
 
   def __init__(self, *, root: Path | None = None) -> None:
-    self.root = find_repo_root(root)
+    self.root = root if root is not None else find_repo_root(None)
     self.directory = self.root / "specify" / "standards"
     self.output_path = get_registry_dir(self.root) / "standards.yaml"
 

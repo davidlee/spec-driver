@@ -453,9 +453,10 @@ class TestFormatDeltaDetails(unittest.TestCase):
     result = format_delta_details(artifact)
 
     assert "Plan: IP-003 (3 phases)" in result
-    assert "0: Foundation & Prerequisites" in result
-    assert "1: Core Implementation" in result
-    assert "2: Testing & Validation" in result
+    # Table format - just check objectives are present
+    assert "Foundation & Prerequisites" in result
+    assert "Core Implementation" in result
+    assert "Testing & Validation" in result
 
   def test_delta_with_relations(self) -> None:
     """Test formatting delta with relations."""
@@ -583,12 +584,12 @@ class TestFormatDeltaPhasesVTPHASE003(unittest.TestCase):
     result = format_delta_details(artifact)
 
     assert "Plan: IP-011 (3 phases)" in result
-    assert "IP-011.PHASE-01" in result
-    assert "IP-011.PHASE-02" in result
-    assert "IP-011.PHASE-03" in result
+    assert "PHASE-01" in result
+    assert "PHASE-02" in result
+    assert "PHASE-03" in result
 
   def test_delta_phase_objective_truncation(self) -> None:
-    """Test that long objectives are truncated appropriately."""
+    """Test that long objectives are wrapped in table display."""
     long_objective = "A" * 120  # 120 character objective
     artifact = ChangeArtifact(
       id="DE-012",
@@ -608,10 +609,10 @@ class TestFormatDeltaPhasesVTPHASE003(unittest.TestCase):
 
     result = format_delta_details(artifact)
 
-    # Objective should be truncated (default: 60 chars in format_phase_summary)
+    # Long objectives should be wrapped in Rich table (no ellipsis)
     assert "Plan: IP-012 (1 phases)" in result
-    # Should contain truncated version with ellipsis
-    assert "..." in result
+    # Should contain the full objective (wrapped across lines)
+    assert "AAAA" in result  # Part of the long objective
     # Should not contain full 120 character string
     assert "A" * 120 not in result
 
@@ -639,8 +640,8 @@ class TestFormatDeltaPhasesVTPHASE003(unittest.TestCase):
 
     result = format_delta_details(artifact)
 
-    # Verify phase ID appears in standard format
-    assert "IP-013.PHASE-01" in result
+    # Verify phase ID appears in short format (prefix stripped)
+    assert "PHASE-01" in result
     # Verify objective appears
     assert "Initial setup and configuration" in result
 

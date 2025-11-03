@@ -42,12 +42,11 @@ tasks:
 
 def _wrap_block(inner: str) -> str:
   """Wrap YAML content in markdown code fence with tracking marker."""
-  return (
-    f"# Phase Document\n\n```yaml {TRACKING_MARKER}\n{inner}```\n\n## Content\n"
-  )
+  return f"# Phase Document\n\n```yaml {TRACKING_MARKER}\n{inner}```\n\n## Content\n"
 
 
 # Extraction tests
+
 
 def test_extract_phase_tracking_finds_valid_block() -> None:
   """Test extracting tracking block from markdown."""
@@ -110,6 +109,7 @@ def test_extract_phase_tracking_handles_malformed_yaml() -> None:
 
 
 # Validation tests
+
 
 def test_validator_accepts_valid_tracking_block() -> None:
   """Test validator passes for valid tracking block."""
@@ -266,6 +266,7 @@ phase: IP-004.PHASE-05
 
 # Integration test for completion calculation
 
+
 def test_task_completion_calculation() -> None:
   """Test calculating task completion from tracking data."""
   content = _wrap_block(SAMPLE_VALID_TRACKING)
@@ -299,6 +300,7 @@ def test_criteria_completion_calculation() -> None:
 
 
 # File path tracking tests
+
 
 def test_validator_accepts_phase_files() -> None:
   """Test validator accepts optional phase-level file references."""

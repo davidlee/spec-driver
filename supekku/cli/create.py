@@ -24,6 +24,14 @@ from supekku.scripts.lib.decisions.creation import (
   create_adr as create_adr_impl,
 )
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
+from supekku.scripts.lib.policies.creation import (
+  PolicyAlreadyExistsError,
+  PolicyCreationOptions,
+)
+from supekku.scripts.lib.policies.creation import (
+  create_policy as create_policy_impl,
+)
+from supekku.scripts.lib.policies.registry import PolicyRegistry
 from supekku.scripts.lib.specs.creation import (
   CreateSpecOptions,
   SpecCreationError,
@@ -31,6 +39,14 @@ from supekku.scripts.lib.specs.creation import (
 from supekku.scripts.lib.specs.creation import (
   create_spec as create_spec_impl,
 )
+from supekku.scripts.lib.standards.creation import (
+  StandardAlreadyExistsError,
+  StandardCreationOptions,
+)
+from supekku.scripts.lib.standards.creation import (
+  create_standard as create_standard_impl,
+)
+from supekku.scripts.lib.standards.registry import StandardRegistry
 
 app = typer.Typer(help="Create new artifacts", no_args_is_help=True)
 
@@ -279,6 +295,110 @@ def create_adr(
     raise typer.Exit(EXIT_FAILURE) from e
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating ADR: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("policy")
+def create_policy(
+  title: Annotated[str, typer.Argument(help="Title for the new policy")],
+  status: Annotated[
+    str,
+    typer.Option(
+      "--status",
+      "-s",
+      help="Initial status (draft, required; default: draft)",
+    ),
+  ] = "draft",
+  author: Annotated[
+    str | None,
+    typer.Option(
+      "--author",
+      "-a",
+      help="Author name",
+    ),
+  ] = None,
+  author_email: Annotated[
+    str | None,
+    typer.Option(
+      "--author-email",
+      "-e",
+      help="Author email",
+    ),
+  ] = None,
+  root: RootOption = None,
+) -> None:
+  """Create a new policy with the next available ID."""
+  try:
+    registry = PolicyRegistry(root=root)
+    options = PolicyCreationOptions(
+      title=title,
+      status=status,
+      author=author,
+      author_email=author_email,
+    )
+
+    result = create_policy_impl(registry, options, sync_registry=True)
+    typer.echo(f"Created policy: {result.policy_id}")
+    typer.echo(str(result.path))
+    raise typer.Exit(EXIT_SUCCESS)
+
+  except PolicyAlreadyExistsError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error creating policy: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("standard")
+def create_standard(
+  title: Annotated[str, typer.Argument(help="Title for the new standard")],
+  status: Annotated[
+    str,
+    typer.Option(
+      "--status",
+      "-s",
+      help="Initial status (draft, required, default; default: draft)",
+    ),
+  ] = "draft",
+  author: Annotated[
+    str | None,
+    typer.Option(
+      "--author",
+      "-a",
+      help="Author name",
+    ),
+  ] = None,
+  author_email: Annotated[
+    str | None,
+    typer.Option(
+      "--author-email",
+      "-e",
+      help="Author email",
+    ),
+  ] = None,
+  root: RootOption = None,
+) -> None:
+  """Create a new standard with the next available ID."""
+  try:
+    registry = StandardRegistry(root=root)
+    options = StandardCreationOptions(
+      title=title,
+      status=status,
+      author=author,
+      author_email=author_email,
+    )
+
+    result = create_standard_impl(registry, options, sync_registry=True)
+    typer.echo(f"Created standard: {result.standard_id}")
+    typer.echo(str(result.path))
+    raise typer.Exit(EXIT_SUCCESS)
+
+  except StandardAlreadyExistsError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error creating standard: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
 

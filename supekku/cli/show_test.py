@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -318,8 +319,14 @@ class ShowDeltaCommandTest(unittest.TestCase):
 
     assert result.exit_code == 0, f"Command failed: {result.stderr}"
 
-    # Check for task completion in output (format: "[22/25 tasks - 88%]")
-    assert "tasks" in result.stdout.lower()
+    # Check for table format with task completion stats (format: "25/25 (100%)")
+    # The new format uses a table with Status column showing completion
+    assert "phase" in result.stdout.lower()
+    assert "status" in result.stdout.lower()
+    # Check for completion ratio pattern (e.g., "25/25" or "22/25")
+    assert re.search(r"\d+/\d+\s+\(\d+%\)", result.stdout), (
+      "Expected task completion stats in format 'X/Y (Z%)'"
+    )
 
   def test_show_delta_json_flag_in_help(self) -> None:
     """Test that --json flag is documented in help."""

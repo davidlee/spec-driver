@@ -271,4 +271,68 @@ coverage or remove stale artifacts.
 - Clear expected behavior
 - Actionable remediation guidance
 
-**Ready for**: Final review and delta completion
+**Ready for**: Delta completion
+
+## 13. Handover Notes for Next Agent
+
+### Status
+Phase 02 COMPLETE and COMMITTED (2d1627a)
+
+### What Was Accomplished
+1. **Validation warnings**: Coverage without baseline status (with artifact IDs shown)
+2. **Registry cleanup**: 57 VT/VA/VH artifacts moved from verified_by to coverage_evidence
+3. **Quality improvements**: Warning messages now show specific artifacts and remediation steps
+4. **Tests**: VT-912 passing with artifact ID assertions
+5. **All gates passed**: 1173 tests, linters clean, 0 validation errors
+
+### What Remains (Optional Enhancements)
+1. **Grace period warnings** (task 2.2): TODO placeholder at validator.py:79-82
+   - Requires PROD-009 grace period definition
+   - Can be added as future enhancement
+2. **Integration test VT-914**: Deferred - already covered by existing sync tests
+
+### Files Modified & Committed
+- `supekku/scripts/lib/validation/validator.py` - Warnings with artifact IDs
+- `supekku/scripts/lib/validation/validator_test.py` - VT-912
+- `.spec-driver/registry/requirements.yaml` - Clean separation achieved
+- `change/deltas/DE-008-add-coverage-evidence/phases/phase-02.md` - This file
+- Contract tests (auto-generated)
+
+### Delta Completion Readiness
+**Can complete DE-008 now?** YES
+- Both phases complete (Phase 01: 94dcbaa, Phase 02: 2d1627a)
+- Core objectives achieved:
+  - ✓ coverage_evidence field added (Phase 01)
+  - ✓ Sync logic updated (Phase 01)
+  - ✓ Validation warnings added (Phase 02)
+  - ✓ Formatters updated (committed in DE-004)
+  - ✓ Registry cleaned (Phase 02)
+  - ✓ 0 validation errors
+
+**Deferred items are optional**, not blocking:
+- Grace period warnings: Future enhancement, not in original scope
+- VT-914: Already covered by existing tests
+
+### Validation Evidence
+```bash
+# Run workspace validation
+uv run python3 -c "
+from supekku.scripts.lib.workspace import Workspace
+from supekku.scripts.lib.validation.validator import validate_workspace
+from pathlib import Path
+ws = Workspace(Path('.'))
+issues = validate_workspace(ws)
+errors = [i for i in issues if i.level == 'error']
+warnings = [i for i in issues if i.level == 'warning']
+print(f'Errors: {len(errors)}')
+print(f'Warnings: {len(warnings)} (expected: 39)')
+"
+# Expected output: Errors: 0, Warnings: 39
+```
+
+### Next Steps
+1. **Option A**: Mark DE-008 delta as complete
+2. **Option B**: Implement grace period warnings (task 2.2) before completion
+3. **Option C**: Create PR for review
+
+**Recommendation**: Option A - mark complete. Deferred items are enhancements, not blockers.

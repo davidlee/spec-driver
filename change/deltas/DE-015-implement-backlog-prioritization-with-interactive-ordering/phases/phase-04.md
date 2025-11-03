@@ -272,7 +272,16 @@ uv run spec-driver create delta --from-backlog IMPR-002
 
 ## 9. Decisions & Outcomes
 
-*(To be filled during implementation)*
+**Design Decisions:**
+- **2025-11-04** - Made `name` argument optional in `create delta` when using `--from-backlog` - better UX
+- **2025-11-04** - Fixed BacklogItem unhashability by using ID-based lookups in partition/merge logic
+- **2025-11-04** - Inline partition/merge logic in `edit_backlog_ordering()` instead of calling generic functions - avoids hashability issues
+
+**Implementation Outcomes:**
+- `--prioritize` flag fully functional with proper error handling
+- Editor integration works correctly (tested with vim)
+- `--from-backlog` successfully pre-populates delta templates
+- All tests passing, quality metrics improved (pylint +0.39)
 
 ## 10. Findings / Research Notes
 
@@ -295,14 +304,14 @@ uv run spec-driver create delta --from-backlog IMPR-002
 - `sort_by_priority()` from Phase 2 (priority.py:117-154)
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied (all flags working)
-- [ ] VT-015-005 CLI integration tests passing
-- [ ] VH-015-001 manual verification complete
-- [ ] Lint checks passing (ruff + pylint)
-- [ ] Phase tracking updated (status: completed)
-- [ ] Code committed with clear commit message
+- [x] Exit criteria satisfied (all flags working)
+- [x] VT-015-005 CLI integration tests passing (2 tests, all passing)
+- [x] VH-015-001 manual verification complete (tested with actual editor)
+- [x] Lint checks passing (ruff ✓, pylint 9.22/10)
+- [x] Phase tracking updated (status: completed)
+- [x] Code committed with clear commit message (commit 084ae0e)
 - [ ] Delta completion:
-  - [ ] All verification artifacts executed
+  - [x] All verification artifacts executed (VT-015-001 through VT-015-005, VH-015-001)
   - [ ] Update IP-015 with lessons learned
   - [ ] Mark delta as ready for completion
   - [ ] Run `uv run spec-driver complete delta DE-015` (or --force if needed)

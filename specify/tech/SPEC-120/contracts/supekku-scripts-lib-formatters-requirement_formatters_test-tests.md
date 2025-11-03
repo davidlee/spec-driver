@@ -14,6 +14,7 @@ Tests for format_requirement_details function.
 
 - `test_format_full_requirement(self) -> None`: Test formatting requirement with all fields.
 - `test_format_minimal_requirement(self) -> None`: Test formatting requirement with minimal fields.
+- `test_format_requirement_with_coverage_evidence(self) -> None`: Test formatting requirement with coverage_evidence field.
 
 ### TestFormatRequirementListJson
 
@@ -24,6 +25,7 @@ Tests for format_requirement_list_json function.
 #### Methods
 
 - `test_format_minimal_requirement(self) -> None`: Test formatting requirement with minimal fields.
+- `test_format_requirement_with_coverage_evidence(self) -> None`: Test formatting requirement with coverage_evidence in JSON.
 - `test_format_requirement_with_path(self) -> None`: Test formatting requirement with path.
 
 ### TestFormatRequirementListTable

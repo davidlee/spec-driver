@@ -46,6 +46,21 @@ Tests for format_delta_details function.
 - `test_delta_without_root(self) -> None`: Test formatting delta without root shows absolute path.
 - `test_minimal_delta(self) -> None`: Test formatting delta with minimal fields.
 
+### TestFormatDeltaPhasesVTPHASE003
+
+VT-PHASE-003: Tests for phase display in delta formatter.
+
+Verifies PROD-006.FR-003: Enhanced delta display shows phases.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_delta_phase_id_and_name_formatted(self) -> None`: Test phase ID and name are formatted correctly in output.
+- `test_delta_phase_objective_truncation(self) -> None`: Test that long objectives are truncated appropriately.
+- `test_delta_with_three_phases(self) -> None`: Test delta with 3 phases shows all with proper formatting.
+- `test_delta_with_zero_phases(self) -> None`: Test delta with plan but no phases shows plan ID.
+
 ### TestFormatPhaseSummary
 
 Tests for format_phase_summary function.

@@ -971,6 +971,10 @@ def list_requirements(
     str | None,
     typer.Option("--kind", "-k", help="Filter by kind (FR|NF)"),
   ] = None,
+  category: Annotated[
+    str | None,
+    typer.Option("--category", "-c", help="Filter by category (substring match)"),
+  ] = None,
   substring: Annotated[
     str | None,
     typer.Option(
@@ -994,7 +998,9 @@ def list_requirements(
   """List requirements with optional filtering.
 
   The --filter flag does substring matching (case-insensitive).
-  The --regexp flag does pattern matching on UID, label, and title fields.
+  The --regexp flag does pattern matching on UID, label, title, and category fields.
+  The --category flag does substring matching on category field.
+  Use --case-insensitive (-i) to make regexp and category filters case-insensitive.
   """
   # --json flag overrides --format
   if json_output:
@@ -1036,6 +1042,21 @@ def list_requirements(
         for r in requirements
         if any(r.label.startswith(prefix) for prefix in kind_prefixes)
       ]
+
+    # Category filter (substring match, respects --case-insensitive)
+    if category:
+      if case_insensitive:
+        category_lower = category.lower()
+        requirements = [
+          r
+          for r in requirements
+          if r.category and category_lower in r.category.lower()
+        ]
+      else:
+        requirements = [
+          r for r in requirements if r.category and category in r.category
+        ]
+
     if substring:
       filter_lower = substring.lower()
       requirements = [
@@ -1044,13 +1065,15 @@ def list_requirements(
         if filter_lower in r.label.lower() or filter_lower in r.title.lower()
       ]
 
-    # Apply regexp filter on uid, label, title
+    # Apply regexp filter on uid, label, title, category
     if regexp:
       try:
         requirements = [
           r
           for r in requirements
-          if matches_regexp(regexp, [r.uid, r.label, r.title], case_insensitive)
+          if matches_regexp(
+            regexp, [r.uid, r.label, r.title, r.category or ""], case_insensitive
+          )
         ]
       except re.error as e:
         typer.echo(f"Error: invalid regexp pattern: {e}", err=True)

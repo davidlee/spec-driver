@@ -160,9 +160,9 @@ just pylint supekku/scripts/lib/formatters/requirement_formatters.py
 | --- | --- | --- | --- | --- |
 | [x] | 2.1 | Create requirement_formatters.py module | [ ] | Module already existed |
 | [x] | 2.2 | Add category to all formatters | [ ] | TSV, table, JSON, details updated |
-| [ ] | 2.3 | Add --category filter to CLI | [ ] | Substring match on category field |
-| [ ] | 2.4 | Extend regexp/case-insensitive filters | [ ] | Include category in search fields |
-| [ ] | 2.5 | Update CLI to use formatter | [ ] | Replace inline formatting |
+| [x] | 2.3 | Add --category filter to CLI | [ ] | Added -c/--category option with case-sensitive/insensitive support |
+| [x] | 2.4 | Extend regexp/case-insensitive filters | [ ] | Regexp now includes category field (handles None) |
+| [x] | 2.5 | Update CLI to use formatter | [ ] | Already using formatter (verified) |
 | [ ] | 2.6 | Write VT-017-003 filtering tests | [ ] | Integration tests for CLI filters |
 | [ ] | 2.7 | Write VT-017-004 display tests | [ ] | Integration tests for category column |
 | [ ] | 2.8 | Run linters and fix issues | [ ] | ruff + pylint |
@@ -194,15 +194,28 @@ just pylint supekku/scripts/lib/formatters/requirement_formatters.py
 
 **2.3 Add --category filter to CLI**
 - **Design / Approach**: Add `--category` option, filter records where category substring matches
-- **Files / Components**: Find list requirements command (likely `supekku/scripts/requirements.py` or `supekku/cli/list.py`)
+- **Files / Components**: `supekku/cli/list.py:list_requirements()`
 - **Testing**: Integration tests in VT-017-003
-- **Observations & AI Notes**: Use case-sensitive substring match by default, combine with -i for case-insensitive
+- **Observations & AI Notes**:
+  - Added `-c/--category` option to `list_requirements()` command
+  - Respects `--case-insensitive` flag for case matching behavior
+  - Case-sensitive by default: `category in r.category`
+  - With `-i`: `category.lower() in r.category.lower()`
+  - Filters out None categories (uncategorized requirements excluded when filter active)
+  - Location: list.py:1045-1057
+  - quickcheck passed (1352 tests)
 
 **2.4 Extend regexp/case-insensitive filters**
 - **Design / Approach**: Include category field in regexp and case-insensitive search scope
-- **Files / Components**: CLI filter logic
+- **Files / Components**: `supekku/cli/list.py:list_requirements()`
 - **Testing**: Integration tests verify filters work on category
-- **Observations & AI Notes**: Handle None category gracefully (skip in filter or treat as empty string)
+- **Observations & AI Notes**:
+  - Updated regexp filter fields from `[r.uid, r.label, r.title]` to include `r.category or ""`
+  - Empty string fallback handles None category gracefully (no match on empty pattern)
+  - Uses existing `matches_regexp()` helper from `supekku/cli/common.py`
+  - Already respects `--case-insensitive` flag through helper function
+  - Location: list.py:1067-1079
+  - quickcheck passed (1352 tests)
 
 **2.5 Update CLI to use formatter**
 - **Design / Approach**: Import and call `format_requirement_list_item()` instead of inline formatting

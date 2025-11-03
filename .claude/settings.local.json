@@ -37,7 +37,8 @@
       "mcp__serena__replace_symbol_body",
       "mcp__serena__search_for_pattern",
       "Bash(yq:*)",
-      "Bash(just quickcheck:*)"
+      "Bash(just quickcheck:*)",
+      "mcp__serena__insert_after_symbol"
     ],
     "deny": [],
     "ask": []

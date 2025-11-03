@@ -173,15 +173,15 @@ that enable native reverse traversal of relationships in registries.
 - `test_list_deltas_implements_nonexistent_requirement(self)`: Test --implements with non-existent requirement returns empty list. - Placeholder for TDD
 - `test_list_deltas_implements_with_status_filter(self)`: Test combining --implements with --status filter.
 - `test_list_requirements_verified_by_exact_match(self)`: Test --verified-by with exact artifact ID. - Placeholder for TDD
-- `test_list_requirements_verified_by_flag_exists(self)`: Test that list requirements accepts --verified-by flag (TDD placeholder).
+- `test_list_requirements_verified_by_flag_exists(self)`: Test that list requirements accepts --verified-by flag (TDD placeholder). - Empty output is also acceptable (current CLI behavior)
 - `test_list_requirements_verified_by_glob_pattern(self)`: Test --verified-by with glob pattern matching.
 - `test_list_requirements_verified_by_nonexistent_artifact(self)`: Test --verified-by with non-existent artifact returns empty list. - Placeholder for TDD
 - `test_list_requirements_verified_by_va_pattern(self)`: Test --verified-by with VA (agent validation) pattern.
 - `test_list_requirements_verified_by_with_spec_filter(self)`: Test combining --verified-by with --spec filter. - Placeholder for TDD
 - `test_list_specs_informed_by_filters_correctly(self)`: Test that --informed-by returns only specs referencing specific ADR. - Placeholder for TDD
-- `test_list_specs_informed_by_flag_exists(self)`: Test that list specs accepts --informed-by flag (TDD placeholder).
+- `test_list_specs_informed_by_flag_exists(self)`: Test that list specs accepts --informed-by flag (TDD placeholder). - Empty output is also acceptable (current CLI behavior)
 - `test_list_specs_informed_by_nonexistent_adr(self)`: Test --informed-by with non-existent ADR returns empty list. - Placeholder for TDD
-- `test_list_specs_informed_by_with_kind_filter(self)`: Test combining --informed-by with --kind filter.
+- `test_list_specs_informed_by_with_kind_filter(self)`: Test combining --informed-by with --kind filter. - Empty output is also acceptable (current CLI behavior for no matches)
 
 ### TestShowCommandJSON
 

@@ -4,6 +4,23 @@ Tests for list CLI commands (backlog shortcuts).
 
 ## Classes
 
+### BacklogPrioritizationTest
+
+Test cases for backlog prioritization feature (VT-015-005).
+
+Tests the --prioritize flag and interactive editor workflow integration.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`: Set up test environment with sample backlog entries and registry.
+- `tearDown(self) -> None`: Clean up test environment.
+- `test_list_backlog_uses_priority_order(self) -> None`: Test that list backlog displays items in priority order by default.
+- `test_order_by_id_flag(self) -> None`: Test --order-by-id flag provides chronological ordering.
+- `_create_sample_improvement(self, impr_id, title, status) -> None`: Helper to create a sample improvement file.
+- `_create_sample_issue(self, issue_id, title, status, severity) -> None`: Helper to create a sample issue file.
+
 ### ListBacklogShortcutsTest
 
 Test cases for backlog listing shortcut commands.

@@ -36,7 +36,7 @@ Args:
   decision: Decision to format
 
 Returns:
-  List of formatted cell values [id, title, status, updated]
+  List of formatted cell values [id, title, tags, status, updated]
 - `format_decision_details(decision) -> str`: Format decision details as multi-line string for display.
 
 Args:

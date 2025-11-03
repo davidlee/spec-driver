@@ -4,6 +4,7 @@ Tests for backlog priority ordering and partitioning.
 
 VT-015-001: Head-tail partition algorithm tests
 VT-015-003: Priority ordering sort function tests
+VT-015-004: Editor utility and markdown functions tests
 
 ## Classes
 
@@ -43,3 +44,34 @@ VT-015-003: Tests for priority sort function.
 - `test_sort_by_priority_partial_registry(self)`: Test mixed scenario: some items in registry, some not.
 - `test_sort_by_priority_registry_order_trumps_severity(self)`: Test that registry position takes precedence over severity.
 - `test_sort_by_priority_severity_fallback(self)`: Test severity ordering for items not in registry.
+
+### TestGenerateMarkdownList
+
+Test generate_markdown_list function.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_basic_list_generation(self) -> None`: Test generating markdown list from backlog items.
+- `test_empty_list(self) -> None`: Test generating markdown from empty list.
+- `test_long_title_truncation(self) -> None`: Test that long titles are truncated.
+- `test_with_severity(self) -> None`: Test markdown generation includes severity.
+
+### TestParseMarkdownList
+
+Test parse_markdown_list function.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_basic_parsing(self) -> None`: Test parsing markdown list with checkboxes.
+- `test_duplicate_ids_kept_first(self) -> None`: Test that duplicate IDs keep only first occurrence.
+- `test_empty_markdown_raises(self) -> None`: Test that empty markdown raises ValueError.
+- `test_ignores_blank_lines(self) -> None`: Test that blank lines are ignored.
+- `test_ignores_comments(self) -> None`: Test that comment lines are ignored.
+- `test_mixed_formats(self) -> None`: Test parsing various markdown formats together.
+- `test_no_ids_raises(self) -> None`: Test that markdown with no IDs raises ValueError.
+- `test_with_severity(self) -> None`: Test parsing handles severity in parentheses.
+- `test_without_checkbox(self) -> None`: Test parsing items without checkbox syntax.

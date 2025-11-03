@@ -79,6 +79,13 @@ def sync(
       help="Synchronize ADR/decision registry",
     ),
   ] = False,
+  backlog: Annotated[
+    bool,
+    typer.Option(
+      "--backlog",
+      help="Synchronize backlog priority registry",
+    ),
+  ] = False,
   prune: Annotated[
     bool,
     typer.Option(
@@ -100,8 +107,9 @@ def sync(
   - Go (via gomarkdoc)
   - Python (via AST analysis)
   - ADR/decision registry synchronization
+  - Backlog priority registry synchronization
 
-  By default, only syncs specs. Use --adr to also sync ADR registry.
+  By default, only syncs specs. Use --adr or --backlog to sync registries.
   """
   # Auto-discover repository root
   root = find_repo_root()
@@ -152,6 +160,16 @@ def sync(
       results["adr"] = adr_result
     except Exception as e:
       typer.echo(f"Error syncing ADRs: {e}", err=True)
+      raise typer.Exit(EXIT_FAILURE) from e
+
+  # Sync backlog if requested
+  if backlog:
+    typer.echo("Synchronizing backlog priority registry...")
+    try:
+      backlog_result = _sync_backlog(root=root)
+      results["backlog"] = backlog_result
+    except Exception as e:
+      typer.echo(f"Error syncing backlog: {e}", err=True)
       raise typer.Exit(EXIT_FAILURE) from e
 
   # Always sync requirements from specs
@@ -530,6 +548,21 @@ def _sync_requirements(root: Path) -> dict:
   )
 
   return {"success": True, "created": stats.created, "updated": stats.updated}
+
+
+def _sync_backlog(root: Path) -> dict:
+  """Execute backlog priority registry synchronization."""
+  from supekku.scripts.lib.backlog.registry import sync_backlog_registry
+
+  stats = sync_backlog_registry(root)
+
+  typer.echo(
+    f"  Backlog: {stats['total']} total items "
+    f"({stats['added']} added, {stats['removed']} removed, "
+    f"{stats['unchanged']} unchanged)",
+  )
+
+  return {"success": True, **stats}
 
 
 # For direct testing

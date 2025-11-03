@@ -47,18 +47,17 @@ version: 1
 phase: IP-015.PHASE-01
 status: in-progress
 started: '2025-11-04'
-tasks_completed: 4
+tasks_completed: 5
 tasks_total: 8
 last_updated: '2025-11-04'
 notes: |
-  Tasks 1.1-1.4 complete: Core registry functions implemented
-  - Registry YAML schema defined at .spec-driver/registry/backlog.yaml
-  - load_backlog_registry() reads ordered list (defensive parsing)
-  - save_backlog_registry() writes ordered list (creates dirs if needed)
-  - sync_backlog_registry() merges filesystem with registry (preserves order, prunes orphans)
-  - All functions exported in __all__
-  - Lint checks pass (ruff ✓, pylint 9.76/10 +0.02)
-  - Ready for CLI integration (task 1.5)
+  Tasks 1.1-1.5 complete: CLI integration done
+  - Registry YAML schema at .spec-driver/registry/backlog.yaml
+  - load/save/sync functions implemented in backlog/registry.py
+  - CLI --backlog flag added to spec-driver sync command
+  - Manual test successful: synced 18 backlog items ✓
+  - Lint checks pass (ruff ✓, pylint 9.12/10)
+  - Ready for comprehensive testing (tasks 1.6-1.7)
 ```
 
 # Phase 1 - Registry Infrastructure
@@ -135,7 +134,7 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 | [x] | 1.2 | Implement registry read function | [ ] | load_backlog_registry() complete |
 | [x] | 1.3 | Implement registry write function | [ ] | save_backlog_registry() complete |
 | [x] | 1.4 | Implement sync logic | [ ] | sync_backlog_registry() complete |
-| [WIP] | 1.5 | Add sync command to CLI | [ ] | Wire to supekku/cli/sync.py |
+| [x] | 1.5 | Add sync command to CLI | [ ] | --backlog flag added to sync |
 | [ ] | 1.6 | Write unit tests | [P] | Can parallel with 1.5 |
 | [ ] | 1.7 | Write integration tests | [ ] | After 1.5 complete |
 | [ ] | 1.8 | Run lint and fix issues | [ ] | Final cleanup |
@@ -202,14 +201,20 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
   - Handles orphaned items gracefully (pruned from order)
   - Set operations make logic clear and efficient
 
-**1.5 - Add sync command to CLI**
-- **Design**: Add `sync_backlog()` command to `supekku/cli/sync.py`
-  - Follow existing pattern from `sync_decisions()`
-  - Call `sync_backlog_registry()`
-  - Print summary of changes
-- **Files**: `supekku/cli/sync.py`
-- **Testing**: Integration test
-- **Observations**: Keep CLI thin - delegate to domain
+**1.5 - Add sync command to CLI** ✅
+- **Design**: Add `--backlog` flag to `spec-driver sync` command
+  - Follows existing pattern from `--adr` flag
+  - Calls `_sync_backlog()` helper which calls `sync_backlog_registry()`
+  - Prints summary: total, added, removed, unchanged
+- **Files**: `supekku/cli/sync.py:82-88, 165-173, 553-565`
+- **Testing**: Manual test successful - synced 18 items ✓
+- **Observations**:
+  - Integrated into main sync command (not separate subcommand)
+  - Follows thin CLI pattern - delegates to domain
+  - Displays useful stats from sync operation
+  - Works alongside --adr, --specs flags
+  - Command: `spec-driver sync --backlog`
+  - Registry file generated at .spec-driver/registry/backlog.yaml
 
 **1.6 - Write unit tests**
 - **Design**: `supekku/scripts/lib/backlog/registry_test.py`

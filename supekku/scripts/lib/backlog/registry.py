@@ -142,6 +142,55 @@ def save_backlog_registry(ordering: list[str], root: Path | None = None) -> None
   registry_path.write_text(yaml_content, encoding="utf-8")
 
 
+def sync_backlog_registry(root: Path | None = None) -> dict[str, int]:
+  """Sync backlog registry with filesystem.
+
+  Discovers all backlog items, merges with existing registry ordering,
+  and writes updated registry. Preserves order of existing items,
+  appends new items, and prunes orphaned IDs.
+
+  Args:
+    root: Repository root path (auto-detected if None)
+
+  Returns:
+    Dictionary with sync statistics:
+      - total: total items in registry after sync
+      - added: number of new items added
+      - removed: number of orphaned items removed
+      - unchanged: number of items already in registry
+  """
+  repo_root = find_repo_root(root)
+
+  # Discover all backlog items from filesystem
+  items = discover_backlog_items(root=repo_root)
+  current_ids = {item.id for item in items}
+
+  # Load existing registry ordering
+  existing_order = load_backlog_registry(repo_root)
+  existing_ids = set(existing_order)
+
+  # Calculate changes
+  new_ids = current_ids - existing_ids
+  orphaned_ids = existing_ids - current_ids
+
+  # Build merged ordering:
+  # 1. Keep existing items in their current order (excluding orphans)
+  # 2. Append new items sorted by ID
+  merged_order = [item_id for item_id in existing_order if item_id in current_ids]
+  merged_order.extend(sorted(new_ids))
+
+  # Save updated registry
+  save_backlog_registry(merged_order, repo_root)
+
+  # Return statistics
+  return {
+    "total": len(merged_order),
+    "added": len(new_ids),
+    "removed": len(orphaned_ids),
+    "unchanged": len(existing_ids - orphaned_ids),
+  }
+
+
 def slugify(value: str) -> str:
   """Convert value to URL-friendly slug.
 
@@ -387,4 +436,5 @@ __all__ = [
   "find_repo_root",
   "load_backlog_registry",
   "save_backlog_registry",
+  "sync_backlog_registry",
 ]

@@ -47,16 +47,18 @@ version: 1
 phase: IP-015.PHASE-01
 status: in-progress
 started: '2025-11-04'
-tasks_completed: 3
+tasks_completed: 4
 tasks_total: 8
 last_updated: '2025-11-04'
 notes: |
-  Tasks 1.1-1.3 complete: Registry infrastructure ready
+  Tasks 1.1-1.4 complete: Core registry functions implemented
   - Registry YAML schema defined at .spec-driver/registry/backlog.yaml
   - load_backlog_registry() reads ordered list (defensive parsing)
   - save_backlog_registry() writes ordered list (creates dirs if needed)
-  - Both functions exported in __all__
-  - Lint checks pass (ruff + pylint 9.74/10)
+  - sync_backlog_registry() merges filesystem with registry (preserves order, prunes orphans)
+  - All functions exported in __all__
+  - Lint checks pass (ruff ✓, pylint 9.76/10 +0.02)
+  - Ready for CLI integration (task 1.5)
 ```
 
 # Phase 1 - Registry Infrastructure
@@ -132,8 +134,8 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 | [x] | 1.1 | Define registry YAML schema | [ ] | Created .spec-driver/registry/backlog.yaml |
 | [x] | 1.2 | Implement registry read function | [ ] | load_backlog_registry() complete |
 | [x] | 1.3 | Implement registry write function | [ ] | save_backlog_registry() complete |
-| [WIP] | 1.4 | Implement sync logic | [ ] | Discover → merge → write |
-| [ ] | 1.5 | Add sync command to CLI | [ ] | Wire to supekku/cli/sync.py |
+| [x] | 1.4 | Implement sync logic | [ ] | sync_backlog_registry() complete |
+| [WIP] | 1.5 | Add sync command to CLI | [ ] | Wire to supekku/cli/sync.py |
 | [ ] | 1.6 | Write unit tests | [P] | Can parallel with 1.5 |
 | [ ] | 1.7 | Write integration tests | [ ] | After 1.5 complete |
 | [ ] | 1.8 | Run lint and fix issues | [ ] | Final cleanup |
@@ -183,16 +185,22 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
   - Direct write (not temp file) - acceptable for this use case
   - Added to __all__ exports for public API
 
-**1.4 - Implement sync logic**
-- **Design**: `sync_backlog_registry(root: Path)`
+**1.4 - Implement sync logic** ✅
+- **Design**: `sync_backlog_registry(root: Path | None) -> dict[str, int]`
   - Call `discover_backlog_items()` to get all items
   - Load existing registry (if exists)
-  - Merge: preserve order for existing items, append new items
+  - Merge: preserve order for existing items, append new items sorted by ID
   - Prune: remove IDs not in discovered items
   - Save updated registry
-- **Files**: `supekku/scripts/lib/backlog/registry.py`
-- **Testing**: Unit tests with various scenarios
-- **Observations**: Merge logic is key - test thoroughly
+  - Return statistics dict: total, added, removed, unchanged
+- **Files**: `supekku/scripts/lib/backlog/registry.py:145-189`
+- **Testing**: Unit tests with various scenarios (task 1.6)
+- **Observations**:
+  - Clean merge algorithm: filter existing order, append sorted new items
+  - Returns useful stats for CLI display
+  - Handles empty registry (all items are "new")
+  - Handles orphaned items gracefully (pruned from order)
+  - Set operations make logic clear and efficient
 
 **1.5 - Add sync command to CLI**
 - **Design**: Add `sync_backlog()` command to `supekku/cli/sync.py`

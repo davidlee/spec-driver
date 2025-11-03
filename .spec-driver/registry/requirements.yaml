@@ -209,7 +209,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-010
     verified_by: []
     coverage_evidence:
     - VT-PROD-003-001
@@ -223,7 +224,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-010
     verified_by: []
     coverage_evidence:
     - VT-PROD-003-002
@@ -237,7 +239,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-010
     verified_by: []
     coverage_evidence:
     - VT-PROD-003-003
@@ -252,7 +255,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-010
     verified_by: []
     coverage_evidence:
     - VT-PROD-003-004
@@ -267,7 +271,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-010
     verified_by: []
     coverage_evidence:
     - VT-PROD-003-005
@@ -282,7 +287,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-010
     verified_by: []
     coverage_evidence:
     - VT-PROD-003-006
@@ -297,7 +303,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-010
     verified_by: []
     coverage_evidence:
     - VT-PROD-003-007
@@ -312,7 +319,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-010
     verified_by: []
     coverage_evidence:
     - VT-PROD-003-008
@@ -327,7 +335,8 @@ requirements:
     kind: non-functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-010
     verified_by: []
     coverage_evidence:
     - VT-PROD-003-009
@@ -342,7 +351,8 @@ requirements:
     kind: non-functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-010
     verified_by: []
     coverage_evidence:
     - VA-PROD-003-001
@@ -926,7 +936,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-009
@@ -941,7 +951,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-009
@@ -956,7 +966,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-009
@@ -1097,7 +1107,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: non-functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-009

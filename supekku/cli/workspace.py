@@ -73,21 +73,35 @@ def validate(
       help="Enable strict validation (warn about deprecated ADR references)",
     ),
   ] = False,
+  verbose: Annotated[
+    bool,
+    typer.Option(
+      "--verbose",
+      "-v",
+      help="Show info-level messages (planned verification artifacts, etc.)",
+    ),
+  ] = False,
 ) -> None:
   """Validate workspace metadata and relationships.
 
   Checks workspace integrity, validates cross-references between documents,
   and reports any issues found.
+
+  By default, only errors and warnings are shown. Use --verbose to see
+  info-level messages about planned verification artifacts.
   """
   try:
     ws = Workspace(find_repo_root(root))
 
     if sync:
-      ws.reload_specs()
-      ws.sync_change_registries()
-      ws.sync_requirements()
+      ws.sync_all_registries()
 
     issues = validate_ws(ws, strict=strict)
+
+    # Filter issues based on verbosity
+    if not verbose:
+      issues = [i for i in issues if i.level != "info"]
+
     if not issues:
       typer.echo("Workspace validation passed")
       raise typer.Exit(EXIT_SUCCESS)

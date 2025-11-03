@@ -56,6 +56,14 @@ def list_specs(
       help="Restrict to tech specs, product specs, or both",
     ),
   ] = "all",
+  status: Annotated[
+    str | None,
+    typer.Option(
+      "--status",
+      "-s",
+      help="Filter by status (draft, active, deprecated, superseded)",
+    ),
+  ] = None,
   substring: Annotated[
     str | None,
     typer.Option(
@@ -171,6 +179,16 @@ def list_specs(
           package_filters.append(base.as_posix().lower())
 
     specs = registry.all_specs()
+
+    # Apply status filter
+    if status:
+      status_normalized = normalize_status(status)
+      specs = [
+        spec
+        for spec in specs
+        if normalize_status(spec.status) == status_normalized
+      ]
+
     if filter_substring:
       specs = [
         spec
@@ -269,6 +287,13 @@ def list_deltas(
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   truncate: TruncateOption = False,
   details: Annotated[
     bool,
@@ -283,6 +308,10 @@ def list_deltas(
 
   The --regexp flag filters on ID, name, and slug fields.
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   # Validate format
   if format_type not in ["table", "json", "tsv"]:
     typer.echo(f"Error: invalid format: {format_type}", err=True)
@@ -385,6 +414,13 @@ def list_changes(
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   truncate: TruncateOption = False,
   paths: Annotated[
     bool,
@@ -420,6 +456,10 @@ def list_changes(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID, slug, and name fields.
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   if kind not in ["delta", "revision", "audit", "all"]:
     typer.echo(f"Error: invalid kind: {kind}", err=True)
     raise typer.Exit(EXIT_FAILURE)
@@ -586,6 +626,13 @@ def list_adrs(
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   truncate: TruncateOption = False,
 ) -> None:
   """List Architecture Decision Records (ADRs) with optional filtering.
@@ -593,6 +640,10 @@ def list_adrs(
   The --regexp flag filters on title and summary fields.
   Other flags filter on specific structured fields (status, tags, references).
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   # Validate format
   if format_type not in ["table", "json", "tsv"]:
     typer.echo(f"Error: invalid format: {format_type}", err=True)
@@ -665,6 +716,13 @@ def list_requirements(
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   truncate: TruncateOption = False,
 ) -> None:
   """List requirements with optional filtering.
@@ -672,6 +730,10 @@ def list_requirements(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on UID, label, and title fields.
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   # Validate format
   if format_type not in ["table", "json", "tsv"]:
     typer.echo(f"Error: invalid format: {format_type}", err=True)
@@ -753,6 +815,13 @@ def list_revisions(
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   truncate: TruncateOption = False,
 ) -> None:
   """List revisions with optional filtering.
@@ -760,6 +829,10 @@ def list_revisions(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID, slug, and name fields.
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   # Validate format
   if format_type not in ["table", "json", "tsv"]:
     typer.echo(f"Error: invalid format: {format_type}", err=True)

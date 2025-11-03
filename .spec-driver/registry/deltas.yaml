@@ -307,6 +307,24 @@ deltas:
           - Phase template includes tracking block
           - VT-PHASE-007 passing
           - Backward compatibility maintained
+        - id: IP-004.PHASE-06
+          name: Phase 06 - Schema Simplification & Verification
+          objective: Simplify plan.overview schema to eliminate duplication (ID-only
+            phases), add JSON schema for phase.tracking@v1, execute verification artifacts,
+            and prepare DE-004 for completion.
+          entrance_criteria:
+          - Phases 01, 04, 05 complete (core functionality implemented)
+          - All VT-PHASE tests passing (VT-001 through VT-007)
+          - Duplication between plan.overview and phase.overview identified
+          exit_criteria:
+          - plan.overview schema simplified (phases array = ID-only objects)
+          - create_phase writes only ID to plan.overview
+          - Backward compatibility maintained for old format plans
+          - phase.tracking@v1 has JSON schema support
+          - VA-PHASE-001 and VA-PHASE-002 executed
+          - IP-004.md migrated to simplified format
+          - All tests passing, linters clean
+          - Requirements registry updated with verification status
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -411,6 +429,45 @@ deltas:
         - Breaking changes to existing phase files
         - Complex data structure may be harder to maintain manually
         - Need to support both tracking block and markdown checkboxes
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-004.PHASE-06
+        plan: IP-004
+        delta: DE-004
+        objective: Simplify plan.overview schema to eliminate duplication (ID-only
+          phases array), add JSON schema for phase.tracking@v1, execute verification
+          artifacts, and prepare DE-004 for completion.
+        entrance_criteria:
+        - Phases 01, 04, 05 complete (core functionality implemented)
+        - All VT-PHASE tests passing (VT-001 through VT-007)
+        - phase.overview schema already registered and working
+        exit_criteria:
+        - phase.tracking@v1 has JSON schema with schema show support
+        - VA-PHASE-001 executed (performance benchmark <2sec for 20 phases)
+        - VA-PHASE-002 executed (UX review of delta display readability)
+        - All acceptance criteria in DE-004 satisfied
+        - Requirements registry updated with verification status
+        verification:
+          tests:
+          - VA-PHASE-001
+          - VA-PHASE-002
+          evidence:
+          - JSON schema for phase.tracking viewable via schema show
+          - Performance benchmark results
+          - UX review findings
+          - Updated requirements registry
+        tasks:
+        - Research metadata-driven validation pattern for phase.tracking
+        - Create JSON schema definition for phase.tracking@v1
+        - Register schema in metadata system
+        - Verify schema show phase.tracking works
+        - Execute VA-PHASE-001 (performance benchmark)
+        - Execute VA-PHASE-002 (UX review)
+        - Update requirements registry with verification results
+        - Update DE-004 with completion notes
+        risks:
+        - Metadata-driven validation migration may be complex
+        - Performance may not meet <2sec threshold (mitigation: optimize if needed)
       - id: IP-004.PHASE-02
         name: Phase 02 - Enhanced Display & Validation
         objective: Enhance delta display formatter to show phases. Add schema validation
@@ -855,7 +912,7 @@ deltas:
           mitigation: Use 30-day default for grace period, make configurable
   DE-009:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - CLI JSON consistency fixes
     slug: cli-json-consistency-fixes
     updated: '2025-11-03'
@@ -868,11 +925,6 @@ deltas:
       - PROD-010.FR-002
       - PROD-010.FR-003
       - PROD-010.NF-003
-    relations:
-    - type: implements
-      target: PROD-010
-      attributes:
-        description: Implements Priority 1 requirements for CLI agent UX consistency
     plan:
       id: IP-009
       overview:
@@ -883,17 +935,38 @@ deltas:
         revision_links:
           aligns_with: []
         specs:
-          primary: []
-          collaborators: []
+          primary:
+          - SPEC-110
+          collaborators:
+          - SPEC-120
         requirements:
-          targets: []
+          targets:
+          - PROD-010.FR-001
+          - PROD-010.FR-002
+          - PROD-010.FR-003
+          - PROD-010.NF-003
           dependencies: []
         phases:
         - id: IP-009.PHASE-01
-          name: Phase 01 - Initial delivery
-          objective: Deliver the foundational work for this delta.
-          entrance_criteria: []
-          exit_criteria: []
+          name: Phase 01 - CLI JSON Consistency Fixes
+          objective: 'Implement Priority 1 CLI consistency fixes: standardize --json
+            flag across all list/show commands, add status filter to specs, ensure
+            backward compatibility, and validate against UX research findings.'
+          entrance_criteria:
+          - Development environment set up with uv and dependencies installed
+          - Existing CLI test suite passing
+          - Both linters passing
+          - Familiarity with CLAUDE.md skinny CLI patterns
+          - UX research report reviewed
+          exit_criteria:
+          - All list commands support both --json and --format=json flags
+          - All show commands support --json flag
+          - list specs command supports -s/--status filter
+          - All unit tests passing with new test coverage
+          - Both linters passing with zero warnings
+          - Help text updated and accurate
+          - JSON output schemas validated as stable
+          - Manual agent workflow testing confirms consistency improvements
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -972,3 +1045,204 @@ deltas:
           likelihood: medium
           impact: medium
           mitigation: Reuse exact patterns from list_deltas; test for behavioral parity
+  DE-010:
+    kind: delta
+    status: draft
+    name: Delta - Policy and Standard Management
+    slug: policy-and-standard-management
+    updated: '2025-11-03'
+    path: change/deltas/DE-010-policy-and-standard-management/DE-010.md
+    applies_to:
+      specs:
+      - PROD-003
+      requirements:
+      - PROD-003.FR-001
+      - PROD-003.FR-002
+      - PROD-003.FR-003
+      - PROD-003.FR-004
+      - PROD-003.FR-005
+      - PROD-003.FR-006
+      - PROD-003.FR-007
+      - PROD-003.FR-008
+      - PROD-003.NF-001
+      - PROD-003.NF-002
+    plan:
+      id: IP-010
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-010
+        delta: DE-010
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-003
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-003.FR-001
+          - PROD-003.FR-002
+          - PROD-003.FR-003
+          - PROD-003.FR-004
+          - PROD-003.FR-005
+          - PROD-003.FR-006
+          - PROD-003.FR-007
+          - PROD-003.FR-008
+          - PROD-003.NF-001
+          - PROD-003.NF-002
+          dependencies: []
+        phases:
+        - id: IP-010.PHASE-01
+          name: Phase 01 - Foundation & Domain Models
+          objective: Create domain packages (policies/, standards/) with models, registry,
+            and creation logic mirroring the proven decisions/ package architecture.
+          entrance_criteria:
+          - Delta approved and PROD-003 reviewed
+          - Decisions package structure understood (SPEC-117 reference)
+          - Template structure defined
+          exit_criteria:
+          - PolicyRecord and StandardRecord models implemented
+          - PolicyRegistry and StandardRegistry with YAML serialization
+          - Creation functions with ID generation and frontmatter building
+          - Unit tests passing for all domain logic
+          - Lint checks passing
+        - id: IP-010.PHASE-02
+          name: Phase 02 - Formatters & Display
+          objective: Implement pure formatting functions for policies and standards
+            following established formatter patterns.
+          entrance_criteria: &id005
+          - Phase 01 complete (domain models available)
+          - Formatter patterns reviewed (decision_formatters.py reference)
+          exit_criteria: &id006
+          - policy_formatters.py with table/JSON/TSV output functions
+          - standard_formatters.py with status-aware formatting
+          - Comprehensive formatter tests covering edge cases
+          - Formatters exported in __init__.py
+          - Lint checks passing
+        - id: IP-010.PHASE-03
+          name: Phase 03 - CLI Integration
+          objective: Add CLI commands (create, list, show) for policies and standards,
+            extending existing CLI infrastructure.
+          entrance_criteria: &id007
+          - Phase 02 complete (formatters available)
+          - CLI architecture reviewed (SPEC-110 reference)
+          exit_criteria: &id008
+          - spec-driver create policy/standard commands
+          - spec-driver list policies/standards with filtering
+          - spec-driver show policy/standard with full details
+          - CLI help text and documentation complete
+          - Integration tests for all CLI workflows
+          - Lint checks passing
+        - id: IP-010.PHASE-04
+          name: Phase 04 - Cross-References & Backlinks
+          objective: Implement bidirectional cross-references between policies, standards,
+            and ADRs with automatic backlink maintenance.
+          entrance_criteria: &id009
+          - Phase 03 complete (CLI functional)
+          - ADR frontmatter schema extensible
+          exit_criteria: &id010
+          - ADR frontmatter extended with policies and standards fields
+          - Backlink generation in registry sync
+          - Cross-reference validation
+          - Integration tests for bidirectional navigation
+          - Lint checks passing
+        - id: IP-010.PHASE-05
+          name: Phase 05 - Verification & Documentation
+          objective: Complete E2E testing, update documentation, and verify all acceptance
+            criteria.
+          entrance_criteria: &id011
+          - Phase 04 complete (full feature set implemented)
+          - All unit and integration tests passing
+          exit_criteria: &id012
+          - "E2E tests for complete workflows (create \u2192 reference \u2192 show\
+            \ backlinks)"
+          - All VT-PROD-003-* tests implemented and passing
+          - VA-PROD-003-001 UX review complete
+          - README updated with policy/standard examples
+          - All acceptance criteria verified
+          - just test, just lint, just pylint all passing
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-010.PHASE-01
+        plan: IP-010
+        delta: DE-010
+        objective: Create domain packages (policies/, standards/) with models, registry,
+          and creation logic mirroring the proven decisions/ package architecture.
+        entrance_criteria:
+        - Delta DE-010 approved and PROD-003 reviewed
+        - Decisions package structure understood (SPEC-117 reference)
+        - Template structure defined
+        exit_criteria:
+        - PolicyRecord and StandardRecord models implemented
+        - PolicyRegistry and StandardRegistry with YAML serialization
+        - Creation functions with ID generation and frontmatter building
+        - Unit tests passing for all domain logic
+        - Lint checks passing (just lint, just pylint)
+        verification:
+          tests:
+          - VT-PROD-003-001 - E2E test for policy creation
+          - VT-PROD-003-002 - Integration test for policy lifecycle
+          - VT-PROD-003-003 - E2E test for standard creation
+          - VT-PROD-003-004 - Unit test for default status behavior
+          evidence:
+          - Test run output showing all unit tests passing
+          - Lint checks passing (ruff + pylint)
+          - Registry YAML files generated correctly
+        tasks:
+        - id: '1.1'
+          description: Research decisions package architecture
+        - id: '1.2'
+          description: Create policies/ package structure
+        - id: '1.3'
+          description: Create standards/ package structure
+        - id: '1.4'
+          description: Implement PolicyRecord and StandardRecord models
+        - id: '1.5'
+          description: Implement PolicyRegistry with YAML serialization
+        - id: '1.6'
+          description: Implement StandardRegistry with YAML serialization
+        - id: '1.7'
+          description: Implement policy creation with ID generation
+        - id: '1.8'
+          description: Implement standard creation with ID generation
+        - id: '1.9'
+          description: Create policy and standard templates
+        - id: '1.10'
+          description: Write comprehensive unit tests
+        - id: '1.11'
+          description: Lint and validate all code
+        risks:
+        - description: Decisions package may use internal APIs not suitable for reuse
+          mitigation: Extract patterns, not code; implement independently if needed
+        - description: Template structure may need iteration
+          mitigation: Start with PROD-003 spec; refine based on actual usage
+      - id: IP-010.PHASE-02
+        name: Phase 02 - Formatters & Display
+        objective: Implement pure formatting functions for policies and standards
+          following established formatter patterns.
+        entrance_criteria: *id005
+        exit_criteria: *id006
+        phase: IP-010.PHASE-02
+      - id: IP-010.PHASE-03
+        name: Phase 03 - CLI Integration
+        objective: Add CLI commands (create, list, show) for policies and standards,
+          extending existing CLI infrastructure.
+        entrance_criteria: *id007
+        exit_criteria: *id008
+        phase: IP-010.PHASE-03
+      - id: IP-010.PHASE-04
+        name: Phase 04 - Cross-References & Backlinks
+        objective: Implement bidirectional cross-references between policies, standards,
+          and ADRs with automatic backlink maintenance.
+        entrance_criteria: *id009
+        exit_criteria: *id010
+        phase: IP-010.PHASE-04
+      - id: IP-010.PHASE-05
+        name: Phase 05 - Verification & Documentation
+        objective: Complete E2E testing, update documentation, and verify all acceptance
+          criteria.
+        entrance_criteria: *id011
+        exit_criteria: *id012
+        phase: IP-010.PHASE-05

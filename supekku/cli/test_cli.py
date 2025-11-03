@@ -313,6 +313,288 @@ class TestErrorHandling:
     assert result.exit_code != 0
 
 
+class TestJSONFlagConsistency:
+  """Test --json flag consistency across list and show commands (DE-009)."""
+
+  def test_list_deltas_json_flag(self):
+    """Test list deltas accepts --json flag."""
+    result = runner.invoke(app, ["list", "deltas", "--json"])
+    assert result.exit_code == 0
+    # Output should be valid JSON
+    import json
+    try:
+      data = json.loads(result.stdout)
+      assert isinstance(data, dict)
+    except json.JSONDecodeError:
+      pytest.fail("Output is not valid JSON")
+
+  def test_list_deltas_json_equals_format_json(self):
+    """Test --json produces same output as --format=json for deltas."""
+    result_json = runner.invoke(app, ["list", "deltas", "--json"])
+    result_format = runner.invoke(app, ["list", "deltas", "--format", "json"])
+    assert result_json.exit_code == 0
+    assert result_format.exit_code == 0
+    assert result_json.stdout == result_format.stdout
+
+  def test_list_adrs_json_flag(self):
+    """Test list adrs accepts --json flag."""
+    result = runner.invoke(app, ["list", "adrs", "--json"])
+    assert result.exit_code == 0
+    import json
+    try:
+      data = json.loads(result.stdout)
+      assert isinstance(data, dict)
+    except json.JSONDecodeError:
+      pytest.fail("Output is not valid JSON")
+
+  def test_list_adrs_json_equals_format_json(self):
+    """Test --json produces same output as --format=json for adrs."""
+    result_json = runner.invoke(app, ["list", "adrs", "--json"])
+    result_format = runner.invoke(app, ["list", "adrs", "--format", "json"])
+    assert result_json.exit_code == 0
+    assert result_format.exit_code == 0
+    assert result_json.stdout == result_format.stdout
+
+  def test_list_requirements_json_flag(self):
+    """Test list requirements accepts --json flag."""
+    result = runner.invoke(app, ["list", "requirements", "--json"])
+    assert result.exit_code == 0
+    import json
+    try:
+      data = json.loads(result.stdout)
+      assert isinstance(data, dict)
+    except json.JSONDecodeError:
+      pytest.fail("Output is not valid JSON")
+
+  def test_list_requirements_json_equals_format_json(self):
+    """Test --json produces same output as --format=json for requirements."""
+    result_json = runner.invoke(app, ["list", "requirements", "--json"])
+    result_format = runner.invoke(app, ["list", "requirements", "--format", "json"])
+    assert result_json.exit_code == 0
+    assert result_format.exit_code == 0
+    assert result_json.stdout == result_format.stdout
+
+  def test_list_revisions_json_flag(self):
+    """Test list revisions accepts --json flag."""
+    result = runner.invoke(app, ["list", "revisions", "--json"])
+    assert result.exit_code == 0
+    import json
+    try:
+      data = json.loads(result.stdout)
+      assert isinstance(data, dict)
+    except json.JSONDecodeError:
+      pytest.fail("Output is not valid JSON")
+
+  def test_list_revisions_json_equals_format_json(self):
+    """Test --json produces same output as --format=json for revisions."""
+    result_json = runner.invoke(app, ["list", "revisions", "--json"])
+    result_format = runner.invoke(app, ["list", "revisions", "--format", "json"])
+    assert result_json.exit_code == 0
+    assert result_format.exit_code == 0
+    assert result_json.stdout == result_format.stdout
+
+  def test_list_changes_json_flag(self):
+    """Test list changes accepts --json flag."""
+    result = runner.invoke(app, ["list", "changes", "--json"])
+    assert result.exit_code == 0
+    import json
+    try:
+      data = json.loads(result.stdout)
+      assert isinstance(data, dict)
+    except json.JSONDecodeError:
+      pytest.fail("Output is not valid JSON")
+
+  def test_list_changes_json_equals_format_json(self):
+    """Test --json produces same output as --format=json for changes."""
+    result_json = runner.invoke(app, ["list", "changes", "--json"])
+    result_format = runner.invoke(app, ["list", "changes", "--format", "json"])
+    assert result_json.exit_code == 0
+    assert result_format.exit_code == 0
+    assert result_json.stdout == result_format.stdout
+
+  def test_list_specs_json_flag_already_exists(self):
+    """Test list specs --json flag (should already work)."""
+    result = runner.invoke(app, ["list", "specs", "--json"])
+    assert result.exit_code == 0
+    import json
+    try:
+      data = json.loads(result.stdout)
+      assert isinstance(data, dict)
+    except json.JSONDecodeError:
+      pytest.fail("Output is not valid JSON")
+
+  def test_list_specs_json_help_documents_flag(self):
+    """Test list specs help mentions --json flag."""
+    result = runner.invoke(app, ["list", "specs", "--help"])
+    assert result.exit_code == 0
+    assert "--json" in result.stdout
+
+  def test_list_deltas_json_help_documents_flag(self):
+    """Test list deltas help mentions --json flag."""
+    result = runner.invoke(app, ["list", "deltas", "--help"])
+    assert result.exit_code == 0
+    assert "--json" in result.stdout
+
+  def test_list_adrs_json_help_documents_flag(self):
+    """Test list adrs help mentions --json flag."""
+    result = runner.invoke(app, ["list", "adrs", "--help"])
+    assert result.exit_code == 0
+    assert "--json" in result.stdout
+
+
+class TestShowCommandJSON:
+  """Test --json flag on show commands (DE-009)."""
+
+  def test_show_spec_json_flag(self):
+    """Test show spec accepts --json flag."""
+    # Use a real spec ID that exists in this repo
+    result = runner.invoke(app, ["show", "spec", "SPEC-001", "--json"])
+    # May not find spec, but should accept the flag
+    # If spec not found, exit code=1; if flag not recognized, exit code=2
+    assert result.exit_code in [0, 1]
+    if result.exit_code == 0:
+      import json
+      try:
+        data = json.loads(result.stdout)
+        assert isinstance(data, dict)
+      except json.JSONDecodeError:
+        pytest.fail("Output is not valid JSON")
+
+  def test_show_adr_json_flag(self):
+    """Test show adr accepts --json flag."""
+    result = runner.invoke(app, ["show", "adr", "ADR-001", "--json"])
+    assert result.exit_code in [0, 1]
+    if result.exit_code == 0:
+      import json
+      try:
+        data = json.loads(result.stdout)
+        assert isinstance(data, dict)
+      except json.JSONDecodeError:
+        pytest.fail("Output is not valid JSON")
+
+  def test_show_requirement_json_flag(self):
+    """Test show requirement accepts --json flag."""
+    result = runner.invoke(app, ["show", "requirement", "SPEC-001.FR-001", "--json"])
+    assert result.exit_code in [0, 1]
+    if result.exit_code == 0:
+      import json
+      try:
+        data = json.loads(result.stdout)
+        assert isinstance(data, dict)
+      except json.JSONDecodeError:
+        pytest.fail("Output is not valid JSON")
+
+  def test_show_revision_json_flag(self):
+    """Test show revision accepts --json flag."""
+    result = runner.invoke(app, ["show", "revision", "RE-001", "--json"])
+    assert result.exit_code in [0, 1]
+    if result.exit_code == 0:
+      import json
+      try:
+        data = json.loads(result.stdout)
+        assert isinstance(data, dict)
+      except json.JSONDecodeError:
+        pytest.fail("Output is not valid JSON")
+
+  def test_show_delta_json_flag_already_exists(self):
+    """Test show delta --json flag (should already work)."""
+    result = runner.invoke(app, ["show", "delta", "DE-001", "--json"])
+    assert result.exit_code in [0, 1]
+    if result.exit_code == 0:
+      import json
+      try:
+        data = json.loads(result.stdout)
+        assert isinstance(data, dict)
+      except json.JSONDecodeError:
+        pytest.fail("Output is not valid JSON")
+
+  def test_show_spec_json_help_documents_flag(self):
+    """Test show spec help mentions --json flag."""
+    result = runner.invoke(app, ["show", "spec", "--help"])
+    assert result.exit_code == 0
+    assert "--json" in result.stdout
+
+  def test_show_adr_json_help_documents_flag(self):
+    """Test show adr help mentions --json flag."""
+    result = runner.invoke(app, ["show", "adr", "--help"])
+    assert result.exit_code == 0
+    assert "--json" in result.stdout
+
+
+class TestStatusFilterParity:
+  """Test status filter consistency across list commands (DE-009)."""
+
+  def test_list_specs_status_filter_flag(self):
+    """Test list specs accepts --status/-s flag."""
+    result = runner.invoke(app, ["list", "specs", "--status", "draft"])
+    assert result.exit_code == 0
+
+  def test_list_specs_status_filter_short_flag(self):
+    """Test list specs accepts -s short flag."""
+    result = runner.invoke(app, ["list", "specs", "-s", "draft"])
+    assert result.exit_code == 0
+
+  def test_list_specs_status_filter_active(self):
+    """Test list specs filters by active status."""
+    result = runner.invoke(app, ["list", "specs", "--status", "active"])
+    assert result.exit_code == 0
+
+  def test_list_specs_status_filter_deprecated(self):
+    """Test list specs filters by deprecated status."""
+    result = runner.invoke(app, ["list", "specs", "--status", "deprecated"])
+    assert result.exit_code == 0
+
+  def test_list_specs_status_filter_superseded(self):
+    """Test list specs filters by superseded status."""
+    result = runner.invoke(app, ["list", "specs", "--status", "superseded"])
+    assert result.exit_code == 0
+
+  def test_list_specs_status_help_documents_flag(self):
+    """Test list specs help mentions --status/-s flag."""
+    result = runner.invoke(app, ["list", "specs", "--help"])
+    assert result.exit_code == 0
+    assert "--status" in result.stdout or "-s" in result.stdout
+
+  def test_list_specs_status_filter_with_json(self):
+    """Test status filter works with JSON output."""
+    result = runner.invoke(app, ["list", "specs", "--status", "active", "--json"])
+    assert result.exit_code == 0
+    import json
+    try:
+      data = json.loads(result.stdout)
+      assert isinstance(data, dict)
+      assert "items" in data
+      # All items should have active status
+      for item in data["items"]:
+        if "status" in item:
+          assert item["status"] == "active"
+    except json.JSONDecodeError:
+      pytest.fail("Output is not valid JSON")
+
+
+class TestJSONSchemaRegression:
+  """Test JSON output schema stability (DE-009 backward compatibility)."""
+
+  def test_list_specs_json_schema_stable(self):
+    """Test list specs JSON output maintains expected structure."""
+    result = runner.invoke(app, ["list", "specs", "--json"])
+    assert result.exit_code == 0
+    import json
+    data = json.loads(result.stdout)
+    # Should have items key
+    assert "items" in data
+    assert isinstance(data["items"], list)
+
+  def test_list_deltas_json_schema_stable(self):
+    """Test list deltas JSON output maintains expected structure."""
+    result = runner.invoke(app, ["list", "deltas", "--format", "json"])
+    assert result.exit_code == 0
+    import json
+    data = json.loads(result.stdout)
+    # Should have expected top-level structure
+    assert isinstance(data, dict)
+
+
 class TestRegexpFiltering:
   """Test regexp filtering utility and CLI flags."""
 

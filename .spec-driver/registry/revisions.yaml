@@ -50,3 +50,14 @@ revisions:
     - type: documents
       target: DE-003
       attributes: {}
+  RE-006:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-009 completion
+    slug: delta-de-009-completion
+    updated: '2025-11-03'
+    path: change/revisions/RE-006-delta-de-009-completion/RE-006.md
+    relations:
+    - type: documents
+      target: DE-009
+      attributes: {}

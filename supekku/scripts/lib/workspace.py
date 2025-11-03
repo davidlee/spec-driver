@@ -152,5 +152,22 @@ class Workspace:
         msg = f"Unsupported change registry kind: {kind}"
         raise ValueError(msg)
 
+  def sync_all_registries(self) -> None:
+    """Synchronize all registries in the workspace.
+
+    This is the central sync method that should be used when all registries
+    need to be updated (e.g., before validation, after major changes).
+
+    Syncs in order:
+    1. Specs (reload from disk)
+    2. Decisions/ADRs (sync symlinks)
+    3. Change registries (deltas, revisions, audits)
+    4. Requirements (sync from specs and changes)
+    """
+    self.reload_specs()
+    self.sync_decisions()
+    self.sync_change_registries()
+    self.sync_requirements()
+
 
 __all__ = ["Workspace"]

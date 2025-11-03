@@ -366,7 +366,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     assert len(adr_issues) == 0
 
   def test_validator_warns_coverage_without_baseline_status(self) -> None:
-    """Test validator warns when requirement has coverage but wrong status (VT-912)."""
+    """Test validator handles coverage evidence based on requirement status (VT-912)."""
     root = self._create_repo()
     self._write_spec(root, "SPEC-400", "FR-400")
 
@@ -378,26 +378,39 @@ class WorkspaceValidatorTest(RepoTestCase):
     record = ws.requirements.records[req_uid]
     assert record.status == "pending"  # Default status
 
-    # Add coverage evidence
+    # Add coverage evidence to pending requirement
     record.coverage_evidence = ["VT-001", "VT-002"]
     ws.requirements.save()
 
-    # Validate - should produce warning
+    # Validate - should produce INFO for pending with planned artifacts
+    issues = validate_workspace(ws)
+    info_msgs = [issue for issue in issues if issue.level == "info"]
+    warnings = [issue for issue in issues if issue.level == "warning"]
+
+    assert len(info_msgs) == 1
+    assert req_uid in info_msgs[0].artifact
+    assert "planned verification" in info_msgs[0].message.lower()
+    assert "VT-001" in info_msgs[0].message
+    assert len(warnings) == 0  # No warnings for pending + coverage
+
+    # Test in-progress status - should produce warning
+    record.status = "in-progress"
+    ws.requirements.save()
     issues = validate_workspace(ws)
     warnings = [issue for issue in issues if issue.level == "warning"]
 
     assert len(warnings) == 1
     assert req_uid in warnings[0].artifact
     assert "coverage evidence" in warnings[0].message.lower()
-    assert "VT-001" in warnings[0].message  # Should mention specific artifacts
-    assert "VT-002" in warnings[0].message
-    assert "pending" in warnings[0].message
+    assert "in-progress" in warnings[0].message
 
-    # Fix by changing status to baseline
+    # Fix by changing status to baseline - should have no info/warnings
     record.status = "baseline"
     ws.requirements.save()
     issues = validate_workspace(ws)
+    info_msgs = [issue for issue in issues if issue.level == "info"]
     warnings = [issue for issue in issues if issue.level == "warning"]
+    assert len(info_msgs) == 0
     assert len(warnings) == 0
 
 

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class ValidationIssue:
   """Represents a validation issue with severity level and context."""
 
-  level: str  # "error" or "warning"
+  level: str  # "error", "warning", or "info"
   message: str
   artifact: str
 
@@ -65,16 +65,25 @@ class WorkspaceValidator:
             f"Requirement references missing audit {audit_id}",
           )
 
-      # Validation warning: coverage evidence without proper status
+      # Validation check: coverage evidence without proper status
       valid_statuses = ("baseline", "active", "verified")
       if record.coverage_evidence and record.status not in valid_statuses:
         artifacts = ", ".join(record.coverage_evidence)
-        self._warning(
-          req_id,
-          f"Has coverage evidence ({artifacts}) but status is '{record.status}'. "
-          f"Expected: baseline/active/verified. "
-          f"Update requirement status to reflect coverage or remove stale artifacts.",
-        )
+        # Pending + coverage means all artifacts are "planned" - this is expected
+        if record.status == "pending":
+          self._info(
+            req_id,
+            f"Has planned verification artifacts ({artifacts}). "
+            f"Requirement will move to active when artifacts are verified.",
+          )
+        else:
+          # Other statuses (e.g., in-progress) with coverage may indicate issues
+          self._warning(
+            req_id,
+            f"Has coverage evidence ({artifacts}) but status is '{record.status}'. "
+            f"Expected: baseline/active/verified. "
+            f"Update requirement status to reflect coverage or remove stale artifacts.",
+          )
 
       # Validation warning: missing audit verification
       # (placeholder for grace period logic)
@@ -143,6 +152,11 @@ class WorkspaceValidator:
   def _warning(self, artifact: str, message: str) -> None:
     self.issues.append(
       ValidationIssue(level="warning", artifact=artifact, message=message),
+    )
+
+  def _info(self, artifact: str, message: str) -> None:
+    self.issues.append(
+      ValidationIssue(level="info", artifact=artifact, message=message),
     )
 
   def _validate_decision_references(

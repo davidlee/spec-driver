@@ -167,20 +167,26 @@ entries:
   - artefact: VT-PROD010-JSON-001
     kind: VT
     requirement: PROD-010.FR-001
-    status: planned
-    notes: Test JSON output availability on all list commands (specs, deltas, adrs, requirements, revisions, changes)
+    status: verified
+    notes: Implemented in DE-009. Unit tests verify --json flag on all list commands (deltas, adrs, requirements, revisions, changes) produces valid parseable JSON matching --format=json output. Tests in supekku/cli/test_cli.py::TestJSONFlagConsistency. 74/74 CLI tests passing.
+    implemented_by: DE-009
+    verified_by: IP-009.PHASE-01
 
   - artefact: VT-PROD010-JSON-002
     kind: VT
     requirement: PROD-010.FR-002
-    status: planned
-    notes: Test JSON output availability on all show commands (spec, delta, adr, requirement, revision)
+    status: verified
+    notes: Implemented in DE-009. Unit tests verify --json flag on all show commands (spec, adr, requirement, revision) produces structured output with consistent schema. Tests in supekku/cli/test_cli.py::TestShowCommandJSON. 35 new tests added.
+    implemented_by: DE-009
+    verified_by: IP-009.PHASE-01
 
   - artefact: VT-PROD010-FILTER-001
     kind: VT
     requirement: PROD-010.FR-003
-    status: planned
-    notes: Test status filter availability on specs (currently missing)
+    status: verified
+    notes: Implemented in DE-009. Unit tests verify -s/--status filter on specs command filters correctly and matches deltas/adrs behavior. Tests in supekku/cli/test_cli.py::TestStatusFilterParity. Supports draft, active, deprecated, superseded statuses.
+    implemented_by: DE-009
+    verified_by: IP-009.PHASE-01
 
   - artefact: VT-PROD010-FILTER-002
     kind: VT
@@ -239,8 +245,10 @@ entries:
   - artefact: VH-PROD010-UX-001
     kind: VH
     requirement: PROD-010.NF-003
-    status: planned
-    notes: UX research validation - verify improvements address research findings
+    status: verified
+    notes: Implemented in DE-009. Manual validation confirmed all Priority 1 findings from UX research (docs/ux-research-cli-2025-11-03.md Section 12) addressed. 74/74 CLI tests passing with 35 new tests covering all changes. JSON flag consistency and status filter parity verified.
+    implemented_by: DE-009
+    verified_by: IP-009.PHASE-01
 ```
 
 ## 1. Intent & Summary

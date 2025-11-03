@@ -31,6 +31,7 @@ app = typer.Typer(help="Show detailed artifact information", no_args_is_help=Tru
 @app.command("spec")
 def show_spec(
   spec_id: Annotated[str, typer.Argument(help="Spec ID (e.g., SPEC-009, PROD-042)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specification."""
@@ -42,7 +43,16 @@ def show_spec(
       typer.echo(f"Error: Specification not found: {spec_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    typer.echo(format_spec_details(spec, root=root))
+    if json_output:
+      output = (
+        spec.to_dict()
+        if hasattr(spec, "to_dict")
+        else {"id": spec.id}
+      )
+      typer.echo(json.dumps(output, indent=2))
+    else:
+      typer.echo(format_spec_details(spec, root=root))
+
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
@@ -79,6 +89,7 @@ def show_delta(
 @app.command("revision")
 def show_revision(
   revision_id: Annotated[str, typer.Argument(help="Revision ID (e.g., RE-001)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a revision."""
@@ -91,7 +102,16 @@ def show_revision(
       typer.echo(f"Error: Revision not found: {revision_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    typer.echo(format_revision_details(artifact, root=root))
+    if json_output:
+      output = (
+        artifact.to_dict()
+        if hasattr(artifact, "to_dict")
+        else {"id": artifact.id}
+      )
+      typer.echo(json.dumps(output, indent=2))
+    else:
+      typer.echo(format_revision_details(artifact, root=root))
+
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
@@ -101,6 +121,7 @@ def show_revision(
 @app.command("requirement")
 def show_requirement(
   req_id: Annotated[str, typer.Argument(help="Requirement ID (e.g., SPEC-009.FR-001)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a requirement."""
@@ -115,7 +136,16 @@ def show_requirement(
       typer.echo(f"Error: Requirement not found: {req_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    typer.echo(format_requirement_details(requirement))
+    if json_output:
+      output = (
+        requirement.to_dict()
+        if hasattr(requirement, "to_dict")
+        else {"uid": req_id}
+      )
+      typer.echo(json.dumps(output, indent=2))
+    else:
+      typer.echo(format_requirement_details(requirement))
+
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
@@ -125,6 +155,7 @@ def show_requirement(
 @app.command("adr")
 def show_adr(
   decision_id: Annotated[str, typer.Argument(help="Decision ID (e.g., ADR-001)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific decision/ADR."""
@@ -136,7 +167,16 @@ def show_adr(
       typer.echo(f"Error: Decision not found: {decision_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    typer.echo(format_decision_details(decision))
+    if json_output:
+      output = (
+        decision.to_dict()
+        if hasattr(decision, "to_dict")
+        else {"id": decision.id}
+      )
+      typer.echo(json.dumps(output, indent=2))
+    else:
+      typer.echo(format_decision_details(decision))
+
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)

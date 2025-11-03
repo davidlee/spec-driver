@@ -236,5 +236,69 @@ status: accepted
     assert new_link.is_symlink()
 
 
+  def test_workspace_sync_all_registries(self) -> None:
+    """Test that sync_all_registries syncs all registries in correct order."""
+    root = self._create_repo()
+    self._write_spec(root)
+
+    # Create ADR at root of decisions directory
+    decisions_dir = root / "specify" / "decisions"
+    decisions_dir.mkdir(parents=True)
+    adr_path = decisions_dir / "ADR-099-test.md"
+    adr_path.write_text(
+      """---
+id: ADR-099
+title: Test Decision
+status: accepted
+---
+# Test""",
+      encoding="utf-8",
+    )
+
+    # Create delta
+    delta_dir = root / "change" / "deltas" / "DE-099-test"
+    delta_dir.mkdir(parents=True)
+    delta_path = delta_dir / "DE-099.md"
+    delta_path.write_text(
+      """---
+id: DE-099
+slug: test
+name: Test Delta
+status: draft
+kind: delta
+applies_to:
+  specs: []
+  requirements: []
+---
+# Test""",
+      encoding="utf-8",
+    )
+
+    # Create registry directory
+    registry_dir = get_registry_dir(root)
+    registry_dir.mkdir(parents=True)
+
+    ws = Workspace(root)
+
+    # Sync all registries
+    ws.sync_all_registries()
+
+    # Verify specs were loaded
+    assert len(ws.specs.all_specs()) > 0
+    assert ws.specs.get("SPEC-200") is not None
+
+    # Verify decisions were synced (registry created)
+    yaml_path = registry_dir / "decisions.yaml"
+    assert yaml_path.exists()
+
+    # Verify change registries were synced
+    delta_registry = ws.delta_registry.collect()
+    assert "DE-099" in delta_registry
+
+    # Verify requirements were synced from specs
+    req_uid = "SPEC-200.FR-200"
+    assert req_uid in ws.requirements.records
+
+
 if __name__ == "__main__":
   unittest.main()

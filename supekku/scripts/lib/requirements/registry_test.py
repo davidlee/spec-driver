@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import io
 import os
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,7 +12,11 @@ from pathlib import Path
 from supekku.scripts.lib.core.paths import get_registry_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.relations.manager import add_relation
-from supekku.scripts.lib.requirements.lifecycle import STATUS_LIVE, STATUS_PENDING
+from supekku.scripts.lib.requirements.lifecycle import (
+  STATUS_IN_PROGRESS,
+  STATUS_LIVE,
+  STATUS_PENDING,
+)
 from supekku.scripts.lib.requirements.registry import RequirementsRegistry
 from supekku.scripts.lib.specs.registry import SpecRegistry
 
@@ -403,6 +409,113 @@ requirements:
     assert record.status == "in-progress"
     assert record.introduced == "RE-002"
     assert record.path == "specify/tech/spec-002-example/SPEC-002.md"
+
+  def test_sync_processes_coverage_blocks(self) -> None:
+    """VT-902: Registry sync updates lifecycle from coverage blocks."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    # Create spec with coverage blocks
+    test_root = Path(__file__).parent.parent.parent.parent.parent
+    fixtures_dir = test_root / "tests" / "fixtures"
+    coverage_dir = fixtures_dir / "requirements" / "coverage"
+
+    # Debug: Check if files exist
+    assert coverage_dir.exists(), f"Coverage dir does not exist: {coverage_dir}"
+    spec_files = list(registry._iter_spec_files([coverage_dir]))
+    assert len(spec_files) > 0, f"No spec files found in {coverage_dir}"
+
+    stats = registry.sync_from_specs(
+      spec_dirs=[coverage_dir],
+      plan_dirs=[coverage_dir],
+    )
+    registry.save()
+
+    # Verify requirements were created
+    assert stats.created >= 3, (
+      f"Expected >=3 created, got {stats.created}. "
+      f"Records: {list(registry.records.keys())}"
+    )
+    assert "SPEC-900.FR-001" in registry.records
+    assert "SPEC-900.FR-002" in registry.records
+    assert "SPEC-900.FR-003" in registry.records
+
+    # Check verified_by populated from coverage
+    fr001 = registry.records["SPEC-900.FR-001"]
+    assert "VT-900" in fr001.verified_by
+    assert fr001.status == STATUS_LIVE  # All verified
+
+    fr002 = registry.records["SPEC-900.FR-002"]
+    assert "VT-901" in fr002.verified_by
+    assert fr002.status == STATUS_IN_PROGRESS  # In progress
+
+    fr003 = registry.records["SPEC-900.FR-003"]
+    assert "VT-902" in fr003.verified_by
+    assert fr003.status == STATUS_PENDING  # Planned
+
+  def test_coverage_drift_detection(self) -> None:
+    """Registry emits warnings for coverage conflicts."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    test_root = Path(__file__).parent.parent.parent.parent.parent
+    fixtures_dir = test_root / "tests" / "fixtures"
+    coverage_dir = fixtures_dir / "requirements" / "coverage"
+
+    # Capture stderr to check for drift warnings
+    old_stderr = sys.stderr
+    sys.stderr = io.StringIO()
+
+    try:
+      registry.sync_from_specs(
+        spec_dirs=[coverage_dir],
+        plan_dirs=[coverage_dir],
+      )
+
+      stderr_output = sys.stderr.getvalue()
+
+      # Check that drift warning was emitted for SPEC-901.FR-001
+      assert "Coverage drift detected for SPEC-901.FR-001" in stderr_output
+      assert "SPEC-901.md" in stderr_output
+      assert "IP-901.md" in stderr_output
+    finally:
+      sys.stderr = old_stderr
+
+  def test_compute_status_from_coverage(self) -> None:
+    """Unit test for status computation from coverage entries."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    # All verified → live
+    entries = [{"status": "verified"}, {"status": "verified"}]
+    assert registry._compute_status_from_coverage(entries) == STATUS_LIVE
+
+    # In-progress → in-progress
+    entries = [{"status": "in-progress"}]
+    assert registry._compute_status_from_coverage(entries) == STATUS_IN_PROGRESS
+
+    # All planned → pending
+    entries = [{"status": "planned"}]
+    assert registry._compute_status_from_coverage(entries) == STATUS_PENDING
+
+    # Failed → in-progress (needs attention)
+    entries = [{"status": "failed"}]
+    assert registry._compute_status_from_coverage(entries) == STATUS_IN_PROGRESS
+
+    # Blocked → in-progress
+    entries = [{"status": "blocked"}]
+    assert registry._compute_status_from_coverage(entries) == STATUS_IN_PROGRESS
+
+    # Mixed → in-progress
+    entries = [{"status": "verified"}, {"status": "planned"}]
+    assert registry._compute_status_from_coverage(entries) == STATUS_IN_PROGRESS
+
+    # Empty → None
+    entries = []
+    assert registry._compute_status_from_coverage(entries) is None
 
 
 if __name__ == "__main__":

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import re
+import sys
+from collections import defaultdict
 from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
@@ -21,11 +23,14 @@ from supekku.scripts.lib.blocks.revision import (
   RevisionBlockValidator,
   load_revision_blocks,
 )
+from supekku.scripts.lib.blocks.verification import load_coverage_blocks
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
 
 from .lifecycle import (
+  STATUS_IN_PROGRESS,
+  STATUS_LIVE,
   STATUS_PENDING,
   VALID_STATUSES,
   RequirementStatus,
@@ -153,6 +158,7 @@ class RequirementsRegistry:
     delta_dirs: Iterable[Path] | None = None,
     revision_dirs: Iterable[Path] | None = None,
     audit_dirs: Iterable[Path] | None = None,
+    plan_dirs: Iterable[Path] | None = None,
   ) -> SyncStats:
     """Sync requirements from specs and change artifacts, updating registry."""
     repo_root = spec_registry.root if spec_registry else find_repo_root()
@@ -247,6 +253,33 @@ class RequirementsRegistry:
       )
     if audit_dirs:
       self._apply_audit_relations(audit_dirs)
+
+    # Apply coverage blocks to update lifecycle from verification entries
+    spec_files = []
+    if spec_registry:
+      spec_files = [spec.path for spec in spec_registry.all_specs()]
+    elif spec_dirs:
+      spec_files = list(self._iter_spec_files(spec_dirs))
+
+    delta_files = []
+    if delta_dirs:
+      delta_files = list(self._iter_change_files(delta_dirs, prefix="DE-"))
+
+    plan_files = []
+    if plan_dirs:
+      plan_files = list(self._iter_plan_files(plan_dirs))
+
+    audit_files = []
+    if audit_dirs:
+      audit_files = list(self._iter_change_files(audit_dirs, prefix="AUD-"))
+
+    if spec_files or delta_files or plan_files or audit_files:
+      self._apply_coverage_blocks(
+        spec_files=spec_files,
+        delta_files=delta_files,
+        plan_files=plan_files,
+        audit_files=audit_files,
+      )
 
     # Clean specs list for records not seen this run
     for uid, record in list(self.records.items()):
@@ -388,6 +421,207 @@ class RequirementsRegistry:
         if audit_id not in record.verified_by:
           record.verified_by.append(audit_id)
           record.verified_by.sort()
+
+  def _check_coverage_drift(
+    self,
+    req_id: str,
+    entries: list[dict[str, Any]],
+  ) -> None:
+    """Check for coverage drift and emit warnings.
+
+    Detects when the same requirement has conflicting coverage statuses
+    across different artifacts (spec vs IP vs audit).
+    """
+    # Group by source file
+    by_source: dict[Path, list[str]] = defaultdict(list)
+    for entry in entries:
+      source = entry.get("source")
+      status = entry.get("status")
+      artefact = entry.get("artefact")
+      if source and status and artefact:
+        by_source[source].append(f"{status} ({artefact})")
+
+    # Check if all sources agree
+    if len(by_source) <= 1:
+      return
+
+    statuses_by_source = {
+      source: set(statuses) for source, statuses in by_source.items()
+    }
+
+    # Get unique status sets
+    unique_status_sets = list({frozenset(s) for s in statuses_by_source.values()})
+
+    # If all sources have the same set of statuses, no drift
+    if len(unique_status_sets) <= 1:
+      return
+
+    # Drift detected - emit warning
+    print(
+      f"WARNING: Coverage drift detected for {req_id}",
+      file=sys.stderr,
+    )
+    for source, status_list in sorted(by_source.items(), key=lambda x: x[0].name):
+      print(
+        f"  {source.name}: {', '.join(status_list)}",
+        file=sys.stderr,
+      )
+    print(
+      "  Action: Update specs or change artifacts to resolve inconsistency",
+      file=sys.stderr,
+    )
+
+  def _compute_status_from_coverage(
+    self,
+    entries: list[dict[str, Any]],
+  ) -> RequirementStatus | None:
+    """Compute requirement status from aggregated coverage entries.
+
+    Applies precedence rules:
+    - ANY 'failed' or 'blocked' → in-progress (needs attention)
+    - ALL 'verified' → live
+    - ANY 'in-progress' → in-progress
+    - ALL 'planned' → pending
+    - MIXED → in-progress
+
+    Returns None if no entries or unable to determine.
+    """
+    if not entries:
+      return None
+
+    statuses = {e.get("status") for e in entries if e.get("status")}
+    if not statuses:
+      return None
+
+    # Failed or blocked coverage means requirement needs work
+    if "failed" in statuses or "blocked" in statuses:
+      return STATUS_IN_PROGRESS
+
+    # All verified means requirement is live
+    if statuses == {"verified"}:
+      return STATUS_LIVE
+
+    # In-progress or mixed statuses
+    if "in-progress" in statuses or len(statuses) > 1:
+      return STATUS_IN_PROGRESS
+
+    # All planned
+    if statuses == {"planned"}:
+      return STATUS_PENDING
+
+    return None
+
+  def _apply_coverage_blocks(
+    self,
+    spec_files: Iterable[Path],
+    delta_files: Iterable[Path],
+    plan_files: Iterable[Path],
+    audit_files: Iterable[Path],
+  ) -> None:
+    """Apply verification coverage blocks to update requirement lifecycle.
+
+    Extracts coverage blocks from all artifact types, aggregates coverage
+    entries by requirement, and updates verified_by lists.
+    """
+    coverage_map: dict[str, list[dict[str, Any]]] = defaultdict(list)
+
+    # Extract from specs
+    for spec_file in spec_files:
+      try:
+        blocks = load_coverage_blocks(spec_file)
+      except (ValueError, OSError):
+        continue
+      for block in blocks:
+        for entry in block.data.get("entries", []):
+          req_id = entry.get("requirement")
+          if not req_id:
+            continue
+          coverage_map[req_id].append(
+            {
+              "source": spec_file,
+              "artefact": entry.get("artefact"),
+              "status": entry.get("status"),
+              "kind": entry.get("kind"),
+            }
+          )
+
+    # Extract from deltas
+    for delta_file in delta_files:
+      try:
+        blocks = load_coverage_blocks(delta_file)
+      except (ValueError, OSError):
+        continue
+      for block in blocks:
+        for entry in block.data.get("entries", []):
+          req_id = entry.get("requirement")
+          if not req_id:
+            continue
+          coverage_map[req_id].append(
+            {
+              "source": delta_file,
+              "artefact": entry.get("artefact"),
+              "status": entry.get("status"),
+              "kind": entry.get("kind"),
+            }
+          )
+
+    # Extract from implementation plans
+    for plan_file in plan_files:
+      try:
+        blocks = load_coverage_blocks(plan_file)
+      except (ValueError, OSError):
+        continue
+      for block in blocks:
+        for entry in block.data.get("entries", []):
+          req_id = entry.get("requirement")
+          if not req_id:
+            continue
+          coverage_map[req_id].append(
+            {
+              "source": plan_file,
+              "artefact": entry.get("artefact"),
+              "status": entry.get("status"),
+              "kind": entry.get("kind"),
+            }
+          )
+
+    # Extract from audits
+    for audit_file in audit_files:
+      try:
+        blocks = load_coverage_blocks(audit_file)
+      except (ValueError, OSError):
+        continue
+      for block in blocks:
+        for entry in block.data.get("entries", []):
+          req_id = entry.get("requirement")
+          if not req_id:
+            continue
+          coverage_map[req_id].append(
+            {
+              "source": audit_file,
+              "artefact": entry.get("artefact"),
+              "status": entry.get("status"),
+              "kind": entry.get("kind"),
+            }
+          )
+
+    # Update records
+    for req_id, entries in coverage_map.items():
+      record = self.records.get(req_id)
+      if not record:
+        continue
+
+      # Check for drift before updating
+      self._check_coverage_drift(req_id, entries)
+
+      # Update verified_by with unique artefact IDs
+      artefacts = {e["artefact"] for e in entries if e.get("artefact")}
+      record.verified_by = sorted(set(record.verified_by) | artefacts)
+
+      # Compute and update status from coverage
+      computed_status = self._compute_status_from_coverage(entries)
+      if computed_status is not None:
+        record.status = computed_status
 
   def _apply_spec_relationships(
     self,
@@ -645,6 +879,18 @@ class RequirementsRegistry:
           continue
         for file in bundle.glob("*.md"):
           if file.name.startswith(prefix):
+            yield file
+
+  def _iter_plan_files(self, dirs: Iterable[Path]) -> Iterator[Path]:
+    """Iterate over implementation plan files in directories."""
+    for directory in dirs:
+      if not directory.exists():
+        continue
+      for bundle in directory.iterdir():
+        if not bundle.is_dir():
+          continue
+        for file in bundle.glob("*.md"):
+          if file.name.startswith("IP-"):
             yield file
 
   def _records_from_frontmatter(

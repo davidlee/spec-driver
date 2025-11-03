@@ -5,4 +5,10 @@ This package handles backlog entry management.
 
 from __future__ import annotations
 
-__all__: list[str] = []
+from .priority import build_partitions, merge_ordering, sort_by_priority
+
+__all__: list[str] = [
+  'build_partitions',
+  'merge_ordering',
+  'sort_by_priority',
+]

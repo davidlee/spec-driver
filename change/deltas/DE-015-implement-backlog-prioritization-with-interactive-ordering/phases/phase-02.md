@@ -118,31 +118,41 @@ uv run spec-driver list backlog
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Implement head-tail partition algorithm | [ ] | Core merge logic |
-| [ ] | 2.2 | Implement priority sort function | [ ] | Registry → severity → ID |
+| [x] | 2.1 | Implement head-tail partition algorithm | [ ] | Core merge logic |
+| [x] | 2.2 | Implement priority sort function | [ ] | Registry → severity → ID |
 | [ ] | 2.3 | Update list backlog to use priority ordering | [ ] | Modify CLI display |
-| [ ] | 2.4 | Write comprehensive tests (VT-015-001, VT-015-003) | [P] | Can parallel with 2.3 |
-| [ ] | 2.5 | Run lint and fix issues | [ ] | Final cleanup |
+| [x] | 2.4 | Write comprehensive tests (VT-015-001, VT-015-003) | [P] | Can parallel with 2.3 |
+| [x] | 2.5 | Run lint and fix issues | [ ] | Final cleanup |
 
 ### Task Details
 
-**2.1 - Implement head-tail partition algorithm**
+**2.1 - Implement head-tail partition algorithm** ✅
 - **Design**: Algorithm from research findings (lines 186-274)
   - `build_partitions(all_items, filtered_items)` → returns (prefix, [(head, [tail])])
   - Each partition is (shown_item, [unshown_followers])
   - Prefix contains items before first shown item
-- **Files**: `supekku/scripts/lib/backlog/priority.py` (new module)
-- **Testing**: Unit tests with various filter scenarios
-- **Observations**: This is needed for Phase 3 (interactive editing) but good to implement now
+- **Files**: `supekku/scripts/lib/backlog/priority.py` (new module) ✓
+- **Testing**: 11 comprehensive tests (VT-015-001) all passing ✓
+- **Observations**:
+  - Implemented stateless partition algorithm with proper tail handling
+  - Fixed edge case: trailing unshown items attach to last partition
+  - Merge function correctly reorders heads with tails following atomically
+  - All partition tests pass including roundtrip verification
+  - Pylint: 10.00/10 ✓
 
-**2.2 - Implement priority sort function**
+**2.2 - Implement priority sort function** ✅
 - **Design**: `sort_by_priority(items: list[BacklogItem], ordering: list[str]) -> list[BacklogItem]`
   - Create index map from ordering list
   - Sort with key: (registry_index or 999999, severity_rank, id)
   - Severity rank: p1=0, p2=1, p3=2, none=3
-- **Files**: `supekku/scripts/lib/backlog/priority.py`
-- **Testing**: Test with partial ordering, missing items, severity fallback
-- **Observations**: Pure function - easy to test
+- **Files**: `supekku/scripts/lib/backlog/priority.py:116-153` ✓
+- **Testing**: 7 comprehensive tests (VT-015-003) all passing ✓
+- **Observations**:
+  - Pure function with triple-level fallback: registry → severity → ID
+  - Case-insensitive severity matching
+  - Items not in registry get large position value (999999)
+  - All edge cases covered: empty registry, partial registry, same severity
+  - Pylint: 10.00/10 ✓
 
 **2.3 - Update list backlog to use priority ordering**
 - **Design**: Modify `list_backlog()` in CLI to:

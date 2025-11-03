@@ -45,24 +45,29 @@ def build_partitions(
 
   for item in all_items:
     if item in filtered_items:
-      seen_first_shown = True
-      partitions.append((item, current_tail))
-      current_tail = []
-    else:
       if not seen_first_shown:
-        prefix.append(item)
+        # First shown item - current_tail is actually the prefix
+        prefix = current_tail.copy()
+        current_tail = []
+        seen_first_shown = True
       else:
-        current_tail.append(item)
-
-  # Handle trailing unshown items (attach to last partition or standalone)
-  if current_tail:
-    if partitions:
-      # Append to last partition's tail
-      last_head, last_tail = partitions[-1]
-      partitions[-1] = (last_head, last_tail + current_tail)
+        # Subsequent shown item - attach current_tail to previous partition
+        if partitions:
+          last_head, _ = partitions[-1]
+          partitions[-1] = (last_head, current_tail)
+        current_tail = []
+      # Add this shown item with empty tail (will be filled next iteration)
+      partitions.append((item, []))
     else:
-      # No shown items - all trailing items go to prefix
-      prefix.extend(current_tail)
+      current_tail.append(item)
+
+  # Attach any remaining tail to the last partition
+  if current_tail and partitions:
+    last_head, _ = partitions[-1]
+    partitions[-1] = (last_head, current_tail)
+  elif current_tail and not seen_first_shown:
+    # No shown items at all - everything is prefix
+    prefix = current_tail
 
   return prefix, partitions
 

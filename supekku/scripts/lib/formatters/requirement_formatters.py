@@ -46,33 +46,41 @@ def format_requirement_list_table(
     rows = []
     for req in requirements:
       spec = req.primary_spec or (req.specs[0] if req.specs else "")
-      rows.append([spec, req.label, req.title, req.status])
+      category = req.category or "-"
+      rows.append([spec, req.label, category, req.title, req.status])
     return format_as_tsv(rows)
 
-  # table format - columns: Spec, Label, Title, Status
+  # table format - columns: Spec, Label, Category, Title, Status
   table = create_table(
-    columns=["Spec", "Label", "Title", "Status"],
+    columns=["Spec", "Label", "Category", "Title", "Status"],
     title="Requirements",
   )
 
   terminal_width = get_terminal_width()
 
-  # Custom column widths: Spec (10), Label (8), Status (12), rest for Title
-  # Reserve space for borders/padding (~10 chars total)
+  # Custom column widths: Spec (10), Label (8), Category (12), Status (12)
+  # Reserve space for borders/padding (~10 chars total), rest for Title
   reserved = 10
   spec_width = 10
   label_width = 8
+  category_width = 12
   status_width = 12
   title_width = max(
-    terminal_width - spec_width - label_width - status_width - reserved,
+    terminal_width
+    - spec_width
+    - label_width
+    - category_width
+    - status_width
+    - reserved,
     20,  # minimum title width
   )
 
   max_widths = {
     0: spec_width,
     1: label_width,
-    2: title_width,
-    3: status_width,
+    2: category_width,
+    3: title_width,
+    4: status_width,
   }
 
   for req in requirements:
@@ -80,12 +88,13 @@ def format_requirement_list_table(
     spec = req.primary_spec or (req.specs[0] if req.specs else "—")
     spec_styled = f"[spec.id]{spec}[/spec.id]"
     label_styled = f"[requirement.id]{req.label}[/requirement.id]"
+    category = req.category or "—"
     status_style = get_requirement_status_style(req.status)
     status_styled = f"[{status_style}]{req.status}[/{status_style}]"
 
     add_row_with_truncation(
       table,
-      [spec_styled, label_styled, req.title, status_styled],
+      [spec_styled, label_styled, category, req.title, status_styled],
       max_widths=max_widths if truncate else None,
     )
 
@@ -109,6 +118,7 @@ def format_requirement_list_json(requirements: Sequence[RequirementRecord]) -> s
       "title": req.title,
       "status": req.status,
       "kind": req.kind,
+      "category": req.category,
       "primary_spec": req.primary_spec,
       "specs": req.specs,
     }
@@ -145,6 +155,8 @@ def format_requirement_details(requirement: RequirementRecord) -> str:
   lines.append(f"Label: {requirement.label}")
   lines.append(f"Title: {requirement.title}")
   lines.append(f"Kind: {requirement.kind}")
+  if requirement.category:
+    lines.append(f"Category: {requirement.category}")
   lines.append(f"Status: {requirement.status}")
 
   # Specs

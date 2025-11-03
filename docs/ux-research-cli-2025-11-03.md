@@ -429,6 +429,11 @@ Error: No such command 'delta'. Did you mean 'deltas'?
 - `list deltas` shows only deltas
 - Not obvious from command names alone
 
+**[NEGATIVE]** Backlog shortcuts missing
+- `create issue|problem|improvement|risk` exists
+- `list backlog -k issue` required (no `list issues` shortcut)
+- Inconsistent: must remember to use generic `list backlog` with filter, unlike other artifacts
+
 ### Recommendations
 1. Add note to `list changes --help`:
    ```
@@ -439,6 +444,8 @@ Error: No such command 'delta'. Did you mean 'deltas'?
 2. Make `--json` universal and documented
 
 3. Add status filter to specs
+
+4. Add kind-specific backlog shortcuts: `list issues`, `list problems`, `list improvements`, `list risks`
 
 ---
 
@@ -498,6 +505,7 @@ File: specify/tech/SPEC-110/SPEC-110.md
 1. ✅ Add `--json` as universal shorthand across all commands
 2. ✅ Add `-s`/`--status` filter to `list specs`
 3. ✅ Document `--json` availability in show command help
+4. ⭕ Add kind-specific backlog shortcuts (`list issues|problems|improvements|risks`)
 
 ### Priority 2: Error Messages
 4. ✅ Improve "invalid format" errors to list valid options

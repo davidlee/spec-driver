@@ -6,6 +6,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -21,6 +22,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -36,6 +38,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -51,6 +54,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -65,6 +69,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -79,6 +84,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -94,6 +100,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -108,6 +115,7 @@ requirements:
     - PROD-002
     primary_spec: PROD-002
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -122,6 +130,7 @@ requirements:
     - PROD-002
     primary_spec: PROD-002
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -136,6 +145,7 @@ requirements:
     - PROD-002
     primary_spec: PROD-002
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -150,6 +160,7 @@ requirements:
     - PROD-002
     primary_spec: PROD-002
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -164,12 +175,29 @@ requirements:
     - PROD-002
     primary_spec: PROD-002
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
     verified_by: []
     coverage_evidence:
     - VT-005
+    path: specify/product/PROD-002/PROD-002.md
+  PROD-002.FR-006:
+    label: FR-006
+    title: Delta Creation Includes Design Revision Artifact
+    specs:
+    - PROD-002
+    primary_spec: PROD-002
+    kind: functional
+    category: null
+    status: active
+    introduced: null
+    implemented_by:
+    - DE-013
+    verified_by: []
+    coverage_evidence:
+    - VT-006
     path: specify/product/PROD-002/PROD-002.md
   PROD-002.NF-001:
     label: NF-001
@@ -178,6 +206,7 @@ requirements:
     - PROD-002
     primary_spec: PROD-002
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -192,6 +221,7 @@ requirements:
     - PROD-002
     primary_spec: PROD-002
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -206,6 +236,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -221,6 +252,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -236,6 +268,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -252,6 +285,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -268,6 +302,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -284,6 +319,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -300,6 +336,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -316,6 +353,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -332,6 +370,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: non-functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -348,6 +387,7 @@ requirements:
     - PROD-003
     primary_spec: PROD-003
     kind: non-functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -363,6 +403,7 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -377,6 +418,7 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -391,6 +433,7 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -405,6 +448,7 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -420,6 +464,7 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -434,6 +479,7 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -447,6 +493,7 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -461,6 +508,7 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -474,6 +522,7 @@ requirements:
     - PROD-004
     primary_spec: PROD-004
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -487,6 +536,7 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -503,6 +553,7 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -518,6 +569,7 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -533,6 +585,7 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -548,6 +601,7 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -562,6 +616,7 @@ requirements:
     - PROD-005
     primary_spec: PROD-005
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -577,6 +632,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -594,6 +650,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -610,6 +667,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -626,6 +684,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -643,6 +702,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -659,6 +719,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: non-functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -675,6 +736,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: non-functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -690,6 +752,7 @@ requirements:
     - PROD-007
     primary_spec: PROD-007
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -705,6 +768,7 @@ requirements:
     - PROD-007
     primary_spec: PROD-007
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -720,6 +784,7 @@ requirements:
     - PROD-007
     primary_spec: PROD-007
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -735,6 +800,7 @@ requirements:
     - PROD-007
     primary_spec: PROD-007
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -749,6 +815,7 @@ requirements:
     - PROD-007
     primary_spec: PROD-007
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -764,6 +831,7 @@ requirements:
     - PROD-007
     primary_spec: PROD-007
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -781,6 +849,7 @@ requirements:
     - PROD-009
     primary_spec: PROD-008
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -799,6 +868,7 @@ requirements:
     - PROD-009
     primary_spec: PROD-008
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -816,6 +886,7 @@ requirements:
     - PROD-008
     primary_spec: PROD-008
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -832,6 +903,7 @@ requirements:
     - PROD-008
     primary_spec: PROD-008
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -846,6 +918,7 @@ requirements:
     - PROD-008
     primary_spec: PROD-008
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -860,6 +933,7 @@ requirements:
     - PROD-009
     primary_spec: PROD-009
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -876,6 +950,7 @@ requirements:
     - PROD-009
     primary_spec: PROD-009
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -892,6 +967,7 @@ requirements:
     - PROD-009
     primary_spec: PROD-009
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -908,6 +984,7 @@ requirements:
     - PROD-009
     primary_spec: PROD-009
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -922,6 +999,7 @@ requirements:
     - PROD-009
     primary_spec: PROD-009
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -935,6 +1013,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -950,6 +1029,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -965,6 +1045,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -980,6 +1061,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -995,6 +1077,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -1010,6 +1093,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -1025,6 +1109,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by:
@@ -1040,6 +1125,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1054,6 +1140,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1068,6 +1155,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1082,6 +1170,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -1098,6 +1187,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1113,6 +1203,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1128,6 +1219,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1142,6 +1234,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1156,6 +1249,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1170,6 +1264,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1184,6 +1279,7 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: non-functional
+    category: null
     status: active
     introduced: null
     implemented_by:
@@ -1192,6 +1288,160 @@ requirements:
     coverage_evidence:
     - VH-PROD010-UX-001
     path: specify/product/PROD-010/PROD-010.md
+  PROD-011.FR-001:
+    label: FR-001
+    title: Remove Phase-01 Auto-Creation**
+    specs:
+    - PROD-011
+    primary_spec: PROD-011
+    kind: functional
+    category: null
+    status: active
+    introduced: null
+    implemented_by:
+    - DE-016
+    verified_by: []
+    coverage_evidence:
+    - VT-011-001
+    - VT-016-001
+    path: specify/product/PROD-011/PROD-011.md
+  PROD-011.FR-002:
+    label: FR-002
+    title: Enable Phase Creation When No Phases Exist**
+    specs:
+    - PROD-011
+    primary_spec: PROD-011
+    kind: functional
+    category: null
+    status: active
+    introduced: null
+    implemented_by:
+    - DE-016
+    verified_by: []
+    coverage_evidence:
+    - VT-011-002
+    - VT-016-002
+    path: specify/product/PROD-011/PROD-011.md
+  PROD-011.FR-003:
+    label: FR-003
+    title: Hook Installation System**
+    specs:
+    - PROD-011
+    primary_spec: PROD-011
+    kind: functional
+    category: null
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-011-003
+    path: specify/product/PROD-011/PROD-011.md
+  PROD-011.FR-004:
+    label: FR-004
+    title: Default Workflow Hooks**
+    specs:
+    - PROD-011
+    primary_spec: PROD-011
+    kind: functional
+    category: null
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-011-004
+    path: specify/product/PROD-011/PROD-011.md
+  PROD-011.FR-005:
+    label: FR-005
+    title: IP Automation Metadata Schema**
+    specs:
+    - PROD-011
+    primary_spec: PROD-011
+    kind: functional
+    category: null
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-011-005
+    path: specify/product/PROD-011/PROD-011.md
+  PROD-011.FR-006:
+    label: FR-006
+    title: Constitution Integration in Commands**
+    specs:
+    - PROD-011
+    primary_spec: PROD-011
+    kind: functional
+    category: null
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-011-006
+    path: specify/product/PROD-011/PROD-011.md
+  PROD-011.FR-007:
+    label: FR-007
+    title: Constitution Validation Tooling**
+    specs:
+    - PROD-011
+    primary_spec: PROD-011
+    kind: functional
+    category: null
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-011-007
+    path: specify/product/PROD-011/PROD-011.md
+  PROD-011.FR-008:
+    label: FR-008
+    title: VCS Abstraction**
+    specs:
+    - PROD-011
+    primary_spec: PROD-011
+    kind: functional
+    category: null
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-011-008
+    path: specify/product/PROD-011/PROD-011.md
+  PROD-011.NF-001:
+    label: NF-001
+    title: High Workflow Adoption**
+    specs:
+    - PROD-011
+    primary_spec: PROD-011
+    kind: non-functional
+    category: null
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VH-011-001
+    path: specify/product/PROD-011/PROD-011.md
+  PROD-011.NF-002:
+    label: NF-002
+    title: Improved Delta Quality**
+    specs:
+    - PROD-011
+    primary_spec: PROD-011
+    kind: non-functional
+    category: null
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VA-011-001
+    path: specify/product/PROD-011/PROD-011.md
   SPEC-110.FR-001:
     label: FR-001
     title: CLI MUST provide single unified entry point (`spec-driver`) routing to
@@ -1201,6 +1451,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1217,6 +1468,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1232,6 +1484,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1248,6 +1501,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1264,6 +1518,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1283,6 +1538,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1301,6 +1557,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1315,6 +1572,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1331,6 +1589,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1347,6 +1606,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1362,6 +1622,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: non-functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1377,6 +1638,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: non-functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1392,6 +1654,7 @@ requirements:
     - SPEC-112
     primary_spec: SPEC-112
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1407,6 +1670,7 @@ requirements:
     - SPEC-112
     primary_spec: SPEC-112
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1422,6 +1686,7 @@ requirements:
     - SPEC-112
     primary_spec: SPEC-112
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1437,6 +1702,7 @@ requirements:
     - SPEC-112
     primary_spec: SPEC-112
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1452,6 +1718,7 @@ requirements:
     - SPEC-112
     primary_spec: SPEC-112
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1467,6 +1734,7 @@ requirements:
     - SPEC-112
     primary_spec: SPEC-112
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1482,6 +1750,7 @@ requirements:
     - SPEC-112
     primary_spec: SPEC-112
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1497,6 +1766,7 @@ requirements:
     - SPEC-112
     primary_spec: SPEC-112
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1512,6 +1782,7 @@ requirements:
     - SPEC-112
     primary_spec: SPEC-112
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1526,6 +1797,7 @@ requirements:
     - SPEC-114
     primary_spec: SPEC-114
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1539,6 +1811,7 @@ requirements:
     - SPEC-114
     primary_spec: SPEC-114
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1552,6 +1825,7 @@ requirements:
     - SPEC-114
     primary_spec: SPEC-114
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1565,6 +1839,7 @@ requirements:
     - SPEC-114
     primary_spec: SPEC-114
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1578,6 +1853,7 @@ requirements:
     - SPEC-114
     primary_spec: SPEC-114
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1591,6 +1867,7 @@ requirements:
     - SPEC-114
     primary_spec: SPEC-114
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1604,6 +1881,7 @@ requirements:
     - SPEC-114
     primary_spec: SPEC-114
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1617,6 +1895,7 @@ requirements:
     - SPEC-114
     primary_spec: SPEC-114
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1630,6 +1909,7 @@ requirements:
     - SPEC-114
     primary_spec: SPEC-114
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1643,6 +1923,7 @@ requirements:
     - SPEC-116
     primary_spec: SPEC-116
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1656,6 +1937,7 @@ requirements:
     - SPEC-116
     primary_spec: SPEC-116
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1669,6 +1951,7 @@ requirements:
     - SPEC-116
     primary_spec: SPEC-116
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1683,6 +1966,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1697,6 +1981,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1712,6 +1997,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1726,6 +2012,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1741,6 +2028,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1755,6 +2043,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1770,6 +2059,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1784,6 +2074,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1798,6 +2089,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -1812,6 +2104,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1825,6 +2118,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1838,6 +2132,7 @@ requirements:
     - SPEC-122
     primary_spec: SPEC-122
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1852,6 +2147,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1867,6 +2163,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1882,6 +2179,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1897,6 +2195,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1911,6 +2210,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1926,6 +2226,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1941,6 +2242,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1955,6 +2257,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1969,6 +2272,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1984,6 +2288,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -1999,6 +2304,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -2014,6 +2320,7 @@ requirements:
     - SPEC-124
     primary_spec: SPEC-124
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -2029,6 +2336,7 @@ requirements:
     - SPEC-125
     primary_spec: SPEC-125
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -2044,6 +2352,7 @@ requirements:
     - SPEC-125
     primary_spec: SPEC-125
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -2059,6 +2368,7 @@ requirements:
     - SPEC-125
     primary_spec: SPEC-125
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -2074,6 +2384,7 @@ requirements:
     - SPEC-125
     primary_spec: SPEC-125
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -2089,6 +2400,7 @@ requirements:
     - SPEC-125
     primary_spec: SPEC-125
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -2104,6 +2416,7 @@ requirements:
     - SPEC-125
     primary_spec: SPEC-125
     kind: functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -2119,6 +2432,7 @@ requirements:
     - SPEC-125
     primary_spec: SPEC-125
     kind: non-functional
+    category: null
     status: active
     introduced: null
     implemented_by: []
@@ -2133,6 +2447,7 @@ requirements:
     - SPEC-128
     primary_spec: SPEC-128
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -2147,6 +2462,7 @@ requirements:
     - SPEC-128
     primary_spec: SPEC-128
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -2160,6 +2476,7 @@ requirements:
     - SPEC-128
     primary_spec: SPEC-128
     kind: functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -2173,6 +2490,7 @@ requirements:
     - SPEC-128
     primary_spec: SPEC-128
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -2186,6 +2504,7 @@ requirements:
     - SPEC-128
     primary_spec: SPEC-128
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []
@@ -2199,6 +2518,7 @@ requirements:
     - SPEC-128
     primary_spec: SPEC-128
     kind: non-functional
+    category: null
     status: pending
     introduced: null
     implemented_by: []

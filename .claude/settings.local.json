@@ -33,7 +33,11 @@
       "Bash(just test:*)",
       "Bash(for f in change/deltas/*/IP-*.md)",
       "Bash(do if grep -A 5 \"phases:\" \"$f\")",
-      "Bash(then echo \"$f\" fi done)"
+      "Bash(then echo \"$f\" fi done)",
+      "mcp__serena__replace_symbol_body",
+      "mcp__serena__search_for_pattern",
+      "Bash(yq:*)",
+      "Bash(just quickcheck:*)"
     ],
     "deny": [],
     "ask": []

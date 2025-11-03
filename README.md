@@ -139,6 +139,13 @@ spec-driver create revision
 spec-driver create adr
 ```
 
+Delta creation scaffolds a full bundle by default:
+- `DE-XXX.md` — delta summary and scope
+- `DR-XXX.md` — design revision capturing architecture intent, code impacts, and verification alignment
+- `IP-XXX.md` — implementation plan
+- `phases/phase-01.md` — first execution phase sheet
+- `notes.md` — scratchpad for research and findings
+
 ### Listing Artifacts
 
 ```bash

@@ -9,7 +9,10 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import yaml
+
 from supekku.scripts.lib.backlog.models import BacklogItem
+from supekku.scripts.lib.core.paths import get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 

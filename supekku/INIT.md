@@ -31,9 +31,9 @@ Not yet implemented.
 
 ## Implementation Workflow
 
-Deltas and the documents in the delta bundle - IP (Implementation Plan), Phase sheets - are the focus for all implementation planning, execution, and progress tracking.
+Deltas and the documents in the delta bundle — Design Revision (DR-XXX), Implementation Plan (IP-XXX), and Phase sheets — are the focus for all implementation planning, execution, and progress tracking.
 
-List the delta directory contents. It may contain additional files relevant to implementation.
+List the delta directory contents. It now includes the design revision alongside notes, plans, and phases; review each before making changes.
 
 ### Pre-flight
 
@@ -42,8 +42,8 @@ Agent:
 - That's task 1.4 in phase 1 - likely a handover of work already in progress
 - assume the intent is to continue implementation from 1.4
 - `uv run spec-driver show delta DE-005 --json`
-- read the delta and other entities referenced in its metadata (specs, etc)
-- read any existing IP + thes relevant phase sheet
+- read the delta, design revision, and other entities referenced in metadata (specs, etc)
+- read any existing IP + the relevant phase sheet
 - **IMPORTANT**: CHECK ENTRY CRITERIA.
   - Mark off any already satisfied
   - Attempt to satisfy (e.g. with research) any remaining

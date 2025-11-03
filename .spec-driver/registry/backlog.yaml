@@ -1,6 +1,5 @@
 ordering:
 - IMPR-001
-- IMPR-002
 - ISSUE-003
 - ISSUE-004
 - ISSUE-005
@@ -13,6 +12,7 @@ ordering:
 - ISSUE-012
 - ISSUE-013
 - ISSUE-014
+- IMPR-002
 - ISSUE-015
 - ISSUE-016
 - ISSUE-017

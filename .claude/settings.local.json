@@ -38,7 +38,8 @@
       "mcp__serena__search_for_pattern",
       "Bash(yq:*)",
       "Bash(just quickcheck:*)",
-      "mcp__serena__insert_after_symbol"
+      "mcp__serena__insert_after_symbol",
+      "mcp__serena__find_referencing_symbols"
     ],
     "deny": [],
     "ask": []

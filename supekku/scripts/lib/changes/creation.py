@@ -250,14 +250,12 @@ def create_delta(
 
   plan_id = delta_id.replace("DE", "IP")
   if not allow_missing_plan:
-    # Render YAML blocks
-    first_phase_id = f"{plan_id}.PHASE-01"
+    # Render YAML blocks (no first_phase_id since phase-01 not auto-created)
     plan_overview_block = render_plan_overview_block(
       plan_id,
       delta_id,
       primary_specs=list(specs or []),
       target_requirements=list(requirements or []),
-      first_phase_id=first_phase_id,
     )
 
     # Render verification block for plan
@@ -269,7 +267,6 @@ def create_delta(
           "artefact": "VT-XXX",
           "kind": "VT",
           "requirement": first_req,
-          "phase": first_phase_id,
           "status": "planned",
           "notes": "Link to evidence (test run, audit, validation artefact).",
         }
@@ -300,42 +297,9 @@ def create_delta(
     dump_markdown_file(plan_path, plan_frontmatter, plan_body)
     extras.append(plan_path)
 
-    phases_dir = delta_dir / "phases"
-    _ensure_directory(phases_dir)
-
-    # Render YAML blocks for phase
-    phase_id = f"{plan_id}.PHASE-01"
-    phase_overview_block = render_phase_overview_block(
-      phase_id,
-      plan_id,
-      delta_id,
-    )
-
-    # Load and render phase template
-    phase_template_path = _get_template_path("phase.md", repo)
-    phase_template_body = extract_template_body(phase_template_path)
-    phase_template = Template(phase_template_body)
-    phase_body = phase_template.render(
-      phase_id=phase_id,
-      plan_id=plan_id,
-      delta_id=delta_id,
-      phase_overview_block=phase_overview_block,
-    )
-    phase_path = phases_dir / "phase-01.md"
-    dump_markdown_file(
-      phase_path,
-      {
-        "id": f"{plan_id}.PHASE-01",
-        "slug": f"{slug}-phase-01",
-        "name": f"{plan_id} Phase 01",
-        "created": today,
-        "updated": today,
-        "status": "draft",
-        "kind": "phase",
-      },
-      phase_body,
-    )
-    extras.append(phase_path)
+    # Phase-01 no longer auto-created (PROD-011.FR-001)
+    # Use `create phase --plan {plan_id}` after fleshing out IP to create phase-01
+    # with intelligent entry/exit criteria copying
 
   notes_path = delta_dir / "notes.md"
   if not notes_path.exists():

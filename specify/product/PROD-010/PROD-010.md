@@ -176,9 +176,9 @@ entries:
     kind: VT
     requirement: PROD-010.FR-002
     status: verified
-    notes: Implemented in DE-009. Unit tests verify --json flag on all show commands (spec, adr, requirement, revision) produces structured output with consistent schema. Tests in supekku/cli/test_cli.py::TestShowCommandJSON. 35 new tests added.
+    notes: Fully implemented in DE-009 (Phase 1 + Phase 2). All show commands support --json with complete structured output. Added Spec.to_dict() method. Fixed show adr/policy/standard to properly call to_dict(root). Tests confirm all commands return full data without crashes. 92/92 CLI tests passing.
     implemented_by: DE-009
-    verified_by: IP-009.PHASE-01
+    verified_by: IP-009.PHASE-02
 
   - artefact: VT-PROD010-FILTER-001
     kind: VT

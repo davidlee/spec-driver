@@ -48,7 +48,10 @@ def show_spec(
       raise typer.Exit(EXIT_FAILURE)
 
     if json_output:
-      output = spec.to_dict() if hasattr(spec, "to_dict") else {"id": spec.id}
+      from supekku.scripts.lib.core.repo import find_repo_root
+
+      repo_root = find_repo_root(root)
+      output = spec.to_dict(repo_root)
       typer.echo(json.dumps(output, indent=2))
     else:
       typer.echo(format_spec_details(spec, root=root))
@@ -164,9 +167,10 @@ def show_adr(
       raise typer.Exit(EXIT_FAILURE)
 
     if json_output:
-      output = (
-        decision.to_dict() if hasattr(decision, "to_dict") else {"id": decision.id}
-      )
+      from supekku.scripts.lib.core.repo import find_repo_root
+
+      repo_root = find_repo_root(root)
+      output = decision.to_dict(repo_root)
       typer.echo(json.dumps(output, indent=2))
     else:
       typer.echo(format_decision_details(decision))
@@ -193,7 +197,10 @@ def show_policy(
       raise typer.Exit(EXIT_FAILURE)
 
     if json_output:
-      output = policy.to_dict() if hasattr(policy, "to_dict") else {"id": policy.id}
+      from supekku.scripts.lib.core.repo import find_repo_root
+
+      repo_root = find_repo_root(root)
+      output = policy.to_dict(repo_root)
       typer.echo(json.dumps(output, indent=2))
     else:
       typer.echo(format_policy_details(policy))
@@ -220,9 +227,10 @@ def show_standard(
       raise typer.Exit(EXIT_FAILURE)
 
     if json_output:
-      output = (
-        standard.to_dict() if hasattr(standard, "to_dict") else {"id": standard.id}
-      )
+      from supekku.scripts.lib.core.repo import find_repo_root
+
+      repo_root = find_repo_root(root)
+      output = standard.to_dict(repo_root)
       typer.echo(json.dumps(output, indent=2))
     else:
       typer.echo(format_standard_details(standard))

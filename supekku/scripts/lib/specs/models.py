@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -48,6 +48,31 @@ class Spec:
   def status(self) -> str:
     """Return the status of this spec (e.g., 'draft', 'active')."""
     return str(self.frontmatter.data.get("status", "draft"))
+
+  def to_dict(self, root: Path) -> dict[str, str | list[str]]:
+    """Convert to dictionary for JSON serialization.
+
+    Args:
+        root: Repository root path for relativizing file paths
+
+    Returns:
+        Dictionary representation suitable for JSON serialization
+
+    """
+    data: dict[str, Any] = {
+      "id": self.id,
+      "slug": self.slug,
+      "name": self.name,
+      "kind": self.kind,
+      "status": self.status,
+      "path": str(self.path.relative_to(root)) if root else str(self.path),
+    }
+
+    # Add packages if present
+    if self.packages:
+      data["packages"] = self.packages
+
+    return data
 
 
 __all__ = ["Spec"]

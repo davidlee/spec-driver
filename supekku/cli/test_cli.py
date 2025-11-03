@@ -519,6 +519,46 @@ class TestShowCommandJSON:
       except json.JSONDecodeError:
         pytest.fail("Output is not valid JSON")
 
+  def test_show_spec_json_complete_output(self):
+    """Test show spec --json returns complete spec data, not just id."""
+    # Use PROD-010 which we know exists
+    result = runner.invoke(app, ["show", "spec", "PROD-010", "--json"])
+    assert result.exit_code == 0, f"Command failed: {result.stdout}"
+
+    import json
+
+    data = json.loads(result.stdout)
+    # Should have more than just id
+    assert "id" in data
+    assert data["id"] == "PROD-010"
+    # Should include other spec fields
+    assert "name" in data, "Missing 'name' field"
+    assert "status" in data, "Missing 'status' field"
+    assert "kind" in data, "Missing 'kind' field"
+    assert data["kind"] == "prod"
+    assert "path" in data, "Missing 'path' field"
+    # Should not be minimal output like {"id": "PROD-010"}
+    assert len(data.keys()) > 2, f"Output too minimal: {data}"
+
+  def test_show_adr_json_complete_output(self):
+    """Test show adr --json returns complete decision data without crashing."""
+    result = runner.invoke(app, ["show", "adr", "ADR-001", "--json"])
+    assert result.exit_code == 0, f"Command failed: {result.stdout}"
+
+    import json
+
+    data = json.loads(result.stdout)
+    # Should have complete decision data
+    assert "id" in data
+    assert data["id"] == "ADR-001"
+    assert "title" in data, "Missing 'title' field"
+    assert "status" in data, "Missing 'status' field"
+    assert "path" in data, "Missing 'path' field"
+    # Date fields
+    assert "created" in data, "Missing 'created' field"
+    # Should not crash with AttributeError
+    assert len(data.keys()) > 3, f"Output too minimal: {data}"
+
   def test_show_spec_json_help_documents_flag(self):
     """Test show spec help mentions --json flag."""
     result = runner.invoke(app, ["show", "spec", "--help"])
@@ -795,40 +835,37 @@ class TestMultiValueFilters:
   """
 
   def test_list_deltas_multi_value_status_not_yet_implemented(self):
-    """Test multi-value status filter for deltas (should fail until implemented)."""
-    # This test will FAIL until Task 1.4 is completed
+    """Test multi-value status filter for deltas (TDD placeholder)."""
+    # This test will be updated in Task 1.4
     # Expected: returns deltas with status draft OR in-progress
     result = runner.invoke(app, ["list", "deltas", "-s", "draft,in-progress", "--json"])
-    # For now, just ensure it doesn't crash - actual filtering will be tested in Task 1.4
-    assert result.exit_code == 0  # Should not error even if filtering not implemented yet
-    # TODO: After Task 1.4, add assertions to verify multi-value filtering works correctly  # Placeholder - will be updated in Task 1.4
+    # For now, just ensure it doesn't crash
+    assert result.exit_code == 0
+    # TODO: Task 1.4 - verify multi-value filtering works correctly
 
   def test_list_specs_multi_value_kind_not_yet_implemented(self):
-    """Test multi-value kind filter for specs (should fail until implemented)."""
-    # This test documents current behavior: multi-value kind fails validation
+    """Test multi-value kind filter for specs (TDD placeholder)."""
+    # Documents current behavior: multi-value kind fails validation
     # Expected after Task 1.4: returns specs with kind prod OR tech
     result = runner.invoke(app, ["list", "specs", "-k", "prod,tech", "--json"])
-    # Current behavior: error "invalid kind: prod,tech"
+    # Current: error "invalid kind: prod,tech"
     # After Task 1.4: should be exit_code 0 with filtered results
     assert "invalid kind" in result.stdout or result.exit_code != 0
-    # TODO: After Task 1.4, change to: assert result.exit_code == 0  # Should not error
-    # TODO: After Task 1.4, verify multi-value kind filtering works correctly  # Placeholder
+    # TODO: Task 1.4 - change to: assert result.exit_code == 0
 
   def test_list_requirements_multi_value_kind_not_yet_implemented(self):
-    """Test multi-value kind filter for requirements (should fail until implemented)."""
-    # This test will FAIL until Task 1.4 is completed
-    # Expected: returns requirements with kind FR OR NF
+    """Test multi-value kind filter for requirements (TDD placeholder)."""
+    # Expected after Task 1.4: returns requirements with kind FR OR NF
     result = runner.invoke(app, ["list", "requirements", "-k", "FR,NF", "--json"])
     assert result.exit_code == 0  # Should not error
-    # TODO: After Task 1.4, verify multi-value kind filtering works correctly  # Placeholder
+    # TODO: Task 1.4 - verify multi-value kind filtering works
 
   def test_list_adrs_multi_value_status_not_yet_implemented(self):
-    """Test multi-value status filter for ADRs (should fail until implemented)."""
-    # This test will FAIL until Task 1.4 is completed
-    # Expected: returns ADRs with status draft OR proposed
+    """Test multi-value status filter for ADRs (TDD placeholder)."""
+    # Expected after Task 1.4: returns ADRs with status draft OR proposed
     result = runner.invoke(app, ["list", "adrs", "-s", "draft,proposed", "--json"])
     assert result.exit_code == 0  # Should not error
-    # TODO: After Task 1.4, verify multi-value status filtering works correctly  # Placeholder
+    # TODO: Task 1.4 - verify multi-value status filtering works
 
   def test_backward_compat_single_value_status_filter(self):
     """Test that single-value status filters still work (backward compatibility)."""

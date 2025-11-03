@@ -6,7 +6,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    category: null
+    category: workflow
     status: pending
     introduced: null
     implemented_by: []
@@ -22,7 +22,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    category: null
+    category: automation
     status: pending
     introduced: null
     implemented_by: []
@@ -38,7 +38,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    category: null
+    category: ux
     status: pending
     introduced: null
     implemented_by: []
@@ -54,7 +54,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    category: null
+    category: workflow
     status: pending
     introduced: null
     implemented_by: []
@@ -69,7 +69,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    category: null
+    category: validation
     status: pending
     introduced: null
     implemented_by: []
@@ -84,7 +84,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: non-functional
-    category: null
+    category: ux
     status: pending
     introduced: null
     implemented_by: []
@@ -100,7 +100,7 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: non-functional
-    category: null
+    category: reliability
     status: pending
     introduced: null
     implemented_by: []
@@ -1451,7 +1451,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
-    category: null
+    category: cli
     status: active
     introduced: null
     implemented_by: []
@@ -1468,7 +1468,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
-    category: null
+    category: architecture
     status: active
     introduced: null
     implemented_by: []
@@ -1484,7 +1484,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
-    category: null
+    category: automation
     status: active
     introduced: null
     implemented_by: []
@@ -1501,7 +1501,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
-    category: null
+    category: integration
     status: active
     introduced: null
     implemented_by: []
@@ -1518,7 +1518,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
-    category: null
+    category: cli
     status: active
     introduced: null
     implemented_by: []
@@ -1538,7 +1538,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
-    category: null
+    category: cli
     status: active
     introduced: null
     implemented_by: []
@@ -1557,7 +1557,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
-    category: null
+    category: documentation
     status: active
     introduced: null
     implemented_by: []
@@ -1572,7 +1572,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
-    category: null
+    category: cli
     status: active
     introduced: null
     implemented_by: []
@@ -1589,7 +1589,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
-    category: null
+    category: cli
     status: active
     introduced: null
     implemented_by: []
@@ -1606,7 +1606,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: functional
-    category: null
+    category: automation
     status: active
     introduced: null
     implemented_by: []
@@ -1622,7 +1622,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: non-functional
-    category: null
+    category: performance
     status: active
     introduced: null
     implemented_by: []
@@ -1638,7 +1638,7 @@ requirements:
     - SPEC-110
     primary_spec: SPEC-110
     kind: non-functional
-    category: null
+    category: architecture
     status: active
     introduced: null
     implemented_by: []

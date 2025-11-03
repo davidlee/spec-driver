@@ -124,7 +124,9 @@ class TestChangeRegistryReverseQueries(RepoTestCase):
     """Test finding multiple deltas implementing same requirement."""
     root = self._create_repo()
     self._write_delta_with_requirements(root, "DE-101", ["PROD-010.FR-004"])
-    self._write_delta_with_requirements(root, "DE-102", ["PROD-010.FR-004", "PROD-010.FR-005"])
+    self._write_delta_with_requirements(
+      root, "DE-102", ["PROD-010.FR-004", "PROD-010.FR-005"]
+    )
 
     registry = ChangeRegistry(root=root, kind="delta")
     registry.sync()

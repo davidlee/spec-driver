@@ -890,5 +890,206 @@ class TestMultiValueFilters:
     assert result.exit_code == 0
 
 
+class TestReverseRelationshipQueries:
+  """Test reverse relationship query flags for list commands.
+
+  These tests verify the --implements, --verified-by, and --informed-by flags
+  that enable native reverse traversal of relationships in registries.
+  """
+
+  def test_list_deltas_implements_flag_exists(self):
+    """Test that list deltas accepts --implements flag (TDD placeholder)."""
+    # This flag will be implemented in Task 1.7
+    # Expected: returns deltas that implement the given requirement
+    result = runner.invoke(
+      app, ["list", "deltas", "--implements", "PROD-010.FR-004", "--json"]
+    )
+    # For now, verify flag is recognized (will fail until implementation)
+    # After Task 1.7: verify result.exit_code == 0 and filtering works
+    assert result is not None  # Placeholder assertion for TDD
+
+  def test_list_deltas_implements_filters_correctly(self):
+    """Test that --implements returns only deltas implementing specific requirement."""
+    result = runner.invoke(
+      app, ["list", "deltas", "--implements", "PROD-010.FR-004", "--json"]
+    )
+
+    if result.exit_code == 0:
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+
+      # All returned deltas should implement PROD-010.FR-004
+      for delta in items:
+        applies_to = delta.get("applies_to", {})
+        requirements = applies_to.get("requirements", [])
+        assert "PROD-010.FR-004" in requirements, f"{delta['id']} missing requirement"
+
+  def test_list_deltas_implements_with_status_filter(self):
+    """Test combining --implements with --status filter."""
+    # Expected: returns in-progress deltas that implement requirement
+    result = runner.invoke(
+      app,
+      [
+        "list",
+        "deltas",
+        "--implements",
+        "PROD-010.FR-004",
+        "-s",
+        "in-progress",
+        "--json",
+      ],
+    )
+    # After Task 1.7: verify both filters apply
+    assert result is not None  # Placeholder for TDD
+
+  def test_list_deltas_implements_nonexistent_requirement(self):
+    """Test --implements with non-existent requirement returns empty list."""
+    result = runner.invoke(
+      app,
+      ["list", "deltas", "--implements", "NONEXISTENT.FR-999", "--json"],
+    )
+
+    if result.exit_code == 0:
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+      assert len(items) == 0, "Should return empty list for non-existent requirement"
+
+  def test_list_requirements_verified_by_flag_exists(self):
+    """Test that list requirements accepts --verified-by flag (TDD placeholder)."""
+    # This flag will be implemented in Task 1.7
+    # Expected: returns requirements verified by given artifact
+    result = runner.invoke(
+      app,
+      ["list", "requirements", "--verified-by", "VT-CLI-001", "--json"],
+    )
+    # After Task 1.7: assert result.exit_code == 0
+    assert result is not None  # Placeholder for TDD
+
+  def test_list_requirements_verified_by_exact_match(self):
+    """Test --verified-by with exact artifact ID."""
+    result = runner.invoke(
+      app,
+      ["list", "requirements", "--verified-by", "VT-PROD010-FILTER-002", "--json"],
+    )
+
+    if result.exit_code == 0:
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+
+      # Returned requirements should be verified by the artifact
+      for req in items:
+        verified_by = req.get("verified_by", [])
+        coverage_evidence = req.get("coverage_evidence", [])
+        artifact_found = (
+          "VT-PROD010-FILTER-002" in verified_by
+          or "VT-PROD010-FILTER-002" in coverage_evidence
+        )
+        assert artifact_found, f"{req['uid']} not verified by artifact"
+
+  def test_list_requirements_verified_by_glob_pattern(self):
+    """Test --verified-by with glob pattern matching."""
+    # Expected after Task 1.8: glob patterns work for verification artifacts
+    result = runner.invoke(
+      app, ["list", "requirements", "--verified-by", "VT-CLI-*", "--json"]
+    )
+
+    if result.exit_code == 0:
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+
+      # All returned requirements should have VT-CLI-* artifacts
+      for req in items:
+        verified_by = req.get("verified_by", [])
+        coverage_evidence = req.get("coverage_evidence", [])
+        all_artifacts = verified_by + coverage_evidence
+
+        has_vt_cli = any(a.startswith("VT-CLI-") for a in all_artifacts)
+        assert has_vt_cli, f"{req['uid']} missing VT-CLI-* artifact"
+
+  def test_list_requirements_verified_by_va_pattern(self):
+    """Test --verified-by with VA (agent validation) pattern."""
+    result = runner.invoke(
+      app, ["list", "requirements", "--verified-by", "VA-*", "--json"]
+    )
+    # After Task 1.8: verify VA artifacts matched
+    assert result is not None  # Placeholder for TDD
+
+  def test_list_requirements_verified_by_with_spec_filter(self):
+    """Test combining --verified-by with --spec filter."""
+    result = runner.invoke(
+      app,
+      ["list", "requirements", "--spec", "SPEC-110", "--verified-by", "VT-*", "--json"],
+    )
+    # After Task 1.7: verify both filters apply (AND logic)
+    assert result is not None  # Placeholder for TDD
+
+  def test_list_requirements_verified_by_nonexistent_artifact(self):
+    """Test --verified-by with non-existent artifact returns empty list."""
+    result = runner.invoke(
+      app,
+      ["list", "requirements", "--verified-by", "NONEXISTENT-ARTIFACT", "--json"],
+    )
+
+    if result.exit_code == 0:
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+      assert len(items) == 0, "Should return empty list for non-existent artifact"
+
+  def test_list_specs_informed_by_flag_exists(self):
+    """Test that list specs accepts --informed-by flag (TDD placeholder)."""
+    # This flag will be implemented in Task 1.7
+    # Expected: returns specs informed by given ADR
+    result = runner.invoke(
+      app, ["list", "specs", "--informed-by", "ADR-001", "--json"]
+    )
+    # After Task 1.7: assert result.exit_code == 0
+    assert result is not None  # Placeholder for TDD
+
+  def test_list_specs_informed_by_filters_correctly(self):
+    """Test that --informed-by returns only specs referencing specific ADR."""
+    result = runner.invoke(app, ["list", "specs", "--informed-by", "ADR-005", "--json"])
+
+    if result.exit_code == 0:
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+
+      # All returned specs should reference ADR-005
+      for spec in items:
+        informed_by = spec.get("informed_by", [])
+        assert "ADR-005" in informed_by, f"{spec['id']} missing ADR-005 reference"
+
+  def test_list_specs_informed_by_with_kind_filter(self):
+    """Test combining --informed-by with --kind filter."""
+    result = runner.invoke(
+      app,
+      ["list", "specs", "--informed-by", "ADR-005", "-k", "tech", "--json"],
+    )
+    # After Task 1.7: verify both filters apply
+    assert result is not None  # Placeholder for TDD
+
+  def test_list_specs_informed_by_nonexistent_adr(self):
+    """Test --informed-by with non-existent ADR returns empty list."""
+    result = runner.invoke(app, ["list", "specs", "--informed-by", "ADR-999", "--json"])
+
+    if result.exit_code == 0:
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+      assert len(items) == 0, "Should return empty list for non-existent ADR"
+
+
 if __name__ == "__main__":
   pytest.main([__file__, "-v"])

@@ -875,7 +875,9 @@ class TestRequirementsRegistryReverseQueries(unittest.TestCase):
     os.chdir(root)
     return root
 
-  def _write_spec_with_requirements(self, root: Path, spec_id: str, requirements: list[str]) -> None:
+  def _write_spec_with_requirements(
+    self, root: Path, spec_id: str, requirements: list[str]
+  ) -> None:
     """Write a spec file with specific requirements."""
     spec_dir = root / "specify" / "tech" / f"{spec_id.lower()}-example"
     spec_dir.mkdir(parents=True, exist_ok=True)
@@ -919,14 +921,19 @@ class TestRequirementsRegistryReverseQueries(unittest.TestCase):
 
     if "SPEC-001.NF-020" in registry.records:
       registry.records["SPEC-001.NF-020"].verified_by = []
-      registry.records["SPEC-001.NF-020"].coverage_evidence = ["VT-CLI-001", "VT-CLI-002"]
+      registry.records["SPEC-001.NF-020"].coverage_evidence = [
+        "VT-CLI-001",
+        "VT-CLI-002",
+      ]
 
     return registry
 
   def test_find_by_verified_by_exact_match(self) -> None:
     """Test finding requirements verified by specific artifact (exact match)."""
     root = self._make_repo()
-    self._write_spec_with_requirements(root, "SPEC-001", ["FR-001: First requirement", "FR-002: Second requirement"])
+    self._write_spec_with_requirements(
+      root, "SPEC-001", ["FR-001: First requirement", "FR-002: Second requirement"]
+    )
 
     registry = self._create_registry_with_verification(root)
 
@@ -963,7 +970,11 @@ class TestRequirementsRegistryReverseQueries(unittest.TestCase):
     self._write_spec_with_requirements(
       root,
       "SPEC-001",
-      ["FR-001: First requirement", "FR-002: Second requirement", "NF-020: Performance"],
+      [
+        "FR-001: First requirement",
+        "FR-002: Second requirement",
+        "NF-020: Performance",
+      ],
     )
 
     registry = self._create_registry_with_verification(root)

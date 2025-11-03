@@ -463,23 +463,23 @@ The CLI module provides five core capabilities as defined in the YAML block abov
 
 ### Functional Requirements
 
-- **SPEC-110.FR-001**: CLI MUST provide single unified entry point (`spec-driver`) routing to all subcommand groups (list, show, create, sync, schema, backfill, complete, workspace)
+- **SPEC-110.FR-001**(cli): CLI MUST provide single unified entry point (`spec-driver`) routing to all subcommand groups (list, show, create, sync, schema, backfill, complete, workspace)
   *Rationale*: Single tool reduces cognitive load and installation complexity
   *Verification*: VT-CLI-LIST-001 - All commands accessible via `spec-driver` main entry point
 
-- **SPEC-110.FR-002**: List commands MUST delegate all data access to registries and all formatting to formatters (zero business logic in CLI)
+- **SPEC-110.FR-002**(architecture): List commands MUST delegate all data access to registries and all formatting to formatters (zero business logic in CLI)
   *Rationale*: Skinny CLI pattern keeps code maintainable and testable
   *Verification*: VT-CLI-LIST-001 - Tests verify thin orchestration: args → registry → filter → format → output
 
-- **SPEC-110.FR-003**: Backfill command MUST detect stub specs (status='stub' or ≤30 lines) and replace body with template while preserving frontmatter
+- **SPEC-110.FR-003**(automation): Backfill command MUST detect stub specs (status='stub' or ≤30 lines) and replace body with template while preserving frontmatter
   *Rationale*: Enables spec completion workflow (reduces backfill time from 2hrs to 10min)
   *Verification*: VT-CLI-BACKFILL-001 - Stub detection and template replacement tests
 
-- **SPEC-110.FR-004**: Sync command MUST delegate to sync adapters for multi-language code-to-spec synchronization (Python, Go, TypeScript) and MUST support separate ADR registry synchronization via `--adr` flag
+- **SPEC-110.FR-004**(integration): Sync command MUST delegate to sync adapters for multi-language code-to-spec synchronization (Python, Go, TypeScript) and MUST support separate ADR registry synchronization via `--adr` flag
   *Rationale*: Thin CLI layer orchestrates; adapters implement language-specific logic; ADR sync is opt-in
   *Verification*: VT-CLI-SYNC-001 - Sync delegation tests, ADR sync flag tests
 
-- **SPEC-110.FR-005**: All list commands MUST support consistent flag patterns (--format, --json, --filter, --regexp, --case-insensitive, --root) and MUST apply regexp filtering to artifact-specific fields:
+- **SPEC-110.FR-005**(cli): All list commands MUST support consistent flag patterns (--format, --json, --filter, --regexp, --case-insensitive, --root) and MUST apply regexp filtering to artifact-specific fields:
   - ADRs: title, summary
   - Backlog items: ID, title
   - Changes (deltas/revisions/audits): ID, slug, name
@@ -490,15 +490,15 @@ The CLI module provides five core capabilities as defined in the YAML block abov
   *Rationale*: Consistent UX enables muscle memory; field-specific filtering ensures relevant matches; --json shorthand improves CLI ergonomics
   *Verification*: VT-CLI-COMMON-001, VT-CLI-FILTER-001, VT-CLI-REGEXP-001, VT-CLI-JSON-001 - Flag pattern and filtering tests
 
-- **SPEC-110.FR-006**: All list commands MUST support output formats: table (default), json, tsv; list specs command MUST additionally support --status/-s filter for filtering by spec status (draft, active, deprecated, superseded)
+- **SPEC-110.FR-006**(cli): All list commands MUST support output formats: table (default), json, tsv; list specs command MUST additionally support --status/-s filter for filtering by spec status (draft, active, deprecated, superseded)
   *Rationale*: JSON output enables automation; table output optimizes human readability; status filtering enables focused spec exploration
   *Verification*: VT-CLI-FORMAT-001, VT-CLI-STATUS-FILTER-001, VT-CLI-JSON-SCHEMA-001 - Output format tests verify JSON is parseable and stable, status filtering works correctly
 
-- **SPEC-110.FR-007**: Schema commands MUST list block schemas and frontmatter schemas separately (via `schema list blocks|frontmatter|all`) and MUST display schema details in json-schema or yaml-example formats
+- **SPEC-110.FR-007**(documentation): Schema commands MUST list block schemas and frontmatter schemas separately (via `schema list blocks|frontmatter|all`) and MUST display schema details in json-schema or yaml-example formats
   *Rationale*: Self-documentation reduces external documentation burden; separate listing enables focused exploration
   *Verification*: VT-CLI-SCHEMA-001 - Schema listing and display tests for both block and frontmatter types
 
-- **SPEC-110.FR-008**: Create commands MUST support all artifact types using templates:
+- **SPEC-110.FR-008**(cli): Create commands MUST support all artifact types using templates:
   - Specifications (SPEC/PROD)
   - Changes: deltas, revisions, phases
   - Decisions: ADRs
@@ -507,21 +507,21 @@ The CLI module provides five core capabilities as defined in the YAML block abov
   *Rationale*: Template-based creation ensures consistency and completeness across all artifact types
   *Verification*: VT-CLI-CREATE-001 - Create command tests for all artifact types
 
-- **SPEC-110.FR-009**: Show commands MUST display detailed artifact information for all major types (specs, deltas, revisions, ADRs, requirements) and MUST include `show template` for displaying spec templates
+- **SPEC-110.FR-009**(cli): Show commands MUST display detailed artifact information for all major types (specs, deltas, revisions, ADRs, requirements) and MUST include `show template` for displaying spec templates
   *Rationale*: Separation of concerns: CLI orchestrates, formatters implement display logic; template display aids spec creation
   *Verification*: VT-CLI-SHOW-001 - Show command delegation tests
 
-- **SPEC-110.FR-010**: Complete delta command MUST mark delta as completed AND update associated requirement statuses to 'live' in revision source files
+- **SPEC-110.FR-010**(automation): Complete delta command MUST mark delta as completed AND update associated requirement statuses to 'live' in revision source files
   *Rationale*: Automates requirement lifecycle transitions; prevents manual status update errors; maintains traceability
   *Verification*: VT-CLI-COMPLETE-001 - Delta completion with requirement lifecycle tests
 
 ### Non-Functional Requirements
 
-- **SPEC-110.NF-001**: CLI commands MUST complete typical operations (list, show, create) in <2 seconds on standard hardware
+- **SPEC-110.NF-001**(performance): CLI commands MUST complete typical operations (list, show, create) in <2 seconds on standard hardware
   *Rationale*: Fast response times keep interactive workflows fluid
   *Measurement*: VT-CLI-INTEGRATION-001 - Integration tests measure command responsiveness
 
-- **SPEC-110.NF-002**: CLI modules MUST average <200 lines per file to maintain thin orchestration pattern
+- **SPEC-110.NF-002**(architecture): CLI modules MUST average <200 lines per file to maintain thin orchestration pattern
   *Rationale*: Enforces architectural constraint that business logic stays out of CLI
   *Measurement*: Static analysis of CLI file line counts (current average: ~150 lines)
 

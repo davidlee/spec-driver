@@ -285,33 +285,33 @@ See capabilities YAML block above for complete capability definitions. Key behav
 
 ### Functional Requirements
 
-- **FR-001**: Claude Command Provides Complete Workflow
+- **FR-001**(workflow): Claude Command Provides Complete Workflow
   The `.claude/commands/supekku.specify.md` command file contains all instructions necessary for an agent to guide a user from feature description to validated, registry-synced specification without external documentation.
   *Verification*: VT-001 - Test agent follows command from start to finish with zero external lookups
 
-- **FR-002**: Agent Completes All YAML Blocks Without Manual Editing
+- **FR-002**(automation): Agent Completes All YAML Blocks Without Manual Editing
   The workflow instructs agents to fetch schema documentation via `spec-driver schema show` and use it to generate valid YAML blocks for `spec.relationships`, `spec.capabilities`, and `verification.coverage` without requiring users to manually edit YAML syntax.
   *Verification*: VT-002 - Validate 100 generated specs have valid YAML blocks with zero manual corrections
 
-- **FR-003**: Clarification Questions Limited to Critical Decisions
+- **FR-003**(ux): Clarification Questions Limited to Critical Decisions
   Agents ask maximum 3 clarification questions, prioritized by scope > security > UX impact, making informed assumptions for all other details and documenting those assumptions in the spec's Intent & Summary section.
   *Verification*: VT-003 - Analyze 50 spec creation sessions, confirm ≤3 questions asked, all assumptions documented
 
-- **FR-004**: Spec Type Determines Section Content Adaptation
+- **FR-004**(workflow): Spec Type Determines Section Content Adaptation
   Product specs emphasize user personas, journeys, and business value; tech specs emphasize architecture, components, and integration contracts. The workflow instructs agents to adapt section content appropriately based on `--kind` flag.
   *Verification*: Manual review of 20 product specs and 20 tech specs confirms appropriate content focus
 
-- **FR-005**: Validation Integrated Before Workflow Completion
+- **FR-005**(validation): Validation Integrated Before Workflow Completion
   The workflow requires agents to run `spec-driver sync` and `spec-driver validate` commands before declaring spec creation complete, catching errors (invalid relationships, missing requirements, YAML syntax issues) before user moves to next task.
   *Verification*: VT-002 - Confirm validation catches all common error types (tested via intentional error injection)
 
 ### Non-Functional Requirements
 
-- **NF-001**: First-Time User Experience Requires Minimal Cognitive Load
+- **NF-001**(ux): First-Time User Experience Requires Minimal Cognitive Load
   Users with zero spec-driver experience can complete their first spec creation in under 1 hour with zero "what do I do now?" friction points.
   *Measurement*: VA-001 - User testing with 10 first-time users, measure time-to-completion and friction point incidents (target: 0 critical friction points)
 
-- **NF-002**: Registry Sync Success Rate >95% on First Attempt
+- **NF-002**(reliability): Registry Sync Success Rate >95% on First Attempt
   Specs created through this workflow sync to the registry without errors on first attempt in >95% of cases, indicating validation catches errors early.
   *Measurement*: VA-002 - Track sync success rate over 200 spec creations across diverse projects
 

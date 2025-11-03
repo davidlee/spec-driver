@@ -32,7 +32,10 @@ Test cases for backlog listing shortcut commands.
 
 ### ListRequirementsCategoryFilterTest
 
-Test cases for requirements listing with category filtering (VT-017-003, VT-017-004).
+Test cases for requirements with category filtering.
+
+VT-017-003: Category filtering tests
+VT-017-004: Category display tests
 
 **Inherits from:** unittest.TestCase
 

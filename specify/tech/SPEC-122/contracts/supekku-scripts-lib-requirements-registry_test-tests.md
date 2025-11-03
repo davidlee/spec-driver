@@ -37,3 +37,28 @@ Test cases for RequirementsRegistry functionality.
 - `_make_repo(self) -> Path`
 - `_write_revision_with_block(self, root, revision_id, block_yaml) -> Path`
 - `_write_spec(self, root, spec_id, body) -> None`
+
+### TestRequirementsRegistryReverseQueries
+
+Test reverse relationship query methods for RequirementsRegistry.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_find_by_verified_by_case_sensitive(self) -> None`: Test that artifact ID matching is case-sensitive.
+- `test_find_by_verified_by_empty_string(self) -> None`: Test find_by_verified_by with empty string returns empty list.
+- `test_find_by_verified_by_exact_match(self) -> None`: Test finding requirements verified by specific artifact (exact match).
+- `test_find_by_verified_by_glob_pattern(self) -> None`: Test finding requirements with glob pattern matching.
+- `test_find_by_verified_by_glob_wildcard_positions(self) -> None`: Test glob patterns with wildcards in different positions.
+- `test_find_by_verified_by_none(self) -> None`: Test find_by_verified_by with None returns empty list.
+- `test_find_by_verified_by_nonexistent_artifact(self) -> None`: Test finding requirements for non-existent artifact returns empty list.
+- `test_find_by_verified_by_returns_requirement_records(self) -> None`: Test that find_by_verified_by returns proper RequirementRecord objects.
+- `test_find_by_verified_by_searches_both_fields(self) -> None`: Test that find_by_verified_by searches both verified_by and coverage_evidence.
+- `test_find_by_verified_by_va_pattern(self) -> None`: Test finding requirements with VA (agent validation) artifacts.
+- `test_find_by_verified_by_vt_prefix_pattern(self) -> None`: Test finding requirements with VT-PROD prefix.
+- `_create_registry_with_verification(self, root) -> RequirementsRegistry`: Create requirements registry and manually add verification metadata.
+- `_make_repo(self) -> Path`
+- `_write_spec_with_requirements(self, root, spec_id, requirements) -> None`: Write a spec file with specific requirements.

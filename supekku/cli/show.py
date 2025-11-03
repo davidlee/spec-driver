@@ -14,6 +14,7 @@ from supekku.scripts.lib.core.templates import TemplateNotFoundError, render_tem
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.change_formatters import (
   format_delta_details,
+  format_delta_details_json,
   format_revision_details,
 )
 from supekku.scripts.lib.formatters.decision_formatters import format_decision_details
@@ -51,6 +52,7 @@ def show_spec(
 @app.command("delta")
 def show_delta(
   delta_id: Annotated[str, typer.Argument(help="Delta ID (e.g., DE-003)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a delta."""
@@ -63,7 +65,11 @@ def show_delta(
       typer.echo(f"Error: Delta not found: {delta_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    typer.echo(format_delta_details(artifact, root=root))
+    if json_output:
+      typer.echo(format_delta_details_json(artifact, root=root))
+    else:
+      typer.echo(format_delta_details(artifact, root=root))
+
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)

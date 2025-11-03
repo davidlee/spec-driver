@@ -6,6 +6,9 @@ Formatters take ChangeArtifact objects and return formatted strings for display.
 
 from __future__ import annotations
 
+import contextlib
+import json
+import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -192,7 +195,71 @@ def _format_applies_to(artifact: ChangeArtifact) -> list[str]:
   return lines
 
 
-def _format_plan_overview(artifact: ChangeArtifact) -> list[str]:
+def _enrich_phase_data(
+  phase: dict[str, Any],
+  artifact: ChangeArtifact,
+  root: Path | None = None,
+) -> dict[str, Any]:
+  """Enrich phase data with file path and task completion stats.
+
+  Args:
+    phase: Phase dictionary
+    artifact: Parent delta artifact
+    root: Repository root for relative paths
+
+  Returns:
+    Enriched phase dictionary
+  """
+  enriched = phase.copy()
+
+  # Try to find the phase file
+  phase_id = phase.get("phase") or phase.get("id")
+  if not phase_id:
+    return enriched
+
+  phases_dir = artifact.path.parent / "phases"
+  if not phases_dir.exists():
+    return enriched
+
+  # Extract numeric part from phase ID (e.g., "IP-005.PHASE-01" -> "01")
+  phase_num = None
+  if isinstance(phase_id, str):
+    parts = phase_id.split("-")
+    if parts:
+      phase_num = parts[-1]
+
+  if not phase_num:
+    return enriched
+
+  phase_file = phases_dir / f"phase-{phase_num.zfill(2)}.md"
+  if not phase_file.exists():
+    return enriched
+
+  # Add file path
+  phase_path_str = phase_file.as_posix()
+  if root:
+    with contextlib.suppress(ValueError):
+      phase_path_str = phase_file.relative_to(root).as_posix()
+  enriched["path"] = phase_path_str
+
+  # Extract task completion stats
+  try:
+    phase_content = phase_file.read_text(encoding="utf-8")
+    completed = len(re.findall(r"^- \[x\]", phase_content, re.MULTILINE))
+    total = len(re.findall(r"^- \[(x| )\]", phase_content, re.MULTILINE))
+    if total > 0:
+      enriched["tasks_completed"] = completed
+      enriched["tasks_total"] = total
+  except (OSError, UnicodeDecodeError):
+    pass
+
+  return enriched
+
+
+def _format_plan_overview(
+  artifact: ChangeArtifact,
+  root: Path | None = None,
+) -> list[str]:
   """Format plan overview section if present."""
   if not artifact.plan:
     return []
@@ -203,10 +270,32 @@ def _format_plan_overview(artifact: ChangeArtifact) -> list[str]:
   if not phases:
     return []
 
-  lines = ["", f"Plan: {plan_id} ({len(phases)} phases)"]
+  # Format plan file path
+  plan_path = artifact.path.parent / f"{plan_id}.md"
+  plan_path_str = plan_path.as_posix()
+  if root:
+    with contextlib.suppress(ValueError):
+      plan_path_str = plan_path.relative_to(root).as_posix()
+
+  lines = ["", f"Plan: {plan_id} ({len(phases)} phases)", f"  File: {plan_path_str}"]
+
+  # Format each phase with enriched data
   for phase in phases:
-    phase_summary = format_phase_summary(phase)
+    enriched_phase = _enrich_phase_data(phase, artifact, root)
+    phase_summary = format_phase_summary(enriched_phase)
+
+    # Add task completion stats if available
+    tasks_completed = enriched_phase.get("tasks_completed")
+    tasks_total = enriched_phase.get("tasks_total")
+    if tasks_completed is not None and tasks_total is not None:
+      pct = int((tasks_completed / tasks_total) * 100) if tasks_total > 0 else 0
+      phase_summary += f" [{tasks_completed}/{tasks_total} tasks - {pct}%]"
+
     lines.append(f"  {phase_summary}")
+
+    # Add phase file path if available
+    if "path" in enriched_phase:
+      lines.append(f"    File: {enriched_phase['path']}")
 
   return lines
 
@@ -221,6 +310,45 @@ def _format_relations(artifact: ChangeArtifact) -> list[str]:
     kind = relation.get("kind", "")
     target = relation.get("target", "")
     lines.append(f"  - {kind}: {target}")
+
+  return lines
+
+
+def _format_other_files(
+  artifact: ChangeArtifact,
+  root: Path | None = None,
+) -> list[str]:
+  """Format other files in delta bundle."""
+  # Collect all other files (excluding delta, plan, and phase files)
+  excluded_files = {artifact.path}
+  if artifact.plan:
+    plan_id = artifact.plan.get("id", "")
+    plan_path = artifact.path.parent / f"{plan_id}.md"
+    excluded_files.add(plan_path)
+
+    # Add all phase files to exclusion set
+    phases_dir = artifact.path.parent / "phases"
+    if phases_dir.exists():
+      for phase_file in phases_dir.glob("*.md"):
+        excluded_files.add(phase_file)
+
+  # Find all other files
+  other_files = []
+  delta_dir = artifact.path.parent
+  for file_path in sorted(delta_dir.rglob("*")):
+    if file_path.is_file() and file_path not in excluded_files:
+      file_path_str = file_path.as_posix()
+      if root:
+        with contextlib.suppress(ValueError):
+          file_path_str = file_path.relative_to(root).as_posix()
+      other_files.append(file_path_str)
+
+  if not other_files:
+    return []
+
+  lines = ["", "Other Files:"]
+  for file_path in other_files:
+    lines.append(f"  {file_path}")
 
   return lines
 
@@ -255,8 +383,9 @@ def format_delta_details(
   sections = [
     _format_change_basic_fields(artifact),
     _format_applies_to(artifact),
-    _format_plan_overview(artifact),
+    _format_plan_overview(artifact, root),
     _format_relations(artifact),
+    _format_other_files(artifact, root),
     _format_file_path_for_change(artifact, root),
   ]
 
@@ -353,3 +482,98 @@ def format_change_list_json(changes: Sequence[ChangeArtifact]) -> str:
     items.append(item)
 
   return format_as_json(items)
+
+
+def format_delta_details_json(
+  artifact: ChangeArtifact,
+  root: Path | None = None,
+) -> str:
+  """Format delta details as JSON with all file paths included.
+
+  Args:
+    artifact: ChangeArtifact to format
+    root: Repository root for relative path calculation (optional)
+
+  Returns:
+    JSON string with complete delta information including all paths
+  """
+  # Calculate relative path for delta file
+  delta_path = artifact.path.as_posix()
+  if root:
+    with contextlib.suppress(ValueError):
+      delta_path = artifact.path.relative_to(root).as_posix()
+
+  # Build base delta object
+  delta_obj: dict[str, Any] = {
+    "id": artifact.id,
+    "kind": artifact.kind,
+    "status": artifact.status,
+    "name": artifact.name,
+    "slug": artifact.slug,
+    "path": delta_path,
+  }
+
+  # Add optional basic fields
+  if artifact.updated:
+    delta_obj["updated"] = artifact.updated
+
+  # Add applies_to with spec/requirement details
+  if artifact.applies_to:
+    delta_obj["applies_to"] = artifact.applies_to
+
+  # Add relations
+  if artifact.relations:
+    delta_obj["relations"] = artifact.relations
+
+  # Add plan with all phase file paths
+  if artifact.plan:
+    plan_id = artifact.plan.get("id", "")
+    plan_path = artifact.path.parent / f"{plan_id}.md"
+    plan_path_str = plan_path.as_posix()
+    if root:
+      with contextlib.suppress(ValueError):
+        plan_path_str = plan_path.relative_to(root).as_posix()
+
+    plan_obj: dict[str, Any] = {
+      "id": plan_id,
+      "path": plan_path_str,
+      "overview": artifact.plan.get("overview", {}),
+      "phases": [],
+    }
+
+    # Add phases with enriched data (paths and task stats)
+    for phase in artifact.plan.get("phases", []):
+      enriched_phase = _enrich_phase_data(phase, artifact, root)
+      plan_obj["phases"].append(enriched_phase)
+
+    delta_obj["plan"] = plan_obj
+
+  # Collect all other files in the delta bundle directory
+  # Exclude: delta file, plan file, and phase files (already listed above)
+  excluded_files = {artifact.path}
+  if artifact.plan:
+    plan_id = artifact.plan.get("id", "")
+    plan_path = artifact.path.parent / f"{plan_id}.md"
+    excluded_files.add(plan_path)
+
+    # Add all phase files to exclusion set
+    phases_dir = artifact.path.parent / "phases"
+    if phases_dir.exists():
+      for phase_file in phases_dir.glob("*.md"):
+        excluded_files.add(phase_file)
+
+  # Find all other files
+  other_files = []
+  delta_dir = artifact.path.parent
+  for file_path in sorted(delta_dir.rglob("*")):
+    if file_path.is_file() and file_path not in excluded_files:
+      file_path_str = file_path.as_posix()
+      if root:
+        with contextlib.suppress(ValueError):
+          file_path_str = file_path.relative_to(root).as_posix()
+      other_files.append(file_path_str)
+
+  if other_files:
+    delta_obj["files"] = other_files
+
+  return json.dumps(delta_obj, indent=2, default=str)

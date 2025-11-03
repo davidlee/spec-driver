@@ -48,6 +48,7 @@ SPEC_DRIVER_THEME = Theme(
     # Requirement status colors
     "requirement.status.live": "#8ec07c",  # green
     "requirement.status.implemented": "#8ec07c",  # green
+    "requirement.status.verified": "#00ff00 bold",  # hot lime green
     "requirement.status.in-progress": "#d79921",  # yellow
     "requirement.status.pending": "#00b8ff",  # sky blue
     "requirement.status.retired": "#cc241d",  # red

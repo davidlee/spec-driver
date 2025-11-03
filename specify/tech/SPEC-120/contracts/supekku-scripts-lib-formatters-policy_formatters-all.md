@@ -36,7 +36,7 @@ Args:
   policy: PolicyRecord to format
 
 Returns:
-  List of formatted cell values [id, title, status, updated]
+  List of formatted cell values [id, title, tags, status, updated]
 - `format_policy_details(policy) -> str`: Format policy details as multi-line string for display.
 
 Args:

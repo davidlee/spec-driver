@@ -3,7 +3,7 @@ id: ISSUE-013
 name: Restore entry/exit criteria to IP and phase.overview schemas
 created: '2025-11-03'
 updated: '2025-11-03'
-status: open
+status: resolved
 kind: issue
 categories:
   - process_gap
@@ -12,6 +12,7 @@ severity: p2
 impact: process
 linked_deltas:
   - DE-004
+  - DE-012
 related_requirements: []
 ---
 
@@ -217,4 +218,3 @@ This affects the core implementation workflow contract. Without upfront criteria
 - Phase sheets start without clear baseline
 - Drift is undetectable
 - Implementation handoffs are ambiguous
-

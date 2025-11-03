@@ -869,7 +869,7 @@ deltas:
     status: completed
     name: Delta - CLI JSON consistency fixes
     slug: cli-json-consistency-fixes
-    updated: '2025-11-03'
+    updated: '2025-01-04'
     path: change/deltas/DE-009-cli-json-consistency-fixes/DE-009.md
     applies_to:
       specs:
@@ -902,6 +902,7 @@ deltas:
           dependencies: []
         phases:
         - id: IP-009.PHASE-01
+        - id: IP-009.PHASE-02
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -980,6 +981,100 @@ deltas:
           likelihood: medium
           impact: medium
           mitigation: Reuse exact patterns from list_deltas; test for behavioral parity
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-009.PHASE-02
+        plan: IP-009
+        delta: DE-009
+        objective: Complete PROD-010.FR-002 by implementing proper JSON serialization
+          for show commands that currently return incomplete output (show spec) or
+          crash (show adr, show policy, show standard). Add to_dict() methods to model
+          objects or create dedicated JSON formatters to match the working pattern
+          used by show delta/requirement.
+        entrance_criteria:
+        - Development environment set up with uv and dependencies installed
+        - Phase 01 completed - list commands and some show commands working
+        - Existing CLI test suite passing (just test)
+        - Both linters passing (just lint, just pylint)
+        - Understanding of current implementation gaps (spec/adr/policy/standard)
+        - Familiarity with working patterns (show delta uses format_delta_details_json
+          formatter)
+        exit_criteria:
+        - All show commands support --json flag with full structured output
+        - show spec --json returns complete spec data (not just {"id":"..."})
+        - show adr --json returns complete decision data without crashing
+        - show policy --json returns complete policy data (if policies exist)
+        - show standard --json returns complete standard data (if standards exist)
+        - Consistent JSON schema patterns across all show commands
+        - All unit tests passing with new test coverage for fixed commands
+        - Both linters passing with zero warnings
+        - Manual testing confirms all show --json commands work properly
+        - PROD-010.FR-002 coverage status updated to "verified"
+        verification:
+          tests:
+          - VT-CLI-SHOW-SPEC-JSON
+          - VT-CLI-SHOW-ADR-JSON
+          - VT-CLI-SHOW-POLICY-JSON
+          - VT-CLI-SHOW-STANDARD-JSON
+          evidence:
+          - VT-PROD010-JSON-002
+        tasks:
+        - id: '2.1'
+          description: Research existing model structures and identify to_dict() implementation
+            patterns
+          status: pending
+        - id: '2.2'
+          description: Write tests for show spec --json returning full spec data (TDD)
+          status: pending
+        - id: '2.3'
+          description: Implement to_dict() method on Spec model or create format_spec_details_json
+            formatter
+          status: pending
+        - id: '2.4'
+          description: Update show spec command to use proper JSON serialization
+          status: pending
+        - id: '2.5'
+          description: Write tests for show adr --json returning full decision data
+            (TDD)
+          status: pending
+        - id: '2.6'
+          description: Implement to_dict() method on DecisionRecord model
+          status: pending
+        - id: '2.7'
+          description: Update show adr command to use proper JSON serialization
+          status: pending
+        - id: '2.8'
+          description: Write tests for show policy/standard --json (TDD)
+          status: pending
+        - id: '2.9'
+          description: Implement to_dict() methods on PolicyRecord and StandardRecord
+            models
+          status: pending
+        - id: '2.10'
+          description: Update show policy/standard commands to use proper JSON serialization
+          status: pending
+        - id: '2.11'
+          description: Run full test suite and linters, fix any issues
+          status: pending
+        - id: '2.12'
+          description: Manual validation of all show --json commands
+          status: pending
+        - id: '2.13'
+          description: Update PROD-010 coverage block to mark FR-002 as verified
+          status: pending
+        risks:
+        - description: Adding to_dict() methods might break existing code that expects
+            different structure
+          likelihood: low
+          impact: medium
+          mitigation: Comprehensive test coverage; check for existing usage of these
+            models
+        - description: JSON output schema differences between show commands confuse
+            agents
+          likelihood: medium
+          impact: high
+          mitigation: Follow consistent pattern - all show commands return similar
+            top-level structure
   DE-010:
     kind: delta
     status: in-progress
@@ -1036,6 +1131,7 @@ deltas:
         - id: IP-010.PHASE-02
         - id: IP-010.PHASE-03
         - id: IP-010.PHASE-04
+        - id: IP-010.PHASE-05
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -1240,8 +1336,64 @@ deltas:
           mitigation: Follow existing backlink patterns from decisions package
         - description: Formatter display cluttered with too many cross-refs
           mitigation: Show count in table view, full list in details/JSON
-      - id: IP-010.PHASE-05
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-010.PHASE-05
+        plan: IP-010
+        delta: DE-010
+        objective: Complete E2E verification, update documentation, validate all acceptance
+          criteria, and ensure delta completion requirements satisfied.
+        entrance_criteria:
+        - Phase 04 complete - cross-references and backlinks working
+        - All unit and integration tests passing (1,327 tests)
+        - All linters passing (ruff + pylint)
+        - Domain models, registries, formatters, CLI commands functional
+        exit_criteria:
+        - All VT verification artifacts executed and documented
+        - VA-PROD-003-001 (UX review) complete
+        - README/documentation updated with policy/standard examples
+        - All delta acceptance criteria verified
+        - Requirements coverage complete for all 10 requirements
+        - Final quality gates passing (just test/lint/pylint)
+        - Delta ready for completion (uv run spec-driver complete delta DE-010)
+        verification:
+          tests:
+          - VT-PROD-003-001 - E2E test for policy creation
+          - VT-PROD-003-002 - Integration test for policy lifecycle
+          - VT-PROD-003-003 - E2E test for standard creation
+          - VT-PROD-003-004 - Unit test for default status behavior
+          - VT-PROD-003-005 - Integration test for list commands with filters
+          - VT-PROD-003-006 - Integration test for show commands
+          - "VT-PROD-003-007 - Bidirectional policy \u2194 standard references"
+          - VT-PROD-003-008 - Policy/standard references in ADRs with backlinks
+          - VT-PROD-003-009 - Template validation for consistency
+          - VA-PROD-003-001 - UX review for CLI discoverability
+          evidence:
+          - All test output captured and documented
+          - Manual verification of CLI workflows
+          - Documentation review and updates
+          - Requirements coverage verification
+        tasks:
+        - id: '5.1'
+          description: Review and document all VT test artifacts (VT-PROD-003-001
+            through VT-PROD-003-009)
+        - id: '5.2'
+          description: Conduct UX review for CLI patterns and discoverability (VA-PROD-003-001)
+        - id: '5.3'
+          description: Update README with policy/standard usage examples
+        - id: '5.4'
+          description: Validate all delta acceptance criteria
+        - id: '5.5'
+          description: Update requirements coverage in PROD-003 spec
+        - id: '5.6'
+          description: Run final quality gates and document results
+        - id: '5.7'
+          description: Prepare delta completion documentation
+        risks:
+        - description: Coverage gaps in verification artifacts
+          mitigation: Systematic review of IP-010 coverage block against actual tests
+        - description: Documentation drift from implementation
+          mitigation: Manual verification of all code examples in README
   DE-011:
     kind: delta
     status: in-progress

@@ -3,7 +3,7 @@ id: ISSUE-010
 name: Add path field to requirements JSON output for automation workflows
 created: '2025-11-02'
 updated: '2025-11-02'
-status: open
+status: resolved
 kind: issue
 categories: [enhancement, json-output]
 severity: p3
@@ -64,4 +64,3 @@ uv run spec-driver list requirements --json | jq '.items[0]'
 - [ ] Path field allows locating the spec file containing the requirement
 - [ ] Tests updated for new JSON structure
 - [ ] Formatters maintain backward compatibility where possible
-

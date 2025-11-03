@@ -3,7 +3,7 @@ id: ISSUE-012
 name: Capture coverage artefacts separately from verified_by
 created: '2025-11-03'
 updated: '2025-11-03'
-status: open
+status: resolved
 kind: issue
 categories: []
 severity: p3

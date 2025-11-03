@@ -1,1 +1,12 @@
-policies: {}
+policies:
+  POL-001:
+    id: POL-001
+    title: 'POL-001: maximise code reuse, minimise sprawl'
+    status: draft
+    path: specify/policies/POL-001-maximise-code-reuse-minimise-sprawl.md
+    summary: ''
+    created: '2025-11-04'
+    updated: '2025-11-04'
+    reviewed: '2025-11-04'
+    tags:
+    - coding

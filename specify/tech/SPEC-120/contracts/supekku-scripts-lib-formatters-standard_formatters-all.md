@@ -36,7 +36,7 @@ Args:
   standard: StandardRecord to format
 
 Returns:
-  List of formatted cell values [id, title, status, updated]
+  List of formatted cell values [id, title, tags, status, updated]
 - `format_standard_details(standard) -> str`: Format standard details as multi-line string for display.
 
 Args:

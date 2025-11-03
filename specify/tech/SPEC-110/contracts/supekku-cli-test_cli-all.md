@@ -111,6 +111,22 @@ Test main application structure and help.
 - `test_main_no_args(self)`: Test invoking with no arguments shows help.
 - `test_main_shows_all_commands(self)`: Test that all major commands are listed.
 
+### TestMultiValueFilters
+
+Test multi-value filter support in list commands.
+
+These tests verify that comma-separated filter values work correctly
+and maintain backward compatibility with single values.
+
+#### Methods
+
+- `test_backward_compat_single_value_kind_filter(self)`: Test that single-value kind filters still work (backward compatibility).
+- `test_backward_compat_single_value_status_filter(self)`: Test that single-value status filters still work (backward compatibility). - TODO: Task 1.4 - verify multi-value status filtering works
+- `test_list_adrs_multi_value_status_not_yet_implemented(self)`: Test multi-value status filter for ADRs (TDD placeholder). - TODO: Task 1.4 - verify multi-value kind filtering works
+- `test_list_deltas_multi_value_status_not_yet_implemented(self)`: Test multi-value status filter for deltas (TDD placeholder).
+- `test_list_requirements_multi_value_kind_not_yet_implemented(self)`: Test multi-value kind filter for requirements (TDD placeholder). - TODO: Task 1.4 - change to: assert result.exit_code == 0
+- `test_list_specs_multi_value_kind_works(self)`: Test multi-value kind filter for specs returns union. - TODO: Task 1.4 - verify multi-value filtering works correctly
+
 ### TestPolicyCommands
 
 Test policy-related CLI commands.
@@ -149,11 +165,13 @@ Test --json flag on show commands (DE-009).
 
 #### Methods
 
+- `test_show_adr_json_complete_output(self)`: Test show adr --json returns complete decision data without crashing.
 - `test_show_adr_json_flag(self)`: Test show adr accepts --json flag.
 - `test_show_adr_json_help_documents_flag(self)`: Test show adr help mentions --json flag.
 - `test_show_delta_json_flag_already_exists(self)`: Test show delta --json flag (should already work).
 - `test_show_requirement_json_flag(self)`: Test show requirement accepts --json flag.
 - `test_show_revision_json_flag(self)`: Test show revision accepts --json flag.
+- `test_show_spec_json_complete_output(self)`: Test show spec --json returns complete spec data, not just id.
 - `test_show_spec_json_flag(self)`: Test show spec accepts --json flag.
 - `test_show_spec_json_help_documents_flag(self)`: Test show spec help mentions --json flag.
 

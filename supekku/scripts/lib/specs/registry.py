@@ -50,6 +50,22 @@ class SpecRegistry:
     """Find all specs that reference the given package."""
     return [spec for spec in self._specs.values() if package in spec.packages]
 
+  def find_by_informed_by(self, adr_id: str | None) -> list[Spec]:
+    """Find specs informed by a specific ADR.
+
+    Args:
+      adr_id: The ADR ID to search for (e.g., "ADR-001").
+              Returns empty list if None or empty string.
+
+    Returns:
+      List of Spec objects informed by the given ADR.
+      Returns empty list if adr_id is None, empty, or no matches found.
+    """
+    if not adr_id:
+      return []
+
+    return [spec for spec in self._specs.values() if adr_id in spec.informed_by]
+
   # ------------------------------------------------------------------
   def _load_directory(
     self,

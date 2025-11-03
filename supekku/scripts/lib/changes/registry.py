@@ -92,5 +92,33 @@ class ChangeRegistry:
     text = yaml.safe_dump(serialised, sort_keys=False)
     self.output_path.write_text(text, encoding="utf-8")
 
+  def find_by_implements(self, requirement_id: str | None) -> list[ChangeArtifact]:
+    """Find change artifacts that implement a specific requirement.
+
+    Args:
+      requirement_id: The requirement ID to search for (e.g., "PROD-010.FR-004").
+                      Returns empty list if None or empty string.
+
+    Returns:
+      List of ChangeArtifact objects that implement the given requirement.
+      Returns empty list if requirement_id is None, empty, or no matches found.
+    """
+    if not requirement_id:
+      return []
+
+    artifacts = self.collect()
+    matches: list[ChangeArtifact] = []
+
+    for artifact in artifacts.values():
+      # Check applies_to field - it's a dict with 'requirements' and 'specs' keys
+      if not artifact.applies_to:
+        continue
+
+      requirements = artifact.applies_to.get("requirements", [])
+      if requirement_id in requirements:
+        matches.append(artifact)
+
+    return matches
+
 
 __all__ = ["ChangeRegistry"]

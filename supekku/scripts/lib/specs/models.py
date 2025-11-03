@@ -49,6 +49,22 @@ class Spec:
     """Return the status of this spec (e.g., 'draft', 'active')."""
     return str(self.frontmatter.data.get("status", "draft"))
 
+  @property
+  def informed_by(self) -> list[str]:
+    """Return list of ADR IDs that inform this spec."""
+    informed_by = self.frontmatter.data.get("informed_by", [])
+    if isinstance(informed_by, Iterable) and not isinstance(informed_by, (str, bytes)):
+      return [str(item) for item in informed_by]
+    return []
+
+  @property
+  def tags(self) -> list[str]:
+    """Return list of tags for this spec."""
+    tags = self.frontmatter.data.get("tags", [])
+    if isinstance(tags, Iterable) and not isinstance(tags, (str, bytes)):
+      return [str(item) for item in tags]
+    return []
+
   def to_dict(self, root: Path) -> dict[str, str | list[str]]:
     """Convert to dictionary for JSON serialization.
 

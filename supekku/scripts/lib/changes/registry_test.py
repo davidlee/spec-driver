@@ -205,7 +205,7 @@ class TestChangeRegistryReverseQueries(RepoTestCase):
 
     # Verify delta has expected attributes from ChangeArtifact
     assert delta.id == "DE-101"
-    assert hasattr(delta, "metadata")
+    assert hasattr(delta, "applies_to")
     assert hasattr(delta, "status")
     assert delta.status == "in-progress"
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import fnmatch
 import logging
 import re
 import sys
@@ -1135,6 +1136,39 @@ class RequirementsRegistry:
       msg = f"Requirement {uid} not found"
       raise KeyError(msg) from exc
     record.status = status
+
+  def find_by_verified_by(
+    self, artifact_pattern: str | None
+  ) -> list[RequirementRecord]:
+    """Find requirements verified by specific artifact(s) using glob patterns.
+
+    Searches both verified_by and coverage_evidence fields.
+
+    Args:
+      artifact_pattern: Artifact ID or glob pattern (e.g., "VT-CLI-001" or "VT-*").
+                        Returns empty list if None or empty string.
+
+    Returns:
+      List of RequirementRecord objects verified by matching artifacts.
+      Returns empty list if artifact_pattern is None, empty, or no matches found.
+    """
+
+    if not artifact_pattern:
+      return []
+
+    matches: list[RequirementRecord] = []
+
+    for record in self.records.values():
+      # Combine both verified_by and coverage_evidence fields
+      all_artifacts = (record.verified_by or []) + (record.coverage_evidence or [])
+
+      # Check if any artifact matches the pattern
+      for artifact_id in all_artifacts:
+        if fnmatch.fnmatch(artifact_id, artifact_pattern):
+          matches.append(record)
+          break  # Only add each requirement once
+
+    return sorted(matches, key=lambda r: r.uid)
 
 
 __all__ = [

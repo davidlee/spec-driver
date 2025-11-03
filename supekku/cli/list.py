@@ -101,6 +101,13 @@ def list_specs(
       help="Filter specs whose packages include PATH",
     ),
   ] = None,
+  informed_by: Annotated[
+    str | None,
+    typer.Option(
+      "--informed-by",
+      help="Filter by ADR ID (e.g., ADR-001)",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -131,6 +138,7 @@ def list_specs(
 
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID, slug, and name fields.
+  The --informed-by flag filters by ADR ID (reverse relationship query).
   """
   # --json flag overrides --format
   if json_output:
@@ -190,7 +198,11 @@ def list_specs(
         except ValueError:
           package_filters.append(base.as_posix().lower())
 
-    specs = registry.all_specs()
+    # Apply reverse relationship query first (if specified)
+    if informed_by:
+      specs = registry.find_by_informed_by(informed_by)
+    else:
+      specs = registry.all_specs()
 
     # Apply status filter (multi-value OR logic)
     if status:
@@ -297,6 +309,13 @@ def list_deltas(
       help=f"Filter by status. Valid: {', '.join(sorted(VALID_STATUSES))}",
     ),
   ] = None,
+  implements: Annotated[
+    str | None,
+    typer.Option(
+      "--implements",
+      help="Filter by requirement ID (e.g., PROD-010.FR-004)",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -320,6 +339,7 @@ def list_deltas(
   """List deltas with optional filtering and status grouping.
 
   The --regexp flag filters on ID, name, and slug fields.
+  The --implements flag filters by requirement ID (reverse relationship query).
   """
   # --json flag overrides --format
   if json_output:
@@ -336,6 +356,14 @@ def list_deltas(
 
     if not artifacts:
       raise typer.Exit(EXIT_SUCCESS)
+
+    # Apply reverse relationship query first (if specified)
+    if implements:
+      filtered_by_implements = registry.find_by_implements(implements)
+      # Convert to dict for consistent filtering below
+      artifacts = {a.id: a for a in filtered_by_implements}
+      if not artifacts:
+        raise typer.Exit(EXIT_SUCCESS)
 
     delta_ids = set(ids) if ids else None
 
@@ -975,6 +1003,13 @@ def list_requirements(
     str | None,
     typer.Option("--category", "-c", help="Filter by category (substring match)"),
   ] = None,
+  verified_by: Annotated[
+    str | None,
+    typer.Option(
+      "--verified-by",
+      help="Filter by verification artifact (supports glob patterns, e.g., 'VT-*')",
+    ),
+  ] = None,
   substring: Annotated[
     str | None,
     typer.Option(
@@ -1000,6 +1035,7 @@ def list_requirements(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on UID, label, title, and category fields.
   The --category flag does substring matching on category field.
+  The --verified-by flag filters by verification artifact (supports glob patterns).
   Use --case-insensitive (-i) to make regexp and category filters case-insensitive.
   """
   # --json flag overrides --format
@@ -1021,7 +1057,11 @@ def list_requirements(
     registry_path = get_registry_dir(repo_root) / "requirements.yaml"
     registry = RequirementsRegistry(registry_path)
 
-    requirements = list(registry.records.values())
+    # Apply reverse relationship query first (if specified)
+    if verified_by:
+      requirements = registry.find_by_verified_by(verified_by)
+    else:
+      requirements = list(registry.records.values())
 
     # Apply filters
     if spec:

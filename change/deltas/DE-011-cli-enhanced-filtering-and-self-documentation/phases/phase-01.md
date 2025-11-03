@@ -253,7 +253,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Research existing patterns | [ ] |  |
+| [x] | 1.1 | Research existing patterns | [ ] | Completed - see Section 10 |
 | [ ] | 1.2 | Create core/filters.py module | [ ] | After 1.1 |
 | [ ] | 1.3 | Write multi-value filter tests | [x] | Can parallelize with 1.5 |
 | [ ] | 1.4 | Implement multi-value filters | [ ] | After 1.3 |
@@ -270,7 +270,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 
 ### Task Details
 
-#### **1.1 Research existing patterns**
+#### **1.1 Research existing patterns** ✅
 - **Design / Approach**:
   - Review current filter implementations in `list deltas`, `list adrs`, `list requirements`
   - Examine registry query methods in `ChangeRegistry`, `SpecRegistry`, `RequirementRegistry`
@@ -284,8 +284,12 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - `supekku/scripts/lib/requirements/registry.py` - RequirementRegistry query methods
   - `.spec-driver/registry/*.yaml` - registry YAML structures
 - **Testing**: No tests for research phase
-- **Observations & AI Notes**: *Record findings here*
-- **Commits / References**: N/A
+- **Observations & AI Notes**:
+  - All findings documented in Section 10
+  - Key decision: `--verified-by` should search BOTH `verified_by` and `coverage_evidence` fields
+  - DecisionRegistry.filter() provides excellent pattern for reverse queries
+  - Python fnmatch confirmed as glob library choice
+- **Commits / References**: Phase sheet updated with research findings
 
 #### **1.2 Create core/filters.py module**
 - **Design / Approach**:
@@ -540,13 +544,50 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 *(Use for code spelunking results, pattern discoveries, reference links)*
 
 **Existing Filter Patterns**:
-- TBD: Document current filter implementations after research
+- **Single-value status filters**: All list commands use simple string comparison
+  - `list_deltas`: `normalize_status(artifact.status) != normalize_status(status)` - line 331
+  - `list_requirements`: `r.status.lower() == status.lower()` - line 985
+  - `list_adrs`: Uses `DecisionRegistry.iter(status=status)` - line 651
+- **String matching**: No comma-separated parsing exists yet
+- **Regexp filters**: Implemented consistently across commands with `matches_regexp()` helper
+- **Filter combination**: AND logic (all filters must match)
 
 **Registry Query Methods**:
-- TBD: Document existing registry query patterns
+- **ChangeRegistry** (registry.py:30-92):
+  - `collect()` - returns dict of artifacts
+  - No filtering methods - filtering done in CLI layer
+- **RequirementsRegistry** (registry.py:128-1057):
+  - `search()` - substring matching on title/label (lines 1014-1043)
+  - No reverse relationship query methods exist yet
+  - `records` dict: key=uid (e.g., "PROD-001.FR-001")
+- **DecisionRegistry** (registry.py:112-393):
+  - `filter()` - relationship filtering (lines 298-328)
+  - Filters by: tag, spec, delta, requirement, policy
+  - Pattern: `if spec and spec not in decision.specs: matches = False`
+  - This is a good reference pattern for reverse queries!
 
 **Relationship Metadata Structure**:
-- TBD: Document metadata fields (delta.implements, requirement.verified_by, etc.)
+- **Delta registry** (deltas.yaml):
+  - `applies_to.requirements` - list of requirement IDs (e.g., PROD-005.FR-001)
+  - `applies_to.specs` - list of spec IDs
+  - Pattern: delta "implements" requirements
+- **Requirements registry** (requirements.yaml):
+  - `implemented_by` - list of delta IDs (empty in examples seen)
+  - `verified_by` - list of verification artifact IDs (e.g., AUD-001)
+  - `coverage_evidence` - list of test artifact IDs (e.g., VT-001)
+  - Note: Both `verified_by` and `coverage_evidence` could match verification artifacts!
+
+**Glob Pattern Support**:
+- Python standard library `fnmatch` is appropriate choice
+- Already used in codebase (found in sync adapters)
+- Pattern: `fnmatch.fnmatch(artifact_id, pattern)`
+
+**Key Insights**:
+1. No multi-value parsing exists - need to create utility
+2. DecisionRegistry.filter() provides good pattern for reverse queries
+3. Requirements have TWO fields for verification: `verified_by` and `coverage_evidence`
+4. Need to decide: should `--verified-by` search both fields or just one?
+5. Verification coverage blocks are separate from registry - stored in spec/plan content
 
 ## 11. Wrap-up Checklist
 

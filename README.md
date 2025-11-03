@@ -19,8 +19,9 @@ Specification-driven development toolkit with multi-language spec sync and docum
 
 - **Multi-language spec sync**: Automatically sync specifications with Go, Python & TypeScript/JS codebases
 - **Architecture Decision Records (ADRs)**: Manage and track architectural decisions
+- **Policies & Standards**: Document hard rules (policies) and conventions (standards) with lifecycle management
 - **Delta/Change tracking**: Relate specification changes, requirements, deltas, implementation plans and revisions
-- **Documentation generation**: Generate compact, legible, deterministic markdown documentation from code 
+- **Documentation generation**: Generate compact, legible, deterministic markdown documentation from code
 - **Workspace validation**: Ensure consistency across specification artifacts
 - **Orphan detection**: Safely remove specs for deleted source files
 
@@ -180,6 +181,37 @@ spec-driver show adr ADR-001
 
 # Sync ADR registry
 spec-driver sync --adr
+```
+
+### Policies and Standards
+
+```bash
+# Create a policy (hard rule)
+spec-driver create policy "All code must have tests"
+
+# Create a standard (convention/default)
+spec-driver create standard "Use Google Python Style Guide"
+
+# List policies
+spec-driver list policies
+
+# List policies by status
+spec-driver list policies --status required
+
+# List standards with "default" status
+spec-driver list standards --status default
+
+# Show policy details
+spec-driver show policy POL-001
+
+# Show standard details
+spec-driver show standard STD-001
+
+# List ADRs that reference a policy
+spec-driver list adrs --policy POL-001
+
+# List ADRs that reference a standard
+spec-driver list adrs --standard STD-001
 ```
 
 ### Validation

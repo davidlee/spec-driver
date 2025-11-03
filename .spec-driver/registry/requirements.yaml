@@ -2125,3 +2125,82 @@ requirements:
     coverage_evidence:
     - VT-VALIDATOR-007
     path: specify/tech/SPEC-125/SPEC-125.md
+  SPEC-128.FR-001:
+    label: FR-001
+    title: Component MUST [specific technical capability]
+    specs:
+    - SPEC-128
+    primary_spec: SPEC-128
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-XXX
+    path: specify/tech/SPEC-128/SPEC-128.md
+  SPEC-128.FR-002:
+    label: FR-002
+    title: System MUST [integration or contract requirement]
+    specs:
+    - SPEC-128
+    primary_spec: SPEC-128
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-128/SPEC-128.md
+  SPEC-128.FR-003:
+    label: FR-003
+    title: Component MUST [data handling or state management]
+    specs:
+    - SPEC-128
+    primary_spec: SPEC-128
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-128/SPEC-128.md
+  SPEC-128.NF-001:
+    label: NF-001
+    title: '[Performance constraint with specific metrics]'
+    specs:
+    - SPEC-128
+    primary_spec: SPEC-128
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-128/SPEC-128.md
+  SPEC-128.NF-002:
+    label: NF-002
+    title: '[Scalability or resource requirement]'
+    specs:
+    - SPEC-128
+    primary_spec: SPEC-128
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-128/SPEC-128.md
+  SPEC-128.NF-003:
+    label: NF-003
+    title: '[Reliability or fault tolerance]'
+    specs:
+    - SPEC-128
+    primary_spec: SPEC-128
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-128/SPEC-128.md

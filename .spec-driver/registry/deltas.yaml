@@ -1609,3 +1609,62 @@ deltas:
         risks: []
       - id: IP-012.PHASE-02
         phase: IP-012.PHASE-02
+  DE-013:
+    kind: delta
+    status: completed
+    name: Delta - add design artefacts to delta package
+    slug: add-design-artefacts-to-delta-package
+    updated: '2025-11-04'
+    path: change/deltas/DE-013-add-design-artefacts-to-delta-package/DE-013.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-013
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-013
+        delta: DE-013
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-013.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-013.PHASE-01
+        plan: IP-013
+        delta: DE-013
+        objective: Validate design revision schema expectations and capture the automation
+          approach.
+        entrance_criteria:
+        - Delta DE-013 approved for planning.
+        - Frontmatter schema reference available locally.
+        exit_criteria:
+        - Template requirements captured in plan.
+        - Implementation steps documented and approved.
+        verification:
+          tests:
+          - Inspect schema via `uv run spec-driver schema show frontmatter.design_revision`.
+          evidence:
+          - Notes recorded in plan and phase log.
+        tasks:
+        - id: 1
+          description: Review glossary + schema requirements for design revision.
+          status: done
+        - id: 2
+          description: Define template sections + metadata expectations.
+          status: done
+        - id: 3
+          description: Outline implementation/testing steps in plan.
+          status: done
+        risks:
+        - description: Template misses required schema field.
+          mitigation: Cross-check schema output, capture TODOs explicitly.

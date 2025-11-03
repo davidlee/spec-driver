@@ -1088,9 +1088,7 @@ def list_requirements(
       if case_insensitive:
         category_lower = category.lower()
         requirements = [
-          r
-          for r in requirements
-          if r.category and category_lower in r.category.lower()
+          r for r in requirements if r.category and category_lower in r.category.lower()
         ]
       else:
         requirements = [
@@ -1252,6 +1250,13 @@ def list_backlog(
       help="Substring filter on title (case-insensitive)",
     ),
   ] = None,
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -1284,6 +1289,10 @@ def list_backlog(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID and title fields.
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   if kind not in ["issue", "problem", "improvement", "risk", "all"]:
     typer.echo(f"Error: invalid kind: {kind}", err=True)
     raise typer.Exit(EXIT_FAILURE)
@@ -1392,6 +1401,13 @@ def list_issues(
       help="Substring filter on title (case-insensitive)",
     ),
   ] = None,
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -1401,6 +1417,10 @@ def list_issues(
 
   Shortcut for: list backlog --kind issue
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   list_backlog(
     root=root,
     kind="issue",
@@ -1428,6 +1448,13 @@ def list_problems(
       help="Substring filter on title (case-insensitive)",
     ),
   ] = None,
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -1437,6 +1464,10 @@ def list_problems(
 
   Shortcut for: list backlog --kind problem
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   list_backlog(
     root=root,
     kind="problem",
@@ -1464,6 +1495,13 @@ def list_improvements(
       help="Substring filter on title (case-insensitive)",
     ),
   ] = None,
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -1473,6 +1511,10 @@ def list_improvements(
 
   Shortcut for: list backlog --kind improvement
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   list_backlog(
     root=root,
     kind="improvement",
@@ -1500,6 +1542,13 @@ def list_risks(
       help="Substring filter on title (case-insensitive)",
     ),
   ] = None,
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -1509,6 +1558,10 @@ def list_risks(
 
   Shortcut for: list backlog --kind risk
   """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
   list_backlog(
     root=root,
     kind="risk",

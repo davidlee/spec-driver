@@ -677,6 +677,186 @@ requirements:
     # Total extracted: 2 from SPEC-001, 3 from SPEC-002, 4 from SPEC-003
     assert stats.created == 9
 
+  def test_category_parsing_inline_syntax(self) -> None:
+    """VT-017-001: Test category extraction from inline syntax."""
+    root = self._make_repo()
+
+    # Test various inline category formats
+    category_body = (
+      "# SPEC-004\n\n"
+      "## 6. Requirements\n\n"
+      "- **FR-001**(auth): Authentication requirement\n"
+      "- **FR-002**(security/auth): Nested category with slash\n"
+      "- **NF-001**(perf.db): Category with dot delimiter\n"
+      "- **FR-003**( whitespace ): Category with whitespace\n"
+      "- **FR-004**: No category\n"
+      "- **SPEC-004.FR-005**(storage): Qualified with category\n"
+    )
+    self._write_spec(root, "SPEC-004", category_body)
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+    spec_registry.reload()
+
+    _stats = registry.sync_from_specs(
+      [root / "specify" / "tech"],
+      spec_registry=spec_registry,
+    )
+    registry.save()
+
+    # Verify inline categories extracted correctly
+    fr001 = registry.records["SPEC-004.FR-001"]
+    assert fr001.category == "auth"
+    assert fr001.title == "Authentication requirement"
+
+    fr002 = registry.records["SPEC-004.FR-002"]
+    assert fr002.category == "security/auth"
+
+    nf001 = registry.records["SPEC-004.NF-001"]
+    assert nf001.category == "perf.db"
+
+    # Whitespace should be stripped
+    fr003 = registry.records["SPEC-004.FR-003"]
+    assert fr003.category == "whitespace"
+
+    # No category should be None
+    fr004 = registry.records["SPEC-004.FR-004"]
+    assert fr004.category is None
+
+    # Qualified format with category
+    fr005 = registry.records["SPEC-004.FR-005"]
+    assert fr005.category == "storage"
+
+  def test_category_parsing_frontmatter(self) -> None:
+    """VT-017-001: Test category extraction from frontmatter."""
+    root = self._make_repo()
+
+    # Create spec with frontmatter category
+    spec_dir = root / "specify" / "tech" / "spec-005-example"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / "SPEC-005.md"
+    frontmatter = {
+      "id": "SPEC-005",
+      "slug": "spec-005",
+      "name": "Spec with frontmatter category",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+      "category": "security",
+    }
+    body = (
+      "# SPEC-005\n\n"
+      "## 6. Requirements\n\n"
+      "- **FR-001**: Requirement inherits frontmatter category\n"
+      "- **FR-002**(auth): Inline category overrides frontmatter\n"
+    )
+    dump_markdown_file(spec_path, frontmatter, body)
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+    spec_registry.reload()
+
+    _stats = registry.sync_from_specs(
+      [root / "specify" / "tech"],
+      spec_registry=spec_registry,
+    )
+    registry.save()
+
+    # Verify frontmatter category inheritance
+    fr001 = registry.records["SPEC-005.FR-001"]
+    assert fr001.category == "security"
+
+    # Verify inline category takes precedence over frontmatter
+    fr002 = registry.records["SPEC-005.FR-002"]
+    assert fr002.category == "auth"
+
+  def test_category_merge_precedence(self) -> None:
+    """VT-017-002: Test category merge with body precedence."""
+    # Create two RequirementRecords and test merge behavior
+    existing = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Existing requirement",
+      primary_spec="SPEC-001",
+      category="existing-category",
+      status=STATUS_ACTIVE,
+    )
+
+    # Test 1: New record has category (should override)
+    new_with_category = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Updated requirement",
+      primary_spec="SPEC-001",
+      category="new-category",
+    )
+    merged = existing.merge(new_with_category)
+    assert merged.category == "new-category"
+
+    # Test 2: New record has no category (should keep existing)
+    new_without_category = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Updated requirement",
+      primary_spec="SPEC-001",
+      category=None,
+    )
+    merged = existing.merge(new_without_category)
+    assert merged.category == "existing-category"
+
+    # Test 3: Neither has category
+    no_category_1 = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="No category 1",
+      primary_spec="SPEC-001",
+      category=None,
+    )
+    no_category_2 = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="No category 2",
+      primary_spec="SPEC-001",
+      category=None,
+    )
+    merged = no_category_1.merge(no_category_2)
+    assert merged.category is None
+
+  def test_category_serialization_round_trip(self) -> None:
+    """VT-017-002: Test category survives serialization round-trip."""
+    record = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Test requirement",
+      primary_spec="SPEC-001",
+      category="test-category",
+    )
+
+    # Serialize to dict
+    data = record.to_dict()
+    assert data["category"] == "test-category"
+
+    # Deserialize from dict
+    restored = RequirementRecord.from_dict("SPEC-001.FR-001", data)
+    assert restored.category == "test-category"
+
+    # Test with None category
+    record_no_cat = RequirementRecord(
+      uid="SPEC-001.FR-002",
+      label="FR-002",
+      title="No category",
+      primary_spec="SPEC-001",
+      category=None,
+    )
+    data_no_cat = record_no_cat.to_dict()
+    assert data_no_cat["category"] is None
+
+    restored_no_cat = RequirementRecord.from_dict("SPEC-001.FR-002", data_no_cat)
+    assert restored_no_cat.category is None
+
 
 if __name__ == "__main__":
   unittest.main()

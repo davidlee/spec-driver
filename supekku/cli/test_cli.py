@@ -850,6 +850,7 @@ class TestMultiValueFilters:
     assert result.exit_code == 0, f"Command failed: {result.stdout}"
 
     import json
+
     data = json.loads(result.stdout)
     items = data.get("items", [])
 

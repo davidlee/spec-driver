@@ -341,7 +341,9 @@ def list_deltas(
 
     # Parse multi-value status filter
     status_values = parse_multi_value_filter(status)
-    status_normalized = [normalize_status(s) for s in status_values] if status_values else []
+    status_normalized = (
+      [normalize_status(s) for s in status_values] if status_values else []
+    )
 
     # Apply filters
     filtered_artifacts = []
@@ -350,7 +352,9 @@ def list_deltas(
       if delta_ids is not None and artifact.id not in delta_ids:
         continue
       # Check status filter (multi-value OR logic)
-      if status_normalized and normalize_status(artifact.status) not in status_normalized:
+      if (
+        status_normalized and normalize_status(artifact.status) not in status_normalized
+      ):
         continue
       # Check regexp filter on id, name, slug
       if regexp:
@@ -493,7 +497,7 @@ def list_changes(
 
   try:
     # Multi-value kind filter - expand "all" or use parsed values
-    kinds = ["delta", "revision", "audit"] if not kind_values else kind_values
+    kinds = kind_values if kind_values else ["delta", "revision", "audit"]
     all_artifacts = []
 
     # Parse multi-value status filter
@@ -1028,7 +1032,8 @@ def list_requirements(
       kind_values = parse_multi_value_filter(kind)
       kind_prefixes = [k.upper() for k in kind_values]
       requirements = [
-        r for r in requirements
+        r
+        for r in requirements
         if any(r.label.startswith(prefix) for prefix in kind_prefixes)
       ]
     if substring:
@@ -1114,9 +1119,11 @@ def list_revisions(
     registry = ChangeRegistry(root=root, kind="revision")
     revisions = list(registry.collect().values())
 
-    # Apply filters
+    # Apply filters (multi-value status OR logic)
     if status:
-      revisions = [r for r in revisions if r.status.lower() == status.lower()]
+      status_values = parse_multi_value_filter(status)
+      status_normalized = [s.lower() for s in status_values]
+      revisions = [r for r in revisions if r.status.lower() in status_normalized]
     if spec:
       spec_upper = spec.upper()
       revisions = [

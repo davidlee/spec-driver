@@ -605,6 +605,78 @@ requirements:
     assert "VT-901" in fr002.coverage_evidence
     assert fr002.verified_by == []
 
+  def test_qualified_requirement_format(self) -> None:
+    """Test extraction of requirements with fully-qualified IDs (SPEC-XXX.FR-001)."""
+    root = self._make_repo()
+
+    # Create spec with qualified format (as used in PROD-010, SPEC-110, etc.)
+    qualified_body = (
+      "# SPEC-002\n\n"
+      "## 3. Requirements\n\n"
+      "**Priority 1: Critical**\n\n"
+      "- **SPEC-002.FR-001**: All list commands MUST support JSON output\n"
+      "- **SPEC-002.FR-002**: System MUST validate input schemas\n"
+      "- **SPEC-002.NF-001**: Commands MUST complete in <2 seconds\n"
+    )
+    self._write_spec(root, "SPEC-002", qualified_body)
+
+    # Also test mixed format in same file
+    mixed_body = (
+      "# SPEC-003\n\n"
+      "## Legacy format\n\n"
+      "- **FR-001**: Short format requirement\n"
+      "- **NF-001**: Short format non-functional\n\n"
+      "## New format\n\n"
+      "- **SPEC-003.FR-002**: Qualified format requirement\n"
+      "- **SPEC-003.NF-002**: Qualified format non-functional\n"
+    )
+    self._write_spec(root, "SPEC-003", mixed_body)
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+    spec_registry.reload()
+
+    stats = registry.sync_from_specs(
+      [root / "specify" / "tech"],
+      spec_registry=spec_registry,
+    )
+    registry.save()
+
+    # Verify SPEC-002 qualified requirements extracted
+    assert "SPEC-002.FR-001" in registry.records
+    assert "SPEC-002.FR-002" in registry.records
+    assert "SPEC-002.NF-001" in registry.records
+
+    fr001 = registry.records["SPEC-002.FR-001"]
+    assert fr001.label == "FR-001"
+    assert fr001.title == "All list commands MUST support JSON output"
+    assert fr001.kind == "functional"
+
+    nf001 = registry.records["SPEC-002.NF-001"]
+    assert nf001.label == "NF-001"
+    assert nf001.kind == "non-functional"
+
+    # Verify SPEC-003 mixed format works
+    assert "SPEC-003.FR-001" in registry.records  # Short format
+    assert "SPEC-003.FR-002" in registry.records  # Qualified format
+    assert "SPEC-003.NF-001" in registry.records  # Short format
+    assert "SPEC-003.NF-002" in registry.records  # Qualified format
+
+    # All should have correct spec association
+    for uid in [
+      "SPEC-003.FR-001",
+      "SPEC-003.FR-002",
+      "SPEC-003.NF-001",
+      "SPEC-003.NF-002",
+    ]:
+      record = registry.records[uid]
+      assert record.primary_spec == "SPEC-003"
+      assert "SPEC-003" in record.specs
+
+    # Total extracted: 2 from SPEC-001, 3 from SPEC-002, 4 from SPEC-003
+    assert stats.created == 9
+
 
 if __name__ == "__main__":
   unittest.main()

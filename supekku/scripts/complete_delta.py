@@ -57,7 +57,7 @@ def prompt_yes_no(question: str, default: bool = False) -> bool:
 
 
 def validate_delta_status(
-  _delta_id: str,
+  delta_id: str,
   delta,
   force: bool,
   dry_run: bool,
@@ -69,13 +69,15 @@ def validate_delta_status(
   if delta.status == "completed":
     return True, True
 
-  if (
-    delta.status != "draft"
-    and not force
-    and not dry_run
-    and not prompt_yes_no("Continue anyway?", default=False)
-  ):
-    return False, False
+  # Accept draft and in-progress as valid completion states
+  valid_statuses = {"draft", "in-progress"}
+  if delta.status not in valid_statuses and not force and not dry_run:
+    # Unexpected status - prompt with explanation
+    print(f"Warning: Delta {delta_id} has unexpected status '{delta.status}'")
+    print("Expected status: draft or in-progress")
+    if not prompt_yes_no("Complete anyway?", default=False):
+      return False, False
+
   return True, False
 
 

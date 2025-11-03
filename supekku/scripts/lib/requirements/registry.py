@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import sys
 from collections import defaultdict
@@ -41,8 +42,14 @@ if TYPE_CHECKING:
 
   from supekku.scripts.lib.specs.registry import SpecRegistry
 
+logger = logging.getLogger(__name__)
+
+# Updated pattern to support both formats:
+# - **FR-001**: Short format (legacy)
+# - **PROD-010.FR-001**: Fully-qualified format (current standard)
 _REQUIREMENT_LINE = re.compile(
-  r"^\s*[-*]\s*\*{0,2}\s*(FR|NF)-(\d{3})\s*\*{0,2}\s*[:\-–]\s*(.+)$",
+  r"^\s*[-*]\s*\*{0,2}\s*(?:[A-Z]+-\d{3}\.)?("
+  r"FR|NF)-(\d{3})\s*\*{0,2}\s*[:\-–]\s*(.+)$",
   re.IGNORECASE,
 )
 
@@ -304,6 +311,11 @@ class RequirementsRegistry:
           verified_by=sorted(set(record.verified_by)),
           path=record.path,
         )
+
+    # Validation: warn about specs with no extracted requirements
+    if spec_registry:
+      self._validate_extraction(spec_registry, seen)
+
     return stats
 
   def _iter_spec_files(self, spec_dirs: Iterable[Path]) -> Iterator[Path]:
@@ -316,6 +328,35 @@ class RequirementsRegistry:
         for file in subdir.glob("*.md"):
           if file.name.startswith("SPEC-") or file.name.startswith("PROD-"):
             yield file
+
+  def _validate_extraction(
+    self,
+    spec_registry: SpecRegistry,
+    seen: set[str],
+  ) -> None:
+    """Validate extraction results and warn about potential issues.
+
+    Checks for specs with zero extracted requirements, which may indicate
+    format issues or extraction failures.
+    """
+    for spec in spec_registry.all_specs():
+      # Skip non-product/tech specs (like policies, standards)
+      if spec.kind not in ("prod", "tech"):
+        continue
+
+      # Count requirements extracted from this spec
+      extracted = [uid for uid in seen if uid.startswith(f"{spec.id}.")]
+
+      if len(extracted) == 0:
+        print(
+          f"WARNING: Spec {spec.id} ({spec.kind}) has 0 extracted requirements. "
+          f"Check requirement format in {spec.path.name}",
+          file=sys.stderr,
+        )
+        logger.warning(
+          "Spec %s has no extracted requirements - possible format mismatch",
+          spec.id,
+        )
 
   def _apply_delta_relations(
     self,
@@ -926,14 +967,28 @@ class RequirementsRegistry:
     spec_path: Path,
     repo_root: Path,
   ) -> Iterator[RequirementRecord]:
+    """Extract requirement records from spec body content.
+
+    Logs warnings if requirement-like lines are found but not extracted.
+    """
     try:
       path = spec_path.relative_to(repo_root).as_posix()
     except ValueError:
       path = spec_path.as_posix()
+
+    requirement_like_lines = []
+    extracted_count = 0
+
     for line in body.splitlines():
+      # Track lines that look like requirements for diagnostics
+      if re.search(r"\b(FR|NF)-\d{3}\b", line, re.IGNORECASE):
+        requirement_like_lines.append(line.strip())
+
       match = _REQUIREMENT_LINE.match(line)
       if not match:
         continue
+
+      extracted_count += 1
       prefix, number, title = match.groups()
       label = f"{prefix.upper()}-{number}"
       uid = f"{spec_id}.{label}"
@@ -947,6 +1002,17 @@ class RequirementsRegistry:
         kind=kind,
         status=STATUS_PENDING,
         path=path,
+      )
+
+    # Warn if we found requirement-like lines but extracted none
+    if requirement_like_lines and extracted_count == 0:
+      logger.warning(
+        "Spec %s at %s: Found %d requirement-like lines but extracted 0. "
+        "First line: %s",
+        spec_id,
+        spec_path.name,
+        len(requirement_like_lines),
+        requirement_like_lines[0][:80],
       )
 
   def _requirements_from_spec(

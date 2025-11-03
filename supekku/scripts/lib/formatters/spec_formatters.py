@@ -107,7 +107,7 @@ def format_spec_list_table(
     return format_as_tsv(rows)
 
   # table format
-  columns = ["ID", "Name", "Status"]
+  columns = ["ID", "Name", "Tags", "Status"]
   if include_packages:
     columns.append("Packages")
 
@@ -120,10 +120,15 @@ def format_spec_list_table(
   for spec in specs:
     # Apply styling
     styled_id = f"[spec.id]{spec.id}[/spec.id]"
+
+    # Format tags as comma-separated list with styling
+    tags = ", ".join(spec.tags) if spec.tags else ""
+    tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
+
     status_style = get_spec_status_style(spec.status)
     styled_status = f"[{status_style}]{spec.status}[/{status_style}]"
 
-    row_data = [styled_id, spec.name, styled_status]
+    row_data = [styled_id, spec.name, tags_styled, styled_status]
     if include_packages:
       row_data.append(format_package_list(spec.packages))
 

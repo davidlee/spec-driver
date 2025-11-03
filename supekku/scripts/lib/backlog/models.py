@@ -17,6 +17,7 @@ class BacklogItem:
   title: str
   path: Path
   frontmatter: dict[str, Any] = field(default_factory=dict)
+  tags: list[str] = field(default_factory=list)
   # Kind-specific optional fields
   severity: str = ""
   categories: list[str] = field(default_factory=list)

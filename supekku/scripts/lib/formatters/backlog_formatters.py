@@ -49,37 +49,51 @@ def format_backlog_list_table(
       rows.append([item.id, item.kind, item.status, item.title, severity])
     return format_as_tsv(rows)
 
-  # table format - columns: ID, Kind, Status, Title, Severity
+  # table format - columns: ID, Kind, Title, Tags, Status, Severity
   table = create_table(
-    columns=["ID", "Kind", "Status", "Title", "Severity"],
+    columns=["ID", "Kind", "Title", "Tags", "Status", "Severity"],
     title="Backlog Items",
   )
 
   terminal_width = get_terminal_width()
 
-  # Custom column widths: ID (12), Kind (12), Status (12), Severity (10), rest for Title
+  # Custom column widths: ID (12), Kind (12), Tags (20), Status (12),
+  # Severity (10), rest for Title
   # Reserve space for borders/padding (~10 chars total)
   reserved = 10
   id_width = 12
   kind_width = 12
+  tags_width = 20
   status_width = 12
   severity_width = 10
   title_width = max(
-    terminal_width - id_width - kind_width - status_width - severity_width - reserved,
+    terminal_width
+    - id_width
+    - kind_width
+    - tags_width
+    - status_width
+    - severity_width
+    - reserved,
     20,  # minimum title width
   )
 
   max_widths = {
     0: id_width,
     1: kind_width,
-    2: status_width,
-    3: title_width,
-    4: severity_width,
+    2: title_width,
+    3: tags_width,
+    4: status_width,
+    5: severity_width,
   }
 
   for item in items:
     # Apply styling with rich markup
     item_id = f"[backlog.id]{item.id}[/backlog.id]"
+
+    # Format tags as comma-separated list with styling
+    tags = ", ".join(item.tags) if item.tags else ""
+    tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
+
     status_style = get_backlog_status_style(item.kind, item.status)
     status_styled = f"[{status_style}]{item.status}[/{status_style}]"
 
@@ -88,7 +102,7 @@ def format_backlog_list_table(
 
     add_row_with_truncation(
       table,
-      [item_id, item.kind, status_styled, item.title, severity],
+      [item_id, item.kind, item.title, tags_styled, status_styled, severity],
       max_widths=max_widths if truncate else None,
     )
 

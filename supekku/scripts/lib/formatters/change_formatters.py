@@ -143,22 +143,27 @@ def format_change_list_table(
 
   # table format
   table = create_table(
-    columns=["ID", "Status", "Name"],
+    columns=["ID", "Name", "Tags", "Status"],
     title="Change Artifacts",
   )
 
   terminal_width = get_terminal_width()
-  max_widths = calculate_column_widths(terminal_width, num_columns=3)
+  max_widths = calculate_column_widths(terminal_width, num_columns=4)
 
   for change in changes:
     # Apply styling
     styled_id = f"[change.id]{change.id}[/change.id]"
+
+    # Format tags as comma-separated list with styling
+    tags = ", ".join(change.tags) if change.tags else ""
+    tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
+
     status_style = get_change_status_style(change.status)
     styled_status = f"[{status_style}]{change.status}[/{status_style}]"
 
     add_row_with_truncation(
       table,
-      [styled_id, styled_status, change.name],
+      [styled_id, change.name, tags_styled, styled_status],
       max_widths=max_widths if not no_truncate else None,
     )
 

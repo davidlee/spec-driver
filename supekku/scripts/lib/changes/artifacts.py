@@ -33,6 +33,7 @@ class ChangeArtifact:
   slug: str
   path: Path
   updated: str | None
+  tags: list[str] = field(default_factory=list)
   applies_to: dict[str, Any] = field(default_factory=dict)
   relations: list[dict[str, Any]] = field(default_factory=list)
   plan: dict[str, Any] | None = None
@@ -95,6 +96,8 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
   name = str(frontmatter.get("name", artifact_id))
   slug = str(frontmatter.get("slug", artifact_id.lower()))
   updated = frontmatter.get("updated")
+  tags = frontmatter.get("tags", [])
+  tags_list = [str(tag) for tag in tags] if isinstance(tags, list) else []
   applies_to = frontmatter.get("applies_to")
   applies_to_mapping = dict(applies_to) if isinstance(applies_to, dict) else {}
   relations = [rel.__dict__ for rel in list_relations(path)]
@@ -200,6 +203,7 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
     slug=slug,
     path=path,
     updated=str(updated) if updated else None,
+    tags=tags_list,
     applies_to=applies_to_mapping,
     relations=relations,
     plan=plan_payload,

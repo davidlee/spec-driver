@@ -67,6 +67,7 @@ class RequirementRecord:
   kind: str = "functional"
   category: str | None = None
   status: RequirementStatus = STATUS_PENDING
+  tags: list[str] = field(default_factory=list)
   introduced: str | None = None
   implemented_by: list[str] = field(default_factory=list)
   verified_by: list[str] = field(default_factory=list)
@@ -84,6 +85,7 @@ class RequirementRecord:
       kind=other.kind or self.kind,
       category=other.category or self.category,
       status=self.status,
+      tags=sorted(set(self.tags) | set(other.tags)),
       introduced=self.introduced,
       implemented_by=list(self.implemented_by),
       verified_by=list(self.verified_by),
@@ -103,6 +105,7 @@ class RequirementRecord:
       "kind": self.kind,
       "category": self.category,
       "status": self.status,
+      "tags": self.tags,
       "introduced": self.introduced,
       "implemented_by": self.implemented_by,
       "verified_by": self.verified_by,
@@ -122,6 +125,7 @@ class RequirementRecord:
       kind=str(data.get("kind", "functional")),
       category=data.get("category"),
       status=str(data.get("status", STATUS_PENDING)),
+      tags=list(data.get("tags", [])),
       introduced=data.get("introduced"),
       implemented_by=list(data.get("implemented_by", [])),
       verified_by=list(data.get("verified_by", [])),

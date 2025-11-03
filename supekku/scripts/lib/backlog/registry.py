@@ -417,6 +417,7 @@ def discover_backlog_items(
           title=title,
           path=md_file,
           frontmatter=dict(frontmatter),
+          tags=list(frontmatter.get("tags", [])),
           severity=str(frontmatter.get("severity", "")),
           categories=list(frontmatter.get("categories", [])),
           impact=str(frontmatter.get("impact", "")),

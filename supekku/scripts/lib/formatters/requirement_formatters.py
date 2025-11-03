@@ -50,26 +50,28 @@ def format_requirement_list_table(
       rows.append([spec, req.label, category, req.title, req.status])
     return format_as_tsv(rows)
 
-  # table format - columns: Spec, Label, Category, Title, Status
+  # table format - columns: Spec, Label, Category, Title, Tags, Status
   table = create_table(
-    columns=["Spec", "Label", "Category", "Title", "Status"],
+    columns=["Spec", "Label", "Category", "Title", "Tags", "Status"],
     title="Requirements",
   )
 
   terminal_width = get_terminal_width()
 
-  # Custom column widths: Spec (10), Label (8), Category (12), Status (12)
+  # Custom column widths: Spec (10), Label (8), Category (12), Tags (20), Status (12)
   # Reserve space for borders/padding (~10 chars total), rest for Title
   reserved = 10
   spec_width = 10
   label_width = 8
   category_width = 12
+  tags_width = 20
   status_width = 12
   title_width = max(
     terminal_width
     - spec_width
     - label_width
     - category_width
+    - tags_width
     - status_width
     - reserved,
     20,  # minimum title width
@@ -80,7 +82,8 @@ def format_requirement_list_table(
     1: label_width,
     2: category_width,
     3: title_width,
-    4: status_width,
+    4: tags_width,
+    5: status_width,
   }
 
   for req in requirements:
@@ -90,12 +93,24 @@ def format_requirement_list_table(
     label_styled = f"[requirement.id]{req.label}[/requirement.id]"
     category = req.category or "—"
     category_styled = f"[requirement.category]{category}[/requirement.category]"
+
+    # Format tags as comma-separated list with styling
+    tags = ", ".join(req.tags) if req.tags else ""
+    tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
+
     status_style = get_requirement_status_style(req.status)
     status_styled = f"[{status_style}]{req.status}[/{status_style}]"
 
     add_row_with_truncation(
       table,
-      [spec_styled, label_styled, category_styled, req.title, status_styled],
+      [
+        spec_styled,
+        label_styled,
+        category_styled,
+        req.title,
+        tags_styled,
+        status_styled,
+      ],
       max_widths=max_widths if truncate else None,
     )
 

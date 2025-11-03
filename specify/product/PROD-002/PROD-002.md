@@ -39,6 +39,7 @@ requirements:
     - PROD-002.FR-003
     - PROD-002.FR-004
     - PROD-002.FR-005
+    - PROD-002.FR-006
     - PROD-002.NF-001
     - PROD-002.NF-002
   collaborators: []
@@ -136,6 +137,13 @@ entries:
     requirement: PROD-002.FR-005
     status: planned
     notes: Test validation error detection and clear messaging
+  - artefact: VT-006
+    kind: VT
+    requirement: PROD-002.FR-006
+    status: verified
+    notes: Implemented in DE-013. Design revision (DR) file automatically scaffolded with valid design_revision frontmatter schema when creating delta. Template includes sections for current/target behavior, architecture impact, code hotspots. Tests verify DR creation with correct frontmatter and delta ID linkage.
+    implemented_by: DE-013
+    verified_by: IP-013.PHASE-01
   - artefact: VA-001
     kind: VA
     requirement: PROD-002.NF-001
@@ -292,6 +300,11 @@ And lightweight changes don't require unnecessary structure
 - **FR-005**: Clear Error Messages Guide Users to Corrections
   When validation fails (non-existent spec ID, malformed structure, broken relationships), users receive specific error messages explaining the problem and suggesting corrections.
   *Verification*: VT-005 - Test error messages provide actionable guidance
+
+- **FR-006**: Delta Creation Includes Design Revision Artifact
+  Every delta creation automatically scaffolds a design revision (DR) document capturing architectural intent, current vs target behavior, and affected code hotspots, using the design_revision frontmatter schema and template structure.
+  *Rationale*: Design revisions provide architecture context needed for implementation and review
+  *Verification*: VT-006 - Verify DR file created with valid frontmatter and template structure
 
 ### Non-Functional Requirements
 

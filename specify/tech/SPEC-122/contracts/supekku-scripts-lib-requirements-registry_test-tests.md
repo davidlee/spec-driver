@@ -14,6 +14,10 @@ Test cases for RequirementsRegistry functionality.
 
 - `setUp(self) -> None`
 - `tearDown(self) -> None`
+- `test_category_merge_precedence(self) -> None`: VT-017-002: Test category merge with body precedence.
+- `test_category_parsing_frontmatter(self) -> None`: VT-017-001: Test category extraction from frontmatter.
+- `test_category_parsing_inline_syntax(self) -> None`: VT-017-001: Test category extraction from inline syntax.
+- `test_category_serialization_round_trip(self) -> None`: VT-017-002: Test category survives serialization round-trip.
 - `test_compute_status_from_coverage(self) -> None`: Unit test for status computation from coverage entries.
 - `test_coverage_drift_detection(self) -> None`: Registry emits warnings for coverage conflicts. - Planned
 - `test_coverage_evidence_field_serialization(self) -> None`: VT-910: RequirementRecord with coverage_evidence serializes correctly.

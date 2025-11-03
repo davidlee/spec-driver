@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import warnings
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -13,6 +14,8 @@ from jinja2 import Template
 
 from supekku.scripts.lib.blocks.delta import render_delta_relationships_block
 from supekku.scripts.lib.blocks.plan import (
+  PLAN_MARKER,
+  extract_plan_overview,
   render_phase_overview_block,
   render_plan_overview_block,
 )
@@ -454,6 +457,76 @@ def _find_next_phase_number(phases_dir: Path) -> int:
   return max_num + 1
 
 
+def _update_plan_overview_phases(
+  plan_path: Path,
+  phase_id: str,
+) -> None:
+  """Update plan.overview block to include new phase entry.
+
+  Appends a minimal phase entry to the phases array in the plan.overview block.
+  Uses id-only format to minimize user conflict.
+
+  Args:
+    plan_path: Path to the plan markdown file.
+    phase_id: Phase ID to add (e.g., "IP-002.PHASE-04").
+
+  Raises:
+    ValueError: If plan.overview block missing or malformed.
+    OSError: If file I/O fails.
+  """
+  # Read plan file
+  content = plan_path.read_text(encoding="utf-8")
+
+  # Extract plan.overview block
+  block = extract_plan_overview(content, plan_path)
+  if block is None:
+    msg = f"No plan.overview block found in {plan_path}"
+    raise ValueError(msg)
+
+  # Parse data
+  data = block.data
+
+  # Append new phase entry (minimal - just ID)
+  phases = data.get("phases", [])
+  if not isinstance(phases, list):
+    msg = f"plan.overview phases is not a list in {plan_path}"
+    raise ValueError(msg)
+
+  # Add phase with minimal metadata (id only)
+  phases.append({"id": phase_id})
+  data["phases"] = phases
+
+  # Re-serialize YAML block
+  yaml_content = yaml.safe_dump(
+    data,
+    sort_keys=False,
+    indent=2,
+    default_flow_style=False,
+  )
+
+  # Ensure trailing newline
+  if not yaml_content.endswith("\n"):
+    yaml_content += "\n"
+
+  # Build new block with markers
+  new_block = f"```yaml {PLAN_MARKER}\n{yaml_content}```"
+
+  # Replace old block with new block using regex
+  pattern = re.compile(
+    r"```(?:yaml|yml)\s+" + re.escape(PLAN_MARKER) + r"\n.*?```",
+    re.DOTALL,
+  )
+
+  new_content = pattern.sub(new_block, content, count=1)
+
+  if new_content == content:
+    msg = f"Failed to replace plan.overview block in {plan_path}"
+    raise ValueError(msg)
+
+  # Write back to file
+  plan_path.write_text(new_content, encoding="utf-8")
+
+
 def create_phase(
   name: str,
   plan_id: str,
@@ -573,6 +646,17 @@ def create_phase(
   }
 
   dump_markdown_file(phase_path, phase_frontmatter, phase_body)
+
+  # Update plan.overview block with new phase
+  try:
+    _update_plan_overview_phases(plan_path, phase_id)
+  except (ValueError, OSError) as exc:
+    # Phase file created successfully but metadata update failed
+    # Log warning but don't fail phase creation
+    warnings.warn(
+      f"Phase {phase_id} created but plan metadata update failed: {exc}",
+      stacklevel=2,
+    )
 
   return PhaseCreationResult(
     phase_id=phase_id,

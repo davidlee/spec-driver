@@ -222,6 +222,71 @@ class CreateChangeTest(unittest.TestCase):
     assert f"plan: {plan_id}" in body
     assert f"delta: {delta_id}" in body
 
+  def test_create_phase_updates_plan_metadata(self) -> None:
+    """VT-PHASE-006: Test plan.overview phases array is updated."""
+    root = self._make_repo()
+    # Create delta with plan
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+
+    # Read plan before creating phase
+    content_before = plan_path.read_text(encoding="utf-8")
+    # Verify initial phase exists (from delta creation)
+    assert f"{plan_id}.PHASE-01" in content_before
+
+    # Create second phase
+    result = create_phase("Phase 02 - Test", plan_id, repo_root=root)
+
+    # Read plan after creating phase
+    content_after = plan_path.read_text(encoding="utf-8")
+
+    # Verify new phase added to plan.overview
+    assert f"- id: {result.phase_id}" in content_after
+    assert f"- id: {plan_id}.PHASE-02" in content_after
+
+    # Verify both phases present
+    assert content_after.count("- id: ") >= 2
+
+  def test_create_phase_metadata_preserves_existing(self) -> None:
+    """VT-PHASE-006: Test existing phases not corrupted by new phase."""
+    root = self._make_repo()
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+
+    # Read original phase-01 from plan
+    content_before = plan_path.read_text(encoding="utf-8")
+    assert f"{plan_id}.PHASE-01" in content_before
+
+    # Create phase-02
+    create_phase("Phase 02", plan_id, repo_root=root)
+
+    # Create phase-03
+    create_phase("Phase 03", plan_id, repo_root=root)
+
+    # Verify all three phases present and phase-01 not corrupted
+    content_after = plan_path.read_text(encoding="utf-8")
+    assert f"{plan_id}.PHASE-01" in content_after
+    assert f"{plan_id}.PHASE-02" in content_after
+    assert f"{plan_id}.PHASE-03" in content_after
+
+    # Verify structure still valid (phases as list)
+    assert "phases:" in content_after
+    assert content_after.count("- id: ") == 3
+
 
 if __name__ == "__main__":
   unittest.main()

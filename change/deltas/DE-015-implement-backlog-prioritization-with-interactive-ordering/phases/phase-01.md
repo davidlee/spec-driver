@@ -45,6 +45,14 @@ risks:
 schema: supekku.phase.tracking
 version: 1
 phase: IP-015.PHASE-01
+status: in-progress
+started: '2025-11-04'
+tasks_completed: 1
+tasks_total: 8
+last_updated: '2025-11-04'
+notes: |
+  Task 1.1 complete: Registry YAML schema defined at .spec-driver/registry/backlog.yaml
+  Simple ordered list structure chosen for minimal complexity
 ```
 
 # Phase 1 - Registry Infrastructure
@@ -117,8 +125,8 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Define registry YAML schema | [ ] | Simple ordered list |
-| [ ] | 1.2 | Implement registry read function | [ ] | Load + parse YAML |
+| [x] | 1.1 | Define registry YAML schema | [ ] | Created .spec-driver/registry/backlog.yaml |
+| [WIP] | 1.2 | Implement registry read function | [ ] | Load + parse YAML |
 | [ ] | 1.3 | Implement registry write function | [ ] | Generate + write YAML |
 | [ ] | 1.4 | Implement sync logic | [ ] | Discover → merge → write |
 | [ ] | 1.5 | Add sync command to CLI | [ ] | Wire to supekku/cli/sync.py |
@@ -128,7 +136,7 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 
 ### Task Details
 
-**1.1 - Define registry YAML schema**
+**1.1 - Define registry YAML schema** ✅
 - **Design**: Simple ordered list, similar to requirements registry but minimal
   ```yaml
   ordering:
@@ -136,10 +144,14 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
     - IMPR-002
     - ISSUE-005
   ```
-- **Files**: Research findings document (for reference)
-- **Testing**: Manual YAML validation
-- **Observations**: Keep it simple - just IDs in order
-- **Commits**: Schema definition committed
+- **Files**: `.spec-driver/registry/backlog.yaml` created
+- **Testing**: Manual YAML validation - structure confirmed
+- **Observations**:
+  - Kept schema minimal - just ordered list of IDs
+  - Added header comments documenting purpose and usage
+  - Initialized with empty list (will populate via sync command)
+  - Follows same pattern as other registries but simpler structure
+- **Commits**: Ready to commit after phase tracking updated
 
 **1.2 - Implement registry read function**
 - **Design**: `load_backlog_registry(root: Path) -> list[str]`

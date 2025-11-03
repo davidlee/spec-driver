@@ -605,6 +605,54 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 
 ## 12. Hand-off Notes
 
+### Current Progress (2025-11-03)
+
+**Completed Tasks:**
+- ✅ **Task 1.1**: Research existing filter patterns
+  - All findings documented in Section 10
+  - Key decision: `--verified-by` searches both `verified_by` AND `coverage_evidence` fields
+  - Reference pattern identified: `DecisionRegistry.filter()` for reverse queries
+  - Glob library confirmed: Python `fnmatch`
+
+- ✅ **Task 1.2**: Create core/filters.py module
+  - New module: `supekku/scripts/lib/core/filters.py` (42 lines)
+  - Function: `parse_multi_value_filter(value: str | None) -> list[str]`
+  - Exported from `core/__init__.py`
+  - Linters: ruff clean, pylint 10.00/10
+  - Commits: d930910
+
+**Next Tasks (Ready to Start):**
+- 🔜 **Task 1.3**: Write multi-value filter tests (TDD)
+  - Create `supekku/scripts/lib/core/filters_test.py`
+  - Test `parse_multi_value_filter()` with all edge cases
+  - Add CLI integration tests in `supekku/cli/test_cli.py`
+  - Tests should FAIL initially (TDD red phase)
+
+- 🔜 **Task 1.4**: Implement multi-value filters in CLI commands
+  - Update `list_deltas`, `list_requirements`, `list_specs`, `list_adrs`, etc.
+  - Replace single-value status checks with multi-value logic
+  - Pattern: `if status and artifact.status not in parse_multi_value_filter(status)`
+  - Tests from 1.3 should then PASS (TDD green phase)
+
+**Important Context for Next Developer:**
+1. **TDD Discipline**: Task 1.3 must write tests BEFORE Task 1.4 implementation
+2. **Multi-value filter fields**: status, kind (any categorical field)
+3. **Backward compatibility**: Single values must still work ("draft" not "draft,")
+4. **Filter combination**: Use AND logic (all filters must match)
+5. **Testing scope**: Need unit tests for utility + integration tests for CLI
+
+**Reference Code Locations:**
+- Existing filter patterns: `supekku/cli/list.py` lines 273-379 (list_deltas)
+- Requirements filtering: `supekku/cli/list.py` lines 923-1023 (list_requirements)
+- Status normalization: `supekku/scripts/lib/changes/artifacts.py`
+- Test examples: `supekku/cli/test_cli.py` (existing CLI tests)
+
+**Design Decisions Made:**
+- Comma separator for multi-value: "draft,in-progress"
+- Whitespace handling: strip() on each value
+- Empty/None handling: return [] (simplifies caller logic)
+- No validation in utility - let CLI/registry validate enum values
+
 **For Phase 2** (Self-Documentation):
 - Multi-value filter patterns established; can reference for consistency
 - Registry query methods available for introspection in enum commands
@@ -614,3 +662,8 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 **Known Limitations**:
 - No indexing yet; performance adequate for current registry sizes but may need optimization for larger registries
 - Glob pattern support limited to `fnmatch` syntax (not full regex)
+
+**Files Modified So Far:**
+- `change/deltas/DE-011-.../phases/phase-01.md` - research findings, task updates
+- `supekku/scripts/lib/core/filters.py` - NEW pure filter utility
+- `supekku/scripts/lib/core/__init__.py` - export parse_multi_value_filter

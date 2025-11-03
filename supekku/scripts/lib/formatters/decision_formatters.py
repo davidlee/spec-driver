@@ -73,6 +73,8 @@ def _format_artifact_references(decision: Decision) -> list[str]:
   """Format references to other artifacts (specs, requirements, etc)."""
   lines = []
   artifact_refs = [
+    ("Policies", decision.policies),
+    ("Standards", decision.standards),
     ("Related specs", decision.specs),
     ("Requirements", decision.requirements),
     ("Deltas", decision.deltas),
@@ -266,6 +268,10 @@ def format_decision_list_json(decisions: Sequence[Decision]) -> str:
       "tags": decision.tags if decision.tags else [],
     }
     # Add optional fields
+    if decision.policies:
+      item["policies"] = decision.policies
+    if decision.standards:
+      item["standards"] = decision.standards
     if decision.specs:
       item["specs"] = decision.specs
     if decision.requirements:

@@ -44,6 +44,8 @@ class TestFormatDecisionDetails(unittest.TestCase):
       owners=["team-alpha"],
       supersedes=["ADR-001"],
       superseded_by=["ADR-003"],
+      policies=["POL-001", "POL-002"],
+      standards=["STD-001"],
       specs=["SPEC-100"],
       requirements=["SPEC-100.FR-001"],
       deltas=["DELTA-001"],
@@ -74,6 +76,10 @@ class TestFormatDecisionDetails(unittest.TestCase):
     # Relationships
     assert "Supersedes: ADR-001" in result
     assert "Superseded by: ADR-003" in result
+
+    # Cross-references
+    assert "Policies: POL-001, POL-002" in result
+    assert "Standards: STD-001" in result
 
     # References
     assert "Related specs: SPEC-100" in result
@@ -147,6 +153,34 @@ class TestFormatDecisionDetails(unittest.TestCase):
     assert lines[3] == "Created: 2024-01-01"
     # Tags should be near the end
     assert "Tags: test" in lines
+
+  def test_format_with_policies_and_standards(self) -> None:
+    """Test formatting decisions with policy and standard cross-references."""
+    decision = DecisionRecord(
+      id="ADR-006",
+      title="Decision with Cross-References",
+      status="accepted",
+      policies=["POL-001", "POL-002"],
+      standards=["STD-001", "STD-002", "STD-003"],
+    )
+
+    result = format_decision_details(decision)
+
+    assert "Policies: POL-001, POL-002" in result
+    assert "Standards: STD-001, STD-002, STD-003" in result
+
+  def test_format_without_policies_or_standards(self) -> None:
+    """Test that policies and standards are omitted when empty."""
+    decision = DecisionRecord(
+      id="ADR-007",
+      title="Decision without Cross-References",
+      status="draft",
+    )
+
+    result = format_decision_details(decision)
+
+    assert "Policies:" not in result
+    assert "Standards:" not in result
 
 
 if __name__ == "__main__":

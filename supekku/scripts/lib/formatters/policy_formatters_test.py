@@ -157,6 +157,23 @@ class TestFormatPolicyDetails(unittest.TestCase):
     assert "Tags:" not in result
     assert "Standards:" not in result
 
+  def test_format_with_decision_backlinks(self) -> None:
+    """Test formatting policies with decision backlinks."""
+    policy = PolicyRecord(
+      id="POL-007",
+      title="Policy Referenced by Decisions",
+      status="active",
+    )
+    # Backlinks from decisions (populated by PolicyRegistry)
+    policy.backlinks = {
+      "decisions": ["ADR-001", "ADR-002", "ADR-003"],
+    }
+
+    result = format_policy_details(policy)
+
+    assert "Backlinks:" in result
+    assert "decisions: ADR-001, ADR-002, ADR-003" in result
+
 
 class TestFormatPolicyListJson(unittest.TestCase):
   """Tests for format_policy_list_json function."""

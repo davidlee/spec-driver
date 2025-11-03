@@ -97,11 +97,11 @@ entrance_criteria:
     completed: true
 exit_criteria:
   - item: "DecisionRecord extended with standards field"
-    completed: false
+    completed: true
   - item: "Backlink maintenance implemented in all three registries"
-    completed: false
+    completed: true
   - item: "Formatters display cross-references and backlinks"
-    completed: false
+    completed: true
   - item: "CLI list commands support cross-reference filtering"
     completed: false
   - item: "Cross-reference integrity tests passing"
@@ -147,7 +147,7 @@ tasks:
       tests: []
   - id: "4.5"
     description: "Add cross-reference display to decision_formatters"
-    status: pending
+    status: completed
     files:
       added: []
       modified:
@@ -156,28 +156,35 @@ tasks:
       removed: []
       tests:
         - "supekku/scripts/lib/formatters/decision_formatters_test.py"
+    notes: |
+      Added policies and standards to _format_artifact_references() and format_decision_list_json().
+      Added 2 new test cases for cross-reference display. All 7 tests passing.
   - id: "4.6"
     description: "Add backlink display to policy_formatters"
-    status: pending
+    status: completed
     files:
       added: []
       modified:
-        - "supekku/scripts/lib/formatters/policy_formatters.py"
         - "supekku/scripts/lib/formatters/policy_formatters_test.py"
       removed: []
       tests:
         - "supekku/scripts/lib/formatters/policy_formatters_test.py"
+    notes: |
+      Backlink display already implemented in _format_tags_and_backlinks().
+      Added test_format_with_decision_backlinks() test case. All 15 tests passing.
   - id: "4.7"
     description: "Add backlink display to standard_formatters"
-    status: pending
+    status: completed
     files:
       added: []
       modified:
-        - "supekku/scripts/lib/formatters/standard_formatters.py"
         - "supekku/scripts/lib/formatters/standard_formatters_test.py"
       removed: []
       tests:
         - "supekku/scripts/lib/formatters/standard_formatters_test.py"
+    notes: |
+      Backlink display already implemented in _format_tags_and_backlinks().
+      Added test_format_with_decision_and_policy_backlinks() test case. All 16 tests passing.
   - id: "4.8"
     description: "Add --standard flag to list adrs command"
     status: pending
@@ -462,8 +469,30 @@ uv run just test
 - Backlinks cleared on each sync - fresh computation from forward references
 - All three registries now support cross-reference backlink generation
 
-**Remaining Work** (estimated 1.5-2 hours):
-- Formatter updates (4.5-4.7) - display cross-refs and backlinks
+**Tasks 4.5-4.7 Complete** (30 mins)
+
+✅ **Task 4.5**: Added cross-reference display to decision_formatters
+- Added `policies` and `standards` to `_format_artifact_references()` function
+- Updated `format_decision_list_json()` to include policies/standards in JSON output
+- Added 2 new test cases: `test_format_with_policies_and_standards`, `test_format_without_policies_or_standards`
+- All 7 decision formatter tests passing
+- Ruff passing
+
+✅ **Task 4.6**: Enhanced policy_formatters with backlink tests
+- Backlink display already implemented in `_format_tags_and_backlinks()` function
+- Added `test_format_with_decision_backlinks()` test case
+- All 15 policy formatter tests passing
+- Ruff passing
+
+✅ **Task 4.7**: Enhanced standard_formatters with backlink tests
+- Backlink display already implemented in `_format_tags_and_backlinks()` function
+- Added `test_format_with_decision_and_policy_backlinks()` test case
+- All 16 standard formatter tests passing
+- Ruff passing
+
+**Summary**: All 143 formatter tests passing. Cross-references now display in details view and JSON output. Backlinks tested for all artifact types.
+
+**Remaining Work** (estimated 1-1.5 hours):
 - CLI flag addition (4.8) - `--standard` for list adrs
 - Integration tests (4.9) - verify backlink integrity
 - Final lint/test (4.10)

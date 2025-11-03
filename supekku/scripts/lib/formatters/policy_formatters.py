@@ -146,22 +146,24 @@ def _calculate_column_widths(terminal_width: int) -> dict[int, int]:
   Returns:
     Dictionary mapping column index to max width
   """
-  # Custom column widths: ID (10), Status (12), Updated (10), rest for Title
+  # Custom column widths: ID (10), Tags (20), Status (12), Updated (10), rest for Title
   # Reserve space for borders/padding (~10 chars total)
   reserved = 10
   id_width = 10
+  tags_width = 20
   status_width = 12
   updated_width = 10
   title_width = max(
-    terminal_width - id_width - status_width - updated_width - reserved,
+    terminal_width - id_width - tags_width - status_width - updated_width - reserved,
     20,  # minimum title width
   )
 
   return {
     0: id_width,
     1: title_width,
-    2: status_width,
-    3: updated_width,
+    2: tags_width,
+    3: status_width,
+    4: updated_width,
   }
 
 
@@ -172,10 +174,14 @@ def _prepare_policy_row(policy: PolicyRecord) -> list[str]:
     policy: PolicyRecord to format
 
   Returns:
-    List of formatted cell values [id, title, status, updated]
+    List of formatted cell values [id, title, tags, status, updated]
   """
   # Remove "POL-XXX: " prefix from title for display
   title = re.sub(r"^POL-\d+:\s*", "", policy.title)
+
+  # Format tags as comma-separated list with styling
+  tags = ", ".join(policy.tags) if policy.tags else ""
+  tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
 
   # Use em dash for missing dates in table format
   updated_date = policy.updated.strftime("%Y-%m-%d") if policy.updated else "—"
@@ -185,7 +191,7 @@ def _prepare_policy_row(policy: PolicyRecord) -> list[str]:
   status_style = get_policy_status_style(policy.status)
   status_styled = f"[{status_style}]{policy.status}[/{status_style}]"
 
-  return [policy_id, title, status_styled, updated_date]
+  return [policy_id, title, tags_styled, status_styled, updated_date]
 
 
 def _format_as_table(
@@ -202,7 +208,7 @@ def _format_as_table(
     Rendered table string
   """
   table = create_table(
-    columns=["ID", "Title", "Status", "Updated"],
+    columns=["ID", "Title", "Tags", "Status", "Updated"],
     title="Policies",
   )
 

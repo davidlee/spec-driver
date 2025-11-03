@@ -148,22 +148,24 @@ def _calculate_column_widths(terminal_width: int) -> dict[int, int]:
   Returns:
     Dictionary mapping column index to max width
   """
-  # Custom column widths: ID (10), Status (12), Updated (10), rest for Title
+  # Custom column widths: ID (10), Tags (20), Status (12), Updated (10), rest for Title
   # Reserve space for borders/padding (~10 chars total)
   reserved = 10
   id_width = 10
+  tags_width = 20
   status_width = 12
   updated_width = 10
   title_width = max(
-    terminal_width - id_width - status_width - updated_width - reserved,
+    terminal_width - id_width - tags_width - status_width - updated_width - reserved,
     20,  # minimum title width
   )
 
   return {
     0: id_width,
     1: title_width,
-    2: status_width,
-    3: updated_width,
+    2: tags_width,
+    3: status_width,
+    4: updated_width,
   }
 
 
@@ -174,10 +176,14 @@ def _prepare_standard_row(standard: StandardRecord) -> list[str]:
     standard: StandardRecord to format
 
   Returns:
-    List of formatted cell values [id, title, status, updated]
+    List of formatted cell values [id, title, tags, status, updated]
   """
   # Remove "STD-XXX: " prefix from title for display
   title = re.sub(r"^STD-\d+:\s*", "", standard.title)
+
+  # Format tags as comma-separated list with styling
+  tags = ", ".join(standard.tags) if standard.tags else ""
+  tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
 
   # Use em dash for missing dates in table format
   updated_date = standard.updated.strftime("%Y-%m-%d") if standard.updated else "—"
@@ -187,7 +193,7 @@ def _prepare_standard_row(standard: StandardRecord) -> list[str]:
   status_style = get_standard_status_style(standard.status)
   status_styled = f"[{status_style}]{standard.status}[/{status_style}]"
 
-  return [standard_id, title, status_styled, updated_date]
+  return [standard_id, title, tags_styled, status_styled, updated_date]
 
 
 def _format_as_table(
@@ -204,7 +210,7 @@ def _format_as_table(
     Rendered table string
   """
   table = create_table(
-    columns=["ID", "Title", "Status", "Updated"],
+    columns=["ID", "Title", "Tags", "Status", "Updated"],
     title="Standards",
   )
 

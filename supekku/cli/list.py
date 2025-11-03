@@ -24,6 +24,7 @@ from supekku.cli.common import (
 )
 from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_status
 from supekku.scripts.lib.changes.registry import ChangeRegistry
+from supekku.scripts.lib.core.filters import parse_multi_value_filter
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.backlog_formatters import format_backlog_list_table
 from supekku.scripts.lib.formatters.change_formatters import (
@@ -135,9 +136,14 @@ def list_specs(
   if json_output:
     format_type = "json"
 
-  if kind not in ["tech", "product", "all"]:
-    typer.echo(f"Error: invalid kind: {kind}", err=True)
-    raise typer.Exit(EXIT_FAILURE)
+  # Parse multi-value kind filter
+  kind_values = parse_multi_value_filter(kind) if kind != "all" else []
+  # Validate kind values
+  valid_kinds = {"tech", "product", "prod", "all"}
+  for k in kind_values:
+    if k not in valid_kinds:
+      typer.echo(f"Error: invalid kind: {k}", err=True)
+      raise typer.Exit(EXIT_FAILURE)
 
   # Validate format
   if format_type not in ["table", "json", "tsv"]:
@@ -186,11 +192,12 @@ def list_specs(
 
     specs = registry.all_specs()
 
-    # Apply status filter
+    # Apply status filter (multi-value OR logic)
     if status:
-      status_normalized = normalize_status(status)
+      status_values = parse_multi_value_filter(status)
+      status_normalized = [normalize_status(s) for s in status_values]
       specs = [
-        spec for spec in specs if normalize_status(spec.status) == status_normalized
+        spec for spec in specs if normalize_status(spec.status) in status_normalized
       ]
 
     if filter_substring:
@@ -228,17 +235,19 @@ def list_specs(
         )
       ]
 
-    # Filter by kind
-    def normalise_kind(requested: str, spec_id: str) -> bool:
-      if requested == "all":
+    # Filter by kind (multi-value OR logic)
+    def normalise_kind(requested_kinds: list[str], spec_id: str) -> bool:
+      if not requested_kinds:  # "all" or no filter
         return True
-      if requested == "tech":
-        return spec_id.startswith("SPEC-")
-      if requested == "product":
-        return spec_id.startswith("PROD-")
-      return True
+      # Check if spec matches any of the requested kinds
+      for k in requested_kinds:
+        if k in ("tech", "all") and spec_id.startswith("SPEC-"):
+          return True
+        if k in ("product", "prod", "all") and spec_id.startswith("PROD-"):
+          return True
+      return False
 
-    specs = [spec for spec in specs if normalise_kind(kind, spec.id)]
+    specs = [spec for spec in specs if normalise_kind(kind_values, spec.id)]
 
     if not specs:
       raise typer.Exit(EXIT_SUCCESS)
@@ -330,14 +339,18 @@ def list_deltas(
 
     delta_ids = set(ids) if ids else None
 
+    # Parse multi-value status filter
+    status_values = parse_multi_value_filter(status)
+    status_normalized = [normalize_status(s) for s in status_values] if status_values else []
+
     # Apply filters
     filtered_artifacts = []
     for artifact in artifacts.values():
       # Check ID filter
       if delta_ids is not None and artifact.id not in delta_ids:
         continue
-      # Check status filter
-      if status and normalize_status(artifact.status) != normalize_status(status):
+      # Check status filter (multi-value OR logic)
+      if status_normalized and normalize_status(artifact.status) not in status_normalized:
         continue
       # Check regexp filter on id, name, slug
       if regexp:
@@ -464,9 +477,14 @@ def list_changes(
   if json_output:
     format_type = "json"
 
-  if kind not in ["delta", "revision", "audit", "all"]:
-    typer.echo(f"Error: invalid kind: {kind}", err=True)
-    raise typer.Exit(EXIT_FAILURE)
+  # Parse multi-value kind filter
+  kind_values = parse_multi_value_filter(kind) if kind != "all" else []
+  # Validate kind values
+  valid_change_kinds = {"delta", "revision", "audit", "all"}
+  for k in kind_values:
+    if k not in valid_change_kinds:
+      typer.echo(f"Error: invalid kind: {k}", err=True)
+      raise typer.Exit(EXIT_FAILURE)
 
   # Validate format
   if format_type not in ["table", "json", "tsv"]:
@@ -474,8 +492,13 @@ def list_changes(
     raise typer.Exit(EXIT_FAILURE)
 
   try:
-    kinds = ["delta", "revision", "audit"] if kind == "all" else [kind]
+    # Multi-value kind filter - expand "all" or use parsed values
+    kinds = ["delta", "revision", "audit"] if not kind_values else kind_values
     all_artifacts = []
+
+    # Parse multi-value status filter
+    status_values = parse_multi_value_filter(status)
+    status_normalized = [s.lower() for s in status_values] if status_values else []
 
     for current_kind in kinds:
       registry = ChangeRegistry(root=root, kind=current_kind)
@@ -505,8 +528,8 @@ def list_changes(
             typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
             raise typer.Exit(EXIT_FAILURE) from e
 
-        # Check status filter
-        if status and artifact.status.lower() != status.lower():
+        # Check status filter (multi-value OR logic)
+        if status_normalized and artifact.status.lower() not in status_normalized:
           continue
 
         # Check applies_to filter
@@ -993,11 +1016,21 @@ def list_requirements(
     # Apply filters
     if spec:
       requirements = [r for r in requirements if spec.upper() in r.specs]
+
+    # Multi-value status filter (OR logic)
     if status:
-      requirements = [r for r in requirements if r.status.lower() == status.lower()]
+      status_values = parse_multi_value_filter(status)
+      status_normalized = [s.lower() for s in status_values]
+      requirements = [r for r in requirements if r.status.lower() in status_normalized]
+
+    # Multi-value kind filter (OR logic)
     if kind:
-      kind_prefix = kind.upper()
-      requirements = [r for r in requirements if r.label.startswith(kind_prefix)]
+      kind_values = parse_multi_value_filter(kind)
+      kind_prefixes = [k.upper() for k in kind_values]
+      requirements = [
+        r for r in requirements
+        if any(r.label.startswith(prefix) for prefix in kind_prefixes)
+      ]
     if substring:
       filter_lower = substring.lower()
       requirements = [

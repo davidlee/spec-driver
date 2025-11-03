@@ -843,14 +843,22 @@ class TestMultiValueFilters:
     assert result.exit_code == 0
     # TODO: Task 1.4 - verify multi-value filtering works correctly
 
-  def test_list_specs_multi_value_kind_not_yet_implemented(self):
-    """Test multi-value kind filter for specs (TDD placeholder)."""
-    # Documents current behavior: multi-value kind fails validation
-    # Expected after Task 1.4: returns specs with kind prod OR tech
+  def test_list_specs_multi_value_kind_works(self):
+    """Test multi-value kind filter for specs returns union."""
+    # Test that prod,tech returns both PROD and SPEC specs
     result = runner.invoke(app, ["list", "specs", "-k", "prod,tech", "--json"])
-    # Current: error "invalid kind: prod,tech"
-    # After Task 1.4: should be exit_code 0 with filtered results
-    assert "invalid kind" in result.stdout or result.exit_code != 0
+    assert result.exit_code == 0, f"Command failed: {result.stdout}"
+
+    import json
+    data = json.loads(result.stdout)
+    items = data.get("items", [])
+
+    # Should have both PROD and SPEC specs
+    prod_specs = [s for s in items if s["id"].startswith("PROD-")]
+    tech_specs = [s for s in items if s["id"].startswith("SPEC-")]
+
+    assert len(prod_specs) > 0, "Should have PROD specs"
+    assert len(tech_specs) > 0, "Should have SPEC specs"
     # TODO: Task 1.4 - change to: assert result.exit_code == 0
 
   def test_list_requirements_multi_value_kind_not_yet_implemented(self):

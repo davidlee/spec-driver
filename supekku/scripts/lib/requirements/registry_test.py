@@ -17,7 +17,10 @@ from supekku.scripts.lib.requirements.lifecycle import (
   STATUS_IN_PROGRESS,
   STATUS_PENDING,
 )
-from supekku.scripts.lib.requirements.registry import RequirementsRegistry
+from supekku.scripts.lib.requirements.registry import (
+  RequirementRecord,
+  RequirementsRegistry,
+)
 from supekku.scripts.lib.specs.registry import SpecRegistry
 
 
@@ -441,17 +444,17 @@ requirements:
     assert "SPEC-900.FR-002" in registry.records
     assert "SPEC-900.FR-003" in registry.records
 
-    # Check verified_by populated from coverage
+    # Check coverage_evidence populated from coverage (not verified_by)
     fr001 = registry.records["SPEC-900.FR-001"]
-    assert "VT-900" in fr001.verified_by
+    assert "VT-900" in fr001.coverage_evidence
     assert fr001.status == STATUS_ACTIVE  # All verified
 
     fr002 = registry.records["SPEC-900.FR-002"]
-    assert "VT-901" in fr002.verified_by
+    assert "VT-901" in fr002.coverage_evidence
     assert fr002.status == STATUS_IN_PROGRESS  # In progress
 
     fr003 = registry.records["SPEC-900.FR-003"]
-    assert "VT-902" in fr003.verified_by
+    assert "VT-902" in fr003.coverage_evidence
     assert fr003.status == STATUS_PENDING  # Planned
 
   def test_coverage_drift_detection(self) -> None:
@@ -516,6 +519,91 @@ requirements:
     # Empty → None
     entries = []
     assert registry._compute_status_from_coverage(entries) is None
+
+  def test_coverage_evidence_field_serialization(self) -> None:
+    """VT-910: RequirementRecord with coverage_evidence serializes correctly."""
+    # Create record with coverage_evidence
+    record = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Test requirement",
+      coverage_evidence=["VT-910", "VT-911", "VA-321"],
+      verified_by=["AUD-001"],
+    )
+
+    # Test to_dict serialization
+    data = record.to_dict()
+    assert "coverage_evidence" in data
+    assert data["coverage_evidence"] == ["VT-910", "VT-911", "VA-321"]
+    assert data["verified_by"] == ["AUD-001"]
+
+    # Test from_dict deserialization
+    reconstructed = RequirementRecord.from_dict("SPEC-001.FR-001", data)
+    assert reconstructed.coverage_evidence == ["VT-910", "VT-911", "VA-321"]
+    assert reconstructed.verified_by == ["AUD-001"]
+    assert reconstructed.uid == "SPEC-001.FR-001"
+
+  def test_coverage_evidence_merge(self) -> None:
+    """VT-910: RequirementRecord.merge() combines coverage_evidence correctly."""
+    record1 = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Original title",
+      coverage_evidence=["VT-910", "VT-911"],
+      verified_by=["AUD-001"],
+    )
+
+    record2 = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Updated title",
+      coverage_evidence=["VT-911", "VA-321"],  # Overlapping + new
+      verified_by=["AUD-002"],  # Different verified_by
+    )
+
+    # Merge preserves lifecycle fields from self, merges coverage_evidence
+    merged = record1.merge(record2)
+    assert merged.title == "Updated title"
+    # coverage_evidence should be union, sorted
+    assert merged.coverage_evidence == ["VA-321", "VT-910", "VT-911"]
+    # verified_by preserved from self (lifecycle field)
+    assert merged.verified_by == ["AUD-001"]
+
+  def test_coverage_sync_populates_coverage_evidence(self) -> None:
+    """VT-911: Coverage sync populates coverage_evidence, not verified_by."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    # Create spec with coverage blocks
+    test_root = Path(__file__).parent.parent.parent.parent.parent
+    fixtures_dir = test_root / "tests" / "fixtures"
+    coverage_dir = fixtures_dir / "requirements" / "coverage"
+
+    stats = registry.sync_from_specs(
+      spec_dirs=[coverage_dir],
+      plan_dirs=[coverage_dir],
+    )
+    registry.save()
+
+    # Verify requirements were created
+    assert stats.created >= 3
+    assert "SPEC-900.FR-001" in registry.records
+    assert "SPEC-900.FR-002" in registry.records
+
+    # NEW: Check coverage_evidence populated (not verified_by)
+    fr001 = registry.records["SPEC-900.FR-001"]
+    assert "VT-900" in fr001.coverage_evidence, (
+      f"Expected VT-900 in coverage_evidence, got {fr001.coverage_evidence}"
+    )
+    # verified_by should remain empty (no audits in fixtures)
+    assert fr001.verified_by == [], (
+      f"Expected empty verified_by, got {fr001.verified_by}"
+    )
+
+    fr002 = registry.records["SPEC-900.FR-002"]
+    assert "VT-901" in fr002.coverage_evidence
+    assert fr002.verified_by == []
 
 
 if __name__ == "__main__":

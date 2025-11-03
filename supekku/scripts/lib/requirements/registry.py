@@ -61,6 +61,7 @@ class RequirementRecord:
   introduced: str | None = None
   implemented_by: list[str] = field(default_factory=list)
   verified_by: list[str] = field(default_factory=list)
+  coverage_evidence: list[str] = field(default_factory=list)
   path: str = ""
 
   def merge(self, other: RequirementRecord) -> RequirementRecord:
@@ -76,6 +77,9 @@ class RequirementRecord:
       introduced=self.introduced,
       implemented_by=list(self.implemented_by),
       verified_by=list(self.verified_by),
+      coverage_evidence=sorted(
+        set(self.coverage_evidence) | set(other.coverage_evidence)
+      ),
       path=other.path or self.path,
     )
 
@@ -91,6 +95,7 @@ class RequirementRecord:
       "introduced": self.introduced,
       "implemented_by": self.implemented_by,
       "verified_by": self.verified_by,
+      "coverage_evidence": self.coverage_evidence,
       "path": self.path,
     }
 
@@ -108,6 +113,7 @@ class RequirementRecord:
       introduced=data.get("introduced"),
       implemented_by=list(data.get("implemented_by", [])),
       verified_by=list(data.get("verified_by", [])),
+      coverage_evidence=list(data.get("coverage_evidence", [])),
       path=str(data.get("path", "")),
     )
 
@@ -614,9 +620,9 @@ class RequirementsRegistry:
       # Check for drift before updating
       self._check_coverage_drift(req_id, entries)
 
-      # Update verified_by with unique artefact IDs
+      # Update coverage_evidence with unique artefact IDs
       artefacts = {e["artefact"] for e in entries if e.get("artefact")}
-      record.verified_by = sorted(set(record.verified_by) | artefacts)
+      record.coverage_evidence = sorted(set(record.coverage_evidence) | artefacts)
 
       # Compute and update status from coverage
       computed_status = self._compute_status_from_coverage(entries)

@@ -311,4 +311,39 @@ just pylint supekku/scripts/lib/formatters/requirement_formatters.py
 - [x] Task 2.8 complete (linters)
 - [x] Lint output captured (ruff clean, pylint +0.34)
 - [x] IP-017 updated with any plan changes
-- [ ] Hand-off notes to Phase 3 (Verification & Polish)
+- [x] Manual testing with real requirements (see section 12)
+- [x] Hand-off notes: Phase 2 complete, ready for Phase 3 (manual verification)
+
+## 12. Manual Testing Results
+
+**Test Data**: Added categories to 14 requirements across PROD-001 and SPEC-110
+- PROD-001: workflow (2), automation (1), ux (2), validation (1), reliability (1)
+- SPEC-110: cli (5), architecture (2), automation (2), integration (1), documentation (1), performance (1)
+
+**Filter Tests**:
+```bash
+# Category substring filter (case-sensitive)
+$ uv run spec-driver list requirements --category workflow
+# Result: 2 requirements (PROD-001.FR-001, PROD-001.FR-004)
+
+$ uv run spec-driver list requirements --category cli
+# Result: 5 requirements (SPEC-110.FR-001, FR-005, FR-006, FR-008, FR-009)
+
+# Case-insensitive category filter
+$ uv run spec-driver list requirements --category UX -i
+# Result: 2 requirements (PROD-001.FR-003, NF-001)
+
+# Regexp filter on category
+$ uv run spec-driver list requirements -r "automation|ux" -i
+# Result: 10 matches (includes both categorized and title matches)
+```
+
+**Observations**:
+- Category filtering works as designed
+- Case-insensitive flag applies to both --category and -r filters
+- Regexp filter searches across uid, label, title, AND category fields
+- Uncategorized requirements excluded from --category results (None handling correct)
+- Table output shows category column with proper alignment
+- All filters can be combined (e.g., --category auth --kind FR)
+
+**Status**: All manual tests pass. Feature working as specified.

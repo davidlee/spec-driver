@@ -1246,6 +1246,150 @@ def list_backlog(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("issues")
+def list_issues(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on title (case-insensitive)",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
+) -> None:
+  """List backlog issues with optional filtering.
+
+  Shortcut for: list backlog --kind issue
+  """
+  list_backlog(
+    root=root,
+    kind="issue",
+    status=status,
+    substring=substring,
+    regexp=regexp,
+    case_insensitive=case_insensitive,
+    format_type=format_type,
+    truncate=truncate,
+  )
+
+
+@app.command("problems")
+def list_problems(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on title (case-insensitive)",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
+) -> None:
+  """List backlog problems with optional filtering.
+
+  Shortcut for: list backlog --kind problem
+  """
+  list_backlog(
+    root=root,
+    kind="problem",
+    status=status,
+    substring=substring,
+    regexp=regexp,
+    case_insensitive=case_insensitive,
+    format_type=format_type,
+    truncate=truncate,
+  )
+
+
+@app.command("improvements")
+def list_improvements(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on title (case-insensitive)",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
+) -> None:
+  """List backlog improvements with optional filtering.
+
+  Shortcut for: list backlog --kind improvement
+  """
+  list_backlog(
+    root=root,
+    kind="improvement",
+    status=status,
+    substring=substring,
+    regexp=regexp,
+    case_insensitive=case_insensitive,
+    format_type=format_type,
+    truncate=truncate,
+  )
+
+
+@app.command("risks")
+def list_risks(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on title (case-insensitive)",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
+) -> None:
+  """List backlog risks with optional filtering.
+
+  Shortcut for: list backlog --kind risk
+  """
+  list_backlog(
+    root=root,
+    kind="risk",
+    status=status,
+    substring=substring,
+    regexp=regexp,
+    case_insensitive=case_insensitive,
+    format_type=format_type,
+    truncate=truncate,
+  )
+
+
 # For direct testing
 if __name__ == "__main__":  # pragma: no cover
   app()

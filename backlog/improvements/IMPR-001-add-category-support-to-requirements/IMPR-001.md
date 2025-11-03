@@ -3,7 +3,7 @@ id: IMPR-001
 name: Add category support to requirements
 created: '2025-11-04'
 updated: '2025-11-04'
-status: idea
+status: implemented
 kind: improvement
 ---
 

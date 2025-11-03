@@ -1274,6 +1274,7 @@ def list_backlog(
     typer.Option(
       "--prioritize/--no-prioritize",
       "--prioritise/--no-prioritise",
+      "-p",
       help="Open filtered items in editor for reordering",
     ),
   ] = False,
@@ -1412,6 +1413,23 @@ def list_issues(
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
+  order_by_id: Annotated[
+    bool,
+    typer.Option(
+      "--order-by-id",
+      "-o",
+      help="Order by ID (chronological) instead of priority",
+    ),
+  ] = False,
+  prioritize: Annotated[
+    bool,
+    typer.Option(
+      "--prioritize/--no-prioritize",
+      "--prioritise/--no-prioritise",
+      "-p",
+      help="Open filtered items in editor for reordering",
+    ),
+  ] = False,
 ) -> None:
   """List backlog issues with optional filtering.
 
@@ -1430,6 +1448,8 @@ def list_issues(
     case_insensitive=case_insensitive,
     format_type=format_type,
     truncate=truncate,
+    order_by_id=order_by_id,
+    prioritize=prioritize,
   )
 
 
@@ -1459,6 +1479,23 @@ def list_problems(
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
+  order_by_id: Annotated[
+    bool,
+    typer.Option(
+      "--order-by-id",
+      "-o",
+      help="Order by ID (chronological) instead of priority",
+    ),
+  ] = False,
+  prioritize: Annotated[
+    bool,
+    typer.Option(
+      "--prioritize/--no-prioritize",
+      "--prioritise/--no-prioritise",
+      "-p",
+      help="Open filtered items in editor for reordering",
+    ),
+  ] = False,
 ) -> None:
   """List backlog problems with optional filtering.
 
@@ -1477,6 +1514,8 @@ def list_problems(
     case_insensitive=case_insensitive,
     format_type=format_type,
     truncate=truncate,
+    order_by_id=order_by_id,
+    prioritize=prioritize,
   )
 
 
@@ -1506,6 +1545,23 @@ def list_improvements(
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
+  order_by_id: Annotated[
+    bool,
+    typer.Option(
+      "--order-by-id",
+      "-o",
+      help="Order by ID (chronological) instead of priority",
+    ),
+  ] = False,
+  prioritize: Annotated[
+    bool,
+    typer.Option(
+      "--prioritize/--no-prioritize",
+      "--prioritise/--no-prioritise",
+      "-p",
+      help="Open filtered items in editor for reordering",
+    ),
+  ] = False,
 ) -> None:
   """List backlog improvements with optional filtering.
 
@@ -1524,6 +1580,8 @@ def list_improvements(
     case_insensitive=case_insensitive,
     format_type=format_type,
     truncate=truncate,
+    order_by_id=order_by_id,
+    prioritize=prioritize,
   )
 
 
@@ -1553,6 +1611,23 @@ def list_risks(
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
+  order_by_id: Annotated[
+    bool,
+    typer.Option(
+      "--order-by-id",
+      "-o",
+      help="Order by ID (chronological) instead of priority",
+    ),
+  ] = False,
+  prioritize: Annotated[
+    bool,
+    typer.Option(
+      "--prioritize/--no-prioritize",
+      "--prioritise/--no-prioritise",
+      "-p",
+      help="Open filtered items in editor for reordering",
+    ),
+  ] = False,
 ) -> None:
   """List backlog risks with optional filtering.
 
@@ -1571,6 +1646,8 @@ def list_risks(
     case_insensitive=case_insensitive,
     format_type=format_type,
     truncate=truncate,
+    order_by_id=order_by_id,
+    prioritize=prioritize,
   )
 
 

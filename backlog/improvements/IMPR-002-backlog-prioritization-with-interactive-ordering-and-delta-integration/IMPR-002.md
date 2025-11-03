@@ -3,7 +3,7 @@ id: IMPR-002
 name: Backlog prioritization with interactive ordering and delta integration
 created: '2025-11-04'
 updated: '2025-11-04'
-status: idea
+status: implemented
 kind: improvement
 ---
 
@@ -103,4 +103,3 @@ Add `--order-by-id` / `-o` flag to `list backlog` commands:
 - Explicitly requests ID-based ordering (current behavior)
 - Useful for chronological views or when working with specific ID ranges
 - Provides escape hatch from priority-based ordering when needed
-

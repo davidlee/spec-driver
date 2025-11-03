@@ -1,1 +1,41 @@
-audits: {}
+audits:
+  AUD-001:
+    kind: audit
+    status: completed
+    name: AUD-001
+    slug: aud-001
+    updated: null
+    path: change/audits/AUD-001-spec-creation-workflow-verification/AUD-001.md
+    relations:
+    - type: verifies
+      target: PROD-001.FR-001
+      attributes: {}
+    - type: verifies
+      target: PROD-001.FR-002
+      attributes: {}
+    - type: verifies
+      target: PROD-001.FR-003
+      attributes: {}
+    - type: verifies
+      target: PROD-001.FR-004
+      attributes: {}
+    - type: verifies
+      target: PROD-001.FR-005
+      attributes: {}
+    - type: verifies
+      target: PROD-001.NF-001
+      attributes: {}
+    - type: unknown
+      target: PROD-001.NF-002
+      attributes: {}
+  AUD-002:
+    kind: audit
+    status: completed
+    name: AUD-002
+    slug: aud-002
+    updated: null
+    path: change/audits/AUD-002-test-precedence/AUD-002.md
+    relations:
+    - type: verifies
+      target: PROD-005.FR-001
+      attributes: {}

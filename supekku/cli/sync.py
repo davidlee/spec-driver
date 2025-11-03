@@ -508,7 +508,21 @@ def _sync_requirements(root: Path) -> dict:
   requirements_path = get_registry_dir(root) / "requirements.yaml"
   req_registry = RequirementsRegistry(requirements_path)
 
-  stats = req_registry.sync_from_specs(spec_registry=spec_registry)
+  # Gather change artifact directories
+  delta_dir = root / "change" / "deltas"
+  revision_dir = root / "change" / "revisions"
+  audit_dir = root / "change" / "audits"
+
+  delta_dirs = [delta_dir] if delta_dir.exists() else None
+  revision_dirs = [revision_dir] if revision_dir.exists() else None
+  audit_dirs = [audit_dir] if audit_dir.exists() else None
+
+  stats = req_registry.sync_from_specs(
+    spec_registry=spec_registry,
+    delta_dirs=delta_dirs,
+    revision_dirs=revision_dirs,
+    audit_dirs=audit_dirs,
+  )
   req_registry.save()
 
   typer.echo(

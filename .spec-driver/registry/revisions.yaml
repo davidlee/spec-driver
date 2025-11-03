@@ -1,1 +1,8 @@
-revisions: {}
+revisions:
+  RE-001:
+    kind: revision
+    status: draft
+    name: Spec Revision - test revision
+    slug: test-revision
+    updated: '2025-11-01'
+    path: change/revisions/RE-001-test-revision/RE-001.md

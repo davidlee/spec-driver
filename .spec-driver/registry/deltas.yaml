@@ -1,1 +1,562 @@
-deltas: {}
+deltas:
+  DE-002:
+    kind: delta
+    status: completed
+    name: Delta - Python package-level spec granularity
+    slug: python-package-level-spec-granularity
+    updated: '2025-11-02'
+    path: change/deltas/DE-002-python-package-level-spec-granularity/DE-002.md
+    applies_to:
+      specs:
+      - PROD-005
+      requirements:
+      - PROD-005.FR-001
+      - PROD-005.FR-002
+      - PROD-005.FR-003
+      - PROD-005.FR-004
+    relations:
+    - type: satisfies
+      target: PROD-005
+      attributes:
+        nature: Establishes Python package-level spec granularity pattern
+    plan:
+      id: IP-002
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-002
+        delta: DE-002
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-005
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-005.FR-001
+          - PROD-005.FR-002
+          - PROD-005.FR-003
+          - PROD-005.FR-004
+          dependencies: []
+        phases:
+        - id: IP-002.PHASE-01
+          name: Phase 01 - Tooling & Validation
+          objective: Implement package detection logic, validate deterministic ordering,
+            audit registry for package-level support. Ensure foundation is sound before
+            migration.
+          entrance_criteria:
+          - PROD-005 spec approved and synced
+          - DE-002 delta created
+          exit_criteria:
+          - Package detection logic implemented and tested
+          - Deterministic ordering validated across platforms
+          - Registry audit complete with adaptation plan
+          - VT-001 and VT-002 passing
+        - id: IP-002.PHASE-02
+          name: Phase 02 - Migration Execution
+          objective: Delete file-level specs, generate package-level specs, update
+            relationships, sync registry. Execute the breaking change cleanly.
+          entrance_criteria:
+          - Phase 01 complete
+          - Tooling changes tested and validated
+          exit_criteria:
+          - All 101 file-level specs deleted
+          - ~25-30 package-level specs created
+          - Registry synced successfully
+          - Validation passes with no errors
+        - id: IP-002.PHASE-03
+          name: Phase 03 - Verification & Documentation
+          objective: Complete verification testing (VT-003, VT-004), update documentation,
+            verify contract stability, confirm acceptance gates.
+          entrance_criteria:
+          - Phase 02 complete
+          - Package-level specs synced and validated
+          exit_criteria:
+          - VT-003 and VT-004 passing
+          - Documentation updated
+          - VA-001 confirms zero spurious diffs
+          - All acceptance gates met
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-002.PHASE-01
+        plan: IP-002
+        delta: DE-002
+        name: Phase 01 - Tooling & Validation
+        objective: Implement package detection logic, validate deterministic ordering,
+          audit registry for package-level support. Ensure foundation is sound before
+          migration.
+        entrance_criteria:
+        - PROD-005 spec approved and synced
+        - DE-002 delta created
+        - Research complete on existing codebase
+        exit_criteria:
+        - Package detection logic implemented and tested
+        - Deterministic ordering validated across platforms
+        - Registry audit complete with adaptation plan
+        - VT-001 and VT-002 passing
+        - VA-002 design review complete
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-002.PHASE-02
+        plan: IP-002
+        delta: DE-002
+        name: Phase 02 - Migration Execution
+        objective: Delete file-level specs, generate package-level specs, update relationships,
+          sync registry. Execute the breaking change cleanly.
+        entrance_criteria:
+        - Phase 01 complete
+        - Tooling changes tested and validated
+        - 16 leaf packages identified
+        exit_criteria:
+        - All existing file-level specs deleted (if any)
+        - 16 package-level specs created
+        - Registry synced successfully
+        - Validation passes with no errors
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-002.PHASE-03
+        plan: IP-002
+        delta: DE-002
+        name: Phase 03 - Verification & Documentation
+        objective: Complete verification testing (VT-003, VT-004), update documentation,
+          verify contract stability, confirm acceptance gates.
+        entrance_criteria:
+        - Phase 02 complete
+        - Package-level specs synced and validated
+        - 16 package-level specs created (SPEC-110 to SPEC-125)
+        exit_criteria:
+        - VT-003 passing (integration test with package-level specs)
+        - VT-004 passing (file-to-package resolution tests)
+        - VA-001 complete (git diff stability analysis)
+        - Documentation updated
+        - All acceptance gates met
+  DE-003:
+    kind: delta
+    status: completed
+    name: Delta - CLI Integration for Frontmatter Schema Show Commands
+    slug: cli-integration-for-frontmatter-schema-show-commands
+    updated: '2025-11-02'
+    path: change/deltas/DE-003-cli-integration-for-frontmatter-schema-show-commands/DE-003.md
+    applies_to:
+      specs:
+      - PROD-004
+      requirements:
+      - PROD-004.FR-004
+    relations:
+    - type: implements
+      target: PROD-004.FR-004
+      attributes: {}
+    plan:
+      id: IP-003
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-003
+        delta: DE-003
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-004
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-003.PHASE-01
+          name: Phase 01 - Initial delivery
+          objective: Deliver the foundational work for this delta.
+          entrance_criteria: []
+          exit_criteria: []
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-003.PHASE-01
+        plan: IP-003
+        delta: DE-003
+        objective: Extend existing schema CLI commands to support all 16 frontmatter
+          kinds with JSON Schema and YAML example output formats.
+        entrance_criteria:
+        - Frontmatter metadata registry accessible
+        - Existing schema.py patterns understood
+        exit_criteria:
+        - All frontmatter kinds accessible via CLI
+        - Comprehensive tests passing
+        - Lint checks passing
+        verification:
+          tests:
+          - supekku/cli/schema_test.py
+          evidence:
+          - 23 schema tests passing (8 new)
+          - 78 total CLI tests passing
+          - Ruff: 0 errors
+          - Pylint: 9.67/10
+        tasks:
+        - Review existing CLI structure
+        - Verify frontmatter registry
+        - Extend list command for frontmatter
+        - Extend show command for frontmatter
+        - Add helper functions
+        - Write comprehensive tests
+        - Lint and manual testing
+        risks: []
+  DE-004:
+    kind: delta
+    status: draft
+    name: Delta - Phase Management Implementation
+    slug: phase-management-implementation
+    updated: '2025-11-02'
+    path: change/deltas/DE-004-phase-management-implementation/DE-004.md
+    applies_to:
+      specs:
+      - PROD-006
+      requirements:
+      - PROD-006.FR-001
+      - PROD-006.FR-002
+      - PROD-006.FR-003
+      - PROD-006.FR-004
+      - PROD-006.FR-005
+      - PROD-006.NF-001
+      - PROD-006.NF-002
+    plan:
+      id: IP-004
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-004
+        delta: DE-004
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-006
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-006.FR-001
+          - PROD-006.FR-002
+          - PROD-006.FR-003
+          - PROD-006.FR-004
+          - PROD-006.FR-005
+          - PROD-006.NF-001
+          - PROD-006.NF-002
+          dependencies: []
+        phases:
+        - id: IP-004.PHASE-01
+          name: Phase 01 - Create Phase Command
+          objective: Implement `create phase` command with auto-numbering, metadata
+            population, and template rendering. Covers core phase creation logic.
+          entrance_criteria:
+          - DE-004 delta approved
+          - PROD-006 spec reviewed
+          exit_criteria:
+          - create_phase() function implemented in creation.py
+          - CLI command wired in cli/create.py
+          - VT-PHASE-001, VT-PHASE-002, VT-PHASE-004 passing
+          - Manual test: create phase for IP-002 works
+        - id: IP-004.PHASE-02
+          name: Phase 02 - Enhanced Display & Validation
+          objective: Enhance delta display formatter to show phases. Add schema validation
+            for phase.overview blocks during sync.
+          entrance_criteria: &id001
+          - Phase 01 complete
+          - Phase creation working and tested
+          exit_criteria: &id002
+          - format_delta_details() shows phase summaries
+          - Schema validation enforces phase.overview correctness
+          - VT-PHASE-003, VT-PHASE-005 passing
+          - Manual test: show delta DE-002 displays all phases
+        - id: IP-004.PHASE-03
+          name: Phase 03 - Verification & Polish
+          objective: Complete verification artifacts (performance, UX review), ensure
+            quality gates pass, update documentation.
+          entrance_criteria: &id003
+          - Phase 02 complete
+          - All core functionality working
+          exit_criteria: &id004
+          - VA-PHASE-001 (performance) complete
+          - VA-PHASE-002 (UX review) complete
+          - All tests + linters passing
+          - Documentation updated
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-004.PHASE-01
+        plan: IP-004
+        delta: DE-004
+        name: Phase 01 - Create Phase Command
+        objective: Implement `create phase` command with auto-numbering, metadata
+          population, and template rendering. Covers core phase creation logic.
+        entrance_criteria:
+        - DE-004 delta approved
+        - PROD-006 spec reviewed
+        exit_criteria:
+        - create_phase() function implemented in creation.py
+        - CLI command wired in cli/create.py
+        - VT-PHASE-001, VT-PHASE-002, VT-PHASE-004 passing
+        - Manual test - create phase for IP-002 works
+        verification:
+          tests:
+          - VT-PHASE-001
+          - VT-PHASE-002
+          - VT-PHASE-004
+          evidence:
+          - Test output showing all tests passing
+          - Manual test creating phase for IP-002
+          - Lint output (ruff + pylint) passing
+        tasks:
+        - Implement create_phase() function
+        - Add CLI command in create.py
+        - Write comprehensive unit tests
+        - Test with real implementation plan
+        risks:
+        - Phase numbering logic may be complex
+        - Template rendering may need escaping
+      - id: IP-004.PHASE-02
+        name: Phase 02 - Enhanced Display & Validation
+        objective: Enhance delta display formatter to show phases. Add schema validation
+          for phase.overview blocks during sync.
+        entrance_criteria: *id001
+        exit_criteria: *id002
+        phase: IP-004.PHASE-02
+      - id: IP-004.PHASE-03
+        name: Phase 03 - Verification & Polish
+        objective: Complete verification artifacts (performance, UX review), ensure
+          quality gates pass, update documentation.
+        entrance_criteria: *id003
+        exit_criteria: *id004
+        phase: IP-004.PHASE-03
+  DE-005:
+    kind: delta
+    status: completed
+    name: Delta - implement spec backfill
+    slug: implement-spec-backfill
+    updated: '2025-11-02'
+    path: change/deltas/DE-005-implement-spec-backfill/DE-005.md
+    applies_to:
+      specs:
+      - PROD-007
+      requirements:
+      - PROD-007.FR-001
+      - PROD-007.FR-002
+      - PROD-007.FR-003
+      - PROD-007.FR-004
+      - PROD-007.NF-001
+      - PROD-007.NF-002
+    plan:
+      id: IP-005
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-005
+        delta: DE-005
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-007
+          collaborators:
+          - SPEC-110
+          - SPEC-112
+        requirements:
+          targets:
+          - PROD-007.FR-001
+          - PROD-007.FR-002
+          - PROD-007.FR-005
+          - PROD-007.FR-006
+          dependencies: []
+        phases:
+        - id: IP-005.PHASE-01
+          name: Phase 01 - Core Implementation
+          status: complete
+          objective: 'Implement single-spec backfill: template retrieval, stub detection,
+            completion logic, CLI command, and agent workflow. Batch mode deferred.'
+          entrance_criteria:
+          - PROD-007 complete and validated
+          - Contracts generation working
+          - SpecRegistry and template infrastructure confirmed
+          exit_criteria:
+          - show template command working
+          - Stub detection tested and reliable
+          - Single spec backfill E2E functional
+          - All tests and linters passing
+          evidence:
+          - SPEC-125 completed successfully
+          - SPEC-110 rewrite test
+          - CONTRACT_REVIEW.md validation (17k tokens, 8 findings)
+          - 17 unit tests passing
+          - Both linters clean
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-005.PHASE-01
+        plan: IP-005
+        delta: DE-005
+        objective: 'Implement simplified spec backfill: stub detection, CLI body replacement
+          with template, and agent workflow. Agent handles intelligent completion.
+          Batch mode deferred.'
+        entrance_criteria:
+        - PROD-007 complete and validated
+        - Contracts generation working (via sync)
+        - Task 1.1 (show template) complete
+        exit_criteria:
+        - Stub detection logic implemented and tested
+        - CLI backfill command replaces body with template
+        - Agent command workflow functional
+        - End-to-end backfill demonstrated
+        verification:
+          tests:
+          - VT-004
+          - VT-005
+          - VT-001
+          evidence:
+          - End-to-end workflow demonstration
+          - Test suite passing
+        tasks:
+        - Implement stub detection (1.2)
+        - Build CLI backfill command (1.4 - simplified)
+        - Write agent command (1.5 - revised)
+        - Integration testing (1.6)
+        risks:
+        - Stub detection false positives
+        - Accidental overwrite of manual content
+  DE-006:
+    kind: delta
+    status: completed
+    name: Delta - Standardize CLI JSON output support
+    slug: standardize-cli-json-output-support
+    updated: '2025-11-02'
+    path: change/deltas/DE-006-standardize-cli-json-output-support/DE-006.md
+    applies_to:
+      specs:
+      - SPEC-003
+      - SPEC-004
+      requirements: []
+    relations:
+    - type: resolves
+      target: ISSUE-007
+      attributes:
+        nature: Fixes inconsistent --json support across CLI commands
+    plan:
+      id: IP-006
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-006
+        delta: DE-006
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-003
+          - SPEC-004
+          - SPEC-006
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-006.PHASE-01
+          name: Phase 01 - Add --json support to all CLI commands
+          objective: Extend --json flag to create, list, and show commands with standardized
+            output format
+          entrance_criteria:
+          - Delta approved
+          - Existing --json pattern understood (create.py lines 58-79)
+          - Standard JSON schema defined
+          exit_criteria:
+          - All create/list/show commands support --json
+          - All tests passing (unit + integration)
+          - Ruff and Pylint passing
+          - ISSUE-007 resolved
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-006.PHASE-01
+        plan: IP-006
+        delta: DE-006
+        objective: Add --json flag to create and list CLI commands with standardized
+          output format
+        entrance_criteria:
+        - Delta DE-006 approved
+        - Existing --json pattern understood (create.py lines 58-79)
+        - Standard JSON schema defined
+        exit_criteria:
+        - All create subcommands (issue, problem, improvement, risk) support --json
+        - List specs command supports --json shorthand
+        - All tests passing (69 CLI tests)
+        - Ruff and Pylint passing
+        - ISSUE-007 resolved
+        verification:
+          tests:
+          - test_create_issue_json_output
+          - test_create_problem_json_output
+          - test_create_risk_json_output
+          evidence:
+          - Git commit 8f388ea
+          - All 69 CLI tests passing
+          - Ruff 100% clean
+          - Pylint 10/10 score
+        tasks:
+        - Add --json to create issue, problem, improvement, risk
+        - Add --json shorthand to list specs
+        - Write JSON output tests
+        - Run full test suite
+        - Resolve ISSUE-007
+        risks:
+        - Breaking text output (mitigated - --json is opt-in)
+        - Inconsistent JSON schema (mitigated - standard format defined)
+  DE-007:
+    kind: delta
+    status: draft
+    name: Delta - Lifecycle coverage enforcement
+    slug: lifecycle-coverage-enforcement
+    updated: '2025-11-03'
+    path: change/deltas/DE-007-lifecycle-coverage-enforcement/DE-007.md
+    applies_to:
+      specs:
+      - PROD-008
+      - PROD-009
+      - SPEC-122
+      requirements:
+      - PROD-008.FR-001
+      - PROD-008.FR-002
+      - PROD-008.FR-003
+      - PROD-009.FR-002
+      - PROD-009.FR-003
+    plan:
+      id: IP-007
+      overview: {}
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-007.PHASE-01
+        plan: IP-007
+        delta: DE-007
+        objective: Wire verification coverage entries into the requirements registry
+          lifecycle and emit drift warnings when coverage disagrees with audits or
+          plans.
+        entrance_criteria:
+        - SPEC-122 guidance reviewed
+        - Test fixtures for coverage-enabled specs identified
+        exit_criteria:
+        - Registry sync updates lifecycle fields from coverage status changes
+        - Validation warning emitted for simulated spec vs audit/plan drift
+        - VT-902 integration test passing
+        verification:
+          tests:
+          - VT-902
+          evidence:
+          - Lifecycle sync logs
+          - Validation warning output snapshot
+        tasks:
+        - Add coverage block extraction to registry sync
+        - Implement lifecycle status aggregation logic
+        - Add drift detection and warning emission
+        - Create test fixtures with coverage blocks
+        - Write comprehensive integration tests
+        risks:
+        - Registry regression affecting existing specs
+        - Performance impact from additional parsing

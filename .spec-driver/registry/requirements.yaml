@@ -6,10 +6,11 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    status: pending
+    status: verified
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - AUD-001
     path: specify/product/PROD-001/PROD-001.md
   PROD-001.FR-002:
     label: FR-002
@@ -18,10 +19,11 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    status: pending
+    status: verified
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - AUD-001
     path: specify/product/PROD-001/PROD-001.md
   PROD-001.FR-003:
     label: FR-003
@@ -30,10 +32,11 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    status: pending
+    status: verified
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - AUD-001
     path: specify/product/PROD-001/PROD-001.md
   PROD-001.FR-004:
     label: FR-004
@@ -42,10 +45,11 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    status: pending
+    status: verified
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - AUD-001
     path: specify/product/PROD-001/PROD-001.md
   PROD-001.FR-005:
     label: FR-005
@@ -54,10 +58,11 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: functional
-    status: pending
+    status: verified
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - AUD-001
     path: specify/product/PROD-001/PROD-001.md
   PROD-001.NF-001:
     label: NF-001
@@ -66,10 +71,11 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: non-functional
-    status: pending
+    status: verified
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - AUD-001
     path: specify/product/PROD-001/PROD-001.md
   PROD-001.NF-002:
     label: NF-002
@@ -78,10 +84,11 @@ requirements:
     - PROD-001
     primary_spec: PROD-001
     kind: non-functional
-    status: pending
+    status: verified
     introduced: null
     implemented_by: []
-    verified_by: []
+    verified_by:
+    - AUD-001
     path: specify/product/PROD-001/PROD-001.md
   PROD-002.FR-001:
     label: FR-001
@@ -90,7 +97,7 @@ requirements:
     - PROD-002
     primary_spec: PROD-002
     kind: functional
-    status: pending
+    status: verified
     introduced: null
     implemented_by: []
     verified_by: []
@@ -414,7 +421,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-002
-    verified_by: []
+    verified_by:
+    - AUD-002
     path: specify/product/PROD-005/PROD-005.md
   PROD-005.FR-002:
     label: FR-002
@@ -491,7 +499,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-004
     verified_by: []
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.FR-002:
@@ -504,7 +513,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-004
     verified_by: []
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.FR-003:
@@ -517,7 +527,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-004
     verified_by: []
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.FR-004:
@@ -530,7 +541,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-004
     verified_by: []
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.FR-005:
@@ -543,7 +555,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-004
     verified_by: []
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.NF-001:
@@ -556,7 +569,8 @@ requirements:
     kind: non-functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-004
     verified_by: []
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.NF-002:
@@ -569,7 +583,8 @@ requirements:
     kind: non-functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-004
     verified_by: []
     path: specify/product/PROD-006/PROD-006.md
   PROD-007.FR-001:
@@ -581,7 +596,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-005
     verified_by: []
     path: specify/product/PROD-007/PROD-007.md
   PROD-007.FR-002:
@@ -593,7 +609,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-005
     verified_by: []
     path: specify/product/PROD-007/PROD-007.md
   PROD-007.FR-003:
@@ -605,7 +622,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-005
     verified_by: []
     path: specify/product/PROD-007/PROD-007.md
   PROD-007.FR-004:
@@ -617,7 +635,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-005
     verified_by: []
     path: specify/product/PROD-007/PROD-007.md
   PROD-007.NF-001:
@@ -629,7 +648,8 @@ requirements:
     kind: non-functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-005
     verified_by: []
     path: specify/product/PROD-007/PROD-007.md
   PROD-007.NF-002:
@@ -641,6 +661,335 @@ requirements:
     kind: non-functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-005
     verified_by: []
     path: specify/product/PROD-007/PROD-007.md
+  PROD-008.FR-001:
+    label: FR-001
+    title: "The specs frontmatter and coverage block MUST be the authoritative record\
+      \ of each requirement\u2019s lifecycle state and supporting evidence."
+    specs:
+    - PROD-008
+    - PROD-009
+    primary_spec: PROD-008
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by:
+    - DE-007
+    verified_by: []
+    path: specify/product/PROD-008/PROD-008.md
+  PROD-008.FR-002:
+    label: FR-002
+    title: Every delta that changes requirement behaviour MUST provide an implementation
+      plan documenting planned VT/VA/VH artefacts and promote the final state back
+      into the owning spec coverage block before completion.
+    specs:
+    - PROD-008
+    - PROD-009
+    primary_spec: PROD-008
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by:
+    - DE-007
+    verified_by: []
+    path: specify/product/PROD-008/PROD-008.md
+  PROD-008.FR-003:
+    label: FR-003
+    title: Audits MUST reconcile observed behaviour against the spec coverage block
+      and raise drift through validation warnings until the spec is corrected or follow-up
+      work is scheduled.
+    specs:
+    - PROD-008
+    primary_spec: PROD-008
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by:
+    - DE-007
+    verified_by: []
+    path: specify/product/PROD-008/PROD-008.md
+  PROD-008.NF-001:
+    label: NF-001
+    title: Lifecycle updates MUST propagate through the registry within one sync cycle
+      (< 5 minutes) after a spec change.
+    specs:
+    - PROD-008
+    primary_spec: PROD-008
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-008/PROD-008.md
+  PROD-008.NF-002:
+    label: NF-002
+    title: Validation warnings about lifecycle drift MUST be actionable, surfacing
+      responsible artefacts and suggested remediation steps.
+    specs:
+    - PROD-008
+    primary_spec: PROD-008
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-008/PROD-008.md
+  PROD-009.FR-001:
+    label: FR-001
+    title: Specs MUST allow authors to declare baseline lifecycle statuses (`planned`,
+      `asserted`, `legacy_verified`, `deprecated`) directly in coverage entries.
+    specs:
+    - PROD-009
+    primary_spec: PROD-009
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-009/PROD-009.md
+  PROD-009.FR-002:
+    label: FR-002
+    title: The lifecycle engine MUST overlay statuses from deltas and audits using
+      timestamp precedence, preferring audits over deltas when recorded at the same
+      time.
+    specs:
+    - PROD-009
+    primary_spec: PROD-009
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by:
+    - DE-007
+    verified_by: []
+    path: specify/product/PROD-009/PROD-009.md
+  PROD-009.FR-003:
+    label: FR-003
+    title: Validation MUST emit corrective warnings when overlays disagree and keep
+      humans informed until a new delta or audit resolves the conflict.
+    specs:
+    - PROD-009
+    primary_spec: PROD-009
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by:
+    - DE-007
+    verified_by: []
+    path: specify/product/PROD-009/PROD-009.md
+  PROD-009.NF-001:
+    label: NF-001
+    title: Lifecycle projections MUST expose provenance (source artefact, timestamp,
+      actor) for the effective status.
+    specs:
+    - PROD-009
+    primary_spec: PROD-009
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-009/PROD-009.md
+  PROD-009.NF-002:
+    label: NF-002
+    title: Warning messages SHOULD be actionable within one hop (point to artefacts
+      and remediation) and default to warning severity rather than errors.
+    specs:
+    - PROD-009
+    primary_spec: PROD-009
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/product/PROD-009/PROD-009.md
+  SPEC-116.NF-001:
+    label: NF-001
+    title: Fast Metadata Lookup**
+    specs:
+    - SPEC-116
+    primary_spec: SPEC-116
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-116/SPEC-116.md
+  SPEC-116.NF-002:
+    label: NF-002
+    title: Clear Schema Definitions**
+    specs:
+    - SPEC-116
+    primary_spec: SPEC-116
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-116/SPEC-116.md
+  SPEC-116.NF-003:
+    label: NF-003
+    title: Validation Correctness**
+    specs:
+    - SPEC-116
+    primary_spec: SPEC-116
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-116/SPEC-116.md
+  SPEC-122.FR-001:
+    label: FR-001
+    title: Define RequirementRecord dataclass with uid, label, title, specs, primary_spec,
+      kind, status, introduced, implemented_by, verified_by, path fields
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.FR-002:
+    label: FR-002
+    title: 'Support requirement status values: pending, in-progress, live, retired'
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.FR-003:
+    label: FR-003
+    title: Load and save requirements registry at `.spec-driver/registry/requirements.yaml`
+    specs:
+    - PROD-009
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.FR-004:
+    label: FR-004
+    title: 'Extract requirements from spec markdown using pattern `- FR-NNN: Title`
+      (case-insensitive, bold/italic tolerant)'
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.FR-005:
+    label: FR-005
+    title: Parse structured spec.relationships blocks for explicit requirement lists
+      (primary, collaborators)
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.FR-006:
+    label: FR-006
+    title: Process delta frontmatter applies_to.requirements and relationship blocks
+      to link deltas to requirements
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.FR-007:
+    label: FR-007
+    title: Process revision blocks for requirement moves, introductions, and lifecycle
+      updates
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.FR-008:
+    label: FR-008
+    title: Support move_requirement operation updating uid, specs, primary_spec, path,
+      and introduced fields
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.FR-009:
+    label: FR-009
+    title: 'Provide search API with filters: query, status, spec, implemented_by,
+      introduced_by, verified_by'
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.NF-001:
+    label: NF-001
+    title: Registry file uses UTF-8 encoding and sorted YAML keys for diff stability
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.NF-002:
+    label: NF-002
+    title: Sync operations idempotent (re-running produces identical registry)
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md
+  SPEC-122.NF-003:
+    label: NF-003
+    title: Search results sorted by UID for stable output
+    specs:
+    - SPEC-122
+    primary_spec: SPEC-122
+    kind: non-functional
+    status: pending
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: specify/tech/SPEC-122/SPEC-122.md

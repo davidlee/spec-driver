@@ -15,7 +15,10 @@ Display formatting is delegated to supekku.scripts.lib.formatters
 
 The --regexp flag filters on title and summary fields.
 Other flags filter on specific structured fields (status, tags, references).
-- @app.command(backlog) `list_backlog(root, kind, status, substring, regexp, case_insensitive, format_type, truncate) -> None`: List backlog items with optional filtering.
+- @app.command(backlog) `list_backlog(root, kind, status, substring, regexp, case_insensitive, format_type, truncate, order_by_id) -> None`: List backlog items with optional filtering.
+
+By default, items are sorted by priority (registry order → severity → ID).
+Use --order-by-id to sort chronologically by ID instead.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID and title fields.

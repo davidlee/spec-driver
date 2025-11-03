@@ -1,0 +1,69 @@
+# supekku.scripts.lib.backlog.priority
+
+Priority ordering and head-tail partitioning for backlog items.
+
+This module implements the priority ordering logic for backlog items,
+including the head-tail partition algorithm used for smart merging of
+filtered item reordering.
+
+## Constants
+
+- `T`
+
+## Functions
+
+- `build_partitions(all_items, filtered_items) -> tuple[Tuple[list[T], list[tuple[Tuple[T, list[T]]]]]]`: Partition items into (shown, [unshown_followers]) pairs.
+
+The partition structure preserves the relationship between filtered (shown)
+items and their unshown followers. This enables smart merging where
+reordering shown items causes their tails to move atomically.
+
+Args:
+  all_items: Complete ordered list of items
+  filtered_items: Set of items that are visible/shown after filtering
+
+Returns:
+  Tuple of (prefix, partitions) where:
+    - prefix: Items before the first shown item
+    - partitions: List of (head, [tail_items]) pairs
+      - head: A shown item (or None for trailing unshown items)
+      - tail_items: Unshown items that follow this head
+
+Example:
+  all_items = ['a', 'b', 'c', 'd', 'e']
+  filtered_items = {'b', 'd'}
+  => prefix=['a'], partitions=[('b', ['c']), ('d', ['e'])]
+- `merge_ordering(prefix, partitions, new_filtered_order) -> list[T]`: Reorder partitions based on new filtered order, then flatten.
+
+Takes the partitioned structure and a new ordering of the filtered items,
+then reconstructs the full ordered list with tails moving atomically
+with their heads.
+
+Args:
+  prefix: Items before the first shown item
+  partitions: List of (head, [tail_items]) pairs
+  new_filtered_order: New desired order for shown items
+
+Returns:
+  Flattened ordered list with tails following their reordered heads
+
+Example:
+  prefix = ['a']
+  partitions = [('b', ['c']), ('d', ['e'])]
+  new_filtered_order = ['d', 'b']
+  => ['a', 'd', 'e', 'b', 'c']
+- `sort_by_priority(items, ordering) -> list[BacklogItem]`: Sort backlog items by priority with fallback to severity and ID.
+
+Priority order:
+  1. Registry position (lower index = higher priority)
+  2. Severity (p1 > p2 > p3 > none)
+  3. ID (alphabetical)
+
+Items not in the registry are treated as lowest priority.
+
+Args:
+  items: List of backlog items to sort
+  ordering: Ordered list of item IDs from registry
+
+Returns:
+  Sorted list of backlog items

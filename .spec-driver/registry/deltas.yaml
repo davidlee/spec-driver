@@ -1668,3 +1668,48 @@ deltas:
         risks:
         - description: Template misses required schema field.
           mitigation: Cross-check schema output, capture TODOs explicitly.
+  DE-014:
+    kind: delta
+    status: completed
+    name: Delta - backlog command shortcuts
+    slug: backlog-command-shortcuts
+    updated: '2025-11-04'
+    path: change/deltas/DE-014-backlog-command-shortcuts/DE-014.md
+    applies_to:
+      specs:
+      - PROD-010
+      requirements:
+      - PROD-010.FR-011
+    plan:
+      id: IP-014
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-014
+        delta: DE-014
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-010
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-010.FR-011
+          dependencies: []
+        phases:
+        - id: IP-014.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-014.PHASE-01
+        plan: IP-014
+        delta: DE-014
+        objective: Describe the outcome for this phase.
+        entrance_criteria: []
+        exit_criteria: []
+        verification:
+          tests: []
+          evidence: []
+        tasks: []
+        risks: []

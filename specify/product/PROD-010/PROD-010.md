@@ -237,8 +237,10 @@ entries:
   - artefact: VT-PROD010-BACKLOG-001
     kind: VT
     requirement: PROD-010.FR-011
-    status: planned
-    notes: Test kind-specific backlog list shortcuts (issues, problems, improvements, risks) with all filter options
+    status: verified
+    notes: Implemented in DE-014. Four shortcut commands (list issues/problems/improvements/risks) delegate to list_backlog with fixed kind parameter. All filter options supported (status, substring, regexp, format, truncate). Tests in supekku/cli/list_test.py verify equivalence, filtering, JSON/TSV output. 11 new tests, 156/156 CLI tests passing.
+    implemented_by: DE-014
+    verified_by: IP-014.PHASE-01
 
   - artefact: VT-PROD010-HELP-001
     kind: VT

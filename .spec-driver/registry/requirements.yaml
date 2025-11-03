@@ -1082,9 +1082,10 @@ requirements:
     - PROD-010
     primary_spec: PROD-010
     kind: functional
-    status: pending
+    status: active
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-014
     verified_by: []
     coverage_evidence:
     - VT-PROD010-BACKLOG-001

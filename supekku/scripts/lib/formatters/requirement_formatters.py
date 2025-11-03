@@ -89,12 +89,13 @@ def format_requirement_list_table(
     spec_styled = f"[spec.id]{spec}[/spec.id]"
     label_styled = f"[requirement.id]{req.label}[/requirement.id]"
     category = req.category or "—"
+    category_styled = f"[requirement.category]{category}[/requirement.category]"
     status_style = get_requirement_status_style(req.status)
     status_styled = f"[{status_style}]{req.status}[/{status_style}]"
 
     add_row_with_truncation(
       table,
-      [spec_styled, label_styled, category, req.title, status_styled],
+      [spec_styled, label_styled, category_styled, req.title, status_styled],
       max_widths=max_widths if truncate else None,
     )
 

@@ -92,6 +92,7 @@ SPEC_DRIVER_THEME = Theme(
     "spec.id": "#00b8ff",  # sky blue
     "change.id": "#d79921",  # yellow
     "requirement.id": "#9600ff",  # purple
+    "requirement.category": "#458588",  # blue
     "backlog.id": "#ff00c1",  # magenta
     # UI elements
     "table.border": "#7c7876",  # mid grey

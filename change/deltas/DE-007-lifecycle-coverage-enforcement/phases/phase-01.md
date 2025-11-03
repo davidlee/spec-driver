@@ -65,18 +65,18 @@ Integrate verification coverage block parsing into the requirements registry syn
 - [x] SPEC-122 guidance reviewed (requirements registry architecture)
 - [x] Existing verification coverage parser understood
 - [x] Current registry sync flow mapped
-- [ ] Test fixtures directory created (`tests/fixtures/requirements/coverage/`)
-- [ ] Regression test baseline established
+- [x] Test fixtures created (inline in test file)
+- [x] Regression test baseline established (11 existing tests)
 
 ## 4. Exit Criteria / Done When
 
-- [ ] Registry sync extracts coverage blocks from specs, IPs, deltas, audits
-- [ ] `RequirementRecord.verified_by` populated with artefact IDs from coverage
-- [ ] Requirement status computed from aggregated coverage statuses
-- [ ] Drift warnings emitted when coverage statuses conflict across artifacts
-- [ ] VT-902 integration test passing
-- [ ] No regression in existing registry tests
-- [ ] Both linters passing (`just lint` + `just pylint`)
+- [x] Registry sync extracts coverage blocks from specs, IPs, deltas, audits
+- [x] `RequirementRecord.verified_by` populated with artefact IDs from coverage
+- [x] Requirement status computed from aggregated coverage statuses
+- [x] Drift warnings emitted when coverage statuses conflict across artifacts
+- [x] VT-902 integration test passing
+- [x] No regression in existing registry tests (11/11 passing)
+- [x] Both linters passing (`just lint` + `just pylint`)
 
 ## 5. Verification
 

@@ -80,9 +80,9 @@ Enforce verification coverage updates during delta completion, blocking completi
 
 - [x] Phase 01 exit criteria met (registry processes coverage)
 - [x] Phase 01 hand-off notes reviewed (see phase-01.md section 12)
-- [ ] Complete delta script structure understood
-- [ ] CLI test harness available
-- [ ] Example deltas with requirements identified for testing
+- [x] Complete delta script structure understood (research-phase-02.md)
+- [x] CLI test harness available (created coverage_check_test.py with workspace fixtures)
+- [x] Example deltas with requirements identified for testing (DE-007 itself used for validation)
 
 **Phase 01 Hand-off Notes:**
 - Registry infrastructure complete: `_apply_coverage_blocks()` method ready
@@ -94,16 +94,16 @@ Enforce verification coverage updates during delta completion, blocking completi
 
 ## 4. Exit Criteria / Done When
 
-- [ ] Pre-completion check validates coverage completeness
-- [ ] Completion blocked when requirements have `status: planned` coverage
-- [ ] `--force` flag bypasses check with warning
-- [ ] `SPEC_DRIVER_ENFORCE_COVERAGE` environment variable controls enforcement
-- [ ] Error messages are actionable (list missing coverage, show examples)
-- [ ] RUN.md documents coverage workflow
-- [ ] AGENTS.md or CLAUDE.md updated with coverage checklist
-- [ ] VA-320 validation session complete
-- [ ] VH-201 manual validation complete
-- [ ] Both linters passing
+- [x] Pre-completion check validates coverage completeness
+- [x] Completion blocked when requirements have `status: planned` coverage
+- [x] `--force` flag bypasses check with warning
+- [x] `SPEC_DRIVER_ENFORCE_COVERAGE` environment variable controls enforcement
+- [x] Error messages are actionable (list missing coverage, show examples)
+- [x] RUN.md documents coverage workflow (created .spec-driver/RUN.md)
+- [x] AGENTS.md and CLAUDE.md updated with coverage checklist
+- [x] VA-320 validation session complete (tested DE-007 completion)
+- [x] VH-201 manual validation complete (drift tests passing)
+- [x] Both linters passing (ruff + pylint clean)
 
 ## 5. Verification
 

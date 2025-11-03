@@ -205,7 +205,9 @@ def format_spec_list_json(specs: Sequence[Spec]) -> str:
       "id": spec.id,
       "slug": spec.slug,
       "name": spec.name,
+      "kind": spec.kind,
       "status": spec.status,
+      "path": spec.path.as_posix(),
       "packages": spec.packages if spec.packages else [],
     }
     items.append(item)

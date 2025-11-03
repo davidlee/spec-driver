@@ -13,8 +13,8 @@ from supekku.scripts.lib.core.paths import get_registry_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.relations.manager import add_relation
 from supekku.scripts.lib.requirements.lifecycle import (
+  STATUS_ACTIVE,
   STATUS_IN_PROGRESS,
-  STATUS_LIVE,
   STATUS_PENDING,
 )
 from supekku.scripts.lib.requirements.registry import RequirementsRegistry
@@ -170,7 +170,7 @@ class RequirementsRegistryTest(unittest.TestCase):
       [root / "specify" / "tech"],
       spec_registry=spec_registry,
     )
-    registry.set_status("SPEC-001.FR-001", STATUS_LIVE)
+    registry.set_status("SPEC-001.FR-001", STATUS_ACTIVE)
     registry.save()
 
     # re-sync after modifying spec body
@@ -188,7 +188,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     registry.save()
 
     assert stats.created == 1
-    assert registry.records["SPEC-001.FR-001"].status == STATUS_LIVE
+    assert registry.records["SPEC-001.FR-001"].status == STATUS_ACTIVE
 
   def test_search_filters(self) -> None:
     """Test that search can filter requirements by text query."""
@@ -444,7 +444,7 @@ requirements:
     # Check verified_by populated from coverage
     fr001 = registry.records["SPEC-900.FR-001"]
     assert "VT-900" in fr001.verified_by
-    assert fr001.status == STATUS_LIVE  # All verified
+    assert fr001.status == STATUS_ACTIVE  # All verified
 
     fr002 = registry.records["SPEC-900.FR-002"]
     assert "VT-901" in fr002.verified_by
@@ -489,9 +489,9 @@ requirements:
     registry_path = get_registry_dir(root) / "requirements.yaml"
     registry = RequirementsRegistry(registry_path)
 
-    # All verified → live
+    # All verified → active
     entries = [{"status": "verified"}, {"status": "verified"}]
-    assert registry._compute_status_from_coverage(entries) == STATUS_LIVE
+    assert registry._compute_status_from_coverage(entries) == STATUS_ACTIVE
 
     # In-progress → in-progress
     entries = [{"status": "in-progress"}]

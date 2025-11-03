@@ -253,7 +253,7 @@ class TestFormatSpecDetails(unittest.TestCase):
       name="Complete Specification",
       slug="complete-spec",
       kind="spec",
-      status="live",
+      status="active",
       packages=["pkg/core", "pkg/utils", "internal/lib"],
       path=Path("/repo/specify/tech/SPEC-123/SPEC-123.md"),
     )
@@ -266,7 +266,7 @@ class TestFormatSpecDetails(unittest.TestCase):
     assert "Name: Complete Specification" in result
     assert "Slug: complete-spec" in result
     assert "Kind: spec" in result
-    assert "Status: live" in result
+    assert "Status: active" in result
     assert "Packages:" in result
     assert "pkg/core" in result
     assert "File: specify/tech/SPEC-123/SPEC-123.md" in result

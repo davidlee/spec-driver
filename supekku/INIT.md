@@ -40,12 +40,20 @@ List the delta directory contents. It may contain additional files relevant to i
 User: look at DE-005/1.4
 Agent:
 - That's task 1.4 in phase 1 - likely a handover of work already in progress
+- assume the intent is to continue implementation from 1.4
 - `uv run spec-driver show delta DE-005 --json`
 - read the delta and other entities referenced in its metadata (specs, etc)
 - read any existing IP + thes relevant phase sheet
-- assume the intent is to continue implementation from 1.4
-- run a quick pre-flight check and outline any questions or concerns before implementation
-- ask user whether to pause for review / confirmation after each task
+- **IMPORTANT**: CHECK ENTRY CRITERIA.
+  - Mark off any already satisfied
+  - Attempt to satisfy (e.g. with research) any remaining
+  - STOP and report if all cannot truthfully be satisfied.
+- run a quick pre-flight check: consider readiness & confidence
+- summarise for the user:
+  - summary of entry criteria
+  - outline any questions or concerns before implementation
+  - summarise level of confidence in the plan
+  - ask user whether to pause for review / confirmation after each task
 
 ### When task is completed
 

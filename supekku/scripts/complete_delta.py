@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Complete a delta and transition associated requirements to live status."""
+"""Complete a delta and transition associated requirements to active status."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ from supekku.scripts.lib.changes.updater import (
   RevisionUpdateError,
   update_requirement_lifecycle_status,
 )
-from supekku.scripts.lib.requirements.lifecycle import STATUS_LIVE
+from supekku.scripts.lib.requirements.lifecycle import STATUS_ACTIVE
 from supekku.scripts.lib.workspace import Workspace
 
 
@@ -197,9 +197,9 @@ def update_requirements_status(
   requirements_registry,
   silent=False,
 ) -> None:
-  """Update requirement statuses to live (registry only - ephemeral)."""
+  """Update requirement statuses to active (registry only - ephemeral)."""
   for req_id, _req in requirements_to_update:
-    requirements_registry.set_status(req_id, STATUS_LIVE)
+    requirements_registry.set_status(req_id, STATUS_ACTIVE)
 
   requirements_registry.save()
   if requirements_to_update and not silent:
@@ -261,7 +261,7 @@ def update_requirements_in_revision_sources(
         changed = update_requirement_lifecycle_status(
           source.revision_file,
           req_id,
-          STATUS_LIVE,
+          STATUS_ACTIVE,
           block_index=source.block_index,
           requirement_index=source.requirement_index,
         )
@@ -304,7 +304,9 @@ def handle_already_completed_delta(
   """
   # Check if requirements need fixing
   needs_fixing = [
-    (req_id, req) for req_id, req in requirements_to_update if req.status != STATUS_LIVE
+    (req_id, req)
+    for req_id, req in requirements_to_update
+    if req.status != STATUS_ACTIVE
   ]
 
   if not needs_fixing:
@@ -317,7 +319,7 @@ def handle_already_completed_delta(
     return 0
 
   if not force and not prompt_yes_no(
-    "Update requirements to 'live' status?",
+    "Update requirements to 'active' status?",
     default=True,
   ):
     return 0
@@ -354,14 +356,14 @@ def complete_delta(
   skip_sync: bool = False,
   update_requirements: bool = True,
 ) -> int:
-  """Complete a delta and transition requirements to live status.
+  """Complete a delta and transition requirements to active status.
 
   Args:
       delta_id: Delta identifier (e.g., DE-004)
       dry_run: Preview changes without applying them
       force: Skip all prompts
       skip_sync: Skip spec sync prompt/check
-      update_requirements: If True (default), update requirements to 'live' status
+      update_requirements: If True (default), update requirements to 'active' status
                          in revision source files (persistent). Creates completion
                          revision for untracked requirements. If False, only marks
                          delta as completed without updating requirements.

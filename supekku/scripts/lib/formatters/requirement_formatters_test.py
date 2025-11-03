@@ -39,7 +39,7 @@ class TestFormatRequirementListTable(unittest.TestCase):
       uid="SPEC-001.FR-001",
       label="FR-001",
       title="User authentication",
-      status="live",
+      status="active",
       primary_spec="SPEC-001",
       specs=["SPEC-001"],
     )
@@ -53,7 +53,7 @@ class TestFormatRequirementListTable(unittest.TestCase):
       uid="SPEC-001.FR-001",
       label="FR-001",
       title="User authentication",
-      status="live",
+      status="active",
       kind="functional",
       primary_spec="SPEC-001",
       specs=["SPEC-001"],
@@ -64,7 +64,7 @@ class TestFormatRequirementListTable(unittest.TestCase):
     assert data["items"][0]["uid"] == "SPEC-001.FR-001"
     assert data["items"][0]["label"] == "FR-001"
     assert data["items"][0]["title"] == "User authentication"
-    assert data["items"][0]["status"] == "live"
+    assert data["items"][0]["status"] == "active"
     assert data["items"][0]["kind"] == "functional"
 
   def test_format_single_requirement_tsv(self) -> None:
@@ -73,7 +73,7 @@ class TestFormatRequirementListTable(unittest.TestCase):
       uid="SPEC-001.FR-001",
       label="FR-001",
       title="User authentication",
-      status="live",
+      status="active",
       primary_spec="SPEC-001",
       specs=["SPEC-001"],
     )
@@ -84,7 +84,7 @@ class TestFormatRequirementListTable(unittest.TestCase):
     assert fields[0] == "SPEC-001"  # spec
     assert fields[1] == "FR-001"  # label
     assert fields[2] == "User authentication"  # title
-    assert fields[3] == "live"  # status
+    assert fields[3] == "active"  # status
 
   def test_format_multiple_requirements(self) -> None:
     """Test formatting multiple requirements."""
@@ -93,7 +93,7 @@ class TestFormatRequirementListTable(unittest.TestCase):
         uid="SPEC-001.FR-001",
         label="FR-001",
         title="User authentication",
-        status="live",
+        status="active",
         primary_spec="SPEC-001",
         specs=["SPEC-001"],
       ),
@@ -120,7 +120,7 @@ class TestFormatRequirementListTable(unittest.TestCase):
       uid="SPEC-001.FR-002",
       label="FR-002",
       title="Password reset",
-      status="live",
+      status="active",
       primary_spec="SPEC-001",
       specs=["SPEC-001"],
       introduced="RE-001",
@@ -190,7 +190,7 @@ class TestFormatRequirementListJson(unittest.TestCase):
       uid="SPEC-001.FR-001",
       label="FR-001",
       title="Test requirement",
-      status="live",
+      status="active",
       path="specify/tech/SPEC-001/SPEC-001.md",
     )
     result = format_requirement_list_json([req])
@@ -224,7 +224,7 @@ class TestFormatRequirementDetails(unittest.TestCase):
       uid="SPEC-001.FR-001",
       label="FR-001",
       title="User authentication",
-      status="live",
+      status="active",
       kind="functional",
       primary_spec="SPEC-001",
       specs=["SPEC-001", "SPEC-002"],
@@ -238,7 +238,7 @@ class TestFormatRequirementDetails(unittest.TestCase):
     assert "Label: FR-001" in result
     assert "Title: User authentication" in result
     assert "Kind: functional" in result
-    assert "Status: live" in result
+    assert "Status: active" in result
     assert "Primary Spec: SPEC-001" in result
     assert "Specs: SPEC-001, SPEC-002" in result
     assert "Introduced: RE-001" in result

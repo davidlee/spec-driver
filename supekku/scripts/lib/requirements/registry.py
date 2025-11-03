@@ -29,8 +29,8 @@ from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
 
 from .lifecycle import (
+  STATUS_ACTIVE,
   STATUS_IN_PROGRESS,
-  STATUS_LIVE,
   STATUS_PENDING,
   VALID_STATUSES,
   RequirementStatus,
@@ -479,7 +479,7 @@ class RequirementsRegistry:
 
     Applies precedence rules:
     - ANY 'failed' or 'blocked' → in-progress (needs attention)
-    - ALL 'verified' → live
+    - ALL 'verified' → active
     - ANY 'in-progress' → in-progress
     - ALL 'planned' → pending
     - MIXED → in-progress
@@ -499,7 +499,7 @@ class RequirementsRegistry:
 
     # All verified means requirement is live
     if statuses == {"verified"}:
-      return STATUS_LIVE
+      return STATUS_ACTIVE
 
     # In-progress or mixed statuses
     if "in-progress" in statuses or len(statuses) > 1:

@@ -45,10 +45,10 @@ def complete_delta(
     ),
   ] = False,
 ) -> None:
-  """Complete a delta and transition associated requirements to live status.
+  """Complete a delta and transition associated requirements to active status.
 
   Marks a delta as completed and optionally updates associated requirements
-  to 'live' status in revision source files.
+  to 'active' status in revision source files.
   """
   try:
     exit_code = complete_delta_impl(

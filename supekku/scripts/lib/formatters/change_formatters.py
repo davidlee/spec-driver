@@ -472,6 +472,7 @@ def format_change_list_json(changes: Sequence[ChangeArtifact]) -> str:
       "status": change.status,
       "name": change.name,
       "slug": change.slug,
+      "path": change.path.as_posix(),
     }
     # Add optional fields
     if change.applies_to:

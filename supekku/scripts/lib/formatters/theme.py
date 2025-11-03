@@ -46,7 +46,7 @@ SPEC_DRIVER_THEME = Theme(
     "spec.status.deprecated": "#cc241d",  # red
     "spec.status.archived": "#3c3836",  # dark grey
     # Requirement status colors
-    "requirement.status.live": "#8ec07c",  # green
+    "requirement.status.active": "#8ec07c",  # green
     "requirement.status.implemented": "#8ec07c",  # green
     "requirement.status.verified": "#00ff00 bold",  # hot lime green
     "requirement.status.in-progress": "#d79921",  # yellow
@@ -129,10 +129,10 @@ def get_requirement_status_style(status: str) -> str:
   """Get the style name for a requirement status.
 
   Args:
-    status: Status string (e.g., "live", "pending")
+    status: Status string (e.g., "active", "pending")
 
   Returns:
-    Style name from theme (e.g., "requirement.status.live")
+    Style name from theme (e.g., "requirement.status.active")
   """
   status_lower = status.lower().replace(" ", "-")
   return f"requirement.status.{status_lower}"

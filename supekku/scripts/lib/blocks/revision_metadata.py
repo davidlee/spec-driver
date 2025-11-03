@@ -424,7 +424,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
             "spec": "SPEC-100",
           },
           "lifecycle": {
-            "status": "live",
+            "status": "active",
             "introduced_by": "RE-001",
             "implemented_by": ["DE-001", "DE-002"],
             "verified_by": ["AUD-001"],

@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from supekku.scripts.lib.requirements.lifecycle import STATUS_LIVE, STATUS_PENDING
+from supekku.scripts.lib.requirements.lifecycle import STATUS_ACTIVE, STATUS_PENDING
 
 from .updater import (
   RevisionUpdateError,
@@ -55,7 +55,7 @@ def test_update_requirement_lifecycle_status_updates_status() -> None:
     changed = update_requirement_lifecycle_status(
       revision_file,
       "SPEC-150.FR-001",
-      STATUS_LIVE,
+      STATUS_ACTIVE,
       block_index=0,
       requirement_index=0,
     )
@@ -64,7 +64,7 @@ def test_update_requirement_lifecycle_status_updates_status() -> None:
 
     # Verify file was updated
     content = revision_file.read_text(encoding="utf-8")
-    assert "status: live" in content
+    assert "status: active" in content
     assert "status: pending" not in content
 
 
@@ -114,7 +114,7 @@ def test_update_requirement_lifecycle_status_validates_requirement_id() -> None:
       update_requirement_lifecycle_status(
         revision_file,
         "SPEC-999.FR-999",  # Wrong ID
-        STATUS_LIVE,
+        STATUS_ACTIVE,
         block_index=0,
         requirement_index=0,
       )
@@ -131,7 +131,7 @@ def test_update_requirement_lifecycle_status_validates_block_index() -> None:
       update_requirement_lifecycle_status(
         revision_file,
         "SPEC-150.FR-001",
-        STATUS_LIVE,
+        STATUS_ACTIVE,
         block_index=999,  # Out of range
         requirement_index=0,
       )
@@ -151,7 +151,7 @@ def test_update_requirement_lifecycle_status_validates_requirement_index() -> No
       update_requirement_lifecycle_status(
         revision_file,
         "SPEC-150.FR-001",
-        STATUS_LIVE,
+        STATUS_ACTIVE,
         block_index=0,
         requirement_index=999,  # Out of range
       )
@@ -191,7 +191,7 @@ requirements:
     changed = update_requirement_lifecycle_status(
       revision_file,
       "SPEC-150.FR-002",
-      STATUS_LIVE,
+      STATUS_ACTIVE,
       block_index=0,
       requirement_index=0,
     )
@@ -201,4 +201,4 @@ requirements:
     # Verify lifecycle was added
     content = revision_file.read_text(encoding="utf-8")
     assert "lifecycle:" in content
-    assert "status: live" in content
+    assert "status: active" in content

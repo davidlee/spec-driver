@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 import yaml
 
-from supekku.scripts.lib.requirements.lifecycle import STATUS_LIVE
+from supekku.scripts.lib.requirements.lifecycle import STATUS_ACTIVE
 
 from .creation import create_revision
 
@@ -64,7 +64,7 @@ def _render_revision_change_block(
         "lifecycle": {
           "introduced_by": delta_id,
           "implemented_by": [delta_id],
-          "status": STATUS_LIVE,
+          "status": STATUS_ACTIVE,
         },
       },
     )

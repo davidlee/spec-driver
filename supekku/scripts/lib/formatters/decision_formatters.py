@@ -259,6 +259,7 @@ def format_decision_list_json(decisions: Sequence[Decision]) -> str:
       "id": decision.id,
       "status": decision.status,
       "title": decision.title,
+      "path": decision.path,
       "created": decision.created,
       "updated": decision.updated,
       "decided": decision.decided,

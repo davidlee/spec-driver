@@ -153,17 +153,17 @@ schema: supekku.verification.coverage
 version: 1
 subject: PROD-011
 entries:
-  - artefact: VT-011-001
+  - artefact: VT-016-001
     kind: VT
     requirement: PROD-011.FR-001
-    status: planned
-    notes: Test create delta no longer creates phase-01 directory
+    status: verified
+    notes: Test create delta no longer creates phase-01 directory (implemented in DE-016)
 
-  - artefact: VT-011-002
+  - artefact: VT-016-002
     kind: VT
     requirement: PROD-011.FR-002
-    status: planned
-    notes: Test create phase works when plan has no existing phases
+    status: verified
+    notes: Test create phase works when plan has no existing phases (implemented in DE-016)
 
   - artefact: VT-011-003
     kind: VT

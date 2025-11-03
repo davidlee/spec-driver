@@ -252,7 +252,10 @@ def update_requirements_in_revision_sources(
   if dry_run:
     return True
 
-  if not force and not prompt_yes_no("Proceed with updates?", default=True):
+  if not force and not prompt_yes_no(
+    "Update requirement lifecycle status in revision files?",
+    default=True,
+  ):
     return False
 
   # Update tracked requirements in revision files
@@ -278,12 +281,19 @@ def update_requirements_in_revision_sources(
   # Create completion revision for untracked requirements
   if untracked:
     try:
-      create_completion_revision(
+      revision_id = create_completion_revision(
         delta_id=delta_id,
         requirements=sorted(untracked),
         workspace=workspace,
       )
-    except (ValueError, OSError):
+      # Display revision info
+      revision_slug = delta_id.lower() + "-completion"
+      revision_dir = f"{revision_id}-{revision_slug}"
+      revision_path = workspace.root / "change" / "revisions" / revision_dir
+      print(f"\n✓ Created completion revision: {revision_id}")
+      print(f"  {revision_path.relative_to(workspace.root)}")
+    except (ValueError, OSError) as e:
+      print(f"\nError creating completion revision: {e}", file=sys.stderr)
       return False
 
   return True
@@ -443,7 +453,7 @@ def complete_delta(
     print("Note: Coverage enforcement is disabled via SPEC_DRIVER_ENFORCE_COVERAGE")
 
   # Confirm unless force mode
-  if not force and not prompt_yes_no("Proceed with completion?", default=False):
+  if not force and not prompt_yes_no("Mark delta as completed?", default=False):
     return 1
 
   # Update requirement statuses if flag is set

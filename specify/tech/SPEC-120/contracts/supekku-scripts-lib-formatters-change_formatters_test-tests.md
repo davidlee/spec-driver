@@ -57,7 +57,7 @@ Verifies PROD-006.FR-003: Enhanced delta display shows phases.
 #### Methods
 
 - `test_delta_phase_id_and_name_formatted(self) -> None`: Test phase ID and name are formatted correctly in output.
-- `test_delta_phase_objective_truncation(self) -> None`: Test that long objectives are truncated appropriately.
+- `test_delta_phase_objective_truncation(self) -> None`: Test that long objectives are wrapped in table display.
 - `test_delta_with_three_phases(self) -> None`: Test delta with 3 phases shows all with proper formatting.
 - `test_delta_with_zero_phases(self) -> None`: Test delta with plan but no phases shows plan ID.
 

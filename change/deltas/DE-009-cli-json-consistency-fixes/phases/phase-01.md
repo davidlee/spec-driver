@@ -4,7 +4,7 @@ slug: cli-json-consistency-fixes-phase-01
 name: IP-009 Phase 01
 created: '2025-11-03'
 updated: '2025-11-03'
-status: draft
+status: completed
 kind: phase
 ---
 

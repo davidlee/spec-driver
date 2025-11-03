@@ -580,13 +580,14 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-004
     verified_by: []
     coverage_evidence:
     - VT-PHASE-001
+    - VT-PHASE-007
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.FR-002:
     label: FR-002
@@ -596,7 +597,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-004
@@ -612,7 +613,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-004
@@ -628,13 +629,14 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-004
     verified_by: []
     coverage_evidence:
     - VT-PHASE-004
+    - VT-PHASE-006
     path: specify/product/PROD-006/PROD-006.md
   PROD-006.FR-005:
     label: FR-005
@@ -644,7 +646,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-004
@@ -660,7 +662,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: non-functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-004
@@ -676,7 +678,7 @@ requirements:
     - PROD-006
     primary_spec: PROD-006
     kind: non-functional
-    status: pending
+    status: active
     introduced: null
     implemented_by:
     - DE-004
@@ -983,7 +985,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-011
     verified_by: []
     coverage_evidence:
     - VT-PROD010-FILTER-002
@@ -997,7 +1000,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-011
     verified_by: []
     coverage_evidence:
     - VT-PROD010-FILTER-003
@@ -1011,7 +1015,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-011
     verified_by: []
     coverage_evidence:
     - VT-PROD010-SCHEMA-001
@@ -1025,7 +1030,8 @@ requirements:
     kind: functional
     status: pending
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-011
     verified_by: []
     coverage_evidence:
     - VT-PROD010-SCHEMA-002

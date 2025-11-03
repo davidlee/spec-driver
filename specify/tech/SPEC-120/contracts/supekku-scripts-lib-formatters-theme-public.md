@@ -57,6 +57,13 @@ Args:
 
 Returns:
   Style name from theme (e.g., "change.status.completed")
+- `get_policy_status_style(status) -> str`: Get the style name for a policy status.
+
+Args:
+  status: Status string (e.g., "active", "draft")
+
+Returns:
+  Style name from theme (e.g., "policy.status.active")
 - `get_requirement_status_style(status) -> str`: Get the style name for a requirement status.
 
 Args:
@@ -71,3 +78,10 @@ Args:
 
 Returns:
   Style name from theme (e.g., "spec.status.active")
+- `get_standard_status_style(status) -> str`: Get the style name for a standard status.
+
+Args:
+  status: Status string (e.g., "required", "default")
+
+Returns:
+  Style name from theme (e.g., "standard.status.required")

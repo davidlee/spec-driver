@@ -18,7 +18,7 @@ Args:
   root: Repository root for relative paths
 
 Returns:
-  Enriched phase dictionary
+  Enriched phase dictionary with tasks/criteria in checkbox format
 - `_format_affects(artifact) -> list[str]`: Format affects section for revisions (similar to applies_to for deltas).
 - `_format_applies_to(artifact) -> list[str]`: Format applies_to section if present.
 - `_format_change_basic_fields(artifact) -> list[str]`: Format basic change artifact fields.

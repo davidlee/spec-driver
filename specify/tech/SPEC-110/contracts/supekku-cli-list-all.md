@@ -26,6 +26,10 @@ The --regexp flag does pattern matching on ID, slug, and name fields.
 - @app.command(deltas) `list_deltas(root, ids, status, regexp, case_insensitive, format_type, json_output, truncate, details) -> None`: List deltas with optional filtering and status grouping.
 
 The --regexp flag filters on ID, name, and slug fields.
+- @app.command(policies) `list_policies(root, status, tag, spec, delta, requirement_filter, standard, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List policies with optional filtering.
+
+The --regexp flag filters on title and summary fields.
+Other flags filter on specific structured fields (status, tags, references).
 - @app.command(requirements) `list_requirements(root, spec, status, kind, substring, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List requirements with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
@@ -38,3 +42,7 @@ The --regexp flag does pattern matching on ID, slug, and name fields.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
+- @app.command(standards) `list_standards(root, status, tag, spec, delta, requirement_filter, policy, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List standards with optional filtering.
+
+The --regexp flag filters on title and summary fields.
+Other flags filter on specific structured fields (status, tags, references).

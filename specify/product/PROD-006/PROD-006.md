@@ -118,44 +118,56 @@ entries:
   - artefact: VT-PHASE-001
     kind: VT
     requirement: PROD-006.FR-001
-    status: planned
-    notes: Unit tests for phase creation with various plan/delta contexts
+    status: verified
+    notes: Unit tests for phase creation - passing in creation_test.py
 
   - artefact: VT-PHASE-002
     kind: VT
     requirement: PROD-006.FR-002
-    status: planned
-    notes: Integration test for phase metadata population and sequencing
+    status: verified
+    notes: Auto-increment numbering tests - passing in creation_test.py
 
   - artefact: VT-PHASE-003
     kind: VT
     requirement: PROD-006.FR-003
-    status: planned
-    notes: Formatter tests for enhanced delta display with phases
+    status: verified
+    notes: Formatter tests for enhanced delta display - passing in change_formatters_test.py
 
   - artefact: VT-PHASE-004
     kind: VT
     requirement: PROD-006.FR-004
-    status: planned
-    notes: E2E test for phase navigation workflow
+    status: verified
+    notes: Metadata population tests - passing in creation_test.py
 
   - artefact: VT-PHASE-005
     kind: VT
     requirement: PROD-006.FR-005
-    status: planned
-    notes: Schema validation tests for phase.overview frontmatter
+    status: verified
+    notes: Schema validation tests for phase.overview - passing in blocks/ tests
+
+  - artefact: VT-PHASE-006
+    kind: VT
+    requirement: PROD-006.FR-004
+    status: verified
+    notes: Plan metadata update tests - passing in plan_test.py
+
+  - artefact: VT-PHASE-007
+    kind: VT
+    requirement: PROD-006.FR-001
+    status: verified
+    notes: Phase tracking block tests - passing in tracking_test.py (19 tests)
 
   - artefact: VA-PHASE-001
     kind: VA
     requirement: PROD-006.NF-001
-    status: planned
-    notes: Design review of phase metadata schema extensibility
+    status: verified
+    notes: Performance benchmark - all 20 phases created in <200ms (92% faster than 2s requirement). See change/deltas/DE-004-phase-management-implementation/VA-PHASE-001-performance.md
 
   - artefact: VA-PHASE-002
     kind: VA
     requirement: PROD-006.NF-002
-    status: planned
-    notes: UX review of delta display with phase information
+    status: verified
+    notes: UX review - delta display readable with 1-6 phases, truncation effective. See change/deltas/DE-004-phase-management-implementation/VA-PHASE-002-ux-review.md
 ```
 
 ## 1. Intent & Summary
@@ -497,13 +509,16 @@ See `supekku:verification.coverage@v1` block above. All FR/NF requirements mappe
 ### Acceptance Gates
 
 **MVP Launch Criteria**:
-- [ ] `create phase` command implemented and tested (VT-PHASE-001, VT-PHASE-002)
-- [ ] Phase metadata auto-population working (VT-PHASE-004)
-- [ ] Enhanced delta display shows phases (VT-PHASE-003)
-- [ ] Schema validation enforces phase.overview correctness (VT-PHASE-005)
-- [ ] All tests passing (`just test`)
-- [ ] Linters passing (`just lint`, `just pylint`)
-- [ ] Documentation updated with phase creation examples
+- [x] `create phase` command implemented and tested (VT-PHASE-001, VT-PHASE-002)
+- [x] Phase metadata auto-population working (VT-PHASE-004, VT-PHASE-006)
+- [x] Enhanced delta display shows phases (VT-PHASE-003)
+- [x] Schema validation enforces phase.overview correctness (VT-PHASE-005)
+- [x] Structured progress tracking implemented (VT-PHASE-007)
+- [x] Performance verified <2s (VA-PHASE-001: avg 0.144s)
+- [x] UX review completed (VA-PHASE-002: readable with 1-6 phases)
+- [x] All tests passing (`just test`)
+- [x] Linters passing (`just lint`, `just pylint`)
+- [x] Documentation updated (phase template, tracking examples)
 
 ## 7. Backlog Hooks & Dependencies
 

@@ -111,6 +111,18 @@ Test main application structure and help.
 - `test_main_no_args(self)`: Test invoking with no arguments shows help.
 - `test_main_shows_all_commands(self)`: Test that all major commands are listed.
 
+### TestPolicyCommands
+
+Test policy-related CLI commands.
+
+#### Methods
+
+- `test_create_policy_help(self)`: Test create policy command help.
+- `test_list_policies_empty_succeeds(self)`: Test list policies with no policies exits successfully.
+- `test_list_policies_help(self)`: Test list policies command help.
+- `test_list_policies_json_flag(self)`: Test list policies supports --json flag.
+- `test_show_policy_help(self)`: Test show policy command help.
+
 ### TestRegexpFiltering
 
 Test regexp filtering utility and CLI flags.
@@ -153,6 +165,18 @@ Test show command group.
 
 - `test_show_adr_help(self)`: Test show adr command help.
 - `test_show_help(self)`: Test show command group help.
+
+### TestStandardCommands
+
+Test standard-related CLI commands.
+
+#### Methods
+
+- `test_create_standard_help(self)`: Test create standard command help.
+- `test_list_standards_empty_succeeds(self)`: Test list standards with no standards exits successfully.
+- `test_list_standards_help(self)`: Test list standards command help.
+- `test_list_standards_json_flag(self)`: Test list standards supports --json flag.
+- `test_show_standard_help(self)`: Test show standard command help.
 
 ### TestStatusFilterParity
 

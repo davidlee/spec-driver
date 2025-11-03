@@ -41,42 +41,8 @@ deltas:
           dependencies: []
         phases:
         - id: IP-002.PHASE-01
-          name: Phase 01 - Tooling & Validation
-          objective: Implement package detection logic, validate deterministic ordering,
-            audit registry for package-level support. Ensure foundation is sound before
-            migration.
-          entrance_criteria:
-          - PROD-005 spec approved and synced
-          - DE-002 delta created
-          exit_criteria:
-          - Package detection logic implemented and tested
-          - Deterministic ordering validated across platforms
-          - Registry audit complete with adaptation plan
-          - VT-001 and VT-002 passing
         - id: IP-002.PHASE-02
-          name: Phase 02 - Migration Execution
-          objective: Delete file-level specs, generate package-level specs, update
-            relationships, sync registry. Execute the breaking change cleanly.
-          entrance_criteria:
-          - Phase 01 complete
-          - Tooling changes tested and validated
-          exit_criteria:
-          - All 101 file-level specs deleted
-          - ~25-30 package-level specs created
-          - Registry synced successfully
-          - Validation passes with no errors
         - id: IP-002.PHASE-03
-          name: Phase 03 - Verification & Documentation
-          objective: Complete verification testing (VT-003, VT-004), update documentation,
-            verify contract stability, confirm acceptance gates.
-          entrance_criteria:
-          - Phase 02 complete
-          - Package-level specs synced and validated
-          exit_criteria:
-          - VT-003 and VT-004 passing
-          - Documentation updated
-          - VA-001 confirms zero spurious diffs
-          - All acceptance gates met
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -166,10 +132,6 @@ deltas:
           dependencies: []
         phases:
         - id: IP-003.PHASE-01
-          name: Phase 01 - Initial delivery
-          objective: Deliver the foundational work for this delta.
-          entrance_criteria: []
-          exit_criteria: []
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -204,10 +166,10 @@ deltas:
         risks: []
   DE-004:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Phase Management Implementation
     slug: phase-management-implementation
-    updated: '2025-11-02'
+    updated: '2025-11-03'
     path: change/deltas/DE-004-phase-management-implementation/DE-004.md
     applies_to:
       specs:
@@ -523,25 +485,6 @@ deltas:
           dependencies: []
         phases:
         - id: IP-005.PHASE-01
-          name: Phase 01 - Core Implementation
-          status: complete
-          objective: 'Implement single-spec backfill: template retrieval, stub detection,
-            completion logic, CLI command, and agent workflow. Batch mode deferred.'
-          entrance_criteria:
-          - PROD-007 complete and validated
-          - Contracts generation working
-          - SpecRegistry and template infrastructure confirmed
-          exit_criteria:
-          - show template command working
-          - Stub detection tested and reliable
-          - Single spec backfill E2E functional
-          - All tests and linters passing
-          evidence:
-          - SPEC-125 completed successfully
-          - SPEC-110 rewrite test
-          - CONTRACT_REVIEW.md validation (17k tokens, 8 findings)
-          - 17 unit tests passing
-          - Both linters clean
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -613,18 +556,6 @@ deltas:
           dependencies: []
         phases:
         - id: IP-006.PHASE-01
-          name: Phase 01 - Add --json support to all CLI commands
-          objective: Extend --json flag to create, list, and show commands with standardized
-            output format
-          entrance_criteria:
-          - Delta approved
-          - Existing --json pattern understood (create.py lines 58-79)
-          - Standard JSON schema defined
-          exit_criteria:
-          - All create/list/show commands support --json
-          - All tests passing (unit + integration)
-          - Ruff and Pylint passing
-          - ISSUE-007 resolved
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -682,7 +613,30 @@ deltas:
       - PROD-009.FR-003
     plan:
       id: IP-007
-      overview: {}
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-007
+        delta: DE-007
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-008
+          - PROD-009
+          - SPEC-122
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-008.FR-001
+          - PROD-008.FR-002
+          - PROD-008.FR-003
+          - PROD-009.FR-002
+          - PROD-009.FR-003
+          dependencies: []
+        phases:
+        - id: IP-007.PHASE-01
+        - id: IP-007.PHASE-02
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -948,25 +902,6 @@ deltas:
           dependencies: []
         phases:
         - id: IP-009.PHASE-01
-          name: Phase 01 - CLI JSON Consistency Fixes
-          objective: 'Implement Priority 1 CLI consistency fixes: standardize --json
-            flag across all list/show commands, add status filter to specs, ensure
-            backward compatibility, and validate against UX research findings.'
-          entrance_criteria:
-          - Development environment set up with uv and dependencies installed
-          - Existing CLI test suite passing
-          - Both linters passing
-          - Familiarity with CLAUDE.md skinny CLI patterns
-          - UX research report reviewed
-          exit_criteria:
-          - All list commands support both --json and --format=json flags
-          - All show commands support --json flag
-          - list specs command supports -s/--status filter
-          - All unit tests passing with new test coverage
-          - Both linters passing with zero warnings
-          - Help text updated and accurate
-          - JSON output schemas validated as stable
-          - Manual agent workflow testing confirms consistency improvements
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -1047,7 +982,7 @@ deltas:
           mitigation: Reuse exact patterns from list_deltas; test for behavioral parity
   DE-010:
     kind: delta
-    status: draft
+    status: in-progress
     name: Delta - Policy and Standard Management
     slug: policy-and-standard-management
     updated: '2025-11-03'
@@ -1094,74 +1029,13 @@ deltas:
           dependencies: []
         phases:
         - id: IP-010.PHASE-01
-          name: Phase 01 - Foundation & Domain Models
-          objective: Create domain packages (policies/, standards/) with models, registry,
-            and creation logic mirroring the proven decisions/ package architecture.
-          entrance_criteria:
-          - Delta approved and PROD-003 reviewed
-          - Decisions package structure understood (SPEC-117 reference)
-          - Template structure defined
-          exit_criteria:
-          - PolicyRecord and StandardRecord models implemented
-          - PolicyRegistry and StandardRegistry with YAML serialization
-          - Creation functions with ID generation and frontmatter building
-          - Unit tests passing for all domain logic
-          - Lint checks passing
         - id: IP-010.PHASE-02
-          name: Phase 02 - Formatters & Display
-          objective: Implement pure formatting functions for policies and standards
-            following established formatter patterns.
-          entrance_criteria: &id005
-          - Phase 01 complete (domain models available)
-          - Formatter patterns reviewed (decision_formatters.py reference)
-          exit_criteria: &id006
-          - policy_formatters.py with table/JSON/TSV output functions
-          - standard_formatters.py with status-aware formatting
-          - Comprehensive formatter tests covering edge cases
-          - Formatters exported in __init__.py
-          - Lint checks passing
         - id: IP-010.PHASE-03
-          name: Phase 03 - CLI Integration
-          objective: Add CLI commands (create, list, show) for policies and standards,
-            extending existing CLI infrastructure.
-          entrance_criteria: &id007
-          - Phase 02 complete (formatters available)
-          - CLI architecture reviewed (SPEC-110 reference)
-          exit_criteria: &id008
-          - spec-driver create policy/standard commands
-          - spec-driver list policies/standards with filtering
-          - spec-driver show policy/standard with full details
-          - CLI help text and documentation complete
-          - Integration tests for all CLI workflows
-          - Lint checks passing
         - id: IP-010.PHASE-04
-          name: Phase 04 - Cross-References & Backlinks
-          objective: Implement bidirectional cross-references between policies, standards,
-            and ADRs with automatic backlink maintenance.
-          entrance_criteria: &id009
-          - Phase 03 complete (CLI functional)
-          - ADR frontmatter schema extensible
-          exit_criteria: &id010
-          - ADR frontmatter extended with policies and standards fields
-          - Backlink generation in registry sync
-          - Cross-reference validation
-          - Integration tests for bidirectional navigation
-          - Lint checks passing
         - id: IP-010.PHASE-05
-          name: Phase 05 - Verification & Documentation
-          objective: Complete E2E testing, update documentation, and verify all acceptance
-            criteria.
-          entrance_criteria: &id011
-          - Phase 04 complete (full feature set implemented)
-          - All unit and integration tests passing
-          exit_criteria: &id012
-          - "E2E tests for complete workflows (create \u2192 reference \u2192 show\
-            \ backlinks)"
-          - All VT-PROD-003-* tests implemented and passing
-          - VA-PROD-003-001 UX review complete
-          - README updated with policy/standard examples
-          - All acceptance criteria verified
-          - just test, just lint, just pylint all passing
+        - id: IP-010.PHASE-02
+        - id: IP-010.PHASE-03
+        - id: IP-010.PHASE-04
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -1218,31 +1092,287 @@ deltas:
           mitigation: Extract patterns, not code; implement independently if needed
         - description: Template structure may need iteration
           mitigation: Start with PROD-003 spec; refine based on actual usage
-      - id: IP-010.PHASE-02
-        name: Phase 02 - Formatters & Display
-        objective: Implement pure formatting functions for policies and standards
-          following established formatter patterns.
-        entrance_criteria: *id005
-        exit_criteria: *id006
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-010.PHASE-02
-      - id: IP-010.PHASE-03
-        name: Phase 03 - CLI Integration
-        objective: Add CLI commands (create, list, show) for policies and standards,
-          extending existing CLI infrastructure.
-        entrance_criteria: *id007
-        exit_criteria: *id008
+        plan: IP-010
+        delta: DE-010
+        objective: Implement pure formatting functions for policies and standards
+          following decision_formatters patterns (table/JSON/TSV output).
+        entrance_criteria:
+        - Phase 01 complete (domain models + registries working)
+        - PolicyRecord and StandardRecord models available
+        - decision_formatters.py reviewed and patterns understood
+        - Architectural principles internalized
+        exit_criteria:
+        - policy_formatters.py and standard_formatters.py created
+        - Pure functions for details, table, JSON, TSV formats
+        - Comprehensive test coverage (29 test cases)
+        - Formatters exported from formatters/__init__.py
+        - All tests passing (just test)
+        - All linters passing (just lint + just pylint)
+        verification:
+          tests:
+          - VT-PROD-003-009 - Template validation for policies/standards consistency
+          evidence:
+          - 29 test cases passing (14 policy + 15 standard)
+          - Pylint: 9.86/10 (duplicate code warnings expected)
+          - Ruff: All checks passed
+        tasks:
+        - id: '2.1'
+          description: Create policy_formatters.py with pure formatting functions
+        - id: '2.2'
+          description: Create standard_formatters.py with pure formatting functions
+        - id: '2.3'
+          description: Add policy/standard status styles to theme.py
+        - id: '2.4'
+          description: Create policy_formatters_test.py with comprehensive tests
+        - id: '2.5'
+          description: Create standard_formatters_test.py with comprehensive tests
+        - id: '2.6'
+          description: Export formatters from formatters/__init__.py
+        - id: '2.7'
+          description: Lint and test all code
+        risks:
+        - description: JSON output format might differ from expectations
+          mitigation: Follow table_utils.format_as_json pattern (wraps in {"items"})
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-010.PHASE-03
-      - id: IP-010.PHASE-04
-        name: Phase 04 - Cross-References & Backlinks
-        objective: Implement bidirectional cross-references between policies, standards,
-          and ADRs with automatic backlink maintenance.
-        entrance_criteria: *id009
-        exit_criteria: *id010
+        plan: IP-010
+        delta: DE-010
+        objective: Add CLI create/list/show commands for policies and standards following
+          skinny CLI pattern (delegate to registries + formatters).
+        entrance_criteria:
+        - Phase 02 complete - formatters working
+        - CLI architecture patterns understood (list.py, show.py, create.py)
+        - PolicyRegistry and StandardRegistry with collect/filter methods available
+        - Formatters exported and tested
+        exit_criteria:
+        - CLI commands implemented for policies and standards
+        - All commands follow skinny CLI pattern (<150 lines per file)
+        - Integration tests passing
+        - Help text clear and consistent with ADR commands
+        - All linters passing (ruff + pylint)
+        verification:
+          tests:
+          - VT-PROD-003-005 - Integration test for list commands with filters
+          - VT-PROD-003-006 - Integration test for show commands
+          evidence:
+          - CLI integration tests passing
+          - Manual CLI smoke tests (create, list, show workflows)
+          - Lint checks passing
+        tasks:
+        - id: '3.1'
+          description: Add policy commands to list.py (list policies)
+        - id: '3.2'
+          description: Add standard commands to list.py (list standards)
+        - id: '3.3'
+          description: Add policy commands to show.py (show policy)
+        - id: '3.4'
+          description: Add standard commands to show.py (show standard)
+        - id: '3.5'
+          description: Add policy creation to create.py (create policy)
+        - id: '3.6'
+          description: Add standard creation to create.py (create standard)
+        - id: '3.7'
+          description: Write CLI integration tests
+        - id: '3.8'
+          description: Lint and test all code
+        risks:
+        - description: CLI flags inconsistent across artifact types
+          mitigation: Review existing CLI patterns; maintain consistency with ADRs/specs
+        - description: Filter logic duplicated across commands
+          mitigation: Defer abstraction until pattern proven (3+ uses)
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-010.PHASE-04
+        plan: IP-010
+        delta: DE-010
+        objective: "Implement bidirectional cross-references between policies \u2194\
+          \ standards \u2194 ADRs with automatic backlink maintenance in registries."
+        entrance_criteria:
+        - Phase 03 complete - CLI commands working
+        - PolicyRecord and StandardRecord have reference fields (standards, policies)
+        - DecisionRecord has policies field but needs standards field
+        - Backlink infrastructure exists in all three models
+        - Cross-reference patterns understood
+        exit_criteria:
+        - DecisionRecord extended with standards field
+        - Backlink maintenance implemented in all three registries
+        - Formatters display cross-references and backlinks
+        - CLI list commands support cross-reference filtering
+        - Cross-reference integrity tests passing
+        - All linters passing (ruff + pylint)
+        verification:
+          tests:
+          - "VT-PROD-003-007 - Bidirectional policy \u2194 standard references"
+          - VT-PROD-003-008 - Policy/standard references in ADRs with backlinks
+          evidence:
+          - Integration tests for cross-reference integrity
+          - Manual testing of backlink generation
+          - Lint checks passing
+        tasks:
+        - id: '4.1'
+          description: Add standards field to DecisionRecord model
+        - id: '4.2'
+          description: Update DecisionRegistry.sync() for policy/standard backlinks
+        - id: '4.3'
+          description: Update PolicyRegistry.sync() for decision backlinks
+        - id: '4.4'
+          description: Update StandardRegistry.sync() for decision/policy backlinks
+        - id: '4.5'
+          description: Add cross-reference display to decision_formatters
+        - id: '4.6'
+          description: Add backlink display to policy_formatters
+        - id: '4.7'
+          description: Add backlink display to standard_formatters
+        - id: '4.8'
+          description: Add --standard flag to list adrs command
+        - id: '4.9'
+          description: Write cross-reference integrity tests
+        - id: '4.10'
+          description: Lint and test all code
+        risks:
+        - description: Existing ADR files lack standards field
+          mitigation: Field defaults to empty list - backward compatible
+        - description: Backlink generation logic complex
+          mitigation: Follow existing backlink patterns from decisions package
+        - description: Formatter display cluttered with too many cross-refs
+          mitigation: Show count in table view, full list in details/JSON
       - id: IP-010.PHASE-05
-        name: Phase 05 - Verification & Documentation
-        objective: Complete E2E testing, update documentation, and verify all acceptance
-          criteria.
-        entrance_criteria: *id011
-        exit_criteria: *id012
         phase: IP-010.PHASE-05
+  DE-011:
+    kind: delta
+    status: draft
+    name: Delta - CLI enhanced filtering and self-documentation
+    slug: cli-enhanced-filtering-and-self-documentation
+    updated: '2025-11-03'
+    path: change/deltas/DE-011-cli-enhanced-filtering-and-self-documentation/DE-011.md
+    applies_to:
+      specs:
+      - SPEC-110
+      requirements:
+      - PROD-010.FR-004
+      - PROD-010.FR-005
+      - PROD-010.FR-006
+      - PROD-010.FR-007
+    plan:
+      id: IP-011
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-011
+        delta: DE-011
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-110
+          collaborators:
+          - SPEC-120
+        requirements:
+          targets:
+          - PROD-010.FR-004
+          - PROD-010.FR-005
+          - PROD-010.FR-006
+          - PROD-010.FR-007
+          dependencies: []
+        phases:
+        - id: IP-011.PHASE-01
+        - id: IP-011.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-011.PHASE-01
+        plan: IP-011
+        delta: DE-011
+        objective: Implement multi-value filtering and reverse relationship queries
+          for all list commands, enabling agents to construct complex queries natively
+          without post-processing with jq/grep.
+        entrance_criteria:
+        - Development environment set up with uv and dependencies installed
+        - DE-009 completed (consistent JSON and status filtering baseline)
+        - Existing CLI test suite passing (just test)
+        - Both linters passing (just lint, just pylint)
+        - Familiarity with CLAUDE.md skinny CLI patterns and formatter separation
+        - Understanding of existing filter patterns (list deltas, list adrs, etc.)
+        exit_criteria:
+        - Multi-value filter parsing utility implemented and tested
+        - All list commands support comma-separated multi-value filters
+        - Reverse relationship query flags implemented on relevant commands
+        - Registry methods support reverse queries with glob pattern matching
+        - Backward compatibility: existing single-value filters unchanged
+        - All unit tests passing with comprehensive new test coverage
+        - Both linters passing with zero warnings
+        - Performance: reverse queries complete in <2s for typical registries
+        - Manual workflow testing confirms multi-value and reverse query functionality
+        verification:
+          tests:
+          - VT-CLI-MULTI-FILTER
+          - VT-CLI-REVERSE-QUERY
+          - VT-CLI-BACKWARD-COMPAT
+          evidence:
+          - VT-PROD010-FILTER-002
+          - VT-PROD010-FILTER-003
+        tasks:
+        - id: '1.1'
+          description: Research existing filter patterns and registry query methods
+          status: pending
+        - id: '1.2'
+          description: Create core/filters.py module with multi-value filter utilities
+          status: pending
+        - id: '1.3'
+          description: Write tests for multi-value filter parsing (TDD)
+          status: pending
+        - id: '1.4'
+          description: Implement multi-value filter support in all list commands
+          status: pending
+        - id: '1.5'
+          description: Write tests for reverse relationship queries (TDD)
+          status: pending
+        - id: '1.6'
+          description: Add reverse query methods to registries (deltas, requirements,
+            specs)
+          status: pending
+        - id: '1.7'
+          description: Implement reverse relationship flags in list commands
+          status: pending
+        - id: '1.8'
+          description: Add glob pattern support for verification artifact matching
+          status: pending
+        - id: '1.9'
+          description: Write tests for verification status/kind filters (TDD)
+          status: pending
+        - id: '1.10'
+          description: Implement --vstatus and --vkind flags for list requirements
+          status: pending
+        - id: '1.11'
+          description: Write backward compatibility tests
+          status: pending
+        - id: '1.12'
+          description: Run full test suite and linters, fix any issues
+          status: pending
+        - id: '1.13'
+          description: Performance testing for reverse queries
+          status: pending
+        - id: '1.14'
+          description: Manual validation of multi-value and reverse query workflows
+          status: pending
+        risks:
+        - description: Multi-value filter parsing breaks existing regex filters
+          likelihood: medium
+          impact: high
+          mitigation: Comprehensive backward compatibility tests; escape comma in
+            regex if needed
+        - description: Reverse relationship queries too slow on large registries
+          likelihood: medium
+          impact: medium
+          mitigation: Index relationships in registry; implement early filtering;
+            performance tests
+        - description: Glob pattern parsing conflicts with shell expansion
+          likelihood: medium
+          impact: low
+          mitigation: Quote patterns in examples; document shell escaping requirements
+      - id: IP-011.PHASE-02
+        phase: IP-011.PHASE-02

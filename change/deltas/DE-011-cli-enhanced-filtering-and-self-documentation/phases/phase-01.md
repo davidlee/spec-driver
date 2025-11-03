@@ -254,7 +254,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
 | [x] | 1.1 | Research existing patterns | [ ] | Completed - see Section 10 |
-| [ ] | 1.2 | Create core/filters.py module | [ ] | After 1.1 |
+| [x] | 1.2 | Create core/filters.py module | [ ] | Completed - pylint 10/10 |
 | [ ] | 1.3 | Write multi-value filter tests | [x] | Can parallelize with 1.5 |
 | [ ] | 1.4 | Implement multi-value filters | [ ] | After 1.3 |
 | [ ] | 1.5 | Write reverse query tests | [x] | Can parallelize with 1.3 |
@@ -291,7 +291,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Python fnmatch confirmed as glob library choice
 - **Commits / References**: Phase sheet updated with research findings
 
-#### **1.2 Create core/filters.py module**
+#### **1.2 Create core/filters.py module** ✅
 - **Design / Approach**:
   - Create new module `supekku/scripts/lib/core/filters.py`
   - Implement `parse_multi_value_filter(value: str) -> list[str]` utility
@@ -300,11 +300,15 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Handle empty/None values: None → []
   - Pure function (no side effects)
 - **Files / Components**:
-  - `supekku/scripts/lib/core/filters.py` (new file)
+  - `supekku/scripts/lib/core/filters.py` (new file) - 42 lines
   - `supekku/scripts/lib/core/__init__.py` - export utility
 - **Testing**: Unit tests in task 1.3
-- **Observations & AI Notes**: *Record implementation decisions*
-- **Commits / References**: *Commit hash after creation*
+- **Observations & AI Notes**:
+  - Pure function with comprehensive docstring and examples
+  - Strips whitespace from each value for flexibility
+  - Returns empty list for None/empty input (simplifies caller logic)
+  - Linters: ruff clean, pylint 10.00/10
+- **Commits / References**: Next commit
 
 #### **1.3 Write multi-value filter tests (TDD)**
 - **Design / Approach**:

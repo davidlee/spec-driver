@@ -1216,8 +1216,19 @@ def list_backlog(
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
+  order_by_id: Annotated[
+    bool,
+    typer.Option(
+      "--order-by-id",
+      "-o",
+      help="Order by ID (chronological) instead of priority",
+    ),
+  ] = False,
 ) -> None:
   """List backlog items with optional filtering.
+
+  By default, items are sorted by priority (registry order → severity → ID).
+  Use --order-by-id to sort chronologically by ID instead.
 
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID and title fields.
@@ -1234,7 +1245,11 @@ def list_backlog(
   try:
     from pathlib import Path
 
-    from supekku.scripts.lib.backlog.registry import discover_backlog_items
+    from supekku.scripts.lib.backlog.priority import sort_by_priority
+    from supekku.scripts.lib.backlog.registry import (
+      discover_backlog_items,
+      load_backlog_registry,
+    )
 
     repo_root = Path(root) if root else None
     items = discover_backlog_items(root=repo_root, kind=kind)
@@ -1258,6 +1273,11 @@ def list_backlog(
 
     if not items:
       raise typer.Exit(EXIT_SUCCESS)
+
+    # Apply priority ordering (unless --order-by-id specified)
+    if not order_by_id:
+      ordering = load_backlog_registry(root=repo_root)
+      items = sort_by_priority(items, ordering)
 
     # Format and output
     output = format_backlog_list_table(items, format_type, truncate)

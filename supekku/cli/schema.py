@@ -318,6 +318,7 @@ def _render_json_schema(block_type: str, schema) -> None:
     "delta.relationships": "supekku.scripts.lib.blocks.delta_metadata",
     "plan.overview": "supekku.scripts.lib.blocks.plan_metadata",
     "phase.overview": "supekku.scripts.lib.blocks.plan_metadata",
+    "phase.tracking": "supekku.scripts.lib.blocks.tracking_metadata",
     "revision.change": "supekku.scripts.lib.blocks.revision_metadata",
   }
 
@@ -413,6 +414,7 @@ def _render_yaml_example(schema) -> None:
     "delta.relationships": "supekku.scripts.lib.blocks.delta_metadata",
     "plan.overview": "supekku.scripts.lib.blocks.plan_metadata",
     "phase.overview": "supekku.scripts.lib.blocks.plan_metadata",
+    "phase.tracking": "supekku.scripts.lib.blocks.tracking_metadata",
     "revision.change": "supekku.scripts.lib.blocks.revision_metadata",
   }
 

@@ -21,7 +21,7 @@ entrance_criteria:
   - Phase 01 exit criteria met
   - CLI fixtures prepared for completion workflow tests
 exit_criteria:
-  - `spec-driver complete delta` blocks when coverage entries missing
+  - spec-driver complete delta blocks when coverage entries missing
   - RUN.md / CLAUDE command docs updated with enforcement guidance
   - VA-320 and VH-201 verification complete
 verification:

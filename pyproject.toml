@@ -33,7 +33,7 @@ classifiers = [
 Homepage = "https://github.com/davidlee/spec-driver"
 Repository = "https://github.com/davidlee/spec-driver"
 Issues = "https://github.com/davidlee/spec-driver/issues"
-Website = "https//supekku.dev/"
+Website = "https://supekku.dev/"
 
 
 [project.scripts]

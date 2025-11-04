@@ -154,6 +154,11 @@ def format_change_list_table(
     # Apply styling
     styled_id = f"[change.id]{change.id}[/change.id]"
 
+    # Strip "Delta - " prefix from delta names for cleaner display
+    display_name = change.name
+    if change.kind == "delta" and display_name.startswith("Delta - "):
+      display_name = display_name[8:]  # Remove "Delta - " (8 chars)
+
     # Format tags as comma-separated list with styling
     tags = ", ".join(change.tags) if change.tags else ""
     tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
@@ -163,7 +168,7 @@ def format_change_list_table(
 
     add_row_with_truncation(
       table,
-      [styled_id, change.name, tags_styled, styled_status],
+      [styled_id, display_name, tags_styled, styled_status],
       max_widths=max_widths if not no_truncate else None,
     )
 

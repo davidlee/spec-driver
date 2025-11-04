@@ -70,9 +70,7 @@ Test problem content.
 """
     prob_file.write_text(content, encoding="utf-8")
 
-  def _create_sample_improvement(
-    self, impr_id: str, title: str, status: str
-  ) -> None:
+  def _create_sample_improvement(self, impr_id: str, title: str, status: str) -> None:
     """Helper to create a sample improvement file."""
     impr_dir = self.root / "backlog" / "improvements" / impr_id
     impr_dir.mkdir(parents=True, exist_ok=True)
@@ -561,9 +559,7 @@ Test issue content.
 """
     issue_file.write_text(content, encoding="utf-8")
 
-  def _create_sample_improvement(
-    self, impr_id: str, title: str, status: str
-  ) -> None:
+  def _create_sample_improvement(self, impr_id: str, title: str, status: str) -> None:
     """Helper to create a sample improvement file."""
     impr_dir = self.root / "backlog" / "improvements" / impr_id
     impr_dir.mkdir(parents=True, exist_ok=True)

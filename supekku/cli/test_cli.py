@@ -1055,9 +1055,7 @@ class TestReverseRelationshipQueries:
     """Test that list specs accepts --informed-by flag (TDD placeholder)."""
     # This flag will be implemented in Task 1.7
     # Expected: returns specs informed by given ADR
-    result = runner.invoke(
-      app, ["list", "specs", "--informed-by", "ADR-001", "--json"]
-    )
+    result = runner.invoke(app, ["list", "specs", "--informed-by", "ADR-001", "--json"])
     # After Task 1.7: assert result.exit_code == 0
     assert result is not None  # Placeholder for TDD
 

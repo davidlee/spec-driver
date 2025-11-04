@@ -20,7 +20,9 @@ The backlog captures pending work against the systems of truth (PROD, SPEC, Cons
 - **Ideas (`kind: issue`, category `idea`)**: proposed improvements or opportunities, usually tied to a problem statement.
 - **Deltas / Design Revisions**: execution artefacts spawned when problems/issues demand changes to PROD/SPEC.
 
-Prioritisation lives in dedicated Markdown lists (e.g. `backlog/backlog.md`). The list order is canonical; scripts ensure new artefacts get appended, while humans/agents reorder lines to reflect priority. Impact/severity metadata helps triage but does not dictate ordering.
+invoke `uv run spec-driver backlog --prioritize` to open the list of backlog items in your $EDITOR - reorder them as you wish, and the order will be preserved. New items are added at the bottom.
+
+Impact/severity metadata helps triage but does not dictate ordering, though you can filter by it.
 
 **Workflow:**
 1. Capture a problem statement when a new pain/opportunity emerges.

@@ -1,6 +1,6 @@
 [project]
 name = "spec-driver"
-version = "0.4.3"
+version = "0.4.4"
 description = "Specification-driven development toolkit with multi-language spec sync and documentation generation"
 authors = [
     { name = "David Lee", email = "dav@davlee.com" }
@@ -39,16 +39,16 @@ Website = "https://supekku.dev/"
 [project.scripts]
 spec-driver = "supekku.cli.main:main"
 
+#
+# BUILD MANIFEST
+#
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["supekku"]
-artifacts = [
-    "supekku/templates/*.md",
-    "supekku/about/*.md",
-]
 exclude = [
     "supekku/CLAUDE.md",
     ".direnv/",
@@ -63,10 +63,15 @@ exclude = [
     "**/*.pyc",
     "**/*.pyo",
 ]
-# Force-include lib/ since it's in .gitignore (meant for build artifacts, not source)
-#force-include = { "supekku/scripts/lib" = "supekku/scripts/lib" }
+ # [tool.hatch.build.targets.wheel.force-include]
+ # "supekku/templates" = "supekku/templates"
+ # "supekku/agents" = "supekku/agents"
+ # "supekku/about" = "supekku/about"
+
 
 [tool.hatch.build.targets.sdist]
+packages = ["supekku"]
+
 exclude = [
     "supekku/CLAUDE.md",
     ".direnv/",
@@ -81,7 +86,6 @@ exclude = [
     "**/*.pyc",
     "**/*.pyo",
 ]
-#force-include = { "supekku/scripts/lib" = "supekku/scripts/lib" }
 
 [dependency-groups]
 dev = [

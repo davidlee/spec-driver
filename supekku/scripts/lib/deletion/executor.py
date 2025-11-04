@@ -393,6 +393,8 @@ class DeletionValidator:
     """
     symlinks = []
     spec_dir = self.tech_dir / spec_id
+    # Resolve spec_dir to handle macOS /var -> /private/var symlink
+    spec_dir_resolved = spec_dir.resolve()
 
     # Check index directories for symlinks
     for index_dir in ["by-slug", "by-package", "by-language"]:
@@ -406,7 +408,7 @@ class DeletionValidator:
           # Check if it points to our spec
           try:
             target = item.resolve()
-            if target == spec_dir or target.is_relative_to(spec_dir):
+            if target == spec_dir_resolved or target.is_relative_to(spec_dir_resolved):
               symlinks.append(item)
           except (OSError, ValueError):
             # Broken symlink or resolution error

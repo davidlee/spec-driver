@@ -59,7 +59,8 @@ class BacklogLibraryTest(unittest.TestCase):
     assert len(additions) == 1
     summary = (root / "backlog" / "backlog.md").read_text(encoding="utf-8")
     assert "ISSUE-001" in summary
-    assert entry.relative_to(root / "backlog").as_posix() in summary
+    # Resolve paths to handle macOS /var -> /private/var symlink
+    assert entry.resolve().relative_to(root.resolve() / "backlog").as_posix() in summary
 
   def test_find_repo_root_resolves_from_nested_path(self) -> None:
     """Test that find_repo_root resolves correctly from nested directories."""
@@ -67,7 +68,8 @@ class BacklogLibraryTest(unittest.TestCase):
     nested = root / "backlog" / "issues"
     os.chdir(nested)
     resolved = find_repo_root()
-    assert resolved == root
+    # Resolve both paths to handle macOS /var -> /private/var symlink
+    assert resolved.resolve() == root.resolve()
 
   def test_load_backlog_registry_returns_empty_when_missing(self) -> None:
     """Test that load_backlog_registry returns empty list when file doesn't exist."""

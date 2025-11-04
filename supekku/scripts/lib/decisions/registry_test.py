@@ -82,9 +82,12 @@ class TestDecisionRegistry(unittest.TestCase):
       root = self._setup_test_repo(tmpdir)
       registry = DecisionRegistry(root=root)
 
-      assert registry.root == root
-      assert registry.directory == root / "specify" / "decisions"
-      assert registry.output_path == get_registry_dir(root) / "decisions.yaml"
+      # Resolve both paths to handle macOS /var -> /private/var symlink
+      assert registry.root.resolve() == root.resolve()
+      expected_dir = (root / "specify" / "decisions").resolve()
+      assert registry.directory.resolve() == expected_dir
+      expected_output = (get_registry_dir(root) / "decisions.yaml").resolve()
+      assert registry.output_path.resolve() == expected_output
 
   def test_collect_empty_directory(self) -> None:
     """Test collecting from empty directory."""

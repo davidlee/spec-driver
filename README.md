@@ -338,7 +338,8 @@ I'll aim not to make breaking changes to data formats, though.
 ## Related
 - [PyPi project](https://pypi.org/project/spec-driver/)
 - [npm dependency for TS doc gen](https://www.npmjs.com/package/ts-doc-extract)
-- [sort of a website](https://supekku.dev)
+- [A Socratic dialogue wherein I talk myself into building this thing](https://supekku.dev)
+- [Spec-Kit, which I stole / borrowed agent prompts and ideas from](https://github.com/github/spec-kit)
 - [me](https://www.linkedin.com/in/davidlee-au/)
 
 ## License

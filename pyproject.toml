@@ -1,11 +1,12 @@
 [project]
 name = "spec-driver"
-version = "0.4.0"
+version = "0.4.1"
 description = "Specification-driven development toolkit with multi-language spec sync and documentation generation"
 authors = [
-    { name = "David Lee", email = "david@davlee.com" }
+    { name = "David Lee", email = "dav@davlee.com" }
 ]
 readme = "README.md"
+long_description_content_type = "text/markdown"
 license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = [
@@ -32,6 +33,8 @@ classifiers = [
 Homepage = "https://github.com/davidlee/spec-driver"
 Repository = "https://github.com/davidlee/spec-driver"
 Issues = "https://github.com/davidlee/spec-driver/issues"
+Website = "https//supekku.dev"
+
 
 [project.scripts]
 spec-driver = "supekku.cli.main:main"

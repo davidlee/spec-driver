@@ -434,7 +434,6 @@ IMPR-002 (p2): Enhancement
     self.assertEqual(["ISSUE-003", "IMPR-002", "ISSUE-005"], result)
 
 
-
 class TestEditBacklogOrdering(unittest.TestCase):
   """Tests for edit_backlog_ordering with deleted items."""
 

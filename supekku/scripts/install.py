@@ -62,6 +62,45 @@ def prompt_for_category(
   return response in ("", "y", "yes")
 
 
+def copy_directory_if_changed(
+  src: Path,
+  dest: Path,
+  *,
+  pattern: str,
+  category_name: str,
+  dry_run: bool = False,
+  auto_yes: bool = False,
+  dry_run_label: str | None = None,
+) -> None:
+  """Copy directory contents from src to dest if changes detected.
+
+  Args:
+    src: Source directory
+    dest: Destination directory
+    pattern: Glob pattern for files to copy (e.g., "*.md", "**/*")
+    category_name: Display name for user prompts
+    dry_run: If True, show changes without copying (default: False)
+    auto_yes: If True, auto-confirm without prompting (default: False)
+    dry_run_label: Optional custom label for dry-run output (defaults to category_name)
+  """
+  if not src.exists():
+    return
+
+  changes = scan_directory_changes(src, dest, pattern)
+
+  if dry_run:
+    if changes.has_changes:
+      label = dry_run_label or category_name
+      print(f"\n[DRY RUN] {label}:")
+      print(format_detailed_changes(changes, dest))
+  elif prompt_for_category(category_name, changes, dest, auto_yes):
+    for rel_path in changes.new_files + changes.existing_files:
+      src_file = src / rel_path
+      dest_file = dest / rel_path
+      dest_file.parent.mkdir(parents=True, exist_ok=True)
+      shutil.copy2(src_file, dest_file)
+
+
 def initialize_workspace(
   target_root: Path, dry_run: bool = False, auto_yes: bool = False
 ) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
@@ -94,6 +133,7 @@ def initialize_workspace(
     f"{SPEC_DRIVER_DIR}/registry",
     f"{SPEC_DRIVER_DIR}/templates",
     f"{SPEC_DRIVER_DIR}/about",
+    f"{SPEC_DRIVER_DIR}/agents",
   ]
 
   for dir_path in directories:
@@ -136,67 +176,50 @@ def initialize_workspace(
 
   # Copy templates from package to target
   package_root = get_package_root()
-  template_src = package_root / "templates"
-  template_dest = target_root / SPEC_DRIVER_DIR / "templates"
-
-  if template_src.exists():
-    # Scan for changes
-    template_changes = scan_directory_changes(template_src, template_dest, "*.md")
-
-    if dry_run:
-      if template_changes.has_changes:
-        print("\n[DRY RUN] Templates:")
-        print(format_detailed_changes(template_changes, template_dest))
-    elif prompt_for_category("Templates", template_changes, template_dest, auto_yes):
-      # Copy new and updated files
-      for rel_path in template_changes.new_files + template_changes.existing_files:
-        src_file = template_src / rel_path
-        dest_file = template_dest / rel_path
-        shutil.copy2(src_file, dest_file)
+  copy_directory_if_changed(
+    src=package_root / "templates",
+    dest=target_root / SPEC_DRIVER_DIR / "templates",
+    pattern="*.md",
+    category_name="Templates",
+    dry_run=dry_run,
+    auto_yes=auto_yes,
+  )
 
   # Copy about files from package to target
-  about_src = package_root / "about"
-  about_dest = target_root / SPEC_DRIVER_DIR / "about"
+  copy_directory_if_changed(
+    src=package_root / "about",
+    dest=target_root / SPEC_DRIVER_DIR / "about",
+    pattern="**/*",
+    category_name="About documentation",
+    dry_run=dry_run,
+    auto_yes=auto_yes,
+  )
 
-  if about_src.exists():
-    # Scan for changes (use ** to include subdirectories)
-    about_changes = scan_directory_changes(about_src, about_dest, "**/*")
+  # Copy agent files from package to target
+  copy_directory_if_changed(
+    src=package_root / "agents",
+    dest=target_root / SPEC_DRIVER_DIR / "agents",
+    pattern="**/*",
+    category_name="agent documentation",
+    dry_run=dry_run,
+    auto_yes=auto_yes,
+    dry_run_label="agent instruction",
+  )
 
-    if dry_run:
-      if about_changes.has_changes:
-        print("\n[DRY RUN] About documentation:")
-        print(format_detailed_changes(about_changes, about_dest))
-    elif prompt_for_category(
-      "About documentation", about_changes, about_dest, auto_yes
-    ):
-      # Copy new and updated files
-      for rel_path in about_changes.new_files + about_changes.existing_files:
-        src_file = about_src / rel_path
-        dest_file = about_dest / rel_path
-        dest_file.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src_file, dest_file)
-
-  # Copy agent files to .claude/commands/ if .claude exists
+  # Copy claude.command files to .claude/commands/ if .claude exists
   claude_dir = target_root / ".claude"
   if claude_dir.exists() and claude_dir.is_dir():
     commands_dir = claude_dir / "commands"
     commands_dir.mkdir(parents=True, exist_ok=True)
 
-    agents_src = package_root / "agents"
-    if agents_src.exists():
-      # Scan for changes
-      agent_changes = scan_directory_changes(agents_src, commands_dir, "*.md")
-
-      if dry_run:
-        if agent_changes.has_changes:
-          print("\n[DRY RUN] Agent commands:")
-          print(format_detailed_changes(agent_changes, commands_dir))
-      elif prompt_for_category("Agent commands", agent_changes, commands_dir, auto_yes):
-        # Copy new and updated files
-        for rel_path in agent_changes.new_files + agent_changes.existing_files:
-          src_file = agents_src / rel_path
-          dest_file = commands_dir / rel_path
-          shutil.copy2(src_file, dest_file)
+    copy_directory_if_changed(
+      src=package_root / "claude.commands",
+      dest=commands_dir,
+      pattern="*.md",
+      category_name="Agent commands",
+      dry_run=dry_run,
+      auto_yes=auto_yes,
+    )
 
 
 def main() -> None:

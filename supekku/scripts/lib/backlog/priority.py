@@ -286,8 +286,7 @@ def edit_backlog_ordering(
 
   # Instructions for user
   instructions = (
-    "Reorder backlog items by moving lines up/down. "
-    "Save and exit to apply changes."
+    "Reorder backlog items by moving lines up/down. Save and exit to apply changes."
   )
 
   # Invoke editor
@@ -303,9 +302,7 @@ def edit_backlog_ordering(
   # Build filtered item objects for new order (preserve object references)
   filtered_map = {item.id: item for item in filtered_items}
   new_filtered_items = [
-    filtered_map[item_id]
-    for item_id in new_filtered_ids
-    if item_id in filtered_map
+    filtered_map[item_id] for item_id in new_filtered_ids if item_id in filtered_map
   ]
 
   # Detect deleted items: items that were shown but aren't in the edited list

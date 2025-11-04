@@ -2,7 +2,7 @@
 
 Your specification-driven development framework construction toolkit, with multi-language spec sync and documentation generation.
 
-![spec-driver](./assets/spec-driver-framed.png | width=100)
+![spec-driver](./assets/spec-driver-med.png)
 
 **Why?**
 - Maintain verifiably accurate, evergreen specs covering your _entire system_
@@ -18,7 +18,6 @@ Your specification-driven development framework construction toolkit, with multi
 - a low friction, conceptually coherent, unified CLI for spec-driven development you can adapt as your needs change
 - (maybe already? if not soon): also ready to eat right out of the box!
 
-![workflow diagram](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/simple.svg)
 
 ## Status
 
@@ -75,6 +74,8 @@ uv run spec-driver --help
 # Or use it right off the tubes
 uvx --from git+https://github.com/davidlee/spec-driver spec-driver --help
 ```
+
+![workflow diagram](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/simple.svg)
 
 ## Quick Start
 

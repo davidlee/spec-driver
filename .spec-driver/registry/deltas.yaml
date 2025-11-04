@@ -1718,7 +1718,7 @@ deltas:
         risks: []
   DE-015:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Implement backlog prioritization with interactive ordering
     slug: implement-backlog-prioritization-with-interactive-ordering
     updated: '2025-11-04'
@@ -1747,6 +1747,8 @@ deltas:
         - id: IP-015.PHASE-03
         - id: IP-015.PHASE-04
         - id: IP-015.PHASE-02
+        - id: IP-015.PHASE-03
+        - id: IP-015.PHASE-04
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -1811,10 +1813,83 @@ deltas:
         risks:
         - Sort function complexity with multiple fallback levels (mitigate with clear
           tests)
-      - id: IP-015.PHASE-03
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-015.PHASE-03
-      - id: IP-015.PHASE-04
+        plan: IP-015
+        delta: DE-015
+        objective: Build editor utility and interactive reordering flow so users can
+          open filtered items in $EDITOR and save reordered list
+        entrance_criteria:
+        - Phase 2 complete (priority.py module provides partition/merge functions)
+        - Registry contains backlog ordering
+        - partition/merge algorithm tested and working
+        exit_criteria:
+        - editor.py utility created with invoke_editor() function
+        - Markdown list generation implemented
+        - Markdown parsing handles edge cases (syntax errors, duplicates, missing
+          items)
+        - Merge algorithm correctly integrates user edits with hidden items
+        - VT-015-004 tests passing (mocked editor)
+        - Lint checks pass
+        verification:
+          tests:
+          - VT-015-004
+          evidence:
+          - Mocked editor tests passing
+          - Manual smoke test with actual $EDITOR
+          - Edge case validation (malformed input)
+        tasks:
+        - 3.1 Create editor.py utility module
+        - 3.2 Implement markdown list generation from BacklogItems
+        - 3.3 Implement markdown list parsing to extract IDs
+        - 3.4 Wire partition algorithm to merge user edits
+        - 3.5 Write comprehensive tests (mocked editor)
+        - 3.6 Run lint and fix issues
+        risks:
+        - Editor invocation fails on some platforms (mitigate with $EDITOR/$VISUAL/vi
+          fallback)
+        - User provides malformed markdown (mitigate with defensive parsing, validation)
+        - Parsing breaks with unusual item titles (mitigate with ID-first parsing,
+          not title matching)
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-015.PHASE-04
+        plan: IP-015
+        delta: DE-015
+        objective: Wire interactive prioritization into CLI commands and add delta
+          creation from backlog items
+        entrance_criteria:
+        - Phase 3 complete (editor utility and markdown functions working)
+        - edit_backlog_ordering() function available and tested
+        - Registry sync working (Phase 1)
+        - Priority ordering working (Phase 2)
+        exit_criteria:
+        - --prioritize flag working in list backlog command
+        - --order-by-id flag provides chronological fallback
+        - create delta --from-backlog ITEM-ID populates template
+        - VT-015-005 CLI integration tests passing
+        - VH-015-001 manual verification complete
+        - Lint checks pass
+        verification:
+          tests:
+          - VT-015-005
+          - VH-015-001
+          evidence:
+          - CLI integration tests passing
+          - Manual workflow test results
+          - User acceptance of interactive editor flow
+        tasks:
+        - 4.1 Add --prioritize flag to list backlog command
+        - 4.2 Add --order-by-id flag for chronological fallback
+        - 4.3 Implement create delta --from-backlog flag
+        - 4.4 Write CLI integration tests (VT-015-005)
+        - 4.5 Perform manual verification (VH-015-001)
+        - 4.6 Run lint and fix issues
+        risks:
+        - User confusion if --prioritize doesn't persist (document: must save registry)
+        - create delta integration may need template updates (check existing template)
+        - Manual testing may reveal UX issues (iterate based on feedback)
   DE-016:
     kind: delta
     status: completed
@@ -1859,7 +1934,7 @@ deltas:
       specs: []
       requirements: []
     relations:
-    - type: implements
+    - type: relates_to
       target: IMPR-001
       attributes:
         note: Add category support to requirements
@@ -1985,7 +2060,7 @@ deltas:
           mitigation: Follow existing filter patterns in codebase
   DE-018:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Add Tags column to list table output for all artifact types
     slug: add-tags-column-to-list-table-output-for-all-artifact-types
     updated: '2025-11-04'

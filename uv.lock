@@ -417,11 +417,10 @@ wheels = [
 
 [[package]]
 name = "spec-driver"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
     { name = "jinja2" },
-    { name = "pylint-per-file-ignores" },
     { name = "python-frontmatter" },
     { name = "pyyaml" },
     { name = "typer" },
@@ -430,6 +429,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "pylint" },
+    { name = "pylint-per-file-ignores" },
     { name = "pytest" },
     { name = "ruff" },
 ]
@@ -437,7 +437,6 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "jinja2", specifier = ">=3.1.0" },
-    { name = "pylint-per-file-ignores", specifier = ">=3.1.0" },
     { name = "python-frontmatter", specifier = ">=1.1.0" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "typer", specifier = ">=0.15.0" },
@@ -446,6 +445,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "pylint", specifier = ">=4.0.2" },
+    { name = "pylint-per-file-ignores", specifier = ">=3.1.0" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "ruff", specifier = ">=0.14.0" },
 ]

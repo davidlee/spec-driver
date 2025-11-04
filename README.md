@@ -16,7 +16,7 @@ Specification-driven development toolkit with multi-language spec sync and docum
 - a low friction, conceptually coherent, unified CLI for spec-driven development you can adapt as your needs change
 - (maybe already? if not soon): also ready to eat right out of the box!
 
-![workflow diagram](./assets/simple.svg)
+![workflow diagram](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/simple.svg)
 
 ## Status
 
@@ -25,6 +25,7 @@ Specification-driven development toolkit with multi-language spec sync and docum
 ## Features
 
 A smorgasbord for you to build your own workflow around
+
 
 |Feature|Blurb|
 |---|---|
@@ -45,10 +46,7 @@ A smorgasbord for you to build your own workflow around
 |**Markdown + Git \| jujutsu**|Why use a shitty Saas when version controlled text is this powerful, and agents can work with it so fluently? I'm sure you can pipe it into other, lesser tools if you need it.|
 |**Zero Lock-In, Zero Cost**|Things change fast, but if text in open formats goes out of fashion, all bets are off.|
 
-
-## 
-
-![ADR list](./assets/adr-list.png)
+![ADR list](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/adr-list.png)
 
 ## Installation
 

@@ -884,11 +884,7 @@ class TestRequirementsRegistryReverseQueries(unittest.TestCase):
     spec_path = spec_dir / f"{spec_id}.md"
 
     req_lines = "\n".join(f"- {req}" for req in requirements)
-    body = (
-      f"# {spec_id}\n\n"
-      "## 6. Quality & Operational Requirements\n\n"
-      f"{req_lines}\n"
-    )
+    body = f"# {spec_id}\n\n## 6. Quality & Operational Requirements\n\n{req_lines}\n"
 
     frontmatter = {
       "id": spec_id,

@@ -19,7 +19,9 @@ class TestFindEditor:
 
   def test_uses_editor_env_var(self) -> None:
     """Test that $EDITOR is checked first."""
-    with patch.dict("os.environ", {"EDITOR": "/usr/bin/nano", "VISUAL": "/usr/bin/emacs"}):  # noqa: E501
+    with patch.dict(
+      "os.environ", {"EDITOR": "/usr/bin/nano", "VISUAL": "/usr/bin/emacs"}
+    ):  # noqa: E501
       assert find_editor() == "/usr/bin/nano"
 
   def test_falls_back_to_visual(self) -> None:

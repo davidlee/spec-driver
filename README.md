@@ -1,6 +1,8 @@
 # spec-driver
 
-Specification-driven development toolkit with multi-language spec sync and documentation generation.
+Your specification-driven development framework construction toolkit, with multi-language spec sync and documentation generation.
+
+![spec-driver](./assets/spec-driver-framed.png | width=100)
 
 **Why?**
 - Maintain verifiably accurate, evergreen specs covering your _entire system_

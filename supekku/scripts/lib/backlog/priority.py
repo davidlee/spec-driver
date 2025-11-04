@@ -12,12 +12,11 @@ from typing import TypeVar
 
 from .models import BacklogItem
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def build_partitions(
-  all_items: list[T],
-  filtered_items: set[T]
+  all_items: list[T], filtered_items: set[T]
 ) -> tuple[list[T], list[tuple[T, list[T]]]]:
   """Partition items into (shown, [unshown_followers]) pairs.
 
@@ -76,9 +75,7 @@ def build_partitions(
 
 
 def merge_ordering(
-  prefix: list[T],
-  partitions: list[tuple[T, list[T]]],
-  new_filtered_order: list[T]
+  prefix: list[T], partitions: list[tuple[T, list[T]]], new_filtered_order: list[T]
 ) -> list[T]:
   """Reorder partitions based on new filtered order, then flatten.
 
@@ -117,8 +114,7 @@ def merge_ordering(
 
 
 def sort_by_priority(
-  items: list[BacklogItem],
-  ordering: list[str]
+  items: list[BacklogItem], ordering: list[str]
 ) -> list[BacklogItem]:
   """Sort backlog items by priority with fallback to severity and ID.
 
@@ -141,16 +137,16 @@ def sort_by_priority(
 
   # Severity ranking (lower = higher priority)
   severity_rank = {
-    'p1': 0,
-    'p2': 1,
-    'p3': 2,
-    '': 3,  # No severity
+    "p1": 0,
+    "p2": 1,
+    "p3": 2,
+    "": 3,  # No severity
   }
 
   def sort_key(item: BacklogItem) -> tuple[int, int, str]:
     """Generate sort key: (registry_position, severity_rank, id)."""
     reg_pos = registry_index.get(item.id, 999999)  # Large number for unregistered
-    sev_rank = severity_rank.get(item.severity.lower() if item.severity else '', 3)
+    sev_rank = severity_rank.get(item.severity.lower() if item.severity else "", 3)
     return (reg_pos, sev_rank, item.id)
 
   return sorted(items, key=sort_key)
@@ -182,7 +178,7 @@ def generate_markdown_list(items: list[BacklogItem]) -> str:
     title = item.title
     max_title_len = 80
     if len(title) > max_title_len:
-      title = title[:max_title_len - 3] + "..."
+      title = title[: max_title_len - 3] + "..."
 
     line = f"- [ ] {item.id}{severity_str}: {title}"
     lines.append(line)
@@ -217,15 +213,15 @@ def parse_markdown_list(markdown: str) -> list[str]:
     ["ISSUE-003", "IMPR-002"]
   """
   # Pattern matches backlog IDs: KIND-NUMBER (e.g., ISSUE-003, IMPR-002)
-  id_pattern = re.compile(r'([A-Z]+-\d+)')
+  id_pattern = re.compile(r"([A-Z]+-\d+)")
 
   ids: list[str] = []
   seen: set[str] = set()
 
-  for line in markdown.split('\n'):
+  for line in markdown.split("\n"):
     # Skip blank lines and comments
     stripped = line.strip()
-    if not stripped or stripped.startswith('#'):
+    if not stripped or stripped.startswith("#"):
       continue
 
     # Extract first ID match from line
@@ -254,6 +250,9 @@ def edit_backlog_ordering(
   Opens filtered items in user's editor for reordering, then merges the
   edited order with unfiltered items using head-tail partitioning to
   preserve relative positions of hidden items.
+
+  Items deleted from the editor are preserved in their original position
+  (treated as unshown items).
 
   Args:
     all_items: Complete list of all backlog items
@@ -309,9 +308,14 @@ def edit_backlog_ordering(
     if item_id in filtered_map
   ]
 
-  # Use partition algorithm to merge with unshown items
-  # Create a set of filtered IDs for membership checking
-  filtered_id_set = {item.id for item in filtered_sorted}
+  # Detect deleted items: items that were shown but aren't in the edited list
+  original_filtered_ids = {item.id for item in filtered_sorted}
+  kept_filtered_ids = set(new_filtered_ids)
+  deleted_ids = original_filtered_ids - kept_filtered_ids
+
+  # Create set of IDs that should be treated as "unshown" during partitioning
+  # This includes both originally hidden items AND deleted items
+  filtered_id_set = {item.id for item in filtered_sorted if item.id not in deleted_ids}
 
   # Build partitions using ID-based checking
   prefix: list[BacklogItem] = []

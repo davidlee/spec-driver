@@ -1,6 +1,6 @@
 [project]
 name = "spec-driver"
-version = "0.4.4"
+version = "0.4.5"
 description = "Specification-driven development toolkit with multi-language spec sync and documentation generation"
 authors = [
     { name = "David Lee", email = "dav@davlee.com" }

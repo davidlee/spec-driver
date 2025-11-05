@@ -39,6 +39,9 @@ Opens filtered items in user's editor for reordering, then merges the
 edited order with unfiltered items using head-tail partitioning to
 preserve relative positions of hidden items.
 
+Items deleted from the editor are preserved in their original position
+(treated as unshown items).
+
 Args:
   all_items: Complete list of all backlog items
   filtered_items: Subset of items to show in editor

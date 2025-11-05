@@ -45,6 +45,17 @@ VT-015-003: Tests for priority sort function.
 - `test_sort_by_priority_registry_order_trumps_severity(self)`: Test that registry position takes precedence over severity.
 - `test_sort_by_priority_severity_fallback(self)`: Test severity ordering for items not in registry.
 
+### TestEditBacklogOrdering
+
+Tests for edit_backlog_ordering with deleted items.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_deleted_items_preserved_in_original_position(self) -> None`: Test that items deleted from editor are preserved in original position.
+- `test_reorder_with_some_deletions(self) -> None`: Test reordering when some filtered items are deleted.
+
 ### TestGenerateMarkdownList
 
 Test generate_markdown_list function.

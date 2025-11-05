@@ -15,7 +15,7 @@ Display formatting is delegated to supekku.scripts.lib.formatters
 
 The --regexp flag filters on title and summary fields.
 Other flags filter on specific structured fields (status, tags, references).
-- @app.command(backlog) `list_backlog(root, kind, status, substring, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog items with optional filtering.
+- @app.command(backlog) `list_backlog(root, kind, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog items with optional filtering.
 
 By default, items are sorted by priority (registry order → severity → ID).
 Use --order-by-id to sort chronologically by ID instead.
@@ -33,17 +33,17 @@ The --regexp flag does pattern matching on ID, slug, and name fields.
 
 The --regexp flag filters on ID, name, and slug fields.
 The --implements flag filters by requirement ID (reverse relationship query).
-- @app.command(improvements) `list_improvements(root, status, substring, regexp, case_insensitive, format_type, truncate) -> None`: List backlog improvements with optional filtering.
+- @app.command(improvements) `list_improvements(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog improvements with optional filtering.
 
 Shortcut for: list backlog --kind improvement
-- @app.command(issues) `list_issues(root, status, substring, regexp, case_insensitive, format_type, truncate) -> None`: List backlog issues with optional filtering.
+- @app.command(issues) `list_issues(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog issues with optional filtering.
 
 Shortcut for: list backlog --kind issue
 - @app.command(policies) `list_policies(root, status, tag, spec, delta, requirement_filter, standard, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List policies with optional filtering.
 
 The --regexp flag filters on title and summary fields.
 Other flags filter on specific structured fields (status, tags, references).
-- @app.command(problems) `list_problems(root, status, substring, regexp, case_insensitive, format_type, truncate) -> None`: List backlog problems with optional filtering.
+- @app.command(problems) `list_problems(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog problems with optional filtering.
 
 Shortcut for: list backlog --kind problem
 - @app.command(requirements) `list_requirements(root, spec, status, kind, category, verified_by, substring, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List requirements with optional filtering.
@@ -57,7 +57,7 @@ Use --case-insensitive (-i) to make regexp and category filters case-insensitive
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
-- @app.command(risks) `list_risks(root, status, substring, regexp, case_insensitive, format_type, truncate) -> None`: List backlog risks with optional filtering.
+- @app.command(risks) `list_risks(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog risks with optional filtering.
 
 Shortcut for: list backlog --kind risk
 - @app.command(specs) `list_specs(root, kind, status, substring, package_filter, package_path, for_path, informed_by, regexp, case_insensitive, format_type, json_output, truncate, paths, packages) -> None`: List SPEC/PROD artifacts with optional filtering.

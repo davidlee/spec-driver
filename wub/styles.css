@@ -1,0 +1,343 @@
+/* Dark color scheme (Auto) */
+/* Automatically enabled if user has Dark mode enabled */
+/*
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+  }
+}
+*/
+/* Dark color scheme (Forced) */
+/* Enabled if forced with data-theme="dark" */
+/* [data-theme="dark"] { } */
+/* [data-theme="light"], :root.not([data-theme="dark"]) { } */
+
+:root {
+  --main-bg-color: #111213;
+  --main-bg-inset: #141517;
+  --main-bg-frame: #333436;
+  --main-bg-main:  #494a4c;
+  --pico-font-family-monospace: "Google Sans Code";
+}
+
+/* ================================================================================
+ *
+/* FONTS
+ *
+ */
+
+
+html {
+  font-family: "Noto Sans", sans-serif;
+  /* font-family: "Nunito Sans", sans-serif; */
+  /* font-family: "Google Sans Code", monospace; */
+  font-optical-sizing: auto;
+  font-weight: 450;
+  font-variation-settings:
+    "wdth" 100;
+
+  p {
+    font-weight: 400;
+    font-style: normal;
+  }
+}
+
+hgroup *, h1,h2,h3,h4,h5,h6 .momo-trust-display-regular {
+  font-family: "Momo Trust Display", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.8em;
+}
+
+pre, nav ul li a, footer {
+  font-family: "Google Sans Code", monospace;
+  font-weight: 350;
+  font-style: normal;
+}
+
+h2,h3,h4,h5,h6 {
+  font-family: "Raleway", sans-serif;
+  font-weight: 600;
+}
+
+/* ================================================================================
+ * typography
+ */
+
+hgroup p {
+  font-weight: 900;
+}
+
+h1 { font-size: 4rem;}
+
+
+/* ================================================================================
+ * img
+ */
+
+.media {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  .content {
+    flex: 1;
+  }
+  .image {
+    display: block;
+    /* img {max-width: 100%; } */
+  }
+}
+
+.hero {
+  max-width: 270px;
+  margin-left: 3dvw;
+  border: 12px solid #d65d0e;
+  margin-top: 0.5rem;
+  filter: drop-shadow(3px 3px 3px rgba(0,0,0,0.6));
+}
+
+/* ================================================================================
+ * sticky footer
+ */
+body {
+  min-height:100dvh;
+  display: flex;
+  flex-direction: column;
+  main {
+    flex: 1;
+  }
+}
+
+/* ================================================================================
+ * main page width
+ */
+main {
+  display: flex;
+  flex-direction: row;
+
+  article {
+    margin: 0 auto;
+    flex-grow: 1;
+    min-width: 60dvw;
+    max-width: 800px;
+    section {
+      height:100%;
+      margin: 0 auto;
+      max-width: 80dvw;
+      padding: 4dvh 4dvw;
+    }
+  }
+}
+
+
+/* ================================================================================
+ * 3 column footer
+ */
+footer {
+  border-top: 1px solid var(--main-bg-frame);
+  margin-top: auto;
+}
+
+/* ================================================================================
+ * nav
+ */
+nav {
+  background: #000;
+  ul {
+    li {
+      a {
+        text-decoration: none;
+        color: white;
+      }
+    };
+    li:hover, li:visited, li:active, li:link {
+      background: red;
+      a {
+        color: black;
+        text-decoration: none
+      }
+    };
+  }
+}
+
+/*
+ * footer
+ */
+footer * {
+  text-align: center;
+}
+
+/* ================================================================================
+ * whitespace
+ */
+
+html, body, main, nav, nav *, article, footer, footer * {
+  margin: 0;
+  padding: 0;
+}
+
+
+html {
+  body {
+    main {
+      display: flex;
+      nav {
+        margin: 0 4dvw;
+        ul {
+          li a {
+            padding: 2dvw 3dvw;
+          }
+        }
+      }
+      article {
+        width: 60vw;
+        padding: 1dvw;
+        hgroup * {
+          /* line-height: 1.5em; */
+        }
+        section {
+          padding: 3dvh 4dvw;
+        }
+      }
+      footer div {
+        margin:0;
+        padding:0;
+        font-size: smaller;
+      }
+    }
+  }
+}
+
+/* ================================================================================
+ * colours
+ */
+
+
+html {
+  background: linear-gradient(#000, #311213);
+  background: linear-gradient(#000, #d65d0e);
+  header {
+    background: var(--main-bg-inset);
+    border-bottom: 1px solid var(--main-bg-frame);
+  }
+}
+
+html * {
+  color: #222;
+}
+
+main {
+  color: transparent;
+}
+
+article {
+  border:0px solid #111;
+  filter: drop-shadow(5px 5px 4px rgba(0,0,0,0.7));
+  /* background: #3c3836; */
+  background: #ebdbb2;
+}
+
+section {
+  background: #f9f5d7;
+}
+
+mark {
+  /* background: #689d6a; */
+  /* background: #8ec07c; */
+  background: #f2e5bc;
+  font-weight: bold;
+  border-bottom: 4px solid #fabd2f;
+}
+
+hgroup mark {
+  background: #fabd2f;
+  font-weight: bold;
+  border-bottom: 8px solid #d65d0e;
+}
+
+figcaption {
+  font-style: italic;
+  font-family: monospace;
+  text-align: center;
+  background: #f2e5bc;
+}
+mark a {
+  text-decoration: none;
+}
+
+mark:has(a) {
+  border-bottom: 4px solid #cc241d;
+}
+mark:has(a:hover) {
+  border-bottom: 4px solid #076678;
+  background: #fabd2f;
+}
+
+footer {
+  background: #1d2021;
+  div { color: #ccc; }
+}
+
+nav {
+  a { color: white; }
+}
+
+pre {
+  background: #ebdbb2 !important;
+  color: #3c3836;
+}
+
+blockquote {
+  background: #928374 !important;
+  color: #fbf1c7;
+}
+
+hr {
+  color: #3c3836;
+  border-top: 8px solid #3c3836;
+  border-top: 8px solid #7c6f64;
+  size: 8px !important;
+}
+
+a {
+  text-decoration-thickness: 4px;
+  text-decoration-skip-ink: none;
+  text-decoration-color: #cc241d;
+}
+
+/* tables
+ *
+ */
+th, td {
+  vertical-align: top;
+}
+
+tr:nth-child(even){
+  th,td {
+    background-color: #ebdbb2;
+    background-color: #fbf1c7;
+
+  }
+}
+
+.inline {
+  display: inline;
+}
+
+.spaced {
+  margin: 2em 0;
+}
+
+.wrap {
+  text-wrap: balance;
+}
+
+.pad-2 {
+  padding: 2dvh 2dvw;
+}
+
+.mg-2 {
+  margin: 2dvh 2dvw;
+}
+
+
+

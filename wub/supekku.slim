@@ -1,0 +1,232 @@
+doctype 5
+head
+  title Supekku
+  meta charset="utf-8"
+  meta name="viewport" content="width=device-width, initial-scale=1"
+  meta name="color-scheme" content="light dark"
+  link rel="stylesheet" href="css/pico.min.css"
+  //
+  // js
+  script [defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"]
+  //
+  // webfont
+  link rel="preconnect" href="https://fonts.googleapis.com"
+  link [rel="preconnect" href="https://fonts.gstatic.com" crossorigin]
+  //
+  link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&family=Momo+Trust+Display&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"
+  //
+  // css
+  link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.orange.min.css"
+  link rel="stylesheet" href="styles.css"
+  script href="behaviour.js"
+body [data-theme="light"]
+  header
+  nav
+    ul
+      li
+        a.contrast href="#" home
+      li
+        a.contrast href="#" about
+      li
+        a.contrast href="#" github
+
+  main.container-fluid
+    article
+      section
+
+        div
+          hgroup
+            h1
+              mark spec-driver
+            p
+              |<> open toolkit & framework for
+              mark specification-driven development
+
+        //blockquote.wrap.mg-2.pad-2
+        p
+          |> An open, opinionated CLI application for spec-driven development, which turns markdown
+          |> files into relational data, scaffolding spec generation (and maintenance!) for
+          |> Go, Python and TypeScript projects.
+        p
+          |> Provides a comprehensive set of Markdown entities which, taken together, form a cohesive
+          |> and flexible conceptual framework. Stick with the defaults and use them all — or cherry-pick
+          |> and customise the templates, to build your ideal workflow.
+        p
+          mark spec-driver
+          |> came about because I was blown away by
+          mark
+            a href="https://github.com/github/spec-kit" spec-kit
+          |> ... until I realised it didn't actually do what I'd hoped.
+          |> You start with specifications, and it's got a great workflow for taking them from idea
+          |> to implementation — but there's no support for actually
+          em keeping them as a source of truth
+          |<> once you're done.
+
+        table
+          thead
+            tr
+              th
+              th
+                a href="https://github.com/github/spec-kit" spec-kit
+              th
+                a href="https://github.com/davidlee/spec-driver" spec-driver
+
+          tbody
+            tr
+              th
+                b status
+              td production - robust, excellent agent commands, multiple maintainers, feature complete
+              td beta - expect some rough edges & feature gaps; single maintainer
+            tr
+              th
+                b ideal projects
+              td smaller projects / microservices (language agnostic)
+              td go, python, typescript projects - any size
+            tr
+              th
+                b expected prior experience
+              td new to spec-driven development
+              td prior experience with other tools
+            tr
+              th
+                b strongest advantage
+              td widely used; highly polished
+              td relational structured data; evergreen specs — better for larger projects
+            tr
+              th
+                b weaknesses
+              td specifications are disposable; works best with modest codebases; no support for legacy adoption
+              td works for me™; rough edges; potential for bugs; documentation & guidance
+        figcaption Comparing spec-kit and spec-driver
+
+        br
+        p
+          b TL'DR
+          |> - if you haven't tried spec-kit, maybe start there. If you find yourself wanting more, spec-driver might be for you.
+
+        hr
+
+        div.media
+          div.content
+            p
+              b The pitch
+            ul
+              li
+                |<> Maintain
+                strong verifiably accurate
+                |> , interlinked,
+                mark evergreen
+                |<> specifications for your
+                em entire project
+              li
+                mark Product specs
+                |> for user-motivated features, use cases and requirements
+              li
+                mark Tech specs
+                |> for system architecture and implementation guidance
+              li
+                mark Markdown + embedded YAML
+                |<>
+                |<> makes a surprisingly powerful platform for structured data,
+                |<> and is highly legible to both human and agent developers
+              li
+                |> The registry turns markdown files into
+                mark relational data
+                |> — establishes
+                |> relationships, quick lookups and validation,
+                |> and propagates updates
+              li
+                mark Deterministically generate
+                |> cheap, concise, accurate documentation for
+                |>
+                strong every line of code
+                |<> within the scope of your spec
+              li
+                |<> These generated
+                mark contracts
+                |> provide an excellent complement to (and insurance against)
+                |<> the stochastic nature of research & implementation agents.
+              li
+                |<> They're also an extremely concise, token-effecient reference
+                |<> for both agents and humans
+              li
+                mark Requirements
+                |<> persist and evolve after initial implementation, with a
+                |<> rich lifecycle; verification and audit mechanisms
+              li
+                |> quickly capture desisions, risks, issues, and problem statements / product hypotheses into your
+                mark backlog
+              li
+                mark Prioritise
+                |> , interrogate, and generate implementation plans from your backlog, or absorb them into specs
+              li
+                |> Evolutionary
+                mark governance
+                |<> of your project with
+                strong ADRs
+                |<> (architecture decision records),
+                strong policies
+                |<> and
+                strong standards
+              li
+                |<> Process hooks and tooling support ensure they're considered during design, implementation and verification, and
+                mark audits
+                |<> give you the confidence to change both the code and the rules.
+          div.image
+            img.hero src="./assets/spec-driver.png"
+        blockquote
+          | Let's stop banging rocks together.
+        ul
+          li Spec-driven development is the only sane way to code with agents
+          li So now you're going to the trouble to write specs
+          li technical design requires understanding the existing code
+          li it's not long until this means a research stage for every spec
+        p
+          |> So ...
+          mark why would you accept specs and research being disposable
+          |<> when you could direct that research into ensuring the
+          mark specs reflect the current reality
+          |?
+
+        div.spaced
+          p
+            |> Run the
+            mark spec-driver sync
+            |<> command to automatically:
+          ul
+            li
+              b stub out
+              |<> new specs
+              |<> for unspecified modules
+            li
+              |> warn (or
+              pre.inline --prune
+              |<> when specs are "orphaned" by moved or deleted code
+            li
+              mark audit
+              |<>
+              b contract drift:
+              |<> detect when code changes aren't covered by specs
+
+
+        p
+          b Design goals
+
+        ul
+          li
+            strong first-class support
+            |<> for legacy codebases
+          li keep agents on track, no matter how large the codebase
+          li a fast, consistent, unified CLI for everything
+          li a great UX for both humans and agents
+          li multiple paths to victory: adapt the framework as your needs change, or to the scale and criticality of the task
+          li be ready to eat right out of the box
+
+
+
+
+  footer
+    div David Lee - ⓒ 2025
+
+
+

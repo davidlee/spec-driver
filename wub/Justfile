@@ -1,0 +1,13 @@
+build *_:
+  #/home/david/.local/share/gem/ruby/3.3.0/bin/slimrb -p supekku.slim > ./dist.html
+  just slim -p supekku.slim > dist.html
+
+watch:
+  build
+  fswatch --event Updated -0 supekku.slim styles.css | xargs -0 -n 1 just build
+
+slim *args:
+  direnv exec . slimrb {{args}}
+
+html:
+  just slim -p supekku.slim

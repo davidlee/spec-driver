@@ -39,7 +39,8 @@
       "Bash(yq:*)",
       "Bash(just quickcheck:*)",
       "mcp__serena__insert_after_symbol",
-      "mcp__serena__find_referencing_symbols"
+      "mcp__serena__find_referencing_symbols",
+      "Bash(just create-backlog-issue:*)"
     ],
     "deny": [],
     "ask": []

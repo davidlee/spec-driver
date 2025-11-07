@@ -1,3 +1,5 @@
+mod wub 'docs/Justfile' # web stuff
+
 check: format lint test pylint
 
 test:

@@ -20,7 +20,6 @@ head
   link rel="stylesheet" href="styles.css"
   script href="behaviour.js"
 body [data-theme="light"]
-  header
   nav
     ul
       li
@@ -29,11 +28,9 @@ body [data-theme="light"]
         a.contrast href="https://pypi.org/project/spec-driver/" install
       li
         a.contrast href="https://github.com/davidlee/spec-driver" github
-
   main.container-fluid
     article
       section
-
         div
           hgroup
             h1
@@ -42,8 +39,6 @@ body [data-theme="light"]
               |<> the
               mark specification-driven development
               |<> eigentoolkit
-
-        //blockquote.wrap.mg-2.pad-2
         p
           |> An open, opinionated CLI for spec-driven development.  Notably, it:
           ul
@@ -63,9 +58,7 @@ body [data-theme="light"]
           |> If you're building something ambitious, the process that got you started will not get
           |> you where you're going - and it's a plus if you don't have to declare process bankruptcy
           |> three times on the way there.
-
         hr
-
         p
           mark spec-driver
           |> came about because I was blown away by
@@ -85,7 +78,6 @@ body [data-theme="light"]
                 a href="https://github.com/github/spec-kit" spec-kit
               th
                 a href="https://github.com/davidlee/spec-driver" spec-driver
-
           tbody
             tr
               th
@@ -112,15 +104,14 @@ body [data-theme="light"]
                 b weaknesses
               td specifications are disposable; works best with modest codebases; no support for legacy adoption
               td works for me™; rough edges; potential bugs; gaps in documentation & guidance
-        figcaption Comparing spec-kit and spec-driver
+        figcaption fig a) Comparing spec-kit and spec-driver
 
         br
         p
           b TL'DR
           |> - if you haven't tried spec-kit, maybe start there. If you find yourself wanting more, spec-driver might be for you.
-
         hr
-
+        // ...
         div
           p
             b The pitch
@@ -132,23 +123,19 @@ body [data-theme="light"]
             li but technical design requires understanding the existing code
             li so ... it's not long until this means a research phase is required for every spec
             li but that only gives you a local understanding of the code explicitly inspected
-
           p
             |> If we're to elevate the role of specifications and build a methodology around them
             |> being "executable" by agent developers to drive implementation, isn't it a sign
             |> of a critical design flaw if those specifications, and the research that informs them,
             |> are only accurate at a point in time?
-
           p
             |> Put another way: if specs are important enough to name a movement after ...
-
           p
             mark why would we accept disposable specs
             |<> (and research)
             |<> when we could, at no greater cost, ensure the
             mark specs remain a system of truth
             |<> about the actual technical design and implementation, and the embodied product requirements?
-
           img.hero src="./assets/spec-driver.png"
           ul
             li
@@ -215,6 +202,7 @@ body [data-theme="light"]
               |> relationships, quick lookups and validation,
               |> and propagates updates
 
+        figcaption fig b) a typical workflow: create a delta to bundle some changes; design, plan, implement and verify them; then capture the context with an auto-generated revision, and reflect the changes to specs / requirements
         img src="./assets/simple.svg"
         div.spaced
           p
@@ -235,8 +223,7 @@ body [data-theme="light"]
               |<>
               b contract drift:
               |<> detect when code changes aren't covered by specs
-
-
+        hr
         p
           b Design goals
 

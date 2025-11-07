@@ -178,16 +178,18 @@ html, body, main, nav, nav *, article, footer, footer * {
 
 html {
   body {
-    main {
-      display: flex;
-      nav {
-        margin: 0 4dvw;
-        ul {
-          li a {
-            padding: 2dvw 3dvw;
-          }
+    nav {
+      margin: 0 0dvw;
+      max-width: 60%;
+      margin: auto;
+      ul {
+        li a {
+          padding: 0dvw 4dvw;
         }
       }
+    }
+    main {
+      display: flex;
       article {
         width: 60vw;
         padding: 1dvw;
@@ -314,6 +316,9 @@ a {
 /* tables
  *
  */
+table {
+  margin-bottom: 0;
+}
 th, td {
   vertical-align: top;
 }

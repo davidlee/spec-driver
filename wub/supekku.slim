@@ -39,24 +39,39 @@ body [data-theme="light"]
             h1
               mark spec-driver
             p
-              |<> open toolkit & framework for
+              |<> the
               mark specification-driven development
+              |<> eigentoolkit
 
         //blockquote.wrap.mg-2.pad-2
         p
-          |> An open, opinionated CLI application for spec-driven development, which turns markdown
-          |> files into relational data, scaffolding spec generation (and maintenance!) for
-          |> Go, Python and TypeScript projects.
+          |> An open, opinionated CLI for spec-driven development.  Notably, it:
+          ul
+            li lets markdown files impersonate a relational database
+            li scaffolds spec generation (and maintenance!) for Go, Python and TypeScript projects.
+            li
+              |> manages a cohesive set of nouns and verbs. Together, they form an adaptable framework
+              |> for building at sustainable pace with agents.
         p
-          |> Provides a comprehensive set of Markdown entities which, taken together, form a cohesive
-          |> and flexible conceptual framework. Stick with the defaults and use them all — or cherry-pick
-          |> and customise the templates, to build your ideal workflow.
+          |> Stick with the defaults and use everything — or cherry-pick
+          |> and customise the templates to suit.
+        p
+          |> Spec-driver is a "variable bureaucracy" framework: work from one line descriptions in a lightweight backlog,
+          |> up to standalone requirement documents, detailed runsheets, detailed spec revisions, and a
+          |> full audit trail of verifications tests linked to functional & non-functional requirements.
+        p
+          |> If you're building something ambitious, the process that got you started will not get
+          |> you where you're going - and it's a plus if you don't have to declare process bankruptcy
+          |> three times on the way there.
+
+        hr
+
         p
           mark spec-driver
           |> came about because I was blown away by
           mark
             a href="https://github.com/github/spec-kit" spec-kit
-          |> ... until I realised it didn't actually do what I'd hoped.
+          |> ... until I realised it wasn't actually trying to solve the problem I'd assumed it was.
           |> You start with specifications, and it's got a great workflow for taking them from idea
           |> to implementation — but there's no support for actually
           em keeping them as a source of truth
@@ -89,14 +104,14 @@ body [data-theme="light"]
               td prior experience with other tools
             tr
               th
-                b strongest advantage
-              td widely used; highly polished
-              td relational structured data; evergreen specs — better for larger projects
+                b key strengths
+              td documentation; strong community adoption; polished onboarding
+              td structured data; evergreen specs; unified CLI for automation
             tr
               th
                 b weaknesses
               td specifications are disposable; works best with modest codebases; no support for legacy adoption
-              td works for me™; rough edges; potential for bugs; documentation & guidance
+              td works for me™; rough edges; potential bugs; gaps in documentation & guidance
         figcaption Comparing spec-kit and spec-driver
 
         br
@@ -106,88 +121,101 @@ body [data-theme="light"]
 
         hr
 
-        div.media
-          div.content
-            p
-              b The pitch
-            ul
-              li
-                |<> Maintain
-                strong verifiably accurate
-                |> , interlinked,
-                mark evergreen
-                |<> specifications for your
-                em entire project
-              li
-                mark Product specs
-                |> for user-motivated features, use cases and requirements
-              li
-                mark Tech specs
-                |> for system architecture and implementation guidance
-              li
-                mark Markdown + embedded YAML
-                |<>
-                |<> makes a surprisingly powerful platform for structured data,
-                |<> and is highly legible to both human and agent developers
-              li
-                |> The registry turns markdown files into
-                mark relational data
-                |> — establishes
-                |> relationships, quick lookups and validation,
-                |> and propagates updates
-              li
-                mark Deterministically generate
-                |> cheap, concise, accurate documentation for
-                |>
-                strong every line of code
-                |<> within the scope of your spec
-              li
-                |<> These generated
-                mark contracts
-                |> provide an excellent complement to (and insurance against)
-                |<> the stochastic nature of research & implementation agents.
-              li
-                |<> They're also an extremely concise, token-effecient reference
-                |<> for both agents and humans
-              li
-                mark Requirements
-                |<> persist and evolve after initial implementation, with a
-                |<> rich lifecycle; verification and audit mechanisms
-              li
-                |> quickly capture desisions, risks, issues, and problem statements / product hypotheses into your
-                mark backlog
-              li
-                mark Prioritise
-                |> , interrogate, and generate implementation plans from your backlog, or absorb them into specs
-              li
-                |> Evolutionary
-                mark governance
-                |<> of your project with
-                strong ADRs
-                |<> (architecture decision records),
-                strong policies
-                |<> and
-                strong standards
-              li
-                |<> Process hooks and tooling support ensure they're considered during design, implementation and verification, and
-                mark audits
-                |<> give you the confidence to change both the code and the rules.
-          div.image
-            img.hero src="./assets/spec-driver.png"
-        blockquote
-          | Let's stop banging rocks together.
-        ul
-          li Spec-driven development is the only sane way to code with agents
-          li So now you're going to the trouble to write specs
-          li technical design requires understanding the existing code
-          li it's not long until this means a research stage for every spec
-        p
-          |> So ...
-          mark why would you accept specs and research being disposable
-          |<> when you could direct that research into ensuring the
-          mark specs reflect the current reality
-          |?
+        div
+          p
+            b The pitch
+          blockquote
+            | Stop banging rocks together.
+          ul
+            li spec-driven development is the only sane way to code with agents
+            li so ... you want to write a spec
+            li but technical design requires understanding the existing code
+            li so ... it's not long until this means a research phase is required for every spec
+            li but that only gives you a local understanding of the code explicitly inspected
 
+          p
+            |> If we're to elevate the role of specifications and build a methodology around them
+            |> being "executable" by agent developers to drive implementation, isn't it a sign
+            |> of a critical design flaw if those specifications, and the research that informs them,
+            |> are only accurate at a point in time?
+
+          p
+            |> Put another way: if specs are important enough to name a movement after ...
+
+          p
+            mark why would we accept disposable specs
+            |<> (and research)
+            |<> when we could, at no greater cost, ensure the
+            mark specs remain a system of truth
+            |<> about the actual technical design and implementation, and the embodied product requirements?
+
+          img.hero src="./assets/spec-driver.png"
+          ul
+            li
+              |<> Maintain
+              strong verifiably accurate
+              |> , interlinked,
+              mark evergreen
+              |<> specifications for your
+              em entire project
+            li
+              mark Product specs
+              |<> for user-motivated features, use cases and requirements
+            li
+              mark Tech specs
+              |<> for system architecture and implementation guidance
+
+            li
+              |<> Deterministically
+              mark generate
+              |<> cheap, concise, accurate documentation for
+              |>
+              em every line of code
+              |<> within the scope of your spec
+            li
+              |<> These generated
+              mark contracts
+              |<> provide an excellent complement to (and insurance against)
+              |<> the stochastic nature of research & implementation agents.
+            li
+              |<> They're also an extremely concise, token-effecient reference
+              |<> for both agents and humans
+            li
+              mark Requirements
+              |<> persist and evolve after initial implementation, with a
+              |<> rich lifecycle; verification and audit mechanisms
+            li
+              |> quickly capture desisions, risks, issues, and problem statements / product hypotheses into your
+              mark backlog
+            li
+              mark Prioritise
+              |> , interrogate, and generate implementation plans from your backlog, or absorb them into specs
+            li
+              |> Evolutionary
+              mark governance
+              |<> of your project with
+              strong ADRs
+              |<> (architecture decision records),
+              strong policies
+              |<> and
+              strong standards
+            li
+              |<> Process hooks and tooling support ensure they're considered during design, implementation and verification, and
+              mark audits
+              |<> give you the confidence to change both the code and the rules.
+            li
+              mark Markdown + embedded YAML
+              |<>
+              |<> makes a surprisingly powerful platform for structured data,
+              |<> and is highly legible to both human and agent developers
+            li
+              |> The registry turns markdown files into
+              mark relational data
+              |> — establishes
+              |> relationships, quick lookups and validation,
+              |> and propagates updates
+
+        img src="./assets/simple.svg"
         div.spaced
           p
             |> Run the

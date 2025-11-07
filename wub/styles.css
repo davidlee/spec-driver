@@ -88,10 +88,11 @@ h1 { font-size: 4rem;}
 }
 
 .hero {
-  max-width: 270px;
+  max-width: 310px;
   margin-left: 3dvw;
   border: 12px solid #d65d0e;
   margin-top: 0.5rem;
+  float: right;
   filter: drop-shadow(3px 3px 3px rgba(0,0,0,0.6));
 }
 
@@ -99,7 +100,7 @@ h1 { font-size: 4rem;}
  * sticky footer
  */
 body {
-  min-height:100dvh;
+  mi n-height:100dvh;
   display: flex;
   flex-direction: column;
   main {
@@ -120,7 +121,7 @@ main {
     min-width: 60dvw;
     max-width: 800px;
     section {
-      height:100%;
+      _height:100%;
       margin: 0 auto;
       max-width: 80dvw;
       padding: 4dvh 4dvw;
@@ -175,7 +176,6 @@ html, body, main, nav, nav *, article, footer, footer * {
   padding: 0;
 }
 
-
 html {
   body {
     main {
@@ -192,7 +192,6 @@ html {
         width: 60vw;
         padding: 1dvw;
         hgroup * {
-          /* line-height: 1.5em; */
         }
         section {
           padding: 3dvh 4dvw;
@@ -289,13 +288,21 @@ pre {
 blockquote {
   background: #928374 !important;
   color: #fbf1c7;
+  border-left: 8px solid #3c3836;
 }
 
 hr {
   color: #3c3836;
-  border-top: 8px solid #3c3836;
-  border-top: 8px solid #7c6f64;
-  size: 8px !important;
+  /* border-top: 8px solid #3c3836; */
+}
+
+article > hr {
+  border-top: 1px solid #7c6f64;
+}
+
+section > hr {
+  border-top: 5px solid #7c6f64;
+  margin: 2rem 0;
 }
 
 a {

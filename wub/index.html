@@ -37,18 +37,36 @@
               <mark>spec-driver</mark>
             </h1>
             <p>
-              open toolkit & framework for <mark>specification-driven development</mark>
+              the <mark>specification-driven development</mark> eigentoolkit 
             </p>
           </hgroup>
         </div>
         <p>
-          An open, opinionated CLI application for spec-driven development, which turns markdown files into relational data, scaffolding spec generation (and maintenance!) for Go, Python and TypeScript projects. 
+          An open, opinionated CLI for spec-driven development.  Notably, it: 
+          <ul>
+            <li>
+              lets markdown files impersonate a relational database
+            </li>
+            <li>
+              scaffolds spec generation (and maintenance!) for Go, Python and TypeScript projects.
+            </li>
+            <li>
+              manages a cohesive set of nouns and verbs. Together, they form an adaptable framework for building at sustainable pace with agents. 
+            </li>
+          </ul>
         </p>
         <p>
-          Provides a comprehensive set of Markdown entities which, taken together, form a cohesive and flexible conceptual framework. Stick with the defaults and use them all — or cherry-pick and customise the templates, to build your ideal workflow. 
+          Stick with the defaults and use everything — or cherry-pick and customise the templates to suit. 
         </p>
         <p>
-          <mark>spec-driver</mark>came about because I was blown away by <mark><a href="https://github.com/github/spec-kit">spec-kit</a></mark>... until I realised it didn't actually do what I'd hoped. You start with specifications, and it's got a great workflow for taking them from idea to implementation — but there's no support for actually <em>keeping them as a source of truth</em> once you're done. 
+          Spec-driver is a "variable bureaucracy" framework: work from one line descriptions in a lightweight backlog, up to standalone requirement documents, detailed runsheets, detailed spec revisions, and a full audit trail of verifications tests linked to functional & non-functional requirements. 
+        </p>
+        <p>
+          If you're building something ambitious, the process that got you started will not get you where you're going - and it's a plus if you don't have to declare process bankruptcy three times on the way there. 
+        </p>
+        <hr />
+        <p>
+          <mark>spec-driver</mark>came about because I was blown away by <mark><a href="https://github.com/github/spec-kit">spec-kit</a></mark>... until I realised it wasn't actually trying to solve the problem I'd assumed it was. You start with specifications, and it's got a great workflow for taking them from idea to implementation — but there's no support for actually <em>keeping them as a source of truth</em> once you're done. 
         </p>
         <table>
           <thead>
@@ -98,13 +116,13 @@
             </tr>
             <tr>
               <th>
-                <b>strongest advantage</b>
+                <b>key strengths</b>
               </th>
               <td>
-                widely used; highly polished
+                documentation; strong community adoption; polished onboarding
               </td>
               <td>
-                relational structured data; evergreen specs — better for larger projects
+                structured data; evergreen specs; unified CLI for automation
               </td>
             </tr>
             <tr>
@@ -115,7 +133,7 @@
                 specifications are disposable; works best with modest codebases; no support for legacy adoption
               </td>
               <td>
-                works for me™; rough edges; potential for bugs; documentation & guidance
+                works for me™; rough edges; potential bugs; gaps in documentation & guidance
               </td>
             </tr>
           </tbody>
@@ -125,75 +143,81 @@
           <b>TL'DR</b>- if you haven't tried spec-kit, maybe start there. If you find yourself wanting more, spec-driver might be for you. 
         </p>
         <hr />
-        <div class="media">
-          <div class="content">
-            <p>
-              <b>The pitch</b>
-            </p>
-            <ul>
-              <li>
-                Maintain <strong>verifiably accurate</strong>, interlinked, <mark>evergreen</mark> specifications for your <em>entire project</em>
-              </li>
-              <li>
-                <mark>Product specs</mark>for user-motivated features, use cases and requirements 
-              </li>
-              <li>
-                <mark>Tech specs</mark>for system architecture and implementation guidance 
-              </li>
-              <li>
-                <mark>Markdown + embedded YAML</mark>   makes a surprisingly powerful platform for structured data,  and is highly legible to both human and agent developers 
-              </li>
-              <li>
-                The registry turns markdown files into <mark>relational data</mark>— establishes relationships, quick lookups and validation, and propagates updates 
-              </li>
-              <li>
-                <mark>Deterministically generate</mark>cheap, concise, accurate documentation for  <strong>every line of code</strong> within the scope of your spec 
-              </li>
-              <li>
-                These generated <mark>contracts</mark>provide an excellent complement to (and insurance against)  the stochastic nature of research & implementation agents. 
-              </li>
-              <li>
-                They're also an extremely concise, token-effecient reference  for both agents and humans 
-              </li>
-              <li>
-                <mark>Requirements</mark> persist and evolve after initial implementation, with a  rich lifecycle; verification and audit mechanisms 
-              </li>
-              <li>
-                quickly capture desisions, risks, issues, and problem statements / product hypotheses into your <mark>backlog</mark>
-              </li>
-              <li>
-                <mark>Prioritise</mark>, interrogate, and generate implementation plans from your backlog, or absorb them into specs 
-              </li>
-              <li>
-                Evolutionary <mark>governance</mark> of your project with <strong>ADRs</strong> (architecture decision records), <strong>policies</strong> and <strong>standards</strong>
-              </li>
-              <li>
-                Process hooks and tooling support ensure they're considered during design, implementation and verification, and <mark>audits</mark> give you the confidence to change both the code and the rules. 
-              </li>
-            </ul>
-          </div>
-          <div class="image">
-            <img class="hero" src="./assets/spec-driver.png" />
-          </div>
+        <div>
+          <p>
+            <b>The pitch</b>
+          </p>
+          <blockquote>Stop banging rocks together.</blockquote>
+          <ul>
+            <li>
+              spec-driven development is the only sane way to code with agents
+            </li>
+            <li>
+              so ... you want to write a spec
+            </li>
+            <li>
+              but technical design requires understanding the existing code
+            </li>
+            <li>
+              so ... it's not long until this means a research phase is required for every spec
+            </li>
+            <li>
+              but that only gives you a local understanding of the code explicitly inspected
+            </li>
+          </ul>
+          <p>
+            If we're to elevate the role of specifications and build a methodology around them being "executable" by agent developers to drive implementation, isn't it a sign of a critical design flaw if those specifications, and the research that informs them, are only accurate at a point in time? 
+          </p>
+          <p>
+            Put another way: if specs are important enough to name a movement after ... 
+          </p>
+          <p>
+            <mark>why would we accept disposable specs</mark> (and research)  when we could, at no greater cost, ensure the <mark>specs remain a system of truth</mark> about the actual technical design and implementation, and the embodied product requirements? 
+          </p>
+          <img class="hero" src="./assets/spec-driver.png" />
+          <ul>
+            <li>
+              Maintain <strong>verifiably accurate</strong>, interlinked, <mark>evergreen</mark> specifications for your <em>entire project</em>
+            </li>
+            <li>
+              <mark>Product specs</mark> for user-motivated features, use cases and requirements 
+            </li>
+            <li>
+              <mark>Tech specs</mark> for system architecture and implementation guidance 
+            </li>
+            <li>
+              Deterministically <mark>generate</mark> cheap, concise, accurate documentation for  <em>every line of code</em> within the scope of your spec 
+            </li>
+            <li>
+              These generated <mark>contracts</mark> provide an excellent complement to (and insurance against)  the stochastic nature of research & implementation agents. 
+            </li>
+            <li>
+              They're also an extremely concise, token-effecient reference  for both agents and humans 
+            </li>
+            <li>
+              <mark>Requirements</mark> persist and evolve after initial implementation, with a  rich lifecycle; verification and audit mechanisms 
+            </li>
+            <li>
+              quickly capture desisions, risks, issues, and problem statements / product hypotheses into your <mark>backlog</mark>
+            </li>
+            <li>
+              <mark>Prioritise</mark>, interrogate, and generate implementation plans from your backlog, or absorb them into specs 
+            </li>
+            <li>
+              Evolutionary <mark>governance</mark> of your project with <strong>ADRs</strong> (architecture decision records), <strong>policies</strong> and <strong>standards</strong>
+            </li>
+            <li>
+              Process hooks and tooling support ensure they're considered during design, implementation and verification, and <mark>audits</mark> give you the confidence to change both the code and the rules. 
+            </li>
+            <li>
+              <mark>Markdown + embedded YAML</mark>   makes a surprisingly powerful platform for structured data,  and is highly legible to both human and agent developers 
+            </li>
+            <li>
+              The registry turns markdown files into <mark>relational data</mark>— establishes relationships, quick lookups and validation, and propagates updates 
+            </li>
+          </ul>
         </div>
-        <blockquote>Let's stop banging rocks together.</blockquote>
-        <ul>
-          <li>
-            Spec-driven development is the only sane way to code with agents
-          </li>
-          <li>
-            So now you're going to the trouble to write specs
-          </li>
-          <li>
-            technical design requires understanding the existing code
-          </li>
-          <li>
-            it's not long until this means a research stage for every spec
-          </li>
-        </ul>
-        <p>
-          So ... <mark>why would you accept specs and research being disposable</mark> when you could direct that research into ensuring the <mark>specs reflect the current reality</mark>?
-        </p>
+        <img src="./assets/simple.svg" />
         <div class="spaced">
           <p>
             Run the <mark>spec-driver sync</mark> command to automatically: 

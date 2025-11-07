@@ -1,0 +1,58 @@
+user: User
+user.shape: person
+
+spec: Spec
+spec.style.multiple: true
+spec: {
+  requirements.style.multiple: true
+  contracts.style.multiple: true
+}
+
+rev2: Revision
+rev2.shape: page
+rev2: {style.fill: '#ffe'}
+
+delta: Delta
+delta: {style.fill: '#fee'}
+
+delta: {
+  DA: Design Artefact
+  DA: {style.fill: '#efe'}
+  DA.shape: page
+
+  IP: Implementation Plan
+  IP: {style.fill: '#fcfcdf'}
+  IP.shape: page
+
+  IP: {
+    phase 1: {style.fill: '#eee'}
+    phase 2: {style.fill: '#eee'}
+    phase 3: {style.fill: '#eee'}
+  }
+  IP -> DA
+}
+
+codebase: Codebase
+codebase: {
+  component
+  tests
+}
+
+audit: Audit {style.fill: '#fef0fe'}
+audit.shape: parallelogram
+audit
+
+rev2 -> spec: update
+
+delta -> spec.requirements: implements {style.stroke: '#777'; target-arrowhead.shape: circle}
+
+user -> delta.DA: "1. design" {style.font-color: black; style.bold: true}
+user -> delta.IP: "2. plan" {style.font-color: black; style.bold: true}
+user -> audit: "3. verify" {style.font-color: black; style.bold: true}
+user -> rev2: "4. apply" {style.font-color: black; style.bold: true}
+
+delta -> codebase: change
+
+audit -- codebase: {style.stroke: '#777'; style.stroke-dash: 3}
+audit -- delta.IP: {style.stroke: '#777'; style.stroke-dash: 3}
+codebase -> spec.contracts: "generate"

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<head>
+  <title>Supekku</title>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <meta content="light dark" name="color-scheme" />
+  <link href="css/pico.min.css" rel="stylesheet" />
+  <script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&amp;family=Momo+Trust+Display&amp;family=Noto+Sans:ital,wght@0,100..900;1,100..900&amp;family=Raleway:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.orange.min.css" rel="stylesheet" />
+  <link href="styles.css" rel="stylesheet" />
+  <script href="behaviour.js"></script>
+</head>
+<body data-theme="light">
+  <header></header>
+  <nav>
+    <ul>
+      <li>
+        <a class="contrast" href="#">home</a>
+      </li>
+      <li>
+        <a class="contrast" href="#">about</a>
+      </li>
+      <li>
+        <a class="contrast" href="#">github</a>
+      </li>
+    </ul>
+  </nav>
+  <main class="container-fluid">
+    <article>
+      <section>
+        <div>
+          <hgroup>
+            <h1>
+              <mark>spec-driver</mark>
+            </h1>
+            <p>
+              open toolkit & framework for <mark>specification-driven development</mark>
+            </p>
+          </hgroup>
+        </div>
+        <p>
+          An open, opinionated CLI application for spec-driven development, which turns markdown files into relational data, scaffolding spec generation (and maintenance!) for Go, Python and TypeScript projects. 
+        </p>
+        <p>
+          Provides a comprehensive set of Markdown entities which, taken together, form a cohesive and flexible conceptual framework. Stick with the defaults and use them all — or cherry-pick and customise the templates, to build your ideal workflow. 
+        </p>
+        <p>
+          <mark>spec-driver</mark>came about because I was blown away by <mark><a href="https://github.com/github/spec-kit">spec-kit</a></mark>... until I realised it didn't actually do what I'd hoped. You start with specifications, and it's got a great workflow for taking them from idea to implementation — but there's no support for actually <em>keeping them as a source of truth</em> once you're done. 
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>
+                <a href="https://github.com/github/spec-kit">spec-kit</a>
+              </th>
+              <th>
+                <a href="https://github.com/davidlee/spec-driver">spec-driver</a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>
+                <b>status</b>
+              </th>
+              <td>
+                production - robust, excellent agent commands, multiple maintainers, feature complete
+              </td>
+              <td>
+                beta - expect some rough edges & feature gaps; single maintainer
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <b>ideal projects</b>
+              </th>
+              <td>
+                smaller projects / microservices (language agnostic)
+              </td>
+              <td>
+                go, python, typescript projects - any size
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <b>expected prior experience</b>
+              </th>
+              <td>
+                new to spec-driven development
+              </td>
+              <td>
+                prior experience with other tools
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <b>strongest advantage</b>
+              </th>
+              <td>
+                widely used; highly polished
+              </td>
+              <td>
+                relational structured data; evergreen specs — better for larger projects
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <b>weaknesses</b>
+              </th>
+              <td>
+                specifications are disposable; works best with modest codebases; no support for legacy adoption
+              </td>
+              <td>
+                works for me™; rough edges; potential for bugs; documentation & guidance
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <figcaption>Comparing spec-kit and spec-driver</figcaption><br />
+        <p>
+          <b>TL'DR</b>- if you haven't tried spec-kit, maybe start there. If you find yourself wanting more, spec-driver might be for you. 
+        </p>
+        <hr />
+        <div class="media">
+          <div class="content">
+            <p>
+              <b>The pitch</b>
+            </p>
+            <ul>
+              <li>
+                Maintain <strong>verifiably accurate</strong>, interlinked, <mark>evergreen</mark> specifications for your <em>entire project</em>
+              </li>
+              <li>
+                <mark>Product specs</mark>for user-motivated features, use cases and requirements 
+              </li>
+              <li>
+                <mark>Tech specs</mark>for system architecture and implementation guidance 
+              </li>
+              <li>
+                <mark>Markdown + embedded YAML</mark>   makes a surprisingly powerful platform for structured data,  and is highly legible to both human and agent developers 
+              </li>
+              <li>
+                The registry turns markdown files into <mark>relational data</mark>— establishes relationships, quick lookups and validation, and propagates updates 
+              </li>
+              <li>
+                <mark>Deterministically generate</mark>cheap, concise, accurate documentation for  <strong>every line of code</strong> within the scope of your spec 
+              </li>
+              <li>
+                These generated <mark>contracts</mark>provide an excellent complement to (and insurance against)  the stochastic nature of research & implementation agents. 
+              </li>
+              <li>
+                They're also an extremely concise, token-effecient reference  for both agents and humans 
+              </li>
+              <li>
+                <mark>Requirements</mark> persist and evolve after initial implementation, with a  rich lifecycle; verification and audit mechanisms 
+              </li>
+              <li>
+                quickly capture desisions, risks, issues, and problem statements / product hypotheses into your <mark>backlog</mark>
+              </li>
+              <li>
+                <mark>Prioritise</mark>, interrogate, and generate implementation plans from your backlog, or absorb them into specs 
+              </li>
+              <li>
+                Evolutionary <mark>governance</mark> of your project with <strong>ADRs</strong> (architecture decision records), <strong>policies</strong> and <strong>standards</strong>
+              </li>
+              <li>
+                Process hooks and tooling support ensure they're considered during design, implementation and verification, and <mark>audits</mark> give you the confidence to change both the code and the rules. 
+              </li>
+            </ul>
+          </div>
+          <div class="image">
+            <img class="hero" src="./assets/spec-driver.png" />
+          </div>
+        </div>
+        <blockquote>Let's stop banging rocks together.</blockquote>
+        <ul>
+          <li>
+            Spec-driven development is the only sane way to code with agents
+          </li>
+          <li>
+            So now you're going to the trouble to write specs
+          </li>
+          <li>
+            technical design requires understanding the existing code
+          </li>
+          <li>
+            it's not long until this means a research stage for every spec
+          </li>
+        </ul>
+        <p>
+          So ... <mark>why would you accept specs and research being disposable</mark> when you could direct that research into ensuring the <mark>specs reflect the current reality</mark>?
+        </p>
+        <div class="spaced">
+          <p>
+            Run the <mark>spec-driver sync</mark> command to automatically: 
+          </p>
+          <ul>
+            <li>
+              <b>stub out</b> new specs  for unspecified modules 
+            </li>
+            <li>
+              warn (or <pre class="inline">--prune</pre> when specs are "orphaned" by moved or deleted code 
+            </li>
+            <li>
+              <mark>audit</mark>  <b>contract drift:</b> detect when code changes aren't covered by specs 
+            </li>
+          </ul>
+        </div>
+        <p>
+          <b>Design goals</b>
+        </p>
+        <ul>
+          <li>
+            <strong>first-class support</strong> for legacy codebases 
+          </li>
+          <li>
+            keep agents on track, no matter how large the codebase
+          </li>
+          <li>
+            a fast, consistent, unified CLI for everything
+          </li>
+          <li>
+            a great UX for both humans and agents
+          </li>
+          <li>
+            multiple paths to victory: adapt the framework as your needs change, or to the scale and criticality of the task
+          </li>
+          <li>
+            be ready to eat right out of the box
+          </li>
+        </ul>
+      </section>
+    </article>
+  </main>
+  <footer>
+    <div>
+      David Lee - ⓒ 2025
+    </div>
+  </footer>
+</body>

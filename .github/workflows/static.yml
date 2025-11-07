@@ -19,7 +19,7 @@ permissions:
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   # Single deploy job since we're just deploying
@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: 'wub'
+          path: './wub'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

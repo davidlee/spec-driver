@@ -1261,14 +1261,14 @@ def list_backlog(
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
-  order_by_id: Annotated[
-    bool,
+  order: Annotated[
+    str | None,
     typer.Option(
-      "--order-by-id",
+      "--order",
       "-o",
-      help="Order by ID (chronological) instead of priority",
+      help="Order by field: id, severity, status, kind (default: priority)",
     ),
-  ] = False,
+  ] = None,
   prioritize: Annotated[
     bool,
     typer.Option(
@@ -1278,11 +1278,35 @@ def list_backlog(
       help="Open filtered items in editor for reordering",
     ),
   ] = False,
+  show_all: Annotated[
+    bool,
+    typer.Option(
+      "--all",
+      "-a",
+      help="Include resolved/implemented items (default: exclude them)",
+    ),
+  ] = False,
+  limit: Annotated[
+    int | None,
+    typer.Option(
+      "--limit",
+      help="Maximum number of items to display (default: 20)",
+    ),
+  ] = 20,
+  pager: Annotated[
+    bool,
+    typer.Option(
+      "--pager",
+      "-P",
+      help="Display output using pager for scrolling",
+    ),
+  ] = False,
 ) -> None:
   """List backlog items with optional filtering.
 
-  By default, items are sorted by priority (registry order → severity → ID).
-  Use --order-by-id to sort chronologically by ID instead.
+  By default, items are sorted by priority (registry order → severity → ID) and
+  resolved/implemented items are excluded. Use --all to include all statuses.
+  Use --order to sort by: id, severity, status, or kind.
 
   Use --prioritize to open the filtered items in your editor for interactive reordering.
   After saving, the registry will be updated with your new ordering.
@@ -1323,6 +1347,13 @@ def list_backlog(
     repo_root = Path(root) if root else None
     all_items = discover_backlog_items(root=repo_root, kind=kind)
     items = all_items.copy()
+
+    # Apply default status filter (exclude resolved/implemented unless --all specified)
+    if not show_all:
+      items = [
+        i for i in items
+        if i.status.lower() not in ["resolved", "implemented"]
+      ]
 
     # Apply filters
     if status:
@@ -1372,14 +1403,53 @@ def list_backlog(
         typer.echo("No changes made to registry.", err=True)
         raise typer.Exit(EXIT_FAILURE) from err
 
-    # Apply priority ordering (unless --order-by-id specified)
-    if not order_by_id:
+    # Apply ordering
+    if order:
+      # Validate order field
+      valid_orders = ["id", "severity", "status", "kind"]
+      if order.lower() not in valid_orders:
+        typer.echo(f"Error: invalid order field: {order}", err=True)
+        typer.echo(f"Valid options: {', '.join(valid_orders)}", err=True)
+        raise typer.Exit(EXIT_FAILURE)
+
+      # Sort by requested field
+      order_lower = order.lower()
+      if order_lower == "id":
+        items = sorted(items, key=lambda x: x.id)
+      elif order_lower == "severity":
+        items = sorted(items, key=lambda x: (not x.severity, x.severity or ""))
+      elif order_lower == "status":
+        items = sorted(items, key=lambda x: x.status)
+      elif order_lower == "kind":
+        items = sorted(items, key=lambda x: x.kind)
+    else:
+      # Default: priority ordering
       ordering = load_backlog_registry(root=repo_root)
       items = sort_by_priority(items, ordering)
 
+    # Store total count before limiting
+    total_count = len(items)
+
+    # Apply limit if specified
+    if limit is not None and limit > 0:
+      items = items[:limit]
+
     # Format and output
     output = format_backlog_list_table(items, format_type, truncate)
-    typer.echo(output)
+
+    # Add pagination info if results were limited
+    if limit is not None and total_count > limit and format_type == "table":
+      output += f"\n\nShowing {len(items)} of {total_count} items. "
+      output += "Use --limit to see more or --all to include resolved/implemented."
+
+    # Output via pager or normal echo
+    if pager and format_type == "table":
+      from rich.console import Console
+      console = Console()
+      with console.pager():
+        console.print(output, markup=False)
+    else:
+      typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
@@ -1413,14 +1483,14 @@ def list_issues(
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
-  order_by_id: Annotated[
-    bool,
+  order: Annotated[
+    str | None,
     typer.Option(
-      "--order-by-id",
+      "--order",
       "-o",
-      help="Order by ID (chronological) instead of priority",
+      help="Order by field: id, severity, status, kind (default: priority)",
     ),
-  ] = False,
+  ] = None,
   prioritize: Annotated[
     bool,
     typer.Option(
@@ -1430,10 +1500,35 @@ def list_issues(
       help="Open filtered items in editor for reordering",
     ),
   ] = False,
+  show_all: Annotated[
+    bool,
+    typer.Option(
+      "--all",
+      "-a",
+      help="Include resolved/implemented items (default: exclude them)",
+    ),
+  ] = False,
+  limit: Annotated[
+    int | None,
+    typer.Option(
+      "--limit",
+      help="Maximum number of items to display (default: 20)",
+    ),
+  ] = 20,
+  pager: Annotated[
+    bool,
+    typer.Option(
+      "--pager",
+      "-P",
+      help="Display output using pager for scrolling",
+    ),
+  ] = False,
 ) -> None:
   """List backlog issues with optional filtering.
 
   Shortcut for: list backlog --kind issue
+
+  By default, resolved/implemented items are excluded. Use --all to show all.
   """
   # --json flag overrides --format
   if json_output:
@@ -1448,8 +1543,11 @@ def list_issues(
     case_insensitive=case_insensitive,
     format_type=format_type,
     truncate=truncate,
-    order_by_id=order_by_id,
+    order=order,
     prioritize=prioritize,
+    show_all=show_all,
+    limit=limit,
+    pager=pager,
   )
 
 
@@ -1479,14 +1577,14 @@ def list_problems(
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
-  order_by_id: Annotated[
-    bool,
+  order: Annotated[
+    str | None,
     typer.Option(
-      "--order-by-id",
+      "--order",
       "-o",
-      help="Order by ID (chronological) instead of priority",
+      help="Order by field: id, severity, status, kind (default: priority)",
     ),
-  ] = False,
+  ] = None,
   prioritize: Annotated[
     bool,
     typer.Option(
@@ -1496,10 +1594,35 @@ def list_problems(
       help="Open filtered items in editor for reordering",
     ),
   ] = False,
+  show_all: Annotated[
+    bool,
+    typer.Option(
+      "--all",
+      "-a",
+      help="Include resolved/implemented items (default: exclude them)",
+    ),
+  ] = False,
+  limit: Annotated[
+    int | None,
+    typer.Option(
+      "--limit",
+      help="Maximum number of items to display (default: 20)",
+    ),
+  ] = 20,
+  pager: Annotated[
+    bool,
+    typer.Option(
+      "--pager",
+      "-P",
+      help="Display output using pager for scrolling",
+    ),
+  ] = False,
 ) -> None:
   """List backlog problems with optional filtering.
 
   Shortcut for: list backlog --kind problem
+
+  By default, resolved/implemented items are excluded. Use --all to show all.
   """
   # --json flag overrides --format
   if json_output:
@@ -1514,8 +1637,11 @@ def list_problems(
     case_insensitive=case_insensitive,
     format_type=format_type,
     truncate=truncate,
-    order_by_id=order_by_id,
+    order=order,
     prioritize=prioritize,
+    show_all=show_all,
+    limit=limit,
+    pager=pager,
   )
 
 
@@ -1545,14 +1671,14 @@ def list_improvements(
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
-  order_by_id: Annotated[
-    bool,
+  order: Annotated[
+    str | None,
     typer.Option(
-      "--order-by-id",
+      "--order",
       "-o",
-      help="Order by ID (chronological) instead of priority",
+      help="Order by field: id, severity, status, kind (default: priority)",
     ),
-  ] = False,
+  ] = None,
   prioritize: Annotated[
     bool,
     typer.Option(
@@ -1562,10 +1688,35 @@ def list_improvements(
       help="Open filtered items in editor for reordering",
     ),
   ] = False,
+  show_all: Annotated[
+    bool,
+    typer.Option(
+      "--all",
+      "-a",
+      help="Include resolved/implemented items (default: exclude them)",
+    ),
+  ] = False,
+  limit: Annotated[
+    int | None,
+    typer.Option(
+      "--limit",
+      help="Maximum number of items to display (default: 20)",
+    ),
+  ] = 20,
+  pager: Annotated[
+    bool,
+    typer.Option(
+      "--pager",
+      "-P",
+      help="Display output using pager for scrolling",
+    ),
+  ] = False,
 ) -> None:
   """List backlog improvements with optional filtering.
 
   Shortcut for: list backlog --kind improvement
+
+  By default, resolved/implemented items are excluded. Use --all to show all.
   """
   # --json flag overrides --format
   if json_output:
@@ -1580,8 +1731,11 @@ def list_improvements(
     case_insensitive=case_insensitive,
     format_type=format_type,
     truncate=truncate,
-    order_by_id=order_by_id,
+    order=order,
     prioritize=prioritize,
+    show_all=show_all,
+    limit=limit,
+    pager=pager,
   )
 
 
@@ -1611,14 +1765,14 @@ def list_risks(
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   truncate: TruncateOption = False,
-  order_by_id: Annotated[
-    bool,
+  order: Annotated[
+    str | None,
     typer.Option(
-      "--order-by-id",
+      "--order",
       "-o",
-      help="Order by ID (chronological) instead of priority",
+      help="Order by field: id, severity, status, kind (default: priority)",
     ),
-  ] = False,
+  ] = None,
   prioritize: Annotated[
     bool,
     typer.Option(
@@ -1628,10 +1782,35 @@ def list_risks(
       help="Open filtered items in editor for reordering",
     ),
   ] = False,
+  show_all: Annotated[
+    bool,
+    typer.Option(
+      "--all",
+      "-a",
+      help="Include resolved/implemented items (default: exclude them)",
+    ),
+  ] = False,
+  limit: Annotated[
+    int | None,
+    typer.Option(
+      "--limit",
+      help="Maximum number of items to display (default: 20)",
+    ),
+  ] = 20,
+  pager: Annotated[
+    bool,
+    typer.Option(
+      "--pager",
+      "-P",
+      help="Display output using pager for scrolling",
+    ),
+  ] = False,
 ) -> None:
   """List backlog risks with optional filtering.
 
   Shortcut for: list backlog --kind risk
+
+  By default, resolved/implemented items are excluded. Use --all to show all.
   """
   # --json flag overrides --format
   if json_output:
@@ -1646,8 +1825,11 @@ def list_risks(
     case_insensitive=case_insensitive,
     format_type=format_type,
     truncate=truncate,
-    order_by_id=order_by_id,
+    order=order,
     prioritize=prioritize,
+    show_all=show_all,
+    limit=limit,
+    pager=pager,
   )
 
 

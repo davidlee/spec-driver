@@ -1,4 +1,4 @@
-mod wub 'docs/Justfile' # web stuff
+mod wub
 
 check: format lint test pylint
 

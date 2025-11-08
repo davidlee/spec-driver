@@ -53,7 +53,7 @@ A smorgasbord for you to build your own workflow around
 
 ### PyPi package
 
-```bash
+```zsh
 # try before you buy (no install)
 uvx spec-driver --help
 
@@ -65,7 +65,7 @@ uv run spec-driver --help
 
 ### From GitHub (Development)
 
-```bash
+```zsh
 # Install from latest commit
 uv init 
 uv add git+https://github.com/davidlee/spec-driver
@@ -75,6 +75,22 @@ uv run spec-driver --help
 uvx --from git+https://github.com/davidlee/spec-driver spec-driver --help
 ```
 
+## npm dependency: ts-doc-extract
+
+```zsh
+npx ts-doc-extract
+
+```
+**IMPORTANT**: The TypeScript doc/contract generation requires the
+[ts-doc-extract](https://www.npmjs.com/package/ts-doc-extract) package
+available and will attempt to run it in a non-interactive shell using npx,
+which will cause `spec-driver sync` to hang in a not especially informative way
+if you have typescript / javascript code in your project. 
+
+For now, that means you need to run `npx ts-doc-extract` as part of
+installation. Hopefully the fix is as simple in the common case as adding
+`--yes` to multi-language npx invocation (although I'd much rather wrap it in a
+confirmation).
 ![workflow diagram](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/simple.svg)
 
 ## Quick Start

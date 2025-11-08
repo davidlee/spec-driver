@@ -236,7 +236,18 @@ body [data-theme="light"]
           li a great UX for both humans and agents
           li multiple paths to victory: adapt the framework as your needs change, or to the scale and criticality of the task
           li be ready to eat right out of the box
-
+        p
+          b Design principles
+        ul
+          li
+            |> Begin with correctness (a
+            mark robust conceptual model
+            |<> ), and then make it comprehensible; don't start with what's easy and then try to make it work correctly. Compare the trajectories of MySQL (it was fast, they tried to make it correct) and PostgreSQL (it was correct, they made it fast).
+          li
+            mark self-teaching over instruction
+            |<> if we provide tooling which clarifies and reinforces the data model (as with
+            pre.inline spec-driver schema show
+            |< and the prompts to use it when creating new files), the agent needs far less documentation and behavioural scaffolding, and can often intuit, and even clarify for you how to use the system appropriately.
 
 
 

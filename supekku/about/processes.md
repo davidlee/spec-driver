@@ -3,25 +3,25 @@
 A quick reference for the core workflows in Vice's agentic development loop. Each process links the relevant specs, templates, and artefacts.
 
 ## Spec Creation
-- **Tech spec**: `just new-spec "Component Name"` (defaults to tech)
-- **Product spec**: `just new-spec -- --type product "Capability Name"`
+- **Tech spec**: `uv run spec-driver create spec "Component Name"` (defaults to tech)
+- **Product spec**: `uv run spec-driver create spec --type product "Capability Name"`
 - Fill out the generated `SPEC-XXX.md` / `PROD-XXX.md` using the templates under `.spec-driver/templates/`
 - Optional `SPEC-XXX.tests.md` for detailed testing guidance
-- Use `just .spec-driver::sync-spec --allow-missing-go <package>` to bootstrap conceptual specs even before Go code exists
+- Use `uv run spec-driver sync --allow-missing-source go:<package>` to bootstrap conceptual specs even before Go code exists
 
 ## Backlog Capture
-- Issues: `just .spec-driver::new-issue "Title"`
-- Problems: `just .spec-driver::new-problem "Title"`
-- Improvements: `just .spec-driver::new-improvement "Title"`
-- Risks: `just .spec-driver::new-risk "Title"`
-- Append to shared backlog list: `just .spec-driver::backlog-append`
+- Issues: `uv run spec-driver create issue "Title"`
+- Problems: `uv run spec-driver create problem "Title"`
+- Improvements: `uv run spec-driver create improvement "Title"`
+- Risks: `uv run spec-driver create risk "Title"`
+- Prioritize backlog: `uv run spec-driver list backlog -p` (opens editor to reorder items)
 - All items live under `backlog/` and feed delta scoping
 
 ## Delta Lifecycle
-1. Scaffold with `just .spec-driver:delta-new "Title" [-- --spec SPEC-### --requirement SPEC-###.FR-###]`
+1. Scaffold with `uv run spec-driver create delta "Title" --spec SPEC-### --requirement SPEC-###.FR-###`
 2. Populate `DE-XXX.md` describing scope, inputs, risks, commit references
 3. Maintain companion design artefact (`DR-XXX.md`), implementation plan (`IP-XXX.md`), and phase sheets under `phases/`
-4. After merge, archive under `archive/deltas/`
+4. Complete with `uv run spec-driver complete delta DE-XXX`
 
 ## Design Revision
 - Template guidance lives in `.spec-driver/templates/implementation-plan-template.md` and accompanying design notes
@@ -47,14 +47,14 @@ A quick reference for the core workflows in Vice's agentic development loop. Eac
 - Use audits to confirm the spec matches reality after each change
 
 ## Spec Revision Workflow
-- Draft a revision with `just .spec-driver::new-revision "Summary"` and link source/destination specs plus requirements
-- Use `uv run python .spec-driver/scripts/requirements.py move SPEC-AAA.FR-### SPEC-BBB --introduced-by RE-###` to migrate requirements while keeping lifecycle data aligned
+- Draft a revision with `uv run spec-driver create revision "Summary"` and link source/destination specs plus requirements
+- Edit the generated `RE-XXX.md` to document requirement moves and spec changes
 - Once the revision is approved, proceed to delta planning/execution as above
 
 ## Architecture Decision Records (ADR) Workflow
 
 ### Creating a New ADR
-- **New ADR**: `just .spec-driver::decision-registry new "Decision Title" --author "Your Name"`
+- **New ADR**: `uv run spec-driver create adr "Decision Title"`
 - Edit the generated `ADR-XXX-slug.md` file with:
   - Context: problem statement requiring a decision
   - Decision: chosen approach with rationale
@@ -65,13 +65,13 @@ A quick reference for the core workflows in Vice's agentic development loop. Eac
 - **Draft → Proposed**: Update `status: proposed` when ready for review
 - **Proposed → Accepted**: Update `status: accepted` after approval
 - **Status changes**: Use `deprecated`, `superseded`, `rejected` as appropriate
-- **Sync registry**: `just .spec-driver::decision-registry sync` (rebuilds symlinks automatically)
+- **Sync registry**: `uv run spec-driver sync --adr` (rebuilds symlinks automatically)
 
 ### ADR Registry Operations
-- **List ADRs**: `just .spec-driver::decision-registry list`
-- **Filter by status**: `just .spec-driver::decision-registry list --status accepted`
-- **Show ADR details**: `just .spec-driver::decision-registry show ADR-061`
-- **Validate references**: `just .spec-driver::registry-validate` (detects broken ADR references)
+- **List ADRs**: `uv run spec-driver list adrs`
+- **Filter by status**: `uv run spec-driver list adrs --status accepted`
+- **Show ADR details**: `uv run spec-driver show adr ADR-061`
+- **Validate references**: `uv run spec-driver validate` (detects broken ADR references)
 
 ### Status Directories
 - `specify/decisions/accepted/` - Symlinks to accepted ADRs (auto-maintained)
@@ -86,11 +86,11 @@ A quick reference for the core workflows in Vice's agentic development loop. Eac
 
 ## Multi-Language Documentation Sync
 
-- **Sync all languages**: `uv run python .spec-driver/scripts/sync_specs.py`
-- **Sync specific language**: `uv run python .spec-driver/scripts/sync_specs.py --language go|python|typescript`
-- **Sync specific targets**: `uv run python .spec-driver/scripts/sync_specs.py --targets go:internal/package python:module.py`
-- **Check mode** (validate without writing): `uv run python .spec-driver/scripts/sync_specs.py --check`
-- **Existing sources only**: `uv run python .spec-driver/scripts/sync_specs.py --existing`
+- **Sync all languages**: `uv run spec-driver sync`
+- **Sync specific language**: `uv run spec-driver sync --language go|python|typescript`
+- **Sync specific targets**: `uv run spec-driver sync go:internal/package python:module.py`
+- **Check mode** (validate without writing): `uv run spec-driver sync --check`
+- **Existing sources only**: `uv run spec-driver sync --existing`
 
 ### Language-Specific Workflows
 
@@ -111,26 +111,9 @@ A quick reference for the core workflows in Vice's agentic development loop. Eac
 
 ### Registry Management
 
-- **Migrate to v2 format**: `uv run python .spec-driver/scripts/migrate_spec_registry_v2.py`
 - Registry supports multi-language source tracking with backwards compatibility
 - Symlink indices automatically rebuilt: `by-language/`, `by-package/`, `by-slug/`
 
-### Justfile Commands (Recommended)
-
-- **Sync all languages**: `just .spec-driver::sync-all` (recommended default)
-- **Language-specific sync**: `just .spec-driver::sync-go`, `just .spec-driver::sync-python`, `just .spec-driver::sync-typescript`
-- **Flexible language targeting**: `just .spec-driver::sync-lang python`
-- **Specific targets**: `just .spec-driver::sync-targets go:internal/package python:module.py`
-- **Check mode**: `just .spec-driver::sync-check`
-- **Existing sources only**: `just .spec-driver::sync-existing`
-- **Registry migration**: `just .spec-driver::migrate-registry`
-
-### Legacy Compatibility
-
-- Old Go-only commands still supported for backwards compatibility:
-  - `just .spec-driver::sync-specs [<package> ...]`
-
 ## Validation & Registries
-- Refresh change registries: `just .spec-driver::change-registry [<kind>]`
-- Regenerate requirement registry: `just .spec-driver::sync-requirements`
-- Validate overall workspace integrity (relations, lifecycle links): `just .spec-driver::validate-workspace`
+- Sync all registries (changes, requirements, backlog): `uv run spec-driver validate --sync`
+- Validate workspace integrity (relations, lifecycle links): `uv run spec-driver validate`

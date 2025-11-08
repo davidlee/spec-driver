@@ -20,12 +20,12 @@
 | **Requirements Registry** | Generated catalogue of every requirement with lifecycle metadata (status, introduced/implemented/verified-by/coverage-evidence). | `.spec-driver/registry/requirements.yaml` |
 | **Change Registry** | Generated YAML index of deltas, revisions, and audits capturing frontmatter summaries and paths. | `.spec-driver/registry/{deltas,revisions,audits}.yaml` |
 | **Workspace** | High-level facade combining spec, requirements, and change registries plus validation helpers. | `.spec-driver/scripts/lib/workspace.py` |
-| **Workspace Validator** | Automated integrity checks across relations, lifecycle links, and registries. | `.spec-driver/scripts/lib/validator.py` / `just validate-workspace` |
+| **Workspace Validator** | Automated integrity checks across relations, lifecycle links, and registries. | `.spec-driver/scripts/lib/validator.py` / `uv run spec-driver validate` |
 | **Architecture Decision Record (ADR)** | Formal document capturing architecture decisions with context, options considered, and rationale. Uses enhanced frontmatter schema. | `specify/decisions/ADR-xxx-slug.md` |
 | **Decision Registry** | Generated YAML catalogue of all ADRs with metadata, relationships, and backlinks for automation and validation. | `.spec-driver/registry/decisions.yaml` |
 | **ADR Status Directories** | Symlink directories organizing ADRs by status (`accepted/`, `draft/`, `deprecated/`, etc.). Automatically maintained by registry sync. | `specify/decisions/<status>/` |
-| **ADR CLI** | Command-line interface for ADR management: creation, listing, filtering, and registry synchronization. | `just .spec-driver::decision-registry {sync,list,show,new}` |
-| **Backlog Helper Scripts** | CLI helpers for creating backlog entries: `just create-backlog-issue\|problem\|improvement\|risk`. | `.spec-driver/scripts/backlog/create_entry.py` |
+| **ADR CLI** | Command-line interface for ADR management: creation, listing, filtering, and registry synchronization. | `uv run spec-driver create adr`, `uv run spec-driver list adrs`, `uv run spec-driver show adr ADR-XXX` |
+| **Backlog Helper Scripts** | CLI helpers for creating backlog entries. | `uv run spec-driver create {issue\|problem\|improvement\|risk}` |
 | **VT (Verification Test)** | Automated test artifact providing test coverage for requirements. Typically unit or integration tests that prove functionality. | Implementation plan verification blocks, test files |
 | **VH (Verification by Human)** | Manual verification artifact requiring user testing or attestation. Records human judgment, usability testing, or acceptance. | Implementation plan verification blocks, audit records |
 | **VA (Verification by Agent)** | Automated agent-generated test report or analysis artifact. AI/tooling validates behavior, performs design review, or analyzes stability. | Implementation plan verification blocks, analysis documents |

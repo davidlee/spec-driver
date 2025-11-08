@@ -45,8 +45,34 @@ bootstrapped effectively
        strategies, etc which you learned and which are neither covered by the
        onboarding material, nor an appropriate part of the delta artefacts
        proper
-   - in which case, create a concise document HANDOVER-PHASE-{XX}.md to supply
+     - describe work you would otherwise continue with after completing this
+       delta, which is out of scope 
+   - in such cases, create a concise document HANDOVER-PHASE-{XX}.md to supply
      the next agent
+3. provide the use with: 
+   1. a very concise summary, and 
+   2. a very short message they can pass on to the next agent to kick off their
+      side of the handover.
 
+Example handover message:
+  ```markdown
+  I've prepared for handover, and the docs are in good shape for the 
+  next agent. Here's a message you can use to get them started:
+
+  ---
+  You're picking up DE-XXX; the work so far is accurately recorded.
+  Inspect it with: 
+
+  > spec-driver show delta DE-XXX --json
+
+  Read the docs in the delta bundle, and raise any important questions you have.
+
+  When ready, create a sheet for phase 3 with:
+
+  > uv spec-driver create phase --plan IP-XXX --json
+
+  Then ask the user if you should begin task breakdown & flesh out the 
+  phase sheet, performing any targeted research required as you go. 
+  ```
 
 

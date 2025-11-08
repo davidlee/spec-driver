@@ -29,6 +29,51 @@ Not yet implemented.
 
 @about/glossary.md
 
+## Contracts for API Research
+
+Contracts are auto-generated public/private API docs at:
+ - `specify/tech/SPEC-nnn/contracts/*.md` (actual location)
+  - `specify/tech/by-package/.../contracts/*.md` (symlink tree)
+
+### When to use contracts vs code
+
+**Contracts excel at:**
+  - API comparison across modules 
+  - Understanding public surface quickly
+  - Spotting patterns/inconsistencies
+  - Initial discovery ("what XXXs exist?")
+
+**Code (or SPEC) required for:**
+  - Implementation details
+  - Understanding WHY (rationale, comments)
+  - Type precision (Python: contracts sometimes show `<BinOp>`)
+  - Relationships/usage patterns
+
+### Efficient search patterns
+
+  ```bash
+  # Find all contracts for a concept
+  rg 'Registry' specify/**/contracts/**public.md -ln
+
+  # Find contract by source file (requires source: metadata)
+  rg '^source:.*backlog/priority' specify/**/contracts/*.md -l
+
+  # See what a contract covers
+  rg '^[^#]*(registry)' specify/**/contracts/**public.md
+
+  Workflow: Contracts → Code
+
+  1. Use rg to find relevant contracts
+  2. Read contracts for API overview (fast, low-token)
+  3. Use Serena for semantic code inspection (when needed)
+  4. Read implementation for details
+
+  Before deep code inspection:
+  - [ ] Searched contracts for relevant APIs
+  - [ ] Identified gaps contracts can't answer
+  - [ ] Using Serena for semantic/detailed inspection
+
+
 ## Implementation Workflow
 
 Deltas and the documents in the delta bundle — Design Revision (DR-XXX), Implementation Plan (IP-XXX), and Phase sheets — are the focus for all implementation planning, execution, and progress tracking.
@@ -75,3 +120,5 @@ Agent:
 ### When delta is completed
 
 - TBD ask user
+
+

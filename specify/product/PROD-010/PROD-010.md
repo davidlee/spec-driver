@@ -1,29 +1,32 @@
 ---
 id: PROD-010
-slug: cli-agent-ux
-name: CLI Agent UX
+slug: cli-ux
+name: CLI UX
 created: '2025-11-03'
-updated: '2025-11-03'
+updated: '2025-11-08'
 status: draft
 kind: prod
 aliases: []
 relations:
 - type: informs
   target: SPEC-110
-  description: Drives CLI implementation requirements for agent workflows
+  description: Drives CLI implementation requirements for both human and agent workflows
 guiding_principles:
 - Consistency enables automation - agents learn patterns once, apply everywhere
 - Predictability over features - stable contracts more valuable than rich options
 - Machine-readable first - JSON output and schemas enable agent autonomy
 - Progressive disclosure - simple defaults, opt-in detail flags for token efficiency
+- Ergonomic for humans, optimized for agents - intelligent input handling reduces friction
+- Forgiving input parsing - accept natural variations (plural/singular, abbreviated IDs)
 assumptions:
 - Agents primarily consume JSON output for parsing and decision-making
 - CLI is the primary interface for both human and agent workflows
 - Agent workflows prioritize token efficiency and predictable structure
+- Human workflows prioritize ergonomics and discoverability
 - Existing CLI architecture (SPEC-110) supports these enhancements
 ---
 
-# PROD-010 – CLI Agent UX
+# PROD-010 – CLI UX
 
 ```yaml supekku:spec.relationships@v1
 schema: supekku.spec.relationships
@@ -45,6 +48,9 @@ requirements:
     - PROD-010.FR-012
     - PROD-010.FR-013
     - PROD-010.FR-014
+    - PROD-010.FR-015
+    - PROD-010.FR-016
+    - PROD-010.FR-017
     - PROD-010.NF-001
     - PROD-010.NF-002
     - PROD-010.NF-003
@@ -52,7 +58,7 @@ requirements:
 interactions:
   - spec: SPEC-110
     type: informs
-    description: Defines agent-focused UX requirements for CLI implementation
+    description: Defines UX requirements for CLI implementation (human and agent workflows)
 ```
 
 ```yaml supekku:spec.capabilities@v1
@@ -161,6 +167,45 @@ capabilities:
       - Invalid enum values list valid choices
       - Error messages include actionable examples
       - Help text documents all available options
+
+  - id: intelligent-input-handling
+    name: Intelligent Input Handling
+    responsibilities:
+      - Accept abbreviated artifact IDs (001 vs ISSUE-001)
+      - Support case-insensitive ID matching
+      - Allow singular/plural keyword variations
+      - Normalize kind filter aliases (prod/product, issue/issues)
+    requirements:
+      - PROD-010.FR-016
+    summary: >-
+      Both humans and agents benefit from forgiving input parsing that accepts
+      natural variations. Reduces cognitive overhead, token usage, and trivial
+      errors. Users can type what feels natural without memorizing exact forms.
+    success_criteria:
+      - Abbreviated IDs resolve correctly across all show commands
+      - Keyword variations work identically in all contexts
+      - Case-insensitive matching prevents common typos
+      - Token usage reduced by 20-40% for agents using short IDs
+
+  - id: integrated-editing
+    name: Integrated Editing Workflow
+    responsibilities:
+      - Open artifacts in $EDITOR from CLI
+      - Support all artifact types (specs, deltas, issues, etc.)
+      - Provide JSON mode for programmatic file path access
+      - Fall back through editor precedence ($EDITOR, $VISUAL, vim, nano)
+    requirements:
+      - PROD-010.FR-017
+    summary: >-
+      Eliminates context-switch between CLI discovery and file editing.
+      Humans get seamless workflow integration with their preferred editor.
+      Agents get file paths for programmatic access. Supports both interactive
+      and scripted use cases.
+    success_criteria:
+      - Edit command works for all artifact types
+      - $EDITOR environment variable honored
+      - JSON mode returns paths without opening editor
+      - Invalid IDs provide helpful error messages
 ```
 
 ```yaml supekku:verification.coverage@v1
@@ -266,6 +311,30 @@ entries:
     status: planned
     notes: Test per-file validation of frontmatter and YAML blocks
 
+  - artefact: VT-PROD010-INPUT-001
+    kind: VT
+    requirement: PROD-010.FR-016
+    status: planned
+    notes: Test ID normalization (abbreviated, case-insensitive, prefix-optional) across all show commands
+
+  - artefact: VT-PROD010-INPUT-002
+    kind: VT
+    requirement: PROD-010.FR-016
+    status: planned
+    notes: Test keyword variations (singular/plural, aliases) across all list commands and filters
+
+  - artefact: VT-PROD010-EDIT-001
+    kind: VT
+    requirement: PROD-010.FR-017
+    status: planned
+    notes: Test edit command opens artifacts in $EDITOR (mocked) with correct file paths
+
+  - artefact: VT-PROD010-EDIT-002
+    kind: VT
+    requirement: PROD-010.FR-017
+    status: planned
+    notes: Test edit --json mode returns correct file paths without opening editor
+
   - artefact: VA-PROD010-TOKEN-001
     kind: VA
     requirement: PROD-010.NF-001
@@ -290,17 +359,25 @@ entries:
 ## 1. Intent & Summary
 
 - **Problem / Purpose**:
-  AI agents using spec-driver CLI encounter inconsistent patterns that require special-case handling and external documentation. The 2025-11-03 UX research identified critical gaps: JSON output inconsistency (`--json` vs `--format json`), missing status filters on specs, undocumented features, and lack of metadata introspection. These gaps force agents to:
+  Both AI agents and human users of spec-driver CLI encounter inconsistent patterns and ergonomic friction. The 2025-11-03 UX research identified critical gaps: JSON output inconsistency (`--json` vs `--format json`), missing status filters on specs, undocumented features, and lack of metadata introspection. Additionally, users must remember exact ID formats and command variations. These gaps force agents to:
   - Implement command-specific logic instead of learning universal patterns
   - Consume excessive tokens parsing table output when JSON unavailable
   - Post-process results with grep/jq for missing filters
   - Rely on external documentation for valid enum values
+
+  And create friction for human users:
+  - Remember exact ID formats (must type `ISSUE-001` not `001` or `issue-001`)
+  - Recall singular vs plural command forms (`spec` vs `specs`, `prod` vs `product`)
+  - Manually open files in editor instead of using integrated edit command
+  - Context-switch between CLI and file system for common tasks
 
 - **Value Signals**:
   - **Agent Autonomy**: Reduce documentation lookups by 80% via schema introspection
   - **Token Efficiency**: Compact JSON mode reduces token usage 30-50% for typical workflows
   - **Reliability**: Consistent patterns eliminate special-case handling across 14+ commands
   - **Developer Velocity**: Standard workflows complete 2-3x faster with predictable CLI behavior
+  - **Human Ergonomics**: Intelligent input parsing eliminates cognitive overhead for ID/keyword variations
+  - **Workflow Integration**: Edit command integrates with $EDITOR for seamless file manipulation
 
 - **Guiding Principles**:
   - **Consistency enables automation**: Agents learn patterns once, apply everywhere
@@ -319,10 +396,10 @@ entries:
     - Pains: Inconsistent patterns require special cases, missing JSON output forces table parsing, undiscoverable valid values
     - Expectations: Predictable behavior, self-documenting schemas, stable JSON contracts
 
-  - **Developer (Secondary)**: Human using CLI interactively or in scripts
-    - Goals: Fast discovery, scriptable workflows, clear error messages
-    - Pains: Trial-and-error to find valid options, verbose output wastes screen space
-    - Expectations: Helpful errors, consistent patterns, good defaults
+  - **Developer (Co-Primary)**: Human using CLI interactively or in scripts
+    - Goals: Fast discovery, scriptable workflows, clear error messages, seamless file editing
+    - Pains: Trial-and-error to find valid options, verbose output wastes screen space, remembering exact ID formats, context-switching to file system
+    - Expectations: Helpful errors, consistent patterns, good defaults, intelligent input handling, integrated editing
 
 - **Primary Journeys / Flows**:
 
@@ -369,20 +446,53 @@ entries:
   4. **And** agent retries with `--format json` without user intervention
   5. **Result**: Self-correction reduces failure cascades
 
+  **Journey 7: Human Uses Abbreviated IDs** (new)
+  1. **Given** human remembers delta number but not full ID format
+  2. **When** human types `spec-driver show delta 5`
+  3. **Then** CLI normalizes to `DE-005` and displays delta
+  4. **And** human saves time not typing `DE-005`
+  5. **Result**: Reduced friction, faster workflows
+
+  **Journey 8: Agent Uses Short IDs for Token Efficiency** (new)
+  1. **Given** agent needs to query multiple deltas
+  2. **When** agent uses `show delta 5`, `show delta 9`, etc.
+  3. **Then** token usage 30-40% lower than full IDs
+  4. **And** all queries succeed without error
+  5. **Result**: Token budget preserved for analysis
+
+  **Journey 9: Human Edits Artifact After Discovery** (new)
+  1. **Given** human finds issue via `spec-driver list issues -s draft`
+  2. **When** human runs `spec-driver edit issue 42`
+  3. **Then** issue file opens in configured editor
+  4. **And** human makes changes and saves
+  5. **Result**: Zero context-switch to file system
+
+  **Journey 10: Agent Gets File Path for Processing** (new)
+  1. **Given** agent needs to analyze delta content
+  2. **When** agent runs `spec-driver edit delta 5 --json`
+  3. **Then** JSON output: `{"path": "/abs/path/to/DE-005.md"}`
+  4. **And** agent reads file programmatically
+  5. **Result**: Agent gets file path without opening editor
+
 - **Edge Cases & Non-goals**:
-  - **IN SCOPE**: All read-only operations (list, show, schema, validate)
+  - **IN SCOPE**: All read-only operations (list, show, schema, validate, edit)
   - **IN SCOPE**: Filter consistency across all artifact types
+  - **IN SCOPE**: Intelligent input parsing (ID normalization, keyword variations)
+  - **IN SCOPE**: Editor integration for file access
   - **OUT OF SCOPE**: Interactive TUI mode (future enhancement)
   - **OUT OF SCOPE**: Natural language query translation
+  - **OUT OF SCOPE**: In-CLI editing (full editor experience)
   - **EDGE CASE**: Empty result sets → return `{"items": []}` (not error)
   - **EDGE CASE**: Very large result sets (>1000 items) → pagination required
+  - **EDGE CASE**: Ambiguous abbreviated IDs → show all matches, ask user to clarify
   - **GUARD RAIL**: Invalid relationship targets → validate existence, suggest valid options
+  - **GUARD RAIL**: Missing $EDITOR → fall back to $VISUAL, vim, nano in order
 
 ## 3. Responsibilities & Requirements
 
 ### Capability Overview
 
-The CLI Agent UX improvements provide seven core capabilities:
+The CLI UX improvements provide nine core capabilities:
 
 1. **Consistent JSON Output** (FR-001, FR-002): Universal JSON support across all list/show commands with stable schemas
 2. **Universal Filtering** (FR-003, FR-004, FR-005): Status filters everywhere, multi-value selections, reverse relationship queries
@@ -391,6 +501,8 @@ The CLI Agent UX improvements provide seven core capabilities:
 5. **Machine-Readable Mode** (FR-008, FR-009, NF-001): Unified flag for agent-optimized output with pagination
 6. **Improved Error Guidance** (FR-010, NF-002): Actionable error messages with valid alternatives and examples
 7. **Command Consistency** (FR-011): Kind-specific shortcuts aligned with create commands
+8. **Intelligent Input Handling** (FR-016): Forgiving ID/keyword parsing (abbreviated, case-insensitive, singular/plural)
+9. **Integrated Editing** (FR-017): Seamless $EDITOR integration for artifact manipulation
 
 ### Functional Requirements
 
@@ -464,6 +576,34 @@ The CLI Agent UX improvements provide seven core capabilities:
   *Commands*: `validate file <path>` validates frontmatter schema and all embedded YAML blocks
   *Current Gap*: Only workspace-level validation exists; no targeted file validation
   *Verification*: VT-PROD010-VALIDATE-001 - Test file validation catches schema errors, invalid blocks
+
+- **PROD-010.FR-016**: CLI MUST accept intelligent variations of artifact IDs and keywords:
+  - Artifact IDs: `ISSUE-001` == `001` == `issue-001` (case-insensitive, prefix optional)
+  - Keywords: `spec` == `specs`, `prod` == `product`, `delta` == `deltas`
+  - Kind filters: `-k prod` == `-k product`, `-k issue` == `-k issues`
+  *Rationale*: Reduces cognitive overhead for humans, reduces token usage for agents (shorter IDs), eliminates trivial input errors
+  *Examples*:
+    - `spec-driver show delta 005` → resolves to `DE-005`
+    - `spec-driver list specs -k prod` → same as `-k product`
+    - `spec-driver show issue 42` → resolves to `ISSUE-042`
+  *Current Gap*: Exact ID format and keyword matching required; users/agents must remember canonical forms
+  *Verification*: VT-PROD010-INPUT-001 - Test ID normalization across all show commands
+  *Verification*: VT-PROD010-INPUT-002 - Test keyword variations across all list commands
+
+- **PROD-010.FR-017**: CLI MUST provide edit command to open artifacts in $EDITOR:
+  - `spec-driver edit delta DE-005` → opens delta file in $EDITOR
+  - `spec-driver edit spec SPEC-110` → opens spec file in $EDITOR
+  - `spec-driver edit issue 42` → opens issue file in $EDITOR
+  - `spec-driver edit delta DE-005 --json` → returns `{"path": "/path/to/DE-005.md"}` (agent mode)
+  *Rationale*: Eliminates context-switch to file system; humans get integrated workflow, agents get file paths for programmatic access
+  *Current Gap*: Users must manually navigate file system or use grep to find artifact files
+  *Behavior*:
+    - Honors $EDITOR environment variable (falls back to $VISUAL, then `vim`, then `nano`)
+    - `--json` mode returns file path instead of opening editor (for scripting/agents)
+    - Multi-file artifacts (e.g., deltas with phases) open primary file (DE-XXX.md)
+    - Invalid artifact ID shows helpful error with suggestions
+  *Verification*: VT-PROD010-EDIT-001 - Test edit command with mocked $EDITOR
+  *Verification*: VT-PROD010-EDIT-002 - Test edit --json returns correct file paths
 
 **Priority 4: Machine-Readable Mode (Token efficiency)**
 

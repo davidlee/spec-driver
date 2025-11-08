@@ -1320,6 +1320,40 @@ requirements:
     coverage_evidence:
     - VT-PROD010-VALIDATE-001
     path: specify/product/PROD-010/PROD-010.md
+  PROD-010.FR-016:
+    label: FR-016
+    title: 'CLI MUST accept intelligent variations of artifact IDs and keywords:'
+    specs:
+    - PROD-010
+    primary_spec: PROD-010
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-PROD010-INPUT-001
+    - VT-PROD010-INPUT-002
+    path: specify/product/PROD-010/PROD-010.md
+  PROD-010.FR-017:
+    label: FR-017
+    title: 'CLI MUST provide edit command to open artifacts in $EDITOR:'
+    specs:
+    - PROD-010
+    primary_spec: PROD-010
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-PROD010-EDIT-001
+    - VT-PROD010-EDIT-002
+    path: specify/product/PROD-010/PROD-010.md
   PROD-010.NF-001:
     label: NF-001
     title: Token efficiency final validation
@@ -2686,3 +2720,94 @@ requirements:
     verified_by: []
     coverage_evidence: []
     path: specify/tech/SPEC-128/SPEC-128.md
+  SPEC-129.FR-001:
+    label: FR-001
+    title: Component MUST [specific technical capability]
+    specs:
+    - SPEC-129
+    primary_spec: SPEC-129
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-XXX
+    path: specify/tech/SPEC-129/SPEC-129.md
+  SPEC-129.FR-002:
+    label: FR-002
+    title: System MUST [integration or contract requirement]
+    specs:
+    - SPEC-129
+    primary_spec: SPEC-129
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-129/SPEC-129.md
+  SPEC-129.FR-003:
+    label: FR-003
+    title: Component MUST [data handling or state management]
+    specs:
+    - SPEC-129
+    primary_spec: SPEC-129
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-129/SPEC-129.md
+  SPEC-129.NF-001:
+    label: NF-001
+    title: '[Performance constraint with specific metrics]'
+    specs:
+    - SPEC-129
+    primary_spec: SPEC-129
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-129/SPEC-129.md
+  SPEC-129.NF-002:
+    label: NF-002
+    title: '[Scalability or resource requirement]'
+    specs:
+    - SPEC-129
+    primary_spec: SPEC-129
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-129/SPEC-129.md
+  SPEC-129.NF-003:
+    label: NF-003
+    title: '[Reliability or fault tolerance]'
+    specs:
+    - SPEC-129
+    primary_spec: SPEC-129
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/tech/SPEC-129/SPEC-129.md

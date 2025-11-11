@@ -40,7 +40,11 @@
       "Bash(just quickcheck:*)",
       "mcp__serena__insert_after_symbol",
       "mcp__serena__find_referencing_symbols",
-      "Bash(just create-backlog-issue:*)"
+      "Bash(just create-backlog-issue:*)",
+      "Bash(git add:*)",
+      "WebFetch(domain:rich.readthedocs.io)",
+      "Bash(head -3 echo \"\" echo \"=== Test 2: With --all flag (include all statuses) ===\" uv run spec-driver list backlog --all --limit 3)",
+      "Bash(grep -E \"(Showing|resolved|implemented)\" echo \"\" echo \"=== Test 3: No limit (show all open items) ===\" uv run spec-driver list backlog --limit 0)"
     ],
     "deny": [],
     "ask": []

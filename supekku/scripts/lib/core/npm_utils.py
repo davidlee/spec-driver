@@ -9,10 +9,12 @@ This module provides centralized functionality for:
 Designed for reuse across TypeScriptAdapter, installer, and doctor command.
 """
 
+import os
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from shutil import which
-from typing import Callable, Literal
+from typing import Literal
 
 # Type alias for supported package managers
 PackageManager = Literal["npm", "pnpm", "bun"]
@@ -132,3 +134,54 @@ def get_package_manager_info(path: Path) -> PackageManagerInfo:
     install_global_command=["npm", "install", "-g"],
     install_local_command=["npm", "install", "--save-dev"],
   )
+
+
+def is_npm_package_available(
+  package_name: str, package_root: Path | None = None
+) -> bool:
+  """Check if npm package is available locally or globally.
+
+  Checks local node_modules/.bin/ first (if package_root provided),
+  then falls back to global PATH check.
+
+  Args:
+      package_name: Name of the npm package to check
+      package_root: Optional project root directory to check for local installation
+
+  Returns:
+      True if package is available locally (and executable) or globally
+
+  """
+  # Check local installation first if package_root provided
+  if package_root is not None:
+    local_bin = package_root / "node_modules" / ".bin" / package_name
+    # Check if exists, is file, and is executable
+    if local_bin.exists() and local_bin.is_file() and os.access(local_bin, os.X_OK):
+      return True
+
+  # Fall back to global PATH check
+  return which(package_name) is not None
+
+
+def get_install_instructions(
+  package_name: str, pm_info: PackageManagerInfo, prefer_local: bool = False
+) -> str:
+  """Generate installation instructions for the user's package manager.
+
+  Args:
+      package_name: Name of the npm package
+      pm_info: Package manager information with install commands
+      prefer_local: If True, show local installation first, else global first
+
+  Returns:
+      Formatted multi-line installation instructions
+
+  """
+  # Build command strings
+  global_cmd = " ".join(pm_info.install_global_command + [package_name])
+  local_cmd = " ".join(pm_info.install_local_command + [package_name])
+
+  # Format instructions based on preference
+  if prefer_local:
+    return f"Install locally: {local_cmd}\nOr globally: {global_cmd}"
+  return f"Install globally: {global_cmd}\nOr locally: {local_cmd}"

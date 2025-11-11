@@ -13,6 +13,14 @@ from pathlib import Path
 from shutil import which
 from typing import TYPE_CHECKING, ClassVar
 
+from rich.console import Console
+
+from supekku.scripts.lib.core import (
+  PackageManagerInfo,
+  get_install_instructions,
+  get_package_manager_info,
+  is_npm_package_available,
+)
 from supekku.scripts.lib.sync.models import (
   DocVariant,
   SourceDescriptor,
@@ -47,20 +55,16 @@ class TypeScriptAdapter(LanguageAdapter):
 
   language: ClassVar[str] = "typescript"
 
+  def __init__(self, repo_root: Path) -> None:
+    """Initialize TypeScriptAdapter with caching for npm_utils calls."""
+    super().__init__(repo_root)
+    self._pm_info: PackageManagerInfo | None = None
+    self._ts_doc_extract_available: bool | None = None
+
   @staticmethod
   def is_node_available() -> bool:
     """Check if Node.js is available in PATH."""
     return which("node") is not None
-
-  @staticmethod
-  def is_pnpm_available() -> bool:
-    """Check if pnpm is available in PATH."""
-    return which("pnpm") is not None
-
-  @staticmethod
-  def is_bun_available() -> bool:
-    """Check if bun is available in PATH."""
-    return which("bun") is not None
 
   def discover_targets(
     self,
@@ -279,53 +283,46 @@ class TypeScriptAdapter(LanguageAdapter):
     skip_dirs = {"dist", "build", ".next", "out", "node_modules"}
     return any(part in skip_dirs for part in file_path.parts)
 
-  @staticmethod
-  def _detect_package_manager(path: Path) -> str:
-    """Detect package manager from lockfile.
+  def _ensure_ts_doc_extract_available(self, package_root: Path | None = None) -> bool:
+    """Check if ts-doc-extract is available (local or global), with caching.
 
-    Walks up directory tree to find lockfile.
-    Priority: pnpm > bun > npm
+    Checks for ts-doc-extract in node_modules/.bin (if package_root provided)
+    and in global PATH. Caches result per adapter instance to avoid repeated
+    subprocess calls.
 
     Args:
-        path: Starting path (file or directory)
+        package_root: Package root to check for local installation (optional)
 
     Returns:
-        Package manager name: 'pnpm', 'bun', or 'npm'
+        True if ts-doc-extract is available, False otherwise
 
     """
-    current = path if path.is_dir() else path.parent
+    if self._ts_doc_extract_available is not None:
+      return self._ts_doc_extract_available
 
-    while current != current.parent:
-      if (current / "pnpm-lock.yaml").exists():
-        return "pnpm"
-      if (current / "bun.lockb").exists():
-        return "bun"
-      if (current / "package-lock.json").exists() or (current / "yarn.lock").exists():
-        return "npm"
-      current = current.parent
-
-    # Default to npm
-    return "npm"
+    self._ts_doc_extract_available = is_npm_package_available(
+      "ts-doc-extract", package_root
+    )
+    return self._ts_doc_extract_available
 
   def _get_npx_command(self, package_root: Path) -> list[str]:
     """Get the appropriate npx command based on package manager.
+
+    Uses npm_utils to detect package manager and build command with --yes flags
+    to prevent interactive install prompts. Caches PackageManagerInfo per adapter
+    instance to avoid repeated subprocess calls.
 
     Args:
         package_root: Package root directory
 
     Returns:
-        Command to run npx equivalent (pnpm dlx, bunx, or npx)
+        Command to run npx equivalent (pnpm dlx, bunx, or npx) with --yes flags
 
     """
-    pm = self._detect_package_manager(package_root)
+    if self._pm_info is None:
+      self._pm_info = get_package_manager_info(package_root)
 
-    if pm == "pnpm" and self.is_pnpm_available():
-      return ["pnpm", "dlx"]
-    if pm == "bun" and self.is_bun_available():
-      return ["bunx"]
-
-    # Default to npx (works with npm and yarn)
-    return ["npx"]
+    return self._pm_info.build_npx_command("ts-doc-extract")
 
   def _find_package_root(self, file_path: Path) -> Path:
     """Find nearest package.json directory.
@@ -506,6 +503,29 @@ class TypeScriptAdapter(LanguageAdapter):
 
     # Convert unit to absolute path
     module_path = self.repo_root / unit.identifier
+
+    # Find package root for this module to check ts-doc-extract availability
+    try:
+      package_root = self._find_package_root(module_path)
+    except ValueError:
+      # No package.json found, use None for global-only check
+      package_root = None
+
+    # Check if ts-doc-extract is available (pre-flight validation per DEC-019-002)
+    if not self._ensure_ts_doc_extract_available(package_root):
+      # Get package manager info for install instructions
+      pm_info = get_package_manager_info(package_root) if package_root else None
+      instructions = get_install_instructions("ts-doc-extract", pm_info)
+
+      console = Console(stderr=True)
+      console.print(
+        f"[yellow]Warning:[/yellow] ts-doc-extract not found. "
+        f"Skipping TypeScript contract generation.\n\n{instructions}",
+        style="dim",
+      )
+
+      # Skip gracefully - return empty list (per DEC-019-004)
+      return []
 
     if not module_path.exists():
       # Return error variants

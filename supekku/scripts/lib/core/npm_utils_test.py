@@ -2,15 +2,15 @@
 
 from unittest.mock import patch
 
-import pytest
-
 from supekku.scripts.lib.core.npm_utils import (
   PackageManager,
   PackageManagerInfo,
   detect_package_manager,
+  get_install_instructions,
   get_package_manager_info,
   is_bun_available,
   is_npm_available,
+  is_npm_package_available,
   is_pnpm_available,
 )
 
@@ -249,3 +249,174 @@ class TestGetPackageManagerInfo:
     assert info.name == "npm"
     cmd = info.build_npx_command("pkg")
     assert cmd == ["npx", "--yes", "pkg"]
+
+
+class TestIsNpmPackageAvailable:
+  """Test is_npm_package_available function."""
+
+  def test_package_available_locally(self, tmp_path):
+    """Test package found in local node_modules/.bin/."""
+    # Create node_modules/.bin/ts-doc-extract
+    node_modules_bin = tmp_path / "node_modules" / ".bin"
+    node_modules_bin.mkdir(parents=True)
+    package_bin = node_modules_bin / "ts-doc-extract"
+    package_bin.write_text("#!/usr/bin/env node")
+    package_bin.chmod(0o755)
+
+
+    result = is_npm_package_available("ts-doc-extract", tmp_path)
+    assert result is True
+
+  @patch("supekku.scripts.lib.core.npm_utils.which")
+  def test_package_not_executable_local(self, mock_which, tmp_path):
+    """Test package exists locally but is not executable (should be False)."""
+    # Create node_modules/.bin/ts-doc-extract without execute permission
+    node_modules_bin = tmp_path / "node_modules" / ".bin"
+    node_modules_bin.mkdir(parents=True)
+    package_bin = node_modules_bin / "ts-doc-extract"
+    package_bin.write_text("#!/usr/bin/env node")
+    package_bin.chmod(0o644)  # Not executable
+
+    # Mock which to return None (not in global PATH either)
+    mock_which.return_value = None
+
+
+    result = is_npm_package_available("ts-doc-extract", tmp_path)
+    assert result is False
+    mock_which.assert_called_once_with("ts-doc-extract")
+
+  @patch("supekku.scripts.lib.core.npm_utils.which")
+  def test_package_available_globally(self, mock_which, tmp_path):
+    """Test package found globally via which() when not in local node_modules."""
+    mock_which.return_value = "/usr/local/bin/ts-doc-extract"
+
+
+    result = is_npm_package_available("ts-doc-extract", tmp_path)
+    assert result is True
+    mock_which.assert_called_once_with("ts-doc-extract")
+
+  @patch("supekku.scripts.lib.core.npm_utils.which")
+  def test_package_not_available_anywhere(self, mock_which, tmp_path):
+    """Test package not found locally or globally."""
+    mock_which.return_value = None
+
+
+    result = is_npm_package_available("ts-doc-extract", tmp_path)
+    assert result is False
+
+  @patch("supekku.scripts.lib.core.npm_utils.which")
+  def test_package_check_global_only_when_no_root(self, mock_which):
+    """Test only checks global when package_root is None."""
+    mock_which.return_value = "/usr/local/bin/pkg"
+
+
+    result = is_npm_package_available("pkg", None)
+    assert result is True
+    mock_which.assert_called_once_with("pkg")
+
+  @patch("supekku.scripts.lib.core.npm_utils.which")
+  def test_local_takes_priority_over_global(self, mock_which, tmp_path):
+    """Test local installation found first, global check never called."""
+    # Create local installation
+    node_modules_bin = tmp_path / "node_modules" / ".bin"
+    node_modules_bin.mkdir(parents=True)
+    package_bin = node_modules_bin / "ts-doc-extract"
+    package_bin.write_text("#!/usr/bin/env node")
+    package_bin.chmod(0o755)
+
+
+    result = is_npm_package_available("ts-doc-extract", tmp_path)
+    assert result is True
+    # which() should not be called since local found
+    mock_which.assert_not_called()
+
+
+class TestGetInstallInstructions:
+  """Test get_install_instructions function."""
+
+  def test_npm_install_instructions_global_first(self):
+    """Test npm installation instructions with global shown first."""
+    pm_info = PackageManagerInfo(
+      name="npm",
+      build_npx_command=lambda pkg: ["npx", "--yes", pkg],
+      install_global_command=["npm", "install", "-g"],
+      install_local_command=["npm", "install", "--save-dev"],
+    )
+
+    result = get_install_instructions("ts-doc-extract", pm_info, prefer_local=False)
+
+    # Should contain both global and local options, global first
+    assert "npm install -g ts-doc-extract" in result
+    assert "npm install --save-dev ts-doc-extract" in result
+    # Check ordering: global appears before local
+    global_pos = result.index("npm install -g")
+    local_pos = result.index("npm install --save-dev")
+    assert global_pos < local_pos
+
+  def test_npm_install_instructions_local_first(self):
+    """Test npm installation instructions with local shown first."""
+    pm_info = PackageManagerInfo(
+      name="npm",
+      build_npx_command=lambda pkg: ["npx", "--yes", pkg],
+      install_global_command=["npm", "install", "-g"],
+      install_local_command=["npm", "install", "--save-dev"],
+    )
+
+    result = get_install_instructions("ts-doc-extract", pm_info, prefer_local=True)
+
+    # Should contain both options, local first
+    assert "npm install --save-dev ts-doc-extract" in result
+    assert "npm install -g ts-doc-extract" in result
+    # Check ordering: local appears before global
+    local_pos = result.index("npm install --save-dev")
+    global_pos = result.index("npm install -g")
+    assert local_pos < global_pos
+
+  def test_pnpm_install_instructions(self):
+    """Test pnpm installation instructions use correct syntax."""
+    pm_info = PackageManagerInfo(
+      name="pnpm",
+      build_npx_command=lambda pkg: ["pnpm", "dlx", f"--package={pkg}", pkg],
+      install_global_command=["pnpm", "add", "-g"],
+      install_local_command=["pnpm", "add", "--save-dev"],
+    )
+
+    result = get_install_instructions("ts-doc-extract", pm_info)
+
+    # Should use pnpm commands
+    assert "pnpm add -g ts-doc-extract" in result
+    assert "pnpm add --save-dev ts-doc-extract" in result
+    # Should NOT contain npm commands
+    assert "npm install" not in result
+
+  def test_bun_install_instructions(self):
+    """Test bun installation instructions use correct syntax."""
+    pm_info = PackageManagerInfo(
+      name="bun",
+      build_npx_command=lambda pkg: ["bunx", "--yes", pkg],
+      install_global_command=["bun", "add", "-g"],
+      install_local_command=["bun", "add", "--save-dev"],
+    )
+
+    result = get_install_instructions("prettier", pm_info)
+
+    # Should use bun commands
+    assert "bun add -g prettier" in result
+    assert "bun add --save-dev prettier" in result
+    # Should NOT contain npm commands
+    assert "npm install" not in result
+
+  def test_instructions_are_multiline(self):
+    """Test that instructions span multiple lines for readability."""
+    pm_info = PackageManagerInfo(
+      name="npm",
+      build_npx_command=lambda pkg: ["npx", "--yes", pkg],
+      install_global_command=["npm", "install", "-g"],
+      install_local_command=["npm", "install", "--save-dev"],
+    )
+
+    result = get_install_instructions("pkg", pm_info)
+
+    # Should have multiple lines
+    lines = result.strip().split("\n")
+    assert len(lines) >= 2  # At least 2 lines for global and local options

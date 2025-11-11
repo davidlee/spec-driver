@@ -10,6 +10,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from supekku.scripts.lib.core import PackageManagerInfo
 from supekku.scripts.lib.sync.models import SourceUnit
 
 from .typescript import (
@@ -42,28 +43,6 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
       # Test Node.js not available
       mock_which.return_value = None
       assert not TypeScriptAdapter.is_node_available()
-
-  def test_is_pnpm_available(self) -> None:
-    """Test pnpm availability detection."""
-    with patch("supekku.scripts.lib.sync.adapters.typescript.which") as mock_which:
-      # Test pnpm available
-      mock_which.return_value = "/usr/bin/pnpm"
-      assert TypeScriptAdapter.is_pnpm_available()
-
-      # Test pnpm not available
-      mock_which.return_value = None
-      assert not TypeScriptAdapter.is_pnpm_available()
-
-  def test_is_bun_available(self) -> None:
-    """Test bun availability detection."""
-    with patch("supekku.scripts.lib.sync.adapters.typescript.which") as mock_which:
-      # Test bun available
-      mock_which.return_value = "/usr/bin/bun"
-      assert TypeScriptAdapter.is_bun_available()
-
-      # Test bun not available
-      mock_which.return_value = None
-      assert not TypeScriptAdapter.is_bun_available()
 
   def test_supports_identifier_valid_typescript(self) -> None:
     """Test supports_identifier returns True for valid TS/JS identifiers."""
@@ -106,81 +85,74 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
         msg = f"Should not support identifier: {identifier}"
         assert not self.adapter.supports_identifier(identifier), msg
 
-  def test_detect_package_manager_pnpm(self) -> None:
-    """Test package manager detection finds pnpm."""
-    test_dir = Path("/test/project/src")
-
-    # Create a mock that returns True only for pnpm-lock.yaml
-    with patch("pathlib.Path.exists", lambda self: "pnpm-lock.yaml" in str(self)):
-      pm = TypeScriptAdapter._detect_package_manager(test_dir)
-      assert pm == "pnpm"
-
-  def test_detect_package_manager_bun(self) -> None:
-    """Test package manager detection finds bun."""
-    test_dir = Path("/test/project/src")
-
-    # Create a mock that returns True only for bun.lockb
-    with patch("pathlib.Path.exists", lambda self: "bun.lockb" in str(self)):
-      pm = TypeScriptAdapter._detect_package_manager(test_dir)
-      assert pm == "bun"
-
-  def test_detect_package_manager_npm(self) -> None:
-    """Test package manager detection finds npm."""
-    test_dir = Path("/test/project/src")
-
-    # Create a mock that returns True only for package-lock.json
-    with patch("pathlib.Path.exists", lambda self: "package-lock.json" in str(self)):
-      pm = TypeScriptAdapter._detect_package_manager(test_dir)
-      assert pm == "npm"
-
-  def test_detect_package_manager_defaults_to_npm(self) -> None:
-    """Test package manager detection defaults to npm when no lockfile found."""
-    test_dir = Path("/test/project/src")
-
-    with patch.object(Path, "exists", return_value=False):
-      pm = TypeScriptAdapter._detect_package_manager(test_dir)
-      assert pm == "npm"
-
   def test_get_npx_command_pnpm(self) -> None:
-    """Test npx command generation for pnpm."""
+    """Test npx command generation for pnpm using npm_utils."""
     package_root = Path("/test/project")
+    mock_pm_info = PackageManagerInfo(
+      name="pnpm",
+      build_npx_command=lambda pkg: ["pnpm", "dlx", f"--package={pkg}", pkg],
+      install_global_command=["pnpm", "add", "-g"],
+      install_local_command=["pnpm", "add", "-D"],
+    )
 
-    with (
-      patch.object(TypeScriptAdapter, "_detect_package_manager", return_value="pnpm"),
-      patch.object(TypeScriptAdapter, "is_pnpm_available", return_value=True),
+    with patch(
+      "supekku.scripts.lib.sync.adapters.typescript.get_package_manager_info",
+      return_value=mock_pm_info,
     ):
       cmd = self.adapter._get_npx_command(package_root)
-      assert cmd == ["pnpm", "dlx"]
+      assert cmd == ["pnpm", "dlx", "--package=ts-doc-extract", "ts-doc-extract"]
 
   def test_get_npx_command_bun(self) -> None:
-    """Test npx command generation for bun."""
+    """Test npx command generation for bun using npm_utils."""
     package_root = Path("/test/project")
+    mock_pm_info = PackageManagerInfo(
+      name="bun",
+      build_npx_command=lambda pkg: ["bunx", "--yes", pkg],
+      install_global_command=["bun", "add", "-g"],
+      install_local_command=["bun", "add", "-d"],
+    )
 
-    with (
-      patch.object(TypeScriptAdapter, "_detect_package_manager", return_value="bun"),
-      patch.object(TypeScriptAdapter, "is_bun_available", return_value=True),
+    with patch(
+      "supekku.scripts.lib.sync.adapters.typescript.get_package_manager_info",
+      return_value=mock_pm_info,
     ):
       cmd = self.adapter._get_npx_command(package_root)
-      assert cmd == ["bunx"]
+      assert cmd == ["bunx", "--yes", "ts-doc-extract"]
 
   def test_get_npx_command_npm(self) -> None:
-    """Test npx command generation for npm."""
+    """Test npx command generation for npm using npm_utils."""
     package_root = Path("/test/project")
+    mock_pm_info = PackageManagerInfo(
+      name="npm",
+      build_npx_command=lambda pkg: ["npx", "--yes", pkg],
+      install_global_command=["npm", "install", "-g"],
+      install_local_command=["npm", "install", "--save-dev"],
+    )
 
-    with patch.object(TypeScriptAdapter, "_detect_package_manager", return_value="npm"):
-      cmd = self.adapter._get_npx_command(package_root)
-      assert cmd == ["npx"]
-
-  def test_get_npx_command_fallback_to_npx(self) -> None:
-    """Test npx command falls back to npx when package manager not available."""
-    package_root = Path("/test/project")
-
-    with (
-      patch.object(TypeScriptAdapter, "_detect_package_manager", return_value="pnpm"),
-      patch.object(TypeScriptAdapter, "is_pnpm_available", return_value=False),
+    with patch(
+      "supekku.scripts.lib.sync.adapters.typescript.get_package_manager_info",
+      return_value=mock_pm_info,
     ):
       cmd = self.adapter._get_npx_command(package_root)
-      assert cmd == ["npx"]
+      assert cmd == ["npx", "--yes", "ts-doc-extract"]
+
+  def test_get_npx_command_fallback_to_npx(self) -> None:
+    """Test npx command falls back to npx when preferred PM not available."""
+    package_root = Path("/test/project")
+    # npm_utils automatically falls back to npm if pnpm not available
+    mock_pm_info = PackageManagerInfo(
+      name="npm",
+      build_npx_command=lambda pkg: ["npx", "--yes", pkg],
+      install_global_command=["npm", "install", "-g"],
+      install_local_command=["npm", "install", "--save-dev"],
+    )
+
+    with patch(
+      "supekku.scripts.lib.sync.adapters.typescript.get_package_manager_info",
+      return_value=mock_pm_info,
+    ):
+      cmd = self.adapter._get_npx_command(package_root)
+      assert cmd == ["npx", "--yes", "ts-doc-extract"]
 
   def test_find_package_root_success(self) -> None:
     """Test finding package.json in parent directory."""
@@ -528,6 +500,67 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
       pytest.raises(ValueError, match="cannot process"),
     ):
       self.adapter.generate(unit, spec_dir=spec_dir)
+
+  def test_ensure_ts_doc_extract_available_caching(self) -> None:
+    """Test _ensure_ts_doc_extract_available caches result."""
+    package_root = Path("/test/project")
+
+    with patch(
+      "supekku.scripts.lib.sync.adapters.typescript.is_npm_package_available",
+      return_value=True,
+    ) as mock_check:
+      # First call should check
+      result1 = self.adapter._ensure_ts_doc_extract_available(package_root)
+      assert result1 is True
+      assert mock_check.call_count == 1
+
+      # Second call should use cache
+      result2 = self.adapter._ensure_ts_doc_extract_available(package_root)
+      assert result2 is True
+      assert mock_check.call_count == 1  # Not called again
+
+  def test_ensure_ts_doc_extract_available_not_found(self) -> None:
+    """Test _ensure_ts_doc_extract_available when package not found."""
+    package_root = Path("/test/project")
+
+    with patch(
+      "supekku.scripts.lib.sync.adapters.typescript.is_npm_package_available",
+      return_value=False,
+    ):
+      result = self.adapter._ensure_ts_doc_extract_available(package_root)
+      assert result is False
+
+  def test_generate_skips_gracefully_when_ts_doc_extract_missing(self) -> None:
+    """Test generate skips with warning when ts-doc-extract not available."""
+    unit = SourceUnit("typescript", "src/index.ts", self.repo_root)
+    spec_dir = Path("/test/specs")
+
+    with (
+      patch.object(TypeScriptAdapter, "is_node_available", return_value=True),
+      patch.object(
+        self.adapter, "_find_package_root", return_value=Path("/test/project")
+      ),
+      patch(
+        "supekku.scripts.lib.sync.adapters.typescript.is_npm_package_available",
+        return_value=False,
+      ),
+      patch(
+        "supekku.scripts.lib.sync.adapters.typescript.get_install_instructions",
+        return_value="npm install -g ts-doc-extract",
+      ),
+      patch("supekku.scripts.lib.sync.adapters.typescript.Console") as mock_console,
+    ):
+      result = self.adapter.generate(unit, spec_dir=spec_dir)
+
+      # Should return empty list (skip gracefully)
+      assert result == []
+
+      # Should print warning with install instructions
+      mock_console.return_value.print.assert_called_once()
+      call_args = mock_console.return_value.print.call_args[0][0]
+      assert "Warning" in call_args
+      assert "ts-doc-extract not found" in call_args
+      assert "npm install" in call_args  # Should include install instructions
 
   def test_deduplicates_identical_variants(self) -> None:
     """Test that internal.md is removed when identical to api.md."""

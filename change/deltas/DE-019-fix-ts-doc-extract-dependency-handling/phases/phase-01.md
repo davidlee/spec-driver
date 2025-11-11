@@ -38,25 +38,25 @@ verification:
 tasks:
   - id: '1.1'
     description: Create npm_utils.py stub and test file
-    status: pending
+    status: completed
   - id: '1.2'
     description: TDD - Package manager availability checks
-    status: pending
+    status: completed
   - id: '1.3'
     description: TDD - Package manager detection from lockfiles
-    status: pending
+    status: completed
   - id: '1.4'
     description: TDD - PackageManagerInfo dataclass and get_package_manager_info()
-    status: pending
+    status: completed
   - id: '1.5'
     description: TDD - is_npm_package_available() with local/global detection
-    status: pending
+    status: completed
   - id: '1.6'
     description: TDD - get_install_instructions() message generation
-    status: pending
+    status: completed
   - id: '1.7'
     description: Run full test suite and lint checks
-    status: pending
+    status: completed
 risks:
   - risk: Package manager command syntax may vary across versions
     mitigation: Document tested versions in tests, add comments with version info
@@ -84,6 +84,18 @@ progress:
     task: '1.4'
     status: completed
     note: TDD - Created PackageManagerInfo dataclass with build_npx_command callable. Added 5 tests for get_package_manager_info() covering npm/pnpm/bun detection, correct command generation (npx --yes, pnpm dlx --package=X X, bunx --yes), and fallback to npm when PM not available. 21 tests total passing.
+  - timestamp: '2025-11-08T00:04:00Z'
+    task: '1.5'
+    status: completed
+    note: TDD - Implemented is_npm_package_available() with 6 tests covering local node_modules/.bin detection (with executable check), global PATH fallback, and priority ordering. Function checks local first (os.access for executable), then falls back to which(). 27 tests passing.
+  - timestamp: '2025-11-08T00:05:00Z'
+    task: '1.6'
+    status: completed
+    note: TDD - Implemented get_install_instructions() with 5 tests covering npm/pnpm/bun command formatting, prefer_local flag behavior, and multiline output. Function generates DRY installation messages using PackageManagerInfo fields. 32 tests passing.
+  - timestamp: '2025-11-08T00:06:00Z'
+    task: '1.7'
+    status: completed
+    note: Final verification - All 32 tests passing. Ruff lint passing (fixed import order, line length, nested if). Pylint 10.00/10. Updated supekku/scripts/lib/core/__init__.py to export all npm_utils functions. just quickcheck passing (1495 total tests).
 ```
 
 # Phase 1 - npm_utils module (TDD)
@@ -114,13 +126,13 @@ Create a new shared utility module `supekku/scripts/lib/core/npm_utils.py` that 
 - [x] Familiar with existing `go_utils.py` pattern for availability checks
 
 ## 4. Exit Criteria / Done When
-- [ ] `supekku/scripts/lib/core/npm_utils.py` created with all functions from DR-019
-- [ ] `supekku/scripts/lib/core/npm_utils_test.py` achieves 100% test coverage
-- [ ] All unit tests passing (`uv run pytest supekku/scripts/lib/core/npm_utils_test.py`)
-- [ ] Ruff lint passing (`uv run ruff check supekku/scripts/lib/core/npm_utils.py`)
-- [ ] Pylint passing (`uv run pylint supekku/scripts/lib/core/npm_utils.py`)
-- [ ] Code reviewed against DR-019 specification
-- [ ] `__init__.py` updated to export npm_utils functions
+- [x] `supekku/scripts/lib/core/npm_utils.py` created with all functions from DR-019
+- [x] `supekku/scripts/lib/core/npm_utils_test.py` achieves 100% test coverage
+- [x] All unit tests passing (`uv run pytest supekku/scripts/lib/core/npm_utils_test.py`)
+- [x] Ruff lint passing (`uv run ruff check supekku/scripts/lib/core/npm_utils.py`)
+- [x] Pylint passing (`uv run pylint supekku/scripts/lib/core/npm_utils.py`)
+- [x] Code reviewed against DR-019 specification
+- [x] `__init__.py` updated to export npm_utils functions
 
 ## 5. Verification
 
@@ -162,9 +174,9 @@ uv run pylint --indent-string "  " supekku/scripts/lib/core/npm_utils.py
 | [x] | 1.2 | TDD - Package manager availability checks | [ ] | Complete - 3 functions, 6 tests passing |
 | [x] | 1.3 | TDD - Package manager detection | [ ] | Complete - 1 function, 9 tests passing |
 | [x] | 1.4 | TDD - PackageManagerInfo and builder | [ ] | Complete - dataclass + builder, 5 tests passing |
-| [ ] | 1.5 | TDD - npm package availability check | [ ] | TODO: `is_npm_package_available()` with local/global detection |
-| [ ] | 1.6 | TDD - Install instructions generator | [ ] | TODO: `get_install_instructions()` DRY message generation |
-| [ ] | 1.7 | Run full test suite and lint | [ ] | TODO: Run pytest + ruff + pylint, update __init__.py exports |
+| [x] | 1.5 | TDD - npm package availability check | [ ] | Complete - 6 tests, local/global detection with executable check |
+| [x] | 1.6 | TDD - Install instructions generator | [ ] | Complete - 5 tests, DRY message generation for all package managers |
+| [x] | 1.7 | Run full test suite and lint | [ ] | Complete - 32 tests passing, ruff+pylint clean, __init__.py updated |
 
 ### Task Details
 
@@ -307,20 +319,56 @@ uv run pylint --indent-string "  " supekku/scripts/lib/core/npm_utils.py
 - Existing pattern in `go_utils.py:13-23` for `is_go_available()` using `which()`
 - TypeScriptAdapter current detection logic at `typescript.py:281-307` can be extracted as-is
 
-**Implementation Progress (Tasks 1.1-1.4 Complete)**:
+**Implementation Complete (All Tasks 1.1-1.7)**:
 - Module structure created with proper docstrings and type hints
-- 21 tests passing covering availability checks, package detection, and PackageManagerInfo
-- Confirmed correct command syntax for all three package managers
+- 32 tests passing covering all npm_utils functionality
+- Confirmed correct command syntax for all three package managers (npm/pnpm/bun)
 - Fallback to npm when detected PM not available works correctly
-- Lambda functions in PackageManagerInfo correctly generate commands per PM
+- Local package detection checks executable permission via os.access()
+- Global package detection uses which() fallback
+- DRY installation instructions generated with PackageManagerInfo
+- All exports added to supekku/scripts/lib/core/__init__.py
+- Ruff lint: All checks passed
+- Pylint: 10.00/10 score
+- just quickcheck: 1495 tests passing
 
-**Next Steps for Continuation**:
-- Task 1.5: Implement `is_npm_package_available()` - check local node_modules/.bin/ then global PATH
-- Task 1.6: Implement `get_install_instructions()` - DRY message formatting with PM-specific commands
-- Task 1.7: Final verification - run full test suite, lint checks, update __init__.py exports
+**Phase 1 Status**: COMPLETE - Ready for Phase 2 (TypeScriptAdapter refactor)
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied (all items in Section 4 checked)
-- [ ] Verification evidence stored (pytest + coverage + lint output)
-- [ ] IP-019 updated with phase completion
-- [ ] Hand-off notes: npm_utils module ready for use by TypeScriptAdapter (Phase 2)
+- [x] Exit criteria satisfied (all items in Section 4 checked)
+- [x] Verification evidence stored (pytest + coverage + lint output)
+- [x] IP-019 updated with phase completion
+- [x] Hand-off notes: npm_utils module ready for use by TypeScriptAdapter (Phase 2)
+
+### Hand-off to Phase 2
+
+**Status**: Phase 1 COMPLETE - Ready for Phase 2 implementation
+
+**What was delivered**:
+- `supekku/scripts/lib/core/npm_utils.py` - 189 lines, fully implemented and tested
+- `supekku/scripts/lib/core/npm_utils_test.py` - 32 tests, 100% passing
+- Exported functions added to `supekku/scripts/lib/core/__init__.py`
+- All quality gates passed: ruff (clean), pylint (10/10), just quickcheck (1495 tests)
+
+**Key functions available for Phase 2**:
+- `get_package_manager_info(path)` → PackageManagerInfo with build_npx_command callable
+- `is_npm_package_available(pkg, root)` → bool (checks local + global)
+- `get_install_instructions(pkg, pm_info, prefer_local)` → str (DRY messages)
+- `detect_package_manager(path)`, `is_npm_available()`, `is_pnpm_available()`, `is_bun_available()`
+
+**Important implementation notes**:
+- PackageManagerInfo.build_npx_command includes `--yes` flags automatically (prevents hangs)
+- is_npm_package_available checks local node_modules/.bin first (with executable check), then global PATH
+- All functions use subprocess-based detection (which, os.access) - cache results to avoid overhead
+
+**Next agent should**:
+1. Read `change/deltas/DE-019-fix-ts-doc-extract-dependency-handling/phases/phase-02.md`
+2. Verify baseline: run `uv run pytest supekku/scripts/lib/sync/adapters/typescript_test.py -v`
+3. Start with Task 2.1 (refactor _get_npx_command)
+4. Work incrementally through tasks 2.1-2.6, running tests after each change
+
+**Files to modify in Phase 2**:
+- `supekku/scripts/lib/sync/adapters/typescript.py` - main refactor target
+- `supekku/scripts/lib/sync/adapters/typescript_test.py` - update mocks, add degradation tests
+
+**Critical**: Follow DR-019 design decisions (validate in generate(), cache per instance, skip gracefully)

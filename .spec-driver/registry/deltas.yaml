@@ -2092,3 +2092,136 @@ deltas:
       phases:
       - id: IP-018-P01
         phase: IP-018-P01
+  DE-019:
+    kind: delta
+    status: draft
+    name: Delta - Fix ts-doc-extract dependency handling
+    slug: fix-ts-doc-extract-dependency-handling
+    updated: '2025-11-08'
+    path: change/deltas/DE-019-fix-ts-doc-extract-dependency-handling/DE-019.md
+    applies_to:
+      specs:
+      - SPEC-124
+      requirements: []
+    plan:
+      id: IP-019
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-019
+        delta: DE-019
+        revision_links:
+          aligns_with:
+          - DR-019
+        specs:
+          primary:
+          - SPEC-124
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-019.PHASE-01
+          name: Phase 01 - npm_utils module (TDD)
+          objective: Create supekku/scripts/lib/core/npm_utils.py module with comprehensive
+            test coverage using TDD approach
+          entrance_criteria:
+          - DR-019 design revision reviewed and approved
+          - IP-019 implementation plan complete
+          - Development environment ready (uv, python, linters configured)
+          exit_criteria:
+          - npm_utils.py module complete with all planned functions
+          - npm_utils_test.py achieves 100% test coverage
+          - All tests passing (pytest)
+          - Lint passing (ruff + pylint)
+          - Code reviewed against DR-019 specification
+        - id: IP-019-P02
+          name: Phase 02 - TypeScriptAdapter refactor
+          objective: Update TypeScriptAdapter to use npm_utils, add dependency validation
+          entrance_criteria: &id005
+          - Phase 1 complete (npm_utils module available)
+          - All Phase 1 tests passing
+          exit_criteria: &id006
+          - TypeScriptAdapter refactored to use npm_utils
+          - Removed duplicate package manager detection code
+          - Added _ensure_ts_doc_extract_available() method
+          - All TypeScriptAdapter tests updated and passing
+          - Manual sync test succeeds with and without ts-doc-extract
+        - id: IP-019-P03
+          name: Phase 03 - Installer & final verification
+          objective: Add optional dependency checking to installer, run full verification
+          entrance_criteria: &id007
+          - Phase 2 complete (TypeScriptAdapter refactored)
+          - All existing tests passing
+          exit_criteria: &id008
+          - Installer warns about missing ts-doc-extract in TypeScript projects
+          - Integration test added for sync with missing ts-doc-extract
+          - All lint/tests pass (just quickcheck)
+          - Manual verification complete for all package managers
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-019.PHASE-01
+        plan: IP-019
+        delta: DE-019
+        objective: Create supekku/scripts/lib/core/npm_utils.py module with comprehensive
+          test coverage using TDD approach. Module provides package manager detection,
+          availability checks, command building, and installation instruction generation
+          for npm/pnpm/bun.
+        entrance_criteria:
+        - DR-019 design revision reviewed and approved
+        - IP-019 implementation plan complete
+        - Development environment ready (uv, python, linters configured)
+        exit_criteria:
+        - npm_utils.py module complete with all planned functions
+        - npm_utils_test.py achieves 100% test coverage
+        - All tests passing (pytest)
+        - Lint passing (ruff + pylint)
+        - Code reviewed against DR-019 specification
+        verification:
+          tests:
+          - VT-019-001: Unit tests for npm_utils (package detection, availability,
+              command building)
+          evidence:
+          - pytest output showing all tests passing
+          - coverage report showing 100% for npm_utils.py
+          - ruff and pylint output showing zero warnings
+        tasks:
+        - id: '1.1'
+          description: Create npm_utils.py stub and test file
+          status: pending
+        - id: '1.2'
+          description: TDD - Package manager availability checks
+          status: pending
+        - id: '1.3'
+          description: TDD - Package manager detection from lockfiles
+          status: pending
+        - id: '1.4'
+          description: TDD - PackageManagerInfo dataclass and get_package_manager_info()
+          status: pending
+        - id: '1.5'
+          description: TDD - is_npm_package_available() with local/global detection
+          status: pending
+        - id: '1.6'
+          description: TDD - get_install_instructions() message generation
+          status: pending
+        - id: '1.7'
+          description: Run full test suite and lint checks
+          status: pending
+        risks:
+        - risk: Package manager command syntax may vary across versions
+          mitigation: Document tested versions in tests, add comments with version
+            info
+          status: mitigated
+      - id: IP-019-P02
+        name: Phase 02 - TypeScriptAdapter refactor
+        objective: Update TypeScriptAdapter to use npm_utils, add dependency validation
+        entrance_criteria: *id005
+        exit_criteria: *id006
+        phase: IP-019-P02
+      - id: IP-019-P03
+        name: Phase 03 - Installer & final verification
+        objective: Add optional dependency checking to installer, run full verification
+        entrance_criteria: *id007
+        exit_criteria: *id008
+        phase: IP-019-P03

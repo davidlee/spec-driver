@@ -1,0 +1,28 @@
+requirement.shape: sql_table
+spec.shape: sql_table
+verification.shape: sql_table
+delta.shape: sql_table
+
+spec: Specification
+requirement: Requirement
+validation: Validation
+delta: Delta DE-XXX
+ip: Implementation Plan IP-XXX
+phase: IP-XXX Phase X
+task: 
+
+tech: tech SPEC-XXX
+prod: product PROD-XXX
+
+spec <- prod: is a
+spec <- tech: is a
+
+fr: functional requirement FR-XXX
+nfr: non-functional requirement NF-XXX
+
+requirement <- nfr: is a
+requirement <- fr: is a
+
+requirement <- spec: belongs to
+
+requirement <- delta: satisfies

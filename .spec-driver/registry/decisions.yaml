@@ -27,3 +27,12 @@ decisions:
     - architecture
     - data-model
     - governance
+  ADR-003:
+    id: ADR-003
+    title: 'ADR-003: TS contracts need by-package tree'
+    status: draft
+    path: specify/decisions/ADR-003-ts-contracts-need-by-package-tree.md
+    summary: ''
+    created: '2025-11-05'
+    updated: '2025-11-05'
+    reviewed: '2025-11-05'

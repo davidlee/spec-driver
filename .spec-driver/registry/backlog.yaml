@@ -1,19 +1,38 @@
 ordering:
+<<<<<<< Updated upstream
 - ISSUE-003
 - ISSUE-009
 - ISSUE-010
 - ISSUE-011
 - ISSUE-005
+||||||| Stash base
+- ISSUE-005
+=======
+- ISSUE-007
+>>>>>>> Stashed changes
 - ISSUE-006
 - ISSUE-004
-- ISSUE-007
 - ISSUE-008
+<<<<<<< Updated upstream
+||||||| Stash base
+- ISSUE-003
+- ISSUE-009
+- ISSUE-010
+- ISSUE-011
+=======
+- ISSUE-003
+- ISSUE-009
+- ISSUE-010
+- ISSUE-014
+- ISSUE-011
+- ISSUE-005
+>>>>>>> Stashed changes
 - ISSUE-012
 - ISSUE-013
-- ISSUE-014
 - ISSUE-015
 - ISSUE-016
 - ISSUE-017
+<<<<<<< Updated upstream
 - ISSUE-021
 - ISSUE-019
 - ISSUE-020
@@ -24,3 +43,7 @@ ordering:
 - IMPR-001
 - IMPR-002
 - PROB-001
+||||||| Stash base
+=======
+- ISSUE-018
+>>>>>>> Stashed changes

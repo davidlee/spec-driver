@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+import tempfile
 from pathlib import Path
 from shutil import which
 from typing import TYPE_CHECKING, ClassVar

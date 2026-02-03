@@ -23,13 +23,14 @@ from supekku.scripts.lib.specs.package_utils import (
   validate_package_path,
 )
 
-# Known leaf packages in supekku/ (as of 2025-11-03)
+# Known leaf packages in supekku/ (as of 2026-02-03)
 KNOWN_LEAF_PACKAGES = {
   "supekku/cli",
   "supekku/scripts/backlog",
   "supekku/scripts/cli",
   "supekku/scripts/lib/backlog",
   "supekku/scripts/lib/blocks/metadata",
+  "supekku/scripts/lib/cards",
   "supekku/scripts/lib/changes/blocks",
   "supekku/scripts/lib/core/frontmatter_metadata",
   "supekku/scripts/lib/decisions",
@@ -160,12 +161,12 @@ class TestValidatePackagePath:
 class TestFindAllLeafPackages:
   """Test find_all_leaf_packages() function."""
 
-  def test_finds_all_18_leaf_packages_in_supekku(self) -> None:
-    """Test that all 18 known leaf packages are discovered."""
+  def test_finds_all_19_leaf_packages_in_supekku(self) -> None:
+    """Test that all 19 known leaf packages are discovered."""
     result = find_all_leaf_packages(Path("supekku"))
     result_set = {str(p) for p in result}
 
-    assert len(result) == 18, f"Expected 18 leaf packages, found {len(result)}"
+    assert len(result) == 19, f"Expected 19 leaf packages, found {len(result)}"
     assert result_set == KNOWN_LEAF_PACKAGES
 
   def test_returns_sorted_results(self) -> None:

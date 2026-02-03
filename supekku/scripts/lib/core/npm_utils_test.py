@@ -263,7 +263,6 @@ class TestIsNpmPackageAvailable:
     package_bin.write_text("#!/usr/bin/env node")
     package_bin.chmod(0o755)
 
-
     result = is_npm_package_available("ts-doc-extract", tmp_path)
     assert result is True
 
@@ -280,7 +279,6 @@ class TestIsNpmPackageAvailable:
     # Mock which to return None (not in global PATH either)
     mock_which.return_value = None
 
-
     result = is_npm_package_available("ts-doc-extract", tmp_path)
     assert result is False
     mock_which.assert_called_once_with("ts-doc-extract")
@@ -289,7 +287,6 @@ class TestIsNpmPackageAvailable:
   def test_package_available_globally(self, mock_which, tmp_path):
     """Test package found globally via which() when not in local node_modules."""
     mock_which.return_value = "/usr/local/bin/ts-doc-extract"
-
 
     result = is_npm_package_available("ts-doc-extract", tmp_path)
     assert result is True
@@ -300,7 +297,6 @@ class TestIsNpmPackageAvailable:
     """Test package not found locally or globally."""
     mock_which.return_value = None
 
-
     result = is_npm_package_available("ts-doc-extract", tmp_path)
     assert result is False
 
@@ -308,7 +304,6 @@ class TestIsNpmPackageAvailable:
   def test_package_check_global_only_when_no_root(self, mock_which):
     """Test only checks global when package_root is None."""
     mock_which.return_value = "/usr/local/bin/pkg"
-
 
     result = is_npm_package_available("pkg", None)
     assert result is True
@@ -323,7 +318,6 @@ class TestIsNpmPackageAvailable:
     package_bin = node_modules_bin / "ts-doc-extract"
     package_bin.write_text("#!/usr/bin/env node")
     package_bin.chmod(0o755)
-
 
     result = is_npm_package_available("ts-doc-extract", tmp_path)
     assert result is True

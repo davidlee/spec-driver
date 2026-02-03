@@ -14,6 +14,11 @@ from .backlog_formatters import (
   format_backlog_list_json,
   format_backlog_list_table,
 )
+from .card_formatters import (
+  format_card_details,
+  format_card_list_json,
+  format_card_list_table,
+)
 from .change_formatters import (
   format_change_list_item,
   format_change_list_json,
@@ -63,6 +68,9 @@ __all__ = [
   "format_backlog_details",
   "format_backlog_list_json",
   "format_backlog_list_table",
+  "format_card_details",
+  "format_card_list_json",
+  "format_card_list_table",
   "format_change_list_item",
   "format_change_list_json",
   "format_change_list_table",

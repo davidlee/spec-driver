@@ -8,10 +8,12 @@ from typing import Annotated
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
+from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.templates import TemplateNotFoundError, render_template
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
+from supekku.scripts.lib.formatters.card_formatters import format_card_details
 from supekku.scripts.lib.formatters.change_formatters import (
   format_delta_details,
   format_delta_details_json,
@@ -286,6 +288,51 @@ def show_template(
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
   except (FileNotFoundError, ValueError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("card")
+def show_card(
+  card_id: Annotated[str, typer.Argument(help="Card ID (e.g., T123)")],
+  quiet: Annotated[
+    bool,
+    typer.Option(
+      "--quiet",
+      "-q",
+      help="Print only the path (for scripting)",
+    ),
+  ] = False,
+  anywhere: Annotated[
+    bool,
+    typer.Option(
+      "--anywhere",
+      "-a",
+      help="Search entire repo instead of just kanban/",
+    ),
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about a specific card."""
+  try:
+    registry = CardRegistry(root=root)
+
+    if quiet:
+      # Path-only output for -q flag
+      path = registry.resolve_path(card_id, anywhere=anywhere)
+      typer.echo(path)
+    else:
+      # Full card details
+      card = registry.resolve_card(card_id, anywhere=anywhere)
+      typer.echo(format_card_details(card))
+
+    raise typer.Exit(EXIT_SUCCESS)
+
+  except FileNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except ValueError as e:
+    # Ambiguity error
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 

@@ -22,11 +22,16 @@ from supekku.cli.common import (
   TruncateOption,
   matches_regexp,
 )
+from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_status
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.backlog_formatters import format_backlog_list_table
+from supekku.scripts.lib.formatters.card_formatters import (
+  format_card_list_json,
+  format_card_list_table,
+)
 from supekku.scripts.lib.formatters.change_formatters import (
   format_change_list_table,
   format_change_with_context,
@@ -1350,10 +1355,7 @@ def list_backlog(
 
     # Apply default status filter (exclude resolved/implemented unless --all specified)
     if not show_all:
-      items = [
-        i for i in items
-        if i.status.lower() not in ["resolved", "implemented"]
-      ]
+      items = [i for i in items if i.status.lower() not in ["resolved", "implemented"]]
 
     # Apply filters
     if status:
@@ -1445,6 +1447,7 @@ def list_backlog(
     # Output via pager or normal echo
     if pager and format_type == "table":
       from rich.console import Console
+
       console = Console()
       with console.pager():
         console.print(output, markup=False)
@@ -1831,6 +1834,59 @@ def list_risks(
     limit=limit,
     pager=pager,
   )
+
+
+@app.command("cards")
+def list_cards(
+  root: RootOption = None,
+  lane: Annotated[
+    str | None,
+    typer.Option(
+      "--lane",
+      "-l",
+      help="Filter by lane (backlog/doing/done)",
+    ),
+  ] = None,
+  format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
+) -> None:
+  """List kanban cards with optional filtering."""
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    registry = CardRegistry(root=root)
+
+    # Get cards, optionally filtered by lane
+    cards = registry.cards_by_lane(lane) if lane else registry.all_cards()
+
+    if not cards:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Format and output
+    if format_type == "json":
+      output = format_card_list_json(cards)
+    else:
+      output = format_card_list_table(cards, format_type)
+
+    typer.echo(output)
+    raise typer.Exit(EXIT_SUCCESS)
+
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
 
 
 # For direct testing

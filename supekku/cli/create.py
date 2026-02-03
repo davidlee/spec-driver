@@ -9,6 +9,7 @@ import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
 from supekku.scripts.lib.backlog.registry import create_backlog_entry
+from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.creation import (
   PhaseCreationError,
   create_delta,
@@ -583,6 +584,36 @@ def create_risk(
     raise typer.Exit(EXIT_SUCCESS)
   except (ValueError, FileNotFoundError) as e:
     typer.echo(f"Error creating risk: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("card")
+def create_card(
+  description: Annotated[str, typer.Argument(help="Card description/title")],
+  lane: Annotated[
+    str,
+    typer.Option(
+      "--lane",
+      "-l",
+      help="Target lane (backlog/doing/done, default: backlog)",
+    ),
+  ] = "backlog",
+  root: RootOption = None,
+) -> None:
+  """Create a new kanban card with the next available ID."""
+  try:
+    registry = CardRegistry(root=root)
+    card = registry.create_card(description, lane=lane)
+
+    typer.echo(f"Created card: {card.id}")
+    typer.echo(str(card.path))
+    raise typer.Exit(EXIT_SUCCESS)
+
+  except ValueError as e:
+    typer.echo(f"Error creating card: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except FileNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
 

@@ -1847,6 +1847,14 @@ def list_cards(
       help="Filter by lane (backlog/doing/done)",
     ),
   ] = None,
+  all_lanes: Annotated[
+    bool,
+    typer.Option(
+      "--all",
+      "-a",
+      help="Show all cards including done/archived (default hides done/archived)",
+    ),
+  ] = False,
   format_type: FormatOption = "table",
   json_output: Annotated[
     bool,
@@ -1856,7 +1864,10 @@ def list_cards(
     ),
   ] = False,
 ) -> None:
-  """List kanban cards with optional filtering."""
+  """List kanban cards with optional filtering.
+
+  By default, hides cards in done/ and archived/ lanes. Use --all to show everything.
+  """
   # --json flag overrides --format
   if json_output:
     format_type = "json"
@@ -1870,7 +1881,13 @@ def list_cards(
     registry = CardRegistry(root=root)
 
     # Get cards, optionally filtered by lane
-    cards = registry.cards_by_lane(lane) if lane else registry.all_cards()
+    if lane:
+      cards = registry.cards_by_lane(lane)
+    else:
+      cards = registry.all_cards()
+      # Filter out done/archived unless --all specified
+      if not all_lanes:
+        cards = [c for c in cards if c.lane not in ("done", "archived")]
 
     if not cards:
       raise typer.Exit(EXIT_SUCCESS)
@@ -1889,6 +1906,21 @@ def list_cards(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
-# For direct testing
+
+# Singular command aliases - dynamically register
+_PLURAL_TO_SINGULAR = {
+  'specs': 'spec', 'deltas': 'delta', 'changes': 'change',
+  'adrs': 'adr', 'policies': 'policy', 'standards': 'standard',
+  'requirements': 'requirement', 'revisions': 'revision',
+  'issues': 'issue', 'problems': 'problem', 'improvements': 'improvement',
+  'risks': 'risk', 'cards': 'card',
+}
+
+for plural, singular in _PLURAL_TO_SINGULAR.items():
+  plural_func = globals().get(f'list_{plural}')
+  if plural_func and callable(plural_func):
+    app.command(singular)(plural_func)
+
+
 if __name__ == "__main__":  # pragma: no cover
   app()

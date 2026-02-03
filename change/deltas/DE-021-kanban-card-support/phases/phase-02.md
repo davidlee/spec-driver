@@ -4,7 +4,8 @@ slug: 021-kanban-card-support-phase-02
 name: IP-021 Phase 02
 created: '2026-02-03'
 updated: '2026-02-03'
-status: draft
+completed: '2026-02-03'
+status: complete
 kind: phase
 ---
 
@@ -86,13 +87,13 @@ Implement complete card artifact support following TDD principles. Build domain 
 - [x] Existing patterns reviewed (decisions, backlog, formatters)
 
 ## 4. Exit Criteria / Done When
-- [ ] All VT-021-001..006 tests passing
-- [ ] Domain package implemented (cards/models.py, cards/registry.py)
-- [ ] Formatters implemented (formatters/card_formatters.py)
-- [ ] CLI commands implemented (create/list/show/find card)
-- [ ] kanban/template.md created
-- [ ] `just` passes (format + lint + test + pylint)
-- [ ] Manual smoke test successful
+- [x] All VT-021-001..006 tests passing (32 card tests + all others)
+- [x] Domain package implemented (cards/models.py, cards/registry.py)
+- [x] Formatters implemented (formatters/card_formatters.py)
+- [x] CLI commands implemented (create/list/show/find card)
+- [x] kanban/template.md created
+- [x] `just` passes (format + lint + test + pylint) - 1524 tests, ruff clean, pylint clean
+- [ ] Manual smoke test successful (deferred to Phase 3 VH-021-001)
 
 ## 5. Verification
 **Tests to run**:
@@ -127,20 +128,20 @@ Implement complete card artifact support following TDD principles. Build domain 
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Create domain package structure | [ ] | mkdir cards/, __init__.py |
-| [ ] | 2.2 | Implement Card model | [ ] | TDD: VT-021-001 |
-| [ ] | 2.3 | Implement CardRegistry discovery + ID parsing | [ ] | TDD: VT-021-001 |
-| [ ] | 2.4 | Implement next-ID allocation | [ ] | TDD: VT-021-002 |
-| [ ] | 2.5 | Implement card creation | [ ] | TDD: VT-021-003 |
-| [ ] | 2.6 | Implement card resolution (show) | [ ] | TDD: VT-021-004 |
-| [ ] | 2.7 | Create card formatters | [ ] | TDD: VT-021-006 |
-| [ ] | 2.8 | Add CLI create card command | [ ] | Thin orchestration |
-| [ ] | 2.9 | Add CLI list cards command | [ ] | Thin orchestration |
-| [ ] | 2.10 | Add CLI show card command | [ ] | Thin orchestration |
-| [ ] | 2.11 | Add CLI find card command | [ ] | New find.py + main.py |
-| [ ] | 2.12 | Create kanban/template.md | [ ] | Minimal template |
-| [ ] | 2.13 | Run tests and fix issues | [ ] | just test |
-| [ ] | 2.14 | Run linters and fix issues | [ ] | just lint, just pylint |
+| [x] | 2.1 | Create domain package structure | [ ] | cards/ package created with models.py, registry.py |
+| [x] | 2.2 | Implement Card model | [ ] | Dataclass with id, title, lane, path, created, status |
+| [x] | 2.3 | Implement CardRegistry discovery + ID parsing | [ ] | Glob-based discovery, ID parsing from filename |
+| [x] | 2.4 | Implement next-ID allocation | [ ] | Scans all lanes for max ID |
+| [x] | 2.5 | Implement card creation | [ ] | Template-based with H1/Created rewrite |
+| [x] | 2.6 | Implement card resolution (show) | [ ] | Ambiguity detection, --anywhere support |
+| [x] | 2.7 | Create card formatters | [ ] | Table/tsv/json formats, detail view |
+| [x] | 2.8 | Add CLI create card command | [ ] | create.py - thin orchestration |
+| [x] | 2.9 | Add CLI list cards command | [ ] | list.py - filtering + formatting + --all flag |
+| [x] | 2.10 | Add CLI show card command | [ ] | show.py - resolution + display |
+| [x] | 2.11 | Add CLI find card command | [ ] | find.py - repo-wide search |
+| [x] | 2.12 | Create kanban/template.md | [ ] | Minimal template with sections |
+| [x] | 2.13 | Run tests and fix issues | [ ] | All 1524 tests pass, fixed rebase issues |
+| [x] | 2.14 | Run linters and fix issues | [ ] | ruff + pylint passing |
 
 ### Task Details
 
@@ -333,16 +334,25 @@ Implement complete card artifact support following TDD principles. Build domain 
 ## 9. Decisions & Outcomes
 - `2026-02-03` - TDD approach: write tests before implementation for each VT artifact
 - `2026-02-03` - Follow established patterns from decisions/ and backlog/ domains
+- `2026-02-03` - **UX Enhancement**: list cards now hides done/archived lanes by default, added --all flag (user feedback)
+- `2026-02-03` - Phase 2 complete: All automated tests passing, ready for manual verification
 
 ## 10. Findings / Research Notes
 - Decision formatters use helper functions (_format_*) for reusable components
 - Backlog registry has next_identifier() pattern for ID allocation
 - CLI commands are thin (~20-50 lines) with all logic in registry
+- **Rebase issues fixed**: 5 backlog list_test.py failures (ISSUE-002/003 filtering) resolved post-rebase
+- **Unrelated test fix**: typescript_test.py required package.json in test setup for package root detection
+- **Test coverage**: 32 card-specific tests across models, registry, formatters, CLI
+- **Pattern adherence**: Successfully followed SRP + thin CLI patterns; formatters are pure functions
+- **Performance**: Glob-based discovery efficient; no performance concerns observed
+- **UX refinement**: User feedback led to --all flag for list cards; default now hides done/archived lanes
+- **Future enhancement**: Regex lane filtering deferred to future work (keep scope contained)
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] All VT-021-001..006 tests passing
-- [ ] `just` passes (format/lint/test/pylint)
-- [ ] Verification evidence stored (test output, linter output)
-- [ ] Phase 2 notes updated with observations
-- [ ] Hand-off notes to Phase 3 (manual verification)
+- [x] Exit criteria satisfied (except manual smoke test → Phase 3)
+- [x] All VT-021-001..006 tests passing (32 card tests)
+- [x] `just` passes (format/lint/test/pylint) - 1524 tests, ruff clean, pylint clean
+- [x] Verification evidence: All tests pass, linters clean
+- [x] Phase 2 notes updated with observations
+- [x] Hand-off notes to Phase 3 (manual verification VH-021-001)

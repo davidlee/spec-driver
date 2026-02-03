@@ -573,6 +573,10 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
     contracts_dir = spec_dir / "contracts"
     contracts_dir.mkdir(parents=True, exist_ok=True)
 
+    # Create package.json (required for package root detection)
+    package_json = test_repo / "package.json"
+    package_json.write_text('{"name": "test-dedup", "version": "1.0.0"}')
+
     # Create source file path
     module_path = test_repo / "src/index.ts"
     module_path.parent.mkdir(parents=True, exist_ok=True)

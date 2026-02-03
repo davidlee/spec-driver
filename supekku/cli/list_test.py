@@ -24,6 +24,7 @@ class ListBacklogShortcutsTest(unittest.TestCase):
     # Create sample backlog entries for testing
     self._create_sample_issue("ISSUE-001", "Test issue one", "open")
     self._create_sample_issue("ISSUE-002", "Test issue two", "resolved")
+    self._create_sample_issue("ISSUE-003", "Test issue three", "open")
     self._create_sample_problem("PROB-001", "Test problem", "captured")
     self._create_sample_improvement("IMPR-001", "Test improvement", "idea")
     self._create_sample_risk("RISK-001", "Test risk", "identified")
@@ -117,7 +118,8 @@ Test risk content.
 
     assert result.exit_code == 0
     assert "ISSUE-001" in result.stdout
-    assert "ISSUE-002" in result.stdout
+    assert "ISSUE-003" in result.stdout
+    assert "ISSUE-002" not in result.stdout  # resolved, filtered by default
     assert "PROB-001" not in result.stdout  # Should not show problems
 
   def test_list_problems(self) -> None:
@@ -185,7 +187,8 @@ Test risk content.
     assert result.exit_code == 0
     # JSON output should be valid and contain issue data
     assert "ISSUE-001" in result.stdout
-    assert "ISSUE-002" in result.stdout
+    assert "ISSUE-003" in result.stdout
+    assert "ISSUE-002" not in result.stdout  # resolved, filtered by default
 
   def test_list_issues_empty_result(self) -> None:
     """Test listing issues with filter that returns no results."""
@@ -218,12 +221,13 @@ Test risk content.
     """Test listing with regexp filter."""
     result = self.runner.invoke(
       app,
-      ["issues", "--root", str(self.root), "--regexp", "ISSUE-00[12]"],
+      ["issues", "--root", str(self.root), "--regexp", "ISSUE-00[13]"],
     )
 
     assert result.exit_code == 0
     assert "ISSUE-001" in result.stdout
-    assert "ISSUE-002" in result.stdout
+    assert "ISSUE-003" in result.stdout
+    assert "ISSUE-002" not in result.stdout  # resolved, filtered by default
 
   def test_tsv_format(self) -> None:
     """Test listing with TSV format."""
@@ -582,7 +586,7 @@ Test improvement content.
     """Test that list backlog displays items in priority order by default."""
     result = self.runner.invoke(
       app,
-      ["backlog", "--root", str(self.root)],
+      ["backlog", "--root", str(self.root), "--all"],
     )
 
     assert result.exit_code == 0
@@ -603,10 +607,10 @@ Test improvement content.
     assert positions["IMPR-002"] < positions["ISSUE-003"]
 
   def test_order_by_id_flag(self) -> None:
-    """Test --order-by-id flag provides chronological ordering."""
+    """Test --order id flag provides chronological ordering."""
     result = self.runner.invoke(
       app,
-      ["backlog", "--root", str(self.root), "--order-by-id"],
+      ["backlog", "--root", str(self.root), "--order", "id", "--all"],
     )
 
     assert result.exit_code == 0

@@ -90,3 +90,13 @@ class Card:
       if match:
         return match.group(1)
     return None
+
+  def to_dict(self) -> dict:
+    """Convert card to dictionary for JSON serialization."""
+    return {
+      "id": self.id,
+      "title": self.title,
+      "lane": self.lane,
+      "path": str(self.path),
+      "created": self.created,
+    }

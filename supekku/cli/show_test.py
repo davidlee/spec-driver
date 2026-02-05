@@ -337,5 +337,189 @@ class ShowDeltaCommandTest(unittest.TestCase):
     assert "Output as JSON" in result.stdout
 
 
+class ShowPathFlagTest(unittest.TestCase):
+  """Test cases for --path flag on show commands."""
+
+  def setUp(self) -> None:
+    """Set up test environment."""
+    self.runner = CliRunner()
+    self.root = find_repo_root()
+
+  def test_show_delta_path_flag(self) -> None:
+    """Test --path flag returns only the path."""
+    delta_dirs = list((self.root / "change" / "deltas").glob("DE-*"))
+    if not delta_dirs:
+      self.skipTest("No deltas found in repository")
+
+    delta_id = f"DE-{delta_dirs[0].name.split('-')[1]}"
+    result = self.runner.invoke(app, ["delta", delta_id, "--path"])
+
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    # Should output just a path (single line, ends with .md)
+    output = result.stdout.strip()
+    assert output.endswith(".md")
+    assert "change/deltas/" in output
+    assert "\n" not in output  # Single line
+
+  def test_show_adr_path_flag(self) -> None:
+    """Test --path flag on show adr."""
+    adr_files = list((self.root / "specify" / "decisions").glob("ADR-*.md"))
+    if not adr_files:
+      self.skipTest("No ADRs found in repository")
+
+    adr_id = adr_files[0].stem.split("-")[0] + "-" + adr_files[0].stem.split("-")[1]
+    result = self.runner.invoke(app, ["adr", adr_id, "--path"])
+
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    output = result.stdout.strip()
+    assert output.endswith(".md")
+    assert "\n" not in output
+
+  def test_show_spec_path_flag(self) -> None:
+    """Test --path flag on show spec."""
+    spec_dirs = list((self.root / "specify" / "tech").glob("SPEC-*"))
+    if not spec_dirs:
+      self.skipTest("No specs found in repository")
+
+    spec_id = spec_dirs[0].name
+    result = self.runner.invoke(app, ["spec", spec_id, "--path"])
+
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    output = result.stdout.strip()
+    assert output.endswith(".md")
+    assert "\n" not in output
+
+  def test_path_and_json_mutually_exclusive(self) -> None:
+    """Test that --path and --json are mutually exclusive."""
+    result = self.runner.invoke(app, ["delta", "DE-001", "--path", "--json"])
+
+    assert result.exit_code == 1
+    assert "mutually exclusive" in result.stderr.lower()
+
+
+class ShowCardJsonFlagTest(unittest.TestCase):
+  """Test cases for --json flag on show card command."""
+
+  def setUp(self) -> None:
+    """Set up test environment."""
+    self.runner = CliRunner()
+    self.root = find_repo_root()
+
+  def test_show_card_json_flag(self) -> None:
+    """Test --json flag on show card."""
+    card_files = list((self.root / "kanban").rglob("T*.md"))
+    if not card_files:
+      self.skipTest("No cards found in repository")
+
+    card_id = card_files[0].stem.split("-")[0]
+    result = self.runner.invoke(app, ["card", card_id, "--json"])
+
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    output = json.loads(result.stdout)
+    assert "id" in output
+    assert "title" in output
+    assert "path" in output
+
+  def test_show_card_path_flag_alias(self) -> None:
+    """Test -q alias still works for --path flag."""
+    card_files = list((self.root / "kanban").rglob("T*.md"))
+    if not card_files:
+      self.skipTest("No cards found in repository")
+
+    card_id = card_files[0].stem.split("-")[0]
+    result = self.runner.invoke(app, ["card", card_id, "-q"])
+
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    output = result.stdout.strip()
+    assert output.endswith(".md")
+    assert "\n" not in output
+
+
+class ShowRawFlagTest(unittest.TestCase):
+  """Test cases for --raw flag on show commands."""
+
+  def setUp(self) -> None:
+    """Set up test environment."""
+    self.runner = CliRunner()
+    self.root = find_repo_root()
+
+  def test_show_delta_raw_flag(self) -> None:
+    """Test --raw flag outputs raw file content."""
+    delta_dirs = list((self.root / "change" / "deltas").glob("DE-*"))
+    if not delta_dirs:
+      self.skipTest("No deltas found in repository")
+
+    delta_id = f"DE-{delta_dirs[0].name.split('-')[1]}"
+    result = self.runner.invoke(app, ["delta", delta_id, "--raw"])
+
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    # Raw output should contain frontmatter (starts with ---)
+    assert result.stdout.startswith("---")
+    # Should contain YAML frontmatter fields
+    assert "id:" in result.stdout or "name:" in result.stdout
+
+  def test_show_adr_raw_flag(self) -> None:
+    """Test --raw flag on show adr."""
+    adr_files = list((self.root / "specify" / "decisions").glob("ADR-*.md"))
+    if not adr_files:
+      self.skipTest("No ADRs found in repository")
+
+    adr_id = adr_files[0].stem.split("-")[0] + "-" + adr_files[0].stem.split("-")[1]
+    result = self.runner.invoke(app, ["adr", adr_id, "--raw"])
+
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    # Raw output should match file content
+    expected = adr_files[0].read_text()
+    # Strip trailing newline since typer.echo adds one
+    assert result.stdout.strip() == expected.strip()
+
+  def test_show_spec_raw_flag(self) -> None:
+    """Test --raw flag on show spec."""
+    spec_dirs = list((self.root / "specify" / "tech").glob("SPEC-*"))
+    if not spec_dirs:
+      self.skipTest("No specs found in repository")
+
+    spec_id = spec_dirs[0].name
+    spec_path = spec_dirs[0] / f"{spec_id}.md"
+    if not spec_path.exists():
+      self.skipTest(f"Spec file not found: {spec_path}")
+
+    result = self.runner.invoke(app, ["spec", spec_id, "--raw"])
+
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    # Raw output should match file content
+    expected = spec_path.read_text()
+    assert result.stdout.strip() == expected.strip()
+
+  def test_raw_and_json_mutually_exclusive(self) -> None:
+    """Test that --raw and --json are mutually exclusive."""
+    result = self.runner.invoke(app, ["delta", "DE-001", "--raw", "--json"])
+
+    assert result.exit_code == 1
+    assert "mutually exclusive" in result.stderr.lower()
+
+  def test_raw_and_path_mutually_exclusive(self) -> None:
+    """Test that --raw and --path are mutually exclusive."""
+    result = self.runner.invoke(app, ["delta", "DE-001", "--raw", "--path"])
+
+    assert result.exit_code == 1
+    assert "mutually exclusive" in result.stderr.lower()
+
+  def test_all_three_flags_mutually_exclusive(self) -> None:
+    """Test that --raw, --json, and --path together fail."""
+    result = self.runner.invoke(app, ["delta", "DE-001", "--raw", "--json", "--path"])
+
+    assert result.exit_code == 1
+    assert "mutually exclusive" in result.stderr.lower()
+
+  def test_show_raw_flag_in_help(self) -> None:
+    """Test that --raw flag is documented in help."""
+    result = self.runner.invoke(app, ["delta", "--help"])
+
+    assert result.exit_code == 0
+    assert "--raw" in result.stdout
+    assert "raw file content" in result.stdout.lower()
+
+
 if __name__ == "__main__":
   unittest.main()

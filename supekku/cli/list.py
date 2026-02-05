@@ -1906,18 +1906,25 @@ def list_cards(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
-
 # Singular command aliases - dynamically register
 _PLURAL_TO_SINGULAR = {
-  'specs': 'spec', 'deltas': 'delta', 'changes': 'change',
-  'adrs': 'adr', 'policies': 'policy', 'standards': 'standard',
-  'requirements': 'requirement', 'revisions': 'revision',
-  'issues': 'issue', 'problems': 'problem', 'improvements': 'improvement',
-  'risks': 'risk', 'cards': 'card',
+  "specs": "spec",
+  "deltas": "delta",
+  "changes": "change",
+  "adrs": "adr",
+  "policies": "policy",
+  "standards": "standard",
+  "requirements": "requirement",
+  "revisions": "revision",
+  "issues": "issue",
+  "problems": "problem",
+  "improvements": "improvement",
+  "risks": "risk",
+  "cards": "card",
 }
 
 for plural, singular in _PLURAL_TO_SINGULAR.items():
-  plural_func = globals().get(f'list_{plural}')
+  plural_func = globals().get(f"list_{plural}")
   if plural_func and callable(plural_func):
     app.command(singular)(plural_func)
 

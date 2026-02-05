@@ -4,7 +4,18 @@ from __future__ import annotations
 
 import typer
 
-from supekku.cli import backfill, complete, create, find, schema, show, sync, workspace
+from supekku.cli import (
+  backfill,
+  complete,
+  create,
+  edit,
+  find,
+  schema,
+  show,
+  sync,
+  view,
+  workspace,
+)
 from supekku.cli import list as list_module
 from supekku.cli.common import VersionOption
 
@@ -54,6 +65,18 @@ app.add_typer(
   show.app,
   name="show",
   help="Show detailed artifact information",
+)
+
+app.add_typer(
+  view.app,
+  name="view",
+  help="View artifacts in pager ($PAGER)",
+)
+
+app.add_typer(
+  edit.app,
+  name="edit",
+  help="Edit artifacts in editor ($EDITOR)",
 )
 
 app.add_typer(

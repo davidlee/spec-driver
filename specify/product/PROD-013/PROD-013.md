@@ -136,33 +136,38 @@ entries:
   - artefact: VT-001
     kind: VT
     requirement: PROD-013.FR-001
-    status: planned
-    notes: Test --path flag on all show subcommands
+    status: verified
+    notes: show_test.py - ShowPathFlagTest covers --path on all show commands
   - artefact: VT-002
     kind: VT
     requirement: PROD-013.FR-002
-    status: planned
-    notes: Test --raw flag outputs unmodified content
+    status: verified
+    notes: show_test.py - ShowRawFlagTest covers --raw on all show commands (7 tests)
   - artefact: VT-003
     kind: VT
     requirement: PROD-013.FR-003
-    status: planned
-    notes: Test view command with various $PAGER values
+    status: verified
+    notes: view_test.py - 16 tests covering pager resolution and invocation
   - artefact: VT-004
     kind: VT
     requirement: PROD-013.FR-004
-    status: planned
-    notes: Test edit command with various $EDITOR values
+    status: verified
+    notes: edit_test.py - 11 tests covering editor resolution and invocation
   - artefact: VT-005
     kind: VT
     requirement: PROD-013.FR-005
-    status: planned
-    notes: Test find subcommands for all artifact types
+    status: verified
+    notes: find_test.py - 13 tests covering find subcommands for all artifact types
   - artefact: VT-006
     kind: VT
     requirement: PROD-013.FR-006
-    status: planned
-    notes: Test --json flag consistency
+    status: verified
+    notes: show_test.py - ShowCardJsonFlagTest covers --json on show card
+  - artefact: VT-007
+    kind: VT
+    requirement: PROD-013.FR-007
+    status: verified
+    notes: show_test.py - JSON output tests verify path field present
 ```
 
 ## 1. Intent & Summary

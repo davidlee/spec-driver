@@ -2468,3 +2468,379 @@ deltas:
         - 3.2 Run final quality checks (just)
         - 3.3 Update phase documentation
         risks: []
+  DE-022:
+    kind: delta
+    status: completed
+    name: Add --path flag to show commands
+    slug: add-path-flag-to-show-commands
+    updated: '2026-02-04'
+    path: change/deltas/DE-022-add-path-flag-to-show-commands/DE-022.md
+    applies_to:
+      specs:
+      - PROD-013
+      requirements:
+      - PROD-013.FR-001
+      - PROD-013.FR-006
+      - PROD-013.FR-007
+    plan:
+      id: IP-022
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-022
+        delta: DE-022
+        revision_links:
+          aligns_with:
+          - DR-022
+        specs:
+          primary:
+          - PROD-013
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-013.FR-001
+          - PROD-013.FR-006
+          - PROD-013.FR-007
+          dependencies: []
+        phases:
+        - id: IP-022-P01
+        - id: IP-022.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-022.PHASE-01
+        plan: IP-022
+        delta: DE-022
+        objective: Add --path flag to all show subcommands and --json to show card
+          for consistent CLI flag support.
+        entrance_criteria:
+        - DR-022 design approved
+        - PROD-013 spec reviewed
+        exit_criteria:
+        - All show commands support --path flag
+        - show card supports --json flag
+        - Tests passing
+        - Lint clean
+        verification:
+          tests:
+          - supekku/cli/show_test.py
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Add --path flag to show_spec
+          status: complete
+        - id: '1.2'
+          description: Add --path flag to show_delta
+          status: complete
+        - id: '1.3'
+          description: Add --path flag to show_revision
+          status: complete
+        - id: '1.4'
+          description: Add --path flag to show_requirement
+          status: complete
+        - id: '1.5'
+          description: Add --path flag to show_adr
+          status: complete
+        - id: '1.6'
+          description: Add --path flag to show_policy
+          status: complete
+        - id: '1.7'
+          description: Add --path flag to show_standard
+          status: complete
+        - id: '1.8'
+          description: Update show_card with --json and --path
+          status: complete
+        - id: '1.9'
+          description: Write tests
+          status: complete
+        - id: '1.10'
+          description: Lint and verify
+          status: complete
+        risks: []
+      - id: IP-022-P01
+        phase: IP-022-P01
+  DE-023:
+    kind: delta
+    status: completed
+    name: Add view and edit commands
+    slug: add-view-and-edit-commands
+    updated: '2026-02-04'
+    path: change/deltas/DE-023-add-view-and-edit-commands/DE-023.md
+    applies_to:
+      specs:
+      - PROD-013
+      requirements:
+      - PROD-013.FR-003
+      - PROD-013.FR-004
+    plan:
+      id: IP-023
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-023
+        delta: DE-023
+        revision_links:
+          aligns_with:
+          - DR-023
+        specs:
+          primary:
+          - PROD-013
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-013.FR-003
+          - PROD-013.FR-004
+          dependencies: []
+        phases:
+        - id: IP-023-P01
+        - id: IP-023.PHASE-01
+        - id: IP-023.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-023.PHASE-01
+        plan: IP-023
+        delta: DE-023
+        objective: Implement view and edit commands for opening artifacts in pager/editor.
+        entrance_criteria:
+        - DR-023 design approved
+        - PROD-013 spec reviewed
+        exit_criteria:
+        - view command works for all artifact types
+        - edit command works for all artifact types
+        - Tests passing
+        - Lint clean
+        verification:
+          tests:
+          - supekku/cli/view_test.py
+          - supekku/cli/edit_test.py
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Add pager/editor helpers to common.py
+          status: complete
+        - id: '1.2'
+          description: Create view.py with all subcommands
+          status: complete
+        - id: '1.3'
+          description: Create edit.py with all subcommands
+          status: complete
+        - id: '1.4'
+          description: Register commands in main.py
+          status: complete
+        - id: '1.5'
+          description: Write tests
+          status: complete
+        - id: '1.6'
+          description: Lint and verify
+          status: complete
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-023.PHASE-02
+        plan: IP-023
+        delta: DE-023
+        objective: Allow numeric-only IDs (e.g., '001') for artifact types with unambiguous
+          prefixes.
+        entrance_criteria:
+        - Phase 1 complete
+        exit_criteria:
+        - numeric shorthand works for unambiguous types
+        - full IDs still work
+        - tests passing
+        - lint clean
+        verification:
+          tests:
+          - supekku/cli/view_test.py
+          - supekku/cli/edit_test.py
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Add normalize_id() helper to common.py
+          status: complete
+        - id: '2.2'
+          description: Update view.py to use normalize_id()
+          status: complete
+        - id: '2.3'
+          description: Update edit.py to use normalize_id()
+          status: complete
+        - id: '2.4'
+          description: Add tests for shorthand IDs
+          status: complete
+        - id: '2.5'
+          description: Lint and verify
+          status: complete
+        risks: []
+      - id: IP-023-P01
+        phase: IP-023-P01
+  DE-024:
+    kind: delta
+    status: completed
+    name: Delta - Add --raw flag to show commands
+    slug: add-raw-flag-to-show-commands
+    updated: '2026-02-05'
+    path: change/deltas/DE-024-add-raw-flag-to-show-commands/DE-024.md
+    applies_to:
+      specs:
+      - PROD-013
+      requirements:
+      - PROD-013.FR-002
+    plan:
+      id: IP-024
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-024
+        delta: DE-024
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-013
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-013.FR-002
+          dependencies: []
+        phases:
+        - id: IP-024-P01
+        - id: IP-024.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-024.PHASE-01
+        plan: IP-024
+        delta: DE-024
+        objective: Add --raw flag to all show subcommands for raw file content output.
+        entrance_criteria:
+        - DR-024 design approved
+        exit_criteria:
+        - All show commands support --raw flag
+        - Mutual exclusivity with --json and --path
+        - Tests passing
+        - Lint clean
+        verification:
+          tests:
+          - supekku/cli/show_test.py
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Update show.py mutual exclusivity check
+          status: complete
+        - id: '1.2'
+          description: Add --raw to show_spec
+          status: complete
+        - id: '1.3'
+          description: Add --raw to show_delta
+          status: complete
+        - id: '1.4'
+          description: Add --raw to show_revision
+          status: complete
+        - id: '1.5'
+          description: Add --raw to show_requirement
+          status: complete
+        - id: '1.6'
+          description: Add --raw to show_adr
+          status: complete
+        - id: '1.7'
+          description: Add --raw to show_policy
+          status: complete
+        - id: '1.8'
+          description: Add --raw to show_standard
+          status: complete
+        - id: '1.9'
+          description: Add --raw to show_card
+          status: complete
+        - id: '1.10'
+          description: Write tests
+          status: complete
+        - id: '1.11'
+          description: Lint and verify
+          status: complete
+        risks: []
+      - id: IP-024-P01
+        phase: IP-024-P01
+  DE-025:
+    kind: delta
+    status: completed
+    name: Delta - Extend find command to all artifact types
+    slug: extend-find-command-to-all-artifact-types
+    updated: '2026-02-05'
+    path: change/deltas/DE-025-extend-find-command-to-all-artifact-types/DE-025.md
+    applies_to:
+      specs:
+      - PROD-013
+      requirements:
+      - PROD-013.FR-005
+    plan:
+      id: IP-025
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-025
+        delta: DE-025
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-013
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-013.FR-005
+          dependencies: []
+        phases:
+        - id: IP-025-P01
+        - id: IP-025.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-025.PHASE-01
+        plan: IP-025
+        delta: DE-025
+        objective: Add find subcommands for all artifact types with pattern matching
+          support.
+        entrance_criteria:
+        - DR-025 design approved
+        exit_criteria:
+        - find spec subcommand works
+        - find delta subcommand works
+        - find adr subcommand works
+        - find revision subcommand works
+        - find policy subcommand works
+        - find standard subcommand works
+        - Pattern matching works (fnmatch)
+        - Tests passing
+        - Lint clean
+        verification:
+          tests:
+          - supekku/cli/find_test.py
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Add find spec subcommand
+          status: complete
+        - id: '1.2'
+          description: Add find delta subcommand
+          status: complete
+        - id: '1.3'
+          description: Add find adr subcommand
+          status: complete
+        - id: '1.4'
+          description: Add find revision subcommand
+          status: complete
+        - id: '1.5'
+          description: Add find policy subcommand
+          status: complete
+        - id: '1.6'
+          description: Add find standard subcommand
+          status: complete
+        - id: '1.7'
+          description: Write tests
+          status: complete
+        - id: '1.8'
+          description: Lint and verify
+          status: complete
+        risks: []
+      - id: IP-025-P01
+        phase: IP-025-P01

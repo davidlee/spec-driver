@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -38,10 +39,18 @@ app = typer.Typer(help="Show detailed artifact information", no_args_is_help=Tru
 def show_spec(
   spec_id: Annotated[str, typer.Argument(help="Spec ID (e.g., SPEC-009, PROD-042)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specification."""
   try:
+    if sum([json_output, path_only, raw_output]) > 1:
+      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
     registry = SpecRegistry(root=root)
     spec = registry.get(spec_id)
 
@@ -49,7 +58,11 @@ def show_spec(
       typer.echo(f"Error: Specification not found: {spec_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if json_output:
+    if path_only:
+      typer.echo(spec.path)
+    elif raw_output:
+      typer.echo(spec.path.read_text())
+    elif json_output:
       from supekku.scripts.lib.core.repo import find_repo_root
 
       repo_root = find_repo_root(root)
@@ -68,10 +81,18 @@ def show_spec(
 def show_delta(
   delta_id: Annotated[str, typer.Argument(help="Delta ID (e.g., DE-003)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a delta."""
   try:
+    if sum([json_output, path_only, raw_output]) > 1:
+      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
     registry = ChangeRegistry(root=root, kind="delta")
     artifacts = registry.collect()
     artifact = artifacts.get(delta_id)
@@ -80,7 +101,11 @@ def show_delta(
       typer.echo(f"Error: Delta not found: {delta_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if json_output:
+    if path_only:
+      typer.echo(artifact.path)
+    elif raw_output:
+      typer.echo(artifact.path.read_text())
+    elif json_output:
       typer.echo(format_delta_details_json(artifact, root=root))
     else:
       typer.echo(format_delta_details(artifact, root=root))
@@ -95,10 +120,18 @@ def show_delta(
 def show_revision(
   revision_id: Annotated[str, typer.Argument(help="Revision ID (e.g., RE-001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a revision."""
   try:
+    if sum([json_output, path_only, raw_output]) > 1:
+      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
     registry = ChangeRegistry(root=root, kind="revision")
     artifacts = registry.collect()
     artifact = artifacts.get(revision_id)
@@ -107,7 +140,11 @@ def show_revision(
       typer.echo(f"Error: Revision not found: {revision_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if json_output:
+    if path_only:
+      typer.echo(artifact.path)
+    elif raw_output:
+      typer.echo(artifact.path.read_text())
+    elif json_output:
       output = (
         artifact.to_dict() if hasattr(artifact, "to_dict") else {"id": artifact.id}
       )
@@ -125,10 +162,18 @@ def show_revision(
 def show_requirement(
   req_id: Annotated[str, typer.Argument(help="Requirement ID (e.g., SPEC-009.FR-001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a requirement."""
   try:
+    if sum([json_output, path_only, raw_output]) > 1:
+      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
     repo_root = find_repo_root(root)
     registry_path = repo_root / ".spec-driver" / "registry" / "requirements.yaml"
     registry = RequirementsRegistry(registry_path)
@@ -139,7 +184,18 @@ def show_requirement(
       typer.echo(f"Error: Requirement not found: {req_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if json_output:
+    if path_only or raw_output:
+      req_dict = requirement.to_dict() if hasattr(requirement, "to_dict") else {}
+      path_str = req_dict.get("path", "")
+      if not path_str:
+        typer.echo(f"Error: No path found for requirement: {req_id}", err=True)
+        raise typer.Exit(EXIT_FAILURE)
+      full_path = repo_root / path_str
+      if path_only:
+        typer.echo(full_path)
+      else:
+        typer.echo(full_path.read_text())
+    elif json_output:
       output = (
         requirement.to_dict() if hasattr(requirement, "to_dict") else {"uid": req_id}
       )
@@ -157,10 +213,18 @@ def show_requirement(
 def show_adr(
   decision_id: Annotated[str, typer.Argument(help="Decision ID (e.g., ADR-001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific decision/ADR."""
   try:
+    if sum([json_output, path_only, raw_output]) > 1:
+      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
     registry = DecisionRegistry(root=root)
     decision = registry.find(decision_id)
 
@@ -168,7 +232,11 @@ def show_adr(
       typer.echo(f"Error: Decision not found: {decision_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if json_output:
+    if path_only:
+      typer.echo(decision.path)
+    elif raw_output:
+      typer.echo(Path(decision.path).read_text())
+    elif json_output:
       from supekku.scripts.lib.core.repo import find_repo_root
 
       repo_root = find_repo_root(root)
@@ -187,10 +255,18 @@ def show_adr(
 def show_policy(
   policy_id: Annotated[str, typer.Argument(help="Policy ID (e.g., POL-001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific policy."""
   try:
+    if sum([json_output, path_only, raw_output]) > 1:
+      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
     registry = PolicyRegistry(root=root)
     policy = registry.find(policy_id)
 
@@ -198,7 +274,11 @@ def show_policy(
       typer.echo(f"Error: Policy not found: {policy_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if json_output:
+    if path_only:
+      typer.echo(policy.path)
+    elif raw_output:
+      typer.echo(Path(policy.path).read_text())
+    elif json_output:
       from supekku.scripts.lib.core.repo import find_repo_root
 
       repo_root = find_repo_root(root)
@@ -217,10 +297,18 @@ def show_policy(
 def show_standard(
   standard_id: Annotated[str, typer.Argument(help="Standard ID (e.g., STD-001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific standard."""
   try:
+    if sum([json_output, path_only, raw_output]) > 1:
+      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
     registry = StandardRegistry(root=root)
     standard = registry.find(standard_id)
 
@@ -228,7 +316,11 @@ def show_standard(
       typer.echo(f"Error: Standard not found: {standard_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if json_output:
+    if path_only:
+      typer.echo(standard.path)
+    elif raw_output:
+      typer.echo(Path(standard.path).read_text())
+    elif json_output:
       from supekku.scripts.lib.core.repo import find_repo_root
 
       repo_root = find_repo_root(root)
@@ -295,13 +387,17 @@ def show_template(
 @app.command("card")
 def show_card(
   card_id: Annotated[str, typer.Argument(help="Card ID (e.g., T123)")],
-  quiet: Annotated[
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[
     bool,
     typer.Option(
-      "--quiet",
+      "--path",
       "-q",
       help="Print only the path (for scripting)",
     ),
+  ] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
   anywhere: Annotated[
     bool,
@@ -315,12 +411,22 @@ def show_card(
 ) -> None:
   """Show detailed information about a specific card."""
   try:
+    if sum([json_output, path_only, raw_output]) > 1:
+      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
     registry = CardRegistry(root=root)
 
-    if quiet:
-      # Path-only output for -q flag
+    if path_only:
+      # Path-only output for --path/-q flag
       path = registry.resolve_path(card_id, anywhere=anywhere)
       typer.echo(path)
+    elif raw_output:
+      path = registry.resolve_path(card_id, anywhere=anywhere)
+      typer.echo(Path(path).read_text())
+    elif json_output:
+      card = registry.resolve_card(card_id, anywhere=anywhere)
+      typer.echo(json.dumps(card.to_dict(), indent=2))
     else:
       # Full card details
       card = registry.resolve_card(card_id, anywhere=anywhere)

@@ -1944,7 +1944,7 @@ requirements:
     primary_spec: PROD-013
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -1962,10 +1962,11 @@ requirements:
     primary_spec: PROD-013
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-024
     verified_by: []
     coverage_evidence:
     - VT-002
@@ -1979,7 +1980,7 @@ requirements:
     primary_spec: PROD-013
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -1997,7 +1998,7 @@ requirements:
     primary_spec: PROD-013
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -2015,10 +2016,11 @@ requirements:
     primary_spec: PROD-013
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-025
     verified_by: []
     coverage_evidence:
     - VT-005
@@ -2031,7 +2033,7 @@ requirements:
     primary_spec: PROD-013
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -2048,13 +2050,14 @@ requirements:
     primary_spec: PROD-013
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-022
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-007
     path: specify/product/PROD-013/PROD-013.md
   PROD-013.NF-001:
     label: NF-001

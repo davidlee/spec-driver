@@ -1855,6 +1855,8 @@ def list_cards(
       help="Show all cards including done/archived (default hides done/archived)",
     ),
   ] = False,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
   json_output: Annotated[
     bool,
@@ -1867,6 +1869,7 @@ def list_cards(
   """List kanban cards with optional filtering.
 
   By default, hides cards in done/ and archived/ lanes. Use --all to show everything.
+  The --regexp flag does pattern matching on ID and title fields.
   """
   # --json flag overrides --format
   if json_output:
@@ -1888,6 +1891,16 @@ def list_cards(
       # Filter out done/archived unless --all specified
       if not all_lanes:
         cards = [c for c in cards if c.lane not in ("done", "archived")]
+
+    # Apply regexp filter on id, title
+    if regexp:
+      try:
+        cards = [
+          c for c in cards if matches_regexp(regexp, [c.id, c.title], case_insensitive)
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
 
     if not cards:
       raise typer.Exit(EXIT_SUCCESS)

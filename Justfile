@@ -25,6 +25,5 @@ publish:
   uv build
   rm dist/.gitignore
   uv publish
-
 sort-size:
   @fd '[^_test].py' supekku | xargs wc -l --total=never| tr ' ' 0 | sed -E 's/0s/ s/' | sort | sed -E 's/^0+//'

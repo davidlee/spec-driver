@@ -9,6 +9,7 @@ Create commands for specs, deltas, requirements, revisions, and ADRs.
 ## Functions
 
 - @app.command(adr) `create_adr(title, status, author, author_email, root) -> None`: Create a new ADR with the next available ID.
+- @app.command(card) `create_card(description, lane, root) -> None`: Create a new kanban card with the next available ID.
 - @app.command(delta) `create_delta_cmd(name, specs, requirements, allow_missing_plan, from_backlog) -> None`: Create a Delta bundle with optional plan scaffolding.
 
 Can create from scratch with a title, or populate from a backlog item

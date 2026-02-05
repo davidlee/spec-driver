@@ -63,9 +63,7 @@ Returns:
 
 Raises:
     NodeRuntimeNotAvailableError: If Node.js is not available
-- @staticmethod `is_bun_available() -> bool`: Check if bun is available in PATH.
 - @staticmethod `is_node_available() -> bool`: Check if Node.js is available in PATH.
-- @staticmethod `is_pnpm_available() -> bool`: Check if pnpm is available in PATH.
 - `supports_identifier(self, identifier) -> bool`: Check if identifier looks like a TypeScript/JavaScript module.
 
 Args:
@@ -73,17 +71,19 @@ Args:
 
 Returns:
     True if identifier appears to be a TypeScript/JavaScript path
-- @staticmethod `_detect_package_manager(path) -> str`: Detect package manager from lockfile.
+- `__init__(self, repo_root) -> None`: Initialize TypeScriptAdapter with caching for npm_utils calls.
+- `_discover_requested(self, repo_root, requested) -> list[SourceUnit]`: Discover specific requested modules.
+- `_ensure_ts_doc_extract_available(self, package_root) -> bool`: Check if ts-doc-extract is available (local or global), with caching.
 
-Walks up directory tree to find lockfile.
-Priority: pnpm > bun > npm
+Checks for ts-doc-extract in node_modules/.bin (if package_root provided)
+and in global PATH. Caches result per adapter instance to avoid repeated
+subprocess calls.
 
 Args:
-    path: Starting path (file or directory)
+    package_root: Package root to check for local installation (optional)
 
 Returns:
-    Package manager name: 'pnpm', 'bun', or 'npm'
-- `_discover_requested(self, repo_root, requested) -> list[SourceUnit]`: Discover specific requested modules.
+    True if ts-doc-extract is available, False otherwise
 - `_extract_ast(self, file_path, variant) -> dict`: Extract AST data from TypeScript/JavaScript file via ts-doc-extract.
 
 Args:
@@ -140,11 +140,15 @@ Returns:
     Generated markdown string
 - `_get_npx_command(self, package_root) -> list[str]`: Get the appropriate npx command based on package manager.
 
+Uses npm_utils to detect package manager and build command with --yes flags
+to prevent interactive install prompts. Caches PackageManagerInfo per adapter
+instance to avoid repeated subprocess calls.
+
 Args:
     package_root: Package root directory
 
 Returns:
-    Command to run npx equivalent (pnpm dlx, bunx, or npx)
+    Command to run npx equivalent (pnpm dlx, bunx, or npx) with --yes flags
 - `_should_skip_file(self, file_path) -> bool`: Check if a TypeScript/JavaScript file should be skipped.
 
 Args:

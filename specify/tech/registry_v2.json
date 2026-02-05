@@ -7,6 +7,7 @@
       "supekku/scripts/cli": "SPEC-112",
       "supekku/scripts/lib/backlog": "SPEC-113",
       "supekku/scripts/lib/blocks/metadata": "SPEC-114",
+      "supekku/scripts/lib/cards": "SPEC-130",
       "supekku/scripts/lib/changes/blocks": "SPEC-115",
       "supekku/scripts/lib/core/frontmatter_metadata": "SPEC-116",
       "supekku/scripts/lib/decisions": "SPEC-117",

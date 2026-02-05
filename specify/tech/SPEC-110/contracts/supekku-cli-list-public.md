@@ -15,16 +15,20 @@ Display formatting is delegated to supekku.scripts.lib.formatters
 
 The --regexp flag filters on title and summary fields.
 Other flags filter on specific structured fields (status, tags, references).
-- @app.command(backlog) `list_backlog(root, kind, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog items with optional filtering.
+- @app.command(backlog) `list_backlog(root, kind, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager) -> None`: List backlog items with optional filtering.
 
-By default, items are sorted by priority (registry order → severity → ID).
-Use --order-by-id to sort chronologically by ID instead.
+By default, items are sorted by priority (registry order → severity → ID) and
+resolved/implemented items are excluded. Use --all to include all statuses.
+Use --order to sort by: id, severity, status, or kind.
 
 Use --prioritize to open the filtered items in your editor for interactive reordering.
 After saving, the registry will be updated with your new ordering.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID and title fields.
+- @app.command(cards) `list_cards(root, lane, all_lanes, format_type, json_output) -> None`: List kanban cards with optional filtering.
+
+By default, hides cards in done/ and archived/ lanes. Use --all to show everything.
 - @app.command(changes) `list_changes(root, kind, substring, status, applies_to, regexp, case_insensitive, format_type, json_output, truncate, paths, relations, applies, plan) -> None`: List change artifacts (deltas, revisions, audits) with optional filters.
 
 The --filter flag does substring matching (case-insensitive).
@@ -33,19 +37,25 @@ The --regexp flag does pattern matching on ID, slug, and name fields.
 
 The --regexp flag filters on ID, name, and slug fields.
 The --implements flag filters by requirement ID (reverse relationship query).
-- @app.command(improvements) `list_improvements(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog improvements with optional filtering.
+- @app.command(improvements) `list_improvements(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager) -> None`: List backlog improvements with optional filtering.
 
 Shortcut for: list backlog --kind improvement
-- @app.command(issues) `list_issues(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog issues with optional filtering.
+
+By default, resolved/implemented items are excluded. Use --all to show all.
+- @app.command(issues) `list_issues(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager) -> None`: List backlog issues with optional filtering.
 
 Shortcut for: list backlog --kind issue
+
+By default, resolved/implemented items are excluded. Use --all to show all.
 - @app.command(policies) `list_policies(root, status, tag, spec, delta, requirement_filter, standard, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List policies with optional filtering.
 
 The --regexp flag filters on title and summary fields.
 Other flags filter on specific structured fields (status, tags, references).
-- @app.command(problems) `list_problems(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog problems with optional filtering.
+- @app.command(problems) `list_problems(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager) -> None`: List backlog problems with optional filtering.
 
 Shortcut for: list backlog --kind problem
+
+By default, resolved/implemented items are excluded. Use --all to show all.
 - @app.command(requirements) `list_requirements(root, spec, status, kind, category, verified_by, substring, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List requirements with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
@@ -57,9 +67,11 @@ Use --case-insensitive (-i) to make regexp and category filters case-insensitive
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
-- @app.command(risks) `list_risks(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order_by_id, prioritize) -> None`: List backlog risks with optional filtering.
+- @app.command(risks) `list_risks(root, status, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager) -> None`: List backlog risks with optional filtering.
 
 Shortcut for: list backlog --kind risk
+
+By default, resolved/implemented items are excluded. Use --all to show all.
 - @app.command(specs) `list_specs(root, kind, status, substring, package_filter, package_path, for_path, informed_by, regexp, case_insensitive, format_type, json_output, truncate, paths, packages) -> None`: List SPEC/PROD artifacts with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).

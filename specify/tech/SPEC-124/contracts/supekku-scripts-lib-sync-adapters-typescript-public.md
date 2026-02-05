@@ -63,9 +63,7 @@ Returns:
 
 Raises:
     NodeRuntimeNotAvailableError: If Node.js is not available
-- @staticmethod `is_bun_available() -> bool`: Check if bun is available in PATH.
 - @staticmethod `is_node_available() -> bool`: Check if Node.js is available in PATH.
-- @staticmethod `is_pnpm_available() -> bool`: Check if pnpm is available in PATH.
 - `supports_identifier(self, identifier) -> bool`: Check if identifier looks like a TypeScript/JavaScript module.
 
 Args:

@@ -9,6 +9,7 @@ Show commands for displaying detailed information about artifacts.
 ## Functions
 
 - @app.command(adr) `show_adr(decision_id, json_output, root) -> None`: Show detailed information about a specific decision/ADR.
+- @app.command(card) `show_card(card_id, quiet, anywhere, root) -> None`: Show detailed information about a specific card.
 - @app.command(delta) `show_delta(delta_id, json_output, root) -> None`: Show detailed information about a delta.
 - @app.command(policy) `show_policy(policy_id, json_output, root) -> None`: Show detailed information about a specific policy.
 - @app.command(requirement) `show_requirement(req_id, json_output, root) -> None`: Show detailed information about a requirement.

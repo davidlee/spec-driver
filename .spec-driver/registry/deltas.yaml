@@ -2147,6 +2147,14 @@ deltas:
           - Added _ensure_ts_doc_extract_available() method
           - All TypeScriptAdapter tests updated and passing
           - Manual sync test succeeds with and without ts-doc-extract
+          status: completed
+          completion_date: '2025-11-10'
+          notes: 'Code implementation and automated testing complete. Refactored _get_npx_command(),
+            deleted 3 duplicate methods, added availability checking with caching,
+            updated generate() with pre-flight validation. 27/27 tests passing, all
+            quality gates met.
+
+            '
         - id: IP-019-P03
           name: Phase 03 - Installer & final verification
           objective: Add optional dependency checking to installer, run full verification
@@ -2189,35 +2197,105 @@ deltas:
         tasks:
         - id: '1.1'
           description: Create npm_utils.py stub and test file
-          status: pending
+          status: completed
         - id: '1.2'
           description: TDD - Package manager availability checks
-          status: pending
+          status: completed
         - id: '1.3'
           description: TDD - Package manager detection from lockfiles
-          status: pending
+          status: completed
         - id: '1.4'
           description: TDD - PackageManagerInfo dataclass and get_package_manager_info()
-          status: pending
+          status: completed
         - id: '1.5'
           description: TDD - is_npm_package_available() with local/global detection
-          status: pending
+          status: completed
         - id: '1.6'
           description: TDD - get_install_instructions() message generation
-          status: pending
+          status: completed
         - id: '1.7'
           description: Run full test suite and lint checks
-          status: pending
+          status: completed
         risks:
         - risk: Package manager command syntax may vary across versions
           mitigation: Document tested versions in tests, add comments with version
             info
+          status: mitigated
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-019.PHASE-02
+        plan: IP-019
+        delta: DE-019
+        objective: Refactor TypeScriptAdapter to use npm_utils module, add pre-flight
+          dependency validation, and ensure graceful degradation when ts-doc-extract
+          is missing.
+        entrance_criteria:
+        - Phase 1 complete (npm_utils module available and tested)
+        - All Phase 1 tests passing (32 tests)
+        - npm_utils functions exported from supekku/scripts/lib/core/__init__.py
+        exit_criteria:
+        - TypeScriptAdapter refactored to use npm_utils.get_package_manager_info()
+        - Removed duplicate code: is_pnpm_available(), is_bun_available(), _detect_package_manager()
+        - Added _ensure_ts_doc_extract_available() method with caching
+        - Updated _get_npx_command() to use PackageManagerInfo.build_npx_command with
+          --yes flags
+        - Updated generate() to call _ensure_ts_doc_extract_available() at start
+        - TypeScript files skipped gracefully with actionable warning when ts-doc-extract
+          missing
+        - All TypeScriptAdapter tests updated and passing
+        - Manual sync test succeeds with and without ts-doc-extract
+        verification:
+          tests:
+          - VT-019-002: Unit tests for TypeScriptAdapter graceful degradation
+          - VT-019-004: Existing TypeScriptAdapter tests updated to mock npm_utils
+          evidence:
+          - pytest output showing all TypeScriptAdapter tests passing
+          - Manual test: sync without ts-doc-extract shows warning and skips TypeScript
+              files
+          - Manual test: sync with ts-doc-extract generates contracts successfully
+        tasks:
+        - id: '2.1'
+          description: Refactor _get_npx_command() to use npm_utils.get_package_manager_info()
+          status: pending
+        - id: '2.2'
+          description: Remove duplicate methods (is_pnpm_available, is_bun_available,
+            _detect_package_manager)
+          status: pending
+        - id: '2.3'
+          description: Add _ensure_ts_doc_extract_available() method with instance-level
+            caching
+          status: pending
+        - id: '2.4'
+          description: Update generate() to validate ts-doc-extract availability upfront
+          status: pending
+        - id: '2.5'
+          description: Update TypeScriptAdapter tests to mock npm_utils, add degradation
+            tests
+          status: pending
+        - id: '2.6'
+          description: Run full verification (tests + manual sync)
+          status: pending
+        risks:
+        - risk: Existing TypeScriptAdapter tests may break during refactor
+          mitigation: Run tests after each incremental change, fix immediately
+          status: open
+        - risk: npm_utils caching may not align with TypeScriptAdapter lifecycle
+          mitigation: Use instance variable _ts_doc_extract_available for per-adapter
+            caching
           status: mitigated
       - id: IP-019-P02
         name: Phase 02 - TypeScriptAdapter refactor
         objective: Update TypeScriptAdapter to use npm_utils, add dependency validation
         entrance_criteria: *id005
         exit_criteria: *id006
+        status: completed
+        completion_date: '2025-11-10'
+        notes: 'Code implementation and automated testing complete. Refactored _get_npx_command(),
+          deleted 3 duplicate methods, added availability checking with caching, updated
+          generate() with pre-flight validation. 27/27 tests passing, all quality
+          gates met.
+
+          '
         phase: IP-019-P02
       - id: IP-019-P03
         name: Phase 03 - Installer & final verification
@@ -2225,3 +2303,168 @@ deltas:
         entrance_criteria: *id007
         exit_criteria: *id008
         phase: IP-019-P03
+  DE-020:
+    kind: delta
+    status: completed
+    name: Delta - Add default filtering and pagination to backlog list command
+    slug: add-default-filtering-and-pagination-to-backlog-list-command
+    updated: '2025-11-08'
+    path: change/deltas/DE-020-add-default-filtering-and-pagination-to-backlog-list-command/DE-020.md
+    applies_to:
+      specs:
+      - SPEC-113
+      - SPEC-110
+      - PROD-010
+      requirements:
+      - ISSUE-025
+    plan:
+      id: IP-020
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-020
+        delta: DE-020
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-020-P01
+      phases:
+      - id: IP-020-P01
+        phase: IP-020-P01
+  DE-021:
+    kind: delta
+    status: completed
+    name: Delta - Card support (kanban board)
+    slug: kanban-card-support
+    updated: '2026-02-03'
+    path: change/deltas/DE-021-kanban-card-support/DE-021.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-021
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-021
+        delta: DE-021
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-021.PHASE-01
+        - id: IP-021.PHASE-02
+        - id: IP-021.PHASE-03
+        - id: IP-021.PHASE-01
+        - id: IP-021.PHASE-02
+        - id: IP-021.PHASE-03
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-021.PHASE-01
+        plan: IP-021
+        delta: DE-021
+        objective: Confirm architectural patterns, lock CLI behaviors, and resolve
+          open design questions
+        entrance_criteria:
+        - Delta DE-021 exists with clear scope
+        - IMPR-003 reviewed and understood
+        exit_criteria:
+        - Design decisions documented
+        - CLI command signatures locked
+        - Template requirements identified
+        - Ready to implement domain + CLI
+        verification:
+          tests: []
+          evidence:
+          - Design review completed
+          - Open questions resolved or documented
+        tasks:
+        - Review existing domain patterns (decisions, backlog)
+        - Confirm CLI thin orchestration pattern
+        - Identify template.md requirements
+        - Answer open design questions
+        risks:
+        - Missing kanban/template.md will block card creation
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-021.PHASE-02
+        plan: IP-021
+        delta: DE-021
+        objective: Implement card artifact support with domain package, formatters,
+          CLI commands, and comprehensive tests
+        entrance_criteria:
+        - Phase 1 complete with design locked
+        - Open questions resolved
+        - Test strategy confirmed
+        exit_criteria:
+        - All VT verification artifacts passing
+        - Domain + formatters + CLI implemented
+        - just passes (format/lint/test/pylint)
+        - Code follows SRP and thin CLI patterns
+        verification:
+          tests:
+          - VT-021-001 - ID parsing + lane detection + ambiguity rules
+          - VT-021-002 - next-ID allocation scans all lanes
+          - VT-021-003 - create card copies template and rewrites only H1/Created
+          - VT-021-004 - show card -q path-only behaviour and errors
+          - VT-021-005 - find card repo-wide filename matching
+          - VT-021-006 - list cards output formats (table/json/tsv)
+          evidence:
+          - All tests passing
+          - Linters passing
+          - Manual smoke test of create/list/show/find
+        tasks:
+        - 2.1 Create domain package structure
+        - 2.2 Implement Card model (TDD)
+        - 2.3 Implement CardRegistry discovery + ID parsing (TDD)
+        - 2.4 Implement next-ID allocation (TDD)
+        - 2.5 Implement card creation (TDD)
+        - 2.6 Implement card resolution (show) (TDD)
+        - 2.7 Create card formatters (TDD)
+        - 2.8 Add CLI create card command
+        - 2.9 Add CLI list cards command
+        - 2.10 Add CLI show card command
+        - 2.11 Add CLI find card command
+        - 2.12 Create kanban/template.md
+        - 2.13 Run tests and fix issues
+        - 2.14 Run linters and fix issues
+        risks:
+        - Template rewriting might affect user content
+        - Ambiguity handling needs careful error messages
+        - Lane validation needs clear errors
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-021.PHASE-03
+        plan: IP-021
+        delta: DE-021
+        objective: Execute manual verification (VH-021-001) and final quality checks
+          before delta completion
+        entrance_criteria:
+        - Phase 2 complete with all automated tests passing
+        - All linters passing
+        exit_criteria:
+        - VH-021-001 manual verification passed
+        - All quality gates confirmed
+        verification:
+          tests:
+          - VH-021-001 - Manual UX sanity test (create/list/show/find)
+          evidence:
+          - Manual test execution log
+          - All commands verified working
+        tasks:
+        - 3.1 Execute VH-021-001 manual verification
+        - 3.2 Run final quality checks (just)
+        - 3.3 Update phase documentation
+        risks: []

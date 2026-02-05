@@ -1567,6 +1567,525 @@ requirements:
     coverage_evidence:
     - VA-011-001
     path: specify/product/PROD-011/PROD-011.md
+  PROD-012.FR-001:
+    label: FR-001
+    title: System MUST generate API contract documentation from Go, Python, and TypeScript
+      source code using AST parsing
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-001
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-002:
+    label: FR-002
+    title: System MUST preserve all comments (package-level, function-level, inline)
+      in generated contracts
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-003:
+    label: FR-003
+    title: System MUST extract and represent complete type information including function
+      signatures, interfaces, type parameters, and optionality markers
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-004:
+    label: FR-004
+    title: System MUST distinguish and separately document public vs private vs test
+      interfaces
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-005:
+    label: FR-005
+    title: System MUST auto-generate stub tech specs for code not covered by existing
+      specs when running `sync` command
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-006:
+    label: FR-006
+    title: System MUST store generated contracts in `specify/tech/SPEC-nnn/contracts/`
+      directory within the corresponding tech spec bundle
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-007:
+    label: FR-007
+    title: System MUST provide `--check` mode that reports code requiring spec coverage
+      without modifying files
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-008:
+    label: FR-008
+    title: System MUST provide `--prune` flag that removes stub specs only when manual
+      specs exist covering same code
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-009:
+    label: FR-009
+    title: System MUST create symlink trees organizing contracts by-language and by-package
+      under `specify/tech/by-**/` directories
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-010:
+    label: FR-010
+    title: System MUST support filtering contract output by visibility level (public/private/test)
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-011:
+    label: FR-011
+    title: System MUST generate useful contracts from code without JSDoc, docstrings,
+      type hints, or special annotations
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-012:
+    label: FR-012
+    title: System MUST operate with zero configuration to produce meaningful contracts
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-013:
+    label: FR-013
+    title: System MUST record git SHA of last sync operation in tech spec frontmatter
+      (`git_shas.last_sync`) to enable drift detection
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-014:
+    label: FR-014
+    title: System MUST support recording git SHA when spec is reviewed and verified
+      as accurate (`git_shas.last_review`), enabling calculation of what code changes
+      need to be accounted for
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-015:
+    label: FR-015
+    title: System MUST map code to specs such that each piece of code belongs to exactly
+      one spec, with spec scope being cohesive and right-sized for the language
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-016:
+    label: FR-016
+    title: Symlink tree structures (`by-language/` and `by-package/`) MUST be intuitive,
+      easy to navigate, and follow unsurprising conventions matching developer mental
+      models
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-017:
+    label: FR-017
+    title: System MUST provide tooling to find corresponding spec from code file and
+      vice-versa (bidirectional navigation)
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.FR-018:
+    label: FR-018
+    title: System MUST provide tooling to navigate between code directories and spec
+      directories
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.NF-001:
+    label: NF-001
+    title: 'Generated contracts MUST be deterministic: identical source code MUST
+      produce byte-identical contract output'
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-002
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.NF-002:
+    label: NF-002
+    title: 'Contract generation MUST be idempotent: running `sync` multiple times
+      on unchanged code MUST produce no file modifications'
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.NF-003:
+    label: NF-003
+    title: Covered by VA-001 (performance benchmarks)
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VA-001
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.NF-004:
+    label: NF-004
+    title: Covered by VT-006 (legacy compatibility)
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-012.NF-005:
+    label: NF-005
+    title: Covered by VH-001 (human readability review)
+    specs:
+    - PROD-012
+    primary_spec: PROD-012
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-012/PROD-012.md
+  PROD-013.FR-001:
+    label: FR-001
+    title: All `show` subcommands MUST support `--path` flag that outputs only the
+      file path
+    specs:
+    - PROD-013
+    primary_spec: PROD-013
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-022
+    verified_by: []
+    coverage_evidence:
+    - VT-001
+    path: specify/product/PROD-013/PROD-013.md
+  PROD-013.FR-002:
+    label: FR-002
+    title: All `show` subcommands MUST support `--raw` flag that outputs raw file
+      content
+    specs:
+    - PROD-013
+    primary_spec: PROD-013
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-002
+    path: specify/product/PROD-013/PROD-013.md
+  PROD-013.FR-003:
+    label: FR-003
+    title: 'System MUST provide `view` command that opens artifact in `$PAGER` (fallback:
+      less, more)'
+    specs:
+    - PROD-013
+    primary_spec: PROD-013
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-023
+    verified_by: []
+    coverage_evidence:
+    - VT-003
+    path: specify/product/PROD-013/PROD-013.md
+  PROD-013.FR-004:
+    label: FR-004
+    title: 'System MUST provide `edit` command that opens artifact in `$EDITOR` (fallback:
+      $VISUAL, vi)'
+    specs:
+    - PROD-013
+    primary_spec: PROD-013
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-023
+    verified_by: []
+    coverage_evidence:
+    - VT-004
+    path: specify/product/PROD-013/PROD-013.md
+  PROD-013.FR-005:
+    label: FR-005
+    title: '`find` command MUST support all artifact types (spec, delta, adr, revision,
+      requirement, policy, standard), not just card'
+    specs:
+    - PROD-013
+    primary_spec: PROD-013
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-005
+    path: specify/product/PROD-013/PROD-013.md
+  PROD-013.FR-006:
+    label: FR-006
+    title: All `show` subcommands MUST support `--json` flag for structured output
+    specs:
+    - PROD-013
+    primary_spec: PROD-013
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-022
+    verified_by: []
+    coverage_evidence:
+    - VT-006
+    path: specify/product/PROD-013/PROD-013.md
+  PROD-013.FR-007:
+    label: FR-007
+    title: '`--json` output MUST include `path` field for all artifacts'
+    specs:
+    - PROD-013
+    primary_spec: PROD-013
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-022
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-013/PROD-013.md
+  PROD-013.NF-001:
+    label: NF-001
+    title: Path resolution MUST complete in <100ms for any artifact
+    specs:
+    - PROD-013
+    primary_spec: PROD-013
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-013/PROD-013.md
+  PROD-013.NF-002:
+    label: NF-002
+    title: CLI flag names MUST be consistent across all artifact types
+    specs:
+    - PROD-013
+    primary_spec: PROD-013
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-013/PROD-013.md
   SPEC-110.FR-001:
     label: FR-001
     title: CLI MUST provide single unified entry point (`spec-driver`) routing to

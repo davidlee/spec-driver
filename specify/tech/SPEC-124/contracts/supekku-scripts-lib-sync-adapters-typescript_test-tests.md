@@ -19,13 +19,11 @@ Test TypeScriptAdapter functionality.
 #### Methods
 
 - `setUp(self) -> None`: Set up test fixtures.
-- `test_deduplicates_identical_variants(self) -> None`: Test that internal.md is removed when identical to api.md.
+- `test_deduplicates_identical_variants(self) -> None`: Test that internal.md is removed when identical to api.md. - Should include install instructions
 - `test_describe_typescript_module_directory(self) -> None`: Test describe method for TypeScript directory module.
 - `test_describe_typescript_module_file(self) -> None`: Test describe method for TypeScript file.
-- `test_detect_package_manager_bun(self) -> None`: Test package manager detection finds bun.
-- `test_detect_package_manager_defaults_to_npm(self) -> None`: Test package manager detection defaults to npm when no lockfile found.
-- `test_detect_package_manager_npm(self) -> None`: Test package manager detection finds npm.
-- `test_detect_package_manager_pnpm(self) -> None`: Test package manager detection finds pnpm.
+- `test_ensure_ts_doc_extract_available_caching(self) -> None`: Test _ensure_ts_doc_extract_available caches result.
+- `test_ensure_ts_doc_extract_available_not_found(self) -> None`: Test _ensure_ts_doc_extract_available when package not found. - Not called again
 - `test_extract_ast_directory_no_index_raises_error(self) -> None`: Test AST extraction from directory without index file raises error.
 - `test_extract_ast_directory_with_index(self) -> None`: Test AST extraction from directory finds index.ts.
 - `test_extract_ast_invalid_json(self) -> None`: Test AST extraction handles invalid JSON output.
@@ -36,14 +34,13 @@ Test TypeScriptAdapter functionality.
 - `test_generate_markdown_simple(self) -> None`: Test markdown generation from AST data.
 - `test_generate_markdown_with_class(self) -> None`: Test markdown generation with class.
 - `test_generate_requires_node_runtime(self) -> None`: Test generate raises error when Node.js not available.
+- `test_generate_skips_gracefully_when_ts_doc_extract_missing(self) -> None`: Test generate skips with warning when ts-doc-extract not available.
 - `test_generate_validates_unit_language(self) -> None`: Test generate validates unit language.
-- `test_get_npx_command_bun(self) -> None`: Test npx command generation for bun.
-- `test_get_npx_command_fallback_to_npx(self) -> None`: Test npx command falls back to npx when package manager not available.
-- `test_get_npx_command_npm(self) -> None`: Test npx command generation for npm.
-- `test_get_npx_command_pnpm(self) -> None`: Test npx command generation for pnpm.
-- `test_is_bun_available(self) -> None`: Test bun availability detection.
+- `test_get_npx_command_bun(self) -> None`: Test npx command generation for bun using npm_utils.
+- `test_get_npx_command_fallback_to_npx(self) -> None`: Test npx command falls back to npx when preferred PM not available.
+- `test_get_npx_command_npm(self) -> None`: Test npx command generation for npm using npm_utils.
+- `test_get_npx_command_pnpm(self) -> None`: Test npx command generation for pnpm using npm_utils.
 - `test_is_node_available(self) -> None`: Test Node.js availability detection.
-- `test_is_pnpm_available(self) -> None`: Test pnpm availability detection.
 - `test_language_identifier(self) -> None`: Test that TypeScriptAdapter has correct language identifier.
 - `test_should_skip_file_build_dirs(self) -> None`: Test that files in build directories are skipped.
 - `test_should_skip_file_test_files(self) -> None`: Test that test files are skipped.

@@ -33,7 +33,7 @@ def sync(
     typer.Option(
       "--language",
       "-l",
-      help="Language to synchronize (go, python, or all)",
+      help="Language to synchronize (go, python, zig, or all)",
     ),
   ] = "all",
   existing: Annotated[
@@ -106,6 +106,7 @@ def sync(
   Unified command for multi-language spec synchronization. Supports:
   - Go (via gomarkdoc)
   - Python (via AST analysis)
+  - Zig (via doc comment parsing)
   - ADR/decision registry synchronization
   - Backlog priority registry synchronization
 
@@ -121,9 +122,9 @@ def sync(
     typer.echo(f"Tech spec directory not found: {tech_dir}", err=True)
     raise typer.Exit(EXIT_FAILURE)
 
-  if language not in ["go", "python", "all"]:
+  if language not in ["go", "python", "zig", "all"]:
     typer.echo(
-      f"Invalid language: {language}. Must be go, python, or all",
+      f"Invalid language: {language}. Must be go, python, zig, or all",
       err=True,
     )
     raise typer.Exit(EXIT_FAILURE)

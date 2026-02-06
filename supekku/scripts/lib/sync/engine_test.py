@@ -42,11 +42,12 @@ class TestSpecSyncEngine(unittest.TestCase):
     """Test engine initialization with default adapters."""
     engine = SpecSyncEngine(repo_root=self.repo_root, tech_dir=self.tech_dir)
 
-    # Should have default Go, Python, and TypeScript adapters
+    # Should have default Go, Python, TypeScript, and Zig adapters
     assert "go" in engine.adapters
     assert "python" in engine.adapters
     assert "typescript" in engine.adapters
-    assert len(engine.adapters) == 3
+    assert "zig" in engine.adapters
+    assert len(engine.adapters) == 4
 
   def test_initialization_with_custom_adapters(self) -> None:
     """Test engine initialization with custom adapters."""

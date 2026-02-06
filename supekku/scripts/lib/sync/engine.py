@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .adapters import GoAdapter, LanguageAdapter, PythonAdapter, TypeScriptAdapter
+from .adapters import (
+  GoAdapter,
+  LanguageAdapter,
+  PythonAdapter,
+  TypeScriptAdapter,
+  ZigAdapter,
+)
 from .models import SourceUnit, SyncOutcome
 
 if TYPE_CHECKING:
@@ -43,6 +49,7 @@ class SpecSyncEngine:
         "go": GoAdapter(repo_root),
         "python": PythonAdapter(repo_root),
         "typescript": TypeScriptAdapter(repo_root),
+        "zig": ZigAdapter(repo_root),
       }
 
     self.adapters = adapters

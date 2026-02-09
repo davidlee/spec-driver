@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 import yaml
 
 from supekku.scripts.lib.backlog.models import BacklogItem
+from supekku.scripts.lib.core import slugify
 from supekku.scripts.lib.core.paths import get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
@@ -189,19 +190,6 @@ def sync_backlog_registry(root: Path | None = None) -> dict[str, int]:
     "removed": len(orphaned_ids),
     "unchanged": len(existing_ids - orphaned_ids),
   }
-
-
-def slugify(value: str) -> str:
-  """Convert value to URL-friendly slug.
-
-  Args:
-    value: String to slugify.
-
-  Returns:
-    Lowercase slug with hyphens.
-  """
-  slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
-  return slug or "item"
 
 
 def next_identifier(entries: Iterable[Path], prefix: str) -> str:

@@ -32,6 +32,18 @@ Across all list commands, we use consistent flag patterns:
 
 ## Functions
 
+- `get_editor() -> <BinOp>`: Get editor command from environment or fallback.
+
+Resolution order: $EDITOR -> $VISUAL -> vi
+
+Returns:
+  Editor command string, or None if no editor available.
+- `get_pager() -> <BinOp>`: Get pager command from environment or fallback.
+
+Resolution order: $PAGER -> less -> more
+
+Returns:
+  Pager command string, or None if no pager available.
 - `matches_regexp(pattern, text_fields, case_insensitive) -> bool`: Check if any of the text fields match the given regexp pattern.
 
 Args:
@@ -44,6 +56,41 @@ Returns:
 
 Raises:
   re.error: If the pattern is invalid
+- `normalize_id(artifact_type, raw_id) -> str`: Normalize artifact ID by prepending prefix if raw_id is numeric-only.
+
+For artifact types with unambiguous prefixes, allows shorthand like '001' or '1'
+to be expanded to 'ADR-001' etc. Numeric IDs are zero-padded to 3 digits.
+
+Args:
+  artifact_type: The artifact type key (e.g., 'adr', 'delta')
+  raw_id: The user-provided ID (e.g., '001', 'ADR-001', 'foo')
+
+Returns:
+  Normalized ID with prefix, or original ID if not applicable.
+
+Examples:
+  >>> normalize_id("adr", "1")
+  'ADR-001'
+  >>> normalize_id("adr", "001")
+  'ADR-001'
+  >>> normalize_id("adr", "ADR-001")
+  'ADR-001'
+  >>> normalize_id("spec", "001")
+  '001'
+- `open_in_editor(path) -> None`: Open file in editor.
+
+Args:
+  path: Path to file to open
+
+Raises:
+  RuntimeError: If no editor is available
+- `open_in_pager(path) -> None`: Open file in pager.
+
+Args:
+  path: Path to file to open
+
+Raises:
+  RuntimeError: If no pager is available
 - `root_option_callback(value) -> Path`: Callback to process root directory option with auto-detection.
 
 Args:

@@ -22,18 +22,18 @@ class TestTitleSlug(unittest.TestCase):
 
   def test_simple_title(self) -> None:
     """Test slug creation from simple title."""
-    assert create_title_slug("Code must have tests") == "code-must-have-tests"
+    assert create_title_slug("Code must have tests") == "code_must_have_tests"
 
   def test_with_special_chars(self) -> None:
     """Test slug creation with special characters."""
-    assert create_title_slug("Don't store PII!") == "don-t-store-pii"
+    assert create_title_slug("Don't store PII!") == "don_t_store_pii"
 
   def test_multiple_spaces(self) -> None:
     """Test slug creation with multiple spaces."""
-    assert create_title_slug("Multiple   spaces   here") == "multiple-spaces-here"
+    assert create_title_slug("Multiple   spaces   here") == "multiple_spaces_here"
 
-  def test_leading_trailing_hyphens(self) -> None:
-    """Test slug strips leading/trailing hyphens."""
+  def test_leading_trailing_separators(self) -> None:
+    """Test slug strips leading/trailing separators."""
     assert create_title_slug("--test--") == "test"
 
 
@@ -135,7 +135,7 @@ class TestCreatePolicy(unittest.TestCase):
     result = create_policy(registry, options, sync_registry=False)
 
     assert result.policy_id == "POL-001"
-    assert result.filename == "POL-001-code-must-have-tests.md"
+    assert result.filename == "POL-001-code_must_have_tests.md"
     assert result.path.exists()
 
     # Verify file content

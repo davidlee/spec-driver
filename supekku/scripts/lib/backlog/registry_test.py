@@ -215,7 +215,7 @@ class BacklogLibraryTest(unittest.TestCase):
     save_backlog_registry(["ISSUE-002", "ISSUE-001"], root)
 
     # Delete ISSUE-002 and add new items
-    (root / "backlog" / "issues" / "ISSUE-002-second-issue" / "ISSUE-002.md").unlink()
+    (root / "backlog" / "issues" / "ISSUE-002-second_issue" / "ISSUE-002.md").unlink()
     create_backlog_entry("improvement", "First improvement")
     create_backlog_entry("issue", "Third issue")
 

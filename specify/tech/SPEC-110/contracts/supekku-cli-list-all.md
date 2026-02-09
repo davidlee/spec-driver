@@ -27,9 +27,10 @@ After saving, the registry will be updated with your new ordering.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID and title fields.
-- @app.command(cards) `list_cards(root, lane, all_lanes, format_type, json_output) -> None`: List kanban cards with optional filtering.
+- @app.command(cards) `list_cards(root, lane, all_lanes, regexp, case_insensitive, format_type, json_output) -> None`: List kanban cards with optional filtering.
 
 By default, hides cards in done/ and archived/ lanes. Use --all to show everything.
+The --regexp flag does pattern matching on ID and title fields.
 - @app.command(changes) `list_changes(root, kind, substring, status, applies_to, regexp, case_insensitive, format_type, json_output, truncate, paths, relations, applies, plan) -> None`: List change artifacts (deltas, revisions, audits) with optional filters.
 
 The --filter flag does substring matching (case-insensitive).

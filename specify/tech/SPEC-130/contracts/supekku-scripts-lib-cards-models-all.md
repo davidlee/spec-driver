@@ -20,6 +20,7 @@ Returns:
 
 Raises:
   ValueError: If ID cannot be parsed from filename
+- `to_dict(self) -> dict`: Convert card to dictionary for JSON serialization.
 - @staticmethod `_detect_lane_from_path(card_path) -> <BinOp>`: Detect lane from path (kanban/doing/T123.md -> 'doing').
 - @staticmethod `_parse_created_from_content(content) -> <BinOp>`: Parse Created: YYYY-MM-DD date from content.
 - @staticmethod `_parse_id_from_filename(card_path) -> str`: Extract T### ID from filename.

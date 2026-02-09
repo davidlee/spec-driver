@@ -8,7 +8,7 @@ from typing import Annotated
 
 import typer
 
-from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
+from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption, normalize_id
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.repo import find_repo_root
@@ -79,7 +79,7 @@ def show_spec(
 
 @app.command("delta")
 def show_delta(
-  delta_id: Annotated[str, typer.Argument(help="Delta ID (e.g., DE-003)")],
+  delta_id: Annotated[str, typer.Argument(help="Delta ID (e.g., DE-003, 003)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
   raw_output: Annotated[
@@ -93,12 +93,13 @@ def show_delta(
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
+    normalized_id = normalize_id("delta", delta_id)
     registry = ChangeRegistry(root=root, kind="delta")
     artifacts = registry.collect()
-    artifact = artifacts.get(delta_id)
+    artifact = artifacts.get(normalized_id)
 
     if not artifact:
-      typer.echo(f"Error: Delta not found: {delta_id}", err=True)
+      typer.echo(f"Error: Delta not found: {normalized_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
     if path_only:
@@ -118,7 +119,7 @@ def show_delta(
 
 @app.command("revision")
 def show_revision(
-  revision_id: Annotated[str, typer.Argument(help="Revision ID (e.g., RE-001)")],
+  revision_id: Annotated[str, typer.Argument(help="Revision ID (e.g., RE-001, 001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
   raw_output: Annotated[
@@ -132,12 +133,13 @@ def show_revision(
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
+    normalized_id = normalize_id("revision", revision_id)
     registry = ChangeRegistry(root=root, kind="revision")
     artifacts = registry.collect()
-    artifact = artifacts.get(revision_id)
+    artifact = artifacts.get(normalized_id)
 
     if not artifact:
-      typer.echo(f"Error: Revision not found: {revision_id}", err=True)
+      typer.echo(f"Error: Revision not found: {normalized_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
     if path_only:
@@ -211,7 +213,7 @@ def show_requirement(
 
 @app.command("adr")
 def show_adr(
-  decision_id: Annotated[str, typer.Argument(help="Decision ID (e.g., ADR-001)")],
+  decision_id: Annotated[str, typer.Argument(help="Decision ID (e.g., ADR-001, 001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
   raw_output: Annotated[
@@ -225,11 +227,12 @@ def show_adr(
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
+    normalized_id = normalize_id("adr", decision_id)
     registry = DecisionRegistry(root=root)
-    decision = registry.find(decision_id)
+    decision = registry.find(normalized_id)
 
     if not decision:
-      typer.echo(f"Error: Decision not found: {decision_id}", err=True)
+      typer.echo(f"Error: Decision not found: {normalized_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
     if path_only:
@@ -253,7 +256,7 @@ def show_adr(
 
 @app.command("policy")
 def show_policy(
-  policy_id: Annotated[str, typer.Argument(help="Policy ID (e.g., POL-001)")],
+  policy_id: Annotated[str, typer.Argument(help="Policy ID (e.g., POL-001, 001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
   raw_output: Annotated[
@@ -267,11 +270,12 @@ def show_policy(
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
+    normalized_id = normalize_id("policy", policy_id)
     registry = PolicyRegistry(root=root)
-    policy = registry.find(policy_id)
+    policy = registry.find(normalized_id)
 
     if not policy:
-      typer.echo(f"Error: Policy not found: {policy_id}", err=True)
+      typer.echo(f"Error: Policy not found: {normalized_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
     if path_only:
@@ -295,7 +299,7 @@ def show_policy(
 
 @app.command("standard")
 def show_standard(
-  standard_id: Annotated[str, typer.Argument(help="Standard ID (e.g., STD-001)")],
+  standard_id: Annotated[str, typer.Argument(help="Standard ID (e.g., STD-001, 001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
   raw_output: Annotated[
@@ -309,11 +313,12 @@ def show_standard(
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
+    normalized_id = normalize_id("standard", standard_id)
     registry = StandardRegistry(root=root)
-    standard = registry.find(standard_id)
+    standard = registry.find(normalized_id)
 
     if not standard:
-      typer.echo(f"Error: Standard not found: {standard_id}", err=True)
+      typer.echo(f"Error: Standard not found: {normalized_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
     if path_only:

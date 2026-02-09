@@ -8,7 +8,7 @@ from typing import Annotated
 
 import typer
 
-from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
+from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption, normalize_id
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.policies.registry import PolicyRegistry
@@ -48,18 +48,20 @@ def find_spec(
 
 @app.command("delta")
 def find_delta(
-  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., DE-*, DE-01?)")],
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., DE-*, 001)")],
   root: RootOption = None,
 ) -> None:
   """Find deltas matching ID pattern.
 
   Supports fnmatch patterns: * matches everything, ? matches single char.
-  Examples: DE-*, DE-00?, DE-02*
+  Also accepts numeric-only IDs (e.g., 001 -> DE-001).
+  Examples: DE-*, DE-00?, 001
   """
   try:
+    normalized_pattern = normalize_id("delta", pattern)
     registry = ChangeRegistry(root=root, kind="delta")
     for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, pattern):
+      if _matches_pattern(artifact_id, normalized_pattern):
         typer.echo(artifact.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
@@ -69,18 +71,20 @@ def find_delta(
 
 @app.command("adr")
 def find_adr(
-  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., ADR-*, ADR-00?)")],
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., ADR-*, 001)")],
   root: RootOption = None,
 ) -> None:
   """Find ADRs matching ID pattern.
 
   Supports fnmatch patterns: * matches everything, ? matches single char.
-  Examples: ADR-*, ADR-00?, ADR-01*
+  Also accepts numeric-only IDs (e.g., 001 -> ADR-001).
+  Examples: ADR-*, ADR-00?, 001
   """
   try:
+    normalized_pattern = normalize_id("adr", pattern)
     registry = DecisionRegistry(root=root)
     for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, pattern):
+      if _matches_pattern(artifact_id, normalized_pattern):
         typer.echo(artifact.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
@@ -90,18 +94,20 @@ def find_adr(
 
 @app.command("revision")
 def find_revision(
-  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., RE-*, RE-00?)")],
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., RE-*, 001)")],
   root: RootOption = None,
 ) -> None:
   """Find revisions matching ID pattern.
 
   Supports fnmatch patterns: * matches everything, ? matches single char.
-  Examples: RE-*, RE-00?, RE-01*
+  Also accepts numeric-only IDs (e.g., 001 -> RE-001).
+  Examples: RE-*, RE-00?, 001
   """
   try:
+    normalized_pattern = normalize_id("revision", pattern)
     registry = ChangeRegistry(root=root, kind="revision")
     for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, pattern):
+      if _matches_pattern(artifact_id, normalized_pattern):
         typer.echo(artifact.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
@@ -111,18 +117,20 @@ def find_revision(
 
 @app.command("policy")
 def find_policy(
-  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., POL-*, POL-00?)")],
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., POL-*, 001)")],
   root: RootOption = None,
 ) -> None:
   """Find policies matching ID pattern.
 
   Supports fnmatch patterns: * matches everything, ? matches single char.
-  Examples: POL-*, POL-00?, POL-01*
+  Also accepts numeric-only IDs (e.g., 001 -> POL-001).
+  Examples: POL-*, POL-00?, 001
   """
   try:
+    normalized_pattern = normalize_id("policy", pattern)
     registry = PolicyRegistry(root=root)
     for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, pattern):
+      if _matches_pattern(artifact_id, normalized_pattern):
         typer.echo(artifact.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
@@ -132,18 +140,20 @@ def find_policy(
 
 @app.command("standard")
 def find_standard(
-  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., STD-*, STD-00?)")],
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., STD-*, 001)")],
   root: RootOption = None,
 ) -> None:
   """Find standards matching ID pattern.
 
   Supports fnmatch patterns: * matches everything, ? matches single char.
-  Examples: STD-*, STD-00?, STD-01*
+  Also accepts numeric-only IDs (e.g., 001 -> STD-001).
+  Examples: STD-*, STD-00?, 001
   """
   try:
+    normalized_pattern = normalize_id("standard", pattern)
     registry = StandardRegistry(root=root)
     for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, pattern):
+      if _matches_pattern(artifact_id, normalized_pattern):
         typer.echo(artifact.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:

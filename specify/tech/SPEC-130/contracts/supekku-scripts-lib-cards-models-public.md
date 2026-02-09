@@ -20,3 +20,4 @@ Returns:
 
 Raises:
   ValueError: If ID cannot be parsed from filename
+- `to_dict(self) -> dict`: Convert card to dictionary for JSON serialization.

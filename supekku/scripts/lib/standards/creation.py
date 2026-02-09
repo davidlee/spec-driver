@@ -10,6 +10,7 @@ from pathlib import Path
 import yaml
 from jinja2 import Template
 
+from supekku.scripts.lib.core import slugify
 from supekku.scripts.lib.core.paths import get_templates_dir
 from supekku.scripts.lib.core.templates import extract_template_body
 from supekku.scripts.lib.standards.registry import StandardRegistry
@@ -67,7 +68,7 @@ def create_title_slug(title: str) -> str:
   Returns:
     Lowercase slug with hyphens.
   """
-  return re.sub(r"[^a-zA-Z0-9]+", "-", title.lower()).strip("-")
+  return slugify(title)
 
 
 def build_standard_frontmatter(

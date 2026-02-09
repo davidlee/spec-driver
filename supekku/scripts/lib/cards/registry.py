@@ -7,6 +7,8 @@ from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
 
+from supekku.scripts.lib.core import slugify
+
 from .models import Card
 
 VALID_LANES = {"backlog", "doing", "done"}
@@ -120,7 +122,7 @@ class CardRegistry:
     card_content = self._rewrite_template(template_content, card_id, description)
 
     # Create card file
-    slug = description.lower().replace(" ", "-")[:40]
+    slug = slugify(description)[:40]
     card_filename = f"{card_id}-{slug}.md"
     lane_dir = self.kanban_dir / lane
     lane_dir.mkdir(parents=True, exist_ok=True)

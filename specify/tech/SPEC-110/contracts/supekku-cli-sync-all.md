@@ -17,6 +17,7 @@ Unified synchronization command for specs, ADRs, and registries.
 Unified command for multi-language spec synchronization. Supports:
 - Go (via gomarkdoc)
 - Python (via AST analysis)
+- Zig (via doc comment parsing)
 - ADR/decision registry synchronization
 - Backlog priority registry synchronization
 

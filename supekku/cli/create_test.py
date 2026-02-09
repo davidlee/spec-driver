@@ -146,7 +146,7 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     issue_dir = self.root / "backlog" / "issues"
     dirs = list(issue_dir.iterdir())
     assert len(dirs) == 1
-    assert "complex-issue-title-with-spaces" in dirs[0].name
+    assert "complex_issue_title_with_spaces" in dirs[0].name
 
   def test_create_issue_json_output(self) -> None:
     """Test creating an issue with --json flag returns valid JSON."""

@@ -16,6 +16,7 @@ from supekku.scripts.lib.blocks.relationships import (
   render_spec_relationships_block,
 )
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
+from supekku.scripts.lib.core import slugify
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, get_templates_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.core.templates import (
@@ -286,18 +287,6 @@ def determine_next_identifier(base_dir: Path, prefix: str) -> str:
       except ValueError:
         continue
   return f"{prefix}-{highest + 1:03d}"
-
-
-def slugify(name: str) -> str:
-  """Convert name to URL-friendly slug.
-
-  Args:
-    name: Human-readable name.
-
-  Returns:
-    Lowercase slug with hyphens.
-  """
-  return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
 
 def extract_template_body(path: Path) -> str:

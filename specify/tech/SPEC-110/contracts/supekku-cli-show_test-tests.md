@@ -4,6 +4,18 @@ Tests for show CLI commands.
 
 ## Classes
 
+### ShowCardJsonFlagTest
+
+Test cases for --json flag on show card command.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`: Set up test environment.
+- `test_show_card_json_flag(self) -> None`: Test --json flag on show card.
+- `test_show_card_path_flag_alias(self) -> None`: Test -q alias still works for --path flag.
+
 ### ShowDeltaCommandTest
 
 Test cases for show delta CLI command.
@@ -22,6 +34,37 @@ Test cases for show delta CLI command.
 - `test_show_delta_not_found(self) -> None`: Test error when delta ID does not exist.
 - `test_show_delta_text_includes_task_completion(self) -> None`: Test that text output includes task completion stats for phases.
 - `test_show_delta_text_output(self) -> None`: Test showing delta in text format (default).
+
+### ShowPathFlagTest
+
+Test cases for --path flag on show commands.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`: Set up test environment.
+- `test_path_and_json_mutually_exclusive(self) -> None`: Test that --path and --json are mutually exclusive.
+- `test_show_adr_path_flag(self) -> None`: Test --path flag on show adr. - Single line
+- `test_show_delta_path_flag(self) -> None`: Test --path flag returns only the path.
+- `test_show_spec_path_flag(self) -> None`: Test --path flag on show spec.
+
+### ShowRawFlagTest
+
+Test cases for --raw flag on show commands.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`: Set up test environment.
+- `test_all_three_flags_mutually_exclusive(self) -> None`: Test that --raw, --json, and --path together fail.
+- `test_raw_and_json_mutually_exclusive(self) -> None`: Test that --raw and --json are mutually exclusive.
+- `test_raw_and_path_mutually_exclusive(self) -> None`: Test that --raw and --path are mutually exclusive.
+- `test_show_adr_raw_flag(self) -> None`: Test --raw flag on show adr.
+- `test_show_delta_raw_flag(self) -> None`: Test --raw flag outputs raw file content.
+- `test_show_raw_flag_in_help(self) -> None`: Test that --raw flag is documented in help.
+- `test_show_spec_raw_flag(self) -> None`: Test --raw flag on show spec.
 
 ### ShowTemplateCommandTest
 

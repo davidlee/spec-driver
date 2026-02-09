@@ -10,6 +10,7 @@ This package contains foundational utilities depended upon by all other domains:
 - go_utils: Go toolchain utilities
 - npm_utils: npm package manager utilities
 - editor: Editor invocation utilities
+- strings: String manipulation utilities
 """
 
 from __future__ import annotations
@@ -33,6 +34,7 @@ from .npm_utils import (
   is_npm_package_available,
   is_pnpm_available,
 )
+from .strings import slugify
 
 __all__: list[str] = [
   "EditorError",
@@ -50,4 +52,5 @@ __all__: list[str] = [
   "is_npm_package_available",
   "is_pnpm_available",
   "parse_multi_value_filter",
+  "slugify",
 ]

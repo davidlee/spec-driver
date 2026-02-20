@@ -27,3 +27,12 @@ decisions:
     - architecture
     - data-model
     - governance
+  ADR-003:
+    id: ADR-003
+    title: 'ADR-003: Separate unit and assembly specs'
+    status: draft
+    path: specify/decisions/ADR-003-separate_unit_and_assembly_specs.md
+    summary: ''
+    created: '2026-02-20'
+    updated: '2026-02-20'
+    reviewed: '2026-02-20'

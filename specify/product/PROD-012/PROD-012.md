@@ -174,6 +174,16 @@ entries:
     requirement: PROD-012.NF-003
     status: planned
     notes: CLI tool performance benchmarks
+  - artefact: VH-905
+    kind: VH
+    requirement: PROD-012.FR-005
+    status: blocked
+    notes: "Invalidated by ADR-003 + RE-016: sync defaults should be contracts-first and spec auto-creation should be opt-in with a persisted marker."
+  - artefact: VH-906
+    kind: VH
+    requirement: PROD-012.FR-006
+    status: blocked
+    notes: "Invalidated by PROD-014/RE-015 direction: canonical contract storage is `.contracts/**`; legacy SPEC bundle storage is compatibility-only (to be specified)."
 ```
 
 ## 1. Intent & Summary
@@ -305,11 +315,11 @@ See `supekku:spec.capabilities@v1` block above for detailed capability definitio
 - **FR-004**: System MUST distinguish and separately document public vs private vs test interfaces
   *Verification*: VT-001 - Visibility filtering tests
 
-- **FR-005**: System MUST auto-generate stub tech specs for code not covered by existing specs when running `sync` command
-  *Verification*: VT-003 - Stub generation tests
+- **FR-005**: System MUST support auto-generating stub tech specs for uncovered code, but spec auto-creation MUST be opt-in (persisted per-repo) rather than a first-run default.
+  *Verification*: VH-905 - Invalidated-by note (sync defaults revision); follow-up delta will introduce new VT coverage.
 
-- **FR-006**: System MUST store generated contracts in `specify/tech/SPEC-nnn/contracts/` directory within the corresponding tech spec bundle
-  *Verification*: VT-003 - Contract organization tests
+- **FR-006**: System MUST store the canonical generated contracts corpus under `.contracts/**` (mirror-of-source layout), with any legacy `specify/tech/SPEC-*/contracts/` paths treated as compatibility-only.
+  *Verification*: VH-906 - Invalidated-by note (canonical storage revision); follow-up delta will introduce new VT coverage.
 
 - **FR-007**: System MUST provide `--check` mode that reports code requiring spec coverage without modifying files
   *Verification*: VT-004 - Check mode validation tests

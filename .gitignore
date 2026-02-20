@@ -224,6 +224,9 @@ __pycache__
 
 /scratch
 
+# Generated contract mirror tree (rebuilt by sync)
+/.contracts
+
 
 # we install over these
 /.claude/commands

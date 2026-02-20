@@ -77,13 +77,6 @@ Args:
 
 Note:
   Creates parent directories if needed. Uses atomic write via temporary file.
-- `slugify(value) -> str`: Convert value to URL-friendly slug.
-
-Args:
-  value: String to slugify.
-
-Returns:
-  Lowercase slug with hyphens.
 - `sync_backlog_registry(root) -> dict[Tuple[str, int]]`: Sync backlog registry with filesystem.
 
 Discovers all backlog items, merges with existing registry ordering,

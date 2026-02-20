@@ -2089,6 +2089,160 @@ requirements:
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-013/PROD-013.md
+  PROD-014.FR-001:
+    label: FR-001
+    title: System MUST generate a repo-root `.contracts/` directory as a deterministic,
+      rebuildable index of generated contracts.
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-027
+    verified_by: []
+    coverage_evidence:
+    - VT-CONTRACT-MIRROR-001
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-002:
+    label: FR-002
+    title: System MUST mirror repo-relative source paths inside `.contracts/<view>/...`
+      and use symlinks to point at the underlying contract markdown artefacts under
+      `specify/tech/SPEC-*/contracts/`.
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-027
+    verified_by: []
+    coverage_evidence:
+    - VT-CONTRACT-MIRROR-002
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-003:
+    label: FR-003
+    title: 'For each supported language, the index builder MUST map registered source
+      units to mirror paths using language-appropriate rules:'
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-027
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-004:
+    label: FR-004
+    title: 'System MUST create idiom alias paths as symlinks:'
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-027
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-005:
+    label: FR-005
+    title: Rebuilding the mirror MUST remove stale entries and MUST only write within
+      `.contracts/` (no changes elsewhere in the repo).
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-027
+    verified_by: []
+    coverage_evidence:
+    - VT-CONTRACT-MIRROR-003
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-006:
+    label: FR-006
+    title: Mirror generation MUST be driven by existing registry + existing contract
+      outputs, without requiring code parsing or toolchain execution (beyond reading
+      contract markdown for mapping when required).
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-027
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-007:
+    label: FR-007
+    title: 'Mirror generation MUST handle missing/absent variants gracefully:'
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-027
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.NF-001:
+    label: NF-001
+    title: 'Mirror rebuild MUST be fast enough for interactive use (target: <2s for
+      ~10k contract artefacts on a typical dev machine; linear in number of artefacts).'
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.NF-002:
+    label: NF-002
+    title: '`.contracts/` MUST be safe to `.gitignore` entirely without breaking core
+      spec-driver operations (it is a derived index/view).'
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-014/PROD-014.md
   SPEC-110.FR-001:
     label: FR-001
     title: CLI MUST provide single unified entry point (`spec-driver`) routing to

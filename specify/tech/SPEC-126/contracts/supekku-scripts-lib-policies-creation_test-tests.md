@@ -46,7 +46,7 @@ Tests for create_title_slug function.
 
 #### Methods
 
-- `test_leading_trailing_hyphens(self) -> None`: Test slug strips leading/trailing hyphens.
+- `test_leading_trailing_separators(self) -> None`: Test slug strips leading/trailing separators.
 - `test_multiple_spaces(self) -> None`: Test slug creation with multiple spaces.
 - `test_simple_title(self) -> None`: Test slug creation from simple title.
 - `test_with_special_chars(self) -> None`: Test slug creation with special characters.

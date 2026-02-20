@@ -61,13 +61,6 @@ Returns:
 
 Raises:
   RepositoryRootNotFoundError: If repository root cannot be found.
-- `slugify(name) -> str`: Convert name to URL-friendly slug.
-
-Args:
-  name: Human-readable name.
-
-Returns:
-  Lowercase slug with hyphens.
 
 ## Classes
 

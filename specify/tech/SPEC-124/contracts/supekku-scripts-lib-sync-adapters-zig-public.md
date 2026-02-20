@@ -5,6 +5,7 @@ Zig language adapter for specification synchronization.
 ## Functions
 
 - `is_zig_available() -> bool`: Check if zig compiler is available in PATH.
+- `is_zigmarkdoc_available() -> bool`: Check if zigmarkdoc is available in PATH.
 
 ## Classes
 
@@ -34,9 +35,7 @@ Args:
 
 Returns:
     List of SourceUnit objects for Zig packages/modules
-- `generate(self, unit) -> list[DocVariant]`: Generate documentation for a Zig package/module.
-
-Uses `zig build-exe --emit=docs` or autodoc when available.
+- `generate(self, unit) -> list[DocVariant]`: Generate documentation for a Zig package/module using zigmarkdoc.
 
 Args:
     unit: Zig source unit
@@ -45,6 +44,10 @@ Args:
 
 Returns:
     List of DocVariant objects with generation results
+
+Raises:
+    ZigmarkdocNotAvailableError: If zigmarkdoc is not available
+    FileNotFoundError: If source path does not exist
 - `supports_identifier(self, identifier) -> bool`: Check if identifier looks like a Zig path.
 
 Args:
@@ -56,5 +59,11 @@ Returns:
 ### ZigToolchainNotAvailableError
 
 Raised when Zig toolchain is required but not available.
+
+**Inherits from:** RuntimeError
+
+### ZigmarkdocNotAvailableError
+
+Raised when zigmarkdoc is required but not available.
 
 **Inherits from:** RuntimeError

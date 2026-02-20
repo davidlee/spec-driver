@@ -5,6 +5,7 @@ Zig language adapter for specification synchronization.
 ## Functions
 
 - `is_zig_available() -> bool`: Check if zig compiler is available in PATH.
+- `is_zigmarkdoc_available() -> bool`: Check if zigmarkdoc is available in PATH.
 
 ## Classes
 
@@ -34,9 +35,7 @@ Args:
 
 Returns:
     List of SourceUnit objects for Zig packages/modules
-- `generate(self, unit) -> list[DocVariant]`: Generate documentation for a Zig package/module.
-
-Uses `zig build-exe --emit=docs` or autodoc when available.
+- `generate(self, unit) -> list[DocVariant]`: Generate documentation for a Zig package/module using zigmarkdoc.
 
 Args:
     unit: Zig source unit
@@ -45,6 +44,10 @@ Args:
 
 Returns:
     List of DocVariant objects with generation results
+
+Raises:
+    ZigmarkdocNotAvailableError: If zigmarkdoc is not available
+    FileNotFoundError: If source path does not exist
 - `supports_identifier(self, identifier) -> bool`: Check if identifier looks like a Zig path.
 
 Args:
@@ -52,41 +55,24 @@ Args:
 
 Returns:
     True if identifier appears to be a Zig source path
-- `_extract_declaration(self, line) -> <BinOp>`: Extract declaration name from a pub line.
+- `_find_zig_files(self, root) -> list[Path]`: Find Zig source files.
 
-Args:
-    line: Line starting with 'pub '
-
-Returns:
-    Declaration signature or None
-- `_find_zig_modules(self, root) -> list[Path]`: Find Zig modules (directories with .zig files).
-
-Returns directories containing .zig files that are likely modules.
-- `_generate_zig_docs(self, source_path) -> str`: Generate markdown documentation for Zig source.
-
-Parses Zig files and extracts doc comments and public declarations.
-
-Args:
-    source_path: Path to Zig source file or directory
-
-Returns:
-    Markdown documentation string
+Returns individual .zig files (Zig is per-file, not per-directory).
 - `_is_zig_package(self, path) -> bool`: Check if directory is a Zig package.
 
 A Zig package is identified by:
 - build.zig in the directory
 - src/ subdirectory with .zig files
 - build.zig.zon (Zig package manifest)
-- `_parse_zig_file(self, zig_file) -> list[str]`: Parse a Zig file and extract documentation.
-
-Args:
-    zig_file: Path to .zig file
-
-Returns:
-    List of documentation lines
 
 ### ZigToolchainNotAvailableError
 
 Raised when Zig toolchain is required but not available.
+
+**Inherits from:** RuntimeError
+
+### ZigmarkdocNotAvailableError
+
+Raised when zigmarkdoc is required but not available.
 
 **Inherits from:** RuntimeError

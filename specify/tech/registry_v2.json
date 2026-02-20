@@ -9,6 +9,7 @@
       "supekku/scripts/lib/blocks/metadata": "SPEC-114",
       "supekku/scripts/lib/cards": "SPEC-130",
       "supekku/scripts/lib/changes/blocks": "SPEC-115",
+      "supekku/scripts/lib/contracts": "SPEC-131",
       "supekku/scripts/lib/core/frontmatter_metadata": "SPEC-116",
       "supekku/scripts/lib/decisions": "SPEC-117",
       "supekku/scripts/lib/deletion": "SPEC-118",

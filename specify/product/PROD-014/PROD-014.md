@@ -85,20 +85,44 @@ entries:
   - artefact: VT-CONTRACT-MIRROR-001
     kind: VT
     requirement: PROD-014.FR-001
-    status: planned
-    notes: Creates `.contracts/` and populates expected variant roots.
+    status: verified
+    notes: "Integration tests: .contracts/ creation, variant view dirs, alias symlinks (mirror_test.py)"
+
+  - artefact: VT-CONTRACT-MIRROR-001
+    kind: VT
+    requirement: PROD-014.FR-004
+    status: verified
+    notes: "test_rebuild_creates_aliases, test_alias_not_created_for_empty_view"
 
   - artefact: VT-CONTRACT-MIRROR-002
     kind: VT
     requirement: PROD-014.FR-002
-    status: planned
-    notes: Verifies language-specific path mapping (go package, python module, ts file, zig file).
+    status: verified
+    notes: "Integration tests: Python, Zig, Go, TS mirror symlinks resolve to correct contract artefacts"
+
+  - artefact: VT-CONTRACT-MIRROR-002
+    kind: VT
+    requirement: PROD-014.FR-003
+    status: verified
+    notes: "Unit tests: per-language path mapping (python module, zig file, go package, ts file, zig root __root__)"
 
   - artefact: VT-CONTRACT-MIRROR-003
     kind: VT
     requirement: PROD-014.FR-005
-    status: planned
-    notes: Verifies rebuild cleans stale links, preserves determinism, and never writes outside `.contracts/`.
+    status: verified
+    notes: "test_write_confinement, test_rebuild_cleans_stale, test_rebuild_removes_all_stale_views, test_rebuild_is_idempotent"
+
+  - artefact: VT-CONTRACT-MIRROR-002
+    kind: VT
+    requirement: PROD-014.FR-006
+    status: verified
+    notes: "Builder reads only registry JSON + contract directories; no toolchain invocation. Verified by test design."
+
+  - artefact: VT-CONTRACT-MIRROR-002
+    kind: VT
+    requirement: PROD-014.FR-007
+    status: verified
+    notes: "test_missing_variant (Zig/TS), test_conflict_resolution (deterministic SPEC ID precedence + warning)"
 ```
 
 ## 1. Intent & Summary

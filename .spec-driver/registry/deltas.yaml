@@ -2844,3 +2844,229 @@ deltas:
         risks: []
       - id: IP-025-P01
         phase: IP-025-P01
+  DE-026:
+    kind: delta
+    status: draft
+    name: Delta - Use zigmarkdoc for Zig documentation generation
+    slug: use_zigmarkdoc_for_zig_documentation_generation
+    updated: '2026-02-16'
+    path: change/deltas/DE-026-use_zigmarkdoc_for_zig_documentation_generation/DE-026.md
+    applies_to:
+      specs:
+      - SPEC-124
+      requirements: []
+    plan:
+      id: IP-026
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-026
+        delta: DE-026
+        revision_links:
+          aligns_with:
+          - DR-026
+        specs:
+          primary:
+          - SPEC-124
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-026-P01
+        - id: IP-026-P02
+        - id: IP-026-P03
+        - id: IP-026.PHASE-01
+        - id: IP-026.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-026.PHASE-01
+        plan: IP-026
+        delta: DE-026
+        objective: Replace manual Zig doc parser with zigmarkdoc subprocess calls
+        entrance_criteria:
+        - Design revision approved
+        - Open questions resolved
+        - zigmarkdoc tool available at ~/.local/bin/zigmarkdoc
+        exit_criteria:
+        - Code refactored to use zigmarkdoc
+        - Obsolete methods removed
+        - Basic functionality working (contracts generate)
+        - Code passes lint
+        verification:
+          tests:
+          - Manual verification: uv run spec-driver sync --language zig
+          evidence:
+          - Generated contracts using zigmarkdoc
+        tasks:
+        - id: '1.1'
+          description: Add zigmarkdoc availability check and error class
+        - id: '1.2'
+          description: Update describe() to return both public and all variants
+        - id: '1.3'
+          description: Refactor generate() to call zigmarkdoc subprocess
+        - id: '1.4'
+          description: Remove obsolete manual parser methods
+        - id: '1.5'
+          description: Lint and manual test
+        risks:
+        - risk: zigmarkdoc output format incompatible with expected structure
+          mitigation: Follow GoAdapter pattern closely
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-026.PHASE-02
+        plan: IP-026
+        delta: DE-026
+        objective: Comprehensive test coverage for zigmarkdoc integration
+        entrance_criteria:
+        - Phase 1 complete (core implementation done)
+        exit_criteria:
+        - All tests passing (13/13)
+        - Ruff lint clean
+        - Pylint 9.67/10
+        verification:
+          tests:
+          - uv run pytest supekku/scripts/lib/sync/adapters/zig_test.py -v
+          evidence:
+          - 13 passing tests covering all ZigAdapter functionality
+        tasks:
+        - id: '2.1'
+          description: Create zig_test.py following GoAdapter pattern
+        risks: []
+      - id: IP-026-P01
+        phase: IP-026-P01
+      - id: IP-026-P02
+        phase: IP-026-P02
+      - id: IP-026-P03
+        phase: IP-026-P03
+  DE-027:
+    kind: delta
+    status: completed
+    name: Delta - Contract mirror tree index
+    slug: contract_mirror_tree_index
+    updated: '2026-02-20'
+    path: change/deltas/DE-027-contract_mirror_tree_index/DE-027.md
+    applies_to:
+      specs:
+      - PROD-014
+      requirements:
+      - PROD-014.FR-001
+      - PROD-014.FR-002
+      - PROD-014.FR-003
+      - PROD-014.FR-004
+      - PROD-014.FR-005
+      - PROD-014.FR-006
+      - PROD-014.FR-007
+    plan:
+      id: IP-027
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-027
+        delta: DE-027
+        revision_links:
+          aligns_with:
+          - DR-027
+        specs:
+          primary:
+          - PROD-014
+          collaborators:
+          - SPEC-110
+          - SPEC-123
+        requirements:
+          targets:
+          - PROD-014.FR-001
+          - PROD-014.FR-002
+          - PROD-014.FR-003
+          - PROD-014.FR-004
+          - PROD-014.FR-005
+          - PROD-014.FR-006
+          - PROD-014.FR-007
+          dependencies: []
+        phases:
+        - id: IP-027-P01
+        - id: IP-027-P02
+        - id: IP-027.PHASE-01
+        - id: IP-027.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-027.PHASE-01
+        plan: IP-027
+        delta: DE-027
+        objective: Implement ContractMirrorTreeBuilder with per-language path mapping
+          functions (Python + Zig tested, Go/TS architectural). Unit and integration
+          tests passing, linters clean.
+        entrance_criteria:
+        - Delta and design revision drafted (DE-027, DR-027)
+        - Reference implementation understood (SpecIndexBuilder)
+        - Contract naming conventions confirmed from filesystem
+        exit_criteria:
+        - ContractMirrorTreeBuilder produces correct .contracts/ tree for Python contracts
+        - Per-language path mapping functions implemented and tested
+        - Zig mapping implemented (testable via fixtures)
+        - Go/TS mappers implemented architecturally with fixture tests
+        - Unit + integration tests pass (just test)
+        - Linters clean (just lint, just pylint)
+        verification:
+          tests:
+          - VT-CONTRACT-MIRROR-001
+          - VT-CONTRACT-MIRROR-002
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Create contracts package with per-language path mapping functions
+          status: pending
+        - id: '1.2'
+          description: Implement ContractMirrorTreeBuilder core
+          status: pending
+        - id: '1.3'
+          description: Unit tests for path mapping (all languages)
+          status: pending
+        - id: '1.4'
+          description: Integration tests for tree building (Python contracts)
+          status: pending
+        - id: '1.5'
+          description: Lint and final checks
+          status: pending
+        risks:
+        - description: Python contract header format may vary
+          mitigation: Confirmed from real files; header is always "# dotted.module.name"
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-027.PHASE-02
+        plan: IP-027
+        delta: DE-027
+        objective: Wire ContractMirrorTreeBuilder into sync CLI, add .gitignore entry,
+          write VT-CONTRACT-MIRROR-003 tests for write confinement and stale view
+          cleanup.
+        entrance_criteria:
+        - Phase 1 complete (builder + mapping + tests)
+        exit_criteria:
+        - sync CLI invokes mirror builder after index rebuild
+        - .contracts/ in .gitignore
+        - VT-CONTRACT-MIRROR-003 tests passing
+        - Full test suite green, linters clean
+        verification:
+          tests:
+          - VT-CONTRACT-MIRROR-003
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Wire mirror builder into sync CLI
+          status: complete
+        - id: '2.2'
+          description: Add .contracts/ to .gitignore
+          status: complete
+        - id: '2.3'
+          description: Write VT-CONTRACT-MIRROR-003 tests
+          status: complete
+        - id: '2.4'
+          description: Final lint and test
+          status: complete
+        risks: []
+      - id: IP-027-P01
+        phase: IP-027-P01
+      - id: IP-027-P02
+        phase: IP-027-P02

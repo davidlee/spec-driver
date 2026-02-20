@@ -2098,7 +2098,7 @@ requirements:
     primary_spec: PROD-014
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -2117,7 +2117,7 @@ requirements:
     primary_spec: PROD-014
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -2135,13 +2135,14 @@ requirements:
     primary_spec: PROD-014
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-027
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-CONTRACT-MIRROR-002
     path: specify/product/PROD-014/PROD-014.md
   PROD-014.FR-004:
     label: FR-004
@@ -2151,13 +2152,14 @@ requirements:
     primary_spec: PROD-014
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-027
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-CONTRACT-MIRROR-001
     path: specify/product/PROD-014/PROD-014.md
   PROD-014.FR-005:
     label: FR-005
@@ -2168,7 +2170,7 @@ requirements:
     primary_spec: PROD-014
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -2187,13 +2189,14 @@ requirements:
     primary_spec: PROD-014
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-027
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-CONTRACT-MIRROR-002
     path: specify/product/PROD-014/PROD-014.md
   PROD-014.FR-007:
     label: FR-007
@@ -2203,13 +2206,14 @@ requirements:
     primary_spec: PROD-014
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-027
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-CONTRACT-MIRROR-002
     path: specify/product/PROD-014/PROD-014.md
   PROD-014.NF-001:
     label: NF-001

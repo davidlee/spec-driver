@@ -498,6 +498,15 @@ def _sync_specs(
     spec_manager.save_registry()
     typer.echo("✓ Symlink indices updated")
 
+    # Rebuild contract mirror tree
+    from supekku.scripts.lib.contracts import ContractMirrorTreeBuilder
+
+    mirror_builder = ContractMirrorTreeBuilder(root, tech_dir)
+    mirror_warnings = mirror_builder.rebuild()
+    for warning in mirror_warnings:
+      typer.echo(f"  Warning: {warning}", err=True)
+    typer.echo("✓ Contract mirror tree updated")
+
   return {
     "success": True,
     "processed": processed_count,

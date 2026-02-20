@@ -24,9 +24,18 @@ class ZigToolchainNotAvailableError(RuntimeError):
   """Raised when Zig toolchain is required but not available."""
 
 
+class ZigmarkdocNotAvailableError(RuntimeError):
+  """Raised when zigmarkdoc is required but not available."""
+
+
 def is_zig_available() -> bool:
   """Check if zig compiler is available in PATH."""
   return which("zig") is not None
+
+
+def is_zigmarkdoc_available() -> bool:
+  """Check if zigmarkdoc is available in PATH."""
+  return which("zigmarkdoc") is not None
 
 
 class ZigAdapter(LanguageAdapter):
@@ -60,30 +69,24 @@ class ZigAdapter(LanguageAdapter):
 
     return False
 
-  def _find_zig_modules(self, root: Path) -> list[Path]:
-    """Find Zig modules (directories with .zig files).
+  def _find_zig_files(self, root: Path) -> list[Path]:
+    """Find Zig source files.
 
-    Returns directories containing .zig files that are likely modules.
+    Returns individual .zig files (Zig is per-file, not per-directory).
     """
-    modules = []
-    seen_dirs: set[Path] = set()
+    zig_files = []
 
     for zig_file in root.rglob("*.zig"):
       if self._should_skip_path(zig_file):
         continue
 
-      parent = zig_file.parent
-      if parent in seen_dirs:
-        continue
-      seen_dirs.add(parent)
-
-      # Skip test directories
-      if "test" in parent.name.lower() and parent.name != "test":
+      # Skip test files
+      if "test" in zig_file.name.lower():
         continue
 
-      modules.append(parent)
+      zig_files.append(zig_file)
 
-    return sorted(modules)
+    return sorted(zig_files)
 
   def discover_targets(
     self,
@@ -132,13 +135,13 @@ class ZigAdapter(LanguageAdapter):
           ),
         )
 
-      # Find other Zig modules
-      for module_dir in self._find_zig_modules(repo_root):
-        # Skip root if already added
-        if module_dir == repo_root:
+      # Find other Zig files
+      for zig_file in self._find_zig_files(repo_root):
+        # Skip build.zig if root package already added
+        if self._is_zig_package(repo_root) and zig_file.name == "build.zig":
           continue
 
-        rel_path = module_dir.relative_to(repo_root)
+        rel_path = zig_file.relative_to(repo_root)
 
         # Skip vendor, zig-cache, zig-out directories
         rel_str = str(rel_path)
@@ -169,11 +172,16 @@ class ZigAdapter(LanguageAdapter):
     """
     self._validate_unit_language(unit)
 
-    # Generate slug parts from path
+    # Generate slug parts from file path (Zig is per-file)
+    # e.g., "src/utils.zig" -> ["src", "utils-zig"]
     if unit.identifier == ".":
       slug_parts = ["root"]
     else:
-      slug_parts = unit.identifier.replace("\\", "/").split("/")
+      path_parts = unit.identifier.replace("\\", "/").split("/")
+      # Replace .zig extension with -zig in the filename
+      if path_parts[-1].endswith(".zig"):
+        path_parts[-1] = path_parts[-1].replace(".zig", "-zig")
+      slug_parts = path_parts
 
     # Default frontmatter for Zig packages
     default_frontmatter = {
@@ -185,16 +193,31 @@ class ZigAdapter(LanguageAdapter):
           "variants": [
             {
               "name": "public",
-              "path": "contracts/zig/public.md",
+              "path": "contracts/interfaces.md",
+            },
+            {
+              "name": "internal",
+              "path": "contracts/internals.md",
             },
           ],
         },
       ],
     }
 
-    # Document variants
+    # Document variants that will be generated
     variants = [
-      self._create_doc_variant("public", slug_parts, "zig"),
+      DocVariant(
+        name="public",
+        path=Path("contracts/interfaces.md"),
+        hash="",
+        status="unchanged",
+      ),
+      DocVariant(
+        name="internal",
+        path=Path("contracts/internals.md"),
+        hash="",
+        status="unchanged",
+      ),
     ]
 
     return SourceDescriptor(
@@ -210,9 +233,7 @@ class ZigAdapter(LanguageAdapter):
     spec_dir: Path,
     check: bool = False,
   ) -> list[DocVariant]:
-    """Generate documentation for a Zig package/module.
-
-    Uses `zig build-exe --emit=docs` or autodoc when available.
+    """Generate documentation for a Zig package/module using zigmarkdoc.
 
     Args:
         unit: Zig source unit
@@ -221,206 +242,207 @@ class ZigAdapter(LanguageAdapter):
 
     Returns:
         List of DocVariant objects with generation results
+
+    Raises:
+        ZigmarkdocNotAvailableError: If zigmarkdoc is not available
+        FileNotFoundError: If source path does not exist
     """
     self._validate_unit_language(unit)
 
-    # Determine output path
-    slug_parts = (
-      ["root"]
-      if unit.identifier == "."
-      else unit.identifier.replace("\\", "/").split("/")
-    )
-    contracts_dir = spec_dir / "contracts" / "zig"
-    output_file = contracts_dir / f"{'-'.join(slug_parts)}-public.md"
+    # Check if zigmarkdoc is available
+    if not is_zigmarkdoc_available():
+      raise ZigmarkdocNotAvailableError(
+        "zigmarkdoc not found in PATH. Please install it from: "
+        "https://github.com/davidlee/zigmarkdoc"
+      )
+
+    # Determine source path (should be a .zig file)
+    source_path = self.repo_root / unit.identifier
+    if not source_path.exists():
+      msg = f"Source path does not exist: {source_path}"
+      raise FileNotFoundError(msg)
+
+    # Verify it's a .zig file (Zig modules are per-file, not per-directory)
+    if not source_path.is_file() or source_path.suffix != ".zig":
+      msg = f"Source path must be a .zig file, got: {source_path}"
+      raise ValueError(msg)
+
+    # Determine output paths within spec directory
+    contracts_dir = spec_dir / "contracts"
+    public_output = contracts_dir / "interfaces.md"
+    internal_output = contracts_dir / "internals.md"
 
     variants = []
 
-    # Check if Zig is available
-    if not is_zig_available():
-      # Return placeholder variant when Zig isn't available
-      if spec_dir in output_file.parents:
-        out_path = output_file.relative_to(spec_dir)
-      else:
-        out_path = output_file
-      variants.append(
-        DocVariant(
-          name="public",
-          path=out_path,
-          hash="",
-          status="unchanged",  # No change possible without toolchain
-        ),
-      )
-      return variants
-
-    # Determine source path
-    source_path = self.repo_root / unit.identifier
-    if not source_path.exists():
-      variants.append(
-        DocVariant(
-          name="public",
-          path=Path(f"contracts/zig/{'-'.join(slug_parts)}-public.md"),
-          hash="",
-          status="unchanged",  # Source missing, no docs to generate
-        ),
-      )
-      return variants
-
-    # Generate documentation
+    # Generate public docs (interfaces)
     try:
-      contracts_dir.mkdir(parents=True, exist_ok=True)
-
-      # Check if file exists before generation
-      existed_before = output_file.exists()
-      old_hash = None
-      if existed_before:
-        old_content = output_file.read_text(encoding="utf-8")
-        old_hash = hashlib.sha256(old_content.encode("utf-8")).hexdigest()
-
-      # Generate basic documentation by parsing Zig files
-      doc_content = self._generate_zig_docs(source_path)
-
-      if check:
-        # In check mode, compare content
-        if not existed_before:
-          status = "created"
-        else:
-          new_hash = hashlib.sha256(doc_content.encode("utf-8")).hexdigest()
-          status = "unchanged" if new_hash == old_hash else "changed"
+      if check and not public_output.exists():
+        # In check mode, if file doesn't exist, it's missing
+        variants.append(
+          DocVariant(
+            name="public",
+            path=public_output.relative_to(spec_dir),
+            hash="",
+            status="created",  # Would be created
+          ),
+        )
       else:
-        # Write documentation
-        output_file.write_text(doc_content, encoding="utf-8")
+        # Generate or check public docs
+        contracts_dir.mkdir(parents=True, exist_ok=True)
 
-        content_hash = hashlib.sha256(doc_content.encode("utf-8")).hexdigest()
-        if not existed_before:
-          status = "created"
-        elif content_hash != old_hash:
-          status = "changed"
+        content_hash = ""
+        if check:
+          # Check mode - run zigmarkdoc --check
+          cmd = [
+            "zigmarkdoc",
+            "--check",
+            "--output",
+            str(public_output),
+            str(source_path),
+          ]
+          try:
+            subprocess.run(cmd, check=True, capture_output=True, text=True)
+            status = "unchanged"
+          except subprocess.CalledProcessError:
+            status = "changed"  # Would be changed
         else:
-          status = "unchanged"
+          # Check if file exists before generation
+          existed_before = public_output.exists()
+          old_hash = None
+          if existed_before:
+            old_content = public_output.read_text(encoding="utf-8")
+            old_hash = hashlib.sha256(
+              old_content.encode("utf-8"),
+            ).hexdigest()
 
-      doc_hash = "" if check else hashlib.sha256(
-        doc_content.encode("utf-8")
-      ).hexdigest()
+          # Generate mode
+          cmd = [
+            "zigmarkdoc",
+            "--output",
+            str(public_output),
+            str(source_path),
+          ]
+          subprocess.run(cmd, check=True, capture_output=True, text=True)
+
+          # Determine status by checking if file changed
+          content_hash = ""
+          if public_output.exists():
+            content = public_output.read_text(encoding="utf-8")
+            content_hash = hashlib.sha256(
+              content.encode("utf-8"),
+            ).hexdigest()
+
+            if not existed_before:
+              status = "created"
+            elif content_hash != old_hash:
+              status = "changed"
+            else:
+              status = "unchanged"
+          else:
+            status = "created"
+
+        variants.append(
+          DocVariant(
+            name="public",
+            path=public_output.relative_to(spec_dir),
+            hash=content_hash if not check else "",
+            status=status,
+          ),
+        )
+
+    except subprocess.CalledProcessError:
+      # Handle zigmarkdoc errors gracefully
       variants.append(
         DocVariant(
           name="public",
-          path=output_file.relative_to(spec_dir),
-          hash=doc_hash,
-          status=status,
+          path=public_output.relative_to(spec_dir) if public_output else Path(),
+          hash="",
+          status="unchanged",  # Error status would be handled at higher level
         ),
       )
 
-    except (subprocess.CalledProcessError, OSError):
+    # Generate internal docs (with private symbols)
+    try:
+      if check and not internal_output.exists():
+        variants.append(
+          DocVariant(
+            name="internal",
+            path=internal_output.relative_to(spec_dir),
+            hash="",
+            status="created",
+          ),
+        )
+      else:
+        content_hash = ""
+        if check:
+          cmd = [
+            "zigmarkdoc",
+            "--check",
+            "--include-private",
+            "--output",
+            str(internal_output),
+            str(source_path),
+          ]
+          try:
+            subprocess.run(cmd, check=True, capture_output=True, text=True)
+            status = "unchanged"
+          except subprocess.CalledProcessError:
+            status = "changed"
+        else:
+          # Check if file exists before generation
+          existed_before = internal_output.exists()
+          old_hash = None
+          if existed_before:
+            old_content = internal_output.read_text(encoding="utf-8")
+            old_hash = hashlib.sha256(
+              old_content.encode("utf-8"),
+            ).hexdigest()
+
+          cmd = [
+            "zigmarkdoc",
+            "--include-private",
+            "--output",
+            str(internal_output),
+            str(source_path),
+          ]
+          subprocess.run(cmd, check=True, capture_output=True, text=True)
+
+          if internal_output.exists():
+            content = internal_output.read_text(encoding="utf-8")
+            content_hash = hashlib.sha256(
+              content.encode("utf-8"),
+            ).hexdigest()
+
+            if not existed_before:
+              status = "created"
+            elif content_hash != old_hash:
+              status = "changed"
+            else:
+              status = "unchanged"
+          else:
+            status = "created"
+
+        variants.append(
+          DocVariant(
+            name="internal",
+            path=internal_output.relative_to(spec_dir),
+            hash=content_hash if not check else "",
+            status=status,
+          ),
+        )
+
+    except subprocess.CalledProcessError:
       variants.append(
         DocVariant(
-          name="public",
-          path=Path(f"contracts/zig/{'-'.join(slug_parts)}-public.md"),
+          name="internal",
+          path=internal_output.relative_to(spec_dir) if internal_output else Path(),
           hash="",
-          status="unchanged",  # Error during generation
+          status="unchanged",
         ),
       )
 
     return variants
 
-  def _generate_zig_docs(self, source_path: Path) -> str:
-    """Generate markdown documentation for Zig source.
-
-    Parses Zig files and extracts doc comments and public declarations.
-
-    Args:
-        source_path: Path to Zig source file or directory
-
-    Returns:
-        Markdown documentation string
-    """
-    lines = [f"# Zig Module: {source_path.name}", ""]
-
-    if source_path.is_file():
-      zig_files = [source_path]
-    else:
-      zig_files = sorted(source_path.glob("*.zig"))
-
-    for zig_file in zig_files:
-      if zig_file.name.startswith("_"):
-        continue
-
-      file_docs = self._parse_zig_file(zig_file)
-      if file_docs:
-        lines.append(f"## {zig_file.name}")
-        lines.append("")
-        lines.extend(file_docs)
-        lines.append("")
-
-    return "\n".join(lines)
-
-  def _parse_zig_file(self, zig_file: Path) -> list[str]:
-    """Parse a Zig file and extract documentation.
-
-    Args:
-        zig_file: Path to .zig file
-
-    Returns:
-        List of documentation lines
-    """
-    lines = []
-    try:
-      content = zig_file.read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
-      return lines
-
-    current_doc: list[str] = []
-    in_doc_comment = False
-
-    for line in content.splitlines():
-      stripped = line.strip()
-
-      # Collect doc comments (/// or //!)
-      if stripped.startswith("///") or stripped.startswith("//!"):
-        doc_text = stripped[3:].strip()
-        current_doc.append(doc_text)
-        in_doc_comment = True
-      elif in_doc_comment:
-        # Check if this is a public declaration
-        if stripped.startswith("pub "):
-          # Extract declaration
-          decl = self._extract_declaration(stripped)
-          if decl:
-            lines.append(f"### `{decl}`")
-            lines.append("")
-            if current_doc:
-              lines.extend(current_doc)
-              lines.append("")
-        current_doc = []
-        in_doc_comment = False
-
-    return lines
-
-  def _extract_declaration(self, line: str) -> str | None:
-    """Extract declaration name from a pub line.
-
-    Args:
-        line: Line starting with 'pub '
-
-    Returns:
-        Declaration signature or None
-    """
-    # Remove 'pub ' prefix
-    rest = line[4:].strip()
-
-    # Handle common declaration types
-    for keyword in ["fn ", "const ", "var ", "struct ", "enum ", "union "]:
-      if rest.startswith(keyword):
-        # Extract up to opening brace or equals
-        end_chars = ["{", "=", ";"]
-        end_idx = len(rest)
-        for char in end_chars:
-          idx = rest.find(char)
-          if idx != -1 and idx < end_idx:
-            end_idx = idx
-
-        return rest[:end_idx].strip()
-
-    return None
 
   def supports_identifier(self, identifier: str) -> bool:
     """Check if identifier looks like a Zig path.

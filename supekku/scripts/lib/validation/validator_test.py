@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import unittest
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.relations.manager import add_relation
@@ -36,6 +36,8 @@ class WorkspaceValidatorTest(RepoTestCase):
       "updated": "2024-06-01",
       "status": "draft",
       "kind": "spec",
+      "category": "assembly",
+      "c4_level": "component",
     }
     dump_markdown_file(
       spec_path,
@@ -412,6 +414,161 @@ class WorkspaceValidatorTest(RepoTestCase):
     warnings = [issue for issue in issues if issue.level == "warning"]
     assert len(info_msgs) == 0
     assert len(warnings) == 0
+
+  # -- Taxonomy validation tests (VT-030-005) --
+
+  def _write_tech_spec(
+    self,
+    root: Path,
+    spec_id: str,
+    *,
+    category: str = "",
+    c4_level: str = "",
+  ) -> None:
+    """Write a tech spec with optional taxonomy fields."""
+    spec_dir = root / "specify" / "tech" / f"{spec_id}-sample"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / f"{spec_id}.md"
+    frontmatter: dict[str, Any] = {
+      "id": spec_id,
+      "slug": "sample",
+      "name": f"Sample {spec_id}",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+    }
+    if category:
+      frontmatter["category"] = category
+    if c4_level:
+      frontmatter["c4_level"] = c4_level
+    dump_markdown_file(spec_path, frontmatter, f"# {spec_id}\n")
+
+  def _write_prod_spec(self, root: Path, spec_id: str) -> None:
+    """Write a product spec (no taxonomy expected)."""
+    spec_dir = root / "specify" / "product" / spec_id
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / f"{spec_id}.md"
+    frontmatter = {
+      "id": spec_id,
+      "slug": "sample",
+      "name": f"Sample {spec_id}",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "prod",
+    }
+    dump_markdown_file(spec_path, frontmatter, f"# {spec_id}\n")
+
+  def test_taxonomy_warns_missing_category(self) -> None:
+    """Tech spec without category emits a warning."""
+    root = self._create_repo()
+    self._write_tech_spec(root, "SPEC-500", c4_level="code")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    warnings = [i for i in issues if i.level == "warning" and "category" in i.message]
+    assert len(warnings) == 1
+    assert warnings[0].artifact == "SPEC-500"
+
+  def test_taxonomy_warns_missing_c4_level(self) -> None:
+    """Tech spec without c4_level emits a warning."""
+    root = self._create_repo()
+    self._write_tech_spec(root, "SPEC-501", category="assembly")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    warnings = [i for i in issues if i.level == "warning" and "c4_level" in i.message]
+    assert len(warnings) == 1
+    assert warnings[0].artifact == "SPEC-501"
+
+  def test_taxonomy_warns_both_missing(self) -> None:
+    """Tech spec missing both category and c4_level emits two warnings."""
+    root = self._create_repo()
+    self._write_tech_spec(root, "SPEC-502")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    warnings = [i for i in issues if i.level == "warning" and i.artifact == "SPEC-502"]
+    assert len(warnings) == 2
+
+  def test_taxonomy_warns_inconsistent_unit_non_code(self) -> None:
+    """category: unit with c4_level != code emits a warning."""
+    root = self._create_repo()
+    self._write_tech_spec(root, "SPEC-503", category="unit", c4_level="component")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    warnings = [
+      i for i in issues if i.level == "warning" and "inconsistent" in i.message.lower()
+    ]
+    assert len(warnings) == 1
+    assert warnings[0].artifact == "SPEC-503"
+
+  def test_taxonomy_no_warn_unit_code(self) -> None:
+    """category: unit with c4_level: code is consistent — no warning."""
+    root = self._create_repo()
+    self._write_tech_spec(root, "SPEC-504", category="unit", c4_level="code")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    taxonomy_warnings = [
+      i for i in issues if i.level == "warning" and i.artifact == "SPEC-504"
+    ]
+    assert len(taxonomy_warnings) == 0
+
+  def test_taxonomy_no_warn_assembly_component(self) -> None:
+    """category: assembly with c4_level: component is fine — no warning."""
+    root = self._create_repo()
+    self._write_tech_spec(root, "SPEC-505", category="assembly", c4_level="component")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    taxonomy_warnings = [
+      i for i in issues if i.level == "warning" and i.artifact == "SPEC-505"
+    ]
+    assert len(taxonomy_warnings) == 0
+
+  def test_taxonomy_no_warn_for_prod_spec(self) -> None:
+    """PROD spec missing taxonomy must not trigger warnings."""
+    root = self._create_repo()
+    self._write_prod_spec(root, "PROD-600")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    prod_warnings = [
+      i for i in issues if i.level == "warning" and i.artifact == "PROD-600"
+    ]
+    assert len(prod_warnings) == 0
+
+  def test_taxonomy_never_emits_errors(self) -> None:
+    """Taxonomy validation only emits warnings, never errors."""
+    root = self._create_repo()
+    # Worst case: missing both + inconsistent (if somehow both present)
+    self._write_tech_spec(root, "SPEC-506")
+    self._write_tech_spec(root, "SPEC-507", category="unit", c4_level="container")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    taxonomy_errors = [
+      i for i in issues if i.level == "error" and i.artifact in ("SPEC-506", "SPEC-507")
+    ]
+    assert len(taxonomy_errors) == 0
+
+  # -- Non-breaking regression (VT-030-006) --
+
+  def test_existing_specs_remain_valid_after_taxonomy_validation(self) -> None:
+    """Existing specs/paths remain valid when taxonomy validation is active."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-600", "FR-600")
+    self._write_tech_spec(root, "SPEC-601", category="unit", c4_level="code")
+    self._write_prod_spec(root, "PROD-700")
+
+    ws = Workspace(root)
+    # All specs loadable and accessible
+    all_specs = ws.specs.all_specs()
+    spec_ids = {s.id for s in all_specs}
+    assert "SPEC-600" in spec_ids
+    assert "SPEC-601" in spec_ids
+    assert "PROD-700" in spec_ids
+
+    # Validation runs without error
+    issues = validate_workspace(ws)
+    errors = [i for i in issues if i.level == "error"]
+    # Only SPEC-600 (no taxonomy) should produce warnings, not errors
+    assert not any(e.artifact in ("SPEC-600", "SPEC-601", "PROD-700") for e in errors)
 
 
 if __name__ == "__main__":

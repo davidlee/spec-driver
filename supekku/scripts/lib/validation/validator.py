@@ -113,6 +113,9 @@ class WorkspaceValidator:
     self._validate_decision_references(decisions, decision_ids)
     self._validate_decision_status_compatibility(decisions)
 
+    # Spec taxonomy validation (warn-only)
+    self._validate_spec_taxonomy()
+
     return list(self.issues)
 
   # --------------------------------------------------------------
@@ -197,6 +200,34 @@ class WorkspaceValidator:
             decision_id,
             f"References {related_decision.status} decision {related_id}",
           )
+
+  def _validate_spec_taxonomy(self) -> None:
+    """Warn when tech specs are missing taxonomy or have inconsistent values.
+
+    Scoped to tech specs (SPEC-*) only. PROD specs are excluded.
+    Emits warnings only — never errors.
+    """
+    for spec in self.workspace.specs.all_specs():
+      if spec.kind != "spec":
+        continue
+
+      if not spec.category:
+        self._warning(
+          spec.id,
+          "Tech spec is missing 'category' (expected: unit or assembly).",
+        )
+      if not spec.c4_level:
+        self._warning(
+          spec.id,
+          "Tech spec is missing 'c4_level' (expected: code, component, etc.).",
+        )
+
+      if spec.category == "unit" and spec.c4_level and spec.c4_level != "code":
+        self._warning(
+          spec.id,
+          f"Inconsistent taxonomy: category 'unit' typically implies "
+          f"c4_level 'code', but found '{spec.c4_level}'.",
+        )
 
 
 def validate_workspace(

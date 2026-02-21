@@ -1,10 +1,10 @@
 ---
 id: ADR-003
 title: 'ADR-003: Separate unit and assembly specs'
-status: draft
+status: accepted
 created: '2026-02-20'
-updated: '2026-02-20'
-reviewed: '2026-02-20'
+updated: '2026-02-21'
+reviewed: '2026-02-21'
 owners: []
 supersedes: []
 superseded_by: []
@@ -54,10 +54,22 @@ We intentionally avoid “module spec” because “module” varies across lang
 
 Keep existing spec IDs and storage (`SPEC-###` under `specify/tech/`) but require explicit classification via frontmatter:
 - `c4_level`: already supported by schema (`system|container|component|code|interaction`)
-- Add/standardize a `category` (or equivalent) to distinguish `unit` vs `assembly` (and allow future categories).
+- Standardize `category` to distinguish `unit` vs `assembly` (and allow future categories).
+
+Reserved `category` values for `kind: spec` (tech specs):
+- `unit`: 1:1 with a single language unit (file/module/package/folder as language-appropriate)
+- `assembly`: cross-unit (subsystem, integration boundary, functional slice)
+
+Default mapping (guidance, not a strict rule):
+- `category: unit` SHOULD imply `c4_level: code`
+- `category: assembly` SHOULD use `c4_level: component|container|system|interaction` depending on scope
 
 Tooling SHOULD provide “views” (indices) that separate these categories for navigation and automation, without requiring
 an immediate breaking migration.
+
+Sync-created unit specs MUST set:
+- `category: unit`
+- `c4_level: code`
 
 ### Filesystem / ID strategy (potential breaking v2, optional)
 
@@ -115,8 +127,9 @@ This reduces ambiguity and gives validation a hook to detect contradictory asser
   - Once opted in, subsequent `sync` runs default to that behavior (filesystem marker/config).
 
 ## References
-- `planning/2026-02-20-unit-vs-assembly-specs.md`
-- `planning/2026-02-20-sync-defaults-opt-in-specs.md`
 - `specify/product/PROD-012/PROD-012.md` (contract sync + spec stubbing goals)
 - `specify/product/PROD-014/PROD-014.md` (contracts corpus ergonomics)
+- `specify/product/PROD-015/PROD-015.md` (taxonomy + navigation intent)
 - `change/revisions/RE-015-contracts_canonical_storage_sync_less_generation/RE-015.md`
+- `change/revisions/RE-016-sync_defaults_contracts_first_opt_in_spec_creation/RE-016.md`
+- `change/deltas/DE-030-unit_vs_assembly_spec_classification/DE-030.md`

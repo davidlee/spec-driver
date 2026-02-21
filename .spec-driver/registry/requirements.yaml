@@ -1634,35 +1634,42 @@ requirements:
     path: specify/product/PROD-012/PROD-012.md
   PROD-012.FR-005:
     label: FR-005
-    title: System MUST auto-generate stub tech specs for code not covered by existing
-      specs when running `sync` command
+    title: System MUST support auto-generating stub tech specs for uncovered code,
+      but spec auto-creation MUST be opt-in (persisted per-repo) rather than a first-run
+      default.
     specs:
     - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
-    status: pending
+    status: in-progress
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-028
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VH-905
     path: specify/product/PROD-012/PROD-012.md
   PROD-012.FR-006:
     label: FR-006
-    title: System MUST store generated contracts in `specify/tech/SPEC-nnn/contracts/`
-      directory within the corresponding tech spec bundle
+    title: System MUST store the canonical generated contracts corpus under `.contracts/**`
+      (mirror-of-source layout), with any legacy `specify/tech/SPEC-*/contracts/`
+      paths treated as compatibility-only.
     specs:
     - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
-    status: pending
+    status: in-progress
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-028
+    - DE-029
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VH-906
     path: specify/product/PROD-012/PROD-012.md
   PROD-012.FR-007:
     label: FR-007
@@ -2110,8 +2117,7 @@ requirements:
   PROD-014.FR-002:
     label: FR-002
     title: System MUST mirror repo-relative source paths inside `.contracts/<view>/...`
-      and use symlinks to point at the underlying contract markdown artefacts under
-      `specify/tech/SPEC-*/contracts/`.
+      as the canonical navigation shape for contracts.
     specs:
     - PROD-014
     primary_spec: PROD-014
@@ -2215,6 +2221,96 @@ requirements:
     coverage_evidence:
     - VT-CONTRACT-MIRROR-002
     path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-008:
+    label: FR-008
+    title: System MUST support generating and storing contract artefacts as real files
+      under `.contracts/<view>/...` using the mirror-of-source path mapping rules
+      (FR-003).
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-029
+    verified_by: []
+    coverage_evidence:
+    - VT-CONTRACTS-STORAGE-001
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-009:
+    label: FR-009
+    title: System MUST support generating contracts for explicit targets without requiring
+      pre-existing specs or registry entries.
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CONTRACTS-GEN-001
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-010:
+    label: FR-010
+    title: "System SHOULD support generating contracts for \u201Call discoverable\
+      \ targets\u201D of a language without first creating/specifying SPEC bundles."
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-CONTRACTS-GEN-002
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-011:
+    label: FR-011
+    title: System SHOULD provide an explicit backwards-compatibility strategy for
+      legacy access paths.
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-029
+    verified_by: []
+    coverage_evidence:
+    - VT-CONTRACTS-COMPAT-001
+    path: specify/product/PROD-014/PROD-014.md
+  PROD-014.FR-012:
+    label: FR-012
+    title: System MUST warn when contract artefacts exist but `.contracts/**` generation
+      yields zero entries for their owning spec/source unit(s) (convention drift /
+      mapper mismatch).
+    specs:
+    - PROD-014
+    primary_spec: PROD-014
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-029
+    verified_by: []
+    coverage_evidence:
+    - VT-CONTRACTS-DRIFT-001
+    path: specify/product/PROD-014/PROD-014.md
   PROD-014.NF-001:
     label: NF-001
     title: 'Mirror rebuild MUST be fast enough for interactive use (target: <2s for
@@ -2234,7 +2330,8 @@ requirements:
   PROD-014.NF-002:
     label: NF-002
     title: '`.contracts/` MUST be safe to `.gitignore` entirely without breaking core
-      spec-driver operations (it is a derived index/view).'
+      spec-driver operations. Contracts are derived/deterministic: ignoring `.contracts/`
+      means the corpus is ephemeral and must be regenerated on demand.'
     specs:
     - PROD-014
     primary_spec: PROD-014
@@ -2247,6 +2344,98 @@ requirements:
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-014/PROD-014.md
+  PROD-015.FR-001:
+    label: FR-001
+    title: System MUST [specific user-facing capability]
+    specs:
+    - PROD-015
+    primary_spec: PROD-015
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-XXX
+    path: specify/product/PROD-015/PROD-015.md
+  PROD-015.FR-002:
+    label: FR-002
+    title: Users MUST be able to [key interaction or workflow]
+    specs:
+    - PROD-015
+    primary_spec: PROD-015
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-015/PROD-015.md
+  PROD-015.FR-003:
+    label: FR-003
+    title: System MUST [data or behavior requirement]
+    specs:
+    - PROD-015
+    primary_spec: PROD-015
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-015/PROD-015.md
+  PROD-015.FR-004:
+    label: FR-004
+    title: 'System MUST [capability] [NEEDS CLARIFICATION: specific question about
+      scope, security, or UX]'
+    specs:
+    - PROD-015
+    primary_spec: PROD-015
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-015/PROD-015.md
+  PROD-015.NF-001:
+    label: NF-001
+    title: '[Performance expectation from user perspective]'
+    specs:
+    - PROD-015
+    primary_spec: PROD-015
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-015/PROD-015.md
+  PROD-015.NF-002:
+    label: NF-002
+    title: '[Usability or accessibility requirement]'
+    specs:
+    - PROD-015
+    primary_spec: PROD-015
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-015/PROD-015.md
   SPEC-110.FR-001:
     label: FR-001
     title: CLI MUST provide single unified entry point (`spec-driver`) routing to

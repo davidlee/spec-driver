@@ -179,6 +179,7 @@ class MultiLanguageSpecManager:
     adapter,
     check_mode: bool = False,
     dry_run: bool = False,
+    generate_contracts: bool = True,
   ) -> dict:
     """Process a single source unit.
 
@@ -248,14 +249,15 @@ class MultiLanguageSpecManager:
         # Ensure source is listed in spec frontmatter
         self._ensure_source_in_spec(spec_file, source_unit)
 
-        # Generate documentation
-        doc_variants = adapter.generate(
-          source_unit,
-          spec_dir=spec_dir,
-          check=check_mode,
-        )
-        result["doc_variants"] = doc_variants
-      else:
+        if generate_contracts:
+          # Generate documentation
+          doc_variants = adapter.generate(
+            source_unit,
+            spec_dir=spec_dir,
+            check=check_mode,
+          )
+          result["doc_variants"] = doc_variants
+      elif generate_contracts:
         # Dry-run: show what doc paths would be created
         for variant in descriptor.variants:
           variant_path = spec_dir / variant.path

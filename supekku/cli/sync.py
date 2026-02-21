@@ -66,10 +66,20 @@ def sync(
     ),
   ] = None,
   specs: Annotated[
+    bool | None,
+    typer.Option(
+      "--specs/--no-specs",
+      help="Create/update tech specs for discovered code units. "
+      "Default: off unless previously opted in via --specs. "
+      "First use of --specs persists the preference for future runs.",
+    ),
+  ] = None,
+  contracts: Annotated[
     bool,
     typer.Option(
-      "--specs",
-      help="Synchronize tech specs with source code",
+      "--contracts/--no-contracts",
+      help="Generate contract documentation for source units. "
+      "Independent of --specs.",
     ),
   ] = True,
   adr: Annotated[
@@ -110,7 +120,9 @@ def sync(
   - ADR/decision registry synchronization
   - Backlog priority registry synchronization
 
-  By default, only syncs specs. Use --adr or --backlog to sync registries.
+  By default, generates contracts for existing specs. Spec auto-creation
+  is off unless opted in with --specs (persisted for future runs).
+  Use --adr or --backlog to sync registries.
   """
   # Auto-discover repository root
   root = find_repo_root()

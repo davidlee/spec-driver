@@ -59,8 +59,8 @@ class SyncCommandTest(unittest.TestCase):
     }
     mock_sync_reqs.return_value = {"success": True, "created": 0, "updated": 0}
 
-    # Run sync command
-    result = self.runner.invoke(app, ["sync"])
+    # Run sync command (--specs required: default is now off)
+    result = self.runner.invoke(app, ["sync", "--specs"])
 
     # Should exit 0
     assert result.exit_code == 0, (
@@ -90,8 +90,8 @@ class SyncCommandTest(unittest.TestCase):
     }
     mock_sync_reqs.return_value = {"success": True, "created": 0, "updated": 0}
 
-    # Run sync command
-    result = self.runner.invoke(app, ["sync"])
+    # Run sync command (--specs required: default is now off)
+    result = self.runner.invoke(app, ["sync", "--specs"])
 
     # Should exit 1
     assert result.exit_code == 1, (

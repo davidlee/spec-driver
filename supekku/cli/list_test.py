@@ -504,6 +504,148 @@ requirements:
     assert result.stdout.strip() == ""
 
 
+class ListSpecsCategoryFilterTest(unittest.TestCase):
+  """VT-030-003: list specs --category and --c4-level filters."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    tech_dir = self.root / "specify" / "tech"
+
+    # Unit spec
+    self._create_spec(tech_dir, "SPEC-001", "unit-mod", "Unit Module",
+                      category="unit", c4_level="code")
+    # Assembly spec
+    self._create_spec(tech_dir, "SPEC-002", "assembly-sub", "Assembly Subsystem",
+                      category="assembly", c4_level="component")
+    # Unclassified spec (no category)
+    self._create_spec(tech_dir, "SPEC-003", "bare-spec", "Bare Spec")
+
+    # Product spec (should never be filtered by --category)
+    prod_dir = self.root / "specify" / "product"
+    prod_dir.mkdir(parents=True)
+    prod_file = prod_dir / "PROD-001.md"
+    prod_file.write_text(
+      "---\nid: PROD-001\nslug: sample-prod\nname: Sample Product\n"
+      "kind: prod\nstatus: draft\ncreated: '2026-01-01'\nupdated: '2026-01-01'\n---\n"
+      "# PROD-001\n",
+      encoding="utf-8",
+    )
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_spec(
+    self, tech_dir, spec_id, slug, name, *, category=None, c4_level=None,
+  ) -> None:
+    spec_dir = tech_dir / spec_id
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    fm_lines = [
+      "---",
+      f"id: {spec_id}",
+      f"slug: {slug}",
+      f"name: {name}",
+      "kind: spec",
+      "status: draft",
+      "created: '2026-01-01'",
+      "updated: '2026-01-01'",
+    ]
+    if category:
+      fm_lines.append(f"category: {category}")
+    if c4_level:
+      fm_lines.append(f"c4_level: {c4_level}")
+    fm_lines += ["---", f"# {spec_id}", ""]
+    (spec_dir / f"{spec_id}.md").write_text(
+      "\n".join(fm_lines), encoding="utf-8",
+    )
+
+  def test_default_hides_unit_specs(self) -> None:
+    """Default listing shows assembly + unknown but hides unit specs."""
+    result = self.runner.invoke(app, ["specs", "--root", str(self.root)])
+    assert result.exit_code == 0
+    assert "SPEC-001" not in result.stdout  # unit → hidden
+    assert "SPEC-002" in result.stdout       # assembly → shown
+    assert "SPEC-003" in result.stdout       # unknown → shown
+    assert "PROD-001" in result.stdout       # product → always shown
+
+  def test_category_all_shows_everything(self) -> None:
+    """--category all disables category filtering for tech specs."""
+    result = self.runner.invoke(
+      app, ["specs", "--root", str(self.root), "--category", "all"],
+    )
+    assert result.exit_code == 0
+    assert "SPEC-001" in result.stdout
+    assert "SPEC-002" in result.stdout
+    assert "SPEC-003" in result.stdout
+    assert "PROD-001" in result.stdout
+
+  def test_category_unit_only(self) -> None:
+    """--category unit shows only unit tech specs (plus products)."""
+    result = self.runner.invoke(
+      app, ["specs", "--root", str(self.root), "--category", "unit"],
+    )
+    assert result.exit_code == 0
+    assert "SPEC-001" in result.stdout
+    assert "SPEC-002" not in result.stdout
+    assert "SPEC-003" not in result.stdout
+    assert "PROD-001" in result.stdout  # products always pass
+
+  def test_category_assembly_only(self) -> None:
+    """--category assembly shows only assembly tech specs."""
+    result = self.runner.invoke(
+      app, ["specs", "--root", str(self.root), "--category", "assembly"],
+    )
+    assert result.exit_code == 0
+    assert "SPEC-001" not in result.stdout
+    assert "SPEC-002" in result.stdout
+    assert "SPEC-003" not in result.stdout  # unknown ≠ assembly
+
+  def test_category_multi_value(self) -> None:
+    """--category unit,assembly shows both but excludes unknown."""
+    result = self.runner.invoke(
+      app, ["specs", "--root", str(self.root), "--category", "unit,assembly"],
+    )
+    assert result.exit_code == 0
+    assert "SPEC-001" in result.stdout
+    assert "SPEC-002" in result.stdout
+    assert "SPEC-003" not in result.stdout
+
+  def test_c4_level_filter(self) -> None:
+    """--c4-level code shows only code-level tech specs."""
+    result = self.runner.invoke(
+      app,
+      ["specs", "--root", str(self.root),
+       "--category", "all", "--c4-level", "code"],
+    )
+    assert result.exit_code == 0
+    assert "SPEC-001" in result.stdout   # c4_level: code
+    assert "SPEC-002" not in result.stdout  # c4_level: component
+    assert "SPEC-003" not in result.stdout  # c4_level: unknown
+
+  def test_kind_tech_with_category_filter(self) -> None:
+    """--kind tech + default category still hides unit specs."""
+    result = self.runner.invoke(
+      app, ["specs", "--root", str(self.root), "--kind", "tech"],
+    )
+    assert result.exit_code == 0
+    assert "SPEC-001" not in result.stdout  # unit → hidden
+    assert "SPEC-002" in result.stdout
+    assert "PROD-001" not in result.stdout  # kind=tech excludes products
+
+  def test_kind_product_ignores_category(self) -> None:
+    """--kind product is unaffected by --category."""
+    result = self.runner.invoke(
+      app,
+      ["specs", "--root", str(self.root),
+       "--kind", "product", "--category", "unit"],
+    )
+    assert result.exit_code == 0
+    assert "PROD-001" in result.stdout
+    assert "SPEC-001" not in result.stdout  # kind=product excludes tech
+
+
 class BacklogPrioritizationTest(unittest.TestCase):
   """Test cases for backlog prioritization feature (VT-015-005).
 

@@ -65,6 +65,16 @@ class Spec:
       return [str(item) for item in tags]
     return []
 
+  @property
+  def category(self) -> str:
+    """Return the taxonomy category (e.g. 'unit', 'assembly', or '')."""
+    return str(self.frontmatter.data.get("category", ""))
+
+  @property
+  def c4_level(self) -> str:
+    """Return the C4 architecture level (e.g. 'code', 'component', or '')."""
+    return str(self.frontmatter.data.get("c4_level", ""))
+
   def to_dict(self, root: Path) -> dict[str, str | list[str]]:
     """Convert to dictionary for JSON serialization.
 
@@ -87,6 +97,12 @@ class Spec:
     # Add packages if present
     if self.packages:
       data["packages"] = self.packages
+
+    # Add taxonomy fields if present
+    if self.category:
+      data["category"] = self.category
+    if self.c4_level:
+      data["c4_level"] = self.c4_level
 
     return data
 

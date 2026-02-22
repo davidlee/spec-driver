@@ -77,6 +77,8 @@ class TestSpecIndexBuilder(unittest.TestCase):
     assert self.builder.slug_dir == self.base_dir / "by-slug"
     assert self.builder.package_dir == self.base_dir / "by-package"
     assert self.builder.language_dir == self.base_dir / "by-language"
+    assert self.builder.category_dir == self.base_dir / "by-category"
+    assert self.builder.c4_level_dir == self.base_dir / "by-c4-level"
 
   def test_rebuild_creates_directories(self) -> None:
     """Test that rebuild creates necessary directories."""
@@ -85,6 +87,8 @@ class TestSpecIndexBuilder(unittest.TestCase):
     assert self.builder.slug_dir.exists()
     assert self.builder.package_dir.exists()
     assert self.builder.language_dir.exists()
+    assert self.builder.category_dir.exists()
+    assert self.builder.c4_level_dir.exists()
 
   def test_rebuild_with_slug_symlinks(self) -> None:
     """Test rebuild creates slug-based symlinks."""
@@ -426,6 +430,73 @@ class TestSpecIndexBuilder(unittest.TestCase):
     # No symlinks should be created for empty frontmatter
     assert len(list(self.builder.slug_dir.iterdir())) == 0
     assert len(list(self.builder.language_dir.rglob("*"))) == 0
+
+  def test_rebuild_creates_by_category_views(self) -> None:
+    """VT-030-004: by-category views built deterministically."""
+    self._create_spec_with_frontmatter(
+      "SPEC-020", {"slug": "unit-mod", "category": "unit", "c4_level": "code"},
+    )
+    self._create_spec_with_frontmatter(
+      "SPEC-021", {"slug": "asm-sub", "category": "assembly", "c4_level": "component"},
+    )
+    self._create_spec_with_frontmatter(
+      "SPEC-022", {"slug": "bare-spec"},  # no category → unknown
+    )
+
+    self.builder.rebuild()
+
+    unit_link = self.builder.category_dir / "unit" / "SPEC-020"
+    asm_link = self.builder.category_dir / "assembly" / "SPEC-021"
+    unknown_link = self.builder.category_dir / "unknown" / "SPEC-022"
+
+    assert unit_link.is_symlink()
+    assert unit_link.readlink() == Path("../../SPEC-020")
+    assert asm_link.is_symlink()
+    assert asm_link.readlink() == Path("../../SPEC-021")
+    assert unknown_link.is_symlink()
+    assert unknown_link.readlink() == Path("../../SPEC-022")
+
+  def test_rebuild_creates_by_c4_level_views(self) -> None:
+    """VT-030-004: by-c4-level views built deterministically."""
+    self._create_spec_with_frontmatter(
+      "SPEC-030", {"slug": "code-lvl", "c4_level": "code"},
+    )
+    self._create_spec_with_frontmatter(
+      "SPEC-031", {"slug": "comp-lvl", "c4_level": "component"},
+    )
+    self._create_spec_with_frontmatter(
+      "SPEC-032", {"slug": "no-lvl"},  # no c4_level → unknown
+    )
+
+    self.builder.rebuild()
+
+    code_link = self.builder.c4_level_dir / "code" / "SPEC-030"
+    comp_link = self.builder.c4_level_dir / "component" / "SPEC-031"
+    unknown_link = self.builder.c4_level_dir / "unknown" / "SPEC-032"
+
+    assert code_link.is_symlink()
+    assert code_link.readlink() == Path("../../SPEC-030")
+    assert comp_link.is_symlink()
+    assert comp_link.readlink() == Path("../../SPEC-031")
+    assert unknown_link.is_symlink()
+    assert unknown_link.readlink() == Path("../../SPEC-032")
+
+  def test_rebuild_cleans_taxonomy_views(self) -> None:
+    """VT-030-004: taxonomy views are cleaned on rebuild."""
+    self._create_spec_with_frontmatter(
+      "SPEC-040", {"slug": "was-unit", "category": "unit"},
+    )
+    self.builder.rebuild()
+    assert (self.builder.category_dir / "unit" / "SPEC-040").is_symlink()
+
+    # Change category and rebuild
+    self._create_spec_with_frontmatter(
+      "SPEC-040", {"slug": "now-asm", "category": "assembly"},
+    )
+    self.builder.rebuild()
+
+    assert not (self.builder.category_dir / "unit" / "SPEC-040").exists()
+    assert (self.builder.category_dir / "assembly" / "SPEC-040").is_symlink()
 
   def test_read_frontmatter_valid_yaml(self) -> None:
     """Test _read_frontmatter with valid YAML."""

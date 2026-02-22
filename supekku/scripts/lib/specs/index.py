@@ -27,6 +27,8 @@ class SpecIndexBuilder:
     self.slug_dir = base_dir / "by-slug"
     self.package_dir = base_dir / "by-package"
     self.language_dir = base_dir / "by-language"
+    self.category_dir = base_dir / "by-category"
+    self.c4_level_dir = base_dir / "by-c4-level"
 
   def rebuild(self) -> None:
     """Rebuild the specification index by creating symlinks."""
@@ -63,6 +65,10 @@ class SpecIndexBuilder:
           entry.rmdir()
     else:
       self.language_dir.mkdir()
+
+    # Clean up taxonomy view directories
+    self._clean_flat_view_dir(self.category_dir)
+    self._clean_flat_view_dir(self.c4_level_dir)
 
     for entry in sorted(self.base_dir.glob("SPEC-*/")):
       spec_file = entry / f"{entry.name}.md"
@@ -113,6 +119,44 @@ class SpecIndexBuilder:
             rel /= ".."
           rel /= entry.name
           lang_path.symlink_to(rel)
+
+      # Create taxonomy view symlinks
+      # by-category/{unit,assembly,unknown}/SPEC-XXX → ../../SPEC-XXX
+      cat = frontmatter.get("category") or "unknown"
+      self._create_flat_view_link(self.category_dir, cat, entry.name)
+
+      # by-c4-level/{code,component,...,unknown}/SPEC-XXX → ../../SPEC-XXX
+      level = frontmatter.get("c4_level") or "unknown"
+      self._create_flat_view_link(self.c4_level_dir, level, entry.name)
+
+
+  @staticmethod
+  def _clean_flat_view_dir(view_dir: Path) -> None:
+    """Remove all symlinks and empty subdirectories in a flat view."""
+    if view_dir.exists():
+      for entry in view_dir.rglob("*"):
+        if entry.is_symlink() or entry.is_file():
+          entry.unlink()
+      for entry in sorted(
+        (p for p in view_dir.iterdir() if p.is_dir()),
+        reverse=True,
+      ):
+        if not any(entry.iterdir()):
+          entry.rmdir()
+    else:
+      view_dir.mkdir()
+
+  @staticmethod
+  def _create_flat_view_link(
+    view_dir: Path, bucket: str, spec_name: str,
+  ) -> None:
+    """Create a symlink: view_dir/bucket/spec_name → ../../spec_name."""
+    bucket_dir = view_dir / bucket
+    bucket_dir.mkdir(parents=True, exist_ok=True)
+    link = bucket_dir / spec_name
+    if link.exists() or link.is_symlink():
+      link.unlink()
+    link.symlink_to(Path("..") / ".." / spec_name)
 
   def _read_frontmatter(self, path: Path) -> dict:
     """Extract YAML frontmatter from a markdown file."""

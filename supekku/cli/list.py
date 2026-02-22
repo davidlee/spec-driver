@@ -106,6 +106,27 @@ def list_specs(
       help="Filter specs whose packages include PATH",
     ),
   ] = None,
+  category: Annotated[
+    str,
+    typer.Option(
+      "--category",
+      "-c",
+      help=(
+        "Filter tech specs by taxonomy category (comma-separated). "
+        "Default: assembly,unknown (hides unit specs). Use 'all' to include unit specs."
+      ),
+    ),
+  ] = "assembly,unknown",
+  c4_level: Annotated[
+    str,
+    typer.Option(
+      "--c4-level",
+      help=(
+        "Filter tech specs by C4 level (comma-separated). "
+        "Default: all. Values: system,container,component,code,interaction,unknown."
+      ),
+    ),
+  ] = "all",
   informed_by: Annotated[
     str | None,
     typer.Option(
@@ -265,6 +286,30 @@ def list_specs(
       return False
 
     specs = [spec for spec in specs if normalise_kind(kind_values, spec.id)]
+
+    # Filter tech specs by taxonomy (category / c4_level).
+    # Product specs are never affected by these filters.
+    category_values = (
+      parse_multi_value_filter(category) if category != "all" else []
+    )
+    c4_level_values = (
+      parse_multi_value_filter(c4_level) if c4_level != "all" else []
+    )
+
+    def matches_taxonomy(spec) -> bool:
+      if not spec.id.startswith("SPEC-"):
+        return True  # Non-tech specs pass through
+      if category_values:
+        spec_cat = spec.category or "unknown"
+        if spec_cat not in category_values:
+          return False
+      if c4_level_values:
+        spec_level = spec.c4_level or "unknown"
+        if spec_level not in c4_level_values:
+          return False
+      return True
+
+    specs = [spec for spec in specs if matches_taxonomy(spec)]
 
     if not specs:
       raise typer.Exit(EXIT_SUCCESS)

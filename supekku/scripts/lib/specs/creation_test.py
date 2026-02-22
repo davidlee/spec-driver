@@ -15,6 +15,7 @@ from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.specs.creation import (
   CreateSpecOptions,
   RepositoryRootNotFoundError,
+  build_frontmatter,
   create_spec,
 )
 
@@ -116,6 +117,60 @@ class CreateSpecTest(unittest.TestCase):
     payload = json.loads(result.to_json())
     assert payload["id"] == "SPEC-001"
     assert "spec_file" in payload
+
+
+class BuildFrontmatterTaxonomyTest(unittest.TestCase):
+  """VT-030-002: build_frontmatter sets taxonomy defaults correctly."""
+
+  def test_tech_spec_defaults_to_assembly(self):
+    fm = build_frontmatter(
+      spec_id="SPEC-001", slug="test", name="Test", kind="spec", created="2026-01-01",
+    )
+    assert fm["category"] == "assembly"
+    assert "c4_level" not in fm
+
+  def test_product_spec_has_no_category(self):
+    fm = build_frontmatter(
+      spec_id="PROD-001", slug="test", name="Test", kind="prod", created="2026-01-01",
+    )
+    assert "category" not in fm
+
+  def test_guidance_has_no_category(self):
+    fm = build_frontmatter(
+      spec_id="SPEC-001.TESTS", slug="test-tests", name="Test Guide",
+      kind="guidance", created="2026-01-01",
+    )
+    assert "category" not in fm
+
+  def test_explicit_category_overrides_default(self):
+    fm = build_frontmatter(
+      spec_id="SPEC-001", slug="test", name="Test", kind="spec",
+      created="2026-01-01", category="unit", c4_level="code",
+    )
+    assert fm["category"] == "unit"
+    assert fm["c4_level"] == "code"
+
+  def test_create_tech_spec_frontmatter_has_assembly(self):
+    """Integration: create_spec produces a tech spec with category: assembly."""
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    templates = get_templates_dir(root)
+    templates.mkdir(parents=True)
+    (root / "specify" / "tech").mkdir(parents=True)
+    (root / "specify" / "product").mkdir(parents=True)
+    (templates / "spec.md").write_text(
+      "# {{ spec_id }} – {{ name }}\n\nBody\n", encoding="utf-8",
+    )
+    saved = Path.cwd()
+    os.chdir(root)
+    try:
+      result = create_spec("Test Spec", CreateSpecOptions(spec_type="tech"))
+      frontmatter, _ = load_markdown_file(result.spec_path)
+      assert frontmatter["category"] == "assembly"
+    finally:
+      os.chdir(saved)
 
 
 if __name__ == "__main__":

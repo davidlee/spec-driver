@@ -20,7 +20,11 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
     "category": FieldMetadata(
       type="string",
       required=False,
-      description="Optional categorization for requirements (freeform)",
+      description=(
+        "Spec taxonomy category. Reserved values for tech specs: "
+        "'unit' (1:1 with a code unit) and 'assembly' (cross-unit). "
+        "See ADR-003."
+      ),
     ),
     "c4_level": FieldMetadata(
       type="enum",

@@ -328,6 +328,8 @@ def build_frontmatter(
   name: str,
   kind: str,
   created: str,
+  category: str = "",
+  c4_level: str = "",
 ) -> MutableMapping[str, object]:
   """Build YAML frontmatter dictionary for spec file.
 
@@ -337,11 +339,17 @@ def build_frontmatter(
     name: Human-readable spec name.
     kind: Spec kind/type.
     created: Creation date (ISO format).
+    category: Taxonomy category. Defaults to 'assembly' for tech specs (DEC-030-04).
+    c4_level: C4 architecture level (optional).
 
   Returns:
     Frontmatter dictionary.
   """
-  return {
+  # Default category for tech specs per DEC-030-04
+  if not category and kind == "spec":
+    category = "assembly"
+
+  fm: MutableMapping[str, object] = {
     "id": spec_id,
     "slug": slug,
     "name": name,
@@ -354,6 +362,11 @@ def build_frontmatter(
     "guiding_principles": [],
     "assumptions": [],
   }
+  if category:
+    fm["category"] = category
+  if c4_level:
+    fm["c4_level"] = c4_level
+  return fm
 
 
 __all__ = [

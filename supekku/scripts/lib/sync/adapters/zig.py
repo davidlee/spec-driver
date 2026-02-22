@@ -146,8 +146,7 @@ class ZigAdapter(LanguageAdapter):
         # Skip vendor, zig-cache, zig-out directories
         rel_str = str(rel_path)
         if any(
-          skip in rel_str
-          for skip in ["zig-cache", "zig-out", "vendor", ".zig-cache"]
+          skip in rel_str for skip in ["zig-cache", "zig-out", "vendor", ".zig-cache"]
         ):
           continue
 
@@ -230,14 +229,14 @@ class ZigAdapter(LanguageAdapter):
     self,
     unit: SourceUnit,
     *,
-    spec_dir: Path,
+    variant_outputs: dict[str, Path],
     check: bool = False,
   ) -> list[DocVariant]:
     """Generate documentation for a Zig package/module using zigmarkdoc.
 
     Args:
         unit: Zig source unit
-        spec_dir: Specification directory to write documentation to
+        variant_outputs: Per-variant canonical output file paths
         check: If True, only check if docs would change
 
     Returns:
@@ -267,182 +266,105 @@ class ZigAdapter(LanguageAdapter):
       msg = f"Source path must be a .zig file, got: {source_path}"
       raise ValueError(msg)
 
-    # Determine output paths within spec directory
-    contracts_dir = spec_dir / "contracts"
-    public_output = contracts_dir / "interfaces.md"
-    internal_output = contracts_dir / "internals.md"
+    # Output paths from caller-provided variant_outputs
+    public_output = variant_outputs["public"]
+    internal_output = variant_outputs["internal"]
 
-    variants = []
+    variants: list[DocVariant] = []
 
     # Generate public docs (interfaces)
-    try:
-      if check and not public_output.exists():
-        # In check mode, if file doesn't exist, it's missing
-        variants.append(
-          DocVariant(
-            name="public",
-            path=public_output.relative_to(spec_dir),
-            hash="",
-            status="created",  # Would be created
-          ),
-        )
-      else:
-        # Generate or check public docs
-        contracts_dir.mkdir(parents=True, exist_ok=True)
-
-        content_hash = ""
-        if check:
-          # Check mode - run zigmarkdoc --check
-          cmd = [
-            "zigmarkdoc",
-            "--check",
-            "--output",
-            str(public_output),
-            str(source_path),
-          ]
-          try:
-            subprocess.run(cmd, check=True, capture_output=True, text=True)
-            status = "unchanged"
-          except subprocess.CalledProcessError:
-            status = "changed"  # Would be changed
-        else:
-          # Check if file exists before generation
-          existed_before = public_output.exists()
-          old_hash = None
-          if existed_before:
-            old_content = public_output.read_text(encoding="utf-8")
-            old_hash = hashlib.sha256(
-              old_content.encode("utf-8"),
-            ).hexdigest()
-
-          # Generate mode
-          cmd = [
-            "zigmarkdoc",
-            "--output",
-            str(public_output),
-            str(source_path),
-          ]
-          subprocess.run(cmd, check=True, capture_output=True, text=True)
-
-          # Determine status by checking if file changed
-          content_hash = ""
-          if public_output.exists():
-            content = public_output.read_text(encoding="utf-8")
-            content_hash = hashlib.sha256(
-              content.encode("utf-8"),
-            ).hexdigest()
-
-            if not existed_before:
-              status = "created"
-            elif content_hash != old_hash:
-              status = "changed"
-            else:
-              status = "unchanged"
-          else:
-            status = "created"
-
-        variants.append(
-          DocVariant(
-            name="public",
-            path=public_output.relative_to(spec_dir),
-            hash=content_hash if not check else "",
-            status=status,
-          ),
-        )
-
-    except subprocess.CalledProcessError:
-      # Handle zigmarkdoc errors gracefully
-      variants.append(
-        DocVariant(
-          name="public",
-          path=public_output.relative_to(spec_dir) if public_output else Path(),
-          hash="",
-          status="unchanged",  # Error status would be handled at higher level
-        ),
-      )
+    variants.append(
+      self._generate_variant(
+        name="public",
+        output_path=public_output,
+        source_path=source_path,
+        check=check,
+        extra_flags=[],
+      ),
+    )
 
     # Generate internal docs (with private symbols)
-    try:
-      if check and not internal_output.exists():
-        variants.append(
-          DocVariant(
-            name="internal",
-            path=internal_output.relative_to(spec_dir),
-            hash="",
-            status="created",
-          ),
-        )
-      else:
-        content_hash = ""
-        if check:
-          cmd = [
-            "zigmarkdoc",
-            "--check",
-            "--include-private",
-            "--output",
-            str(internal_output),
-            str(source_path),
-          ]
-          try:
-            subprocess.run(cmd, check=True, capture_output=True, text=True)
-            status = "unchanged"
-          except subprocess.CalledProcessError:
-            status = "changed"
-        else:
-          # Check if file exists before generation
-          existed_before = internal_output.exists()
-          old_hash = None
-          if existed_before:
-            old_content = internal_output.read_text(encoding="utf-8")
-            old_hash = hashlib.sha256(
-              old_content.encode("utf-8"),
-            ).hexdigest()
-
-          cmd = [
-            "zigmarkdoc",
-            "--include-private",
-            "--output",
-            str(internal_output),
-            str(source_path),
-          ]
-          subprocess.run(cmd, check=True, capture_output=True, text=True)
-
-          if internal_output.exists():
-            content = internal_output.read_text(encoding="utf-8")
-            content_hash = hashlib.sha256(
-              content.encode("utf-8"),
-            ).hexdigest()
-
-            if not existed_before:
-              status = "created"
-            elif content_hash != old_hash:
-              status = "changed"
-            else:
-              status = "unchanged"
-          else:
-            status = "created"
-
-        variants.append(
-          DocVariant(
-            name="internal",
-            path=internal_output.relative_to(spec_dir),
-            hash=content_hash if not check else "",
-            status=status,
-          ),
-        )
-
-    except subprocess.CalledProcessError:
-      variants.append(
-        DocVariant(
-          name="internal",
-          path=internal_output.relative_to(spec_dir) if internal_output else Path(),
-          hash="",
-          status="unchanged",
-        ),
-      )
+    variants.append(
+      self._generate_variant(
+        name="internal",
+        output_path=internal_output,
+        source_path=source_path,
+        check=check,
+        extra_flags=["--include-private"],
+      ),
+    )
 
     return variants
 
+  def _generate_variant(
+    self,
+    *,
+    name: str,
+    output_path: Path,
+    source_path: Path,
+    check: bool,
+    extra_flags: list[str],
+  ) -> DocVariant:
+    """Generate a single documentation variant via zigmarkdoc."""
+    try:
+      if check and not output_path.exists():
+        return DocVariant(name=name, path=output_path, hash="", status="created")
+
+      output_path.parent.mkdir(parents=True, exist_ok=True)
+      content_hash = ""
+
+      if check:
+        cmd = [
+          "zigmarkdoc",
+          "--check",
+          *extra_flags,
+          "--output",
+          str(output_path),
+          str(source_path),
+        ]
+        try:
+          subprocess.run(cmd, check=True, capture_output=True, text=True)
+          status = "unchanged"
+        except subprocess.CalledProcessError:
+          status = "changed"
+      else:
+        existed_before = output_path.exists()
+        old_hash = None
+        if existed_before:
+          old_hash = hashlib.sha256(
+            output_path.read_text(encoding="utf-8").encode("utf-8"),
+          ).hexdigest()
+
+        cmd = [
+          "zigmarkdoc",
+          *extra_flags,
+          "--output",
+          str(output_path),
+          str(source_path),
+        ]
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+
+        if output_path.exists():
+          content = output_path.read_text(encoding="utf-8")
+          content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+          if not existed_before:
+            status = "created"
+          elif content_hash != old_hash:
+            status = "changed"
+          else:
+            status = "unchanged"
+        else:
+          status = "created"
+
+      return DocVariant(
+        name=name,
+        path=output_path,
+        hash=content_hash if not check else "",
+        status=status,
+      )
+
+    except subprocess.CalledProcessError:
+      return DocVariant(name=name, path=output_path, hash="", status="unchanged")
 
   def supports_identifier(self, identifier: str) -> bool:
     """Check if identifier looks like a Zig path.

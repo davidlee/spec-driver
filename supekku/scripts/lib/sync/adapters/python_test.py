@@ -129,10 +129,12 @@ class TestPythonAdapter(unittest.TestCase):
   def test_generate_rejects_non_python_unit(self) -> None:
     """Test generate method rejects non-Python source units."""
     unit = SourceUnit("go", "internal/package", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
+    variant_outputs = {
+      "_staging_dir": Path("/test/output/.staging/python/internal-package")
+    }
 
     with pytest.raises(ValueError) as context:
-      self.adapter.generate(unit, spec_dir=spec_dir)
+      self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     assert "PythonAdapter cannot process go units" in str(context.value)
 
@@ -142,8 +144,10 @@ class TestPythonAdapter(unittest.TestCase):
     mock_exists.return_value = False
 
     unit = SourceUnit("python", "missing/module.py", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
-    variants = self.adapter.generate(unit, spec_dir=spec_dir)
+    variant_outputs = {
+      "_staging_dir": Path("/test/output/.staging/python/missing-module-py")
+    }
+    variants = self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     # Should return single error variant
     assert len(variants) == 1
@@ -156,23 +160,25 @@ class TestPythonAdapter(unittest.TestCase):
     # Setup mocks
     mock_exists.return_value = True
 
+    staging_dir = Path("/test/output/.staging/python/module-py")
+
     # Mock the generate_docs results
     mock_results = [
       Mock(
         variant="public",
-        path=Path("/test/repo/contracts/python/module-api.md"),
+        path=staging_dir / "module-api.md",
         hash="hash1",
         status="created",
       ),
       Mock(
         variant="all",
-        path=Path("/test/repo/contracts/python/module-implementation.md"),
+        path=staging_dir / "module-implementation.md",
         hash="hash2",
         status="changed",
       ),
       Mock(
         variant="tests",
-        path=Path("/test/repo/contracts/python/module-tests.md"),
+        path=staging_dir / "module-tests.md",
         hash="hash3",
         status="unchanged",
       ),
@@ -180,8 +186,8 @@ class TestPythonAdapter(unittest.TestCase):
     mock_generate_docs.return_value = mock_results
 
     unit = SourceUnit("python", "module.py", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
-    variants = self.adapter.generate(unit, spec_dir=spec_dir)
+    variant_outputs = {"_staging_dir": staging_dir}
+    variants = self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     # Should generate three variants
     assert len(variants) == 3
@@ -197,7 +203,7 @@ class TestPythonAdapter(unittest.TestCase):
 
     assert kwargs["unit"] == self.repo_root / "module.py"
     assert not kwargs["check"]
-    assert kwargs["output_root"] == spec_dir / "contracts"
+    assert kwargs["output_root"] == staging_dir
     assert kwargs["base_path"] == self.repo_root
 
   @patch("pathlib.Path.exists")
@@ -206,10 +212,11 @@ class TestPythonAdapter(unittest.TestCase):
     """Test generate method in check mode."""
     mock_exists.return_value = True
 
+    staging_dir = Path("/test/output/.staging/python/module-py")
     mock_results = [
       Mock(
         variant="public",
-        path=Path("/test/repo/contracts/python/module-api.md"),
+        path=staging_dir / "module-api.md",
         hash="hash1",
         status="unchanged",
       ),
@@ -217,8 +224,8 @@ class TestPythonAdapter(unittest.TestCase):
     mock_generate_docs.return_value = mock_results
 
     unit = SourceUnit("python", "module.py", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
-    self.adapter.generate(unit, spec_dir=spec_dir, check=True)
+    variant_outputs = {"_staging_dir": staging_dir}
+    self.adapter.generate(unit, variant_outputs=variant_outputs, check=True)
 
     # Check that check=True was passed to generate_docs
     _, kwargs = mock_generate_docs.call_args
@@ -232,8 +239,9 @@ class TestPythonAdapter(unittest.TestCase):
     mock_generate_docs.side_effect = Exception("Generation failed")
 
     unit = SourceUnit("python", "module.py", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
-    variants = self.adapter.generate(unit, spec_dir=spec_dir)
+    staging_dir = Path("/test/output/.staging/python/module-py")
+    variant_outputs = {"_staging_dir": staging_dir}
+    variants = self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     # Should return error variants for all expected outputs
     assert len(variants) == 3

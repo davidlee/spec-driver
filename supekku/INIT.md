@@ -32,13 +32,13 @@ Not yet implemented.
 ## Contracts for API Research
 
 Contracts are auto-generated public/private API docs at:
- - `specify/tech/SPEC-nnn/contracts/*.md` (actual location)
+ - `specify/.contracts/*.md` (actual location)
   - `specify/tech/by-package/.../contracts/*.md` (symlink tree)
 
 ### When to use contracts vs code
 
 **Contracts excel at:**
-  - API comparison across modules 
+  - API comparison across modules
   - Understanding public surface quickly
   - Spotting patterns/inconsistencies
   - Initial discovery ("what XXXs exist?")
@@ -53,13 +53,13 @@ Contracts are auto-generated public/private API docs at:
 
   ```bash
   # Find all contracts for a concept
-  rg 'Registry' specify/**/contracts/**public.md -ln
+  rg 'Registry' .contracts/public/**/*.md -ln
 
   # Find contract by source file (requires source: metadata)
-  rg '^source:.*backlog/priority' specify/**/contracts/*.md -l
+  rg '^source:.*backlog/priority' .contracts/*.md -l
 
   # See what a contract covers
-  rg '^[^#]*(registry)' specify/**/contracts/**public.md
+  rg '^[^#]*(registry)' specify/.contracts/public/**/*.md
 
   Workflow: Contracts → Code
 

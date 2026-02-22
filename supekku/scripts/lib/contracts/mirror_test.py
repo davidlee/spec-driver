@@ -1,7 +1,6 @@
 """Tests for contract mirror tree builder."""
 
 import json
-import shutil
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -12,7 +11,11 @@ from .mirror import (
   go_mirror_entries,
   python_mirror_entries,
   python_module_to_path,
+  python_staging_dir,
   read_python_module_name,
+  resolve_go_variant_outputs,
+  resolve_ts_variant_outputs,
+  resolve_zig_variant_outputs,
   ts_mirror_entries,
   zig_mirror_entries,
 )
@@ -202,7 +205,9 @@ class TestZigMirrorEntries(unittest.TestCase):
     (self.contracts_dir / "interfaces.md").write_text("Public API")
     (self.contracts_dir / "internals.md").write_text("Internals")
     entries, _ = zig_mirror_entries(
-      "SPEC-007", self.contracts_dir, "src/combat/agent.zig",
+      "SPEC-007",
+      self.contracts_dir,
+      "src/combat/agent.zig",
     )
     assert len(entries) == 2
     public = next(e for e in entries if e.view == "public")
@@ -225,7 +230,9 @@ class TestZigMirrorEntries(unittest.TestCase):
     """Test only existing contract files produce entries."""
     (self.contracts_dir / "interfaces.md").write_text("Public API")
     entries, _ = zig_mirror_entries(
-      "SPEC-007", self.contracts_dir, "src/foo.zig",
+      "SPEC-007",
+      self.contracts_dir,
+      "src/foo.zig",
     )
     assert len(entries) == 1
     assert entries[0].view == "public"
@@ -233,7 +240,9 @@ class TestZigMirrorEntries(unittest.TestCase):
   def test_no_contracts(self) -> None:
     """Test empty contracts directory returns empty."""
     entries, warnings = zig_mirror_entries(
-      "SPEC-007", self.contracts_dir, "src/foo.zig",
+      "SPEC-007",
+      self.contracts_dir,
+      "src/foo.zig",
     )
     assert not entries
     assert not warnings
@@ -256,7 +265,9 @@ class TestGoMirrorEntries(unittest.TestCase):
     (self.contracts_dir / "interfaces.md").write_text("Public API")
     (self.contracts_dir / "internals.md").write_text("Internals")
     entries, _ = go_mirror_entries(
-      "SPEC-003", self.contracts_dir, "internal/foo/bar",
+      "SPEC-003",
+      self.contracts_dir,
+      "internal/foo/bar",
     )
     assert len(entries) == 2
     public = next(e for e in entries if e.view == "public")
@@ -282,7 +293,9 @@ class TestTsMirrorEntries(unittest.TestCase):
     (self.contracts_dir / "api.md").write_text("Public API")
     (self.contracts_dir / "internal.md").write_text("Internal")
     entries, _ = ts_mirror_entries(
-      "SPEC-050", self.contracts_dir, "src/api.ts",
+      "SPEC-050",
+      self.contracts_dir,
+      "src/api.ts",
     )
     assert len(entries) == 2
     public = next(e for e in entries if e.view == "public")
@@ -294,17 +307,100 @@ class TestTsMirrorEntries(unittest.TestCase):
     """Test only existing contract files produce entries."""
     (self.contracts_dir / "api.md").write_text("Public API")
     entries, _ = ts_mirror_entries(
-      "SPEC-050", self.contracts_dir, "src/api.ts",
+      "SPEC-050",
+      self.contracts_dir,
+      "src/api.ts",
     )
     assert len(entries) == 1
     assert entries[0].view == "public"
+
+
+# --- Pre-generation path resolver tests ---
+
+
+class TestResolveGoVariantOutputs(unittest.TestCase):
+  """Test Go pre-generation path resolution."""
+
+  def test_standard_package(self) -> None:
+    """Test Go package produces dir/filename canonical paths."""
+    root = Path("/repo/.contracts")
+    result = resolve_go_variant_outputs("internal/foo/bar", root)
+    assert result == {
+      "public": root / "public" / "internal/foo/bar" / "interfaces.md",
+      "internal": root / "internal" / "internal/foo/bar" / "internals.md",
+    }
+
+  def test_simple_package(self) -> None:
+    """Test single-segment Go package."""
+    root = Path("/repo/.contracts")
+    result = resolve_go_variant_outputs("pkg", root)
+    assert result == {
+      "public": root / "public" / "pkg" / "interfaces.md",
+      "internal": root / "internal" / "pkg" / "internals.md",
+    }
+
+
+class TestResolveZigVariantOutputs(unittest.TestCase):
+  """Test Zig pre-generation path resolution."""
+
+  def test_file_identifier(self) -> None:
+    """Test Zig file produces {identifier}.md leaf."""
+    root = Path("/repo/.contracts")
+    result = resolve_zig_variant_outputs("src/combat/agent.zig", root)
+    assert result == {
+      "public": root / "public" / "src/combat/agent.zig.md",
+      "internal": root / "internal" / "src/combat/agent.zig.md",
+    }
+
+  def test_root_package(self) -> None:
+    """Test root '.' maps to __root__/ with original filenames."""
+    root = Path("/repo/.contracts")
+    result = resolve_zig_variant_outputs(".", root)
+    assert result == {
+      "public": root / "public" / "__root__" / "interfaces.md",
+      "internal": root / "internal" / "__root__" / "internals.md",
+    }
+
+
+class TestResolveTsVariantOutputs(unittest.TestCase):
+  """Test TypeScript pre-generation path resolution."""
+
+  def test_file_identifier(self) -> None:
+    """Test TS file produces {identifier}.md leaf with adapter variant names."""
+    root = Path("/repo/.contracts")
+    result = resolve_ts_variant_outputs("src/api.ts", root)
+    assert result == {
+      "api": root / "public" / "src/api.ts.md",
+      "internal": root / "internal" / "src/api.ts.md",
+    }
+
+
+class TestPythonStagingDir(unittest.TestCase):
+  """Test Python staging directory computation."""
+
+  def test_package_identifier(self) -> None:
+    """Test Python package identifier slugified correctly."""
+    root = Path("/repo/.contracts")
+    result = python_staging_dir("supekku/scripts/lib/foo", root)
+    assert result == root / ".staging" / "python" / "supekku-scripts-lib-foo"
+
+  def test_dotted_identifier(self) -> None:
+    """Test dotted module names are slugified."""
+    root = Path("/repo/.contracts")
+    result = python_staging_dir("supekku.scripts.lib.foo", root)
+    assert result == root / ".staging" / "python" / "supekku-scripts-lib-foo"
 
 
 # --- Integration tests: ContractMirrorTreeBuilder ---
 
 
 class TestContractMirrorTreeBuilder(unittest.TestCase):
-  """Test ContractMirrorTreeBuilder end-to-end."""
+  """Test ContractMirrorTreeBuilder: compat symlinks SPEC-*/contracts/ → .contracts/.
+
+  Canonical contract files live in .contracts/<view>/<path>.
+  rebuild() creates compat symlinks from SPEC-*/contracts/ pointing back
+  into .contracts/ so that spec-relative tooling still works.
+  """
 
   def setUp(self) -> None:
     """Set up temp repo with tech directory."""
@@ -312,6 +408,7 @@ class TestContractMirrorTreeBuilder(unittest.TestCase):
     self.repo_root = Path(self.temp_dir.name)
     self.tech_dir = self.repo_root / "specify" / "tech"
     self.tech_dir.mkdir(parents=True)
+    self.contracts_root = self.repo_root / ".contracts"
     self.builder = ContractMirrorTreeBuilder(self.repo_root, self.tech_dir)
 
   def tearDown(self) -> None:
@@ -321,306 +418,176 @@ class TestContractMirrorTreeBuilder(unittest.TestCase):
   def _create_registry(self, languages: dict) -> None:
     registry = {"version": 2, "languages": languages, "metadata": {}}
     self.builder.registry_path.write_text(
-      json.dumps(registry), encoding="utf-8",
+      json.dumps(registry),
+      encoding="utf-8",
     )
 
-  def _create_python_contract(
-    self, spec_id: str, filename: str, module_name: str,
-  ) -> None:
-    contracts_dir = self.tech_dir / spec_id / "contracts"
-    contracts_dir.mkdir(parents=True, exist_ok=True)
-    (contracts_dir / filename).write_text(f"# {module_name}\n\nContract.")
+  def _create_canonical(self, view: str, rel_path: str) -> Path:
+    """Create a canonical contract file in .contracts/<view>/<rel_path>."""
+    path = self.contracts_root / view / rel_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("Contract.")
+    return path
 
-  def _create_contract_file(
-    self, spec_id: str, filename: str, content: str = "Contract.",
-  ) -> None:
-    contracts_dir = self.tech_dir / spec_id / "contracts"
-    contracts_dir.mkdir(parents=True, exist_ok=True)
-    (contracts_dir / filename).write_text(content)
+  def _compat_link(self, spec_id: str, view: str, rel_path: str) -> Path:
+    """Return expected compat symlink path in SPEC-*/contracts/."""
+    return self.tech_dir / spec_id / "contracts" / view / rel_path
 
-  def test_rebuild_creates_mirror_dir(self) -> None:
-    """Test rebuild creates .contracts/ directory."""
-    self._create_registry({})
-    self.builder.rebuild()
-    assert self.builder.mirror_dir.exists()
-
-  def test_rebuild_python_contracts(self) -> None:
-    """Test Python contracts produce correct mirror symlinks."""
-    self._create_registry({
-      "python": {"supekku/scripts/lib/foo": "SPEC-100"},
-    })
-    self._create_python_contract(
-      "SPEC-100", "supekku-scripts-lib-foo-bar-public.md",
-      "supekku.scripts.lib.foo.bar",
-    )
-
-    warnings = self.builder.rebuild()
-
-    link = (
-      self.builder.mirror_dir
-      / "public" / "supekku/scripts/lib/foo/bar.py.md"
-    )
-    assert link.exists()
-    assert link.is_symlink()
-    expected = (
-      self.tech_dir / "SPEC-100" / "contracts"
-      / "supekku-scripts-lib-foo-bar-public.md"
-    )
-    assert link.resolve() == expected.resolve()
-    assert not warnings
-
-  def test_rebuild_python_multiple_modules(self) -> None:
-    """Test multiple Python modules in same SPEC."""
-    self._create_registry({
-      "python": {"supekku/scripts/lib/foo": "SPEC-100"},
-    })
-    self._create_python_contract(
-      "SPEC-100", "foo-bar-public.md", "supekku.scripts.lib.foo.bar",
-    )
-    self._create_python_contract(
-      "SPEC-100", "foo-baz-all.md", "supekku.scripts.lib.foo.baz",
-    )
-
-    self.builder.rebuild()
-
-    pub_link = (
-      self.builder.mirror_dir
-      / "public" / "supekku/scripts/lib/foo/bar.py.md"
-    )
-    all_link = (
-      self.builder.mirror_dir
-      / "all" / "supekku/scripts/lib/foo/baz.py.md"
-    )
-    assert pub_link.exists()
-    assert all_link.exists()
-
-  def test_rebuild_zig_contracts(self) -> None:
-    """Test Zig contracts produce correct mirror symlinks."""
-    self._create_registry({
-      "zig": {"src/combat/agent.zig": "SPEC-007"},
-    })
-    self._create_contract_file("SPEC-007", "interfaces.md")
-
-    warnings = self.builder.rebuild()
-
-    link = (
-      self.builder.mirror_dir / "public" / "src/combat/agent.zig.md"
-    )
-    assert link.exists()
-    assert link.is_symlink()
-    assert not warnings
-
-  def test_rebuild_zig_root_package(self) -> None:
-    """Test Zig root package maps to __root__/ directory."""
-    self._create_registry({"zig": {".": "SPEC-001"}})
-    self._create_contract_file("SPEC-001", "interfaces.md")
-
-    self.builder.rebuild()
-
-    link = self.builder.mirror_dir / "public" / "__root__" / "interfaces.md"
-    assert link.exists()
-    assert link.is_symlink()
-
-  def test_rebuild_go_contracts(self) -> None:
-    """Test Go contracts produce correct package-based mirror paths."""
-    self._create_registry({
-      "go": {"internal/foo/bar": "SPEC-003"},
-    })
-    self._create_contract_file("SPEC-003", "interfaces.md")
-    self._create_contract_file("SPEC-003", "internals.md")
-
-    self.builder.rebuild()
-
-    pub_link = (
-      self.builder.mirror_dir
-      / "public" / "internal/foo/bar/interfaces.md"
-    )
-    int_link = (
-      self.builder.mirror_dir
-      / "internal" / "internal/foo/bar/internals.md"
-    )
-    assert pub_link.exists()
-    assert int_link.exists()
-
-  def test_rebuild_ts_contracts(self) -> None:
-    """Test TypeScript contracts produce correct mirror symlinks."""
-    self._create_registry({
-      "typescript": {"src/api.ts": "SPEC-050"},
-    })
-    self._create_contract_file("SPEC-050", "api.md")
-
-    self.builder.rebuild()
-
-    link = self.builder.mirror_dir / "public" / "src/api.ts.md"
-    assert link.exists()
-
-  def test_rebuild_creates_aliases(self) -> None:
-    """Test alias symlinks are created for existing views."""
-    self._create_registry({
-      "python": {"supekku/scripts/lib/foo": "SPEC-100"},
-    })
-    self._create_python_contract(
-      "SPEC-100", "foo-public.md", "supekku.scripts.lib.foo",
-    )
-
-    self.builder.rebuild()
-
-    api_alias = self.builder.mirror_dir / "api"
-    assert api_alias.is_symlink()
-    assert api_alias.readlink() == Path("public")
-
-  def test_alias_not_created_for_empty_view(self) -> None:
-    """Test aliases are not created when target view is empty."""
-    self._create_registry({})
-    self.builder.rebuild()
-
-    impl_alias = self.builder.mirror_dir / "implementation"
-    assert not impl_alias.exists()
-
-  def test_rebuild_cleans_stale(self) -> None:
-    """Test rebuild removes stale entries from previous build."""
-    self._create_registry({"zig": {"src/old.zig": "SPEC-001"}})
-    self._create_contract_file("SPEC-001", "interfaces.md")
-    self.builder.rebuild()
-
-    old_link = self.builder.mirror_dir / "public" / "src/old.zig.md"
-    assert old_link.exists()
-
-    shutil.rmtree(self.tech_dir / "SPEC-001" / "contracts")
-    self._create_registry({"zig": {"src/new.zig": "SPEC-002"}})
-    self._create_contract_file("SPEC-002", "interfaces.md")
-    self.builder.rebuild()
-
-    assert not old_link.exists()
-    new_link = self.builder.mirror_dir / "public" / "src/new.zig.md"
-    assert new_link.exists()
-
-  def test_rebuild_is_idempotent(self) -> None:
-    """Test consecutive rebuilds produce identical results."""
-    self._create_registry({"zig": {"src/foo.zig": "SPEC-001"}})
-    self._create_contract_file("SPEC-001", "interfaces.md")
-
-    self.builder.rebuild()
-    self.builder.rebuild()
-
-    link = self.builder.mirror_dir / "public" / "src/foo.zig.md"
-    assert link.exists()
-    assert link.is_symlink()
-
-  def test_conflict_resolution(self) -> None:
-    """Test conflicting mirror paths resolved by lowest SPEC ID."""
-    self._create_registry({
-      "python": {
-        "supekku/a": "SPEC-004",
-        "supekku/b": "SPEC-113",
-      },
-    })
-    self._create_python_contract(
-      "SPEC-004", "shared-module-public.md", "shared.module",
-    )
-    self._create_python_contract(
-      "SPEC-113", "shared-module-public.md", "shared.module",
-    )
-
-    warnings = self.builder.rebuild()
-
-    link = self.builder.mirror_dir / "public" / "shared/module.py.md"
-    assert link.exists()
-    expected = (
-      self.tech_dir / "SPEC-004" / "contracts" / "shared-module-public.md"
-    )
-    assert link.resolve() == expected.resolve()
-    assert any(
-      "Conflict" in w and "SPEC-004 wins" in w
-      for w in warnings
-    )
+  # -- basic wiring --
 
   def test_missing_registry(self) -> None:
     """Test rebuild with missing registry produces warning."""
     warnings = self.builder.rebuild()
     assert any("Registry not found" in w for w in warnings)
 
-  def test_symlinks_use_relative_paths(self) -> None:
-    """Test symlink targets are relative, not absolute."""
-    self._create_registry({"zig": {"src/foo.zig": "SPEC-007"}})
-    self._create_contract_file("SPEC-007", "interfaces.md")
+  def test_empty_registry(self) -> None:
+    """Test rebuild with empty registry is a no-op."""
+    self._create_registry({})
+    warnings = self.builder.rebuild()
+    assert not warnings
 
-    self.builder.rebuild()
+  # -- per-language compat symlinks --
 
-    link = self.builder.mirror_dir / "public" / "src/foo.zig.md"
-    target = link.readlink()
-    assert not target.is_absolute()
-
-  def test_python_deduplicates_same_spec(self) -> None:
-    """Two identifiers mapping to the same SPEC don't produce duplicates."""
-    self._create_registry({
-      "python": {
-        "supekku/scripts/lib/foo": "SPEC-100",
-        "supekku/scripts/lib/bar": "SPEC-100",
-      },
-    })
-    self._create_python_contract(
-      "SPEC-100", "mod-public.md", "some.module",
-    )
+  def test_zig_compat_symlinks(self) -> None:
+    """Zig: compat symlinks in SPEC-*/contracts/ → .contracts/."""
+    self._create_registry({"zig": {"src/combat/agent.zig": "SPEC-007"}})
+    self._create_canonical("public", "src/combat/agent.zig.md")
+    self._create_canonical("internal", "src/combat/agent.zig.md")
 
     warnings = self.builder.rebuild()
 
-    link = self.builder.mirror_dir / "public" / "some/module.py.md"
-    assert link.exists()
-    assert not any("Conflict" in w for w in warnings)
-
-  def test_write_confinement(self) -> None:
-    """Test rebuild writes only within .contracts/ (VT-CONTRACT-MIRROR-003)."""
-    self._create_registry({
-      "python": {"supekku/scripts/lib/foo": "SPEC-100"},
-    })
-    self._create_python_contract(
-      "SPEC-100", "foo-public.md", "supekku.scripts.lib.foo",
+    pub = self._compat_link("SPEC-007", "public", "src/combat/agent.zig.md")
+    int_ = self._compat_link("SPEC-007", "internal", "src/combat/agent.zig.md")
+    assert pub.is_symlink()
+    assert int_.is_symlink()
+    assert (
+      pub.resolve()
+      == (self.contracts_root / "public" / "src/combat/agent.zig.md").resolve()
     )
+    assert not warnings
 
-    # Snapshot all files/dirs outside .contracts/ before rebuild
-    before = set()
-    for p in self.repo_root.rglob("*"):
-      rel = p.relative_to(self.repo_root)
-      if not str(rel).startswith(".contracts"):
-        before.add((str(rel), p.stat().st_mtime_ns))
+  def test_zig_root_package(self) -> None:
+    """Zig root package '.' maps to __root__/ directory."""
+    self._create_registry({"zig": {".": "SPEC-001"}})
+    self._create_canonical("public", "__root__/interfaces.md")
 
     self.builder.rebuild()
 
-    # Verify nothing outside .contracts/ was modified or created
-    after = set()
-    for p in self.repo_root.rglob("*"):
-      rel = p.relative_to(self.repo_root)
-      if not str(rel).startswith(".contracts"):
-        after.add((str(rel), p.stat().st_mtime_ns))
+    link = self._compat_link("SPEC-001", "public", "__root__/interfaces.md")
+    assert link.is_symlink()
 
-    assert before == after, (
-      f"Files outside .contracts/ changed: {before.symmetric_difference(after)}"
-    )
+  def test_go_compat_symlinks(self) -> None:
+    """Go: compat symlinks mirror package-based paths."""
+    self._create_registry({"go": {"internal/foo/bar": "SPEC-003"}})
+    self._create_canonical("public", "internal/foo/bar/interfaces.md")
+    self._create_canonical("internal", "internal/foo/bar/internals.md")
 
-  def test_rebuild_removes_all_stale_views(self) -> None:
-    """Test rebuild removes entire stale view directories."""
-    # Build with contracts producing an "all" view
-    self._create_registry({
-      "python": {"supekku/scripts/lib/foo": "SPEC-100"},
-    })
-    self._create_python_contract(
-      "SPEC-100", "foo-all.md", "supekku.scripts.lib.foo",
-    )
     self.builder.rebuild()
 
-    all_dir = self.builder.mirror_dir / "all"
-    impl_alias = self.builder.mirror_dir / "implementation"
-    assert all_dir.exists()
-    assert impl_alias.is_symlink()
+    pub = self._compat_link("SPEC-003", "public", "internal/foo/bar/interfaces.md")
+    int_ = self._compat_link("SPEC-003", "internal", "internal/foo/bar/internals.md")
+    assert pub.is_symlink()
+    assert int_.is_symlink()
 
-    # Rebuild with no contracts at all
-    shutil.rmtree(self.tech_dir / "SPEC-100" / "contracts")
+  def test_ts_compat_symlinks(self) -> None:
+    """TypeScript: compat symlinks for file-based identifiers."""
+    self._create_registry({"typescript": {"src/api.ts": "SPEC-050"}})
+    self._create_canonical("public", "src/api.ts.md")
+
+    self.builder.rebuild()
+
+    link = self._compat_link("SPEC-050", "public", "src/api.ts.md")
+    assert link.is_symlink()
+
+  def test_python_compat_symlinks(self) -> None:
+    """Python: compat symlinks for distributed contract files."""
+    self._create_registry(
+      {"python": {"supekku/scripts/lib/foo": "SPEC-100"}},
+    )
+    self._create_canonical(
+      "public",
+      "supekku/scripts/lib/foo/bar.py.md",
+    )
+
+    self.builder.rebuild()
+
+    link = self._compat_link(
+      "SPEC-100",
+      "public",
+      "supekku/scripts/lib/foo/bar.py.md",
+    )
+    assert link.is_symlink()
+
+  # -- aliases --
+
+  def test_aliases_created_in_contracts_root(self) -> None:
+    """View aliases (api → public) created in .contracts/."""
+    self._create_registry({"go": {"internal/foo": "SPEC-001"}})
+    self._create_canonical("public", "internal/foo/interfaces.md")
+
+    self.builder.rebuild()
+
+    api_alias = self.contracts_root / "api"
+    assert api_alias.is_symlink()
+    assert api_alias.readlink() == Path("public")
+
+  def test_alias_not_created_for_empty_view(self) -> None:
+    """Aliases are not created when target view directory doesn't exist."""
     self._create_registry({})
     self.builder.rebuild()
 
-    assert not all_dir.exists()
+    impl_alias = self.contracts_root / "implementation"
     assert not impl_alias.exists()
+
+  # -- properties --
+
+  def test_symlinks_use_relative_paths(self) -> None:
+    """Compat symlink targets are relative, not absolute."""
+    self._create_registry({"zig": {"src/foo.zig": "SPEC-007"}})
+    self._create_canonical("public", "src/foo.zig.md")
+
+    self.builder.rebuild()
+
+    link = self._compat_link("SPEC-007", "public", "src/foo.zig.md")
+    target = link.readlink()
+    assert not target.is_absolute()
+
+  def test_rebuild_is_idempotent(self) -> None:
+    """Consecutive rebuilds produce identical results."""
+    self._create_registry({"zig": {"src/foo.zig": "SPEC-001"}})
+    self._create_canonical("public", "src/foo.zig.md")
+
+    self.builder.rebuild()
+    self.builder.rebuild()
+
+    link = self._compat_link("SPEC-001", "public", "src/foo.zig.md")
+    assert link.is_symlink()
+
+  def test_canonical_files_not_modified(self) -> None:
+    """Rebuild must not modify canonical .contracts/ files."""
+    self._create_registry({"go": {"internal/foo": "SPEC-001"}})
+    canonical = self._create_canonical("public", "internal/foo/interfaces.md")
+    mtime_before = canonical.stat().st_mtime_ns
+
+    self.builder.rebuild()
+
+    assert canonical.stat().st_mtime_ns == mtime_before
+    assert not canonical.is_symlink()
+
+  def test_replaces_non_symlink_with_warning(self) -> None:
+    """Replacing a real file in SPEC-*/contracts/ emits a warning."""
+    self._create_registry({"zig": {"src/foo.zig": "SPEC-001"}})
+    self._create_canonical("public", "src/foo.zig.md")
+
+    # Pre-create a real file where the compat symlink should go
+    compat = self._compat_link("SPEC-001", "public", "src/foo.zig.md")
+    compat.parent.mkdir(parents=True, exist_ok=True)
+    compat.write_text("stale real file")
+
+    warnings = self.builder.rebuild()
+
+    assert compat.is_symlink()
+    assert any("non-symlink" in w for w in warnings)
 
 
 if __name__ == "__main__":

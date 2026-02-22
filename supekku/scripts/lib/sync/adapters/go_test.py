@@ -106,10 +106,13 @@ class TestGoAdapter(unittest.TestCase):
   def test_generate_rejects_non_go_unit(self) -> None:
     """Test generate method rejects non-Go source units."""
     unit = SourceUnit("python", "some/module.py", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
+    variant_outputs = {
+      "public": Path("/test/output/public/interfaces.md"),
+      "internal": Path("/test/output/internal/internals.md"),
+    }
 
     with pytest.raises(ValueError) as context:
-      self.adapter.generate(unit, spec_dir=spec_dir)
+      self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     assert "GoAdapter cannot process python units" in str(context.value)
 
@@ -146,8 +149,11 @@ class TestGoAdapter(unittest.TestCase):
       mock_get_module.return_value = "github.com/test/repo"
 
       unit = SourceUnit("go", "internal/test", self.repo_root)
-      spec_dir = Path("/test/spec/SPEC-001")
-      variants = self.adapter.generate(unit, spec_dir=spec_dir)
+      variant_outputs = {
+        "public": Path("/test/output/public/internal/test/interfaces.md"),
+        "internal": Path("/test/output/internal/internal/test/internals.md"),
+      }
+      variants = self.adapter.generate(unit, variant_outputs=variant_outputs)
 
       # Should generate two variants
       assert len(variants) == 2
@@ -186,8 +192,15 @@ class TestGoAdapter(unittest.TestCase):
       mock_get_module.return_value = "github.com/test/repo"
 
       unit = SourceUnit("go", "internal/test", self.repo_root)
-      spec_dir = Path("/test/spec/SPEC-001")
-      variants = self.adapter.generate(unit, spec_dir=spec_dir, check=True)
+      variant_outputs = {
+        "public": Path("/test/output/public/internal/test/interfaces.md"),
+        "internal": Path("/test/output/internal/internal/test/internals.md"),
+      }
+      variants = self.adapter.generate(
+        unit,
+        variant_outputs=variant_outputs,
+        check=True,
+      )
 
       # Should check both variants
       assert len(variants) == 2
@@ -227,10 +240,13 @@ class TestGoAdapter(unittest.TestCase):
     mock_is_go.return_value = False
 
     unit = SourceUnit("go", "internal/test", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
+    variant_outputs = {
+      "public": Path("/test/output/public/interfaces.md"),
+      "internal": Path("/test/output/internal/internals.md"),
+    }
 
     with pytest.raises(GoToolchainNotAvailableError) as context:
-      self.adapter.generate(unit, spec_dir=spec_dir)
+      self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     assert "Go toolchain not found in PATH" in str(context.value)
     assert "https://go.dev/dl/" in str(context.value)
@@ -277,10 +293,13 @@ class TestGoAdapter(unittest.TestCase):
     mock_which.side_effect = which_side_effect
 
     unit = SourceUnit("go", "internal/test", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
+    variant_outputs = {
+      "public": Path("/test/output/public/interfaces.md"),
+      "internal": Path("/test/output/internal/internals.md"),
+    }
 
     with pytest.raises(GomarkdocNotAvailableError) as context:
-      self.adapter.generate(unit, spec_dir=spec_dir)
+      self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     assert "gomarkdoc not found in PATH" in str(context.value)
     assert "go install github.com/princjef/gomarkdoc" in str(context.value)

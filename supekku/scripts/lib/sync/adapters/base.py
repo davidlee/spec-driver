@@ -238,14 +238,25 @@ class LanguageAdapter(ABC):
     self,
     unit: SourceUnit,
     *,
-    spec_dir: Path,
+    variant_outputs: dict[str, Path],
     check: bool = False,
   ) -> list[DocVariant]:
     """Generate documentation variants for a source unit.
 
+    Adapters write each variant to the exact file path provided in
+    variant_outputs.  The returned DocVariant.path MUST match the
+    corresponding value from variant_outputs (centrally validated by
+    the caller).
+
+    Python exception: variant_outputs contains a single "_staging_dir"
+    key whose value is a staging directory.  The adapter writes all
+    output there; the caller distributes to canonical paths afterward.
+
     Args:
         unit: Source unit to generate documentation for
-        spec_dir: Specification directory to write documentation to
+        variant_outputs: Per-variant canonical output file paths.
+            Keys are variant names (e.g. "public", "internal");
+            values are absolute file paths to write to.
         check: If True, only check if docs would change (don't write files)
 
     Returns:

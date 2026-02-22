@@ -475,14 +475,14 @@ class TypeScriptAdapter(LanguageAdapter):
     self,
     unit: SourceUnit,
     *,
-    spec_dir: Path,
+    variant_outputs: dict[str, Path],
     check: bool = False,
   ) -> list[DocVariant]:
     """Generate documentation for a TypeScript/JavaScript module.
 
     Args:
         unit: TypeScript/JavaScript module source unit
-        spec_dir: Specification directory to write documentation to
+        variant_outputs: Per-variant canonical output file paths
         check: If True, only check if docs would change
 
     Returns:
@@ -528,60 +528,38 @@ class TypeScriptAdapter(LanguageAdapter):
       return []
 
     if not module_path.exists():
-      # Return error variants
       return [
-        DocVariant(
-          name="api",
-          path=Path("contracts/api.md"),
-          hash="",
-          status="unchanged",
-        ),
-        DocVariant(
-          name="internal",
-          path=Path("contracts/internal.md"),
-          hash="",
-          status="unchanged",
-        ),
+        DocVariant(name=name, path=path, hash="", status="unchanged")
+        for name, path in variant_outputs.items()
       ]
 
-    # Map variant names
-    variant_mapping = {
-      "api": "public",  # Our 'api' maps to ts-doc-extract's 'public'
+    # Map our variant names to ts-doc-extract variant names
+    ts_variant_mapping = {
+      "api": "public",
       "internal": "internal",
     }
 
-    output_root = spec_dir / "contracts"
-    doc_variants = []
+    doc_variants: list[DocVariant] = []
 
-    for our_variant, ts_variant in variant_mapping.items():
+    for our_variant, output_path in variant_outputs.items():
+      ts_variant = ts_variant_mapping.get(our_variant, our_variant)
       try:
-        # Extract AST
         ast_data = self._extract_ast(module_path, ts_variant)
-
-        # Generate markdown
         markdown = self._generate_markdown(ast_data, our_variant)
-
-        # Calculate output path
-        output_file = output_root / f"{our_variant}.md"
-
-        # Calculate hash
         content_hash = hashlib.sha256(markdown.encode("utf-8")).hexdigest()
 
-        # Write file (unless check mode)
         if check:
-          # Check if file exists and content matches
-          if output_file.exists():
-            with open(output_file, encoding="utf-8") as f:
+          if output_path.exists():
+            with open(output_path, encoding="utf-8") as f:
               existing = f.read()
             existing_hash = hashlib.sha256(existing.encode("utf-8")).hexdigest()
             status = "unchanged" if existing_hash == content_hash else "error"
           else:
-            status = "error"  # Missing file in check mode
+            status = "error"
         else:
-          # Write mode
           status = "unchanged"
-          if output_file.exists():
-            with open(output_file, encoding="utf-8") as f:
+          if output_path.exists():
+            with open(output_path, encoding="utf-8") as f:
               existing = f.read()
             existing_hash = hashlib.sha256(existing.encode("utf-8")).hexdigest()
             if existing_hash != content_hash:
@@ -589,42 +567,34 @@ class TypeScriptAdapter(LanguageAdapter):
           else:
             status = "created"
 
-          # Write file
-          output_file.parent.mkdir(parents=True, exist_ok=True)
-          with open(output_file, "w", encoding="utf-8") as f:
+          output_path.parent.mkdir(parents=True, exist_ok=True)
+          with open(output_path, "w", encoding="utf-8") as f:
             f.write(markdown)
 
         doc_variants.append(
           DocVariant(
             name=our_variant,
-            path=output_file.relative_to(spec_dir),
+            path=output_path,
             hash=content_hash,
             status=status,
           ),
         )
 
       except TypeScriptExtractionError:
-        # Return error variant
         doc_variants.append(
-          DocVariant(
-            name=our_variant,
-            path=Path(f"contracts/{our_variant}.md"),
-            hash="",
-            status="unchanged",
-          ),
+          DocVariant(name=our_variant, path=output_path, hash="", status="unchanged"),
         )
 
-    # If both variants exist and are identical, remove internal.md
+    # If both variants exist and are identical, remove internal
     if (
       not check
       and len(doc_variants) == 2
       and doc_variants[0].hash
       and doc_variants[0].hash == doc_variants[1].hash
     ):
-      internal_file = output_root / "internal.md"
-      if internal_file.exists():
-        internal_file.unlink()
-      # Remove internal variant from list
+      internal_path = variant_outputs.get("internal")
+      if internal_path and internal_path.exists():
+        internal_path.unlink()
       doc_variants = [v for v in doc_variants if v.name != "internal"]
 
     return doc_variants

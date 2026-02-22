@@ -25,6 +25,12 @@ if str(ROOT) not in sys.path:
   sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
+from supekku.scripts.lib.contracts.mirror import (  # type: ignore
+  python_staging_dir,
+  resolve_go_variant_outputs,
+  resolve_ts_variant_outputs,
+  resolve_zig_variant_outputs,
+)
 from supekku.scripts.lib.core.spec_utils import (  # type: ignore
   append_unique,
   dump_markdown_file,
@@ -113,6 +119,8 @@ class MultiLanguageSpecManager:
       "updated": today,
       "status": "stub",
       "kind": "spec",
+      "category": "unit",
+      "c4_level": "code",
       "responsibilities": [],
       "aliases": [],
     }
@@ -180,6 +188,7 @@ class MultiLanguageSpecManager:
     check_mode: bool = False,
     dry_run: bool = False,
     generate_contracts: bool = True,
+    create_specs: bool = True,
   ) -> dict:
     """Process a single source unit.
 
@@ -208,61 +217,79 @@ class MultiLanguageSpecManager:
       )
 
       # Create new spec if needed
-      if not spec_id:
+      has_spec = bool(spec_id)
+      if not has_spec:
         if check_mode:
           result["skipped"] = True
           result["reason"] = "no registered spec for check mode"
           return result
 
-        spec_id = self._get_next_spec_id(dry_run=dry_run)
-        result["created"] = True
-        result["spec_id"] = spec_id
+        if not create_specs and not generate_contracts:
+          result["skipped"] = True
+          result["reason"] = "spec auto-creation is off"
+          return result
 
-        if dry_run:
-          # Show what would be created
-          spec_dir = self.tech_dir / spec_id
-          spec_file = spec_dir / f"{spec_id}.md"
-          result["would_create_paths"].append(str(spec_file))
-        else:
-          # Create spec directory and file
-          spec_file = self._create_spec_directory_and_file(
-            spec_id,
-            source_unit,
-            descriptor,
-          )
+        if create_specs:
+          spec_id = self._get_next_spec_id(dry_run=dry_run)
+          result["created"] = True
+          result["spec_id"] = spec_id
 
-          # Update registry
-          self._update_registry(source_unit, spec_id)
+          if dry_run:
+            spec_dir = self.tech_dir / spec_id
+            spec_file = spec_dir / f"{spec_id}.md"
+            result["would_create_paths"].append(str(spec_file))
+          else:
+            spec_file = self._create_spec_directory_and_file(
+              spec_id,
+              source_unit,
+              descriptor,
+            )
+            self._update_registry(source_unit, spec_id)
       else:
         result["spec_id"] = spec_id
 
-      # Determine spec directory
-      spec_dir = self.tech_dir / spec_id
-      spec_file = spec_dir / f"{spec_id}.md"
+      # Spec-related work: frontmatter update, file checks
+      if has_spec or create_specs:
+        spec_dir = self.tech_dir / spec_id
+        spec_file = spec_dir / f"{spec_id}.md"
 
-      if not dry_run and not spec_file.exists():
-        result["skipped"] = True
-        result["reason"] = "spec file missing"
-        return result
+        if not dry_run and not spec_file.exists():
+          result["skipped"] = True
+          result["reason"] = "spec file missing"
+          return result
 
+        if not dry_run:
+          self._ensure_source_in_spec(spec_file, source_unit)
+
+      # Contract generation — independent of spec existence
       if not dry_run:
-        # Ensure source is listed in spec frontmatter
-        self._ensure_source_in_spec(spec_file, source_unit)
-
         if generate_contracts:
-          # Generate documentation
+          contracts_root = source_unit.root / ".contracts"
+          variant_outputs = self._resolve_variant_outputs(
+            source_unit,
+            contracts_root,
+          )
           doc_variants = adapter.generate(
             source_unit,
-            spec_dir=spec_dir,
+            variant_outputs=variant_outputs,
             check=check_mode,
           )
+
+          if source_unit.language == "python":
+            staging = variant_outputs["_staging_dir"]
+            doc_variants = self._distribute_python_contracts(
+              staging,
+              contracts_root,
+              doc_variants,
+            )
+
           result["doc_variants"] = doc_variants
-      elif generate_contracts:
-        # Dry-run: show what doc paths would be created
+      elif generate_contracts and spec_id:
+        # Dry-run with spec: show what doc paths would be created
+        spec_dir = self.tech_dir / spec_id
         for variant in descriptor.variants:
           variant_path = spec_dir / variant.path
           result["would_create_paths"].append(str(variant_path))
-        # Use descriptor variants for display
         result["doc_variants"] = descriptor.variants
 
       result["processed"] = True
@@ -273,6 +300,123 @@ class MultiLanguageSpecManager:
       result["skipped"] = True
       result["reason"] = str(e)
       return result
+
+  @staticmethod
+  def _resolve_variant_outputs(
+    source_unit,
+    contracts_root: Path,
+  ) -> dict[str, Path]:
+    """Compute per-variant canonical output paths for a source unit."""
+    lang = source_unit.language
+    identifier = source_unit.identifier
+
+    if lang == "go":
+      return resolve_go_variant_outputs(identifier, contracts_root)
+    if lang == "zig":
+      return resolve_zig_variant_outputs(identifier, contracts_root)
+    if lang in ("typescript", "javascript"):
+      return resolve_ts_variant_outputs(identifier, contracts_root)
+    if lang == "python":
+      staging = python_staging_dir(identifier, contracts_root)
+      return {"_staging_dir": staging}
+
+    msg = f"No variant output resolver for language: {lang}"
+    raise ValueError(msg)
+
+  @staticmethod
+  def _distribute_python_contracts(
+    staging_dir: Path,
+    contracts_root: Path,
+    doc_variants: list,
+  ) -> list:
+    """Distribute staged Python contracts to canonical locations.
+
+    Scans staging_dir for generated contract files, parses the header
+    to determine the module identity, extracts the variant from the
+    filename suffix, and moves each file to its canonical path under
+    contracts_root/<view>/<module-path>.py.md.
+
+    Returns updated DocVariant list with canonical paths.
+    """
+    from supekku.scripts.lib.contracts.mirror import (  # noqa: PLC0415
+      extract_python_variant,
+      python_module_to_path,
+      read_python_module_name,
+    )
+    from supekku.scripts.lib.sync.models import DocVariant  # noqa: PLC0415
+
+    # Python variant name → canonical view name
+    variant_view_map = {
+      "public": "public",
+      "all": "all",
+      "tests": "tests",
+    }
+
+    updated_variants: list[DocVariant] = []
+
+    try:
+      if not staging_dir.is_dir():
+        return list(doc_variants)
+
+      for staged_file in sorted(staging_dir.rglob("*.md")):
+        variant = extract_python_variant(staged_file.name)
+        if variant is None:
+          continue
+
+        module_name = read_python_module_name(staged_file)
+        if module_name is None:
+          continue
+
+        view = variant_view_map.get(variant, variant)
+        mirror_path = f"{python_module_to_path(module_name)}.md"
+        canonical_path = contracts_root / view / mirror_path
+
+        canonical_path.parent.mkdir(parents=True, exist_ok=True)
+        # Move staged file to canonical location
+        import shutil  # noqa: PLC0415
+
+        shutil.move(str(staged_file), str(canonical_path))
+
+        # Find matching doc variant to update its path
+        # Map adapter variant names to our output variant names
+        adapter_to_output = {
+          "public": "api",
+          "all": "implementation",
+          "tests": "tests",
+        }
+        output_name = adapter_to_output.get(variant, variant)
+
+        # Find the original variant and create updated version
+        original = next(
+          (v for v in doc_variants if v.name == output_name),
+          None,
+        )
+        if original:
+          updated_variants.append(
+            DocVariant(
+              name=original.name,
+              path=canonical_path,
+              hash=original.hash,
+              status=original.status,
+            ),
+          )
+
+    finally:
+      # Clean up staging directory
+      import shutil  # noqa: PLC0415
+
+      if staging_dir.exists():
+        shutil.rmtree(staging_dir)
+        # Also remove parent staging dirs if empty
+        parent = staging_dir.parent
+        while parent != contracts_root and parent.exists():
+          try:
+            parent.rmdir()  # only succeeds if empty
+            parent = parent.parent
+          except OSError:
+            break
+
+    return updated_variants if updated_variants else list(doc_variants)
 
   def rebuild_indices(self) -> None:
     """Rebuild symlink indices."""

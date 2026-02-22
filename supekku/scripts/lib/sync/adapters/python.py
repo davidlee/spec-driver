@@ -203,14 +203,19 @@ class PythonAdapter(LanguageAdapter):
     self,
     unit: SourceUnit,
     *,
-    spec_dir: Path,
+    variant_outputs: dict[str, Path],
     check: bool = False,
   ) -> list[DocVariant]:
     """Generate documentation for a Python module using AST analysis.
 
+    Python exception: variant_outputs contains a single "_staging_dir"
+    key whose value is the staging directory.  The adapter writes all
+    per-module contract files there; the caller distributes to canonical
+    paths via a post-generation distribute step.
+
     Args:
         unit: Python module source unit
-        spec_dir: Specification directory to write documentation to
+        variant_outputs: Must contain ``{"_staging_dir": <staging_path>}``
         check: If True, only check if docs would change
 
     Returns:
@@ -229,7 +234,6 @@ class PythonAdapter(LanguageAdapter):
     module_path = self.repo_root / unit.identifier
 
     if not module_path.exists():
-      # Return error variant
       return [
         DocVariant(name="error", path=Path(), hash="", status="unchanged"),
       ]
@@ -248,11 +252,10 @@ class PythonAdapter(LanguageAdapter):
       "tests": "tests",
     }
 
-    # Set output directory (within spec directory)
-    output_root = spec_dir / "contracts"
+    # Python uses staging dir, not per-variant output paths
+    output_root = variant_outputs["_staging_dir"]
 
     try:
-      # Generate documentation using the Python AST system
       results = generate_docs(
         unit=module_path,
         variants=variants_to_generate,
@@ -261,19 +264,13 @@ class PythonAdapter(LanguageAdapter):
         base_path=self.repo_root,
       )
 
-      # Convert DocResult objects to DocVariant objects
       doc_variants = []
       for result in results:
-        # Map variant name to our naming convention
         mapped_name = variant_name_mapping.get(result.variant, result.variant)
-
-        # Use the actual path from the result, relative to spec_dir
-        actual_path = result.path
-
         doc_variants.append(
           DocVariant(
             name=mapped_name,
-            path=actual_path.relative_to(spec_dir),
+            path=result.path,
             hash=result.hash,
             status=result.status,
           ),
@@ -282,9 +279,6 @@ class PythonAdapter(LanguageAdapter):
       return doc_variants
 
     except Exception:
-      # Handle any errors in documentation generation
-
-      # Return error variants for each expected output
       error_variants = []
       for variant_name in ["api", "implementation", "tests"]:
         error_variants.append(
@@ -292,10 +286,9 @@ class PythonAdapter(LanguageAdapter):
             name=variant_name,
             path=Path(f"contracts/{variant_name}.md"),
             hash="",
-            status="unchanged",  # Error status handled at higher level
+            status="unchanged",
           ),
         )
-
       return error_variants
 
   def supports_identifier(self, identifier: str) -> bool:

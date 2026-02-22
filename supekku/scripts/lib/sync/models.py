@@ -29,16 +29,21 @@ class SourceUnit:
 class DocVariant:
   """Named documentation artifact produced per source unit.
 
+  After generation, ``path`` MUST match the output path provided
+  via ``variant_outputs`` to the adapter.  The caller validates
+  this contract centrally.  Python adapters may return placeholder
+  paths (the caller uses a filesystem scan of the staging dir instead).
+
   Examples:
       - Go: DocVariant("public",
-          Path("contracts/go/foo-public.md"), "abc123", "created")
-      - Python: DocVariant("api",
-          Path("contracts/python/workspace-api.md"), "def456", "changed")
+          Path(".contracts/public/internal/foo/interfaces.md"), ...)
+      - Zig: DocVariant("public",
+          Path(".contracts/public/src/agent.zig.md"), ...)
 
   """
 
   name: str  # e.g. "public", "all", "tests"
-  path: Path  # relative path under contracts/...
+  path: Path  # canonical output path (must match variant_outputs value)
   hash: str  # content hash for audit/check mode
   status: Literal["created", "changed", "unchanged"]
 

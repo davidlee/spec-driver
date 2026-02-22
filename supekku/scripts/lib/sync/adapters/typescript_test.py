@@ -482,24 +482,30 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
   def test_generate_requires_node_runtime(self) -> None:
     """Test generate raises error when Node.js not available."""
     unit = SourceUnit("typescript", "src/index.ts", self.repo_root)
-    spec_dir = Path("/test/specs")
+    variant_outputs = {
+      "api": Path("/test/output/public/src/index.ts.md"),
+      "internal": Path("/test/output/internal/src/index.ts.md"),
+    }
 
     with (
       patch.object(TypeScriptAdapter, "is_node_available", return_value=False),
       pytest.raises(NodeRuntimeNotAvailableError),
     ):
-      self.adapter.generate(unit, spec_dir=spec_dir)
+      self.adapter.generate(unit, variant_outputs=variant_outputs)
 
   def test_generate_validates_unit_language(self) -> None:
     """Test generate validates unit language."""
     unit = SourceUnit("python", "src/module.py", self.repo_root)
-    spec_dir = Path("/test/specs")
+    variant_outputs = {
+      "api": Path("/test/output/public/src/module.py.md"),
+      "internal": Path("/test/output/internal/src/module.py.md"),
+    }
 
     with (
       patch.object(TypeScriptAdapter, "is_node_available", return_value=True),
       pytest.raises(ValueError, match="cannot process"),
     ):
-      self.adapter.generate(unit, spec_dir=spec_dir)
+      self.adapter.generate(unit, variant_outputs=variant_outputs)
 
   def test_ensure_ts_doc_extract_available_caching(self) -> None:
     """Test _ensure_ts_doc_extract_available caches result."""
@@ -533,7 +539,10 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
   def test_generate_skips_gracefully_when_ts_doc_extract_missing(self) -> None:
     """Test generate skips with warning when ts-doc-extract not available."""
     unit = SourceUnit("typescript", "src/index.ts", self.repo_root)
-    spec_dir = Path("/test/specs")
+    variant_outputs = {
+      "api": Path("/test/output/public/src/index.ts.md"),
+      "internal": Path("/test/output/internal/src/index.ts.md"),
+    }
 
     with (
       patch.object(TypeScriptAdapter, "is_node_available", return_value=True),
@@ -550,7 +559,7 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
       ),
       patch("supekku.scripts.lib.sync.adapters.typescript.Console") as mock_console,
     ):
-      result = self.adapter.generate(unit, spec_dir=spec_dir)
+      result = self.adapter.generate(unit, variant_outputs=variant_outputs)
 
       # Should return empty list (skip gracefully)
       assert result == []
@@ -569,9 +578,13 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
     test_repo.mkdir(parents=True, exist_ok=True)
 
     unit = SourceUnit("typescript", "src/index.ts", test_repo)
-    spec_dir = Path("/tmp/test-specs")
-    contracts_dir = spec_dir / "contracts"
-    contracts_dir.mkdir(parents=True, exist_ok=True)
+    output_dir = Path("/tmp/test-contracts-output")
+    api_output = output_dir / "public" / "src" / "index.ts.md"
+    internal_output = output_dir / "internal" / "src" / "index.ts.md"
+    variant_outputs = {
+      "api": api_output,
+      "internal": internal_output,
+    }
 
     # Create package.json (required for package root detection)
     package_json = test_repo / "package.json"
@@ -606,20 +619,20 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
         patch.object(TypeScriptAdapter, "is_node_available", return_value=True),
         patch.object(TypeScriptAdapter, "_extract_ast", return_value=ast_data),
       ):
-        variants = test_adapter.generate(unit, spec_dir=spec_dir)
+        variants = test_adapter.generate(unit, variant_outputs=variant_outputs)
 
         # Should only return api variant (internal was deduplicated)
         assert len(variants) == 1
         assert variants[0].name == "api"
 
-        # api.md should exist
-        assert (contracts_dir / "api.md").exists()
+        # api output should exist
+        assert api_output.exists()
 
-        # internal.md should NOT exist
-        assert not (contracts_dir / "internal.md").exists()
+        # internal output should NOT exist
+        assert not internal_output.exists()
     finally:
       # Cleanup
       if test_repo.exists():
         shutil.rmtree(test_repo)
-      if spec_dir.exists():
-        shutil.rmtree(spec_dir)
+      if output_dir.exists():
+        shutil.rmtree(output_dir)

@@ -9,6 +9,10 @@ import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
 from supekku.scripts.lib.core.repo import find_repo_root
+from supekku.scripts.lib.core.sync_preferences import (
+  persist_spec_autocreate,
+  spec_autocreate_enabled,
+)
 from supekku.scripts.lib.sync.engine import SpecSyncEngine
 from supekku.scripts.lib.sync.models import SourceUnit
 from supekku.scripts.sync_specs import (
@@ -78,8 +82,7 @@ def sync(
     bool,
     typer.Option(
       "--contracts/--no-contracts",
-      help="Generate contract documentation for source units. "
-      "Independent of --specs.",
+      help="Generate contract documentation for source units. Independent of --specs.",
     ),
   ] = True,
   adr: Annotated[
@@ -143,8 +146,33 @@ def sync(
 
   results = {}
 
-  # Sync specs if requested
-  if specs:
+  # Backward compat: existing registry entries imply opt-in
+  if not spec_autocreate_enabled(root) and registry_path.exists():
+    from supekku.scripts.lib.registry_migration import RegistryV2
+
+    registry = RegistryV2.from_file(registry_path)
+    has_specs = any(registry.languages.values())
+    if has_specs:
+      persist_spec_autocreate(root)
+      typer.echo(
+        "Existing specs detected; enabling spec auto-creation (persisted).",
+        err=True,
+      )
+
+  # Resolve spec auto-creation preference (explicit flag > marker > False)
+  resolved_specs = specs
+  if resolved_specs is None:
+    resolved_specs = spec_autocreate_enabled(root)
+  if specs is True:
+    persist_spec_autocreate(root)
+
+  # Sync specs / contracts
+  if resolved_specs or contracts:
+    if not resolved_specs:
+      typer.echo(
+        "Spec auto-creation is off. Use --specs to enable (persisted for future runs).",
+        err=True,
+      )
     typer.echo("Synchronizing tech specs...")
     try:
       spec_result = _sync_specs(
@@ -159,6 +187,8 @@ def sync(
         _allow_missing_source=allow_missing_source or [],
         prune=prune,
         force=force,
+        create_specs=resolved_specs,
+        generate_contracts=contracts,
       )
       results["specs"] = spec_result
     except (FileNotFoundError, ValueError, KeyError) as e:
@@ -215,6 +245,8 @@ def _sync_specs(
   _allow_missing_source: list[str],
   prune: bool,
   force: bool,
+  create_specs: bool = True,
+  generate_contracts: bool = True,
 ) -> dict:
   """Execute spec synchronization."""
   # Initialize spec sync engine and spec manager
@@ -379,6 +411,8 @@ def _sync_specs(
         adapter,
         check_mode=check,
         dry_run=dry_run,
+        generate_contracts=generate_contracts,
+        create_specs=create_specs,
       )
 
       if result["processed"]:
@@ -510,14 +544,15 @@ def _sync_specs(
     spec_manager.save_registry()
     typer.echo("✓ Symlink indices updated")
 
-    # Rebuild contract mirror tree
-    from supekku.scripts.lib.contracts import ContractMirrorTreeBuilder
+    if generate_contracts:
+      # Build compat symlinks: SPEC-*/contracts/ → .contracts/
+      from supekku.scripts.lib.contracts import ContractMirrorTreeBuilder
 
-    mirror_builder = ContractMirrorTreeBuilder(root, tech_dir)
-    mirror_warnings = mirror_builder.rebuild()
-    for warning in mirror_warnings:
-      typer.echo(f"  Warning: {warning}", err=True)
-    typer.echo("✓ Contract mirror tree updated")
+      mirror_builder = ContractMirrorTreeBuilder(root, tech_dir)
+      mirror_warnings = mirror_builder.rebuild()
+      for warning in mirror_warnings:
+        typer.echo(f"  Warning: {warning}", err=True)
+      typer.echo("✓ Contract compat symlinks updated")
 
   return {
     "success": True,

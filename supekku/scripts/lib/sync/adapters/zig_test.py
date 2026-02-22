@@ -103,10 +103,13 @@ class TestZigAdapter(unittest.TestCase):
   def test_generate_rejects_non_zig_unit(self) -> None:
     """Test generate method rejects non-Zig source units."""
     unit = SourceUnit("python", "some/module.py", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
+    variant_outputs = {
+      "public": Path("/test/output/public/src/test.zig.md"),
+      "internal": Path("/test/output/internal/src/test.zig.md"),
+    }
 
     with pytest.raises(ValueError) as context:
-      self.adapter.generate(unit, spec_dir=spec_dir)
+      self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     assert "ZigAdapter cannot process python units" in str(context.value)
 
@@ -136,8 +139,11 @@ class TestZigAdapter(unittest.TestCase):
     mock_read_text.return_value = "# Documentation content"
 
     unit = SourceUnit("zig", "src/test.zig", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
-    variants = self.adapter.generate(unit, spec_dir=spec_dir)
+    variant_outputs = {
+      "public": Path("/test/output/public/src/test.zig.md"),
+      "internal": Path("/test/output/internal/src/test.zig.md"),
+    }
+    variants = self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     # Should generate two variants
     assert len(variants) == 2
@@ -170,8 +176,11 @@ class TestZigAdapter(unittest.TestCase):
     mock_subprocess.return_value = Mock(returncode=0)  # Check passes
 
     unit = SourceUnit("zig", "src/test.zig", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
-    variants = self.adapter.generate(unit, spec_dir=spec_dir, check=True)
+    variant_outputs = {
+      "public": Path("/test/output/public/src/test.zig.md"),
+      "internal": Path("/test/output/internal/src/test.zig.md"),
+    }
+    variants = self.adapter.generate(unit, variant_outputs=variant_outputs, check=True)
 
     # Should check both variants
     assert len(variants) == 2
@@ -216,8 +225,11 @@ class TestZigAdapter(unittest.TestCase):
     mock_subprocess.side_effect = subprocess_side_effect
 
     unit = SourceUnit("zig", "src/test.zig", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
-    variants = self.adapter.generate(unit, spec_dir=spec_dir, check=True)
+    variant_outputs = {
+      "public": Path("/test/output/public/src/test.zig.md"),
+      "internal": Path("/test/output/internal/src/test.zig.md"),
+    }
+    variants = self.adapter.generate(unit, variant_outputs=variant_outputs, check=True)
 
     # Should check both variants
     assert len(variants) == 2
@@ -249,8 +261,11 @@ class TestZigAdapter(unittest.TestCase):
     mock_read_text.return_value = "# Documentation content"
 
     unit = SourceUnit("zig", "src/test.zig", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
-    self.adapter.generate(unit, spec_dir=spec_dir)
+    variant_outputs = {
+      "public": Path("/test/output/public/src/test.zig.md"),
+      "internal": Path("/test/output/internal/src/test.zig.md"),
+    }
+    self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     # Check that second call (internal variant) has --include-private
     assert mock_subprocess.call_count == 2
@@ -266,10 +281,13 @@ class TestZigAdapter(unittest.TestCase):
     mock_is_zigmarkdoc.return_value = False
 
     unit = SourceUnit("zig", "src/test.zig", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
+    variant_outputs = {
+      "public": Path("/test/output/public/src/test.zig.md"),
+      "internal": Path("/test/output/internal/src/test.zig.md"),
+    }
 
     with pytest.raises(ZigmarkdocNotAvailableError) as context:
-      self.adapter.generate(unit, spec_dir=spec_dir)
+      self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     assert "zigmarkdoc not found in PATH" in str(context.value)
     assert "https://github.com/davidlee/zigmarkdoc" in str(context.value)
@@ -286,10 +304,13 @@ class TestZigAdapter(unittest.TestCase):
     mock_exists.return_value = False
 
     unit = SourceUnit("zig", "src/nonexistent.zig", self.repo_root)
-    spec_dir = Path("/test/spec/SPEC-001")
+    variant_outputs = {
+      "public": Path("/test/output/public/src/test.zig.md"),
+      "internal": Path("/test/output/internal/src/test.zig.md"),
+    }
 
     with pytest.raises(FileNotFoundError) as context:
-      self.adapter.generate(unit, spec_dir=spec_dir)
+      self.adapter.generate(unit, variant_outputs=variant_outputs)
 
     assert "Source path does not exist" in str(context.value)
 

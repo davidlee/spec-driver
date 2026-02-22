@@ -8,11 +8,16 @@ from __future__ import annotations
 
 import json
 import os
-import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
-__all__ = ["ContractMirrorTreeBuilder", "MirrorEntry"]
+__all__ = [
+  "ContractMirrorTreeBuilder",
+  "MirrorEntry",
+  "resolve_go_variant_outputs",
+  "resolve_ts_variant_outputs",
+  "resolve_zig_variant_outputs",
+]
 
 # Python contract variants map 1:1 to canonical view names
 PYTHON_KNOWN_VARIANTS = frozenset({"public", "all", "tests"})
@@ -34,6 +39,73 @@ VIEW_ALIASES: dict[str, str] = {
   "api": "public",
   "implementation": "all",
 }
+
+
+# --- Pre-generation path resolvers ---
+# Compute per-variant canonical output file paths *before* generation.
+# Same mapping logic as the post-hoc mirror entry functions, applied upfront.
+
+
+def resolve_go_variant_outputs(
+  identifier: str,
+  contracts_root: Path,
+) -> dict[str, Path]:
+  """Compute per-variant canonical output paths for Go.
+
+  Go preserves adapter filenames (interfaces.md, internals.md).
+  Canonical path: .contracts/<view>/<identifier>/<contract_name>
+  """
+  return {
+    "public": contracts_root / "public" / identifier / "interfaces.md",
+    "internal": contracts_root / "internal" / identifier / "internals.md",
+  }
+
+
+def resolve_zig_variant_outputs(
+  identifier: str,
+  contracts_root: Path,
+) -> dict[str, Path]:
+  """Compute per-variant canonical output paths for Zig.
+
+  Zig discards adapter filenames; canonical leaf is {identifier}.md.
+  Root package '.' maps to __root__/ with original filenames preserved.
+  """
+  if identifier == ".":
+    return {
+      "public": contracts_root / "public" / "__root__" / "interfaces.md",
+      "internal": contracts_root / "internal" / "__root__" / "internals.md",
+    }
+  return {
+    "public": contracts_root / "public" / f"{identifier}.md",
+    "internal": contracts_root / "internal" / f"{identifier}.md",
+  }
+
+
+def resolve_ts_variant_outputs(
+  identifier: str,
+  contracts_root: Path,
+) -> dict[str, Path]:
+  """Compute per-variant canonical output paths for TypeScript.
+
+  TS discards adapter filenames; canonical leaf is {identifier}.md.
+  Keys use the adapter's own variant names (api, internal).
+  """
+  return {
+    "api": contracts_root / "public" / f"{identifier}.md",
+    "internal": contracts_root / "internal" / f"{identifier}.md",
+  }
+
+
+def python_staging_dir(
+  identifier: str,
+  contracts_root: Path,
+) -> Path:
+  """Compute the Python staging directory path.
+
+  Staging key: python/<identifier-slug> (not spec-id).
+  """
+  slug = identifier.replace("/", "-").replace(".", "-")
+  return contracts_root / ".staging" / "python" / slug
 
 
 @dataclass
@@ -81,7 +153,8 @@ def read_python_module_name(contract_path: Path) -> str | None:
 
 
 def python_mirror_entries(
-  spec_id: str, contracts_dir: Path,
+  spec_id: str,
+  contracts_dir: Path,
 ) -> tuple[list[MirrorEntry], list[str]]:
   """Produce mirror entries for all Python contracts in a SPEC bundle."""
   entries: list[MirrorEntry] = []
@@ -103,18 +176,22 @@ def python_mirror_entries(
       warnings.append(f"Could not read module name from {contract_file}")
       continue
 
-    entries.append(MirrorEntry(
-      view=variant,
-      mirror_path=f"{python_module_to_path(module_name)}.md",
-      contract_path=contract_file,
-      spec_id=spec_id,
-    ))
+    entries.append(
+      MirrorEntry(
+        view=variant,
+        mirror_path=f"{python_module_to_path(module_name)}.md",
+        contract_path=contract_file,
+        spec_id=spec_id,
+      )
+    )
 
   return entries, warnings
 
 
 def zig_mirror_entries(
-  spec_id: str, contracts_dir: Path, identifier: str,
+  spec_id: str,
+  contracts_dir: Path,
+  identifier: str,
 ) -> tuple[list[MirrorEntry], list[str]]:
   """Produce mirror entries for Zig contracts."""
   entries: list[MirrorEntry] = []
@@ -130,18 +207,22 @@ def zig_mirror_entries(
     else:
       mirror_path = f"{identifier}.md"
 
-    entries.append(MirrorEntry(
-      view=view,
-      mirror_path=mirror_path,
-      contract_path=contract_path,
-      spec_id=spec_id,
-    ))
+    entries.append(
+      MirrorEntry(
+        view=view,
+        mirror_path=mirror_path,
+        contract_path=contract_path,
+        spec_id=spec_id,
+      )
+    )
 
   return entries, warnings
 
 
 def go_mirror_entries(
-  spec_id: str, contracts_dir: Path, identifier: str,
+  spec_id: str,
+  contracts_dir: Path,
+  identifier: str,
 ) -> tuple[list[MirrorEntry], list[str]]:
   """Produce mirror entries for Go contracts."""
   entries: list[MirrorEntry] = []
@@ -152,18 +233,22 @@ def go_mirror_entries(
     if not contract_path.exists():
       continue
 
-    entries.append(MirrorEntry(
-      view=view,
-      mirror_path=f"{identifier}/{contract_name}",
-      contract_path=contract_path,
-      spec_id=spec_id,
-    ))
+    entries.append(
+      MirrorEntry(
+        view=view,
+        mirror_path=f"{identifier}/{contract_name}",
+        contract_path=contract_path,
+        spec_id=spec_id,
+      )
+    )
 
   return entries, warnings
 
 
 def ts_mirror_entries(
-  spec_id: str, contracts_dir: Path, identifier: str,
+  spec_id: str,
+  contracts_dir: Path,
+  identifier: str,
 ) -> tuple[list[MirrorEntry], list[str]]:
   """Produce mirror entries for TypeScript contracts."""
   entries: list[MirrorEntry] = []
@@ -174,12 +259,14 @@ def ts_mirror_entries(
     if not contract_path.exists():
       continue
 
-    entries.append(MirrorEntry(
-      view=view,
-      mirror_path=f"{identifier}.md",
-      contract_path=contract_path,
-      spec_id=spec_id,
-    ))
+    entries.append(
+      MirrorEntry(
+        view=view,
+        mirror_path=f"{identifier}.md",
+        contract_path=contract_path,
+        spec_id=spec_id,
+      )
+    )
 
   return entries, warnings
 
@@ -194,33 +281,102 @@ class ContractMirrorTreeBuilder:  # pylint: disable=too-few-public-methods
     self.registry_path = self.tech_dir / "registry_v2.json"
 
   def rebuild(self) -> list[str]:
-    """Rebuild the .contracts/ symlink tree. Returns warnings."""
+    """Rebuild compat symlinks: SPEC-*/contracts/ → .contracts/.
+
+    Canonical contract files live in .contracts/<view>/<path>.
+    For each registered spec, create compat symlinks from
+    SPEC-*/contracts/<view>/<path> pointing into .contracts/.
+    """
     warnings: list[str] = []
 
-    # Clean and recreate
-    if self.mirror_dir.exists():
-      shutil.rmtree(self.mirror_dir)
-    self.mirror_dir.mkdir()
-
-    # Load registry
     registry = self._load_registry()
     if registry is None:
       warnings.append(f"Registry not found: {self.registry_path}")
       return warnings
 
-    # Collect all mirror entries
-    entries = self._collect_entries(registry, warnings)
+    languages = registry.get("languages", {})
+    contracts_root = self.mirror_dir  # .contracts/
 
-    # Resolve conflicts
-    resolved = self._resolve_conflicts(entries, warnings)
+    for language, identifiers in languages.items():
+      for identifier, entry in identifiers.items():
+        spec_id = entry if isinstance(entry, str) else entry.get("spec_id")
+        if not spec_id:
+          continue
 
-    # Create symlinks
-    self._create_symlinks(resolved)
+        # Compute expected canonical paths for this source unit
+        canonical_paths = self._canonical_paths_for(
+          language,
+          identifier,
+          contracts_root,
+        )
 
-    # Create aliases
+        # Create compat symlinks from SPEC-*/contracts/ → .contracts/
+        spec_contracts = self.tech_dir / spec_id / "contracts"
+        for canonical in canonical_paths:
+          if not canonical.exists():
+            continue
+
+          # Relative path under .contracts/ (e.g. public/internal/foo/interfaces.md)
+          rel = canonical.relative_to(contracts_root)
+          link_path = spec_contracts / rel
+          link_path.parent.mkdir(parents=True, exist_ok=True)
+
+          target = Path(os.path.relpath(canonical, link_path.parent))
+          if link_path.is_symlink() or link_path.exists():
+            if link_path.is_symlink():
+              link_path.unlink()
+            else:
+              warnings.append(
+                f"Replacing non-symlink {link_path} with compat symlink",
+              )
+              link_path.unlink()
+          link_path.symlink_to(target)
+
+    # Create view aliases inside .contracts/ (api → public, etc.)
     self._create_aliases()
 
     return warnings
+
+  def _canonical_paths_for(
+    self,
+    language: str,
+    identifier: str,
+    contracts_root: Path,
+  ) -> list[Path]:
+    """Return expected canonical file paths for a source unit."""
+    if language == "go":
+      outputs = resolve_go_variant_outputs(identifier, contracts_root)
+      return list(outputs.values())
+    if language == "zig":
+      outputs = resolve_zig_variant_outputs(identifier, contracts_root)
+      return list(outputs.values())
+    if language in ("typescript", "javascript"):
+      outputs = resolve_ts_variant_outputs(identifier, contracts_root)
+      return list(outputs.values())
+    if language == "python":
+      # Python files are distributed; scan for matching files
+      return self._scan_python_contracts(identifier, contracts_root)
+    return []
+
+  @staticmethod
+  def _scan_python_contracts(
+    identifier: str,
+    contracts_root: Path,
+  ) -> list[Path]:
+    """Find canonical Python contract files by scanning .contracts/ views."""
+    results: list[Path] = []
+    for view_dir in contracts_root.iterdir():
+      if not view_dir.is_dir() or view_dir.is_symlink():
+        continue
+      # Python contracts mirror the module path
+      module_dir = view_dir / identifier
+      if module_dir.is_dir():
+        results.extend(module_dir.rglob("*.md"))
+      # Also check for single-file modules
+      module_file = view_dir / f"{identifier}.md"
+      if module_file.is_file():
+        results.append(module_file)
+    return results
 
   def _load_registry(self) -> dict | None:
     """Load registry_v2.json."""
@@ -233,7 +389,9 @@ class ContractMirrorTreeBuilder:  # pylint: disable=too-few-public-methods
       return None
 
   def _collect_entries(
-    self, registry: dict, warnings: list[str],
+    self,
+    registry: dict,
+    warnings: list[str],
   ) -> list[MirrorEntry]:
     """Collect mirror entries from all registered source units."""
     entries: list[MirrorEntry] = []
@@ -251,19 +409,26 @@ class ContractMirrorTreeBuilder:  # pylint: disable=too-few-public-methods
             continue
           seen_specs.add(spec_id)
           new_entries, new_warnings = python_mirror_entries(
-            spec_id, contracts_dir,
+            spec_id,
+            contracts_dir,
           )
         elif language == "zig":
           new_entries, new_warnings = zig_mirror_entries(
-            spec_id, contracts_dir, identifier,
+            spec_id,
+            contracts_dir,
+            identifier,
           )
         elif language == "go":
           new_entries, new_warnings = go_mirror_entries(
-            spec_id, contracts_dir, identifier,
+            spec_id,
+            contracts_dir,
+            identifier,
           )
         elif language in ("typescript", "javascript"):
           new_entries, new_warnings = ts_mirror_entries(
-            spec_id, contracts_dir, identifier,
+            spec_id,
+            contracts_dir,
+            identifier,
           )
         else:
           continue
@@ -274,7 +439,9 @@ class ContractMirrorTreeBuilder:  # pylint: disable=too-few-public-methods
     return entries
 
   def _resolve_conflicts(
-    self, entries: list[MirrorEntry], warnings: list[str],
+    self,
+    entries: list[MirrorEntry],
+    warnings: list[str],
   ) -> list[MirrorEntry]:
     """Resolve conflicting mirror destinations. Lowest SPEC ID wins."""
     groups: dict[tuple[str, str], list[MirrorEntry]] = {}

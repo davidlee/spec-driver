@@ -271,6 +271,39 @@ class TestFormatSpecDetails(unittest.TestCase):
     assert "pkg/core" in result
     assert "File: specify/tech/SPEC-123/SPEC-123.md" in result
 
+  def test_spec_with_taxonomy_fields(self) -> None:
+    """Test formatting spec displays category and c4_level."""
+    spec = self._create_mock_spec()
+    spec.category = "assembly"
+    spec.c4_level = "component"
+
+    result = format_spec_details(spec)
+
+    assert "Category: assembly" in result
+    assert "C4 Level: component" in result
+
+  def test_spec_with_category_only(self) -> None:
+    """Test formatting spec with category but no c4_level."""
+    spec = self._create_mock_spec()
+    spec.category = "unit"
+    spec.c4_level = ""
+
+    result = format_spec_details(spec)
+
+    assert "Category: unit" in result
+    assert "C4 Level" not in result
+
+  def test_spec_without_taxonomy(self) -> None:
+    """Test formatting spec without taxonomy fields omits them."""
+    spec = self._create_mock_spec()
+    spec.category = ""
+    spec.c4_level = ""
+
+    result = format_spec_details(spec)
+
+    assert "Category" not in result
+    assert "C4 Level" not in result
+
 
 if __name__ == "__main__":
   unittest.main()

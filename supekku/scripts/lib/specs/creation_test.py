@@ -124,28 +124,44 @@ class BuildFrontmatterTaxonomyTest(unittest.TestCase):
 
   def test_tech_spec_defaults_to_assembly(self):
     fm = build_frontmatter(
-      spec_id="SPEC-001", slug="test", name="Test", kind="spec", created="2026-01-01",
+      spec_id="SPEC-001",
+      slug="test",
+      name="Test",
+      kind="spec",
+      created="2026-01-01",
     )
     assert fm["category"] == "assembly"
     assert "c4_level" not in fm
 
   def test_product_spec_has_no_category(self):
     fm = build_frontmatter(
-      spec_id="PROD-001", slug="test", name="Test", kind="prod", created="2026-01-01",
+      spec_id="PROD-001",
+      slug="test",
+      name="Test",
+      kind="prod",
+      created="2026-01-01",
     )
     assert "category" not in fm
 
   def test_guidance_has_no_category(self):
     fm = build_frontmatter(
-      spec_id="SPEC-001.TESTS", slug="test-tests", name="Test Guide",
-      kind="guidance", created="2026-01-01",
+      spec_id="SPEC-001.TESTS",
+      slug="test-tests",
+      name="Test Guide",
+      kind="guidance",
+      created="2026-01-01",
     )
     assert "category" not in fm
 
   def test_explicit_category_overrides_default(self):
     fm = build_frontmatter(
-      spec_id="SPEC-001", slug="test", name="Test", kind="spec",
-      created="2026-01-01", category="unit", c4_level="code",
+      spec_id="SPEC-001",
+      slug="test",
+      name="Test",
+      kind="spec",
+      created="2026-01-01",
+      category="unit",
+      c4_level="code",
     )
     assert fm["category"] == "unit"
     assert fm["c4_level"] == "code"
@@ -161,7 +177,8 @@ class BuildFrontmatterTaxonomyTest(unittest.TestCase):
     (root / "specify" / "tech").mkdir(parents=True)
     (root / "specify" / "product").mkdir(parents=True)
     (templates / "spec.md").write_text(
-      "# {{ spec_id }} – {{ name }}\n\nBody\n", encoding="utf-8",
+      "# {{ spec_id }} – {{ name }}\n\nBody\n",
+      encoding="utf-8",
     )
     saved = Path.cwd()
     os.chdir(root)

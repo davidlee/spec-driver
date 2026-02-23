@@ -434,13 +434,16 @@ class TestSpecIndexBuilder(unittest.TestCase):
   def test_rebuild_creates_by_category_views(self) -> None:
     """VT-030-004: by-category views built deterministically."""
     self._create_spec_with_frontmatter(
-      "SPEC-020", {"slug": "unit-mod", "category": "unit", "c4_level": "code"},
+      "SPEC-020",
+      {"slug": "unit-mod", "category": "unit", "c4_level": "code"},
     )
     self._create_spec_with_frontmatter(
-      "SPEC-021", {"slug": "asm-sub", "category": "assembly", "c4_level": "component"},
+      "SPEC-021",
+      {"slug": "asm-sub", "category": "assembly", "c4_level": "component"},
     )
     self._create_spec_with_frontmatter(
-      "SPEC-022", {"slug": "bare-spec"},  # no category → unknown
+      "SPEC-022",
+      {"slug": "bare-spec"},  # no category → unknown
     )
 
     self.builder.rebuild()
@@ -459,13 +462,16 @@ class TestSpecIndexBuilder(unittest.TestCase):
   def test_rebuild_creates_by_c4_level_views(self) -> None:
     """VT-030-004: by-c4-level views built deterministically."""
     self._create_spec_with_frontmatter(
-      "SPEC-030", {"slug": "code-lvl", "c4_level": "code"},
+      "SPEC-030",
+      {"slug": "code-lvl", "c4_level": "code"},
     )
     self._create_spec_with_frontmatter(
-      "SPEC-031", {"slug": "comp-lvl", "c4_level": "component"},
+      "SPEC-031",
+      {"slug": "comp-lvl", "c4_level": "component"},
     )
     self._create_spec_with_frontmatter(
-      "SPEC-032", {"slug": "no-lvl"},  # no c4_level → unknown
+      "SPEC-032",
+      {"slug": "no-lvl"},  # no c4_level → unknown
     )
 
     self.builder.rebuild()
@@ -484,14 +490,16 @@ class TestSpecIndexBuilder(unittest.TestCase):
   def test_rebuild_cleans_taxonomy_views(self) -> None:
     """VT-030-004: taxonomy views are cleaned on rebuild."""
     self._create_spec_with_frontmatter(
-      "SPEC-040", {"slug": "was-unit", "category": "unit"},
+      "SPEC-040",
+      {"slug": "was-unit", "category": "unit"},
     )
     self.builder.rebuild()
     assert (self.builder.category_dir / "unit" / "SPEC-040").is_symlink()
 
     # Change category and rebuild
     self._create_spec_with_frontmatter(
-      "SPEC-040", {"slug": "now-asm", "category": "assembly"},
+      "SPEC-040",
+      {"slug": "now-asm", "category": "assembly"},
     )
     self.builder.rebuild()
 
@@ -531,6 +539,53 @@ class TestSpecIndexBuilder(unittest.TestCase):
     frontmatter = self.builder._read_frontmatter(spec_file)
 
     assert frontmatter == {}
+
+  def test_rebuild_creates_alias_symlinks(self) -> None:
+    """Phase 3: convenience alias directory symlinks for ergonomic navigation."""
+    self._create_spec_with_frontmatter(
+      "SPEC-050",
+      {"slug": "alias-test", "category": "unit", "c4_level": "code"},
+    )
+    self.builder.rebuild()
+
+    assemblies = self.base_dir / "assemblies"
+    units = self.base_dir / "units"
+    c4 = self.base_dir / "c4"
+
+    assert assemblies.is_symlink()
+    assert assemblies.readlink() == Path("by-category/assembly")
+    assert units.is_symlink()
+    assert units.readlink() == Path("by-category/unit")
+    assert c4.is_symlink()
+    assert c4.readlink() == Path("by-c4-level")
+
+  def test_alias_symlinks_resolve_to_specs(self) -> None:
+    """Alias symlinks resolve through to actual spec directories."""
+    self._create_spec_with_frontmatter(
+      "SPEC-051",
+      {"slug": "unit-via-alias", "category": "unit", "c4_level": "code"},
+    )
+    self._create_spec_with_frontmatter(
+      "SPEC-052",
+      {"slug": "asm-via-alias", "category": "assembly", "c4_level": "component"},
+    )
+    self.builder.rebuild()
+
+    # Navigate through alias symlinks
+    assert (self.base_dir / "units" / "SPEC-051").exists()
+    assert (self.base_dir / "assemblies" / "SPEC-052").exists()
+    assert (self.base_dir / "c4" / "code" / "SPEC-051").exists()
+    assert (self.base_dir / "c4" / "component" / "SPEC-052").exists()
+
+  def test_alias_symlinks_cleaned_on_rebuild(self) -> None:
+    """Alias symlinks are idempotent across rebuilds."""
+    self.builder.rebuild()
+    assert (self.base_dir / "assemblies").is_symlink()
+
+    # Rebuild again — should not error or create duplicates
+    self.builder.rebuild()
+    assert (self.base_dir / "assemblies").is_symlink()
+    assert (self.base_dir / "assemblies").readlink() == Path("by-category/assembly")
 
 
 if __name__ == "__main__":

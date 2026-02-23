@@ -168,11 +168,13 @@ class SyncCreatedSpecTaxonomyTest(unittest.TestCase):
     descriptor = SourceDescriptor(
       slug_parts=["internal", "foo"],
       default_frontmatter={
-        "sources": [{
-          "language": "go",
-          "identifier": "internal/foo",
-          "variants": [],
-        }],
+        "sources": [
+          {
+            "language": "go",
+            "identifier": "internal/foo",
+            "variants": [],
+          }
+        ],
       },
       variants=[],
     )

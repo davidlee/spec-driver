@@ -515,11 +515,18 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
     tech_dir = self.root / "specify" / "tech"
 
     # Unit spec
-    self._create_spec(tech_dir, "SPEC-001", "unit-mod", "Unit Module",
-                      category="unit", c4_level="code")
+    self._create_spec(
+      tech_dir, "SPEC-001", "unit-mod", "Unit Module", category="unit", c4_level="code"
+    )
     # Assembly spec
-    self._create_spec(tech_dir, "SPEC-002", "assembly-sub", "Assembly Subsystem",
-                      category="assembly", c4_level="component")
+    self._create_spec(
+      tech_dir,
+      "SPEC-002",
+      "assembly-sub",
+      "Assembly Subsystem",
+      category="assembly",
+      c4_level="component",
+    )
     # Unclassified spec (no category)
     self._create_spec(tech_dir, "SPEC-003", "bare-spec", "Bare Spec")
 
@@ -538,7 +545,14 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
     self.tmpdir.cleanup()
 
   def _create_spec(
-    self, tech_dir, spec_id, slug, name, *, category=None, c4_level=None,
+    self,
+    tech_dir,
+    spec_id,
+    slug,
+    name,
+    *,
+    category=None,
+    c4_level=None,
   ) -> None:
     spec_dir = tech_dir / spec_id
     spec_dir.mkdir(parents=True, exist_ok=True)
@@ -558,7 +572,8 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
       fm_lines.append(f"c4_level: {c4_level}")
     fm_lines += ["---", f"# {spec_id}", ""]
     (spec_dir / f"{spec_id}.md").write_text(
-      "\n".join(fm_lines), encoding="utf-8",
+      "\n".join(fm_lines),
+      encoding="utf-8",
     )
 
   def test_default_hides_unit_specs(self) -> None:
@@ -566,14 +581,15 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
     result = self.runner.invoke(app, ["specs", "--root", str(self.root)])
     assert result.exit_code == 0
     assert "SPEC-001" not in result.stdout  # unit → hidden
-    assert "SPEC-002" in result.stdout       # assembly → shown
-    assert "SPEC-003" in result.stdout       # unknown → shown
-    assert "PROD-001" in result.stdout       # product → always shown
+    assert "SPEC-002" in result.stdout  # assembly → shown
+    assert "SPEC-003" in result.stdout  # unknown → shown
+    assert "PROD-001" in result.stdout  # product → always shown
 
   def test_category_all_shows_everything(self) -> None:
     """--category all disables category filtering for tech specs."""
     result = self.runner.invoke(
-      app, ["specs", "--root", str(self.root), "--category", "all"],
+      app,
+      ["specs", "--root", str(self.root), "--category", "all"],
     )
     assert result.exit_code == 0
     assert "SPEC-001" in result.stdout
@@ -584,7 +600,8 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
   def test_category_unit_only(self) -> None:
     """--category unit shows only unit tech specs (plus products)."""
     result = self.runner.invoke(
-      app, ["specs", "--root", str(self.root), "--category", "unit"],
+      app,
+      ["specs", "--root", str(self.root), "--category", "unit"],
     )
     assert result.exit_code == 0
     assert "SPEC-001" in result.stdout
@@ -595,7 +612,8 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
   def test_category_assembly_only(self) -> None:
     """--category assembly shows only assembly tech specs."""
     result = self.runner.invoke(
-      app, ["specs", "--root", str(self.root), "--category", "assembly"],
+      app,
+      ["specs", "--root", str(self.root), "--category", "assembly"],
     )
     assert result.exit_code == 0
     assert "SPEC-001" not in result.stdout
@@ -605,7 +623,8 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
   def test_category_multi_value(self) -> None:
     """--category unit,assembly shows both but excludes unknown."""
     result = self.runner.invoke(
-      app, ["specs", "--root", str(self.root), "--category", "unit,assembly"],
+      app,
+      ["specs", "--root", str(self.root), "--category", "unit,assembly"],
     )
     assert result.exit_code == 0
     assert "SPEC-001" in result.stdout
@@ -616,18 +635,18 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
     """--c4-level code shows only code-level tech specs."""
     result = self.runner.invoke(
       app,
-      ["specs", "--root", str(self.root),
-       "--category", "all", "--c4-level", "code"],
+      ["specs", "--root", str(self.root), "--category", "all", "--c4-level", "code"],
     )
     assert result.exit_code == 0
-    assert "SPEC-001" in result.stdout   # c4_level: code
+    assert "SPEC-001" in result.stdout  # c4_level: code
     assert "SPEC-002" not in result.stdout  # c4_level: component
     assert "SPEC-003" not in result.stdout  # c4_level: unknown
 
   def test_kind_tech_with_category_filter(self) -> None:
     """--kind tech + default category still hides unit specs."""
     result = self.runner.invoke(
-      app, ["specs", "--root", str(self.root), "--kind", "tech"],
+      app,
+      ["specs", "--root", str(self.root), "--kind", "tech"],
     )
     assert result.exit_code == 0
     assert "SPEC-001" not in result.stdout  # unit → hidden
@@ -638,8 +657,7 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
     """--kind product is unaffected by --category."""
     result = self.runner.invoke(
       app,
-      ["specs", "--root", str(self.root),
-       "--kind", "product", "--category", "unit"],
+      ["specs", "--root", str(self.root), "--kind", "product", "--category", "unit"],
     )
     assert result.exit_code == 0
     assert "PROD-001" in result.stdout

@@ -289,12 +289,8 @@ def list_specs(
 
     # Filter tech specs by taxonomy (category / c4_level).
     # Product specs are never affected by these filters.
-    category_values = (
-      parse_multi_value_filter(category) if category != "all" else []
-    )
-    c4_level_values = (
-      parse_multi_value_filter(c4_level) if c4_level != "all" else []
-    )
+    category_values = parse_multi_value_filter(category) if category != "all" else []
+    c4_level_values = parse_multi_value_filter(c4_level) if c4_level != "all" else []
 
     def matches_taxonomy(spec) -> bool:
       if not spec.id.startswith("SPEC-"):

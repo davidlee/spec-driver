@@ -129,6 +129,17 @@ class SpecIndexBuilder:
       level = frontmatter.get("c4_level") or "unknown"
       self._create_flat_view_link(self.c4_level_dir, level, entry.name)
 
+    # Create convenience alias directory symlinks
+    self._ensure_alias(self.base_dir / "assemblies", Path("by-category/assembly"))
+    self._ensure_alias(self.base_dir / "units", Path("by-category/unit"))
+    self._ensure_alias(self.base_dir / "c4", Path("by-c4-level"))
+
+  @staticmethod
+  def _ensure_alias(link: Path, target: Path) -> None:
+    """Create or replace a directory alias symlink."""
+    if link.is_symlink() or link.exists():
+      link.unlink()
+    link.symlink_to(target)
 
   @staticmethod
   def _clean_flat_view_dir(view_dir: Path) -> None:
@@ -148,7 +159,9 @@ class SpecIndexBuilder:
 
   @staticmethod
   def _create_flat_view_link(
-    view_dir: Path, bucket: str, spec_name: str,
+    view_dir: Path,
+    bucket: str,
+    spec_name: str,
   ) -> None:
     """Create a symlink: view_dir/bucket/spec_name → ../../spec_name."""
     bucket_dir = view_dir / bucket

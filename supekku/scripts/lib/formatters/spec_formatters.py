@@ -163,6 +163,16 @@ def _format_packages(spec: Spec) -> list[str]:
   return lines
 
 
+def _format_taxonomy(spec: Spec) -> list[str]:
+  """Format taxonomy fields (category, c4_level) if present."""
+  lines: list[str] = []
+  if spec.category:
+    lines.append(f"Category: {spec.category}")
+  if spec.c4_level:
+    lines.append(f"C4 Level: {spec.c4_level}")
+  return lines
+
+
 def _format_file_path(spec: Spec, root: Path | None = None) -> list[str]:
   """Format file path section."""
   if root:
@@ -186,6 +196,7 @@ def format_spec_details(spec: Spec, root: Path | None = None) -> str:
   """
   sections = [
     _format_basic_fields(spec),
+    _format_taxonomy(spec),
     _format_packages(spec),
     _format_file_path(spec, root),
   ]

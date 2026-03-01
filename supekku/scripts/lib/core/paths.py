@@ -64,9 +64,22 @@ def get_about_dir(repo_root: Path | None = None) -> Path:
   return get_spec_driver_root(repo_root) / "about"
 
 
+def get_agents_dir(repo_root: Path | None = None) -> Path:
+  """Get the agents directory for generated agent guidance.
+
+  Args:
+    repo_root: Repository root path. If None, will auto-discover.
+
+  Returns:
+    Path to the agents directory (e.g., repo_root/.spec-driver/agents)
+  """
+  return get_spec_driver_root(repo_root) / "agents"
+
+
 __all__ = [
   "SPEC_DRIVER_DIR",
   "get_about_dir",
+  "get_agents_dir",
   "get_registry_dir",
   "get_spec_driver_root",
   "get_templates_dir",

@@ -13,7 +13,9 @@ from pathlib import Path
 
 import yaml
 
+from supekku.scripts.lib.core.config import load_workflow_config
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
+from supekku.scripts.lib.core.templates import TemplateNotFoundError, render_template
 
 # Import after path setup to avoid circular imports
 from supekku.scripts.lib.file_ops import (
@@ -21,6 +23,8 @@ from supekku.scripts.lib.file_ops import (
   format_detailed_changes,
   scan_directory_changes,
 )
+
+AGENT_TEMPLATES = ("exec", "workflow", "glossary", "policy")
 
 
 def get_package_root() -> Path:
@@ -99,6 +103,45 @@ def copy_directory_if_changed(
       dest_file = dest / rel_path
       dest_file.parent.mkdir(parents=True, exist_ok=True)
       shutil.copy2(src_file, dest_file)
+
+
+def _render_agent_docs(
+  target_root: Path, package_root: Path, *, dry_run: bool = False
+) -> None:
+  """Render agent guidance templates into .spec-driver/agents/.
+
+  Loads workflow config, renders each agent template with it, and writes
+  the result. Falls back to static copy if templates are missing from
+  the package (backward compat for pre-template installs).
+  """
+  config = load_workflow_config(target_root)
+  agents_dir = target_root / SPEC_DRIVER_DIR / "agents"
+  agents_dir.mkdir(parents=True, exist_ok=True)
+
+  try:
+    for name in AGENT_TEMPLATES:
+      content = render_template(
+        f"agents/{name}.md",
+        {"config": config},
+        repo_root=target_root,
+      )
+      dest = agents_dir / f"{name}.md"
+      if dry_run:
+        print("\n[DRY RUN] agent instruction:")
+        print(f"  + ./{SPEC_DRIVER_DIR}/agents/{name}.md")
+      else:
+        dest.write_text(content, encoding="utf-8")
+  except TemplateNotFoundError:
+    # Fallback: static copy for pre-template package installs
+    copy_directory_if_changed(
+      src=package_root / "agents",
+      dest=agents_dir,
+      pattern="**/*",
+      category_name="agent documentation",
+      dry_run=dry_run,
+      auto_yes=True,
+      dry_run_label="agent instruction",
+    )
 
 
 def initialize_workspace(
@@ -195,16 +238,8 @@ def initialize_workspace(
     auto_yes=auto_yes,
   )
 
-  # Copy agent files from package to target
-  copy_directory_if_changed(
-    src=package_root / "agents",
-    dest=target_root / SPEC_DRIVER_DIR / "agents",
-    pattern="**/*",
-    category_name="agent documentation",
-    dry_run=dry_run,
-    auto_yes=auto_yes,
-    dry_run_label="agent instruction",
-  )
+  # Render agent guidance from templates (config-tailored)
+  _render_agent_docs(target_root, package_root, dry_run=dry_run)
 
   # Copy claude.command files to .claude/commands/ if .claude exists
   claude_dir = target_root / ".claude"

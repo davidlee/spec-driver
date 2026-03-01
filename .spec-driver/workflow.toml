@@ -1,0 +1,33 @@
+ceremony = "pioneer" # pioneer | settler | town_planner
+
+[tool]
+exec = "uv_run"
+
+[verification]
+command = "just check"
+
+[cards]
+enabled = true
+root = "kanban"
+lanes = ["backlog", "next", "doing", "finishing", "done"]
+id_prefix = "T" # produces T123-* ids
+
+[docs]
+artefacts_root = "doc/artefacts" # design docs / artefacts, keyed by T123-*
+plans_root = "doc/plans"         # implementation plans, keyed by T123-*
+
+[policy]
+adrs = true
+policies = false
+standards = false
+
+[contracts]
+enabled = true
+root = ".contracts"
+
+[bootstrap]
+doctrine_path = ".spec-driver/doctrine.md"
+
+[authoring]
+engine = "superpowers" # superpowers | spec_driver
+

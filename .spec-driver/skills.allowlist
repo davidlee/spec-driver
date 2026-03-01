@@ -1,0 +1,16 @@
+# Skills allowlist (project-exposed)
+#
+# Intended use (future):
+# - OpenSkills installs packs to `.agent/skills/` (not agent-discoverable by default).
+# - `spec-driver skills sync` exposes ONLY the skills listed here in `AGENTS.md`.
+#
+# One skill name per line (folder name under `.agent/skills/`).
+
+boot
+preflight
+consult
+implement
+notes
+continuation
+
+

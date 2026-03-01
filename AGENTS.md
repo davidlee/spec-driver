@@ -82,6 +82,7 @@ supekku/scripts/lib/
 │   ├── artifacts.py   # ChangeArtifact model
 │   ├── registry.py    # ChangeRegistry
 │   └── lifecycle.py   # Status management
+├── contracts/         # Contracts corpus + indices (NO spec business logic)
 ├── specs/             # Specifications: models, registry, index
 ├── requirements/      # Requirements domain
 ├── formatters/        # Display formatting (NO business logic)
@@ -102,6 +103,33 @@ CLI dependency direction: CLI → Formatters → Domain → Core
 - Shared utility? → `core/`
 
 ## Common Patterns
+
+## Contracts, Sync, and Truth
+
+### Canonical contracts corpus
+
+- `.contracts/**` is the canonical storage/location for generated contracts.
+- The contracts corpus is **derived and deterministic**: it is always safe to delete and regenerate.
+- Compatibility paths (e.g. `specify/**/SPEC-*/contracts/`) are optional and should be treated as derived views.
+
+### Sync defaults and flags
+
+- Prefer **contracts-first** workflows for legacy repos to avoid unit-spec sprawl.
+- `sync` must respect `--specs/--no-specs` and `--contracts/--no-contracts` independently.
+- If the repo has an opt-in marker for spec auto-creation (e.g. `.spec-driver/enable_spec_autocreate`), treat that as the persisted default.
+
+### Unit vs assembly specs (taxonomy)
+
+- **Unit spec**: 1:1 with a code unit (language-specific: file/module/package). Often auto-created/maintained.
+- **Assembly spec**: cross-unit subsystem/integration/functional slice. Human-authored intent and constraints.
+- Prefer making the taxonomy explicit in spec frontmatter:
+  - `category: unit|assembly` (reserved values; others may exist but these are first-class)
+  - `c4_level: code|component|container|system|interaction` (typically `unit` → `code`)
+
+### Avoid “competing truths”
+
+- Generated contracts are the canonical record of *what the code exposes*.
+- Specs (especially assembly specs) should express *requirements/constraints* to validate against observed contracts/code, not duplicate full signatures as competing sources of truth.
 
 ### Adding a Formatter
 
@@ -216,8 +244,7 @@ Sometimes you need to deviate. When you do:
 
 Before beginning implementation:
 
-- [ ] No code without an approved written plan
-- [ ] You will write your plan to a file before executing it
+- [ ] No code without an approved DR/IP/phase sheet (or an equivalent delta artefact)
 - [ ] Research as necessary to ensure it is informed by existing code
 
 When coding:

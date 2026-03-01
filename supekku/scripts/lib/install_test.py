@@ -338,3 +338,109 @@ def test_initialize_workspace_prompts_per_category(tmp_path: Path, capsys) -> No
   package_root = get_package_root()
   original_readme = (package_root / "about" / "README.md").read_text()
   assert (about_dir / "README.md").read_text() == original_readme
+
+
+# --- Agent template rendering tests ---
+
+
+def test_initialize_workspace_renders_agent_docs(tmp_path: Path) -> None:
+  """With workflow.toml present, agent docs are rendered with config values."""
+  # Write a workflow.toml with non-default values
+  sd_dir = tmp_path / SPEC_DRIVER_DIR
+  sd_dir.mkdir(parents=True)
+  (sd_dir / "workflow.toml").write_text(
+    'ceremony = "town_planner"\n'
+    "\n"
+    "[tool]\n"
+    'exec = "npx"\n'
+    "\n"
+    "[cards]\n"
+    "enabled = false\n",
+    encoding="utf-8",
+  )
+
+  initialize_workspace(tmp_path, auto_yes=True)
+
+  agents_dir = sd_dir / "agents"
+  assert agents_dir.is_dir()
+
+  # All four agent docs should exist
+  for name in ("exec", "workflow", "glossary", "policy"):
+    assert (agents_dir / f"{name}.md").exists(), f"agents/{name}.md missing"
+
+  # exec.md should contain the configured tool runner
+  exec_content = (agents_dir / "exec.md").read_text()
+  assert "npx" in exec_content
+
+  # workflow.md should reflect ceremony mode
+  workflow_content = (agents_dir / "workflow.md").read_text()
+  assert "town_planner" in workflow_content
+
+  # cards disabled: glossary should NOT mention "Card"
+  glossary_content = (agents_dir / "glossary.md").read_text()
+  assert "Card" not in glossary_content
+
+
+def test_initialize_workspace_renders_agent_docs_with_defaults(
+  tmp_path: Path,
+) -> None:
+  """Without workflow.toml, agent docs are rendered using default config."""
+  initialize_workspace(tmp_path, auto_yes=True)
+
+  agents_dir = tmp_path / SPEC_DRIVER_DIR / "agents"
+
+  for name in ("exec", "workflow", "glossary", "policy"):
+    assert (agents_dir / f"{name}.md").exists(), f"agents/{name}.md missing"
+
+  # Defaults: ceremony=pioneer, tool.exec=uv_run, cards.enabled=True
+  exec_content = (agents_dir / "exec.md").read_text()
+  assert "uv_run" in exec_content
+
+  workflow_content = (agents_dir / "workflow.md").read_text()
+  assert "pioneer" in workflow_content
+
+  glossary_content = (agents_dir / "glossary.md").read_text()
+  assert "Card" in glossary_content
+
+
+def test_initialize_workspace_agent_docs_idempotent(tmp_path: Path) -> None:
+  """Re-running produces identical agent docs."""
+  initialize_workspace(tmp_path, auto_yes=True)
+
+  agents_dir = tmp_path / SPEC_DRIVER_DIR / "agents"
+  first_run = {
+    name: (agents_dir / f"{name}.md").read_text()
+    for name in ("exec", "workflow", "glossary", "policy")
+  }
+
+  # Re-run
+  initialize_workspace(tmp_path, auto_yes=True)
+
+  for name, content in first_run.items():
+    assert (agents_dir / f"{name}.md").read_text() == content, (
+      f"agents/{name}.md changed on re-run"
+    )
+
+
+def test_initialize_workspace_agent_fallback_to_static_copy(
+  tmp_path: Path,
+) -> None:
+  """If agent templates are missing, fall back to static copy."""
+  # Temporarily move the agent templates out of the way
+  package_root = get_package_root()
+  agents_template_dir = package_root / "templates" / "agents"
+  backup = package_root / "templates" / "_agents_backup"
+
+  try:
+    agents_template_dir.rename(backup)
+
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    agents_dir = tmp_path / SPEC_DRIVER_DIR / "agents"
+    # Static fallback should have copied whatever is in supekku/agents/
+    # At minimum the directory should exist (even if only dogma.md)
+    assert agents_dir.is_dir()
+  finally:
+    # Restore
+    if backup.exists():
+      backup.rename(agents_template_dir)

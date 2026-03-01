@@ -40,9 +40,19 @@ All tasks done, tests passing, lint clean.
   - 10 new tests: missing category, missing c4_level, both missing, inconsistent combo,
     consistent unit/code, assembly/component, PROD exclusion, never-errors, regression
 
+### Phase 3 — COMPLETE ✓
+
+- **3.1** ✓ Alias directory symlinks in `SpecIndexBuilder.rebuild()` (`specs/index.py`)
+  - `assemblies -> by-category/assembly`, `units -> by-category/unit`, `c4 -> by-c4-level`
+  - New `_ensure_alias` static method; idempotent across rebuilds
+  - 3 new tests in `index_test.py`
+- **3.2** ✓ Taxonomy in `show spec` output (`formatters/spec_formatters.py`)
+  - New `_format_taxonomy` function displays Category/C4 Level when present
+  - 3 new tests in `spec_formatters_test.py`
+
 ### Test counts
-- 1693 passed, 3 skipped, 0 failed
-- `just lint` clean, pylint: validator.py 9.70/10, validator_test.py 10/10
+- 1699 passed, 3 skipped, 0 failed
+- `just lint` clean, pylint: index.py + spec_formatters.py at 9.71/10
 
 ## Don'ts (scope control)
 - Don't tighten the schema to an enum for `category` in v1 (too breaking; existing freeform use may exist).

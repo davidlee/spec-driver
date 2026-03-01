@@ -237,3 +237,5 @@ __pycache__
 /spec-kit
 /vice
 .mcp.json
+
+/temp/

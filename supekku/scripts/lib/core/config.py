@@ -12,7 +12,7 @@ from .paths import SPEC_DRIVER_DIR
 DEFAULT_CONFIG: dict = {
   "ceremony": "pioneer",
   "tool": {
-    "exec": "uv_run",
+    "exec": "uv run spec-driver",
   },
   "verification": {
     "command": "just check",

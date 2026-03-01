@@ -100,14 +100,15 @@ class CreateSpecTest(unittest.TestCase):
 
   def test_repository_root_not_found(self) -> None:
     """Test that operations outside a repository raise RepositoryRootNotFoundError."""
-    # Create temp dir that's NOT under /tmp to avoid finding stray .spec-driver dirs
-    tmpdir = tempfile.TemporaryDirectory(dir=Path.home())  # pylint: disable=consider-using-with
-    self.addCleanup(tmpdir.cleanup)
-    test_dir = Path(tmpdir.name) / "nested" / "deep"
-    test_dir.mkdir(parents=True)
-    os.chdir(test_dir)
+    from unittest.mock import patch  # noqa: PLC0415
 
-    with pytest.raises(RepositoryRootNotFoundError):
+    with (
+      patch(
+        "supekku.scripts.lib.specs.creation.find_repository_root",
+        side_effect=RepositoryRootNotFoundError("no repo"),
+      ),
+      pytest.raises(RepositoryRootNotFoundError),
+    ):
       create_spec("No Repo", CreateSpecOptions())
 
   def test_json_output_matches_structure(self) -> None:

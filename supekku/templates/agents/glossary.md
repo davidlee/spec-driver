@@ -1,5 +1,6 @@
 # Glossary of Primitives & Concepts
 
+{% if config.cards.enabled -%}
 ## Card
 
 A **card** is the primary record for task execution and implementation notes. Depending on the project's ceremony level and workflow, a card may be:
@@ -10,7 +11,6 @@ A **card** is the primary record for task execution and implementation notes. De
 
 The term "card" in skills and workflows refers to whichever of these the project uses as its primary unit of work — not exclusively a kanban card.
 
-{% if config.cards.enabled -%}
 Cards root: `{{ config.cards.root }}/`
 ID format: `{{ config.cards.id_prefix }}NNN-slug`
 {% endif -%}

@@ -349,13 +349,7 @@ def test_initialize_workspace_renders_agent_docs(tmp_path: Path) -> None:
   sd_dir = tmp_path / SPEC_DRIVER_DIR
   sd_dir.mkdir(parents=True)
   (sd_dir / "workflow.toml").write_text(
-    'ceremony = "town_planner"\n'
-    "\n"
-    "[tool]\n"
-    'exec = "npx"\n'
-    "\n"
-    "[cards]\n"
-    "enabled = false\n",
+    'ceremony = "town_planner"\n\n[tool]\nexec = "npx"\n\n[cards]\nenabled = false\n',
     encoding="utf-8",
   )
 
@@ -392,9 +386,9 @@ def test_initialize_workspace_renders_agent_docs_with_defaults(
   for name in ("exec", "workflow", "glossary", "policy"):
     assert (agents_dir / f"{name}.md").exists(), f"agents/{name}.md missing"
 
-  # Defaults: ceremony=pioneer, tool.exec=uv_run, cards.enabled=True
+  # Defaults: ceremony=pioneer, tool.exec="uv run spec-driver", cards.enabled=True
   exec_content = (agents_dir / "exec.md").read_text()
-  assert "uv_run" in exec_content
+  assert "uv run spec-driver" in exec_content
 
   workflow_content = (agents_dir / "workflow.md").read_text()
   assert "pioneer" in workflow_content

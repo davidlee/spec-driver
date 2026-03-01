@@ -1,10 +1,10 @@
 # Execution Environment
 
-Run spec-driver via: `uv run spec-driver`
+Run spec-driver via: `{{ config.tool.exec }}`
 
-Any instruction like `spec-driver $args` means `uv run spec-driver $args`.
-For example: `spec-driver list adrs` → `uv run spec-driver list adrs`.
+Any instruction like `spec-driver $args` means `{{ config.tool.exec }} $args`.
+For example: `spec-driver list adrs` → `{{ config.tool.exec }} list adrs`.
 
-Run `uv run spec-driver --help` for available commands.
+Run `{{ config.tool.exec }} --help` for available commands.
 
 Verification: `{{ config.verification.command }}`

@@ -1,7 +1,7 @@
 ceremony = "pioneer" # pioneer | settler | town_planner
 
 [tool]
-exec = "uv_run"
+exec = "uv run spec-driver"
 
 [verification]
 command = "just check"

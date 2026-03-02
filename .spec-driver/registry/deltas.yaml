@@ -3070,3 +3070,571 @@ deltas:
         phase: IP-027-P01
       - id: IP-027-P02
         phase: IP-027-P02
+  DE-028:
+    kind: delta
+    status: draft
+    name: 'Delta - Sync defaults: contracts-first, opt-in spec creation'
+    slug: sync_defaults_contracts_first_opt_in_spec_creation
+    updated: '2026-02-20'
+    path: change/deltas/DE-028-sync_defaults_contracts_first_opt_in_spec_creation/DE-028.md
+    applies_to:
+      specs:
+      - PROD-012
+      requirements:
+      - PROD-012.FR-005
+      - PROD-012.FR-006
+    relations:
+    - type: introduces
+      target: RE-016
+    plan:
+      id: IP-028
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-028
+        delta: DE-028
+        revision_links:
+          aligns_with:
+          - RE-016
+        specs:
+          primary:
+          - PROD-012
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-012.FR-005
+          dependencies: []
+        phases:
+        - id: IP-028-P01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-028-P01
+        plan: IP-028
+        delta: DE-028
+        status: complete
+  DE-029:
+    kind: delta
+    status: in-progress
+    name: Delta - Canonical contract storage
+    slug: canonical_contract_storage
+    updated: '2026-02-21'
+    path: change/deltas/DE-029-canonical_contract_storage/DE-029.md
+    applies_to:
+      specs:
+      - PROD-012
+      - PROD-014
+      requirements:
+      - PROD-012.FR-006
+      - PROD-014.FR-008
+      - PROD-014.FR-011
+      - PROD-014.FR-012
+    plan:
+      id: IP-029
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-029
+        delta: DE-029
+        revision_links:
+          aligns_with:
+          - RE-015
+        specs:
+          primary:
+          - PROD-014
+          collaborators:
+          - PROD-012
+        requirements:
+          targets:
+          - PROD-014.FR-008
+          - PROD-014.FR-011
+          - PROD-014.FR-012
+          - PROD-012.FR-006
+          dependencies: []
+        phases:
+        - id: IP-029.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-029.PHASE-01
+        plan: IP-029
+        delta: DE-029
+        objective: Change adapter interface from spec_dir to variant_outputs, compute
+          canonical output paths in process_source_unit, write contracts as real files
+          to .contracts/<view>/<mirror-path>. Python uses staging + distribute.
+        entrance_criteria:
+        - DE-028 complete (generate_contracts seam exists)
+        - Delta DE-029 accepted
+        - "Gate checks passed (IP-029 \xA73)"
+        exit_criteria:
+        - All 4 adapters accept variant_outputs (Go/Zig/TS) or staging dir (Python)
+        - sync writes real files to .contracts/<view>/...
+        - VT-CONTRACTS-STORAGE-001 passes
+        - VT-CONTRACTS-ADAPTER-001 passes
+        - VT-CONTRACTS-PATH-VALIDATION-001 passes
+        - just green (tests + lint + pylint)
+        verification:
+          tests:
+          - VT-CONTRACTS-STORAGE-001
+          - VT-CONTRACTS-ADAPTER-001
+          - VT-CONTRACTS-PATH-VALIDATION-001
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: "Change LanguageAdapter.generate() signature: spec_dir \u2192\
+            \ variant_outputs"
+        - id: '1.2'
+          description: Update Go adapter to write to provided variant output paths
+        - id: '1.3'
+          description: Update Zig adapter to write to provided variant output paths
+        - id: '1.4'
+          description: Update TypeScript adapter to write to provided variant output
+            paths
+        - id: '1.5'
+          description: Update Python adapter to accept staging dir
+        - id: '1.6'
+          description: Implement path resolution + dispatch in process_source_unit
+        - id: '1.7'
+          description: "Implement Python distribute step (staging \u2192 canonical)"
+        - id: '1.8'
+          description: Write VT tests (storage, adapter, path validation)
+        - id: '1.9'
+          description: Update _sync_specs post-sync flow
+        risks:
+        - description: Zig/TS adapters call external tools with --output; must redirect
+            to caller-provided path
+          mitigation: Already passing output path to subprocess; just change the variable
+            source
+  DE-030:
+    kind: delta
+    status: draft
+    name: Delta - unit_vs_assembly_spec_classification
+    slug: unit_vs_assembly_spec_classification
+    updated: '2026-02-21'
+    path: change/deltas/DE-030-unit_vs_assembly_spec_classification/DE-030.md
+    applies_to:
+      specs:
+      - PROD-015
+      - ADR-003
+      requirements:
+      - PROD-015.FR-001
+      - PROD-015.FR-002
+      - PROD-015.FR-003
+      - PROD-015.FR-004
+      - PROD-015.FR-005
+      - PROD-015.NF-001
+      - PROD-015.NF-002
+    plan:
+      id: IP-030
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-030
+        delta: DE-030
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-015
+          collaborators:
+          - ADR-003
+          - PROD-012
+        requirements:
+          targets:
+          - PROD-015.FR-001
+          - PROD-015.FR-002
+          - PROD-015.FR-003
+          - PROD-015.FR-004
+          - PROD-015.FR-005
+          - PROD-015.NF-001
+          - PROD-015.NF-002
+          dependencies: []
+        phases:
+        - id: IP-030-P01
+        - id: IP-030-P02
+      phases:
+      - id: IP-030-P01
+        phase: IP-030-P01
+      - id: IP-030-P02
+        phase: IP-030-P02
+  DE-031:
+    kind: delta
+    status: in-progress
+    name: Delta - boot_generated_agent_guidance
+    slug: boot_generated_agent_guidance
+    updated: '2026-03-01'
+    path: change/deltas/DE-031-boot_generated_agent_guidance/DE-031.md
+    applies_to:
+      specs:
+      - PROD-016
+      requirements:
+      - PROD-016.FR-001
+      - PROD-016.FR-006
+      - PROD-016.FR-008
+    plan:
+      id: IP-031
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-031
+        delta: DE-031
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-016
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-016.FR-001
+          - PROD-016.FR-006
+          - PROD-016.FR-008
+          dependencies: []
+        phases:
+        - id: IP-031-P01
+      phases:
+      - id: IP-031-P01
+        phase: IP-031-P01
+  DE-032:
+    kind: delta
+    status: draft
+    name: Delta - skills_allowlist_sync
+    slug: skills_allowlist_sync
+    updated: '2026-03-01'
+    path: change/deltas/DE-032-skills_allowlist_sync/DE-032.md
+    applies_to:
+      specs:
+      - PROD-016
+      requirements:
+      - PROD-016.FR-005
+      - PROD-016.NF-001
+      - PROD-016.NF-002
+    plan:
+      id: IP-032
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-032
+        delta: DE-032
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-016
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-016.FR-005
+          - PROD-016.NF-001
+          - PROD-016.NF-002
+          dependencies: []
+        phases:
+        - id: IP-032-P01
+      phases:
+      - id: IP-032-P01
+        phase: IP-032-P01
+  DE-033:
+    kind: delta
+    status: completed
+    name: Delta - memory records schema and command surface
+    slug: memory_records_schema_and_command_surface
+    updated: '2026-03-02'
+    path: change/deltas/DE-033-memory_records_schema_and_command_surface/DE-033.md
+    applies_to:
+      specs:
+      - PROD-TBD
+      - SPEC-TBD
+      requirements: []
+    relations:
+    - type: relates_to
+      target: RE-017
+      attributes: {}
+    - type: introduces
+      target: RE-017
+    plan:
+      id: IP-033
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-033
+        delta: DE-033
+        revision_links:
+          aligns_with:
+          - DR-033
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets:
+          - MEM-FR-001
+          - MEM-FR-002
+          - MEM-FR-003
+          - MEM-FR-004
+          - MEM-FR-005
+          - MEM-NFR-001
+          - MEM-NFR-002
+          dependencies: []
+        phases:
+        - id: IP-033.PHASE-01
+          status: completed
+        - id: IP-033.PHASE-02
+          status: completed
+        - id: IP-033.PHASE-03
+          status: completed
+        - id: IP-033.PHASE-04
+          status: completed
+        - id: IP-033.PHASE-05
+          status: completed
+        - id: IP-033.PHASE-06
+          status: completed
+        - id: IP-033.PHASE-08
+          status: completed
+        - id: IP-033.PHASE-09
+          status: completed
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-033.PHASE-02
+        plan: IP-033
+        delta: DE-033
+        objective: Implement a MemoryRecord model and MemoryRegistry that can discover,
+          parse, and index memory artifact files from the filesystem, following the
+          established decisions/ registry pattern.
+        entrance_criteria:
+        - Phase 1 complete (memory frontmatter metadata profile exists and validates)
+        - DecisionRegistry / DecisionRecord pattern reviewed as reference architecture
+        - Memory file storage convention agreed (or defaulted)
+        exit_criteria:
+        - MemoryRecord dataclass loads all memory-specific frontmatter fields
+        - MemoryRegistry discovers MEM-*.md files and parses them into MemoryRecords
+        - Registry supports collect, find, iter, filter (by memory_type, status, tag)
+        - to_dict serialization works for future YAML registry output
+        - Unit tests passing for model and registry
+        - Lint checks passing (ruff + pylint)
+        verification:
+          tests:
+          - VT-MEM-SCHEMA-001 (continued) - MemoryRecord round-trips frontmatter correctly
+          - VT-MEM-REGISTRY-001 - Registry discovers and loads fixture files
+          - VT-MEM-REGISTRY-002 - Registry filters by memory_type, status, tag
+          evidence:
+          - Test run output showing all unit tests passing
+          - Lint checks passing (ruff + pylint)
+        tasks:
+        - id: '2.1'
+          description: Create supekku/scripts/lib/memory/ package with __init__.py
+        - id: '2.2'
+          description: Implement MemoryRecord dataclass in models.py
+        - id: '2.3'
+          description: "Write model tests (models_test.py) \u2014 construction, to_dict,\
+            \ edge cases"
+        - id: '2.4'
+          description: "Implement MemoryRegistry in registry.py \u2014 collect, find,\
+            \ iter, filter"
+        - id: '2.5'
+          description: Create test fixtures (sample MEM-*.md files in tests/fixtures/)
+        - id: '2.6'
+          description: "Write registry tests (registry_test.py) \u2014 discovery,\
+            \ parsing, filtering"
+        - id: '2.7'
+          description: Lint and quality check
+        risks:
+        - description: Nested frontmatter objects (scope, priority, provenance) add
+            parsing complexity
+          mitigation: Keep model flat where sensible; use typed sub-dataclasses only
+            where structure is validated
+        - description: Memory storage location not yet decided
+          mitigation: Default to memory/ at repo root; make configurable via registry
+            constructor
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-033.PHASE-04
+        plan: IP-033
+        delta: DE-033
+        objective: Implement deterministic scope matching, filtering, and ordering
+          for memory records (MEM-FR-003). Pure-function selection module with CLI
+          integration via --path, --command, --match-tag options on list memories.
+        entrance_criteria:
+        - Phase 2 complete (MemoryRecord + MemoryRegistry)
+        - Phase 3 complete (CLI surface working)
+        - Design document reviewed and approved (design-phase-04-selection.md)
+        exit_criteria:
+        - selection.py module with matches_scope, scope_specificity, sort_key, is_surfaceable,
+          select
+        - "Deterministic ordering verified by tests (same input \u2192 same output)"
+        - CLI list memories supports --path, --command, --match-tag, --include-draft,
+          --limit
+        - Thread recency exclusion working with scope + verified date check
+        - Path normalization handles repo-relative, trailing /, .., ./
+        - Command matching uses token-prefix (no substring false positives)
+        - Unit tests passing (VT-MEM-SELECTION-001)
+        - Lint checks passing (ruff + pylint)
+        verification:
+          tests:
+          - VT-MEM-SELECTION-001 - Deterministic filtering, scope matching, and ordering
+          evidence:
+          - Test run output showing all selection tests passing
+          - Lint checks passing (ruff + pylint)
+          - CLI smoke tests with --path and --command options
+        tasks:
+        - id: '4.1'
+          description: "Core selection functions \u2014 normalize_path, matches_scope,\
+            \ scope_specificity (TDD)"
+        - id: '4.2'
+          description: "Ordering and filtering \u2014 sort_key, is_surfaceable, select\
+            \ (TDD)"
+        - id: '4.3'
+          description: "CLI integration \u2014 --path, --command, --match-tag, --include-draft,\
+            \ --limit on list memories"
+        - id: '4.4'
+          description: Integration tests and smoke tests
+        risks:
+        - description: PurePosixPath.full_match() behavior edge cases with ** globs
+          mitigation: Verified working on Python 3.13; comprehensive glob test cases
+        - description: shlex.split may fail on malformed command strings
+          mitigation: Graceful fallback to simple split on whitespace
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-033.PHASE-05
+        plan: IP-033
+        delta: DE-033
+        objective: Complete memory formatter coverage, fix theme gaps, author real
+          memory records to validate display and behavior, update schema docs and
+          YAML example, and produce a CLI reference document to support external skills
+          authoring.
+        entrance_criteria:
+        - Phase 3 complete (CLI surface working)
+        - Phase 4 complete (selection and filtering working)
+        - Formatter module exists with list/detail/JSON functions
+        exit_criteria:
+        - Detail formatter renders all non-empty model fields
+        - Theme includes all valid memory statuses (incl. deprecated)
+        - "\u22652 real memory records committed and visible in list/show output"
+        - Frontmatter schema doc updated to match implementation
+        - schema show yaml-example includes scope/priority/provenance
+        - CLI reference doc authored (memory commands + valid frontmatter)
+        - Formatter tests cover full-field detail, truncate, TSV columns
+        - Lint + tests passing
+        verification:
+          tests:
+          - VT-MEM-FMT-001 - Full-field detail formatter coverage
+          evidence:
+          - Real memory records displayed via list/show/tsv/json
+          - schema show frontmatter.memory --format yaml-example output
+          - Lint checks passing (ruff + pylint)
+        tasks:
+        - id: '5.1'
+          description: Extend detail formatter to render all non-empty model fields
+        - id: '5.2'
+          description: 'Theme gap: add deprecated + superseded + obsolete memory statuses'
+        - id: '5.3'
+          description: 'Formatter tests: full-field detail, truncate, TSV column consistency'
+        - id: '5.4'
+          description: "Create \u22652 real memory records to validate display and\
+            \ selection behavior"
+        - id: '5.5'
+          description: Update frontmatter-schema.md and schema show yaml-example
+        - id: '5.6'
+          description: Author CLI reference doc for memory commands (skills input)
+        risks:
+        - description: "Detail formatter complexity \u2014 rendering nested dicts\
+            \ (scope, priority, provenance)"
+          mitigation: 'Follow decision_formatters.py pattern; keep it flat with key:
+            value lines'
+        - description: yaml-example requires schema module changes
+          mitigation: Check schema generation code first; may be config-only
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-033.PHASE-06
+        plan: IP-033
+        delta: DE-033
+        objective: Replace sequential MEM-NNN IDs with semantic dot-separated IDs
+          (mem.<type>.<domain>.<subject>[.<purpose>]) to improve readability, linkability,
+          and grep-ability. Migrate existing records, update creation/registry/CLI/tests,
+          and add ID validation.
+        entrance_criteria:
+        - Phase 5 complete (formatters, real records, schema docs)
+        - ID spec reviewed and accepted (id-spec.md in delta bundle)
+        exit_criteria:
+        - Memory IDs use canonical form mem.<type>.<topic>... throughout
+        - create memory accepts user-supplied ID (required arg or --id)
+        - Registry discovers mem.*.md files (not MEM-*.md)
+        - find/show accept shorthand (omitted mem. prefix) and canonical
+        - Validation rejects malformed IDs; warns on type/memory_type mismatch
+        - Existing MEM-001, MEM-002 migrated to semantic IDs
+        - All tests updated and passing
+        - Lint clean
+        verification:
+          tests:
+          - VT-MEM-ID-001 - ID validation (canonical, shorthand, rejection)
+          - VT-MEM-ID-002 - Registry discovers new file naming
+          - VT-MEM-ID-003 - Creation with user-supplied ID
+          evidence:
+          - create/list/show/find work with semantic IDs
+          - Lint passing (ruff + pylint)
+        tasks:
+        - id: '6.1'
+          description: 'ID validation module: canonical form, normalization, type
+            extraction'
+        - id: '6.2'
+          description: 'Rewrite creation.py: user-supplied ID, validation, file naming'
+        - id: '6.3'
+          description: 'Update registry.py: glob pattern, file parsing for new naming'
+        - id: '6.4'
+          description: 'Update CLI: create (--id required), find/show normalization,
+            common.py prefix'
+        - id: '6.5'
+          description: Migrate existing records (MEM-001, MEM-002) to semantic IDs
+        - id: '6.6'
+          description: Update all test fixtures and verify full suite
+        - id: '6.7'
+          description: Update schema examples, CLI reference doc, frontmatter-schema.md
+        risks:
+        - description: Blast radius in test fixtures (~271 MEM- references across
+            7 test files)
+          mitigation: Mechanical replacement; run full suite after each file
+        - description: Shorthand normalization ambiguity (e.g., system.auth vs mem.system.auth)
+          mitigation: 'Simple rule: if no mem. prefix, prepend it. No registry lookup
+            needed for normalization.'
+        - description: Type segment vs memory_type mismatch
+          mitigation: Warn on create, don't block. Frontmatter memory_type remains
+            authoritative per spec.
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-033.PHASE-09
+        plan: IP-033
+        delta: DE-033
+        objective: Consolidate duplicated artifact ID regex patterns from blocks/revision.py
+          and blocks/verification.py into core/artifact_ids.py. Eliminate pattern
+          drift and establish single source of truth for ID classification.
+        entrance_criteria:
+        - Phase 8 complete (artifact_ids.py exists with classify_artifact_id)
+        exit_criteria:
+        - verification, phase, subject patterns added to artifact_ids.py
+        - revision.py uses artifact_ids instead of local _is_*_id() helpers
+        - verification.py uses artifact_ids instead of local regex constants
+        - No duplicate ID patterns remain outside core/artifact_ids.py
+        - All existing tests pass (no regressions)
+        - Lint clean (ruff + pylint)
+        tasks:
+        - id: '9.1'
+          description: "Extend artifact_ids.py \u2014 add verification, phase, subject\
+            \ patterns"
+        - id: '9.2'
+          description: "Consolidate revision.py \u2014 replace local patterns + helpers"
+        - id: '9.3'
+          description: "Consolidate verification.py \u2014 replace local patterns"
+        - id: '9.4'
+          description: Verify all tests pass, lint clean
+        risks:
+        - description: Pattern harmonization changes validation strictness
+          mitigation: Shared patterns are more correct (PROD prefix, 3+ digits); review
+            test diffs
+      - id: IP-033.PHASE-01
+        status: completed
+        phase: IP-033.PHASE-01
+      - id: IP-033.PHASE-03
+        status: completed
+        phase: IP-033.PHASE-03
+      - id: IP-033.PHASE-08
+        status: completed
+        phase: IP-033.PHASE-08

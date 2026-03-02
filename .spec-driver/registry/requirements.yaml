@@ -2346,7 +2346,8 @@ requirements:
     path: specify/product/PROD-014/PROD-014.md
   PROD-015.FR-001:
     label: FR-001
-    title: System MUST [specific user-facing capability]
+    title: 'Tech specs MUST support explicit taxonomy via frontmatter fields: `category`
+      and `c4_level`.'
     specs:
     - PROD-015
     primary_spec: PROD-015
@@ -2355,14 +2356,16 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-030
     verified_by: []
     coverage_evidence:
     - VT-XXX
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.FR-002:
     label: FR-002
-    title: Users MUST be able to [key interaction or workflow]
+    title: 'Sync-created unit specs MUST default to `category: unit` and `c4_level:
+      code`.'
     specs:
     - PROD-015
     primary_spec: PROD-015
@@ -2371,13 +2374,14 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-030
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.FR-003:
     label: FR-003
-    title: System MUST [data or behavior requirement]
+    title: The CLI MUST support filtering spec listings by `category` and `c4_level`.
     specs:
     - PROD-015
     primary_spec: PROD-015
@@ -2386,14 +2390,16 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-030
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.FR-004:
     label: FR-004
-    title: 'System MUST [capability] [NEEDS CLARIFICATION: specific question about
-      scope, security, or UX]'
+    title: "The system MUST provide deterministic filesystem \u201Cviews\u201D for\
+      \ navigation by `category` and `c4_level` (e.g. `specify/tech/by-category/assembly/\u2026\
+      `)."
     specs:
     - PROD-015
     primary_spec: PROD-015
@@ -2402,13 +2408,33 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-030
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-015/PROD-015.md
+  PROD-015.FR-005:
+    label: FR-005
+    title: 'Validation MUST warn (not error) when a tech spec is missing taxonomy
+      fields or uses inconsistent combinations (e.g. `category: unit` with non-`code`
+      `c4_level`).'
+    specs:
+    - PROD-015
+    primary_spec: PROD-015
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-030
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.NF-001:
     label: NF-001
-    title: '[Performance expectation from user perspective]'
+    title: 'Taxonomy views and CLI filtering MUST remain fast enough for interactive
+      use (target: <2s on typical repos).'
     specs:
     - PROD-015
     primary_spec: PROD-015
@@ -2417,13 +2443,15 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-030
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.NF-002:
     label: NF-002
-    title: '[Usability or accessibility requirement]'
+    title: 'Taxonomy adoption MUST be non-breaking: existing spec IDs, paths, and
+      registries remain valid.'
     specs:
     - PROD-015
     primary_spec: PROD-015
@@ -2432,10 +2460,196 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-030
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-015/PROD-015.md
+  PROD-016.FR-001:
+    label: FR-001
+    title: The repository MUST have a single workflow configuration file (TOML) readable
+      by both spec-driver and agents (e.g. `.spec-driver/workflow.toml`).
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-031
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.FR-002:
+    label: FR-002
+    title: 'The configuration MUST cover the majority of workflow shaping needs with
+      a minimal set of knobs (80/20), including:'
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.FR-003:
+    label: FR-003
+    title: The system MUST provide an escape hatch for bespoke project instructions
+      as a small plain-text doctrine note that is loaded at the right time (instead
+      of exploding the config keyspace).
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.FR-004:
+    label: FR-004
+    title: The system MUST provide a configurator command/skill that interviews the
+      user and recommends a configuration appropriate for their repo (legacy-biased
+      defaults).
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.FR-005:
+    label: FR-005
+    title: 'The configurator MUST write/update config and install skills/guidance
+      deterministically and idempotently:'
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-032
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.FR-006:
+    label: FR-006
+    title: The system MUST generate a short prescriptive project agent bootstrap (~30
+      lines) that `@references` modular runsheets and is appropriate to the selected
+      configuration.
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-031
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.FR-007:
+    label: FR-007
+    title: The system MUST provide customization hooks for projects to add local skills/guidance
+      and policy without forking canonical content.
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.FR-008:
+    label: FR-008
+    title: 'The system MUST generate project-local, config-tailored guidance markdown
+      (installed/overwritten by the installer) for skills to reference, to:'
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-031
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.NF-001:
+    label: NF-001
+    title: The configurator and installer MUST be safe to re-run and produce minimal
+      diffs (idempotent, deterministic).
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-032
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.NF-002:
+    label: NF-002
+    title: Skills/guidance MUST be provider-neutral at the core, with provider-specific
+      wrappers as thin adapters.
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-032
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.NF-003:
+    label: NF-003
+    title: The default bootstrap MUST be token-cheap and route an agent to the right
+      runsheet/skill without loading long overview docs.
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
   SPEC-110.FR-001:
     label: FR-001
     title: CLI MUST provide single unified entry point (`spec-driver`) routing to

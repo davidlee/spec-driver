@@ -57,6 +57,7 @@ def _format_detail_lines(record: MemoryRecord) -> list[str]:
   lines.extend(_format_priority(record.priority))
   lines.extend(_format_provenance(record.provenance))
   lines.extend(_format_relations(record.relations))
+  lines.extend(_format_links(record.links))
 
   lines.append(f"Path: {record.path}")
   return lines
@@ -116,6 +117,29 @@ def _format_provenance(provenance: dict) -> list[str]:
     if note:
       entry += f" ({note})"
     lines.append(entry)
+  return lines
+
+
+def _format_links(links: dict) -> list[str]:
+  """Format links dict as indented sub-lines."""
+  if not links:
+    return []
+  out = links.get("out", [])
+  missing = links.get("missing", [])
+  if not out and not missing:
+    return []
+  lines = ["Links:"]
+  for entry in out:
+    target_id = entry.get("id", "")
+    kind = entry.get("kind", "")
+    label = entry.get("label")
+    display = f"{target_id} ({kind})"
+    if label:
+      display += f" [{label}]"
+    lines.append(f"  → {display}")
+  for entry in missing:
+    raw = entry.get("raw", "")
+    lines.append(f"  ? {raw} (unresolved)")
   return lines
 
 
@@ -268,6 +292,8 @@ def format_memory_list_json(records: Sequence[MemoryRecord]) -> str:
       item["confidence"] = record.confidence
     if record.summary:
       item["summary"] = record.summary
+    if record.links:
+      item["links"] = record.links
 
     items.append(item)
 

@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
+from supekku.scripts.lib.core.artifact_ids import classify_artifact_id, is_kind
+
 if TYPE_CHECKING:
   from pathlib import Path
 
@@ -21,13 +23,8 @@ VALID_KINDS = {"VT", "VA", "VH"}
 # Valid verification statuses
 VALID_STATUSES = {"planned", "in-progress", "verified", "failed", "blocked"}
 
-# ID patterns for validation
-_VERIFICATION_ID = re.compile(r"^V[TAH]-\d{3,}$")
-_SUBJECT_ID = re.compile(r"^(SPEC|PROD|IP|AUD)-\d{3,}(?:-[A-Z0-9]+)*$")
-_REQUIREMENT_ID = re.compile(
-  r"^(SPEC|PROD)-\d{3,}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$",
-)
-_PHASE_ID = re.compile(r"^IP-\d{3,}(?:-[A-Z0-9]+)*\.PHASE-\d{2}$")
+# Valid subject kinds for verification coverage blocks
+VALID_SUBJECT_KINDS = {"spec", "prod", "plan", "audit"}
 
 
 @dataclass(frozen=True)
@@ -71,7 +68,7 @@ class VerificationCoverageValidator:
     subject_value = str(data.get("subject", ""))
     if not subject_value:
       errors.append("coverage block missing subject id")
-    elif not _SUBJECT_ID.match(subject_value):
+    elif classify_artifact_id(subject_value) not in VALID_SUBJECT_KINDS:
       errors.append(
         f"subject '{subject_value}' does not match expected pattern "
         "(SPEC|PROD|IP|AUD)-###",
@@ -99,7 +96,7 @@ class VerificationCoverageValidator:
           errors.append(f"entry[{idx}] missing artefact")
         elif not isinstance(artefact, str):
           errors.append(f"entry[{idx}] artefact must be a string")
-        elif not _VERIFICATION_ID.match(artefact):
+        elif not is_kind(artefact, "verification"):
           errors.append(
             f"entry[{idx}] artefact '{artefact}' does not match pattern V[TAH]-###",
           )
@@ -122,7 +119,7 @@ class VerificationCoverageValidator:
           errors.append(f"entry[{idx}] missing requirement")
         elif not isinstance(requirement, str):
           errors.append(f"entry[{idx}] requirement must be a string")
-        elif not _REQUIREMENT_ID.match(requirement):
+        elif not is_kind(requirement, "requirement"):
           errors.append(
             f"entry[{idx}] requirement '{requirement}' does not match "
             "pattern (SPEC|PROD)-###.(FR|NFR)-...",
@@ -133,7 +130,7 @@ class VerificationCoverageValidator:
         if phase is not None:
           if not isinstance(phase, str):
             errors.append(f"entry[{idx}] phase must be a string")
-          elif not _PHASE_ID.match(phase):
+          elif not is_kind(phase, "phase"):
             errors.append(
               f"entry[{idx}] phase '{phase}' does not match pattern IP-###.PHASE-##",
             )

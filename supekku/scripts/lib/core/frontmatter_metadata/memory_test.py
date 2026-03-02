@@ -286,6 +286,60 @@ class MemoryFrontmatterValidationTest(unittest.TestCase):
     new_errors = new_validator.validate(data)
     self.assertNotEqual(new_errors, [], "Should reject audience as non-array")
 
+  # ── Links field tests ──────────────────────────────────────
+
+  def test_valid_links_with_out(self) -> None:
+    """Both validators accept links with resolved out entries."""
+    data = _minimal_memory(
+      links={
+        "out": [
+          {"id": "ADR-001", "path": "decisions/ADR-001.md", "kind": "adr"},
+        ],
+      },
+    )
+    self._assert_both_valid(data)
+
+  def test_valid_links_with_label(self) -> None:
+    """Both validators accept links out entry with optional label."""
+    data = _minimal_memory(
+      links={
+        "out": [
+          {
+            "id": "ADR-001",
+            "path": "decisions/ADR-001.md",
+            "kind": "adr",
+            "label": "Auth Decision",
+          },
+        ],
+      },
+    )
+    self._assert_both_valid(data)
+
+  def test_valid_links_with_missing(self) -> None:
+    """Both validators accept links with missing entries."""
+    data = _minimal_memory(
+      links={
+        "missing": [{"raw": "ADR-999"}],
+      },
+    )
+    self._assert_both_valid(data)
+
+  def test_valid_links_mixed(self) -> None:
+    """Both validators accept links with out and missing."""
+    data = _minimal_memory(
+      links={
+        "out": [
+          {"id": "SPEC-001", "path": "s.md", "kind": "spec"},
+        ],
+        "missing": [{"raw": "NOPE-999"}],
+      },
+    )
+    self._assert_both_valid(data)
+
+  def test_valid_links_empty(self) -> None:
+    """Both validators accept empty links object."""
+    self._assert_both_valid(_minimal_memory(links={}))
+
 
 if __name__ == "__main__":
   unittest.main()

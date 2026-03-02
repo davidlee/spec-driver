@@ -99,6 +99,13 @@ def sync(
       help="Synchronize backlog priority registry",
     ),
   ] = False,
+  memory_links: Annotated[
+    bool,
+    typer.Option(
+      "--memory-links",
+      help="Resolve [[...]] links in memory record bodies",
+    ),
+  ] = False,
   prune: Annotated[
     bool,
     typer.Option(
@@ -223,6 +230,21 @@ def sync(
   except Exception as e:
     typer.echo(f"Error syncing requirements: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
+
+  # Resolve memory links if requested
+  if memory_links:
+    typer.echo("Resolving memory links...")
+    try:
+      from supekku.cli.resolve import _resolve_memory_links
+
+      link_stats = _resolve_memory_links(root, dry_run=dry_run)
+      results["memory_links"] = {"success": True, **link_stats}
+      typer.echo(
+        f"  Links: {link_stats['resolved']} resolved, {link_stats['missing']} missing",
+      )
+    except Exception as e:
+      typer.echo(f"Error resolving memory links: {e}", err=True)
+      results["memory_links"] = {"success": False}
 
   # Report overall results
   if all(r.get("success", True) for r in results.values()):

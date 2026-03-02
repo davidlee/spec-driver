@@ -209,6 +209,63 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
       ),
       description="Surfacing mode: hook-driven (pre) or manual (on_demand)",
     ),
+    "links": FieldMetadata(
+      type="object",
+      required=False,
+      description="Resolved cross-artifact links parsed from body [[...]] tokens",
+      properties={
+        "out": FieldMetadata(
+          type="array",
+          required=False,
+          items=FieldMetadata(
+            type="object",
+            description="Resolved outgoing link",
+            properties={
+              "id": FieldMetadata(
+                type="string",
+                required=True,
+                pattern=r".+",
+                description="Target artifact ID",
+              ),
+              "path": FieldMetadata(
+                type="string",
+                required=True,
+                pattern=r".+",
+                description="Relative path to target",
+              ),
+              "kind": FieldMetadata(
+                type="string",
+                required=True,
+                description="Artifact kind (adr, spec, memory, etc.)",
+              ),
+              "label": FieldMetadata(
+                type="string",
+                required=False,
+                description="Optional display label from [[id|label]]",
+              ),
+            },
+          ),
+          description="Resolved outgoing links",
+        ),
+        "missing": FieldMetadata(
+          type="array",
+          required=False,
+          items=FieldMetadata(
+            type="object",
+            description="Unresolved link target",
+            properties={
+              "raw": FieldMetadata(
+                type="string",
+                required=True,
+                pattern=r".+",
+                description="Original link target text",
+              ),
+            },
+          ),
+          description="Unresolved link targets",
+        ),
+      },
+    ),
   },
   examples=[
     # Representative memory with scope, priority, provenance (default example)

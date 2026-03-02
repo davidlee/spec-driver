@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
+from supekku.scripts.lib.core.artifact_ids import is_kind
 from supekku.scripts.lib.requirements.lifecycle import (
   VALID_STATUSES as REQUIREMENT_VALID_STATUSES,
 )
@@ -346,37 +347,6 @@ class RevisionChangeBlock:
     return original[: self.content_start] + new_yaml + original[self.content_end :]
 
 
-_REQUIREMENT_ID = re.compile(r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$")
-_SPEC_ID = re.compile(r"^SPEC-\d{3}(?:-[A-Z0-9]+)*$")
-_REVISION_ID = re.compile(r"^RE-\d{3,}$")
-_DELTA_ID = re.compile(r"^DE-\d{3,}$")
-_AUDIT_ID = re.compile(r"^AUD-\d{3,}$")
-_BACKLOG_ID = re.compile(r"^[A-Z]+-\d{3,}$")
-
-
-def _is_requirement_id(value: str) -> bool:
-  return bool(_REQUIREMENT_ID.match(value))
-
-
-def _is_spec_id(value: str) -> bool:
-  return bool(_SPEC_ID.match(value))
-
-
-def _is_revision_id(value: str) -> bool:
-  return bool(_REVISION_ID.match(value))
-
-
-def _is_delta_id(value: str) -> bool:
-  return bool(_DELTA_ID.match(value))
-
-
-def _is_audit_id(value: str) -> bool:
-  return bool(_AUDIT_ID.match(value))
-
-
-def _is_backlog_id(value: str) -> bool:
-  return bool(_BACKLOG_ID.match(value))
-
 
 def _disallow_extra_keys(
   mapping: dict[str, Any],
@@ -473,7 +443,7 @@ class RevisionBlockValidator:
       messages.append(ValidationMessage(("metadata", "revision"), "is required"))
     else:
       revision = metadata.get("revision")
-      if not isinstance(revision, str) or not _is_revision_id(revision):
+      if not isinstance(revision, str) or not is_kind(revision, "revision"):
         messages.append(
           ValidationMessage(
             ("metadata", "revision"),
@@ -511,7 +481,7 @@ class RevisionBlockValidator:
 
     spec_id = spec.get("spec_id")
     if spec_id is not None and (
-      not isinstance(spec_id, str) or not _is_spec_id(spec_id)
+      not isinstance(spec_id, str) or not is_kind(spec_id, "spec")
     ):
       messages.append(
         ValidationMessage((*path, "spec_id"), "must be a SPEC identifier"),
@@ -555,7 +525,7 @@ class RevisionBlockValidator:
             )
             continue
           for idx, item in enumerate(value):
-            if not isinstance(item, str) or not _is_requirement_id(item):
+            if not isinstance(item, str) or not is_kind(item, "requirement"):
               messages.append(
                 ValidationMessage(
                   (*path, "requirement_flow", key, idx),
@@ -645,7 +615,7 @@ class RevisionBlockValidator:
 
     requirement_id = requirement.get("requirement_id")
     if requirement_id is not None and (
-      not isinstance(requirement_id, str) or not _is_requirement_id(requirement_id)
+      not isinstance(requirement_id, str) or not is_kind(requirement_id, "requirement")
     ):
       messages.append(
         ValidationMessage(
@@ -725,8 +695,8 @@ class RevisionBlockValidator:
             ),
           )
         else:
-          if kind_value == "requirement" and not _is_requirement_id(
-            ref_value,
+          if kind_value == "requirement" and not is_kind(
+            ref_value, "requirement",
           ):
             messages.append(
               ValidationMessage(
@@ -734,14 +704,14 @@ class RevisionBlockValidator:
                 "must be a requirement identifier",
               ),
             )
-          if kind_value == "spec" and not _is_spec_id(ref_value):
+          if kind_value == "spec" and not is_kind(ref_value, "spec"):
             messages.append(
               ValidationMessage(
                 (*origin_path, "ref"),
                 "must be a SPEC identifier",
               ),
             )
-          if kind_value == "backlog" and not _is_backlog_id(ref_value):
+          if kind_value == "backlog" and not is_kind(ref_value, "backlog"):
             messages.append(
               ValidationMessage(
                 (*origin_path, "ref"),
@@ -784,7 +754,7 @@ class RevisionBlockValidator:
       )
       spec_value = destination.get("spec")
       if spec_value is not None and (
-        not isinstance(spec_value, str) or not _is_spec_id(spec_value)
+        not isinstance(spec_value, str) or not is_kind(spec_value, "spec")
       ):
         messages.append(
           ValidationMessage(
@@ -794,7 +764,7 @@ class RevisionBlockValidator:
         )
       req_value = destination.get("requirement_id")
       if req_value is not None and (
-        not isinstance(req_value, str) or not _is_requirement_id(req_value)
+        not isinstance(req_value, str) or not is_kind(req_value, "requirement")
       ):
         messages.append(
           ValidationMessage(
@@ -820,7 +790,7 @@ class RevisionBlockValidator:
           )
         else:
           for idx, spec in enumerate(additional):
-            if not isinstance(spec, str) or not _is_spec_id(spec):
+            if not isinstance(spec, str) or not is_kind(spec, "spec"):
               messages.append(
                 ValidationMessage(
                   (*path, "destination", "additional_specs", idx),
@@ -851,7 +821,7 @@ class RevisionBlockValidator:
           )
         introduced_by = lifecycle.get("introduced_by")
         if introduced_by is not None and (
-          not isinstance(introduced_by, str) or not _is_revision_id(introduced_by)
+          not isinstance(introduced_by, str) or not is_kind(introduced_by, "revision")
         ):
           messages.append(
             ValidationMessage(
@@ -870,7 +840,7 @@ class RevisionBlockValidator:
             )
           else:
             for idx, delta in enumerate(implemented_by):
-              if not isinstance(delta, str) or not _is_delta_id(delta):
+              if not isinstance(delta, str) or not is_kind(delta, "delta"):
                 messages.append(
                   ValidationMessage(
                     (*path, "lifecycle", "implemented_by", idx),
@@ -888,7 +858,7 @@ class RevisionBlockValidator:
             )
           else:
             for idx, audit in enumerate(verified_by):
-              if not isinstance(audit, str) or not _is_audit_id(audit):
+              if not isinstance(audit, str) or not is_kind(audit, "audit"):
                 messages.append(
                   ValidationMessage(
                     (*path, "lifecycle", "verified_by", idx),

@@ -10,6 +10,7 @@ from supekku.cli import (
   create,
   edit,
   find,
+  resolve,
   schema,
   show,
   skills,
@@ -96,6 +97,12 @@ app.add_typer(
   schema.app,
   name="schema",
   help="Show YAML block schemas",
+)
+
+app.add_typer(
+  resolve.app,
+  name="resolve",
+  help="Resolve cross-artifact references",
 )
 
 app.add_typer(

@@ -250,6 +250,68 @@ class TestMemoryRecord(unittest.TestCase):
     self.assertIsNone(record.created)
     self.assertIsNone(record.verified)
 
+  def test_links_defaults_empty(self) -> None:
+    """links field defaults to empty dict."""
+    record = MemoryRecord(
+      id="mem.fact.test",
+      name="Test",
+      status="active",
+      memory_type="fact",
+      path="",
+    )
+    self.assertEqual(record.links, {})
+
+  def test_from_frontmatter_with_links(self) -> None:
+    """from_frontmatter parses links object."""
+    links = {
+      "out": [
+        {"id": "ADR-001", "path": "decisions/ADR-001.md", "kind": "adr"},
+      ],
+      "missing": [{"raw": "ADR-999"}],
+    }
+    fm = {
+      "id": "mem.fact.test",
+      "name": "Test",
+      "status": "active",
+      "memory_type": "fact",
+      "links": links,
+    }
+    record = MemoryRecord.from_frontmatter(
+      Path("/repo/mem.fact.test.md"),
+      fm,
+    )
+    self.assertEqual(record.links, links)
+
+  def test_to_dict_with_links(self) -> None:
+    """to_dict includes links when non-empty."""
+    links = {
+      "out": [
+        {"id": "ADR-001", "path": "a.md", "kind": "adr"},
+      ],
+    }
+    record = MemoryRecord(
+      id="mem.fact.test",
+      name="Test",
+      status="active",
+      memory_type="fact",
+      path="/repo/memory/mem.fact.test.md",
+      links=links,
+    )
+    d = record.to_dict(Path("/repo"))
+    self.assertEqual(d["links"], links)
+
+  def test_to_dict_omits_empty_links(self) -> None:
+    """to_dict omits links when empty."""
+    record = MemoryRecord(
+      id="mem.fact.test",
+      name="Test",
+      status="active",
+      memory_type="fact",
+      path="/repo/memory/mem.fact.test.md",
+    )
+    d = record.to_dict(Path("/repo"))
+    self.assertNotIn("links", d)
+
 
 if __name__ == "__main__":
   unittest.main()

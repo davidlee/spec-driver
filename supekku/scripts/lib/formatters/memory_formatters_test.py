@@ -162,6 +162,47 @@ class TestFormatMemoryDetails:
     output = format_memory_details(record)
     assert "Relations:" not in output
 
+  def test_includes_resolved_links(self) -> None:
+    record = _make_record(
+      links={
+        "out": [
+          {"id": "ADR-001", "path": "a.md", "kind": "adr"},
+        ],
+      },
+    )
+    output = format_memory_details(record)
+    assert "Links:" in output
+    assert "ADR-001 (adr)" in output
+
+  def test_includes_link_label(self) -> None:
+    record = _make_record(
+      links={
+        "out": [
+          {
+            "id": "ADR-001",
+            "path": "a.md",
+            "kind": "adr",
+            "label": "Auth",
+          },
+        ],
+      },
+    )
+    output = format_memory_details(record)
+    assert "[Auth]" in output
+
+  def test_includes_missing_links(self) -> None:
+    record = _make_record(
+      links={"missing": [{"raw": "ADR-999"}]},
+    )
+    output = format_memory_details(record)
+    assert "Links:" in output
+    assert "ADR-999 (unresolved)" in output
+
+  def test_empty_links_omitted(self) -> None:
+    record = _make_record(links={})
+    output = format_memory_details(record)
+    assert "Links:" not in output
+
 
 # --- format_memory_list_table ---
 
@@ -291,3 +332,22 @@ class TestFormatMemoryListJson:
     item = json.loads(output)["items"][0]
     assert item["created"] is None
     assert item["updated"] is None
+
+  def test_json_includes_links(self) -> None:
+    """JSON output includes links when present."""
+    links = {
+      "out": [
+        {"id": "ADR-001", "path": "a.md", "kind": "adr"},
+      ],
+    }
+    records = [_make_record(links=links)]
+    output = format_memory_list_json(records)
+    item = json.loads(output)["items"][0]
+    assert item["links"] == links
+
+  def test_json_omits_empty_links(self) -> None:
+    """JSON output omits links when empty."""
+    records = [_make_record(links={})]
+    output = format_memory_list_json(records)
+    item = json.loads(output)["items"][0]
+    assert "links" not in item

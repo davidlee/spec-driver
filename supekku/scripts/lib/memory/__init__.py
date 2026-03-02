@@ -1,4 +1,4 @@
-"""Memory domain — models, registry, selection, and ID utilities."""
+"""Memory domain — models, registry, selection, ID utilities, and links."""
 
 from __future__ import annotations
 
@@ -7,6 +7,16 @@ from supekku.scripts.lib.memory.ids import (
   filename_from_id,
   normalize_memory_id,
   validate_memory_id,
+)
+from supekku.scripts.lib.memory.links import (
+  LinkResolutionResult,
+  MissingLink,
+  ParsedLink,
+  ResolvedLink,
+  links_to_frontmatter,
+  parse_links,
+  resolve_all_links,
+  resolve_parsed_link,
 )
 from supekku.scripts.lib.memory.models import MemoryRecord
 from supekku.scripts.lib.memory.registry import MemoryRegistry
@@ -21,15 +31,23 @@ from supekku.scripts.lib.memory.selection import (
 )
 
 __all__: list[str] = [
+  "LinkResolutionResult",
   "MatchContext",
   "MemoryRecord",
   "MemoryRegistry",
+  "MissingLink",
+  "ParsedLink",
+  "ResolvedLink",
   "extract_type_from_id",
   "filename_from_id",
   "is_surfaceable",
+  "links_to_frontmatter",
   "matches_scope",
   "normalize_memory_id",
   "normalize_path",
+  "parse_links",
+  "resolve_all_links",
+  "resolve_parsed_link",
   "scope_specificity",
   "select",
   "sort_key",

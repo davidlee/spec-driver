@@ -69,6 +69,7 @@ class MemoryRecord:
   scope: dict[str, Any] = field(default_factory=dict)
   priority: dict[str, Any] = field(default_factory=dict)
   provenance: dict[str, Any] = field(default_factory=dict)
+  links: dict[str, Any] = field(default_factory=dict)
 
   @classmethod
   def from_frontmatter(cls, path: Path, fm: dict[str, Any]) -> MemoryRecord:
@@ -102,6 +103,7 @@ class MemoryRecord:
       scope=fm.get("scope", {}),
       priority=fm.get("priority", {}),
       provenance=fm.get("provenance", {}),
+      links=fm.get("links", {}),
     )
 
   def to_dict(self, root: Path) -> dict[str, Any]:
@@ -147,7 +149,7 @@ class MemoryRecord:
         data[list_field] = val
 
     # Optional objects — include only if non-empty
-    for obj_field in ("scope", "priority", "provenance"):
+    for obj_field in ("scope", "priority", "provenance", "links"):
       val = getattr(self, obj_field)
       if val:
         data[obj_field] = val

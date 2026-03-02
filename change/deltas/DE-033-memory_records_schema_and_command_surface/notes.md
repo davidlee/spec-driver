@@ -81,7 +81,31 @@
 
 ### Next steps
 
-- Phase 3: CLI commands (`create memory`, `list memories`, `show memory`, `find memory`)
+- Phase 3: CLI surface — phase sheet created at `phases/phase-03.md`
 - Phase 4: Selection & deterministic filtering/ordering
-- Phase 5: Memory formatters
+- Phase 5: Formatters refinement & docs
 - Phase 6: Verification & skills
+
+## Handover — Phase 3 pickup
+
+Phase 3 sheet is at `phases/phase-03.md` with 8 tasks. Start with `/preflight DE-033/3.1`.
+
+Key context for the next agent:
+
+1. **Reference implementations are well-established**:
+   - Creation: `decisions/creation.py` → `ADRCreationOptions`, `create_adr()`, `generate_next_adr_id()`
+   - Formatters: `formatters/decision_formatters.py` → `format_decision_details()`, `format_decision_list_table()`
+   - CLI: `cli/create.py` (`create_adr`), `cli/list.py` (`list_adrs`), `cli/show.py` (`show_adr`), `cli/find.py` (`find_adr`)
+
+2. **Shared utilities already handle most plumbing**:
+   - `normalize_id()` in `cli/common.py` — just needs `"memory": "MEM-"` added to `ARTIFACT_PREFIXES`
+   - `table_utils.py` — `create_table`, `render_table`, `format_as_json`, `format_as_tsv`
+   - `matches_regexp()` in `cli/common.py` for `--regexp` filtering
+
+3. **Watch for file size**: `list.py` is ~2000 lines. Keep memory list command thin (~50 lines).
+
+4. **Note on Phase 5 overlap**: The phase sheet includes formatters as task 3.4/3.5. This overlaps with the original Phase 5 ("Formatters & Docs"). Phase 5 may reduce to just docs and refinement once Phase 3 formatters are done. Revisit Phase 5 scope after Phase 3.
+
+5. **Commits so far**:
+   - `d1bca98` — Phase 1: memory frontmatter metadata schema
+   - `df69d6c` — Phase 2: MemoryRecord model and MemoryRegistry

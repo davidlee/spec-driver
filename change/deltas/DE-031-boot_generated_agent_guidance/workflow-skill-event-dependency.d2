@@ -1,0 +1,109 @@
+direction: right
+
+title: "DE-031 / PROD-016 Skill and Event Dependency Skeleton"
+
+legend: {
+  note: "Edge annotation: status=<canonical|provisional|experimental>; source=<refs>"
+}
+
+inputs: {
+  label: "Config + Source Inputs"
+  workflow_toml: ".spec-driver/workflow.toml"
+  doctrine: ".spec-driver/doctrine.md"
+  allowlist: ".spec-driver/skills.allowlist"
+  templates: "supekku/templates/agents/*.md"
+}
+
+tooling: {
+  label: "Tooling Pipeline"
+  configure: "spec-driver configure (planned)"
+  install: "spec-driver install"
+  skills_sync: "spec-driver skills sync"
+}
+
+generated: {
+  label: "Generated Guidance Surface"
+  agent_exec: ".spec-driver/agents/exec.md"
+  agent_workflow: ".spec-driver/agents/workflow.md"
+  agent_glossary: ".spec-driver/agents/glossary.md"
+  agent_policy: ".spec-driver/agents/policy.md"
+  agents_table: "AGENTS.md <available_skills>"
+}
+
+events: {
+  label: "Events (Trigger Bus)"
+  e_boot: "event.boot_requested"
+  e_task: "event.task_requested"
+  e_blocker: "event.blocker_detected"
+  e_impl_done: "event.implementation_complete"
+  e_phase_done: "event.phase_complete"
+  e_handoff: "event.handoff_required"
+}
+
+skills: {
+  label: "Skills (Current Repo Exposure)"
+  boot: "boot"
+  preflight: "preflight"
+  consult: "consult"
+  implement: "implement"
+  notes: "notes"
+  continuation: "continuation"
+}
+
+guards: {
+  label: "Config Guards"
+  g_ceremony: "ceremony (pioneer|settler|town_planner)"
+  g_cards: "cards.enabled"
+  g_contracts: "contracts.enabled"
+  g_policy: "policy.adrs/policies/standards"
+}
+
+inputs.workflow_toml -> tooling.install: "status=canonical; source=DE-031"
+inputs.doctrine -> tooling.install: "status=canonical; source=DE-031 notes"
+inputs.templates -> tooling.install: "status=canonical; source=DR-031"
+tooling.configure -> inputs.workflow_toml: "status=provisional; source=PROD-016.FR-004"
+
+tooling.install -> generated.agent_exec: "status=canonical; source=DE-031"
+tooling.install -> generated.agent_workflow: "status=canonical; source=DE-031"
+tooling.install -> generated.agent_glossary: "status=canonical; source=DE-031"
+tooling.install -> generated.agent_policy: "status=canonical; source=DE-031"
+
+inputs.allowlist -> tooling.skills_sync: "status=canonical; source=DE-032"
+tooling.skills_sync -> generated.agents_table: "status=canonical; source=DE-032"
+generated.agents_table -> skills.boot: "status=canonical; source=AGENTS discovery model"
+generated.agents_table -> skills.preflight: "status=canonical; source=AGENTS discovery model"
+generated.agents_table -> skills.consult: "status=canonical; source=AGENTS discovery model"
+generated.agents_table -> skills.implement: "status=canonical; source=AGENTS discovery model"
+generated.agents_table -> skills.notes: "status=canonical; source=AGENTS discovery model"
+generated.agents_table -> skills.continuation: "status=canonical; source=AGENTS discovery model"
+
+generated.agent_exec -> skills.boot: "status=canonical; source=DE-031 intent"
+generated.agent_workflow -> skills.preflight: "status=canonical; source=DE-031 intent"
+generated.agent_glossary -> skills.preflight: "status=canonical; source=DE-031 intent"
+generated.agent_policy -> skills.preflight: "status=canonical; source=DE-031 intent"
+
+events.e_boot -> skills.boot: "status=canonical; source=current skill contract"
+events.e_task -> skills.preflight: "status=canonical; source=current skill contract"
+events.e_task -> skills.implement: "status=canonical; source=current skill contract"
+events.e_blocker -> skills.consult: "status=canonical; source=current skill contract"
+events.e_impl_done -> skills.notes: "status=canonical; source=current skill contract"
+events.e_phase_done -> skills.notes: "status=provisional; source=commands-workflow.md"
+events.e_handoff -> skills.continuation: "status=canonical; source=current skill contract"
+
+skills.boot -> events.e_task: "emits next-step routing"
+skills.preflight -> events.e_blocker: "may emit when complexity rises"
+skills.preflight -> events.e_task: "emits normalized task context"
+skills.implement -> events.e_impl_done: "emits completion signal"
+skills.consult -> events.e_task: "emits revised approach"
+skills.notes -> events.e_phase_done: "emits evidence update"
+skills.notes -> events.e_handoff: "emits handoff need"
+
+inputs.workflow_toml -> guards.g_ceremony
+inputs.workflow_toml -> guards.g_cards
+inputs.workflow_toml -> guards.g_contracts
+inputs.workflow_toml -> guards.g_policy
+
+guards.g_ceremony -> skills.preflight: "status=canonical; source=workflow mode routing"
+guards.g_cards -> skills.preflight: "status=canonical; source=workflow.toml"
+guards.g_contracts -> skills.notes: "status=provisional; source=commands-workflow truth model"
+guards.g_policy -> skills.consult: "status=provisional; source=commands-workflow governance layer"

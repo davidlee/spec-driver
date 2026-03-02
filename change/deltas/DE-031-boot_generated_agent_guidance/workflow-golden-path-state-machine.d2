@@ -1,0 +1,110 @@
+direction: right
+
+title: "DE-031 / PROD-016 Golden Path Workflow (State Machine Skeleton)"
+
+legend: {
+  label: "Edge annotation format"
+  sample: "skill=<name>; guard=<condition>; status=<canonical|provisional|experimental>; source=<refs>"
+}
+
+setup: {
+  label: "Setup + Bootstrap States"
+  start: "Repo Ready"
+  configure: "Configure Interview"
+  write_config: "Write .spec-driver/workflow.toml"
+  install: "Run spec-driver install"
+  render_agents: "Render .spec-driver/agents/*.md"
+  sync_skills: "Sync allowlisted skills into AGENTS.md"
+  boot: "Agent Boot"
+}
+
+delivery: {
+  label: "Delivery States"
+  choose_mode: "Select Ceremony Mode"
+  pioneer: "Pioneer Path"
+  settler: "Settler Path"
+  town_planner: "Town Planner Path"
+
+  pioneer_card: "Card Intake (T*)"
+  pioneer_impl: "Implement From Card"
+  pioneer_close: "Card Closure Update"
+
+  settler_backlog: "Backlog Intake"
+  settler_delta: "Delta Scope (DE-*)"
+  settler_design: "Design Revision (Optional DR-*)"
+  settler_ip: "Implementation Plan / Phases (Optional IP-*)"
+  settler_impl: "Implement"
+  settler_verify: "Verification / Audit"
+  settler_close: "Owning Record Closure Update"
+
+  town_revision: "Revision / Governance Entry"
+  town_spec_update: "Spec/Requirement Update"
+  town_delta: "Delta Scope (DE-*)"
+  town_design: "Design Revision (DR-*)"
+  town_ip: "Implementation Plan / Phases (IP-*)"
+  town_impl: "Implement"
+  town_audit: "Conformance Audit"
+  town_close: "Structured Closure Update"
+}
+
+cross_cutting: {
+  label: "Cross-Cutting Guards"
+  g_cards: "cards.enabled"
+  g_contracts: "contracts.enabled"
+  g_adrs: "policy.adrs"
+  g_policies: "policy.policies"
+  g_standards: "policy.standards"
+}
+
+end: "Done"
+end.shape: hexagon
+
+setup.start -> setup.configure: "skill=boot; guard=agent startup; status=canonical; source=DE-031, DR-031"
+setup.configure -> setup.write_config: "skill=configure (planned); guard=FR-004; status=provisional; source=PROD-016.FR-004"
+setup.write_config -> setup.install: "skill=configure/install; guard=config changed || first run; status=canonical; source=DE-031"
+setup.install -> setup.render_agents: "skill=install; guard=templates available; status=canonical; source=DE-031, DR-031"
+setup.install -> setup.render_agents: "skill=install; guard=template missing -> static copy fallback; status=provisional; source=DE-031"
+setup.render_agents -> setup.sync_skills: "skill=skills sync; guard=allowlist exists; status=provisional; source=DE-032"
+setup.render_agents -> setup.boot: "skill=boot; guard=agents docs generated; status=canonical; source=DE-031, PROD-016.FR-008"
+setup.sync_skills -> setup.boot: "skill=boot; guard=AGENTS.md updated; status=provisional; source=DE-032"
+
+setup.boot -> delivery.choose_mode: "skill=preflight; guard=workflow.toml parsed; status=canonical; source=PROD-016.FR-001"
+delivery.choose_mode -> delivery.pioneer: "skill=preflight; guard=ceremony=pioneer; status=canonical; source=workflow.toml"
+delivery.choose_mode -> delivery.settler: "skill=preflight; guard=ceremony=settler; status=canonical; source=workflow.toml"
+delivery.choose_mode -> delivery.town_planner: "skill=preflight; guard=ceremony=town_planner; status=canonical; source=workflow.toml"
+
+cross_cutting.g_cards -> delivery.pioneer_card
+cross_cutting.g_contracts -> delivery.settler_verify
+cross_cutting.g_contracts -> delivery.town_audit
+cross_cutting.g_adrs -> delivery.settler_design
+cross_cutting.g_policies -> delivery.town_revision
+cross_cutting.g_standards -> delivery.town_audit
+
+delivery.pioneer -> delivery.pioneer_card: "skill=preflight; guard=cards.enabled; status=canonical; source=workflow.toml, commands-workflow.md"
+delivery.pioneer_card -> delivery.pioneer_impl: "skill=implement; guard=work accepted; status=canonical; source=commands-workflow.md"
+delivery.pioneer_impl -> delivery.pioneer_close: "skill=notes; guard=evidence captured minimally; status=provisional; source=commands-workflow.md"
+delivery.pioneer_close -> end: "skill=continuation; guard=handoff needed?; status=canonical; source=skills table"
+
+delivery.settler -> delivery.settler_backlog: "skill=preflight; guard=backlog primitive active; status=canonical; source=commands-workflow.md"
+delivery.settler_backlog -> delivery.settler_delta: "skill=preflight; guard=intentional change; status=canonical; source=commands-workflow.md"
+delivery.settler_delta -> delivery.settler_design: "skill=consult; guard=design complexity; status=provisional; source=DR-031 intent"
+delivery.settler_delta -> delivery.settler_ip: "skill=preflight; guard=execution non-trivial; status=canonical; source=commands-workflow.md"
+delivery.settler_design -> delivery.settler_ip: "skill=preflight; guard=design settled; status=provisional; source=DE-031 context"
+delivery.settler_ip -> delivery.settler_impl: "skill=implement; guard=phase ready; status=canonical; source=commands-workflow.md"
+delivery.settler_impl -> delivery.settler_verify: "skill=notes; guard=verification artefacts required; status=canonical; source=commands-workflow.md"
+delivery.settler_verify -> delivery.settler_close: "skill=notes; guard=owning record identified; status=canonical; source=commands-workflow.md"
+delivery.settler_close -> end: "skill=continuation; guard=handoff needed?; status=canonical; source=skills table"
+
+delivery.town_planner -> delivery.town_revision: "skill=preflight; guard=governance first; status=provisional; source=commands-workflow.md"
+delivery.town_revision -> delivery.town_spec_update: "skill=preflight; guard=requirements affected; status=provisional; source=commands-workflow.md"
+delivery.town_spec_update -> delivery.town_delta: "skill=preflight; guard=change approved; status=provisional; source=commands-workflow.md"
+delivery.town_delta -> delivery.town_design: "skill=consult; guard=design record required; status=provisional; source=commands-workflow.md"
+delivery.town_design -> delivery.town_ip: "skill=preflight; guard=plan needed; status=provisional; source=commands-workflow.md"
+delivery.town_ip -> delivery.town_impl: "skill=implement; guard=phase ready; status=provisional; source=commands-workflow.md"
+delivery.town_impl -> delivery.town_audit: "skill=notes; guard=conformance evidence required; status=provisional; source=commands-workflow.md"
+delivery.town_audit -> delivery.town_close: "skill=notes; guard=coverage blocks updated; status=provisional; source=commands-workflow.md"
+delivery.town_close -> end: "skill=continuation; guard=handoff needed?; status=canonical; source=skills table"
+
+delivery.settler_impl -> delivery.settler_design: "skill=consult; guard=unexpected blocker; status=canonical; source=consult skill contract"
+delivery.town_impl -> delivery.town_design: "skill=consult; guard=unexpected blocker; status=canonical; source=consult skill contract"
+delivery.pioneer_impl -> delivery.pioneer_card: "skill=consult; guard=unexpected blocker; status=canonical; source=consult skill contract"

@@ -12,6 +12,7 @@ from supekku.cli import (
   find,
   schema,
   show,
+  skills,
   sync,
   view,
   workspace,
@@ -101,6 +102,12 @@ app.add_typer(
   backfill.app,
   name="backfill",
   help="Backfill incomplete stub specifications",
+)
+
+app.add_typer(
+  skills.app,
+  name="skills",
+  help="Manage agent skill exposure",
 )
 
 

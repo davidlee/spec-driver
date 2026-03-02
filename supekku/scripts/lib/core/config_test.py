@@ -86,6 +86,10 @@ doctrine_path = "custom/doctrine.md"
 
 [authoring]
 engine = "spec_driver"
+
+[integration]
+agents_md = false
+claude_md = false
 """
   toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
   toml_path.parent.mkdir(parents=True)
@@ -105,6 +109,7 @@ engine = "spec_driver"
   assert config["contracts"]["root"] == "api-contracts"
   assert config["bootstrap"]["doctrine_path"] == "custom/doctrine.md"
   assert config["authoring"]["engine"] == "spec_driver"
+  assert config["integration"]["agents_md"] is False
 
 
 def test_invalid_toml_warns_and_returns_defaults(
@@ -132,3 +137,4 @@ def test_defaults_have_expected_structure() -> None:
   assert isinstance(DEFAULT_CONFIG["bootstrap"], dict)
   assert isinstance(DEFAULT_CONFIG["authoring"], dict)
   assert isinstance(DEFAULT_CONFIG["verification"], dict)
+  assert isinstance(DEFAULT_CONFIG["integration"], dict)

@@ -42,6 +42,10 @@ DEFAULT_CONFIG: dict = {
   "authoring": {
     "engine": "superpowers",
   },
+  "integration": {
+    "agents_md": True,
+    "claude_md": True,
+  },
 }
 
 

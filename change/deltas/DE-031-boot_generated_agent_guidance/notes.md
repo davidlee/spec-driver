@@ -27,6 +27,24 @@ Source inputs:
 - Keep each module short and composable; avoid putting “everything” in `workflow.md`.
 - Installer may overwrite `.spec-driver/agents/**` on every run.
 
+## Planned: derived template context (phase 2+)
+
+The glossary and other templates need to conditionally render based on which
+primitives are active. Workflow.toml doesn't model this directly — it has
+`cards.enabled`, `contracts.enabled`, etc. but nothing for specs, deltas,
+requirements, verification, backlog.
+
+Rather than littering templates with compound Jinja conditionals, add a
+`build_template_context(config) -> dict` function that derives higher-level
+flags from the raw config:
+
+- `has_specs`, `has_deltas`, `has_requirements`, `has_backlog`, `has_verification`, etc.
+- Cross-cutting: "requirements appear if specs OR backlog enabled"
+- Templates get a flat, pre-computed context — `{% if ctx.has_requirements %}`
+
+This keeps workflow.toml lean, derivation logic testable in Python, and
+templates maintainable.
+
 ## Suggested test strategy
 
 - Add unit tests for “render from config” using a temp repo root:

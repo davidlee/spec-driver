@@ -42,6 +42,7 @@ BASE_FRONTMATTER_METADATA = BlockMetadata(
         "delta",
         "design_revision",
         "issue",
+        "memory",
         "phase",
         "plan",
         "policy",

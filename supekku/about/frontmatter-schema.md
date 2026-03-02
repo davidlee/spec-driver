@@ -22,7 +22,7 @@ This note proposes a shared YAML frontmatter contract for every structured artef
 id: SPEC-001
 name: Records, Fields, and Schemas Specification
 slug: spec-records-fields-schemas
-kind: spec|contract|design_doc|design_revision|requirement|verification|delta|feature|plan|phase|task|research|audit|regression|revision|poc|issue|problem|investigation|standard/policy|standard/technical|adr|risk
+kind: spec|contract|design_doc|design_revision|requirement|verification|delta|feature|plan|phase|task|research|audit|regression|revision|poc|issue|problem|investigation|standard/policy|standard/technical|adr|risk|memory
 status: draft|approved|active|superseded|archived
 lifecycle: discovery|design|implementation|verification|maintenance
 created: 2024-05-24
@@ -404,6 +404,39 @@ relations:
 ```
 
 Use standalone risk docs for "lurking" hazards or cross-cutting concerns. Link them from specs, ADRs, or issues with `relations` (`tracked_by`, `threatens`, etc.).
+
+## Memory Records (`kind: memory`)
+
+```yaml
+memory_type: system|fact|pattern|thread|concept|signpost
+confidence: low|medium|high
+verified: 2026-03-01
+review_by: 2026-06-01
+requires_reading:
+  - specify/decisions/ADR-011-auth-flow.md
+scope:
+  globs: ["src/auth/**"]
+  paths: ["src/auth/cache.ts"]
+  commands: ["test auth:integration"]
+  languages: ["ts", "py"]
+  platforms: ["linux"]
+priority:
+  severity: none|low|medium|high|critical
+  weight: 10
+provenance:
+  sources:
+    - kind: adr|code|commit|design|doc|external|issue|pr|spec
+      ref: specify/decisions/ADR-011-auth-flow.md
+      note: Primary authority for auth flow
+audience: [human, agent]
+visibility: [pre, on_demand]
+```
+
+Memory records are pointer/constraint artifacts that reference canonical ADR/spec/design docs. They support deterministic context surfacing via `scope` matching and `priority` ordering. `memory_type` categorises the record for filtering and default review cadences. `verified` tracks when the record was last checked against reality; `review_by` drives review queues. `requires_reading` declares pre-reading dependencies for agents and humans. `provenance.sources` tracks attribution for anti-drift enforcement.
+
+Memory records do not replace canonical artifacts. If content becomes normative or detailed, it must be moved to an ADR/spec/design doc and the memory record reduced to a pointer with summary.
+
+**v1 note**: Memory uses frontmatter-only metadata. No dedicated `supekku:*` YAML block is required or defined for v1. Block metadata is deferred to a later increment.
 
 ## Implementation Plans (`kind: plan|phase|task`)
 

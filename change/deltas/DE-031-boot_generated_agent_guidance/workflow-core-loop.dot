@@ -1,0 +1,54 @@
+digraph workflow_core_loop {
+  graph [
+    label="SpecDriver Core Change Loop (Revision -> DR -> Delta -> IP -> Phase -> Audit -> Spec)",
+    labelloc=t,
+    fontsize=18,
+    fontname="Helvetica",
+    rankdir=LR,
+    splines=true,
+    pad=0.2
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fillcolor="#eef5ff",
+    color="#3b5b8a",
+    fontname="Helvetica",
+    fontsize=11
+  ];
+
+  edge [
+    color="#4a5a70",
+    arrowsize=0.8,
+    fontname="Helvetica",
+    fontsize=10
+  ];
+
+  revision [label="Spec Revision\n(RE-*)"];
+  spec [label="Spec / Requirement Truth\n(PROD-*, SPEC-*)"];
+  delta [label="Delta Scope\n(DE-*)"];
+  dr [label="Design Revision\n(DR-*)"];
+  ip [label="Implementation Plan\n(IP-*)"];
+  phase [label="Phase Sheet(s)\n(IP-*.PHASE-*)"];
+  code [label="Code + Tests"];
+  audit [label="Audit / Verification\n(AUD-* + VT/VA/VH evidence)"];
+  closure [label="Closure Update\n(update owning record,\ncoverage, registries)"];
+
+  revision -> spec [label="apply requirement moves"];
+  spec -> delta [label="scope intended change"];
+  delta -> dr [label="translate intent to design"];
+  dr -> ip [label="plan execution"];
+  ip -> phase [label="author next phase"];
+  phase -> code [label="implement tasks"];
+  code -> audit [label="verify vs spec/contracts"];
+  audit -> closure [label="record evidence + findings"];
+  closure -> spec [label="sync evergreen truth"];
+
+  // Drift/backfill loop from evidence to planned change.
+  audit -> delta [style=dashed, label="if drift/gaps -> follow-up delta"];
+
+  // Provisional variant discussed in planning threads: revision -> DR -> delta.
+  revision -> dr [style=dashed, label="provisional: revision informs DR first"];
+  dr -> delta [style=dashed, label="provisional: DR reframes delta scope"];
+}

@@ -1,0 +1,45 @@
+digraph workflow_phase_execution_subloop {
+  graph [
+    label="Execution Sub-loop (Delta -> IP -> Phases -> Delta Complete)",
+    labelloc=t,
+    fontsize=18,
+    fontname="Helvetica",
+    rankdir=LR,
+    splines=true,
+    pad=0.2
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fillcolor="#f4f8f1",
+    color="#4f7a4f",
+    fontname="Helvetica",
+    fontsize=11
+  ];
+
+  edge [
+    color="#4a5a70",
+    arrowsize=0.8,
+    fontname="Helvetica",
+    fontsize=10
+  ];
+
+  delta_create [label="Create Delta\n(scaffold DE/DR/IP)"];
+  plan [label="Plan Stage\n(fill DR + IP)"];
+  phase_create [label="Create Next Phase Sheet"];
+  phase_work [label="Execute Phase Tasks\n(code/tests/notes)"];
+  phase_complete [label="Phase Complete Check\n(entry/exit criteria)"];
+  more_phases [label="More Phases?", shape=diamond, fillcolor="#fff6e8", color="#8a6a3b"];
+  delta_complete [label="Delta Complete\n(sync + validate + complete delta)"];
+  close_records [label="Closure Updates\n(coverage + owning records)"];
+
+  delta_create -> plan;
+  plan -> phase_create;
+  phase_create -> phase_work;
+  phase_work -> phase_complete;
+  phase_complete -> more_phases;
+  more_phases -> phase_create [label="yes"];
+  more_phases -> delta_complete [label="no"];
+  delta_complete -> close_records;
+}

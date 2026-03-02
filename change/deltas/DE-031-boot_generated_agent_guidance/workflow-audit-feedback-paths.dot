@@ -1,0 +1,64 @@
+digraph workflow_audit_feedback_paths {
+  graph [
+    label="Audit Feedback Paths (Prospective / Retrospective / Hybrid)",
+    labelloc=t,
+    fontsize=18,
+    fontname="Helvetica",
+    rankdir=LR,
+    splines=true,
+    pad=0.2
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fillcolor="#f6f2ff",
+    color="#5b4b8a",
+    fontname="Helvetica",
+    fontsize=11
+  ];
+
+  edge [
+    color="#4a5a70",
+    arrowsize=0.8,
+    fontname="Helvetica",
+    fontsize=10
+  ];
+
+  subgraph cluster_prospective {
+    label="Prospective (Delta-driven)";
+    color="#9fb3d9";
+    style=rounded;
+
+    p_delta [label="Delta implements relations"];
+    p_impl [label="Implementation"];
+    p_sync [label="sync/validate"];
+    p_req [label="Requirements registry\nimplemented_by[] updated"];
+
+    p_delta -> p_impl -> p_sync -> p_req;
+  }
+
+  subgraph cluster_retro {
+    label="Retrospective (Audit-driven)";
+    color="#b9a7d8";
+    style=rounded;
+
+    r_code [label="Existing code"];
+    r_audit [label="Audit verifies relations"];
+    r_sync [label="sync/validate"];
+    r_req [label="Requirements registry\nverified_by[] updated"];
+
+    r_code -> r_audit -> r_sync -> r_req;
+  }
+
+  subgraph cluster_hybrid {
+    label="Hybrid";
+    color="#8fa6c8";
+    style=rounded;
+
+    h_req [label="Requirement lifecycle state\n(active/verified)"];
+  }
+
+  p_req -> h_req [label="implemented_by contributes"];
+  r_req -> h_req [label="verified_by contributes"];
+}

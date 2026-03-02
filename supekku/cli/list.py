@@ -39,6 +39,9 @@ from supekku.scripts.lib.formatters.change_formatters import (
 from supekku.scripts.lib.formatters.decision_formatters import (
   format_decision_list_table,
 )
+from supekku.scripts.lib.formatters.memory_formatters import (
+  format_memory_list_table,
+)
 from supekku.scripts.lib.formatters.policy_formatters import format_policy_list_table
 from supekku.scripts.lib.formatters.requirement_formatters import (
   format_requirement_list_table,
@@ -50,6 +53,7 @@ from supekku.scripts.lib.formatters.spec_formatters import (
 from supekku.scripts.lib.formatters.standard_formatters import (
   format_standard_list_table,
 )
+from supekku.scripts.lib.memory.registry import MemoryRegistry
 from supekku.scripts.lib.policies.registry import PolicyRegistry
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.standards.registry import StandardRegistry
@@ -1960,6 +1964,81 @@ def list_cards(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("memories")
+def list_memories(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  memory_type: Annotated[
+    str | None,
+    typer.Option("--type", "-t", help="Filter by memory type"),
+  ] = None,
+  tag: Annotated[
+    str | None,
+    typer.Option("--tag", help="Filter by tag"),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
+  truncate: TruncateOption = False,
+) -> None:
+  """List memory records with optional filtering.
+
+  The --regexp flag filters on name and summary fields.
+  """
+  if json_output:
+    format_type = "json"
+
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    registry = MemoryRegistry(root=root)
+
+    if any([memory_type, tag]):
+      records = registry.filter(
+        memory_type=memory_type, tag=tag, status=status,
+      )
+    else:
+      records = list(registry.iter(status=status))
+
+    if regexp:
+      try:
+        records = [
+          r for r in records
+          if matches_regexp(
+            regexp, [r.name, r.summary], case_insensitive,
+          )
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
+
+    if not records:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    records_sorted = sorted(records, key=lambda r: r.id)
+    output = format_memory_list_table(
+      records_sorted, format_type, truncate,
+    )
+    typer.echo(output)
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 # Singular command aliases - dynamically register
 _PLURAL_TO_SINGULAR = {
   "specs": "spec",
@@ -1975,6 +2054,7 @@ _PLURAL_TO_SINGULAR = {
   "improvements": "improvement",
   "risks": "risk",
   "cards": "card",
+  "memories": "memory",
 }
 
 for plural, singular in _PLURAL_TO_SINGULAR.items():

@@ -82,6 +82,13 @@ SPEC_DRIVER_THEME = Theme(
     "backlog.risk.suspected": "#d79921",  # yellow
     "backlog.risk.confirmed": "#cc241d",  # red
     "backlog.risk.mitigated": "#8ec07c",  # green
+    # Memory status colors
+    "memory.status.active": "#8ec07c",  # green
+    "memory.status.draft": "#7c7876",  # mid grey
+    "memory.status.review": "#d79921",  # yellow
+    "memory.status.archived": "#3c3836",  # dark grey
+    # Memory display
+    "memory.id": "#458588",  # blue
     # General semantic colors
     "info": "#00b8ff",  # sky blue
     "warning": "#d79921",  # yellow
@@ -191,3 +198,16 @@ def get_standard_status_style(status: str) -> str:
   """
   status_lower = status.lower().replace(" ", "-")
   return f"standard.status.{status_lower}"
+
+
+def get_memory_status_style(status: str) -> str:
+  """Get the style name for a memory status.
+
+  Args:
+    status: Status string (e.g., "active", "draft")
+
+  Returns:
+    Style name from theme (e.g., "memory.status.active")
+  """
+  status_lower = status.lower().replace(" ", "-")
+  return f"memory.status.{status_lower}"

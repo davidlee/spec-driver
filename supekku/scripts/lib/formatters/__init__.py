@@ -32,6 +32,11 @@ from .decision_formatters import (
   format_decision_list_json,
   format_decision_list_table,
 )
+from .memory_formatters import (
+  format_memory_details,
+  format_memory_list_json,
+  format_memory_list_table,
+)
 from .policy_formatters import (
   format_policy_details,
   format_policy_list_json,
@@ -78,6 +83,9 @@ __all__ = [
   "format_decision_details",
   "format_decision_list_json",
   "format_decision_list_table",
+  "format_memory_details",
+  "format_memory_list_json",
+  "format_memory_list_table",
   "format_delta_details_json",
   "format_package_list",
   "format_phase_summary",

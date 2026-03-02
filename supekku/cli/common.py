@@ -237,6 +237,7 @@ def open_in_editor(path: Path | str) -> None:
 ARTIFACT_PREFIXES: dict[str, str] = {
   "adr": "ADR-",
   "delta": "DE-",
+  "memory": "MEM-",
   "revision": "RE-",
   "policy": "POL-",
   "standard": "STD-",

@@ -25,6 +25,14 @@ from supekku.scripts.lib.decisions.creation import (
   create_adr as create_adr_impl,
 )
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
+from supekku.scripts.lib.memory.creation import (
+  MemoryAlreadyExistsError,
+  MemoryCreationOptions,
+)
+from supekku.scripts.lib.memory.creation import (
+  create_memory as create_memory_impl,
+)
+from supekku.scripts.lib.memory.registry import MemoryRegistry
 from supekku.scripts.lib.policies.creation import (
   PolicyAlreadyExistsError,
   PolicyCreationOptions,
@@ -614,6 +622,55 @@ def create_card(
     raise typer.Exit(EXIT_FAILURE) from e
   except FileNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("memory")
+def create_memory_cmd(
+  name: Annotated[str, typer.Argument(help="Name for the new memory")],
+  memory_type: Annotated[
+    str,
+    typer.Option(
+      "--type",
+      "-t",
+      help="Memory type (concept, fact, pattern, signpost, system, thread)",
+    ),
+  ],
+  status: Annotated[
+    str,
+    typer.Option("--status", "-s", help="Initial status (default: active)"),
+  ] = "active",
+  tag: Annotated[
+    list[str] | None,
+    typer.Option("--tag", help="Tag (repeatable)"),
+  ] = None,
+  summary: Annotated[
+    str,
+    typer.Option("--summary", help="Brief summary"),
+  ] = "",
+  root: RootOption = None,
+) -> None:
+  """Create a new memory record with the next available ID."""
+  try:
+    registry = MemoryRegistry(root=root)
+    options = MemoryCreationOptions(
+      name=name,
+      memory_type=memory_type,
+      status=status,
+      tags=tag or [],
+      summary=summary,
+    )
+
+    result = create_memory_impl(registry, options)
+    typer.echo(f"Created memory: {result.memory_id}")
+    typer.echo(str(result.path))
+    raise typer.Exit(EXIT_SUCCESS)
+
+  except MemoryAlreadyExistsError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error creating memory: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
 

@@ -167,6 +167,7 @@ class TestNormalizeId:
     """All unambiguous artifact types normalize correctly."""
     assert normalize_id("adr", "5") == "ADR-005"
     assert normalize_id("delta", "23") == "DE-023"
+    assert normalize_id("memory", "3") == "MEM-003"
     assert normalize_id("revision", "1") == "RE-001"
     assert normalize_id("policy", "42") == "POL-042"
     assert normalize_id("standard", "7") == "STD-007"

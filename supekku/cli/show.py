@@ -21,12 +21,14 @@ from supekku.scripts.lib.formatters.change_formatters import (
   format_revision_details,
 )
 from supekku.scripts.lib.formatters.decision_formatters import format_decision_details
+from supekku.scripts.lib.formatters.memory_formatters import format_memory_details
 from supekku.scripts.lib.formatters.policy_formatters import format_policy_details
 from supekku.scripts.lib.formatters.requirement_formatters import (
   format_requirement_details,
 )
 from supekku.scripts.lib.formatters.spec_formatters import format_spec_details
 from supekku.scripts.lib.formatters.standard_formatters import format_standard_details
+from supekku.scripts.lib.memory.registry import MemoryRegistry
 from supekku.scripts.lib.policies.registry import PolicyRegistry
 from supekku.scripts.lib.requirements.registry import RequirementsRegistry
 from supekku.scripts.lib.specs.registry import SpecRegistry
@@ -444,6 +446,56 @@ def show_card(
     raise typer.Exit(EXIT_FAILURE) from e
   except ValueError as e:
     # Ambiguity error
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("memory")
+def show_memory(
+  memory_id: Annotated[
+    str, typer.Argument(help="Memory ID (e.g., MEM-001, 001)"),
+  ],
+  json_output: Annotated[
+    bool, typer.Option("--json", help="Output as JSON"),
+  ] = False,
+  path_only: Annotated[
+    bool, typer.Option("--path", help="Output path only"),
+  ] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content"),
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about a specific memory record."""
+  try:
+    if sum([json_output, path_only, raw_output]) > 1:
+      typer.echo(
+        "Error: --json, --path, and --raw are mutually exclusive",
+        err=True,
+      )
+      raise typer.Exit(EXIT_FAILURE)
+
+    normalized_id = normalize_id("memory", memory_id)
+    registry = MemoryRegistry(root=root)
+    record = registry.find(normalized_id)
+
+    if not record:
+      typer.echo(f"Error: Memory not found: {normalized_id}", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
+    if path_only:
+      typer.echo(record.path)
+    elif raw_output:
+      typer.echo(Path(record.path).read_text())
+    elif json_output:
+      repo_root = find_repo_root(root)
+      output = record.to_dict(repo_root)
+      typer.echo(json.dumps(output, indent=2))
+    else:
+      typer.echo(format_memory_details(record))
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 

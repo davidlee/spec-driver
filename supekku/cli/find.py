@@ -11,6 +11,7 @@ import typer
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption, normalize_id
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
+from supekku.scripts.lib.memory.registry import MemoryRegistry
 from supekku.scripts.lib.policies.registry import PolicyRegistry
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.standards.registry import StandardRegistry
@@ -189,6 +190,31 @@ def find_card(
     raise typer.Exit(EXIT_SUCCESS)
 
   except (PermissionError, OSError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("memory")
+def find_memory(
+  pattern: Annotated[
+    str, typer.Argument(help="ID pattern (e.g., MEM-*, 001)"),
+  ],
+  root: RootOption = None,
+) -> None:
+  """Find memory records matching ID pattern.
+
+  Supports fnmatch patterns: * matches everything, ? matches single char.
+  Also accepts numeric-only IDs (e.g., 001 -> MEM-001).
+  Examples: MEM-*, MEM-00?, 001
+  """
+  try:
+    normalized_pattern = normalize_id("memory", pattern)
+    registry = MemoryRegistry(root=root)
+    for artifact_id, artifact in registry.collect().items():
+      if _matches_pattern(artifact_id, normalized_pattern):
+        typer.echo(artifact.path)
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 

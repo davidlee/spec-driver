@@ -4,7 +4,7 @@ slug: 033-memory_records_schema_and_command_surface-phase-03
 name: IP-033 Phase 03 - CLI Surface
 created: '2026-03-02'
 updated: '2026-03-02'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -87,17 +87,17 @@ Add memory commands to the four existing CLI verb groups (`create`, `list`, `sho
 
 ## 3. Entrance Criteria
 - [x] Phase 2 complete — MemoryRecord + MemoryRegistry, 30 tests passing
-- [ ] Formatter pattern reviewed (decision_formatters.py)
-- [ ] CLI patterns reviewed (create/list/show/find for ADRs)
+- [x] Formatter pattern reviewed (decision_formatters.py)
+- [x] CLI patterns reviewed (create/list/show/find for ADRs)
 
 ## 4. Exit Criteria / Done When
-- [ ] `create memory` generates valid `MEM-*.md` with frontmatter + body template
-- [ ] `list memories` with `--status`, `--type`, `--tag`, `--format`, `--json`, `--regexp`, `--truncate`
-- [ ] `show memory MEM-XXX` with `--json`, `--path`, `--raw`
-- [ ] `find memory` with pattern matching
-- [ ] `normalize_id("memory", "1")` returns `"MEM-001"`
-- [ ] Formatters: `format_memory_details`, `format_memory_list_table`, `format_memory_list_json`
-- [ ] Tests and lint passing
+- [x] `create memory` generates valid `MEM-*.md` with frontmatter + body template
+- [x] `list memories` with `--status`, `--type`, `--tag`, `--format`, `--json`, `--regexp`, `--truncate`
+- [x] `show memory MEM-XXX` with `--json`, `--path`, `--raw`
+- [x] `find memory` with pattern matching
+- [x] `normalize_id("memory", "1")` returns `"MEM-001"`
+- [x] Formatters: `format_memory_details`, `format_memory_list_table`, `format_memory_list_json`
+- [x] Tests and lint passing (1849 pass, ruff clean, pylint 10.00)
 
 ## 5. Verification
 - `uv run pytest supekku/scripts/lib/memory/ supekku/scripts/lib/formatters/memory_formatters_test.py -v`
@@ -117,14 +117,14 @@ Add memory commands to the four existing CLI verb groups (`create`, `list`, `sho
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 3.1 | Add MEM- prefix to ARTIFACT_PREFIXES | | One-line change in `cli/common.py` |
-| [ ] | 3.2 | Memory creation logic | | `memory/creation.py`: next_id, build_frontmatter, create_memory |
-| [ ] | 3.3 | Creation tests | [P] | TDD: test before impl where practical |
-| [ ] | 3.4 | Memory formatters | | `formatters/memory_formatters.py` |
-| [ ] | 3.5 | Formatter tests | [P] | TDD: details, table, json output |
-| [ ] | 3.6 | CLI commands | | Wire into create.py, list.py, show.py, find.py |
-| [ ] | 3.7 | CLI integration tests | | End-to-end command output tests |
-| [ ] | 3.8 | Lint and quality check | | ruff + pylint, full test suite |
+| [x] | 3.1 | Add MEM- prefix to ARTIFACT_PREFIXES | | `cli/common.py` + test assertion added |
+| [x] | 3.2 | Memory creation logic | | `memory/creation.py`: 3 dataclasses, 3 functions |
+| [x] | 3.3 | Creation tests | [P] | 13 tests (id gen, frontmatter, create, errors) |
+| [x] | 3.4 | Memory formatters | | `formatters/memory_formatters.py` + theme entries |
+| [x] | 3.5 | Formatter tests | [P] | 16 tests (details, table, json, tsv, edge cases) |
+| [x] | 3.6 | CLI commands | | create, list, show, find — all 4 wired |
+| [x] | 3.7 | CLI integration tests | | 22 tests in `cli/memory_test.py` |
+| [x] | 3.8 | Lint and quality check | | 1849 pass, ruff clean, pylint 10.00 |
 
 ### Task Details
 
@@ -157,12 +157,17 @@ Add memory commands to the four existing CLI verb groups (`create`, `list`, `sho
 ## 8. Risks & Mitigations
 | Risk | Mitigation | Status |
 | --- | --- | --- |
-| list.py is already ~2000 lines | Memory list command is ~50 lines if kept thin | Open |
-| create memory needs a sensible body template | Minimal template: `# {name}\n\n## Summary\n\n## Context\n` | Open |
-| memory_type is required but not a CLI positional | Use `--type` required option (consistent with schema) | Open |
+| list.py is already ~2000 lines | Memory list command is ~50 lines if kept thin | Resolved — 2067 lines, under 2100 threshold |
+| create memory needs a sensible body template | Minimal template: `# {name}\n\n## Summary\n\n## Context\n` | Resolved — inline body, no Jinja template needed |
+| memory_type is required but not a CLI positional | Use `--type` required option (consistent with schema) | Resolved |
 
 ## 9. Decisions & Outcomes
-- *Record during implementation*
+- `build_memory_frontmatter` takes `(memory_id, options)` not individual args — avoids pylint too-many-arguments, cleaner API
+- Memory body template is inline (`# {name}\n\n## Summary\n\n## Context\n`) — no Jinja template file. Simpler than ADR pattern; can add template later if needed.
+- `create memory --type` is required (not positional) — consistent with schema where `memory_type` is required
+- `--tag` is repeatable (`list[str]`) on create, single value on list (consistent with other list commands)
+- Added memory theme entries for status styling (active/draft/review/archived) + `memory.id`
+- Singular alias `list memory` registered via existing `_PLURAL_TO_SINGULAR` machinery
 
 ## 10. Findings / Research Notes
 - ADR CLI pattern: create calls `creation.py` impl, list uses registry + formatters, show uses registry + formatter/json, find uses registry + pattern match
@@ -171,8 +176,8 @@ Add memory commands to the four existing CLI verb groups (`create`, `list`, `sho
 - `table_utils.py` provides `create_table`, `render_table`, `format_as_json`, `format_as_tsv` shared helpers
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
+- [x] Exit criteria satisfied
+- [x] Verification evidence: 1849 tests pass, ruff clean, pylint 10.00
 - [ ] IP-033 updated with Phase 3 outcomes
-- [ ] Notes.md updated
+- [x] Notes.md updated
 - [ ] Hand-off notes to Phase 4 (selection & ordering) and Phase 5 (formatters refinement)

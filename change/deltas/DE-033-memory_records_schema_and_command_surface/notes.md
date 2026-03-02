@@ -86,26 +86,49 @@
 - Phase 5: Formatters refinement & docs
 - Phase 6: Verification & skills
 
-## Handover — Phase 3 pickup
+## Phase 3: CLI Surface
 
-Phase 3 sheet is at `phases/phase-03.md` with 8 tasks. Start with `/preflight DE-033/3.1`.
+### Completed
 
-Key context for the next agent:
+1. **ARTIFACT_PREFIXES**: Added `"memory": "MEM-"` to `cli/common.py`. Test assertion added to `view_test.py`.
 
-1. **Reference implementations are well-established**:
-   - Creation: `decisions/creation.py` → `ADRCreationOptions`, `create_adr()`, `generate_next_adr_id()`
-   - Formatters: `formatters/decision_formatters.py` → `format_decision_details()`, `format_decision_list_table()`
-   - CLI: `cli/create.py` (`create_adr`), `cli/list.py` (`list_adrs`), `cli/show.py` (`show_adr`), `cli/find.py` (`find_adr`)
+2. **Creation logic** (`memory/creation.py`):
+   - `MemoryCreationOptions`, `MemoryCreationResult`, `MemoryAlreadyExistsError`
+   - `generate_next_memory_id()`, `build_memory_frontmatter()`, `create_memory()`
+   - `build_memory_frontmatter` accepts `(memory_id, options)` — cleaner than individual args
 
-2. **Shared utilities already handle most plumbing**:
-   - `normalize_id()` in `cli/common.py` — just needs `"memory": "MEM-"` added to `ARTIFACT_PREFIXES`
-   - `table_utils.py` — `create_table`, `render_table`, `format_as_json`, `format_as_tsv`
-   - `matches_regexp()` in `cli/common.py` for `--regexp` filtering
+3. **Formatters** (`formatters/memory_formatters.py`):
+   - `format_memory_details()` — multi-line detail view, omits empty optional fields
+   - `format_memory_list_table()` — table/json/tsv dispatch
+   - `format_memory_list_json()` — JSON array output
+   - Table columns: ID, Status, Type, Name, Confidence, Tags, Updated
+   - Theme: `memory.status.{active,draft,review,archived}` + `memory.id` + `get_memory_status_style()`
 
-3. **Watch for file size**: `list.py` is ~2000 lines. Keep memory list command thin (~50 lines).
+4. **CLI commands**:
+   - `create memory NAME --type TYPE [--status] [--tag ...] [--summary]`
+   - `list memories [--status] [--type] [--tag] [--regexp] [--format] [--json] [--truncate]`
+   - `show memory ID [--json] [--path] [--raw]`
+   - `find memory PATTERN`
+   - Singular alias `list memory` via `_PLURAL_TO_SINGULAR`
 
-4. **Note on Phase 5 overlap**: The phase sheet includes formatters as task 3.4/3.5. This overlaps with the original Phase 5 ("Formatters & Docs"). Phase 5 may reduce to just docs and refinement once Phase 3 formatters are done. Revisit Phase 5 scope after Phase 3.
+5. **Tests**: 52 new tests (13 creation + 16 formatter + 1 normalize_id + 22 CLI integration). Full suite: 1849 pass.
 
-5. **Commits so far**:
-   - `d1bca98` — Phase 1: memory frontmatter metadata schema
-   - `df69d6c` — Phase 2: MemoryRecord model and MemoryRegistry
+6. **Lint**: ruff clean, pylint 10.00/10 on new modules. list.py at 2067 lines (under 2100 threshold).
+
+### Design decisions
+- Inline body template instead of Jinja template file — simpler for now
+- `--tag` repeatable on create, single-value on list (consistent with other list commands)
+- No `sync_registry` on create — MemoryRegistry has no YAML registry sync yet (future phase)
+
+### Observations
+- Phase 5 ("Formatters & Docs") scope reduced — formatters done in Phase 3. Phase 5 is now docs/refinement only.
+- `list.py` approaching size limit — next artifact type may need sub-module refactor
+
+## Handover — Phase 4 pickup
+
+Phase 3 complete. Next: Phase 4 (selection & deterministic filtering/ordering).
+
+Commits so far:
+- `d1bca98` — Phase 1: memory frontmatter metadata schema
+- `df69d6c` — Phase 2: MemoryRecord model and MemoryRegistry
+- (pending) — Phase 3: CLI surface

@@ -13,6 +13,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import yaml
+
 from supekku.scripts.lib.core.config import load_workflow_config
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
 
@@ -55,6 +57,58 @@ def parse_allowlist(path: Path) -> list[str]:
   return names
 
 
+def _extract_frontmatter_lines(text: str) -> list[str] | None:
+  """Return the lines between ``---`` frontmatter delimiters, or None."""
+  lines = text.splitlines()
+  if not lines or lines[0].strip() != "---":
+    return None
+
+  for i, line in enumerate(lines[1:], start=1):
+    if line.strip() == "---":
+      return lines[1:i]
+  return None
+
+
+def _parse_frontmatter_naive(lines: list[str]) -> dict[str, str]:
+  """Simple first-colon split parser for single-line ``key: value`` pairs.
+
+  Handles values containing colons (e.g. ``description: foo: bar``)
+  but cannot parse multiline block scalars.
+  """
+  meta: dict[str, str] = {}
+  for line in lines:
+    if ":" in line:
+      key, _, value = line.partition(":")
+      key = key.strip()
+      value = value.strip().strip('"').strip("'")
+      if key and value:
+        meta[key] = value
+  return meta
+
+
+def _extract_frontmatter(text: str) -> dict | None:
+  """Extract and parse YAML frontmatter from ``---`` delimited text.
+
+  Tries ``yaml.safe_load`` first.  Falls back to a naive ``key: value``
+  line parser when the YAML is technically invalid (e.g. unquoted values
+  containing ``: ``).
+  """
+  fm_lines = _extract_frontmatter_lines(text)
+  if fm_lines is None:
+    return None
+
+  try:
+    data = yaml.safe_load("\n".join(fm_lines))
+    if isinstance(data, dict):
+      return data
+  except yaml.YAMLError:
+    pass
+
+  # Fallback: naive parser tolerates unquoted colons in values
+  naive = _parse_frontmatter_naive(fm_lines)
+  return naive or None
+
+
 def read_skill_metadata(skill_md_path: Path) -> dict[str, str] | None:
   """Read name and description from SKILL.md YAML frontmatter.
 
@@ -64,34 +118,20 @@ def read_skill_metadata(skill_md_path: Path) -> dict[str, str] | None:
   if not skill_md_path.is_file():
     return None
 
-  text = skill_md_path.read_text(encoding="utf-8")
-  lines = text.splitlines()
-
-  if not lines or lines[0].strip() != "---":
+  data = _extract_frontmatter(skill_md_path.read_text(encoding="utf-8"))
+  if not data:
     return None
 
-  # Find closing ---
-  end = None
-  for i, line in enumerate(lines[1:], start=1):
-    if line.strip() == "---":
-      end = i
-      break
-  if end is None:
+  name = data.get("name")
+  description = data.get("description")
+  if not name or not description:
     return None
 
-  # Minimal YAML key: value parsing (no dependency on pyyaml for this)
-  meta: dict[str, str] = {}
-  for line in lines[1:end]:
-    if ":" in line:
-      key, _, value = line.partition(":")
-      key = key.strip()
-      value = value.strip().strip('"').strip("'")
-      if key in ("name", "description"):
-        meta[key] = value
-
-  if "name" not in meta or "description" not in meta:
-    return None
-  return meta
+  # Normalize multiline strings: collapse to single line
+  return {
+    "name": str(name).strip(),
+    "description": " ".join(str(description).split()),
+  }
 
 
 def render_skills_system(skills: list[dict[str, str]]) -> str:

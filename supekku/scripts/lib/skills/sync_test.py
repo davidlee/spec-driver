@@ -83,6 +83,60 @@ def test_read_skill_metadata_no_frontmatter(tmp_path: Path) -> None:
   assert read_skill_metadata(skill_dir / "SKILL.md") is None
 
 
+def test_read_skill_metadata_unquoted_colon_in_value(tmp_path: Path) -> None:
+  """Handles description values containing colons (invalid strict YAML)."""
+  skill_dir = tmp_path / "preflight"
+  skill_dir.mkdir(parents=True)
+  (skill_dir / "SKILL.md").write_text(
+    "---\n"
+    "name: preflight\n"
+    "description: Before starting something new: understand task, intent, and context\n"
+    "---\n\n# Body\n",
+    encoding="utf-8",
+  )
+  meta = read_skill_metadata(skill_dir / "SKILL.md")
+  assert meta is not None
+  assert meta["name"] == "preflight"
+  assert "understand task, intent, and context" in meta["description"]
+
+
+def test_read_skill_metadata_multiline_literal(tmp_path: Path) -> None:
+  """Handles YAML literal block (|) multiline descriptions."""
+  skill_dir = tmp_path / "recall"
+  skill_dir.mkdir(parents=True)
+  (skill_dir / "SKILL.md").write_text(
+    "---\n"
+    "name: recall\n"
+    "description: |\n"
+    "  First line of description.\n"
+    "  Second line continues here.\n"
+    "---\n\n# Body\n",
+    encoding="utf-8",
+  )
+  meta = read_skill_metadata(skill_dir / "SKILL.md")
+  assert meta is not None
+  assert meta["name"] == "recall"
+  assert meta["description"] == "First line of description. Second line continues here."
+
+
+def test_read_skill_metadata_multiline_folded(tmp_path: Path) -> None:
+  """Handles YAML folded block (>) multiline descriptions."""
+  skill_dir = tmp_path / "fold"
+  skill_dir.mkdir(parents=True)
+  (skill_dir / "SKILL.md").write_text(
+    "---\n"
+    "name: fold\n"
+    "description: >\n"
+    "  Folded line one.\n"
+    "  Folded line two.\n"
+    "---\n\n# Body\n",
+    encoding="utf-8",
+  )
+  meta = read_skill_metadata(skill_dir / "SKILL.md")
+  assert meta is not None
+  assert meta["description"] == "Folded line one. Folded line two."
+
+
 # --- rendering ---
 
 

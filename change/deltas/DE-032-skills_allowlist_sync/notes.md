@@ -28,6 +28,27 @@ Reference format captured from `/tmp/pooper/AGENTS.md`:
   - `<description>from SKILL frontmatter</description>`
   - `<location>project|global</location>`
 
+## Bugfix: multiline YAML frontmatter in SKILL.md (2026-03-03)
+
+`read_skill_metadata()` used a naive line-by-line `key: value` parser that
+failed on two categories of SKILL.md frontmatter:
+
+1. **Multiline block scalars** (`|` / `>`): stored the literal `|` character
+   as the description. Affected: `capturing-memory`, `maintaining-memory`,
+   `retrieving-memory`, `reviewing-memory`.
+2. **Unquoted values containing `: `**: `yaml.safe_load` rejects these as
+   ambiguous mappings. Affected: `preflight` (`... something new: understand ...`).
+
+**Fix**: try `yaml.safe_load` first (handles multiline blocks correctly),
+fall back to naive first-colon-split parser (handles unquoted colons).
+Multiline descriptions are collapsed to a single line for the XML output.
+
+Extracted `_extract_frontmatter_lines()` and `_parse_frontmatter_naive()` helpers
+to keep return-statement count under pylint threshold.
+
+Added 3 test cases: `test_read_skill_metadata_unquoted_colon_in_value`,
+`test_read_skill_metadata_multiline_literal`, `test_read_skill_metadata_multiline_folded`.
+
 ## Suggested test strategy
 
 - Create temp repo with:

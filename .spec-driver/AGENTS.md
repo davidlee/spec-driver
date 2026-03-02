@@ -54,6 +54,30 @@ Usage notes:
 <location>project</location>
 </skill>
 
+<skill>
+<name>capturing-memory</name>
+<description>Invoke this skill whenever any of the following occurs during work: (1) you discover or confirm a durable fact, constraint, invariant, or “how we do X here” pattern; (2) you create a new workflow/checklist that will be reused; (3) you resolve a recurring confusion (“where is the source of truth?”); (4) you make a decision that is not an ADR/SPEC but would prevent rework; (5) you detect a sharp edge, footgun, or non-obvious dependency that future agents will hit. Do NOT rely on conversational context to persist. When the information would save ≥10 minutes for a future agent, write a memory record immediately.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>retrieving-memory</name>
+<description>Invoke this skill before making non-trivial assumptions in a large codebase. Mandatory triggers: (1) you are about to modify a subsystem you have not touched in this run; (2) you are about to run, change, or suggest a command pipeline (tests, builds, releases, migrations); (3) you see conflicting cues in code/docs; (4) you are asked “what is the right way here?”; (5) you are debugging a recurring failure mode; (6) you are about to answer with “probably/usually/likely”. Default rule: if you cannot cite a source-of-truth file/doc/ADR/SPEC from the repo, you must consult memories first and then proceed.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>maintaining-memory</name>
+<description>Invoke this skill whenever you observe memory drift or when your actions would invalidate existing memories. Mandatory triggers: (1) you change a workflow/command, move files, rename modules, or change invariants; (2) you discover a memory is wrong, missing provenance, or stale; (3) you see a memory record guiding behaviour that is no longer true; (4) you find duplicates or near-duplicates; (5) you are about to add a new memory that overlaps an existing one. Core rule: if you change reality, you must change memory in the same change-set (or immediately after) so future agents do not inherit incorrect guidance.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>reviewing-memory</name>
+<description>Invoke this skill as a deliberate review pass whenever stability matters: (1) before a release/migration/large refactor; (2) at the start of work in an unfamiliar subsystem; (3) when you see repeated agent confusion; (4) when thread-type working sets accumulate; (5) when you suspect stale guidance is causing defects. This is not ad-hoc maintenance; it is a structured audit to prevent systemic drift.</description>
+<location>project</location>
+</skill>
+
 </available_skills>
 
 </skills_system>

@@ -24,9 +24,12 @@ def _write_memory_file(
   memory_type: str = "fact",
   status: str = "active",
   tags: list[str] | None = None,
+  scope: dict | None = None,
+  priority: dict | None = None,
+  verified: str | None = None,
 ) -> Path:
   """Write a minimal valid memory file for testing."""
-  fm = {
+  fm: dict = {
     "id": mem_id,
     "name": name,
     "kind": "memory",
@@ -37,6 +40,12 @@ def _write_memory_file(
     "tags": tags or [],
     "summary": "",
   }
+  if scope:
+    fm["scope"] = scope
+  if priority:
+    fm["priority"] = priority
+  if verified:
+    fm["verified"] = verified
   slug = name.lower().replace(" ", "_")
   path = directory / f"{mem_id}-{slug}.md"
   content = f"---\n{yaml.safe_dump(fm, sort_keys=False)}---\n\n# {name}\n"
@@ -383,6 +392,313 @@ class FindMemoryCommandTest(unittest.TestCase):
 
     assert result.exit_code == 0
     assert result.stdout.strip() == ""
+
+
+class ListMemoriesSelectionTest(unittest.TestCase):
+  """Integration tests for list memories selection/filtering options."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self.mem_dir = self.root / "memory"
+    self.mem_dir.mkdir()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  # -- --path scope matching --
+
+  def test_path_filters_by_scope(self) -> None:
+    """--path returns only records whose scope.paths match."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Auth Pattern",
+      scope={"paths": ["src/auth/"]},
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "DB Pattern",
+      scope={"paths": ["src/db/models.py"]},
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--path", "src/auth/login.py",
+       "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-001" in result.stdout
+    assert "MEM-002" not in result.stdout
+
+  def test_path_no_match_empty_output(self) -> None:
+    """--path with no matching records exits cleanly."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Auth",
+      scope={"paths": ["src/auth/"]},
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--path", "src/unrelated/foo.py",
+       "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-001" not in result.stdout
+
+  def test_path_repeatable(self) -> None:
+    """Multiple --path flags are OR'd."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Auth",
+      scope={"paths": ["src/auth/"]},
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "DB",
+      scope={"paths": ["src/db/"]},
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-003", "CLI",
+      scope={"paths": ["src/cli/"]},
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories",
+       "--path", "src/auth/login.py",
+       "--path", "src/db/conn.py",
+       "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-001" in result.stdout
+    assert "MEM-002" in result.stdout
+    assert "MEM-003" not in result.stdout
+
+  # -- --command scope matching --
+
+  def test_command_filters_by_scope(self) -> None:
+    """--command filters by token-prefix match on scope.commands."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Test Tips",
+      scope={"commands": ["test"]},
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "Lint Tips",
+      scope={"commands": ["lint"]},
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--command", "test auth --verbose",
+       "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-001" in result.stdout
+    assert "MEM-002" not in result.stdout
+
+  # -- --match-tag scope matching --
+
+  def test_match_tag_filters_by_tag_intersection(self) -> None:
+    """--match-tag filters records whose tags overlap."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Auth",
+      tags=["auth", "security"],
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "DB",
+      tags=["database"],
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--match-tag", "auth",
+       "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-001" in result.stdout
+    assert "MEM-002" not in result.stdout
+
+  def test_match_tag_repeatable(self) -> None:
+    """Multiple --match-tag flags are OR'd."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Auth",
+      tags=["auth"],
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "DB",
+      tags=["database"],
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-003", "CLI",
+      tags=["cli"],
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories",
+       "--match-tag", "auth",
+       "--match-tag", "database",
+       "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-001" in result.stdout
+    assert "MEM-002" in result.stdout
+    assert "MEM-003" not in result.stdout
+
+  # -- --include-draft --
+
+  def test_draft_excluded_by_default(self) -> None:
+    """Draft records are excluded without --include-draft."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Active", status="active",
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "Draft", status="draft",
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-001" in result.stdout
+    assert "MEM-002" not in result.stdout
+
+  def test_include_draft_shows_drafts(self) -> None:
+    """--include-draft surfaces draft records."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Active", status="active",
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "Draft", status="draft",
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--include-draft", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-001" in result.stdout
+    assert "MEM-002" in result.stdout
+
+  # -- --limit --
+
+  def test_limit_caps_output(self) -> None:
+    """--limit restricts the number of results."""
+    for i in range(1, 6):
+      _write_memory_file(
+        self.mem_dir, f"MEM-{i:03d}", f"Mem {i}",
+      )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--limit", "2", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    # Count non-empty, non-header lines containing MEM-
+    mem_lines = [
+      ln for ln in result.stdout.splitlines() if "MEM-" in ln
+    ]
+    assert len(mem_lines) == 2
+
+  # -- deprecated excluded by default --
+
+  def test_deprecated_excluded_by_default(self) -> None:
+    """Deprecated records are excluded without explicit --status."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Active", status="active",
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "Old", status="deprecated",
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-001" in result.stdout
+    assert "MEM-002" not in result.stdout
+
+  def test_explicit_status_bypasses_exclusion(self) -> None:
+    """--status deprecated shows deprecated records (skip_status_filter)."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Active", status="active",
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "Old", status="deprecated",
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--status", "deprecated",
+       "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-002" in result.stdout
+    assert "MEM-001" not in result.stdout
+
+  # -- deterministic ordering --
+
+  def test_ordering_by_severity(self) -> None:
+    """Records ordered by severity (critical before low)."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Low Sev",
+      priority={"severity": "low", "weight": 0},
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "Critical Sev",
+      priority={"severity": "critical", "weight": 0},
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--format", "tsv", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    lines = [ln for ln in result.stdout.splitlines() if "MEM-" in ln]
+    assert len(lines) == 2
+    assert lines[0].startswith("MEM-002"), (
+      f"Critical should come first, got: {lines}"
+    )
+    assert lines[1].startswith("MEM-001")
+
+  # -- combined scope + metadata filter --
+
+  def test_path_combined_with_type_filter(self) -> None:
+    """--path and --type both apply (AND between metadata and scope)."""
+    _write_memory_file(
+      self.mem_dir, "MEM-001", "Auth Fact",
+      memory_type="fact",
+      scope={"paths": ["src/auth/"]},
+    )
+    _write_memory_file(
+      self.mem_dir, "MEM-002", "Auth Pattern",
+      memory_type="pattern",
+      scope={"paths": ["src/auth/"]},
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories",
+       "--type", "fact",
+       "--path", "src/auth/login.py",
+       "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "MEM-001" in result.stdout
+    assert "MEM-002" not in result.stdout
 
 
 if __name__ == "__main__":

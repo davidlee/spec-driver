@@ -54,6 +54,7 @@ from supekku.scripts.lib.formatters.standard_formatters import (
   format_standard_list_table,
 )
 from supekku.scripts.lib.memory.registry import MemoryRegistry
+from supekku.scripts.lib.memory.selection import MatchContext, select
 from supekku.scripts.lib.policies.registry import PolicyRegistry
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.standards.registry import StandardRegistry
@@ -1965,7 +1966,7 @@ def list_cards(
 
 
 @app.command("memories")
-def list_memories(
+def list_memories(  # noqa: PLR0913
   root: RootOption = None,
   status: Annotated[
     str | None,
@@ -1977,7 +1978,36 @@ def list_memories(
   ] = None,
   tag: Annotated[
     str | None,
-    typer.Option("--tag", help="Filter by tag"),
+    typer.Option("--tag", help="Filter by tag (metadata pre-filter)"),
+  ] = None,
+  path: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--path", "-p",
+      help="Scope match: paths (repeatable)",
+    ),
+  ] = None,
+  command: Annotated[
+    str | None,
+    typer.Option(
+      "--command", "-c",
+      help="Scope match: command string (token-prefix)",
+    ),
+  ] = None,
+  match_tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--match-tag",
+      help="Scope match: tags (repeatable, OR with path/command)",
+    ),
+  ] = None,
+  include_draft: Annotated[
+    bool,
+    typer.Option("--include-draft", help="Include draft memories"),
+  ] = False,
+  limit: Annotated[
+    int | None,
+    typer.Option("--limit", "-n", help="Max results"),
   ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
@@ -1991,9 +2021,11 @@ def list_memories(
   ] = False,
   truncate: TruncateOption = False,
 ) -> None:
-  """List memory records with optional filtering.
+  """List memory records with optional filtering and scope matching.
 
-  The --regexp flag filters on name and summary fields.
+  Metadata pre-filters (--type, --status, --tag) apply first (AND logic).
+  Scope matching (--path, --command, --match-tag) filters by context (OR).
+  Results ordered deterministically by severity/weight/specificity/recency/id.
   """
   if json_output:
     format_type = "json"
@@ -2005,6 +2037,7 @@ def list_memories(
   try:
     registry = MemoryRegistry(root=root)
 
+    # Step 1: metadata pre-filter
     if any([memory_type, tag]):
       records = registry.filter(
         memory_type=memory_type, tag=tag, status=status,
@@ -2012,6 +2045,7 @@ def list_memories(
     else:
       records = list(registry.iter(status=status))
 
+    # Step 2: regexp filter
     if regexp:
       try:
         records = [
@@ -2024,13 +2058,25 @@ def list_memories(
         typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
         raise typer.Exit(EXIT_FAILURE) from e
 
+    # Step 3: build context and apply selection pipeline
+    has_context = any([path, command, match_tag])
+    context = MatchContext(
+      paths=path or [],
+      command=command,
+      tags=match_tag or [],
+    ) if has_context else None
+
+    records = select(
+      records, context,
+      include_draft=include_draft,
+      skip_status_filter=status is not None,
+      limit=limit,
+    )
+
     if not records:
       raise typer.Exit(EXIT_SUCCESS)
 
-    records_sorted = sorted(records, key=lambda r: r.id)
-    output = format_memory_list_table(
-      records_sorted, format_type, truncate,
-    )
+    output = format_memory_list_table(records, format_type, truncate)
     typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)

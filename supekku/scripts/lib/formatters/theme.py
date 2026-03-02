@@ -87,6 +87,9 @@ SPEC_DRIVER_THEME = Theme(
     "memory.status.draft": "#7c7876",  # mid grey
     "memory.status.review": "#d79921",  # yellow
     "memory.status.archived": "#3c3836",  # dark grey
+    "memory.status.deprecated": "#cc241d",  # red
+    "memory.status.superseded": "#cc241d",  # red
+    "memory.status.obsolete": "#cc241d",  # red
     # Memory display
     "memory.id": "#458588",  # blue
     # General semantic colors

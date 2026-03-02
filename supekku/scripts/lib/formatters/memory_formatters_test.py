@@ -82,6 +82,84 @@ class TestFormatMemoryDetails:
     # Should still format without error
     assert "MEM-001" in output
 
+  def test_full_record(self) -> None:
+    """All non-empty fields render in detail view."""
+    record = _make_record(
+      confidence="high",
+      summary="Full test",
+      tags=["arch", "py"],
+      verified=date(2026, 2, 15),
+      review_by=date(2026, 6, 1),
+      owners=["alice", "bob"],
+      audience=["human", "agent"],
+      visibility=["pre", "on_demand"],
+      requires_reading=["ADR-011.md", "SPEC-042.md"],
+      scope={
+        "paths": ["src/auth/cache.ts"],
+        "globs": ["src/auth/**"],
+        "commands": ["test auth"],
+        "languages": ["ts"],
+      },
+      priority={"severity": "high", "weight": 10},
+      provenance={"sources": [
+        {"kind": "adr", "ref": "ADR-011.md", "note": "Primary"},
+      ]},
+      relations=[
+        {"type": "implements", "target": "FR-102", "annotation": "Auth cache"},
+      ],
+    )
+    output = format_memory_details(record)
+
+    # Dates
+    assert "Verified: 2026-02-15" in output
+    assert "Review by: 2026-06-01" in output
+
+    # Lists
+    assert "Owners: alice, bob" in output
+    assert "Audience: human, agent" in output
+    assert "Visibility: pre, on_demand" in output
+    assert "Requires reading: ADR-011.md, SPEC-042.md" in output
+
+    # Scope
+    assert "Scope:" in output
+    assert "paths: src/auth/cache.ts" in output
+    assert "globs: src/auth/**" in output
+    assert "commands: test auth" in output
+    assert "languages: ts" in output
+
+    # Priority
+    assert "Priority:" in output
+    assert "severity: high" in output
+    assert "weight: 10" in output
+
+    # Provenance
+    assert "Provenance:" in output
+    assert "adr: ADR-011.md (Primary)" in output
+
+    # Relations
+    assert "Relations:" in output
+    assert "implements → FR-102 (Auth cache)" in output
+
+  def test_empty_scope_omitted(self) -> None:
+    record = _make_record(scope={})
+    output = format_memory_details(record)
+    assert "Scope:" not in output
+
+  def test_empty_priority_omitted(self) -> None:
+    record = _make_record(priority={})
+    output = format_memory_details(record)
+    assert "Priority:" not in output
+
+  def test_empty_provenance_omitted(self) -> None:
+    record = _make_record(provenance={})
+    output = format_memory_details(record)
+    assert "Provenance:" not in output
+
+  def test_empty_relations_omitted(self) -> None:
+    record = _make_record(relations=[])
+    output = format_memory_details(record)
+    assert "Relations:" not in output
+
 
 # --- format_memory_list_table ---
 
@@ -119,6 +197,46 @@ class TestFormatMemoryListTable:
     output = format_memory_list_table(records)
     assert "pattern" in output
 
+  def test_truncate_table(self) -> None:
+    """Table with truncate=True does not error and still renders."""
+    records = [_make_record(name="A" * 200, tags=["tag-" + str(i) for i in range(20)])]
+    output = format_memory_list_table(records, truncate=True)
+    assert "MEM-001" in output
+    # Truncated content should not contain the full long name
+    assert "A" * 200 not in output
+
+  def test_tsv_column_count(self) -> None:
+    """TSV rows have exactly 6 columns: id, status, type, name, confidence, updated."""
+    records = [
+      _make_record(confidence="high"),
+      _make_record(id="MEM-002", name="Second", confidence=None),
+    ]
+    output = format_memory_list_table(records, format_type="tsv")
+    rows = output.strip().split("\n")
+    assert len(rows) == 2
+    for row in rows:
+      cols = row.split("\t")
+      assert len(cols) == 6, f"Expected 6 TSV columns, got {len(cols)}: {cols}"
+
+  def test_tsv_column_content(self) -> None:
+    """TSV columns contain expected values in order."""
+    records = [_make_record(confidence="medium")]
+    output = format_memory_list_table(records, format_type="tsv")
+    cols = output.strip().split("\t")
+    assert cols[0] == "MEM-001"
+    assert cols[1] == "active"
+    assert cols[2] == "fact"
+    assert cols[3] == "Test Memory"
+    assert cols[4] == "medium"
+    assert cols[5] == "2026-02-01"
+
+  def test_tsv_no_confidence(self) -> None:
+    """TSV renders empty string for missing confidence."""
+    records = [_make_record(confidence=None)]
+    output = format_memory_list_table(records, format_type="tsv")
+    cols = output.strip().split("\t")
+    assert cols[4] == ""
+
 
 # --- format_memory_list_json ---
 
@@ -151,3 +269,19 @@ class TestFormatMemoryListJson:
     output = format_memory_list_json([])
     parsed = json.loads(output)
     assert parsed["items"] == []
+
+  def test_date_serialization_iso(self) -> None:
+    """JSON serializes dates as ISO-8601 strings, not raw date objects."""
+    records = [_make_record(created=date(2026, 1, 15), updated=date(2026, 2, 1))]
+    output = format_memory_list_json(records)
+    item = json.loads(output)["items"][0]
+    assert item["created"] == "2026-01-15"
+    assert item["updated"] == "2026-02-01"
+
+  def test_null_dates_in_json(self) -> None:
+    """JSON serializes None dates as null."""
+    records = [_make_record(created=None, updated=None)]
+    output = format_memory_list_json(records)
+    item = json.loads(output)["items"][0]
+    assert item["created"] is None
+    assert item["updated"] is None

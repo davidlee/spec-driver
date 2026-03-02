@@ -211,18 +211,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
     ),
   },
   examples=[
-    # Minimal memory (base fields + required memory_type)
-    {
-      "id": "MEM-001",
-      "name": "Example Memory Record",
-      "slug": "mem-example",
-      "kind": "memory",
-      "status": "active",
-      "created": "2026-03-01",
-      "updated": "2026-03-01",
-      "memory_type": "fact",
-    },
-    # Complete memory with all fields
+    # Representative memory with scope, priority, provenance (default example)
     {
       "id": "MEM-042",
       "name": "ADR-11 Required Pre-Reading for Auth Changes",
@@ -261,6 +250,17 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
       "relations": [
         {"type": "relates_to", "target": "ADR-011"},
       ],
+    },
+    # Minimal memory (base fields + required memory_type only)
+    {
+      "id": "MEM-001",
+      "name": "Example Memory Record",
+      "slug": "mem-example",
+      "kind": "memory",
+      "status": "active",
+      "created": "2026-03-01",
+      "updated": "2026-03-01",
+      "memory_type": "fact",
     },
   ],
 )

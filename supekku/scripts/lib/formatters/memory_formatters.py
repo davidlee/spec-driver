@@ -38,17 +38,100 @@ def _format_detail_lines(record: MemoryRecord) -> list[str]:
   if record.confidence:
     lines.append(f"Confidence: {record.confidence}")
 
-  if record.created:
-    lines.append(f"Created: {record.created.isoformat()}")
-  if record.updated:
-    lines.append(f"Updated: {record.updated.isoformat()}")
+  lines.extend(_format_dates(record))
 
   if record.summary:
     lines.append(f"Summary: {record.summary}")
   if record.tags:
     lines.append(f"Tags: {', '.join(record.tags)}")
+  if record.owners:
+    lines.append(f"Owners: {', '.join(record.owners)}")
+  if record.audience:
+    lines.append(f"Audience: {', '.join(record.audience)}")
+  if record.visibility:
+    lines.append(f"Visibility: {', '.join(record.visibility)}")
+  if record.requires_reading:
+    lines.append(f"Requires reading: {', '.join(record.requires_reading)}")
+
+  lines.extend(_format_scope(record.scope))
+  lines.extend(_format_priority(record.priority))
+  lines.extend(_format_provenance(record.provenance))
+  lines.extend(_format_relations(record.relations))
 
   lines.append(f"Path: {record.path}")
+  return lines
+
+
+def _format_dates(record: MemoryRecord) -> list[str]:
+  """Format date fields if present."""
+  lines: list[str] = []
+  for label, value in [
+    ("Created", record.created),
+    ("Updated", record.updated),
+    ("Verified", record.verified),
+    ("Review by", record.review_by),
+  ]:
+    if value:
+      lines.append(f"{label}: {value.isoformat()}")
+  return lines
+
+
+def _format_scope(scope: dict) -> list[str]:
+  """Format scope dict as indented sub-lines."""
+  if not scope:
+    return []
+  lines = ["Scope:"]
+  for key in ("paths", "globs", "commands", "languages", "platforms"):
+    values = scope.get(key, [])
+    if values:
+      lines.append(f"  {key}: {', '.join(values)}")
+  return lines
+
+
+def _format_priority(priority: dict) -> list[str]:
+  """Format priority dict as indented sub-lines."""
+  if not priority:
+    return []
+  lines = ["Priority:"]
+  if "severity" in priority:
+    lines.append(f"  severity: {priority['severity']}")
+  if "weight" in priority:
+    lines.append(f"  weight: {priority['weight']}")
+  return lines
+
+
+def _format_provenance(provenance: dict) -> list[str]:
+  """Format provenance dict as indented sub-lines."""
+  if not provenance:
+    return []
+  sources = provenance.get("sources", [])
+  if not sources:
+    return []
+  lines = ["Provenance:"]
+  for src in sources:
+    kind = src.get("kind", "")
+    ref = src.get("ref", "")
+    note = src.get("note", "")
+    entry = f"  {kind}: {ref}"
+    if note:
+      entry += f" ({note})"
+    lines.append(entry)
+  return lines
+
+
+def _format_relations(relations: list[dict]) -> list[str]:
+  """Format relations list as indented entries."""
+  if not relations:
+    return []
+  lines = ["Relations:"]
+  for rel in relations:
+    rel_type = rel.get("type", "")
+    target = rel.get("target", "")
+    entry = f"  {rel_type} → {target}"
+    annotation = rel.get("annotation", "")
+    if annotation:
+      entry += f" ({annotation})"
+    lines.append(entry)
   return lines
 
 

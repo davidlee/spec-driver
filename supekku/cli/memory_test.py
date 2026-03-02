@@ -46,8 +46,7 @@ def _write_memory_file(
     fm["priority"] = priority
   if verified:
     fm["verified"] = verified
-  slug = name.lower().replace(" ", "_")
-  path = directory / f"{mem_id}-{slug}.md"
+  path = directory / f"{mem_id}.md"
   content = f"---\n{yaml.safe_dump(fm, sort_keys=False)}---\n\n# {name}\n"
   path.write_text(content, encoding="utf-8")
   return path
@@ -69,19 +68,28 @@ class CreateMemoryCommandTest(unittest.TestCase):
     """Create memory writes file and prints ID."""
     result = self.runner.invoke(
       create_app,
-      ["memory", "Test Fact", "--type", "fact", "--root", str(self.root)],
+      [
+        "memory",
+        "mem.fact.test",
+        "--name",
+        "Test Fact",
+        "--type",
+        "fact",
+        "--root",
+        str(self.root),
+      ],
     )
 
     assert result.exit_code == 0, f"Failed: {result.stderr}"
-    assert "Created memory: MEM-001" in result.stdout
+    assert "Created memory: mem.fact.test" in result.stdout
 
     mem_dir = self.root / "memory"
     assert mem_dir.exists()
-    files = list(mem_dir.glob("MEM-001-*.md"))
-    assert len(files) == 1
+    path = mem_dir / "mem.fact.test.md"
+    assert path.exists()
 
-    content = files[0].read_text(encoding="utf-8")
-    assert "id: MEM-001" in content
+    content = path.read_text(encoding="utf-8")
+    assert "id: mem.fact.test" in content
     assert "memory_type: fact" in content
     assert "kind: memory" in content
 
@@ -90,47 +98,90 @@ class CreateMemoryCommandTest(unittest.TestCase):
     result = self.runner.invoke(
       create_app,
       [
-        "memory", "Arch Pattern",
-        "--type", "pattern",
-        "--status", "draft",
-        "--tag", "arch",
-        "--tag", "python",
-        "--summary", "Key pattern",
-        "--root", str(self.root),
+        "memory",
+        "mem.pattern.arch.registry",
+        "--name",
+        "Arch Pattern",
+        "--type",
+        "pattern",
+        "--status",
+        "draft",
+        "--tag",
+        "arch",
+        "--tag",
+        "python",
+        "--summary",
+        "Key pattern",
+        "--root",
+        str(self.root),
       ],
     )
 
     assert result.exit_code == 0, f"Failed: {result.stderr}"
-    assert "MEM-001" in result.stdout
+    assert "mem.pattern.arch.registry" in result.stdout
 
-    files = list((self.root / "memory").glob("MEM-001-*.md"))
-    content = files[0].read_text(encoding="utf-8")
+    path = self.root / "memory" / "mem.pattern.arch.registry.md"
+    content = path.read_text(encoding="utf-8")
     assert "status: draft" in content
     assert "memory_type: pattern" in content
     assert "summary: Key pattern" in content
 
-  def test_create_memory_increments_id(self) -> None:
-    """Second create gets MEM-002."""
+  def test_create_memory_rejects_duplicate(self) -> None:
+    """Creating a memory with an existing ID fails."""
     mem_dir = self.root / "memory"
     mem_dir.mkdir(parents=True)
-    _write_memory_file(mem_dir, "MEM-001")
+    _write_memory_file(mem_dir, "mem.fact.alpha")
 
     result = self.runner.invoke(
       create_app,
-      ["memory", "Second", "--type", "concept", "--root", str(self.root)],
+      [
+        "memory",
+        "mem.fact.alpha",
+        "--name",
+        "Duplicate",
+        "--type",
+        "fact",
+        "--root",
+        str(self.root),
+      ],
     )
 
-    assert result.exit_code == 0
-    assert "MEM-002" in result.stdout
+    assert result.exit_code != 0
 
   def test_create_memory_requires_type(self) -> None:
     """Missing --type should error."""
     result = self.runner.invoke(
       create_app,
-      ["memory", "No Type", "--root", str(self.root)],
+      [
+        "memory",
+        "mem.fact.test",
+        "--name",
+        "No Type",
+        "--root",
+        str(self.root),
+      ],
     )
 
     assert result.exit_code != 0
+
+  def test_create_memory_shorthand_id(self) -> None:
+    """Shorthand ID (without mem. prefix) is normalized."""
+    result = self.runner.invoke(
+      create_app,
+      [
+        "memory",
+        "fact.shorthand",
+        "--name",
+        "Shorthand",
+        "--type",
+        "fact",
+        "--root",
+        str(self.root),
+      ],
+    )
+
+    assert result.exit_code == 0
+    assert "mem.fact.shorthand" in result.stdout
 
 
 class ListMemoriesCommandTest(unittest.TestCase):
@@ -150,40 +201,43 @@ class ListMemoriesCommandTest(unittest.TestCase):
   def test_list_memories_empty(self) -> None:
     """Empty directory exits cleanly."""
     result = self.runner.invoke(
-      list_app, ["memories", "--root", str(self.root)],
+      list_app,
+      ["memories", "--root", str(self.root)],
     )
     assert result.exit_code == 0
 
   def test_list_memories_table(self) -> None:
     """Table output includes record IDs and names."""
-    _write_memory_file(self.mem_dir, "MEM-001", "First")
-    _write_memory_file(self.mem_dir, "MEM-002", "Second")
+    _write_memory_file(self.mem_dir, "mem.fact.alpha", "First")
+    _write_memory_file(self.mem_dir, "mem.fact.beta", "Second")
 
     result = self.runner.invoke(
-      list_app, ["memories", "--root", str(self.root)],
+      list_app,
+      ["memories", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" in result.stdout
 
   def test_list_memories_json(self) -> None:
     """JSON output parses correctly."""
-    _write_memory_file(self.mem_dir, "MEM-001", "JSON Test")
+    _write_memory_file(self.mem_dir, "mem.fact.alpha", "JSON Test")
 
     result = self.runner.invoke(
-      list_app, ["memories", "--json", "--root", str(self.root)],
+      list_app,
+      ["memories", "--json", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
     parsed = json.loads(result.stdout)
     assert len(parsed["items"]) == 1
-    assert parsed["items"][0]["id"] == "MEM-001"
+    assert parsed["items"][0]["id"] == "mem.fact.alpha"
 
   def test_list_memories_filter_status(self) -> None:
     """--status filters records."""
-    _write_memory_file(self.mem_dir, "MEM-001", "Active", status="active")
-    _write_memory_file(self.mem_dir, "MEM-002", "Draft", status="draft")
+    _write_memory_file(self.mem_dir, "mem.fact.alpha", "Active", status="active")
+    _write_memory_file(self.mem_dir, "mem.fact.beta", "Draft", status="draft")
 
     result = self.runner.invoke(
       list_app,
@@ -191,16 +245,22 @@ class ListMemoriesCommandTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    assert "MEM-002" in result.stdout
-    assert "MEM-001" not in result.stdout
+    assert "mem.fact.beta" in result.stdout
+    assert "mem.fact.alpha" not in result.stdout
 
   def test_list_memories_filter_type(self) -> None:
     """--type filters records."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Fact", memory_type="fact",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Fact",
+      memory_type="fact",
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "Pattern", memory_type="pattern",
+      self.mem_dir,
+      "mem.fact.beta",
+      "Pattern",
+      memory_type="pattern",
     )
 
     result = self.runner.invoke(
@@ -209,12 +269,12 @@ class ListMemoriesCommandTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    assert "MEM-002" in result.stdout
-    assert "MEM-001" not in result.stdout
+    assert "mem.fact.beta" in result.stdout
+    assert "mem.fact.alpha" not in result.stdout
 
   def test_list_memories_tsv(self) -> None:
     """TSV output contains tabs."""
-    _write_memory_file(self.mem_dir, "MEM-001")
+    _write_memory_file(self.mem_dir, "mem.fact.alpha")
 
     result = self.runner.invoke(
       list_app,
@@ -223,18 +283,19 @@ class ListMemoriesCommandTest(unittest.TestCase):
 
     assert result.exit_code == 0
     assert "\t" in result.stdout
-    assert "MEM-001" in result.stdout
+    assert "mem.fact.alpha" in result.stdout
 
   def test_list_memory_singular_alias(self) -> None:
     """Singular 'memory' alias works."""
-    _write_memory_file(self.mem_dir, "MEM-001")
+    _write_memory_file(self.mem_dir, "mem.fact.alpha")
 
     result = self.runner.invoke(
-      list_app, ["memory", "--root", str(self.root)],
+      list_app,
+      ["memory", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
+    assert "mem.fact.alpha" in result.stdout
 
 
 class ShowMemoryCommandTest(unittest.TestCase):
@@ -253,36 +314,37 @@ class ShowMemoryCommandTest(unittest.TestCase):
 
   def test_show_memory_details(self) -> None:
     """Show memory displays record details."""
-    _write_memory_file(self.mem_dir, "MEM-001", "Test Memory")
+    _write_memory_file(self.mem_dir, "mem.fact.alpha", "Test Memory")
 
     result = self.runner.invoke(
-      show_app, ["memory", "MEM-001", "--root", str(self.root)],
+      show_app,
+      ["memory", "mem.fact.alpha", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0, f"Failed: {result.stderr}"
-    assert "MEM-001" in result.stdout
+    assert "mem.fact.alpha" in result.stdout
     assert "Test Memory" in result.stdout
 
   def test_show_memory_json(self) -> None:
     """Show memory --json outputs valid JSON."""
-    _write_memory_file(self.mem_dir, "MEM-001", "JSON Record")
+    _write_memory_file(self.mem_dir, "mem.fact.alpha", "JSON Record")
 
     result = self.runner.invoke(
       show_app,
-      ["memory", "MEM-001", "--json", "--root", str(self.root)],
+      ["memory", "mem.fact.alpha", "--json", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
     parsed = json.loads(result.stdout)
-    assert parsed["id"] == "MEM-001"
+    assert parsed["id"] == "mem.fact.alpha"
 
   def test_show_memory_path(self) -> None:
     """Show memory --path outputs file path."""
-    path = _write_memory_file(self.mem_dir, "MEM-001")
+    path = _write_memory_file(self.mem_dir, "mem.fact.alpha")
 
     result = self.runner.invoke(
       show_app,
-      ["memory", "MEM-001", "--path", "--root", str(self.root)],
+      ["memory", "mem.fact.alpha", "--path", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
@@ -290,45 +352,46 @@ class ShowMemoryCommandTest(unittest.TestCase):
 
   def test_show_memory_raw(self) -> None:
     """Show memory --raw outputs raw file content."""
-    _write_memory_file(self.mem_dir, "MEM-001", "Raw Test")
+    _write_memory_file(self.mem_dir, "mem.fact.alpha", "Raw Test")
 
     result = self.runner.invoke(
       show_app,
-      ["memory", "MEM-001", "--raw", "--root", str(self.root)],
+      ["memory", "mem.fact.alpha", "--raw", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
     assert "# Raw Test" in result.stdout
-    assert "id: MEM-001" in result.stdout
+    assert "id: mem.fact.alpha" in result.stdout
 
   def test_show_memory_not_found(self) -> None:
     """Show memory with bad ID errors."""
     result = self.runner.invoke(
       show_app,
-      ["memory", "MEM-999", "--root", str(self.root)],
+      ["memory", "mem.fact.nonexistent", "--root", str(self.root)],
     )
 
     assert result.exit_code == 1
     assert "not found" in result.stderr.lower()
 
-  def test_show_memory_numeric_shorthand(self) -> None:
-    """Show memory '1' normalizes to MEM-001."""
-    _write_memory_file(self.mem_dir, "MEM-001")
-
-    result = self.runner.invoke(
-      show_app, ["memory", "1", "--root", str(self.root)],
-    )
-
-    assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-
-  def test_show_memory_mutually_exclusive(self) -> None:
-    """--json and --path are mutually exclusive."""
-    _write_memory_file(self.mem_dir, "MEM-001")
+  def test_show_memory_shorthand(self) -> None:
+    """Show memory 'fact.alpha' normalizes to mem.fact.alpha."""
+    _write_memory_file(self.mem_dir, "mem.fact.alpha")
 
     result = self.runner.invoke(
       show_app,
-      ["memory", "MEM-001", "--json", "--path", "--root", str(self.root)],
+      ["memory", "fact.alpha", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "mem.fact.alpha" in result.stdout
+
+  def test_show_memory_mutually_exclusive(self) -> None:
+    """--json and --path are mutually exclusive."""
+    _write_memory_file(self.mem_dir, "mem.fact.alpha")
+
+    result = self.runner.invoke(
+      show_app,
+      ["memory", "mem.fact.alpha", "--json", "--path", "--root", str(self.root)],
     )
 
     assert result.exit_code == 1
@@ -350,44 +413,48 @@ class FindMemoryCommandTest(unittest.TestCase):
     self.tmpdir.cleanup()
 
   def test_find_memory_wildcard(self) -> None:
-    """Find memory with MEM-* pattern."""
-    _write_memory_file(self.mem_dir, "MEM-001", "First")
-    _write_memory_file(self.mem_dir, "MEM-002", "Second")
+    """Find memory with mem.* pattern."""
+    _write_memory_file(self.mem_dir, "mem.fact.alpha", "First")
+    _write_memory_file(self.mem_dir, "mem.fact.beta", "Second")
 
     result = self.runner.invoke(
-      find_app, ["memory", "MEM-*", "--root", str(self.root)],
+      find_app,
+      ["memory", "mem.fact.*", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" in result.stdout
 
   def test_find_memory_exact(self) -> None:
     """Find memory with exact ID."""
-    _write_memory_file(self.mem_dir, "MEM-001")
+    _write_memory_file(self.mem_dir, "mem.fact.alpha")
 
     result = self.runner.invoke(
-      find_app, ["memory", "MEM-001", "--root", str(self.root)],
+      find_app,
+      ["memory", "mem.fact.alpha", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
+    assert "mem.fact.alpha" in result.stdout
 
-  def test_find_memory_numeric_shorthand(self) -> None:
-    """Find memory with numeric shorthand."""
-    _write_memory_file(self.mem_dir, "MEM-001")
+  def test_find_memory_shorthand(self) -> None:
+    """Find memory with shorthand (omitted mem. prefix)."""
+    _write_memory_file(self.mem_dir, "mem.fact.alpha")
 
     result = self.runner.invoke(
-      find_app, ["memory", "1", "--root", str(self.root)],
+      find_app,
+      ["memory", "fact.alpha", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
+    assert "mem.fact.alpha" in result.stdout
 
   def test_find_memory_no_match(self) -> None:
     """Find memory with no match exits cleanly."""
     result = self.runner.invoke(
-      find_app, ["memory", "MEM-999", "--root", str(self.root)],
+      find_app,
+      ["memory", "mem.fact.nonexistent", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
@@ -413,151 +480,189 @@ class ListMemoriesSelectionTest(unittest.TestCase):
   def test_path_filters_by_scope(self) -> None:
     """--path returns only records whose scope.paths match."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Auth Pattern",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Auth Pattern",
       scope={"paths": ["src/auth/"]},
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "DB Pattern",
+      self.mem_dir,
+      "mem.fact.beta",
+      "DB Pattern",
       scope={"paths": ["src/db/models.py"]},
     )
 
     result = self.runner.invoke(
       list_app,
-      ["memories", "--path", "src/auth/login.py",
-       "--root", str(self.root)],
+      ["memories", "--path", "src/auth/login.py", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" not in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" not in result.stdout
 
   def test_path_no_match_empty_output(self) -> None:
     """--path with no matching records exits cleanly."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Auth",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Auth",
       scope={"paths": ["src/auth/"]},
     )
 
     result = self.runner.invoke(
       list_app,
-      ["memories", "--path", "src/unrelated/foo.py",
-       "--root", str(self.root)],
+      ["memories", "--path", "src/unrelated/foo.py", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" not in result.stdout
+    assert "mem.fact.alpha" not in result.stdout
 
   def test_path_repeatable(self) -> None:
     """Multiple --path flags are OR'd."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Auth",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Auth",
       scope={"paths": ["src/auth/"]},
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "DB",
+      self.mem_dir,
+      "mem.fact.beta",
+      "DB",
       scope={"paths": ["src/db/"]},
     )
     _write_memory_file(
-      self.mem_dir, "MEM-003", "CLI",
+      self.mem_dir,
+      "mem.fact.gamma",
+      "CLI",
       scope={"paths": ["src/cli/"]},
     )
 
     result = self.runner.invoke(
       list_app,
-      ["memories",
-       "--path", "src/auth/login.py",
-       "--path", "src/db/conn.py",
-       "--root", str(self.root)],
+      [
+        "memories",
+        "--path",
+        "src/auth/login.py",
+        "--path",
+        "src/db/conn.py",
+        "--root",
+        str(self.root),
+      ],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" in result.stdout
-    assert "MEM-003" not in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" in result.stdout
+    assert "mem.fact.gamma" not in result.stdout
 
   # -- --command scope matching --
 
   def test_command_filters_by_scope(self) -> None:
     """--command filters by token-prefix match on scope.commands."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Test Tips",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Test Tips",
       scope={"commands": ["test"]},
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "Lint Tips",
+      self.mem_dir,
+      "mem.fact.beta",
+      "Lint Tips",
       scope={"commands": ["lint"]},
     )
 
     result = self.runner.invoke(
       list_app,
-      ["memories", "--command", "test auth --verbose",
-       "--root", str(self.root)],
+      ["memories", "--command", "test auth --verbose", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" not in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" not in result.stdout
 
   # -- --match-tag scope matching --
 
   def test_match_tag_filters_by_tag_intersection(self) -> None:
     """--match-tag filters records whose tags overlap."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Auth",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Auth",
       tags=["auth", "security"],
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "DB",
+      self.mem_dir,
+      "mem.fact.beta",
+      "DB",
       tags=["database"],
     )
 
     result = self.runner.invoke(
       list_app,
-      ["memories", "--match-tag", "auth",
-       "--root", str(self.root)],
+      ["memories", "--match-tag", "auth", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" not in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" not in result.stdout
 
   def test_match_tag_repeatable(self) -> None:
     """Multiple --match-tag flags are OR'd."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Auth",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Auth",
       tags=["auth"],
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "DB",
+      self.mem_dir,
+      "mem.fact.beta",
+      "DB",
       tags=["database"],
     )
     _write_memory_file(
-      self.mem_dir, "MEM-003", "CLI",
+      self.mem_dir,
+      "mem.fact.gamma",
+      "CLI",
       tags=["cli"],
     )
 
     result = self.runner.invoke(
       list_app,
-      ["memories",
-       "--match-tag", "auth",
-       "--match-tag", "database",
-       "--root", str(self.root)],
+      [
+        "memories",
+        "--match-tag",
+        "auth",
+        "--match-tag",
+        "database",
+        "--root",
+        str(self.root),
+      ],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" in result.stdout
-    assert "MEM-003" not in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" in result.stdout
+    assert "mem.fact.gamma" not in result.stdout
 
   # -- --include-draft --
 
   def test_draft_excluded_by_default(self) -> None:
     """Draft records are excluded without --include-draft."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Active", status="active",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Active",
+      status="active",
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "Draft", status="draft",
+      self.mem_dir,
+      "mem.fact.beta",
+      "Draft",
+      status="draft",
     )
 
     result = self.runner.invoke(
@@ -566,16 +671,22 @@ class ListMemoriesSelectionTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" not in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" not in result.stdout
 
   def test_include_draft_shows_drafts(self) -> None:
     """--include-draft surfaces draft records."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Active", status="active",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Active",
+      status="active",
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "Draft", status="draft",
+      self.mem_dir,
+      "mem.fact.beta",
+      "Draft",
+      status="draft",
     )
 
     result = self.runner.invoke(
@@ -584,16 +695,19 @@ class ListMemoriesSelectionTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" in result.stdout
 
   # -- --limit --
 
   def test_limit_caps_output(self) -> None:
     """--limit restricts the number of results."""
-    for i in range(1, 6):
+    names = ["alpha", "beta", "gamma", "delta", "epsilon"]
+    for name in names:
       _write_memory_file(
-        self.mem_dir, f"MEM-{i:03d}", f"Mem {i}",
+        self.mem_dir,
+        f"mem.fact.{name}",
+        f"Mem {name}",
       )
 
     result = self.runner.invoke(
@@ -602,10 +716,8 @@ class ListMemoriesSelectionTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    # Count non-empty, non-header lines containing MEM-
-    mem_lines = [
-      ln for ln in result.stdout.splitlines() if "MEM-" in ln
-    ]
+    # Count non-empty, non-header lines containing mem.
+    mem_lines = [ln for ln in result.stdout.splitlines() if "mem." in ln]
     assert len(mem_lines) == 2
 
   # -- deprecated excluded by default --
@@ -613,10 +725,16 @@ class ListMemoriesSelectionTest(unittest.TestCase):
   def test_deprecated_excluded_by_default(self) -> None:
     """Deprecated records are excluded without explicit --status."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Active", status="active",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Active",
+      status="active",
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "Old", status="deprecated",
+      self.mem_dir,
+      "mem.fact.beta",
+      "Old",
+      status="deprecated",
     )
 
     result = self.runner.invoke(
@@ -625,38 +743,47 @@ class ListMemoriesSelectionTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" not in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" not in result.stdout
 
   def test_explicit_status_bypasses_exclusion(self) -> None:
     """--status deprecated shows deprecated records (skip_status_filter)."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Active", status="active",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Active",
+      status="active",
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "Old", status="deprecated",
+      self.mem_dir,
+      "mem.fact.beta",
+      "Old",
+      status="deprecated",
     )
 
     result = self.runner.invoke(
       list_app,
-      ["memories", "--status", "deprecated",
-       "--root", str(self.root)],
+      ["memories", "--status", "deprecated", "--root", str(self.root)],
     )
 
     assert result.exit_code == 0
-    assert "MEM-002" in result.stdout
-    assert "MEM-001" not in result.stdout
+    assert "mem.fact.beta" in result.stdout
+    assert "mem.fact.alpha" not in result.stdout
 
   # -- deterministic ordering --
 
   def test_ordering_by_severity(self) -> None:
     """Records ordered by severity (critical before low)."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Low Sev",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Low Sev",
       priority={"severity": "low", "weight": 0},
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "Critical Sev",
+      self.mem_dir,
+      "mem.fact.beta",
+      "Critical Sev",
       priority={"severity": "critical", "weight": 0},
     )
 
@@ -666,39 +793,48 @@ class ListMemoriesSelectionTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    lines = [ln for ln in result.stdout.splitlines() if "MEM-" in ln]
+    lines = [ln for ln in result.stdout.splitlines() if "mem." in ln]
     assert len(lines) == 2
-    assert lines[0].startswith("MEM-002"), (
+    assert lines[0].startswith("mem.fact.beta"), (
       f"Critical should come first, got: {lines}"
     )
-    assert lines[1].startswith("MEM-001")
+    assert lines[1].startswith("mem.fact.alpha")
 
   # -- combined scope + metadata filter --
 
   def test_path_combined_with_type_filter(self) -> None:
     """--path and --type both apply (AND between metadata and scope)."""
     _write_memory_file(
-      self.mem_dir, "MEM-001", "Auth Fact",
+      self.mem_dir,
+      "mem.fact.alpha",
+      "Auth Fact",
       memory_type="fact",
       scope={"paths": ["src/auth/"]},
     )
     _write_memory_file(
-      self.mem_dir, "MEM-002", "Auth Pattern",
+      self.mem_dir,
+      "mem.fact.beta",
+      "Auth Pattern",
       memory_type="pattern",
       scope={"paths": ["src/auth/"]},
     )
 
     result = self.runner.invoke(
       list_app,
-      ["memories",
-       "--type", "fact",
-       "--path", "src/auth/login.py",
-       "--root", str(self.root)],
+      [
+        "memories",
+        "--type",
+        "fact",
+        "--path",
+        "src/auth/login.py",
+        "--root",
+        str(self.root),
+      ],
     )
 
     assert result.exit_code == 0
-    assert "MEM-001" in result.stdout
-    assert "MEM-002" not in result.stdout
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" not in result.stdout
 
 
 if __name__ == "__main__":

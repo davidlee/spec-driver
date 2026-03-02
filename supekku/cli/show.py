@@ -453,16 +453,22 @@ def show_card(
 @app.command("memory")
 def show_memory(
   memory_id: Annotated[
-    str, typer.Argument(help="Memory ID (e.g., MEM-001, 001)"),
+    str,
+    typer.Argument(
+      help="Memory ID (e.g., mem.pattern.cli.skinny or pattern.cli.skinny)",
+    ),
   ],
   json_output: Annotated[
-    bool, typer.Option("--json", help="Output as JSON"),
+    bool,
+    typer.Option("--json", help="Output as JSON"),
   ] = False,
   path_only: Annotated[
-    bool, typer.Option("--path", help="Output path only"),
+    bool,
+    typer.Option("--path", help="Output path only"),
   ] = False,
   raw_output: Annotated[
-    bool, typer.Option("--raw", help="Output raw file content"),
+    bool,
+    typer.Option("--raw", help="Output raw file content"),
   ] = False,
   root: RootOption = None,
 ) -> None:
@@ -475,7 +481,9 @@ def show_memory(
       )
       raise typer.Exit(EXIT_FAILURE)
 
-    normalized_id = normalize_id("memory", memory_id)
+    from supekku.scripts.lib.memory.ids import normalize_memory_id
+
+    normalized_id = normalize_memory_id(memory_id)
     registry = MemoryRegistry(root=root)
     record = registry.find(normalized_id)
 

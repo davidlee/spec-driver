@@ -197,18 +197,27 @@ def find_card(
 @app.command("memory")
 def find_memory(
   pattern: Annotated[
-    str, typer.Argument(help="ID pattern (e.g., MEM-*, 001)"),
+    str,
+    typer.Argument(
+      help="ID pattern (e.g., mem.pattern.*, pattern.cli.*)",
+    ),
   ],
   root: RootOption = None,
 ) -> None:
   """Find memory records matching ID pattern.
 
   Supports fnmatch patterns: * matches everything, ? matches single char.
-  Also accepts numeric-only IDs (e.g., 001 -> MEM-001).
-  Examples: MEM-*, MEM-00?, 001
+  The 'mem.' prefix is prepended automatically if the pattern doesn't
+  already start with it.
+
+  Examples: mem.pattern.*, pattern.cli.*, mem.*.auth.*
   """
   try:
-    normalized_pattern = normalize_id("memory", pattern)
+    # Normalize: prepend mem. if missing (but preserve glob chars)
+    normalized_pattern = pattern.strip().lower()
+    if not normalized_pattern.startswith("mem."):
+      normalized_pattern = f"mem.{normalized_pattern}"
+
     registry = MemoryRegistry(root=root)
     for artifact_id, artifact in registry.collect().items():
       if _matches_pattern(artifact_id, normalized_pattern):

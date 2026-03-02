@@ -1,5 +1,5 @@
 ---
-id: MEM-002
+id: mem.pattern.formatters.soc
 name: Formatter Separation of Concerns
 kind: memory
 status: active
@@ -40,7 +40,7 @@ requires_reading:
 - CLAUDE.md
 relations:
 - type: relates_to
-  target: MEM-001
+  target: mem.pattern.cli.skinny
   annotation: Complementary pattern
 ---
 

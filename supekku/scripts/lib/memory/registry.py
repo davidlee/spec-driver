@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -19,7 +18,8 @@ class MemoryRegistry:
   """Registry for discovering and querying memory artifact files.
 
   Follows the same collect/find/iter/filter pattern as DecisionRegistry.
-  Memory files are expected to be named MEM-*.md in the memory directory.
+  Memory files are expected to be named mem.*.md in the memory directory.
+  Frontmatter ``id`` is the primary key; filename stem is fallback.
   """
 
   def __init__(
@@ -32,7 +32,7 @@ class MemoryRegistry:
     self.directory = directory or (self.root / "memory")
 
   def collect(self) -> dict[str, MemoryRecord]:
-    """Discover and parse all MEM-*.md files into MemoryRecords.
+    """Discover and parse all mem.*.md files into MemoryRecords.
 
     Returns:
       Dictionary mapping memory ID to MemoryRecord.
@@ -41,7 +41,7 @@ class MemoryRegistry:
     if not self.directory.exists():
       return records
 
-    for mem_file in self.directory.glob("MEM-*.md"):
+    for mem_file in self.directory.glob("mem.*.md"):
       try:
         record = self._parse_memory_file(mem_file)
         if record:
@@ -54,8 +54,11 @@ class MemoryRegistry:
   def _parse_memory_file(self, path: Path) -> MemoryRecord | None:
     """Parse a single memory file into a MemoryRecord.
 
+    Frontmatter ``id`` is authoritative. Falls back to filename stem
+    if frontmatter has no ``id`` field.
+
     Args:
-      path: Path to the MEM-*.md file.
+      path: Path to a mem.*.md file.
 
     Returns:
       MemoryRecord or None if the file can't be parsed.
@@ -64,14 +67,9 @@ class MemoryRegistry:
     if not frontmatter:
       return None
 
-    # Validate ID is present (from frontmatter or filename)
-    filename_match = re.match(r"MEM-(\d+)", path.name)
-    if not filename_match:
-      return None
-
-    file_id = f"MEM-{filename_match.group(1)}"
+    # Frontmatter ID is primary; filename stem is fallback
     if not frontmatter.get("id"):
-      frontmatter["id"] = file_id
+      frontmatter["id"] = path.stem
 
     return MemoryRecord.from_frontmatter(path, frontmatter)
 
@@ -79,7 +77,7 @@ class MemoryRegistry:
     """Find a specific memory record by ID.
 
     Args:
-      memory_id: The memory ID (e.g. "MEM-001").
+      memory_id: The memory ID (e.g. 'mem.pattern.cli.skinny').
 
     Returns:
       MemoryRecord or None if not found.

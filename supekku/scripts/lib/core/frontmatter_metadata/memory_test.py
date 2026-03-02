@@ -16,7 +16,7 @@ from .memory import MEMORY_FRONTMATTER_METADATA
 def _minimal_memory(**overrides: object) -> dict:
   """Build a minimal valid memory record, with optional overrides."""
   data: dict = {
-    "id": "MEM-001",
+    "id": "mem.fact.test",
     "name": "Test Memory",
     "slug": "test-memory",
     "kind": "memory",
@@ -61,7 +61,7 @@ class MemoryFrontmatterValidationTest(unittest.TestCase):
   def test_valid_memory_with_all_fields(self) -> None:
     """Both validators accept memory with all optional fields."""
     data = {
-      "id": "MEM-042",
+      "id": "mem.signpost.auth.prereading",
       "name": "ADR-11 Required Pre-Reading for Auth Changes",
       "slug": "mem-adr11-required-for-auth",
       "kind": "memory",

@@ -135,8 +135,12 @@ class MemoryRecord:
 
     # Optional lists — include only if non-empty
     for list_field in (
-      "tags", "owners", "requires_reading",
-      "audience", "visibility", "relations",
+      "tags",
+      "owners",
+      "requires_reading",
+      "audience",
+      "visibility",
+      "relations",
     ):
       val = getattr(self, list_field)
       if val:

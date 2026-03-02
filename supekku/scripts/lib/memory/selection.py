@@ -35,7 +35,9 @@ class MatchContext:
 
 
 def normalize_path(
-  path: str, *, repo_root: PurePosixPath | None = None,
+  path: str,
+  *,
+  repo_root: PurePosixPath | None = None,
 ) -> str:
   """Normalize a path to repo-relative POSIX form.
 
@@ -85,16 +87,14 @@ def normalize_path(
 
 
 def _matches_paths(
-  scope_paths: list[str], context_paths: list[str],
+  scope_paths: list[str],
+  context_paths: list[str],
 ) -> bool:
   """Check if any context path matches any scope path (exact or prefix)."""
   for scope_path in scope_paths:
     if scope_path.endswith("/"):
       for ctx_path in context_paths:
-        if (
-          ctx_path.startswith(scope_path)
-          or ctx_path == scope_path.rstrip("/")
-        ):
+        if ctx_path.startswith(scope_path) or ctx_path == scope_path.rstrip("/"):
           return True
     elif scope_path in context_paths:
       return True
@@ -113,8 +113,10 @@ def _glob_match(path: str, pattern: str) -> bool:
 
 
 def _match_segments(
-  path_parts: list[str], pi: int,
-  pat_parts: list[str], gi: int,
+  path_parts: list[str],
+  pi: int,
+  pat_parts: list[str],
+  gi: int,
 ) -> bool:
   """Recursive segment matcher for glob patterns."""
   while pi < len(path_parts) and gi < len(pat_parts):
@@ -137,7 +139,8 @@ def _match_segments(
 
 
 def _matches_globs(
-  scope_globs: list[str], context_paths: list[str],
+  scope_globs: list[str],
+  context_paths: list[str],
 ) -> bool:
   """Check if any context path matches any scope glob pattern."""
   return any(
@@ -156,7 +159,8 @@ def _tokenize_command(command: str) -> list[str]:
 
 
 def _matches_commands(
-  scope_commands: list[str], context_command: str,
+  scope_commands: list[str],
+  context_command: str,
 ) -> bool:
   """Check if scope command tokens are a prefix of context command tokens."""
   ctx_tokens = _tokenize_command(context_command)
@@ -165,7 +169,7 @@ def _matches_commands(
     if (
       scope_tokens
       and len(scope_tokens) <= len(ctx_tokens)
-      and ctx_tokens[:len(scope_tokens)] == scope_tokens
+      and ctx_tokens[: len(scope_tokens)] == scope_tokens
     ):
       return True
   return False
@@ -187,34 +191,27 @@ def matches_scope(record: MemoryRecord, context: MatchContext) -> bool:
   scope = record.scope
 
   scope_paths = scope.get("paths", [])
-  if (
-    scope_paths and context.paths
-    and _matches_paths(scope_paths, context.paths)
-  ):
+  if scope_paths and context.paths and _matches_paths(scope_paths, context.paths):
     return True
 
   scope_globs = scope.get("globs", [])
-  if (
-    scope_globs and context.paths
-    and _matches_globs(scope_globs, context.paths)
-  ):
+  if scope_globs and context.paths and _matches_globs(scope_globs, context.paths):
     return True
 
   scope_commands = scope.get("commands", [])
   if (
-    scope_commands and context.command
+    scope_commands
+    and context.command
     and _matches_commands(scope_commands, context.command)
   ):
     return True
 
-  return bool(
-    context.tags and record.tags
-    and set(context.tags) & set(record.tags)
-  )
+  return bool(context.tags and record.tags and set(context.tags) & set(record.tags))
 
 
 def scope_specificity(
-  record: MemoryRecord, context: MatchContext,
+  record: MemoryRecord,
+  context: MatchContext,
 ) -> int:
   """Score how specific the scope match is.
 
@@ -235,22 +232,17 @@ def scope_specificity(
   scope = record.scope
 
   scope_paths = scope.get("paths", [])
-  if (
-    scope_paths and context.paths
-    and _matches_paths(scope_paths, context.paths)
-  ):
+  if scope_paths and context.paths and _matches_paths(scope_paths, context.paths):
     score = max(score, 3)
 
   scope_globs = scope.get("globs", [])
-  if (
-    scope_globs and context.paths
-    and _matches_globs(scope_globs, context.paths)
-  ):
+  if scope_globs and context.paths and _matches_globs(scope_globs, context.paths):
     score = max(score, 2)
 
   scope_commands = scope.get("commands", [])
   if (
-    scope_commands and context.command
+    scope_commands
+    and context.command
     and _matches_commands(scope_commands, context.command)
   ):
     score = max(score, 1)
@@ -300,9 +292,7 @@ def sort_key(
 
   weight = priority.get("weight", 0) if priority else 0
 
-  specificity = (
-    scope_specificity(record, context) if context else 0
-  )
+  specificity = scope_specificity(record, context) if context else 0
 
   if record.verified:
     ref = today or date.today()
@@ -350,8 +340,10 @@ def is_surfaceable(
 
   if record.memory_type == "thread":
     return _is_thread_surfaceable(
-      record, context,
-      recency_days=thread_recency_days, today=today,
+      record,
+      context,
+      recency_days=thread_recency_days,
+      today=today,
     )
 
   return True
@@ -414,9 +406,11 @@ def select(
 
   # Step 1: surfaceability filter
   surfaceable = [
-    r for r in records
+    r
+    for r in records
     if is_surfaceable(
-      r, context,
+      r,
+      context,
       include_draft=include_draft,
       skip_status_filter=skip_status_filter,
       thread_recency_days=thread_recency_days,
@@ -427,8 +421,7 @@ def select(
   # Step 2: scope filter (if context provided)
   if context:
     matched = [
-      r for r in surfaceable
-      if r.memory_type == "thread" or matches_scope(r, context)
+      r for r in surfaceable if r.memory_type == "thread" or matches_scope(r, context)
     ]
   else:
     matched = surfaceable

@@ -1,5 +1,5 @@
 ---
-id: MEM-001
+id: mem.pattern.cli.skinny
 name: Skinny CLI Pattern
 kind: memory
 status: active
@@ -44,7 +44,7 @@ requires_reading:
 - CLAUDE.md
 relations:
 - type: relates_to
-  target: MEM-002
+  target: mem.pattern.formatters.soc
   annotation: Complementary pattern
 ---
 

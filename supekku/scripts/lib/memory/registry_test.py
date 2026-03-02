@@ -13,7 +13,7 @@ from supekku.scripts.lib.memory.registry import MemoryRegistry
 
 MINIMAL_MEM = """\
 ---
-id: MEM-001
+id: mem.fact.test
 name: Test Fact
 slug: test-fact
 kind: memory
@@ -28,7 +28,7 @@ A simple fact for testing.
 
 FULL_MEM = """\
 ---
-id: MEM-042
+id: mem.signpost.auth.prereading
 name: Auth Pre-Reading
 slug: auth-prereading
 kind: memory
@@ -66,7 +66,7 @@ Detailed body content for this memory record.
 
 PATTERN_MEM = """\
 ---
-id: MEM-099
+id: mem.pattern.python.naming
 name: Python Naming Convention
 slug: python-naming
 kind: memory
@@ -85,7 +85,7 @@ Use snake_case for everything except class names.
 
 ARCHIVED_MEM = """\
 ---
-id: MEM-050
+id: mem.concept.old-guideline
 name: Old Guideline
 slug: old-guideline
 kind: memory
@@ -138,39 +138,47 @@ class TestMemoryRegistry(unittest.TestCase):
       self.assertEqual(records, {})
 
   def test_collect_empty_directory_exists(self) -> None:
-    """collect returns empty dict when memory dir exists but has no MEM files."""
+    """collect returns empty dict when memory dir has no mem.* files."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = _setup_repo(tmpdir, files={})
       (root / "memory").mkdir(exist_ok=True)
-      # Add a non-memory file
-      (root / "memory" / "README.md").write_text("# Memory\n", encoding="utf-8")
+      (root / "memory" / "README.md").write_text(
+        "# Memory\n",
+        encoding="utf-8",
+      )
       registry = MemoryRegistry(root=root)
       records = registry.collect()
       self.assertEqual(records, {})
 
   def test_collect_discovers_mem_files(self) -> None:
-    """collect finds MEM-*.md files and parses them."""
+    """collect finds mem.*.md files and parses them."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test-fact.md": MINIMAL_MEM,
-        "MEM-042-auth-prereading.md": FULL_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.signpost.auth.prereading.md": FULL_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
       records = registry.collect()
 
       self.assertEqual(len(records), 2)
-      self.assertIn("MEM-001", records)
-      self.assertIn("MEM-042", records)
+      self.assertIn("mem.fact.test", records)
+      self.assertIn("mem.signpost.auth.prereading", records)
 
   def test_collect_parses_minimal_correctly(self) -> None:
     """collect parses minimal memory file fields."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test-fact.md": MINIMAL_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
       records = registry.collect()
-      rec = records["MEM-001"]
+      rec = records["mem.fact.test"]
 
       self.assertEqual(rec.name, "Test Fact")
       self.assertEqual(rec.status, "active")
@@ -180,79 +188,143 @@ class TestMemoryRegistry(unittest.TestCase):
   def test_collect_parses_full_correctly(self) -> None:
     """collect parses full memory file with all fields."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-042-auth-prereading.md": FULL_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.signpost.auth.prereading.md": FULL_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
       records = registry.collect()
-      rec = records["MEM-042"]
+      rec = records["mem.signpost.auth.prereading"]
 
       self.assertEqual(rec.memory_type, "signpost")
       self.assertEqual(rec.confidence, "high")
       self.assertEqual(rec.verified, date(2026, 3, 1))
       self.assertEqual(rec.review_by, date(2026, 5, 1))
       self.assertEqual(rec.tags, ["auth", "pre-read"])
-      self.assertEqual(rec.requires_reading, ["specify/decisions/ADR-011-auth-flow.md"])
+      self.assertEqual(
+        rec.requires_reading,
+        ["specify/decisions/ADR-011-auth-flow.md"],
+      )
       self.assertEqual(rec.scope["globs"], ["src/auth/**"])
       self.assertEqual(rec.priority["severity"], "high")
       self.assertEqual(rec.audience, ["human", "agent"])
       self.assertEqual(rec.visibility, ["pre"])
 
   def test_collect_ignores_non_mem_files(self) -> None:
-    """collect skips files that don't match MEM-*.md pattern."""
+    """collect skips files that don't match mem.*.md pattern."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-        "README.md": "# Not a memory\n",
-        "ADR-001-decision.md": "---\nid: ADR-001\n---\n",
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "README.md": "# Not a memory\n",
+          "ADR-001-decision.md": "---\nid: ADR-001\n---\n",
+        },
+      )
       registry = MemoryRegistry(root=root)
       records = registry.collect()
       self.assertEqual(len(records), 1)
-      self.assertIn("MEM-001", records)
+      self.assertIn("mem.fact.test", records)
 
   def test_collect_skips_malformed_files(self) -> None:
     """collect skips files with missing/broken frontmatter."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-good.md": MINIMAL_MEM,
-        "MEM-999-bad.md": "No frontmatter here\n",
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.bad.nofront.md": "No frontmatter here\n",
+        },
+      )
       registry = MemoryRegistry(root=root)
       records = registry.collect()
-      # Good file parsed, bad file skipped
       self.assertEqual(len(records), 1)
-      self.assertIn("MEM-001", records)
+      self.assertIn("mem.fact.test", records)
+
+  def test_collect_uses_frontmatter_id_over_filename(self) -> None:
+    """Frontmatter id takes precedence over filename stem."""
+    content = """\
+---
+id: mem.fact.override
+name: Override Test
+kind: memory
+status: active
+memory_type: fact
+---
+"""
+    with tempfile.TemporaryDirectory() as tmpdir:
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.something-else.md": content,
+        },
+      )
+      registry = MemoryRegistry(root=root)
+      records = registry.collect()
+      self.assertIn("mem.fact.override", records)
+
+  def test_collect_falls_back_to_filename_stem(self) -> None:
+    """When frontmatter has no id, filename stem is used."""
+    content = """\
+---
+name: No ID
+kind: memory
+status: active
+memory_type: fact
+---
+"""
+    with tempfile.TemporaryDirectory() as tmpdir:
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.fallback.md": content,
+        },
+      )
+      registry = MemoryRegistry(root=root)
+      records = registry.collect()
+      self.assertIn("mem.fact.fallback", records)
 
   def test_find_existing(self) -> None:
     """find returns the record for a known ID."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-        "MEM-042-auth.md": FULL_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.signpost.auth.prereading.md": FULL_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
-      rec = registry.find("MEM-042")
+      rec = registry.find("mem.signpost.auth.prereading")
       self.assertIsNotNone(rec)
-      self.assertEqual(rec.name, "Auth Pre-Reading")  # type: ignore[union-attr]
+      assert rec is not None
+      self.assertEqual(rec.name, "Auth Pre-Reading")
 
   def test_find_missing(self) -> None:
     """find returns None for unknown ID."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
-      self.assertIsNone(registry.find("MEM-999"))
+      self.assertIsNone(registry.find("mem.fact.missing"))
 
   def test_iter_all(self) -> None:
     """iter without filters yields all records."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-        "MEM-042-auth.md": FULL_MEM,
-        "MEM-099-pattern.md": PATTERN_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.signpost.auth.prereading.md": FULL_MEM,
+          "mem.pattern.python.naming.md": PATTERN_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
       all_records = list(registry.iter())
       self.assertEqual(len(all_records), 3)
@@ -260,98 +332,125 @@ class TestMemoryRegistry(unittest.TestCase):
   def test_iter_by_status(self) -> None:
     """iter with status filter yields only matching records."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-        "MEM-099-pattern.md": PATTERN_MEM,
-        "MEM-050-old.md": ARCHIVED_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.pattern.python.naming.md": PATTERN_MEM,
+          "mem.concept.old-guideline.md": ARCHIVED_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
 
       active = list(registry.iter(status="active"))
       self.assertEqual(len(active), 1)
-      self.assertEqual(active[0].id, "MEM-001")
+      self.assertEqual(active[0].id, "mem.fact.test")
 
       drafts = list(registry.iter(status="draft"))
       self.assertEqual(len(drafts), 1)
-      self.assertEqual(drafts[0].id, "MEM-099")
+      self.assertEqual(drafts[0].id, "mem.pattern.python.naming")
 
   def test_filter_by_memory_type(self) -> None:
     """filter by memory_type returns matching records."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-        "MEM-042-auth.md": FULL_MEM,
-        "MEM-099-pattern.md": PATTERN_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.signpost.auth.prereading.md": FULL_MEM,
+          "mem.pattern.python.naming.md": PATTERN_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
 
       facts = registry.filter(memory_type="fact")
       self.assertEqual(len(facts), 1)
-      self.assertEqual(facts[0].id, "MEM-001")
+      self.assertEqual(facts[0].id, "mem.fact.test")
 
       signposts = registry.filter(memory_type="signpost")
       self.assertEqual(len(signposts), 1)
-      self.assertEqual(signposts[0].id, "MEM-042")
+      self.assertEqual(
+        signposts[0].id,
+        "mem.signpost.auth.prereading",
+      )
 
   def test_filter_by_tag(self) -> None:
     """filter by tag returns records containing that tag."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-        "MEM-042-auth.md": FULL_MEM,
-        "MEM-099-pattern.md": PATTERN_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.signpost.auth.prereading.md": FULL_MEM,
+          "mem.pattern.python.naming.md": PATTERN_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
 
       auth_records = registry.filter(tag="auth")
       ids = {r.id for r in auth_records}
-      self.assertEqual(ids, {"MEM-042"})
+      self.assertEqual(ids, {"mem.signpost.auth.prereading"})
 
       python_records = registry.filter(tag="python")
       ids = {r.id for r in python_records}
-      self.assertEqual(ids, {"MEM-099"})
+      self.assertEqual(ids, {"mem.pattern.python.naming"})
 
   def test_filter_by_status(self) -> None:
     """filter by status returns matching records."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-        "MEM-050-old.md": ARCHIVED_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.concept.old-guideline.md": ARCHIVED_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
 
       archived = registry.filter(status="archived")
       self.assertEqual(len(archived), 1)
-      self.assertEqual(archived[0].id, "MEM-050")
+      self.assertEqual(archived[0].id, "mem.concept.old-guideline")
 
   def test_filter_combined(self) -> None:
     """filter with multiple criteria ANDs them together."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-        "MEM-042-auth.md": FULL_MEM,
-        "MEM-099-pattern.md": PATTERN_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.signpost.auth.prereading.md": FULL_MEM,
+          "mem.pattern.python.naming.md": PATTERN_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
 
-      # active signpost with auth tag
       results = registry.filter(
-        status="active", memory_type="signpost", tag="auth",
+        status="active",
+        memory_type="signpost",
+        tag="auth",
       )
       self.assertEqual(len(results), 1)
-      self.assertEqual(results[0].id, "MEM-042")
+      self.assertEqual(
+        results[0].id,
+        "mem.signpost.auth.prereading",
+      )
 
-      # no match
-      results = registry.filter(status="active", memory_type="pattern")
+      results = registry.filter(
+        status="active",
+        memory_type="pattern",
+      )
       self.assertEqual(len(results), 0)
 
   def test_filter_no_criteria(self) -> None:
     """filter with no criteria returns all records."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-        "MEM-042-auth.md": FULL_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.signpost.auth.prereading.md": FULL_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
       results = registry.filter()
       self.assertEqual(len(results), 2)
@@ -362,7 +461,10 @@ class TestMemoryRegistry(unittest.TestCase):
       root = _setup_repo(tmpdir)
       custom = root / "specify" / "memory"
       custom.mkdir(parents=True)
-      (custom / "MEM-001-test.md").write_text(MINIMAL_MEM, encoding="utf-8")
+      (custom / "mem.fact.test.md").write_text(
+        MINIMAL_MEM,
+        encoding="utf-8",
+      )
 
       registry = MemoryRegistry(root=root, directory=custom)
       self.assertEqual(registry.directory, custom)
@@ -372,15 +474,18 @@ class TestMemoryRegistry(unittest.TestCase):
   def test_to_dict_integration(self) -> None:
     """Records produced by collect serialize correctly via to_dict."""
     with tempfile.TemporaryDirectory() as tmpdir:
-      root = _setup_repo(tmpdir, files={
-        "MEM-001-test.md": MINIMAL_MEM,
-      })
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+        },
+      )
       registry = MemoryRegistry(root=root)
       records = registry.collect()
-      rec = records["MEM-001"]
+      rec = records["mem.fact.test"]
       d = rec.to_dict(root)
 
-      self.assertEqual(d["id"], "MEM-001")
+      self.assertEqual(d["id"], "mem.fact.test")
       self.assertEqual(d["memory_type"], "fact")
       self.assertTrue(d["path"].startswith("memory/"))
 

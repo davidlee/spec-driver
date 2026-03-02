@@ -213,7 +213,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
   examples=[
     # Representative memory with scope, priority, provenance (default example)
     {
-      "id": "MEM-042",
+      "id": "mem.signpost.auth.prereading",
       "name": "ADR-11 Required Pre-Reading for Auth Changes",
       "slug": "mem-adr11-required-for-auth",
       "kind": "memory",
@@ -253,7 +253,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
     },
     # Minimal memory (base fields + required memory_type only)
     {
-      "id": "MEM-001",
+      "id": "mem.fact.example",
       "name": "Example Memory Record",
       "slug": "mem-example",
       "kind": "memory",

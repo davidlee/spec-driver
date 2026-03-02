@@ -20,7 +20,7 @@ from supekku.scripts.lib.memory.selection import (
 
 def _record(
   *,
-  record_id: str = "MEM-001",
+  record_id: str = "mem.fact.alpha",
   scope: dict | None = None,
   tags: list[str] | None = None,
   **kwargs,
@@ -49,7 +49,8 @@ class TestNormalizePath(unittest.TestCase):
 
   def test_already_relative(self) -> None:
     self.assertEqual(
-      normalize_path("src/auth/cache.ts"), "src/auth/cache.ts",
+      normalize_path("src/auth/cache.ts"),
+      "src/auth/cache.ts",
     )
 
   def test_strips_leading_dot_slash(self) -> None:
@@ -75,7 +76,8 @@ class TestNormalizePath(unittest.TestCase):
 
   def test_no_double_slashes(self) -> None:
     self.assertEqual(
-      normalize_path("src//auth//cache.ts"), "src/auth/cache.ts",
+      normalize_path("src//auth//cache.ts"),
+      "src/auth/cache.ts",
     )
 
   def test_dot_only(self) -> None:
@@ -300,7 +302,9 @@ class TestScopeSpecificity(unittest.TestCase):
       tags=["auth"],
     )
     ctx = MatchContext(
-      paths=["src/a.py"], command="test auth", tags=["auth"],
+      paths=["src/a.py"],
+      command="test auth",
+      tags=["auth"],
     )
     self.assertEqual(scope_specificity(rec, ctx), 3)
 
@@ -324,79 +328,92 @@ class TestSortKey(unittest.TestCase):
   def test_severity_ordering(self) -> None:
     """critical < high < medium < low < none in sort order."""
     records = [
-      _record(record_id="MEM-005", priority={"severity": "none"}),
-      _record(record_id="MEM-001", priority={"severity": "critical"}),
-      _record(record_id="MEM-003", priority={"severity": "medium"}),
-      _record(record_id="MEM-002", priority={"severity": "high"}),
-      _record(record_id="MEM-004", priority={"severity": "low"}),
+      _record(record_id="mem.thread.epsilon", priority={"severity": "none"}),
+      _record(record_id="mem.fact.alpha", priority={"severity": "critical"}),
+      _record(record_id="mem.fact.gamma", priority={"severity": "medium"}),
+      _record(record_id="mem.fact.beta", priority={"severity": "high"}),
+      _record(record_id="mem.concept.delta", priority={"severity": "low"}),
     ]
     sorted_recs = sorted(records, key=lambda r: sort_key(r))
     ids = [r.id for r in sorted_recs]
-    self.assertEqual(ids, [
-      "MEM-001", "MEM-002", "MEM-003", "MEM-004", "MEM-005",
-    ])
+    self.assertEqual(
+      ids,
+      [
+        "mem.fact.alpha",
+        "mem.fact.beta",
+        "mem.fact.gamma",
+        "mem.concept.delta",
+        "mem.thread.epsilon",
+      ],
+    )
 
   def test_weight_tiebreak_descending(self) -> None:
     """Higher weight sorts first within same severity."""
     records = [
       _record(
-        record_id="MEM-001",
+        record_id="mem.fact.alpha",
         priority={"severity": "high", "weight": 5},
       ),
       _record(
-        record_id="MEM-002",
+        record_id="mem.fact.beta",
         priority={"severity": "high", "weight": 10},
       ),
     ]
     sorted_recs = sorted(records, key=lambda r: sort_key(r))
-    self.assertEqual(sorted_recs[0].id, "MEM-002")
+    self.assertEqual(sorted_recs[0].id, "mem.fact.beta")
 
   def test_specificity_tiebreak(self) -> None:
     """Higher specificity sorts first within same severity/weight."""
     ctx = MatchContext(
-      paths=["src/a.py"], command="test auth",
+      paths=["src/a.py"],
+      command="test auth",
     )
     rec_path = _record(
-      record_id="MEM-001", scope={"paths": ["src/a.py"]},
+      record_id="mem.fact.alpha",
+      scope={"paths": ["src/a.py"]},
     )
     rec_cmd = _record(
-      record_id="MEM-002", scope={"commands": ["test"]},
+      record_id="mem.fact.beta",
+      scope={"commands": ["test"]},
     )
     sorted_recs = sorted(
-      [rec_cmd, rec_path], key=lambda r: sort_key(r, ctx),
+      [rec_cmd, rec_path],
+      key=lambda r: sort_key(r, ctx),
     )
-    self.assertEqual(sorted_recs[0].id, "MEM-001")  # paths=3 > commands=1
+    self.assertEqual(sorted_recs[0].id, "mem.fact.alpha")  # paths=3 > commands=1
 
   def test_verified_recency_tiebreak(self) -> None:
     """More recently verified sorts first; null last."""
     today = date(2026, 3, 2)
     rec_recent = _record(
-      record_id="MEM-001", verified=date(2026, 3, 1),
+      record_id="mem.fact.alpha",
+      verified=date(2026, 3, 1),
     )
     rec_old = _record(
-      record_id="MEM-002", verified=date(2026, 1, 1),
+      record_id="mem.fact.beta",
+      verified=date(2026, 1, 1),
     )
-    rec_null = _record(record_id="MEM-003")
+    rec_null = _record(record_id="mem.fact.gamma")
     sorted_recs = sorted(
       [rec_null, rec_old, rec_recent],
       key=lambda r: sort_key(r, today=today),
     )
     self.assertEqual(
       [r.id for r in sorted_recs],
-      ["MEM-001", "MEM-002", "MEM-003"],
+      ["mem.fact.alpha", "mem.fact.beta", "mem.fact.gamma"],
     )
 
   def test_id_tiebreak(self) -> None:
     """Lexicographic ID as final tie-breaker."""
     records = [
-      _record(record_id="MEM-003"),
-      _record(record_id="MEM-001"),
-      _record(record_id="MEM-002"),
+      _record(record_id="mem.fact.gamma"),
+      _record(record_id="mem.fact.alpha"),
+      _record(record_id="mem.fact.beta"),
     ]
     sorted_recs = sorted(records, key=lambda r: sort_key(r))
     self.assertEqual(
       [r.id for r in sorted_recs],
-      ["MEM-001", "MEM-002", "MEM-003"],
+      ["mem.fact.alpha", "mem.fact.beta", "mem.fact.gamma"],
     )
 
   def test_missing_severity_defaults_to_none(self) -> None:
@@ -421,28 +438,29 @@ class TestSortKey(unittest.TestCase):
     """Same input set always produces same sort order."""
     records = [
       _record(
-        record_id="MEM-001",
+        record_id="mem.fact.alpha",
         priority={"severity": "high", "weight": 5},
         verified=date(2026, 3, 1),
       ),
       _record(
-        record_id="MEM-002",
+        record_id="mem.fact.beta",
         priority={"severity": "high", "weight": 5},
         verified=date(2026, 2, 1),
       ),
       _record(
-        record_id="MEM-003",
+        record_id="mem.fact.gamma",
         priority={"severity": "critical"},
       ),
     ]
     today = date(2026, 3, 2)
     for _ in range(10):
       sorted_recs = sorted(
-        records, key=lambda r: sort_key(r, today=today),
+        records,
+        key=lambda r: sort_key(r, today=today),
       )
       self.assertEqual(
         [r.id for r in sorted_recs],
-        ["MEM-003", "MEM-001", "MEM-002"],
+        ["mem.fact.gamma", "mem.fact.alpha", "mem.fact.beta"],
       )
 
 
@@ -500,8 +518,10 @@ class TestIsSurfaceable(unittest.TestCase):
     ctx = MatchContext(paths=["src/a.py"])
     self.assertFalse(
       is_surfaceable(
-        rec, context=ctx,
-        thread_recency_days=14, today=date(2026, 3, 2),
+        rec,
+        context=ctx,
+        thread_recency_days=14,
+        today=date(2026, 3, 2),
       ),
     )
 
@@ -518,7 +538,8 @@ class TestIsSurfaceable(unittest.TestCase):
 
   def test_thread_excluded_when_no_verified_date(self) -> None:
     rec = _record(
-      memory_type="thread", scope={"paths": ["src/a.py"]},
+      memory_type="thread",
+      scope={"paths": ["src/a.py"]},
     )
     ctx = MatchContext(paths=["src/a.py"])
     self.assertFalse(
@@ -536,12 +557,15 @@ class TestIsSurfaceable(unittest.TestCase):
   def test_skip_status_filter_still_checks_threads(self) -> None:
     """Thread recency check applies even with skip_status_filter."""
     rec = _record(
-      memory_type="thread", status="active",
+      memory_type="thread",
+      status="active",
       scope={"paths": ["src/a.py"]},
     )
     self.assertFalse(
       is_surfaceable(
-        rec, skip_status_filter=True, today=date(2026, 3, 2),
+        rec,
+        skip_status_filter=True,
+        today=date(2026, 3, 2),
       ),
     )
 
@@ -555,36 +579,42 @@ class TestSelect(unittest.TestCase):
   def _make_records(self) -> list[MemoryRecord]:
     return [
       _record(
-        record_id="MEM-001", status="active",
+        record_id="mem.fact.alpha",
+        status="active",
         memory_type="fact",
         priority={"severity": "high", "weight": 10},
         scope={"paths": ["src/auth/cache.ts"]},
         verified=date(2026, 3, 1),
       ),
       _record(
-        record_id="MEM-002", status="active",
+        record_id="mem.fact.beta",
+        status="active",
         memory_type="signpost",
         priority={"severity": "critical"},
         scope={"globs": ["src/**"]},
         verified=date(2026, 2, 15),
       ),
       _record(
-        record_id="MEM-003", status="deprecated",
+        record_id="mem.fact.gamma",
+        status="deprecated",
         memory_type="fact",
       ),
       _record(
-        record_id="MEM-004", status="draft",
+        record_id="mem.concept.delta",
+        status="draft",
         memory_type="concept",
         scope={"globs": ["**"]},
       ),
       _record(
-        record_id="MEM-005", status="active",
+        record_id="mem.thread.epsilon",
+        status="active",
         memory_type="thread",
         scope={"paths": ["src/auth/cache.ts"]},
         verified=date(2026, 3, 1),
       ),
       _record(
-        record_id="MEM-006", status="active",
+        record_id="mem.pattern.zeta",
+        status="active",
         memory_type="pattern",
         tags=["auth"],
       ),
@@ -595,13 +625,13 @@ class TestSelect(unittest.TestCase):
     records = self._make_records()
     result = select(records, today=date(2026, 3, 2))
     ids = [r.id for r in result]
-    # MEM-003 excluded (deprecated), MEM-004 (draft), MEM-005 (thread, no ctx)
-    self.assertIn("MEM-001", ids)
-    self.assertIn("MEM-002", ids)
-    self.assertIn("MEM-006", ids)
-    self.assertNotIn("MEM-003", ids)
-    self.assertNotIn("MEM-004", ids)
-    self.assertNotIn("MEM-005", ids)
+    # gamma excluded (deprecated), delta (draft), epsilon (thread, no ctx)
+    self.assertIn("mem.fact.alpha", ids)
+    self.assertIn("mem.fact.beta", ids)
+    self.assertIn("mem.pattern.zeta", ids)
+    self.assertNotIn("mem.fact.gamma", ids)
+    self.assertNotIn("mem.concept.delta", ids)
+    self.assertNotIn("mem.thread.epsilon", ids)
 
   def test_context_filters_by_scope(self) -> None:
     """With context, only scope-matched records returned."""
@@ -609,10 +639,10 @@ class TestSelect(unittest.TestCase):
     ctx = MatchContext(paths=["src/auth/cache.ts"])
     result = select(records, ctx, today=date(2026, 3, 2))
     ids = [r.id for r in result]
-    self.assertIn("MEM-001", ids)  # path match
-    self.assertIn("MEM-002", ids)  # glob match
-    self.assertIn("MEM-005", ids)  # thread, scoped + recent
-    self.assertNotIn("MEM-006", ids)  # tags only, no --match-tag
+    self.assertIn("mem.fact.alpha", ids)  # path match
+    self.assertIn("mem.fact.beta", ids)  # glob match
+    self.assertIn("mem.thread.epsilon", ids)  # thread, scoped + recent
+    self.assertNotIn("mem.pattern.zeta", ids)  # tags only, no --match-tag
 
   def test_ordering_is_deterministic(self) -> None:
     """Records sorted by severity > weight > specificity > verified."""
@@ -620,17 +650,17 @@ class TestSelect(unittest.TestCase):
     ctx = MatchContext(paths=["src/auth/cache.ts"])
     result = select(records, ctx, today=date(2026, 3, 2))
     ids = [r.id for r in result]
-    # MEM-002: critical, glob(2)
-    # MEM-001: high, weight=10, path(3)
-    # MEM-005: no severity(none), path(3), verified recent
-    self.assertEqual(ids[0], "MEM-002")  # critical first
-    self.assertEqual(ids[1], "MEM-001")  # high second
+    # beta: critical, glob(2)
+    # alpha: high, weight=10, path(3)
+    # epsilon: no severity(none), path(3), verified recent
+    self.assertEqual(ids[0], "mem.fact.beta")  # critical first
+    self.assertEqual(ids[1], "mem.fact.alpha")  # high second
 
   def test_include_draft(self) -> None:
     records = self._make_records()
     result = select(records, include_draft=True, today=date(2026, 3, 2))
     ids = [r.id for r in result]
-    self.assertIn("MEM-004", ids)
+    self.assertIn("mem.concept.delta", ids)
 
   def test_limit(self) -> None:
     records = self._make_records()

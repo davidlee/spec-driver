@@ -627,7 +627,13 @@ def create_card(
 
 @app.command("memory")
 def create_memory_cmd(
-  name: Annotated[str, typer.Argument(help="Name for the new memory")],
+  memory_id: Annotated[
+    str,
+    typer.Argument(
+      help="Semantic ID (e.g., mem.pattern.cli.skinny or pattern.cli.skinny)",
+    ),
+  ],
+  name: Annotated[str, typer.Option("--name", "-n", help="Display name")],
   memory_type: Annotated[
     str,
     typer.Option(
@@ -650,10 +656,15 @@ def create_memory_cmd(
   ] = "",
   root: RootOption = None,
 ) -> None:
-  """Create a new memory record with the next available ID."""
+  """Create a new memory record with a semantic ID.
+
+  ID format: mem.<type>.<domain>.<subject>[.<purpose>]
+  The 'mem.' prefix is prepended automatically if omitted.
+  """
   try:
     registry = MemoryRegistry(root=root)
     options = MemoryCreationOptions(
+      memory_id=memory_id,
       name=name,
       memory_type=memory_type,
       status=status,
@@ -662,6 +673,11 @@ def create_memory_cmd(
     )
 
     result = create_memory_impl(registry, options)
+
+    if result.warnings:
+      for w in result.warnings:
+        typer.echo(f"Warning: {w}", err=True)
+
     typer.echo(f"Created memory: {result.memory_id}")
     typer.echo(str(result.path))
     raise typer.Exit(EXIT_SUCCESS)

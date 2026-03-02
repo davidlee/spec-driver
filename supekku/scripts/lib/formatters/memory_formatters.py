@@ -161,8 +161,13 @@ def _prepare_memory_row(record: MemoryRecord) -> list[str]:
   updated = record.updated.strftime("%Y-%m-%d") if record.updated else "—"
 
   return [
-    mem_id, status, record.memory_type, record.name,
-    confidence, tags_styled, updated,
+    mem_id,
+    status,
+    record.memory_type,
+    record.name,
+    confidence,
+    tags_styled,
+    updated,
   ]
 
 
@@ -199,10 +204,16 @@ def _format_memory_as_tsv_rows(
   rows = []
   for record in records:
     updated = record.updated.strftime("%Y-%m-%d") if record.updated else "N/A"
-    rows.append([
-      record.id, record.status, record.memory_type,
-      record.name, record.confidence or "", updated,
-    ])
+    rows.append(
+      [
+        record.id,
+        record.status,
+        record.memory_type,
+        record.name,
+        record.confidence or "",
+        updated,
+      ]
+    )
   return rows
 
 

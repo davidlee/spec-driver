@@ -16,11 +16,11 @@ from supekku.scripts.lib.memory.models import MemoryRecord
 def _make_record(**overrides) -> MemoryRecord:
   """Create a MemoryRecord with sensible defaults, overridable."""
   defaults = {
-    "id": "MEM-001",
+    "id": "mem.fact.test",
     "name": "Test Memory",
     "status": "active",
     "memory_type": "fact",
-    "path": "/repo/memory/MEM-001-test_memory.md",
+    "path": "/repo/memory/mem.fact.test.md",
     "created": date(2026, 1, 15),
     "updated": date(2026, 2, 1),
   }
@@ -37,7 +37,7 @@ class TestFormatMemoryDetails:
   def test_minimal_record(self) -> None:
     record = _make_record()
     output = format_memory_details(record)
-    assert "MEM-001" in output
+    assert "mem.fact.test" in output
     assert "Test Memory" in output
     assert "active" in output
     assert "fact" in output
@@ -67,7 +67,7 @@ class TestFormatMemoryDetails:
   def test_includes_path(self) -> None:
     record = _make_record()
     output = format_memory_details(record)
-    assert "MEM-001-test_memory.md" in output
+    assert "mem.fact.test.md" in output
 
   def test_omits_empty_optional_fields(self) -> None:
     record = _make_record(confidence=None, tags=[], summary="")
@@ -80,7 +80,7 @@ class TestFormatMemoryDetails:
     record = _make_record(created=None, updated=None)
     output = format_memory_details(record)
     # Should still format without error
-    assert "MEM-001" in output
+    assert "mem.fact.test" in output
 
   def test_full_record(self) -> None:
     """All non-empty fields render in detail view."""
@@ -101,9 +101,11 @@ class TestFormatMemoryDetails:
         "languages": ["ts"],
       },
       priority={"severity": "high", "weight": 10},
-      provenance={"sources": [
-        {"kind": "adr", "ref": "ADR-011.md", "note": "Primary"},
-      ]},
+      provenance={
+        "sources": [
+          {"kind": "adr", "ref": "ADR-011.md", "note": "Primary"},
+        ]
+      },
       relations=[
         {"type": "implements", "target": "FR-102", "annotation": "Auth cache"},
       ],
@@ -168,10 +170,10 @@ class TestFormatMemoryListTable:
   """Tests for format_memory_list_table."""
 
   def test_table_output(self) -> None:
-    records = [_make_record(), _make_record(id="MEM-002", name="Other")]
+    records = [_make_record(), _make_record(id="mem.fact.other", name="Other")]
     output = format_memory_list_table(records)
-    assert "MEM-001" in output
-    assert "MEM-002" in output
+    assert "mem.fact.test" in output
+    assert "mem.fact.other" in output
 
   def test_json_format(self) -> None:
     records = [_make_record()]
@@ -179,12 +181,12 @@ class TestFormatMemoryListTable:
     parsed = json.loads(output)
     assert "items" in parsed
     assert len(parsed["items"]) == 1
-    assert parsed["items"][0]["id"] == "MEM-001"
+    assert parsed["items"][0]["id"] == "mem.fact.test"
 
   def test_tsv_format(self) -> None:
     records = [_make_record()]
     output = format_memory_list_table(records, format_type="tsv")
-    assert "MEM-001" in output
+    assert "mem.fact.test" in output
     assert "\t" in output
 
   def test_empty_list(self) -> None:
@@ -201,7 +203,7 @@ class TestFormatMemoryListTable:
     """Table with truncate=True does not error and still renders."""
     records = [_make_record(name="A" * 200, tags=["tag-" + str(i) for i in range(20)])]
     output = format_memory_list_table(records, truncate=True)
-    assert "MEM-001" in output
+    assert "mem.fact.test" in output
     # Truncated content should not contain the full long name
     assert "A" * 200 not in output
 
@@ -209,7 +211,7 @@ class TestFormatMemoryListTable:
     """TSV rows have exactly 6 columns: id, status, type, name, confidence, updated."""
     records = [
       _make_record(confidence="high"),
-      _make_record(id="MEM-002", name="Second", confidence=None),
+      _make_record(id="mem.fact.other", name="Second", confidence=None),
     ]
     output = format_memory_list_table(records, format_type="tsv")
     rows = output.strip().split("\n")
@@ -223,7 +225,7 @@ class TestFormatMemoryListTable:
     records = [_make_record(confidence="medium")]
     output = format_memory_list_table(records, format_type="tsv")
     cols = output.strip().split("\t")
-    assert cols[0] == "MEM-001"
+    assert cols[0] == "mem.fact.test"
     assert cols[1] == "active"
     assert cols[2] == "fact"
     assert cols[3] == "Test Memory"
@@ -250,15 +252,19 @@ class TestFormatMemoryListJson:
     parsed = json.loads(output)
     assert "items" in parsed
     item = parsed["items"][0]
-    assert item["id"] == "MEM-001"
+    assert item["id"] == "mem.fact.test"
     assert item["name"] == "Test Memory"
     assert item["status"] == "active"
     assert item["memory_type"] == "fact"
 
   def test_includes_optional_fields(self) -> None:
-    records = [_make_record(
-      tags=["core"], confidence="high", summary="Brief",
-    )]
+    records = [
+      _make_record(
+        tags=["core"],
+        confidence="high",
+        summary="Brief",
+      )
+    ]
     output = format_memory_list_json(records)
     item = json.loads(output)["items"][0]
     assert item["tags"] == ["core"]

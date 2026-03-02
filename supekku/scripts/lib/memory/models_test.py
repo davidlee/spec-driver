@@ -15,22 +15,22 @@ class TestMemoryRecord(unittest.TestCase):
   def test_minimal_construction(self) -> None:
     """Construct with only required fields."""
     record = MemoryRecord(
-      id="MEM-001",
+      id="mem.fact.test",
       name="Test Memory",
       status="active",
       memory_type="fact",
-      path="/repo/memory/MEM-001-test.md",
+      path="/repo/memory/mem.fact.test.md",
     )
-    self.assertEqual(record.id, "MEM-001")
+    self.assertEqual(record.id, "mem.fact.test")
     self.assertEqual(record.name, "Test Memory")
     self.assertEqual(record.status, "active")
     self.assertEqual(record.memory_type, "fact")
-    self.assertEqual(record.path, "/repo/memory/MEM-001-test.md")
+    self.assertEqual(record.path, "/repo/memory/mem.fact.test.md")
 
   def test_optional_fields_default(self) -> None:
     """Optional fields have sensible defaults."""
     record = MemoryRecord(
-      id="MEM-001",
+      id="mem.fact.test",
       name="Test",
       status="active",
       memory_type="fact",
@@ -55,11 +55,11 @@ class TestMemoryRecord(unittest.TestCase):
   def test_full_construction(self) -> None:
     """Construct with all fields populated."""
     record = MemoryRecord(
-      id="MEM-042",
+      id="mem.signpost.auth.prereading",
       name="ADR-11 Required Pre-Reading",
       status="active",
       memory_type="signpost",
-      path="/repo/memory/MEM-042-adr11-prereading.md",
+      path="/repo/memory/mem.signpost.auth.prereading.md",
       created=date(2026, 2, 1),
       updated=date(2026, 3, 1),
       confidence="high",
@@ -88,20 +88,20 @@ class TestMemoryRecord(unittest.TestCase):
   def test_to_dict_minimal(self) -> None:
     """to_dict with minimal record omits empty optional fields."""
     record = MemoryRecord(
-      id="MEM-001",
+      id="mem.fact.test",
       name="Test",
       status="active",
       memory_type="fact",
-      path="/repo/memory/MEM-001-test.md",
+      path="/repo/memory/mem.fact.test.md",
     )
     root = Path("/repo")
     d = record.to_dict(root)
 
-    self.assertEqual(d["id"], "MEM-001")
+    self.assertEqual(d["id"], "mem.fact.test")
     self.assertEqual(d["name"], "Test")
     self.assertEqual(d["status"], "active")
     self.assertEqual(d["memory_type"], "fact")
-    self.assertEqual(d["path"], "memory/MEM-001-test.md")
+    self.assertEqual(d["path"], "memory/mem.fact.test.md")
     # Optional fields omitted when empty/None
     self.assertNotIn("created", d)
     self.assertNotIn("tags", d)
@@ -111,11 +111,11 @@ class TestMemoryRecord(unittest.TestCase):
   def test_to_dict_full(self) -> None:
     """to_dict includes all populated fields."""
     record = MemoryRecord(
-      id="MEM-042",
+      id="mem.signpost.auth.prereading",
       name="Auth Pre-Reading",
       status="active",
       memory_type="signpost",
-      path="/repo/memory/MEM-042-auth.md",
+      path="/repo/memory/mem.signpost.auth.prereading.md",
       created=date(2026, 2, 1),
       updated=date(2026, 3, 1),
       confidence="high",
@@ -154,19 +154,19 @@ class TestMemoryRecord(unittest.TestCase):
   def test_to_dict_path_relativization(self) -> None:
     """to_dict relativizes path against root."""
     record = MemoryRecord(
-      id="MEM-001",
+      id="mem.fact.test",
       name="Test",
       status="active",
       memory_type="fact",
-      path="/my/project/memory/MEM-001-test.md",
+      path="/my/project/memory/mem.fact.test.md",
     )
     d = record.to_dict(Path("/my/project"))
-    self.assertEqual(d["path"], "memory/MEM-001-test.md")
+    self.assertEqual(d["path"], "memory/mem.fact.test.md")
 
   def test_to_dict_empty_path(self) -> None:
     """to_dict handles empty path."""
     record = MemoryRecord(
-      id="MEM-001",
+      id="mem.fact.test",
       name="Test",
       status="active",
       memory_type="fact",
@@ -178,22 +178,23 @@ class TestMemoryRecord(unittest.TestCase):
   def test_from_frontmatter_minimal(self) -> None:
     """from_frontmatter constructs record from minimal frontmatter dict."""
     fm = {
-      "id": "MEM-001",
+      "id": "mem.fact.test",
       "name": "Test",
       "status": "active",
       "memory_type": "fact",
     }
     record = MemoryRecord.from_frontmatter(
-      Path("/repo/memory/MEM-001-test.md"), fm,
+      Path("/repo/memory/mem.fact.test.md"),
+      fm,
     )
-    self.assertEqual(record.id, "MEM-001")
+    self.assertEqual(record.id, "mem.fact.test")
     self.assertEqual(record.memory_type, "fact")
-    self.assertEqual(record.path, "/repo/memory/MEM-001-test.md")
+    self.assertEqual(record.path, "/repo/memory/mem.fact.test.md")
 
   def test_from_frontmatter_with_dates(self) -> None:
     """from_frontmatter parses date strings and date objects."""
     fm = {
-      "id": "MEM-001",
+      "id": "mem.fact.test",
       "name": "Test",
       "status": "active",
       "memory_type": "fact",
@@ -202,7 +203,7 @@ class TestMemoryRecord(unittest.TestCase):
       "verified": "2026-03-01",
       "review_by": "2026-06-01",
     }
-    record = MemoryRecord.from_frontmatter(Path("/repo/MEM-001.md"), fm)
+    record = MemoryRecord.from_frontmatter(Path("/repo/mem.fact.test.md"), fm)
     self.assertEqual(record.created, date(2026, 3, 1))
     self.assertEqual(record.updated, date(2026, 3, 2))
     self.assertEqual(record.verified, date(2026, 3, 1))
@@ -211,7 +212,7 @@ class TestMemoryRecord(unittest.TestCase):
   def test_from_frontmatter_full(self) -> None:
     """from_frontmatter handles all optional fields."""
     fm = {
-      "id": "MEM-042",
+      "id": "mem.signpost.auth.prereading",
       "name": "Auth Pre-Reading",
       "status": "active",
       "memory_type": "signpost",
@@ -227,7 +228,8 @@ class TestMemoryRecord(unittest.TestCase):
       "visibility": ["pre", "on_demand"],
       "relations": [{"type": "relates_to", "target": "ADR-011"}],
     }
-    record = MemoryRecord.from_frontmatter(Path("/repo/MEM-042.md"), fm)
+    path = Path("/repo/mem.signpost.auth.prereading.md")
+    record = MemoryRecord.from_frontmatter(path, fm)
     self.assertEqual(record.confidence, "high")
     self.assertEqual(record.requires_reading, ["ADR-011"])
     self.assertEqual(record.scope, {"globs": ["src/**"]})
@@ -237,14 +239,14 @@ class TestMemoryRecord(unittest.TestCase):
   def test_from_frontmatter_bad_date_ignored(self) -> None:
     """from_frontmatter sets None for unparseable dates."""
     fm = {
-      "id": "MEM-001",
+      "id": "mem.fact.test",
       "name": "Test",
       "status": "active",
       "memory_type": "fact",
       "created": "not-a-date",
       "verified": "March 2026",
     }
-    record = MemoryRecord.from_frontmatter(Path("/repo/MEM-001.md"), fm)
+    record = MemoryRecord.from_frontmatter(Path("/repo/mem.fact.test.md"), fm)
     self.assertIsNone(record.created)
     self.assertIsNone(record.verified)
 

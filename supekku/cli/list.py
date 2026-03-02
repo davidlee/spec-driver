@@ -1983,14 +1983,16 @@ def list_memories(  # noqa: PLR0913
   path: Annotated[
     list[str] | None,
     typer.Option(
-      "--path", "-p",
+      "--path",
+      "-p",
       help="Scope match: paths (repeatable)",
     ),
   ] = None,
   command: Annotated[
     str | None,
     typer.Option(
-      "--command", "-c",
+      "--command",
+      "-c",
       help="Scope match: command string (token-prefix)",
     ),
   ] = None,
@@ -2040,7 +2042,9 @@ def list_memories(  # noqa: PLR0913
     # Step 1: metadata pre-filter
     if any([memory_type, tag]):
       records = registry.filter(
-        memory_type=memory_type, tag=tag, status=status,
+        memory_type=memory_type,
+        tag=tag,
+        status=status,
       )
     else:
       records = list(registry.iter(status=status))
@@ -2049,9 +2053,12 @@ def list_memories(  # noqa: PLR0913
     if regexp:
       try:
         records = [
-          r for r in records
+          r
+          for r in records
           if matches_regexp(
-            regexp, [r.name, r.summary], case_insensitive,
+            regexp,
+            [r.name, r.summary],
+            case_insensitive,
           )
         ]
       except re.error as e:
@@ -2060,14 +2067,19 @@ def list_memories(  # noqa: PLR0913
 
     # Step 3: build context and apply selection pipeline
     has_context = any([path, command, match_tag])
-    context = MatchContext(
-      paths=path or [],
-      command=command,
-      tags=match_tag or [],
-    ) if has_context else None
+    context = (
+      MatchContext(
+        paths=path or [],
+        command=command,
+        tags=match_tag or [],
+      )
+      if has_context
+      else None
+    )
 
     records = select(
-      records, context,
+      records,
+      context,
       include_draft=include_draft,
       skip_status_filter=status is not None,
       limit=limit,

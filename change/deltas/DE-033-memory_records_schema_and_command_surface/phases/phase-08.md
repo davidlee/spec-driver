@@ -4,7 +4,7 @@ slug: 033-memory_records_schema_and_command_surface-phase-08
 name: IP-033 Phase 08 - Inline Link Parsing & Resolution
 created: '2026-03-03'
 updated: '2026-03-03'
-status: in_progress
+status: completed
 kind: phase
 ---
 
@@ -102,9 +102,9 @@ frontmatter `links` field, and provide CLI + sync integration.
 - [x] `cli/sync.py` — --memory-links flag
 - [x] 2087 tests pass (up from 1984)
 - [x] ruff clean
-- [ ] pylint cleanup on resolve.py (9.33 → target ≥9.6)
-- [ ] VT-MEM-LINKS-001 status updated to verified in IP-033
-- [ ] IP-033 phase overview updated
+- [x] pylint cleanup on resolve.py (8.54 → 10.00 — extracted per-registry collectors, top-level imports)
+- [x] VT-MEM-LINKS-001 status updated to verified in IP-033
+- [x] IP-033 phase overview updated
 
 ## 5. Verification
 ```bash
@@ -125,7 +125,7 @@ uv run spec-driver resolve --help             # Shows links subcommand
 | [x] | 8.3 | Schema + model | links FieldMetadata (out/missing arrays), MemoryRecord.links field. 9 tests. |
 | [x] | 8.4 | CLI + sync | `cli/resolve.py` resolve links [--dry-run], sync --memory-links. 8 CLI tests. |
 | [x] | 8.5 | Formatter | _format_links(), wired into details + JSON. 6 formatter tests. |
-| [ ] | 8.6 | Verification | pylint cleanup, IP-033 VT status update. Blocked on pylint refactor. |
+| [x] | 8.6 | Verification | pylint 10.00 (extracted collectors + top-level imports), IP-033 updated. |
 
 ## 8. Outstanding Work
 

@@ -20,6 +20,7 @@ Review procedure:
     - Scope: does it surface under the correct `--path/--command/--match-tag` queries? If not, fix `scope.*`.
     - Actionability: does it contain executable steps/pointers (especially for pattern/signpost/system)? If not, rewrite to be procedural or convert to a signpost.
     - Duplication/conflict: does it overlap or contradict another memory? If yes, merge/supersede immediately.
+    - Links: run `spec-driver resolve links --dry-run` to check for broken `[[...]]` references. Missing targets may indicate renamed/deleted artifacts.
 
 4) Thread hygiene (mandatory):
     - Threads are context-dependent and should not linger. Any thread that is not verified recently (or no longer relevant to current work) must be moved to `archived`, `superseded`, or converted into a durable fact/pattern/system record with proper scope and provenance.

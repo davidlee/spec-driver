@@ -16,6 +16,7 @@ description: |
   3) Apply minimal corrective edits:
      - Prefer changing the memory to point to the new authority rather than restating details.
      - Update `updated` and (when you have verified against reality) set `verified` to today; set/adjust `review_by` based on volatility (short for pattern/thread, longer for system/concept).
+     - If you edited the body and it contains `[[...]]` references, run `spec-driver resolve links` to update `links.out`. Stale links are cleared automatically.
 
   4) Handle lifecycle states aggressively:
      - If a record is wrong and replaced, mark the old one `superseded` and create/update the successor; link via `relations` (type + target + annotation) or `superseded_by`/`supersedes` if you use that convention.

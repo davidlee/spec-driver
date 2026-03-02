@@ -27,8 +27,12 @@ Procedure:
 
 4) Keep the body short and executable:
     - Put the “do X” steps in bullets with exact command snippets.
+    - Use `[[artifact-id]]` in prose to reference related artifacts (e.g., `[[ADR-012]]`, `[[mem.pattern.cli.skinny]]`). These are cheaper than manual `relations` entries and auto-resolve into frontmatter `links.out`. Reserve `relations` for lifecycle semantics (supersedes, depends_on).
     - For system/concept/signpost, prefer pointers to authoritative artifacts over restating them.
     - If the item would become an ADR/SPEC/other artifact, STOP and link to the proper artifact instead; memory should remain a pointer/recipe layer.
 
 5) Immediately sanity-check surfaceability:
     - Run `spec-driver list memories --type <type> --path ... --command ... --match-tag ...` to confirm it appears under the intended context.
+
+6) Resolve inline links (if body contains `[[...]]`):
+    - `spec-driver resolve links` — populates `links.out` from body tokens. Optional but recommended; can also be done in bulk later.

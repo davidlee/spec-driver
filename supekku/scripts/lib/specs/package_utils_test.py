@@ -38,6 +38,7 @@ KNOWN_LEAF_PACKAGES = {
   "supekku/scripts/lib/deletion",
   "supekku/scripts/lib/docs/python",
   "supekku/scripts/lib/formatters",
+  "supekku/scripts/lib/memory",
   "supekku/scripts/lib/policies",
   "supekku/scripts/lib/relations",
   "supekku/scripts/lib/requirements",
@@ -163,12 +164,12 @@ class TestValidatePackagePath:
 class TestFindAllLeafPackages:
   """Test find_all_leaf_packages() function."""
 
-  def test_finds_all_21_leaf_packages_in_supekku(self) -> None:
-    """Test that all 21 known leaf packages are discovered."""
+  def test_finds_all_22_leaf_packages_in_supekku(self) -> None:
+    """Test that all 22 known leaf packages are discovered."""
     result = find_all_leaf_packages(Path("supekku"))
     result_set = {str(p) for p in result}
 
-    assert len(result) == 21, f"Expected 21 leaf packages, found {len(result)}"
+    assert len(result) == 22, f"Expected 22 leaf packages, found {len(result)}"
     assert result_set == KNOWN_LEAF_PACKAGES
 
   def test_returns_sorted_results(self) -> None:

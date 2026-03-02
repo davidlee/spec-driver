@@ -4,7 +4,7 @@ slug: memory-domain-model-and-registry
 name: IP-033 Phase 02 - Domain Model & Registry
 created: '2026-03-02'
 updated: '2026-03-02'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -75,15 +75,15 @@ Build the `supekku/scripts/lib/memory/` domain package with a `MemoryRecord` mod
 ## 3. Entrance Criteria
 - [x] Phase 1 complete — memory metadata profile validates, 28 tests pass
 - [x] DecisionRegistry pattern reviewed as reference architecture
-- [ ] Memory file storage convention agreed (default: `memory/` at repo root)
+- [x] Memory file storage convention agreed — `memory/` at repo root (configurable via constructor)
 
 ## 4. Exit Criteria / Done When
-- [ ] `MemoryRecord` dataclass with all memory-specific fields
-- [ ] `MemoryRegistry` discovers `MEM-*.md` files, parses frontmatter, builds index
-- [ ] `find(id)`, `iter(status=)`, `filter(memory_type=, tag=, ...)` methods work
-- [ ] `to_dict()` serialization for future YAML registry output
-- [ ] Unit tests passing
-- [ ] Lint passing (ruff + pylint)
+- [x] `MemoryRecord` dataclass with all memory-specific fields (20 attrs incl. scope, priority, provenance)
+- [x] `MemoryRegistry` discovers `MEM-*.md` files, parses frontmatter, builds index
+- [x] `find(id)`, `iter(status=)`, `filter(memory_type=, tag=, status=)` methods work
+- [x] `to_dict(root)` serialization for future YAML registry output
+- [x] Unit tests passing — 30 tests (11 model + 19 registry)
+- [x] Lint passing — ruff clean, pylint 9.98/10 (only `too-many-instance-attributes` on dataclass, same as DecisionRecord)
 
 ## 5. Verification
 - `uv run pytest supekku/scripts/lib/memory/ -v`
@@ -101,13 +101,13 @@ Build the `supekku/scripts/lib/memory/` domain package with a `MemoryRecord` mod
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Create memory package structure | | `__init__.py` + empty modules |
-| [ ] | 2.2 | Implement MemoryRecord model | | Dataclass with typed fields |
-| [ ] | 2.3 | Write model tests | [P] | Construction, to_dict, edge cases |
-| [ ] | 2.4 | Implement MemoryRegistry | | collect, find, iter, filter |
-| [ ] | 2.5 | Create test fixtures | [P] | Sample MEM-*.md files |
-| [ ] | 2.6 | Write registry tests | | Discovery, parsing, filtering |
-| [ ] | 2.7 | Lint and quality check | | ruff + pylint |
+| [x] | 2.1 | Create memory package structure | | `__init__.py` |
+| [x] | 2.2 | Implement MemoryRecord model | | Dataclass with from_frontmatter + to_dict |
+| [x] | 2.3 | Write model tests | [P] | 11 tests: construction, to_dict, from_frontmatter, edge cases |
+| [x] | 2.4 | Implement MemoryRegistry | | collect, find, iter, filter |
+| [x] | 2.5 | Create test fixtures | [P] | Inline YAML fixtures in registry_test.py |
+| [x] | 2.6 | Write registry tests | | 19 tests: discovery, parsing, filtering, integration |
+| [x] | 2.7 | Lint and quality check | | ruff clean, pylint 9.98/10 |
 
 ### Task Details
 
@@ -132,16 +132,20 @@ Build the `supekku/scripts/lib/memory/` domain package with a `MemoryRecord` mod
 | Storage location not finalized | Default to `memory/`; accept path override in constructor | Open |
 
 ## 9. Decisions & Outcomes
-- *None yet — record during implementation*
+- `_parse_date` extracted as module-level function in `models.py` (not a method on MemoryRecord or MemoryRegistry). Reduces coupling; potential consolidation target with DecisionRegistry.parse_date in future.
+- Test fixtures are inline YAML strings in `registry_test.py` rather than separate fixture files. Simpler, self-contained, no fixture directory maintenance.
+- `MemoryRegistry.directory` is configurable via constructor kwarg, defaulting to `root / "memory"`.
 
 ## 10. Findings / Research Notes
-- DecisionRegistry uses `load_markdown_file()` from `supekku/scripts/lib/core/` for frontmatter parsing
-- DecisionRecord uses `@dataclass` with `field(default_factory=list)` for optional lists
-- Registry pattern: `__init__` → `collect()` → `find/iter/filter` — memory should follow same shape
+- DecisionRegistry uses `load_markdown_file()` from `supekku/scripts/lib/core/` for frontmatter parsing — reused here.
+- DecisionRecord uses `@dataclass` with `field(default_factory=list)` for optional lists — same pattern adopted.
+- `parse_date` is duplicated across DecisionRegistry, PolicyRegistry, StandardRegistry. Extracted as `_parse_date` module function in models.py — future consolidation opportunity into `core/`.
+- Added `memory` to KNOWN_LEAF_PACKAGES in `package_utils_test.py` (21→22 leaf packages).
+- pylint `too-many-instance-attributes` warning is expected for rich data models (DecisionRecord has same). Not suppressed.
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] IP-033 updated with Phase 2 outcomes
-- [ ] Notes.md updated
-- [ ] Hand-off notes to Phase 3 (CLI surface)
+- [x] Exit criteria satisfied
+- [x] Verification evidence: 30 tests passing, ruff clean, pylint 9.98/10
+- [x] IP-033 updated with Phase 2 outcomes
+- [x] Notes.md updated
+- [x] Hand-off notes to Phase 3 (CLI surface)

@@ -11,6 +11,7 @@ from .paths import SPEC_DRIVER_DIR
 
 DEFAULT_CONFIG: dict = {
   "ceremony": "pioneer",
+  "strict_mode": False,
   "tool": {
     "exec": "uv run spec-driver",
   },
@@ -103,7 +104,13 @@ def _merge_defaults(user_config: dict) -> dict:
   return result
 
 
+def is_strict_mode(config: dict) -> bool:
+  """Return whether strict mode is enabled in the given config."""
+  return config.get("strict_mode", False) is True
+
+
 __all__ = [
   "DEFAULT_CONFIG",
+  "is_strict_mode",
   "load_workflow_config",
 ]

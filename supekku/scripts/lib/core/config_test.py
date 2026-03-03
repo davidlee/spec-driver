@@ -8,6 +8,7 @@ import pytest
 
 from supekku.scripts.lib.core.config import (
   DEFAULT_CONFIG,
+  is_strict_mode,
   load_workflow_config,
 )
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
@@ -138,3 +139,52 @@ def test_defaults_have_expected_structure() -> None:
   assert isinstance(DEFAULT_CONFIG["authoring"], dict)
   assert isinstance(DEFAULT_CONFIG["verification"], dict)
   assert isinstance(DEFAULT_CONFIG["integration"], dict)
+
+
+# --- strict_mode config tests ---
+
+
+def test_strict_mode_defaults_to_false() -> None:
+  """strict_mode must default to False in DEFAULT_CONFIG."""
+  assert DEFAULT_CONFIG["strict_mode"] is False
+
+
+def test_strict_mode_false_when_toml_absent(tmp_path: Path) -> None:
+  """Missing workflow.toml should yield strict_mode=False."""
+  config = load_workflow_config(tmp_path)
+  assert config["strict_mode"] is False
+
+
+def test_strict_mode_true_loads_from_toml(tmp_path: Path) -> None:
+  """strict_mode=true in workflow.toml is loaded correctly."""
+  toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+  toml_path.parent.mkdir(parents=True)
+  toml_path.write_text("strict_mode = true\n", encoding="utf-8")
+
+  config = load_workflow_config(tmp_path)
+  assert config["strict_mode"] is True
+
+
+def test_strict_mode_false_loads_from_toml(tmp_path: Path) -> None:
+  """Explicit strict_mode=false in workflow.toml is respected."""
+  toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+  toml_path.parent.mkdir(parents=True)
+  toml_path.write_text("strict_mode = false\n", encoding="utf-8")
+
+  config = load_workflow_config(tmp_path)
+  assert config["strict_mode"] is False
+
+
+def test_is_strict_mode_returns_true_when_enabled() -> None:
+  """is_strict_mode() returns True when strict_mode=true in config."""
+  assert is_strict_mode({"strict_mode": True}) is True
+
+
+def test_is_strict_mode_returns_false_when_disabled() -> None:
+  """is_strict_mode() returns False when strict_mode=false in config."""
+  assert is_strict_mode({"strict_mode": False}) is False
+
+
+def test_is_strict_mode_returns_false_when_key_missing() -> None:
+  """is_strict_mode() returns False when strict_mode key is absent."""
+  assert is_strict_mode({}) is False

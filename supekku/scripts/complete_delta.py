@@ -24,6 +24,7 @@ from supekku.scripts.lib.changes.updater import (
   RevisionUpdateError,
   update_requirement_lifecycle_status,
 )
+from supekku.scripts.lib.core.config import is_strict_mode, load_workflow_config
 from supekku.scripts.lib.requirements.lifecycle import STATUS_ACTIVE
 from supekku.scripts.lib.workspace import Workspace
 
@@ -418,6 +419,22 @@ def complete_delta(
   """
   workspace = Workspace.from_cwd()
 
+  # Strict-mode enforcement: block bypass flags (DEC-039-01, DEC-039-04)
+  config = load_workflow_config(workspace.root)
+  if is_strict_mode(config):
+    if force:
+      print("Error: --force is not permitted in strict mode", file=sys.stderr)
+      return 1
+    if not update_requirements:
+      print(
+        "Error: --skip-update-requirements is not permitted in strict mode",
+        file=sys.stderr,
+      )
+      return 1
+    if skip_sync:
+      print("Error: --skip-sync is not permitted in strict mode", file=sys.stderr)
+      return 1
+
   # Load and validate delta
   delta_registry = workspace.delta_registry
   delta_artifacts = delta_registry.collect()
@@ -481,6 +498,13 @@ def complete_delta(
         display_coverage_error(delta_id, missing, workspace.root)
         return 1
   else:
+    if is_strict_mode(config):
+      print(
+        "Error: disabling coverage enforcement via"
+        " SPEC_DRIVER_ENFORCE_COVERAGE is not permitted in strict mode",
+        file=sys.stderr,
+      )
+      return 1
     # Log that enforcement is disabled
     print("Note: Coverage enforcement is disabled via SPEC_DRIVER_ENFORCE_COVERAGE")
 

@@ -15,7 +15,7 @@ This package contains foundational utilities depended upon by all other domains:
 
 from __future__ import annotations
 
-from .config import load_workflow_config
+from .config import is_strict_mode, load_workflow_config
 from .editor import (
   EditorError,
   EditorInvocationError,
@@ -44,6 +44,7 @@ __all__: list[str] = [
   "PackageManager",
   "PackageManagerInfo",
   "detect_package_manager",
+  "is_strict_mode",
   "load_workflow_config",
   "find_editor",
   "get_install_instructions",

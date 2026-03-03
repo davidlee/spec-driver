@@ -12,6 +12,7 @@ from supekku.scripts.lib.backlog.registry import create_backlog_entry
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.creation import (
   PhaseCreationError,
+  create_audit,
   create_delta,
   create_phase,
   create_requirement_breakout,
@@ -296,6 +297,47 @@ def create_revision_cmd(
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating revision: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("audit")
+def create_audit_cmd(
+  title: Annotated[str, typer.Argument(help="Audit title")],
+  specs: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--spec",
+      help="Spec ID referenced (repeatable)",
+    ),
+  ] = None,
+  prods: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--prod",
+      help="Product spec ID referenced (repeatable)",
+    ),
+  ] = None,
+  code_scope: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--code-scope",
+      help="Code scope pattern (repeatable)",
+    ),
+  ] = None,
+) -> None:
+  """Create an Audit bundle."""
+  try:
+    result = create_audit(
+      title,
+      spec_refs=specs,
+      prod_refs=prods,
+      code_scope=code_scope,
+    )
+    typer.echo(f"Audit created: {result.artifact_id}")
+    typer.echo(str(result.primary_path))
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error creating audit: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
 

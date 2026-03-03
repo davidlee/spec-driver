@@ -1,11 +1,12 @@
-"""Utilities for creating completion revisions.
+"""Utilities for completing and creating completion revisions.
 
-Documenting delta lifecycle transitions.
+Documenting delta lifecycle transitions and completing revisions.
 """
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import yaml
@@ -13,6 +14,8 @@ import yaml
 from supekku.scripts.lib.requirements.lifecycle import STATUS_ACTIVE
 
 from .creation import create_revision
+from .lifecycle import STATUS_COMPLETED, STATUS_DRAFT, STATUS_IN_PROGRESS
+from .registry import ChangeRegistry
 
 if TYPE_CHECKING:
   from .workspace import Workspace
@@ -202,4 +205,98 @@ def create_completion_revision(
   return revision_id
 
 
-__all__ = ["create_completion_revision"]
+def _update_artifact_frontmatter_status(
+  path: Path,
+  status: str,
+) -> bool:
+  """Update status and updated date in artifact frontmatter.
+
+  Args:
+    path: Path to the artifact markdown file.
+    status: New status value.
+
+  Returns:
+    True if frontmatter was successfully updated, False otherwise.
+  """
+  if not path.exists():
+    return False
+
+  content = path.read_text(encoding="utf-8")
+  lines = content.splitlines()
+  today = date.today().isoformat()
+
+  in_frontmatter = False
+  updated_lines = []
+  status_updated = False
+
+  for line in lines:
+    if line.strip() == "---":
+      in_frontmatter = not in_frontmatter
+      updated_lines.append(line)
+      continue
+
+    if in_frontmatter and line.startswith("status:"):
+      updated_lines.append(f"status: {status}")
+      status_updated = True
+    elif in_frontmatter and line.startswith("updated:"):
+      updated_lines.append(f"updated: '{today}'")
+    else:
+      updated_lines.append(line)
+
+  if not status_updated:
+    return False
+
+  path.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
+  return True
+
+
+COMPLETABLE_STATUSES = {STATUS_DRAFT, STATUS_IN_PROGRESS}
+
+
+def complete_revision(
+  revision_id: str,
+  *,
+  force: bool = False,
+  repo_root: Path | None = None,
+) -> int:
+  """Complete a revision by transitioning its status to completed.
+
+  Args:
+    revision_id: Revision identifier (e.g., RE-015).
+    force: If True, complete even from unexpected statuses.
+    repo_root: Optional repository root. Auto-detected if not provided.
+
+  Returns:
+    Exit code (0 for success, non-zero for errors).
+  """
+  registry = ChangeRegistry(root=repo_root, kind="revision")
+  artifacts = registry.collect()
+
+  if revision_id not in artifacts:
+    print(f"Error: Revision {revision_id} not found")
+    return 1
+
+  revision = artifacts[revision_id]
+
+  if revision.status == STATUS_COMPLETED:
+    print(f"Revision {revision_id} is already completed")
+    return 0
+
+  if revision.status not in COMPLETABLE_STATUSES and not force:
+    print(
+      f"Error: Revision {revision_id} has status '{revision.status}'; "
+      f"expected {', '.join(sorted(COMPLETABLE_STATUSES))}. "
+      f"Use --force to override."
+    )
+    return 1
+
+  if not _update_artifact_frontmatter_status(revision.path, STATUS_COMPLETED):
+    print(f"Error: Failed to update frontmatter in {revision.path}")
+    return 1
+
+  registry.sync()
+  print(f"Revision {revision_id} completed")
+  return 0
+
+
+__all__ = ["complete_revision", "create_completion_revision"]

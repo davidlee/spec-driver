@@ -11,6 +11,7 @@ from textwrap import dedent
 from supekku.scripts.lib.changes.creation import (
   ChangeArtifactCreated,
   PhaseCreationError,
+  create_audit,
   create_delta,
   create_phase,
   create_requirement_breakout,
@@ -62,6 +63,12 @@ class CreateChangeTest(unittest.TestCase):
     # Uses {{ phase_overview_block }} and {{ phase_tracking_block }} variables
     (templates_dir / "phase.md").write_text(
       "{{ phase_overview_block }}\n\n{{ phase_tracking_block }}\n",
+      encoding="utf-8",
+    )
+
+    # Audit template (Jinja2, no frontmatter)
+    (templates_dir / "audit.md").write_text(
+      "{{ audit_verification_block }}\n\n## Observations\n- …\n",
       encoding="utf-8",
     )
 
@@ -512,6 +519,55 @@ class CreateChangeTest(unittest.TestCase):
     assert result.phase_path.exists()
     phase_content = result.phase_path.read_text(encoding="utf-8")
     assert "Test empty arrays" in phase_content
+
+
+  def test_create_audit(self) -> None:
+    """Test creating an audit artifact with spec and prod refs."""
+    root = self._make_repo()
+    result = create_audit(
+      "Content alignment review",
+      spec_refs=["SPEC-100"],
+      prod_refs=["PROD-020"],
+      code_scope=["internal/content/**"],
+      repo_root=root,
+    )
+    assert isinstance(result, ChangeArtifactCreated)
+    assert result.primary_path.exists()
+    assert result.artifact_id.startswith("AUD-")
+    frontmatter, body = load_markdown_file(result.primary_path)
+    assert frontmatter["kind"] == "audit"
+    assert frontmatter["status"] == "draft"
+    assert frontmatter["spec_refs"] == ["SPEC-100"]
+    assert frontmatter["prod_refs"] == ["PROD-020"]
+    assert frontmatter["code_scope"] == ["internal/content/**"]
+    # Template body rendered (audit_verification_block is empty)
+    assert "## Observations" in body
+
+  def test_create_audit_minimal(self) -> None:
+    """Test creating an audit with only required title."""
+    root = self._make_repo()
+    result = create_audit("Quick review", repo_root=root)
+    assert result.primary_path.exists()
+    frontmatter, _ = load_markdown_file(result.primary_path)
+    assert frontmatter["kind"] == "audit"
+    assert "spec_refs" not in frontmatter
+    assert "prod_refs" not in frontmatter
+    assert "code_scope" not in frontmatter
+
+  def test_create_audit_id_increments(self) -> None:
+    """Test audit ID auto-increments correctly."""
+    root = self._make_repo()
+    r1 = create_audit("First audit", repo_root=root)
+    r2 = create_audit("Second audit", repo_root=root)
+    assert r1.artifact_id == "AUD-001"
+    assert r2.artifact_id == "AUD-002"
+
+  def test_create_audit_directory_structure(self) -> None:
+    """Test audit creates correct directory under change/audits/."""
+    root = self._make_repo()
+    result = create_audit("Test audit", repo_root=root)
+    assert result.directory.parent == root / "change" / "audits"
+    assert result.directory.name.startswith("AUD-001-")
 
 
 if __name__ == "__main__":

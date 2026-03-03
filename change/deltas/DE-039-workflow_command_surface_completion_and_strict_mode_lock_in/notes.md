@@ -22,6 +22,7 @@
 
 - Generated `IP-039` template included placeholder phase ID `IP-039-P01`; corrected to canonical phase IDs.
 - `uv run spec-driver validate --sync` refreshed decision registry/symlinks and moved ADR-003 from draft index to accepted index based on source status.
+- Strict-mode policy decision resolved in-session: strict mode will block bypass flags universally; no exception knobs in this delta.
 
 ### Verification
 

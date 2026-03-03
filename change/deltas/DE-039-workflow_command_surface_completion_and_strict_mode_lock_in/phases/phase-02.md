@@ -36,22 +36,22 @@ verification:
 tasks:
   - id: 2.1
     title: Add create_audit() domain function in changes/creation.py
-    status: todo
+    status: done
   - id: 2.2
     title: Add `create audit` CLI command in cli/create.py
-    status: todo
+    status: done
   - id: 2.3
     title: Add complete_revision() domain function
-    status: todo
+    status: done
   - id: 2.4
     title: Add `complete revision` CLI command in cli/complete.py
-    status: todo
+    status: done
   - id: 2.5
     title: Write tests for create audit and complete revision
-    status: todo
+    status: done
   - id: 2.6
     title: Run verification, lint, update evidence
-    status: todo
+    status: done
 risks:
   - risk: Audit template placeholder `{{ audit_verification_block }}` may need a renderer.
     mitigation: Check if render function exists; if not, render empty string or stub block.
@@ -109,12 +109,12 @@ lifecycle flows are discoverable and executable without ad-hoc file scaffolding.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Add `create_audit()` in `changes/creation.py` | [x] | parallel with 2.3 |
-| [ ] | 2.2 | Add `create audit` CLI command in `cli/create.py` | [ ] | depends on 2.1 |
-| [ ] | 2.3 | Add `complete_revision()` domain function | [x] | parallel with 2.1 |
-| [ ] | 2.4 | Add `complete revision` CLI in `cli/complete.py` | [ ] | depends on 2.3 |
-| [ ] | 2.5 | Write tests for both flows | [ ] | depends on 2.1–2.4 |
-| [ ] | 2.6 | Run verification, lint, update evidence | [ ] | depends on 2.5 |
+| [x] | 2.1 | Add `create_audit()` in `changes/creation.py` | [x] | Follows `create_revision()` pattern; renders `audit_verification_block=""` |
+| [x] | 2.2 | Add `create audit` CLI command in `cli/create.py` | [ ] | Thin: title + --spec/--prod/--code-scope → create_audit() |
+| [x] | 2.3 | Add `complete_revision()` domain function | [x] | In `completion.py`; extracted `_update_artifact_frontmatter_status()` helper |
+| [x] | 2.4 | Add `complete revision` CLI in `cli/complete.py` | [ ] | Thin: revision_id + --force → complete_revision_impl() |
+| [x] | 2.5 | Write tests for both flows | [ ] | 16 new tests: 4 audit creation, 7 complete_revision domain, 5 CLI |
+| [x] | 2.6 | Run verification, lint, update evidence | [ ] | 2226 pass, 0 fail; ruff clean; pylint 9.82/10 (no new warnings) |
 
 ### Task Details
 
@@ -180,19 +180,23 @@ lifecycle flows are discoverable and executable without ad-hoc file scaffolding.
 ## 8. Risks & Mitigations
 | Risk | Mitigation | Status |
 | --- | --- | --- |
-| Audit template placeholder needs block renderer | Render empty string or stub; flag for follow-up if needed | Open |
-| Frontmatter update duplication across delta/revision | Accept parallel functions for now; extract only if third case appears | Open |
+| Audit template placeholder needs block renderer | Render empty string — no infrastructure needed | Resolved |
+| Frontmatter update duplication across delta/revision | Extracted `_update_artifact_frontmatter_status()` in `completion.py` — reusable if third artifact type needs it | Resolved |
 
 ## 9. Decisions & Outcomes
-*(Record as work progresses.)*
+- `audit_verification_block` rendered as empty string — sufficient for now; can be enhanced later.
+- `complete_revision()` placed in `completion.py` alongside `create_completion_revision()`.
+- Extracted `_update_artifact_frontmatter_status()` as a reusable helper (updates both `status` and `updated` date). Could replace `update_delta_frontmatter()` in `complete_delta.py` in a future cleanup pass.
+- `complete_revision` is idempotent: already-completed revisions return success.
 
 ## 10. Findings / Research Notes
 - `create_revision()` at `creation.py:73-140` is the canonical pattern for `create_audit()`.
 - Audit statuses in template include `in-review` which is non-standard vs lifecycle.py — use `draft` as initial status regardless.
 - `complete_delta.py:update_delta_frontmatter()` is the pattern for frontmatter status transition.
+- `_update_artifact_frontmatter_status()` is strictly better: also updates the `updated:` field.
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (2226 pass, ruff clean, pylint 9.82)
 - [ ] Spec/Delta/Plan updated with lessons
 - [ ] Hand-off notes to next phase (if any)

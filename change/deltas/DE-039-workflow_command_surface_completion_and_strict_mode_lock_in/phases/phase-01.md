@@ -122,6 +122,7 @@ so automation behavior is deterministic and discoverable.
 
 ## 9. Decisions & Outcomes
 - `2026-03-04` - Added deterministic non-interactive prompt policy to avoid stdin choreography in automation.
+- `2026-03-04` - Locked strict-mode policy: universally block force-style bypass paths when `strict_mode=true`.
 - `2026-03-04` - Coverage gate doc pointer updated from nonexistent `.spec-driver/RUN.md` to `docs/commands-workflow.md`.
 
 ## 10. Findings / Research Notes

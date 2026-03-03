@@ -1,4 +1,4 @@
-"""Complete commands for marking deltas as completed."""
+"""Complete commands for marking artifacts as completed."""
 
 from __future__ import annotations
 
@@ -8,6 +8,9 @@ import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
 from supekku.scripts.complete_delta import complete_delta as complete_delta_impl
+from supekku.scripts.lib.changes.completion import (
+  complete_revision as complete_revision_impl,
+)
 
 app = typer.Typer(help="Complete artifacts", no_args_is_help=True)
 
@@ -63,6 +66,29 @@ def complete_delta(
         typer.echo("Dry run completed successfully")
       else:
         typer.echo(f"Delta {delta_id} completed successfully")
+      raise typer.Exit(EXIT_SUCCESS)
+    raise typer.Exit(EXIT_FAILURE)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("revision")
+def complete_revision(
+  revision_id: Annotated[str, typer.Argument(help="Revision ID (e.g., RE-015)")],
+  force: Annotated[
+    bool,
+    typer.Option(
+      "--force",
+      "-f",
+      help="Complete even from unexpected statuses",
+    ),
+  ] = False,
+) -> None:
+  """Complete a revision and transition its status to completed."""
+  try:
+    exit_code = complete_revision_impl(revision_id, force=force)
+    if exit_code == 0:
       raise typer.Exit(EXIT_SUCCESS)
     raise typer.Exit(EXIT_FAILURE)
   except (FileNotFoundError, ValueError, KeyError) as e:

@@ -16,6 +16,11 @@ description: |
   3) Apply minimal corrective edits:
      - Prefer changing the memory to point to the new authority rather than restating details.
      - Update `updated` and (when you have verified against reality) set `verified` to today; set/adjust `review_by` based on volatility (short for pattern/thread, longer for system/concept).
+     - Keep `created` stable unless you are correcting bad history; freshness should be carried by `updated`/`verified`.
+     - Prune default/low-value metadata while editing:
+       - remove `audience` when it is just `[human, agent]`
+       - remove `visibility` unless the memory is intentionally used for pre-read/write hook surfacing with concrete scope
+       - remove generated `links` blocks unless an active consumer requires committed resolved links
      - If you edited the body and it contains `[[...]]` references, run `spec-driver resolve links` to update `links.out`. Stale links are cleared automatically.
 
   4) Handle lifecycle states aggressively:
@@ -25,6 +30,7 @@ description: |
 
   5) Re-scope if selection misses:
      - If a correct memory does not surface under relevant `--path/--command`, add `scope.paths/globs/commands` so retrieval is automatic for future agents. Records without scope are excluded from scope-filtered results.
+     - If you add `visibility: [pre]`, ensure it is paired with meaningful `scope.*`; avoid global pre-hook noise.
 
   6) De-duplicate:
      - If two memories cover the same operational guidance, keep one canonical record and convert the other into a short signpost pointing at it (or supersede it). This prevents diverging “truths”.

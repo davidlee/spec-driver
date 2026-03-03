@@ -17,6 +17,11 @@ Procedure:
 
 2) Create the record:
     - Command: `spec-driver create memory "..." --type <concept|fact|pattern|signpost|system|thread> [--summary "..."] [--tag ...]`
+    - Default to lean frontmatter. Keep only fields that improve retrieval/ranking/review now; avoid metadata that can be inferred or generated later.
+    - Practical baseline:
+      - Keep: `id`, `name`, `kind`, `status`, `memory_type`, `updated` (and usually `tags`, `summary`).
+      - Add when useful: `scope`, `priority`, `verified`, `review_by`, `provenance.sources`.
+      - Usually omit: `audience: [human, agent]` (default), `created` (low value vs `updated`/`verified`), and `visibility` unless you are intentionally wiring pre-read/write hook surfacing.
     - If the content is risky or easy to drift, add/ensure frontmatter: `provenance.sources` (code/doc/adr/spec/commit refs), `verified` (today), and `review_by` (short horizon for volatile items).
 
 3) Scope it so it will be findable:
@@ -27,7 +32,8 @@ Procedure:
 
 4) Keep the body short and executable:
     - Put the “do X” steps in bullets with exact command snippets.
-    - Use `[[artifact-id]]` in prose to reference related artifacts (e.g., `[[ADR-012]]`, `[[mem.pattern.cli.skinny]]`). These are cheaper than manual `relations` entries and auto-resolve into frontmatter `links.out`. Reserve `relations` for lifecycle semantics (supersedes, depends_on).
+    - Use `[[artifact-id]]` in prose to reference related artifacts (e.g., `[[ADR-012]]`, `[[mem.pattern.cli.skinny]]`). These are cheaper than manual `relations` entries. Reserve `relations` for lifecycle semantics (supersedes, depends_on).
+    - Treat `links.out` as derived metadata: do not hand-author it; generate only when a consumer needs resolved links.
     - For system/concept/signpost, prefer pointers to authoritative artifacts over restating them.
     - If the item would become an ADR/SPEC/other artifact, STOP and link to the proper artifact instead; memory should remain a pointer/recipe layer.
 
@@ -35,4 +41,5 @@ Procedure:
     - Run `spec-driver list memories --type <type> --path ... --command ... --match-tag ...` to confirm it appears under the intended context.
 
 6) Resolve inline links (if body contains `[[...]]`):
-    - `spec-driver resolve links` — populates `links.out` from body tokens. Optional but recommended; can also be done in bulk later.
+    - `spec-driver resolve links` — populates `links.out` from body tokens.
+    - Prefer running this on-demand (or in bulk maintenance passes) rather than committing large generated link blocks by default.

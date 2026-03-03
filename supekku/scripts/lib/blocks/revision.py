@@ -347,7 +347,6 @@ class RevisionChangeBlock:
     return original[: self.content_start] + new_yaml + original[self.content_end :]
 
 
-
 def _disallow_extra_keys(
   mapping: dict[str, Any],
   allowed_keys: Sequence[str],
@@ -696,7 +695,8 @@ class RevisionBlockValidator:
           )
         else:
           if kind_value == "requirement" and not is_kind(
-            ref_value, "requirement",
+            ref_value,
+            "requirement",
           ):
             messages.append(
               ValidationMessage(

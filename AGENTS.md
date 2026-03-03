@@ -1,3 +1,5 @@
+@.spec-driver/AGENTS.md
+
 # SpecDriver Architecture Guide
 
 @supekku/INIT.md

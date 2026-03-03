@@ -4,44 +4,30 @@ name: Formatter Separation of Concerns
 kind: memory
 status: active
 memory_type: pattern
-created: '2026-03-02'
 updated: '2026-03-02'
-confidence: high
 verified: '2026-03-02'
 review_by: '2026-06-02'
+confidence: high
 tags:
 - architecture
 - formatters
-summary: >-
-  Formatters are pure functions in formatters/. No business logic. No side
+summary: Formatters are pure functions in formatters/. No business logic. No side
   effects. Same input always produces same output.
-owners:
-- platform-team
-audience:
-- human
-- agent
-visibility:
-- pre
-- on_demand
-scope:
-  globs:
-  - "supekku/scripts/lib/formatters/**"
-  languages:
-  - py
 priority:
   severity: medium
   weight: 5
+scope:
+  globs:
+  - supekku/scripts/lib/formatters/**
+  languages:
+  - py
 provenance:
   sources:
   - kind: doc
-    ref: CLAUDE.md
     note: Pure Functions Over Stateful Objects section
+    ref: CLAUDE.md
 requires_reading:
 - CLAUDE.md
-relations:
-- type: relates_to
-  target: mem.pattern.cli.skinny
-  annotation: Complementary pattern
 ---
 
 # Formatter Separation of Concerns

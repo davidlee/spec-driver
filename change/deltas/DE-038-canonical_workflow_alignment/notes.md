@@ -73,9 +73,32 @@
   - Applied skill edits under `supekku/skills/*/SKILL.md` to avoid overwrite from skill sync.
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation/skill-guidance-only.
 
+## 2026-03-03 (phase 04 retrieval precision pass execution)
+- Executed Phase 04 tasks `4.1`-`4.4` from `phases/phase-04.md`.
+- Captured baseline retrieval outputs using the exact phase query set:
+  - `uv run spec-driver list memories -c "uv run spec-driver complete delta" --match-tag spec-driver --limit 12 --format tsv`
+  - `uv run spec-driver list memories -c "uv run spec-driver create delta" --match-tag spec-driver --limit 12 --format tsv`
+  - `uv run spec-driver list memories -p supekku/scripts/complete_delta.py -p supekku/scripts/lib/changes/coverage_check.py --match-tag spec-driver --limit 12 --format tsv`
+- Applied scope metadata tuning (`scope.commands`/`scope.paths` only) on the Phase 04 target set:
+  - `mem.pattern.spec-driver.core-loop`
+  - `mem.concept.spec-driver.revision`
+  - `mem.pattern.spec-driver.delta-completion`
+  - `mem.concept.spec-driver.posture`
+  - `mem.signpost.spec-driver.ceremony`
+  - `mem.concept.spec-driver.ceremony.settler`
+  - `mem.fact.spec-driver.coverage-gate`
+  - `mem.fact.spec-driver.status-enums`
+- Re-ran the same query set and confirmed improved ranking in relevant contexts:
+  - `complete delta` context now surfaces `coverage-gate` and `status-enums` first.
+  - `create delta` context now surfaces `core-loop` first.
+  - complete-delta path context now surfaces `coverage-gate` and `status-enums` first.
+- Residual risk: `mem.concept.spec-driver.philosophy` remains top-3 in close-out/path query results due high base priority and being outside this phase target scope tuning set.
+- Fixed policy decisions preserved (unchanged): one `strict_mode` setting, hard-fail non-canonical baseline with no exception knobs, and v1 mixed-coverage policy (`mixed => in-progress`, mixed-status validation => warning).
+- Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was metadata/docs-only memory tuning.
+
 ## New Agent Instructions
 - Task card code: DE-038 (`canonical_workflow_alignment`)
-- Next activity: execute Phase 3 (Retrieval Precision Pass) via `/implement` using [phase-04.md](./phases/phase-04.md).
+- Next activity: run verification gate readback (VA/VH evidence consolidation) and prepare delta close-out when directed.
 - Required reading:
   - [DE-038.md](./DE-038.md)
   - [DR-038.md](./DR-038.md)
@@ -96,13 +119,14 @@
   - `/home/david/dev/spec-driver/supekku/cli/sync.py`
 - Memory review outcome:
   - Completed in phase 02; target memories now updated and two fact memories added.
+- Retrieval precision outcome:
+  - Completed in phase 04; target memory scope metadata tuned and before/after evidence captured in [phase-04.md](./phases/phase-04.md).
 - Fixed policy decisions to preserve:
   - `strict_mode` remains one setting for now (split later only if too restrictive).
   - Baseline strict-mode contract: hard-fail non-canonical paths; no exception knobs in this delta.
   - Recommended v1 coverage precedence: mixed status => `in-progress`; mixed-status validation => warning.
 - Incomplete work / loose ends:
-  - Execute phase 04 retrieval-precision tasks to tighten memory scope/ranking behavior.
-  - Apply scope metadata to workflow-critical memory set and validate before/after query ordering.
+  - `IP-038` verification gates remain unchecked pending VA/VH close-out confirmation.
   - Keep notes current after each completed unit of work.
 - Advice:
   - `uv run spec-driver create phase` currently appends duplicate phase IDs in `IP-038` plan block; clean duplicates if command is used again.

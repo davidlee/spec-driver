@@ -19,6 +19,14 @@ summary: complete delta requires verified parent-spec coverage for each delta
 priority:
   severity: high
   weight: 10
+scope:
+  commands:
+  - uv run spec-driver complete delta
+  - complete delta
+  paths:
+  - supekku/scripts/lib/changes/coverage_check.py
+  - supekku/scripts/complete_delta.py
+  - supekku/cli/complete.py
 provenance:
   sources:
   - kind: code

@@ -18,6 +18,14 @@ summary: 'Self-contained checklist for closing a delta: phase completion, verifi
 priority:
   severity: high
   weight: 9
+scope:
+  commands:
+  - uv run spec-driver complete delta
+  - complete delta
+  paths:
+  - supekku/scripts/complete_delta.py
+  - supekku/scripts/lib/changes/coverage_check.py
+  - supekku/cli/complete.py
 provenance:
   sources:
   - kind: code

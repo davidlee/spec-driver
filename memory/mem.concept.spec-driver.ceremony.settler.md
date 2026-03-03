@@ -17,6 +17,11 @@ summary: 'Medium ceremony: delta-first delivery with selective specs, backlog in
 priority:
   severity: medium
   weight: 7
+scope:
+  commands:
+  - uv run spec-driver create delta
+  paths:
+  - docs/commands-workflow.md
 provenance:
   sources:
   - kind: code

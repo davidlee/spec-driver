@@ -18,6 +18,13 @@ summary: 'The canonical spec-driver loop is delta-first: capture → delta scope
 priority:
   severity: high
   weight: 10
+scope:
+  commands:
+  - uv run spec-driver create delta
+  - uv run spec-driver create phase
+  paths:
+  - supekku/scripts/lib/changes/creation.py
+  - docs/commands-workflow.md
 provenance:
   sources:
   - kind: code

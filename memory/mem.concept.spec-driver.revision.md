@@ -17,6 +17,11 @@ summary: Spec Revisions (RE-*) document requirement/spec change intent and linea
 priority:
   severity: medium
   weight: 6
+scope:
+  commands:
+  - uv run spec-driver create revision
+  paths:
+  - supekku/scripts/lib/requirements/registry.py
 provenance:
   sources:
   - kind: code

@@ -18,6 +18,13 @@ summary: The framework is permissive; the project chooses its constraints. Postu
 priority:
   severity: high
   weight: 9
+scope:
+  commands:
+  - uv run spec-driver sync
+  - uv run spec-driver validate
+  paths:
+  - .spec-driver/workflow.toml
+  - supekku/scripts/lib/core/config.py
 provenance:
   sources:
   - kind: code

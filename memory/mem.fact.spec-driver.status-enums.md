@@ -17,6 +17,19 @@ summary: Authoritative status enums for requirements, change artifacts, and veri
 priority:
   severity: high
   weight: 10
+scope:
+  commands:
+  - uv run spec-driver complete delta
+  - complete delta
+  - uv run spec-driver sync
+  - uv run spec-driver validate
+  paths:
+  - supekku/scripts/complete_delta.py
+  - supekku/scripts/lib/changes/coverage_check.py
+  - supekku/scripts/lib/requirements/lifecycle.py
+  - supekku/scripts/lib/requirements/registry.py
+  - supekku/scripts/lib/changes/lifecycle.py
+  - supekku/scripts/lib/blocks/verification.py
 provenance:
   sources:
   - kind: code

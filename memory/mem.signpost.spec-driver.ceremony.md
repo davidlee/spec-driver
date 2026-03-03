@@ -17,6 +17,12 @@ summary: Check workflow.toml for the active ceremony mode, then read the corresp
 priority:
   severity: high
   weight: 9
+scope:
+  commands:
+  - uv run spec-driver validate
+  paths:
+  - .spec-driver/workflow.toml
+  - supekku/scripts/lib/core/config.py
 provenance:
   sources:
   - kind: code

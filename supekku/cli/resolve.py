@@ -34,6 +34,18 @@ def resolve_links(
       help="Show what would change without modifying files",
     ),
   ] = False,
+  link_mode: Annotated[
+    str,
+    typer.Option(
+      "--link-mode",
+      help=(
+        "Link persistence mode: none (suppress all), "
+        "missing (unresolved only, default), "
+        "compact (id-only resolved + missing), "
+        "full (complete resolved + missing)"
+      ),
+    ),
+  ] = "missing",
 ) -> None:
   """Resolve [[...]] links in memory record bodies.
 
@@ -48,7 +60,9 @@ def resolve_links(
     typer.echo("Resolving memory links...")
 
   try:
-    stats = _resolve_memory_links(root, dry_run=dry_run)
+    stats = _resolve_memory_links(
+      root, dry_run=dry_run, link_mode=link_mode,
+    )
   except Exception as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
@@ -141,6 +155,7 @@ def _resolve_single_memory(
   stats: dict,
   *,
   dry_run: bool,
+  link_mode: str = "missing",
 ) -> None:
   """Resolve links in a single memory file and update stats."""
   try:
@@ -158,7 +173,7 @@ def _resolve_single_memory(
   stats["missing"] += len(result.missing)
   stats["warnings"].extend(result.warnings)
 
-  links_data = links_to_frontmatter(result)
+  links_data = links_to_frontmatter(result, mode=link_mode)
   has_existing = bool(fm.get("links"))
   has_new = bool(links_data)
 
@@ -176,6 +191,7 @@ def _resolve_single_memory(
 def _resolve_memory_links(
   root: Path,
   dry_run: bool = False,
+  link_mode: str = "missing",
 ) -> dict:
   """Resolve inline links in all memory records.
 
@@ -197,6 +213,8 @@ def _resolve_memory_links(
     return stats
 
   for mem_file in sorted(mem_dir.glob("mem.*.md")):
-    _resolve_single_memory(mem_file, index, stats, dry_run=dry_run)
+    _resolve_single_memory(
+      mem_file, index, stats, dry_run=dry_run, link_mode=link_mode,
+    )
 
   return stats

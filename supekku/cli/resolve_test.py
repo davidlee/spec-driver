@@ -94,7 +94,36 @@ class TestResolveMemoryLinks:
     self,
     tmp_path: Path,
   ) -> None:
-    """Resolution writes links to frontmatter."""
+    """Resolution writes full links to frontmatter in full mode."""
+    mem_dir = _init_repo(tmp_path)
+
+    _write_memory(mem_dir, "mem.fact.auth", "Auth", "No links.\n")
+    _write_memory(
+      mem_dir,
+      "mem.pattern.cli.skinny",
+      "Skinny CLI",
+      "See [[mem.fact.auth]]\n",
+      memory_type="pattern",
+    )
+
+    stats = _resolve_memory_links(
+      tmp_path, dry_run=False, link_mode="full",
+    )
+    assert stats["processed"] == 2
+    assert stats["resolved"] >= 1
+
+    fm, _ = load_markdown_file(
+      mem_dir / "mem.pattern.cli.skinny.md",
+    )
+    assert "links" in fm
+    assert len(fm["links"]["out"]) == 1
+    assert fm["links"]["out"][0]["id"] == "mem.fact.auth"
+
+  def test_default_mode_omits_out(
+    self,
+    tmp_path: Path,
+  ) -> None:
+    """Default mode (missing) omits resolved links from frontmatter."""
     mem_dir = _init_repo(tmp_path)
 
     _write_memory(mem_dir, "mem.fact.auth", "Auth", "No links.\n")
@@ -113,9 +142,9 @@ class TestResolveMemoryLinks:
     fm, _ = load_markdown_file(
       mem_dir / "mem.pattern.cli.skinny.md",
     )
-    assert "links" in fm
-    assert len(fm["links"]["out"]) == 1
-    assert fm["links"]["out"][0]["id"] == "mem.fact.auth"
+    # Default mode=missing: no links.out persisted, no links key
+    # since there are no missing links either
+    assert "links" not in fm
 
   def test_dry_run_skips_writes(self, tmp_path: Path) -> None:
     """Dry-run does not modify files."""

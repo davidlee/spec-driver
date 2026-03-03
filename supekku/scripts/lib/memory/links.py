@@ -246,31 +246,60 @@ def resolve_all_links(
 # ── Serialization ────────────────────────────────────────────
 
 
-def links_to_frontmatter(result: LinkResolutionResult) -> dict:
+_VALID_LINK_MODES = frozenset({"none", "missing", "compact", "full"})
+
+
+def links_to_frontmatter(
+  result: LinkResolutionResult,
+  mode: str = "missing",
+) -> dict:
   """Serialize link resolution result for YAML frontmatter.
 
-  Returns empty dict if no links. Sorted by id for deterministic output.
+  Returns empty dict if no links (or if mode suppresses all output).
+  Sorted by id for deterministic output.
+
+  Modes:
+    none:    Always return empty dict (suppress all link persistence).
+    missing: Persist only unresolved links (links.missing). Default.
+    compact: Persist id-only entries for resolved links + missing.
+    full:    Persist full resolved entries (id, path, kind, label)
+             + missing.
 
   Args:
     result: Resolution result to serialize.
+    mode: Link persistence mode (none/missing/compact/full).
 
   Returns:
     Dict suitable for frontmatter links field. Empty dict if no links.
   """
+  if mode not in _VALID_LINK_MODES:
+    msg = f"Invalid link mode: {mode!r}"
+    raise ValueError(msg)
+
+  if mode == "none":
+    return {}
+
   if not result.out and not result.missing:
     return {}
 
   data: dict = {}
 
-  if result.out:
+  if result.out and mode in ("compact", "full"):
     entries = sorted(result.out, key=lambda r: r.id)
-    out_list = []
-    for entry in entries:
-      item: dict = {"id": entry.id, "path": entry.path, "kind": entry.kind}
-      if entry.label:
-        item["label"] = entry.label
-      out_list.append(item)
-    data["out"] = out_list
+    if mode == "compact":
+      data["out"] = [{"id": e.id} for e in entries]
+    else:
+      out_list = []
+      for entry in entries:
+        item: dict = {
+          "id": entry.id,
+          "path": entry.path,
+          "kind": entry.kind,
+        }
+        if entry.label:
+          item["label"] = entry.label
+        out_list.append(item)
+      data["out"] = out_list
 
   if result.missing:
     data["missing"] = [{"raw": m.raw} for m in result.missing]

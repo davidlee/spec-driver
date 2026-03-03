@@ -17,6 +17,8 @@ Field mapping from JAMMS v0.1 to spec-driver conventions:
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 
 from .base import BASE_FRONTMATTER_METADATA
@@ -27,6 +29,39 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for memory records (kind: memory)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
+    # Base field persistence overrides for memory compaction
+    "lifecycle": replace(
+      BASE_FRONTMATTER_METADATA.fields["lifecycle"],
+      persistence="optional",
+    ),
+    "owners": replace(
+      BASE_FRONTMATTER_METADATA.fields["owners"],
+      persistence="optional",
+      default_value=[],
+    ),
+    "auditers": replace(
+      BASE_FRONTMATTER_METADATA.fields["auditers"],
+      persistence="optional",
+      default_value=[],
+    ),
+    "source": replace(
+      BASE_FRONTMATTER_METADATA.fields["source"],
+      persistence="optional",
+    ),
+    "summary": replace(
+      BASE_FRONTMATTER_METADATA.fields["summary"],
+      persistence="optional",
+    ),
+    "tags": replace(
+      BASE_FRONTMATTER_METADATA.fields["tags"],
+      persistence="optional",
+      default_value=[],
+    ),
+    "relations": replace(
+      BASE_FRONTMATTER_METADATA.fields["relations"],
+      persistence="optional",
+      default_value=[],
+    ),
     # Memory-specific fields
     "memory_type": FieldMetadata(
       type="enum",
@@ -46,18 +81,23 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
       required=False,
       enum_values=["low", "medium", "high"],
       description="Confidence level in the record's accuracy",
+      persistence="optional",
     ),
     "verified": FieldMetadata(
       type="string",
       required=False,
       pattern=r"^\d{4}-\d{2}-\d{2}$",
-      description=("ISO-8601 date of last verification against reality (YYYY-MM-DD)"),
+      description=(
+        "ISO-8601 date of last verification against reality (YYYY-MM-DD)"
+      ),
+      persistence="optional",
     ),
     "review_by": FieldMetadata(
       type="string",
       required=False,
       pattern=r"^\d{4}-\d{2}-\d{2}$",
       description="ISO-8601 date for next required review (YYYY-MM-DD)",
+      persistence="optional",
     ),
     "requires_reading": FieldMetadata(
       type="array",
@@ -68,11 +108,14 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
         description="Path or artifact ID that must be read",
       ),
       description="Pre-reading artifacts required for scope/task/change",
+      persistence="optional",
+      default_value=[],
     ),
     "scope": FieldMetadata(
       type="object",
       required=False,
       description="Context matching criteria for deterministic surfacing",
+      persistence="optional",
       properties={
         "globs": FieldMetadata(
           type="array",
@@ -130,6 +173,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
       type="object",
       required=False,
       description="Ordering hints for hook surfacing",
+      persistence="optional",
       properties={
         "severity": FieldMetadata(
           type="enum",
@@ -148,6 +192,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
       type="object",
       required=False,
       description="Source attribution for anti-drift tracking",
+      persistence="optional",
       properties={
         "sources": FieldMetadata(
           type="array",
@@ -198,6 +243,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
         description="Audience type",
       ),
       description="Intended audience (default: both)",
+      persistence="optional",
     ),
     "visibility": FieldMetadata(
       type="array",
@@ -208,11 +254,15 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
         description="Visibility mode",
       ),
       description="Surfacing mode: hook-driven (pre) or manual (on_demand)",
+      persistence="optional",
     ),
     "links": FieldMetadata(
       type="object",
       required=False,
-      description="Resolved cross-artifact links parsed from body [[...]] tokens",
+      description=(
+        "Resolved cross-artifact links parsed from body [[...]] tokens"
+      ),
+      persistence="optional",
       properties={
         "out": FieldMetadata(
           type="array",
@@ -236,16 +286,22 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
               "kind": FieldMetadata(
                 type="string",
                 required=True,
-                description="Artifact kind (adr, spec, memory, etc.)",
+                description=(
+                  "Artifact kind (adr, spec, memory, etc.)"
+                ),
               ),
               "label": FieldMetadata(
                 type="string",
                 required=False,
-                description="Optional display label from [[id|label]]",
+                description=(
+                  "Optional display label from [[id|label]]"
+                ),
               ),
             },
           ),
           description="Resolved outgoing links",
+          persistence="derived",
+          default_value=[],
         ),
         "missing": FieldMetadata(
           type="array",

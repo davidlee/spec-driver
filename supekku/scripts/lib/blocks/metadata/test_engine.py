@@ -900,5 +900,67 @@ class ComplexIntegrationTest(unittest.TestCase):
     ]
 
 
+class FieldMetadataPersistenceTest(unittest.TestCase):
+  """Test persistence and default_value fields on FieldMetadata."""
+
+  def test_default_persistence_is_canonical(self):
+    """New fields default to canonical persistence."""
+    field = FieldMetadata(type="string")
+    assert field.persistence == "canonical"
+
+  def test_default_value_is_none(self):
+    """default_value defaults to None."""
+    field = FieldMetadata(type="string")
+    assert field.default_value is None
+
+  def test_valid_persistence_values(self):
+    """All four persistence classifications are accepted."""
+    for value in ("canonical", "derived", "optional", "default-omit"):
+      field = FieldMetadata(type="string", persistence=value)
+      assert field.persistence == value
+
+  def test_invalid_persistence_raises(self):
+    """Invalid persistence value raises ValueError."""
+    with self.assertRaises(ValueError, msg="Invalid persistence"):
+      FieldMetadata(type="string", persistence="bogus")
+
+  def test_default_value_with_empty_list(self):
+    """default_value can hold an empty list for array default-omit."""
+    field = FieldMetadata(
+      type="array",
+      items=FieldMetadata(type="string"),
+      persistence="default-omit",
+      default_value=[],
+    )
+    assert field.default_value == []
+    assert field.persistence == "default-omit"
+
+  def test_default_value_with_dict(self):
+    """default_value can hold a dict for object default-omit."""
+    sentinel = {"specs": [], "requirements": []}
+    field = FieldMetadata(
+      type="object",
+      properties={
+        "specs": FieldMetadata(
+          type="array", items=FieldMetadata(type="string")
+        ),
+      },
+      persistence="default-omit",
+      default_value=sentinel,
+    )
+    assert field.default_value == sentinel
+
+  def test_existing_fields_unaffected(self):
+    """Adding persistence fields doesn't break existing FieldMetadata usage."""
+    field = FieldMetadata(
+      type="enum",
+      required=True,
+      enum_values=["a", "b"],
+      description="test",
+    )
+    assert field.persistence == "canonical"
+    assert field.default_value is None
+
+
 if __name__ == "__main__":
   unittest.main()

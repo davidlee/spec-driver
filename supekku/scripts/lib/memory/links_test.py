@@ -370,7 +370,7 @@ class TestLinksToFrontmatter:
       missing=[],
       warnings=[],
     )
-    fm = links_to_frontmatter(result)
+    fm = links_to_frontmatter(result, mode="full")
     assert "out" in fm
     assert len(fm["out"]) == 1
     assert fm["out"][0]["id"] == "ADR-001"
@@ -391,7 +391,7 @@ class TestLinksToFrontmatter:
       missing=[],
       warnings=[],
     )
-    fm = links_to_frontmatter(result)
+    fm = links_to_frontmatter(result, mode="full")
     assert fm["out"][0]["label"] == "Auth"
 
   def test_missing_only(self) -> None:
@@ -424,7 +424,7 @@ class TestLinksToFrontmatter:
       missing=[MissingLink(raw="NOPE-999")],
       warnings=[],
     )
-    fm = links_to_frontmatter(result)
+    fm = links_to_frontmatter(result, mode="full")
     # Sorted by id
     assert fm["out"][0]["id"] == "ADR-001"
     assert fm["out"][1]["id"] == "SPEC-001"
@@ -456,6 +456,109 @@ class TestLinksToFrontmatter:
       missing=[],
       warnings=[],
     )
-    fm = links_to_frontmatter(result)
+    fm = links_to_frontmatter(result, mode="full")
     ids = [entry["id"] for entry in fm["out"]]
     assert ids == ["ADR-001", "SPEC-001", "SPEC-002"]
+
+
+# ── Link mode tests ─────────────────────────────────────────
+
+
+def _mixed_result() -> LinkResolutionResult:
+  """Helper: result with both resolved and missing links."""
+  return LinkResolutionResult(
+    out=[
+      ResolvedLink(
+        id="ADR-001", path="a.md", label=None, kind="adr",
+      ),
+    ],
+    missing=[MissingLink(raw="NOPE-999")],
+    warnings=[],
+  )
+
+
+class TestLinksToFrontmatterModes:
+  """links_to_frontmatter mode parameter controls output shape."""
+
+  def test_default_mode_is_missing(self) -> None:
+    """Default mode omits out, keeps missing."""
+    result = _mixed_result()
+    fm = links_to_frontmatter(result)
+    assert "out" not in fm
+    assert "missing" in fm
+    assert fm["missing"][0]["raw"] == "NOPE-999"
+
+  def test_mode_full_includes_both(self) -> None:
+    """Full mode includes out and missing."""
+    result = _mixed_result()
+    fm = links_to_frontmatter(result, mode="full")
+    assert "out" in fm
+    assert "missing" in fm
+
+  def test_mode_missing_omits_out(self) -> None:
+    """Missing mode omits out, keeps missing."""
+    result = _mixed_result()
+    fm = links_to_frontmatter(result, mode="missing")
+    assert "out" not in fm
+    assert "missing" in fm
+
+  def test_mode_none_returns_empty(self) -> None:
+    """None mode returns empty dict regardless of content."""
+    result = _mixed_result()
+    fm = links_to_frontmatter(result, mode="none")
+    assert fm == {}
+
+  def test_mode_compact_includes_ids_only(self) -> None:
+    """Compact mode includes out with id-only entries."""
+    result = _mixed_result()
+    fm = links_to_frontmatter(result, mode="compact")
+    assert "out" in fm
+    assert fm["out"][0] == {"id": "ADR-001"}
+    assert "missing" in fm
+
+  def test_mode_missing_empty_missing_returns_empty(self) -> None:
+    """Missing mode with no missing links returns empty dict."""
+    result = LinkResolutionResult(
+      out=[
+        ResolvedLink(
+          id="ADR-001", path="a.md", label=None, kind="adr",
+        ),
+      ],
+      missing=[],
+      warnings=[],
+    )
+    fm = links_to_frontmatter(result, mode="missing")
+    assert fm == {}
+
+  def test_mode_full_empty_result(self) -> None:
+    """Full mode with empty result returns empty dict."""
+    result = LinkResolutionResult()
+    fm = links_to_frontmatter(result, mode="full")
+    assert fm == {}
+
+  def test_mode_full_preserves_sort_order(self) -> None:
+    """Full mode sorts out entries by id."""
+    result = LinkResolutionResult(
+      out=[
+        ResolvedLink(
+          id="SPEC-002", path="s.md", label=None, kind="spec",
+        ),
+        ResolvedLink(
+          id="ADR-001", path="a.md", label=None, kind="adr",
+        ),
+      ],
+      missing=[],
+      warnings=[],
+    )
+    fm = links_to_frontmatter(result, mode="full")
+    ids = [e["id"] for e in fm["out"]]
+    assert ids == ["ADR-001", "SPEC-002"]
+
+  def test_invalid_mode_raises(self) -> None:
+    """Invalid mode raises ValueError."""
+    result = _mixed_result()
+    try:
+      links_to_frontmatter(result, mode="bogus")
+      raise AssertionError("Expected ValueError")  # noqa: TRY301
+    except ValueError as exc:
+      assert "Invalid link mode" in str(exc)

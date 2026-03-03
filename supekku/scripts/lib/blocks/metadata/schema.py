@@ -25,6 +25,11 @@ class FieldMetadata:
     description: Human-readable field description
     min_items: Minimum array length (for array type)
     max_items: Maximum array length (for array type)
+    persistence: Compaction classification — canonical (always persist),
+      derived (reconstructible; omit by default), optional (omit when
+      absent/default), default-omit (omit when equal to default_value).
+    default_value: Value that signals "omit during compaction" for
+      optional/default-omit fields (e.g. [] for empty arrays).
   """
 
   type: str
@@ -37,6 +42,15 @@ class FieldMetadata:
   description: str = ""
   min_items: int | None = None
   max_items: int | None = None
+  persistence: str = "canonical"
+  default_value: Any = None
+
+  _VALID_PERSISTENCE = frozenset({
+    "canonical",
+    "derived",
+    "optional",
+    "default-omit",
+  })
 
   def __post_init__(self) -> None:
     """Validate field metadata consistency."""
@@ -51,6 +65,10 @@ class FieldMetadata:
     }
     if self.type not in valid_types:
       msg = f"Invalid field type: {self.type}"
+      raise ValueError(msg)
+
+    if self.persistence not in self._VALID_PERSISTENCE:
+      msg = f"Invalid persistence: {self.persistence}"
       raise ValueError(msg)
 
     if self.type == "const" and self.const_value is None:

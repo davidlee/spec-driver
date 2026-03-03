@@ -6,6 +6,8 @@ extending the base metadata with delta-specific fields.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 
 from .base import BASE_FRONTMATTER_METADATA
@@ -16,11 +18,46 @@ DELTA_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for deltas (kind: delta)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
+    # Base field persistence overrides for delta compaction
+    "lifecycle": replace(
+      BASE_FRONTMATTER_METADATA.fields["lifecycle"],
+      persistence="optional",
+    ),
+    "owners": replace(
+      BASE_FRONTMATTER_METADATA.fields["owners"],
+      persistence="optional",
+      default_value=[],
+    ),
+    "auditers": replace(
+      BASE_FRONTMATTER_METADATA.fields["auditers"],
+      persistence="optional",
+      default_value=[],
+    ),
+    "source": replace(
+      BASE_FRONTMATTER_METADATA.fields["source"],
+      persistence="optional",
+    ),
+    "summary": replace(
+      BASE_FRONTMATTER_METADATA.fields["summary"],
+      persistence="optional",
+    ),
+    "tags": replace(
+      BASE_FRONTMATTER_METADATA.fields["tags"],
+      persistence="optional",
+      default_value=[],
+    ),
+    "relations": replace(
+      BASE_FRONTMATTER_METADATA.fields["relations"],
+      persistence="default-omit",
+      default_value=[],
+    ),
     # Delta-specific fields (all optional)
     "applies_to": FieldMetadata(
       type="object",
       required=False,
       description="Declarative inputs this delta aligns with",
+      persistence="default-omit",
+      default_value={"specs": [], "requirements": []},
       properties={
         "specs": FieldMetadata(
           type="array",
@@ -49,6 +86,8 @@ DELTA_FRONTMATTER_METADATA = BlockMetadata(
     "context_inputs": FieldMetadata(
       type="array",
       required=False,
+      persistence="optional",
+      default_value=[],
       items=FieldMetadata(
         type="object",
         description="Supporting research or decision context",
@@ -72,11 +111,16 @@ DELTA_FRONTMATTER_METADATA = BlockMetadata(
     "outcome_summary": FieldMetadata(
       type="string",
       required=False,
-      description="Declarative description of target state after applying delta",
+      description=(
+        "Declarative description of target state after applying delta"
+      ),
+      persistence="optional",
     ),
     "risk_register": FieldMetadata(
       type="array",
       required=False,
+      persistence="optional",
+      default_value=[],
       items=FieldMetadata(
         type="object",
         description="Risk entry for this delta",

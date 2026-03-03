@@ -15,14 +15,37 @@ phase: IP-037.PHASE-02
 plan: IP-037
 delta: DE-037
 objective: >-
-  None
-entrance_criteria: []
-exit_criteria: []
+  Implement two-bucket memory install behavior in install.py: seed (create-only)
+  and spec-driver (replace/refresh with pruning). Dual discovery for dev/installed contexts.
+entrance_criteria:
+  - Phase 0 complete (corpus classified, seed stubs authored)
+  - pyproject.toml force-include configured
+exit_criteria:
+  - install.py has memory install step with dual discovery
+  - seed bucket creates missing files only, never overwrites
+  - spec-driver bucket replaces/refreshes from package source
+  - managed-set pruning removes spec-driver IDs absent from source
+  - unmanaged memories are never touched
+  - all new behavior covered by tests (VT-037-001 through VT-037-003)
+  - existing install tests still pass
 verification:
-  tests: []
+  tests:
+    - VT-037-001 seed create-only
+    - VT-037-002 spec-driver managed refresh
+    - VT-037-003 unmanaged preservation
   evidence: []
-tasks: []
-risks: []
+tasks:
+  - id: '2.1'
+    description: Write tests for memory install behavior (TDD)
+  - id: '2.2'
+    description: Implement _find_memory_source, _classify_memory, _install_memories
+  - id: '2.3'
+    description: Integrate _install_memories into initialize_workspace
+  - id: '2.4'
+    description: Verify all tests pass, lint clean
+risks:
+  - description: Managed replacement could accidentally target user files
+    mitigation: Strict namespace classifier; only mem.*.spec-driver.* touched
 ```
 
 ```yaml supekku:phase.tracking@v1
@@ -31,60 +54,57 @@ version: 1
 phase: IP-037.PHASE-02
 ```
 
-# Phase N - <Name>
+# Phase 1 — Installer Semantics
 
 ## 1. Objective
-<What this phase achieves>
+Implement two-bucket memory install in `install.py`: seed (create-only) and spec-driver (replace/refresh with pruning).
 
 ## 2. Links & References
 - **Delta**: DE-037
-- **Design Revision Sections**: <bullets>
-- **Specs / PRODs**: <list requirement IDs>
-- **Support Docs**: <links to reference material>
+- **Phase 0**: phase-01.md (classification complete)
+- **Files**: `supekku/scripts/install.py`, `supekku/scripts/lib/install_test.py`
 
 ## 3. Entrance Criteria
-- [ ] Item 1
-- [ ] Item 2
+- [x] Phase 0 complete
+- [x] pyproject.toml force-include configured
 
 ## 4. Exit Criteria / Done When
-- [ ] Outcome 1
-- [ ] Outcome 2
+- [ ] `_find_memory_source()` discovers memories in dev and installed contexts
+- [ ] `_classify_memory()` correctly classifies by namespace
+- [ ] Seed: create-if-missing, never overwrite
+- [ ] Spec-driver: replace/refresh from source
+- [ ] Pruning: remove managed IDs absent from source (with notice)
+- [ ] Unmanaged memories untouched
+- [ ] Tests pass, lint clean
 
 ## 5. Verification
-- Tests to run (unit/integration/system)
-- Tooling/commands (`go test ./...`, scripts, etc.)
-- Evidence to capture (logs, screenshots, audit snippets)
+- `uv run pytest supekku/scripts/lib/install_test.py -x -q`
+- `uv run ruff check supekku/scripts/install.py`
 
 ## 6. Assumptions & STOP Conditions
-- Assumptions: …
-- STOP when: <condition that requires human check-in>
+- Memory destination: `target_root / "memory"`
+- Seed auto-applies (create-only is non-destructive); managed prompts per category
+- STOP: if memory source structure differs from expected
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | High-level activity | [ ] |  |
-
-### Task Details
-- **1.1 Description**
-  - **Design / Approach**: …
-  - **Files / Components**: …
-  - **Testing**: …
-  - **Observations & AI Notes**: …
-  - **Commits / References**: …
-
-*(Repeat detail blocks per task as needed)*
+| [ ] | 2.1 | Write tests for memory install behavior (TDD) | | |
+| [ ] | 2.2 | Implement memory install functions | | After 2.1 |
+| [ ] | 2.3 | Integrate into initialize_workspace | | After 2.2 |
+| [ ] | 2.4 | Verify all tests pass, lint clean | | After 2.3 |
 
 ## 8. Risks & Mitigations
 | Risk | Mitigation | Status |
 | --- | --- | --- |
+| Managed replacement targets user files | Strict namespace classifier | open |
 
 ## 9. Decisions & Outcomes
-- `YYYY-MM-DD` - Decision summary (include rationale)
+- `2026-03-04` - Seed auto-applies (non-destructive); managed uses prompt_for_category pattern
+- `2026-03-04` - Pruning emits notice per removed file
 
 ## 10. Findings / Research Notes
-- Use for code spelunking results, links, screenshots, etc.
 
 ## 11. Wrap-up Checklist
 - [ ] Exit criteria satisfied

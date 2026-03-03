@@ -10,7 +10,7 @@ Supekku is based on an "inverted model" of spec-driven development. Unlike tradi
 
 -   **Specs as Truth**: Technical and Product Specifications (`SPECs` and `PRODs`) are the canonical source of truth for the system's behavior and intent.
 -   **Change is Explicit**: All changes to the system are managed through explicit, declarative `Deltas` that describe the required modifications to bring the code back into alignment with the specs.
--   **Specs Evolve via Revisions**: Spec Revisions (`RE-`) document the movement of requirements and responsibilities before code work begins, preserving the documentation lineage.
+-   **Specs Evolve via Revisions**: Spec Revisions (`RE-`) document requirement/spec updates and lineage, typically during reconciliation after implementation/audit in delta-first flows.
 -   **Continuous Auditing**: The system is designed for continuous verification. `Audits` and automated tooling ensure that the implementation never drifts far from its specification.
 -   **Agent-Native**: The process is designed to be automatable and leveraged by AI development agents, with structured, machine-readable artifacts and clear, deterministic workflows.
 
@@ -18,12 +18,12 @@ Supekku is based on an "inverted model" of spec-driven development. Unlike tradi
 
 The methodology is built around a set of interconnected markdown artifacts, linked via a rich frontmatter schema and structured YAML blocks that are machine-auditable.
 
--   **Constitution**: The set of non-negotiable principles and rules that govern all development work. See (`specify/constitution.md`).
+-   **Policy Layer**: Governance is expressed through ADRs, Policies, and Standards (under `specify/decisions/`, `specify/policies/`, `specify/standards/`).
 -   **Tech Spec (SPEC)**: A detailed, evergreen technical specification for a specific system component (e.g., a Go package). It defines responsibilities, architecture, contracts, and testing strategies.
 -   **Product Spec (PROD)**: A product-level specification that captures user problems, business value, hypotheses, and success metrics.
 -   **Architecture Decision Record (ADR)**: Formal documents capturing significant architectural decisions with context, options considered, and rationale. ADRs use enhanced frontmatter with relationships and are managed through a comprehensive registry system.
 -   **Delta (DE)**: A declarative change bundle. It's the primary mechanism for managing change, scoping the work required to align the codebase with updated specifications.
--   **Design Artefact (DA)**: A companion to a Delta, detailing the specific code-level design changes required (`kind: design_artefact` in frontmatter).
+-   **Design Revision (DR)**: A companion to a Delta, detailing the specific code-level design changes required (`kind: design_revision` in frontmatter).
 -   **Implementation Plan (IP)**: A phased plan for executing a Delta, defining clear entrance and exit criteria for each stage. Phase sheets embed `supekku:plan`/`supekku:phase` YAML blocks that drive registry updates.
 -   **Audit (AUD)**: A formal review that compares the state of the code against its corresponding specs to identify drift and ensure alignment.
 -   **Workspace**: An orchestration facade (`supekku/scripts/lib/workspace.py`) that loads registries, validates relations, and powers automation.
@@ -41,6 +41,6 @@ The Supekku workflow follows a structured, iterative loop:
 5.  **Plan**: An `Implementation Plan` breaks the work into verifiable phases.
 6.  **Implement**: An agent (or developer) executes the plan, writing code and tests to match the design revision.
 7.  **Verify**: The changes are verified against the spec through testing and a final `Audit`. Automated tooling like `sync_specs.py` helps ensure contracts are aligned across all supported languages.
-8.  **Archive**: Once complete, the Delta and its related artifacts are archived, and the evergreen specs now reflect the new state of the system.
+8.  **Close**: Complete the Delta and reconcile owning records (coverage/lifecycle/relations), then run sync/validate so evergreen specs and registries reflect the current system state.
 
 See `processes.md` for a more detailed breakdown of the commands and steps for each stage.

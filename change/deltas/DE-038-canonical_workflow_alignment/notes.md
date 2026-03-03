@@ -129,6 +129,17 @@
 - Re-ranked remaining priority queue accordingly.
 - No runtime behavior changes; docs-only update.
 
+## 2026-03-04 (README closure + policy-layer remediation)
+- Updated `supekku/about/README.md` to remove stale Constitution reference and align governance language:
+  - replaced Constitution bullet with Policy layer (`ADRs`, `Policies`, `Standards`)
+  - corrected design artifact naming to `Design Revision (DR)` / `kind: design_revision`
+- Replaced stale workflow step `Archive` with implemented closure semantics (`complete` + reconcile + `sync`/`validate`).
+- Updated `gaps-to-adoption.md` statuses:
+  - archive/closure confusion vector -> `resolved`
+  - README documentation debt row -> `resolved`
+  - remaining priority queue shifted to `commands-workflow.md` coverage prerequisite and `RUN.md` status terminology cleanup.
+- No runtime behavior changes; docs-only update.
+
 ## New Agent Instructions
 - Task card code: DE-038 (`canonical_workflow_alignment`)
 - Next activity: run delta close-out flow (`complete delta --dry-run` then `complete delta`) when directed.

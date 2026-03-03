@@ -3875,7 +3875,7 @@ deltas:
         phase: IP-036-P04
   DE-037:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - install and refresh seed memories during workspace install
     slug: install_and_refresh_seed_memories_during_workspace_install
     updated: '2026-03-03'
@@ -3900,7 +3900,111 @@ deltas:
         - id: IP-037-P02
         - id: IP-037-P03
         - id: IP-037-P04
+        - id: IP-037.PHASE-01
+        - id: IP-037.PHASE-02
+        - id: IP-037.PHASE-03
       phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-037.PHASE-01
+        plan: IP-037
+        delta: DE-037
+        objective: Classify existing memory corpus into spec-driver/unmanaged buckets,
+          author 2 seed project stubs, retire the `seed` tag as bucket classifier,
+          and configure wheel build to bundle memories.
+        entrance_criteria:
+        - "Bucket model and classifier agreed (DE-037 \xA79)"
+        - Replace semantics agreed (seed never overwrite; spec-driver refresh)
+        exit_criteria:
+        - Corpus classified: every memory file in memory/ assigned to spec-driver,
+            seed, or unmanaged bucket
+        - 2 seed stubs authored (mem.pattern.project.workflow, mem.pattern.project.completion)
+        - Stale `seed` tags removed from memory frontmatter
+        - pyproject.toml force-include configured for wheel builds
+        - Classification report (VA-037-001) recorded in notes.md
+        verification:
+          tests: []
+          evidence:
+          - VA-037-001 classification report in notes.md
+        tasks:
+        - id: '1.1'
+          description: Author mem.pattern.project.workflow seed stub
+        - id: '1.2'
+          description: Author mem.pattern.project.completion seed stub
+        - id: '1.3'
+          description: Remove stale seed tags from memory frontmatter
+        - id: '1.4'
+          description: Add hatch force-include for memory in pyproject.toml
+        - id: '1.5'
+          description: Produce VA-037-001 classification report
+        risks:
+        - description: Seed stubs reference platform memories that may evolve
+          mitigation: Stubs use wikilinks; content changes in platform memories are
+            transparent
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-037.PHASE-02
+        plan: IP-037
+        delta: DE-037
+        objective: 'Implement two-bucket memory install behavior in install.py: seed
+          (create-only) and spec-driver (replace/refresh with pruning). Dual discovery
+          for dev/installed contexts.'
+        entrance_criteria:
+        - Phase 0 complete (corpus classified, seed stubs authored)
+        - pyproject.toml force-include configured
+        exit_criteria:
+        - install.py has memory install step with dual discovery
+        - seed bucket creates missing files only, never overwrites
+        - spec-driver bucket replaces/refreshes from package source
+        - managed-set pruning removes spec-driver IDs absent from source
+        - unmanaged memories are never touched
+        - all new behavior covered by tests (VT-037-001 through VT-037-003)
+        - existing install tests still pass
+        verification:
+          tests:
+          - VT-037-001 seed create-only
+          - VT-037-002 spec-driver managed refresh
+          - VT-037-003 unmanaged preservation
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Write tests for memory install behavior (TDD)
+        - id: '2.2'
+          description: Implement _find_memory_source, _classify_memory, _install_memories
+        - id: '2.3'
+          description: Integrate _install_memories into initialize_workspace
+        - id: '2.4'
+          description: Verify all tests pass, lint clean
+        risks:
+        - description: Managed replacement could accidentally target user files
+          mitigation: Strict namespace classifier; only mem.*.spec-driver.* touched
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-037.PHASE-03
+        plan: IP-037
+        delta: DE-037
+        objective: Complete dry-run/reporting integration tests, verify all VT/VA
+          artefacts, finalize notes and documentation.
+        entrance_criteria:
+        - Phase 1 complete (installer semantics implemented)
+        exit_criteria:
+        - VT-037-001 through VT-037-004 covered by passing tests
+        - VA-037-001 classification report complete
+        - Integration tests for initialize_workspace with memories
+        - All tests pass, lint clean
+        verification:
+          tests:
+          - VT-037-004 dry-run category reporting
+          evidence:
+          - Integration test results
+        tasks:
+        - id: '3.1'
+          description: Add integration and dry-run reporting tests
+        - id: '3.2'
+          description: Verify all VT/VA artefacts satisfied
+        - id: '3.3'
+          description: Update notes and phase sheets
+        risks: []
       - id: IP-037-P01
         phase: IP-037-P01
       - id: IP-037-P02
@@ -4092,3 +4196,77 @@ deltas:
         - Over-scoping may hide useful conceptual records from discovery.
         - Inconsistent scope conventions across memories may create new retrieval
           bias.
+  DE-039:
+    kind: delta
+    status: draft
+    name: Delta - workflow command-surface completion and strict-mode lock-in
+    slug: workflow_command_surface_completion_and_strict_mode_lock_in
+    updated: '2026-03-04'
+    path: change/deltas/DE-039-workflow_command_surface_completion_and_strict_mode_lock_in/DE-039.md
+    applies_to:
+      specs:
+      - PROD-016
+      requirements:
+      - PROD-016.FR-002
+      - PROD-016.FR-009
+      - PROD-016.FR-010
+    plan:
+      id: IP-039
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-039
+        delta: DE-039
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-016
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-016.FR-002
+          - PROD-016.FR-009
+          - PROD-016.FR-010
+          dependencies: []
+        phases:
+        - id: IP-039.PHASE-01
+        - id: IP-039.PHASE-02
+        - id: IP-039.PHASE-03
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-039.PHASE-01
+        plan: IP-039
+        delta: DE-039
+        objective: Finalize workflow completion command ergonomics for automation
+          and align coverage-gate messaging/docs before expanding command surface.
+        entrance_criteria:
+        - DE-039 and DR-039 approved for execution
+        - PROD-016 requirements FR-002/FR-009/FR-010 mapped in plan
+        exit_criteria:
+        - Non-interactive completion prompt behavior is deterministic and test-backed
+        - Coverage-gate runtime guidance points to canonical active docs
+        - Phase evidence recorded and linked in plan coverage entries
+        verification:
+          tests:
+          - uv run pytest -q supekku/scripts/complete_delta_test.py supekku/scripts/lib/changes/coverage_check_test.py
+          evidence:
+          - VT-039-002
+        tasks:
+        - id: 1.1
+          title: Validate and lock deterministic non-interactive prompt handling
+          status: in-progress
+        - id: 1.2
+          title: Update coverage-gate runtime documentation pointer and tests
+          status: todo
+        - id: 1.3
+          title: Re-run targeted verification and sync DE/IP notes
+          status: todo
+        risks:
+        - risk: Prompt default changes could silently alter operator expectations.
+          mitigation: Document defaults in memory/docs and add explicit tests.
+      - id: IP-039.PHASE-02
+        phase: IP-039.PHASE-02
+      - id: IP-039.PHASE-03
+        phase: IP-039.PHASE-03

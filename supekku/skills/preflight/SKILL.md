@@ -1,6 +1,6 @@
 ---
 name: preflight
-description: Before starting something new: understand task, intent, and context
+description: Before starting anything new, understand task, intent, and context.
 ---
 You're about to begin work on something: $ARGUMENTS
 

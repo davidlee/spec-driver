@@ -790,3 +790,94 @@ class TestInstallMemoriesReporting:
 
     captured = capsys.readouterr()
     assert "prun" in captured.out.lower() or "remov" in captured.out.lower()
+
+  def test_dry_run_reports_with_prefix(self, tmp_path: Path, capsys) -> None:
+    """VT-037-004: dry-run output distinguishes categories."""
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.pattern.project.workflow.md": "seed default",
+      "mem.concept.spec-driver.delta.md": "managed v2",
+    })
+    dest.mkdir()
+    (dest / "mem.concept.spec-driver.delta.md").write_text("managed v1")
+    (dest / "mem.concept.spec-driver.old.md").write_text("to prune")
+
+    _install_memories(src, dest, dry_run=True, auto_yes=True)
+
+    captured = capsys.readouterr()
+    assert "[DRY RUN]" in captured.out
+    assert "Seed memories" in captured.out
+    assert "Managed memories" in captured.out
+
+  def test_reports_new_managed_and_updated(
+    self, tmp_path: Path, capsys,
+  ) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.concept.spec-driver.new.md": "brand new",
+      "mem.concept.spec-driver.existing.md": "updated",
+    })
+    dest.mkdir()
+    (dest / "mem.concept.spec-driver.existing.md").write_text("old")
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    captured = capsys.readouterr()
+    assert "1 new" in captured.out
+    assert "1 updated" in captured.out
+
+
+# --- Integration: initialize_workspace with memories ---
+
+
+class TestInitializeWorkspaceMemories:
+  """Integration tests for memory install via initialize_workspace."""
+
+  def test_installs_memories_on_fresh_workspace(
+    self, tmp_path: Path,
+  ) -> None:
+    """Fresh install creates memory directory with managed + seed files."""
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    memory_dir = tmp_path / "memory"
+    assert memory_dir.is_dir()
+
+    # Should have at least some managed memories
+    managed = [
+      f for f in memory_dir.glob("*.md")
+      if _classify_memory(f.name) == "spec-driver"
+    ]
+    assert len(managed) > 0
+
+    # Should have seed stubs
+    seeds = [
+      f for f in memory_dir.glob("*.md")
+      if _classify_memory(f.name) == "seed"
+    ]
+    assert len(seeds) > 0
+
+  def test_preserves_customized_seed_on_reinstall(
+    self, tmp_path: Path,
+  ) -> None:
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    # Customise a seed memory
+    wf = tmp_path / "memory" / "mem.pattern.project.workflow.md"
+    assert wf.exists()
+    wf.write_text("my custom workflow")
+
+    # Reinstall
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    assert wf.read_text() == "my custom workflow"
+
+  def test_dry_run_does_not_create_memories(
+    self, tmp_path: Path,
+  ) -> None:
+    initialize_workspace(tmp_path, dry_run=True)
+    memory_dir = tmp_path / "memory"
+    # Memory dir might be created (mkdir), but no files copied
+    md_files = list(memory_dir.glob("*.md")) if memory_dir.exists() else []
+    assert len(md_files) == 0

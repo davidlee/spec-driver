@@ -63,3 +63,32 @@
 | unmanaged | 3 | Ignored by installer |
 | **Total** | **27** | |
 
+## Implementation Summary
+
+### Phase 0 — Classification & Sifting
+- Classified all 27 memory files by ID namespace
+- Authored 2 seed stubs: `mem.pattern.project.workflow`, `mem.pattern.project.completion`
+- Removed stale `seed` tag from 19 files
+- Configured hatch `force-include` for wheel builds
+
+### Phase 1 — Installer Semantics
+New functions in `supekku/scripts/install.py`:
+- `_classify_memory(filename)` — namespace-based classifier
+- `_find_memory_source(package_root)` — dual discovery (package, then dev repo root)
+- `_install_seed_memories()` — create-if-missing, never overwrite
+- `_refresh_managed_memories()` — replace/refresh from source
+- `_prune_managed_memories()` — remove IDs absent from source
+- `_install_memories()` — orchestrates all three buckets
+- `_MemoryChanges` dataclass + `_report_memory_changes()` — structured reporting
+
+Integrated into `initialize_workspace()` between agent docs and skills install.
+
+### Phase 2+3 — UX, Safety & Verification
+- 32 new tests (55 total install tests, 2210 total suite)
+- All 5 VT/VA artefacts verified
+- Dry-run, idempotence, and integration coverage complete
+
+### Decisions made during implementation
+- Managed memories auto-apply (no prompt) — consistent with agent docs pattern
+- `auto_yes` parameter reserved for future prompt-per-category support
+- Reporting uses `_MemoryChanges` dataclass to keep functions simple

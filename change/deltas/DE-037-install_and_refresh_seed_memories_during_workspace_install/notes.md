@@ -92,3 +92,19 @@ Integrated into `initialize_workspace()` between agent docs and skills install.
 - Managed memories auto-apply (no prompt) — consistent with agent docs pattern
 - `auto_yes` parameter reserved for future prompt-per-category support
 - Reporting uses `_MemoryChanges` dataclass to keep functions simple
+
+### Commits
+- `cc762df` phase 0 — classify corpus, author seed stubs
+- `8963790` phase 1 — two-bucket memory install in installer
+- `5dbe15e` phase 2+3 — integration tests, verification, close-out
+
+### Verification
+- `just test`: 2210 passed, 3 skipped (last run after final commit)
+- `just lint`: all checks passed
+- `just pylint`: 9.54/10 (no new warnings from DE-037 code)
+
+### Potential rough edges / follow-ups
+- `auto_yes` param is wired but unused — activate when prompt-per-category UX is wanted
+- No wheel build test yet — `force-include` config is untested in actual `hatch build`
+- Pruning has no undo — if a managed ID is accidentally removed from source, it's gone from workspace on next install (mitigated: memories are in git)
+- 3 unmanaged memories (`cli.skinny`, `formatters.soc`, `assembly-only-taxonomy`) could eventually be reclassified if they become platform concepts

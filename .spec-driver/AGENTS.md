@@ -19,38 +19,14 @@ Usage notes:
 <available_skills>
 
 <skill>
+<name>audit-change</name>
+<description>Perform verification/audit pass after implementation (or as discovery/backfill), reconcile against specs/contracts, and route findings into closure or follow-up change.</description>
+<location>project</location>
+</skill>
+
+<skill>
 <name>boot</name>
 <description>Mandatory onboarding. Every agent MUST execute this on startup, or as soon as becoming aware of it.</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>preflight</name>
-<description>Before starting anything new, understand task, intent, and context.</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>consult</name>
-<description>Identify and address obstacles, significant decisions, or emergent complexity. You MUST use this skill if you encounter unanticipated obstacles during implementation.</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>implement</name>
-<description>implement a well-defined task or implementation plan</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>notes</name>
-<description>Whenever you complete a task or phase - record implementation notes.</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>continuation</name>
-<description>Write a prompt to help the next agent continue effectively.</description>
 <location>project</location>
 </skill>
 
@@ -61,8 +37,38 @@ Usage notes:
 </skill>
 
 <skill>
-<name>retrieving-memory</name>
-<description>Invoke this skill before making non-trivial assumptions in a large codebase. Mandatory triggers: (1) you are about to modify a subsystem you have not touched in this run; (2) you are about to run, change, or suggest a command pipeline (tests, builds, releases, migrations); (3) you see conflicting cues in code/docs; (4) you are asked “what is the right way here?”; (5) you are debugging a recurring failure mode; (6) you are about to answer with “probably/usually/likely”. Default rule: if you cannot cite a source-of-truth file/doc/ADR/SPEC from the repo, you must consult memories first and then proceed.</description>
+<name>close-change</name>
+<description>Close a delta safely: satisfy coverage gates, complete the delta command, and verify owning-record lifecycle updates.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>consult</name>
+<description>Identify and address obstacles, significant decisions, or emergent complexity. You MUST use this skill if you encounter unanticipated obstacles during implementation.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>continuation</name>
+<description>Write a prompt to help the next agent continue effectively.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>draft-design-revision</name>
+<description>Draft or refine a design revision (DR) for a delta, capturing current vs target behavior, code impacts, and verification alignment.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>execute-phase</name>
+<description>Execute an active implementation phase against DR/IP intent, keep notes current, and surface blockers early.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>implement</name>
+<description>implement a well-defined task or implementation plan</description>
 <location>project</location>
 </skill>
 
@@ -73,8 +79,50 @@ Usage notes:
 </skill>
 
 <skill>
+<name>next</name>
+<description>Print a concise continuation prompt for the next agent. Use this when everything is written down and in order for the next agent, and the user has indicated they wish to continue with fresh context.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>notes</name>
+<description>Whenever you complete a task or phase - record implementation notes.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>plan-phases</name>
+<description>Plan execution for a delta: refine IP objectives/gates and create the next phase sheet with concrete tasks and verification expectations.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>preflight</name>
+<description>Before starting anything new, understand task, intent, and context.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>retrieving-memory</name>
+<description>Invoke this skill before making non-trivial assumptions in a large codebase. Mandatory triggers: (1) you are about to modify a subsystem you have not touched in this run; (2) you are about to run, change, or suggest a command pipeline (tests, builds, releases, migrations); (3) you see conflicting cues in code/docs; (4) you are asked “what is the right way here?”; (5) you are debugging a recurring failure mode; (6) you are about to answer with “probably/usually/likely”. Default rule: if you cannot cite a source-of-truth file/doc/ADR/SPEC from the repo, you must consult memories first and then proceed.</description>
+<location>project</location>
+</skill>
+
+<skill>
 <name>reviewing-memory</name>
 <description>Invoke this skill as a deliberate review pass whenever stability matters: (1) before a release/migration/large refactor; (2) at the start of work in an unfamiliar subsystem; (3) when you see repeated agent confusion; (4) when thread-type working sets accumulate; (5) when you suspect stale guidance is causing defects. This is not ad-hoc maintenance; it is a structured audit to prevent systemic drift.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>scope-delta</name>
+<description>Scope intentional change as a delta. Define applies-to specs/requirements, risks, and closure targets before implementation.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>shape-revision</name>
+<description>Shape a spec revision when requirements/responsibilities move. Use this before delta scoping when policy/doctrine requires revision-first flow.</description>
 <location>project</location>
 </skill>
 

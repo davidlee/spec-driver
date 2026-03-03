@@ -1,6 +1,6 @@
 # Workflow
 
-Ceremony mode: **pioneer**
+Ceremony mode: **settler**
 
 ## Workflow Stance
 

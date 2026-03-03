@@ -5,15 +5,23 @@
 # - `spec-driver skills sync` exposes ONLY the skills listed here in `AGENTS.md`.
 #
 # One skill name per line (folder name under `.agent/skills/`).
-
+audit-change
 boot
-preflight
-consult
-implement
-notes
-continuation
 capturing-memory
-retrieving-memory
+close-change
+consult
+continuation
+doctrine
+draft-design-revision
+execute-phase
+implement
 maintaining-memory
+next
+notes
+plan-phases
+preflight
+retrieving-memory
 reviewing-memory
+scope-delta
+shape-revision
 

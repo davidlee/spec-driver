@@ -3911,7 +3911,7 @@ deltas:
         phase: IP-037-P04
   DE-038:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Canonical workflow alignment
     slug: canonical_workflow_alignment
     updated: '2026-03-03'

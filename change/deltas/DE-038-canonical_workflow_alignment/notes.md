@@ -96,9 +96,19 @@
 - Fixed policy decisions preserved (unchanged): one `strict_mode` setting, hard-fail non-canonical baseline with no exception knobs, and v1 mixed-coverage policy (`mixed => in-progress`, mixed-status validation => warning).
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was metadata/docs-only memory tuning.
 
+## 2026-03-04 (verification gate closeout for IP-038)
+- Consolidated verification coverage statuses in `IP-038`:
+  - `VA-038-001` -> `verified` (DE/DR/workflow-research strict-mode coherence)
+  - `VA-038-002` -> `verified` (memory review + retrieval precision evidence)
+  - `VA-038-003` -> `verified` (skill review alignment evidence)
+  - `VH-038-001` -> `verified` (human acceptance captured in-session on 2026-03-04)
+- Updated `IP-038` progress tracking: `Verification gates passed` now checked.
+- No runtime behavior changes made; documentation/plan state only.
+- Verification commands not run in this step (`just`, `just test`, `just lint`, `just pylint`), as this update records verification state rather than code changes.
+
 ## New Agent Instructions
 - Task card code: DE-038 (`canonical_workflow_alignment`)
-- Next activity: run verification gate readback (VA/VH evidence consolidation) and prepare delta close-out when directed.
+- Next activity: run delta close-out flow (`complete delta --dry-run` then `complete delta`) when directed.
 - Required reading:
   - [DE-038.md](./DE-038.md)
   - [DR-038.md](./DR-038.md)
@@ -126,7 +136,7 @@
   - Baseline strict-mode contract: hard-fail non-canonical paths; no exception knobs in this delta.
   - Recommended v1 coverage precedence: mixed status => `in-progress`; mixed-status validation => warning.
 - Incomplete work / loose ends:
-  - `IP-038` verification gates remain unchecked pending VA/VH close-out confirmation.
+  - Verification gates in `IP-038` are closed; remaining work is operational close-out execution.
   - Keep notes current after each completed unit of work.
 - Advice:
   - `uv run spec-driver create phase` currently appends duplicate phase IDs in `IP-038` plan block; clean duplicates if command is used again.

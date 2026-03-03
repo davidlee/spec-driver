@@ -5,35 +5,50 @@ reliable agent/user adoption of the intended workflow.
 
 Scope: specify gaps and evidence only. Remediation planning is follow-up work.
 
+Snapshot date: 2026-03-04
+
+Status legend:
+- `resolved` = addressed by DE-038 outputs
+- `partial` = mitigated in memory/skill surfaces, but source docs/runtime still drift
+- `remains` = still open
+- `deferred` = intentionally left for a follow-up delta
+
 ## 1. Hard Blockers
 
-| Gap | Severity | Affected Journey | Recommended Fix | Evidence |
-|-----|----------|------------------|-----------------|----------|
-| Coverage prerequisite is easy to miss before `complete delta`, causing late close-out failures | High | Implement -> close delta | Surface coverage prerequisite in canonical onboarding/memories and completion checklist | `supekku/scripts/lib/changes/coverage_check.py`, `supekku/scripts/complete_delta.py`, `supekku/about/RUN.md` |
-| Status vocabulary in docs diverges from runtime lifecycle vocabulary | High | Requirement updates, validation, closure | Publish canonical vs tolerated status policy and align docs | `supekku/about/lifecycle.md`, `supekku/scripts/lib/requirements/lifecycle.py`, `supekku/scripts/lib/requirements/registry.py` |
-| Primary memory loop currently promotes revision-first as default | High | New-agent onboarding and sequencing | Reframe core loop to delta-first; keep revision-first as explicit concession path | `memory/mem.pattern.spec-driver.core-loop.md`, `memory/mem.concept.spec-driver.revision.md`, `docs/commands-workflow.md` |
+| Gap | Severity | Status (2026-03-04) | Affected Journey | Recommended Fix (Carry-Forward) | Evidence |
+|-----|----------|----------------------|------------------|----------------------------------|----------|
+| Coverage prerequisite is easy to miss before `complete delta`, causing late close-out failures | High | partial | Implement -> close delta | Keep DE-038 memory/skill guidance and add explicit prerequisite callout in canonical workflow docs | `supekku/scripts/lib/changes/coverage_check.py`, `supekku/scripts/complete_delta.py`, `memory/mem.fact.spec-driver.coverage-gate.md`, `change/deltas/DE-038-canonical_workflow_alignment/phases/phase-04.md` |
+| Status vocabulary in docs diverges from runtime lifecycle vocabulary | High | partial | Requirement updates, validation, closure | `lifecycle.md` aligned; finish remaining status drift in `RUN.md` and related docs | `supekku/about/lifecycle.md`, `supekku/about/RUN.md`, `supekku/scripts/lib/requirements/lifecycle.py`, `supekku/scripts/lib/requirements/registry.py` |
+| Primary memory loop promoted revision-first as default | High | resolved | New-agent onboarding and sequencing | Completed in DE-038: retain delta-first core-loop/revision framing | `memory/mem.pattern.spec-driver.core-loop.md`, `memory/mem.concept.spec-driver.revision.md`, `change/deltas/DE-038-canonical_workflow_alignment/notes.md` |
 
 ## 2. Confusion Vectors
 
-| Gap | Severity | Affected Journey | Recommended Fix | Evidence |
-|-----|----------|------------------|-----------------|----------|
-| Ceremony mode is often read as runtime enforcement despite no command branching on ceremony | Medium | Workflow selection and command expectations | State clearly that ceremony is guidance-only in current runtime | `.spec-driver/workflow.toml`, `supekku/scripts/lib/core/config.py`, `docs/commands-workflow.md` |
-| "Archive" language in top-level docs does not match implemented closure behavior | Medium | End-of-change expectations | Replace archive narrative with implemented close/sync/validate semantics | `supekku/about/README.md`, `supekku/scripts/complete_delta.py`, `supekku/cli/complete.py` |
-| Phase auto-scaffold assumptions still appear in narrative docs | Medium | Delta creation and planning | Explicitly state phases are created via `create phase` | `supekku/about/lifecycle.md`, `supekku/scripts/lib/changes/creation.py`, `supekku/cli/create.py` |
+| Gap | Severity | Status (2026-03-04) | Affected Journey | Recommended Fix (Carry-Forward) | Evidence |
+|-----|----------|----------------------|------------------|----------------------------------|----------|
+| Ceremony mode is often read as runtime enforcement despite no command branching on ceremony | Medium | partial | Workflow selection and command expectations | Keep DE-038 memory/skill posture updates; align top-level docs so they repeat advisory-only semantics | `.spec-driver/workflow.toml`, `supekku/scripts/lib/core/config.py`, `memory/mem.concept.spec-driver.posture.md`, `memory/mem.signpost.spec-driver.ceremony.md` |
+| "Archive" language in top-level docs does not match implemented closure behavior | Medium | remains | End-of-change expectations | Replace archive narrative with implemented close/sync/validate semantics in README/process docs | `supekku/about/README.md`, `supekku/scripts/complete_delta.py`, `supekku/cli/complete.py` |
+| Phase auto-scaffold assumptions still appear in narrative docs | Medium | resolved | Delta creation and planning | Completed: `lifecycle.md` now states phases are created via `create phase` and not auto-scaffolded | `supekku/about/lifecycle.md`, `supekku/scripts/lib/changes/creation.py`, `supekku/cli/create.py` |
 
 ## 3. Missing Automation
 
-| Gap | Severity | Affected Journey | Recommended Fix | Evidence |
-|-----|----------|------------------|-----------------|----------|
-| No runtime strict-mode switch yet for canonical lock-in | Medium | Governance-grade workflow enforcement | Implement `strict_mode` in workflow config and wire enforcement touchpoints | `.spec-driver/workflow.toml`, `supekku/scripts/lib/core/config.py`, `change/deltas/DE-038-canonical_workflow_alignment/DR-038.md` |
-| No first-class `create audit` command | Medium | Post-implementation conformance workflow | Add CLI creation flow for audit bundles | `supekku/cli/create.py`, `supekku/about/processes.md` |
-| No first-class `complete revision` command | Low | Revision lifecycle management | Define and implement revision completion command semantics | `supekku/cli/complete.py`, `supekku/about/processes.md` |
+| Gap | Severity | Status (2026-03-04) | Affected Journey | Recommended Fix (Carry-Forward) | Evidence |
+|-----|----------|----------------------|------------------|----------------------------------|----------|
+| No runtime strict-mode switch yet for canonical lock-in | Medium | deferred | Governance-grade workflow enforcement | Implement `strict_mode` runtime branching and enforcement touchpoints from DR-038 | `.spec-driver/workflow.toml`, `supekku/scripts/lib/core/config.py`, `change/deltas/DE-038-canonical_workflow_alignment/DR-038.md` |
+| No first-class `create audit` command | Medium | remains | Post-implementation conformance workflow | Add CLI creation flow for audit bundles | `supekku/cli/create.py`, `supekku/about/processes.md` |
+| No first-class `complete revision` command | Low | remains | Revision lifecycle management | Define and implement revision completion semantics + CLI | `supekku/cli/complete.py`, `supekku/about/processes.md` |
 
 ## 4. Documentation Debt
 
-| File | Claim Drift | Severity | Recommended Fix |
-|------|-------------|----------|-----------------|
-| `supekku/about/lifecycle.md` | Uses non-canonical requirement statuses and outdated completion flow details | High | Rewrite around current runtime behavior and canonical/tolerated status policy |
-| `supekku/about/README.md` | Includes "Archive" workflow step with no direct runtime implementation | Medium | Align workflow section to implemented closure primitives |
-| `docs/commands-workflow.md` | Canonical workflow map does not emphasize coverage close-out prerequisite | Medium | Add explicit prerequisite section with source references |
-| `supekku/about/RUN.md` | Uses outdated wording ("live" status) that does not match current lifecycle constants | Medium | Align to `active` lifecycle terminology and current completion behavior |
+| File | Claim Drift | Severity | Status (2026-03-04) | Recommended Fix |
+|------|-------------|----------|----------------------|-----------------|
+| `supekku/about/lifecycle.md` | Previously used non-canonical statuses and outdated completion flow details | High | resolved | Rewritten to match current runtime behavior and canonical/tolerated status policy |
+| `supekku/about/README.md` | Includes "Archive" workflow step with no direct runtime implementation | Medium | remains | Align workflow section to implemented closure primitives |
+| `docs/commands-workflow.md` | Canonical workflow map still under-emphasizes explicit coverage close-out prerequisite | Medium | remains | Add explicit prerequisite section with source references (`coverage_check.py`, `complete_delta.py`) |
+| `supekku/about/RUN.md` | Contains outdated lifecycle wording (`live`) despite otherwise useful coverage guidance | Medium | remains | Align lifecycle terminology to current requirement statuses (`active`) and closure behavior |
+
+## 5. Remaining Priority Queue
+
+1. Align `supekku/about/README.md` closure narrative (remove/archive mismatch).
+2. Add explicit coverage prerequisite callout to `docs/commands-workflow.md`.
+3. Clean status terminology drift in `supekku/about/RUN.md`.
+4. Plan follow-up automation delta(s): `strict_mode` runtime, `create audit`, `complete revision`.

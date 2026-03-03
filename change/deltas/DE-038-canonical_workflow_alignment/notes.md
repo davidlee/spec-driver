@@ -106,6 +106,29 @@
 - No runtime behavior changes made; documentation/plan state only.
 - Verification commands not run in this step (`just`, `just test`, `just lint`, `just pylint`), as this update records verification state rather than code changes.
 
+## 2026-03-04 (gaps register status clarification)
+- Reworked `gaps-to-adoption.md` into a dated status snapshot (`resolved` / `partial` / `remains` / `deferred`) so unresolved adoption items are explicit.
+- Clarified carry-forward status per gap category:
+  - resolved in DE-038: revision-first memory-loop drift
+  - partial: coverage prerequisite discoverability, ceremony enforcement perception
+  - remains: status-vocabulary drift, archive narrative drift, phase auto-scaffold drift, doc debt set, and missing audit/revision completion automation
+  - deferred: runtime `strict_mode` implementation
+- Added a ranked remaining-priority queue to preserve follow-up sequence.
+- No runtime behavior changes; docs-only update.
+
+## 2026-03-04 (lifecycle doc drift remediation)
+- Rewrote `supekku/about/lifecycle.md` to match current code-truth:
+  - canonical requirement statuses: `pending`, `in-progress`, `active`, `retired`
+  - coverage aggregation precedence and drift-warning behavior from requirements registry sync
+  - revision lifecycle ingestion caveat (tolerant read-time status handling)
+  - accurate delta flow (`create delta` does not auto-create phase files; `complete delta` coverage gate + revision-source lifecycle updates)
+- Updated `gaps-to-adoption.md` statuses:
+  - `lifecycle.md` documentation debt -> `resolved`
+  - phase auto-scaffold confusion vector -> `resolved`
+  - status vocabulary hard blocker -> `partial` (remaining drift concentrated in `RUN.md` and related docs)
+- Re-ranked remaining priority queue accordingly.
+- No runtime behavior changes; docs-only update.
+
 ## New Agent Instructions
 - Task card code: DE-038 (`canonical_workflow_alignment`)
 - Next activity: run delta close-out flow (`complete delta --dry-run` then `complete delta`) when directed.

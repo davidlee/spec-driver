@@ -12,7 +12,6 @@ tags:
 - truth-model
 - contracts
 - specs
-- seed
 summary: Contracts record observed truth (what code exposes). Specs express intent
   and constraints. Never let them become competing sources of truth.
 priority:

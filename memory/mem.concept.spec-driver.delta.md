@@ -10,7 +10,6 @@ confidence: high
 tags:
 - spec-driver
 - delta
-- seed
 summary: Deltas (DE-*) are declarative change bundles — the mechanism for applying
   revision intent to code. They scope work, link requirements, and carry verification
   strategy toward audit/reconciliation.

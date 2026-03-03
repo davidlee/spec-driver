@@ -11,7 +11,6 @@ tags:
 - spec-driver
 - relations
 - traceability
-- seed
 summary: Relations link artefacts via frontmatter. Traceability (implemented_by, verified_by)
   is automatic via sync. Status is always manual.
 priority:

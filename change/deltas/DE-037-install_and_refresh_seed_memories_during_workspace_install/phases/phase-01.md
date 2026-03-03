@@ -68,11 +68,11 @@ Classify existing memory corpus into two managed buckets (spec-driver, seed) plu
 - [x] Replace semantics agreed (seed: never overwrite; spec-driver: refresh)
 
 ## 4. Exit Criteria / Done When
-- [ ] Every memory file classified into spec-driver / seed / unmanaged
-- [ ] 2 seed stubs authored and committed
-- [ ] Stale `seed` tags removed from frontmatter
-- [ ] pyproject.toml force-include configured
-- [ ] VA-037-001 classification report in notes.md
+- [x] Every memory file classified into spec-driver / seed / unmanaged
+- [x] 2 seed stubs authored
+- [x] Stale `seed` tags removed from frontmatter
+- [x] pyproject.toml force-include configured
+- [x] VA-037-001 classification report in notes.md
 
 ## 5. Verification
 - VA-037-001: classification report documenting all 27 memory files (22 spec-driver + 3 unmanaged + 2 new seed)
@@ -85,11 +85,11 @@ Classify existing memory corpus into two managed buckets (spec-driver, seed) plu
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Author mem.pattern.project.workflow seed stub | [P] | |
-| [ ] | 1.2 | Author mem.pattern.project.completion seed stub | [P] | |
-| [ ] | 1.3 | Remove stale `seed` tags from memory frontmatter | [P] | |
-| [ ] | 1.4 | Add hatch force-include for memory in pyproject.toml | [P] | |
-| [ ] | 1.5 | Produce VA-037-001 classification report | | After 1.1–1.4 |
+| [x] | 1.1 | Author mem.pattern.project.workflow seed stub | [P] | Thin stub referencing core-loop |
+| [x] | 1.2 | Author mem.pattern.project.completion seed stub | [P] | Thin stub referencing delta-completion |
+| [x] | 1.3 | Remove stale `seed` tags from memory frontmatter | [P] | Removed from 19 files |
+| [x] | 1.4 | Add hatch force-include for memory in pyproject.toml | [P] | `"memory" = "supekku/memory"` |
+| [x] | 1.5 | Produce VA-037-001 classification report | | 22 spec-driver / 2 seed / 3 unmanaged |
 
 ## 8. Risks & Mitigations
 | Risk | Mitigation | Status |

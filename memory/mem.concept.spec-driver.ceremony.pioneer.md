@@ -11,7 +11,6 @@ tags:
 - spec-driver
 - ceremony
 - pioneer
-- seed
 summary: 'Low ceremony: ship and learn. Cards for most work, optional ADRs, minimal
   spec-driver overhead. Speed over traceability.'
 priority:

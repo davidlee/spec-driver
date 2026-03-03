@@ -10,7 +10,6 @@ confidence: high
 tags:
 - spec-driver
 - ceremony
-- seed
 summary: Check workflow.toml for the active ceremony mode, then read the corresponding
   mode memory for operational guidance. Ceremony is advisory; enforcement comes
   from explicit command gates.

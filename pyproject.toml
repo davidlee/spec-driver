@@ -63,10 +63,8 @@ exclude = [
     "**/*.pyc",
     "**/*.pyo",
 ]
- # [tool.hatch.build.targets.wheel.force-include]
- # "supekku/templates" = "supekku/templates"
- # "supekku/agents" = "supekku/agents"
- # "supekku/about" = "supekku/about"
+[tool.hatch.build.targets.wheel.force-include]
+"memory" = "supekku/memory"
 
 
 [tool.hatch.build.targets.sdist]

@@ -11,7 +11,6 @@ tags:
 - spec-driver
 - verification
 - evidence
-- seed
 summary: Three verification artifact types (VT, VA, VH) provide evidence that requirements
   are satisfied. Coverage blocks in specs track their status.
 priority:

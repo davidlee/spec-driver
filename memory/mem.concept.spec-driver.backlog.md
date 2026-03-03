@@ -10,7 +10,6 @@ confidence: high
 tags:
 - spec-driver
 - backlog
-- seed
 summary: 'Work intake layer: issues, problems, improvements, and risks. Feeds delta
   scoping and prioritisation.'
 priority:

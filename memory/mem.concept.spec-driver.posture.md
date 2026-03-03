@@ -11,7 +11,6 @@ tags:
 - spec-driver
 - posture
 - ceremony
-- seed
 summary: The framework is permissive; the project chooses its constraints. Posture
   is configured via workflow.toml. Ceremony mode is advisory; runtime enforcement
   comes from explicit command gates and validations.

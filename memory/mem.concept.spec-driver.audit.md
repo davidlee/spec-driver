@@ -11,7 +11,6 @@ tags:
 - spec-driver
 - audit
 - verification
-- seed
 summary: Audits (AUD-*) compare implementation against specs. They reconcile realised
   behavior against intent and feed explicit spec reconciliation before closure.
 priority:

@@ -12,7 +12,6 @@ tags:
 - delta
 - completion
 - verification
-- seed
 summary: 'Self-contained checklist for closing a delta: phase completion, verification
   artifacts, spec coverage prerequisites, completion command, sync, and validation.'
 priority:

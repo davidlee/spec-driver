@@ -10,7 +10,6 @@ confidence: high
 tags:
 - spec-driver
 - contracts
-- seed
 summary: Contracts are auto-generated API documentation — the canonical record of
   what the code actually exposes. Observed truth, not authored intent.
 priority:

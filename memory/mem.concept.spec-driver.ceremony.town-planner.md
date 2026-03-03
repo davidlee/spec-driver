@@ -11,7 +11,6 @@ tags:
 - spec-driver
 - ceremony
 - town-planner
-- seed
 summary: 'High ceremony: full governance with revisions before deltas, evidence discipline,
   and explicit spec reconciliation after audit/contracts.'
 priority:

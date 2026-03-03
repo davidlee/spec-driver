@@ -11,7 +11,6 @@ tags:
 - spec-driver
 - plan
 - phases
-- seed
 summary: Implementation Plans (IP-*) break delta execution into verifiable phases
   with entrance/exit criteria. Phase sheets track detailed task progress.
 priority:

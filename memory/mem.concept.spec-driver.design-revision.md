@@ -10,7 +10,6 @@ confidence: high
 tags:
 - spec-driver
 - design-revision
-- seed
 summary: 'Design Revisions (DR-*) translate delta intent into concrete code-level
   design: current vs target behaviour, hotspots, and test impacts.'
 priority:

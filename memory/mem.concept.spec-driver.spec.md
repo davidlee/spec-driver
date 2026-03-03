@@ -11,7 +11,6 @@ tags:
 - spec-driver
 - spec
 - requirements
-- seed
 summary: Tech Specs (SPEC-*) and Product Specs (PROD-*) define system behaviour, architecture,
   and product intent. In high-rigor flows, canonical spec state is finalized after
   audit/contracts reconciliation.

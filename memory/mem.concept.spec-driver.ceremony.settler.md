@@ -11,7 +11,6 @@ tags:
 - spec-driver
 - ceremony
 - settler
-- seed
 summary: 'Medium ceremony: delta-first delivery with selective specs, backlog intake,
   and flexible evidence capture. The default mode for most projects.'
 priority:

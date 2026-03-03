@@ -10,7 +10,6 @@ confidence: high
 tags:
 - spec-driver
 - revision
-- seed
 summary: Spec Revisions (RE-*) document requirement/spec change intent and lineage.
   In canonical delta-first flow they typically follow
   audit findings; revision-first is a town-planner concession path.

@@ -6,6 +6,7 @@ import typer
 
 from supekku.cli import (
   backfill,
+  compact,
   complete,
   create,
   edit,
@@ -115,6 +116,12 @@ app.add_typer(
   skills.app,
   name="skills",
   help="Manage agent skill exposure",
+)
+
+app.add_typer(
+  compact.app,
+  name="compact",
+  help="Compact artifact frontmatter by stripping default/derived fields",
 )
 
 

@@ -122,13 +122,13 @@ def test_initialize_workspace_copies_agents_when_claude_exists(tmp_path: Path) -
   assert len(agent_files) > 0, "No agent files were copied"
 
 
-def test_initialize_workspace_skips_agents_when_no_claude(tmp_path: Path) -> None:
-  """Test that initialize_workspace skips agents if .claude doesn't exist."""
+def test_initialize_workspace_skips_commands_when_no_claude(tmp_path: Path) -> None:
+  """Test that agent commands are not copied if .claude didn't exist before install."""
+  # .claude may be created by sync_skills (for skills), but commands/ should not
   initialize_workspace(tmp_path, auto_yes=True)
 
-  # .claude directory should not be created
-  claude_dir = tmp_path / ".claude"
-  assert not claude_dir.exists()
+  commands_dir = tmp_path / ".claude" / "commands"
+  assert not commands_dir.exists()
 
 
 def test_initialize_workspace_skips_existing_files(tmp_path: Path) -> None:
@@ -316,8 +316,9 @@ def test_initialize_workspace_prompts_per_category(tmp_path: Path, capsys) -> No
     about_dir = tmp_path / SPEC_DRIVER_DIR / "about"
     (about_dir / "README.md").write_text("modified")
 
-    # Mock user saying "no" to templates but "yes" to about docs
-    with mock.patch("builtins.input", side_effect=["n", "y"]):
+    # Mock user saying "no" to templates, "yes" to about docs,
+    # "n" to agent commands (.claude/ now exists from sync_skills)
+    with mock.patch("builtins.input", side_effect=["n", "y", "n"]):
       initialize_workspace(tmp_path)
       captured = capsys.readouterr()
 
@@ -438,3 +439,75 @@ def test_initialize_workspace_agent_fallback_to_static_copy(
     # Restore
     if backup.exists():
       backup.rename(agents_template_dir)
+
+
+# --- Skills installation integration ---
+
+
+def test_initialize_workspace_installs_skills(tmp_path: Path) -> None:
+  """initialize_workspace calls sync_skills to install package skills."""
+  # Create allowlist
+  sd = tmp_path / SPEC_DRIVER_DIR
+  sd.mkdir(parents=True)
+  (sd / "skills.allowlist").write_text("boot\nconsult\n", encoding="utf-8")
+
+  initialize_workspace(tmp_path, auto_yes=True)
+
+  # Skills should be installed to default targets
+  claude_skills = tmp_path / ".claude" / "skills"
+  agents_skills = tmp_path / ".agents" / "skills"
+
+  assert claude_skills.is_dir(), ".claude/skills/ not created"
+  assert agents_skills.is_dir(), ".agents/skills/ not created"
+
+  # At least boot and consult should be present (from real package skills)
+  assert (claude_skills / "boot" / "SKILL.md").is_file()
+  assert (claude_skills / "consult" / "SKILL.md").is_file()
+  assert (agents_skills / "boot" / "SKILL.md").is_file()
+  assert (agents_skills / "consult" / "SKILL.md").is_file()
+
+
+def test_initialize_workspace_dry_run_skips_skills(tmp_path: Path) -> None:
+  """In dry-run mode, skills are not installed."""
+  sd = tmp_path / SPEC_DRIVER_DIR
+  sd.mkdir(parents=True)
+  (sd / "skills.allowlist").write_text("boot\n", encoding="utf-8")
+
+  initialize_workspace(tmp_path, dry_run=True)
+
+  assert not (tmp_path / ".claude" / "skills").exists()
+  assert not (tmp_path / ".agents" / "skills").exists()
+
+
+def test_initialize_workspace_bootstraps_allowlist(tmp_path: Path) -> None:
+  """When no allowlist exists, installer creates one with all package skills."""
+  initialize_workspace(tmp_path, auto_yes=True)
+
+  allowlist = tmp_path / SPEC_DRIVER_DIR / "skills.allowlist"
+  assert allowlist.is_file()
+  content = allowlist.read_text(encoding="utf-8")
+
+  # Should contain at least boot and consult (known package skills)
+  lines = [
+    ln.strip() for ln in content.splitlines() if ln.strip() and not ln.startswith("#")
+  ]
+  assert "boot" in lines
+  assert "consult" in lines
+
+  # Should be sorted
+  assert lines == sorted(lines)
+
+  # Skills should actually be installed
+  assert (tmp_path / ".claude" / "skills" / "boot" / "SKILL.md").is_file()
+
+
+def test_initialize_workspace_preserves_existing_allowlist(tmp_path: Path) -> None:
+  """Existing allowlist is never overwritten."""
+  sd = tmp_path / SPEC_DRIVER_DIR
+  sd.mkdir(parents=True)
+  (sd / "skills.allowlist").write_text("boot\n", encoding="utf-8")
+
+  initialize_workspace(tmp_path, auto_yes=True)
+
+  content = (sd / "skills.allowlist").read_text(encoding="utf-8")
+  assert content == "boot\n"

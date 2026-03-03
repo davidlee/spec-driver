@@ -1,1 +1,1 @@
-"""Skills management: allowlist-driven exposure of OpenSkills to agents."""
+"""Skills management: install, prune, and expose package skills to agents."""

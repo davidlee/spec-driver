@@ -26,7 +26,7 @@ Usage notes:
 
 <skill>
 <name>preflight</name>
-<description>Before starting something new: understand task, intent, and context</description>
+<description>Before starting anything new, understand task, intent, and context.</description>
 <location>project</location>
 </skill>
 

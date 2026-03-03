@@ -1,19 +1,64 @@
-"""Tests for skills sync: allowlist parsing, metadata, rendering, AGENTS.md."""
+"""Tests for skills sync: allowlist, metadata, rendering, install, prune, AGENTS.md."""
 
 from __future__ import annotations
 
+import warnings as _warnings
 from pathlib import Path
 
 from supekku.scripts.lib.skills.sync import (
   AGENTS_MD_REFERENCE,
+  SKILL_TARGET_DIRS,
+  _skill_dir_matches,
   ensure_file_reference,
+  get_package_skill_names,
+  install_skills_to_target,
   parse_allowlist,
+  prune_skills_from_target,
   read_skill_metadata,
   render_skills_system,
   sync_skills,
 )
 
 AGENTS_MD_REF = AGENTS_MD_REFERENCE
+
+
+# --- helpers ---
+
+
+def _make_skill(
+  skills_dir: Path, name: str, description: str, *, body: str = "# Instructions\n"
+) -> None:
+  """Helper to create a SKILL.md with frontmatter."""
+  skill_dir = skills_dir / name
+  skill_dir.mkdir(parents=True, exist_ok=True)
+  (skill_dir / "SKILL.md").write_text(
+    f"---\nname: {name}\ndescription: {description}\n---\n\n{body}",
+    encoding="utf-8",
+  )
+
+
+def _make_source(tmp_path: Path) -> Path:
+  """Create a package-like skills source directory."""
+  source = tmp_path / "pkg_skills"
+  _make_skill(source, "boot", "Mandatory onboarding.")
+  _make_skill(source, "consult", "Obstacle handling.")
+  _make_skill(source, "notes", "Session notes.")
+  return source
+
+
+def _setup_repo(tmp_path: Path) -> tuple[Path, Path]:
+  """Create a minimal repo with skills source and allowlist.
+
+  Returns (repo_root, skills_source_dir).
+  """
+  root = tmp_path / "repo"
+  root.mkdir()
+  sd = root / ".spec-driver"
+  sd.mkdir()
+  (sd / "skills.allowlist").write_text("boot\nconsult\n", encoding="utf-8")
+
+  source = _make_source(tmp_path)
+  return root, source
 
 
 # --- allowlist parsing ---
@@ -50,16 +95,6 @@ def test_parse_allowlist_missing_file(tmp_path: Path) -> None:
 
 
 # --- skill metadata ---
-
-
-def _make_skill(skills_dir: Path, name: str, description: str) -> None:
-  """Helper to create a SKILL.md with frontmatter."""
-  skill_dir = skills_dir / name
-  skill_dir.mkdir(parents=True, exist_ok=True)
-  (skill_dir / "SKILL.md").write_text(
-    f"---\nname: {name}\ndescription: {description}\n---\n\n# Instructions\n",
-    encoding="utf-8",
-  )
 
 
 def test_read_skill_metadata(tmp_path: Path) -> None:
@@ -202,75 +237,279 @@ def test_ensure_file_reference_idempotent(tmp_path: Path) -> None:
   assert content.count(AGENTS_MD_REF) == 1
 
 
+# --- get_package_skill_names ---
+
+
+def test_get_package_skill_names_valid(tmp_path: Path) -> None:
+  """Returns names of dirs containing non-empty SKILL.md."""
+  source = _make_source(tmp_path)
+  names = get_package_skill_names(source)
+  assert names == {"boot", "consult", "notes"}
+
+
+def test_get_package_skill_names_empty_dir(tmp_path: Path) -> None:
+  """Returns empty set for non-existent directory."""
+  assert get_package_skill_names(tmp_path / "nope") == set()
+
+
+def test_get_package_skill_names_ignores_empty_skill_md(tmp_path: Path) -> None:
+  """Ignores dirs where SKILL.md is empty (0 bytes)."""
+  source = tmp_path / "skills"
+  _make_skill(source, "good", "Valid skill.")
+  empty_dir = source / "doctrine"
+  empty_dir.mkdir(parents=True)
+  (empty_dir / "SKILL.md").write_text("", encoding="utf-8")
+  names = get_package_skill_names(source)
+  assert names == {"good"}
+
+
+def test_get_package_skill_names_ignores_non_dirs(tmp_path: Path) -> None:
+  """Ignores regular files at top level of source dir."""
+  source = tmp_path / "skills"
+  source.mkdir()
+  _make_skill(source, "boot", "Valid.")
+  (source / "README.md").write_text("not a skill", encoding="utf-8")
+  names = get_package_skill_names(source)
+  assert names == {"boot"}
+
+
+# --- _skill_dir_matches ---
+
+
+def test_skill_dir_matches_identical(tmp_path: Path) -> None:
+  """Returns True when SKILL.md content matches."""
+  src = tmp_path / "src" / "boot"
+  dest = tmp_path / "dest" / "boot"
+  _make_skill(tmp_path / "src", "boot", "Same.")
+  _make_skill(tmp_path / "dest", "boot", "Same.")
+  assert _skill_dir_matches(src, dest)
+
+
+def test_skill_dir_matches_different(tmp_path: Path) -> None:
+  """Returns False when SKILL.md content differs."""
+  _make_skill(tmp_path / "src", "boot", "Version 1.")
+  _make_skill(tmp_path / "dest", "boot", "Version 2.")
+  assert not _skill_dir_matches(tmp_path / "src" / "boot", tmp_path / "dest" / "boot")
+
+
+def test_skill_dir_matches_missing_dest(tmp_path: Path) -> None:
+  """Returns False when destination SKILL.md doesn't exist."""
+  _make_skill(tmp_path / "src", "boot", "Exists.")
+  assert not _skill_dir_matches(tmp_path / "src" / "boot", tmp_path / "dest" / "boot")
+
+
+# --- install_skills_to_target ---
+
+
+def test_install_skills_to_target_copies(tmp_path: Path) -> None:
+  """Installs allowlisted skills to target dir."""
+  source = _make_source(tmp_path)
+  target = tmp_path / "target"
+  result = install_skills_to_target(source, target, ["boot", "consult"])
+  assert set(result["installed"]) == {"boot", "consult"}
+  assert (target / "boot" / "SKILL.md").is_file()
+  assert (target / "consult" / "SKILL.md").is_file()
+
+
+def test_install_skills_to_target_idempotent(tmp_path: Path) -> None:
+  """Second run reports up_to_date, not installed."""
+  source = _make_source(tmp_path)
+  target = tmp_path / "target"
+  install_skills_to_target(source, target, ["boot"])
+  result = install_skills_to_target(source, target, ["boot"])
+  assert result["installed"] == []
+  assert result["up_to_date"] == ["boot"]
+
+
+def test_install_skills_to_target_updates_changed(tmp_path: Path) -> None:
+  """Re-installs when source SKILL.md has changed."""
+  source = _make_source(tmp_path)
+  target = tmp_path / "target"
+  install_skills_to_target(source, target, ["boot"])
+
+  # Modify source
+  (source / "boot" / "SKILL.md").write_text(
+    "---\nname: boot\ndescription: Updated.\n---\n\n# New body\n",
+    encoding="utf-8",
+  )
+  result = install_skills_to_target(source, target, ["boot"])
+  assert result["installed"] == ["boot"]
+  assert "Updated." in (target / "boot" / "SKILL.md").read_text(encoding="utf-8")
+
+
+def test_install_skills_to_target_creates_dir(tmp_path: Path) -> None:
+  """Creates target directory if it doesn't exist."""
+  source = _make_source(tmp_path)
+  target = tmp_path / "deep" / "nested" / "target"
+  assert not target.exists()
+  install_skills_to_target(source, target, ["boot"])
+  assert (target / "boot" / "SKILL.md").is_file()
+
+
+def test_install_skills_to_target_skips_missing_source(tmp_path: Path) -> None:
+  """Silently skips skills not in source directory."""
+  source = _make_source(tmp_path)
+  target = tmp_path / "target"
+  result = install_skills_to_target(source, target, ["boot", "nonexistent"])
+  assert result["installed"] == ["boot"]
+
+
+# --- prune_skills_from_target ---
+
+
+def test_prune_removes_delisted_package_skills(tmp_path: Path) -> None:
+  """Removes package skills that are no longer allowlisted."""
+  source = _make_source(tmp_path)
+  target = tmp_path / "target"
+  install_skills_to_target(source, target, ["boot", "consult", "notes"])
+
+  # Now allowlist only boot — consult and notes should be pruned
+  package_names = get_package_skill_names(source)
+  pruned = prune_skills_from_target(target, package_names, ["boot"])
+  assert set(pruned) == {"consult", "notes"}
+  assert (target / "boot").is_dir()
+  assert not (target / "consult").exists()
+  assert not (target / "notes").exists()
+
+
+def test_prune_ignores_user_skills(tmp_path: Path) -> None:
+  """Does not remove skills that aren't in the package."""
+  source = _make_source(tmp_path)
+  target = tmp_path / "target"
+  install_skills_to_target(source, target, ["boot"])
+
+  # Add a user-created skill
+  user_skill = target / "my-custom-skill"
+  user_skill.mkdir()
+  (user_skill / "SKILL.md").write_text("---\nname: custom\ndescription: Mine.\n---\n")
+
+  package_names = get_package_skill_names(source)
+  pruned = prune_skills_from_target(target, package_names, ["boot"])
+  assert pruned == []
+  assert user_skill.is_dir()
+
+
+def test_prune_noop_when_all_allowed(tmp_path: Path) -> None:
+  """No pruning when all package skills are in the allowlist."""
+  source = _make_source(tmp_path)
+  target = tmp_path / "target"
+  install_skills_to_target(source, target, ["boot", "consult", "notes"])
+  package_names = get_package_skill_names(source)
+  pruned = prune_skills_from_target(
+    target,
+    package_names,
+    ["boot", "consult", "notes"],
+  )
+  assert pruned == []
+
+
+def test_prune_nonexistent_target_dir(tmp_path: Path) -> None:
+  """Returns empty list for non-existent target directory."""
+  pruned = prune_skills_from_target(
+    tmp_path / "nope",
+    {"boot"},
+    ["boot"],
+  )
+  assert pruned == []
+
+
 # --- end-to-end sync ---
-
-
-def _setup_repo(tmp_path: Path) -> Path:
-  """Create a minimal repo structure for sync tests."""
-  root = tmp_path
-  sd = root / ".spec-driver"
-  sd.mkdir()
-  (sd / "skills.allowlist").write_text("boot\nconsult\n", encoding="utf-8")
-
-  skills_dir = root / ".agent" / "skills"
-  _make_skill(skills_dir, "boot", "Mandatory onboarding.")
-  _make_skill(skills_dir, "consult", "Obstacle handling.")
-  _make_skill(skills_dir, "unrelated", "Not in allowlist.")
-  return root
 
 
 def test_sync_skills_writes_agents_md(tmp_path: Path) -> None:
   """sync_skills writes .spec-driver/AGENTS.md with allowlisted skills only."""
-  root = _setup_repo(tmp_path)
-  result = sync_skills(root)
+  root, source = _setup_repo(tmp_path)
+  result = sync_skills(root, skills_source_dir=source)
 
   agents_md = root / ".spec-driver" / "AGENTS.md"
   assert agents_md.exists()
   content = agents_md.read_text(encoding="utf-8")
   assert "<name>boot</name>" in content
   assert "<name>consult</name>" in content
-  assert "<name>unrelated</name>" not in content
   assert result["written"] == 2
+
+
+def test_sync_skills_installs_to_targets(tmp_path: Path) -> None:
+  """sync_skills installs skills to configured target directories."""
+  root, source = _setup_repo(tmp_path)
+  result = sync_skills(root, skills_source_dir=source)
+
+  # Check both default targets
+  for target_name, target_path in SKILL_TARGET_DIRS.items():
+    abs_target = root / target_path
+    assert (abs_target / "boot" / "SKILL.md").is_file(), (
+      f"boot not installed to {target_name}"
+    )
+    assert (abs_target / "consult" / "SKILL.md").is_file(), (
+      f"consult not installed to {target_name}"
+    )
+
+  assert "claude" in result["targets"]
+  assert "codex" in result["targets"]
+
+
+def test_sync_skills_prunes_from_targets(tmp_path: Path) -> None:
+  """sync_skills prunes de-listed skills from targets."""
+  root, source = _setup_repo(tmp_path)
+  # First sync with boot + consult
+  sync_skills(root, skills_source_dir=source)
+
+  # Now narrow allowlist to just boot
+  sd = root / ".spec-driver"
+  (sd / "skills.allowlist").write_text("boot\n", encoding="utf-8")
+  result = sync_skills(root, skills_source_dir=source)
+
+  for target_name, target_path in SKILL_TARGET_DIRS.items():
+    abs_target = root / target_path
+    assert (abs_target / "boot").is_dir()
+    assert not (abs_target / "consult").exists(), (
+      f"consult not pruned from {target_name}"
+    )
+    assert "consult" in result["targets"][target_name]["pruned"]
 
 
 def test_sync_skills_idempotent(tmp_path: Path) -> None:
   """Running sync twice produces identical output."""
-  root = _setup_repo(tmp_path)
-  sync_skills(root)
+  root, source = _setup_repo(tmp_path)
+  sync_skills(root, skills_source_dir=source)
   first = (root / ".spec-driver" / "AGENTS.md").read_text(encoding="utf-8")
-  result = sync_skills(root)
+  result = sync_skills(root, skills_source_dir=source)
   second = (root / ".spec-driver" / "AGENTS.md").read_text(encoding="utf-8")
   assert first == second
-  assert result["changed"] is False
+  assert result["agents_md_changed"] is False
+
+  # All targets should report up_to_date
+  for info in result["targets"].values():
+    assert info["installed"] == []
+    assert info["pruned"] == []
 
 
 def test_sync_skills_ensures_root_agents_reference(tmp_path: Path) -> None:
   """sync_skills ensures root AGENTS.md has @-reference."""
-  root = _setup_repo(tmp_path)
-  sync_skills(root)
+  root, source = _setup_repo(tmp_path)
+  sync_skills(root, skills_source_dir=source)
   content = (root / "AGENTS.md").read_text(encoding="utf-8")
   assert AGENTS_MD_REF in content
 
 
 def test_sync_skills_warns_on_missing_skill(tmp_path: Path) -> None:
-  """Warns when allowlisted skill is not installed."""
-  root = tmp_path
+  """Warns when allowlisted skill is not in source."""
+  root, source = _setup_repo(tmp_path)
   sd = root / ".spec-driver"
-  sd.mkdir()
   (sd / "skills.allowlist").write_text("boot\nmissing_skill\n", encoding="utf-8")
-  skills_dir = root / ".agent" / "skills"
-  _make_skill(skills_dir, "boot", "Onboarding.")
 
-  result = sync_skills(root)
+  result = sync_skills(root, skills_source_dir=source)
   assert "missing_skill" in result["warnings"]
   assert result["written"] == 1
 
 
 def test_sync_skills_no_allowlist(tmp_path: Path) -> None:
   """When allowlist is missing, writes empty skills block."""
-  root = tmp_path
+  root = tmp_path / "repo"
+  root.mkdir()
   (root / ".spec-driver").mkdir()
-  result = sync_skills(root)
+  source = _make_source(tmp_path)
+  result = sync_skills(root, skills_source_dir=source)
   assert result["written"] == 0
   agents_md = root / ".spec-driver" / "AGENTS.md"
   assert agents_md.exists()
@@ -279,19 +518,18 @@ def test_sync_skills_no_allowlist(tmp_path: Path) -> None:
 # --- CLAUDE.md integration ---
 
 
-def test_sync_skills_ensures_claude_md_reference(tmp_path: Path) -> None:
-  """sync_skills ensures root CLAUDE.md has @-reference to AGENTS.md."""
-  root = _setup_repo(tmp_path)
-  sync_skills(root)
-  content = (root / "CLAUDE.md").read_text(encoding="utf-8")
-  assert AGENTS_MD_REF in content
+def test_sync_skills_skips_claude_md_by_default(tmp_path: Path) -> None:
+  """By default, CLAUDE.md is not touched (Claude reads AGENTS.md natively)."""
+  root, source = _setup_repo(tmp_path)
+  sync_skills(root, skills_source_dir=source)
+  assert not (root / "CLAUDE.md").exists()
 
 
-def test_sync_skills_prepends_in_existing_claude_md(tmp_path: Path) -> None:
-  """@-reference is prepended before existing CLAUDE.md content."""
-  root = _setup_repo(tmp_path)
+def test_sync_skills_writes_claude_md_when_opted_in(tmp_path: Path) -> None:
+  """When integration.claude_md is true, CLAUDE.md gets the @-reference."""
+  root, source = _setup_repo_with_config(tmp_path, claude_md=True)
   (root / "CLAUDE.md").write_text("# Project\n\nRules.\n", encoding="utf-8")
-  sync_skills(root)
+  sync_skills(root, skills_source_dir=source)
   content = (root / "CLAUDE.md").read_text(encoding="utf-8")
   lines = content.splitlines()
   assert lines[0] == AGENTS_MD_REF
@@ -303,11 +541,12 @@ def test_sync_skills_prepends_in_existing_claude_md(tmp_path: Path) -> None:
 
 def _setup_repo_with_config(
   tmp_path: Path,
+  *,
   agents_md: bool = True,
   claude_md: bool = True,
-) -> Path:
+) -> tuple[Path, Path]:
   """Create repo with workflow.toml integration config."""
-  root = _setup_repo(tmp_path)
+  root, source = _setup_repo(tmp_path)
   toml = (
     f"[integration]\nagents_md = {str(agents_md).lower()}\n"
     f"claude_md = {str(claude_md).lower()}\n"
@@ -316,30 +555,62 @@ def _setup_repo_with_config(
     toml,
     encoding="utf-8",
   )
-  return root
+  return root, source
 
 
 def test_config_agents_md_false_skips_reference(tmp_path: Path) -> None:
   """When integration.agents_md is false, root AGENTS.md is not touched."""
-  root = _setup_repo_with_config(tmp_path, agents_md=False)
-  sync_skills(root)
+  root, source = _setup_repo_with_config(tmp_path, agents_md=False)
+  sync_skills(root, skills_source_dir=source)
   assert not (root / "AGENTS.md").exists()
 
 
 def test_config_claude_md_false_skips_reference(tmp_path: Path) -> None:
   """When integration.claude_md is false, root CLAUDE.md is not touched."""
-  root = _setup_repo_with_config(tmp_path, claude_md=False)
-  sync_skills(root)
+  root, source = _setup_repo_with_config(tmp_path, claude_md=False)
+  sync_skills(root, skills_source_dir=source)
   assert not (root / "CLAUDE.md").exists()
 
 
-def test_config_defaults_enable_both(tmp_path: Path) -> None:
-  """Without config, both AGENTS.md and CLAUDE.md get references."""
-  root = _setup_repo(tmp_path)
-  sync_skills(root)
+def test_config_defaults_enable_agents_md_only(tmp_path: Path) -> None:
+  """Without config, AGENTS.md gets reference but CLAUDE.md does not."""
+  root, source = _setup_repo(tmp_path)
+  sync_skills(root, skills_source_dir=source)
   assert (root / "AGENTS.md").exists()
-  assert (root / "CLAUDE.md").exists()
+  assert not (root / "CLAUDE.md").exists()
   agents = (root / "AGENTS.md").read_text(encoding="utf-8")
-  claude = (root / "CLAUDE.md").read_text(encoding="utf-8")
   assert AGENTS_MD_REF in agents
-  assert AGENTS_MD_REF in claude
+
+
+# --- config-driven targets ---
+
+
+def test_sync_skills_respects_target_config(tmp_path: Path) -> None:
+  """Only installs to targets listed in workflow.toml [skills] section."""
+  root, source = _setup_repo(tmp_path)
+  toml = '[skills]\ntargets = ["claude"]\n'
+  (root / ".spec-driver" / "workflow.toml").write_text(toml, encoding="utf-8")
+
+  result = sync_skills(root, skills_source_dir=source)
+  assert "claude" in result["targets"]
+  assert "codex" not in result["targets"]
+
+  # Claude target should have skills
+  assert (root / ".claude" / "skills" / "boot" / "SKILL.md").is_file()
+  # Codex target should not exist
+  assert not (root / ".agents" / "skills").exists()
+
+
+def test_sync_skills_unknown_target_warns(tmp_path: Path) -> None:
+  """Unknown target name emits a warning and is skipped."""
+  root, source = _setup_repo(tmp_path)
+  toml = '[skills]\ntargets = ["claude", "vscode"]\n'
+  (root / ".spec-driver" / "workflow.toml").write_text(toml, encoding="utf-8")
+
+  with _warnings.catch_warnings(record=True) as caught:
+    _warnings.simplefilter("always")
+    result = sync_skills(root, skills_source_dir=source)
+
+  assert "claude" in result["targets"]
+  assert "vscode" not in result["targets"]
+  assert any("vscode" in str(w.message) for w in caught)

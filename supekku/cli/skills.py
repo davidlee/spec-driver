@@ -13,11 +13,11 @@ app = typer.Typer(help="Skills management", no_args_is_help=True)
 
 @app.command("sync")
 def skills_sync() -> None:
-  """Sync allowlisted skills to .spec-driver/AGENTS.md.
+  """Sync skills from package to agent target directories.
 
-  Reads `.spec-driver/skills.allowlist`, reads skill metadata from
-  `.agent/skills/*/SKILL.md`, and writes a managed AGENTS.md with
-  only the allowlisted project skills exposed.
+  Installs allowlisted skills to configured targets (e.g.
+  `.claude/skills/`, `.agents/skills/`), prunes de-listed skills,
+  and updates `.spec-driver/AGENTS.md`.
   """
   try:
     root = find_repo_root()
@@ -27,12 +27,27 @@ def skills_sync() -> None:
 
   result = sync_skills(root)
 
-  if result["changed"]:
+  # Per-target summary
+  for target_name, info in result["targets"].items():
+    installed = info["installed"]
+    pruned = info["pruned"]
+    parts: list[str] = []
+    if installed:
+      parts.append(f"installed {len(installed)}")
+    if pruned:
+      parts.append(f"pruned {len(pruned)}")
+    if parts:
+      typer.echo(f"  {target_name}: {', '.join(parts)}")
+    else:
+      typer.echo(f"  {target_name}: up to date")
+
+  # AGENTS.md summary
+  if result["agents_md_changed"]:
     typer.echo(
       f"Wrote {result['written']} skills to .spec-driver/AGENTS.md",
     )
   else:
-    typer.echo("No changes (already up to date)")
+    typer.echo("AGENTS.md up to date")
 
   if result["warnings"]:
     for name in result["warnings"]:

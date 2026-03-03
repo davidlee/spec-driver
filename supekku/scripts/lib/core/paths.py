@@ -76,10 +76,22 @@ def get_agents_dir(repo_root: Path | None = None) -> Path:
   return get_spec_driver_root(repo_root) / "agents"
 
 
+def get_package_skills_dir() -> Path:
+  """Get the bundled skills directory within the supekku package.
+
+  Returns:
+    Path to supekku/skills/ (package data, not workspace).
+  """
+  import supekku  # noqa: PLC0415  # pylint: disable=import-outside-toplevel
+
+  return Path(supekku.__file__).parent / "skills"
+
+
 __all__ = [
   "SPEC_DRIVER_DIR",
   "get_about_dir",
   "get_agents_dir",
+  "get_package_skills_dir",
   "get_registry_dir",
   "get_spec_driver_root",
   "get_templates_dir",

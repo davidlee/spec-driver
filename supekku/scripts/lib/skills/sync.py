@@ -1,8 +1,9 @@
-"""Allowlist-driven skills sync: expose selected OpenSkills in AGENTS.md.
+"""Allowlist-driven skills sync: install, prune, and expose skills in AGENTS.md.
 
-Reads `.spec-driver/skills.allowlist`, reads SKILL.md frontmatter from
-`.agent/skills/*/SKILL.md`, and writes a self-contained `<skills_system>`
-block to `.spec-driver/AGENTS.md`.
+Reads `.spec-driver/skills.allowlist`, installs allowlisted skills from the
+package source (`supekku/skills/`) to configured agent target dirs
+(`.claude/skills/`, `.agents/skills/`), prunes de-listed skills, and writes
+a `<skills_system>` block to `.spec-driver/AGENTS.md`.
 
 Root `AGENTS.md` and `CLAUDE.md` are updated with `@`-references to the
 managed file, controlled by `[integration]` in `workflow.toml`.
@@ -10,15 +11,22 @@ managed file, controlled by `[integration]` in `workflow.toml`.
 
 from __future__ import annotations
 
+import shutil
 import sys
+import warnings
 from pathlib import Path
 
 import yaml
 
 from supekku.scripts.lib.core.config import load_workflow_config
-from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, get_package_skills_dir
 
-SKILLS_CACHE_DIR = Path(".agent") / "skills"
+# Agent-specific target directories (relative to repo root)
+SKILL_TARGET_DIRS: dict[str, Path] = {
+  "claude": Path(".claude") / "skills",
+  "codex": Path(".agents") / "skills",
+}
+
 ALLOWLIST_FILE = "skills.allowlist"
 MANAGED_AGENTS_FILE = "AGENTS.md"
 AGENTS_MD_REFERENCE = f"@{SPEC_DRIVER_DIR}/{MANAGED_AGENTS_FILE}"
@@ -186,72 +194,223 @@ def ensure_file_reference(file_path: Path, reference: str) -> None:
   )
 
 
+# --- Package skill discovery ---
+
+
+def get_package_skill_names(skills_source_dir: Path) -> set[str]:
+  """List valid skill names in the package source directory.
+
+  A valid skill is a subdirectory containing a non-empty SKILL.md.
+  """
+  if not skills_source_dir.is_dir():
+    return set()
+  names: set[str] = set()
+  for child in skills_source_dir.iterdir():
+    if not child.is_dir():
+      continue
+    skill_md = child / "SKILL.md"
+    if skill_md.is_file() and skill_md.stat().st_size > 0:
+      names.add(child.name)
+  return names
+
+
+def _skill_dir_matches(src: Path, dest: Path) -> bool:
+  """Check whether a destination skill dir matches the source.
+
+  Compares SKILL.md content byte-for-byte. Returns False if
+  the destination SKILL.md is missing.
+  """
+  src_md = src / "SKILL.md"
+  dest_md = dest / "SKILL.md"
+  if not dest_md.is_file():
+    return False
+  return src_md.read_bytes() == dest_md.read_bytes()
+
+
+def install_skills_to_target(
+  skills_source_dir: Path,
+  target_dir: Path,
+  allowed_names: list[str],
+) -> dict[str, list[str]]:
+  """Copy allowlisted skills from package source to a target directory.
+
+  Idempotent: skips skills whose SKILL.md already matches the source.
+  Creates target_dir if it doesn't exist.
+
+  Returns dict with 'installed' and 'up_to_date' lists of skill names.
+  """
+  target_dir.mkdir(parents=True, exist_ok=True)
+  installed: list[str] = []
+  up_to_date: list[str] = []
+
+  for name in allowed_names:
+    src = skills_source_dir / name
+    if not src.is_dir():
+      continue
+    dest = target_dir / name
+    if _skill_dir_matches(src, dest):
+      up_to_date.append(name)
+      continue
+    # Copy entire skill directory
+    if dest.exists():
+      shutil.rmtree(dest)
+    shutil.copytree(src, dest)
+    installed.append(name)
+
+  return {"installed": installed, "up_to_date": up_to_date}
+
+
+def prune_skills_from_target(
+  target_dir: Path,
+  package_skill_names: set[str],
+  allowed_names: list[str],
+) -> list[str]:
+  """Remove de-listed package skills from a target directory.
+
+  Only prunes skills that exist in the package (by name) but are NOT
+  in the allowlist. User-created skills (not in package) are never touched.
+
+  Returns list of pruned skill names.
+  """
+  if not target_dir.is_dir():
+    return []
+  allowed_set = set(allowed_names)
+  pruned: list[str] = []
+  for child in sorted(target_dir.iterdir()):
+    if not child.is_dir():
+      continue
+    name = child.name
+    # Only prune if it's a known package skill AND not in the allowlist
+    if name in package_skill_names and name not in allowed_set:
+      shutil.rmtree(child)
+      pruned.append(name)
+  return pruned
+
+
+# --- Orchestration ---
+
+
 def _collect_skills(
   repo_root: Path,
+  skills_source_dir: Path,
 ) -> tuple[list[dict[str, str]], list[str]]:
-  """Read allowlist and resolve skill metadata.
+  """Read allowlist and resolve skill metadata from package source.
 
   Returns (skills, warnings) where warnings lists names of
   allowlisted skills that could not be found or read.
   """
   sd_root = repo_root / SPEC_DRIVER_DIR
   allowed = parse_allowlist(sd_root / ALLOWLIST_FILE)
-  skills_dir = repo_root / SKILLS_CACHE_DIR
 
   skills: list[dict[str, str]] = []
-  warnings: list[str] = []
+  warn_names: list[str] = []
   for name in allowed:
-    meta = read_skill_metadata(skills_dir / name / "SKILL.md")
+    meta = read_skill_metadata(skills_source_dir / name / "SKILL.md")
     if meta is None:
-      warnings.append(name)
+      warn_names.append(name)
       print(
         f"Warning: allowlisted skill '{name}' not found",
         file=sys.stderr,
       )
       continue
     skills.append(meta)
-  return skills, warnings
+  return skills, warn_names
 
 
-def sync_skills(repo_root: Path) -> dict:
-  """Sync allowlisted skills to .spec-driver/AGENTS.md.
+def _sync_to_targets(
+  repo_root: Path,
+  source: Path,
+  target_names: list[str],
+  allowed: list[str],
+  package_names: set[str],
+) -> dict[str, dict]:
+  """Install and prune skills for each configured target.
 
-  Returns a summary dict with keys:
-    written: number of skills written
-    warnings: list of warning strings (e.g. missing skills)
-    changed: whether the output file was modified
+  Returns per-target summary dict.
   """
-  skills, warnings = _collect_skills(repo_root)
+  targets: dict[str, dict] = {}
+  for name in target_names:
+    rel_path = SKILL_TARGET_DIRS.get(name)
+    if rel_path is None:
+      warnings.warn(
+        f"Unknown skill target '{name}'; skipping.",
+        UserWarning,
+        stacklevel=3,
+      )
+      continue
+    abs_target = repo_root / rel_path
+    result = install_skills_to_target(source, abs_target, allowed)
+    pruned = prune_skills_from_target(abs_target, package_names, allowed)
+    targets[name] = {**result, "pruned": pruned}
+  return targets
+
+
+def _write_agents_md(
+  repo_root: Path,
+  skills: list[dict[str, str]],
+) -> bool:
+  """Write AGENTS.md if content changed. Returns True if file was modified."""
   content = render_skills_system(skills)
   managed = repo_root / SPEC_DRIVER_DIR / MANAGED_AGENTS_FILE
 
-  # Check for changes
-  changed = True
   if managed.is_file() and managed.read_text(encoding="utf-8") == content:
-    changed = False
+    return False
 
-  if changed:
-    managed.parent.mkdir(parents=True, exist_ok=True)
-    managed.write_text(content, encoding="utf-8")
+  managed.parent.mkdir(parents=True, exist_ok=True)
+  managed.write_text(content, encoding="utf-8")
+  return True
+
+
+def sync_skills(
+  repo_root: Path,
+  *,
+  skills_source_dir: Path | None = None,
+) -> dict:
+  """Sync skills from package source to agent targets and update AGENTS.md.
+
+  Installs allowlisted skills to each configured target dir, prunes
+  de-listed package skills, and writes the AGENTS.md skills block.
+
+  Args:
+    repo_root: Workspace root path.
+    skills_source_dir: Override package skills dir (for testing).
+
+  Returns a summary dict with keys:
+    written: number of skills in AGENTS.md
+    warnings: list of missing skill names
+    agents_md_changed: whether .spec-driver/AGENTS.md was modified
+    targets: per-target install/prune summary
+  """
+  source = skills_source_dir or get_package_skills_dir()
+  config = load_workflow_config(repo_root)
+  target_names: list[str] = config.get("skills", {}).get(
+    "targets",
+    ["claude", "codex"],
+  )
+
+  allowed = parse_allowlist(repo_root / SPEC_DRIVER_DIR / ALLOWLIST_FILE)
+  package_names = get_package_skill_names(source)
+  targets = _sync_to_targets(
+    repo_root,
+    source,
+    target_names,
+    allowed,
+    package_names,
+  )
+
+  skills, warn_names = _collect_skills(repo_root, source)
+  agents_md_changed = _write_agents_md(repo_root, skills)
 
   # Insert @-references in root files per config
-  integration = load_workflow_config(repo_root).get(
-    "integration",
-    {},
-  )
+  integration = config.get("integration", {})
   if integration.get("agents_md", True):
-    ensure_file_reference(
-      repo_root / "AGENTS.md",
-      AGENTS_MD_REFERENCE,
-    )
+    ensure_file_reference(repo_root / "AGENTS.md", AGENTS_MD_REFERENCE)
   if integration.get("claude_md", True):
-    ensure_file_reference(
-      repo_root / "CLAUDE.md",
-      AGENTS_MD_REFERENCE,
-    )
+    ensure_file_reference(repo_root / "CLAUDE.md", AGENTS_MD_REFERENCE)
 
   return {
     "written": len(skills),
-    "warnings": warnings,
-    "changed": changed,
+    "warnings": warn_names,
+    "agents_md_changed": agents_md_changed,
+    "targets": targets,
   }

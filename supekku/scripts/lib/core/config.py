@@ -42,9 +42,12 @@ DEFAULT_CONFIG: dict = {
   "authoring": {
     "engine": "superpowers",
   },
+  "skills": {
+    "targets": ["claude", "codex"],
+  },
   "integration": {
     "agents_md": True,
-    "claude_md": True,
+    "claude_md": False,
   },
 }
 

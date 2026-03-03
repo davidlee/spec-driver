@@ -256,6 +256,24 @@ def initialize_workspace(
       auto_yes=auto_yes,
     )
 
+  # Bootstrap skills allowlist if missing, then install to targets
+  if not dry_run:
+    from supekku.scripts.lib.skills.sync import sync_skills  # noqa: PLC0415, I001  # pylint: disable=import-outside-toplevel
+    from supekku.scripts.lib.core.paths import get_package_skills_dir  # noqa: PLC0415, I001  # pylint: disable=import-outside-toplevel
+    from supekku.scripts.lib.skills.sync import get_package_skill_names  # noqa: PLC0415, I001  # pylint: disable=import-outside-toplevel
+
+    allowlist_path = target_root / SPEC_DRIVER_DIR / "skills.allowlist"
+    if not allowlist_path.exists():
+      names = sorted(get_package_skill_names(get_package_skills_dir()))
+      allowlist_path.write_text(
+        "# Skills allowlist — one skill name per line.\n"
+        "# Remove a line to stop installing that skill.\n"
+        + "".join(f"{n}\n" for n in names),
+        encoding="utf-8",
+      )
+
+    sync_skills(target_root)
+
 
 def main() -> None:
   """Main entry point for spec-driver-install command."""

@@ -11,6 +11,7 @@ from supekku.scripts.lib.blocks.metadata import BlockMetadata
 
 from .audit import AUDIT_FRONTMATTER_METADATA
 from .base import BASE_FRONTMATTER_METADATA
+from .compaction import compact_frontmatter
 from .delta import DELTA_FRONTMATTER_METADATA
 from .design_revision import DESIGN_REVISION_FRONTMATTER_METADATA
 from .issue import ISSUE_FRONTMATTER_METADATA
@@ -77,5 +78,6 @@ __all__ = [
   "STANDARD_FRONTMATTER_METADATA",
   "VERIFICATION_FRONTMATTER_METADATA",
   "FRONTMATTER_METADATA_REGISTRY",
+  "compact_frontmatter",
   "get_frontmatter_metadata",
 ]

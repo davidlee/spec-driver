@@ -1,4 +1,4 @@
-# Project doctrine (escape hatch)
+# Project doctrine
 
 This file is intentionally short and is loaded by skills at specific “hook points”
 (boot/preflight/new-card/brainstorm/plan/notes/handover) to apply project-specific
@@ -6,7 +6,7 @@ conventions without forking vendor-managed skills.
 
 ## Conventions
 
-- Card IDs: `T123-*` in `kanban/{backlog|next|doing|finishing|done}/`
+- Kanban IDs: `T123-*` in `kanban/{backlog|next|doing|finishing|done}/`
 - Design docs: `doc/artefacts/T123-*.md`
 - Plans: `doc/plans/T123-*.md`
 

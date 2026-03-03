@@ -3638,3 +3638,33 @@ deltas:
       - id: IP-033.PHASE-08
         status: completed
         phase: IP-033.PHASE-08
+  DE-034:
+    kind: delta
+    status: completed
+    name: 'Delta - Native skills installation: replace openskills dependency'
+    slug: native_skills_installation_replace_openskills_dependency
+    updated: '2026-03-03'
+    path: change/deltas/DE-034-native_skills_installation_replace_openskills_dependency/DE-034.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-034
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-034
+        delta: DE-034
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-034-P01
+      phases:
+      - id: IP-034-P01
+        phase: IP-034-P01

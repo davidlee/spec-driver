@@ -24,7 +24,13 @@ from supekku.scripts.lib.file_ops import (
   scan_directory_changes,
 )
 
-AGENT_TEMPLATES = ("exec", "workflow", "glossary", "policy")
+
+def _discover_agent_templates(package_root: Path) -> list[str]:
+  """Discover agent template names from supekku/templates/agents/*.md."""
+  agents_tpl_dir = package_root / "templates" / "agents"
+  if not agents_tpl_dir.is_dir():
+    return []
+  return sorted(p.stem for p in agents_tpl_dir.glob("*.md"))
 
 
 def get_package_root() -> Path:
@@ -118,8 +124,9 @@ def _render_agent_docs(
   agents_dir = target_root / SPEC_DRIVER_DIR / "agents"
   agents_dir.mkdir(parents=True, exist_ok=True)
 
+  template_names = _discover_agent_templates(package_root)
   try:
-    for name in AGENT_TEMPLATES:
+    for name in template_names:
       content = render_template(
         f"agents/{name}.md",
         {"config": config},

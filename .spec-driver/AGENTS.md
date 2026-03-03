@@ -38,7 +38,7 @@ Usage notes:
 
 <skill>
 <name>close-change</name>
-<description>Close a delta safely: satisfy coverage gates, complete the delta command, and verify owning-record lifecycle updates.</description>
+<description>Close a delta safely - satisfy coverage gates, complete the delta command, and verify owning-record lifecycle updates.</description>
 <location>project</location>
 </skill>
 
@@ -51,6 +51,12 @@ Usage notes:
 <skill>
 <name>continuation</name>
 <description>Write a prompt to help the next agent continue effectively.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>doctrine</name>
+<description>Understand project governance to avoid spreading heresy. you</description>
 <location>project</location>
 </skill>
 
@@ -92,7 +98,7 @@ Usage notes:
 
 <skill>
 <name>plan-phases</name>
-<description>Plan execution for a delta: refine IP objectives/gates and create the next phase sheet with concrete tasks and verification expectations.</description>
+<description>Plan execution for a delta - refine IP objectives/gates and create the next phase sheet with concrete tasks and verification expectations.</description>
 <location>project</location>
 </skill>
 

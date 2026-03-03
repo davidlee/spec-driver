@@ -4,7 +4,7 @@ slug: 038-canonical_workflow_alignment-phase-02
 name: IP-038 Phase 02
 created: '2026-03-03'
 updated: '2026-03-03'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -34,16 +34,16 @@ verification:
 tasks:
   - id: P2.1
     title: Baseline-read memory targets and capture claim drift.
-    status: todo
+    status: done
   - id: P2.2
     title: Patch core-loop, revision, and delta-completion memories.
-    status: todo
+    status: done
   - id: P2.3
     title: Patch posture/ceremony memories and add new fact memories if missing.
-    status: todo
+    status: done
   - id: P2.4
     title: Coherence readback + notes update + handoff to phase 03.
-    status: todo
+    status: done
 risks:
   - Memory provenance may still reference stale docs unless explicitly updated.
   - Over-correction could hide valid town-planner concession pathways.
@@ -77,12 +77,12 @@ Execute the memory review pass so workflow-critical memories consistently reflec
 ## 3. Entrance Criteria
 - [x] Phase 01 contract-freeze complete and documented
 - [x] Memory review target set listed in IP-038
-- [ ] Memory files loaded for baseline read and drift capture
+- [x] Memory files loaded for baseline read and drift capture
 
 ## 4. Exit Criteria / Done When
-- [ ] Target memories updated/confirmed aligned with DE-038 contract
-- [ ] Provenance and claim wording are code-truth aligned
-- [ ] No residual contradiction across core-loop/revision/delta-completion/posture/ceremony memory set
+- [x] Target memories updated/confirmed aligned with DE-038 contract
+- [x] Provenance and claim wording are code-truth aligned
+- [x] No residual contradiction across core-loop/revision/delta-completion/posture/ceremony memory set
 
 ## 5. Verification
 - Verification type: VA (memory consistency + source-truth audit)
@@ -108,10 +108,10 @@ Execute the memory review pass so workflow-critical memories consistently reflec
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Baseline-read all target memories and log drift | [ ] | Capture claim-level mismatches vs DE/DR/research |
-| [ ] | 2.2 | Update core workflow memories | [ ] | `core-loop`, `revision`, `delta-completion` |
-| [ ] | 2.3 | Update posture/ceremony memories + create fact memories | [ ] | `posture`, `ceremony*`, `coverage-gate`, `status-enums` |
-| [ ] | 2.4 | Run coherence readback and finalize memory notes | [ ] | Ensure no conflicting narrative remains |
+| [x] | 2.1 | Baseline-read all target memories and log drift | [ ] | Captured revision-first default drift, ceremony enforcement drift, and missing fact memories |
+| [x] | 2.2 | Update core workflow memories | [ ] | Updated `core-loop`, `revision`, `delta-completion` with code-backed framing |
+| [x] | 2.3 | Update posture/ceremony memories + create fact memories | [ ] | Updated `posture`, `ceremony*`; added `coverage-gate` and `status-enums` facts |
+| [x] | 2.4 | Run coherence readback and finalize memory notes | [ ] | Completed grep/readback checks and updated DE-038 notes |
 
 ### Task Details
 - **2.1 Description**
@@ -155,10 +155,22 @@ Execute the memory review pass so workflow-critical memories consistently reflec
 - `2026-03-03` - Phase scaffolded; execution checklist prefilled with target memory set from IP-038.
 
 ## 10. Findings / Research Notes
-- To be populated during execution with claim-by-claim drift findings and source references.
+- Drift captured against source-of-truth code:
+  - `core-loop` incorrectly led with revision intent instead of delta-first scope.
+  - `revision` framed as default entry step instead of post-audit reconciliation or town-planner concession path.
+  - `delta-completion` lacked explicit parent-spec coverage gate semantics and env/flag bypass caveats.
+  - `posture` and ceremony signpost wording implied ceremony-mode enforcement, which is not implemented in runtime branching.
+  - No memory record existed for the close-out coverage sharp edge or canonical status enum set.
+- Source references used for correction:
+  - `supekku/scripts/complete_delta.py`
+  - `supekku/scripts/lib/changes/coverage_check.py`
+  - `supekku/scripts/lib/requirements/lifecycle.py`
+  - `supekku/scripts/lib/requirements/registry.py`
+  - `supekku/scripts/lib/changes/lifecycle.py`
+  - `supekku/scripts/lib/blocks/verification.py`
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Spec/Delta/Plan updated with lessons
-- [ ] Hand-off notes to next phase (if any)
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Spec/Delta/Plan updated with lessons
+- [x] Hand-off notes to next phase (if any)

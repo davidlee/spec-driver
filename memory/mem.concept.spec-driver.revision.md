@@ -11,26 +11,35 @@ tags:
 - spec-driver
 - revision
 - seed
-summary: Spec Revisions (RE-*) document intent before delivery, often introducing
-  new/changed requirements. They preserve lineage and feed downstream delta execution.
+summary: Spec Revisions (RE-*) document requirement/spec change intent and lineage.
+  In canonical delta-first flow they typically follow
+  audit findings; revision-first is a town-planner concession path.
 priority:
   severity: medium
   weight: 6
 provenance:
   sources:
+  - kind: code
+    note: Completion path can auto-create revision updates for requirements
+    ref: supekku/scripts/complete_delta.py
+  - kind: code
+    note: Completion updates revision sources for requirement lifecycle changes
+    ref: supekku/scripts/lib/requirements/registry.py
   - kind: doc
-    ref: supekku/about/glossary.md
-  - kind: doc
-    note: Spec Revision Workflow section
-    ref: supekku/about/processes.md
+    note: Canonical vs concession-path framing
+    ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
 ---
 
 # Spec Revisions
 
 ## Role in the Loop
 
-Revisions are the **intent** step. They capture requirement/spec change intent
-before delivery artifacts are executed.
+Revisions capture requirement/spec change intent with lineage.
+
+- In the canonical delta-first model, revisions most often appear after
+  implementation/audit when patching specs to observed truth.
+- In town-planner mode, revision-first remains a valid higher-ceremony
+  concession path.
 
 ## What They Capture
 
@@ -50,7 +59,10 @@ Creates `change/revisions/RE-XXX-slug/RE-XXX.md`.
 
 ## Posture Variance
 
-- **Pioneer/Settler**: revisions are optional — specs may be updated directly
-  as part of delta work
-- **Town Planner**: revision-first is the default high-rigor path; then
+- **Pioneer/Settler**: revisions are optional and often post-audit/post-implementation
+  reconciliation artifacts, not required entry points.
+- **Settler completion nuance**: if requirements are not tracked in existing
+  revision sources, delta completion can create completion revision updates as
+  part of requirement lifecycle persistence.
+- **Town Planner**: revision-first is a valid high-rigor path; then
   `revision → delta/DR/IP/phases → implementation → audit/contracts → spec reconciliation → closure`

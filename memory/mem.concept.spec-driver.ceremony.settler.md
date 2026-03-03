@@ -19,6 +19,12 @@ priority:
   weight: 7
 provenance:
   sources:
+  - kind: code
+    note: Delta completion coverage and lifecycle behavior
+    ref: supekku/scripts/complete_delta.py
+  - kind: code
+    note: Coverage gate specifics and enforcement defaults
+    ref: supekku/scripts/lib/changes/coverage_check.py
   - kind: doc
     note: Settler mode description
     ref: docs/commands-workflow.md
@@ -44,7 +50,7 @@ capture. Traceability without governance overhead.
 
 **Prospective** (planned work):
 ```
-backlog item → delta → (optional DR) → (optional IP/phases) → implement → closure
+backlog item → delta → (optional DR) → (optional IP/phases) → implement → audit/reconcile → close
 ```
 
 **Retrospective** (existing code):
@@ -64,4 +70,6 @@ mature into the source of truth described in
 - Deltas are the standard work unit — use `uv run spec-driver create delta` for intentional changes
 - Cards may coexist with deltas but are not interchangeable — cards do not link to the delta→IP flow
 - When closing work, follow [[mem.pattern.spec-driver.delta-completion]]
+- `complete delta` normally requires verified parent-spec coverage blocks for
+  all delta requirements; see [[mem.fact.spec-driver.coverage-gate]]
 - Audits are legitimate for discovery (applying spec-driver to existing code), not just conformance

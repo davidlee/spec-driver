@@ -14,21 +14,24 @@ tags:
 - verification
 - seed
 summary: 'Self-contained checklist for closing a delta: phase completion, verification
-  artifacts, post-audit spec reconciliation, completion command, sync, and validation.'
+  artifacts, spec coverage prerequisites, completion command, sync, and validation.'
 priority:
   severity: high
   weight: 9
 provenance:
   sources:
-  - kind: doc
-    note: Complete workflow and checklist
-    ref: docs/delta-completion-workflow.md
-  - kind: doc
-    note: Status lifecycle and traceability
-    ref: supekku/about/lifecycle.md
   - kind: code
-    note: Canonical completion command behavior
+    note: Canonical completion command behavior and lifecycle updates
     ref: supekku/scripts/complete_delta.py
+  - kind: code
+    note: Coverage gate enforcement and bypass conditions
+    ref: supekku/scripts/lib/changes/coverage_check.py
+  - kind: code
+    note: Coverage status vocabulary
+    ref: supekku/scripts/lib/blocks/verification.py
+  - kind: doc
+    note: Canonical close-out framing for this delta
+    ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
 ---
 
 # Delta Completion
@@ -61,7 +64,11 @@ In `IP-XXX.md`:
 
 ## Step 4: Patch Specs to Match Observed Truth
 
-In owning specs/plans, update coverage/status entries using valid statuses:
+Coverage blocks (`supekku:verification.coverage@v1`) in parent specs must
+contain each `applies_to.requirements` entry with `status: verified` before
+normal completion.
+
+In owning specs/plans, update coverage entries using valid statuses:
 
 - `planned`
 - `in-progress`
@@ -81,8 +88,15 @@ uv run spec-driver complete delta DE-XXX
 ```
 
 Notes:
-- Fix any reported coverage gate failures, then retry.
+- Fix coverage gate failures (`missing_block`, `missing_entry`, `not_verified`,
+  invalid requirement IDs, or missing parent specs), then retry.
+- Requirements with status `retired` block normal requirement lifecycle updates.
 - Use `--force` only with explicit justification and documented follow-up work.
+- `SPEC_DRIVER_ENFORCE_COVERAGE=false` disables the coverage check, but this is
+  a non-canonical bypass.
+- `--skip-update-requirements` is also a non-canonical bypass path.
+- Completion can update revision sources for requirement lifecycle state and
+  create completion revision updates for untracked requirements.
 
 ## Step 6: Sync and Validate
 
@@ -102,7 +116,8 @@ uv run spec-driver show delta DE-XXX                    # should show 'completed
 
 - Completing delta before reconciling specs with audit/contracts
 - Using invalid coverage statuses (for example `passed` instead of `verified`)
-- Bypassing coverage gates with `--force` without documented follow-up
+- Running `complete delta` before parent specs have verified coverage blocks
+- Bypassing coverage gates with `--force`/disabled enforcement without documented follow-up
 - Using wrong phase ID format (`phases: [phase-01]` instead of
   `phases: [{id: "IP-XXX.PHASE-01"}]`)
 - Marking delta complete with unchecked IP success criteria

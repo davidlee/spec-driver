@@ -69,13 +69,13 @@ Implement two-bucket memory install in `install.py`: seed (create-only) and spec
 - [x] pyproject.toml force-include configured
 
 ## 4. Exit Criteria / Done When
-- [ ] `_find_memory_source()` discovers memories in dev and installed contexts
-- [ ] `_classify_memory()` correctly classifies by namespace
-- [ ] Seed: create-if-missing, never overwrite
-- [ ] Spec-driver: replace/refresh from source
-- [ ] Pruning: remove managed IDs absent from source (with notice)
-- [ ] Unmanaged memories untouched
-- [ ] Tests pass, lint clean
+- [x] `_find_memory_source()` discovers memories in dev and installed contexts
+- [x] `_classify_memory()` correctly classifies by namespace
+- [x] Seed: create-if-missing, never overwrite
+- [x] Spec-driver: replace/refresh from source
+- [x] Pruning: remove managed IDs absent from source (with notice)
+- [x] Unmanaged memories untouched
+- [x] Tests pass, lint clean
 
 ## 5. Verification
 - `uv run pytest supekku/scripts/lib/install_test.py -x -q`
@@ -90,10 +90,10 @@ Implement two-bucket memory install in `install.py`: seed (create-only) and spec
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Write tests for memory install behavior (TDD) | | |
-| [ ] | 2.2 | Implement memory install functions | | After 2.1 |
-| [ ] | 2.3 | Integrate into initialize_workspace | | After 2.2 |
-| [ ] | 2.4 | Verify all tests pass, lint clean | | After 2.3 |
+| [x] | 2.1 | Write tests for memory install behavior (TDD) | | 27 new tests |
+| [x] | 2.2 | Implement memory install functions | | _classify_memory, _find_memory_source, _install_memories + helpers |
+| [x] | 2.3 | Integrate into initialize_workspace | | Added after agent docs, before skills |
+| [x] | 2.4 | Verify all tests pass, lint clean | | 2205 pass, ruff clean, pylint clean on new code |
 
 ## 8. Risks & Mitigations
 | Risk | Mitigation | Status |

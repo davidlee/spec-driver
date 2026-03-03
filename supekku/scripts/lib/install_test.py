@@ -9,7 +9,13 @@ from unittest import mock
 import pytest
 import yaml
 
-from supekku.scripts.install import get_package_root, initialize_workspace
+from supekku.scripts.install import (
+  _classify_memory,
+  _find_memory_source,
+  _install_memories,
+  get_package_root,
+  initialize_workspace,
+)
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
 
 
@@ -496,3 +502,291 @@ def test_initialize_workspace_preserves_existing_allowlist(tmp_path: Path) -> No
 
   content = (sd / "skills.allowlist").read_text(encoding="utf-8")
   assert content == "boot\n"
+
+
+# --- Memory classification tests ---
+
+
+class TestClassifyMemory:
+  """Tests for _classify_memory namespace classifier."""
+
+  def test_spec_driver_concept(self) -> None:
+    assert _classify_memory("mem.concept.spec-driver.delta.md") == "spec-driver"
+
+  def test_spec_driver_pattern(self) -> None:
+    assert _classify_memory("mem.pattern.spec-driver.core-loop.md") == "spec-driver"
+
+  def test_spec_driver_signpost(self) -> None:
+    assert _classify_memory("mem.signpost.spec-driver.ceremony.md") == "spec-driver"
+
+  def test_spec_driver_fact(self) -> None:
+    assert _classify_memory("mem.fact.spec-driver.status-enums.md") == "spec-driver"
+
+  def test_seed_project_pattern(self) -> None:
+    assert _classify_memory("mem.pattern.project.workflow.md") == "seed"
+
+  def test_seed_project_completion(self) -> None:
+    assert _classify_memory("mem.pattern.project.completion.md") == "seed"
+
+  def test_unmanaged_no_namespace(self) -> None:
+    assert _classify_memory("mem.pattern.cli.skinny.md") is None
+
+  def test_unmanaged_spec_without_driver(self) -> None:
+    assert _classify_memory("mem.concept.spec.assembly-only-taxonomy.md") is None
+
+  def test_non_markdown_ignored(self) -> None:
+    assert _classify_memory("mem.concept.spec-driver.delta.yaml") is None
+
+  def test_random_file_ignored(self) -> None:
+    assert _classify_memory("README.md") is None
+
+
+# --- Memory source discovery tests ---
+
+
+class TestFindMemorySource:
+  """Tests for _find_memory_source dual discovery."""
+
+  def test_finds_in_package_root(self, tmp_path: Path) -> None:
+    mem_dir = tmp_path / "memory"
+    mem_dir.mkdir()
+    (mem_dir / "mem.concept.spec-driver.delta.md").write_text("test")
+    assert _find_memory_source(tmp_path) == mem_dir
+
+  def test_falls_back_to_parent(self, tmp_path: Path) -> None:
+    pkg_root = tmp_path / "supekku"
+    pkg_root.mkdir()
+    mem_dir = tmp_path / "memory"
+    mem_dir.mkdir()
+    (mem_dir / "mem.concept.spec-driver.delta.md").write_text("test")
+    assert _find_memory_source(pkg_root) == mem_dir
+
+  def test_prefers_package_root(self, tmp_path: Path) -> None:
+    """Package-level memory dir takes precedence over parent."""
+    pkg_memory = tmp_path / "memory"
+    pkg_memory.mkdir()
+    (pkg_memory / "mem.concept.spec-driver.delta.md").write_text("pkg")
+    # Don't create parent — just verify the package path wins
+    assert _find_memory_source(tmp_path) == pkg_memory
+
+  def test_returns_none_when_absent(self, tmp_path: Path) -> None:
+    assert _find_memory_source(tmp_path) is None
+
+
+# --- Memory install behavior tests ---
+
+
+def _make_memory_source(src_dir: Path, files: dict[str, str]) -> None:
+  """Helper: populate a memory source directory."""
+  src_dir.mkdir(parents=True, exist_ok=True)
+  for name, content in files.items():
+    (src_dir / name).write_text(content, encoding="utf-8")
+
+
+class TestInstallMemoriesSeed:
+  """VT-037-001: seed bucket create-only behavior."""
+
+  def test_creates_missing_seed_memories(self, tmp_path: Path) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.pattern.project.workflow.md": "default workflow",
+      "mem.pattern.project.completion.md": "default completion",
+    })
+    dest.mkdir()
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    wf = (dest / "mem.pattern.project.workflow.md").read_text()
+    assert wf == "default workflow"
+    comp = (dest / "mem.pattern.project.completion.md").read_text()
+    assert comp == "default completion"
+
+  def test_never_overwrites_customized_seed(self, tmp_path: Path) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.pattern.project.workflow.md": "new default",
+    })
+    dest.mkdir()
+    (dest / "mem.pattern.project.workflow.md").write_text("my custom workflow")
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    content = (dest / "mem.pattern.project.workflow.md").read_text()
+    assert content == "my custom workflow"
+
+  def test_seed_dry_run_does_not_create(self, tmp_path: Path) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.pattern.project.workflow.md": "default workflow",
+    })
+    dest.mkdir()
+
+    _install_memories(src, dest, dry_run=True, auto_yes=True)
+
+    assert not (dest / "mem.pattern.project.workflow.md").exists()
+
+
+class TestInstallMemoriesManaged:
+  """VT-037-002: spec-driver managed bucket refresh behavior."""
+
+  def test_creates_new_managed_memories(self, tmp_path: Path) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.concept.spec-driver.delta.md": "delta v2",
+    })
+    dest.mkdir()
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    assert (dest / "mem.concept.spec-driver.delta.md").read_text() == "delta v2"
+
+  def test_replaces_outdated_managed_memories(self, tmp_path: Path) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.concept.spec-driver.delta.md": "delta v2",
+    })
+    dest.mkdir()
+    (dest / "mem.concept.spec-driver.delta.md").write_text("delta v1")
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    assert (dest / "mem.concept.spec-driver.delta.md").read_text() == "delta v2"
+
+  def test_skips_unchanged_managed_memories(self, tmp_path: Path) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    content = "delta same"
+    _make_memory_source(src, {
+      "mem.concept.spec-driver.delta.md": content,
+    })
+    dest.mkdir()
+    (dest / "mem.concept.spec-driver.delta.md").write_text(content)
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    assert (dest / "mem.concept.spec-driver.delta.md").read_text() == content
+
+  def test_prunes_managed_ids_absent_from_source(self, tmp_path: Path) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.concept.spec-driver.delta.md": "kept",
+    })
+    dest.mkdir()
+    (dest / "mem.concept.spec-driver.delta.md").write_text("kept")
+    (dest / "mem.concept.spec-driver.removed.md").write_text("should be pruned")
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    assert (dest / "mem.concept.spec-driver.delta.md").exists()
+    assert not (dest / "mem.concept.spec-driver.removed.md").exists()
+
+  def test_managed_dry_run_does_not_modify(self, tmp_path: Path) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.concept.spec-driver.delta.md": "new version",
+    })
+    dest.mkdir()
+    (dest / "mem.concept.spec-driver.delta.md").write_text("old version")
+    (dest / "mem.concept.spec-driver.removed.md").write_text("should survive dry run")
+
+    _install_memories(src, dest, dry_run=True, auto_yes=True)
+
+    assert (dest / "mem.concept.spec-driver.delta.md").read_text() == "old version"
+    assert (dest / "mem.concept.spec-driver.removed.md").exists()
+
+
+class TestInstallMemoriesUnmanaged:
+  """VT-037-003: unmanaged user memories are preserved."""
+
+  def test_preserves_unmanaged_memories(self, tmp_path: Path) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.concept.spec-driver.delta.md": "managed",
+      "mem.pattern.project.workflow.md": "seed",
+    })
+    dest.mkdir()
+    (dest / "mem.pattern.cli.skinny.md").write_text("user memory")
+    (dest / "mem.pattern.formatters.soc.md").write_text("another user memory")
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    assert (dest / "mem.pattern.cli.skinny.md").read_text() == "user memory"
+    assert (dest / "mem.pattern.formatters.soc.md").read_text() == "another user memory"
+
+  def test_unmanaged_source_files_are_skipped(self, tmp_path: Path) -> None:
+    """Unmanaged files in source are not installed."""
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.pattern.cli.skinny.md": "should not be installed",
+      "README.md": "also not installed",
+    })
+    dest.mkdir()
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    assert not (dest / "mem.pattern.cli.skinny.md").exists()
+    assert not (dest / "README.md").exists()
+
+
+class TestInstallMemoriesIdempotence:
+  """Repeated installs produce consistent results."""
+
+  def test_repeated_install_is_idempotent(self, tmp_path: Path) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.concept.spec-driver.delta.md": "managed",
+      "mem.pattern.project.workflow.md": "seed default",
+    })
+    dest.mkdir()
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+    first_run = {
+      f.name: f.read_text() for f in sorted(dest.glob("*.md"))
+    }
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+    second_run = {
+      f.name: f.read_text() for f in sorted(dest.glob("*.md"))
+    }
+
+    assert first_run == second_run
+
+
+class TestInstallMemoriesReporting:
+  """Output reporting for memory install."""
+
+  def test_reports_seed_left_untouched(self, tmp_path: Path, capsys) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {
+      "mem.pattern.project.workflow.md": "new default",
+    })
+    dest.mkdir()
+    (dest / "mem.pattern.project.workflow.md").write_text("customized")
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    captured = capsys.readouterr()
+    assert "untouched" in captured.out.lower() or "skipped" in captured.out.lower()
+
+  def test_reports_pruned_managed_files(self, tmp_path: Path, capsys) -> None:
+    src = tmp_path / "src" / "memory"
+    dest = tmp_path / "dest"
+    _make_memory_source(src, {})
+    dest.mkdir()
+    (dest / "mem.concept.spec-driver.removed.md").write_text("old")
+
+    _install_memories(src, dest, dry_run=False, auto_yes=True)
+
+    captured = capsys.readouterr()
+    assert "prun" in captured.out.lower() or "remov" in captured.out.lower()

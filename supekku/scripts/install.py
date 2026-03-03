@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import shutil
 import sys
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
@@ -23,6 +24,212 @@ from supekku.scripts.lib.file_ops import (
   format_detailed_changes,
   scan_directory_changes,
 )
+
+
+def _classify_memory(filename: str) -> str | None:
+  """Classify a memory file by ID namespace.
+
+  Returns:
+    'spec-driver' for platform-managed memories (mem.*.spec-driver.*),
+    'seed' for project-owned starters (mem.*.project.*),
+    or None for unmanaged/non-memory files.
+  """
+  if not filename.endswith(".md"):
+    return None
+  stem = filename.removesuffix(".md")
+  parts = stem.split(".")
+  # Expect at least: mem.<type>.<namespace>.<name>
+  if len(parts) < 4 or parts[0] != "mem":
+    return None
+  # Check namespace segment(s) — join everything after type
+  namespace = ".".join(parts[2:])
+  if namespace.startswith("spec-driver."):
+    return "spec-driver"
+  if namespace.startswith("project."):
+    return "seed"
+  return None
+
+
+def _find_memory_source(package_root: Path) -> Path | None:
+  """Find memory source directory with dual discovery.
+
+  Checks package root first (installed wheel), then parent directory
+  (development repo root).
+
+  Returns:
+    Path to memory source directory, or None if not found.
+  """
+  pkg_memory = package_root / "memory"
+  if pkg_memory.is_dir():
+    return pkg_memory
+  dev_memory = package_root.parent / "memory"
+  if dev_memory.is_dir():
+    return dev_memory
+  return None
+
+
+@dataclass
+class _MemoryChanges:
+  """Collects memory install actions for reporting."""
+
+  seed_created: list[str] = field(default_factory=list)
+  seed_skipped: list[str] = field(default_factory=list)
+  managed_new: list[str] = field(default_factory=list)
+  managed_updated: list[str] = field(default_factory=list)
+  pruned: list[str] = field(default_factory=list)
+
+
+def _install_seed_memories(
+  sources: list[Path], dest_dir: Path, *, dry_run: bool,
+) -> tuple[list[str], list[str]]:
+  """Install seed memories: create if missing, never overwrite.
+
+  Returns:
+    (created, skipped) filename lists.
+  """
+  created, skipped = [], []
+  for src in sources:
+    dest = dest_dir / src.name
+    if dest.exists():
+      skipped.append(src.name)
+    else:
+      created.append(src.name)
+      if not dry_run:
+        shutil.copy2(src, dest)
+  return created, skipped
+
+
+def _refresh_managed_memories(
+  sources: list[Path], dest_dir: Path, *, dry_run: bool,
+) -> tuple[list[str], list[str]]:
+  """Replace/refresh spec-driver managed memories from source.
+
+  Returns:
+    (new, updated) filename lists.
+  """
+  new, updated = [], []
+  for src in sources:
+    dest = dest_dir / src.name
+    if not dest.exists():
+      new.append(src.name)
+      if not dry_run:
+        shutil.copy2(src, dest)
+    elif src.read_bytes() != dest.read_bytes():
+      updated.append(src.name)
+      if not dry_run:
+        shutil.copy2(src, dest)
+  return new, updated
+
+
+def _prune_managed_memories(
+  source_names: set[str], dest_dir: Path, *, dry_run: bool,
+) -> list[str]:
+  """Remove managed memory IDs from dest that are absent in source."""
+  pruned = []
+  for dest_file in sorted(dest_dir.glob("*.md")):
+    if (
+      _classify_memory(dest_file.name) == "spec-driver"
+      and dest_file.name not in source_names
+    ):
+      pruned.append(dest_file.name)
+      if not dry_run:
+        dest_file.unlink()
+  return pruned
+
+
+def _install_memories(
+  source_dir: Path,
+  dest_dir: Path,
+  *,
+  dry_run: bool = False,
+  auto_yes: bool = False,  # noqa: ARG001  # pylint: disable=unused-argument
+) -> None:
+  """Install/refresh memory packs from source into workspace.
+
+  Two-bucket semantics:
+    - seed (mem.*.project.*): create if missing, never overwrite
+    - spec-driver (mem.*.spec-driver.*): replace/refresh from source
+    - unmanaged: ignored entirely
+
+  Managed-set pruning removes spec-driver IDs present in dest but
+  absent from source.
+
+  Args:
+    source_dir: Directory containing package memory files.
+    dest_dir: Workspace memory directory.
+    dry_run: If True, report without modifying files.
+    auto_yes: Reserved for future prompt-per-category support.
+  """
+  dest_dir.mkdir(parents=True, exist_ok=True)
+
+  # Classify source files
+  seed_sources: list[Path] = []
+  managed_sources: list[Path] = []
+  for f in sorted(source_dir.glob("*.md")):
+    bucket = _classify_memory(f.name)
+    if bucket == "seed":
+      seed_sources.append(f)
+    elif bucket == "spec-driver":
+      managed_sources.append(f)
+
+  changes = _MemoryChanges()
+  changes.seed_created, changes.seed_skipped = (
+    _install_seed_memories(seed_sources, dest_dir, dry_run=dry_run)
+  )
+  changes.managed_new, changes.managed_updated = (
+    _refresh_managed_memories(managed_sources, dest_dir, dry_run=dry_run)
+  )
+  changes.pruned = _prune_managed_memories(
+    {f.name for f in managed_sources}, dest_dir, dry_run=dry_run,
+  )
+  _report_memory_changes(changes, dry_run=dry_run)
+
+
+def _print_file_list(
+  prefix: str, label: str, files: list[str], marker: str,
+) -> None:
+  """Print a labeled file list with a marker prefix per entry."""
+  print(f"\n{prefix}{label}")
+  for name in files:
+    print(f"  {marker} {name}")
+
+
+def _report_memory_changes(
+  changes: _MemoryChanges, *, dry_run: bool,
+) -> None:
+  """Print memory install summary."""
+  prefix = "[DRY RUN] " if dry_run else ""
+
+  if changes.seed_created:
+    n = len(changes.seed_created)
+    _print_file_list(prefix, f"Seed memories: {n} new", changes.seed_created, "+")
+
+  if changes.seed_skipped:
+    n = len(changes.seed_skipped)
+    _print_file_list(
+      prefix, f"Seed memories: {n} skipped (left untouched)",
+      changes.seed_skipped, "=",
+    )
+
+  if changes.managed_new or changes.managed_updated:
+    parts = []
+    if changes.managed_new:
+      parts.append(f"{len(changes.managed_new)} new")
+    if changes.managed_updated:
+      parts.append(f"{len(changes.managed_updated)} updated")
+    label = f"Managed memories: {', '.join(parts)}"
+    print(f"\n{prefix}{label}")
+    for name in changes.managed_new:
+      print(f"  + {name}")
+    for name in changes.managed_updated:
+      print(f"  ~ {name}")
+
+  if changes.pruned:
+    n = len(changes.pruned)
+    _print_file_list(
+      prefix, f"Managed memories: {n} removed (absent from package)",
+      changes.pruned, "-",
+    )
 
 
 def _discover_agent_templates(package_root: Path) -> list[str]:
@@ -247,6 +454,16 @@ def initialize_workspace(
 
   # Render agent guidance from templates (config-tailored)
   _render_agent_docs(target_root, package_root, dry_run=dry_run)
+
+  # Install/refresh memory packs
+  memory_source = _find_memory_source(package_root)
+  if memory_source is not None:
+    _install_memories(
+      memory_source,
+      target_root / "memory",
+      dry_run=dry_run,
+      auto_yes=auto_yes,
+    )
 
   # Bootstrap skills allowlist if missing, then install to targets
   if not dry_run:

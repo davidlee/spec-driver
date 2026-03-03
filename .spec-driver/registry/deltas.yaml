@@ -1723,9 +1723,6 @@ deltas:
     slug: implement-backlog-prioritization-with-interactive-ordering
     updated: '2025-11-04'
     path: change/deltas/DE-015-implement-backlog-prioritization-with-interactive-ordering/DE-015.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-015
       overview:
@@ -1930,9 +1927,6 @@ deltas:
     slug: add-category-support-to-requirements
     updated: '2025-11-04'
     path: change/deltas/DE-017-add-category-support-to-requirements/DE-017.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: IMPR-001
@@ -2344,9 +2338,6 @@ deltas:
     slug: kanban-card-support
     updated: '2026-02-03'
     path: change/deltas/DE-021-kanban-card-support/DE-021.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-021
       overview:
@@ -2846,7 +2837,7 @@ deltas:
         phase: IP-025-P01
   DE-026:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Use zigmarkdoc for Zig documentation generation
     slug: use_zigmarkdoc_for_zig_documentation_generation
     updated: '2026-02-16'
@@ -3297,7 +3288,7 @@ deltas:
         phase: IP-031-P01
   DE-032:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - skills_allowlist_sync
     slug: skills_allowlist_sync
     updated: '2026-03-01'
@@ -3645,9 +3636,6 @@ deltas:
     slug: native_skills_installation_replace_openskills_dependency
     updated: '2026-03-03'
     path: change/deltas/DE-034-native_skills_installation_replace_openskills_dependency/DE-034.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-034
       overview:
@@ -3668,3 +3656,439 @@ deltas:
       phases:
       - id: IP-034-P01
         phase: IP-034-P01
+  DE-035:
+    kind: delta
+    status: draft
+    name: Delta - assembly-only tech specs and unit-spec deprecation
+    slug: assembly_only_tech_specs_and_unit_spec_deprecation
+    updated: '2026-03-03'
+    path: change/deltas/DE-035-assembly_only_tech_specs_and_unit_spec_deprecation/DE-035.md
+    applies_to:
+      specs:
+      - ADR-003
+      - PROD-012
+      - PROD-015
+      requirements:
+      - PROD-012.FR-005
+      - PROD-015.FR-002
+      - PROD-015.FR-003
+      - PROD-015.FR-004
+      - PROD-015.FR-005
+    plan:
+      id: IP-035
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-035
+        delta: DE-035
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - ADR-003
+          - PROD-012
+          - PROD-015
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-012.FR-005
+          - PROD-015.FR-002
+          - PROD-015.FR-003
+          - PROD-015.FR-004
+          - PROD-015.FR-005
+          dependencies: []
+        phases:
+        - id: IP-035-P01
+        - id: IP-035-P02
+      phases:
+      - id: IP-035-P01
+        phase: IP-035-P01
+      - id: IP-035-P02
+        phase: IP-035-P02
+  DE-036:
+    kind: delta
+    status: completed
+    name: Delta - frontmatter metadata compaction and canonicalization controls
+    slug: frontmatter_metadata_compaction_and_canonicalization_controls
+    updated: '2026-03-03'
+    path: change/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/DE-036.md
+    plan:
+      id: IP-036
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-036
+        delta: DE-036
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-036-P01
+        - id: IP-036-P02
+        - id: IP-036-P03
+        - id: IP-036-P04
+        - id: IP-036.PHASE-01
+        - id: IP-036.PHASE-02
+        - id: IP-036.PHASE-03
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-036.PHASE-01
+        plan: IP-036
+        delta: DE-036
+        objective: Inventory metadata inflation patterns, classify canonical vs derived
+          fields for memory and delta frontmatter, document baseline metrics, and
+          fill in DR-036 with design decisions.
+        entrance_criteria:
+        - Delta DE-036 accepted (status: in-progress)
+        exit_criteria:
+        - Canonical/derived matrix documented for memory and delta frontmatter
+        - Baseline inflation metrics measured and recorded
+        - DR-036 filled in with design approach
+        - "Open design questions from IP-036 \xA78 answered"
+        verification:
+          tests: []
+          evidence:
+          - Inflation metrics in findings section
+          - Canonical/derived matrix in findings section
+        tasks:
+        - id: '0.1'
+          description: Measure memory link payload inflation
+          status: complete
+        - id: '0.2'
+          description: Build canonical/derived matrix for memory frontmatter
+          status: complete
+        - id: '0.3'
+          description: Build canonical/derived matrix for delta frontmatter
+          status: complete
+        - id: '0.4'
+          description: Fill in DR-036 with design decisions
+          status: complete
+        - id: '0.5'
+          description: "Answer open design questions from IP-036 \xA78"
+          status: complete
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-036.PHASE-02
+        plan: IP-036
+        delta: DE-036
+        objective: Add resolve/sync write modes and memory compaction profile so link
+          persistence is mode-controlled and defaults are lean.
+        entrance_criteria:
+        - Phase 0 complete (canonical/derived matrix, DR-036 filled in)
+        exit_criteria:
+        - FieldMetadata extended with persistence + default_value
+        - Memory and delta metadata annotated with persistence classifications
+        - links_to_frontmatter() supports mode parameter (none/missing/compact/full)
+        - resolve links and sync --memory-links pass --link-mode through
+        - All tests pass, linters clean
+        verification:
+          tests:
+          - VT-036-001: resolve/sync default does not persist links.out
+          - VT-036-002: mode parameter controls serialization shape
+          evidence:
+          - Test output from just test
+          - Lint output from just lint + just pylint
+        tasks:
+        - id: '1.1'
+          description: Extend FieldMetadata with persistence and default_value
+          status: complete
+        - id: '1.2'
+          description: Annotate memory frontmatter fields with persistence
+          status: complete
+        - id: '1.3'
+          description: Annotate delta frontmatter fields with persistence
+          status: complete
+        - id: '1.4'
+          description: Add mode parameter to links_to_frontmatter()
+          status: complete
+        - id: '1.5'
+          description: Add --link-mode flag to resolve links CLI
+          status: complete
+        - id: '1.6'
+          description: Add --link-mode flag to sync --memory-links CLI
+          status: complete
+        risks:
+        - description: Existing FieldMetadata consumers may fail if __post_init__
+            validates new fields
+          mitigation: New fields have safe defaults; no validation constraints added
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-036.PHASE-03
+        plan: IP-036
+        delta: DE-036
+        objective: Implement a shared compaction profile mechanism that uses FieldMetadata
+          persistence annotations to omit default/derived fields during write, and
+          pilot it on delta frontmatter.
+        entrance_criteria:
+        - Phase 1 complete (FieldMetadata persistence fields, memory/delta annotations)
+        exit_criteria:
+        - Compaction function uses FieldMetadata persistence + default_value to decide
+          field omission
+        - Delta frontmatter round-trips through compact write without semantic loss
+        - Existing files parse unchanged (read-side tolerance)
+        - Measurable metadata reduction on delta corpus
+        - All tests pass, linters clean
+        verification:
+          tests:
+          - VT-036-003: Delta compaction round-trip fidelity, default-omit fields
+              stripped
+          evidence:
+          - Before/after delta frontmatter size comparison
+          - Test output from just test
+        tasks:
+        - id: '2.1'
+          description: Implement compact_frontmatter() using BlockMetadata persistence
+            annotations
+          status: complete
+        - id: '2.2'
+          description: Write round-trip tests for delta compaction
+          status: complete
+        - id: '2.3'
+          description: Integrate compaction into sync write path for deltas (if applicable)
+          status: complete
+          notes: "Resolved via `spec-driver compact delta` CLI command (8be91c4).\
+            \ Standalone command rather than sync flag \u2014 keeps sync read-only\
+            \ on source files."
+        - id: '2.4'
+          description: Measure before/after size on delta corpus
+          status: complete
+        risks:
+        - description: Compaction strips fields that downstream consumers expect
+          mitigation: Round-trip tests; read-side tolerance; full mode always available
+        - description: applies_to default_value shape mismatch (has prod key not in
+            default)
+          mitigation: Equality check against default_value, not structural subset
+      - id: IP-036-P01
+        phase: IP-036-P01
+      - id: IP-036-P02
+        phase: IP-036-P02
+      - id: IP-036-P03
+        phase: IP-036-P03
+      - id: IP-036-P04
+        phase: IP-036-P04
+  DE-037:
+    kind: delta
+    status: draft
+    name: Delta - install and refresh seed memories during workspace install
+    slug: install_and_refresh_seed_memories_during_workspace_install
+    updated: '2026-03-03'
+    path: change/deltas/DE-037-install_and_refresh_seed_memories_during_workspace_install/DE-037.md
+    plan:
+      id: IP-037
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-037
+        delta: DE-037
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-037-P01
+        - id: IP-037-P02
+        - id: IP-037-P03
+        - id: IP-037-P04
+      phases:
+      - id: IP-037-P01
+        phase: IP-037-P01
+      - id: IP-037-P02
+        phase: IP-037-P02
+      - id: IP-037-P03
+        phase: IP-037-P03
+      - id: IP-037-P04
+        phase: IP-037-P04
+  DE-038:
+    kind: delta
+    status: in-progress
+    name: Delta - Canonical workflow alignment
+    slug: canonical_workflow_alignment
+    updated: '2026-03-03'
+    path: change/deltas/DE-038-canonical_workflow_alignment/DE-038.md
+    plan:
+      id: IP-038
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-038
+        delta: DE-038
+        revision_links:
+          aligns_with:
+          - DR-038
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-038.PHASE-01
+        - id: IP-038.PHASE-02
+        - id: IP-038.PHASE-03
+        - id: IP-038.PHASE-04
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-038.PHASE-01
+        plan: IP-038
+        delta: DE-038
+        objective: Freeze the DE-038 documentation contract so strict-mode policy,
+          coverage precedence, and code-truth wording are internally coherent before
+          memory/skill updates.
+        entrance_criteria:
+        - DE-038, DR-038, and workflow-research draft updates are present in the bundle.
+        - Strict-mode baseline direction is agreed (hard-fail non-canonical paths).
+        - Gaps document exists in the delta bundle.
+        exit_criteria:
+        - DE-038, DR-038, and workflow-research align on strict_mode contract and
+          terminology.
+        - Recommended v1 coverage precedence and mixed-status warning posture are
+          documented.
+        - Remaining open questions are narrowed to follow-up feasibility/scope items.
+        verification:
+          tests:
+          - VA doc coherence pass against code truth sources listed in workflow-research.
+          evidence:
+          - Updated DE-038/DR-038/workflow-research with line-citable strict-mode
+            contract language.
+          - Updated gaps-to-adoption and notes records for this phase.
+        tasks:
+        - id: P1.1
+          title: Align strict_mode contract language across DE/DR/research.
+          status: done
+        - id: P1.2
+          title: Add v1 coverage precedence and mixed-status warning policy.
+          status: done
+        - id: P1.3
+          title: Create IP-038 phase sheet and prefill contract-freeze checklist.
+          status: done
+        risks:
+        - Policy language drifts between artifacts and reintroduces ambiguity.
+        - Overstating runtime enforcement in documentation before implementation.
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-038.PHASE-02
+        plan: IP-038
+        delta: DE-038
+        objective: Execute memory review pass to align workflow-critical memory records
+          with DE-038 strict-mode and coverage-policy contract.
+        entrance_criteria:
+        - Phase 01 contract-freeze outcomes are documented in DE/DR/research.
+        - Memory target list is confirmed in IP-038.
+        - Gaps document and notes are available for evidence references.
+        exit_criteria:
+        - Target memory records are updated or explicitly confirmed already aligned.
+        - Memory claims are traceable to code/docs with cited sources.
+        - No reviewed memory implies ceremony runtime enforcement or non-canonical
+          sequencing as default.
+        verification:
+          tests:
+          - VA memory review against source-of-truth scripts/docs listed in workflow-research.
+          evidence:
+          - Diffs for reviewed memory files with line-level source references.
+          - Notes entry summarizing findings, updates, and residual risks.
+        tasks:
+        - id: P2.1
+          title: Baseline-read memory targets and capture claim drift.
+          status: done
+        - id: P2.2
+          title: Patch core-loop, revision, and delta-completion memories.
+          status: done
+        - id: P2.3
+          title: Patch posture/ceremony memories and add new fact memories if missing.
+          status: done
+        - id: P2.4
+          title: Coherence readback + notes update + handoff to phase 03.
+          status: done
+        risks:
+        - Memory provenance may still reference stale docs unless explicitly updated.
+        - Over-correction could hide valid town-planner concession pathways.
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-038.PHASE-03
+        plan: IP-038
+        delta: DE-038
+        objective: Execute skill-review pass to align workflow-facing skills/templates
+          with the DE-038 canonical sequence and strict-mode contract.
+        entrance_criteria:
+        - Phase 02 memory review outcomes are captured or ready for carry-forward.
+        - Skill review target set in IP-038 is confirmed.
+        - DE/DR/research contract wording is stable.
+        exit_criteria:
+        - Workflow-facing skills/templates reviewed for sequencing/enforcement claims.
+        - Skill guidance no longer conflicts with delta-first default or advisory
+          ceremony runtime.
+        - Notes capture residual follow-ups and handoff outcomes.
+        verification:
+          tests:
+          - VA skill-guidance review against DE-038/DR-038/workflow-research contract.
+          evidence:
+          - Diffs for skill/template files touched in this phase.
+          - Notes entry summarizing reviewed skills and unresolved gaps.
+        tasks:
+        - id: P3.1
+          title: Inventory workflow-facing skills/templates and baseline their claims.
+          status: done
+        - id: P3.2
+          title: Patch sequencing and enforcement language to match DE-038 contract.
+          status: done
+        - id: P3.3
+          title: Readback for consistency with memory set and docs.
+          status: done
+        - id: P3.4
+          title: Finalize notes + recommend any follow-up deltas for remaining drift.
+          status: done
+        risks:
+        - Skill guidance may implicitly preserve stale revision-first/default narratives.
+        - Template text may diverge from skill text after partial updates.
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-038.PHASE-04
+        plan: IP-038
+        delta: DE-038
+        objective: Execute memory retrieval-precision pass so workflow-critical command/path
+          queries surface operational records ahead of broad conceptual records.
+        entrance_criteria:
+        - Phase 03 skill review outcomes are captured or ready for carry-forward.
+        - Memory target set from phase 02 is available with current wording/provenance.
+        - Baseline noisy query examples are recorded for comparison.
+        exit_criteria:
+        - Target memories include sensible scope metadata (`scope.commands`/`scope.paths`)
+          where needed.
+        - Baseline and after-state query outputs show improved surfacing of operational
+          memories.
+        - Notes capture any residual retrieval noise and follow-up recommendations.
+        verification:
+          tests:
+          - VA retrieval precision readback against baseline command/path queries.
+          evidence:
+          - Diffs for memory files updated with scope metadata.
+          - Before/after query snapshots recorded in phase notes.
+        tasks:
+        - id: P4.1
+          title: Baseline query capture for retrieval noise.
+          status: done
+        - id: P4.2
+          title: Patch scope metadata on workflow-critical memory set.
+          status: done
+        - id: P4.3
+          title: Re-run query set and validate improved ranking.
+          status: done
+        - id: P4.4
+          title: Finalize notes and handoff.
+          status: done
+        risks:
+        - Over-scoping may hide useful conceptual records from discovery.
+        - Inconsistent scope conventions across memories may create new retrieval
+          bias.

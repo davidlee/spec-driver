@@ -48,6 +48,16 @@
 - Residual risk: many non-target memories still rank similarly for command/path memory queries because broad historical scope metadata remains; phase 03/maintenance can tighten surfacing later.
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation/memory-only.
 
+## 2026-03-03 (retrieval precision pass added)
+- Added explicit Phase 04 retrieval-precision pass:
+  - updated `IP-038.md` phase overview/progress to include `IP-038.PHASE-04`.
+  - added [phases/phase-04.md](./phases/phase-04.md) with baseline-query, scope-tuning, and before/after ranking verification tasks.
+- Updated DE/DR contract text to include retrieval-precision outcomes as part of DE-038 scope.
+- Updated memory maintenance skill guidance:
+  - added explicit noisy-ranking playbook for `scope.commands`/`scope.paths` tuning.
+  - added required before/after query validation step for ranking quality.
+- Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation/skill-guidance-only.
+
 ## New Agent Instructions
 - Task card code: DE-038 (`canonical_workflow_alignment`)
 - Next activity: execute Phase 2 (Skill Review Pass) via `/implement` using [phase-03.md](./phases/phase-03.md).
@@ -77,6 +87,7 @@
   - Recommended v1 coverage precedence: mixed status => `in-progress`; mixed-status validation => warning.
 - Incomplete work / loose ends:
   - Execute phase 03 skill-review tasks to align workflow-facing skills with DE-038 contract.
+  - Execute phase 04 retrieval-precision tasks after phase 03 to tighten memory scope/ranking behavior.
   - Re-check workflow-facing instructions for any implied ceremony enforcement or revision-first defaults.
   - Keep notes current after each completed unit of work.
 - Advice:

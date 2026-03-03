@@ -106,29 +106,15 @@ def test_initialize_workspace_copies_about_files(tmp_path: Path) -> None:
   assert len(about_files) > 0, "No about files were copied"
 
 
-def test_initialize_workspace_copies_agents_when_claude_exists(tmp_path: Path) -> None:
-  """Test that initialize_workspace copies agents if .claude exists."""
-  # Create .claude directory before installing
+def test_initialize_workspace_no_commands_dir_created(tmp_path: Path) -> None:
+  """Commands have been replaced by skills; .claude/commands/ should not be created."""
   claude_dir = tmp_path / ".claude"
   claude_dir.mkdir()
 
   initialize_workspace(tmp_path, auto_yes=True)
 
   commands_dir = claude_dir / "commands"
-  assert commands_dir.exists()
-
-  # Check that agent files were copied
-  agent_files = list(commands_dir.glob("*.md"))
-  assert len(agent_files) > 0, "No agent files were copied"
-
-
-def test_initialize_workspace_skips_commands_when_no_claude(tmp_path: Path) -> None:
-  """Test that agent commands are not copied if .claude didn't exist before install."""
-  # .claude may be created by sync_skills (for skills), but commands/ should not
-  initialize_workspace(tmp_path, auto_yes=True)
-
-  commands_dir = tmp_path / ".claude" / "commands"
-  assert not commands_dir.exists()
+  assert not commands_dir.exists(), ".claude/commands/ should not be created"
 
 
 def test_initialize_workspace_skips_existing_files(tmp_path: Path) -> None:
@@ -316,9 +302,8 @@ def test_initialize_workspace_prompts_per_category(tmp_path: Path, capsys) -> No
     about_dir = tmp_path / SPEC_DRIVER_DIR / "about"
     (about_dir / "README.md").write_text("modified")
 
-    # Mock user saying "no" to templates, "yes" to about docs,
-    # "n" to agent commands (.claude/ now exists from sync_skills)
-    with mock.patch("builtins.input", side_effect=["n", "y", "n"]):
+    # Mock user saying "no" to templates, "yes" to about docs
+    with mock.patch("builtins.input", side_effect=["n", "y"]):
       initialize_workspace(tmp_path)
       captured = capsys.readouterr()
 

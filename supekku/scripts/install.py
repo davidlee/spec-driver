@@ -248,21 +248,6 @@ def initialize_workspace(
   # Render agent guidance from templates (config-tailored)
   _render_agent_docs(target_root, package_root, dry_run=dry_run)
 
-  # Copy claude.command files to .claude/commands/ if .claude exists
-  claude_dir = target_root / ".claude"
-  if claude_dir.exists() and claude_dir.is_dir():
-    commands_dir = claude_dir / "commands"
-    commands_dir.mkdir(parents=True, exist_ok=True)
-
-    copy_directory_if_changed(
-      src=package_root / "claude.commands",
-      dest=commands_dir,
-      pattern="*.md",
-      category_name="Agent commands",
-      dry_run=dry_run,
-      auto_yes=auto_yes,
-    )
-
   # Bootstrap skills allowlist if missing, then install to targets
   if not dry_run:
     from supekku.scripts.lib.skills.sync import sync_skills  # noqa: PLC0415, I001  # pylint: disable=import-outside-toplevel

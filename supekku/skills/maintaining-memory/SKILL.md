@@ -31,10 +31,19 @@ description: |
   5) Re-scope if selection misses:
      - If a correct memory does not surface under relevant `--path/--command`, add `scope.paths/globs/commands` so retrieval is automatic for future agents. Records without scope are excluded from scope-filtered results.
      - If you add `visibility: [pre]`, ensure it is paired with meaningful `scope.*`; avoid global pre-hook noise.
+     - If retrieval is noisy (broad conceptual memories outrank actionable records), tighten scope on the actionable records first:
+       - add `scope.commands` for exact command prefixes (for example `uv run spec-driver complete delta`)
+       - add `scope.paths` for source-of-truth files tied to the operation
+       - avoid adding broad global globs that make every memory match every query
 
   6) De-duplicate:
      - If two memories cover the same operational guidance, keep one canonical record and convert the other into a short signpost pointing at it (or supersede it). This prevents diverging “truths”.
 
+  7) Validate ranking quality explicitly:
+     - Capture a before/after query for the target context (same `--path/--command/--match-tag` and `--limit`).
+     - Confirm the top results now include the intended operational memory/memories.
+     - If broad concept/signpost records still dominate, either tighten scope on operational records further or reduce over-broad scope on the dominating records.
+
   Completion criterion:
-  - After edits, run the same `list memories` query that originally surfaced the issue and confirm the corrected record ranks above stale ones via ordering (severity/weight/specificity/recency).
+  - After edits, run the same `list memories` query that originally surfaced the issue and confirm the corrected record ranks above stale/noisy results for that context (severity/weight/specificity/recency + scope).
 ---

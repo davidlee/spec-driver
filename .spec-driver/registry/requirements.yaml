@@ -423,7 +423,8 @@ requirements:
     path: specify/product/PROD-003/PROD-003.md
   PROD-004.FR-001:
     label: FR-001
-    title: System MUST validate frontmatter for all 11 kinds using metadata definitions
+    title: System MUST validate frontmatter for all registered kinds using metadata
+      definitions
     specs:
     - PROD-004
     primary_spec: PROD-004
@@ -516,6 +517,23 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence: []
+    path: specify/product/PROD-004/PROD-004.md
+  PROD-004.FR-007:
+    label: FR-007
+    title: Metadata definitions MUST support canonical/derived field classification
+      enabling compaction profiles
+    specs:
+    - PROD-004
+    primary_spec: PROD-004
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence:
+    - VT-007
     path: specify/product/PROD-004/PROD-004.md
   PROD-004.NF-001:
     label: NF-001
@@ -1647,6 +1665,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-028
+    - DE-035
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-012/PROD-012.md
@@ -2374,6 +2393,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-030
+    - DE-035
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-015/PROD-015.md
@@ -2390,6 +2410,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-030
+    - DE-035
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-015/PROD-015.md
@@ -2408,6 +2429,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-030
+    - DE-035
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-015/PROD-015.md
@@ -2426,6 +2448,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-030
+    - DE-035
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-015/PROD-015.md

@@ -58,15 +58,30 @@
   - added required before/after query validation step for ranking quality.
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation/skill-guidance-only.
 
+## 2026-03-03 (phase 03 skill review pass execution)
+- Executed Phase 03 tasks `3.1`-`3.4` from `phases/phase-03.md`.
+- Workflow-facing skill/template updates:
+  - Added explicit delta-first canonical stance and advisory-ceremony/runtime-gate distinction to:
+    - `supekku/templates/agents/workflow.md`
+    - `.spec-driver/agents/workflow.md`
+  - Added canonical workflow reminders to source skill:
+    - `supekku/skills/implement/SKILL.md`
+- Baseline drift summary:
+  - No hard contradiction lines were found in reviewed skill files.
+  - Main drift was omission: workflow docs did not explicitly encode delta-first default + advisory ceremony semantics.
+- Source-of-truth hygiene:
+  - Applied skill edits under `supekku/skills/*/SKILL.md` to avoid overwrite from skill sync.
+- Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation/skill-guidance-only.
+
 ## New Agent Instructions
 - Task card code: DE-038 (`canonical_workflow_alignment`)
-- Next activity: execute Phase 2 (Skill Review Pass) via `/implement` using [phase-03.md](./phases/phase-03.md).
+- Next activity: execute Phase 3 (Retrieval Precision Pass) via `/implement` using [phase-04.md](./phases/phase-04.md).
 - Required reading:
   - [DE-038.md](./DE-038.md)
   - [DR-038.md](./DR-038.md)
   - [workflow-research.md](./workflow-research.md)
   - [IP-038.md](./IP-038.md)
-  - [phases/phase-03.md](./phases/phase-03.md)
+  - [phases/phase-04.md](./phases/phase-04.md)
   - [gaps-to-adoption.md](./gaps-to-adoption.md)
 - Key source-of-truth files:
   - `/home/david/dev/spec-driver/supekku/scripts/complete_delta.py`
@@ -86,9 +101,8 @@
   - Baseline strict-mode contract: hard-fail non-canonical paths; no exception knobs in this delta.
   - Recommended v1 coverage precedence: mixed status => `in-progress`; mixed-status validation => warning.
 - Incomplete work / loose ends:
-  - Execute phase 03 skill-review tasks to align workflow-facing skills with DE-038 contract.
-  - Execute phase 04 retrieval-precision tasks after phase 03 to tighten memory scope/ranking behavior.
-  - Re-check workflow-facing instructions for any implied ceremony enforcement or revision-first defaults.
+  - Execute phase 04 retrieval-precision tasks to tighten memory scope/ranking behavior.
+  - Apply scope metadata to workflow-critical memory set and validate before/after query ordering.
   - Keep notes current after each completed unit of work.
 - Advice:
   - `uv run spec-driver create phase` currently appends duplicate phase IDs in `IP-038` plan block; clean duplicates if command is used again.

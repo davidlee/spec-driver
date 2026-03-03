@@ -4,7 +4,7 @@ slug: 038-canonical_workflow_alignment-phase-03
 name: IP-038 Phase 03
 created: '2026-03-03'
 updated: '2026-03-03'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -34,16 +34,16 @@ verification:
 tasks:
   - id: P3.1
     title: Inventory workflow-facing skills/templates and baseline their claims.
-    status: todo
+    status: done
   - id: P3.2
     title: Patch sequencing and enforcement language to match DE-038 contract.
-    status: todo
+    status: done
   - id: P3.3
     title: Readback for consistency with memory set and docs.
-    status: todo
+    status: done
   - id: P3.4
     title: Finalize notes + recommend any follow-up deltas for remaining drift.
-    status: todo
+    status: done
 risks:
   - Skill guidance may implicitly preserve stale revision-first/default narratives.
   - Template text may diverge from skill text after partial updates.
@@ -76,12 +76,12 @@ Review and align workflow-facing skill guidance so agent behavior matches the fr
 ## 3. Entrance Criteria
 - [x] Contract wording in DE/DR/research is stable
 - [x] Skill review target set listed in IP-038
-- [ ] Skill/template files loaded and baselined for drift
+- [x] Skill/template files loaded and baselined for drift
 
 ## 4. Exit Criteria / Done When
-- [ ] Skill/template workflow guidance is aligned with canonical model
-- [ ] No reviewed skill implies ceremony runtime enforcement today
-- [ ] Handoff notes include any remaining follow-up scope
+- [x] Skill/template workflow guidance is aligned with canonical model
+- [x] No reviewed skill implies ceremony runtime enforcement today
+- [x] Handoff notes include any remaining follow-up scope
 
 ## 5. Verification
 - Verification type: VA (skill guidance coherence audit)
@@ -106,10 +106,10 @@ Review and align workflow-facing skill guidance so agent behavior matches the fr
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 3.1 | Inventory workflow-facing skills/templates and baseline drift | [ ] | Record mismatched sequencing/enforcement claims |
-| [ ] | 3.2 | Patch core skill guidance to canonical model | [ ] | Delta-first default, strict-mode future enforcement, advisory ceremony |
-| [ ] | 3.3 | Cross-check skill output against reviewed memories | [ ] | Ensure no contradictory narrative |
-| [ ] | 3.4 | Final notes and handoff | [ ] | Capture follow-up scope only where needed |
+| [x] | 3.1 | Inventory workflow-facing skills/templates and baseline drift | [ ] | Drift was mostly omission: workflow docs lacked explicit canonical/advisory wording |
+| [x] | 3.2 | Patch core skill guidance to canonical model | [ ] | Updated workflow template/runtime docs and implement skill source guidance |
+| [x] | 3.3 | Cross-check skill output against reviewed memories | [ ] | Readback confirms no ceremony-as-runtime-enforcement claim remains in reviewed files |
+| [x] | 3.4 | Final notes and handoff | [ ] | Notes updated; next activity points to retrieval precision phase |
 
 ### Task Details
 - **3.1 Description**
@@ -153,10 +153,23 @@ Review and align workflow-facing skill guidance so agent behavior matches the fr
 - `2026-03-03` - Phase scaffolded; execution checklist prefilled for skill-review pass.
 
 ## 10. Findings / Research Notes
-- To be populated during execution with skill-level drift findings and line-cited references.
+- Baseline inventory covered:
+  - `.agents/skills/*` and `supekku/skills/*` skill pairs
+  - `.spec-driver/agents/workflow.md`
+  - `supekku/templates/agents/workflow.md`
+- Drift findings:
+  - Workflow docs/templates did not explicitly state delta-first canonical sequencing.
+  - Workflow docs/templates did not explicitly clarify ceremony as advisory guidance vs runtime enforcement.
+  - Implement skill guidance lacked explicit canonical-sequence and completion-gate reminders.
+- Files updated in this phase:
+  - `supekku/templates/agents/workflow.md`
+  - `.spec-driver/agents/workflow.md`
+  - `supekku/skills/implement/SKILL.md`
+- Source-of-truth note:
+  - Skill edits were applied to `supekku/skills/*/SKILL.md` sources to avoid overwrite by skill sync.
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Spec/Delta/Plan updated with lessons
-- [ ] Hand-off notes to next phase (if any)
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Spec/Delta/Plan updated with lessons
+- [x] Hand-off notes to next phase (if any)

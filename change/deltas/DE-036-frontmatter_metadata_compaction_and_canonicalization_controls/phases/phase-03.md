@@ -4,7 +4,7 @@ slug: 036-frontmatter_metadata_compaction_and_canonicalization_controls-phase-03
 name: IP-036 Phase 03 - Generalized Framework Pilot
 created: '2026-03-03'
 updated: '2026-03-03'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -35,16 +35,21 @@ verification:
 tasks:
   - id: "2.1"
     description: Implement compact_frontmatter() using BlockMetadata persistence annotations
-    status: pending
+    status: complete
   - id: "2.2"
     description: Write round-trip tests for delta compaction
-    status: pending
+    status: complete
   - id: "2.3"
     description: Integrate compaction into sync write path for deltas (if applicable)
-    status: pending
+    status: deferred
+    notes: >-
+      Deferred to P3. No existing delta file write path in sync (registry sync
+      reads delta files, writes YAML). DEC-036-001 constrains compaction to
+      sync commands only, ruling out create delta. sync.py already 661 lines.
+      compact_frontmatter() ready to wire via new compact command in P3.
   - id: "2.4"
     description: Measure before/after size on delta corpus
-    status: pending
+    status: complete
 risks:
   - description: Compaction strips fields that downstream consumers expect
     mitigation: Round-trip tests; read-side tolerance; full mode always available
@@ -74,12 +79,12 @@ Implement a shared compaction profile mechanism that uses `FieldMetadata.persist
 - [x] Phase 1 complete (FieldMetadata has persistence + default_value; delta fields annotated)
 
 ## 4. Exit Criteria / Done When
-- [ ] `compact_frontmatter(data, metadata)` function implemented
-- [ ] Compaction respects all four persistence classifications (canonical/derived/optional/default-omit)
-- [ ] Delta frontmatter round-trips without semantic loss
-- [ ] Existing delta files parse unchanged
-- [ ] Before/after size measurement on delta corpus
-- [ ] All tests pass, linters clean
+- [x] `compact_frontmatter(data, metadata)` function implemented
+- [x] Compaction respects all four persistence classifications (canonical/derived/optional/default-omit)
+- [x] Delta frontmatter round-trips without semantic loss
+- [x] Existing delta files parse unchanged
+- [x] Before/after size measurement on delta corpus
+- [x] All tests pass, linters clean
 
 ## 5. Verification
 - `just test` — all tests pass
@@ -95,23 +100,41 @@ Implement a shared compaction profile mechanism that uses `FieldMetadata.persist
 
 | Status | ID | Description | Notes |
 | --- | --- | --- | --- |
-| [ ] | 2.1 | Implement compact_frontmatter() | Pure function using BlockMetadata |
-| [ ] | 2.2 | Round-trip tests for delta compaction | Confirm no semantic loss |
-| [ ] | 2.3 | Integrate into sync write path (if applicable) | May be deferred to P3 |
-| [ ] | 2.4 | Before/after size measurement on delta corpus | VA-036-001 evidence |
+| [x] | 2.1 | Implement compact_frontmatter() | Pure function in `compaction.py`, 25 tests |
+| [x] | 2.2 | Round-trip tests for delta compaction | 8 delta-specific round-trip tests |
+| [~] | 2.3 | Integrate into sync write path (if applicable) | Deferred to P3 — no delta sync write path exists |
+| [x] | 2.4 | Before/after size measurement on delta corpus | 37/37 files reducible, 7.1% avg, 26% max |
 
 ## 8. Risks & Mitigations
 | Risk | Mitigation | Status |
 | --- | --- | --- |
-| Compaction strips fields downstream consumers expect | Round-trip tests; full mode fallback | Open |
-| `applies_to` default shape mismatch (`prod` key absent from default) | Equality check, not structural subset | Open |
+| Compaction strips fields downstream consumers expect | Round-trip tests; full mode fallback | Mitigated |
+| `applies_to` default shape mismatch (`prod` key absent from default) | Equality check, not structural subset | Mitigated (tested) |
 
 ## 9. Decisions & Outcomes
 
+- **Placement**: `compact_frontmatter()` lives in `core/frontmatter_metadata/compaction.py` — near metadata definitions, pure function of `BlockMetadata` + data dict.
+- **Task 2.3 deferred**: No existing delta file sync write path. `delta_registry.sync()` reads delta files and writes registry YAML; it doesn't modify source files. DEC-036-001 rules out `create delta`. P3 should add a `compact` CLI command.
+- **`aliases` field**: Not in delta metadata definitions — passes through compaction as unknown field. Consistent with P1 finding (annotate when/if defined).
+
 ## 10. Findings / Research Notes
 
+### Delta corpus compaction measurement
+- **Corpus**: 37 delta files
+- **All 37 files** have reduction potential
+- **Total reduction**: 1011 bytes (7.1% of frontmatter)
+- **Range**: 0.3% (DE-032, DE-033 — minimal defaults) to 26% (DE-021 — mostly empty defaults)
+- **Primary savings**: `relations: []`, `applies_to: {specs: [], requirements: []}`, empty optional arrays (`owners`, `tags`, `risk_register`, `context_inputs`)
+- **Note**: Delta frontmatter is relatively small (avg ~386 bytes) so absolute savings are modest; the value is in noise reduction and diff cleanliness.
+
+### Implementation details
+- `compact_frontmatter(data, metadata, mode="compact")` — 42 lines of code, pure function
+- Helper `_should_keep(persistence, value, default_value)` implements the four-rule semantics table
+- Unknown fields (not in metadata) pass through — safe for forward compatibility
+- `mode="full"` returns a shallow copy unchanged — no-op for non-compacting paths
+
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (§10)
+- [x] Notes updated
 - [ ] Hand-off notes to Phase 3 (Verification & Rollout)

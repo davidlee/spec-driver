@@ -6,6 +6,7 @@ import os
 import unittest
 from typing import TYPE_CHECKING, Any
 
+from supekku.scripts.lib.backlog.registry import sync_backlog_registry
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.relations.manager import add_relation
 from supekku.scripts.lib.test_base import RepoTestCase
@@ -546,6 +547,45 @@ class WorkspaceValidatorTest(RepoTestCase):
       i for i in issues if i.level == "error" and i.artifact in ("SPEC-506", "SPEC-507")
     ]
     assert len(taxonomy_errors) == 0
+
+  # -- Backlog item acceptance (applies_to.requirements) --
+
+  def _write_backlog_item(self, root: Path, item_id: str) -> None:
+    """Create a backlog issue on disk and register it."""
+    kind_dir = root / "backlog" / "issues" / f"{item_id}-sample"
+    kind_dir.mkdir(parents=True)
+    md_path = kind_dir / f"{item_id}.md"
+    frontmatter = {
+      "id": item_id,
+      "title": f"Sample {item_id}",
+      "status": "open",
+      "created": "2024-06-01",
+    }
+    dump_markdown_file(md_path, frontmatter, f"# {item_id}\n")
+
+    sync_backlog_registry(root)
+
+  def test_validator_accepts_backlog_item_in_applies_to(self) -> None:
+    """Delta referencing a backlog item in applies_to.requirements is valid."""
+    root = self._create_repo()
+    self._write_backlog_item(root, "ISSUE-100")
+    self._write_delta(root, "DE-100", "ISSUE-100")
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    errors = [i for i in issues if i.level == "error"]
+    assert len(errors) == 0
+
+  def test_validator_rejects_unknown_applies_to_requirement(self) -> None:
+    """Delta referencing a nonexistent ID in applies_to.requirements is an error."""
+    root = self._create_repo()
+    self._write_delta(root, "DE-101", "ISSUE-999")
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    errors = [i for i in issues if i.level == "error"]
+    assert len(errors) == 1
+    assert "ISSUE-999" in errors[0].message
 
   # -- Non-breaking regression (VT-030-006) --
 

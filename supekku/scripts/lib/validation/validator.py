@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.backlog.registry import load_backlog_registry
+
 if TYPE_CHECKING:
   from collections.abc import Iterable
 
@@ -44,6 +46,10 @@ class WorkspaceValidator:
     delta_ids = set(delta_registry.keys())
     revision_ids = set(revision_registry.keys())
     audit_ids = set(audit_registry.keys())
+
+    # Backlog items (ISSUE-*, IMPR-*, etc.) are valid applies_to targets
+    backlog_ids = set(load_backlog_registry(self.workspace.root))
+    applies_to_ids = requirement_ids | backlog_ids
 
     # Requirement lifecycle links
     for req_id, record in requirements.records.items():
@@ -96,16 +102,19 @@ class WorkspaceValidator:
     self._validate_change_relations(
       delta_registry.values(),
       requirement_ids,
+      applies_to_ids=applies_to_ids,
       expected_type="implements",
     )
     self._validate_change_relations(
       revision_registry.values(),
       requirement_ids,
+      applies_to_ids=applies_to_ids,
       expected_type="introduces",
     )
     self._validate_change_relations(
       audit_registry.values(),
       requirement_ids,
+      applies_to_ids=applies_to_ids,
       expected_type="verifies",
     )
 
@@ -124,6 +133,7 @@ class WorkspaceValidator:
     artifacts: Iterable[ChangeArtifact],
     requirement_ids: set[str],
     *,
+    applies_to_ids: set[str],
     expected_type: str,
   ) -> None:
     exp = expected_type.lower()
@@ -141,7 +151,7 @@ class WorkspaceValidator:
       applies = artifact.applies_to.get("requirements", [])
       if applies:
         for req in applies:
-          if req not in requirement_ids:
+          if req not in applies_to_ids:
             self._error(
               artifact.id,
               f"applies_to requirement {req} not found",

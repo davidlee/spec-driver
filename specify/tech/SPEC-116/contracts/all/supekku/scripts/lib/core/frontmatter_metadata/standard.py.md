@@ -1,0 +1,1 @@
+../../../../../../../../../../.contracts/all/supekku/scripts/lib/core/frontmatter_metadata/standard.py.md

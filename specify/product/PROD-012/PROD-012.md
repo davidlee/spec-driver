@@ -174,16 +174,6 @@ entries:
     requirement: PROD-012.NF-003
     status: planned
     notes: CLI tool performance benchmarks
-  - artefact: VH-905
-    kind: VH
-    requirement: PROD-012.FR-005
-    status: blocked
-    notes: "Invalidated by ADR-003 + RE-016: sync defaults should be contracts-first and spec auto-creation should be opt-in with a persisted marker."
-  - artefact: VH-906
-    kind: VH
-    requirement: PROD-012.FR-006
-    status: blocked
-    notes: "Invalidated by PROD-014/RE-015 direction: canonical contract storage is `.contracts/**`; legacy SPEC bundle storage is compatibility-only (to be specified)."
 ```
 
 ## 1. Intent & Summary

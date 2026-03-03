@@ -6,6 +6,8 @@ created: '2025-11-02'
 updated: '2025-11-03'
 status: draft
 kind: spec
+category: unit
+c4_level: code
 responsibilities:
 - Provide metadata-driven frontmatter validation schema definitions for all artifact kinds
 - Define field schemas with types, patterns, enums, and validation rules using BlockMetadata

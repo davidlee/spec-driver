@@ -1,0 +1,1 @@
+../../../../../../../.contracts/tests/supekku/cli/skills_test.py.md

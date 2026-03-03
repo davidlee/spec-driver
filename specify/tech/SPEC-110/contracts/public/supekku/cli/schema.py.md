@@ -1,0 +1,1 @@
+../../../../../../../.contracts/public/supekku/cli/schema.py.md

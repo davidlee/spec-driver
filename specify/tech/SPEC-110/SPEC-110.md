@@ -6,6 +6,8 @@ created: '2025-11-02'
 updated: '2025-11-03'
 status: draft
 kind: spec
+category: unit
+c4_level: code
 responsibilities:
 - Provide unified command-line interface for spec-driver operations
 - Orchestrate thin command layers that delegate to registries and formatters

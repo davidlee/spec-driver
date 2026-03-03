@@ -1,0 +1,1 @@
+../../../../../../../../../../.contracts/public/supekku/scripts/lib/sync/adapters/typescript.py.md

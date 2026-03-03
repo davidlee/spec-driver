@@ -6,6 +6,8 @@ created: '2025-11-02'
 updated: '2025-11-02'
 status: draft
 kind: spec
+category: unit
+c4_level: code
 responsibilities:
 - Manage requirement records with comprehensive lifecycle tracking
 - Synchronize requirements from specs and change artifacts into central registry

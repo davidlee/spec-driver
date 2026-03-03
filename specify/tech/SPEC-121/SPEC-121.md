@@ -6,6 +6,8 @@ created: '2025-11-02'
 updated: '2025-11-02'
 status: stub
 kind: spec
+category: unit
+c4_level: code
 responsibilities: []
 aliases: []
 packages:

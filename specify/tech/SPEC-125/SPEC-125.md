@@ -6,6 +6,8 @@ created: '2025-11-02'
 updated: '2025-11-02'
 status: draft
 kind: spec
+category: unit
+c4_level: code
 responsibilities:
 - Validate workspace consistency and artifact relationships
 - Detect broken references between requirements, changes, and decisions

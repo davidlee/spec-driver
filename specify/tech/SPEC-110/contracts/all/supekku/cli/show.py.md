@@ -1,0 +1,1 @@
+../../../../../../../.contracts/all/supekku/cli/show.py.md

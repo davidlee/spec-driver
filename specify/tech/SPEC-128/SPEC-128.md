@@ -6,6 +6,8 @@ created: '2025-11-04'
 updated: '2025-11-04'
 status: draft
 kind: spec
+category: unit
+c4_level: code
 aliases: []
 relations: []
 guiding_principles: []

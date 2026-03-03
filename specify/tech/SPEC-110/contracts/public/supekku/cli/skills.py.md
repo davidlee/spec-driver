@@ -1,0 +1,1 @@
+../../../../../../../.contracts/public/supekku/cli/skills.py.md

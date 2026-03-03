@@ -102,7 +102,8 @@ For delta close-out, `complete delta` requires each delta requirement to have
 `status: verified` in parent spec coverage blocks (`supekku:verification.coverage@v1`),
 unless bypassed with `--force` or `SPEC_DRIVER_ENFORCE_COVERAGE=false`.
 
-See: `supekku/about/RUN.md` and `supekku/scripts/lib/changes/coverage_check.py`.
+See: `docs/commands-workflow.md` and
+`supekku/scripts/lib/changes/coverage_check.py`.
 
 ## Non-Canonical Status Terms to Avoid
 

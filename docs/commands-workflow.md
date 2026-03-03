@@ -133,6 +133,16 @@ there even is a relevant backlog item). In Settler/Town Planner modes, agent
 workflows should prefer structured updates (frontmatter + coverage blocks)
 where the project has adopted them.
 
+### 4.1 Coverage prerequisite for `complete delta`
+
+Before running `uv run spec-driver complete delta DE-XXX`, each requirement in
+`delta.applies_to.requirements` must be present in the parent spec
+`supekku:verification.coverage@v1` block with `status: verified`.
+
+If coverage is missing or not verified, completion hard-fails unless bypassed
+with `--force` (or disabled globally via `SPEC_DRIVER_ENFORCE_COVERAGE=false`,
+non-canonical path).
+
 ## 5. Allowable permutations (non-exhaustive)
 
 Valid sequences (choose based on ceremony):

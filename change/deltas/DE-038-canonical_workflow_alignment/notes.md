@@ -140,6 +140,18 @@
   - remaining priority queue shifted to `commands-workflow.md` coverage prerequisite and `RUN.md` status terminology cleanup.
 - No runtime behavior changes; docs-only update.
 
+## 2026-03-04 (RUN.md retirement + coverage callout migration)
+- Added explicit `complete delta` coverage prerequisite section to `docs/commands-workflow.md` (parent spec coverage entries must be `verified`).
+- Updated `supekku/about/lifecycle.md` coverage references to point at canonical workflow docs + code source, removing `RUN.md` dependency.
+- Removed `supekku/about/RUN.md` as obsolete operational guidance after migration into canonical docs/memories.
+- Updated `gaps-to-adoption.md` statuses:
+  - coverage prerequisite hard blocker -> `resolved`
+  - status vocabulary hard blocker -> `resolved`
+  - `commands-workflow.md` documentation debt -> `resolved`
+  - `RUN.md` documentation debt -> `resolved`
+  - added remaining low-severity follow-up: runtime coverage error text still references legacy `.spec-driver/RUN.md` path.
+- No runtime behavior changes; docs-only update.
+
 ## New Agent Instructions
 - Task card code: DE-038 (`canonical_workflow_alignment`)
 - Next activity: run delta close-out flow (`complete delta --dry-run` then `complete delta`) when directed.

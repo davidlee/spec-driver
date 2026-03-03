@@ -12,7 +12,8 @@ tags:
 - delta
 - seed
 summary: Deltas (DE-*) are declarative change bundles — the mechanism for applying
-  intent to code. They scope work, link to specs, and carry verification.
+  revision intent to code. They scope work, link requirements, and carry verification
+  strategy toward audit/reconciliation.
 priority:
   severity: high
   weight: 8
@@ -33,7 +34,8 @@ provenance:
 
 The delta is the **scope** step of the [[mem.pattern.spec-driver.core-loop]].
 It declares the intent to modify the system and scopes the work required to
-bring code into alignment with [[mem.concept.spec-driver.spec|specs]].
+bring code into alignment with revision/design intent, then through audit back
+into reconciled [[mem.concept.spec-driver.spec|specs]].
 
 ## What a Delta Contains
 

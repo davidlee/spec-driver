@@ -13,7 +13,7 @@ tags:
 - verification
 - seed
 summary: Audits (AUD-*) compare implementation against specs. They reconcile realised
-  intent back into the specs, closing the development loop.
+  behavior against intent and feed explicit spec reconciliation before closure.
 priority:
   severity: medium
   weight: 6
@@ -34,9 +34,8 @@ provenance:
 ## Role in the Loop
 
 The audit is the **verify** step of the [[mem.pattern.spec-driver.core-loop]].
-In the [[mem.concept.spec-driver.philosophy|idealised form]], audits reconcile
-what was realised back into the [[mem.concept.spec-driver.spec|specs]], ensuring
-they remain truth.
+In high-rigor flow, audits/contracts establish observed truth, then specs are
+patched to match that observed truth before final closure.
 
 ## Two Modes
 
@@ -44,6 +43,7 @@ they remain truth.
 - Validates that implementation matches spec intent
 - Produces `verifies` [[mem.concept.spec-driver.relations|relations]]
 - Projects evidence back into [[mem.concept.spec-driver.verification|coverage]]
+- Drives any required post-audit spec reconciliation
 
 **Discovery/backfill audit** (typical in settler):
 - Applied to existing code that predates spec-driver

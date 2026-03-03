@@ -3,7 +3,7 @@ id: PROD-004
 slug: frontmatter-metadata-validation
 name: Frontmatter Metadata Validation
 created: '2025-11-02'
-updated: '2025-11-02'
+updated: '2026-03-03'
 status: draft
 kind: prod
 aliases: []
@@ -23,7 +23,9 @@ guiding_principles:
   - Backward compatibility during migration to prevent breakage
 assumptions:
   - Phases 1-5 metadata migration patterns are proven and stable
-  - All 11 frontmatter kinds documented in supekku/about/frontmatter-schema.md
+  - All registered frontmatter kinds documented in supekku/about/frontmatter-schema.md
+  - 15 unique metadata definitions across 17 registry entries (plan/phase/task share one schema)
+  - Memory kind added via DE-033; included in registry and schema coverage
   - Existing code uses FrontmatterValidationResult and can be gradually migrated
   - JSON Schema output will benefit agents and future external tooling
 ---
@@ -42,6 +44,7 @@ requirements:
     - PROD-004.FR-004
     - PROD-004.FR-005
     - PROD-004.FR-006
+    - PROD-004.FR-007
     - PROD-004.NF-001
     - PROD-004.NF-002
     - PROD-004.NF-003
@@ -66,7 +69,7 @@ capabilities:
     name: Metadata-Driven Frontmatter Validation
     responsibilities:
       - Validate frontmatter using declarative metadata definitions
-      - Support all 11 frontmatter kinds with kind-specific schemas
+      - Support all registered frontmatter kinds with kind-specific schemas
       - Generate consistent, detailed validation error messages
       - Maintain compatibility with existing validation API
     requirements:
@@ -76,10 +79,11 @@ capabilities:
     summary: >-
       Replaces imperative validation code with metadata-driven validation,
       enabling consistent validation across all artifact kinds. Each frontmatter
-      kind (spec, delta, requirement, verification, problem, risk, policy,
-      standard, etc.) has a declarative schema that drives validation behavior.
+      kind (spec, prod, delta, requirement, verification, design_revision,
+      problem, risk, issue, memory, audit, plan, policy, standard) has a
+      declarative schema that drives validation behavior.
     success_criteria:
-      - All 11 frontmatter kinds validate correctly via metadata
+      - All registered frontmatter kinds validate correctly via metadata
       - Validation errors are clear and actionable
       - No regressions from imperative validator behavior
   - id: json-schema-generation
@@ -124,6 +128,26 @@ capabilities:
       - Each code path opts in independently
       - Dual-validation tests confirm behavioral equivalence
       - Clear deprecation warnings before removal
+  - id: metadata-compaction
+    name: Metadata Compaction Profiles
+    responsibilities:
+      - Classify fields as canonical, derived, or default-valued in metadata definitions
+      - Enable compaction profiles that omit reconstructible or default fields during serialization
+      - Ensure agents can discover full schema structure despite compacted persistence
+      - Support per-artifact-family compaction rules using shared infrastructure
+    requirements:
+      - PROD-004.FR-007
+    summary: >-
+      Extends metadata definitions with canonical/derived/default-aware persistence
+      semantics. Write paths use compaction profiles to omit fields that can be
+      reconstructed at read time, keeping persisted frontmatter lean without losing
+      semantic fidelity. Agents query JSON Schema for full structure guidance when
+      authoring compacted artifacts.
+    success_criteria:
+      - FieldMetadata supports persistence classification (canonical/derived/optional)
+      - At least one artifact family uses compaction profiles in sync/write paths
+      - Compacted artifacts round-trip without information loss
+      - Agent guidance (JSON Schema, skills) accounts for compacted frontmatter
 ```
 
 ```yaml supekku:verification.coverage@v1
@@ -135,7 +159,7 @@ entries:
     kind: VT
     requirement: PROD-004.FR-001
     status: planned
-    notes: Comprehensive test suite covering all 11 frontmatter kinds with valid/invalid cases
+    notes: Comprehensive test suite covering all registered frontmatter kinds with valid/invalid cases
   - artefact: VT-002
     kind: VT
     requirement: PROD-004.FR-002
@@ -161,6 +185,11 @@ entries:
     requirement: PROD-004.NF-001
     status: planned
     notes: Dual-validation pattern tests ensuring zero behavioral regressions
+  - artefact: VT-007
+    kind: VT
+    requirement: PROD-004.FR-007
+    status: planned
+    notes: Compaction profile tests - canonical/derived classification, round-trip fidelity, default omission
 ```
 
 ## 1. Intent & Summary
@@ -199,14 +228,14 @@ The metadata-driven approach proven in Phases 1-5 (YAML block validators) provid
 
 **System Quality**:
 - Comprehensive kind-specific validation (not just base fields)
-- 275-440 tests across 11 schemas ensuring correctness
+- Per-schema test suites covering all registered kinds (maintained via CI)
 - Backward compatibility maintained throughout migration
 
 ### Guiding Principles
 
 1. **Metadata as truth**: Validation logic lives in metadata definitions, not imperative code
 2. **Declarative over imperative**: Schemas describe constraints; engine enforces them
-3. **Consistency across kinds**: All 11 frontmatter kinds follow same metadata pattern
+3. **Consistency across kinds**: All registered frontmatter kinds follow same metadata pattern
 4. **Agent-friendly**: JSON Schema enables agent understanding and reduces errors
 5. **Gradual migration**: No breaking changes; dual implementation until fully migrated
 
@@ -215,6 +244,7 @@ The metadata-driven approach proven in Phases 1-5 (YAML block validators) provid
 - **2025-11-02**: Initial specification created following Phases 1-5 metadata migration pattern
 - Based on proven approach from revision block validator (Phase 5)
 - Addresses TODO items in supekku/scripts/lib/TODO.md lines 60-94
+- **2026-03-03**: RE-019 — refresh kind/schema counts for memory and current registry; add FR-007 metadata compaction capability; replace brittle test counts with CI-anchored phrasing
 
 ## 2. Stakeholders & Journeys
 
@@ -295,7 +325,7 @@ The metadata-driven approach proven in Phases 1-5 (YAML block validators) provid
 
 This product delivers three core capabilities:
 
-1. **Metadata-Driven Frontmatter Validation**: Replaces imperative validation with declarative schemas covering all 11 frontmatter kinds. Each kind (spec, delta, requirement, verification, problem, risk, policy, standard, etc.) has metadata defining required fields, types, patterns, and nested structures.
+1. **Metadata-Driven Frontmatter Validation**: Replaces imperative validation with declarative schemas covering all registered frontmatter kinds (15 unique definitions / 17 registry entries). Each kind (spec, prod, delta, requirement, verification, design_revision, problem, risk, issue, memory, audit, plan, policy, standard) has metadata defining required fields, types, patterns, and nested structures.
 
 2. **JSON Schema Generation for Agents**: Enables agents to query JSON Schema for any frontmatter kind via CLI. Schema output includes examples, field descriptions, and complete constraint information, eliminating documentation drift.
 
@@ -303,8 +333,9 @@ This product delivers three core capabilities:
 
 ### Functional Requirements
 
-- **FR-001**: System MUST validate frontmatter for all 11 kinds using metadata definitions
-  - Kinds: base, spec, prod, delta, requirement, verification, design_revision, problem, issue, audit, plan/phase/task
+- **FR-001**: System MUST validate frontmatter for all registered kinds using metadata definitions
+  - Kinds: base, spec, prod, delta, design_revision, policy, standard, verification, problem, risk, requirement, issue, memory, audit, plan/phase/task
+  - 15 unique metadata definitions; plan/phase/task share one schema
   - Each kind has dedicated metadata in `supekku/scripts/lib/core/frontmatter_metadata/{kind}.py`
   - Validation driven by `BlockMetadata` with `FieldMetadata` definitions
   - *Verification*: VT-001 - Comprehensive test suite covering all kinds
@@ -340,11 +371,18 @@ This product delivers three core capabilities:
   - Deprecation warnings only after full ecosystem migration
   - *Verification*: VT-005 - Migration path tests
 
+- **FR-007**: Metadata definitions MUST support canonical/derived field classification enabling compaction profiles
+  - `FieldMetadata` extended with persistence semantics (e.g., `canonical`, `derived`, `optional`)
+  - Compaction profiles omit derived and default-valued fields during serialization
+  - Read paths reconstruct omitted fields transparently (no information loss)
+  - Agent-facing JSON Schema reflects full structure regardless of compaction state
+  - *Verification*: VT-007 - Compaction profile round-trip and classification tests
+
 ### Non-Functional Requirements
 
 - **NF-001**: Validation behavior MUST match imperative validator (zero regressions)
   - Dual-validation test pattern: same input validates with both, assert same errors
-  - 275-440 tests covering all schemas with valid/invalid cases
+  - Per-schema test suites covering all registered kinds (counts maintained via CI)
   - *Measurement*: VT-006 - Dual-validation pattern across all test suites
 
 - **NF-002**: JSON Schema generation MUST complete in <100ms per kind
@@ -359,11 +397,12 @@ This product delivers three core capabilities:
 
 ### Success Metrics / Signals
 
-- **Adoption**: All 11 frontmatter kinds validated via metadata (not imperative code)
+- **Adoption**: All registered frontmatter kinds validated via metadata (not imperative code)
 - **Quality**: Zero validation regressions from imperative validator
 - **Agent Effectiveness**: JSON Schema available for all kinds via CLI
 - **Developer Experience**: New frontmatter kinds added in <30 minutes (vs. hours)
-- **Test Coverage**: 275-440 tests passing with dual-validation pattern
+- **Test Coverage**: Per-schema test suites passing with dual-validation pattern (counts tracked in CI)
+- **Compaction**: At least one artifact family uses metadata-driven compaction profiles in write paths
 
 ## 4. Solution Outline
 
@@ -651,7 +690,7 @@ def validate_frontmatter_metadata(
 - Invalid patterns/enums: 3-5 tests (date format, enum values, etc.)
 - Nested structure validation: 5-10 tests (relations array, risk_register, sources, etc.)
 - JSON Schema generation: 1 test (output valid JSON Schema)
-- **Total**: ~25-40 tests per schema × 11 schemas = **275-440 tests**
+- **Total**: ~25-40 tests per schema across all registered kinds (exact counts tracked in CI)
 
 **Test Levels**:
 - **Unit**: Each metadata definition tested in isolation (e.g., `base_test.py`)
@@ -700,8 +739,8 @@ Aligned with `supekku:verification.coverage@v1` YAML block above.
 - Ruff and Pylint pass
 
 **Phase 6B-6D (Kind Schemas) Complete When**:
-- All 11 kind metadata definitions created
-- 275-440 tests passing across all schemas
+- All registered kind metadata definitions created (15 unique definitions)
+- Per-schema test suites passing across all kinds
 - JSON Schema generation working for all kinds
 - Ruff and Pylint pass
 
@@ -718,11 +757,12 @@ Aligned with `supekku:verification.coverage@v1` YAML block above.
 - Examples included in all metadata definitions
 
 **Overall Product Complete When**:
-- All 11 frontmatter kinds validated via metadata
+- All registered frontmatter kinds validated via metadata
 - JSON Schema available for all kinds via CLI
 - Zero validation regressions (dual-validation tests passing)
 - Migration path documented and proven
 - Imperative validator deprecated (warnings in logs)
+- Compaction profiles implemented for at least one artifact family (FR-007)
 
 ## 7. Backlog Hooks & Dependencies
 
@@ -762,7 +802,7 @@ Aligned with `supekku:verification.coverage@v1` YAML block above.
 ### Open Decisions / Questions
 
 None - user provided clear answers during discovery:
-- All 11 kinds will be implemented (not MVP subset)
+- All registered kinds will be implemented (not MVP subset)
 - Replace/supplement imperative validator (minimize parallel implementations)
 - Primary beneficiaries are developers, architects, and agents
 - No external tool integrations yet (JSON Schema enables future work)
@@ -783,6 +823,7 @@ None - user provided clear answers during discovery:
 | Problem | PROB-### | problem_statement, context, success_criteria |
 | Risk | RISK-### | risk_statement, likelihood, impact, mitigation_strategy |
 | Issue | ISSUE-### | categories, severity, impact, problem_refs |
+| Memory | mem.{type}.{topic} | memory_type, confidence, scope, priority, provenance, links |
 | Audit | AUD-### | spec_refs, audit_window, findings, next_actions |
 | Plan/Phase/Task | IP-### | objective, entrance_criteria, exit_criteria |
 | Policy | POL-### | statement, rationale, scope, enforcement |
@@ -797,10 +838,11 @@ From `FRONTMATTER_METADATA_MIGRATION_PLAN.md`:
 | 6A | Base frontmatter schema | 3-4 hours |
 | 6B | Spec frontmatter schema | 2-3 hours |
 | 6C | Delta frontmatter schema | 2-3 hours |
-| 6D | 8 remaining schemas (problem, risk, verification, requirement, design_revision, issue, audit, plan/phase/task) | 8-16 hours |
+| 6D | Remaining schemas (problem, risk, verification, requirement, design_revision, issue, memory, audit, plan/phase/task) | 8-16 hours |
 | 6E | Integration and migration (compatibility layer, opt-in migration) | 4-6 hours |
 | 6F | JSON Schema CLI integration (`schema show frontmatter.*`) | 2-3 hours |
-| **Total** | End-to-end | **21-35 hours** |
+| 6G | Compaction profiles — canonical/derived classification + pilot (FR-007, DE-036) | TBD |
+| **Total** | End-to-end (excluding 6G) | **21-35 hours** |
 
 ### References
 

@@ -12,7 +12,8 @@ tags:
 - philosophy
 - seed
 summary: Spec-driver treats specifications as the evergreen source of truth for a
-  system. Change is explicit, auditable, and agent-native. Start here.
+  system, but canonical spec finalization happens after implementation and audit
+  reconciliation. Change is explicit, auditable, and agent-native. Start here.
 priority:
   severity: high
   weight: 10
@@ -39,12 +40,23 @@ is and does.
 
 In its purest expression:
 
-- **Specs are truth** — they describe what the system IS, not what we wish it were
-- **Revisions express intent** — when truth must change, a [[mem.concept.spec-driver.revision]] captures that intent before code moves
-- **Deltas apply intent to code** — a [[mem.concept.spec-driver.delta]] is the scoped mechanism for aligning code with revised specs
-- **Audits reconcile** — a [[mem.concept.spec-driver.audit]] closes the loop, ensuring specs reflect what was actually realised
+- **Revisions express intent first** — a [[mem.concept.spec-driver.revision]]
+  generally introduces new/changed requirements and the intended direction.
+- **Deltas + DR/IP/phases apply intent** — delivery artifacts drive code changes.
+- **Audits + contracts establish observed truth** — they show what was actually
+  realised.
+- **Specs are reconciled last** — specs are patched to match observed truth and
+  then become canonical again.
 
-This is a closed cycle: truth → intent to change → change → reconcile back to truth.
+This is a closed cycle: intent → apply → observe → reconcile → canonical truth.
+
+## Two Truth Views
+
+- **Normative truth**: specs/revisions (what should hold after closure)
+- **Observed truth**: contracts/audit evidence (what code currently does)
+
+During active delivery, normative and observed truth may diverge briefly.
+Closure exists to reconcile them deliberately.
 
 ## Three Tenets
 

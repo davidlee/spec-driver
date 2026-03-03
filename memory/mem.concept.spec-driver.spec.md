@@ -13,7 +13,8 @@ tags:
 - requirements
 - seed
 summary: Tech Specs (SPEC-*) and Product Specs (PROD-*) define system behaviour, architecture,
-  and product intent. In the idealised form, specs are truth.
+  and product intent. In high-rigor flows, canonical spec state is finalized after
+  audit/contracts reconciliation.
 priority:
   severity: high
   weight: 8
@@ -34,7 +35,7 @@ provenance:
 ## Role in the Loop
 
 Specs are the **specify** step of the [[mem.pattern.spec-driver.core-loop]].
-They define the desired end-state of the system.
+They define intended behavior and become canonical after reconciliation.
 
 ## Two Families
 
@@ -56,18 +57,19 @@ Requirements have their own lifecycle tracked in the
 
 ```bash
 uv run spec-driver create spec "Component Name"           # tech spec
-uv run spec-driver create spec --type product "Feature"    # product spec
+uv run spec-driver create spec --kind product "Feature"    # product spec
 ```
 
 ## The Posture Spectrum
 
-In the [[mem.concept.spec-driver.philosophy|idealised form]], **specs are truth**
-— they describe what the system IS. But this depends on
+In the [[mem.concept.spec-driver.philosophy|high-rigor form]], specs are
+canonical after closure reconciliation. During active delivery, intent and
+observed behavior may diverge briefly. This depends on
 [[mem.concept.spec-driver.posture]]:
 
 - **Pioneer**: specs are aspirational or absent
 - **Settler**: specs are converging toward truth
-- **Town Planner**: specs ARE truth — deviations are defects
+- **Town Planner**: specs are reconciled to truth after audit/contracts; unresolved deviations are defects
 
 ## Taxonomy
 

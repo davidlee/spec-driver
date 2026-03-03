@@ -32,7 +32,8 @@ provenance:
 ## The Flexibility Problem
 
 Spec-driver defines an [[mem.concept.spec-driver.philosophy|idealised form]] —
-a tight loop where specs are truth and every change is explicit. But not every
+a tight loop where change is explicit and specs are reconciled to truth before
+closure. But not every
 project is ready for that. Early-stage code needs speed. Legacy codebases need
 gradual adoption. The framework must be flexible without muddying the ideal.
 
@@ -53,7 +54,7 @@ Spec-driver defines three named postures (see [[mem.signpost.spec-driver.ceremon
 
 - **Pioneer** — ship and learn; cards and optional ADRs; specs are aspirational
 - **Settler** — delta-first delivery; specs converging toward truth
-- **Town Planner** — full governance; specs ARE truth; revisions before deltas
+- **Town Planner** — full governance; revision-driven delivery with mandatory audit/reconciliation before closure
 
 The transition from pioneer → settler → town-planner is convergence toward
 the idealised form. It is not "more process" — it is specs becoming truth

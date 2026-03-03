@@ -14,7 +14,7 @@ tags:
 - verification
 - seed
 summary: 'Self-contained checklist for closing a delta: phase completion, verification
-  artifacts, requirements registry updates, sync, and validation.'
+  artifacts, post-audit spec reconciliation, completion command, sync, and validation.'
 priority:
   severity: high
   weight: 9
@@ -26,6 +26,9 @@ provenance:
   - kind: doc
     note: Status lifecycle and traceability
     ref: supekku/about/lifecycle.md
+  - kind: code
+    note: Canonical completion command behavior
+    ref: supekku/scripts/complete_delta.py
 ---
 
 # Delta Completion
@@ -50,59 +53,56 @@ In `IP-XXX.md`:
 - Verify all success criteria checkboxes are checked
 - Ensure `supekku:plan.overview` YAML lists all phase IDs
 
-## Step 3: Close the Delta
+## Step 3: Audit + Contracts
 
-In `DE-XXX.md`:
+- Execute required verification and audit activities.
+- Reconcile implementation against contracts and audit findings.
+- Ensure coverage evidence is explicit and consistent.
 
-- Set frontmatter `status: completed`
-- Verify `supekku:delta.relationships` block lists all implemented requirements
-  and phase IDs (format: `{id: "IP-XXX.PHASE-NN"}`)
+## Step 4: Patch Specs to Match Observed Truth
 
-## Step 4: Update Verification
+In owning specs/plans, update coverage/status entries using valid statuses:
 
-In the owning spec (typically `PROD-XXX.md`):
+- `planned`
+- `in-progress`
+- `verified`
+- `failed`
+- `blocked`
 
-- Update `supekku:verification.coverage` entries to `status: passed`
-  (see [[mem.concept.spec-driver.verification]])
+Do this before formal closure so specs reflect realised behavior.
 
-## Step 5: Update Requirements Registry
+## Step 5: Complete the Delta
 
-**This is the most commonly missed step.**
+Use the completion command as the canonical close-out path:
 
-Edit `.spec-driver/registry/requirements.yaml`:
-
-```yaml
-PROD-XXX.FR-001:
-  status: implemented        # was: pending or in_progress
-  implemented_by:
-    - DE-XXX                 # add delta ID
-  verified_by: []            # leave empty unless audit exists
+```bash
+uv run spec-driver complete delta DE-XXX --dry-run
+uv run spec-driver complete delta DE-XXX
 ```
 
-Repeat for all requirements implemented by the delta.
+Notes:
+- Fix any reported coverage gate failures, then retry.
+- Use `--force` only with explicit justification and documented follow-up work.
 
 ## Step 6: Sync and Validate
 
 ```bash
-uv run spec-driver complete delta DE-XXX    # attempts automated completion
 uv run spec-driver sync                     # populates traceability arrays
 uv run spec-driver validate                 # checks structural integrity
 ```
 
-If `complete delta` requires `--force`, document the reason and create a
-follow-up task for any skipped coverage updates.
-
 ## Verify
 
 ```bash
-uv run spec-driver list requirements --spec PROD-XXX   # should show 'implemented'
+uv run spec-driver list requirements --spec PROD-XXX   # should reflect current lifecycle (typically 'active')
 uv run spec-driver show delta DE-XXX                    # should show 'completed'
 ```
 
 ## Common Mistakes
 
-- Updating delta status but forgetting the requirements registry (Step 5)
-- Not updating verification coverage entries in the spec (Step 4)
+- Completing delta before reconciling specs with audit/contracts
+- Using invalid coverage statuses (for example `passed` instead of `verified`)
+- Bypassing coverage gates with `--force` without documented follow-up
 - Using wrong phase ID format (`phases: [phase-01]` instead of
   `phases: [{id: "IP-XXX.PHASE-01"}]`)
 - Marking delta complete with unchecked IP success criteria

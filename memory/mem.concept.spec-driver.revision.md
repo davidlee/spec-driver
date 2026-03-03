@@ -11,8 +11,8 @@ tags:
 - spec-driver
 - revision
 - seed
-summary: Spec Revisions (RE-*) document intent to change specs before code moves.
-  They preserve documentation lineage and track requirement movements.
+summary: Spec Revisions (RE-*) document intent before delivery, often introducing
+  new/changed requirements. They preserve lineage and feed downstream delta execution.
 priority:
   severity: medium
   weight: 6
@@ -29,14 +29,13 @@ provenance:
 
 ## Role in the Loop
 
-Revisions are the **intent** step — they capture the decision to change
-[[mem.concept.spec-driver.spec|specs]] before any code moves. In the
-[[mem.concept.spec-driver.philosophy|idealised form]], this is how truth
-evolves: deliberately, with a documented trail.
+Revisions are the **intent** step. They capture requirement/spec change intent
+before delivery artifacts are executed.
 
 ## What They Capture
 
 - Which specs are changing and why
+- New/changed requirements (often before implementation exists)
 - Requirement movements (e.g., FR-003 moves from SPEC-A to SPEC-B)
 - Source and destination specs
 - Rationale for the change
@@ -53,5 +52,5 @@ Creates `change/revisions/RE-XXX-slug/RE-XXX.md`.
 
 - **Pioneer/Settler**: revisions are optional — specs may be updated directly
   as part of delta work
-- **Town Planner**: revisions precede [[mem.concept.spec-driver.delta|deltas]]
-  — the canonical flow is `revision → spec updates → delta(s) → implementation`
+- **Town Planner**: revision-first is the default high-rigor path; then
+  `revision → delta/DR/IP/phases → implementation → audit/contracts → spec reconciliation → closure`

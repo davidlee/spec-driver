@@ -12,8 +12,9 @@ tags:
 - workflow
 - core-loop
 - seed
-summary: 'The spec-driver development loop: capture → specify → scope → design → plan
-  → implement → verify → archive. Ceremony determines which steps are required.'
+summary: 'The canonical spec-driver loop: capture → revision intent → delta/design/plan
+  → implement → audit/contracts → spec reconciliation → closure. Ceremony determines
+  which steps are required.'
 priority:
   severity: high
   weight: 10
@@ -35,37 +36,36 @@ provenance:
 ## The Full Cycle
 
 ```
-capture → specify → scope → design → plan → implement → verify → archive
+capture → revision intent → scope → design → plan → implement → audit/contracts → spec reconcile → close
 ```
 
 Each step corresponds to a primitive artefact:
 
 1. **Capture** — need for change enters the [[mem.concept.spec-driver.backlog]]
    (issue, problem, improvement, or risk)
-2. **Specify** — desired end-state defined in [[mem.concept.spec-driver.spec]]
-   documents (SPEC/PROD); or existing specs updated via
-   [[mem.concept.spec-driver.revision]]
-3. **Scope** — a [[mem.concept.spec-driver.delta]] declares the intent to
-   modify the system, referencing specs and requirements
+2. **Revision intent** — a [[mem.concept.spec-driver.revision]] captures
+   intended requirement/spec changes (often introducing new requirements)
+3. **Scope** — a [[mem.concept.spec-driver.delta]] declares and bounds code
+   change work against that intent
 4. **Design** — a [[mem.concept.spec-driver.design-revision]] translates
    intent into concrete code-level design
 5. **Plan** — an [[mem.concept.spec-driver.plan]] breaks work into verifiable
    phases with entrance/exit criteria
 6. **Implement** — agent or developer executes the plan, writing code and tests
-7. **Verify** — [[mem.concept.spec-driver.audit]] reconciles realised changes
-   against specs; [[mem.concept.spec-driver.contract]] generation confirms
-   observed API surface
-8. **Archive** — delta and related artefacts are closed; evergreen specs
-   reflect the new state
+7. **Audit/contracts** — [[mem.concept.spec-driver.audit]] plus
+   [[mem.concept.spec-driver.contract]] establish observed truth
+8. **Spec reconcile** — patch specs/coverage to match audit findings and
+   contracts
+9. **Close** — complete delta and verify owning records are coherent
 
 ## Ceremony Shortcuts
 
 Not every step is required. [[mem.concept.spec-driver.posture]] determines
 which are active:
 
-- **Pioneer**: card → implement → done (steps 1, 6 only)
-- **Settler**: backlog → delta → implement → closure (steps 1, 3, 6, 7-8)
-- **Town Planner**: full cycle (all steps)
+- **Pioneer**: card → implement → done (minimal loop)
+- **Settler**: backlog → delta → implement → audit/reconcile → close
+- **Town Planner**: full revision-driven loop above (often policy-gated)
 
 See `docs/commands-workflow.md` §5 for the complete permutation table.
 

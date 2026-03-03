@@ -1,137 +1,116 @@
-# Requirement Lifecycle & Traceability
+# Requirement Lifecycle & Traceability (Code-Truth)
 
-## Core Concept
+This document describes the current implemented lifecycle behavior.
 
-**Status is manual. Traceability is automatic.**
+## Canonical Requirement Statuses
 
-## The Two Parallel Systems
+Requirement lifecycle statuses are:
 
-### 1. Status Field (Manual)
-```yaml
-status: pending → in_progress → implemented → verified
-```
-- You control this via direct registry edits
-- No automatic transitions
-- No validation enforcement
-- Pure lifecycle indicator
+- `pending`
+- `in-progress`
+- `active`
+- `retired`
 
-### 2. Traceability Arrays (Automatic via sync)
-```yaml
-implemented_by: [DE-002, DE-005]  # Deltas with "implements" relations
-verified_by: [AUD-001, AUD-003]   # Audits with "verifies" relations
-```
-- Populated automatically by `spec-driver sync`
-- Based on frontmatter `relations:` blocks
-- Independent of status field
-- Can be empty at any status
+Source of truth: `supekku/scripts/lib/requirements/lifecycle.py`.
 
-## How Relations Work
+## Status Updates: What Is Automatic vs Manual
 
-### Deltas → `implemented_by[]`
-```yaml
-# In change/deltas/DE-XXX/DE-XXX.md
-relations:
-  - type: implements
-    target: PROD-001.FR-001
-```
-OR structured block:
-```yaml
-```yaml supekku:delta.relationships@v1
-requirements:
-  implements:
-    - PROD-001.FR-001
-```
-```
+Status can change from multiple paths.
 
-### Audits → `verified_by[]`
-```yaml
-# In change/audits/AUD-XXX/AUD-XXX.md
-relations:
-  - type: verifies
-    target: PROD-001.FR-001
-```
+### 1) Coverage aggregation during sync (automatic)
 
-## Practical Workflows
+When requirements are synchronized, coverage blocks from specs/deltas/plans/audits
+are aggregated and mapped to requirement status.
 
-### Prospective (Delta-driven)
-1. Create delta: `uv run spec-driver create delta <slug>` (scaffolds delta, design revision, implementation plan, first phase, notes)
-2. Populate the design revision (architecture intent, code impacts, verification alignment)
-3. Add `implements` relations in delta frontmatter
-4. Complete implementation work
+Current precedence:
 
-FIXME: no longer necessary - instead run `spec-driver delta complete`
-> 5. Mark delta complete: `status: completed` in frontmatter
-> 6. **Manually edit** `.spec-driver/registry/requirements.yaml`: `status: implemented`
-7. Run `uv run spec-driver validate --sync` → populates `implemented_by[]`
+- any `failed` or `blocked` -> `in-progress`
+- all `verified` -> `active`
+- any `in-progress` or mixed statuses -> `in-progress`
+- all `planned` -> `pending`
 
-### Retrospective (Audit-driven)
-1. Code already exists (no delta was created)
-2. Create audit: manually in `change/audits/AUD-XXX/`
-3. Add `verifies` relations in audit frontmatter
-4. Run `uv run spec-driver sync` → populates `verified_by[]`
-5. **Manually edit** `.spec-driver/registry/requirements.yaml`: `status: verified`
+Coverage drift across sources emits a warning (not an error).
 
-### Hybrid (Both)
-A requirement can have both:
-```yaml
-status: verified           # Manual
-implemented_by: [DE-002]   # Delta implemented it
-verified_by: [AUD-001]     # Audit verified it
-```
-This is ideal - full traceability!
+Source of truth: `supekku/scripts/lib/requirements/registry.py`
+(`_apply_coverage_blocks`, `_compute_status_from_coverage`, `_check_coverage_drift`).
 
-## Key Insights
+### 2) Revision lifecycle ingestion during sync (automatic, tolerant)
 
-1. **Audits are for retroactive documentation** - when spec-driver is applied to existing code
-2. **Deltas are for planned changes** - SPEC → change → code
-3. **Status ≠ Arrays** - You can have `status: verified` with empty arrays (not recommended, but valid)
-4. **No conflicts** - Deltas and audits coexist peacefully in their respective arrays
-5. **Sync is safe** - Re-running never changes status, only updates arrays based on relations
+Revision lifecycle payloads can set requirement `status` during sync.
+Current ingestion is tolerant and may accept non-canonical strings from payloads.
 
-## The Manual Step
+Source of truth: `supekku/scripts/lib/requirements/registry.py`
+(`_apply_revision_requirement`, `_create_placeholder_record`).
 
-```bash
-# After sync, you MUST manually edit:
-.spec-driver/registry/requirements.yaml
+### 3) Manual status edits (supported)
 
-# Change:
-PROD-001.FR-001:
-  status: pending  # ← Edit this
+Manual edits to `.spec-driver/registry/requirements.yaml` are still possible.
+There is no first-class CLI command for direct requirement status mutation.
 
-# To:
-PROD-001.FR-001:
-  status: verified  # ← Or implemented, in_progress, etc.
-```
+Library API exists: `RequirementsRegistry.set_status(...)`.
 
-**No CLI command exists yet** for `spec-driver requirements set-status`.
+## Traceability Fields
 
-## Status Semantics
+Traceability arrays are synchronized from relations/evidence sources:
 
-| Status | Meaning | Typical `implemented_by` | Typical `verified_by` |
-|--------|---------|--------------------------|----------------------|
-| `pending` | Not started | `[]` | `[]` |
-| `in_progress` | Delta assigned, work ongoing | `[DE-XXX]` (draft/in-progress) | `[]` |
-| `active` | Delta complete, code deployed | `[DE-XXX]` (completed) | `[]` or `[AUD-XXX]` |
-| `verified` | Audit confirms alignment | `[DE-XXX]` or `[]` | `[AUD-XXX]` |
+- `implemented_by`:
+  - delta `applies_to.requirements`
+  - delta `relations` entries with `type: implements`
+  - structured `supekku:delta.relationships@v1` `requirements.implements`
+- `verified_by`:
+  - audit `relations` entries with `type: verifies`
+- `coverage_evidence`:
+  - `artefact` IDs from `supekku:verification.coverage@v1` entries across
+    specs, deltas, plans, and audits
 
-## Complete Example
+Source of truth: `supekku/scripts/lib/requirements/registry.py`.
 
-```yaml
-# After prospective implementation:
-PROD-005.FR-001:
-  status: active            
-  implemented_by: [DE-002]  # Auto: sync found DE-002's "implements" relation
-  verified_by: []           # Auto: no audits yet
+## Operational Workflow (Current)
 
-# After retrospective audit:
-PROD-005.FR-001:
-  status: verified          # Manual: You updated this
-  implemented_by: [DE-002]  # Auto: unchanged
-  verified_by: [AUD-002]    # Auto: sync found AUD-002's "verifies" relation
-```
+### Prospective (delta-driven)
 
-## Reference
+1. Create delta: `uv run spec-driver create delta "Title" ...`
+2. Optional: create phases explicitly via `uv run spec-driver create phase --plan IP-XXX`
+3. Implement and update parent spec coverage blocks
+4. Complete delta: `uv run spec-driver complete delta DE-XXX`
+5. Sync/validate as needed:
+   - `uv run spec-driver sync`
+   - `uv run spec-driver validate --sync`
 
-Full workflow: `docs/delta-completion-workflow.md`
-Glossary: `supekku/about/glossary.md`
-Requirements logic: `supekku/scripts/lib/requirements/registry.py:375-390`
+Notes:
+
+- `create delta` scaffolds delta + DR + IP + notes, but does **not** auto-create
+  `phase-01.md`.
+- `complete delta` enforces coverage verification by default unless bypassed.
+- `complete delta` updates requirement lifecycle in revision sources by default
+  and can create a completion revision for untracked requirements.
+
+Source of truth:
+`supekku/scripts/lib/changes/creation.py`,
+`supekku/scripts/complete_delta.py`,
+`supekku/scripts/lib/changes/coverage_check.py`.
+
+### Retrospective (audit/discovery)
+
+1. Capture audit evidence and verification relationships
+2. Run sync to refresh traceability/lifecycle from current artifacts
+3. Reconcile any mixed or drifting coverage statuses
+
+## Coverage Gate Reminder
+
+For delta close-out, `complete delta` requires each delta requirement to have
+`status: verified` in parent spec coverage blocks (`supekku:verification.coverage@v1`),
+unless bypassed with `--force` or `SPEC_DRIVER_ENFORCE_COVERAGE=false`.
+
+See: `supekku/about/RUN.md` and `supekku/scripts/lib/changes/coverage_check.py`.
+
+## Non-Canonical Status Terms to Avoid
+
+Do not use these as requirement lifecycle statuses:
+
+- `implemented`
+- `verified`
+- `live`
+- `in_progress`
+
+Use canonical forms listed at the top of this document.

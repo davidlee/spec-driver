@@ -148,10 +148,12 @@ class TestCompactFrontmatter(unittest.TestCase):
         default_value={"specs": [], "requirements": []},
         properties={
           "specs": FieldMetadata(
-            type="array", items=FieldMetadata(type="string"),
+            type="array",
+            items=FieldMetadata(type="string"),
           ),
           "requirements": FieldMetadata(
-            type="array", items=FieldMetadata(type="string"),
+            type="array",
+            items=FieldMetadata(type="string"),
           ),
         },
       ),
@@ -172,10 +174,12 @@ class TestCompactFrontmatter(unittest.TestCase):
         default_value={"specs": [], "requirements": []},
         properties={
           "specs": FieldMetadata(
-            type="array", items=FieldMetadata(type="string"),
+            type="array",
+            items=FieldMetadata(type="string"),
           ),
           "requirements": FieldMetadata(
-            type="array", items=FieldMetadata(type="string"),
+            type="array",
+            items=FieldMetadata(type="string"),
           ),
         },
       ),
@@ -421,7 +425,8 @@ class TestDeltaCompactionRoundTrip(unittest.TestCase):
         self.assertIsNotNone(field_meta, f"Missing field {key} not in metadata")
         assert field_meta is not None  # narrow type for linter
         self.assertEqual(
-          value, field_meta.default_value,
+          value,
+          field_meta.default_value,
           f"Omitted field {key} had non-default value",
         )
 

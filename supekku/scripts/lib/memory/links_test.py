@@ -469,7 +469,10 @@ def _mixed_result() -> LinkResolutionResult:
   return LinkResolutionResult(
     out=[
       ResolvedLink(
-        id="ADR-001", path="a.md", label=None, kind="adr",
+        id="ADR-001",
+        path="a.md",
+        label=None,
+        kind="adr",
       ),
     ],
     missing=[MissingLink(raw="NOPE-999")],
@@ -521,7 +524,10 @@ class TestLinksToFrontmatterModes:
     result = LinkResolutionResult(
       out=[
         ResolvedLink(
-          id="ADR-001", path="a.md", label=None, kind="adr",
+          id="ADR-001",
+          path="a.md",
+          label=None,
+          kind="adr",
         ),
       ],
       missing=[],
@@ -541,10 +547,16 @@ class TestLinksToFrontmatterModes:
     result = LinkResolutionResult(
       out=[
         ResolvedLink(
-          id="SPEC-002", path="s.md", label=None, kind="spec",
+          id="SPEC-002",
+          path="s.md",
+          label=None,
+          kind="spec",
         ),
         ResolvedLink(
-          id="ADR-001", path="a.md", label=None, kind="adr",
+          id="ADR-001",
+          path="a.md",
+          label=None,
+          kind="adr",
         ),
       ],
       missing=[],

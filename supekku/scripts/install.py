@@ -20,6 +20,7 @@ from supekku.scripts.lib.core.templates import TemplateNotFoundError, render_tem
 
 # Import after path setup to avoid circular imports
 from supekku.scripts.lib.file_ops import (
+  FileChanges,
   format_change_summary,
   format_detailed_changes,
   scan_directory_changes,
@@ -80,7 +81,10 @@ class _MemoryChanges:
 
 
 def _install_seed_memories(
-  sources: list[Path], dest_dir: Path, *, dry_run: bool,
+  sources: list[Path],
+  dest_dir: Path,
+  *,
+  dry_run: bool,
 ) -> tuple[list[str], list[str]]:
   """Install seed memories: create if missing, never overwrite.
 
@@ -100,7 +104,10 @@ def _install_seed_memories(
 
 
 def _refresh_managed_memories(
-  sources: list[Path], dest_dir: Path, *, dry_run: bool,
+  sources: list[Path],
+  dest_dir: Path,
+  *,
+  dry_run: bool,
 ) -> tuple[list[str], list[str]]:
   """Replace/refresh spec-driver managed memories from source.
 
@@ -122,7 +129,10 @@ def _refresh_managed_memories(
 
 
 def _prune_managed_memories(
-  source_names: set[str], dest_dir: Path, *, dry_run: bool,
+  source_names: set[str],
+  dest_dir: Path,
+  *,
+  dry_run: bool,
 ) -> list[str]:
   """Remove managed memory IDs from dest that are absent in source."""
   pruned = []
@@ -173,20 +183,25 @@ def _install_memories(
       managed_sources.append(f)
 
   changes = _MemoryChanges()
-  changes.seed_created, changes.seed_skipped = (
-    _install_seed_memories(seed_sources, dest_dir, dry_run=dry_run)
+  changes.seed_created, changes.seed_skipped = _install_seed_memories(
+    seed_sources, dest_dir, dry_run=dry_run
   )
-  changes.managed_new, changes.managed_updated = (
-    _refresh_managed_memories(managed_sources, dest_dir, dry_run=dry_run)
+  changes.managed_new, changes.managed_updated = _refresh_managed_memories(
+    managed_sources, dest_dir, dry_run=dry_run
   )
   changes.pruned = _prune_managed_memories(
-    {f.name for f in managed_sources}, dest_dir, dry_run=dry_run,
+    {f.name for f in managed_sources},
+    dest_dir,
+    dry_run=dry_run,
   )
   _report_memory_changes(changes, dry_run=dry_run)
 
 
 def _print_file_list(
-  prefix: str, label: str, files: list[str], marker: str,
+  prefix: str,
+  label: str,
+  files: list[str],
+  marker: str,
 ) -> None:
   """Print a labeled file list with a marker prefix per entry."""
   print(f"\n{prefix}{label}")
@@ -195,7 +210,9 @@ def _print_file_list(
 
 
 def _report_memory_changes(
-  changes: _MemoryChanges, *, dry_run: bool,
+  changes: _MemoryChanges,
+  *,
+  dry_run: bool,
 ) -> None:
   """Print memory install summary."""
   prefix = "[DRY RUN] " if dry_run else ""
@@ -207,8 +224,10 @@ def _report_memory_changes(
   if changes.seed_skipped:
     n = len(changes.seed_skipped)
     _print_file_list(
-      prefix, f"Seed memories: {n} skipped (left untouched)",
-      changes.seed_skipped, "=",
+      prefix,
+      f"Seed memories: {n} skipped (left untouched)",
+      changes.seed_skipped,
+      "=",
     )
 
   if changes.managed_new or changes.managed_updated:
@@ -227,8 +246,10 @@ def _report_memory_changes(
   if changes.pruned:
     n = len(changes.pruned)
     _print_file_list(
-      prefix, f"Managed memories: {n} removed (absent from package)",
-      changes.pruned, "-",
+      prefix,
+      f"Managed memories: {n} removed (absent from package)",
+      changes.pruned,
+      "-",
     )
 
 
@@ -247,13 +268,13 @@ def get_package_root() -> Path:
 
 
 def prompt_for_category(
-  category_name: str, changes, dest_dir: Path, auto_yes: bool = False
+  category_name: str, changes: FileChanges, dest_dir: Path, auto_yes: bool = False
 ) -> bool:
   """Prompt user for confirmation to proceed with changes in a category.
 
   Args:
     category_name: Name of the category (e.g., "Templates", "About docs")
-    changes: FileChanges object with scan results
+    changes: Scan results for this category.
     dest_dir: Destination directory to show full paths
     auto_yes: If True, automatically approve without prompting
 
@@ -316,6 +337,32 @@ def copy_directory_if_changed(
       dest_file = dest / rel_path
       dest_file.parent.mkdir(parents=True, exist_ok=True)
       shutil.copy2(src_file, dest_file)
+
+
+def _render_boot_md(
+  target_root: Path, *, dry_run: bool = False
+) -> None:
+  """Render boot.md template into .spec-driver/BOOT.md.
+
+  Falls back to a minimal default ('/boot') if the template is missing.
+  """
+  dest = target_root / SPEC_DRIVER_DIR / "BOOT.md"
+  try:
+    config = load_workflow_config(target_root)
+    content = render_template(
+      "boot.md",
+      {"config": config},
+      repo_root=target_root,
+    )
+  except TemplateNotFoundError:
+    content = "/boot\n"
+
+  if dry_run:
+    print("\n[DRY RUN] boot instruction:")
+    print(f"  + ./{SPEC_DRIVER_DIR}/BOOT.md")
+  else:
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(content, encoding="utf-8")
 
 
 def _render_agent_docs(
@@ -453,6 +500,7 @@ def initialize_workspace(
   )
 
   # Render agent guidance from templates (config-tailored)
+  _render_boot_md(target_root, dry_run=dry_run)
   _render_agent_docs(target_root, package_root, dry_run=dry_run)
 
   # Install/refresh memory packs

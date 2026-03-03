@@ -45,12 +45,14 @@ class FieldMetadata:
   persistence: str = "canonical"
   default_value: Any = None
 
-  _VALID_PERSISTENCE = frozenset({
-    "canonical",
-    "derived",
-    "optional",
-    "default-omit",
-  })
+  _VALID_PERSISTENCE = frozenset(
+    {
+      "canonical",
+      "derived",
+      "optional",
+      "default-omit",
+    }
+  )
 
   def __post_init__(self) -> None:
     """Validate field metadata consistency."""

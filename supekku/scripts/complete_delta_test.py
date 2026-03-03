@@ -15,13 +15,16 @@ class CompleteDeltaPromptBehaviorTest(unittest.TestCase):
 
   def test_prompt_yes_no_uses_non_interactive_default_without_input(self) -> None:
     """Non-interactive mode must not call input()."""
-    with patch.object(
-      complete_delta_module.sys.stdin,
-      "isatty",
-      return_value=False,
-    ), patch(
-      "builtins.input",
-      side_effect=AssertionError("input() should not be called"),
+    with (
+      patch.object(
+        complete_delta_module.sys.stdin,
+        "isatty",
+        return_value=False,
+      ),
+      patch(
+        "builtins.input",
+        side_effect=AssertionError("input() should not be called"),
+      ),
     ):
       result = complete_delta_module.prompt_yes_no(
         "Mark delta as completed?",
@@ -33,13 +36,16 @@ class CompleteDeltaPromptBehaviorTest(unittest.TestCase):
 
   def test_prompt_yes_no_non_interactive_falls_back_to_default(self) -> None:
     """When no override is provided, default answer is used."""
-    with patch.object(
-      complete_delta_module.sys.stdin,
-      "isatty",
-      return_value=False,
-    ), patch(
-      "builtins.input",
-      side_effect=AssertionError("input() should not be called"),
+    with (
+      patch.object(
+        complete_delta_module.sys.stdin,
+        "isatty",
+        return_value=False,
+      ),
+      patch(
+        "builtins.input",
+        side_effect=AssertionError("input() should not be called"),
+      ),
     ):
       result = complete_delta_module.prompt_yes_no(
         "Sync specs now?",
@@ -50,13 +56,16 @@ class CompleteDeltaPromptBehaviorTest(unittest.TestCase):
 
   def test_prompt_yes_no_uses_fallback_on_eof(self) -> None:
     """EOF during input should return the non-interactive fallback."""
-    with patch.object(
-      complete_delta_module.sys.stdin,
-      "isatty",
-      return_value=True,
-    ), patch(
-      "builtins.input",
-      side_effect=EOFError,
+    with (
+      patch.object(
+        complete_delta_module.sys.stdin,
+        "isatty",
+        return_value=True,
+      ),
+      patch(
+        "builtins.input",
+        side_effect=EOFError,
+      ),
     ):
       result = complete_delta_module.prompt_yes_no(
         "Mark delta as completed?",
@@ -68,14 +77,17 @@ class CompleteDeltaPromptBehaviorTest(unittest.TestCase):
 
   def test_prompt_spec_sync_non_interactive_skips_sync(self) -> None:
     """Non-interactive mode defaults to no for optional sync prompt."""
-    with patch.object(
-      complete_delta_module.sys.stdin,
-      "isatty",
-      return_value=False,
-    ), patch.object(
-      complete_delta_module,
-      "run_spec_sync",
-      side_effect=AssertionError("run_spec_sync() should not be called"),
+    with (
+      patch.object(
+        complete_delta_module.sys.stdin,
+        "isatty",
+        return_value=False,
+      ),
+      patch.object(
+        complete_delta_module,
+        "run_spec_sync",
+        side_effect=AssertionError("run_spec_sync() should not be called"),
+      ),
     ):
       result = complete_delta_module.prompt_spec_sync(
         skip_sync=False,
@@ -106,7 +118,8 @@ class StrictModeEnforcementTest(unittest.TestCase):
     strict_config = {"strict_mode": True}
     with (
       patch.object(
-        complete_delta_module, "Workspace",
+        complete_delta_module,
+        "Workspace",
       ) as mock_ws_cls,
       patch(
         "supekku.scripts.complete_delta.load_workflow_config",
@@ -137,7 +150,8 @@ class StrictModeEnforcementTest(unittest.TestCase):
     strict_config = {"strict_mode": True}
     with (
       patch.object(
-        complete_delta_module, "Workspace",
+        complete_delta_module,
+        "Workspace",
       ) as mock_ws_cls,
       patch(
         "supekku.scripts.complete_delta.load_workflow_config",
@@ -149,7 +163,8 @@ class StrictModeEnforcementTest(unittest.TestCase):
       ),
       patch.object(
         complete_delta_module.sys.stdin,
-        "isatty", return_value=False,
+        "isatty",
+        return_value=False,
       ),
     ):
       mock_ws_cls.from_cwd.return_value = ws
@@ -157,11 +172,14 @@ class StrictModeEnforcementTest(unittest.TestCase):
     assert code == 1
 
 
-@pytest.mark.parametrize("flag_kwargs", [
-  {"force": True},
-  {"skip_sync": True},
-  {"update_requirements": False},
-])
+@pytest.mark.parametrize(
+  "flag_kwargs",
+  [
+    {"force": True},
+    {"skip_sync": True},
+    {"update_requirements": False},
+  ],
+)
 def test_bypass_flags_permitted_in_permissive_mode(flag_kwargs):
   """In permissive mode, bypass flags must NOT be blocked by strict-mode gate."""
   workspace = MagicMock()
@@ -178,7 +196,8 @@ def test_bypass_flags_permitted_in_permissive_mode(flag_kwargs):
   permissive_config = {"strict_mode": False}
   with (
     patch.object(
-      complete_delta_module, "Workspace",
+      complete_delta_module,
+      "Workspace",
     ) as mock_ws_cls,
     patch(
       "supekku.scripts.complete_delta.load_workflow_config",
@@ -186,7 +205,8 @@ def test_bypass_flags_permitted_in_permissive_mode(flag_kwargs):
     ),
     patch.object(
       complete_delta_module.sys.stdin,
-      "isatty", return_value=False,
+      "isatty",
+      return_value=False,
     ),
     patch(
       "supekku.scripts.complete_delta.is_coverage_enforcement_enabled",

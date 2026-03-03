@@ -4198,7 +4198,7 @@ deltas:
           bias.
   DE-039:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - workflow command-surface completion and strict-mode lock-in
     slug: workflow_command_surface_completion_and_strict_mode_lock_in
     updated: '2026-03-04'
@@ -4256,17 +4256,61 @@ deltas:
         tasks:
         - id: 1.1
           title: Validate and lock deterministic non-interactive prompt handling
-          status: in-progress
+          status: done
         - id: 1.2
           title: Update coverage-gate runtime documentation pointer and tests
-          status: todo
+          status: done
         - id: 1.3
           title: Re-run targeted verification and sync DE/IP notes
-          status: todo
+          status: done
         risks:
         - risk: Prompt default changes could silently alter operator expectations.
           mitigation: Document defaults in memory/docs and add explicit tests.
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-039.PHASE-03
+        plan: IP-039
+        delta: DE-039
+        objective: Implement strict_mode config loading and runtime enforcement at
+          bypass touchpoints in complete-delta, preserving permissive default behavior.
+        entrance_criteria:
+        - Phase 2 complete (create audit + complete revision verified)
+        - Strict-mode policy decisions locked (DEC-039-01, DEC-039-04)
+        - No strict_mode runtime code exists yet (greenfield)
+        exit_criteria:
+        - strict_mode loads from workflow.toml with default false
+        - strict_mode=true blocks --force, --skip-sync, --skip-update-requirements
+          in complete delta
+        - strict_mode=true blocks SPEC_DRIVER_ENFORCE_COVERAGE=false
+        - Permissive default behavior preserved (all existing tests pass)
+        - VT-039-001 tests pass
+        verification:
+          tests:
+          - uv run pytest -q supekku/scripts/lib/core/config_test.py -k strict
+          - uv run pytest -q supekku/scripts/complete_delta_test.py -k strict
+          evidence:
+          - VT-039-001
+        tasks:
+        - id: 3.1
+          title: Add strict_mode to config defaults and accessor
+          status: done
+        - id: 3.2
+          title: Add strict-mode gate in complete_delta()
+          status: done
+        - id: 3.3
+          title: Gate SPEC_DRIVER_ENFORCE_COVERAGE=false under strict mode
+          status: done
+        - id: 3.4
+          title: Write tests for config and enforcement paths
+          status: done
+        - id: 3.5
+          title: Run verification, lint, update evidence
+          status: done
+        risks:
+        - risk: Strict-mode gate breaks existing permissive-mode tests
+          mitigation: Gate is only active when strict_mode=true; default is false.
+            Existing tests unaffected.
+        - risk: Enforcement messages diverge from coverage_check messaging style
+          mitigation: Follow existing format_coverage_error() patterns for consistency.
       - id: IP-039.PHASE-02
         phase: IP-039.PHASE-02
-      - id: IP-039.PHASE-03
-        phase: IP-039.PHASE-03

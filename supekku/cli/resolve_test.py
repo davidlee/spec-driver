@@ -107,7 +107,9 @@ class TestResolveMemoryLinks:
     )
 
     stats = _resolve_memory_links(
-      tmp_path, dry_run=False, link_mode="full",
+      tmp_path,
+      dry_run=False,
+      link_mode="full",
     )
     assert stats["processed"] == 2
     assert stats["resolved"] >= 1

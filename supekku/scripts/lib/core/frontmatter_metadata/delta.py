@@ -111,9 +111,7 @@ DELTA_FRONTMATTER_METADATA = BlockMetadata(
     "outcome_summary": FieldMetadata(
       type="string",
       required=False,
-      description=(
-        "Declarative description of target state after applying delta"
-      ),
+      description=("Declarative description of target state after applying delta"),
       persistence="optional",
     ),
     "risk_register": FieldMetadata(

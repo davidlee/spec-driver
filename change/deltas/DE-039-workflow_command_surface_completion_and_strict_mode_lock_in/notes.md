@@ -30,3 +30,26 @@
 - Code-level verification for command behavior changes was run earlier in the working tree:
   - `uv run pytest -q supekku/scripts/complete_delta_test.py supekku/scripts/lib/changes/coverage_check_test.py`
   - `uv run ruff check supekku/scripts/complete_delta.py supekku/scripts/complete_delta_test.py`
+
+## 2026-03-04 - Closure Prep Updates
+
+- Updated parent-spec coverage entries in `PROD-016` for DE-039 requirements:
+  - `PROD-016.FR-002` -> `verified` (`VT-039-001`)
+  - `PROD-016.FR-009` -> `verified` (`VT-016-006` note linked to VT-039-002 evidence)
+  - `PROD-016.FR-010` -> `verified` (`VT-016-007` note linked to VT-039-003 evidence)
+- Marked IP verification gates complete:
+  - `VA-039-001` set to `verified`
+  - `Progress Tracking` -> `Verification gates passed`
+- Harmonized phase artefacts:
+  - `phase-02.md` status -> `completed`, exit criteria + wrap-up checklist checked
+  - `phase-03.md` status `complete` -> `completed`, wrap-up handoff marked done
+- Updated `DE-039` relationships block to include `IP-039.PHASE-02` and `IP-039.PHASE-03`.
+
+## 2026-03-04 - Delta Closure
+
+- `uv run spec-driver complete delta DE-039` succeeded.
+- Delta close created completion revision: `RE-020` at
+  `change/revisions/RE-020-delta_de_039_completion/`.
+- Post-close validation completed:
+  - `uv run spec-driver sync`
+  - `uv run spec-driver validate`

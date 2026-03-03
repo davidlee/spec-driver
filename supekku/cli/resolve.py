@@ -61,7 +61,9 @@ def resolve_links(
 
   try:
     stats = _resolve_memory_links(
-      root, dry_run=dry_run, link_mode=link_mode,
+      root,
+      dry_run=dry_run,
+      link_mode=link_mode,
     )
   except Exception as e:
     typer.echo(f"Error: {e}", err=True)
@@ -214,7 +216,11 @@ def _resolve_memory_links(
 
   for mem_file in sorted(mem_dir.glob("mem.*.md")):
     _resolve_single_memory(
-      mem_file, index, stats, dry_run=dry_run, link_mode=link_mode,
+      mem_file,
+      index,
+      stats,
+      dry_run=dry_run,
+      link_mode=link_mode,
     )
 
   return stats

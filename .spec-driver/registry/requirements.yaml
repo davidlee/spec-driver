@@ -2501,7 +2501,8 @@ requirements:
     implemented_by:
     - DE-031
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-016-001
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.FR-002:
     label: FR-002
@@ -2512,13 +2513,14 @@ requirements:
     primary_spec: PROD-016
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-039
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-039-001
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.FR-003:
     label: FR-003
@@ -2552,7 +2554,8 @@ requirements:
     introduced: null
     implemented_by: []
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-016-002
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.FR-005:
     label: FR-005
@@ -2569,7 +2572,8 @@ requirements:
     implemented_by:
     - DE-032
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-016-003
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.FR-006:
     label: FR-006
@@ -2587,7 +2591,8 @@ requirements:
     implemented_by:
     - DE-031
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-016-004
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.FR-007:
     label: FR-007
@@ -2620,7 +2625,8 @@ requirements:
     implemented_by:
     - DE-031
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-016-005
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.FR-009:
     label: FR-009
@@ -2631,13 +2637,14 @@ requirements:
     primary_spec: PROD-016
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-039
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-016-006
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.FR-010:
     label: FR-010
@@ -2648,13 +2655,14 @@ requirements:
     primary_spec: PROD-016
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-039
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VT-016-007
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.NF-001:
     label: NF-001
@@ -2704,7 +2712,8 @@ requirements:
     introduced: null
     implemented_by: []
     verified_by: []
-    coverage_evidence: []
+    coverage_evidence:
+    - VA-016-001
     path: specify/product/PROD-016/PROD-016.md
   SPEC-110.FR-001:
     label: FR-001

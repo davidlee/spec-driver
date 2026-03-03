@@ -465,39 +465,53 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 #### **1.9 Write tests for verification status/kind filters (TDD)**
 - **Design / Approach**:
   - Write tests BEFORE implementation (TDD)
+  - **Key design decision**: `RequirementRecord` currently stores only artifact IDs in
+    `coverage_evidence`/`verified_by`. Full verification entries (with status, kind) live in
+    `verification.coverage` blocks processed by `_apply_coverage_blocks()`. Implementation
+    must enrich `RequirementRecord` with `coverage_entries: list[dict]` during registry build,
+    so vstatus/vkind filtering can work from the record directly.
   - Test `--vstatus` flag on `list requirements`:
-    - Single value: `--vstatus verified` returns requirements with verified test artifacts
+    - Single value: `--vstatus verified` returns requirements with ≥1 verified entry
     - Multi-value: `--vstatus planned,in-progress` returns union
     - Filter by verification entry status, not requirement status
   - Test `--vkind` flag on `list requirements`:
-    - Single value: `--vkind VT` returns requirements with unit tests
-    - Multi-value: `--vkind VT,VA` returns requirements with tests OR agent validation
-    - Filter by verification artifact kind
-  - Test combining filters: `--vstatus verified --vkind VT,VA`
-  - Test interaction with existing filters: `--spec SPEC-110 --vstatus failed`
+    - Single value: `--vkind VT` returns requirements with ≥1 VT entry
+    - Multi-value: `--vkind VT,VA` returns union
+  - Test combining: `--vstatus verified --vkind VT` (AND logic across flags)
+  - Test interaction with existing: `--spec SPEC-110 --vstatus failed`
+  - Constants: `VALID_STATUSES = {"planned", "in-progress", "verified", "failed", "blocked"}`
+  - Constants: `VALID_KINDS = {"VT", "VA", "VH"}`
+  - Source: `supekku/scripts/lib/blocks/verification.py`
 - **Files / Components**:
-  - `supekku/cli/test_cli.py` - add TestVerificationStatusFilters class
-  - Test data should include requirements with multiple verification entries with different statuses/kinds
+  - `supekku/scripts/lib/requirements/registry_test.py` — add `TestRequirementCoverageEntries` class
+    (test that `coverage_entries` populated during build)
+  - `supekku/scripts/lib/requirements/registry_test.py` — add `TestFindByVerificationStatus`,
+    `TestFindByVerificationKind` classes
+  - `supekku/cli/test_cli.py` — add `TestVerificationStatusFilters` class (CLI integration)
 - **Testing**: Tests will initially FAIL (TDD red phase)
 - **Observations & AI Notes**: *Record expected behavior for verification filters*
 - **Commits / References**: *Commit hash after tests written*
 
 #### **1.10 Implement --vstatus and --vkind flags for list requirements**
 - **Design / Approach**:
-  - Add `--vstatus` / `--verification-status` flag to `list requirements` command
-  - Add `--vkind` / `--verification-kind` flag to `list requirements` command
-  - Both flags use multi-value filter parsing from `core/filters.py`
-  - Implement `RequirementRegistry.find_by_verification_status()` method
-  - Implement `RequirementRegistry.find_by_verification_kind()` method
-  - Filter logic: requirement matches if ANY of its verification entries match the filter
-  - Combine with existing filters (AND logic across different filter types)
-  - Valid values:
-    - vstatus: planned, in-progress, verified, failed, blocked
-    - vkind: VT, VA, VH
+  - **Step A**: Enrich `RequirementRecord` — add `coverage_entries: list[dict]` field
+    (default `field(default_factory=list)`). Populate during `_apply_coverage_blocks()`
+    which already iterates all coverage entries per requirement.
+  - **Step B**: Add registry methods:
+    - `RequirementRegistry.find_by_verification_status(statuses: list[str])` —
+      match if ANY entry's status is in `statuses`
+    - `RequirementRegistry.find_by_verification_kind(kinds: list[str])` —
+      match if ANY entry's kind is in `kinds`
+  - **Step C**: Add CLI flags to `list_requirements`:
+    - `--vstatus` (multi-value via `parse_multi_value_filter`)
+    - `--vkind` (multi-value via `parse_multi_value_filter`)
+  - Filter logic: requirement matches if ANY entry matches. Cross-flag: AND logic.
+  - Validate input against `VALID_STATUSES`/`VALID_KINDS` from `blocks/verification.py`.
 - **Files / Components**:
-  - `supekku/cli/list.py` - add flags to list_requirements command
-  - `supekku/scripts/lib/requirements/registry.py` - add filter methods
-  - `supekku/scripts/lib/blocks/verification.py` - reference VALID_STATUSES and VALID_KINDS constants
+  - `supekku/scripts/lib/requirements/registry.py` — `RequirementRecord.coverage_entries`,
+    `_apply_coverage_blocks()` enrichment, `find_by_verification_status()`,
+    `find_by_verification_kind()`
+  - `supekku/cli/list.py` — `--vstatus`, `--vkind` flags + filtering in `list_requirements`
 - **Testing**: Run tests from 1.9; should now PASS (TDD green phase)
 - **Observations & AI Notes**: *Record implementation approach, edge cases*
 - **Commits / References**: *Commit hash after implementation*

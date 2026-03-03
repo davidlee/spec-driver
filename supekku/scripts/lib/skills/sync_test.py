@@ -7,6 +7,7 @@ from pathlib import Path
 
 from supekku.scripts.lib.skills.sync import (
   AGENTS_MD_REFERENCE,
+  BOOT_MD_REFERENCE,
   SKILL_TARGET_DIRS,
   _skill_dir_matches,
   ensure_file_reference,
@@ -20,6 +21,7 @@ from supekku.scripts.lib.skills.sync import (
 )
 
 AGENTS_MD_REF = AGENTS_MD_REFERENCE
+BOOT_MD_REF = BOOT_MD_REFERENCE
 
 
 # --- helpers ---
@@ -485,11 +487,12 @@ def test_sync_skills_idempotent(tmp_path: Path) -> None:
 
 
 def test_sync_skills_ensures_root_agents_reference(tmp_path: Path) -> None:
-  """sync_skills ensures root AGENTS.md has @-reference."""
+  """sync_skills ensures root AGENTS.md has skills and boot references."""
   root, source = _setup_repo(tmp_path)
   sync_skills(root, skills_source_dir=source)
   content = (root / "AGENTS.md").read_text(encoding="utf-8")
   assert AGENTS_MD_REF in content
+  assert BOOT_MD_REF in content
 
 
 def test_sync_skills_warns_on_missing_skill(tmp_path: Path) -> None:
@@ -515,25 +518,51 @@ def test_sync_skills_no_allowlist(tmp_path: Path) -> None:
   assert agents_md.exists()
 
 
+# --- BOOT.md creation ---
+
+
+def test_sync_skills_creates_boot_md(tmp_path: Path) -> None:
+  """sync_skills creates .spec-driver/BOOT.md if it doesn't exist."""
+  root, source = _setup_repo(tmp_path)
+  sync_skills(root, skills_source_dir=source)
+  boot_md = root / ".spec-driver" / "BOOT.md"
+  assert boot_md.exists()
+  assert "/boot" in boot_md.read_text(encoding="utf-8")
+
+
+def test_sync_skills_preserves_existing_boot_md(tmp_path: Path) -> None:
+  """sync_skills does not overwrite an existing .spec-driver/BOOT.md."""
+  root, source = _setup_repo(tmp_path)
+  boot_md = root / ".spec-driver" / "BOOT.md"
+  boot_md.write_text("/boot\n\n# Custom instructions\n", encoding="utf-8")
+  sync_skills(root, skills_source_dir=source)
+  assert "Custom instructions" in boot_md.read_text(encoding="utf-8")
+
+
 # --- CLAUDE.md integration ---
 
 
-def test_sync_skills_skips_claude_md_by_default(tmp_path: Path) -> None:
-  """By default, CLAUDE.md is not touched (Claude reads AGENTS.md natively)."""
+def test_sync_skills_creates_claude_md_by_default(tmp_path: Path) -> None:
+  """By default, CLAUDE.md is created with the boot reference."""
   root, source = _setup_repo(tmp_path)
   sync_skills(root, skills_source_dir=source)
-  assert not (root / "CLAUDE.md").exists()
+  claude_md = root / "CLAUDE.md"
+  assert claude_md.exists()
+  content = claude_md.read_text(encoding="utf-8")
+  assert BOOT_MD_REF in content
+  assert AGENTS_MD_REF not in content
 
 
 def test_sync_skills_writes_claude_md_when_opted_in(tmp_path: Path) -> None:
-  """When integration.claude_md is true, CLAUDE.md gets the @-reference."""
+  """When integration.claude_md is true, CLAUDE.md gets the boot reference."""
   root, source = _setup_repo_with_config(tmp_path, claude_md=True)
   (root / "CLAUDE.md").write_text("# Project\n\nRules.\n", encoding="utf-8")
   sync_skills(root, skills_source_dir=source)
   content = (root / "CLAUDE.md").read_text(encoding="utf-8")
   lines = content.splitlines()
-  assert lines[0] == AGENTS_MD_REF
+  assert lines[0] == BOOT_MD_REF
   assert "Rules." in content
+  assert AGENTS_MD_REF not in content
 
 
 # --- config gating ---
@@ -572,14 +601,18 @@ def test_config_claude_md_false_skips_reference(tmp_path: Path) -> None:
   assert not (root / "CLAUDE.md").exists()
 
 
-def test_config_defaults_enable_agents_md_only(tmp_path: Path) -> None:
-  """Without config, AGENTS.md gets reference but CLAUDE.md does not."""
+def test_config_defaults_enable_both_agents_and_claude_md(tmp_path: Path) -> None:
+  """Without config, both AGENTS.md and CLAUDE.md get references."""
   root, source = _setup_repo(tmp_path)
   sync_skills(root, skills_source_dir=source)
   assert (root / "AGENTS.md").exists()
-  assert not (root / "CLAUDE.md").exists()
+  assert (root / "CLAUDE.md").exists()
   agents = (root / "AGENTS.md").read_text(encoding="utf-8")
   assert AGENTS_MD_REF in agents
+  assert BOOT_MD_REF in agents
+  claude = (root / "CLAUDE.md").read_text(encoding="utf-8")
+  assert BOOT_MD_REF in claude
+  assert AGENTS_MD_REF not in claude
 
 
 # --- config-driven targets ---

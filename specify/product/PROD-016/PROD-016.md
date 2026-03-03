@@ -139,42 +139,47 @@ entries:
     kind: VT
     requirement: PROD-016.FR-001
     status: planned
-    notes: `.spec-driver/workflow.toml` exists and is readable by spec-driver and agents.
+    notes: ".spec-driver/workflow.toml exists and is readable by spec-driver and agents."
   - artefact: VT-016-002
     kind: VT
     requirement: PROD-016.FR-004
     status: planned
-    notes: `spec-driver configure` interview produces a correct recommended config for each ceremony mode.
+    notes: "spec-driver configure interview produces a correct recommended config for each ceremony mode."
   - artefact: VT-016-003
     kind: VT
     requirement: PROD-016.FR-005
     status: planned
-    notes: Installer installs only the relevant skills/guidance and is safe to re-run (idempotent).
+    notes: "Installer installs only the relevant skills/guidance and is safe to re-run (idempotent)."
   - artefact: VT-016-004
     kind: VT
     requirement: PROD-016.FR-006
     status: planned
-    notes: Bootstrap generation produces ~30-line prescription with `@references` to modular runsheets.
+    notes: "Bootstrap generation produces ~30-line prescription with @references to modular runsheets."
   - artefact: VT-016-005
     kind: VT
     requirement: PROD-016.FR-008
     status: planned
-    notes: Installed project-local guidance is config-tailored, path-rendered, and token-cheap.
+    notes: "Installed project-local guidance is config-tailored, path-rendered, and token-cheap."
   - artefact: VT-016-006
     kind: VT
     requirement: PROD-016.FR-009
-    status: planned
-    notes: Workflow completion commands are deterministic in non-interactive execution.
+    status: verified
+    notes: "Verified by DE-039 VT-039-002 (non-interactive completion behavior + coverage messaging tests)."
   - artefact: VT-016-007
     kind: VT
     requirement: PROD-016.FR-010
-    status: planned
-    notes: First-class create/complete command coverage exists for delta/revision/audit lifecycle paths.
+    status: verified
+    notes: "Verified by DE-039 VT-039-003 (create-audit + complete-revision command flow tests)."
+  - artefact: VT-039-001
+    kind: VT
+    requirement: PROD-016.FR-002
+    status: verified
+    notes: "strict_mode config and enforcement paths verified in DE-039 phase 3."
   - artefact: VA-016-001
     kind: VA
     requirement: PROD-016.NF-003
     status: planned
-    notes: Agent study: bootstrap + on-demand runsheets work within context limits and reduce time-to-first-delta.
+    notes: "Agent study: bootstrap + on-demand runsheets work within context limits and reduce time-to-first-delta."
 ```
 
 ## 1. Intent & Summary

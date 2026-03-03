@@ -941,9 +941,7 @@ class FieldMetadataPersistenceTest(unittest.TestCase):
     field = FieldMetadata(
       type="object",
       properties={
-        "specs": FieldMetadata(
-          type="array", items=FieldMetadata(type="string")
-        ),
+        "specs": FieldMetadata(type="array", items=FieldMetadata(type="string")),
       },
       persistence="default-omit",
       default_value=sentinel,

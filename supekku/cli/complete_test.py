@@ -104,10 +104,14 @@ class CreateAuditCommandTest(unittest.TestCase):
     result = self.runner.invoke(
       create_app,
       [
-        "audit", "Full Audit",
-        "--spec", "SPEC-100",
-        "--prod", "PROD-016",
-        "--code-scope", "supekku/cli/**",
+        "audit",
+        "Full Audit",
+        "--spec",
+        "SPEC-100",
+        "--prod",
+        "PROD-016",
+        "--code-scope",
+        "supekku/cli/**",
       ],
     )
     assert result.exit_code == 0

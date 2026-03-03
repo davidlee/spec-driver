@@ -4,7 +4,7 @@ slug: 039-workflow_command_surface_completion_and_strict_mode_lock_in-phase-02
 name: IP-039 Phase 02
 created: '2026-03-04'
 updated: '2026-03-04'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -89,10 +89,10 @@ lifecycle flows are discoverable and executable without ad-hoc file scaffolding.
 - [x] ChangeRegistry already handles `kind="audit"` with `AUD-` prefix
 
 ## 4. Exit Criteria / Done When
-- [ ] `create audit` command creates `AUD-NNN` directory under `change/audits/`
-- [ ] `complete revision` command transitions revision status to `completed`
-- [ ] Tests pass for both command flows
-- [ ] `just lint` and `just pylint` clean on changed files
+- [x] `create audit` command creates `AUD-NNN` directory under `change/audits/`
+- [x] `complete revision` command transitions revision status to `completed`
+- [x] Tests pass for both command flows
+- [x] `just lint` and `just pylint` clean on changed files
 
 ## 5. Verification
 - `uv run pytest -q` on new/updated test files
@@ -198,5 +198,5 @@ lifecycle flows are discoverable and executable without ad-hoc file scaffolding.
 ## 11. Wrap-up Checklist
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (2226 pass, ruff clean, pylint 9.82)
-- [ ] Spec/Delta/Plan updated with lessons
-- [ ] Hand-off notes to next phase (if any)
+- [x] Spec/Delta/Plan updated with lessons
+- [x] Hand-off notes to next phase: Phase 3 executed and completed (`a87422d`).

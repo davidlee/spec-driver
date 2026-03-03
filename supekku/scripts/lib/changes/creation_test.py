@@ -520,7 +520,6 @@ class CreateChangeTest(unittest.TestCase):
     phase_content = result.phase_path.read_text(encoding="utf-8")
     assert "Test empty arrays" in phase_content
 
-
   def test_create_audit(self) -> None:
     """Test creating an audit artifact with spec and prod refs."""
     root = self._make_repo()

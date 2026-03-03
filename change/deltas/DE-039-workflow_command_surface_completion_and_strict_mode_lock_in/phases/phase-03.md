@@ -4,7 +4,7 @@ slug: 039-workflow_command_surface_completion_and_strict_mode_lock_in-phase-03
 name: IP-039 Phase 03
 created: '2026-03-04'
 updated: '2026-03-04'
-status: complete
+status: completed
 kind: phase
 ---
 
@@ -214,4 +214,4 @@ Default: `false` (permissive — no behavioral change unless opt-in).
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (ruff clean, pylint 9.93/10, 2233 passed)
 - [x] Phase sheet updated with task notes and outcomes
-- [ ] Hand-off notes to next phase (if any)
+- [x] Hand-off notes to next phase: no additional implementation phase; proceed to DE-039 closure.

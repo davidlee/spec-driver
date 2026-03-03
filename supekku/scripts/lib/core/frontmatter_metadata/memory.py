@@ -87,9 +87,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
       type="string",
       required=False,
       pattern=r"^\d{4}-\d{2}-\d{2}$",
-      description=(
-        "ISO-8601 date of last verification against reality (YYYY-MM-DD)"
-      ),
+      description=("ISO-8601 date of last verification against reality (YYYY-MM-DD)"),
       persistence="optional",
     ),
     "review_by": FieldMetadata(
@@ -259,9 +257,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
     "links": FieldMetadata(
       type="object",
       required=False,
-      description=(
-        "Resolved cross-artifact links parsed from body [[...]] tokens"
-      ),
+      description=("Resolved cross-artifact links parsed from body [[...]] tokens"),
       persistence="optional",
       properties={
         "out": FieldMetadata(
@@ -286,16 +282,12 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
               "kind": FieldMetadata(
                 type="string",
                 required=True,
-                description=(
-                  "Artifact kind (adr, spec, memory, etc.)"
-                ),
+                description=("Artifact kind (adr, spec, memory, etc.)"),
               ),
               "label": FieldMetadata(
                 type="string",
                 required=False,
-                description=(
-                  "Optional display label from [[id|label]]"
-                ),
+                description=("Optional display label from [[id|label]]"),
               ),
             },
           ),

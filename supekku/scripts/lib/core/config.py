@@ -48,7 +48,7 @@ DEFAULT_CONFIG: dict = {
   },
   "integration": {
     "agents_md": True,
-    "claude_md": False,
+    "claude_md": True,
   },
 }
 

@@ -248,7 +248,9 @@ def sync(
       from supekku.cli.resolve import _resolve_memory_links
 
       link_stats = _resolve_memory_links(
-        root, dry_run=dry_run, link_mode=link_mode,
+        root,
+        dry_run=dry_run,
+        link_mode=link_mode,
       )
       results["memory_links"] = {"success": True, **link_stats}
       typer.echo(

@@ -2515,7 +2515,8 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-039
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-016/PROD-016.md
@@ -2618,6 +2619,40 @@ requirements:
     introduced: null
     implemented_by:
     - DE-031
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.FR-009:
+    label: FR-009
+    title: 'Workflow completion commands MUST be automation-safe in non-interactive
+      contexts:'
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-039
+    verified_by: []
+    coverage_evidence: []
+    path: specify/product/PROD-016/PROD-016.md
+  PROD-016.FR-010:
+    label: FR-010
+    title: The CLI MUST provide first-class create/complete command coverage for active
+      change primitives (`delta`, `revision`, `audit`) with lifecycle-consistent semantics.
+    specs:
+    - PROD-016
+    primary_spec: PROD-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-039
     verified_by: []
     coverage_evidence: []
     path: specify/product/PROD-016/PROD-016.md

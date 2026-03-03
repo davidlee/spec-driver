@@ -250,7 +250,7 @@ def format_coverage_error(
 
   lines.extend(
     [
-      "Documentation: .spec-driver/RUN.md",
+      "Documentation: docs/commands-workflow.md",
       "",
       "To bypass this check (emergency only):",
       f"  uv run spec-driver complete delta {delta_id} --force",

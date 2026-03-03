@@ -44,3 +44,7 @@ Most important observation from interrogating current state: spec-driver primiti
   3. Convert parity ledger rows to requirement records (parity ledger can remain UX view initially).
   4. Keep just cap, but have it read spec-driver registry as source-of-truth, not bespoke markdown parsing.
 If you want, next I can draft a concrete “T295b migration card” with exact file/command steps to move CAP-001..009 into spec-driver without breaking your existing canon workflow.
+
+---
+
+

@@ -43,11 +43,33 @@ def run_spec_sync() -> bool:
     return False
 
 
-def prompt_yes_no(question: str, default: bool = False) -> bool:
-  """Prompt user for yes/no answer."""
+def _is_interactive_input_available() -> bool:
+  """Return True when stdin is interactive and can accept prompts."""
+  try:
+    return sys.stdin.isatty()
+  except Exception:  # pylint: disable=broad-except
+    return False
+
+
+def prompt_yes_no(
+  question: str,
+  default: bool = False,
+  *,
+  non_interactive_default: bool | None = None,
+) -> bool:
+  """Prompt user for yes/no answer, with non-interactive fallback."""
+  if non_interactive_default is None:
+    non_interactive_default = default
+
+  if not _is_interactive_input_available():
+    return non_interactive_default
+
   suffix = "[Y/n]" if default else "[y/N]"
   while True:
-    response = input(f"{question} {suffix} ").strip().lower()
+    try:
+      response = input(f"{question} {suffix} ").strip().lower()
+    except EOFError:
+      return non_interactive_default
     if not response:
       return default
     if response in ("y", "yes"):
@@ -75,7 +97,11 @@ def validate_delta_status(
     # Unexpected status - prompt with explanation
     print(f"Warning: Delta {delta_id} has unexpected status '{delta.status}'")
     print("Expected status: draft or in-progress")
-    if not prompt_yes_no("Complete anyway?", default=False):
+    if not prompt_yes_no(
+      "Complete anyway?",
+      default=False,
+      non_interactive_default=False,
+    ):
       return False, False
 
   return True, False
@@ -128,7 +154,11 @@ def prompt_spec_sync(skip_sync: bool, dry_run: bool, force: bool) -> bool:
     return True
 
   if not force:
-    sync_now = prompt_yes_no("Sync specs now?", default=False)
+    sync_now = prompt_yes_no(
+      "Sync specs now?",
+      default=False,
+      non_interactive_default=False,
+    )
     if sync_now and not run_spec_sync():
       return False
   return True
@@ -255,6 +285,7 @@ def update_requirements_in_revision_sources(
   if not force and not prompt_yes_no(
     "Update requirement lifecycle status in revision files?",
     default=True,
+    non_interactive_default=True,
   ):
     return False
 
@@ -333,6 +364,7 @@ def handle_already_completed_delta(
   if not force and not prompt_yes_no(
     "Update requirements to 'active' status?",
     default=True,
+    non_interactive_default=True,
   ):
     return 0
 
@@ -453,7 +485,11 @@ def complete_delta(
     print("Note: Coverage enforcement is disabled via SPEC_DRIVER_ENFORCE_COVERAGE")
 
   # Confirm unless force mode
-  if not force and not prompt_yes_no("Mark delta as completed?", default=False):
+  if not force and not prompt_yes_no(
+    "Mark delta as completed?",
+    default=False,
+    non_interactive_default=True,
+  ):
     return 1
 
   # Update requirement statuses if flag is set

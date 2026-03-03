@@ -4,8 +4,8 @@ name: Delta Completion
 kind: memory
 status: active
 memory_type: pattern
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-04'
+verified: '2026-03-04'
 confidence: high
 tags:
 - spec-driver
@@ -102,6 +102,9 @@ Notes:
 - `SPEC_DRIVER_ENFORCE_COVERAGE=false` disables the coverage check, but this is
   a non-canonical bypass.
 - `--skip-update-requirements` is also a non-canonical bypass path.
+- Non-interactive runs do not require piped prompt answers:
+  sync prompt defaults to `no`; completion and requirement-update confirmations
+  default to `yes`.
 - Completion can update revision sources for requirement lifecycle state and
   create completion revision updates for untracked requirements.
 

@@ -3,7 +3,7 @@ id: PROD-016
 slug: agentic_sdlc_configurator
 name: agentic sdlc configurator
 created: '2026-02-23'
-updated: '2026-02-23'
+updated: '2026-03-04'
 status: draft
 kind: prod
 aliases: []
@@ -34,6 +34,9 @@ requirements:
     - PROD-016.FR-005
     - PROD-016.FR-006
     - PROD-016.FR-007
+    - PROD-016.FR-008
+    - PROD-016.FR-009
+    - PROD-016.FR-010
     - PROD-016.NF-001
     - PROD-016.NF-002
     - PROD-016.NF-003
@@ -100,6 +103,7 @@ capabilities:
     requirements:
       - PROD-016.FR-006
       - PROD-016.FR-007
+      - PROD-016.FR-008
       - PROD-016.NF-003
     summary: >-
       Ensures an agent can start work from a short bootstrap (~30 lines) and
@@ -107,6 +111,23 @@ capabilities:
     success_criteria:
       - Bootstrap stays short and prescriptive, not encyclopedic.
       - Skills cover most “jobs to be done”; remaining docs focus on routing and FAQ.
+  - id: workflow-command-surface
+    name: Workflow Command Surface
+    responsibilities:
+      - Ensure core workflow commands are automation-safe in non-interactive contexts.
+      - Provide first-class create/complete command coverage for active change primitives.
+      - Keep command behavior aligned with lifecycle semantics and generated guidance.
+    requirements:
+      - PROD-016.FR-009
+      - PROD-016.FR-010
+      - PROD-016.NF-001
+    summary: >-
+      Reduces agent/operator friction by making lifecycle commands predictable in
+      CI/headless environments and ensuring core primitives are represented by
+      first-class command flows.
+    success_criteria:
+      - No prompt-deadlocks in non-interactive command execution.
+      - Revision and audit workflows do not require ad-hoc file scaffolding.
 ```
 
 ```yaml supekku:verification.coverage@v1
@@ -134,6 +155,21 @@ entries:
     requirement: PROD-016.FR-006
     status: planned
     notes: Bootstrap generation produces ~30-line prescription with `@references` to modular runsheets.
+  - artefact: VT-016-005
+    kind: VT
+    requirement: PROD-016.FR-008
+    status: planned
+    notes: Installed project-local guidance is config-tailored, path-rendered, and token-cheap.
+  - artefact: VT-016-006
+    kind: VT
+    requirement: PROD-016.FR-009
+    status: planned
+    notes: Workflow completion commands are deterministic in non-interactive execution.
+  - artefact: VT-016-007
+    kind: VT
+    requirement: PROD-016.FR-010
+    status: planned
+    notes: First-class create/complete command coverage exists for delta/revision/audit lifecycle paths.
   - artefact: VA-016-001
     kind: VA
     requirement: PROD-016.NF-003
@@ -151,6 +187,7 @@ entries:
 - **Guiding Principles**: See frontmatter; especially “token-cheap onboarding” and “provider-neutral skills”.
 - **Change History**:
   - 2026-02-23: Introduced workflow switchboard + configurator + installer + bootstrap as a first-class product capability.
+  - 2026-03-04: Clarified command-surface requirements for non-interactive completion behavior and first-class revision/audit lifecycle commands.
 
 ## 2. Stakeholders & Journeys
 - **Personas / Actors**:
@@ -190,6 +227,7 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
   - ceremony mode (`pioneer|settler|town_planner`)
   - activated primitives (policy/backlog/spec/delta/ip/audit)
   - posture knobs that influence “suggest vs ask vs assume” and evidence expectations
+  - strict workflow lock-in control (for canonical sequencing enforcement)
   *Verification*: VT-016-001.
 
 - **FR-003**: The system MUST provide an escape hatch for bespoke project instructions as a small plain-text doctrine note that is loaded at the right time (instead of exploding the config keyspace).
@@ -215,7 +253,16 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
   - hide disabled primitives to conserve agent tokens
   - avoid making skills dynamically parse config at runtime
   *Notes*: `.spec-driver/agents/` is the canonical home for generated agent-facing markdown referenced by skills.
-  *Verification*: VT-016-004.
+  *Verification*: VT-016-005.
+
+- **FR-009**: Workflow completion commands MUST be automation-safe in non-interactive contexts:
+  - no mandatory stdin prompt choreography in headless execution
+  - deterministic defaults for optional prompts
+  - explicit flags for override/bypass behavior
+  *Verification*: VT-016-006.
+
+- **FR-010**: The CLI MUST provide first-class create/complete command coverage for active change primitives (`delta`, `revision`, `audit`) with lifecycle-consistent semantics.
+  *Verification*: VT-016-007.
 ### Non-Functional Requirements
 
 - **NF-001**: The configurator and installer MUST be safe to re-run and produce minimal diffs (idempotent, deterministic).

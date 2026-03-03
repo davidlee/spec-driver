@@ -1,1 +1,0 @@
-../ADR-099-test-sync-behavior.md

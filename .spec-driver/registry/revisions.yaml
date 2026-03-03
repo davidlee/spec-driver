@@ -94,3 +94,98 @@ revisions:
     - type: documents
       target: DE-016
       attributes: {}
+  RE-010:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-023 completion
+    slug: delta-de-023-completion
+    updated: '2026-02-05'
+    path: change/revisions/RE-010-delta-de-023-completion/RE-010.md
+    relations:
+    - type: documents
+      target: DE-023
+      attributes: {}
+  RE-011:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-022 completion
+    slug: delta-de-022-completion
+    updated: '2026-02-05'
+    path: change/revisions/RE-011-delta-de-022-completion/RE-011.md
+    relations:
+    - type: documents
+      target: DE-022
+      attributes: {}
+  RE-012:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-024 completion
+    slug: delta-de-024-completion
+    updated: '2026-02-05'
+    path: change/revisions/RE-012-delta-de-024-completion/RE-012.md
+    relations:
+    - type: documents
+      target: DE-024
+      attributes: {}
+  RE-013:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-025 completion
+    slug: delta-de-025-completion
+    updated: '2026-02-05'
+    path: change/revisions/RE-013-delta-de-025-completion/RE-013.md
+    relations:
+    - type: documents
+      target: DE-025
+      attributes: {}
+  RE-014:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-027 completion
+    slug: delta_de_027_completion
+    updated: '2026-02-20'
+    path: change/revisions/RE-014-delta_de_027_completion/RE-014.md
+    relations:
+    - type: documents
+      target: DE-027
+      attributes: {}
+  RE-015:
+    kind: revision
+    status: draft
+    name: 'Spec Revision - Contracts: canonical storage + sync-less generation'
+    slug: contracts_canonical_storage_sync_less_generation
+    updated: '2026-02-20'
+    path: change/revisions/RE-015-contracts_canonical_storage_sync_less_generation/RE-015.md
+  RE-016:
+    kind: revision
+    status: draft
+    name: 'Spec Revision - Sync defaults: contracts-first, opt-in spec creation'
+    slug: sync_defaults_contracts_first_opt_in_spec_creation
+    updated: '2026-02-20'
+    path: change/revisions/RE-016-sync_defaults_contracts_first_opt_in_spec_creation/RE-016.md
+  RE-017:
+    kind: revision
+    status: draft
+    name: Spec Revision - memory schema and cli taxonomy alignment
+    slug: memory_schema_and_cli_taxonomy_alignment
+    updated: '2026-03-02'
+    path: change/revisions/RE-017-memory_schema_and_cli_taxonomy_alignment/RE-017.md
+    relations:
+    - type: relates_to
+      target: DE-033
+      attributes: {}
+  RE-018:
+    kind: revision
+    status: draft
+    name: Spec Revision - assembly-only tech specs; deprecate unit spec generation
+    slug: assembly_only_tech_specs_deprecate_unit_spec_generation
+    updated: '2026-03-03'
+    path: change/revisions/RE-018-assembly_only_tech_specs_deprecate_unit_spec_generation/RE-018.md
+  RE-019:
+    kind: revision
+    status: completed
+    name: Spec Revision - refresh PROD-004 frontmatter metadata validation for memory
+      and compaction
+    slug: refresh_prod_004_frontmatter_metadata_validation_for_memory_and_compaction
+    updated: '2026-03-03'
+    path: change/revisions/RE-019-refresh_prod_004_frontmatter_metadata_validation_for_memory_and_compaction/RE-019.md

@@ -23,6 +23,12 @@ A quick reference for the core workflows in Vice's agentic development loop. Eac
 3. Maintain companion design artefact (`DR-XXX.md`), implementation plan (`IP-XXX.md`), and phase sheets under `phases/`
 4. Complete with `uv run spec-driver complete delta DE-XXX`
 
+## Frontmatter Compaction
+- Compact all deltas: `uv run spec-driver compact delta`
+- Compact one delta: `uv run spec-driver compact delta DE-XXX`
+- Preview only: `uv run spec-driver compact delta --dry-run`
+- Use this after automation-heavy edits to reduce metadata noise by omitting derived/default frontmatter fields while preserving parse-equivalent content.
+
 ## Design Revision
 - Template guidance lives in `.spec-driver/templates/implementation-plan-template.md` and accompanying design notes
 - Elaborates code-level changes, interfaces, and testing updates for a delta

@@ -41,12 +41,10 @@ tasks:
     status: complete
   - id: "2.3"
     description: Integrate compaction into sync write path for deltas (if applicable)
-    status: deferred
+    status: complete
     notes: >-
-      Deferred to P3. No existing delta file write path in sync (registry sync
-      reads delta files, writes YAML). DEC-036-001 constrains compaction to
-      sync commands only, ruling out create delta. sync.py already 661 lines.
-      compact_frontmatter() ready to wire via new compact command in P3.
+      Resolved via `spec-driver compact delta` CLI command (8be91c4).
+      Standalone command rather than sync flag — keeps sync read-only on source files.
   - id: "2.4"
     description: Measure before/after size on delta corpus
     status: complete
@@ -102,7 +100,7 @@ Implement a shared compaction profile mechanism that uses `FieldMetadata.persist
 | --- | --- | --- | --- |
 | [x] | 2.1 | Implement compact_frontmatter() | Pure function in `compaction.py`, 25 tests |
 | [x] | 2.2 | Round-trip tests for delta compaction | 8 delta-specific round-trip tests |
-| [~] | 2.3 | Integrate into sync write path (if applicable) | Deferred to P3 — no delta sync write path exists |
+| [x] | 2.3 | Integrate into sync write path (if applicable) | Resolved: `spec-driver compact delta` CLI command (8be91c4) |
 | [x] | 2.4 | Before/after size measurement on delta corpus | 37/37 files reducible, 7.1% avg, 26% max |
 
 ## 8. Risks & Mitigations
@@ -114,7 +112,7 @@ Implement a shared compaction profile mechanism that uses `FieldMetadata.persist
 ## 9. Decisions & Outcomes
 
 - **Placement**: `compact_frontmatter()` lives in `core/frontmatter_metadata/compaction.py` — near metadata definitions, pure function of `BlockMetadata` + data dict.
-- **Task 2.3 deferred**: No existing delta file sync write path. `delta_registry.sync()` reads delta files and writes registry YAML; it doesn't modify source files. DEC-036-001 rules out `create delta`. P3 should add a `compact` CLI command.
+- **Task 2.3 resolved**: Added `spec-driver compact delta` CLI command (`supekku/cli/compact.py`, 8be91c4). Thin CLI delegates to `compact_frontmatter()`. Supports `--dry-run`, targeted delta ID, `--root` for testing.
 - **`aliases` field**: Not in delta metadata definitions — passes through compaction as unknown field. Consistent with P1 finding (annotate when/if defined).
 
 ## 10. Findings / Research Notes
@@ -137,4 +135,4 @@ Implement a shared compaction profile mechanism that uses `FieldMetadata.persist
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (§10)
 - [x] Notes updated
-- [ ] Hand-off notes to Phase 3 (Verification & Rollout)
+- [x] Hand-off: doc alignment (frontmatter-schema.md, processes.md) + memory record delegated to next agent

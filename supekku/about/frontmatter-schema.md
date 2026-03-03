@@ -3,7 +3,7 @@ id: NOTE-spec-frontmatter-schema
 slug: spec-frontmatter-schema
 name: Spec Frontmatter Schema
 created: 2024-06-08
-updated: 2024-06-08
+updated: 2026-03-03
 status: draft
 kind: note
 aliases:
@@ -51,7 +51,7 @@ relations: []
 - `source` stores canonical path for syncing across folders.
 - `summary` keeps a canonical overview for search and agents.
 - `tags` are optional but provide a loose discovery surface without inventing new enumerations.
-- `relations` is always present, even when empty, to simplify parsing.
+- `relations` is present when non-empty; parsers should treat absence as `[]`.
 - Non-functional requirement IDs use `NF-` so the `FR-`/`NF-` pair stays visually aligned.
 - Qualities (e.g. ISO25010 dimensions) stay in the body text alongside the requirements they justify—frontmatter does not attempt to encode them.
 
@@ -457,6 +457,21 @@ Frontmatter can reference requirements or verifications when they act as gating 
 - `aliases` enables Obsidian's alternate title rendering and search.
 - Arrays use standard YAML sequences (`- item`). Obsidian accepts inline lists, but multiline sequences are more legible.
 - Tags can stay in frontmatter (`tags:`) or inline (`#spec`); pick one strategy per artefact. This schema keeps tags in frontmatter for machine parsing.
+
+## Frontmatter Compaction
+
+- Persistence is defined per field via `FieldMetadata.persistence`:
+  - `canonical`: always persist
+  - `derived`: omit in compact mode
+  - `optional`: omit when absent, `None`, or equal to the field default
+  - `default-omit`: omit when equal to `default_value`
+- Compaction contract:
+  - write-side only; read-side must tolerate both compact and full frontmatter
+  - unknown fields pass through unchanged for forward compatibility
+- CLI entry point for the pilot family (deltas):
+  - `uv run spec-driver compact delta`
+  - `uv run spec-driver compact delta DE-XXX`
+  - `uv run spec-driver compact delta --dry-run`
 
 ## Next Tasks
 

@@ -69,10 +69,11 @@
 - Delta corpus measurement: 37/37 files reducible, 7.1% avg, 26% max reduction
 - 2176 tests pass, ruff clean, pylint 9.61
 
-### Task 2.3 deferred
-- No existing delta file sync write path — `delta_registry.sync()` reads delta files, writes registry YAML
-- DEC-036-001 constrains compaction to sync commands only, ruling out `create delta`
-- `sync.py` already 661 lines (4x guideline)
+### Task 2.3 resolved
+- Added `spec-driver compact delta` CLI command (`supekku/cli/compact.py`, 8be91c4)
+- Thin CLI (87 lines): `compact delta [DE-XXX] [--dry-run] [--root PATH]`
+- 7 CLI tests, pylint 10/10
+- 2183 tests total, ruff clean, pylint 9.61
 - Recommendation for P3: add a `compact` CLI command that applies `compact_frontmatter()` to artifact files by kind
 
 ### Design choices
@@ -87,42 +88,37 @@
 
 ---
 
+## 2026-03-03 — Docs + memory alignment follow-up (frontmatter compaction)
+
+### Done
+- Updated `supekku/about/frontmatter-schema.md`:
+  - corrected `relations` note (`relations` may be omitted when empty; parsers should treat absence as `[]`)
+  - added concise compaction reference section (persistence levels, write-side/read-side contract, unknown-field passthrough, compact CLI entry points)
+- Updated `supekku/about/processes.md`:
+  - added `Frontmatter Compaction` workflow section with:
+    - `uv run spec-driver compact delta`
+    - `uv run spec-driver compact delta DE-XXX`
+    - `uv run spec-driver compact delta --dry-run`
+- Created memory:
+  - `mem.pattern.spec-driver.frontmatter-compaction`
+  - captures `compact_frontmatter()` semantics, persistence classes, CLI/implementation locations, write-side/read-side contract, DEC-036-001/003, scope globs, and provenance (`DR-036`, `phase-01.md §10.5`).
+
+### Verification
+- No runtime behavior changes.
+- `just`, `just test`, `just lint`, and `just pylint` not run for this follow-up (docs/memory-only updates).
+
+---
+
 ## New Agent Instructions
 
 ### Task
 DE-036 — frontmatter metadata compaction and canonicalization controls.
-Phases 0–2 **complete**. Next: **Phase 3 — Verification & Rollout**.
+Implementation **complete** (P0–P2) with docs/memory alignment follow-up applied.
 
-### Required reading
-- `change/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/DR-036.md` — design revision (4 binding design decisions)
-- `change/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/IP-036.md` — implementation plan
-- `change/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/phases/phase-03.md` — P2: completed, corpus metrics in §10
-- Phase sheet for P3 does not yet exist — create via `uv run spec-driver create phase --plan IP-036`
+### Remaining work
+1. `uv run spec-driver complete delta DE-036`
+2. If needed, run final VA/VH confirmation pass over DE-036 bundle before close-out.
 
-### Key files (P0–P2 cumulative)
-- `supekku/scripts/lib/blocks/metadata/schema.py` — `FieldMetadata` with `persistence` + `default_value`
-- `supekku/scripts/lib/core/frontmatter_metadata/compaction.py` — `compact_frontmatter(data, metadata, mode)`
-- `supekku/scripts/lib/core/frontmatter_metadata/compaction_test.py` — 25 tests (17 unit + 8 delta round-trip)
-- `supekku/scripts/lib/core/frontmatter_metadata/delta.py` — delta fields annotated with persistence
-- `supekku/scripts/lib/core/frontmatter_metadata/memory.py` — memory fields annotated
-- `supekku/scripts/lib/memory/links.py` — `links_to_frontmatter(result, mode="missing")`
-- `supekku/cli/resolve.py` — `--link-mode` flag
-- `supekku/cli/sync.py` — `--link-mode` flag for `--memory-links`
-
-### P3 scope (from IP-036 §4)
-- Full verification: VT/VA evidence complete
-- Docs/skills alignment
-- Rollout guidance
-- Deferred from P2: CLI integration for delta compaction (add `compact` command or flag)
-
-### Design decisions (binding)
-- DEC-036-001: compact-by-default on sync commands only
-- DEC-036-002: link persistence default is `missing` only
-- DEC-036-003: pilot non-memory family is delta frontmatter
-- DEC-036-004: `FieldMetadata.persistence` + `default_value`
-
-### Loose ends
-- IP-036 §8 open questions answered but IP file not updated to mark them resolved
+### Loose ends (non-blocking)
 - Pylint duplicate-code warning between memory.py and delta.py base overrides — extract shared helper if a third family needs the pattern
 - `aliases` field in P0 matrix not in metadata definitions — annotate when defined
-- Task 2.3 deferred: CLI integration for delta frontmatter compaction

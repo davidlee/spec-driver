@@ -211,5 +211,5 @@ uv run spec-driver show delta DE-XXX
 uv run spec-driver list deltas
 
 # Sync all registries
-just supekku::sync-all
+uv run spec-driver sync
 ```

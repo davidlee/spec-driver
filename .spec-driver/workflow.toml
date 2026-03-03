@@ -1,4 +1,4 @@
-ceremony = "pioneer" # pioneer | settler | town_planner
+ceremony = "settler" # pioneer | settler | town_planner
 
 [tool]
 exec = "uv run spec-driver"

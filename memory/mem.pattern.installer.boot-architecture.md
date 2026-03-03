@@ -1,5 +1,5 @@
 ---
-id: mem.pattern.spec-driver.installer-and-boot
+id: mem.pattern.installer.boot-architecture
 name: Installer & Agent Boot Architecture
 kind: memory
 status: active

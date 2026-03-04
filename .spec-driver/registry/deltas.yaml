@@ -1433,6 +1433,7 @@ deltas:
         phases:
         - id: IP-011.PHASE-01
         - id: IP-011.PHASE-02
+        - id: IP-011.PHASE-02
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -1526,8 +1527,72 @@ deltas:
           likelihood: medium
           impact: low
           mitigation: Quote patterns in examples; document shell escaping requirements
-      - id: IP-011.PHASE-02
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-011.PHASE-02
+        plan: IP-011
+        delta: DE-011
+        objective: Add schema enum introspection and enhanced help text so agents
+          can discover valid filter values and output format options without external
+          documentation.
+        entrance_criteria:
+        - Phase 1 complete (multi-value filters, reverse queries, vstatus/vkind all
+          passing)
+        - Full test suite green (just test)
+        - Both linters passing (just lint, just pylint)
+        - Existing schema command working (schema list, schema show)
+        exit_criteria:
+        - schema show enums.<artifact>.<field> returns JSON array of valid values
+        - All key artifact/field combinations covered (delta.status, spec.kind, requirement.status,
+          requirement.kind, verification.status, verification.kind, command.format)
+        - All list command help text includes "Output Formats" section with examples
+        - All list command help text includes filter syntax examples (multi-value,
+          reverse query)
+        - show command help documents --json, --path, --raw options
+        - Unit tests for enum extraction and help text content
+        - Both linters passing with zero warnings
+        verification:
+          tests:
+          - VT-CLI-ENUM-INTROSPECTION
+          - VT-CLI-HELP-EXAMPLES
+          evidence:
+          - VT-PROD010-SCHEMA-001
+          - VT-PROD010-SCHEMA-002
+        tasks:
+        - id: '2.1'
+          description: Research enum sources and schema command extension points
+          status: pending
+        - id: '2.2'
+          description: Write enum introspection tests (TDD)
+          status: pending
+        - id: '2.3'
+          description: Implement enum registry and schema show enums subcommand
+          status: pending
+        - id: '2.4'
+          description: Write help text content tests (TDD)
+          status: pending
+        - id: '2.5'
+          description: Add Output Formats sections to all list command help
+          status: pending
+        - id: '2.6'
+          description: Update show command help with format documentation
+          status: pending
+        - id: '2.7'
+          description: Full test suite + linters
+          status: pending
+        - id: '2.8'
+          description: Manual validation
+          status: pending
+        risks:
+        - description: Enum values scattered across modules with no central registry
+          likelihood: confirmed
+          impact: medium
+          mitigation: Create lightweight enum registry mapping artifact.field to source
+            constants
+        - description: Help text verbosity makes commands harder to scan
+          likelihood: medium
+          impact: low
+          mitigation: Keep examples concise; use epilog sections for extended docs
   DE-012:
     kind: delta
     status: completed
@@ -4314,3 +4379,13 @@ deltas:
           mitigation: Follow existing format_coverage_error() patterns for consistency.
       - id: IP-039.PHASE-02
         phase: IP-039.PHASE-02
+  DE-040:
+    kind: delta
+    status: completed
+    name: 'Delta - Separate template concerns: agents, artifacts, hooks'
+    slug: separate_template_concerns_agents_artifacts_hooks
+    updated: '2026-03-04'
+    path: change/deltas/DE-040-separate_template_concerns_agents_artifacts_hooks/DE-040.md
+    applies_to:
+      specs: []
+      requirements: []

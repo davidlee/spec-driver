@@ -20,6 +20,24 @@ pylint:
 pylint-only *args:
   uv run pylint supekku --disable=all --extension-pkg-allow-list=pylint.extensions.mccabe --enable={{args}}
 
+## helpers
+tech id:
+  glow $(spec-driver show spec TECH-{{id}} --path) --pager
+
+prod id:
+  glow $(spec-driver show spec PROD-{{id}} --path) --pager
+
+delta id:
+  glow $(spec-driver show delta {{id}} --path) --pager
+
+dr id:
+  glow $(fd DR-{{id}} change/deltas) --pager
+
+plan id:
+  glow $(fd IP-{{id}} change/deltas) --pager
+
+## Publish
+##
 
 publish: publish-pypi brew-update brew-publish
 

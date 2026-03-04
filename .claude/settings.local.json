@@ -39,7 +39,8 @@
       "Bash(just:*)",
       "Bash(git -C:*)",
       "Bash(echo EXIT: $?:*)",
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__pal__codereview"
     ],
     "deny": [],
     "ask": []

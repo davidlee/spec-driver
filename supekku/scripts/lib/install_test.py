@@ -12,6 +12,7 @@ import yaml
 from supekku.scripts.install import (
   _classify_memory,
   _find_memory_source,
+  _install_hooks,
   _install_memories,
   get_package_root,
   initialize_workspace,
@@ -47,6 +48,7 @@ def test_initialize_workspace_creates_directories(tmp_path: Path) -> None:
     f"{SPEC_DRIVER_DIR}/registry",
     f"{SPEC_DRIVER_DIR}/templates",
     f"{SPEC_DRIVER_DIR}/about",
+    f"{SPEC_DRIVER_DIR}/hooks",
   ]
 
   for dir_path in expected_dirs:
@@ -590,6 +592,95 @@ def test_initialize_workspace_preserves_existing_allowlist(tmp_path: Path) -> No
 
   content = (sd / "skills.allowlist").read_text(encoding="utf-8")
   assert content == "boot\n"
+
+
+# --- Hook file installation tests ---
+
+
+class TestInstallHooks:
+  """Tests for hook file installation (create-if-missing semantics)."""
+
+  def test_installs_hooks_on_fresh_workspace(self, tmp_path: Path) -> None:
+    """Fresh install creates .spec-driver/hooks/ with hook files."""
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    hooks_dir = tmp_path / SPEC_DRIVER_DIR / "hooks"
+    assert hooks_dir.is_dir()
+    assert (hooks_dir / "doctrine.md").exists()
+    assert (hooks_dir / "README.md").exists()
+
+  def test_does_not_overwrite_existing_hooks(self, tmp_path: Path) -> None:
+    """Existing hook files are never overwritten on reinstall."""
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    hooks_dir = tmp_path / SPEC_DRIVER_DIR / "hooks"
+    doctrine = hooks_dir / "doctrine.md"
+    doctrine.write_text("# My custom doctrine\n")
+
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    assert doctrine.read_text() == "# My custom doctrine\n"
+
+  def test_install_hooks_creates_missing_files_only(
+    self, tmp_path: Path
+  ) -> None:
+    """_install_hooks only creates files that don't exist yet."""
+    package_root = get_package_root()
+    hooks_dest = tmp_path / SPEC_DRIVER_DIR / "hooks"
+    hooks_dest.mkdir(parents=True)
+
+    # Pre-create one file with custom content
+    (hooks_dest / "doctrine.md").write_text("custom")
+
+    _install_hooks(package_root, tmp_path, dry_run=False)
+
+    # Custom file preserved
+    assert (hooks_dest / "doctrine.md").read_text() == "custom"
+    # Other files installed
+    assert (hooks_dest / "README.md").exists()
+
+  def test_install_hooks_dry_run(self, tmp_path: Path, capsys) -> None:
+    """Dry-run shows what would be installed without creating files."""
+    package_root = get_package_root()
+    sd_hooks = tmp_path / SPEC_DRIVER_DIR / "hooks"
+    sd_hooks.mkdir(parents=True)
+
+    _install_hooks(package_root, tmp_path, dry_run=True)
+
+    captured = capsys.readouterr()
+    assert "[DRY RUN]" in captured.out
+
+    # No files should have been created
+    hook_files = list(sd_hooks.glob("*"))
+    assert len(hook_files) == 0
+
+  def test_install_hooks_idempotent(self, tmp_path: Path) -> None:
+    """Repeated installs produce consistent results."""
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    hooks_dir = tmp_path / SPEC_DRIVER_DIR / "hooks"
+    first_run = {
+      f.name: f.read_text() for f in sorted(hooks_dir.iterdir()) if f.is_file()
+    }
+
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    second_run = {
+      f.name: f.read_text() for f in sorted(hooks_dir.iterdir()) if f.is_file()
+    }
+    assert first_run == second_run
+
+
+# --- Boot template resolution test ---
+
+
+def test_render_boot_md_resolves_agents_path(tmp_path: Path) -> None:
+  """_render_boot_md finds template at agents/boot.md."""
+  initialize_workspace(tmp_path, auto_yes=True)
+  boot_md = tmp_path / SPEC_DRIVER_DIR / "BOOT.md"
+  assert boot_md.exists()
+  content = boot_md.read_text(encoding="utf-8")
+  assert "/boot" in content
 
 
 # --- Memory classification tests ---

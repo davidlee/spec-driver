@@ -348,7 +348,7 @@ def _render_boot_md(target_root: Path, *, dry_run: bool = False) -> None:
   try:
     config = load_workflow_config(target_root)
     content = render_template(
-      "boot.md",
+      "agents/boot.md",
       {"config": config},
       repo_root=target_root,
     )
@@ -403,6 +403,34 @@ def _render_agent_docs(
     )
 
 
+def _install_hooks(
+  package_root: Path, target_root: Path, *, dry_run: bool = False
+) -> None:
+  """Install hook files to .spec-driver/hooks/ with create-if-missing semantics.
+
+  Hook files are user-customizable and seeded on first install only.
+  Existing files are never overwritten.
+  """
+  hooks_src = package_root / "templates" / "hooks"
+  if not hooks_src.is_dir():
+    return
+
+  hooks_dest = target_root / SPEC_DRIVER_DIR / "hooks"
+  hooks_dest.mkdir(parents=True, exist_ok=True)
+
+  for src_file in sorted(hooks_src.iterdir()):
+    if not src_file.is_file():
+      continue
+    dest_file = hooks_dest / src_file.name
+    if dest_file.exists():
+      continue
+    if dry_run:
+      print("\n[DRY RUN] hook file:")
+      print(f"  + ./{SPEC_DRIVER_DIR}/hooks/{src_file.name}")
+    else:
+      shutil.copy2(src_file, dest_file)
+
+
 def initialize_workspace(
   target_root: Path, dry_run: bool = False, auto_yes: bool = False
 ) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
@@ -436,6 +464,7 @@ def initialize_workspace(
     f"{SPEC_DRIVER_DIR}/templates",
     f"{SPEC_DRIVER_DIR}/about",
     f"{SPEC_DRIVER_DIR}/agents",
+    f"{SPEC_DRIVER_DIR}/hooks",
   ]
 
   for dir_path in directories:
@@ -508,6 +537,9 @@ def initialize_workspace(
     dry_run=dry_run,
     auto_yes=auto_yes,
   )
+
+  # Install hook files (create-if-missing, never overwrite)
+  _install_hooks(package_root, target_root, dry_run=dry_run)
 
   # Render agent guidance from templates (config-tailored)
   _render_boot_md(target_root, dry_run=dry_run)

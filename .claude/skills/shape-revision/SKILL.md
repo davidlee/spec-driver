@@ -12,7 +12,7 @@ Process:
 1. Read:
    - `.spec-driver/agents/workflow.md`
    - `.spec-driver/agents/policy.md`
-   - `.spec-driver/doctrine.md`
+   - `.spec-driver/hooks/doctrine.md`
 2. Decide if revision is required:
    - If policy/doctrine says revision-first, create/update a revision.
    - If the change is implementation-only with no spec movement, stop and use `/scope-delta`.

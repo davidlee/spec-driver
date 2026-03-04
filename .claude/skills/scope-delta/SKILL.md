@@ -12,7 +12,7 @@ Process:
 1. Read:
    - `.spec-driver/agents/workflow.md`
    - `.spec-driver/agents/policy.md`
-   - `.spec-driver/doctrine.md`
+   - `.spec-driver/hooks/doctrine.md`
 2. If revision-first is required and missing, stop and run `/shape-revision`.
 3. Create delta:
    - From scratch:

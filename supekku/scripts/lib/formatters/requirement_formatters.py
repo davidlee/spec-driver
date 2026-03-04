@@ -145,6 +145,8 @@ def format_requirement_list_json(requirements: Sequence[RequirementRecord]) -> s
       item["implemented_by"] = req.implemented_by
     if req.coverage_evidence:
       item["coverage_evidence"] = req.coverage_evidence
+    if req.coverage_entries:
+      item["coverage_entries"] = req.coverage_entries
     if req.verified_by:
       item["verified_by"] = req.verified_by
     if req.path:

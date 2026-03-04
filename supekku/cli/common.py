@@ -1,6 +1,7 @@
 """Common utilities, options, and callbacks for CLI commands.
 
-This module provides reusable CLI option types for consistent flag behavior.
+This module provides reusable CLI option types, shared data types for artifact
+resolution, and consistent flag behavior across all CLI commands.
 
 ## Standardized Flags
 
@@ -17,14 +18,51 @@ Across all list commands, we use consistent flag patterns:
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 
 # Exit codes
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
+
+
+# --- Artifact resolution types ---
+
+
+@dataclass(frozen=True)
+class ArtifactRef:
+  """Resolved artifact reference returned by resolve_artifact."""
+
+  id: str
+  path: Path
+  record: Any
+
+
+class ArtifactNotFoundError(Exception):
+  """Raised when an artifact cannot be found by ID."""
+
+  def __init__(self, artifact_type: str, artifact_id: str) -> None:
+    self.artifact_type = artifact_type
+    self.artifact_id = artifact_id
+    super().__init__(f"{artifact_type} not found: {artifact_id}")
+
+
+class AmbiguousArtifactError(Exception):
+  """Raised when multiple artifacts match a single-target lookup."""
+
+  def __init__(
+    self, artifact_type: str, artifact_id: str, paths: list[Path]
+  ) -> None:
+    self.artifact_type = artifact_type
+    self.artifact_id = artifact_id
+    self.paths = paths
+    path_list = "\n  ".join(str(p) for p in paths)
+    super().__init__(
+      f"Ambiguous {artifact_type} ID {artifact_id}, matches:\n  {path_list}"
+    )
 
 
 def root_option_callback(value: Path | None) -> Path:
@@ -282,3 +320,189 @@ def normalize_id(artifact_type: str, raw_id: str) -> str:
 
   # Not numeric, return as-is (might be a slug or other format)
   return raw_id
+
+
+# --- Artifact resolution ---
+
+# Lazy imports for registries to avoid circular imports and keep CLI startup fast.
+# Each _resolve_* function imports its registry at call time.
+
+
+def _resolve_spec(root: Path, raw_id: str) -> ArtifactRef:
+  from supekku.scripts.lib.specs.registry import SpecRegistry  # noqa: PLC0415
+
+  registry = SpecRegistry(root)
+  spec = registry.get(raw_id)
+  if not spec:
+    raise ArtifactNotFoundError("spec", raw_id)
+  return ArtifactRef(id=raw_id, path=spec.path, record=spec)
+
+
+def _resolve_change(root: Path, raw_id: str, kind: str) -> ArtifactRef:
+  from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
+
+  normalized = normalize_id(kind, raw_id)
+  registry = ChangeRegistry(root=root, kind=kind)
+  artifacts = registry.collect()
+  artifact = artifacts.get(normalized)
+  if not artifact:
+    raise ArtifactNotFoundError(kind, normalized)
+  return ArtifactRef(id=normalized, path=artifact.path, record=artifact)
+
+
+def _resolve_decision(root: Path, raw_id: str) -> ArtifactRef:
+  from supekku.scripts.lib.decisions.registry import DecisionRegistry  # noqa: PLC0415
+
+  normalized = normalize_id("adr", raw_id)
+  registry = DecisionRegistry(root=root)
+  decision = registry.find(normalized)
+  if not decision:
+    raise ArtifactNotFoundError("adr", normalized)
+  return ArtifactRef(id=normalized, path=Path(decision.path), record=decision)
+
+
+def _resolve_policy(root: Path, raw_id: str) -> ArtifactRef:
+  from supekku.scripts.lib.policies.registry import PolicyRegistry  # noqa: PLC0415
+
+  normalized = normalize_id("policy", raw_id)
+  registry = PolicyRegistry(root=root)
+  record = registry.find(normalized)
+  if not record:
+    raise ArtifactNotFoundError("policy", normalized)
+  return ArtifactRef(id=normalized, path=Path(record.path), record=record)
+
+
+def _resolve_standard(root: Path, raw_id: str) -> ArtifactRef:
+  from supekku.scripts.lib.standards.registry import StandardRegistry  # noqa: PLC0415
+
+  normalized = normalize_id("standard", raw_id)
+  registry = StandardRegistry(root=root)
+  record = registry.find(normalized)
+  if not record:
+    raise ArtifactNotFoundError("standard", normalized)
+  return ArtifactRef(id=normalized, path=Path(record.path), record=record)
+
+
+def _resolve_requirement(root: Path, raw_id: str) -> ArtifactRef:
+  from supekku.scripts.lib.core.paths import get_registry_dir  # noqa: PLC0415
+  from supekku.scripts.lib.requirements.registry import (  # noqa: PLC0415
+    RequirementsRegistry,
+  )
+
+  # DEC-041-05: normalize colon-separated to dot-separated
+  normalized = raw_id.replace(":", ".")
+  registry_path = get_registry_dir(root) / "requirements.yaml"
+  registry = RequirementsRegistry(registry_path)
+  record = registry.records.get(normalized)
+  if not record:
+    raise ArtifactNotFoundError("requirement", normalized)
+  req_path = Path(record.path) if record.path else root
+  return ArtifactRef(id=normalized, path=req_path, record=record)
+
+
+def _resolve_card(root: Path, raw_id: str) -> ArtifactRef:
+  from supekku.scripts.lib.cards import CardRegistry  # noqa: PLC0415
+
+  registry = CardRegistry(root=root)
+  try:
+    card = registry.resolve_card(raw_id)
+  except (FileNotFoundError, ValueError) as exc:
+    raise ArtifactNotFoundError("card", raw_id) from exc
+  return ArtifactRef(id=raw_id, path=card.path, record=card)
+
+
+def _resolve_memory(root: Path, raw_id: str) -> ArtifactRef:
+  from supekku.scripts.lib.memory.registry import MemoryRegistry  # noqa: PLC0415
+
+  registry = MemoryRegistry(root=root)
+  record = registry.find(raw_id)
+  if not record:
+    raise ArtifactNotFoundError("memory", raw_id)
+  return ArtifactRef(id=raw_id, path=Path(record.path), record=record)
+
+
+# Dispatch table: artifact_type -> resolver(root, raw_id) -> ArtifactRef
+_ARTIFACT_RESOLVERS: dict[str, Any] = {
+  "spec": _resolve_spec,
+  "delta": lambda root, raw_id: _resolve_change(root, raw_id, "delta"),
+  "revision": lambda root, raw_id: _resolve_change(root, raw_id, "revision"),
+  "audit": lambda root, raw_id: _resolve_change(root, raw_id, "audit"),
+  "adr": _resolve_decision,
+  "policy": _resolve_policy,
+  "standard": _resolve_standard,
+  "requirement": _resolve_requirement,
+  "card": _resolve_card,
+  "memory": _resolve_memory,
+}
+
+
+def resolve_artifact(artifact_type: str, raw_id: str, root: Path) -> ArtifactRef:
+  """Resolve an artifact by type and ID, returning an ArtifactRef.
+
+  Uses a dispatch table to delegate to type-specific resolvers. Each
+  resolver handles ID normalization, registry lookup, and not-found errors.
+
+  Args:
+    artifact_type: Artifact type key (e.g. 'revision', 'spec', 'adr').
+    raw_id: User-provided ID (may be shorthand like '1' or full like 'RE-001').
+    root: Repository root path.
+
+  Returns:
+    ArtifactRef with resolved id, path, and record.
+
+  Raises:
+    ArtifactNotFoundError: If the artifact cannot be found.
+    ValueError: If artifact_type is not in the dispatch table.
+
+  """
+  resolver = _ARTIFACT_RESOLVERS.get(artifact_type)
+  if not resolver:
+    msg = f"Unknown artifact type: {artifact_type}"
+    raise ValueError(msg)
+  return resolver(root, raw_id)
+
+
+# --- Artifact output ---
+
+
+def emit_artifact(
+  ref: ArtifactRef,
+  *,
+  json_output: bool = False,
+  path_only: bool = False,
+  raw_output: bool = False,
+  format_fn: Any,
+  json_fn: Any,
+) -> None:
+  """Dispatch artifact output by mode: path, raw, json, or formatted.
+
+  Handles mutual-exclusivity check for --json/--path/--raw and calls the
+  appropriate output function. Always raises typer.Exit on completion.
+
+  Args:
+    ref: Resolved artifact reference.
+    json_output: If True, output JSON via json_fn.
+    path_only: If True, echo the artifact path.
+    raw_output: If True, echo raw file content.
+    format_fn: Callable(record) -> str for default formatted output.
+    json_fn: Callable(record) -> str for JSON output. Required.
+
+  Raises:
+    typer.Exit: Always — EXIT_SUCCESS on success, EXIT_FAILURE on error.
+
+  """
+  if sum([json_output, path_only, raw_output]) > 1:
+    typer.echo(
+      "Error: --json, --path, and --raw are mutually exclusive", err=True
+    )
+    raise typer.Exit(EXIT_FAILURE)
+
+  if path_only:
+    typer.echo(ref.path)
+  elif raw_output:
+    typer.echo(ref.path.read_text())
+  elif json_output:
+    typer.echo(json_fn(ref.record))
+  else:
+    typer.echo(format_fn(ref.record))
+  raise typer.Exit(EXIT_SUCCESS)

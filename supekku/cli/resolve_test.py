@@ -87,6 +87,8 @@ class TestResolveMemoryLinks:
 
   def test_no_op_missing_directory(self, tmp_path: Path) -> None:
     """No-op when memory directory doesn't exist."""
+    # Anchor repo root at tmp_path so find_repo_root doesn't walk up
+    (tmp_path / ".spec-driver").mkdir()
     stats = _resolve_memory_links(tmp_path, dry_run=False)
     assert stats["processed"] == 0
 

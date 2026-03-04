@@ -32,8 +32,30 @@ regex interpretation of the replacement string.
 
 **Test**: `test_create_phase_plan_with_backslash_sequences` in `creation_test.py`.
 
-## Pre-existing test failures (not DE-041)
+## Pre-existing test failures — FIXED (2026-03-04)
 
-6 tests fail on main before any DE-041 changes:
-- `resolve_test.py::TestResolveMemoryLinks::test_no_op_missing_directory`
-- 5× `test_cli.py::TestVerificationStatusFilters` (empty `coverage_entries`)
+6 tests failed on main before DE-041 changes. Fixed as prerequisites:
+
+1. `resolve_test.py::test_no_op_missing_directory` — test didn't anchor repo root at `tmp_path`, so `find_repo_root` walked up to the real repo. Fix: create `.spec-driver/` dir in tmp_path.
+2. 5× `test_cli.py::TestVerificationStatusFilters` — `format_requirement_list_json` omitted `coverage_entries` from JSON output. Filter worked correctly on model objects, but assertions against JSON output failed. Fix: added `coverage_entries` to JSON serialization in `requirement_formatters.py`.
+
+## Phase 1, tasks 1.1–1.3 (2026-03-04)
+
+**Done**: Shared helpers in `supekku/cli/common.py` (tasks 1.1–1.3):
+- `ArtifactRef` (frozen dataclass), `ArtifactNotFoundError`, `AmbiguousArtifactError`
+- `resolve_artifact()` — dispatch table covering 10 types (spec, delta, revision, audit, adr, policy, standard, requirement, card, memory). Lazy imports to keep CLI startup fast.
+- `emit_artifact()` — output-mode dispatch (path/raw/json/formatted) with mutual-exclusivity check. `json_fn` is required per DR-041 §4.1.
+- DEC-041-05: requirement ID colon→dot normalization (`SPEC-009:FR-001` → `SPEC-009.FR-001`)
+
+**Tests**: 32 new tests in `common_test.py` (10 data types + 15 resolve + 7 emit). Full suite: 2359 passed, 0 failed.
+
+**Surprises/adaptations**:
+- Lazy imports inside `_resolve_*` functions require patching at the source module (`supekku.scripts.lib.*.registry.XRegistry`), not at `supekku.cli.common`. Standard mock behavior for `from X import Y` inside functions.
+- `typer.Exit` is `click.exceptions.Exit`, not `SystemExit` — tests must catch `typer.Exit` when calling helpers directly (outside typer runner).
+- Policy/standard resolvers: `find()` returns record with string `.path`, needs `Path()` wrapping. Consistent with decision pattern.
+
+**Potential rough edges**:
+- `_resolve_requirement` path handling: if `record.path` is empty, falls back to `root`. May need refinement when requirements get standalone files.
+- pylint `import-outside-toplevel` warnings (16) from lazy imports — expected, threshold (0.75) not breached.
+
+**Verification**: `just check` green (tests + ruff + pylint). Uncommitted.

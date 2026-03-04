@@ -557,19 +557,14 @@ class ShowRevisionRegressionTest(unittest.TestCase):
     assert result.exit_code == 0, f"Failed: {result.stderr}"
     assert "---" in result.stdout  # frontmatter
 
-  def test_show_revision_json_known_bug(self) -> None:
-    """show revision --json has known bug: to_dict() called without repo_root.
-
-    This test documents current broken behavior. After migration (task 1.7),
-    this test will be updated to assert correct JSON output.
-    """
+  def test_show_revision_json(self) -> None:
+    """show revision --json outputs valid JSON with expected fields."""
     result = self.runner.invoke(app, ["revision", "RE-001", "--json"])
-    # Known bug: may produce incorrect output or crash
-    # We just document that it runs (exit code may be 0 or 1)
-    if result.exit_code == 0:
-      # If it succeeds, output should be valid JSON
-      parsed = json.loads(result.stdout)
-      assert isinstance(parsed, dict)
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    parsed = json.loads(result.stdout)
+    assert isinstance(parsed, dict)
+    assert parsed.get("kind") == "revision"
+    assert "path" in parsed
 
   def test_show_revision_not_found(self) -> None:
     """show revision with nonexistent ID fails gracefully."""

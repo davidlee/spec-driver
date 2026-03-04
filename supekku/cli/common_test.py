@@ -125,9 +125,7 @@ class TestResolveArtifactRevision:
     mock_cls.assert_called_once_with(root=Path("/repo"), kind="revision")
 
   @patch("supekku.scripts.lib.changes.registry.ChangeRegistry")
-  def test_resolves_revision_by_numeric_shorthand(
-    self, mock_cls: MagicMock
-  ) -> None:
+  def test_resolves_revision_by_numeric_shorthand(self, mock_cls: MagicMock) -> None:
     art = _mock_change_artifact("RE-001", "/repo/re.md")
     mock_cls.return_value = _mock_registry_collect({"RE-001": art})
 
@@ -135,9 +133,7 @@ class TestResolveArtifactRevision:
     assert ref.id == "RE-001"
 
   @patch("supekku.scripts.lib.changes.registry.ChangeRegistry")
-  def test_raises_not_found_for_missing_revision(
-    self, mock_cls: MagicMock
-  ) -> None:
+  def test_raises_not_found_for_missing_revision(self, mock_cls: MagicMock) -> None:
     mock_cls.return_value = _mock_registry_collect({})
 
     with pytest.raises(ArtifactNotFoundError) as exc_info:
@@ -207,9 +203,7 @@ class TestResolveArtifactAdr:
     assert ref.path == Path("/repo/specify/decisions/ADR-001-foo.md")
 
   @patch("supekku.scripts.lib.decisions.registry.DecisionRegistry")
-  def test_raises_not_found_for_missing_adr(
-    self, mock_cls: MagicMock
-  ) -> None:
+  def test_raises_not_found_for_missing_adr(self, mock_cls: MagicMock) -> None:
     mock_cls.return_value.find.return_value = None
 
     with pytest.raises(ArtifactNotFoundError):
@@ -236,9 +230,7 @@ class TestResolveArtifactRequirement:
 
   @patch("supekku.scripts.lib.core.paths.get_registry_dir")
   @patch("supekku.scripts.lib.requirements.registry.RequirementsRegistry")
-  def test_resolves_requirement(
-    self, mock_cls: MagicMock, mock_dir: MagicMock
-  ) -> None:
+  def test_resolves_requirement(self, mock_cls: MagicMock, mock_dir: MagicMock) -> None:
     mock_dir.return_value = Path("/repo/.spec-driver/registry")
     record = SimpleNamespace(uid="SPEC-009.FR-001", path="specify/tech/SPEC-009.md")
     mock_cls.return_value.records = {"SPEC-009.FR-001": record}
@@ -273,9 +265,7 @@ class TestResolveArtifactCard:
     assert ref.record is card
 
   @patch("supekku.scripts.lib.cards.CardRegistry")
-  def test_raises_not_found_for_missing_card(
-    self, mock_cls: MagicMock
-  ) -> None:
+  def test_raises_not_found_for_missing_card(self, mock_cls: MagicMock) -> None:
     mock_cls.return_value.resolve_card.side_effect = FileNotFoundError("nope")
 
     with pytest.raises(ArtifactNotFoundError):
@@ -324,13 +314,22 @@ class TestResolveArtifactStandard:
 class TestResolveArtifactDispatchCoverage:
   """All types in dispatch table are exercised."""
 
-  @pytest.mark.parametrize("artifact_type", [
-    "spec", "delta", "revision", "audit", "adr",
-    "policy", "standard", "requirement", "card", "memory",
-  ])
-  def test_known_type_does_not_raise_value_error(
-    self, artifact_type: str
-  ) -> None:
+  @pytest.mark.parametrize(
+    "artifact_type",
+    [
+      "spec",
+      "delta",
+      "revision",
+      "audit",
+      "adr",
+      "policy",
+      "standard",
+      "requirement",
+      "card",
+      "memory",
+    ],
+  )
+  def test_known_type_does_not_raise_value_error(self, artifact_type: str) -> None:
     """Every registered type should dispatch (may raise NotFound, not ValueError)."""
     with pytest.raises((ArtifactNotFoundError, FileNotFoundError, Exception)):
       resolve_artifact(artifact_type, "NONEXISTENT-999", Path("/tmp/no-repo"))
@@ -405,9 +404,7 @@ class TestEmitArtifactPath:
 class TestEmitArtifactRaw:
   """emit_artifact --raw mode reads the file content."""
 
-  def test_raw_reads_file(
-    self, tmp_path: Path, capsys: pytest.CaptureFixture
-  ) -> None:
+  def test_raw_reads_file(self, tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
     artifact_file = tmp_path / "artifact.md"
     artifact_file.write_text("---\nid: RE-001\n---\nBody here.\n")
     ref = ArtifactRef(id="RE-001", path=artifact_file, record={})
@@ -424,9 +421,7 @@ class TestEmitArtifactRaw:
 class TestEmitArtifactMutualExclusivity:
   """emit_artifact rejects multiple output modes."""
 
-  def test_json_and_path_rejected(
-    self, capsys: pytest.CaptureFixture
-  ) -> None:
+  def test_json_and_path_rejected(self, capsys: pytest.CaptureFixture) -> None:
     ref = _make_ref()
     with pytest.raises(typer.Exit):
       emit_artifact(
@@ -438,9 +433,7 @@ class TestEmitArtifactMutualExclusivity:
       )
     assert "mutually exclusive" in capsys.readouterr().err
 
-  def test_json_and_raw_rejected(
-    self, capsys: pytest.CaptureFixture
-  ) -> None:
+  def test_json_and_raw_rejected(self, capsys: pytest.CaptureFixture) -> None:
     ref = _make_ref()
     with pytest.raises(typer.Exit):
       emit_artifact(
@@ -452,9 +445,7 @@ class TestEmitArtifactMutualExclusivity:
       )
     assert "mutually exclusive" in capsys.readouterr().err
 
-  def test_all_three_rejected(
-    self, capsys: pytest.CaptureFixture
-  ) -> None:
+  def test_all_three_rejected(self, capsys: pytest.CaptureFixture) -> None:
     ref = _make_ref()
     with pytest.raises(typer.Exit):
       emit_artifact(
@@ -606,15 +597,11 @@ class TestFindArtifactsRequirement:
 
   @patch("supekku.scripts.lib.core.paths.get_registry_dir")
   @patch("supekku.scripts.lib.requirements.registry.RequirementsRegistry")
-  def test_colon_normalization(
-    self, mock_cls: MagicMock, mock_dir: MagicMock
-  ) -> None:
+  def test_colon_normalization(self, mock_cls: MagicMock, mock_dir: MagicMock) -> None:
     """DEC-041-05: colon in pattern normalized to dot."""
     mock_dir.return_value = Path("/repo/.spec-driver/registry")
     records = {
-      "SPEC-009.FR-001": SimpleNamespace(
-        uid="SPEC-009.FR-001", path="x.md"
-      ),
+      "SPEC-009.FR-001": SimpleNamespace(uid="SPEC-009.FR-001", path="x.md"),
     }
     mock_cls.return_value.records = records
 

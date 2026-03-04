@@ -71,4 +71,32 @@ regex interpretation of the replacement string.
 
 **Tests**: 2401 passed, 0 failed (+42 from previous commit).
 
-**Verification**: Full suite green. Uncommitted.
+**Verification**: Full suite green. Committed: `d6c3a6d`.
+
+**Next**: Tasks 1.7 (migrate revision commands + fix --json bug) and 1.8 (final verification).
+
+## Phase 1, task 1.7 — migration + --json bug fix (2026-03-04)
+
+**Done**: Migrated all 4 revision commands to shared helpers:
+- `show_revision` → `resolve_artifact` + `emit_artifact` (show.py)
+- `view_revision` → `resolve_artifact` + `open_in_pager` (view.py)
+- `edit_revision` → `resolve_artifact` + `open_in_editor` (edit.py)
+- `find_revision` → `find_artifacts` (find.py)
+
+**Bug fix**: `show revision --json` — was calling `artifact.to_dict()` without
+required `repo_root` arg (show.py:152-154). Fixed by passing
+`json_fn=lambda r: json.dumps(r.to_dict(root), indent=2)` to `emit_artifact`.
+Regression test updated from "known bug" documentation to proper assertion.
+
+**Lines saved**: Each migrated command reduced from ~25-30 lines to ~5-10 lines.
+- show_revision: 30 → 11 lines
+- view_revision: 25 → 10 lines
+- edit_revision: 25 → 10 lines
+- find_revision: 20 → 8 lines
+
+**Error handling change**: Migrated commands catch `ArtifactNotFoundError` instead
+of broad `(FileNotFoundError, ValueError, KeyError)`. This is intentional —
+`resolve_artifact` normalizes all lookup failures into `ArtifactNotFoundError`,
+so the broad catch was masking unrelated errors.
+
+**Verification**: All 18 regression tests pass. `just check` green (2384 passed, pylint 9.59/10).

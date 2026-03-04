@@ -1188,7 +1188,8 @@ def list_requirements(
       vstatus_values = parse_multi_value_filter(vstatus)
       vstatus_set = set(vstatus_values)
       requirements = [
-        r for r in requirements
+        r
+        for r in requirements
         if any(e.get("status") in vstatus_set for e in r.coverage_entries)
       ]
 
@@ -1197,7 +1198,8 @@ def list_requirements(
       vkind_values = parse_multi_value_filter(vkind)
       vkind_set = set(vkind_values)
       requirements = [
-        r for r in requirements
+        r
+        for r in requirements
         if any(e.get("kind") in vkind_set for e in r.coverage_entries)
       ]
 

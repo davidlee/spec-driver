@@ -8,7 +8,15 @@ from typing import Annotated
 
 import typer
 
-from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption, normalize_id
+from supekku.cli.common import (
+  EXIT_FAILURE,
+  EXIT_SUCCESS,
+  ArtifactNotFoundError,
+  RootOption,
+  emit_artifact,
+  normalize_id,
+  resolve_artifact,
+)
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.repo import find_repo_root
@@ -131,33 +139,16 @@ def show_revision(
 ) -> None:
   """Show detailed information about a revision."""
   try:
-    if sum([json_output, path_only, raw_output]) > 1:
-      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    normalized_id = normalize_id("revision", revision_id)
-    registry = ChangeRegistry(root=root, kind="revision")
-    artifacts = registry.collect()
-    artifact = artifacts.get(normalized_id)
-
-    if not artifact:
-      typer.echo(f"Error: Revision not found: {normalized_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    if path_only:
-      typer.echo(artifact.path)
-    elif raw_output:
-      typer.echo(artifact.path.read_text())
-    elif json_output:
-      output = (
-        artifact.to_dict() if hasattr(artifact, "to_dict") else {"id": artifact.id}
-      )
-      typer.echo(json.dumps(output, indent=2))
-    else:
-      typer.echo(format_revision_details(artifact, root=root))
-
-    raise typer.Exit(EXIT_SUCCESS)
-  except (FileNotFoundError, ValueError, KeyError) as e:
+    ref = resolve_artifact("revision", revision_id, root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      format_fn=lambda r: format_revision_details(r, root=root),
+      json_fn=lambda r: json.dumps(r.to_dict(root), indent=2),
+    )
+  except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 

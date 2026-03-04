@@ -2,9 +2,8 @@
 name: boot
 description: Mandatory onboarding. Every agent MUST execute this on startup, or as soon as becoming aware of it.
 ---
-This project uses a structured, artefact driven development methodology.
-
-Read and follow the guidance in these files:
+Follow the boot sequence **strictly**.
+It includes ALL referenced files.
 
 @.spec-driver/about/dogma.md
 
@@ -15,4 +14,8 @@ Read and follow the guidance in these files:
 @.spec-driver/agents/memory.md
 
 @.spec-driver/hooks/doctrine.md
+
+When it has been observed successfully and **in full** - print:
+Agent ready.
+
 

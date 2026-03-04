@@ -273,7 +273,10 @@ class GoAdapter(LanguageAdapter):
       ]
       try:
         subprocess.run(
-          cmd, check=True, capture_output=True, text=True,
+          cmd,
+          check=True,
+          capture_output=True,
+          text=True,
           cwd=self.repo_root,
         )
         status = "unchanged"
@@ -297,7 +300,10 @@ class GoAdapter(LanguageAdapter):
         module_pkg,
       ]
       subprocess.run(
-        cmd, check=True, capture_output=True, text=True,
+        cmd,
+        check=True,
+        capture_output=True,
+        text=True,
         cwd=self.repo_root,
       )
 

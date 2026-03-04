@@ -1271,9 +1271,7 @@ class TestFilterBackwardCompatibility:
 
   def test_list_requirements_single_kind(self):
     """Single-value --kind FR on list requirements still works."""
-    result = runner.invoke(
-      app, ["list", "requirements", "--kind", "FR", "--json"]
-    )
+    result = runner.invoke(app, ["list", "requirements", "--kind", "FR", "--json"])
     assert result.exit_code == 0
 
   def test_list_adrs_single_status(self):
@@ -1285,16 +1283,12 @@ class TestFilterBackwardCompatibility:
 
   def test_list_deltas_regexp_filter(self):
     """Regexp filter on list deltas still works."""
-    result = runner.invoke(
-      app, ["list", "deltas", "--regexp", "CLI", "--json"]
-    )
+    result = runner.invoke(app, ["list", "deltas", "--regexp", "CLI", "--json"])
     assert result.exit_code == 0
 
   def test_list_requirements_regexp_filter(self):
     """Regexp filter on list requirements still works."""
-    result = runner.invoke(
-      app, ["list", "requirements", "--regexp", "FR-00", "--json"]
-    )
+    result = runner.invoke(app, ["list", "requirements", "--regexp", "FR-00", "--json"])
     assert result.exit_code == 0
 
   # -- Empty/no filters return all --
@@ -1322,9 +1316,7 @@ class TestFilterBackwardCompatibility:
     """JSON output schema includes expected fields."""
     import json
 
-    result = runner.invoke(
-      app, ["list", "requirements", "--json"]
-    )
+    result = runner.invoke(app, ["list", "requirements", "--json"])
     assert result.exit_code == 0
     data = json.loads(result.stdout)
     items = data.get("items", [])
@@ -1356,8 +1348,7 @@ class TestFilterBackwardCompatibility:
     """Combining --status with --regexp still works."""
     result = runner.invoke(
       app,
-      ["list", "requirements", "--status", "pending",
-       "--regexp", "FR", "--json"],
+      ["list", "requirements", "--status", "pending", "--regexp", "FR", "--json"],
     )
     assert result.exit_code == 0
 
@@ -1365,8 +1356,7 @@ class TestFilterBackwardCompatibility:
     """Combining --spec with --kind still works."""
     result = runner.invoke(
       app,
-      ["list", "requirements", "--spec", "SPEC-110",
-       "--kind", "FR", "--json"],
+      ["list", "requirements", "--spec", "SPEC-110", "--kind", "FR", "--json"],
     )
     assert result.exit_code == 0
 

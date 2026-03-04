@@ -388,7 +388,9 @@ class ContractMirrorTreeBuilder:  # pylint: disable=too-few-public-methods
           continue
 
         canonical = self._canonical_paths_for(
-          language, identifier, contracts_root,
+          language,
+          identifier,
+          contracts_root,
         )
         if not any(p.exists() for p in canonical):
           warnings.append(

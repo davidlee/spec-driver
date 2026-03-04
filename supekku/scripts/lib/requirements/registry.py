@@ -676,15 +676,12 @@ class RequirementsRegistry:
 
       # Store structured coverage entries on the record
       record.coverage_entries = [
-        {k: v for k, v in e.items() if k != "source"}
-        for e in entries
+        {k: v for k, v in e.items() if k != "source"} for e in entries
       ]
 
       # Update coverage_evidence with unique artefact IDs
       artefacts = {e["artefact"] for e in entries if e.get("artefact")}
-      record.coverage_evidence = sorted(
-        set(record.coverage_evidence) | artefacts
-      )
+      record.coverage_evidence = sorted(set(record.coverage_evidence) | artefacts)
 
       # Compute and update status from coverage
       computed_status = self._compute_status_from_coverage(entries)
@@ -1186,9 +1183,7 @@ class RequirementsRegistry:
 
     return sorted(matches, key=lambda r: r.uid)
 
-  def find_by_verification_status(
-    self, statuses: list[str]
-  ) -> list[RequirementRecord]:
+  def find_by_verification_status(self, statuses: list[str]) -> list[RequirementRecord]:
     """Find requirements with coverage entries matching given statuses.
 
     A requirement matches if ANY of its coverage_entries has a status
@@ -1207,18 +1202,14 @@ class RequirementsRegistry:
     status_set = set(statuses)
     return sorted(
       (
-        r for r in self.records.values()
-        if any(
-          e.get("status") in status_set
-          for e in r.coverage_entries
-        )
+        r
+        for r in self.records.values()
+        if any(e.get("status") in status_set for e in r.coverage_entries)
       ),
       key=lambda r: r.uid,
     )
 
-  def find_by_verification_kind(
-    self, kinds: list[str]
-  ) -> list[RequirementRecord]:
+  def find_by_verification_kind(self, kinds: list[str]) -> list[RequirementRecord]:
     """Find requirements with coverage entries matching given kinds.
 
     A requirement matches if ANY of its coverage_entries has a kind
@@ -1237,11 +1228,9 @@ class RequirementsRegistry:
     kind_set = set(kinds)
     return sorted(
       (
-        r for r in self.records.values()
-        if any(
-          e.get("kind") in kind_set
-          for e in r.coverage_entries
-        )
+        r
+        for r in self.records.values()
+        if any(e.get("kind") in kind_set for e in r.coverage_entries)
       ),
       key=lambda r: r.uid,
     )

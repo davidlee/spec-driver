@@ -7,7 +7,14 @@ from typing import Annotated
 
 import typer
 
-from supekku.cli.common import EXIT_FAILURE, RootOption, normalize_id, open_in_editor
+from supekku.cli.common import (
+  EXIT_FAILURE,
+  ArtifactNotFoundError,
+  RootOption,
+  normalize_id,
+  open_in_editor,
+  resolve_artifact,
+)
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.repo import find_repo_root
@@ -79,22 +86,12 @@ def edit_revision(
 ) -> None:
   """Edit revision in editor."""
   try:
-    normalized_id = normalize_id("revision", revision_id)
-    registry = ChangeRegistry(root=root, kind="revision")
-    artifacts = registry.collect()
-    artifact = artifacts.get(normalized_id)
-
-    if not artifact:
-      typer.echo(f"Error: Revision not found: {normalized_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    open_in_editor(artifact.path)
-  except typer.Exit:
-    raise
-  except RuntimeError as e:
+    ref = resolve_artifact("revision", revision_id, root)
+    open_in_editor(ref.path)
+  except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
-  except (FileNotFoundError, ValueError, KeyError) as e:
+  except RuntimeError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 

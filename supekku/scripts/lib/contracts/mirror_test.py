@@ -589,7 +589,6 @@ class TestContractMirrorTreeBuilder(unittest.TestCase):
     assert compat.is_symlink()
     assert any("non-symlink" in w for w in warnings)
 
-
   # -- drift warnings (VT-CONTRACTS-DRIFT-001) --
 
   def test_drift_warning_when_spec_has_contracts_but_no_canonical(self) -> None:

@@ -55,9 +55,7 @@ class ArtifactNotFoundError(Exception):
 class AmbiguousArtifactError(Exception):
   """Raised when multiple artifacts match a single-target lookup."""
 
-  def __init__(
-    self, artifact_type: str, artifact_id: str, paths: list[Path]
-  ) -> None:
+  def __init__(self, artifact_type: str, artifact_id: str, paths: list[Path]) -> None:
     self.artifact_type = artifact_type
     self.artifact_id = artifact_id
     self.paths = paths
@@ -494,9 +492,7 @@ def emit_artifact(
 
   """
   if sum([json_output, path_only, raw_output]) > 1:
-    typer.echo(
-      "Error: --json, --path, and --raw are mutually exclusive", err=True
-    )
+    typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
     raise typer.Exit(EXIT_FAILURE)
 
   if path_only:
@@ -529,9 +525,7 @@ def _find_specs(root: Path, pattern: str) -> Iterator[ArtifactRef]:
       yield ArtifactRef(id=spec.id, path=spec.path, record=spec)
 
 
-def _find_changes(
-  root: Path, pattern: str, kind: str
-) -> Iterator[ArtifactRef]:
+def _find_changes(root: Path, pattern: str, kind: str) -> Iterator[ArtifactRef]:
   from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
 
   normalized = normalize_id(kind, pattern)

@@ -308,7 +308,9 @@ class TestGoAdapter(unittest.TestCase):
     mock_which.return_value = "/usr/bin/gomarkdoc"
     mock_exists.return_value = False
     mock_subprocess.side_effect = subprocess.CalledProcessError(
-      1, ["gomarkdoc"], stderr="invalid package",
+      1,
+      ["gomarkdoc"],
+      stderr="invalid package",
     )
 
     unit = SourceUnit("go", "bad/pkg", self.repo_root)

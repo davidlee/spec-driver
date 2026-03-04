@@ -8,7 +8,13 @@ from typing import Annotated
 
 import typer
 
-from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption, normalize_id
+from supekku.cli.common import (
+  EXIT_FAILURE,
+  EXIT_SUCCESS,
+  RootOption,
+  find_artifacts,
+  normalize_id,
+)
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.memory.registry import MemoryRegistry
@@ -105,11 +111,8 @@ def find_revision(
   Examples: RE-*, RE-00?, 001
   """
   try:
-    normalized_pattern = normalize_id("revision", pattern)
-    registry = ChangeRegistry(root=root, kind="revision")
-    for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, normalized_pattern):
-        typer.echo(artifact.path)
+    for ref in find_artifacts("revision", pattern, root):
+      typer.echo(ref.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
     typer.echo(f"Error: {e}", err=True)

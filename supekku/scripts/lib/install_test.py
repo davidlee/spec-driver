@@ -618,9 +618,7 @@ class TestInstallHooks:
 
     assert doctrine.read_text() == "# My custom doctrine\n"
 
-  def test_install_hooks_creates_missing_files_only(
-    self, tmp_path: Path
-  ) -> None:
+  def test_install_hooks_creates_missing_files_only(self, tmp_path: Path) -> None:
     """_install_hooks only creates files that don't exist yet."""
     package_root = get_package_root()
     hooks_dest = tmp_path / SPEC_DRIVER_DIR / "hooks"
@@ -666,7 +664,6 @@ class TestInstallHooks:
       f.name: f.read_text() for f in sorted(hooks_dir.iterdir()) if f.is_file()
     }
     assert first_run == second_run
-
 
 
 # --- Memory classification tests ---

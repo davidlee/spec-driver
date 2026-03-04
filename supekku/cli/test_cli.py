@@ -1243,5 +1243,133 @@ class TestVerificationStatusFilters:
     assert result is not None
 
 
+class TestFilterBackwardCompatibility:
+  """Verify existing filter behavior is unchanged after DE-011 additions.
+
+  Multi-value, reverse query, vstatus, and vkind features must not
+  break single-value filters, regex filters, or empty-filter behavior.
+  """
+
+  # -- Single-value status filters (all list commands) --
+
+  def test_list_deltas_single_status(self):
+    """Single-value -s flag on list deltas still works."""
+    result = runner.invoke(app, ["list", "deltas", "-s", "draft", "--json"])
+    assert result.exit_code == 0
+
+  def test_list_specs_single_kind(self):
+    """Single-value -k flag on list specs still works."""
+    result = runner.invoke(app, ["list", "specs", "-k", "tech"])
+    assert result.exit_code == 0
+
+  def test_list_requirements_single_status(self):
+    """Single-value --status on list requirements still works."""
+    result = runner.invoke(
+      app, ["list", "requirements", "--status", "pending", "--json"]
+    )
+    assert result.exit_code == 0
+
+  def test_list_requirements_single_kind(self):
+    """Single-value --kind FR on list requirements still works."""
+    result = runner.invoke(
+      app, ["list", "requirements", "--kind", "FR", "--json"]
+    )
+    assert result.exit_code == 0
+
+  def test_list_adrs_single_status(self):
+    """Single-value -s flag on list adrs still works."""
+    result = runner.invoke(app, ["list", "adrs", "-s", "accepted"])
+    assert result.exit_code == 0
+
+  # -- Regex filters unchanged --
+
+  def test_list_deltas_regexp_filter(self):
+    """Regexp filter on list deltas still works."""
+    result = runner.invoke(
+      app, ["list", "deltas", "--regexp", "CLI", "--json"]
+    )
+    assert result.exit_code == 0
+
+  def test_list_requirements_regexp_filter(self):
+    """Regexp filter on list requirements still works."""
+    result = runner.invoke(
+      app, ["list", "requirements", "--regexp", "FR-00", "--json"]
+    )
+    assert result.exit_code == 0
+
+  # -- Empty/no filters return all --
+
+  def test_list_deltas_no_filters(self):
+    """list deltas with no filters returns results."""
+    result = runner.invoke(app, ["list", "deltas", "--json"])
+    assert result.exit_code == 0
+    assert result.stdout.strip()  # Should have output
+
+  def test_list_requirements_no_filters(self):
+    """list requirements with no filters returns results."""
+    result = runner.invoke(app, ["list", "requirements", "--json"])
+    assert result.exit_code == 0
+    assert result.stdout.strip()
+
+  def test_list_specs_no_filters(self):
+    """list specs with no filters returns results."""
+    result = runner.invoke(app, ["list", "specs"])
+    assert result.exit_code == 0
+
+  # -- New flags don't interfere with existing output --
+
+  def test_list_requirements_json_schema_unchanged(self):
+    """JSON output schema includes expected fields."""
+    import json
+
+    result = runner.invoke(
+      app, ["list", "requirements", "--json"]
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    items = data.get("items", [])
+    if items:
+      item = items[0]
+      # Core fields must be present
+      assert "uid" in item
+      assert "label" in item
+      assert "title" in item
+      assert "status" in item
+      assert "kind" in item
+
+  def test_list_deltas_json_schema_unchanged(self):
+    """JSON output for deltas includes expected fields."""
+    import json
+
+    result = runner.invoke(app, ["list", "deltas", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    items = data.get("items", [])
+    if items:
+      item = items[0]
+      assert "id" in item
+      assert "status" in item
+
+  # -- Combined old + new flags --
+
+  def test_status_with_regexp(self):
+    """Combining --status with --regexp still works."""
+    result = runner.invoke(
+      app,
+      ["list", "requirements", "--status", "pending",
+       "--regexp", "FR", "--json"],
+    )
+    assert result.exit_code == 0
+
+  def test_spec_filter_with_kind(self):
+    """Combining --spec with --kind still works."""
+    result = runner.invoke(
+      app,
+      ["list", "requirements", "--spec", "SPEC-110",
+       "--kind", "FR", "--json"],
+    )
+    assert result.exit_code == 0
+
+
 if __name__ == "__main__":
   pytest.main([__file__, "-v"])

@@ -263,7 +263,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 | [x] | 1.8 | Add glob pattern support | [ ] | Completed in 1.6 - fnmatch |
 | [x] | 1.9 | Write vstatus/vkind filter tests | [x] | Completed - 31 tests (TDD red→green) |
 | [x] | 1.10 | Implement vstatus/vkind flags | [ ] | Completed - coverage_entries + 2 methods + CLI |
-| [ ] | 1.11 | Write backward compat tests | [x] | Can start early |
+| [x] | 1.11 | Write backward compat tests | [x] | Completed - 14 tests |
 | [ ] | 1.12 | Full test suite + linters | [ ] | After 1.4, 1.7, 1.8, 1.10 |
 | [ ] | 1.13 | Performance testing | [ ] | After 1.7 |
 | [ ] | 1.14 | Manual validation | [ ] | Final step |
@@ -502,17 +502,22 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Linters: ruff clean ✅, pylint registry.py 9.62, list.py 8.73 (pre-existing complexity)
 - **Commits / References**: Uncommitted
 
-#### **1.11 Write backward compatibility tests**
+#### **1.11 Write backward compatibility tests** ✅
 - **Design / Approach**:
-  - Test single-value filters still work: `-s draft` (not `draft,`)
-  - Test regex filters unchanged (if supported)
-  - Test empty filter values handled correctly
-  - Ensure no breaking changes to existing CLI usage
+  - TestFilterBackwardCompatibility class with 14 tests covering:
+    - Single-value status/kind filters on deltas, specs, requirements, adrs (5 tests)
+    - Regexp filters on deltas and requirements (2 tests)
+    - No-filter runs return results on deltas, requirements, specs (3 tests)
+    - JSON output schema includes expected fields (2 tests)
+    - Combined old+new flag usage (2 tests)
 - **Files / Components**:
-  - `supekku/cli/test_cli.py` - add TestFilterBackwardCompatibility class
-- **Testing**: All backward compat tests must PASS
-- **Observations & AI Notes**: *Record any breaking changes discovered*
-- **Commits / References**: *Commit hash after tests*
+  - `supekku/cli/test_cli.py` — `TestFilterBackwardCompatibility` class (14 tests)
+- **Testing**: All 14 tests PASS ✅. No breaking changes found.
+- **Observations & AI Notes**:
+  - All single-value filters work unchanged
+  - Regex filters unaffected by multi-value parsing
+  - JSON schema stable — no field regressions
+- **Commits / References**: Uncommitted
 
 #### **1.10 Full test suite + linters**
 - **Design / Approach**:

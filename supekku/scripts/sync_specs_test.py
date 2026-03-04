@@ -97,8 +97,29 @@ class ProcessSourceUnitContractGateTest(unittest.TestCase):
     spec_dirs = list(self.tech_dir.glob("SPEC-*"))
     assert spec_dirs == []
 
-  def test_check_mode_still_skips_unregistered(self) -> None:
-    """VT-DE029-GATE-003: check_mode with no spec still returns early."""
+  def test_check_mode_skips_spec_but_generates_contracts(self) -> None:
+    """VT-DE029-GATE-003: check_mode with no spec skips spec, runs contracts."""
+    source_unit = SourceUnit(
+      language="go",
+      identifier="internal/baz",
+      root=self.root,
+    )
+    adapter = MagicMock()
+    adapter.generate.return_value = []
+
+    result = self.manager.process_source_unit(
+      source_unit,
+      adapter,
+      check_mode=True,
+      create_specs=False,
+    )
+
+    assert result["processed"] is True
+    assert result["created"] is False
+    adapter.generate.assert_called_once()
+
+  def test_check_mode_no_spec_no_contracts_skips(self) -> None:
+    """Check mode with no spec and contracts off skips entirely."""
     source_unit = SourceUnit(
       language="go",
       identifier="internal/baz",
@@ -111,10 +132,10 @@ class ProcessSourceUnitContractGateTest(unittest.TestCase):
       adapter,
       check_mode=True,
       create_specs=False,
+      generate_contracts=False,
     )
 
     assert result["skipped"] is True
-    assert result["reason"] == "no registered spec for check mode"
     adapter.generate.assert_not_called()
 
   def test_both_contracts_and_specs_off_skips(self) -> None:

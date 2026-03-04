@@ -590,5 +590,70 @@ class TestContractMirrorTreeBuilder(unittest.TestCase):
     assert any("non-symlink" in w for w in warnings)
 
 
+  # -- drift warnings (VT-CONTRACTS-DRIFT-001) --
+
+  def test_drift_warning_when_spec_has_contracts_but_no_canonical(self) -> None:
+    """VT-CONTRACTS-DRIFT-001: warn on contracts/ with no canonical."""
+    self._create_registry({"zig": {"src/foo.zig": "SPEC-001"}})
+    # Create non-empty contracts/ in spec dir (pre-existing real files)
+    spec_contracts = self.tech_dir / "SPEC-001" / "contracts"
+    spec_contracts.mkdir(parents=True)
+    (spec_contracts / "interfaces.md").write_text("stale contract")
+    # Do NOT create any canonical .contracts/ entries
+
+    warnings = self.builder.rebuild()
+
+    assert any("drift" in w.lower() for w in warnings), (
+      f"Expected drift warning, got: {warnings}"
+    )
+
+  def test_no_drift_warning_when_canonical_entries_exist(self) -> None:
+    """No drift warning when canonical entries exist for the spec's unit."""
+    self._create_registry({"zig": {"src/foo.zig": "SPEC-001"}})
+    spec_contracts = self.tech_dir / "SPEC-001" / "contracts"
+    spec_contracts.mkdir(parents=True)
+    (spec_contracts / "interfaces.md").write_text("old contract")
+    # Canonical entry exists
+    self._create_canonical("public", "src/foo.zig.md")
+
+    warnings = self.builder.rebuild()
+
+    assert not any("drift" in w.lower() for w in warnings), (
+      f"Unexpected drift warning: {warnings}"
+    )
+
+  def test_no_drift_warning_for_empty_contracts_dir(self) -> None:
+    """Empty contracts/ dir does NOT trigger drift warning (no false positives)."""
+    self._create_registry({"zig": {"src/foo.zig": "SPEC-001"}})
+    spec_contracts = self.tech_dir / "SPEC-001" / "contracts"
+    spec_contracts.mkdir(parents=True)
+    # Empty — no .md files
+
+    warnings = self.builder.rebuild()
+
+    assert not any("drift" in w.lower() for w in warnings)
+
+  def test_no_drift_warning_when_contracts_dir_missing(self) -> None:
+    """No drift warning when SPEC has no contracts/ directory at all."""
+    self._create_registry({"zig": {"src/foo.zig": "SPEC-001"}})
+    (self.tech_dir / "SPEC-001").mkdir(parents=True)
+    # No contracts/ subdir
+
+    warnings = self.builder.rebuild()
+
+    assert not any("drift" in w.lower() for w in warnings)
+
+  def test_drift_warning_python_spec(self) -> None:
+    """Drift warning fires for Python specs with contracts but no canonical."""
+    self._create_registry({"python": {"supekku/lib/foo": "SPEC-200"}})
+    spec_contracts = self.tech_dir / "SPEC-200" / "contracts"
+    spec_contracts.mkdir(parents=True)
+    (spec_contracts / "foo-public.md").write_text("# supekku.lib.foo\nold")
+
+    warnings = self.builder.rebuild()
+
+    assert any("drift" in w.lower() for w in warnings)
+
+
 if __name__ == "__main__":
   unittest.main()

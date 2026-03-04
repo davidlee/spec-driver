@@ -3171,7 +3171,7 @@ deltas:
         status: complete
   DE-029:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Canonical contract storage
     slug: canonical_contract_storage
     updated: '2026-02-21'
@@ -3209,6 +3209,7 @@ deltas:
           dependencies: []
         phases:
         - id: IP-029.PHASE-01
+        - id: IP-029.PHASE-02
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -3261,6 +3262,46 @@ deltas:
             to caller-provided path
           mitigation: Already passing output path to subprocess; just change the variable
             source
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-029.PHASE-02
+        plan: IP-029
+        delta: DE-029
+        objective: Implement convention drift warnings (FR-012), fix check-mode contract
+          gate for specless units, remove dead code orphaned by Phase 1 mirror inversion.
+        entrance_criteria:
+        - Phase 1 complete (all adapters write to canonical paths)
+        - "Mirror builder inverted (compat symlinks FROM SPEC-*/contracts/ \u2192\
+          \ .contracts/)"
+        exit_criteria:
+        - Drift warning emitted when SPEC has non-empty contracts/ but zero canonical
+          entries
+        - VT-CONTRACTS-DRIFT-001 passes
+        - check mode processes contracts for specless source units (no spurious skip)
+        - Dead methods removed from mirror.py (_collect_entries, _resolve_conflicts,
+          _create_symlinks)
+        - MirrorEntry removed from mirror.py and __init__.py exports
+        - just green (tests + lint + pylint)
+        verification:
+          tests:
+          - VT-CONTRACTS-DRIFT-001
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Implement drift detection in ContractMirrorTreeBuilder.rebuild()
+        - id: '2.2'
+          description: Write VT-CONTRACTS-DRIFT-001 test
+        - id: '2.3'
+          description: 'Fix check-mode gate: specless units must still generate contracts'
+        - id: '2.4'
+          description: 'Remove dead code: _collect_entries, _resolve_conflicts, _create_symlinks,
+            MirrorEntry'
+        - id: '2.5'
+          description: Update IP-029 verification coverage statuses and progress tracking
+        risks:
+        - description: MirrorEntry may be imported by downstream code we haven't found
+          mitigation: Grep confirmed zero external usage outside mirror.py and its
+            test
   DE-030:
     kind: delta
     status: draft

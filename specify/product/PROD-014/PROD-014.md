@@ -164,8 +164,8 @@ entries:
   - artefact: VT-CONTRACTS-STORAGE-001
     kind: VT
     requirement: PROD-014.FR-008
-    status: planned
-    notes: Generates real contract files under `.contracts/**` (no symlink dependency on SPEC bundles).
+    status: verified
+    notes: "DE-029 Phase 1: adapters write real files to .contracts/<view>/...; adapter + storage tests pass."
 
   - artefact: VT-CONTRACTS-GEN-001
     kind: VT
@@ -182,14 +182,14 @@ entries:
   - artefact: VT-CONTRACTS-COMPAT-001
     kind: VT
     requirement: PROD-014.FR-011
-    status: planned
-    notes: Backwards-compat behavior for legacy SPEC bundle contract access paths is explicit and tested.
+    status: verified
+    notes: "DE-029 Phase 1: compat symlinks SPEC-*/contracts/ → .contracts/; 13 mirror builder tests."
 
   - artefact: VT-CONTRACTS-DRIFT-001
     kind: VT
     requirement: PROD-014.FR-012
-    status: planned
-    notes: Warn when a SPEC has contracts but produces zero mirror entries (convention drift / mapper mismatch).
+    status: verified
+    notes: "DE-029 Phase 2: 5 tests — positive (zig, python) + negative (empty, missing, canonical exists)."
 ```
 
 ## 1. Intent & Summary

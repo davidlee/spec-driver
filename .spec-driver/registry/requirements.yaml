@@ -2045,15 +2045,19 @@ requirements:
     primary_spec: PROD-012
     kind: functional
     category: null
-    status: in-progress
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-028
     - DE-029
     verified_by: []
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VT-CONTRACTS-ADAPTER-001
+    coverage_entries:
+    - artefact: VT-CONTRACTS-ADAPTER-001
+      status: verified
+      kind: VT
     path: specify/product/PROD-012/PROD-012.md
   PROD-012.FR-007:
     label: FR-007
@@ -2696,7 +2700,7 @@ requirements:
     primary_spec: PROD-014
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -2706,7 +2710,7 @@ requirements:
     - VT-CONTRACTS-STORAGE-001
     coverage_entries:
     - artefact: VT-CONTRACTS-STORAGE-001
-      status: planned
+      status: verified
       kind: VT
     path: specify/product/PROD-014/PROD-014.md
   PROD-014.FR-009:
@@ -2760,7 +2764,7 @@ requirements:
     primary_spec: PROD-014
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -2770,7 +2774,7 @@ requirements:
     - VT-CONTRACTS-COMPAT-001
     coverage_entries:
     - artefact: VT-CONTRACTS-COMPAT-001
-      status: planned
+      status: verified
       kind: VT
     path: specify/product/PROD-014/PROD-014.md
   PROD-014.FR-012:
@@ -2783,7 +2787,7 @@ requirements:
     primary_spec: PROD-014
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -2793,7 +2797,7 @@ requirements:
     - VT-CONTRACTS-DRIFT-001
     coverage_entries:
     - artefact: VT-CONTRACTS-DRIFT-001
-      status: planned
+      status: verified
       kind: VT
     path: specify/product/PROD-014/PROD-014.md
   PROD-014.NF-001:

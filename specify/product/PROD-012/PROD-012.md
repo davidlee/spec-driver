@@ -174,6 +174,11 @@ entries:
     requirement: PROD-012.NF-003
     status: planned
     notes: CLI tool performance benchmarks
+  - artefact: VT-CONTRACTS-ADAPTER-001
+    kind: VT
+    requirement: PROD-012.FR-006
+    status: verified
+    notes: "DE-029: all 4 adapters accept variant_outputs, write to provided paths. Per-adapter tests pass."
 ```
 
 ## 1. Intent & Summary

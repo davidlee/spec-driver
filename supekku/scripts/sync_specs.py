@@ -219,17 +219,15 @@ class MultiLanguageSpecManager:
       # Create new spec if needed
       has_spec = bool(spec_id)
       if not has_spec:
-        if check_mode:
-          result["skipped"] = True
-          result["reason"] = "no registered spec for check mode"
-          return result
-
         if not create_specs and not generate_contracts:
           result["skipped"] = True
           result["reason"] = "spec auto-creation is off"
           return result
 
-        if create_specs:
+        if check_mode:
+          # Check mode: skip spec creation, but still process contracts
+          pass
+        elif create_specs:
           spec_id = self._get_next_spec_id(dry_run=dry_run)
           result["created"] = True
           result["spec_id"] = spec_id

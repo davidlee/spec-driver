@@ -2,7 +2,6 @@
 
 from .mirror import (
   ContractMirrorTreeBuilder,
-  MirrorEntry,
   python_staging_dir,
   resolve_go_variant_outputs,
   resolve_ts_variant_outputs,
@@ -11,7 +10,6 @@ from .mirror import (
 
 __all__ = [
   "ContractMirrorTreeBuilder",
-  "MirrorEntry",
   "python_staging_dir",
   "resolve_go_variant_outputs",
   "resolve_ts_variant_outputs",

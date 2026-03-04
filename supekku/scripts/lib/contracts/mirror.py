@@ -13,7 +13,6 @@ from pathlib import Path
 
 __all__ = [
   "ContractMirrorTreeBuilder",
-  "MirrorEntry",
   "resolve_go_variant_outputs",
   "resolve_ts_variant_outputs",
   "resolve_zig_variant_outputs",
@@ -332,6 +331,10 @@ class ContractMirrorTreeBuilder:  # pylint: disable=too-few-public-methods
               link_path.unlink()
           link_path.symlink_to(target)
 
+    # Drift detection: warn when a spec has non-empty contracts/ but
+    # zero canonical .contracts/ entries (FR-012 / DR-029 §7.5)
+    self._detect_drift(languages, contracts_root, warnings)
+
     # Create view aliases inside .contracts/ (api → public, etc.)
     self._create_aliases()
 
@@ -358,12 +361,51 @@ class ContractMirrorTreeBuilder:  # pylint: disable=too-few-public-methods
       return self._scan_python_contracts(identifier, contracts_root)
     return []
 
+  def _detect_drift(
+    self,
+    languages: dict,
+    contracts_root: Path,
+    warnings: list[str],
+  ) -> None:
+    """Warn when a spec has non-empty contracts/ but zero canonical entries."""
+    seen_specs: set[str] = set()
+    for language, identifiers in languages.items():
+      for identifier, entry in identifiers.items():
+        spec_id = entry if isinstance(entry, str) else entry.get("spec_id")
+        if not spec_id or spec_id in seen_specs:
+          continue
+        seen_specs.add(spec_id)
+
+        spec_contracts = self.tech_dir / spec_id / "contracts"
+        if not spec_contracts.is_dir():
+          continue
+        has_md = any(
+          f.suffix == ".md"
+          for f in spec_contracts.iterdir()
+          if f.is_file() or f.is_symlink()
+        )
+        if not has_md:
+          continue
+
+        canonical = self._canonical_paths_for(
+          language, identifier, contracts_root,
+        )
+        if not any(p.exists() for p in canonical):
+          warnings.append(
+            f"Drift: {spec_id} has contracts/ with .md files"
+            f" but zero canonical .contracts/ entries"
+            f" for {language}:{identifier}"
+            f" (convention mismatch?)",
+          )
+
   @staticmethod
   def _scan_python_contracts(
     identifier: str,
     contracts_root: Path,
   ) -> list[Path]:
     """Find canonical Python contract files by scanning .contracts/ views."""
+    if not contracts_root.is_dir():
+      return []
     results: list[Path] = []
     for view_dir in contracts_root.iterdir():
       if not view_dir.is_dir() or view_dir.is_symlink():
@@ -387,97 +429,6 @@ class ContractMirrorTreeBuilder:  # pylint: disable=too-few-public-methods
         return json.load(f)
     except (json.JSONDecodeError, OSError):
       return None
-
-  def _collect_entries(
-    self,
-    registry: dict,
-    warnings: list[str],
-  ) -> list[MirrorEntry]:
-    """Collect mirror entries from all registered source units."""
-    entries: list[MirrorEntry] = []
-    languages = registry.get("languages", {})
-
-    for language, identifiers in languages.items():
-      seen_specs: set[str] = set()
-
-      for identifier, spec_id in identifiers.items():
-        contracts_dir = self.tech_dir / spec_id / "contracts"
-
-        if language == "python":
-          # Python scans full contracts dir; deduplicate by spec
-          if spec_id in seen_specs:
-            continue
-          seen_specs.add(spec_id)
-          new_entries, new_warnings = python_mirror_entries(
-            spec_id,
-            contracts_dir,
-          )
-        elif language == "zig":
-          new_entries, new_warnings = zig_mirror_entries(
-            spec_id,
-            contracts_dir,
-            identifier,
-          )
-        elif language == "go":
-          new_entries, new_warnings = go_mirror_entries(
-            spec_id,
-            contracts_dir,
-            identifier,
-          )
-        elif language in ("typescript", "javascript"):
-          new_entries, new_warnings = ts_mirror_entries(
-            spec_id,
-            contracts_dir,
-            identifier,
-          )
-        else:
-          continue
-
-        entries.extend(new_entries)
-        warnings.extend(new_warnings)
-
-    return entries
-
-  def _resolve_conflicts(
-    self,
-    entries: list[MirrorEntry],
-    warnings: list[str],
-  ) -> list[MirrorEntry]:
-    """Resolve conflicting mirror destinations. Lowest SPEC ID wins."""
-    groups: dict[tuple[str, str], list[MirrorEntry]] = {}
-    for entry in entries:
-      key = (entry.view, entry.mirror_path)
-      groups.setdefault(key, []).append(entry)
-
-    resolved: list[MirrorEntry] = []
-    for group in groups.values():
-      if len(group) > 1:
-        group.sort(key=lambda e: e.spec_id)
-        winner = group[0]
-        losers = [e.spec_id for e in group[1:] if e.spec_id != winner.spec_id]
-        if losers:
-          warnings.append(
-            f"Conflict at .contracts/{winner.view}/{winner.mirror_path}"
-            f" — {winner.spec_id} wins over {', '.join(losers)}"
-          )
-        resolved.append(winner)
-      else:
-        resolved.append(group[0])
-
-    return resolved
-
-  def _create_symlinks(self, entries: list[MirrorEntry]) -> None:
-    """Create symlinks for all resolved mirror entries."""
-    for entry in entries:
-      link_path = self.mirror_dir / entry.view / entry.mirror_path
-      link_path.parent.mkdir(parents=True, exist_ok=True)
-
-      # Compute relative symlink target
-      target = Path(os.path.relpath(entry.contract_path, link_path.parent))
-
-      if link_path.exists() or link_path.is_symlink():
-        link_path.unlink()
-      link_path.symlink_to(target)
 
   def _create_aliases(self) -> None:
     """Create alias symlinks (e.g. api -> public)."""

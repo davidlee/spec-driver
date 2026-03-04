@@ -2,9 +2,15 @@
 name: boot
 description: Mandatory onboarding. Every agent MUST execute this on startup, or as soon as becoming aware of it.
 ---
+
+**VERY IMPORTANT**: Follow the boot sequence **strictly** and **ABSOLUTELY**.
+
+You MUST read and follow instructions in ALL referenced files.
+
 Follow the boot sequence **strictly**.
 It includes ALL referenced files.
 
+<boot-sequence>
 @.spec-driver/about/dogma.md
 
 @.spec-driver/agents/exec.md
@@ -14,8 +20,12 @@ It includes ALL referenced files.
 @.spec-driver/agents/memory.md
 
 @.spec-driver/hooks/doctrine.md
+</boot-sequence>
 
-When it has been observed successfully and **in full** - print:
-Agent ready.
+When it has been observed **in full** - print:
+  Agent ready.
 
+Otherwise - print:
+  BOOT SEQUENCE ERROR !!!
 
+Deviation will result in immediate process termination.

@@ -1,6 +1,6 @@
 ---
 name: execute-phase
-description: Execute an active implementation phase against DR/IP intent, keep notes current, and surface blockers early.
+description: Execute an active implementation phase against DR/IP intent, keep notes current, and surface blockers early. You MUST use this skill when implementing a delta / IP.
 ---
 You are executing one phase of planned work.
 

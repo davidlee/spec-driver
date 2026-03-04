@@ -68,7 +68,7 @@ Usage notes:
 
 <skill>
 <name>execute-phase</name>
-<description>Execute an active implementation phase against DR/IP intent, keep notes current, and surface blockers early.</description>
+<description>Execute an active implementation phase against DR/IP intent, keep notes current, and surface blockers early. You MUST use this skill when implementing a delta / IP.</description>
 <location>project</location>
 </skill>
 

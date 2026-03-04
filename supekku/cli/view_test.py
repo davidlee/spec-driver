@@ -266,3 +266,42 @@ class TestViewRevisionRegression:
     result = runner.invoke(app, ["revision", "RE-999"])
     assert result.exit_code == 1
     assert "not found" in result.stderr.lower()
+
+
+class TestViewNewSubcommands:
+  """Integration tests for Phase 2 view subcommands."""
+
+  def test_view_plan(self) -> None:
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["plan", "IP-041"])
+      assert result.exit_code == 0
+      mock_run.assert_called_once()
+
+  def test_view_plan_not_found(self) -> None:
+    result = runner.invoke(app, ["plan", "IP-999"])
+    assert result.exit_code == 1
+
+  def test_view_audit(self) -> None:
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["audit", "AUD-001"])
+      assert result.exit_code == 0
+
+  def test_view_issue(self) -> None:
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["issue", "ISSUE-003"])
+      assert result.exit_code == 0
+
+  def test_view_problem(self) -> None:
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["problem", "PROB-001"])
+      assert result.exit_code == 0
+
+  def test_view_improvement(self) -> None:
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["improvement", "IMPR-001"])
+      assert result.exit_code == 0

@@ -231,5 +231,46 @@ class FindRevisionRegressionTest(unittest.TestCase):
     assert result.stdout.strip() == ""
 
 
+class FindNewSubcommandsTest(unittest.TestCase):
+  """Integration tests for Phase 2 find subcommands."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+
+  def test_find_plan_wildcard(self) -> None:
+    result = self.runner.invoke(app, ["plan", "IP-*"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "IP-" in result.stdout
+
+  def test_find_plan_exact(self) -> None:
+    result = self.runner.invoke(app, ["plan", "IP-041"])
+    assert result.exit_code == 0
+    assert result.stdout.strip().endswith(".md")
+
+  def test_find_plan_no_match(self) -> None:
+    result = self.runner.invoke(app, ["plan", "IP-999"])
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
+
+  def test_find_audit_wildcard(self) -> None:
+    result = self.runner.invoke(app, ["audit", "AUD-*"])
+    assert result.exit_code == 0
+    assert "AUD-" in result.stdout
+
+  def test_find_issue_wildcard(self) -> None:
+    result = self.runner.invoke(app, ["issue", "ISSUE-*"])
+    assert result.exit_code == 0
+    assert "ISSUE-" in result.stdout
+
+  def test_find_improvement_wildcard(self) -> None:
+    result = self.runner.invoke(app, ["improvement", "IMPR-*"])
+    assert result.exit_code == 0
+    assert "IMPR-" in result.stdout
+
+  def test_find_requirement(self) -> None:
+    result = self.runner.invoke(app, ["requirement", "SPEC-*"])
+    assert result.exit_code == 0
+
+
 if __name__ == "__main__":
   unittest.main()

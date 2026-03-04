@@ -118,3 +118,16 @@ so the broad catch was masking unrelated errors.
 **Lint fixes**: Previous agent left 3 line-too-long errors in test helpers (f-string frontmatter). Extracted `kind` variable and split strings.
 
 **Verification**: `just check` green (2423 passed, pylint 9.58/10).
+
+## Phase 2, tasks 2.7, 2.11–2.13 (2026-03-04)
+
+**Done**:
+
+- **2.7**: Extracted `_render_plan()` (internal helper) and `create_plan()` (public, for existing deltas) from inline code in `create_delta()`. `create_plan` locates delta dir, reads frontmatter for metadata (slug, name, specs, requirements), checks for existing plan, renders via `_render_plan`. 4 tests: create for planless delta, already-exists error, missing delta error, metadata inheritance.
+- **2.11**: `create plan --delta DE-XXX` CLI command in `create.py`. Thin: calls `create_plan()`, handles `FileExistsError`/`FileNotFoundError`.
+- **2.12**: 28 integration tests across show (10), view (6), edit (5), find (7). All use real repo artifacts. View/edit tests mock subprocess.run; show tests verify formatted output; find tests verify wildcard/exact matching.
+- **2.13**: `just check` green.
+
+**Verification**: 2472 passed, 3 skipped, pylint 9.57/10.
+
+**Phase 2 complete.** All 13 tasks done, all exit criteria satisfied.

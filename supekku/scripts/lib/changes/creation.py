@@ -22,7 +22,7 @@ from supekku.scripts.lib.blocks.plan import (
 )
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
 from supekku.scripts.lib.core.paths import get_templates_dir
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 from supekku.scripts.lib.specs.creation import (
   extract_template_body,
   find_repository_root,
@@ -140,6 +140,137 @@ def create_revision(
   )
 
 
+def _render_plan(
+  delta_id: str,
+  delta_dir: Path,
+  slug: str,
+  name: str,
+  repo: Path,
+  *,
+  specs: Iterable[str] | None = None,
+  requirements: Iterable[str] | None = None,
+) -> Path:
+  """Render an implementation plan file inside a delta directory.
+
+  This is the internal workhorse; both create_delta and create_plan call it.
+
+  Returns:
+    Path to the created plan file.
+  """
+  plan_id = delta_id.replace("DE", "IP")
+  today = date.today().isoformat()
+
+  plan_overview_block = render_plan_overview_block(
+    plan_id,
+    delta_id,
+    primary_specs=list(specs or []),
+    target_requirements=list(requirements or []),
+  )
+
+  first_req = list(requirements or [])[0] if requirements else "SPEC-YYY.FR-001"
+  plan_verification_block = render_verification_coverage_block(
+    plan_id,
+    entries=[
+      {
+        "artefact": "VT-XXX",
+        "kind": "VT",
+        "requirement": first_req,
+        "status": "planned",
+        "notes": "Link to evidence (test run, audit, validation artefact).",
+      }
+    ],
+  )
+
+  plan_template_path = _get_template_path("plan.md", repo)
+  plan_template_body = extract_template_body(plan_template_path)
+  plan_template = Template(plan_template_body)
+  plan_body = plan_template.render(
+    plan_id=plan_id,
+    delta_id=delta_id,
+    plan_overview_block=plan_overview_block,
+    plan_verification_block=plan_verification_block,
+  )
+  plan_frontmatter = {
+    "id": plan_id,
+    "slug": slug,
+    "name": f"Implementation Plan - {name}",
+    "created": today,
+    "updated": today,
+    "status": "draft",
+    "kind": "plan",
+    "aliases": [],
+  }
+  plan_path = delta_dir / f"{plan_id}.md"
+  dump_markdown_file(plan_path, plan_frontmatter, plan_body)
+  return plan_path
+
+
+def create_plan(
+  delta_id: str,
+  *,
+  repo_root: Path | None = None,
+) -> Path:
+  """Create an implementation plan for an existing delta.
+
+  Locates the delta directory, reads its frontmatter for metadata,
+  and renders a plan file. Raises if the delta doesn't exist or
+  a plan already exists.
+
+  Args:
+    delta_id: Delta ID (e.g. 'DE-041').
+    repo_root: Optional repository root. Auto-detected if not provided.
+
+  Returns:
+    Path to the created plan file.
+
+  Raises:
+    FileNotFoundError: If delta directory not found.
+    FileExistsError: If plan already exists in the delta directory.
+  """
+  repo = find_repository_root(repo_root or Path.cwd())
+  deltas_dir = repo / "change" / "deltas"
+
+  # Find delta directory
+  delta_dir = None
+  if deltas_dir.exists():
+    for entry in deltas_dir.iterdir():
+      if entry.is_dir() and entry.name.startswith(f"{delta_id}-"):
+        delta_dir = entry
+        break
+  if delta_dir is None:
+    msg = f"Delta directory not found for {delta_id}"
+    raise FileNotFoundError(msg)
+
+  # Check for existing plan
+  plan_id = delta_id.replace("DE", "IP")
+  plan_path = delta_dir / f"{plan_id}.md"
+  if plan_path.exists():
+    msg = f"Plan {plan_id} already exists at {plan_path}"
+    raise FileExistsError(msg)
+
+  # Read delta frontmatter for metadata
+  delta_file = delta_dir / f"{delta_id}.md"
+  if not delta_file.exists():
+    msg = f"Delta file not found: {delta_file}"
+    raise FileNotFoundError(msg)
+  frontmatter, _ = load_markdown_file(delta_file)
+  slug = frontmatter.get("slug", "plan")
+  name = frontmatter.get("name", delta_id).removeprefix("Delta - ")
+  applies_to = frontmatter.get("applies_to", {})
+  specs = applies_to.get("specs")
+  requirements = applies_to.get("requirements")
+
+  return _render_plan(
+    delta_id,
+    delta_dir,
+    slug,
+    name,
+    repo,
+    specs=specs,
+    requirements=requirements,
+  )
+
+
 def create_delta(
   name: str,
   *,
@@ -248,58 +379,17 @@ def create_delta(
   )
   extras.append(design_revision_path)
 
-  plan_id = delta_id.replace("DE", "IP")
   if not allow_missing_plan:
-    # Render YAML blocks (no first_phase_id since phase-01 not auto-created)
-    plan_overview_block = render_plan_overview_block(
-      plan_id,
+    plan_path = _render_plan(
       delta_id,
-      primary_specs=list(specs or []),
-      target_requirements=list(requirements or []),
+      delta_dir,
+      slug,
+      name,
+      repo,
+      specs=specs,
+      requirements=requirements,
     )
-
-    # Render verification block for plan
-    first_req = list(requirements or [])[0] if requirements else "SPEC-YYY.FR-001"
-    plan_verification_block = render_verification_coverage_block(
-      plan_id,
-      entries=[
-        {
-          "artefact": "VT-XXX",
-          "kind": "VT",
-          "requirement": first_req,
-          "status": "planned",
-          "notes": "Link to evidence (test run, audit, validation artefact).",
-        }
-      ],
-    )
-
-    # Load and render template
-    plan_template_path = _get_template_path("plan.md", repo)
-    plan_template_body = extract_template_body(plan_template_path)
-    plan_template = Template(plan_template_body)
-    plan_body = plan_template.render(
-      plan_id=plan_id,
-      delta_id=delta_id,
-      plan_overview_block=plan_overview_block,
-      plan_verification_block=plan_verification_block,
-    )
-    plan_frontmatter = {
-      "id": plan_id,
-      "slug": slug,
-      "name": f"Implementation Plan - {name}",
-      "created": today,
-      "updated": today,
-      "status": "draft",
-      "kind": "plan",
-      "aliases": [],
-    }
-    plan_path = delta_dir / f"{plan_id}.md"
-    dump_markdown_file(plan_path, plan_frontmatter, plan_body)
     extras.append(plan_path)
-
-    # Phase-01 no longer auto-created (PROD-011.FR-001)
-    # Use `create phase --plan {plan_id}` after fleshing out IP to create phase-01
-    # with intelligent entry/exit criteria copying
 
   notes_path = delta_dir / "notes.md"
   if not notes_path.exists():
@@ -818,6 +908,7 @@ __all__ = [
   "PhaseCreationResult",
   "create_audit",
   "create_delta",
+  "create_plan",
   "create_phase",
   "create_requirement_breakout",
   "create_revision",

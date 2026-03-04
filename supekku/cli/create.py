@@ -15,6 +15,7 @@ from supekku.scripts.lib.changes.creation import (
   create_audit,
   create_delta,
   create_phase,
+  create_plan,
   create_requirement_breakout,
   create_revision,
 )
@@ -203,6 +204,28 @@ def create_delta_cmd(
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating delta: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("plan")
+def create_plan_cmd(
+  delta: Annotated[
+    str,
+    typer.Option("--delta", help="Delta ID (e.g., DE-041)"),
+  ],
+  root: RootOption = None,
+) -> None:
+  """Create an implementation plan for an existing delta."""
+  try:
+    plan_path = create_plan(delta, repo_root=root)
+    typer.echo(f"Plan created: {plan_path.stem}")
+    typer.echo(str(plan_path))
+    raise typer.Exit(EXIT_SUCCESS)
+  except FileExistsError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except FileNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
 

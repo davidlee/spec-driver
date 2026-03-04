@@ -14,6 +14,7 @@ from supekku.scripts.lib.changes.creation import (
   create_audit,
   create_delta,
   create_phase,
+  create_plan,
   create_requirement_breakout,
   create_revision,
 )
@@ -161,6 +162,56 @@ class CreateChangeTest(unittest.TestCase):
     ]
     plan_files = [p for p in result.extras if p.name.startswith("IP-")]
     assert plan_files == []
+
+  def test_create_plan_for_existing_delta(self) -> None:
+    """Create a plan for a delta that was created without one."""
+    root = self._make_repo()
+    result = create_delta(
+      "Planless delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+      allow_missing_plan=True,
+    )
+    plan_path = create_plan(result.artifact_id, repo_root=root)
+    assert plan_path.exists()
+    frontmatter, _ = load_markdown_file(plan_path)
+    assert frontmatter["kind"] == "plan"
+    assert frontmatter["id"] == result.artifact_id.replace("DE", "IP")
+    assert frontmatter["slug"] == "planless_delta"
+    assert frontmatter["status"] == "draft"
+
+  def test_create_plan_raises_if_already_exists(self) -> None:
+    """Cannot create a plan when one already exists."""
+    root = self._make_repo()
+    result = create_delta(
+      "Has plan",
+      specs=["SPEC-100"],
+      repo_root=root,
+    )
+    with self.assertRaises(FileExistsError):
+      create_plan(result.artifact_id, repo_root=root)
+
+  def test_create_plan_raises_if_delta_missing(self) -> None:
+    """Cannot create a plan for a nonexistent delta."""
+    root = self._make_repo()
+    with self.assertRaises(FileNotFoundError):
+      create_plan("DE-999", repo_root=root)
+
+  def test_create_plan_inherits_delta_metadata(self) -> None:
+    """Plan inherits specs/requirements from delta frontmatter."""
+    root = self._make_repo()
+    result = create_delta(
+      "Metadata test",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+      allow_missing_plan=True,
+    )
+    plan_path = create_plan(result.artifact_id, repo_root=root)
+    content = plan_path.read_text(encoding="utf-8")
+    assert "SPEC-100" in content
+    assert "SPEC-100.FR-100" in content
 
   def test_create_requirement_breakout(self) -> None:
     """Test creating a requirement breakout artifact for a spec."""

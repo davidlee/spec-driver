@@ -232,3 +232,35 @@ class TestEditRevisionRegression:
     result = runner.invoke(app, ["revision", "RE-999"])
     assert result.exit_code == 1
     assert "not found" in result.stderr.lower()
+
+
+class TestEditNewSubcommands:
+  """Integration tests for Phase 2 edit subcommands."""
+
+  def test_edit_plan(self) -> None:
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["plan", "IP-041"])
+      assert result.exit_code == 0
+
+  def test_edit_plan_not_found(self) -> None:
+    result = runner.invoke(app, ["plan", "IP-999"])
+    assert result.exit_code == 1
+
+  def test_edit_audit(self) -> None:
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["audit", "AUD-001"])
+      assert result.exit_code == 0
+
+  def test_edit_issue(self) -> None:
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["issue", "ISSUE-003"])
+      assert result.exit_code == 0
+
+  def test_edit_improvement(self) -> None:
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["improvement", "IMPR-001"])
+      assert result.exit_code == 0

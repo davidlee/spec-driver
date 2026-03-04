@@ -4,7 +4,7 @@ slug: 041-cli_completeness_fill_obvious_command_gaps-phase-02
 name: "IP-041 Phase 02 — Domain additions + new commands"
 created: '2026-03-04'
 updated: '2026-03-04'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -66,7 +66,7 @@ tasks:
     status: complete
   - id: "2.7"
     description: "Extract create_plan() from create_delta() + tests (VT-create-plan)"
-    status: pending
+    status: complete
   - id: "2.8"
     description: "Wire all new show subcommands (plan, audit, issue, problem, improvement, risk)"
     status: complete
@@ -78,13 +78,13 @@ tasks:
     status: complete
   - id: "2.11"
     description: "Wire create plan --delta CLI command"
-    status: pending
+    status: complete
   - id: "2.12"
     description: "Integration tests for new commands (VT-commands)"
-    status: pending
+    status: complete
   - id: "2.13"
     description: "Final verification: just check green"
-    status: pending
+    status: complete
 risks:
   - description: Backlog items lack a to_dict(root) method needed for show --json
     likelihood: medium
@@ -126,15 +126,15 @@ then wiring the thin CLI commands on top.
 - [x] DR-041 §4.2–4.10 reviewed
 
 ## 4. Exit Criteria / Done When
-- [ ] Plan resolver + finder in dispatch tables
-- [ ] Backlog resolvers + finders in dispatch tables
-- [ ] `find_backlog_items_by_id()` tested
-- [ ] `create_plan()` extracted and tested
-- [ ] `format_audit_details()` and `format_plan_details()` tested
-- [ ] All new show/view/edit/find subcommands wired
-- [ ] `create plan --delta` wired
-- [ ] Integration tests for new commands
-- [ ] `just check` green
+- [x] Plan resolver + finder in dispatch tables
+- [x] Backlog resolvers + finders in dispatch tables
+- [x] `find_backlog_items_by_id()` tested
+- [x] `create_plan()` extracted and tested
+- [x] `format_audit_details()` and `format_plan_details()` tested
+- [x] All new show/view/edit/find subcommands wired
+- [x] `create plan --delta` wired
+- [x] Integration tests for new commands
+- [x] `just check` green
 
 ## 5. Verification
 ```bash
@@ -176,13 +176,13 @@ just check
 | [x] | 2.4 | Unit tests for new resolvers/finders | [ ] | After 2.1–2.3 |
 | [x] | 2.5 | format_audit_details() + format_plan_details() | [P] | Independent of 2.1–2.3 |
 | [x] | 2.6 | Unit tests for formatters | [ ] | After 2.5 |
-| [ ] | 2.7 | Extract create_plan() + tests | [P] | Independent of 2.1–2.6 |
+| [x] | 2.7 | Extract create_plan() + tests | [P] | Independent of 2.1–2.6 |
 | [x] | 2.8 | Wire new show subcommands | [ ] | After 2.4 + 2.6 |
 | [x] | 2.9 | Wire new view/edit subcommands | [P] | Can parallel with 2.8 |
 | [x] | 2.10 | Wire new find subcommands | [P] | Can parallel with 2.8 |
-| [ ] | 2.11 | Wire create plan --delta | [ ] | After 2.7 |
-| [ ] | 2.12 | Integration tests for new commands | [ ] | After 2.8–2.11 |
-| [ ] | 2.13 | Final verification | [ ] | After 2.12 |
+| [x] | 2.11 | Wire create plan --delta | [ ] | After 2.7 |
+| [x] | 2.12 | Integration tests for new commands | [ ] | After 2.8–2.11 |
+| [x] | 2.13 | Final verification | [ ] | After 2.12 |
 
 ### Task Details
 
@@ -264,7 +264,7 @@ just check
 - `discover_backlog_items()` does full O(n) scan — `find_backlog_items_by_id()` uses targeted path lookup
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] IP-041 updated with Phase 2 results
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] IP-041 updated with Phase 2 results
 - [ ] Hand-off notes to Phase 3

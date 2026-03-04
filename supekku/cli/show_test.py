@@ -579,5 +579,59 @@ class ShowRevisionRegressionTest(unittest.TestCase):
     assert "mutually exclusive" in result.stderr.lower()
 
 
+class ShowNewSubcommandsTest(unittest.TestCase):
+  """Integration tests for Phase 2 show subcommands."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+
+  def test_show_plan_default(self) -> None:
+    result = self.runner.invoke(app, ["plan", "IP-041"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "IP-041" in result.stdout
+
+  def test_show_plan_path(self) -> None:
+    result = self.runner.invoke(app, ["plan", "41", "--path"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert result.stdout.strip().endswith(".md")
+
+  def test_show_plan_not_found(self) -> None:
+    result = self.runner.invoke(app, ["plan", "IP-999"])
+    assert result.exit_code == 1
+    assert "not found" in result.stderr.lower()
+
+  def test_show_audit_default(self) -> None:
+    result = self.runner.invoke(app, ["audit", "AUD-001"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "AUD-001" in result.stdout
+
+  def test_show_audit_not_found(self) -> None:
+    result = self.runner.invoke(app, ["audit", "AUD-999"])
+    assert result.exit_code == 1
+
+  def test_show_issue_default(self) -> None:
+    result = self.runner.invoke(app, ["issue", "ISSUE-003"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "ISSUE-003" in result.stdout
+
+  def test_show_issue_not_found(self) -> None:
+    result = self.runner.invoke(app, ["issue", "ISSUE-999"])
+    assert result.exit_code == 1
+
+  def test_show_problem_default(self) -> None:
+    result = self.runner.invoke(app, ["problem", "PROB-001"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "PROB-001" in result.stdout
+
+  def test_show_improvement_default(self) -> None:
+    result = self.runner.invoke(app, ["improvement", "IMPR-001"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "IMPR-001" in result.stdout
+
+  def test_show_improvement_not_found(self) -> None:
+    result = self.runner.invoke(app, ["improvement", "IMPR-999"])
+    assert result.exit_code == 1
+
+
 if __name__ == "__main__":
   unittest.main()

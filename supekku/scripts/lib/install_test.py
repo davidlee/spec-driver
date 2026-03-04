@@ -334,24 +334,21 @@ def test_initialize_workspace_prompts_per_category(tmp_path: Path, capsys) -> No
   assert (about_dir / "README.md").read_text() == original_readme
 
 
-# --- BOOT.md rendering tests ---
+# --- Agent boot.md rendering tests ---
 
 
-def test_initialize_workspace_renders_boot_md(tmp_path: Path) -> None:
-  """initialize_workspace renders .spec-driver/BOOT.md from template."""
+def test_initialize_workspace_renders_boot_agent_doc(tmp_path: Path) -> None:
+  """initialize_workspace renders .spec-driver/agents/boot.md from template."""
   initialize_workspace(tmp_path, auto_yes=True)
-  boot_md = tmp_path / SPEC_DRIVER_DIR / "BOOT.md"
+  boot_md = tmp_path / SPEC_DRIVER_DIR / "agents" / "boot.md"
   assert boot_md.exists()
   assert "/boot" in boot_md.read_text(encoding="utf-8")
 
 
-def test_initialize_workspace_boot_md_idempotent(tmp_path: Path) -> None:
-  """Re-running produces identical BOOT.md."""
+def test_initialize_workspace_does_not_create_boot_md(tmp_path: Path) -> None:
+  """BOOT.md is no longer created — boot is rendered as an agent doc."""
   initialize_workspace(tmp_path, auto_yes=True)
-  boot_md = tmp_path / SPEC_DRIVER_DIR / "BOOT.md"
-  first = boot_md.read_text(encoding="utf-8")
-  initialize_workspace(tmp_path, auto_yes=True)
-  assert boot_md.read_text(encoding="utf-8") == first
+  assert not (tmp_path / SPEC_DRIVER_DIR / "BOOT.md").exists()
 
 
 # --- workflow.toml exec detection tests ---
@@ -670,17 +667,6 @@ class TestInstallHooks:
     }
     assert first_run == second_run
 
-
-# --- Boot template resolution test ---
-
-
-def test_render_boot_md_resolves_agents_path(tmp_path: Path) -> None:
-  """_render_boot_md finds template at agents/boot.md."""
-  initialize_workspace(tmp_path, auto_yes=True)
-  boot_md = tmp_path / SPEC_DRIVER_DIR / "BOOT.md"
-  assert boot_md.exists()
-  content = boot_md.read_text(encoding="utf-8")
-  assert "/boot" in content
 
 
 # --- Memory classification tests ---

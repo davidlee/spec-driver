@@ -30,8 +30,7 @@ SKILL_TARGET_DIRS: dict[str, Path] = {
 ALLOWLIST_FILE = "skills.allowlist"
 MANAGED_AGENTS_FILE = "AGENTS.md"
 AGENTS_MD_REFERENCE = f"@{SPEC_DRIVER_DIR}/{MANAGED_AGENTS_FILE}"
-BOOT_MD_FILE = "BOOT.md"
-BOOT_MD_REFERENCE = f"@{SPEC_DRIVER_DIR}/{BOOT_MD_FILE}"
+BOOT_MD_REFERENCE = f"@{SPEC_DRIVER_DIR}/agents/boot.md"
 
 USAGE_BLOCK = """\
 <usage>
@@ -363,18 +362,6 @@ def _write_agents_md(
   return True
 
 
-def _ensure_boot_md(repo_root: Path) -> None:
-  """Write .spec-driver/BOOT.md if it doesn't exist yet.
-
-  The installer renders this from a template; this is the fallback
-  for when sync_skills runs standalone.
-  """
-  boot_path = repo_root / SPEC_DRIVER_DIR / BOOT_MD_FILE
-  if not boot_path.exists():
-    boot_path.parent.mkdir(parents=True, exist_ok=True)
-    boot_path.write_text("/boot\n", encoding="utf-8")
-
-
 def sync_skills(
   repo_root: Path,
   *,
@@ -414,9 +401,6 @@ def sync_skills(
 
   skills, warn_names = _collect_skills(repo_root, source)
   agents_md_changed = _write_agents_md(repo_root, skills)
-
-  # Ensure .spec-driver/BOOT.md exists (fallback if installer hasn't run)
-  _ensure_boot_md(repo_root)
 
   # Insert @-references in root files per config
   integration = config.get("integration", {})

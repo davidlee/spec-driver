@@ -339,30 +339,6 @@ def copy_directory_if_changed(
       shutil.copy2(src_file, dest_file)
 
 
-def _render_boot_md(target_root: Path, *, dry_run: bool = False) -> None:
-  """Render boot.md template into .spec-driver/BOOT.md.
-
-  Falls back to a minimal default ('/boot') if the template is missing.
-  """
-  dest = target_root / SPEC_DRIVER_DIR / "BOOT.md"
-  try:
-    config = load_workflow_config(target_root)
-    content = render_template(
-      "agents/boot.md",
-      {"config": config},
-      repo_root=target_root,
-    )
-  except TemplateNotFoundError:
-    content = "/boot\n"
-
-  if dry_run:
-    print("\n[DRY RUN] boot instruction:")
-    print(f"  + ./{SPEC_DRIVER_DIR}/BOOT.md")
-  else:
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(content, encoding="utf-8")
-
-
 def _render_agent_docs(
   target_root: Path, package_root: Path, *, dry_run: bool = False
 ) -> None:
@@ -542,7 +518,6 @@ def initialize_workspace(
   _install_hooks(package_root, target_root, dry_run=dry_run)
 
   # Render agent guidance from templates (config-tailored)
-  _render_boot_md(target_root, dry_run=dry_run)
   _render_agent_docs(target_root, package_root, dry_run=dry_run)
 
   # Install/refresh memory packs

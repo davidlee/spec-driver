@@ -15,7 +15,7 @@ tags:
 - agent-guidance
 summary: >-
   How the installer sets up agent guidance, skills, and boot references.
-  Covers file ownership (managed vs authored), the BOOT.md / AGENTS.md
+  Covers file ownership (managed vs authored), the agents/boot.md / AGENTS.md
   reference architecture, and the template-driven rendering pipeline.
 priority:
   severity: high
@@ -52,8 +52,7 @@ provenance:
 | File | Writer | Content |
 |---|---|---|
 | `.spec-driver/AGENTS.md` | `sync_skills` | `<skills_system>` XML block with allowlisted skill metadata |
-| `.spec-driver/BOOT.md` | installer (template) / sync (fallback) | `/boot` — triggers the boot skill |
-| `.spec-driver/agents/*.md` | installer | Jinja2-rendered agent guidance (exec, workflow, glossary, policy) |
+| `.spec-driver/agents/*.md` | installer | Jinja2-rendered agent guidance (boot, exec, workflow, glossary, policy) |
 
 ### Authored (created if missing, never overwritten)
 
@@ -66,13 +65,13 @@ provenance:
 
 Root **AGENTS.md** receives (prepended, idempotent):
 ```
+@.spec-driver/agents/boot.md ← triggers /boot
 @.spec-driver/AGENTS.md      ← skills XML
-@.spec-driver/BOOT.md        ← triggers /boot
 ```
 
 Root **CLAUDE.md** receives (prepended, idempotent):
 ```
-@.spec-driver/BOOT.md        ← triggers /boot (no skills XML)
+@.spec-driver/agents/boot.md ← triggers /boot (no skills XML)
 ```
 
 CLAUDE.md does NOT get the AGENTS.md skills reference — Claude reads
@@ -90,8 +89,9 @@ AGENTS.md natively for skill discovery.
 ## Template Pipeline
 
 Templates live in `supekku/templates/`:
-- `boot.md` → `.spec-driver/BOOT.md`
-- `agents/*.md` → `.spec-driver/agents/*.md` (rendered with workflow config)
+- `agents/*.md` → `.spec-driver/agents/*.md` (rendered with workflow config via Jinja2)
+- `hooks/*` → `.spec-driver/hooks/*` (create-if-missing, never overwritten)
+- Top-level `*.md` → `.spec-driver/templates/*.md` (artifact templates)
 
 Rendering uses Jinja2 via `render_template()` with `{"config": workflow_config}`
 as context. Falls back to static defaults if templates are missing.
@@ -102,12 +102,11 @@ as context. Falls back to static defaults if templates are missing.
 1. Reads `.spec-driver/skills.allowlist`
 2. Installs skill dirs to targets (`.claude/skills/`, `.agents/skills/`)
 3. Writes `.spec-driver/AGENTS.md` (skills XML)
-4. Ensures `.spec-driver/BOOT.md` exists (fallback if installer hasn't run)
-5. Prepends `@`-references to root AGENTS.md and CLAUDE.md per config
+4. Prepends `@`-references to root AGENTS.md and CLAUDE.md per config
 
 ## Boot Flow
 
 1. Agent reads root CLAUDE.md or AGENTS.md
-2. `@.spec-driver/BOOT.md` expands → `/boot`
+2. `@.spec-driver/agents/boot.md` expands → `/boot`
 3. `/boot` triggers the boot skill
-4. Boot skill loads agent guidance from `.spec-driver/agents/*.md`
+4. Boot skill loads agent guidance from `.spec-driver/agents/*.md` and `.spec-driver/hooks/*.md`

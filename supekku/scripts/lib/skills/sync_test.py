@@ -518,27 +518,6 @@ def test_sync_skills_no_allowlist(tmp_path: Path) -> None:
   assert agents_md.exists()
 
 
-# --- BOOT.md creation ---
-
-
-def test_sync_skills_creates_boot_md(tmp_path: Path) -> None:
-  """sync_skills creates .spec-driver/BOOT.md if it doesn't exist."""
-  root, source = _setup_repo(tmp_path)
-  sync_skills(root, skills_source_dir=source)
-  boot_md = root / ".spec-driver" / "BOOT.md"
-  assert boot_md.exists()
-  assert "/boot" in boot_md.read_text(encoding="utf-8")
-
-
-def test_sync_skills_preserves_existing_boot_md(tmp_path: Path) -> None:
-  """sync_skills does not overwrite an existing .spec-driver/BOOT.md."""
-  root, source = _setup_repo(tmp_path)
-  boot_md = root / ".spec-driver" / "BOOT.md"
-  boot_md.write_text("/boot\n\n# Custom instructions\n", encoding="utf-8")
-  sync_skills(root, skills_source_dir=source)
-  assert "Custom instructions" in boot_md.read_text(encoding="utf-8")
-
-
 # --- CLAUDE.md integration ---
 
 

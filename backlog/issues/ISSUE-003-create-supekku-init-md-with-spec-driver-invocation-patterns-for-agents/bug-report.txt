@@ -1,0 +1,83 @@
+ agent report:
+
+---
+ spec-driver sync and complete delta overwrite manually-set requirement statuses
+
+  Summary
+
+  When a requirement's coverage_entries contains any entry with status: deferred, sync (and
+   complete delta, which calls sync internally) automatically downgrades the requirement's
+  status from active to in-progress. This overwrite occurs silently and repeatedly — any
+  manual correction is lost on the next sync/complete invocation.
+
+  Steps to Reproduce
+
+  1. Add coverage entries to a requirement in the PROD spec's verification.coverage block,
+  including one with status: deferred:
+  - artefact: VT-013
+    kind: VT
+    requirement: PROD-001.FR-008
+    status: verified
+  - artefact: VH-001
+    kind: VH
+    requirement: PROD-001.FR-008
+    status: verified
+  - artefact: VH-004
+    kind: VH
+    requirement: PROD-001.FR-008
+    status: deferred
+  2. Set the requirement status to active in the registry (requirements.yaml).
+  3. Run spec-driver sync or spec-driver complete delta DE-XXX.
+  4. Observe: the requirement status in requirements.yaml has been overwritten to
+  in-progress.
+  5. Manually fix it back to active.
+  6. Run sync again — overwritten again.
+
+  Expected Behaviour
+
+  A single deferred coverage entry among otherwise verified entries should not force the
+  requirement status to in-progress. The requirement is implemented and verified by
+  multiple artefacts; the deferred VH is a known gap (in this case, a third-party editor
+  with flaky --wait support), not a signal that implementation is incomplete.
+
+  Possible expectations (any would resolve the issue):
+  - Option A: Treat deferred as neutral — don't count it against the requirement. Derive
+  status from non-deferred entries only.
+  - Option B: Don't auto-derive requirement status from coverage at all. Let the agent/user
+   set it and leave it alone.
+  - Option C: Derive status but allow an explicit override flag (e.g., status_override:
+  active) that sync respects.
+
+  Actual Behaviour
+
+  Sync derives requirement status using a rule like "if any coverage entry is not verified,
+   downgrade to in-progress". This makes deferred functionally equivalent to failing or
+  planned from the status derivation perspective.
+
+  Impact
+
+  - Agent workflow friction: Every sync or delta completion requires a manual post-fix to
+  the registry. Agents that don't know about this will leave requirements in incorrect
+  in-progress state.
+  - Closure ceremony: complete delta calls sync internally, so the overwrite happens as
+  part of the closure flow — exactly when you want statuses to be correct.
+  - Validator contradiction: After sync sets in-progress, spec-driver validate warns that
+  the requirement has coverage evidence but an unexpected status, recommending it be set to
+   active — the opposite of what sync just did.
+
+  Workaround
+
+  Set the requirement status back to active after each sync/complete call. Alternatively,
+  omit the deferred VH from coverage_entries entirely and document it only in prose (notes
+  field or the spec's verification block).
+
+  Environment
+
+  spec-driver invoked via spec-driver (Python/uv). Observed during DE-003 closure on
+  2026-03-05.
+
+❯ were you using the skill 'close-change'?
+
+● Yes. I invoked it and followed its process (pre-check → dry-run → complete → post-check).
+   The sync-overwrite issue hit during step 3 (complete delta), then again when I manually
+  fixed the status and re-ran sync during post-checks.

@@ -100,3 +100,21 @@ of broad `(FileNotFoundError, ValueError, KeyError)`. This is intentional —
 so the broad catch was masking unrelated errors.
 
 **Verification**: All 18 regression tests pass. `just check` green (2384 passed, pylint 9.59/10).
+
+## Phase 2, tasks 2.1–2.6, 2.8–2.10 (2026-03-04)
+
+**Done** (by previous agent, verified and lint-fixed by current agent):
+
+- **2.1**: `find_backlog_items_by_id()` in `backlog/registry.py` — targeted path search with optional kind filter. 8 tests.
+- **2.2**: Plan resolver (`_resolve_plan`) + finder (`_find_plans`) in `common.py` — normalizes `41` → `IP-041`, scans delta dirs. 7 tests.
+- **2.3**: Backlog resolvers + finders for all 4 types (issue/problem/improvement/risk) in dispatch tables. 8 tests.
+- **2.4**: Unit tests for all new resolvers/finders in `common_test.py`.
+- **2.5**: `format_audit_details()` and `format_plan_details()` in `change_formatters.py`. Follow existing formatter patterns.
+- **2.6**: Formatter tests — 4 audit + 3 plan test cases in `change_formatters_test.py`.
+- **2.8**: 6 new show subcommands (plan, audit, issue, problem, improvement, risk) in `show.py`.
+- **2.9**: 6 new view + 6 new edit subcommands in `view.py`/`edit.py`.
+- **2.10**: 7 new find subcommands (plan, audit, requirement, issue, problem, improvement, risk) in `find.py`.
+
+**Lint fixes**: Previous agent left 3 line-too-long errors in test helpers (f-string frontmatter). Extracted `kind` variable and split strings.
+
+**Verification**: `just check` green (2423 passed, pylint 9.58/10).

@@ -231,6 +231,122 @@ def find_memory(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("plan")
+def find_plan(
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., IP-*, 041)")],
+  root: RootOption = None,
+) -> None:
+  """Find implementation plans matching ID pattern.
+
+  Supports fnmatch patterns: * matches everything, ? matches single char.
+  Also accepts numeric-only IDs (e.g., 041 -> IP-041).
+  """
+  try:
+    for ref in find_artifacts("plan", pattern, root):
+      typer.echo(ref.path)
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("audit")
+def find_audit(
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., AUD-*, 001)")],
+  root: RootOption = None,
+) -> None:
+  """Find audits matching ID pattern.
+
+  Supports fnmatch patterns: * matches everything, ? matches single char.
+  """
+  try:
+    for ref in find_artifacts("audit", pattern, root):
+      typer.echo(ref.path)
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("requirement")
+def find_requirement(
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., SPEC-009.FR-*)")],
+  root: RootOption = None,
+) -> None:
+  """Find requirements matching ID pattern.
+
+  Supports fnmatch patterns. Accepts colon-separated IDs (normalized to dot).
+  Examples: SPEC-009.FR-*, SPEC-009:FR-001
+  """
+  try:
+    for ref in find_artifacts("requirement", pattern, root):
+      typer.echo(ref.path)
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("issue")
+def find_issue(
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., ISSUE-*, ISSUE-001)")],
+  root: RootOption = None,
+) -> None:
+  """Find issues matching ID pattern."""
+  try:
+    for ref in find_artifacts("issue", pattern, root):
+      typer.echo(ref.path)
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("problem")
+def find_problem(
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., PROB-*, PROB-001)")],
+  root: RootOption = None,
+) -> None:
+  """Find problems matching ID pattern."""
+  try:
+    for ref in find_artifacts("problem", pattern, root):
+      typer.echo(ref.path)
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("improvement")
+def find_improvement(
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., IMPR-*, IMPR-001)")],
+  root: RootOption = None,
+) -> None:
+  """Find improvements matching ID pattern."""
+  try:
+    for ref in find_artifacts("improvement", pattern, root):
+      typer.echo(ref.path)
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("risk")
+def find_risk(
+  pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., RISK-*, RISK-001)")],
+  root: RootOption = None,
+) -> None:
+  """Find risks matching ID pattern."""
+  try:
+    for ref in find_artifacts("risk", pattern, root):
+      typer.echo(ref.path)
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 # For direct testing
 if __name__ == "__main__":  # pragma: no cover
   app()

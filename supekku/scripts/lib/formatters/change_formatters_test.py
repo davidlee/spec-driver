@@ -7,10 +7,12 @@ from pathlib import Path
 
 from supekku.scripts.lib.changes.artifacts import ChangeArtifact
 from supekku.scripts.lib.formatters.change_formatters import (
+  format_audit_details,
   format_change_list_item,
   format_change_with_context,
   format_delta_details,
   format_phase_summary,
+  format_plan_details,
   format_revision_details,
 )
 
@@ -644,6 +646,75 @@ class TestFormatDeltaPhasesVTPHASE003(unittest.TestCase):
     assert "PHASE-01" in result
     # Verify objective appears
     assert "Initial setup and configuration" in result
+
+
+class FormatAuditDetailsTest(unittest.TestCase):
+  """Tests for format_audit_details (VT-format-audit)."""
+
+  def _make_audit(self, **overrides: object) -> ChangeArtifact:
+    defaults: dict[str, object] = {
+      "id": "AUD-001",
+      "kind": "audit",
+      "status": "draft",
+      "name": "Audit - test audit",
+      "slug": "test-audit",
+      "path": Path("change/audits/AUD-001.md"),
+      "updated": "2026-03-04",
+      "applies_to": {},
+      "relations": [],
+    }
+    defaults.update(overrides)
+    return ChangeArtifact(**defaults)
+
+  def test_basic_fields(self) -> None:
+    result = format_audit_details(self._make_audit())
+    assert "Audit: AUD-001" in result
+    assert "Name: Audit - test audit" in result
+    assert "Status: draft" in result
+    assert "Kind: audit" in result
+
+  def test_with_root_shows_relative_path(self) -> None:
+    root = Path("/repo")
+    audit = self._make_audit(path=root / "change" / "audits" / "AUD-001.md")
+    result = format_audit_details(audit, root=root)
+    assert "change/audits/AUD-001.md" in result
+
+  def test_with_relations(self) -> None:
+    audit = self._make_audit(
+      relations=[{"kind": "audits", "target": "DE-041"}],
+    )
+    result = format_audit_details(audit)
+    assert "audits: DE-041" in result
+
+  def test_with_applies_to(self) -> None:
+    audit = self._make_audit(
+      applies_to={"specs": ["SPEC-009"], "requirements": []},
+    )
+    result = format_audit_details(audit)
+    assert "SPEC-009" in result
+
+
+class FormatPlanDetailsTest(unittest.TestCase):
+  """Tests for format_plan_details (VT-format-plan)."""
+
+  def test_basic_fields(self) -> None:
+    data = {"id": "IP-041", "name": "Test Plan", "status": "draft", "kind": "plan"}
+    result = format_plan_details(data)
+    assert "Plan: IP-041" in result
+    assert "Name: Test Plan" in result
+    assert "Status: draft" in result
+
+  def test_with_path_and_root(self) -> None:
+    root = Path("/repo")
+    path = root / "change" / "deltas" / "DE-041" / "IP-041.md"
+    data = {"id": "IP-041", "name": "P", "status": "draft"}
+    result = format_plan_details(data, root=root, path=path)
+    assert "change/deltas/DE-041/IP-041.md" in result
+
+  def test_missing_fields_use_defaults(self) -> None:
+    result = format_plan_details({})
+    assert "Plan: unknown" in result
+    assert "Status: " in result
 
 
 if __name__ == "__main__":

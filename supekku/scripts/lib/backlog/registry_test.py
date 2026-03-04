@@ -12,6 +12,7 @@ import yaml
 from supekku.scripts.lib.backlog.registry import (
   append_backlog_summary,
   create_backlog_entry,
+  find_backlog_items_by_id,
   find_repo_root,
   load_backlog_registry,
   save_backlog_registry,
@@ -229,6 +230,91 @@ class BacklogLibraryTest(unittest.TestCase):
     ordering = load_backlog_registry(root)
     # ISSUE-001 preserved, ISSUE-002 removed, new items appended sorted
     assert ordering == ["ISSUE-001", "IMPR-001", "ISSUE-003"]
+
+
+class FindBacklogItemsByIdTest(unittest.TestCase):
+  """Tests for find_backlog_items_by_id (VT-backlog-find)."""
+
+  def _make_repo(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    return root
+
+  def _create_item(self, root: Path, subdir: str, item_id: str, slug: str) -> Path:
+    """Create a minimal backlog item at the expected path."""
+    entry_dir = root / "backlog" / subdir / f"{item_id}-{slug}"
+    entry_dir.mkdir(parents=True, exist_ok=True)
+    md_file = entry_dir / f"{item_id}.md"
+    kind = subdir.rstrip("s")
+    fm = (
+      f"---\nid: {item_id}\nname: {slug}\nkind: {kind}\nstatus: open\n---\n# {slug}\n"
+    )
+    md_file.write_text(fm, encoding="utf-8")
+    return md_file
+
+  def test_finds_issue_by_id(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test-issue")
+    items = find_backlog_items_by_id("ISSUE-001", root)
+    assert len(items) == 1
+    assert items[0].id == "ISSUE-001"
+    assert items[0].kind == "issue"
+
+  def test_finds_improvement_by_id(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "improvements", "IMPR-001", "test-improvement")
+    items = find_backlog_items_by_id("IMPR-001", root)
+    assert len(items) == 1
+    assert items[0].id == "IMPR-001"
+
+  def test_finds_risk_by_id(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "risks", "RISK-001", "test-risk")
+    items = find_backlog_items_by_id("RISK-001", root)
+    assert len(items) == 1
+    assert items[0].id == "RISK-001"
+
+  def test_finds_problem_by_id(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "problems", "PROB-001", "test-problem")
+    items = find_backlog_items_by_id("PROB-001", root)
+    assert len(items) == 1
+    assert items[0].id == "PROB-001"
+
+  def test_returns_empty_for_missing_id(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test")
+    items = find_backlog_items_by_id("ISSUE-999", root)
+    assert items == []
+
+  def test_returns_empty_for_no_backlog_dir(self) -> None:
+    root = self._make_repo()
+    items = find_backlog_items_by_id("ISSUE-001", root)
+    assert items == []
+
+  def test_kind_filter_narrows_search(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test")
+    items = find_backlog_items_by_id("ISSUE-001", root, kind="problem")
+    assert items == []
+    items = find_backlog_items_by_id("ISSUE-001", root, kind="issue")
+    assert len(items) == 1
+
+  def test_invalid_kind_returns_empty(self) -> None:
+    root = self._make_repo()
+    items = find_backlog_items_by_id("ISSUE-001", root, kind="nonsense")
+    assert items == []
+
+  def test_duplicate_ids_returns_multiple(self) -> None:
+    """Duplicate IDs across subdirs (or within) return all matches."""
+    root = self._make_repo()
+    # Same ID in two different slug dirs (simulating data quality issue)
+    self._create_item(root, "issues", "ISSUE-001", "first")
+    self._create_item(root, "issues", "ISSUE-001", "second")
+    items = find_backlog_items_by_id("ISSUE-001", root)
+    assert len(items) == 2
 
 
 if __name__ == "__main__":

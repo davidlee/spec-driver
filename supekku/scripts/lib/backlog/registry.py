@@ -418,10 +418,84 @@ def discover_backlog_items(
   return sorted(items, key=lambda x: x.id)
 
 
+def find_backlog_items_by_id(
+  item_id: str,
+  root: Path,
+  kind: str | None = None,
+) -> list[BacklogItem]:
+  """Find backlog items by ID using targeted path search.
+
+  Exploits directory naming convention: backlog/{subdir}/{ID}-*/{ID}.md
+  Returns all matches (may be >1 if duplicate IDs exist across subdirs).
+
+  Args:
+    item_id: Backlog item ID (e.g. 'ISSUE-001', 'IMPR-003').
+    root: Repository root path.
+    kind: Optional kind filter ('issue', 'problem', 'improvement', 'risk').
+      If None, searches all subdirs.
+
+  Returns:
+    List of matching BacklogItem objects, sorted by ID.
+  """
+  backlog_dir = backlog_root(root)
+  if not backlog_dir.exists():
+    return []
+
+  if kind:
+    template = TEMPLATES.get(kind)
+    if not template:
+      return []
+    search_dirs = [backlog_dir / template.subdir]
+  else:
+    search_dirs = [backlog_dir / t.subdir for t in TEMPLATES.values()]
+
+  items: list[BacklogItem] = []
+  for search_dir in search_dirs:
+    if not search_dir.exists():
+      continue
+    # Pattern: {ID}-*/{ID}.md
+    for entry_dir in search_dir.glob(f"{item_id}-*"):
+      if not entry_dir.is_dir():
+        continue
+      md_file = entry_dir / f"{item_id}.md"
+      if not md_file.exists():
+        continue
+      try:
+        frontmatter, _ = load_markdown_file(md_file)
+      except Exception:  # noqa: BLE001
+        continue
+
+      kind_dir = search_dir.name
+      item_kind = str(frontmatter.get("kind", "")).lower() or kind_dir.rstrip("s")
+      status = str(frontmatter.get("status", "")).lower() or "unknown"
+      title = str(frontmatter.get("name", "")).strip() or extract_title(md_file)
+
+      items.append(
+        BacklogItem(
+          id=item_id,
+          kind=item_kind,
+          status=status,
+          title=title,
+          path=md_file,
+          frontmatter=dict(frontmatter),
+          tags=list(frontmatter.get("tags", [])),
+          severity=str(frontmatter.get("severity", "")),
+          categories=list(frontmatter.get("categories", [])),
+          impact=str(frontmatter.get("impact", "")),
+          likelihood=float(frontmatter.get("likelihood", 0.0)),
+          created=str(frontmatter.get("created", "")),
+          updated=str(frontmatter.get("updated", "")),
+        )
+      )
+
+  return sorted(items, key=lambda x: str(x.path))
+
+
 __all__ = [
   "append_backlog_summary",
   "create_backlog_entry",
   "discover_backlog_items",
+  "find_backlog_items_by_id",
   "find_repo_root",
   "load_backlog_registry",
   "save_backlog_registry",

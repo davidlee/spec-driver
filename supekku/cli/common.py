@@ -421,6 +421,50 @@ def _resolve_memory(root: Path, raw_id: str) -> ArtifactRef:
   return ArtifactRef(id=raw_id, path=Path(record.path), record=record)
 
 
+# Plan ID prefix for normalization
+ARTIFACT_PREFIXES_PLAN = "IP-"
+
+
+def _normalize_plan_id(raw_id: str) -> str:
+  """Normalize plan ID: '41' -> 'IP-041', 'IP-041' -> 'IP-041'."""
+  if raw_id.upper().startswith(ARTIFACT_PREFIXES_PLAN):
+    return raw_id.upper()
+  if raw_id.isdigit():
+    return f"{ARTIFACT_PREFIXES_PLAN}{int(raw_id):03d}"
+  return raw_id
+
+
+def _resolve_plan(root: Path, raw_id: str) -> ArtifactRef:
+  from supekku.scripts.lib.core.spec_utils import load_markdown_file  # noqa: PLC0415
+
+  normalized = _normalize_plan_id(raw_id)
+  deltas_dir = root / "change" / "deltas"
+  if not deltas_dir.exists():
+    raise ArtifactNotFoundError("plan", normalized)
+  for delta_dir in deltas_dir.iterdir():
+    if not delta_dir.is_dir():
+      continue
+    plan_file = delta_dir / f"{normalized}.md"
+    if plan_file.exists():
+      frontmatter, _ = load_markdown_file(plan_file)
+      return ArtifactRef(id=normalized, path=plan_file, record=frontmatter)
+  raise ArtifactNotFoundError("plan", normalized)
+
+
+def _resolve_backlog(root: Path, raw_id: str, kind: str) -> ArtifactRef:
+  from supekku.scripts.lib.backlog.registry import (  # noqa: PLC0415
+    find_backlog_items_by_id,
+  )
+
+  matches = find_backlog_items_by_id(raw_id, root, kind=kind)
+  if not matches:
+    raise ArtifactNotFoundError(kind, raw_id)
+  if len(matches) > 1:
+    raise AmbiguousArtifactError(kind, raw_id, [m.path for m in matches])
+  item = matches[0]
+  return ArtifactRef(id=item.id, path=item.path, record=item)
+
+
 # Dispatch table: artifact_type -> resolver(root, raw_id) -> ArtifactRef
 _ARTIFACT_RESOLVERS: dict[str, Any] = {
   "spec": _resolve_spec,
@@ -433,6 +477,11 @@ _ARTIFACT_RESOLVERS: dict[str, Any] = {
   "requirement": _resolve_requirement,
   "card": _resolve_card,
   "memory": _resolve_memory,
+  "plan": _resolve_plan,
+  "issue": lambda root, raw_id: _resolve_backlog(root, raw_id, "issue"),
+  "problem": lambda root, raw_id: _resolve_backlog(root, raw_id, "problem"),
+  "improvement": lambda root, raw_id: _resolve_backlog(root, raw_id, "improvement"),
+  "risk": lambda root, raw_id: _resolve_backlog(root, raw_id, "risk"),
 }
 
 
@@ -600,6 +649,37 @@ def _find_requirements(root: Path, pattern: str) -> Iterator[ArtifactRef]:
       yield ArtifactRef(id=uid, path=req_path, record=record)
 
 
+def _find_plans(root: Path, pattern: str) -> Iterator[ArtifactRef]:
+  from supekku.scripts.lib.core.spec_utils import load_markdown_file  # noqa: PLC0415
+
+  normalized = _normalize_plan_id(pattern)
+  deltas_dir = root / "change" / "deltas"
+  if not deltas_dir.exists():
+    return
+  for delta_dir in sorted(deltas_dir.iterdir()):
+    if not delta_dir.is_dir():
+      continue
+    for plan_file in sorted(delta_dir.glob("IP-*.md")):
+      plan_id = plan_file.stem
+      if _matches_pattern(plan_id, normalized):
+        try:
+          frontmatter, _ = load_markdown_file(plan_file)
+        except Exception:  # noqa: BLE001
+          continue
+        yield ArtifactRef(id=plan_id, path=plan_file, record=frontmatter)
+
+
+def _find_backlog(root: Path, pattern: str, kind: str) -> Iterator[ArtifactRef]:
+  from supekku.scripts.lib.backlog.registry import (  # noqa: PLC0415
+    discover_backlog_items,
+  )
+
+  items = discover_backlog_items(root=root, kind=kind)
+  for item in items:
+    if _matches_pattern(item.id, pattern):
+      yield ArtifactRef(id=item.id, path=item.path, record=item)
+
+
 # Dispatch table for find: artifact_type -> finder(root, pattern) -> Iterator
 _ARTIFACT_FINDERS: dict[str, Any] = {
   "spec": _find_specs,
@@ -612,6 +692,11 @@ _ARTIFACT_FINDERS: dict[str, Any] = {
   "requirement": _find_requirements,
   "card": _find_cards,
   "memory": _find_memories,
+  "plan": _find_plans,
+  "issue": lambda root, pat: _find_backlog(root, pat, "issue"),
+  "problem": lambda root, pat: _find_backlog(root, pat, "problem"),
+  "improvement": lambda root, pat: _find_backlog(root, pat, "improvement"),
+  "risk": lambda root, pat: _find_backlog(root, pat, "risk"),
 }
 
 

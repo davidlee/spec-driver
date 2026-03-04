@@ -246,6 +246,129 @@ def view_card(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("plan")
+def view_plan(
+  plan_id: Annotated[str, typer.Argument(help="Plan ID (e.g., IP-041, 041)")],
+  root: RootOption = None,
+) -> None:
+  """View implementation plan in pager."""
+  try:
+    ref = resolve_artifact("plan", plan_id, root)
+    open_in_pager(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("audit")
+def view_audit(
+  audit_id: Annotated[str, typer.Argument(help="Audit ID (e.g., AUD-001, 001)")],
+  root: RootOption = None,
+) -> None:
+  """View audit in pager."""
+  try:
+    ref = resolve_artifact("audit", audit_id, root)
+    open_in_pager(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("memory")
+def view_memory(
+  memory_id: Annotated[
+    str, typer.Argument(help="Memory ID (e.g., mem.pattern.cli.skinny)")
+  ],
+  root: RootOption = None,
+) -> None:
+  """View memory record in pager."""
+  try:
+    ref = resolve_artifact("memory", memory_id, root)
+    open_in_pager(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("issue")
+def view_issue(
+  issue_id: Annotated[str, typer.Argument(help="Issue ID (e.g., ISSUE-001)")],
+  root: RootOption = None,
+) -> None:
+  """View issue in pager."""
+  try:
+    ref = resolve_artifact("issue", issue_id, root)
+    open_in_pager(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("problem")
+def view_problem(
+  problem_id: Annotated[str, typer.Argument(help="Problem ID (e.g., PROB-001)")],
+  root: RootOption = None,
+) -> None:
+  """View problem in pager."""
+  try:
+    ref = resolve_artifact("problem", problem_id, root)
+    open_in_pager(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("improvement")
+def view_improvement(
+  improvement_id: Annotated[
+    str, typer.Argument(help="Improvement ID (e.g., IMPR-001)")
+  ],
+  root: RootOption = None,
+) -> None:
+  """View improvement in pager."""
+  try:
+    ref = resolve_artifact("improvement", improvement_id, root)
+    open_in_pager(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("risk")
+def view_risk(
+  risk_id: Annotated[str, typer.Argument(help="Risk ID (e.g., RISK-001)")],
+  root: RootOption = None,
+) -> None:
+  """View risk in pager."""
+  try:
+    ref = resolve_artifact("risk", risk_id, root)
+    open_in_pager(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 # For direct testing
 if __name__ == "__main__":  # pragma: no cover
   app()

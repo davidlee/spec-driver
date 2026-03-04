@@ -7,12 +7,12 @@ You are executing one phase of planned work.
 Inputs:
 - Active phase sheet (`IP-XXX.PHASE-XX`)
 - `IP-XXX.md`
-- `DR-XXX.md` (when present)
+- `DR-XXX.md` (when present, canonical design reference)
 - `DE-XXX.md`
 
 Process:
 1. Confirm entry criteria are met for the active phase.
-2. Read DR + IP + phase sheet before coding.
+2. Read DR + IP + phase sheet before coding. `/preflight`
 3. Implement phase tasks (code/tests/docs) in small coherent units.
 4. After each meaningful unit, run `/notes`.
 5. If you encounter unexpected obstacles/tradeoffs/policy ambiguity, stop and `/consult`.

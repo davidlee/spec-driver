@@ -246,6 +246,129 @@ def edit_card(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("plan")
+def edit_plan(
+  plan_id: Annotated[str, typer.Argument(help="Plan ID (e.g., IP-041, 041)")],
+  root: RootOption = None,
+) -> None:
+  """Edit implementation plan in editor."""
+  try:
+    ref = resolve_artifact("plan", plan_id, root)
+    open_in_editor(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("audit")
+def edit_audit(
+  audit_id: Annotated[str, typer.Argument(help="Audit ID (e.g., AUD-001, 001)")],
+  root: RootOption = None,
+) -> None:
+  """Edit audit in editor."""
+  try:
+    ref = resolve_artifact("audit", audit_id, root)
+    open_in_editor(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("memory")
+def edit_memory(
+  memory_id: Annotated[
+    str, typer.Argument(help="Memory ID (e.g., mem.pattern.cli.skinny)")
+  ],
+  root: RootOption = None,
+) -> None:
+  """Edit memory record in editor."""
+  try:
+    ref = resolve_artifact("memory", memory_id, root)
+    open_in_editor(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("issue")
+def edit_issue(
+  issue_id: Annotated[str, typer.Argument(help="Issue ID (e.g., ISSUE-001)")],
+  root: RootOption = None,
+) -> None:
+  """Edit issue in editor."""
+  try:
+    ref = resolve_artifact("issue", issue_id, root)
+    open_in_editor(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("problem")
+def edit_problem(
+  problem_id: Annotated[str, typer.Argument(help="Problem ID (e.g., PROB-001)")],
+  root: RootOption = None,
+) -> None:
+  """Edit problem in editor."""
+  try:
+    ref = resolve_artifact("problem", problem_id, root)
+    open_in_editor(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("improvement")
+def edit_improvement(
+  improvement_id: Annotated[
+    str, typer.Argument(help="Improvement ID (e.g., IMPR-001)")
+  ],
+  root: RootOption = None,
+) -> None:
+  """Edit improvement in editor."""
+  try:
+    ref = resolve_artifact("improvement", improvement_id, root)
+    open_in_editor(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("risk")
+def edit_risk(
+  risk_id: Annotated[str, typer.Argument(help="Risk ID (e.g., RISK-001)")],
+  root: RootOption = None,
+) -> None:
+  """Edit risk in editor."""
+  try:
+    ref = resolve_artifact("risk", risk_id, root)
+    open_in_editor(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 # For direct testing
 if __name__ == "__main__":  # pragma: no cover
   app()

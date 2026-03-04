@@ -24,8 +24,10 @@ from supekku.scripts.lib.core.templates import TemplateNotFoundError, render_tem
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.card_formatters import format_card_details
 from supekku.scripts.lib.formatters.change_formatters import (
+  format_audit_details,
   format_delta_details,
   format_delta_details_json,
+  format_plan_details,
   format_revision_details,
 )
 from supekku.scripts.lib.formatters.decision_formatters import format_decision_details
@@ -495,6 +497,172 @@ def show_memory(
 
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("plan")
+def show_plan(
+  plan_id: Annotated[str, typer.Argument(help="Plan ID (e.g., IP-041, 041)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about an implementation plan."""
+  try:
+    ref = resolve_artifact("plan", plan_id, root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      format_fn=lambda r: format_plan_details(r, root=root, path=ref.path),
+      json_fn=lambda r: json.dumps(r, indent=2),
+    )
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("audit")
+def show_audit(
+  audit_id: Annotated[str, typer.Argument(help="Audit ID (e.g., AUD-001, 001)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about an audit."""
+  try:
+    ref = resolve_artifact("audit", audit_id, root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      format_fn=lambda r: format_audit_details(r, root=root),
+      json_fn=lambda r: json.dumps(r.to_dict(root), indent=2),
+    )
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("issue")
+def show_issue(
+  issue_id: Annotated[str, typer.Argument(help="Issue ID (e.g., ISSUE-001)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about an issue."""
+  try:
+    ref = resolve_artifact("issue", issue_id, root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      format_fn=lambda r: (
+        f"Issue: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
+      ),
+      json_fn=lambda r: json.dumps(r.frontmatter, indent=2, default=str),
+    )
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("problem")
+def show_problem(
+  problem_id: Annotated[str, typer.Argument(help="Problem ID (e.g., PROB-001)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about a problem."""
+  try:
+    ref = resolve_artifact("problem", problem_id, root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      format_fn=lambda r: (
+        f"Problem: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
+      ),
+      json_fn=lambda r: json.dumps(r.frontmatter, indent=2, default=str),
+    )
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("improvement")
+def show_improvement(
+  improvement_id: Annotated[
+    str, typer.Argument(help="Improvement ID (e.g., IMPR-001)")
+  ],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about an improvement."""
+  try:
+    ref = resolve_artifact("improvement", improvement_id, root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      format_fn=lambda r: (
+        f"Improvement: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
+      ),
+      json_fn=lambda r: json.dumps(r.frontmatter, indent=2, default=str),
+    )
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("risk")
+def show_risk(
+  risk_id: Annotated[str, typer.Argument(help="Risk ID (e.g., RISK-001)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about a risk."""
+  try:
+    ref = resolve_artifact("risk", risk_id, root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      format_fn=lambda r: (
+        f"Risk: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
+      ),
+      json_fn=lambda r: json.dumps(r.frontmatter, indent=2, default=str),
+    )
+  except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 

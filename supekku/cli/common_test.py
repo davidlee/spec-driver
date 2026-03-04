@@ -327,12 +327,93 @@ class TestResolveArtifactDispatchCoverage:
       "requirement",
       "card",
       "memory",
+      "plan",
+      "issue",
+      "problem",
+      "improvement",
+      "risk",
     ],
   )
   def test_known_type_does_not_raise_value_error(self, artifact_type: str) -> None:
     """Every registered type should dispatch (may raise NotFound, not ValueError)."""
     with pytest.raises((ArtifactNotFoundError, FileNotFoundError, Exception)):
       resolve_artifact(artifact_type, "NONEXISTENT-999", Path("/tmp/no-repo"))
+
+
+class TestResolveArtifactPlan:
+  """Tests for plan resolver (VT-plan-resolve)."""
+
+  def test_resolves_plan_by_full_id(self, tmp_path: Path) -> None:
+    delta_dir = tmp_path / "change" / "deltas" / "DE-041-slug"
+    delta_dir.mkdir(parents=True)
+    plan_file = delta_dir / "IP-041.md"
+    plan_file.write_text(
+      "---\nid: IP-041\nname: Test Plan\nstatus: draft\nkind: plan\n---\n",
+    )
+    ref = resolve_artifact("plan", "IP-041", tmp_path)
+    assert ref.id == "IP-041"
+    assert ref.path == plan_file
+    assert ref.record["id"] == "IP-041"
+
+  def test_resolves_plan_by_numeric_shorthand(self, tmp_path: Path) -> None:
+    delta_dir = tmp_path / "change" / "deltas" / "DE-041-slug"
+    delta_dir.mkdir(parents=True)
+    (delta_dir / "IP-041.md").write_text(
+      "---\nid: IP-041\nname: P\nstatus: draft\nkind: plan\n---\n",
+    )
+    ref = resolve_artifact("plan", "41", tmp_path)
+    assert ref.id == "IP-041"
+
+  def test_raises_not_found_for_missing_plan(self, tmp_path: Path) -> None:
+    (tmp_path / "change" / "deltas").mkdir(parents=True)
+    with pytest.raises(ArtifactNotFoundError):
+      resolve_artifact("plan", "IP-999", tmp_path)
+
+  def test_raises_not_found_when_no_deltas_dir(self, tmp_path: Path) -> None:
+    with pytest.raises(ArtifactNotFoundError):
+      resolve_artifact("plan", "IP-041", tmp_path)
+
+
+class TestResolveArtifactBacklog:
+  """Tests for backlog resolvers (issue, problem, improvement, risk)."""
+
+  def _create_backlog_item(
+    self, root: Path, subdir: str, item_id: str, slug: str
+  ) -> Path:
+    entry_dir = root / "backlog" / subdir / f"{item_id}-{slug}"
+    entry_dir.mkdir(parents=True, exist_ok=True)
+    md = entry_dir / f"{item_id}.md"
+    kind = subdir.rstrip("s")
+    fm = f"---\nid: {item_id}\nname: {slug}\nkind: {kind}\nstatus: open\n---\n"
+    md.write_text(fm)
+    return md
+
+  @pytest.mark.parametrize(
+    ("artifact_type", "subdir", "item_id"),
+    [
+      ("issue", "issues", "ISSUE-001"),
+      ("problem", "problems", "PROB-001"),
+      ("improvement", "improvements", "IMPR-001"),
+      ("risk", "risks", "RISK-001"),
+    ],
+  )
+  def test_resolves_backlog_item(
+    self, tmp_path: Path, artifact_type: str, subdir: str, item_id: str
+  ) -> None:
+    md = self._create_backlog_item(tmp_path, subdir, item_id, "test")
+    ref = resolve_artifact(artifact_type, item_id, tmp_path)
+    assert ref.id == item_id
+    assert ref.path == md
+
+  def test_raises_not_found_for_missing_backlog(self, tmp_path: Path) -> None:
+    with pytest.raises(ArtifactNotFoundError):
+      resolve_artifact("issue", "ISSUE-999", tmp_path)
+
+  def test_raises_ambiguous_for_duplicates(self, tmp_path: Path) -> None:
+    self._create_backlog_item(tmp_path, "issues", "ISSUE-001", "first")
+    self._create_backlog_item(tmp_path, "issues", "ISSUE-001", "second")
+    with pytest.raises(AmbiguousArtifactError):
+      resolve_artifact("issue", "ISSUE-001", tmp_path)
 
 
 class TestResolveArtifactUnsupportedType:
@@ -607,6 +688,74 @@ class TestFindArtifactsRequirement:
 
     refs = list(find_artifacts("requirement", "SPEC-009:FR-*", Path("/repo")))
     assert len(refs) == 1
+
+
+class TestFindArtifactsPlan:
+  """find_artifacts for plan type scans delta dirs."""
+
+  def test_finds_matching_plans(self, tmp_path: Path) -> None:
+    d1 = tmp_path / "change" / "deltas" / "DE-041-slug"
+    d1.mkdir(parents=True)
+    (d1 / "IP-041.md").write_text(
+      "---\nid: IP-041\nname: P1\nstatus: draft\nkind: plan\n---\n",
+    )
+    d2 = tmp_path / "change" / "deltas" / "DE-042-other"
+    d2.mkdir(parents=True)
+    (d2 / "IP-042.md").write_text(
+      "---\nid: IP-042\nname: P2\nstatus: draft\nkind: plan\n---\n",
+    )
+
+    refs = list(find_artifacts("plan", "IP-04*", tmp_path))
+    ids = {r.id for r in refs}
+    assert "IP-041" in ids
+    assert "IP-042" in ids
+
+  def test_numeric_shorthand_pattern(self, tmp_path: Path) -> None:
+    d = tmp_path / "change" / "deltas" / "DE-041-slug"
+    d.mkdir(parents=True)
+    (d / "IP-041.md").write_text(
+      "---\nid: IP-041\nstatus: draft\nkind: plan\n---\n",
+    )
+    refs = list(find_artifacts("plan", "41", tmp_path))
+    assert len(refs) == 1
+
+  def test_no_deltas_dir(self, tmp_path: Path) -> None:
+    refs = list(find_artifacts("plan", "IP-*", tmp_path))
+    assert refs == []
+
+
+class TestFindArtifactsBacklog:
+  """find_artifacts for backlog types uses discover_backlog_items."""
+
+  def _create_item(self, root: Path, subdir: str, item_id: str) -> None:
+    entry_dir = root / "backlog" / subdir / f"{item_id}-test"
+    entry_dir.mkdir(parents=True, exist_ok=True)
+    kind = subdir.rstrip("s")
+    fm = f"---\nid: {item_id}\nname: test\nkind: {kind}\nstatus: open\n---\n"
+    (entry_dir / f"{item_id}.md").write_text(fm)
+
+  @pytest.mark.parametrize(
+    ("artifact_type", "subdir", "item_id"),
+    [
+      ("issue", "issues", "ISSUE-001"),
+      ("problem", "problems", "PROB-001"),
+      ("improvement", "improvements", "IMPR-001"),
+      ("risk", "risks", "RISK-001"),
+    ],
+  )
+  def test_finds_backlog_items(
+    self, tmp_path: Path, artifact_type: str, subdir: str, item_id: str
+  ) -> None:
+    (tmp_path / ".git").mkdir()
+    self._create_item(tmp_path, subdir, item_id)
+    refs = list(find_artifacts(artifact_type, f"{item_id[:4]}*", tmp_path))
+    assert len(refs) >= 1
+    assert any(r.id == item_id for r in refs)
+
+  def test_no_matches(self, tmp_path: Path) -> None:
+    (tmp_path / ".git").mkdir()
+    refs = list(find_artifacts("issue", "ISSUE-999", tmp_path))
+    assert refs == []
 
 
 class TestFindArtifactsUnsupportedType:

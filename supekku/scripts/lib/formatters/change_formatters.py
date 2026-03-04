@@ -576,6 +576,70 @@ def format_revision_details(
   return "\n".join(lines)
 
 
+def _format_audit_basic_fields(artifact: ChangeArtifact) -> list[str]:
+  """Format basic audit artifact fields."""
+  return [
+    f"Audit: {artifact.id}",
+    f"Name: {artifact.name}",
+    f"Status: {artifact.status}",
+    f"Kind: {artifact.kind}",
+  ]
+
+
+def format_audit_details(
+  artifact: ChangeArtifact,
+  root: Path | None = None,
+) -> str:
+  """Format audit details as multi-line string for display.
+
+  Args:
+    artifact: ChangeArtifact to format (must be kind='audit')
+    root: Repository root for relative path calculation (optional)
+
+  Returns:
+    Formatted string with all audit details
+  """
+  sections = [
+    _format_audit_basic_fields(artifact),
+    _format_affects(artifact),
+    _format_relations(artifact),
+    _format_file_path_for_change(artifact, root),
+  ]
+
+  lines = [line for section in sections for line in section]
+  return "\n".join(lines)
+
+
+def format_plan_details(
+  plan_data: dict,
+  root: Path | None = None,
+  path: Path | None = None,
+) -> str:
+  """Format plan details as multi-line string for display.
+
+  Args:
+    plan_data: Plan frontmatter dictionary.
+    root: Repository root for relative path calculation (optional).
+    path: Plan file path (optional).
+
+  Returns:
+    Formatted string with plan details.
+  """
+  lines = [
+    f"Plan: {plan_data.get('id', 'unknown')}",
+    f"Name: {plan_data.get('name', '')}",
+    f"Status: {plan_data.get('status', '')}",
+    f"Kind: {plan_data.get('kind', 'plan')}",
+  ]
+  if path:
+    display_path = path
+    if root:
+      with contextlib.suppress(ValueError):
+        display_path = path.relative_to(root)
+    lines.extend(["", f"File: {display_path}"])
+  return "\n".join(lines)
+
+
 def format_change_list_json(changes: Sequence[ChangeArtifact]) -> str:
   """Format change artifacts as JSON array.
 

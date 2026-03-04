@@ -1202,6 +1202,8 @@ class TestRequirementCoverageEntries(unittest.TestCase):
       "name": "S",
       "status": "draft",
       "kind": "spec",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
     }
     dump_markdown_file(
       spec_path,

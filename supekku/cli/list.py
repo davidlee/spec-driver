@@ -1061,6 +1061,21 @@ def list_requirements(
       help="Filter by verification artifact (supports glob patterns, e.g., 'VT-*')",
     ),
   ] = None,
+  vstatus: Annotated[
+    str | None,
+    typer.Option(
+      "--vstatus",
+      help="Filter by verification status "
+      "(planned,in-progress,verified,failed,blocked)",
+    ),
+  ] = None,
+  vkind: Annotated[
+    str | None,
+    typer.Option(
+      "--vkind",
+      help="Filter by verification kind (VT,VA,VH)",
+    ),
+  ] = None,
   substring: Annotated[
     str | None,
     typer.Option(
@@ -1167,6 +1182,24 @@ def list_requirements(
       except re.error as e:
         typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
         raise typer.Exit(EXIT_FAILURE) from e
+
+    # Verification status filter (OR across values, AND with other flags)
+    if vstatus:
+      vstatus_values = parse_multi_value_filter(vstatus)
+      vstatus_set = set(vstatus_values)
+      requirements = [
+        r for r in requirements
+        if any(e.get("status") in vstatus_set for e in r.coverage_entries)
+      ]
+
+    # Verification kind filter (OR across values, AND with other flags)
+    if vkind:
+      vkind_values = parse_multi_value_filter(vkind)
+      vkind_set = set(vkind_values)
+      requirements = [
+        r for r in requirements
+        if any(e.get("kind") in vkind_set for e in r.coverage_entries)
+      ]
 
     if not requirements:
       raise typer.Exit(EXIT_SUCCESS)

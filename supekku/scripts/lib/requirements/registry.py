@@ -72,6 +72,7 @@ class RequirementRecord:
   implemented_by: list[str] = field(default_factory=list)
   verified_by: list[str] = field(default_factory=list)
   coverage_evidence: list[str] = field(default_factory=list)
+  coverage_entries: list[dict[str, Any]] = field(default_factory=list)
   path: str = ""
 
   def merge(self, other: RequirementRecord) -> RequirementRecord:
@@ -92,6 +93,7 @@ class RequirementRecord:
       coverage_evidence=sorted(
         set(self.coverage_evidence) | set(other.coverage_evidence)
       ),
+      coverage_entries=list(self.coverage_entries),
       path=other.path or self.path,
     )
 
@@ -110,6 +112,7 @@ class RequirementRecord:
       "implemented_by": self.implemented_by,
       "verified_by": self.verified_by,
       "coverage_evidence": self.coverage_evidence,
+      "coverage_entries": self.coverage_entries,
       "path": self.path,
     }
 
@@ -130,6 +133,7 @@ class RequirementRecord:
       implemented_by=list(data.get("implemented_by", [])),
       verified_by=list(data.get("verified_by", [])),
       coverage_evidence=list(data.get("coverage_evidence", [])),
+      coverage_entries=list(data.get("coverage_entries", [])),
       path=str(data.get("path", "")),
     )
 
@@ -670,9 +674,17 @@ class RequirementsRegistry:
       # Check for drift before updating
       self._check_coverage_drift(req_id, entries)
 
+      # Store structured coverage entries on the record
+      record.coverage_entries = [
+        {k: v for k, v in e.items() if k != "source"}
+        for e in entries
+      ]
+
       # Update coverage_evidence with unique artefact IDs
       artefacts = {e["artefact"] for e in entries if e.get("artefact")}
-      record.coverage_evidence = sorted(set(record.coverage_evidence) | artefacts)
+      record.coverage_evidence = sorted(
+        set(record.coverage_evidence) | artefacts
+      )
 
       # Compute and update status from coverage
       computed_status = self._compute_status_from_coverage(entries)
@@ -1173,6 +1185,66 @@ class RequirementsRegistry:
           break  # Only add each requirement once
 
     return sorted(matches, key=lambda r: r.uid)
+
+  def find_by_verification_status(
+    self, statuses: list[str]
+  ) -> list[RequirementRecord]:
+    """Find requirements with coverage entries matching given statuses.
+
+    A requirement matches if ANY of its coverage_entries has a status
+    in the provided list (OR logic).
+
+    Args:
+      statuses: List of verification statuses to match.
+                Returns empty list if empty.
+
+    Returns:
+      Sorted list of matching RequirementRecord objects.
+    """
+    if not statuses:
+      return []
+
+    status_set = set(statuses)
+    return sorted(
+      (
+        r for r in self.records.values()
+        if any(
+          e.get("status") in status_set
+          for e in r.coverage_entries
+        )
+      ),
+      key=lambda r: r.uid,
+    )
+
+  def find_by_verification_kind(
+    self, kinds: list[str]
+  ) -> list[RequirementRecord]:
+    """Find requirements with coverage entries matching given kinds.
+
+    A requirement matches if ANY of its coverage_entries has a kind
+    in the provided list (OR logic).
+
+    Args:
+      kinds: List of verification kinds (VT, VA, VH) to match.
+             Returns empty list if empty.
+
+    Returns:
+      Sorted list of matching RequirementRecord objects.
+    """
+    if not kinds:
+      return []
+
+    kind_set = set(kinds)
+    return sorted(
+      (
+        r for r in self.records.values()
+        if any(
+          e.get("kind") in kind_set
+          for e in r.coverage_entries
+        )
+      ),
+      key=lambda r: r.uid,
+    )
 
 
 __all__ = [

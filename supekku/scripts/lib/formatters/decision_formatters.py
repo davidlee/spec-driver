@@ -10,12 +10,8 @@ import re
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.formatters.table_utils import (
-  add_row_with_truncation,
-  create_table,
   format_as_json,
-  format_as_tsv,
-  get_terminal_width,
-  render_table,
+  format_list_table,
 )
 from supekku.scripts.lib.formatters.theme import get_adr_status_style
 
@@ -134,13 +130,10 @@ def format_decision_details(decision: Decision) -> str:
   return "\n".join(lines)
 
 
-def _format_decision_as_tsv_rows(decisions: Sequence[Decision]) -> list[list[str]]:
-  """Convert decisions to TSV row format."""
-  rows = []
-  for decision in decisions:
-    updated_date = decision.updated.strftime("%Y-%m-%d") if decision.updated else "N/A"
-    rows.append([decision.id, decision.status, decision.title, updated_date])
-  return rows
+def _prepare_decision_tsv_row(decision: Decision) -> list[str]:
+  """Prepare a single decision as a plain TSV row (no markup)."""
+  updated_date = decision.updated.strftime("%Y-%m-%d") if decision.updated else "N/A"
+  return [decision.id, decision.status, decision.title, updated_date]
 
 
 def _calculate_column_widths(terminal_width: int) -> dict[int, int]:
@@ -200,33 +193,6 @@ def _prepare_decision_row(decision: Decision) -> list[str]:
   return [decision_id, title, tags_styled, status_styled, updated_date]
 
 
-def _format_as_table(
-  decisions: Sequence[Decision],
-  truncate: bool,
-) -> str:
-  """Format decisions as a rich table.
-
-  Args:
-    decisions: Decisions to format
-    truncate: Whether to truncate columns to fit terminal
-
-  Returns:
-    Rendered table string
-  """
-  table = create_table(
-    columns=["ID", "Title", "Tags", "Status", "Updated"],
-    title="Architecture Decision Records",
-  )
-
-  max_widths = _calculate_column_widths(get_terminal_width()) if truncate else None
-
-  for decision in decisions:
-    row = _prepare_decision_row(decision)
-    add_row_with_truncation(table, row, max_widths=max_widths)
-
-  return render_table(table)
-
-
 def format_decision_list_table(
   decisions: Sequence[Decision],
   format_type: str = "table",
@@ -242,14 +208,17 @@ def format_decision_list_table(
   Returns:
     Formatted string in requested format
   """
-  if format_type == "json":
-    return format_decision_list_json(decisions)
-
-  if format_type == "tsv":
-    rows = _format_decision_as_tsv_rows(decisions)
-    return format_as_tsv(rows)
-
-  return _format_as_table(decisions, truncate)
+  return format_list_table(
+    decisions,
+    columns=["ID", "Title", "Tags", "Status", "Updated"],
+    title="Architecture Decision Records",
+    prepare_row=_prepare_decision_row,
+    prepare_tsv_row=_prepare_decision_tsv_row,
+    to_json=format_decision_list_json,
+    format_type=format_type,
+    truncate=truncate,
+    column_widths=_calculate_column_widths,
+  )
 
 
 def format_decision_list_json(decisions: Sequence[Decision]) -> str:

@@ -141,7 +141,7 @@ class TestCardFormatters(unittest.TestCase):
   def test_format_empty_card_list(self) -> None:
     """Handle empty card list gracefully."""
     output = format_card_list_table([], format_type="table")
-    self.assertEqual(output, "No cards found.")
+    self.assertIn("ID", output)  # headers still rendered
 
     output_json = format_card_list_json([])
     parsed = json.loads(output_json)

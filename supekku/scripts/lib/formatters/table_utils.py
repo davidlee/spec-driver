@@ -17,7 +17,7 @@ from rich.table import Table
 from supekku.scripts.lib.formatters.theme import SPEC_DRIVER_THEME
 
 if TYPE_CHECKING:
-  from collections.abc import Sequence
+  from collections.abc import Callable, Sequence
 
 
 def get_terminal_width() -> int:
@@ -184,3 +184,63 @@ def format_as_tsv(rows: Sequence[Sequence[str]]) -> str:
     TSV string with one row per line
   """
   return "\n".join("\t".join(str(cell) for cell in row) for row in rows)
+
+
+def format_list_table(
+  items: Sequence[Any],
+  *,
+  columns: Sequence[str],
+  title: str,
+  prepare_row: Callable[[Any], Sequence[str]],
+  prepare_tsv_row: Callable[[Any], Sequence[str]],
+  to_json: Callable[[Sequence[Any]], str],
+  format_type: str = "table",
+  truncate: bool = False,
+  column_widths: Callable[[int], dict[int, int]] | None = None,
+) -> str:
+  """Generic list-table formatter with json/tsv/table dispatch.
+
+  Eliminates the repeated dispatch + table-setup boilerplate shared by all
+  ``format_*_list_table`` functions.  Callers supply only the variable parts:
+  column definitions, per-item row preparation, and serialisation callbacks.
+
+  Args:
+    items: Sequence of domain objects to render.
+    columns: Column header names for the table.
+    title: Table title.
+    prepare_row: ``(item) -> [cell, ...]`` for rich-table rows (may include
+      markup).
+    prepare_tsv_row: ``(item) -> [cell, ...]`` for plain TSV rows (no markup).
+    to_json: ``(items) -> str`` for JSON serialisation of the full list.
+    format_type: Output format — ``"table"`` (default), ``"json"``, or
+      ``"tsv"``.
+    truncate: When *True*, truncate cell content to fit terminal width.
+    column_widths: Optional ``(terminal_width) -> {col_idx: width}`` for
+      custom width distribution.  Only called when *truncate* is True.
+      Falls back to equal distribution via :func:`calculate_column_widths`.
+
+  Returns:
+    Formatted string in the requested format.
+  """
+  if format_type == "json":
+    return to_json(items)
+
+  if format_type == "tsv":
+    return format_as_tsv([prepare_tsv_row(item) for item in items])
+
+  # -- table format --
+  table = create_table(columns=list(columns), title=title)
+
+  max_widths: dict[int, int] | None = None
+  if truncate:
+    tw = get_terminal_width()
+    if column_widths is not None:
+      max_widths = column_widths(tw)
+    else:
+      max_widths = calculate_column_widths(tw, len(columns))
+
+  for item in items:
+    row = prepare_row(item)
+    add_row_with_truncation(table, row, max_widths=max_widths)
+
+  return render_table(table)

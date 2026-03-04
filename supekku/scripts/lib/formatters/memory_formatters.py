@@ -10,12 +10,8 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.formatters.table_utils import (
-  add_row_with_truncation,
-  create_table,
   format_as_json,
-  format_as_tsv,
-  get_terminal_width,
-  render_table,
+  format_list_table,
 )
 from supekku.scripts.lib.formatters.theme import get_memory_status_style
 
@@ -205,40 +201,17 @@ def _calculate_column_widths(terminal_width: int) -> dict[int, int]:
   return {3: name_width, 5: tags_width}
 
 
-def _format_as_table(records: Sequence[MemoryRecord], truncate: bool) -> str:
-  """Format memory records as a rich table."""
-  table = create_table(
-    columns=["ID", "Status", "Type", "Name", "Confidence", "Tags", "Updated"],
-    title="Memory Records",
-  )
-
-  max_widths = _calculate_column_widths(get_terminal_width()) if truncate else None
-
-  for record in records:
-    row = _prepare_memory_row(record)
-    add_row_with_truncation(table, row, max_widths=max_widths)
-
-  return render_table(table)
-
-
-def _format_memory_as_tsv_rows(
-  records: Sequence[MemoryRecord],
-) -> list[list[str]]:
-  """Convert memory records to TSV row format."""
-  rows = []
-  for record in records:
-    updated = record.updated.strftime("%Y-%m-%d") if record.updated else "N/A"
-    rows.append(
-      [
-        record.id,
-        record.status,
-        record.memory_type,
-        record.name,
-        record.confidence or "",
-        updated,
-      ]
-    )
-  return rows
+def _prepare_memory_tsv_row(record: MemoryRecord) -> list[str]:
+  """Prepare a single memory record as a plain TSV row (no markup)."""
+  updated = record.updated.strftime("%Y-%m-%d") if record.updated else "N/A"
+  return [
+    record.id,
+    record.status,
+    record.memory_type,
+    record.name,
+    record.confidence or "",
+    updated,
+  ]
 
 
 def format_memory_list_table(
@@ -256,14 +229,17 @@ def format_memory_list_table(
   Returns:
     Formatted string in requested format.
   """
-  if format_type == "json":
-    return format_memory_list_json(records)
-
-  if format_type == "tsv":
-    rows = _format_memory_as_tsv_rows(records)
-    return format_as_tsv(rows)
-
-  return _format_as_table(records, truncate)
+  return format_list_table(
+    records,
+    columns=["ID", "Status", "Type", "Name", "Confidence", "Tags", "Updated"],
+    title="Memory Records",
+    prepare_row=_prepare_memory_row,
+    prepare_tsv_row=_prepare_memory_tsv_row,
+    to_json=format_memory_list_json,
+    format_type=format_type,
+    truncate=truncate,
+    column_widths=_calculate_column_widths,
+  )
 
 
 def format_memory_list_json(records: Sequence[MemoryRecord]) -> str:

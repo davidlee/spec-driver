@@ -10,12 +10,8 @@ import re
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.formatters.table_utils import (
-  add_row_with_truncation,
-  create_table,
   format_as_json,
-  format_as_tsv,
-  get_terminal_width,
-  render_table,
+  format_list_table,
 )
 from supekku.scripts.lib.formatters.theme import get_policy_status_style
 
@@ -128,13 +124,10 @@ def format_policy_details(policy: PolicyRecord) -> str:
   return "\n".join(lines)
 
 
-def _format_policy_as_tsv_rows(policies: Sequence[PolicyRecord]) -> list[list[str]]:
-  """Convert policies to TSV row format."""
-  rows = []
-  for policy in policies:
-    updated_date = policy.updated.strftime("%Y-%m-%d") if policy.updated else "N/A"
-    rows.append([policy.id, policy.status, policy.title, updated_date])
-  return rows
+def _prepare_policy_tsv_row(policy: PolicyRecord) -> list[str]:
+  """Prepare a single policy as a plain TSV row (no markup)."""
+  updated_date = policy.updated.strftime("%Y-%m-%d") if policy.updated else "N/A"
+  return [policy.id, policy.status, policy.title, updated_date]
 
 
 def _calculate_column_widths(terminal_width: int) -> dict[int, int]:
@@ -194,33 +187,6 @@ def _prepare_policy_row(policy: PolicyRecord) -> list[str]:
   return [policy_id, title, tags_styled, status_styled, updated_date]
 
 
-def _format_as_table(
-  policies: Sequence[PolicyRecord],
-  truncate: bool,
-) -> str:
-  """Format policies as a rich table.
-
-  Args:
-    policies: Policies to format
-    truncate: Whether to truncate columns to fit terminal
-
-  Returns:
-    Rendered table string
-  """
-  table = create_table(
-    columns=["ID", "Title", "Tags", "Status", "Updated"],
-    title="Policies",
-  )
-
-  max_widths = _calculate_column_widths(get_terminal_width()) if truncate else None
-
-  for policy in policies:
-    row = _prepare_policy_row(policy)
-    add_row_with_truncation(table, row, max_widths=max_widths)
-
-  return render_table(table)
-
-
 def format_policy_list_table(
   policies: Sequence[PolicyRecord],
   format_type: str = "table",
@@ -236,14 +202,17 @@ def format_policy_list_table(
   Returns:
     Formatted string in requested format
   """
-  if format_type == "json":
-    return format_policy_list_json(policies)
-
-  if format_type == "tsv":
-    rows = _format_policy_as_tsv_rows(policies)
-    return format_as_tsv(rows)
-
-  return _format_as_table(policies, truncate)
+  return format_list_table(
+    policies,
+    columns=["ID", "Title", "Tags", "Status", "Updated"],
+    title="Policies",
+    prepare_row=_prepare_policy_row,
+    prepare_tsv_row=_prepare_policy_tsv_row,
+    to_json=format_policy_list_json,
+    format_type=format_type,
+    truncate=truncate,
+    column_widths=_calculate_column_widths,
+  )
 
 
 def format_policy_list_json(policies: Sequence[PolicyRecord]) -> str:

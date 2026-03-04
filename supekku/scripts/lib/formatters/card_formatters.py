@@ -9,12 +9,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.formatters.table_utils import (
-  add_row_with_truncation,
-  create_table,
   format_as_json,
   format_as_tsv,
-  get_terminal_width,
-  render_table,
+  format_list_table,
 )
 
 if TYPE_CHECKING:
@@ -62,18 +59,6 @@ def _format_card_as_row(card: Card) -> list[str]:
   ]
 
 
-def _format_cards_as_tsv_rows(cards: Sequence[Card]) -> list[list[str]]:
-  """Convert cards to TSV row format.
-
-  Args:
-    cards: Sequence of Card instances
-
-  Returns:
-    List of rows, each row is a list of column values
-  """
-  return [_format_card_as_row(card) for card in cards]
-
-
 def _calculate_card_column_widths(terminal_width: int) -> dict[int, int]:
   """Calculate optimal column widths for card table.
 
@@ -102,50 +87,42 @@ def _calculate_card_column_widths(terminal_width: int) -> dict[int, int]:
   }
 
 
-def _format_as_table(cards: Sequence[Card]) -> str:
-  """Format cards as aligned table.
-
-  Args:
-    cards: Sequence of Card instances
-
-  Returns:
-    Formatted table string
-  """
-  if not cards:
-    return "No cards found."
-
+def _card_list_to_tsv(cards: Sequence[Card]) -> str:
+  """Format cards as TSV with header row."""
   headers = ["ID", "Lane", "Title", "Created"]
-  table = create_table(headers)
-
-  terminal_width = get_terminal_width()
-  column_widths = _calculate_card_column_widths(terminal_width)
-
-  for card in cards:
-    row = _format_card_as_row(card)
-    add_row_with_truncation(table, row, column_widths)
-
-  return render_table(table)
+  rows = [headers] + [_format_card_as_row(card) for card in cards]
+  return format_as_tsv(rows)
 
 
 def format_card_list_table(
   cards: Sequence[Card],
   format_type: str = "table",
+  truncate: bool = False,
 ) -> str:
-  """Format cards as table or TSV.
+  """Format cards as table, JSON, or TSV.
 
   Args:
     cards: Sequence of Card instances
-    format_type: Output format ("table" or "tsv")
+    format_type: Output format (table|json|tsv)
+    truncate: If True, truncate long fields.
 
   Returns:
     Formatted output string
   """
   if format_type == "tsv":
-    headers = ["ID", "Lane", "Title", "Created"]
-    rows = [headers] + _format_cards_as_tsv_rows(cards)
-    return format_as_tsv(rows)
+    return _card_list_to_tsv(cards)
 
-  return _format_as_table(cards)
+  return format_list_table(
+    cards,
+    columns=["ID", "Lane", "Title", "Created"],
+    title="Cards",
+    prepare_row=_format_card_as_row,
+    prepare_tsv_row=_format_card_as_row,
+    to_json=format_card_list_json,
+    format_type=format_type,
+    truncate=truncate,
+    column_widths=_calculate_card_column_widths,
+  )
 
 
 def format_card_list_json(cards: Sequence[Card]) -> str:

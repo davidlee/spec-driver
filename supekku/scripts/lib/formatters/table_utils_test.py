@@ -15,6 +15,7 @@ from supekku.scripts.lib.formatters.table_utils import (
   create_table,
   format_as_json,
   format_as_tsv,
+  format_list_table,
   get_terminal_width,
   is_tty,
   render_table,
@@ -262,6 +263,127 @@ class TestTsvFormatting:
     lines = output.split("\n")
     assert "42" in lines[1]
     assert "0" in lines[2]
+
+
+class TestFormatListTable:
+  """Tests for the generic format_list_table helper."""
+
+  @staticmethod
+  def _make_item(item_id: str, name: str, status: str = "active") -> dict:
+    return {"id": item_id, "name": name, "status": status}
+
+  @staticmethod
+  def _prepare_row(item: dict) -> list[str]:
+    return [item["id"], item["name"], item["status"]]
+
+  @staticmethod
+  def _prepare_tsv_row(item: dict) -> list[str]:
+    return [item["id"], item["name"], item["status"]]
+
+  @staticmethod
+  def _to_json(items: list) -> str:
+    return json.dumps({"items": [dict(i) for i in items]}, indent=2)
+
+  def _call(self, items, **kwargs):
+    defaults = {
+      "columns": ["ID", "Name", "Status"],
+      "title": "Test Items",
+      "prepare_row": self._prepare_row,
+      "prepare_tsv_row": self._prepare_tsv_row,
+      "to_json": self._to_json,
+    }
+    defaults.update(kwargs)
+    return format_list_table(items, **defaults)
+
+  def test_table_format_renders_columns_and_data(self):
+    items = [self._make_item("T-001", "Alpha"), self._make_item("T-002", "Beta")]
+    result = self._call(items, format_type="table")
+    assert "ID" in result
+    assert "Name" in result
+    assert "T-001" in result
+    assert "Beta" in result
+
+  def test_table_format_is_default(self):
+    items = [self._make_item("T-001", "Alpha")]
+    result = self._call(items)
+    assert "T-001" in result
+    assert "Alpha" in result
+
+  def test_json_format_delegates_to_callback(self):
+    items = [self._make_item("T-001", "Alpha")]
+    result = self._call(items, format_type="json")
+    parsed = json.loads(result)
+    assert parsed["items"][0]["id"] == "T-001"
+
+  def test_tsv_format_uses_tsv_row_callback(self):
+    items = [
+      self._make_item("T-001", "Alpha"),
+      self._make_item("T-002", "Beta", "draft"),
+    ]
+    result = self._call(items, format_type="tsv")
+    lines = result.split("\n")
+    assert len(lines) == 2
+    assert lines[0] == "T-001\tAlpha\tactive"
+    assert lines[1] == "T-002\tBeta\tdraft"
+
+  def test_empty_items_table(self):
+    result = self._call([], format_type="table")
+    assert "ID" in result  # headers still rendered
+
+  def test_empty_items_json(self):
+    result = self._call([], format_type="json")
+    parsed = json.loads(result)
+    assert parsed["items"] == []
+
+  def test_empty_items_tsv(self):
+    result = self._call([], format_type="tsv")
+    assert result == ""
+
+  def test_truncate_false_preserves_all_content(self):
+    long_name = "A" * 200
+    items = [self._make_item("T-001", long_name)]
+    result = self._call(items, format_type="table", truncate=False)
+    # Rich wraps long text across lines; verify all chars present (no "...")
+    assert "..." not in result
+    # Count As in rendered output (stripping table chrome)
+    a_count = result.count("A")
+    assert a_count == 200
+
+  def test_truncate_true_shortens_content(self):
+    long_name = "A" * 200
+    items = [self._make_item("T-001", long_name)]
+    result = self._call(items, format_type="table", truncate=True)
+    # Full string should NOT appear when truncated
+    assert long_name not in result
+
+  def test_custom_column_widths(self):
+    """Custom column_widths callback is used when provided."""
+    custom_called = []
+
+    def custom_widths(terminal_width: int) -> dict[int, int]:
+      custom_called.append(terminal_width)
+      return {0: 8, 1: 20, 2: 10}
+
+    items = [self._make_item("T-001", "Alpha")]
+    self._call(items, format_type="table", truncate=True, column_widths=custom_widths)
+    assert len(custom_called) == 1
+
+  def test_custom_column_widths_not_called_without_truncate(self):
+    """column_widths callback should not be called when truncate is False."""
+    custom_called = []
+
+    def custom_widths(terminal_width: int) -> dict[int, int]:
+      custom_called.append(True)
+      return {0: 8, 1: 20, 2: 10}
+
+    items = [self._make_item("T-001", "Alpha")]
+    self._call(items, format_type="table", truncate=False, column_widths=custom_widths)
+    assert len(custom_called) == 0
+
+  def test_title_appears_in_table(self):
+    items = [self._make_item("T-001", "Alpha")]
+    result = self._call(items, format_type="table", title="My Custom Title")
+    assert "My Custom Title" in result
 
 
 if __name__ == "__main__":

@@ -19,6 +19,7 @@ from supekku.scripts.lib.formatters.table_utils import (
   create_table,
   format_as_json,
   format_as_tsv,
+  format_list_table,
   get_terminal_width,
   render_table,
 )
@@ -638,6 +639,76 @@ def format_plan_details(
         display_path = path.relative_to(root)
     lines.extend(["", f"File: {display_path}"])
   return "\n".join(lines)
+
+
+def _prepare_plan_row(plan: dict[str, Any]) -> list[str]:
+  """Prepare a plan row with styling for rich table display."""
+  plan_id = f"[change.id]{plan.get('id', '?')}[/change.id]"
+  status = plan.get("status", "")
+  status_style = get_change_status_style(status)
+  styled_status = f"[{status_style}]{status}[/{status_style}]"
+  name = plan.get("name", "")
+  if name.startswith("Implementation Plan - "):
+    name = name[21:]
+  delta = plan.get("delta_ref", "")
+  return [plan_id, styled_status, name, delta]
+
+
+def _prepare_plan_tsv_row(plan: dict[str, Any]) -> list[str]:
+  """Prepare a plan row for TSV output (no markup)."""
+  name = plan.get("name", "")
+  if name.startswith("Implementation Plan - "):
+    name = name[21:]
+  return [
+    plan.get("id", ""),
+    plan.get("status", ""),
+    name,
+    plan.get("delta_ref", ""),
+  ]
+
+
+def _plan_list_to_json(plans: Sequence[dict[str, Any]]) -> str:
+  """Serialize plans to JSON."""
+  items = []
+  for plan in plans:
+    item: dict[str, Any] = {
+      "id": plan.get("id", ""),
+      "status": plan.get("status", ""),
+      "name": plan.get("name", ""),
+    }
+    if plan.get("delta_ref"):
+      item["delta_ref"] = plan["delta_ref"]
+    if plan.get("kind"):
+      item["kind"] = plan["kind"]
+    items.append(item)
+  return format_as_json(items)
+
+
+def format_plan_list_table(
+  plans: Sequence[dict[str, Any]],
+  format_type: str = "table",
+  truncate: bool = False,
+) -> str:
+  """Format plans as table, JSON, or TSV.
+
+  Args:
+    plans: Plan frontmatter dictionaries.
+    format_type: Output format (table|json|tsv).
+    truncate: If True, truncate long fields.
+
+  Returns:
+    Formatted string in requested format.
+  """
+  return format_list_table(
+    plans,
+    columns=["ID", "Status", "Name", "Delta"],
+    title="Implementation Plans",
+    prepare_row=_prepare_plan_row,
+    prepare_tsv_row=_prepare_plan_tsv_row,
+    to_json=_plan_list_to_json,
+    format_type=format_type,
+    truncate=truncate,
+  )
 
 
 def format_change_list_json(changes: Sequence[ChangeArtifact]) -> str:

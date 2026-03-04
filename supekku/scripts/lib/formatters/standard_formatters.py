@@ -10,12 +10,8 @@ import re
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.formatters.table_utils import (
-  add_row_with_truncation,
-  create_table,
   format_as_json,
-  format_as_tsv,
-  get_terminal_width,
-  render_table,
+  format_list_table,
 )
 from supekku.scripts.lib.formatters.theme import get_standard_status_style
 
@@ -128,15 +124,10 @@ def format_standard_details(standard: StandardRecord) -> str:
   return "\n".join(lines)
 
 
-def _format_standard_as_tsv_rows(
-  standards: Sequence[StandardRecord],
-) -> list[list[str]]:
-  """Convert standards to TSV row format."""
-  rows = []
-  for standard in standards:
-    updated_date = standard.updated.strftime("%Y-%m-%d") if standard.updated else "N/A"
-    rows.append([standard.id, standard.status, standard.title, updated_date])
-  return rows
+def _prepare_standard_tsv_row(standard: StandardRecord) -> list[str]:
+  """Prepare a single standard as a plain TSV row (no markup)."""
+  updated_date = standard.updated.strftime("%Y-%m-%d") if standard.updated else "N/A"
+  return [standard.id, standard.status, standard.title, updated_date]
 
 
 def _calculate_column_widths(terminal_width: int) -> dict[int, int]:
@@ -196,33 +187,6 @@ def _prepare_standard_row(standard: StandardRecord) -> list[str]:
   return [standard_id, title, tags_styled, status_styled, updated_date]
 
 
-def _format_as_table(
-  standards: Sequence[StandardRecord],
-  truncate: bool,
-) -> str:
-  """Format standards as a rich table.
-
-  Args:
-    standards: Standards to format
-    truncate: Whether to truncate columns to fit terminal
-
-  Returns:
-    Rendered table string
-  """
-  table = create_table(
-    columns=["ID", "Title", "Tags", "Status", "Updated"],
-    title="Standards",
-  )
-
-  max_widths = _calculate_column_widths(get_terminal_width()) if truncate else None
-
-  for standard in standards:
-    row = _prepare_standard_row(standard)
-    add_row_with_truncation(table, row, max_widths=max_widths)
-
-  return render_table(table)
-
-
 def format_standard_list_table(
   standards: Sequence[StandardRecord],
   format_type: str = "table",
@@ -238,14 +202,17 @@ def format_standard_list_table(
   Returns:
     Formatted string in requested format
   """
-  if format_type == "json":
-    return format_standard_list_json(standards)
-
-  if format_type == "tsv":
-    rows = _format_standard_as_tsv_rows(standards)
-    return format_as_tsv(rows)
-
-  return _format_as_table(standards, truncate)
+  return format_list_table(
+    standards,
+    columns=["ID", "Title", "Tags", "Status", "Updated"],
+    title="Standards",
+    prepare_row=_prepare_standard_row,
+    prepare_tsv_row=_prepare_standard_tsv_row,
+    to_json=format_standard_list_json,
+    format_type=format_type,
+    truncate=truncate,
+    column_widths=_calculate_column_widths,
+  )
 
 
 def format_standard_list_json(standards: Sequence[StandardRecord]) -> str:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import unittest
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from supekku.scripts.lib.formatters.change_formatters import (
   format_delta_details,
   format_phase_summary,
   format_plan_details,
+  format_plan_list_table,
   format_revision_details,
 )
 
@@ -715,6 +717,71 @@ class FormatPlanDetailsTest(unittest.TestCase):
     result = format_plan_details({})
     assert "Plan: unknown" in result
     assert "Status: " in result
+
+
+class FormatPlanListTableTest(unittest.TestCase):
+  """Tests for format_plan_list_table (VT-format-plan-list)."""
+
+  @staticmethod
+  def _plan(
+    plan_id: str = "IP-041",
+    name: str = "Test Plan",
+    status: str = "draft",
+    delta: str = "DE-041",
+  ) -> dict:
+    return {"id": plan_id, "name": name, "status": status, "delta_ref": delta}
+
+  def test_table_contains_columns_and_data(self) -> None:
+    plans = [self._plan(), self._plan("IP-042", "Other Plan", "complete", "DE-042")]
+    result = format_plan_list_table(plans)
+    assert "ID" in result
+    assert "Status" in result
+    assert "IP-041" in result
+    assert "IP-042" in result
+
+  def test_table_shows_delta_ref(self) -> None:
+    result = format_plan_list_table([self._plan()])
+    assert "DE-041" in result
+
+  def test_table_strips_name_prefix(self) -> None:
+    plan = self._plan(name="Implementation Plan - CLI completeness")
+    result = format_plan_list_table([plan])
+    assert "Implementation Plan - " not in result
+    assert "CLI completeness" in result
+
+  def test_json_format(self) -> None:
+    plans = [self._plan()]
+    result = format_plan_list_table(plans, format_type="json")
+    parsed = json.loads(result)
+    assert len(parsed["items"]) == 1
+    assert parsed["items"][0]["id"] == "IP-041"
+    assert parsed["items"][0]["status"] == "draft"
+
+  def test_tsv_format(self) -> None:
+    plans = [self._plan(), self._plan("IP-042", "Other", "complete", "DE-042")]
+    result = format_plan_list_table(plans, format_type="tsv")
+    lines = result.split("\n")
+    assert len(lines) == 2
+    assert "IP-041" in lines[0]
+    assert "DE-042" in lines[1]
+
+  def test_empty_plans(self) -> None:
+    result = format_plan_list_table([])
+    assert "ID" in result  # table headers still rendered
+
+  def test_empty_plans_json(self) -> None:
+    result = format_plan_list_table([], format_type="json")
+    parsed = json.loads(result)
+    assert parsed["items"] == []
+
+  def test_missing_fields_use_defaults(self) -> None:
+    result = format_plan_list_table([{"id": "IP-099"}])
+    assert "IP-099" in result
+
+  def test_truncate_parameter_accepted(self) -> None:
+    plans = [self._plan(name="A" * 200)]
+    result = format_plan_list_table(plans, truncate=True)
+    assert "..." in result
 
 
 if __name__ == "__main__":

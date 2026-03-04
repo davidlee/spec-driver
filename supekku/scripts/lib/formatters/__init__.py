@@ -26,6 +26,7 @@ from .change_formatters import (
   format_change_with_context,
   format_delta_details_json,
   format_phase_summary,
+  format_plan_list_table,
 )
 from .decision_formatters import (
   format_decision_details,
@@ -89,6 +90,7 @@ __all__ = [
   "format_delta_details_json",
   "format_package_list",
   "format_phase_summary",
+  "format_plan_list_table",
   "format_policy_details",
   "format_policy_list_json",
   "format_policy_list_table",

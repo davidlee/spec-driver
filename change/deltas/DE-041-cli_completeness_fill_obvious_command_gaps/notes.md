@@ -131,3 +131,43 @@ so the broad catch was masking unrelated errors.
 **Verification**: 2472 passed, 3 skipped, pylint 9.57/10.
 
 **Phase 2 complete.** All 13 tasks done, all exit criteria satisfied.
+
+## Phase 3, pre-task: generic list table helper + formatter migration (2026-03-05)
+
+**Done** (prerequisite for task 3.1):
+
+- **`format_list_table()`** — generic helper in `table_utils.py` that eliminates
+  repeated json/tsv/table dispatch + table-setup boilerplate. Takes callables for
+  variable parts: `prepare_row`, `prepare_tsv_row`, `to_json`, optional
+  `column_widths`. 12 tests in `table_utils_test.py`.
+
+- **Task 3.1**: `format_plan_list_table()` in `change_formatters.py` using the
+  generic helper. Columns: ID, Status, Name, Delta. Strips "Implementation Plan - "
+  prefix. 9 tests in `change_formatters_test.py`. Exported in `__init__.py`.
+
+- **5 trivial formatter migrations** to use generic helper:
+  - `decision_formatters.py` — rewired, `_format_as_table` removed
+  - `policy_formatters.py` — rewired, `_format_as_table` removed
+  - `standard_formatters.py` — rewired, `_format_as_table` removed
+  - `memory_formatters.py` — rewired, `_format_as_table` removed
+  - `card_formatters.py` — rewired, added `truncate` param (was missing),
+    JSON already supported but wasn't wired in dispatch. TSV kept special-cased
+    (cards uniquely include header row in TSV output).
+
+- **IMPR-006** filed for remaining 4 moderate migrations (spec, change, backlog,
+  requirement formatters) + DRY helpers (tags cell, date cell, column width
+  consolidation) + `no_truncate` → `truncate` naming standardization.
+
+**Adaptations**:
+- TSV callbacks changed from list-level (`_format_*_as_tsv_rows`) to per-item
+  (`_prepare_*_tsv_row`) to fit generic helper's iteration model.
+- Card empty-list behavior changed from "No cards found." string to empty table
+  with headers (consistent with all other formatters). Test updated.
+- Card TSV kept as special case outside generic helper because it's the only
+  formatter that prepends a header row to TSV output.
+
+**Tests**: 2493 passed, 3 skipped (+21 from phase 2 end).
+
+**Verification**: `just check` green (ruff clean, pylint 9.57/10).
+
+**Status**: Uncommitted.

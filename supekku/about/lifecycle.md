@@ -1,3 +1,9 @@
+---
+verified_at:
+  date: '2026-03-05'
+  sha: '01753be0aa705c00f094a63af39e54d3df0d62bd'
+---
+
 # Requirement Lifecycle & Traceability (Code-Truth)
 
 This document describes the current implemented lifecycle behavior.
@@ -12,6 +18,24 @@ Requirement lifecycle statuses are:
 - `retired`
 
 Source of truth: `supekku/scripts/lib/requirements/lifecycle.py`.
+
+Coverage (verification) statuses are:
+- `planned`
+- `in-progress`
+- `verified`
+- `failed`
+- `blocked`
+
+Source of truth: `supekku/scripts/lib/blocks/verification.py`.
+
+Change artifact statuses (delta / revision / audit) are:
+- `draft`
+- `pending`
+- `in-progress`
+- `completed`
+- `deferred`
+
+Source of truth: `supekku/scripts/lib/changes/lifecycle.py`.
 
 ## Status Updates: What Is Automatic vs Manual
 
@@ -44,7 +68,9 @@ Source of truth: `supekku/scripts/lib/requirements/registry.py`
 
 ### 3) Manual status edits (supported)
 
-Manual edits to `.spec-driver/registry/requirements.yaml` are still possible.
+Manual edits to `.spec-driver/registry/requirements.yaml` are still possible but
+discouraged; treat the registry as derived and reconcile via specs/coverage or
+revisions instead.
 There is no first-class CLI command for direct requirement status mutation.
 
 Library API exists: `RequirementsRegistry.set_status(...)`.
@@ -65,7 +91,18 @@ Traceability arrays are synchronized from relations/evidence sources:
 
 Source of truth: `supekku/scripts/lib/requirements/registry.py`.
 
+## Requirement Sources (Spec Bundles)
+
+Requirements are canonical when present in SPEC/PROD markdown files.
+
+Some specs also include `requirements/*.md` files in their bundle. Current
+behavior:
+- These files are not consumed by sync or lifecycle logic.
+- Requirement identity still must appear in the spec markdown to be tracked.
+
 ## Operational Workflow (Current)
+
+These labels are descriptive; tooling does not enforce the workflow shape.
 
 ### Prospective (delta-driven)
 
@@ -96,6 +133,10 @@ Source of truth:
 2. Run sync to refresh traceability/lifecycle from current artifacts
 3. Reconcile any mixed or drifting coverage statuses
 
+Notes:
+- Retrospective flow is typically higher maturity: audits surface reality first,
+  then revisions are applied to reconcile specs with codebase truth.
+
 ## Coverage Gate Reminder
 
 For delta close-out, `complete delta` requires each delta requirement to have
@@ -104,6 +145,13 @@ unless bypassed with `--force` or `SPEC_DRIVER_ENFORCE_COVERAGE=false`.
 
 See: `docs/commands-workflow.md` and
 `supekku/scripts/lib/changes/coverage_check.py`.
+
+## Metadata & Schema References
+
+- `supekku:verification.coverage@v1` → `supekku/scripts/lib/blocks/verification.py`
+- `supekku:delta.relationships@v1` → `supekku/scripts/lib/blocks/delta.py`
+- `supekku:spec.relationships@v1` → `supekku/scripts/lib/blocks/relationships.py`
+- `supekku:revision.change@v1` → `supekku/scripts/lib/blocks/revision.py`
 
 ## Non-Canonical Status Terms to Avoid
 

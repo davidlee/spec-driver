@@ -4,7 +4,7 @@ slug: cli-enhanced-filtering-and-self-documentation-phase-01
 name: IP-011 Phase 01 - Enhanced Filtering
 created: '2025-11-03'
 updated: '2025-11-03'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -131,30 +131,30 @@ Implement advanced filtering capabilities to eliminate agent post-processing wor
 
 - [x] Development environment set up with uv and dependencies installed
 - [x] DE-009 completed (consistent JSON and status filtering baseline)
-- [ ] Existing CLI test suite passing (`just test`)
-- [ ] Both linters passing (`just lint`, `just pylint`)
-- [ ] Familiarity with CLAUDE.md skinny CLI patterns and formatter separation
-- [ ] Understanding of existing filter patterns (review `list deltas`, `list adrs` implementations)
-- [ ] Registry structure understood (ChangeRegistry, SpecRegistry, RequirementRegistry)
-- [ ] Existing relationship metadata patterns reviewed (delta `implements`, requirement `verified_by`)
+- [x] Existing CLI test suite passing (`just test`)
+- [x] Both linters passing (`just lint`, `just pylint`)
+- [x] Familiarity with CLAUDE.md skinny CLI patterns and formatter separation
+- [x] Understanding of existing filter patterns (review `list deltas`, `list adrs` implementations)
+- [x] Registry structure understood (ChangeRegistry, SpecRegistry, RequirementRegistry)
+- [x] Existing relationship metadata patterns reviewed (delta `implements`, requirement `verified_by`)
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `core/filters.py` module created with `parse_multi_value_filter()` utility
-- [ ] All list commands accept comma-separated multi-value filters
-- [ ] Multi-value filters work for status, kind, and other categorical fields
-- [ ] `list deltas --implements <REQ-ID>` returns correct filtered results
-- [ ] `list requirements --verified-by <ARTIFACT>` returns correct filtered results
-- [ ] `list specs --informed-by <ADR>` returns correct filtered results
-- [ ] Glob patterns supported for verification artifacts (`--verified-by "VT-*"`)
-- [ ] `list requirements --vstatus <STATUS>` filters by verification status
-- [ ] `list requirements --vkind <KIND>` filters by verification artifact kind
-- [ ] Verification filters support multi-value syntax (`--vstatus verified,failed`)
-- [ ] Backward compatibility tests pass (single-value filters unchanged)
-- [ ] All new tests passing (>40 new test cases expected)
-- [ ] Both linters passing (`just lint`, `just pylint`)
-- [ ] Performance benchmark: reverse queries complete in <2s for typical registries
-- [ ] Manual workflow validation confirms functionality
+- [x] `core/filters.py` module created with `parse_multi_value_filter()` utility
+- [x] All list commands accept comma-separated multi-value filters
+- [x] Multi-value filters work for status, kind, and other categorical fields
+- [x] `list deltas --implements <REQ-ID>` returns correct filtered results
+- [x] `list requirements --verified-by <ARTIFACT>` returns correct filtered results
+- [x] `list specs --informed-by <ADR>` returns correct filtered results
+- [x] Glob patterns supported for verification artifacts (`--verified-by "VT-*"`)
+- [x] `list requirements --vstatus <STATUS>` filters by verification status
+- [x] `list requirements --vkind <KIND>` filters by verification artifact kind
+- [x] Verification filters support multi-value syntax (`--vstatus verified,failed`)
+- [x] Backward compatibility tests pass (single-value filters unchanged)
+- [x] All new tests passing (>40 new test cases expected)
+- [x] Both linters passing (`just lint`, `just pylint`)
+- [x] Performance benchmark: reverse queries complete in <2s for typical registries
+- [x] Manual workflow validation confirms functionality
 
 ## 5. Verification
 
@@ -264,9 +264,9 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 | [x] | 1.9 | Write vstatus/vkind filter tests | [x] | Completed - 31 tests (TDD red→green) |
 | [x] | 1.10 | Implement vstatus/vkind flags | [ ] | Completed - coverage_entries + 2 methods + CLI |
 | [x] | 1.11 | Write backward compat tests | [x] | Completed - 14 tests |
-| [ ] | 1.12 | Full test suite + linters | [ ] | After 1.4, 1.7, 1.8, 1.10 |
-| [ ] | 1.13 | Performance testing | [ ] | After 1.7 |
-| [ ] | 1.14 | Manual validation | [ ] | Final step |
+| [x] | 1.12 | Full test suite + linters | [ ] | Skipped (user) — covered by prior task commits |
+| [x] | 1.13 | Performance testing | [ ] | Completed — all <0.4s (target <2s) |
+| [x] | 1.14 | Manual validation | [ ] | Completed — all categories pass |
 
 ### Task Details
 
@@ -544,46 +544,31 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Observations & AI Notes**: *Record performance results, bottlenecks*
 - **Commits / References**: N/A (performance validation)
 
-#### **1.12 Full test suite + linters**
-- **Design / Approach**:
-  - Run full test suite: `just test`
-  - Run both linters: `just lint`, `just pylint`
-  - Fix any failing tests or lint issues
-  - Ensure zero warnings from both linters
-  - Validate test coverage for new code (aim for >90%)
-- **Files / Components**: All modified files
-- **Testing**: Full suite validation
-- **Observations & AI Notes**: *Record issues found, fixes applied*
-- **Commits / References**: *Commit hash for fixes*
+#### **1.12 Full test suite + linters** ✅
+- **Design / Approach**: Skipped at user's direction — prior task commits each ran tests and linters.
+- **Observations & AI Notes**: Deferred to task 1.11 commit which ran full suite (2286 passed, 3 skipped).
 
-#### **1.13 Performance testing**
-- **Design / Approach**:
-  - Benchmark reverse query performance on typical registries
-  - Measure time for `list deltas --implements SPEC-110.FR-001`
-  - Measure time for `list requirements --verified-by "VT-*"`
-  - Measure time for `list requirements --vstatus verified --vkind VT`
-  - Target: <2s for typical registries (~20-30 deltas, ~80 requirements)
-  - If exceeds threshold, consider indexing or early filtering optimization
-- **Files / Components**:
-  - `supekku/cli/test_cli.py` - add TestReverseQueryPerformance class (optional)
-- **Testing**: Manual timing with `time` command; optional automated tests
-- **Observations & AI Notes**: *Record performance results, bottlenecks*
-- **Commits / References**: N/A (performance validation)
+#### **1.13 Performance testing** ✅
+- **Design / Approach**: Timed reverse queries and combined filters against real registries.
+- **Testing**: Manual timing with `time` command.
+- **Observations & AI Notes**:
+  - `list deltas --implements SPEC-110.FR-001` → 0.39s
+  - `list requirements --verified-by "VT-*"` → 0.29s
+  - `list requirements --vstatus verified --vkind VT` → 0.28s
+  - All well under 2s target. No indexing needed at current registry size.
 
-#### **1.14 Manual validation**
-- **Design / Approach**:
-  - Test multi-value filters manually with various combinations
-  - Test reverse relationship queries with real artifact IDs
-  - Test glob patterns with various verification artifact patterns
-  - Test verification status and kind filters
-  - Test combining multiple filter types
-  - Validate backward compatibility with existing single-value filters
-  - Cross-reference with PROD-010.FR-004 and FR-005 requirements
-  - Document findings and any gaps discovered
-- **Files / Components**: N/A (manual testing)
-- **Testing**: Manual workflow validation
-- **Observations & AI Notes**: *Record validation results, gaps found*
-- **Commits / References**: N/A
+#### **1.14 Manual validation** ✅
+- **Design / Approach**: Ran all commands from Section 5 against live project data.
+- **Testing**: Manual workflow validation.
+- **Observations & AI Notes**:
+  - **Multi-value filters**: `-s draft,in-progress` (7 deltas), `-k prod,tech` (18 specs), `-k FR,NF` (162+ reqs) — all correct
+  - **Reverse queries**: `--implements PROD-010.FR-004` → DE-011 ✅; `--verified-by VT-PROD010-FILTER-002` → PROD-010.FR-004 ✅
+  - **Glob patterns**: `VT-CLI-*` → 12 SPEC-110 FRs; `VT-PROD010-*` → 17 PROD-010 FRs ✅
+  - **Verification status**: `--vstatus verified` returns results; `--vstatus failed,blocked` returns empty (none exist) ✅
+  - **Verification kind**: `--vkind VT` → 138; `--vkind VA,VH` returns results; `--vkind VT,VA,VH` → 162 ✅
+  - **Combined filters**: `--vstatus verified --vkind VT,VA` → 69; `--spec SPEC-110 --vstatus failed` → empty ✅
+  - **Backward compat**: `-s draft` (4 deltas), `-k prod` (16 specs) — single-value unchanged ✅
+  - **No issues found.**
 
 ## 8. Risks & Mitigations
 
@@ -653,13 +638,13 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied (all 12 items in Section 4)
-- [ ] Verification evidence stored (test outputs, performance benchmarks)
+- [x] Exit criteria satisfied (all 15 items in Section 4)
+- [x] Verification evidence stored (test outputs, performance benchmarks)
 - [ ] DE-011 updated with Phase 1 implementation notes
 - [ ] IP-011 verification coverage updated with test results
 - [ ] Hand-off notes prepared for Phase 2 (self-documentation)
-- [ ] Performance benchmarks documented
-- [ ] Backward compatibility confirmed
+- [x] Performance benchmarks documented (all <0.4s, target <2s)
+- [x] Backward compatibility confirmed (single-value filters unchanged)
 
 ## 12. Hand-off Notes
 

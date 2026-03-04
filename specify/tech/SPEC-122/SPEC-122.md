@@ -102,7 +102,7 @@ capabilities:
       with lifecycle tracking (status, introduced, implemented_by, verified_by).
     success_criteria:
       - UID format is SPEC-ID.LABEL (e.g., SPEC-110.FR-001)
-      - Status values limited to: pending, in-progress, live, retired
+      - Status values limited to: pending, in-progress, active, retired
       - Merge operation preserves lifecycle fields from existing record
       - Round-trip serialization maintains all fields
 
@@ -243,7 +243,7 @@ capabilities:
   - id: status-management
     name: Status Management
     responsibilities:
-      - Define valid requirement statuses (pending, in-progress, live, retired)
+      - Define valid requirement statuses (pending, in-progress, active, retired)
       - Validate status transitions
       - Update requirement status with validation
       - Prevent invalid status values
@@ -313,6 +313,8 @@ The `supekku/scripts/lib/requirements` package manages the central requirements 
 
 **Design Philosophy**: Registry-centric synchronization model where requirements are parsed from specs and change artifacts, merged into a central YAML registry, and exposed via flexible search API. Pure data model (RequirementRecord) + stateful registry (RequirementsRegistry) pattern.
 
+**Change History**: 2026-03-05 – Align requirement status terminology to `active` (RE-022).
+
 ## 2. Stakeholders & Journeys
 
 ### Primary Users
@@ -343,7 +345,7 @@ The `supekku/scripts/lib/requirements` package manages the central requirements 
 **Lifecycle Tracking**
 1. Delta created with `applies_to.requirements: [SPEC-110.FR-001]`
 2. Sync operation links delta to requirement via `implemented_by`
-3. Delta completion updates requirement status to `live`
+3. Delta completion updates requirement status to `active`
 4. Audit verification adds audit ID to requirement's `verified_by` list
 
 **Requirement Refactoring**
@@ -364,7 +366,7 @@ The package provides three layers:
 ### Functional Requirements
 
 - **FR-001**: Define RequirementRecord dataclass with uid, label, title, specs, primary_spec, kind, status, introduced, implemented_by, verified_by, path fields
-- **FR-002**: Support requirement status values: pending, in-progress, live, retired
+- **FR-002**: Support requirement status values: pending, in-progress, active, retired
 - **FR-003**: Load and save requirements registry at `.spec-driver/registry/requirements.yaml`
 - **FR-004**: Extract requirements from spec markdown using pattern `- FR-NNN: Title` (case-insensitive, bold/italic tolerant)
 - **FR-005**: Parse structured spec.relationships blocks for explicit requirement lists (primary, collaborators)
@@ -418,7 +420,7 @@ title: str                  # Requirement description
 specs: list[str]            # All specs referencing this requirement
 primary_spec: str           # Primary owning spec
 kind: str                   # "functional" or "non-functional"
-status: RequirementStatus   # pending | in-progress | live | retired
+status: RequirementStatus   # pending | in-progress | active | retired
 introduced: str | None      # Revision ID that introduced requirement
 implemented_by: list[str]   # Delta IDs implementing requirement
 verified_by: list[str]      # Audit IDs verifying requirement
@@ -434,7 +436,7 @@ requirements:
     specs: [SPEC-110]
     primary_spec: SPEC-110
     kind: functional
-    status: live
+    status: active
     introduced: RE-005
     implemented_by: [DE-012]
     verified_by: [AUD-003]
@@ -617,4 +619,4 @@ See `supekku:verification.coverage@v1` block above for detailed test coverage ma
 
 - Should requirements have explicit version numbers? (Current: no, rely on lifecycle tracking)
 - Should requirement movement be auditable beyond introduced field? (Current: no, sufficient for now)
-- Should status transitions be constrained (e.g., pending → in-progress → live)? (Current: no, allow any transition)
+- Should status transitions be constrained (e.g., pending → in-progress → active)? (Current: no, allow any transition)

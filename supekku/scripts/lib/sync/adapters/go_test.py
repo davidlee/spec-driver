@@ -1,5 +1,6 @@
 """Tests for Go language adapter."""
 
+import subprocess
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -132,38 +133,32 @@ class TestGoAdapter(unittest.TestCase):
     mock_is_go,
   ) -> None:
     """Test generate method creates documentation variants."""
-    # Setup mocks
-    # Mock both Go and gomarkdoc being available
     mock_is_go.return_value = True
     mock_which.return_value = "/usr/bin/go"
     mock_exists.return_value = True
     mock_subprocess.return_value = Mock(returncode=0, stdout="", stderr="")
-
-    # Mock file content for hash calculation
     mock_read_text.return_value = "# Documentation content"
 
-    # Mock get_go_module_name
-    with patch(
-      "supekku.scripts.lib.sync.adapters.go.get_go_module_name",
-    ) as mock_get_module:
-      mock_get_module.return_value = "github.com/test/repo"
+    unit = SourceUnit("go", "internal/test", self.repo_root)
+    variant_outputs = {
+      "public": Path("/test/output/public/internal/test/interfaces.md"),
+      "internal": Path("/test/output/internal/internal/test/internals.md"),
+    }
+    variants = self.adapter.generate(unit, variant_outputs=variant_outputs)
 
-      unit = SourceUnit("go", "internal/test", self.repo_root)
-      variant_outputs = {
-        "public": Path("/test/output/public/internal/test/interfaces.md"),
-        "internal": Path("/test/output/internal/internal/test/internals.md"),
-      }
-      variants = self.adapter.generate(unit, variant_outputs=variant_outputs)
+    assert len(variants) == 2
+    variant_names = [v.name for v in variants]
+    assert "public" in variant_names
+    assert "internal" in variant_names
 
-      # Should generate two variants
-      assert len(variants) == 2
+    # gomarkdoc called twice (public + internal)
+    assert mock_subprocess.call_count == 2
 
-      variant_names = [v.name for v in variants]
-      assert "public" in variant_names
-      assert "internal" in variant_names
-
-      # Check that gomarkdoc was called
-      assert mock_subprocess.call_count == 2
+    # Verify ./-prefixed relative path and cwd=repo_root
+    for call in mock_subprocess.call_args_list:
+      cmd = call[0][0]
+      assert cmd[-1] == "./internal/test", f"Expected ./prefix path, got {cmd[-1]}"
+      assert call[1].get("cwd") == self.repo_root
 
   @patch("supekku.scripts.lib.sync.adapters.go.is_go_available")
   @patch("supekku.scripts.lib.sync.adapters.go.which")
@@ -179,41 +174,32 @@ class TestGoAdapter(unittest.TestCase):
     mock_is_go,
   ) -> None:
     """Test generate method in check mode."""
-    # Setup: files exist and gomarkdoc check passes
-    # Mock both Go and gomarkdoc being available
     mock_is_go.return_value = True
     mock_which.return_value = "/usr/bin/go"
     mock_exists.return_value = True
-    mock_subprocess.return_value = Mock(returncode=0)  # Check passes
+    mock_subprocess.return_value = Mock(returncode=0)
 
-    with patch(
-      "supekku.scripts.lib.sync.adapters.go.get_go_module_name",
-    ) as mock_get_module:
-      mock_get_module.return_value = "github.com/test/repo"
+    unit = SourceUnit("go", "internal/test", self.repo_root)
+    variant_outputs = {
+      "public": Path("/test/output/public/internal/test/interfaces.md"),
+      "internal": Path("/test/output/internal/internal/test/internals.md"),
+    }
+    variants = self.adapter.generate(
+      unit,
+      variant_outputs=variant_outputs,
+      check=True,
+    )
 
-      unit = SourceUnit("go", "internal/test", self.repo_root)
-      variant_outputs = {
-        "public": Path("/test/output/public/internal/test/interfaces.md"),
-        "internal": Path("/test/output/internal/internal/test/internals.md"),
-      }
-      variants = self.adapter.generate(
-        unit,
-        variant_outputs=variant_outputs,
-        check=True,
-      )
+    assert len(variants) == 2
+    for variant in variants:
+      assert variant.status == "unchanged"
 
-      # Should check both variants
-      assert len(variants) == 2
-
-      # All variants should be unchanged (check passed)
-      for variant in variants:
-        assert variant.status == "unchanged"
-
-      # Should have called gomarkdoc with --check
-      assert mock_subprocess.call_count == 2
-      for call in mock_subprocess.call_args_list:
-        args = call[0][0]  # First positional argument (command list)
-        assert "--check" in args
+    assert mock_subprocess.call_count == 2
+    for call in mock_subprocess.call_args_list:
+      cmd = call[0][0]
+      assert "--check" in cmd
+      assert cmd[-1] == "./internal/test"
+      assert call[1].get("cwd") == self.repo_root
 
   @patch("supekku.scripts.lib.sync.adapters.go.is_go_available")
   def test_discover_targets_raises_when_go_not_available(
@@ -303,6 +289,36 @@ class TestGoAdapter(unittest.TestCase):
 
     assert "gomarkdoc not found in PATH" in str(context.value)
     assert "go install github.com/princjef/gomarkdoc" in str(context.value)
+
+  @patch("supekku.scripts.lib.sync.adapters.go.is_go_available")
+  @patch("supekku.scripts.lib.sync.adapters.go.which")
+  @patch("subprocess.run")
+  @patch("pathlib.Path.exists")
+  @patch("pathlib.Path.mkdir")
+  def test_generate_propagates_gomarkdoc_error(
+    self,
+    _mock_mkdir,
+    mock_exists,
+    mock_subprocess,
+    mock_which,
+    mock_is_go,
+  ) -> None:
+    """Test generate propagates CalledProcessError instead of swallowing it."""
+    mock_is_go.return_value = True
+    mock_which.return_value = "/usr/bin/gomarkdoc"
+    mock_exists.return_value = False
+    mock_subprocess.side_effect = subprocess.CalledProcessError(
+      1, ["gomarkdoc"], stderr="invalid package",
+    )
+
+    unit = SourceUnit("go", "bad/pkg", self.repo_root)
+    variant_outputs = {
+      "public": Path("/test/output/public.md"),
+      "internal": Path("/test/output/internal.md"),
+    }
+
+    with pytest.raises(subprocess.CalledProcessError):
+      self.adapter.generate(unit, variant_outputs=variant_outputs)
 
 
 if __name__ == "__main__":

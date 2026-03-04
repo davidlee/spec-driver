@@ -211,9 +211,8 @@ class GoAdapter(LanguageAdapter):
         "go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest"
       )
 
-    # Get module name for full package path
-    module = get_go_module_name(self.repo_root)
-    module_pkg = f"{module}/{unit.identifier}"
+    # gomarkdoc expects ./-prefixed relative paths, not import paths
+    pkg_arg = f"./{unit.identifier}"
 
     # Output paths from caller-provided variant_outputs
     public_output = variant_outputs["public"]
@@ -226,7 +225,7 @@ class GoAdapter(LanguageAdapter):
       self._generate_variant(
         name="public",
         output_path=public_output,
-        module_pkg=module_pkg,
+        module_pkg=pkg_arg,
         check=check,
         extra_flags=[],
       ),
@@ -237,7 +236,7 @@ class GoAdapter(LanguageAdapter):
       self._generate_variant(
         name="internal",
         output_path=internal_output,
-        module_pkg=module_pkg,
+        module_pkg=pkg_arg,
         check=check,
         extra_flags=["--include-unexported"],
       ),
@@ -255,69 +254,71 @@ class GoAdapter(LanguageAdapter):
     extra_flags: list[str],
   ) -> DocVariant:
     """Generate a single documentation variant via gomarkdoc."""
-    try:
-      if check and not output_path.exists():
-        return DocVariant(name=name, path=output_path, hash="", status="created")
+    if check and not output_path.exists():
+      return DocVariant(name=name, path=output_path, hash="", status="created")
 
-      output_path.parent.mkdir(parents=True, exist_ok=True)
-      content_hash = ""
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    content_hash = ""
 
-      if check:
-        cmd = [
-          "gomarkdoc",
-          "--format",
-          "github",
-          "--check",
-          *extra_flags,
-          "--output",
-          str(output_path),
-          module_pkg,
-        ]
-        try:
-          subprocess.run(cmd, check=True, capture_output=True, text=True)
-          status = "unchanged"
-        except subprocess.CalledProcessError:
-          status = "changed"
-      else:
-        existed_before = output_path.exists()
-        old_hash = None
-        if existed_before:
-          old_hash = hashlib.sha256(
-            output_path.read_text(encoding="utf-8").encode("utf-8"),
-          ).hexdigest()
+    if check:
+      cmd = [
+        "gomarkdoc",
+        "--format",
+        "github",
+        "--check",
+        *extra_flags,
+        "--output",
+        str(output_path),
+        module_pkg,
+      ]
+      try:
+        subprocess.run(
+          cmd, check=True, capture_output=True, text=True,
+          cwd=self.repo_root,
+        )
+        status = "unchanged"
+      except subprocess.CalledProcessError:
+        status = "changed"
+    else:
+      existed_before = output_path.exists()
+      old_hash = None
+      if existed_before:
+        old_hash = hashlib.sha256(
+          output_path.read_text(encoding="utf-8").encode("utf-8"),
+        ).hexdigest()
 
-        cmd = [
-          "gomarkdoc",
-          "--format",
-          "github",
-          *extra_flags,
-          "--output",
-          str(output_path),
-          module_pkg,
-        ]
-        subprocess.run(cmd, check=True, capture_output=True, text=True)
-
-        if output_path.exists():
-          content = output_path.read_text(encoding="utf-8")
-          content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
-          if not existed_before:
-            status = "created"
-          elif content_hash != old_hash:
-            status = "changed"
-          else:
-            status = "unchanged"
-        else:
-          status = "created"
-
-      return DocVariant(
-        name=name,
-        path=output_path,
-        hash=content_hash if not check else "",
-        status=status,
+      cmd = [
+        "gomarkdoc",
+        "--format",
+        "github",
+        *extra_flags,
+        "--output",
+        str(output_path),
+        module_pkg,
+      ]
+      subprocess.run(
+        cmd, check=True, capture_output=True, text=True,
+        cwd=self.repo_root,
       )
 
-    except subprocess.CalledProcessError:
-      return DocVariant(name=name, path=output_path, hash="", status="unchanged")
+      if output_path.exists():
+        content = output_path.read_text(encoding="utf-8")
+        content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+        if not existed_before:
+          status = "created"
+        elif content_hash != old_hash:
+          status = "changed"
+        else:
+          status = "unchanged"
+      else:
+        status = "created"
+
+    return DocVariant(
+      name=name,
+      path=output_path,
+      hash=content_hash if not check else "",
+      status=status,
+    )
 
   def supports_identifier(self, identifier: str) -> bool:
     """Check if identifier looks like a Go package path.

@@ -19,6 +19,24 @@
       ];
 
       perSystem = {pkgs, ...}: {
+        packages.default = pkgs.python3Packages.buildPythonApplication {
+          pname = "spec-driver";
+          version = "0.6.2";
+          src = ./.;
+          pyproject = true;
+
+          build-system = with pkgs.python3Packages; [hatchling];
+
+          dependencies = with pkgs.python3Packages; [
+            jinja2
+            pyyaml
+            python-frontmatter
+            typer
+          ];
+
+          doCheck = false;
+        };
+
         devshells.default = {
           packages = with pkgs;
             [
@@ -29,18 +47,19 @@
               watchexec
 
               nodejs_latest
-              bun
-              go
-              pyright
-
-              marksman # for serena
+              # bun
 
               # treesitter
               tree-sitter
+              #tree-sitter-grammars.tree-sitter-python
               tree-sitter-grammars.tree-sitter-python
-              # tree-sitter-grammars.tree-sitter-yaml
+              pyright
 
-              # nodejs_latest
+              ## language support
+
+              ## go
+              # go
+              gomarkdoc
               # Go
               # go # compiler
               # gopls # language server
@@ -48,18 +67,18 @@
               # gofumpt # strict formatter
               # golangci-lint # linter
 
-              # diagram
-              # d2
+              ## zig
+
+              ## diagrams
+              d2
+              graphviz
             ]
             ++ lib.optionals stdenv.isLinux [];
 
-          # shellHook = ''
-          #   alias sd="uv run spec-driver"
-          # '';
           commands = [
             {
-              name = "sd";
-              help = "uv spec-driver ...";
+              name = "sdr";
+              help = "uv run spec-driver $@";
               command = ''
                 uv run spec-driver $@
               '';

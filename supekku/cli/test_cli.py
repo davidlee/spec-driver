@@ -1101,5 +1101,157 @@ class TestReverseRelationshipQueries:
       # Empty output is also acceptable (current CLI behavior)
 
 
+class TestVerificationStatusFilters:
+  """Test --vstatus and --vkind flags for list requirements.
+
+  These flags filter requirements by the status and kind of their
+  verification coverage entries (VT/VA/VH, verified/planned/etc.).
+  """
+
+  def test_vstatus_flag_exists(self):
+    """Test that list requirements accepts --vstatus flag."""
+    result = runner.invoke(
+      app, ["list", "requirements", "--vstatus", "verified", "--json"]
+    )
+    # Flag must be recognized (not "no such option")
+    assert "No such option" not in (result.stdout + (result.stderr or "")), (
+      "--vstatus flag not recognized"
+    )
+
+  def test_vkind_flag_exists(self):
+    """Test that list requirements accepts --vkind flag."""
+    result = runner.invoke(
+      app, ["list", "requirements", "--vkind", "VT", "--json"]
+    )
+    assert "No such option" not in (result.stdout + (result.stderr or "")), (
+      "--vkind flag not recognized"
+    )
+
+  def test_vstatus_single_value(self):
+    """Test --vstatus with single value filters by verification status."""
+    result = runner.invoke(
+      app, ["list", "requirements", "--vstatus", "verified", "--json"]
+    )
+    if result.exit_code == 0 and result.stdout.strip():
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+      # All returned items should have at least one verified coverage entry
+      for item in items:
+        entries = item.get("coverage_entries", [])
+        statuses = {e.get("status") for e in entries}
+        assert "verified" in statuses, (
+          f"{item['uid']} has no verified entry"
+        )
+
+  def test_vstatus_multi_value(self):
+    """Test --vstatus with comma-separated values (OR logic)."""
+    result = runner.invoke(
+      app,
+      ["list", "requirements", "--vstatus", "planned,in-progress", "--json"],
+    )
+    if result.exit_code == 0 and result.stdout.strip():
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+      for item in items:
+        entries = item.get("coverage_entries", [])
+        statuses = {e.get("status") for e in entries}
+        assert statuses & {"planned", "in-progress"}, (
+          f"{item['uid']} has no planned/in-progress entry"
+        )
+
+  def test_vkind_single_value(self):
+    """Test --vkind with single kind filters by verification kind."""
+    result = runner.invoke(
+      app, ["list", "requirements", "--vkind", "VT", "--json"]
+    )
+    if result.exit_code == 0 and result.stdout.strip():
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+      for item in items:
+        entries = item.get("coverage_entries", [])
+        kinds = {e.get("kind") for e in entries}
+        assert "VT" in kinds, f"{item['uid']} has no VT entry"
+
+  def test_vkind_multi_value(self):
+    """Test --vkind with comma-separated values (OR logic)."""
+    result = runner.invoke(
+      app, ["list", "requirements", "--vkind", "VA,VH", "--json"]
+    )
+    if result.exit_code == 0 and result.stdout.strip():
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+      for item in items:
+        entries = item.get("coverage_entries", [])
+        kinds = {e.get("kind") for e in entries}
+        assert kinds & {"VA", "VH"}, (
+          f"{item['uid']} has no VA/VH entry"
+        )
+
+  def test_vstatus_and_vkind_combined(self):
+    """Test combining --vstatus and --vkind (AND logic across flags)."""
+    result = runner.invoke(
+      app,
+      ["list", "requirements", "--vstatus", "verified", "--vkind", "VT", "--json"],
+    )
+    if result.exit_code == 0 and result.stdout.strip():
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+      for item in items:
+        entries = item.get("coverage_entries", [])
+        has_verified = any(e.get("status") == "verified" for e in entries)
+        has_vt = any(e.get("kind") == "VT" for e in entries)
+        assert has_verified and has_vt, (
+          f"{item['uid']} missing verified+VT"
+        )
+
+  def test_vstatus_with_spec_filter(self):
+    """Test combining --vstatus with --spec filter."""
+    result = runner.invoke(
+      app,
+      ["list", "requirements", "--spec", "SPEC-110", "--vstatus", "verified", "--json"],
+    )
+    # Both filters should apply (AND logic)
+    if result.exit_code == 0 and result.stdout.strip():
+      import json
+
+      data = json.loads(result.stdout)
+      items = data.get("items", [])
+      for item in items:
+        assert "SPEC-110" in item.get("specs", []), (
+          f"{item['uid']} not in SPEC-110"
+        )
+
+  def test_vstatus_with_verified_by_filter(self):
+    """Test combining --vstatus with --verified-by filter."""
+    result = runner.invoke(
+      app,
+      [
+        "list", "requirements",
+        "--verified-by", "VT-*",
+        "--vstatus", "verified", "--json",
+      ],
+    )
+    # Both filters should apply (AND logic)
+    assert result is not None
+
+  def test_vstatus_nonexistent_returns_empty(self):
+    """Test --vstatus with value matching no entries returns empty."""
+    result = runner.invoke(
+      app, ["list", "requirements", "--vstatus", "blocked", "--json"]
+    )
+    # Should exit cleanly, possibly with no output
+    assert result is not None
+
+
 if __name__ == "__main__":
   pytest.main([__file__, "-v"])

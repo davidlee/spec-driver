@@ -280,7 +280,11 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
       patch.object(
         self.adapter, "_find_package_root", return_value=Path("/test/project")
       ),
-      patch.object(self.adapter, "_get_npx_command", return_value=["npx"]),
+      patch.object(
+        self.adapter,
+        "_get_npx_command",
+        return_value=["npx", "--yes", "ts-doc-extract"],
+      ),
       patch("subprocess.run") as mock_run,
     ):
       # Mock subprocess to return JSON
@@ -293,10 +297,11 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
 
       # Verify subprocess was called correctly
       mock_run.assert_called_once()
-      call_args = mock_run.call_args
-      assert call_args[0][0][0] == "npx"
-      assert "ts-doc-extract" in call_args[0][0]
-      assert "--variant=public" in call_args[0][0]
+      cmd = mock_run.call_args[0][0]
+      assert cmd == [
+        "npx", "--yes", "ts-doc-extract",
+        str(test_file), "--variant=public",
+      ]
 
   def test_extract_ast_directory_with_index(self) -> None:
     """Test AST extraction from directory finds index.ts."""
@@ -312,7 +317,11 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
       patch.object(
         self.adapter, "_find_package_root", return_value=Path("/test/project")
       ),
-      patch.object(self.adapter, "_get_npx_command", return_value=["npx"]),
+      patch.object(
+        self.adapter,
+        "_get_npx_command",
+        return_value=["npx", "--yes", "ts-doc-extract"],
+      ),
       patch("subprocess.run") as mock_run,
     ):
       mock_run.return_value = Mock(stdout=json.dumps({"module": "components"}))
@@ -344,7 +353,11 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
       patch.object(
         self.adapter, "_find_package_root", return_value=Path("/test/project")
       ),
-      patch.object(self.adapter, "_get_npx_command", return_value=["npx"]),
+      patch.object(
+        self.adapter,
+        "_get_npx_command",
+        return_value=["npx", "--yes", "ts-doc-extract"],
+      ),
       patch("subprocess.run") as mock_run,
     ):
       # Mock subprocess failure
@@ -365,7 +378,11 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
       patch.object(
         self.adapter, "_find_package_root", return_value=Path("/test/project")
       ),
-      patch.object(self.adapter, "_get_npx_command", return_value=["npx"]),
+      patch.object(
+        self.adapter,
+        "_get_npx_command",
+        return_value=["npx", "--yes", "ts-doc-extract"],
+      ),
       patch("subprocess.run") as mock_run,
     ):
       # Mock invalid JSON output

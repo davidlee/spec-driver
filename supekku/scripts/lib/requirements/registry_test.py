@@ -1105,5 +1105,393 @@ class TestRequirementsRegistryReverseQueries(unittest.TestCase):
     assert "SPEC-001.NF-020" in uids
 
 
+class TestRequirementCoverageEntries(unittest.TestCase):
+  """Test that coverage_entries field is populated during registry sync.
+
+  After _apply_coverage_blocks(), each RequirementRecord should have a
+  coverage_entries field containing the structured verification data
+  (artefact, kind, status) from coverage blocks.
+  """
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def _make_repo(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+    return root
+
+  def test_coverage_entries_populated_after_sync(self) -> None:
+    """Syncing with coverage blocks populates coverage_entries on records."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    test_root = Path(__file__).parent.parent.parent.parent.parent
+    coverage_dir = test_root / "tests" / "fixtures" / "requirements" / "coverage"
+
+    registry.sync_from_specs(spec_dirs=[coverage_dir], plan_dirs=[coverage_dir])
+
+    fr001 = registry.records["SPEC-900.FR-001"]
+    assert hasattr(fr001, "coverage_entries"), (
+      "RequirementRecord must have coverage_entries field"
+    )
+    assert isinstance(fr001.coverage_entries, list)
+    assert len(fr001.coverage_entries) >= 1
+
+    # Each entry should have artefact, kind, status
+    entry = fr001.coverage_entries[0]
+    assert "artefact" in entry
+    assert "kind" in entry
+    assert "status" in entry
+
+  def test_coverage_entries_contain_correct_data(self) -> None:
+    """Coverage entries preserve artefact ID, kind, and status from blocks."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    test_root = Path(__file__).parent.parent.parent.parent.parent
+    coverage_dir = test_root / "tests" / "fixtures" / "requirements" / "coverage"
+
+    registry.sync_from_specs(spec_dirs=[coverage_dir], plan_dirs=[coverage_dir])
+
+    fr001 = registry.records["SPEC-900.FR-001"]
+    artefacts = {e["artefact"] for e in fr001.coverage_entries}
+    assert "VT-900" in artefacts
+
+    kinds = {e["kind"] for e in fr001.coverage_entries}
+    assert "VT" in kinds
+
+    statuses = {e["status"] for e in fr001.coverage_entries}
+    assert "verified" in statuses
+
+  def test_coverage_entries_multiple_statuses(self) -> None:
+    """Requirements with entries from multiple sources aggregate all entries."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    test_root = Path(__file__).parent.parent.parent.parent.parent
+    coverage_dir = test_root / "tests" / "fixtures" / "requirements" / "coverage"
+
+    registry.sync_from_specs(spec_dirs=[coverage_dir], plan_dirs=[coverage_dir])
+
+    # FR-002 has entries from both SPEC-900 and IP-900
+    fr002 = registry.records["SPEC-900.FR-002"]
+    assert hasattr(fr002, "coverage_entries")
+    assert len(fr002.coverage_entries) >= 2  # From spec + plan
+
+  def test_coverage_entries_empty_for_no_coverage(self) -> None:
+    """Requirements without coverage blocks have empty coverage_entries."""
+    root = self._make_repo()
+
+    # Create a spec with no coverage blocks
+    spec_dir = root / "specify" / "tech" / "spec-001-example"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / "SPEC-001.md"
+    frontmatter = {
+      "id": "SPEC-001", "slug": "spec-001",
+      "name": "S", "status": "draft", "kind": "spec",
+    }
+    dump_markdown_file(
+      spec_path, frontmatter,
+      "# SPEC-001\n\n- FR-001: No coverage\n",
+    )
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+    registry.sync_from_specs([root / "specify" / "tech"], spec_registry=spec_registry)
+
+    fr001 = registry.records["SPEC-001.FR-001"]
+    assert hasattr(fr001, "coverage_entries")
+    assert fr001.coverage_entries == []
+
+  def test_coverage_entries_serialization(self) -> None:
+    """coverage_entries survives to_dict/from_dict round-trip."""
+    record = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Test",
+      coverage_entries=[
+        {"artefact": "VT-001", "kind": "VT", "status": "verified"},
+      ],
+    )
+
+    data = record.to_dict()
+    assert "coverage_entries" in data
+
+    restored = RequirementRecord.from_dict("SPEC-001.FR-001", data)
+    assert restored.coverage_entries == [
+      {"artefact": "VT-001", "kind": "VT", "status": "verified"},
+    ]
+
+
+class TestFindByVerificationStatus(unittest.TestCase):
+  """Test RequirementsRegistry.find_by_verification_status() method."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def _make_registry_with_entries(self) -> RequirementsRegistry:
+    """Create a registry with records having diverse coverage_entries."""
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    # FR-001: verified
+    registry.records["SPEC-001.FR-001"] = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Verified requirement",
+      coverage_entries=[
+        {"artefact": "VT-001", "kind": "VT", "status": "verified"},
+      ],
+    )
+    # FR-002: in-progress
+    registry.records["SPEC-001.FR-002"] = RequirementRecord(
+      uid="SPEC-001.FR-002",
+      label="FR-002",
+      title="In-progress requirement",
+      coverage_entries=[
+        {"artefact": "VT-002", "kind": "VT", "status": "in-progress"},
+      ],
+    )
+    # FR-003: planned
+    registry.records["SPEC-001.FR-003"] = RequirementRecord(
+      uid="SPEC-001.FR-003",
+      label="FR-003",
+      title="Planned requirement",
+      coverage_entries=[
+        {"artefact": "VA-001", "kind": "VA", "status": "planned"},
+      ],
+    )
+    # FR-004: mixed (verified + failed)
+    registry.records["SPEC-001.FR-004"] = RequirementRecord(
+      uid="SPEC-001.FR-004",
+      label="FR-004",
+      title="Mixed status requirement",
+      coverage_entries=[
+        {"artefact": "VT-003", "kind": "VT", "status": "verified"},
+        {"artefact": "VH-001", "kind": "VH", "status": "failed"},
+      ],
+    )
+    # NF-001: no coverage entries
+    registry.records["SPEC-001.NF-001"] = RequirementRecord(
+      uid="SPEC-001.NF-001",
+      label="NF-001",
+      title="No coverage requirement",
+      coverage_entries=[],
+    )
+    return registry
+
+  def test_single_status_verified(self) -> None:
+    """Filter by single status 'verified' returns matching requirements."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_status(["verified"])
+    uids = {r.uid for r in results}
+    assert "SPEC-001.FR-001" in uids  # Has verified entry
+    assert "SPEC-001.FR-004" in uids  # Has verified + failed
+    assert "SPEC-001.FR-002" not in uids
+
+  def test_single_status_failed(self) -> None:
+    """Filter by 'failed' returns requirements with failed entries."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_status(["failed"])
+    uids = {r.uid for r in results}
+    assert "SPEC-001.FR-004" in uids
+    assert len(uids) == 1
+
+  def test_multi_status_or_logic(self) -> None:
+    """Multi-value status uses OR logic: match if ANY entry matches ANY status."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_status(["planned", "in-progress"])
+    uids = {r.uid for r in results}
+    assert "SPEC-001.FR-002" in uids  # in-progress
+    assert "SPEC-001.FR-003" in uids  # planned
+    assert "SPEC-001.FR-001" not in uids
+
+  def test_empty_list_returns_all(self) -> None:
+    """Empty status list returns empty result (no filter match)."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_status([])
+    assert results == []
+
+  def test_nonexistent_status(self) -> None:
+    """Non-existent status returns empty list."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_status(["nonexistent"])
+    assert results == []
+
+  def test_results_sorted_by_uid(self) -> None:
+    """Results are sorted by uid."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_status(["verified"])
+    uids = [r.uid for r in results]
+    assert uids == sorted(uids)
+
+  def test_no_coverage_entries_excluded(self) -> None:
+    """Requirements with empty coverage_entries are never matched."""
+    registry = self._make_registry_with_entries()
+    # NF-001 has no coverage_entries — should never appear
+    for status in ["verified", "in-progress", "planned", "failed", "blocked"]:
+      results = registry.find_by_verification_status([status])
+      uids = {r.uid for r in results}
+      assert "SPEC-001.NF-001" not in uids
+
+
+class TestFindByVerificationKind(unittest.TestCase):
+  """Test RequirementsRegistry.find_by_verification_kind() method."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def _make_registry_with_entries(self) -> RequirementsRegistry:
+    """Create a registry with records having diverse verification kinds."""
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    # FR-001: VT only
+    registry.records["SPEC-001.FR-001"] = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="VT-only requirement",
+      coverage_entries=[
+        {"artefact": "VT-001", "kind": "VT", "status": "verified"},
+      ],
+    )
+    # FR-002: VA only
+    registry.records["SPEC-001.FR-002"] = RequirementRecord(
+      uid="SPEC-001.FR-002",
+      label="FR-002",
+      title="VA-only requirement",
+      coverage_entries=[
+        {"artefact": "VA-001", "kind": "VA", "status": "verified"},
+      ],
+    )
+    # FR-003: VH only
+    registry.records["SPEC-001.FR-003"] = RequirementRecord(
+      uid="SPEC-001.FR-003",
+      label="FR-003",
+      title="VH-only requirement",
+      coverage_entries=[
+        {"artefact": "VH-001", "kind": "VH", "status": "planned"},
+      ],
+    )
+    # FR-004: mixed VT + VA
+    registry.records["SPEC-001.FR-004"] = RequirementRecord(
+      uid="SPEC-001.FR-004",
+      label="FR-004",
+      title="Mixed VT+VA requirement",
+      coverage_entries=[
+        {"artefact": "VT-002", "kind": "VT", "status": "in-progress"},
+        {"artefact": "VA-002", "kind": "VA", "status": "verified"},
+      ],
+    )
+    # NF-001: no coverage entries
+    registry.records["SPEC-001.NF-001"] = RequirementRecord(
+      uid="SPEC-001.NF-001",
+      label="NF-001",
+      title="No coverage requirement",
+      coverage_entries=[],
+    )
+    return registry
+
+  def test_single_kind_vt(self) -> None:
+    """Filter by VT returns requirements with VT entries."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_kind(["VT"])
+    uids = {r.uid for r in results}
+    assert "SPEC-001.FR-001" in uids
+    assert "SPEC-001.FR-004" in uids
+    assert "SPEC-001.FR-002" not in uids  # VA only
+    assert "SPEC-001.FR-003" not in uids  # VH only
+
+  def test_single_kind_va(self) -> None:
+    """Filter by VA returns requirements with VA entries."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_kind(["VA"])
+    uids = {r.uid for r in results}
+    assert "SPEC-001.FR-002" in uids
+    assert "SPEC-001.FR-004" in uids
+    assert "SPEC-001.FR-001" not in uids
+
+  def test_single_kind_vh(self) -> None:
+    """Filter by VH returns requirements with VH entries."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_kind(["VH"])
+    uids = {r.uid for r in results}
+    assert uids == {"SPEC-001.FR-003"}
+
+  def test_multi_kind_or_logic(self) -> None:
+    """Multi-value kind uses OR logic."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_kind(["VA", "VH"])
+    uids = {r.uid for r in results}
+    assert "SPEC-001.FR-002" in uids  # VA
+    assert "SPEC-001.FR-003" in uids  # VH
+    assert "SPEC-001.FR-004" in uids  # VA+VT (matches VA)
+    assert "SPEC-001.FR-001" not in uids  # VT only
+
+  def test_all_kinds(self) -> None:
+    """Filtering by all three kinds returns all requirements with coverage."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_kind(["VT", "VA", "VH"])
+    uids = {r.uid for r in results}
+    assert "SPEC-001.NF-001" not in uids  # No entries
+    assert len(uids) == 4
+
+  def test_empty_list_returns_empty(self) -> None:
+    """Empty kind list returns empty result."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_kind([])
+    assert results == []
+
+  def test_nonexistent_kind(self) -> None:
+    """Non-existent kind returns empty list."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_kind(["XX"])
+    assert results == []
+
+  def test_results_sorted_by_uid(self) -> None:
+    """Results are sorted by uid."""
+    registry = self._make_registry_with_entries()
+    results = registry.find_by_verification_kind(["VT"])
+    uids = [r.uid for r in results]
+    assert uids == sorted(uids)
+
+  def test_no_coverage_entries_excluded(self) -> None:
+    """Requirements with empty coverage_entries never matched."""
+    registry = self._make_registry_with_entries()
+    for kind in ["VT", "VA", "VH"]:
+      results = registry.find_by_verification_kind([kind])
+      uids = {r.uid for r in results}
+      assert "SPEC-001.NF-001" not in uids
+
+
 if __name__ == "__main__":
   unittest.main()

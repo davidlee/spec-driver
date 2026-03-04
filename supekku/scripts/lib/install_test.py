@@ -352,6 +352,69 @@ def test_initialize_workspace_boot_md_idempotent(tmp_path: Path) -> None:
   assert boot_md.read_text(encoding="utf-8") == first
 
 
+# --- workflow.toml exec detection tests ---
+
+
+def test_initialize_creates_workflow_toml_with_detected_exec(
+  tmp_path: Path,
+) -> None:
+  """On fresh install, workflow.toml is created with detected exec command."""
+  initialize_workspace(tmp_path, auto_yes=True)
+
+  workflow_toml = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+  assert workflow_toml.exists()
+  content = workflow_toml.read_text(encoding="utf-8")
+  assert "[tool]" in content
+  assert 'exec = ' in content
+
+
+def test_initialize_preserves_existing_workflow_toml(tmp_path: Path) -> None:
+  """Existing workflow.toml is never overwritten."""
+  sd_dir = tmp_path / SPEC_DRIVER_DIR
+  sd_dir.mkdir(parents=True)
+  (sd_dir / "workflow.toml").write_text(
+    '[tool]\nexec = "custom-runner"\n',
+    encoding="utf-8",
+  )
+
+  initialize_workspace(tmp_path, auto_yes=True)
+
+  content = (sd_dir / "workflow.toml").read_text(encoding="utf-8")
+  assert 'exec = "custom-runner"' in content
+
+
+def test_initialize_detects_project_dep_exec(tmp_path: Path) -> None:
+  """When pyproject.toml lists spec-driver, exec is 'uv run spec-driver'."""
+  (tmp_path / "pyproject.toml").write_text(
+    '[project]\ndependencies = ["spec-driver>=0.6"]\n',
+    encoding="utf-8",
+  )
+
+  with mock.patch("supekku.scripts.lib.core.config.which", return_value="/usr/bin/uv"):
+    initialize_workspace(tmp_path, auto_yes=True)
+
+  content = (tmp_path / SPEC_DRIVER_DIR / "workflow.toml").read_text(encoding="utf-8")
+  assert 'exec = "uv run spec-driver"' in content
+
+
+def test_initialize_detects_global_install_exec(tmp_path: Path) -> None:
+  """When binary is in a permanent location, exec is bare 'spec-driver'."""
+  with mock.patch("sys.argv", ["/nix/store/abc/bin/spec-driver", "install"]):
+    initialize_workspace(tmp_path, auto_yes=True)
+
+  content = (tmp_path / SPEC_DRIVER_DIR / "workflow.toml").read_text(encoding="utf-8")
+  assert 'exec = "spec-driver"' in content
+
+
+def test_initialize_dry_run_does_not_create_workflow_toml(
+  tmp_path: Path,
+) -> None:
+  """Dry-run reports but does not write workflow.toml."""
+  initialize_workspace(tmp_path, dry_run=True)
+
+  assert not (tmp_path / SPEC_DRIVER_DIR / "workflow.toml").exists()
+
+
 # --- Agent template rendering tests ---
 
 
@@ -390,18 +453,23 @@ def test_initialize_workspace_renders_agent_docs(tmp_path: Path) -> None:
 def test_initialize_workspace_renders_agent_docs_with_defaults(
   tmp_path: Path,
 ) -> None:
-  """Without workflow.toml, agent docs are rendered using default config."""
-  initialize_workspace(tmp_path, auto_yes=True)
+  """Without workflow.toml, agent docs are rendered using detected exec + defaults."""
+  with mock.patch(
+    "supekku.scripts.install.detect_exec_command",
+    return_value="uv run spec-driver",
+  ):
+    initialize_workspace(tmp_path, auto_yes=True)
 
   agents_dir = tmp_path / SPEC_DRIVER_DIR / "agents"
 
   for name in ("exec", "workflow", "glossary", "policy"):
     assert (agents_dir / f"{name}.md").exists(), f"agents/{name}.md missing"
 
-  # Defaults: ceremony=pioneer, tool.exec="uv run spec-driver", cards.enabled=True
+  # exec.md reflects detected command written to workflow.toml
   exec_content = (agents_dir / "exec.md").read_text()
   assert "uv run spec-driver" in exec_content
 
+  # Other defaults: ceremony=pioneer, cards.enabled=True
   workflow_content = (agents_dir / "workflow.md").read_text()
   assert "pioneer" in workflow_content
 

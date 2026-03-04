@@ -14,7 +14,7 @@ from pathlib import Path
 
 import yaml
 
-from supekku.scripts.lib.core.config import load_workflow_config
+from supekku.scripts.lib.core.config import detect_exec_command, load_workflow_config
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
 from supekku.scripts.lib.core.templates import TemplateNotFoundError, render_template
 
@@ -477,6 +477,18 @@ def initialize_workspace(
       )
     else:
       pass
+
+  # Create workflow.toml with detected exec if it doesn't exist
+  workflow_toml = target_root / SPEC_DRIVER_DIR / "workflow.toml"
+  if not workflow_toml.exists():
+    exec_cmd = detect_exec_command(target_root)
+    if dry_run:
+      print(f'\n[DRY RUN] workflow.toml: exec = "{exec_cmd}"')
+    else:
+      workflow_toml.write_text(
+        f'[tool]\nexec = "{exec_cmd}"\n',
+        encoding="utf-8",
+      )
 
   # Copy templates from package to target
   package_root = get_package_root()

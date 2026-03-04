@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
 from supekku.scripts.lib.core.config import (
   DEFAULT_CONFIG,
+  _is_project_dependency,
+  detect_exec_command,
   is_strict_mode,
   load_workflow_config,
 )
@@ -188,3 +191,110 @@ def test_is_strict_mode_returns_false_when_disabled() -> None:
 def test_is_strict_mode_returns_false_when_key_missing() -> None:
   """is_strict_mode() returns False when strict_mode key is absent."""
   assert is_strict_mode({}) is False
+
+
+# --- exec detection tests ---
+
+
+class TestIsProjectDependency:
+  """Tests for _is_project_dependency."""
+
+  def test_no_pyproject(self, tmp_path: Path) -> None:
+    """Returns False when pyproject.toml is absent."""
+    assert _is_project_dependency(tmp_path) is False
+
+  def test_project_dependency(self, tmp_path: Path) -> None:
+    """Detects spec-driver in [project.dependencies]."""
+    (tmp_path / "pyproject.toml").write_text(
+      '[project]\ndependencies = ["spec-driver>=0.6"]\n',
+      encoding="utf-8",
+    )
+    assert _is_project_dependency(tmp_path) is True
+
+  def test_dependency_group(self, tmp_path: Path) -> None:
+    """Detects spec-driver in [dependency-groups]."""
+    (tmp_path / "pyproject.toml").write_text(
+      '[dependency-groups]\ndev = ["spec-driver>=0.6"]\n',
+      encoding="utf-8",
+    )
+    assert _is_project_dependency(tmp_path) is True
+
+  def test_unrelated_project(self, tmp_path: Path) -> None:
+    """Returns False when spec-driver is not a dependency."""
+    (tmp_path / "pyproject.toml").write_text(
+      '[project]\ndependencies = ["requests"]\n',
+      encoding="utf-8",
+    )
+    assert _is_project_dependency(tmp_path) is False
+
+  def test_tool_uv_dev_dependencies(self, tmp_path: Path) -> None:
+    """Detects spec-driver in [tool.uv.dev-dependencies]."""
+    (tmp_path / "pyproject.toml").write_text(
+      '[tool.uv]\ndev-dependencies = ["spec-driver"]\n',
+      encoding="utf-8",
+    )
+    assert _is_project_dependency(tmp_path) is True
+
+  def test_uv_toml_dev_dependencies(self, tmp_path: Path) -> None:
+    """Detects spec-driver in uv.toml dev-dependencies."""
+    (tmp_path / "uv.toml").write_text(
+      'dev-dependencies = ["spec-driver>=0.6"]\n',
+      encoding="utf-8",
+    )
+    assert _is_project_dependency(tmp_path) is True
+
+  def test_venv_binary_exists(self, tmp_path: Path) -> None:
+    """Detects .venv/bin/spec-driver as strongest signal."""
+    venv_bin = tmp_path / ".venv" / "bin"
+    venv_bin.mkdir(parents=True)
+    binary = venv_bin / "spec-driver"
+    binary.write_text("#!/bin/sh\n")
+    binary.chmod(0o755)
+    assert _is_project_dependency(tmp_path) is True
+
+  def test_invalid_toml(self, tmp_path: Path) -> None:
+    """Returns False on malformed pyproject.toml."""
+    (tmp_path / "pyproject.toml").write_text("[[invalid", encoding="utf-8")
+    assert _is_project_dependency(tmp_path) is False
+
+
+class TestDetectExecCommand:
+  """Tests for detect_exec_command."""
+
+  def test_project_dep_with_uv(self, tmp_path: Path) -> None:
+    """Project dependency + uv available → uv run."""
+    (tmp_path / "pyproject.toml").write_text(
+      '[project]\ndependencies = ["spec-driver"]\n',
+      encoding="utf-8",
+    )
+    with patch("supekku.scripts.lib.core.config.which", return_value="/usr/bin/uv"):
+      assert detect_exec_command(tmp_path) == "uv run spec-driver"
+
+  def test_global_install(self, tmp_path: Path) -> None:
+    """Binary in permanent location, no project dep → bare command."""
+    with patch("sys.argv", ["/usr/local/bin/spec-driver", "install"]):
+      assert detect_exec_command(tmp_path) == "spec-driver"
+
+  def test_uvx_fallback(self, tmp_path: Path) -> None:
+    """Transient binary + uvx available → uvx."""
+    with (
+      patch("sys.argv", ["/home/u/.cache/uv/tool/spec-driver", "install"]),
+      patch(
+        "supekku.scripts.lib.core.config.which",
+        side_effect=lambda cmd: "/usr/bin/uvx" if cmd == "uvx" else None,
+      ),
+    ):
+      assert detect_exec_command(tmp_path) == "uvx spec-driver"
+
+  def test_nix_store_is_global(self, tmp_path: Path) -> None:
+    """Binary in /nix/store/ is a permanent global install."""
+    with patch("sys.argv", ["/nix/store/abc123/bin/spec-driver", "install"]):
+      assert detect_exec_command(tmp_path) == "spec-driver"
+
+  def test_venv_without_uvx_falls_back(self, tmp_path: Path) -> None:
+    """Transient binary, no uvx → bare command as last resort."""
+    with (
+      patch("sys.argv", ["/proj/.venv/bin/spec-driver", "install"]),
+      patch("supekku.scripts.lib.core.config.which", return_value=None),
+    ):
+      assert detect_exec_command(tmp_path) == "spec-driver"

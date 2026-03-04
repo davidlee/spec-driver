@@ -8,7 +8,7 @@ Your specification-driven development framework construction toolkit, with multi
 - Maintain verifiably accurate, evergreen specs covering your _entire system_
 - Use cheap, fast, deterministically generated docs to complement and audit the work of messy, stochastic agents
 - The combination of markdown and YAML is a surprisingly powerful platform for structured, legible data
-- Tooling joins related entities through a registry for fast lookup, validation, and relational data 
+- Tooling joins related entities through a registry for fast lookup, validation, and relational data
 - Stop banging rocks together
 
 **What for?**
@@ -54,20 +54,25 @@ A smorgasbord for you to build your own workflow around
 ### PyPi package
 
 ```zsh
-# try before you buy (no install)
+# try before you buy
 uvx spec-driver --help
+uvx spec-driver install
 
-# Or settle in with it 
+# install as a tool (recommended)
+uv tool install spec-driver
+spec-driver install
+
+# Or set up as a python project
 uv init
-uv add speec-driver
-uv run spec-driver --help
+uv add spec-driver
+uv run spec-driver install
 ```
 
 ### From GitHub (Development)
 
 ```zsh
 # Install from latest commit
-uv init 
+uv init
 uv add git+https://github.com/davidlee/spec-driver
 uv run spec-driver --help
 
@@ -75,58 +80,70 @@ uv run spec-driver --help
 uvx --from git+https://github.com/davidlee/spec-driver spec-driver --help
 ```
 
+### Brew
+
+```zsh
+brew tap davidlee/spec-driver
+brew install spec-driver
+```
+
+### Nix Flake
+
+```zsh
+nix profile install github:davidlee/spec-driver
+```
+
+Or use the flake input:
+
+```nix
+inputs.spec-driver.url = "github:davidlee/spec-driver";
+```
+
+[example](./shell.nix) dev shell.
+
+## Extras: Contract generation
+
+If you're writing TypeScript / JavaScript, Go, or Zig, you'll want to install
+the appropriate contract doc generator:
+
+- gomarkdoc
+- [zigmarkdoc](https://github.com/davidlee/zigmarkdoc)
+
 ## npm dependency: ts-doc-extract
 
 ```zsh
-npx ts-doc-extract
-
+npx ts-doc-extract --yes
 ```
-**IMPORTANT**: The TypeScript doc/contract generation requires the
-[ts-doc-extract](https://www.npmjs.com/package/ts-doc-extract) package
-available and will attempt to run it in a non-interactive shell using npx,
-which will cause `spec-driver sync` to hang in a not especially informative way
-if you have typescript / javascript code in your project. 
 
-For now, that means you need to run `npx ts-doc-extract` as part of
-installation. Hopefully the fix is as simple in the common case as adding
-`--yes` to multi-language npx invocation (although I'd much rather wrap it in a
-confirmation).
+Doc/contract generation requires the
+[ts-doc-extract](https://www.npmjs.com/package/ts-doc-extract) package if you
+have TypeScript in your project, and will install it using npx. It's a small
+library which uses the tsc AST to generate compact documentation.
+
 ![workflow diagram](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/simple.svg)
 
 ## Quick Start
 
-```bash
-# Initialize workspace in your project
-spec-driver install
-
-# Sync specs with your codebase
-spec-driver sync
-
-# All commands have help
-spec-driver --help
-
-# List all your specs
-spec-driver list specs
-
-# Get the file path where a requirement is defined (every command supports --json)
-spec-driver show requirement PROD-010.NF-001 --json | jq -r '.path'
-
-# Create a new spec
-spec-driver create spec --kind tech
-
-# Better yet, have Claude do the legwork
-/supekku.specify prod: make users punch a banner with a monkey to win prizes
-
-# Create a new delta
-spec-driver create delta 
-
-# Create the next phase's runsheet for detailed tracking (under an implementation plan)
-spec-driver create phase --plan IP-012
+```zsh
+claude
 ```
 
-## Usage
+If you use Claude Code or Codex, your agent can manage the workflow, and you
+can stop reading here.
 
-All commands are accessed through the unified `spec-driver` CLI. You probably run it with `uv run spec-driver`, but that's a bit long so maybe set an alias? You'll be using it a bit.
+The rest is for reference if you need it.
+
+## Tool use
+
+All commands are accessed through the unified `spec-driver` CLI.
+
+Depending on how you installed it, you might need to use `uv run spec-driver`.
+
+I suggest adding alias to your `.zshrc` or `.envrc`:
+
+```zsh
+alias sdr="uv run spec-driver"
+```
 
 ### Installation & Setup
 
@@ -137,8 +154,9 @@ spec-driver install
 # This creates:
 # - specify/ directory (for specs, ADRs)
 # - change/ directory (for deltas, revisions)
-# - .spec-driver/registry/ (for YAML registries)
-# - .spec-driver/templates (user-editable, markdown w/ Jinja2) 
+# - memories/ directory (agent memory files)
+# - .spec-driver/ (YAML registries & configuration)
+# - agent skills (depending on your configuration)
 ```
 
 ### Synchronization
@@ -348,7 +366,7 @@ spec-driver validate
 
 ## Development
 
-This package is under active development, and API stability is not even hinted at. 
+This package is under active development, and API stability is not even hinted at.
 
 I'll aim not to make breaking changes to data formats, though.
 

@@ -382,10 +382,9 @@ class TypeScriptAdapter(LanguageAdapter):
 
     npx_cmd = self._get_npx_command(package_root)
 
-    # Build command
+    # Build command (npx_cmd already includes the package name)
     cmd = [
       *npx_cmd,
-      "ts-doc-extract",
       str(file_path),
       f"--variant={variant}",
     ]

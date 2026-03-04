@@ -365,7 +365,7 @@ def test_initialize_creates_workflow_toml_with_detected_exec(
   assert workflow_toml.exists()
   content = workflow_toml.read_text(encoding="utf-8")
   assert "[tool]" in content
-  assert 'exec = ' in content
+  assert "exec = " in content
 
 
 def test_initialize_preserves_existing_workflow_toml(tmp_path: Path) -> None:

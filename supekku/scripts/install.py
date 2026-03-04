@@ -339,9 +339,7 @@ def copy_directory_if_changed(
       shutil.copy2(src_file, dest_file)
 
 
-def _render_boot_md(
-  target_root: Path, *, dry_run: bool = False
-) -> None:
+def _render_boot_md(target_root: Path, *, dry_run: bool = False) -> None:
   """Render boot.md template into .spec-driver/BOOT.md.
 
   Falls back to a minimal default ('/boot') if the template is missing.

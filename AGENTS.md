@@ -1,3 +1,5 @@
+@.spec-driver/BOOT.md
+
 @.spec-driver/AGENTS.md
 
 # SpecDriver Architecture Guide

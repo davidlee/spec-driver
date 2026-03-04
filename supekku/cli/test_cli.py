@@ -1120,9 +1120,7 @@ class TestVerificationStatusFilters:
 
   def test_vkind_flag_exists(self):
     """Test that list requirements accepts --vkind flag."""
-    result = runner.invoke(
-      app, ["list", "requirements", "--vkind", "VT", "--json"]
-    )
+    result = runner.invoke(app, ["list", "requirements", "--vkind", "VT", "--json"])
     assert "No such option" not in (result.stdout + (result.stderr or "")), (
       "--vkind flag not recognized"
     )
@@ -1141,9 +1139,7 @@ class TestVerificationStatusFilters:
       for item in items:
         entries = item.get("coverage_entries", [])
         statuses = {e.get("status") for e in entries}
-        assert "verified" in statuses, (
-          f"{item['uid']} has no verified entry"
-        )
+        assert "verified" in statuses, f"{item['uid']} has no verified entry"
 
   def test_vstatus_multi_value(self):
     """Test --vstatus with comma-separated values (OR logic)."""
@@ -1165,9 +1161,7 @@ class TestVerificationStatusFilters:
 
   def test_vkind_single_value(self):
     """Test --vkind with single kind filters by verification kind."""
-    result = runner.invoke(
-      app, ["list", "requirements", "--vkind", "VT", "--json"]
-    )
+    result = runner.invoke(app, ["list", "requirements", "--vkind", "VT", "--json"])
     if result.exit_code == 0 and result.stdout.strip():
       import json
 
@@ -1180,9 +1174,7 @@ class TestVerificationStatusFilters:
 
   def test_vkind_multi_value(self):
     """Test --vkind with comma-separated values (OR logic)."""
-    result = runner.invoke(
-      app, ["list", "requirements", "--vkind", "VA,VH", "--json"]
-    )
+    result = runner.invoke(app, ["list", "requirements", "--vkind", "VA,VH", "--json"])
     if result.exit_code == 0 and result.stdout.strip():
       import json
 
@@ -1191,9 +1183,7 @@ class TestVerificationStatusFilters:
       for item in items:
         entries = item.get("coverage_entries", [])
         kinds = {e.get("kind") for e in entries}
-        assert kinds & {"VA", "VH"}, (
-          f"{item['uid']} has no VA/VH entry"
-        )
+        assert kinds & {"VA", "VH"}, f"{item['uid']} has no VA/VH entry"
 
   def test_vstatus_and_vkind_combined(self):
     """Test combining --vstatus and --vkind (AND logic across flags)."""
@@ -1210,9 +1200,7 @@ class TestVerificationStatusFilters:
         entries = item.get("coverage_entries", [])
         has_verified = any(e.get("status") == "verified" for e in entries)
         has_vt = any(e.get("kind") == "VT" for e in entries)
-        assert has_verified and has_vt, (
-          f"{item['uid']} missing verified+VT"
-        )
+        assert has_verified and has_vt, f"{item['uid']} missing verified+VT"
 
   def test_vstatus_with_spec_filter(self):
     """Test combining --vstatus with --spec filter."""
@@ -1227,18 +1215,20 @@ class TestVerificationStatusFilters:
       data = json.loads(result.stdout)
       items = data.get("items", [])
       for item in items:
-        assert "SPEC-110" in item.get("specs", []), (
-          f"{item['uid']} not in SPEC-110"
-        )
+        assert "SPEC-110" in item.get("specs", []), f"{item['uid']} not in SPEC-110"
 
   def test_vstatus_with_verified_by_filter(self):
     """Test combining --vstatus with --verified-by filter."""
     result = runner.invoke(
       app,
       [
-        "list", "requirements",
-        "--verified-by", "VT-*",
-        "--vstatus", "verified", "--json",
+        "list",
+        "requirements",
+        "--verified-by",
+        "VT-*",
+        "--vstatus",
+        "verified",
+        "--json",
       ],
     )
     # Both filters should apply (AND logic)

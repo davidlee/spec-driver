@@ -299,8 +299,11 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
       mock_run.assert_called_once()
       cmd = mock_run.call_args[0][0]
       assert cmd == [
-        "npx", "--yes", "ts-doc-extract",
-        str(test_file), "--variant=public",
+        "npx",
+        "--yes",
+        "ts-doc-extract",
+        str(test_file),
+        "--variant=public",
       ]
 
   def test_extract_ast_directory_with_index(self) -> None:

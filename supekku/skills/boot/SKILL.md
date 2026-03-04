@@ -12,5 +12,7 @@ Read and follow the guidance in these files:
 @.spec-driver/agents/glossary.md
 @.spec-driver/agents/workflow.md
 @.spec-driver/agents/policy.md
+@.spec-driver/agents/memory.md
 
 @.spec-driver/doctrine.md
+

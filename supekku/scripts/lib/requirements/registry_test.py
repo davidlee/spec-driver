@@ -1197,11 +1197,15 @@ class TestRequirementCoverageEntries(unittest.TestCase):
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / "SPEC-001.md"
     frontmatter = {
-      "id": "SPEC-001", "slug": "spec-001",
-      "name": "S", "status": "draft", "kind": "spec",
+      "id": "SPEC-001",
+      "slug": "spec-001",
+      "name": "S",
+      "status": "draft",
+      "kind": "spec",
     }
     dump_markdown_file(
-      spec_path, frontmatter,
+      spec_path,
+      frontmatter,
       "# SPEC-001\n\n- FR-001: No coverage\n",
     )
 

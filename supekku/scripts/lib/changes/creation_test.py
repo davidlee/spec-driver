@@ -520,6 +520,44 @@ class CreateChangeTest(unittest.TestCase):
     phase_content = result.phase_path.read_text(encoding="utf-8")
     assert "Test empty arrays" in phase_content
 
+  def test_create_phase_plan_with_backslash_sequences(self) -> None:
+    """Regression: re.sub must not interpret backslash sequences in plan content.
+
+    When a plan file contains text like URLs or unicode escapes (e.g. \\u, \\n),
+    _update_plan_overview_phases used to pass the replacement string directly to
+    re.sub, which interprets backslash sequences. This caused 'bad escape \\u'
+    errors. The fix uses a lambda replacement to avoid interpretation.
+    """
+    root = self._make_repo()
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+
+    # Inject content with backslash-like sequences into the plan
+    content = plan_path.read_text(encoding="utf-8")
+    content += dedent("""\
+      ## Notes
+      - URL: https://example.com/users/update
+      - Unicode example: bullet \\u2022
+    """)
+    plan_path.write_text(content, encoding="utf-8")
+
+    # This should not raise "bad escape \\u"
+    result = create_phase("Phase with escapes", plan_id, repo_root=root)
+    assert result.phase_path.exists()
+
+    # Verify plan was updated correctly
+    updated = plan_path.read_text(encoding="utf-8")
+    assert f"- id: {result.phase_id}" in updated
+    # Verify the injected content survived
+    assert "https://example.com/users/update" in updated
+
   def test_create_audit(self) -> None:
     """Test creating an audit artifact with spec and prod refs."""
     root = self._make_repo()

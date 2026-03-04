@@ -589,7 +589,8 @@ def _update_plan_overview_phases(
     re.DOTALL,
   )
 
-  new_content = pattern.sub(new_block, content, count=1)
+  # Use lambda to avoid re.sub interpreting backslash sequences in replacement
+  new_content = pattern.sub(lambda _: new_block, content, count=1)
 
   if new_content == content:
     msg = f"Failed to replace plan.overview block in {plan_path}"

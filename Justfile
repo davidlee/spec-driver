@@ -20,7 +20,10 @@ pylint:
 pylint-only *args:
   uv run pylint supekku --disable=all --extension-pkg-allow-list=pylint.extensions.mccabe --enable={{args}}
 
-publish: && brew-update
+
+publish: publish-pypi brew-update brew-publish
+
+publish-pypi:
   rm -fr dist/
   uv build
   rm dist/.gitignore

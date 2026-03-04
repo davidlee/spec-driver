@@ -521,5 +521,68 @@ class ShowRawFlagTest(unittest.TestCase):
     assert "raw file content" in result.stdout.lower()
 
 
+# ── Pre-migration regression tests for show revision (VT-migration) ──
+
+
+class ShowRevisionRegressionTest(unittest.TestCase):
+  """Regression tests for show revision — must pass before AND after migration."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.root = find_repo_root()
+
+  def test_show_revision_default(self) -> None:
+    """show revision RE-001 outputs formatted details."""
+    result = self.runner.invoke(app, ["revision", "RE-001"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "RE-001" in result.stdout
+
+  def test_show_revision_numeric_shorthand(self) -> None:
+    """show revision 1 resolves to RE-001."""
+    result = self.runner.invoke(app, ["revision", "1"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "RE-001" in result.stdout
+
+  def test_show_revision_path(self) -> None:
+    """show revision --path outputs file path."""
+    result = self.runner.invoke(app, ["revision", "RE-001", "--path"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    path = result.stdout.strip()
+    assert path.endswith(".md")
+    assert Path(path).exists()
+
+  def test_show_revision_raw(self) -> None:
+    """show revision --raw outputs raw file content."""
+    result = self.runner.invoke(app, ["revision", "RE-001", "--raw"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "---" in result.stdout  # frontmatter
+
+  def test_show_revision_json_known_bug(self) -> None:
+    """show revision --json has known bug: to_dict() called without repo_root.
+
+    This test documents current broken behavior. After migration (task 1.7),
+    this test will be updated to assert correct JSON output.
+    """
+    result = self.runner.invoke(app, ["revision", "RE-001", "--json"])
+    # Known bug: may produce incorrect output or crash
+    # We just document that it runs (exit code may be 0 or 1)
+    if result.exit_code == 0:
+      # If it succeeds, output should be valid JSON
+      parsed = json.loads(result.stdout)
+      assert isinstance(parsed, dict)
+
+  def test_show_revision_not_found(self) -> None:
+    """show revision with nonexistent ID fails gracefully."""
+    result = self.runner.invoke(app, ["revision", "RE-999"])
+    assert result.exit_code == 1
+    assert "not found" in result.stderr.lower()
+
+  def test_show_revision_mutual_exclusivity(self) -> None:
+    """show revision --json --path fails with mutual exclusivity error."""
+    result = self.runner.invoke(app, ["revision", "RE-001", "--json", "--path"])
+    assert result.exit_code == 1
+    assert "mutually exclusive" in result.stderr.lower()
+
+
 if __name__ == "__main__":
   unittest.main()

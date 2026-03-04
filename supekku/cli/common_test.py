@@ -17,6 +17,7 @@ from supekku.cli.common import (
   ArtifactNotFoundError,
   ArtifactRef,
   emit_artifact,
+  find_artifacts,
   resolve_artifact,
 )
 
@@ -281,6 +282,60 @@ class TestResolveArtifactCard:
       resolve_artifact("card", "T999", Path("/repo"))
 
 
+class TestResolveArtifactPolicy:
+  """resolve_artifact for policy type."""
+
+  @patch("supekku.scripts.lib.policies.registry.PolicyRegistry")
+  def test_resolves_policy(self, mock_cls: MagicMock) -> None:
+    record = SimpleNamespace(id="POL-001", path="/repo/specify/policies/POL-001.md")
+    mock_cls.return_value.find.return_value = record
+
+    ref = resolve_artifact("policy", "1", Path("/repo"))
+    assert ref.id == "POL-001"
+    assert ref.path == Path("/repo/specify/policies/POL-001.md")
+
+  @patch("supekku.scripts.lib.policies.registry.PolicyRegistry")
+  def test_raises_not_found(self, mock_cls: MagicMock) -> None:
+    mock_cls.return_value.find.return_value = None
+
+    with pytest.raises(ArtifactNotFoundError):
+      resolve_artifact("policy", "POL-999", Path("/repo"))
+
+
+class TestResolveArtifactStandard:
+  """resolve_artifact for standard type."""
+
+  @patch("supekku.scripts.lib.standards.registry.StandardRegistry")
+  def test_resolves_standard(self, mock_cls: MagicMock) -> None:
+    record = SimpleNamespace(id="STD-001", path="/repo/specify/standards/STD-001.md")
+    mock_cls.return_value.find.return_value = record
+
+    ref = resolve_artifact("standard", "1", Path("/repo"))
+    assert ref.id == "STD-001"
+
+  @patch("supekku.scripts.lib.standards.registry.StandardRegistry")
+  def test_raises_not_found(self, mock_cls: MagicMock) -> None:
+    mock_cls.return_value.find.return_value = None
+
+    with pytest.raises(ArtifactNotFoundError):
+      resolve_artifact("standard", "STD-999", Path("/repo"))
+
+
+class TestResolveArtifactDispatchCoverage:
+  """All types in dispatch table are exercised."""
+
+  @pytest.mark.parametrize("artifact_type", [
+    "spec", "delta", "revision", "audit", "adr",
+    "policy", "standard", "requirement", "card", "memory",
+  ])
+  def test_known_type_does_not_raise_value_error(
+    self, artifact_type: str
+  ) -> None:
+    """Every registered type should dispatch (may raise NotFound, not ValueError)."""
+    with pytest.raises((ArtifactNotFoundError, FileNotFoundError, Exception)):
+      resolve_artifact(artifact_type, "NONEXISTENT-999", Path("/tmp/no-repo"))
+
+
 class TestResolveArtifactUnsupportedType:
   """resolve_artifact raises ValueError for unknown types."""
 
@@ -411,3 +466,165 @@ class TestEmitArtifactMutualExclusivity:
         json_fn=lambda r: "",
       )
     assert "mutually exclusive" in capsys.readouterr().err
+
+
+# ── find_artifacts ──────────────────────────────────────────────
+
+
+class TestFindArtifactsRevision:
+  """find_artifacts for revision type — returns matching ArtifactRefs."""
+
+  @patch("supekku.scripts.lib.changes.registry.ChangeRegistry")
+  def test_finds_matching_revisions(self, mock_cls: MagicMock) -> None:
+    arts = {
+      "RE-001": _mock_change_artifact("RE-001", "/repo/re-001.md"),
+      "RE-002": _mock_change_artifact("RE-002", "/repo/re-002.md"),
+      "RE-010": _mock_change_artifact("RE-010", "/repo/re-010.md"),
+    }
+    mock_cls.return_value = _mock_registry_collect(arts)
+
+    refs = list(find_artifacts("revision", "RE-00*", Path("/repo")))
+    ids = [r.id for r in refs]
+    assert "RE-001" in ids
+    assert "RE-002" in ids
+    assert "RE-010" not in ids
+
+  @patch("supekku.scripts.lib.changes.registry.ChangeRegistry")
+  def test_empty_results(self, mock_cls: MagicMock) -> None:
+    mock_cls.return_value = _mock_registry_collect({})
+
+    refs = list(find_artifacts("revision", "RE-*", Path("/repo")))
+    assert refs == []
+
+  @patch("supekku.scripts.lib.changes.registry.ChangeRegistry")
+  def test_numeric_pattern_normalized(self, mock_cls: MagicMock) -> None:
+    arts = {"RE-001": _mock_change_artifact("RE-001", "/repo/re.md")}
+    mock_cls.return_value = _mock_registry_collect(arts)
+
+    refs = list(find_artifacts("revision", "1", Path("/repo")))
+    assert len(refs) == 1
+    assert refs[0].id == "RE-001"
+
+
+class TestFindArtifactsSpec:
+  """find_artifacts for spec type."""
+
+  @patch("supekku.scripts.lib.specs.registry.SpecRegistry")
+  def test_finds_matching_specs(self, mock_cls: MagicMock) -> None:
+    specs = [
+      SimpleNamespace(id="SPEC-009", path=Path("/repo/spec-009.md")),
+      SimpleNamespace(id="SPEC-010", path=Path("/repo/spec-010.md")),
+      SimpleNamespace(id="PROD-001", path=Path("/repo/prod-001.md")),
+    ]
+    mock_cls.return_value.all_specs.return_value = specs
+
+    refs = list(find_artifacts("spec", "SPEC-*", Path("/repo")))
+    ids = [r.id for r in refs]
+    assert ids == ["SPEC-009", "SPEC-010"]
+
+
+class TestFindArtifactsMemory:
+  """find_artifacts for memory type — auto-prepends mem. prefix."""
+
+  @patch("supekku.scripts.lib.memory.registry.MemoryRegistry")
+  def test_finds_with_prefix_normalization(self, mock_cls: MagicMock) -> None:
+    records = {
+      "mem.pattern.cli.skinny": SimpleNamespace(
+        id="mem.pattern.cli.skinny",
+        path=Path("/repo/memory/mem.pattern.cli.skinny.md"),
+      ),
+      "mem.fact.auth": SimpleNamespace(
+        id="mem.fact.auth",
+        path=Path("/repo/memory/mem.fact.auth.md"),
+      ),
+    }
+    mock_cls.return_value.collect.return_value = records
+
+    refs = list(find_artifacts("memory", "pattern.*", Path("/repo")))
+    assert len(refs) == 1
+    assert refs[0].id == "mem.pattern.cli.skinny"
+
+  @patch("supekku.scripts.lib.memory.registry.MemoryRegistry")
+  def test_pattern_already_prefixed(self, mock_cls: MagicMock) -> None:
+    records = {
+      "mem.fact.auth": SimpleNamespace(
+        id="mem.fact.auth",
+        path=Path("/repo/memory/mem.fact.auth.md"),
+      ),
+    }
+    mock_cls.return_value.collect.return_value = records
+
+    refs = list(find_artifacts("memory", "mem.fact.*", Path("/repo")))
+    assert len(refs) == 1
+
+
+class TestFindArtifactsCard:
+  """find_artifacts for card type uses rglob."""
+
+  def test_finds_matching_cards(self, tmp_path: Path) -> None:
+    kanban = tmp_path / "kanban" / "doing"
+    kanban.mkdir(parents=True)
+    (kanban / "T001-task.md").write_text("card")
+    (kanban / "T002-other.md").write_text("card")
+
+    refs = list(find_artifacts("card", "T001", tmp_path))
+    assert len(refs) == 1
+    assert "T001-task.md" in str(refs[0].path)
+
+  def test_no_matches(self, tmp_path: Path) -> None:
+    refs = list(find_artifacts("card", "T999", tmp_path))
+    assert refs == []
+
+
+class TestFindArtifactsRequirement:
+  """find_artifacts for requirement type."""
+
+  @patch("supekku.scripts.lib.core.paths.get_registry_dir")
+  @patch("supekku.scripts.lib.requirements.registry.RequirementsRegistry")
+  def test_finds_matching_requirements(
+    self, mock_cls: MagicMock, mock_dir: MagicMock
+  ) -> None:
+    mock_dir.return_value = Path("/repo/.spec-driver/registry")
+    records = {
+      "SPEC-009.FR-001": SimpleNamespace(
+        uid="SPEC-009.FR-001", path="specify/tech/SPEC-009.md"
+      ),
+      "SPEC-009.FR-002": SimpleNamespace(
+        uid="SPEC-009.FR-002", path="specify/tech/SPEC-009.md"
+      ),
+      "SPEC-010.FR-001": SimpleNamespace(
+        uid="SPEC-010.FR-001", path="specify/tech/SPEC-010.md"
+      ),
+    }
+    mock_cls.return_value.records = records
+
+    refs = list(find_artifacts("requirement", "SPEC-009.*", Path("/repo")))
+    ids = [r.id for r in refs]
+    assert "SPEC-009.FR-001" in ids
+    assert "SPEC-009.FR-002" in ids
+    assert "SPEC-010.FR-001" not in ids
+
+  @patch("supekku.scripts.lib.core.paths.get_registry_dir")
+  @patch("supekku.scripts.lib.requirements.registry.RequirementsRegistry")
+  def test_colon_normalization(
+    self, mock_cls: MagicMock, mock_dir: MagicMock
+  ) -> None:
+    """DEC-041-05: colon in pattern normalized to dot."""
+    mock_dir.return_value = Path("/repo/.spec-driver/registry")
+    records = {
+      "SPEC-009.FR-001": SimpleNamespace(
+        uid="SPEC-009.FR-001", path="x.md"
+      ),
+    }
+    mock_cls.return_value.records = records
+
+    refs = list(find_artifacts("requirement", "SPEC-009:FR-*", Path("/repo")))
+    assert len(refs) == 1
+
+
+class TestFindArtifactsUnsupportedType:
+  """find_artifacts raises ValueError for unknown types."""
+
+  def test_raises_value_error(self) -> None:
+    with pytest.raises(ValueError, match="Unknown artifact type"):
+      list(find_artifacts("bogus", "*", Path("/repo")))

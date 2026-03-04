@@ -10,6 +10,7 @@ from typer.testing import CliRunner
 
 from supekku.cli.common import get_editor
 from supekku.cli.edit import app
+from supekku.scripts.lib.core.repo import find_repo_root
 
 runner = CliRunner()
 
@@ -196,3 +197,38 @@ class TestEditDeltaShorthand:
         mock_run.return_value = MagicMock(returncode=0)
         result = runner.invoke(app, ["delta", "23"])
         assert result.exit_code == 0
+
+
+# ── Pre-migration regression tests for edit revision (VT-migration) ──
+
+
+class TestEditRevisionRegression:
+  """Regression tests for edit revision — must pass before AND after migration."""
+
+  def test_edit_revision_invokes_editor(self) -> None:
+    """edit revision RE-001 opens editor with correct file."""
+    root = find_repo_root()
+    rev_paths = list(root.glob("change/revisions/RE-001-*/RE-001.md"))
+    if not rev_paths:
+      pytest.skip("RE-001 not found")
+
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["revision", "RE-001"])
+      assert result.exit_code == 0
+      mock_run.assert_called_once()
+      editor_args = mock_run.call_args[0][0]
+      assert str(editor_args[-1]).endswith(".md")
+
+  def test_edit_revision_numeric_shorthand(self) -> None:
+    """edit revision 1 resolves to RE-001."""
+    with patch("subprocess.run") as mock_run:
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["revision", "1"])
+      assert result.exit_code == 0
+
+  def test_edit_revision_not_found(self) -> None:
+    """edit revision with nonexistent ID fails gracefully."""
+    result = runner.invoke(app, ["revision", "RE-999"])
+    assert result.exit_code == 1
+    assert "not found" in result.stderr.lower()

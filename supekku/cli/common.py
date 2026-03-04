@@ -17,7 +17,9 @@ Across all list commands, we use consistent flag patterns:
 
 from __future__ import annotations
 
+import fnmatch
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Any
@@ -506,3 +508,141 @@ def emit_artifact(
   else:
     typer.echo(format_fn(ref.record))
   raise typer.Exit(EXIT_SUCCESS)
+
+
+# --- Artifact finding (multi-match) ---
+
+
+def _matches_pattern(artifact_id: str, pattern: str) -> bool:
+  """Check if artifact ID matches fnmatch pattern (case-insensitive)."""
+  return fnmatch.fnmatch(artifact_id, pattern) or fnmatch.fnmatch(
+    artifact_id, pattern.upper()
+  )
+
+
+def _find_specs(root: Path, pattern: str) -> Iterator[ArtifactRef]:
+  from supekku.scripts.lib.specs.registry import SpecRegistry  # noqa: PLC0415
+
+  registry = SpecRegistry(root)
+  for spec in registry.all_specs():
+    if _matches_pattern(spec.id, pattern):
+      yield ArtifactRef(id=spec.id, path=spec.path, record=spec)
+
+
+def _find_changes(
+  root: Path, pattern: str, kind: str
+) -> Iterator[ArtifactRef]:
+  from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
+
+  normalized = normalize_id(kind, pattern)
+  registry = ChangeRegistry(root=root, kind=kind)
+  for art_id, art in registry.collect().items():
+    if _matches_pattern(art_id, normalized):
+      yield ArtifactRef(id=art_id, path=art.path, record=art)
+
+
+def _find_decisions(root: Path, pattern: str) -> Iterator[ArtifactRef]:
+  from supekku.scripts.lib.decisions.registry import DecisionRegistry  # noqa: PLC0415
+
+  normalized = normalize_id("adr", pattern)
+  registry = DecisionRegistry(root=root)
+  for art_id, art in registry.collect().items():
+    if _matches_pattern(art_id, normalized):
+      yield ArtifactRef(id=art_id, path=Path(art.path), record=art)
+
+
+def _find_policies(root: Path, pattern: str) -> Iterator[ArtifactRef]:
+  from supekku.scripts.lib.policies.registry import PolicyRegistry  # noqa: PLC0415
+
+  normalized = normalize_id("policy", pattern)
+  registry = PolicyRegistry(root=root)
+  for art_id, art in registry.collect().items():
+    if _matches_pattern(art_id, normalized):
+      yield ArtifactRef(id=art_id, path=Path(art.path), record=art)
+
+
+def _find_standards(root: Path, pattern: str) -> Iterator[ArtifactRef]:
+  from supekku.scripts.lib.standards.registry import StandardRegistry  # noqa: PLC0415
+
+  normalized = normalize_id("standard", pattern)
+  registry = StandardRegistry(root=root)
+  for art_id, art in registry.collect().items():
+    if _matches_pattern(art_id, normalized):
+      yield ArtifactRef(id=art_id, path=Path(art.path), record=art)
+
+
+def _find_memories(root: Path, pattern: str) -> Iterator[ArtifactRef]:
+  from supekku.scripts.lib.memory.registry import MemoryRegistry  # noqa: PLC0415
+
+  normalized = pattern.strip().lower()
+  if not normalized.startswith("mem."):
+    normalized = f"mem.{normalized}"
+  registry = MemoryRegistry(root=root)
+  for art_id, art in registry.collect().items():
+    if _matches_pattern(art_id, normalized):
+      yield ArtifactRef(id=art_id, path=Path(art.path), record=art)
+
+
+def _find_cards(root: Path, pattern: str) -> Iterator[ArtifactRef]:
+  """Find cards by repo-wide rglob matching {pattern}-*.md."""
+  search_pattern = f"{pattern}-*.md"
+  for match in sorted(root.rglob(search_pattern)):
+    yield ArtifactRef(id=pattern, path=match, record=None)
+
+
+def _find_requirements(root: Path, pattern: str) -> Iterator[ArtifactRef]:
+  from supekku.scripts.lib.core.paths import get_registry_dir  # noqa: PLC0415
+  from supekku.scripts.lib.requirements.registry import (  # noqa: PLC0415
+    RequirementsRegistry,
+  )
+
+  # DEC-041-05: normalize colon to dot
+  normalized = pattern.replace(":", ".")
+  registry_path = get_registry_dir(root) / "requirements.yaml"
+  registry = RequirementsRegistry(registry_path)
+  for uid, record in registry.records.items():
+    if _matches_pattern(uid, normalized):
+      req_path = Path(record.path) if record.path else root
+      yield ArtifactRef(id=uid, path=req_path, record=record)
+
+
+# Dispatch table for find: artifact_type -> finder(root, pattern) -> Iterator
+_ARTIFACT_FINDERS: dict[str, Any] = {
+  "spec": _find_specs,
+  "delta": lambda root, pat: _find_changes(root, pat, "delta"),
+  "revision": lambda root, pat: _find_changes(root, pat, "revision"),
+  "audit": lambda root, pat: _find_changes(root, pat, "audit"),
+  "adr": _find_decisions,
+  "policy": _find_policies,
+  "standard": _find_standards,
+  "requirement": _find_requirements,
+  "card": _find_cards,
+  "memory": _find_memories,
+}
+
+
+def find_artifacts(
+  artifact_type: str, pattern: str, root: Path
+) -> Iterator[ArtifactRef]:
+  """Find all artifacts of a type matching a fnmatch pattern.
+
+  Companion to resolve_artifact for the find verb group. Returns an
+  iterator of ArtifactRef for all matching artifacts.
+
+  Args:
+    artifact_type: Artifact type key (e.g. 'revision', 'spec').
+    pattern: fnmatch pattern to match against artifact IDs.
+    root: Repository root path.
+
+  Yields:
+    ArtifactRef for each matching artifact.
+
+  Raises:
+    ValueError: If artifact_type is not in the dispatch table.
+
+  """
+  finder = _ARTIFACT_FINDERS.get(artifact_type)
+  if not finder:
+    msg = f"Unknown artifact type: {artifact_type}"
+    raise ValueError(msg)
+  yield from finder(root, pattern)

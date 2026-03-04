@@ -58,4 +58,17 @@ regex interpretation of the replacement string.
 - `_resolve_requirement` path handling: if `record.path` is empty, falls back to `root`. May need refinement when requirements get standalone files.
 - pylint `import-outside-toplevel` warnings (16) from lazy imports — expected, threshold (0.75) not breached.
 
-**Verification**: `just check` green (tests + ruff + pylint). Uncommitted.
+**Verification**: `just check` green (tests + ruff + pylint). Committed: `722b815`.
+
+## Phase 1, tasks 1.4–1.6 (2026-03-04)
+
+**Done**:
+- `find_artifacts()` — dispatch table returning `Iterator[ArtifactRef]` for 10 artifact types. Memory auto-prepends `mem.` prefix. Card uses rglob. Requirement normalizes colon→dot per DEC-041-05.
+- `_matches_pattern()` — fnmatch helper (case-insensitive), extracted to common.py for reuse by both `find_artifacts` and future migrated find commands.
+- Test coverage gap-fill: added policy/standard resolve tests, dispatch coverage parameterized test, card/requirement find tests. 57 tests in common_test.py total.
+- Pre-migration regression tests: 17 tests across show_test (7), view_test (3), edit_test (3), find_test (4). All 4 revision commands × relevant output modes covered.
+- `show revision --json` known bug confirmed: test documents current behavior (passes if output is valid JSON, tolerates failure).
+
+**Tests**: 2401 passed, 0 failed (+42 from previous commit).
+
+**Verification**: Full suite green. Uncommitted.

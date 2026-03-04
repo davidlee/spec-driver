@@ -195,5 +195,41 @@ class FindCardCommandTest(unittest.TestCase):
     assert f"{card_id}-" in result.stdout
 
 
+# ── Pre-migration regression tests for find revision (VT-migration) ──
+
+
+class FindRevisionRegressionTest(unittest.TestCase):
+  """Regression tests for find revision — must pass before AND after migration."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.root = find_repo_root()
+
+  def test_find_revision_wildcard(self) -> None:
+    """find revision RE-* returns paths for all revisions."""
+    result = self.runner.invoke(app, ["revision", "RE-*"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "RE-001" in result.stdout
+
+  def test_find_revision_exact(self) -> None:
+    """find revision RE-001 returns its path."""
+    result = self.runner.invoke(app, ["revision", "RE-001"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    path = result.stdout.strip()
+    assert path.endswith(".md")
+
+  def test_find_revision_numeric_shorthand(self) -> None:
+    """find revision 1 resolves to RE-001."""
+    result = self.runner.invoke(app, ["revision", "1"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert ".md" in result.stdout
+
+  def test_find_revision_no_match(self) -> None:
+    """find revision with nonexistent pattern returns empty (exit 0)."""
+    result = self.runner.invoke(app, ["revision", "RE-999"])
+    assert result.exit_code == 0  # find returns 0 with no output
+    assert result.stdout.strip() == ""
+
+
 if __name__ == "__main__":
   unittest.main()

@@ -15,7 +15,24 @@ from pathlib import Path
 import yaml
 
 from supekku.scripts.lib.core.config import detect_exec_command, load_workflow_config
-from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
+from supekku.scripts.lib.core.paths import (
+  AUDITS_SUBDIR,
+  BACKLOG_DIR,
+  CHANGES_DIR,
+  DECISIONS_SUBDIR,
+  DELTAS_SUBDIR,
+  IMPROVEMENTS_SUBDIR,
+  ISSUES_SUBDIR,
+  MEMORY_DIR,
+  POLICIES_SUBDIR,
+  PROBLEMS_SUBDIR,
+  PRODUCT_SPECS_SUBDIR,
+  REVISIONS_SUBDIR,
+  RISKS_SUBDIR,
+  SPEC_DRIVER_DIR,
+  SPECS_DIR,
+  TECH_SPECS_SUBDIR,
+)
 from supekku.scripts.lib.core.templates import TemplateNotFoundError, render_template
 
 # Import after path setup to avoid circular imports
@@ -481,17 +498,17 @@ def initialize_workspace(
 
   # Create directory structure
   directories = [
-    "change/audits",
-    "change/deltas",
-    "change/revisions",
-    "specify/decisions",
-    "specify/policies",
-    "specify/product",
-    "specify/tech",
-    "backlog/improvements",
-    "backlog/issues",
-    "backlog/problems",
-    "backlog/risks",
+    f"{CHANGES_DIR}/{AUDITS_SUBDIR}",
+    f"{CHANGES_DIR}/{DELTAS_SUBDIR}",
+    f"{CHANGES_DIR}/{REVISIONS_SUBDIR}",
+    f"{SPECS_DIR}/{DECISIONS_SUBDIR}",
+    f"{SPECS_DIR}/{POLICIES_SUBDIR}",
+    f"{SPECS_DIR}/{PRODUCT_SPECS_SUBDIR}",
+    f"{SPECS_DIR}/{TECH_SPECS_SUBDIR}",
+    f"{BACKLOG_DIR}/{IMPROVEMENTS_SUBDIR}",
+    f"{BACKLOG_DIR}/{ISSUES_SUBDIR}",
+    f"{BACKLOG_DIR}/{PROBLEMS_SUBDIR}",
+    f"{BACKLOG_DIR}/{RISKS_SUBDIR}",
     f"{SPEC_DRIVER_DIR}/registry",
     f"{SPEC_DRIVER_DIR}/templates",
     f"{SPEC_DRIVER_DIR}/about",
@@ -504,7 +521,7 @@ def initialize_workspace(
     full_path.mkdir(parents=True, exist_ok=True)
 
   # Create empty backlog/backlog.md file
-  backlog_file = target_root / "backlog" / "backlog.md"
+  backlog_file = target_root / BACKLOG_DIR / "backlog.md"
   if not backlog_file.exists():
     backlog_file.write_text(
       "# Backlog\n\n"
@@ -584,7 +601,7 @@ def initialize_workspace(
   if memory_source is not None:
     _install_memories(
       memory_source,
-      target_root / "memory",
+      target_root / MEMORY_DIR,
       dry_run=dry_run,
       auto_yes=auto_yes,
     )

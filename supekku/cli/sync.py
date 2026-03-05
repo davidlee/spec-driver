@@ -8,6 +8,12 @@ from typing import Annotated
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
+from supekku.scripts.lib.core.paths import (
+  get_audits_dir,
+  get_deltas_dir,
+  get_revisions_dir,
+  get_tech_specs_dir,
+)
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.sync_preferences import (
   persist_spec_autocreate,
@@ -146,7 +152,7 @@ def sync(
   """
   # Auto-discover repository root
   root = find_repo_root()
-  tech_dir = root / "specify" / "tech"
+  tech_dir = get_tech_specs_dir(root)
   registry_path = tech_dir / "registry_v2.json"
 
   # Validate directory structure
@@ -620,9 +626,9 @@ def _sync_requirements(root: Path) -> dict:
   req_registry = RequirementsRegistry(requirements_path)
 
   # Gather change artifact directories
-  delta_dir = root / "change" / "deltas"
-  revision_dir = root / "change" / "revisions"
-  audit_dir = root / "change" / "audits"
+  delta_dir = get_deltas_dir(root)
+  revision_dir = get_revisions_dir(root)
+  audit_dir = get_audits_dir(root)
 
   delta_dirs = [delta_dir] if delta_dir.exists() else None
   revision_dirs = [revision_dir] if revision_dir.exists() else None

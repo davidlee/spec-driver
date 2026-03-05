@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.core.paths import get_memory_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
@@ -29,7 +30,7 @@ class MemoryRegistry:
     directory: Path | None = None,
   ) -> None:
     self.root = find_repo_root(root)
-    self.directory = directory or (self.root / "memory")
+    self.directory = directory or get_memory_dir(self.root)
 
   def collect(self) -> dict[str, MemoryRecord]:
     """Discover and parse all mem.*.md files into MemoryRecords.

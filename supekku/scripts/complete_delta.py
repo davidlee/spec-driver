@@ -25,6 +25,7 @@ from supekku.scripts.lib.changes.updater import (
   update_requirement_lifecycle_status,
 )
 from supekku.scripts.lib.core.config import is_strict_mode, load_workflow_config
+from supekku.scripts.lib.core.paths import get_revisions_dir
 from supekku.scripts.lib.requirements.lifecycle import STATUS_ACTIVE
 from supekku.scripts.lib.workspace import Workspace
 
@@ -255,7 +256,7 @@ def update_requirements_in_revision_sources(
   Returns True if successful, False on error.
   """
   # Discover requirement sources
-  revision_dirs = [workspace.root / "change" / "revisions"]
+  revision_dirs = [get_revisions_dir(workspace.root)]
   sources = find_requirement_sources(requirement_ids, revision_dirs)
 
   # Categorize
@@ -325,7 +326,7 @@ def update_requirements_in_revision_sources(
       # Display revision info
       revision_slug = delta_id.lower() + "-completion"
       revision_dir = f"{revision_id}-{revision_slug}"
-      revision_path = workspace.root / "change" / "revisions" / revision_dir
+      revision_path = get_revisions_dir(workspace.root) / revision_dir
       print(f"\n✓ Created completion revision: {revision_id}")
       print(f"  {revision_path.relative_to(workspace.root)}")
     except (ValueError, OSError) as e:

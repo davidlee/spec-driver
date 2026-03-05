@@ -10,6 +10,7 @@ import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
 from supekku.scripts.lib.changes.registry import ChangeRegistry
+from supekku.scripts.lib.core.paths import get_memory_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
@@ -208,7 +209,7 @@ def _resolve_memory_links(
     Stats dict with processed, resolved, missing, warnings counts.
   """
   index = _build_artifact_index(root)
-  mem_dir = root / "memory"
+  mem_dir = get_memory_dir(root)
   stats: dict = {"processed": 0, "resolved": 0, "missing": 0, "warnings": []}
 
   if not mem_dir.exists():

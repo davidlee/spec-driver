@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.core.paths import get_product_specs_dir, get_tech_specs_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_validated_markdown_file
 
@@ -19,8 +20,8 @@ class SpecRegistry:
 
   def __init__(self, root: Path | None = None) -> None:
     self.root = find_repo_root(root)
-    self.tech_dir = self.root / "specify" / "tech"
-    self.product_dir = self.root / "specify" / "product"
+    self.tech_dir = get_tech_specs_dir(self.root)
+    self.product_dir = get_product_specs_dir(self.root)
     self._specs: dict[str, Spec] = {}
     self.reload()
 

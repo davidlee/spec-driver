@@ -269,39 +269,71 @@ class TestViewRevisionRegression:
 
 
 class TestViewNewSubcommands:
-  """Integration tests for Phase 2 view subcommands."""
+  """Tests for Phase 2 view subcommands using mocked resolution."""
 
-  def test_view_plan(self) -> None:
-    with patch("subprocess.run") as mock_run:
+  @staticmethod
+  def _mock_ref(tmp_path: Path, artifact_id: str) -> MagicMock:
+    f = tmp_path / f"{artifact_id}.md"
+    f.write_text(f"# {artifact_id}\n")
+    return MagicMock(id=artifact_id, path=f)
+
+  def test_view_plan(self, tmp_path: Path) -> None:
+    ref = self._mock_ref(tmp_path, "IP-001")
+    with (
+      patch("supekku.cli.view.resolve_artifact", return_value=ref),
+      patch("subprocess.run") as mock_run,
+    ):
       mock_run.return_value = MagicMock(returncode=0)
-      result = runner.invoke(app, ["plan", "IP-041"])
+      result = runner.invoke(app, ["plan", "IP-001"])
       assert result.exit_code == 0
       mock_run.assert_called_once()
 
   def test_view_plan_not_found(self) -> None:
-    result = runner.invoke(app, ["plan", "IP-999"])
-    assert result.exit_code == 1
+    from supekku.cli.common import ArtifactNotFoundError  # noqa: PLC0415
 
-  def test_view_audit(self) -> None:
-    with patch("subprocess.run") as mock_run:
+    with patch(
+      "supekku.cli.view.resolve_artifact",
+      side_effect=ArtifactNotFoundError("plan", "IP-999"),
+    ):
+      result = runner.invoke(app, ["plan", "IP-999"])
+      assert result.exit_code == 1
+
+  def test_view_audit(self, tmp_path: Path) -> None:
+    ref = self._mock_ref(tmp_path, "AUD-001")
+    with (
+      patch("supekku.cli.view.resolve_artifact", return_value=ref),
+      patch("subprocess.run") as mock_run,
+    ):
       mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["audit", "AUD-001"])
       assert result.exit_code == 0
 
-  def test_view_issue(self) -> None:
-    with patch("subprocess.run") as mock_run:
+  def test_view_issue(self, tmp_path: Path) -> None:
+    ref = self._mock_ref(tmp_path, "ISSUE-001")
+    with (
+      patch("supekku.cli.view.resolve_artifact", return_value=ref),
+      patch("subprocess.run") as mock_run,
+    ):
       mock_run.return_value = MagicMock(returncode=0)
-      result = runner.invoke(app, ["issue", "ISSUE-003"])
+      result = runner.invoke(app, ["issue", "ISSUE-001"])
       assert result.exit_code == 0
 
-  def test_view_problem(self) -> None:
-    with patch("subprocess.run") as mock_run:
+  def test_view_problem(self, tmp_path: Path) -> None:
+    ref = self._mock_ref(tmp_path, "PROB-001")
+    with (
+      patch("supekku.cli.view.resolve_artifact", return_value=ref),
+      patch("subprocess.run") as mock_run,
+    ):
       mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["problem", "PROB-001"])
       assert result.exit_code == 0
 
-  def test_view_improvement(self) -> None:
-    with patch("subprocess.run") as mock_run:
+  def test_view_improvement(self, tmp_path: Path) -> None:
+    ref = self._mock_ref(tmp_path, "IMPR-001")
+    with (
+      patch("supekku.cli.view.resolve_artifact", return_value=ref),
+      patch("subprocess.run") as mock_run,
+    ):
       mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["improvement", "IMPR-001"])
       assert result.exit_code == 0

@@ -13,7 +13,7 @@ import yaml
 
 from supekku.scripts.lib.backlog.models import BacklogItem
 from supekku.scripts.lib.core import slugify
-from supekku.scripts.lib.core.paths import get_registry_dir
+from supekku.scripts.lib.core.paths import get_backlog_dir, get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 
@@ -84,7 +84,7 @@ def backlog_root(repo_root: Path) -> Path:
   Returns:
     Backlog directory path.
   """
-  return repo_root / "backlog"
+  return get_backlog_dir(repo_root)
 
 
 def load_backlog_registry(root: Path | None = None) -> list[str]:

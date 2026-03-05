@@ -19,6 +19,7 @@ from supekku.scripts.lib.blocks.revision import (  # type: ignore
   extract_revision_blocks,
 )
 from supekku.scripts.lib.core.cli_utils import add_root_argument
+from supekku.scripts.lib.core.paths import get_revisions_dir
 from supekku.scripts.lib.core.repo import find_repo_root  # type: ignore
 
 
@@ -89,7 +90,7 @@ def discover_revision_files(
         resolved.append(path)
     return sorted(set(resolved))
   if scan_all:
-    revision_root = root / "change" / "revisions"
+    revision_root = get_revisions_dir(root)
     if not revision_root.is_dir():
       return []
     return sorted(revision_root.rglob("RE-*.md"))

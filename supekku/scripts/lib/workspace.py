@@ -6,7 +6,14 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from .changes.registry import ChangeRegistry
-from .core.paths import get_registry_dir
+from .core.paths import (
+  get_audits_dir,
+  get_deltas_dir,
+  get_product_specs_dir,
+  get_registry_dir,
+  get_revisions_dir,
+  get_tech_specs_dir,
+)
 from .core.repo import find_repo_root
 from .decisions.registry import DecisionRegistry
 from .policies.registry import PolicyRegistry
@@ -76,11 +83,11 @@ class Workspace:
     """Synchronize requirements registry from specs and changes."""
     registry = self.requirements
     registry.sync_from_specs(
-      [self.root / "specify" / "tech", self.root / "specify" / "product"],
+      [get_tech_specs_dir(self.root), get_product_specs_dir(self.root)],
       spec_registry=self.specs,
-      delta_dirs=[self.root / "change" / "deltas"],
-      revision_dirs=[self.root / "change" / "revisions"],
-      audit_dirs=[self.root / "change" / "audits"],
+      delta_dirs=[get_deltas_dir(self.root)],
+      revision_dirs=[get_revisions_dir(self.root)],
+      audit_dirs=[get_audits_dir(self.root)],
     )
     registry.save()
 

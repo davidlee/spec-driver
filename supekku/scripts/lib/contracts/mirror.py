@@ -11,6 +11,8 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+from supekku.scripts.lib.core.paths import get_tech_specs_dir
+
 __all__ = [
   "ContractMirrorTreeBuilder",
   "resolve_go_variant_outputs",
@@ -275,7 +277,7 @@ class ContractMirrorTreeBuilder:  # pylint: disable=too-few-public-methods
 
   def __init__(self, repo_root: Path, tech_dir: Path | None = None) -> None:
     self.repo_root = repo_root
-    self.tech_dir = tech_dir or repo_root / "specify" / "tech"
+    self.tech_dir = tech_dir or get_tech_specs_dir(repo_root)
     self.mirror_dir = repo_root / ".contracts"
     self.registry_path = self.tech_dir / "registry_v2.json"
 

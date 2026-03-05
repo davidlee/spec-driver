@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from supekku.scripts.lib.core.paths import get_registry_dir
+from supekku.scripts.lib.core.paths import get_decisions_dir, get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
@@ -115,7 +115,7 @@ class DecisionRegistry:
 
   def __init__(self, *, root: Path | None = None) -> None:
     self.root = find_repo_root(root)
-    self.directory = self.root / "specify" / "decisions"
+    self.directory = get_decisions_dir(self.root)
     self.output_path = get_registry_dir(self.root) / "decisions.yaml"
 
   @classmethod
@@ -334,7 +334,7 @@ class DecisionRegistry:
   def rebuild_status_symlinks(self) -> None:
     """Rebuild all status-based symlink directories."""
     decisions = self.collect()
-    decisions_dir = self.root / "specify" / "decisions"
+    decisions_dir = get_decisions_dir(self.root)
 
     # First, clean up all existing status directories
     self._cleanup_all_status_directories(decisions_dir)

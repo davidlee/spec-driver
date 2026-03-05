@@ -6,7 +6,14 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from supekku.scripts.lib.core.paths import get_registry_dir  # type: ignore
+from supekku.scripts.lib.core.paths import (  # type: ignore
+  get_audits_dir,
+  get_deltas_dir,
+  get_product_specs_dir,
+  get_registry_dir,
+  get_revisions_dir,
+  get_tech_specs_dir,
+)
 from supekku.scripts.lib.requirements.registry import (  # type: ignore
   VALID_STATUSES,
   RequirementsRegistry,
@@ -15,10 +22,10 @@ from supekku.scripts.lib.specs.registry import SpecRegistry  # type: ignore
 
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = get_registry_dir(ROOT) / "requirements.yaml"
-DEFAULT_SPEC_DIRS = [ROOT / "specify" / "tech", ROOT / "specify" / "product"]
-DEFAULT_DELTA_DIRS = [ROOT / "change" / "deltas"]
-DEFAULT_REVISION_DIRS = [ROOT / "change" / "revisions"]
-DEFAULT_AUDIT_DIRS = [ROOT / "change" / "audits"]
+DEFAULT_SPEC_DIRS = [get_tech_specs_dir(ROOT), get_product_specs_dir(ROOT)]
+DEFAULT_DELTA_DIRS = [get_deltas_dir(ROOT)]
+DEFAULT_REVISION_DIRS = [get_revisions_dir(ROOT)]
+DEFAULT_AUDIT_DIRS = [get_audits_dir(ROOT)]
 
 
 def build_parser() -> argparse.ArgumentParser:

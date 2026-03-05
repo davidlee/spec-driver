@@ -235,32 +235,62 @@ class TestEditRevisionRegression:
 
 
 class TestEditNewSubcommands:
-  """Integration tests for Phase 2 edit subcommands."""
+  """Tests for Phase 2 edit subcommands using mocked resolution."""
 
-  def test_edit_plan(self) -> None:
-    with patch("subprocess.run") as mock_run:
+  def test_edit_plan(self, tmp_path: Path) -> None:
+    plan_file = tmp_path / "IP-001.md"
+    plan_file.write_text("# Plan\n")
+    ref = MagicMock(id="IP-001", path=plan_file)
+    with (
+      patch("supekku.cli.edit.resolve_artifact", return_value=ref),
+      patch("subprocess.run") as mock_run,
+    ):
       mock_run.return_value = MagicMock(returncode=0)
-      result = runner.invoke(app, ["plan", "IP-041"])
+      result = runner.invoke(app, ["plan", "IP-001"])
       assert result.exit_code == 0
 
   def test_edit_plan_not_found(self) -> None:
-    result = runner.invoke(app, ["plan", "IP-999"])
-    assert result.exit_code == 1
+    from supekku.cli.common import ArtifactNotFoundError  # noqa: PLC0415
 
-  def test_edit_audit(self) -> None:
-    with patch("subprocess.run") as mock_run:
+    with patch(
+      "supekku.cli.edit.resolve_artifact",
+      side_effect=ArtifactNotFoundError("plan", "IP-999"),
+    ):
+      result = runner.invoke(app, ["plan", "IP-999"])
+      assert result.exit_code == 1
+
+  def test_edit_audit(self, tmp_path: Path) -> None:
+    audit_file = tmp_path / "AUD-001.md"
+    audit_file.write_text("# Audit\n")
+    ref = MagicMock(id="AUD-001", path=audit_file)
+    with (
+      patch("supekku.cli.edit.resolve_artifact", return_value=ref),
+      patch("subprocess.run") as mock_run,
+    ):
       mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["audit", "AUD-001"])
       assert result.exit_code == 0
 
-  def test_edit_issue(self) -> None:
-    with patch("subprocess.run") as mock_run:
+  def test_edit_issue(self, tmp_path: Path) -> None:
+    issue_file = tmp_path / "ISSUE-001.md"
+    issue_file.write_text("# Issue\n")
+    ref = MagicMock(id="ISSUE-001", path=issue_file)
+    with (
+      patch("supekku.cli.edit.resolve_artifact", return_value=ref),
+      patch("subprocess.run") as mock_run,
+    ):
       mock_run.return_value = MagicMock(returncode=0)
-      result = runner.invoke(app, ["issue", "ISSUE-003"])
+      result = runner.invoke(app, ["issue", "ISSUE-001"])
       assert result.exit_code == 0
 
-  def test_edit_improvement(self) -> None:
-    with patch("subprocess.run") as mock_run:
+  def test_edit_improvement(self, tmp_path: Path) -> None:
+    impr_file = tmp_path / "IMPR-001.md"
+    impr_file.write_text("# Improvement\n")
+    ref = MagicMock(id="IMPR-001", path=impr_file)
+    with (
+      patch("supekku.cli.edit.resolve_artifact", return_value=ref),
+      patch("subprocess.run") as mock_run,
+    ):
       mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["improvement", "IMPR-001"])
       assert result.exit_code == 0

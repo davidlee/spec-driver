@@ -26,6 +26,7 @@ from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_status
 from supekku.scripts.lib.changes.registry import ChangeRegistry, discover_plans
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
+from supekku.scripts.lib.core.paths import get_tech_specs_dir
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.backlog_formatters import format_backlog_list_table
 from supekku.scripts.lib.formatters.card_formatters import (
@@ -199,7 +200,7 @@ def list_specs(
     registry = SpecRegistry(root)
     filter_substring = (substring or "").strip().lower()
 
-    spec_root = registry.root / "specify" / "tech"
+    spec_root = get_tech_specs_dir(registry.root)
     package_index_root = spec_root / "by-package"
 
     package_filters: list[str] = []

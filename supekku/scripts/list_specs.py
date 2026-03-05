@@ -17,6 +17,7 @@ if str(ROOT) not in sys.path:
 
 # pylint: disable=wrong-import-position
 from supekku.scripts.lib.core.cli_utils import add_root_argument
+from supekku.scripts.lib.core.paths import get_tech_specs_dir
 from supekku.scripts.lib.formatters.spec_formatters import (  # type: ignore
   format_spec_list_item,
 )
@@ -114,7 +115,7 @@ def main(argv: list[str] | None = None) -> int:
   registry = SpecRegistry(args.root)
   substring = (args.substring or "").strip().lower()
 
-  spec_root = registry.root / "specify" / "tech"
+  spec_root = get_tech_specs_dir(registry.root)
   package_index_root = spec_root / "by-package"
 
   package_filters: list[str] = []

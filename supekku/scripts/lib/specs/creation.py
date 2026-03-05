@@ -17,7 +17,12 @@ from supekku.scripts.lib.blocks.relationships import (
 )
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
 from supekku.scripts.lib.core import slugify
-from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, get_templates_dir
+from supekku.scripts.lib.core.paths import (
+  SPEC_DRIVER_DIR,
+  get_product_specs_dir,
+  get_tech_specs_dir,
+  get_templates_dir,
+)
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.core.templates import (
   extract_template_body as extract_template_body_fallback,
@@ -246,7 +251,7 @@ def build_template_config(repo_root: Path, spec_type: str) -> SpecTemplateConfig
   templates_dir = get_templates_dir(repo_root)
   if spec_type == "tech":
     return SpecTemplateConfig(
-      base_dir=repo_root / "specify" / "tech",
+      base_dir=get_tech_specs_dir(repo_root),
       prefix="SPEC",
       kind="spec",
       template_path=templates_dir / "spec.md",
@@ -254,7 +259,7 @@ def build_template_config(repo_root: Path, spec_type: str) -> SpecTemplateConfig
     )
   if spec_type == "product":
     return SpecTemplateConfig(
-      base_dir=repo_root / "specify" / "product",
+      base_dir=get_product_specs_dir(repo_root),
       prefix="PROD",
       kind="prod",
       template_path=templates_dir / "spec.md",

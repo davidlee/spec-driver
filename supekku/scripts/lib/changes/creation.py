@@ -21,7 +21,12 @@ from supekku.scripts.lib.blocks.plan import (
   render_plan_overview_block,
 )
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
-from supekku.scripts.lib.core.paths import get_templates_dir
+from supekku.scripts.lib.core.paths import (
+  get_audits_dir,
+  get_deltas_dir,
+  get_revisions_dir,
+  get_templates_dir,
+)
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 from supekku.scripts.lib.specs.creation import (
   extract_template_body,
@@ -93,7 +98,7 @@ def create_revision(
     ChangeArtifactCreated with revision details.
   """
   repo = find_repository_root(repo_root or Path.cwd())
-  base_dir = repo / "change" / "revisions"
+  base_dir = get_revisions_dir(repo)
   _ensure_directory(base_dir)
   revision_id = _next_identifier(base_dir, "RE")
   today = date.today().isoformat()
@@ -228,7 +233,7 @@ def create_plan(
     FileExistsError: If plan already exists in the delta directory.
   """
   repo = find_repository_root(repo_root or Path.cwd())
-  deltas_dir = repo / "change" / "deltas"
+  deltas_dir = get_deltas_dir(repo)
 
   # Find delta directory
   delta_dir = None
@@ -292,7 +297,7 @@ def create_delta(
     ChangeArtifactCreated with delta details and optional plan/phase paths.
   """
   repo = find_repository_root(repo_root or Path.cwd())
-  base_dir = repo / "change" / "deltas"
+  base_dir = get_deltas_dir(repo)
   _ensure_directory(base_dir)
   delta_id = _next_identifier(base_dir, "DE")
   today = date.today().isoformat()
@@ -425,7 +430,7 @@ def create_audit(
     ChangeArtifactCreated with audit details.
   """
   repo = find_repository_root(repo_root or Path.cwd())
-  base_dir = repo / "change" / "audits"
+  base_dir = get_audits_dir(repo)
   _ensure_directory(base_dir)
   audit_id = _next_identifier(base_dir, "AUD")
   today = date.today().isoformat()
@@ -567,7 +572,7 @@ def _find_plan_file(plan_id: str, repo_root: Path) -> Path | None:
   Returns:
     Path to plan file, or None if not found.
   """
-  deltas_dir = repo_root / "change" / "deltas"
+  deltas_dir = get_deltas_dir(repo_root)
   if not deltas_dir.exists():
     return None
 

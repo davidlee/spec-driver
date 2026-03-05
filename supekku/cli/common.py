@@ -26,6 +26,8 @@ from typing import Annotated, Any
 
 import typer
 
+from supekku.scripts.lib.core.paths import get_deltas_dir
+
 # Exit codes
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
@@ -438,7 +440,7 @@ def _resolve_plan(root: Path, raw_id: str) -> ArtifactRef:
   from supekku.scripts.lib.core.spec_utils import load_markdown_file  # noqa: PLC0415
 
   normalized = _normalize_plan_id(raw_id)
-  deltas_dir = root / "change" / "deltas"
+  deltas_dir = get_deltas_dir(root)
   if not deltas_dir.exists():
     raise ArtifactNotFoundError("plan", normalized)
   for delta_dir in deltas_dir.iterdir():
@@ -663,7 +665,7 @@ def _find_plans(root: Path, pattern: str) -> Iterator[ArtifactRef]:
   from supekku.scripts.lib.core.spec_utils import load_markdown_file  # noqa: PLC0415
 
   normalized = _normalize_plan_id(pattern)
-  deltas_dir = root / "change" / "deltas"
+  deltas_dir = get_deltas_dir(root)
   if not deltas_dir.exists():
     return
   for delta_dir in sorted(deltas_dir.iterdir()):

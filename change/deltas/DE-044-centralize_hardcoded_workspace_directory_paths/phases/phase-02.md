@@ -4,7 +4,7 @@ slug: 044-centralize_hardcoded_workspace_directory_paths-phase-02
 name: 'P02: Production code'
 created: '2026-03-05'
 updated: '2026-03-05'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -69,13 +69,13 @@ import + reference swap.
 - [x] P01 complete — constants and helpers exist in `core/paths.py`
 
 ## 4. Exit Criteria / Done When
-- [ ] All registries use path helpers
-- [ ] `workspace.py` uses path helpers
-- [ ] `install.py` uses path constants
-- [ ] CLI commands use path helpers/constants
-- [ ] Other production scripts use path helpers/constants
-- [ ] `just test` passes
-- [ ] `just lint` + `just pylint` clean (no regression)
+- [x] All registries use path helpers
+- [x] `workspace.py` uses path helpers
+- [x] `install.py` uses path constants
+- [x] CLI commands use path helpers/constants
+- [x] Other production scripts use path helpers/constants
+- [x] `just test` passes (2606 passed)
+- [x] `just lint` + `just pylint` clean (no regression)
 
 ## 5. Verification
 - `just test` after each task group
@@ -90,12 +90,12 @@ import + reference swap.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Update registries | — | specs, decisions, policies, standards, changes, backlog, memory |
-| [ ] | 2.2 | Update `workspace.py` | — | After 2.1 (uses registries) |
-| [ ] | 2.3 | Update `install.py` | [P] | Independent of 2.1/2.2 |
-| [ ] | 2.4 | Update CLI commands | — | ~10 files in `cli/` |
-| [ ] | 2.5 | Update remaining scripts | — | `scripts/*.py` + `scripts/lib/` modules |
-| [ ] | 2.6 | Lint and full test suite | — | After all above |
+| [x] | 2.1 | Update registries | — | 7 registries: specs, decisions, policies, standards, changes, backlog, memory |
+| [x] | 2.2 | Update `workspace.py` | — | sync_requirements() path refs → helpers |
+| [x] | 2.3 | Update `install.py` | [P] | Directory list + backlog/memory refs → constants |
+| [x] | 2.4 | Update CLI commands | — | sync.py, common.py, list.py, resolve.py |
+| [x] | 2.5 | Update remaining scripts | — | creation.py, executor.py, specs/creation.py, mirror.py, list_specs.py, requirements.py, complete_delta.py, sync_specs.py, validate_revision_blocks.py |
+| [x] | 2.6 | Lint and full test suite | — | 2606 passed, ruff clean, pylint 9.56/10 (unchanged) |
 
 ### Task Details
 
@@ -133,13 +133,17 @@ import + reference swap.
 | Subtle path difference (trailing slash, etc.) | Tests catch any path mismatch | open |
 
 ## 9. Decisions & Outcomes
-(none yet)
+- `install.py` pkg_memory refs (`package_root / "memory"`) intentionally left as-is — these are package directory lookups, not workspace paths
+- `_KIND_TO_DIR` mapping in changes/registry.py kept — the ChangeRegistry composes `get_changes_dir(root) / subdir` rather than using per-kind helpers, which is clean since the mapping is local knowledge
+- Fixed 3 test files (edit_test, show_test, view_test) that used ISSUE-003 (deleted fixture) — converted to mocked resolution or updated IDs
 
 ## 10. Findings / Research Notes
-(none yet)
+- ~25 production files had hardcoded workspace path strings
+- No import cycle issues — paths.py only depends on repo.py
+- No runtime NameErrors — full test suite green after each task group
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Spec/Delta/Plan updated with lessons
-- [ ] Hand-off notes to next phase (if any)
+- [x] Exit criteria satisfied
+- [x] Verification evidence: `just` passes (2606 tests, ruff clean, pylint 9.56/10)
+- [x] Grep verification: zero path-construction hits in production code
+- [ ] Hand-off notes to P03 (test fixtures)

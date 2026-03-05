@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
+from supekku.scripts.lib.core.paths import get_changes_dir, get_tech_specs_dir
 from supekku.scripts.lib.registry_migration import RegistryV2
 from supekku.scripts.lib.specs.index import SpecIndexBuilder
 
@@ -294,8 +295,8 @@ class DeletionValidator:
 
     """
     self.repo_root = repo_root
-    self.tech_dir = repo_root / "specify" / "tech"
-    self.change_dir = repo_root / "change"
+    self.tech_dir = get_tech_specs_dir(repo_root)
+    self.change_dir = get_changes_dir(repo_root)
     self.scanner = RegistryScanner(repo_root)
 
   def validate_spec_deletion(
@@ -467,7 +468,7 @@ class DeletionExecutor:
         file_path.unlink()
 
     # Delete spec directory
-    spec_dir = self.repo_root / "specify" / "tech" / spec_id
+    spec_dir = get_tech_specs_dir(self.repo_root) / spec_id
     if spec_dir.exists():
       shutil.rmtree(spec_dir)
 
@@ -502,7 +503,7 @@ class DeletionExecutor:
 
   def _rebuild_spec_indices(self) -> None:
     """Rebuild spec symlink indices after deletion."""
-    tech_dir = self.repo_root / "specify" / "tech"
+    tech_dir = get_tech_specs_dir(self.repo_root)
     if tech_dir.exists():
       builder = SpecIndexBuilder(tech_dir)
       builder.rebuild()

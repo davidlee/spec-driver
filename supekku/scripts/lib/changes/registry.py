@@ -8,7 +8,11 @@ from typing import TYPE_CHECKING, Any
 import yaml
 from rich.console import Console
 
-from supekku.scripts.lib.core.paths import get_registry_dir
+from supekku.scripts.lib.core.paths import (
+  get_changes_dir,
+  get_deltas_dir,
+  get_registry_dir,
+)
 from supekku.scripts.lib.core.repo import find_repo_root
 
 from .artifacts import ChangeArtifact, load_change_artifact
@@ -38,7 +42,7 @@ class ChangeRegistry:
       raise ValueError(msg)
     self.kind = kind
     self.root = find_repo_root(root)
-    self.directory = self.root / "change" / _KIND_TO_DIR[kind]
+    self.directory = get_changes_dir(self.root) / _KIND_TO_DIR[kind]
     self.output_path = get_registry_dir(self.root) / f"{_KIND_TO_DIR[kind]}.yaml"
 
   def collect(self) -> dict[str, ChangeArtifact]:
@@ -151,7 +155,7 @@ def discover_plans(root: Path) -> list[PlanSummary]:
   from supekku.scripts.lib.blocks.plan import extract_plan_overview  # noqa: PLC0415
   from supekku.scripts.lib.core.spec_utils import load_markdown_file  # noqa: PLC0415
 
-  deltas_dir = root / "change" / "deltas"
+  deltas_dir = get_deltas_dir(root)
   if not deltas_dir.exists():
     return []
 

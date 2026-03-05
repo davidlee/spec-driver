@@ -17,8 +17,10 @@ from pathlib import Path
 
 import typer
 
+from supekku.scripts.lib.core.paths import get_tech_specs_dir
+
 ROOT = Path(__file__).resolve().parents[2]
-TECH_DIR = ROOT / "specify" / "tech"
+TECH_DIR = get_tech_specs_dir(ROOT)
 REGISTRY_PATH = TECH_DIR / "registry_v2.json"
 
 if str(ROOT) not in sys.path:

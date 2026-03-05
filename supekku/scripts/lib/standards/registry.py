@@ -16,7 +16,7 @@ from typing import Any
 
 import yaml
 
-from supekku.scripts.lib.core.paths import get_registry_dir
+from supekku.scripts.lib.core.paths import get_registry_dir, get_standards_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
@@ -110,7 +110,7 @@ class StandardRegistry:
 
   def __init__(self, *, root: Path | None = None) -> None:
     self.root = root if root is not None else find_repo_root(None)
-    self.directory = self.root / "specify" / "standards"
+    self.directory = get_standards_dir(self.root)
     self.output_path = get_registry_dir(self.root) / "standards.yaml"
 
   @classmethod

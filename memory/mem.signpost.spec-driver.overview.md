@@ -68,3 +68,7 @@ project’s ceremony mode and read the matching guidance:
 
 ## File Map
 For where things live, see [[mem.signpost.spec-driver.file-map]].
+
+## Philosophy
+For the underlying posture and convergence model, see
+[[mem.concept.spec-driver.philosophy]].

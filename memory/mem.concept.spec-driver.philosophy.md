@@ -71,6 +71,7 @@ agents as much as by humans.
 
 ## See Also
 
+- [[mem.signpost.spec-driver.overview]] — quick overview
 - [[mem.concept.spec-driver.posture]] — how projects adopt the philosophy gradually
 - [[mem.pattern.spec-driver.core-loop]] — the operational workflow
 - [[mem.signpost.spec-driver.ceremony]] — ceremony modes (pioneer/settler/town-planner)

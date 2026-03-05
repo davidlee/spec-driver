@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/startup.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+

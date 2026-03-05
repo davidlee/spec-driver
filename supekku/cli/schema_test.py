@@ -322,6 +322,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     result = self.runner.invoke(app, ["show", "enums.delta.status"])
     assert result.exit_code == 0
     import json
+
     values = json.loads(result.stdout)
     assert isinstance(values, list)
     assert "draft" in values
@@ -337,6 +338,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     result = self.runner.invoke(app, ["show", "enums.requirement.status"])
     assert result.exit_code == 0
     import json
+
     values = json.loads(result.stdout)
     assert "pending" in values
     assert "active" in values
@@ -349,6 +351,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     result = self.runner.invoke(app, ["show", "enums.verification.status"])
     assert result.exit_code == 0
     import json
+
     values = json.loads(result.stdout)
     assert "planned" in values
     assert "verified" in values
@@ -361,6 +364,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     result = self.runner.invoke(app, ["show", "enums.verification.kind"])
     assert result.exit_code == 0
     import json
+
     values = json.loads(result.stdout)
     assert values == ["VA", "VH", "VT"]
 
@@ -369,6 +373,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     result = self.runner.invoke(app, ["show", "enums.spec.kind"])
     assert result.exit_code == 0
     import json
+
     values = json.loads(result.stdout)
     assert values == ["prod", "tech"]
 
@@ -377,6 +382,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     result = self.runner.invoke(app, ["show", "enums.requirement.kind"])
     assert result.exit_code == 0
     import json
+
     values = json.loads(result.stdout)
     assert values == ["FR", "NF"]
 
@@ -385,6 +391,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     result = self.runner.invoke(app, ["show", "enums.command.format"])
     assert result.exit_code == 0
     import json
+
     values = json.loads(result.stdout)
     assert values == ["json", "table", "tsv"]
 

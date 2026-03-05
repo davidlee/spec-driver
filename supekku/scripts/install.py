@@ -379,6 +379,62 @@ def _render_agent_docs(
     )
 
 
+def _collect_claude_sources(
+  package_root: Path,
+) -> tuple[Path | None, list[Path]]:
+  """Collect Claude config sources from the package.
+
+  Returns:
+    (settings_path or None, list of hook source paths).
+  """
+  settings = package_root / "claude.settings.json"
+  settings_path = settings if settings.is_file() else None
+
+  hooks_src = package_root / "claude.hooks"
+  hook_files = (
+    sorted(f for f in hooks_src.iterdir() if f.is_file()) if hooks_src.is_dir() else []
+  )
+
+  return settings_path, hook_files
+
+
+def _install_claude_config(
+  package_root: Path, target_root: Path, *, dry_run: bool = False
+) -> None:
+  """Install .claude/ settings and hooks from package source.
+
+  Copies claude.settings.json and .claude/hooks/* into the target workspace.
+  These are installer-owned and overwritten on every install. Hook scripts
+  are made executable after copy.
+  """
+  settings_src, hook_sources = _collect_claude_sources(package_root)
+
+  if settings_src is None and not hook_sources:
+    return
+
+  if dry_run:
+    print("\n[DRY RUN] Claude config:")
+    if settings_src:
+      print("  + .claude/settings.json")
+    for src in hook_sources:
+      print(f"  + .claude/hooks/{src.name}")
+    return
+
+  claude_dir = target_root / ".claude"
+  claude_dir.mkdir(parents=True, exist_ok=True)
+
+  if settings_src:
+    shutil.copy2(settings_src, claude_dir / "settings.json")
+
+  if hook_sources:
+    hooks_dest = claude_dir / "hooks"
+    hooks_dest.mkdir(parents=True, exist_ok=True)
+    for src in hook_sources:
+      dest = hooks_dest / src.name
+      shutil.copy2(src, dest)
+      dest.chmod(dest.stat().st_mode | 0o111)
+
+
 def _install_hooks(
   package_root: Path, target_root: Path, *, dry_run: bool = False
 ) -> None:
@@ -516,6 +572,9 @@ def initialize_workspace(
 
   # Install hook files (create-if-missing, never overwrite)
   _install_hooks(package_root, target_root, dry_run=dry_run)
+
+  # Install .claude/ settings and hooks (installer-owned, overwrite)
+  _install_claude_config(package_root, target_root, dry_run=dry_run)
 
   # Render agent guidance from templates (config-tailored)
   _render_agent_docs(target_root, package_root, dry_run=dry_run)

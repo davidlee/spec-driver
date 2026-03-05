@@ -189,7 +189,7 @@ def _show_enums(block_type: str) -> None:
     return
 
   # Strip 'enums.' prefix to get the registry key
-  enum_path = block_type[len("enums."):]
+  enum_path = block_type[len("enums.") :]
   values = get_enum_values(enum_path)
 
   if values is None:

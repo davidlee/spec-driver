@@ -12,6 +12,7 @@ import yaml
 from supekku.scripts.install import (
   _classify_memory,
   _find_memory_source,
+  _install_claude_config,
   _install_hooks,
   _install_memories,
   get_package_root,
@@ -589,6 +590,175 @@ def test_initialize_workspace_preserves_existing_allowlist(tmp_path: Path) -> No
 
   content = (sd / "skills.allowlist").read_text(encoding="utf-8")
   assert content == "boot\n"
+
+
+# --- Claude config installation tests ---
+
+
+class TestInstallClaudeConfig:
+  """Tests for .claude/ settings and hooks installation."""
+
+  def _make_claude_source(self, package_root: Path) -> None:
+    """Create package source files for Claude config."""
+    (package_root / "claude.settings.json").write_text(
+      '{"hooks": {"SessionStart": [{"hooks": [{"type": "command", '
+      '"command": ".claude/hooks/startup.sh"}]}]}}',
+      encoding="utf-8",
+    )
+    hooks_dir = package_root / "claude.hooks"
+    hooks_dir.mkdir(parents=True)
+    (hooks_dir / "startup.sh").write_text(
+      '#!/usr/bin/env bash\necho "boot"',
+      encoding="utf-8",
+    )
+    (hooks_dir / "prompt.sh").write_text(
+      '#!/usr/bin/bash\necho "prompt"',
+      encoding="utf-8",
+    )
+
+  def test_installs_settings_and_hooks(self, tmp_path: Path) -> None:
+    """Fresh install creates .claude/settings.json and .claude/hooks/*."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_claude_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_claude_config(pkg, target, dry_run=False)
+
+    settings = target / ".claude" / "settings.json"
+    assert settings.exists()
+    assert "SessionStart" in settings.read_text()
+
+    startup = target / ".claude" / "hooks" / "startup.sh"
+    assert startup.exists()
+    assert os.access(startup, os.X_OK), "startup.sh should be executable"
+
+    prompt = target / ".claude" / "hooks" / "prompt.sh"
+    assert prompt.exists()
+    assert os.access(prompt, os.X_OK), "prompt.sh should be executable"
+
+  def test_overwrites_on_reinstall(self, tmp_path: Path) -> None:
+    """Settings and hooks are overwritten (installer-owned)."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_claude_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    # First install
+    _install_claude_config(pkg, target, dry_run=False)
+
+    # Modify installed files
+    settings = target / ".claude" / "settings.json"
+    settings.write_text('{"custom": true}')
+    startup = target / ".claude" / "hooks" / "startup.sh"
+    startup.write_text("#!/bin/bash\necho custom")
+
+    # Reinstall
+    _install_claude_config(pkg, target, dry_run=False)
+
+    assert "SessionStart" in settings.read_text()
+    assert "boot" in startup.read_text()
+
+  def test_dry_run_does_not_write(self, tmp_path: Path, capsys) -> None:
+    """Dry-run reports without creating files."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_claude_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_claude_config(pkg, target, dry_run=True)
+
+    assert not (target / ".claude" / "settings.json").exists()
+    assert not (target / ".claude" / "hooks").exists()
+
+    captured = capsys.readouterr()
+    assert "[DRY RUN]" in captured.out
+
+  def test_creates_directories(self, tmp_path: Path) -> None:
+    """Creates .claude/ and .claude/hooks/ if they don't exist."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_claude_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_claude_config(pkg, target, dry_run=False)
+
+    assert (target / ".claude").is_dir()
+    assert (target / ".claude" / "hooks").is_dir()
+
+  def test_idempotent(self, tmp_path: Path) -> None:
+    """Repeated installs produce identical results."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_claude_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_claude_config(pkg, target, dry_run=False)
+    first = (target / ".claude" / "settings.json").read_text()
+
+    _install_claude_config(pkg, target, dry_run=False)
+    second = (target / ".claude" / "settings.json").read_text()
+
+    assert first == second
+
+  def test_skips_if_no_source_settings(self, tmp_path: Path) -> None:
+    """No-op when package has no claude.settings.json."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_claude_config(pkg, target, dry_run=False)
+
+    assert not (target / ".claude" / "settings.json").exists()
+
+  def test_hooks_without_settings(self, tmp_path: Path) -> None:
+    """Hooks are installed even if settings.json is absent."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    hooks_dir = pkg / "claude.hooks"
+    hooks_dir.mkdir(parents=True)
+    (hooks_dir / "startup.sh").write_text("#!/bin/bash\necho hi")
+
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_claude_config(pkg, target, dry_run=False)
+
+    startup = target / ".claude" / "hooks" / "startup.sh"
+    assert startup.exists()
+    assert os.access(startup, os.X_OK)
+
+
+class TestInitializeWorkspaceClaudeConfig:
+  """Integration: initialize_workspace installs .claude/ config."""
+
+  def test_installs_claude_settings_and_hooks(self, tmp_path: Path) -> None:
+    """initialize_workspace copies Claude settings and hooks."""
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    settings = tmp_path / ".claude" / "settings.json"
+    assert settings.exists(), ".claude/settings.json not installed"
+
+    hooks_dir = tmp_path / ".claude" / "hooks"
+    assert hooks_dir.is_dir(), ".claude/hooks/ not created"
+
+    # Hooks should be executable
+    for hook in hooks_dir.glob("*.sh"):
+      assert os.access(hook, os.X_OK), f"{hook.name} should be executable"
+
+  def test_dry_run_does_not_install_claude_config(self, tmp_path: Path) -> None:
+    """Dry-run does not create .claude/ files."""
+    initialize_workspace(tmp_path, dry_run=True)
+
+    # .claude/ may exist from skills dry-run skipping, but settings shouldn't
+    settings = tmp_path / ".claude" / "settings.json"
+    assert not settings.exists()
 
 
 # --- Hook file installation tests ---

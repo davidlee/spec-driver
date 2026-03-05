@@ -1,3 +1,3 @@
 #!/bin/sh
 
-echo '{"systemMessage": "Welcome to spec-driver", "additionalContext":"you MUST use the /boot skill IMMEDIATELY after receiving the next prompt."}'
+echo '{"systemMessage": "Welcome to spec-driver",{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"you MUST use the /boot skill IMMEDIATELY after receiving the next prompt."}}}'

@@ -14,6 +14,7 @@ from supekku.cli.create import app as create_app
 from supekku.cli.find import app as find_app
 from supekku.cli.list import app as list_app
 from supekku.cli.show import app as show_app
+from supekku.scripts.lib.core.paths import MEMORY_DIR
 
 
 def _write_memory_file(
@@ -83,7 +84,7 @@ class CreateMemoryCommandTest(unittest.TestCase):
     assert result.exit_code == 0, f"Failed: {result.stderr}"
     assert "Created memory: mem.fact.test" in result.stdout
 
-    mem_dir = self.root / "memory"
+    mem_dir = self.root / MEMORY_DIR
     assert mem_dir.exists()
     path = mem_dir / "mem.fact.test.md"
     assert path.exists()
@@ -120,7 +121,7 @@ class CreateMemoryCommandTest(unittest.TestCase):
     assert result.exit_code == 0, f"Failed: {result.stderr}"
     assert "mem.pattern.arch.registry" in result.stdout
 
-    path = self.root / "memory" / "mem.pattern.arch.registry.md"
+    path = self.root / MEMORY_DIR / "mem.pattern.arch.registry.md"
     content = path.read_text(encoding="utf-8")
     assert "status: draft" in content
     assert "memory_type: pattern" in content
@@ -128,7 +129,7 @@ class CreateMemoryCommandTest(unittest.TestCase):
 
   def test_create_memory_rejects_duplicate(self) -> None:
     """Creating a memory with an existing ID fails."""
-    mem_dir = self.root / "memory"
+    mem_dir = self.root / MEMORY_DIR
     mem_dir.mkdir(parents=True)
     _write_memory_file(mem_dir, "mem.fact.alpha")
 
@@ -192,7 +193,7 @@ class ListMemoriesCommandTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / "memory"
+    self.mem_dir = self.root / MEMORY_DIR
     self.mem_dir.mkdir()
 
   def tearDown(self) -> None:
@@ -306,7 +307,7 @@ class ListMemoriesLinksToTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / "memory"
+    self.mem_dir = self.root / MEMORY_DIR
     self.mem_dir.mkdir()
 
   def tearDown(self) -> None:
@@ -339,15 +340,11 @@ class ListMemoriesLinksToTest(unittest.TestCase):
 
   def test_links_to_returns_backlinkers(self) -> None:
     """--links-to shows memories that link to the target."""
-    self._write_memory_with_body(
-      "mem.fact.hub", "Hub", "The hub memory."
-    )
+    self._write_memory_with_body("mem.fact.hub", "Hub", "The hub memory.")
     self._write_memory_with_body(
       "mem.fact.alpha", "Alpha", "See [[mem.fact.hub]] for details."
     )
-    self._write_memory_with_body(
-      "mem.fact.beta", "Beta", "Unrelated content."
-    )
+    self._write_memory_with_body("mem.fact.beta", "Beta", "Unrelated content.")
 
     result = self.runner.invoke(
       list_app,
@@ -360,9 +357,7 @@ class ListMemoriesLinksToTest(unittest.TestCase):
 
   def test_links_to_no_backlinks(self) -> None:
     """--links-to with no backlinks exits cleanly."""
-    self._write_memory_with_body(
-      "mem.fact.lonely", "Lonely", "Nobody links to me."
-    )
+    self._write_memory_with_body("mem.fact.lonely", "Lonely", "Nobody links to me.")
 
     result = self.runner.invoke(
       list_app,
@@ -373,18 +368,10 @@ class ListMemoriesLinksToTest(unittest.TestCase):
 
   def test_links_to_multiple_backlinkers(self) -> None:
     """--links-to returns all memories that link to the target."""
-    self._write_memory_with_body(
-      "mem.fact.hub", "Hub", "Central node."
-    )
-    self._write_memory_with_body(
-      "mem.fact.a", "A", "See [[mem.fact.hub]]."
-    )
-    self._write_memory_with_body(
-      "mem.fact.b", "B", "Also see [[mem.fact.hub]]."
-    )
-    self._write_memory_with_body(
-      "mem.fact.c", "C", "And [[mem.fact.hub]] too."
-    )
+    self._write_memory_with_body("mem.fact.hub", "Hub", "Central node.")
+    self._write_memory_with_body("mem.fact.a", "A", "See [[mem.fact.hub]].")
+    self._write_memory_with_body("mem.fact.b", "B", "Also see [[mem.fact.hub]].")
+    self._write_memory_with_body("mem.fact.c", "C", "And [[mem.fact.hub]] too.")
 
     result = self.runner.invoke(
       list_app,
@@ -399,12 +386,8 @@ class ListMemoriesLinksToTest(unittest.TestCase):
 
   def test_links_to_with_shorthand(self) -> None:
     """--links-to accepts shorthand IDs (without mem. prefix)."""
-    self._write_memory_with_body(
-      "mem.fact.hub", "Hub", "Central."
-    )
-    self._write_memory_with_body(
-      "mem.fact.linker", "Linker", "See [[mem.fact.hub]]."
-    )
+    self._write_memory_with_body("mem.fact.hub", "Hub", "Central.")
+    self._write_memory_with_body("mem.fact.linker", "Linker", "See [[mem.fact.hub]].")
 
     result = self.runner.invoke(
       list_app,
@@ -416,12 +399,8 @@ class ListMemoriesLinksToTest(unittest.TestCase):
 
   def test_links_to_json_output(self) -> None:
     """--links-to works with --json output."""
-    self._write_memory_with_body(
-      "mem.fact.hub", "Hub", "Central."
-    )
-    self._write_memory_with_body(
-      "mem.fact.alpha", "Alpha", "See [[mem.fact.hub]]."
-    )
+    self._write_memory_with_body("mem.fact.hub", "Hub", "Central.")
+    self._write_memory_with_body("mem.fact.alpha", "Alpha", "See [[mem.fact.hub]].")
 
     result = self.runner.invoke(
       list_app,
@@ -442,7 +421,7 @@ class ShowMemoryCommandTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / "memory"
+    self.mem_dir = self.root / MEMORY_DIR
     self.mem_dir.mkdir()
 
   def tearDown(self) -> None:
@@ -542,7 +521,7 @@ class ShowMemoryLinksDepthTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / "memory"
+    self.mem_dir = self.root / MEMORY_DIR
     self.mem_dir.mkdir()
 
   def tearDown(self) -> None:
@@ -575,19 +554,18 @@ class ShowMemoryLinksDepthTest(unittest.TestCase):
 
   def test_links_depth_shows_graph_table(self) -> None:
     """--links-depth 1 shows outgoing links as table."""
-    self._write_memory_with_body(
-      "mem.fact.root", "Root", "See [[mem.fact.child]]."
-    )
-    self._write_memory_with_body(
-      "mem.fact.child", "Child", "Leaf node."
-    )
+    self._write_memory_with_body("mem.fact.root", "Root", "See [[mem.fact.child]].")
+    self._write_memory_with_body("mem.fact.child", "Child", "Leaf node.")
 
     result = self.runner.invoke(
       show_app,
       [
-        "memory", "mem.fact.root",
-        "--links-depth", "1",
-        "--root", str(self.root),
+        "memory",
+        "mem.fact.root",
+        "--links-depth",
+        "1",
+        "--root",
+        str(self.root),
       ],
     )
 
@@ -597,9 +575,7 @@ class ShowMemoryLinksDepthTest(unittest.TestCase):
 
   def test_links_depth_tree_format(self) -> None:
     """--links-depth with --tree shows indented tree."""
-    self._write_memory_with_body(
-      "mem.fact.root", "Root", "See [[mem.fact.child]]."
-    )
+    self._write_memory_with_body("mem.fact.root", "Root", "See [[mem.fact.child]].")
     self._write_memory_with_body(
       "mem.fact.child", "Child", "Leaf node.", memory_type="pattern"
     )
@@ -607,10 +583,13 @@ class ShowMemoryLinksDepthTest(unittest.TestCase):
     result = self.runner.invoke(
       show_app,
       [
-        "memory", "mem.fact.root",
-        "--links-depth", "1",
+        "memory",
+        "mem.fact.root",
+        "--links-depth",
+        "1",
         "--tree",
-        "--root", str(self.root),
+        "--root",
+        str(self.root),
       ],
     )
 
@@ -621,20 +600,19 @@ class ShowMemoryLinksDepthTest(unittest.TestCase):
 
   def test_links_depth_json_format(self) -> None:
     """--links-depth with --json outputs structured JSON."""
-    self._write_memory_with_body(
-      "mem.fact.root", "Root", "See [[mem.fact.child]]."
-    )
-    self._write_memory_with_body(
-      "mem.fact.child", "Child", "Leaf."
-    )
+    self._write_memory_with_body("mem.fact.root", "Root", "See [[mem.fact.child]].")
+    self._write_memory_with_body("mem.fact.child", "Child", "Leaf.")
 
     result = self.runner.invoke(
       show_app,
       [
-        "memory", "mem.fact.root",
-        "--links-depth", "1",
+        "memory",
+        "mem.fact.root",
+        "--links-depth",
+        "1",
         "--json",
-        "--root", str(self.root),
+        "--root",
+        str(self.root),
       ],
     )
 
@@ -647,19 +625,18 @@ class ShowMemoryLinksDepthTest(unittest.TestCase):
 
   def test_links_depth_zero(self) -> None:
     """--links-depth 0 shows only root node."""
-    self._write_memory_with_body(
-      "mem.fact.root", "Root", "See [[mem.fact.child]]."
-    )
-    self._write_memory_with_body(
-      "mem.fact.child", "Child", "Leaf."
-    )
+    self._write_memory_with_body("mem.fact.root", "Root", "See [[mem.fact.child]].")
+    self._write_memory_with_body("mem.fact.child", "Child", "Leaf.")
 
     result = self.runner.invoke(
       show_app,
       [
-        "memory", "mem.fact.root",
-        "--links-depth", "0",
-        "--root", str(self.root),
+        "memory",
+        "mem.fact.root",
+        "--links-depth",
+        "0",
+        "--root",
+        str(self.root),
       ],
     )
 
@@ -672,9 +649,12 @@ class ShowMemoryLinksDepthTest(unittest.TestCase):
     result = self.runner.invoke(
       show_app,
       [
-        "memory", "mem.fact.missing",
-        "--links-depth", "1",
-        "--root", str(self.root),
+        "memory",
+        "mem.fact.missing",
+        "--links-depth",
+        "1",
+        "--root",
+        str(self.root),
       ],
     )
 
@@ -689,7 +669,7 @@ class ShowMemoryBodyOnlyTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / "memory"
+    self.mem_dir = self.root / MEMORY_DIR
     self.mem_dir.mkdir()
 
   def tearDown(self) -> None:
@@ -743,7 +723,7 @@ class FindMemoryCommandTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / "memory"
+    self.mem_dir = self.root / MEMORY_DIR
     self.mem_dir.mkdir()
 
   def tearDown(self) -> None:
@@ -806,7 +786,7 @@ class ListMemoriesSelectionTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / "memory"
+    self.mem_dir = self.root / MEMORY_DIR
     self.mem_dir.mkdir()
 
   def tearDown(self) -> None:

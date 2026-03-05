@@ -7,7 +7,7 @@ import unittest
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.changes.registry import ChangeRegistry
-from supekku.scripts.lib.core.paths import get_registry_dir
+from supekku.scripts.lib.core.paths import CHANGES_DIR, DELTAS_SUBDIR, get_registry_dir
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.relations.manager import add_relation
 from supekku.scripts.lib.test_base import RepoTestCase
@@ -31,7 +31,7 @@ class ChangeRegistryTest(RepoTestCase):
     artifact_id: str,
     relations: list[tuple[str, str]] | None = None,
   ) -> None:
-    bundle_dir = root / "change" / kind / f"{artifact_id}-sample"
+    bundle_dir = root / CHANGES_DIR / kind / f"{artifact_id}-sample"
     bundle_dir.mkdir(parents=True, exist_ok=True)
     path = bundle_dir / f"{artifact_id}.md"
     frontmatter = {
@@ -87,7 +87,7 @@ class TestChangeRegistryReverseQueries(RepoTestCase):
     requirements: list[str],
   ) -> None:
     """Write a delta that implements specific requirements."""
-    bundle_dir = root / "change" / "deltas" / f"{delta_id}-sample"
+    bundle_dir = root / CHANGES_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
     bundle_dir.mkdir(parents=True, exist_ok=True)
     path = bundle_dir / f"{delta_id}.md"
     frontmatter = {
@@ -230,7 +230,7 @@ class TestChangeRegistryReverseQueries(RepoTestCase):
     root = self._create_repo()
 
     # Create deltas with different statuses
-    bundle_dir = root / "change" / "deltas" / "DE-101-sample"
+    bundle_dir = root / CHANGES_DIR / DELTAS_SUBDIR / "DE-101-sample"
     bundle_dir.mkdir(parents=True, exist_ok=True)
     path = bundle_dir / "DE-101.md"
     frontmatter = {

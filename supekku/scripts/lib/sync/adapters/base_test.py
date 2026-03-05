@@ -6,6 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
 
+from supekku.scripts.lib.core.paths import CHANGES_DIR, SPECS_DIR, TECH_SPECS_SUBDIR
 from supekku.scripts.lib.sync.models import SourceDescriptor, SourceUnit
 
 from .base import LanguageAdapter
@@ -292,13 +293,15 @@ class TestLanguageAdapterShouldSkipPath(unittest.TestCase):
 
   def test_should_skip_specify_directory(self) -> None:
     """Test that paths in specify/ are skipped."""
-    spec_path = self.repo_root / "specify" / "tech" / "SPEC-001" / "SPEC-001.md"
+    spec_path = (
+      self.repo_root / SPECS_DIR / TECH_SPECS_SUBDIR / "SPEC-001" / "SPEC-001.md"
+    )
 
     assert self.adapter._should_skip_path(spec_path) is True
 
   def test_should_skip_change_directory(self) -> None:
     """Test that paths in change/ are skipped."""
-    change_path = self.repo_root / "change" / "deltas" / "DE-001" / "delta.yaml"
+    change_path = self.repo_root / CHANGES_DIR / "deltas" / "DE-001" / "delta.yaml"
 
     assert self.adapter._should_skip_path(change_path) is True
 

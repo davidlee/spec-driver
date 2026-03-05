@@ -15,6 +15,7 @@ from unittest.mock import MagicMock, patch
 from typer.testing import CliRunner
 
 from supekku.cli.sync import app
+from supekku.scripts.lib.core.paths import SPECS_DIR, TECH_SPECS_SUBDIR
 from supekku.scripts.lib.core.sync_preferences import MARKER_FILENAME
 
 _SPEC_DRIVER_DIR = ".spec-driver"
@@ -38,7 +39,7 @@ class SyncDefaultsTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.tech_dir = self.root / "specify" / "tech"
+    self.tech_dir = self.root / SPECS_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True)
     self.registry_path = self.tech_dir / "registry_v2.json"
     self._write_registry({})

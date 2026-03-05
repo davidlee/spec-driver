@@ -10,6 +10,7 @@ import yaml
 from typer.testing import CliRunner
 
 from supekku.cli.main import app
+from supekku.scripts.lib.core.paths import CHANGES_DIR, DELTAS_SUBDIR
 
 runner = CliRunner()
 
@@ -44,7 +45,7 @@ def _write_delta(root: Path, frontmatter: dict, body: str = "# Test\n") -> Path:
   """Write a delta file in the expected directory structure."""
   delta_id = frontmatter["id"]
   slug = frontmatter.get("slug", "test")
-  delta_dir = root / "change" / "deltas" / f"{delta_id}-{slug}"
+  delta_dir = root / CHANGES_DIR / DELTAS_SUBDIR / f"{delta_id}-{slug}"
   delta_dir.mkdir(parents=True, exist_ok=True)
   delta_file = delta_dir / f"{delta_id}.md"
   fm_yaml = yaml.safe_dump(frontmatter, sort_keys=False)

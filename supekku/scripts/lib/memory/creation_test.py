@@ -8,6 +8,7 @@ import frontmatter
 import pytest
 import yaml
 
+from supekku.scripts.lib.core.paths import MEMORY_DIR
 from supekku.scripts.lib.memory.creation import (
   MemoryAlreadyExistsError,
   MemoryCreationOptions,
@@ -21,7 +22,7 @@ from supekku.scripts.lib.memory.registry import MemoryRegistry
 @pytest.fixture()
 def memory_dir(tmp_path: Path) -> Path:
   """Create a temporary memory directory with sample files."""
-  mem_dir = tmp_path / "memory"
+  mem_dir = tmp_path / MEMORY_DIR
   mem_dir.mkdir()
   return mem_dir
 
@@ -204,7 +205,7 @@ class TestCreateMemory:
     assert post["status"] == "draft"
 
   def test_creates_directory_if_missing(self, tmp_path: Path) -> None:
-    mem_dir = tmp_path / "memory"
+    mem_dir = tmp_path / MEMORY_DIR
     reg = MemoryRegistry(root=tmp_path, directory=mem_dir)
     opts = MemoryCreationOptions(
       memory_id="mem.fact.new",

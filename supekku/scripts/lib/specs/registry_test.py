@@ -6,6 +6,11 @@ import os
 import unittest
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.core.paths import (
+  PRODUCT_SPECS_SUBDIR,
+  SPECS_DIR,
+  TECH_SPECS_SUBDIR,
+)
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.specs.models import Spec
 from supekku.scripts.lib.specs.package_utils import find_package_for_file
@@ -22,7 +27,7 @@ class SpecRegistryTest(RepoTestCase):
   def _make_repo(self) -> Path:
     root = super()._make_repo()
 
-    tech_dir = root / "specify" / "tech" / "SPEC-001-sample"
+    tech_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "SPEC-001-sample"
     tech_dir.mkdir(parents=True)
     tech_spec = tech_dir / "SPEC-001.md"
     tech_frontmatter = {
@@ -37,7 +42,7 @@ class SpecRegistryTest(RepoTestCase):
     }
     dump_markdown_file(tech_spec, tech_frontmatter, "# Sample Tech\n")
 
-    product_dir = root / "specify" / "product"
+    product_dir = root / SPECS_DIR / PRODUCT_SPECS_SUBDIR
     product_dir.mkdir(parents=True, exist_ok=True)
     product_spec = product_dir / "PROD-001.md"
     product_frontmatter = {
@@ -81,7 +86,7 @@ class SpecRegistryTest(RepoTestCase):
     root = self._make_repo()
     registry = SpecRegistry(root)
 
-    new_dir = root / "specify" / "tech" / "SPEC-002-extra"
+    new_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "SPEC-002-extra"
     new_dir.mkdir(parents=True)
     new_spec = new_dir / "SPEC-002.md"
     frontmatter = {
@@ -181,8 +186,9 @@ class TestSpecRegistryReverseQueries(RepoTestCase):
 
   def _write_spec_with_adrs(self, root: Path, spec_id: str, adr_ids: list[str]) -> None:
     """Write a spec that references specific ADRs."""
-    kind = "tech" if spec_id.startswith("SPEC-") else "product"
-    spec_dir = root / "specify" / kind / f"{spec_id.lower()}-sample"
+    subdir = TECH_SPECS_SUBDIR if spec_id.startswith("SPEC-") else PRODUCT_SPECS_SUBDIR
+    kind = "spec" if spec_id.startswith("SPEC-") else "prod"
+    spec_dir = root / SPECS_DIR / subdir / f"{spec_id.lower()}-sample"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / f"{spec_id}.md"
 
@@ -194,7 +200,7 @@ class TestSpecRegistryReverseQueries(RepoTestCase):
       "created": "2024-06-01",
       "updated": "2024-06-01",
       "status": "draft",
-      "kind": "spec" if kind == "tech" else "prod",
+      "kind": kind,
       "informed_by": adr_ids,
     }
     dump_markdown_file(spec_path, frontmatter, f"# {spec_id}\n")
@@ -304,7 +310,7 @@ class TestSpecRegistryReverseQueries(RepoTestCase):
     root = self._make_repo()
 
     # Create spec WITHOUT informed_by field
-    spec_dir = root / "specify" / "tech" / "spec-003-sample"
+    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "spec-003-sample"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / "SPEC-003.md"
     frontmatter = {

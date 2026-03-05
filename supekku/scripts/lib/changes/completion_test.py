@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 from supekku.scripts.lib.changes.completion import complete_revision
+from supekku.scripts.lib.core.paths import CHANGES_DIR, REVISIONS_SUBDIR
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 
@@ -35,7 +36,7 @@ class CompleteRevisionTest(unittest.TestCase):
     status: str = "draft",
   ) -> Path:
     """Create a minimal revision file for testing."""
-    revision_dir = root / "change" / "revisions" / f"{revision_id}-test"
+    revision_dir = root / CHANGES_DIR / REVISIONS_SUBDIR / f"{revision_id}-test"
     revision_dir.mkdir(parents=True, exist_ok=True)
     revision_path = revision_dir / f"{revision_id}.md"
     revision_path.write_text(
@@ -91,7 +92,7 @@ class CompleteRevisionTest(unittest.TestCase):
   def test_complete_not_found(self) -> None:
     """Test error when revision does not exist."""
     root = self._make_repo()
-    (root / "change" / "revisions").mkdir(parents=True, exist_ok=True)
+    (root / CHANGES_DIR / REVISIONS_SUBDIR).mkdir(parents=True, exist_ok=True)
     exit_code = complete_revision("RE-999", repo_root=root)
     assert exit_code == 1
 

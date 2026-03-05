@@ -18,7 +18,7 @@ from supekku.scripts.install import (
   get_package_root,
   initialize_workspace,
 )
-from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
+from supekku.scripts.lib.core.paths import BACKLOG_DIR, MEMORY_DIR, SPEC_DRIVER_DIR
 
 
 def test_get_package_root() -> None:
@@ -56,7 +56,7 @@ def test_initialize_workspace_creates_directories(tmp_path: Path) -> None:
     assert (tmp_path / dir_path).is_dir(), f"Directory {dir_path} not created"
 
   # Verify backlog.md was created
-  backlog_file = tmp_path / "backlog" / "backlog.md"
+  backlog_file = tmp_path / BACKLOG_DIR / "backlog.md"
   assert backlog_file.exists(), "backlog/backlog.md not created"
 
   # Verify content
@@ -279,7 +279,7 @@ def test_initialize_workspace_registry_files_never_overwritten(tmp_path: Path) -
 
 def test_initialize_workspace_backlog_never_overwritten(tmp_path: Path) -> None:
   """Test that backlog.md is never overwritten, even with --yes."""
-  backlog_dir = tmp_path / "backlog"
+  backlog_dir = tmp_path / BACKLOG_DIR
   backlog_dir.mkdir(parents=True)
 
   # Create backlog file with custom content
@@ -880,7 +880,7 @@ class TestFindMemorySource:
   """Tests for _find_memory_source dual discovery."""
 
   def test_finds_in_package_root(self, tmp_path: Path) -> None:
-    mem_dir = tmp_path / "memory"
+    mem_dir = tmp_path / MEMORY_DIR
     mem_dir.mkdir()
     (mem_dir / "mem.concept.spec-driver.delta.md").write_text("test")
     assert _find_memory_source(tmp_path) == mem_dir
@@ -888,14 +888,14 @@ class TestFindMemorySource:
   def test_falls_back_to_parent(self, tmp_path: Path) -> None:
     pkg_root = tmp_path / "supekku"
     pkg_root.mkdir()
-    mem_dir = tmp_path / "memory"
+    mem_dir = tmp_path / MEMORY_DIR
     mem_dir.mkdir()
     (mem_dir / "mem.concept.spec-driver.delta.md").write_text("test")
     assert _find_memory_source(pkg_root) == mem_dir
 
   def test_prefers_package_root(self, tmp_path: Path) -> None:
     """Package-level memory dir takes precedence over parent."""
-    pkg_memory = tmp_path / "memory"
+    pkg_memory = tmp_path / MEMORY_DIR
     pkg_memory.mkdir()
     (pkg_memory / "mem.concept.spec-driver.delta.md").write_text("pkg")
     # Don't create parent — just verify the package path wins
@@ -1214,7 +1214,7 @@ class TestInitializeWorkspaceMemories:
     """Fresh install creates memory directory with managed + seed files."""
     initialize_workspace(tmp_path, auto_yes=True)
 
-    memory_dir = tmp_path / "memory"
+    memory_dir = tmp_path / MEMORY_DIR
     assert memory_dir.is_dir()
 
     # Should have at least some managed memories
@@ -1234,7 +1234,7 @@ class TestInitializeWorkspaceMemories:
     initialize_workspace(tmp_path, auto_yes=True)
 
     # Customise a seed memory
-    wf = tmp_path / "memory" / "mem.pattern.project.workflow.md"
+    wf = tmp_path / MEMORY_DIR / "mem.pattern.project.workflow.md"
     assert wf.exists()
     wf.write_text("my custom workflow")
 
@@ -1248,7 +1248,7 @@ class TestInitializeWorkspaceMemories:
     tmp_path: Path,
   ) -> None:
     initialize_workspace(tmp_path, dry_run=True)
-    memory_dir = tmp_path / "memory"
+    memory_dir = tmp_path / MEMORY_DIR
     # Memory dir might be created (mkdir), but no files copied
     md_files = list(memory_dir.glob("*.md")) if memory_dir.exists() else []
     assert len(md_files) == 0

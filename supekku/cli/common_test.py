@@ -20,6 +20,7 @@ from supekku.cli.common import (
   find_artifacts,
   resolve_artifact,
 )
+from supekku.scripts.lib.core.paths import BACKLOG_DIR, CHANGES_DIR, DELTAS_SUBDIR
 
 # ── ArtifactRef ─────────────────────────────────────────────────
 
@@ -344,7 +345,7 @@ class TestResolveArtifactPlan:
   """Tests for plan resolver (VT-plan-resolve)."""
 
   def test_resolves_plan_by_full_id(self, tmp_path: Path) -> None:
-    delta_dir = tmp_path / "change" / "deltas" / "DE-041-slug"
+    delta_dir = tmp_path / CHANGES_DIR / DELTAS_SUBDIR / "DE-041-slug"
     delta_dir.mkdir(parents=True)
     plan_file = delta_dir / "IP-041.md"
     plan_file.write_text(
@@ -356,7 +357,7 @@ class TestResolveArtifactPlan:
     assert ref.record["id"] == "IP-041"
 
   def test_resolves_plan_by_numeric_shorthand(self, tmp_path: Path) -> None:
-    delta_dir = tmp_path / "change" / "deltas" / "DE-041-slug"
+    delta_dir = tmp_path / CHANGES_DIR / DELTAS_SUBDIR / "DE-041-slug"
     delta_dir.mkdir(parents=True)
     (delta_dir / "IP-041.md").write_text(
       "---\nid: IP-041\nname: P\nstatus: draft\nkind: plan\n---\n",
@@ -365,7 +366,7 @@ class TestResolveArtifactPlan:
     assert ref.id == "IP-041"
 
   def test_raises_not_found_for_missing_plan(self, tmp_path: Path) -> None:
-    (tmp_path / "change" / "deltas").mkdir(parents=True)
+    (tmp_path / CHANGES_DIR / DELTAS_SUBDIR).mkdir(parents=True)
     with pytest.raises(ArtifactNotFoundError):
       resolve_artifact("plan", "IP-999", tmp_path)
 
@@ -380,7 +381,7 @@ class TestResolveArtifactBacklog:
   def _create_backlog_item(
     self, root: Path, subdir: str, item_id: str, slug: str
   ) -> Path:
-    entry_dir = root / "backlog" / subdir / f"{item_id}-{slug}"
+    entry_dir = root / BACKLOG_DIR / subdir / f"{item_id}-{slug}"
     entry_dir.mkdir(parents=True, exist_ok=True)
     md = entry_dir / f"{item_id}.md"
     kind = subdir.rstrip("s")
@@ -744,12 +745,12 @@ class TestFindArtifactsPlan:
   """find_artifacts for plan type scans delta dirs."""
 
   def test_finds_matching_plans(self, tmp_path: Path) -> None:
-    d1 = tmp_path / "change" / "deltas" / "DE-041-slug"
+    d1 = tmp_path / CHANGES_DIR / DELTAS_SUBDIR / "DE-041-slug"
     d1.mkdir(parents=True)
     (d1 / "IP-041.md").write_text(
       "---\nid: IP-041\nname: P1\nstatus: draft\nkind: plan\n---\n",
     )
-    d2 = tmp_path / "change" / "deltas" / "DE-042-other"
+    d2 = tmp_path / CHANGES_DIR / DELTAS_SUBDIR / "DE-042-other"
     d2.mkdir(parents=True)
     (d2 / "IP-042.md").write_text(
       "---\nid: IP-042\nname: P2\nstatus: draft\nkind: plan\n---\n",
@@ -761,7 +762,7 @@ class TestFindArtifactsPlan:
     assert "IP-042" in ids
 
   def test_numeric_shorthand_pattern(self, tmp_path: Path) -> None:
-    d = tmp_path / "change" / "deltas" / "DE-041-slug"
+    d = tmp_path / CHANGES_DIR / DELTAS_SUBDIR / "DE-041-slug"
     d.mkdir(parents=True)
     (d / "IP-041.md").write_text(
       "---\nid: IP-041\nstatus: draft\nkind: plan\n---\n",
@@ -778,7 +779,7 @@ class TestFindArtifactsBacklog:
   """find_artifacts for backlog types uses discover_backlog_items."""
 
   def _create_item(self, root: Path, subdir: str, item_id: str) -> None:
-    entry_dir = root / "backlog" / subdir / f"{item_id}-test"
+    entry_dir = root / BACKLOG_DIR / subdir / f"{item_id}-test"
     entry_dir.mkdir(parents=True, exist_ok=True)
     kind = subdir.rstrip("s")
     fm = f"---\nid: {item_id}\nname: test\nkind: {kind}\nstatus: open\n---\n"

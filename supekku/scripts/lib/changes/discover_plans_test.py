@@ -7,6 +7,7 @@ import unittest
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.changes.registry import discover_plans
+from supekku.scripts.lib.core.paths import CHANGES_DIR, DELTAS_SUBDIR
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.test_base import RepoTestCase
 
@@ -47,7 +48,7 @@ def _write_plan(
   phases: list[dict[str, str]] | None = None,
 ) -> Path:
   """Write a plan file inside a delta directory."""
-  delta_dir = root / "change" / "deltas" / f"{delta_id}-sample"
+  delta_dir = root / CHANGES_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
   delta_dir.mkdir(parents=True, exist_ok=True)
   path = delta_dir / f"{plan_id}.md"
   frontmatter = {
@@ -79,7 +80,7 @@ class TestDiscoverPlans(RepoTestCase):
 
   def test_no_deltas_dir_returns_empty_list(self) -> None:
     root = self._create_repo()
-    (root / "change").mkdir(parents=True)
+    (root / CHANGES_DIR).mkdir(parents=True)
     result = discover_plans(root)
     assert result == []
 
@@ -150,7 +151,7 @@ class TestDiscoverPlans(RepoTestCase):
   def test_plan_without_overview_block(self) -> None:
     """Plans without a plan.overview block get empty delta_id and phases."""
     root = self._create_repo()
-    delta_dir = root / "change" / "deltas" / "DE-100-sample"
+    delta_dir = root / CHANGES_DIR / DELTAS_SUBDIR / "DE-100-sample"
     delta_dir.mkdir(parents=True, exist_ok=True)
     path = delta_dir / "IP-100.md"
     frontmatter = {
@@ -173,7 +174,7 @@ class TestDiscoverPlans(RepoTestCase):
   def test_skips_non_plan_files(self) -> None:
     """Only IP-*.md files are discovered, not DE-*.md or DR-*.md."""
     root = self._create_repo()
-    delta_dir = root / "change" / "deltas" / "DE-100-sample"
+    delta_dir = root / CHANGES_DIR / DELTAS_SUBDIR / "DE-100-sample"
     delta_dir.mkdir(parents=True, exist_ok=True)
     frontmatter = {
       "id": "DE-100",
@@ -195,7 +196,7 @@ class TestDiscoverPlans(RepoTestCase):
   def test_skips_malformed_frontmatter(self) -> None:
     """Plans with unparseable frontmatter are silently skipped."""
     root = self._create_repo()
-    delta_dir = root / "change" / "deltas" / "DE-100-sample"
+    delta_dir = root / CHANGES_DIR / DELTAS_SUBDIR / "DE-100-sample"
     delta_dir.mkdir(parents=True, exist_ok=True)
     (delta_dir / "IP-100.md").write_text("not valid frontmatter\n")
     _write_plan(root, "DE-101", "IP-101")

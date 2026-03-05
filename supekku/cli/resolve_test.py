@@ -8,6 +8,7 @@ from supekku.cli.resolve import (
   _build_artifact_index,
   _resolve_memory_links,
 )
+from supekku.scripts.lib.core.paths import MEMORY_DIR
 from supekku.scripts.lib.core.spec_utils import (
   dump_markdown_file,
   load_markdown_file,
@@ -21,7 +22,7 @@ def _init_repo(tmp_path: Path) -> Path:
   and memory/ for mem files. Returns memory dir.
   """
   (tmp_path / ".spec-driver").mkdir(exist_ok=True)
-  mem_dir = tmp_path / "memory"
+  mem_dir = tmp_path / MEMORY_DIR
   mem_dir.mkdir(exist_ok=True)
   return mem_dir
 

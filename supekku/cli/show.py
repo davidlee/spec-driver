@@ -514,7 +514,11 @@ def show_memory(  # noqa: PLR0913
       names = {mid: r.name for mid, r in all_records.items()}
       types = {mid: r.memory_type for mid, r in all_records.items()}
       nodes = expand_link_graph(
-        normalized_id, bodies, names, types, max_depth=links_depth,
+        normalized_id,
+        bodies,
+        names,
+        types,
+        max_depth=links_depth,
       )
       if json_output:
         typer.echo(format_link_graph_json(nodes))

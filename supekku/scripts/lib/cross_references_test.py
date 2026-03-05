@@ -13,6 +13,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from supekku.scripts.lib.core.paths import (
+  DECISIONS_SUBDIR,
+  POLICIES_SUBDIR,
+  SPECS_DIR,
+  STANDARDS_SUBDIR,
+)
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.policies.registry import PolicyRegistry
 
@@ -23,9 +29,9 @@ class TestCrossReferenceIntegrity(unittest.TestCase):
   def _setup_test_repo(self, tmpdir: str) -> Path:
     """Set up a minimal test repository."""
     root = Path(tmpdir)
-    (root / "specify" / "decisions").mkdir(parents=True)
-    (root / "specify" / "policies").mkdir(parents=True)
-    (root / "specify" / "standards").mkdir(parents=True)
+    (root / SPECS_DIR / DECISIONS_SUBDIR).mkdir(parents=True)
+    (root / SPECS_DIR / POLICIES_SUBDIR).mkdir(parents=True)
+    (root / SPECS_DIR / STANDARDS_SUBDIR).mkdir(parents=True)
     (root / ".spec-driver" / "registry").mkdir(parents=True)
     return root
 
@@ -35,7 +41,7 @@ class TestCrossReferenceIntegrity(unittest.TestCase):
       root = self._setup_test_repo(tmpdir)
 
       # Create policy referencing standards
-      pol_file = root / "specify" / "policies" / "POL-001-test.md"
+      pol_file = root / SPECS_DIR / POLICIES_SUBDIR / "POL-001-test.md"
       pol_file.write_text(
         """---
 id: POL-001
@@ -66,7 +72,7 @@ standards: [STD-001, STD-002]
       root = self._setup_test_repo(tmpdir)
 
       # Create ADR referencing policies
-      adr_file = root / "specify" / "decisions" / "ADR-001-test.md"
+      adr_file = root / SPECS_DIR / DECISIONS_SUBDIR / "ADR-001-test.md"
       adr_file.write_text(
         """---
 id: ADR-001
@@ -97,7 +103,7 @@ policies: [POL-001, POL-002]
       root = self._setup_test_repo(tmpdir)
 
       # Create ADR referencing standards
-      adr_file = root / "specify" / "decisions" / "ADR-002-test.md"
+      adr_file = root / SPECS_DIR / DECISIONS_SUBDIR / "ADR-002-test.md"
       adr_file.write_text(
         """---
 id: ADR-002
@@ -128,7 +134,7 @@ standards: [STD-001, STD-002]
       root = self._setup_test_repo(tmpdir)
 
       # Create ADR with both policy and standard references
-      adr_file = root / "specify" / "decisions" / "ADR-003-test.md"
+      adr_file = root / SPECS_DIR / DECISIONS_SUBDIR / "ADR-003-test.md"
       adr_file.write_text(
         """---
 id: ADR-003

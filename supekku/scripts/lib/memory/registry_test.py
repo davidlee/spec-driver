@@ -7,6 +7,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
+from supekku.scripts.lib.core.paths import MEMORY_DIR, SPECS_DIR
 from supekku.scripts.lib.memory.registry import MemoryRegistry
 
 # ── Fixture content ─────────────────────────────────────────────
@@ -112,7 +113,7 @@ def _setup_repo(tmpdir: str, files: dict[str, str] | None = None) -> Path:
   root = Path(tmpdir)
   (root / ".git").mkdir()
   if files:
-    mem_dir = root / "memory"
+    mem_dir = root / MEMORY_DIR
     mem_dir.mkdir()
     for name, content in files.items():
       (mem_dir / name).write_text(content, encoding="utf-8")
@@ -127,7 +128,7 @@ class TestMemoryRegistry(unittest.TestCase):
     with tempfile.TemporaryDirectory() as tmpdir:
       root = _setup_repo(tmpdir)
       registry = MemoryRegistry(root=root)
-      self.assertEqual(registry.directory, root / "memory")
+      self.assertEqual(registry.directory, root / MEMORY_DIR)
 
   def test_collect_empty_directory(self) -> None:
     """collect returns empty dict when no memory directory exists."""
@@ -141,8 +142,8 @@ class TestMemoryRegistry(unittest.TestCase):
     """collect returns empty dict when memory dir has no mem.* files."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = _setup_repo(tmpdir, files={})
-      (root / "memory").mkdir(exist_ok=True)
-      (root / "memory" / "README.md").write_text(
+      (root / MEMORY_DIR).mkdir(exist_ok=True)
+      (root / MEMORY_DIR / "README.md").write_text(
         "# Memory\n",
         encoding="utf-8",
       )
@@ -459,7 +460,7 @@ memory_type: fact
     """Registry accepts a custom memory directory path."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = _setup_repo(tmpdir)
-      custom = root / "specify" / "memory"
+      custom = root / SPECS_DIR / MEMORY_DIR
       custom.mkdir(parents=True)
       (custom / "mem.fact.test.md").write_text(
         MINIMAL_MEM,

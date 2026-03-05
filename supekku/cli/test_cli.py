@@ -11,6 +11,17 @@ from typer.testing import CliRunner
 
 from supekku.cli.common import matches_regexp
 from supekku.cli.main import app
+from supekku.scripts.lib.core.paths import (
+  BACKLOG_DIR,
+  CHANGES_DIR,
+  DELTAS_SUBDIR,
+  IMPROVEMENTS_SUBDIR,
+  ISSUES_SUBDIR,
+  PROBLEMS_SUBDIR,
+  RISKS_SUBDIR,
+  SPECS_DIR,
+  TECH_SPECS_SUBDIR,
+)
 
 runner = CliRunner()
 
@@ -64,19 +75,19 @@ class TestWorkspaceCommands:
 
       # Verify directories were created
       workspace = Path(tmpdir)
-      assert (workspace / "change" / "deltas").exists()
-      assert (workspace / "specify" / "tech").exists()
+      assert (workspace / CHANGES_DIR / DELTAS_SUBDIR).exists()
+      assert (workspace / SPECS_DIR / TECH_SPECS_SUBDIR).exists()
       assert (workspace / ".spec-driver" / "registry").exists()
 
       # Verify backlog structure
-      assert (workspace / "backlog" / "improvements").exists()
-      assert (workspace / "backlog" / "issues").exists()
-      assert (workspace / "backlog" / "problems").exists()
-      assert (workspace / "backlog" / "risks").exists()
-      assert (workspace / "backlog" / "backlog.md").exists()
+      assert (workspace / BACKLOG_DIR / IMPROVEMENTS_SUBDIR).exists()
+      assert (workspace / BACKLOG_DIR / ISSUES_SUBDIR).exists()
+      assert (workspace / BACKLOG_DIR / PROBLEMS_SUBDIR).exists()
+      assert (workspace / BACKLOG_DIR / RISKS_SUBDIR).exists()
+      assert (workspace / BACKLOG_DIR / "backlog.md").exists()
 
       # Verify backlog.md content
-      backlog_content = (workspace / "backlog" / "backlog.md").read_text()
+      backlog_content = (workspace / BACKLOG_DIR / "backlog.md").read_text()
       assert "# Backlog" in backlog_content
       assert "improvements/" in backlog_content
 

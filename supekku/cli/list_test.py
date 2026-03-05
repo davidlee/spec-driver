@@ -9,6 +9,18 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from supekku.cli.list import app
+from supekku.scripts.lib.core.paths import (
+  BACKLOG_DIR,
+  CHANGES_DIR,
+  DELTAS_SUBDIR,
+  IMPROVEMENTS_SUBDIR,
+  ISSUES_SUBDIR,
+  PROBLEMS_SUBDIR,
+  PRODUCT_SPECS_SUBDIR,
+  RISKS_SUBDIR,
+  SPECS_DIR,
+  TECH_SPECS_SUBDIR,
+)
 
 
 class ListBacklogShortcutsTest(unittest.TestCase):
@@ -35,7 +47,7 @@ class ListBacklogShortcutsTest(unittest.TestCase):
 
   def _create_sample_issue(self, issue_id: str, title: str, status: str) -> None:
     """Helper to create a sample issue file."""
-    issue_dir = self.root / "backlog" / "issues" / issue_id
+    issue_dir = self.root / BACKLOG_DIR / ISSUES_SUBDIR / issue_id
     issue_dir.mkdir(parents=True, exist_ok=True)
     issue_file = issue_dir / f"{issue_id}.md"
     content = f"""---
@@ -54,7 +66,7 @@ Test issue content.
 
   def _create_sample_problem(self, prob_id: str, title: str, status: str) -> None:
     """Helper to create a sample problem file."""
-    prob_dir = self.root / "backlog" / "problems" / prob_id
+    prob_dir = self.root / BACKLOG_DIR / PROBLEMS_SUBDIR / prob_id
     prob_dir.mkdir(parents=True, exist_ok=True)
     prob_file = prob_dir / f"{prob_id}.md"
     content = f"""---
@@ -73,7 +85,7 @@ Test problem content.
 
   def _create_sample_improvement(self, impr_id: str, title: str, status: str) -> None:
     """Helper to create a sample improvement file."""
-    impr_dir = self.root / "backlog" / "improvements" / impr_id
+    impr_dir = self.root / BACKLOG_DIR / IMPROVEMENTS_SUBDIR / impr_id
     impr_dir.mkdir(parents=True, exist_ok=True)
     impr_file = impr_dir / f"{impr_id}.md"
     content = f"""---
@@ -92,7 +104,7 @@ Test improvement content.
 
   def _create_sample_risk(self, risk_id: str, title: str, status: str) -> None:
     """Helper to create a sample risk file."""
-    risk_dir = self.root / "backlog" / "risks" / risk_id
+    risk_dir = self.root / BACKLOG_DIR / RISKS_SUBDIR / risk_id
     risk_dir.mkdir(parents=True, exist_ok=True)
     risk_file = risk_dir / f"{risk_id}.md"
     content = f"""---
@@ -512,7 +524,7 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    tech_dir = self.root / "specify" / "tech"
+    tech_dir = self.root / SPECS_DIR / TECH_SPECS_SUBDIR
 
     # Unit spec
     self._create_spec(
@@ -531,7 +543,7 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
     self._create_spec(tech_dir, "SPEC-003", "bare-spec", "Bare Spec")
 
     # Product spec (should never be filtered by --category)
-    prod_dir = self.root / "specify" / "product"
+    prod_dir = self.root / SPECS_DIR / PRODUCT_SPECS_SUBDIR
     prod_dir.mkdir(parents=True)
     prod_file = prod_dir / "PROD-001.md"
     prod_file.write_text(
@@ -705,7 +717,7 @@ class BacklogPrioritizationTest(unittest.TestCase):
     self, issue_id: str, title: str, status: str, severity: str
   ) -> None:
     """Helper to create a sample issue file."""
-    issue_dir = self.root / "backlog" / "issues" / issue_id
+    issue_dir = self.root / BACKLOG_DIR / ISSUES_SUBDIR / issue_id
     issue_dir.mkdir(parents=True, exist_ok=True)
     issue_file = issue_dir / f"{issue_id}.md"
     content = f"""---
@@ -725,7 +737,7 @@ Test issue content.
 
   def _create_sample_improvement(self, impr_id: str, title: str, status: str) -> None:
     """Helper to create a sample improvement file."""
-    impr_dir = self.root / "backlog" / "improvements" / impr_id
+    impr_dir = self.root / BACKLOG_DIR / IMPROVEMENTS_SUBDIR / impr_id
     impr_dir.mkdir(parents=True, exist_ok=True)
     impr_file = impr_dir / f"{impr_id}.md"
     content = f"""---
@@ -809,7 +821,7 @@ class ListPlansTest(unittest.TestCase):
     name: str,
     status: str,
   ) -> None:
-    delta_dir = self.root / "change" / "deltas" / f"{delta_id}-sample"
+    delta_dir = self.root / CHANGES_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
     delta_dir.mkdir(parents=True, exist_ok=True)
     content = f"""---
 id: {plan_id}
@@ -896,7 +908,7 @@ class ListFilterBackfillTest(unittest.TestCase):
       ("DE-100", "Alpha feature", "draft"),
       ("DE-101", "Beta bugfix", "in-progress"),
     ]:
-      delta_dir = self.root / "change" / "deltas" / f"{delta_id}-sample"
+      delta_dir = self.root / CHANGES_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
       delta_dir.mkdir(parents=True, exist_ok=True)
       content = f"""---
 id: {delta_id}

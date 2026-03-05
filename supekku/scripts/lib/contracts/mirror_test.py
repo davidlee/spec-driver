@@ -5,6 +5,8 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from supekku.scripts.lib.core.paths import SPECS_DIR, TECH_SPECS_SUBDIR
+
 from .mirror import (
   ContractMirrorTreeBuilder,
   extract_python_variant,
@@ -406,7 +408,7 @@ class TestContractMirrorTreeBuilder(unittest.TestCase):
     """Set up temp repo with tech directory."""
     self.temp_dir = TemporaryDirectory()  # pylint: disable=consider-using-with
     self.repo_root = Path(self.temp_dir.name)
-    self.tech_dir = self.repo_root / "specify" / "tech"
+    self.tech_dir = self.repo_root / SPECS_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True)
     self.contracts_root = self.repo_root / ".contracts"
     self.builder = ContractMirrorTreeBuilder(self.repo_root, self.tech_dir)

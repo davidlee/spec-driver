@@ -18,6 +18,12 @@ from supekku.scripts.lib.changes.creation import (
   create_requirement_breakout,
   create_revision,
 )
+from supekku.scripts.lib.core.paths import (
+  AUDITS_SUBDIR,
+  CHANGES_DIR,
+  SPECS_DIR,
+  TECH_SPECS_SUBDIR,
+)
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 
@@ -73,7 +79,7 @@ class CreateChangeTest(unittest.TestCase):
       encoding="utf-8",
     )
 
-    spec_dir = root / "specify" / "tech" / "spec-100-example"
+    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "spec-100-example"
     spec_dir.mkdir(parents=True, exist_ok=True)
     (spec_dir / "SPEC-100.md").write_text(
       (
@@ -654,7 +660,7 @@ class CreateChangeTest(unittest.TestCase):
     """Test audit creates correct directory under change/audits/."""
     root = self._make_repo()
     result = create_audit("Test audit", repo_root=root)
-    assert result.directory.parent == root / "change" / "audits"
+    assert result.directory.parent == root / CHANGES_DIR / AUDITS_SUBDIR
     assert result.directory.name.startswith("AUD-001-")
 
 

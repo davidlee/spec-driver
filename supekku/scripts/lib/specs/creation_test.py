@@ -10,7 +10,12 @@ from pathlib import Path
 
 import pytest
 
-from supekku.scripts.lib.core.paths import get_templates_dir
+from supekku.scripts.lib.core.paths import (
+  PRODUCT_SPECS_SUBDIR,
+  SPECS_DIR,
+  TECH_SPECS_SUBDIR,
+  get_templates_dir,
+)
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.specs.creation import (
   CreateSpecOptions,
@@ -36,8 +41,8 @@ class CreateSpecTest(unittest.TestCase):
     (root / ".git").mkdir()
     templates = get_templates_dir(root)
     templates.mkdir(parents=True)
-    (root / "specify" / "tech").mkdir(parents=True)
-    (root / "specify" / "product").mkdir(parents=True)
+    (root / SPECS_DIR / TECH_SPECS_SUBDIR).mkdir(parents=True)
+    (root / SPECS_DIR / PRODUCT_SPECS_SUBDIR).mkdir(parents=True)
     (templates / "spec.md").write_text(
       """# {{ spec_id }} – {{ name }}\n\nSpec body content\n""",
       encoding="utf-8",
@@ -175,8 +180,8 @@ class BuildFrontmatterTaxonomyTest(unittest.TestCase):
     (root / ".git").mkdir()
     templates = get_templates_dir(root)
     templates.mkdir(parents=True)
-    (root / "specify" / "tech").mkdir(parents=True)
-    (root / "specify" / "product").mkdir(parents=True)
+    (root / SPECS_DIR / TECH_SPECS_SUBDIR).mkdir(parents=True)
+    (root / SPECS_DIR / PRODUCT_SPECS_SUBDIR).mkdir(parents=True)
     (templates / "spec.md").write_text(
       "# {{ spec_id }} – {{ name }}\n\nBody\n",
       encoding="utf-8",

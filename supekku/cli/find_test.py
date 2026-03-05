@@ -7,6 +7,13 @@ import unittest
 from typer.testing import CliRunner
 
 from supekku.cli.find import app
+from supekku.scripts.lib.core.paths import (
+  CHANGES_DIR,
+  DECISIONS_SUBDIR,
+  DELTAS_SUBDIR,
+  SPECS_DIR,
+  TECH_SPECS_SUBDIR,
+)
 from supekku.scripts.lib.core.repo import find_repo_root
 
 
@@ -30,7 +37,7 @@ class FindSpecCommandTest(unittest.TestCase):
   def test_find_spec_exact_match(self) -> None:
     """Test finding spec with exact ID."""
     # Find a spec that exists
-    spec_dirs = list((self.root / "specify" / "tech").glob("SPEC-*"))
+    spec_dirs = list((self.root / SPECS_DIR / TECH_SPECS_SUBDIR).glob("SPEC-*"))
     if not spec_dirs:
       self.skipTest("No specs found in repository")
 
@@ -85,7 +92,7 @@ class FindDeltaCommandTest(unittest.TestCase):
 
   def test_find_delta_exact_match(self) -> None:
     """Test finding delta with exact ID."""
-    delta_dirs = list((self.root / "change" / "deltas").glob("DE-*"))
+    delta_dirs = list((self.root / CHANGES_DIR / DELTAS_SUBDIR).glob("DE-*"))
     if not delta_dirs:
       self.skipTest("No deltas found in repository")
 
@@ -114,7 +121,7 @@ class FindAdrCommandTest(unittest.TestCase):
 
   def test_find_adr_exact_match(self) -> None:
     """Test finding ADR with exact ID."""
-    adr_files = list((self.root / "specify" / "decisions").glob("ADR-*.md"))
+    adr_files = list((self.root / SPECS_DIR / DECISIONS_SUBDIR).glob("ADR-*.md"))
     if not adr_files:
       self.skipTest("No ADRs found in repository")
 

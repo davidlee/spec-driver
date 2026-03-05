@@ -10,7 +10,15 @@ import textwrap
 import unittest
 from pathlib import Path
 
-from supekku.scripts.lib.core.paths import get_registry_dir
+from supekku.scripts.lib.core.paths import (
+  AUDITS_SUBDIR,
+  CHANGES_DIR,
+  DELTAS_SUBDIR,
+  REVISIONS_SUBDIR,
+  SPECS_DIR,
+  TECH_SPECS_SUBDIR,
+  get_registry_dir,
+)
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.relations.manager import add_relation
 from supekku.scripts.lib.requirements.lifecycle import (
@@ -35,7 +43,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     os.chdir(self._cwd)
 
   def _write_spec(self, root: Path, spec_id: str, body: str) -> None:
-    spec_dir = root / "specify" / "tech" / f"{spec_id.lower()}-example"
+    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / f"{spec_id.lower()}-example"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / f"{spec_id}.md"
     frontmatter = {
@@ -73,7 +81,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     spec_registry = SpecRegistry(root)
 
     stats = registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
     )
     registry.save()
@@ -92,7 +100,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     file_id: str,
     kind: str,
   ) -> Path:
-    bundle_dir = root / "change" / bundle
+    bundle_dir = root / CHANGES_DIR / bundle
     bundle_dir.mkdir(parents=True, exist_ok=True)
     file_path = bundle_dir / f"{file_id}.md"
     frontmatter = {
@@ -142,11 +150,11 @@ class RequirementsRegistryTest(unittest.TestCase):
     registry = RequirementsRegistry(registry_path)
     spec_registry = SpecRegistry(root)
     registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
-      delta_dirs=[root / "change" / "deltas"],
-      revision_dirs=[root / "change" / "revisions"],
-      audit_dirs=[root / "change" / "audits"],
+      delta_dirs=[root / CHANGES_DIR / DELTAS_SUBDIR],
+      revision_dirs=[root / CHANGES_DIR / REVISIONS_SUBDIR],
+      audit_dirs=[root / CHANGES_DIR / AUDITS_SUBDIR],
     )
     registry.save()
 
@@ -171,14 +179,16 @@ class RequirementsRegistryTest(unittest.TestCase):
     registry = RequirementsRegistry(registry_path)
     spec_registry = SpecRegistry(root)
     registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
     )
     registry.set_status("SPEC-001.FR-001", STATUS_ACTIVE)
     registry.save()
 
     # re-sync after modifying spec body
-    spec_path = root / "specify" / "tech" / "spec-001-example" / "SPEC-001.md"
+    spec_path = (
+      root / SPECS_DIR / TECH_SPECS_SUBDIR / "spec-001-example" / "SPEC-001.md"
+    )
     text = spec_path.read_text(encoding="utf-8")
     text += "- FR-002: Second requirement\n"
     spec_path.write_text(text, encoding="utf-8")
@@ -186,7 +196,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     registry = RequirementsRegistry(registry_path)
     spec_registry.reload()
     stats = registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
     )
     registry.save()
@@ -201,7 +211,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     registry = RequirementsRegistry(registry_path)
     spec_registry = SpecRegistry(root)
     registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
     )
 
@@ -222,7 +232,7 @@ class RequirementsRegistryTest(unittest.TestCase):
     registry = RequirementsRegistry(registry_path)
     spec_registry = SpecRegistry(root)
     registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
     )
 
@@ -265,7 +275,7 @@ interactions: []
     spec_registry = SpecRegistry(root)
     spec_registry.reload()
     registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
     )
 
@@ -278,7 +288,7 @@ interactions: []
     """Test that delta relationship blocks mark requirements as implemented."""
     root = self._make_repo()
 
-    delta_dir = root / "change" / "deltas" / "DE-002-example"
+    delta_dir = root / CHANGES_DIR / DELTAS_SUBDIR / "DE-002-example"
     delta_dir.mkdir(parents=True, exist_ok=True)
     delta_path = delta_dir / "DE-002.md"
     frontmatter = {
@@ -320,9 +330,9 @@ interactions: []
     registry = RequirementsRegistry(registry_path)
     spec_registry = SpecRegistry(root)
     registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
-      delta_dirs=[root / "change" / "deltas"],
+      delta_dirs=[root / CHANGES_DIR / DELTAS_SUBDIR],
     )
 
     record = registry.records["SPEC-001.FR-001"]
@@ -334,7 +344,7 @@ interactions: []
     revision_id: str,
     block_yaml: str,
   ) -> Path:
-    bundle_dir = root / "change" / "revisions" / f"{revision_id.lower()}-bundle"
+    bundle_dir = root / CHANGES_DIR / REVISIONS_SUBDIR / f"{revision_id.lower()}-bundle"
     bundle_dir.mkdir(parents=True, exist_ok=True)
     revision_path = bundle_dir / f"{revision_id}.md"
     frontmatter = {
@@ -369,7 +379,7 @@ interactions: []
     registry = RequirementsRegistry(registry_path)
     spec_registry = SpecRegistry(root)
     registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
     )
     registry.save()
@@ -399,9 +409,9 @@ requirements:
 
     spec_registry.reload()
     stats = registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
-      revision_dirs=[root / "change" / "revisions"],
+      revision_dirs=[root / CHANGES_DIR / REVISIONS_SUBDIR],
     )
     registry.save()
 
@@ -665,7 +675,7 @@ requirements:
     spec_registry.reload()
 
     stats = registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
     )
     registry.save()
@@ -727,7 +737,7 @@ requirements:
     spec_registry.reload()
 
     _stats = registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
     )
     registry.save()
@@ -760,7 +770,7 @@ requirements:
     root = self._make_repo()
 
     # Create spec with frontmatter category
-    spec_dir = root / "specify" / "tech" / "spec-005-example"
+    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "spec-005-example"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / "SPEC-005.md"
     frontmatter = {
@@ -787,7 +797,7 @@ requirements:
     spec_registry.reload()
 
     _stats = registry.sync_from_specs(
-      [root / "specify" / "tech"],
+      [root / SPECS_DIR / TECH_SPECS_SUBDIR],
       spec_registry=spec_registry,
     )
     registry.save()
@@ -906,7 +916,7 @@ class TestRequirementsRegistryReverseQueries(unittest.TestCase):
     self, root: Path, spec_id: str, requirements: list[str]
   ) -> None:
     """Write a spec file with specific requirements."""
-    spec_dir = root / "specify" / "tech" / f"{spec_id.lower()}-example"
+    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / f"{spec_id.lower()}-example"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / f"{spec_id}.md"
 
@@ -930,7 +940,8 @@ class TestRequirementsRegistryReverseQueries(unittest.TestCase):
     registry = RequirementsRegistry(registry_path)
     spec_registry = SpecRegistry(root)
 
-    registry.sync_from_specs([root / "specify" / "tech"], spec_registry=spec_registry)
+    spec_dirs = [root / SPECS_DIR / TECH_SPECS_SUBDIR]
+    registry.sync_from_specs(spec_dirs, spec_registry=spec_registry)
 
     # Manually add verification metadata to requirements
     # This simulates what would happen after coverage blocks are processed
@@ -1220,7 +1231,7 @@ class TestRequirementCoverageEntries(unittest.TestCase):
     root = self._make_repo()
 
     # Create a spec with no coverage blocks
-    spec_dir = root / "specify" / "tech" / "spec-001-example"
+    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "spec-001-example"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / "SPEC-001.md"
     frontmatter = {
@@ -1241,7 +1252,8 @@ class TestRequirementCoverageEntries(unittest.TestCase):
     registry_path = get_registry_dir(root) / "requirements.yaml"
     registry = RequirementsRegistry(registry_path)
     spec_registry = SpecRegistry(root)
-    registry.sync_from_specs([root / "specify" / "tech"], spec_registry=spec_registry)
+    spec_dirs = [root / SPECS_DIR / TECH_SPECS_SUBDIR]
+    registry.sync_from_specs(spec_dirs, spec_registry=spec_registry)
 
     fr001 = registry.records["SPEC-001.FR-001"]
     assert hasattr(fr001, "coverage_entries")
@@ -1271,7 +1283,7 @@ class TestRequirementCoverageEntries(unittest.TestCase):
     root = self._make_repo()
 
     # Create a spec with a coverage block containing a mix of valid + unknown
-    spec_dir = root / "specify" / "tech" / "spec-043-example"
+    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "spec-043-example"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / "SPEC-043.md"
     body = textwrap.dedent("""\
@@ -1313,7 +1325,7 @@ class TestRequirementCoverageEntries(unittest.TestCase):
     sys.stderr = io.StringIO()
     try:
       registry.sync_from_specs(
-        [root / "specify" / "tech"],
+        [root / SPECS_DIR / TECH_SPECS_SUBDIR],
         spec_registry=spec_registry,
       )
       stderr_output = sys.stderr.getvalue()

@@ -6,6 +6,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from supekku.scripts.lib.core.paths import SPECS_DIR, STANDARDS_SUBDIR
+
 from .registry import StandardRecord, StandardRegistry
 
 
@@ -46,7 +48,7 @@ class TestStandardRegistry(unittest.TestCase):
     self.test_dir = tempfile.mkdtemp()
     self.root = Path(self.test_dir)
 
-    self.standards_dir = self.root / "specify" / "standards"
+    self.standards_dir = self.root / SPECS_DIR / STANDARDS_SUBDIR
     self.standards_dir.mkdir(parents=True)
 
     self.registry_dir = self.root / "specify" / ".registry"

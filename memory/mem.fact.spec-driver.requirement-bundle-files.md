@@ -10,8 +10,8 @@ tags:
 - spec-driver
 - requirements
 - sharp-edge
-summary: Requirement detail files under requirements/ are not consumed by sync;
-  canonical identity and lifecycle remain in spec markdown.
+summary: Requirement detail files under requirements/ are not consumed by sync; canonical
+  identity and lifecycle remain in spec markdown.
 scope:
   paths:
   - supekku/scripts/lib/requirements/registry.py
@@ -23,6 +23,9 @@ provenance:
     ref: supekku/scripts/lib/requirements/registry.py
   - kind: doc
     ref: supekku/about/lifecycle.md
+links:
+  missing:
+  - raw: PROB-002
 ---
 
 # Requirement Bundle Files Are Supplemental

@@ -11,8 +11,8 @@ tags:
 - spec-driver
 - ceremony
 summary: Check workflow.toml for the active ceremony mode, then read the corresponding
-  mode memory for operational guidance. Ceremony is advisory; enforcement comes
-  from explicit command gates.
+  mode memory for operational guidance. Ceremony is advisory; enforcement comes from
+  explicit command gates.
 priority:
   severity: high
   weight: 9
@@ -36,6 +36,9 @@ provenance:
 ---
 
 # Ceremony Mode Selection
+
+## Start Here
+- [[mem.signpost.spec-driver.overview]]
 
 ## How to Determine
 

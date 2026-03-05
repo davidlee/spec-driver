@@ -35,6 +35,9 @@ provenance:
     ref: supekku/scripts/lib/blocks/verification.py
   - kind: code
     ref: supekku/scripts/lib/changes/lifecycle.py
+links:
+  missing:
+  - raw: PROB-002
 ---
 
 # Requirement Lifecycle Guidance

@@ -10,10 +10,9 @@ confidence: high
 tags:
 - project
 - completion
-summary: >-
-  Project-owned completion checklist stub. Defaults to the spec-driver
-  delta completion procedure; edit to add deployment steps, sign-off
-  requirements, or local verification gates.
+summary: Project-owned completion checklist stub. Defaults to the spec-driver delta
+  completion procedure; edit to add deployment steps, sign-off requirements, or local
+  verification gates.
 priority:
   severity: high
   weight: 9

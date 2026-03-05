@@ -11,9 +11,9 @@ tags:
 - spec-driver
 - workflow
 - core-loop
-summary: 'The canonical spec-driver loop is delta-first: capture → delta scope/design/plan
-  → implement → audit/contracts → revision/spec reconciliation → closure. Revision-first
-  is a town-planner concession path.'
+summary: "The canonical spec-driver loop is delta-first: capture \u2192 delta scope/design/plan\
+  \ \u2192 implement \u2192 audit/contracts \u2192 revision/spec reconciliation \u2192\
+  \ closure. Revision-first is a town-planner concession path."
 priority:
   severity: high
   weight: 10

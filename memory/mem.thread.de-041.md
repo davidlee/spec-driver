@@ -36,7 +36,7 @@ provenance:
     note: Delta, DR, and IP for CLI completeness
   - kind: doc
     ref: CLAUDE.md
-    note: Architecture guide — skinny CLI, formatter SoC
+    note: "Architecture guide \u2014 skinny CLI, formatter SoC"
 ---
 
 # DE-041 CLI completeness — working context

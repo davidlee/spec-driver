@@ -14,8 +14,8 @@ tags:
 - delta
 - completion
 - sharp-edge
-summary: complete delta requires verified parent-spec coverage for each delta
-  requirement unless bypassed with force/disabled enforcement.
+summary: complete delta requires verified parent-spec coverage for each delta requirement
+  unless bypassed with force/disabled enforcement.
 priority:
   severity: high
   weight: 10

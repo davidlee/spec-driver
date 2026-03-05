@@ -10,9 +10,8 @@ confidence: high
 tags:
 - project
 - workflow
-summary: >-
-  Project-owned development workflow stub. Defaults to the spec-driver
-  core loop; edit to add local shortcuts, required steps, or ceremony overrides.
+summary: Project-owned development workflow stub. Defaults to the spec-driver core
+  loop; edit to add local shortcuts, required steps, or ceremony overrides.
 priority:
   severity: high
   weight: 10

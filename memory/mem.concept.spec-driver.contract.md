@@ -10,8 +10,8 @@ confidence: high
 tags:
 - spec-driver
 - contracts
-summary: Contracts are auto-generated API documentation — the canonical record of
-  what the code actually exposes. Observed truth, not authored intent.
+summary: "Contracts are auto-generated API documentation \u2014 the canonical record\
+  \ of what the code actually exposes. Observed truth, not authored intent."
 priority:
   severity: medium
   weight: 6

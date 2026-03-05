@@ -640,9 +640,9 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 
 - [x] Exit criteria satisfied (all 15 items in Section 4)
 - [x] Verification evidence stored (test outputs, performance benchmarks)
-- [ ] DE-011 updated with Phase 1 implementation notes
-- [ ] IP-011 verification coverage updated with test results
-- [ ] Hand-off notes prepared for Phase 2 (self-documentation)
+- [x] DE-011 updated with Phase 1 implementation notes
+- [x] IP-011 verification coverage updated with test results
+- [x] Hand-off notes prepared for Phase 2 (self-documentation)
 - [x] Performance benchmarks documented (all <0.4s, target <2s)
 - [x] Backward compatibility confirmed (single-value filters unchanged)
 

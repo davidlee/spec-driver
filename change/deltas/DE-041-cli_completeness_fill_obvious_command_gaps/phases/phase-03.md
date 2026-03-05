@@ -40,10 +40,10 @@ verification:
 tasks:
   - id: "3.1"
     description: "format_plan_list_table() formatter + tests (VT-format-plan-list)"
-    status: pending
+    status: complete
   - id: "3.2"
     description: "Plan discovery function for list plans"
-    status: pending
+    status: complete
   - id: "3.3"
     description: "Wire list plans subcommand with full baseline flags"
     status: pending
@@ -135,8 +135,8 @@ just check
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 3.1 | format_plan_list_table() + tests | [ ] | Foundation for list plans |
-| [ ] | 3.2 | Plan discovery function | [P] | Can parallel with 3.1 |
+| [x] | 3.1 | format_plan_list_table() + tests | [ ] | Foundation for list plans |
+| [x] | 3.2 | Plan discovery function | [P] | `PlanSummary` + `discover_plans()` in `changes/registry.py`; 10 tests |
 | [ ] | 3.3 | Wire list plans subcommand | [ ] | After 3.1 + 3.2 |
 | [ ] | 3.4 | --filter on list deltas | [P] | Mechanical; independent |
 | [ ] | 3.5 | --filter on adrs/policies/standards/memories | [P] | Mechanical; independent |

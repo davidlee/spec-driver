@@ -45,3 +45,6 @@ confidence in the lifecycle contract.
   adopt them via schema changes.
 - Decide how to treat requirement detail files: informational only vs canonical
   with required identity records in the spec file.
+
+## Related
+- ISSUE-034 (resolve links does not support backlog items)

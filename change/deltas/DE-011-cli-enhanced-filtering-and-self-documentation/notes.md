@@ -36,14 +36,25 @@
 ### Performance
 All reverse queries <0.4s on current registry sizes (~30 deltas, ~160 requirements).
 
-## Phase 2 — Self-Documentation (pending)
+## Phase 2 — Self-Documentation (complete)
 
-### Scope
-- PROD-010.FR-006: Schema enum introspection (`schema show enums.<artifact>.<field>`)
-- PROD-010.FR-007: Enhanced help text with output format examples
+### What was delivered
+- `core/enums.py`: enum registry with 7 enum paths, sourced from lifecycle constants
+- `schema show enums` — lists all available enum paths
+- `schema show enums.<artifact>.<field>` — returns sorted JSON array
+- Examples sections added to 4 list command docstrings (deltas, specs, requirements, adrs)
 
-### Context for next implementer
-- Multi-value filter patterns established — reference `core/filters.py` for consistency
-- Registry query methods available for introspection in enum commands
-- Test patterns established for CLI flag additions
-- `list.py` is getting large (~1100 lines) — consider extracting sub-modules if Phase 2 adds significantly
+### Key decisions
+- Top-level imports from lifecycle modules (not lazy) — modules are lightweight
+- Hardcoded values for spec.kind, requirement.kind, command.format (no constants exist)
+- Plain `print(json.dumps(...))` for enum output (agent-friendly, no Rich formatting)
+- Show command help already documented flags adequately — no changes needed
+
+### Files modified
+- `supekku/scripts/lib/core/enums.py` — new module (50 lines)
+- `supekku/cli/schema.py` — `enums.*` routing + `_show_enums()` handler
+- `supekku/cli/list.py` — docstring examples on 4 list commands
+
+### Test files
+- `supekku/cli/schema_test.py` — 10 new enum introspection tests (EnumIntrospectionTest)
+- `supekku/cli/test_cli.py` — 10 new help text tests (TestHelpTextContent)

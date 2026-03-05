@@ -539,6 +539,56 @@ class TestEmitArtifactMutualExclusivity:
       )
     assert "mutually exclusive" in capsys.readouterr().err
 
+  def test_body_only_and_json_rejected(self, capsys: pytest.CaptureFixture) -> None:
+    ref = _make_ref()
+    with pytest.raises(typer.Exit):
+      emit_artifact(
+        ref,
+        json_output=True,
+        body_only=True,
+        format_fn=lambda r: "",
+        json_fn=lambda r: "",
+      )
+    assert "mutually exclusive" in capsys.readouterr().err
+
+  def test_body_only_and_raw_rejected(self, capsys: pytest.CaptureFixture) -> None:
+    ref = _make_ref()
+    with pytest.raises(typer.Exit):
+      emit_artifact(
+        ref,
+        raw_output=True,
+        body_only=True,
+        format_fn=lambda r: "",
+        json_fn=lambda r: "",
+      )
+    assert "mutually exclusive" in capsys.readouterr().err
+
+
+class TestEmitArtifactBodyOnly:
+  """emit_artifact --body-only mode outputs body without frontmatter."""
+
+  def test_body_only_strips_frontmatter(
+    self,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture,
+  ) -> None:
+    artifact_file = tmp_path / "artifact.md"
+    content = "---\nid: RE-001\ntitle: Test\n---\n\n# Body\n\nContent here.\n"
+    artifact_file.write_text(content)
+    ref = ArtifactRef(id="RE-001", path=artifact_file, record={})
+    with pytest.raises(typer.Exit):
+      emit_artifact(
+        ref,
+        body_only=True,
+        format_fn=lambda r: "nope",
+        json_fn=lambda r: "nope",
+      )
+    out = capsys.readouterr().out
+    assert "# Body" in out
+    assert "Content here." in out
+    assert "---" not in out
+    assert "title:" not in out
+
 
 # ── find_artifacts ──────────────────────────────────────────────
 

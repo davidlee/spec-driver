@@ -12,6 +12,7 @@ from supekku.cli.common import (
   EXIT_FAILURE,
   EXIT_SUCCESS,
   ArtifactNotFoundError,
+  ArtifactRef,
   RootOption,
   emit_artifact,
   normalize_id,
@@ -463,17 +464,18 @@ def show_memory(
     bool,
     typer.Option("--raw", help="Output raw file content"),
   ] = False,
+  body_only: Annotated[
+    bool,
+    typer.Option(
+      "--body-only",
+      "-b",
+      help="Output body text only (no frontmatter)",
+    ),
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific memory record."""
   try:
-    if sum([json_output, path_only, raw_output]) > 1:
-      typer.echo(
-        "Error: --json, --path, and --raw are mutually exclusive",
-        err=True,
-      )
-      raise typer.Exit(EXIT_FAILURE)
-
     from supekku.scripts.lib.memory.ids import normalize_memory_id
 
     normalized_id = normalize_memory_id(memory_id)
@@ -481,21 +483,27 @@ def show_memory(
     record = registry.find(normalized_id)
 
     if not record:
-      typer.echo(f"Error: Memory not found: {normalized_id}", err=True)
+      typer.echo(
+        f"Error: Memory not found: {normalized_id}",
+        err=True,
+      )
       raise typer.Exit(EXIT_FAILURE)
 
-    if path_only:
-      typer.echo(record.path)
-    elif raw_output:
-      typer.echo(Path(record.path).read_text())
-    elif json_output:
-      repo_root = find_repo_root(root)
-      output = record.to_dict(repo_root)
-      typer.echo(json.dumps(output, indent=2))
-    else:
-      typer.echo(format_memory_details(record))
-
-    raise typer.Exit(EXIT_SUCCESS)
+    repo_root = find_repo_root(root)
+    ref = ArtifactRef(
+      id=record.id,
+      path=Path(record.path),
+      record=record,
+    )
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      body_only=body_only,
+      format_fn=format_memory_details,
+      json_fn=lambda r: json.dumps(r.to_dict(repo_root), indent=2),
+    )
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e

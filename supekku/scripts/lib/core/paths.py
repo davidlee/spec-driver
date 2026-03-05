@@ -10,89 +10,184 @@ from pathlib import Path
 
 from .repo import find_repo_root
 
-# Directory name - single source of truth
-# Changed from "supekku" to ".spec-driver" for cleaner repo root
+# --- spec-driver internal directory ---
+
 SPEC_DRIVER_DIR = ".spec-driver"
+
+# --- Workspace root directories ---
+
+SPECS_DIR = "specify"
+CHANGES_DIR = "change"
+BACKLOG_DIR = "backlog"
+MEMORY_DIR = "memory"
+
+# --- Subdirectories within SPECS_DIR ---
+
+TECH_SPECS_SUBDIR = "tech"
+PRODUCT_SPECS_SUBDIR = "product"
+DECISIONS_SUBDIR = "decisions"
+POLICIES_SUBDIR = "policies"
+STANDARDS_SUBDIR = "standards"
+
+# --- Subdirectories within CHANGES_DIR ---
+
+DELTAS_SUBDIR = "deltas"
+REVISIONS_SUBDIR = "revisions"
+AUDITS_SUBDIR = "audits"
+
+# --- Subdirectories within BACKLOG_DIR ---
+
+ISSUES_SUBDIR = "issues"
+PROBLEMS_SUBDIR = "problems"
+IMPROVEMENTS_SUBDIR = "improvements"
+RISKS_SUBDIR = "risks"
+
+
+# --- spec-driver internal helpers ---
+
+
+def _resolve_root(repo_root: Path | None) -> Path:
+  return find_repo_root(repo_root) if repo_root is None else repo_root
 
 
 def get_spec_driver_root(repo_root: Path | None = None) -> Path:
-  """Get the spec-driver configuration directory.
-
-  Args:
-    repo_root: Repository root path. If None, will auto-discover.
-
-  Returns:
-    Path to the spec-driver directory (e.g., repo_root/supekku)
-  """
-  root = find_repo_root(repo_root) if repo_root is None else repo_root
-  return root / SPEC_DRIVER_DIR
+  """Get the spec-driver configuration directory."""
+  return _resolve_root(repo_root) / SPEC_DRIVER_DIR
 
 
 def get_registry_dir(repo_root: Path | None = None) -> Path:
-  """Get the registry directory for YAML registry files.
-
-  Args:
-    repo_root: Repository root path. If None, will auto-discover.
-
-  Returns:
-    Path to the registry directory (e.g., repo_root/supekku/registry)
-  """
+  """Get the registry directory for YAML registry files."""
   return get_spec_driver_root(repo_root) / "registry"
 
 
 def get_templates_dir(repo_root: Path | None = None) -> Path:
-  """Get the templates directory for spec templates.
-
-  Args:
-    repo_root: Repository root path. If None, will auto-discover.
-
-  Returns:
-    Path to the templates directory (e.g., repo_root/supekku/templates)
-  """
+  """Get the templates directory for spec templates."""
   return get_spec_driver_root(repo_root) / "templates"
 
 
 def get_about_dir(repo_root: Path | None = None) -> Path:
-  """Get the about directory for documentation.
-
-  Args:
-    repo_root: Repository root path. If None, will auto-discover.
-
-  Returns:
-    Path to the about directory (e.g., repo_root/supekku/about)
-  """
+  """Get the about directory for documentation."""
   return get_spec_driver_root(repo_root) / "about"
 
 
 def get_agents_dir(repo_root: Path | None = None) -> Path:
-  """Get the agents directory for generated agent guidance.
-
-  Args:
-    repo_root: Repository root path. If None, will auto-discover.
-
-  Returns:
-    Path to the agents directory (e.g., repo_root/.spec-driver/agents)
-  """
+  """Get the agents directory for generated agent guidance."""
   return get_spec_driver_root(repo_root) / "agents"
 
 
 def get_package_skills_dir() -> Path:
-  """Get the bundled skills directory within the supekku package.
-
-  Returns:
-    Path to supekku/skills/ (package data, not workspace).
-  """
+  """Get the bundled skills directory within the supekku package."""
   import supekku  # noqa: PLC0415  # pylint: disable=import-outside-toplevel
 
   return Path(supekku.__file__).parent / "skills"
 
 
+# --- Workspace directory helpers: specify/ ---
+
+
+def get_specs_dir(repo_root: Path | None = None) -> Path:
+  """Get the specifications root directory."""
+  return _resolve_root(repo_root) / SPECS_DIR
+
+
+def get_tech_specs_dir(repo_root: Path | None = None) -> Path:
+  """Get the technical specifications directory."""
+  return get_specs_dir(repo_root) / TECH_SPECS_SUBDIR
+
+
+def get_product_specs_dir(repo_root: Path | None = None) -> Path:
+  """Get the product specifications directory."""
+  return get_specs_dir(repo_root) / PRODUCT_SPECS_SUBDIR
+
+
+def get_decisions_dir(repo_root: Path | None = None) -> Path:
+  """Get the architecture decisions directory."""
+  return get_specs_dir(repo_root) / DECISIONS_SUBDIR
+
+
+def get_policies_dir(repo_root: Path | None = None) -> Path:
+  """Get the policies directory."""
+  return get_specs_dir(repo_root) / POLICIES_SUBDIR
+
+
+def get_standards_dir(repo_root: Path | None = None) -> Path:
+  """Get the standards directory."""
+  return get_specs_dir(repo_root) / STANDARDS_SUBDIR
+
+
+# --- Workspace directory helpers: change/ ---
+
+
+def get_changes_dir(repo_root: Path | None = None) -> Path:
+  """Get the changes root directory."""
+  return _resolve_root(repo_root) / CHANGES_DIR
+
+
+def get_deltas_dir(repo_root: Path | None = None) -> Path:
+  """Get the deltas directory."""
+  return get_changes_dir(repo_root) / DELTAS_SUBDIR
+
+
+def get_revisions_dir(repo_root: Path | None = None) -> Path:
+  """Get the revisions directory."""
+  return get_changes_dir(repo_root) / REVISIONS_SUBDIR
+
+
+def get_audits_dir(repo_root: Path | None = None) -> Path:
+  """Get the audits directory."""
+  return get_changes_dir(repo_root) / AUDITS_SUBDIR
+
+
+# --- Workspace directory helpers: backlog/ ---
+
+
+def get_backlog_dir(repo_root: Path | None = None) -> Path:
+  """Get the backlog root directory."""
+  return _resolve_root(repo_root) / BACKLOG_DIR
+
+
+# --- Workspace directory helpers: memory/ ---
+
+
+def get_memory_dir(repo_root: Path | None = None) -> Path:
+  """Get the memory directory."""
+  return _resolve_root(repo_root) / MEMORY_DIR
+
+
 __all__ = [
+  "AUDITS_SUBDIR",
+  "BACKLOG_DIR",
+  "CHANGES_DIR",
+  "DECISIONS_SUBDIR",
+  "DELTAS_SUBDIR",
+  "IMPROVEMENTS_SUBDIR",
+  "ISSUES_SUBDIR",
+  "MEMORY_DIR",
+  "POLICIES_SUBDIR",
+  "PROBLEMS_SUBDIR",
+  "PRODUCT_SPECS_SUBDIR",
+  "REVISIONS_SUBDIR",
+  "RISKS_SUBDIR",
+  "SPECS_DIR",
   "SPEC_DRIVER_DIR",
+  "STANDARDS_SUBDIR",
+  "TECH_SPECS_SUBDIR",
   "get_about_dir",
   "get_agents_dir",
+  "get_audits_dir",
+  "get_backlog_dir",
+  "get_changes_dir",
+  "get_decisions_dir",
+  "get_deltas_dir",
+  "get_memory_dir",
   "get_package_skills_dir",
+  "get_policies_dir",
+  "get_product_specs_dir",
   "get_registry_dir",
+  "get_revisions_dir",
   "get_spec_driver_root",
+  "get_specs_dir",
+  "get_standards_dir",
+  "get_tech_specs_dir",
   "get_templates_dir",
 ]

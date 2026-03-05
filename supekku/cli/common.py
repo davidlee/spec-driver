@@ -520,19 +520,21 @@ def emit_artifact(
   json_output: bool = False,
   path_only: bool = False,
   raw_output: bool = False,
+  body_only: bool = False,
   format_fn: Any,
   json_fn: Any,
 ) -> None:
-  """Dispatch artifact output by mode: path, raw, json, or formatted.
+  """Dispatch artifact output by mode: path, raw, body, json, or formatted.
 
-  Handles mutual-exclusivity check for --json/--path/--raw and calls the
-  appropriate output function. Always raises typer.Exit on completion.
+  Handles mutual-exclusivity check for --json/--path/--raw/--body-only
+  and calls the appropriate output function. Always raises typer.Exit.
 
   Args:
     ref: Resolved artifact reference.
     json_output: If True, output JSON via json_fn.
     path_only: If True, echo the artifact path.
     raw_output: If True, echo raw file content.
+    body_only: If True, echo body text only (no frontmatter).
     format_fn: Callable(record) -> str for default formatted output.
     json_fn: Callable(record) -> str for JSON output. Required.
 
@@ -540,14 +542,22 @@ def emit_artifact(
     typer.Exit: Always — EXIT_SUCCESS on success, EXIT_FAILURE on error.
 
   """
-  if sum([json_output, path_only, raw_output]) > 1:
-    typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
+  if sum([json_output, path_only, raw_output, body_only]) > 1:
+    typer.echo(
+      "Error: --json, --path, --raw, and --body-only are mutually exclusive",
+      err=True,
+    )
     raise typer.Exit(EXIT_FAILURE)
 
   if path_only:
     typer.echo(ref.path)
   elif raw_output:
     typer.echo(ref.path.read_text())
+  elif body_only:
+    from supekku.scripts.lib.core.spec_utils import load_markdown_file
+
+    _, body = load_markdown_file(ref.path)
+    typer.echo(body)
   elif json_output:
     typer.echo(json_fn(ref.record))
   else:

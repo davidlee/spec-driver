@@ -240,26 +240,26 @@ entries:
   - artefact: VT-PROD010-FILTER-002
     kind: VT
     requirement: PROD-010.FR-004
-    status: planned
-    notes: Test multi-value filter support across all list commands
+    status: verified
+    notes: "Verified by DE-011: 24 unit tests (18 filter utility + 6 CLI integration) verify multi-value status filters on all list commands."
 
   - artefact: VT-PROD010-FILTER-003
     kind: VT
     requirement: PROD-010.FR-005
-    status: planned
-    notes: Test reverse relationship queries (--implements, --verified-by, --informed-by)
+    status: verified
+    notes: "Verified by DE-011: 49 unit tests verify reverse relationship queries (--implements, --verified-by, --informed-by) with glob pattern support."
 
   - artefact: VT-PROD010-SCHEMA-001
     kind: VT
     requirement: PROD-010.FR-006
-    status: planned
-    notes: Test enum introspection via schema commands
+    status: verified
+    notes: "Verified by DE-011: 10 unit tests in EnumIntrospectionTest verify schema show enums.* returns sorted JSON arrays for all 7 enum paths."
 
   - artefact: VT-PROD010-SCHEMA-002
     kind: VT
     requirement: PROD-010.FR-007
-    status: planned
-    notes: Test output format documentation in help text
+    status: verified
+    notes: "Verified by DE-011: 10 unit tests in TestHelpTextContent verify all list commands include examples, multi-value syntax, and reverse query flag docs."
 
   - artefact: VT-PROD010-MACHINE-001
     kind: VT

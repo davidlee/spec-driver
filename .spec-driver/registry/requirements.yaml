@@ -1393,7 +1393,7 @@ requirements:
     primary_spec: PROD-010
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -1403,7 +1403,7 @@ requirements:
     - VT-PROD010-FILTER-002
     coverage_entries:
     - artefact: VT-PROD010-FILTER-002
-      status: planned
+      status: verified
       kind: VT
     path: specify/product/PROD-010/PROD-010.md
   PROD-010.FR-005:
@@ -1414,7 +1414,7 @@ requirements:
     primary_spec: PROD-010
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -1424,7 +1424,7 @@ requirements:
     - VT-PROD010-FILTER-003
     coverage_entries:
     - artefact: VT-PROD010-FILTER-003
-      status: planned
+      status: verified
       kind: VT
     path: specify/product/PROD-010/PROD-010.md
   PROD-010.FR-006:
@@ -1435,7 +1435,7 @@ requirements:
     primary_spec: PROD-010
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -1445,7 +1445,7 @@ requirements:
     - VT-PROD010-SCHEMA-001
     coverage_entries:
     - artefact: VT-PROD010-SCHEMA-001
-      status: planned
+      status: verified
       kind: VT
     path: specify/product/PROD-010/PROD-010.md
   PROD-010.FR-007:
@@ -1456,7 +1456,7 @@ requirements:
     primary_spec: PROD-010
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -1466,7 +1466,7 @@ requirements:
     - VT-PROD010-SCHEMA-002
     coverage_entries:
     - artefact: VT-PROD010-SCHEMA-002
-      status: planned
+      status: verified
       kind: VT
     path: specify/product/PROD-010/PROD-010.md
   PROD-010.FR-008:

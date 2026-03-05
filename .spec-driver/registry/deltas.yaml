@@ -1396,7 +1396,7 @@ deltas:
           mitigation: Manual verification of all code examples in README
   DE-011:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - CLI enhanced filtering and self-documentation
     slug: cli-enhanced-filtering-and-self-documentation
     updated: '2025-11-03'
@@ -4752,7 +4752,7 @@ deltas:
         phase: IP-042-P01
   DE-043:
     kind: delta
-    status: draft
+    status: in-progress
     name: Verification coverage validation and requirement lifecycle guidance
     slug: verification_coverage_validation_and_lifecycle_guidance
     updated: '2026-03-05'
@@ -4838,7 +4838,7 @@ deltas:
         phase: IP-043.PHASE-02
   DE-044:
     kind: delta
-    status: draft
+    status: in-progress
     name: Delta - Centralize hardcoded workspace directory paths
     slug: centralize_hardcoded_workspace_directory_paths
     updated: '2026-03-05'
@@ -4906,7 +4906,7 @@ deltas:
         phase: IP-044.PHASE-03
   DE-045:
     kind: delta
-    status: draft
+    status: in-progress
     name: Memory graph navigation for agent discoverability
     slug: memory_graph_navigation_for_agent_discoverability
     updated: '2026-03-05'

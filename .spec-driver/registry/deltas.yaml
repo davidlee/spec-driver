@@ -4866,7 +4866,7 @@ deltas:
           mitigation: Link to canonical code and specs as provenance
   DE-044:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Centralize hardcoded workspace directory paths
     slug: centralize_hardcoded_workspace_directory_paths
     updated: '2026-03-05'
@@ -4893,6 +4893,7 @@ deltas:
         phases:
         - id: IP-044.PHASE-01
         - id: IP-044.PHASE-02
+        - id: IP-044.PHASE-03
         - id: IP-044.PHASE-03
       phases:
       - schema: supekku.phase.overview
@@ -4962,8 +4963,46 @@ deltas:
         risks:
         - description: Missed import causes runtime NameError
           mitigation: Run full test suite after each file group
-      - id: IP-044.PHASE-03
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-044.PHASE-03
+        plan: IP-044
+        delta: DE-044
+        objective: Replace all hardcoded workspace directory strings in test fixtures
+          with constants/helpers from core/paths.py. Run VA-044-grep final verification.
+        entrance_criteria:
+        - "P02 complete \u2014 production code uses constants"
+        exit_criteria:
+        - All test files use constants/helpers for workspace path construction
+        - VA-044-grep passes (zero magic path-construction hits outside paths_test.py)
+        - just test passes (full suite green)
+        - just lint + just pylint clean
+        verification:
+          tests:
+          - VT-044-regression
+          - VA-044-grep
+          evidence:
+          - 2625 passed, 3 skipped, 0 failures
+          - ruff clean, pylint 9.56/10 (unchanged)
+          - "VA-044-grep clean \u2014 all remaining hits are legitimate exceptions"
+        tasks:
+        - id: '3.1'
+          summary: Update spec-related test files (specs, decisions, policies, standards)
+        - id: '3.2'
+          summary: Update change-related test files (changes, creation, completion,
+            coverage)
+        - id: '3.3'
+          summary: Update backlog and memory test files
+        - id: '3.4'
+          summary: Update CLI test files
+        - id: '3.5'
+          summary: Update remaining test files (workspace, validator, cross-refs,
+            etc.)
+        - id: '3.6'
+          summary: VA-044-grep verification and final just check
+        risks:
+        - description: Large file count causes merge conflicts with concurrent work
+          mitigation: Commit in logical batches
   DE-045:
     kind: delta
     status: completed
@@ -5171,3 +5210,158 @@ deltas:
         risks:
         - description: Diff-based validation too permissive
           mitigation: Only exempt errors present before update; verify with test
+  DE-047:
+    kind: delta
+    status: draft
+    name: Contradiction discovery and resolution framework
+    slug: contradiction_discovery_and_resolution_framework
+    updated: '2026-03-05'
+    path: change/deltas/DE-047-contradiction_discovery_and_resolution_framework/DE-047.md
+    applies_to:
+      specs:
+      - PROD-001
+      - PROD-002
+      - PROD-003
+      - PROD-004
+      - PROD-005
+      - PROD-006
+      - PROD-007
+      - PROD-008
+      - PROD-009
+      - PROD-010
+      - PROD-011
+      - PROD-012
+      - PROD-013
+      - PROD-014
+      - PROD-015
+      - PROD-016
+      requirements: []
+    relations:
+    - type: addresses
+      target: ISSUE-039
+      attributes: {}
+    plan:
+      id: IP-047
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-047
+        delta: DE-047
+        revision_links:
+          aligns_with:
+          - DR-047
+        specs:
+          primary:
+          - PROD-001
+          - PROD-002
+          - PROD-003
+          - PROD-004
+          - PROD-005
+          - PROD-006
+          - PROD-007
+          - PROD-008
+          - PROD-009
+          - PROD-010
+          - PROD-011
+          - PROD-012
+          - PROD-013
+          - PROD-014
+          - PROD-015
+          - PROD-016
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-047.PHASE-01
+        - id: IP-047.PHASE-02
+        - id: IP-047.PHASE-03
+        - id: IP-047.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-047.PHASE-01
+        plan: IP-047
+        delta: DE-047
+        objective: Systematically survey the PROD spec corpus and governance docs
+          to populate drift ledger DL-047 with all contradictions, stale claims, missing
+          decisions, and ambiguous intent.
+        entrance_criteria:
+        - DR-047 reviewed and approved
+        - "Corpus inventory confirmed (DR-047 \xA74)"
+        - DL schema understood (IMPR-007)
+        exit_criteria:
+        - DL-047 exists with entries covering all corpus docs
+        - Every document in corpus inventory appears as a source in at least one entry
+        - All entries at minimum triaged status (severity, topic, owner assigned)
+        verification:
+          tests: []
+          evidence:
+          - VA-047-001
+        tasks:
+        - id: 1.1
+          description: Create drift ledger file
+        - id: 1.2
+          description: Read and extract claims from all PROD specs
+        - id: 1.3
+          description: Read and extract claims from governance docs
+        - id: 1.4
+          description: Cross-reference and populate ledger entries
+        - id: 1.5
+          description: Triage all entries (severity, topic, owner)
+        - id: 1.6
+          description: Verify corpus coverage
+        risks:
+        - description: Survey misses subtle contradictions in long PROD specs
+          mitigation: Structured concept extraction; multiple passes if needed
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-047.PHASE-02
+        plan: IP-047
+        delta: DE-047
+        objective: Adjudicate all DL-047 entries with human decisions, then codify
+          as ADRs and spec revisions. Every blocking/significant entry gets a resolution_ref.
+        entrance_criteria:
+        - DL-047 populated with all entries triaged (Phase 1 complete)
+        exit_criteria:
+        - All 20 DL-047 entries at adjudicated or dismissed status
+        - ADRs drafted for contracts and lifecycle topics
+        - REs drafted for affected PROD specs
+        - Every blocking/significant entry has resolution_ref populated
+        - Backlog items created for deferred work (.006, .010, .019, .020)
+        verification:
+          tests: []
+          evidence:
+          - VH-047-001
+        tasks:
+        - id: 2.1
+          description: Adjudicate all triaged DL entries with human decisions
+        - id: 2.2
+          description: Draft contracts ADR (role, canonical location, navigation)
+        - id: 2.3
+          description: Draft lifecycle ADR (normative vs observed truth)
+        - id: 2.4
+          description: Draft RE on PROD-002 (phase-01 auto-creation reversal)
+        - id: 2.5
+          description: "Draft RE on PROD-003 (backlinks model \u2014 runtime computed)"
+        - id: 2.6
+          description: Draft RE on PROD-012 (flows aligned to contracts ADR)
+        - id: 2.7
+          description: Draft RE on PROD-008/009 (lifecycle semantics per ADR)
+        - id: 2.8
+          description: Draft RE on PROD-016 (installer config semantics clarity)
+        - id: 2.9
+          description: Patch ADR-003 + CLAUDE.md (remove c4_level "interaction")
+        - id: 2.1
+          description: Patch doctrine.md/workflow.md/glossary.md for clarity (.008)
+        - id: 2.11
+          description: Create backlog items for deferred work
+        - id: 2.12
+          description: Populate resolution_ref on all blocking/significant DL entries
+        risks:
+        - description: ADR drafting cascades into scope creep
+          mitigation: ADRs record decisions already made; keep minimal
+        - description: RE volume is high (5+ specs)
+          mitigation: "REs can be lightweight \u2014 frontmatter + summary of change"
+      - id: IP-047.PHASE-03
+        phase: IP-047.PHASE-03

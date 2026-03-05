@@ -4,7 +4,7 @@ slug: 046-fix-silent-failure
 name: IP-046 Phase 01 - Fix silent failure and diff-based validation
 created: '2026-03-05'
 updated: '2026-03-05'
-status: draft
+status: completed
 kind: phase
 ---
 

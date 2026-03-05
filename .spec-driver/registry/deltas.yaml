@@ -5056,7 +5056,7 @@ deltas:
         phase: IP-045-P02
   DE-046:
     kind: delta
-    status: draft
+    status: completed
     name: Fix silent failure in complete delta when revision update fails
     slug: complete_delta_silently_swallows_revisionupdateerror
     updated: '2026-03-05'

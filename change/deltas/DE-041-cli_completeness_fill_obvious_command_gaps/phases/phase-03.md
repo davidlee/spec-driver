@@ -46,16 +46,16 @@ tasks:
     status: complete
   - id: "3.3"
     description: "Wire list plans subcommand with full baseline flags"
-    status: pending
+    status: complete
   - id: "3.4"
     description: "Add --filter to list deltas"
-    status: pending
+    status: complete
   - id: "3.5"
     description: "Add --filter to list adrs, list policies, list standards, list memories"
-    status: pending
+    status: complete
   - id: "3.6"
     description: "Add --filter and --truncate to list cards"
-    status: pending
+    status: complete
   - id: "3.7"
     description: "Integration tests for list changes (VT-list-filters)"
     status: pending
@@ -137,10 +137,10 @@ just check
 | --- | --- | --- | --- | --- |
 | [x] | 3.1 | format_plan_list_table() + tests | [ ] | Foundation for list plans |
 | [x] | 3.2 | Plan discovery function | [P] | `PlanSummary` + `discover_plans()` in `changes/registry.py`; 10 tests |
-| [ ] | 3.3 | Wire list plans subcommand | [ ] | After 3.1 + 3.2 |
-| [ ] | 3.4 | --filter on list deltas | [P] | Mechanical; independent |
-| [ ] | 3.5 | --filter on adrs/policies/standards/memories | [P] | Mechanical; independent |
-| [ ] | 3.6 | --filter + --truncate on list cards | [P] | Mechanical; independent |
+| [x] | 3.3 | Wire list plans subcommand | [ ] | `list plans` with --status/--filter/--regexp/--json/--format/--truncate |
+| [x] | 3.4 | --filter on list deltas | [P] | Substring filter before regexp |
+| [x] | 3.5 | --filter on adrs/policies/standards/memories | [P] | Same pattern; 4 commands |
+| [x] | 3.6 | --filter + --truncate on list cards | [P] | Substring filter + truncate passed to formatter |
 | [ ] | 3.7 | Integration tests (VT-list-filters) | [ ] | After 3.3–3.6 |
 | [ ] | 3.8 | IP verification update + final check | [ ] | After 3.7 |
 

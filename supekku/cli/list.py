@@ -24,7 +24,7 @@ from supekku.cli.common import (
 )
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_status
-from supekku.scripts.lib.changes.registry import ChangeRegistry
+from supekku.scripts.lib.changes.registry import ChangeRegistry, discover_plans
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.backlog_formatters import format_backlog_list_table
@@ -35,6 +35,7 @@ from supekku.scripts.lib.formatters.card_formatters import (
 from supekku.scripts.lib.formatters.change_formatters import (
   format_change_list_table,
   format_change_with_context,
+  format_plan_list_table,
 )
 from supekku.scripts.lib.formatters.decision_formatters import (
   format_decision_list_table,
@@ -367,6 +368,14 @@ def list_deltas(
       help="Filter by requirement ID (e.g., PROD-010.FR-004)",
     ),
   ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on ID or name (case-insensitive)",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -389,6 +398,7 @@ def list_deltas(
 ) -> None:
   """List deltas with optional filtering and status grouping.
 
+  The --filter flag does substring matching (case-insensitive).
   The --regexp flag filters on ID, name, and slug fields.
   The --implements flag filters by requirement ID (reverse relationship query).
   """
@@ -435,6 +445,14 @@ def list_deltas(
         status_normalized and normalize_status(artifact.status) not in status_normalized
       ):
         continue
+      # Check substring filter
+      if substring:
+        filter_lower = substring.lower()
+        if (
+          filter_lower not in artifact.id.lower()
+          and filter_lower not in artifact.name.lower()
+        ):
+          continue
       # Check regexp filter on id, name, slug
       if regexp:
         try:
@@ -740,6 +758,14 @@ def list_adrs(
       help="Filter by standard reference",
     ),
   ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on ID or title (case-insensitive)",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -754,6 +780,7 @@ def list_adrs(
 ) -> None:
   """List Architecture Decision Records (ADRs) with optional filtering.
 
+  The --filter flag does substring matching (case-insensitive).
   The --regexp flag filters on title and summary fields.
   Other flags filter on specific structured fields (status, tags, references).
   """
@@ -781,6 +808,15 @@ def list_adrs(
       )
     else:
       decisions = list(registry.iter(status=status))
+
+    # Apply substring filter
+    if substring:
+      filter_lower = substring.lower()
+      decisions = [
+        d
+        for d in decisions
+        if filter_lower in d.id.lower() or filter_lower in d.title.lower()
+      ]
 
     # Apply regexp filter on title and summary
     if regexp:
@@ -856,6 +892,14 @@ def list_policies(
       help="Filter by standard reference",
     ),
   ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on ID or title (case-insensitive)",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -870,6 +914,7 @@ def list_policies(
 ) -> None:
   """List policies with optional filtering.
 
+  The --filter flag does substring matching (case-insensitive).
   The --regexp flag filters on title and summary fields.
   Other flags filter on specific structured fields (status, tags, references).
   """
@@ -896,6 +941,15 @@ def list_policies(
       )
     else:
       policies = list(registry.iter(status=status))
+
+    # Apply substring filter
+    if substring:
+      filter_lower = substring.lower()
+      policies = [
+        p
+        for p in policies
+        if filter_lower in p.id.lower() or filter_lower in p.title.lower()
+      ]
 
     # Apply regexp filter on title
     if regexp:
@@ -970,6 +1024,14 @@ def list_standards(
       help="Filter by policy reference",
     ),
   ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on ID or title (case-insensitive)",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -984,6 +1046,7 @@ def list_standards(
 ) -> None:
   """List standards with optional filtering.
 
+  The --filter flag does substring matching (case-insensitive).
   The --regexp flag filters on title and summary fields.
   Other flags filter on specific structured fields (status, tags, references).
   """
@@ -1010,6 +1073,15 @@ def list_standards(
       )
     else:
       standards = list(registry.iter(status=status))
+
+    # Apply substring filter
+    if substring:
+      filter_lower = substring.lower()
+      standards = [
+        s
+        for s in standards
+        if filter_lower in s.id.lower() or filter_lower in s.title.lower()
+      ]
 
     # Apply regexp filter on title
     if regexp:
@@ -1305,6 +1377,96 @@ def list_revisions(
     # Sort and format
     revisions.sort(key=lambda r: r.id)
     output = format_change_list_table(revisions, format_type, not truncate)
+    typer.echo(output)
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("plans")
+def list_plans(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on ID or name (case-insensitive)",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
+  truncate: TruncateOption = False,
+) -> None:
+  """List implementation plans with optional filtering.
+
+  The --filter flag does substring matching (case-insensitive).
+  The --regexp flag does pattern matching on ID, slug, and name fields.
+  """
+  if json_output:
+    format_type = "json"
+
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
+
+    repo_root = find_repo_root(root)
+    plans = discover_plans(repo_root)
+
+    if status:
+      status_values = parse_multi_value_filter(status)
+      status_normalized = [s.lower() for s in status_values]
+      plans = [p for p in plans if p.status.lower() in status_normalized]
+    if substring:
+      filter_lower = substring.lower()
+      plans = [
+        p
+        for p in plans
+        if filter_lower in p.id.lower() or filter_lower in p.name.lower()
+      ]
+    if regexp:
+      try:
+        plans = [
+          p
+          for p in plans
+          if matches_regexp(regexp, [p.id, p.slug, p.name], case_insensitive)
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
+
+    if not plans:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Convert PlanSummary to dicts for formatter
+    plan_dicts = [
+      {
+        "id": p.id,
+        "status": p.status,
+        "name": p.name,
+        "delta_ref": p.delta_id,
+        "kind": "plan",
+      }
+      for p in plans
+    ]
+    output = format_plan_list_table(plan_dicts, format_type, truncate)
     typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
@@ -1936,6 +2098,14 @@ def list_cards(
       help="Show all cards including done/archived (default hides done/archived)",
     ),
   ] = False,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on ID or title (case-insensitive)",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -1946,10 +2116,12 @@ def list_cards(
       help="Output result as JSON (shorthand for --format=json)",
     ),
   ] = False,
+  truncate: TruncateOption = False,
 ) -> None:
   """List kanban cards with optional filtering.
 
   By default, hides cards in done/ and archived/ lanes. Use --all to show everything.
+  The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID and title fields.
   """
   # --json flag overrides --format
@@ -1973,6 +2145,15 @@ def list_cards(
       if not all_lanes:
         cards = [c for c in cards if c.lane not in ("done", "archived")]
 
+    # Apply substring filter
+    if substring:
+      filter_lower = substring.lower()
+      cards = [
+        c
+        for c in cards
+        if filter_lower in c.id.lower() or filter_lower in c.title.lower()
+      ]
+
     # Apply regexp filter on id, title
     if regexp:
       try:
@@ -1990,7 +2171,7 @@ def list_cards(
     if format_type == "json":
       output = format_card_list_json(cards)
     else:
-      output = format_card_list_table(cards, format_type)
+      output = format_card_list_table(cards, format_type, truncate)
 
     typer.echo(output)
     raise typer.Exit(EXIT_SUCCESS)
@@ -2046,6 +2227,14 @@ def list_memories(  # noqa: PLR0913
     int | None,
     typer.Option("--limit", "-n", help="Max results"),
   ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on ID or name (case-insensitive)",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -2060,6 +2249,7 @@ def list_memories(  # noqa: PLR0913
 ) -> None:
   """List memory records with optional filtering and scope matching.
 
+  The --filter flag does substring matching (case-insensitive).
   Metadata pre-filters (--type, --status, --tag) apply first (AND logic).
   Scope matching (--path, --command, --match-tag) filters by context (OR).
   Results ordered deterministically by severity/weight/specificity/recency/id.
@@ -2083,6 +2273,15 @@ def list_memories(  # noqa: PLR0913
       )
     else:
       records = list(registry.iter(status=status))
+
+    # Step 1.5: substring filter
+    if substring:
+      filter_lower = substring.lower()
+      records = [
+        r
+        for r in records
+        if filter_lower in r.id.lower() or filter_lower in r.name.lower()
+      ]
 
     # Step 2: regexp filter
     if regexp:
@@ -2148,6 +2347,7 @@ _PLURAL_TO_SINGULAR = {
   "risks": "risk",
   "cards": "card",
   "memories": "memory",
+  "plans": "plan",
 }
 
 for plural, singular in _PLURAL_TO_SINGULAR.items():

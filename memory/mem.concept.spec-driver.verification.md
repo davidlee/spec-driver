@@ -4,8 +4,8 @@ name: Verification
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-05'
+verified: '2026-03-05'
 confidence: high
 tags:
 - spec-driver
@@ -45,20 +45,20 @@ entries:
   - artefact: VT-001
     kind: VT
     requirement: PROD-005.FR-001
-    status: planned      # planned → in_progress → passed | failed
+    status: planned      # planned → in-progress → verified | failed | blocked
     notes: Verify leaf package identification
 ```
 
 ## Status Lifecycle
 
 ```
-planned → in_progress → passed | failed
+planned → in-progress → verified | failed | blocked
 ```
 
 ## How Verification Feeds Traceability
 
 1. Verification artifacts are executed (tests run, human reviews, agent analysis)
-2. Coverage block entries updated to `passed` or `failed`
+2. Coverage block entries updated to `verified` or `failed`
 3. [[mem.concept.spec-driver.audit|Audits]] create `verifies`
    [[mem.concept.spec-driver.relations|relations]]
 4. Sync populates `verified_by[]` in the requirements registry

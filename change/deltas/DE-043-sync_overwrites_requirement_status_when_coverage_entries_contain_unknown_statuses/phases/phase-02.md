@@ -4,7 +4,7 @@ slug: 043-guidance-and-memory
 name: IP-043 Phase 02 - Guidance and memory
 created: '2026-03-05'
 updated: '2026-03-05'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -73,14 +73,14 @@ cross-references.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `mem.guide.spec-driver.requirement-lifecycle` exists and covers:
+- [x] `mem.concept.spec-driver.requirement-lifecycle` exists and covers:
   1. Three status vocabularies — what they are, where they apply
   2. Changing an established requirement — flow through spec revisions
   3. Backlog → spec transit — when and how requirements are formalised
   4. Lifecycle transition points — capture → deliver → observe cycle
-- [ ] `mem.concept.spec-driver.verification` corrected
-- [ ] `mem.fact.spec-driver.status-enums` updated
-- [ ] All memories retrievable via `spec-driver list memories` scope queries
+- [x] `mem.concept.spec-driver.verification` corrected
+- [x] `mem.fact.spec-driver.status-enums` updated
+- [x] All memories retrievable via `spec-driver list memories` scope queries
 
 ## 5. Verification
 
@@ -99,10 +99,10 @@ cross-references.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Create `mem.guide.spec-driver.requirement-lifecycle` | | DEC-043-03 |
-| [ ] | 2.2 | Fix `mem.concept.spec-driver.verification` drift | [P] | |
-| [ ] | 2.3 | Update `mem.fact.spec-driver.status-enums` | [P] | |
-| [ ] | 2.4 | Verify discoverability via scope queries | | Depends on 2.1-2.3 |
+| [x] | 2.1 | Create `mem.guide.spec-driver.requirement-lifecycle` | | Updated existing `mem.concept.*` — `guide` type not supported; added all 4 corner cases |
+| [x] | 2.2 | Fix `mem.concept.spec-driver.verification` drift | [P] | `passed` → `verified`, `in_progress` → `in-progress`, added `blocked` |
+| [x] | 2.3 | Update `mem.fact.spec-driver.status-enums` | [P] | Added DE-043 validation note to caveat section |
+| [x] | 2.4 | Verify discoverability via scope queries | | Tag + path queries succeed; `-c` requires CLI commands not keywords |
 
 ### Task Details
 
@@ -144,15 +144,25 @@ cross-references.
 
 ## 9. Decisions & Outcomes
 
-*(Record during implementation)*
+- **`guide` type not available**: The `create memory` command only supports types:
+  concept, fact, pattern, signpost, system, thread. Used existing `concept` type
+  memory (`mem.concept.spec-driver.requirement-lifecycle`) which was already created
+  today. Updated in-place with all four corner cases rather than creating a duplicate.
+- **`-c` scope query semantics**: The `-c` flag matches against `scope.commands`
+  (actual CLI commands), not keyword tokens. The phase sheet test
+  `-c "requirement lifecycle"` is a scope mismatch — correct queries use
+  `--match-tag` or `-p` for this content.
 
 ## 10. Findings / Research Notes
 
-*(Record during implementation)*
+- The existing `mem.concept.spec-driver.requirement-lifecycle` was created during
+  Phase 1 work but only covered 2 of 4 corner cases. Extended rather than replaced.
+- PROD-008 §2 capture/deliver/observe cycle and PROD-009 §4 evidence overlay
+  semantics added as provenance sources.
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] VA-043-001 evidence captured
-- [ ] IP-043 progress tracking updated
-- [ ] Delta ready for closure
+- [x] Exit criteria satisfied
+- [x] VA-043-001 evidence captured (IP-043 coverage block updated)
+- [x] IP-043 progress tracking updated
+- [x] Delta ready for closure

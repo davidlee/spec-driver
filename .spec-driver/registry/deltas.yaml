@@ -4752,7 +4752,7 @@ deltas:
         phase: IP-042-P01
   DE-043:
     kind: delta
-    status: in-progress
+    status: completed
     name: Verification coverage validation and requirement lifecycle guidance
     slug: verification_coverage_validation_and_lifecycle_guidance
     updated: '2026-03-05'
@@ -4834,8 +4834,36 @@ deltas:
         - description: Extraction loop duplication makes the filter insertion repetitive
           mitigation: Consider extracting a shared helper if the pattern is identical
             across all four loops
-      - id: IP-043.PHASE-02
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-043.PHASE-02
+        plan: IP-043
+        delta: DE-043
+        objective: Create discoverable lifecycle guidance for agents, correct memory
+          drift, and update the status-enums memory to reference DE-043.
+        entrance_criteria:
+        - Phase 1 complete (code fix committed)
+        exit_criteria:
+        - mem.guide.spec-driver.requirement-lifecycle exists and answers corner cases
+        - "mem.concept.spec-driver.verification corrected (passed \u2192 verified)"
+        - mem.fact.spec-driver.status-enums updated to reference DE-043
+        - All memories retrievable via relevant scope queries
+        verification:
+          tests: []
+          evidence:
+          - VA-043-001
+        tasks:
+        - id: '2.1'
+          description: Create mem.guide.spec-driver.requirement-lifecycle
+        - id: '2.2'
+          description: Fix mem.concept.spec-driver.verification drift
+        - id: '2.3'
+          description: Update mem.fact.spec-driver.status-enums
+        - id: '2.4'
+          description: Verify discoverability via scope queries
+        risks:
+        - description: Guidance memory becomes stale as lifecycle evolves
+          mitigation: Link to canonical code and specs as provenance
   DE-044:
     kind: delta
     status: in-progress
@@ -4900,8 +4928,40 @@ deltas:
         - id: '1.6'
           summary: Lint and verify
         risks: []
-      - id: IP-044.PHASE-02
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-044.PHASE-02
+        plan: IP-044
+        delta: DE-044
+        objective: Replace all hardcoded workspace directory strings in production
+          code with constants and helpers from core/paths.py.
+        entrance_criteria:
+        - "P01 complete \u2014 constants and helpers exist and are tested"
+        exit_criteria:
+        - All production .py files use constants/helpers for workspace paths
+        - just test passes (2571+ tests, zero failures)
+        - just lint clean
+        - just pylint does not regress
+        verification:
+          tests:
+          - VT-044-regression
+          evidence: []
+        tasks:
+        - id: '2.1'
+          summary: Update registries
+        - id: '2.2'
+          summary: Update workspace.py
+        - id: '2.3'
+          summary: Update install.py
+        - id: '2.4'
+          summary: Update CLI commands
+        - id: '2.5'
+          summary: Update remaining production scripts
+        - id: '2.6'
+          summary: Lint and full test suite verification
+        risks:
+        - description: Missed import causes runtime NameError
+          mitigation: Run full test suite after each file group
       - id: IP-044.PHASE-03
         phase: IP-044.PHASE-03
   DE-045:
@@ -4994,3 +5054,74 @@ deltas:
         name: CLI wiring + integration tests
         status: pending
         phase: IP-045-P02
+  DE-046:
+    kind: delta
+    status: draft
+    name: Fix silent failure in complete delta when revision update fails
+    slug: complete_delta_silently_swallows_revisionupdateerror
+    updated: '2026-03-05'
+    path: change/deltas/DE-046-complete_delta_silently_swallows_revisionupdateerror/DE-046.md
+    applies_to:
+      specs:
+      - PROD-002
+      requirements: []
+    relations:
+    - type: addresses
+      target: DE-043
+      attributes:
+        note: Discovered during DE-043 closure attempt
+    plan:
+      id: IP-046
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-046
+        delta: DE-046
+        revision_links:
+          aligns_with:
+          - DR-046
+        specs:
+          primary:
+          - PROD-002
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-046.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-046.PHASE-01
+        plan: IP-046
+        delta: DE-046
+        objective: Fix silent RevisionUpdateError handling in complete_delta.py and
+          implement diff-based validation in updater.py so targeted updates tolerate
+          pre-existing validation issues.
+        entrance_criteria:
+        - DR-046 reviewed
+        - Existing tests passing (just check)
+        exit_criteria:
+        - All error paths in complete_delta.py print to stderr
+        - update_requirement_lifecycle_status uses diff-based validation
+        - VT-046-001/002/003 verified
+        - just check green
+        verification:
+          tests:
+          - VT-046-001
+          - VT-046-002
+          - VT-046-003
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Fix silent RevisionUpdateError catch in complete_delta.py
+        - id: '1.2'
+          description: Audit all error paths in complete_delta.py for missing stderr
+            output
+        - id: '1.3'
+          description: Implement diff-based validation in updater.py
+        - id: '1.4'
+          description: Write tests for error output and diff-based validation
+        risks:
+        - description: Diff-based validation too permissive
+          mitigation: Only exempt errors present before update; verify with test

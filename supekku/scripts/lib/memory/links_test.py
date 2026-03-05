@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 from supekku.scripts.lib.memory.links import (
+  LinkGraphNode,
   LinkResolutionResult,
   MissingLink,
   ParsedLink,
   ResolvedLink,
+  compute_backlinks,
+  expand_link_graph,
   links_to_frontmatter,
   parse_links,
   resolve_all_links,
@@ -574,3 +577,200 @@ class TestLinksToFrontmatterModes:
       raise AssertionError("Expected ValueError")  # noqa: TRY301
     except ValueError as exc:
       assert "Invalid link mode" in str(exc)
+
+
+# ── compute_backlinks tests ──────────────────────────────────
+
+
+class TestComputeBacklinks:
+  """compute_backlinks builds reverse edges from forward links."""
+
+  def test_empty_corpus(self) -> None:
+    assert compute_backlinks({}) == {}
+
+  def test_single_link(self) -> None:
+    bodies = {
+      "mem.a": "See [[mem.b]] for details.",
+      "mem.b": "No links here.",
+    }
+    bl = compute_backlinks(bodies)
+    assert bl["mem.b"] == ["mem.a"]
+
+  def test_self_link_excluded(self) -> None:
+    bodies = {"mem.a": "Self ref [[mem.a]] ignored."}
+    bl = compute_backlinks(bodies)
+    assert "mem.a" not in bl
+
+  def test_hub_node_multiple_backlinks(self) -> None:
+    bodies = {
+      "mem.a": "Links to [[mem.hub]].",
+      "mem.b": "Also links to [[mem.hub]].",
+      "mem.c": "And [[mem.hub]] too.",
+      "mem.hub": "The hub.",
+    }
+    bl = compute_backlinks(bodies)
+    assert bl["mem.hub"] == ["mem.a", "mem.b", "mem.c"]
+
+  def test_missing_target_still_tracked(self) -> None:
+    """Backlinks include targets not in the corpus."""
+    bodies = {"mem.a": "Links to [[PROB-002]]."}
+    bl = compute_backlinks(bodies)
+    assert bl["PROB-002"] == ["mem.a"]
+
+  def test_mem_uri_scheme_normalized(self) -> None:
+    bodies = {"mem.a": "See [[mem:b]] for details.", "mem.b": ""}
+    bl = compute_backlinks(bodies)
+    assert bl["mem.b"] == ["mem.a"]
+
+  def test_deduplicates_per_source(self) -> None:
+    """Same target linked twice from same source appears once."""
+    bodies = {"mem.a": "[[mem.b]] and again [[mem.b]]."}
+    bl = compute_backlinks(bodies)
+    assert bl["mem.b"] == ["mem.a"]
+
+  def test_multiple_targets_from_one_source(self) -> None:
+    bodies = {"mem.a": "[[mem.b]] and [[mem.c]]."}
+    bl = compute_backlinks(bodies)
+    assert bl["mem.b"] == ["mem.a"]
+    assert bl["mem.c"] == ["mem.a"]
+
+  def test_results_sorted(self) -> None:
+    bodies = {
+      "mem.z": "[[mem.target]]",
+      "mem.a": "[[mem.target]]",
+      "mem.m": "[[mem.target]]",
+    }
+    bl = compute_backlinks(bodies)
+    assert bl["mem.target"] == ["mem.a", "mem.m", "mem.z"]
+
+
+# ── expand_link_graph tests ──────────────────────────────────
+
+
+def _graph_bodies() -> dict[str, str]:
+  return {
+    "mem.root": "Links to [[mem.a]] and [[mem.b]].",
+    "mem.a": "Links to [[mem.c]].",
+    "mem.b": "Links to [[mem.a]] and [[mem.c]].",
+    "mem.c": "Leaf node.",
+  }
+
+
+def _graph_names() -> dict[str, str]:
+  return {
+    "mem.root": "Root",
+    "mem.a": "Node A",
+    "mem.b": "Node B",
+    "mem.c": "Node C",
+  }
+
+
+def _graph_types() -> dict[str, str]:
+  return {
+    "mem.root": "signpost",
+    "mem.a": "concept",
+    "mem.b": "concept",
+    "mem.c": "fact",
+  }
+
+
+class TestExpandLinkGraph:
+  """expand_link_graph does BFS expansion from a root node."""
+
+  def test_depth_zero_returns_root_only(self) -> None:
+    nodes = expand_link_graph(
+      "mem.root",
+      _graph_bodies(),
+      _graph_names(),
+      _graph_types(),
+      max_depth=0,
+    )
+    assert len(nodes) == 1
+    assert nodes[0] == LinkGraphNode("mem.root", "Root", 0, "signpost")
+
+  def test_depth_one(self) -> None:
+    nodes = expand_link_graph(
+      "mem.root",
+      _graph_bodies(),
+      _graph_names(),
+      _graph_types(),
+      max_depth=1,
+    )
+    ids = [n.id for n in nodes]
+    assert ids[0] == "mem.root"
+    assert set(ids[1:]) == {"mem.a", "mem.b"}
+    assert all(n.depth == 1 for n in nodes[1:])
+
+  def test_depth_two(self) -> None:
+    nodes = expand_link_graph(
+      "mem.root",
+      _graph_bodies(),
+      _graph_names(),
+      _graph_types(),
+      max_depth=2,
+    )
+    ids = [n.id for n in nodes]
+    assert set(ids) == {"mem.root", "mem.a", "mem.b", "mem.c"}
+    # mem.c should be at depth 2
+    c_node = next(n for n in nodes if n.id == "mem.c")
+    assert c_node.depth == 2
+
+  def test_cycle_protection(self) -> None:
+    bodies = {
+      "mem.a": "[[mem.b]]",
+      "mem.b": "[[mem.a]]",
+    }
+    names = {"mem.a": "A", "mem.b": "B"}
+    nodes = expand_link_graph("mem.a", bodies, names, {}, max_depth=5)
+    ids = [n.id for n in nodes]
+    assert ids == ["mem.a", "mem.b"]
+
+  def test_missing_target_included_but_not_expanded(self) -> None:
+    bodies = {"mem.a": "[[mem.unknown]]"}
+    names = {"mem.a": "A"}
+    nodes = expand_link_graph("mem.a", bodies, names, {}, max_depth=2)
+    ids = [n.id for n in nodes]
+    assert "mem.unknown" in ids
+    # Only 2 nodes — unknown is not expanded
+    assert len(nodes) == 2
+
+  def test_preserves_name_and_type(self) -> None:
+    nodes = expand_link_graph(
+      "mem.root",
+      _graph_bodies(),
+      _graph_names(),
+      _graph_types(),
+      max_depth=1,
+    )
+    a_node = next(n for n in nodes if n.id == "mem.a")
+    assert a_node.name == "Node A"
+    assert a_node.memory_type == "concept"
+
+  def test_unknown_node_uses_id_as_name(self) -> None:
+    bodies = {"mem.a": "[[mem.unknown]]"}
+    nodes = expand_link_graph("mem.a", bodies, {}, {}, max_depth=1)
+    unknown = next(n for n in nodes if n.id == "mem.unknown")
+    assert unknown.name == "mem.unknown"
+
+  def test_max_depth_capped(self) -> None:
+    """Depths above 5 are capped to 5."""
+    nodes = expand_link_graph(
+      "mem.root",
+      _graph_bodies(),
+      _graph_names(),
+      _graph_types(),
+      max_depth=100,
+    )
+    assert all(n.depth <= 5 for n in nodes)
+
+  def test_root_not_in_bodies(self) -> None:
+    """Root ID with no body returns just root node."""
+    nodes = expand_link_graph(
+      "mem.missing",
+      {},
+      {"mem.missing": "Gone"},
+      {},
+      max_depth=2,
+    )
+    assert len(nodes) == 1
+    assert nodes[0].id == "mem.missing"

@@ -4,12 +4,15 @@ Pure functions for extracting [[...]] wikilinks from memory body content,
 resolving them against a known artifact index, and serializing results
 for frontmatter storage.
 
+Also provides graph operations: backlink computation and depth expansion.
+
 No I/O — callers provide the body text and artifact index.
 """
 
 from __future__ import annotations
 
 import re
+from collections import defaultdict, deque
 from dataclasses import dataclass, field
 
 from supekku.scripts.lib.core.artifact_ids import classify_artifact_id
@@ -305,3 +308,135 @@ def links_to_frontmatter(
     data["missing"] = [{"raw": m.raw} for m in result.missing]
 
   return data
+
+
+# ── Graph operations ──────────────────────────────────────────
+
+
+@dataclass(frozen=True)
+class LinkGraphNode:
+  """A node in a link graph expansion."""
+
+  id: str
+  name: str
+  depth: int
+  memory_type: str = ""
+
+
+_MAX_LINK_DEPTH = 5
+
+
+def _normalize_link_target(target: str) -> str:
+  """Normalize a parsed link target to canonical form.
+
+  Strips mem: URI scheme and applies memory ID normalization.
+  Recognized non-memory artifacts (SPEC-*, PROB-*, etc.) are returned as-is.
+  Returns the original target if normalization fails.
+  """
+  t = target
+  if t.startswith("mem:"):
+    t = "mem." + t[4:]
+
+  # Recognized non-memory artifact — return as-is
+  if classify_artifact_id(t) is not None:
+    return t
+
+  try:
+    return normalize_memory_id(t)
+  except ValueError:
+    return t
+
+
+def compute_backlinks(bodies: dict[str, str]) -> dict[str, list[str]]:
+  """Compute reverse edges from forward links in memory bodies.
+
+  For each source memory, parses ``[[...]]`` links from its body and
+  records the source as a backlink on each target. Self-links are excluded.
+
+  Args:
+    bodies: Mapping of memory ID to body text.
+
+  Returns:
+    Dict mapping target ID to sorted list of source IDs that link to it.
+  """
+  backlinks: dict[str, list[str]] = defaultdict(list)
+
+  for source_id, body in bodies.items():
+    links = parse_links(body)
+    for link in links:
+      target = _normalize_link_target(link.target)
+      if target != source_id:
+        backlinks[target].append(source_id)
+
+  return {k: sorted(v) for k, v in backlinks.items()}
+
+
+def expand_link_graph(
+  root_id: str,
+  bodies: dict[str, str],
+  names: dict[str, str],
+  types: dict[str, str],
+  *,
+  max_depth: int = 1,
+) -> list[LinkGraphNode]:
+  """Expand outgoing link graph from a root node via BFS.
+
+  Follows ``[[...]]`` links in memory bodies to the given depth,
+  returning a flat list of discovered nodes with depth annotations.
+  Cycle-safe via visited set. Only expands nodes present in ``bodies``.
+
+  Args:
+    root_id: Starting memory ID.
+    bodies: Mapping of memory ID to body text.
+    names: Mapping of memory ID to display name.
+    types: Mapping of memory ID to memory type.
+    max_depth: Maximum expansion depth (capped at 5).
+
+  Returns:
+    List of LinkGraphNode in BFS order (root at depth 0).
+  """
+  max_depth = min(max_depth, _MAX_LINK_DEPTH)
+
+  root_name = names.get(root_id, root_id)
+  root_type = types.get(root_id, "")
+  result: list[LinkGraphNode] = [
+    LinkGraphNode(id=root_id, name=root_name, depth=0, memory_type=root_type),
+  ]
+
+  if max_depth == 0:
+    return result
+
+  visited: set[str] = {root_id}
+  queue: deque[tuple[str, int]] = deque([(root_id, 0)])
+
+  while queue:
+    current_id, current_depth = queue.popleft()
+    if current_depth >= max_depth:
+      continue
+
+    body = bodies.get(current_id, "")
+    if not body:
+      continue
+
+    links = parse_links(body)
+    for link in links:
+      target = _normalize_link_target(link.target)
+      if target in visited:
+        continue
+      visited.add(target)
+
+      # Only expand nodes we have bodies for (known memories)
+      target_name = names.get(target, target)
+      target_type = types.get(target, "")
+      node = LinkGraphNode(
+        id=target,
+        name=target_name,
+        depth=current_depth + 1,
+        memory_type=target_type,
+      )
+      result.append(node)
+
+      if target in bodies:
+        queue.append((target, current_depth + 1))
+
+  return result

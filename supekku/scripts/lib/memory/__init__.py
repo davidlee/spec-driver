@@ -9,10 +9,13 @@ from supekku.scripts.lib.memory.ids import (
   validate_memory_id,
 )
 from supekku.scripts.lib.memory.links import (
+  LinkGraphNode,
   LinkResolutionResult,
   MissingLink,
   ParsedLink,
   ResolvedLink,
+  compute_backlinks,
+  expand_link_graph,
   links_to_frontmatter,
   parse_links,
   resolve_all_links,
@@ -31,6 +34,7 @@ from supekku.scripts.lib.memory.selection import (
 )
 
 __all__: list[str] = [
+  "LinkGraphNode",
   "LinkResolutionResult",
   "MatchContext",
   "MemoryRecord",
@@ -41,6 +45,8 @@ __all__: list[str] = [
   "extract_type_from_id",
   "filename_from_id",
   "is_surfaceable",
+  "compute_backlinks",
+  "expand_link_graph",
   "links_to_frontmatter",
   "matches_scope",
   "normalize_memory_id",

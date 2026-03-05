@@ -6,10 +6,14 @@ import json
 from datetime import date
 
 from supekku.scripts.lib.formatters.memory_formatters import (
+  format_link_graph_json,
+  format_link_graph_table,
+  format_link_graph_tree,
   format_memory_details,
   format_memory_list_json,
   format_memory_list_table,
 )
+from supekku.scripts.lib.memory.links import LinkGraphNode
 from supekku.scripts.lib.memory.models import MemoryRecord
 
 
@@ -351,3 +355,91 @@ class TestFormatMemoryListJson:
     output = format_memory_list_json(records)
     item = json.loads(output)["items"][0]
     assert "links" not in item
+
+
+# --- format_link_graph_table ---
+
+
+def _sample_nodes() -> list[LinkGraphNode]:
+  return [
+    LinkGraphNode(id="mem.root", name="Root", depth=0, memory_type="signpost"),
+    LinkGraphNode(id="mem.a", name="Node A", depth=1, memory_type="concept"),
+    LinkGraphNode(id="mem.b", name="Node B", depth=1, memory_type="fact"),
+    LinkGraphNode(id="mem.c", name="Node C", depth=2, memory_type="pattern"),
+  ]
+
+
+class TestFormatLinkGraphTable:
+  """Tests for format_link_graph_table."""
+
+  def test_empty(self) -> None:
+    assert format_link_graph_table([]) == ""
+
+  def test_single_node(self) -> None:
+    nodes = [LinkGraphNode("mem.a", "A", 0, "fact")]
+    output = format_link_graph_table(nodes)
+    assert "mem.a" in output
+    assert "A" in output
+
+  def test_multi_depth_indentation(self) -> None:
+    output = format_link_graph_table(_sample_nodes())
+    lines = output.split("\n")
+    assert lines[0].startswith("0")
+    assert "mem.root" in lines[0]
+    # Depth 1 nodes have 2-space indent
+    assert "  mem.a" in lines[1]
+    # Depth 2 has 4-space indent
+    assert "    mem.c" in lines[3]
+
+  def test_includes_type(self) -> None:
+    output = format_link_graph_table(_sample_nodes())
+    assert "signpost" in output
+    assert "concept" in output
+
+
+class TestFormatLinkGraphTree:
+  """Tests for format_link_graph_tree."""
+
+  def test_empty(self) -> None:
+    assert format_link_graph_tree([]) == ""
+
+  def test_single_node(self) -> None:
+    nodes = [LinkGraphNode("mem.a", "A", 0, "fact")]
+    output = format_link_graph_tree(nodes)
+    assert output == "mem.a — A (fact)"
+
+  def test_multi_depth(self) -> None:
+    output = format_link_graph_tree(_sample_nodes())
+    lines = output.split("\n")
+    assert lines[0] == "mem.root — Root (signpost)"
+    assert lines[1] == "  mem.a — Node A (concept)"
+    assert lines[3] == "    mem.c — Node C (pattern)"
+
+  def test_empty_type_no_suffix(self) -> None:
+    nodes = [LinkGraphNode("mem.a", "A", 0, "")]
+    output = format_link_graph_tree(nodes)
+    assert output == "mem.a — A"
+
+
+class TestFormatLinkGraphJson:
+  """Tests for format_link_graph_json."""
+
+  def test_empty(self) -> None:
+    output = format_link_graph_json([])
+    assert json.loads(output) == []
+
+  def test_structure(self) -> None:
+    nodes = [LinkGraphNode("mem.a", "A", 0, "fact")]
+    parsed = json.loads(format_link_graph_json(nodes))
+    assert len(parsed) == 1
+    assert parsed[0] == {
+      "id": "mem.a",
+      "name": "A",
+      "depth": 0,
+      "memory_type": "fact",
+    }
+
+  def test_multi_node(self) -> None:
+    parsed = json.loads(format_link_graph_json(_sample_nodes()))
+    assert len(parsed) == 4
+    assert parsed[2]["depth"] == 1

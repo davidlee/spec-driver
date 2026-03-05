@@ -6,6 +6,7 @@ Formatters take MemoryRecord objects and return formatted strings for display.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
@@ -16,6 +17,7 @@ from supekku.scripts.lib.formatters.table_utils import (
 from supekku.scripts.lib.formatters.theme import get_memory_status_style
 
 if TYPE_CHECKING:
+  from supekku.scripts.lib.memory.links import LinkGraphNode
   from supekku.scripts.lib.memory.models import MemoryRecord
 
 
@@ -274,3 +276,70 @@ def format_memory_list_json(records: Sequence[MemoryRecord]) -> str:
     items.append(item)
 
   return format_as_json(items)
+
+
+# --- Graph views ---
+
+
+def format_link_graph_table(nodes: Sequence[LinkGraphNode]) -> str:
+  """Format link graph nodes as a compact table.
+
+  Columns: depth, id, name, type.
+
+  Args:
+    nodes: List of LinkGraphNode objects (BFS order).
+
+  Returns:
+    Formatted table string. Empty string if no nodes.
+  """
+  if not nodes:
+    return ""
+
+  lines = []
+  for node in nodes:
+    indent = "  " * node.depth
+    lines.append(f"{node.depth}  {indent}{node.id}\t{node.name}\t{node.memory_type}")
+  return "\n".join(lines)
+
+
+def format_link_graph_tree(nodes: Sequence[LinkGraphNode]) -> str:
+  """Format link graph nodes as an indented tree.
+
+  Each depth level is indented by two spaces. Shows id and name.
+
+  Args:
+    nodes: List of LinkGraphNode objects (BFS order).
+
+  Returns:
+    Formatted tree string. Empty string if no nodes.
+  """
+  if not nodes:
+    return ""
+
+  lines = []
+  for node in nodes:
+    indent = "  " * node.depth
+    type_suffix = f" ({node.memory_type})" if node.memory_type else ""
+    lines.append(f"{indent}{node.id} — {node.name}{type_suffix}")
+  return "\n".join(lines)
+
+
+def format_link_graph_json(nodes: Sequence[LinkGraphNode]) -> str:
+  """Format link graph nodes as JSON array.
+
+  Args:
+    nodes: List of LinkGraphNode objects.
+
+  Returns:
+    JSON string with list of node dicts.
+  """
+  items = [
+    {
+      "id": n.id,
+      "name": n.name,
+      "depth": n.depth,
+      "memory_type": n.memory_type,
+    }
+    for n in nodes
+  ]
+  return json.dumps(items, indent=2)

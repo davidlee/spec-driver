@@ -1130,6 +1130,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-007
+    - DE-043
     verified_by: []
     coverage_evidence:
     - VH-201
@@ -1231,7 +1232,8 @@ requirements:
     status: active
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-043
     verified_by: []
     coverage_evidence:
     - VH-330
@@ -1277,6 +1279,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-007
+    - DE-043
     verified_by: []
     coverage_evidence:
     - VT-940
@@ -3925,7 +3928,7 @@ requirements:
     path: specify/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-002:
     label: FR-002
-    title: 'Support requirement status values: pending, in-progress, live, retired'
+    title: 'Support requirement status values: pending, in-progress, active, retired'
     specs:
     - SPEC-122
     primary_spec: SPEC-122

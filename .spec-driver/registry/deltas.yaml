@@ -4430,3 +4430,363 @@ deltas:
     applies_to:
       specs: []
       requirements: []
+  DE-041:
+    kind: delta
+    status: completed
+    name: "Delta - CLI completeness \u2014 fill obvious command gaps"
+    slug: cli_completeness_fill_obvious_command_gaps
+    updated: '2026-03-04'
+    path: change/deltas/DE-041-cli_completeness_fill_obvious_command_gaps/DE-041.md
+    applies_to:
+      specs:
+      - PROD-010
+      - PROD-013
+      requirements: []
+    plan:
+      id: IP-041
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-041
+        delta: DE-041
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-010
+          - PROD-013
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-041-P01
+          name: "Foundation \u2014 shared helpers + migration PoC"
+          status: complete
+        - id: IP-041-P02
+          name: Domain additions + new commands
+          status: complete
+        - id: IP-041-P03
+          name: List improvements + final verification
+          status: complete
+        - id: IP-041.PHASE-03
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-041.PHASE-01
+        plan: IP-041
+        delta: DE-041
+        objective: Extract shared CLI helpers (resolve_artifact, emit_artifact, find_artifacts)
+          into common.py, validate them by migrating revision commands as proof-of-concept,
+          and fix the known show revision --json bug.
+        entrance_criteria:
+        - DR-041 reviewed and contradictions resolved
+        - "Gate check passed (IP-041 \xA73)"
+        - Existing test suite passing (just check)
+        - Familiarity with existing show/view/edit/find patterns in CLI files
+        exit_criteria:
+        - ArtifactRef, ArtifactNotFoundError, AmbiguousArtifactError implemented in
+          common.py
+        - resolve_artifact() handles all existing artifact types via dispatch table
+        - emit_artifact() enforces explicit json_fn (no fallback chain)
+        - find_artifacts() yields matching ArtifactRef for pattern queries
+        - All helpers have comprehensive parameterized unit tests
+        - Pre-migration regression tests written for revision commands (all verbs
+          x all output modes)
+        - Revision commands (show/view/edit/find) migrated to shared helpers
+        - show revision --json bug fixed
+        - Regression tests pass both before and after migration
+        - just check green (tests + both linters)
+        verification:
+          tests:
+          - VT-resolve
+          - VT-emit
+          - VT-find-artifacts
+          - VT-migration
+          evidence:
+          - VA-lint
+        tasks:
+        - id: '1.1'
+          description: Implement ArtifactRef, ArtifactNotFoundError, AmbiguousArtifactError
+          status: pending
+        - id: '1.2'
+          description: Implement resolve_artifact() with dispatch table for existing
+            types
+          status: pending
+        - id: '1.3'
+          description: Implement emit_artifact() with required json_fn
+          status: pending
+        - id: '1.4'
+          description: Implement find_artifacts()
+          status: pending
+        - id: '1.5'
+          description: Unit tests for helpers (VT-resolve, VT-emit, VT-find-artifacts)
+          status: pending
+        - id: '1.6'
+          description: Write pre-migration regression tests for revision commands
+          status: pending
+        - id: '1.7'
+          description: Migrate revision show/view/edit/find to shared helpers; fix
+            --json bug
+          status: pending
+        - id: '1.8'
+          description: 'Final verification: just check green'
+          status: pending
+        risks:
+        - description: Dispatch table approach may not handle all artifact type quirks
+          likelihood: low
+          impact: medium
+          mitigation: PoC migration validates against real revision commands; adjust
+            dispatch per type
+        - description: emit_artifact may need per-type variations beyond format_fn/json_fn
+          likelihood: low
+          impact: low
+          mitigation: Start with minimal signature; revision migration reveals if
+            more params needed
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-041.PHASE-02
+        plan: IP-041
+        delta: DE-041
+        objective: Add all missing show/view/edit/find subcommands using Phase 1 shared
+          helpers, add plan and backlog resolvers to the dispatch tables, create domain
+          support (find_backlog_items_by_id, create_plan), and add required formatters.
+        entrance_criteria:
+        - Phase 1 complete (shared helpers tested, revision migration done)
+        - Existing test suite passing (just check)
+        - "DR-041 \xA74.2\u20134.10 reviewed"
+        exit_criteria:
+        - Plan resolver (_resolve_plan) and finder (_find_plans) in common.py dispatch
+          tables
+        - Backlog resolvers (_resolve_backlog) and finders (_find_backlog) in dispatch
+          tables
+        - find_backlog_items_by_id() in backlog/registry.py with tests
+        - create_plan() extracted from create_delta() with tests
+        - format_audit_details() and format_plan_details() formatters with tests
+        - All new show subcommands wired (plan, audit, issue, problem, improvement,
+          risk)
+        - All new view subcommands wired (plan, audit, memory, issue, problem, improvement,
+          risk)
+        - All new edit subcommands wired (plan, audit, memory, issue, problem, improvement,
+          risk)
+        - All new find subcommands wired (plan, audit, requirement, issue, problem,
+          improvement, risk)
+        - create plan --delta DE-XXX CLI command wired
+        - Integration tests per new subcommand (VT-commands)
+        - just check green (tests + both linters)
+        verification:
+          tests:
+          - VT-backlog-find
+          - VT-plan-resolve
+          - VT-create-plan
+          - VT-format-audit
+          - VT-format-plan
+          - VT-commands
+          evidence:
+          - VA-lint
+        tasks:
+        - id: '2.1'
+          description: Implement find_backlog_items_by_id() in backlog/registry.py
+          status: complete
+        - id: '2.2'
+          description: Add plan resolver (_resolve_plan) and finder (_find_plans)
+            to common.py
+          status: complete
+        - id: '2.3'
+          description: Add backlog resolvers and finders to common.py dispatch tables
+          status: complete
+        - id: '2.4'
+          description: Unit tests for new resolvers/finders (VT-plan-resolve, VT-backlog-find)
+          status: complete
+        - id: '2.5'
+          description: Add format_audit_details() and format_plan_details() formatters
+          status: complete
+        - id: '2.6'
+          description: Unit tests for formatters (VT-format-audit, VT-format-plan)
+          status: complete
+        - id: '2.7'
+          description: Extract create_plan() from create_delta() + tests (VT-create-plan)
+          status: complete
+        - id: '2.8'
+          description: Wire all new show subcommands (plan, audit, issue, problem,
+            improvement, risk)
+          status: complete
+        - id: '2.9'
+          description: Wire all new view/edit subcommands
+          status: complete
+        - id: '2.10'
+          description: Wire all new find subcommands (plan, audit, requirement, issue,
+            problem, improvement, risk)
+          status: complete
+        - id: '2.11'
+          description: Wire create plan --delta CLI command
+          status: complete
+        - id: '2.12'
+          description: Integration tests for new commands (VT-commands)
+          status: complete
+        - id: '2.13'
+          description: 'Final verification: just check green'
+          status: complete
+        risks:
+        - description: Backlog items lack a to_dict(root) method needed for show --json
+          likelihood: medium
+          impact: low
+          mitigation: Provide json_fn using BacklogItem's existing attributes or a
+            simple dict comprehension
+        - description: Plan frontmatter parsing may differ from ChangeArtifact model
+          likelihood: low
+          impact: medium
+          mitigation: Plan resolver loads frontmatter directly via yaml; doesn't need
+            ChangeRegistry
+        - description: create_plan extraction may break create_delta's coupling
+          likelihood: low
+          impact: medium
+          mitigation: Extract as pure function; create_delta calls it internally
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-041.PHASE-03
+        plan: IP-041
+        delta: DE-041
+        objective: Add list plans command, backfill --filter on 6 list commands that
+          lack it, add --truncate to list cards, create format_plan_list_table() formatter,
+          and complete delta verification.
+        entrance_criteria:
+        - Phase 2 complete (all show/view/edit/find subcommands wired and tested)
+        - Existing test suite passing (just check)
+        - "DR-041 \xA74.8 reviewed"
+        exit_criteria:
+        - list plans subcommand with --json/--format/--filter/--status/--truncate
+          flags
+        - format_plan_list_table() formatter with tests
+        - --filter added to list deltas, list adrs, list policies, list standards,
+          list memories
+        - --filter and --truncate added to list cards
+        - Integration tests for new/modified list commands (VT-list-filters)
+        - All IP-041 verification artifacts status updated
+        - just check green (tests + both linters)
+        verification:
+          tests:
+          - VT-format-plan-list
+          - VT-list-plans
+          - VT-list-filters
+          evidence:
+          - VA-lint
+        tasks:
+        - id: '3.1'
+          description: format_plan_list_table() formatter + tests (VT-format-plan-list)
+          status: complete
+        - id: '3.2'
+          description: Plan discovery function for list plans
+          status: complete
+        - id: '3.3'
+          description: Wire list plans subcommand with full baseline flags
+          status: complete
+        - id: '3.4'
+          description: Add --filter to list deltas
+          status: complete
+        - id: '3.5'
+          description: Add --filter to list adrs, list policies, list standards, list
+            memories
+          status: complete
+        - id: '3.6'
+          description: Add --filter and --truncate to list cards
+          status: complete
+        - id: '3.7'
+          description: Integration tests for list changes (VT-list-filters)
+          status: complete
+        - id: '3.8'
+          description: Update IP-041 verification statuses + final just check
+          status: complete
+        risks:
+        - description: list.py is already 2158 lines; adding more commands increases
+            maintenance burden
+          likelihood: low
+          impact: low
+          mitigation: Each addition is mechanical and small; consider extraction if
+            it crosses 2500
+        - description: Plan discovery may be slow scanning all delta dirs
+          likelihood: low
+          impact: low
+          mitigation: Delta dirs are typically <50; glob is fast enough
+      - id: IP-041-P01
+        name: "Foundation \u2014 shared helpers + migration PoC"
+        status: complete
+        phase: IP-041-P01
+      - id: IP-041-P02
+        name: Domain additions + new commands
+        status: complete
+        phase: IP-041-P02
+      - id: IP-041-P03
+        name: List improvements + final verification
+        status: complete
+        phase: IP-041-P03
+  DE-042:
+    kind: delta
+    status: in-progress
+    name: Fix Go contract generation and respect calling shell environment
+    slug: respect_target_project_direnv_environment_in_sync_adapters
+    updated: '2026-03-04'
+    path: change/deltas/DE-042-respect_target_project_direnv_environment_in_sync_adapters/DE-042.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-042
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-042
+        delta: DE-042
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-042-P01
+      phases:
+      - id: IP-042-P01
+        phase: IP-042-P01
+  DE-043:
+    kind: delta
+    status: draft
+    name: Verification coverage validation and requirement lifecycle guidance
+    slug: verification_coverage_validation_and_lifecycle_guidance
+    updated: '2026-03-05'
+    path: change/deltas/DE-043-sync_overwrites_requirement_status_when_coverage_entries_contain_unknown_statuses/DE-043.md
+    applies_to:
+      specs:
+      - PROD-008
+      - PROD-009
+      - SPEC-122
+      requirements:
+      - PROD-008.FR-001
+      - PROD-009.FR-001
+      - PROD-009.FR-003
+    relations:
+    - type: addresses
+      target: ISSUE-033
+      attributes: {}
+    plan:
+      id: IP-043
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-043
+        delta: DE-043
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-043-P01
+      phases:
+      - id: IP-043-P01
+        phase: IP-043-P01

@@ -18,8 +18,8 @@ plans_root = "doc/plans"         # implementation plans, keyed by T123-*
 
 [policy]
 adrs = true
-policies = false
-standards = false
+policies = true
+standards = true
 
 [contracts]
 enabled = true

@@ -4,8 +4,8 @@ name: Canonical Status Enums
 kind: memory
 status: active
 memory_type: fact
-updated: '2026-03-05'
-verified: '2026-03-05'
+updated: '2026-03-03'
+verified: '2026-03-03'
 confidence: high
 tags:
 - spec-driver
@@ -76,12 +76,7 @@ Legacy alias:
 
 ## Important Caveat
 
-DE-043 added **coverage status validation at the sync boundary**: unknown coverage
-statuses are now warned and excluded from requirement status derivation. The
-derivation function also references `VALID_COVERAGE_STATUSES` instead of
-hardcoded strings.
-
-Revision lifecycle ingestion in requirements registry still tolerates
+Revision lifecycle ingestion in requirements registry currently tolerates
 non-canonical status strings from payloads (it does not hard-validate against
 the canonical requirement enum on read).
 

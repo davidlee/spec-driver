@@ -2979,7 +2979,7 @@ requirements:
     primary_spec: PROD-016
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -2989,7 +2989,7 @@ requirements:
     - VT-016-001
     coverage_entries:
     - artefact: VT-016-001
-      status: planned
+      status: verified
       kind: VT
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.FR-002:
@@ -3086,7 +3086,7 @@ requirements:
     primary_spec: PROD-016
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -3096,7 +3096,7 @@ requirements:
     - VT-016-004
     coverage_entries:
     - artefact: VT-016-004
-      status: planned
+      status: verified
       kind: VT
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.FR-007:
@@ -3125,7 +3125,7 @@ requirements:
     primary_spec: PROD-016
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -3135,7 +3135,7 @@ requirements:
     - VT-016-005
     coverage_entries:
     - artefact: VT-016-005
-      status: planned
+      status: verified
       kind: VT
     path: specify/product/PROD-016/PROD-016.md
   PROD-016.FR-009:

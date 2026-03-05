@@ -138,8 +138,8 @@ entries:
   - artefact: VT-016-001
     kind: VT
     requirement: PROD-016.FR-001
-    status: planned
-    notes: ".spec-driver/workflow.toml exists and is readable by spec-driver and agents."
+    status: verified
+    notes: "Verified by DE-031 VT-031-003: installer copies claude.settings.json + hooks with chmod +x. workflow.toml creation verified by test_initialize_creates_workflow_toml_with_detected_exec."
   - artefact: VT-016-002
     kind: VT
     requirement: PROD-016.FR-004
@@ -153,13 +153,13 @@ entries:
   - artefact: VT-016-004
     kind: VT
     requirement: PROD-016.FR-006
-    status: planned
-    notes: "Bootstrap generation produces ~30-line prescription with @references to modular runsheets."
+    status: verified
+    notes: "Verified by DE-031 VT-031-001: installer renders all four agent modules (exec/workflow/glossary/policy) from templates with config substitutions."
   - artefact: VT-016-005
     kind: VT
     requirement: PROD-016.FR-008
-    status: planned
-    notes: "Installed project-local guidance is config-tailored, path-rendered, and token-cheap."
+    status: verified
+    notes: "Verified by DE-031 VT-031-002: disabled primitives omitted from glossary/policy; paths reflect workflow.toml config."
   - artefact: VT-016-006
     kind: VT
     requirement: PROD-016.FR-009

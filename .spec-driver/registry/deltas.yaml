@@ -3356,7 +3356,7 @@ deltas:
         phase: IP-030-P02
   DE-031:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - boot_generated_agent_guidance
     slug: boot_generated_agent_guidance
     updated: '2026-03-01'
@@ -4778,6 +4778,150 @@ deltas:
         plan: IP-043
         delta: DE-043
         revision_links:
+          aligns_with:
+          - DR-043
+        specs:
+          primary:
+          - SPEC-122
+          collaborators:
+          - PROD-008
+          - PROD-009
+        requirements:
+          targets:
+          - PROD-008.FR-001
+          - PROD-009.FR-001
+          - PROD-009.FR-003
+          dependencies: []
+        phases:
+        - id: IP-043.PHASE-01
+        - id: IP-043.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-043.PHASE-01
+        plan: IP-043
+        delta: DE-043
+        objective: Add validation at the sync boundary so unknown coverage statuses
+          are warned and excluded from status derivation; refactor derivation to reference
+          the canonical vocabulary.
+        entrance_criteria:
+        - DR-043 reviewed and approved
+        - Existing tests passing (just check)
+        exit_criteria:
+        - Unknown coverage statuses excluded from derivation with warning
+        - _compute_status_from_coverage() references canonical set
+        - VALID_COVERAGE_STATUSES alias exported from verification.py
+        - All tests pass (just check)
+        - VT-043-001, VT-043-002, VT-043-003 verified
+        verification:
+          tests:
+          - VT-043-001
+          - VT-043-002
+          - VT-043-003
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Add VALID_COVERAGE_STATUSES alias to verification.py
+        - id: '1.2'
+          description: Write tests for unknown status filtering (TDD)
+        - id: '1.3'
+          description: Add validation in _apply_coverage_blocks()
+        - id: '1.4'
+          description: Refactor _compute_status_from_coverage() to use canonical set
+        - id: '1.5'
+          description: Verify all checks pass
+        risks:
+        - description: Extraction loop duplication makes the filter insertion repetitive
+          mitigation: Consider extracting a shared helper if the pattern is identical
+            across all four loops
+      - id: IP-043.PHASE-02
+        phase: IP-043.PHASE-02
+  DE-044:
+    kind: delta
+    status: draft
+    name: Delta - Centralize hardcoded workspace directory paths
+    slug: centralize_hardcoded_workspace_directory_paths
+    updated: '2026-03-05'
+    path: change/deltas/DE-044-centralize_hardcoded_workspace_directory_paths/DE-044.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-044
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-044
+        delta: DE-044
+        revision_links:
+          aligns_with:
+          - DR-044
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-044.PHASE-01
+        - id: IP-044.PHASE-02
+        - id: IP-044.PHASE-03
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-044.PHASE-01
+        plan: IP-044
+        delta: DE-044
+        objective: Add workspace directory constants and get_* helper functions to
+          core/paths.py with comprehensive unit tests.
+        entrance_criteria:
+        - DR-044 reviewed
+        - Existing paths.py read and understood
+        exit_criteria:
+        - All constants and helpers defined and exported
+        - Unit tests cover every constant and helper
+        - just lint + just pylint clean
+        - Existing test suite still passes
+        verification:
+          tests:
+          - VT-044-paths
+          evidence: []
+        tasks:
+        - id: '1.1'
+          summary: Add workspace root constants
+        - id: '1.2'
+          summary: Add subdirectory constants
+        - id: '1.3'
+          summary: Add get_* helper functions
+        - id: '1.4'
+          summary: Update __all__ exports
+        - id: '1.5'
+          summary: Write unit tests
+        - id: '1.6'
+          summary: Lint and verify
+        risks: []
+      - id: IP-044.PHASE-02
+        phase: IP-044.PHASE-02
+      - id: IP-044.PHASE-03
+        phase: IP-044.PHASE-03
+  DE-045:
+    kind: delta
+    status: draft
+    name: Memory graph navigation for agent discoverability
+    slug: memory_graph_navigation_for_agent_discoverability
+    updated: '2026-03-05'
+    path: change/deltas/DE-045-memory_graph_navigation_for_agent_discoverability/DE-045.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-045
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-045
+        delta: DE-045
+        revision_links:
           aligns_with: []
         specs:
           primary: []
@@ -4786,7 +4930,67 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-043-P01
+        - id: IP-045-P01
+          name: Graph domain + shared infrastructure
+          status: pending
+        - id: IP-045-P02
+          name: CLI wiring + integration tests
+          status: pending
+        - id: IP-045.PHASE-01
       phases:
-      - id: IP-043-P01
-        phase: IP-043-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-045.PHASE-01
+        plan: IP-045
+        delta: DE-045
+        objective: Build pure graph functions (backlinks, depth expansion) and formatters.
+          Migrate show_memory to emit_artifact and add body-only mode to the shared
+          helper. All domain code tested before CLI wiring in phase 2.
+        entrance_criteria:
+        - DE-045 scoped and decisions settled
+        exit_criteria:
+        - "compute_backlinks tested with real-world expectations (\u226510 backlinks\
+          \ for core-loop)"
+        - expand_link_graph tested with depth 0/1/2, cycles, and missing targets
+        - format_link_graph_table and format_link_graph_tree tested
+        - emit_artifact supports body_only mode with tests
+        - show_memory migrated to emit_artifact (no functional change to existing
+          flags)
+        - lint clean, all existing tests pass
+        verification:
+          tests:
+          - VT-backlinks
+          - VT-expand-graph
+          - VT-format-graph
+          - VT-body-only
+          - VT-emit-body
+          evidence: []
+        tasks:
+        - id: '1.1'
+          name: compute_backlinks pure function
+          status: pending
+        - id: '1.2'
+          name: expand_link_graph pure function
+          status: pending
+        - id: '1.3'
+          name: Graph formatters (table + tree)
+          status: pending
+        - id: '1.4'
+          name: Add body_only to emit_artifact
+          status: pending
+        - id: '1.5'
+          name: Migrate show_memory to emit_artifact
+          status: pending
+        risks:
+        - description: show_memory has custom logic (normalize_memory_id, registry.find)
+            that may not fit emit_artifact pattern cleanly
+          mitigation: "emit_artifact takes format_fn/json_fn callbacks \u2014 resolve/find\
+            \ stays in the command, emit handles output dispatch"
+      - id: IP-045-P01
+        name: Graph domain + shared infrastructure
+        status: pending
+        phase: IP-045-P01
+      - id: IP-045-P02
+        name: CLI wiring + integration tests
+        status: pending
+        phase: IP-045-P02

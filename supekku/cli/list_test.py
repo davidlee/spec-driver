@@ -788,5 +788,148 @@ Test improvement content.
     assert positions["ISSUE-002"] < positions["ISSUE-003"]
 
 
+class ListPlansTest(unittest.TestCase):
+  """Integration tests for list plans command (VT-list-plans)."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_plan("DE-100", "IP-100", "Draft plan alpha", "draft")
+    self._create_plan("DE-101", "IP-101", "Complete plan beta", "complete")
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_plan(
+    self, delta_id: str, plan_id: str, name: str, status: str,
+  ) -> None:
+    delta_dir = self.root / "change" / "deltas" / f"{delta_id}-sample"
+    delta_dir.mkdir(parents=True, exist_ok=True)
+    content = f"""---
+id: {plan_id}
+slug: {delta_id.lower()}_sample
+name: {name}
+created: '2026-03-01'
+updated: '2026-03-02'
+status: {status}
+kind: plan
+---
+
+```yaml supekku:plan.overview@v1
+schema: supekku.plan.overview
+version: 1
+plan: {plan_id}
+delta: {delta_id}
+phases:
+  - id: {plan_id}.PHASE-01
+    name: Phase 1
+    status: complete
+```
+
+# {plan_id}
+"""
+    (delta_dir / f"{plan_id}.md").write_text(content, encoding="utf-8")
+
+  def test_list_plans_basic(self) -> None:
+    result = self.runner.invoke(app, ["plans", "--root", str(self.root)])
+    assert result.exit_code == 0
+    assert "IP-100" in result.stdout
+    assert "IP-101" in result.stdout
+
+  def test_list_plans_status_filter(self) -> None:
+    result = self.runner.invoke(
+      app, ["plans", "--root", str(self.root), "-s", "complete"],
+    )
+    assert result.exit_code == 0
+    assert "IP-101" in result.stdout
+    assert "IP-100" not in result.stdout
+
+  def test_list_plans_substring_filter(self) -> None:
+    result = self.runner.invoke(
+      app, ["plans", "--root", str(self.root), "-f", "alpha"],
+    )
+    assert result.exit_code == 0
+    assert "IP-100" in result.stdout
+    assert "IP-101" not in result.stdout
+
+  def test_list_plans_filter_no_match(self) -> None:
+    result = self.runner.invoke(
+      app, ["plans", "--root", str(self.root), "-f", "nonexistent"],
+    )
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
+
+  def test_list_plans_json(self) -> None:
+    result = self.runner.invoke(
+      app, ["plans", "--root", str(self.root), "--json"],
+    )
+    assert result.exit_code == 0
+    assert '"IP-100"' in result.stdout
+    assert '"IP-101"' in result.stdout
+
+
+class ListFilterBackfillTest(unittest.TestCase):
+  """Integration tests for --filter backfill on list commands (VT-list-filters)."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_deltas()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_deltas(self) -> None:
+    for delta_id, name, status in [
+      ("DE-100", "Alpha feature", "draft"),
+      ("DE-101", "Beta bugfix", "in-progress"),
+    ]:
+      delta_dir = self.root / "change" / "deltas" / f"{delta_id}-sample"
+      delta_dir.mkdir(parents=True, exist_ok=True)
+      content = f"""---
+id: {delta_id}
+slug: {delta_id.lower()}_sample
+name: {name}
+created: '2026-03-01'
+updated: '2026-03-02'
+status: {status}
+kind: delta
+applies_to:
+  specs: []
+  requirements: []
+---
+
+# {delta_id}
+"""
+      (delta_dir / f"{delta_id}.md").write_text(content, encoding="utf-8")
+
+  def test_list_deltas_filter_narrows(self) -> None:
+    result = self.runner.invoke(
+      app, ["deltas", "--root", str(self.root), "-f", "alpha"],
+    )
+    assert result.exit_code == 0
+    assert "DE-100" in result.stdout
+    assert "DE-101" not in result.stdout
+
+  def test_list_deltas_filter_no_match(self) -> None:
+    result = self.runner.invoke(
+      app, ["deltas", "--root", str(self.root), "-f", "nonexistent"],
+    )
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
+
+  def test_list_deltas_filter_by_id(self) -> None:
+    result = self.runner.invoke(
+      app, ["deltas", "--root", str(self.root), "-f", "101"],
+    )
+    assert result.exit_code == 0
+    assert "DE-101" in result.stdout
+    assert "DE-100" not in result.stdout
+
+
 if __name__ == "__main__":
   unittest.main()

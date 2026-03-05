@@ -58,7 +58,7 @@ tasks:
     status: complete
   - id: "3.7"
     description: "Integration tests for list changes (VT-list-filters)"
-    status: pending
+    status: complete
   - id: "3.8"
     description: "Update IP-041 verification statuses + final just check"
     status: pending
@@ -141,7 +141,7 @@ just check
 | [x] | 3.4 | --filter on list deltas | [P] | Substring filter before regexp |
 | [x] | 3.5 | --filter on adrs/policies/standards/memories | [P] | Same pattern; 4 commands |
 | [x] | 3.6 | --filter + --truncate on list cards | [P] | Substring filter + truncate passed to formatter |
-| [ ] | 3.7 | Integration tests (VT-list-filters) | [ ] | After 3.3–3.6 |
+| [x] | 3.7 | Integration tests (VT-list-filters) | [ ] | 8 tests: 5 list plans + 3 list deltas filter |
 | [ ] | 3.8 | IP verification update + final check | [ ] | After 3.7 |
 
 ### Task Details

@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Any
 
 import yaml
 from rich.console import Console
@@ -121,4 +122,73 @@ class ChangeRegistry:
     return matches
 
 
-__all__ = ["ChangeRegistry"]
+@dataclass(frozen=True)
+class PlanSummary:
+  """Summary of an implementation plan for listing and display."""
+
+  id: str
+  status: str
+  name: str
+  slug: str
+  path: Path
+  updated: str
+  delta_id: str
+  phases: list[dict[str, Any]] = field(default_factory=list)
+
+
+def discover_plans(root: Path) -> list[PlanSummary]:
+  """Discover all implementation plans by scanning delta directories.
+
+  Scans ``change/deltas/*/IP-*.md``, parses frontmatter and the
+  ``plan.overview`` YAML block, and returns sorted ``PlanSummary`` objects.
+
+  Args:
+    root: Repository root path.
+
+  Returns:
+    List of PlanSummary objects sorted by ID.
+  """
+  from supekku.scripts.lib.blocks.plan import extract_plan_overview  # noqa: PLC0415
+  from supekku.scripts.lib.core.spec_utils import load_markdown_file  # noqa: PLC0415
+
+  deltas_dir = root / "change" / "deltas"
+  if not deltas_dir.exists():
+    return []
+
+  plans: list[PlanSummary] = []
+  for delta_dir in sorted(deltas_dir.iterdir()):
+    if not delta_dir.is_dir():
+      continue
+    for plan_file in sorted(delta_dir.glob("IP-*.md")):
+      try:
+        frontmatter, body = load_markdown_file(plan_file)
+      except Exception:  # noqa: BLE001
+        continue
+
+      plan_id = str(frontmatter.get("id", "")).strip()
+      if not plan_id:
+        continue
+
+      # Extract delta and phases from plan.overview block
+      delta_id = ""
+      phase_list: list[dict[str, Any]] = []
+      overview = extract_plan_overview(body, source_path=plan_file)
+      if overview:
+        delta_id = str(overview.data.get("delta", ""))
+        phase_list = list(overview.data.get("phases", []))
+
+      plans.append(PlanSummary(
+        id=plan_id,
+        status=str(frontmatter.get("status", "")),
+        name=str(frontmatter.get("name", "")),
+        slug=str(frontmatter.get("slug", "")),
+        path=plan_file,
+        updated=str(frontmatter.get("updated", "")),
+        delta_id=delta_id,
+        phases=phase_list,
+      ))
+
+  return sorted(plans, key=lambda p: p.id)
+
+
+__all__ = ["ChangeRegistry", "PlanSummary", "discover_plans"]

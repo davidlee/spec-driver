@@ -1,10 +1,10 @@
 ---
 id: POL-001
 title: 'POL-001: maximise code reuse, minimise sprawl'
-status: draft
+status: required
 created: '2025-11-04'
-updated: '2025-11-04'
-reviewed: '2025-11-04'
+updated: '2026-03-05'
+reviewed: '2026-03-05'
 owners: []
 supersedes: []
 superseded_by: []
@@ -12,41 +12,43 @@ standards: []
 specs: []
 requirements: []
 deltas: []
-related_policies: []
+related_policies: [POL-002]
 related_standards: []
-tags: [coding]
-summary: ''
+tags: [coding, maintainability, architecture]
+summary: 'Prefer reuse and consolidation over copy/paste; avoid needless duplication and sprawl.'
 ---
 
 # POL-001: maximise code reuse, minimise sprawl
 
 ## Statement
 
-Clear, concise statement of the policy rule that must be followed.
+When adding or modifying functionality, prefer reuse and consolidation over
+copy/paste or parallel implementations. If a capability already exists, extend
+or adapt it rather than introducing a competing variant.
+
+This does not require premature abstraction: start specific, but when duplication
+appears or reuse is clearly beneficial, extract or align the shared behavior.
 
 ## Rationale
 
-Why this policy exists. What problem does it solve? What value does it provide?
+Sprawl creates hidden divergence, increases maintenance cost, and makes changes
+riskier. Reuse keeps behavior consistent, improves searchability, and reduces
+the long-term surface area of the codebase.
 
 ## Scope
 
-Where and when this policy applies. What is included and excluded?
+Applies to all production code in this repository (including CLI, libraries, and
+tools). Tests may duplicate small inputs for clarity, but shared fixtures or
+domain behaviors should still be centralized.
 
-Examples:
-- Applies to: All production code in main codebase
-- Excludes: Prototypes, spikes, explicitly marked experimental code
+Excludes prototypes, spikes, and explicitly marked experimental code.
 
 ## Verification
 
-How compliance with this policy is verified or enforced.
-
-Examples:
-- Pre-commit hooks
-- CI/CD checks
-- Code review checklist
-- Audit procedures
+Code review should flag new duplication and ask for consolidation or reuse.
+Audits can track sprawl hotspots; standards or lint rules should be added if
+repeat issues appear.
 
 ## References
 
-- [Related ADRs, specs, or standards]
-- [External documentation or research]
+- (Add related standards or ADRs when created)

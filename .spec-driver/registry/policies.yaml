@@ -10,3 +10,12 @@ policies:
     reviewed: '2025-11-04'
     tags:
     - coding
+  POL-002:
+    id: POL-002
+    title: 'POL-002: Avoid magic strings and numbers'
+    status: draft
+    path: specify/policies/POL-002-avoid_magic_strings_and_numbers.md
+    summary: ''
+    created: '2026-03-05'
+    updated: '2026-03-05'
+    reviewed: '2026-03-05'

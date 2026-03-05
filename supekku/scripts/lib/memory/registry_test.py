@@ -471,6 +471,45 @@ memory_type: fact
       records = registry.collect()
       self.assertEqual(len(records), 1)
 
+  def test_collect_bodies_returns_body_text(self) -> None:
+    """collect_bodies returns {id: body_text} for all memories."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+      root = _setup_repo(
+        tmpdir,
+        files={
+          "mem.fact.test.md": MINIMAL_MEM,
+          "mem.signpost.auth.prereading.md": FULL_MEM,
+        },
+      )
+      registry = MemoryRegistry(root=root)
+      bodies = registry.collect_bodies()
+
+      self.assertEqual(len(bodies), 2)
+      self.assertIn("mem.fact.test", bodies)
+      self.assertIn("mem.signpost.auth.prereading", bodies)
+      self.assertIn("A simple fact for testing.", bodies["mem.fact.test"])
+      self.assertIn("Detailed body content", bodies["mem.signpost.auth.prereading"])
+
+  def test_collect_bodies_empty_directory(self) -> None:
+    """collect_bodies returns empty dict when no memories exist."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+      root = _setup_repo(tmpdir)
+      registry = MemoryRegistry(root=root)
+      self.assertEqual(registry.collect_bodies(), {})
+
+  def test_collect_bodies_strips_frontmatter(self) -> None:
+    """collect_bodies does not include frontmatter delimiters or content."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+      root = _setup_repo(
+        tmpdir,
+        files={"mem.fact.test.md": MINIMAL_MEM},
+      )
+      registry = MemoryRegistry(root=root)
+      bodies = registry.collect_bodies()
+      body = bodies["mem.fact.test"]
+      self.assertNotIn("---", body)
+      self.assertNotIn("id:", body)
+
   def test_to_dict_integration(self) -> None:
     """Records produced by collect serialize correctly via to_dict."""
     with tempfile.TemporaryDirectory() as tmpdir:

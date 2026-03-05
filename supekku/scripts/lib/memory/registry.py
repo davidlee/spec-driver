@@ -73,6 +73,23 @@ class MemoryRegistry:
 
     return MemoryRecord.from_frontmatter(path, frontmatter)
 
+  def collect_bodies(self) -> dict[str, str]:
+    """Collect body text for all memory records.
+
+    Reads each memory file, strips frontmatter, and returns the body.
+    Useful for graph operations (backlinks, link expansion).
+
+    Returns:
+      Dictionary mapping memory ID to body text.
+    """
+    records = self.collect()
+    bodies: dict[str, str] = {}
+    for mem_id, record in records.items():
+      _, body = load_markdown_file(Path(record.path))
+      if body:
+        bodies[mem_id] = body
+    return bodies
+
   def find(self, memory_id: str) -> MemoryRecord | None:
     """Find a specific memory record by ID.
 

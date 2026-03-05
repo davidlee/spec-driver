@@ -298,6 +298,142 @@ class ListMemoriesCommandTest(unittest.TestCase):
     assert "mem.fact.alpha" in result.stdout
 
 
+class ListMemoriesLinksToTest(unittest.TestCase):
+  """Integration tests for list memories --links-to."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self.mem_dir = self.root / "memory"
+    self.mem_dir.mkdir()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _write_memory_with_body(
+    self,
+    mem_id: str,
+    name: str,
+    body: str,
+    *,
+    status: str = "active",
+  ) -> Path:
+    """Write a memory file with custom body content."""
+    fm = {
+      "id": mem_id,
+      "name": name,
+      "kind": "memory",
+      "status": status,
+      "memory_type": "fact",
+      "created": "2026-01-15",
+      "updated": "2026-02-01",
+      "tags": [],
+      "summary": "",
+    }
+    path = self.mem_dir / f"{mem_id}.md"
+    content = f"---\n{yaml.safe_dump(fm, sort_keys=False)}---\n\n{body}\n"
+    path.write_text(content, encoding="utf-8")
+    return path
+
+  def test_links_to_returns_backlinkers(self) -> None:
+    """--links-to shows memories that link to the target."""
+    self._write_memory_with_body(
+      "mem.fact.hub", "Hub", "The hub memory."
+    )
+    self._write_memory_with_body(
+      "mem.fact.alpha", "Alpha", "See [[mem.fact.hub]] for details."
+    )
+    self._write_memory_with_body(
+      "mem.fact.beta", "Beta", "Unrelated content."
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--links-to", "mem.fact.hub", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0, f"Failed: {result.output}"
+    assert "mem.fact.alpha" in result.stdout
+    assert "mem.fact.beta" not in result.stdout
+
+  def test_links_to_no_backlinks(self) -> None:
+    """--links-to with no backlinks exits cleanly."""
+    self._write_memory_with_body(
+      "mem.fact.lonely", "Lonely", "Nobody links to me."
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--links-to", "mem.fact.lonely", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+
+  def test_links_to_multiple_backlinkers(self) -> None:
+    """--links-to returns all memories that link to the target."""
+    self._write_memory_with_body(
+      "mem.fact.hub", "Hub", "Central node."
+    )
+    self._write_memory_with_body(
+      "mem.fact.a", "A", "See [[mem.fact.hub]]."
+    )
+    self._write_memory_with_body(
+      "mem.fact.b", "B", "Also see [[mem.fact.hub]]."
+    )
+    self._write_memory_with_body(
+      "mem.fact.c", "C", "And [[mem.fact.hub]] too."
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--links-to", "mem.fact.hub", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "mem.fact.a" in result.stdout
+    assert "mem.fact.b" in result.stdout
+    assert "mem.fact.c" in result.stdout
+    assert "mem.fact.hub" not in result.stdout
+
+  def test_links_to_with_shorthand(self) -> None:
+    """--links-to accepts shorthand IDs (without mem. prefix)."""
+    self._write_memory_with_body(
+      "mem.fact.hub", "Hub", "Central."
+    )
+    self._write_memory_with_body(
+      "mem.fact.linker", "Linker", "See [[mem.fact.hub]]."
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--links-to", "fact.hub", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0, f"Failed: {result.output}"
+    assert "mem.fact.linker" in result.stdout
+
+  def test_links_to_json_output(self) -> None:
+    """--links-to works with --json output."""
+    self._write_memory_with_body(
+      "mem.fact.hub", "Hub", "Central."
+    )
+    self._write_memory_with_body(
+      "mem.fact.alpha", "Alpha", "See [[mem.fact.hub]]."
+    )
+
+    result = self.runner.invoke(
+      list_app,
+      ["memories", "--links-to", "mem.fact.hub", "--json", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    parsed = json.loads(result.stdout)
+    ids = [item["id"] for item in parsed["items"]]
+    assert "mem.fact.alpha" in ids
+
+
 class ShowMemoryCommandTest(unittest.TestCase):
   """Test cases for show memory CLI command."""
 
@@ -392,6 +528,207 @@ class ShowMemoryCommandTest(unittest.TestCase):
     result = self.runner.invoke(
       show_app,
       ["memory", "mem.fact.alpha", "--json", "--path", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 1
+    assert "mutually exclusive" in result.stderr.lower()
+
+
+class ShowMemoryLinksDepthTest(unittest.TestCase):
+  """Integration tests for show memory --links-depth."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self.mem_dir = self.root / "memory"
+    self.mem_dir.mkdir()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _write_memory_with_body(
+    self,
+    mem_id: str,
+    name: str,
+    body: str,
+    *,
+    memory_type: str = "fact",
+  ) -> Path:
+    """Write a memory file with custom body content."""
+    fm = {
+      "id": mem_id,
+      "name": name,
+      "kind": "memory",
+      "status": "active",
+      "memory_type": memory_type,
+      "created": "2026-01-15",
+      "updated": "2026-02-01",
+      "tags": [],
+      "summary": "",
+    }
+    path = self.mem_dir / f"{mem_id}.md"
+    content = f"---\n{yaml.safe_dump(fm, sort_keys=False)}---\n\n{body}\n"
+    path.write_text(content, encoding="utf-8")
+    return path
+
+  def test_links_depth_shows_graph_table(self) -> None:
+    """--links-depth 1 shows outgoing links as table."""
+    self._write_memory_with_body(
+      "mem.fact.root", "Root", "See [[mem.fact.child]]."
+    )
+    self._write_memory_with_body(
+      "mem.fact.child", "Child", "Leaf node."
+    )
+
+    result = self.runner.invoke(
+      show_app,
+      [
+        "memory", "mem.fact.root",
+        "--links-depth", "1",
+        "--root", str(self.root),
+      ],
+    )
+
+    assert result.exit_code == 0, f"Failed: {result.output}"
+    assert "mem.fact.root" in result.stdout
+    assert "mem.fact.child" in result.stdout
+
+  def test_links_depth_tree_format(self) -> None:
+    """--links-depth with --tree shows indented tree."""
+    self._write_memory_with_body(
+      "mem.fact.root", "Root", "See [[mem.fact.child]]."
+    )
+    self._write_memory_with_body(
+      "mem.fact.child", "Child", "Leaf node.", memory_type="pattern"
+    )
+
+    result = self.runner.invoke(
+      show_app,
+      [
+        "memory", "mem.fact.root",
+        "--links-depth", "1",
+        "--tree",
+        "--root", str(self.root),
+      ],
+    )
+
+    assert result.exit_code == 0, f"Failed: {result.output}"
+    # Tree format: indented child
+    assert "mem.fact.root" in result.stdout
+    assert "  mem.fact.child" in result.stdout
+
+  def test_links_depth_json_format(self) -> None:
+    """--links-depth with --json outputs structured JSON."""
+    self._write_memory_with_body(
+      "mem.fact.root", "Root", "See [[mem.fact.child]]."
+    )
+    self._write_memory_with_body(
+      "mem.fact.child", "Child", "Leaf."
+    )
+
+    result = self.runner.invoke(
+      show_app,
+      [
+        "memory", "mem.fact.root",
+        "--links-depth", "1",
+        "--json",
+        "--root", str(self.root),
+      ],
+    )
+
+    assert result.exit_code == 0, f"Failed: {result.output}"
+    parsed = json.loads(result.stdout)
+    assert isinstance(parsed, list)
+    ids = [n["id"] for n in parsed]
+    assert "mem.fact.root" in ids
+    assert "mem.fact.child" in ids
+
+  def test_links_depth_zero(self) -> None:
+    """--links-depth 0 shows only root node."""
+    self._write_memory_with_body(
+      "mem.fact.root", "Root", "See [[mem.fact.child]]."
+    )
+    self._write_memory_with_body(
+      "mem.fact.child", "Child", "Leaf."
+    )
+
+    result = self.runner.invoke(
+      show_app,
+      [
+        "memory", "mem.fact.root",
+        "--links-depth", "0",
+        "--root", str(self.root),
+      ],
+    )
+
+    assert result.exit_code == 0
+    assert "mem.fact.root" in result.stdout
+    assert "mem.fact.child" not in result.stdout
+
+  def test_links_depth_not_found(self) -> None:
+    """--links-depth on nonexistent memory errors."""
+    result = self.runner.invoke(
+      show_app,
+      [
+        "memory", "mem.fact.missing",
+        "--links-depth", "1",
+        "--root", str(self.root),
+      ],
+    )
+
+    assert result.exit_code == 1
+
+
+class ShowMemoryBodyOnlyTest(unittest.TestCase):
+  """Integration tests for show memory --body-only."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self.mem_dir = self.root / "memory"
+    self.mem_dir.mkdir()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def test_body_only_strips_frontmatter(self) -> None:
+    """--body-only outputs body without frontmatter."""
+    _write_memory_file(self.mem_dir, "mem.fact.alpha", "Body Test")
+
+    result = self.runner.invoke(
+      show_app,
+      ["memory", "mem.fact.alpha", "--body-only", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "---" not in result.stdout
+    assert "id:" not in result.stdout
+    assert "# Body Test" in result.stdout
+
+  def test_body_only_short_flag(self) -> None:
+    """-b is shorthand for --body-only."""
+    _write_memory_file(self.mem_dir, "mem.fact.alpha", "Short Flag")
+
+    result = self.runner.invoke(
+      show_app,
+      ["memory", "mem.fact.alpha", "-b", "--root", str(self.root)],
+    )
+
+    assert result.exit_code == 0
+    assert "# Short Flag" in result.stdout
+    assert "---" not in result.stdout
+
+  def test_body_only_mutually_exclusive_with_json(self) -> None:
+    """--body-only and --json are mutually exclusive."""
+    _write_memory_file(self.mem_dir, "mem.fact.alpha")
+
+    result = self.runner.invoke(
+      show_app,
+      ["memory", "mem.fact.alpha", "--body-only", "--json", "--root", str(self.root)],
     )
 
     assert result.exit_code == 1

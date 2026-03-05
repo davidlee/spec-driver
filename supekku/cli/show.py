@@ -445,7 +445,7 @@ def show_card(
 
 
 @app.command("memory")
-def show_memory(
+def show_memory(  # noqa: PLR0913
   memory_id: Annotated[
     str,
     typer.Argument(
@@ -472,11 +472,22 @@ def show_memory(
       help="Output body text only (no frontmatter)",
     ),
   ] = False,
+  links_depth: Annotated[
+    int | None,
+    typer.Option(
+      "--links-depth",
+      help="Expand outgoing link graph to N levels",
+    ),
+  ] = None,
+  tree: Annotated[
+    bool,
+    typer.Option("--tree", help="Show link graph as indented tree"),
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific memory record."""
   try:
-    from supekku.scripts.lib.memory.ids import normalize_memory_id
+    from supekku.scripts.lib.memory.ids import normalize_memory_id  # noqa: PLC0415
 
     normalized_id = normalize_memory_id(memory_id)
     registry = MemoryRegistry(root=root)
@@ -488,6 +499,30 @@ def show_memory(
         err=True,
       )
       raise typer.Exit(EXIT_FAILURE)
+
+    # Graph expansion mode
+    if links_depth is not None:
+      from supekku.scripts.lib.formatters.memory_formatters import (  # noqa: PLC0415
+        format_link_graph_json,
+        format_link_graph_table,
+        format_link_graph_tree,
+      )
+      from supekku.scripts.lib.memory.links import expand_link_graph  # noqa: PLC0415
+
+      all_records = registry.collect()
+      bodies = registry.collect_bodies()
+      names = {mid: r.name for mid, r in all_records.items()}
+      types = {mid: r.memory_type for mid, r in all_records.items()}
+      nodes = expand_link_graph(
+        normalized_id, bodies, names, types, max_depth=links_depth,
+      )
+      if json_output:
+        typer.echo(format_link_graph_json(nodes))
+      elif tree:
+        typer.echo(format_link_graph_tree(nodes))
+      else:
+        typer.echo(format_link_graph_table(nodes))
+      raise typer.Exit(EXIT_SUCCESS)
 
     repo_root = find_repo_root(root)
     ref = ArtifactRef(

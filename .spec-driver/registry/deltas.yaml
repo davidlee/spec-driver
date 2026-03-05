@@ -4966,7 +4966,7 @@ deltas:
         phase: IP-044.PHASE-03
   DE-045:
     kind: delta
-    status: in-progress
+    status: completed
     name: Memory graph navigation for agent discoverability
     slug: memory_graph_navigation_for_agent_discoverability
     updated: '2026-03-05'
@@ -4992,10 +4992,10 @@ deltas:
         phases:
         - id: IP-045-P01
           name: Graph domain + shared infrastructure
-          status: pending
+          status: complete
         - id: IP-045-P02
           name: CLI wiring + integration tests
-          status: pending
+          status: complete
         - id: IP-045.PHASE-01
       phases:
       - schema: supekku.phase.overview
@@ -5046,13 +5046,59 @@ deltas:
             that may not fit emit_artifact pattern cleanly
           mitigation: "emit_artifact takes format_fn/json_fn callbacks \u2014 resolve/find\
             \ stays in the command, emit handles output dispatch"
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-045.PHASE-02
+        plan: IP-045
+        delta: DE-045
+        objective: Wire phase-1 domain functions into CLI commands. Add --links-to
+          filter to list memories, --links-depth/--tree to show memory. Integration
+          tests for all new CLI flags. Agent walkthrough (VA).
+        entrance_criteria:
+        - Phase 1 complete, all domain tests green
+        - emit_artifact supports body_only mode
+        - show_memory uses emit_artifact
+        exit_criteria:
+        - list memories --links-to <id> returns matching backlinkers
+        - show memory --links-depth N outputs graph table (default) or tree (--tree)
+        - show memory --body-only outputs body without frontmatter (already wired)
+        - CLI integration tests for --links-to, --links-depth, --tree, --body-only
+        - VA agent walkthrough documented
+        - lint clean, all tests pass
+        verification:
+          tests:
+          - VT-cli-links-to
+          - VT-cli-links-depth
+          - VT-cli-body-only
+          - VA-agent-walkthrough
+          evidence: []
+        tasks:
+        - id: '2.1'
+          name: MemoryRegistry.collect_bodies() helper
+          status: done
+        - id: '2.2'
+          name: Wire --links-to into list memories
+          status: done
+        - id: '2.3'
+          name: Wire --links-depth and --tree into show memory
+          status: done
+        - id: '2.4'
+          name: CLI integration tests
+          status: done
+        - id: '2.5'
+          name: Agent walkthrough (VA)
+          status: done
+        risks:
+        - description: list memories --links-to changes the semantics of the output
+            (shows sources, not the target)
+          mitigation: Clear help text; output format unchanged (same table columns)
       - id: IP-045-P01
         name: Graph domain + shared infrastructure
-        status: pending
+        status: complete
         phase: IP-045-P01
       - id: IP-045-P02
         name: CLI wiring + integration tests
-        status: pending
+        status: complete
         phase: IP-045-P02
   DE-046:
     kind: delta

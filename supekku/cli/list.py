@@ -2266,6 +2266,13 @@ def list_memories(  # noqa: PLR0913
       help="Output result as JSON (shorthand for --format=json)",
     ),
   ] = False,
+  links_to: Annotated[
+    str | None,
+    typer.Option(
+      "--links-to",
+      help="Show memories that link to this ID (backlinks)",
+    ),
+  ] = None,
   truncate: TruncateOption = False,
 ) -> None:
   """List memory records with optional filtering and scope matching.
@@ -2285,8 +2292,19 @@ def list_memories(  # noqa: PLR0913
   try:
     registry = MemoryRegistry(root=root)
 
+    # Step 0: backlink filter (overrides normal filter pipeline)
+    if links_to:
+      from supekku.scripts.lib.memory.ids import normalize_memory_id  # noqa: PLC0415
+      from supekku.scripts.lib.memory.links import compute_backlinks  # noqa: PLC0415
+
+      target_id = normalize_memory_id(links_to)
+      bodies = registry.collect_bodies()
+      backlinks = compute_backlinks(bodies)
+      source_ids = set(backlinks.get(target_id, []))
+      all_records = registry.collect()
+      records = [all_records[sid] for sid in sorted(source_ids) if sid in all_records]
     # Step 1: metadata pre-filter
-    if any([memory_type, tag]):
+    elif any([memory_type, tag]):
       records = registry.filter(
         memory_type=memory_type,
         tag=tag,

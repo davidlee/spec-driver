@@ -803,7 +803,11 @@ class ListPlansTest(unittest.TestCase):
     self.tmpdir.cleanup()
 
   def _create_plan(
-    self, delta_id: str, plan_id: str, name: str, status: str,
+    self,
+    delta_id: str,
+    plan_id: str,
+    name: str,
+    status: str,
   ) -> None:
     delta_dir = self.root / "change" / "deltas" / f"{delta_id}-sample"
     delta_dir.mkdir(parents=True, exist_ok=True)
@@ -840,7 +844,8 @@ phases:
 
   def test_list_plans_status_filter(self) -> None:
     result = self.runner.invoke(
-      app, ["plans", "--root", str(self.root), "-s", "complete"],
+      app,
+      ["plans", "--root", str(self.root), "-s", "complete"],
     )
     assert result.exit_code == 0
     assert "IP-101" in result.stdout
@@ -848,7 +853,8 @@ phases:
 
   def test_list_plans_substring_filter(self) -> None:
     result = self.runner.invoke(
-      app, ["plans", "--root", str(self.root), "-f", "alpha"],
+      app,
+      ["plans", "--root", str(self.root), "-f", "alpha"],
     )
     assert result.exit_code == 0
     assert "IP-100" in result.stdout
@@ -856,14 +862,16 @@ phases:
 
   def test_list_plans_filter_no_match(self) -> None:
     result = self.runner.invoke(
-      app, ["plans", "--root", str(self.root), "-f", "nonexistent"],
+      app,
+      ["plans", "--root", str(self.root), "-f", "nonexistent"],
     )
     assert result.exit_code == 0
     assert result.stdout.strip() == ""
 
   def test_list_plans_json(self) -> None:
     result = self.runner.invoke(
-      app, ["plans", "--root", str(self.root), "--json"],
+      app,
+      ["plans", "--root", str(self.root), "--json"],
     )
     assert result.exit_code == 0
     assert '"IP-100"' in result.stdout
@@ -909,7 +917,8 @@ applies_to:
 
   def test_list_deltas_filter_narrows(self) -> None:
     result = self.runner.invoke(
-      app, ["deltas", "--root", str(self.root), "-f", "alpha"],
+      app,
+      ["deltas", "--root", str(self.root), "-f", "alpha"],
     )
     assert result.exit_code == 0
     assert "DE-100" in result.stdout
@@ -917,14 +926,16 @@ applies_to:
 
   def test_list_deltas_filter_no_match(self) -> None:
     result = self.runner.invoke(
-      app, ["deltas", "--root", str(self.root), "-f", "nonexistent"],
+      app,
+      ["deltas", "--root", str(self.root), "-f", "nonexistent"],
     )
     assert result.exit_code == 0
     assert result.stdout.strip() == ""
 
   def test_list_deltas_filter_by_id(self) -> None:
     result = self.runner.invoke(
-      app, ["deltas", "--root", str(self.root), "-f", "101"],
+      app,
+      ["deltas", "--root", str(self.root), "-f", "101"],
     )
     assert result.exit_code == 0
     assert "DE-101" in result.stdout

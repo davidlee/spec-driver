@@ -4,7 +4,7 @@ slug: 041-cli_completeness_fill_obvious_command_gaps-phase-03
 name: "IP-041 Phase 03 — List improvements + final verification"
 created: '2026-03-04'
 updated: '2026-03-04'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -61,7 +61,7 @@ tasks:
     status: complete
   - id: "3.8"
     description: "Update IP-041 verification statuses + final just check"
-    status: pending
+    status: complete
 risks:
   - description: list.py is already 2158 lines; adding more commands increases maintenance burden
     likelihood: low
@@ -95,17 +95,17 @@ subcommand, backfill the `--filter` flag on 6 commands that lack it, add
 
 ## 3. Entrance Criteria
 - [x] Phase 2 complete (all show/view/edit/find subcommands wired and tested)
-- [ ] Existing test suite passing (`just check`)
-- [ ] DR-041 §4.8 reviewed
+- [x] Existing test suite passing (`just check`)
+- [x] DR-041 §4.8 reviewed
 
 ## 4. Exit Criteria / Done When
-- [ ] `list plans` with `--json/--format/--filter/--status/--truncate`
-- [ ] `format_plan_list_table()` tested
-- [ ] `--filter` on: deltas, adrs, policies, standards, memories
-- [ ] `--filter` + `--truncate` on: cards
-- [ ] Integration tests for all modified list commands
-- [ ] IP-041 verification statuses updated
-- [ ] `just check` green
+- [x] `list plans` with `--json/--format/--filter/--status/--truncate`
+- [x] `format_plan_list_table()` tested
+- [x] `--filter` on: deltas, adrs, policies, standards, memories
+- [x] `--filter` + `--truncate` on: cards
+- [x] Integration tests for all modified list commands
+- [x] IP-041 verification statuses updated
+- [x] `just check` green
 
 ## 5. Verification
 ```bash
@@ -142,7 +142,7 @@ just check
 | [x] | 3.5 | --filter on adrs/policies/standards/memories | [P] | Same pattern; 4 commands |
 | [x] | 3.6 | --filter + --truncate on list cards | [P] | Substring filter + truncate passed to formatter |
 | [x] | 3.7 | Integration tests (VT-list-filters) | [ ] | 8 tests: 5 list plans + 3 list deltas filter |
-| [ ] | 3.8 | IP verification update + final check | [ ] | After 3.7 |
+| [x] | 3.8 | IP verification update + final check | [ ] | All VTs verified, VA-lint verified, just check green |
 
 ### Task Details
 

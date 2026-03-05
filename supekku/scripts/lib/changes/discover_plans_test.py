@@ -124,8 +124,12 @@ class TestDiscoverPlans(RepoTestCase):
       {"id": "IP-100.PHASE-02", "name": "Phase 2", "status": "pending"},
     ]
     path = _write_plan(
-      root, "DE-100", "IP-100",
-      name="My Plan", status="in-progress", phases=phases,
+      root,
+      "DE-100",
+      "IP-100",
+      name="My Plan",
+      status="in-progress",
+      phases=phases,
     )
 
     result = discover_plans(root)
@@ -172,9 +176,13 @@ class TestDiscoverPlans(RepoTestCase):
     delta_dir = root / "change" / "deltas" / "DE-100-sample"
     delta_dir.mkdir(parents=True, exist_ok=True)
     frontmatter = {
-      "id": "DE-100", "slug": "x", "name": "Delta",
-      "created": "2026-03-01", "updated": "2026-03-01",
-      "status": "draft", "kind": "delta",
+      "id": "DE-100",
+      "slug": "x",
+      "name": "Delta",
+      "created": "2026-03-01",
+      "updated": "2026-03-01",
+      "status": "draft",
+      "kind": "delta",
     }
     dump_markdown_file(delta_dir / "DE-100.md", frontmatter, "# Delta\n")
     _write_plan(root, "DE-100", "IP-100")

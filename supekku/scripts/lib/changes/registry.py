@@ -177,16 +177,18 @@ def discover_plans(root: Path) -> list[PlanSummary]:
         delta_id = str(overview.data.get("delta", ""))
         phase_list = list(overview.data.get("phases", []))
 
-      plans.append(PlanSummary(
-        id=plan_id,
-        status=str(frontmatter.get("status", "")),
-        name=str(frontmatter.get("name", "")),
-        slug=str(frontmatter.get("slug", "")),
-        path=plan_file,
-        updated=str(frontmatter.get("updated", "")),
-        delta_id=delta_id,
-        phases=phase_list,
-      ))
+      plans.append(
+        PlanSummary(
+          id=plan_id,
+          status=str(frontmatter.get("status", "")),
+          name=str(frontmatter.get("name", "")),
+          slug=str(frontmatter.get("slug", "")),
+          path=plan_file,
+          updated=str(frontmatter.get("updated", "")),
+          delta_id=delta_id,
+          phases=phase_list,
+        )
+      )
 
   return sorted(plans, key=lambda p: p.id)
 

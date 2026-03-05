@@ -1361,5 +1361,46 @@ class TestFilterBackwardCompatibility:
     assert result.exit_code == 0
 
 
+class TestHelpTextContent:
+  """Test that help text includes output format and filter syntax docs."""
+
+  @pytest.mark.parametrize("cmd", [
+    ["list", "deltas"],
+    ["list", "specs"],
+    ["list", "requirements"],
+    ["list", "adrs"],
+  ])
+  def test_list_help_has_examples(self, cmd: list[str]) -> None:
+    """Each list command help should include usage examples."""
+    result = runner.invoke(app, [*cmd, "--help"])
+    assert result.exit_code == 0
+    assert "Examples:" in result.stdout or "examples:" in result.stdout.lower()
+
+  @pytest.mark.parametrize("cmd", [
+    ["list", "deltas"],
+    ["list", "specs"],
+    ["list", "requirements"],
+  ])
+  def test_list_help_shows_multi_value_syntax(self, cmd: list[str]) -> None:
+    """List command help should document multi-value filter syntax."""
+    result = runner.invoke(app, [*cmd, "--help"])
+    assert result.exit_code == 0
+    # Should show comma-separated syntax somewhere
+    assert "," in result.stdout
+
+  @pytest.mark.parametrize("cmd,flag", [
+    (["list", "deltas"], "--implements"),
+    (["list", "requirements"], "--verified-by"),
+    (["list", "specs"], "--informed-by"),
+  ])
+  def test_list_help_documents_reverse_flags(
+    self, cmd: list[str], flag: str,
+  ) -> None:
+    """List command help should document reverse relationship flags."""
+    result = runner.invoke(app, [*cmd, "--help"])
+    assert result.exit_code == 0
+    assert flag in result.stdout
+
+
 if __name__ == "__main__":
   pytest.main([__file__, "-v"])

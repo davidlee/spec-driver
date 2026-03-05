@@ -171,6 +171,11 @@ def list_specs(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID, slug, and name fields.
   The --informed-by flag filters by ADR ID (reverse relationship query).
+
+  Examples:
+    list specs -k prod,tech          # Multi-value kind filter
+    list specs -s active --json      # JSON output with status filter
+    list specs --informed-by ADR-001 # Specs informed by an ADR
   """
   # --json flag overrides --format
   if json_output:
@@ -401,6 +406,11 @@ def list_deltas(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag filters on ID, name, and slug fields.
   The --implements flag filters by requirement ID (reverse relationship query).
+
+  Examples:
+    list deltas -s draft,in-progress          # Multi-value status filter
+    list deltas --implements PROD-010.FR-004   # Reverse relationship query
+    list deltas --json                         # JSON output
   """
   # --json flag overrides --format
   if json_output:
@@ -783,6 +793,11 @@ def list_adrs(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag filters on title and summary fields.
   Other flags filter on specific structured fields (status, tags, references).
+
+  Examples:
+    list adrs -s accepted             # Filter by status
+    list adrs --spec SPEC-110 --json  # ADRs referencing a spec
+    list adrs -t cli                  # Filter by tag
   """
   # --json flag overrides --format
   if json_output:
@@ -1175,6 +1190,12 @@ def list_requirements(
   The --category flag does substring matching on category field.
   The --verified-by flag filters by verification artifact (supports glob patterns).
   Use --case-insensitive (-i) to make regexp and category filters case-insensitive.
+
+  Examples:
+    list requirements -k FR,NF                   # Multi-value kind filter
+    list requirements --verified-by "VT-CLI-*"   # Glob pattern match
+    list requirements --vstatus verified --json   # Verification status filter
+    list requirements --spec SPEC-110 --vkind VT  # Combined filters
   """
   # --json flag overrides --format
   if json_output:

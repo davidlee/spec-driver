@@ -299,5 +299,136 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "Available Frontmatter Schemas" not in result.stdout
 
 
+class EnumIntrospectionTest(unittest.TestCase):
+  """Test cases for schema show enums.* commands."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+
+  def test_show_enums_bare_lists_all(self) -> None:
+    """schema show enums lists all available enum paths."""
+    result = self.runner.invoke(app, ["show", "enums"])
+    assert result.exit_code == 0
+    assert "delta.status" in result.stdout
+    assert "requirement.status" in result.stdout
+    assert "verification.kind" in result.stdout
+    assert "verification.status" in result.stdout
+    assert "spec.kind" in result.stdout
+    assert "requirement.kind" in result.stdout
+    assert "command.format" in result.stdout
+
+  def test_show_enums_delta_status(self) -> None:
+    """schema show enums.delta.status returns sorted JSON array."""
+    result = self.runner.invoke(app, ["show", "enums.delta.status"])
+    assert result.exit_code == 0
+    import json
+    values = json.loads(result.stdout)
+    assert isinstance(values, list)
+    assert "draft" in values
+    assert "in-progress" in values
+    assert "completed" in values
+    assert "deferred" in values
+    # Legacy "complete" should be excluded
+    assert "complete" not in values
+    assert values == sorted(values)
+
+  def test_show_enums_requirement_status(self) -> None:
+    """schema show enums.requirement.status returns sorted JSON array."""
+    result = self.runner.invoke(app, ["show", "enums.requirement.status"])
+    assert result.exit_code == 0
+    import json
+    values = json.loads(result.stdout)
+    assert "pending" in values
+    assert "active" in values
+    assert "in-progress" in values
+    assert "retired" in values
+    assert values == sorted(values)
+
+  def test_show_enums_verification_status(self) -> None:
+    """schema show enums.verification.status returns sorted JSON array."""
+    result = self.runner.invoke(app, ["show", "enums.verification.status"])
+    assert result.exit_code == 0
+    import json
+    values = json.loads(result.stdout)
+    assert "planned" in values
+    assert "verified" in values
+    assert "failed" in values
+    assert "blocked" in values
+    assert values == sorted(values)
+
+  def test_show_enums_verification_kind(self) -> None:
+    """schema show enums.verification.kind returns sorted JSON array."""
+    result = self.runner.invoke(app, ["show", "enums.verification.kind"])
+    assert result.exit_code == 0
+    import json
+    values = json.loads(result.stdout)
+    assert values == ["VA", "VH", "VT"]
+
+  def test_show_enums_spec_kind(self) -> None:
+    """schema show enums.spec.kind returns sorted JSON array."""
+    result = self.runner.invoke(app, ["show", "enums.spec.kind"])
+    assert result.exit_code == 0
+    import json
+    values = json.loads(result.stdout)
+    assert values == ["prod", "tech"]
+
+  def test_show_enums_requirement_kind(self) -> None:
+    """schema show enums.requirement.kind returns sorted JSON array."""
+    result = self.runner.invoke(app, ["show", "enums.requirement.kind"])
+    assert result.exit_code == 0
+    import json
+    values = json.loads(result.stdout)
+    assert values == ["FR", "NF"]
+
+  def test_show_enums_command_format(self) -> None:
+    """schema show enums.command.format returns sorted JSON array."""
+    result = self.runner.invoke(app, ["show", "enums.command.format"])
+    assert result.exit_code == 0
+    import json
+    values = json.loads(result.stdout)
+    assert values == ["json", "table", "tsv"]
+
+  def test_show_enums_invalid_path(self) -> None:
+    """schema show enums.nonexistent.field returns error with available list."""
+    result = self.runner.invoke(app, ["show", "enums.nonexistent.field"])
+    assert result.exit_code == 1
+    assert "Unknown enum" in result.stdout
+    assert "delta.status" in result.stdout  # should list available
+
+  def test_show_enums_values_match_lifecycle_constants(self) -> None:
+    """Enum values match actual lifecycle constants (no drift)."""
+    import json
+
+    from supekku.scripts.lib.blocks.verification import (
+      VALID_KINDS as VER_KINDS,
+    )
+    from supekku.scripts.lib.blocks.verification import (
+      VALID_STATUSES as VER_STATUSES,
+    )
+    from supekku.scripts.lib.changes.lifecycle import (
+      VALID_STATUSES as CHANGE_STATUSES,
+    )
+    from supekku.scripts.lib.requirements.lifecycle import (
+      VALID_STATUSES as REQ_STATUSES,
+    )
+
+    result = self.runner.invoke(app, ["show", "enums.delta.status"])
+    delta_values = set(json.loads(result.stdout))
+    # delta enum should be subset of VALID_STATUSES (minus legacy "complete")
+    assert delta_values <= CHANGE_STATUSES
+
+    result = self.runner.invoke(app, ["show", "enums.requirement.status"])
+    req_values = set(json.loads(result.stdout))
+    assert req_values == REQ_STATUSES
+
+    result = self.runner.invoke(app, ["show", "enums.verification.status"])
+    ver_status_values = set(json.loads(result.stdout))
+    assert ver_status_values == VER_STATUSES
+
+    result = self.runner.invoke(app, ["show", "enums.verification.kind"])
+    ver_kind_values = set(json.loads(result.stdout))
+    assert ver_kind_values == VER_KINDS
+
+
 if __name__ == "__main__":
   unittest.main()

@@ -26,6 +26,7 @@ from supekku.scripts.lib.blocks.schema_registry import (
   get_block_schema,
   list_block_types,
 )
+from supekku.scripts.lib.core.enums import get_enum_values, list_enum_paths
 from supekku.scripts.lib.core.frontmatter_metadata import (
   FRONTMATTER_METADATA_REGISTRY,
   get_frontmatter_metadata,
@@ -139,6 +140,11 @@ def show_schema(
     list_schemas()
     return
 
+  # Check if this is an enum introspection request
+  if block_type == "enums" or block_type.startswith("enums."):
+    _show_enums(block_type)
+    return
+
   # Check if this is a frontmatter schema request
   if block_type.startswith("frontmatter."):
     _show_frontmatter_schema(block_type, format_type)
@@ -167,6 +173,33 @@ def show_schema(
     console.print(f"[red]Unknown format: {format_type}[/red]")
     console.print("Available formats: markdown, json, json-schema, yaml-example")
     raise typer.Exit(code=1)
+
+
+def _show_enums(block_type: str) -> None:
+  """Show enum values for a dotted path, or list all enum paths.
+
+  Args:
+    block_type: 'enums' (list all) or 'enums.<artifact>.<field>'
+  """
+  if block_type == "enums":
+    # List all available enum paths
+    paths = list_enum_paths()
+    for path in paths:
+      console.print(f"enums.{path}")
+    return
+
+  # Strip 'enums.' prefix to get the registry key
+  enum_path = block_type[len("enums."):]
+  values = get_enum_values(enum_path)
+
+  if values is None:
+    console.print(f"[red]Unknown enum: {enum_path}[/red]")
+    available = ", ".join(list_enum_paths())
+    console.print(f"Available enums: {available}")
+    raise typer.Exit(code=1)
+
+  # Output as plain JSON array (agent-friendly, no Rich formatting)
+  print(json.dumps(values))  # noqa: T201
 
 
 def _show_frontmatter_schema(block_type: str, format_type: str) -> None:

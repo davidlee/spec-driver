@@ -31,6 +31,24 @@ content-type output to preserve context.
 ## Notes
 - `show memory --raw` already exists; `--content-type` could standardize this
   across artifact types and serve as a short-hand.
+- ADR-002 prohibits storing backlinks in frontmatter — `--links-to` must use
+  runtime computation from forward references. Registry caching is permitted.
+- Default `show memory` already excludes body (metadata-only). The missing
+  inverse is `--body-only/-b` (body without frontmatter) for agents that
+  already have metadata and just want content.
+- The `--truncate` flag on `list memories` renders the table nearly unreadable —
+  the Status column includes the file path (`active[/memory....`). Worth
+  investigating separately.
+- Current corpus is ~35 memories with ~100 resolved links; `core-loop` is the
+  most connected node (12 inbound links). Performance of runtime backlink
+  computation is not a concern at this scale.
+
+## Deltas
+- DE-045: `--links-to`, `--links-depth N`, `--body-only` (agent discoverability)
+- Remaining: `resolve links --verbose`, `--path/--id` scoped resolution,
+  backlog item resolution (see also ISSUE-034)
 
 ## Related
+- ISSUE-034 (resolve links does not support backlog items)
 - ISSUE-036 (standardize show output selectors)
+- ADR-002 (do not store backlinks in frontmatter)

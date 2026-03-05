@@ -131,16 +131,23 @@ def update_requirement_lifecycle_status(
     # No change needed
     return False
 
+  # Capture pre-existing validation errors before update
+  validator = RevisionBlockValidator()
+  pre_errors = {
+    f"{err.render_path()}: {err.message}" for err in validator.validate(data)
+  }
+
   # Update status
   lifecycle["status"] = new_status
 
-  # Validate updated schema
-  validator = RevisionBlockValidator()
-  validation_errors = validator.validate(data)
-  if validation_errors:
-    error_msgs = [f"{err.render_path()}: {err.message}" for err in validation_errors]
+  # Validate: only reject if the update introduced NEW errors
+  post_errors = {
+    f"{err.render_path()}: {err.message}" for err in validator.validate(data)
+  }
+  new_errors = post_errors - pre_errors
+  if new_errors:
     raise RevisionUpdateError(
-      "Updated block failed validation:\n" + "\n".join(error_msgs),
+      "Update introduced validation errors:\n" + "\n".join(sorted(new_errors)),
     )
 
   # Format and replace YAML

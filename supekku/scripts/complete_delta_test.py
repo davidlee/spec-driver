@@ -226,5 +226,110 @@ def test_bypass_flags_permitted_in_permissive_mode(flag_kwargs):
   # The key assertion: it got past the strict-mode gate
 
 
+class RevisionUpdateErrorOutputTest(unittest.TestCase):
+  """RevisionUpdateError must produce descriptive stderr output (VT-046-001)."""
+
+  def test_revision_update_error_prints_to_stderr(self) -> None:
+    """When RevisionUpdateError is raised, error message must appear on stderr."""
+    workspace = MagicMock()
+    delta = MagicMock()
+    delta.status = "in-progress"
+    delta.applies_to = {"requirements": ["SPEC-150.FR-001"]}
+    delta.path = MagicMock()
+    workspace.delta_registry.collect.return_value = {"DE-TEST": delta}
+
+    # Requirement exists and is not retired
+    req_mock = MagicMock()
+    req_mock.status = "pending"
+    workspace.requirements.records = {"SPEC-150.FR-001": req_mock}
+
+    permissive_config = {"strict_mode": False}
+
+    error_message = (
+      "Updated block failed validation:\nspecs[0].spec_id: must be a SPEC identifier"
+    )
+
+    with (
+      patch.object(
+        complete_delta_module,
+        "Workspace",
+      ) as mock_ws_cls,
+      patch(
+        "supekku.scripts.complete_delta.load_workflow_config",
+        return_value=permissive_config,
+      ),
+      patch.object(
+        complete_delta_module.sys.stdin,
+        "isatty",
+        return_value=False,
+      ),
+      patch(
+        "supekku.scripts.complete_delta.is_coverage_enforcement_enabled",
+        return_value=True,
+      ),
+      patch(
+        "supekku.scripts.complete_delta.check_coverage_completeness",
+        return_value=(True, []),
+      ),
+      patch(
+        "supekku.scripts.complete_delta.find_requirement_sources",
+        return_value={
+          "SPEC-150.FR-001": MagicMock(
+            revision_file=MagicMock(),
+            block_index=0,
+            requirement_index=0,
+          ),
+        },
+      ),
+      patch(
+        "supekku.scripts.complete_delta.update_requirement_lifecycle_status",
+        side_effect=complete_delta_module.RevisionUpdateError(error_message),
+      ),
+      patch("sys.stderr") as mock_stderr,
+    ):
+      mock_ws_cls.from_cwd.return_value = workspace
+      code = complete_delta_module.complete_delta("DE-TEST", force=True)
+
+    assert code == 1
+    # Verify error was printed to stderr
+    mock_stderr.write.assert_called()
+    stderr_output = "".join(
+      call.args[0] for call in mock_stderr.write.call_args_list if call.args
+    )
+    assert "Failed to update requirements" in stderr_output
+    assert error_message in stderr_output
+
+
+class DeltaNotFoundErrorOutputTest(unittest.TestCase):
+  """Delta not found must produce descriptive stderr output."""
+
+  def test_delta_not_found_prints_to_stderr(self) -> None:
+    """When delta ID is not found, error must appear on stderr."""
+    workspace = MagicMock()
+    workspace.delta_registry.collect.return_value = {"DE-001": MagicMock()}
+
+    permissive_config = {"strict_mode": False}
+    with (
+      patch.object(
+        complete_delta_module,
+        "Workspace",
+      ) as mock_ws_cls,
+      patch(
+        "supekku.scripts.complete_delta.load_workflow_config",
+        return_value=permissive_config,
+      ),
+      patch("sys.stderr") as mock_stderr,
+    ):
+      mock_ws_cls.from_cwd.return_value = workspace
+      code = complete_delta_module.complete_delta("DE-NONEXISTENT")
+
+    assert code == 1
+    stderr_output = "".join(
+      call.args[0] for call in mock_stderr.write.call_args_list if call.args
+    )
+    assert "DE-NONEXISTENT" in stderr_output
+    assert "not found" in stderr_output
+
+
 if __name__ == "__main__":
   unittest.main()

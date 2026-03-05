@@ -304,7 +304,11 @@ def update_requirements_in_revision_sources(
         )
         if changed:
           pass
-    except RevisionUpdateError:
+    except RevisionUpdateError as e:
+      print(
+        f"Error: Failed to update requirements in revision files: {e}",
+        file=sys.stderr,
+      )
       return False
 
     if tracked:
@@ -380,6 +384,10 @@ def handle_already_completed_delta(
       force=True,  # Already confirmed above
     )
     if not success:
+      print(
+        f"Error: Failed to fix requirement statuses for {delta_id}",
+        file=sys.stderr,
+      )
       return 1
 
     # Sync from source files
@@ -440,7 +448,11 @@ def complete_delta(
   delta_artifacts = delta_registry.collect()
 
   if delta_id not in delta_artifacts:
-    ", ".join(sorted(delta_artifacts.keys()))
+    available = ", ".join(sorted(delta_artifacts.keys()))
+    print(
+      f"Error: Delta {delta_id} not found. Available: {available}",
+      file=sys.stderr,
+    )
     return 1
 
   delta = delta_artifacts[delta_id]
@@ -462,6 +474,10 @@ def complete_delta(
     workspace,
   )
   if error:
+    print(
+      f"Error: Cannot complete {delta_id}: retired requirements found",
+      file=sys.stderr,
+    )
     return 1
 
   # Handle already-completed delta (idempotent mode)
@@ -480,6 +496,7 @@ def complete_delta(
 
   # Prompt for spec sync
   if not prompt_spec_sync(skip_sync, dry_run, force):
+    print("Error: Spec sync failed", file=sys.stderr)
     return 1
 
   # Show actions
@@ -528,6 +545,10 @@ def complete_delta(
       force=force,
     )
     if not success:
+      print(
+        f"Error: Failed to update requirement lifecycle for {delta_id}",
+        file=sys.stderr,
+      )
       return 1
 
     # Sync requirements from source files to pick up changes
@@ -535,6 +556,10 @@ def complete_delta(
 
   # Perform delta updates
   if not update_delta_frontmatter(delta.path, delta_id):
+    print(
+      f"Error: Failed to update delta frontmatter for {delta_id}",
+      file=sys.stderr,
+    )
     return 1
 
   # Sync delta registry to reflect changes

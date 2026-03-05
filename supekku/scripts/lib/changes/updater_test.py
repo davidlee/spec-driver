@@ -202,3 +202,78 @@ requirements:
     content = revision_file.read_text(encoding="utf-8")
     assert "lifecycle:" in content
     assert "status: active" in content
+
+
+# --- Diff-based validation tests (DEC-046-01) ---
+
+# Revision with pre-existing validation issues: PROD-* in spec_id (expects SPEC-*)
+# and introduced_by doesn't match RE pattern.
+REVISION_WITH_PREEXISTING_ERRORS = """---
+id: RE-010
+name: Test Revision With Pre-existing Issues
+status: completed
+kind: revision
+---
+
+# RE-010
+
+```yaml supekku:revision.change@v1
+schema: supekku.revision.change
+version: 1
+metadata:
+  revision: RE-010
+specs:
+  - spec_id: PROD-008
+    action: updated
+requirements:
+  - requirement_id: PROD-008.FR-001
+    kind: functional
+    action: introduce
+    destination:
+      spec: PROD-008
+      requirement_id: PROD-008.FR-001
+    lifecycle:
+      status: pending
+      introduced_by: DE-007
+```
+"""
+
+
+def test_update_succeeds_with_preexisting_validation_errors() -> None:
+  """Targeted update should succeed when block has pre-existing errors."""
+  with TemporaryDirectory() as tmpdir:
+    revision_file = Path(tmpdir) / "RE-010.md"
+    revision_file.write_text(REVISION_WITH_PREEXISTING_ERRORS, encoding="utf-8")
+
+    # This would previously fail because the entire block fails validation
+    # (PROD-008 in spec_id, DE-007 in introduced_by).
+    # With diff-based validation, it should succeed because the update
+    # (pending → active) doesn't introduce NEW errors.
+    changed = update_requirement_lifecycle_status(
+      revision_file,
+      "PROD-008.FR-001",
+      STATUS_ACTIVE,
+      block_index=0,
+      requirement_index=0,
+    )
+
+    assert changed is True
+    content = revision_file.read_text(encoding="utf-8")
+    assert "status: active" in content
+
+
+def test_update_rejects_genuinely_invalid_new_status() -> None:
+  """Update that introduces new validation errors should still be rejected."""
+  with TemporaryDirectory() as tmpdir:
+    revision_file = Path(tmpdir) / "RE-001.md"
+    revision_file.write_text(SAMPLE_REVISION_MD, encoding="utf-8")
+
+    # Invalid status is caught by the explicit check before validation
+    with pytest.raises(ValueError, match="Invalid status"):
+      update_requirement_lifecycle_status(
+        revision_file,
+        "SPEC-150.FR-001",
+        "bogus_status",
+        block_index=0,
+        requirement_index=0,
+      )

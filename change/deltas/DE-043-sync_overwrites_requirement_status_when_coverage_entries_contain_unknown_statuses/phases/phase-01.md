@@ -81,11 +81,11 @@ set. Write comprehensive tests.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `VALID_COVERAGE_STATUSES` alias exported from `verification.py`
-- [ ] `_apply_coverage_blocks()` warns and excludes entries with unknown statuses
-- [ ] `_compute_status_from_coverage()` references canonical set, not string literals
-- [ ] Invalid entries still stored on `record.coverage_entries` for transparency
-- [ ] All tests pass (`just check`)
+- [x] `VALID_COVERAGE_STATUSES` alias exported from `verification.py`
+- [x] `_apply_coverage_blocks()` warns on entries with unknown statuses
+- [x] `_compute_status_from_coverage()` references canonical set, not string literals
+- [x] Invalid entries still stored on `record.coverage_entries` for transparency
+- [x] All tests pass (`just check`) — 2605 passed, 9.56/10 pylint
 
 ## 5. Verification
 
@@ -106,11 +106,11 @@ set. Write comprehensive tests.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Add `VALID_COVERAGE_STATUSES` alias to `verification.py` | | DEC-043-02 |
-| [ ] | 1.2 | Write tests for unknown status filtering (TDD) | | VT-043-001, VT-043-002 |
-| [ ] | 1.3 | Add validation in `_apply_coverage_blocks()` | | DR-043 §4 |
-| [ ] | 1.4 | Refactor `_compute_status_from_coverage()` to use canonical set | | DR-043 §4 |
-| [ ] | 1.5 | Run `just check` and verify all gates pass | | |
+| [x] | 1.1 | Add `VALID_COVERAGE_STATUSES` alias to `verification.py` | | DEC-043-02 |
+| [x] | 1.2 | Write tests for unknown status filtering (TDD) | | VT-043-001, VT-043-002 |
+| [x] | 1.3 | Add validation in `_apply_coverage_blocks()` | | DR-043 §4; extracted `_extract_coverage_entries` helper |
+| [x] | 1.4 | Refactor `_compute_status_from_coverage()` to use canonical set | | DR-043 §4 |
+| [x] | 1.5 | Run `just check` and verify all gates pass | | 2605 passed, 9.56/10 pylint |
 
 ### Task Details
 
@@ -160,16 +160,24 @@ set. Write comprehensive tests.
 
 | Risk | Mitigation | Status |
 | --- | --- | --- |
-| Four identical extraction loops → repetitive filter insertion | Consider extracting shared helper if warranted | Monitor |
-| Filtering at ingestion vs derivation is a design fork | Resolve during 1.3; prefer simplest approach that satisfies DR intent | Open |
+| Four identical extraction loops → repetitive filter insertion | Extracted `_extract_coverage_entries` helper | Resolved |
+| Filtering at ingestion vs derivation is a design fork | Both: warn at ingestion, filter at derivation | Resolved |
 
 ## 9. Decisions & Outcomes
 
-*(Record during implementation)*
+- `2026-03-05` – **Design fork resolved**: warn at ingestion, let entries into
+  `coverage_map` (so `coverage_entries` stays complete for transparency), rely on
+  defensive filter in `_compute_status_from_coverage()` to exclude unknowns from
+  derivation. Two layers: warning at boundary + filter at derivation.
+- `2026-03-05` – **Extracted `_extract_coverage_entries` helper**: the four
+  identical extraction loops were consolidated into a single `@staticmethod`.
+  Warning logic lives in one place. Net reduction in code.
 
 ## 10. Findings / Research Notes
 
-*(Record during implementation)*
+- The four extraction loops in `_apply_coverage_blocks()` were exact duplicates
+  differing only in the source file variable. Extracting the helper was a clear
+  improvement and reduced the method from ~90 lines to ~10.
 
 ## 11. Wrap-up Checklist
 

@@ -25,7 +25,10 @@ from supekku.scripts.lib.blocks.revision import (
   RevisionBlockValidator,
   load_revision_blocks,
 )
-from supekku.scripts.lib.blocks.verification import load_coverage_blocks
+from supekku.scripts.lib.blocks.verification import (
+  VALID_COVERAGE_STATUSES,
+  load_coverage_blocks,
+)
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
@@ -537,6 +540,10 @@ class RequirementsRegistry:
   ) -> RequirementStatus | None:
     """Compute requirement status from aggregated coverage entries.
 
+    Only entries with statuses in VALID_COVERAGE_STATUSES are considered.
+    Unknown statuses are silently ignored (warnings are emitted at the
+    ingestion boundary in _apply_coverage_blocks).
+
     Applies precedence rules:
     - ANY 'failed' or 'blocked' → in-progress (needs attention)
     - ALL 'verified' → active
@@ -549,7 +556,9 @@ class RequirementsRegistry:
     if not entries:
       return None
 
-    statuses = {e.get("status") for e in entries if e.get("status")}
+    statuses = {
+      e.get("status") for e in entries if e.get("status") in VALID_COVERAGE_STATUSES
+    }
     if not statuses:
       return None
 
@@ -571,6 +580,45 @@ class RequirementsRegistry:
 
     return None
 
+  @staticmethod
+  def _extract_coverage_entries(
+    files: Iterable[Path],
+    coverage_map: dict[str, list[dict[str, Any]]],
+  ) -> None:
+    """Extract coverage entries from a set of artifact files into coverage_map.
+
+    Entries with unknown statuses are still recorded (for transparency in
+    coverage_entries) but a warning is emitted.  The downstream
+    _compute_status_from_coverage() independently filters unknown statuses
+    so they never influence derived requirement state.
+    """
+    for source_file in files:
+      try:
+        blocks = load_coverage_blocks(source_file)
+      except (ValueError, OSError):
+        continue
+      for block in blocks:
+        for entry in block.data.get("entries", []):
+          req_id = entry.get("requirement")
+          if not req_id:
+            continue
+          status = entry.get("status")
+          if status and status not in VALID_COVERAGE_STATUSES:
+            print(
+              f"WARNING: Coverage entry for {req_id} has unknown status "
+              f"{status!r} in {source_file.name}; "
+              f"entry will not influence derived requirement status",
+              file=sys.stderr,
+            )
+          coverage_map[req_id].append(
+            {
+              "source": source_file,
+              "artefact": entry.get("artefact"),
+              "status": status,
+              "kind": entry.get("kind"),
+            }
+          )
+
   def _apply_coverage_blocks(
     self,
     spec_files: Iterable[Path],
@@ -585,85 +633,8 @@ class RequirementsRegistry:
     """
     coverage_map: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
-    # Extract from specs
-    for spec_file in spec_files:
-      try:
-        blocks = load_coverage_blocks(spec_file)
-      except (ValueError, OSError):
-        continue
-      for block in blocks:
-        for entry in block.data.get("entries", []):
-          req_id = entry.get("requirement")
-          if not req_id:
-            continue
-          coverage_map[req_id].append(
-            {
-              "source": spec_file,
-              "artefact": entry.get("artefact"),
-              "status": entry.get("status"),
-              "kind": entry.get("kind"),
-            }
-          )
-
-    # Extract from deltas
-    for delta_file in delta_files:
-      try:
-        blocks = load_coverage_blocks(delta_file)
-      except (ValueError, OSError):
-        continue
-      for block in blocks:
-        for entry in block.data.get("entries", []):
-          req_id = entry.get("requirement")
-          if not req_id:
-            continue
-          coverage_map[req_id].append(
-            {
-              "source": delta_file,
-              "artefact": entry.get("artefact"),
-              "status": entry.get("status"),
-              "kind": entry.get("kind"),
-            }
-          )
-
-    # Extract from implementation plans
-    for plan_file in plan_files:
-      try:
-        blocks = load_coverage_blocks(plan_file)
-      except (ValueError, OSError):
-        continue
-      for block in blocks:
-        for entry in block.data.get("entries", []):
-          req_id = entry.get("requirement")
-          if not req_id:
-            continue
-          coverage_map[req_id].append(
-            {
-              "source": plan_file,
-              "artefact": entry.get("artefact"),
-              "status": entry.get("status"),
-              "kind": entry.get("kind"),
-            }
-          )
-
-    # Extract from audits
-    for audit_file in audit_files:
-      try:
-        blocks = load_coverage_blocks(audit_file)
-      except (ValueError, OSError):
-        continue
-      for block in blocks:
-        for entry in block.data.get("entries", []):
-          req_id = entry.get("requirement")
-          if not req_id:
-            continue
-          coverage_map[req_id].append(
-            {
-              "source": audit_file,
-              "artefact": entry.get("artefact"),
-              "status": entry.get("status"),
-              "kind": entry.get("kind"),
-            }
-          )
+    for files in (spec_files, delta_files, plan_files, audit_files):
+      self._extract_coverage_entries(files, coverage_map)
 
     # Update records
     for req_id, entries in coverage_map.items():

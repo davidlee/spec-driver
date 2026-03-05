@@ -6,6 +6,7 @@ import io
 import os
 import sys
 import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 
@@ -519,6 +520,32 @@ requirements:
     # Empty → None
     entries = []
     assert registry._compute_status_from_coverage(entries) is None
+
+  def test_compute_status_from_coverage_ignores_unknown_statuses(self) -> None:
+    """VT-043-002: Unknown statuses are filtered out of derivation."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    # Unknown status alone → None (no valid statuses to derive from)
+    entries = [{"status": "deferred"}]
+    assert registry._compute_status_from_coverage(entries) is None
+
+    # All unknown → None
+    entries = [{"status": "deferred"}, {"status": "acknowledged"}]
+    assert registry._compute_status_from_coverage(entries) is None
+
+    # Valid + unknown: unknown is ignored, valid drives derivation
+    entries = [{"status": "verified"}, {"status": "deferred"}]
+    assert registry._compute_status_from_coverage(entries) == STATUS_ACTIVE
+
+    # Multiple valid + unknown: derives from valid entries only
+    entries = [
+      {"status": "verified"},
+      {"status": "deferred"},
+      {"status": "planned"},
+    ]
+    assert registry._compute_status_from_coverage(entries) == STATUS_IN_PROGRESS
 
   def test_coverage_evidence_field_serialization(self) -> None:
     """VT-910: RequirementRecord with coverage_evidence serializes correctly."""
@@ -1238,6 +1265,74 @@ class TestRequirementCoverageEntries(unittest.TestCase):
     assert restored.coverage_entries == [
       {"artefact": "VT-001", "kind": "VT", "status": "verified"},
     ]
+
+  def test_unknown_coverage_status_excluded_from_derivation(self) -> None:
+    """VT-043-001: Entries with unknown statuses must not influence derived status."""
+    root = self._make_repo()
+
+    # Create a spec with a coverage block containing a mix of valid + unknown
+    spec_dir = root / "specify" / "tech" / "spec-043-example"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / "SPEC-043.md"
+    body = textwrap.dedent("""\
+      # SPEC-043
+
+      - FR-001: A requirement with mixed coverage statuses
+
+      ```yaml supekku:verification.coverage@v1
+      schema: supekku.verification.coverage
+      version: 1
+      subject: SPEC-043
+      entries:
+        - artefact: VT-001
+          kind: VT
+          requirement: SPEC-043.FR-001
+          status: verified
+        - artefact: VH-001
+          kind: VH
+          requirement: SPEC-043.FR-001
+          status: deferred
+      ```
+    """)
+    frontmatter = {
+      "id": "SPEC-043",
+      "slug": "spec-043",
+      "name": "Spec 043",
+      "status": "draft",
+      "kind": "spec",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+    }
+    dump_markdown_file(spec_path, frontmatter, body)
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+
+    old_stderr = sys.stderr
+    sys.stderr = io.StringIO()
+    try:
+      registry.sync_from_specs(
+        [root / "specify" / "tech"],
+        spec_registry=spec_registry,
+      )
+      stderr_output = sys.stderr.getvalue()
+    finally:
+      sys.stderr = old_stderr
+
+    fr001 = registry.records["SPEC-043.FR-001"]
+
+    # Unknown status should NOT drag derivation to in-progress.
+    # Only the valid "verified" entry counts → status should be active.
+    assert fr001.status == STATUS_ACTIVE, (
+      f"Expected active (from verified entry only), got {fr001.status}"
+    )
+
+    # Warning should appear on stderr
+    assert "deferred" in stderr_output, (
+      "Expected warning about unknown status 'deferred' on stderr"
+    )
+    assert "SPEC-043.FR-001" in stderr_output or "SPEC-043" in stderr_output
 
 
 class TestFindByVerificationStatus(unittest.TestCase):

@@ -41,7 +41,7 @@ decisions:
   ADR-004:
     id: ADR-004
     title: 'ADR-004: canonical core workflow loop'
-    status: draft
+    status: accepted
     path: specify/decisions/ADR-004-canonical_workflow_loop.md
     summary: Define the single canonical spec-driver workflow loop, distinguish supported
       variants from canon, and reject spec-first aspirational doctrine as the default
@@ -95,6 +95,25 @@ decisions:
     title: 'ADR-006: consolidate workspace directories under .spec-driver'
     status: draft
     path: specify/decisions/ADR-006-consolidate_workspace_directories_under_spec_driver.md
+    summary: Canonical spec-driver workspace directories move under .spec-driver/
+      with backward-compat root symlinks; migration tooling and content reference
+      cleanup are deferred.
+    created: '2026-03-06'
+    updated: '2026-03-06'
+    reviewed: '2026-03-06'
+    related_decisions:
+    - ADR-001
+    - ADR-003
+    tags:
+    - architecture
+    - workspace
+    - install
+  ADR-007:
+    id: ADR-007
+    title: 'ADR-007: contracts are derived observed corpus with dedicated canonical
+      storage'
+    status: draft
+    path: specify/decisions/ADR-007-contracts_are_derived_observed_corpus_with_dedicated_canonical_storage.md
     summary: ''
     created: '2026-03-06'
     updated: '2026-03-06'

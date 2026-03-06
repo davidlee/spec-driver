@@ -27,19 +27,23 @@ def skills_sync() -> None:
 
   result = sync_skills(root)
 
-  # Per-target summary
-  for target_name, info in result["targets"].items():
-    installed = info["installed"]
-    pruned = info["pruned"]
-    parts: list[str] = []
-    if installed:
-      parts.append(f"installed {len(installed)}")
-    if pruned:
-      parts.append(f"pruned {len(pruned)}")
-    if parts:
-      typer.echo(f"  {target_name}: {', '.join(parts)}")
-    else:
-      typer.echo(f"  {target_name}: up to date")
+  # Canonical dir summary
+  canonical = result["canonical"]
+  installed = canonical["installed"]
+  pruned = canonical["pruned"]
+  parts: list[str] = []
+  if installed:
+    parts.append(f"installed {len(installed)}")
+  if pruned:
+    parts.append(f"pruned {len(pruned)}")
+  if parts:
+    typer.echo(f"  .spec-driver/skills: {', '.join(parts)}")
+  else:
+    typer.echo("  .spec-driver/skills: up to date")
+
+  # Symlink outcomes
+  for target_name, outcome in result["symlinks"].items():
+    typer.echo(f"  {target_name}: {outcome}")
 
   # AGENTS.md summary
   if result["agents_md_changed"]:

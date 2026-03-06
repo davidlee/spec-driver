@@ -57,8 +57,8 @@ def test_skills_sync_writes_output(tmp_path: Path) -> None:
   assert "1 skills" in result.output
 
 
-def test_skills_sync_reports_target_status(tmp_path: Path) -> None:
-  """CLI reports per-target install status."""
+def test_skills_sync_reports_symlink_status(tmp_path: Path) -> None:
+  """CLI reports per-target symlink outcomes."""
   root, source = _setup_repo(tmp_path)
   with (
     patch("supekku.cli.skills.find_repo_root", return_value=root),

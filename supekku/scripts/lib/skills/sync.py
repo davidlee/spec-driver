@@ -1,9 +1,12 @@
 """Allowlist-driven skills sync: install, prune, and expose skills in AGENTS.md.
 
 Reads `.spec-driver/skills.allowlist`, installs allowlisted skills from the
-package source (`supekku/skills/`) to configured agent target dirs
-(`.claude/skills/`, `.agents/skills/`), prunes de-listed skills, and writes
-a `<skills_system>` block to `.spec-driver/AGENTS.md`.
+package source (`supekku/skills/`) to `.spec-driver/skills/` (the canonical
+workspace copy), then ensures agent target dirs (`.claude/skills/`,
+`.agents/skills/`) are dir-level symlinks to the canonical location.
+
+Prunes de-listed skills from the canonical dir only.  Writes a
+`<skills_system>` block to `.spec-driver/AGENTS.md`.
 
 Root `AGENTS.md` and `CLAUDE.md` are updated with `@`-references to the
 managed file, controlled by `[integration]` in `workflow.toml`.
@@ -21,10 +24,20 @@ import yaml
 from supekku.scripts.lib.core.config import load_workflow_config
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, get_package_skills_dir
 
-# Agent-specific target directories (relative to repo root)
+# Canonical install location (relative to repo root)
+CANONICAL_SKILLS_DIR = Path(SPEC_DRIVER_DIR) / "skills"
+
+# Agent-specific target directories (relative to repo root).
+# Post-migration these become dir-level symlinks to CANONICAL_SKILLS_DIR.
 SKILL_TARGET_DIRS: dict[str, Path] = {
   "claude": Path(".claude") / "skills",
   "codex": Path(".agents") / "skills",
+}
+
+# Known compat children used to detect pre-migration workspaces.
+_COMPAT_CHILDREN: dict[str, tuple[str, ...]] = {
+  "specify": ("decisions", "policies", "product", "standards", "tech"),
+  "change": ("audits", "deltas", "revisions"),
 }
 
 ALLOWLIST_FILE = "skills.allowlist"
@@ -288,6 +301,95 @@ def prune_skills_from_target(
   return pruned
 
 
+# --- Target symlinks ---
+
+
+def _is_pre_migration_layout(repo_root: Path) -> bool:
+  """True if workspace has pre-DE-049 layout (real subdirs, not symlinks).
+
+  Checks known compat children of ``specify/`` and ``change/``.  If any
+  is a real directory (not a symlink), the workspace predates the
+  consolidated layout and skill target dirs contain vanilla copies that
+  are safe to replace with symlinks.
+  """
+  for parent, children in _COMPAT_CHILDREN.items():
+    parent_dir = repo_root / parent
+    for name in children:
+      child = parent_dir / name
+      if child.is_dir() and not child.is_symlink():
+        return True
+  return False
+
+
+def _ensure_target_symlinks(
+  repo_root: Path,
+  target_names: list[str],
+  package_skill_names: set[str],
+) -> dict[str, str]:
+  """Ensure agent target dirs are symlinks to the canonical skills dir.
+
+  For each configured target:
+
+  - Already a correct symlink → ``"ok"``
+  - Does not exist → create symlink → ``"created"``
+  - Real dir in pre-migration workspace → migrate (remove package-managed
+    skill dirs, replace with symlink if empty) → ``"migrated"``
+    or ``"kept"`` if user content remains
+  - Real dir in post-migration workspace → leave alone → ``"custom"``
+
+  Returns a dict mapping target name to outcome.
+  """
+  canonical = repo_root / CANONICAL_SKILLS_DIR
+  pre_migration = _is_pre_migration_layout(repo_root)
+  outcomes: dict[str, str] = {}
+
+  for name in target_names:
+    rel_path = SKILL_TARGET_DIRS.get(name)
+    if rel_path is None:
+      continue
+    target = repo_root / rel_path
+
+    # Compute relative symlink path from target's parent to canonical dir
+    # e.g. .claude/skills → ../.spec-driver/skills
+    link_target = Path("..") / CANONICAL_SKILLS_DIR
+
+    if target.is_symlink():
+      if target.resolve() == canonical.resolve():
+        outcomes[name] = "ok"
+      else:
+        # Symlink points elsewhere — leave it alone
+        outcomes[name] = "custom"
+      continue
+
+    if target.is_dir():
+      if not pre_migration:
+        # Post-migration real dir = intentional customisation
+        outcomes[name] = "custom"
+        continue
+
+      # Pre-migration: remove package-managed skill dirs, then replace
+      for child in sorted(target.iterdir()):
+        if child.is_dir() and child.name in package_skill_names:
+          shutil.rmtree(child)
+
+      # Replace with symlink only if dir is now empty
+      remaining = list(target.iterdir())
+      if not remaining:
+        target.rmdir()
+        target.symlink_to(link_target)
+        outcomes[name] = "migrated"
+      else:
+        outcomes[name] = "kept"
+      continue
+
+    # Does not exist — create parent and symlink
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.symlink_to(link_target)
+    outcomes[name] = "created"
+
+  return outcomes
+
+
 # --- Orchestration ---
 
 
@@ -318,32 +420,19 @@ def _collect_skills(
   return skills, warn_names
 
 
-def _sync_to_targets(
-  repo_root: Path,
-  source: Path,
-  target_names: list[str],
-  allowed: list[str],
-  package_names: set[str],
-) -> dict[str, dict]:
-  """Install and prune skills for each configured target.
-
-  Returns per-target summary dict.
-  """
-  targets: dict[str, dict] = {}
+def _validate_target_names(target_names: list[str]) -> list[str]:
+  """Filter target names, warning on unknowns. Returns valid names."""
+  valid: list[str] = []
   for name in target_names:
-    rel_path = SKILL_TARGET_DIRS.get(name)
-    if rel_path is None:
+    if name in SKILL_TARGET_DIRS:
+      valid.append(name)
+    else:
       warnings.warn(
         f"Unknown skill target '{name}'; skipping.",
         UserWarning,
         stacklevel=3,
       )
-      continue
-    abs_target = repo_root / rel_path
-    result = install_skills_to_target(source, abs_target, allowed)
-    pruned = prune_skills_from_target(abs_target, package_names, allowed)
-    targets[name] = {**result, "pruned": pruned}
-  return targets
+  return valid
 
 
 def _write_agents_md(
@@ -367,10 +456,11 @@ def sync_skills(
   *,
   skills_source_dir: Path | None = None,
 ) -> dict:
-  """Sync skills from package source to agent targets and update AGENTS.md.
+  """Sync skills from package source to canonical dir and update AGENTS.md.
 
-  Installs allowlisted skills to each configured target dir, prunes
-  de-listed package skills, and writes the AGENTS.md skills block.
+  Installs allowlisted skills to ``.spec-driver/skills/`` (once), prunes
+  de-listed skills (once), then ensures each agent target dir is a
+  symlink to the canonical location.  Writes the AGENTS.md skills block.
 
   Args:
     repo_root: Workspace root path.
@@ -380,7 +470,8 @@ def sync_skills(
     written: number of skills in AGENTS.md
     warnings: list of missing skill names
     agents_md_changed: whether .spec-driver/AGENTS.md was modified
-    targets: per-target install/prune summary
+    canonical: install/prune summary for .spec-driver/skills/
+    symlinks: per-target symlink outcome
   """
   source = skills_source_dir or get_package_skills_dir()
   config = load_workflow_config(repo_root)
@@ -388,14 +479,20 @@ def sync_skills(
     "targets",
     ["claude", "codex"],
   )
+  valid_targets = _validate_target_names(target_names)
 
   allowed = parse_allowlist(repo_root / SPEC_DRIVER_DIR / ALLOWLIST_FILE)
   package_names = get_package_skill_names(source)
-  targets = _sync_to_targets(
+
+  # Install and prune in canonical location only
+  canonical_dir = repo_root / CANONICAL_SKILLS_DIR
+  install_result = install_skills_to_target(source, canonical_dir, allowed)
+  pruned = prune_skills_from_target(canonical_dir, package_names, allowed)
+
+  # Ensure agent targets are symlinks to canonical dir
+  symlink_outcomes = _ensure_target_symlinks(
     repo_root,
-    source,
-    target_names,
-    allowed,
+    valid_targets,
     package_names,
   )
 
@@ -414,5 +511,6 @@ def sync_skills(
     "written": len(skills),
     "warnings": warn_names,
     "agents_md_changed": agents_md_changed,
-    "targets": targets,
+    "canonical": {**install_result, "pruned": pruned},
+    "symlinks": symlink_outcomes,
   }

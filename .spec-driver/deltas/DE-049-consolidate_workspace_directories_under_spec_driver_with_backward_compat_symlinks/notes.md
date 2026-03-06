@@ -196,3 +196,74 @@ Phase 4 (regression + cleanup):
 - Memory files (`mem.signpost.spec-driver.file-map` etc.) need updating
 - Consider whether `STANDARDS_SUBDIR` was previously missing from installer
   (pre-existing gap or introduced by this delta?)
+
+---
+
+## Design note: skill sync → symlinks (Phase 4 addition)
+
+### Context
+
+Currently `sync_skills()` copies every allowlisted skill directory from the
+package (`supekku/skills/<name>/`) into each agent target dir
+(`.claude/skills/<name>/`, `.agents/skills/<name>/`). This means:
+
+- Every skill exists 2–3 times on disk (package + 2 targets)
+- Every `spec-driver install` touches N×M files (N skills × M targets)
+- Commit noise: all target copies appear in git diffs
+
+### Decision: dir-level symlinks to `.spec-driver/skills/`
+
+Install skills once to `.spec-driver/skills/` (canonical workspace copy,
+allowlist-gated, pruned as before). Agent target dirs become dir-level symlinks:
+
+```
+.spec-driver/skills/       ← canonical (installed from package)
+  boot/
+  preflight/
+  ...
+.claude/skills             → ../.spec-driver/skills   (symlink)
+.agents/skills             → ../.spec-driver/skills   (symlink)
+```
+
+### Rationale
+
+- **Single source of truth**: one copy, two views.
+- **Less commit noise**: skill updates touch `.spec-driver/skills/` only;
+  symlinks don't change.
+- **Customisation path**: users can break the symlink and replace a target dir
+  with a real directory containing their own skills. The installer should
+  respect existing real dirs (don't clobber).
+- **Simpler prune**: only one directory to manage.
+
+### Trade-off: dir-level vs per-skill symlinks
+
+Dir-level chosen. Per-skill symlinks (`.claude/skills/boot → ...`) would allow
+different skill sets per agent target. In practice all targets use the same
+allowlist, so this flexibility is unused. If per-agent differentiation is ever
+needed, per-skill symlinks are an easy upgrade — the canonical dir stays the same.
+
+### Migration: existing workspaces with real target dirs
+
+Existing workspaces have real `.claude/skills/` and `.agents/skills/` dirs with
+copied content. On install:
+
+1. If the target is already a symlink pointing to the right place → skip.
+2. If the target is a real directory containing only package-managed skills →
+   safe to replace with symlink (the content is duplicated, not custom).
+3. If the target doesn't exist → create symlink.
+
+For (2), the simplest safe approach: delete the real dir contents that match
+package skill names (same pruning logic), then if the dir is empty, replace it
+with the symlink. If non-package skills remain (user-created), warn and leave
+the real dir in place. This matches the existing prune semantics — we already
+distinguish package skills from user skills by name.
+
+### Key implementation points
+
+- `install_skills_to_target()` → rename/refactor to install into
+  `repo_root / SPEC_DRIVER_DIR / "skills"` only.
+- New `_ensure_target_symlinks()`: for each target, create dir-level symlink.
+  Idempotent. Don't clobber real dirs that contain non-package content.
+- `prune_skills_from_target()` → operate on canonical dir only.
+- `sync_skills()`: install once → prune once → ensure symlinks per target.
+- Tests: verify symlink creation, idempotency, prune-then-symlink migration.

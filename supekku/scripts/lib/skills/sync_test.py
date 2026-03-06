@@ -1,4 +1,4 @@
-"""Tests for skills sync: allowlist, metadata, rendering, install, prune, AGENTS.md."""
+"""Tests for skills sync: allowlist, metadata, rendering, install, prune, symlinks."""
 
 from __future__ import annotations
 
@@ -8,7 +8,10 @@ from pathlib import Path
 from supekku.scripts.lib.skills.sync import (
   AGENTS_MD_REFERENCE,
   BOOT_MD_REFERENCE,
+  CANONICAL_SKILLS_DIR,
   SKILL_TARGET_DIRS,
+  _ensure_target_symlinks,
+  _is_pre_migration_layout,
   _skill_dir_matches,
   ensure_file_reference,
   get_package_skill_names,
@@ -52,6 +55,7 @@ def _setup_repo(tmp_path: Path) -> tuple[Path, Path]:
   """Create a minimal repo with skills source and allowlist.
 
   Returns (repo_root, skills_source_dir).
+  Post-migration layout: specify/tech is a symlink (not a real dir).
   """
   root = tmp_path / "repo"
   root.mkdir()
@@ -61,6 +65,20 @@ def _setup_repo(tmp_path: Path) -> tuple[Path, Path]:
 
   source = _make_source(tmp_path)
   return root, source
+
+
+def _make_pre_migration(root: Path) -> None:
+  """Add pre-migration layout markers (real dirs under specify/)."""
+  (root / "specify" / "tech").mkdir(parents=True)
+
+
+def _make_post_migration(root: Path) -> None:
+  """Add post-migration layout markers (symlinks under specify/)."""
+  specify = root / "specify"
+  specify.mkdir(exist_ok=True)
+  sd_specs = root / ".spec-driver" / "specs" / "tech"
+  sd_specs.mkdir(parents=True, exist_ok=True)
+  (specify / "tech").symlink_to(Path("..") / ".spec-driver" / "specs" / "tech")
 
 
 # --- allowlist parsing ---
@@ -415,6 +433,165 @@ def test_prune_nonexistent_target_dir(tmp_path: Path) -> None:
   assert pruned == []
 
 
+# --- _is_pre_migration_layout ---
+
+
+def test_pre_migration_layout_real_dir(tmp_path: Path) -> None:
+  """Returns True when specify/ has a real subdirectory."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  _make_pre_migration(root)
+  assert _is_pre_migration_layout(root) is True
+
+
+def test_pre_migration_layout_symlink(tmp_path: Path) -> None:
+  """Returns False when specify/ children are symlinks (post-migration)."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  (root / ".spec-driver").mkdir()
+  _make_post_migration(root)
+  assert _is_pre_migration_layout(root) is False
+
+
+def test_pre_migration_layout_no_specify(tmp_path: Path) -> None:
+  """Returns False when specify/ does not exist."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  assert _is_pre_migration_layout(root) is False
+
+
+def test_pre_migration_layout_change_dir(tmp_path: Path) -> None:
+  """Returns True when change/ has a real subdirectory."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  (root / "change" / "deltas").mkdir(parents=True)
+  assert _is_pre_migration_layout(root) is True
+
+
+# --- _ensure_target_symlinks ---
+
+
+def test_ensure_symlinks_creates_new(tmp_path: Path) -> None:
+  """Creates symlinks when target dirs do not exist."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  (root / ".spec-driver" / "skills").mkdir(parents=True)
+  (root / ".claude").mkdir()
+
+  outcomes = _ensure_target_symlinks(root, ["claude"], set())
+  assert outcomes["claude"] == "created"
+  target = root / ".claude" / "skills"
+  assert target.is_symlink()
+  assert target.resolve() == (root / CANONICAL_SKILLS_DIR).resolve()
+
+
+def test_ensure_symlinks_ok_when_correct(tmp_path: Path) -> None:
+  """Reports 'ok' when symlink already points to canonical dir."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  canonical = root / CANONICAL_SKILLS_DIR
+  canonical.mkdir(parents=True)
+  claude_dir = root / ".claude"
+  claude_dir.mkdir()
+  (claude_dir / "skills").symlink_to(Path("..") / CANONICAL_SKILLS_DIR)
+
+  outcomes = _ensure_target_symlinks(root, ["claude"], set())
+  assert outcomes["claude"] == "ok"
+
+
+def test_ensure_symlinks_custom_when_wrong_symlink(tmp_path: Path) -> None:
+  """Reports 'custom' when symlink points elsewhere."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  (root / CANONICAL_SKILLS_DIR).mkdir(parents=True)
+  other = root / "other_skills"
+  other.mkdir()
+  claude_dir = root / ".claude"
+  claude_dir.mkdir()
+  (claude_dir / "skills").symlink_to(other)
+
+  outcomes = _ensure_target_symlinks(root, ["claude"], set())
+  assert outcomes["claude"] == "custom"
+
+
+def test_ensure_symlinks_custom_post_migration_real_dir(tmp_path: Path) -> None:
+  """Reports 'custom' for real dir in post-migration workspace."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  (root / ".spec-driver" / "skills").mkdir(parents=True)
+  _make_post_migration(root)
+
+  # Real skills dir (user customisation)
+  (root / ".claude" / "skills" / "my-skill").mkdir(parents=True)
+
+  outcomes = _ensure_target_symlinks(root, ["claude"], set())
+  assert outcomes["claude"] == "custom"
+  # Real dir preserved
+  assert (root / ".claude" / "skills" / "my-skill").is_dir()
+
+
+def test_ensure_symlinks_migrates_pre_migration_real_dir(tmp_path: Path) -> None:
+  """Replaces real dir with symlink in pre-migration workspace."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  canonical = root / CANONICAL_SKILLS_DIR
+  canonical.mkdir(parents=True)
+  _make_pre_migration(root)
+
+  # Simulate old installer: real skills dir with package skills
+  target = root / ".claude" / "skills"
+  _make_skill(target, "boot", "Mandatory onboarding.")
+  _make_skill(target, "consult", "Obstacle handling.")
+
+  outcomes = _ensure_target_symlinks(
+    root,
+    ["claude"],
+    {"boot", "consult"},
+  )
+  assert outcomes["claude"] == "migrated"
+  assert target.is_symlink()
+  assert target.resolve() == canonical.resolve()
+
+
+def test_ensure_symlinks_keeps_pre_migration_with_user_content(
+  tmp_path: Path,
+) -> None:
+  """Keeps real dir when pre-migration target has non-package skills."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  (root / CANONICAL_SKILLS_DIR).mkdir(parents=True)
+  _make_pre_migration(root)
+
+  # Real dir with package + user skills
+  target = root / ".claude" / "skills"
+  _make_skill(target, "boot", "Mandatory onboarding.")
+  _make_skill(target, "my-custom", "User skill.")
+
+  outcomes = _ensure_target_symlinks(
+    root,
+    ["claude"],
+    {"boot"},
+  )
+  assert outcomes["claude"] == "kept"
+  assert target.is_dir()
+  assert not target.is_symlink()
+  # Package skill removed, user skill preserved
+  assert not (target / "boot").exists()
+  assert (target / "my-custom").is_dir()
+
+
+def test_ensure_symlinks_idempotent(tmp_path: Path) -> None:
+  """Second call returns 'ok' after initial creation."""
+  root = tmp_path / "repo"
+  root.mkdir()
+  (root / CANONICAL_SKILLS_DIR).mkdir(parents=True)
+  (root / ".claude").mkdir()
+
+  _ensure_target_symlinks(root, ["claude"], set())
+  outcomes = _ensure_target_symlinks(root, ["claude"], set())
+  assert outcomes["claude"] == "ok"
+
+
 # --- end-to-end sync ---
 
 
@@ -431,43 +608,53 @@ def test_sync_skills_writes_agents_md(tmp_path: Path) -> None:
   assert result["written"] == 2
 
 
-def test_sync_skills_installs_to_targets(tmp_path: Path) -> None:
-  """sync_skills installs skills to configured target directories."""
+def test_sync_skills_installs_to_canonical(tmp_path: Path) -> None:
+  """sync_skills installs skills to .spec-driver/skills/."""
   root, source = _setup_repo(tmp_path)
   result = sync_skills(root, skills_source_dir=source)
 
-  # Check both default targets
+  canonical = root / CANONICAL_SKILLS_DIR
+  assert (canonical / "boot" / "SKILL.md").is_file()
+  assert (canonical / "consult" / "SKILL.md").is_file()
+  assert set(result["canonical"]["installed"]) == {"boot", "consult"}
+
+
+def test_sync_skills_creates_target_symlinks(tmp_path: Path) -> None:
+  """sync_skills creates symlinks for agent target dirs."""
+  root, source = _setup_repo(tmp_path)
+  result = sync_skills(root, skills_source_dir=source)
+
+  canonical = root / CANONICAL_SKILLS_DIR
+  for target_name, target_path in SKILL_TARGET_DIRS.items():
+    abs_target = root / target_path
+    assert abs_target.is_symlink(), f"{target_name} is not a symlink"
+    assert abs_target.resolve() == canonical.resolve()
+
+  # Skills visible through symlinks
   for target_name, target_path in SKILL_TARGET_DIRS.items():
     abs_target = root / target_path
     assert (abs_target / "boot" / "SKILL.md").is_file(), (
-      f"boot not installed to {target_name}"
-    )
-    assert (abs_target / "consult" / "SKILL.md").is_file(), (
-      f"consult not installed to {target_name}"
+      f"boot not visible through {target_name}"
     )
 
-  assert "claude" in result["targets"]
-  assert "codex" in result["targets"]
+  assert result["symlinks"]["claude"] == "created"
+  assert result["symlinks"]["codex"] == "created"
 
 
-def test_sync_skills_prunes_from_targets(tmp_path: Path) -> None:
-  """sync_skills prunes de-listed skills from targets."""
+def test_sync_skills_prunes_from_canonical(tmp_path: Path) -> None:
+  """sync_skills prunes de-listed skills from canonical dir."""
   root, source = _setup_repo(tmp_path)
-  # First sync with boot + consult
   sync_skills(root, skills_source_dir=source)
 
-  # Now narrow allowlist to just boot
+  # Narrow allowlist to just boot
   sd = root / ".spec-driver"
   (sd / "skills.allowlist").write_text("boot\n", encoding="utf-8")
   result = sync_skills(root, skills_source_dir=source)
 
-  for target_name, target_path in SKILL_TARGET_DIRS.items():
-    abs_target = root / target_path
-    assert (abs_target / "boot").is_dir()
-    assert not (abs_target / "consult").exists(), (
-      f"consult not pruned from {target_name}"
-    )
-    assert "consult" in result["targets"][target_name]["pruned"]
+  canonical = root / CANONICAL_SKILLS_DIR
+  assert (canonical / "boot").is_dir()
+  assert not (canonical / "consult").exists()
+  assert "consult" in result["canonical"]["pruned"]
 
 
 def test_sync_skills_idempotent(tmp_path: Path) -> None:
@@ -480,10 +667,13 @@ def test_sync_skills_idempotent(tmp_path: Path) -> None:
   assert first == second
   assert result["agents_md_changed"] is False
 
-  # All targets should report up_to_date
-  for info in result["targets"].values():
-    assert info["installed"] == []
-    assert info["pruned"] == []
+  # Canonical dir should report up_to_date
+  assert result["canonical"]["installed"] == []
+  assert result["canonical"]["pruned"] == []
+
+  # Symlinks should report ok
+  for outcome in result["symlinks"].values():
+    assert outcome == "ok"
 
 
 def test_sync_skills_ensures_root_agents_reference(tmp_path: Path) -> None:
@@ -604,10 +794,11 @@ def test_sync_skills_respects_target_config(tmp_path: Path) -> None:
   (root / ".spec-driver" / "workflow.toml").write_text(toml, encoding="utf-8")
 
   result = sync_skills(root, skills_source_dir=source)
-  assert "claude" in result["targets"]
-  assert "codex" not in result["targets"]
+  assert "claude" in result["symlinks"]
+  assert "codex" not in result["symlinks"]
 
-  # Claude target should have skills
+  # Claude target should be a symlink with skills visible
+  assert (root / ".claude" / "skills").is_symlink()
   assert (root / ".claude" / "skills" / "boot" / "SKILL.md").is_file()
   # Codex target should not exist
   assert not (root / ".agents" / "skills").exists()
@@ -623,6 +814,6 @@ def test_sync_skills_unknown_target_warns(tmp_path: Path) -> None:
     _warnings.simplefilter("always")
     result = sync_skills(root, skills_source_dir=source)
 
-  assert "claude" in result["targets"]
-  assert "vscode" not in result["targets"]
+  assert "claude" in result["symlinks"]
+  assert "vscode" not in result["symlinks"]
   assert any("vscode" in str(w.message) for w in caught)

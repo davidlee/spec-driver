@@ -19,6 +19,7 @@ from supekku.scripts.lib.core.repo import find_repo_root
 from .artifacts import ChangeArtifact, load_change_artifact
 
 if TYPE_CHECKING:
+  from collections.abc import Iterator
   from pathlib import Path
 
 _KIND_TO_DIR_NAME = {
@@ -103,6 +104,38 @@ class ChangeRegistry:
     self.output_path.parent.mkdir(parents=True, exist_ok=True)
     text = yaml.safe_dump(serialised, sort_keys=False)
     self.output_path.write_text(text, encoding="utf-8")
+
+  def find(self, artifact_id: str) -> ChangeArtifact | None:
+    """Find a change artifact by its ID.
+
+    Returns:
+      ChangeArtifact or None if not found.
+    """
+    return self.collect().get(artifact_id)
+
+  def iter(self, *, status: str | None = None) -> Iterator[ChangeArtifact]:
+    """Iterate over change artifacts, optionally filtered by status.
+
+    Args:
+      status: If provided, yield only artifacts with this status.
+
+    Yields:
+      ChangeArtifact instances.
+    """
+    for artifact in self.collect().values():
+      if status is None or artifact.status == status:
+        yield artifact
+
+  def filter(self, *, status: str | None = None) -> list[ChangeArtifact]:
+    """Filter change artifacts by status (AND logic).
+
+    Args:
+      status: Filter by status field.
+
+    Returns:
+      List of matching ChangeArtifacts.
+    """
+    return list(self.iter(status=status))
 
   def find_by_implements(self, requirement_id: str | None) -> list[ChangeArtifact]:
     """Find change artifacts that implement a specific requirement.

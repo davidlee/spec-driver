@@ -1,5 +1,38 @@
 # Notes for DE-050
 
+## 2026-03-07 - Phase 1 complete (SpecRegistry + ChangeRegistry)
+
+### Done
+
+- **SpecRegistry** (`supekku/scripts/lib/specs/registry.py`):
+  - Added `find()`, `collect()`, `iter(status=)`, `filter(status=, category=, kind=, tag=)`
+  - `get()` now delegates to `find()` with `DeprecationWarning`
+  - `filter()` params chosen from Spec model properties: status, category, kind, tag
+- **ChangeRegistry** (`supekku/scripts/lib/changes/registry.py`):
+  - Added `find()`, `iter(status=)`, `filter(status=)`
+  - `collect()` already existed — `find()` and `iter()` delegate to it
+  - `filter()` has only `status` param; `kind` is constructor-level, not per-artifact
+- **Tests**: 16 new tests across both registries (29 total spec, 18 total change)
+- **Verification**: `just` passes — 2673 tests, ruff clean, pylint 9.55/10
+
+### Observations
+
+- ~10 callers of `SpecRegistry.get()` in production code — deprecation alias keeps
+  them all working. DeprecationWarnings visible in test output.
+- ChangeRegistry `find()`/`iter()` call `collect()` each time (lazy, re-parses).
+  Acceptable for current corpus size per ADR-009 §4.
+- ChangeRegistry `filter()` is minimal (status only). Could add `tag` later if
+  ChangeArtifact tags become used in practice.
+
+### Follow-up
+
+- Phase 2: Requirements, Card, Backlog registries (higher risk — constructor changes)
+- Existing callers of `get()` should migrate to `find()` in a future cleanup pass
+
+### Git state
+
+- Uncommitted work
+
 ## 2026-03-06 - ADR draft for registry convention
 
 - Drafted `ADR-009: standard registry API convention`.

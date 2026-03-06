@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import unittest
+import warnings
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.core.paths import (
@@ -344,6 +345,185 @@ class TestSpecRegistryReverseQueries(RepoTestCase):
     assert len(specs) == 1
     assert specs[0].id == "PROD-005"
     assert specs[0].kind == "prod"
+
+
+class TestSpecRegistryStandardSurface(RepoTestCase):
+  """Tests for ADR-009 standard registry surface: find, collect, iter, filter."""
+
+  def _make_repo(self) -> Path:
+    root = super()._make_repo()
+    os.chdir(root)
+    return root
+
+  def _write_spec(
+    self,
+    root: Path,
+    spec_id: str,
+    *,
+    status: str = "draft",
+    category: str = "",
+    tags: list[str] | None = None,
+    kind: str = "spec",
+  ) -> None:
+    subdir = TECH_SPECS_SUBDIR if kind == "spec" else PRODUCT_SPECS_SUBDIR
+    spec_dir = root / SPEC_DRIVER_DIR / subdir / f"{spec_id.lower()}-sample"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    fm: dict = {
+      "id": spec_id,
+      "slug": spec_id.lower(),
+      "name": f"Spec {spec_id}",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": status,
+      "kind": kind,
+    }
+    if category:
+      fm["category"] = category
+    if tags:
+      fm["tags"] = tags
+    dump_markdown_file(spec_dir / f"{spec_id}.md", fm, f"# {spec_id}\n")
+
+  # -- find() ---------------------------------------------------------------
+
+  def test_find_returns_spec(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001")
+    registry = SpecRegistry(root)
+    spec = registry.find("SPEC-001")
+    assert isinstance(spec, Spec)
+    assert spec.id == "SPEC-001"
+
+  def test_find_returns_none_for_missing(self) -> None:
+    root = self._make_repo()
+    registry = SpecRegistry(root)
+    assert registry.find("SPEC-999") is None
+
+  # -- get() deprecation ----------------------------------------------------
+
+  def test_get_delegates_to_find(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001")
+    registry = SpecRegistry(root)
+    with warnings.catch_warnings(record=True) as w:
+      warnings.simplefilter("always")
+      spec = registry.get("SPEC-001")
+    assert spec is not None
+    assert spec.id == "SPEC-001"
+    assert len(w) == 1
+    assert issubclass(w[0].category, DeprecationWarning)
+    assert "find()" in str(w[0].message)
+
+  # -- collect() ------------------------------------------------------------
+
+  def test_collect_returns_dict(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001")
+    self._write_spec(root, "SPEC-002")
+    registry = SpecRegistry(root)
+    result = registry.collect()
+    assert isinstance(result, dict)
+    assert "SPEC-001" in result
+    assert "SPEC-002" in result
+    assert isinstance(result["SPEC-001"], Spec)
+
+  def test_collect_returns_copy(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001")
+    registry = SpecRegistry(root)
+    a = registry.collect()
+    b = registry.collect()
+    assert a is not b
+
+  def test_collect_empty_registry(self) -> None:
+    root = self._make_repo()
+    registry = SpecRegistry(root)
+    assert registry.collect() == {}
+
+  # -- iter() ---------------------------------------------------------------
+
+  def test_iter_yields_all(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001", status="draft")
+    self._write_spec(root, "SPEC-002", status="active")
+    registry = SpecRegistry(root)
+    ids = {s.id for s in registry.iter()}
+    assert ids == {"SPEC-001", "SPEC-002"}
+
+  def test_iter_filters_by_status(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001", status="draft")
+    self._write_spec(root, "SPEC-002", status="active")
+    registry = SpecRegistry(root)
+    ids = {s.id for s in registry.iter(status="active")}
+    assert ids == {"SPEC-002"}
+
+  def test_iter_no_matches(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001", status="draft")
+    registry = SpecRegistry(root)
+    assert list(registry.iter(status="retired")) == []
+
+  # -- filter() -------------------------------------------------------------
+
+  def test_filter_by_status(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001", status="draft")
+    self._write_spec(root, "SPEC-002", status="active")
+    registry = SpecRegistry(root)
+    result = registry.filter(status="active")
+    assert len(result) == 1
+    assert result[0].id == "SPEC-002"
+
+  def test_filter_by_category(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001", category="unit")
+    self._write_spec(root, "SPEC-002", category="assembly")
+    registry = SpecRegistry(root)
+    result = registry.filter(category="unit")
+    assert len(result) == 1
+    assert result[0].id == "SPEC-001"
+
+  def test_filter_by_tag(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001", tags=["cli", "registry"])
+    self._write_spec(root, "SPEC-002", tags=["registry"])
+    registry = SpecRegistry(root)
+    result = registry.filter(tag="cli")
+    assert len(result) == 1
+    assert result[0].id == "SPEC-001"
+
+  def test_filter_by_kind(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001", kind="spec")
+    self._write_spec(root, "PROD-001", kind="prod")
+    registry = SpecRegistry(root)
+    result = registry.filter(kind="prod")
+    assert len(result) == 1
+    assert result[0].id == "PROD-001"
+
+  def test_filter_and_logic(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001", status="active", category="unit")
+    self._write_spec(root, "SPEC-002", status="active", category="assembly")
+    self._write_spec(root, "SPEC-003", status="draft", category="unit")
+    registry = SpecRegistry(root)
+    result = registry.filter(status="active", category="unit")
+    assert len(result) == 1
+    assert result[0].id == "SPEC-001"
+
+  def test_filter_no_params_returns_all(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001")
+    self._write_spec(root, "SPEC-002")
+    registry = SpecRegistry(root)
+    result = registry.filter()
+    assert len(result) == 2
+
+  def test_filter_no_matches_returns_empty(self) -> None:
+    root = self._make_repo()
+    self._write_spec(root, "SPEC-001", status="draft")
+    registry = SpecRegistry(root)
+    assert registry.filter(status="retired") == []
 
 
 if __name__ == "__main__":

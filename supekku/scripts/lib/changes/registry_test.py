@@ -264,5 +264,98 @@ class TestChangeRegistryReverseQueries(RepoTestCase):
     assert in_progress[0].id == "DE-102"
 
 
+class TestChangeRegistryStandardSurface(RepoTestCase):
+  """Tests for ADR-009 standard registry surface: find, iter, filter."""
+
+  def _create_repo(self) -> Path:
+    root = super()._make_repo()
+    os.chdir(root)
+    return root
+
+  def _write_delta(
+    self,
+    root: Path,
+    delta_id: str,
+    *,
+    status: str = "draft",
+  ) -> None:
+    bundle_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
+    bundle_dir.mkdir(parents=True, exist_ok=True)
+    path = bundle_dir / f"{delta_id}.md"
+    frontmatter = {
+      "id": delta_id,
+      "slug": delta_id.lower(),
+      "name": f"Delta {delta_id}",
+      "created": "2024-06-01",
+      "updated": "2024-06-02",
+      "status": status,
+      "kind": "delta",
+      "applies_to": {"requirements": [], "specs": []},
+    }
+    dump_markdown_file(path, frontmatter, f"# {delta_id}\n")
+
+  # -- find() ---------------------------------------------------------------
+
+  def test_find_returns_artifact(self) -> None:
+    root = self._create_repo()
+    self._write_delta(root, "DE-101")
+    registry = ChangeRegistry(root=root, kind="delta")
+    artifact = registry.find("DE-101")
+    assert artifact is not None
+    assert artifact.id == "DE-101"
+
+  def test_find_returns_none_for_missing(self) -> None:
+    root = self._create_repo()
+    registry = ChangeRegistry(root=root, kind="delta")
+    assert registry.find("DE-999") is None
+
+  # -- iter() ---------------------------------------------------------------
+
+  def test_iter_yields_all(self) -> None:
+    root = self._create_repo()
+    self._write_delta(root, "DE-101", status="draft")
+    self._write_delta(root, "DE-102", status="in-progress")
+    registry = ChangeRegistry(root=root, kind="delta")
+    ids = {a.id for a in registry.iter()}
+    assert ids == {"DE-101", "DE-102"}
+
+  def test_iter_filters_by_status(self) -> None:
+    root = self._create_repo()
+    self._write_delta(root, "DE-101", status="draft")
+    self._write_delta(root, "DE-102", status="in-progress")
+    registry = ChangeRegistry(root=root, kind="delta")
+    ids = {a.id for a in registry.iter(status="in-progress")}
+    assert ids == {"DE-102"}
+
+  def test_iter_empty(self) -> None:
+    root = self._create_repo()
+    registry = ChangeRegistry(root=root, kind="delta")
+    assert list(registry.iter()) == []
+
+  # -- filter() -------------------------------------------------------------
+
+  def test_filter_by_status(self) -> None:
+    root = self._create_repo()
+    self._write_delta(root, "DE-101", status="draft")
+    self._write_delta(root, "DE-102", status="completed")
+    registry = ChangeRegistry(root=root, kind="delta")
+    result = registry.filter(status="completed")
+    assert len(result) == 1
+    assert result[0].id == "DE-102"
+
+  def test_filter_no_params_returns_all(self) -> None:
+    root = self._create_repo()
+    self._write_delta(root, "DE-101")
+    self._write_delta(root, "DE-102")
+    registry = ChangeRegistry(root=root, kind="delta")
+    assert len(registry.filter()) == 2
+
+  def test_filter_no_matches_returns_empty(self) -> None:
+    root = self._create_repo()
+    self._write_delta(root, "DE-101", status="draft")
+    registry = ChangeRegistry(root=root, kind="delta")
+    assert registry.filter(status="completed") == []
+
+
 if __name__ == "__main__":
   unittest.main()

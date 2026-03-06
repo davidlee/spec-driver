@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.core.paths import get_product_specs_dir, get_tech_specs_dir
@@ -39,9 +40,73 @@ class SpecRegistry:
       expected_kind="prod",
     )
 
-  def get(self, spec_id: str) -> Spec | None:
-    """Get a spec by its ID."""
+  def find(self, spec_id: str) -> Spec | None:
+    """Find a spec by its ID.
+
+    Returns:
+      Spec or None if not found.
+    """
     return self._specs.get(spec_id)
+
+  def get(self, spec_id: str) -> Spec | None:
+    """Find a spec by ID. Deprecated — use find() instead."""
+    warnings.warn(
+      "SpecRegistry.get() is deprecated, use find() instead",
+      DeprecationWarning,
+      stacklevel=2,
+    )
+    return self.find(spec_id)
+
+  def collect(self) -> dict[str, Spec]:
+    """Return all specs as a dictionary keyed by ID.
+
+    Returns:
+      Copy of the internal spec dictionary.
+    """
+    return dict(self._specs)
+
+  def iter(self, *, status: str | None = None) -> Iterator[Spec]:
+    """Iterate over specs, optionally filtered by status.
+
+    Args:
+      status: If provided, yield only specs with this status.
+
+    Yields:
+      Spec instances.
+    """
+    for spec in self._specs.values():
+      if status is None or spec.status == status:
+        yield spec
+
+  def filter(
+    self,
+    *,
+    status: str | None = None,
+    category: str | None = None,
+    kind: str | None = None,
+    tag: str | None = None,
+  ) -> list[Spec]:
+    """Filter specs by multiple criteria (AND logic).
+
+    Args:
+      status: Filter by status field.
+      category: Filter by category (unit/assembly).
+      kind: Filter by kind (spec/prod).
+      tag: Filter by tag membership.
+
+    Returns:
+      List of matching Specs.
+    """
+    results = []
+    for spec in self.iter(status=status):
+      if category and spec.category != category:
+        continue
+      if kind and spec.kind != kind:
+        continue
+      if tag and tag not in spec.tags:
+        continue
+      results.append(spec)
+    return results
 
   def all_specs(self) -> list[Spec]:
     """Return all loaded specs."""

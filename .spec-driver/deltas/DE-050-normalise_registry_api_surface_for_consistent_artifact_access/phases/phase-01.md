@@ -72,12 +72,12 @@ already close to the target pattern, and changes are purely additive.
 - [x] ADR-009 accepted
 
 ## 4. Exit Criteria / Done When
-- [ ] SpecRegistry: `find()`, `collect()`, `iter()`, `filter()` implemented
-- [ ] SpecRegistry: `get()` emits `DeprecationWarning`, delegates to `find()`
-- [ ] ChangeRegistry: `find()`, `iter()`, `filter()` implemented
-- [ ] All existing registry tests pass unchanged
-- [ ] New unit tests cover every added method (hit, miss, edge cases)
-- [ ] `just` passes (tests + both linters)
+- [x] SpecRegistry: `find()`, `collect()`, `iter()`, `filter()` implemented
+- [x] SpecRegistry: `get()` emits `DeprecationWarning`, delegates to `find()`
+- [x] ChangeRegistry: `find()`, `iter()`, `filter()` implemented
+- [x] All existing registry tests pass unchanged
+- [x] New unit tests cover every added method (hit, miss, edge cases)
+- [x] `just` passes (tests + both linters)
 
 ## 5. Verification
 - Run: `just test` (full suite)
@@ -94,12 +94,12 @@ already close to the target pattern, and changes are purely additive.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | SpecRegistry: add `find()`, `collect()`, `iter()`, `filter()` | [P] | |
-| [ ] | 1.2 | SpecRegistry: deprecate `get()` → `find()` with warning | | After 1.1 |
-| [ ] | 1.3 | ChangeRegistry: add `find()`, `iter()`, `filter()` | [P] | Independent of 1.1 |
-| [ ] | 1.4 | Tests for SpecRegistry new methods | | After 1.1/1.2 |
-| [ ] | 1.5 | Tests for ChangeRegistry new methods | | After 1.3 |
-| [ ] | 1.6 | Lint + full test suite | | After all above |
+| [x] | 1.1 | SpecRegistry: add `find()`, `collect()`, `iter()`, `filter()` | [P] | done |
+| [x] | 1.2 | SpecRegistry: deprecate `get()` → `find()` with warning | | done |
+| [x] | 1.3 | ChangeRegistry: add `find()`, `iter()`, `filter()` | [P] | done |
+| [x] | 1.4 | Tests for SpecRegistry new methods | | 16 new tests |
+| [x] | 1.5 | Tests for ChangeRegistry new methods | | 7 new tests |
+| [x] | 1.6 | Lint + full test suite | | 2673 pass, ruff clean, pylint 9.55 |
 
 ### Task Details
 
@@ -134,7 +134,7 @@ already close to the target pattern, and changes are purely additive.
 ## 10. Findings / Research Notes
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (`just` passes — 2673 tests, ruff clean, pylint 9.55)
+- [x] Notes updated
 - [ ] Hand-off notes to Phase 2

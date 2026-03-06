@@ -633,11 +633,11 @@ Must achieve before declaring feature complete:
 - **Mitigation**: Implement protection mechanism - specs without code package links marked as "manual" (via frontmatter flag or detection heuristic); sync skips deletion for manual specs; add `--dry-run` mode to show what would be deleted
 - **Status**: CRITICAL - must address before widespread adoption
 
-**RISK-006**: Users don't add INIT.md reference to CLAUDE.md, agents can't invoke spec-driver
-- **Likelihood**: Very High (installer doesn't prompt; users skip setup step)
-- **Impact**: High (workflow completely broken; agents don't know how to call `uv run spec-driver`)
-- **Mitigation**: Installer script must prompt user to add `@supekku/INIT.md` to project CLAUDE.md; provide copy-paste instructions; verify reference exists before proceeding; create `spec-driver doctor` command to check setup
-- **Status**: BLOCKER for FR-001 - must implement in installer
+**RISK-006**: Onboarding references drift from the canonical boot path and agents miss current guidance
+- **Likelihood**: Medium (live bootstrap is now installed automatically, but stale local/project guidance can still drift)
+- **Impact**: Medium (agents may read stale instructions or miss local conventions)
+- **Mitigation**: Installer and skills sync must maintain the canonical bootstrap path via `@.spec-driver/agents/boot.md`, `@.spec-driver/AGENTS.md`, and `.spec-driver/README.md`; legacy onboarding docs such as `INIT.md` should not be part of the live boot path
+- **Status**: Mitigated - no longer a blocker for FR-001
 
 **RISK-007**: No workflow for completing existing/vestigial specs
 - **Likelihood**: Very High (users manually create specs, sync creates placeholder tech specs)
@@ -653,13 +653,10 @@ Must achieve before declaring feature complete:
 - Relationship discovery heuristics basic → could leverage NLP/semantic search for better suggestions
 - **HIGH PRIORITY**: No spec refinement/completion workflow → users with existing specs (manual or sync-generated) can't use guided workflow
 - Policy/constitution framework barely defined → need ADR/policy structure for team-specific preferences
-- **CRITICAL**: No `supekku/INIT.md` file exists yet → must create with spec-driver invocation patterns
-- **CRITICAL**: Installer doesn't guide CLAUDE.md setup → agents won't know how to invoke CLI
+- Legacy onboarding docs can drift from the canonical memories + skills layer if not removed
 - **CRITICAL**: Orphan detection lacks manual spec protection → risk of data loss
 
 **Backlog Items**:
-- `ISSUE-003`: Create supekku/INIT.md with invocation patterns for agents (CRITICAL)
-- `ISSUE-004`: Enhance installer to prompt CLAUDE.md setup with verification (BLOCKER)
 - `ISSUE-005`: Implement orphan detection protection for manual specs (CRITICAL)
 - `ISSUE-006`: Create spec refinement/completion workflow for existing specs (HIGH PRIORITY)
 - TODO: Test workflow on Codex and Gemini platforms

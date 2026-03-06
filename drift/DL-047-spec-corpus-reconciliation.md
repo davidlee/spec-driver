@@ -2,7 +2,7 @@
 id: DL-047
 name: Spec corpus reconciliation
 created: '2026-03-05'
-updated: '2026-03-05'
+updated: '2026-03-06'
 status: open
 kind: drift_ledger
 delta_ref: DE-047
@@ -222,22 +222,23 @@ docs.
     ref: PROD-001
     note: "RISK-006: INIT.md doesn't exist yet (BLOCKER)"
   - kind: doc
-    ref: supekku/INIT.md
-    note: "exists on disk but may be vestigial"
+    ref: AGENTS.md
+    note: "live agent bootstrap no longer references INIT.md"
 - claims:
   - kind: observation
     label: observed
-    text: "supekku/INIT.md exists, is referenced from CLAUDE.md, but the boot skill, agent memories, and AGENTS.md have superseded its onboarding role. It may also be vestigial dead code in the installer."
+    text: "INIT.md was a vestigial onboarding layer. The live boot path is now `.spec-driver/agents/boot.md` + `.spec-driver/AGENTS.md` + `.spec-driver/README.md`; INIT.md has been removed."
 - assessment: confirmed
 - resolution_path: DE
 - affected_artifacts:
   - PROD-001
-  - supekku/INIT.md
-  - CLAUDE.md
-- analysis: Two issues: (1) PROD-001 RISK-006 is stale and should be marked resolved. (2) INIT.md itself may be vestigial — the boot skill, memories, and a minimal project-local AGENTS.md are now the primary onboarding mechanism. Consider removing INIT.md from the installer in favour of the better agent infrastructure, and updating CLAUDE.md's @reference accordingly. This is larger than editorial — likely a small delta.
+  - AGENTS.md
+  - .spec-driver/README.md
+- analysis: PROD-001's INIT-based onboarding risk was stale. The canonical onboarding path is now boot skill + generated agent guidance + memory/skill routing; INIT.md has been removed from the live bootstrap and deleted.
 - evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
-  - 2026-03-05 adjudicated: INIT.md is vestigial dead code in the installer; should be removed in favour of boot skill + memories + minimal AGENTS.md. PROD-001 RISK-006 to be marked resolved. Needs its own small delta or backlog item.
+  - 2026-03-05 adjudicated: INIT.md is vestigial dead code in the installer; should be removed in favour of boot skill + memories + minimal AGENTS.md. PROD-001 RISK-006 to be marked resolved.
+  - 2026-03-06 implemented: removed `@supekku/INIT.md` from the live bootstrap path, deleted `supekku/INIT.md`, and updated PROD-001 to describe the current boot path.
 
 ### DL-047.007: Ceremony mode dual declaration — workflow.md vs workflow.toml
 

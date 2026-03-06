@@ -22,9 +22,10 @@ entrance_criteria:
 exit_criteria:
   - All 20 DL-047 entries at adjudicated or dismissed status
   - ADRs drafted for contracts and lifecycle topics
+  - Core loop ADR drafted
   - REs drafted for affected PROD specs
   - Every blocking/significant entry has resolution_ref populated
-  - Backlog items created for deferred work (.006, .010, .019, .020)
+  - Deferred work routed appropriately: resolved directly or backlogged (.010, .019, .020; .006 if still needed)
 verification:
   tests: []
   evidence:
@@ -119,15 +120,15 @@ backlog items) and link them back to the ledger as resolution references.
 | [x] | 2.1 | Adjudicate all triaged DL entries | | 11 entries resolved in human review session |
 | [ ] | 2.2 | Draft contracts ADR | | Covers .003, .004, .013: role, location, navigation |
 | [ ] | 2.3 | Draft lifecycle ADR | | Covers .009, .017, .018: normative vs observed truth |
-| [ ] | 2.3a | Draft core loop ADR | | Covers .021: canonical workflow + permutations. Blocking. |
+| [x] | 2.3a | Draft core loop ADR | | `ADR-004` drafted; now the canonical workflow doctrine for .021 |
 | [ ] | 2.4 | Draft RE on PROD-002 | | Covers .001, .011: phase-01 auto-creation reversal |
 | [ ] | 2.5 | Draft RE on PROD-003 | | Covers .005, .015: backlinks → runtime computed |
 | [ ] | 2.6 | Draft RE on PROD-012 | [P] | Covers .002, .012: flows aligned to contracts ADR |
 | [ ] | 2.7 | Draft RE on PROD-008/009 | [P] | Covers .009, .017, .018: lifecycle per ADR |
 | [ ] | 2.8 | Draft RE on PROD-016 | [P] | Covers .014: installer config semantics |
 | [ ] | 2.9 | Patch ADR-003 + CLAUDE.md | [P] | Covers .016: remove "interaction" c4_level |
-| [ ] | 2.10 | Patch doctrine/workflow/glossary | [P] | Covers .008: default posture clarity |
-| [ ] | 2.11 | Create backlog items | [P] | .006 (INIT.md), .010 (marker→toml), .019 (glossary merge), .020 (VCS) |
+| [~] | 2.10 | Patch doctrine/workflow/glossary | [P] | Broadened into guidance-layer cleanup: ADR-005, `.spec-driver/README.md`, `about/` + `docs/` reduction, memory updates |
+| [~] | 2.11 | Create backlog items | [P] | `.006` resolved directly in DE-047; `.010/.019/.020` still candidates for backlog/follow-up |
 | [ ] | 2.12 | Populate resolution_ref on DL entries | | After artifacts exist |
 
 ### Task Details
@@ -150,11 +151,11 @@ backlog items) and link them back to the ledger as resolution references.
 
 - **2.3a Core loop ADR**
   - Covers .021: the most important gap in the corpus
+  - Drafted as `ADR-004: canonical core workflow loop`
   - Canonically defines the core loop and its permutations:
-    delta-first (default), revision-first (concession), eager-spec-edit (status TBD), pioneer minimal
-  - Defines when each applies, what triggers the choice, what's optional vs mandatory
-  - Should become the single source agents read first for workflow understanding
-  - May later warrant its own PROD spec
+    delta-first (default), revision-first (concession), low-ceremony card path
+  - Establishes the anti-pattern boundary around spec-first aspirational doctrine
+  - Now the primary doctrinal source for workflow understanding; may later warrant its own PROD spec
 
 - **2.4–2.8 Spec Revisions**
   - Each RE is lightweight: document what changes and why
@@ -169,12 +170,19 @@ backlog items) and link them back to the ledger as resolution references.
   - Clarify polymorphic "card" concept in glossary
   - Clarify doctrine vs workflow relationship (config-dependent, not contradictory)
   - Clarify kanban = low-ceremony gateway
+  - Work broadened into guidance-layer cleanup once `ADR-005` made the target
+    documentation architecture explicit:
+    - `.spec-driver/README.md` added as installed router
+    - `.spec-driver/about/README.md` reduced to routing/reference
+    - duplicate `about/` and `docs/` handbook material removed
+    - active memories updated to become the canonical explanatory layer
 
 - **2.11 Backlog items**
-  - ISSUE for .006: remove INIT.md from installer
   - ISSUE for .010: migrate spec auto-create to workflow.toml
   - ISSUE for .019: consolidate glossaries
   - ISSUE for .020: VCS abstraction scope (link to PROD-011 FR-008)
+  - `.006` no longer needs backlog capture: `INIT.md` was removed directly in
+    DE-047 and `PROD-001` / DL-047 were updated to reflect the current boot path
 
 ## 8. Risks & Mitigations
 
@@ -195,3 +203,11 @@ backlog items) and link them back to the ledger as resolution references.
   - .010: workflow.toml canonical; small delta to migrate
   - .019: .contracts/ correct; consolidate glossaries later
   - .020: VCS gap acknowledged; backlog only
+
+- 2026-03-06 — Additional phase-02 progress landed directly in working tree:
+  - `ADR-004` drafted for .021 (core loop canon)
+  - `ADR-005` drafted to make memories + skills the canonical guidance layer
+  - `.006` implemented directly: removed `INIT.md`, updated live bootstrap,
+    patched `PROD-001`, updated DL-047
+  - duplicate `about/` and `docs/` guidance removed after porting surviving
+    value into memories

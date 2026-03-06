@@ -5,7 +5,7 @@ deltas:
     name: Delta - Python package-level spec granularity
     slug: python-package-level-spec-granularity
     updated: '2025-11-02'
-    path: change/deltas/DE-002-python-package-level-spec-granularity/DE-002.md
+    path: .spec-driver/deltas/DE-002-python-package-level-spec-granularity/DE-002.md
     applies_to:
       specs:
       - PROD-005
@@ -104,7 +104,7 @@ deltas:
     name: Delta - CLI Integration for Frontmatter Schema Show Commands
     slug: cli-integration-for-frontmatter-schema-show-commands
     updated: '2025-11-02'
-    path: change/deltas/DE-003-cli-integration-for-frontmatter-schema-show-commands/DE-003.md
+    path: .spec-driver/deltas/DE-003-cli-integration-for-frontmatter-schema-show-commands/DE-003.md
     applies_to:
       specs:
       - PROD-004
@@ -170,7 +170,7 @@ deltas:
     name: Delta - Phase Management Implementation
     slug: phase-management-implementation
     updated: '2025-11-03'
-    path: change/deltas/DE-004-phase-management-implementation/DE-004.md
+    path: .spec-driver/deltas/DE-004-phase-management-implementation/DE-004.md
     applies_to:
       specs:
       - PROD-006
@@ -450,7 +450,7 @@ deltas:
     name: Delta - implement spec backfill
     slug: implement-spec-backfill
     updated: '2025-11-02'
-    path: change/deltas/DE-005-implement-spec-backfill/DE-005.md
+    path: .spec-driver/deltas/DE-005-implement-spec-backfill/DE-005.md
     applies_to:
       specs:
       - PROD-007
@@ -525,7 +525,7 @@ deltas:
     name: Delta - Standardize CLI JSON output support
     slug: standardize-cli-json-output-support
     updated: '2025-11-02'
-    path: change/deltas/DE-006-standardize-cli-json-output-support/DE-006.md
+    path: .spec-driver/deltas/DE-006-standardize-cli-json-output-support/DE-006.md
     applies_to:
       specs:
       - SPEC-003
@@ -599,7 +599,7 @@ deltas:
     name: Delta - Lifecycle coverage enforcement
     slug: lifecycle-coverage-enforcement
     updated: '2025-11-03'
-    path: change/deltas/DE-007-lifecycle-coverage-enforcement/DE-007.md
+    path: .spec-driver/deltas/DE-007-lifecycle-coverage-enforcement/DE-007.md
     applies_to:
       specs:
       - PROD-008
@@ -720,7 +720,7 @@ deltas:
     name: Separate coverage evidence from audit verification
     slug: add-coverage-evidence
     updated: '2025-11-03'
-    path: change/deltas/DE-008-add-coverage-evidence/DE-008.md
+    path: .spec-driver/deltas/DE-008-add-coverage-evidence/DE-008.md
     applies_to:
       specs:
       - SPEC-122
@@ -870,7 +870,7 @@ deltas:
     name: Delta - CLI JSON consistency fixes
     slug: cli-json-consistency-fixes
     updated: '2025-01-04'
-    path: change/deltas/DE-009-cli-json-consistency-fixes/DE-009.md
+    path: .spec-driver/deltas/DE-009-cli-json-consistency-fixes/DE-009.md
     applies_to:
       specs:
       - SPEC-110
@@ -1081,7 +1081,7 @@ deltas:
     name: Delta - Policy and Standard Management
     slug: policy-and-standard-management
     updated: '2025-11-03'
-    path: change/deltas/DE-010-policy-and-standard-management/DE-010.md
+    path: .spec-driver/deltas/DE-010-policy-and-standard-management/DE-010.md
     applies_to:
       specs:
       - PROD-003
@@ -1400,7 +1400,7 @@ deltas:
     name: Delta - CLI enhanced filtering and self-documentation
     slug: cli-enhanced-filtering-and-self-documentation
     updated: '2025-11-03'
-    path: change/deltas/DE-011-cli-enhanced-filtering-and-self-documentation/DE-011.md
+    path: .spec-driver/deltas/DE-011-cli-enhanced-filtering-and-self-documentation/DE-011.md
     applies_to:
       specs:
       - SPEC-110
@@ -1599,7 +1599,7 @@ deltas:
     name: Delta - Restore Entry/Exit Criteria to IP Schema
     slug: restore-entry-exit-criteria-to-ip-schema
     updated: '2025-11-03'
-    path: change/deltas/DE-012-restore-entry-exit-criteria-to-ip-schema/DE-012.md
+    path: .spec-driver/deltas/DE-012-restore-entry-exit-criteria-to-ip-schema/DE-012.md
     applies_to:
       specs:
       - PROD-006
@@ -1680,7 +1680,7 @@ deltas:
     name: Delta - add design artefacts to delta package
     slug: add-design-artefacts-to-delta-package
     updated: '2025-11-04'
-    path: change/deltas/DE-013-add-design-artefacts-to-delta-package/DE-013.md
+    path: .spec-driver/deltas/DE-013-add-design-artefacts-to-delta-package/DE-013.md
     applies_to:
       specs:
       - SPEC-110
@@ -1742,7 +1742,7 @@ deltas:
     name: Delta - backlog command shortcuts
     slug: backlog-command-shortcuts
     updated: '2025-11-04'
-    path: change/deltas/DE-014-backlog-command-shortcuts/DE-014.md
+    path: .spec-driver/deltas/DE-014-backlog-command-shortcuts/DE-014.md
     applies_to:
       specs:
       - PROD-010
@@ -1787,7 +1787,7 @@ deltas:
     name: Delta - Implement backlog prioritization with interactive ordering
     slug: implement-backlog-prioritization-with-interactive-ordering
     updated: '2025-11-04'
-    path: change/deltas/DE-015-implement-backlog-prioritization-with-interactive-ordering/DE-015.md
+    path: .spec-driver/deltas/DE-015-implement-backlog-prioritization-with-interactive-ordering/DE-015.md
     plan:
       id: IP-015
       overview:
@@ -1958,7 +1958,7 @@ deltas:
     name: Delta - Remove phase-01 auto-creation and enable intelligent phase creation
     slug: remove-phase-01-auto-creation-and-enable-intelligent-phase-creation
     updated: '2025-11-04'
-    path: change/deltas/DE-016-remove-phase-01-auto-creation-and-enable-intelligent-phase-creation/DE-016.md
+    path: .spec-driver/deltas/DE-016-remove-phase-01-auto-creation-and-enable-intelligent-phase-creation/DE-016.md
     applies_to:
       specs:
       - PROD-011
@@ -1991,7 +1991,7 @@ deltas:
     name: Delta - Add category support to requirements
     slug: add-category-support-to-requirements
     updated: '2025-11-04'
-    path: change/deltas/DE-017-add-category-support-to-requirements/DE-017.md
+    path: .spec-driver/deltas/DE-017-add-category-support-to-requirements/DE-017.md
     relations:
     - type: relates_to
       target: IMPR-001
@@ -2123,7 +2123,7 @@ deltas:
     name: Delta - Add Tags column to list table output for all artifact types
     slug: add-tags-column-to-list-table-output-for-all-artifact-types
     updated: '2025-11-04'
-    path: change/deltas/DE-018-add-tags-column-to-list-table-output-for-all-artifact-types/DE-018.md
+    path: .spec-driver/deltas/DE-018-add-tags-column-to-list-table-output-for-all-artifact-types/DE-018.md
     applies_to:
       specs:
       - SPEC-110
@@ -2157,7 +2157,7 @@ deltas:
     name: Delta - Fix ts-doc-extract dependency handling
     slug: fix-ts-doc-extract-dependency-handling
     updated: '2025-11-08'
-    path: change/deltas/DE-019-fix-ts-doc-extract-dependency-handling/DE-019.md
+    path: .spec-driver/deltas/DE-019-fix-ts-doc-extract-dependency-handling/DE-019.md
     applies_to:
       specs:
       - SPEC-124
@@ -2368,7 +2368,7 @@ deltas:
     name: Delta - Add default filtering and pagination to backlog list command
     slug: add-default-filtering-and-pagination-to-backlog-list-command
     updated: '2025-11-08'
-    path: change/deltas/DE-020-add-default-filtering-and-pagination-to-backlog-list-command/DE-020.md
+    path: .spec-driver/deltas/DE-020-add-default-filtering-and-pagination-to-backlog-list-command/DE-020.md
     applies_to:
       specs:
       - SPEC-113
@@ -2402,7 +2402,7 @@ deltas:
     name: Delta - Card support (kanban board)
     slug: kanban-card-support
     updated: '2026-02-03'
-    path: change/deltas/DE-021-kanban-card-support/DE-021.md
+    path: .spec-driver/deltas/DE-021-kanban-card-support/DE-021.md
     plan:
       id: IP-021
       overview:
@@ -2530,7 +2530,7 @@ deltas:
     name: Add --path flag to show commands
     slug: add-path-flag-to-show-commands
     updated: '2026-02-04'
-    path: change/deltas/DE-022-add-path-flag-to-show-commands/DE-022.md
+    path: .spec-driver/deltas/DE-022-add-path-flag-to-show-commands/DE-022.md
     applies_to:
       specs:
       - PROD-013
@@ -2621,7 +2621,7 @@ deltas:
     name: Add view and edit commands
     slug: add-view-and-edit-commands
     updated: '2026-02-04'
-    path: change/deltas/DE-023-add-view-and-edit-commands/DE-023.md
+    path: .spec-driver/deltas/DE-023-add-view-and-edit-commands/DE-023.md
     applies_to:
       specs:
       - PROD-013
@@ -2735,7 +2735,7 @@ deltas:
     name: Delta - Add --raw flag to show commands
     slug: add-raw-flag-to-show-commands
     updated: '2026-02-05'
-    path: change/deltas/DE-024-add-raw-flag-to-show-commands/DE-024.md
+    path: .spec-driver/deltas/DE-024-add-raw-flag-to-show-commands/DE-024.md
     applies_to:
       specs:
       - PROD-013
@@ -2822,7 +2822,7 @@ deltas:
     name: Delta - Extend find command to all artifact types
     slug: extend-find-command-to-all-artifact-types
     updated: '2026-02-05'
-    path: change/deltas/DE-025-extend-find-command-to-all-artifact-types/DE-025.md
+    path: .spec-driver/deltas/DE-025-extend-find-command-to-all-artifact-types/DE-025.md
     applies_to:
       specs:
       - PROD-013
@@ -2906,7 +2906,7 @@ deltas:
     name: Delta - Use zigmarkdoc for Zig documentation generation
     slug: use_zigmarkdoc_for_zig_documentation_generation
     updated: '2026-02-16'
-    path: change/deltas/DE-026-use_zigmarkdoc_for_zig_documentation_generation/DE-026.md
+    path: .spec-driver/deltas/DE-026-use_zigmarkdoc_for_zig_documentation_generation/DE-026.md
     applies_to:
       specs:
       - SPEC-124
@@ -3002,7 +3002,7 @@ deltas:
     name: Delta - Contract mirror tree index
     slug: contract_mirror_tree_index
     updated: '2026-02-20'
-    path: change/deltas/DE-027-contract_mirror_tree_index/DE-027.md
+    path: .spec-driver/deltas/DE-027-contract_mirror_tree_index/DE-027.md
     applies_to:
       specs:
       - PROD-014
@@ -3132,7 +3132,7 @@ deltas:
     name: 'Delta - Sync defaults: contracts-first, opt-in spec creation'
     slug: sync_defaults_contracts_first_opt_in_spec_creation
     updated: '2026-02-20'
-    path: change/deltas/DE-028-sync_defaults_contracts_first_opt_in_spec_creation/DE-028.md
+    path: .spec-driver/deltas/DE-028-sync_defaults_contracts_first_opt_in_spec_creation/DE-028.md
     applies_to:
       specs:
       - PROD-012
@@ -3175,7 +3175,7 @@ deltas:
     name: Delta - Canonical contract storage
     slug: canonical_contract_storage
     updated: '2026-02-21'
-    path: change/deltas/DE-029-canonical_contract_storage/DE-029.md
+    path: .spec-driver/deltas/DE-029-canonical_contract_storage/DE-029.md
     applies_to:
       specs:
       - PROD-012
@@ -3308,7 +3308,7 @@ deltas:
     name: Delta - unit_vs_assembly_spec_classification
     slug: unit_vs_assembly_spec_classification
     updated: '2026-02-21'
-    path: change/deltas/DE-030-unit_vs_assembly_spec_classification/DE-030.md
+    path: .spec-driver/deltas/DE-030-unit_vs_assembly_spec_classification/DE-030.md
     applies_to:
       specs:
       - PROD-015
@@ -3360,7 +3360,7 @@ deltas:
     name: Delta - boot_generated_agent_guidance
     slug: boot_generated_agent_guidance
     updated: '2026-03-01'
-    path: change/deltas/DE-031-boot_generated_agent_guidance/DE-031.md
+    path: .spec-driver/deltas/DE-031-boot_generated_agent_guidance/DE-031.md
     applies_to:
       specs:
       - PROD-016
@@ -3398,7 +3398,7 @@ deltas:
     name: Delta - skills_allowlist_sync
     slug: skills_allowlist_sync
     updated: '2026-03-01'
-    path: change/deltas/DE-032-skills_allowlist_sync/DE-032.md
+    path: .spec-driver/deltas/DE-032-skills_allowlist_sync/DE-032.md
     applies_to:
       specs:
       - PROD-016
@@ -3436,7 +3436,7 @@ deltas:
     name: Delta - memory records schema and command surface
     slug: memory_records_schema_and_command_surface
     updated: '2026-03-02'
-    path: change/deltas/DE-033-memory_records_schema_and_command_surface/DE-033.md
+    path: .spec-driver/deltas/DE-033-memory_records_schema_and_command_surface/DE-033.md
     applies_to:
       specs:
       - PROD-TBD
@@ -3741,7 +3741,7 @@ deltas:
     name: 'Delta - Native skills installation: replace openskills dependency'
     slug: native_skills_installation_replace_openskills_dependency
     updated: '2026-03-03'
-    path: change/deltas/DE-034-native_skills_installation_replace_openskills_dependency/DE-034.md
+    path: .spec-driver/deltas/DE-034-native_skills_installation_replace_openskills_dependency/DE-034.md
     plan:
       id: IP-034
       overview:
@@ -3768,7 +3768,7 @@ deltas:
     name: Delta - assembly-only tech specs and unit-spec deprecation
     slug: assembly_only_tech_specs_and_unit_spec_deprecation
     updated: '2026-03-03'
-    path: change/deltas/DE-035-assembly_only_tech_specs_and_unit_spec_deprecation/DE-035.md
+    path: .spec-driver/deltas/DE-035-assembly_only_tech_specs_and_unit_spec_deprecation/DE-035.md
     applies_to:
       specs:
       - ADR-003
@@ -3817,7 +3817,7 @@ deltas:
     name: Delta - frontmatter metadata compaction and canonicalization controls
     slug: frontmatter_metadata_compaction_and_canonicalization_controls
     updated: '2026-03-03'
-    path: change/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/DE-036.md
+    path: .spec-driver/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/DE-036.md
     plan:
       id: IP-036
       overview:
@@ -3985,7 +3985,7 @@ deltas:
     name: Delta - install and refresh seed memories during workspace install
     slug: install_and_refresh_seed_memories_during_workspace_install
     updated: '2026-03-03'
-    path: change/deltas/DE-037-install_and_refresh_seed_memories_during_workspace_install/DE-037.md
+    path: .spec-driver/deltas/DE-037-install_and_refresh_seed_memories_during_workspace_install/DE-037.md
     plan:
       id: IP-037
       overview:
@@ -4125,7 +4125,7 @@ deltas:
     name: Delta - Canonical workflow alignment
     slug: canonical_workflow_alignment
     updated: '2026-03-03'
-    path: change/deltas/DE-038-canonical_workflow_alignment/DE-038.md
+    path: .spec-driver/deltas/DE-038-canonical_workflow_alignment/DE-038.md
     plan:
       id: IP-038
       overview:
@@ -4308,7 +4308,7 @@ deltas:
     name: Delta - workflow command-surface completion and strict-mode lock-in
     slug: workflow_command_surface_completion_and_strict_mode_lock_in
     updated: '2026-03-04'
-    path: change/deltas/DE-039-workflow_command_surface_completion_and_strict_mode_lock_in/DE-039.md
+    path: .spec-driver/deltas/DE-039-workflow_command_surface_completion_and_strict_mode_lock_in/DE-039.md
     applies_to:
       specs:
       - PROD-016
@@ -4426,7 +4426,7 @@ deltas:
     name: 'Delta - Separate template concerns: agents, artifacts, hooks'
     slug: separate_template_concerns_agents_artifacts_hooks
     updated: '2026-03-04'
-    path: change/deltas/DE-040-separate_template_concerns_agents_artifacts_hooks/DE-040.md
+    path: .spec-driver/deltas/DE-040-separate_template_concerns_agents_artifacts_hooks/DE-040.md
     applies_to:
       specs: []
       requirements: []
@@ -4436,7 +4436,7 @@ deltas:
     name: "Delta - CLI completeness \u2014 fill obvious command gaps"
     slug: cli_completeness_fill_obvious_command_gaps
     updated: '2026-03-04'
-    path: change/deltas/DE-041-cli_completeness_fill_obvious_command_gaps/DE-041.md
+    path: .spec-driver/deltas/DE-041-cli_completeness_fill_obvious_command_gaps/DE-041.md
     applies_to:
       specs:
       - PROD-010
@@ -4726,7 +4726,7 @@ deltas:
     name: Fix Go contract generation and respect calling shell environment
     slug: respect_target_project_direnv_environment_in_sync_adapters
     updated: '2026-03-04'
-    path: change/deltas/DE-042-respect_target_project_direnv_environment_in_sync_adapters/DE-042.md
+    path: .spec-driver/deltas/DE-042-respect_target_project_direnv_environment_in_sync_adapters/DE-042.md
     applies_to:
       specs: []
       requirements: []
@@ -4756,7 +4756,7 @@ deltas:
     name: Verification coverage validation and requirement lifecycle guidance
     slug: verification_coverage_validation_and_lifecycle_guidance
     updated: '2026-03-05'
-    path: change/deltas/DE-043-sync_overwrites_requirement_status_when_coverage_entries_contain_unknown_statuses/DE-043.md
+    path: .spec-driver/deltas/DE-043-sync_overwrites_requirement_status_when_coverage_entries_contain_unknown_statuses/DE-043.md
     applies_to:
       specs:
       - PROD-008
@@ -4870,7 +4870,7 @@ deltas:
     name: Delta - Centralize hardcoded workspace directory paths
     slug: centralize_hardcoded_workspace_directory_paths
     updated: '2026-03-05'
-    path: change/deltas/DE-044-centralize_hardcoded_workspace_directory_paths/DE-044.md
+    path: .spec-driver/deltas/DE-044-centralize_hardcoded_workspace_directory_paths/DE-044.md
     applies_to:
       specs: []
       requirements: []
@@ -5009,7 +5009,7 @@ deltas:
     name: Memory graph navigation for agent discoverability
     slug: memory_graph_navigation_for_agent_discoverability
     updated: '2026-03-05'
-    path: change/deltas/DE-045-memory_graph_navigation_for_agent_discoverability/DE-045.md
+    path: .spec-driver/deltas/DE-045-memory_graph_navigation_for_agent_discoverability/DE-045.md
     applies_to:
       specs: []
       requirements: []
@@ -5145,7 +5145,7 @@ deltas:
     name: Fix silent failure in complete delta when revision update fails
     slug: complete_delta_silently_swallows_revisionupdateerror
     updated: '2026-03-05'
-    path: change/deltas/DE-046-complete_delta_silently_swallows_revisionupdateerror/DE-046.md
+    path: .spec-driver/deltas/DE-046-complete_delta_silently_swallows_revisionupdateerror/DE-046.md
     applies_to:
       specs:
       - PROD-002
@@ -5216,7 +5216,7 @@ deltas:
     name: Contradiction discovery and resolution framework
     slug: contradiction_discovery_and_resolution_framework
     updated: '2026-03-05'
-    path: change/deltas/DE-047-contradiction_discovery_and_resolution_framework/DE-047.md
+    path: .spec-driver/deltas/DE-047-contradiction_discovery_and_resolution_framework/DE-047.md
     applies_to:
       specs:
       - PROD-001
@@ -5373,7 +5373,7 @@ deltas:
     name: Delta - Configurable workspace directory paths via workflow.toml
     slug: configurable_workspace_directory_paths_via_workflow_toml
     updated: '2026-03-06'
-    path: change/deltas/DE-048-configurable_workspace_directory_paths_via_workflow_toml/DE-048.md
+    path: .spec-driver/deltas/DE-048-configurable_workspace_directory_paths_via_workflow_toml/DE-048.md
     applies_to:
       specs: []
       requirements: []
@@ -5447,12 +5447,12 @@ deltas:
           mitigation: reset_paths() in tearDown; tests are already sequential
   DE-049:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Consolidate workspace directories under .spec-driver with backward-compat
       symlinks
     slug: consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks
     updated: '2026-03-06'
-    path: change/deltas/DE-049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks/DE-049.md
+    path: .spec-driver/deltas/DE-049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks/DE-049.md
     applies_to:
       specs: []
       requirements: []
@@ -5471,7 +5471,8 @@ deltas:
         plan: IP-049
         delta: DE-049
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-049
         specs:
           primary: []
           collaborators: []
@@ -5479,17 +5480,194 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-049-P01
+        - id: IP-049.PHASE-01
+        - id: IP-049.PHASE-02
+        - id: IP-049.PHASE-03
+        - id: IP-049.PHASE-04
+        - id: IP-049.PHASE-02
       phases:
-      - id: IP-049-P01
-        phase: IP-049-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-049.PHASE-01
+        plan: IP-049
+        delta: DE-049
+        objective: "Move content directories into .spec-driver/ via git mv, create\
+          \ backward-compat symlinks at old locations. Pure structural change \u2014\
+          \ no code modifications."
+        entrance_criteria:
+        - DR-049 approved
+        - ADR-004 accepted
+        - DE-048 completed
+        exit_criteria:
+        - All content under .spec-driver/ (tech/, product/, decisions/, policies/,
+          standards/, deltas/, revisions/, audits/, backlog/, memory/)
+        - Compat symlinks at old locations resolve correctly
+        - Git working tree clean (committed)
+        - No broken cross-references via symlinks
+        verification:
+          tests:
+          - VT-049-migration
+          evidence:
+          - Manual verification that old paths resolve via symlinks
+        tasks:
+        - id: '1.1'
+          description: Delete derived symlinks (spec index, contract mirror, decision
+            status)
+        - id: '1.2'
+          description: git mv content directories into .spec-driver/
+        - id: '1.3'
+          description: Create backward-compat symlink structures
+        - id: '1.4'
+          description: Verify old paths resolve, commit
+        risks:
+        - description: Large diff even after derived symlink cleanup
+          mitigation: Separate commit for derived symlink deletion
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-049.PHASE-02
+        plan: IP-049
+        delta: DE-049
+        objective: Flatten path constants/helpers to resolve under .spec-driver/ instead
+          of grouping dirs. Update config defaults. Add warning for unknown [dirs]
+          keys. Rewrite tests to match new invariants. No caller changes (phase 3).
+        entrance_criteria:
+        - Phase 1 committed (structural migration complete)
+        exit_criteria:
+        - SPECS_DIR and CHANGES_DIR constants eliminated
+        - get_specs_dir() and get_changes_dir() removed
+        - All leaf helpers resolve under get_spec_driver_root()
+        - get_backlog_dir() and get_memory_dir() resolve under .spec-driver/
+        - DEFAULT_CONFIG["dirs"] updated (specs/changes keys removed)
+        - _CONFIG_KEY_TO_CONSTANT updated to match
+        - init_paths() warns on unrecognized keys
+        - paths_test.py rewritten for new invariants
+        - config_test.py updated for new defaults
+        - just lint passes
+        - "just test passes (may fail on callers \u2014 that's phase 3)"
+        verification:
+          tests:
+          - VT-049-paths
+          evidence:
+          - Unit tests pass for flattened helper resolution
+        tasks:
+        - id: '2.1'
+          description: "Flatten path constants \u2014 eliminate SPECS_DIR, CHANGES_DIR"
+        - id: '2.2'
+          description: Rewrite helpers to resolve under get_spec_driver_root()
+        - id: '2.3'
+          description: Update _CONFIG_KEY_TO_CONSTANT and DEFAULT_CONFIG
+        - id: '2.4'
+          description: Add init_paths() warning for unknown keys
+        - id: '2.5'
+          description: Rewrite paths_test.py for new invariants
+        - id: '2.6'
+          description: Update config_test.py for new defaults
+        - id: '2.7'
+          description: Lint and test
+        risks:
+        - description: Removing get_specs_dir/get_changes_dir breaks callers
+          mitigation: Phase 3 handles callers; expect import errors until then
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-049.PHASE-03
+        plan: IP-049
+        delta: DE-049
+        objective: Update initialize_workspace() to create flat .spec-driver/ layout
+          with backward-compat symlinks. Refactor install.py imports to use helpers
+          instead of removed constants. Fix base.py hardcoded path filter. Update
+          ~20 test files that import removed SPECS_DIR/CHANGES_DIR.
+        entrance_criteria:
+        - Phase 2 committed (path model flattened, f6b5d97)
+        exit_criteria:
+        - install.py uses helper calls instead of direct constant imports
+        - initialize_workspace() creates flat layout under .spec-driver/
+        - initialize_workspace() creates backward-compat symlinks per DEC-049-03
+        - sync/adapters/base.py path filter updated for .spec-driver/
+        - "All test files updated \u2014 no imports of removed SPECS_DIR/CHANGES_DIR"
+        - CLI boots successfully (uv run spec-driver --help)
+        - just lint passes (both ruff and pylint)
+        - just test passes
+        verification:
+          tests:
+          - VT-049-install
+          - VT-049-symlinks
+          evidence:
+          - initialize_workspace() creates dirs under .spec-driver/
+          - Backward-compat symlinks created and resolve correctly
+          - Full test suite passes
+        tasks:
+        - id: '3.1'
+          description: "Fix install.py imports \u2014 replace SPECS_DIR/CHANGES_DIR\
+            \ with SPEC_DRIVER_DIR + subdirs"
+        - id: '3.2'
+          description: Restructure directory creation in initialize_workspace() for
+            flat layout
+        - id: '3.3'
+          description: Add symlink creation step to initialize_workspace()
+        - id: '3.4'
+          description: Replace direct constant usage with helper calls where appropriate
+        - id: '3.5'
+          description: Update base.py hardcoded path filter
+        - id: '3.6'
+          description: Update test file imports (~20 files)
+        - id: '3.7'
+          description: Write install tests (VT-049-install, VT-049-symlinks)
+        - id: '3.8'
+          description: Lint and test
+        risks:
+        - description: "Large number of test files to update \u2014 tedious but mechanical"
+          mitigation: "Changes are import-only (SPECS_DIR\u2192SPEC_DRIVER_DIR, CHANGES_DIR\u2192\
+            SPEC_DRIVER_DIR)"
+        - description: base.py path filter change could affect sync behavior
+          mitigation: Verify with existing base_test.py
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-049.PHASE-04
+        plan: IP-049
+        delta: DE-049
+        objective: Refactor skill sync to install to .spec-driver/skills/ with dir-level
+          symlinks for agent targets. Update agent instruction files and memories
+          that reference old paths. Full regression pass.
+        entrance_criteria:
+        - Phase 3 committed (4cedc0a)
+        exit_criteria:
+        - Skill sync installs to .spec-driver/skills/, agent targets are symlinks
+        - Agent instruction files reference .spec-driver/ paths (not specify/change/)
+        - mem.signpost.spec-driver.file-map updated
+        - just passes (full regression)
+        - Both linters clean
+        verification:
+          tests:
+          - VT-049-regression
+          - VA-049-agent
+          evidence:
+          - Full test suite passes
+          - Agent instruction files reference correct paths
+        tasks:
+        - id: '4.1'
+          description: "Refactor skill sync \u2014 install to .spec-driver/skills/,\
+            \ symlink targets"
+        - id: '4.2'
+          description: Update skill sync tests
+        - id: '4.3'
+          description: Scan agent instruction files for old path references
+        - id: '4.4'
+          description: Update mem.signpost.spec-driver.file-map
+        - id: '4.5'
+          description: Full regression (just)
+        risks:
+        - description: Skill sync refactor changes behavior for all installs
+          mitigation: Existing tests cover install/prune semantics; symlink is additive
+        - description: Agent instructions scattered across generated and hand-authored
+            files
+          mitigation: Grep sweep; compat symlinks keep old paths working regardless
   DE-050:
     kind: delta
     status: draft
     name: Delta - Normalise registry API surface for consistent artifact access
     slug: normalise_registry_api_surface_for_consistent_artifact_access
     updated: '2026-03-06'
-    path: change/deltas/DE-050-normalise_registry_api_surface_for_consistent_artifact_access/DE-050.md
+    path: .spec-driver/deltas/DE-050-normalise_registry_api_surface_for_consistent_artifact_access/DE-050.md
     applies_to:
       specs: []
       requirements: []
@@ -5501,25 +5679,69 @@ deltas:
         plan: IP-050
         delta: DE-050
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-050
         specs:
           primary: []
-          collaborators: []
+          collaborators:
+          - SPEC-110
         requirements:
           targets: []
           dependencies: []
         phases:
         - id: IP-050-P01
+        - id: IP-050-P02
+        - id: IP-050-P03
+        - id: IP-050.PHASE-01
       phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-050.PHASE-01
+        plan: IP-050
+        delta: DE-050
+        objective: "Add ADR-009 standard surface (find, collect, iter, filter) to\
+          \ SpecRegistry and ChangeRegistry. These are Group B \u2014 low risk, additive,\
+          \ no constructor changes needed."
+        entrance_criteria:
+        - DR-050 approved
+        - ADR-009 accepted
+        exit_criteria:
+        - SpecRegistry exposes find(), collect(), iter(), filter()
+        - ChangeRegistry exposes find(), iter(), filter()
+        - SpecRegistry.get() emits DeprecationWarning
+        - All existing tests pass
+        - New unit tests for every added method
+        - just lint + just pylint pass
+        verification:
+          tests:
+          - "VT-050-01 (partial \u2014 Spec and Change registries)"
+          - VT-050-02 (regression)
+          evidence: []
+        tasks:
+        - id: 1.1
+          description: Add find(), collect(), iter(), filter() to SpecRegistry
+        - id: 1.2
+          description: Deprecate SpecRegistry.get() with warning
+        - id: 1.3
+          description: Add find(), iter(), filter() to ChangeRegistry
+        - id: 1.4
+          description: Write tests for all new methods
+        risks:
+        - description: get() deprecation breaks callers
+          mitigation: alias calls find() internally; no removal
       - id: IP-050-P01
         phase: IP-050-P01
+      - id: IP-050-P02
+        phase: IP-050-P02
+      - id: IP-050-P03
+        phase: IP-050-P03
   DE-051:
     kind: delta
     status: completed
     name: Delta - migrate spec auto-creation opt-in from marker file to workflow.toml
     slug: migrate_spec_auto_creation_opt_in_from_marker_file_to_workflow_toml
     updated: '2026-03-06'
-    path: change/deltas/DE-051-migrate_spec_auto_creation_opt_in_from_marker_file_to_workflow_toml/DE-051.md
+    path: .spec-driver/deltas/DE-051-migrate_spec_auto_creation_opt_in_from_marker_file_to_workflow_toml/DE-051.md
     applies_to:
       specs:
       - PROD-016

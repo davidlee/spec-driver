@@ -80,7 +80,7 @@ owner: david
 
 # Where the drift appears
 sources:
-  - kind: spec | prod | adr | policy | doc | impl | contract | audit | test
+  - kind: spec | prod | adr | policy | doc | impl | contract | audit | test | registry | delta | revision | plan
     ref: <artifact ID or path>
     note: <optional>
 
@@ -194,4 +194,46 @@ PROD spec corpus discovered during the cross-reference survey.
   and ambiguous intent via flexible claims structure (D6).
 - Evidence is append-only timestamped, following the parity ledger convention
   from deck_of_dwarf (D10).
+- Lifecycle drift should be expressible without special schema:
+  normative claim from spec, observed claim from audit/delta/plan, derived
+  projection from registry. Resolution remains explicit via ADR/RE/DE, never
+  timestamp precedence.
 - Registry (`drift.yaml`) and richer CLI deferred until after DE-047 pilot (D2).
+
+## Lifecycle example
+
+```markdown
+### DL-047.009: Requirement lifecycle authority — specs vs evidence overlays
+
+- status: adjudicated
+- entry_type: contradiction
+- severity: significant
+- topic: lifecycle
+- owner: david
+- sources:
+  - kind: prod
+    ref: PROD-008
+    note: "FR-001: specs are authoritative"
+  - kind: prod
+    ref: PROD-009
+    note: "newest evidence overlay wins by timestamp"
+  - kind: registry
+    ref: .spec-driver/registry/requirements.yaml
+    note: "derived projection must not become the authority source"
+- claims:
+  - kind: assertion
+    label: normative
+    text: "Specs own lifecycle truth."
+  - kind: observation
+    label: observed
+    text: "Registry/evidence currently present a newer overlay as the effective state."
+- assessment: confirmed
+- resolution_path: ADR
+- resolution_ref: ADR-008
+- affected_artifacts:
+  - PROD-008
+  - PROD-009
+- evidence:
+  - 2026-03-05 discovered during PROD spec survey (VA-047-001)
+  - 2026-03-06 adjudicated: evidence triggers reconciliation; it does not silently replace normative truth
+```

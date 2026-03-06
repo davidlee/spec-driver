@@ -3,7 +3,7 @@ id: PROB-003
 name: Workspace directory paths are hardcoded magic strings throughout codebase
 created: '2026-03-05'
 updated: '2026-03-05'
-status: captured
+status: mitigated
 kind: problem
 severity: moderate
 tags: [maintainability, paths, magic-strings, refactor]
@@ -44,6 +44,14 @@ already centralizing the `.spec-driver` directory name.
 - All production code references replaced with constant imports
 - Test fixtures use constants (or helpers that use them)
 - Optional: directory names configurable via `workflow.toml`
+
+## Resolution Progress
+
+- **DE-044 (completed)**: Centralized all workspace directory names as constants
+  in `core/paths.py`. All production code and test fixtures now use constants.
+  First 3 success criteria met.
+- **IMPR-008**: Configurable directory layout (remaining success criterion).
+  Spike complete — see `backlog/improvements/IMPR-008-*/spike.md`.
 
 ## References
 

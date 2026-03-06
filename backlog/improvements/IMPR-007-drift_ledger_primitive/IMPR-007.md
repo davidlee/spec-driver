@@ -188,3 +188,6 @@ See `drift-ledger-schema-draft.md` in this folder.
 - Progressive strictness (minimal capture → triage → adjudication → resolution)
 - Evidence is append-only, timeline style
 - CLI MVP: `create drift`, `schema show drift.entry`, `--create-ledger`
+- Lifecycle drift should model explicit normative vs observed disagreement:
+  spec = normative claim, audit/delta/plan/registry = observed or derived
+  context, resolution via ADR/RE/DE rather than timestamp precedence

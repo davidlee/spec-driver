@@ -534,11 +534,14 @@ def _get_package_version() -> str:
     return version("spec-driver")
   except PackageNotFoundError:
     from supekku import __version__  # noqa: PLC0415
+
     return __version__
 
 
 def _stamp_installed_version(
-  workflow_toml: Path, *, dry_run: bool = False,
+  workflow_toml: Path,
+  *,
+  dry_run: bool = False,
 ) -> None:
   """Write or update ``spec_driver_installed_version`` in workflow.toml.
 
@@ -580,6 +583,24 @@ def initialize_workspace(
 
   if not target_root.exists():
     sys.exit(1)
+
+  # Detect legacy workspace (installed before DE-049 consolidation)
+  _legacy_warning: str | None = None
+  workflow_toml = target_root / SPEC_DRIVER_DIR / "workflow.toml"
+  if workflow_toml.exists():
+    content = workflow_toml.read_text(encoding="utf-8")
+    if _VERSION_KEY not in content:
+      script = get_package_root() / "scripts" / "migrate_to_consolidated_layout.sh"
+      _legacy_warning = (
+        "\033[1;31m"
+        "⚠  Legacy workspace detected"
+        " (no version stamp in workflow.toml).\n"
+        "   Content may still live under"
+        " specify/, change/, backlog/, memory/.\n"
+        "   To migrate, run:\033[0m\n"
+        f"     bash {script} --dry-run\n"
+      )
+      print(f"\n{_legacy_warning}")
 
   # Create directory structure — flat layout under .spec-driver/ (DE-049)
   sd = SPEC_DRIVER_DIR
@@ -722,6 +743,10 @@ def initialize_workspace(
 
   # Check optional dependencies (informational only)
   _check_optional_dependencies(target_root, auto_yes=auto_yes)
+
+  # Repeat legacy warning so it isn't buried in output
+  if _legacy_warning:
+    print(f"\n{_legacy_warning}")
 
 
 def _check_optional_dependencies(target_root: Path, *, auto_yes: bool = False) -> None:

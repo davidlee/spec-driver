@@ -146,14 +146,26 @@ old directory paths. Full regression pass.
 
 ## 9. Decisions & Outcomes
 
-(To be filled during execution)
+- **Dir-level → per-skill symlinks**: revised mid-phase. Dir-level symlinks
+  couldn't represent this repo's state in git cleanly. Per-skill symlinks
+  work and allow future per-agent differentiation.
+- **Version stamping for migration detection**: replaced `_COMPAT_CHILDREN`
+  heuristic with `spec_driver_installed_version` key in `workflow.toml`.
+  Simpler, decoupled from compat dir structure, generalises.
+- **Config preserves unknown keys**: `_merge_defaults()` updated to pass
+  through user keys not in `DEFAULT_CONFIG`, required for version stamp.
 
 ## 10. Findings / Research Notes
 
-(To be filled during execution)
+- Per-skill symlink depth is `../../.spec-driver/skills/<name>` (two levels
+  up from `.claude/skills/<name>`), not `../.spec-driver/skills` as with
+  dir-level.
+- `_stamp_installed_version()` uses regex to replace in-place, preserving
+  comments and other content. Prepends if absent, replaces if present.
+- `CONVERGENCE.md` was stale — deleted as part of cleanup.
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated (notes.md — Phase 4 section)
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (2647 pass, ruff clean, pylint 9.56)
+- [x] Notes updated (notes.md — Phase 4 section)
 - [ ] Delta ready for closure

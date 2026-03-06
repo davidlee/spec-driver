@@ -65,14 +65,14 @@ echo "=== Phase 1: Delete derived symlinks ==="
 for dir in specify/tech/by-slug specify/tech/by-package specify/tech/by-language \
            specify/tech/by-category specify/tech/by-c4-level; do
   if [[ -d "$dir" ]]; then
-    run git rm -rf "$dir"
+    run git rm -rf --ignore-unmatch "$dir"
   fi
 done
 
 # Alias symlinks
 for link in specify/tech/assemblies specify/tech/units specify/tech/c4; do
   if [[ -L "$link" ]]; then
-    run git rm "$link"
+    run git rm --ignore-unmatch "$link"
   fi
 done
 
@@ -89,13 +89,13 @@ fi
 for dir in specify/decisions/accepted specify/decisions/draft \
            specify/decisions/superseded specify/decisions/deprecated; do
   if [[ -d "$dir" ]]; then
-    run git rm -rf "$dir"
+    run git rm -rf --ignore-unmatch "$dir"
   fi
 done
 
 # Derived registry file
 if [[ -f specify/tech/registry_v2.json ]]; then
-  run git rm specify/tech/registry_v2.json
+  run git rm --ignore-unmatch specify/tech/registry_v2.json
 fi
 
 if ! $DRY_RUN && [[ -n "$(git status --porcelain)" ]]; then

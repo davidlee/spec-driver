@@ -197,28 +197,54 @@ Phase 4 (regression + cleanup):
 - Consider whether `STANDARDS_SUBDIR` was previously missing from installer
   (pre-existing gap or introduced by this delta?)
 
-## Phase 4 — Skill symlinks, agent docs, file-map (in progress)
+## Phase 4 — Skill symlinks, agent docs, file-map (complete)
+
+### Commits
+
+- `f8bf140` — Skill sync refactor (dir-level symlinks), agent docs, tests
+- `99f1a9b` — Tidies
+- `d18df4d` — Skills install: canonical dir + file-map memory
+- `49df946`..`03e4b42` — Iterative skill install fixes
+- `161b4bd` — Per-skill symlinks (revised from dir-level), migration detection
+  via version stamp, `_COMPAT_CHILDREN` removed
+- `6f4242c` — Version stamping in installer, config preserves unknown keys,
+  install tests, this repo migrated to per-skill symlinks
 
 ### What's done
 
-Uncommitted. All changes in working tree.
+**Skill sync refactor (`sync.py`):**
+- Skills install once to `.spec-driver/skills/` (canonical dir), prune once
+  from canonical dir, then ensure **per-skill symlinks** in agent target dirs.
+- New functions: `_is_pre_migration_layout()`, `_ensure_target_symlinks()`,
+  `_validate_target_names()`.
+- Return dict changed: `targets` → `canonical` + `symlinks` (per-target,
+  per-skill outcome dicts).
 
-**Production code:**
-- `sync.py`: Refactored to install skills once to `.spec-driver/skills/`
-  (canonical dir), prune once from canonical dir, then ensure agent targets
-  are dir-level symlinks. New functions: `_is_pre_migration_layout()`,
-  `_ensure_target_symlinks()`, `_validate_target_names()`. Return dict
-  changed: `targets` → `canonical` + `symlinks`.
-- `cli/skills.py`: Updated output formatting for new return structure.
-  Reports canonical dir status + per-target symlink outcomes.
+**Per-skill symlinks (revised from dir-level):**
+- Initial implementation used dir-level symlinks (`.claude/skills → ../.spec-driver/skills`).
+- Revised to per-skill symlinks (`.claude/skills/boot → ../../.spec-driver/skills/boot`)
+  because dir-level symlinks couldn't represent this repo's post-migration state
+  in git (symlinks to `.spec-driver/` would be circular in the committed tree).
+- Per-skill approach also allows future per-agent skill differentiation.
 
-**Migration safety:**
-- `_is_pre_migration_layout()` checks known compat children of `specify/`
-  and `change/` — only attempts dir→symlink replacement if those are real
-  dirs (pre-DE-049). Post-migration real skill dirs are treated as
-  intentional customisation and left alone.
-- Pre-migration migration: removes package-managed skill dirs from target,
-  replaces with symlink only if dir is now empty. User skills preserved.
+**Version stamping (`install.py`):**
+- New `_stamp_installed_version()`: writes/updates `spec_driver_installed_version`
+  in `workflow.toml` on every install. Uses regex replacement (idempotent).
+- `_get_package_version()`: reads from `importlib.metadata`, falls back to
+  `supekku.__version__`.
+- Called from `initialize_workspace()` after directory creation.
+
+**Migration detection (revised):**
+- `_is_pre_migration_layout()` originally used `_COMPAT_CHILDREN` heuristic
+  (checking if `specify/` and `change/` subdirs were real dirs vs symlinks).
+- Revised to check for `spec_driver_installed_version` key in `workflow.toml`.
+  Absence = pre-migration workspace. Simpler, more reliable, no coupling to
+  compat directory structure.
+- `_COMPAT_CHILDREN` constant removed.
+
+**Config (`config.py`):**
+- `_merge_defaults()` now preserves user keys not in `DEFAULT_CONFIG`.
+  Required for `spec_driver_installed_version` to survive config load/merge.
 
 **Agent docs updated:**
 - `supekku/templates/agents/glossary.md`: all `specify/`, `change/`,
@@ -231,16 +257,24 @@ Uncommitted. All changes in working tree.
 - `mem.signpost.spec-driver.file-map`: rewritten for consolidated layout,
   includes skills, symlink structure, all `.spec-driver/` subdirs.
 
+**This repo migrated:**
+- Real `.claude/skills/*/SKILL.md` and `.agents/skills/*/SKILL.md` files
+  replaced with per-skill symlinks to `../../.spec-driver/skills/*/`.
+- `CONVERGENCE.md` deleted (stale).
+- `workflow.toml` now contains `spec_driver_installed_version`.
+
 **Tests:**
-- `sync_test.py`: 58 tests (was 30). New tests for `_is_pre_migration_layout`
-  (4), `_ensure_target_symlinks` (7), updated e2e sync tests for canonical
-  dir + symlink semantics.
-- `skills_test.py`: 4 tests updated for new output format.
+- `sync_test.py`: comprehensive coverage for per-skill symlinks, migration
+  detection, canonical install, prune, and e2e sync.
+- `skills_test.py`: updated for new output format (per-skill outcomes).
+- `install_test.py`: 6 new tests for version stamping (prepend, update,
+  idempotency, comment preservation, dry-run, e2e via `initialize_workspace`).
+- `config_test.py`: 1 new test for extra user keys preserved through merge.
 
 ### Verification
 
 - `uv run ruff check` — clean
-- `uv run pytest` — 2641 passed, 3 skipped
+- `uv run pytest` — 2647 passed, 3 skipped
 - `just pylint` — 9.56/10 (±0.00)
 - `just` — all green
 
@@ -249,18 +283,16 @@ Uncommitted. All changes in working tree.
 - `install_skills_to_target()` and `prune_skills_from_target()` unchanged
   in signature — they now just operate on the canonical dir instead of
   per-target dirs. Clean reuse.
-- The `_COMPAT_CHILDREN` constant is scoped to skill sync but could be
-  useful elsewhere if other migration-aware code needs the same check.
+- The dir-level → per-skill symlink pivot was driven by a practical constraint:
+  git can't commit a symlink that points into `.spec-driver/` from `.claude/`
+  when `.spec-driver/` contains the very skills being linked. Per-skill
+  symlinks avoid this because each is a leaf-level link.
+- Version stamping is a clean migration-detection mechanism that generalises
+  beyond skill sync — any future migration-aware code can check it.
 
 ### Follow-up items
 
-1. **This repo's skill dirs need manual cleanup.** Post-migration layout
-   means `_is_pre_migration_layout()` → False, so real `.claude/skills/`
-   and `.agents/skills/` dirs are treated as intentional customisation and
-   left alone. Need to: delete the real dirs, re-run `spec-driver install`
-   to create symlinks, commit the result.
-
-2. **Memory wheel bundling.** `pyproject.toml` `force-include` maps
+1. **Memory wheel bundling.** `pyproject.toml` `force-include` maps
    `"memory"` → `supekku/memory` — but `memory/` is now a symlink to
    `.spec-driver/memory/`, which bundles all 35 memories (including 8
    project-specific ones) into the wheel. Functionally safe (install logic
@@ -268,77 +300,70 @@ Uncommitted. All changes in working tree.
    `supekku/memory/` as a real dir with only distributable memories,
    update `_find_memory_source()` dev fallback accordingly.
 
-3. **Installer doesn't log symlink outcomes.** `install.py` calls
+2. **Installer doesn't log symlink outcomes.** `install.py` calls
    `sync_skills()` but doesn't inspect the `symlinks` return dict.
    Low priority.
 
 ---
 
-## Design note: skill sync → symlinks (Phase 4 addition)
+## Design note: skill sync → per-skill symlinks (Phase 4)
 
 ### Context
 
-Currently `sync_skills()` copies every allowlisted skill directory from the
+Previously `sync_skills()` copied every allowlisted skill directory from the
 package (`supekku/skills/<name>/`) into each agent target dir
-(`.claude/skills/<name>/`, `.agents/skills/<name>/`). This means:
+(`.claude/skills/<name>/`, `.agents/skills/<name>/`). This meant:
 
 - Every skill exists 2–3 times on disk (package + 2 targets)
 - Every `spec-driver install` touches N×M files (N skills × M targets)
 - Commit noise: all target copies appear in git diffs
 
-### Decision: dir-level symlinks to `.spec-driver/skills/`
+### Decision: per-skill symlinks via `.spec-driver/skills/`
 
 Install skills once to `.spec-driver/skills/` (canonical workspace copy,
-allowlist-gated, pruned as before). Agent target dirs become dir-level symlinks:
+allowlist-gated, pruned as before). Agent target dirs contain per-skill
+symlinks:
 
 ```
 .spec-driver/skills/       ← canonical (installed from package)
   boot/
   preflight/
   ...
-.claude/skills             → ../.spec-driver/skills   (symlink)
-.agents/skills             → ../.spec-driver/skills   (symlink)
+.claude/skills/            ← real dir with per-skill symlinks
+  boot → ../../.spec-driver/skills/boot
+  preflight → ../../.spec-driver/skills/preflight
+  ...
+.agents/skills/            ← same pattern
+  boot → ../../.spec-driver/skills/boot
+  ...
 ```
 
 ### Rationale
 
-- **Single source of truth**: one copy, two views.
-- **Less commit noise**: skill updates touch `.spec-driver/skills/` only;
-  symlinks don't change.
-- **Customisation path**: users can break the symlink and replace a target dir
-  with a real directory containing their own skills. The installer should
-  respect existing real dirs (don't clobber).
+- **Single source of truth**: one canonical copy, symlinked views.
+- **Less commit noise**: skill content changes touch `.spec-driver/skills/` only.
+- **Customisation path**: users can replace any per-skill symlink with a real
+  dir. `_ensure_target_symlinks()` respects existing real dirs ("custom").
 - **Simpler prune**: only one directory to manage.
 
-### Trade-off: dir-level vs per-skill symlinks
+### Why per-skill, not dir-level
 
-Dir-level chosen. Per-skill symlinks (`.claude/skills/boot → ...`) would allow
-different skill sets per agent target. In practice all targets use the same
-allowlist, so this flexibility is unused. If per-agent differentiation is ever
-needed, per-skill symlinks are an easy upgrade — the canonical dir stays the same.
+Initial implementation used dir-level symlinks (`.claude/skills → ../.spec-driver/skills`).
+This was revised because:
 
-### Migration: existing workspaces with real target dirs
+1. Git can't represent a dir-level symlink into `.spec-driver/` cleanly when
+   the target contains the committed skill content.
+2. Per-skill symlinks allow future per-agent skill differentiation (different
+   skill sets per target).
+3. Per-skill gives finer-grained customisation — override one skill without
+   breaking the link for others.
 
-Existing workspaces have real `.claude/skills/` and `.agents/skills/` dirs with
-copied content. On install:
+### Migration detection: version stamping
 
-1. If the target is already a symlink pointing to the right place → skip.
-2. If the target is a real directory containing only package-managed skills →
-   safe to replace with symlink (the content is duplicated, not custom).
-3. If the target doesn't exist → create symlink.
+Pre-migration detection uses `spec_driver_installed_version` in `workflow.toml`
+(stamped on every install). Absence of the key = pre-migration workspace.
 
-For (2), the simplest safe approach: delete the real dir contents that match
-package skill names (same pruning logic), then if the dir is empty, replace it
-with the symlink. If non-package skills remain (user-created), warn and leave
-the real dir in place. This matches the existing prune semantics — we already
-distinguish package skills from user skills by name.
-
-### Key implementation points
-
-- `install_skills_to_target()` → rename/refactor to install into
-  `repo_root / SPEC_DRIVER_DIR / "skills"` only.
-- New `_ensure_target_symlinks()`: for each target, create dir-level symlink.
-  Idempotent. Don't clobber real dirs that contain non-package content.
-- `prune_skills_from_target()` → operate on canonical dir only.
-- `sync_skills()`: install once → prune once → ensure symlinks per target.
-- Tests: verify symlink creation, idempotency, prune-then-symlink migration.
+This replaced the original `_COMPAT_CHILDREN` heuristic (checking whether
+`specify/` and `change/` subdirs were real dirs). The version stamp is simpler,
+doesn't couple to the compat directory structure, and generalises to future
+migration-aware code.

@@ -547,6 +547,33 @@ def test_initialize_stamps_version(tmp_path: Path) -> None:
   assert "spec_driver_installed_version" in content
 
 
+# --- legacy workspace detection ---
+
+
+def test_legacy_workspace_warns(
+  tmp_path: Path,
+  capsys: pytest.CaptureFixture[str],
+) -> None:
+  """Legacy workspace (no version stamp) prints migration warning."""
+  sd = tmp_path / SPEC_DRIVER_DIR
+  sd.mkdir(parents=True)
+  (sd / "workflow.toml").write_text('ceremony = "settler"\n', encoding="utf-8")
+  initialize_workspace(tmp_path, auto_yes=True)
+  captured = capsys.readouterr()
+  assert captured.out.count("Legacy workspace detected") == 2
+  assert "migrate_to_consolidated_layout.sh" in captured.out
+
+
+def test_fresh_workspace_no_legacy_warning(
+  tmp_path: Path,
+  capsys: pytest.CaptureFixture[str],
+) -> None:
+  """Fresh install (no pre-existing workflow.toml) has no legacy warning."""
+  initialize_workspace(tmp_path, auto_yes=True)
+  captured = capsys.readouterr()
+  assert "Legacy workspace detected" not in captured.out
+
+
 # --- Agent template rendering tests ---
 
 

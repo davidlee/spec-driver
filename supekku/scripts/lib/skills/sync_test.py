@@ -82,8 +82,7 @@ def _make_post_migration(root: Path) -> None:
   sd.mkdir(exist_ok=True)
   toml = sd / "workflow.toml"
   toml.write_text(
-    'spec_driver_installed_version = "0.1.0"\n'
-    '[tool]\nexec = "spec-driver"\n',
+    'spec_driver_installed_version = "0.1.0"\n[tool]\nexec = "spec-driver"\n',
     encoding="utf-8",
   )
 
@@ -484,7 +483,10 @@ def test_ensure_symlinks_creates_per_skill(tmp_path: Path) -> None:
   canonical = _setup_canonical(root, "boot", "consult")
 
   outcomes = _ensure_target_symlinks(
-    root, ["claude"], ["boot", "consult"], {"boot", "consult"},
+    root,
+    ["claude"],
+    ["boot", "consult"],
+    {"boot", "consult"},
   )
   assert outcomes["claude"]["boot"] == "created"
   assert outcomes["claude"]["consult"] == "created"
@@ -505,11 +507,17 @@ def test_ensure_symlinks_ok_when_correct(tmp_path: Path) -> None:
 
   # First call creates
   _ensure_target_symlinks(
-    root, ["claude"], ["boot"], {"boot"},
+    root,
+    ["claude"],
+    ["boot"],
+    {"boot"},
   )
   # Second call checks
   outcomes = _ensure_target_symlinks(
-    root, ["claude"], ["boot"], {"boot"},
+    root,
+    ["claude"],
+    ["boot"],
+    {"boot"},
   )
   assert outcomes["claude"]["boot"] == "ok"
 
@@ -527,7 +535,10 @@ def test_ensure_symlinks_custom_when_wrong_symlink(tmp_path: Path) -> None:
   (target_dir / "boot").symlink_to(other)
 
   outcomes = _ensure_target_symlinks(
-    root, ["claude"], ["boot"], {"boot"},
+    root,
+    ["claude"],
+    ["boot"],
+    {"boot"},
   )
   assert outcomes["claude"]["boot"] == "custom"
 
@@ -543,7 +554,10 @@ def test_ensure_symlinks_custom_post_migration_real_dir(tmp_path: Path) -> None:
   _make_skill(root / ".claude" / "skills", "boot", "Custom boot.")
 
   outcomes = _ensure_target_symlinks(
-    root, ["claude"], ["boot"], {"boot"},
+    root,
+    ["claude"],
+    ["boot"],
+    {"boot"},
   )
   assert outcomes["claude"]["boot"] == "custom"
   # Real dir preserved
@@ -564,7 +578,10 @@ def test_ensure_symlinks_migrates_pre_migration(tmp_path: Path) -> None:
   _make_skill(target_dir, "consult", "Obstacle handling.")
 
   outcomes = _ensure_target_symlinks(
-    root, ["claude"], ["boot", "consult"], {"boot", "consult"},
+    root,
+    ["claude"],
+    ["boot", "consult"],
+    {"boot", "consult"},
   )
   assert outcomes["claude"]["boot"] == "migrated"
   assert outcomes["claude"]["consult"] == "migrated"
@@ -583,7 +600,10 @@ def test_ensure_symlinks_preserves_user_skills(tmp_path: Path) -> None:
   _make_skill(target_dir, "my-custom", "User skill.")
 
   outcomes = _ensure_target_symlinks(
-    root, ["claude"], ["boot"], {"boot"},
+    root,
+    ["claude"],
+    ["boot"],
+    {"boot"},
   )
   assert outcomes["claude"]["boot"] == "created"
   # User skill untouched (not in allowed_names, not processed)
@@ -598,10 +618,16 @@ def test_ensure_symlinks_idempotent(tmp_path: Path) -> None:
   _setup_canonical(root, "boot", "consult")
 
   _ensure_target_symlinks(
-    root, ["claude"], ["boot", "consult"], {"boot", "consult"},
+    root,
+    ["claude"],
+    ["boot", "consult"],
+    {"boot", "consult"},
   )
   outcomes = _ensure_target_symlinks(
-    root, ["claude"], ["boot", "consult"], {"boot", "consult"},
+    root,
+    ["claude"],
+    ["boot", "consult"],
+    {"boot", "consult"},
   )
   assert all(v == "ok" for v in outcomes["claude"].values())
 
@@ -646,9 +672,7 @@ def test_sync_skills_creates_target_symlinks(tmp_path: Path) -> None:
     assert not abs_target.is_symlink()
     for skill in ("boot", "consult"):
       skill_link = abs_target / skill
-      assert skill_link.is_symlink(), (
-        f"{skill} not a symlink in {target_name}"
-      )
+      assert skill_link.is_symlink(), f"{skill} not a symlink in {target_name}"
       assert skill_link.resolve() == (canonical / skill).resolve()
       assert (skill_link / "SKILL.md").is_file()
 

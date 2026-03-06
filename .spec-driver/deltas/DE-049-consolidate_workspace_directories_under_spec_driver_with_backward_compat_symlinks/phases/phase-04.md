@@ -76,14 +76,14 @@ old directory paths. Full regression pass.
 - [x] Phase 3 committed (4cedc0a)
 
 ## 4. Exit Criteria / Done When
-- [ ] `sync.py` installs skills to `.spec-driver/skills/` (not directly to targets)
-- [ ] `.claude/skills` and `.agents/skills` are dir-level symlinks to `../.spec-driver/skills`
-- [ ] Prune operates on `.spec-driver/skills/` only
-- [ ] Skill sync tests updated
-- [ ] Agent instruction files scanned and updated for `.spec-driver/` paths
-- [ ] `mem.signpost.spec-driver.file-map` updated
-- [ ] `just` passes (VT-049-regression)
-- [ ] Both linters clean
+- [x] `sync.py` installs skills to `.spec-driver/skills/` (not directly to targets)
+- [x] `.claude/skills` and `.agents/skills` are dir-level symlinks to `../.spec-driver/skills`
+- [x] Prune operates on `.spec-driver/skills/` only
+- [x] Skill sync tests updated
+- [x] Agent instruction files scanned and updated for `.spec-driver/` paths
+- [x] `mem.signpost.spec-driver.file-map` updated
+- [x] `just` passes (VT-049-regression)
+- [x] Both linters clean
 
 ## 5. Verification
 - `uv run pytest supekku/scripts/lib/skills/sync_test.py -v`
@@ -99,11 +99,11 @@ old directory paths. Full regression pass.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 4.1 | Refactor skill sync | No | Install to .spec-driver/skills/, symlink targets |
-| [ ] | 4.2 | Update skill sync tests | No | Test symlink creation, idempotency, prune |
-| [ ] | 4.3 | Scan/fix agent instruction files | Yes | Old path refs in .spec-driver/agents/*.md etc |
-| [ ] | 4.4 | Update file-map memory | Yes | mem.signpost.spec-driver.file-map |
-| [ ] | 4.5 | Full regression | No | just (lint + test) |
+| [x] | 4.1 | Refactor skill sync | No | Install to .spec-driver/skills/, symlink targets |
+| [x] | 4.2 | Update skill sync tests | No | 58 tests (was 30), +11 new for symlinks/migration |
+| [x] | 4.3 | Scan/fix agent instruction files | Yes | glossary template + rendered copy updated |
+| [x] | 4.4 | Update file-map memory | Yes | mem.signpost.spec-driver.file-map rewritten |
+| [x] | 4.5 | Full regression | No | 2641 passed, pylint 9.56, just green |
 
 ### Task Details
 

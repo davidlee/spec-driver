@@ -197,6 +197,71 @@ Phase 4 (regression + cleanup):
 - Consider whether `STANDARDS_SUBDIR` was previously missing from installer
   (pre-existing gap or introduced by this delta?)
 
+## Phase 4 — Skill symlinks, agent docs, file-map (in progress)
+
+### What's done
+
+Uncommitted. All changes in working tree.
+
+**Production code:**
+- `sync.py`: Refactored to install skills once to `.spec-driver/skills/`
+  (canonical dir), prune once from canonical dir, then ensure agent targets
+  are dir-level symlinks. New functions: `_is_pre_migration_layout()`,
+  `_ensure_target_symlinks()`, `_validate_target_names()`. Return dict
+  changed: `targets` → `canonical` + `symlinks`.
+- `cli/skills.py`: Updated output formatting for new return structure.
+  Reports canonical dir status + per-target symlink outcomes.
+
+**Migration safety:**
+- `_is_pre_migration_layout()` checks known compat children of `specify/`
+  and `change/` — only attempts dir→symlink replacement if those are real
+  dirs (pre-DE-049). Post-migration real skill dirs are treated as
+  intentional customisation and left alone.
+- Pre-migration migration: removes package-managed skill dirs from target,
+  replaces with symlink only if dir is now empty. User skills preserved.
+
+**Agent docs updated:**
+- `supekku/templates/agents/glossary.md`: all `specify/`, `change/`,
+  `backlog/` location references → `.spec-driver/` equivalents.
+- `.spec-driver/agents/glossary.md`: same (rendered copy).
+- CLAUDE.md `specify/**` reference left as-is — it describes compat paths.
+- `kanban/` references left as-is — not in DE-049 scope.
+
+**Memory updated:**
+- `mem.signpost.spec-driver.file-map`: rewritten for consolidated layout,
+  includes skills, symlink structure, all `.spec-driver/` subdirs.
+
+**Tests:**
+- `sync_test.py`: 58 tests (was 30). New tests for `_is_pre_migration_layout`
+  (4), `_ensure_target_symlinks` (7), updated e2e sync tests for canonical
+  dir + symlink semantics.
+- `skills_test.py`: 4 tests updated for new output format.
+
+### Verification
+
+- `uv run ruff check` — clean
+- `uv run pytest` — 2641 passed, 3 skipped
+- `just pylint` — 9.56/10 (±0.00)
+- `just` — all green
+
+### Observations
+
+- `install_skills_to_target()` and `prune_skills_from_target()` unchanged
+  in signature — they now just operate on the canonical dir instead of
+  per-target dirs. Clean reuse.
+- The `_COMPAT_CHILDREN` constant is scoped to skill sync but could be
+  useful elsewhere if other migration-aware code needs the same check.
+
+### Follow-up considerations
+
+- This repo's `.claude/skills/` and `.agents/skills/` are currently real
+  dirs with committed content. Running `spec-driver install` will migrate
+  them to symlinks (pre-migration layout detected). The committed skill
+  files will become dead — should be cleaned up in a follow-up commit.
+- `install.py` calls `sync_skills()` but doesn't inspect return — no
+  changes needed there, but the installer doesn't currently log symlink
+  outcomes. Low priority.
+
 ---
 
 ## Design note: skill sync → symlinks (Phase 4 addition)

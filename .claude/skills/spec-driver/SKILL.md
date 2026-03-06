@@ -68,6 +68,9 @@ listing the relevant entities instead of dumping every help screen.
   `--json`, `--format=tsv`, `--truncate`.
 - `show` is often better than reading files directly:
   `--raw` for source markdown, `--path` for the file path, `--json` for data.
+- `show --path` composes well with shell tools:
+  `dirname "$(spec-driver show delta DE-037 --path)"` to get the bundle dir;
+  if `tree` is available, `tree "$(dirname "$(spec-driver show delta DE-037 --path)")"`.
 - Memory lookup is scope-aware:
   `spec-driver list memories -p <path> -c "<command terms>" --match-tag <tag>`.
 - Use schema introspection instead of guessing field names:

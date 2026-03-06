@@ -334,7 +334,7 @@ def _resolve_spec(root: Path, raw_id: str) -> ArtifactRef:
   from supekku.scripts.lib.specs.registry import SpecRegistry  # noqa: PLC0415
 
   registry = SpecRegistry(root)
-  spec = registry.get(raw_id)
+  spec = registry.find(raw_id)
   if not spec:
     raise ArtifactNotFoundError("spec", raw_id)
   return ArtifactRef(id=raw_id, path=spec.path, record=spec)
@@ -345,8 +345,7 @@ def _resolve_change(root: Path, raw_id: str, kind: str) -> ArtifactRef:
 
   normalized = normalize_id(kind, raw_id)
   registry = ChangeRegistry(root=root, kind=kind)
-  artifacts = registry.collect()
-  artifact = artifacts.get(normalized)
+  artifact = registry.find(normalized)
   if not artifact:
     raise ArtifactNotFoundError(kind, normalized)
   return ArtifactRef(id=normalized, path=artifact.path, record=artifact)
@@ -386,16 +385,14 @@ def _resolve_standard(root: Path, raw_id: str) -> ArtifactRef:
 
 
 def _resolve_requirement(root: Path, raw_id: str) -> ArtifactRef:
-  from supekku.scripts.lib.core.paths import get_registry_dir  # noqa: PLC0415
   from supekku.scripts.lib.requirements.registry import (  # noqa: PLC0415
     RequirementsRegistry,
   )
 
   # DEC-041-05: normalize colon-separated to dot-separated
   normalized = raw_id.replace(":", ".")
-  registry_path = get_registry_dir(root) / "requirements.yaml"
-  registry = RequirementsRegistry(registry_path)
-  record = registry.records.get(normalized)
+  registry = RequirementsRegistry(root=root)
+  record = registry.find(normalized)
   if not record:
     raise ArtifactNotFoundError("requirement", normalized)
   req_path = Path(record.path) if record.path else root
@@ -406,10 +403,9 @@ def _resolve_card(root: Path, raw_id: str) -> ArtifactRef:
   from supekku.scripts.lib.cards import CardRegistry  # noqa: PLC0415
 
   registry = CardRegistry(root=root)
-  try:
-    card = registry.resolve_card(raw_id)
-  except (FileNotFoundError, ValueError) as exc:
-    raise ArtifactNotFoundError("card", raw_id) from exc
+  card = registry.find(raw_id)
+  if not card:
+    raise ArtifactNotFoundError("card", raw_id)
   return ArtifactRef(id=raw_id, path=card.path, record=card)
 
 
@@ -646,16 +642,14 @@ def _find_cards(root: Path, pattern: str) -> Iterator[ArtifactRef]:
 
 
 def _find_requirements(root: Path, pattern: str) -> Iterator[ArtifactRef]:
-  from supekku.scripts.lib.core.paths import get_registry_dir  # noqa: PLC0415
   from supekku.scripts.lib.requirements.registry import (  # noqa: PLC0415
     RequirementsRegistry,
   )
 
   # DEC-041-05: normalize colon to dot
   normalized = pattern.replace(":", ".")
-  registry_path = get_registry_dir(root) / "requirements.yaml"
-  registry = RequirementsRegistry(registry_path)
-  for uid, record in registry.records.items():
+  registry = RequirementsRegistry(root=root)
+  for uid, record in registry.collect().items():
     if _matches_pattern(uid, normalized):
       req_path = Path(record.path) if record.path else root
       yield ArtifactRef(id=uid, path=req_path, record=record)

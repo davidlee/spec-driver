@@ -105,9 +105,10 @@ def _mock_change_artifact(artifact_id: str, path: str) -> SimpleNamespace:
 
 
 def _mock_registry_collect(artifacts: dict) -> MagicMock:
-  """Create a mock ChangeRegistry whose collect() returns artifacts dict."""
+  """Create a mock ChangeRegistry whose collect()/find() return artifacts."""
   registry = MagicMock()
   registry.collect.return_value = artifacts
+  registry.find.side_effect = artifacts.get
   return registry
 
 
@@ -175,7 +176,7 @@ class TestResolveArtifactSpec:
   @patch("supekku.scripts.lib.specs.registry.SpecRegistry")
   def test_resolves_spec(self, mock_cls: MagicMock) -> None:
     spec = SimpleNamespace(path=Path("/repo/specify/tech/SPEC-009/SPEC-009.md"))
-    mock_cls.return_value.get.return_value = spec
+    mock_cls.return_value.find.return_value = spec
 
     ref = resolve_artifact("spec", "SPEC-009", Path("/repo"))
     assert ref.id == "SPEC-009"
@@ -183,7 +184,7 @@ class TestResolveArtifactSpec:
 
   @patch("supekku.scripts.lib.specs.registry.SpecRegistry")
   def test_raises_not_found_for_missing_spec(self, mock_cls: MagicMock) -> None:
-    mock_cls.return_value.get.return_value = None
+    mock_cls.return_value.find.return_value = None
 
     with pytest.raises(ArtifactNotFoundError):
       resolve_artifact("spec", "SPEC-999", Path("/repo"))
@@ -259,7 +260,7 @@ class TestResolveArtifactCard:
   @patch("supekku.scripts.lib.cards.CardRegistry")
   def test_resolves_card(self, mock_cls: MagicMock) -> None:
     card = SimpleNamespace(id="T001", path=Path("/repo/kanban/doing/T001-task.md"))
-    mock_cls.return_value.resolve_card.return_value = card
+    mock_cls.return_value.find.return_value = card
 
     ref = resolve_artifact("card", "T001", Path("/repo"))
     assert ref.id == "T001"
@@ -267,7 +268,7 @@ class TestResolveArtifactCard:
 
   @patch("supekku.scripts.lib.cards.CardRegistry")
   def test_raises_not_found_for_missing_card(self, mock_cls: MagicMock) -> None:
-    mock_cls.return_value.resolve_card.side_effect = FileNotFoundError("nope")
+    mock_cls.return_value.find.return_value = None
 
     with pytest.raises(ArtifactNotFoundError):
       resolve_artifact("card", "T999", Path("/repo"))
@@ -702,12 +703,8 @@ class TestFindArtifactsCard:
 class TestFindArtifactsRequirement:
   """find_artifacts for requirement type."""
 
-  @patch("supekku.scripts.lib.core.paths.get_registry_dir")
   @patch("supekku.scripts.lib.requirements.registry.RequirementsRegistry")
-  def test_finds_matching_requirements(
-    self, mock_cls: MagicMock, mock_dir: MagicMock
-  ) -> None:
-    mock_dir.return_value = Path("/repo/.spec-driver/registry")
+  def test_finds_matching_requirements(self, mock_cls: MagicMock) -> None:
     records = {
       "SPEC-009.FR-001": SimpleNamespace(
         uid="SPEC-009.FR-001", path="specify/tech/SPEC-009.md"
@@ -719,7 +716,7 @@ class TestFindArtifactsRequirement:
         uid="SPEC-010.FR-001", path="specify/tech/SPEC-010.md"
       ),
     }
-    mock_cls.return_value.records = records
+    mock_cls.return_value.collect.return_value = records
 
     refs = list(find_artifacts("requirement", "SPEC-009.*", Path("/repo")))
     ids = [r.id for r in refs]
@@ -727,15 +724,13 @@ class TestFindArtifactsRequirement:
     assert "SPEC-009.FR-002" in ids
     assert "SPEC-010.FR-001" not in ids
 
-  @patch("supekku.scripts.lib.core.paths.get_registry_dir")
   @patch("supekku.scripts.lib.requirements.registry.RequirementsRegistry")
-  def test_colon_normalization(self, mock_cls: MagicMock, mock_dir: MagicMock) -> None:
+  def test_colon_normalization(self, mock_cls: MagicMock) -> None:
     """DEC-041-05: colon in pattern normalized to dot."""
-    mock_dir.return_value = Path("/repo/.spec-driver/registry")
     records = {
       "SPEC-009.FR-001": SimpleNamespace(uid="SPEC-009.FR-001", path="x.md"),
     }
-    mock_cls.return_value.records = records
+    mock_cls.return_value.collect.return_value = records
 
     refs = list(find_artifacts("requirement", "SPEC-009:FR-*", Path("/repo")))
     assert len(refs) == 1

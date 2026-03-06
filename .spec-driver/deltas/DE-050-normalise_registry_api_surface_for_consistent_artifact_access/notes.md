@@ -62,6 +62,31 @@
 
 ### Git state
 
+- Committed as 49e6c4f
+
+## 2026-03-07 - Phase 3 complete (common.py simplification)
+
+### Done
+
+- **`cli/common.py`** resolvers simplified to use normalised API:
+  - `_resolve_spec`: `registry.get()` → `registry.find()`
+  - `_resolve_change`: `registry.collect()` + dict → `registry.find()`
+  - `_resolve_requirement`: manual `registry_path` + `records.get()` → `RequirementsRegistry(root=root)` + `registry.find()`
+  - `_resolve_card`: try/except `resolve_card()` → `registry.find()`
+  - `_find_requirements`: same constructor + `collect()` simplification
+  - `_resolve_backlog`: kept as-is (intentionally preserves multi-match semantics)
+- **`cli/common_test.py`** mocks updated to match new API calls
+- **Verification**: 2700 tests pass, ruff clean, pylint 9.54/10
+
+### Observations
+
+- Deprecation warnings in test output dropped from 27 to 26 (one `get()` call
+  removed from common.py). Remaining warnings come from other CLI/domain callers.
+- Backlog resolver intentionally not simplified — `find_backlog_items_by_id()` with
+  `AmbiguousArtifactError` is the correct semantic for the resolve path.
+
+### Git state
+
 - Uncommitted work
 
 ## 2026-03-06 - ADR draft for registry convention

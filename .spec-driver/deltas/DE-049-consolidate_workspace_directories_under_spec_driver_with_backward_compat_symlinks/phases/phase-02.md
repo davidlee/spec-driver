@@ -4,7 +4,7 @@ slug: 049-consolidate_workspace_directories_under_spec_driver_with_backward_comp
 name: IP-049 Phase 02 — Flatten path model and update config defaults
 created: '2026-03-06'
 updated: '2026-03-06'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -84,17 +84,17 @@ import removed symbols will break — that's Phase 3.
 - [x] Phase 1 committed (structural migration complete)
 
 ## 4. Exit Criteria / Done When
-- [ ] `SPECS_DIR` and `CHANGES_DIR` constants removed from `paths.py`
-- [ ] `get_specs_dir()` and `get_changes_dir()` removed from `paths.py`
-- [ ] All leaf helpers resolve as `get_spec_driver_root() / SUBDIR`
-- [ ] `get_backlog_dir()` / `get_memory_dir()` resolve under `.spec-driver/`
-- [ ] `DEFAULT_CONFIG["dirs"]` updated — `specs`/`changes` keys removed
-- [ ] `_CONFIG_KEY_TO_CONSTANT` updated — `specs`/`changes` entries removed
-- [ ] `init_paths()` emits `warnings.warn()` for unrecognized keys
-- [ ] `paths_test.py` rewritten for new invariants
-- [ ] `config_test.py` updated if needed
-- [ ] `just lint` clean
-- [ ] `just test` — paths/config tests pass (caller failures expected → P3)
+- [x] `SPECS_DIR` and `CHANGES_DIR` constants removed from `paths.py`
+- [x] `get_specs_dir()` and `get_changes_dir()` removed from `paths.py`
+- [x] All leaf helpers resolve as `get_spec_driver_root() / SUBDIR`
+- [x] `get_backlog_dir()` / `get_memory_dir()` resolve under `.spec-driver/`
+- [x] `DEFAULT_CONFIG["dirs"]` updated — `specs`/`changes` keys removed
+- [x] `_CONFIG_KEY_TO_CONSTANT` updated — `specs`/`changes` entries removed
+- [x] `init_paths()` emits `warnings.warn()` for unrecognized keys
+- [x] `paths_test.py` rewritten for new invariants
+- [x] `config_test.py` updated
+- [x] `just lint` clean
+- [x] Paths/config tests pass (69/69)
 
 ## 5. Verification
 - `uv run pytest supekku/scripts/lib/core/paths_test.py -v`
@@ -109,13 +109,14 @@ import removed symbols will break — that's Phase 3.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Flatten path constants | No | Remove SPECS_DIR, CHANGES_DIR |
-| [ ] | 2.2 | Rewrite helpers | No | Leaf helpers → get_spec_driver_root(); remove get_specs_dir/get_changes_dir |
-| [ ] | 2.3 | Update config mapping + defaults | No | _CONFIG_KEY_TO_CONSTANT, DEFAULT_CONFIG |
-| [ ] | 2.4 | Add unknown-key warning to init_paths | No | warnings.warn() |
-| [ ] | 2.5 | Rewrite paths_test.py | No | New structural invariants |
-| [ ] | 2.6 | Update config_test.py | No | If defaults changed |
-| [ ] | 2.7 | Lint and test | No | just lint; targeted pytest |
+| [x] | 2.1 | Flatten path constants | No | SPECS_DIR, CHANGES_DIR removed |
+| [x] | 2.2 | Rewrite helpers | No | All leaf helpers → get_spec_driver_root() |
+| [x] | 2.3 | Update config mapping + defaults | No | specs/changes keys removed |
+| [x] | 2.4 | Add unknown-key warning to init_paths | No | warnings.warn() for unrecognized keys |
+| [x] | 2.5 | Rewrite paths_test.py | No | 40 tests, all pass |
+| [x] | 2.6 | Update config_test.py | No | 2 tests updated |
+| [x] | 2.7 | Lint and test | No | ruff clean, pylint 9.72, 69 tests pass |
+| [x] | 2.8 | Fix production callers (pulled from P3) | No | registry.py + executor.py — import chain required |
 
 ### Task Details
 
@@ -160,13 +161,25 @@ import removed symbols will break — that's Phase 3.
 | _ORIGINAL_DEFAULTS stale after constant removal | Computed at import time from new constants | Clear |
 
 ## 9. Decisions & Outcomes
-*(Updated during execution)*
+
+- Pulled 2 production caller fixes from Phase 3 into Phase 2: `changes/registry.py`
+  and `deletion/executor.py`. The import chain via `__init__.py` → `ChangeRegistry`
+  → `get_changes_dir` made it impossible to even collect paths_test.py without
+  fixing these first.
+- `changes/registry.py` refactored to use a `_KIND_TO_DIR_HELPER` dispatch dict
+  mapping kind → leaf helper function, eliminating the `get_changes_dir() / subdir`
+  pattern entirely. Cleaner than the original.
 
 ## 10. Findings / Research Notes
-*(Updated during execution)*
+
+- Net code reduction: -96 lines (131 added, 227 removed)
+- The `_KIND_TO_DIR` dict in registry.py was renamed to `_KIND_TO_DIR_NAME` to
+  distinguish from the new `_KIND_TO_DIR_HELPER` dispatch dict
+- `deletion/executor.py` had a pre-existing `orphaned_specs` unused argument
+  (pylint W0613) — not introduced by this change, left as-is
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
-- [ ] Hand-off notes to Phase 3
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (69 tests pass, both linters clean)
+- [x] Notes updated (notes.md — Phase 2 section)
+- [x] Hand-off notes to Phase 3 (in notes.md)

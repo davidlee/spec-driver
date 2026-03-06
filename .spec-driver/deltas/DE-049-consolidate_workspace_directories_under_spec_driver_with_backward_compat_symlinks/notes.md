@@ -102,6 +102,35 @@ Phase 1 steps as a reusable shell script with `--dry-run`, idempotency, and
 verification. Placement TBD — move to a proper home when migration/deployment
 strategy is formalized.
 
+## Phase 2 — Flatten path model and config (complete)
+
+### What's done
+
+One commit: `f6b5d97`
+- `paths.py`: removed `SPECS_DIR`, `CHANGES_DIR`, `get_specs_dir()`, `get_changes_dir()`.
+  All leaf helpers now resolve under `get_spec_driver_root()`. `init_paths()` warns
+  on unrecognized `[dirs]` keys.
+- `config.py`: removed `specs`/`changes` from `DEFAULT_CONFIG["dirs"]`
+- `changes/registry.py`: refactored to leaf helper dispatch (`_KIND_TO_DIR_HELPER`)
+- `deletion/executor.py`: removed dead `get_changes_dir` import and assignment
+- `paths_test.py`: fully rewritten (40 tests)
+- `config_test.py`: 2 tests updated
+
+### Adaptation
+
+Pulled `changes/registry.py` and `deletion/executor.py` fixes from Phase 3 scope —
+import chain via `__init__.py` blocked test collection without them.
+
+### Verification
+
+69 tests pass. Both linters clean. Net -96 lines.
+
+### Hand-off to Phase 3
+
+~20 test files still import `SPECS_DIR`, `CHANGES_DIR` for fixture path composition.
+These need updating to use `SPEC_DRIVER_DIR` instead. The `sync/adapters/base.py`
+hardcoded path filter also needs updating. `install.py` needs restructuring.
+
 ### Hand-off to Phase 2
 
 Phase 2 (path model + config) can now proceed. Key inputs:

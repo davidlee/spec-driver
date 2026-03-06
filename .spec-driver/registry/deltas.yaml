@@ -5212,7 +5212,7 @@ deltas:
           mitigation: Only exempt errors present before update; verify with test
   DE-047:
     kind: delta
-    status: draft
+    status: completed
     name: Contradiction discovery and resolution framework
     slug: contradiction_discovery_and_resolution_framework
     updated: '2026-03-05'
@@ -5367,3 +5367,146 @@ deltas:
           mitigation: "REs can be lightweight \u2014 frontmatter + summary of change"
       - id: IP-047.PHASE-03
         phase: IP-047.PHASE-03
+  DE-048:
+    kind: delta
+    status: draft
+    name: Delta - Configurable workspace directory paths via workflow.toml
+    slug: configurable_workspace_directory_paths_via_workflow_toml
+    updated: '2026-03-06'
+    path: change/deltas/DE-048-configurable_workspace_directory_paths_via_workflow_toml/DE-048.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: follows-from
+      target: DE-044
+      attributes: {}
+    plan:
+      id: IP-048
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-048
+        delta: DE-048
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-048-P01
+      phases:
+      - id: IP-048-P01
+        phase: IP-048-P01
+  DE-049:
+    kind: delta
+    status: draft
+    name: Delta - Consolidate workspace directories under .spec-driver with backward-compat
+      symlinks
+    slug: consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks
+    updated: '2026-03-06'
+    path: change/deltas/DE-049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks/DE-049.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: follows-from
+      target: DE-048
+      attributes: {}
+    - type: implements
+      target: IMPR-008
+      attributes: {}
+    plan:
+      id: IP-049
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-049
+        delta: DE-049
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-049-P01
+      phases:
+      - id: IP-049-P01
+        phase: IP-049-P01
+  DE-050:
+    kind: delta
+    status: draft
+    name: Delta - Normalise registry API surface for consistent artifact access
+    slug: normalise_registry_api_surface_for_consistent_artifact_access
+    updated: '2026-03-06'
+    path: change/deltas/DE-050-normalise_registry_api_surface_for_consistent_artifact_access/DE-050.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-050
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-050
+        delta: DE-050
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-050-P01
+      phases:
+      - id: IP-050-P01
+        phase: IP-050-P01
+  DE-051:
+    kind: delta
+    status: completed
+    name: Delta - migrate spec auto-creation opt-in from marker file to workflow.toml
+    slug: migrate_spec_auto_creation_opt_in_from_marker_file_to_workflow_toml
+    updated: '2026-03-06'
+    path: change/deltas/DE-051-migrate_spec_auto_creation_opt_in_from_marker_file_to_workflow_toml/DE-051.md
+    applies_to:
+      specs:
+      - PROD-016
+      requirements:
+      - PROD-016.FR-001
+      - PROD-016.FR-002
+      - PROD-016.FR-008
+    plan:
+      id: IP-051
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-051
+        delta: DE-051
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-016
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-016.FR-001
+          - PROD-016.FR-002
+          - PROD-016.FR-008
+          dependencies: []
+        phases:
+        - id: IP-051-P01
+        - id: IP-051-P02
+      phases:
+      - id: IP-051-P01
+        phase: IP-051-P01
+      - id: IP-051-P02
+        phase: IP-051-P02

@@ -1118,7 +1118,11 @@ requirements:
   PROD-008.FR-001:
     label: FR-001
     title: "The specs frontmatter and coverage block MUST be the authoritative record\
-      \ of each requirement\u2019s lifecycle state and supporting evidence."
+      \ of each requirement\u2019s *normative* lifecycle state and supporting evidence.\
+      \ Evidence overlays from deltas, audits, and contracts record *observed* truth\
+      \ and may disagree with the spec \u2014 such disagreement is drift to be reconciled\
+      \ explicitly, not a silent override (per ADR-008). The requirements registry\
+      \ is a derived projection of this data, not itself an authoritative source."
     specs:
     - PROD-008
     - PROD-009
@@ -1165,9 +1169,10 @@ requirements:
     path: specify/product/PROD-008/PROD-008.md
   PROD-008.FR-003:
     label: FR-003
-    title: Audits MUST reconcile observed behaviour against the spec coverage block
-      and raise drift through validation warnings until the spec is corrected or follow-up
-      work is scheduled.
+    title: "Audits MUST surface observed behaviour against the spec coverage block\
+      \ and raise drift through validation warnings until the spec is explicitly reconciled\
+      \ or follow-up work is scheduled. Audit findings do not silently override spec\
+      \ truth \u2014 they trigger explicit reconciliation (per ADR-008)."
     specs:
     - PROD-008
     primary_spec: PROD-008
@@ -1244,9 +1249,12 @@ requirements:
     path: specify/product/PROD-009/PROD-009.md
   PROD-009.FR-002:
     label: FR-002
-    title: The lifecycle engine MUST overlay statuses from deltas and audits using
-      timestamp precedence, preferring audits over deltas when recorded at the same
-      time.
+    title: "The lifecycle engine MUST surface evidence from deltas and audits alongside\
+      \ spec baseline statuses, presenting both normative and observed truth with\
+      \ provenance. When normative and observed truth diverge, the system MUST raise\
+      \ drift warnings for explicit human reconciliation rather than silently determining\
+      \ an effective status by timestamp or artefact-kind precedence (per ADR-008\
+      \ \xA73\u20134)."
     specs:
     - PROD-009
     primary_spec: PROD-009
@@ -2118,8 +2126,10 @@ requirements:
     path: specify/product/PROD-012/PROD-012.md
   PROD-012.FR-009:
     label: FR-009
-    title: System MUST create symlink trees organizing contracts by-language and by-package
-      under `specify/tech/by-**/` directories
+    title: "System MAY create derived navigation indexes organizing contracts by-language\
+      \ and by-package. These are augmentation views over the canonical mirror-of-source\
+      \ contracts corpus (`.contracts/`), not a competing canonical storage structure\
+      \ (per ADR-007 \xA75\u20136)."
     specs:
     - PROD-012
     primary_spec: PROD-012
@@ -2236,9 +2246,9 @@ requirements:
     path: specify/product/PROD-012/PROD-012.md
   PROD-012.FR-016:
     label: FR-016
-    title: Symlink tree structures (`by-language/` and `by-package/`) MUST be intuitive,
-      easy to navigate, and follow unsurprising conventions matching developer mental
-      models
+    title: Contract navigation structures (mirror-of-source corpus and optional derived
+      indexes) MUST be intuitive, easy to navigate, and follow unsurprising conventions
+      matching developer mental models
     specs:
     - PROD-012
     primary_spec: PROD-012
@@ -3032,6 +3042,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-031
+    - DE-051
     verified_by: []
     coverage_evidence:
     - VT-016-001
@@ -3054,6 +3065,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-039
+    - DE-051
     verified_by: []
     coverage_evidence:
     - VT-039-001
@@ -3178,6 +3190,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-031
+    - DE-051
     verified_by: []
     coverage_evidence:
     - VT-016-005

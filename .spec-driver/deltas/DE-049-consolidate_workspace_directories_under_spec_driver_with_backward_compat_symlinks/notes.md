@@ -252,15 +252,25 @@ Uncommitted. All changes in working tree.
 - The `_COMPAT_CHILDREN` constant is scoped to skill sync but could be
   useful elsewhere if other migration-aware code needs the same check.
 
-### Follow-up considerations
+### Follow-up items
 
-- This repo's `.claude/skills/` and `.agents/skills/` are currently real
-  dirs with committed content. Running `spec-driver install` will migrate
-  them to symlinks (pre-migration layout detected). The committed skill
-  files will become dead — should be cleaned up in a follow-up commit.
-- `install.py` calls `sync_skills()` but doesn't inspect return — no
-  changes needed there, but the installer doesn't currently log symlink
-  outcomes. Low priority.
+1. **This repo's skill dirs need manual cleanup.** Post-migration layout
+   means `_is_pre_migration_layout()` → False, so real `.claude/skills/`
+   and `.agents/skills/` dirs are treated as intentional customisation and
+   left alone. Need to: delete the real dirs, re-run `spec-driver install`
+   to create symlinks, commit the result.
+
+2. **Memory wheel bundling.** `pyproject.toml` `force-include` maps
+   `"memory"` → `supekku/memory` — but `memory/` is now a symlink to
+   `.spec-driver/memory/`, which bundles all 35 memories (including 8
+   project-specific ones) into the wheel. Functionally safe (install logic
+   only touches `spec-driver.*` memories), but untidy. Fix: maintain
+   `supekku/memory/` as a real dir with only distributable memories,
+   update `_find_memory_source()` dev fallback accordingly.
+
+3. **Installer doesn't log symlink outcomes.** `install.py` calls
+   `sync_skills()` but doesn't inspect the `symlinks` return dict.
+   Low priority.
 
 ---
 

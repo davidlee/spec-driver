@@ -1,0 +1,1 @@
+../../../../../../../../../../.contracts/all/supekku/scripts/lib/docs/python/generator.py.md

@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "languages": {
+    "python": {
+      "supekku/cli": "SPEC-134",
+      "supekku/scripts/backlog": "SPEC-135",
+      "supekku/scripts/cli": "SPEC-136",
+      "supekku/scripts/lib/backlog": "SPEC-137",
+      "supekku/scripts/lib/blocks/metadata": "SPEC-138",
+      "supekku/scripts/lib/cards": "SPEC-139",
+      "supekku/scripts/lib/changes/blocks": "SPEC-140",
+      "supekku/scripts/lib/contracts": "SPEC-141",
+      "supekku/scripts/lib/core/frontmatter_metadata": "SPEC-142",
+      "supekku/scripts/lib/decisions": "SPEC-143",
+      "supekku/scripts/lib/deletion": "SPEC-144",
+      "supekku/scripts/lib/docs/python": "SPEC-145",
+      "supekku/scripts/lib/formatters": "SPEC-146",
+      "supekku/scripts/lib/memory": "SPEC-147",
+      "supekku/scripts/lib/policies": "SPEC-148",
+      "supekku/scripts/lib/relations": "SPEC-149",
+      "supekku/scripts/lib/requirements": "SPEC-150",
+      "supekku/scripts/lib/skills": "SPEC-151",
+      "supekku/scripts/lib/specs": "SPEC-152",
+      "supekku/scripts/lib/standards": "SPEC-153",
+      "supekku/scripts/lib/sync/adapters": "SPEC-154",
+      "supekku/scripts/lib/validation": "SPEC-155"
+    }
+  },
+  "metadata": {
+    "created": "2026-03-07T01:17:49.408352"
+  }
+}

@@ -1,0 +1,1 @@
+../../../../../../../.contracts/tests/supekku/cli/common_test.py.md

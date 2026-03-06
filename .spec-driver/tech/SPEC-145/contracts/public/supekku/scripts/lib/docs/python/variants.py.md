@@ -1,0 +1,1 @@
+../../../../../../../../../../.contracts/public/supekku/scripts/lib/docs/python/variants.py.md

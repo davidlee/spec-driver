@@ -1,0 +1,1 @@
+../../../../../../../../../.contracts/public/supekku/scripts/lib/standards/creation.py.md

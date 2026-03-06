@@ -1,0 +1,1 @@
+../../../../../../../../../../.contracts/tests/supekku/scripts/lib/docs/python/variants_test.py.md

@@ -1,0 +1,1 @@
+../../../../../../../../.contracts/all/supekku/scripts/cli/ast_doc_generator.py.md

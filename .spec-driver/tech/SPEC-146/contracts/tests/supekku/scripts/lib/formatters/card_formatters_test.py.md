@@ -1,0 +1,1 @@
+../../../../../../../../../.contracts/tests/supekku/scripts/lib/formatters/card_formatters_test.py.md

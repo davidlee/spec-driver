@@ -1,0 +1,1 @@
+../../../../../../../../../../.contracts/all/supekku/scripts/lib/docs/python/analyzer.py.md

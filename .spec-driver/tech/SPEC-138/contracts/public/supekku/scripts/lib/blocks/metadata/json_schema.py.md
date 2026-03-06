@@ -1,0 +1,1 @@
+../../../../../../../../../../.contracts/public/supekku/scripts/lib/blocks/metadata/json_schema.py.md

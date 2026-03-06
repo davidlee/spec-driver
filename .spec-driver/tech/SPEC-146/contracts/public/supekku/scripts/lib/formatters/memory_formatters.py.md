@@ -1,0 +1,1 @@
+../../../../../../../../../.contracts/public/supekku/scripts/lib/formatters/memory_formatters.py.md

@@ -1,0 +1,1 @@
+../../../../../../../../../.contracts/tests/supekku/scripts/lib/memory/registry_test.py.md

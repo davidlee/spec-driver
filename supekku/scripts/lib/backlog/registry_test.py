@@ -13,6 +13,7 @@ from supekku.scripts.lib.backlog.registry import (
   append_backlog_summary,
   create_backlog_entry,
   find_backlog_items_by_id,
+  find_item,
   find_repo_root,
   load_backlog_registry,
   save_backlog_registry,
@@ -320,6 +321,65 @@ class FindBacklogItemsByIdTest(unittest.TestCase):
     self._create_item(root, "issues", "ISSUE-001", "second")
     items = find_backlog_items_by_id("ISSUE-001", root)
     assert len(items) == 2
+
+
+class TestFindItem(unittest.TestCase):
+  """Tests for find_item() convenience function (ADR-009 surface)."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def _make_repo(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+    return root
+
+  def _create_item(self, root: Path, subdir: str, item_id: str, slug: str) -> Path:
+    entry_dir = root / SPEC_DRIVER_DIR / BACKLOG_DIR / subdir / f"{item_id}-{slug}"
+    entry_dir.mkdir(parents=True, exist_ok=True)
+    md_file = entry_dir / f"{item_id}.md"
+    kind = subdir.rstrip("s")
+    fm = (
+      f"---\nid: {item_id}\nname: {slug}\nkind: {kind}\nstatus: open\n---\n# {slug}\n"
+    )
+    md_file.write_text(fm, encoding="utf-8")
+    return md_file
+
+  def test_find_item_returns_item(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test-issue")
+    item = find_item("ISSUE-001", root)
+    assert item is not None
+    assert item.id == "ISSUE-001"
+
+  def test_find_item_returns_none_for_missing(self) -> None:
+    root = self._make_repo()
+    assert find_item("ISSUE-999", root) is None
+
+  def test_find_item_warns_on_multiple(self) -> None:
+    import warnings  # noqa: PLC0415
+
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "first")
+    self._create_item(root, "issues", "ISSUE-001", "second")
+    with warnings.catch_warnings(record=True) as w:
+      warnings.simplefilter("always")
+      item = find_item("ISSUE-001", root)
+    assert item is not None
+    assert len(w) == 1
+    assert "Multiple" in str(w[0].message)
+
+  def test_find_item_respects_kind_filter(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test")
+    assert find_item("ISSUE-001", root, kind="issue") is not None
+    assert find_item("ISSUE-001", root, kind="problem") is None
 
 
 if __name__ == "__main__":

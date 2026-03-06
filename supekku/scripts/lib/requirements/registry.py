@@ -152,10 +152,82 @@ class SyncStats:
 class RequirementsRegistry:
   """Registry for managing requirement records and lifecycle tracking."""
 
-  def __init__(self, registry_path: Path) -> None:
+  def __init__(
+    self,
+    registry_path: Path | None = None,
+    *,
+    root: Path | None = None,
+  ) -> None:
+    if registry_path is None and root is None:
+      root = find_repo_root()
+    if registry_path is None:
+      from supekku.scripts.lib.core.paths import get_registry_dir  # noqa: PLC0415
+
+      registry_path = get_registry_dir(root) / "requirements.yaml"
     self.registry_path = registry_path
     self.records: dict[str, RequirementRecord] = {}
     self._load()
+
+  # -- ADR-009 standard surface --------------------------------------------
+
+  def find(self, uid: str) -> RequirementRecord | None:
+    """Find a requirement record by its UID.
+
+    Returns:
+      RequirementRecord or None if not found.
+    """
+    return self.records.get(uid)
+
+  def collect(self) -> dict[str, RequirementRecord]:
+    """Return all requirement records as a dictionary keyed by UID.
+
+    Returns:
+      Copy of the internal records dictionary.
+    """
+    return dict(self.records)
+
+  def iter(self, *, status: str | None = None) -> Iterator[RequirementRecord]:
+    """Iterate over requirement records, optionally filtered by status.
+
+    Args:
+      status: If provided, yield only records with this status.
+
+    Yields:
+      RequirementRecord instances.
+    """
+    for record in self.records.values():
+      if status is None or record.status == status:
+        yield record
+
+  def filter(
+    self,
+    *,
+    status: str | None = None,
+    spec: str | None = None,
+    kind: str | None = None,
+    tag: str | None = None,
+  ) -> list[RequirementRecord]:
+    """Filter requirement records by multiple criteria (AND logic).
+
+    Args:
+      status: Filter by status field.
+      spec: Filter by spec membership (primary or secondary).
+      kind: Filter by kind (functional/non-functional).
+      tag: Filter by tag membership.
+
+    Returns:
+      List of matching RequirementRecords.
+    """
+    results = []
+    for record in self.iter(status=status):
+      if spec and spec not in record.specs:
+        continue
+      if kind and record.kind != kind:
+        continue
+      if tag and tag not in record.tags:
+        continue
+      results.append(record)
+    return results
 
   # ------------------------------------------------------------------
   def _load(self) -> None:

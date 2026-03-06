@@ -31,6 +31,37 @@
 
 ### Git state
 
+- Committed as 344e6e5
+
+## 2026-03-07 - Phase 2 complete (Requirements + Card + Backlog)
+
+### Done
+
+- **RequirementsRegistry** (`supekku/scripts/lib/requirements/registry.py`):
+  - Constructor now accepts optional `root` keyword alongside existing positional
+    `registry_path`. `RequirementsRegistry(path)` still works;
+    `RequirementsRegistry(root=root)` auto-discovers path.
+  - Added `find(uid)`, `collect()`, `iter(status=)`, `filter(status=, spec=, kind=, tag=)`
+- **CardRegistry** (`supekku/scripts/lib/cards/registry.py`):
+  - Added `find(id)`, `collect()`, `iter(lane=)`, `filter(lane=)` per DEC-050-05
+  - `resolve_card()` kept for strict resolution (raises on missing/ambiguous)
+- **BacklogRegistry** (`supekku/scripts/lib/backlog/registry.py`):
+  - Added `find_item(id, root, kind)` convenience function
+  - Returns first match or None; warns on multiple matches per DEC-050-02
+- **Tests**: 27 new tests across three registries (2700 total suite)
+- **Verification**: `just` passes — 2700 tests, ruff clean, pylint 9.54/10
+
+### Observations
+
+- RequirementsRegistry constructor change was clean — `registry_path` is now
+  `Path | None = None` with `root` as keyword-only alternative. Lazy import of
+  `get_registry_dir` avoids circular import.
+- CardRegistry `find()` scans `all_cards()` each call (no cache). Acceptable for
+  small kanban boards. `collect()` similarly builds dict from `all_cards()`.
+- All 36+ existing callers of `RequirementsRegistry(path)` continue working.
+
+### Git state
+
 - Uncommitted work
 
 ## 2026-03-06 - ADR draft for registry convention

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import sys
+import warnings
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -491,11 +492,43 @@ def find_backlog_items_by_id(
   return sorted(items, key=lambda x: str(x.path))
 
 
+def find_item(
+  item_id: str,
+  root: Path | None = None,
+  kind: str | None = None,
+) -> BacklogItem | None:
+  """Find a single backlog item by ID, returning the first match or None.
+
+  Convenience wrapper around find_backlog_items_by_id for callers that
+  expect at most one match. Emits a warning if multiple matches are found.
+
+  Args:
+    item_id: Backlog item ID (e.g. 'ISSUE-001').
+    root: Repository root path (auto-detected if None).
+    kind: Optional kind filter.
+
+  Returns:
+    BacklogItem or None if not found.
+  """
+  if root is None:
+    root = find_repo_root()
+  matches = find_backlog_items_by_id(item_id, root, kind=kind)
+  if not matches:
+    return None
+  if len(matches) > 1:
+    warnings.warn(
+      f"Multiple backlog items found for {item_id}; returning first match",
+      stacklevel=2,
+    )
+  return matches[0]
+
+
 __all__ = [
   "append_backlog_summary",
   "create_backlog_entry",
   "discover_backlog_items",
   "find_backlog_items_by_id",
+  "find_item",
   "find_repo_root",
   "load_backlog_registry",
   "save_backlog_registry",

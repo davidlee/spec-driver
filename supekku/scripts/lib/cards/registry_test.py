@@ -424,3 +424,84 @@ class TestCardResolution(unittest.TestCase):
     path = registry.resolve_path("T789")
 
     self.assertEqual(path, str(card_path))
+
+
+class TestCardRegistryStandardSurface(unittest.TestCase):
+  """Tests for ADR-009 standard registry surface: find, collect, iter, filter."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+    self._tmpdir = tempfile.TemporaryDirectory()
+    self.tmp_path = Path(self._tmpdir.name)
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+    self._tmpdir.cleanup()
+
+  def _create_card(self, card_id: str, lane: str) -> None:
+    card_path = self.tmp_path / "kanban" / lane / f"{card_id}-task.md"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_text(f"# {card_id}: Task\n\nCreated: 2026-02-03\n")
+
+  # -- find() ---------------------------------------------------------------
+
+  def test_find_returns_card(self) -> None:
+    self._create_card("T001", "backlog")
+    registry = CardRegistry(self.tmp_path)
+    card = registry.find("T001")
+    assert card is not None
+    assert card.id == "T001"
+
+  def test_find_returns_none_for_missing(self) -> None:
+    (self.tmp_path / "kanban").mkdir(parents=True)
+    registry = CardRegistry(self.tmp_path)
+    assert registry.find("T999") is None
+
+  # -- collect() ------------------------------------------------------------
+
+  def test_collect_returns_dict(self) -> None:
+    self._create_card("T001", "backlog")
+    self._create_card("T002", "doing")
+    registry = CardRegistry(self.tmp_path)
+    result = registry.collect()
+    assert isinstance(result, dict)
+    assert "T001" in result
+    assert "T002" in result
+
+  # -- iter() ---------------------------------------------------------------
+
+  def test_iter_yields_all(self) -> None:
+    self._create_card("T001", "backlog")
+    self._create_card("T002", "doing")
+    registry = CardRegistry(self.tmp_path)
+    ids = {c.id for c in registry.iter()}
+    assert ids == {"T001", "T002"}
+
+  def test_iter_filters_by_lane(self) -> None:
+    self._create_card("T001", "backlog")
+    self._create_card("T002", "doing")
+    registry = CardRegistry(self.tmp_path)
+    ids = {c.id for c in registry.iter(lane="doing")}
+    assert ids == {"T002"}
+
+  # -- filter() -------------------------------------------------------------
+
+  def test_filter_by_lane(self) -> None:
+    self._create_card("T001", "backlog")
+    self._create_card("T002", "doing")
+    self._create_card("T003", "done")
+    registry = CardRegistry(self.tmp_path)
+    result = registry.filter(lane="backlog")
+    assert len(result) == 1
+    assert result[0].id == "T001"
+
+  def test_filter_no_params_returns_all(self) -> None:
+    self._create_card("T001", "backlog")
+    self._create_card("T002", "doing")
+    registry = CardRegistry(self.tmp_path)
+    assert len(registry.filter()) == 2
+
+  def test_filter_no_matches_returns_empty(self) -> None:
+    self._create_card("T001", "backlog")
+    registry = CardRegistry(self.tmp_path)
+    assert registry.filter(lane="done") == []

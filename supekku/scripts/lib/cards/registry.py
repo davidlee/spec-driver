@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterator
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
@@ -34,6 +35,53 @@ class CardRegistry:
     """
     self.root = Path(root)
     self.kanban_dir = self.root / "kanban"
+
+  # -- ADR-009 standard surface --------------------------------------------
+
+  def find(self, card_id: str) -> Card | None:
+    """Find a card by its ID.
+
+    Returns:
+      Card or None if not found.
+    """
+    for card in self.all_cards():
+      if card.id == card_id:
+        return card
+    return None
+
+  def collect(self) -> dict[str, Card]:
+    """Return all cards as a dictionary keyed by ID.
+
+    Returns:
+      Dictionary mapping card ID to Card.
+    """
+    return {card.id: card for card in self.all_cards()}
+
+  def iter(self, *, lane: str | None = None) -> Iterator[Card]:
+    """Iterate over cards, optionally filtered by lane.
+
+    Args:
+      lane: If provided, yield only cards in this lane.
+
+    Yields:
+      Card instances.
+    """
+    for card in self.all_cards():
+      if lane is None or card.lane == lane:
+        yield card
+
+  def filter(self, *, lane: str | None = None) -> list[Card]:
+    """Filter cards by lane.
+
+    Args:
+      lane: Filter by lane (backlog/doing/done).
+
+    Returns:
+      List of matching Cards.
+    """
+    return list(self.iter(lane=lane))
+
+  # ------------------------------------------------------------------
 
   def all_cards(self) -> list[Card]:
     """Discover all cards in kanban directory.

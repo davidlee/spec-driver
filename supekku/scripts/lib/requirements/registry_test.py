@@ -1606,5 +1606,150 @@ class TestFindByVerificationKind(unittest.TestCase):
       assert "SPEC-001.NF-001" not in uids
 
 
+class TestRequirementsRegistryStandardSurface(unittest.TestCase):
+  """Tests for ADR-009 standard registry surface: find, collect, iter, filter."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def _make_registry(self) -> tuple[RequirementsRegistry, Path]:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    registry.records["SPEC-001.FR-001"] = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="First requirement",
+      specs=["SPEC-001"],
+      kind="functional",
+      status=STATUS_ACTIVE,
+      tags=["core"],
+    )
+    registry.records["SPEC-001.NF-001"] = RequirementRecord(
+      uid="SPEC-001.NF-001",
+      label="NF-001",
+      title="Non-functional requirement",
+      specs=["SPEC-001"],
+      kind="non-functional",
+      status=STATUS_PENDING,
+      tags=["performance"],
+    )
+    registry.records["SPEC-002.FR-001"] = RequirementRecord(
+      uid="SPEC-002.FR-001",
+      label="FR-001",
+      title="Second spec requirement",
+      specs=["SPEC-002"],
+      kind="functional",
+      status=STATUS_ACTIVE,
+    )
+    return registry, root
+
+  # -- constructor ----------------------------------------------------------
+
+  def test_constructor_with_root_keyword(self) -> None:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+    registry = RequirementsRegistry(root=root)
+    assert registry.registry_path == get_registry_dir(root) / "requirements.yaml"
+
+  def test_constructor_positional_still_works(self) -> None:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+    explicit_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(explicit_path)
+    assert registry.registry_path == explicit_path
+
+  # -- find() ---------------------------------------------------------------
+
+  def test_find_returns_record(self) -> None:
+    registry, _ = self._make_registry()
+    record = registry.find("SPEC-001.FR-001")
+    assert record is not None
+    assert record.uid == "SPEC-001.FR-001"
+
+  def test_find_returns_none_for_missing(self) -> None:
+    registry, _ = self._make_registry()
+    assert registry.find("SPEC-999.FR-999") is None
+
+  # -- collect() ------------------------------------------------------------
+
+  def test_collect_returns_dict(self) -> None:
+    registry, _ = self._make_registry()
+    result = registry.collect()
+    assert isinstance(result, dict)
+    assert len(result) == 3
+    assert "SPEC-001.FR-001" in result
+
+  def test_collect_returns_copy(self) -> None:
+    registry, _ = self._make_registry()
+    a = registry.collect()
+    b = registry.collect()
+    assert a is not b
+
+  # -- iter() ---------------------------------------------------------------
+
+  def test_iter_yields_all(self) -> None:
+    registry, _ = self._make_registry()
+    uids = {r.uid for r in registry.iter()}
+    assert len(uids) == 3
+
+  def test_iter_filters_by_status(self) -> None:
+    registry, _ = self._make_registry()
+    uids = {r.uid for r in registry.iter(status=STATUS_ACTIVE)}
+    assert uids == {"SPEC-001.FR-001", "SPEC-002.FR-001"}
+
+  # -- filter() -------------------------------------------------------------
+
+  def test_filter_by_status(self) -> None:
+    registry, _ = self._make_registry()
+    result = registry.filter(status=STATUS_PENDING)
+    assert len(result) == 1
+    assert result[0].uid == "SPEC-001.NF-001"
+
+  def test_filter_by_spec(self) -> None:
+    registry, _ = self._make_registry()
+    result = registry.filter(spec="SPEC-002")
+    assert len(result) == 1
+    assert result[0].uid == "SPEC-002.FR-001"
+
+  def test_filter_by_kind(self) -> None:
+    registry, _ = self._make_registry()
+    result = registry.filter(kind="non-functional")
+    assert len(result) == 1
+    assert result[0].uid == "SPEC-001.NF-001"
+
+  def test_filter_by_tag(self) -> None:
+    registry, _ = self._make_registry()
+    result = registry.filter(tag="core")
+    assert len(result) == 1
+    assert result[0].uid == "SPEC-001.FR-001"
+
+  def test_filter_and_logic(self) -> None:
+    registry, _ = self._make_registry()
+    result = registry.filter(status=STATUS_ACTIVE, kind="functional")
+    assert len(result) == 2
+
+  def test_filter_no_params_returns_all(self) -> None:
+    registry, _ = self._make_registry()
+    assert len(registry.filter()) == 3
+
+  def test_filter_no_matches_returns_empty(self) -> None:
+    registry, _ = self._make_registry()
+    assert registry.filter(tag="nonexistent") == []
+
+
 if __name__ == "__main__":
   unittest.main()

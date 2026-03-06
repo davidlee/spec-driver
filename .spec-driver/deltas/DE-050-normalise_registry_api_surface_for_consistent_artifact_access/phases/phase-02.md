@@ -62,8 +62,8 @@ concessions.
 
 | Status | ID | Description | Notes |
 | --- | --- | --- | --- |
-| [ ] | 2.1 | RequirementsRegistry: find(), collect(), iter(), filter(), root kw | |
-| [ ] | 2.2 | CardRegistry: find(), collect(), iter(lane=), filter(lane=) | |
-| [ ] | 2.3 | BacklogRegistry: find_item() convenience function | |
-| [ ] | 2.4 | Tests for all new methods | |
-| [ ] | 2.5 | Lint + full test suite | |
+| [x] | 2.1 | RequirementsRegistry: find(), collect(), iter(), filter(), root kw | done |
+| [x] | 2.2 | CardRegistry: find(), collect(), iter(lane=), filter(lane=) | done |
+| [x] | 2.3 | BacklogRegistry: find_item() convenience function | done |
+| [x] | 2.4 | Tests for all new methods | 27 new tests |
+| [x] | 2.5 | Lint + full test suite | 2700 pass, ruff clean, pylint 9.54 |

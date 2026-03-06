@@ -53,7 +53,7 @@ We intentionally avoid “module spec” because “module” varies across lang
 ### Classification (non-breaking v1)
 
 Keep existing spec IDs and storage (`SPEC-###` under `specify/tech/`) but require explicit classification via frontmatter:
-- `c4_level`: already supported by schema (`system|container|component|code|interaction`)
+- `c4_level`: already supported by schema (`system|container|component|code`)
 - Standardize `category` to distinguish `unit` vs `assembly` (and allow future categories).
 
 Reserved `category` values for `kind: spec` (tech specs):
@@ -62,7 +62,7 @@ Reserved `category` values for `kind: spec` (tech specs):
 
 Default mapping (guidance, not a strict rule):
 - `category: unit` SHOULD imply `c4_level: code`
-- `category: assembly` SHOULD use `c4_level: component|container|system|interaction` depending on scope
+- `category: assembly` SHOULD use `c4_level: component|container|system` depending on scope
 
 Tooling SHOULD provide “views” (indices) that separate these categories for navigation and automation, without requiring
 an immediate breaking migration.

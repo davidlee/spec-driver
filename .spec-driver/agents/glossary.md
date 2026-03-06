@@ -18,7 +18,7 @@ ID format: `TNNN-slug`
 - **Tech Spec** (`SPEC-xxx`): Technical specification describing responsibilities, architecture, behaviour, and requirements. Location: `specify/tech/SPEC-xxx/`.
   - `category: unit` — 1:1 with a code unit (file/module/package).
   - `category: assembly` — cross-unit subsystem/integration/functional slice.
-  - `c4_level: system|container|component|code|interaction` — C4 architecture level.
+  - `c4_level: system|container|component|code` — C4 architecture level.
 - **Testing Companion** (`SPEC-xxx.tests.md`): Supplemental testing strategy and suite inventory.
 
 ## Change Artefacts

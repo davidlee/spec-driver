@@ -3,7 +3,7 @@ id: PROD-003
 slug: policy-and-standard-management
 name: Policy and Standard Management
 created: '2025-11-02'
-updated: '2025-11-02'
+updated: '2026-03-06'
 status: draft
 kind: prod
 aliases: []
@@ -16,7 +16,7 @@ relations:
     nature: Registry pattern reuse from decisions package
 guiding_principles:
   - Policies enforce hard rules; standards provide flexible guidance
-  - Bidirectional traceability between policies, standards, and decisions
+  - Bidirectional traceability between policies, standards, and decisions (reverse references computed at runtime per ADR-002)
   - Simple, focused metadata structure (Statement, Rationale, Scope, Verification)
 assumptions:
   - Teams already use ADRs and understand the decision registry pattern
@@ -118,7 +118,7 @@ capabilities:
       - Link policies/standards to specs, requirements, deltas
       - Support bidirectional references between policies and standards
       - Display policy/standard references in ADRs and other artifacts
-      - Maintain backlinks automatically
+      - Compute reverse references at runtime from forward references (per ADR-002)
     requirements:
       - PROD-003.FR-007
       - PROD-003.FR-008
@@ -128,7 +128,7 @@ capabilities:
       through decisions to implementation artifacts.
     success_criteria:
       - Policies/standards referenced from ADRs, specs, deltas
-      - Backlinks maintained automatically
+      - Reverse references computed at runtime
       - Governance context visible when viewing decisions
 ```
 
@@ -240,7 +240,7 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 3. **Project Managers / QA**
    - **Goals**: Verify compliance with policies, track governance evolution, audit decision rationale
    - **Pains**: No central registry of policies, unclear which rules are active vs deprecated
-   - **Expectations**: Filterable lists, backlinks to implementing artifacts, verification traceability
+   - **Expectations**: Filterable lists, computed reverse references to implementing artifacts, verification traceability
 
 ### Primary Journeys / Flows
 
@@ -274,7 +274,7 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 **When** they add `policies: [POL-001]` to the ADR frontmatter
 **Then**:
 1. ADR explicitly cites governing policy
-2. Policy's backlinks automatically include this ADR
+2. Policy's computed reverse references automatically include this ADR
 3. `spec-driver show POL-001` displays all implementing ADRs
 4. Relationship is bidirectionally navigable
 5. Decision rationale is grounded in governance context
@@ -287,7 +287,7 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 1. System displays all active (required) policies
 2. Developer reviews each policy's Statement and Scope
 3. Developer understands what rules apply to their work
-4. Developer can follow backlinks to see how policies are implemented
+4. Developer can follow reverse references to see how policies are implemented
 
 ### Edge Cases & Non-goals
 
@@ -295,7 +295,7 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 - **Conflicting policies**: Two required policies that contradict each other (requires architectural resolution, not tooling)
 - **Policy without verification**: Valid but indicates governance gap (flagged in reports)
 - **Standard that becomes policy**: Use supersession to deprecate STD-XXX and create POL-XXX
-- **Deprecated policy still referenced**: Backlinks show usage; requires cleanup (detected by validation)
+- **Deprecated policy still referenced**: Computed reverse references show usage; requires cleanup (detected by validation)
 
 **Non-goals**:
 - **Automated enforcement**: spec-driver documents policies/standards but doesn't enforce them in CI/CD (integration point for future)
@@ -313,7 +313,7 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 
 **Discovery and Navigation** provides CLI commands to list, filter, and display policies/standards, making governance discoverable. Cross-references between policies, standards, and ADRs enable navigation from rules to implementations.
 
-**Traceability and Integration** connects policies/standards to the broader artifact graph (specs, requirements, deltas, ADRs). Bidirectional references and automatic backlinks ensure governance context is always available.
+**Traceability and Integration** connects policies/standards to the broader artifact graph (specs, requirements, deltas, ADRs). Forward references in frontmatter plus runtime-computed reverse references ensure governance context is always available (per ADR-002, reverse references are never stored).
 
 ### Functional Requirements
 
@@ -336,10 +336,10 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
   *Verification*: VT-PROD-003-006 - Test show commands with all metadata fields populated
 
 - **FR-007**: System MUST support bidirectional cross-references between policies and standards (policies can reference standards and vice versa)
-  *Verification*: VT-PROD-003-007 - Test mutual references and backlink generation
+  *Verification*: VT-PROD-003-007 - Test mutual forward references and computed reverse reference resolution
 
 - **FR-008**: System MUST allow ADRs, specs, deltas, and other artifacts to reference policies and standards via frontmatter fields
-  *Verification*: VT-PROD-003-008 - Test policy/standard references from ADRs with backlink validation
+  *Verification*: VT-PROD-003-008 - Test policy/standard references from ADRs with forward reference validation
 
 ### Non-Functional Requirements
 
@@ -444,7 +444,7 @@ Updated: 2025-11-02
 Statement:
 All production code must be accompanied by automated tests.
 
-Backlinks:
+Reverse References (computed at runtime):
   specs: SPEC-099
   deltas: DE-042
   related_decisions: ADR-023, ADR-035
@@ -484,7 +484,9 @@ class PolicyRecord:
   tags: list[str]                  # Classification tags
   summary: str                     # Short summary
   path: str                        # File path
-  backlinks: dict[str, list[str]]  # Reverse references
+  # Note: reverse references (backlinks) are computed at runtime
+  # by scanning forward references across the registry, per ADR-002.
+  # They are NOT stored in frontmatter or registry YAML.
 ```
 
 **StandardRecord** (same structure, but status includes "default"):
@@ -508,10 +510,7 @@ policies:
     related_policies: []
     related_standards: [STD-003]
     tags: [quality, testing]
-    backlinks:
-      specs: [SPEC-099]
-      deltas: [DE-042]
-      related_decisions: [ADR-023, ADR-035]
+    # Reverse references computed at runtime, not stored (per ADR-002)
 ```
 
 ## 5. Behaviour & Scenarios
@@ -533,14 +532,14 @@ policies:
 3. **Set status to default**: Indicates recommendation rather than requirement
 4. **Document in Scope section**: Add note: "Recommended unless justified otherwise"
 5. **Reference from ADRs**: Developers cite STD-001 when following guide, note deviations when not
-6. **Monitor adoption**: Check backlinks to see how often standard is followed vs justified deviations
+6. **Monitor adoption**: Check computed reverse references to see how often standard is followed vs justified deviations
 
 ### Primary Flow 3: Link Policy to Decision
 
 1. **Developer creates ADR**: Working on testing strategy for new service
 2. **Add policy reference**: Include `policies: [POL-001]` in ADR frontmatter
-3. **Sync registry**: Run `spec-driver sync` to update backlinks
-4. **Bidirectional navigation**: `show policy POL-001` displays ADR in backlinks; `show adr ADR-023` displays policy reference
+3. **Query reverse references**: Run `spec-driver show policy POL-001` to see computed reverse references
+4. **Bidirectional navigation**: `show policy POL-001` displays ADR in reverse references; `show adr ADR-023` displays policy forward reference
 5. **Governance context visible**: Reviewers see policy constraint when reviewing ADR
 
 ### Primary Flow 4: Supersede a Policy
@@ -570,12 +569,12 @@ policies:
 - creation_test.py: ID generation, frontmatter building, template rendering
 
 **Integration Tests** (registry, CLI commands, cross-references):
-- registry_test.py: File parsing, YAML serialization, filtering, backlinks
+- registry_test.py: File parsing, YAML serialization, filtering, computed reverse references
 - CLI integration: Create → sync → list → show → validate workflows
 - Cross-reference integrity: Policy ↔ standard ↔ ADR bidirectional links
 
 **E2E Tests** (full workflows):
-- Create policy → reference from ADR → verify backlinks
+- Create policy → reference from ADR → verify computed reverse references
 - Create standard with "default" status → verify documentation
 - Supersede policy → verify deprecation cascade
 - Filter policies by tags/status → verify result accuracy
@@ -586,7 +585,7 @@ policies:
 - Count of active policies/standards (by status)
 - Policy reference frequency (which policies are most cited)
 - Standard adoption rate (% of ADRs citing defaults vs deviating)
-- Orphan detection (policies with no backlinks = not implemented)
+- Orphan detection (policies with no reverse references = not implemented)
 
 **Registry Health**:
 - Broken reference detection (references to non-existent IDs)
@@ -669,7 +668,7 @@ Before feature launch:
   - **required**: Enforced like a policy (must comply)
   - **default**: Recommended unless justified otherwise (flexible guidance)
 - **Supersession**: Relationship where a newer policy/standard replaces an older one (preserves history and reasoning)
-- **Backlink**: Reverse reference (e.g., policy knows which ADRs cite it)
+- **Reverse reference**: Computed at runtime by scanning forward references (e.g., policy discovers which ADRs cite it). Per ADR-002, never stored in frontmatter or registry.
 
 ### Examples of Policies vs Standards
 

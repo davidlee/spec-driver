@@ -251,3 +251,46 @@ revisions:
     - type: documents
       target: DE-043
       attributes: {}
+  RE-026:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-028 completion
+    slug: delta_de_028_completion
+    updated: '2026-03-06'
+    path: change/revisions/RE-026-delta_de_028_completion/RE-026.md
+    relations:
+    - type: documents
+      target: DE-028
+      attributes: {}
+  RE-027:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-030 completion
+    slug: delta_de_030_completion
+    updated: '2026-03-06'
+    path: change/revisions/RE-027-delta_de_030_completion/RE-027.md
+    relations:
+    - type: documents
+      target: DE-030
+      attributes: {}
+  RE-028:
+    kind: revision
+    status: completed
+    name: Align PROD-002 FR-002 with phase-01 just-in-time creation
+    slug: align_prod_002_fr_002_with_phase_01_just_in_time_creation
+    updated: '2026-03-06'
+    path: change/revisions/RE-028-align_prod_002_fr_002_with_phase_01_just_in_time_creation/RE-028.md
+  RE-029:
+    kind: revision
+    status: completed
+    name: Remove stored backlinks from PROD-003 per ADR-002
+    slug: remove_stored_backlinks_from_prod_003_per_adr_002
+    updated: '2026-03-06'
+    path: change/revisions/RE-029-remove_stored_backlinks_from_prod_003_per_adr_002/RE-029.md
+  RE-030:
+    kind: revision
+    status: completed
+    name: Clarify generated vs user-owned doc semantics in PROD-016
+    slug: clarify_generated_vs_user_owned_doc_semantics_in_prod_016
+    updated: '2026-03-06'
+    path: change/revisions/RE-030-clarify_generated_vs_user_owned_doc_semantics_in_prod_016/RE-030.md

@@ -55,7 +55,7 @@ docs.
 
 ### DL-047.001: Phase-01 auto-creation — PROD-002 vs PROD-011
 
-- status: adjudicated
+- status: resolved
 - entry_type: contradiction
 - severity: blocking
 - topic: workflow
@@ -182,7 +182,7 @@ docs.
 
 ### DL-047.005: PROD-003 backlinks model vs ADR-002
 
-- status: adjudicated
+- status: resolved
 - entry_type: contradiction
 - severity: significant
 - topic: governance
@@ -363,7 +363,7 @@ docs.
 
 ### DL-047.011: Missing revision on PROD-002 FR-002 after PROD-011 reversal
 
-- status: adjudicated
+- status: resolved
 - entry_type: missing_decision
 - severity: blocking
 - topic: workflow
@@ -439,7 +439,7 @@ docs.
 
 ### DL-047.014: Missing decision — doctrine.md/workflow.md relationship to workflow.toml
 
-- status: adjudicated
+- status: resolved
 - entry_type: missing_decision
 - severity: significant
 - topic: governance
@@ -469,7 +469,7 @@ docs.
 
 ### DL-047.015: Missing decision — PROD-003 backlinks implementation given ADR-002
 
-- status: adjudicated
+- status: resolved
 - entry_type: missing_decision
 - severity: significant
 - topic: governance
@@ -495,7 +495,7 @@ docs.
 
 ### DL-047.016: c4_level "interaction" value — undefined
 
-- status: adjudicated
+- status: resolved
 - entry_type: ambiguous_intent
 - severity: cosmetic
 - topic: taxonomy
@@ -693,7 +693,7 @@ docs.
 
 ### DL-047.020: VCS abstraction scope — undefined
 
-- status: adjudicated
+- status: resolved
 - entry_type: missing_decision
 - severity: cosmetic
 - topic: workflow

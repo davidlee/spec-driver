@@ -126,7 +126,7 @@ CLI dependency direction: CLI → Formatters → Domain → Core
 - **Assembly spec**: cross-unit subsystem/integration/functional slice. Human-authored intent and constraints.
 - Prefer making the taxonomy explicit in spec frontmatter:
   - `category: unit|assembly` (reserved values; others may exist but these are first-class)
-  - `c4_level: code|component|container|system|interaction` (typically `unit` → `code`)
+  - `c4_level: code|component|container|system` (typically `unit` → `code`)
 
 ### Avoid “competing truths”
 

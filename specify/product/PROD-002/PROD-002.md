@@ -3,7 +3,7 @@ id: PROD-002
 slug: delta-creation-workflow
 name: Delta Creation Workflow
 created: '2025-11-02'
-updated: '2025-11-02'
+updated: '2026-03-06'
 status: draft
 kind: prod
 aliases: []
@@ -23,7 +23,7 @@ assumptions:
   - Agents can access registries for discovery
   - Projects have delta/plan/phase templates
   - Users understand delta/plan/phase artifact structure
-  - Default workflow creates plan + first phase
+  - Default workflow creates delta + DR + plan (phase sheets created just-in-time per ADR-004)
 ---
 
 # PROD-002 – Delta Creation Workflow
@@ -64,9 +64,10 @@ capabilities:
       - PROD-002.FR-002
       - PROD-002.NF-001
     summary: >-
-      Ensures users can create complete delta artifacts (delta + plan + first phase)
+      Ensures users can create complete delta artifacts (delta + DR + plan)
       through a single guided command without needing to understand file structure
-      or YAML syntax. The workflow mirrors PROD-001's proven pattern.
+      or YAML syntax. Phase sheets are created just-in-time during execution,
+      not during delta creation (per ADR-004, PROD-011).
     success_criteria:
       - First-time users complete delta creation without external documentation
       - Zero "what do I do now?" moments during the workflow
@@ -93,7 +94,7 @@ capabilities:
     responsibilities:
       - Validate structure and relationships during creation
       - Catch errors before delta completion
-      - Ensure delta bundle (delta + design revision + plan + phases + notes) is well-formed and complete
+      - Ensure delta bundle (delta + design revision + plan + notes) is well-formed and complete
     requirements:
       - PROD-002.FR-005
       - PROD-002.NF-002
@@ -121,7 +122,7 @@ entries:
     kind: VT
     requirement: PROD-002.FR-002
     status: planned
-    notes: Verify delta bundle structure (delta + design revision + plan + phase artifacts)
+    notes: Verify delta bundle structure (delta + design revision + plan artifacts; no auto-created phase)
   - artefact: VT-003
     kind: VT
     requirement: PROD-002.FR-003
@@ -180,10 +181,11 @@ entries:
   - Claude Code or compatible agent environment available
   - Projects using spec-driver have delta/plan/phase templates
   - Users prefer guided workflows over reading documentation
-  - Default behavior creates complete delta bundles (delta + design revision + plan + first phase)
+  - Default behavior creates delta bundles (delta + design revision + plan); phase sheets created just-in-time
 
 - **Change History**:
   - 2025-11-02: Initial draft mirroring PROD-001 pattern for delta artifacts
+  - 2026-03-06: RE-028 — Removed phase-01 auto-creation from FR-002 default bundle (per ADR-004, PROD-011)
 
 ## 2. Stakeholders & Journeys
 
@@ -223,12 +225,12 @@ Given Sarah wants to refactor the authentication module
 3. Sarah confirms: "Yes"
 4. Agent asks: "Which requirements: FR-001 (auth flow), FR-003 (token refresh), NF-002 (performance)?"
 5. Sarah selects: "FR-003 and NF-002"
-6. Agent creates complete delta bundle (delta file, design revision, implementation plan, first phase)
+6. Agent creates delta bundle (delta file, design revision, implementation plan)
 7. Agent reports: "Created DE-002 at change/deltas/DE-002-refactor-authentication-module/"
-8. Sarah opens delta file, reviews plan, starts implementation following phase guidance
+8. Sarah opens delta file, reviews plan, creates phase sheet when ready to implement
 
 Then Sarah has complete change tracking from the start
-And she can implement with clear phase-based plan
+And she creates phase sheets just-in-time as implementation progresses
 
 **Journey 2: Agent Creates Delta Proactively During Implementation**
 
@@ -237,8 +239,8 @@ Given Claude is implementing payment processing feature
 2. Claude invokes delta creation with inferred relationships
 3. Claude asks user: "Should this also implement SPEC-018.FR-005 (transaction logging)?"
 4. User confirms or adjusts
-5. Claude creates delta bundle (delta, design revision, implementation plan, first phase)
-6. Claude continues implementation following phase structure
+5. Claude creates delta bundle (delta, design revision, implementation plan)
+6. Claude creates phase sheet and continues implementation
 
 Then change is tracked from inception
 And implementation follows structured plan
@@ -286,8 +288,8 @@ And lightweight changes don't require unnecessary structure
   *Verification*: VT-001 - Test complete workflow from command to validated delta bundle
 
 - **FR-002**: Default Behavior Creates Complete Delta Bundle
-  By default, delta creation produces four artifacts: delta file (tracks change), design revision (captures architecture intent), implementation plan (organizes work), and first phase (ready to execute), with option to skip plan/phase via flag for lightweight tracking (design revision remains).
-  *Verification*: VT-002 - Verify bundle contains all four artifacts with proper cross-references
+  By default, delta creation produces three artifacts: delta file (tracks change), design revision (captures architecture intent), and implementation plan (organizes work), with option to skip plan via flag for lightweight tracking (design revision remains). Phase sheets are NOT auto-created — they are created just-in-time during execution (per ADR-004, PROD-011).
+  *Verification*: VT-002 - Verify bundle contains all three artifacts with proper cross-references
 
 - **FR-003**: Users Can Provide Known Relationships Explicitly
   Users can specify specs (`--spec SPEC-XXX`) and requirements (`--requirement SPEC-XXX.FR-YYY`) they know the change affects, and workflow accepts and validates these inputs.
@@ -366,7 +368,7 @@ And lightweight changes don't require unnecessary structure
 2. Agent extracts key information from description
 3. Agent performs relationship discovery
 4. Agent asks confirmation questions (2-3 max)
-5. Agent creates delta bundle (delta, design revision, implementation plan, first phase)
+5. Agent creates delta bundle (delta, design revision, implementation plan)
 6. Agent validates structure and relationships
 7. User receives completion confirmation with file paths
 
@@ -374,7 +376,7 @@ And lightweight changes don't require unnecessary structure
 1. User invokes command with --spec and --requirement flags
 2. Agent validates provided IDs exist
 3. Agent asks if additional relationships needed
-4. Agent creates delta bundle (delta, design revision, implementation plan, first phase)
+4. Agent creates delta bundle (delta, design revision, implementation plan)
 5. Validation confirms structure
 6. User begins implementation
 

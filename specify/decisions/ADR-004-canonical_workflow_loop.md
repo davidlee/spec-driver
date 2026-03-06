@@ -1,7 +1,7 @@
 ---
 id: ADR-004
 title: 'ADR-004: canonical core workflow loop'
-status: draft
+status: accepted
 created: '2026-03-06'
 updated: '2026-03-06'
 reviewed: '2026-03-06'

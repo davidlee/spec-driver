@@ -340,7 +340,23 @@ Design intent:
 - Keep this stable and boring. It is a switchboard, not a process encyclopedia.
 - Everything not covered by 80/20 knobs should be handled by doctrine/hooks, not by key explosion.
 
-### 5.2 Doctrine hook points (escape hatch)
+### 5.2 File ownership semantics
+
+The installer manages two categories of files with different ownership rules:
+
+| Category | Location | On install | On re-install | Editable by user |
+| --- | --- | --- | --- | --- |
+| **Generated** | `.spec-driver/agents/*.md` | Created from `workflow.toml` | Overwritten | No (will be lost) |
+| **User-owned** | `.spec-driver/hooks/doctrine.md` | Seeded with defaults | Never overwritten | Yes (primary purpose) |
+
+- **Generated guidance** (FR-008): config-tailored markdown that skills reference.
+  These files are deterministic projections of `workflow.toml` settings. Users
+  should not edit them — changes are made in `workflow.toml` and regenerated.
+- **Doctrine hooks** (FR-007): user-authored bespoke instructions loaded at
+  specific hook points. Seeded once with sensible defaults; the user owns the
+  file thereafter. The installer MUST NOT overwrite user edits.
+
+### 5.3 Doctrine hook points (escape hatch)
 
 `doctrine.md` should be loaded at the right times to cover bespoke conventions without forking skills.
 
@@ -353,7 +369,7 @@ Canonical hook points (v1):
 - `work/notes`: before writing progress notes and follow-ups
 - `work/handover`: before writing a “start here” and handover prompt
 
-### 5.3 Superpowers integration posture
+### 5.4 Superpowers integration posture
 
 The v1 kit SHOULD treat superpowers/obra-style interview+progressive writing as a first-class authoring engine:
 - If `authoring.engine = "superpowers"`, spec-driver skills should route into it and enforce project conventions

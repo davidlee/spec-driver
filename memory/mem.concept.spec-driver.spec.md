@@ -4,8 +4,8 @@ name: Specifications
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
@@ -19,22 +19,22 @@ priority:
   weight: 8
 provenance:
   sources:
-  - kind: doc
-    note: Key Artifacts section
-    ref: supekku/about/README.md
-  - kind: doc
-    ref: supekku/about/glossary.md
-  - kind: doc
-    note: Spec Creation section
-    ref: supekku/about/processes.md
+  - kind: adr
+    ref: ADR-004
+  - kind: adr
+    ref: ADR-003
+  - kind: code
+    ref: supekku/cli/create.py
 ---
 
 # Specifications
 
 ## Role in the Loop
 
-Specs are the **specify** step of the [[mem.pattern.spec-driver.core-loop]].
-They define intended behavior and become canonical after reconciliation.
+Specs are the durable normative record in the
+[[mem.pattern.spec-driver.core-loop]]. In high-rigor flow they become
+canonical after explicit reconciliation, not by being edited aspirationally
+ahead of implementation.
 
 ## Two Families
 

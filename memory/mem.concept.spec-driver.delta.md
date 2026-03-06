@@ -4,8 +4,8 @@ name: Deltas
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
@@ -18,11 +18,12 @@ priority:
   weight: 8
 provenance:
   sources:
-  - kind: doc
-    ref: supekku/about/glossary.md
-  - kind: doc
-    note: Delta Lifecycle section
-    ref: supekku/about/processes.md
+  - kind: adr
+    ref: ADR-004
+  - kind: code
+    ref: supekku/cli/create.py
+  - kind: code
+    ref: supekku/scripts/lib/changes/creation.py
   - kind: doc
     ref: docs/delta-completion-workflow.md
 ---
@@ -32,9 +33,8 @@ provenance:
 ## Role in the Loop
 
 The delta is the **scope** step of the [[mem.pattern.spec-driver.core-loop]].
-It declares the intent to modify the system and scopes the work required to
-bring code into alignment with revision/design intent, then through audit back
-into reconciled [[mem.concept.spec-driver.spec|specs]].
+It declares the intended change and carries execution toward observed truth,
+revision, and reconciled [[mem.concept.spec-driver.spec|specs]].
 
 ## What a Delta Contains
 

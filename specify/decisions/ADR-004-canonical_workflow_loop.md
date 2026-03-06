@@ -66,24 +66,21 @@ We need one authoritative doctrine that:
 - preserves flexibility around revisions without flattening the conceptual model
 - gives DE-047 a single reference point for repo-wide reconciliation
 
-This ADR also acknowledges the obvious objection: this can look heavy.
-The rationale for that weight is not bureaucracy for its own sake, but reduction
-of a different and more expensive waste pattern:
+This framework is intentionally heavy in one place to eliminate heavier waste elsewhere:
 
 - repeated speculative research into a codebase before and during implementation
 - specs written from a narrow design-time snapshot that becomes stale quickly
 - duplicated agent effort re-learning system truth after code changes
 - low-trust specifications that are too inaccurate to support architecture work
 
-The intended trade is:
+The trade is explicit:
 
 - pay for structured change records once, during execution
 - use contracts and audits to recover observed truth cheaply and deterministically
 - reconcile specs from those findings
 - reduce future research cost because the documentary record becomes trustworthy
 
-In other words, the framework is intentionally heavier during change execution so
-that the system becomes much cheaper to understand correctly later.
+Spec-driver therefore chooses heavier execution records over repeated rediscovery.
 
 ## Decision
 
@@ -108,16 +105,16 @@ The canonical spec-driver loop for code-changing work is:
 -> close
 ```
 
-Equivalent short form:
+Short form:
 
 `delta-first implementation, observation, explicit reconciliation, closure`
 
-This is the default doctrine for code-changing work.
+This is the canonical doctrine for code-changing work.
 
 ### 2. Observation precedes reconciliation
 
-For code-changing work, specs SHOULD NOT usually be edited aspirationally in
-advance to describe future technical reality as if it already exists.
+For code-changing work, specs SHOULD NOT be edited aspirationally in advance to
+describe future technical reality as if it already exists.
 
 Instead:
 
@@ -132,14 +129,13 @@ Instead:
 - specs are updated to reflect the accepted reconciled outcome
 - closure confirms owning records are coherent
 
-This is the core discipline that prevents doctrine from drifting into
-“spec-first waterfall”.
+This is the discipline that prevents drift into spec-first waterfall.
 
 ### 3. Specs remain authoritative, but authority is maintained by explicit reconciliation
 
 Specs remain the durable authoritative record of accepted behaviour and
 requirements. That authority is maintained by explicit reconciliation after
-implementation and observation, not by prematurely asserting future truth.
+implementation and observation, not by premature assertion of future truth.
 
 Observed truth does not silently replace spec truth. It triggers reconciliation:
 
@@ -149,8 +145,8 @@ Observed truth does not silently replace spec truth. It triggers reconciliation:
 
 ### 4. Requirements lifecycle and verification partially mitigate aspirational-spec risk
 
-Requirement lifecycle and verification coverage provide an important mitigation,
-especially for product-level work.
+Requirement lifecycle and verification coverage mitigate this risk, especially
+for product-level work.
 
 Coverage and lifecycle state can distinguish, at requirement granularity:
 
@@ -159,21 +155,20 @@ Coverage and lifecycle state can distinguish, at requirement granularity:
 - what is `verified`
 - what has drifted or failed verification
 
-This means a spec can contain a mixture of already-satisfied, planned, and
-newly-asserted requirements without pretending they are all equally implemented.
+This allows a spec to contain already-satisfied, planned, and newly-asserted
+requirements without pretending they are all equally implemented.
 
 That mitigation is often sufficient for PROD specs, where intent and staged
-delivery are central.
+delivery are part of the artefact's job.
 
-It is less sufficient for TECH specs, where whole-system coherence, structure,
+It is weaker for TECH specs, where whole-system coherence, structure,
 interfaces, and design consistency matter more than per-requirement granularity.
 For TECH specs, aspirational editing is therefore more dangerous and generally
-less advisable.
+not advised.
 
 ### 5. Product and technical specs have different tolerance for forward intent
 
-The canonical doctrine applies to both PROD and TECH specs, but not with equal
-strictness.
+The canonical doctrine applies to both PROD and TECH specs, but not with equal strictness.
 
 - **PROD specs** may reasonably carry more planned or newly-accepted intent
   before all implementation is complete, provided coverage/lifecycle clearly
@@ -183,11 +178,11 @@ strictness.
   is often a property of the whole design rather than a checklist of isolated
   requirements.
 
-If a workflow description does not distinguish these postures, it is incomplete.
+Any workflow description that does not distinguish these postures is incomplete.
 
 ### 6. Revisions are flexible inputs and reconciliation artefacts
 
-Revisions are not restricted to a single moment in the loop.
+Revisions are not tied to a single moment in the loop.
 
 Valid patterns include:
 
@@ -197,15 +192,13 @@ Valid patterns include:
 - one revision feeding several outcomes: spec updates, follow-up delta, backlog items,
   or further revision work
 
-What matters doctrinally is not the precise timing of a revision.
-What matters is that the loop still converges through explicit reconciliation,
-and that specs are not misleadingly advanced ahead of observed truth for ordinary
-technical change work.
+Doctrine does not require one revision timing pattern.
+Doctrine requires explicit reconciliation and forbids misleadingly advancing
+technical specs ahead of observed truth for ordinary code-changing work.
 
 ### 7. Supported variants are concessions, not co-equal canon
 
-Spec-driver supports several valid workflow variants, but they are not
-doctrinally equal.
+Spec-driver supports several valid workflow variants, but they are not doctrinally equal.
 
 Supported variants:
 
@@ -219,7 +212,7 @@ Supported variants:
   `card -> implement -> done`
 
 These are concessions for capture, governance, maturity, or low-ceremony work.
-They do not redefine the canonical loop.
+They do not redefine canon.
 
 ### 8. Spec-first aspirational doctrine is not canonical for code-changing work
 
@@ -244,14 +237,13 @@ Ceremony mode, configuration, and skills govern:
 - when DR/IP/phases/audits are recommended or required
 - how strongly agents steer users back toward the canonical path
 
-They do not create multiple contradictory truths about the workflow.
-
-Configuration changes posture and enforcement strength.
-It does not create multiple equally canonical doctrines.
+They do not create multiple truths about the workflow.
+Configuration changes posture and enforcement strength. It does not create
+multiple canonical doctrines.
 
 ### 10. Closure requires owning-record reconciliation
 
-Work is not doctrinally complete merely because code exists or tests pass.
+Work is not complete merely because code exists or tests pass.
 
 Closure requires reconciliation of the owning records:
 
@@ -279,7 +271,7 @@ Closure requires reconciliation of the owning records:
 ### Negative
 - Some existing docs and product specs will need revision because they currently
   imply or teach spec-first sequencing.
-- The doctrine is stricter and more nuanced than a simple linear workflow slogan.
+- The doctrine is stricter than a simple linear workflow slogan.
 - Users may find the difference between tolerated practice and canonical practice uncomfortable.
 
 ### Neutral
@@ -287,8 +279,7 @@ Closure requires reconciliation of the owning records:
 - This ADR does not forbid revision-first or low-ceremony workflows.
 - This ADR establishes canon first; enforcement remains a separate concern for
   workflow config, skills, and command gates.
-- The framework remains intentionally heavier than ad-hoc workflows during
-  execution, but aims to move cost from repeated rediscovery into durable records.
+- The framework remains heavier than ad-hoc workflows during execution, by design.
 
 ## Verification
 - `.spec-driver/agents/workflow.md` and related generated guidance describe the

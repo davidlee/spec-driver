@@ -4,8 +4,8 @@ name: Implementation Plans
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
@@ -18,11 +18,12 @@ priority:
   weight: 6
 provenance:
   sources:
-  - kind: doc
-    ref: supekku/about/glossary.md
-  - kind: doc
-    note: Implementation Planning section
-    ref: supekku/about/processes.md
+  - kind: adr
+    ref: ADR-004
+  - kind: code
+    ref: supekku/cli/create.py
+  - kind: code
+    ref: supekku/scripts/lib/changes/creation.py
   - kind: doc
     note: Phase document structure
     ref: docs/delta-completion-workflow.md
@@ -35,6 +36,9 @@ provenance:
 The IP is the **plan** step of the [[mem.pattern.spec-driver.core-loop]].
 It decomposes a [[mem.concept.spec-driver.delta|delta]] into phases that can
 be verified independently.
+
+Phase sheets are created just-in-time during execution, not all scaffolded up
+front.
 
 ## Structure
 
@@ -62,7 +66,7 @@ change/deltas/DE-XXX-slug/
 ## Commands
 
 ```bash
-uv run spec-driver create phase --plan IP-XXX   # create next phase sheet
+uv run spec-driver create phase "Phase name" --plan IP-XXX   # create next phase sheet
 ```
 
 ## Posture Variance

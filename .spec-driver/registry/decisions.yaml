@@ -40,9 +40,37 @@ decisions:
     reviewed: '2026-02-21'
   ADR-004:
     id: ADR-004
-    title: 'ADR-004: canonical workflow loop'
+    title: 'ADR-004: canonical core workflow loop'
     status: draft
     path: specify/decisions/ADR-004-canonical_workflow_loop.md
+    summary: Define the single canonical spec-driver workflow loop, distinguish supported
+      variants from canon, and reject spec-first aspirational doctrine as the default
+      for code-changing work.
+    created: '2026-03-06'
+    updated: '2026-03-06'
+    reviewed: '2026-03-06'
+    owners:
+    - david
+    specs:
+    - PROD-002
+    - PROD-008
+    - PROD-009
+    - PROD-011
+    - PROD-016
+    deltas:
+    - DE-047
+    related_decisions:
+    - ADR-001
+    - ADR-003
+    tags:
+    - workflow
+    - doctrine
+    - lifecycle
+  ADR-005:
+    id: ADR-005
+    title: 'ADR-005: memories and skills are the canonical guidance layer'
+    status: draft
+    path: specify/decisions/ADR-005-memories_and_skills_are_the_canonical_guidance_layer.md
     summary: ''
     created: '2026-03-06'
     updated: '2026-03-06'

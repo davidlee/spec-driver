@@ -4,8 +4,8 @@ name: Spec-Driver Philosophy
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
@@ -18,9 +18,10 @@ priority:
   weight: 10
 provenance:
   sources:
-  - kind: doc
-    note: Core philosophy section
-    ref: supekku/about/README.md
+  - kind: adr
+    ref: ADR-004
+  - kind: adr
+    ref: ADR-005
   - kind: doc
     note: Three tenets
     ref: supekku/about/dogma.md

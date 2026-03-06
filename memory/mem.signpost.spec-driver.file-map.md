@@ -4,8 +4,8 @@ name: Spec-Driver File Map
 kind: memory
 status: active
 memory_type: signpost
-updated: '2026-03-05'
-verified: '2026-03-05'
+updated: '2026-03-06'
+verified: '2026-03-06'
 tags:
 - spec-driver
 - navigation
@@ -25,7 +25,7 @@ scope:
 provenance:
   sources:
   - kind: doc
-    ref: supekku/about/glossary.md
+    ref: .spec-driver/README.md
   - kind: doc
     ref: supekku/about/lifecycle.md
 ---

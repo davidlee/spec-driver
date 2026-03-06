@@ -4,8 +4,8 @@ name: Audits
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
@@ -18,11 +18,10 @@ priority:
   weight: 6
 provenance:
   sources:
-  - kind: doc
-    ref: supekku/about/glossary.md
-  - kind: doc
-    note: Audit / Patch-Level Review section
-    ref: supekku/about/processes.md
+  - kind: adr
+    ref: ADR-004
+  - kind: code
+    ref: supekku/cli/create.py
   - kind: doc
     note: Retrospective (Audit-driven) workflow
     ref: supekku/about/lifecycle.md

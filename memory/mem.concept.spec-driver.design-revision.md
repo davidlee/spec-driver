@@ -4,8 +4,8 @@ name: Design Revisions
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
@@ -17,11 +17,10 @@ priority:
   weight: 5
 provenance:
   sources:
-  - kind: doc
-    ref: supekku/about/glossary.md
-  - kind: doc
-    note: Design Revision section
-    ref: supekku/about/processes.md
+  - kind: adr
+    ref: ADR-004
+  - kind: code
+    ref: supekku/scripts/lib/changes/creation.py
 ---
 
 # Design Revisions

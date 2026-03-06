@@ -4,7 +4,7 @@
 # SpecDriver Architecture Guide
 
 @supekku/INIT.md
-@supekku/about/glossary.md
+@.spec-driver/README.md
 
 Quick reference for agents maintaining architectural integrity.
 

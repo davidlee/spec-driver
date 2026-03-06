@@ -4,8 +4,8 @@ name: Backlog
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
@@ -17,11 +17,12 @@ priority:
   weight: 5
 provenance:
   sources:
-  - kind: doc
-    note: Backlog Capture section
-    ref: supekku/about/processes.md
-  - kind: doc
-    ref: supekku/about/glossary.md
+  - kind: code
+    ref: supekku/cli/create.py
+  - kind: code
+    ref: supekku/cli/list.py
+  - kind: code
+    ref: supekku/scripts/lib/backlog/registry.py
 ---
 
 # Backlog

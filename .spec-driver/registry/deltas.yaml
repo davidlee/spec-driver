@@ -5369,7 +5369,7 @@ deltas:
         phase: IP-047.PHASE-03
   DE-048:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Configurable workspace directory paths via workflow.toml
     slug: configurable_workspace_directory_paths_via_workflow_toml
     updated: '2026-03-06'
@@ -5389,7 +5389,8 @@ deltas:
         plan: IP-048
         delta: DE-048
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-048
         specs:
           primary: []
           collaborators: []
@@ -5397,10 +5398,53 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-048-P01
+        - id: IP-048.PHASE-01
       phases:
-      - id: IP-048-P01
-        phase: IP-048-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-048.PHASE-01
+        plan: IP-048
+        delta: DE-048
+        objective: "Add [dirs] config section to workflow.toml, implement init_paths/reset_paths\
+          \ in paths.py, wire CLI startup, and update test base \u2014 with full test\
+          \ coverage."
+        entrance_criteria:
+        - DR-048 reviewed
+        - Existing tests green (just)
+        - core/paths.py and core/config.py read and understood
+        exit_criteria:
+        - init_paths(config) and reset_paths() implemented and tested
+        - '[dirs] section in DEFAULT_CONFIG with all directory name defaults'
+        - CLI entry point calls init_paths after config load
+        - RepoTestCase.tearDown calls reset_paths
+        - All VT gates satisfied
+        - just green (zero lint warnings, all tests pass)
+        verification:
+          tests:
+          - core/paths_test.py
+          - core/config_test.py
+          evidence:
+          - VT-048-config
+          - VT-048-custom
+          - VT-048-regression
+        tasks:
+        - id: 1.1
+          description: Add [dirs] section to DEFAULT_CONFIG in config.py
+        - id: 1.2
+          description: Implement init_paths(config) and reset_paths() in paths.py
+        - id: 1.3
+          description: Write paths_test.py (init, reset, custom dirs, fallback)
+        - id: 1.4
+          description: Update config_test.py for [dirs] parsing
+        - id: 1.5
+          description: Wire init_paths() into CLI entry point
+        - id: 1.6
+          description: Add reset_paths() to RepoTestCase.tearDown
+        - id: 1.7
+          description: "Run just \u2014 verify full regression"
+        risks:
+        - description: Mutable module state complicates test parallelism
+          mitigation: reset_paths() in tearDown; tests are already sequential
   DE-049:
     kind: delta
     status: draft

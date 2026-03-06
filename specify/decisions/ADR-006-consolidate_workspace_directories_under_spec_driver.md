@@ -1,7 +1,7 @@
 ---
 id: ADR-006
 title: 'ADR-006: consolidate workspace directories under .spec-driver'
-status: draft
+status: accepted
 created: '2026-03-06'
 updated: '2026-03-06'
 reviewed: '2026-03-06'

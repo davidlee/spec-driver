@@ -93,7 +93,7 @@ decisions:
   ADR-006:
     id: ADR-006
     title: 'ADR-006: consolidate workspace directories under .spec-driver'
-    status: draft
+    status: accepted
     path: specify/decisions/ADR-006-consolidate_workspace_directories_under_spec_driver.md
     summary: Canonical spec-driver workspace directories move under .spec-driver/
       with backward-compat root symlinks; migration tooling and content reference
@@ -137,8 +137,30 @@ decisions:
   ADR-008:
     id: ADR-008
     title: 'ADR-008: normative lifecycle truth and observed evidence reconciliation'
-    status: draft
+    status: accepted
     path: specify/decisions/ADR-008-normative_lifecycle_truth_and_observed_evidence_reconciliation.md
+    summary: Specs own normative lifecycle truth; audits, deltas, and contracts contribute
+      observed evidence overlays; drift is reconciled explicitly rather than silently
+      by timestamp precedence.
+    created: '2026-03-06'
+    updated: '2026-03-06'
+    reviewed: '2026-03-06'
+    specs:
+    - PROD-008
+    - PROD-009
+    deltas:
+    - DE-047
+    related_decisions:
+    - ADR-004
+    tags:
+    - lifecycle
+    - requirements
+    - architecture
+  ADR-009:
+    id: ADR-009
+    title: 'ADR-009: standard registry API convention'
+    status: draft
+    path: specify/decisions/ADR-009-standard_registry_api_convention.md
     summary: ''
     created: '2026-03-06'
     updated: '2026-03-06'

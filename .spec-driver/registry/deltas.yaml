@@ -2153,7 +2153,7 @@ deltas:
         phase: IP-018-P01
   DE-019:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Fix ts-doc-extract dependency handling
     slug: fix-ts-doc-extract-dependency-handling
     updated: '2025-11-08'
@@ -3128,7 +3128,7 @@ deltas:
         phase: IP-027-P02
   DE-028:
     kind: delta
-    status: draft
+    status: completed
     name: 'Delta - Sync defaults: contracts-first, opt-in spec creation'
     slug: sync_defaults_contracts_first_opt_in_spec_creation
     updated: '2026-02-20'
@@ -3304,7 +3304,7 @@ deltas:
             test
   DE-030:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - unit_vs_assembly_spec_classification
     slug: unit_vs_assembly_spec_classification
     updated: '2026-02-21'
@@ -5326,9 +5326,11 @@ deltas:
         exit_criteria:
         - All 20 DL-047 entries at adjudicated or dismissed status
         - ADRs drafted for contracts and lifecycle topics
+        - Core loop ADR drafted
         - REs drafted for affected PROD specs
         - Every blocking/significant entry has resolution_ref populated
-        - Backlog items created for deferred work (.006, .010, .019, .020)
+        - Deferred work routed appropriately: resolved directly or backlogged (.010,
+            .019, .020; .006 if still needed)
         verification:
           tests: []
           evidence:

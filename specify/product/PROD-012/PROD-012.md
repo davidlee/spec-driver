@@ -179,6 +179,31 @@ entries:
     requirement: PROD-012.FR-006
     status: verified
     notes: "DE-029: all 4 adapters accept variant_outputs, write to provided paths. Per-adapter tests pass."
+  - artefact: VT-SYNC-DEFAULTS-001
+    kind: VT
+    requirement: PROD-012.FR-005
+    status: verified
+    notes: "DE-028: Default behaviour - no marker, no flag → contracts only."
+  - artefact: VT-SYNC-DEFAULTS-002
+    kind: VT
+    requirement: PROD-012.FR-005
+    status: verified
+    notes: "DE-028: --specs creates marker, subsequent sync defaults specs-on."
+  - artefact: VT-SYNC-DEFAULTS-003
+    kind: VT
+    requirement: PROD-012.FR-005
+    status: verified
+    notes: "DE-028: --no-contracts skips contract generation + mirror rebuild."
+  - artefact: VT-SYNC-DEFAULTS-004
+    kind: VT
+    requirement: PROD-012.FR-005
+    status: verified
+    notes: "DE-028: Backward compat - existing registry entries imply opt-in."
+  - artefact: VT-SYNC-DEFAULTS-005
+    kind: VT
+    requirement: PROD-012.FR-005
+    status: verified
+    notes: "DE-028: First-run hint message when spec creation skipped."
 ```
 
 ## 1. Intent & Summary

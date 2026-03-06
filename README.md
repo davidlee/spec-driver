@@ -111,14 +111,21 @@ the appropriate contract doc generator:
 
 ## npm dependency: ts-doc-extract
 
-```zsh
-npx ts-doc-extract --yes
-```
+TypeScript/JavaScript contract generation requires the
+[ts-doc-extract](https://www.npmjs.com/package/ts-doc-extract) npm package. It's
+a small library which uses the tsc AST to generate compact documentation.
 
-Doc/contract generation requires the
-[ts-doc-extract](https://www.npmjs.com/package/ts-doc-extract) package if you
-have TypeScript in your project, and will install it using npx. It's a small
-library which uses the tsc AST to generate compact documentation.
+If ts-doc-extract is not installed, `sync` will skip TypeScript contract
+generation with a warning and install instructions. The installer also detects
+TypeScript projects and advises.
+
+```zsh
+# install globally
+npm install -g ts-doc-extract
+
+# or locally in your project
+npm install --save-dev ts-doc-extract
+```
 
 ![workflow diagram](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/simple.svg)
 

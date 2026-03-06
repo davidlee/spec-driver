@@ -2028,15 +2028,35 @@ requirements:
     primary_spec: PROD-012
     kind: functional
     category: null
-    status: in-progress
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-028
     - DE-035
     verified_by: []
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VT-SYNC-DEFAULTS-001
+    - VT-SYNC-DEFAULTS-002
+    - VT-SYNC-DEFAULTS-003
+    - VT-SYNC-DEFAULTS-004
+    - VT-SYNC-DEFAULTS-005
+    coverage_entries:
+    - artefact: VT-SYNC-DEFAULTS-001
+      status: verified
+      kind: VT
+    - artefact: VT-SYNC-DEFAULTS-002
+      status: verified
+      kind: VT
+    - artefact: VT-SYNC-DEFAULTS-003
+      status: verified
+      kind: VT
+    - artefact: VT-SYNC-DEFAULTS-004
+      status: verified
+      kind: VT
+    - artefact: VT-SYNC-DEFAULTS-005
+      status: verified
+      kind: VT
     path: specify/product/PROD-012/PROD-012.md
   PROD-012.FR-006:
     label: FR-006
@@ -2847,15 +2867,19 @@ requirements:
     primary_spec: PROD-015
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-030
     verified_by: []
     coverage_evidence:
+    - VT-030-001
     - VT-XXX
-    coverage_entries: []
+    coverage_entries:
+    - artefact: VT-030-001
+      status: verified
+      kind: VT
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.FR-002:
     label: FR-002
@@ -2866,15 +2890,19 @@ requirements:
     primary_spec: PROD-015
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-030
     - DE-035
     verified_by: []
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VT-030-002
+    coverage_entries:
+    - artefact: VT-030-002
+      status: verified
+      kind: VT
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.FR-003:
     label: FR-003
@@ -2884,15 +2912,19 @@ requirements:
     primary_spec: PROD-015
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-030
     - DE-035
     verified_by: []
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VT-030-003
+    coverage_entries:
+    - artefact: VT-030-003
+      status: verified
+      kind: VT
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.FR-004:
     label: FR-004
@@ -2904,15 +2936,19 @@ requirements:
     primary_spec: PROD-015
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-030
     - DE-035
     verified_by: []
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VT-030-004
+    coverage_entries:
+    - artefact: VT-030-004
+      status: verified
+      kind: VT
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.FR-005:
     label: FR-005
@@ -2924,15 +2960,19 @@ requirements:
     primary_spec: PROD-015
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-030
     - DE-035
     verified_by: []
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VT-030-005
+    coverage_entries:
+    - artefact: VT-030-005
+      status: verified
+      kind: VT
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.NF-001:
     label: NF-001
@@ -2943,14 +2983,18 @@ requirements:
     primary_spec: PROD-015
     kind: non-functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-030
     verified_by: []
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VA-001
+    coverage_entries:
+    - artefact: VA-001
+      status: verified
+      kind: VA
     path: specify/product/PROD-015/PROD-015.md
   PROD-015.NF-002:
     label: NF-002
@@ -2961,14 +3005,18 @@ requirements:
     primary_spec: PROD-015
     kind: non-functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-030
     verified_by: []
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VT-030-006
+    coverage_entries:
+    - artefact: VT-030-006
+      status: verified
+      kind: VT
     path: specify/product/PROD-015/PROD-015.md
   PROD-016.FR-001:
     label: FR-001

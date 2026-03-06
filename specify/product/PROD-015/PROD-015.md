@@ -95,26 +95,41 @@ schema: supekku.verification.coverage
 version: 1
 subject: PROD-015
 entries:
-  - artefact: VT-001
+  - artefact: VT-030-001
     kind: VT
     requirement: PROD-015.FR-001
-    status: planned
-    notes: Schema + registry roundtrip preserves taxonomy fields.
-  - artefact: VT-002
+    status: verified
+    notes: "DE-030: Spec model exposes category/c4_level from frontmatter; roundtrip preserved."
+  - artefact: VT-030-002
+    kind: VT
+    requirement: PROD-015.FR-002
+    status: verified
+    notes: "DE-030: Sync-created specs set category: unit, c4_level: code; create spec defaults to category: assembly."
+  - artefact: VT-030-003
     kind: VT
     requirement: PROD-015.FR-003
-    status: planned
-    notes: `list specs --category assembly` filters correctly.
-  - artefact: VT-003
+    status: verified
+    notes: "DE-030: list specs --category unit/assembly/all filter correctly; default hides unit specs."
+  - artefact: VT-030-004
     kind: VT
     requirement: PROD-015.FR-004
-    status: planned
-    notes: `specify/tech/by-category/*` and `specify/tech/by-c4-level/*` views build deterministically.
+    status: verified
+    notes: "DE-030: by-category/{unit,assembly,unknown} and by-c4-level views built deterministically."
+  - artefact: VT-030-005
+    kind: VT
+    requirement: PROD-015.FR-005
+    status: verified
+    notes: "DE-030: Validator warns on missing taxonomy (tech specs only); does not produce errors. 10 tests."
+  - artefact: VT-030-006
+    kind: VT
+    requirement: PROD-015.NF-002
+    status: verified
+    notes: "DE-030: Existing spec IDs/paths/registries remain valid after index rebuild."
   - artefact: VA-001
     kind: VA
     requirement: PROD-015.NF-001
-    status: planned
-    notes: Benchmark list/index operations remain <2s for typical repos.
+    status: verified
+    notes: "DE-030: list specs --category all completes in ~0.2s; well under 2s target."
 ```
 
 ## 1. Intent & Summary

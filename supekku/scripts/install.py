@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import shutil
+import subprocess as _subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -15,6 +16,11 @@ from pathlib import Path
 import yaml
 
 from supekku.scripts.lib.core.config import detect_exec_command, load_workflow_config
+from supekku.scripts.lib.core.npm_utils import (
+  get_install_instructions,
+  get_package_manager_info,
+  is_npm_package_available,
+)
 from supekku.scripts.lib.core.paths import (
   AUDITS_SUBDIR,
   BACKLOG_DIR,
@@ -623,6 +629,59 @@ def initialize_workspace(
       )
 
     sync_skills(target_root)
+
+  # Check optional dependencies (informational only)
+  _check_optional_dependencies(target_root, auto_yes=auto_yes)
+
+
+def _check_optional_dependencies(
+  target_root: Path, *, auto_yes: bool = False
+) -> None:
+  """Check for missing optional dependencies and offer to install them.
+
+  Detects TypeScript/JavaScript projects and offers to install
+  ts-doc-extract if not available.
+  """
+  # Detect TypeScript project presence
+  has_tsconfig = any(target_root.glob("**/tsconfig.json"))
+  if not has_tsconfig:
+    has_ts_files = any(target_root.glob("**/*.ts"))
+    if not has_ts_files:
+      return
+
+  # Check if ts-doc-extract is available
+  if is_npm_package_available("ts-doc-extract", target_root):
+    return
+
+  pm_info = get_package_manager_info(target_root)
+
+  print(
+    "\nTypeScript project detected but ts-doc-extract is not installed.\n"
+    "  Contract generation for TypeScript will be skipped during sync."
+  )
+
+  local_cmd = [*pm_info.install_local_command, "ts-doc-extract"]
+  global_cmd = ["npx", "--yes", "ts-doc-extract", "--help"]
+
+  if auto_yes:
+    choice = "l"
+  else:
+    print(
+      f"\n  [l] Install locally: {' '.join(local_cmd)}"
+      f"\n  [g] Install via npx (downloads on demand)"
+      "\n  [s] Skip"
+    )
+    choice = input("\n  Install ts-doc-extract? [l/g/s] ").strip().lower()
+
+  if choice == "l":
+    print(f"  Running: {' '.join(local_cmd)}")
+    _subprocess.run(local_cmd, cwd=target_root, check=False)
+  elif choice == "g":
+    print("  Verifying npx can fetch ts-doc-extract...")
+    _subprocess.run(global_cmd, cwd=target_root, check=False)
+  else:
+    instructions = get_install_instructions("ts-doc-extract", pm_info)
+    print(f"\n  To install later:\n  {instructions}")
 
 
 def main() -> None:

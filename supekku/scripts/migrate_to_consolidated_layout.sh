@@ -193,7 +193,48 @@ if ! $DRY_RUN && [[ -n "$(git status --porcelain)" ]]; then
   echo
 fi
 
-echo "=== Phase 4: Verify ==="
+echo "=== Phase 4: Migrate skill target dirs to per-skill symlinks ==="
+
+# .claude/skills and .agents/skills: replace real dirs with per-skill
+# symlinks into .spec-driver/skills/ (the canonical install location).
+# Only acts on dirs that contain package-managed skill copies; leaves
+# user-created skills untouched.
+
+if [[ -d .spec-driver/skills ]]; then
+  for target_dir in .claude/skills .agents/skills; do
+    if [[ -d "$target_dir" && ! -L "$target_dir" ]]; then
+      echo "  Migrating $target_dir → per-skill symlinks"
+      for skill_dir in "$target_dir"/*/; do
+        skill_name="$(basename "$skill_dir")"
+        canonical=".spec-driver/skills/$skill_name"
+        if [[ -d "$canonical" ]]; then
+          # Package-managed skill — replace with symlink
+          run rm -rf "$target_dir/$skill_name"
+          run ln -s "../../.spec-driver/skills/$skill_name" "$target_dir/$skill_name"
+        else
+          echo "    KEEP: $target_dir/$skill_name (not in canonical)"
+        fi
+      done
+    elif [[ ! -e "$target_dir" ]]; then
+      echo "  Creating $target_dir with per-skill symlinks"
+      run mkdir -p "$target_dir"
+      for skill_dir in .spec-driver/skills/*/; do
+        skill_name="$(basename "$skill_dir")"
+        run ln -s "../../.spec-driver/skills/$skill_name" "$target_dir/$skill_name"
+      done
+    fi
+  done
+
+  if ! $DRY_RUN && [[ -n "$(git status --porcelain)" ]]; then
+    run git add .claude/skills .agents/skills 2>/dev/null || true
+    run git commit -m "spec-driver: replace skill target dirs with per-skill symlinks"
+    echo
+  fi
+else
+  echo "  SKIP: .spec-driver/skills/ does not exist — run spec-driver install first"
+fi
+
+echo "=== Phase 5: Verify ==="
 
 FAIL=0
 verify() {
@@ -212,6 +253,20 @@ verify specify/decisions
 verify change/deltas
 if [[ -L backlog ]]; then verify backlog; fi
 if [[ -L memory ]]; then verify memory; fi
+
+# Verify skill symlinks
+if [[ -d .spec-driver/skills ]]; then
+  for target_dir in .claude/skills .agents/skills; do
+    if [[ -d "$target_dir" ]]; then
+      for link in "$target_dir"/*/; do
+        name="$(basename "$link")"
+        if [[ -L "$target_dir/$name" ]]; then
+          verify "$target_dir/$name/SKILL.md"
+        fi
+      done
+    fi
+  done
+fi
 
 if [[ "$FAIL" -eq 0 ]]; then
   echo

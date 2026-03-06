@@ -34,12 +34,6 @@ SKILL_TARGET_DIRS: dict[str, Path] = {
   "codex": Path(".agents") / "skills",
 }
 
-# Known compat children used to detect pre-migration workspaces.
-_COMPAT_CHILDREN: dict[str, tuple[str, ...]] = {
-  "specify": ("decisions", "policies", "product", "standards", "tech"),
-  "change": ("audits", "deltas", "revisions"),
-}
-
 ALLOWLIST_FILE = "skills.allowlist"
 MANAGED_AGENTS_FILE = "AGENTS.md"
 AGENTS_MD_REFERENCE = f"@{SPEC_DRIVER_DIR}/{MANAGED_AGENTS_FILE}"
@@ -305,20 +299,16 @@ def prune_skills_from_target(
 
 
 def _is_pre_migration_layout(repo_root: Path) -> bool:
-  """True if workspace has pre-DE-049 layout (real subdirs, not symlinks).
+  """True if workspace predates the consolidated .spec-driver/ layout.
 
-  Checks known compat children of ``specify/`` and ``change/``.  If any
-  is a real directory (not a symlink), the workspace predates the
-  consolidated layout and skill target dirs contain vanilla copies that
-  are safe to replace with symlinks.
+  A workspace is post-migration if ``workflow.toml`` contains
+  ``spec_driver_installed_version`` (stamped on every install by the
+  new installer).  Absence of that key means the workspace was last
+  installed before the migration and skill target dirs contain vanilla
+  copies that are safe to replace with symlinks.
   """
-  for parent, children in _COMPAT_CHILDREN.items():
-    parent_dir = repo_root / parent
-    for name in children:
-      child = parent_dir / name
-      if child.is_dir() and not child.is_symlink():
-        return True
-  return False
+  config = load_workflow_config(repo_root)
+  return "spec_driver_installed_version" not in config
 
 
 def _ensure_target_symlinks(

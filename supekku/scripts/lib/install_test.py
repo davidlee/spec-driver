@@ -15,6 +15,7 @@ from supekku.scripts.install import (
   _install_claude_config,
   _install_hooks,
   _install_memories,
+  _stamp_installed_version,
   get_package_root,
   initialize_workspace,
 )
@@ -477,6 +478,73 @@ def test_initialize_dry_run_does_not_create_workflow_toml(
   initialize_workspace(tmp_path, dry_run=True)
 
   assert not (tmp_path / SPEC_DRIVER_DIR / "workflow.toml").exists()
+
+
+# --- version stamping tests ---
+
+
+def test_stamp_version_prepends_to_existing_toml(tmp_path: Path) -> None:
+  """Stamps version at top of existing workflow.toml."""
+  toml = tmp_path / "workflow.toml"
+  toml.write_text('ceremony = "settler"\n', encoding="utf-8")
+  _stamp_installed_version(toml)
+  content = toml.read_text(encoding="utf-8")
+  lines = content.splitlines()
+  assert lines[0].startswith("spec_driver_installed_version = ")
+  assert 'ceremony = "settler"' in content
+
+
+def test_stamp_version_updates_existing_value(tmp_path: Path) -> None:
+  """Updates version if already present in toml."""
+  toml = tmp_path / "workflow.toml"
+  toml.write_text(
+    'spec_driver_installed_version = "0.0.1"\nceremony = "settler"\n',
+    encoding="utf-8",
+  )
+  _stamp_installed_version(toml)
+  content = toml.read_text(encoding="utf-8")
+  assert content.count("spec_driver_installed_version") == 1
+  assert '"0.0.1"' not in content
+
+
+def test_stamp_version_idempotent(tmp_path: Path) -> None:
+  """Running twice produces identical content."""
+  toml = tmp_path / "workflow.toml"
+  toml.write_text('ceremony = "settler"\n', encoding="utf-8")
+  _stamp_installed_version(toml)
+  first = toml.read_text(encoding="utf-8")
+  _stamp_installed_version(toml)
+  second = toml.read_text(encoding="utf-8")
+  assert first == second
+
+
+def test_stamp_version_preserves_comments(tmp_path: Path) -> None:
+  """Comments in workflow.toml are preserved."""
+  toml = tmp_path / "workflow.toml"
+  toml.write_text(
+    'ceremony = "settler" # pioneer | settler | town_planner\n',
+    encoding="utf-8",
+  )
+  _stamp_installed_version(toml)
+  content = toml.read_text(encoding="utf-8")
+  assert "# pioneer | settler | town_planner" in content
+
+
+def test_stamp_version_dry_run_does_not_modify(tmp_path: Path) -> None:
+  """Dry-run does not modify the file."""
+  toml = tmp_path / "workflow.toml"
+  toml.write_text('ceremony = "settler"\n', encoding="utf-8")
+  _stamp_installed_version(toml, dry_run=True)
+  content = toml.read_text(encoding="utf-8")
+  assert "spec_driver_installed_version" not in content
+
+
+def test_initialize_stamps_version(tmp_path: Path) -> None:
+  """initialize_workspace stamps version in workflow.toml."""
+  initialize_workspace(tmp_path, auto_yes=True)
+  toml = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+  content = toml.read_text(encoding="utf-8")
+  assert "spec_driver_installed_version" in content
 
 
 # --- Agent template rendering tests ---

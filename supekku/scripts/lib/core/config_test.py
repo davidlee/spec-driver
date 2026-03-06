@@ -199,6 +199,22 @@ def test_dirs_missing_section_uses_defaults(tmp_path: Path) -> None:
   assert config["dirs"] == DEFAULT_CONFIG["dirs"]
 
 
+# --- extra user keys ---
+
+
+def test_extra_user_keys_preserved(tmp_path: Path) -> None:
+  """User keys not in DEFAULT_CONFIG are passed through."""
+  toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+  toml_path.parent.mkdir(parents=True)
+  toml_path.write_text(
+    'spec_driver_installed_version = "1.2.3"\nceremony = "settler"\n',
+    encoding="utf-8",
+  )
+  config = load_workflow_config(tmp_path)
+  assert config["spec_driver_installed_version"] == "1.2.3"
+  assert config["ceremony"] == "settler"
+
+
 # --- strict_mode config tests ---
 
 

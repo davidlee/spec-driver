@@ -125,6 +125,11 @@ def _merge_defaults(user_config: dict) -> dict:
     else:
       result[key] = user_config[key]
 
+  # Preserve user keys not in defaults (e.g. spec_driver_installed_version)
+  for key, val in user_config.items():
+    if key not in DEFAULT_CONFIG:
+      result[key] = val
+
   return result
 
 

@@ -7,6 +7,7 @@ for a new spec-driver workspace.
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import subprocess as _subprocess
 import sys
@@ -521,6 +522,49 @@ def _create_compat_symlinks(target_root: Path) -> None:
     link.symlink_to(target)
 
 
+_VERSION_KEY = "spec_driver_installed_version"
+_VERSION_RE = re.compile(rf'^{_VERSION_KEY}\s*=\s*".*"', re.MULTILINE)
+
+
+def _get_package_version() -> str:
+  """Get the installed spec-driver package version."""
+  from importlib.metadata import PackageNotFoundError, version  # noqa: PLC0415
+
+  try:
+    return version("spec-driver")
+  except PackageNotFoundError:
+    from supekku import __version__  # noqa: PLC0415
+    return __version__
+
+
+def _stamp_installed_version(
+  workflow_toml: Path, *, dry_run: bool = False,
+) -> None:
+  """Write or update ``spec_driver_installed_version`` in workflow.toml.
+
+  Preserves existing content and comments.  Replaces the line if present,
+  otherwise prepends it.
+  """
+  pkg_version = _get_package_version()
+  version_line = f'{_VERSION_KEY} = "{pkg_version}"'
+
+  if dry_run:
+    print(f"\n[DRY RUN] workflow.toml: {version_line}")
+    return
+
+  if not workflow_toml.exists():
+    return  # Will be created by the caller
+
+  content = workflow_toml.read_text(encoding="utf-8")
+  if _VERSION_RE.search(content):
+    updated = _VERSION_RE.sub(version_line, content)
+  else:
+    updated = f"{version_line}\n{content}"
+
+  if updated != content:
+    workflow_toml.write_text(updated, encoding="utf-8")
+
+
 def initialize_workspace(
   target_root: Path, dry_run: bool = False, auto_yes: bool = False
 ) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
@@ -614,6 +658,9 @@ def initialize_workspace(
         f'[tool]\nexec = "{exec_cmd}"\n',
         encoding="utf-8",
       )
+
+  # Stamp installed version (every install, not just first)
+  _stamp_installed_version(workflow_toml, dry_run=dry_run)
 
   # Copy templates from package to target
   package_root = get_package_root()

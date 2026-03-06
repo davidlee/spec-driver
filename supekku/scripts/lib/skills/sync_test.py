@@ -68,17 +68,24 @@ def _setup_repo(tmp_path: Path) -> tuple[Path, Path]:
 
 
 def _make_pre_migration(root: Path) -> None:
-  """Add pre-migration layout markers (real dirs under specify/)."""
-  (root / "specify" / "tech").mkdir(parents=True)
+  """Pre-migration workspace: no version stamp in workflow.toml."""
+  sd = root / ".spec-driver"
+  sd.mkdir(exist_ok=True)
+  toml = sd / "workflow.toml"
+  if not toml.exists():
+    toml.write_text('[tool]\nexec = "spec-driver"\n', encoding="utf-8")
 
 
 def _make_post_migration(root: Path) -> None:
-  """Add post-migration layout markers (symlinks under specify/)."""
-  specify = root / "specify"
-  specify.mkdir(exist_ok=True)
-  sd_specs = root / ".spec-driver" / "specs" / "tech"
-  sd_specs.mkdir(parents=True, exist_ok=True)
-  (specify / "tech").symlink_to(Path("..") / ".spec-driver" / "specs" / "tech")
+  """Post-migration workspace: version stamp present in workflow.toml."""
+  sd = root / ".spec-driver"
+  sd.mkdir(exist_ok=True)
+  toml = sd / "workflow.toml"
+  toml.write_text(
+    'spec_driver_installed_version = "0.1.0"\n'
+    '[tool]\nexec = "spec-driver"\n',
+    encoding="utf-8",
+  )
 
 
 # --- allowlist parsing ---
@@ -436,35 +443,26 @@ def test_prune_nonexistent_target_dir(tmp_path: Path) -> None:
 # --- _is_pre_migration_layout ---
 
 
-def test_pre_migration_layout_real_dir(tmp_path: Path) -> None:
-  """Returns True when specify/ has a real subdirectory."""
+def test_pre_migration_layout_no_version_stamp(tmp_path: Path) -> None:
+  """Returns True when workflow.toml has no version stamp."""
   root = tmp_path / "repo"
   root.mkdir()
   _make_pre_migration(root)
   assert _is_pre_migration_layout(root) is True
 
 
-def test_pre_migration_layout_symlink(tmp_path: Path) -> None:
-  """Returns False when specify/ children are symlinks (post-migration)."""
+def test_pre_migration_layout_with_version_stamp(tmp_path: Path) -> None:
+  """Returns False when workflow.toml has version stamp."""
   root = tmp_path / "repo"
   root.mkdir()
-  (root / ".spec-driver").mkdir()
   _make_post_migration(root)
   assert _is_pre_migration_layout(root) is False
 
 
-def test_pre_migration_layout_no_specify(tmp_path: Path) -> None:
-  """Returns False when specify/ does not exist."""
+def test_pre_migration_layout_no_toml(tmp_path: Path) -> None:
+  """Returns True when workflow.toml does not exist."""
   root = tmp_path / "repo"
   root.mkdir()
-  assert _is_pre_migration_layout(root) is False
-
-
-def test_pre_migration_layout_change_dir(tmp_path: Path) -> None:
-  """Returns True when change/ has a real subdirectory."""
-  root = tmp_path / "repo"
-  root.mkdir()
-  (root / "change" / "deltas").mkdir(parents=True)
   assert _is_pre_migration_layout(root) is True
 
 

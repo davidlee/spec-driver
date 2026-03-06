@@ -3,7 +3,7 @@ id: DL-047
 name: Spec corpus reconciliation
 created: '2026-03-05'
 updated: '2026-03-06'
-status: open # 1 adjudicated (DL-047.010), 19 resolved, 1 dismissed
+status: open # 20 resolved, 1 dismissed — all entries addressed
 kind: drift_ledger
 delta_ref: DE-047
 ---
@@ -338,7 +338,7 @@ docs.
 
 ### DL-047.010: Spec auto-creation opt-in — marker file vs TOML config
 
-- status: adjudicated
+- status: resolved
 - entry_type: ambiguous_intent
 - severity: cosmetic
 - topic: contracts
@@ -363,6 +363,7 @@ docs.
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
   - 2026-03-05 adjudicated: workflow.toml canonical. Small delta to migrate marker file to TOML config. Future: auto-creation scope may narrow (Go-only, package/glob-scoped) but that's separate.
   - 2026-03-06 note: migration blocked on TOML write capability — stdlib tomllib is read-only, no tomli_w/tomlkit dependency. Read side (config check) is trivial; write side (persist_spec_autocreate) needs either a new dep or string manipulation. Requires its own delta.
+  - 2026-03-06 resolved: DE-051 adds tomlkit dependency; sync_preferences.py rewritten to read/write workflow.toml [sync] section with legacy marker fallback and auto-migration. CLAUDE.md updated.
 
 ### DL-047.011: Missing revision on PROD-002 FR-002 after PROD-011 reversal
 

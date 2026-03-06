@@ -21,6 +21,9 @@ adrs = true
 policies = true
 standards = true
 
+[sync]
+spec_autocreate = true
+
 [contracts]
 enabled = true
 root = ".contracts"

@@ -12,14 +12,14 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import tomlkit
 from typer.testing import CliRunner
 
 from supekku.cli.sync import app
 from supekku.scripts.lib.core.paths import SPECS_DIR, TECH_SPECS_SUBDIR
-from supekku.scripts.lib.core.sync_preferences import MARKER_FILENAME
 
 _SPEC_DRIVER_DIR = ".spec-driver"
-_MARKER_PATH = f"{_SPEC_DRIVER_DIR}/{MARKER_FILENAME}"
+_WORKFLOW_TOML = "workflow.toml"
 
 _SYNC_SPECS_SUCCESS = {
   "success": True,
@@ -31,6 +31,15 @@ _SYNC_SPECS_SUCCESS = {
 _SYNC_REQS_SUCCESS = {"success": True, "created": 0, "updated": 0}
 
 
+def _read_toml_autocreate(root: Path) -> bool:
+  """Read spec_autocreate from workflow.toml."""
+  toml_path = root / _SPEC_DRIVER_DIR / _WORKFLOW_TOML
+  if not toml_path.exists():
+    return False
+  doc = tomlkit.parse(toml_path.read_text(encoding="utf-8"))
+  return doc.get("sync", {}).get("spec_autocreate", False)
+
+
 class SyncDefaultsTest(unittest.TestCase):
   """VT-SYNC-DEFAULTS: preference resolution and backward compat."""
 
@@ -39,12 +48,21 @@ class SyncDefaultsTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
+    sd = self.root / _SPEC_DRIVER_DIR
+    sd.mkdir()
+    (sd / _WORKFLOW_TOML).write_text(
+      'ceremony = "settler"\n', encoding="utf-8"
+    )
     self.tech_dir = self.root / SPECS_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True)
     self.registry_path = self.tech_dir / "registry_v2.json"
     self._write_registry({})
+    # Agent doc rendering is tested separately; mock it out here
+    self._agent_docs_patcher = patch("supekku.cli.sync.render_agent_docs")
+    self._agent_docs_patcher.start()
 
   def tearDown(self) -> None:
+    self._agent_docs_patcher.stop()
     self.tmpdir.cleanup()
 
   # -- helpers --
@@ -54,9 +72,6 @@ class SyncDefaultsTest(unittest.TestCase):
       json.dumps({"version": 2, "languages": languages}),
       encoding="utf-8",
     )
-
-  def _marker_path(self) -> Path:
-    return self.root / _MARKER_PATH
 
   def _invoke(self, args: list[str] | None = None):
     return self.runner.invoke(app, ["sync", *(args or [])])
@@ -84,7 +99,7 @@ class SyncDefaultsTest(unittest.TestCase):
     call_kwargs = mock_sync_specs.call_args
     assert call_kwargs.kwargs["create_specs"] is False
     assert call_kwargs.kwargs["generate_contracts"] is True
-    assert not self._marker_path().exists()
+    assert not _read_toml_autocreate(self.root)
 
   # -- VT-002: --specs → persist + subsequent bare sync inherits --
 
@@ -106,9 +121,9 @@ class SyncDefaultsTest(unittest.TestCase):
     result = self._invoke(["--specs"])
     assert result.exit_code == 0, result.output
     assert mock_sync_specs.call_args.kwargs["create_specs"] is True
-    assert self._marker_path().exists(), "marker should be written"
+    assert _read_toml_autocreate(self.root), "TOML key should be set"
 
-    # Second run: no flag — should still create specs from marker
+    # Second run: no flag — should still create specs from TOML
     mock_sync_specs.reset_mock()
     result = self._invoke()
     assert result.exit_code == 0, result.output
@@ -149,7 +164,7 @@ class SyncDefaultsTest(unittest.TestCase):
     mock_sync_specs: MagicMock,
     mock_sync_reqs: MagicMock,
   ) -> None:
-    """VT-SYNC-DEFAULTS-004: populated registry → implicit opt-in + marker."""
+    """VT-SYNC-DEFAULTS-004: populated registry → implicit opt-in via TOML."""
     mock_root.return_value = self.root
     mock_sync_specs.return_value = _SYNC_SPECS_SUCCESS
     mock_sync_reqs.return_value = _SYNC_REQS_SUCCESS
@@ -164,7 +179,7 @@ class SyncDefaultsTest(unittest.TestCase):
     result = self._invoke()
 
     assert result.exit_code == 0, result.output
-    assert self._marker_path().exists(), "marker should be written by heuristic"
+    assert _read_toml_autocreate(self.root), "TOML key should be set by heuristic"
     mock_sync_specs.assert_called_once()
     assert mock_sync_specs.call_args.kwargs["create_specs"] is True
     assert "Existing specs detected" in result.output

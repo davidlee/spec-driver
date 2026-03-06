@@ -118,7 +118,7 @@ CLI dependency direction: CLI → Formatters → Domain → Core
 
 - Prefer **contracts-first** workflows for legacy repos to avoid unit-spec sprawl.
 - `sync` must respect `--specs/--no-specs` and `--contracts/--no-contracts` independently.
-- If the repo has an opt-in marker for spec auto-creation (e.g. `.spec-driver/enable_spec_autocreate`), treat that as the persisted default.
+- Spec auto-creation opt-in is persisted in `workflow.toml` under `[sync] spec_autocreate = true`.
 
 ### Unit vs assembly specs (taxonomy)
 

@@ -15,7 +15,8 @@ from pathlib import Path
 
 import yaml
 
-from supekku.scripts.lib.core.config import detect_exec_command, load_workflow_config
+from supekku.scripts.lib.core.agent_docs import render_agent_docs
+from supekku.scripts.lib.core.config import detect_exec_command
 from supekku.scripts.lib.core.npm_utils import (
   get_install_instructions,
   get_package_manager_info,
@@ -39,7 +40,7 @@ from supekku.scripts.lib.core.paths import (
   SPECS_DIR,
   TECH_SPECS_SUBDIR,
 )
-from supekku.scripts.lib.core.templates import TemplateNotFoundError, render_template
+from supekku.scripts.lib.core.templates import TemplateNotFoundError
 
 # Import after path setup to avoid circular imports
 from supekku.scripts.lib.file_ops import (
@@ -276,13 +277,6 @@ def _report_memory_changes(
     )
 
 
-def _discover_agent_templates(package_root: Path) -> list[str]:
-  """Discover agent template names from supekku/templates/agents/*.md."""
-  agents_tpl_dir = package_root / "templates" / "agents"
-  if not agents_tpl_dir.is_dir():
-    return []
-  return sorted(p.stem for p in agents_tpl_dir.glob("*.md"))
-
 
 def get_package_root() -> Path:
   """Find the root directory of the installed spec-driver package."""
@@ -367,30 +361,15 @@ def _render_agent_docs(
 ) -> None:
   """Render agent guidance templates into .spec-driver/agents/.
 
-  Loads workflow config, renders each agent template with it, and writes
-  the result. Falls back to static copy if templates are missing from
-  the package (backward compat for pre-template installs).
+  Delegates to ``render_agent_docs`` from ``core.agent_docs``.
+  Falls back to static copy if templates are missing from the package
+  (backward compat for pre-template installs).
   """
-  config = load_workflow_config(target_root)
-  agents_dir = target_root / SPEC_DRIVER_DIR / "agents"
-  agents_dir.mkdir(parents=True, exist_ok=True)
-
-  template_names = _discover_agent_templates(package_root)
   try:
-    for name in template_names:
-      content = render_template(
-        f"agents/{name}.md",
-        {"config": config},
-        repo_root=target_root,
-      )
-      dest = agents_dir / f"{name}.md"
-      if dry_run:
-        print("\n[DRY RUN] agent instruction:")
-        print(f"  + ./{SPEC_DRIVER_DIR}/agents/{name}.md")
-      else:
-        dest.write_text(content, encoding="utf-8")
+    render_agent_docs(target_root, package_root, dry_run=dry_run)
   except TemplateNotFoundError:
-    # Fallback: static copy for pre-template package installs
+    agents_dir = target_root / SPEC_DRIVER_DIR / "agents"
+    agents_dir.mkdir(parents=True, exist_ok=True)
     copy_directory_if_changed(
       src=package_root / "agents",
       dest=agents_dir,

@@ -423,6 +423,7 @@ dependencies = [
     { name = "jinja2" },
     { name = "python-frontmatter" },
     { name = "pyyaml" },
+    { name = "tomlkit" },
     { name = "typer" },
 ]
 
@@ -439,6 +440,7 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.0" },
     { name = "python-frontmatter", specifier = ">=1.1.0" },
     { name = "pyyaml", specifier = ">=6.0.3" },
+    { name = "tomlkit", specifier = ">=0.13.0" },
     { name = "typer", specifier = ">=0.15.0" },
 ]
 

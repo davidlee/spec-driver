@@ -1,7 +1,7 @@
 ---
 phase: IP-051-P01
 name: Core migration + agent doc regeneration
-status: ready
+status: complete
 ---
 
 # Phase 1 — Core migration + agent doc regeneration

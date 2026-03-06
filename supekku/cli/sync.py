@@ -8,6 +8,7 @@ from typing import Annotated
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
+from supekku.scripts.lib.core.agent_docs import render_agent_docs
 from supekku.scripts.lib.core.paths import (
   get_audits_dir,
   get_deltas_dir,
@@ -152,6 +153,18 @@ def sync(
   """
   # Auto-discover repository root
   root = find_repo_root()
+
+  # Regenerate agent docs from current workflow.toml
+  try:
+    rendered = render_agent_docs(root)
+    if rendered:
+      typer.echo(
+        f"Regenerated agent docs ({len(rendered)} files).",
+        err=True,
+      )
+  except Exception as exc:  # noqa: BLE001 — non-fatal; log and continue
+    typer.echo(f"Warning: agent doc regeneration failed: {exc}", err=True)
+
   tech_dir = get_tech_specs_dir(root)
   registry_path = tech_dir / "registry_v2.json"
 

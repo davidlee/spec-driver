@@ -38,6 +38,9 @@ DEFAULT_CONFIG: dict = {
     "policies": False,
     "standards": False,
   },
+  "sync": {
+    "spec_autocreate": False,
+  },
   "contracts": {
     "enabled": True,
     "root": ".contracts",

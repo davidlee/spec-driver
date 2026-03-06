@@ -24,9 +24,7 @@ def repo_root(tmp_path: Path) -> Path:
   """Create a minimal repo root with .spec-driver/ and workflow.toml."""
   sd = tmp_path / _SPEC_DRIVER
   sd.mkdir()
-  (sd / _WORKFLOW_TOML).write_text(
-    'ceremony = "settler"\n', encoding="utf-8"
-  )
+  (sd / _WORKFLOW_TOML).write_text('ceremony = "settler"\n', encoding="utf-8")
   return tmp_path
 
 

@@ -277,7 +277,6 @@ def _report_memory_changes(
     )
 
 
-
 def get_package_root() -> Path:
   """Find the root directory of the installed spec-driver package."""
   # The script is in supekku/scripts/, so package root is two levels up
@@ -613,9 +612,7 @@ def initialize_workspace(
   _check_optional_dependencies(target_root, auto_yes=auto_yes)
 
 
-def _check_optional_dependencies(
-  target_root: Path, *, auto_yes: bool = False
-) -> None:
+def _check_optional_dependencies(target_root: Path, *, auto_yes: bool = False) -> None:
   """Check for missing optional dependencies and offer to install them.
 
   Detects TypeScript/JavaScript projects and offers to install

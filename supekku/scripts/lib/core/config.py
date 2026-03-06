@@ -58,6 +58,24 @@ DEFAULT_CONFIG: dict = {
     "agents_md": True,
     "claude_md": True,
   },
+  "dirs": {
+    "specs": "specify",
+    "changes": "change",
+    "backlog": "backlog",
+    "memory": "memory",
+    "tech_specs": "tech",
+    "product_specs": "product",
+    "decisions": "decisions",
+    "policies": "policies",
+    "standards": "standards",
+    "deltas": "deltas",
+    "revisions": "revisions",
+    "audits": "audits",
+    "issues": "issues",
+    "problems": "problems",
+    "improvements": "improvements",
+    "risks": "risks",
+  },
 }
 
 

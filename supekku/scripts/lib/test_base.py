@@ -5,6 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from supekku.scripts.lib.core.paths import reset_paths
+
 
 class RepoTestCase(unittest.TestCase):
   """Base test case that handles directory context and creates temporary repos."""
@@ -14,8 +16,9 @@ class RepoTestCase(unittest.TestCase):
     self._cwd = Path.cwd()
 
   def tearDown(self) -> None:
-    """Restore original directory."""
+    """Restore original directory and reset path constants."""
     os.chdir(self._cwd)
+    reset_paths()
 
   def _make_repo(self) -> Path:
     """Create a temporary repository for testing."""

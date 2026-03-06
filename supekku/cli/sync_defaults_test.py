@@ -50,9 +50,7 @@ class SyncDefaultsTest(unittest.TestCase):
     (self.root / ".git").mkdir()
     sd = self.root / _SPEC_DRIVER_DIR
     sd.mkdir()
-    (sd / _WORKFLOW_TOML).write_text(
-      'ceremony = "settler"\n', encoding="utf-8"
-    )
+    (sd / _WORKFLOW_TOML).write_text('ceremony = "settler"\n', encoding="utf-8")
     self.tech_dir = self.root / SPECS_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True)
     self.registry_path = self.tech_dir / "registry_v2.json"

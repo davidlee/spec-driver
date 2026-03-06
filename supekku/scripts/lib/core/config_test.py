@@ -142,6 +142,61 @@ def test_defaults_have_expected_structure() -> None:
   assert isinstance(DEFAULT_CONFIG["authoring"], dict)
   assert isinstance(DEFAULT_CONFIG["verification"], dict)
   assert isinstance(DEFAULT_CONFIG["integration"], dict)
+  assert isinstance(DEFAULT_CONFIG["dirs"], dict)
+
+
+# --- [dirs] config tests ---
+
+
+def test_dirs_defaults_match_path_constants() -> None:
+  """[dirs] defaults must mirror the constants in paths.py."""
+  dirs = DEFAULT_CONFIG["dirs"]
+  assert dirs["specs"] == "specify"
+  assert dirs["changes"] == "change"
+  assert dirs["backlog"] == "backlog"
+  assert dirs["memory"] == "memory"
+  assert dirs["tech_specs"] == "tech"
+  assert dirs["product_specs"] == "product"
+  assert dirs["decisions"] == "decisions"
+  assert dirs["policies"] == "policies"
+  assert dirs["standards"] == "standards"
+  assert dirs["deltas"] == "deltas"
+  assert dirs["revisions"] == "revisions"
+  assert dirs["audits"] == "audits"
+  assert dirs["issues"] == "issues"
+  assert dirs["problems"] == "problems"
+  assert dirs["improvements"] == "improvements"
+  assert dirs["risks"] == "risks"
+
+
+def test_dirs_partial_override_merges_with_defaults(tmp_path: Path) -> None:
+  """Partial [dirs] overrides merge with defaults for missing keys."""
+  toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+  toml_path.parent.mkdir(parents=True)
+  toml_path.write_text(
+    '[dirs]\nspecs = "specifications"\ndeltas = "patches"\n',
+    encoding="utf-8",
+  )
+
+  config = load_workflow_config(tmp_path)
+
+  assert config["dirs"]["specs"] == "specifications"
+  assert config["dirs"]["deltas"] == "patches"
+  # Non-overridden keys retain defaults
+  assert config["dirs"]["changes"] == "change"
+  assert config["dirs"]["memory"] == "memory"
+  assert config["dirs"]["audits"] == "audits"
+
+
+def test_dirs_missing_section_uses_defaults(tmp_path: Path) -> None:
+  """Missing [dirs] section yields all defaults."""
+  toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+  toml_path.parent.mkdir(parents=True)
+  toml_path.write_text('ceremony = "settler"\n', encoding="utf-8")
+
+  config = load_workflow_config(tmp_path)
+
+  assert config["dirs"] == DEFAULT_CONFIG["dirs"]
 
 
 # --- strict_mode config tests ---

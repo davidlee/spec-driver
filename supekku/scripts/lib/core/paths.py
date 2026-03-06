@@ -42,6 +42,49 @@ PROBLEMS_SUBDIR = "problems"
 IMPROVEMENTS_SUBDIR = "improvements"
 RISKS_SUBDIR = "risks"
 
+# --- Config key → module constant name mapping ---
+
+_CONFIG_KEY_TO_CONSTANT: dict[str, str] = {
+  "specs": "SPECS_DIR",
+  "changes": "CHANGES_DIR",
+  "backlog": "BACKLOG_DIR",
+  "memory": "MEMORY_DIR",
+  "tech_specs": "TECH_SPECS_SUBDIR",
+  "product_specs": "PRODUCT_SPECS_SUBDIR",
+  "decisions": "DECISIONS_SUBDIR",
+  "policies": "POLICIES_SUBDIR",
+  "standards": "STANDARDS_SUBDIR",
+  "deltas": "DELTAS_SUBDIR",
+  "revisions": "REVISIONS_SUBDIR",
+  "audits": "AUDITS_SUBDIR",
+  "issues": "ISSUES_SUBDIR",
+  "problems": "PROBLEMS_SUBDIR",
+  "improvements": "IMPROVEMENTS_SUBDIR",
+  "risks": "RISKS_SUBDIR",
+}
+
+# Snapshot of original defaults for reset_paths()
+_ORIGINAL_DEFAULTS: dict[str, str] = {
+  const: globals()[const] for const in _CONFIG_KEY_TO_CONSTANT.values()
+}
+
+
+def init_paths(config: dict) -> None:
+  """Override module-level directory constants from config["dirs"].
+
+  Safe to skip — helpers fall back to compiled defaults when not called.
+  """
+  dirs = config.get("dirs", {})
+  for config_key, const_name in _CONFIG_KEY_TO_CONSTANT.items():
+    if config_key in dirs:
+      globals()[const_name] = dirs[config_key]
+
+
+def reset_paths() -> None:
+  """Restore all directory constants to their original compiled defaults."""
+  for const_name, default_val in _ORIGINAL_DEFAULTS.items():
+    globals()[const_name] = default_val
+
 
 # --- spec-driver internal helpers ---
 
@@ -190,4 +233,6 @@ __all__ = [
   "get_standards_dir",
   "get_tech_specs_dir",
   "get_templates_dir",
+  "init_paths",
+  "reset_paths",
 ]

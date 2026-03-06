@@ -30,9 +30,28 @@ app = typer.Typer(
 )
 
 
-def version_callback(_value: bool | None = None) -> None:
-  """Handle version option."""
-  # Version is handled by common.VersionOption
+def _init_paths_from_config() -> None:
+  """Initialize path constants from workflow.toml if in a repo.
+
+  Silently skips if not in a repo — commands like --help and install
+  must work without a workspace.
+  """
+  from supekku.scripts.lib.core.config import load_workflow_config  # noqa: PLC0415
+  from supekku.scripts.lib.core.paths import init_paths  # noqa: PLC0415
+  from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
+
+  try:
+    root = find_repo_root()
+  except RuntimeError:
+    return
+  config = load_workflow_config(root)
+  init_paths(config)
+
+
+@app.callback()
+def _app_callback(_version: VersionOption = None) -> None:
+  """Process global options and initialize path configuration."""
+  _init_paths_from_config()
 
 
 # Top-level commands
@@ -126,7 +145,7 @@ app.add_typer(
 
 
 # Main entry point
-def main(_version: VersionOption = None) -> None:
+def main() -> None:
   """Spec-driver CLI main entry point."""
   app()
 

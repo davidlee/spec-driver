@@ -468,128 +468,144 @@ def test_pre_migration_layout_change_dir(tmp_path: Path) -> None:
   assert _is_pre_migration_layout(root) is True
 
 
-# --- _ensure_target_symlinks ---
+# --- _ensure_target_symlinks (per-skill) ---
 
 
-def test_ensure_symlinks_creates_new(tmp_path: Path) -> None:
-  """Creates symlinks when target dirs do not exist."""
+def _setup_canonical(root: Path, *skill_names: str) -> Path:
+  """Create canonical skills dir with named skill subdirs."""
+  canonical = root / CANONICAL_SKILLS_DIR
+  for name in skill_names:
+    _make_skill(canonical, name, f"{name} skill.")
+  return canonical
+
+
+def test_ensure_symlinks_creates_per_skill(tmp_path: Path) -> None:
+  """Creates per-skill symlinks when target dir is empty."""
   root = tmp_path / "repo"
   root.mkdir()
-  (root / ".spec-driver" / "skills").mkdir(parents=True)
-  (root / ".claude").mkdir()
+  canonical = _setup_canonical(root, "boot", "consult")
 
-  outcomes = _ensure_target_symlinks(root, ["claude"], set())
-  assert outcomes["claude"] == "created"
+  outcomes = _ensure_target_symlinks(
+    root, ["claude"], ["boot", "consult"], {"boot", "consult"},
+  )
+  assert outcomes["claude"]["boot"] == "created"
+  assert outcomes["claude"]["consult"] == "created"
+
   target = root / ".claude" / "skills"
-  assert target.is_symlink()
-  assert target.resolve() == (root / CANONICAL_SKILLS_DIR).resolve()
+  assert target.is_dir()
+  assert not target.is_symlink()
+  assert (target / "boot").is_symlink()
+  assert (target / "boot").resolve() == (canonical / "boot").resolve()
+  assert (target / "boot" / "SKILL.md").is_file()
 
 
 def test_ensure_symlinks_ok_when_correct(tmp_path: Path) -> None:
-  """Reports 'ok' when symlink already points to canonical dir."""
+  """Reports 'ok' when per-skill symlinks already point correctly."""
   root = tmp_path / "repo"
   root.mkdir()
-  canonical = root / CANONICAL_SKILLS_DIR
-  canonical.mkdir(parents=True)
-  claude_dir = root / ".claude"
-  claude_dir.mkdir()
-  (claude_dir / "skills").symlink_to(Path("..") / CANONICAL_SKILLS_DIR)
+  _setup_canonical(root, "boot")
 
-  outcomes = _ensure_target_symlinks(root, ["claude"], set())
-  assert outcomes["claude"] == "ok"
+  # First call creates
+  _ensure_target_symlinks(
+    root, ["claude"], ["boot"], {"boot"},
+  )
+  # Second call checks
+  outcomes = _ensure_target_symlinks(
+    root, ["claude"], ["boot"], {"boot"},
+  )
+  assert outcomes["claude"]["boot"] == "ok"
 
 
 def test_ensure_symlinks_custom_when_wrong_symlink(tmp_path: Path) -> None:
-  """Reports 'custom' when symlink points elsewhere."""
+  """Reports 'custom' when per-skill symlink points elsewhere."""
   root = tmp_path / "repo"
   root.mkdir()
-  (root / CANONICAL_SKILLS_DIR).mkdir(parents=True)
-  other = root / "other_skills"
-  other.mkdir()
-  claude_dir = root / ".claude"
-  claude_dir.mkdir()
-  (claude_dir / "skills").symlink_to(other)
+  _setup_canonical(root, "boot")
+  other = root / "other_skills" / "boot"
+  other.mkdir(parents=True)
 
-  outcomes = _ensure_target_symlinks(root, ["claude"], set())
-  assert outcomes["claude"] == "custom"
+  target_dir = root / ".claude" / "skills"
+  target_dir.mkdir(parents=True)
+  (target_dir / "boot").symlink_to(other)
+
+  outcomes = _ensure_target_symlinks(
+    root, ["claude"], ["boot"], {"boot"},
+  )
+  assert outcomes["claude"]["boot"] == "custom"
 
 
 def test_ensure_symlinks_custom_post_migration_real_dir(tmp_path: Path) -> None:
-  """Reports 'custom' for real dir in post-migration workspace."""
+  """Reports 'custom' for real skill dir in post-migration workspace."""
   root = tmp_path / "repo"
   root.mkdir()
-  (root / ".spec-driver" / "skills").mkdir(parents=True)
+  _setup_canonical(root, "boot")
   _make_post_migration(root)
 
-  # Real skills dir (user customisation)
-  (root / ".claude" / "skills" / "my-skill").mkdir(parents=True)
+  # Real skill dir (user customisation)
+  _make_skill(root / ".claude" / "skills", "boot", "Custom boot.")
 
-  outcomes = _ensure_target_symlinks(root, ["claude"], set())
-  assert outcomes["claude"] == "custom"
+  outcomes = _ensure_target_symlinks(
+    root, ["claude"], ["boot"], {"boot"},
+  )
+  assert outcomes["claude"]["boot"] == "custom"
   # Real dir preserved
-  assert (root / ".claude" / "skills" / "my-skill").is_dir()
+  assert (root / ".claude" / "skills" / "boot").is_dir()
+  assert not (root / ".claude" / "skills" / "boot").is_symlink()
 
 
-def test_ensure_symlinks_migrates_pre_migration_real_dir(tmp_path: Path) -> None:
-  """Replaces real dir with symlink in pre-migration workspace."""
+def test_ensure_symlinks_migrates_pre_migration(tmp_path: Path) -> None:
+  """Replaces real skill dirs with symlinks in pre-migration workspace."""
   root = tmp_path / "repo"
   root.mkdir()
-  canonical = root / CANONICAL_SKILLS_DIR
-  canonical.mkdir(parents=True)
+  canonical = _setup_canonical(root, "boot", "consult")
   _make_pre_migration(root)
 
-  # Simulate old installer: real skills dir with package skills
-  target = root / ".claude" / "skills"
-  _make_skill(target, "boot", "Mandatory onboarding.")
-  _make_skill(target, "consult", "Obstacle handling.")
+  # Simulate old installer: real skill dirs
+  target_dir = root / ".claude" / "skills"
+  _make_skill(target_dir, "boot", "Mandatory onboarding.")
+  _make_skill(target_dir, "consult", "Obstacle handling.")
 
   outcomes = _ensure_target_symlinks(
-    root,
-    ["claude"],
-    {"boot", "consult"},
+    root, ["claude"], ["boot", "consult"], {"boot", "consult"},
   )
-  assert outcomes["claude"] == "migrated"
-  assert target.is_symlink()
-  assert target.resolve() == canonical.resolve()
+  assert outcomes["claude"]["boot"] == "migrated"
+  assert outcomes["claude"]["consult"] == "migrated"
+  assert (target_dir / "boot").is_symlink()
+  assert (target_dir / "boot").resolve() == (canonical / "boot").resolve()
 
 
-def test_ensure_symlinks_keeps_pre_migration_with_user_content(
-  tmp_path: Path,
-) -> None:
-  """Keeps real dir when pre-migration target has non-package skills."""
+def test_ensure_symlinks_preserves_user_skills(tmp_path: Path) -> None:
+  """User-created skills in target dir are untouched."""
   root = tmp_path / "repo"
   root.mkdir()
-  (root / CANONICAL_SKILLS_DIR).mkdir(parents=True)
-  _make_pre_migration(root)
+  _setup_canonical(root, "boot")
 
-  # Real dir with package + user skills
-  target = root / ".claude" / "skills"
-  _make_skill(target, "boot", "Mandatory onboarding.")
-  _make_skill(target, "my-custom", "User skill.")
+  # Pre-existing user skill in target dir
+  target_dir = root / ".claude" / "skills"
+  _make_skill(target_dir, "my-custom", "User skill.")
 
   outcomes = _ensure_target_symlinks(
-    root,
-    ["claude"],
-    {"boot"},
+    root, ["claude"], ["boot"], {"boot"},
   )
-  assert outcomes["claude"] == "kept"
-  assert target.is_dir()
-  assert not target.is_symlink()
-  # Package skill removed, user skill preserved
-  assert not (target / "boot").exists()
-  assert (target / "my-custom").is_dir()
+  assert outcomes["claude"]["boot"] == "created"
+  # User skill untouched (not in allowed_names, not processed)
+  assert (target_dir / "my-custom").is_dir()
+  assert not (target_dir / "my-custom").is_symlink()
 
 
 def test_ensure_symlinks_idempotent(tmp_path: Path) -> None:
-  """Second call returns 'ok' after initial creation."""
+  """Second call returns all 'ok' after initial creation."""
   root = tmp_path / "repo"
   root.mkdir()
-  (root / CANONICAL_SKILLS_DIR).mkdir(parents=True)
-  (root / ".claude").mkdir()
+  _setup_canonical(root, "boot", "consult")
 
-  _ensure_target_symlinks(root, ["claude"], set())
-  outcomes = _ensure_target_symlinks(root, ["claude"], set())
-  assert outcomes["claude"] == "ok"
+  _ensure_target_symlinks(
+    root, ["claude"], ["boot", "consult"], {"boot", "consult"},
+  )
+  outcomes = _ensure_target_symlinks(
+    root, ["claude"], ["boot", "consult"], {"boot", "consult"},
+  )
+  assert all(v == "ok" for v in outcomes["claude"].values())
 
 
 # --- end-to-end sync ---
@@ -620,25 +636,26 @@ def test_sync_skills_installs_to_canonical(tmp_path: Path) -> None:
 
 
 def test_sync_skills_creates_target_symlinks(tmp_path: Path) -> None:
-  """sync_skills creates symlinks for agent target dirs."""
+  """sync_skills creates per-skill symlinks in agent target dirs."""
   root, source = _setup_repo(tmp_path)
   result = sync_skills(root, skills_source_dir=source)
 
   canonical = root / CANONICAL_SKILLS_DIR
   for target_name, target_path in SKILL_TARGET_DIRS.items():
     abs_target = root / target_path
-    assert abs_target.is_symlink(), f"{target_name} is not a symlink"
-    assert abs_target.resolve() == canonical.resolve()
+    # Target dir is real, individual skills are symlinks
+    assert abs_target.is_dir()
+    assert not abs_target.is_symlink()
+    for skill in ("boot", "consult"):
+      skill_link = abs_target / skill
+      assert skill_link.is_symlink(), (
+        f"{skill} not a symlink in {target_name}"
+      )
+      assert skill_link.resolve() == (canonical / skill).resolve()
+      assert (skill_link / "SKILL.md").is_file()
 
-  # Skills visible through symlinks
-  for target_name, target_path in SKILL_TARGET_DIRS.items():
-    abs_target = root / target_path
-    assert (abs_target / "boot" / "SKILL.md").is_file(), (
-      f"boot not visible through {target_name}"
-    )
-
-  assert result["symlinks"]["claude"] == "created"
-  assert result["symlinks"]["codex"] == "created"
+  assert result["symlinks"]["claude"]["boot"] == "created"
+  assert result["symlinks"]["codex"]["boot"] == "created"
 
 
 def test_sync_skills_prunes_from_canonical(tmp_path: Path) -> None:
@@ -671,9 +688,9 @@ def test_sync_skills_idempotent(tmp_path: Path) -> None:
   assert result["canonical"]["installed"] == []
   assert result["canonical"]["pruned"] == []
 
-  # Symlinks should report ok
-  for outcome in result["symlinks"].values():
-    assert outcome == "ok"
+  # Per-skill symlinks should report ok
+  for skill_outcomes in result["symlinks"].values():
+    assert all(v == "ok" for v in skill_outcomes.values())
 
 
 def test_sync_skills_ensures_root_agents_reference(tmp_path: Path) -> None:
@@ -797,8 +814,8 @@ def test_sync_skills_respects_target_config(tmp_path: Path) -> None:
   assert "claude" in result["symlinks"]
   assert "codex" not in result["symlinks"]
 
-  # Claude target should be a symlink with skills visible
-  assert (root / ".claude" / "skills").is_symlink()
+  # Claude target has per-skill symlinks
+  assert (root / ".claude" / "skills" / "boot").is_symlink()
   assert (root / ".claude" / "skills" / "boot" / "SKILL.md").is_file()
   # Codex target should not exist
   assert not (root / ".agents" / "skills").exists()

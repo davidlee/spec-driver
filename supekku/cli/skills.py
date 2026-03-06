@@ -41,9 +41,16 @@ def skills_sync() -> None:
   else:
     typer.echo("  .spec-driver/skills: up to date")
 
-  # Symlink outcomes
-  for target_name, outcome in result["symlinks"].items():
-    typer.echo(f"  {target_name}: {outcome}")
+  # Per-target symlink summary
+  for target_name, skill_outcomes in result["symlinks"].items():
+    if not skill_outcomes:
+      typer.echo(f"  {target_name}: no skills")
+      continue
+    counts: dict[str, int] = {}
+    for outcome in skill_outcomes.values():
+      counts[outcome] = counts.get(outcome, 0) + 1
+    summary = ", ".join(f"{v} {k}" for k, v in sorted(counts.items()))
+    typer.echo(f"  {target_name}: {summary}")
 
   # AGENTS.md summary
   if result["agents_md_changed"]:

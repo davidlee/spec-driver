@@ -324,68 +324,65 @@ def _is_pre_migration_layout(repo_root: Path) -> bool:
 def _ensure_target_symlinks(
   repo_root: Path,
   target_names: list[str],
+  allowed_names: list[str],
   package_skill_names: set[str],
-) -> dict[str, str]:
-  """Ensure agent target dirs are symlinks to the canonical skills dir.
+) -> dict[str, dict[str, str]]:
+  """Ensure per-skill symlinks from agent target dirs to canonical skills.
 
-  For each configured target:
+  For each configured target, ensures the target directory exists and
+  contains a symlink for each allowlisted skill pointing to the canonical
+  copy in ``.spec-driver/skills/<name>``.
+
+  Per-skill behaviour:
 
   - Already a correct symlink → ``"ok"``
   - Does not exist → create symlink → ``"created"``
-  - Real dir in pre-migration workspace → migrate (remove package-managed
-    skill dirs, replace with symlink if empty) → ``"migrated"``
-    or ``"kept"`` if user content remains
+  - Real dir in pre-migration workspace → replace with symlink → ``"migrated"``
   - Real dir in post-migration workspace → leave alone → ``"custom"``
 
-  Returns a dict mapping target name to outcome.
+  Returns a dict mapping target name to per-skill outcome dicts.
   """
   canonical = repo_root / CANONICAL_SKILLS_DIR
   pre_migration = _is_pre_migration_layout(repo_root)
-  outcomes: dict[str, str] = {}
+  outcomes: dict[str, dict[str, str]] = {}
 
-  for name in target_names:
-    rel_path = SKILL_TARGET_DIRS.get(name)
+  for target_name in target_names:
+    rel_path = SKILL_TARGET_DIRS.get(target_name)
     if rel_path is None:
       continue
-    target = repo_root / rel_path
+    target_dir = repo_root / rel_path
+    target_dir.mkdir(parents=True, exist_ok=True)
 
-    # Compute relative symlink path from target's parent to canonical dir
-    # e.g. .claude/skills → ../.spec-driver/skills
-    link_target = Path("..") / CANONICAL_SKILLS_DIR
+    skill_outcomes: dict[str, str] = {}
+    for skill_name in allowed_names:
+      canonical_skill = canonical / skill_name
+      if not canonical_skill.is_dir():
+        continue
+      target_skill = target_dir / skill_name
 
-    if target.is_symlink():
-      if target.resolve() == canonical.resolve():
-        outcomes[name] = "ok"
-      else:
-        # Symlink points elsewhere — leave it alone
-        outcomes[name] = "custom"
-      continue
+      # e.g. .claude/skills/boot → ../../.spec-driver/skills/boot
+      link_target = Path("..") / ".." / CANONICAL_SKILLS_DIR / skill_name
 
-    if target.is_dir():
-      if not pre_migration:
-        # Post-migration real dir = intentional customisation
-        outcomes[name] = "custom"
+      if target_skill.is_symlink():
+        if target_skill.resolve() == canonical_skill.resolve():
+          skill_outcomes[skill_name] = "ok"
+        else:
+          skill_outcomes[skill_name] = "custom"
         continue
 
-      # Pre-migration: remove package-managed skill dirs, then replace
-      for child in sorted(target.iterdir()):
-        if child.is_dir() and child.name in package_skill_names:
-          shutil.rmtree(child)
+      if target_skill.is_dir():
+        if pre_migration:
+          shutil.rmtree(target_skill)
+          target_skill.symlink_to(link_target)
+          skill_outcomes[skill_name] = "migrated"
+        else:
+          skill_outcomes[skill_name] = "custom"
+        continue
 
-      # Replace with symlink only if dir is now empty
-      remaining = list(target.iterdir())
-      if not remaining:
-        target.rmdir()
-        target.symlink_to(link_target)
-        outcomes[name] = "migrated"
-      else:
-        outcomes[name] = "kept"
-      continue
+      target_skill.symlink_to(link_target)
+      skill_outcomes[skill_name] = "created"
 
-    # Does not exist — create parent and symlink
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.symlink_to(link_target)
-    outcomes[name] = "created"
+    outcomes[target_name] = skill_outcomes
 
   return outcomes
 
@@ -489,10 +486,11 @@ def sync_skills(
   install_result = install_skills_to_target(source, canonical_dir, allowed)
   pruned = prune_skills_from_target(canonical_dir, package_names, allowed)
 
-  # Ensure agent targets are symlinks to canonical dir
+  # Ensure per-skill symlinks in agent target dirs
   symlink_outcomes = _ensure_target_symlinks(
     repo_root,
     valid_targets,
+    allowed,
     package_names,
   )
 

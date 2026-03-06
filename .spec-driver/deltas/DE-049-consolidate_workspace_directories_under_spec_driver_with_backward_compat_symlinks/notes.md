@@ -95,6 +95,13 @@ Manual spot-checks pass:
 
 **No code tests run** — Phase 1 is pure structural, no code changes. Expect test failures starting Phase 2 when path defaults change.
 
+### Migration script
+
+`supekku/scripts/migrate_to_consolidated_layout.sh` (`3280914`) — captures the
+Phase 1 steps as a reusable shell script with `--dry-run`, idempotency, and
+verification. Placement TBD — move to a proper home when migration/deployment
+strategy is formalized.
+
 ### Hand-off to Phase 2
 
 Phase 2 (path model + config) can now proceed. Key inputs:

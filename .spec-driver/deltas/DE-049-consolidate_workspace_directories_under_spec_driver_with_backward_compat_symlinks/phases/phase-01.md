@@ -161,6 +161,7 @@ continue to resolve. No code changes in this phase.
 
 - Also deleted `registry_v2.json` (derived file) during 1.1 — reduces diff noise
 - `by-language/` dir survived derived symlink deletion (it's a real dir with content, not a symlink) — will be handled naturally by git mv in 1.2
+- Captured migration steps as reusable shell script: `supekku/scripts/migrate_to_consolidated_layout.sh` (3280914). Final home TBD.
 
 ## 10. Findings / Research Notes
 

@@ -7,6 +7,7 @@ Ceremony mode: **settler**
 - Canonical default narrative is delta-first:
   `delta -> DR -> IP -> phase sheet(s) -> implement -> audit -> revision -> patch specs -> close`
 - Revision-first is a concession path (typically town-planner governance), not the default entry path.
+- Low-ceremony work (pioneer/settler) may use kanban cards instead of deltas — see doctrine.md for project preferences.
 - Ceremony mode sets guidance posture, not runtime command enforcement.
 - Current runtime enforcement comes from explicit command gates (for example coverage checks in `complete delta`) and command flags.
 

@@ -3,7 +3,7 @@ id: DL-047
 name: Spec corpus reconciliation
 created: '2026-03-05'
 updated: '2026-03-06'
-status: open
+status: open # 1 adjudicated (DL-047.010), 19 resolved, 1 dismissed
 kind: drift_ledger
 delta_ref: DE-047
 ---
@@ -212,7 +212,7 @@ docs.
 
 ### DL-047.006: INIT.md — stale risk + vestigial onboarding mechanism
 
-- status: adjudicated
+- status: resolved
 - entry_type: stale_claim
 - severity: significant
 - topic: workflow
@@ -239,6 +239,7 @@ docs.
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
   - 2026-03-05 adjudicated: INIT.md is vestigial dead code in the installer; should be removed in favour of boot skill + memories + minimal AGENTS.md. PROD-001 RISK-006 to be marked resolved.
   - 2026-03-06 implemented: removed `@supekku/INIT.md` from the live bootstrap path, deleted `supekku/INIT.md`, and updated PROD-001 to describe the current boot path.
+  - 2026-03-06 resolved: implementation confirmed complete; flipped status.
 
 ### DL-047.007: Ceremony mode dual declaration — workflow.md vs workflow.toml
 
@@ -265,7 +266,7 @@ docs.
 
 ### DL-047.008: Default posture — doctrine "prefer cards" vs workflow "delta-first canonical"
 
-- status: adjudicated
+- status: resolved
 - entry_type: ambiguous_intent
 - severity: significant
 - topic: workflow
@@ -302,6 +303,7 @@ docs.
 - evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
   - 2026-03-06 adjudicated: configuration-dependent, not a contradiction. Kanban = low-ceremony gateway; "card" = polymorphic work-tracking artifact. Patch docs for clarity; full resolution via PROD-016 installer.
+  - 2026-03-06 resolved: patched doctrine.md (polymorphic card definition, ceremony-mode framing) and workflow.md (bridging sentence for low-ceremony kanban path). glossary.md already correct.
 
 ### DL-047.009: Requirement lifecycle authority — specs vs evidence overlays
 
@@ -360,6 +362,7 @@ docs.
 - evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
   - 2026-03-05 adjudicated: workflow.toml canonical. Small delta to migrate marker file to TOML config. Future: auto-creation scope may narrow (Go-only, package/glob-scoped) but that's separate.
+  - 2026-03-06 note: migration blocked on TOML write capability — stdlib tomllib is read-only, no tomli_w/tomlkit dependency. Read side (config check) is trivial; write side (persist_spec_autocreate) needs either a new dep or string manipulation. Requires its own delta.
 
 ### DL-047.011: Missing revision on PROD-002 FR-002 after PROD-011 reversal
 
@@ -576,7 +579,7 @@ docs.
 
 ### DL-047.019: Two glossaries with divergent contract definitions
 
-- status: adjudicated
+- status: resolved
 - entry_type: stale_claim
 - severity: cosmetic
 - topic: other
@@ -605,10 +608,11 @@ docs.
 - evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
   - 2026-03-05 adjudicated: .contracts/ is correct. Consolidate two glossaries into one canonical file as a deliberate activity (later phase or follow-up). Fix stale by-package references during consolidation.
+  - 2026-03-06 resolved: consolidation achieved by elimination — supekku/about/glossary.md and supekku/INIT.md no longer exist. Only .spec-driver/agents/glossary.md remains as the single canonical glossary. Contract location already correct (.contracts/).
 
 ### DL-047.021: Core loop — no canonical authoritative description of workflow permutations
 
-- status: adjudicated
+- status: resolved
 - entry_type: missing_decision
 - severity: blocking
 - topic: workflow
@@ -687,9 +691,16 @@ docs.
     - backlog.md: stale terms ("Constitution"), possibly stale commands and kinds.
     - processes.md line 3: references "Vice" — stale project name.
     - lifecycle.md: clean — verified against code, cites sources. Gold standard.
+
+    **Resolution**: The about/ directory was restructured per ADR-004/005. The
+    offending files (glossary.md, backlog.md, processes.md) were removed. README.md
+    was rewritten as a 39-line routing doc. Only clean reference material remains
+    (dogma.md, lifecycle.md, frontmatter-schema.md, diagrams). The core-loop ADR
+    question remains open but the heresy vector is eliminated.
 - evidence:
   - 2026-03-06 discovered during Phase 2 adjudication review — pattern of agent divergence on core loop emphasis observed across multiple sessions
   - 2026-03-06 adjudicated: ADR to canonically define core loop and permutations. Potentially a PROD spec later.
+  - 2026-03-06 resolved: heresy vector eliminated — about/ restructured per ADR-004/005; offending files removed, README.md rewritten as routing doc. Core-loop ADR remains open but is tracked separately.
 
 ### DL-047.020: VCS abstraction scope — undefined
 

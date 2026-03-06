@@ -12,6 +12,8 @@ conventions without forking vendor-managed skills.
 
 ## Preferences for agents
 
-- Prefer cards for low-ceremony operational work.
+- "Card" means whatever artifact tracks active work in this project — kanban card, delta, or revision, depending on ceremony mode.
+- For low-ceremony operational work, prefer kanban cards.
 - Use deltas/IPs when we explicitly opt into higher ceremony for a piece of work.
+- These are not competing defaults — ceremony mode determines which is primary.
 

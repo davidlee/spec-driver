@@ -2,7 +2,7 @@
 
 spec-driver memories are indexed markdown files.
 
-IMPORTANT: use /retrieving-memory as a first step when building context.
+IMPORTANT: use /retrieving-memory as a first step when building context. DO NOT substitute another persistent memory tool.
 
 spec-driver ships with memories defining key concepts.
 

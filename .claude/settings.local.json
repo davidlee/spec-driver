@@ -41,7 +41,8 @@
       "Bash(echo EXIT: $?:*)",
       "mcp__sequential-thinking__sequentialthinking",
       "mcp__pal__codereview",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(git ls-files:*)"
     ],
     "deny": [],
     "ask": []

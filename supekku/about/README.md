@@ -1,40 +1,74 @@
 # About: The Supekku Spec-Driven Development Methodology
 
-This directory contains the reference material and meta-guidance for the Supekku development methodology as implemented in this project. Supekku is a rigorous, agent-centric workflow designed to build auditable, maintainable, and robust software by treating specifications as the evergreen source of truth.
+This directory contains reference material guidance for spec-driver.
 
-This implementation supports multi-language codebases (Go, Python, TypeScript) and is designed with the intention of being extracted into a generic, open-source framework.
+Spec-driver is a rigorous, agent-centric workflow designed to build auditable,
+maintainable, and robust software by treating specifications as the evergreen
+source of truth.
+
+Many approaches claim to support spec-driven development. Spec-driver can drive
+specs from development.
+
+It supports multi-language codebases (Go, Python, TypeScript, Zig) and is an
+open-source framework for building evolvable, highly customisable workflows
+which can evolve with growing agentic engineering projects.
 
 ## Core Philosophy
 
-Supekku is based on an "inverted model" of spec-driven development. Unlike traditional approaches where specs are disposable artifacts used only for initial implementation, here they are living documents that co-evolve with the codebase.
+Supekku is based on an "inverted model" of spec-driven development.
 
--   **Specs as Truth**: Technical and Product Specifications (`SPECs` and `PRODs`) are the canonical source of truth for the system's behavior and intent.
--   **Change is Explicit**: All changes to the system are managed through explicit, declarative `Deltas` that describe the required modifications to bring the code back into alignment with the specs.
--   **Specs Evolve via Revisions**: Spec Revisions (`RE-`) document requirement/spec updates and lineage, typically during reconciliation after implementation/audit in delta-first flows.
--   **Continuous Auditing**: The system is designed for continuous verification. `Audits` and automated tooling ensure that the implementation never drifts far from its specification.
--   **Agent-Native**: The process is designed to be automatable and leveraged by AI development agents, with structured, machine-readable artifacts and clear, deterministic workflows.
+Under naive approaches, specs (and research) are disposable, and begin to rot
+as soon as the code changes - often as soon as implementation begins.
+
+They don't have to be disposable.
+
+-   **Specs as Normative Truth**: Technical and Product Specifications (`SPECs`
+    and `PRODs`) are the canonical source of truth for the system's behavior
+    and intent.
+-   **Change is Explicit**: All changes to the system are managed through
+    explicit `Deltas` whiwh describe the changes and verification gates.
+-   **Specs Evolve via Revisions**: Spec Revisions (`RE-`) document
+    requirement/spec updates and lineage, during reconciliation after
+    implementation/audit in delta-first flows.
+-   **Continuous Auditing**: Spec-driver is designed for continuous
+    verification. `Audits` and compact, deterministically generated contracts
+    ensure that implementation never drifts far from its specification.
+-   **Agent-Native**: Designed to provide fast rails for agents, with
+    structured, machine-readable artifacts and configurable workflows.
 
 ## Key Artifacts & Concepts
 
-The methodology is built around a set of interconnected markdown artifacts, linked via a rich frontmatter schema and structured YAML blocks that are machine-auditable.
+Built around a set of interconnected markdown artifacts, linked by schema-validated YAML.
 
--   **Policy Layer**: Governance is expressed through ADRs, Policies, and Standards (under `specify/decisions/`, `specify/policies/`, `specify/standards/`).
--   **Tech Spec (SPEC)**: A detailed, evergreen technical specification for a specific system component (e.g., a Go package). It defines responsibilities, architecture, contracts, and testing strategies.
--   **Product Spec (PROD)**: A product-level specification that captures user problems, business value, hypotheses, and success metrics.
--   **Architecture Decision Record (ADR)**: Formal documents capturing significant architectural decisions with context, options considered, and rationale. ADRs use enhanced frontmatter with relationships and are managed through a comprehensive registry system.
--   **Delta (DE)**: A declarative change bundle. It's the primary mechanism for managing change, scoping the work required to align the codebase with updated specifications.
--   **Design Revision (DR)**: A companion to a Delta, detailing the specific code-level design changes required (`kind: design_revision` in frontmatter).
--   **Implementation Plan (IP)**: A phased plan for executing a Delta, defining clear entrance and exit criteria for each stage. Phase sheets embed `supekku:plan`/`supekku:phase` YAML blocks that drive registry updates.
--   **Audit (AUD)**: A formal review that compares the state of the code against its corresponding specs to identify drift and ensure alignment.
--   **Workspace**: An orchestration facade (`supekku/scripts/lib/workspace.py`) that loads registries, validates relations, and powers automation.
+-   **Policy Layer**: Governance is expressed through ADRs, Policies, and
+    Standards.
+-   **Tech Spec (SPEC)**: A detailed, evergreen technical specification for a
+    given subsystem. Defines responsibilities, architecture, contracts, and
+    testing strategies.
+-   **Product Spec (PROD)**: A product requirements document which captures
+    problems, value drivers, hypotheses, use cases, and success metrics.
+-   **Architecture Decision Record (ADR)**: These capture significant
+    architectural decisions with context, options considered, and rationale.
+-   **Delta (DE)**: A declarative change bundle. The primary mechanism for
+    managing change, scoping the work required to align the codebase with
+    updated specifications.
+-   **Design Revision (DR)**: A companion to a Delta, detailing the specific
+    code-level design changes required.
+-   **Implementation Plan (IP)**: A phased plan for executing a Delta, defining
+    clear entrance and exit criteria for each stage. Phase sheets embed YAML
+    which propagate progress through a registry.
+-   **Audit (AUD)**: A formal review that compares observed system reality
+    against its corresponding specs to identify drift and ensure alignment.
+-   **Workspace**: An orchestration facade that loads registries, validates
+    relations, and powers automation.
 
 See `glossary.md`, `frontmatter-schema.md`, and `directory-structure.md` in this directory for detailed definitions and navigation patterns.
 
 ## The Development Workflow
 
-The Supekku workflow follows a structured, iterative loop:
+Work follows a structured, iterative loop:
 
-1.  **Capture**: Need for change is captured in a `Problem Statement`, `Issue`, or `PROD` spec.
+1.  **Capture**: Need for change is captured in a backlog card or spec.
 2.  **Specify**: The desired end-state is defined by creating or updating `SPEC` and `PROD` documents. For non-code changes, a `Spec Revision` is used.
 3.  **Scope Change**: A `Delta` is created to declare the intent to modify the system, referencing the relevant specs and requirements.
 4.  **Design**: A `Design Revision` is drafted to translate the Delta's intent into a concrete technical design.

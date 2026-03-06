@@ -45,6 +45,11 @@ docs.
 | agents/glossary.md | yes | .008 |
 | doctrine.md | yes | .008, .014 |
 | INIT.md | yes | .019 |
+| .spec-driver/about/README.md | yes | .021 |
+| .spec-driver/about/glossary.md | yes | .021 |
+| .spec-driver/about/backlog.md | yes | .021 |
+| .spec-driver/about/processes.md | yes | .021 |
+| .spec-driver/about/lifecycle.md | yes | — clean |
 
 ## Entries
 
@@ -654,6 +659,10 @@ docs.
 - affected_artifacts:
   - .spec-driver/agents/workflow.md
   - supekku/memories/mem.pattern.spec-driver.core-loop.md
+  - .spec-driver/about/README.md
+  - .spec-driver/about/glossary.md
+  - .spec-driver/about/backlog.md
+  - .spec-driver/about/processes.md
   - PROD-002
   - PROD-008
   - PROD-011
@@ -665,6 +674,18 @@ docs.
     of the loop, but no document owns the full narrative with all permutations
     precisely defined. An ADR should canonically stake out the loop and its variants.
     May ultimately deserve its own PROD spec.
+
+    Heresy audit of .spec-driver/about/ found active contamination:
+    - README.md lines 71-78: describes a spec-first waterfall loop (Capture →
+      Specify → Scope → ...) that contradicts delta-first doctrine. Worst offender.
+    - README.md line 72: positions spec creation/update before delta scoping.
+    - README.md line 72: implies revision is an alternative to delta for non-code
+      changes, conflating their purposes.
+    - glossary.md line 8: delta definition says "brings code back into alignment
+      with specs" — spec-first bias; in delta-first flow, specs reconcile to code.
+    - backlog.md: stale terms ("Constitution"), possibly stale commands and kinds.
+    - processes.md line 3: references "Vice" — stale project name.
+    - lifecycle.md: clean — verified against code, cites sources. Gold standard.
 - evidence:
   - 2026-03-06 discovered during Phase 2 adjudication review — pattern of agent divergence on core loop emphasis observed across multiple sessions
   - 2026-03-06 adjudicated: ADR to canonically define core loop and permutations. Potentially a PROD spec later.

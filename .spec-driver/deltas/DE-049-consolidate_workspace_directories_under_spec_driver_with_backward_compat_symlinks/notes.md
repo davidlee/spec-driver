@@ -131,9 +131,68 @@ import chain via `__init__.py` blocked test collection without them.
 These need updating to use `SPEC_DRIVER_DIR` instead. The `sync/adapters/base.py`
 hardcoded path filter also needs updating. `install.py` needs restructuring.
 
-### Hand-off to Phase 2
+## Phase 3 — Installer + callers (complete)
 
-Phase 2 (path model + config) can now proceed. Key inputs:
-- Content is at `.spec-driver/{tech,product,decisions,...}`
-- Old paths resolve via compat symlinks — tests should still pass via symlinks until code paths are updated
-- First code file to touch: `supekku/scripts/lib/core/paths.py`
+### What's done
+
+Uncommitted. All changes in working tree.
+
+**Production code:**
+- `install.py`: removed `SPECS_DIR`/`CHANGES_DIR` imports, replaced with
+  `SPEC_DRIVER_DIR` + subdirs. Directory creation restructured for flat
+  `.spec-driver/` layout. Added `_create_compat_symlinks()` — creates targeted
+  symlinks per DEC-049-03 (idempotent, won't clobber real dirs). Replaced
+  `target_root / MEMORY_DIR` and `target_root / BACKLOG_DIR` with helper calls
+  (`get_memory_dir()`, `get_backlog_dir()`).
+- `sync/adapters/base.py:92`: path filter updated from
+  `"/specify/" or "/change/"` to `"/.spec-driver/"`.
+
+**Test files updated (~34 files total):**
+- 22 test files: replaced `SPECS_DIR`/`CHANGES_DIR` imports with `SPEC_DRIVER_DIR`
+  in import lines and all fixture path constructions.
+- 12 additional test files discovered via second grep sweep (not in original
+  `paths` import — used constants from other import paths or had body-only refs).
+- `cli/memory_test.py`: added `parents=True` to `.mkdir()` calls (`.spec-driver`
+  parent must exist before `memory/` subdir).
+- `scripts/lib/memory/registry_test.py`: same `.mkdir(parents=True)` fix, updated
+  assertion string from `"memory/"` to `".spec-driver/memory/"`.
+- `scripts/lib/deletion/executor_test.py`: removed stale `change_dir` assertion
+  (attribute removed in Phase 2).
+- `scripts/lib/install_test.py`: updated expected directory list for flat layout,
+  added 3 new tests (VT-049-symlinks: creation, idempotency, resolution).
+- Formatter and requirements test assertions updated for `.spec-driver/` paths.
+- Several line-length fixes from longer `SPEC_DRIVER_DIR` constant name.
+
+### Scope vs plan
+
+The phase sheet estimated ~20 test files. Actual count was ~34 — the initial
+grep only caught files importing directly from `core.paths`. A second sweep
+found 12 more files importing the constants via other paths or using them only
+in function bodies.
+
+### Observations
+
+- `_create_compat_symlinks()` is ~40 lines, clean. Uses `readlink()` for
+  idempotency checks. Won't clobber real directories (skips if `link.exists()`
+  and not a symlink).
+- The `STANDARDS_SUBDIR` was missing from the old `install.py` import — added
+  as part of the flat layout restructuring.
+- `base.py` filter change is minimal: the symlink check above it already
+  catches compat symlinks, so `"/.spec-driver/"` catches the real content dirs.
+
+### Verification
+
+- `uv run ruff check` — clean
+- `uv run pytest` — 2629 passed, 3 skipped (net +3 tests from new symlink tests)
+- `just pylint` — 9.55/10 (±0.00 from previous)
+- `just` — all green
+- CLI boots: `uv run spec-driver --help` works
+
+### Hand-off to Phase 4
+
+Phase 4 (regression + cleanup):
+- Full regression already passes (`just` green)
+- Agent instruction files may reference old paths — check and update
+- Memory files (`mem.signpost.spec-driver.file-map` etc.) need updating
+- Consider whether `STANDARDS_SUBDIR` was previously missing from installer
+  (pre-existing gap or introduced by this delta?)

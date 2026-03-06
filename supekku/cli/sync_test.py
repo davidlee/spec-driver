@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 from typer.testing import CliRunner
 
 from supekku.cli.sync import app
-from supekku.scripts.lib.core.paths import SPECS_DIR, TECH_SPECS_SUBDIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, TECH_SPECS_SUBDIR
 
 
 class SyncCommandTest(unittest.TestCase):
@@ -25,7 +25,7 @@ class SyncCommandTest(unittest.TestCase):
     (self.root / ".git").mkdir()
 
     # Create tech directory structure
-    self.tech_dir = self.root / SPECS_DIR / TECH_SPECS_SUBDIR
+    self.tech_dir = self.root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True)
 
     # Create minimal registry_v2.json

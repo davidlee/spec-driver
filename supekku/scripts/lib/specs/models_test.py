@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from supekku.scripts.lib.core.paths import SPECS_DIR, TECH_SPECS_SUBDIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, TECH_SPECS_SUBDIR
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.test_base import RepoTestCase
@@ -15,7 +15,7 @@ class SpecTaxonomyTest(RepoTestCase):
 
   def _make_repo_with_specs(self):
     root = self._make_repo()
-    tech_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR
+    tech_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
 
     # Unit spec with taxonomy fields
     unit_dir = tech_dir / "SPEC-001"

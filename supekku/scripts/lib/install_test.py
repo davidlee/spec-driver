@@ -33,36 +33,100 @@ def test_initialize_workspace_creates_directories(tmp_path: Path) -> None:
   """Test that initialize_workspace creates the expected directory structure."""
   initialize_workspace(tmp_path, auto_yes=True)
 
-  # Verify directories were created
+  sd = SPEC_DRIVER_DIR
+
+  # Verify content directories under .spec-driver/ (DE-049 flat layout)
   expected_dirs = [
-    "change/audits",
-    "change/deltas",
-    "change/revisions",
-    "specify/decisions",
-    "specify/policies",
-    "specify/product",
-    "specify/tech",
-    "backlog/improvements",
-    "backlog/issues",
-    "backlog/problems",
-    "backlog/risks",
-    f"{SPEC_DRIVER_DIR}/registry",
-    f"{SPEC_DRIVER_DIR}/templates",
-    f"{SPEC_DRIVER_DIR}/about",
-    f"{SPEC_DRIVER_DIR}/hooks",
+    f"{sd}/audits",
+    f"{sd}/deltas",
+    f"{sd}/revisions",
+    f"{sd}/decisions",
+    f"{sd}/policies",
+    f"{sd}/product",
+    f"{sd}/standards",
+    f"{sd}/tech",
+    f"{sd}/backlog/improvements",
+    f"{sd}/backlog/issues",
+    f"{sd}/backlog/problems",
+    f"{sd}/backlog/risks",
+    f"{sd}/memory",
+    f"{sd}/registry",
+    f"{sd}/templates",
+    f"{sd}/about",
+    f"{sd}/hooks",
   ]
 
   for dir_path in expected_dirs:
     assert (tmp_path / dir_path).is_dir(), f"Directory {dir_path} not created"
 
-  # Verify backlog.md was created
-  backlog_file = tmp_path / BACKLOG_DIR / "backlog.md"
-  assert backlog_file.exists(), "backlog/backlog.md not created"
+  # Verify backlog.md was created under .spec-driver/backlog/
+  backlog_file = tmp_path / sd / BACKLOG_DIR / "backlog.md"
+  assert backlog_file.exists(), ".spec-driver/backlog/backlog.md not created"
 
   # Verify content
   content = backlog_file.read_text()
   assert "# Backlog" in content
   assert "improvements/" in content
+
+
+def test_initialize_workspace_creates_compat_symlinks(tmp_path: Path) -> None:
+  """VT-049-symlinks: installer creates backward-compat symlinks."""
+  initialize_workspace(tmp_path, auto_yes=True)
+  sd = SPEC_DRIVER_DIR
+
+  # specify/ is a real dir with targeted symlinks (DEC-049-03)
+  specify = tmp_path / "specify"
+  assert specify.is_dir()
+  assert not specify.is_symlink()
+  for subdir in ["tech", "product", "decisions", "policies", "standards"]:
+    link = specify / subdir
+    assert link.is_symlink(), f"specify/{subdir} should be a symlink"
+    assert link.resolve() == (tmp_path / sd / subdir).resolve()
+
+  # change/ is a real dir with targeted symlinks
+  change = tmp_path / "change"
+  assert change.is_dir()
+  assert not change.is_symlink()
+  for subdir in ["deltas", "revisions", "audits"]:
+    link = change / subdir
+    assert link.is_symlink(), f"change/{subdir} should be a symlink"
+    assert link.resolve() == (tmp_path / sd / subdir).resolve()
+
+  # backlog/ and memory/ are direct symlinks
+  for name in ["backlog", "memory"]:
+    link = tmp_path / name
+    assert link.is_symlink(), f"{name} should be a symlink"
+    assert link.resolve() == (tmp_path / sd / name).resolve()
+
+
+def test_initialize_workspace_compat_symlinks_idempotent(
+  tmp_path: Path,
+) -> None:
+  """VT-049-symlinks: second install doesn't error on existing symlinks."""
+  initialize_workspace(tmp_path, auto_yes=True)
+  initialize_workspace(tmp_path, auto_yes=True)  # Should not raise
+
+  # Symlinks still correct
+  assert (tmp_path / "specify" / "tech").is_symlink()
+  assert (tmp_path / "backlog").is_symlink()
+
+
+def test_initialize_workspace_compat_symlinks_resolve(
+  tmp_path: Path,
+) -> None:
+  """VT-049-symlinks: old paths resolve to content under .spec-driver/."""
+  initialize_workspace(tmp_path, auto_yes=True)
+  sd = SPEC_DRIVER_DIR
+
+  # Write a file via the new path
+  spec_dir = tmp_path / sd / "tech" / "SPEC-001"
+  spec_dir.mkdir(parents=True)
+  (spec_dir / "SPEC-001.md").write_text("# SPEC-001\n")
+
+  # Read it via the old compat path
+  compat_path = tmp_path / "specify" / "tech" / "SPEC-001" / "SPEC-001.md"
+  assert compat_path.exists()
+  assert compat_path.read_text() == "# SPEC-001\n"
 
 
 def test_initialize_workspace_creates_registry_files(tmp_path: Path) -> None:

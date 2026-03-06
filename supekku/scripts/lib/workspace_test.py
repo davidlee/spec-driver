@@ -9,11 +9,10 @@ from typing import TYPE_CHECKING
 import yaml
 
 from supekku.scripts.lib.core.paths import (
-  CHANGES_DIR,
   DECISIONS_SUBDIR,
   DELTAS_SUBDIR,
   POLICIES_SUBDIR,
-  SPECS_DIR,
+  SPEC_DRIVER_DIR,
   STANDARDS_SUBDIR,
   TECH_SPECS_SUBDIR,
   get_registry_dir,
@@ -36,7 +35,7 @@ class WorkspaceTest(RepoTestCase):
     return root
 
   def _write_spec(self, root: Path) -> None:
-    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "SPEC-200-sample"
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "SPEC-200-sample"
     spec_dir.mkdir(parents=True)
     spec_path = spec_dir / "SPEC-200.md"
     frontmatter = {
@@ -70,7 +69,7 @@ class WorkspaceTest(RepoTestCase):
   def test_sync_change_registries(self) -> None:
     """Test syncing change registries collects delta, revision, audit."""
     root = self._create_repo()
-    change_dir = root / CHANGES_DIR / DELTAS_SUBDIR / "DE-200-sample"
+    change_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-200-sample"
     change_dir.mkdir(parents=True)
     delta_path = change_dir / "DE-200.md"
     frontmatter = {
@@ -108,7 +107,7 @@ class WorkspaceTest(RepoTestCase):
     root = self._create_repo()
 
     # Create ADR directory and file
-    decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+    decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
     decisions_dir.mkdir(parents=True)
     adr_file = decisions_dir / "ADR-001-test-decision.md"
     adr_content = """---
@@ -145,7 +144,7 @@ We decided to test.
     root = self._create_repo()
 
     # Create ADR directory and files
-    decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+    decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
     decisions_dir.mkdir(parents=True)
 
     # Create ADRs with different statuses
@@ -212,7 +211,7 @@ status: draft
     root = self._create_repo()
 
     # Pre-create directories and existing symlinks
-    decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+    decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
     decisions_dir.mkdir(parents=True)
     accepted_dir = decisions_dir / "accepted"
     accepted_dir.mkdir(parents=True)
@@ -250,7 +249,7 @@ status: accepted
     self._write_spec(root)
 
     # Create ADR at root of decisions directory
-    decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+    decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
     decisions_dir.mkdir(parents=True)
     adr_path = decisions_dir / "ADR-099-test.md"
     adr_path.write_text(
@@ -264,7 +263,7 @@ status: accepted
     )
 
     # Create policy
-    policies_dir = root / SPECS_DIR / POLICIES_SUBDIR
+    policies_dir = root / SPEC_DRIVER_DIR / POLICIES_SUBDIR
     policies_dir.mkdir(parents=True)
     policy_path = policies_dir / "POL-001-test-policy.md"
     policy_path.write_text(
@@ -278,7 +277,7 @@ status: required
     )
 
     # Create standard
-    standards_dir = root / SPECS_DIR / STANDARDS_SUBDIR
+    standards_dir = root / SPEC_DRIVER_DIR / STANDARDS_SUBDIR
     standards_dir.mkdir(parents=True)
     standard_path = standards_dir / "STD-001-test-standard.md"
     standard_path.write_text(
@@ -292,7 +291,7 @@ status: default
     )
 
     # Create delta
-    delta_dir = root / CHANGES_DIR / DELTAS_SUBDIR / "DE-099-test"
+    delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-099-test"
     delta_dir.mkdir(parents=True)
     delta_path = delta_dir / "DE-099.md"
     delta_path.write_text(

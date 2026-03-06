@@ -21,8 +21,9 @@ def _init_repo(tmp_path: Path) -> Path:
   Creates .spec-driver dir so find_repo_root succeeds,
   and memory/ for mem files. Returns memory dir.
   """
-  (tmp_path / ".spec-driver").mkdir(exist_ok=True)
-  mem_dir = tmp_path / MEMORY_DIR
+  sd_dir = tmp_path / ".spec-driver"
+  sd_dir.mkdir(exist_ok=True)
+  mem_dir = sd_dir / MEMORY_DIR
   mem_dir.mkdir(exist_ok=True)
   return mem_dir
 

@@ -137,16 +137,21 @@ class TestHelperComposition(unittest.TestCase):
   def test_all_content_dirs_are_children_of_spec_driver_root(self) -> None:
     """Every content helper resolves as a direct child of .spec-driver/."""
     helpers = [
-      get_tech_specs_dir, get_product_specs_dir,
-      get_decisions_dir, get_policies_dir, get_standards_dir,
-      get_deltas_dir, get_revisions_dir, get_audits_dir,
-      get_backlog_dir, get_memory_dir,
+      get_tech_specs_dir,
+      get_product_specs_dir,
+      get_decisions_dir,
+      get_policies_dir,
+      get_standards_dir,
+      get_deltas_dir,
+      get_revisions_dir,
+      get_audits_dir,
+      get_backlog_dir,
+      get_memory_dir,
     ]
     for helper in helpers:
       result = helper(self.root)
       assert result.parent == self.sd, (
-        f"{helper.__name__} resolves to {result}, "
-        f"expected parent {self.sd}"
+        f"{helper.__name__} resolves to {result}, expected parent {self.sd}"
       )
 
 

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.core.paths import (
   PRODUCT_SPECS_SUBDIR,
-  SPECS_DIR,
+  SPEC_DRIVER_DIR,
   TECH_SPECS_SUBDIR,
 )
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
@@ -27,7 +27,7 @@ class SpecRegistryTest(RepoTestCase):
   def _make_repo(self) -> Path:
     root = super()._make_repo()
 
-    tech_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "SPEC-001-sample"
+    tech_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "SPEC-001-sample"
     tech_dir.mkdir(parents=True)
     tech_spec = tech_dir / "SPEC-001.md"
     tech_frontmatter = {
@@ -42,7 +42,7 @@ class SpecRegistryTest(RepoTestCase):
     }
     dump_markdown_file(tech_spec, tech_frontmatter, "# Sample Tech\n")
 
-    product_dir = root / SPECS_DIR / PRODUCT_SPECS_SUBDIR
+    product_dir = root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR
     product_dir.mkdir(parents=True, exist_ok=True)
     product_spec = product_dir / "PROD-001.md"
     product_frontmatter = {
@@ -86,7 +86,7 @@ class SpecRegistryTest(RepoTestCase):
     root = self._make_repo()
     registry = SpecRegistry(root)
 
-    new_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "SPEC-002-extra"
+    new_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "SPEC-002-extra"
     new_dir.mkdir(parents=True)
     new_spec = new_dir / "SPEC-002.md"
     frontmatter = {
@@ -188,7 +188,7 @@ class TestSpecRegistryReverseQueries(RepoTestCase):
     """Write a spec that references specific ADRs."""
     subdir = TECH_SPECS_SUBDIR if spec_id.startswith("SPEC-") else PRODUCT_SPECS_SUBDIR
     kind = "spec" if spec_id.startswith("SPEC-") else "prod"
-    spec_dir = root / SPECS_DIR / subdir / f"{spec_id.lower()}-sample"
+    spec_dir = root / SPEC_DRIVER_DIR / subdir / f"{spec_id.lower()}-sample"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / f"{spec_id}.md"
 
@@ -310,7 +310,7 @@ class TestSpecRegistryReverseQueries(RepoTestCase):
     root = self._make_repo()
 
     # Create spec WITHOUT informed_by field
-    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / "spec-003-sample"
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-003-sample"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / "SPEC-003.md"
     frontmatter = {

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from supekku.scripts.lib.core.paths import POLICIES_SUBDIR, SPECS_DIR
+from supekku.scripts.lib.core.paths import POLICIES_SUBDIR, SPEC_DRIVER_DIR
 
 from .creation import (
   PolicyCreationOptions,
@@ -46,7 +46,7 @@ class TestGenerateNextPolicyId(unittest.TestCase):
     """Set up test fixtures."""
     self.test_dir = tempfile.mkdtemp()
     self.root = Path(self.test_dir)
-    self.policies_dir = self.root / SPECS_DIR / POLICIES_SUBDIR
+    self.policies_dir = self.root / SPEC_DRIVER_DIR / POLICIES_SUBDIR
     self.policies_dir.mkdir(parents=True)
 
   def test_first_policy(self) -> None:
@@ -114,7 +114,7 @@ class TestCreatePolicy(unittest.TestCase):
     self.root = Path(self.test_dir)
 
     # Create directory structure
-    self.policies_dir = self.root / SPECS_DIR / POLICIES_SUBDIR
+    self.policies_dir = self.root / SPEC_DRIVER_DIR / POLICIES_SUBDIR
     self.policies_dir.mkdir(parents=True)
 
     # Create .spec-driver/templates directory and copy policy template

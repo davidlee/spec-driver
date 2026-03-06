@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from supekku.scripts.lib.core.paths import SPECS_DIR, STANDARDS_SUBDIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, STANDARDS_SUBDIR
 
 from .creation import (
   StandardCreationOptions,
@@ -24,7 +24,7 @@ class TestGenerateNextStandardId(unittest.TestCase):
     """Set up test fixtures."""
     self.test_dir = tempfile.mkdtemp()
     self.root = Path(self.test_dir)
-    self.standards_dir = self.root / SPECS_DIR / STANDARDS_SUBDIR
+    self.standards_dir = self.root / SPEC_DRIVER_DIR / STANDARDS_SUBDIR
     self.standards_dir.mkdir(parents=True)
 
   def test_first_standard(self) -> None:
@@ -43,7 +43,7 @@ class TestCreateStandard(unittest.TestCase):
     self.test_dir = tempfile.mkdtemp()
     self.root = Path(self.test_dir)
 
-    self.standards_dir = self.root / SPECS_DIR / STANDARDS_SUBDIR
+    self.standards_dir = self.root / SPEC_DRIVER_DIR / STANDARDS_SUBDIR
     self.standards_dir.mkdir(parents=True)
 
     # Create .spec-driver/templates directory and copy standard template

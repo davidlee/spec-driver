@@ -10,7 +10,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from supekku.cli.complete import app
-from supekku.scripts.lib.core.paths import CHANGES_DIR, REVISIONS_SUBDIR
+from supekku.scripts.lib.core.paths import REVISIONS_SUBDIR, SPEC_DRIVER_DIR
 
 
 class CompleteRevisionCommandTest(unittest.TestCase):
@@ -34,7 +34,8 @@ class CompleteRevisionCommandTest(unittest.TestCase):
     status: str = "draft",
   ) -> Path:
     """Create a minimal revision file for testing."""
-    revision_dir = self.root / CHANGES_DIR / REVISIONS_SUBDIR / f"{revision_id}-test"
+    rev_slug = f"{revision_id}-test"
+    revision_dir = self.root / SPEC_DRIVER_DIR / REVISIONS_SUBDIR / rev_slug
     revision_dir.mkdir(parents=True, exist_ok=True)
     revision_path = revision_dir / f"{revision_id}.md"
     revision_path.write_text(
@@ -55,7 +56,7 @@ class CompleteRevisionCommandTest(unittest.TestCase):
 
   def test_complete_revision_not_found(self) -> None:
     """Test error when revision not found."""
-    (self.root / CHANGES_DIR / REVISIONS_SUBDIR).mkdir(parents=True, exist_ok=True)
+    (self.root / SPEC_DRIVER_DIR / REVISIONS_SUBDIR).mkdir(parents=True, exist_ok=True)
     result = self.runner.invoke(app, ["revision", "RE-999"])
     assert result.exit_code == 1
 

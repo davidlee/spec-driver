@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 from supekku.scripts.lib.changes.artifacts import ChangeArtifact
-from supekku.scripts.lib.core.paths import AUDITS_SUBDIR, CHANGES_DIR, DELTAS_SUBDIR
+from supekku.scripts.lib.core.paths import AUDITS_SUBDIR, DELTAS_SUBDIR, SPEC_DRIVER_DIR
 from supekku.scripts.lib.formatters.change_formatters import (
   format_audit_details,
   format_change_list_item,
@@ -678,9 +678,9 @@ class FormatAuditDetailsTest(unittest.TestCase):
 
   def test_with_root_shows_relative_path(self) -> None:
     root = Path("/repo")
-    audit = self._make_audit(path=root / CHANGES_DIR / AUDITS_SUBDIR / "AUD-001.md")
+    audit = self._make_audit(path=root / SPEC_DRIVER_DIR / AUDITS_SUBDIR / "AUD-001.md")
     result = format_audit_details(audit, root=root)
-    assert "change/audits/AUD-001.md" in result
+    assert ".spec-driver/audits/AUD-001.md" in result
 
   def test_with_relations(self) -> None:
     audit = self._make_audit(
@@ -709,10 +709,10 @@ class FormatPlanDetailsTest(unittest.TestCase):
 
   def test_with_path_and_root(self) -> None:
     root = Path("/repo")
-    path = root / CHANGES_DIR / DELTAS_SUBDIR / "DE-041" / "IP-041.md"
+    path = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-041" / "IP-041.md"
     data = {"id": "IP-041", "name": "P", "status": "draft"}
     result = format_plan_details(data, root=root, path=path)
-    assert "change/deltas/DE-041/IP-041.md" in result
+    assert ".spec-driver/deltas/DE-041/IP-041.md" in result
 
   def test_missing_fields_use_defaults(self) -> None:
     result = format_plan_details({})

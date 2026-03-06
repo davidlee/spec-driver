@@ -11,7 +11,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from supekku.scripts.lib.core.paths import SPECS_DIR, TECH_SPECS_SUBDIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, TECH_SPECS_SUBDIR
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.sync.models import DocVariant, SourceDescriptor, SourceUnit
 from supekku.scripts.sync_specs import MultiLanguageSpecManager
@@ -23,7 +23,7 @@ class ProcessSourceUnitContractGateTest(unittest.TestCase):
   def setUp(self) -> None:
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
-    self.tech_dir = self.root / SPECS_DIR / TECH_SPECS_SUBDIR
+    self.tech_dir = self.root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True)
     self.registry_path = self.tech_dir / "registry_v2.json"
     self._write_registry({})
@@ -165,7 +165,7 @@ class SyncCreatedSpecTaxonomyTest(unittest.TestCase):
   def setUp(self) -> None:
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
-    self.tech_dir = self.root / SPECS_DIR / TECH_SPECS_SUBDIR
+    self.tech_dir = self.root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True)
     self.registry_path = self.tech_dir / "registry_v2.json"
     self._write_registry({})

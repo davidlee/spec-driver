@@ -8,10 +8,9 @@ from typer.testing import CliRunner
 
 from supekku.cli.find import app
 from supekku.scripts.lib.core.paths import (
-  CHANGES_DIR,
   DECISIONS_SUBDIR,
   DELTAS_SUBDIR,
-  SPECS_DIR,
+  SPEC_DRIVER_DIR,
   TECH_SPECS_SUBDIR,
 )
 from supekku.scripts.lib.core.repo import find_repo_root
@@ -31,13 +30,13 @@ class FindSpecCommandTest(unittest.TestCase):
 
     assert result.exit_code == 0, f"Command failed: {result.stderr}"
     # Should output paths
-    assert "specify/tech/SPEC-" in result.stdout
+    assert ".spec-driver/tech/SPEC-" in result.stdout
     assert ".md" in result.stdout
 
   def test_find_spec_exact_match(self) -> None:
     """Test finding spec with exact ID."""
     # Find a spec that exists
-    spec_dirs = list((self.root / SPECS_DIR / TECH_SPECS_SUBDIR).glob("SPEC-*"))
+    spec_dirs = list((self.root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).glob("SPEC-*"))
     if not spec_dirs:
       self.skipTest("No specs found in repository")
 
@@ -87,12 +86,12 @@ class FindDeltaCommandTest(unittest.TestCase):
     result = self.runner.invoke(app, ["delta", "DE-*"])
 
     assert result.exit_code == 0, f"Command failed: {result.stderr}"
-    assert "change/deltas/DE-" in result.stdout
+    assert ".spec-driver/deltas/DE-" in result.stdout
     assert ".md" in result.stdout
 
   def test_find_delta_exact_match(self) -> None:
     """Test finding delta with exact ID."""
-    delta_dirs = list((self.root / CHANGES_DIR / DELTAS_SUBDIR).glob("DE-*"))
+    delta_dirs = list((self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*"))
     if not delta_dirs:
       self.skipTest("No deltas found in repository")
 
@@ -116,12 +115,12 @@ class FindAdrCommandTest(unittest.TestCase):
     result = self.runner.invoke(app, ["adr", "ADR-*"])
 
     assert result.exit_code == 0, f"Command failed: {result.stderr}"
-    assert "specify/decisions/ADR-" in result.stdout
+    assert ".spec-driver/decisions/ADR-" in result.stdout
     assert ".md" in result.stdout
 
   def test_find_adr_exact_match(self) -> None:
     """Test finding ADR with exact ID."""
-    adr_files = list((self.root / SPECS_DIR / DECISIONS_SUBDIR).glob("ADR-*.md"))
+    adr_files = list((self.root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR).glob("ADR-*.md"))
     if not adr_files:
       self.skipTest("No ADRs found in repository")
 
@@ -147,7 +146,7 @@ class FindRevisionCommandTest(unittest.TestCase):
     assert result.exit_code == 0, f"Command failed: {result.stderr}"
     # If there are revisions, they should be in the output
     if result.stdout.strip():
-      assert "change/revisions/RE-" in result.stdout
+      assert ".spec-driver/revisions/RE-" in result.stdout
       assert ".md" in result.stdout
 
 

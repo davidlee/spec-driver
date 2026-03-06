@@ -9,7 +9,11 @@ from pathlib import Path
 
 import yaml
 
-from supekku.scripts.lib.core.paths import DECISIONS_SUBDIR, SPECS_DIR, get_registry_dir
+from supekku.scripts.lib.core.paths import (
+  DECISIONS_SUBDIR,
+  SPEC_DRIVER_DIR,
+  get_registry_dir,
+)
 
 from .registry import DecisionRecord, DecisionRegistry
 
@@ -84,7 +88,7 @@ class TestDecisionRegistry(unittest.TestCase):
 
       # Resolve both paths to handle macOS /var -> /private/var symlink
       assert registry.root.resolve() == root.resolve()
-      expected_dir = (root / SPECS_DIR / DECISIONS_SUBDIR).resolve()
+      expected_dir = (root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR).resolve()
       assert registry.directory.resolve() == expected_dir
       expected_output = (get_registry_dir(root) / "decisions.yaml").resolve()
       assert registry.output_path.resolve() == expected_output
@@ -102,7 +106,7 @@ class TestDecisionRegistry(unittest.TestCase):
     """Test collecting ADR files."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create test ADR file
@@ -151,7 +155,7 @@ We decided to test.
     """Test parsing ADR file without frontmatter."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create ADR file without frontmatter
@@ -174,7 +178,7 @@ This has no frontmatter.
     """Test writing registry to YAML file."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create test ADR
@@ -207,7 +211,7 @@ status: accepted
     """Test finding specific decision."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       adr_file = decisions_dir / "ADR-004-find-test.md"
@@ -235,7 +239,7 @@ title: "Find Test"
     """Test filtering decisions."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create multiple ADRs
@@ -283,7 +287,7 @@ specs: [SPEC-200]
     """Test filtering decisions by standard reference."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create ADR with standard reference
@@ -324,7 +328,7 @@ id: ADR-011
     """Test iterating with status filter."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create ADRs with different statuses
@@ -388,7 +392,7 @@ status: draft
     """Test that rebuild_status_symlinks creates status directories and symlinks."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create ADRs with different statuses
@@ -441,7 +445,7 @@ status: draft
     """Test that rebuild_status_symlinks cleans up existing symlinks."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create an ADR
@@ -475,7 +479,7 @@ status: accepted
     """Test that rebuild_status_symlinks skips ADRs with missing files."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create ADR file
@@ -512,7 +516,7 @@ status: accepted
     """Test sync_with_symlinks performs both sync and symlink rebuild."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
       registry_dir = get_registry_dir(root)
       registry_dir.mkdir(parents=True)
@@ -546,7 +550,7 @@ status: accepted
     """Test _cleanup_all_status_directories removes all symlinks."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create status directories with symlinks
@@ -570,7 +574,7 @@ status: accepted
     """Test _rebuild_status_directory creates relative symlinks."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create ADR
@@ -599,7 +603,7 @@ status: accepted
     """Test that changing ADR status moves symlinks between directories."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create ADR initially as draft
@@ -650,7 +654,7 @@ status: accepted
     """Test handling of ADRs with invalid/non-standard status values."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create ADR with non-standard status
@@ -679,7 +683,7 @@ status: unknown-status
     """Test that broken symlinks are properly cleaned up."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create status directory with broken symlinks
@@ -719,7 +723,7 @@ status: accepted
     """Test robustness when directories are modified during operations."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create ADR
@@ -754,7 +758,7 @@ status: accepted
     """Test symlink rebuild with no ADR files."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create some status directories with old symlinks
@@ -777,7 +781,7 @@ status: accepted
     """Test graceful handling when symlink creation might fail."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create ADR
@@ -813,7 +817,7 @@ status: accepted
     """Test that multiple ADRs with same status are properly grouped."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = self._setup_test_repo(tmpdir)
-      decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+      decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
       decisions_dir.mkdir(parents=True)
 
       # Create multiple ADRs with same status

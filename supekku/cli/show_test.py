@@ -11,10 +11,9 @@ from typer.testing import CliRunner
 
 from supekku.cli.show import app
 from supekku.scripts.lib.core.paths import (
-  CHANGES_DIR,
   DECISIONS_SUBDIR,
   DELTAS_SUBDIR,
-  SPECS_DIR,
+  SPEC_DRIVER_DIR,
   TECH_SPECS_SUBDIR,
 )
 from supekku.scripts.lib.core.repo import find_repo_root
@@ -139,7 +138,7 @@ class ShowDeltaCommandTest(unittest.TestCase):
   def test_show_delta_text_output(self) -> None:
     """Test showing delta in text format (default)."""
     # Find a delta that exists in the repository
-    delta_dirs = list((self.root / CHANGES_DIR / DELTAS_SUBDIR).glob("DE-*"))
+    delta_dirs = list((self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*"))
     if not delta_dirs:
       self.skipTest("No deltas found in repository")
 
@@ -156,7 +155,7 @@ class ShowDeltaCommandTest(unittest.TestCase):
   def test_show_delta_json_output(self) -> None:
     """Test showing delta in JSON format."""
     # Find a delta that exists in the repository
-    delta_dirs = list((self.root / CHANGES_DIR / DELTAS_SUBDIR).glob("DE-*"))
+    delta_dirs = list((self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*"))
     if not delta_dirs:
       self.skipTest("No deltas found in repository")
 
@@ -182,14 +181,14 @@ class ShowDeltaCommandTest(unittest.TestCase):
 
     # Verify path is relative
     assert not Path(output["path"]).is_absolute()
-    assert output["path"].startswith("change/deltas/")
+    assert output["path"].startswith(".spec-driver/deltas/")
 
   def test_show_delta_json_includes_plan_paths(self) -> None:
     """Test that JSON output includes plan and phase file paths."""
     # Find DE-005 which should have a plan
     delta_id = "DE-005"
     delta_dir = (
-      self.root / CHANGES_DIR / DELTAS_SUBDIR / "DE-005-implement-spec-backfill"
+      self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-005-implement-spec-backfill"
     )
 
     if not delta_dir.exists():
@@ -224,7 +223,7 @@ class ShowDeltaCommandTest(unittest.TestCase):
     # Find a delta with applies_to
     delta_id = "DE-005"
     delta_dir = (
-      self.root / CHANGES_DIR / DELTAS_SUBDIR / "DE-005-implement-spec-backfill"
+      self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-005-implement-spec-backfill"
     )
 
     if not delta_dir.exists():
@@ -255,7 +254,7 @@ class ShowDeltaCommandTest(unittest.TestCase):
     # DE-005 has additional files like notes.md, design docs
     delta_id = "DE-005"
     delta_dir = (
-      self.root / CHANGES_DIR / DELTAS_SUBDIR / "DE-005-implement-spec-backfill"
+      self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-005-implement-spec-backfill"
     )
 
     if not delta_dir.exists():
@@ -276,7 +275,7 @@ class ShowDeltaCommandTest(unittest.TestCase):
       # Files should be relative paths
       for file_path in files:
         assert not Path(file_path).is_absolute()
-        assert file_path.startswith("change/deltas/")
+        assert file_path.startswith(".spec-driver/deltas/")
 
       # Files should NOT include the main delta, plan, or phase files
       # (those are already in other fields)
@@ -296,7 +295,7 @@ class ShowDeltaCommandTest(unittest.TestCase):
     """Test that JSON output includes task completion stats for phases."""
     delta_id = "DE-005"
     delta_dir = (
-      self.root / CHANGES_DIR / DELTAS_SUBDIR / "DE-005-implement-spec-backfill"
+      self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-005-implement-spec-backfill"
     )
 
     if not delta_dir.exists():
@@ -326,7 +325,7 @@ class ShowDeltaCommandTest(unittest.TestCase):
     """Test that text output includes task completion stats for phases."""
     delta_id = "DE-005"
     delta_dir = (
-      self.root / CHANGES_DIR / DELTAS_SUBDIR / "DE-005-implement-spec-backfill"
+      self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-005-implement-spec-backfill"
     )
 
     if not delta_dir.exists():
@@ -364,7 +363,7 @@ class ShowPathFlagTest(unittest.TestCase):
 
   def test_show_delta_path_flag(self) -> None:
     """Test --path flag returns only the path."""
-    delta_dirs = list((self.root / CHANGES_DIR / DELTAS_SUBDIR).glob("DE-*"))
+    delta_dirs = list((self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*"))
     if not delta_dirs:
       self.skipTest("No deltas found in repository")
 
@@ -375,12 +374,12 @@ class ShowPathFlagTest(unittest.TestCase):
     # Should output just a path (single line, ends with .md)
     output = result.stdout.strip()
     assert output.endswith(".md")
-    assert "change/deltas/" in output
+    assert ".spec-driver/deltas/" in output
     assert "\n" not in output  # Single line
 
   def test_show_adr_path_flag(self) -> None:
     """Test --path flag on show adr."""
-    adr_files = list((self.root / SPECS_DIR / DECISIONS_SUBDIR).glob("ADR-*.md"))
+    adr_files = list((self.root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR).glob("ADR-*.md"))
     if not adr_files:
       self.skipTest("No ADRs found in repository")
 
@@ -394,7 +393,7 @@ class ShowPathFlagTest(unittest.TestCase):
 
   def test_show_spec_path_flag(self) -> None:
     """Test --path flag on show spec."""
-    spec_dirs = list((self.root / SPECS_DIR / TECH_SPECS_SUBDIR).glob("SPEC-*"))
+    spec_dirs = list((self.root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).glob("SPEC-*"))
     if not spec_dirs:
       self.skipTest("No specs found in repository")
 
@@ -462,7 +461,7 @@ class ShowRawFlagTest(unittest.TestCase):
 
   def test_show_delta_raw_flag(self) -> None:
     """Test --raw flag outputs raw file content."""
-    delta_dirs = list((self.root / CHANGES_DIR / DELTAS_SUBDIR).glob("DE-*"))
+    delta_dirs = list((self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*"))
     if not delta_dirs:
       self.skipTest("No deltas found in repository")
 
@@ -477,7 +476,7 @@ class ShowRawFlagTest(unittest.TestCase):
 
   def test_show_adr_raw_flag(self) -> None:
     """Test --raw flag on show adr."""
-    adr_files = list((self.root / SPECS_DIR / DECISIONS_SUBDIR).glob("ADR-*.md"))
+    adr_files = list((self.root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR).glob("ADR-*.md"))
     if not adr_files:
       self.skipTest("No ADRs found in repository")
 
@@ -492,7 +491,7 @@ class ShowRawFlagTest(unittest.TestCase):
 
   def test_show_spec_raw_flag(self) -> None:
     """Test --raw flag on show spec."""
-    spec_dirs = list((self.root / SPECS_DIR / TECH_SPECS_SUBDIR).glob("SPEC-*"))
+    spec_dirs = list((self.root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).glob("SPEC-*"))
     if not spec_dirs:
       self.skipTest("No specs found in repository")
 

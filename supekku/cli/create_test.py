@@ -16,6 +16,7 @@ from supekku.scripts.lib.core.paths import (
   ISSUES_SUBDIR,
   PROBLEMS_SUBDIR,
   RISKS_SUBDIR,
+  SPEC_DRIVER_DIR,
 )
 
 
@@ -45,7 +46,7 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     assert "ISSUE-001.md" in result.stdout
 
     # Verify file exists
-    issue_dir = self.root / BACKLOG_DIR / ISSUES_SUBDIR
+    issue_dir = self.root / SPEC_DRIVER_DIR / BACKLOG_DIR / ISSUES_SUBDIR
     assert issue_dir.exists()
     issue_files = list(issue_dir.rglob("ISSUE-001.md"))
     assert len(issue_files) == 1
@@ -70,7 +71,7 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     assert "PROB-001.md" in result.stdout
 
     # Verify file exists
-    problem_dir = self.root / BACKLOG_DIR / PROBLEMS_SUBDIR
+    problem_dir = self.root / SPEC_DRIVER_DIR / BACKLOG_DIR / PROBLEMS_SUBDIR
     assert problem_dir.exists()
     problem_files = list(problem_dir.rglob("PROB-001.md"))
     assert len(problem_files) == 1
@@ -94,7 +95,7 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     assert "IMPR-001.md" in result.stdout
 
     # Verify file exists
-    improvement_dir = self.root / BACKLOG_DIR / IMPROVEMENTS_SUBDIR
+    improvement_dir = self.root / SPEC_DRIVER_DIR / BACKLOG_DIR / IMPROVEMENTS_SUBDIR
     assert improvement_dir.exists()
     improvement_files = list(improvement_dir.rglob("IMPR-001.md"))
     assert len(improvement_files) == 1
@@ -118,7 +119,7 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     assert "RISK-001.md" in result.stdout
 
     # Verify file exists
-    risk_dir = self.root / BACKLOG_DIR / RISKS_SUBDIR
+    risk_dir = self.root / SPEC_DRIVER_DIR / BACKLOG_DIR / RISKS_SUBDIR
     assert risk_dir.exists()
     risk_files = list(risk_dir.rglob("RISK-001.md"))
     assert len(risk_files) == 1
@@ -150,7 +151,7 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     )
 
     assert result.exit_code == 0
-    issue_dir = self.root / BACKLOG_DIR / ISSUES_SUBDIR
+    issue_dir = self.root / SPEC_DRIVER_DIR / BACKLOG_DIR / ISSUES_SUBDIR
     dirs = list(issue_dir.iterdir())
     assert len(dirs) == 1
     assert "complex_issue_title_with_spaces" in dirs[0].name

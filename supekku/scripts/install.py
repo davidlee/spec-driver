@@ -25,7 +25,6 @@ from supekku.scripts.lib.core.npm_utils import (
 from supekku.scripts.lib.core.paths import (
   AUDITS_SUBDIR,
   BACKLOG_DIR,
-  CHANGES_DIR,
   DECISIONS_SUBDIR,
   DELTAS_SUBDIR,
   IMPROVEMENTS_SUBDIR,
@@ -37,8 +36,10 @@ from supekku.scripts.lib.core.paths import (
   REVISIONS_SUBDIR,
   RISKS_SUBDIR,
   SPEC_DRIVER_DIR,
-  SPECS_DIR,
+  STANDARDS_SUBDIR,
   TECH_SPECS_SUBDIR,
+  get_backlog_dir,
+  get_memory_dir,
 )
 from supekku.scripts.lib.core.templates import TemplateNotFoundError
 
@@ -464,6 +465,62 @@ def _install_hooks(
       shutil.copy2(src_file, dest_file)
 
 
+def _create_compat_symlinks(target_root: Path) -> None:
+  """Create backward-compat symlinks for old workspace paths (DEC-049-03).
+
+  Creates targeted symlinks so that old paths like ``specify/tech/`` and
+  ``change/deltas/`` resolve to their new locations under ``.spec-driver/``.
+
+  - ``specify/`` and ``change/`` are real directories containing per-subdir symlinks
+  - ``backlog/`` and ``memory/`` are direct symlinks to ``.spec-driver/`` children
+
+  Idempotent: skips symlinks that already exist with the correct target.
+  """
+  sd = SPEC_DRIVER_DIR
+
+  # Targeted symlinks inside real compat directories
+  _targeted_symlinks: dict[str, list[str]] = {
+    "specify": [
+      TECH_SPECS_SUBDIR,
+      PRODUCT_SPECS_SUBDIR,
+      DECISIONS_SUBDIR,
+      POLICIES_SUBDIR,
+      STANDARDS_SUBDIR,
+    ],
+    "change": [
+      DELTAS_SUBDIR,
+      REVISIONS_SUBDIR,
+      AUDITS_SUBDIR,
+    ],
+  }
+
+  for compat_dir, subdirs in _targeted_symlinks.items():
+    parent = target_root / compat_dir
+    parent.mkdir(exist_ok=True)
+    for subdir in subdirs:
+      link = parent / subdir
+      target = Path("..") / sd / subdir
+      if link.is_symlink():
+        if link.readlink() == target:
+          continue
+        link.unlink()
+      elif link.exists():
+        continue  # Real directory — don't clobber
+      link.symlink_to(target)
+
+  # Direct symlinks for backlog/ and memory/
+  for name in [BACKLOG_DIR, MEMORY_DIR]:
+    link = target_root / name
+    target = Path(sd) / name
+    if link.is_symlink():
+      if link.readlink() == target:
+        continue
+      link.unlink()
+    elif link.exists():
+      continue  # Real directory — don't clobber
+    link.symlink_to(target)
+
+
 def initialize_workspace(
   target_root: Path, dry_run: bool = False, auto_yes: bool = False
 ) -> None:  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
@@ -480,32 +537,40 @@ def initialize_workspace(
   if not target_root.exists():
     sys.exit(1)
 
-  # Create directory structure
+  # Create directory structure — flat layout under .spec-driver/ (DE-049)
+  sd = SPEC_DRIVER_DIR
   directories = [
-    f"{CHANGES_DIR}/{AUDITS_SUBDIR}",
-    f"{CHANGES_DIR}/{DELTAS_SUBDIR}",
-    f"{CHANGES_DIR}/{REVISIONS_SUBDIR}",
-    f"{SPECS_DIR}/{DECISIONS_SUBDIR}",
-    f"{SPECS_DIR}/{POLICIES_SUBDIR}",
-    f"{SPECS_DIR}/{PRODUCT_SPECS_SUBDIR}",
-    f"{SPECS_DIR}/{TECH_SPECS_SUBDIR}",
-    f"{BACKLOG_DIR}/{IMPROVEMENTS_SUBDIR}",
-    f"{BACKLOG_DIR}/{ISSUES_SUBDIR}",
-    f"{BACKLOG_DIR}/{PROBLEMS_SUBDIR}",
-    f"{BACKLOG_DIR}/{RISKS_SUBDIR}",
-    f"{SPEC_DRIVER_DIR}/registry",
-    f"{SPEC_DRIVER_DIR}/templates",
-    f"{SPEC_DRIVER_DIR}/about",
-    f"{SPEC_DRIVER_DIR}/agents",
-    f"{SPEC_DRIVER_DIR}/hooks",
+    # Content directories (direct children of .spec-driver/)
+    f"{sd}/{AUDITS_SUBDIR}",
+    f"{sd}/{DELTAS_SUBDIR}",
+    f"{sd}/{REVISIONS_SUBDIR}",
+    f"{sd}/{DECISIONS_SUBDIR}",
+    f"{sd}/{POLICIES_SUBDIR}",
+    f"{sd}/{PRODUCT_SPECS_SUBDIR}",
+    f"{sd}/{STANDARDS_SUBDIR}",
+    f"{sd}/{TECH_SPECS_SUBDIR}",
+    f"{sd}/{BACKLOG_DIR}/{IMPROVEMENTS_SUBDIR}",
+    f"{sd}/{BACKLOG_DIR}/{ISSUES_SUBDIR}",
+    f"{sd}/{BACKLOG_DIR}/{PROBLEMS_SUBDIR}",
+    f"{sd}/{BACKLOG_DIR}/{RISKS_SUBDIR}",
+    f"{sd}/{MEMORY_DIR}",
+    # Internal directories
+    f"{sd}/registry",
+    f"{sd}/templates",
+    f"{sd}/about",
+    f"{sd}/agents",
+    f"{sd}/hooks",
   ]
 
   for dir_path in directories:
     full_path = target_root / dir_path
     full_path.mkdir(parents=True, exist_ok=True)
 
+  # Create backward-compat symlinks (DEC-049-03)
+  _create_compat_symlinks(target_root)
+
   # Create empty backlog/backlog.md file
-  backlog_file = target_root / BACKLOG_DIR / "backlog.md"
+  backlog_file = get_backlog_dir(target_root) / "backlog.md"
   if not backlog_file.exists():
     backlog_file.write_text(
       "# Backlog\n\n"
@@ -585,7 +650,7 @@ def initialize_workspace(
   if memory_source is not None:
     _install_memories(
       memory_source,
-      target_root / MEMORY_DIR,
+      get_memory_dir(target_root),
       dry_run=dry_run,
       auto_yes=auto_yes,
     )

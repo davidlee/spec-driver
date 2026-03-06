@@ -14,7 +14,7 @@ from supekku.cli.create import app as create_app
 from supekku.cli.find import app as find_app
 from supekku.cli.list import app as list_app
 from supekku.cli.show import app as show_app
-from supekku.scripts.lib.core.paths import MEMORY_DIR
+from supekku.scripts.lib.core.paths import MEMORY_DIR, SPEC_DRIVER_DIR
 
 
 def _write_memory_file(
@@ -84,7 +84,7 @@ class CreateMemoryCommandTest(unittest.TestCase):
     assert result.exit_code == 0, f"Failed: {result.stderr}"
     assert "Created memory: mem.fact.test" in result.stdout
 
-    mem_dir = self.root / MEMORY_DIR
+    mem_dir = self.root / SPEC_DRIVER_DIR / MEMORY_DIR
     assert mem_dir.exists()
     path = mem_dir / "mem.fact.test.md"
     assert path.exists()
@@ -121,7 +121,7 @@ class CreateMemoryCommandTest(unittest.TestCase):
     assert result.exit_code == 0, f"Failed: {result.stderr}"
     assert "mem.pattern.arch.registry" in result.stdout
 
-    path = self.root / MEMORY_DIR / "mem.pattern.arch.registry.md"
+    path = self.root / SPEC_DRIVER_DIR / MEMORY_DIR / "mem.pattern.arch.registry.md"
     content = path.read_text(encoding="utf-8")
     assert "status: draft" in content
     assert "memory_type: pattern" in content
@@ -129,7 +129,7 @@ class CreateMemoryCommandTest(unittest.TestCase):
 
   def test_create_memory_rejects_duplicate(self) -> None:
     """Creating a memory with an existing ID fails."""
-    mem_dir = self.root / MEMORY_DIR
+    mem_dir = self.root / SPEC_DRIVER_DIR / MEMORY_DIR
     mem_dir.mkdir(parents=True)
     _write_memory_file(mem_dir, "mem.fact.alpha")
 
@@ -193,8 +193,8 @@ class ListMemoriesCommandTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / MEMORY_DIR
-    self.mem_dir.mkdir()
+    self.mem_dir = self.root / SPEC_DRIVER_DIR / MEMORY_DIR
+    self.mem_dir.mkdir(parents=True)
 
   def tearDown(self) -> None:
     self.tmpdir.cleanup()
@@ -307,8 +307,8 @@ class ListMemoriesLinksToTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / MEMORY_DIR
-    self.mem_dir.mkdir()
+    self.mem_dir = self.root / SPEC_DRIVER_DIR / MEMORY_DIR
+    self.mem_dir.mkdir(parents=True)
 
   def tearDown(self) -> None:
     self.tmpdir.cleanup()
@@ -421,8 +421,8 @@ class ShowMemoryCommandTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / MEMORY_DIR
-    self.mem_dir.mkdir()
+    self.mem_dir = self.root / SPEC_DRIVER_DIR / MEMORY_DIR
+    self.mem_dir.mkdir(parents=True)
 
   def tearDown(self) -> None:
     self.tmpdir.cleanup()
@@ -521,8 +521,8 @@ class ShowMemoryLinksDepthTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / MEMORY_DIR
-    self.mem_dir.mkdir()
+    self.mem_dir = self.root / SPEC_DRIVER_DIR / MEMORY_DIR
+    self.mem_dir.mkdir(parents=True)
 
   def tearDown(self) -> None:
     self.tmpdir.cleanup()
@@ -669,8 +669,8 @@ class ShowMemoryBodyOnlyTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / MEMORY_DIR
-    self.mem_dir.mkdir()
+    self.mem_dir = self.root / SPEC_DRIVER_DIR / MEMORY_DIR
+    self.mem_dir.mkdir(parents=True)
 
   def tearDown(self) -> None:
     self.tmpdir.cleanup()
@@ -723,8 +723,8 @@ class FindMemoryCommandTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / MEMORY_DIR
-    self.mem_dir.mkdir()
+    self.mem_dir = self.root / SPEC_DRIVER_DIR / MEMORY_DIR
+    self.mem_dir.mkdir(parents=True)
 
   def tearDown(self) -> None:
     self.tmpdir.cleanup()
@@ -786,8 +786,8 @@ class ListMemoriesSelectionTest(unittest.TestCase):
     self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
     self.root = Path(self.tmpdir.name)
     (self.root / ".git").mkdir()
-    self.mem_dir = self.root / MEMORY_DIR
-    self.mem_dir.mkdir()
+    self.mem_dir = self.root / SPEC_DRIVER_DIR / MEMORY_DIR
+    self.mem_dir.mkdir(parents=True)
 
   def tearDown(self) -> None:
     self.tmpdir.cleanup()

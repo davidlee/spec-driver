@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from supekku.scripts.lib.core.paths import CHANGES_DIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.list_changes import main as list_changes_main
 
@@ -36,7 +36,7 @@ def _write_change(
   plan_block: str | None = None,
   phases: dict[str, str] | None = None,
 ) -> Path:
-  directory = root / CHANGES_DIR / f"{kind}s" / f"{artifact_id.lower()}-bundle"
+  directory = root / SPEC_DRIVER_DIR / f"{kind}s" / f"{artifact_id.lower()}-bundle"
   directory.mkdir(parents=True, exist_ok=True)
   path = directory / f"{artifact_id}.md"
   frontmatter = {

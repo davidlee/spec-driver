@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 
 import yaml
 
-from supekku.scripts.lib.core.paths import CHANGES_DIR, SPECS_DIR, TECH_SPECS_SUBDIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, TECH_SPECS_SUBDIR
 from supekku.scripts.lib.registry_migration import RegistryV2
 
 from .executor import (
@@ -110,7 +110,7 @@ class TestDeletionValidator(unittest.TestCase):
     """Set up test fixtures."""
     self.temp_dir = TemporaryDirectory()
     self.repo_root = Path(self.temp_dir.name)
-    self.tech_dir = self.repo_root / SPECS_DIR / TECH_SPECS_SUBDIR
+    self.tech_dir = self.repo_root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True)
     self.validator = DeletionValidator(self.repo_root)
 
@@ -141,7 +141,6 @@ class TestDeletionValidator(unittest.TestCase):
     """Test DeletionValidator initialization."""
     assert self.validator.repo_root == self.repo_root
     assert self.validator.tech_dir == self.tech_dir
-    assert self.validator.change_dir == self.repo_root / CHANGES_DIR
 
   def test_validate_spec_deletion_nonexistent_spec(self) -> None:
     """Test validating deletion of a spec that doesn't exist."""
@@ -283,7 +282,7 @@ class TestDeletionExecutor(unittest.TestCase):
     """Set up test fixtures."""
     self.temp_dir = TemporaryDirectory()
     self.repo_root = Path(self.temp_dir.name)
-    self.tech_dir = self.repo_root / SPECS_DIR / TECH_SPECS_SUBDIR
+    self.tech_dir = self.repo_root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True)
     self.executor = DeletionExecutor(self.repo_root)
 
@@ -733,7 +732,7 @@ class TestCrossReferenceValidation(unittest.TestCase):
     """Set up test environment."""
     self.temp_dir = TemporaryDirectory()
     self.root = Path(self.temp_dir.name)
-    self.tech_dir = self.root / SPECS_DIR / TECH_SPECS_SUBDIR
+    self.tech_dir = self.root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True, exist_ok=True)
     self.registry_dir = self.root / ".spec-driver" / "registry"
     self.registry_dir.mkdir(parents=True, exist_ok=True)

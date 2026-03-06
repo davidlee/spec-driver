@@ -7,7 +7,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from supekku.scripts.lib.core.paths import MEMORY_DIR, SPECS_DIR
+from supekku.scripts.lib.core.paths import MEMORY_DIR, SPEC_DRIVER_DIR
 from supekku.scripts.lib.memory.registry import MemoryRegistry
 
 # ── Fixture content ─────────────────────────────────────────────
@@ -113,8 +113,8 @@ def _setup_repo(tmpdir: str, files: dict[str, str] | None = None) -> Path:
   root = Path(tmpdir)
   (root / ".git").mkdir()
   if files:
-    mem_dir = root / MEMORY_DIR
-    mem_dir.mkdir()
+    mem_dir = root / SPEC_DRIVER_DIR / MEMORY_DIR
+    mem_dir.mkdir(parents=True)
     for name, content in files.items():
       (mem_dir / name).write_text(content, encoding="utf-8")
   return root
@@ -128,7 +128,7 @@ class TestMemoryRegistry(unittest.TestCase):
     with tempfile.TemporaryDirectory() as tmpdir:
       root = _setup_repo(tmpdir)
       registry = MemoryRegistry(root=root)
-      self.assertEqual(registry.directory, root / MEMORY_DIR)
+      self.assertEqual(registry.directory, root / SPEC_DRIVER_DIR / MEMORY_DIR)
 
   def test_collect_empty_directory(self) -> None:
     """collect returns empty dict when no memory directory exists."""
@@ -142,8 +142,8 @@ class TestMemoryRegistry(unittest.TestCase):
     """collect returns empty dict when memory dir has no mem.* files."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = _setup_repo(tmpdir, files={})
-      (root / MEMORY_DIR).mkdir(exist_ok=True)
-      (root / MEMORY_DIR / "README.md").write_text(
+      (root / SPEC_DRIVER_DIR / MEMORY_DIR).mkdir(parents=True, exist_ok=True)
+      (root / SPEC_DRIVER_DIR / MEMORY_DIR / "README.md").write_text(
         "# Memory\n",
         encoding="utf-8",
       )
@@ -460,7 +460,7 @@ memory_type: fact
     """Registry accepts a custom memory directory path."""
     with tempfile.TemporaryDirectory() as tmpdir:
       root = _setup_repo(tmpdir)
-      custom = root / SPECS_DIR / MEMORY_DIR
+      custom = root / SPEC_DRIVER_DIR / MEMORY_DIR
       custom.mkdir(parents=True)
       (custom / "mem.fact.test.md").write_text(
         MINIMAL_MEM,
@@ -527,7 +527,7 @@ memory_type: fact
 
       self.assertEqual(d["id"], "mem.fact.test")
       self.assertEqual(d["memory_type"], "fact")
-      self.assertTrue(d["path"].startswith("memory/"))
+      self.assertTrue(d["path"].startswith(".spec-driver/memory/"))
 
 
 if __name__ == "__main__":

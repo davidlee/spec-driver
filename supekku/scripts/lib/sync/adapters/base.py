@@ -87,9 +87,9 @@ class LanguageAdapter(ABC):
     if path.is_symlink():
       return True
 
-    # Skip documentation directories
+    # Skip spec-driver workspace directories (DE-049: consolidated under .spec-driver/)
     path_str = str(path)
-    if "/specify/" in path_str or "/change/" in path_str:
+    if "/.spec-driver/" in path_str:
       return True
 
     # Skip files not tracked by git (includes gitignored files)

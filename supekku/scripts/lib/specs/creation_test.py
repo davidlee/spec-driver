@@ -12,7 +12,7 @@ import pytest
 
 from supekku.scripts.lib.core.paths import (
   PRODUCT_SPECS_SUBDIR,
-  SPECS_DIR,
+  SPEC_DRIVER_DIR,
   TECH_SPECS_SUBDIR,
   get_templates_dir,
 )
@@ -41,8 +41,8 @@ class CreateSpecTest(unittest.TestCase):
     (root / ".git").mkdir()
     templates = get_templates_dir(root)
     templates.mkdir(parents=True)
-    (root / SPECS_DIR / TECH_SPECS_SUBDIR).mkdir(parents=True)
-    (root / SPECS_DIR / PRODUCT_SPECS_SUBDIR).mkdir(parents=True)
+    (root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).mkdir(parents=True)
+    (root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR).mkdir(parents=True)
     (templates / "spec.md").write_text(
       """# {{ spec_id }} – {{ name }}\n\nSpec body content\n""",
       encoding="utf-8",
@@ -180,8 +180,8 @@ class BuildFrontmatterTaxonomyTest(unittest.TestCase):
     (root / ".git").mkdir()
     templates = get_templates_dir(root)
     templates.mkdir(parents=True)
-    (root / SPECS_DIR / TECH_SPECS_SUBDIR).mkdir(parents=True)
-    (root / SPECS_DIR / PRODUCT_SPECS_SUBDIR).mkdir(parents=True)
+    (root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).mkdir(parents=True)
+    (root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR).mkdir(parents=True)
     (templates / "spec.md").write_text(
       "# {{ spec_id }} – {{ name }}\n\nBody\n",
       encoding="utf-8",

@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from supekku.scripts.lib.core.paths import POLICIES_SUBDIR, SPECS_DIR
+from supekku.scripts.lib.core.paths import POLICIES_SUBDIR, SPEC_DRIVER_DIR
 
 from .registry import PolicyRecord, PolicyRegistry
 
@@ -71,7 +71,7 @@ class TestPolicyRegistry(unittest.TestCase):
     self.root = Path(self.test_dir)
 
     # Create directory structure
-    self.policies_dir = self.root / SPECS_DIR / POLICIES_SUBDIR
+    self.policies_dir = self.root / SPEC_DRIVER_DIR / POLICIES_SUBDIR
     self.policies_dir.mkdir(parents=True)
 
     self.registry_dir = self.root / ".spec-driver" / "registry"

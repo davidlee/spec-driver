@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from supekku.scripts.lib.core.paths import SPECS_DIR, TECH_SPECS_SUBDIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, TECH_SPECS_SUBDIR
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.specs.index import SpecIndexBuilder
 from supekku.scripts.list_specs import main as list_specs_main
@@ -30,7 +30,7 @@ def _write_spec(
   packages: list[str],
   name: str,
 ) -> Path:
-  directory = root / SPECS_DIR / TECH_SPECS_SUBDIR / f"{spec_id.lower()}-bundle"
+  directory = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / f"{spec_id.lower()}-bundle"
   directory.mkdir(parents=True, exist_ok=True)
   path = directory / f"{spec_id}.md"
   frontmatter = {
@@ -75,7 +75,7 @@ def test_for_path_filters_using_cwd(temp_repo: Path) -> None:
   working_dir = temp_repo / "internal" / "shared" / "pkg"
   working_dir.mkdir(parents=True, exist_ok=True)
 
-  SpecIndexBuilder(temp_repo / SPECS_DIR / TECH_SPECS_SUBDIR).rebuild()
+  SpecIndexBuilder(temp_repo / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).rebuild()
 
   original_cwd = Path.cwd()
   try:
@@ -106,7 +106,7 @@ def test_package_path_filter_uses_symlink_index(temp_repo: Path) -> None:
   _write_spec(temp_repo, "SPEC-500", "spec-500", ["internal/app/foo"], "Foo")
 
   # Rebuild index manually
-  SpecIndexBuilder(temp_repo / SPECS_DIR / TECH_SPECS_SUBDIR).rebuild()
+  SpecIndexBuilder(temp_repo / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).rebuild()
 
   lines = _run(["--package-path", "internal/app/foo"], root=temp_repo)
   assert lines == ["SPEC-500\tspec-500"]

@@ -8,9 +8,8 @@ from tempfile import TemporaryDirectory
 from unittest.mock import Mock
 
 from supekku.scripts.lib.core.paths import (
-  CHANGES_DIR,
   DELTAS_SUBDIR,
-  SPECS_DIR,
+  SPEC_DRIVER_DIR,
   TECH_SPECS_SUBDIR,
 )
 from supekku.scripts.lib.workspace import Workspace
@@ -229,12 +228,12 @@ def test_check_coverage_completeness_all_verified() -> None:
     tmp_path = Path(tmpdir)
 
     # Create workspace structure
-    spec_dir = tmp_path / SPECS_DIR / TECH_SPECS_SUBDIR / "SPEC-900"
+    spec_dir = tmp_path / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "SPEC-900"
     spec_dir.mkdir(parents=True)
     spec_file = spec_dir / "SPEC-900.md"
     spec_file.write_text(SPEC_WITH_VERIFIED_COVERAGE, encoding="utf-8")
 
-    delta_dir = tmp_path / CHANGES_DIR / DELTAS_SUBDIR / "DE-900"
+    delta_dir = tmp_path / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-900"
     delta_dir.mkdir(parents=True)
     delta_file = delta_dir / "DE-900.md"
     delta_file.write_text(DELTA_CONTENT, encoding="utf-8")
@@ -260,7 +259,7 @@ def test_check_coverage_completeness_planned_coverage() -> None:
     tmp_path = Path(tmpdir)
 
     # Create spec with planned coverage
-    spec_dir = tmp_path / SPECS_DIR / TECH_SPECS_SUBDIR / "SPEC-901"
+    spec_dir = tmp_path / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "SPEC-901"
     spec_dir.mkdir(parents=True)
     spec_file = spec_dir / "SPEC-901.md"
     spec_file.write_text(SPEC_WITH_PLANNED_COVERAGE, encoding="utf-8")
@@ -270,7 +269,7 @@ def test_check_coverage_completeness_planned_coverage() -> None:
       "DE-900",
       "DE-901",
     )
-    delta_dir = tmp_path / CHANGES_DIR / DELTAS_SUBDIR / "DE-901"
+    delta_dir = tmp_path / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-901"
     delta_dir.mkdir(parents=True)
     delta_file = delta_dir / "DE-901.md"
     delta_file.write_text(delta_content, encoding="utf-8")
@@ -299,7 +298,7 @@ def test_check_coverage_completeness_missing_coverage() -> None:
     tmp_path = Path(tmpdir)
 
     # Create spec without coverage
-    spec_dir = tmp_path / SPECS_DIR / TECH_SPECS_SUBDIR / "SPEC-902"
+    spec_dir = tmp_path / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "SPEC-902"
     spec_dir.mkdir(parents=True)
     spec_file = spec_dir / "SPEC-902.md"
     spec_file.write_text(SPEC_WITHOUT_COVERAGE, encoding="utf-8")
@@ -309,7 +308,7 @@ def test_check_coverage_completeness_missing_coverage() -> None:
       "DE-900",
       "DE-902",
     )
-    delta_dir = tmp_path / CHANGES_DIR / DELTAS_SUBDIR / "DE-902"
+    delta_dir = tmp_path / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-902"
     delta_dir.mkdir(parents=True)
     delta_file = delta_dir / "DE-902.md"
     delta_file.write_text(delta_content, encoding="utf-8")
@@ -350,7 +349,7 @@ applies_to:
 
 # DE-903 - Test Delta
 """
-    delta_dir = tmp_path / CHANGES_DIR / DELTAS_SUBDIR / "DE-903"
+    delta_dir = tmp_path / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-903"
     delta_dir.mkdir(parents=True)
     delta_file = delta_dir / "DE-903.md"
     delta_file.write_text(delta_content, encoding="utf-8")

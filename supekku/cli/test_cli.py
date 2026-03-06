@@ -13,13 +13,12 @@ from supekku.cli.common import matches_regexp
 from supekku.cli.main import app
 from supekku.scripts.lib.core.paths import (
   BACKLOG_DIR,
-  CHANGES_DIR,
   DELTAS_SUBDIR,
   IMPROVEMENTS_SUBDIR,
   ISSUES_SUBDIR,
   PROBLEMS_SUBDIR,
   RISKS_SUBDIR,
-  SPECS_DIR,
+  SPEC_DRIVER_DIR,
   TECH_SPECS_SUBDIR,
 )
 
@@ -75,8 +74,8 @@ class TestWorkspaceCommands:
 
       # Verify directories were created
       workspace = Path(tmpdir)
-      assert (workspace / CHANGES_DIR / DELTAS_SUBDIR).exists()
-      assert (workspace / SPECS_DIR / TECH_SPECS_SUBDIR).exists()
+      assert (workspace / SPEC_DRIVER_DIR / DELTAS_SUBDIR).exists()
+      assert (workspace / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).exists()
       assert (workspace / ".spec-driver" / "registry").exists()
 
       # Verify backlog structure

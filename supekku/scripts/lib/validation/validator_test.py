@@ -10,13 +10,12 @@ from supekku.scripts.lib.backlog.registry import sync_backlog_registry
 from supekku.scripts.lib.core.paths import (
   AUDITS_SUBDIR,
   BACKLOG_DIR,
-  CHANGES_DIR,
   DECISIONS_SUBDIR,
   DELTAS_SUBDIR,
   ISSUES_SUBDIR,
   PRODUCT_SPECS_SUBDIR,
   REVISIONS_SUBDIR,
-  SPECS_DIR,
+  SPEC_DRIVER_DIR,
   TECH_SPECS_SUBDIR,
 )
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
@@ -38,7 +37,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     return root
 
   def _write_spec(self, root: Path, spec_id: str, requirement_label: str) -> None:
-    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / f"{spec_id}-sample"
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / f"{spec_id}-sample"
     spec_dir.mkdir(parents=True)
     spec_path = spec_dir / f"{spec_id}.md"
     frontmatter = {
@@ -59,7 +58,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     )
 
   def _write_delta(self, root: Path, delta_id: str, requirement_uid: str) -> Path:
-    delta_dir = root / CHANGES_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
+    delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
     delta_dir.mkdir(parents=True)
     delta_path = delta_dir / f"{delta_id}.md"
     frontmatter = {
@@ -82,7 +81,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     revision_id: str,
     requirement_uid: str,
   ) -> Path:
-    revision_dir = root / CHANGES_DIR / REVISIONS_SUBDIR / f"{revision_id}-sample"
+    revision_dir = root / SPEC_DRIVER_DIR / REVISIONS_SUBDIR / f"{revision_id}-sample"
     revision_dir.mkdir(parents=True)
     revision_path = revision_dir / f"{revision_id}.md"
     frontmatter = {
@@ -100,7 +99,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     return revision_path
 
   def _write_audit(self, root: Path, audit_id: str, requirement_uid: str) -> Path:
-    audit_dir = root / CHANGES_DIR / AUDITS_SUBDIR / f"{audit_id}-sample"
+    audit_dir = root / SPEC_DRIVER_DIR / AUDITS_SUBDIR / f"{audit_id}-sample"
     audit_dir.mkdir(parents=True)
     audit_path = audit_dir / f"{audit_id}.md"
     frontmatter = {
@@ -161,7 +160,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     if related_decisions is None:
       related_decisions = []
 
-    decisions_dir = root / SPECS_DIR / DECISIONS_SUBDIR
+    decisions_dir = root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR
     decisions_dir.mkdir(parents=True, exist_ok=True)
     adr_path = decisions_dir / f"{adr_id}-test.md"
 
@@ -439,7 +438,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     c4_level: str = "",
   ) -> None:
     """Write a tech spec with optional taxonomy fields."""
-    spec_dir = root / SPECS_DIR / TECH_SPECS_SUBDIR / f"{spec_id}-sample"
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / f"{spec_id}-sample"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / f"{spec_id}.md"
     frontmatter: dict[str, Any] = {
@@ -459,7 +458,7 @@ class WorkspaceValidatorTest(RepoTestCase):
 
   def _write_prod_spec(self, root: Path, spec_id: str) -> None:
     """Write a product spec (no taxonomy expected)."""
-    spec_dir = root / SPECS_DIR / PRODUCT_SPECS_SUBDIR / spec_id
+    spec_dir = root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR / spec_id
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / f"{spec_id}.md"
     frontmatter = {
@@ -564,7 +563,8 @@ class WorkspaceValidatorTest(RepoTestCase):
 
   def _write_backlog_item(self, root: Path, item_id: str) -> None:
     """Create a backlog issue on disk and register it."""
-    kind_dir = root / BACKLOG_DIR / ISSUES_SUBDIR / f"{item_id}-sample"
+    backlog = root / SPEC_DRIVER_DIR / BACKLOG_DIR
+    kind_dir = backlog / ISSUES_SUBDIR / f"{item_id}-sample"
     kind_dir.mkdir(parents=True)
     md_path = kind_dir / f"{item_id}.md"
     frontmatter = {

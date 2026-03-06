@@ -18,7 +18,7 @@ from supekku.scripts.lib.backlog.registry import (
   save_backlog_registry,
   sync_backlog_registry,
 )
-from supekku.scripts.lib.core.paths import BACKLOG_DIR
+from supekku.scripts.lib.core.paths import BACKLOG_DIR, SPEC_DRIVER_DIR
 
 
 class BacklogLibraryTest(unittest.TestCase):
@@ -35,8 +35,9 @@ class BacklogLibraryTest(unittest.TestCase):
     self.addCleanup(tmpdir.cleanup)
     root = Path(tmpdir.name)
     (root / ".git").mkdir()
-    (root / BACKLOG_DIR / "issues").mkdir(parents=True)
-    (root / BACKLOG_DIR / "backlog.md").write_text("", encoding="utf-8")
+    backlog = root / SPEC_DRIVER_DIR / BACKLOG_DIR
+    (backlog / "issues").mkdir(parents=True)
+    (backlog / "backlog.md").write_text("", encoding="utf-8")
     os.chdir(root)
     return root
 
@@ -59,16 +60,17 @@ class BacklogLibraryTest(unittest.TestCase):
     additions = append_backlog_summary()
 
     assert len(additions) == 1
-    summary = (root / BACKLOG_DIR / "backlog.md").read_text(encoding="utf-8")
+    backlog = root / SPEC_DRIVER_DIR / BACKLOG_DIR
+    summary = (backlog / "backlog.md").read_text(encoding="utf-8")
     assert "ISSUE-001" in summary
     # Resolve paths to handle macOS /var -> /private/var symlink
-    backlog_root = root.resolve() / BACKLOG_DIR
+    backlog_root = root.resolve() / SPEC_DRIVER_DIR / BACKLOG_DIR
     assert entry.resolve().relative_to(backlog_root).as_posix() in summary
 
   def test_find_repo_root_resolves_from_nested_path(self) -> None:
     """Test that find_repo_root resolves correctly from nested directories."""
     root = self._make_repo()
-    nested = root / BACKLOG_DIR / "issues"
+    nested = root / SPEC_DRIVER_DIR / BACKLOG_DIR / "issues"
     os.chdir(nested)
     resolved = find_repo_root()
     # Resolve both paths to handle macOS /var -> /private/var symlink
@@ -218,7 +220,8 @@ class BacklogLibraryTest(unittest.TestCase):
     save_backlog_registry(["ISSUE-002", "ISSUE-001"], root)
 
     # Delete ISSUE-002 and add new items
-    (root / BACKLOG_DIR / "issues" / "ISSUE-002-second_issue" / "ISSUE-002.md").unlink()
+    backlog = root / SPEC_DRIVER_DIR / BACKLOG_DIR
+    (backlog / "issues" / "ISSUE-002-second_issue" / "ISSUE-002.md").unlink()
     create_backlog_entry("improvement", "First improvement")
     create_backlog_entry("issue", "Third issue")
 
@@ -246,7 +249,7 @@ class FindBacklogItemsByIdTest(unittest.TestCase):
 
   def _create_item(self, root: Path, subdir: str, item_id: str, slug: str) -> Path:
     """Create a minimal backlog item at the expected path."""
-    entry_dir = root / BACKLOG_DIR / subdir / f"{item_id}-{slug}"
+    entry_dir = root / SPEC_DRIVER_DIR / BACKLOG_DIR / subdir / f"{item_id}-{slug}"
     entry_dir.mkdir(parents=True, exist_ok=True)
     md_file = entry_dir / f"{item_id}.md"
     kind = subdir.rstrip("s")

@@ -16,7 +16,7 @@ import tomlkit
 from typer.testing import CliRunner
 
 from supekku.cli.sync import app
-from supekku.scripts.lib.core.paths import SPECS_DIR, TECH_SPECS_SUBDIR
+from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, TECH_SPECS_SUBDIR
 
 _SPEC_DRIVER_DIR = ".spec-driver"
 _WORKFLOW_TOML = "workflow.toml"
@@ -51,7 +51,7 @@ class SyncDefaultsTest(unittest.TestCase):
     sd = self.root / _SPEC_DRIVER_DIR
     sd.mkdir()
     (sd / _WORKFLOW_TOML).write_text('ceremony = "settler"\n', encoding="utf-8")
-    self.tech_dir = self.root / SPECS_DIR / TECH_SPECS_SUBDIR
+    self.tech_dir = self.root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
     self.tech_dir.mkdir(parents=True)
     self.registry_path = self.tech_dir / "registry_v2.json"
     self._write_registry({})

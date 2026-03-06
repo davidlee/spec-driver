@@ -65,3 +65,39 @@
 11. `init_paths()` should warn on unrecognized `[dirs]` keys — added to DEC-049-06 and code impact table
 12. Decision status symlinks not mentioned — included in step 0 cleanup
 13. DEC-049-04/06 tension noted — flagged as known follow-up interaction
+
+---
+
+## Phase 1 — Structural migration (complete)
+
+### What's done
+
+Three commits, clean sequence:
+1. `843f9b1` — Deleted 388 derived symlinks (spec index dirs, alias symlinks, contract mirror symlinks, decision status symlinks, registry_v2.json)
+2. `4d5649a` — `git mv` of 526 files: all content from `specify/`, `change/`, `backlog/`, `memory/` into `.spec-driver/`
+3. `981abac` — Created 10 backward-compat symlinks per DEC-049-03
+
+### Observations
+
+- No conflicts with existing `.spec-driver/` subdirs (as predicted in preflight)
+- All `git mv` renames detected at 100% similarity — clean history preservation
+- `by-language/` survived derived symlink deletion (real dir, not a symlink) — moved naturally during 1.2
+- Symlink structure matches DR-049 §4 exactly
+
+### Verification
+
+Manual spot-checks pass:
+- `specify/tech/SPEC-110/SPEC-110.md` resolves
+- `change/deltas/DE-049-*/DE-049.md` resolves
+- `backlog/improvements/IMPR-008-*/spike.md` resolves
+- `memory/` lists memory files
+- `git status` clean
+
+**No code tests run** — Phase 1 is pure structural, no code changes. Expect test failures starting Phase 2 when path defaults change.
+
+### Hand-off to Phase 2
+
+Phase 2 (path model + config) can now proceed. Key inputs:
+- Content is at `.spec-driver/{tech,product,decisions,...}`
+- Old paths resolve via compat symlinks — tests should still pass via symlinks until code paths are updated
+- First code file to touch: `supekku/scripts/lib/core/paths.py`

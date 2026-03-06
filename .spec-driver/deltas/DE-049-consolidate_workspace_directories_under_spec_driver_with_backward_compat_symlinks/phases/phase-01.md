@@ -4,7 +4,7 @@ slug: 049-consolidate_workspace_directories_under_spec_driver_with_backward_comp
 name: IP-049 Phase 01 — Structural migration
 created: '2026-03-06'
 updated: '2026-03-06'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -70,11 +70,11 @@ continue to resolve. No code changes in this phase.
 - [x] DE-048 completed
 
 ## 4. Exit Criteria / Done When
-- [ ] Derived symlinks deleted and committed
-- [ ] Content `git mv`'d into `.spec-driver/` and committed
-- [ ] Compat symlink structures created and committed
-- [ ] Old paths resolve correctly via symlinks (manual spot check)
-- [ ] Git working tree clean
+- [x] Derived symlinks deleted and committed (843f9b1)
+- [x] Content `git mv`'d into `.spec-driver/` and committed (4d5649a)
+- [x] Compat symlink structures created and committed (981abac)
+- [x] Old paths resolve correctly via symlinks (manual spot check)
+- [x] Git working tree clean
 
 ## 5. Verification
 - Manual: `ls -la specify/tech/` shows symlink → `../.spec-driver/tech/`
@@ -92,10 +92,10 @@ continue to resolve. No code changes in this phase.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Delete derived symlinks | No | ~400 entries: spec index, contract mirror, decision status |
-| [ ] | 1.2 | git mv content into .spec-driver/ | No | After 1.1 committed |
-| [ ] | 1.3 | Create compat symlink structures | No | After 1.2 committed |
-| [ ] | 1.4 | Verify and final commit | No | Spot-check old paths |
+| [x] | 1.1 | Delete derived symlinks | No | 388 entries deleted, committed 843f9b1 |
+| [x] | 1.2 | git mv content into .spec-driver/ | No | 526 renames, committed 4d5649a |
+| [x] | 1.3 | Create compat symlink structures | No | 10 symlinks, committed 981abac |
+| [x] | 1.4 | Verify and final commit | No | All 5 spot-checks pass, tree clean |
 
 ### Task Details
 
@@ -154,17 +154,22 @@ continue to resolve. No code changes in this phase.
 | Risk | Mitigation | Status |
 | --- | --- | --- |
 | `.spec-driver/` subdir name conflicts | Pre-checked: no overlap between content and existing managed dirs | Clear |
-| Large diff | Derived symlink deletion in separate commit (1.1) | Planned |
-| Broken cross-references | Compat symlinks tested in 1.4 | Planned |
+| Large diff | Derived symlink deletion in separate commit (1.1) | Mitigated — 388 entries in own commit |
+| Broken cross-references | Compat symlinks tested in 1.4 | Clear — all 5 spot-checks pass |
 
 ## 9. Decisions & Outcomes
-*(Updated during execution)*
+
+- Also deleted `registry_v2.json` (derived file) during 1.1 — reduces diff noise
+- `by-language/` dir survived derived symlink deletion (it's a real dir with content, not a symlink) — will be handled naturally by git mv in 1.2
 
 ## 10. Findings / Research Notes
-*(Updated during execution)*
+
+- Exact counts: 388 derived entries deleted (1.1), 526 renames (1.2), 10 compat symlinks (1.3)
+- No conflicts with existing `.spec-driver/` subdirs as predicted
+- All git mv operations preserved rename detection (100% similarity)
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
-- [ ] Hand-off notes to Phase 2
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (spot-checks documented above)
+- [x] Notes updated (notes.md — Phase 1 section)
+- [x] Hand-off notes to Phase 2 (in notes.md)

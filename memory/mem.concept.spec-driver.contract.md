@@ -4,25 +4,25 @@ name: Contracts
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
 - contracts
-summary: "Contracts are auto-generated API documentation \u2014 the canonical record\
-  \ of what the code actually exposes. Observed truth, not authored intent."
+summary: 'Contracts are auto-generated API documentation — the canonical record
+  of what the code actually exposes. Observed truth, not authored intent.'
 priority:
   severity: medium
   weight: 6
 provenance:
   sources:
+  - kind: adr
+    ref: ADR-003
+  - kind: adr
+    ref: ADR-004
   - kind: doc
-    note: Contracts for API Research section
-    ref: supekku/INIT.md
-  - kind: doc
-    note: Truth model section
-    ref: docs/commands-workflow.md
+    ref: CLAUDE.md
 ---
 
 # Contracts
@@ -42,8 +42,8 @@ See [[mem.concept.spec-driver.truth-model]] for why this distinction matters.
 ## Properties
 
 - **Derived and deterministic**: always safe to delete and regenerate
-- **Canonical location**: `.contracts/` (with optional symlink views)
-- **Multi-language**: Go (gomarkdoc), Python (AST analysis), TypeScript (stub)
+- **Canonical location**: `.contracts/` (with optional compatibility views)
+- **Multi-language**: Go, Python, Zig, TypeScript (stub)
 
 ## When to Use Contracts vs Code
 

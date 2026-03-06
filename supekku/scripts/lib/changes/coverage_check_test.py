@@ -401,7 +401,7 @@ def test_format_coverage_error_contains_key_information() -> None:
   assert "Current status: planned" in error
   assert "status: verified" in error
   assert "complete delta DE-900 --force" in error
-  assert "docs/commands-workflow.md" in error
+  assert "specify/decisions/ADR-004-canonical_workflow_loop.md" in error
 
 
 def test_format_coverage_error_handles_missing_spec() -> None:

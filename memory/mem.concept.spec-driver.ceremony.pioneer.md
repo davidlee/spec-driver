@@ -4,8 +4,8 @@ name: Pioneer Ceremony Mode
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
@@ -18,9 +18,8 @@ priority:
   weight: 7
 provenance:
   sources:
-  - kind: doc
-    note: Pioneer mode description
-    ref: docs/commands-workflow.md
+  - kind: adr
+    ref: ADR-004
 ---
 
 # Pioneer Ceremony Mode
@@ -38,14 +37,14 @@ that doesn't yet pay for itself.
 
 ## What's NOT Active
 
-- Deltas, implementation plans, and phases are intentionally absent
+- Deltas, implementation plans, and phases are intentionally absent by default
 - Backlog metadata linkage is optional and often manual
 - No formal verification/audit cycle
 
 ## Typical Flow
 
 ```
-card → implement → (optional ADR) → done
+card -> implement -> (optional ADR) -> done
 ```
 
 ## How Specs Behave Here
@@ -59,5 +58,7 @@ is something the project converges toward, not something it starts with.
 
 - Check `workflow.toml [cards]` for card conventions
 - Do not create deltas or IPs unless explicitly asked
+- If a significant change needs explicit design or planning, equivalent records
+  may still exist outside the delta bundle
 - If a decision has lasting impact, suggest an ADR
 - Keep documentation lightweight — cards are the primary record

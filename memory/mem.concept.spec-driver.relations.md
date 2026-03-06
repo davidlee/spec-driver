@@ -4,15 +4,16 @@ name: Relations and Traceability
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
 - relations
 - traceability
-summary: Relations link artefacts via frontmatter. Traceability (implemented_by, verified_by)
-  is automatic via sync. Status is always manual.
+summary: 'Relations link artefacts via frontmatter. Traceability arrays are automatic
+  via sync. Requirement lifecycle is derived from coverage and revisions, not edited
+  directly in the registry.'
 priority:
   severity: high
   weight: 8
@@ -21,37 +22,38 @@ provenance:
   - kind: doc
     note: Traceability semantics
     ref: supekku/about/lifecycle.md
-  - kind: doc
-    note: Requirements registry updates
-    ref: docs/delta-completion-workflow.md
+  - kind: code
+    ref: supekku/scripts/lib/requirements/registry.py
+  - kind: code
+    ref: supekku/scripts/lib/blocks/relationships.py
 ---
 
 # Relations and Traceability
 
 ## Core Principle
 
-**Status is manual. Traceability is automatic.**
+**Traceability is automatic. Lifecycle is derived.**
 
-These are two parallel systems that do not interfere:
+These are parallel systems:
 
-### 1. Status (Manual)
-
-```yaml
-status: pending → in_progress → implemented → verified
-```
-
-You control this via direct edits. No automatic transitions.
-
-### 2. Traceability Arrays (Automatic via sync)
+### 1. Traceability Arrays (Automatic via sync)
 
 ```yaml
-implemented_by: [DE-002, DE-005]   # deltas with "implements" relations
-verified_by: [AUD-001, AUD-003]    # audits with "verifies" relations
+implemented_by: [DE-002, DE-005]
+verified_by: [AUD-001, AUD-003]
 ```
 
-Populated automatically by `uv run spec-driver sync` based on frontmatter
-`relations:` blocks. Re-running sync is always safe — it never changes status,
-only updates arrays.
+Populated automatically by `uv run spec-driver sync` from relations and
+evidence sources.
+
+### 2. Requirement Lifecycle (Derived)
+
+```yaml
+status: pending | in-progress | active | retired
+```
+
+Derived during sync from coverage blocks and revision lifecycle payloads.
+The registry is derived. Do not treat manual registry edits as the normal path.
 
 ## Relation Types
 
@@ -67,9 +69,9 @@ only updates arrays.
 1. Add `implements` relations in [[mem.concept.spec-driver.delta|delta]] frontmatter
 2. Run `uv run spec-driver sync` — populates `implemented_by[]` in requirements registry
 3. After [[mem.concept.spec-driver.audit|audit]], `verifies` relations populate `verified_by[]`
-4. Manually update requirement `status` in `.spec-driver/registry/requirements.yaml`
+4. Coverage and revision data drive lifecycle status during sync
 
 ## The Requirements Registry
 
-`.spec-driver/registry/requirements.yaml` is the **source of truth** for
-requirement status. Sync populates traceability arrays; you manage status.
+`.spec-driver/registry/requirements.yaml` is a **derived view** of requirements,
+traceability, and lifecycle. Specs, revisions, and coverage remain the canonical inputs.

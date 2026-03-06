@@ -4,8 +4,8 @@ name: Truth Model
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
@@ -19,9 +19,10 @@ priority:
   weight: 9
 provenance:
   sources:
-  - kind: doc
-    note: Truth model section
-    ref: docs/commands-workflow.md
+  - kind: adr
+    ref: ADR-004
+  - kind: adr
+    ref: ADR-003
   - kind: doc
     note: Contracts, Sync, and Truth section
     ref: CLAUDE.md

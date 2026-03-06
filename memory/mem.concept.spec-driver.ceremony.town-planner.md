@@ -4,8 +4,8 @@ name: Town Planner Ceremony Mode
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
 tags:
 - spec-driver
@@ -18,9 +18,8 @@ priority:
   weight: 7
 provenance:
   sources:
-  - kind: doc
-    note: Town Planner mode description
-    ref: docs/commands-workflow.md
+  - kind: adr
+    ref: ADR-004
 ---
 
 # Town Planner Ceremony Mode
@@ -41,7 +40,7 @@ This is the closest to the [[mem.concept.spec-driver.philosophy|idealised form]]
 ## Typical Flow
 
 ```
-revision (often with new requirements) → delta + DR + IP + phase sheets → implement → audit/contracts → patch specs → closure
+revision (often with new requirements) -> delta + DR + IP + phase sheets -> implement -> audit/contracts -> patch specs -> closure
 ```
 
 This is the full [[mem.pattern.spec-driver.core-loop]] with no shortcuts.

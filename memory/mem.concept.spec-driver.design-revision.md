@@ -45,6 +45,11 @@ concrete technical design.
 
 ## Posture Variance
 
-- **Pioneer**: no DRs — design happens informally
-- **Settler**: optional — used when the change is non-trivial
-- **Town Planner**: expected for any change with architectural impact
+Posture affects how explicitly DRs are expected and where they live, but the
+main question is execution scope.
+
+- Significant, risky, or architecturally meaningful changes should usually have
+  an explicit DR or equivalent design artefact.
+- When deltas are active, the DR normally lives inside the delta bundle.
+- When deltas are not active, equivalent design notes may live in cards,
+  artefact docs, or other local planning records.

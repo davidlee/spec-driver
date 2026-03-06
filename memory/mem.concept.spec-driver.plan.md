@@ -24,9 +24,8 @@ provenance:
     ref: supekku/cli/create.py
   - kind: code
     ref: supekku/scripts/lib/changes/creation.py
-  - kind: doc
-    note: Phase document structure
-    ref: docs/delta-completion-workflow.md
+  - kind: code
+    ref: supekku/scripts/lib/changes/creation.py
 ---
 
 # Implementation Plans
@@ -71,6 +70,13 @@ uv run spec-driver create phase "Phase name" --plan IP-XXX   # create next phase
 
 ## Posture Variance
 
-- **Pioneer**: no IPs — work is tracked in cards
-- **Settler**: optional — used when execution is non-trivial
-- **Town Planner**: expected for multi-step changes
+Posture affects how formally plans are expressed and enforced, but the main
+question is execution scope.
+
+- Significant or multi-step changes should usually have an IP or equivalent
+  planning artefact.
+- Phase sheets are appropriate when execution benefits from just-in-time
+  decomposition and explicit verification checkpoints.
+- When deltas are active, IPs and phase sheets normally live inside the delta bundle.
+- When deltas are not active, equivalent planning records may live in cards or
+  other local planning docs.

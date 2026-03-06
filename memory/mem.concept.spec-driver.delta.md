@@ -24,8 +24,8 @@ provenance:
     ref: supekku/cli/create.py
   - kind: code
     ref: supekku/scripts/lib/changes/creation.py
-  - kind: doc
-    ref: docs/delta-completion-workflow.md
+  - kind: code
+    ref: supekku/scripts/complete_delta.py
 ---
 
 # Deltas

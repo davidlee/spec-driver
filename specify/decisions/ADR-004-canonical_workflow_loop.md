@@ -214,6 +214,12 @@ Supported variants:
 These are concessions for capture, governance, maturity, or low-ceremony work.
 They do not redefine canon.
 
+DRs, IPs, and phase sheets are not maturity badges. They are execution-shaping
+artefacts. Their use should be driven primarily by significance, complexity, and
+coordination risk. When deltas are active, those artefacts normally live inside
+the delta bundle. When deltas are not active, equivalent design/planning records
+may live elsewhere.
+
 ### 8. Spec-first aspirational doctrine is not canonical for code-changing work
 
 The following is explicitly not canonical doctrine for code-changing work:

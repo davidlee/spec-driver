@@ -189,3 +189,65 @@ revisions:
     slug: refresh_prod_004_frontmatter_metadata_validation_for_memory_and_compaction
     updated: '2026-03-03'
     path: change/revisions/RE-019-refresh_prod_004_frontmatter_metadata_validation_for_memory_and_compaction/RE-019.md
+  RE-020:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-039 completion
+    slug: delta_de_039_completion
+    updated: '2026-03-04'
+    path: change/revisions/RE-020-delta_de_039_completion/RE-020.md
+    relations:
+    - type: documents
+      target: DE-039
+      attributes: {}
+  RE-021:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-029 completion
+    slug: delta_de_029_completion
+    updated: '2026-03-04'
+    path: change/revisions/RE-021-delta_de_029_completion/RE-021.md
+    relations:
+    - type: documents
+      target: DE-029
+      attributes: {}
+  RE-022:
+    kind: revision
+    status: draft
+    name: Spec Revision - Align SPEC-122 requirement status terminology with code
+    slug: align_spec_122_requirement_status_terminology_with_code
+    updated: '2026-03-05'
+    path: change/revisions/RE-022-align_spec_122_requirement_status_terminology_with_code/RE-022.md
+  RE-023:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-031 completion
+    slug: delta_de_031_completion
+    updated: '2026-03-05'
+    path: change/revisions/RE-023-delta_de_031_completion/RE-023.md
+    relations:
+    - type: documents
+      target: DE-031
+      attributes: {}
+  RE-024:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-011 completion
+    slug: delta_de_011_completion
+    updated: '2026-03-05'
+    path: change/revisions/RE-024-delta_de_011_completion/RE-024.md
+    relations:
+    - type: documents
+      target: DE-011
+      attributes: {}
+  RE-025:
+    kind: revision
+    status: completed
+    name: Spec Revision - Delta DE-043 completion
+    slug: delta_de_043_completion
+    updated: '2026-03-05'
+    path: change/revisions/RE-025-delta_de_043_completion/RE-025.md
+    relations:
+    - type: documents
+      target: DE-043
+      attributes: {}

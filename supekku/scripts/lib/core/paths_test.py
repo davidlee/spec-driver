@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import unittest
+import warnings
 from pathlib import Path
 
 import supekku.scripts.lib.core.paths as paths_mod
 from supekku.scripts.lib.core.paths import (
   AUDITS_SUBDIR,
   BACKLOG_DIR,
-  CHANGES_DIR,
   DECISIONS_SUBDIR,
   DELTAS_SUBDIR,
   IMPROVEMENTS_SUBDIR,
@@ -20,19 +20,18 @@ from supekku.scripts.lib.core.paths import (
   PRODUCT_SPECS_SUBDIR,
   REVISIONS_SUBDIR,
   RISKS_SUBDIR,
-  SPECS_DIR,
+  SPEC_DRIVER_DIR,
   STANDARDS_SUBDIR,
   TECH_SPECS_SUBDIR,
   get_audits_dir,
   get_backlog_dir,
-  get_changes_dir,
   get_decisions_dir,
   get_deltas_dir,
   get_memory_dir,
   get_policies_dir,
   get_product_specs_dir,
   get_revisions_dir,
-  get_specs_dir,
+  get_spec_driver_root,
   get_standards_dir,
   get_tech_specs_dir,
   init_paths,
@@ -40,199 +39,126 @@ from supekku.scripts.lib.core.paths import (
 )
 
 
-class TestWorkspaceRootConstants(unittest.TestCase):
-  """Workspace root directory constants have expected values."""
-
-  def test_specs_dir(self) -> None:
-    """SPECS_DIR matches the specify directory name."""
-    assert SPECS_DIR == "specify"
-
-  def test_changes_dir(self) -> None:
-    """CHANGES_DIR matches the change directory name."""
-    assert CHANGES_DIR == "change"
-
-  def test_backlog_dir(self) -> None:
-    """BACKLOG_DIR matches the backlog directory name."""
-    assert BACKLOG_DIR == "backlog"
-
-  def test_memory_dir(self) -> None:
-    """MEMORY_DIR matches the memory directory name."""
-    assert MEMORY_DIR == "memory"
-
-
-class TestSpecsSubdirConstants(unittest.TestCase):
-  """Subdirectory constants within SPECS_DIR."""
+class TestContentSubdirConstants(unittest.TestCase):
+  """Content subdirectory constants have expected values."""
 
   def test_tech_specs(self) -> None:
-    """Tech specs subdir is 'tech'."""
     assert TECH_SPECS_SUBDIR == "tech"
 
   def test_product_specs(self) -> None:
-    """Product specs subdir is 'product'."""
     assert PRODUCT_SPECS_SUBDIR == "product"
 
   def test_decisions(self) -> None:
-    """Decisions subdir is 'decisions'."""
     assert DECISIONS_SUBDIR == "decisions"
 
   def test_policies(self) -> None:
-    """Policies subdir is 'policies'."""
     assert POLICIES_SUBDIR == "policies"
 
   def test_standards(self) -> None:
-    """Standards subdir is 'standards'."""
     assert STANDARDS_SUBDIR == "standards"
 
-
-class TestChangesSubdirConstants(unittest.TestCase):
-  """Subdirectory constants within CHANGES_DIR."""
-
   def test_deltas(self) -> None:
-    """Deltas subdir is 'deltas'."""
     assert DELTAS_SUBDIR == "deltas"
 
   def test_revisions(self) -> None:
-    """Revisions subdir is 'revisions'."""
     assert REVISIONS_SUBDIR == "revisions"
 
   def test_audits(self) -> None:
-    """Audits subdir is 'audits'."""
     assert AUDITS_SUBDIR == "audits"
+
+  def test_backlog(self) -> None:
+    assert BACKLOG_DIR == "backlog"
+
+  def test_memory(self) -> None:
+    assert MEMORY_DIR == "memory"
 
 
 class TestBacklogSubdirConstants(unittest.TestCase):
-  """Subdirectory constants within BACKLOG_DIR."""
+  """Subdirectory constants within backlog/."""
 
   def test_issues(self) -> None:
-    """Issues subdir is 'issues'."""
     assert ISSUES_SUBDIR == "issues"
 
   def test_problems(self) -> None:
-    """Problems subdir is 'problems'."""
     assert PROBLEMS_SUBDIR == "problems"
 
   def test_improvements(self) -> None:
-    """Improvements subdir is 'improvements'."""
     assert IMPROVEMENTS_SUBDIR == "improvements"
 
   def test_risks(self) -> None:
-    """Risks subdir is 'risks'."""
     assert RISKS_SUBDIR == "risks"
 
 
-class TestSpecsHelpers(unittest.TestCase):
-  """Helper functions for specify/ directory tree."""
+class TestContentHelpers(unittest.TestCase):
+  """All content helpers resolve under .spec-driver/."""
 
   def setUp(self) -> None:
-    """Set up a fake repo root for path composition tests."""
     self.root = Path("/fake/repo")
-
-  def test_get_specs_dir(self) -> None:
-    """Returns repo_root / specify."""
-    assert get_specs_dir(self.root) == self.root / "specify"
+    self.sd = self.root / SPEC_DRIVER_DIR
 
   def test_get_tech_specs_dir(self) -> None:
-    """Returns repo_root / specify / tech."""
-    assert get_tech_specs_dir(self.root) == self.root / "specify" / "tech"
+    assert get_tech_specs_dir(self.root) == self.sd / "tech"
 
   def test_get_product_specs_dir(self) -> None:
-    """Returns repo_root / specify / product."""
-    assert get_product_specs_dir(self.root) == self.root / "specify" / "product"
+    assert get_product_specs_dir(self.root) == self.sd / "product"
 
   def test_get_decisions_dir(self) -> None:
-    """Returns repo_root / specify / decisions."""
-    assert get_decisions_dir(self.root) == self.root / "specify" / "decisions"
+    assert get_decisions_dir(self.root) == self.sd / "decisions"
 
   def test_get_policies_dir(self) -> None:
-    """Returns repo_root / specify / policies."""
-    assert get_policies_dir(self.root) == self.root / "specify" / "policies"
+    assert get_policies_dir(self.root) == self.sd / "policies"
 
   def test_get_standards_dir(self) -> None:
-    """Returns repo_root / specify / standards."""
-    assert get_standards_dir(self.root) == self.root / "specify" / "standards"
-
-
-class TestChangesHelpers(unittest.TestCase):
-  """Helper functions for change/ directory tree."""
-
-  def setUp(self) -> None:
-    """Set up a fake repo root for path composition tests."""
-    self.root = Path("/fake/repo")
-
-  def test_get_changes_dir(self) -> None:
-    """Returns repo_root / change."""
-    assert get_changes_dir(self.root) == self.root / "change"
+    assert get_standards_dir(self.root) == self.sd / "standards"
 
   def test_get_deltas_dir(self) -> None:
-    """Returns repo_root / change / deltas."""
-    assert get_deltas_dir(self.root) == self.root / "change" / "deltas"
+    assert get_deltas_dir(self.root) == self.sd / "deltas"
 
   def test_get_revisions_dir(self) -> None:
-    """Returns repo_root / change / revisions."""
-    assert get_revisions_dir(self.root) == self.root / "change" / "revisions"
+    assert get_revisions_dir(self.root) == self.sd / "revisions"
 
   def test_get_audits_dir(self) -> None:
-    """Returns repo_root / change / audits."""
-    assert get_audits_dir(self.root) == self.root / "change" / "audits"
-
-
-class TestBacklogHelpers(unittest.TestCase):
-  """Helper functions for backlog/ directory."""
+    assert get_audits_dir(self.root) == self.sd / "audits"
 
   def test_get_backlog_dir(self) -> None:
-    """Returns repo_root / backlog."""
-    root = Path("/fake/repo")
-    assert get_backlog_dir(root) == root / "backlog"
-
-
-class TestMemoryHelpers(unittest.TestCase):
-  """Helper functions for memory/ directory."""
+    assert get_backlog_dir(self.root) == self.sd / "backlog"
 
   def test_get_memory_dir(self) -> None:
-    """Returns repo_root / memory."""
-    root = Path("/fake/repo")
-    assert get_memory_dir(root) == root / "memory"
+    assert get_memory_dir(self.root) == self.sd / "memory"
 
 
 class TestHelperComposition(unittest.TestCase):
-  """Helpers compose correctly - subdirs build on parent helpers."""
+  """All content helpers are direct children of spec-driver root."""
 
   def setUp(self) -> None:
-    """Set up a fake repo root for composition tests."""
     self.root = Path("/fake/repo")
+    self.sd = get_spec_driver_root(self.root)
 
-  def test_tech_specs_is_child_of_specs(self) -> None:
-    """get_tech_specs_dir result is a child of get_specs_dir."""
-    specs = get_specs_dir(self.root)
-    tech = get_tech_specs_dir(self.root)
-    assert tech.parent == specs
-
-  def test_deltas_is_child_of_changes(self) -> None:
-    """get_deltas_dir result is a child of get_changes_dir."""
-    changes = get_changes_dir(self.root)
-    deltas = get_deltas_dir(self.root)
-    assert deltas.parent == changes
-
-  def test_decisions_is_child_of_specs(self) -> None:
-    """get_decisions_dir result is a child of get_specs_dir."""
-    specs = get_specs_dir(self.root)
-    decisions = get_decisions_dir(self.root)
-    assert decisions.parent == specs
+  def test_all_content_dirs_are_children_of_spec_driver_root(self) -> None:
+    """Every content helper resolves as a direct child of .spec-driver/."""
+    helpers = [
+      get_tech_specs_dir, get_product_specs_dir,
+      get_decisions_dir, get_policies_dir, get_standards_dir,
+      get_deltas_dir, get_revisions_dir, get_audits_dir,
+      get_backlog_dir, get_memory_dir,
+    ]
+    for helper in helpers:
+      result = helper(self.root)
+      assert result.parent == self.sd, (
+        f"{helper.__name__} resolves to {result}, "
+        f"expected parent {self.sd}"
+      )
 
 
 class TestInitPaths(unittest.TestCase):
   """init_paths(config) overrides module-level directory constants."""
 
   def tearDown(self) -> None:
-    """Restore defaults after each test."""
     reset_paths()
 
   def test_full_override(self) -> None:
-    """init_paths with all keys overrides every constant."""
     config = {
       "dirs": {
-        "specs": "specifications",
-        "changes": "modifications",
         "backlog": "inbox",
         "memory": "knowledge",
         "tech_specs": "technical",
@@ -251,8 +177,6 @@ class TestInitPaths(unittest.TestCase):
     }
     init_paths(config)
 
-    assert paths_mod.SPECS_DIR == "specifications"
-    assert paths_mod.CHANGES_DIR == "modifications"
     assert paths_mod.BACKLOG_DIR == "inbox"
     assert paths_mod.MEMORY_DIR == "knowledge"
     assert paths_mod.TECH_SPECS_SUBDIR == "technical"
@@ -269,63 +193,74 @@ class TestInitPaths(unittest.TestCase):
     assert paths_mod.RISKS_SUBDIR == "hazards"
 
   def test_partial_override(self) -> None:
-    """init_paths with partial dirs only overrides specified keys."""
-    config = {"dirs": {"specs": "specifications", "deltas": "patches"}}
+    config = {"dirs": {"deltas": "patches", "memory": "knowledge"}}
     init_paths(config)
 
-    assert paths_mod.SPECS_DIR == "specifications"
     assert paths_mod.DELTAS_SUBDIR == "patches"
+    assert paths_mod.MEMORY_DIR == "knowledge"
     # Non-overridden constants retain defaults
-    assert paths_mod.CHANGES_DIR == "change"
-    assert paths_mod.MEMORY_DIR == "memory"
+    assert paths_mod.BACKLOG_DIR == "backlog"
+    assert paths_mod.TECH_SPECS_SUBDIR == "tech"
 
   def test_missing_dirs_section(self) -> None:
-    """init_paths with no dirs key leaves defaults unchanged."""
     init_paths({"ceremony": "settler"})
-
-    assert paths_mod.SPECS_DIR == "specify"
-    assert paths_mod.CHANGES_DIR == "change"
+    assert paths_mod.BACKLOG_DIR == "backlog"
+    assert paths_mod.MEMORY_DIR == "memory"
 
   def test_empty_dirs_section(self) -> None:
-    """init_paths with empty dirs dict leaves defaults unchanged."""
     init_paths({"dirs": {}})
+    assert paths_mod.BACKLOG_DIR == "backlog"
+    assert paths_mod.MEMORY_DIR == "memory"
 
-    assert paths_mod.SPECS_DIR == "specify"
-    assert paths_mod.CHANGES_DIR == "change"
+  def test_unknown_key_warns(self) -> None:
+    """Unrecognized [dirs] keys emit a warning."""
+    with warnings.catch_warnings(record=True) as w:
+      warnings.simplefilter("always")
+      init_paths({"dirs": {"specs": "specify", "bogus": "value"}})
+
+    warning_messages = [str(x.message) for x in w]
+    assert any("specs" in m for m in warning_messages)
+    assert any("bogus" in m for m in warning_messages)
+
+  def test_removed_grouping_keys_warn(self) -> None:
+    """Former grouping keys (specs, changes) trigger warning."""
+    with warnings.catch_warnings(record=True) as w:
+      warnings.simplefilter("always")
+      init_paths({"dirs": {"specs": "specify", "changes": "change"}})
+
+    assert len(w) == 2
+    messages = [str(x.message) for x in w]
+    assert any("specs" in m for m in messages)
+    assert any("changes" in m for m in messages)
 
 
 class TestResetPaths(unittest.TestCase):
   """reset_paths() restores original default constants."""
 
   def tearDown(self) -> None:
-    """Safety net: always restore."""
     reset_paths()
 
   def test_restores_after_override(self) -> None:
-    """reset_paths undoes init_paths overrides."""
-    init_paths({"dirs": {"specs": "custom_specs", "changes": "custom_changes"}})
+    init_paths({"dirs": {"deltas": "custom_deltas", "memory": "custom_mem"}})
     reset_paths()
 
-    assert paths_mod.SPECS_DIR == "specify"
-    assert paths_mod.CHANGES_DIR == "change"
+    assert paths_mod.DELTAS_SUBDIR == "deltas"
+    assert paths_mod.MEMORY_DIR == "memory"
 
   def test_idempotent(self) -> None:
-    """Calling reset_paths without init_paths is safe."""
     reset_paths()
-    assert paths_mod.SPECS_DIR == "specify"
+    assert paths_mod.BACKLOG_DIR == "backlog"
 
 
 class TestCustomDirsHelpers(unittest.TestCase):
   """get_*_dir() helpers return paths using overridden constants."""
 
   def setUp(self) -> None:
-    """Set up custom dirs."""
     self.root = Path("/fake/repo")
+    self.sd = self.root / SPEC_DRIVER_DIR
     init_paths(
       {
         "dirs": {
-          "specs": "specifications",
-          "changes": "modifications",
           "backlog": "inbox",
           "memory": "knowledge",
           "tech_specs": "technical",
@@ -338,44 +273,28 @@ class TestCustomDirsHelpers(unittest.TestCase):
     )
 
   def tearDown(self) -> None:
-    """Restore defaults."""
     reset_paths()
 
-  def test_get_specs_dir_custom(self) -> None:
-    """get_specs_dir uses overridden SPECS_DIR."""
-    assert get_specs_dir(self.root) == self.root / "specifications"
-
-  def test_get_changes_dir_custom(self) -> None:
-    """get_changes_dir uses overridden CHANGES_DIR."""
-    assert get_changes_dir(self.root) == self.root / "modifications"
-
   def test_get_backlog_dir_custom(self) -> None:
-    """get_backlog_dir uses overridden BACKLOG_DIR."""
-    assert get_backlog_dir(self.root) == self.root / "inbox"
+    assert get_backlog_dir(self.root) == self.sd / "inbox"
 
   def test_get_memory_dir_custom(self) -> None:
-    """get_memory_dir uses overridden MEMORY_DIR."""
-    assert get_memory_dir(self.root) == self.root / "knowledge"
+    assert get_memory_dir(self.root) == self.sd / "knowledge"
 
   def test_get_tech_specs_dir_custom(self) -> None:
-    """get_tech_specs_dir uses overridden parent and subdir."""
-    assert get_tech_specs_dir(self.root) == self.root / "specifications" / "technical"
+    assert get_tech_specs_dir(self.root) == self.sd / "technical"
 
   def test_get_decisions_dir_custom(self) -> None:
-    """get_decisions_dir uses overridden parent and subdir."""
-    assert get_decisions_dir(self.root) == self.root / "specifications" / "adrs"
+    assert get_decisions_dir(self.root) == self.sd / "adrs"
 
   def test_get_deltas_dir_custom(self) -> None:
-    """get_deltas_dir uses overridden parent and subdir."""
-    assert get_deltas_dir(self.root) == self.root / "modifications" / "patches"
+    assert get_deltas_dir(self.root) == self.sd / "patches"
 
   def test_get_revisions_dir_custom(self) -> None:
-    """get_revisions_dir uses overridden parent and subdir."""
-    assert get_revisions_dir(self.root) == self.root / "modifications" / "revs"
+    assert get_revisions_dir(self.root) == self.sd / "revs"
 
   def test_get_audits_dir_custom(self) -> None:
-    """get_audits_dir uses overridden parent and subdir."""
-    assert get_audits_dir(self.root) == self.root / "modifications" / "reviews"
+    assert get_audits_dir(self.root) == self.sd / "reviews"
 
 
 if __name__ == "__main__":

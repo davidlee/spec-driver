@@ -59,8 +59,6 @@ DEFAULT_CONFIG: dict = {
     "claude_md": True,
   },
   "dirs": {
-    "specs": "specify",
-    "changes": "change",
     "backlog": "backlog",
     "memory": "memory",
     "tech_specs": "tech",

@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from supekku.scripts.lib.core.paths import get_changes_dir, get_tech_specs_dir
+from supekku.scripts.lib.core.paths import get_tech_specs_dir
 from supekku.scripts.lib.registry_migration import RegistryV2
 from supekku.scripts.lib.specs.index import SpecIndexBuilder
 
@@ -296,7 +296,6 @@ class DeletionValidator:
     """
     self.repo_root = repo_root
     self.tech_dir = get_tech_specs_dir(repo_root)
-    self.change_dir = get_changes_dir(repo_root)
     self.scanner = RegistryScanner(repo_root)
 
   def validate_spec_deletion(

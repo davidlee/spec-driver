@@ -2,10 +2,13 @@
 
 This module provides a single source of truth for all spec-driver workspace paths,
 making it easy to change directory names or structure without hunting through code.
+
+All content directories resolve as direct children of .spec-driver/ (DE-049).
 """
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 
 from .repo import find_repo_root
@@ -14,14 +17,7 @@ from .repo import find_repo_root
 
 SPEC_DRIVER_DIR = ".spec-driver"
 
-# --- Workspace root directories ---
-
-SPECS_DIR = "specify"
-CHANGES_DIR = "change"
-BACKLOG_DIR = "backlog"
-MEMORY_DIR = "memory"
-
-# --- Subdirectories within SPECS_DIR ---
+# --- Content subdirectories (direct children of .spec-driver/) ---
 
 TECH_SPECS_SUBDIR = "tech"
 PRODUCT_SPECS_SUBDIR = "product"
@@ -29,13 +25,14 @@ DECISIONS_SUBDIR = "decisions"
 POLICIES_SUBDIR = "policies"
 STANDARDS_SUBDIR = "standards"
 
-# --- Subdirectories within CHANGES_DIR ---
-
 DELTAS_SUBDIR = "deltas"
 REVISIONS_SUBDIR = "revisions"
 AUDITS_SUBDIR = "audits"
 
-# --- Subdirectories within BACKLOG_DIR ---
+BACKLOG_DIR = "backlog"
+MEMORY_DIR = "memory"
+
+# --- Subdirectories within backlog/ ---
 
 ISSUES_SUBDIR = "issues"
 PROBLEMS_SUBDIR = "problems"
@@ -45,8 +42,6 @@ RISKS_SUBDIR = "risks"
 # --- Config key → module constant name mapping ---
 
 _CONFIG_KEY_TO_CONSTANT: dict[str, str] = {
-  "specs": "SPECS_DIR",
-  "changes": "CHANGES_DIR",
   "backlog": "BACKLOG_DIR",
   "memory": "MEMORY_DIR",
   "tech_specs": "TECH_SPECS_SUBDIR",
@@ -73,8 +68,16 @@ def init_paths(config: dict) -> None:
   """Override module-level directory constants from config["dirs"].
 
   Safe to skip — helpers fall back to compiled defaults when not called.
+  Warns on unrecognized keys (catches removed keys, typos, reparenting surprises).
   """
   dirs = config.get("dirs", {})
+  for key in dirs:
+    if key not in _CONFIG_KEY_TO_CONSTANT:
+      warnings.warn(
+        f"Unknown [dirs] key '{key}' in config — ignored",
+        UserWarning,
+        stacklevel=2,
+      )
   for config_key, const_name in _CONFIG_KEY_TO_CONSTANT.items():
     if config_key in dirs:
       globals()[const_name] = dirs[config_key]
@@ -125,82 +128,63 @@ def get_package_skills_dir() -> Path:
   return Path(supekku.__file__).parent / "skills"
 
 
-# --- Workspace directory helpers: specify/ ---
-
-
-def get_specs_dir(repo_root: Path | None = None) -> Path:
-  """Get the specifications root directory."""
-  return _resolve_root(repo_root) / SPECS_DIR
+# --- Workspace content directory helpers ---
+# All resolve as direct children of .spec-driver/ (DE-049, DEC-049-02).
 
 
 def get_tech_specs_dir(repo_root: Path | None = None) -> Path:
   """Get the technical specifications directory."""
-  return get_specs_dir(repo_root) / TECH_SPECS_SUBDIR
+  return get_spec_driver_root(repo_root) / TECH_SPECS_SUBDIR
 
 
 def get_product_specs_dir(repo_root: Path | None = None) -> Path:
   """Get the product specifications directory."""
-  return get_specs_dir(repo_root) / PRODUCT_SPECS_SUBDIR
+  return get_spec_driver_root(repo_root) / PRODUCT_SPECS_SUBDIR
 
 
 def get_decisions_dir(repo_root: Path | None = None) -> Path:
   """Get the architecture decisions directory."""
-  return get_specs_dir(repo_root) / DECISIONS_SUBDIR
+  return get_spec_driver_root(repo_root) / DECISIONS_SUBDIR
 
 
 def get_policies_dir(repo_root: Path | None = None) -> Path:
   """Get the policies directory."""
-  return get_specs_dir(repo_root) / POLICIES_SUBDIR
+  return get_spec_driver_root(repo_root) / POLICIES_SUBDIR
 
 
 def get_standards_dir(repo_root: Path | None = None) -> Path:
   """Get the standards directory."""
-  return get_specs_dir(repo_root) / STANDARDS_SUBDIR
-
-
-# --- Workspace directory helpers: change/ ---
-
-
-def get_changes_dir(repo_root: Path | None = None) -> Path:
-  """Get the changes root directory."""
-  return _resolve_root(repo_root) / CHANGES_DIR
+  return get_spec_driver_root(repo_root) / STANDARDS_SUBDIR
 
 
 def get_deltas_dir(repo_root: Path | None = None) -> Path:
   """Get the deltas directory."""
-  return get_changes_dir(repo_root) / DELTAS_SUBDIR
+  return get_spec_driver_root(repo_root) / DELTAS_SUBDIR
 
 
 def get_revisions_dir(repo_root: Path | None = None) -> Path:
   """Get the revisions directory."""
-  return get_changes_dir(repo_root) / REVISIONS_SUBDIR
+  return get_spec_driver_root(repo_root) / REVISIONS_SUBDIR
 
 
 def get_audits_dir(repo_root: Path | None = None) -> Path:
   """Get the audits directory."""
-  return get_changes_dir(repo_root) / AUDITS_SUBDIR
-
-
-# --- Workspace directory helpers: backlog/ ---
+  return get_spec_driver_root(repo_root) / AUDITS_SUBDIR
 
 
 def get_backlog_dir(repo_root: Path | None = None) -> Path:
-  """Get the backlog root directory."""
-  return _resolve_root(repo_root) / BACKLOG_DIR
-
-
-# --- Workspace directory helpers: memory/ ---
+  """Get the backlog directory."""
+  return get_spec_driver_root(repo_root) / BACKLOG_DIR
 
 
 def get_memory_dir(repo_root: Path | None = None) -> Path:
   """Get the memory directory."""
-  return _resolve_root(repo_root) / MEMORY_DIR
+  return get_spec_driver_root(repo_root) / MEMORY_DIR
 
 
 __all__ = [
   "AUDITS_SUBDIR",
   "BACKLOG_DIR",
-  "CHANGES_DIR",
   "DECISIONS_SUBDIR",
   "DELTAS_SUBDIR",
   "IMPROVEMENTS_SUBDIR",
@@ -211,7 +195,6 @@ __all__ = [
   "PRODUCT_SPECS_SUBDIR",
   "REVISIONS_SUBDIR",
   "RISKS_SUBDIR",
-  "SPECS_DIR",
   "SPEC_DRIVER_DIR",
   "STANDARDS_SUBDIR",
   "TECH_SPECS_SUBDIR",
@@ -219,7 +202,6 @@ __all__ = [
   "get_agents_dir",
   "get_audits_dir",
   "get_backlog_dir",
-  "get_changes_dir",
   "get_decisions_dir",
   "get_deltas_dir",
   "get_memory_dir",
@@ -229,7 +211,6 @@ __all__ = [
   "get_registry_dir",
   "get_revisions_dir",
   "get_spec_driver_root",
-  "get_specs_dir",
   "get_standards_dir",
   "get_tech_specs_dir",
   "get_templates_dir",

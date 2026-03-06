@@ -9,9 +9,10 @@ import yaml
 from rich.console import Console
 
 from supekku.scripts.lib.core.paths import (
-  get_changes_dir,
+  get_audits_dir,
   get_deltas_dir,
   get_registry_dir,
+  get_revisions_dir,
 )
 from supekku.scripts.lib.core.repo import find_repo_root
 
@@ -20,10 +21,16 @@ from .artifacts import ChangeArtifact, load_change_artifact
 if TYPE_CHECKING:
   from pathlib import Path
 
-_KIND_TO_DIR = {
+_KIND_TO_DIR_NAME = {
   "delta": "deltas",
   "revision": "revisions",
   "audit": "audits",
+}
+
+_KIND_TO_DIR_HELPER = {
+  "delta": get_deltas_dir,
+  "revision": get_revisions_dir,
+  "audit": get_audits_dir,
 }
 
 _KIND_TO_PREFIX = {
@@ -37,13 +44,13 @@ class ChangeRegistry:
   """Registry for managing change artifacts of specific types."""
 
   def __init__(self, *, root: Path | None = None, kind: str) -> None:
-    if kind not in _KIND_TO_DIR:
+    if kind not in _KIND_TO_DIR_HELPER:
       msg = f"Unsupported change artifact kind: {kind}"
       raise ValueError(msg)
     self.kind = kind
     self.root = find_repo_root(root)
-    self.directory = get_changes_dir(self.root) / _KIND_TO_DIR[kind]
-    self.output_path = get_registry_dir(self.root) / f"{_KIND_TO_DIR[kind]}.yaml"
+    self.directory = _KIND_TO_DIR_HELPER[kind](self.root)
+    self.output_path = get_registry_dir(self.root) / f"{_KIND_TO_DIR_NAME[kind]}.yaml"
 
   def collect(self) -> dict[str, ChangeArtifact]:
     """Collect all change artifacts from directory.
@@ -88,7 +95,7 @@ class ChangeRegistry:
     """Synchronize registry file with artifacts found in directory."""
     artifacts = self.collect()
     serialised = {
-      _KIND_TO_DIR[self.kind]: {
+      _KIND_TO_DIR_NAME[self.kind]: {
         artifact_id: artifact.to_dict(self.root)
         for artifact_id, artifact in sorted(artifacts.items())
       },

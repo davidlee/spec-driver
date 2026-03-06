@@ -151,8 +151,9 @@ def test_defaults_have_expected_structure() -> None:
 def test_dirs_defaults_match_path_constants() -> None:
   """[dirs] defaults must mirror the constants in paths.py."""
   dirs = DEFAULT_CONFIG["dirs"]
-  assert dirs["specs"] == "specify"
-  assert dirs["changes"] == "change"
+  # Grouping keys (specs, changes) removed in DE-049
+  assert "specs" not in dirs
+  assert "changes" not in dirs
   assert dirs["backlog"] == "backlog"
   assert dirs["memory"] == "memory"
   assert dirs["tech_specs"] == "tech"
@@ -174,17 +175,16 @@ def test_dirs_partial_override_merges_with_defaults(tmp_path: Path) -> None:
   toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
   toml_path.parent.mkdir(parents=True)
   toml_path.write_text(
-    '[dirs]\nspecs = "specifications"\ndeltas = "patches"\n',
+    '[dirs]\ndeltas = "patches"\nmemory = "knowledge"\n',
     encoding="utf-8",
   )
 
   config = load_workflow_config(tmp_path)
 
-  assert config["dirs"]["specs"] == "specifications"
   assert config["dirs"]["deltas"] == "patches"
+  assert config["dirs"]["memory"] == "knowledge"
   # Non-overridden keys retain defaults
-  assert config["dirs"]["changes"] == "change"
-  assert config["dirs"]["memory"] == "memory"
+  assert config["dirs"]["backlog"] == "backlog"
   assert config["dirs"]["audits"] == "audits"
 
 

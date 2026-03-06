@@ -1,1 +1,0 @@
-../../../../../../../../../../.contracts/tests/supekku/scripts/lib/sync/adapters/zig_test.py.md

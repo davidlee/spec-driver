@@ -1,1 +1,0 @@
-../../../../../../../../../.contracts/tests/supekku/scripts/lib/memory/models_test.py.md

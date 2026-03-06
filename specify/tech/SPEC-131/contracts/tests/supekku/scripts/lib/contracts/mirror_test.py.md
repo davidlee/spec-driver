@@ -1,1 +1,0 @@
-../../../../../../../../../.contracts/tests/supekku/scripts/lib/contracts/mirror_test.py.md

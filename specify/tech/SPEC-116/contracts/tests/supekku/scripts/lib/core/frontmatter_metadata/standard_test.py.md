@@ -1,1 +1,0 @@
-../../../../../../../../../../.contracts/tests/supekku/scripts/lib/core/frontmatter_metadata/standard_test.py.md

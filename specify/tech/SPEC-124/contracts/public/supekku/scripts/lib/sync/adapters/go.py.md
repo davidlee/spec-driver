@@ -1,1 +1,0 @@
-../../../../../../../../../../.contracts/public/supekku/scripts/lib/sync/adapters/go.py.md

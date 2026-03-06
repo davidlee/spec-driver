@@ -1,1 +1,0 @@
-../../../../../../../../../.contracts/all/supekku/scripts/lib/requirements/lifecycle.py.md

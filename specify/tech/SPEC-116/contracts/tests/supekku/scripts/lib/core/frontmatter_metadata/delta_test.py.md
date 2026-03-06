@@ -1,1 +1,0 @@
-../../../../../../../../../../.contracts/tests/supekku/scripts/lib/core/frontmatter_metadata/delta_test.py.md

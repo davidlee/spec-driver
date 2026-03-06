@@ -1,1 +1,0 @@
-../../../../../../../../../.contracts/tests/supekku/scripts/lib/relations/manager_test.py.md

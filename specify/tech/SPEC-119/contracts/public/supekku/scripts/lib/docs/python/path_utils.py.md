@@ -1,1 +1,0 @@
-../../../../../../../../../../.contracts/public/supekku/scripts/lib/docs/python/path_utils.py.md

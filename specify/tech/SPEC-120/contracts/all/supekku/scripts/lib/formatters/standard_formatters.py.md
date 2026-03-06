@@ -1,1 +1,0 @@
-../../../../../../../../../.contracts/all/supekku/scripts/lib/formatters/standard_formatters.py.md

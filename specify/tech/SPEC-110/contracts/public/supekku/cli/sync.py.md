@@ -1,1 +1,0 @@
-../../../../../../../.contracts/public/supekku/cli/sync.py.md

@@ -1,1 +1,0 @@
-../../../../../../../../../.contracts/tests/supekku/scripts/lib/memory/links_test.py.md

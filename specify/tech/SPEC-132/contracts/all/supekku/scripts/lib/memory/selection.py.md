@@ -1,1 +1,0 @@
-../../../../../../../../../.contracts/all/supekku/scripts/lib/memory/selection.py.md

@@ -1,1 +1,0 @@
-../../../../../../../../../.contracts/public/supekku/scripts/lib/decisions/registry.py.md

@@ -1,1 +1,0 @@
-../../../../../../../.contracts/tests/supekku/cli/memory_test.py.md

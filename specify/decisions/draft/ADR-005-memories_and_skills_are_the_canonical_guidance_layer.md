@@ -1,1 +1,0 @@
-../ADR-005-memories_and_skills_are_the_canonical_guidance_layer.md

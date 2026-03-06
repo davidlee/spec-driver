@@ -1,1 +1,0 @@
-../../../../../../../../.contracts/public/supekku/scripts/cli/deterministic_ast_doc_generator.py.md

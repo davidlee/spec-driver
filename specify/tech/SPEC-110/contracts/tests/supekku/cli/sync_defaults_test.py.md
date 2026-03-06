@@ -1,1 +1,0 @@
-../../../../../../../.contracts/tests/supekku/cli/sync_defaults_test.py.md

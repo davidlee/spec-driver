@@ -1,1 +1,0 @@
-../../../../../../../.contracts/tests/supekku/cli/sync_test.py.md

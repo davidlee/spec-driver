@@ -1,1 +1,0 @@
-../../../../../../../../../../.contracts/public/supekku/scripts/lib/core/frontmatter_metadata/audit.py.md

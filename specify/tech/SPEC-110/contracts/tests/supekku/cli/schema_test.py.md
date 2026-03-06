@@ -1,1 +1,0 @@
-../../../../../../../.contracts/tests/supekku/cli/schema_test.py.md

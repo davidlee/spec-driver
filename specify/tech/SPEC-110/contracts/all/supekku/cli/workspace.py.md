@@ -1,1 +1,0 @@
-../../../../../../../.contracts/all/supekku/cli/workspace.py.md

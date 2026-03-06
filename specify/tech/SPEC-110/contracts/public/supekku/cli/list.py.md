@@ -1,1 +1,0 @@
-../../../../../../../.contracts/public/supekku/cli/list.py.md

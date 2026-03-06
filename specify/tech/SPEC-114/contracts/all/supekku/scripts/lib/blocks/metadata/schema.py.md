@@ -1,1 +1,0 @@
-../../../../../../../../../../.contracts/all/supekku/scripts/lib/blocks/metadata/schema.py.md

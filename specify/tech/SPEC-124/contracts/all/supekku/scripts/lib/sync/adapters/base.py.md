@@ -1,1 +1,0 @@
-../../../../../../../../../../.contracts/all/supekku/scripts/lib/sync/adapters/base.py.md

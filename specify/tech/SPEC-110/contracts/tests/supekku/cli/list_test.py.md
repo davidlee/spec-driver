@@ -1,1 +1,0 @@
-../../../../../../../.contracts/tests/supekku/cli/list_test.py.md

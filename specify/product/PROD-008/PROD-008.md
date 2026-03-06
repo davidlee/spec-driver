@@ -3,13 +3,13 @@ id: PROD-008
 slug: requirements-lifecycle-coherence
 name: Requirements Lifecycle Coherence
 created: '2025-11-03'
-updated: '2025-11-03'
+updated: '2026-03-06'
 status: draft
 kind: prod
 aliases: []
 relations: []
 guiding_principles:
-  - Keep a single canonical source of truth for requirement status.
+  - Specs own normative lifecycle truth; observed evidence triggers explicit reconciliation (ADR-008).
   - Make lifecycle shifts observable to both humans and agents.
   - Prefer explicit handoffs (spec ⇄ delta ⇄ audit) over implicit updates.
 assumptions:
@@ -82,7 +82,9 @@ entries:
 - **Problem / Purpose**: Requirements regularly fall out of sync between specs, the registry, deltas, and audits. This spec defines a single lifecycle contract so humans and agents always know which artefact is authoritative.
 - **Value Signals**: Registry accuracy ≥ 99%, zero “unknown” requirement states after delta close, audits raise actionable drift within one business day.
 - **Guiding Principles**: Frontmatter declares ownership and context; coverage blocks publish verified evidence; deltas and plans describe execution and must hand updates back into specs; audits observe reality and trigger reconciliation.
-- **Change History**: Initial draft assembled while adding verification coverage parser (2025-11-03).
+- **Change History**:
+  - 2025-11-03: Initial draft assembled while adding verification coverage parser.
+  - 2026-03-06: RE-031 — Aligned with ADR-008 normative/observed truth model; clarified registry as derived.
 
 ## 2. Stakeholders & Journeys
 - **Personas / Actors**:
@@ -106,11 +108,11 @@ The lifecycle contract capability ensures every lifecycle transition has an owni
 ### Functional Requirements
 
 
-- **FR-001**: The specs frontmatter and coverage block MUST be the authoritative record of each requirement’s lifecycle state and supporting evidence.
+- **FR-001**: The specs frontmatter and coverage block MUST be the authoritative record of each requirement’s *normative* lifecycle state and supporting evidence. Evidence overlays from deltas, audits, and contracts record *observed* truth and may disagree with the spec — such disagreement is drift to be reconciled explicitly, not a silent override (per ADR-008). The requirements registry is a derived projection of this data, not itself an authoritative source.
   *Verification*: VH-201 – Lifecycle walkthrough confirming spec updates after delta closure.
 - **FR-002**: Every delta that changes requirement behaviour MUST provide an implementation plan documenting planned VT/VA/VH artefacts and promote the final state back into the owning spec coverage block before completion.
   *Verification*: VA-320 – Validation session exercising the delta close checklist.
-- **FR-003**: Audits MUST reconcile observed behaviour against the spec coverage block and raise drift through validation warnings until the spec is corrected or follow-up work is scheduled.
+- **FR-003**: Audits MUST surface observed behaviour against the spec coverage block and raise drift through validation warnings until the spec is explicitly reconciled or follow-up work is scheduled. Audit findings do not silently override spec truth — they trigger explicit reconciliation (per ADR-008).
   *Verification*: VT-902 – Automated registry sync test simulating audit failure vs spec state.
 ### Non-Functional Requirements
 
@@ -129,7 +131,7 @@ The lifecycle contract capability ensures every lifecycle transition has an owni
 - **Data & Contracts**:
   - `supekku:verification.coverage@v1` — canonical mapping of requirement → VT/VA/VH artefacts.
   - `frontmatter.relations` — expresses dependencies and verification evidence at a coarse level.
-  - Registry sync contracts (`.spec-driver/registry/*.yaml`) — store lifecycle projections driven by coverage blocks.
+  - Registry sync contracts (`.spec-driver/registry/*.yaml`) — derived lifecycle projections aggregating normative data from specs and observed evidence from deltas/audits (per ADR-008, the registry is not itself authoritative).
 
 ## 5. Behaviour & Scenarios
 - **Primary Flows**:

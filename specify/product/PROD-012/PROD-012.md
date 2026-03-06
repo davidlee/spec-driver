@@ -3,7 +3,7 @@ id: PROD-012
 slug: code-contract-documentation
 name: Code Contract Documentation
 created: '2025-11-10'
-updated: '2025-11-10'
+updated: '2026-03-06'
 status: draft
 kind: prod
 aliases: [docgen, sync]
@@ -88,7 +88,7 @@ capabilities:
     name: Spec-Code Synchronization
     responsibilities:
       - Auto-generate tech spec stubs for uncovered code
-      - Store contracts within tech spec bundles
+      - Store contracts in the canonical contracts corpus (`.contracts/`)
       - Detect and report code changes not covered by specs
       - Support --check mode and --prune operations
       - Track git SHA of last sync to enable drift detection
@@ -96,8 +96,8 @@ capabilities:
     requirements: [PROD-012.FR-005, PROD-012.FR-006, PROD-012.FR-007, PROD-012.FR-008, PROD-012.FR-013, PROD-012.FR-014]
     summary: >-
       System maintains bidirectional links between code and specifications by
-      auto-stubbing specs for uncovered code and organizing contracts within
-      tech spec bundles, making coverage gaps immediately visible. Git SHA
+      auto-stubbing specs for uncovered code and writing contracts to the
+      canonical contracts corpus (`.contracts/`), making coverage gaps immediately visible. Git SHA
       tracking enables precise detection of code drift: last_sync shows when
       contracts were generated, last_review shows when spec was verified accurate,
       enabling diff between them to show exactly what needs to be accounted for.
@@ -121,13 +121,15 @@ capabilities:
       - Enable easy directory navigation between code and specs
     requirements: [PROD-012.FR-009, PROD-012.FR-010, PROD-012.FR-015, PROD-012.FR-016, PROD-012.FR-017, PROD-012.FR-018, PROD-012.NF-003]
     summary: >-
-      System provides multiple organizational views of contracts through symlink
-      trees and filtering, optimized for both human browsing and CLI tool usage.
-      Clean 1:1 code-to-spec mapping ensures every piece of code has exactly one
-      home, while bidirectional navigation tooling and intuitive symlink structures
-      make it effortless to move between code and documentation.
+      System provides multiple organizational views of contracts through the
+      canonical mirror-of-source corpus and optional derived navigation indexes,
+      optimized for both human browsing and CLI tool usage. Clean 1:1 code-to-spec
+      mapping ensures every piece of code has exactly one home, while bidirectional
+      navigation tooling makes it effortless to move between code and documentation.
+      Per ADR-007: mirror-of-source is primary; by-language/by-package trees are
+      derived navigation indexes that augment but do not compete with the corpus.
     success_criteria:
-      - Contracts accessible by-spec, by-language, and by-package
+      - Contracts accessible via mirror-of-source corpus and optional by-language/by-package indexes
       - Public/private/test contracts separable
       - ripgrep/fzf/bfs operations complete in <2s for typical repos
       - Symlink structures intuitive for first-time users
@@ -269,8 +271,8 @@ GIVEN legacy Python/TS/Go repository with no existing documentation
 WHEN developer runs `spec-driver sync` first time
 THEN system generates contracts for all code without errors
 AND creates stub specs for uncovered packages
-AND organizes contracts under specify/tech/*/contracts/
-AND provides by-language, by-package symlink views
+AND writes contracts to the canonical corpus at .contracts/
+AND optionally provides by-language, by-package navigation indexes
 AND developer can immediately ripgrep/browse contracts
 ```
 
@@ -347,7 +349,7 @@ See `supekku:spec.capabilities@v1` block above for detailed capability definitio
 - **FR-008**: System MUST provide `--prune` flag that removes stub specs only when manual specs exist covering same code
   *Verification*: VT-004 - Prune operation safety tests
 
-- **FR-009**: System MUST create symlink trees organizing contracts by-language and by-package under `specify/tech/by-**/` directories
+- **FR-009**: System MAY create derived navigation indexes organizing contracts by-language and by-package. These are augmentation views over the canonical mirror-of-source contracts corpus (`.contracts/`), not a competing canonical storage structure (per ADR-007 §5–6).
   *Verification*: VT-005 - Symlink structure tests
 
 - **FR-010**: System MUST support filtering contract output by visibility level (public/private/test)
@@ -372,7 +374,7 @@ See `supekku:spec.capabilities@v1` block above for detailed capability definitio
   *Verification*: VT-008 - Scope mapping tests
   *Note*: Ensures 1:1 mapping prevents ambiguity and coverage gaps
 
-- **FR-016**: Symlink tree structures (`by-language/` and `by-package/`) MUST be intuitive, easy to navigate, and follow unsurprising conventions matching developer mental models
+- **FR-016**: Contract navigation structures (mirror-of-source corpus and optional derived indexes) MUST be intuitive, easy to navigate, and follow unsurprising conventions matching developer mental models
   *Verification*: VH-002 - Navigation usability testing
 
 - **FR-017**: System MUST provide tooling to find corresponding spec from code file and vice-versa (bidirectional navigation)
@@ -431,12 +433,9 @@ spec-driver sync --check
 # Remove stub specs when manual specs exist
 spec-driver sync --prune
 
-# View contracts organized by language
-ls specify/tech/by-language/python/
-ls specify/tech/by-language/typescript/
-
-# View contracts organized by package
-ls specify/tech/by-package/supekku/scripts/lib/
+# Browse contracts via mirror-of-source corpus
+ls .contracts/public/supekku/scripts/lib/
+rg "Registry" .contracts/public/
 ```
 
 **Developer Workflow:**
@@ -449,7 +448,7 @@ ls specify/tech/by-package/supekku/scripts/lib/
 **Agent Workflow:**
 1. Search contracts via ripgrep instead of reading full source
 2. Verify signatures/types from deterministic, verifiable contracts
-3. Use by-language or by-package views for systematic exploration
+3. Use mirror-of-source corpus for systematic exploration
 4. Fall back to source only when implementation details needed
 
 ### Data & Contracts
@@ -458,27 +457,23 @@ ls specify/tech/by-package/supekku/scripts/lib/
 ```
 specify/tech/SPEC-042-authentication/
 ├── SPEC-042.md                    # Manual narrative spec
-├── SPEC-042.tests.md              # Testing companion
-└── contracts/
-    ├── auth-service.public.md     # Public API contracts
-    ├── auth-service.private.md    # Internal implementation contracts
-    └── auth-service.test.md       # Test helper contracts
+└── SPEC-042.tests.md              # Testing companion
+# Note: contracts live in the canonical corpus at .contracts/,
+# not in the spec bundle (per ADR-007)
 ```
 
-**Symlink Organization:**
+**Canonical Contracts Corpus (mirror-of-source, per ADR-007):**
 ```
-specify/tech/by-language/
-├── python/
-│   └── supekku/scripts/lib/decisions/ -> ../../../../SPEC-*/contracts/*.md
-├── typescript/
-│   └── src/components/ -> ../../../../SPEC-*/contracts/*.md
-└── go/
-    └── pkg/registry/ -> ../../../../SPEC-*/contracts/*.md
-
-specify/tech/by-package/
-└── supekku/scripts/lib/
-    ├── decisions/ -> ../../../../SPEC-*/contracts/*.md
-    └── changes/ -> ../../../../SPEC-*/contracts/*.md
+.contracts/
+├── public/                        # Public API contracts
+│   └── supekku/scripts/lib/
+│       ├── decisions/...
+│       └── formatters/...
+├── internal/                      # Internal implementation contracts
+│   └── supekku/scripts/lib/...
+├── api -> public                  # Idiom alias
+└── implementation -> internal     # Idiom alias
+# By-language/by-package indexes are optional derived navigation views
 ```
 
 **Contract Format (Example):**
@@ -516,8 +511,8 @@ Find decision by ID. Returns None if not found.
 3. For each language, parse AST and extract public/private interfaces
 4. Generate contract markdown preserving comments and types
 5. Map code to existing tech specs via metadata or create stubs
-6. Write contracts to `specify/tech/SPEC-*/contracts/*.md`
-7. Generate symlink trees under `by-language/` and `by-package/`
+6. Write contracts to the canonical contracts corpus at `.contracts/**` (mirror-of-source layout per ADR-007)
+7. Optionally generate by-language/by-package navigation indexes
 8. Report summary: specs created/updated, contracts generated
 
 **Flow 2: Coverage Check (FR-007)**
@@ -549,7 +544,7 @@ Find decision by ID. Returns None if not found.
      last_review: abc123  # When spec was last verified accurate
      last_sync: def456    # When contracts were last generated
    ```
-3. Runs `git diff abc123 def456 -- specify/tech/SPEC-042/contracts/` to see what changed since last review
+3. Runs `git diff abc123 def456 -- .contracts/` to see what changed since last review
 4. Diff shows: `authenticate(user)` became `authenticate(user, options)` and 3 other signature changes
 5. Developer updates SPEC-042 narrative to account for all 4 changes
 6. Developer marks spec as reviewed: `spec-driver review SPEC-042` (updates `last_review` to current HEAD)
@@ -562,7 +557,7 @@ Find decision by ID. Returns None if not found.
      last_review: old123  # 6 months ago
      last_sync: new789    # Today
    ```
-2. Agent runs `git diff old123 new789 -- specify/tech/SPEC-089/contracts/`
+2. Agent runs `git diff old123 new789 -- .contracts/` (filtered to relevant source paths)
 3. Diff shows 47 changed lines across 12 files - significant drift
 4. Agent reports to user: "SPEC-089 has significant unaccounted drift; last reviewed 6 months ago"
 5. User prioritizes SPEC-089 update based on drift magnitude
@@ -572,9 +567,8 @@ Find decision by ID. Returns None if not found.
 2. Runs `spec-driver find-spec src/auth/providers/oauth.ts`
 3. Output: `SPEC-042 (Authentication System)`
 4. Runs `spec-driver cd-spec` → navigates to `specify/tech/SPEC-042/`
-5. Reads SPEC-042.md, sees contracts in `contracts/` subdirectory
+5. Reads SPEC-042.md, finds contracts in `.contracts/` corpus via mirror-of-source paths
 6. Runs `spec-driver cd-code SPEC-042` → navigates back to code root for SPEC-042
-7. Developer can also use symlinks: `ls specify/tech/by-language/typescript/src/auth/`
 
 **Flow 8: Finding All Code for a Spec (FR-017)**
 1. Agent needs to understand what code SPEC-089 covers
@@ -586,15 +580,15 @@ Find decision by ID. Returns None if not found.
    supekku/scripts/lib/formatters/spec_formatters.py
    ```
 4. Agent can now read source files knowing complete scope
-5. Or use contracts: `ls specify/tech/SPEC-089/contracts/` for high-level view
+5. Or browse contracts: `ls .contracts/public/supekku/scripts/lib/formatters/` for high-level view
 
-**Flow 9: Symlink Navigation (FR-016)**
-1. Developer wants to see all Python formatting code
-2. Navigates to `specify/tech/by-language/python/`
-3. Sees directory structure mirroring source: `supekku/scripts/lib/formatters/`
-4. Each contract symlinks back to canonical location in spec bundle
+**Flow 9: Mirror-of-Source Navigation (FR-016)**
+1. Developer wants to see all Python formatting contracts
+2. Navigates to `.contracts/public/supekku/scripts/lib/formatters/`
+3. Sees directory structure mirroring source tree
+4. Contracts are real files in the canonical corpus (per ADR-007)
 5. Structure feels natural: same paths as in source code
-6. Developer can use standard tools: `bfs`, `tree`, `fzf`
+6. Developer can use standard tools: `rg`, `bfs`, `tree`, `fzf`
 
 ### Error Handling / Guards
 
@@ -858,7 +852,7 @@ See `supekku:verification.coverage@v1` YAML block for detailed mapping of verifi
 - **Question**: How should users interact with git SHA drift detection in practice?
 - **Context**: The critical comparison is `last_review` to `last_sync` (or HEAD): this shows exactly what code changes occurred since spec was last verified accurate and need to be accounted for
 - **Options**:
-  1. Manual workflow: User runs `git diff <last_review> <last_sync> -- specify/tech/SPEC-*/contracts/` to see changes
+  1. Manual workflow: User runs `git diff <last_review> <last_sync> -- .contracts/` to see changes
   2. CLI helper: `spec-driver drift SPEC-042` shows contract changes since last review with summary stats
   3. Review command: `spec-driver review SPEC-042` validates drift is acceptable, updates last_review SHA
   4. Automated staleness detection: CI flags specs where `last_review` significantly lags `last_sync`

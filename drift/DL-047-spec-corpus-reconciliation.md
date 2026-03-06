@@ -85,7 +85,7 @@ docs.
 
 ### DL-047.002: Contract write location — PROD-012 internal inconsistency
 
-- status: adjudicated
+- status: resolved
 - entry_type: contradiction
 - severity: significant
 - topic: contracts
@@ -112,7 +112,7 @@ docs.
 
 ### DL-047.003: Contract canonical location — PROD-005 vs PROD-012/014/ADR-003/CLAUDE.md
 
-- status: adjudicated
+- status: resolved
 - entry_type: contradiction
 - severity: significant
 - topic: contracts
@@ -155,7 +155,7 @@ docs.
 
 ### DL-047.004: Contract mirror tree — symlinks vs real files
 
-- status: adjudicated
+- status: resolved
 - entry_type: ambiguous_intent
 - severity: significant
 - topic: contracts
@@ -305,7 +305,7 @@ docs.
 
 ### DL-047.009: Requirement lifecycle authority — specs vs evidence overlays
 
-- status: adjudicated
+- status: resolved
 - entry_type: contradiction
 - severity: significant
 - topic: lifecycle
@@ -389,7 +389,7 @@ docs.
 
 ### DL-047.012: PROD-012 flows stale after FR-006 canonical storage revision
 
-- status: adjudicated
+- status: resolved
 - entry_type: missing_decision
 - severity: significant
 - topic: contracts
@@ -412,7 +412,7 @@ docs.
 
 ### DL-047.013: Missing decision — PROD-014 mirror tree vs PROD-012 symlink trees
 
-- status: adjudicated
+- status: resolved
 - entry_type: missing_decision
 - severity: significant
 - topic: contracts
@@ -522,7 +522,7 @@ docs.
 
 ### DL-047.017: Requirement lifecycle — specs vs requirements registry as source of truth
 
-- status: adjudicated
+- status: resolved
 - entry_type: ambiguous_intent
 - severity: significant
 - topic: lifecycle
@@ -553,7 +553,7 @@ docs.
 
 ### DL-047.018: PROD-009 baseline statuses "asserted" and "legacy_verified" — undefined
 
-- status: adjudicated
+- status: resolved
 - entry_type: ambiguous_intent
 - severity: cosmetic
 - topic: lifecycle

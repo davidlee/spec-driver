@@ -69,7 +69,7 @@ decisions:
   ADR-005:
     id: ADR-005
     title: 'ADR-005: Memories and skills are the canonical guidance layer'
-    status: draft
+    status: accepted
     path: specify/decisions/ADR-005-memories_and_skills_are_the_canonical_guidance_layer.md
     summary: Declare agent memories as the canonical conceptual guidance for spec-driver
       and skills as the canonical procedural guidance layer; reduce other documentation
@@ -112,8 +112,33 @@ decisions:
     id: ADR-007
     title: 'ADR-007: contracts are derived observed corpus with dedicated canonical
       storage'
-    status: draft
+    status: accepted
     path: specify/decisions/ADR-007-contracts_are_derived_observed_corpus_with_dedicated_canonical_storage.md
+    summary: Contracts are derived observation artefacts, not competing intent; they
+      belong in a dedicated canonical contracts corpus, while spec-bundle and index
+      paths remain derived compatibility or navigation views.
+    created: '2026-03-06'
+    updated: '2026-03-06'
+    reviewed: '2026-03-06'
+    specs:
+    - PROD-005
+    - PROD-012
+    - PROD-014
+    deltas:
+    - DE-047
+    related_decisions:
+    - ADR-003
+    - ADR-004
+    - ADR-006
+    tags:
+    - contracts
+    - architecture
+    - sync
+  ADR-008:
+    id: ADR-008
+    title: 'ADR-008: normative lifecycle truth and observed evidence reconciliation'
+    status: draft
+    path: specify/decisions/ADR-008-normative_lifecycle_truth_and_observed_evidence_reconciliation.md
     summary: ''
     created: '2026-03-06'
     updated: '2026-03-06'

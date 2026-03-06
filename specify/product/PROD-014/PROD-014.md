@@ -3,7 +3,7 @@ id: PROD-014
 slug: contract_mirror_tree_index
 name: Contract Mirror Tree Index
 created: '2026-02-20'
-updated: '2026-02-20'
+updated: '2026-03-06'
 status: draft
 kind: prod
 scope: Provide a canonical, mirror-of-source contracts corpus under `.contracts/` for discovery, search, and generation (including legacy “no spec yet” workflows).
@@ -205,6 +205,7 @@ entries:
 - **Change History**:
   - v1 mirror index implemented in DE-027 (symlink-based).
   - v2 follow-ups captured in RE-015 (canonical storage + sync-less generation + drift warnings).
+  - 2026-03-06: RE-035 — ADR-007 accepted; confirms PROD-014's mirror-of-source model as primary navigation. PROD-012 by-language/by-package trees are derived navigation indexes that augment, not compete (ADR-007 §5–6).
 
 ## 2. Stakeholders & Journeys
 - **Personas / Actors**:
@@ -340,6 +341,7 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
 - **Open Decisions / Questions**:
   - Clarify which legacy paths remain supported once `.contracts/` is canonical storage (FR-011).
   - Decide whether “sync-less generate all” updates the registry (discoverability) or stays purely “no-spec corpus” (clean legacy onboarding).
+  - ~~Does mirror-of-source replace or augment PROD-012 by-* trees?~~ **Resolved by ADR-007**: mirror-of-source is primary; by-* trees augment as derived indexes.
 
 ## Appendices (Optional)
 - Glossary, detailed research, extended API examples, migration history, etc.

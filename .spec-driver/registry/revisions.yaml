@@ -294,3 +294,39 @@ revisions:
     slug: clarify_generated_vs_user_owned_doc_semantics_in_prod_016
     updated: '2026-03-06'
     path: change/revisions/RE-030-clarify_generated_vs_user_owned_doc_semantics_in_prod_016/RE-030.md
+  RE-031:
+    kind: revision
+    status: completed
+    name: Align PROD-008 with ADR-008 normative lifecycle truth model
+    slug: align_prod_008_with_adr_008_normative_lifecycle_truth_model
+    updated: '2026-03-06'
+    path: change/revisions/RE-031-align_prod_008_with_adr_008_normative_lifecycle_truth_model/RE-031.md
+  RE-032:
+    kind: revision
+    status: completed
+    name: 'Align PROD-009 with ADR-008: replace timestamp precedence with explicit
+      reconciliation'
+    slug: align_prod_009_with_adr_008_replace_timestamp_precedence_with_explicit_reconciliation
+    updated: '2026-03-06'
+    path: change/revisions/RE-032-align_prod_009_with_adr_008_replace_timestamp_precedence_with_explicit_reconciliation/RE-032.md
+  RE-033:
+    kind: revision
+    status: completed
+    name: Align PROD-005 Decision 3 with ADR-007 canonical contracts storage
+    slug: align_prod_005_decision_3_with_adr_007_canonical_contracts_storage
+    updated: '2026-03-06'
+    path: change/revisions/RE-033-align_prod_005_decision_3_with_adr_007_canonical_contracts_storage/RE-033.md
+  RE-034:
+    kind: revision
+    status: completed
+    name: Align PROD-012 flows and examples with ADR-007 canonical contracts storage
+    slug: align_prod_012_flows_and_examples_with_adr_007_canonical_contracts_storage
+    updated: '2026-03-06'
+    path: change/revisions/RE-034-align_prod_012_flows_and_examples_with_adr_007_canonical_contracts_storage/RE-034.md
+  RE-035:
+    kind: revision
+    status: completed
+    name: 'Align PROD-014 with ADR-007: confirm mirror-of-source as primary navigation'
+    slug: align_prod_014_with_adr_007_confirm_mirror_of_source_as_primary_navigation
+    updated: '2026-03-06'
+    path: change/revisions/RE-035-align_prod_014_with_adr_007_confirm_mirror_of_source_as_primary_navigation/RE-035.md

@@ -3,7 +3,7 @@ id: PROD-005
 slug: python-package-level-specs
 name: Python Package-Level Specs
 created: '2025-11-02'
-updated: '2025-11-02'
+updated: '2026-03-06'
 status: active
 kind: prod
 aliases: []
@@ -168,6 +168,7 @@ entries:
 
 - **Change History**:
   - 2025-11-02: Initial spec establishing Python package-level granularity pattern
+  - 2026-03-06: RE-033 — Updated Decision 3 to reflect ADR-007 canonical contracts storage at `.contracts/`
 
 ## 2. Stakeholders & Journeys
 
@@ -529,9 +530,9 @@ sources:
 - **Leaning**: A (orphaned/error) - deliberate package structure change should be deliberate spec change
 
 **Decision 3**: Should contract variants live in package or spec directory?
-- **Context**: Currently contracts in `specify/tech/SPEC-XXX/contracts/`, could be near code
-- **Options**: (A) Keep in spec dir (current) (B) Near code (e.g., `supekku/formatters/.spec/contracts/`)
-- **Decision**: A (keep current) - separation of code and documentation, already working
+- **Context**: Originally contracts in `specify/tech/SPEC-XXX/contracts/`; later moved to dedicated canonical corpus.
+- **Options**: (A) Keep in spec dir (original) (B) Near code (C) Dedicated canonical corpus at `.contracts/`
+- **Decision**: C — ADR-007 (accepted) establishes `.contracts/**` as the canonical contracts corpus. Spec-bundle paths (`SPEC-*/contracts/`) are compatibility views only. Contracts are derived observation artefacts, always safe to delete and regenerate.
 
 ## Appendices (Optional)
 

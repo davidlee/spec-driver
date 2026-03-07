@@ -139,6 +139,43 @@ Uncommitted. Ready for commit.
 - `.gitignore` for `.spec-driver/run/`
 - Acceptance test against real app
 
+## Phase 2 implementation — 2026-03-07
+
+### Done
+
+All five tasks complete:
+
+- **2.1 — record_artifact() wiring**: Added `record_artifact()` calls to 6 files:
+  `changes/creation.py` (delta, revision, audit, phase), `decisions/creation.py`
+  (ADR), `memory/creation.py`, `specs/creation.py`, `policies/creation.py`,
+  `complete_delta.py` (completion revision)
+- **2.2 — startup.sh session extraction**: Rewrote hook to read stdin into
+  `$INPUT`, extract `session_id` via Python, export via `CLAUDE_ENV_FILE`
+- **2.3 — .gitignore via install**: Added `_ensure_gitignore_entry()` to
+  `install.py`, called during `initialize_workspace()` for `.spec-driver/run/`
+- **2.4 — Tests**: 7 new tests (VT-052-09: 3 wiring tests, VT-052-11: 4
+  gitignore tests). VT-052-10 (startup.sh) and VT-052-12 (acceptance) are
+  shell-level tests not covered in pytest.
+- **2.5 — Lint and test**: 2737 passed, ruff clean, pylint 9.79/10
+
+### Notes
+
+- VT-052-10 (startup.sh stdin/session extraction) is a shell-level test.
+  Manual verification: the hook reads stdin JSON, extracts session_id, exports
+  to CLAUDE_ENV_FILE, and outputs boot prompt to stdout.
+- VT-052-12 (full acceptance) deferred — requires running the real CLI and
+  checking the events log. The unit tests (VT-052-01 through VT-052-09) cover
+  the same paths at a lower level.
+- Install has no existing `.gitignore` management — `_ensure_gitignore_entry()`
+  is a new pattern that could be reused for other entries in the future.
+
+### Verification
+
+- `ruff check` — clean
+- `pytest` — 2737 passed, 3 skipped
+- `pylint` — 9.79/10
+- Uncommitted.
+
 ### Relevant memories
 
 - `mem.pattern.events.cli-middleware` — the process-boundary wrapper pattern

@@ -2,7 +2,7 @@
 id: ISSUE-009
 name: Status fields lack enums and need systematic review
 created: '2025-11-02'
-updated: '2025-11-02'
+updated: '2026-03-07'
 status: open
 kind: issue
 categories:
@@ -82,7 +82,47 @@ Needs systematic review and design for:
 - [ ] Migration strategy for existing documents
 - [ ] Documentation of status semantics and lifecycle
 
+## Audit (2026-03-07)
+
+### Backlog item statuses: schema vs theme vs reality
+
+Frontmatter schemas (`spec-driver schema show frontmatter.{issue,problem,risk}`)
+define `status` as free-form string (`"pattern": ".+"`). No enums.
+
+**Theme styles** (`theme.py:68-84`) define colours for these statuses:
+
+| Kind | Styled statuses |
+|------|----------------|
+| issue | `open`, `in-progress`, `resolved`, `closed` |
+| problem | `captured`, `analyzed` |
+| improvement | `idea`, `planned`, `implemented` |
+| risk | `suspected` (no style!), `confirmed`, `mitigated` |
+
+**Actually in use** (from backlog items on disk):
+
+| Kind | Statuses in use |
+|------|----------------|
+| issue | `open`, `in-progress`, `done`, `resolved`, `implemented` |
+| problem | `captured` |
+| improvement | `idea`, `in-progress` |
+| risk | `mitigated` |
+
+**Gaps found**:
+- `done` and `implemented` used on issues but not styled
+- `in-progress` used on improvements but not styled (only `planned` is)
+- `suspected` is the risk default but has no theme style
+- `closed` and `analyzed` are styled but never used
+- Schema examples hint at statuses (`triaged`, `validated`) that are neither
+  styled nor used
+
+### Downstream impact
+
+IMPR-010 proposes that `list backlog -p` checkboxes should reflect item status.
+Without defined enums, the checkbox mapping (which statuses are "done"?) is
+a design choice with no canonical answer.
+
 ## Related
 
 - Discovered during: DE-005 (implement spec backfill)
 - Related to: PROD-001 (spec creation), frontmatter validation architecture
+- Downstream: IMPR-010 (backlog prioritize UX — status-aware checkboxes)

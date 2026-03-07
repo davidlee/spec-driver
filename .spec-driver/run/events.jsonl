@@ -1,2 +1,21 @@
 {"v":1,"ts":"2026-03-07T03:29:04.103826+00:00","session":null,"cmd":"sync","argv":["sync"],"artifacts":[],"exit_code":0,"status":"ok"}
 {"v":1,"ts":"2026-03-07T03:29:48.771407+00:00","session":"claude","cmd":"create delta","argv":["create","delta","fix validator backlog ID resolution and make registry syncs always-on"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:33:26.829762+00:00","session":null,"cmd":"sync","argv":["sync"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:34:38.165765+00:00","session":"claude","cmd":"create phase","argv":["create","phase","Integration: startup.sh, record_artifact wiring, gitignore","--plan","IP-052"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:35:21.550658+00:00","session":null,"cmd":"list backlog","argv":["list","backlog"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:36:04.415705+00:00","session":null,"cmd":"list backlog","argv":["list","backlog","-p"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:36:12.355776+00:00","session":null,"cmd":"list backlog","argv":["list","backlog","-r","test"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:38:23.360898+00:00","session":"claude","cmd":"list backlog","argv":["list","backlog","--json"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:38:26.062046+00:00","session":"claude","cmd":"list backlog","argv":["list","backlog","--json"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:38:29.547906+00:00","session":"claude","cmd":"list backlog","argv":["list","backlog","--json"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:39:10.918577+00:00","session":"claude","cmd":"schema list","argv":["schema","list"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:39:14.653901+00:00","session":"claude","cmd":"schema show","argv":["schema","show","frontmatter.issue"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:39:21.238211+00:00","session":"claude","cmd":"schema show","argv":["schema","show","frontmatter.problem"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:39:21.428597+00:00","session":"claude","cmd":"schema show","argv":["schema","show","frontmatter.risk"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:40:55.584164+00:00","session":null,"cmd":"show issue","argv":["show","issue","009"],"artifacts":[],"exit_code":1,"status":"error"}
+{"v":1,"ts":"2026-03-07T03:41:07.528669+00:00","session":null,"cmd":"show issue","argv":["show","issue","ISSUE-009"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:41:21.798693+00:00","session":null,"cmd":"view issue","argv":["view","issue","ISSUE-009"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:42:39.614882+00:00","session":"claude","cmd":"create improvement","argv":["create","improvement","backlog prioritize UX: status-aware checkboxes and status toggling"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:44:15.922922+00:00","session":null,"cmd":"list backlog","argv":["list","backlog","-a"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:44:20.890148+00:00","session":null,"cmd":"show issue","argv":["show","issue","ISSUE-009","--raw"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:44:20.892302+00:00","session":null,"cmd":"show issue","argv":["show","issue","ISSUE-009","--path"],"artifacts":[],"exit_code":0,"status":"ok"}

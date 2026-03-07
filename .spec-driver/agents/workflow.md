@@ -1,6 +1,6 @@
 # Workflow
 
-Ceremony mode: **settler**
+Ceremony mode: **town_planner**
 
 ## Workflow Stance
 

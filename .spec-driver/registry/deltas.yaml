@@ -6113,7 +6113,7 @@ deltas:
             real terminal
   DE-054:
     kind: delta
-    status: draft
+    status: completed
     name: 'Delta - TUI track mode: real-time agent session following'
     slug: tui_track_mode_real_time_agent_session_following
     updated: '2026-03-07'
@@ -6139,7 +6139,8 @@ deltas:
         plan: IP-054
         delta: DE-054
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-054
         specs:
           primary: []
           collaborators: []
@@ -6147,10 +6148,102 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-054-P01
+        - id: IP-054.PHASE-01
+        - id: IP-054.PHASE-02
       phases:
-      - id: IP-054-P01
-        phase: IP-054-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-054.PHASE-01
+        plan: IP-054
+        delta: DE-054
+        objective: 'Implement the EventListener abstraction: socket probe, bind/log-tail
+          mode selection, JSONL replay with bounded read, bootstrap drain sequence,
+          and TrackEvent message posting. Fully testable without Textual widgets.'
+        entrance_criteria:
+        - DR-054 reviewed and findings incorporated
+        - DE-052 completed (events.py emitter exists)
+        - DE-053 completed (watchfiles is a dependency)
+        exit_criteria:
+        - event_listener.py passes VT-054-01 through VT-054-04
+        - just passes (lint + test)
+        verification:
+          tests:
+          - VT-054-01
+          - VT-054-02
+          - VT-054-03
+          - VT-054-04
+          evidence: []
+        tasks:
+        - id: P01-T1
+          description: "JSONL replay \u2014 read last N lines, parse, skip malformed"
+        - id: P01-T2
+          description: "Socket probe \u2014 detect live/stale/absent socket"
+        - id: P01-T3
+          description: "Socket-mode listener \u2014 pre-bound SOCK_DGRAM, asyncio\
+            \ protocol, TrackEvent posting"
+        - id: P01-T4
+          description: "Log-tail-mode listener \u2014 directory watch, offset tracking,\
+            \ line parsing"
+        - id: P01-T5
+          description: "Bootstrap drain \u2014 record offset at replay EOF, drain\
+            \ after listener start"
+        - id: P01-T6
+          description: "EventListener public API \u2014 start/stop/replay_events,\
+            \ mode selection"
+        - id: P01-T7
+          description: Tests for VT-054-01 through VT-054-04
+        risks:
+        - description: macOS socket probe errno may differ
+          mitigation: Defensive fallback to log-tail on unexpected OSError
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-054.PHASE-02
+        plan: IP-054
+        delta: DE-054
+        objective: Build TrackScreen, TrackPanel, SessionList widgets. Integrate EventListener
+          into SpecDriverApp with toggle keybinding and cross-screen artifact navigation.
+          Add theme styles and layout CSS.
+        entrance_criteria:
+        - Phase 1 complete (EventListener passes VT-054-01..04)
+        - just green
+        exit_criteria:
+        - VT-054-05 through VT-054-08 passing
+        - VH-054-01 and VH-054-02 attested
+        - just passes (lint + test)
+        verification:
+          tests:
+          - VT-054-05
+          - VT-054-06
+          - VT-054-07
+          - VT-054-08
+          evidence:
+          - VH-054-01
+          - VH-054-02
+        tasks:
+        - id: P02-T1
+          description: Theme style keys for track view (theme.py)
+        - id: P02-T2
+          description: TrackPanel widget (RichLog, event formatting)
+        - id: P02-T3
+          description: SessionList widget (session discovery, colour assignment, filtering)
+        - id: P02-T4
+          description: TrackScreen (2-panel layout, message handling, event buffer)
+        - id: P02-T5
+          description: ArtifactSnapshot.find_entry() cross-type lookup
+        - id: P02-T6
+          description: BrowserScreen.navigate_to_artifact() method
+        - id: P02-T7
+          description: App integration (toggle binding, listener lifecycle, navigate
+            action)
+        - id: P02-T8
+          description: TrackScreen layout CSS (theme.tcss)
+        - id: P02-T9
+          description: Tests VT-054-05..08
+        - id: P02-T10
+          description: VH-054-01 and VH-054-02 manual attestation
+        risks:
+        - description: RichLog max_lines with wrap
+          mitigation: wrap=False enforced, single-line events
   DE-055:
     kind: delta
     status: in-progress
@@ -6764,7 +6857,8 @@ deltas:
         delta: DE-058
         objective: Author a lint-governance standard, fix recursive pylint test-file
           ignores, and verify repo-level lint output remains authoritative and more
-          useful.
+          useful, including a compact reporting workflow for touched files and full-repo
+          runs.
         entrance_criteria:
         - Delta and DR reviewed
         - Existing pylint configuration inspected
@@ -6772,12 +6866,14 @@ deltas:
         - STD-002 authored with concrete guidance
         - Recursive test-file ignore patterns updated in pyproject.toml
         - Repo-level pylint verification captured
+        - Compact summary targets implemented and validated
         verification:
           tests:
           - just pylint
           evidence:
           - VA-DE-058-001
           - VA-DE-058-002
+          - VA-DE-058-003
         tasks:
         - id: '1.1'
           title: Author STD-002 with lint prioritization and anti-rationalization
@@ -6789,6 +6885,46 @@ deltas:
         - id: '1.3'
           title: Run repo-level pylint and capture outcome
           status: done
+        - id: '1.4'
+          title: Implement compact pylint summary workflow
+          status: done
+        - id: '1.5'
+          title: Validate full-report and touched-file targets
+          status: done
         risks:
         - Recursive glob matches unintended files outside tests
         - Standard wording weakens repo-level lint expectations if phrased imprecisely
+  DE-059:
+    kind: delta
+    status: completed
+    name: Delta - TUI auto-follow active agent session on startup
+    slug: tui_auto_follow_active_agent_session_on_startup
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-059-tui_auto_follow_active_agent_session_on_startup/DE-059.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: depends-on
+      target: DE-054
+      attributes: {}
+    plan:
+      id: IP-059
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-059
+        delta: DE-059
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-059.PHASE-01
+      phases:
+      - id: IP-059.PHASE-01
+        phase: IP-059.PHASE-01

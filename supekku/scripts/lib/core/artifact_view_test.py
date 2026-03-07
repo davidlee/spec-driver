@@ -14,6 +14,7 @@ from supekku.scripts.lib.core.artifact_view import (
   ArtifactSnapshot,
   ArtifactType,
   ArtifactTypeMeta,
+  _detect_bundle_dir,
   adapt_record,
 )
 from supekku.scripts.lib.core.paths import BACKLOG_DIR, SPEC_DRIVER_DIR
@@ -35,6 +36,7 @@ class TestArtifactEntry:
     assert entry.status == "active"
     assert entry.artifact_type == ArtifactType.SPEC
     assert entry.error is None
+    assert entry.bundle_dir is None
 
   def test_error_entry(self):
     entry = ArtifactEntry(
@@ -46,6 +48,95 @@ class TestArtifactEntry:
       error="Failed to load",
     )
     assert entry.error == "Failed to load"
+
+  def test_bundle_dir_field(self):
+    entry = ArtifactEntry(
+      id="DE-061",
+      title="Delta",
+      status="draft",
+      path=Path("/deltas/DE-061-slug/DE-061.md"),
+      artifact_type=ArtifactType.DELTA,
+      bundle_dir=Path("/deltas/DE-061-slug"),
+    )
+    assert entry.bundle_dir == Path("/deltas/DE-061-slug")
+
+
+class TestDetectBundleDir:
+  """_detect_bundle_dir identifies bundle directories by artifact ID (VT-061-01)."""
+
+  def test_bundle_dir_detected(self, tmp_path):
+    bundle = tmp_path / "DE-061-slug"
+    bundle.mkdir()
+    primary = bundle / "DE-061.md"
+    primary.write_text("# Delta\n", encoding="utf-8")
+    assert _detect_bundle_dir("DE-061", primary) == bundle
+
+  def test_non_bundle_returns_none(self, tmp_path):
+    shared = tmp_path / "decisions"
+    shared.mkdir()
+    file = shared / "ADR-001-title.md"
+    file.write_text("# ADR\n", encoding="utf-8")
+    assert _detect_bundle_dir("ADR-001", file) is None
+
+  def test_empty_id_returns_none(self, tmp_path):
+    bundle = tmp_path / "DE-061-slug"
+    bundle.mkdir()
+    primary = bundle / "DE-061.md"
+    primary.write_text("# Delta\n", encoding="utf-8")
+    assert _detect_bundle_dir("", primary) is None
+
+  def test_nonexistent_parent_returns_none(self):
+    path = Path("/nonexistent/DE-001-slug/DE-001.md")
+    assert _detect_bundle_dir("DE-001", path) is None
+
+  def test_spec_bundle_detected(self, tmp_path):
+    bundle = tmp_path / "SPEC-042-core"
+    bundle.mkdir()
+    primary = bundle / "SPEC-042.md"
+    primary.write_text("# Spec\n", encoding="utf-8")
+    assert _detect_bundle_dir("SPEC-042", primary) == bundle
+
+  def test_partial_id_mismatch(self, tmp_path):
+    """Parent name must start with the full ID, not a prefix of it."""
+    bundle = tmp_path / "DE-06-wrong"
+    bundle.mkdir()
+    primary = bundle / "DE-061.md"
+    primary.write_text("# Delta\n", encoding="utf-8")
+    assert _detect_bundle_dir("DE-061", primary) is None
+
+
+class TestAdaptRecordBundleDir:
+  """adapt_record populates bundle_dir when applicable (VT-061-01)."""
+
+  def test_adapt_delta_in_bundle(self, tmp_path):
+    bundle = tmp_path / "DE-061-slug"
+    bundle.mkdir()
+    primary = bundle / "DE-061.md"
+    primary.write_text("# Delta\n", encoding="utf-8")
+
+    record = MagicMock()
+    record.id = "DE-061"
+    record.name = "TUI bundle"
+    record.status = "draft"
+    record.path = primary
+
+    entry = adapt_record(record, ArtifactType.DELTA)
+    assert entry.bundle_dir == bundle
+
+  def test_adapt_non_bundle_artifact(self, tmp_path):
+    shared = tmp_path / "decisions"
+    shared.mkdir()
+    file = shared / "ADR-001-title.md"
+    file.write_text("# ADR\n", encoding="utf-8")
+
+    record = MagicMock()
+    record.id = "ADR-001"
+    record.title = "Decision"
+    record.status = "accepted"
+    record.path = file
+
+    entry = adapt_record(record, ArtifactType.ADR)
+    assert entry.bundle_dir is None
 
 
 class TestArtifactGroup:

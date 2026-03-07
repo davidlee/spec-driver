@@ -20,15 +20,21 @@ class PreviewPanel(VerticalScroll):
   def compose(self):
     yield Markdown(id="preview-markdown")
 
+  _MARKDOWN_SUFFIXES = frozenset((".md", ".markdown"))
+
   def show_artifact(self, path: Path) -> None:
     """Load and display the artifact file at the given path."""
+    md = self.query_one("#preview-markdown", Markdown)
+    if path.suffix not in self._MARKDOWN_SUFFIXES:
+      md.update(f"*Non-markdown file:* `{path.name}`")
+      return
     try:
       content = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
       logger.warning("Failed to read %s: %s", path, exc)
       content = f"*Could not load:* `{path}`\n\n`{exc}`"
     content = _FRONTMATTER_RE.sub("", content)
-    self.query_one("#preview-markdown", Markdown).update(content)
+    md.update(content)
 
   def clear_preview(self) -> None:
     """Reset to empty state."""

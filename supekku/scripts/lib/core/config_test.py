@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import tomllib
 from pathlib import Path
 from unittest.mock import patch
 
@@ -11,6 +12,7 @@ from supekku.scripts.lib.core.config import (
   DEFAULT_CONFIG,
   _is_project_dependency,
   detect_exec_command,
+  generate_default_workflow_toml,
   is_strict_mode,
   load_workflow_config,
 )
@@ -327,6 +329,89 @@ class TestIsProjectDependency:
     """Returns False on malformed pyproject.toml."""
     (tmp_path / "pyproject.toml").write_text("[[invalid", encoding="utf-8")
     assert _is_project_dependency(tmp_path) is False
+
+
+# --- generate_default_workflow_toml tests ---
+
+
+class TestGenerateDefaultWorkflowToml:
+  """Tests for the default workflow.toml template generator."""
+
+  def test_contains_all_default_config_keys(self) -> None:
+    """Every key in DEFAULT_CONFIG appears in the generated template."""
+    template = generate_default_workflow_toml()
+    for key, val in DEFAULT_CONFIG.items():
+      if isinstance(val, dict):
+        assert f"[{key}]" in template, f"missing section [{key}]"
+        for sub_key in val:
+          assert sub_key in template, f"missing key {key}.{sub_key}"
+      else:
+        assert key in template, f"missing top-level key {key}"
+
+  def test_uncommented_is_valid_toml(self) -> None:
+    """Stripping single-# config comments yields valid TOML.
+
+    Prose comments use ## and stay as TOML comments when config lines
+    (single #) are uncommented.
+    """
+    template = generate_default_workflow_toml()
+    uncommented_lines = []
+    for line in template.splitlines():
+      if line.startswith("## ") or line == "##":
+        # Prose comment — keep as TOML comment
+        uncommented_lines.append(line)
+      elif line.startswith("# "):
+        uncommented_lines.append(line[2:])
+      else:
+        uncommented_lines.append(line)
+    toml_text = "\n".join(uncommented_lines)
+    parsed = tomllib.loads(toml_text)
+    # Verify a sample of parsed values match defaults
+    assert parsed["ceremony"] == "pioneer"
+    assert parsed["cards"]["enabled"] is True
+    assert parsed["dirs"]["memory"] == "memory"
+
+  def test_tool_section_is_uncommented(self) -> None:
+    """The [tool] section is active (not commented) since exec is install-specific."""
+    template = generate_default_workflow_toml("custom-cmd")
+    assert "[tool]" in template
+    assert "# [tool]" not in template
+    assert 'exec = "custom-cmd"' in template
+
+  def test_exec_cmd_substitution(self) -> None:
+    """The exec_cmd argument is used in the [tool] section."""
+    template = generate_default_workflow_toml("uvx spec-driver")
+    assert 'exec = "uvx spec-driver"' in template
+
+  def test_other_sections_are_commented(self) -> None:
+    """All sections except [tool] are commented out with single #."""
+    template = generate_default_workflow_toml()
+    for key, val in DEFAULT_CONFIG.items():
+      if key == "tool" or not isinstance(val, dict):
+        continue
+      # Section header should be commented with single #
+      assert f"# [{key}]" in template, f"[{key}] should be commented"
+
+  def test_has_explanatory_comments(self) -> None:
+    """Template includes human-readable prose comments (## prefix)."""
+    template = generate_default_workflow_toml()
+    # Check a few signature phrases from _SECTION_COMMENTS
+    assert "## Ceremony mode" in template
+    assert "governance posture" in template
+    assert "## Kanban-style" in template
+    assert "## Generated API contracts" in template
+
+  def test_roundtrip_through_load(self, tmp_path: Path) -> None:
+    """Generated template loads correctly and yields expected config."""
+    template = generate_default_workflow_toml("test-cmd")
+    toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+    toml_path.parent.mkdir(parents=True)
+    toml_path.write_text(template, encoding="utf-8")
+    config = load_workflow_config(tmp_path)
+    # Only [tool] is active, so only exec should differ from defaults
+    assert config["tool"]["exec"] == "test-cmd"
+    assert config["ceremony"] == DEFAULT_CONFIG["ceremony"]
+    assert config["cards"] == DEFAULT_CONFIG["cards"]
 
 
 class TestDetectExecCommand:

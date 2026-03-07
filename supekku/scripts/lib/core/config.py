@@ -224,9 +224,151 @@ def detect_exec_command(target_root: Path) -> str:
   return "spec-driver"
 
 
+# ---------------------------------------------------------------------------
+# Default workflow.toml template generation
+# ---------------------------------------------------------------------------
+
+# Section header comments for the generated template.
+# Each entry maps a DEFAULT_CONFIG key to a human-readable explanation.
+_SECTION_COMMENTS: dict[str, list[str]] = {
+  "_preamble": [
+    "spec-driver workflow configuration",
+    "",
+    "All options below show their defaults.  Uncomment and change any",
+    "value to override.  Missing keys always fall back to built-in defaults,",
+    "so you only need to include what you want to change.",
+    "",
+    "Ceremony mode controls governance posture: how much structure agents",
+    'apply.  Options: "pioneer" (lightweight), "settler" (moderate),',
+    '"town_planner" (full governance).',
+  ],
+  "strict_mode": [
+    "When true, delta completion enforces all coverage gates.",
+    "When false (default), agents may use --force to bypass.",
+  ],
+  "tool": [
+    "How to invoke spec-driver.  Detected automatically at install time.",
+  ],
+  "verification": [
+    "Command agents run to verify the project (tests + lint).",
+  ],
+  "cards": [
+    "Kanban-style task cards for lightweight work tracking.",
+    "Disable with enabled = false if you only use deltas.",
+  ],
+  "docs": [
+    "Where design artefacts and implementation plans live.",
+  ],
+  "policy": [
+    "Toggle governance layers.  ADRs are always recommended.",
+    "Enable policies and standards for stricter governance.",
+  ],
+  "events": [
+    "Event logging for spec-driver operations.",
+  ],
+  "sync": [
+    "Controls for the sync subsystem.",
+    "spec_autocreate: automatically create unit specs during sync.",
+  ],
+  "contracts": [
+    "Generated API contracts corpus.",
+    "root: directory under the repo root (always derived/regenerable).",
+  ],
+  "bootstrap": [
+    "Path to the project doctrine file loaded by agents at boot.",
+  ],
+  "authoring": [
+    'Content authoring engine.  "superpowers" uses the supekku engine;',
+    '"spec_driver" uses the built-in spec-driver templates.',
+  ],
+  "skills": [
+    "Agent skill sync targets.  Each entry is a directory name under",
+    "the agent config root (e.g. .claude/, .codex/).",
+  ],
+  "integration": [
+    "Controls @-references injected into root agent config files.",
+    "Disable if you manage AGENTS.md / CLAUDE.md yourself.",
+  ],
+  "dirs": [
+    "Directory name overrides for spec-driver workspace subdirectories.",
+    "All paths are relative to .spec-driver/.  Change these if your",
+    "project uses non-standard directory names.",
+  ],
+}
+
+
+def _toml_value(val: object) -> str:
+  """Format a Python value as a TOML literal."""
+  if isinstance(val, bool):
+    return "true" if val else "false"
+  if isinstance(val, str):
+    return f'"{val}"'
+  if isinstance(val, int):
+    return str(val)
+  if isinstance(val, list):
+    items = ", ".join(_toml_value(v) for v in val)
+    return f"[{items}]"
+  return repr(val)  # pragma: no cover
+
+
+def _prose(text: str) -> str:
+  """Format a prose comment (## prefix, not uncommentable)."""
+  return f"## {text}" if text else "##"
+
+
+def _emit_prose(lines: list[str], key: str) -> None:
+  """Append prose comments for *key* from ``_SECTION_COMMENTS``."""
+  for comment in _SECTION_COMMENTS.get(key, ()):
+    lines.append(_prose(comment))
+
+
+def _emit_section(lines: list[str], key: str, section: dict) -> None:
+  """Append a commented-out TOML section."""
+  lines.append(f"# [{key}]")
+  for sub_key, sub_val in section.items():
+    lines.append(f"# {sub_key} = {_toml_value(sub_val)}")
+
+
+def generate_default_workflow_toml(exec_cmd: str = "uv run spec-driver") -> str:
+  """Render DEFAULT_CONFIG as a richly-commented TOML template.
+
+  Every option is commented out except ``[tool] exec`` which is set to the
+  detected *exec_cmd* value.  Section headers include explanatory comments
+  describing purpose and allowed values.
+
+  Args:
+    exec_cmd: The detected invocation command for spec-driver.
+
+  Returns:
+    A string suitable for writing to ``.spec-driver/workflow.toml``.
+  """
+  lines: list[str] = []
+
+  # Preamble
+  _emit_prose(lines, "_preamble")
+  lines.append("")
+
+  for key, default_val in DEFAULT_CONFIG.items():
+    if isinstance(default_val, dict):
+      _emit_prose(lines, key)
+      if key == "tool":
+        # [tool] is uncommented — exec is install-specific
+        lines.append(f"[{key}]")
+        lines.append(f'exec = "{exec_cmd}"')
+      else:
+        _emit_section(lines, key, default_val)
+    else:
+      _emit_prose(lines, key)
+      lines.append(f"# {key} = {_toml_value(default_val)}")
+    lines.append("")
+
+  return "\n".join(lines)
+
+
 __all__ = [
   "DEFAULT_CONFIG",
   "detect_exec_command",
+  "generate_default_workflow_toml",
   "is_strict_mode",
   "load_workflow_config",
 ]

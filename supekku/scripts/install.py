@@ -17,7 +17,10 @@ from pathlib import Path
 import yaml
 
 from supekku.scripts.lib.core.agent_docs import render_agent_docs
-from supekku.scripts.lib.core.config import detect_exec_command
+from supekku.scripts.lib.core.config import (
+  detect_exec_command,
+  generate_default_workflow_toml,
+)
 from supekku.scripts.lib.core.npm_utils import (
   get_install_instructions,
   get_package_manager_info,
@@ -676,7 +679,7 @@ def initialize_workspace(
       print(f'\n[DRY RUN] workflow.toml: exec = "{exec_cmd}"')
     else:
       workflow_toml.write_text(
-        f'[tool]\nexec = "{exec_cmd}"\n',
+        generate_default_workflow_toml(exec_cmd),
         encoding="utf-8",
       )
 

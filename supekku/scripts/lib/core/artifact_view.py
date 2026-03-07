@@ -144,6 +144,22 @@ class ArtifactEntry:
   path: Path
   artifact_type: ArtifactType
   error: str | None = None
+  bundle_dir: Path | None = None
+
+
+def _detect_bundle_dir(record_id: str, path: Path) -> Path | None:
+  """Return parent directory if path lives in a bundle named after the artifact.
+
+  A bundle directory is a directory dedicated to one artifact, whose name
+  starts with the artifact's own ID (e.g. ``DE-061-slug/`` for ``DE-061``).
+  Shared containers like ``decisions/`` do not match.
+  """
+  if not record_id:
+    return None
+  parent = path.parent
+  if parent.is_dir() and parent.name.startswith(record_id):
+    return parent
+  return None
 
 
 def adapt_record(record: Any, artifact_type: ArtifactType) -> ArtifactEntry:
@@ -155,12 +171,16 @@ def adapt_record(record: Any, artifact_type: ArtifactType) -> ArtifactEntry:
   title_attr = _TITLE_ATTR.get(artifact_type, "name")
   status_attr = _STATUS_ATTR.get(artifact_type, "status")
 
+  record_id = getattr(record, id_attr, "")
+  path = Path(getattr(record, "path", "."))
+
   return ArtifactEntry(
-    id=getattr(record, id_attr, ""),
+    id=record_id,
     title=getattr(record, title_attr, ""),
     status=getattr(record, status_attr, ""),
-    path=Path(getattr(record, "path", ".")),
+    path=path,
     artifact_type=artifact_type,
+    bundle_dir=_detect_bundle_dir(record_id, path),
   )
 
 

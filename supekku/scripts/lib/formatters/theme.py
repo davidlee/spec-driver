@@ -106,6 +106,11 @@ SPEC_DRIVER_THEME = Theme(
     "requirement.id": "#9600ff",  # purple
     "requirement.category": "#458588",  # blue
     "backlog.id": "#ff00c1",  # magenta
+    # Artifact group colours (DEC-053-11, type selector grouping)
+    "artifact.group.governance": "#458588",  # blue
+    "artifact.group.change": "#d79921",  # yellow
+    "artifact.group.domain": "#00b8ff",  # sky blue
+    "artifact.group.operational": "#8ec07c",  # green
     # UI elements
     "table.border": "#7c7876",  # mid grey
   }

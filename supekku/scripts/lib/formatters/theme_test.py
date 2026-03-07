@@ -49,6 +49,10 @@ class TestResolveStyle:
       "standard.status.required",
       "backlog.issue.open",
       "backlog.improvement.idea",
+      "artifact.group.governance",
+      "artifact.group.change",
+      "artifact.group.domain",
+      "artifact.group.operational",
     ],
   )
   def test_all_core_styles_resolve(self, style_name: str):

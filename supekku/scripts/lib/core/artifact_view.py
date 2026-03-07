@@ -4,7 +4,7 @@ Normalises all registries to a common ArtifactEntry view model.
 No TUI imports — pure data in, pure data out. Reusable by any consumer
 that needs a uniform artifact view (TUI, CLI search, export).
 
-Design decisions: DEC-053-04, DEC-053-06, DEC-053-07, DEC-053-08.
+Design decisions: DEC-053-04, DEC-053-06, DEC-053-07, DEC-053-08, DEC-053-11.
 """
 
 from __future__ import annotations
@@ -18,6 +18,24 @@ from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
+
+
+class ArtifactGroup(Enum):
+  """Semantic grouping for artifact types (DEC-053-11)."""
+
+  GOVERNANCE = "governance"
+  CHANGE = "change"
+  DOMAIN = "domain"
+  OPERATIONAL = "operational"
+
+
+@dataclass(frozen=True)
+class ArtifactTypeMeta:
+  """Display and classification metadata for an artifact type (DEC-053-11)."""
+
+  singular: str
+  plural: str
+  group: ArtifactGroup
 
 
 class ArtifactType(Enum):
@@ -38,6 +56,54 @@ class ArtifactType(Enum):
   MEMORY = "memory"
   CARD = "card"
   BACKLOG = "backlog"
+
+  @property
+  def meta(self) -> ArtifactTypeMeta:
+    """Return display/classification metadata for this type."""
+    return ARTIFACT_TYPE_META[self]
+
+  @property
+  def singular(self) -> str:
+    """Human-readable singular name (e.g. 'ADR', 'Policy')."""
+    return self.meta.singular
+
+  @property
+  def plural(self) -> str:
+    """Human-readable plural name (e.g. 'ADRs', 'Policies')."""
+    return self.meta.plural
+
+  @property
+  def group(self) -> ArtifactGroup:
+    """Semantic group this type belongs to."""
+    return self.meta.group
+
+
+_GOV = ArtifactGroup.GOVERNANCE
+_CHG = ArtifactGroup.CHANGE
+_DOM = ArtifactGroup.DOMAIN
+_OPS = ArtifactGroup.OPERATIONAL
+
+ARTIFACT_TYPE_META: dict[ArtifactType, ArtifactTypeMeta] = {
+  ArtifactType.ADR: ArtifactTypeMeta("ADR", "ADRs", _GOV),
+  ArtifactType.POLICY: ArtifactTypeMeta("Policy", "Policies", _GOV),
+  ArtifactType.STANDARD: ArtifactTypeMeta("Standard", "Standards", _GOV),
+  ArtifactType.DELTA: ArtifactTypeMeta("Delta", "Deltas", _CHG),
+  ArtifactType.REVISION: ArtifactTypeMeta("Revision", "Revisions", _CHG),
+  ArtifactType.AUDIT: ArtifactTypeMeta("Audit", "Audits", _CHG),
+  ArtifactType.SPEC: ArtifactTypeMeta("Spec", "Specs", _DOM),
+  ArtifactType.REQUIREMENT: ArtifactTypeMeta(
+    "Requirement",
+    "Requirements",
+    _DOM,
+  ),
+  ArtifactType.MEMORY: ArtifactTypeMeta("Memory", "Memories", _OPS),
+  ArtifactType.CARD: ArtifactTypeMeta("Card", "Cards", _OPS),
+  ArtifactType.BACKLOG: ArtifactTypeMeta(
+    "Backlog Item",
+    "Backlog Items",
+    _OPS,
+  ),
+}
 
 
 # Maps ArtifactType to the attribute name used for title on the record model.

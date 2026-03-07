@@ -6,9 +6,12 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 from supekku.scripts.lib.core.artifact_view import (
+  ARTIFACT_TYPE_META,
   ArtifactEntry,
+  ArtifactGroup,
   ArtifactSnapshot,
   ArtifactType,
+  ArtifactTypeMeta,
   adapt_record,
 )
 
@@ -40,6 +43,87 @@ class TestArtifactEntry:
       error="Failed to load",
     )
     assert entry.error == "Failed to load"
+
+
+class TestArtifactGroup:
+  """ArtifactGroup enum covers all semantic groups."""
+
+  def test_group_values(self):
+    assert ArtifactGroup.GOVERNANCE.value == "governance"
+    assert ArtifactGroup.CHANGE.value == "change"
+    assert ArtifactGroup.DOMAIN.value == "domain"
+    assert ArtifactGroup.OPERATIONAL.value == "operational"
+
+  def test_exactly_four_groups(self):
+    assert len(ArtifactGroup) == 4
+
+
+class TestArtifactTypeMeta:
+  """ArtifactTypeMeta provides display/classification metadata."""
+
+  def test_all_types_have_metadata(self):
+    for art_type in ArtifactType:
+      assert art_type in ARTIFACT_TYPE_META, f"Missing metadata for {art_type}"
+
+  def test_no_extra_metadata_keys(self):
+    for key in ARTIFACT_TYPE_META:
+      assert key in ArtifactType, f"Extra metadata key {key}"
+
+  def test_meta_is_frozen(self):
+    meta = ARTIFACT_TYPE_META[ArtifactType.ADR]
+    assert isinstance(meta, ArtifactTypeMeta)
+
+  def test_singular_plural_populated(self):
+    for art_type, meta in ARTIFACT_TYPE_META.items():
+      assert meta.singular, f"Empty singular for {art_type}"
+      assert meta.plural, f"Empty plural for {art_type}"
+
+  def test_group_assigned(self):
+    for art_type, meta in ARTIFACT_TYPE_META.items():
+      assert isinstance(meta.group, ArtifactGroup), f"Bad group for {art_type}"
+
+  def test_governance_group_members(self):
+    gov = {t for t in ArtifactType if t.group == ArtifactGroup.GOVERNANCE}
+    expected = {ArtifactType.ADR, ArtifactType.POLICY, ArtifactType.STANDARD}
+    assert gov == expected
+
+  def test_change_group_members(self):
+    chg = {t for t in ArtifactType if t.group == ArtifactGroup.CHANGE}
+    expected = {ArtifactType.DELTA, ArtifactType.REVISION, ArtifactType.AUDIT}
+    assert chg == expected
+
+  def test_domain_group_members(self):
+    dom = {t for t in ArtifactType if t.group == ArtifactGroup.DOMAIN}
+    assert dom == {ArtifactType.SPEC, ArtifactType.REQUIREMENT}
+
+  def test_operational_group_members(self):
+    ops = {t for t in ArtifactType if t.group == ArtifactGroup.OPERATIONAL}
+    expected = {ArtifactType.MEMORY, ArtifactType.CARD, ArtifactType.BACKLOG}
+    assert ops == expected
+
+
+class TestArtifactTypeProperties:
+  """Convenience properties on ArtifactType delegate to metadata."""
+
+  def test_meta_property(self):
+    assert ArtifactType.ADR.meta == ARTIFACT_TYPE_META[ArtifactType.ADR]
+
+  def test_singular(self):
+    assert ArtifactType.ADR.singular == "ADR"
+    assert ArtifactType.POLICY.singular == "Policy"
+    assert ArtifactType.BACKLOG.singular == "Backlog Item"
+
+  def test_plural(self):
+    assert ArtifactType.ADR.plural == "ADRs"
+    assert ArtifactType.POLICY.plural == "Policies"
+    assert ArtifactType.MEMORY.plural == "Memories"
+    assert ArtifactType.BACKLOG.plural == "Backlog Items"
+
+  def test_group(self):
+    assert ArtifactType.ADR.group == ArtifactGroup.GOVERNANCE
+    assert ArtifactType.DELTA.group == ArtifactGroup.CHANGE
+    assert ArtifactType.SPEC.group == ArtifactGroup.DOMAIN
+    assert ArtifactType.MEMORY.group == ArtifactGroup.OPERATIONAL
 
 
 class TestAdaptRecord:

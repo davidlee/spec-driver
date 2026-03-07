@@ -127,15 +127,15 @@ theme style keys and layout CSS.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | P02-T1 | Theme style keys | [P] | No deps |
-| [ ] | P02-T2 | TrackPanel widget | [P] | Needs T1 styles |
-| [ ] | P02-T3 | SessionList widget | [P] | Needs T1 styles |
-| [ ] | P02-T4 | TrackScreen | | Depends on T2, T3 |
-| [ ] | P02-T5 | ArtifactSnapshot.find_entry() | [P] | Independent |
-| [ ] | P02-T6 | BrowserScreen.navigate_to_artifact() | | Depends on T5 |
-| [ ] | P02-T7 | App integration | | Depends on T4, T6 |
-| [ ] | P02-T8 | TrackScreen layout CSS | | Depends on T4 |
-| [ ] | P02-T9 | Tests VT-054-05..08 | | Write alongside tasks |
+| [x] | P02-T1 | Theme style keys | [P] | 13 track.* keys added |
+| [x] | P02-T2 | TrackPanel widget | [P] | DataTable, not RichLog (DEC-054-07 rev) |
+| [x] | P02-T3 | SessionList widget | [P] | OptionList + SessionSelected msg |
+| [x] | P02-T4 | TrackScreen | | 2-panel compose, event buffer |
+| [x] | P02-T5 | ArtifactSnapshot.find_entry() | [P] | Cross-type dict lookup |
+| [x] | P02-T6 | BrowserScreen.navigate_to_artifact() | | Type switch + row cursor |
+| [x] | P02-T7 | App integration | | install+push, toggle, navigate, listener |
+| [x] | P02-T8 | TrackScreen layout CSS | | Horizontal split, border conventions |
+| [x] | P02-T9 | Tests VT-054-05..08 | | 20 tests + 4 find_entry tests |
 | [ ] | P02-T10 | VH manual attestation | | After all code complete |
 
 ### Task Details

@@ -70,7 +70,7 @@ class TestClassifyPath:
       ),
       # Specs
       (
-        "/proj/.spec-driver/specs/tech/SPEC-042/SPEC-042.md",
+        "/proj/.spec-driver/tech/SPEC-042/SPEC-042.md",
         "spec",
         "SPEC-042",
       ),
@@ -192,7 +192,7 @@ class TestBuildEvent:
     event = build_event(
       session_id=None,
       tool_name="Read",
-      file_path="/proj/.spec-driver/specs/tech/SPEC-042/SPEC-042.md",
+      file_path="/proj/.spec-driver/tech/SPEC-042/SPEC-042.md",
       artifact_type="spec",
       artifact_id="SPEC-042",
     )

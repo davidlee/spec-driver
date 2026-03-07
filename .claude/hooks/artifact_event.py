@@ -37,7 +37,7 @@ _ARTIFACT_PATTERNS: list[tuple[re.Pattern[str], str]] = [
   (re.compile(r"\.spec-driver/deltas/(DE-\d+)[^/]*/DR-\d+"), "design_revision"),
   (re.compile(r"\.spec-driver/deltas/(DE-\d+)[^/]*/IP-\d+"), "plan"),
   (re.compile(r"\.spec-driver/deltas/(DE-\d+)"), "delta"),
-  (re.compile(r"\.spec-driver/specs/tech/(SPEC-\d+)"), "spec"),
+  (re.compile(r"\.spec-driver/tech/(SPEC-\d+)"), "spec"),
   (re.compile(r"\.spec-driver/decisions/(ADR-\d+)"), "adr"),
   (re.compile(r"\.spec-driver/revisions/(RE-\d+)"), "revision"),
   (re.compile(r"\.spec-driver/audits/(AUD-\d+)"), "audit"),

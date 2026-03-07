@@ -8,7 +8,7 @@ from supekku.cli.resolve import (
   _build_artifact_index,
   _resolve_memory_links,
 )
-from supekku.scripts.lib.core.paths import MEMORY_DIR
+from supekku.scripts.lib.core.paths import BACKLOG_DIR, MEMORY_DIR, SPEC_DRIVER_DIR
 from supekku.scripts.lib.core.spec_utils import (
   dump_markdown_file,
   load_markdown_file,
@@ -71,6 +71,61 @@ class TestBuildArtifactIndex:
     _init_repo(tmp_path)
     index = _build_artifact_index(tmp_path)
     assert index == {}
+
+  # -- VT-057-link-resolver --
+
+  def test_includes_backlog_items(self, tmp_path: Path) -> None:
+    """Index includes backlog items from BacklogRegistry."""
+    _init_repo(tmp_path)
+    (tmp_path / ".git").mkdir(exist_ok=True)
+    issues_dir = tmp_path / SPEC_DRIVER_DIR / BACKLOG_DIR / "issues"
+    item_dir = issues_dir / "ISSUE-016-sync-reqs"
+    item_dir.mkdir(parents=True)
+    dump_markdown_file(
+      item_dir / "ISSUE-016.md",
+      {"id": "ISSUE-016", "name": "Sync reqs", "kind": "issue", "status": "open"},
+      "# Sync reqs\n",
+    )
+
+    index = _build_artifact_index(tmp_path)
+    assert "ISSUE-016" in index
+    path, kind = index["ISSUE-016"]
+    assert kind == "issue"
+    assert "ISSUE-016.md" in path
+
+  def test_includes_multiple_backlog_kinds(self, tmp_path: Path) -> None:
+    """Index includes issues, problems, improvements, risks."""
+    _init_repo(tmp_path)
+    (tmp_path / ".git").mkdir(exist_ok=True)
+    sd = tmp_path / SPEC_DRIVER_DIR / BACKLOG_DIR
+    for subdir, prefix, kind_val in [
+      ("issues", "ISSUE", "issue"),
+      ("problems", "PROB", "problem"),
+      ("improvements", "IMPR", "improvement"),
+      ("risks", "RISK", "risk"),
+    ]:
+      item_dir = sd / subdir / f"{prefix}-001-test"
+      item_dir.mkdir(parents=True)
+      dump_markdown_file(
+        item_dir / f"{prefix}-001.md",
+        {"id": f"{prefix}-001", "name": "Test", "kind": kind_val, "status": "open"},
+        "# Test\n",
+      )
+
+    index = _build_artifact_index(tmp_path)
+    assert "ISSUE-001" in index
+    assert "PROB-001" in index
+    assert "IMPR-001" in index
+    assert "RISK-001" in index
+    assert index["PROB-001"][1] == "problem"
+    assert index["RISK-001"][1] == "risk"
+
+  def test_unknown_backlog_id_not_in_index(self, tmp_path: Path) -> None:
+    """Unknown backlog IDs are not in the index."""
+    _init_repo(tmp_path)
+    (tmp_path / ".git").mkdir(exist_ok=True)
+    index = _build_artifact_index(tmp_path)
+    assert "ISSUE-999" not in index
 
 
 # ── _resolve_memory_links ────────────────────────────────────

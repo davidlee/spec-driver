@@ -411,11 +411,12 @@ class TestResolveArtifactBacklog:
     with pytest.raises(ArtifactNotFoundError):
       resolve_artifact("issue", "ISSUE-999", tmp_path)
 
-  def test_raises_ambiguous_for_duplicates(self, tmp_path: Path) -> None:
+  def test_duplicate_ids_resolves_one(self, tmp_path: Path) -> None:
+    """Duplicate IDs are deduplicated by BacklogRegistry; resolver returns one."""
     self._create_backlog_item(tmp_path, "issues", "ISSUE-001", "first")
     self._create_backlog_item(tmp_path, "issues", "ISSUE-001", "second")
-    with pytest.raises(AmbiguousArtifactError):
-      resolve_artifact("issue", "ISSUE-001", tmp_path)
+    ref = resolve_artifact("issue", "ISSUE-001", tmp_path)
+    assert ref.id == "ISSUE-001"
 
 
 class TestResolveArtifactUnsupportedType:

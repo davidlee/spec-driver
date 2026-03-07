@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Annotated
 
 import typer
@@ -60,6 +61,20 @@ from supekku.scripts.lib.standards.creation import (
 from supekku.scripts.lib.standards.registry import StandardRegistry
 
 app = typer.Typer(help="Create new artifacts", no_args_is_help=True)
+
+_BACKLOG_ID_RE = re.compile(r"^(ISSUE|PROB|IMPR|RISK)-\d+$")
+
+
+def _validate_backlog_id(value: str | None) -> str | None:
+  """Validate that --from-backlog value looks like a backlog item ID."""
+  if value is None:
+    return None
+  if not _BACKLOG_ID_RE.match(value):
+    raise typer.BadParameter(
+      f"'{value}' does not look like a backlog item ID "
+      "(expected ISSUE-NNN, PROB-NNN, IMPR-NNN, or RISK-NNN)"
+    )
+  return value
 
 
 @app.command("spec")
@@ -149,6 +164,7 @@ def create_delta_cmd(
     typer.Option(
       "--from-backlog",
       help="Create delta from backlog item (pre-populate with item context)",
+      callback=_validate_backlog_id,
     ),
   ] = None,
 ) -> None:
@@ -160,11 +176,10 @@ def create_delta_cmd(
   try:
     # If --from-backlog specified, fetch the item and pre-populate fields
     if from_backlog:
-      from supekku.scripts.lib.backlog.registry import discover_backlog_items
+      from supekku.scripts.lib.backlog.registry import BacklogRegistry
 
-      # Discover all backlog items
-      items = discover_backlog_items(root=None, kind="all")
-      item = next((i for i in items if i.id == from_backlog), None)
+      registry = BacklogRegistry(root=None)
+      item = registry.find(from_backlog)
 
       if not item:
         typer.echo(f"Error: backlog item '{from_backlog}' not found", err=True)

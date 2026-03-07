@@ -1600,12 +1600,13 @@ def list_backlog(
   try:
     from pathlib import Path
 
+    from supekku.scripts.lib.backlog.models import DEFAULT_HIDDEN_STATUSES
     from supekku.scripts.lib.backlog.priority import (
       edit_backlog_ordering,
       sort_by_priority,
     )
     from supekku.scripts.lib.backlog.registry import (
-      discover_backlog_items,
+      BacklogRegistry,
       load_backlog_registry,
       save_backlog_registry,
     )
@@ -1615,12 +1616,14 @@ def list_backlog(
     )
 
     repo_root = Path(root) if root else None
-    all_items = discover_backlog_items(root=repo_root, kind=kind)
+    registry = BacklogRegistry(root=repo_root)
+    kind_filter = kind if kind != "all" else None
+    all_items = sorted(registry.iter(kind=kind_filter), key=lambda x: x.id)
     items = all_items.copy()
 
     # Apply default status filter (exclude resolved/implemented unless --all specified)
     if not show_all:
-      items = [i for i in items if i.status.lower() not in ["resolved", "implemented"]]
+      items = [i for i in items if i.status.lower() not in DEFAULT_HIDDEN_STATUSES]
 
     # Apply filters
     if status:

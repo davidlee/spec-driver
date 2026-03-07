@@ -229,7 +229,7 @@ def sync(
   # Sync backlog ordering (always — cheap filesystem walk)
   typer.echo("Synchronizing backlog priority registry...")
   try:
-    backlog_result = _sync_backlog(root=root)
+    backlog_result = _sync_backlog(root=root, dry_run=dry_run)
     results["backlog"] = backlog_result
   except Exception as e:
     typer.echo(f"Error syncing backlog: {e}", err=True)
@@ -646,11 +646,11 @@ def _sync_requirements(root: Path) -> dict:
   return {"success": True, "created": stats.created, "updated": stats.updated}
 
 
-def _sync_backlog(root: Path) -> dict:
+def _sync_backlog(root: Path, *, dry_run: bool = False) -> dict:
   """Execute backlog priority registry synchronization."""
   from supekku.scripts.lib.backlog.registry import sync_backlog_registry
 
-  stats = sync_backlog_registry(root)
+  stats = sync_backlog_registry(root, dry_run=dry_run)
 
   typer.echo(
     f"  Backlog: {stats['total']} total items "

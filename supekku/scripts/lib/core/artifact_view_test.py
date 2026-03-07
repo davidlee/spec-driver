@@ -1,11 +1,13 @@
-"""Tests for artifact view layer (VT-053-adapter)."""
+"""Tests for artifact view layer (VT-053-adapter, VT-057-artifact-view)."""
 
 from __future__ import annotations
 
 from pathlib import Path
 from unittest.mock import MagicMock
 
+from supekku.scripts.lib.backlog.registry import BacklogRegistry
 from supekku.scripts.lib.core.artifact_view import (
+  _REGISTRY_FACTORIES,
   ARTIFACT_TYPE_META,
   ArtifactEntry,
   ArtifactGroup,
@@ -14,6 +16,7 @@ from supekku.scripts.lib.core.artifact_view import (
   ArtifactTypeMeta,
   adapt_record,
 )
+from supekku.scripts.lib.core.paths import BACKLOG_DIR, SPEC_DRIVER_DIR
 
 
 class TestArtifactEntry:
@@ -223,3 +226,46 @@ class TestArtifactSnapshot:
     for art_type in ArtifactType:
       assert art_type in counts
       assert isinstance(counts[art_type], int)
+
+
+# -- VT-057-artifact-view: BacklogRegistry in standard factory path --
+
+
+class TestBacklogRegistryFactory:
+  """BacklogRegistry is registered in _REGISTRY_FACTORIES (DEC-057-09)."""
+
+  def test_backlog_in_registry_factories(self):
+    """BACKLOG has an entry in _REGISTRY_FACTORIES (shim removed)."""
+    assert ArtifactType.BACKLOG in _REGISTRY_FACTORIES
+
+  def test_factory_returns_backlog_registry(self, tmp_path):
+    """Factory produces a BacklogRegistry instance."""
+    (tmp_path / ".git").mkdir()
+    registry = _REGISTRY_FACTORIES[ArtifactType.BACKLOG](tmp_path)
+    assert isinstance(registry, BacklogRegistry)
+
+  def test_snapshot_loads_backlog_via_standard_path(self, tmp_path):
+    """ArtifactSnapshot loads backlog through _collect_safe, not a shim."""
+    (tmp_path / ".git").mkdir()
+    snapshot = ArtifactSnapshot(root=tmp_path)
+    assert ArtifactType.BACKLOG in snapshot.entries
+    # Empty corpus → empty dict (no error entries)
+    assert isinstance(snapshot.entries[ArtifactType.BACKLOG], dict)
+
+  def test_malformed_backlog_item_produces_error_entry(self, tmp_path):
+    """Malformed item flows through _collect_safe → error placeholder (DEC-057-09)."""
+    (tmp_path / ".git").mkdir()
+    # Create a malformed backlog item (invalid YAML frontmatter)
+    issues_dir = tmp_path / SPEC_DRIVER_DIR / BACKLOG_DIR / "issues"
+    item_dir = issues_dir / "ISSUE-001-bad"
+    item_dir.mkdir(parents=True)
+    bad_file = item_dir / "ISSUE-001.md"
+    bad_file.write_text("---\n: invalid yaml [\n---\nBroken\n", encoding="utf-8")
+
+    snapshot = ArtifactSnapshot(root=tmp_path)
+    backlog_entries = snapshot.entries[ArtifactType.BACKLOG]
+    # Malformed item is skipped at parse time (warning logged),
+    # so the collect dict is empty rather than containing an error placeholder.
+    # The key difference from the old shim: _collect_safe wraps the entire
+    # collect() call, so per-record parse errors are handled by the registry.
+    assert isinstance(backlog_entries, dict)

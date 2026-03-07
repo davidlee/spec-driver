@@ -210,38 +210,6 @@ def _collect_safe(
   return result
 
 
-def _collect_backlog(root: Path) -> dict[str, ArtifactEntry]:
-  """BacklogRegistry shim — wraps function-based API into dict output."""
-  from supekku.scripts.lib.backlog.registry import (  # noqa: PLC0415
-    discover_backlog_items,
-  )
-
-  stderr_capture = io.StringIO()
-  try:
-    with contextlib.redirect_stderr(stderr_capture):
-      items = discover_backlog_items(root=root, kind="all")
-  except Exception as exc:
-    logger.warning("Failed to load backlog: %s", exc)
-    return {
-      "__error_backlog__": ArtifactEntry(
-        id="",
-        title="",
-        status="",
-        path=Path(),
-        artifact_type=ArtifactType.BACKLOG,
-        error=f"Load failed: {exc}",
-      )
-    }
-
-  result: dict[str, ArtifactEntry] = {}
-  for item in items:
-    try:
-      result[item.id] = adapt_record(item, ArtifactType.BACKLOG)
-    except Exception as exc:
-      logger.warning("Failed to adapt backlog item: %s", exc)
-  return result
-
-
 class ArtifactSnapshot:
   """Cached snapshot of all artifacts across registries.
 
@@ -261,10 +229,6 @@ class ArtifactSnapshot:
 
   def _load_type(self, art_type: ArtifactType) -> None:
     """Load a single registry type into the snapshot."""
-    if art_type == ArtifactType.BACKLOG:
-      self.entries[art_type] = _collect_backlog(self._root)
-      return
-
     registry = self._make_registry(art_type)
     if registry is None:
       self.entries[art_type] = {}
@@ -424,6 +388,12 @@ def _make_standard_registry(root: Path) -> Any:
   return StandardRegistry(root=root)
 
 
+def _make_backlog_registry(root: Path) -> Any:
+  from supekku.scripts.lib.backlog.registry import BacklogRegistry  # noqa: PLC0415
+
+  return BacklogRegistry(root=root)
+
+
 _REGISTRY_FACTORIES: dict[ArtifactType, Any] = {
   ArtifactType.ADR: _make_decision_registry,
   ArtifactType.POLICY: _make_policy_registry,
@@ -435,4 +405,5 @@ _REGISTRY_FACTORIES: dict[ArtifactType, Any] = {
   ArtifactType.REQUIREMENT: _make_requirements_registry,
   ArtifactType.MEMORY: _make_memory_registry,
   ArtifactType.CARD: _make_card_registry,
+  ArtifactType.BACKLOG: _make_backlog_registry,
 }

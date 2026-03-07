@@ -103,5 +103,70 @@ class SyncCommandTest(unittest.TestCase):
     assert "Sync completed with errors" in output or result.exit_code == 1
 
 
+class SyncBacklogDryRunTest(unittest.TestCase):
+  """VT-057-sync-dryrun: _sync_backlog respects dry_run."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+
+    # Create minimal spec-driver structure
+    self.tech_dir = self.root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
+    self.tech_dir.mkdir(parents=True)
+    self.registry_path = self.tech_dir / "registry_v2.json"
+    self.registry_path.write_text(
+      json.dumps({"version": 2, "languages": {}}),
+      encoding="utf-8",
+    )
+
+    # Create a backlog item
+    from supekku.scripts.lib.core.paths import BACKLOG_DIR
+
+    issues_dir = self.root / SPEC_DRIVER_DIR / BACKLOG_DIR / "issues"
+    item_dir = issues_dir / "ISSUE-001-test"
+    item_dir.mkdir(parents=True)
+    from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+
+    dump_markdown_file(
+      item_dir / "ISSUE-001.md",
+      {"id": "ISSUE-001", "name": "Test", "kind": "issue", "status": "open"},
+      "# Test\n",
+    )
+
+    # Create registry dir (but no backlog.yaml yet)
+    from supekku.scripts.lib.core.paths import get_registry_dir
+
+    self.registry_dir = get_registry_dir(self.root)
+    self.registry_dir.mkdir(parents=True, exist_ok=True)
+    self.backlog_yaml = self.registry_dir / "backlog.yaml"
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def test_dry_run_does_not_write_registry(self) -> None:
+    """_sync_backlog(dry_run=True) returns stats but does not write backlog.yaml."""
+    from supekku.cli.sync import _sync_backlog
+
+    # Ensure no registry file exists before
+    assert not self.backlog_yaml.exists()
+
+    result = _sync_backlog(self.root, dry_run=True)
+    assert result["total"] == 1
+    assert result["added"] == 1
+
+    # File should NOT have been written
+    assert not self.backlog_yaml.exists()
+
+  def test_non_dry_run_writes_registry(self) -> None:
+    """_sync_backlog(dry_run=False) writes backlog.yaml."""
+    from supekku.cli.sync import _sync_backlog
+
+    result = _sync_backlog(self.root, dry_run=False)
+    assert result["total"] == 1
+    assert self.backlog_yaml.exists()
+
+
 if __name__ == "__main__":
   unittest.main()

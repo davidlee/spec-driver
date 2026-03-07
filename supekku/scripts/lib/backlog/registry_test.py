@@ -10,6 +10,7 @@ from pathlib import Path
 import yaml
 
 from supekku.scripts.lib.backlog.registry import (
+  BacklogRegistry,
   append_backlog_summary,
   create_backlog_entry,
   find_backlog_items_by_id,
@@ -313,14 +314,15 @@ class FindBacklogItemsByIdTest(unittest.TestCase):
     items = find_backlog_items_by_id("ISSUE-001", root, kind="nonsense")
     assert items == []
 
-  def test_duplicate_ids_returns_multiple(self) -> None:
-    """Duplicate IDs across subdirs (or within) return all matches."""
+  def test_duplicate_ids_logs_warning(self) -> None:
+    """Duplicate IDs log a warning; registry keeps one (last wins)."""
     root = self._make_repo()
-    # Same ID in two different slug dirs (simulating data quality issue)
     self._create_item(root, "issues", "ISSUE-001", "first")
     self._create_item(root, "issues", "ISSUE-001", "second")
-    items = find_backlog_items_by_id("ISSUE-001", root)
-    assert len(items) == 2
+    with self.assertLogs("supekku.scripts.lib.backlog.registry", level="WARNING") as cm:
+      items = find_backlog_items_by_id("ISSUE-001", root)
+    assert len(items) == 1
+    assert any("Duplicate" in msg for msg in cm.output)
 
 
 class TestFindItem(unittest.TestCase):
@@ -362,24 +364,202 @@ class TestFindItem(unittest.TestCase):
     root = self._make_repo()
     assert find_item("ISSUE-999", root) is None
 
-  def test_find_item_warns_on_multiple(self) -> None:
-    import warnings  # noqa: PLC0415
-
+  def test_find_item_logs_warning_on_duplicate(self) -> None:
     root = self._make_repo()
     self._create_item(root, "issues", "ISSUE-001", "first")
     self._create_item(root, "issues", "ISSUE-001", "second")
-    with warnings.catch_warnings(record=True) as w:
-      warnings.simplefilter("always")
+    with self.assertLogs("supekku.scripts.lib.backlog.registry", level="WARNING") as cm:
       item = find_item("ISSUE-001", root)
     assert item is not None
-    assert len(w) == 1
-    assert "Multiple" in str(w[0].message)
+    assert any("Duplicate" in msg for msg in cm.output)
 
   def test_find_item_respects_kind_filter(self) -> None:
     root = self._make_repo()
     self._create_item(root, "issues", "ISSUE-001", "test")
     assert find_item("ISSUE-001", root, kind="issue") is not None
     assert find_item("ISSUE-001", root, kind="problem") is None
+
+
+class BacklogRegistryTest(unittest.TestCase):
+  """Tests for BacklogRegistry class (VT-057-registry)."""
+
+  def _make_repo(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    return root
+
+  def _create_item(
+    self,
+    root: Path,
+    subdir: str,
+    item_id: str,
+    slug: str,
+    *,
+    status: str = "open",
+    kind: str | None = None,
+  ) -> Path:
+    entry_dir = root / SPEC_DRIVER_DIR / BACKLOG_DIR / subdir / f"{item_id}-{slug}"
+    entry_dir.mkdir(parents=True, exist_ok=True)
+    md_file = entry_dir / f"{item_id}.md"
+    item_kind = kind or subdir.rstrip("s")
+    fm = (
+      f"---\nid: {item_id}\nname: {slug}\nkind: {item_kind}\n"
+      f"status: {status}\nseverity: p3\n---\n# {slug}\n"
+    )
+    md_file.write_text(fm, encoding="utf-8")
+    return md_file
+
+  # -- Constructor --
+
+  def test_constructor_auto_discovers_root(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test")
+    cwd = Path.cwd()
+    try:
+      os.chdir(root)
+      registry = BacklogRegistry()
+      assert registry.find("ISSUE-001") is not None
+    finally:
+      os.chdir(cwd)
+
+  def test_constructor_accepts_keyword_root(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test")
+    registry = BacklogRegistry(root=root)
+    assert registry.find("ISSUE-001") is not None
+
+  def test_empty_corpus(self) -> None:
+    root = self._make_repo()
+    registry = BacklogRegistry(root=root)
+    assert registry.collect() == {}
+    assert list(registry.iter()) == []
+    assert registry.filter() == []
+    assert registry.find("ISSUE-001") is None
+
+  # -- find --
+
+  def test_find_returns_item(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test-issue")
+    registry = BacklogRegistry(root=root)
+    item = registry.find("ISSUE-001")
+    assert item is not None
+    assert item.id == "ISSUE-001"
+    assert item.kind == "issue"
+
+  def test_find_returns_none_for_missing(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test")
+    registry = BacklogRegistry(root=root)
+    assert registry.find("ISSUE-999") is None
+
+  # -- collect --
+
+  def test_collect_returns_all_items(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "issue-one")
+    self._create_item(root, "improvements", "IMPR-001", "improvement-one")
+    self._create_item(root, "problems", "PROB-001", "problem-one")
+    self._create_item(root, "risks", "RISK-001", "risk-one")
+    registry = BacklogRegistry(root=root)
+    items = registry.collect()
+    assert len(items) == 4
+    assert set(items.keys()) == {"ISSUE-001", "IMPR-001", "PROB-001", "RISK-001"}
+
+  def test_collect_returns_dict_keyed_by_id(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test")
+    registry = BacklogRegistry(root=root)
+    items = registry.collect()
+    assert "ISSUE-001" in items
+    assert items["ISSUE-001"].id == "ISSUE-001"
+
+  # -- iter --
+
+  def test_iter_yields_all(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "one")
+    self._create_item(root, "issues", "ISSUE-002", "two")
+    registry = BacklogRegistry(root=root)
+    items = list(registry.iter())
+    assert len(items) == 2
+
+  def test_iter_filters_by_kind(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "issue")
+    self._create_item(root, "improvements", "IMPR-001", "improvement")
+    registry = BacklogRegistry(root=root)
+    issues = list(registry.iter(kind="issue"))
+    assert len(issues) == 1
+    assert issues[0].kind == "issue"
+
+  def test_iter_filters_by_status(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "open-one", status="open")
+    self._create_item(root, "issues", "ISSUE-002", "resolved-one", status="resolved")
+    registry = BacklogRegistry(root=root)
+    open_items = list(registry.iter(status="open"))
+    assert len(open_items) == 1
+    assert open_items[0].id == "ISSUE-001"
+
+  def test_iter_combines_kind_and_status(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "open-issue", status="open")
+    self._create_item(root, "issues", "ISSUE-002", "resolved-issue", status="resolved")
+    self._create_item(root, "improvements", "IMPR-001", "open-impr", status="open")
+    registry = BacklogRegistry(root=root)
+    items = list(registry.iter(kind="issue", status="open"))
+    assert len(items) == 1
+    assert items[0].id == "ISSUE-001"
+
+  # -- filter --
+
+  def test_filter_by_kind(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "issue")
+    self._create_item(root, "risks", "RISK-001", "risk")
+    registry = BacklogRegistry(root=root)
+    results = registry.filter(kind="risk")
+    assert len(results) == 1
+    assert results[0].kind == "risk"
+
+  def test_filter_by_severity(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test")
+    registry = BacklogRegistry(root=root)
+    results = registry.filter(severity="p3")
+    assert len(results) == 1
+    results = registry.filter(severity="p1")
+    assert len(results) == 0
+
+  def test_filter_returns_empty_on_no_match(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "test")
+    registry = BacklogRegistry(root=root)
+    assert registry.filter(kind="risk") == []
+
+  # -- edge cases --
+
+  def test_malformed_yaml_skipped_with_warning(self) -> None:
+    root = self._make_repo()
+    entry_dir = root / SPEC_DRIVER_DIR / BACKLOG_DIR / "issues" / "ISSUE-001-bad"
+    entry_dir.mkdir(parents=True)
+    md_file = entry_dir / "ISSUE-001.md"
+    md_file.write_text("---\ninvalid: [unclosed\n---\n# Bad\n", encoding="utf-8")
+    with self.assertLogs("supekku.scripts.lib.backlog.registry", level="WARNING"):
+      registry = BacklogRegistry(root=root)
+    assert registry.find("ISSUE-001") is None
+
+  def test_duplicate_ids_warns(self) -> None:
+    root = self._make_repo()
+    self._create_item(root, "issues", "ISSUE-001", "first")
+    self._create_item(root, "issues", "ISSUE-001", "second")
+    with self.assertLogs("supekku.scripts.lib.backlog.registry", level="WARNING") as cm:
+      registry = BacklogRegistry(root=root)
+    assert len(registry.collect()) == 1
+    assert any("Duplicate" in msg for msg in cm.output)
 
 
 if __name__ == "__main__":

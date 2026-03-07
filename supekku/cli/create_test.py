@@ -207,5 +207,61 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     assert output["status"] == "open"
 
 
+class CreateDeltaFromBacklogValidationTest(unittest.TestCase):
+  """VT-057-from-backlog: --from-backlog validation callback."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+
+  def _output(self, result):
+    """Combine stdout and stderr for assertion."""
+    return (result.stdout or "") + (result.stderr or "") + str(result.output or "")
+
+  def _has_validation_error(self, result) -> bool:
+    """Check output for backlog ID validation error (Rich wrapping)."""
+    # Rich box formatting inserts │; strip non-ASCII then normalise
+    raw = self._output(result)
+    text = "".join(c for c in raw if c.isascii())
+    text = " ".join(text.split())
+    return "does not look like a backlog item ID" in text
+
+  def test_from_backlog_rejects_non_id_value(self) -> None:
+    """--from-backlog with non-ID value raises clear error."""
+    result = self.runner.invoke(
+      app,
+      ["delta", "--from-backlog", "--spec"],
+    )
+    assert result.exit_code != 0
+    assert self._has_validation_error(result)
+
+  def test_from_backlog_rejects_garbage(self) -> None:
+    """--from-backlog with random string raises clear error."""
+    result = self.runner.invoke(
+      app,
+      ["delta", "--from-backlog", "xyzzy"],
+    )
+    assert result.exit_code != 0
+    assert self._has_validation_error(result)
+
+  def test_from_backlog_accepts_valid_issue_id(self) -> None:
+    """--from-backlog accepts ISSUE-NNN format (fails on lookup, not validation)."""
+    result = self.runner.invoke(
+      app,
+      ["delta", "--from-backlog", "ISSUE-999"],
+    )
+    # Should pass validation but fail on item lookup (not found)
+    assert result.exit_code != 0
+    assert not self._has_validation_error(result)
+
+  def test_from_backlog_accepts_valid_risk_id(self) -> None:
+    """--from-backlog accepts RISK-NNN format."""
+    result = self.runner.invoke(
+      app,
+      ["delta", "--from-backlog", "RISK-001"],
+    )
+    assert result.exit_code != 0
+    assert not self._has_validation_error(result)
+
+
 if __name__ == "__main__":
   unittest.main()

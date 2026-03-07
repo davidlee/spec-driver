@@ -1,10 +1,13 @@
-"""Backlog management utilities for creating and managing backlog entries."""
+"""Backlog management utilities for creating and managing backlog entries.
+
+Provides BacklogRegistry (ADR-009 conformant class) and module-level
+wrapper functions for backwards compatibility (DEC-057-04).
+"""
 
 from __future__ import annotations
 
+import logging
 import re
-import sys
-import warnings
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -19,7 +22,9 @@ from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 
 if TYPE_CHECKING:
-  from collections.abc import Iterable, Mapping
+  from collections.abc import Iterable, Iterator, Mapping
+
+logger = logging.getLogger(__name__)
 
 BACKLOG_ID_PATTERN = re.compile(r"^(ISSUE|IMPR|PROB|RISK)-(\d{3,})\.md$")
 
@@ -74,6 +79,136 @@ TEMPLATES: Mapping[str, BacklogTemplate] = {
     },
   ),
 }
+
+
+class BacklogRegistry:
+  """Registry for backlog items (ADR-009 conformant).
+
+  Provides find/collect/iter/filter over all backlog item types.
+  Eagerly loads and caches items on construction (DEC-057-05).
+  """
+
+  def __init__(self, *, root: Path | None = None) -> None:
+    self.root = find_repo_root(root)
+    self._directory = get_backlog_dir(self.root)
+    self._items: dict[str, BacklogItem] = {}
+    self._load()
+
+  def _load(self) -> None:
+    """Scan filesystem and cache all backlog items."""
+    if not self._directory.exists():
+      return
+
+    for kind_dir_name in ("issues", "problems", "improvements", "risks"):
+      kind_path = self._directory / kind_dir_name
+      if not kind_path.exists():
+        continue
+      for entry_dir in kind_path.iterdir():
+        if not entry_dir.is_dir():
+          continue
+        for md_file in entry_dir.glob("*.md"):
+          item = self._parse_item(md_file, kind_dir_name)
+          if item is not None:
+            if item.id in self._items:
+              logger.warning(
+                "Duplicate backlog item ID %s: %s and %s",
+                item.id,
+                self._items[item.id].path,
+                item.path,
+              )
+            self._items[item.id] = item
+
+  def _parse_item(self, md_file: Path, kind_dir_name: str) -> BacklogItem | None:
+    """Parse a single backlog item file into a BacklogItem."""
+    match = BACKLOG_ID_PATTERN.match(md_file.name)
+    if not match:
+      return None
+
+    prefix = match.group(1)
+    number = match.group(2)
+    item_id = f"{prefix}-{number}"
+
+    try:
+      frontmatter, _ = load_markdown_file(md_file)
+    except Exception as exc:  # noqa: BLE001
+      logger.warning(
+        "Skipping %s: invalid YAML frontmatter — %s",
+        md_file.relative_to(self.root),
+        exc,
+      )
+      return None
+
+    item_kind = str(frontmatter.get("kind", "")).lower() or kind_dir_name.rstrip("s")
+    status = str(frontmatter.get("status", "")).lower() or "unknown"
+    title = str(frontmatter.get("name", "")).strip()
+    if not title:
+      title = extract_title(md_file)
+
+    return BacklogItem(
+      id=item_id,
+      kind=item_kind,
+      status=status,
+      title=title,
+      path=md_file,
+      frontmatter=dict(frontmatter),
+      tags=list(frontmatter.get("tags", [])),
+      severity=str(frontmatter.get("severity", "")),
+      categories=list(frontmatter.get("categories", [])),
+      impact=str(frontmatter.get("impact", "")),
+      likelihood=float(frontmatter.get("likelihood", 0.0)),
+      created=str(frontmatter.get("created", "")),
+      updated=str(frontmatter.get("updated", "")),
+    )
+
+  def find(self, item_id: str) -> BacklogItem | None:
+    """Find a backlog item by ID.
+
+    Returns the matching item or None (ADR-009 contract).
+    """
+    return self._items.get(item_id)
+
+  def collect(self) -> dict[str, BacklogItem]:
+    """Return all backlog items as a dict keyed by ID (ADR-009 contract)."""
+    return dict(self._items)
+
+  def iter(
+    self,
+    *,
+    status: str | None = None,
+    kind: str | None = None,
+  ) -> Iterator[BacklogItem]:
+    """Iterate over items, optionally filtered by status and/or kind."""
+    for item in self._items.values():
+      if status is not None and item.status != status:
+        continue
+      if kind is not None and item.kind != kind:
+        continue
+      yield item
+
+  def filter(
+    self,
+    *,
+    kind: str | None = None,
+    status: str | None = None,
+    tag: str | None = None,
+    severity: str | None = None,
+  ) -> list[BacklogItem]:
+    """Filter items by domain-specific criteria.
+
+    Returns a list (ADR-009 contract). Empty list when no matches.
+    """
+    results: list[BacklogItem] = []
+    for item in self._items.values():
+      if kind is not None and item.kind != kind:
+        continue
+      if status is not None and item.status != status:
+        continue
+      if tag is not None and tag not in item.tags:
+        continue
+      if severity is not None and item.severity != severity:
+        continue
+      results.append(item)
+    return results
 
 
 def backlog_root(repo_root: Path) -> Path:
@@ -144,7 +279,11 @@ def save_backlog_registry(ordering: list[str], root: Path | None = None) -> None
   registry_path.write_text(yaml_content, encoding="utf-8")
 
 
-def sync_backlog_registry(root: Path | None = None) -> dict[str, int]:
+def sync_backlog_registry(
+  root: Path | None = None,
+  *,
+  dry_run: bool = False,
+) -> dict[str, int]:
   """Sync backlog registry with filesystem.
 
   Discovers all backlog items, merges with existing registry ordering,
@@ -153,6 +292,7 @@ def sync_backlog_registry(root: Path | None = None) -> dict[str, int]:
 
   Args:
     root: Repository root path (auto-detected if None)
+    dry_run: If True, compute stats but skip writing registry.
 
   Returns:
     Dictionary with sync statistics:
@@ -181,8 +321,9 @@ def sync_backlog_registry(root: Path | None = None) -> dict[str, int]:
   merged_order = [item_id for item_id in existing_order if item_id in current_ids]
   merged_order.extend(sorted(new_ids))
 
-  # Save updated registry
-  save_backlog_registry(merged_order, repo_root)
+  # Save updated registry (skip in dry-run mode)
+  if not dry_run:
+    save_backlog_registry(merged_order, repo_root)
 
   # Return statistics
   return {
@@ -329,93 +470,18 @@ def discover_backlog_items(
 ) -> list[BacklogItem]:
   """Discover all backlog items in workspace.
 
+  Thin wrapper around BacklogRegistry for backwards compatibility (DEC-057-04).
+
   Args:
     root: Repository root (auto-detected if None)
     kind: Filter by kind (issue|problem|improvement|risk|all)
 
   Returns:
-    List of BacklogItem objects
+    List of BacklogItem objects, sorted by ID.
   """
-  repo_root = find_repo_root(root)
-  backlog_dir = backlog_root(repo_root)
-
-  if not backlog_dir.exists():
-    return []
-
-  items: list[BacklogItem] = []
-  kind_dirs: list[str] = []
-
-  if kind == "all":
-    kind_dirs = ["issues", "problems", "improvements", "risks"]
-  elif kind == "issue":
-    kind_dirs = ["issues"]
-  elif kind == "problem":
-    kind_dirs = ["problems"]
-  elif kind == "improvement":
-    kind_dirs = ["improvements"]
-  elif kind == "risk":
-    kind_dirs = ["risks"]
-  else:
-    return []
-
-  for kind_dir in kind_dirs:
-    kind_path = backlog_dir / kind_dir
-    if not kind_path.exists():
-      continue
-
-    for entry_dir in kind_path.iterdir():
-      if not entry_dir.is_dir():
-        continue
-
-      # Find markdown file with pattern ISSUE-001.md, PROB-001.md, etc.
-      for md_file in entry_dir.glob("*.md"):
-        match = BACKLOG_ID_PATTERN.match(md_file.name)
-        if not match:
-          continue
-
-        prefix = match.group(1)
-        number = match.group(2)
-        item_id = f"{prefix}-{number}"
-
-        # Load frontmatter - skip if YAML parsing fails
-        try:
-          frontmatter, _ = load_markdown_file(md_file)
-        except Exception as e:  # noqa: BLE001
-          # Warn about files with invalid YAML frontmatter and skip
-          print(
-            f"Warning: Skipping {md_file.relative_to(repo_root)}: "
-            f"Invalid YAML frontmatter - {e}",
-            file=sys.stderr,
-          )
-          continue
-
-        # Extract fields
-        item_kind = str(frontmatter.get("kind", "")).lower() or kind_dir.rstrip("s")
-        status = str(frontmatter.get("status", "")).lower() or "unknown"
-        title = str(frontmatter.get("name", "")).strip()
-
-        if not title:
-          # Fallback to first heading in body if name not in frontmatter
-          title = extract_title(md_file)
-
-        # Create BacklogItem with kind-specific fields
-        item = BacklogItem(
-          id=item_id,
-          kind=item_kind,
-          status=status,
-          title=title,
-          path=md_file,
-          frontmatter=dict(frontmatter),
-          tags=list(frontmatter.get("tags", [])),
-          severity=str(frontmatter.get("severity", "")),
-          categories=list(frontmatter.get("categories", [])),
-          impact=str(frontmatter.get("impact", "")),
-          likelihood=float(frontmatter.get("likelihood", 0.0)),
-          created=str(frontmatter.get("created", "")),
-          updated=str(frontmatter.get("updated", "")),
-        )
-        items.append(item)
-
+  registry = BacklogRegistry(root=root)
+  kind_filter = kind if kind != "all" else None
+  items = list(registry.iter(kind=kind_filter))
   return sorted(items, key=lambda x: x.id)
 
 
@@ -424,72 +490,26 @@ def find_backlog_items_by_id(
   root: Path,
   kind: str | None = None,
 ) -> list[BacklogItem]:
-  """Find backlog items by ID using targeted path search.
+  """Find backlog items by ID.
 
-  Exploits directory naming convention: backlog/{subdir}/{ID}-*/{ID}.md
-  Returns all matches (may be >1 if duplicate IDs exist across subdirs).
+  Thin wrapper around BacklogRegistry for backwards compatibility (DEC-057-04).
+  Returns a list because duplicate IDs may exist (data quality issue).
 
   Args:
     item_id: Backlog item ID (e.g. 'ISSUE-001', 'IMPR-003').
     root: Repository root path.
     kind: Optional kind filter ('issue', 'problem', 'improvement', 'risk').
-      If None, searches all subdirs.
 
   Returns:
-    List of matching BacklogItem objects, sorted by ID.
+    List of matching BacklogItem objects, sorted by path.
   """
-  backlog_dir = backlog_root(root)
-  if not backlog_dir.exists():
+  registry = BacklogRegistry(root=root)
+  item = registry.find(item_id)
+  if item is None:
     return []
-
-  if kind:
-    template = TEMPLATES.get(kind)
-    if not template:
-      return []
-    search_dirs = [backlog_dir / template.subdir]
-  else:
-    search_dirs = [backlog_dir / t.subdir for t in TEMPLATES.values()]
-
-  items: list[BacklogItem] = []
-  for search_dir in search_dirs:
-    if not search_dir.exists():
-      continue
-    # Pattern: {ID}-*/{ID}.md
-    for entry_dir in search_dir.glob(f"{item_id}-*"):
-      if not entry_dir.is_dir():
-        continue
-      md_file = entry_dir / f"{item_id}.md"
-      if not md_file.exists():
-        continue
-      try:
-        frontmatter, _ = load_markdown_file(md_file)
-      except Exception:  # noqa: BLE001
-        continue
-
-      kind_dir = search_dir.name
-      item_kind = str(frontmatter.get("kind", "")).lower() or kind_dir.rstrip("s")
-      status = str(frontmatter.get("status", "")).lower() or "unknown"
-      title = str(frontmatter.get("name", "")).strip() or extract_title(md_file)
-
-      items.append(
-        BacklogItem(
-          id=item_id,
-          kind=item_kind,
-          status=status,
-          title=title,
-          path=md_file,
-          frontmatter=dict(frontmatter),
-          tags=list(frontmatter.get("tags", [])),
-          severity=str(frontmatter.get("severity", "")),
-          categories=list(frontmatter.get("categories", [])),
-          impact=str(frontmatter.get("impact", "")),
-          likelihood=float(frontmatter.get("likelihood", 0.0)),
-          created=str(frontmatter.get("created", "")),
-          updated=str(frontmatter.get("updated", "")),
-        )
-      )
-
-  return sorted(items, key=lambda x: str(x.path))
+  if kind is not None and item.kind != kind:
+    return []
+  return [item]
 
 
 def find_item(
@@ -497,10 +517,9 @@ def find_item(
   root: Path | None = None,
   kind: str | None = None,
 ) -> BacklogItem | None:
-  """Find a single backlog item by ID, returning the first match or None.
+  """Find a single backlog item by ID.
 
-  Convenience wrapper around find_backlog_items_by_id for callers that
-  expect at most one match. Emits a warning if multiple matches are found.
+  Thin wrapper around BacklogRegistry for backwards compatibility (DEC-057-04).
 
   Args:
     item_id: Backlog item ID (e.g. 'ISSUE-001').
@@ -510,20 +529,17 @@ def find_item(
   Returns:
     BacklogItem or None if not found.
   """
-  if root is None:
-    root = find_repo_root()
-  matches = find_backlog_items_by_id(item_id, root, kind=kind)
-  if not matches:
+  registry = BacklogRegistry(root=root)
+  item = registry.find(item_id)
+  if item is None:
     return None
-  if len(matches) > 1:
-    warnings.warn(
-      f"Multiple backlog items found for {item_id}; returning first match",
-      stacklevel=2,
-    )
-  return matches[0]
+  if kind is not None and item.kind != kind:
+    return None
+  return item
 
 
 __all__ = [
+  "BacklogRegistry",
   "append_backlog_summary",
   "create_backlog_entry",
   "discover_backlog_items",

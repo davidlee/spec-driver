@@ -450,16 +450,14 @@ def _resolve_plan(root: Path, raw_id: str) -> ArtifactRef:
 
 
 def _resolve_backlog(root: Path, raw_id: str, kind: str) -> ArtifactRef:
-  from supekku.scripts.lib.backlog.registry import (  # noqa: PLC0415
-    find_backlog_items_by_id,
-  )
+  from supekku.scripts.lib.backlog.registry import BacklogRegistry  # noqa: PLC0415
 
-  matches = find_backlog_items_by_id(raw_id, root, kind=kind)
-  if not matches:
+  registry = BacklogRegistry(root=root)
+  item = registry.find(raw_id)
+  if item is None:
     raise ArtifactNotFoundError(kind, raw_id)
-  if len(matches) > 1:
-    raise AmbiguousArtifactError(kind, raw_id, [m.path for m in matches])
-  item = matches[0]
+  if kind and item.kind != kind:
+    raise ArtifactNotFoundError(kind, raw_id)
   return ArtifactRef(id=item.id, path=item.path, record=item)
 
 
@@ -676,12 +674,11 @@ def _find_plans(root: Path, pattern: str) -> Iterator[ArtifactRef]:
 
 
 def _find_backlog(root: Path, pattern: str, kind: str) -> Iterator[ArtifactRef]:
-  from supekku.scripts.lib.backlog.registry import (  # noqa: PLC0415
-    discover_backlog_items,
-  )
+  from supekku.scripts.lib.backlog.registry import BacklogRegistry  # noqa: PLC0415
 
-  items = discover_backlog_items(root=root, kind=kind)
-  for item in items:
+  kind_filter = kind if kind != "all" else None
+  registry = BacklogRegistry(root=root)
+  for item in registry.iter(kind=kind_filter):
     if _matches_pattern(item.id, pattern):
       yield ArtifactRef(id=item.id, path=item.path, record=item)
 

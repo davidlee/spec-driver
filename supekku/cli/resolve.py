@@ -129,11 +129,24 @@ def _collect_changes(root: Path, index: ArtifactIndex) -> None:
     log.debug("Skipping changes registry", exc_info=True)
 
 
+def _collect_backlog_items(root: Path, index: ArtifactIndex) -> None:
+  """Add backlog items to the artifact index."""
+  try:
+    from supekku.scripts.lib.backlog.registry import BacklogRegistry  # noqa: PLC0415
+
+    registry = BacklogRegistry(root=root)
+    for item_id, item in registry.collect().items():
+      rel = str(item.path.relative_to(root))
+      index[item_id] = (rel, item.kind)
+  except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
+    log.debug("Skipping backlog registry", exc_info=True)
+
+
 def _build_artifact_index(root: Path) -> ArtifactIndex:
   """Build artifact ID → (relative_path, kind) index.
 
   Collects IDs from all known registries: decisions, specs,
-  deltas, revisions, audits, and memory records.
+  deltas, revisions, audits, memory records, and backlog items.
 
   Args:
     root: Repository root path.
@@ -146,6 +159,7 @@ def _build_artifact_index(root: Path) -> ArtifactIndex:
   _collect_decisions(root, index)
   _collect_specs(root, index)
   _collect_changes(root, index)
+  _collect_backlog_items(root, index)
   return index
 
 

@@ -584,7 +584,7 @@ requirements:
     primary_spec: PROD-004
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -594,7 +594,7 @@ requirements:
     - VT-004
     coverage_entries:
     - artefact: VT-004
-      status: passed
+      status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-005:
@@ -714,7 +714,7 @@ requirements:
     primary_spec: PROD-005
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -725,7 +725,7 @@ requirements:
     - VT-001
     coverage_entries:
     - artefact: VT-001
-      status: passed
+      status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-005.FR-002:
@@ -736,7 +736,7 @@ requirements:
     primary_spec: PROD-005
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -746,7 +746,7 @@ requirements:
     - VT-002
     coverage_entries:
     - artefact: VT-002
-      status: passed
+      status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-005.FR-003:
@@ -757,7 +757,7 @@ requirements:
     primary_spec: PROD-005
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -767,7 +767,7 @@ requirements:
     - VT-003
     coverage_entries:
     - artefact: VT-003
-      status: passed
+      status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-005.FR-004:
@@ -778,7 +778,7 @@ requirements:
     primary_spec: PROD-005
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -788,7 +788,7 @@ requirements:
     - VT-004
     coverage_entries:
     - artefact: VT-004
-      status: passed
+      status: verified
       kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-005.NF-001:
@@ -799,7 +799,7 @@ requirements:
     primary_spec: PROD-005
     kind: non-functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -808,7 +808,7 @@ requirements:
     - VA-001
     coverage_entries:
     - artefact: VA-001
-      status: passed
+      status: verified
       kind: VA
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-005.NF-002:
@@ -819,7 +819,7 @@ requirements:
     primary_spec: PROD-005
     kind: non-functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -828,7 +828,7 @@ requirements:
     - VA-002
     coverage_entries:
     - artefact: VA-002
-      status: passed
+      status: verified
       kind: VA
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-006.FR-001:
@@ -4195,7 +4195,7 @@ requirements:
     primary_spec: SPEC-124
     kind: functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4204,7 +4204,7 @@ requirements:
     - VT-001
     coverage_entries:
     - artefact: VT-001
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-002:
@@ -4216,7 +4216,7 @@ requirements:
     primary_spec: SPEC-124
     kind: functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4225,7 +4225,7 @@ requirements:
     - VT-002
     coverage_entries:
     - artefact: VT-002
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-003:
@@ -4237,7 +4237,7 @@ requirements:
     primary_spec: SPEC-124
     kind: functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4246,7 +4246,7 @@ requirements:
     - VT-003
     coverage_entries:
     - artefact: VT-003
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-004:
@@ -4258,7 +4258,7 @@ requirements:
     primary_spec: SPEC-124
     kind: functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4267,7 +4267,7 @@ requirements:
     - VT-004
     coverage_entries:
     - artefact: VT-004
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-005:
@@ -4278,7 +4278,7 @@ requirements:
     primary_spec: SPEC-124
     kind: functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4287,7 +4287,7 @@ requirements:
     - VT-005
     coverage_entries:
     - artefact: VT-005
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-006:
@@ -4299,7 +4299,7 @@ requirements:
     primary_spec: SPEC-124
     kind: functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4308,7 +4308,7 @@ requirements:
     - VT-006
     coverage_entries:
     - artefact: VT-006
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-007:
@@ -4320,7 +4320,7 @@ requirements:
     primary_spec: SPEC-124
     kind: functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4329,7 +4329,7 @@ requirements:
     - VT-007
     coverage_entries:
     - artefact: VT-007
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-008:
@@ -4340,7 +4340,7 @@ requirements:
     primary_spec: SPEC-124
     kind: functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4349,7 +4349,7 @@ requirements:
     - VT-008
     coverage_entries:
     - artefact: VT-008
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-009:
@@ -4360,7 +4360,7 @@ requirements:
     primary_spec: SPEC-124
     kind: functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4369,7 +4369,7 @@ requirements:
     - VT-009
     coverage_entries:
     - artefact: VT-009
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.NF-001:
@@ -4381,7 +4381,7 @@ requirements:
     primary_spec: SPEC-124
     kind: non-functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4390,7 +4390,7 @@ requirements:
     - VT-010
     coverage_entries:
     - artefact: VT-010
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.NF-002:
@@ -4402,7 +4402,7 @@ requirements:
     primary_spec: SPEC-124
     kind: non-functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4411,7 +4411,7 @@ requirements:
     - VT-011
     coverage_entries:
     - artefact: VT-011
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.NF-003:
@@ -4423,7 +4423,7 @@ requirements:
     primary_spec: SPEC-124
     kind: non-functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by: []
@@ -4432,7 +4432,7 @@ requirements:
     - VT-012
     coverage_entries:
     - artefact: VT-012
-      status: implemented
+      status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-125.FR-001:

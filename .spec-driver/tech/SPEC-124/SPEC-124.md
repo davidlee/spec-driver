@@ -156,73 +156,73 @@ entries:
   - artefact: VT-001
     kind: VT
     requirement: SPEC-124.FR-001
-    status: implemented
+    status: verified
     notes: LanguageAdapter abstract interface tests (base_test.py)
 
   - artefact: VT-002
     kind: VT
     requirement: SPEC-124.FR-002
-    status: implemented
+    status: verified
     notes: Source validation and git tracking tests (base_test.py)
 
   - artefact: VT-003
     kind: VT
     requirement: SPEC-124.FR-003
-    status: implemented
+    status: verified
     notes: Python adapter discovery and generation tests (python_test.py)
 
   - artefact: VT-004
     kind: VT
     requirement: SPEC-124.FR-004
-    status: implemented
+    status: verified
     notes: Python docstring preservation tests (python_test.py)
 
   - artefact: VT-005
     kind: VT
     requirement: SPEC-124.FR-005
-    status: implemented
+    status: verified
     notes: Go adapter discovery tests (go_test.py)
 
   - artefact: VT-006
     kind: VT
     requirement: SPEC-124.FR-006
-    status: implemented
+    status: verified
     notes: Go toolchain validation tests (go_test.py)
 
   - artefact: VT-007
     kind: VT
     requirement: SPEC-124.FR-007
-    status: implemented
+    status: verified
     notes: TypeScript adapter discovery tests (typescript_test.py)
 
   - artefact: VT-008
     kind: VT
     requirement: SPEC-124.FR-008
-    status: implemented
+    status: verified
     notes: TypeScript AST extraction tests (typescript_test.py)
 
   - artefact: VT-009
     kind: VT
     requirement: SPEC-124.FR-009
-    status: implemented
+    status: verified
     notes: Node.js runtime validation tests (typescript_test.py)
 
   - artefact: VT-010
     kind: VT
     requirement: SPEC-124.NF-001
-    status: implemented
+    status: verified
     notes: Deterministic output tests across all adapters
 
   - artefact: VT-011
     kind: VT
     requirement: SPEC-124.NF-002
-    status: implemented
+    status: verified
     notes: Error handling tests for missing toolchains
 
   - artefact: VT-012
     kind: VT
     requirement: SPEC-124.NF-003
-    status: implemented
+    status: verified
     notes: Package manager detection tests (typescript_test.py)
 ```
 

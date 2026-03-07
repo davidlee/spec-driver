@@ -111,32 +111,32 @@ entries:
   - artefact: VT-001
     kind: VT
     requirement: PROD-005.FR-001
-    status: passed
+    status: verified
     notes: Verify leaf package identification from Python directory structure
   - artefact: VT-002
     kind: VT
     requirement: PROD-005.FR-002
-    status: passed
+    status: verified
     notes: Test deterministic file ordering within packages across platforms
   - artefact: VT-003
     kind: VT
     requirement: PROD-005.FR-003
-    status: passed
+    status: verified
     notes: Validate sync operation handles package-level specs correctly
   - artefact: VT-004
     kind: VT
     requirement: PROD-005.FR-004
-    status: passed
+    status: verified
     notes: Test --for-path resolution to package specs
   - artefact: VA-001
     kind: VA
     requirement: PROD-005.NF-001
-    status: passed
+    status: verified
     notes: Analyze git diff stability across contract regeneration cycles
   - artefact: VA-002
     kind: VA
     requirement: PROD-005.NF-002
-    status: passed
+    status: verified
     notes: Review design for rollup mechanism compatibility
 ```
 

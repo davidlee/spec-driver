@@ -27,3 +27,33 @@
 {"v":1,"ts":"2026-03-07T03:46:50.223800+00:00","session":"claude","cmd":"show improvement","argv":["show","improvement","010"],"artifacts":[],"exit_code":1,"status":"error"}
 {"v":1,"ts":"2026-03-07T03:46:56.234395+00:00","session":"claude","cmd":"view issue","argv":["view","issue","ISSUE-009"],"artifacts":[],"exit_code":0,"status":"ok"}
 {"v":1,"ts":"2026-03-07T03:47:03.795318+00:00","session":"claude","cmd":"create issue","argv":["create","issue","show/view commands lack ID inference \u2014 require redundant subcommand and full prefix"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:50:28.696894+00:00","session":"claude","cmd":"list policies","argv":["list","policies","-s","required"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:50:28.888416+00:00","session":"claude","cmd":"list standards","argv":["list","standards","-s","required"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:50:46.142647+00:00","session":"claude","cmd":"show delta","argv":["show","delta","DE-052"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:53:46.669939+00:00","session":"claude","cmd":"install","argv":["install","--dry-run"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:54:36.442193+00:00","session":"claude","cmd":"sync","argv":["sync"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:54:36.914175+00:00","session":"claude","cmd":"validate","argv":["validate"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:55:42.237698+00:00","session":"claude","cmd":"complete delta","argv":["complete","delta","DE-052","--dry-run"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:55:45.934637+00:00","session":"claude","cmd":"complete delta","argv":["complete","delta","DE-052"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:55:52.340430+00:00","session":"claude","cmd":"sync","argv":["sync"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:55:52.807541+00:00","session":"claude","cmd":"validate","argv":["validate"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:55:53.155412+00:00","session":"claude","cmd":"show delta","argv":["show","delta","DE-052"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:00:42.610646+00:00","session":null,"cmd":"create phase","argv":["create","phase","Strengthen routing for DR-IP-phase ordering","--plan","IP-055"],"artifacts":["IP-055.PHASE-04"],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:02:03.196036+00:00","session":null,"cmd":"skills sync","argv":["skills","sync"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:10:45.087936+00:00","session":null,"cmd":"list deltas","argv":["list","deltas"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:10:52.169739+00:00","session":null,"cmd":"sync","argv":["sync"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:10:54.522317+00:00","session":null,"cmd":"list deltas","argv":["list","deltas"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:11:16.971522+00:00","session":"claude","cmd":"list policies","argv":["list","policies","-s","required"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:11:17.209301+00:00","session":"claude","cmd":"list standards","argv":["list","standards","-s","required"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:11:23.965998+00:00","session":"claude","cmd":"show delta","argv":["show","delta","DE-053"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:12:36.352729+00:00","session":"claude","cmd":"validate","argv":["validate"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:13:02.255673+00:00","session":null,"cmd":"sync","argv":["sync"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:13:13.055804+00:00","session":"claude","cmd":"sync","argv":["sync","--no-contracts"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:14:23.166074+00:00","session":"claude","cmd":"show delta","argv":["show","delta","DE-050"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:23:20.416508+00:00","session":"claude","cmd":"list specs","argv":["list","specs","-s","active","--format","tsv"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:23:24.170898+00:00","session":"claude","cmd":"list specs","argv":["list","specs","--format","tsv"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:23:26.617985+00:00","session":"claude","cmd":"show spec","argv":["show","spec","PROD-010","--raw"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:40:42.765082+00:00","session":"claude","cmd":"sync","argv":["sync","--no-contracts"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:44:39.596797+00:00","session":null,"cmd":"list policies","argv":["list","policies","-s","required"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:44:49.483977+00:00","session":null,"cmd":"show policy","argv":["show","policy","POL-001","--raw"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T04:44:49.488035+00:00","session":null,"cmd":"show policy","argv":["show","policy","POL-002","--raw"],"artifacts":[],"exit_code":0,"status":"ok"}

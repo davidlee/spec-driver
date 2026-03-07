@@ -71,6 +71,19 @@
 - Promoted DE-055 and IP-055 to `in-progress`.
 - Created and filled `IP-055.PHASE-03` for the lifecycle-guidance tightening work.
 
+### 2026-03-07 - phase 04 decision
+- Chose to strengthen `using-spec-driver` rather than `execute-phase` or boot for the DR -> IP -> phase -> implementation ordering gap.
+- Rationale:
+  - the missing guardrail is in routing, where the agent decides the next governing skill
+  - scope-delta, plan-phases, and execute-phase already encode the intended sequence once the agent has entered them
+  - the failure mode is jumping from "there is a delta" to implementation before the bundle is execution-ready
+
+### 2026-03-07 - phase 04 work
+- Updated `supekku/skills/using-spec-driver/SKILL.md` to:
+  - make execution readiness distinct from merely having a delta
+  - route missing revision/scoping/planning work before `/execute-phase`
+  - add a direct guardrail against treating an existing delta as permission to start implementing
+
 ### Observed failure modes
 - Deltas can be completed with lifecycle status still `draft`.
 - Agents are eager to skip DR, IP, or phase sheets and proceed directly to implementation.

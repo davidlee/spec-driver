@@ -140,7 +140,7 @@ Usage notes:
 
 <skill>
 <name>using-spec-driver</name>
-<description>Use at the start of ANY substantive work in a spec-driver project. You MUST choose the governing skill path before acting, especially when work may touch spec-driver entities, workflow artifacts, or project doctrine.</description>
+<description>Mandatory routing skill for ANY substantive work in a spec-driver project. Choose the governing skill before acting, and do not start implementation until the required delta/design/plan/phase artefacts exist.</description>
 <location>project</location>
 </skill>
 

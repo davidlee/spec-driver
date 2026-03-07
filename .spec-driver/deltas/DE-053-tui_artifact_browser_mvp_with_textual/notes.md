@@ -243,13 +243,121 @@ Phase 1 infrastructure is ready. Phase 2 (TUI core) can now:
 
 ### Commits
 
-Uncommitted. Ready to commit when user approves.
+- `2c63db6` feat(DE-053): Phase 2 — TUI core app, browser, widgets, pilot tests
 
-### Follow-ups
+### Handoff to Phase 3
 
-- CLI entry point (`spec-driver tui` command) — Phase 3
-- File watching (`watchfiles.awatch` integration) — Phase 3
-- Edge cases (`$EDITOR` unset, import guard) — Phase 3
+Phase 2 infrastructure is ready. Phase 3 (integration & close) needs:
+
+1. **CLI entry point** — `spec-driver tui` command in `supekku/cli/main.py`
+   with import guard (`textual` not installed → helpful install message).
+   `SpecDriverApp` accepts `root` and `snapshot` params; CLI just needs to
+   instantiate and call `app.run()`.
+
+2. **File watching** — `watchfiles.awatch` integration. `ArtifactSnapshot`
+   already has `refresh(art_type)` for per-registry invalidation.
+   `BrowserScreen` has `refresh_snapshot(art_type)` to update UI after refresh.
+   The watcher needs to map filesystem paths to `ArtifactType` and call these.
+   `watchfiles` is already installed (`[tui]` extra).
+
+3. **Edge cases** (VT-053-edge-cases):
+   - `$EDITOR` unset — `e` keybinding needs `app.suspend()` + `$EDITOR` launch;
+     helpful error if unset. Not wired yet (placeholder in Phase 2).
+   - Empty registries — already handled (DataTable shows 0 rows, tested).
+   - Import guard — test that `spec-driver tui` without `[tui]` extra gives
+     clean error message.
+
+4. **VH-053-smoke** — manual verification gate. Launch real TUI, browse all
+   types, filter by status, fuzzy search, editor suspend/resume, file watch.
+
+5. **Follow-up delta** — scope BacklogRegistry class normalisation (exit
+   criteria for DE-053).
+
+**Key Textual API findings from Phase 2** (save the next agent debugging time):
+- `DataTable` needs `cursor_type="row"` for `RowSelected` events
+- `Select.clear()` to reset; `select.is_blank()` to check blank state
+- `app.screen.query_one()` not `app.query_one()` for pushed screens
+- Textual dispatches `on_*` handlers across entire MRO, not just most-derived
+- `SpecDriverApp` takes `snapshot=` param for test injection
+
+### Follow-ups (from Phase 2)
+
 - Refactor `list.py` `_PLURAL_TO_SINGULAR` to consume `ArtifactTypeMeta` —
   follow-up (not DE-053 scope)
 - Cross-type fuzzy search — follow-up (DEC-053-12)
+
+## 2026-03-07 — Phase 3: Integration & close
+
+### What was done
+
+- **P03-T01**: CLI entry point — `spec-driver tui` command added to
+  `supekku/cli/main.py` with import guard. Missing `textual` prints
+  install instructions and exits cleanly.
+- **P03-T02**: File watching — `watchfiles.awatch` integration in
+  `SpecDriverApp._watch_files()`. Maps changed paths to `ArtifactType`
+  via new `path_to_artifact_type()` in `core/artifact_view.py`. Per-registry
+  invalidation through existing `BrowserScreen.refresh_snapshot()`.
+  Watcher task created on mount, cancelled on exit.
+- **P03-T03**: Editor integration — `e` keybinding calls `app.suspend()` +
+  `subprocess.run([$EDITOR, path])`. `$EDITOR` unset → `app.notify()`
+  with helpful message. `BrowserScreen.selected_entry` property tracks
+  current selection.
+- **P03-T04**: VT-053-edge-cases — 16 tests: import guard (subprocess),
+  $EDITOR unset (pilot), empty snapshot (pilot), `path_to_artifact_type`
+  (12 path mapping tests covering all 11 types + unrelated path).
+- **P03-T06**: Follow-up delta DE-057 scoped (BacklogRegistry class
+  normalisation). References DE-050, DE-053, IMPR-010, related issues.
+
+### Files created
+
+- `supekku/tui/edge_cases_test.py` (16 tests)
+
+### Files modified
+
+- `supekku/cli/main.py` (+`tui` command with import guard)
+- `supekku/tui/app.py` (file watcher, editor integration, `watch` param)
+- `supekku/tui/browser.py` (`selected_entry` property, `ArtifactEntry` import)
+- `supekku/scripts/lib/core/artifact_view.py` (`path_to_artifact_type()`)
+- `.spec-driver/deltas/DE-057-*/DE-057.md` (follow-up delta)
+
+### Surprises & adaptations
+
+- `app.suspend()` is a context manager (not async) — simpler than expected.
+  `subprocess.run()` inside the context manager works cleanly.
+- `path_to_artifact_type` needs to handle kanban cards specially — they live
+  at repo root (`kanban/`), not under `.spec-driver/`.
+- Added `watch=True` parameter to `SpecDriverApp` so tests can disable
+  the file watcher (avoids watchfiles scanning `/tmp`).
+
+### Verification
+
+- `just` passes: ruff clean, pylint 9.51/10, 2855 tests pass, 3 skipped
+- VT-053-edge-cases: 16/16 pass
+- All 31 TUI tests pass
+- Quick smoke: `spec-driver tui` launches, renders 3-panel layout with
+  correct artifact counts
+
+### VH-053-smoke: passed
+
+User verified all acceptance criteria in interactive session. Additional
+polish applied during VH:
+
+- **Frontmatter stripping**: YAML frontmatter removed from preview
+- **Vertical stacked layout**: list above, preview below (was side-by-side)
+- **Fuzzy search**: Textual `Matcher` replaces substring match, sorted by score
+- **Search navigation**: up/down/enter in search input control the table;
+  enter also focuses preview for immediate scrolling
+- **Status cycler**: 1-line cycling label replaces 3-line Select dropdown;
+  `s` keybinding cycles from anywhere
+- **Keyboard-scrollable preview**: `PreviewPanel` wraps `VerticalScroll`
+  (Markdown widget alone has `can_focus=False`)
+- **Default selection**: ADRs load on startup
+- **Sorted by ID**: alphabetical sort (fuzzy results sorted by score)
+- **Titled borders**: rounded frames with dynamic titles on all panels
+- **File watcher fixes**: custom filter to include `.spec-driver/` (hidden
+  dirs ignored by default); refresh updates artifact list + preview
+
+### Follow-up items
+
+- IMPR-011: TUI polish, navigation, and relational display
+- DE-057: BacklogRegistry class normalisation (exit criteria)

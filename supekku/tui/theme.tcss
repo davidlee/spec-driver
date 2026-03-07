@@ -17,44 +17,72 @@ BrowserScreen {
   width: 1fr;
   min-width: 20;
   max-width: 30;
-  border-right: solid $surface-lighten-2;
+  height: 100%;
+  border: round $surface-lighten-2;
+  border-title-color: $text-muted;
+  background: $surface;
+  padding: 0 1;
 }
 
 #type-selector:focus-within {
-  border-right: solid $accent;
+  border: round $accent;
+  border-title-color: $accent;
 }
 
-/* --- Artifact list (center panel) --- */
+/* Reset OptionList chrome inside our bordered container */
+TypeSelector {
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+/* --- Right column: list above, preview below --- */
+
+#right-column {
+  width: 4fr;
+  height: 1fr;
+}
+
+/* --- Artifact list (top of right column) --- */
 
 #artifact-panel {
-  width: 2fr;
-  min-width: 30;
-  border-right: solid $surface-lighten-2;
+  height: 2fr;
+  min-height: 10;
+  border: round $surface-lighten-2;
+  border-title-color: $text-muted;
+  padding: 0 1;
 }
 
 #artifact-panel:focus-within {
-  border-right: solid $accent;
+  border: round $accent;
+  border-title-color: $accent;
 }
 
 #status-filter {
-  height: 3;
-  margin: 0 1;
+  height: 1;
+}
+
+#search-input {
+  margin: 0 0 1 0;
 }
 
 #artifact-table {
   height: 1fr;
 }
 
-/* --- Preview (right panel) --- */
+/* --- Preview (bottom of right column) --- */
 
 #preview-panel {
-  width: 3fr;
-  min-width: 30;
+  height: 3fr;
+  min-height: 8;
+  border: round $surface-lighten-2;
+  border-title-color: $text-muted;
   padding: 0 1;
 }
 
 #preview-panel:focus-within {
-  border-left: solid $accent;
+  border: round $accent;
+  border-title-color: $accent;
 }
 
 /* --- Footer --- */

@@ -321,6 +321,59 @@ class ArtifactSnapshot:
     }
 
 
+def path_to_artifact_type(changed_path: Path, root: Path) -> ArtifactType | None:
+  """Map a changed filesystem path to its ArtifactType.
+
+  Uses paths.py subdirectory conventions to determine which registry
+  owns the changed file. Returns None if the path doesn't map to a
+  known artifact type.
+  """
+  from supekku.scripts.lib.core.paths import (  # noqa: PLC0415
+    AUDITS_SUBDIR,
+    BACKLOG_DIR,
+    DECISIONS_SUBDIR,
+    DELTAS_SUBDIR,
+    MEMORY_DIR,
+    POLICIES_SUBDIR,
+    PRODUCT_SPECS_SUBDIR,
+    REVISIONS_SUBDIR,
+    STANDARDS_SUBDIR,
+    TECH_SPECS_SUBDIR,
+    get_spec_driver_root,
+  )
+
+  sd_root = get_spec_driver_root(root)
+  try:
+    rel = changed_path.resolve().relative_to(sd_root.resolve())
+  except ValueError:
+    # Check if it's a kanban card (lives at repo root, not under .spec-driver)
+    try:
+      repo_rel = changed_path.resolve().relative_to(root.resolve())
+      if repo_rel.parts and repo_rel.parts[0] == "kanban":
+        return ArtifactType.CARD
+    except ValueError:
+      pass
+    return None
+
+  if not rel.parts:
+    return None
+
+  top = rel.parts[0]
+  _subdir_map: dict[str, ArtifactType] = {
+    TECH_SPECS_SUBDIR: ArtifactType.SPEC,
+    PRODUCT_SPECS_SUBDIR: ArtifactType.SPEC,
+    DECISIONS_SUBDIR: ArtifactType.ADR,
+    POLICIES_SUBDIR: ArtifactType.POLICY,
+    STANDARDS_SUBDIR: ArtifactType.STANDARD,
+    DELTAS_SUBDIR: ArtifactType.DELTA,
+    REVISIONS_SUBDIR: ArtifactType.REVISION,
+    AUDITS_SUBDIR: ArtifactType.AUDIT,
+    BACKLOG_DIR: ArtifactType.BACKLOG,
+    MEMORY_DIR: ArtifactType.MEMORY,
+  }
+  return _subdir_map.get(top)
+
+
 def _make_spec_registry(root: Path) -> Any:
   from supekku.scripts.lib.specs.registry import SpecRegistry  # noqa: PLC0415
 

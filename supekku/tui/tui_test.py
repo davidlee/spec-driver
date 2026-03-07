@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
-from textual.widgets import DataTable, Input, Select
+from textual.widgets import DataTable, Input
 
 from supekku.scripts.lib.core.artifact_view import (
   ArtifactEntry,
@@ -227,11 +227,13 @@ class TestStatusFilter:
       ts.highlighted = 0  # ADR
       ts.action_select()
       await pilot.pause()
-      status_sel = app.screen.query_one(
+      from supekku.tui.widgets.artifact_list import StatusCycler  # noqa: PLC0415
+
+      status_cycler = app.screen.query_one(
         "#status-filter",
-        Select,
+        StatusCycler,
       )
-      assert status_sel is not None
+      assert status_cycler is not None
 
 
 class TestSearchFilter:

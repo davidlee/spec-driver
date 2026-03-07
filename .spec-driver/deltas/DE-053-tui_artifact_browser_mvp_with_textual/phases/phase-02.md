@@ -259,4 +259,4 @@ No phase-specific decisions expected unless STOP conditions trigger.
 - [x] Exit criteria satisfied
 - [x] Verification evidence: `just` passes (2839 tests, ruff clean, pylint 9.51)
 - [x] Notes updated with findings
-- [ ] Hand-off notes to Phase 3
+- [x] Hand-off notes to Phase 3

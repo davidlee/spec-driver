@@ -1,11 +1,14 @@
-"""Artifact list widget — DataTable + Select status filter (DEC-053-13)."""
+"""Artifact list widget — DataTable + status cycle + fuzzy search."""
 
 from __future__ import annotations
 
 from textual import on
 from textual.containers import Vertical
+from textual.events import Key
+from textual.fuzzy import Matcher
 from textual.message import Message
-from textual.widgets import DataTable, Input, Select
+from textual.reactive import reactive
+from textual.widgets import DataTable, Input, Label
 
 from supekku.scripts.lib.core.artifact_view import (
   ArtifactEntry,
@@ -13,8 +16,14 @@ from supekku.scripts.lib.core.artifact_view import (
 )
 from supekku.scripts.lib.formatters.theme import styled_text
 
-# Columns shown in the artifact list (id, title, status).
-_LIST_COLUMNS = ("ID", "Title", "Status")
+# Columns: (label, key, width). None width = auto-size to content.
+_LIST_COLUMNS = (
+  ("ID", "id", 16),
+  ("Title", "title", None),
+  ("Status", "status", 14),
+)
+
+_ALL = "all"
 
 
 class ArtifactSelected(Message):
@@ -23,6 +32,69 @@ class ArtifactSelected(Message):
   def __init__(self, entry: ArtifactEntry) -> None:
     super().__init__()
     self.entry = entry
+
+
+class StatusCycler(Label):
+  """1-line status filter that cycles on click or keybinding."""
+
+  current = reactive(_ALL)
+
+  class Changed(Message):
+    """Posted when the status filter value changes."""
+
+    def __init__(self, status_cycler: StatusCycler, value: str) -> None:
+      super().__init__()
+      self.value = value
+      self.status_cycler = status_cycler
+
+    @property
+    def control(self) -> StatusCycler:
+      """The StatusCycler that sent the message."""
+      return self.status_cycler
+
+  def __init__(self, **kwargs) -> None:
+    super().__init__(**kwargs)
+    self._options: list[str] = []
+
+  def set_statuses(self, statuses: list[str]) -> None:
+    """Update the available status values."""
+    self._options = [_ALL, *statuses]
+    self.current = _ALL
+
+  def watch_current(self, value: str) -> None:
+    self.update(f" Status: {value} ▸")
+    self.post_message(self.Changed(self, value))
+
+  def on_click(self) -> None:
+    self.cycle()
+
+  def cycle(self) -> None:
+    """Advance to the next status value."""
+    if not self._options:
+      return
+    try:
+      idx = self._options.index(self.current)
+    except ValueError:
+      idx = 0
+    self.current = self._options[(idx + 1) % len(self._options)]
+
+
+class _SearchInput(Input):
+  """Search input that forwards navigation keys to the artifact table."""
+
+  def on_key(self, event: Key) -> None:
+    table = self.screen.query_one("#artifact-table", DataTable)
+    if event.key == "down":
+      event.prevent_default()
+      table.action_cursor_down()
+    elif event.key == "up":
+      event.prevent_default()
+      table.action_cursor_up()
+    elif event.key == "enter" and table.row_count > 0:
+      event.prevent_default()
+      table.action_select_cursor()
+      preview = self.screen.query_one("#preview-panel")
+      preview.focus()
 
 
 class ArtifactList(Vertical):
@@ -34,20 +106,20 @@ class ArtifactList(Vertical):
     self._current_type: ArtifactType | None = None
     self._search_text: str = ""
 
+  @property
+  def current_type(self) -> ArtifactType | None:
+    """Currently displayed artifact type."""
+    return self._current_type
+
   def compose(self):
-    yield Select[str](
-      [],
-      prompt="Status: all",
-      allow_blank=True,
-      id="status-filter",
-    )
-    yield Input(placeholder="/ search", id="search-input")
+    yield StatusCycler(id="status-filter")
+    yield _SearchInput(placeholder="/ search", id="search-input")
     yield DataTable(id="artifact-table", cursor_type="row")
 
   def on_mount(self) -> None:
     table = self.query_one("#artifact-table", DataTable)
-    for col in _LIST_COLUMNS:
-      table.add_column(col, key=col.lower())
+    for label, key, width in _LIST_COLUMNS:
+      table.add_column(label, key=key, width=width)
 
   def show_entries(
     self,
@@ -65,27 +137,25 @@ class ArtifactList(Vertical):
 
     # Rebuild status filter options
     statuses = sorted({e.status for e in entries if e.status})
-    status_select = self.query_one("#status-filter", Select)
-    options = [(s, s) for s in statuses]
-    status_select.set_options(options)
-    status_select.clear()
+    cycler = self.query_one("#status-filter", StatusCycler)
+    cycler.set_statuses(statuses)
 
     self._refresh_table()
 
   def _filtered_entries(self) -> list[ArtifactEntry]:
     """Apply status filter and search text to entries."""
     entries = self._entries
-    status_select = self.query_one("#status-filter", Select)
-    if not status_select.is_blank():
-      entries = [e for e in entries if e.status == status_select.value]
+    cycler = self.query_one("#status-filter", StatusCycler)
+    if cycler.current != _ALL:
+      entries = [e for e in entries if e.status == cycler.current]
     if self._search_text:
-      term = self._search_text.lower()
-      entries = [
-        e
+      matcher = Matcher(self._search_text)
+      scored = [
+        (e, max(matcher.match(e.id), matcher.match(e.title), matcher.match(e.status)))
         for e in entries
-        if term in e.id.lower() or term in e.title.lower() or term in e.status.lower()
       ]
-    return entries
+      return [e for e, score in sorted(scored, key=lambda x: -x[1]) if score > 0]
+    return sorted(entries, key=lambda e: e.id)
 
   def _refresh_table(self) -> None:
     table = self.query_one("#artifact-table", DataTable)
@@ -99,8 +169,8 @@ class ArtifactList(Vertical):
         key=entry.id,
       )
 
-  @on(Select.Changed, "#status-filter")
-  def _on_status_changed(self, event: Select.Changed) -> None:
+  @on(StatusCycler.Changed, "#status-filter")
+  def _on_status_changed(self, event: StatusCycler.Changed) -> None:
     event.stop()
     self._refresh_table()
 

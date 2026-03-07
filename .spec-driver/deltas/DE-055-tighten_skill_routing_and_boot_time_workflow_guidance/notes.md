@@ -44,6 +44,7 @@
 - Decide whether further guidance or runtime reinforcement is needed beyond the routing and execute-phase changes already landed for DR, IP, and phase-sheet skipping.
 - Decide where commit defaults belong and how they should be confirmed for the active delta.
 - Decide how to make `/notes` an invariant rather than a suggestion.
+- Decide how explicit handoff prompts should be about carrying forward unresolved assumptions and tensions between phases and fresh agents.
 - Decide how much more explicit the ordering contract should be beyond the using-spec-driver guardrail already added for `DR -> IP -> phase -> implementation`.
 - Decide whether to add a dedicated capture skill and stronger backlog-to-delta-to-backlog lifecycle guidance.
 - Treat `ISSUE-009` as a dependency for backlog-oriented skill workflows, because backlog status semantics are not yet canonical.
@@ -101,9 +102,49 @@
 - Added `evidence-based-skill-development.md` to the DE-055 bundle as a pending research input.
 - Do not read it yet for this delta thread; another agent is preparing a compressed extract of the relevant parts.
 
+### 2026-03-07 - phase 07 case study and decision
+- Captured a DE-053 multi-phase handover failure mode:
+  - the handover named the right artefacts and next command
+  - preflight summarized scope and entrance criteria
+  - but it declared readiness before critically assessing DR/IP/phase tensions and unresolved implementation choices
+- Decision:
+  - strengthen `/preflight` so implementation-bound use must produce a critical assessment of confirmed inputs, assumptions, unresolved questions, and tensions before claiming readiness
+  - strengthen `/continuation` and `/next` so handoffs preserve those unresolved questions instead of flattening them into a generic "ready to proceed"
+  - reinforce `/execute-phase` so unresolved ambiguity discovered in preflight becomes a `/consult` trigger before improvisation
+
+### 2026-03-07 - phase 07 work
+- Updated `supekku/skills/preflight/SKILL.md` to require an explicit critical-assessment section and a stricter readiness standard for implementation-bound work.
+- Updated `supekku/skills/continuation/SKILL.md` and `supekku/skills/next/SKILL.md` so handoff prompts must preserve unresolved assumptions, questions, and tensions.
+- Updated `supekku/skills/execute-phase/SKILL.md` so `/preflight` is explicitly about surfacing assumptions and tensions before coding, and unresolved ambiguity routes to `/consult`.
+- Ran `uv run spec-driver skills sync` successfully; installed skills and `.spec-driver/AGENTS.md` now reflect the stronger preflight and handoff wording.
+
+### 2026-03-07 - evergreen GPT startup reference
+- Added `gpt-skill-authoring-reference.md` to the DE-055 bundle.
+- Purpose:
+  - give GPT agents a short startup document before they touch spec-driver skill work
+  - compress DE-055 doctrine and Superpowers-derived guidance into one practical synthesis
+  - act as a staging document for future memory extraction rather than a new permanent handbook layer
+- Refreshed the document after the DE-053 handover lesson so it now also captures:
+  - implementation readiness as a critical-assessment outcome rather than a scope-summary vibe
+  - the need for `/continuation` and `/next` to preserve unresolved assumptions and tensions in handoffs
+- Main conclusions captured there:
+  - preserve `spec-driver` as a narrow CLI/entity skill
+  - keep routing separate in `using-spec-driver`
+  - keep boot short and force early routing
+  - preserve packaged-skill uniformity and push local variation into generated docs and hooks
+  - import trigger-only descriptions, empirical skill testing, and anti-rationalization patterns from Superpowers
+  - reject universal ceremony and any pattern that competes with ADR-004, ADR-005, or `PROD-016`
+- Likely follow-up:
+  - split the synthesis into a small set of durable memories once the wording settles
+  - probably a signpost, a pattern, and a few facts rather than one long memory
+- Created `mem.signpost.spec-driver.skill-authoring` as the first durable extraction
+  pointing future skill work back to the DE-055 synthesis and the governing
+  ADR/spec/memory sources.
+
 ### Observed failure modes
 - `complete delta` still tolerates lifecycle status `draft`; execute-phase now mitigates the earlier drift, but runtime closure semantics remain undecided.
 - Agents were eager to skip DR, IP, or phase sheets and proceed directly to implementation; routing and execute-phase guidance now address the main guidance gap, but the remaining question is whether stronger reinforcement is still needed.
+- Multi-phase handovers can preserve the right artefact list while still flattening unresolved design questions, leading preflight to overstate implementation readiness.
 - Agents can fail to end each task with `/notes`, leaving records stale.
 - Git commit policy is underspecified: end of task, end of phase, or other cadence is unclear.
 - Ordering between DR, IP, phase-sheet creation, and phase execution now has an explicit routing guardrail, but may still need stronger reinforcement or closure semantics.
@@ -120,6 +161,7 @@
 - Synced skills successfully so generated `AGENTS.md` reflects the new routing surfaces.
 - Linked `ISSUE-009` as the blocker for backlog-oriented skill workflow semantics.
 - Linked `evidence-based-skill-development.md` into the bundle as pending research input without reading it directly.
+- Hardened `preflight`, `continuation`, `next`, and `execute-phase` so implementation readiness requires a critical assessment of assumptions, unresolved questions, and tensions.
 
 ## Fresh-agent onboarding
 
@@ -128,21 +170,27 @@
 - `DR-055.md`
 - `IP-055.md`
 - `notes.md`
+- `gpt-skill-authoring-reference.md`
 - `phases/phase-01.md`
 - `phases/phase-02.md`
 - `phases/phase-03.md`
 - `phases/phase-04.md`
 - `phases/phase-05.md`
+- `phases/phase-06.md`
+- `phases/phase-07.md`
 
 ### Read these only if needed
 - `supekku/skills/using-spec-driver/SKILL.md`
 - `supekku/skills/preflight/SKILL.md`
 - `supekku/skills/execute-phase/SKILL.md`
 - `supekku/skills/update-delta-docs/SKILL.md`
+- `supekku/skills/continuation/SKILL.md`
+- `supekku/skills/next/SKILL.md`
 - `supekku/skills/spec-driver/SKILL.md`
 - `supekku/skills/boot/SKILL.md`
 - `.spec-driver/AGENTS.md`
 - `evidence-based-skill-development.md` only after the compressed relevant extract is available
+- `mem.signpost.spec-driver.skill-authoring` for the durable startup pointer
 
 ### Governing context already established
 - `ADR-004` is the workflow canon.
@@ -159,6 +207,7 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 ### Current design state
 - `using-spec-driver` now exists and is synced into generated agent metadata.
 - `preflight` has been narrowed so it should no longer compete with `using-spec-driver` for first-touch routing.
+- `preflight` now also requires a critical assessment before implementation-readiness claims.
 - `execute-phase` now makes the `draft -> in-progress` transition explicit.
 - `update-delta-docs` now exists for structured DE/IP/phase/DR reconciliation during execution.
 - Current leaning remains:
@@ -171,6 +220,7 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 - Decide whether `complete delta` should still permit `draft` after the execute-phase guidance change
 - Make `/notes` a stronger invariant
 - Define commit-policy defaults and confirmation behaviour
+- Decide whether the new handoff/preflight critical-assessment wording is sufficient in practice or needs even stronger enforcement
 - Add capture/backlog connective tissue:
   - capture or refine backlog item
   - promote to delta cleanly
@@ -205,11 +255,13 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/DR-055.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/IP-055.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/notes.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/gpt-skill-authoring-reference.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-01.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-02.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-03.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-04.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-05.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-06.md`
 
 ### Related documents
 - `/home/david/dev/spec-driver/specify/decisions/ADR-004-canonical_workflow_loop.md`
@@ -221,6 +273,8 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - `/home/david/dev/spec-driver/supekku/skills/preflight/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/execute-phase/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/update-delta-docs/SKILL.md`
+- `/home/david/dev/spec-driver/supekku/skills/continuation/SKILL.md`
+- `/home/david/dev/spec-driver/supekku/skills/next/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/spec-driver/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/boot/SKILL.md`
 - `/home/david/dev/spec-driver/.spec-driver/skills.allowlist`
@@ -230,6 +284,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - `mem.pattern.spec-driver.core-loop`
 - `mem.concept.spec-driver.posture`
 - `mem.pattern.installer.boot-architecture`
+- `mem.signpost.spec-driver.skill-authoring`
 
 ### Relevant doctrines
 - Delta-first canon from `ADR-004`
@@ -250,6 +305,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
   - missing `/notes` at task end
   - ambiguous commit policy
   - missing capture skill / weak backlog -> delta -> backlog connective tissue
+  - whether the new handoff/preflight critical-assessment wording is sufficient or needs stronger reinforcement
   - whether the newly landed routing/execution guardrails are sufficient or need stronger follow-up reinforcement
 - Decide whether brainstorming and adversarial review become explicit optional skills or remain prompt patterns.
 - Use `evidence-based-skill-development.md` only after the compressed delta-relevant extract is available.

@@ -9,3 +9,6 @@ print:
 /preflight
 (provide the path to the current task card and the next obvious task)
 
+If the next task is implementation-bound, include the specific artefacts to
+read and name any unresolved assumptions or design questions the next agent
+must assess before declaring readiness.

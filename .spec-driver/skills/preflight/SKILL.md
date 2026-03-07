@@ -1,6 +1,6 @@
 ---
 name: preflight
-description: Use after routing has already happened, when the next step is bounded up-front research to understand a substantive task without drifting into implementation or open-ended exploration.
+description: Use after routing has already happened, when the next step is bounded up-front research to understand a substantive task, surface unknowns and tensions, and assess readiness without drifting into implementation or open-ended exploration.
 ---
 This is NOT the first routing skill for work in a spec-driver repo.
 
@@ -37,7 +37,8 @@ If you can't tell whether `/preflight` is appropriate, you probably need
 `/using-spec-driver`, not this skill.
 
 Learn **just enough to ask the user the right clarifying questions**. These
-might include: how deeply should you research?
+might include: how deeply should you research? what remains ambiguous? which
+assumptions are safe enough to carry forward?
 
 If you chase the questions which arise as you go, you'll disappear like a
 helium balloon into the open sky.
@@ -51,8 +52,20 @@ Instead:
   - when, concretely, you will stop even if you don't have all the answers.
 5. Remain curious and collect further questions, but don't run off after them.
 6. Stop when you reach your stopping conditions.
-7. Present any significant discoveries, open questions, unresolved tradeoffs to the user.
-8. Indicate the next governing step; suggest the next skill or workflow transition.
+7. Before declaring readiness, produce a critical assessment with these headings:
+  - confirmed inputs
+  - assumptions you would carry into the next step
+  - unresolved questions
+  - tensions or ambiguities across DE/DR/IP/phase sheets/mockups/code
+8. If the task is implementation-bound, do not conclude "ready to proceed",
+   "no blockers", or equivalent unless you explicitly state one of:
+  - no open questions remain after reading the governing artefacts
+  - open questions remain, but they are consciously accepted as implementation assumptions
+9. Treat scope-shaping uncertainty as important even when it is not a hard blocker.
+   Call out things like interaction semantics, ownership of mappings/constants,
+   phase-boundary ambiguity, widget/API choice, or design-vs-discretion gaps.
+10. Present any significant discoveries, open questions, unresolved tradeoffs to the user.
+11. Indicate the next governing step; suggest the next skill or workflow transition.
 
 Repeat, if the user indicates to.
 
@@ -60,5 +73,8 @@ Guardrails:
 - Do not let `/preflight` steal the job of `/using-spec-driver`.
 - Do not treat bounded research as permission to start implementation.
 - Do not widen scope just because new curiosities appear.
+- Do not confuse "I can start coding" with "the materials are ready". Readiness
+  means you have surfaced the remaining unknowns and either resolved them or
+  named them as conscious assumptions.
 
 Do not begin implementation without acknowledgement from the user.

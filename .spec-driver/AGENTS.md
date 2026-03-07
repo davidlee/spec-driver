@@ -104,7 +104,7 @@ Usage notes:
 
 <skill>
 <name>preflight</name>
-<description>Use after routing has already happened, when the next step is bounded up-front research to understand a substantive task without drifting into implementation or open-ended exploration.</description>
+<description>Use after routing has already happened, when the next step is bounded up-front research to understand a substantive task, surface unknowns and tensions, and assess readiness without drifting into implementation or open-ended exploration.</description>
 <location>project</location>
 </skill>
 

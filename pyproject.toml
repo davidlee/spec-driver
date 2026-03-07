@@ -193,7 +193,7 @@ skip-magic-trailing-comma = false
 # PyLint :: main
 #
 [tool.pylint.main]
-fail-under = 0.90 ## FAIL-UNDER ##
+fail-under = 9.50 ## FAIL-UNDER ##
 reports = true
 output-format = "colorized"
 indent-string = "  "
@@ -214,8 +214,8 @@ expected-line-ending-format = "LF"
 
 [tool.pylint.'messages control']
 per-file-ignores = [
-    "*_test.py:protected-access",
-    "*_test.py:missing-function-docstring",
+    "**/*_test.py:protected-access,missing-function-docstring",
+    "**/test_*.py:protected-access,missing-function-docstring",
 ]
 
 [tool.pylint.design]

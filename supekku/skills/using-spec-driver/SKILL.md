@@ -1,6 +1,6 @@
 ---
 name: using-spec-driver
-description: Use at the start of ANY substantive work in a spec-driver project. You MUST choose the governing skill path before acting, especially when work may touch spec-driver entities, workflow artifacts, or project doctrine.
+description: Mandatory routing skill for ANY substantive work in a spec-driver project. Choose the governing skill before acting, and do not start implementation until the required delta/design/plan/phase artefacts exist.
 ---
 
 You MUST choose the governing workflow skill before doing substantive work.
@@ -44,10 +44,14 @@ Process:
 5. If code-changing intent is emerging and there is no governing change artefact yet:
    - use `/scope-delta`
    - use `/shape-revision` first only when governance or doctrine requires revision-first flow
-6. If a delta phase or plan is already active:
+6. If a delta exists but execution readiness is incomplete:
+   - use `/shape-revision` when revision-first governance applies
+   - otherwise use `/scope-delta` and `/plan-phases` to make the bundle execution-ready
+   - do not route to `/execute-phase` until the relevant DR/IP/phase sheet exists for the work being done
+7. If a delta phase is already active and the needed planning artefacts exist:
    - use `/execute-phase` for delta/IP execution
    - use `/implement` only for well-defined work already grounded in the right artefacts
-7. If implementation is complete and the task is now about evidence, reconciliation, or close-out:
+8. If implementation is complete and the task is now about evidence, reconciliation, or close-out:
    - use `/audit-change`
    - then use `/close-change` when closure conditions are met
 
@@ -61,6 +65,7 @@ Priority order:
 Guardrails:
 - Do not guess entity IDs, command shapes, or file locations when `/spec-driver` should be used.
 - Do not implement code-changing work without a governing card, delta, revision, or equivalent artefact appropriate to project posture.
+- Do not jump from "there is a delta" to `/execute-phase` if DR/IP/phase creation is still the missing work.
 - Do not treat plans as higher authority than doctrine, specs, or design revisions.
 - Do not import stricter ceremony than the project has adopted.
 
@@ -68,6 +73,7 @@ Common failure modes:
 - "I'll just inspect files first" - stop and decide whether `/spec-driver`, `/retrieving-memory`, or `/preflight` governs that exploration.
 - "This is probably simple enough to skip workflow routing" - small tasks still need the right governing skill.
 - "I already know the command shape" - use `/spec-driver` when the task is about spec-driver entities or commands.
+- "There is a delta, so I can start implementing" - not until the relevant DR/IP/phase artefacts exist and `/execute-phase` is actually the right next step.
 
 Customisation stance:
 - Packaged skills should stay uniform across installs.

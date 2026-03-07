@@ -82,11 +82,12 @@ class TrackPanel(DataTable):
       styled_text(status, status_style) if status_style else status,
       key=row_key,
     )
+    self.sort("time", key=lambda val: str(val), reverse=True)
 
     while self.row_count > DISPLAY_BUFFER_LIMIT:
-      first_key = list(self.rows)[0]
-      self._row_artifacts.pop(first_key.value, None)
-      self.remove_row(first_key)
+      last_key = list(self.rows)[-1]
+      self._row_artifacts.pop(last_key.value, None)
+      self.remove_row(last_key)
 
   def clear_and_replay(
     self,

@@ -15,6 +15,10 @@ summary: How SpecDriverApp composes screens, EventListener, file watcher, and te
 scope:
   globs:
   - supekku/tui/**
+links:
+  missing:
+  - raw: DEC-053-14
+  - raw: DEC-054-01
 ---
 
 # TUI app architecture: screens, widgets, listener, watcher
@@ -26,7 +30,8 @@ SpecDriverApp (supekku/tui/app.py)
 ├── BrowserScreen (browser.py)         — 3-panel artifact browser
 │   ├── TypeSelector (widgets/type_selector.py)   — OptionList, ArtifactType
 │   ├── ArtifactList (widgets/artifact_list.py)    — DataTable + search + status filter
-│   └── PreviewPanel (widgets/preview_panel.py)    — markdown preview
+│   ├── PreviewPanel (widgets/preview_panel.py)    — markdown/non-md preview
+│   └── BundleTree (widgets/bundle_tree.py)        — Tree widget for bundle dirs
 ├── TrackScreen (track.py)             — 2-panel live event view
 │   ├── SessionList (widgets/session_list.py)      — OptionList, session filter
 │   └── TrackPanel (widgets/track_panel.py)        — DataTable, event rows
@@ -38,7 +43,7 @@ SpecDriverApp (supekku/tui/app.py)
 ## Data flow
 
 - **Events**: CLI → `.spec-driver/run/events.jsonl` + `tui.sock` → EventListener → `TrackEvent` message → App.on_track_event → TrackScreen.add_event
-- **Artifacts**: registries → ArtifactSnapshot → BrowserScreen widgets
+- **Artifacts**: registries → ArtifactSnapshot (with bundle_dir detection) → BrowserScreen widgets
 - **Navigation**: TrackPanel row select → TrackScreen → App.action_navigate_artifact → switch to browser + BrowserScreen.navigate_to_artifact
 - **File watch**: watchfiles → App._watch_files → BrowserScreen.refresh_snapshot
 

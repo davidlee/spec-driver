@@ -1,6 +1,6 @@
 ---
 id: mem.fact.tui.widget-selection
-name: 'Widget selection: DataTable vs RichLog vs OptionList'
+name: 'Widget selection: DataTable vs RichLog vs OptionList vs Tree'
 kind: memory
 status: active
 memory_type: fact
@@ -16,7 +16,7 @@ scope:
   - supekku/tui/**
 ---
 
-# Widget selection: DataTable vs RichLog vs OptionList
+# Widget selection: DataTable vs RichLog vs OptionList vs Tree
 
 ## Decision heuristic
 
@@ -25,6 +25,7 @@ scope:
 | Row selection (click/Enter/cursor) | **DataTable** | Built-in cursor, `RowSelected` message, `move_cursor()` |
 | Append-only log, no selection needed | **RichLog** | `max_lines` auto-pruning, `write(Text)`, no row model |
 | Categorical picker (small list) | **OptionList** | `OptionSelected` message, simple label+id options |
+| Hierarchical/nested navigation | **Tree** | `NodeSelected` message, expand/collapse, `data` on nodes |
 
 ## DataTable specifics
 
@@ -34,6 +35,15 @@ scope:
 - No `max_lines` — prune manually: `remove_row(list(self.rows)[0])` when over cap
 - `clear(columns=False)` clears rows only
 - `row_count` property, `move_cursor(row=idx)` for programmatic selection
+
+## Tree specifics
+
+- Subclass `Tree[T]` with a data type (e.g. `Tree[Path]`)
+- `add(label, data=...)` for branches, `add_leaf(label, data=...)` for leaves
+- `NodeSelected` message — check `event.node.data` for payload
+- `clear()` resets the tree; `root.expand()` after repopulating
+- Depth-limit recursive population to prevent runaway (`_MAX_TREE_DEPTH`)
+- Used by: `BundleTree` for artifact bundle file navigation
 
 ## Gotcha: duplicate row keys
 

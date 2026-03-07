@@ -15,6 +15,9 @@ summary: 'Screen lifecycle: install_screen + push/switch, not push/pop for persi
 scope:
   globs:
   - supekku/tui/**
+links:
+  missing:
+  - raw: DEC-054-01
 ---
 
 # TUI screen lifecycle: install + push/switch

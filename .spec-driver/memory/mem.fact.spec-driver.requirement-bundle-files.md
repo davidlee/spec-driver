@@ -23,9 +23,6 @@ provenance:
     ref: supekku/scripts/lib/requirements/registry.py
   - kind: doc
     ref: supekku/about/lifecycle.md
-links:
-  missing:
-  - raw: PROB-002
 ---
 
 # Requirement Bundle Files Are Supplemental

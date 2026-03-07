@@ -25,9 +25,6 @@ provenance:
     ref: supekku/about/lifecycle.md
   - kind: memory
     ref: mem.concept.spec-driver.requirement-lifecycle
-links:
-  missing:
-  - raw: PROB-002
 ---
 
 # Lifecycle Guidance Start Here

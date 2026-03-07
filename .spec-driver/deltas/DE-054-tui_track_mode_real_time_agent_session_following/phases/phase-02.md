@@ -136,7 +136,7 @@ theme style keys and layout CSS.
 | [x] | P02-T7 | App integration | | install+push, toggle, navigate, listener |
 | [x] | P02-T8 | TrackScreen layout CSS | | Horizontal split, border conventions |
 | [x] | P02-T9 | Tests VT-054-05..08 | | 20 tests + 4 find_entry tests |
-| [ ] | P02-T10 | VH manual attestation | | After all code complete |
+| [x] | P02-T10 | VH manual attestation | | VH-054-01 + VH-054-02 attested |
 
 ### Task Details
 
@@ -228,11 +228,17 @@ theme style keys and layout CSS.
 
 ## 9. Decisions & Outcomes
 
+- DEC-054-01 revised: install_screen + push/switch instead of push/pop (state preservation)
+- DEC-054-07 revised: DataTable instead of RichLog (row selection for navigation)
+- Event buffer lives on TrackScreen, widgets synced on first mount
+- Newest-first sort order (user preference, sort by timestamp descending)
+- Sequential row keys (`evt-N`) with separate artifact mapping (avoids duplicate key errors)
+
 ## 10. Findings / Research Notes
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] VH-054-01 attested
-- [ ] VH-054-02 attested
-- [ ] Verification evidence stored
+- [x] Exit criteria satisfied
+- [x] VH-054-01 attested — live events appear <200ms in track view
+- [x] VH-054-02 attested — second TUI falls back to log-tail, both receive events
+- [x] Verification evidence stored
 - [ ] Delta ready for `/close-change`

@@ -1,6 +1,6 @@
 ---
 name: execute-phase
-description: Mandatory execution skill for any delta/IP implementation phase. Use it before code changes, move the owning delta to in-progress, keep notes current, and surface blockers early.
+description: Mandatory execution skill for any delta/IP implementation phase. Use it before code changes, move the owning delta to in-progress, keep notes current, reconcile structured execution docs, and surface blockers early.
 ---
 This skill is mandatory for implementation work under a delta or implementation
 plan.
@@ -26,11 +26,12 @@ Process:
 3. Ensure the owning delta frontmatter says `status: in-progress` before implementation work proceeds. If it still says `draft`, update it first.
 4. Implement phase tasks (code/tests/docs) in small coherent units.
 5. After each meaningful unit, run `/notes`.
-6. If you encounter unexpected obstacles, tradeoffs, or policy ambiguity, stop and `/consult`.
-7. Keep verification evidence current as work progresses (`planned` -> `in-progress` -> `verified` as appropriate).
-8. When exit criteria are met, hand off to `/audit-change` for verification and spec reconciliation.
+6. When execution changed phase/IP/DE/DR state, run `/update-delta-docs`.
+7. If you encounter unexpected obstacles, tradeoffs, or policy ambiguity, stop and `/consult`.
+8. Keep verification evidence current as work progresses (`planned` -> `in-progress` -> `verified` as appropriate).
+9. When exit criteria are met, hand off to `/audit-change` for verification and spec reconciliation.
 
 Outcomes:
 - Phase objectives are implemented with traceable evidence.
 - Delta lifecycle state matches reality during implementation, not only at closure.
-- Notes and handoff state stay current throughout execution.
+- Notes and structured execution artefacts stay current throughout execution.

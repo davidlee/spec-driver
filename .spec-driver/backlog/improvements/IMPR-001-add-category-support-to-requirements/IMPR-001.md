@@ -11,7 +11,7 @@ kind: improvement
 
 ## Problem
 
-Requirements currently lack categorization, making it difficult to filter and organize them by functional area, quality attribute, or concern. This limits the ability to efficiently navigate large requirement sets and understand requirement distribution across categories.
+Requirements totally lack categorization, making it difficult to filter and organize them by functional area, quality attribute, or concern. This limits the ability to efficiently navigate large requirement sets and understand requirement distribution across categories.
 
 ## Proposed Solution
 

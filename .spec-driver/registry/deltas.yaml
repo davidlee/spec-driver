@@ -5928,7 +5928,7 @@ deltas:
           mitigation: DR-052 DEC-052-03 specifies reading stdin into $INPUT first
   DE-053:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - TUI artifact browser MVP with Textual
     slug: tui_artifact_browser_mvp_with_textual
     updated: '2026-03-07'
@@ -5951,7 +5951,8 @@ deltas:
         plan: IP-053
         delta: DE-053
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-053
         specs:
           primary: []
           collaborators: []
@@ -5959,10 +5960,157 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-053-P01
+        - id: IP-053.PHASE-01
+        - id: IP-053.PHASE-02
+        - id: IP-053.PHASE-03
+        - id: IP-053.PHASE-02
+        - id: IP-053.PHASE-03
       phases:
-      - id: IP-053-P01
-        phase: IP-053-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-053.PHASE-01
+        plan: IP-053
+        delta: DE-053
+        objective: 'Build shared infrastructure: theme style API, shared column metadata,
+          and reusable artifact projection layer. No TUI dependency.'
+        entrance_criteria:
+        - DR-053 approved (all decisions decided, no open questions)
+        - DE-050 completed (normalised registry API available)
+        exit_criteria:
+        - resolve_style() and styled_text() in theme.py with tests
+        - column_defs.py with defs for all artifact types, existing formatters refactored
+          to consume it
+        - core/artifact_view.py with ArtifactEntry model, all registry adapters, error
+          isolation, snapshot caching
+        - All VT-053-adapter, VT-053-column-defs, VT-053-styled-text passing
+        - just passes (lint + test)
+        verification:
+          tests:
+          - VT-053-adapter
+          - VT-053-column-defs
+          - VT-053-styled-text
+          evidence: []
+        tasks:
+        - id: P01-T01
+          description: Add resolve_style() and styled_text() to theme.py
+        - id: P01-T02
+          description: Create column_defs.py and refactor formatters
+        - id: P01-T03
+          description: Build core/artifact_view.py
+        - id: P01-T04
+          description: Write tests for all three modules
+        risks:
+        - description: Formatter refactor to consume column_defs breaks existing CLI
+            output
+          mitigation: Run existing formatter tests after refactor; diff CLI output
+            before/after
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-053.PHASE-02
+        plan: IP-053
+        delta: DE-053
+        objective: 'Build the Textual TUI app consuming Phase 1 infrastructure: app
+          shell, 3-panel browser screen, type selector, artifact list with status
+          filter, preview panel, theme.tcss, and headless pilot tests.'
+        entrance_criteria:
+        - "Phase 1 complete (shared infrastructure committed \u2014 4a203df)"
+        - Textual 8.0.2 available
+        - DR-053 decisions DEC-053-11 through DEC-053-16 resolved
+        exit_criteria:
+        - ArtifactGroup enum and ArtifactTypeMeta in core/artifact_view.py with tests
+        - "tui/app.py \u2014 App subclass with BrowserScreen, keybindings, CSS_PATH"
+        - "tui/browser.py \u2014 BrowserScreen (Screen subclass) with 3-panel layout"
+        - "tui/widgets/type_selector.py \u2014 OptionList with styled Text items,\
+          \ OptionSelected message"
+        - "tui/widgets/artifact_list.py \u2014 DataTable with styled_text cells, Select\
+          \ status filter, ArtifactSelected message"
+        - "tui/widgets/preview_panel.py \u2014 Markdown widget updated on artifact\
+          \ selection"
+        - "tui/theme.tcss \u2014 layout chrome only, no hex/rgb colour literals"
+        - VT-053-pilot passing (headless pilot tests)
+        - VT-053-tcss-lint passing (no colour literals in .tcss)
+        - just passes (lint + test)
+        verification:
+          tests:
+          - VT-053-pilot
+          - VT-053-tcss-lint
+          evidence: []
+        tasks:
+        - id: P02-T01
+          description: Add ArtifactGroup and ArtifactTypeMeta to artifact_view.py
+        - id: P02-T02
+          description: Add artifact.group.* theme entries to theme.py
+        - id: P02-T03
+          description: Create tui package structure and theme.tcss
+        - id: P02-T04
+          description: Build type_selector widget
+        - id: P02-T05
+          description: Build artifact_list widget with status filter
+        - id: P02-T06
+          description: Build preview_panel widget
+        - id: P02-T07
+          description: Build BrowserScreen composing widgets with message wiring
+        - id: P02-T08
+          description: Build App subclass with screen, keybindings, CSS_PATH
+        - id: P02-T09
+          description: Write VT-053-pilot headless pilot tests
+        - id: P02-T10
+          description: Write VT-053-tcss-lint .tcss colour literal scanner
+        risks:
+        - description: OptionList/Select dynamic rebuild causes flicker or state loss
+          mitigation: Test in pilot; if problematic, batch updates or defer rebuild
+            to next frame
+        - description: Textual CSS layout doesn't match mockup proportions
+          mitigation: Iterate .tcss; layout is chrome-only so changes are isolated
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-053.PHASE-03
+        plan: IP-053
+        delta: DE-053
+        objective: Wire TUI into CLI entry point, add file watching with per-registry
+          invalidation, handle edge cases ($EDITOR unset, import guard), run VH smoke
+          gate, and scope follow-up delta for BacklogRegistry normalisation.
+        entrance_criteria:
+        - "Phase 2 complete (TUI core committed \u2014 2c63db6)"
+        - watchfiles available in [tui] extra
+        - ArtifactSnapshot.refresh() and BrowserScreen.refresh_snapshot() APIs exist
+        exit_criteria:
+        - spec-driver tui command launches TUI when [tui] extra installed
+        - spec-driver tui gives helpful install message when textual not installed
+        - File changes trigger per-registry refresh within ~1s
+        - $EDITOR unset produces helpful error (not crash)
+        - VT-053-edge-cases passing
+        - VH-053-smoke passed (manual gate)
+        - Follow-up delta scoped for BacklogRegistry normalisation
+        - just passes (lint + test)
+        verification:
+          tests:
+          - VT-053-edge-cases
+          evidence:
+          - VH-053-smoke
+        tasks:
+        - id: P03-T01
+          description: "CLI entry point \u2014 tui command in main.py with import\
+            \ guard"
+        - id: P03-T02
+          description: "File watching \u2014 watchfiles.awatch integration with per-registry\
+            \ invalidation"
+        - id: P03-T03
+          description: "Editor integration \u2014 $EDITOR launch via app.suspend(),\
+            \ helpful error if unset"
+        - id: P03-T04
+          description: VT-053-edge-cases tests
+        - id: P03-T05
+          description: VH-053-smoke manual verification gate
+        - id: P03-T06
+          description: Scope follow-up delta for BacklogRegistry normalisation
+        risks:
+        - description: watchfiles async watcher conflicts with Textual event loop
+          mitigation: watchfiles.awatch is asyncio-native; test in pilot if feasible,
+            otherwise VH gate
+        - description: app.suspend() + subprocess does not restore terminal state
+          mitigation: Textual docs confirm suspend/resume pattern; VH gate covers
+            real terminal
   DE-054:
     kind: delta
     status: draft
@@ -6044,6 +6192,24 @@ deltas:
         - id: IP-055.PHASE-03
           name: Strengthen execute-phase lifecycle guidance
           status: completed
+        - id: IP-055.PHASE-04
+          name: Strengthen routing for DR-IP-phase ordering
+          status: completed
+        - id: IP-055.PHASE-05
+          name: Add delta-specific execution documentation skill
+          status: completed
+        - id: IP-055.PHASE-06
+          name: Draft evergreen GPT skill-authoring reference
+          status: completed
+        - id: IP-055.PHASE-07
+          name: Harden preflight and handoff critical-assessment guidance
+          status: completed
+        - id: IP-055.PHASE-08
+          name: Decompose brainstorming imports into loop plus artifact guidance
+          status: completed
+        - id: IP-055.PHASE-09
+          name: Apply section-by-section authoring to draft-design-revision
+          status: completed
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -6110,11 +6276,11 @@ deltas:
           status: done
         - id: 2.2
           title: Record implementation results back into delta notes and plan state
-          status: in_progress
+          status: done
         - id: 2.3
           title: Decide whether to design optional brainstorming and adversarial review
             as follow-up skills or prompts
-          status: todo
+          status: done
         risks:
         - description: Routing skill lands, but its boundary remains ambiguous relative
             to spec-driver and boot
@@ -6158,6 +6324,243 @@ deltas:
             entirely
           mitigation: Make the skill description stricter now; evaluate routing/boot
             reinforcements separately
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-04
+        plan: IP-055
+        delta: DE-055
+        objective: Strengthen routing guidance so agents do not skip DR/IP/phase creation
+          when a delta exists but the work is not yet execution-ready.
+        entrance_criteria:
+        - Preflight confirmed the ordering gap lives primarily in using-spec-driver
+          routing.
+        - Existing workflow skills already encode the intended sequence in separate
+          pieces.
+        exit_criteria:
+        - using-spec-driver explicitly routes non-execution-ready delta work through
+          shaping/planning rather than execute-phase.
+        - Installed skills reflect the stronger routing wording after sync.
+        - DE-055 notes and plan state capture the ordering decision and change scope.
+        verification:
+          tests:
+          - uv run spec-driver skills sync
+          evidence:
+          - Installed using-spec-driver skill text matches the packaged source.
+          - Notes record the rationale for putting the ordering rule in routing.
+        tasks:
+        - id: 4.1
+          title: Strengthen using-spec-driver ordering guardrails
+          status: done
+        - id: 4.2
+          title: Sync installed skills and verify propagation
+          status: done
+        - id: 4.3
+          title: Record ordering decision in DE-055 artefacts
+          status: done
+        risks:
+        - description: Routing guidance may become repetitive or over-prescriptive
+          mitigation: Keep the explicit ordering rule in using-spec-driver and avoid
+            duplicating full workflow prose in multiple skills
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-05
+        plan: IP-055
+        delta: DE-055
+        objective: Add a delta-specific execution documentation skill so `/notes`
+          can remain generic while DE/IP/phase/DR reconciliation becomes explicit
+          during implementation.
+        entrance_criteria:
+        - Need confirmed for separating generic notes capture from delta-specific
+          structured doc maintenance.
+        - execute-phase already requires `/notes` during implementation.
+        exit_criteria:
+        - A new delta-specific execution documentation skill exists with a narrow
+          contract.
+        - execute-phase references the new skill alongside `/notes`.
+        - Installed skills and AGENTS output reflect the addition after sync.
+        - DE-055 artefacts record the split and rationale.
+        verification:
+          tests:
+          - uv run spec-driver skills sync
+          evidence:
+          - Installed update-delta-docs skill matches the packaged source.
+          - Installed execute-phase skill references update-delta-docs.
+        tasks:
+        - id: 5.1
+          title: Add update-delta-docs skill with a narrow delta-execution contract
+          status: done
+        - id: 5.2
+          title: Wire execute-phase to use update-delta-docs alongside notes
+          status: done
+        - id: 5.3
+          title: Sync installed skills and record the split in DE-055 artefacts
+          status: done
+        risks:
+        - description: The new skill could overlap too much with notes and become
+            confusing
+          mitigation: Keep notes generic and make update-delta-docs explicitly about
+            structured DE/IP/phase/DR reconciliation
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-06
+        plan: IP-055
+        delta: DE-055
+        objective: Distill DE-055 research and local doctrine into a short startup-facing
+          reference for GPT agents creating or refining spec-driver skills.
+        entrance_criteria:
+        - DE-055 research context, ADRs, and skill touchpoints have been read.
+        - The new deliverable is treated as a bridge toward future memories, not a
+          competing doctrine layer.
+        exit_criteria:
+        - A concise startup-oriented reference exists in the DE-055 bundle.
+        - The reference captures what to import, reject, and preserve for spec-driver
+          skill work.
+        - Notes and phase tracking record the rationale and likely future memory split.
+        verification:
+          tests: []
+          evidence:
+          - gpt-skill-authoring-reference.md created in the DE-055 bundle
+          - notes.md records the evergreen-reference rationale
+        tasks:
+        - id: 6.1
+          title: Synthesize doctrine and DE-055 findings into a short GPT startup
+            guide
+          status: done
+        - id: 6.2
+          title: Record how Superpowers guidance should be imported or adapted
+          status: done
+        - id: 6.3
+          title: Capture likely future memory split for durable reuse
+          status: done
+        risks:
+        - description: The new reference could become another competing handbook
+          mitigation: Keep it short, anchor it to ADR-004/ADR-005/PROD-016, and treat
+            it as a seed for later memories
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-07
+        plan: IP-055
+        delta: DE-055
+        objective: Harden preflight and handoff skill guidance so implementation readiness
+          requires a critical assessment of assumptions, unresolved questions, and
+          tensions rather than a shallow entrance-criteria summary.
+        entrance_criteria:
+        - A concrete multi-phase handover failure mode has been captured from live
+          use.
+        - preflight is already the bounded research skill used ahead of implementation.
+        - continuation and next already own fresh-agent handoff prompts.
+        exit_criteria:
+        - preflight requires an explicit critical-assessment section before readiness
+          claims.
+        - continuation and next preserve unresolved assumptions, questions, and tensions
+          in handoffs.
+        - execute-phase makes unresolved ambiguity from preflight a consult trigger
+          before improvisation.
+        - DE-055 artefacts record the motivating case and resulting workflow change.
+        verification:
+          tests:
+          - uv run spec-driver skills sync
+          evidence:
+          - Packaged skill text for preflight, continuation, next, and execute-phase
+            reflects the stronger contract.
+          - Notes capture the DE-053 case study and the resulting design decision.
+        tasks:
+        - id: 7.1
+          title: Tighten preflight readiness criteria around critical assessment
+          status: done
+        - id: 7.2
+          title: Make handoff skills preserve unresolved assumptions and tensions
+          status: done
+        - id: 7.3
+          title: Record the case study and workflow change in DE-055 artefacts
+          status: done
+        risks:
+        - description: Preflight could become too heavy and drift back into a broad
+            planning ritual
+          mitigation: Keep the requirement focused on surfacing assumptions and tensions
+            without turning every preflight into open-ended design work
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-08
+        plan: IP-055
+        delta: DE-055
+        objective: Decompose the useful imports from Superpowers brainstorming into
+          a generic question-resolution loop plus artifact-specific authoring guidance,
+          and identify the shared high-leverage design-triage step.
+        entrance_criteria:
+        - Superpowers brainstorming has already been reviewed as an optional future
+          pattern.
+        - DE-055 already distinguishes optional patterns from mandatory workflow doctrine.
+        exit_criteria:
+        - DE-055 artefacts record the split between a generic loop and artifact-specific
+          authoring guidance.
+        - Likely first target skills for section-by-section authoring are identified.
+        - The shared explicit design-triage pattern is captured as a high-leverage
+          import candidate.
+        verification:
+          tests: []
+          evidence:
+          - Notes capture the decomposition and rationale.
+          - DR/DE/IP reflect the resulting design direction.
+        tasks:
+        - id: 8.1
+          title: Re-read brainstorming with decomposition in mind
+          status: done
+        - id: 8.2
+          title: Record generic-loop versus artifact-guidance split in DE-055 artefacts
+          status: done
+        - id: 8.3
+          title: Identify the shared design-triage pattern worth preserving
+          status: done
+        risks:
+        - description: The decomposition could be too abstract and lose the practical
+            strengths of the original workflow
+          mitigation: Preserve the concrete section-by-section authoring pattern in
+            specific skills rather than forcing premature generalisation
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-09
+        plan: IP-055
+        delta: DE-055
+        objective: Apply the first artifact-specific brainstorming import to DR authoring
+          by strengthening draft-design-revision around explicit design triage and
+          section-by-section validation.
+        entrance_criteria:
+        - The brainstorming decomposition has identified DRs as the strongest first
+          target.
+        - draft-design-revision currently lacks explicit triage and iterative section
+          validation.
+        exit_criteria:
+        - draft-design-revision requires pre-draft triage of questions, risks, assumptions,
+          and critical decisions.
+        - draft-design-revision supports one-question-at-a-time closure and section-by-section
+          DR validation.
+        - DE-055 artefacts record the DR-first import and the remaining follow-up
+          question for shape-revision or broader rollout.
+        verification:
+          tests:
+          - uv run spec-driver skills sync
+          evidence:
+          - Packaged and installed draft-design-revision wording reflect the stronger
+            DR authoring contract.
+          - Notes capture the rationale for choosing DRs as the first artifact-specific
+            target.
+        tasks:
+        - id: 9.1
+          title: Strengthen draft-design-revision around explicit design triage
+          status: done
+        - id: 9.2
+          title: Add section-by-section validation guidance for DR drafting
+          status: done
+        - id: 9.3
+          title: Record the DR-first import in DE-055 artefacts
+          status: done
+        risks:
+        - description: The DR skill could become too heavy and drift toward a universal
+            authoring framework
+          mitigation: Keep the new structure narrowly tied to DR authoring and defer
+            broader generalisation until shape-revision or another skill proves it
+            out
   DE-056:
     kind: delta
     status: in-progress
@@ -6192,3 +6595,40 @@ deltas:
       phases:
       - id: IP-056-P01
         phase: IP-056-P01
+  DE-057:
+    kind: delta
+    status: draft
+    name: Delta - BacklogRegistry class normalisation
+    slug: backlogregistry_class_normalisation
+    updated: '2026-03-07'
+    path: .spec-driver/deltas/DE-057-backlogregistry_class_normalisation/DE-057.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: follows-up
+      target: DE-053
+      attributes: {}
+    - type: follows-up
+      target: DE-050
+      attributes: {}
+    plan:
+      id: IP-057
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-057
+        delta: DE-057
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-057-P01
+      phases:
+      - id: IP-057-P01
+        phase: IP-057-P01

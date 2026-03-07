@@ -1,6 +1,6 @@
 mod wub
 
-check: format lint test pylint
+check: format lint test pylint-report
 
 test:
   uv run pytest supekku
@@ -8,15 +8,25 @@ test:
 quickcheck: && lint
   uv run pytest -qx
 
+# ruff - must pass
 lint:
   uv run ruff check --fix supekku
 
 format:
   uv run ruff format supekku
 
-pylint:
+pylint-verbose:
   uv run pylint supekku
 
+# use this for whole repo linting
+pylint-report:
+  uv run python -m supekku.scripts.pylint_report
+
+# lint only specific files - use as you go
+pylint-files *args:
+  uv run python -m supekku.scripts.pylint_report {{args}}
+
+# lint w/ only specific linter
 pylint-only *args:
   uv run pylint supekku --disable=all --extension-pkg-allow-list=pylint.extensions.mccabe --enable={{args}}
 

@@ -15,3 +15,11 @@
   - `missing-function-docstring` dropped to 6 occurrences, all in non-test
     modules (`supekku/tui/app.py`, `supekku/tui/widgets/artifact_list.py`,
     `supekku/tui/widgets/type_selector.py`).
+- 2026-03-07: Added compact pylint workflow tooling:
+  - `just pylint-report` runs full-repo pylint via json2, writes full output to
+    `.spec-driver/run/pylint/full.json`, and prints a compact summary with
+    score, top symbols, top files, and first high-severity messages.
+  - `just pylint-files <paths...>` does the same for touched files and writes to
+    `.spec-driver/run/pylint/files.json`.
+  - This caught a touched-file warning (`too-few-public-methods` in the new test
+    class) during implementation and allowed immediate local cleanup.

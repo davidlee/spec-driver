@@ -1,7 +1,7 @@
 ---
 id: STD-002
 title: 'STD-002: govern lint signal and prioritise pylint fixes'
-status: default
+status: required
 created: '2026-03-07'
 updated: '2026-03-07'
 reviewed: '2026-03-07'

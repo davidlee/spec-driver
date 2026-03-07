@@ -208,12 +208,13 @@ No code without tests. `just test`
 We have 2 linters:
 
 - `just lint` (ruff) - MUST pass with zero warnings
-- `just pylint` - threshold is a ratchet, not a stopping point
+- `just pylint-report` - score threshold is a ratchet, not a stopping point
 
-If you need to lint an individual file:
-```bash
-uv run pylint --indent-string "  " path/to/file.py
-```
+USAGE:
+- `just pylint-files *paths` - check just the files you edited
+- `just pylint-report` - view summary for the entire repo
+
+IMPORTANT: If you edit a file with pre-existing warnings - it is not an excuse to add more. Instead: address the pre-existing warnings.
 
 ### Disabling Linters
 
@@ -260,15 +261,15 @@ When coding:
 Before submitting work:
 
 - [ ] Tests written and passing (`just test`)
-- [ ] Both linters passing (`just lint` + `just pylint`)
+- [ ] Both linters passing (on whole codebase)
 - [ ] All of the above (fail-fast): `just`
-- [ ] Display logic in `formatters/`, not in domain packages
+- [ ] Architecture (structure, naming, coupling, etc) of code is strong and maintainable
 
 Before completing a delta:
 
 - [ ] All verification artifacts (VT/VA/VH) executed and results documented
 - [ ] Parent spec coverage blocks updated with `status: verified` for implemented requirements
-- [ ] `uv run spec-driver complete delta DE-XXX` succeeds without `--force`
+- [ ] `spec-driver complete delta DE-XXX` succeeds without `--force`
 - [ ] If using `--force`: document reason and create follow-up task for coverage updates
 
 ## RULES

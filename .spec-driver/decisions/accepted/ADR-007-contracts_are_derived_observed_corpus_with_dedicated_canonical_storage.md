@@ -1,0 +1,1 @@
+../ADR-007-contracts_are_derived_observed_corpus_with_dedicated_canonical_storage.md

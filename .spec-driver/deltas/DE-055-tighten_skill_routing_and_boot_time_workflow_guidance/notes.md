@@ -47,6 +47,22 @@
 - Decide how explicit the ordering contract should be between DR, IP, phase creation, and implementation.
 - Decide whether to add a dedicated capture skill and stronger backlog-to-delta-to-backlog lifecycle guidance.
 
+### 2026-03-07 - phase 03 decision
+- Chose the guidance-layer fix for the `draft` delta failure mode instead of changing `complete delta` in this phase.
+- Rationale:
+  - by close-out time the damage is already done; the misleading state exists during implementation
+  - `execute-phase` is already the intended handoff from planning into active work
+  - strengthening the mandatory invocation and `draft -> in-progress` wording keeps responsibility aligned with the implementation skill
+- Runtime gating in `complete delta` remains a separate design question, not part of this change.
+
+### 2026-03-07 - phase 03 work
+- Updated `supekku/skills/execute-phase/SKILL.md` to:
+  - make invocation mandatory and explicit before implementation work
+  - call out that leaving the delta in `draft` is not harmless bookkeeping
+  - require `status: in-progress` before coding proceeds
+- Promoted DE-055 and IP-055 to `in-progress`.
+- Created and filled `IP-055.PHASE-03` for the lifecycle-guidance tightening work.
+
 ### Observed failure modes
 - Deltas can be completed with lifecycle status still `draft`.
 - Agents are eager to skip DR, IP, or phase sheets and proceed directly to implementation.

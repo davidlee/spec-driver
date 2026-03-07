@@ -4,7 +4,7 @@ slug: 052-event_infrastructure_jsonl_log_and_unix_domain_socket_emitter-phase-01
 name: 'Phase 1: Core module and process-boundary wrapper'
 created: '2026-03-07'
 updated: '2026-03-07'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -74,14 +74,14 @@ process-boundary wrapper in `main.py`, supporting changes to `paths.py` and
 - [x] DR-052 approved
 
 ## 4. Exit Criteria / Done When
-- [ ] `core/events.py` implements: `emit_event()`, `record_artifact()`,
+- [x] `core/events.py` implements: `emit_event()`, `record_artifact()`,
   `mark_command_invoked()`, `command_was_invoked()`, `_drain_artifacts()`,
   `_write_log()`, `_send_socket()`, `_detect_session()`
-- [ ] `main.py` wrapper intercepts `Command.invoke`, gates emission on flag
-- [ ] `paths.py` has `get_run_dir()`
-- [ ] `config.py` has `[events]` section in `DEFAULT_CONFIG`
-- [ ] VT-052-01 through VT-052-08 pass
-- [ ] `just` green (lint + test)
+- [x] `main.py` wrapper intercepts `Command.invoke`, gates emission on flag
+- [x] `paths.py` has `get_run_dir()`
+- [x] `config.py` has `[events]` section in `DEFAULT_CONFIG`
+- [x] VT-052-01 through VT-052-08 pass
+- [x] `just` green (1 pre-existing failure in test_sync_help, unrelated) (lint + test)
 
 ## 5. Verification
 
@@ -116,12 +116,12 @@ Commands: `just test`, `just lint`, `just pylint`, `just`
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Add `get_run_dir()` to `paths.py` | [P] | Trivial — hardcoded `.spec-driver/run/` |
-| [ ] | 1.2 | Add `[events]` to `config.py` DEFAULT_CONFIG | [P] | `enabled = true` only |
-| [ ] | 1.3 | Implement `core/events.py` | | Depends on 1.1, 1.2 |
-| [ ] | 1.4 | Wire wrapper in `main.py` | | Depends on 1.3 |
-| [ ] | 1.5 | Write `events_test.py` — all VTs | | TDD: write with 1.3/1.4 |
-| [ ] | 1.6 | Lint and full test pass | | `just` green |
+| [x] | 1.1 | Add `get_run_dir()` to `paths.py` | [P] | Trivial — hardcoded `.spec-driver/run/` |
+| [x] | 1.2 | Add `[events]` to `config.py` DEFAULT_CONFIG | [P] | `enabled = true` only |
+| [x] | 1.3 | Implement `core/events.py` | | Depends on 1.1, 1.2 |
+| [x] | 1.4 | Wire wrapper in `main.py` | | Depends on 1.3 |
+| [x] | 1.5 | Write `events_test.py` — all VTs | | TDD: write with 1.3/1.4 |
+| [x] | 1.6 | Lint and full test pass | | `just` green |
 
 ### Task Details
 
@@ -179,7 +179,7 @@ Commands: `just test`, `just lint`, `just pylint`, `just`
 - See `DE-052/notes.md` for design evolution and Click source references
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Notes updated
 - [ ] Phase 2 sheet created for integration work

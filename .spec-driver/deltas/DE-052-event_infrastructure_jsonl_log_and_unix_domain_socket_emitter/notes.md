@@ -87,6 +87,58 @@ exports it as `SPEC_DRIVER_SESSION` via `CLAUDE_ENV_FILE`.
 3. `"interrupted"` status is undetectable — Click converts
    `KeyboardInterrupt` → `Abort` → `sys.exit(1)` before the wrapper sees it
 
+## Phase 1 implementation — 2026-03-07
+
+### Done
+
+All six tasks complete. Files created/modified:
+
+- `supekku/scripts/lib/core/events.py` — new: emit_event, record_artifact,
+  mark_command_invoked, command_was_invoked, _detect_session, _resolve_cmd,
+  _write_log, _send_socket, _drain_artifacts, _reset (test helper)
+- `supekku/scripts/lib/core/events_test.py` — new: 30 tests covering
+  VT-052-01 through VT-052-08
+- `supekku/scripts/lib/core/paths.py` — added get_run_dir()
+- `supekku/scripts/lib/core/config.py` — added `"events": {"enabled": True}`
+  to DEFAULT_CONFIG
+- `supekku/cli/main.py` — monkey-patch of Command.invoke + process-boundary
+  wrapper in main()
+
+### Surprise: click.Group inherits click.Command
+
+The monkey-patch on `click.Command.invoke` fires for `click.Group` instances
+too, because `Group` extends `Command`. Without a guard, group-level help and
+no-args paths falsely set the `_command_invoked` flag (VT-052-07 caught this).
+
+**Fix**: guard with `not isinstance(self, click.Group)` in `_tracking_invoke`.
+Note: `click.MultiCommand` is deprecated in Click 9 — use `click.Group`.
+
+### Adaptation: argv is sys.argv[1:]
+
+The DR boundary wrapper code showed `_emit(sys.argv, ...)` but the event schema
+specifies `argv` as `sys.argv[1:]` (no program name). Implementation uses
+`sys.argv[1:]` to match the schema.
+
+### Verification
+
+- `ruff check` — clean (zero errors)
+- `pytest` — 2730 passed, 3 skipped, 1 pre-existing failure (test_sync_help,
+  unrelated — sync.py `--adr` flag removed by another delta)
+- `pylint` — 9.21/10 (remaining warnings are intentional: lazy imports to
+  avoid circular deps, broad-exception-caught for fail-silent, global-statement
+  for module-level flag)
+
+### Status
+
+Uncommitted. Ready for commit.
+
+### Follow-up for Phase 2
+
+- Wire `record_artifact()` calls in domain creation functions
+- `startup.sh` session extraction
+- `.gitignore` for `.spec-driver/run/`
+- Acceptance test against real app
+
 ### Relevant memories
 
 - `mem.pattern.events.cli-middleware` — the process-boundary wrapper pattern

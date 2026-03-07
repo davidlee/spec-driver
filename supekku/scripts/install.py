@@ -741,12 +741,36 @@ def initialize_workspace(
 
     sync_skills(target_root)
 
+  # Ensure .spec-driver/run/ is gitignored (runtime state, never committed)
+  _ensure_gitignore_entry(target_root, f"{SPEC_DRIVER_DIR}/run/", dry_run=dry_run)
+
   # Check optional dependencies (informational only)
   _check_optional_dependencies(target_root, auto_yes=auto_yes)
 
   # Repeat legacy warning so it isn't buried in output
   if _legacy_warning:
     print(f"\n{_legacy_warning}")
+
+
+def _ensure_gitignore_entry(
+  target_root: Path, entry: str, *, dry_run: bool = False
+) -> None:
+  """Append an entry to .gitignore if not already present. Idempotent."""
+  gitignore = target_root / ".gitignore"
+  if gitignore.exists():
+    content = gitignore.read_text(encoding="utf-8")
+    if entry in content:
+      return
+  if dry_run:
+    print(f"[DRY RUN] Would add '{entry}' to .gitignore")
+    return
+  with open(gitignore, "a", encoding="utf-8") as f:
+    # Ensure we start on a new line
+    if gitignore.exists():
+      existing = gitignore.read_text(encoding="utf-8")
+      if existing and not existing.endswith("\n"):
+        f.write("\n")
+    f.write(f"{entry}\n")
 
 
 def _check_optional_dependencies(target_root: Path, *, auto_yes: bool = False) -> None:

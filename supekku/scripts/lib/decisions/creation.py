@@ -11,6 +11,7 @@ import yaml
 from jinja2 import Template
 
 from supekku.scripts.lib.core import slugify
+from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.core.paths import get_templates_dir
 from supekku.scripts.lib.core.templates import extract_template_body
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
@@ -152,6 +153,7 @@ def create_adr(
   """
   # Generate next ID
   adr_id = generate_next_adr_id(registry)
+  record_artifact(adr_id)
 
   # Create filename
   title_slug = create_title_slug(options.title)

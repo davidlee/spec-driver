@@ -25,6 +25,7 @@ from supekku.scripts.lib.changes.updater import (
   update_requirement_lifecycle_status,
 )
 from supekku.scripts.lib.core.config import is_strict_mode, load_workflow_config
+from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.core.paths import get_revisions_dir
 from supekku.scripts.lib.requirements.lifecycle import STATUS_ACTIVE
 from supekku.scripts.lib.workspace import Workspace
@@ -323,6 +324,7 @@ def update_requirements_in_revision_sources(
         requirements=sorted(untracked),
         workspace=workspace,
       )
+      record_artifact(revision_id)
       # Display revision info
       revision_slug = delta_id.lower() + "-completion"
       revision_dir = f"{revision_id}-{revision_slug}"

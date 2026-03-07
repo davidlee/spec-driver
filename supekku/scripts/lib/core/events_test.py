@@ -478,5 +478,145 @@ class TestResolveCmd(unittest.TestCase):
     assert events._resolve_cmd(["list", "specs", "all"]) == "list specs all"
 
 
+# ---------------------------------------------------------------------------
+# VT-052-09: record_artifact called by creation functions
+# ---------------------------------------------------------------------------
+
+
+class TestRecordArtifactWiring(unittest.TestCase):
+  """VT-052-09: Creation functions call record_artifact with correct ID."""
+
+  def setUp(self) -> None:
+    events._reset()
+
+  def tearDown(self) -> None:
+    events._reset()
+
+  def test_create_delta_records_artifact(self, tmp_path: Path | None = None) -> None:
+    """create_delta() calls record_artifact with the delta ID."""
+    import tempfile  # noqa: PLC0415
+
+    from supekku.scripts.lib.changes.creation import create_delta  # noqa: PLC0415
+
+    with tempfile.TemporaryDirectory() as td:
+      root = Path(td)
+      _setup_workspace(root)
+      result = create_delta("test delta", repo_root=root)
+      arts = events._drain_artifacts()
+      assert result.artifact_id in arts
+
+  def test_create_revision_records_artifact(self) -> None:
+    """create_revision() calls record_artifact with the revision ID."""
+    import tempfile  # noqa: PLC0415
+
+    from supekku.scripts.lib.changes.creation import create_revision  # noqa: PLC0415
+
+    with tempfile.TemporaryDirectory() as td:
+      root = Path(td)
+      _setup_workspace(root)
+      result = create_revision("test revision", repo_root=root)
+      arts = events._drain_artifacts()
+      assert result.artifact_id in arts
+
+  def test_create_spec_records_artifact(self) -> None:
+    """create_spec() calls record_artifact with the spec ID."""
+    import tempfile  # noqa: PLC0415
+
+    from supekku.scripts.lib.specs.creation import (  # noqa: PLC0415
+      CreateSpecOptions,
+      create_spec,
+    )
+
+    with tempfile.TemporaryDirectory() as td:
+      root = Path(td)
+      _setup_workspace(root)
+      opts = CreateSpecOptions(spec_type="tech")
+      # Need to be in the workspace dir for find_repository_root
+      old_cwd = Path.cwd()
+      os.chdir(root)
+      try:
+        result = create_spec("test spec", opts)
+        arts = events._drain_artifacts()
+        assert result.spec_id in arts
+      finally:
+        os.chdir(old_cwd)
+
+
+def _setup_workspace(root: Path) -> None:
+  """Create minimal workspace structure for creation tests."""
+  sd = root / ".spec-driver"
+  sd.mkdir(parents=True, exist_ok=True)
+  (sd / "deltas").mkdir(exist_ok=True)
+  (sd / "revisions").mkdir(exist_ok=True)
+  (sd / "tech").mkdir(exist_ok=True)
+  (sd / "templates").mkdir(exist_ok=True)
+  # Minimal templates
+  for name in ("delta.md", "revision.md", "spec.md", "testing.md"):
+    tmpl = sd / "templates" / name
+    if not tmpl.exists():
+      tmpl.write_text("---\n---\n\n# {{ spec_id or delta_id or revision_id }}\n")
+  # Git dir (for find_repo_root)
+  (root / ".git").mkdir(exist_ok=True)
+
+
+# ---------------------------------------------------------------------------
+# VT-052-11: Install adds .spec-driver/run/ to .gitignore
+# ---------------------------------------------------------------------------
+
+
+class TestInstallGitignore(unittest.TestCase):
+  """VT-052-11: spec-driver install adds .spec-driver/run/ to .gitignore."""
+
+  def test_adds_run_to_gitignore(self) -> None:
+    """Install creates .gitignore entry for .spec-driver/run/."""
+    import tempfile  # noqa: PLC0415
+
+    from supekku.scripts.install import _ensure_gitignore_entry  # noqa: PLC0415
+
+    with tempfile.TemporaryDirectory() as td:
+      root = Path(td)
+      _ensure_gitignore_entry(root, ".spec-driver/run/")
+      content = (root / ".gitignore").read_text()
+      assert ".spec-driver/run/" in content
+
+  def test_idempotent(self) -> None:
+    """Calling twice does not duplicate the entry."""
+    import tempfile  # noqa: PLC0415
+
+    from supekku.scripts.install import _ensure_gitignore_entry  # noqa: PLC0415
+
+    with tempfile.TemporaryDirectory() as td:
+      root = Path(td)
+      _ensure_gitignore_entry(root, ".spec-driver/run/")
+      _ensure_gitignore_entry(root, ".spec-driver/run/")
+      content = (root / ".gitignore").read_text()
+      assert content.count(".spec-driver/run/") == 1
+
+  def test_preserves_existing_content(self) -> None:
+    """Existing .gitignore content is preserved."""
+    import tempfile  # noqa: PLC0415
+
+    from supekku.scripts.install import _ensure_gitignore_entry  # noqa: PLC0415
+
+    with tempfile.TemporaryDirectory() as td:
+      root = Path(td)
+      (root / ".gitignore").write_text("node_modules/\n")
+      _ensure_gitignore_entry(root, ".spec-driver/run/")
+      content = (root / ".gitignore").read_text()
+      assert "node_modules/" in content
+      assert ".spec-driver/run/" in content
+
+  def test_dry_run_does_not_create(self) -> None:
+    """Dry run does not modify .gitignore."""
+    import tempfile  # noqa: PLC0415
+
+    from supekku.scripts.install import _ensure_gitignore_entry  # noqa: PLC0415
+
+    with tempfile.TemporaryDirectory() as td:
+      root = Path(td)
+      _ensure_gitignore_entry(root, ".spec-driver/run/", dry_run=True)
+      assert not (root / ".gitignore").exists()
+
+
 if __name__ == "__main__":
   unittest.main()

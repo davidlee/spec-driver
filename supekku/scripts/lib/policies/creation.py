@@ -11,6 +11,7 @@ import yaml
 from jinja2 import Template
 
 from supekku.scripts.lib.core import slugify
+from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.core.paths import get_templates_dir
 from supekku.scripts.lib.core.templates import extract_template_body
 from supekku.scripts.lib.policies.registry import PolicyRegistry
@@ -146,6 +147,7 @@ def create_policy(
   """
   # Generate next ID
   policy_id = generate_next_policy_id(registry)
+  record_artifact(policy_id)
 
   # Create filename
   title_slug = create_title_slug(options.title)

@@ -17,6 +17,7 @@ from supekku.scripts.lib.blocks.relationships import (
 )
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
 from supekku.scripts.lib.core import slugify
+from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.core.paths import (
   SPEC_DRIVER_DIR,
   get_product_specs_dir,
@@ -107,6 +108,7 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
   config.base_dir.mkdir(parents=True, exist_ok=True)
 
   next_id = determine_next_identifier(config.base_dir, config.prefix)
+  record_artifact(next_id)
   slug = slugify(spec_name) or config.kind
   spec_dir = config.base_dir / next_id
   spec_dir.mkdir(parents=True, exist_ok=True)

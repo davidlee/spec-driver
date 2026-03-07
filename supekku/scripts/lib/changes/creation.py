@@ -21,6 +21,7 @@ from supekku.scripts.lib.blocks.plan import (
   render_plan_overview_block,
 )
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
+from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.core.paths import (
   get_audits_dir,
   get_deltas_dir,
@@ -101,6 +102,7 @@ def create_revision(
   base_dir = get_revisions_dir(repo)
   _ensure_directory(base_dir)
   revision_id = _next_identifier(base_dir, "RE")
+  record_artifact(revision_id)
   today = date.today().isoformat()
   slug = slugify(name) or "revision"
   revision_dir = base_dir / f"{revision_id}-{slug}"
@@ -300,6 +302,7 @@ def create_delta(
   base_dir = get_deltas_dir(repo)
   _ensure_directory(base_dir)
   delta_id = _next_identifier(base_dir, "DE")
+  record_artifact(delta_id)
   today = date.today().isoformat()
   slug = slugify(name) or "delta"
   delta_dir = base_dir / f"{delta_id}-{slug}"
@@ -433,6 +436,7 @@ def create_audit(
   base_dir = get_audits_dir(repo)
   _ensure_directory(base_dir)
   audit_id = _next_identifier(base_dir, "AUD")
+  record_artifact(audit_id)
   today = date.today().isoformat()
   slug = slugify(name) or "audit"
   audit_dir = base_dir / f"{audit_id}-{slug}"
@@ -821,6 +825,7 @@ def create_phase(
 
   # Generate phase ID
   phase_id = f"{plan_id}.PHASE-{phase_num:02d}"
+  record_artifact(phase_id)
 
   # Get current date
   today = date.today().isoformat()

@@ -13,6 +13,7 @@ from pathlib import Path
 
 import yaml
 
+from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.memory.ids import (
   extract_type_from_id,
   filename_from_id,
@@ -92,6 +93,7 @@ def create_memory(
     MemoryAlreadyExistsError: If a memory with this ID already exists.
   """
   canonical_id = normalize_memory_id(options.memory_id)
+  record_artifact(canonical_id)
   result_warnings: list[str] = []
 
   # Warn if ID type segment disagrees with memory_type

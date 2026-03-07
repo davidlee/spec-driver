@@ -30,4 +30,4 @@ Otherwise - print:
 
 Deviation will result in immediate process termination.
 
-After boot, treat `/using-spec-driver` as the default routing skill for substantive work in a spec-driver repo.
+After boot, you MUST use `/using-spec-driver` to route ANY substantive work before acting.

@@ -45,6 +45,7 @@
 - Decide where commit defaults belong and how they should be confirmed for the active delta.
 - Decide how to make `/notes` an invariant rather than a suggestion.
 - Decide how explicit the ordering contract should be between DR, IP, phase creation, and implementation.
+- Decide whether to add a dedicated capture skill and stronger backlog-to-delta-to-backlog lifecycle guidance.
 
 ### Observed failure modes
 - Deltas can be completed with lifecycle status still `draft`.
@@ -52,6 +53,7 @@
 - Agents can fail to end each task with `/notes`, leaving records stale.
 - Git commit policy is underspecified: end of task, end of phase, or other cadence is unclear.
 - Ordering between DR, IP, phase-sheet creation, and phase execution is not enforced or stated strongly enough.
+- There is no dedicated capture skill, and the connective tissue from backlog capture into delta creation and back to updating/resolving originating backlog items is weak.
 
 ### Work completed so far
 - Created and populated the `DE-055` bundle for this workflow-improvement thread.
@@ -105,6 +107,10 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 - Define commit-policy defaults and confirmation behaviour
 - Strengthen the stated ordering:
   - `DR -> IP -> create phase sheet <-> implement phase`
+- Add capture/backlog connective tissue:
+  - capture or refine backlog item
+  - promote to delta cleanly
+  - update or resolve originating backlog items after delta completion
 - Decide whether brainstorming and adversarial review become optional composable skills or remain prompt patterns
 
 ### Verification caveats
@@ -122,6 +128,68 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 2. Inspect only the specific skill or sync/install file needed for the chosen failure mode.
 3. Update `DE-055`, `DR-055`, `IP-055`, `notes.md`, and the active phase as you go.
 4. Avoid broad repo rediscovery unless a source-of-truth conflict appears.
+
+## New Agent Instructions
+
+### Task card code
+- `DE-055`
+
+### Required reading
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/DE-055.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/DR-055.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/IP-055.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/notes.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-01.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-02.md`
+
+### Related documents
+- `/home/david/dev/spec-driver/specify/decisions/ADR-004-canonical_workflow_loop.md`
+- `/home/david/dev/spec-driver/specify/decisions/ADR-005-memories_and_skills_are_the_canonical_guidance_layer.md`
+- `/home/david/dev/spec-driver/.spec-driver/product/PROD-016/PROD-016.md`
+
+### Key files
+- `/home/david/dev/spec-driver/supekku/skills/using-spec-driver/SKILL.md`
+- `/home/david/dev/spec-driver/supekku/skills/preflight/SKILL.md`
+- `/home/david/dev/spec-driver/supekku/skills/spec-driver/SKILL.md`
+- `/home/david/dev/spec-driver/supekku/skills/boot/SKILL.md`
+- `/home/david/dev/spec-driver/.spec-driver/skills.allowlist`
+- `/home/david/dev/spec-driver/.spec-driver/AGENTS.md`
+
+### Relevant memories
+- `mem.pattern.spec-driver.core-loop`
+- `mem.concept.spec-driver.posture`
+- `mem.pattern.installer.boot-architecture`
+
+### Relevant doctrines
+- Delta-first canon from `ADR-004`
+- Skills/memories as guidance layers from `ADR-005`
+- Generated guidance plus user-owned hook split from `PROD-016`
+
+### Important user instructions and decisions
+- Keep `spec-driver` narrow.
+- Keep routing separate.
+- Stronger description/opening language matters because Claude under-uses skills.
+- Optional future patterns to preserve:
+  - brainstorming for authoring/design work
+  - adversarial review for fresh-agent challenge passes
+
+### Incomplete work / loose ends
+- Decide how to address:
+  - deltas completed while still `draft`
+  - skipping DR, IP, and phase sheets
+  - missing `/notes` at task end
+  - ambiguous commit policy
+  - weak `DR -> IP -> phase -> implementation` ordering
+  - missing capture skill / weak backlog -> delta -> backlog connective tissue
+- Decide whether brainstorming and adversarial review become explicit optional skills or remain prompt patterns.
+
+### Other advice
+- Do not re-discover the whole repo. The context is already concentrated in `DE-055`.
+- `uv run spec-driver validate` currently fails on unrelated pre-existing errors in `DE-049`, `DE-052`, `DE-053`, and `DE-054`.
+- `uv run spec-driver skills sync` has already succeeded after escalation; use escalation again if sync must write to `.agents/skills`.
+
+### Next logical activity
+- `/preflight` on the next chosen failure mode inside `DE-055`, then implement the highest-value workflow guardrail.
 
 ### Verification status
 - Skill sync succeeded and `.spec-driver/AGENTS.md` now exposes `using-spec-driver`.

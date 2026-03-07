@@ -74,7 +74,7 @@ def _mock_snapshot() -> ArtifactSnapshot:
 def _make_app(snapshot: ArtifactSnapshot | None = None):
   """Create a SpecDriverApp with a mock snapshot."""
   snap = snapshot or _mock_snapshot()
-  return SpecDriverApp(root=Path("/tmp"), snapshot=snap)
+  return SpecDriverApp(root=Path("/tmp"), snapshot=snap, listen=False)
 
 
 # --- Tests ---

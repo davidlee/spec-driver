@@ -111,6 +111,20 @@ SPEC_DRIVER_THEME = Theme(
     "artifact.group.change": "#d79921",  # yellow
     "artifact.group.domain": "#00b8ff",  # sky blue
     "artifact.group.operational": "#8ec07c",  # green
+    # Track view (DE-054)
+    "track.timestamp": "#7c7876",  # mid grey
+    "track.cmd": "#cecdcd",  # light grey
+    "track.artifact": "#00b8ff",  # sky blue
+    "track.status.ok": "#8ec07c",  # green
+    "track.status.error": "#cc241d",  # red
+    "track.session.0": "#458588",  # blue
+    "track.session.1": "#d79921",  # yellow
+    "track.session.2": "#8ec07c",  # green
+    "track.session.3": "#9600ff",  # purple
+    "track.session.4": "#00b8ff",  # sky blue
+    "track.session.5": "#ff00c1",  # magenta
+    "track.session.6": "#cc241d",  # red
+    "track.session.7": "#cecdcd",  # light grey
     # UI elements
     "table.border": "#7c7876",  # mid grey
   }

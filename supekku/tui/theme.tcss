@@ -85,6 +85,48 @@ TypeSelector {
   border-title-color: $accent;
 }
 
+/* --- TrackScreen layout (DEC-054-01) --- */
+
+TrackScreen {
+  layout: horizontal;
+}
+
+#session-list {
+  width: 1fr;
+  min-width: 20;
+  max-width: 25;
+  height: 100%;
+  border: round $surface-lighten-2;
+  border-title-color: $text-muted;
+  background: $surface;
+  padding: 0 1;
+}
+
+#session-list:focus-within {
+  border: round $accent;
+  border-title-color: $accent;
+}
+
+/* Reset OptionList chrome inside bordered container */
+SessionList {
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+#track-panel {
+  width: 4fr;
+  height: 100%;
+  border: round $surface-lighten-2;
+  border-title-color: $text-muted;
+  padding: 0 1;
+}
+
+#track-panel:focus-within {
+  border: round $accent;
+  border-title-color: $accent;
+}
+
 /* --- Footer --- */
 
 Footer {

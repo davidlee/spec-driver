@@ -277,6 +277,17 @@ class ArtifactSnapshot:
         result.append(entry)
     return result
 
+  def find_entry(self, artifact_id: str) -> ArtifactEntry | None:
+    """Find an entry by ID across all artifact types.
+
+    O(n) scan — acceptable for user-initiated navigation (DEC-054-06).
+    """
+    for type_entries in self.entries.values():
+      entry = type_entries.get(artifact_id)
+      if entry is not None and entry.error is None:
+        return entry
+    return None
+
   def counts_by_type(self) -> dict[ArtifactType, int]:
     """Return artifact counts per type (excluding error entries)."""
     return {

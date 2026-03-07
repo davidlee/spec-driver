@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from textual.containers import Vertical
 from textual.screen import Screen
+from textual.widgets import DataTable
 
 from supekku.scripts.lib.core.artifact_view import (
   ArtifactEntry,
@@ -64,6 +65,37 @@ class BrowserScreen(Screen):
   def selected_entry(self) -> ArtifactEntry | None:
     """Currently selected artifact entry, or None."""
     return self._selected_entry
+
+  def navigate_to_artifact(self, artifact_id: str) -> bool:
+    """Navigate to an artifact by ID (DEC-054-06).
+
+    Returns True if navigation succeeded, False if artifact not found.
+    """
+    entry = self._snapshot.find_entry(artifact_id)
+    if entry is None:
+      return False
+
+    art_type = entry.artifact_type
+
+    # Switch type selector
+    type_selector = self.query_one("#type-selector", TypeSelector)
+    idx = type_selector.get_option_index(art_type.value)
+    type_selector.highlighted = idx
+
+    # Populate artifact list for this type
+    entries = self._snapshot.all_entries(type_filter=art_type)
+    artifact_list = self.query_one("#artifact-panel", ArtifactList)
+    artifact_list.show_entries(entries, art_type)
+    artifact_list.border_title = art_type.plural
+
+    # Select the target row
+    table = artifact_list.query_one("#artifact-table", DataTable)
+    for row_idx, row_key in enumerate(table.rows):
+      if row_key.value == artifact_id:
+        table.move_cursor(row=row_idx)
+        break
+
+    return True
 
   def refresh_snapshot(self, art_type: ArtifactType) -> None:
     """Re-collect a single type and update the UI."""

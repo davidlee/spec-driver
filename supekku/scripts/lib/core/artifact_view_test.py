@@ -228,6 +228,67 @@ class TestArtifactSnapshot:
       assert isinstance(counts[art_type], int)
 
 
+class TestFindEntry:
+  """ArtifactSnapshot.find_entry() cross-type lookup (VT-054-07)."""
+
+  @staticmethod
+  def _snapshot_with_entries() -> ArtifactSnapshot:
+    """Build a snapshot with injected entries (no real registries)."""
+    snapshot = ArtifactSnapshot.__new__(ArtifactSnapshot)
+    snapshot.entries = {
+      ArtifactType.DELTA: {
+        "DE-001": ArtifactEntry(
+          id="DE-001",
+          title="Delta one",
+          status="in-progress",
+          path=Path("/d/DE-001"),
+          artifact_type=ArtifactType.DELTA,
+        ),
+      },
+      ArtifactType.SPEC: {
+        "SPEC-001": ArtifactEntry(
+          id="SPEC-001",
+          title="Spec one",
+          status="active",
+          path=Path("/s/SPEC-001"),
+          artifact_type=ArtifactType.SPEC,
+        ),
+      },
+      ArtifactType.ADR: {
+        "__error_adr__": ArtifactEntry(
+          id="",
+          title="",
+          status="",
+          path=Path(),
+          artifact_type=ArtifactType.ADR,
+          error="Load failed",
+        ),
+      },
+    }
+    return snapshot
+
+  def test_finds_entry_by_id(self):
+    snapshot = self._snapshot_with_entries()
+    entry = snapshot.find_entry("DE-001")
+    assert entry is not None
+    assert entry.id == "DE-001"
+    assert entry.artifact_type == ArtifactType.DELTA
+
+  def test_finds_across_types(self):
+    snapshot = self._snapshot_with_entries()
+    entry = snapshot.find_entry("SPEC-001")
+    assert entry is not None
+    assert entry.artifact_type == ArtifactType.SPEC
+
+  def test_returns_none_for_unknown_id(self):
+    snapshot = self._snapshot_with_entries()
+    assert snapshot.find_entry("NONEXISTENT") is None
+
+  def test_skips_error_entries(self):
+    snapshot = self._snapshot_with_entries()
+    assert snapshot.find_entry("__error_adr__") is None
+
+
 # -- VT-057-artifact-view: BacklogRegistry in standard factory path --
 
 

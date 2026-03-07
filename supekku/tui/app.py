@@ -17,6 +17,8 @@ from supekku.scripts.lib.core.artifact_view import (
   path_to_artifact_type,
 )
 from supekku.tui.browser import BrowserScreen
+from supekku.tui.event_listener import EventListener, TrackEvent
+from supekku.tui.track import TrackScreen
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +42,7 @@ class SpecDriverApp(App):
 
   BINDINGS = [
     Binding("q", "quit", "Quit"),
+    Binding("t", "toggle_track", "Track"),
     Binding("e", "edit", "Edit"),
     Binding("s", "cycle_status", "Status"),
     Binding("slash", "focus_search", "Search", key_display="/"),
@@ -51,20 +54,37 @@ class SpecDriverApp(App):
     root: Path | None = None,
     snapshot: ArtifactSnapshot | None = None,
     watch: bool = True,
+    listen: bool = True,
     **kwargs,
   ) -> None:
     super().__init__(**kwargs)
     self._root = root or Path.cwd()
     self._snapshot = snapshot
     self._watch = watch
+    self._listen = listen
     self._watcher_task: asyncio.Task | None = None
+    self._listener: EventListener | None = None
+    self._listener_task: asyncio.Task | None = None
+    self._browser_screen: BrowserScreen | None = None
+    self._track_screen: TrackScreen | None = None
 
   def on_mount(self) -> None:
+    """Install screens, start file watcher and event listener."""
     snapshot = self._snapshot or ArtifactSnapshot(root=self._root)
     self._snapshot = snapshot
-    self.push_screen(BrowserScreen(snapshot))
+
+    self._browser_screen = BrowserScreen(snapshot)
+    self._track_screen = TrackScreen()
+
+    self.install_screen(self._browser_screen, name="browser")
+    self.install_screen(self._track_screen, name="track")
+    self.push_screen("browser")
+
     if self._watch and self._snapshot is not None:
       self._watcher_task = asyncio.create_task(self._watch_files())
+
+    if self._listen:
+      self._listener_task = asyncio.create_task(self._start_listener())
 
   async def _watch_files(self) -> None:
     """Watch workspace for file changes and refresh affected registries."""
@@ -106,6 +126,47 @@ class SpecDriverApp(App):
       search.focus()
     except Exception:  # noqa: BLE001
       pass
+
+  async def _start_listener(self) -> None:
+    """Start the event listener and seed TrackScreen with replayed events."""
+    from supekku.scripts.lib.core.paths import get_run_dir  # noqa: PLC0415
+
+    run_dir = get_run_dir(self._root)
+    self._listener = EventListener(run_dir)
+
+    replay = self._listener.get_replay_events()
+    if self._track_screen is not None:
+      for event in replay:
+        self._track_screen.add_event(event)
+
+    await self._listener.start(self)
+
+  def on_track_event(self, message: TrackEvent) -> None:
+    """Bridge TrackEvent from listener to TrackScreen."""
+    message.stop()
+    if self._track_screen is not None:
+      self._track_screen.add_event(message.event)
+
+  async def on_unmount(self) -> None:
+    """Clean up listener on app shutdown."""
+    if self._listener is not None:
+      await self._listener.stop()
+
+  def action_toggle_track(self) -> None:
+    """Toggle between browser and track screens (DEC-054-01)."""
+    if isinstance(self.screen, TrackScreen):
+      self.switch_screen("browser")
+    else:
+      self.switch_screen("track")
+
+  def action_navigate_artifact(self, artifact_id: str) -> None:
+    """Navigate to an artifact in the browser (DEC-054-06)."""
+    self.switch_screen("browser")
+    screen = self.screen
+    if isinstance(screen, BrowserScreen) and not screen.navigate_to_artifact(
+      artifact_id
+    ):
+      self.notify(f"Artifact {artifact_id} not found.", severity="warning")
 
   def action_edit(self) -> None:
     """Open the selected artifact in $EDITOR."""

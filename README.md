@@ -55,6 +55,11 @@ Boot up, install, and ask the agent to show you around.
 
 
 ![tui](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/tui.png)
+There's a nice little TUI for browsing docs, with fuzzy find.
+Shout out to [lazyspec](https://github.com/jkaloger/lazyspec/)
+
+![follow](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/follow.png)
+Fun fact: TUI now supports following a claude code session in real time.
 
 ## Installation
 

@@ -27,3 +27,8 @@ Then identify the next logical activity, and print instructions for the next age
 
 Usually this means a simple instruction to invoke `/using-spec-driver` or one
 of its target skills, with the appropriate artefact.
+
+If the next step is implementation-adjacent or depends on `/preflight`, make
+the handover explicitly preserve unresolved assumptions, questions, and design
+tensions. Do not hand off with a vague "ready to proceed" if the bundle still
+contains ambiguities the next agent should assess before coding.

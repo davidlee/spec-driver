@@ -1,0 +1,1 @@
+../../../../../../../../.contracts/public/supekku/tui/widgets/artifact_list.py.md

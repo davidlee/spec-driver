@@ -2,8 +2,8 @@
 id: ISSUE-034
 name: Resolve links does not support backlog items
 created: '2026-03-05'
-updated: '2026-03-05'
-status: open
+updated: '2026-03-07'
+status: resolved
 kind: issue
 ---
 
@@ -29,3 +29,9 @@ or add a clear allowlist/flag to suppress missing warnings for these types.
 
 ## Related
 - PROB-002 (requirement lifecycle guidance drift)
+
+## Resolution — DE-057
+
+Added `_collect_backlog_items()` to `cli/resolve.py:_build_artifact_index()`.
+Backlog items (ISSUE-*, PROB-*, IMPR-*, RISK-*) are now indexed and resolved
+via `BacklogRegistry.collect()`. VT-057-link-resolver verifies.

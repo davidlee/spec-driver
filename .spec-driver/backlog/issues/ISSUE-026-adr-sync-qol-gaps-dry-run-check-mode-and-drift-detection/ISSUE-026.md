@@ -2,8 +2,8 @@
 id: ISSUE-026
 name: 'Make sync dry-run/check semantics consistent for ADR/backlog/requirements'
 created: '2026-02-06'
-updated: '2026-02-06'
-status: open
+updated: '2026-03-07'
+status: in-progress
 kind: issue
 categories:
   - cli
@@ -66,3 +66,12 @@ Same issue for `_sync_backlog()` and `_sync_requirements()`.
 
 - `supekku/cli/sync.py` - CLI command implementation
 - `supekku/scripts/lib/decisions/registry.py` - DecisionRegistry
+
+## Resolution (partial) — DE-057
+
+- **Backlog dry_run fixed**: `_sync_backlog()` now threads `dry_run` param through
+  to `sync_backlog_registry()`. When `dry_run=True`, stats are computed but
+  `save_backlog_registry()` is skipped. VT-057-sync-dryrun verifies.
+- **Remaining**: ADR and requirements sync paths still don't respect `dry_run`.
+  `--check` drift detection mode not yet implemented for any registry sync.
+- Status set to `in-progress` — backlog portion resolved, ADR/requirements remain.

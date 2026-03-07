@@ -2,8 +2,8 @@
 id: ISSUE-043
 name: create delta treats --from-backlog value as greedy, swallowing subsequent flags
 created: '2026-03-06'
-updated: '2026-03-06'
-status: open
+updated: '2026-03-07'
+status: in-progress
 kind: issue
 categories: []
 severity: p3
@@ -33,4 +33,16 @@ backlog item ID before attempting a lookup.
 This is a Typer/Click limitation with eager options. Low severity since
 `create delta --help` works and `--from-backlog` is typically given a real
 ID, but it makes the command less discoverable when exploring.
+
+## Mitigation — DE-057 (DEC-057-07)
+
+Added `_validate_backlog_id()` callback on `--from-backlog` option. Rejects
+non-ID values (e.g. `--spec`, `xyzzy`) with clear `BadParameter` message:
+"'--spec' does not look like a backlog item ID (expected ISSUE-NNN, ...)".
+
+**What this does NOT fix**: `--from-backlog --help` still consumes `--help` as
+the option value — Click's parser grabs the next token before the callback runs.
+A full fix would require changing the CLI shape (e.g. making `--from-backlog` a
+boolean flag with the ID as a separate argument). Status: `in-progress` — root
+cause remains.
 

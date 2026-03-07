@@ -1,7 +1,7 @@
 ---
 id: STD-001
 title: 'STD-001: use typer / rich for cli ux elements'
-status: draft
+status: default
 created: '2025-11-04'
 updated: '2025-11-04'
 reviewed: '2025-11-04'

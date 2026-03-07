@@ -23,7 +23,8 @@
       "supekku/scripts/lib/specs": "SPEC-152",
       "supekku/scripts/lib/standards": "SPEC-153",
       "supekku/scripts/lib/sync/adapters": "SPEC-154",
-      "supekku/scripts/lib/validation": "SPEC-155"
+      "supekku/scripts/lib/validation": "SPEC-155",
+      "supekku/tui/widgets": "SPEC-157"
     },
     "typescript": {
       "backlog": "SPEC-156"

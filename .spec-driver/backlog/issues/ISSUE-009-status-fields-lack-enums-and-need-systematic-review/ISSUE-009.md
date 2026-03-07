@@ -3,7 +3,7 @@ id: ISSUE-009
 name: Status fields lack enums and need systematic review
 created: '2025-11-02'
 updated: '2026-03-07'
-status: open
+status: in-progress
 kind: issue
 categories:
   - architecture
@@ -126,3 +126,21 @@ a design choice with no canonical answer.
 - Discovered during: DE-005 (implement spec backfill)
 - Related to: PROD-001 (spec creation), frontmatter validation architecture
 - Downstream: IMPR-010 (backlog prioritize UX — status-aware checkboxes)
+
+## Partial Resolution — DE-057 (backlog item statuses only)
+
+DE-057 delivered per-kind status frozensets in `backlog/models.py` (DEC-057-02,
+DEC-057-08):
+- `ISSUE_STATUSES`, `PROBLEM_STATUSES`, `IMPROVEMENT_STATUSES`, `RISK_STATUSES`
+- `BACKLOG_STATUSES` dict for lookup by kind
+- `DEFAULT_HIDDEN_STATUSES` for list view exclusion
+- `ALL_VALID_STATUSES` union set
+- `is_valid_status()` helper with permissive validation (warn on unknown)
+
+**Remaining for full closure:**
+- Theme/rendering alignment: `theme.py` status colours don't match the defined
+  enums (gaps listed in audit section above)
+- Non-backlog entity types (specs, ADRs, deltas, requirements, etc.) still lack
+  status enums
+- Frontmatter schema validation not yet enforcing enum constraints
+- Status: `in-progress` — backlog modelling done, broader scope remains

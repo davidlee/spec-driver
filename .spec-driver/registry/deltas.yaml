@@ -6563,7 +6563,7 @@ deltas:
             out
   DE-056:
     kind: delta
-    status: in-progress
+    status: completed
     name: Fix validator backlog ID resolution and make registry syncs always-on
     slug: fix_validator_backlog_id_resolution_and_make_registry_syncs_always_on
     updated: '2026-03-07'
@@ -6597,8 +6597,8 @@ deltas:
         phase: IP-056-P01
   DE-057:
     kind: delta
-    status: draft
-    name: Delta - BacklogRegistry class normalisation
+    status: completed
+    name: Delta - BacklogRegistry class normalisation and backlog subsystem improvements
     slug: backlogregistry_class_normalisation
     updated: '2026-03-07'
     path: .spec-driver/deltas/DE-057-backlogregistry_class_normalisation/DE-057.md
@@ -6620,7 +6620,8 @@ deltas:
         plan: IP-057
         delta: DE-057
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-057
         specs:
           primary: []
           collaborators: []
@@ -6628,7 +6629,166 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-057-P01
+        - id: IP-057.PHASE-01
+        - id: IP-057.PHASE-02
+        - id: IP-057.PHASE-03
       phases:
-      - id: IP-057-P01
-        phase: IP-057-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-057.PHASE-01
+        plan: IP-057
+        delta: DE-057
+        objective: BacklogRegistry class with ADR-009 surface + per-kind status sets
+          + tests
+        entrance_criteria:
+        - DR-057 decisions resolved
+        exit_criteria:
+        - BacklogRegistry class passes ADR-009 checklist (find/collect/iter/filter)
+        - Per-kind status frozensets defined with is_valid_status() helper
+        - DEFAULT_HIDDEN_STATUSES matches current list_backlog() exclusion
+        - Module-level wrapper functions delegate to registry class
+        - VT-057-registry and VT-057-status-enums pass
+        - just passes
+        verification:
+          tests:
+          - VT-057-registry
+          - VT-057-status-enums
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Define per-kind status sets in models.py
+        - id: '1.2'
+          description: Implement BacklogRegistry class in registry.py
+        - id: '1.3'
+          description: Convert module-level functions to thin wrappers
+        - id: '1.4'
+          description: Write tests for registry class and status sets
+        risks:
+        - description: Status sets incomplete
+          mitigation: Derive from TEMPLATES + grep observed values; permissive validation
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-057.PHASE-02
+        plan: IP-057
+        delta: DE-057
+        objective: Remove artifact_view.py shim, update CLI consumers, fix operational
+          gaps
+        entrance_criteria:
+        - Phase 1 complete (BacklogRegistry class + status sets tested)
+        exit_criteria:
+        - _collect_backlog() shim removed from artifact_view.py
+        - BacklogRegistry in _REGISTRY_FACTORIES via standard factory
+        - _load_type() special-case for BACKLOG removed
+        - CLI consumers use BacklogRegistry (common.py, list.py, sync.py, create.py)
+        - ISSUE-026 fixed (dry_run threaded)
+        - ISSUE-034 fixed (link resolver supports backlog)
+        - ISSUE-043 mitigated (ID validation callback)
+        - VT-057-artifact-view, -sync-dryrun, -link-resolver, -from-backlog pass
+        - VT-057-regression passes
+        - just passes
+        verification:
+          tests:
+          - VT-057-artifact-view
+          - VT-057-sync-dryrun
+          - VT-057-link-resolver
+          - VT-057-from-backlog
+          - VT-057-regression
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Remove artifact_view.py shim, add factory
+        - id: '2.2'
+          description: Update cli/common.py resolvers
+        - id: '2.3'
+          description: Update cli/list.py to use BacklogRegistry
+        - id: '2.4'
+          description: "Fix ISSUE-026 \u2014 dry_run threading in sync.py"
+        - id: '2.5'
+          description: "Fix ISSUE-034 \u2014 link resolver backlog support"
+        - id: '2.6'
+          description: "Fix ISSUE-043 \u2014 --from-backlog validation callback"
+        - id: '2.7'
+          description: Write/update tests for all integration changes
+        risks:
+        - description: Shim removal changes error behaviour
+          mitigation: Test per-record error placeholders explicitly (DEC-057-09)
+        - description: common.py resolver regresses kind scoping
+          mitigation: Preserve kind validation and ambiguity handling
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-057.PHASE-03
+        plan: IP-057
+        delta: DE-057
+        objective: Final verification, backlog item updates, notes, delta closure
+        entrance_criteria:
+        - Phase 2 complete (all integration changes tested)
+        exit_criteria:
+        - All VTs pass
+        - just passes
+        - Backlog items updated with resolution notes
+        - DE-057 notes updated
+        - Delta closeable via spec-driver complete delta
+        verification:
+          tests:
+          - VT-057-regression
+          evidence: []
+        tasks:
+        - id: '3.1'
+          description: Full verification pass
+        - id: '3.2'
+          description: Update backlog items
+        - id: '3.3'
+          description: Update notes and memory
+        - id: '3.4'
+          description: Close delta
+        risks: []
+  DE-058:
+    kind: delta
+    status: in-progress
+    name: Delta - govern pylint signal and document lint standard
+    slug: govern_pylint_signal_and_document_lint_standard
+    updated: '2026-03-07'
+    path: .spec-driver/deltas/DE-058-govern_pylint_signal_and_document_lint_standard/DE-058.md
+    applies_to:
+      specs:
+      - PROD-003
+      requirements: []
+    plan:
+      id: IP-058
+      overview: {}
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-058.PHASE-01
+        plan: IP-058
+        delta: DE-058
+        objective: Author a lint-governance standard, fix recursive pylint test-file
+          ignores, and verify repo-level lint output remains authoritative and more
+          useful.
+        entrance_criteria:
+        - Delta and DR reviewed
+        - Existing pylint configuration inspected
+        exit_criteria:
+        - STD-002 authored with concrete guidance
+        - Recursive test-file ignore patterns updated in pyproject.toml
+        - Repo-level pylint verification captured
+        verification:
+          tests:
+          - just pylint
+          evidence:
+          - VA-DE-058-001
+          - VA-DE-058-002
+        tasks:
+        - id: '1.1'
+          title: Author STD-002 with lint prioritization and anti-rationalization
+            guidance
+          status: done
+        - id: '1.2'
+          title: Update pylint per-file ignores to recursive test globs
+          status: done
+        - id: '1.3'
+          title: Run repo-level pylint and capture outcome
+          status: done
+        risks:
+        - Recursive glob matches unintended files outside tests
+        - Standard wording weakens repo-level lint expectations if phrased imprecisely

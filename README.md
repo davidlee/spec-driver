@@ -17,8 +17,6 @@ Your specification-driven development framework construction toolkit, with multi
 - large codebases - 150kLoC+
 - legacy conversion
 - nobody can force you to use Jira
-
-**
 - a low friction, conceptually coherent, unified CLI for spec-driven development you can adapt as your needs change
 
 ![ADR list](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/adr-list.png)

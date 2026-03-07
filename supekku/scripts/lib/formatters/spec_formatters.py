@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.column_defs import SPEC_COLUMNS, column_labels
 from supekku.scripts.lib.formatters.table_utils import (
   add_row_with_truncation,
   calculate_column_widths,
@@ -107,7 +108,7 @@ def format_spec_list_table(
     return format_as_tsv(rows)
 
   # table format
-  columns = ["ID", "Name", "Tags", "Status"]
+  columns = column_labels(SPEC_COLUMNS)
   if include_packages:
     columns.append("Packages")
 

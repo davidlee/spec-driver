@@ -13,6 +13,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.blocks.plan import extract_phase_tracking
+from supekku.scripts.lib.formatters.column_defs import (
+  CHANGE_COLUMNS,
+  PHASE_COLUMNS,
+  PLAN_COLUMNS,
+  column_labels,
+)
 from supekku.scripts.lib.formatters.table_utils import (
   add_row_with_truncation,
   calculate_column_widths,
@@ -144,7 +150,7 @@ def format_change_list_table(
 
   # table format
   table = create_table(
-    columns=["ID", "Name", "Tags", "Status"],
+    columns=column_labels(CHANGE_COLUMNS),
     title="Change Artifacts",
   )
 
@@ -364,7 +370,7 @@ def _format_plan_overview(
   ]
 
   # Create Rich table for phases
-  table = create_table(columns=["Phase", "Status", "Objective"], show_header=True)
+  table = create_table(columns=column_labels(PHASE_COLUMNS), show_header=True)
 
   # Add each phase as table row
   for enriched_phase in enriched_phases:
@@ -701,7 +707,7 @@ def format_plan_list_table(
   """
   return format_list_table(
     plans,
-    columns=["ID", "Status", "Name", "Delta"],
+    columns=column_labels(PLAN_COLUMNS),
     title="Implementation Plans",
     prepare_row=_prepare_plan_row,
     prepare_tsv_row=_prepare_plan_tsv_row,

@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.column_defs import POLICY_COLUMNS, column_labels
 from supekku.scripts.lib.formatters.table_utils import (
   format_as_json,
   format_list_table,
@@ -204,7 +205,7 @@ def format_policy_list_table(
   """
   return format_list_table(
     policies,
-    columns=["ID", "Title", "Tags", "Status", "Updated"],
+    columns=column_labels(POLICY_COLUMNS),
     title="Policies",
     prepare_row=_prepare_policy_row,
     prepare_tsv_row=_prepare_policy_tsv_row,

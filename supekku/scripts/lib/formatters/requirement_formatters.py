@@ -8,6 +8,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.column_defs import (
+  REQUIREMENT_COLUMNS,
+  column_labels,
+)
 from supekku.scripts.lib.formatters.table_utils import (
   add_row_with_truncation,
   create_table,
@@ -52,7 +56,7 @@ def format_requirement_list_table(
 
   # table format - columns: Spec, Label, Category, Title, Tags, Status
   table = create_table(
-    columns=["Spec", "Label", "Category", "Title", "Tags", "Status"],
+    columns=column_labels(REQUIREMENT_COLUMNS),
     title="Requirements",
   )
 

@@ -68,3 +68,88 @@
 ### Commits
 
 No code committed — spike was throwaway. Findings recorded here.
+
+## 2026-03-07 — DR review, reconciliation, follow-up scoping
+
+### DR-053 review (two rounds)
+
+Two adversarial review passes surfaced 9 + 3 findings. All resolved. Key
+changes from the original draft:
+
+- Artifact projection layer moved to `core/artifact_view.py` (reusable, no
+  TUI imports) — risk of parallel implementation outweighs premature
+  generalisation
+- Shared `column_defs.py` extracted from formatters (POL-001 compliance)
+- `resolve_style()` / `styled_text()` promoted to public API in `theme.py`
+- `.tcss` uses Textual-native tokens only — intentionally not palette-matched,
+  no runtime bridge
+- Error isolation boundary in adapter (stderr redirect, per-registry catch)
+- Snapshot-on-load caching with watch-triggered per-registry invalidation
+- Bounded dep ranges: `textual>=8.0,<9.0`, `watchfiles>=1.0,<2.0`
+- BacklogRegistry shim in adapter + follow-up delta as exit criteria
+- Type selector: flat OptionList, colour-grouped, no headings
+- Expanded VT: error states, edge cases, tcss lint (POL-002)
+- Accessibility: explicit MVP non-goal
+- DE-053 reconciled with DR-053 (no competing truths)
+
+### BacklogRegistry follow-up delta
+
+DE-053 exit criteria requires a follow-up delta to normalise BacklogRegistry
+from function-based to class-based (`collect/find/iter/filter`).
+
+Related backlog items to evaluate as potential riders:
+- ISSUE-016, ISSUE-024, ISSUE-026, ISSUE-034, ISSUE-043, ISSUE-045
+- IMPR-010
+
+These form a cluster around "backlog subsystem undercooked". Not all should
+ride the normalisation delta — triage when scoping.
+
+## 2026-03-07 — Phase 1 complete: Shared infrastructure
+
+### What was done
+
+- **T01**: `resolve_style()` and `styled_text()` added to `formatters/theme.py`
+  as public API. 21 tests including style key regression inventory.
+- **T02**: `column_defs.py` created with `ColumnDef` dataclass and definitions
+  for all 11 artifact/view types. All 9 existing formatter modules refactored
+  to consume `column_labels()` instead of inline column lists. 15 tests
+  including regression against formatter column expectations. 261 existing
+  formatter tests pass unchanged.
+- **T03**: `core/artifact_view.py` created with `ArtifactEntry` dataclass,
+  `ArtifactSnapshot` cache, per-registry adapters for all 11 types,
+  BacklogRegistry function-based shim, error isolation (try/except + stderr
+  redirect). 13 tests. Verified against real workspace: 496 artifacts across
+  11 types loaded successfully.
+- **T04**: TDD throughout — tests written before or alongside implementation.
+
+### Files created/modified
+
+New:
+- `supekku/scripts/lib/formatters/theme_test.py` (21 tests)
+- `supekku/scripts/lib/formatters/column_defs.py`
+- `supekku/scripts/lib/formatters/column_defs_test.py` (15 tests)
+- `supekku/scripts/lib/core/artifact_view.py`
+- `supekku/scripts/lib/core/artifact_view_test.py` (13 tests)
+
+Modified:
+- `supekku/scripts/lib/formatters/theme.py` (additive: 2 functions)
+- All 9 `*_formatters.py` files (import + column_labels() substitution)
+
+### Verification
+
+- `just` passes: ruff clean, pylint 9.52/10, 2805 tests pass
+- No STOP conditions triggered
+- No surprises — column_defs extraction was cleaner than feared
+
+### Commits
+
+Uncommitted. Ready to commit when user approves.
+
+### Handoff to Phase 2
+
+Phase 1 infrastructure is ready. Phase 2 (TUI core) can now:
+- Import `styled_text()` from `formatters/theme.py`
+- Import `column_labels()` and `*_COLUMNS` from `formatters/column_defs.py`
+- Import `ArtifactSnapshot`, `ArtifactType`, `ArtifactEntry` from
+  `core/artifact_view.py`
+- Build the Textual app consuming this foundation

@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.column_defs import ADR_COLUMNS, column_labels
 from supekku.scripts.lib.formatters.table_utils import (
   format_as_json,
   format_list_table,
@@ -210,7 +211,7 @@ def format_decision_list_table(
   """
   return format_list_table(
     decisions,
-    columns=["ID", "Title", "Tags", "Status", "Updated"],
+    columns=column_labels(ADR_COLUMNS),
     title="Architecture Decision Records",
     prepare_row=_prepare_decision_row,
     prepare_tsv_row=_prepare_decision_tsv_row,

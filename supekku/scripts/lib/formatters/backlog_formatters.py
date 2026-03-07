@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.column_defs import BACKLOG_COLUMNS, column_labels
 from supekku.scripts.lib.formatters.table_utils import (
   add_row_with_truncation,
   create_table,
@@ -51,7 +52,7 @@ def format_backlog_list_table(
 
   # table format - columns: ID, Kind, Title, Tags, Status, Severity
   table = create_table(
-    columns=["ID", "Kind", "Title", "Tags", "Status", "Severity"],
+    columns=column_labels(BACKLOG_COLUMNS),
     title="Backlog Items",
   )
 

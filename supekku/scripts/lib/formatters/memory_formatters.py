@@ -10,6 +10,7 @@ import json
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.column_defs import MEMORY_COLUMNS, column_labels
 from supekku.scripts.lib.formatters.table_utils import (
   format_as_json,
   format_list_table,
@@ -233,7 +234,7 @@ def format_memory_list_table(
   """
   return format_list_table(
     records,
-    columns=["ID", "Status", "Type", "Name", "Confidence", "Tags", "Updated"],
+    columns=column_labels(MEMORY_COLUMNS),
     title="Memory Records",
     prepare_row=_prepare_memory_row,
     prepare_tsv_row=_prepare_memory_tsv_row,

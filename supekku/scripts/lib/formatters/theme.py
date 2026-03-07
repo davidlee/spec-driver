@@ -17,6 +17,8 @@ Color Palette:
 
 from __future__ import annotations
 
+from rich.style import Style
+from rich.text import Text
 from rich.theme import Theme
 
 # Spec-driver application theme
@@ -108,6 +110,35 @@ SPEC_DRIVER_THEME = Theme(
     "table.border": "#7c7876",  # mid grey
   }
 )
+
+
+def resolve_style(name: str) -> Style | None:
+  """Resolve a theme style name to a Rich Style object.
+
+  Args:
+    name: Style name from the theme (e.g., "adr.status.accepted")
+
+  Returns:
+    Resolved Style object, or None if the name is not in the theme.
+  """
+  return SPEC_DRIVER_THEME.styles.get(name)
+
+
+def styled_text(value: str, style_name: str) -> Text:
+  """Create a Rich Text object with a resolved theme style.
+
+  Args:
+    value: The text content.
+    style_name: Style name from the theme (e.g., "spec.id").
+
+  Returns:
+    Text object with the style applied. Unstyled if style_name is not found.
+  """
+  text = Text(value)
+  style = resolve_style(style_name)
+  if style:
+    text.stylize(style)
+  return text
 
 
 def get_adr_status_style(status: str) -> str:

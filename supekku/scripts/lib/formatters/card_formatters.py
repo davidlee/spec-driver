@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.column_defs import CARD_COLUMNS, column_labels
 from supekku.scripts.lib.formatters.table_utils import (
   format_as_json,
   format_as_tsv,
@@ -114,7 +115,7 @@ def format_card_list_table(
 
   return format_list_table(
     cards,
-    columns=["ID", "Lane", "Title", "Created"],
+    columns=column_labels(CARD_COLUMNS),
     title="Cards",
     prepare_row=_format_card_as_row,
     prepare_tsv_row=_format_card_as_row,

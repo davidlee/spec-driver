@@ -1,0 +1,1 @@
+../../../../../../../../../.contracts/all/supekku/scripts/lib/formatters/column_defs.py.md

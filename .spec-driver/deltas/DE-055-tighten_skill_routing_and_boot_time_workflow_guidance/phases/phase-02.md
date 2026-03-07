@@ -4,7 +4,7 @@ slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-02
 name: IP-055 Phase 02
 created: '2026-03-07'
 updated: '2026-03-07'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -36,10 +36,10 @@ tasks:
     status: done
   - id: 2.2
     title: Record implementation results back into delta notes and plan state
-    status: in_progress
+    status: done
   - id: 2.3
     title: Decide whether to design optional brainstorming and adversarial review as follow-up skills or prompts
-    status: todo
+    status: done
 risks:
   - description: Routing skill lands, but its boundary remains ambiguous relative to spec-driver and boot
     mitigation: Keep verification focused on responsibility boundaries and recorded examples
@@ -79,8 +79,8 @@ Confirm the initial routing-skill implementation is exposed correctly and captur
 
 ## 4. Exit Criteria / Done When
 - [x] Generated agent metadata exposes `using-spec-driver`
-- [ ] Notes and phase state fully reflect the implementation
-- [ ] Follow-up direction for brainstorming and adversarial review is explicit
+- [x] Notes and phase state fully reflect the implementation
+- [x] Follow-up direction for brainstorming and adversarial review is explicit
 
 ## 5. Verification
 - Tests to run: none yet beyond sync/integration checks
@@ -104,8 +104,8 @@ Confirm the initial routing-skill implementation is exposed correctly and captur
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
 | [x] | 2.1 | Verify generated agent metadata and installed skill exposure | [ ] | `.spec-driver/AGENTS.md` now includes `using-spec-driver` |
-| [WIP] | 2.2 | Record implementation results back into delta notes and plan state | [ ] | Updating notes and phase state |
-| [ ] | 2.3 | Decide follow-up shape for optional brainstorming and adversarial review | [ ] | Pending |
+| [x] | 2.2 | Record implementation results back into delta notes and plan state | [ ] | Notes and plan state updated in the DE-055 bundle |
+| [x] | 2.3 | Decide follow-up shape for optional brainstorming and adversarial review | [ ] | Kept as explicit optional future patterns rather than blockers for routing work |
 
 ## 8. Risks & Mitigations
 | Risk | Mitigation | Status |
@@ -121,7 +121,7 @@ Confirm the initial routing-skill implementation is exposed correctly and captur
 - Brainstorming and adversarial review remain open as optional composable patterns, not blockers for the routing-skill cut.
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [WIP] Spec, delta, and plan updated with lessons
-- [ ] Hand-off notes to next phase (if any)
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Spec, delta, and plan updated with lessons
+- [x] Hand-off notes to next phase (if any)

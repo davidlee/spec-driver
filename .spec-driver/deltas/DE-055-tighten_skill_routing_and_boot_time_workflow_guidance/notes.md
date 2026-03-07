@@ -40,11 +40,11 @@
 - Decide whether the routing layer should be a distinct skill, boot prose, or both.
 - Decide how to expose optional brainstorming for authoring/design tasks.
 - Decide how to expose adversarial review as a reusable fresh-agent review pattern.
-- Decide how to prevent `complete delta` from tolerating `draft` status at closure time.
-- Decide how aggressively skills should resist skipping DR, IP, and phase sheets.
+- Decide whether `complete delta` should reject `draft` now that execute-phase already requires `status: in-progress` before coding.
+- Decide whether further guidance or runtime reinforcement is needed beyond the routing and execute-phase changes already landed for DR, IP, and phase-sheet skipping.
 - Decide where commit defaults belong and how they should be confirmed for the active delta.
 - Decide how to make `/notes` an invariant rather than a suggestion.
-- Decide how explicit the ordering contract should be between DR, IP, phase creation, and implementation.
+- Decide how much more explicit the ordering contract should be beyond the using-spec-driver guardrail already added for `DR -> IP -> phase -> implementation`.
 - Decide whether to add a dedicated capture skill and stronger backlog-to-delta-to-backlog lifecycle guidance.
 - Treat `ISSUE-009` as a dependency for backlog-oriented skill workflows, because backlog status semantics are not yet canonical.
 
@@ -84,12 +84,29 @@
   - route missing revision/scoping/planning work before `/execute-phase`
   - add a direct guardrail against treating an existing delta as permission to start implementing
 
+### 2026-03-07 - phase 05 decision
+- Keep `/notes` generic over cards and add a delta-specific execution documentation skill instead of overloading notes.
+- Rationale:
+  - compact implementation journaling and structured DE/IP/phase/DR reconciliation are different responsibilities
+  - the generic notes skill still fits kanban and low-ceremony workflows
+  - delta execution needs a stricter place to maintain phase/IP/DE/DR state without turning notes into a hidden workflow meta-skill
+
+### 2026-03-07 - phase 05 work
+- Added `supekku/skills/update-delta-docs/SKILL.md` as the delta-specific structured-doc maintenance skill.
+- Updated `supekku/skills/execute-phase/SKILL.md` to call `/update-delta-docs` alongside `/notes`.
+- Added `update-delta-docs` to `.spec-driver/skills.allowlist` for sync exposure.
+- Ran `uv run spec-driver skills sync`; the first attempt hit sandbox restrictions writing `.agents/skills`, and the escalated retry succeeded.
+
+### 2026-03-07 - queued research input
+- Added `evidence-based-skill-development.md` to the DE-055 bundle as a pending research input.
+- Do not read it yet for this delta thread; another agent is preparing a compressed extract of the relevant parts.
+
 ### Observed failure modes
-- Deltas can be completed with lifecycle status still `draft`.
-- Agents are eager to skip DR, IP, or phase sheets and proceed directly to implementation.
+- `complete delta` still tolerates lifecycle status `draft`; execute-phase now mitigates the earlier drift, but runtime closure semantics remain undecided.
+- Agents were eager to skip DR, IP, or phase sheets and proceed directly to implementation; routing and execute-phase guidance now address the main guidance gap, but the remaining question is whether stronger reinforcement is still needed.
 - Agents can fail to end each task with `/notes`, leaving records stale.
 - Git commit policy is underspecified: end of task, end of phase, or other cadence is unclear.
-- Ordering between DR, IP, phase-sheet creation, and phase execution is not enforced or stated strongly enough.
+- Ordering between DR, IP, phase-sheet creation, and phase execution now has an explicit routing guardrail, but may still need stronger reinforcement or closure semantics.
 - There is no dedicated capture skill, and the connective tissue from backlog capture into delta creation and back to updating/resolving originating backlog items is weak.
 
 ### Work completed so far
@@ -97,7 +114,12 @@
 - Added and synced the new `using-spec-driver` routing skill.
 - Strengthened `using-spec-driver` description and opening language for Claude-style underuse of skills.
 - Tightened `preflight` so it no longer competes with `using-spec-driver` for first-touch routing.
+- Strengthened `execute-phase` so delta implementation must move work to `in-progress`.
+- Added a routing guardrail so `using-spec-driver` sends missing DR/IP/phase work to shaping/planning before `/execute-phase`.
+- Added `update-delta-docs` so structured DE/IP/phase/DR maintenance is separate from generic `/notes`.
 - Synced skills successfully so generated `AGENTS.md` reflects the new routing surfaces.
+- Linked `ISSUE-009` as the blocker for backlog-oriented skill workflow semantics.
+- Linked `evidence-based-skill-development.md` into the bundle as pending research input without reading it directly.
 
 ## Fresh-agent onboarding
 
@@ -108,13 +130,19 @@
 - `notes.md`
 - `phases/phase-01.md`
 - `phases/phase-02.md`
+- `phases/phase-03.md`
+- `phases/phase-04.md`
+- `phases/phase-05.md`
 
 ### Read these only if needed
 - `supekku/skills/using-spec-driver/SKILL.md`
 - `supekku/skills/preflight/SKILL.md`
+- `supekku/skills/execute-phase/SKILL.md`
+- `supekku/skills/update-delta-docs/SKILL.md`
 - `supekku/skills/spec-driver/SKILL.md`
 - `supekku/skills/boot/SKILL.md`
 - `.spec-driver/AGENTS.md`
+- `evidence-based-skill-development.md` only after the compressed relevant extract is available
 
 ### Governing context already established
 - `ADR-004` is the workflow canon.
@@ -131,6 +159,8 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 ### Current design state
 - `using-spec-driver` now exists and is synced into generated agent metadata.
 - `preflight` has been narrowed so it should no longer compete with `using-spec-driver` for first-touch routing.
+- `execute-phase` now makes the `draft -> in-progress` transition explicit.
+- `update-delta-docs` now exists for structured DE/IP/phase/DR reconciliation during execution.
 - Current leaning remains:
   - keep `spec-driver` narrow
   - keep routing separate
@@ -138,17 +168,16 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
   - preserve project-specific customisation through generated docs and hooks
 
 ### Open threads worth working next
-- Prevent deltas from being completed while still `draft`
-- Resist skipping DR, IP, and phase sheets
+- Decide whether `complete delta` should still permit `draft` after the execute-phase guidance change
 - Make `/notes` a stronger invariant
 - Define commit-policy defaults and confirmation behaviour
-- Strengthen the stated ordering:
-  - `DR -> IP -> create phase sheet <-> implement phase`
 - Add capture/backlog connective tissue:
   - capture or refine backlog item
   - promote to delta cleanly
   - update or resolve originating backlog items after delta completion
 - Decide whether brainstorming and adversarial review become optional composable skills or remain prompt patterns
+- Decide whether the newly landed routing and execution guardrails are sufficient or need stronger follow-up enforcement
+- Incorporate the compressed DE-055-relevant extract from `evidence-based-skill-development.md` once it is available
 
 ### Verification caveats
 - `uv run spec-driver skills sync` succeeded after escalation and is not the current blocker.
@@ -178,6 +207,9 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/notes.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-01.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-02.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-03.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-04.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-05.md`
 
 ### Related documents
 - `/home/david/dev/spec-driver/specify/decisions/ADR-004-canonical_workflow_loop.md`
@@ -187,6 +219,8 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 ### Key files
 - `/home/david/dev/spec-driver/supekku/skills/using-spec-driver/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/preflight/SKILL.md`
+- `/home/david/dev/spec-driver/supekku/skills/execute-phase/SKILL.md`
+- `/home/david/dev/spec-driver/supekku/skills/update-delta-docs/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/spec-driver/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/boot/SKILL.md`
 - `/home/david/dev/spec-driver/.spec-driver/skills.allowlist`
@@ -212,13 +246,13 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 
 ### Incomplete work / loose ends
 - Decide how to address:
-  - deltas completed while still `draft`
-  - skipping DR, IP, and phase sheets
+  - whether `complete delta` should still accept `draft`
   - missing `/notes` at task end
   - ambiguous commit policy
-  - weak `DR -> IP -> phase -> implementation` ordering
   - missing capture skill / weak backlog -> delta -> backlog connective tissue
+  - whether the newly landed routing/execution guardrails are sufficient or need stronger follow-up reinforcement
 - Decide whether brainstorming and adversarial review become explicit optional skills or remain prompt patterns.
+- Use `evidence-based-skill-development.md` only after the compressed delta-relevant extract is available.
 
 ### Other advice
 - Do not re-discover the whole repo. The context is already concentrated in `DE-055`.
@@ -226,8 +260,8 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - `uv run spec-driver skills sync` has already succeeded after escalation; use escalation again if sync must write to `.agents/skills`.
 
 ### Next logical activity
-- `/preflight` on the next chosen failure mode inside `DE-055`, then implement the highest-value workflow guardrail.
+- `/preflight` the next unresolved DE-055 workflow failure mode, or fold in the compressed research extract once it is available and reprioritise from there.
 
 ### Verification status
-- Skill sync succeeded and `.spec-driver/AGENTS.md` now exposes `using-spec-driver`.
+- Skill sync succeeded and `.spec-driver/AGENTS.md` now exposes `using-spec-driver` and `update-delta-docs`.
 - `uv run spec-driver validate` still fails on unrelated pre-existing errors in `DE-049`, `DE-052`, `DE-053`, and `DE-054`.

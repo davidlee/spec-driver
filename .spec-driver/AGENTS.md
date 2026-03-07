@@ -68,7 +68,7 @@ Usage notes:
 
 <skill>
 <name>execute-phase</name>
-<description>Mandatory execution skill for any delta/IP implementation phase. Use it before code changes, move the owning delta to in-progress, keep notes current, and surface blockers early.</description>
+<description>Mandatory execution skill for any delta/IP implementation phase. Use it before code changes, move the owning delta to in-progress, keep notes current, reconcile structured execution docs, and surface blockers early.</description>
 <location>project</location>
 </skill>
 
@@ -141,6 +141,12 @@ Usage notes:
 <skill>
 <name>using-spec-driver</name>
 <description>Mandatory routing skill for ANY substantive work in a spec-driver project. Choose the governing skill before acting, and do not start implementation until the required delta/design/plan/phase artefacts exist.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>update-delta-docs</name>
+<description>Reconcile DE/IP/phase/DR execution artefacts during delta work. Use this when implementation changes structured execution state, not just notes.</description>
 <location>project</location>
 </skill>
 

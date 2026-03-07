@@ -1,7 +1,8 @@
-"""VT-054-05..08 — Track view pilot tests (DE-054 Phase 2)."""
+"""VT-054-05..08, VT-059-01..03 — Track view tests (DE-054, DE-059)."""
 
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -15,6 +16,7 @@ from supekku.scripts.lib.core.artifact_view import (
 from supekku.tui.app import SpecDriverApp
 from supekku.tui.browser import BrowserScreen
 from supekku.tui.track import TrackScreen
+from supekku.tui.widgets.preview_panel import PreviewPanel
 from supekku.tui.widgets.session_list import SessionList, SessionSelected
 from supekku.tui.widgets.track_panel import (
   TrackPanel,
@@ -304,3 +306,74 @@ class TestTrackScreenPilot:
       app.action_navigate_artifact("DE-052")
       await pilot.pause()
       assert isinstance(app.screen, BrowserScreen)
+
+
+# --- VT-059-01: Auto-follow triggers ---
+
+
+def _recent_ts(minutes_ago: int = 0) -> str:
+  """ISO timestamp N minutes ago from now."""
+  dt = datetime.now(UTC) - timedelta(minutes=minutes_ago)
+  return dt.isoformat()
+
+
+class TestAutoFollowDetection:
+  """VT-059-01: Auto-follow triggers with single recent session."""
+
+  def test_single_recent_session_detected(self):
+    session_list = SessionList()
+    for i in range(3):
+      session_list.register_event({"ts": _recent_ts(i), "session": "agent-1"})
+    assert session_list.detect_active_session() == "agent-1"
+
+  def test_single_recent_among_stale(self):
+    """Recent session detected even when stale sessions exist."""
+    session_list = SessionList()
+    session_list.register_event({"ts": _recent_ts(0), "session": "recent"})
+    session_list.register_event({"ts": _recent_ts(30), "session": "stale"})
+    assert session_list.detect_active_session() == "recent"
+
+
+# --- VT-059-02: Auto-follow does NOT trigger ---
+
+
+class TestAutoFollowSkipped:
+  """VT-059-02: Auto-follow skipped when ambiguous or no activity."""
+
+  def test_no_sessions(self):
+    session_list = SessionList()
+    assert session_list.detect_active_session() is None
+
+  def test_no_recent_sessions(self):
+    session_list = SessionList()
+    session_list.register_event({"ts": _recent_ts(30), "session": "stale"})
+    assert session_list.detect_active_session() is None
+
+  def test_multiple_recent_sessions(self):
+    session_list = SessionList()
+    session_list.register_event({"ts": _recent_ts(0), "session": "agent-1"})
+    session_list.register_event({"ts": _recent_ts(1), "session": "agent-2"})
+    assert session_list.detect_active_session() is None
+
+  def test_null_session_ignored(self):
+    session_list = SessionList()
+    session_list.register_event({"ts": _recent_ts(0), "session": None})
+    assert session_list.detect_active_session() is None
+
+
+# --- VT-059-03: Preview panel updates ---
+
+
+class TestTrackPreview:
+  """VT-059-03: Preview panel updates on cursor change."""
+
+  @pytest.mark.asyncio()
+  async def test_preview_panel_mounted(self):
+    app = _make_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+      assert screen.query_one("#track-preview", PreviewPanel)

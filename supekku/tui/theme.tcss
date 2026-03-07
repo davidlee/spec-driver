@@ -114,15 +114,33 @@ SessionList {
   padding: 0;
 }
 
-#track-panel {
+#track-right {
   width: 4fr;
-  height: 100%;
+  height: 1fr;
+}
+
+#track-panel {
+  height: 2fr;
+  min-height: 6;
   border: round $surface-lighten-2;
   border-title-color: $text-muted;
   padding: 0 1;
 }
 
 #track-panel:focus-within {
+  border: round $accent;
+  border-title-color: $accent;
+}
+
+#track-preview {
+  height: 3fr;
+  min-height: 8;
+  border: round $surface-lighten-2;
+  border-title-color: $text-muted;
+  padding: 0 1;
+}
+
+#track-preview:focus-within {
   border: round $accent;
   border-title-color: $accent;
 }

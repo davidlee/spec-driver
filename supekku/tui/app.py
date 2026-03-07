@@ -74,7 +74,7 @@ class SpecDriverApp(App):
     self._snapshot = snapshot
 
     self._browser_screen = BrowserScreen(snapshot)
-    self._track_screen = TrackScreen()
+    self._track_screen = TrackScreen(snapshot=snapshot)
 
     self.install_screen(self._browser_screen, name="browser")
     self.install_screen(self._track_screen, name="track")
@@ -138,8 +138,23 @@ class SpecDriverApp(App):
     if self._track_screen is not None:
       for event in replay:
         self._track_screen.add_event(event)
+      self._try_auto_follow()
 
     await self._listener.start(self)
+
+  def _try_auto_follow(self) -> None:
+    """Auto-switch to track if a single active session is detected (DEC-059-01)."""
+    if self._track_screen is None:
+      return
+    from supekku.tui.widgets.session_list import SessionList  # noqa: PLC0415
+
+    detector = SessionList()
+    for event in self._track_screen.event_buffer:
+      detector.register_event(event)
+    session_id = detector.detect_active_session()
+    if session_id is not None:
+      self._track_screen.auto_follow(session_id)
+      self.switch_screen("track")
 
   def on_track_event(self, message: TrackEvent) -> None:
     """Bridge TrackEvent from listener to TrackScreen."""

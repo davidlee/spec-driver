@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 
 from textual.message import Message
 from textual.widgets import OptionList
@@ -13,6 +13,7 @@ from supekku.scripts.lib.formatters.theme import styled_text
 from supekku.tui.widgets.track_panel import session_colour_index
 
 _ALL_SESSIONS = "__all__"
+_ACTIVE_THRESHOLD = timedelta(minutes=10)
 
 
 @dataclass
@@ -23,6 +24,11 @@ class SessionInfo:
   last_ts: str = ""
   count: int = 0
   _parsed_ts: datetime | None = field(default=None, repr=False)
+
+  @property
+  def parsed_ts(self) -> datetime | None:
+    """Most recent parsed timestamp, or None."""
+    return self._parsed_ts
 
   def update(self, ts: str) -> None:
     """Update with a new event timestamp."""
@@ -79,6 +85,23 @@ class SessionList(OptionList):
       display = styled_text(f"{label[:12]} ({info.count})", style_name)
       option_id = info.session_id or "__none__"
       self.add_option(Option(display, id=option_id))
+
+  def detect_active_session(self) -> str | None:
+    """Return session ID if exactly one session is recently active (DEC-059-01).
+
+    Returns None if no sessions, no recent activity, or multiple active sessions.
+    """
+    now = datetime.now(UTC)
+    active: list[str] = []
+    for info in self._sessions.values():
+      if info.session_id is None or info.parsed_ts is None:
+        continue
+      age = now - info.parsed_ts
+      if age <= _ACTIVE_THRESHOLD:
+        active.append(info.session_id)
+    if len(active) == 1:
+      return active[0]
+    return None
 
   def on_option_list_option_selected(
     self,

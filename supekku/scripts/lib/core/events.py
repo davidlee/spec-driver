@@ -23,10 +23,10 @@ _touched_artifacts: list[str] = []
 
 # --- Constants ---
 
-_EVENT_SCHEMA_VERSION = 1
-_LOG_FILENAME = "events.jsonl"
-_SOCKET_FILENAME = "tui.sock"
-_MAX_SOCKET_PATH_LEN = 104
+EVENT_SCHEMA_VERSION = 1
+LOG_FILENAME = "events.jsonl"
+SOCKET_FILENAME = "tui.sock"
+MAX_SOCKET_PATH_LEN = 104
 
 
 # --- Public API ---
@@ -78,7 +78,7 @@ def _emit_event_unsafe(
     return
 
   event = {
-    "v": _EVENT_SCHEMA_VERSION,
+    "v": EVENT_SCHEMA_VERSION,
     "ts": datetime.now(UTC).isoformat(),
     "session": _detect_session(),
     "cmd": _resolve_cmd(argv),
@@ -149,7 +149,7 @@ def _write_log(event: dict, run_dir: Path) -> None:
   """Append a JSON line to the event log. Creates run_dir lazily."""
   try:
     run_dir.mkdir(parents=True, exist_ok=True)
-    log_path = run_dir / _LOG_FILENAME
+    log_path = run_dir / LOG_FILENAME
     line = json.dumps(event, separators=(",", ":")) + "\n"
     # O_APPEND for atomic single-line writes on local filesystems
     fd = os.open(str(log_path), os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
@@ -164,8 +164,8 @@ def _write_log(event: dict, run_dir: Path) -> None:
 def _send_socket(event: dict, run_dir: Path) -> None:
   """Fire-and-forget a JSON datagram to the TUI socket."""
   try:
-    sock_path = str(run_dir / _SOCKET_FILENAME)
-    if len(sock_path) > _MAX_SOCKET_PATH_LEN:
+    sock_path = str(run_dir / SOCKET_FILENAME)
+    if len(sock_path) > MAX_SOCKET_PATH_LEN:
       return
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
     try:

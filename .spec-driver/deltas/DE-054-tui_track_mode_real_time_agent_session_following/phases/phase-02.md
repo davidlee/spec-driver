@@ -105,7 +105,7 @@ theme style keys and layout CSS.
 - VT-054-07: Cross-screen navigation — find_entry resolves artifact,
   browser navigates to correct type + row
 - VT-054-08: TrackScreen pilot — widget composition, event rendering in
-  RichLog, session selection updates filter
+  DataTable, session selection updates filter, row selection triggers navigation
 - VH-054-01: Manual smoke — CLI commands in one terminal, TUI track view
   in another, events appear in real time
 - VH-054-02: Start second TUI — first keeps working on socket, second
@@ -113,13 +113,14 @@ theme style keys and layout CSS.
 
 ## 6. Assumptions & STOP Conditions
 - Assumptions:
-  - Screen stack preserves BrowserScreen state when TrackScreen is pushed
-    (confirmed by Textual docs — push does not unmount)
-  - `RichLog(max_lines=500, wrap=False)` works as expected
+  - `install_screen` + `switch_screen` preserves both screens' widget state
+    (confirmed via Textual API verification)
+  - `DataTable` accepts `Text` objects in cells (confirmed — same pattern
+    as `artifact_list.py`)
   - 8-colour palette is sufficient for session differentiation
 - STOP when:
-  - Screen stack push/pop causes BrowserScreen state loss — escalate
-  - `RichLog.write(Text(...))` doesn't render styled content correctly
+  - `switch_screen` unexpectedly unmounts a screen — escalate
+  - `DataTable.RowSelected` doesn't fire on row click — escalate
 
 ## 7. Tasks & Progress
 *(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
@@ -147,9 +148,12 @@ theme style keys and layout CSS.
   - **Files**: `supekku/scripts/lib/formatters/theme.py`
 
 - **P02-T2: TrackPanel widget**
-  - **Design**: DEC-054-07. `TrackPanel(RichLog)` with `max_lines=500`,
-    `wrap=False`. `append_event(event: dict)` formats as single-line `Text`
-    with styled timestamp, session, cmd, artifact, status. `clear_and_replay(events, session_filter)` for filter changes.
+  - **Design**: DEC-054-07. `TrackPanel(Static)` wrapping a
+    `DataTable(cursor_type="row")` with 5 columns (timestamp, session, cmd,
+    artifact, status). `append_event(event: dict)` adds a styled row;
+    prunes oldest row when `row_count > DISPLAY_BUFFER_LIMIT`.
+    `clear_and_replay(events, session_filter)` for filter changes. Row key
+    stores first artifact ID for navigation.
   - **Files**: `supekku/tui/widgets/track_panel.py`
 
 - **P02-T3: SessionList widget**
@@ -186,10 +190,10 @@ theme style keys and layout CSS.
 
 - **P02-T7: App integration**
   - **Design**: DEC-054-01, DEC-054-05, DEC-054-06. Add `Binding("t",
-    "toggle_track", "Track")`. `action_toggle_track`: push TrackScreen if
-    browser active, pop if track active. `on_mount`: create EventListener,
-    replay events into TrackScreen, start listener task.
-    `action_navigate_artifact(id)`: pop TrackScreen, call
+    "toggle_track", "Track")`. `action_toggle_track`: `switch_screen`
+    between `"browser"` and `"track"`. `on_mount`: install both screens,
+    create EventListener, replay events into TrackScreen, start listener
+    task. `action_navigate_artifact(id)`: switch to browser, call
     `browser.navigate_to_artifact(id)`, notify on failure.
   - **Files**: `supekku/tui/app.py`
 
@@ -218,8 +222,8 @@ theme style keys and layout CSS.
 
 | Risk | Mitigation | Status |
 | --- | --- | --- |
-| RichLog max_lines with wrapped text | wrap=False, single-line format | open |
-| Screen stack state preservation | Textual docs confirm push preserves | open |
+| DataTable row pruning at cap | remove_row on oldest; 500-row cap is small | open |
+| Screen state across switch_screen | install_screen preserves mounted state (verified) | open |
 | TrackEvent delivery to non-active screen | App bridges events to TrackScreen regardless of stack position | open |
 
 ## 9. Decisions & Outcomes

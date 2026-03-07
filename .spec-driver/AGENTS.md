@@ -104,7 +104,7 @@ Usage notes:
 
 <skill>
 <name>preflight</name>
-<description>Before starting anything new, understand task, intent, and context.</description>
+<description>Use after routing has already happened, when the next step is bounded up-front research to understand a substantive task without drifting into implementation or open-ended exploration.</description>
 <location>project</location>
 </skill>
 
@@ -135,6 +135,12 @@ Usage notes:
 <skill>
 <name>spec-driver</name>
 <description>Use this skill any time work involves creating, listing, finding, showing, editing, completing, syncing, or otherwise interacting with spec-driver entities via the CLI. Trigger it whenever a user asks to create or inspect ADRs, specs, deltas, revisions, audits, memories, policies, standards, backlog items, or related workflow artefacts, especially if there is any temptation to guess IDs, paths, or command shapes.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>using-spec-driver</name>
+<description>Use at the start of ANY substantive work in a spec-driver project. You MUST choose the governing skill path before acting, especially when work may touch spec-driver entities, workflow artifacts, or project doctrine.</description>
 <location>project</location>
 </skill>
 

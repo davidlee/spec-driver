@@ -29,3 +29,5 @@ Otherwise - print:
   BOOT SEQUENCE ERROR !!!
 
 Deviation will result in immediate process termination.
+
+After boot, treat `/using-spec-driver` as the default routing skill for substantive work in a spec-driver repo.

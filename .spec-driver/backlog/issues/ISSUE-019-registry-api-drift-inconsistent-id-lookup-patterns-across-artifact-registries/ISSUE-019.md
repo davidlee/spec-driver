@@ -3,11 +3,12 @@ id: ISSUE-019
 name: 'Registry API drift: inconsistent ID lookup patterns across artifact registries'
 created: '2025-11-04'
 updated: '2025-11-04'
-status: open
+status: resolved
 kind: issue
 categories: [architecture, technical-debt]
 severity: p2
 impact: developer
+resolved_by: DE-050
 ---
 
 # Registry API drift: inconsistent ID lookup patterns across artifact registries
@@ -98,8 +99,23 @@ Analysis of auto-generated contracts in `specify/tech/by-package/supekku/scripts
 - [ ] Documentation explains current patterns and convergence path
 - [ ] ADR created if breaking changes needed for normalization
 
+## Resolution
+
+Addressed by DE-050 (normalise registry API surface for consistent artifact
+access), which:
+- Added `find(id)` to all registries that lacked it
+- Added `collect()`, `iter()` for consistency
+- Established ADR-009 as the governing convention for registry design
+- Normalised constructor signatures
+
+Remaining structural work (class-ify BacklogRegistry, formal Protocol) deferred
+as lower priority.
+
 ## References
 
+- DE-050: Normalise registry API surface for consistent artifact access
+- ADR-009: Coherent registry design convention
+- IMPR-009: TUI dashboard (downstream motivation)
 - Auto-generated contracts: `specify/tech/by-package/supekku/scripts/lib/*/spec/contracts/*-registry-public.md`
 - ID patterns: `supekku/scripts/lib/blocks/verification_metadata.py:19-22`
 - Workspace facade: `supekku/scripts/lib/workspace.py:20`

@@ -42,7 +42,9 @@
       "mcp__sequential-thinking__sequentialthinking",
       "mcp__pal__codereview",
       "Bash(git status:*)",
-      "Bash(git ls-files:*)"
+      "Bash(git ls-files:*)",
+      "WebFetch(domain:docs.claude.ai)",
+      "WebFetch(domain:docs.anthropic.com)"
     ],
     "deny": [],
     "ask": []

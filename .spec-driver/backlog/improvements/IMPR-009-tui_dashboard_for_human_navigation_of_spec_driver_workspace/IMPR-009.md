@@ -3,8 +3,12 @@ id: IMPR-009
 name: TUI dashboard for human navigation of spec-driver workspace
 created: '2026-03-06'
 updated: '2026-03-06'
-status: idea
+status: in-progress
 kind: improvement
+deltas:
+  - DE-052
+  - DE-053
+  - DE-054
 related_decisions:
   - ADR-006
 related_issues:
@@ -126,6 +130,13 @@ Selecting an event navigates to that artifact in the browser panel.
 - Event emission must be zero-cost when no TUI is running
 - `workflow.toml` is the single source of truth for directory layout
 - Follow ADR-006 canonical paths (`.spec-driver/` root)
+
+## Exit Criteria
+
+- PROD spec authored covering the TUI as a product surface (user problems,
+  outcomes, success metrics)
+- DE-052, DE-053, DE-054 completed
+- `spec-driver tui` launches and is usable for browsing and tracking
 
 ## References
 

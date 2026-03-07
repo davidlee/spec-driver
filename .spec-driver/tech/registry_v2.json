@@ -24,6 +24,9 @@
       "supekku/scripts/lib/standards": "SPEC-153",
       "supekku/scripts/lib/sync/adapters": "SPEC-154",
       "supekku/scripts/lib/validation": "SPEC-155"
+    },
+    "typescript": {
+      "backlog": "SPEC-156"
     }
   },
   "metadata": {

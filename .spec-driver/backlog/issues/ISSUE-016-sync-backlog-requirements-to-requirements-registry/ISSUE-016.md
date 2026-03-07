@@ -242,6 +242,14 @@ requirements:
 - Source kind/type as metadata, not separate registries (unified view)
 - Migration preserves history via explicit links (traceability)
 
+**Partial fix (2026-03-07)**: Validator `_validate_change_relations` rejected
+`implements -> IMPR-xxx` because it checked against `requirement_ids` only
+(FR/NF). Two changes applied:
+1. Switched validator from `load_backlog_registry` (ordering YAML, easily stale)
+   to `discover_backlog_items` (filesystem discovery) for building `backlog_ids`.
+2. Added `backlog_ids` to the valid target set for `implements` relations, not
+   just `applies_to`. Deltas legitimately implement backlog improvements.
+
 **Future Enhancements**:
 - Automatic requirement promotion (issue → problem → spec)
 - Requirement maturity lifecycle tracking

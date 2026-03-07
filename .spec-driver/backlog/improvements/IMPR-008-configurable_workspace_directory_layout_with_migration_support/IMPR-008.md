@@ -3,8 +3,9 @@ id: IMPR-008
 name: Configurable workspace directory layout with migration support
 created: '2026-03-06'
 updated: '2026-03-06'
-status: idea
+status: implemented
 kind: improvement
+resolved_by: DE-049
 tags:
   - architecture
   - install
@@ -161,9 +162,18 @@ A future delta wraps those constants in config resolution — helpers read
   through ADR process before implementation.
 - **`registry/`**: already lives under `.spec-driver/` — unaffected by either option.
 
+## Progress
+
+- ADR-006 accepted: Option A (flatten under `.spec-driver/`) with backward-compat symlinks
+- DE-044: centralised path constants in `core/paths.py` — completed
+- DE-048: `[dirs]` config resolution via `workflow.toml` — completed
+- DE-049: flattened layout under `.spec-driver/`, backward-compat symlinks — completed
+- IMPR-009 (TUI dashboard) consumes `paths.py` getters and inherits
+  configurability for free
+
 ## Suggested approach
 
-1. ADR to decide between Option A (flatten) vs Option B (nest) vs status quo
-2. Delta: add `[dirs]` config resolution in `paths.py` helpers (non-breaking)
-3. Delta: change default for new installs (per ADR)
-4. Delta: `spec-driver migrate` for existing workspaces
+1. ~~ADR to decide between Option A (flatten) vs Option B (nest) vs status quo~~ — done (ADR-006)
+2. ~~Delta: add `[dirs]` config resolution in `paths.py` helpers (non-breaking)~~ — done (DE-048)
+3. ~~Delta: change default for new installs (per ADR)~~ — done (DE-049)
+4. Delta: `spec-driver migrate` for existing workspaces — deferred (YAGNI at current adoption)

@@ -4,7 +4,7 @@ slug: 062-workflow_toml_rich_commented_defaults_and_config_memory-phase-01
 name: IP-062 Phase 01 - template generator, install wiring, config memory
 created: '2026-03-08'
 updated: '2026-03-08'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -27,20 +27,24 @@ exit_criteria:
   - just passes (tests + lint)
 verification:
   tests:
-    - VT-062-01: template completeness
-    - VT-062-02: template TOML validity
-    - VT-062-03: install integration
+    - VT-062-01: template completeness — verified
+    - VT-062-02: template TOML validity — verified
+    - VT-062-03: install integration — verified
   evidence:
-    - VA-062-01: memory accuracy check
+    - VA-062-01: memory accuracy — verified
 tasks:
   - id: 1.1
     description: Write generate_default_workflow_toml() in config.py
+    status: done
   - id: 1.2
     description: Tests for template generator
+    status: done
   - id: 1.3
     description: Wire into install.py
+    status: done
   - id: 1.4
     description: Create agent memory record
+    status: done
 risks: []
 ```
 
@@ -60,7 +64,7 @@ Replace the spartan 2-line workflow.toml init with a richly-commented template g
 
 - **Delta**: DE-062
 - **Config source**: `supekku/scripts/lib/core/config.py`
-- **Install target**: `supekku/scripts/install.py` (lines 671-681)
+- **Install target**: `supekku/scripts/install.py`
 
 ## 3. Entrance Criteria
 
@@ -68,37 +72,27 @@ Replace the spartan 2-line workflow.toml init with a richly-commented template g
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `generate_default_workflow_toml(exec_cmd)` exists and is tested
-- [ ] `install.py` calls generator instead of inline write
-- [ ] Memory record `mem.reference.spec-driver.workflow-config` created
-- [ ] `just` passes
-
-## 5. Verification
-
-- `just test` — all existing + new tests pass
-- `just lint` — zero warnings
-- `uv run spec-driver show memory mem.reference.spec-driver.workflow-config` works
-
-## 6. Assumptions & STOP Conditions
-
-- Assumptions: generating from DEFAULT_CONFIG dict is sufficient; no need for schema metadata
-- STOP when: if template generation needs to handle types beyond str/bool/int/list, consult
+- [x] `generate_default_workflow_toml(exec_cmd)` exists and is tested
+- [x] `install.py` calls generator instead of inline write
+- [x] Memory record `mem.reference.spec-driver.workflow-config` created
+- [x] `just` passes (3031 tests, lint clean)
 
 ## 7. Tasks & Progress
 
 | Status | ID | Description | Notes |
 | --- | --- | --- | --- |
-| [ ] | 1.1 | `generate_default_workflow_toml(exec_cmd)` in config.py | Renders DEFAULT_CONFIG as commented TOML |
-| [ ] | 1.2 | Tests for generator | Completeness, validity, exec_cmd substitution |
-| [ ] | 1.3 | Wire into install.py | Replace lines 678-680 |
-| [ ] | 1.4 | Agent memory record | `mem.reference.spec-driver.workflow-config` |
+| [x] | 1.1 | `generate_default_workflow_toml(exec_cmd)` in config.py | Uses `##` for prose, `#` for config |
+| [x] | 1.2 | Tests for generator | 7 tests: completeness, TOML validity, tool uncommented, exec substitution, sections commented, prose comments, roundtrip |
+| [x] | 1.3 | Wire into install.py | Replaced lines 678-680, added import |
+| [x] | 1.4 | Agent memory record | `mem.reference.spec-driver.workflow-config` — full config reference |
 
-### Task Details
+## 9. Decisions & Outcomes
 
-- **1.1**: Function takes `exec_cmd` param (detected at install time), renders each DEFAULT_CONFIG section as `# [section]` / `# key = value` with human-readable comments explaining each section's purpose. The `[tool]` section is uncommented (active) since `exec` is install-specific.
+- 2026-03-08 — Used `##` for prose comments and `#` for config lines. This lets users uncomment config with a single `#` strip while prose explanations remain as TOML comments. Cleaner than single-prefix approach.
+- 2026-03-08 — Extracted `_prose()`, `_emit_prose()`, `_emit_section()` helpers to keep `generate_default_workflow_toml` under McCabe threshold.
 
-- **1.2**: Test that all keys from DEFAULT_CONFIG appear in output. Test that stripping `#` prefix yields valid TOML. Test exec_cmd substitution.
+## 11. Wrap-up Checklist
 
-- **1.3**: Replace `workflow_toml.write_text(f'[tool]\nexec = "{exec_cmd}"\n')` with call to generator.
-
-- **1.4**: Memory covering: section inventory, key descriptions, ceremony modes, merge behaviour, where each key is used.
+- [x] Exit criteria satisfied
+- [x] Verification evidence: all tests pass, memory queryable
+- [x] Phase complete

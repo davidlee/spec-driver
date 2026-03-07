@@ -10,7 +10,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/supekku/claude.hooks/artifact_event.py\"",
+            "async": true
+          }
+        ]
+      }
     ]
   }
 }
-

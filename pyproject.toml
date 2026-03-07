@@ -111,6 +111,7 @@ addopts = "-ra"
 asyncio_mode = "auto"
 testpaths = [
     "supekku/cli",
+    "supekku/claude.hooks",
     "supekku/scripts",
     "supekku/scripts/lib",
     "supekku/tui",

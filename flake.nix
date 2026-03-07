@@ -58,7 +58,7 @@
               ## language support
 
               ## go
-              # go
+              go
               gomarkdoc
               # Go
               # go # compiler

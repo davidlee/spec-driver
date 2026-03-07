@@ -39,6 +39,8 @@
 - Check whether governance already states the packaged-skill plus hook-stub principle explicitly enough.
 - Decide whether the routing layer should be a distinct skill, boot prose, or both.
 - Decide how to expose optional brainstorming for authoring/design tasks.
+- Decide whether optional brainstorming imports should split into a generic decision loop and artifact-specific authoring guidance.
+- Decide how much of the new DR-first section-by-section authoring pattern should be mirrored into other authoring skills.
 - Decide how to expose adversarial review as a reusable fresh-agent review pattern.
 - Decide whether `complete delta` should reject `draft` now that execute-phase already requires `status: in-progress` before coding.
 - Decide whether further guidance or runtime reinforcement is needed beyond the routing and execute-phase changes already landed for DR, IP, and phase-sheet skipping.
@@ -141,10 +143,42 @@
   pointing future skill work back to the DE-055 synthesis and the governing
   ADR/spec/memory sources.
 
+### 2026-03-07 - phase 08 brainstorming decomposition
+- Re-read `/tmp/superpowers/skills/brainstorming/SKILL.md` against current DE-055 direction.
+- Conclusion:
+  - the imported value is not one thing
+  - there is a small generic loop for resolving one open question at a time with options, tradeoffs, recommendation, and write-back
+  - there is also a stronger authoring pattern where designs are presented section by section before being written out as a whole
+- Current design direction:
+  - keep the generic loop as a possible future composable skill
+  - put the section-by-section authoring enhancements into specific authoring/revision skills first, especially DR-oriented and revision-oriented skills
+  - do not import the full universal-ceremony version of brainstorming
+- High-leverage shared pattern to preserve:
+  - before drafting sections, explicitly think step by step about open questions, risks, underspecified areas, assumptions, and critical design decisions
+  - this is likely the main upstream quality gate; if it is weak, the downstream design loop cannot recover cleanly
+- Likely future targets:
+  - `draft-design-revision`
+  - `shape-revision`
+  - a lighter delta/capture loop later if the generic question-resolution pattern proves stable
+
+### 2026-03-07 - phase 09 DR-first authoring import
+- Applied the first artifact-specific brainstorming import to `draft-design-revision`.
+- Changes made there:
+  - require explicit pre-draft triage of open questions, risks, underspecified areas, assumptions, and critical design decisions
+  - encourage one-question-at-a-time closure with options, tradeoffs, recommendation, and write-back when unresolved design questions remain
+  - require section-by-section DR drafting/validation instead of treating a full design dump as the default
+  - push toward concrete design detail such as likely types, responsibilities, boundaries, and verification impact
+- Rationale:
+  - DRs are the strongest first target for this pattern
+  - the quality of downstream planning depends heavily on closing or naming foundational design assumptions early
+  - this preserves the high-value authoring behavior from brainstorming without importing its universal ceremony
+- Ran `uv run spec-driver skills sync` successfully; installed skills and `.spec-driver/AGENTS.md` now reflect the stronger DR authoring wording.
+
 ### Observed failure modes
 - `complete delta` still tolerates lifecycle status `draft`; execute-phase now mitigates the earlier drift, but runtime closure semantics remain undecided.
 - Agents were eager to skip DR, IP, or phase sheets and proceed directly to implementation; routing and execute-phase guidance now address the main guidance gap, but the remaining question is whether stronger reinforcement is still needed.
 - Multi-phase handovers can preserve the right artefact list while still flattening unresolved design questions, leading preflight to overstate implementation readiness.
+- Large authoring skills may mix together generic decision closure and artifact-specific presentation choreography, making it harder to import only the high-value parts into spec-driver.
 - Agents can fail to end each task with `/notes`, leaving records stale.
 - Git commit policy is underspecified: end of task, end of phase, or other cadence is unclear.
 - Ordering between DR, IP, phase-sheet creation, and phase execution now has an explicit routing guardrail, but may still need stronger reinforcement or closure semantics.
@@ -162,6 +196,8 @@
 - Linked `ISSUE-009` as the blocker for backlog-oriented skill workflow semantics.
 - Linked `evidence-based-skill-development.md` into the bundle as pending research input without reading it directly.
 - Hardened `preflight`, `continuation`, `next`, and `execute-phase` so implementation readiness requires a critical assessment of assumptions, unresolved questions, and tensions.
+- Decomposed the useful imports from Superpowers brainstorming into a generic decision loop and artifact-specific section-by-section authoring guidance.
+- Landed the first artifact-specific authoring enhancement in `draft-design-revision`.
 
 ## Fresh-agent onboarding
 
@@ -178,6 +214,8 @@
 - `phases/phase-05.md`
 - `phases/phase-06.md`
 - `phases/phase-07.md`
+- `phases/phase-08.md`
+- `phases/phase-09.md`
 
 ### Read these only if needed
 - `supekku/skills/using-spec-driver/SKILL.md`
@@ -186,6 +224,7 @@
 - `supekku/skills/update-delta-docs/SKILL.md`
 - `supekku/skills/continuation/SKILL.md`
 - `supekku/skills/next/SKILL.md`
+- `supekku/skills/draft-design-revision/SKILL.md`
 - `supekku/skills/spec-driver/SKILL.md`
 - `supekku/skills/boot/SKILL.md`
 - `.spec-driver/AGENTS.md`
@@ -210,6 +249,7 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 - `preflight` now also requires a critical assessment before implementation-readiness claims.
 - `execute-phase` now makes the `draft -> in-progress` transition explicit.
 - `update-delta-docs` now exists for structured DE/IP/phase/DR reconciliation during execution.
+- `draft-design-revision` now requires explicit design triage and section-by-section validation before treating a DR as coherent.
 - Current leaning remains:
   - keep `spec-driver` narrow
   - keep routing separate
@@ -221,6 +261,8 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 - Make `/notes` a stronger invariant
 - Define commit-policy defaults and confirmation behaviour
 - Decide whether the new handoff/preflight critical-assessment wording is sufficient in practice or needs even stronger enforcement
+- Decide how much of the DR-first authoring pattern should move next into `shape-revision` or other authoring skills
+- Decide whether to create a generic decision-loop skill and which artifact skills should gain section-by-section authoring guidance first
 - Add capture/backlog connective tissue:
   - capture or refine backlog item
   - promote to delta cleanly
@@ -305,6 +347,8 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
   - missing `/notes` at task end
   - ambiguous commit policy
   - missing capture skill / weak backlog -> delta -> backlog connective tissue
+  - how much of the DR-first authoring pattern should move into `shape-revision` or other authoring skills next
+  - whether to add a generic decision-loop skill and where to embed section-by-section authoring guidance first
   - whether the new handoff/preflight critical-assessment wording is sufficient or needs stronger reinforcement
   - whether the newly landed routing/execution guardrails are sufficient or need stronger follow-up reinforcement
 - Decide whether brainstorming and adversarial review become explicit optional skills or remain prompt patterns.

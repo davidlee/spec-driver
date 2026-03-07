@@ -62,7 +62,7 @@ Usage notes:
 
 <skill>
 <name>draft-design-revision</name>
-<description>Draft or refine a design revision (DR) for a delta, capturing current vs target behavior, code impacts, and verification alignment.</description>
+<description>Draft or refine a design revision (DR) for a delta. Use it when a DR needs concrete design shaping, explicit question triage, and section-by-section validation before implementation planning.</description>
 <location>project</location>
 </skill>
 

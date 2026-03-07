@@ -240,3 +240,4 @@ __pycache__
 .mcp.json
 
 /temp/
+.spec-driver/run/

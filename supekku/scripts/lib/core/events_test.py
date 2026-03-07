@@ -358,9 +358,7 @@ class TestArtifactCollector(unittest.TestCase):
       with patch.object(events, "_get_run_dir", return_value=run_dir):
         events.emit_event(argv=["create", "spec"], exit_code=0, status="ok")
 
-      record = json.loads(
-        run_dir.joinpath("events.jsonl").read_text().strip()
-      )
+      record = json.loads(run_dir.joinpath("events.jsonl").read_text().strip())
       assert record["artifacts"] == ["SPEC-042"]
       # Artifacts drained after emit
       assert events._drain_artifacts() == []

@@ -5816,3 +5816,379 @@ deltas:
         phase: IP-051-P01
       - id: IP-051-P02
         phase: IP-051-P02
+  DE-052:
+    kind: delta
+    status: completed
+    name: 'Delta - Event infrastructure: JSONL log and Unix domain socket emitter'
+    slug: event_infrastructure_jsonl_log_and_unix_domain_socket_emitter
+    updated: '2026-03-07'
+    path: .spec-driver/deltas/DE-052-event_infrastructure_jsonl_log_and_unix_domain_socket_emitter/DE-052.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: implements
+      target: IMPR-009
+      attributes: {}
+    plan:
+      id: IP-052
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-052
+        delta: DE-052
+        revision_links:
+          aligns_with:
+          - DR-052
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-052.PHASE-01
+        - id: IP-052.PHASE-02
+        - id: IP-052.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-052.PHASE-01
+        plan: IP-052
+        delta: DE-052
+        objective: Implement core/events.py, wire the process-boundary wrapper in
+          main.py, add get_run_dir() to paths.py, add [events] config, and write all
+          VTs.
+        entrance_criteria:
+        - DR-052 approved
+        exit_criteria:
+        - VT-052-01 through VT-052-08 pass
+        - just (lint + test) green
+        verification:
+          tests:
+          - VT-052-01
+          - VT-052-02
+          - VT-052-03
+          - VT-052-04
+          - VT-052-05
+          - VT-052-06
+          - VT-052-07
+          - VT-052-08
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Add get_run_dir() to paths.py
+        - id: '1.2'
+          description: Add [events] section to config.py DEFAULT_CONFIG
+        - id: '1.3'
+          description: Implement core/events.py
+        - id: '1.4'
+          description: Wire process-boundary wrapper in main.py
+        - id: '1.5'
+          description: "Write events_test.py \u2014 all VTs"
+        - id: '1.6'
+          description: Lint and test
+        risks:
+        - description: Command.invoke interception may not work as expected
+          mitigation: VT-052-05 and VT-052-07 prove the contract; write these first
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-052.PHASE-02
+        plan: IP-052
+        delta: DE-052
+        objective: Wire record_artifact() into domain creation/completion functions,
+          add session extraction to startup.sh, ensure .spec-driver/run/ is gitignored
+          (via install), and validate with acceptance tests.
+        entrance_criteria:
+        - Phase 1 green (648f82b)
+        exit_criteria:
+        - VT-052-09 through VT-052-12 pass
+        - "Acceptance criteria from DE-052 \xA76 met"
+        - just (lint + test) green
+        verification:
+          tests:
+          - VT-052-09
+          - VT-052-10
+          - VT-052-11
+          - VT-052-12
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Wire record_artifact() into domain creation functions
+        - id: '2.2'
+          description: Add session extraction to startup.sh (DEC-052-03)
+        - id: '2.3'
+          description: Add .spec-driver/run/ to .gitignore via install
+        - id: '2.4'
+          description: Write integration/acceptance tests
+        - id: '2.5'
+          description: Lint and full test pass
+        risks:
+        - description: startup.sh stdin consumption may interfere with boot prompt
+          mitigation: DR-052 DEC-052-03 specifies reading stdin into $INPUT first
+  DE-053:
+    kind: delta
+    status: draft
+    name: Delta - TUI artifact browser MVP with Textual
+    slug: tui_artifact_browser_mvp_with_textual
+    updated: '2026-03-07'
+    path: .spec-driver/deltas/DE-053-tui_artifact_browser_mvp_with_textual/DE-053.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: implements
+      target: IMPR-009
+      attributes: {}
+    - type: depends-on
+      target: DE-050
+      attributes: {}
+    plan:
+      id: IP-053
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-053
+        delta: DE-053
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-053-P01
+      phases:
+      - id: IP-053-P01
+        phase: IP-053-P01
+  DE-054:
+    kind: delta
+    status: draft
+    name: 'Delta - TUI track mode: real-time agent session following'
+    slug: tui_track_mode_real_time_agent_session_following
+    updated: '2026-03-07'
+    path: .spec-driver/deltas/DE-054-tui_track_mode_real_time_agent_session_following/DE-054.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: implements
+      target: IMPR-009
+      attributes: {}
+    - type: depends-on
+      target: DE-052
+      attributes: {}
+    - type: depends-on
+      target: DE-053
+      attributes: {}
+    plan:
+      id: IP-054
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-054
+        delta: DE-054
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-054-P01
+      phases:
+      - id: IP-054-P01
+        phase: IP-054-P01
+  DE-055:
+    kind: delta
+    status: in-progress
+    name: Delta - Tighten skill routing and boot-time workflow guidance
+    slug: tighten_skill_routing_and_boot_time_workflow_guidance
+    updated: '2026-03-07'
+    path: .spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/DE-055.md
+    applies_to:
+      specs:
+      - PROD-002
+      - PROD-011
+      - SPEC-151
+      requirements: []
+    plan:
+      id: IP-055
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-055
+        delta: DE-055
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-002
+          - PROD-011
+          - SPEC-151
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-055.PHASE-01
+          name: Research and decision framing
+          status: completed
+        - id: IP-055.PHASE-02
+          name: Verify routing skill integration and decide follow-up patterns
+          status: completed
+        - id: IP-055.PHASE-03
+          name: Strengthen execute-phase lifecycle guidance
+          status: completed
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-01
+        plan: IP-055
+        delta: DE-055
+        objective: Capture the governing doctrine, current skill-routing behaviour,
+          relevant implementation touchpoints, and the main design options for stricter
+          boot-time routing.
+        entrance_criteria:
+        - Delta DE-055 exists.
+        - Relevant ADRs, memories, and workflow skills have been read.
+        exit_criteria:
+        - DR-055 records current behaviour, target direction, and open questions.
+        - DE-055 and IP-055 contain concrete research and planning notes.
+        - A recommendation exists for the routing-skill vs expanded-spec-driver boundary.
+        verification:
+          tests: []
+          evidence:
+          - VA-055-001 research notes in notes.md and DR-055
+          - VA-055-002 implementation-surface review in DR-055
+        tasks:
+        - id: 1.1
+          title: Gather governing doctrine and memory references
+          status: done
+        - id: 1.2
+          title: Compare current skills with relevant /tmp/superpowers skills
+          status: done
+        - id: 1.3
+          title: Inspect boot, install, and sync touchpoints
+          status: done
+        - id: 1.4
+          title: Record decisions, open questions, and recommended boundary in delta
+            artefacts
+          status: done
+        risks:
+        - description: Over-importing non-canonical superpowers workflow assumptions
+          mitigation: Anchor all decisions to ADR-004, ADR-005, and posture guidance
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-02
+        plan: IP-055
+        delta: DE-055
+        objective: Verify that the new routing skill is integrated correctly and decide
+          the next composable follow-up patterns, especially brainstorming and adversarial
+          review.
+        entrance_criteria:
+        - using-spec-driver skill exists in package skills.
+        - boot skill references using-spec-driver after startup.
+        - skills sync has refreshed installed skills and AGENTS metadata.
+        exit_criteria:
+        - Integration status is verified and recorded.
+        - Remaining design choices for optional brainstorming and adversarial review
+          are captured.
+        - Next implementation step is explicit.
+        verification:
+          tests: []
+          evidence:
+          - skills sync output recorded in notes
+          - AGENTS.md exposes using-spec-driver
+        tasks:
+        - id: 2.1
+          title: Verify generated agent metadata and installed skill exposure
+          status: done
+        - id: 2.2
+          title: Record implementation results back into delta notes and plan state
+          status: in_progress
+        - id: 2.3
+          title: Decide whether to design optional brainstorming and adversarial review
+            as follow-up skills or prompts
+          status: todo
+        risks:
+        - description: Routing skill lands, but its boundary remains ambiguous relative
+            to spec-driver and boot
+          mitigation: Keep verification focused on responsibility boundaries and recorded
+            examples
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-03
+        plan: IP-055
+        delta: DE-055
+        objective: Strengthen execute-phase so implementation work must move the owning
+          delta to in-progress before coding begins, reducing lifecycle drift before
+          close-out.
+        entrance_criteria:
+        - The DE-055 bundle records the draft-status completion failure mode.
+        - execute-phase is the accepted governing skill for delta/IP implementation.
+        exit_criteria:
+        - The packaged execute-phase skill text makes the draft-to-in-progress transition
+          explicit and hard to skip.
+        - The installed execute-phase skill reflects the packaged wording after sync.
+        - DE-055 notes record the decision to prefer guidance-layer enforcement here
+          over a completion gate change.
+        verification:
+          tests:
+          - uv run spec-driver skills sync
+          evidence:
+          - Installed execute-phase skill text matches the packaged source.
+          - Notes capture the rationale and scope of the guidance-only change.
+        tasks:
+        - id: 3.1
+          title: Strengthen execute-phase description and process wording
+          status: done
+        - id: 3.2
+          title: Sync installed skills and verify execute-phase propagation
+          status: done
+        - id: 3.3
+          title: Record lifecycle-guidance decision in DE-055 notes and plan state
+          status: done
+        risks:
+        - description: Guidance may still be bypassed if agents ignore execute-phase
+            entirely
+          mitigation: Make the skill description stricter now; evaluate routing/boot
+            reinforcements separately
+  DE-056:
+    kind: delta
+    status: in-progress
+    name: Fix validator backlog ID resolution and make registry syncs always-on
+    slug: fix_validator_backlog_id_resolution_and_make_registry_syncs_always_on
+    updated: '2026-03-07'
+    path: .spec-driver/deltas/DE-056-fix_validator_backlog_id_resolution_and_make_registry_syncs_always_on/DE-056.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: implements
+      target: ISSUE-016
+      attributes: {}
+    plan:
+      id: IP-056
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-056
+        delta: DE-056
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-056-P01
+      phases:
+      - id: IP-056-P01
+        phase: IP-056-P01

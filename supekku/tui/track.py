@@ -18,6 +18,7 @@ class TrackScreen(Screen):
     super().__init__(**kwargs)
     self._event_buffer: list[dict] = []
     self._session_filter: str | None = None
+    self._mounted = False
 
   def compose(self):
     yield SessionList(id="session-list")
@@ -26,6 +27,10 @@ class TrackScreen(Screen):
   def on_mount(self) -> None:
     self.query_one("#session-list").border_title = "Sessions"
     self.query_one("#track-panel").border_title = "Events"
+    self._mounted = True
+    # Replay any events buffered before mount
+    if self._event_buffer:
+      self._sync_widgets()
 
   def add_event(self, event: dict) -> None:
     """Buffer an event and display it if it passes the session filter."""
@@ -33,12 +38,25 @@ class TrackScreen(Screen):
     while len(self._event_buffer) > DISPLAY_BUFFER_LIMIT:
       self._event_buffer.pop(0)
 
+    if not self._mounted:
+      return
+
     session_list = self.query_one("#session-list", SessionList)
     session_list.register_event(event)
     session_list.rebuild()
 
     if self._session_filter is None or event.get("session") == self._session_filter:
       self.query_one("#track-panel", TrackPanel).append_event(event)
+
+  def _sync_widgets(self) -> None:
+    """Replay buffered events into widgets (called after mount)."""
+    session_list = self.query_one("#session-list", SessionList)
+    panel = self.query_one("#track-panel", TrackPanel)
+    for event in self._event_buffer:
+      session_list.register_event(event)
+      if self._session_filter is None or event.get("session") == self._session_filter:
+        panel.append_event(event)
+    session_list.rebuild()
 
   def on_session_selected(self, message: SessionSelected) -> None:
     """Handle session filter change — replay filtered events."""

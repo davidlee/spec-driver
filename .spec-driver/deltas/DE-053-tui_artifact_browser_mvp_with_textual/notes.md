@@ -153,3 +153,103 @@ Phase 1 infrastructure is ready. Phase 2 (TUI core) can now:
 - Import `ArtifactSnapshot`, `ArtifactType`, `ArtifactEntry` from
   `core/artifact_view.py`
 - Build the Textual app consuming this foundation
+
+## 2026-03-07 — Phase 2 complete: TUI core
+
+### What was done
+
+- **T01**: `ArtifactGroup` enum + `ArtifactTypeMeta` dataclass added to
+  `core/artifact_view.py` (DEC-053-11). Convenience properties on
+  `ArtifactType` (`.singular`, `.plural`, `.group`, `.meta`). 16 new tests.
+- **T02**: 4 `artifact.group.*` theme entries added to `theme.py`. Added to
+  existing style key regression test.
+- **T03**: `supekku/tui/` package created with `__init__.py`, `widgets/__init__.py`,
+  `theme.tcss` (Textual-native tokens only, POL-002 compliant).
+- **T04**: `tui/widgets/type_selector.py` — `TypeSelector(OptionList)` with
+  styled `Text` labels, `TypeSelected` message, `refresh_counts()`.
+- **T05**: `tui/widgets/artifact_list.py` — `ArtifactList(Vertical)` with
+  `Select` status filter (DEC-053-13), `Input` fuzzy search (DEC-053-12),
+  `DataTable` with `cursor_type="row"`, `ArtifactSelected` message.
+- **T06**: `tui/widgets/preview_panel.py` — `PreviewPanel(Markdown)` with
+  `show_artifact(path)`, graceful error handling.
+- **T07**: `tui/browser.py` — `BrowserScreen(Screen)` (DEC-053-14) composing
+  all 3 widgets. Message handlers for `TypeSelected` and `ArtifactSelected`
+  (DEC-053-16).
+- **T08**: `tui/app.py` — `SpecDriverApp(App)` with `CSS_PATH`, keybindings,
+  `snapshot` parameter for testability. Pushes `BrowserScreen` on mount.
+  Built-in `Footer` (DEC-053-15).
+- **T09**: VT-053-pilot — 12 headless pilot tests covering app mount, type
+  selection, artifact selection with preview, status filter, fuzzy search,
+  keybindings (quit, search focus).
+- **T10**: VT-053-tcss-lint — 3 tests scanning theme.tcss for hex/rgb literals.
+
+### Surprises & adaptations
+
+- **Textual MRO handler dispatch**: `on_mount` handlers fire on ALL classes in
+  the MRO, not just the most-derived override. This broke test isolation when
+  `TestApp(SpecDriverApp)` tried to override `on_mount`. Fixed by adding
+  `snapshot` parameter to `SpecDriverApp.__init__` — cleaner API anyway.
+- **DataTable cursor_type**: Default is `"cell"`, not `"row"`.
+  `DataTable.RowSelected` only fires with `cursor_type="row"`.
+- **Select.BLANK vs Select.NULL**: `Select.BLANK` is `False` (not a valid
+  value to assign). Use `select.clear()` to reset and `select.is_blank()` to
+  check state.
+- **app.query_one vs screen.query_one**: `app.query_one()` searches the app's
+  own DOM, not pushed screens. Must use `app.screen.query_one()` or
+  `self.screen.query_one()` to find widgets on the active screen.
+
+### Dependencies added
+
+- `pytest-asyncio>=1.0` — dev dependency for async test support. Required by
+  Textual's headless pilot testing pattern.
+- `[project.optional-dependencies] tui` — `textual>=8.0,<9.0`,
+  `watchfiles>=1.0,<2.0`. Pulled forward from Phase 3 scope because `uv sync`
+  removed textual when it wasn't declared. Dev group includes `spec-driver[tui]`.
+- `supekku/tui` added to pytest `testpaths`.
+- `asyncio_mode = "auto"` added to pytest config.
+
+### Files created
+
+- `supekku/tui/__init__.py`
+- `supekku/tui/app.py`
+- `supekku/tui/browser.py`
+- `supekku/tui/theme.tcss`
+- `supekku/tui/tui_test.py` (12 tests)
+- `supekku/tui/tcss_lint_test.py` (3 tests)
+- `supekku/tui/widgets/__init__.py`
+- `supekku/tui/widgets/type_selector.py`
+- `supekku/tui/widgets/artifact_list.py`
+- `supekku/tui/widgets/preview_panel.py`
+
+### Files modified
+
+- `supekku/scripts/lib/core/artifact_view.py` (ArtifactGroup, ArtifactTypeMeta)
+- `supekku/scripts/lib/core/artifact_view_test.py` (+16 tests)
+- `supekku/scripts/lib/formatters/theme.py` (+4 group style entries)
+- `supekku/scripts/lib/formatters/theme_test.py` (+4 parametrized cases)
+- `supekku/scripts/lib/specs/package_utils_test.py` (22→23 leaf packages)
+- `pyproject.toml` (tui extra, pytest-asyncio, testpaths, asyncio_mode)
+
+### DR updates
+
+- DEC-053-11 through DEC-053-16 added (preflight design review, all decided)
+- Cross-type fuzzy search captured as follow-up in DE-053
+
+### Verification
+
+- `just` passes: ruff clean, pylint 9.51/10, 2839 tests pass, 3 skipped
+- VT-053-pilot: 12/12 pass
+- VT-053-tcss-lint: 3/3 pass
+
+### Commits
+
+Uncommitted. Ready to commit when user approves.
+
+### Follow-ups
+
+- CLI entry point (`spec-driver tui` command) — Phase 3
+- File watching (`watchfiles.awatch` integration) — Phase 3
+- Edge cases (`$EDITOR` unset, import guard) — Phase 3
+- Refactor `list.py` `_PLURAL_TO_SINGULAR` to consume `ArtifactTypeMeta` —
+  follow-up (not DE-053 scope)
+- Cross-type fuzzy search — follow-up (DEC-053-12)

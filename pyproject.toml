@@ -37,6 +37,12 @@ Issues = "https://github.com/davidlee/spec-driver/issues"
 Website = "https://supekku.dev/"
 
 
+[project.optional-dependencies]
+tui = [
+    "textual>=8.0,<9.0",
+    "watchfiles>=1.0,<2.0",
+]
+
 [project.scripts]
 spec-driver = "supekku.cli.main:main"
 
@@ -92,18 +98,22 @@ exclude = [
 [dependency-groups]
 dev = [
     "pytest>=8.4.2",
+    "pytest-asyncio>=1.0",
     "ruff>=0.14.0",
     "pylint>=4.0.2",
     "pylint-per-file-ignores>=3.1.0",
+    "spec-driver[tui]",
 ]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra"
+asyncio_mode = "auto"
 testpaths = [
     "supekku/cli",
     "supekku/scripts",
     "supekku/scripts/lib",
+    "supekku/tui",
 ]
 
 [tool.ruff]

@@ -180,6 +180,15 @@ In spec-driver, high-value checks include:
 - does `using-spec-driver` stop premature exploration?
 - does `spec-driver` still handle entity/CLI tasks without scope creep?
 - do sync/install surfaces expose the intended skill cleanly?
+- is the skill present in `.spec-driver/skills.allowlist` so sync will project it into generated/install surfaces?
+
+Operational gotcha:
+
+- `.spec-driver/skills.allowlist` gates projection into `.spec-driver/skills`,
+  `.agents`, and `.claude`.
+- A missing allowlist entry can make a valid packaged skill look "unsynced."
+- Fresh installs create the full allowlist; deleting the file and rerunning
+  sync repopulates it.
 
 ## 9. Current Design Heuristics From DE-055
 

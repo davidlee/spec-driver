@@ -104,17 +104,17 @@ Phase 3.
 - [x] Select supports dynamic `set_options()` rebuild (verified in preflight)
 
 ## 4. Exit Criteria / Done When
-- [ ] `ArtifactGroup` + `ArtifactTypeMeta` in `core/artifact_view.py` with tests
-- [ ] 4 `artifact.group.*` theme entries added to `theme.py`
-- [ ] `supekku/tui/` package: app, browser, widgets, theme.tcss
-- [ ] App launches headlessly via `app.run_test()`
-- [ ] Type selector shows all 11 types with counts, colour-grouped
-- [ ] Selecting a type populates artifact list with styled rows
-- [ ] Status filter (Select) rebuilds per type, filters artifact list
-- [ ] Selecting an artifact shows markdown preview
-- [ ] VT-053-pilot passing
-- [ ] VT-053-tcss-lint passing
-- [ ] `just` passes (ruff clean, pylint threshold met, all tests pass)
+- [x] `ArtifactGroup` + `ArtifactTypeMeta` in `core/artifact_view.py` with tests
+- [x] 4 `artifact.group.*` theme entries added to `theme.py`
+- [x] `supekku/tui/` package: app, browser, widgets, theme.tcss
+- [x] App launches headlessly via `app.run_test()`
+- [x] Type selector shows all 11 types with counts, colour-grouped
+- [x] Selecting a type populates artifact list with styled rows
+- [x] Status filter (Select) rebuilds per type, filters artifact list
+- [x] Selecting an artifact shows markdown preview
+- [x] VT-053-pilot passing (12 tests)
+- [x] VT-053-tcss-lint passing (3 tests)
+- [x] `just` passes (ruff clean, pylint 9.51/10, 2839 tests pass)
 
 ## 5. Verification
 - `just test` — all existing + new tests
@@ -139,16 +139,16 @@ Phase 3.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | P02-T01 | `ArtifactGroup` + `ArtifactTypeMeta` in `artifact_view.py` | [P] | DEC-053-11 |
-| [ ] | P02-T02 | `artifact.group.*` theme entries in `theme.py` | [P] | 4 group colours |
-| [ ] | P02-T03 | `tui/` package structure + `theme.tcss` | | After T01, T02 |
-| [ ] | P02-T04 | `tui/widgets/type_selector.py` | | Consumes ArtifactTypeMeta |
-| [ ] | P02-T05 | `tui/widgets/artifact_list.py` + status filter | | DataTable + Select |
-| [ ] | P02-T06 | `tui/widgets/preview_panel.py` | [P] | Markdown widget |
-| [ ] | P02-T07 | `tui/browser.py` — BrowserScreen | | Composes T04-T06, message wiring |
-| [ ] | P02-T08 | `tui/app.py` — App subclass | | Mounts BrowserScreen + Footer |
-| [ ] | P02-T09 | VT-053-pilot headless tests | | After T08 |
-| [ ] | P02-T10 | VT-053-tcss-lint | [P] | Can write early, runs against .tcss |
+| [x] | P02-T01 | `ArtifactGroup` + `ArtifactTypeMeta` in `artifact_view.py` | [P] | DEC-053-11, 16 tests |
+| [x] | P02-T02 | `artifact.group.*` theme entries in `theme.py` | [P] | 4 group colours |
+| [x] | P02-T03 | `tui/` package structure + `theme.tcss` | | POL-002 compliant |
+| [x] | P02-T04 | `tui/widgets/type_selector.py` | | styled Text + TypeSelected msg |
+| [x] | P02-T05 | `tui/widgets/artifact_list.py` + status filter | | DataTable + Select + Input |
+| [x] | P02-T06 | `tui/widgets/preview_panel.py` | [P] | Markdown widget |
+| [x] | P02-T07 | `tui/browser.py` — BrowserScreen | | Message wiring, Screen subclass |
+| [x] | P02-T08 | `tui/app.py` — App subclass | | snapshot param for testability |
+| [x] | P02-T09 | VT-053-pilot headless tests | | 12 tests, mock snapshot |
+| [x] | P02-T10 | VT-053-tcss-lint | [P] | 3 tests, hex+rgb scan |
 
 ### Task Details
 
@@ -256,7 +256,7 @@ No phase-specific decisions expected unless STOP conditions trigger.
 - Both widgets confirmed compatible with `styled_text()` approach.
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence: `just` passes
-- [ ] Notes updated with findings
+- [x] Exit criteria satisfied
+- [x] Verification evidence: `just` passes (2839 tests, ruff clean, pylint 9.51)
+- [x] Notes updated with findings
 - [ ] Hand-off notes to Phase 3

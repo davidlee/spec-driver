@@ -143,6 +143,12 @@
   pointing future skill work back to the DE-055 synthesis and the governing
   ADR/spec/memory sources.
 
+### 2026-03-07 - skills allowlist gotcha
+- `.spec-driver/skills.allowlist` controls which packaged skills are installed into generated surfaces such as `.spec-driver/skills`, `.agents`, and `.claude`.
+- If a skill is missing from the allowlist, `uv run spec-driver skills sync` will not expose it there even if the packaged skill exists under `supekku/skills/`.
+- On a fresh install the allowlist is created with the full skill list.
+- Deleting `.spec-driver/skills.allowlist` and rerunning sync repopulates it.
+
 ### 2026-03-07 - phase 08 brainstorming decomposition
 - Re-read `/tmp/superpowers/skills/brainstorming/SKILL.md` against current DE-055 direction.
 - Conclusion:
@@ -198,6 +204,7 @@
 - Hardened `preflight`, `continuation`, `next`, and `execute-phase` so implementation readiness requires a critical assessment of assumptions, unresolved questions, and tensions.
 - Decomposed the useful imports from Superpowers brainstorming into a generic decision loop and artifact-specific section-by-section authoring guidance.
 - Landed the first artifact-specific authoring enhancement in `draft-design-revision`.
+- Recorded the skills-allowlist install-surface gotcha for future skill work.
 
 ## Fresh-agent onboarding
 

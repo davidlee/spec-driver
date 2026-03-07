@@ -2,30 +2,36 @@
 
 Your specification-driven development framework construction toolkit, with multi-language spec sync and documentation generation.
 
-![spec-driver](./assets/spec-driver-med.png)
+![spec-driver](./assets/spec-driver-redux.png)
 
 **Why?**
-- Maintain verifiably accurate, evergreen specs covering your _entire system_
+- Instead of expensive throwaway research, maintain verifiably accurate, evergreen specs
 - Use cheap, fast, deterministically generated docs to complement and audit the work of messy, stochastic agents
 - The combination of markdown and YAML is a surprisingly powerful platform for structured, legible data
 - Tooling joins related entities through a registry for fast lookup, validation, and relational data
 - Stop banging rocks together
 
 **What for?**
-- greenfield spec-driven development with Claude Code & similar (alternatives exist for this, but ...)
-- large codebases - 100kLoC+
-- legacy conversions - with tooling support
-- a low friction, conceptually coherent, unified CLI for spec-driven development you can adapt as your needs change
-- (maybe already? if not soon): also ready to eat right out of the box!
+- greenfield spec-driven development with Claude Code & friends (Codex, etc)
+- adapt and evolve processes as your codebase grows
+- large codebases - 150kLoC+
+- legacy conversion
+- nobody can force you to use Jira
 
+**
+- a low friction, conceptually coherent, unified CLI for spec-driven development you can adapt as your needs change
+
+![ADR list](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/adr-list.png)
 
 ## Status
 
-**Alpha** - Under active development. API and CLI interface may change.
+**Beta** - Under active development. Muggles should stick to Cursor.
 
 ## Features
 
-A smorgasbord for you to build your own workflow around
+A smorgasbord for you to build your own workflow around. CLI, TUI, agent memory, skills.
+
+Boot up, install, and ask the agent to show you around.
 
 
 |Feature|Blurb|
@@ -44,10 +50,11 @@ A smorgasbord for you to build your own workflow around
 |**Orphaned Spec Detection**|Identify & safely remove tech specs for deleted source files.|
 |**Audits**|Record agent (or human) research & inspection to verify implementation, feeding back into requirements & spec status.|
 |**Spec Revisions**|Optionally contextualize changes to product/architectural specs, with data as structured as makes sense. Start your changes with a revision to capture the design changes - or end with one to represent your findings and what actually happened.|
-|**Markdown + Git \| jujutsu**|Why use a shitty Saas when version controlled text is this powerful, and agents can work with it so fluently? I'm sure you can pipe it into other, lesser tools if you need it.|
+|**Markdown + Git**|Why use a shitty Saas when version controlled text is this powerful, and agents can work with it so fluently? I'm sure you can pipe it into other, lesser tools if you need it.|
 |**Zero Lock-In, Zero Cost**|Things change fast, but if text in open formats goes out of fashion, all bets are off.|
 
-![ADR list](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/adr-list.png)
+
+![tui](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/tui.png)
 
 ## Installation
 
@@ -371,17 +378,18 @@ spec-driver sync --check
 spec-driver validate
 ```
 
-## Development
+## Caveats
 
-This package is under active development, and API stability is not even hinted at.
+Installs claude hooks and skills (project-local only), but you can install your own and customize their behaviour.
 
-I'll aim not to make breaking changes to data formats, though.
+Probably doesn't work on Windows, but what does? If you can't afford Linux, I don't know what to tell you.
+
+I'll aim not to make breaking changes to data formats.
 
 ## Related
 - [PyPi project](https://pypi.org/project/spec-driver/)
 - [npm dependency for TS doc gen](https://www.npmjs.com/package/ts-doc-extract)
 - [A Socratic dialogue wherein I talk myself into building this thing](https://supekku.dev)
-- [Spec-Kit, which I stole / borrowed agent prompts and ideas from](https://github.com/github/spec-kit)
 - [me](https://www.linkedin.com/in/davidlee-au/)
 
 ## License

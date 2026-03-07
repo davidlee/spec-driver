@@ -182,6 +182,11 @@ def get_memory_dir(repo_root: Path | None = None) -> Path:
   return get_spec_driver_root(repo_root) / MEMORY_DIR
 
 
+def get_run_dir(repo_root: Path | None = None) -> Path:
+  """Get the runtime state directory (.spec-driver/run/)."""
+  return get_spec_driver_root(repo_root) / "run"
+
+
 __all__ = [
   "AUDITS_SUBDIR",
   "BACKLOG_DIR",
@@ -209,6 +214,7 @@ __all__ = [
   "get_policies_dir",
   "get_product_specs_dir",
   "get_registry_dir",
+  "get_run_dir",
   "get_revisions_dir",
   "get_spec_driver_root",
   "get_standards_dir",

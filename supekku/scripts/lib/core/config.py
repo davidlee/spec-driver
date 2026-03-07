@@ -38,6 +38,9 @@ DEFAULT_CONFIG: dict = {
     "policies": False,
     "standards": False,
   },
+  "events": {
+    "enabled": True,
+  },
   "sync": {
     "spec_autocreate": False,
   },

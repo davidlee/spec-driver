@@ -139,14 +139,14 @@ Usage notes:
 </skill>
 
 <skill>
-<name>using-spec-driver</name>
-<description>Mandatory routing skill for ANY substantive work in a spec-driver project. Choose the governing skill before acting, and do not start implementation until the required delta/design/plan/phase artefacts exist.</description>
+<name>update-delta-docs</name>
+<description>Reconcile DE/IP/phase/DR execution artefacts during delta work. Use this when implementation changes structured execution state, not just notes.</description>
 <location>project</location>
 </skill>
 
 <skill>
-<name>update-delta-docs</name>
-<description>Reconcile DE/IP/phase/DR execution artefacts during delta work. Use this when implementation changes structured execution state, not just notes.</description>
+<name>using-spec-driver</name>
+<description>Mandatory routing skill for ANY substantive work in a spec-driver project. Choose the governing skill before acting, and do not start implementation until the required delta/design/plan/phase artefacts exist.</description>
 <location>project</location>
 </skill>
 

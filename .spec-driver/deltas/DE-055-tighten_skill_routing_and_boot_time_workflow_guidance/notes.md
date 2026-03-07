@@ -46,6 +46,14 @@
 - Decide how to make `/notes` an invariant rather than a suggestion.
 - Decide how explicit the ordering contract should be between DR, IP, phase creation, and implementation.
 - Decide whether to add a dedicated capture skill and stronger backlog-to-delta-to-backlog lifecycle guidance.
+- Treat `ISSUE-009` as a dependency for backlog-oriented skill workflows, because backlog status semantics are not yet canonical.
+
+### 2026-03-07 - backlog dependency linkage
+- Linked `ISSUE-009` into DE-055 as the current blocker for backlog-oriented skill workflow design.
+- Rationale:
+  - backlog capture/promotion/closure skills need canonical status semantics to prescribe transitions confidently
+  - `ISSUE-009` already records that backlog items currently use inconsistent free-form statuses
+  - this is an obstacle for defining workflow wording around backlog items without inventing non-canonical lifecycle states
 
 ### 2026-03-07 - phase 03 decision
 - Chose the guidance-layer fix for the `draft` delta failure mode instead of changing `complete delta` in this phase.

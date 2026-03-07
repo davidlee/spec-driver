@@ -19,3 +19,11 @@
 {"v":1,"ts":"2026-03-07T03:44:15.922922+00:00","session":null,"cmd":"list backlog","argv":["list","backlog","-a"],"artifacts":[],"exit_code":0,"status":"ok"}
 {"v":1,"ts":"2026-03-07T03:44:20.890148+00:00","session":null,"cmd":"show issue","argv":["show","issue","ISSUE-009","--raw"],"artifacts":[],"exit_code":0,"status":"ok"}
 {"v":1,"ts":"2026-03-07T03:44:20.892302+00:00","session":null,"cmd":"show issue","argv":["show","issue","ISSUE-009","--path"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:46:37.580509+00:00","session":"claude","cmd":"show issue","argv":["show","issue","009"],"artifacts":[],"exit_code":1,"status":"error"}
+{"v":1,"ts":"2026-03-07T03:46:37.772402+00:00","session":"claude","cmd":"show issue","argv":["show","issue","ISSUE-009"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:46:49.312131+00:00","session":"claude","cmd":"show issue","argv":["show","issue","009"],"artifacts":[],"exit_code":1,"status":"error"}
+{"v":1,"ts":"2026-03-07T03:46:49.493916+00:00","session":"claude","cmd":"show issue","argv":["show","issue","ISSUE-009"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:46:50.037326+00:00","session":"claude","cmd":"show improvement","argv":["show","improvement","IMPR-010"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:46:50.223800+00:00","session":"claude","cmd":"show improvement","argv":["show","improvement","010"],"artifacts":[],"exit_code":1,"status":"error"}
+{"v":1,"ts":"2026-03-07T03:46:56.234395+00:00","session":"claude","cmd":"view issue","argv":["view","issue","ISSUE-009"],"artifacts":[],"exit_code":0,"status":"ok"}
+{"v":1,"ts":"2026-03-07T03:47:03.795318+00:00","session":"claude","cmd":"create issue","argv":["create","issue","show/view commands lack ID inference \u2014 require redundant subcommand and full prefix"],"artifacts":[],"exit_code":0,"status":"ok"}

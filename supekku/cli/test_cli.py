@@ -242,7 +242,6 @@ class TestSyncCommand:
     assert "--check" in result.stdout
     assert "--dry-run" in result.stdout
     assert "--specs" in result.stdout
-    assert "--adr" in result.stdout
     assert "--prune" in result.stdout
 
   def test_sync_prune_flag_in_help(self):

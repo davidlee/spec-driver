@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.backlog.registry import load_backlog_registry
+from supekku.scripts.lib.backlog.registry import discover_backlog_items
 
 if TYPE_CHECKING:
   from collections.abc import Iterable
@@ -47,8 +47,8 @@ class WorkspaceValidator:
     revision_ids = set(revision_registry.keys())
     audit_ids = set(audit_registry.keys())
 
-    # Backlog items (ISSUE-*, IMPR-*, etc.) are valid applies_to targets
-    backlog_ids = set(load_backlog_registry(self.workspace.root))
+    # Backlog items (ISSUE-*, IMPR-*, etc.) are valid relation targets
+    backlog_ids = {item.id for item in discover_backlog_items(root=self.workspace.root)}
     applies_to_ids = requirement_ids | backlog_ids
 
     # Requirement lifecycle links
@@ -101,7 +101,7 @@ class WorkspaceValidator:
     # Change artifact relation checks
     self._validate_change_relations(
       delta_registry.values(),
-      requirement_ids,
+      requirement_ids | backlog_ids,
       applies_to_ids=applies_to_ids,
       expected_type="implements",
     )

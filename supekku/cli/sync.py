@@ -92,20 +92,6 @@ def sync(
       help="Generate contract documentation for source units. Independent of --specs.",
     ),
   ] = True,
-  adr: Annotated[
-    bool,
-    typer.Option(
-      "--adr",
-      help="Synchronize ADR/decision registry",
-    ),
-  ] = False,
-  backlog: Annotated[
-    bool,
-    typer.Option(
-      "--backlog",
-      help="Synchronize backlog priority registry",
-    ),
-  ] = False,
   memory_links: Annotated[
     bool,
     typer.Option(
@@ -147,9 +133,9 @@ def sync(
   - ADR/decision registry synchronization
   - Backlog priority registry synchronization
 
-  By default, generates contracts for existing specs. Spec auto-creation
-  is off unless opted in with --specs (persisted for future runs).
-  Use --adr or --backlog to sync registries.
+  By default, generates contracts for existing specs and syncs all registries
+  (ADR, backlog, requirements). Spec auto-creation is off unless opted in
+  with --specs (persisted for future runs).
   """
   # Auto-discover repository root
   root = find_repo_root()
@@ -231,25 +217,23 @@ def sync(
       typer.echo(f"Error: {e}", err=True)
       raise typer.Exit(EXIT_FAILURE) from e
 
-  # Sync ADRs if requested
-  if adr:
-    typer.echo("Synchronizing ADR registry...")
-    try:
-      adr_result = _sync_adr(root=root)
-      results["adr"] = adr_result
-    except Exception as e:
-      typer.echo(f"Error syncing ADRs: {e}", err=True)
-      raise typer.Exit(EXIT_FAILURE) from e
+  # Sync ADR registry (always — cheap registry rebuild)
+  typer.echo("Synchronizing ADR registry...")
+  try:
+    adr_result = _sync_adr(root=root)
+    results["adr"] = adr_result
+  except Exception as e:
+    typer.echo(f"Error syncing ADRs: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
 
-  # Sync backlog if requested
-  if backlog:
-    typer.echo("Synchronizing backlog priority registry...")
-    try:
-      backlog_result = _sync_backlog(root=root)
-      results["backlog"] = backlog_result
-    except Exception as e:
-      typer.echo(f"Error syncing backlog: {e}", err=True)
-      raise typer.Exit(EXIT_FAILURE) from e
+  # Sync backlog ordering (always — cheap filesystem walk)
+  typer.echo("Synchronizing backlog priority registry...")
+  try:
+    backlog_result = _sync_backlog(root=root)
+    results["backlog"] = backlog_result
+  except Exception as e:
+    typer.echo(f"Error syncing backlog: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
 
   # Always sync requirements from specs
   typer.echo("Synchronizing requirements registry...")

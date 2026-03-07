@@ -1,5 +1,5 @@
 spec_driver_installed_version = "0.7.1"
-ceremony = "settler" # pioneer | settler | town_planner
+ceremony = "town_planner" # pioneer | settler | town_planner
 
 [tool]
 exec = "uv run spec-driver"

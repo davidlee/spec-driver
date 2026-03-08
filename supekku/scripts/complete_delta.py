@@ -26,6 +26,7 @@ from supekku.scripts.lib.changes.updater import (
 )
 from supekku.scripts.lib.core.config import is_strict_mode, load_workflow_config
 from supekku.scripts.lib.core.events import record_artifact
+from supekku.scripts.lib.core.frontmatter_writer import update_frontmatter_status
 from supekku.scripts.lib.core.paths import get_revisions_dir
 from supekku.scripts.lib.requirements.lifecycle import STATUS_ACTIVE
 from supekku.scripts.lib.workspace import Workspace
@@ -194,37 +195,12 @@ def display_dry_run_requirements(
 def update_delta_frontmatter(delta_path: Path, _delta_id: str) -> bool:
   """Update delta status in frontmatter to 'completed'.
 
+  Delegates to the shared primitive in ``core.frontmatter_writer``.
   Returns True if successful, False otherwise.
   """
   if not delta_path.exists():
     return False
-
-  content = delta_path.read_text(encoding="utf-8")
-  lines = content.splitlines()
-
-  # Find and update status in frontmatter
-  in_frontmatter = False
-  updated_lines = []
-  status_updated = False
-
-  for line in lines:
-    if line.strip() == "---":
-      in_frontmatter = not in_frontmatter
-      updated_lines.append(line)
-      continue
-
-    if in_frontmatter and line.startswith("status:"):
-      updated_lines.append("status: completed")
-      status_updated = True
-    else:
-      updated_lines.append(line)
-
-  if not status_updated:
-    return False
-
-  # Write updated delta file
-  delta_path.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
-  return True
+  return update_frontmatter_status(delta_path, "completed")
 
 
 def update_requirements_status(

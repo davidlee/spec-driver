@@ -5,12 +5,13 @@ Documenting delta lifecycle transitions and completing revisions.
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import yaml
 
+from supekku.scripts.lib.core.frontmatter_writer import update_frontmatter_status
 from supekku.scripts.lib.requirements.lifecycle import STATUS_ACTIVE
 
 from .creation import create_revision
@@ -211,43 +212,11 @@ def _update_artifact_frontmatter_status(
 ) -> bool:
   """Update status and updated date in artifact frontmatter.
 
-  Args:
-    path: Path to the artifact markdown file.
-    status: New status value.
-
-  Returns:
-    True if frontmatter was successfully updated, False otherwise.
+  Delegates to the shared primitive in ``core.frontmatter_writer``.
   """
   if not path.exists():
     return False
-
-  content = path.read_text(encoding="utf-8")
-  lines = content.splitlines()
-  today = date.today().isoformat()
-
-  in_frontmatter = False
-  updated_lines = []
-  status_updated = False
-
-  for line in lines:
-    if line.strip() == "---":
-      in_frontmatter = not in_frontmatter
-      updated_lines.append(line)
-      continue
-
-    if in_frontmatter and line.startswith("status:"):
-      updated_lines.append(f"status: {status}")
-      status_updated = True
-    elif in_frontmatter and line.startswith("updated:"):
-      updated_lines.append(f"updated: '{today}'")
-    else:
-      updated_lines.append(line)
-
-  if not status_updated:
-    return False
-
-  path.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
-  return True
+  return update_frontmatter_status(path, status)
 
 
 COMPLETABLE_STATUSES = {STATUS_DRAFT, STATUS_IN_PROGRESS}

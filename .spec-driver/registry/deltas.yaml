@@ -8968,7 +8968,7 @@ deltas:
           mitigation: Graceful skip with warning log
   DE-077:
     kind: delta
-    status: in-progress
+    status: completed
     name: 'CLI UX: schema discoverability and flag parsing'
     slug: cli_ux_schema_discoverability_and_flag_parsing
     updated: '2026-03-09'
@@ -9090,7 +9090,7 @@ deltas:
         risks: []
   DE-078:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Add list audits CLI subcommand
     slug: add_list_audits_cli_subcommand
     updated: '2026-03-09'

@@ -1,4 +1,4 @@
-spec_driver_installed_version = "0.7.5"
+spec_driver_installed_version = "0.7.6"
 ceremony = "town_planner" # pioneer | settler | town_planner
 
 [tool]

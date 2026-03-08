@@ -713,5 +713,122 @@ class ShowInferredTest(unittest.TestCase):
     assert "inferred" not in result.stdout
 
 
+# ── VT-073-01: --content-type flag tests ───────────────────────
+
+
+class ShowContentTypeFlagTest(unittest.TestCase):
+  """Tests for --content-type/-c flag on show subcommands."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.root = find_repo_root()
+
+  def test_show_delta_content_type_markdown(self) -> None:
+    """show delta -c markdown outputs full file content."""
+    delta_dirs = list(
+      (self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*")
+    )
+    if not delta_dirs:
+      self.skipTest("No deltas found")
+    delta_id = f"DE-{delta_dirs[0].name.split('-')[1]}"
+    result = self.runner.invoke(
+      app, ["delta", delta_id, "-c", "markdown"]
+    )
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "---" in result.stdout
+    assert "id:" in result.stdout
+
+  def test_show_delta_content_type_yaml(self) -> None:
+    """show delta -c yaml outputs only YAML frontmatter."""
+    delta_dirs = list(
+      (self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*")
+    )
+    if not delta_dirs:
+      self.skipTest("No deltas found")
+    delta_id = f"DE-{delta_dirs[0].name.split('-')[1]}"
+    result = self.runner.invoke(
+      app, ["delta", delta_id, "-c", "yaml"]
+    )
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "id:" in result.stdout
+    # Should NOT contain markdown body
+    assert "---" not in result.stdout
+
+  def test_show_delta_content_type_frontmatter(self) -> None:
+    """show delta -c frontmatter outputs formatted metadata."""
+    delta_dirs = list(
+      (self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*")
+    )
+    if not delta_dirs:
+      self.skipTest("No deltas found")
+    delta_id = f"DE-{delta_dirs[0].name.split('-')[1]}"
+    result = self.runner.invoke(
+      app, ["delta", delta_id, "-c", "frontmatter"]
+    )
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert delta_id in result.stdout
+
+  def test_show_adr_content_type_markdown(self) -> None:
+    """show adr -c markdown outputs full file content."""
+    adr_files = list(
+      (self.root / SPEC_DRIVER_DIR / DECISIONS_SUBDIR).glob("ADR-*.md")
+    )
+    if not adr_files:
+      self.skipTest("No ADRs found")
+    adr_id = (
+      adr_files[0].stem.split("-")[0]
+      + "-"
+      + adr_files[0].stem.split("-")[1]
+    )
+    result = self.runner.invoke(
+      app, ["adr", adr_id, "-c", "markdown"]
+    )
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "---" in result.stdout
+
+  def test_content_type_overrides_raw_with_warning(self) -> None:
+    """--content-type overrides --raw with a warning."""
+    delta_dirs = list(
+      (self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*")
+    )
+    if not delta_dirs:
+      self.skipTest("No deltas found")
+    delta_id = f"DE-{delta_dirs[0].name.split('-')[1]}"
+    result = self.runner.invoke(
+      app, ["delta", delta_id, "--raw", "-c", "yaml"]
+    )
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "Warning" in (result.stderr or "")
+    assert "id:" in result.stdout
+
+  def test_content_type_in_help(self) -> None:
+    """--content-type/-c flag appears in help."""
+    result = self.runner.invoke(app, ["delta", "--help"])
+    assert result.exit_code == 0
+    assert "--content-type" in result.stdout or "-c" in result.stdout
+
+  def test_show_spec_content_type_yaml(self) -> None:
+    """show spec -c yaml outputs YAML frontmatter."""
+    spec_dirs = list(
+      (self.root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).glob("SPEC-*")
+    )
+    if not spec_dirs:
+      self.skipTest("No specs found")
+    spec_id = spec_dirs[0].name
+    result = self.runner.invoke(
+      app, ["spec", spec_id, "-c", "yaml"]
+    )
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "id:" in result.stdout
+
+  def test_show_revision_content_type_markdown(self) -> None:
+    """show revision -c markdown via emit_artifact path."""
+    result = self.runner.invoke(
+      app, ["revision", "RE-001", "-c", "markdown"]
+    )
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "---" in result.stdout
+
+
 if __name__ == "__main__":
   unittest.main()

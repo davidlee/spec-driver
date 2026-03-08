@@ -17,6 +17,7 @@ Across all list commands, we use consistent flag patterns:
 
 from __future__ import annotations
 
+import enum
 import fnmatch
 import re
 from collections.abc import Iterator
@@ -32,6 +33,27 @@ from supekku.scripts.lib.core.paths import get_deltas_dir
 # Exit codes
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
+
+
+class ContentType(str, enum.Enum):
+  """Unified output content-type selector for show commands."""
+
+  markdown = "markdown"
+  frontmatter = "frontmatter"
+  yaml = "yaml"
+
+
+ContentTypeOption = Annotated[
+  ContentType | None,
+  typer.Option(
+    "--content-type",
+    "-c",
+    help=(
+      "Output content type: markdown (full file),"
+      " frontmatter (metadata), yaml (raw YAML block)"
+    ),
+  ),
+]
 
 
 # --- Artifact resolution types ---
@@ -643,6 +665,24 @@ class InferringGroup(typer.core.TyperGroup):
 # --- Artifact output ---
 
 
+def extract_yaml_frontmatter(path: Path) -> str:
+  """Extract raw YAML frontmatter block from a markdown file.
+
+  Returns the YAML content between the opening and closing ``---`` fences,
+  without the fences themselves.  Returns an empty string if no frontmatter
+  is found.
+
+  """
+  text = path.read_text()
+  if not text.startswith("---"):
+    return ""
+  end = text.find("\n---", 3)
+  if end == -1:
+    return ""
+  # Return content between the fences (excluding the fences themselves)
+  return text[4:end].strip()
+
+
 def emit_artifact(
   ref: ArtifactRef,
   *,
@@ -650,13 +690,18 @@ def emit_artifact(
   path_only: bool = False,
   raw_output: bool = False,
   body_only: bool = False,
+  content_type: ContentType | None = None,
   format_fn: Any,
   json_fn: Any,
 ) -> None:
-  """Dispatch artifact output by mode: path, raw, body, json, or formatted.
+  """Dispatch artifact output by mode.
+
+  Supports path, raw, body, json, content-type, or formatted output.
 
   Handles mutual-exclusivity check for --json/--path/--raw/--body-only
-  and calls the appropriate output function. Always raises typer.Exit.
+  and calls the appropriate output function. When ``content_type`` is
+  provided it takes precedence over the boolean flags (with a warning if
+  both are given).  Always raises typer.Exit.
 
   Args:
     ref: Resolved artifact reference.
@@ -664,6 +709,7 @@ def emit_artifact(
     path_only: If True, echo the artifact path.
     raw_output: If True, echo raw file content.
     body_only: If True, echo body text only (no frontmatter).
+    content_type: Unified content-type selector (overrides boolean flags).
     format_fn: Callable(record) -> str for default formatted output.
     json_fn: Callable(record) -> str for JSON output. Required.
 
@@ -671,19 +717,36 @@ def emit_artifact(
     typer.Exit: Always — EXIT_SUCCESS on success, EXIT_FAILURE on error.
 
   """
-  if sum([json_output, path_only, raw_output, body_only]) > 1:
+  bool_flags = sum([json_output, path_only, raw_output, body_only])
+
+  # --content-type overrides boolean flags with a warning
+  if content_type is not None and bool_flags:
+    typer.echo(
+      "Warning: --content-type overrides --json/--path/--raw/--body-only",
+      err=True,
+    )
+    json_output = path_only = raw_output = body_only = False
+
+  if bool_flags > 1:
     typer.echo(
       "Error: --json, --path, --raw, and --body-only are mutually exclusive",
       err=True,
     )
     raise typer.Exit(EXIT_FAILURE)
 
-  if path_only:
+  if content_type is not None:
+    if content_type == ContentType.markdown:
+      typer.echo(ref.path.read_text())
+    elif content_type == ContentType.frontmatter:
+      typer.echo(format_fn(ref.record))
+    elif content_type == ContentType.yaml:
+      typer.echo(extract_yaml_frontmatter(ref.path))
+  elif path_only:
     typer.echo(ref.path)
   elif raw_output:
     typer.echo(ref.path.read_text())
   elif body_only:
-    from supekku.scripts.lib.core.spec_utils import load_markdown_file
+    from supekku.scripts.lib.core.spec_utils import load_markdown_file  # noqa: PLC0415
 
     _, body = load_markdown_file(ref.path)
     typer.echo(body)

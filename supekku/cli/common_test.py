@@ -17,8 +17,10 @@ from supekku.cli.common import (
   AmbiguousArtifactError,
   ArtifactNotFoundError,
   ArtifactRef,
+  ContentType,
   _parse_prefix,
   emit_artifact,
+  extract_yaml_frontmatter,
   find_artifacts,
   resolve_artifact,
   resolve_by_id,
@@ -594,6 +596,107 @@ class TestEmitArtifactBodyOnly:
     assert "Content here." in out
     assert "---" not in out
     assert "title:" not in out
+
+
+# ── extract_yaml_frontmatter ────────────────────────────────────
+
+
+class TestExtractYamlFrontmatter:
+  """extract_yaml_frontmatter returns the YAML block between --- fences."""
+
+  def test_extracts_frontmatter(self, tmp_path: Path) -> None:
+    f = tmp_path / "test.md"
+    f.write_text("---\nid: RE-001\nstatus: draft\n---\n\n# Body\n")
+    result = extract_yaml_frontmatter(f)
+    assert "id: RE-001" in result
+    assert "status: draft" in result
+    assert "---" not in result
+    assert "# Body" not in result
+
+  def test_no_frontmatter_returns_empty(self, tmp_path: Path) -> None:
+    f = tmp_path / "test.md"
+    f.write_text("# Just a heading\n\nNo frontmatter here.\n")
+    assert extract_yaml_frontmatter(f) == ""
+
+  def test_empty_frontmatter(self, tmp_path: Path) -> None:
+    f = tmp_path / "test.md"
+    f.write_text("---\n---\n\n# Body\n")
+    assert extract_yaml_frontmatter(f) == ""
+
+
+# ── emit_artifact with content_type ────────────────────────────
+
+
+class TestEmitArtifactContentType:
+  """emit_artifact --content-type dispatches correctly."""
+
+  def test_markdown_outputs_file_content(
+    self, tmp_path: Path, capsys: pytest.CaptureFixture,
+  ) -> None:
+    f = tmp_path / "artifact.md"
+    f.write_text("---\nid: X-001\n---\n\n# Body\n")
+    ref = ArtifactRef(id="X-001", path=f, record={})
+    with pytest.raises(typer.Exit):
+      emit_artifact(
+        ref,
+        content_type=ContentType.markdown,
+        format_fn=lambda r: "nope",
+        json_fn=lambda r: "nope",
+      )
+    out = capsys.readouterr().out
+    assert "---" in out
+    assert "# Body" in out
+
+  def test_frontmatter_calls_format_fn(
+    self, capsys: pytest.CaptureFixture,
+  ) -> None:
+    ref = _make_ref()
+    with pytest.raises(typer.Exit):
+      emit_artifact(
+        ref,
+        content_type=ContentType.frontmatter,
+        format_fn=lambda r: f"formatted:{r['id']}",
+        json_fn=lambda r: "nope",
+      )
+    out = capsys.readouterr().out
+    assert "formatted:RE-001" in out
+
+  def test_yaml_outputs_frontmatter_block(
+    self, tmp_path: Path, capsys: pytest.CaptureFixture,
+  ) -> None:
+    f = tmp_path / "artifact.md"
+    f.write_text("---\nid: X-001\nstatus: draft\n---\n\n# Body\n")
+    ref = ArtifactRef(id="X-001", path=f, record={})
+    with pytest.raises(typer.Exit):
+      emit_artifact(
+        ref,
+        content_type=ContentType.yaml,
+        format_fn=lambda r: "nope",
+        json_fn=lambda r: "nope",
+      )
+    out = capsys.readouterr().out
+    assert "id: X-001" in out
+    assert "# Body" not in out
+
+  def test_content_type_overrides_raw_with_warning(
+    self, tmp_path: Path, capsys: pytest.CaptureFixture,
+  ) -> None:
+    f = tmp_path / "artifact.md"
+    f.write_text("---\nid: X-001\n---\n\n# Body\n")
+    ref = ArtifactRef(id="X-001", path=f, record={})
+    with pytest.raises(typer.Exit):
+      emit_artifact(
+        ref,
+        raw_output=True,
+        content_type=ContentType.yaml,
+        format_fn=lambda r: "nope",
+        json_fn=lambda r: "nope",
+      )
+    captured = capsys.readouterr()
+    assert "Warning" in captured.err
+    assert "--content-type overrides" in captured.err
+    # yaml output should still work
+    assert "id: X-001" in captured.out
 
 
 # ── find_artifacts ──────────────────────────────────────────────

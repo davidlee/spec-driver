@@ -14,6 +14,9 @@ Process:
    - Phase/IP criteria complete
    - Specs patched to match contracts + audit findings
    - Relevant verification coverage statuses updated (typically `verified` where required)
+   - Review notes/phase findings for durable facts, patterns, or gotchas and
+     run `/capturing-memory` or `/maintaining-memory` before closure if the
+     delta taught future agents something reusable
 2. Preview:
    - `uv run spec-driver complete delta DE-XXX --dry-run`
 3. Complete:
@@ -34,3 +37,5 @@ Semantics:
 Outcomes:
 - Delta is completed.
 - Lifecycle/evidence state is coherent across delta/spec/registry surfaces.
+- Durable workflow or subsystem guidance from the delta is either captured in
+  memory or consciously rejected before close-out.

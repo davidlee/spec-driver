@@ -6,9 +6,7 @@ description: implement a well-defined task or implementation plan
 
 Read the card, design doc. (if you haven't already)
 
-run `/retrieving-memory` for the concrete files or subsystems you expect to
-touch before deep reading or editing; use `spec-driver list memories -p <path>`
-queries so glob-scoped memories can surface
+read any memories which are relevant
 
 If there's an implementation plan, read it and
 - if it's already begun, you don't need /preflight
@@ -24,8 +22,6 @@ Workflow alignment reminders:
 proceed with implementation.
 
 take /notes after each complete unit of work on the task card
-if a unit reveals a durable gotcha, workflow, or invariant, run
-`/capturing-memory` or `/maintaining-memory` before considering that unit done
 
 pay attention to doctrine, and to the decisions made in the plan. If you encounter unforeseen obstacles, /consult
 

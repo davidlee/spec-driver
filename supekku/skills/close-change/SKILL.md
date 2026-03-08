@@ -31,6 +31,8 @@ Process:
    - `uv run spec-driver validate`
    - `uv run spec-driver show delta DE-XXX`
    - `uv run spec-driver list requirements --spec SPEC-XXX`
+7. Print:
+   Δ ∴ ⊤
 
 Semantics:
 - Closure happens after audit/contracts-driven spec reconciliation, not before.

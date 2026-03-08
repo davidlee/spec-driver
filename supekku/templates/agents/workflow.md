@@ -10,15 +10,15 @@ Ceremony mode: **{{ config.ceremony }}**
 - Ceremony mode sets guidance posture, not runtime command enforcement.
 - Current runtime enforcement comes from explicit command gates (for example coverage checks in `complete delta`) and command flags.
 
-{% if config.cards.enabled -%}
-## Cards
+{% if config.kanban.enabled -%}
+## Kanban
 
-Cards root: `{{ config.cards.root }}`
-Lanes: {{ config.cards.lanes | join(', ') }}
-ID prefix: `{{ config.cards.id_prefix }}`
+Cards root: `{{ config.kanban.root }}`
+Lanes: {{ config.kanban.lanes | join(', ') }}
+ID prefix: `{{ config.kanban.id_prefix }}`
 {% endif -%}
 
 ## Documentation
 
-Artefacts: `{{ config.docs.artefacts_root }}`
-Plans: `{{ config.docs.plans_root }}`
+Artefacts: `{{ config.kanban.artefacts_root }}`
+Plans: `{{ config.kanban.plans_root }}`

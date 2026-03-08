@@ -23,13 +23,11 @@ DEFAULT_CONFIG: dict = {
   "verification": {
     "command": "just check",
   },
-  "cards": {
+  "kanban": {
     "enabled": True,
     "root": "kanban",
     "lanes": ["backlog", "next", "doing", "finishing", "done"],
     "id_prefix": "T",
-  },
-  "docs": {
     "artefacts_root": "doc/artefacts",
     "plans_root": "doc/plans",
   },
@@ -112,24 +110,49 @@ def load_workflow_config(repo_root: Path) -> dict:
   return _merge_defaults(user_config)
 
 
+def _migrate_legacy_keys(user_config: dict) -> dict:
+  """Promote legacy [cards]/[docs] keys to [kanban].
+
+  Existing installs may have ``[cards]`` and/or ``[docs]`` sections.
+  Merge them into ``kanban`` so downstream code sees a single key.
+  """
+  config = dict(user_config)
+
+  if "cards" in config:
+    kanban = config.pop("cards")
+    existing = config.get("kanban", {})
+    config["kanban"] = {**kanban, **existing}
+
+  if "docs" in config:
+    docs = config.pop("docs")
+    existing = config.get("kanban", {})
+    config["kanban"] = {**existing, **docs}
+
+  return config
+
+
 def _merge_defaults(user_config: dict) -> dict:
   """Deep-merge user config over DEFAULT_CONFIG.
 
   Top-level scalars are replaced; nested dicts are merged key-by-key
   (one level deep — matches the flat-section TOML schema).
+
+  Legacy ``[cards]`` and ``[docs]`` sections are migrated to ``[kanban]``
+  before merging.
   """
+  migrated = _migrate_legacy_keys(user_config)
   result = copy.deepcopy(DEFAULT_CONFIG)
 
   for key, default_val in DEFAULT_CONFIG.items():
-    if key not in user_config:
+    if key not in migrated:
       continue
     if isinstance(default_val, dict):
-      result[key] = {**default_val, **user_config[key]}
+      result[key] = {**default_val, **migrated[key]}
     else:
-      result[key] = user_config[key]
+      result[key] = migrated[key]
 
   # Preserve user keys not in defaults (e.g. spec_driver_installed_version)
-  for key, val in user_config.items():
+  for key, val in migrated.items():
     if key not in DEFAULT_CONFIG:
       result[key] = val
 
@@ -252,12 +275,10 @@ _SECTION_COMMENTS: dict[str, list[str]] = {
   "verification": [
     "Command agents run to verify the project (tests + lint).",
   ],
-  "cards": [
+  "kanban": [
     "Kanban-style task cards for lightweight work tracking.",
     "Disable with enabled = false if you only use deltas.",
-  ],
-  "docs": [
-    "Where design artefacts and implementation plans live.",
+    "artefacts_root / plans_root: where design docs and plans live.",
   ],
   "policy": [
     "Toggle governance layers.  ADRs are always recommended.",

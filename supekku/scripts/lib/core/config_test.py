@@ -35,7 +35,7 @@ def test_partial_config_fills_missing_sections(tmp_path: Path) -> None:
 
   assert config["ceremony"] == "town_planner"
   # Missing sections should have defaults
-  assert config["cards"] == DEFAULT_CONFIG["cards"]
+  assert config["kanban"] == DEFAULT_CONFIG["kanban"]
   assert config["policy"] == DEFAULT_CONFIG["policy"]
   assert config["contracts"] == DEFAULT_CONFIG["contracts"]
   assert config["tool"] == DEFAULT_CONFIG["tool"]
@@ -46,15 +46,15 @@ def test_partial_section_fills_missing_keys(tmp_path: Path) -> None:
   toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
   toml_path.parent.mkdir(parents=True)
   toml_path.write_text(
-    "[cards]\nenabled = false\n",
+    "[kanban]\nenabled = false\n",
     encoding="utf-8",
   )
 
   config = load_workflow_config(tmp_path)
 
-  assert config["cards"]["enabled"] is False
-  assert config["cards"]["root"] == DEFAULT_CONFIG["cards"]["root"]
-  assert config["cards"]["lanes"] == DEFAULT_CONFIG["cards"]["lanes"]
+  assert config["kanban"]["enabled"] is False
+  assert config["kanban"]["root"] == DEFAULT_CONFIG["kanban"]["root"]
+  assert config["kanban"]["lanes"] == DEFAULT_CONFIG["kanban"]["lanes"]
 
 
 def test_full_config_values_preserved(tmp_path: Path) -> None:
@@ -68,13 +68,11 @@ exec = "npx"
 [verification]
 command = "make test"
 
-[cards]
+[kanban]
 enabled = false
 root = "tasks"
 lanes = ["todo", "doing", "done"]
 id_prefix = "TSK"
-
-[docs]
 artefacts_root = "docs/design"
 plans_root = "docs/plans"
 
@@ -106,11 +104,12 @@ claude_md = false
   assert config["ceremony"] == "settler"
   assert config["tool"]["exec"] == "npx"
   assert config["verification"]["command"] == "make test"
-  assert config["cards"]["enabled"] is False
-  assert config["cards"]["root"] == "tasks"
-  assert config["cards"]["lanes"] == ["todo", "doing", "done"]
-  assert config["cards"]["id_prefix"] == "TSK"
-  assert config["docs"]["artefacts_root"] == "docs/design"
+  assert config["kanban"]["enabled"] is False
+  assert config["kanban"]["root"] == "tasks"
+  assert config["kanban"]["lanes"] == ["todo", "doing", "done"]
+  assert config["kanban"]["id_prefix"] == "TSK"
+  assert config["kanban"]["artefacts_root"] == "docs/design"
+  assert config["kanban"]["plans_root"] == "docs/plans"
   assert config["policy"]["policies"] is True
   assert config["contracts"]["root"] == "api-contracts"
   assert config["bootstrap"]["doctrine_path"] == "custom/doctrine.md"
@@ -136,8 +135,7 @@ def test_defaults_have_expected_structure() -> None:
   """DEFAULT_CONFIG has all expected top-level keys and section shapes."""
   assert DEFAULT_CONFIG["ceremony"] == "pioneer"
   assert isinstance(DEFAULT_CONFIG["tool"], dict)
-  assert isinstance(DEFAULT_CONFIG["cards"], dict)
-  assert isinstance(DEFAULT_CONFIG["docs"], dict)
+  assert isinstance(DEFAULT_CONFIG["kanban"], dict)
   assert isinstance(DEFAULT_CONFIG["policy"], dict)
   assert isinstance(DEFAULT_CONFIG["contracts"], dict)
   assert isinstance(DEFAULT_CONFIG["bootstrap"], dict)
@@ -199,6 +197,65 @@ def test_dirs_missing_section_uses_defaults(tmp_path: Path) -> None:
   config = load_workflow_config(tmp_path)
 
   assert config["dirs"] == DEFAULT_CONFIG["dirs"]
+
+
+# --- legacy [cards]/[docs] migration ---
+
+
+def test_legacy_cards_migrated_to_kanban(tmp_path: Path) -> None:
+  """Legacy [cards] section is migrated to [kanban]."""
+  toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+  toml_path.parent.mkdir(parents=True)
+  toml_path.write_text(
+    '[cards]\nenabled = false\nroot = "tasks"\n',
+    encoding="utf-8",
+  )
+
+  config = load_workflow_config(tmp_path)
+
+  assert "cards" not in config
+  assert config["kanban"]["enabled"] is False
+  assert config["kanban"]["root"] == "tasks"
+  # Defaults filled for keys not in legacy section
+  expected = DEFAULT_CONFIG["kanban"]["artefacts_root"]
+  assert config["kanban"]["artefacts_root"] == expected
+
+
+def test_legacy_docs_merged_into_kanban(tmp_path: Path) -> None:
+  """Legacy [docs] section is merged into [kanban]."""
+  toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+  toml_path.parent.mkdir(parents=True)
+  toml_path.write_text(
+    '[docs]\nartefacts_root = "my/artefacts"\nplans_root = "my/plans"\n',
+    encoding="utf-8",
+  )
+
+  config = load_workflow_config(tmp_path)
+
+  assert "docs" not in config
+  assert config["kanban"]["artefacts_root"] == "my/artefacts"
+  assert config["kanban"]["plans_root"] == "my/plans"
+  # Kanban defaults filled
+  assert config["kanban"]["enabled"] is True
+
+
+def test_legacy_cards_and_docs_both_migrate(tmp_path: Path) -> None:
+  """Legacy [cards] + [docs] both merge into [kanban]."""
+  toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+  toml_path.parent.mkdir(parents=True)
+  toml_path.write_text(
+    '[cards]\nenabled = false\nid_prefix = "X"\n\n'
+    '[docs]\nartefacts_root = "custom/art"\n',
+    encoding="utf-8",
+  )
+
+  config = load_workflow_config(tmp_path)
+
+  assert "cards" not in config
+  assert "docs" not in config
+  assert config["kanban"]["enabled"] is False
+  assert config["kanban"]["id_prefix"] == "X"
+  assert config["kanban"]["artefacts_root"] == "custom/art"
 
 
 # --- extra user keys ---
@@ -368,7 +425,7 @@ class TestGenerateDefaultWorkflowToml:
     parsed = tomllib.loads(toml_text)
     # Verify a sample of parsed values match defaults
     assert parsed["ceremony"] == "pioneer"
-    assert parsed["cards"]["enabled"] is True
+    assert parsed["kanban"]["enabled"] is True
     assert parsed["dirs"]["memory"] == "memory"
 
   def test_tool_section_is_uncommented(self) -> None:
@@ -411,7 +468,7 @@ class TestGenerateDefaultWorkflowToml:
     # Only [tool] is active, so only exec should differ from defaults
     assert config["tool"]["exec"] == "test-cmd"
     assert config["ceremony"] == DEFAULT_CONFIG["ceremony"]
-    assert config["cards"] == DEFAULT_CONFIG["cards"]
+    assert config["kanban"] == DEFAULT_CONFIG["kanban"]
 
 
 class TestDetectExecCommand:

@@ -1,4 +1,4 @@
-spec_driver_installed_version = "0.7.6"
+spec_driver_installed_version = "0.7.7"
 ceremony = "town_planner" # pioneer | settler | town_planner
 
 [tool]
@@ -7,13 +7,11 @@ exec = "uv run spec-driver"
 [verification]
 command = "just check"
 
-[cards]
+[kanban]
 enabled = false
 root = "kanban"
 lanes = ["backlog", "next", "doing", "finishing", "done"]
 id_prefix = "T" # produces T123-* ids
-
-[docs]
 artefacts_root = "doc/artefacts" # design docs / artefacts, keyed by T123-*
 plans_root = "doc/plans"         # implementation plans, keyed by T123-*
 

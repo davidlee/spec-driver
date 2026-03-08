@@ -1,18 +1,18 @@
 # Glossary of Primitives & Concepts
 
-{% if config.cards.enabled -%}
 ## Card
 
 A **card** is the primary record for task execution and implementation notes. Depending on the project's ceremony level and workflow, a card may be:
 
-- A **kanban card** (lightweight task in `{{ config.cards.root }}/`)
+- A **kanban card** (lightweight task in `{{ config.kanban.root }}/`)
 - A **delta** (declarative change bundle in `.spec-driver/deltas/`)
 - An **implementation plan** (phased execution plan within a delta)
 
 The term "card" in skills and workflows refers to whichever of these the project uses as its primary unit of work — not exclusively a kanban card.
 
-Cards root: `{{ config.cards.root }}/`
-ID format: `{{ config.cards.id_prefix }}NNN-slug`
+{% if config.kanban.enabled -%}
+Cards root: `{{ config.kanban.root }}/`
+ID format: `{{ config.kanban.id_prefix }}NNN-slug`
 {% endif -%}
 
 ## Specifications

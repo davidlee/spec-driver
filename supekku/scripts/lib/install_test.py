@@ -541,7 +541,7 @@ def test_initialize_workspace_renders_agent_docs(tmp_path: Path) -> None:
   sd_dir = tmp_path / SPEC_DRIVER_DIR
   sd_dir.mkdir(parents=True)
   (sd_dir / "workflow.toml").write_text(
-    'ceremony = "town_planner"\n\n[tool]\nexec = "npx"\n\n[cards]\nenabled = false\n',
+    'ceremony = "town_planner"\n\n[tool]\nexec = "npx"\n\n[kanban]\nenabled = false\n',
     encoding="utf-8",
   )
 
@@ -562,9 +562,10 @@ def test_initialize_workspace_renders_agent_docs(tmp_path: Path) -> None:
   workflow_content = (agents_dir / "workflow.md").read_text()
   assert "town_planner" in workflow_content
 
-  # cards disabled: glossary should NOT mention "Card"
+  # kanban disabled: glossary still explains "Card" but omits kanban details
   glossary_content = (agents_dir / "glossary.md").read_text()
-  assert "Card" not in glossary_content
+  assert "## Card" in glossary_content
+  assert "Cards root:" not in glossary_content
 
 
 def test_initialize_workspace_renders_agent_docs_with_defaults(
@@ -586,7 +587,7 @@ def test_initialize_workspace_renders_agent_docs_with_defaults(
   exec_content = (agents_dir / "exec.md").read_text()
   assert "uv run spec-driver" in exec_content
 
-  # Other defaults: ceremony=pioneer, cards.enabled=True
+  # Other defaults: ceremony=pioneer, kanban.enabled=True
   workflow_content = (agents_dir / "workflow.md").read_text()
   assert "pioneer" in workflow_content
 

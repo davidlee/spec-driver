@@ -1,5 +1,34 @@
 # Notes for DE-064
 
+## Phase 2 — Remaining checks (refs, registries, lifecycle)
+
+### Done
+
+- `diagnostics/checks/refs.py`: delegates to `validate_workspace()`, translates `ValidationIssue` level→status (error→fail, warning→warn, info→pass). Wraps validator call in try/except for resilience.
+- `diagnostics/checks/registries.py`: loads 5 registries (specs, deltas, revisions, audits, decisions) via `Workspace` accessors and `.collect()`. Reports item counts on success, error details on failure.
+- `diagnostics/checks/lifecycle.py`: finds in-progress deltas, parses `updated` date, compares against configurable staleness threshold (default 5 days from `load_workflow_config`). Handles missing/unparseable dates gracefully.
+- `diagnostics/checks/__init__.py`: registered all 3 new checks in CHECK_REGISTRY (total: 6 categories)
+
+### Test coverage
+
+- 23 new tests across 3 test files, all passing
+- Full suite: 3143 passed, 2 pre-existing failures (unchanged)
+
+### Verification
+
+- `just lint`: clean
+- `just pylint-files` on new files: 9.64/10 (3 `broad-exception-caught` — intentional for diagnostic resilience)
+- `just test`: 3143 pass, 2 pre-existing fail, 3 skip
+- Smoke test: `spec-driver doctor` runs all 6 categories successfully
+
+### Remaining for Phase 3
+
+- JSON output polish (already implemented in Phase 1 but may need verification)
+- `--check` filter verification (already working)
+- `--verbose` verification (already working)
+- Full lint pass on entire codebase
+- Verification documentation
+
 ## Phase 1 — Model, runner, first checks, CLI wiring
 
 ### Done
@@ -41,6 +70,10 @@ All work is uncommitted.
 - `refs` check (delegate to WorkspaceValidator)
 - `registries` check (load all registries, check ID uniqueness)
 - `lifecycle` check (stuck in-progress deltas > N days, default 5)
+
+### Out-of-scope follow-ups
+
+- **IMPR-012**: Silent ID deduplication detection in registries check — filesystem-level collision where two source paths produce the same artifact ID. Deferred from Phase 2.
 
 ### Observations
 

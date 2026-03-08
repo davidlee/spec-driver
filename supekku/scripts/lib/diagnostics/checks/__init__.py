@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING
 
 from .config import check_config
 from .deps import check_deps
+from .lifecycle import check_lifecycle
+from .refs import check_refs
+from .registries import check_registries
 from .structure import check_structure
 
 if TYPE_CHECKING:
@@ -22,6 +25,9 @@ CHECK_REGISTRY: dict[str, CheckFn] = {
   "deps": check_deps,
   "config": check_config,
   "structure": check_structure,
+  "registries": check_registries,
+  "refs": check_refs,
+  "lifecycle": check_lifecycle,
 }
 
 __all__ = ["CHECK_REGISTRY"]

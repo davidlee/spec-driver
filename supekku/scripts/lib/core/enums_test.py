@@ -17,8 +17,13 @@ class TestGovernanceEnumValues:
     values = get_enum_values("adr.status")
     assert values is not None
     assert set(values) == {
-      "draft", "proposed", "accepted", "rejected",
-      "deprecated", "superseded", "revision-required",
+      "draft",
+      "proposed",
+      "accepted",
+      "rejected",
+      "deprecated",
+      "superseded",
+      "revision-required",
     }
 
   def test_policy_statuses(self) -> None:

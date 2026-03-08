@@ -4,9 +4,18 @@ from supekku.scripts.lib.specs.lifecycle import SPEC_STATUSES
 
 
 def test_spec_statuses_values() -> None:
-  assert frozenset({
-    "stub", "draft", "active", "deprecated", "archived",
-  }) == SPEC_STATUSES
+  assert (
+    frozenset(
+      {
+        "stub",
+        "draft",
+        "active",
+        "deprecated",
+        "archived",
+      }
+    )
+    == SPEC_STATUSES
+  )
 
 
 def test_spec_statuses_is_frozen() -> None:

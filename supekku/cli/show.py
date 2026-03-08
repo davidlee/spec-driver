@@ -72,9 +72,7 @@ def show_spec(
   try:
     bool_flags = sum([json_output, path_only, raw_output])
     if content_type is not None and bool_flags:
-      typer.echo(
-        "Warning: --content-type overrides --json/--path/--raw", err=True
-      )
+      typer.echo("Warning: --content-type overrides --json/--path/--raw", err=True)
       json_output = path_only = raw_output = False
     elif bool_flags > 1:
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
@@ -127,9 +125,7 @@ def show_delta(
   try:
     bool_flags = sum([json_output, path_only, raw_output])
     if content_type is not None and bool_flags:
-      typer.echo(
-        "Warning: --content-type overrides --json/--path/--raw", err=True
-      )
+      typer.echo("Warning: --content-type overrides --json/--path/--raw", err=True)
       json_output = path_only = raw_output = False
     elif bool_flags > 1:
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
@@ -259,9 +255,7 @@ def show_adr(
   try:
     bool_flags = sum([json_output, path_only, raw_output])
     if content_type is not None and bool_flags:
-      typer.echo(
-        "Warning: --content-type overrides --json/--path/--raw", err=True
-      )
+      typer.echo("Warning: --content-type overrides --json/--path/--raw", err=True)
       json_output = path_only = raw_output = False
     elif bool_flags > 1:
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
@@ -316,9 +310,7 @@ def show_policy(
   try:
     bool_flags = sum([json_output, path_only, raw_output])
     if content_type is not None and bool_flags:
-      typer.echo(
-        "Warning: --content-type overrides --json/--path/--raw", err=True
-      )
+      typer.echo("Warning: --content-type overrides --json/--path/--raw", err=True)
       json_output = path_only = raw_output = False
     elif bool_flags > 1:
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
@@ -373,9 +365,7 @@ def show_standard(
   try:
     bool_flags = sum([json_output, path_only, raw_output])
     if content_type is not None and bool_flags:
-      typer.echo(
-        "Warning: --content-type overrides --json/--path/--raw", err=True
-      )
+      typer.echo("Warning: --content-type overrides --json/--path/--raw", err=True)
       json_output = path_only = raw_output = False
     elif bool_flags > 1:
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)

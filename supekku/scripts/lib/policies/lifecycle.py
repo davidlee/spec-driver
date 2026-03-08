@@ -6,10 +6,12 @@ See DR-075 DEC-075-02.
 
 from __future__ import annotations
 
-POLICY_STATUSES: frozenset[str] = frozenset({
-  "draft",
-  "required",
-  "deprecated",
-})
+POLICY_STATUSES: frozenset[str] = frozenset(
+  {
+    "draft",
+    "required",
+    "deprecated",
+  }
+)
 
 __all__ = ["POLICY_STATUSES"]

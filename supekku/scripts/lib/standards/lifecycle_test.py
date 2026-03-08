@@ -4,9 +4,17 @@ from supekku.scripts.lib.standards.lifecycle import STANDARD_STATUSES
 
 
 def test_standard_statuses_values() -> None:
-  assert frozenset({
-    "draft", "required", "default", "deprecated",
-  }) == STANDARD_STATUSES
+  assert (
+    frozenset(
+      {
+        "draft",
+        "required",
+        "default",
+        "deprecated",
+      }
+    )
+    == STANDARD_STATUSES
+  )
 
 
 def test_standard_statuses_is_frozen() -> None:

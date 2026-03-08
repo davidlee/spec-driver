@@ -631,7 +631,9 @@ class TestEmitArtifactContentType:
   """emit_artifact --content-type dispatches correctly."""
 
   def test_markdown_outputs_file_content(
-    self, tmp_path: Path, capsys: pytest.CaptureFixture,
+    self,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture,
   ) -> None:
     f = tmp_path / "artifact.md"
     f.write_text("---\nid: X-001\n---\n\n# Body\n")
@@ -648,7 +650,8 @@ class TestEmitArtifactContentType:
     assert "# Body" in out
 
   def test_frontmatter_calls_format_fn(
-    self, capsys: pytest.CaptureFixture,
+    self,
+    capsys: pytest.CaptureFixture,
   ) -> None:
     ref = _make_ref()
     with pytest.raises(typer.Exit):
@@ -662,7 +665,9 @@ class TestEmitArtifactContentType:
     assert "formatted:RE-001" in out
 
   def test_yaml_outputs_frontmatter_block(
-    self, tmp_path: Path, capsys: pytest.CaptureFixture,
+    self,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture,
   ) -> None:
     f = tmp_path / "artifact.md"
     f.write_text("---\nid: X-001\nstatus: draft\n---\n\n# Body\n")
@@ -679,7 +684,9 @@ class TestEmitArtifactContentType:
     assert "# Body" not in out
 
   def test_content_type_overrides_raw_with_warning(
-    self, tmp_path: Path, capsys: pytest.CaptureFixture,
+    self,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture,
   ) -> None:
     f = tmp_path / "artifact.md"
     f.write_text("---\nid: X-001\n---\n\n# Body\n")

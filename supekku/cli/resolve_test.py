@@ -394,9 +394,7 @@ class TestResolveLinksById:
     assert "ADR-999" in result.output
     assert "ADR-998" not in result.output
 
-  def test_id_not_found(
-    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-  ) -> None:
+  def test_id_not_found(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     _init_repo(tmp_path)
     monkeypatch.chdir(tmp_path)
 
@@ -418,8 +416,10 @@ class TestResolveLinksById:
     result = runner.invoke(
       app,
       [
-        "--id", "mem.fact.a",
-        "--path", str(mem_dir / "mem.fact.a.md"),
+        "--id",
+        "mem.fact.a",
+        "--path",
+        str(mem_dir / "mem.fact.a.md"),
       ],
       catch_exceptions=False,
     )

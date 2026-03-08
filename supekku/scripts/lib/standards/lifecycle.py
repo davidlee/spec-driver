@@ -6,11 +6,13 @@ Enforcement-level statuses: 'required' (must comply) and 'default'
 
 from __future__ import annotations
 
-STANDARD_STATUSES: frozenset[str] = frozenset({
-  "draft",
-  "required",
-  "default",
-  "deprecated",
-})
+STANDARD_STATUSES: frozenset[str] = frozenset(
+  {
+    "draft",
+    "required",
+    "default",
+    "deprecated",
+  }
+)
 
 __all__ = ["STANDARD_STATUSES"]

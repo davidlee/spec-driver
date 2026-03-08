@@ -15,17 +15,21 @@ logger = logging.getLogger(__name__)
 
 # -- Unified backlog lifecycle statuses (DEC-075-05, supersedes DEC-057-02) --
 
-BACKLOG_BASE_STATUSES: frozenset[str] = frozenset({
-  "open",
-  "triaged",
-  "in-progress",
-  "resolved",
-})
+BACKLOG_BASE_STATUSES: frozenset[str] = frozenset(
+  {
+    "open",
+    "triaged",
+    "in-progress",
+    "resolved",
+  }
+)
 
-RISK_EXTRA_STATUSES: frozenset[str] = frozenset({
-  "accepted",
-  "expired",
-})
+RISK_EXTRA_STATUSES: frozenset[str] = frozenset(
+  {
+    "accepted",
+    "expired",
+  }
+)
 
 RISK_STATUSES: frozenset[str] = BACKLOG_BASE_STATUSES | RISK_EXTRA_STATUSES
 
@@ -38,9 +42,11 @@ BACKLOG_STATUSES: dict[str, frozenset[str]] = {
 }
 
 # Statuses excluded from default list views.
-DEFAULT_HIDDEN_STATUSES: frozenset[str] = frozenset({
-  "resolved",
-})
+DEFAULT_HIDDEN_STATUSES: frozenset[str] = frozenset(
+  {
+    "resolved",
+  }
+)
 
 ALL_VALID_STATUSES: frozenset[str] = BACKLOG_BASE_STATUSES | RISK_EXTRA_STATUSES
 

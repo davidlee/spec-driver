@@ -19,9 +19,17 @@ class UnifiedStatusSetsTest(unittest.TestCase):
   """Test unified backlog status sets (DEC-075-05)."""
 
   def test_base_statuses(self) -> None:
-    assert frozenset({
-      "open", "triaged", "in-progress", "resolved",
-    }) == BACKLOG_BASE_STATUSES
+    assert (
+      frozenset(
+        {
+          "open",
+          "triaged",
+          "in-progress",
+          "resolved",
+        }
+      )
+      == BACKLOG_BASE_STATUSES
+    )
 
   def test_risk_extra_statuses(self) -> None:
     assert frozenset({"accepted", "expired"}) == RISK_EXTRA_STATUSES

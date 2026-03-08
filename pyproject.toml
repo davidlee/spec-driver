@@ -1,6 +1,6 @@
 [project]
 name = "spec-driver"
-version = "0.7.6"
+version = "0.7.7"
 description = "Specification-driving development toolkit"
 authors = [
     { name = "David Lee", email = "dav@davlee.com" }
@@ -194,7 +194,7 @@ skip-magic-trailing-comma = false
 # PyLint :: main
 #
 [tool.pylint.main]
-fail-under = 9.50 ## FAIL-UNDER ##
+fail-under = 9.70 ## FAIL-UNDER ##
 reports = true
 output-format = "colorized"
 indent-string = "  "

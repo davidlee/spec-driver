@@ -8989,14 +8989,175 @@ deltas:
           aligns_with: []
         specs:
           primary:
-          - PROD-016
           - SPEC-110
+          - PROD-016
+          collaborators: []
+        requirements:
+          targets:
+          - SPEC-110.FR-002
+          - SPEC-110.FR-005
+          - SPEC-110.FR-006
+          dependencies: []
+        phases:
+        - id: IP-078.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-078.PHASE-01
+        plan: IP-078
+        delta: DE-078
+        objective: Add `list audits` and `list audit` CLI subcommands mirroring `list
+          revisions` pattern.
+        entrance_criteria:
+        - DR-078 drafted
+        - list_revisions pattern reviewed
+        exit_criteria:
+        - list audits command works with all standard flags
+        - list audit alias registered
+        - tests pass (just)
+        - linters clean (just lint, just pylint-files)
+        verification:
+          tests:
+          - VT-078-001
+          evidence: []
+        tasks:
+        - id: T1
+          description: Add list_audits command to supekku/cli/list.py
+        - id: T2
+          description: Register singular alias (list audit)
+        - id: T3
+          description: Write tests for list audits
+        - id: T4
+          description: Lint and verify
+        risks: []
+  DE-079:
+    kind: delta
+    status: in-progress
+    name: Delta - Implement canonical audit reconciliation contract
+    slug: implement_canonical_audit_reconciliation_contract
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-079-implement_canonical_audit_reconciliation_contract/DE-079.md
+    applies_to:
+      specs:
+      - PROD-008
+      - PROD-011
+      - SPEC-116
+      - SPEC-122
+      - SPEC-125
+      requirements: []
+    relations:
+    - type: depends_on
+      target: DE-055
+      attributes: {}
+    - type: depends_on
+      target: DE-065
+      attributes: {}
+    plan:
+      id: IP-079
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-079
+        delta: DE-079
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-008
+          - PROD-011
+          collaborators:
+          - SPEC-116
+          - SPEC-122
+          - SPEC-125
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-079.PHASE-01
+        - id: IP-079.PHASE-02
+        - id: IP-079.PHASE-03
+        - id: IP-079.PHASE-04
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-079.PHASE-01
+        plan: IP-079
+        delta: DE-079
+        objective: 'Build the schema foundation: audit metadata with disposition sub-schema,
+          delta metadata with audit_gate, disposition constants, updated template,
+          extended create_audit, and manual edit of existing audit with deprecated
+          fields. All with tests, both linters clean.'
+        entrance_criteria:
+        - DR-079 accepted with 11 design decisions, 0 open questions
+        exit_criteria:
+        - Audit frontmatter schema includes mode, delta_ref, and disposition sub-schema
+        - "Disposition constants defined (status, kind, outcome\xD7kind, status\xD7\
+          kind validity)"
+        - Delta frontmatter schema includes audit_gate and audit_gate_rationale
+        - patch_level and next_actions removed from audit schema
+        - Audit template updated with disposition structure, mode, delta_ref
+        - create_audit accepts mode and delta_ref, scaffolds disposition placeholders
+        - Existing audit with deprecated field manually edited
+        - VT-079-001 tests pass
+        - VA-079-001 schema review complete
+        - Both linters clean on all touched files
+        verification:
+          tests:
+          - VT-079-001
+          evidence:
+          - VA-079-001
+        tasks:
+        - id: '1.1'
+          description: Define disposition constants
+        - id: '1.2'
+          description: Update audit frontmatter metadata schema
+        - id: '1.3'
+          description: Add audit_gate to delta frontmatter metadata schema
+        - id: '1.4'
+          description: Update audit template
+        - id: '1.5'
+          description: Extend create_audit with mode, delta_ref, disposition scaffolding
+        - id: '1.6'
+          description: Manually edit existing audit with deprecated field
+        - id: '1.7'
+          description: Write schema validation tests (VT-079-001)
+        risks:
+        - description: Existing audit parsing breaks after deprecated field removal
+          mitigation: Test both existing audits explicitly
+      - id: IP-079.PHASE-02
+        phase: IP-079.PHASE-02
+      - id: IP-079.PHASE-03
+        phase: IP-079.PHASE-03
+      - id: IP-079.PHASE-04
+        phase: IP-079.PHASE-04
+  DE-080:
+    kind: delta
+    status: completed
+    name: Delta - Rename [cards]/[docs] config to [kanban] and always render card
+      explanation
+    slug: rename_cards_docs_config_to_kanban_and_always_render_card_explanation
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-080-rename_cards_docs_config_to_kanban_and_always_render_card_explanation/DE-080.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-080
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-080
+        delta: DE-080
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
           collaborators: []
         requirements:
           targets: []
           dependencies: []
         phases:
-        - id: IP-078-P01
+        - id: IP-080-P01
       phases:
-      - id: IP-078-P01
-        phase: IP-078-P01
+      - id: IP-080-P01
+        phase: IP-080-P01

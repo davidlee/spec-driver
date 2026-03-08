@@ -2,8 +2,8 @@
 id: ISSUE-030
 name: 'CLI verb-noun taxonomy: consistency pass'
 created: '2026-03-02'
-updated: '2026-03-02'
-status: open
+updated: '2026-03-09'
+status: resolved
 kind: issue
 categories: []
 severity: p2

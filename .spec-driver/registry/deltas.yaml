@@ -6310,6 +6310,8 @@ deltas:
           name: Define configurable commit guidance for .spec-driver files
           status: completed
         - id: IP-055.PHASE-12
+          name: Tighten DR review loop and delta reconciliation
+          status: completed
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -6666,14 +6668,48 @@ deltas:
         phase: IP-055.PHASE-12
         plan: IP-055
         delta: DE-055
-        objective: None
-        entrance_criteria: []
-        exit_criteria: []
+        objective: Tighten the DR authoring loop so it borrows the useful progressive-disclosure
+          and challenge patterns from brainstorming without importing full universal
+          ceremony.
+        entrance_criteria:
+        - A new DE-055 follow-up has been approved to improve the DR writing loop.
+        - The current draft-design-revision skill only covers triage and section-by-section
+          drafting.
+        exit_criteria:
+        - draft-design-revision tells the planning agent to keep the loop progressive
+          and code-adjacent where useful.
+        - draft-design-revision requires an internal adversarial review before the
+          DR is treated as coherent.
+        - The skill offers an external adversarial-review prompt only after local
+          feedback is integrated.
+        - The skill requires DE reconciliation before offering `/plan-phases` or new
+          phase-sheet work.
         verification:
-          tests: []
-          evidence: []
-        tasks: []
-        risks: []
+          tests:
+          - uv run spec-driver skills sync
+          evidence:
+          - Packaged and installed draft-design-revision wording reflects the stronger
+            DR loop.
+          - DE-055 bundle records the new review-loop decisions and phase tracking.
+        tasks:
+        - id: 12.1
+          title: Extend draft-design-revision with progressive disclosure and code-adjacent
+            specificity
+          status: done
+        - id: 12.2
+          title: Add adversarial self-review and optional external-review prompt handoff
+          status: done
+        - id: 12.3
+          title: Require DE reconciliation before planning handoff
+          status: done
+        - id: 12.4
+          title: Update DE-055 structured artefacts and notes for the new DR loop
+          status: done
+        risks:
+        - description: The DR loop could become too heavyweight if the new review
+            pass is phrased like a universal mandatory ceremony.
+          mitigation: Keep the wording targeted to DR authoring and preserve the external
+            adversarial pass as optional after local integration.
       - id: IP-055.PHASE-10
         name: Improve memory retrieval and capture workflow guidance
         status: completed
@@ -7877,7 +7913,7 @@ deltas:
         risks: []
   DE-068:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - edit command --status flag for programmatic status updates
     slug: edit_command_status_flag_for_programmatic_status_updates
     updated: '2026-03-08'

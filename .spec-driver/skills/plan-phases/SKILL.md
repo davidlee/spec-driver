@@ -11,18 +11,22 @@ Inputs:
 
 Process:
 1. Read DE/DR/IP together.
-2. Refine `IP-XXX.md`:
+2. Confirm planning is not getting ahead of design:
+   - if the change is non-trivial and `DR-XXX.md` is missing, stop and run `/draft-design-revision`
+   - if `DR-XXX.md` exists but is stale relative to the current ask or DE scope, reconcile the DR first
+   - do not treat IP or phase creation as a substitute for unresolved design
+3. Refine `IP-XXX.md`:
    - Phase objectives
    - Entry/exit criteria per phase
    - Success criteria and verification expectations
-3. Create the next phase:
+4. Create the next phase:
    - `uv run spec-driver create phase "<phase name>" --plan IP-XXX`
-4. Update the new phase sheet with:
+5. Update the new phase sheet with:
    - Task breakdown
    - Assumptions/constraints
    - Verification steps (VT/VA/VH expectations)
-5. If plan complexity or policy ambiguity emerges, `/consult`.
-6. Hand off to `/execute-phase` for implementation.
+6. If plan complexity or policy ambiguity emerges, `/consult`.
+7. Hand off to `/execute-phase` for implementation only after DR, IP, and the active phase sheet tell the same story.
 
 Outcomes:
 - IP is execution-ready.

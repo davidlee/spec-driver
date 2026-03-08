@@ -15,8 +15,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/improvements/IMPR-001-add-category-support-to-requirements/IMPR-001.md
-    source_kind: improvement
-    source_type: backlog
   IMPR-001.NF-001:
     label: NF-001
     title: System shall respond within 100ms
@@ -33,8 +31,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/improvements/IMPR-001-add-category-support-to-requirements/IMPR-001.md
-    source_kind: improvement
-    source_type: backlog
   ISSUE-013.FR-013.001:
     label: FR-013.001
     title: IP Schema Restoration
@@ -51,8 +47,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/issues/ISSUE-013-revert-entry-exit-criteria-from-ip/ISSUE-013.md
-    source_kind: issue
-    source_type: backlog
   ISSUE-013.FR-013.002:
     label: FR-013.002
     title: Phase Creation with Criteria Copy
@@ -69,8 +63,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/issues/ISSUE-013-revert-entry-exit-criteria-from-ip/ISSUE-013.md
-    source_kind: issue
-    source_type: backlog
   ISSUE-013.FR-013.003:
     label: FR-013.003
     title: Drift Detection Warning
@@ -87,8 +79,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/issues/ISSUE-013-revert-entry-exit-criteria-from-ip/ISSUE-013.md
-    source_kind: issue
-    source_type: backlog
   ISSUE-013.NF-013.001:
     label: NF-013.001
     title: Backward Compatibility
@@ -105,8 +95,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/issues/ISSUE-013-revert-entry-exit-criteria-from-ip/ISSUE-013.md
-    source_kind: issue
-    source_type: backlog
   ISSUE-016.FR-016.001:
     label: FR-016.001
     title: Sync Backlog Requirements
@@ -124,8 +112,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/issues/ISSUE-016-sync-backlog-requirements-to-requirements-registry/ISSUE-016.md
-    source_kind: issue
-    source_type: backlog
   ISSUE-016.FR-016.002:
     label: FR-016.002
     title: Filter Requirements by Source
@@ -143,8 +129,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/issues/ISSUE-016-sync-backlog-requirements-to-requirements-registry/ISSUE-016.md
-    source_kind: issue
-    source_type: backlog
   ISSUE-016.FR-016.003:
     label: FR-016.003
     title: Requirement Migration Command
@@ -161,8 +145,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/issues/ISSUE-016-sync-backlog-requirements-to-requirements-registry/ISSUE-016.md
-    source_kind: issue
-    source_type: backlog
   ISSUE-016.FR-016.004:
     label: FR-016.004
     title: Coverage Tracking for Backlog Requirements
@@ -180,8 +162,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/issues/ISSUE-016-sync-backlog-requirements-to-requirements-registry/ISSUE-016.md
-    source_kind: issue
-    source_type: backlog
   ISSUE-016.NF-016.001:
     label: NF-016.001
     title: Backward Compatibility
@@ -199,8 +179,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/issues/ISSUE-016-sync-backlog-requirements-to-requirements-registry/ISSUE-016.md
-    source_kind: issue
-    source_type: backlog
   ISSUE-020.FR-015:
     label: FR-015
     title: Per-file validation could validate SHA format
@@ -217,8 +195,6 @@ requirements:
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/backlog/issues/ISSUE-020-add-git-sha-tracking-to-artifact-frontmatter/ISSUE-020.md
-    source_kind: issue
-    source_type: backlog
   PROD-001.FR-001:
     label: FR-001
     title: Claude Command Provides Complete Workflow
@@ -4222,7 +4198,8 @@ requirements:
     status: active
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-081
     verified_by: []
     coverage_evidence:
     - VT-REQ-LIFECYCLE-001
@@ -4389,7 +4366,8 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-081
     verified_by: []
     coverage_evidence: []
     coverage_entries: []

@@ -37,6 +37,7 @@ from .lifecycle import (
   STATUS_ACTIVE,
   STATUS_IN_PROGRESS,
   STATUS_PENDING,
+  TERMINAL_STATUSES,
   VALID_STATUSES,
   RequirementStatus,
 )
@@ -52,9 +53,11 @@ logger = logging.getLogger(__name__)
 # Updated pattern to support both formats:
 # - **FR-001**: Short format (legacy)
 # - **PROD-010.FR-001**: Fully-qualified format (current standard)
+# Optional tags in square brackets after category: **FR-001**(cat)[tag1, tag2]: Title
 _REQUIREMENT_LINE = re.compile(
   r"^\s*[-*]\s*\*{0,2}\s*(?:[A-Z]+-\d{3}\.)?("
-  r"FR|NF)-(\d{3})\s*\*{0,2}\s*(?:\(([^)]+)\))?\s*[:\-–]\s*(.+)$",
+  r"FR|NF)-(\d{3})\s*\*{0,2}\s*(?:\(([^)]+)\))?"
+  r"(?:\[([^\]]*)\])?\s*[:\-–]\s*(.+)$",
   re.IGNORECASE,
 )
 
@@ -786,15 +789,27 @@ class RequirementsRegistry:
   ) -> None:
     """Apply verification coverage blocks to update requirement lifecycle.
 
-    Extracts coverage blocks from all artifact types, aggregates coverage
-    entries by requirement, and updates verified_by lists.
+    Extracts coverage blocks from all artifact types, rebuilds coverage
+    fields from current sources (not accumulated), and derives status.
+
+    Coverage fields are cleared first so that removed coverage blocks
+    correctly result in empty evidence — the registry is a derived
+    projection (ADR-008 §5), not a persistent accumulator.
+
+    Terminal-status requirements (deprecated, superseded, retired) are
+    not overwritten by coverage-derived status.
     """
+    # Clear all coverage fields — will be rebuilt from current sources
+    for record in self.records.values():
+      record.coverage_evidence = []
+      record.coverage_entries = []
+
     coverage_map: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
     for files in (spec_files, delta_files, plan_files, audit_files):
       self._extract_coverage_entries(files, coverage_map)
 
-    # Update records
+    # Rebuild from current sources
     for req_id, entries in coverage_map.items():
       record = self.records.get(req_id)
       if not record:
@@ -808,11 +823,13 @@ class RequirementsRegistry:
         {k: v for k, v in e.items() if k != "source"} for e in entries
       ]
 
-      # Update coverage_evidence with unique artefact IDs
+      # Derive coverage_evidence from current sources
       artefacts = {e["artefact"] for e in entries if e.get("artefact")}
-      record.coverage_evidence = sorted(set(record.coverage_evidence) | artefacts)
+      record.coverage_evidence = sorted(artefacts)
 
-      # Compute and update status from coverage
+      # Derive status — skip terminal statuses (normative, not derived)
+      if record.status in TERMINAL_STATUSES:
+        continue
       computed_status = self._compute_status_from_coverage(entries)
       if computed_status is not None:
         record.status = computed_status
@@ -1123,13 +1140,18 @@ class RequirementsRegistry:
       match = _REQUIREMENT_LINE.match(line)
       if match:
         extracted_count += 1
-        prefix, number, category, title = match.groups()
+        prefix, number, category, tags_raw, title = match.groups()
         label = f"{prefix.upper()}-{number}"
         uid = f"{spec_id}.{label}"
         kind = "functional" if label.startswith("FR-") else "non-functional"
         inline_category = category.strip() if category else None
         frontmatter_category = _frontmatter.get("category")
         final_category = inline_category or frontmatter_category
+        tags = (
+          sorted(t.strip() for t in tags_raw.split(",") if t.strip())
+          if tags_raw
+          else []
+        )
 
         yield RequirementRecord(
           uid=uid,
@@ -1140,6 +1162,7 @@ class RequirementsRegistry:
           kind=kind,
           category=final_category,
           status=STATUS_PENDING,
+          tags=tags,
           path=path,
         )
         continue

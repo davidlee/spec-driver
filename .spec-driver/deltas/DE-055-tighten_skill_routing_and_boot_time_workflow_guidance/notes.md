@@ -582,3 +582,22 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - Guidance for future agents:
   - use `DR-055` when the question is about doctrine, workflow posture, or skill expectations
   - use `DR-079` when the question is about audit schema, validation rules, lifecycle enums, or `complete delta` gate mechanics
+
+### 2026-03-09 - phase 15 DR-before-IP handoff tightening
+- Follow-up issue observed during live use: agents still too often try to skip DR work and jump straight into IP or phase planning.
+- Root cause captured:
+  - `draft-design-revision` itself was strong
+  - but `using-spec-driver` and `plan-phases` still left enough room to treat IP planning as a substitute for missing or stale non-trivial design
+- Changes made:
+  - created `IP-055.PHASE-15`
+  - updated `using-spec-driver` so missing or stale non-trivial DR work routes back to `/draft-design-revision` before `/plan-phases`
+  - updated `scope-delta` so `/plan-phases` is clearly downstream of DR work for non-trivial changes
+  - updated `plan-phases` so it treats missing or stale non-trivial DR work as a stop condition rather than planning ahead
+  - reconciled `DE-055`, `DR-055`, and `IP-055` so the stronger DR-before-IP rule is explicit
+- Design takeaway:
+  - IP and phase creation are execution planning artefacts, not a substitute for current design intent
+  - the target ordering for non-trivial work is now explicitly `DR -> IP -> phase sheet -> implementation`
+- Verification:
+  - packaged skills updated: `supekku/skills/using-spec-driver/SKILL.md`, `supekku/skills/scope-delta/SKILL.md`, `supekku/skills/plan-phases/SKILL.md`
+  - generated workspace copies refreshed after rerunning the current install flow
+  - verified generated copies now match the new DR-before-IP wording in `.spec-driver/skills/*`

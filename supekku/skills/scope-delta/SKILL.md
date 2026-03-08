@@ -28,8 +28,9 @@ Process:
    - `applies_to` specs/requirements
    - Context inputs and risks
    - Verification/closure intent
-6. If design is non-trivial, run `/draft-design-revision`.
-7. Run `/plan-phases` to create/refine phase sheets before implementation.
+6. If design is non-trivial, run `/draft-design-revision` before `/plan-phases`.
+7. Do not treat IP or phase creation as a substitute for missing design. `/plan-phases` comes after DR work for non-trivial changes, not instead of it.
+8. Run `/plan-phases` to create/refine phase sheets before implementation.
 
 Outcomes:
 - A delta exists with clear scope and traceability targets.

@@ -1,9 +1,7 @@
 ---
 id: AUD-XXX
 kind: audit
-status: draft
-mode: conformance
-delta_ref: DE-XXX
+status: draft|in-review|complete
 spec_refs:
   - SPEC-101
 prod_refs:
@@ -18,14 +16,20 @@ summary: >-
 findings:
   - id: FIND-001
     description: Content reconciler skips schema enforcement.
-    outcome: drift
-    disposition:
-      status: pending
-      kind: spec_patch
-      refs:
-        - kind: spec
-          ref: SPEC-101
-      rationale: ""
+    outcome: drift|aligned|risk
+    linked_issue: ISSUE-018
+    linked_delta: DE-021
+patch_level:
+  - artefact: SPEC-101
+    status: divergent
+    notes: Implementation missing strict mode path.
+  - artefact: PROD-020
+    status: aligned
+next_actions:
+  - type: delta
+    id: DE-021
+  - type: issue
+    id: ISSUE-052
 ---
 
 {{ audit_verification_block }}

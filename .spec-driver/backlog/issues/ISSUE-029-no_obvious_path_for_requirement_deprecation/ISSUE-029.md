@@ -2,8 +2,8 @@
 id: ISSUE-029
 name: no obvious path for requirement deprecation
 created: '2026-02-20'
-updated: '2026-02-20'
-status: open
+updated: '2026-03-09'
+status: in-progress
 kind: issue
 categories: []
 severity: p3

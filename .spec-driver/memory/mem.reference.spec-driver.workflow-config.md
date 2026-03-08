@@ -61,7 +61,7 @@ environment.
 |-----|---------|---------|
 | `command` | `"just check"` | Agent `exec.md` template — verification command |
 
-### [kanban]
+### [cards]
 
 | Key | Default | Description |
 |-----|---------|-------------|
@@ -69,10 +69,13 @@ environment.
 | `root` | `"kanban"` | Directory for card files |
 | `lanes` | `["backlog", "next", "doing", "finishing", "done"]` | Lane names |
 | `id_prefix` | `"T"` | Prefix for card IDs (e.g. T001) |
+
+### [docs]
+
+| Key | Default | Description |
+|-----|---------|-------------|
 | `artefacts_root` | `"doc/artefacts"` | Design document directory |
 | `plans_root` | `"doc/plans"` | Implementation plan directory |
-
-Legacy compat: `[cards]` and `[docs]` sections are auto-migrated to `[kanban]`.
 
 ### [policy]
 

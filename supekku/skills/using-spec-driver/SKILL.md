@@ -46,6 +46,7 @@ Process:
    - use `/shape-revision` first only when governance or doctrine requires revision-first flow
 6. If a delta exists but execution readiness is incomplete:
    - use `/shape-revision` when revision-first governance applies
+   - if the work is non-trivial and the DR is missing, stale, or no longer matches the current ask, route to `/draft-design-revision` before `/plan-phases`
    - otherwise use `/scope-delta` and `/plan-phases` to make the bundle execution-ready
    - do not route to `/execute-phase` until the relevant DR/IP/phase sheet exists for the work being done
 7. If a delta phase is already active and the needed planning artefacts exist:
@@ -65,6 +66,7 @@ Priority order:
 Guardrails:
 - Do not guess entity IDs, command shapes, or file locations when `/spec-driver` should be used.
 - Do not implement code-changing work without a governing card, delta, revision, or equivalent artefact appropriate to project posture.
+- Do not treat IP or phase creation as a substitute for missing or stale non-trivial DR work.
 - Do not jump from "there is a delta" to `/execute-phase` if DR/IP/phase creation is still the missing work.
 - Do not treat plans as higher authority than doctrine, specs, or design revisions.
 - Do not import stricter ceremony than the project has adopted.
@@ -73,6 +75,7 @@ Common failure modes:
 - "I'll just inspect files first" - stop and decide whether `/spec-driver`, `/retrieving-memory`, or `/preflight` governs that exploration.
 - "This is probably simple enough to skip workflow routing" - small tasks still need the right governing skill.
 - "I already know the command shape" - use `/spec-driver` when the task is about spec-driver entities or commands.
+- "I can start IP or phase planning now and fill in DR later" - not for non-trivial work; route to `/draft-design-revision` first.
 - "There is a delta, so I can start implementing" - not until the relevant DR/IP/phase artefacts exist and `/execute-phase` is actually the right next step.
 
 Customisation stance:

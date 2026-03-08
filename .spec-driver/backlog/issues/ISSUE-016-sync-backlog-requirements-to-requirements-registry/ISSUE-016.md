@@ -3,14 +3,14 @@ id: ISSUE-016
 name: Sync backlog requirements to requirements registry
 created: '2025-11-03'
 updated: '2025-11-03'
-status: open
+status: resolved
 kind: issue
 categories:
   - process_gap
   - tooling_enhancement
 severity: p2
 impact: process
-linked_deltas: []
+linked_deltas: [DE-076]
 related_requirements: []
 ---
 
@@ -138,6 +138,36 @@ requirements:
     implemented_by: [DE-012]
     verified_by: [VT-SCHEMA-013-001]
     # ... etc
+```
+
+```yaml supekku:verification.coverage@v1
+schema: supekku.verification.coverage
+version: 1
+subject: ISSUE-016
+entries:
+  - artefact: VT-SYNC-076-002
+    kind: VT
+    requirement: ISSUE-016.FR-016.001
+    status: verified
+    notes: TestBacklogRequirementSync — backlog items synced with correct UIDs and source_kind
+
+  - artefact: VT-FILTER-076-004
+    kind: VT
+    requirement: ISSUE-016.FR-016.002
+    status: verified
+    notes: CLI --source-kind filter implemented and tested
+
+  - artefact: VT-COVERAGE-076-006
+    kind: VT
+    requirement: ISSUE-016.FR-016.004
+    status: verified
+    notes: Coverage tracking works uniformly for backlog-sourced requirements
+
+  - artefact: VT-COMPAT-076-005
+    kind: VT
+    requirement: ISSUE-016.NF-016.001
+    status: verified
+    notes: 3492 existing tests pass; sync_from_specs alias; roundtrip serialization
 ```
 
 ## Requirements

@@ -8789,7 +8789,7 @@ deltas:
         risks: []
   DE-076:
     kind: delta
-    status: draft
+    status: completed
     name: Sync backlog requirements to requirements registry
     slug: sync_backlog_requirements_to_requirements_registry
     updated: '2026-03-09'
@@ -8963,3 +8963,40 @@ deltas:
       phases:
       - id: IP-077-P01
         phase: IP-077-P01
+  DE-078:
+    kind: delta
+    status: draft
+    name: Delta - Add list audits CLI subcommand
+    slug: add_list_audits_cli_subcommand
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-078-add_list_audits_cli_subcommand/DE-078.md
+    applies_to:
+      specs:
+      - SPEC-110
+      - PROD-016
+      requirements:
+      - SPEC-110.FR-002
+      - SPEC-110.FR-005
+      - SPEC-110.FR-006
+    plan:
+      id: IP-078
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-078
+        delta: DE-078
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-016
+          - SPEC-110
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-078-P01
+      phases:
+      - id: IP-078-P01
+        phase: IP-078-P01

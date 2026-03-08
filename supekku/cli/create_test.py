@@ -207,60 +207,74 @@ class CreateBacklogCommandsTest(unittest.TestCase):
     assert output["status"] == "open"
 
 
-class CreateDeltaFromBacklogValidationTest(unittest.TestCase):
-  """VT-057-from-backlog: --from-backlog validation callback."""
+class CreateDeltaFromBacklogTest(unittest.TestCase):
+  """VT-077-from-backlog: --from-backlog as boolean flag."""
 
   def setUp(self) -> None:
     self.runner = CliRunner()
 
   def _output(self, result):
     """Combine stdout and stderr for assertion."""
-    return (result.stdout or "") + (result.stderr or "") + str(result.output or "")
+    return (result.stdout or "") + (result.stderr or "") + str(
+      result.output or ""
+    )
 
-  def _has_validation_error(self, result) -> bool:
-    """Check output for backlog ID validation error (Rich wrapping)."""
-    # Rich box formatting inserts │; strip non-ASCII then normalise
+  def _has_id_validation_error(self, result) -> bool:
+    """Check output for backlog ID format error."""
     raw = self._output(result)
-    text = "".join(c for c in raw if c.isascii())
-    text = " ".join(text.split())
-    return "does not look like a backlog item ID" in text
+    return "backlog item ID" in raw
 
-  def test_from_backlog_rejects_non_id_value(self) -> None:
-    """--from-backlog with non-ID value raises clear error."""
+  def test_from_backlog_without_name_shows_error(self) -> None:
+    """--from-backlog without a name argument shows usage error."""
     result = self.runner.invoke(
       app,
-      ["delta", "--from-backlog", "--spec"],
+      ["delta", "--from-backlog"],
     )
     assert result.exit_code != 0
-    assert self._has_validation_error(result)
+    assert self._has_id_validation_error(result)
 
-  def test_from_backlog_rejects_garbage(self) -> None:
-    """--from-backlog with random string raises clear error."""
+  def test_from_backlog_with_non_id_name_shows_error(self) -> None:
+    """--from-backlog with non-ID name shows format error."""
     result = self.runner.invoke(
       app,
       ["delta", "--from-backlog", "xyzzy"],
     )
     assert result.exit_code != 0
-    assert self._has_validation_error(result)
+    assert self._has_id_validation_error(result)
 
   def test_from_backlog_accepts_valid_issue_id(self) -> None:
-    """--from-backlog accepts ISSUE-NNN format (fails on lookup, not validation)."""
+    """--from-backlog ISSUE-NNN passes validation, fails on lookup."""
     result = self.runner.invoke(
       app,
       ["delta", "--from-backlog", "ISSUE-999"],
     )
-    # Should pass validation but fail on item lookup (not found)
     assert result.exit_code != 0
-    assert not self._has_validation_error(result)
+    # Passes ID validation, fails on item lookup
+    assert not self._has_id_validation_error(result)
 
   def test_from_backlog_accepts_valid_risk_id(self) -> None:
-    """--from-backlog accepts RISK-NNN format."""
+    """--from-backlog RISK-NNN passes validation."""
     result = self.runner.invoke(
       app,
       ["delta", "--from-backlog", "RISK-001"],
     )
     assert result.exit_code != 0
-    assert not self._has_validation_error(result)
+    assert not self._has_id_validation_error(result)
+
+  def test_from_backlog_no_longer_swallows_flags(self) -> None:
+    """--from-backlog --help should show help, not validation error.
+
+    This is the root cause fix for ISSUE-043: --from-backlog is now
+    a boolean flag that doesn't greedily consume the next token.
+    """
+    result = self.runner.invoke(
+      app,
+      ["delta", "--from-backlog", "--help"],
+    )
+    # --help should be processed normally, not consumed as backlog ID
+    assert result.exit_code == 0
+    raw = self._output(result)
+    assert "Create a Delta bundle" in raw
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ from typing import Annotated
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
+from supekku.cli.hints import print_schema_hints
 from supekku.scripts.lib.backlog.registry import create_backlog_entry
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.creation import (
@@ -65,17 +66,6 @@ app = typer.Typer(help="Create new artifacts", no_args_is_help=True)
 _BACKLOG_ID_RE = re.compile(r"^(ISSUE|PROB|IMPR|RISK)-\d+$")
 
 
-def _validate_backlog_id(value: str | None) -> str | None:
-  """Validate that --from-backlog value looks like a backlog item ID."""
-  if value is None:
-    return None
-  if not _BACKLOG_ID_RE.match(value):
-    raise typer.BadParameter(
-      f"'{value}' does not look like a backlog item ID "
-      "(expected ISSUE-NNN, PROB-NNN, IMPR-NNN, or RISK-NNN)"
-    )
-  return value
-
 
 @app.command("spec")
 def create_spec(
@@ -128,6 +118,8 @@ def create_spec(
       pass  # JSON output handled by create_spec_impl
     typer.echo(f"Spec created: {result.spec_id}")
     typer.echo(str(result.spec_path))
+    hint_kind = "prod" if spec_type == "product" else "spec"
+    print_schema_hints(hint_kind)
     raise typer.Exit(EXIT_SUCCESS)
   except SpecCreationError as e:
     typer.echo(f"Error creating spec: {e}", err=True)
@@ -160,36 +152,41 @@ def create_delta_cmd(
     ),
   ] = False,
   from_backlog: Annotated[
-    str | None,
+    bool,
     typer.Option(
       "--from-backlog",
-      help="Create delta from backlog item (pre-populate with item context)",
-      callback=_validate_backlog_id,
+      help="Treat name argument as a backlog item ID to pre-populate from",
     ),
-  ] = None,
+  ] = False,
 ) -> None:
   """Create a Delta bundle with optional plan scaffolding.
 
   Can create from scratch with a title, or populate from a backlog item
-  using --from-backlog.
+  using --from-backlog ITEM-ID (where ITEM-ID is passed as the name argument).
   """
   try:
-    # If --from-backlog specified, fetch the item and pre-populate fields
+    # If --from-backlog, treat name as a backlog item ID
     if from_backlog:
+      if not name or not _BACKLOG_ID_RE.match(name):
+        typer.echo(
+          "Error: --from-backlog requires a backlog item ID as the name argument "
+          "(e.g., create delta --from-backlog ISSUE-123)",
+          err=True,
+        )
+        raise typer.Exit(EXIT_FAILURE)
+
       from supekku.scripts.lib.backlog.registry import BacklogRegistry
 
       registry = BacklogRegistry(root=None)
-      item = registry.find(from_backlog)
+      item = registry.find(name)
 
       if not item:
-        typer.echo(f"Error: backlog item '{from_backlog}' not found", err=True)
+        typer.echo(f"Error: backlog item '{name}' not found", err=True)
         raise typer.Exit(EXIT_FAILURE)
 
-      # Use item title as delta name if not provided
-      if not name:
-        name = item.title
+      # Pre-populate from backlog item
+      name = item.title
 
-      # Extract related requirements from frontmatter if available
       if not requirements and item.frontmatter:
         related_reqs = item.frontmatter.get("related_requirements", [])
         if related_reqs:
@@ -203,7 +200,10 @@ def create_delta_cmd(
 
     # Name is required
     if not name:
-      typer.echo("Error: delta name is required (or use --from-backlog)", err=True)
+      typer.echo(
+        "Error: delta name is required (or use --from-backlog ITEM-ID)",
+        err=True,
+      )
       raise typer.Exit(EXIT_FAILURE)
 
     result = create_delta(
@@ -216,6 +216,7 @@ def create_delta_cmd(
     for extra in result.extras:
       typer.echo(f"  Created: {extra}")
     typer.echo(str(result.primary_path))
+    print_schema_hints("delta")
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating delta: {e}", err=True)
@@ -235,6 +236,7 @@ def create_plan_cmd(
     plan_path = create_plan(delta, repo_root=root)
     typer.echo(f"Plan created: {plan_path.stem}")
     typer.echo(str(plan_path))
+    print_schema_hints("plan")
     raise typer.Exit(EXIT_SUCCESS)
   except FileExistsError as e:
     typer.echo(f"Error: {e}", err=True)
@@ -255,6 +257,7 @@ def create_phase_cmd(
     result = create_phase(name, plan, repo_root=root)
     typer.echo(f"Phase created: {result.phase_id}")
     typer.echo(str(result.phase_path))
+    print_schema_hints("phase")
     raise typer.Exit(EXIT_SUCCESS)
   except PhaseCreationError as e:
     typer.echo(f"Error creating phase: {e}", err=True)
@@ -332,6 +335,7 @@ def create_revision_cmd(
     )
     typer.echo(f"Revision created: {result.artifact_id}")
     typer.echo(str(result.primary_path))
+    print_schema_hints("revision")
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating revision: {e}", err=True)
@@ -389,6 +393,7 @@ def create_audit_cmd(
     )
     typer.echo(f"Audit created: {result.artifact_id}")
     typer.echo(str(result.primary_path))
+    print_schema_hints("audit")
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error creating audit: {e}", err=True)
@@ -489,6 +494,7 @@ def create_policy(
     result = create_policy_impl(registry, options, sync_registry=True)
     typer.echo(f"Created policy: {result.policy_id}")
     typer.echo(str(result.path))
+    print_schema_hints("policy")
     raise typer.Exit(EXIT_SUCCESS)
 
   except PolicyAlreadyExistsError as e:
@@ -541,6 +547,7 @@ def create_standard(
     result = create_standard_impl(registry, options, sync_registry=True)
     typer.echo(f"Created standard: {result.standard_id}")
     typer.echo(str(result.path))
+    print_schema_hints("standard")
     raise typer.Exit(EXIT_SUCCESS)
 
   except StandardAlreadyExistsError as e:
@@ -800,6 +807,7 @@ def create_memory_cmd(
 
     typer.echo(f"Created memory: {result.memory_id}")
     typer.echo(str(result.path))
+    print_schema_hints("memory")
     raise typer.Exit(EXIT_SUCCESS)
 
   except MemoryAlreadyExistsError as e:

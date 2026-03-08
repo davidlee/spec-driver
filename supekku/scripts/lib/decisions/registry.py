@@ -13,6 +13,7 @@ import yaml
 from supekku.scripts.lib.core.paths import get_decisions_dir, get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
+from supekku.scripts.lib.decisions.lifecycle import ADR_STATUSES
 
 if TYPE_CHECKING:
   from collections.abc import Iterator
@@ -178,15 +179,7 @@ class DecisionRegistry:
     status = frontmatter.get("status", "").lower()
     if not status:
       # Infer from directory structure
-      status_dirs = [
-        "accepted",
-        "deprecated",
-        "superseded",
-        "rejected",
-        "proposed",
-        "draft",
-      ]
-      for status_dir in status_dirs:
+      for status_dir in ADR_STATUSES:
         if (self.directory / status_dir / adr_path.name).exists():
           status = status_dir
           break
@@ -354,18 +347,7 @@ class DecisionRegistry:
 
   def _cleanup_all_status_directories(self, decisions_dir: Path) -> None:
     """Remove all symlinks from existing status directories."""
-    # Known status directories that might contain symlinks
-    status_dirs = [
-      "accepted",
-      "draft",
-      "proposed",
-      "deprecated",
-      "superseded",
-      "rejected",
-      "revision-required",
-    ]
-
-    for status in status_dirs:
+    for status in ADR_STATUSES:
       status_dir = decisions_dir / status
       if status_dir.exists() and status_dir.is_dir():
         for item in status_dir.iterdir():

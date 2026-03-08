@@ -10,9 +10,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from supekku.scripts.lib.backlog.models import (
-  IMPROVEMENT_STATUSES,
-  ISSUE_STATUSES,
-  PROBLEM_STATUSES,
+  BACKLOG_BASE_STATUSES,
   RISK_STATUSES,
 )
 from supekku.scripts.lib.blocks.verification import (
@@ -24,10 +22,15 @@ from supekku.scripts.lib.blocks.verification import (
 from supekku.scripts.lib.changes.lifecycle import (
   VALID_STATUSES as CHANGE_STATUSES,
 )
+from supekku.scripts.lib.decisions.lifecycle import ADR_STATUSES
 from supekku.scripts.lib.drift.models import LEDGER_STATUSES
+from supekku.scripts.lib.memory.lifecycle import MEMORY_STATUSES
+from supekku.scripts.lib.policies.lifecycle import POLICY_STATUSES
 from supekku.scripts.lib.requirements.lifecycle import (
   VALID_STATUSES as REQUIREMENT_STATUSES,
 )
+from supekku.scripts.lib.specs.lifecycle import SPEC_STATUSES
+from supekku.scripts.lib.standards.lifecycle import STANDARD_STATUSES
 
 
 def _change_statuses() -> list[str]:
@@ -42,13 +45,20 @@ ENUM_REGISTRY: dict[str, Callable[[], list[str]]] = {
   "requirement.status": lambda: sorted(REQUIREMENT_STATUSES),
   "verification.kind": lambda: sorted(VERIFICATION_KINDS),
   "verification.status": lambda: sorted(VERIFICATION_STATUSES),
-  # Backlog per-kind statuses (DE-057)
-  "issue.status": lambda: sorted(ISSUE_STATUSES),
-  "problem.status": lambda: sorted(PROBLEM_STATUSES),
-  "improvement.status": lambda: sorted(IMPROVEMENT_STATUSES),
+  # Backlog statuses — unified base with risk extensions (DEC-075-05)
+  "backlog.status": lambda: sorted(BACKLOG_BASE_STATUSES),
+  "issue.status": lambda: sorted(BACKLOG_BASE_STATUSES),
+  "problem.status": lambda: sorted(BACKLOG_BASE_STATUSES),
+  "improvement.status": lambda: sorted(BACKLOG_BASE_STATUSES),
   "risk.status": lambda: sorted(RISK_STATUSES),
   # Drift ledger statuses
   "drift.status": lambda: sorted(LEDGER_STATUSES),
+  # Governance artifact statuses (DE-075)
+  "spec.status": lambda: sorted(SPEC_STATUSES),
+  "adr.status": lambda: sorted(ADR_STATUSES),
+  "policy.status": lambda: sorted(POLICY_STATUSES),
+  "standard.status": lambda: sorted(STANDARD_STATUSES),
+  "memory.status": lambda: sorted(MEMORY_STATUSES),
   # No lifecycle constants — stable conventions
   "command.format": lambda: ["json", "table", "tsv"],
   "requirement.kind": lambda: ["FR", "NF"],

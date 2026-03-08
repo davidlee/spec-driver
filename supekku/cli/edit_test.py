@@ -359,8 +359,28 @@ class TestEditStatusFlag:
     # File should be unchanged
     assert "status: draft" in delta_file.read_text()
 
-  def test_status_accepts_any_value_for_spec(self, tmp_path: Path) -> None:
-    """--status with any value for entity without enums succeeds."""
+  def test_status_accepts_valid_value_for_spec(self, tmp_path: Path) -> None:
+    """--status with a valid spec status succeeds."""
+    spec_file = tmp_path / "SPEC-001.md"
+    spec_file.write_text(
+      "---\nid: SPEC-001\nname: Test\nstatus: draft\n"
+      "updated: '2026-01-01'\n---\n# Spec\n"
+    )
+    mock_spec = MagicMock()
+    mock_spec.path = spec_file
+
+    with patch("supekku.cli.edit.SpecRegistry") as mock_cls:
+      mock_registry = MagicMock()
+      mock_registry.get.return_value = mock_spec
+      mock_cls.return_value = mock_registry
+
+      result = runner.invoke(app, ["spec", "SPEC-001", "--status", "active"])
+      assert result.exit_code == 0
+
+    assert "status: active" in spec_file.read_text()
+
+  def test_status_rejects_invalid_value_for_spec(self, tmp_path: Path) -> None:
+    """--status with invalid spec status fails."""
     spec_file = tmp_path / "SPEC-001.md"
     spec_file.write_text(
       "---\nid: SPEC-001\nname: Test\nstatus: draft\n"
@@ -375,9 +395,7 @@ class TestEditStatusFlag:
       mock_cls.return_value = mock_registry
 
       result = runner.invoke(app, ["spec", "SPEC-001", "--status", "anything-goes"])
-      assert result.exit_code == 0
-
-    assert "status: anything-goes" in spec_file.read_text()
+      assert result.exit_code != 0
 
   def test_status_rejects_empty_value(self, tmp_path: Path) -> None:
     """--status with empty string fails."""

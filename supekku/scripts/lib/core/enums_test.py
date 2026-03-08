@@ -5,6 +5,55 @@ import pytest
 from .enums import get_enum_values, list_enum_paths, validate_status_for_entity
 
 
+class TestGovernanceEnumValues:
+  """Tests for governance artifact status enums (DE-075)."""
+
+  def test_spec_statuses(self) -> None:
+    values = get_enum_values("spec.status")
+    assert values is not None
+    assert set(values) == {"stub", "draft", "active", "deprecated", "archived"}
+
+  def test_adr_statuses(self) -> None:
+    values = get_enum_values("adr.status")
+    assert values is not None
+    assert set(values) == {
+      "draft", "proposed", "accepted", "rejected",
+      "deprecated", "superseded", "revision-required",
+    }
+
+  def test_policy_statuses(self) -> None:
+    values = get_enum_values("policy.status")
+    assert values is not None
+    assert set(values) == {"draft", "required", "deprecated"}
+
+  def test_standard_statuses(self) -> None:
+    values = get_enum_values("standard.status")
+    assert values is not None
+    assert set(values) == {"draft", "required", "default", "deprecated"}
+
+  def test_memory_statuses(self) -> None:
+    values = get_enum_values("memory.status")
+    assert values is not None
+    assert set(values) == {"draft", "active", "review", "superseded", "archived"}
+
+  def test_backlog_base_statuses(self) -> None:
+    values = get_enum_values("backlog.status")
+    assert values is not None
+    assert set(values) == {"open", "triaged", "in-progress", "resolved"}
+
+  def test_risk_statuses_include_extensions(self) -> None:
+    values = get_enum_values("risk.status")
+    assert values is not None
+    assert "accepted" in values
+    assert "expired" in values
+    assert "open" in values  # base included
+
+  def test_non_risk_backlog_kinds_share_base(self) -> None:
+    base = get_enum_values("backlog.status")
+    for kind in ("issue", "problem", "improvement"):
+      assert get_enum_values(f"{kind}.status") == base, kind
+
+
 class TestGetEnumValues:
   """Tests for get_enum_values()."""
 
@@ -58,7 +107,7 @@ class TestValidateStatusForEntity:
       validate_status_for_entity("issue", "nonexistent")
 
   def test_accepts_any_status_for_unknown_entity(self) -> None:
-    validate_status_for_entity("spec", "anything-goes")  # no enum → accept
+    validate_status_for_entity("widget", "anything-goes")  # no enum → accept
 
   def test_rejects_empty_status(self) -> None:
     with pytest.raises(ValueError, match="must not be empty"):
@@ -77,9 +126,28 @@ class TestValidateStatusForEntity:
 
   def test_accepts_valid_backlog_statuses(self) -> None:
     validate_status_for_entity("issue", "open")
-    validate_status_for_entity("problem", "captured")
-    validate_status_for_entity("improvement", "idea")
-    validate_status_for_entity("risk", "suspected")
+    validate_status_for_entity("problem", "in-progress")
+    validate_status_for_entity("improvement", "triaged")
+    validate_status_for_entity("risk", "accepted")
+
+  def test_rejects_invalid_backlog_status(self) -> None:
+    with pytest.raises(ValueError, match="Invalid status.*issue"):
+      validate_status_for_entity("issue", "bogus")
+
+  def test_accepts_valid_governance_statuses(self) -> None:
+    validate_status_for_entity("spec", "active")
+    validate_status_for_entity("adr", "accepted")
+    validate_status_for_entity("policy", "required")
+    validate_status_for_entity("standard", "default")
+    validate_status_for_entity("memory", "review")
+
+  def test_rejects_invalid_governance_statuses(self) -> None:
+    with pytest.raises(ValueError, match="Invalid status.*spec"):
+      validate_status_for_entity("spec", "live")
+    with pytest.raises(ValueError, match="Invalid status.*policy"):
+      validate_status_for_entity("policy", "active")
+    with pytest.raises(ValueError, match="Invalid status.*memory"):
+      validate_status_for_entity("memory", "obsolete")
 
 
 class TestListEnumPaths:
@@ -89,15 +157,22 @@ class TestListEnumPaths:
     paths = list_enum_paths()
     assert paths == sorted(paths)
 
-  def test_includes_new_entries(self) -> None:
+  def test_includes_expected_entries(self) -> None:
     paths = list_enum_paths()
     for expected in (
-      "issue.status",
-      "problem.status",
-      "improvement.status",
-      "risk.status",
+      "adr.status",
+      "backlog.status",
+      "delta.status",
       "drift.status",
+      "issue.status",
+      "improvement.status",
+      "memory.status",
+      "policy.status",
+      "problem.status",
+      "requirement.status",
       "revision.status",
-      "audit.status",
+      "risk.status",
+      "spec.status",
+      "standard.status",
     ):
       assert expected in paths, f"{expected} missing from enum paths"

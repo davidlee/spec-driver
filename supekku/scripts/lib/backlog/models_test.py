@@ -1,51 +1,70 @@
-"""Tests for backlog models and status vocabulary (VT-057-status-enums)."""
+"""Tests for backlog models and status vocabulary (VT-057 + VT-075)."""
 
 from __future__ import annotations
 
 import unittest
 
 from supekku.scripts.lib.backlog.models import (
+  ALL_VALID_STATUSES,
+  BACKLOG_BASE_STATUSES,
   BACKLOG_STATUSES,
   DEFAULT_HIDDEN_STATUSES,
-  IMPROVEMENT_STATUSES,
-  ISSUE_STATUSES,
-  PROBLEM_STATUSES,
+  RISK_EXTRA_STATUSES,
   RISK_STATUSES,
   is_valid_status,
 )
 
 
-class StatusSetsTest(unittest.TestCase):
-  """Test per-kind status frozensets."""
+class UnifiedStatusSetsTest(unittest.TestCase):
+  """Test unified backlog status sets (DEC-075-05)."""
 
-  def test_issue_default_in_set(self) -> None:
-    assert "open" in ISSUE_STATUSES
+  def test_base_statuses(self) -> None:
+    assert frozenset({
+      "open", "triaged", "in-progress", "resolved",
+    }) == BACKLOG_BASE_STATUSES
 
-  def test_problem_default_in_set(self) -> None:
-    assert "captured" in PROBLEM_STATUSES
+  def test_risk_extra_statuses(self) -> None:
+    assert frozenset({"accepted", "expired"}) == RISK_EXTRA_STATUSES
 
-  def test_improvement_default_in_set(self) -> None:
-    assert "idea" in IMPROVEMENT_STATUSES
-
-  def test_risk_default_in_set(self) -> None:
-    assert "suspected" in RISK_STATUSES
+  def test_risk_statuses_is_superset_of_base(self) -> None:
+    assert RISK_STATUSES == BACKLOG_BASE_STATUSES | RISK_EXTRA_STATUSES
 
   def test_backlog_statuses_covers_all_kinds(self) -> None:
     assert set(BACKLOG_STATUSES.keys()) == {"issue", "problem", "improvement", "risk"}
 
-  def test_default_hidden_matches_current_behaviour(self) -> None:
-    """DEFAULT_HIDDEN_STATUSES must match current list_backlog() exclusion."""
-    assert frozenset({"resolved", "implemented"}) == DEFAULT_HIDDEN_STATUSES
+  def test_non_risk_kinds_share_base(self) -> None:
+    for kind in ("issue", "problem", "improvement"):
+      assert BACKLOG_STATUSES[kind] is BACKLOG_BASE_STATUSES, kind
+
+  def test_risk_kind_has_extensions(self) -> None:
+    assert BACKLOG_STATUSES["risk"] is RISK_STATUSES
+
+  def test_default_hidden_statuses(self) -> None:
+    assert frozenset({"resolved"}) == DEFAULT_HIDDEN_STATUSES
+
+  def test_all_valid_statuses(self) -> None:
+    assert ALL_VALID_STATUSES == BACKLOG_BASE_STATUSES | RISK_EXTRA_STATUSES
+
+  def test_sets_are_frozen(self) -> None:
+    for s in (BACKLOG_BASE_STATUSES, RISK_EXTRA_STATUSES, RISK_STATUSES):
+      assert isinstance(s, frozenset)
 
 
 class IsValidStatusTest(unittest.TestCase):
   """Test is_valid_status() helper."""
 
-  def test_known_status_returns_true(self) -> None:
-    assert is_valid_status("issue", "open") is True
-    assert is_valid_status("problem", "captured") is True
-    assert is_valid_status("improvement", "idea") is True
-    assert is_valid_status("risk", "suspected") is True
+  def test_base_status_valid_for_all_kinds(self) -> None:
+    for kind in ("issue", "problem", "improvement", "risk"):
+      assert is_valid_status(kind, "open") is True
+
+  def test_risk_extra_valid_for_risk(self) -> None:
+    assert is_valid_status("risk", "accepted") is True
+    assert is_valid_status("risk", "expired") is True
+
+  def test_risk_extra_invalid_for_non_risk(self) -> None:
+    with self.assertLogs("supekku.scripts.lib.backlog.models", level="WARNING"):
+      result = is_valid_status("issue", "accepted")
+    assert result is False
 
   def test_unknown_status_returns_false(self) -> None:
     with self.assertLogs("supekku.scripts.lib.backlog.models", level="WARNING"):
@@ -58,9 +77,6 @@ class IsValidStatusTest(unittest.TestCase):
     assert result is False
 
   def test_terminal_statuses_are_valid(self) -> None:
-    """All DEFAULT_HIDDEN_STATUSES must be valid for at least one kind."""
-    from supekku.scripts.lib.backlog.models import ALL_VALID_STATUSES  # noqa: PLC0415
-
     for status in DEFAULT_HIDDEN_STATUSES:
       assert status in ALL_VALID_STATUSES, f"{status} not in any kind's status set"
 

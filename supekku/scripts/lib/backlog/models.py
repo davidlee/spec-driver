@@ -13,65 +13,36 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
-# -- Per-kind accepted lifecycle statuses (DEC-057-02) --
+# -- Unified backlog lifecycle statuses (DEC-075-05, supersedes DEC-057-02) --
 
-ISSUE_STATUSES: frozenset[str] = frozenset(
-  {
-    "open",
-    "triaged",
-    "in-progress",
-    "resolved",
-    "done",
-    "implemented",
-    "verified",
-  }
-)
+BACKLOG_BASE_STATUSES: frozenset[str] = frozenset({
+  "open",
+  "triaged",
+  "in-progress",
+  "resolved",
+})
 
-PROBLEM_STATUSES: frozenset[str] = frozenset(
-  {
-    "captured",
-    "investigating",
-    "mitigated",
-    "resolved",
-  }
-)
+RISK_EXTRA_STATUSES: frozenset[str] = frozenset({
+  "accepted",
+  "expired",
+})
 
-IMPROVEMENT_STATUSES: frozenset[str] = frozenset(
-  {
-    "idea",
-    "planned",
-    "in-progress",
-    "implemented",
-  }
-)
+RISK_STATUSES: frozenset[str] = BACKLOG_BASE_STATUSES | RISK_EXTRA_STATUSES
 
-RISK_STATUSES: frozenset[str] = frozenset(
-  {
-    "suspected",
-    "confirmed",
-    "mitigated",
-    "accepted",
-    "expired",
-  }
-)
-
+# Per-kind lookup — all non-risk kinds share the base set.
 BACKLOG_STATUSES: dict[str, frozenset[str]] = {
-  "issue": ISSUE_STATUSES,
-  "problem": PROBLEM_STATUSES,
-  "improvement": IMPROVEMENT_STATUSES,
+  "issue": BACKLOG_BASE_STATUSES,
+  "problem": BACKLOG_BASE_STATUSES,
+  "improvement": BACKLOG_BASE_STATUSES,
   "risk": RISK_STATUSES,
 }
 
 # Statuses excluded from default list views.
-# Matches current list_backlog() hardcoded exclusion — no behaviour change.
-DEFAULT_HIDDEN_STATUSES: frozenset[str] = frozenset(
-  {
-    "resolved",
-    "implemented",
-  }
-)
+DEFAULT_HIDDEN_STATUSES: frozenset[str] = frozenset({
+  "resolved",
+})
 
-ALL_VALID_STATUSES: frozenset[str] = frozenset().union(*BACKLOG_STATUSES.values())
+ALL_VALID_STATUSES: frozenset[str] = BACKLOG_BASE_STATUSES | RISK_EXTRA_STATUSES
 
 
 def is_valid_status(kind: str, status: str) -> bool:

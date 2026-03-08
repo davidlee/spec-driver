@@ -8626,7 +8626,7 @@ deltas:
         phase: IP-074-P01
   DE-075:
     kind: delta
-    status: in-progress
+    status: completed
     name: Status enum coverage for governance artifacts
     slug: status_fields_lack_enums_and_need_systematic_review
     updated: '2026-03-09'
@@ -8844,9 +8844,9 @@ deltas:
           name: Backlog requirement sync and CLI filtering
           objective: Add backlog source to sync, heading regex, source_kind fields,
             CLI filter
-          entrance_criteria: &id009
+          entrance_criteria:
           - Phase 1 complete and committed
-          exit_criteria: &id010
+          exit_criteria:
           - _REQUIREMENT_HEADING regex matches dotted backlog format
           - RequirementRecord has source_kind/source_type fields with serialization
           - sync() accepts backlog_registry, iterates items, extracts requirements
@@ -8854,7 +8854,6 @@ deltas:
           - Source column in table output
           - All new and regression tests pass
           - Linters pass
-        - id: IP-076.PHASE-01
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -8862,28 +8861,74 @@ deltas:
         plan: IP-076
         delta: DE-076
         objective: "Extract _upsert_record, eliminate _iter_plan_files, rename sync_from_specs\
-          \ \u2192 sync()"
+          \ \u2192 sync(). Pure refactor \u2014 no behavioral change."
         entrance_criteria:
         - DR-076 design decisions DEC-076-01, DEC-076-04 reviewed
         - Existing test suite passing
         exit_criteria:
-        - All existing tests pass unchanged
-        - Linters pass
-        - _iter_plan_files removed
         - _upsert_record extracted, both call sites consolidated
+        - _iter_plan_files removed, replaced with _iter_change_files(dirs, prefix="IP-")
         - sync() is primary method, sync_from_specs is deprecated alias
+        - All existing tests pass unchanged
+        - Linters pass (ruff + pylint)
         verification:
-          tests: []
+          tests:
+          - VT-COMPAT-076-005
           evidence: []
-        tasks: []
+        tasks:
+        - id: T1
+          name: Extract _upsert_record helper
+        - id: T2
+          name: Eliminate _iter_plan_files
+        - id: T3
+          name: "Rename sync_from_specs \u2192 sync()"
         risks: []
-      - id: IP-076.PHASE-02
-        name: Backlog requirement sync and CLI filtering
-        objective: Add backlog source to sync, heading regex, source_kind fields,
-          CLI filter
-        entrance_criteria: *id009
-        exit_criteria: *id010
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-076.PHASE-02
+        plan: IP-076
+        delta: DE-076
+        objective: Add heading regex for dotted backlog format, source_kind/source_type
+          fields, backlog sync loop, CLI --source-kind filter, and Source column in
+          formatter.
+        entrance_criteria:
+        - Phase 1 complete and committed
+        exit_criteria:
+        - _REQUIREMENT_HEADING regex matches dotted backlog format
+        - RequirementRecord has source_kind/source_type with to_dict/from_dict/merge
+          support
+        - sync() accepts backlog_registry, iterates items, extracts requirements
+        - CLI --source-kind filter works (single and multi-value)
+        - Source column in table output
+        - All VT artifacts verified
+        - All existing tests pass (regression)
+        - Linters pass (ruff + pylint)
+        verification:
+          tests:
+          - VT-REGEX-076-001
+          - VT-SYNC-076-002
+          - VT-UPSERT-076-003
+          - VT-FILTER-076-004
+          - VT-COMPAT-076-005
+          - VT-COVERAGE-076-006
+          evidence: []
+        tasks:
+        - id: T1
+          name: Add _REQUIREMENT_HEADING regex
+        - id: T2
+          name: Add source_kind/source_type to RequirementRecord
+        - id: T3
+          name: Add backlog sync loop to sync()
+        - id: T4
+          name: Add --source-kind CLI filter
+        - id: T5
+          name: Add Source column to formatter
+        - id: T6
+          name: Wire up cli/sync.py
+        risks:
+        - id: R1
+          description: Backlog items with non-standard requirement format
+          mitigation: Graceful skip with warning log
   DE-077:
     kind: delta
     status: draft

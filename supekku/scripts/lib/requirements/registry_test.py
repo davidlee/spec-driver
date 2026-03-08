@@ -23,8 +23,11 @@ from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.relations.manager import add_relation
 from supekku.scripts.lib.requirements.lifecycle import (
   STATUS_ACTIVE,
+  STATUS_DEPRECATED,
   STATUS_IN_PROGRESS,
   STATUS_PENDING,
+  STATUS_SUPERSEDED,
+  TERMINAL_STATUSES,
 )
 from supekku.scripts.lib.requirements.registry import (
   _REQUIREMENT_HEADING,
@@ -2067,6 +2070,372 @@ class TestBacklogRequirementSync(unittest.TestCase):
     # Record exists after sync (not purged by cleanup)
     assert "PROB-001.FR-001.001" in registry.records
     assert registry.records["PROB-001.FR-001.001"].source_kind == "problem"
+
+
+class TestCoverageReplacementSemantics(unittest.TestCase):
+  """VT-081-001: Coverage evidence is rebuilt fresh each sync."""
+
+  def _make_repo(self) -> Path:
+    root = Path(tempfile.mkdtemp())
+    (root / ".git").mkdir()
+    return root
+
+  def _write_spec(self, root: Path, spec_id: str, body: str) -> Path:
+    """Write a spec file and return the tech specs root directory."""
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / spec_id.lower()
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_file = spec_dir / f"{spec_id}.md"
+    dump_markdown_file(
+      spec_file,
+      {"id": spec_id, "status": "draft", "kind": "spec"},
+      body,
+    )
+    return root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
+
+  def test_coverage_evidence_replaced_not_accumulated(self) -> None:
+    """Removing an artefact from a coverage block removes it from evidence."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body_v1 = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: First requirement
+
+      ```yaml supekku:verification.coverage@v1
+      schema: supekku.verification.coverage
+      version: 1
+      subject: SPEC-800
+      entries:
+        - artefact: VT-801
+          kind: VT
+          requirement: SPEC-800.FR-001
+          status: verified
+        - artefact: VT-802
+          kind: VT
+          requirement: SPEC-800.FR-001
+          status: verified
+      ```
+    """)
+    specs_root = self._write_spec(root, "SPEC-800", body_v1)
+
+    registry.sync_from_specs(spec_dirs=[specs_root])
+    fr001 = registry.records["SPEC-800.FR-001"]
+    assert fr001.coverage_evidence == ["VT-801", "VT-802"]
+
+    # Now remove VT-802 from coverage block
+    body_v2 = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: First requirement
+
+      ```yaml supekku:verification.coverage@v1
+      schema: supekku.verification.coverage
+      version: 1
+      subject: SPEC-800
+      entries:
+        - artefact: VT-801
+          kind: VT
+          requirement: SPEC-800.FR-001
+          status: verified
+      ```
+    """)
+    spec_file = specs_root / "spec-800" / "SPEC-800.md"
+    dump_markdown_file(
+      spec_file,
+      {"id": "SPEC-800", "status": "draft", "kind": "spec"},
+      body_v2,
+    )
+
+    registry.sync_from_specs(spec_dirs=[specs_root])
+    fr001 = registry.records["SPEC-800.FR-001"]
+    # VT-802 should be gone — replacement, not accumulation
+    assert fr001.coverage_evidence == ["VT-801"]
+
+  def test_sync_idempotency(self) -> None:
+    """Running sync twice produces identical registry (NF-002)."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: First requirement
+      - **NF-001**: Non-functional requirement
+
+      ```yaml supekku:verification.coverage@v1
+      schema: supekku.verification.coverage
+      version: 1
+      subject: SPEC-810
+      entries:
+        - artefact: VT-811
+          kind: VT
+          requirement: SPEC-810.FR-001
+          status: verified
+      ```
+    """)
+    specs_root = self._write_spec(root, "SPEC-810", body)
+
+    # First sync
+    registry1 = RequirementsRegistry(registry_path)
+    registry1.sync_from_specs(spec_dirs=[specs_root])
+    registry1.save()
+    content1 = registry_path.read_text(encoding="utf-8")
+
+    # Second sync
+    registry2 = RequirementsRegistry(registry_path)
+    registry2.sync_from_specs(spec_dirs=[specs_root])
+    registry2.save()
+    content2 = registry_path.read_text(encoding="utf-8")
+
+    assert content1 == content2
+
+  def test_removed_coverage_block_clears_evidence(self) -> None:
+    """Removing entire coverage block clears evidence for affected requirements."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body_with_coverage = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: Covered requirement
+
+      ```yaml supekku:verification.coverage@v1
+      schema: supekku.verification.coverage
+      version: 1
+      subject: SPEC-820
+      entries:
+        - artefact: VT-821
+          kind: VT
+          requirement: SPEC-820.FR-001
+          status: verified
+      ```
+    """)
+    specs_root = self._write_spec(root, "SPEC-820", body_with_coverage)
+    registry.sync_from_specs(spec_dirs=[specs_root])
+    assert registry.records["SPEC-820.FR-001"].coverage_evidence == ["VT-821"]
+    assert registry.records["SPEC-820.FR-001"].status == STATUS_ACTIVE
+
+    # Remove entire coverage block
+    body_without_coverage = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: Covered requirement
+    """)
+    spec_file = specs_root / "spec-820" / "SPEC-820.md"
+    dump_markdown_file(
+      spec_file,
+      {"id": "SPEC-820", "status": "draft", "kind": "spec"},
+      body_without_coverage,
+    )
+
+    registry.sync_from_specs(spec_dirs=[specs_root])
+    fr001 = registry.records["SPEC-820.FR-001"]
+    assert fr001.coverage_evidence == []
+    assert fr001.coverage_entries == []
+    # Status preserved — losing evidence doesn't downgrade (ADR-008 §3)
+    assert fr001.status == STATUS_ACTIVE
+
+
+class TestTerminalStatusGuard(unittest.TestCase):
+  """VT-081-002: Terminal statuses not overwritten by coverage derivation."""
+
+  def _make_repo(self) -> Path:
+    root = Path(tempfile.mkdtemp())
+    (root / ".git").mkdir()
+    return root
+
+  def _write_spec(self, root: Path, spec_id: str, body: str) -> Path:
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / spec_id.lower()
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    dump_markdown_file(
+      spec_dir / f"{spec_id}.md",
+      {"id": spec_id, "status": "draft", "kind": "spec"},
+      body,
+    )
+    return root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
+
+  def test_deprecated_status_constants(self) -> None:
+    """deprecated and superseded are valid requirement statuses."""
+    assert STATUS_DEPRECATED == "deprecated"
+    assert STATUS_SUPERSEDED == "superseded"
+    assert STATUS_DEPRECATED in TERMINAL_STATUSES
+    assert STATUS_SUPERSEDED in TERMINAL_STATUSES
+
+  def test_deprecated_not_overwritten_by_coverage(self) -> None:
+    """A deprecated requirement keeps its status despite verified coverage."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: Deprecated requirement
+
+      ```yaml supekku:verification.coverage@v1
+      schema: supekku.verification.coverage
+      version: 1
+      subject: SPEC-830
+      entries:
+        - artefact: VT-831
+          kind: VT
+          requirement: SPEC-830.FR-001
+          status: verified
+      ```
+    """)
+    specs_root = self._write_spec(root, "SPEC-830", body)
+
+    registry.sync_from_specs(spec_dirs=[specs_root])
+    assert registry.records["SPEC-830.FR-001"].status == STATUS_ACTIVE
+
+    # Manually set to deprecated (normative lifecycle claim)
+    registry.records["SPEC-830.FR-001"].status = STATUS_DEPRECATED
+
+    # Re-sync — coverage says verified, but deprecated is terminal
+    registry.sync_from_specs(spec_dirs=[specs_root])
+    assert registry.records["SPEC-830.FR-001"].status == STATUS_DEPRECATED
+
+  def test_superseded_not_overwritten_by_coverage(self) -> None:
+    """A superseded requirement keeps its status despite coverage."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: Superseded requirement
+
+      ```yaml supekku:verification.coverage@v1
+      schema: supekku.verification.coverage
+      version: 1
+      subject: SPEC-840
+      entries:
+        - artefact: VT-841
+          kind: VT
+          requirement: SPEC-840.FR-001
+          status: in-progress
+      ```
+    """)
+    specs_root = self._write_spec(root, "SPEC-840", body)
+
+    registry.sync_from_specs(spec_dirs=[specs_root])
+    registry.records["SPEC-840.FR-001"].status = STATUS_SUPERSEDED
+    registry.sync_from_specs(spec_dirs=[specs_root])
+    assert registry.records["SPEC-840.FR-001"].status == STATUS_SUPERSEDED
+
+
+class TestInlineRequirementTags(unittest.TestCase):
+  """VT-081-003: Inline tag extraction from [tag1, tag2] syntax."""
+
+  def _make_repo(self) -> Path:
+    root = Path(tempfile.mkdtemp())
+    (root / ".git").mkdir()
+    return root
+
+  def _write_spec(self, root: Path, spec_id: str, body: str) -> Path:
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / spec_id.lower()
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    dump_markdown_file(
+      spec_dir / f"{spec_id}.md",
+      {"id": spec_id, "status": "draft", "kind": "spec"},
+      body,
+    )
+    return root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
+
+  def test_tags_extracted_from_inline_syntax(self) -> None:
+    """Tags in [brackets] after category are parsed."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**(api)[security, auth]: Validate tokens
+      - **FR-002**[performance]: Fast response
+      - **NF-001**(infra)[reliability, ha]: High availability
+      - **FR-003**: No tags here
+    """)
+    specs_root = self._write_spec(root, "SPEC-850", body)
+
+    registry.sync_from_specs(spec_dirs=[specs_root])
+
+    fr001 = registry.records["SPEC-850.FR-001"]
+    assert fr001.tags == ["auth", "security"]
+    assert fr001.category == "api"
+
+    fr002 = registry.records["SPEC-850.FR-002"]
+    assert fr002.tags == ["performance"]
+    assert fr002.category is None
+
+    nf001 = registry.records["SPEC-850.NF-001"]
+    assert nf001.tags == ["ha", "reliability"]
+    assert nf001.category == "infra"
+
+    fr003 = registry.records["SPEC-850.FR-003"]
+    assert fr003.tags == []
+
+  def test_tags_populated_in_registry_after_save_load(self) -> None:
+    """Tags survive save/load round-trip."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**[alpha, beta]: Tagged requirement
+    """)
+    specs_root = self._write_spec(root, "SPEC-860", body)
+
+    registry.sync_from_specs(spec_dirs=[specs_root])
+    registry.save()
+
+    # Reload
+    registry2 = RequirementsRegistry(registry_path)
+    fr001 = registry2.records["SPEC-860.FR-001"]
+    assert fr001.tags == ["alpha", "beta"]
+
+  def test_filter_by_tag(self) -> None:
+    """filter(tag=...) returns only tagged requirements."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**[security]: Secure endpoint
+      - **FR-002**[performance]: Fast endpoint
+      - **FR-003**[security, performance]: Both
+    """)
+    specs_root = self._write_spec(root, "SPEC-870", body)
+
+    registry.sync_from_specs(spec_dirs=[specs_root])
+
+    security = registry.filter(tag="security")
+    assert {r.uid for r in security} == {
+      "SPEC-870.FR-001", "SPEC-870.FR-003",
+    }
+
+    perf = registry.filter(tag="performance")
+    assert {r.uid for r in perf} == {
+      "SPEC-870.FR-002", "SPEC-870.FR-003",
+    }
+
+    none = registry.filter(tag="nonexistent")
+    assert none == []
+
+  def test_tags_merged_on_multi_spec_sync(self) -> None:
+    """Tags from multiple specs are unioned during merge."""
+    record1 = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Shared requirement",
+      tags=["alpha", "beta"],
+    )
+    record2 = RequirementRecord(
+      uid="SPEC-001.FR-001",
+      label="FR-001",
+      title="Shared requirement",
+      tags=["beta", "gamma"],
+    )
+    merged = record1.merge(record2)
+    assert merged.tags == ["alpha", "beta", "gamma"]
 
 
 if __name__ == "__main__":

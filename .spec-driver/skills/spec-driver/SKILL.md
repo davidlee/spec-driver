@@ -84,4 +84,7 @@ listing the relevant entities instead of dumping every help screen.
   `list backlog` defaults to `--limit 20` and excludes resolved/implemented items unless you use `-a`;
   singular and plural subcommands both work.
 - `spec-driver create delta --from-backlog <item-id>` is the direct promotion path
-  from backlog capture to intentional change.
+  from backlog capture to intentional change. `--from-backlog` is a boolean
+  flag; the item ID is passed as the positional name argument.
+- After creation, commands print `schema show` hints for inspecting the
+  generated artifact's YAML block and frontmatter schemas.

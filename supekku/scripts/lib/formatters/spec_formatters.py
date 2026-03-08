@@ -8,19 +8,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
   EXT_ID_COLUMN,
+  PACKAGES_COLUMN,
   SPEC_COLUMNS,
   column_labels,
 )
 from supekku.scripts.lib.formatters.table_utils import (
-  add_row_with_truncation,
-  calculate_column_widths,
-  create_table,
   format_as_json,
-  format_as_tsv,
-  get_terminal_width,
-  render_table,
+  format_list_table,
 )
 from supekku.scripts.lib.formatters.theme import get_spec_status_style
 
@@ -102,58 +99,43 @@ def format_spec_list_table(
   Returns:
     Formatted string in requested format
   """
-  if format_type == "json":
-    return format_spec_list_json(specs)
-
-  if format_type == "tsv":
-    rows = []
-    for spec in specs:
-      row = [spec.id]
-      if show_external:
-        row.append(spec.ext_id)
-      row.extend([spec.name, spec.status])
-      if include_packages:
-        row.append(format_package_list(spec.packages))
-      rows.append(row)
-    return format_as_tsv(rows)
-
-  # table format
   col_defs = list(SPEC_COLUMNS)
   if show_external:
     col_defs.insert(1, EXT_ID_COLUMN)
-  columns = column_labels(col_defs)
   if include_packages:
-    columns.append("Packages")
+    col_defs.append(PACKAGES_COLUMN)
 
-  table = create_table(columns=columns, title="Specifications")
-
-  terminal_width = get_terminal_width()
-  num_cols = len(columns)
-  max_widths = calculate_column_widths(terminal_width, num_columns=num_cols)
-
-  for spec in specs:
+  def _row(spec: Spec) -> list[str]:
     styled_id = f"[spec.id]{spec.id}[/spec.id]"
-
-    tags = ", ".join(spec.tags) if spec.tags else ""
-    tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
-
     status_style = get_spec_status_style(spec.status)
     styled_status = f"[{status_style}]{spec.status}[/{status_style}]"
-
-    row_data = [styled_id]
+    row = [styled_id]
     if show_external:
-      row_data.append(spec.ext_id)
-    row_data.extend([spec.name, tags_styled, styled_status])
+      row.append(spec.ext_id)
+    row.extend([spec.name, format_tags_cell(spec.tags), styled_status])
     if include_packages:
-      row_data.append(format_package_list(spec.packages))
+      row.append(format_package_list(spec.packages))
+    return row
 
-    add_row_with_truncation(
-      table,
-      row_data,
-      max_widths=max_widths if truncate else None,
-    )
+  def _tsv_row(spec: Spec) -> list[str]:
+    row = [spec.id]
+    if show_external:
+      row.append(spec.ext_id)
+    row.extend([spec.name, spec.status])
+    if include_packages:
+      row.append(format_package_list(spec.packages))
+    return row
 
-  return render_table(table)
+  return format_list_table(
+    specs,
+    columns=column_labels(col_defs),
+    title="Specifications",
+    prepare_row=_row,
+    prepare_tsv_row=_tsv_row,
+    to_json=format_spec_list_json,
+    format_type=format_type,
+    truncate=truncate,
+  )
 
 
 def _format_basic_fields(spec: Spec) -> list[str]:

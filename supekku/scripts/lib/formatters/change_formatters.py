@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.blocks.plan import extract_phase_tracking
+from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
   CHANGE_COLUMNS,
   EXT_ID_COLUMN,
@@ -21,13 +22,9 @@ from supekku.scripts.lib.formatters.column_defs import (
   column_labels,
 )
 from supekku.scripts.lib.formatters.table_utils import (
-  add_row_with_truncation,
-  calculate_column_widths,
   create_table,
   format_as_json,
-  format_as_tsv,
   format_list_table,
-  get_terminal_width,
   render_table,
 )
 from supekku.scripts.lib.formatters.theme import get_change_status_style
@@ -125,6 +122,22 @@ def format_change_with_context(artifact: ChangeArtifact) -> str:
   return "\n".join(lines)
 
 
+def _prepare_change_row(change: ChangeArtifact) -> list[str]:
+  """Prepare a single change artifact row with styling."""
+  styled_id = f"[change.id]{change.id}[/change.id]"
+  display_name = change.name
+  if change.kind == "delta" and display_name.startswith("Delta - "):
+    display_name = display_name[8:]
+  status_style = get_change_status_style(change.status)
+  styled_status = f"[{status_style}]{change.status}[/{status_style}]"
+  return [styled_id, display_name, format_tags_cell(change.tags), styled_status]
+
+
+def _prepare_change_tsv_row(change: ChangeArtifact) -> list[str]:
+  """Prepare a single change artifact as a plain TSV row."""
+  return [change.id, change.status, change.name]
+
+
 def format_change_list_table(
   changes: Sequence[ChangeArtifact],
   format_type: str = "table",
@@ -143,56 +156,32 @@ def format_change_list_table(
   Returns:
     Formatted string in requested format
   """
-  if format_type == "json":
-    return format_change_list_json(changes)
-
-  if format_type == "tsv":
-    rows = []
-    for change in changes:
-      row = [change.id]
-      if show_external:
-        row.append(change.ext_id)
-      row.extend([change.status, change.name])
-      rows.append(row)
-    return format_as_tsv(rows)
-
-  # table format
   col_defs = list(CHANGE_COLUMNS)
   if show_external:
     col_defs.insert(1, EXT_ID_COLUMN)
-  table = create_table(
+
+  def _row(change: ChangeArtifact) -> list[str]:
+    row = _prepare_change_row(change)
+    if show_external:
+      row.insert(1, change.ext_id)
+    return row
+
+  def _tsv_row(change: ChangeArtifact) -> list[str]:
+    row = _prepare_change_tsv_row(change)
+    if show_external:
+      row.insert(1, change.ext_id)
+    return row
+
+  return format_list_table(
+    changes,
     columns=column_labels(col_defs),
     title="Change Artifacts",
+    prepare_row=_row,
+    prepare_tsv_row=_tsv_row,
+    to_json=format_change_list_json,
+    format_type=format_type,
+    truncate=truncate,
   )
-
-  terminal_width = get_terminal_width()
-  max_widths = calculate_column_widths(terminal_width, num_columns=len(col_defs))
-
-  for change in changes:
-    styled_id = f"[change.id]{change.id}[/change.id]"
-
-    display_name = change.name
-    if change.kind == "delta" and display_name.startswith("Delta - "):
-      display_name = display_name[8:]
-
-    tags = ", ".join(change.tags) if change.tags else ""
-    tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
-
-    status_style = get_change_status_style(change.status)
-    styled_status = f"[{status_style}]{change.status}[/{status_style}]"
-
-    row = [styled_id]
-    if show_external:
-      row.append(change.ext_id)
-    row.extend([display_name, tags_styled, styled_status])
-
-    add_row_with_truncation(
-      table,
-      row,
-      max_widths=max_widths if truncate else None,
-    )
-
-  return render_table(table)
 
 
 def _format_change_basic_fields(artifact: ChangeArtifact) -> list[str]:

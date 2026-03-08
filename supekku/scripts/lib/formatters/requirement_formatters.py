@@ -6,20 +6,18 @@ Formatters take RequirementRecord objects and return formatted strings for displ
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
   EXT_ID_COLUMN,
   REQUIREMENT_COLUMNS,
   column_labels,
 )
 from supekku.scripts.lib.formatters.table_utils import (
-  add_row_with_truncation,
-  create_table,
   format_as_json,
-  format_as_tsv,
-  get_terminal_width,
-  render_table,
+  format_list_table,
 )
 from supekku.scripts.lib.formatters.theme import get_requirement_status_style
 
@@ -27,6 +25,72 @@ if TYPE_CHECKING:
   from collections.abc import Sequence
 
   from supekku.scripts.lib.requirements.registry import RequirementRecord
+
+
+def _prepare_requirement_row(req: RequirementRecord) -> list[str]:
+  """Prepare a single requirement row with styling."""
+  spec = req.primary_spec or (req.specs[0] if req.specs else "—")
+  spec_styled = f"[spec.id]{spec}[/spec.id]"
+  label_styled = f"[requirement.id]{req.label}[/requirement.id]"
+  category = req.category or "—"
+  category_styled = f"[requirement.category]{category}[/requirement.category]"
+  status_style = get_requirement_status_style(req.status)
+  status_styled = f"[{status_style}]{req.status}[/{status_style}]"
+  return [
+    spec_styled,
+    label_styled,
+    category_styled,
+    req.title,
+    format_tags_cell(req.tags),
+    status_styled,
+  ]
+
+
+def _prepare_requirement_tsv_row(req: RequirementRecord) -> list[str]:
+  """Prepare a single requirement as a plain TSV row."""
+  spec = req.primary_spec or (req.specs[0] if req.specs else "")
+  category = req.category or "-"
+  return [spec, req.label, category, req.title, req.status]
+
+
+def _requirement_column_widths(
+  show_external: bool = False,
+) -> Callable[[int], dict[int, int]]:
+  """Return a column-width calculator for the requirement table layout."""
+
+  def _calc(terminal_width: int) -> dict[int, int]:
+    reserved = 10
+    spec_width = 10
+    label_width = 8
+    ext_id_width = 14 if show_external else 0
+    category_width = 12
+    tags_width = 20
+    status_width = 12
+    title_width = max(
+      terminal_width
+      - spec_width
+      - label_width
+      - ext_id_width
+      - category_width
+      - tags_width
+      - status_width
+      - reserved,
+      20,
+    )
+    col_idx = 0
+    widths: dict[int, int] = {}
+    for w in [spec_width, label_width]:
+      widths[col_idx] = w
+      col_idx += 1
+    if show_external:
+      widths[col_idx] = ext_id_width
+      col_idx += 1
+    for w in [category_width, title_width, tags_width, status_width]:
+      widths[col_idx] = w
+      col_idx += 1
+    return widths
+
+  return _calc
 
 
 def format_requirement_list_table(
@@ -47,88 +111,33 @@ def format_requirement_list_table(
   Returns:
     Formatted string in requested format
   """
-  if format_type == "json":
-    return format_requirement_list_json(requirements)
-
-  if format_type == "tsv":
-    rows = []
-    for req in requirements:
-      spec = req.primary_spec or (req.specs[0] if req.specs else "")
-      category = req.category or "-"
-      row = [spec, req.label]
-      if show_external:
-        row.append(req.ext_id)
-      row.extend([category, req.title, req.status])
-      rows.append(row)
-    return format_as_tsv(rows)
-
-  # table format
   col_defs = list(REQUIREMENT_COLUMNS)
   if show_external:
-    col_defs.insert(2, EXT_ID_COLUMN)  # After Label
-  table = create_table(
+    col_defs.insert(2, EXT_ID_COLUMN)
+
+  def _row(req: RequirementRecord) -> list[str]:
+    row = _prepare_requirement_row(req)
+    if show_external:
+      row.insert(2, req.ext_id)
+    return row
+
+  def _tsv_row(req: RequirementRecord) -> list[str]:
+    row = _prepare_requirement_tsv_row(req)
+    if show_external:
+      row.insert(2, req.ext_id)
+    return row
+
+  return format_list_table(
+    requirements,
     columns=column_labels(col_defs),
     title="Requirements",
+    prepare_row=_row,
+    prepare_tsv_row=_tsv_row,
+    to_json=format_requirement_list_json,
+    format_type=format_type,
+    truncate=truncate,
+    column_widths=_requirement_column_widths(show_external),
   )
-
-  terminal_width = get_terminal_width()
-
-  reserved = 10
-  spec_width = 10
-  label_width = 8
-  ext_id_width = 14 if show_external else 0
-  category_width = 12
-  tags_width = 20
-  status_width = 12
-  title_width = max(
-    terminal_width
-    - spec_width
-    - label_width
-    - ext_id_width
-    - category_width
-    - tags_width
-    - status_width
-    - reserved,
-    20,
-  )
-
-  col_idx = 0
-  max_widths: dict[int, int] = {}
-  for w in [spec_width, label_width]:
-    max_widths[col_idx] = w
-    col_idx += 1
-  if show_external:
-    max_widths[col_idx] = ext_id_width
-    col_idx += 1
-  for w in [category_width, title_width, tags_width, status_width]:
-    max_widths[col_idx] = w
-    col_idx += 1
-
-  for req in requirements:
-    spec = req.primary_spec or (req.specs[0] if req.specs else "—")
-    spec_styled = f"[spec.id]{spec}[/spec.id]"
-    label_styled = f"[requirement.id]{req.label}[/requirement.id]"
-    category = req.category or "—"
-    category_styled = f"[requirement.category]{category}[/requirement.category]"
-
-    tags = ", ".join(req.tags) if req.tags else ""
-    tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
-
-    status_style = get_requirement_status_style(req.status)
-    status_styled = f"[{status_style}]{req.status}[/{status_style}]"
-
-    row = [spec_styled, label_styled]
-    if show_external:
-      row.append(req.ext_id)
-    row.extend([category_styled, req.title, tags_styled, status_styled])
-
-    add_row_with_truncation(
-      table,
-      row,
-      max_widths=max_widths if truncate else None,
-    )
-
-  return render_table(table)
 
 
 def format_requirement_list_json(requirements: Sequence[RequirementRecord]) -> str:

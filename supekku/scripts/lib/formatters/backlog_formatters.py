@@ -6,20 +6,18 @@ Formatters take BacklogItem objects and return formatted strings for display.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
   BACKLOG_COLUMNS,
   EXT_ID_COLUMN,
   column_labels,
 )
 from supekku.scripts.lib.formatters.table_utils import (
-  add_row_with_truncation,
-  create_table,
   format_as_json,
-  format_as_tsv,
-  get_terminal_width,
-  render_table,
+  format_list_table,
 )
 from supekku.scripts.lib.formatters.theme import get_backlog_status_style
 
@@ -27,6 +25,72 @@ if TYPE_CHECKING:
   from collections.abc import Sequence
 
   from supekku.scripts.lib.backlog.models import BacklogItem
+
+
+def _prepare_backlog_row(item: BacklogItem) -> list[str]:
+  """Prepare a single backlog item row with styling."""
+  item_id = f"[backlog.id]{item.id}[/backlog.id]"
+  status_style = get_backlog_status_style(item.kind, item.status)
+  status_styled = f"[{status_style}]{item.status}[/{status_style}]"
+  severity = getattr(item, "severity", "—")
+  return [
+    item_id,
+    item.kind,
+    item.title,
+    format_tags_cell(item.tags),
+    status_styled,
+    severity,
+  ]
+
+
+def _prepare_backlog_tsv_row(item: BacklogItem) -> list[str]:
+  """Prepare a single backlog item as a plain TSV row."""
+  severity = getattr(item, "severity", "") or ""
+  return [item.id, item.kind, item.status, item.title, severity]
+
+
+def _backlog_column_widths(
+  show_external: bool = False,
+) -> Callable[[int], dict[int, int]]:
+  """Return a column-width calculator for the backlog table layout."""
+
+  def _calc(terminal_width: int) -> dict[int, int]:
+    reserved = 10
+    id_width = 12
+    ext_id_width = 14 if show_external else 0
+    kind_width = 12
+    tags_width = 20
+    status_width = 12
+    severity_width = 10
+    title_width = max(
+      terminal_width
+      - id_width
+      - ext_id_width
+      - kind_width
+      - tags_width
+      - status_width
+      - severity_width
+      - reserved,
+      20,
+    )
+    col_idx = 0
+    widths: dict[int, int] = {col_idx: id_width}
+    col_idx += 1
+    if show_external:
+      widths[col_idx] = ext_id_width
+      col_idx += 1
+    widths[col_idx] = kind_width
+    col_idx += 1
+    widths[col_idx] = title_width
+    col_idx += 1
+    widths[col_idx] = tags_width
+    col_idx += 1
+    widths[col_idx] = status_width
+    col_idx += 1
+    widths[col_idx] = severity_width
+    return widths
+
+  return _calc
 
 
 def format_backlog_list_table(
@@ -47,90 +111,33 @@ def format_backlog_list_table(
   Returns:
     Formatted string in requested format
   """
-  if format_type == "json":
-    return format_backlog_list_json(items)
-
-  if format_type == "tsv":
-    rows = []
-    for item in items:
-      severity = getattr(item, "severity", "") or ""
-      row = [item.id]
-      if show_external:
-        row.append(item.ext_id)
-      row.extend([item.kind, item.status, item.title, severity])
-      rows.append(row)
-    return format_as_tsv(rows)
-
-  # table format
-  columns = list(BACKLOG_COLUMNS)
+  col_defs = list(BACKLOG_COLUMNS)
   if show_external:
-    columns.insert(1, EXT_ID_COLUMN)
-  table = create_table(
-    columns=column_labels(columns),
-    title="Backlog Items",
-  )
+    col_defs.insert(1, EXT_ID_COLUMN)
 
-  terminal_width = get_terminal_width()
-
-  # Custom column widths
-  reserved = 10
-  id_width = 12
-  ext_id_width = 14 if show_external else 0
-  kind_width = 12
-  tags_width = 20
-  status_width = 12
-  severity_width = 10
-  title_width = max(
-    terminal_width
-    - id_width
-    - ext_id_width
-    - kind_width
-    - tags_width
-    - status_width
-    - severity_width
-    - reserved,
-    20,
-  )
-
-  col_idx = 0
-  max_widths = {col_idx: id_width}
-  col_idx += 1
-  if show_external:
-    max_widths[col_idx] = ext_id_width
-    col_idx += 1
-  max_widths[col_idx] = kind_width
-  col_idx += 1
-  max_widths[col_idx] = title_width
-  col_idx += 1
-  max_widths[col_idx] = tags_width
-  col_idx += 1
-  max_widths[col_idx] = status_width
-  col_idx += 1
-  max_widths[col_idx] = severity_width
-
-  for item in items:
-    item_id = f"[backlog.id]{item.id}[/backlog.id]"
-
-    tags = ", ".join(item.tags) if item.tags else ""
-    tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
-
-    status_style = get_backlog_status_style(item.kind, item.status)
-    status_styled = f"[{status_style}]{item.status}[/{status_style}]"
-
-    severity = getattr(item, "severity", "—")
-
-    row = [item_id]
+  def _row(item: BacklogItem) -> list[str]:
+    row = _prepare_backlog_row(item)
     if show_external:
-      row.append(item.ext_id)
-    row.extend([item.kind, item.title, tags_styled, status_styled, severity])
+      row.insert(1, item.ext_id)
+    return row
 
-    add_row_with_truncation(
-      table,
-      row,
-      max_widths=max_widths if truncate else None,
-    )
+  def _tsv_row(item: BacklogItem) -> list[str]:
+    row = _prepare_backlog_tsv_row(item)
+    if show_external:
+      row.insert(1, item.ext_id)
+    return row
 
-  return render_table(table)
+  return format_list_table(
+    items,
+    columns=column_labels(col_defs),
+    title="Backlog Items",
+    prepare_row=_row,
+    prepare_tsv_row=_tsv_row,
+    to_json=format_backlog_list_json,
+    format_type=format_type,
+    truncate=truncate,
+    column_widths=_backlog_column_widths(show_external),
+  )
 
 
 def format_backlog_list_json(items: Sequence[BacklogItem]) -> str:

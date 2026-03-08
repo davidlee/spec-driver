@@ -2,8 +2,8 @@
 id: ISSUE-022
 name: Add spec-driver doctor diagnostic command
 created: '2025-11-08'
-updated: '2025-11-08'
-status: open
+updated: '2026-03-08'
+status: implemented
 kind: issue
 categories: [cli, diagnostics, tooling]
 severity: p2

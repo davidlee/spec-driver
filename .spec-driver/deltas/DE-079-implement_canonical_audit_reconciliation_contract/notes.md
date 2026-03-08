@@ -136,4 +136,4 @@
 
 #### Phase 4 closure
 - DE-079 phase 4 is complete.
-- Remaining work is commit/hand-off hygiene only; the implementation and verification for this phase are finished.
+- Commit: `1d263ad` — `feat(DE-079): phase 4 audit-change runsheet`

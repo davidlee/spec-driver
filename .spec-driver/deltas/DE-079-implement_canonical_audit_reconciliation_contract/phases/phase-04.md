@@ -119,7 +119,7 @@ Rewrite `audit-change` so it is the canonical procedural runsheet for audit reco
     - `supekku/skills/audit-change/SKILL.md`
   - **Testing**: Manual review against DR-079 code impact and current `create audit` CLI.
   - **Observations & AI Notes**: The skill should describe closure-grade audit behavior, not restate the entire schema.
-  - **Commits / References**: pending
+  - **Commits / References**: `1d263ad` feat(DE-079): phase 4 audit-change runsheet
 - **4.2 Description**
   - **Design / Approach**: Refresh generated `.spec-driver/skills/` copy using the current supported workspace refresh flow, then verify AGENTS description remains correct.
   - **Files / Components**:
@@ -127,7 +127,7 @@ Rewrite `audit-change` so it is the canonical procedural runsheet for audit reco
     - `.spec-driver/AGENTS.md`
   - **Testing**: Diff/manual verification only.
   - **Observations & AI Notes**: Notes from DE-055 suggest the historical sync command changed; verify current flow locally rather than assuming.
-  - **Commits / References**: pending
+  - **Commits / References**: `1d263ad` feat(DE-079): phase 4 audit-change runsheet
 - **4.3 Description**
   - **Design / Approach**: Run `just check`, then commit only phase-4-relevant files and update DE/IP/phase notes.
   - **Files / Components**:
@@ -135,7 +135,7 @@ Rewrite `audit-change` so it is the canonical procedural runsheet for audit reco
     - packaged/generated audit-change skill
   - **Testing**: `just check`
   - **Observations & AI Notes**: Worktree is dirty outside DE-079; do not bundle unrelated user changes.
-  - **Commits / References**: pending
+  - **Commits / References**: `1d263ad` feat(DE-079): phase 4 audit-change runsheet
 
 *(Repeat detail blocks per task as needed)*
 

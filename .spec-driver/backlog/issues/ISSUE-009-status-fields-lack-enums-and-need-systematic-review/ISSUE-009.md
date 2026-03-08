@@ -2,7 +2,7 @@
 id: ISSUE-009
 name: Status fields lack enums and need systematic review
 created: '2025-11-02'
-updated: '2026-03-07'
+updated: '2026-03-08'
 status: in-progress
 kind: issue
 categories:
@@ -24,21 +24,31 @@ Status fields across core entities (specs, ADRs, deltas, requirements, etc.) are
 4. **Type safety**: No IDE autocomplete or compile-time checking
 5. **Migration risk**: Status value changes require error-prone find/replace
 
-## Current State
+## Current State (updated 2026-03-08)
 
-**Observed in DE-005 work**:
-- Specs: Uses `"draft"`, `"stub"`, `"active"`, `"deprecated"`, `"archived"` (found in theme.py)
-- ADRs: Uses `"accepted"`, `"rejected"`, `"deprecated"`, `"revision-required"`, `"proposed"`, `"draft"` (found in theme.py)
-- Changes: Uses `"completed"`, `"complete"`, `"in-progress"`, `"pending"`, `"draft"`, `"deferred"` (found in theme.py)
-- Requirements: Uses `"live"`, `"in-progress"`, `"pending"`, `"retired"` (found in theme.py)
+**Entity types WITH domain-level status enums:**
 
-**No enums found in**:
-- `supekku/scripts/lib/core/frontmatter_schema.py` - status defined as `str` (line 33)
-- Data models (specs, ADRs, changes, etc.)
-- Validation logic
+| Entity type | Enum location | Source |
+|---|---|---|
+| Deltas, revisions, audits | `changes/lifecycle.py` → `VALID_STATUSES` | Pre-existing |
+| Requirements | `requirements/lifecycle.py` → `VALID_STATUSES` | Pre-existing |
+| Issues | `backlog/models.py` → `ISSUE_STATUSES` | DE-057 |
+| Problems | `backlog/models.py` → `PROBLEM_STATUSES` | DE-057 |
+| Improvements | `backlog/models.py` → `IMPROVEMENT_STATUSES` | DE-057 |
+| Risks | `backlog/models.py` → `RISK_STATUSES` | DE-057 |
 
-**Theming as documentation**:
-Currently `supekku/scripts/lib/formatters/theme.py` serves as the de facto documentation of valid status values through its color mappings, which is backwards.
+These are also exposed via `ENUM_REGISTRY` in `core/enums.py` (deltas, requirements, verification). DE-068 will add backlog entries to the registry.
+
+**Entity types WITHOUT status enums (remaining gap):**
+- Specs (product & tech)
+- ADRs/Decisions
+- Policies
+- Standards
+- Memories
+
+**Frontmatter schema**: still defines `status` as `"pattern": ".+"` for all kinds — no schema-level enum enforcement.
+
+**Theme**: `theme.py` colour mappings still diverge from defined enums (see audit section below).
 
 ## Impact
 
@@ -62,22 +72,26 @@ Currently `supekku/scripts/lib/formatters/theme.py` serves as the de facto docum
 4. **Documentation**: Enums serve as authoritative documentation
 5. **Theme derivation**: Theme definitions derived from enums (not the reverse)
 
-## Scope
+## Remaining Scope
 
-Needs systematic review and design for:
+Entity types still needing status enums:
 - Specs (product & tech)
 - ADRs/Decisions
-- Deltas
-- Revisions
-- Audits
-- Requirements
-- Backlog items (issues, problems, improvements, risks)
+- Policies
+- Standards
+- Memories
+
+Already resolved:
+- ~~Deltas, revisions, audits~~ — `changes/lifecycle.py`
+- ~~Requirements~~ — `requirements/lifecycle.py`
+- ~~Backlog items~~ — `backlog/models.py` (DE-057)
 
 ## Acceptance Criteria
 
-- [ ] Enum definitions exist for all entity status fields
+- [x] Enum definitions exist for changes, requirements, backlog items
+- [ ] Enum definitions exist for specs, ADRs, policies, standards, memories
 - [ ] Frontmatter schema validation enforces enum constraints
-- [ ] Data models use enum types
+- [ ] Data models use enum types (partially done — frozensets, not Python enums)
 - [ ] Theme.py references enums (not hardcoded strings)
 - [ ] Migration strategy for existing documents
 - [ ] Documentation of status semantics and lifecycle
@@ -144,3 +158,6 @@ DEC-057-08):
   status enums
 - Frontmatter schema validation not yet enforcing enum constraints
 - Status: `in-progress` — backlog modelling done, broader scope remains
+- DE-068 (`edit --status`) will consume `ENUM_REGISTRY` for validation — adding
+  enums for remaining entity types will automatically enable CLI validation with
+  no further code changes

@@ -7542,7 +7542,7 @@ deltas:
         phase: IP-064.PHASE-01
   DE-065:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Drift Ledger primitive
     slug: drift_ledger_primitive
     updated: '2026-03-08'
@@ -7558,7 +7558,8 @@ deltas:
         plan: IP-065
         delta: DE-065
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-065
         specs:
           primary: []
           collaborators: []
@@ -7567,6 +7568,236 @@ deltas:
           dependencies: []
         phases:
         - id: IP-065-P01
+        - id: IP-065-P02
+        - id: IP-065-P03
+        - id: IP-065.PHASE-01
+        - id: IP-065.PHASE-02
+        - id: IP-065.PHASE-03
       phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-065.PHASE-01
+        plan: IP-065
+        delta: DE-065
+        objective: 'Build the drift ledger domain layer: models (DriftLedger, DriftEntry,
+          Source, Claim, DiscoveredBy), lifecycle constants, fenced-YAML parser, and
+          read-only registry. All with tests, both linters clean.'
+        entrance_criteria:
+        - DR-065 accepted
+        - paths.py extension point identified
+        exit_criteria:
+        - models construct correctly with typed substructures
+        - parser handles all edge cases in DR-065 contract table
+        - registry discovers, finds, and filters ledger files
+        - VT-065-models, VT-065-parser, VT-065-registry passing
+        - ruff and pylint clean on all new files
+        verification:
+          tests:
+          - VT-065-models
+          - VT-065-parser
+          - VT-065-registry
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: add DRIFT_SUBDIR and get_drift_dir() to paths.py
+        - id: '1.2'
+          description: implement models (DriftLedger, DriftEntry, Source, Claim, DiscoveredBy,
+            lifecycle constants)
+        - id: '1.3'
+          description: implement parser (heading split, YAML block extraction, entry
+            construction)
+        - id: '1.4'
+          description: implement DriftLedgerRegistry (discover, find, iter)
+        - id: '1.5'
+          description: write tests for all of the above
+        risks:
+        - description: parser edge cases not covered by contract table
+          mitigation: add tests as discovered, update DR-065 contract table
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-065.PHASE-02
+        plan: IP-065
+        delta: DE-065
+        objective: Build drift ledger formatters (pure functions), CLI commands (create/list/show),
+          and integrate with DE-063 ID inference/dispatch system (PREFIX_TO_TYPE,
+          resolvers, finders, show/view handlers).
+        entrance_criteria:
+        - P01 complete (domain layer implemented and tested)
+        - "DR-065 \xA76 integration points understood"
+        exit_criteria:
+        - drift_formatters.py with list table and detail formatters
+        - CLI create/list/show commands working
+        - DE-063 integration: DL prefix inference, show/view dispatch
+        - VT-065-formatters and VT-065-cli passing
+        - ruff and pylint clean on all new/modified files
+        verification:
+          tests:
+          - VT-065-formatters
+          - VT-065-cli
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: create drift_formatters.py (list table, detail, JSON)
+        - id: '2.2'
+          description: add drift theme styles and column defs
+        - id: '2.3'
+          description: create drift ledger creation function
+        - id: '2.4'
+          description: add CLI commands (create/list/show drift)
+        - id: '2.5'
+          description: DE-063 integration (common.py, resolve.py, show.py, view.py)
+        - id: '2.6'
+          description: tests for formatters and CLI
+        risks:
+        - description: common.py or show.py may have changed since DR-065 was written
+          mitigation: read current code before integrating
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-065.PHASE-03
+        plan: IP-065
+        delta: DE-065
+        objective: Migrate pilot DL-047 from repo-root drift/ to .spec-driver/drift/,
+          converting entries from list-item format to fenced YAML blocks. Verify end-to-end
+          CLI (create/list/show), then close delta DE-065.
+        entrance_criteria:
+        - Phase 2 complete (formatters & CLI working)
+        - Pilot DL-047 exists at drift/DL-047-spec-corpus-reconciliation.md
+        exit_criteria:
+        - DL-047 migrated to .spec-driver/drift/ with fenced YAML entries
+        - Parser roundtrips all 21 entries correctly
+        - list drift shows DL-047
+        - show drift DL-047 renders detail view
+        - Old drift/ directory removed
+        - just check green
+        - Delta DE-065 completed
+        verification:
+          tests:
+          - VT-065-migration-roundtrip
+          evidence:
+          - VA-065-cli-e2e
+        tasks:
+        - id: '3.1'
+          description: convert DL-047 entries from list-item to fenced YAML format
+        - id: '3.2'
+          description: move DL-047 to .spec-driver/drift/ and remove old drift/ dir
+        - id: '3.3'
+          description: end-to-end CLI verification (list/show/create)
+        - id: '3.4'
+          description: delta closure (spec-driver complete delta DE-065)
+        risks:
+        - description: pilot entry format has edge cases not covered by parser
+          mitigation: verify parser roundtrip on each entry after conversion
       - id: IP-065-P01
         phase: IP-065-P01
+      - id: IP-065-P02
+        phase: IP-065-P02
+      - id: IP-065-P03
+        phase: IP-065-P03
+  DE-066:
+    kind: delta
+    status: completed
+    name: Delta - TUI drift ledger integration
+    slug: tui_drift_ledger_integration
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-066-tui_drift_ledger_integration/DE-066.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: depends_on
+      target: DE-065
+      attributes: {}
+    plan:
+      id: IP-066
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-066
+        delta: DE-066
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-066-P01
+        - id: IP-066.PHASE-01
+        - id: IP-066.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-066.PHASE-01
+        plan: IP-066
+        delta: DE-066
+        objective: Add DRIFT_LEDGER to ArtifactType, wire registry/metadata/path mapping,
+          write tests, verify TUI renders drift ledgers.
+        entrance_criteria:
+        - DE-065 complete (drift primitive exists)
+        - artifact_view.py integration surface understood
+        exit_criteria:
+        - DRIFT_LEDGER in ArtifactType enum with metadata
+        - DriftLedgerRegistry wired via factory
+        - path_to_artifact_type() maps drift paths
+        - Unit tests for all wiring points
+        - TUI type selector shows "Drift Ledger"
+        - just check green
+        verification:
+          tests:
+          - VT-066-artifact-type
+          - VT-066-path-mapping
+          evidence:
+          - VA-066-tui-e2e
+        tasks:
+        - id: '1.1'
+          description: add DRIFT_LEDGER to ArtifactType enum and metadata tables
+        - id: '1.2'
+          description: add registry factory and path mapping
+        - id: '1.3'
+          description: write tests
+        - id: '1.4'
+          description: verify TUI end-to-end
+        risks:
+        - description: DriftLedger model may lack attributes expected by adapt_record
+          mitigation: "checked \u2014 DriftLedger has id, name, status, path (compatible)"
+      - id: IP-066-P01
+        phase: IP-066-P01
+  DE-067:
+    kind: delta
+    status: draft
+    name: Add ext_id and ext_url support to artifact frontmatter
+    slug: add_extid_and_exturl_support
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-067-add_extid_and_exturl_support_to_specs_requirements_backlog_policies_standards/DE-067.md
+    applies_to:
+      specs:
+      - PROD-004
+      - SPEC-116
+      - SPEC-122
+      requirements: []
+    relations:
+    - type: addresses
+      target: ISSUE-024
+      attributes: {}
+    plan:
+      id: IP-067
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-067
+        delta: DE-067
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-067-P01
+      phases:
+      - id: IP-067-P01
+        phase: IP-067-P01

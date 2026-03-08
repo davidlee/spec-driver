@@ -3,7 +3,7 @@ id: PROB-003
 name: Workspace directory paths are hardcoded magic strings throughout codebase
 created: '2026-03-05'
 updated: '2026-03-05'
-status: mitigated
+status: resolved
 kind: problem
 severity: moderate
 tags: [maintainability, paths, magic-strings, refactor]

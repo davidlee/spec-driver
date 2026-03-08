@@ -9,6 +9,7 @@ deltas:
   - DE-052
   - DE-053
   - DE-054
+  - DE-061
 related_decisions:
   - ADR-006
 related_issues:

@@ -16,6 +16,8 @@ be concise, but record:
   - open questions relating to completed or upcoming work
   - durable facts, patterns, or gotchas that should become a memory
   - relevant commit hash(es), or: uncommitted work
+  - whether `.spec-driver` changes were committed promptly per repo doctrine, or are still pending with a reason
+  - if committed, whether they went out with code or separately when that matters for the next agent
 - if the verification command has run successfully since code was last modified, or:
   outstanding errors
 

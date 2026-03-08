@@ -3,7 +3,7 @@ id: ISSUE-021
 name: Fix ts-doc-extract dependency handling
 created: '2025-11-08'
 updated: '2025-11-08'
-status: open
+status: resolved
 kind: issue
 categories: [installation, dependencies, typescript]
 severity: p1

@@ -17,6 +17,9 @@ Process:
    - Review notes/phase findings for durable facts, patterns, or gotchas and
      run `/capturing-memory` or `/maintaining-memory` before closure if the
      delta taught future agents something reusable
+   - Apply the repo's commit policy from doctrine so `.spec-driver` workflow
+     artefacts are committed in small, clean increments rather than silently
+     accumulating while waiting for a perfect code/workflow split
 2. Preview:
    - `uv run spec-driver complete delta DE-XXX --dry-run`
 3. Complete:

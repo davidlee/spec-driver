@@ -3,7 +3,7 @@ id: ISSUE-027
 name: 'Consolidate filename slug generation across create commands'
 created: '2026-02-06'
 updated: '2026-02-06'
-status: done
+status: resolved
 kind: issue
 categories:
   - cli

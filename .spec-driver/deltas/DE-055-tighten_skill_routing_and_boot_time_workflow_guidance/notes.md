@@ -278,6 +278,12 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 - `uv run spec-driver skills sync`
 - targeted pytest on skill sync/install CLI surfaces
 
+### Verification results
+- `uv run spec-driver skills sync` passed; `.spec-driver/skills` was refreshed and both agent targets reported all skill symlinks `ok`.
+- `uv run pytest supekku/scripts/lib/skills/sync_test.py supekku/scripts/lib/install_test.py supekku/cli/skills_test.py` passed: 148 tests.
+- Created `mem.pattern.git.spec-driver-commit-cleanliness` and confirmed it surfaces for:
+  - `uv run spec-driver list memories -p .spec-driver/hooks/doctrine.md -c "git commit"`
+
 ### Open edge
 - This does not solve proactive surfacing automatically on every file read/write. `PROB-004` still captures that possible hook-based follow-up if the skill-layer prompts prove insufficient.
 
@@ -287,6 +293,26 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 - Created `mem.pattern.skills.memory-retrieval-and-wrapup` and confirmed it surfaces for both:
   - `uv run spec-driver list memories -p supekku/skills/retrieving-memory/SKILL.md -c "uv run spec-driver list memories"`
   - `uv run spec-driver list memories -p supekku/skills/close-change/SKILL.md -c "uv run spec-driver complete delta"`
+
+## 2026-03-08 - phase 11 configurable `.spec-driver` commit guidance
+
+### Decision
+- Put the repo-specific `.spec-driver` commit preference in `.spec-driver/hooks/doctrine.md`.
+- Keep packaged skill guidance generic: follow doctrine, and absent stronger repo guidance prefer frequent, small `.spec-driver` commits with a clean-repo bias.
+
+### Work in progress
+- Created `IP-055.PHASE-11` for this follow-up.
+- Updated `.spec-driver/hooks/doctrine.md` with the local default:
+  - prefer frequent, small `.spec-driver` commits
+  - bias toward a clean repo over waiting for perfectly related `.spec-driver` batches
+  - commit `.spec-driver` changes with code or separately, whichever comes first while keeping the worktree clean
+  - use short, conventional commit messages
+- Updated `supekku/templates/hooks/doctrine.md` so fresh installs get the same commit-policy seam instead of an empty doctrine template.
+- Updated `supekku/skills/execute-phase/SKILL.md`, `supekku/skills/notes/SKILL.md`, `supekku/skills/close-change/SKILL.md`, and `supekku/skills/continuation/SKILL.md` so agents check doctrine and keep pending `.spec-driver` commit state explicit.
+
+### Expected verification
+- `uv run spec-driver skills sync`
+- targeted pytest on skill sync/install CLI surfaces
   - keep `spec-driver` narrow
   - keep routing separate
   - preserve uniform packaged skills across installs

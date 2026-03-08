@@ -9,6 +9,12 @@ Retrieval procedure (fast → thorough):
 1) Contextual list (preferred):
     - Use scope matching to get the most relevant memories:
       `spec-driver list memories -p <path>... -c "<command tokens>" --match-tag <tag>...`
+    - Before working on a specific subsystem, build this query from the concrete
+      files you expect to read or edit first. Memories with `scope.globs` still
+      match those `-p` paths, so you do not need a separate glob flag.
+    - For planned code changes, prefer at least one exact file path plus the
+      command context you are about to run. Example:
+      `spec-driver list memories -p supekku/scripts/lib/skills/sync.py -c "uv run pytest" --match-tag skills`
     - Remember: scope matching is OR across query types, but metadata filters (`--type`, `--status`, `--tag`) are AND pre-filters; avoid over-filtering unless you are certain.
 
 2) Narrow by metadata only after you have a hit list:
@@ -28,4 +34,7 @@ Decision framework (what to trust):
 
 Output discipline:
 - When responding or planning, cite the relevant memory IDs and their linked sources (paths/ADRs/specs). If you cannot, retrieve again with tighter `--path/--command/--match-tag` until you can.
+- When starting work on a new file cluster, do the scoped query before deep
+  reading or editing so glob-scoped gotchas surface while the change is still
+  cheap.
 ---

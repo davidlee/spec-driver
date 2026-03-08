@@ -79,13 +79,15 @@ def build_event(
   file_path: str,
   artifact_type: str,
   artifact_id: str | None,
+  cwd: str | None = None,
 ) -> dict:
   """Build a v1 event dict for an artifact touch."""
   action = _TOOL_TO_ACTION.get(tool_name, tool_name.lower())
   rel_path = file_path
-  # Try to make path relative to cwd for readability
+  # Use hook-provided cwd for deterministic repo-root-relative paths (DEC-061-04)
+  base = Path(cwd) if cwd else Path.cwd()
   with contextlib.suppress(ValueError):
-    rel_path = str(Path(file_path).relative_to(Path.cwd()))
+    rel_path = str(Path(file_path).relative_to(base))
 
   return {
     "v": _EVENT_SCHEMA_VERSION,
@@ -151,6 +153,7 @@ def main() -> None:
     file_path=file_path,
     artifact_type=artifact_type,
     artifact_id=artifact_id,
+    cwd=cwd or None,
   )
 
   # Resolve run dir from project root (cwd in hook JSON)

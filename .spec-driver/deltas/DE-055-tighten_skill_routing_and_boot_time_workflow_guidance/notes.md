@@ -258,6 +258,35 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 - `update-delta-docs` now exists for structured DE/IP/phase/DR reconciliation during execution.
 - `draft-design-revision` now requires explicit design triage and section-by-section validation before treating a DR as coherent.
 - Current leaning remains:
+
+## 2026-03-08 - phase 10 memory-effectiveness follow-up
+
+### Decision
+- Improve memory effectiveness in the skill layer first, not via a new runtime hook in this phase.
+- Rationale:
+  - the request is explicitly for a skills-based solution
+  - ADR-005 says skills own procedural guidance
+  - the main gaps were not missing primitives, but missing prompts in the execution and close-out skills
+
+### Work in progress
+- Created `IP-055.PHASE-10` to track this follow-up under the existing plan.
+- Updated `supekku/skills/retrieving-memory/SKILL.md` so agents query memories with concrete `--path` targets before touching a subsystem; memories scoped by `scope.globs` should surface through those path queries.
+- Updated `supekku/skills/execute-phase/SKILL.md` and `supekku/skills/implement/SKILL.md` so scoped memory lookup happens before deep subsystem work and durable discoveries trigger memory capture/maintenance during execution.
+- Updated `supekku/skills/notes/SKILL.md`, `supekku/skills/capturing-memory/SKILL.md`, and `supekku/skills/close-change/SKILL.md` so phase and delta wrap-up explicitly review for durable facts, patterns, and gotchas worth preserving in memory.
+
+### Expected verification
+- `uv run spec-driver skills sync`
+- targeted pytest on skill sync/install CLI surfaces
+
+### Open edge
+- This does not solve proactive surfacing automatically on every file read/write. `PROB-004` still captures that possible hook-based follow-up if the skill-layer prompts prove insufficient.
+
+### Verification results
+- `uv run spec-driver skills sync` passed; `.spec-driver/skills` was refreshed and both agent targets reported all skill symlinks `ok`.
+- `uv run pytest supekku/scripts/lib/skills/sync_test.py supekku/scripts/lib/install_test.py supekku/cli/skills_test.py` passed: 148 tests.
+- Created `mem.pattern.skills.memory-retrieval-and-wrapup` and confirmed it surfaces for both:
+  - `uv run spec-driver list memories -p supekku/skills/retrieving-memory/SKILL.md -c "uv run spec-driver list memories"`
+  - `uv run spec-driver list memories -p supekku/skills/close-change/SKILL.md -c "uv run spec-driver complete delta"`
   - keep `spec-driver` narrow
   - keep routing separate
   - preserve uniform packaged skills across installs

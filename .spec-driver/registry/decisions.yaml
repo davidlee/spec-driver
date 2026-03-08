@@ -95,9 +95,9 @@ decisions:
     title: 'ADR-006: consolidate workspace directories under .spec-driver'
     status: accepted
     path: .spec-driver/decisions/ADR-006-consolidate_workspace_directories_under_spec_driver.md
-    summary: Canonical spec-driver workspace directories move under .spec-driver/
-      with backward-compat root symlinks; migration tooling and content reference
-      cleanup are deferred.
+    summary: Canonical spec-driver workspace directories move under .spec-driver/;
+      migration tooling and broad content reference cleanup are deferred, while legacy
+      compatibility paths are treated as optional non-default views.
     created: '2026-03-06'
     updated: '2026-03-06'
     reviewed: '2026-03-06'

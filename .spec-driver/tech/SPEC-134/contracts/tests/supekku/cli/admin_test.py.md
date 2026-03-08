@@ -1,0 +1,1 @@
+../../../../../../../.contracts/tests/supekku/cli/admin_test.py.md

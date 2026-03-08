@@ -72,13 +72,13 @@ converting all 21 entries from the old list-item format to fenced YAML blocks
 - [x] Pilot DL-047 exists at `drift/DL-047-spec-corpus-reconciliation.md`
 
 ## 4. Exit Criteria / Done When
-- [ ] DL-047 migrated to `.spec-driver/drift/DL-047-spec-corpus-reconciliation.md`
-- [ ] All 21 entries converted to fenced YAML block format
-- [ ] Parser roundtrips all entries (verified via `show drift DL-047`)
-- [ ] `list drift` shows DL-047
-- [ ] Old `drift/` directory removed
-- [ ] `just check` green
-- [ ] `spec-driver complete delta DE-065` succeeds
+- [x] DL-047 migrated to `.spec-driver/drift/DL-047-spec-corpus-reconciliation.md`
+- [x] All 21 entries converted to fenced YAML block format
+- [x] Parser roundtrips all entries (verified via `show drift DL-047`)
+- [x] `list drift` shows DL-047
+- [x] Old `drift/` directory removed
+- [x] `just check` green (3285 pass, ruff clean, pylint 9.71)
+- [x] `spec-driver complete delta DE-065` succeeds
 
 ## 5. Verification
 - `uv run spec-driver list drift` — shows DL-047
@@ -97,10 +97,10 @@ converting all 21 entries from the old list-item format to fenced YAML blocks
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 3.1 | Convert DL-047 entries to fenced YAML format | — | |
-| [ ] | 3.2 | Move to .spec-driver/drift/, remove old drift/ | — | |
-| [ ] | 3.3 | End-to-end CLI verification | — | |
-| [ ] | 3.4 | Delta closure | — | |
+| [x] | 3.1 | Convert DL-047 entries to fenced YAML format | — | 21 entries converted |
+| [x] | 3.2 | Move to .spec-driver/drift/, remove old drift/ | — | done |
+| [x] | 3.3 | End-to-end CLI verification | — | list/show/parse all work |
+| [x] | 3.4 | Delta closure | — | completed without --force |
 
 ### Task Details
 
@@ -133,11 +133,14 @@ converting all 21 entries from the old list-item format to fenced YAML blocks
 | 21 entries is tedious to convert manually | Systematic conversion, verify each | open |
 
 ## 9. Decisions & Outcomes
+- 2026-03-08: Manual conversion chosen over programmatic — single file, one-time operation
+- 2026-03-08: `analysis` field content moved outside YAML fence as freeform markdown per DEC-065-02
+- 2026-03-08: `evidence` field kept inside YAML fence as list of strings
 
 ## 10. Findings / Research Notes
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Phase sheet updated with outcomes
-- [ ] Notes updated with final handover
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (3285 tests, linters clean)
+- [x] Phase sheet updated with outcomes
+- [x] Notes updated with final handover

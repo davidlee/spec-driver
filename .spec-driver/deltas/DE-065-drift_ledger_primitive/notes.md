@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 2 (formatters, CLI, DE-063 integration) complete. Phase 3 (migration & close) is next. Delta is `in-progress`.
+All 3 phases complete. Delta closed.
 
 ## Completed
 
@@ -85,6 +85,21 @@ Tasks:
 
 - DR-065 listed `supekku/scripts/drift.py` as a new thin CLI file. Instead, commands were added to the existing verb-grouped modules (create.py, list.py, show.py) — this follows the actual codebase pattern where all CLI commands live in verb modules, not artifact modules.
 - `format_list_table()` generic helper was used instead of hand-building table setup (existed from a prior refactor, not known when DR-065 was drafted)
+
+### Phase 3 details
+
+- Migrated pilot DL-047 from `drift/` to `.spec-driver/drift/`
+- Converted all 21 entries from list-item format to fenced YAML blocks (DEC-065-02)
+- `analysis` field content moved outside YAML fence as freeform markdown
+- `evidence` field kept inside fence as YAML list
+- Parser roundtrips all 21 entries correctly
+- `list drift` and `show drift DL-047` both work
+- Old `drift/` directory removed
+- Delta closed without `--force`
+
+### Phase 3 commits
+
+- `55d1632` feat(DE-065): migrate pilot DL-047 to fenced YAML format (P03)
 
 ### Loose ends
 

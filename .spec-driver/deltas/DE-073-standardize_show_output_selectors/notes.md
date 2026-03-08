@@ -44,8 +44,16 @@
 - `just lint` — clean
 - `just test` — 3446 passed, 2 failed (pre-existing, unrelated)
 
-## Phase 3 — `resolve links` improvements (after phase 2)
+## Phase 3 — `resolve links` improvements (complete)
 
-### Scope
-- `--verbose`: report missing targets with containing files
-- `--path <file>` / `--id <mem-id>`: scoped resolution
+### Done
+- `--verbose/-v`: reports each missing target with all containing file paths
+- `--path <file>`: scopes resolution to a single memory file
+- `--id <mem-id>`: convenience wrapper — resolves memory ID to path, delegates
+- `--path` and `--id` are mutually exclusive; both composable with `--dry-run`/`--link-mode`
+- `missing_detail` tracking in stats dict (target → list of source rel paths)
+- 9 new tests (unit + CLI integration); 3455 total passing
+
+### Verification
+- `just lint` — clean
+- `just test` — 3455 passed, 2 failed (pre-existing, unrelated)

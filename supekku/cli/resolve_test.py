@@ -1,11 +1,18 @@
-"""Tests for resolve CLI commands."""
+"""Tests for resolve CLI commands.
+
+VT-073-03: resolve links --verbose/--path/--id.
+"""
 
 from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+from typer.testing import CliRunner
+
 from supekku.cli.resolve import (
   _resolve_memory_links,
+  app,
   build_artifact_index,
 )
 from supekku.scripts.lib.core.paths import BACKLOG_DIR, MEMORY_DIR, SPEC_DRIVER_DIR
@@ -13,6 +20,8 @@ from supekku.scripts.lib.core.spec_utils import (
   dump_markdown_file,
   load_markdown_file,
 )
+
+runner = CliRunner()
 
 
 def _init_repo(tmp_path: Path) -> Path:
@@ -261,3 +270,158 @@ class TestResolveMemoryLinks:
 
     fm, _ = load_markdown_file(mem_dir / "mem.fact.test.md")
     assert "links" not in fm
+
+
+# ── missing_detail tracking ─────────────────────────────────
+
+
+class TestMissingDetail:
+  """_resolve_memory_links tracks missing targets per source file."""
+
+  def test_tracks_missing_targets_with_sources(self, tmp_path: Path) -> None:
+    """missing_detail maps target → list of source file paths."""
+    mem_dir = _init_repo(tmp_path)
+    _write_memory(mem_dir, "mem.fact.a", "A", "See [[ADR-999]]\n")
+    _write_memory(mem_dir, "mem.fact.b", "B", "Also [[ADR-999]]\n")
+
+    stats = _resolve_memory_links(tmp_path, dry_run=False)
+    assert "ADR-999" in stats["missing_detail"]
+    sources = stats["missing_detail"]["ADR-999"]
+    assert len(sources) == 2
+    assert any("mem.fact.a.md" in s for s in sources)
+    assert any("mem.fact.b.md" in s for s in sources)
+
+  def test_no_missing_detail_when_all_resolved(self, tmp_path: Path) -> None:
+    mem_dir = _init_repo(tmp_path)
+    _write_memory(mem_dir, "mem.fact.a", "A", "See [[mem.fact.b]]\n")
+    _write_memory(mem_dir, "mem.fact.b", "B", "No links.\n")
+
+    stats = _resolve_memory_links(tmp_path, dry_run=False)
+    assert stats["missing_detail"] == {}
+
+
+# ── --path scoping ──────────────────────────────────────────
+
+
+class TestScopePath:
+  """_resolve_memory_links with scope_path resolves a single file."""
+
+  def test_scoped_processes_one_file(self, tmp_path: Path) -> None:
+    mem_dir = _init_repo(tmp_path)
+    _write_memory(mem_dir, "mem.fact.a", "A", "See [[ADR-999]]\n")
+    _write_memory(mem_dir, "mem.fact.b", "B", "See [[ADR-998]]\n")
+
+    target = mem_dir / "mem.fact.a.md"
+    stats = _resolve_memory_links(tmp_path, scope_path=target)
+    assert stats["processed"] == 1
+    assert stats["missing"] >= 1
+    # Only mem.fact.a's missing target should appear
+    assert "ADR-999" in stats["missing_detail"]
+    assert "ADR-998" not in stats["missing_detail"]
+
+  def test_scoped_dry_run(self, tmp_path: Path) -> None:
+    mem_dir = _init_repo(tmp_path)
+    _write_memory(mem_dir, "mem.fact.a", "A", "See [[ADR-999]]\n")
+
+    target = mem_dir / "mem.fact.a.md"
+    stats = _resolve_memory_links(tmp_path, dry_run=True, scope_path=target)
+    assert stats["processed"] == 1
+
+    fm, _ = load_markdown_file(target)
+    assert "links" not in fm
+
+
+# ── CLI --verbose flag ──────────────────────────────────────
+
+
+class TestResolveLinksVerbose:
+  """CLI --verbose flag reports missing targets with file locations."""
+
+  def test_verbose_shows_missing_targets(
+    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+  ) -> None:
+    mem_dir = _init_repo(tmp_path)
+    _write_memory(mem_dir, "mem.fact.a", "A", "See [[ADR-999]]\n")
+    monkeypatch.chdir(tmp_path)
+
+    result = runner.invoke(
+      app,
+      ["--verbose", "--dry-run"],
+      catch_exceptions=False,
+    )
+    assert result.exit_code == 0
+    assert "MISSING: ADR-999" in result.output
+    assert "referenced by:" in result.output
+    assert "mem.fact.a.md" in result.output
+
+  def test_no_verbose_hides_detail(
+    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+  ) -> None:
+    mem_dir = _init_repo(tmp_path)
+    _write_memory(mem_dir, "mem.fact.a", "A", "See [[ADR-999]]\n")
+    monkeypatch.chdir(tmp_path)
+
+    result = runner.invoke(
+      app,
+      ["--dry-run"],
+      catch_exceptions=False,
+    )
+    assert result.exit_code == 0
+    assert "MISSING:" not in result.output
+
+
+# ── CLI --id flag ───────────────────────────────────────────
+
+
+class TestResolveLinksById:
+  """CLI --id flag scopes resolution to a single memory record."""
+
+  def test_id_scopes_to_one_record(
+    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+  ) -> None:
+    mem_dir = _init_repo(tmp_path)
+    _write_memory(mem_dir, "mem.fact.a", "A", "See [[ADR-999]]\n")
+    _write_memory(mem_dir, "mem.fact.b", "B", "See [[ADR-998]]\n")
+    monkeypatch.chdir(tmp_path)
+
+    result = runner.invoke(
+      app,
+      ["--id", "mem.fact.a", "--dry-run", "--verbose"],
+      catch_exceptions=False,
+    )
+    assert result.exit_code == 0
+    assert "Processed: 1" in result.output
+    assert "ADR-999" in result.output
+    assert "ADR-998" not in result.output
+
+  def test_id_not_found(
+    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+  ) -> None:
+    _init_repo(tmp_path)
+    monkeypatch.chdir(tmp_path)
+
+    result = runner.invoke(
+      app,
+      ["--id", "mem.fact.nonexistent", "--dry-run"],
+      catch_exceptions=False,
+    )
+    assert result.exit_code == 1
+    assert "not found" in result.output.lower()
+
+  def test_id_and_path_mutually_exclusive(
+    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+  ) -> None:
+    mem_dir = _init_repo(tmp_path)
+    _write_memory(mem_dir, "mem.fact.a", "A", "body\n")
+    monkeypatch.chdir(tmp_path)
+
+    result = runner.invoke(
+      app,
+      [
+        "--id", "mem.fact.a",
+        "--path", str(mem_dir / "mem.fact.a.md"),
+      ],
+      catch_exceptions=False,
+    )
+    assert result.exit_code == 1
+    assert "mutually exclusive" in result.output.lower()

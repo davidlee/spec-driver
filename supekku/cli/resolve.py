@@ -47,6 +47,32 @@ def resolve_links(
       ),
     ),
   ] = "missing",
+  verbose: Annotated[
+    bool,
+    typer.Option(
+      "--verbose",
+      "-v",
+      help="Report missing targets with containing file paths",
+    ),
+  ] = False,
+  scope_path: Annotated[
+    Path | None,
+    typer.Option(
+      "--path",
+      help="Resolve links in a single file only",
+      exists=True,
+      file_okay=True,
+      dir_okay=False,
+      resolve_path=True,
+    ),
+  ] = None,
+  scope_id: Annotated[
+    str | None,
+    typer.Option(
+      "--id",
+      help="Resolve links for a single memory ID (resolves to --path)",
+    ),
+  ] = None,
 ) -> None:
   """Resolve [[...]] links in memory record bodies.
 
@@ -54,6 +80,13 @@ def resolve_links(
   against known artifacts, and writes results to frontmatter.
   """
   root = find_repo_root()
+
+  # --id resolves to --path
+  if scope_id is not None:
+    if scope_path is not None:
+      typer.echo("Error: --path and --id are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+    scope_path = _resolve_memory_path(root, scope_id)
 
   if dry_run:
     typer.echo("Resolving memory links (dry run)...")
@@ -65,6 +98,7 @@ def resolve_links(
       root,
       dry_run=dry_run,
       link_mode=link_mode,
+      scope_path=scope_path,
     )
   except Exception as e:
     typer.echo(f"Error: {e}", err=True)
@@ -76,11 +110,35 @@ def resolve_links(
     f"missing: {stats['missing']} targets",
   )
 
+  if verbose and stats["missing_detail"]:
+    typer.echo("\n  Missing targets:")
+    for target, sources in sorted(stats["missing_detail"].items()):
+      typer.echo(f"    MISSING: {target}")
+      for src in sources:
+        typer.echo(f"      referenced by: {src}")
+
   if stats["warnings"]:
     for warning in stats["warnings"]:
       typer.echo(f"  Warning: {warning}", err=True)
 
   raise typer.Exit(EXIT_SUCCESS)
+
+
+def _resolve_memory_path(root: Path, mem_id: str) -> Path:
+  """Resolve a memory ID to its file path.
+
+  Raises typer.Exit on failure.
+  """
+  registry = MemoryRegistry(root=root)
+  record = registry.find(mem_id)
+  if not record:
+    typer.echo(f"Error: Memory not found: {mem_id}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+  path = Path(record.path)
+  if not path.exists():
+    typer.echo(f"Error: Memory file missing: {path}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+  return path
 
 
 # ── Artifact index collectors ──────────────────────────────────
@@ -182,6 +240,7 @@ def build_artifact_index(root: Path) -> ArtifactIndex:
 
 def _resolve_single_memory(
   mem_file: Path,
+  root: Path,
   index: ArtifactIndex,
   stats: dict,
   *,
@@ -204,6 +263,12 @@ def _resolve_single_memory(
   stats["missing"] += len(result.missing)
   stats["warnings"].extend(result.warnings)
 
+  # Track missing targets → source files for --verbose
+  if result.missing:
+    rel = str(mem_file.relative_to(root)) if root else str(mem_file)
+    for m in result.missing:
+      stats["missing_detail"].setdefault(m.raw, []).append(rel)
+
   links_data = links_to_frontmatter(result, mode=link_mode)
   has_existing = bool(fm.get("links"))
   has_new = bool(links_data)
@@ -223,29 +288,51 @@ def _resolve_memory_links(
   root: Path,
   dry_run: bool = False,
   link_mode: str = "missing",
+  scope_path: Path | None = None,
 ) -> dict:
-  """Resolve inline links in all memory records.
+  """Resolve inline links in memory records.
 
-  For each mem.*.md file: parse body for [[...]] tokens,
-  resolve against artifact index, update frontmatter links field.
+  For each mem.*.md file (or a single scoped file): parse body for
+  ``[[...]]`` tokens, resolve against artifact index, update frontmatter.
 
   Args:
     root: Repository root path.
     dry_run: If True, skip writing changes.
+    link_mode: Link persistence mode.
+    scope_path: If given, resolve only this file.
 
   Returns:
-    Stats dict with processed, resolved, missing, warnings counts.
+    Stats dict with processed, resolved, missing, missing_detail,
+    and warnings.
   """
   index = build_artifact_index(root)
-  mem_dir = get_memory_dir(root)
-  stats: dict = {"processed": 0, "resolved": 0, "missing": 0, "warnings": []}
+  stats: dict = {
+    "processed": 0,
+    "resolved": 0,
+    "missing": 0,
+    "missing_detail": {},
+    "warnings": [],
+  }
 
+  if scope_path is not None:
+    _resolve_single_memory(
+      scope_path,
+      root,
+      index,
+      stats,
+      dry_run=dry_run,
+      link_mode=link_mode,
+    )
+    return stats
+
+  mem_dir = get_memory_dir(root)
   if not mem_dir.exists():
     return stats
 
   for mem_file in sorted(mem_dir.glob("mem.*.md")):
     _resolve_single_memory(
       mem_file,
+      root,
       index,
       stats,
       dry_run=dry_run,

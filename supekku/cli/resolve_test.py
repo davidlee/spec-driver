@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from supekku.cli.resolve import (
-  _build_artifact_index,
   _resolve_memory_links,
+  build_artifact_index,
 )
 from supekku.scripts.lib.core.paths import BACKLOG_DIR, MEMORY_DIR, SPEC_DRIVER_DIR
 from supekku.scripts.lib.core.spec_utils import (
@@ -49,18 +49,18 @@ def _write_memory(
   )
 
 
-# ── _build_artifact_index ────────────────────────────────────
+# ── build_artifact_index ────────────────────────────────────
 
 
 class TestBuildArtifactIndex:
-  """Tests for _build_artifact_index."""
+  """Tests for build_artifact_index."""
 
   def test_includes_memory_records(self, tmp_path: Path) -> None:
     """Index includes memory records from registry."""
     mem_dir = _init_repo(tmp_path)
     _write_memory(mem_dir, "mem.fact.auth", "Auth", "Auth info\n")
 
-    index = _build_artifact_index(tmp_path)
+    index = build_artifact_index(tmp_path)
     assert "mem.fact.auth" in index
     path, kind = index["mem.fact.auth"]
     assert kind == "memory"
@@ -69,7 +69,7 @@ class TestBuildArtifactIndex:
   def test_empty_repo(self, tmp_path: Path) -> None:
     """Index is empty for a repo with no artifacts."""
     _init_repo(tmp_path)
-    index = _build_artifact_index(tmp_path)
+    index = build_artifact_index(tmp_path)
     assert index == {}
 
   # -- VT-057-link-resolver --
@@ -87,7 +87,7 @@ class TestBuildArtifactIndex:
       "# Sync reqs\n",
     )
 
-    index = _build_artifact_index(tmp_path)
+    index = build_artifact_index(tmp_path)
     assert "ISSUE-016" in index
     path, kind = index["ISSUE-016"]
     assert kind == "issue"
@@ -112,7 +112,7 @@ class TestBuildArtifactIndex:
         "# Test\n",
       )
 
-    index = _build_artifact_index(tmp_path)
+    index = build_artifact_index(tmp_path)
     assert "ISSUE-001" in index
     assert "PROB-001" in index
     assert "IMPR-001" in index
@@ -124,7 +124,7 @@ class TestBuildArtifactIndex:
     """Unknown backlog IDs are not in the index."""
     _init_repo(tmp_path)
     (tmp_path / ".git").mkdir(exist_ok=True)
-    index = _build_artifact_index(tmp_path)
+    index = build_artifact_index(tmp_path)
     assert "ISSUE-999" not in index
 
 

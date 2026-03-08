@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 
@@ -13,10 +13,12 @@ from supekku.cli.common import (
   EXIT_SUCCESS,
   ArtifactNotFoundError,
   ArtifactRef,
+  InferringGroup,
   RootOption,
   emit_artifact,
   normalize_id,
   resolve_artifact,
+  resolve_by_id,
 )
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.registry import ChangeRegistry
@@ -45,7 +47,11 @@ from supekku.scripts.lib.requirements.registry import RequirementsRegistry
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.standards.registry import StandardRegistry
 
-app = typer.Typer(help="Show detailed artifact information", no_args_is_help=True)
+app = typer.Typer(
+  help="Show detailed artifact information",
+  no_args_is_help=True,
+  cls=InferringGroup,
+)
 
 
 @app.command("spec")
@@ -712,6 +718,73 @@ def show_risk(
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
+
+
+# --- ID inference fallback ---
+
+
+@app.command("inferred", hidden=True)
+def show_inferred(
+  ctx: typer.Context,
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show an artifact by inferring its type from the ID."""
+  raw_id = ctx.obj["inferred_id"]
+  repo_root = find_repo_root(root)
+  matches = resolve_by_id(raw_id, repo_root)
+
+  if not matches:
+    typer.echo(f"Error: no artifact found matching '{raw_id}'", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  if len(matches) > 1:
+    typer.echo(f"Ambiguous ID '{raw_id}' matches:", err=True)
+    for kind, ref in matches:
+      typer.echo(f"  {ref.id} ({kind})", err=True)
+    typer.echo("Specify the type: e.g. 'show delta ...'", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  kind, ref = matches[0]
+
+  # For --path and --raw, handle directly (type-agnostic)
+  if path_only:
+    typer.echo(ref.path)
+    raise typer.Exit(EXIT_SUCCESS)
+  if raw_output:
+    typer.echo(ref.path.read_text())
+    raise typer.Exit(EXIT_SUCCESS)
+
+  # For default and --json, dispatch to the type-specific show handler.
+  # This reuses the existing per-type formatters without duplication.
+  show_handlers: dict[str, Any] = {
+    "adr": lambda: show_adr(ref.id, json_output=json_output, root=root),
+    "delta": lambda: show_delta(ref.id, json_output=json_output, root=root),
+    "revision": lambda: show_revision(ref.id, json_output=json_output, root=root),
+    "spec": lambda: show_spec(ref.id, json_output=json_output, root=root),
+    "plan": lambda: show_plan(ref.id, json_output=json_output, root=root),
+    "audit": lambda: show_audit(ref.id, json_output=json_output, root=root),
+    "policy": lambda: show_policy(ref.id, json_output=json_output, root=root),
+    "standard": lambda: show_standard(ref.id, json_output=json_output, root=root),
+    "memory": lambda: show_memory(ref.id, json_output=json_output, root=root),
+    "card": lambda: show_card(ref.id, json_output=json_output, root=root),
+    "issue": lambda: show_issue(ref.id, json_output=json_output, root=root),
+    "problem": lambda: show_problem(ref.id, json_output=json_output, root=root),
+    "improvement": lambda: show_improvement(ref.id, json_output=json_output, root=root),
+    "risk": lambda: show_risk(ref.id, json_output=json_output, root=root),
+    "requirement": lambda: show_requirement(ref.id, json_output=json_output, root=root),
+  }
+
+  handler = show_handlers.get(kind)
+  if handler:
+    handler()
+  else:
+    typer.echo(f"Error: unsupported artifact type for show: {kind}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
 
 
 # For direct testing

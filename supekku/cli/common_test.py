@@ -13,12 +13,15 @@ import pytest
 import typer
 
 from supekku.cli.common import (
+  PREFIX_TO_TYPE,
   AmbiguousArtifactError,
   ArtifactNotFoundError,
   ArtifactRef,
+  _parse_prefix,
   emit_artifact,
   find_artifacts,
   resolve_artifact,
+  resolve_by_id,
 )
 from supekku.scripts.lib.core.paths import BACKLOG_DIR, DELTAS_SUBDIR, SPEC_DRIVER_DIR
 
@@ -811,3 +814,114 @@ class TestFindArtifactsUnsupportedType:
   def test_raises_value_error(self) -> None:
     with pytest.raises(ValueError, match="Unknown artifact type"):
       list(find_artifacts("bogus", "*", Path("/repo")))
+
+
+# ── VT-063-01: _parse_prefix and resolve_by_id ────────────────
+
+
+class TestParsePrefix:
+  """_parse_prefix extracts alphabetic prefix from dash-separated IDs."""
+
+  def test_standard_prefix(self) -> None:
+    assert _parse_prefix("DE-063") == "DE"
+
+  def test_multi_char_prefix(self) -> None:
+    assert _parse_prefix("ISSUE-045") == "ISSUE"
+
+  def test_numeric_only(self) -> None:
+    assert _parse_prefix("63") is None
+
+  def test_no_dash(self) -> None:
+    assert _parse_prefix("mem.pattern.foo") is None
+
+  def test_numeric_prefix(self) -> None:
+    # "123-foo" has a numeric prefix, not alphabetic
+    assert _parse_prefix("123-foo") is None
+
+  def test_lowercase_normalized(self) -> None:
+    assert _parse_prefix("de-063") == "DE"
+
+
+class TestPrefixToType:
+  """PREFIX_TO_TYPE mapping covers expected prefixes."""
+
+  def test_delta_prefix(self) -> None:
+    assert PREFIX_TO_TYPE["DE"] == "delta"
+
+  def test_adr_prefix(self) -> None:
+    assert PREFIX_TO_TYPE["ADR"] == "adr"
+
+  def test_spec_prefix(self) -> None:
+    assert PREFIX_TO_TYPE["SPEC"] == "spec"
+
+  def test_prod_maps_to_spec(self) -> None:
+    assert PREFIX_TO_TYPE["PROD"] == "spec"
+
+  def test_improvement_uses_impr(self) -> None:
+    assert PREFIX_TO_TYPE["IMPR"] == "improvement"
+
+  def test_risk_included(self) -> None:
+    assert PREFIX_TO_TYPE["RISK"] == "risk"
+
+  def test_card_uses_t(self) -> None:
+    assert PREFIX_TO_TYPE["T"] == "card"
+
+
+class TestResolveById:
+  """resolve_by_id resolves bare IDs across registries."""
+
+  def test_prefixed_delta_resolves(self) -> None:
+    """A prefixed ID like DE-063 resolves to the correct delta."""
+    from supekku.scripts.lib.core.repo import find_repo_root
+
+    root = find_repo_root()
+    matches = resolve_by_id("DE-063", root)
+    assert len(matches) == 1
+    kind, ref = matches[0]
+    assert kind == "delta"
+    assert ref.id == "DE-063"
+
+  def test_prefixed_adr_resolves(self) -> None:
+    """A prefixed ADR ID resolves correctly."""
+    from supekku.scripts.lib.core.repo import find_repo_root
+
+    root = find_repo_root()
+    matches = resolve_by_id("ADR-001", root)
+    assert len(matches) == 1
+    kind, _ref = matches[0]
+    assert kind == "adr"
+
+  def test_numeric_id_resolves(self) -> None:
+    """A numeric-only ID resolves to matching artifact(s)."""
+    from supekku.scripts.lib.core.repo import find_repo_root
+
+    root = find_repo_root()
+    matches = resolve_by_id("63", root)
+    # DE-063 should match at minimum
+    assert len(matches) >= 1
+    kinds = [k for k, _ in matches]
+    assert "delta" in kinds
+
+  def test_unknown_id_returns_empty(self) -> None:
+    """An ID with no matching artifact returns empty list."""
+    from supekku.scripts.lib.core.repo import find_repo_root
+
+    root = find_repo_root()
+    matches = resolve_by_id("NONEXISTENT-999", root)
+    assert matches == []
+
+  def test_unknown_prefix_returns_empty(self) -> None:
+    """An ID with a prefix not in PREFIX_TO_TYPE returns empty."""
+    from supekku.scripts.lib.core.repo import find_repo_root
+
+    root = find_repo_root()
+    matches = resolve_by_id("BOGUS-001", root)
+    assert matches == []
+
+  def test_numeric_no_match_returns_empty(self) -> None:
+    """A numeric ID with no matching artifact returns empty."""
+    from supekku.scripts.lib.core.repo import find_repo_root
+
+    root = find_repo_root()
+    matches = resolve_by_id("999", root)
+    assert matches == []

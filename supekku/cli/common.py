@@ -24,6 +24,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Any
 
+import click
 import typer
 
 from supekku.scripts.lib.core.paths import get_deltas_dir
@@ -505,6 +506,116 @@ def resolve_artifact(artifact_type: str, raw_id: str, root: Path) -> ArtifactRef
     msg = f"Unknown artifact type: {artifact_type}"
     raise ValueError(msg)
   return resolver(root, raw_id)
+
+
+# --- ID inference ---
+
+# Reverse mapping: prefix string → artifact type key.
+# Used by resolve_by_id() to infer artifact type from a bare ID like "DE-061".
+PREFIX_TO_TYPE: dict[str, str] = {
+  "ADR": "adr",
+  "DE": "delta",
+  "RE": "revision",
+  "POL": "policy",
+  "STD": "standard",
+  "SPEC": "spec",
+  "PROD": "spec",
+  "IP": "plan",
+  "AUD": "audit",
+  "ISSUE": "issue",
+  "PROB": "problem",
+  "IMPR": "improvement",
+  "RISK": "risk",
+  "T": "card",
+}
+
+
+def _parse_prefix(raw_id: str) -> str | None:
+  """Extract alphabetic prefix from an ID like 'DE-061' or 'ISSUE-045'.
+
+  Returns the prefix string (e.g. 'DE', 'ISSUE') if the ID matches the
+  PREFIX-NNN pattern, or None otherwise.
+  """
+  parts = raw_id.split("-", 1)
+  if len(parts) == 2 and parts[0].isalpha():
+    return parts[0].upper()
+  return None
+
+
+def resolve_by_id(raw_id: str, root: Path) -> list[tuple[str, ArtifactRef]]:
+  """Resolve artifact type from a bare ID (prefixed or numeric).
+
+  Uses _build_artifact_index() from resolve.py for O(1) lookup across all
+  registries (DEC-063-04 / POL-001).
+
+  Args:
+    raw_id: User-provided ID (e.g. 'DE-061', '61', 'SPEC-009').
+    root: Repository root path.
+
+  Returns:
+    List of (artifact_type, ArtifactRef) tuples. Empty if no match.
+    Prefixed IDs return 0 or 1 matches; numeric IDs may return multiple.
+  """
+  from supekku.cli.resolve import build_artifact_index  # noqa: PLC0415
+
+  index = build_artifact_index(root)
+
+  # Prefixed ID: look up directly
+  prefix = _parse_prefix(raw_id)
+  if prefix and prefix in PREFIX_TO_TYPE:
+    canonical = raw_id.upper()
+    if canonical in index:
+      _rel_path, kind = index[canonical]
+      try:
+        ref = resolve_artifact(kind, canonical, root)
+        return [(kind, ref)]
+      except (ArtifactNotFoundError, ValueError):
+        return []
+    return []
+
+  # Numeric-only: try all prefixed expansions
+  if raw_id.isdigit():
+    padded = f"{int(raw_id):03d}"
+    matches: list[tuple[str, ArtifactRef]] = []
+    for pfx, kind in PREFIX_TO_TYPE.items():
+      candidate = f"T{raw_id}" if pfx == "T" else f"{pfx}-{padded}"
+      if candidate in index:
+        try:
+          ref = resolve_artifact(kind, candidate, root)
+          matches.append((kind, ref))
+        except (ArtifactNotFoundError, ValueError):
+          continue
+    return matches
+
+  # Unknown format
+  return []
+
+
+class InferringGroup(typer.core.TyperGroup):
+  """Typer Group that infers artifact type from bare IDs.
+
+  When resolve_command() encounters an unknown subcommand name, it stores
+  the name as an inferred artifact ID and routes to the hidden "inferred"
+  command for resolution.
+  """
+
+  def resolve_command(
+    self, ctx: click.Context, args: list[str]
+  ) -> tuple[str | None, click.Command | None, list[str]]:
+    """Resolve command, falling back to ID inference for unknown names."""
+    try:
+      return super().resolve_command(ctx, args)
+    except click.UsageError:
+      if not args:
+        raise
+      # First arg is not a known subcommand — treat as artifact ID
+      cmd_name = args[0]
+      ctx.ensure_object(dict)
+      ctx.obj["inferred_id"] = cmd_name
+      cmd = self.get_command(ctx, "inferred")
+      if cmd is None:
+        raise
+      return "inferred", cmd, args[1:]
 
 
 # --- Artifact output ---

@@ -10,10 +10,12 @@ import typer
 from supekku.cli.common import (
   EXIT_FAILURE,
   ArtifactNotFoundError,
+  InferringGroup,
   RootOption,
   normalize_id,
   open_in_pager,
   resolve_artifact,
+  resolve_by_id,
 )
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.registry import ChangeRegistry
@@ -24,7 +26,11 @@ from supekku.scripts.lib.requirements.registry import RequirementsRegistry
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.standards.registry import StandardRegistry
 
-app = typer.Typer(help="View artifacts in pager", no_args_is_help=True)
+app = typer.Typer(
+  help="View artifacts in pager",
+  no_args_is_help=True,
+  cls=InferringGroup,
+)
 
 
 @app.command("spec")
@@ -364,6 +370,40 @@ def view_risk(
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+# --- ID inference fallback ---
+
+
+@app.command("inferred", hidden=True)
+def view_inferred(
+  ctx: typer.Context,
+  root: RootOption = None,
+) -> None:
+  """View an artifact by inferring its type from the ID."""
+  from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
+
+  raw_id = ctx.obj["inferred_id"]
+  repo_root = find_repo_root(root)
+  matches = resolve_by_id(raw_id, repo_root)
+
+  if not matches:
+    typer.echo(f"Error: no artifact found matching '{raw_id}'", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  if len(matches) > 1:
+    typer.echo(f"Ambiguous ID '{raw_id}' matches:", err=True)
+    for kind, ref in matches:
+      typer.echo(f"  {ref.id} ({kind})", err=True)
+    typer.echo("Specify the type: e.g. 'view delta ...'", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  _kind, ref = matches[0]
+  try:
+    open_in_pager(ref.path)
   except RuntimeError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e

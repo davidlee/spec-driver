@@ -142,7 +142,7 @@ def _collect_backlog_items(root: Path, index: ArtifactIndex) -> None:
     log.debug("Skipping backlog registry", exc_info=True)
 
 
-def _build_artifact_index(root: Path) -> ArtifactIndex:
+def build_artifact_index(root: Path) -> ArtifactIndex:
   """Build artifact ID → (relative_path, kind) index.
 
   Collects IDs from all known registries: decisions, specs,
@@ -222,7 +222,7 @@ def _resolve_memory_links(
   Returns:
     Stats dict with processed, resolved, missing, warnings counts.
   """
-  index = _build_artifact_index(root)
+  index = build_artifact_index(root)
   mem_dir = get_memory_dir(root)
   stats: dict = {"processed": 0, "resolved": 0, "missing": 0, "warnings": []}
 

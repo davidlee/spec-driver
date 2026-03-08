@@ -649,5 +649,69 @@ class ShowNewSubcommandsTest(unittest.TestCase):
     assert result.exit_code == 1
 
 
+# ── VT-063-02: ID inference integration tests ─────────────────
+
+
+class ShowInferredTest(unittest.TestCase):
+  """Integration tests for show with bare ID inference (InferringGroup)."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+
+  def test_existing_subcommand_passthrough(self) -> None:
+    """Existing show <type> <id> still works."""
+    result = self.runner.invoke(app, ["delta", "DE-063"])
+    assert result.exit_code == 0
+    assert "DE-063" in result.stdout
+
+  def test_bare_prefixed_id_resolves(self) -> None:
+    """show DE-063 resolves without specifying 'delta'."""
+    result = self.runner.invoke(app, ["DE-063"])
+    assert result.exit_code == 0
+    assert "DE-063" in result.stdout
+
+  def test_bare_adr_id_resolves(self) -> None:
+    """show ADR-001 resolves without specifying 'adr'."""
+    result = self.runner.invoke(app, ["ADR-001"])
+    assert result.exit_code == 0
+    assert "ADR-001" in result.stdout
+
+  def test_bare_id_with_path_flag(self) -> None:
+    """show DE-063 --path returns the file path."""
+    result = self.runner.invoke(app, ["DE-063", "--path"])
+    assert result.exit_code == 0
+    assert "DE-063" in result.stdout
+    assert result.stdout.strip().endswith(".md")
+
+  def test_bare_id_with_raw_flag(self) -> None:
+    """show DE-063 --raw returns raw file content."""
+    result = self.runner.invoke(app, ["DE-063", "--raw"])
+    assert result.exit_code == 0
+    assert "id: DE-063" in result.stdout
+
+  def test_numeric_id_resolves(self) -> None:
+    """show 63 resolves to DE-063 (or disambiguates)."""
+    result = self.runner.invoke(app, ["63"])
+    # Should either show the delta or list disambiguation
+    assert result.exit_code in [0, 1]
+    assert "63" in (result.stdout + (result.stderr or ""))
+
+  def test_unknown_id_gives_error(self) -> None:
+    """show NONEXISTENT-999 gives clear error."""
+    result = self.runner.invoke(app, ["NONEXISTENT-999"])
+    assert result.exit_code == 1
+    assert "no artifact found" in (result.stderr or "")
+
+  def test_no_args_shows_help(self) -> None:
+    """show with no arguments prints help."""
+    result = self.runner.invoke(app, [])
+    assert "Usage:" in result.stdout
+
+  def test_hidden_command_not_in_help(self) -> None:
+    """The 'inferred' command does not appear in --help output."""
+    result = self.runner.invoke(app, ["--help"])
+    assert "inferred" not in result.stdout
+
+
 if __name__ == "__main__":
   unittest.main()

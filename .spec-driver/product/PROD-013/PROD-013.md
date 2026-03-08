@@ -152,7 +152,7 @@ entries:
     kind: VT
     requirement: PROD-013.FR-004
     status: verified
-    notes: edit_test.py - 11 tests covering editor resolution and invocation
+    notes: edit_test.py - 30 tests covering editor resolution, --status flag, validation, and drift subcommand
   - artefact: VT-005
     kind: VT
     requirement: PROD-013.FR-005

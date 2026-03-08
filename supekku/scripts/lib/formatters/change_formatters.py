@@ -128,7 +128,7 @@ def format_change_with_context(artifact: ChangeArtifact) -> str:
 def format_change_list_table(
   changes: Sequence[ChangeArtifact],
   format_type: str = "table",
-  no_truncate: bool = False,
+  truncate: bool = False,
   *,
   show_external: bool = False,
 ) -> str:
@@ -137,7 +137,7 @@ def format_change_list_table(
   Args:
     changes: List of ChangeArtifact objects to format
     format_type: Output format (table|json|tsv)
-    no_truncate: If True, don't truncate long fields
+    truncate: If True, truncate long fields to fit terminal width
     show_external: If True, show ext_id column after ID
 
   Returns:
@@ -189,7 +189,7 @@ def format_change_list_table(
     add_row_with_truncation(
       table,
       row,
-      max_widths=max_widths if not no_truncate else None,
+      max_widths=max_widths if truncate else None,
     )
 
   return render_table(table)

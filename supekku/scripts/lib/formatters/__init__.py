@@ -19,6 +19,10 @@ from .card_formatters import (
   format_card_list_json,
   format_card_list_table,
 )
+from .cell_helpers import (
+  format_date_cell,
+  format_tags_cell,
+)
 from .change_formatters import (
   format_change_list_item,
   format_change_list_json,
@@ -73,6 +77,8 @@ from .table_utils import (
 )
 
 __all__ = [
+  "format_date_cell",
+  "format_tags_cell",
   "create_table",
   "format_as_json",
   "format_as_tsv",

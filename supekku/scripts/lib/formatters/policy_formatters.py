@@ -9,6 +9,10 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.cell_helpers import (
+  format_date_cell,
+  format_tags_cell,
+)
 from supekku.scripts.lib.formatters.column_defs import (
   EXT_ID_COLUMN,
   POLICY_COLUMNS,
@@ -17,6 +21,7 @@ from supekku.scripts.lib.formatters.column_defs import (
 from supekku.scripts.lib.formatters.table_utils import (
   format_as_json,
   format_list_table,
+  governance_5col_widths,
 )
 from supekku.scripts.lib.formatters.theme import get_policy_status_style
 
@@ -137,65 +142,28 @@ def format_policy_details(policy: PolicyRecord) -> str:
 
 def _prepare_policy_tsv_row(policy: PolicyRecord) -> list[str]:
   """Prepare a single policy as a plain TSV row (no markup)."""
-  updated_date = policy.updated.strftime("%Y-%m-%d") if policy.updated else "N/A"
-  return [policy.id, policy.status, policy.title, updated_date]
-
-
-def _calculate_column_widths(terminal_width: int) -> dict[int, int]:
-  """Calculate optimal column widths for policy table.
-
-  Args:
-    terminal_width: Available terminal width
-
-  Returns:
-    Dictionary mapping column index to max width
-  """
-  # Custom column widths: ID (10), Tags (20), Status (12), Updated (10), rest for Title
-  # Reserve space for borders/padding (~10 chars total)
-  reserved = 10
-  id_width = 10
-  tags_width = 20
-  status_width = 12
-  updated_width = 10
-  title_width = max(
-    terminal_width - id_width - tags_width - status_width - updated_width - reserved,
-    20,  # minimum title width
-  )
-
-  return {
-    0: id_width,
-    1: title_width,
-    2: tags_width,
-    3: status_width,
-    4: updated_width,
-  }
+  updated = format_date_cell(policy.updated, missing="N/A")
+  return [policy.id, policy.status, policy.title, updated]
 
 
 def _prepare_policy_row(policy: PolicyRecord) -> list[str]:
   """Prepare a single policy row with styling.
 
-  Args:
-    policy: PolicyRecord to format
-
   Returns:
     List of formatted cell values [id, title, tags, status, updated]
   """
-  # Remove "POL-XXX: " prefix from title for display
   title = re.sub(r"^POL-\d+:\s*", "", policy.title)
-
-  # Format tags as comma-separated list with styling
-  tags = ", ".join(policy.tags) if policy.tags else ""
-  tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
-
-  # Use em dash for missing dates in table format
-  updated_date = policy.updated.strftime("%Y-%m-%d") if policy.updated else "—"
-
-  # Apply styling with rich markup
   policy_id = f"[policy.id]{policy.id}[/policy.id]"
   status_style = get_policy_status_style(policy.status)
   status_styled = f"[{status_style}]{policy.status}[/{status_style}]"
 
-  return [policy_id, title, tags_styled, status_styled, updated_date]
+  return [
+    policy_id,
+    title,
+    format_tags_cell(policy.tags),
+    status_styled,
+    format_date_cell(policy.updated),
+  ]
 
 
 def format_policy_list_table(
@@ -241,7 +209,7 @@ def format_policy_list_table(
     to_json=format_policy_list_json,
     format_type=format_type,
     truncate=truncate,
-    column_widths=_calculate_column_widths if not show_external else None,
+    column_widths=governance_5col_widths if not show_external else None,
   )
 
 

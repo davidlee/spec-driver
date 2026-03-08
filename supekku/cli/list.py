@@ -341,7 +341,7 @@ def list_specs(
       output = format_spec_list_table(
         specs,
         format_type=format_type,
-        no_truncate=not truncate,
+        truncate=truncate,
         include_packages=packages,
         show_external=external,
       )
@@ -499,7 +499,7 @@ def list_deltas(
       output = format_change_list_table(
         filtered_artifacts,
         format_type=format_type,
-        no_truncate=not truncate,
+        truncate=truncate,
         show_external=external,
       )
       typer.echo(output)
@@ -709,7 +709,7 @@ def list_changes(
       output = format_change_list_table(
         artifacts_only,
         format_type=format_type,
-        no_truncate=not truncate,
+        truncate=truncate,
         show_external=external,
       )
       typer.echo(output)

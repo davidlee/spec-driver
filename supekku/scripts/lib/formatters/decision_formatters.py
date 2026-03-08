@@ -9,10 +9,15 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.cell_helpers import (
+  format_date_cell,
+  format_tags_cell,
+)
 from supekku.scripts.lib.formatters.column_defs import ADR_COLUMNS, column_labels
 from supekku.scripts.lib.formatters.table_utils import (
   format_as_json,
   format_list_table,
+  governance_5col_widths,
 )
 from supekku.scripts.lib.formatters.theme import get_adr_status_style
 
@@ -133,65 +138,28 @@ def format_decision_details(decision: Decision) -> str:
 
 def _prepare_decision_tsv_row(decision: Decision) -> list[str]:
   """Prepare a single decision as a plain TSV row (no markup)."""
-  updated_date = decision.updated.strftime("%Y-%m-%d") if decision.updated else "N/A"
-  return [decision.id, decision.status, decision.title, updated_date]
-
-
-def _calculate_column_widths(terminal_width: int) -> dict[int, int]:
-  """Calculate optimal column widths for decision table.
-
-  Args:
-    terminal_width: Available terminal width
-
-  Returns:
-    Dictionary mapping column index to max width
-  """
-  # Custom column widths: ID (10), Tags (20), Status (12), Updated (10), rest for Title
-  # Reserve space for borders/padding (~10 chars total)
-  reserved = 10
-  id_width = 10
-  tags_width = 20
-  status_width = 12
-  updated_width = 10
-  title_width = max(
-    terminal_width - id_width - tags_width - status_width - updated_width - reserved,
-    20,  # minimum title width
-  )
-
-  return {
-    0: id_width,
-    1: title_width,
-    2: tags_width,
-    3: status_width,
-    4: updated_width,
-  }
+  updated = format_date_cell(decision.updated, missing="N/A")
+  return [decision.id, decision.status, decision.title, updated]
 
 
 def _prepare_decision_row(decision: Decision) -> list[str]:
   """Prepare a single decision row with styling.
 
-  Args:
-    decision: Decision to format
-
   Returns:
     List of formatted cell values [id, title, tags, status, updated]
   """
-  # Remove "ADR-XXX: " prefix from title for display
   title = re.sub(r"^ADR-\d+:\s*", "", decision.title)
-
-  # Format tags as comma-separated list with styling
-  tags = ", ".join(decision.tags) if decision.tags else ""
-  tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
-
-  # Use em dash for missing dates in table format
-  updated_date = decision.updated.strftime("%Y-%m-%d") if decision.updated else "—"
-
-  # Apply styling with rich markup
   decision_id = f"[adr.id]{decision.id}[/adr.id]"
   status_style = get_adr_status_style(decision.status)
   status_styled = f"[{status_style}]{decision.status}[/{status_style}]"
 
-  return [decision_id, title, tags_styled, status_styled, updated_date]
+  return [
+    decision_id,
+    title,
+    format_tags_cell(decision.tags),
+    status_styled,
+    format_date_cell(decision.updated),
+  ]
 
 
 def format_decision_list_table(
@@ -218,7 +186,7 @@ def format_decision_list_table(
     to_json=format_decision_list_json,
     format_type=format_type,
     truncate=truncate,
-    column_widths=_calculate_column_widths,
+    column_widths=governance_5col_widths,
   )
 
 

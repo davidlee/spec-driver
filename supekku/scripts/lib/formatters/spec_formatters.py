@@ -85,7 +85,7 @@ def format_spec_list_item(
 def format_spec_list_table(
   specs: Sequence[Spec],
   format_type: str = "table",
-  no_truncate: bool = False,
+  truncate: bool = False,
   include_packages: bool = False,
   *,
   show_external: bool = False,
@@ -95,7 +95,7 @@ def format_spec_list_table(
   Args:
     specs: List of Spec objects to format
     format_type: Output format (table|json|tsv)
-    no_truncate: If True, don't truncate long fields
+    truncate: If True, truncate long fields to fit terminal width
     include_packages: Include package list in output
     show_external: If True, show ext_id column after ID
 
@@ -150,7 +150,7 @@ def format_spec_list_table(
     add_row_with_truncation(
       table,
       row_data,
-      max_widths=max_widths if not no_truncate else None,
+      max_widths=max_widths if truncate else None,
     )
 
   return render_table(table)

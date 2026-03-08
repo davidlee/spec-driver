@@ -94,7 +94,6 @@ class TestRowAddition:
     add_row_with_truncation(
       table,
       ["ADR-001", "Very Long Decision Name"],
-      no_truncate=True,
     )
     assert len(table.rows) == 1
 
@@ -213,7 +212,7 @@ class TestTableRendering:
   def test_render_table_basic(self):
     """Test rendering a basic table."""
     table = create_table(columns=["ID", "Name"])
-    add_row_with_truncation(table, ["001", "Test"], no_truncate=True)
+    add_row_with_truncation(table, ["001", "Test"])
     output = render_table(table)
     assert isinstance(output, str)
     assert "ID" in output

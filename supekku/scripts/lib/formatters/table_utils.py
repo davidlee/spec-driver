@@ -106,7 +106,6 @@ def add_row_with_truncation(
   table: Table,
   row_data: Sequence[str],
   max_widths: dict[int, int] | None = None,
-  no_truncate: bool = False,
 ) -> None:
   """Add a row to the table with optional markup-aware truncation.
 
@@ -118,10 +117,10 @@ def add_row_with_truncation(
   Args:
     table: Rich Table instance
     row_data: Data for each column (may contain Rich markup)
-    max_widths: Dictionary mapping column index to max width
-    no_truncate: If True, don't truncate any fields
+    max_widths: Dictionary mapping column index to max width.
+      When ``None``, no truncation is applied.
   """
-  if no_truncate or max_widths is None:
+  if max_widths is None:
     table.add_row(*row_data)
     return
 
@@ -236,3 +235,33 @@ def format_list_table(
     add_row_with_truncation(table, row, max_widths=max_widths)
 
   return render_table(table)
+
+
+def governance_5col_widths(terminal_width: int) -> dict[int, int]:
+  """Column widths for the common ID / Title / Tags / Status / Updated layout.
+
+  Used by decision, policy, and standard formatters which share identical
+  column structure.
+
+  Args:
+    terminal_width: Available terminal width.
+
+  Returns:
+    Column-index-to-width mapping with flex space allocated to Title.
+  """
+  reserved = 10  # borders + padding
+  id_width = 10
+  tags_width = 20
+  status_width = 12
+  updated_width = 10
+  title_width = max(
+    terminal_width - id_width - tags_width - status_width - updated_width - reserved,
+    20,
+  )
+  return {
+    0: id_width,
+    1: title_width,
+    2: tags_width,
+    3: status_width,
+    4: updated_width,
+  }

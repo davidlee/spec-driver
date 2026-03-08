@@ -10,6 +10,10 @@ import json
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
+from supekku.scripts.lib.formatters.cell_helpers import (
+  format_date_cell,
+  format_tags_cell,
+)
 from supekku.scripts.lib.formatters.column_defs import MEMORY_COLUMNS, column_labels
 from supekku.scripts.lib.formatters.table_utils import (
   format_as_json,
@@ -178,19 +182,15 @@ def _prepare_memory_row(record: MemoryRecord) -> list[str]:
   mem_id = f"[memory.id]{record.id}[/memory.id]"
   status_style = get_memory_status_style(record.status)
   status = f"[{status_style}]{record.status}[/{status_style}]"
-  confidence = record.confidence or ""
-  tags = ", ".join(record.tags) if record.tags else ""
-  tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
-  updated = record.updated.strftime("%Y-%m-%d") if record.updated else "—"
 
   return [
     mem_id,
     status,
     record.memory_type,
     record.name,
-    confidence,
-    tags_styled,
-    updated,
+    record.confidence or "",
+    format_tags_cell(record.tags),
+    format_date_cell(record.updated),
   ]
 
 
@@ -206,14 +206,13 @@ def _calculate_column_widths(terminal_width: int) -> dict[int, int]:
 
 def _prepare_memory_tsv_row(record: MemoryRecord) -> list[str]:
   """Prepare a single memory record as a plain TSV row (no markup)."""
-  updated = record.updated.strftime("%Y-%m-%d") if record.updated else "N/A"
   return [
     record.id,
     record.status,
     record.memory_type,
     record.name,
     record.confidence or "",
-    updated,
+    format_date_cell(record.updated, missing="N/A"),
   ]
 
 

@@ -1,0 +1,1 @@
+../../../../../../../../../../.contracts/tests/supekku/scripts/lib/diagnostics/checks/structure_test.py.md

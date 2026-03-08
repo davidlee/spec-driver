@@ -22,7 +22,6 @@ ordering:
 - ISSUE-024
 - IMPR-001
 - IMPR-002
-- PROB-001
 - IMPR-003
 - IMPR-004
 - IMPR-005
@@ -55,3 +54,5 @@ ordering:
 - IMPR-010
 - ISSUE-045
 - IMPR-011
+- IMPR-012
+- PROB-004

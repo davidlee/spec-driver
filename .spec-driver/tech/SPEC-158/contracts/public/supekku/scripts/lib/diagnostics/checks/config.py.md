@@ -1,0 +1,1 @@
+../../../../../../../../../../.contracts/public/supekku/scripts/lib/diagnostics/checks/config.py.md

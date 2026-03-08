@@ -13,6 +13,7 @@
       "supekku/scripts/lib/core/frontmatter_metadata": "SPEC-142",
       "supekku/scripts/lib/decisions": "SPEC-143",
       "supekku/scripts/lib/deletion": "SPEC-144",
+      "supekku/scripts/lib/diagnostics/checks": "SPEC-158",
       "supekku/scripts/lib/docs/python": "SPEC-145",
       "supekku/scripts/lib/formatters": "SPEC-146",
       "supekku/scripts/lib/memory": "SPEC-147",

@@ -1,0 +1,1 @@
+../../../../../../../../../.contracts/tests/supekku/scripts/lib/formatters/diagnostic_formatters_test.py.md

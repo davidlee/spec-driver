@@ -6303,6 +6303,12 @@ deltas:
         - id: IP-055.PHASE-09
           name: Apply section-by-section authoring to draft-design-revision
           status: completed
+        - id: IP-055.PHASE-10
+          name: Improve memory retrieval and capture workflow guidance
+          status: completed
+        - id: IP-055.PHASE-11
+          name: Define configurable commit guidance for .spec-driver files
+          status: completed
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -6654,6 +6660,14 @@ deltas:
           mitigation: Keep the new structure narrowly tied to DR authoring and defer
             broader generalisation until shape-revision or another skill proves it
             out
+      - id: IP-055.PHASE-10
+        name: Improve memory retrieval and capture workflow guidance
+        status: completed
+        phase: IP-055.PHASE-10
+      - id: IP-055.PHASE-11
+        name: Define configurable commit guidance for .spec-driver files
+        status: completed
+        phase: IP-055.PHASE-11
   DE-056:
     kind: delta
     status: completed
@@ -7286,3 +7300,168 @@ deltas:
         risks: []
       - id: IP-062-P01
         phase: IP-062-P01
+  DE-063:
+    kind: delta
+    status: draft
+    name: 'CLI interface fixes: ID inference, list truncation bugs, flag parsing'
+    slug: cli_interface_fixes_id_inference_list_truncation_bugs_flag_parsing
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-063-cli_interface_fixes_id_inference_list_truncation_bugs_flag_parsing/DE-063.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: addresses
+      target: ISSUE-045
+      attributes: {}
+    - type: addresses
+      target: ISSUE-038
+      attributes: {}
+    - type: addresses
+      target: ISSUE-041
+      attributes: {}
+    - type: addresses
+      target: ISSUE-042
+      attributes: {}
+    plan:
+      id: IP-063
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-063
+        delta: DE-063
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-063-P01
+      phases:
+      - id: IP-063-P01
+        phase: IP-063-P01
+  DE-064:
+    kind: delta
+    status: completed
+    name: 'spec-driver doctor: workspace health diagnostics'
+    slug: spec_driver_doctor_workspace_health_diagnostics
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-064-spec_driver_doctor_workspace_health_diagnostics/DE-064.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: addresses
+      target: ISSUE-022
+      attributes: {}
+    - type: addresses
+      target: ISSUE-015
+      attributes: {}
+    plan:
+      id: IP-064
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-064
+        delta: DE-064
+        revision_links:
+          aligns_with:
+          - DR-064
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-064.PHASE-01
+        - id: IP-064.PHASE-02
+        - id: IP-064.PHASE-03
+        - id: IP-064.PHASE-02
+        - id: IP-064.PHASE-03
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-064.PHASE-02
+        plan: IP-064
+        delta: DE-064
+        objective: Implement the remaining 3 check categories (refs, registries, lifecycle),
+          register them in CHECK_REGISTRY, and write comprehensive tests so that all
+          6 doctor categories produce results.
+        entrance_criteria:
+        - Phase 1 complete (model, runner, deps/config/structure checks working)
+        - "DR-064 \xA76 reviewed for check specifications"
+        exit_criteria:
+        - check_refs delegates to WorkspaceValidator and translates results correctly
+        - check_registries loads all registries and reports load errors
+        - check_lifecycle detects stale in-progress deltas with configurable threshold
+        - All 3 checks registered in CHECK_REGISTRY
+        - Tests for all 3 checks (pass and fail paths)
+        - just check passes (tests + both linters)
+        verification:
+          tests:
+          - tests/diagnostics/test_checks_refs.py
+          - tests/diagnostics/test_checks_registries.py
+          - tests/diagnostics/test_checks_lifecycle.py
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: "Implement check_refs \u2014 delegate to validate_workspace,\
+            \ translate ValidationIssue"
+        - id: '2.2'
+          description: "Implement check_registries \u2014 load all registries, catch\
+            \ exceptions"
+        - id: '2.3'
+          description: "Implement check_lifecycle \u2014 stale in-progress deltas,\
+            \ configurable threshold"
+        - id: '2.4'
+          description: Register all 3 checks in CHECK_REGISTRY
+        - id: '2.5'
+          description: Lint and test pass
+        risks:
+        - risk: WorkspaceValidator may raise on broken workspaces instead of returning
+            issues
+          mitigation: Wrap in try/except, translate exception to fail result
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-064.PHASE-03
+        plan: IP-064
+        delta: DE-064
+        objective: Verify all CLI options work with all 6 categories, confirm lint
+          and test suites pass across the full codebase, update verification artifacts,
+          and prepare for delta closure.
+        entrance_criteria:
+        - Phase 2 complete (all 6 check categories implemented and tested)
+        exit_criteria:
+        - JSON output includes all 6 categories
+        - --check filter works for each category
+        - --verbose shows pass results across all categories
+        - just check passes (tests + both linters)
+        - Verification coverage updated in IP-064
+        verification:
+          tests:
+          - supekku/scripts/lib/diagnostics/models_test.py
+          - supekku/scripts/lib/diagnostics/runner_test.py
+          - supekku/scripts/lib/diagnostics/checks/deps_test.py
+          - supekku/scripts/lib/diagnostics/checks/config_test.py
+          - supekku/scripts/lib/diagnostics/checks/structure_test.py
+          - supekku/scripts/lib/diagnostics/checks/refs_test.py
+          - supekku/scripts/lib/diagnostics/checks/registries_test.py
+          - supekku/scripts/lib/diagnostics/checks/lifecycle_test.py
+          - supekku/scripts/lib/formatters/diagnostic_formatters_test.py
+          evidence: []
+        tasks:
+        - id: '3.1'
+          description: Verify JSON output with all 6 categories
+        - id: '3.2'
+          description: Verify --check filter for each new category
+        - id: '3.3'
+          description: Full lint and test pass
+        - id: '3.4'
+          description: Update verification coverage in IP-064
+        risks: []
+      - id: IP-064.PHASE-01
+        phase: IP-064.PHASE-01

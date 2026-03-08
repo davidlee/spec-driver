@@ -47,6 +47,7 @@ class TrackPanel(DataTable):
     super().__init__(cursor_type="row", **kwargs)
     self._row_counter = 0
     self._row_artifacts: dict[str, str] = {}
+    self._row_file_paths: dict[str, str] = {}
 
   def on_mount(self) -> None:
     for label, key, width in _COLUMNS:
@@ -55,6 +56,10 @@ class TrackPanel(DataTable):
   def artifact_for_row(self, row_key_value: str) -> str:
     """Return the artifact ID associated with a row key, or empty string."""
     return self._row_artifacts.get(row_key_value, "")
+
+  def file_path_for_row(self, row_key_value: str) -> str:
+    """Return the file path associated with a row key, or empty string."""
+    return self._row_file_paths.get(row_key_value, "")
 
   def append_event(self, event: dict) -> None:
     """Add a styled event row, pruning oldest if over capacity."""
@@ -69,10 +74,15 @@ class TrackPanel(DataTable):
     session_style = f"track.session.{colour_idx}"
     status_style = f"track.status.{status}" if status in ("ok", "error") else ""
 
+    argv = event.get("argv", [])
+    file_path = argv[1] if len(argv) > 1 else ""
+
     self._row_counter += 1
     row_key = f"evt-{self._row_counter}"
     if artifact:
       self._row_artifacts[row_key] = artifact
+    if file_path:
+      self._row_file_paths[row_key] = file_path
 
     self.add_row(
       styled_text(ts, "track.timestamp"),
@@ -87,6 +97,7 @@ class TrackPanel(DataTable):
     while self.row_count > DISPLAY_BUFFER_LIMIT:
       last_key = list(self.rows)[-1]
       self._row_artifacts.pop(last_key.value, None)
+      self._row_file_paths.pop(last_key.value, None)
       self.remove_row(last_key)
 
   def clear_and_replay(
@@ -97,6 +108,7 @@ class TrackPanel(DataTable):
     """Clear table and replay filtered events from buffer."""
     self.clear()
     self._row_artifacts.clear()
+    self._row_file_paths.clear()
     for event in events:
       if session_filter is None or event.get("session") == session_filter:
         self.append_event(event)

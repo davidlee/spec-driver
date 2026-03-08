@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from textual.binding import Binding
 from textual.message import Message
 from textual.widgets import Tree
 from textual.widgets._tree import TreeNode
@@ -27,6 +28,10 @@ class BundleTree(Tree[Path]):
   Skips hidden files (dotfiles) and symlinks. Depth-limited to prevent
   runaway recursion.
   """
+
+  BINDINGS = [
+    Binding("tab", "focus_artifact_table", "Table", show=False),
+  ]
 
   def __init__(self, **kwargs) -> None:
     super().__init__("Bundle", **kwargs)
@@ -79,6 +84,10 @@ class BundleTree(Tree[Path]):
     path = event.node.data
     if isinstance(path, Path) and path.is_file():
       self.post_message(BundleFileSelected(path))
+
+  def action_focus_artifact_table(self) -> None:
+    """Leave tree, focus artifact table (DEC-061-03)."""
+    self.screen.query_one("#artifact-table").focus()
 
   def clear_bundle(self) -> None:
     """Reset to empty state."""

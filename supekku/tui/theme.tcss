@@ -11,12 +11,16 @@ BrowserScreen {
   layout: horizontal;
 }
 
-/* --- Type selector (left panel) --- */
+/* --- Left column: type selector + bundle tree (DEC-061-02) --- */
 
-#type-selector {
+#left-column {
   width: 1fr;
   min-width: 20;
   max-width: 30;
+  height: 100%;
+}
+
+#type-selector {
   height: 100%;
   border: round $surface-lighten-2;
   border-title-color: $text-muted;
@@ -25,6 +29,26 @@ BrowserScreen {
 }
 
 #type-selector:focus-within {
+  border: round $accent;
+  border-title-color: $accent;
+}
+
+#bundle-tree {
+  display: none;
+}
+
+#left-column.has-bundle #type-selector {
+  height: 1fr;
+}
+
+#left-column.has-bundle #bundle-tree {
+  display: block;
+  height: 2fr;
+  border: round $surface-lighten-2;
+  border-title-color: $text-muted;
+}
+
+#bundle-tree:focus-within {
   border: round $accent;
   border-title-color: $accent;
 }

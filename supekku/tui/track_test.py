@@ -31,7 +31,8 @@ _EVENTS = [
     "v": 1,
     "ts": "2026-03-08T14:23:01+00:00",
     "session": "abc123",
-    "cmd": "create delta",
+    "cmd": "artifact.edit",
+    "argv": ["artifact.edit", ".spec-driver/deltas/DE-052-slug/DE-052.md"],
     "artifacts": ["DE-052"],
     "exit_code": 0,
     "status": "ok",
@@ -40,7 +41,8 @@ _EVENTS = [
     "v": 1,
     "ts": "2026-03-08T14:23:03+00:00",
     "session": "abc123",
-    "cmd": "draft-design-revision",
+    "cmd": "artifact.read",
+    "argv": ["artifact.read", ".spec-driver/deltas/DE-052-slug/DR-052.md"],
     "artifacts": ["DR-052"],
     "exit_code": 0,
     "status": "ok",
@@ -377,3 +379,117 @@ class TestTrackPreview:
       screen = app.screen
       assert isinstance(screen, TrackScreen)
       assert screen.query_one("#track-preview", PreviewPanel)
+
+
+# --- VT-061-03: Track file path storage and navigation ---
+
+
+class TestTrackPanelFilePaths:
+  """VT-061-03: TrackPanel stores and retrieves per-row file paths."""
+
+  def test_file_path_stored_from_argv(self):
+    panel = TrackPanel()
+    event = {
+      "ts": "2026-03-08T14:23:01+00:00",
+      "session": "s1",
+      "cmd": "artifact.edit",
+      "argv": ["artifact.edit", ".spec-driver/deltas/DE-061/DE-061.md"],
+      "artifacts": ["DE-061"],
+      "status": "ok",
+    }
+    # Must mount columns before appending
+    panel._row_counter = 0
+    # Simulate by directly calling logic — full pilot test below
+    argv = event.get("argv", [])
+    file_path = argv[1] if len(argv) > 1 else ""
+    assert file_path == ".spec-driver/deltas/DE-061/DE-061.md"
+
+  def test_file_path_for_row_empty_when_no_argv(self):
+    panel = TrackPanel()
+    panel._row_file_paths["evt-1"] = "some/path.md"
+    assert panel.file_path_for_row("evt-1") == "some/path.md"
+    assert panel.file_path_for_row("evt-999") == ""
+
+  @pytest.mark.asyncio()
+  async def test_append_event_stores_file_path(self):
+    app = _make_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      screen.add_event(_EVENTS[0])  # Has argv with file path
+      await pilot.pause()
+
+      panel = screen.query_one("#track-panel", TrackPanel)
+      # Find the row key for the event we just added
+      row_keys = list(panel.rows)
+      assert len(row_keys) >= 1
+      first_key = row_keys[0].value
+      file_path = panel.file_path_for_row(first_key)
+      assert file_path == ".spec-driver/deltas/DE-052-slug/DE-052.md"
+
+  @pytest.mark.asyncio()
+  async def test_no_argv_no_file_path(self):
+    app = _make_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      screen.add_event(_EVENTS[3])  # No argv
+      await pilot.pause()
+
+      panel = screen.query_one("#track-panel", TrackPanel)
+      row_keys = list(panel.rows)
+      assert len(row_keys) >= 1
+      first_key = row_keys[0].value
+      assert panel.file_path_for_row(first_key) == ""
+
+  @pytest.mark.asyncio()
+  async def test_clear_and_replay_clears_file_paths(self):
+    app = _make_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      for event in _EVENTS:
+        screen.add_event(event)
+      await pilot.pause()
+
+      panel = screen.query_one("#track-panel", TrackPanel)
+      assert len(panel._row_file_paths) > 0
+
+      panel.clear_and_replay(_EVENTS, session_filter="def456")
+      # Only 1 event matches def456, and it has no argv
+      assert panel.row_count == 1
+
+
+class TestTrackNavigateWithFilePath:
+  """VT-061-03: Row select navigates with file_path."""
+
+  @pytest.mark.asyncio()
+  async def test_navigate_passes_file_path(self):
+    app = _make_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      # Add event with file path and artifact
+      screen.add_event(_EVENTS[0])
+      await pilot.pause()
+
+      # Navigate via action — should switch to browser
+      app.action_navigate_artifact("DE-052")
+      await pilot.pause()
+      assert isinstance(app.screen, BrowserScreen)

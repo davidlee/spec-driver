@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from textual import on
@@ -61,15 +62,26 @@ class TrackScreen(Screen):
       self._update_preview_for_event(event)
 
   def _update_preview_for_event(self, event: dict) -> None:
-    """Show preview for the event's first artifact, if resolvable."""
+    """Show preview for the event's file path or first artifact (DEC-061-04)."""
+    preview = self.query_one("#track-preview", PreviewPanel)
+
+    # Prefer file path from event argv
+    argv = event.get("argv", [])
+    if len(argv) > 1 and self._snapshot is not None:
+      resolved = self._resolve_event_path(argv[1])
+      if resolved is not None and resolved.is_file():
+        preview.show_artifact(resolved)
+        preview.border_title = resolved.name
+        return
+
+    # Fallback to artifact ID resolution
     artifacts = event.get("artifacts", [])
     if not artifacts or self._snapshot is None:
       return
     entry = self._snapshot.find_entry(artifacts[0])
     if entry is not None:
-      preview = self.query_one("#track-preview", PreviewPanel)
       preview.show_artifact(entry.path)
-      preview.border_title = str(entry.path)
+      preview.border_title = entry.id
 
   def _sync_widgets(self) -> None:
     """Replay buffered events into widgets (called after mount)."""
@@ -93,25 +105,47 @@ class TrackScreen(Screen):
     panel = self.query_one("#track-panel", TrackPanel)
     panel.clear_and_replay(self._event_buffer, self._session_filter)
 
+  def _resolve_event_path(self, rel_path: str) -> Path | None:
+    """Resolve an event-relative path against the snapshot root."""
+    if not self._snapshot or not rel_path:
+      return None
+    root = getattr(self._snapshot, "_root", None)
+    if root is None:
+      return None
+    resolved = Path(root) / rel_path
+    return resolved if resolved.exists() else None
+
   @on(DataTable.RowHighlighted, "#track-panel")
   def _on_event_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
-    """Update preview when cursor moves to a different event row."""
+    """Update preview when cursor moves to a different event row (DEC-061-04)."""
     panel = self.query_one("#track-panel", TrackPanel)
+    preview = self.query_one("#track-preview", PreviewPanel)
+
+    # Prefer file path
+    file_path = panel.file_path_for_row(event.row_key.value)
+    if file_path and self._snapshot is not None:
+      resolved = self._resolve_event_path(file_path)
+      if resolved is not None and resolved.is_file():
+        preview.show_artifact(resolved)
+        preview.border_title = resolved.name
+        return
+
+    # Fallback to artifact ID
     artifact_id = panel.artifact_for_row(event.row_key.value)
     if artifact_id and self._snapshot is not None:
       entry = self._snapshot.find_entry(artifact_id)
       if entry is not None:
-        preview = self.query_one("#track-preview", PreviewPanel)
         preview.show_artifact(entry.path)
-        preview.border_title = str(entry.path)
+        preview.border_title = entry.id
 
   @on(DataTable.RowSelected, "#track-panel")
   def _on_event_row_selected(self, event: DataTable.RowSelected) -> None:
-    """Navigate to artifact when user selects an event row."""
+    """Navigate to artifact when user selects an event row (DEC-061-04)."""
     panel = self.query_one("#track-panel", TrackPanel)
     artifact_id = panel.artifact_for_row(event.row_key.value)
     if artifact_id:
-      self.app.action_navigate_artifact(artifact_id)
+      file_path = panel.file_path_for_row(event.row_key.value) or None
+      self.app.action_navigate_artifact(artifact_id, file_path=file_path)
 
   @property
   def event_buffer(self) -> list[dict]:

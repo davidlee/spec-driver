@@ -174,12 +174,14 @@ class SpecDriverApp(App):
     else:
       self.switch_screen("track")
 
-  def action_navigate_artifact(self, artifact_id: str) -> None:
-    """Navigate to an artifact in the browser (DEC-054-06)."""
+  def action_navigate_artifact(
+    self, artifact_id: str, *, file_path: str | None = None
+  ) -> None:
+    """Navigate to an artifact in the browser (DEC-054-06, DEC-061-04)."""
     self.switch_screen("browser")
     screen = self.screen
     if isinstance(screen, BrowserScreen) and not screen.navigate_to_artifact(
-      artifact_id
+      artifact_id, file_path=file_path
     ):
       self.notify(f"Artifact {artifact_id} not found.", severity="warning")
 

@@ -8,7 +8,7 @@ exec = "uv run spec-driver"
 command = "just check"
 
 [cards]
-enabled = true
+enabled = false
 root = "kanban"
 lanes = ["backlog", "next", "doing", "finishing", "done"]
 id_prefix = "T" # produces T123-* ids

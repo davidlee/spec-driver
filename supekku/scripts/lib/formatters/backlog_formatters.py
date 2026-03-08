@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 def _prepare_backlog_row(item: BacklogItem) -> list[str]:
   """Prepare a single backlog item row with styling."""
   item_id = f"[backlog.id]{item.id}[/backlog.id]"
-  status_style = get_backlog_status_style(item.kind, item.status)
+  status_style = get_backlog_status_style(item.status)
   status_styled = f"[{status_style}]{item.status}[/{status_style}]"
   severity = getattr(item, "severity", "—")
   return [

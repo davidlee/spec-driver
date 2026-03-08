@@ -1,17 +1,5 @@
 # Glossary of Primitives & Concepts
 
-## Card
-
-A **card** is the primary record for task execution and implementation notes. Depending on the project's ceremony level and workflow, a card may be:
-
-- A **kanban card** (lightweight task in `kanban/`)
-- A **delta** (declarative change bundle in `.spec-driver/deltas/`)
-- An **implementation plan** (phased execution plan within a delta)
-
-The term "card" in skills and workflows refers to whichever of these the project uses as its primary unit of work — not exclusively a kanban card.
-
-Cards root: `kanban/`
-ID format: `TNNN-slug`
 ## Specifications
 
 - **PROD Spec** (`PROD-xxx`): Product-level specification capturing user problems, hypotheses, and outcomes. Location: `.spec-driver/product/PROD-xxx/`.

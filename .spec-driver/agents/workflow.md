@@ -10,11 +10,6 @@ Ceremony mode: **town_planner**
 - Ceremony mode sets guidance posture, not runtime command enforcement.
 - Current runtime enforcement comes from explicit command gates (for example coverage checks in `complete delta`) and command flags.
 
-## Cards
-
-Cards root: `kanban`
-Lanes: backlog, next, doing, finishing, done
-ID prefix: `T`
 ## Documentation
 
 Artefacts: `doc/artefacts`

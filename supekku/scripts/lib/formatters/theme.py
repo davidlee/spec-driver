@@ -28,6 +28,7 @@ SPEC_DRIVER_THEME = Theme(
     "adr.status.accepted": "#8ec07c",  # green
     "adr.status.rejected": "#cc241d",  # red
     "adr.status.deprecated": "#cc241d",  # red
+    "adr.status.superseded": "#3c3836",  # dark grey (DEC-075-04)
     "adr.status.revision-required": "#9600ff",  # purple
     "adr.status.proposed": "#d79921",  # yellow
     "adr.status.draft": "#7c7876",  # mid grey
@@ -35,7 +36,7 @@ SPEC_DRIVER_THEME = Theme(
     "adr.id": "#458588",  # blue
     # Policy status colors
     "policy.status.draft": "#7c7876",  # mid grey
-    "policy.status.active": "#8ec07c",  # green
+    "policy.status.required": "#8ec07c",  # green (DEC-075-02)
     "policy.status.deprecated": "#cc241d",  # red
     # Policy display
     "policy.id": "#458588",  # blue
@@ -55,7 +56,6 @@ SPEC_DRIVER_THEME = Theme(
     "change.status.deferred": "#cc241d",  # red
     # Spec status colors
     "spec.status.active": "#8ec07c",  # green
-    "spec.status.live": "#8ec07c",  # green
     "spec.status.draft": "#cecdcd",  # light grey
     "spec.status.stub": "#7c7876",  # mid grey
     "spec.status.deprecated": "#cc241d",  # red
@@ -67,23 +67,13 @@ SPEC_DRIVER_THEME = Theme(
     "requirement.status.in-progress": "#d79921",  # yellow
     "requirement.status.pending": "#00b8ff",  # sky blue
     "requirement.status.retired": "#cc241d",  # red
-    # Backlog item status colors (issue)
-    "backlog.issue.open": "#cc241d",  # red
-    "backlog.issue.in-progress": "#d79921",  # yellow
-    "backlog.issue.resolved": "#8ec07c",  # green
-    "backlog.issue.closed": "#7c7876",  # mid grey
-    # Backlog item status colors (problem)
-    "backlog.problem.captured": "#d79921",  # yellow
-    "backlog.problem.analyzed": "#00b8ff",  # sky blue
-    "backlog.problem.addressed": "#8ec07c",  # green
-    # Backlog item status colors (improvement)
-    "backlog.improvement.idea": "#00b8ff",  # sky blue
-    "backlog.improvement.planned": "#d79921",  # yellow
-    "backlog.improvement.implemented": "#8ec07c",  # green
-    # Backlog item status colors (risk)
-    "backlog.risk.suspected": "#d79921",  # yellow
-    "backlog.risk.confirmed": "#cc241d",  # red
-    "backlog.risk.mitigated": "#8ec07c",  # green
+    # Backlog status colors (unified lifecycle, DEC-075-05)
+    "backlog.status.open": "#cc241d",  # red — needs attention
+    "backlog.status.triaged": "#00b8ff",  # sky blue — assessed
+    "backlog.status.in-progress": "#d79921",  # yellow — active
+    "backlog.status.resolved": "#8ec07c",  # green — done
+    "backlog.status.accepted": "#7c7876",  # mid grey — risk: acknowledged
+    "backlog.status.expired": "#3c3836",  # dark grey — risk: stale
     # Drift ledger status colors
     "drift.status.open": "#d79921",  # yellow
     "drift.status.closed": "#7c7876",  # mid grey
@@ -101,10 +91,8 @@ SPEC_DRIVER_THEME = Theme(
     "memory.status.active": "#8ec07c",  # green
     "memory.status.draft": "#7c7876",  # mid grey
     "memory.status.review": "#d79921",  # yellow
-    "memory.status.archived": "#3c3836",  # dark grey
-    "memory.status.deprecated": "#cc241d",  # red
     "memory.status.superseded": "#cc241d",  # red
-    "memory.status.obsolete": "#cc241d",  # red
+    "memory.status.archived": "#3c3836",  # dark grey
     # Memory display
     "memory.id": "#458588",  # blue
     # General semantic colors
@@ -225,19 +213,17 @@ def get_requirement_status_style(status: str) -> str:
   return f"requirement.status.{status_lower}"
 
 
-def get_backlog_status_style(kind: str, status: str) -> str:
+def get_backlog_status_style(status: str) -> str:
   """Get the style name for a backlog item status.
 
   Args:
-    kind: Backlog item kind (issue, problem, improvement, risk)
-    status: Status string (e.g., "open", "captured")
+    status: Status string (e.g., "open", "in-progress")
 
   Returns:
-    Style name from theme (e.g., "backlog.issue.open")
+    Style name from theme (e.g., "backlog.status.open")
   """
-  kind_lower = kind.lower()
   status_lower = status.lower().replace(" ", "-")
-  return f"backlog.{kind_lower}.{status_lower}"
+  return f"backlog.status.{status_lower}"
 
 
 def get_policy_status_style(status: str) -> str:

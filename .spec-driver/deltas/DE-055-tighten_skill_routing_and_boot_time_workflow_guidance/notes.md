@@ -238,6 +238,59 @@
 - `evidence-based-skill-development.md` only after the compressed relevant extract is available
 - `mem.signpost.spec-driver.skill-authoring` for the durable startup pointer
 
+## 2026-03-09 - audit-loop design narrowing
+
+### What was done
+- Re-read the DE-055 audit-loop section in `DR-055` against:
+  - `ADR-004`
+  - `ADR-008`
+  - `mem.pattern.spec-driver.core-loop`
+  - `mem.concept.spec-driver.audit`
+  - `mem.pattern.spec-driver.delta-completion`
+  - current audit template/schema and close-out/validation touchpoints
+- Tightened the DR so the audit loop now states:
+  - what makes a delta qualify for audit gating
+  - when a standalone `AUD-*` artifact is expected
+  - why discovery/backfill audits should default to warnings while conformance audits block qualifying closure
+  - what per-finding disposition data must exist for closure to reason from audit output
+
+### Design decisions captured
+- Treat audit gating as a closure rule for deltas that change requirement-bearing or spec-governed technical reality, not for every delta indiscriminately.
+- Require a standalone `AUD-*` artifact for qualifying gated audits so closure, validation, and handoff all have a stable reconciliation anchor.
+- Keep non-qualifying or exploratory discovery work flexible: embedded evidence is still acceptable there, but it does not satisfy the canonical gated audit checkpoint.
+- Make conformance audits block closure until every blocking finding has a disposition and linked reconciliation work.
+- Keep discovery/backfill audits warning-first by default, escalating only when they are being used to justify closure or when they reveal materially misleading active specs without any owned follow-up.
+- Replace loose narrative audit outcomes with machine-checkable per-finding disposition data; exact final schema shape is still open.
+
+### Assumptions carried forward explicitly
+- The user wants DR/design work only for now; no implementation or runtime-gate changes were attempted in this pass.
+- Doctrine still says `implement -> audit/contracts -> revision/spec reconcile -> close`.
+- Runtime still only hard-gates delta closure on coverage today; the stronger audit gate remains design intent, not current behavior.
+- The worktree is dirty and includes unrelated changes; inspect carefully before any later commit.
+- `uv run spec-driver validate` is still failing on unrelated pre-existing `DE-076` errors, so that failure should not be treated as a regression from DE-055 design edits.
+
+### Remaining open threads
+- Final audit lifecycle/status enum vocabulary still needs settling.
+- Final schema shape for per-finding disposition is still open:
+  - nested disposition object
+  - dedicated reconciliation block
+  - or both
+- Need a policy for which discovery/backfill warnings should become blockers before any future runtime strictness lands.
+
+### 2026-03-09 - audit/disposition compatibility with drift ledger
+- Follow-up design clarification after the audit-loop narrowing pass:
+  - audit finding disposition should be compatible with DE-065 drift ledgers
+  - drift-ledger linkage should be optional, not required for every audit finding
+  - drift ledger should not become the closure-grade record for conformance audit findings
+- Current recommended shape:
+  - keep per-finding disposition in `AUD-*` as the authoritative closure/checkpoint record
+  - allow optional refs from findings to `DL-*` entries for durable cross-work tracking
+  - let drift entries record audit origin via discovery metadata rather than replacing the audit finding itself
+- Rationale:
+  - preserves DE-065 as a drift-management primitive instead of turning it into a competing closure system
+  - reuses the drift lifecycle where it is strongest: discovery-heavy, cross-cutting, or long-lived adjudication
+  - avoids forcing extra ceremony on every conformance audit
+
 ### Governing context already established
 - `ADR-004` is the workflow canon.
 - `ADR-005` says skills and memories own guidance.
@@ -366,10 +419,14 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-04.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-05.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-06.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-12.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-13.md`
+- `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-14.md`
 
 ### Related documents
 - `/home/david/dev/spec-driver/specify/decisions/ADR-004-canonical_workflow_loop.md`
 - `/home/david/dev/spec-driver/specify/decisions/ADR-005-memories_and_skills_are_the_canonical_guidance_layer.md`
+- `/home/david/dev/spec-driver/specify/decisions/ADR-008-normative_lifecycle_truth_and_observed_evidence_reconciliation.md`
 - `/home/david/dev/spec-driver/.spec-driver/product/PROD-016/PROD-016.md`
 
 ### Key files
@@ -381,24 +438,35 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - `/home/david/dev/spec-driver/supekku/skills/next/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/spec-driver/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/boot/SKILL.md`
+- `/home/david/dev/spec-driver/supekku/skills/audit-change/SKILL.md`
+- `/home/david/dev/spec-driver/supekku/skills/close-change/SKILL.md`
+- `/home/david/dev/spec-driver/supekku/templates/audit.md`
+- `/home/david/dev/spec-driver/supekku/scripts/lib/core/frontmatter_metadata/audit.py`
+- `/home/david/dev/spec-driver/supekku/scripts/complete_delta.py`
+- `/home/david/dev/spec-driver/supekku/scripts/lib/requirements/registry.py`
+- `/home/david/dev/spec-driver/supekku/scripts/lib/validation/validator.py`
 - `/home/david/dev/spec-driver/.spec-driver/skills.allowlist`
 - `/home/david/dev/spec-driver/.spec-driver/AGENTS.md`
 
 ### Relevant memories
 - `mem.pattern.spec-driver.core-loop`
 - `mem.concept.spec-driver.posture`
+- `mem.concept.spec-driver.audit`
+- `mem.concept.spec-driver.revision`
 - `mem.pattern.installer.boot-architecture`
 - `mem.signpost.spec-driver.skill-authoring`
 
 ### Relevant doctrines
 - Delta-first canon from `ADR-004`
 - Skills/memories as guidance layers from `ADR-005`
+- Observed evidence triggers explicit reconciliation, not silent overwrite, from `ADR-008`
 - Generated guidance plus user-owned hook split from `PROD-016`
 
 ### Important user instructions and decisions
 - Keep `spec-driver` narrow.
 - Keep routing separate.
 - Stronger description/opening language matters because Claude under-uses skills.
+- The user explicitly asked for a DR deliverable, not implementation.
 - Optional future patterns to preserve:
   - brainstorming for authoring/design work
   - adversarial review for fresh-agent challenge passes
@@ -413,20 +481,37 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
   - whether to add a generic decision-loop skill and where to embed section-by-section authoring guidance first
   - whether the new handoff/preflight critical-assessment wording is sufficient or needs stronger reinforcement
   - whether the newly landed routing/execution guardrails are sufficient or need stronger follow-up reinforcement
+- Decide the audit-loop design details now captured in `DR-055`:
+  - only if the workflow doctrine changes
+  - concrete audit contract/schema/runtime questions now belong to `DE-079`
 - Decide whether brainstorming and adversarial review become explicit optional skills or remain prompt patterns.
 - Use `evidence-based-skill-development.md` only after the compressed delta-relevant extract is available.
 
+### Pending commit-state guidance
+- Repo doctrine prefers frequent, small `.spec-driver` commits, but do not commit blindly here.
+- Current worktree is not clean:
+  - intended design-doc changes: `DE-055.md`, `DR-055.md`
+  - incidental sync output: `.spec-driver/registry/requirements.yaml`
+  - unrelated pre-existing code changes also exist outside DE-055
+- Next agent should inspect the worktree before committing and avoid bundling unrelated code changes with this DE-055 design work unless the user explicitly wants that.
+
 ### Other advice
 - Do not re-discover the whole repo. The context is already concentrated in `DE-055`.
-- `uv run spec-driver validate` currently fails on unrelated pre-existing errors in `DE-049`, `DE-052`, `DE-053`, and `DE-054`.
+- `uv run spec-driver validate` currently fails on unrelated pre-existing errors in `DE-076`.
 - `uv run spec-driver skills sync` has already succeeded after escalation; use escalation again if sync must write to `.agents/skills`.
+- `uv run spec-driver sync` succeeded in this turn and refreshed generated docs plus the requirements registry.
 
 ### Next logical activity
-- `/preflight` the next unresolved DE-055 workflow failure mode, or fold in the compressed research extract once it is available and reprioritise from there.
+- `/using-spec-driver` for `DE-055`, then either:
+  - `/preflight` any remaining DE-055 doctrine/workflow question that is still unresolved, or
+  - switch to the `DE-079` bundle for audit schema/runtime implementation and review, or
+  - fold in the compressed `evidence-based-skill-development.md` extract once available and reconcile it against the updated DR.
 
 ### Verification status
 - Skill sync succeeded and `.spec-driver/AGENTS.md` now exposes `using-spec-driver` and `update-delta-docs`.
-- `uv run spec-driver validate` still fails on unrelated pre-existing errors in `DE-049`, `DE-052`, `DE-053`, and `DE-054`.
+- `uv run spec-driver show delta DE-055` passed.
+- `uv run spec-driver sync` passed.
+- `uv run spec-driver validate` still fails on unrelated pre-existing errors in `DE-076`.
 
 ## 2026-03-08
 
@@ -465,3 +550,35 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - Rationale:
   - closing the delta without touching the originating backlog item leaves traceability and backlog state behind
   - `ISSUE-009` still blocks inventing a canonical backlog status vocabulary, so the close-out skill should nudge and escalate ambiguity rather than guess
+
+### 2026-03-09 - audit-loop DR extension
+- Treated the user request as design only, not implementation.
+- Extended `DR-055.md` and reconciled `DE-055.md` to cover the missing canonical audit loop:
+  - documented the doctrine/runtime gap between `ADR-004` and `ADR-008` and the current workflow behavior
+  - added an explicit audit contract for qualifying deltas
+  - defined the intended relationship between `audit-change`, the AUD artifact, revisions/spec patches, validation, and `complete delta`
+  - recorded new design decisions and open questions around when audits are mandatory, whether standalone AUD artifacts are always required, and how hard audit drift should gate closure
+- Concrete gaps now called out in the DR:
+  - `audit-change` is still only advisory
+  - `create audit` scaffolds a weak shell
+  - the audit schema/template are richer than the runtime semantics that consume them
+  - `complete delta` gates only on coverage, not audit reconciliation
+  - requirements sync records audit IDs but not unresolved audit drift as a closure-grade outcome
+- Verification performed:
+  - `uv run spec-driver show delta DE-055` passed
+  - `uv run spec-driver sync` passed and refreshed generated agent docs
+  - `uv run spec-driver validate` still fails on unrelated pre-existing `DE-076` requirement-reference errors
+- Important worktree note:
+  - `uv run spec-driver sync` also rewrote `.spec-driver/registry/requirements.yaml`
+  - there are unrelated pre-existing code/worktree changes outside DE-055; do not assume a clean tree
+
+### 2026-03-09 - DE-079 dependency scoping pass
+- Re-scoped `DE-055`/`DR-055` so the audit loop stays doctrine-first here and the concrete contract now clearly belongs to `DE-079`.
+- Changes made:
+  - updated `DE-055.md` earlier in the turn to say `DE-079` owns canonical audit reconciliation implementation
+  - removed audit-schema/open-question ownership from `DR-055` frontmatter
+  - reconciled `DR-055` audit-language to stop implying that stored `closure_effect`, unresolved schema shape, or `accepted_drift` remain live decisions here
+  - kept `DR-055` focused on the workflow contract: qualifying deltas, standalone `AUD-*` expectation, conformance-vs-discovery posture, and optional drift-ledger linkage
+- Guidance for future agents:
+  - use `DR-055` when the question is about doctrine, workflow posture, or skill expectations
+  - use `DR-079` when the question is about audit schema, validation rules, lifecycle enums, or `complete delta` gate mechanics

@@ -20,22 +20,16 @@ class _FakeWorkspace:
 
 
 def _pass_check(_ws: object) -> list[DiagnosticResult]:
-  return [
-    DiagnosticResult(category="test", name="ok", status="pass", message="fine")
-  ]
+  return [DiagnosticResult(category="test", name="ok", status="pass", message="fine")]
 
 
 def _warn_check(_ws: object) -> list[DiagnosticResult]:
-  return [
-    DiagnosticResult(category="test", name="eh", status="warn", message="hmm")
-  ]
+  return [DiagnosticResult(category="test", name="eh", status="warn", message="hmm")]
 
 
 def _fail_check(_ws: object) -> list[DiagnosticResult]:
   return [
-    DiagnosticResult(
-      category="test", name="bad", status="fail", message="broken"
-    )
+    DiagnosticResult(category="test", name="bad", status="fail", message="broken")
   ]
 
 
@@ -45,9 +39,7 @@ class TestRunChecks(unittest.TestCase):
   def test_runs_all_registered_checks(self) -> None:
     """Runs all checks when no filter provided."""
     fake_registry = {"alpha": _pass_check, "beta": _warn_check}
-    with patch(
-      "supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry
-    ):
+    with patch("supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry):
       summaries = run_checks(_FakeWorkspace())
 
     assert len(summaries) == 2
@@ -57,9 +49,7 @@ class TestRunChecks(unittest.TestCase):
   def test_filters_by_category(self) -> None:
     """Only runs requested categories."""
     fake_registry = {"alpha": _pass_check, "beta": _warn_check}
-    with patch(
-      "supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry
-    ):
+    with patch("supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry):
       summaries = run_checks(_FakeWorkspace(), categories=["beta"])
 
     assert len(summaries) == 1
@@ -80,9 +70,7 @@ class TestRunChecks(unittest.TestCase):
   def test_preserves_order(self) -> None:
     """Summaries are returned in registry order."""
     fake_registry = {"z": _pass_check, "a": _warn_check, "m": _fail_check}
-    with patch(
-      "supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry
-    ):
+    with patch("supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry):
       summaries = run_checks(_FakeWorkspace())
 
     assert [s.category for s in summaries] == ["z", "a", "m"]
@@ -93,25 +81,19 @@ class TestOverallExitCode(unittest.TestCase):
 
   def test_all_pass_returns_zero(self) -> None:
     fake_registry = {"a": _pass_check}
-    with patch(
-      "supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry
-    ):
+    with patch("supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry):
       summaries = run_checks(_FakeWorkspace())
     assert overall_exit_code(summaries) == 0
 
   def test_warn_returns_one(self) -> None:
     fake_registry = {"a": _pass_check, "b": _warn_check}
-    with patch(
-      "supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry
-    ):
+    with patch("supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry):
       summaries = run_checks(_FakeWorkspace())
     assert overall_exit_code(summaries) == 1
 
   def test_fail_returns_two(self) -> None:
     fake_registry = {"a": _pass_check, "b": _fail_check}
-    with patch(
-      "supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry
-    ):
+    with patch("supekku.scripts.lib.diagnostics.runner.CHECK_REGISTRY", fake_registry):
       summaries = run_checks(_FakeWorkspace())
     assert overall_exit_code(summaries) == 2
 

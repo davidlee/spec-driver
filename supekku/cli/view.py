@@ -305,6 +305,23 @@ def view_memory(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("drift")
+def view_drift(
+  ledger_id: Annotated[str, typer.Argument(help="Drift ledger ID (e.g., DL-047)")],
+  root: RootOption = None,
+) -> None:
+  """View drift ledger in pager."""
+  try:
+    ref = resolve_artifact("drift_ledger", ledger_id, root)
+    open_in_pager(ref.path)
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 @app.command("issue")
 def view_issue(
   issue_id: Annotated[str, typer.Argument(help="Issue ID (e.g., ISSUE-001)")],

@@ -103,6 +103,15 @@ STANDARD_COLUMNS = [
   ColumnDef(label="Updated", field="updated"),
 ]
 
+DRIFT_COLUMNS = [
+  ColumnDef(label="ID", field="id", style_key="drift.id"),
+  ColumnDef(label="Name", field="name"),
+  ColumnDef(label="Status", field="status"),
+  ColumnDef(label="Entries", field="entries"),
+  ColumnDef(label="Delta", field="delta_ref"),
+  ColumnDef(label="Updated", field="updated"),
+]
+
 PHASE_COLUMNS = [
   ColumnDef(label="Phase", field="id"),
   ColumnDef(label="Status", field="status"),

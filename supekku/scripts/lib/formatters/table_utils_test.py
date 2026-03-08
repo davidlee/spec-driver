@@ -60,7 +60,6 @@ class TestColumnWidthCalculation:
     assert all(w > 0 for w in widths.values())
 
 
-
 class TestTableCreation:
   """Test table creation."""
 

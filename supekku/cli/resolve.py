@@ -142,6 +142,19 @@ def _collect_backlog_items(root: Path, index: ArtifactIndex) -> None:
     log.debug("Skipping backlog registry", exc_info=True)
 
 
+def _collect_drift_ledgers(root: Path, index: ArtifactIndex) -> None:
+  """Add drift ledgers to the artifact index."""
+  try:
+    from supekku.scripts.lib.drift.registry import DriftLedgerRegistry  # noqa: PLC0415
+
+    registry = DriftLedgerRegistry(root=root)
+    for ledger_id, ledger in registry.collect().items():
+      rel = str(ledger.path.relative_to(root))
+      index[ledger_id] = (rel, "drift_ledger")
+  except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
+    log.debug("Skipping drift ledger registry", exc_info=True)
+
+
 def build_artifact_index(root: Path) -> ArtifactIndex:
   """Build artifact ID → (relative_path, kind) index.
 
@@ -160,6 +173,7 @@ def build_artifact_index(root: Path) -> ArtifactIndex:
   _collect_specs(root, index)
   _collect_changes(root, index)
   _collect_backlog_items(root, index)
+  _collect_drift_ledgers(root, index)
   return index
 
 

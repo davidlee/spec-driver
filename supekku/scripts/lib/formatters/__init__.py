@@ -33,6 +33,11 @@ from .decision_formatters import (
   format_decision_list_json,
   format_decision_list_table,
 )
+from .drift_formatters import (
+  format_drift_details,
+  format_drift_details_json,
+  format_drift_list_table,
+)
 from .memory_formatters import (
   format_memory_details,
   format_memory_list_json,
@@ -88,6 +93,9 @@ __all__ = [
   "format_memory_list_json",
   "format_memory_list_table",
   "format_delta_details_json",
+  "format_drift_details",
+  "format_drift_details_json",
+  "format_drift_list_table",
   "format_package_list",
   "format_phase_summary",
   "format_plan_list_table",

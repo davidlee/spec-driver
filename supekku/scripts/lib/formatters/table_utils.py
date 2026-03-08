@@ -71,7 +71,6 @@ def calculate_column_widths(
   return dict.fromkeys(range(num_columns), col_width)
 
 
-
 def create_table(
   columns: Sequence[str],
   title: str | None = None,

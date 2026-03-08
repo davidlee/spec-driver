@@ -400,6 +400,17 @@ def _resolve_requirement(root: Path, raw_id: str) -> ArtifactRef:
   return ArtifactRef(id=normalized, path=req_path, record=record)
 
 
+def _resolve_drift_ledger(root: Path, raw_id: str) -> ArtifactRef:
+  from supekku.scripts.lib.drift.registry import DriftLedgerRegistry  # noqa: PLC0415
+
+  normalized = raw_id.upper()
+  registry = DriftLedgerRegistry(root=root)
+  ledger = registry.find(normalized)
+  if not ledger:
+    raise ArtifactNotFoundError("drift_ledger", normalized)
+  return ArtifactRef(id=normalized, path=ledger.path, record=ledger)
+
+
 def _resolve_card(root: Path, raw_id: str) -> ArtifactRef:
   from supekku.scripts.lib.cards import CardRegistry  # noqa: PLC0415
 
@@ -474,6 +485,7 @@ _ARTIFACT_RESOLVERS: dict[str, Any] = {
   "requirement": _resolve_requirement,
   "card": _resolve_card,
   "memory": _resolve_memory,
+  "drift_ledger": _resolve_drift_ledger,
   "plan": _resolve_plan,
   "issue": lambda root, raw_id: _resolve_backlog(root, raw_id, "issue"),
   "problem": lambda root, raw_id: _resolve_backlog(root, raw_id, "problem"),
@@ -527,6 +539,7 @@ PREFIX_TO_TYPE: dict[str, str] = {
   "IMPR": "improvement",
   "RISK": "risk",
   "T": "card",
+  "DL": "drift_ledger",
 }
 
 
@@ -743,6 +756,16 @@ def _find_memories(root: Path, pattern: str) -> Iterator[ArtifactRef]:
       yield ArtifactRef(id=art_id, path=Path(art.path), record=art)
 
 
+def _find_drift_ledgers(root: Path, pattern: str) -> Iterator[ArtifactRef]:
+  from supekku.scripts.lib.drift.registry import DriftLedgerRegistry  # noqa: PLC0415
+
+  normalized = pattern.upper()
+  registry = DriftLedgerRegistry(root=root)
+  for ledger in registry.iter():
+    if _matches_pattern(ledger.id, normalized):
+      yield ArtifactRef(id=ledger.id, path=ledger.path, record=ledger)
+
+
 def _find_cards(root: Path, pattern: str) -> Iterator[ArtifactRef]:
   """Find cards by repo-wide rglob matching {pattern}-*.md."""
   search_pattern = f"{pattern}-*.md"
@@ -806,6 +829,7 @@ _ARTIFACT_FINDERS: dict[str, Any] = {
   "requirement": _find_requirements,
   "card": _find_cards,
   "memory": _find_memories,
+  "drift_ledger": _find_drift_ledgers,
   "plan": _find_plans,
   "issue": lambda root, pat: _find_backlog(root, pat, "issue"),
   "problem": lambda root, pat: _find_backlog(root, pat, "problem"),

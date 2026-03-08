@@ -25,9 +25,7 @@ from .models import Claim, DiscoveredBy, DriftEntry, Source
 logger = logging.getLogger(__name__)
 
 # Entry heading pattern: ### DL-NNN.MMM: title
-_ENTRY_HEADING_RE = re.compile(
-  r"^###\s+(DL-\d+\.\d+):\s*(.+)$", re.MULTILINE
-)
+_ENTRY_HEADING_RE = re.compile(r"^###\s+(DL-\d+\.\d+):\s*(.+)$", re.MULTILINE)
 
 # Fenced code block pattern (any language tag)
 _FENCE_RE = re.compile(r"^```\w*\s*$", re.MULTILINE)
@@ -218,10 +216,20 @@ def _build_entry(
 
   # Extract known fields, collect extras
   known_keys = {
-    "status", "entry_type", "severity", "topic", "owner",
-    "sources", "claims", "assessment", "resolution_path",
-    "resolution_ref", "affected_artifacts", "discovered_by",
-    "analysis", "evidence",
+    "status",
+    "entry_type",
+    "severity",
+    "topic",
+    "owner",
+    "sources",
+    "claims",
+    "assessment",
+    "resolution_path",
+    "resolution_ref",
+    "affected_artifacts",
+    "discovered_by",
+    "analysis",
+    "evidence",
   }
   extra = {k: v for k, v in data.items() if k not in known_keys}
 

@@ -606,6 +606,37 @@ def show_audit(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("drift")
+def show_drift(
+  ledger_id: Annotated[str, typer.Argument(help="Drift ledger ID (e.g., DL-047)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show detailed information about a drift ledger."""
+  try:
+    ref = resolve_artifact("drift_ledger", ledger_id, root)
+    from supekku.scripts.lib.formatters.drift_formatters import (  # noqa: PLC0415
+      format_drift_details,
+      format_drift_details_json,
+    )
+
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      format_fn=format_drift_details,
+      json_fn=format_drift_details_json,
+    )
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 @app.command("issue")
 def show_issue(
   issue_id: Annotated[str, typer.Argument(help="Issue ID (e.g., ISSUE-001)")],
@@ -772,6 +803,7 @@ def show_inferred(
     "standard": lambda: show_standard(ref.id, json_output=json_output, root=root),
     "memory": lambda: show_memory(ref.id, json_output=json_output, root=root),
     "card": lambda: show_card(ref.id, json_output=json_output, root=root),
+    "drift_ledger": lambda: show_drift(ref.id, json_output=json_output, root=root),
     "issue": lambda: show_issue(ref.id, json_output=json_output, root=root),
     "problem": lambda: show_problem(ref.id, json_output=json_output, root=root),
     "improvement": lambda: show_improvement(ref.id, json_output=json_output, root=root),

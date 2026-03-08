@@ -37,7 +37,10 @@ class TestDiscovery:
     assert reg.collect() == {}
 
   def test_discovers_ledger_files(self, drift_dir: Path, tmp_path: Path):
-    _write_ledger(drift_dir, "DL-047-test.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-test.md",
+      """\
       ---
       id: DL-047
       name: Test ledger
@@ -46,40 +49,53 @@ class TestDiscovery:
       ---
 
       # DL-047 — Test ledger
-    """)
+    """,
+    )
     reg = DriftLedgerRegistry(root=tmp_path)
     ledgers = reg.collect()
     assert "DL-047" in ledgers
     assert ledgers["DL-047"].name == "Test ledger"
 
   def test_ignores_non_ledger_files(self, drift_dir: Path, tmp_path: Path):
-    _write_ledger(drift_dir, "DL-047-test.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-test.md",
+      """\
       ---
       id: DL-047
       name: Test ledger
       status: open
       ---
-    """)
+    """,
+    )
     (drift_dir / "README.md").write_text("Not a ledger")
     (drift_dir / "notes.txt").write_text("Also not a ledger")
     reg = DriftLedgerRegistry(root=tmp_path)
     assert len(reg.collect()) == 1
 
   def test_discovers_multiple_ledgers(self, drift_dir: Path, tmp_path: Path):
-    _write_ledger(drift_dir, "DL-047-first.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-first.md",
+      """\
       ---
       id: DL-047
       name: First
       status: open
       ---
-    """)
-    _write_ledger(drift_dir, "DL-048-second.md", """\
+    """,
+    )
+    _write_ledger(
+      drift_dir,
+      "DL-048-second.md",
+      """\
       ---
       id: DL-048
       name: Second
       status: closed
       ---
-    """)
+    """,
+    )
     reg = DriftLedgerRegistry(root=tmp_path)
     assert len(reg.collect()) == 2
 
@@ -88,13 +104,17 @@ class TestFind:
   """Registry find by ID."""
 
   def test_find_existing(self, drift_dir: Path, tmp_path: Path):
-    _write_ledger(drift_dir, "DL-047-test.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-test.md",
+      """\
       ---
       id: DL-047
       name: Test
       status: open
       ---
-    """)
+    """,
+    )
     reg = DriftLedgerRegistry(root=tmp_path)
     ledger = reg.find("DL-047")
     assert ledger is not None
@@ -109,39 +129,55 @@ class TestIter:
   """Registry iteration with optional status filter."""
 
   def test_iter_all(self, drift_dir: Path, tmp_path: Path):
-    _write_ledger(drift_dir, "DL-047-a.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-a.md",
+      """\
       ---
       id: DL-047
       name: A
       status: open
       ---
-    """)
-    _write_ledger(drift_dir, "DL-048-b.md", """\
+    """,
+    )
+    _write_ledger(
+      drift_dir,
+      "DL-048-b.md",
+      """\
       ---
       id: DL-048
       name: B
       status: closed
       ---
-    """)
+    """,
+    )
     reg = DriftLedgerRegistry(root=tmp_path)
     all_ledgers = list(reg.iter())
     assert len(all_ledgers) == 2
 
   def test_iter_by_status(self, drift_dir: Path, tmp_path: Path):
-    _write_ledger(drift_dir, "DL-047-a.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-a.md",
+      """\
       ---
       id: DL-047
       name: Open one
       status: open
       ---
-    """)
-    _write_ledger(drift_dir, "DL-048-b.md", """\
+    """,
+    )
+    _write_ledger(
+      drift_dir,
+      "DL-048-b.md",
+      """\
       ---
       id: DL-048
       name: Closed one
       status: closed
       ---
-    """)
+    """,
+    )
     reg = DriftLedgerRegistry(root=tmp_path)
     open_ledgers = list(reg.iter(status="open"))
     assert len(open_ledgers) == 1
@@ -152,7 +188,10 @@ class TestParsedContent:
   """Registry correctly parses ledger content including entries."""
 
   def test_entries_parsed(self, drift_dir: Path, tmp_path: Path):
-    _write_ledger(drift_dir, "DL-047-test.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-test.md",
+      """\
       ---
       id: DL-047
       name: Test
@@ -176,7 +215,8 @@ class TestParsedContent:
       status: resolved
       entry_type: stale_claim
       ```
-    """)
+    """,
+    )
     reg = DriftLedgerRegistry(root=tmp_path)
     ledger = reg.find("DL-047")
     assert ledger is not None
@@ -185,7 +225,10 @@ class TestParsedContent:
     assert ledger.entries[1].status == "resolved"
 
   def test_body_preserved(self, drift_dir: Path, tmp_path: Path):
-    _write_ledger(drift_dir, "DL-047-test.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-test.md",
+      """\
       ---
       id: DL-047
       name: Test
@@ -204,7 +247,8 @@ class TestParsedContent:
       status: open
       entry_type: contradiction
       ```
-    """)
+    """,
+    )
     reg = DriftLedgerRegistry(root=tmp_path)
     ledger = reg.find("DL-047")
     assert ledger is not None
@@ -212,14 +256,18 @@ class TestParsedContent:
     assert "PROD-001" in ledger.body
 
   def test_delta_ref_extracted(self, drift_dir: Path, tmp_path: Path):
-    _write_ledger(drift_dir, "DL-047-test.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-test.md",
+      """\
       ---
       id: DL-047
       name: Test
       status: open
       delta_ref: DE-047
       ---
-    """)
+    """,
+    )
     reg = DriftLedgerRegistry(root=tmp_path)
     ledger = reg.find("DL-047")
     assert ledger is not None
@@ -227,13 +275,17 @@ class TestParsedContent:
 
   def test_lazy_loading(self, drift_dir: Path, tmp_path: Path):
     """Registry doesn't load until first access."""
-    _write_ledger(drift_dir, "DL-047-test.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-test.md",
+      """\
       ---
       id: DL-047
       name: Test
       status: open
       ---
-    """)
+    """,
+    )
     reg = DriftLedgerRegistry(root=tmp_path)
     assert reg._ledgers is None  # noqa: SLF001
     reg.collect()
@@ -244,12 +296,16 @@ class TestMalformedLedgers:
   """Registry handles malformed ledger files gracefully."""
 
   def test_missing_id_skipped(self, drift_dir: Path, tmp_path: Path):
-    _write_ledger(drift_dir, "DL-047-test.md", """\
+    _write_ledger(
+      drift_dir,
+      "DL-047-test.md",
+      """\
       ---
       name: No ID
       status: open
       ---
-    """)
+    """,
+    )
     reg = DriftLedgerRegistry(root=tmp_path)
     assert reg.collect() == {}
 

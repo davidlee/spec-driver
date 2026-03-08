@@ -90,9 +90,7 @@ class TestCategorySummary(unittest.TestCase):
   def test_fail_in_results(self) -> None:
     results = (
       DiagnosticResult(category="deps", name="a", status="pass", message="OK"),
-      DiagnosticResult(
-        category="deps", name="b", status="fail", message="missing"
-      ),
+      DiagnosticResult(category="deps", name="b", status="fail", message="missing"),
     )
     summary = CategorySummary(category="deps", results=results)
     assert summary.status == "fail"

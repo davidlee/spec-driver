@@ -1728,6 +1728,63 @@ def list_backlog(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("drift")
+def list_drift(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option("--status", "-s", help="Filter by status (open|closed)"),
+  ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on name (case-insensitive)",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  truncate: TruncateOption = False,
+) -> None:
+  """List drift ledgers."""
+  try:
+    from supekku.scripts.lib.drift.registry import DriftLedgerRegistry
+    from supekku.scripts.lib.formatters.drift_formatters import format_drift_list_table
+
+    registry = DriftLedgerRegistry(root=root)
+    ledgers = list(registry.iter(status=status))
+
+    # Apply substring filter
+    if substring:
+      sub_lower = substring.lower()
+      ledgers = [
+        dl
+        for dl in ledgers
+        if sub_lower in dl.name.lower() or sub_lower in dl.id.lower()
+      ]
+
+    # Apply regexp filter
+    if regexp:
+      ledgers = [
+        dl
+        for dl in ledgers
+        if matches_regexp(regexp, [dl.name, dl.id], case_insensitive)
+      ]
+
+    output = format_drift_list_table(
+      ledgers,
+      format_type=format_type,
+      truncate=truncate,
+    )
+    typer.echo(output)
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 @app.command("issues")
 def list_issues(
   root: RootOption = None,

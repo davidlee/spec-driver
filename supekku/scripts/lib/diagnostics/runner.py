@@ -40,9 +40,7 @@ def run_checks(
   summaries: list[CategorySummary] = []
   for category_name, check_fn in registry.items():
     results = check_fn(ws)
-    summaries.append(
-      CategorySummary(category=category_name, results=tuple(results))
-    )
+    summaries.append(CategorySummary(category=category_name, results=tuple(results)))
   return summaries
 
 

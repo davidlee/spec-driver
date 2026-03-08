@@ -675,6 +675,30 @@ def create_risk(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("drift")
+def create_drift_cmd(
+  name: Annotated[str, typer.Argument(help="Drift ledger name")],
+  delta: Annotated[
+    str | None,
+    typer.Option("--delta", help="Owning delta (e.g. DE-065)"),
+  ] = None,
+  root: RootOption = None,
+) -> None:
+  """Create a new drift ledger."""
+  try:
+    from supekku.scripts.lib.drift.creation import create_drift_ledger
+
+    path = create_drift_ledger(name, delta_ref=delta or "", repo_root=root)
+    ledger_id = path.stem.split("-", 2)
+    dl_id = f"{ledger_id[0]}-{ledger_id[1]}" if len(ledger_id) >= 2 else path.stem
+    typer.echo(f"Drift ledger created: {dl_id}")
+    typer.echo(str(path))
+    raise typer.Exit(EXIT_SUCCESS)
+  except (ValueError, FileNotFoundError, OSError) as e:
+    typer.echo(f"Error creating drift ledger: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 @app.command("card")
 def create_card(
   description: Annotated[str, typer.Argument(help="Card description/title")],

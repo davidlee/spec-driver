@@ -180,15 +180,23 @@ class TestLifecycleConstants:
 
   def test_entry_statuses(self):
     expected = {
-      "open", "triaged", "adjudicated",
-      "resolved", "deferred", "dismissed", "superseded",
+      "open",
+      "triaged",
+      "adjudicated",
+      "resolved",
+      "deferred",
+      "dismissed",
+      "superseded",
     }
     assert expected == ENTRY_STATUSES
 
   def test_entry_types(self):
     expected = {
-      "contradiction", "implementation_drift", "stale_claim",
-      "missing_decision", "ambiguous_intent",
+      "contradiction",
+      "implementation_drift",
+      "stale_claim",
+      "missing_decision",
+      "ambiguous_intent",
     }
     assert expected == ENTRY_TYPES
 
@@ -202,7 +210,12 @@ class TestLifecycleConstants:
     """backlog was added per pilot usage — see DR-065."""
     assert "backlog" in RESOLUTION_PATHS
     assert {
-      "ADR", "RE", "DE", "editorial", "no_change", "backlog",
+      "ADR",
+      "RE",
+      "DE",
+      "editorial",
+      "no_change",
+      "backlog",
     } == RESOLUTION_PATHS
 
 

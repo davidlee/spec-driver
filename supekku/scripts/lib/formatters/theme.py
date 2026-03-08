@@ -84,6 +84,19 @@ SPEC_DRIVER_THEME = Theme(
     "backlog.risk.suspected": "#d79921",  # yellow
     "backlog.risk.confirmed": "#cc241d",  # red
     "backlog.risk.mitigated": "#8ec07c",  # green
+    # Drift ledger status colors
+    "drift.status.open": "#d79921",  # yellow
+    "drift.status.closed": "#7c7876",  # mid grey
+    # Drift entry status colors
+    "drift.entry.open": "#cc241d",  # red
+    "drift.entry.triaged": "#d79921",  # yellow
+    "drift.entry.adjudicated": "#00b8ff",  # sky blue
+    "drift.entry.resolved": "#8ec07c",  # green
+    "drift.entry.deferred": "#7c7876",  # mid grey
+    "drift.entry.dismissed": "#3c3836",  # dark grey
+    "drift.entry.superseded": "#3c3836",  # dark grey
+    # Drift display
+    "drift.id": "#ff00c1",  # magenta
     # Memory status colors
     "memory.status.active": "#8ec07c",  # green
     "memory.status.draft": "#7c7876",  # mid grey
@@ -251,6 +264,32 @@ def get_standard_status_style(status: str) -> str:
   """
   status_lower = status.lower().replace(" ", "-")
   return f"standard.status.{status_lower}"
+
+
+def get_drift_status_style(status: str) -> str:
+  """Get the style name for a drift ledger status.
+
+  Args:
+    status: Status string (e.g., "open", "closed")
+
+  Returns:
+    Style name from theme (e.g., "drift.status.open")
+  """
+  status_lower = status.lower().replace(" ", "-")
+  return f"drift.status.{status_lower}"
+
+
+def get_drift_entry_status_style(status: str) -> str:
+  """Get the style name for a drift entry status.
+
+  Args:
+    status: Status string (e.g., "open", "triaged", "resolved")
+
+  Returns:
+    Style name from theme (e.g., "drift.entry.resolved")
+  """
+  status_lower = status.lower().replace(" ", "-")
+  return f"drift.entry.{status_lower}"
 
 
 def get_memory_status_style(status: str) -> str:

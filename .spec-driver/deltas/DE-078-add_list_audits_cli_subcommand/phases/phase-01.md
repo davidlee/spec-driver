@@ -62,10 +62,10 @@ Add `list audits` (+ `list audit` alias) to `supekku/cli/list.py`, following the
 - [x] `list_revisions` pattern reviewed and understood
 
 ## 4. Exit Criteria / Done When
-- [ ] `spec-driver list audits --help` shows standard flags
-- [ ] `spec-driver list audit` alias works
-- [ ] Tests written and passing
-- [ ] `just` passes clean (tests + both linters)
+- [x] `spec-driver list audits --help` shows standard flags
+- [x] `spec-driver list audit` alias works
+- [x] Tests written and passing (3603 passed)
+- [x] `just` passes clean (ruff clean, pylint — no new warnings)
 
 ## 5. Verification
 - `just test` — all tests pass
@@ -77,10 +77,10 @@ Add `list audits` (+ `list audit` alias) to `supekku/cli/list.py`, following the
 
 | Status | ID | Description | Notes |
 | --- | --- | --- | --- |
-| [ ] | T1 | Add `list_audits` function to `list.py` | Clone `list_revisions`, change kind to `"audit"` |
-| [ ] | T2 | Register `list audit` singular alias | Same pattern as other singular aliases |
-| [ ] | T3 | Write tests | Basic listing, --status, --json, --filter, --regexp, empty result |
-| [ ] | T4 | Lint + verify | `just` must pass clean |
+| [x] | T1 | Add `list_audits` function to `list.py` | Cloned `list_revisions`, kind="audit" |
+| [x] | T2 | Register `list audit` singular alias | Added to `_PLURAL_TO_SINGULAR` dict |
+| [x] | T3 | Write tests | 10 tests: help, alias, json flag/parity, basic, status, filter, regexp, invalid regexp, tsv, invalid format |
+| [x] | T4 | Lint + verify | ruff clean, pylint no new warnings, 3603 tests pass |
 
 ### Task Details
 
@@ -90,6 +90,6 @@ Add `list audits` (+ `list audit` alias) to `supekku/cli/list.py`, following the
 - **T4**: Run `just`. Fix any issues.
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Phase sheet updated with results
+- [x] Exit criteria satisfied
+- [x] Phase sheet updated with results
 - [ ] Delta notes updated

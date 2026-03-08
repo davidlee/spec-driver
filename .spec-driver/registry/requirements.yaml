@@ -1961,7 +1961,6 @@ requirements:
     - DE-016
     verified_by: []
     coverage_evidence:
-    - VT-011-001
     - VT-016-001
     coverage_entries:
     - artefact: VT-016-001
@@ -1983,7 +1982,6 @@ requirements:
     - DE-016
     verified_by: []
     coverage_evidence:
-    - VT-011-002
     - VT-016-002
     coverage_entries:
     - artefact: VT-016-002
@@ -3082,7 +3080,6 @@ requirements:
     verified_by: []
     coverage_evidence:
     - VT-030-001
-    - VT-XXX
     coverage_entries:
     - artefact: VT-030-001
       status: verified
@@ -4189,7 +4186,8 @@ requirements:
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-002:
     label: FR-002
-    title: 'Support requirement status values: pending, in-progress, active, retired'
+    title: 'Support requirement status values: pending, in-progress, active, retired,
+      deprecated, superseded, deprecated, superseded'
     specs:
     - SPEC-122
     primary_spec: SPEC-122
@@ -4202,9 +4200,13 @@ requirements:
     - DE-081
     verified_by: []
     coverage_evidence:
+    - VT-081-002
     - VT-REQ-LIFECYCLE-001
     coverage_entries:
     - artefact: VT-REQ-LIFECYCLE-001
+      status: verified
+      kind: VT
+    - artefact: VT-081-002
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
@@ -4240,9 +4242,13 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
+    - VT-081-003
     - VT-REQ-SYNC-001
     coverage_entries:
     - artefact: VT-REQ-SYNC-001
+      status: verified
+      kind: VT
+    - artefact: VT-081-003
       status: verified
       kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
@@ -4363,14 +4369,18 @@ requirements:
     primary_spec: SPEC-122
     kind: non-functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-081
     verified_by: []
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VT-081-001
+    coverage_entries:
+    - artefact: VT-081-001
+      status: verified
+      kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.NF-003:
     label: NF-003

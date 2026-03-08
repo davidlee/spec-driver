@@ -6318,6 +6318,9 @@ deltas:
         - id: IP-055.PHASE-14
           name: Nudge backlog updates during delta closure
           status: completed
+        - id: IP-055.PHASE-15
+          name: Require DR before IP handoff
+          status: completed
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -6795,6 +6798,40 @@ deltas:
             that the repo has not actually defined yet.
           mitigation: phrase the step as a nudge plus `/consult` escalation when the
             correct backlog transition is unclear.
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-15
+        plan: IP-055
+        delta: DE-055
+        objective: Tighten routing and planning guidance so non-trivial deltas do
+          not skip DR work and jump straight into IP or phase planning.
+        entrance_criteria:
+        - Current DR/IP/routing skills reviewed for the DR-skip failure mode.
+        - DE-055 follow-up approved.
+        exit_criteria:
+        - using-spec-driver routes missing or stale non-trivial design into /draft-design-revision
+          before /plan-phases.
+        - plan-phases treats a missing or stale non-trivial DR as a stop condition,
+          not a planning shortcut.
+        - scope-delta no longer implies that creating an IP/phase can substitute for
+          missing DR work.
+        - DE-055 notes and design docs record the stronger DR-before-IP expectation.
+        verification:
+          tests:
+          - Manual review of packaged skill wording for using-spec-driver, scope-delta,
+            and plan-phases.
+          evidence: []
+        tasks:
+        - id: 15.1
+          title: Tighten routing and planning skill wording for DR-first handoff
+          status: done
+        - id: 15.2
+          title: Reconcile DE-055 docs and notes with the stronger DR-before-IP rule
+          status: done
+        risks:
+        - description: Over-tightening may force DR ceremony onto trivial work that
+            should stay lightweight.
+          mitigation: Keep the rule scoped to non-trivial or stale-design work.
       - id: IP-055.PHASE-10
         name: Improve memory retrieval and capture workflow guidance
         status: completed
@@ -8931,7 +8968,7 @@ deltas:
           mitigation: Graceful skip with warning log
   DE-077:
     kind: delta
-    status: draft
+    status: in-progress
     name: 'CLI UX: schema discoverability and flag parsing'
     slug: cli_ux_schema_discoverability_and_flag_parsing
     updated: '2026-03-09'
@@ -8951,21 +8988,109 @@ deltas:
         plan: IP-077
         delta: DE-077
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-077
         specs:
-          primary: []
-          collaborators: []
+          primary:
+          - SPEC-110
+          collaborators:
+          - PROD-010
         requirements:
-          targets: []
+          targets:
+          - ISSUE-023
+          - ISSUE-043
           dependencies: []
         phases:
-        - id: IP-077-P01
+        - id: IP-077.PHASE-01
+        - id: IP-077.PHASE-02
+        - id: IP-077.PHASE-03
       phases:
-      - id: IP-077-P01
-        phase: IP-077-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-077.PHASE-01
+        plan: IP-077
+        delta: DE-077
+        objective: Create hints.py module, update create commands with schema hints,
+          fix --from-backlog flag parsing, write tests
+        entrance_criteria:
+        - DR-077 drafted
+        exit_criteria:
+        - hints.py exists with ARTIFACT_SCHEMA_MAP and format_schema_hints()
+        - All create commands emit schema hints
+        - --from-backlog is a boolean flag; backlog ID via positional
+        - Unit tests pass for both features
+        - Lint clean on changed files
+        verification:
+          tests:
+          - VT-077-schema-hints
+          - VT-077-from-backlog
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Create supekku/cli/hints.py
+        - id: '1.2'
+          description: Update create commands to emit schema hints
+        - id: '1.3'
+          description: Convert --from-backlog to boolean flag
+        - id: '1.4'
+          description: Write tests
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-077.PHASE-02
+        plan: IP-077
+        delta: DE-077
+        objective: Full test suite green, both linters clean, integration smoke test
+        entrance_criteria:
+        - Phase 1 complete
+        exit_criteria:
+        - just passes (all checks)
+        - No regressions in existing create command tests
+        verification:
+          tests:
+          - VT-077-schema-hints
+          - VT-077-schema-hints-integration
+          - VT-077-from-backlog
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Run full test suite
+        - id: '2.2'
+          description: Run both linters on full codebase
+        - id: '2.3'
+          description: Manual smoke test of create commands
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-077.PHASE-03
+        plan: IP-077
+        delta: DE-077
+        objective: "Ensure spec-driver skills and memories reflect the new CLI behaviour\
+          \ \u2014 schema hints, --from-backlog shape change, and hints.py module"
+        entrance_criteria:
+        - Phase 2 complete (all checks green)
+        exit_criteria:
+        - Relevant skills mention schema hint output where useful
+        - Memory records current for CLI create command behaviour
+        - No stale guidance about --from-backlog as string option
+        verification:
+          tests: []
+          evidence:
+          - VA-077-skills-current
+          - VA-077-memory-coverage
+        tasks:
+        - id: '3.1'
+          description: Audit skills that reference create commands or --from-backlog
+        - id: '3.2'
+          description: Check memory records for CLI create behaviour
+        - id: '3.3'
+          description: Update or create memories as needed
+        - id: '3.4'
+          description: Update spec-driver skill tips if schema hints should be mentioned
+        risks: []
   DE-078:
     kind: delta
-    status: draft
+    status: in-progress
     name: Delta - Add list audits CLI subcommand
     slug: add_list_audits_cli_subcommand
     updated: '2026-03-09'
@@ -9074,9 +9199,17 @@ deltas:
           dependencies: []
         phases:
         - id: IP-079.PHASE-01
+          name: Schema foundation
+          status: completed
         - id: IP-079.PHASE-02
+          name: Audit gating module
+          status: completed
         - id: IP-079.PHASE-03
+          name: Validation rules
+          status: completed
         - id: IP-079.PHASE-04
+          name: Skill rewrite
+          status: completed
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -9124,12 +9257,145 @@ deltas:
         risks:
         - description: Existing audit parsing breaks after deprecated field removal
           mitigation: Test both existing audits explicitly
-      - id: IP-079.PHASE-02
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-079.PHASE-02
-      - id: IP-079.PHASE-03
+        plan: IP-079
+        delta: DE-079
+        objective: Build audit_check.py module with gate resolution, finding collection,
+          closure-effect derivation, and multi-audit union. Wire into complete_delta.py
+          as a pre-check for qualifying deltas.
+        entrance_criteria:
+        - "Phase 1 complete \u2014 audit/delta schema foundation landed and committed"
+        exit_criteria:
+        - audit_check.py exists with resolve_audit_gate, collect_gating_findings,
+          derive_closure_effect, check_audit_completeness
+        - complete_delta.py calls audit completeness check after coverage check
+        - Qualifying deltas blocked without reconciled conformance audit (unless --force)
+        - Discovery audits warn but do not block
+        - Multi-audit union collects findings across multiple AUD artefacts for same
+          delta
+        - Finding ID collisions across audits produce warnings
+        - VT-079-002 tests pass (closure-effect derivation)
+        - VT-079-003 tests pass (audit_gate resolution)
+        - VT-079-004 tests pass (complete_delta integration)
+        - Both linters clean on all touched files
+        verification:
+          tests:
+          - VT-079-002
+          - VT-079-003
+          - VT-079-004
+          evidence:
+          - VA-079-002
+        tasks:
+        - id: '2.1'
+          description: Implement resolve_audit_gate
+        - id: '2.2'
+          description: Implement collect_gating_findings
+        - id: '2.3'
+          description: Implement derive_closure_effect
+        - id: '2.4'
+          description: Implement check_audit_completeness (top-level orchestrator)
+        - id: '2.5'
+          description: Wire audit check into complete_delta.py
+        - id: '2.6'
+          description: Write VT-079-002 tests (closure-effect derivation)
+        - id: '2.7'
+          description: Write VT-079-003 tests (audit_gate resolution)
+        - id: '2.8'
+          description: Write VT-079-004 tests (complete_delta integration)
+        risks:
+        - description: "complete_delta.py already complex \u2014 adding audit check\
+            \ may degrade readability"
+          mitigation: Separate module (DEC-079-011) keeps complete_delta thin; only
+            import + call
+        - description: ChangeArtifact dataclass does not expose audit-specific frontmatter
+          mitigation: Read raw frontmatter via load_markdown_file for audit files
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-079.PHASE-03
-      - id: IP-079.PHASE-04
+        plan: IP-079
+        delta: DE-079
+        objective: "Add audit-specific validation rules to WorkspaceValidator: missing\
+          \ required audit for qualifying deltas, undispositioned findings, invalid\
+          \ status\xD7kind and outcome\xD7kind pairs, closure_override without rationale,\
+          \ and finding ID collisions across multi-audit unions. Surface via spec-driver\
+          \ validate."
+        entrance_criteria:
+        - "Phase 2 complete \u2014 audit_check.py landed with gate resolution and\
+          \ closure-effect derivation"
+        exit_criteria:
+        - _validate_audit_disposition method added to WorkspaceValidator
+        - _validate_audit_gate_coverage method added to WorkspaceValidator
+        - Missing required audit for qualifying delta surfaces as warning
+        - Findings without disposition surface as warning
+        - "Invalid status\xD7kind pairs surface as error"
+        - "Invalid outcome\xD7kind pairs surface as error"
+        - closure_override without rationale surfaces as error
+        - Finding ID collisions across multi-audit union surface as warning
+        - VA-079-003 schema review confirms validation output covers all audit issues
+        - Both linters clean on all touched files
+        verification:
+          tests: []
+          evidence:
+          - VA-079-003
+        tasks:
+        - id: '3.1'
+          description: Add _validate_audit_disposition to WorkspaceValidator
+        - id: '3.2'
+          description: Add _validate_audit_gate_coverage to WorkspaceValidator
+        - id: '3.3'
+          description: Write validation tests
+        risks:
+        - description: Validator test setup may need extensive mocking for audit frontmatter
+          mitigation: Reuse patterns from existing validator_test.py
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-079.PHASE-04
+        plan: IP-079
+        delta: DE-079
+        objective: 'Rewrite the audit-change skill so it becomes the canonical runsheet
+          for closure-grade audits: create or update the AUD artefact, disposition
+          every finding, reconcile specs, sync/validate, then hand off to closure.'
+        entrance_criteria:
+        - Phase 3 validation work is complete.
+        - DR-079 code impact for audit-change has been reviewed.
+        - Current audit-change skill and skill-install surface have been reviewed.
+        exit_criteria:
+        - supekku/skills/audit-change/SKILL.md requires AUD artefact creation or update
+          for qualifying work.
+        - The skill requires per-finding disposition and explicit reconciliation before
+          closure handoff.
+        - Generated .spec-driver skill copy is refreshed and matches the packaged
+          skill.
+        - AGENTS metadata still reflects the updated audit-change description.
+        - just check passes and the phase work is committed.
+        verification:
+          tests:
+          - just check
+          evidence:
+          - generated .spec-driver skill copy matches packaged audit-change
+          - AGENTS.md still exposes the updated audit-change description
+        tasks:
+        - id: 4.1
+          title: Rewrite packaged audit-change skill around the new reconciliation
+            contract
+          status: done
+        - id: 4.2
+          title: Refresh generated skill surfaces and verify AGENTS exposure
+          status: done
+        - id: 4.3
+          title: Run just check, commit phase work, and reconcile DE-079 tracking
+            docs
+          status: done
+        risks:
+        - description: Skill wording may drift from the now-shipped CLI/runtime contract
+            if it paraphrases instead of using the actual artifact flow.
+          mitigation: Anchor the skill to the real `create audit` command shape and
+            DR-079 terms (mode, delta_ref, per-finding disposition).
+        - description: Skill sync mechanism may have changed from earlier notes.
+          mitigation: Verify the current refresh command in the local CLI before updating
+            notes or AGENTS expectations.
   DE-080:
     kind: delta
     status: completed
@@ -9161,3 +9427,87 @@ deltas:
       phases:
       - id: IP-080-P01
         phase: IP-080-P01
+  DE-081:
+    kind: delta
+    status: completed
+    name: 'Delta - Requirements subsystem: sync integrity, lifecycle, and tags'
+    slug: requirements_subsystem_sync_integrity_lifecycle_and_tags
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-081-requirements_subsystem_sync_integrity_lifecycle_and_tags/DE-081.md
+    applies_to:
+      specs:
+      - PROD-008
+      - PROD-009
+      - SPEC-122
+      requirements:
+      - SPEC-122.FR-002
+      - SPEC-122.NF-002
+    plan:
+      id: IP-081
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-081
+        delta: DE-081
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-122
+          collaborators:
+          - PROD-008
+          - PROD-009
+        requirements:
+          targets:
+          - SPEC-122.FR-002
+          - SPEC-122.NF-002
+          dependencies: []
+        phases:
+        - id: IP-081.PHASE-01
+        - id: IP-081.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-081.PHASE-01
+        plan: IP-081
+        delta: DE-081
+        objective: 'Implement all three DE-081 objectives: coverage replacement semantics,
+          deprecated/superseded lifecycle statuses, and inline requirement tag extraction.
+          All tests pass, both linters clean.'
+        entrance_criteria:
+        - DR-081 approved with all design decisions resolved
+        exit_criteria:
+        - Coverage evidence rebuilt fresh each sync (no accumulation)
+        - Sync idempotency restored (NF-002)
+        - deprecated/superseded statuses accepted; terminal statuses guarded from
+          coverage overwrite
+        - Inline [tag] syntax parsed and populates registry
+        - filter(tag=...) works
+        - All tests pass (just test)
+        - Both linters clean (just lint, just pylint-files)
+        verification:
+          tests:
+          - VT-081-001
+          - VT-081-002
+          - VT-081-003
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Add deprecated/superseded constants to lifecycle.py
+        - id: '1.2'
+          description: "Coverage replacement \u2014 clear and rebuild in _apply_coverage_blocks"
+        - id: '1.3'
+          description: Terminal status guard in coverage derivation
+        - id: '1.4'
+          description: Extend _REQUIREMENT_LINE regex for [tag] syntax
+        - id: '1.5'
+          description: Add tag parameter to filter()
+        - id: '1.6'
+          description: Tests for all objectives
+        - id: '1.7'
+          description: Lint and verify
+        risks:
+        - description: Regex change breaks existing parsing
+          mitigation: Tag group is optional; full regression suite
+      - id: IP-081.PHASE-02
+        phase: IP-081.PHASE-02

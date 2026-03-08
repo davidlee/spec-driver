@@ -12,5 +12,5 @@ Ceremony mode: **town_planner**
 
 ## Documentation
 
-Artefacts: `doc/artefacts`
-Plans: `doc/plans`
+Artefacts: `docs/artefacts`
+Plans: `docs/plans`

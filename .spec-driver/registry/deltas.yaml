@@ -9511,3 +9511,14 @@ deltas:
           mitigation: Tag group is optional; full regression suite
       - id: IP-081.PHASE-02
         phase: IP-081.PHASE-02
+  DE-082:
+    kind: delta
+    status: completed
+    name: Delta - spec-driver should warn and suggest install when workflow.toml version
+      is stale
+    slug: spec_driver_should_warn_and_suggest_install_when_workflow_toml_version_is_stale
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-082-spec_driver_should_warn_and_suggest_install_when_workflow_toml_version_is_stale/DE-082.md
+    applies_to:
+      specs: []
+      requirements: []

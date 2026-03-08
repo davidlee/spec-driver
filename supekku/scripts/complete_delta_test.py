@@ -216,6 +216,14 @@ def test_bypass_flags_permitted_in_permissive_mode(flag_kwargs):
       "supekku.scripts.complete_delta.check_coverage_completeness",
       return_value=(True, []),
     ),
+    patch(
+      "supekku.scripts.complete_delta.check_audit_completeness",
+      return_value=MagicMock(
+        is_complete=True,
+        warning_findings=[],
+        collisions=[],
+      ),
+    ),
   ):
     mock_ws_cls.from_cwd.return_value = workspace
     # We don't assert exit code 0 because the full flow has more steps;

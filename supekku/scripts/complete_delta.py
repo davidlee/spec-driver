@@ -13,6 +13,11 @@ if str(ROOT) not in sys.path:
   sys.path.insert(0, str(ROOT))
 
 # pylint: disable=wrong-import-position
+from supekku.scripts.lib.changes.audit_check import (
+  check_audit_completeness,
+  display_audit_error,
+  display_audit_warnings,
+)
 from supekku.scripts.lib.changes.completion import create_completion_revision
 from supekku.scripts.lib.changes.coverage_check import (
   check_coverage_completeness,
@@ -503,6 +508,15 @@ def complete_delta(
       return 1
     # Log that enforcement is disabled
     print("Note: Coverage enforcement is disabled via SPEC_DRIVER_ENFORCE_COVERAGE")
+
+  # Audit completeness check (DEC-079-003, DEC-079-011)
+  if not force:
+    audit_result = check_audit_completeness(delta_id, workspace)
+    if not audit_result.is_complete:
+      display_audit_error(delta_id, audit_result)
+      return 1
+    if audit_result.warning_findings or audit_result.collisions:
+      display_audit_warnings(audit_result)
 
   # Confirm unless force mode
   if not force and not prompt_yes_no(

@@ -4,7 +4,7 @@ slug: 079-implement_canonical_audit_reconciliation_contract-phase-02
 name: "IP-079 Phase 02 — Audit gating module"
 created: '2026-03-09'
 updated: '2026-03-09'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -120,14 +120,14 @@ Build `audit_check.py` following the `coverage_check.py` pattern: a self-contain
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Implement resolve_audit_gate | [P] | Pure function, independent |
-| [ ] | 2.2 | Implement collect_gating_findings | [ ] | Needs audit registry access |
-| [ ] | 2.3 | Implement derive_closure_effect | [P] | Pure function, independent |
-| [ ] | 2.4 | Implement check_audit_completeness | [ ] | Depends on 2.1, 2.2, 2.3 |
-| [ ] | 2.5 | Wire audit check into complete_delta.py | [ ] | Depends on 2.4 |
-| [ ] | 2.6 | Write VT-079-002 tests (closure-effect) | [P] | Can write alongside 2.3 |
-| [ ] | 2.7 | Write VT-079-003 tests (gate resolution) | [P] | Can write alongside 2.1 |
-| [ ] | 2.8 | Write VT-079-004 tests (integration) | [ ] | Depends on 2.5 |
+| [x] | 2.1 | Implement resolve_audit_gate | [P] | Pure function |
+| [x] | 2.2 | Implement collect_gating_findings | [ ] | Multi-audit union + collision detection |
+| [x] | 2.3 | Implement derive_closure_effect | [P] | All DR-079 rules implemented |
+| [x] | 2.4 | Implement check_audit_completeness | [ ] | Top-level orchestrator |
+| [x] | 2.5 | Wire audit check into complete_delta.py | [ ] | After coverage check |
+| [x] | 2.6 | Write VT-079-002 tests (closure-effect) | [P] | 15 tests |
+| [x] | 2.7 | Write VT-079-003 tests (gate resolution) | [P] | 9 tests |
+| [x] | 2.8 | Write VT-079-004 tests (integration) | [ ] | 7 tests + existing test updated |
 
 ### Task Details
 
@@ -191,7 +191,7 @@ Build `audit_check.py` following the `coverage_check.py` pattern: a self-contain
 - Delta frontmatter `audit_gate` is not on `ChangeArtifact` dataclass — will need to read raw frontmatter from delta path too (same as audit)
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
-- [ ] Hand-off notes to phase 3 (validation rules)
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (just check passes, pylint reviewed)
+- [x] Notes updated
+- [x] Hand-off notes to phase 3 (validation rules)

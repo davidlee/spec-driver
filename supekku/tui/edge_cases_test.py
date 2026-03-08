@@ -191,6 +191,14 @@ class TestPathToArtifactType:
     f.touch()
     assert path_to_artifact_type(f, root) == ArtifactType.SPEC
 
+  def test_drift_path(self, tmp_path):
+    root = tmp_path
+    sd = root / ".spec-driver" / "drift"
+    sd.mkdir(parents=True)
+    f = sd / "DL-047-reconciliation.md"
+    f.touch()
+    assert path_to_artifact_type(f, root) == ArtifactType.DRIFT_LEDGER
+
 
 # --- Helpers ---
 

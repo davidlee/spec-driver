@@ -56,6 +56,7 @@ class ArtifactType(Enum):
   MEMORY = "memory"
   CARD = "card"
   BACKLOG = "backlog"
+  DRIFT_LEDGER = "drift_ledger"
 
   @property
   def meta(self) -> ArtifactTypeMeta:
@@ -103,6 +104,11 @@ ARTIFACT_TYPE_META: dict[ArtifactType, ArtifactTypeMeta] = {
     "Backlog Items",
     _OPS,
   ),
+  ArtifactType.DRIFT_LEDGER: ArtifactTypeMeta(
+    "Drift Ledger",
+    "Drift Ledgers",
+    _OPS,
+  ),
 }
 
 
@@ -120,6 +126,7 @@ _TITLE_ATTR: dict[ArtifactType, str] = {
   ArtifactType.MEMORY: "name",
   ArtifactType.CARD: "title",
   ArtifactType.BACKLOG: "title",
+  ArtifactType.DRIFT_LEDGER: "name",
 }
 
 # Maps ArtifactType to the attribute name used for ID on the record model.
@@ -328,6 +335,7 @@ def path_to_artifact_type(changed_path: Path, root: Path) -> ArtifactType | None
     BACKLOG_DIR,
     DECISIONS_SUBDIR,
     DELTAS_SUBDIR,
+    DRIFT_SUBDIR,
     MEMORY_DIR,
     POLICIES_SUBDIR,
     PRODUCT_SPECS_SUBDIR,
@@ -365,6 +373,7 @@ def path_to_artifact_type(changed_path: Path, root: Path) -> ArtifactType | None
     AUDITS_SUBDIR: ArtifactType.AUDIT,
     BACKLOG_DIR: ArtifactType.BACKLOG,
     MEMORY_DIR: ArtifactType.MEMORY,
+    DRIFT_SUBDIR: ArtifactType.DRIFT_LEDGER,
   }
   return _subdir_map.get(top)
 
@@ -425,6 +434,12 @@ def _make_backlog_registry(root: Path) -> Any:
   return BacklogRegistry(root=root)
 
 
+def _make_drift_registry(root: Path) -> Any:
+  from supekku.scripts.lib.drift.registry import DriftLedgerRegistry  # noqa: PLC0415
+
+  return DriftLedgerRegistry(root=root)
+
+
 _REGISTRY_FACTORIES: dict[ArtifactType, Any] = {
   ArtifactType.ADR: _make_decision_registry,
   ArtifactType.POLICY: _make_policy_registry,
@@ -437,4 +452,5 @@ _REGISTRY_FACTORIES: dict[ArtifactType, Any] = {
   ArtifactType.MEMORY: _make_memory_registry,
   ArtifactType.CARD: _make_card_registry,
   ArtifactType.BACKLOG: _make_backlog_registry,
+  ArtifactType.DRIFT_LEDGER: _make_drift_registry,
 }

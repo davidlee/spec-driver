@@ -17,7 +17,8 @@ from supekku.scripts.lib.core.artifact_view import (
   _detect_bundle_dir,
   adapt_record,
 )
-from supekku.scripts.lib.core.paths import BACKLOG_DIR, SPEC_DRIVER_DIR
+from supekku.scripts.lib.core.paths import BACKLOG_DIR, DRIFT_SUBDIR, SPEC_DRIVER_DIR
+from supekku.scripts.lib.drift.registry import DriftLedgerRegistry
 
 
 class TestArtifactEntry:
@@ -192,7 +193,12 @@ class TestArtifactTypeMeta:
 
   def test_operational_group_members(self):
     ops = {t for t in ArtifactType if t.group == ArtifactGroup.OPERATIONAL}
-    expected = {ArtifactType.MEMORY, ArtifactType.CARD, ArtifactType.BACKLOG}
+    expected = {
+      ArtifactType.MEMORY,
+      ArtifactType.CARD,
+      ArtifactType.BACKLOG,
+      ArtifactType.DRIFT_LEDGER,
+    }
     assert ops == expected
 
 
@@ -421,3 +427,65 @@ class TestBacklogRegistryFactory:
     # The key difference from the old shim: _collect_safe wraps the entire
     # collect() call, so per-record parse errors are handled by the registry.
     assert isinstance(backlog_entries, dict)
+
+
+class TestDriftLedgerIntegration:
+  """Drift ledger wiring in artifact view (VT-066-artifact-type)."""
+
+  def test_drift_ledger_in_artifact_type(self):
+    """DRIFT_LEDGER exists as an ArtifactType enum member."""
+    assert ArtifactType.DRIFT_LEDGER.value == "drift_ledger"
+
+  def test_drift_ledger_metadata(self):
+    """DRIFT_LEDGER has correct display metadata."""
+    meta = ARTIFACT_TYPE_META[ArtifactType.DRIFT_LEDGER]
+    assert meta.singular == "Drift Ledger"
+    assert meta.plural == "Drift Ledgers"
+    assert meta.group == ArtifactGroup.OPERATIONAL
+
+  def test_drift_ledger_in_registry_factories(self):
+    """DRIFT_LEDGER has an entry in _REGISTRY_FACTORIES."""
+    assert ArtifactType.DRIFT_LEDGER in _REGISTRY_FACTORIES
+
+  def test_factory_returns_drift_registry(self, tmp_path):
+    """Factory produces a DriftLedgerRegistry instance."""
+    (tmp_path / ".git").mkdir()
+    registry = _REGISTRY_FACTORIES[ArtifactType.DRIFT_LEDGER](tmp_path)
+    assert isinstance(registry, DriftLedgerRegistry)
+
+  def test_snapshot_loads_drift_ledgers(self, tmp_path):
+    """ArtifactSnapshot loads drift ledgers through _collect_safe."""
+    (tmp_path / ".git").mkdir()
+    snapshot = ArtifactSnapshot(root=tmp_path)
+    assert ArtifactType.DRIFT_LEDGER in snapshot.entries
+    assert isinstance(snapshot.entries[ArtifactType.DRIFT_LEDGER], dict)
+
+  def test_adapt_drift_ledger(self):
+    """adapt_record handles DriftLedger records (uses 'name' for title)."""
+    record = MagicMock()
+    record.id = "DL-047"
+    record.name = "Spec corpus reconciliation"
+    record.status = "open"
+    record.path = Path("/drift/DL-047.md")
+    entry = adapt_record(record, ArtifactType.DRIFT_LEDGER)
+    assert entry.id == "DL-047"
+    assert entry.title == "Spec corpus reconciliation"
+    assert entry.status == "open"
+    assert entry.artifact_type == ArtifactType.DRIFT_LEDGER
+
+  def test_snapshot_discovers_drift_file(self, tmp_path):
+    """Snapshot discovers a drift ledger file in the standard location."""
+    (tmp_path / ".git").mkdir()
+    drift_dir = tmp_path / SPEC_DRIVER_DIR / DRIFT_SUBDIR
+    drift_dir.mkdir(parents=True)
+    ledger = drift_dir / "DL-001-test.md"
+    ledger.write_text(
+      "---\nid: DL-001\nname: Test\nstatus: open\n"
+      "kind: drift_ledger\n---\n\n# DL-001 — Test\n\n## Entries\n",
+      encoding="utf-8",
+    )
+    snapshot = ArtifactSnapshot(root=tmp_path)
+    drift_entries = snapshot.entries[ArtifactType.DRIFT_LEDGER]
+    assert "DL-001" in drift_entries
+    assert drift_entries["DL-001"].title == "Test"
+    assert drift_entries["DL-001"].status == "open"

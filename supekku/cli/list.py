@@ -1357,6 +1357,7 @@ def list_revisions(
     ),
   ] = False,
   truncate: TruncateOption = False,
+  external: ExternalOption = False,
 ) -> None:
   """List revisions with optional filtering.
 
@@ -1414,7 +1415,9 @@ def list_revisions(
 
     # Sort and format
     revisions.sort(key=lambda r: r.id)
-    output = format_change_list_table(revisions, format_type, not truncate)
+    output = format_change_list_table(
+      revisions, format_type, not truncate, show_external=external,
+    )
     typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
@@ -1870,6 +1873,7 @@ def list_issues(
       help="Display output using pager for scrolling",
     ),
   ] = False,
+  external: ExternalOption = False,
 ) -> None:
   """List backlog issues with optional filtering.
 
@@ -1895,6 +1899,7 @@ def list_issues(
     show_all=show_all,
     limit=limit,
     pager=pager,
+    external=external,
   )
 
 
@@ -1964,6 +1969,7 @@ def list_problems(
       help="Display output using pager for scrolling",
     ),
   ] = False,
+  external: ExternalOption = False,
 ) -> None:
   """List backlog problems with optional filtering.
 
@@ -1989,6 +1995,7 @@ def list_problems(
     show_all=show_all,
     limit=limit,
     pager=pager,
+    external=external,
   )
 
 
@@ -2058,6 +2065,7 @@ def list_improvements(
       help="Display output using pager for scrolling",
     ),
   ] = False,
+  external: ExternalOption = False,
 ) -> None:
   """List backlog improvements with optional filtering.
 
@@ -2083,6 +2091,7 @@ def list_improvements(
     show_all=show_all,
     limit=limit,
     pager=pager,
+    external=external,
   )
 
 
@@ -2152,6 +2161,7 @@ def list_risks(
       help="Display output using pager for scrolling",
     ),
   ] = False,
+  external: ExternalOption = False,
 ) -> None:
   """List backlog risks with optional filtering.
 
@@ -2177,6 +2187,7 @@ def list_risks(
     show_all=show_all,
     limit=limit,
     pager=pager,
+    external=external,
   )
 
 

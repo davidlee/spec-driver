@@ -106,3 +106,34 @@
 
 #### Phase 3 → Phase 4 handoff
 - Phase 4 is skill rewrite: `audit-change` as canonical reconciliation runsheet.
+
+### Phase 4 execution — complete
+
+#### All tasks completed
+- **4.1 audit-change rewrite**: rewrote `supekku/skills/audit-change/SKILL.md` from advisory audit guidance into the canonical reconciliation runsheet.
+  - description now states that the skill is the canonical `AUD-*` runsheet
+  - requires creating or updating an `AUD-*` artefact before treating the audit as closure-grade work
+  - anchors to the real CLI surface: `spec-driver create audit --mode ... --delta ...`
+  - requires per-finding machine-checkable disposition
+  - requires reconciliation before `/close-change`
+- **4.2 Generated skill refresh**: refreshed `.spec-driver/skills/audit-change/SKILL.md` and `.spec-driver/AGENTS.md` using the current workspace flow:
+  - `uv run spec-driver install -y .`
+  - confirmed the generated skill copy matches the packaged skill
+  - confirmed `AGENTS.md` exposes the stronger audit-change description
+- **4.3 Verification**: `just check` passes after the skill rewrite.
+
+#### Verification status
+- `just check` passes: ruff clean, 3583 tests pass, pylint 9.72/10
+- `AGENTS.md` entry now reads:
+  - `Canonical reconciliation runsheet for AUD artefacts. Create or update the audit, disposition every finding, reconcile specs/contracts, and hand off to closure only when audit state supports it.`
+
+#### Observations
+- The dedicated historical skill-sync command is gone in this CLI; the supported workspace refresh flow for generated skill copies in this repo is currently `uv run spec-driver install -y .`.
+- That install emitted a warning about `audit-check` being allowlisted but missing:
+  - `.spec-driver/skills.allowlist` contains `audit-check`
+  - no packaged `audit-check` skill exists
+  - the warning is workspace state and unrelated to the phase-4 rewrite itself
+
+#### Phase 4 closure
+- DE-079 phase 4 is complete.
+- Remaining work is commit/hand-off hygiene only; the implementation and verification for this phase are finished.

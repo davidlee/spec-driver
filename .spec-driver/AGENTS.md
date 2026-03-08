@@ -20,7 +20,7 @@ Usage notes:
 
 <skill>
 <name>audit-change</name>
-<description>Perform verification/audit pass after implementation (or as discovery/backfill), reconcile against specs/contracts, and route findings into closure or follow-up change.</description>
+<description>Canonical reconciliation runsheet for AUD artefacts. Create or update the audit, disposition every finding, reconcile specs/contracts, and hand off to closure only when audit state supports it.</description>
 <location>project</location>
 </skill>
 

@@ -6312,6 +6312,9 @@ deltas:
         - id: IP-055.PHASE-12
           name: Tighten DR review loop and delta reconciliation
           status: completed
+        - id: IP-055.PHASE-13
+          name: Add doctrine pass to DR authoring
+          status: completed
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -6710,6 +6713,46 @@ deltas:
             pass is phrased like a universal mandatory ceremony.
           mitigation: Keep the wording targeted to DR authoring and preserve the external
             adversarial pass as optional after local integration.
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-13
+        plan: IP-055
+        delta: DE-055
+        objective: Make governance consultation explicit inside the DR authoring loop
+          so relevant ADRs, policies, and standards shape both drafting and critical
+          review.
+        entrance_criteria:
+        - A DE-055 follow-up has been approved to pull doctrine into DR authoring.
+        - The current draft-design-revision loop has progressive drafting and adversarial
+          review but no explicit doctrine step.
+        exit_criteria:
+        - draft-design-revision explicitly runs `/doctrine` before DR drafting.
+        - the design triage and adversarial pass both call out ADR/policy/standard
+          constraints.
+        - the skill tells the agent to `/consult` if governance is ambiguous or conflicting.
+        verification:
+          tests:
+          - uv run spec-driver skills sync
+          evidence:
+          - Packaged and installed draft-design-revision wording reflects the doctrine
+            step.
+          - DE-055 bundle records the governance-aware DR loop.
+        tasks:
+        - id: 13.1
+          title: Add explicit doctrine consultation to draft-design-revision
+          status: done
+        - id: 13.2
+          title: Extend the adversarial review checklist to include governance constraints
+          status: done
+        - id: 13.3
+          title: Update DE-055 structured artefacts and notes for the governance-aware
+            loop
+          status: done
+        risks:
+        - description: Governance wording could turn into boilerplate reading detached
+            from the actual design surface.
+          mitigation: tie `/doctrine` to relevant articles of truth for the current
+            DR and route ambiguity to `/consult`.
       - id: IP-055.PHASE-10
         name: Improve memory retrieval and capture workflow guidance
         status: completed
@@ -8006,7 +8049,7 @@ deltas:
         risks: []
   DE-069:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Complete formatter migration to format_list_table generic helper
     slug: complete_formatter_migration_to_format_list_table_generic_helper
     updated: '2026-03-08'
@@ -8088,8 +8131,19 @@ deltas:
         - id: '1.8'
           summary: Backport cell_helpers into memory_formatters
         risks: []
-      - id: IP-069.PHASE-02
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-069.PHASE-02
+        plan: IP-069
+        delta: DE-069
+        objective: None
+        entrance_criteria: []
+        exit_criteria: []
+        verification:
+          tests: []
+          evidence: []
+        tasks: []
+        risks: []
   DE-070:
     kind: delta
     status: completed
@@ -8163,3 +8217,39 @@ deltas:
         risks: []
       - id: IP-070-P01
         phase: IP-070-P01
+  DE-071:
+    kind: delta
+    status: draft
+    name: 'CLI verb-noun taxonomy: consistency pass'
+    slug: cli_verb_noun_taxonomy_consistency_pass
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-071-cli_verb_noun_taxonomy_consistency_pass/DE-071.md
+    applies_to:
+      specs:
+      - PROD-010
+      - SPEC-110
+      requirements: []
+    relations:
+    - type: addresses
+      target: ISSUE-030
+      attributes: {}
+    plan:
+      id: IP-071
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-071
+        delta: DE-071
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-071-P01
+      phases:
+      - id: IP-071-P01
+        phase: IP-071-P01

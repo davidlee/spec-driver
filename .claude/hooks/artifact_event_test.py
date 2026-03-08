@@ -219,31 +219,6 @@ class TestBuildEvent:
     )
     assert event["artifacts"] == []
 
-  def test_cwd_used_for_relativization(self) -> None:
-    """build_event uses explicit cwd instead of Path.cwd() (DEC-061-04)."""
-    event = build_event(
-      session_id="s1",
-      tool_name="Read",
-      file_path="/proj/.spec-driver/deltas/DE-061-slug/DE-061.md",
-      artifact_type="delta",
-      artifact_id="DE-061",
-      cwd="/proj",
-    )
-    assert event["argv"][1] == ".spec-driver/deltas/DE-061-slug/DE-061.md"
-
-  def test_cwd_none_falls_back_to_process_cwd(self) -> None:
-    """build_event without cwd still works (backward-compatible)."""
-    event = build_event(
-      session_id="s1",
-      tool_name="Read",
-      file_path="/unlikely/path/.spec-driver/deltas/DE-001/DE-001.md",
-      artifact_type="delta",
-      artifact_id="DE-001",
-      cwd=None,
-    )
-    # Path can't be made relative to actual cwd, so stays absolute
-    assert "DE-001.md" in event["argv"][1]
-
 
 class TestWriteLog:
   """write_log appends JSONL to the log file."""

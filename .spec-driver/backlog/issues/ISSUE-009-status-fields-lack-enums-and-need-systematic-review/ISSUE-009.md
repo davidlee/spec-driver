@@ -24,31 +24,26 @@ Status fields across core entities (specs, ADRs, deltas, requirements, etc.) are
 4. **Type safety**: No IDE autocomplete or compile-time checking
 5. **Migration risk**: Status value changes require error-prone find/replace
 
-## Current State (updated 2026-03-08)
+## Current State (updated 2026-03-09)
 
-**Entity types WITH domain-level status enums:**
+**All entity types now have domain-level status enums:**
 
 | Entity type | Enum location | Source |
 |---|---|---|
 | Deltas, revisions, audits | `changes/lifecycle.py` → `VALID_STATUSES` | Pre-existing |
 | Requirements | `requirements/lifecycle.py` → `VALID_STATUSES` | Pre-existing |
-| Issues | `backlog/models.py` → `ISSUE_STATUSES` | DE-057 |
-| Problems | `backlog/models.py` → `PROBLEM_STATUSES` | DE-057 |
-| Improvements | `backlog/models.py` → `IMPROVEMENT_STATUSES` | DE-057 |
-| Risks | `backlog/models.py` → `RISK_STATUSES` | DE-057 |
+| Backlog (all kinds) | `backlog/models.py` → `BACKLOG_BASE_STATUSES` + `RISK_EXTRA_STATUSES` | DE-057 → DE-075 (unified) |
+| Specs | `specs/lifecycle.py` → `SPEC_STATUSES` | DE-075 |
+| ADRs/Decisions | `decisions/lifecycle.py` → `ADR_STATUSES` | DE-075 |
+| Policies | `policies/lifecycle.py` → `POLICY_STATUSES` | DE-075 |
+| Standards | `standards/lifecycle.py` → `STANDARD_STATUSES` | DE-075 |
+| Memories | `memory/lifecycle.py` → `MEMORY_STATUSES` | DE-075 |
 
-These are also exposed via `ENUM_REGISTRY` in `core/enums.py` (deltas, requirements, verification). DE-068 will add backlog entries to the registry.
+All exposed via `ENUM_REGISTRY` in `core/enums.py`. Theme 1:1 aligned with enums (VA-075-01).
 
-**Entity types WITHOUT status enums (remaining gap):**
-- Specs (product & tech)
-- ADRs/Decisions
-- Policies
-- Standards
-- Memories
+**Frontmatter schema**: still defines `status` as `"pattern": ".+"` — schema-level enum enforcement is a separate delta.
 
-**Frontmatter schema**: still defines `status` as `"pattern": ".+"` for all kinds — no schema-level enum enforcement.
-
-**Theme**: `theme.py` colour mappings still diverge from defined enums (see audit section below).
+**Backlog migration**: complete — all items use unified statuses (VA-075-02).
 
 ## Impact
 
@@ -74,27 +69,20 @@ These are also exposed via `ENUM_REGISTRY` in `core/enums.py` (deltas, requireme
 
 ## Remaining Scope
 
-Entity types still needing status enums:
-- Specs (product & tech)
-- ADRs/Decisions
-- Policies
-- Standards
-- Memories
-
-Already resolved:
-- ~~Deltas, revisions, audits~~ — `changes/lifecycle.py`
-- ~~Requirements~~ — `requirements/lifecycle.py`
-- ~~Backlog items~~ — `backlog/models.py` (DE-057)
+All enum definitions are complete. Remaining work (separate deltas):
+- Frontmatter schema enforcement (replace `".+"` patterns with enum constraints)
+- Python `Enum` type migration (frozensets → enums)
+- Status lifecycle documentation / semantics (PROD-009)
 
 ## Acceptance Criteria
 
 - [x] Enum definitions exist for changes, requirements, backlog items
-- [ ] Enum definitions exist for specs, ADRs, policies, standards, memories
-- [ ] Frontmatter schema validation enforces enum constraints
-- [ ] Data models use enum types (partially done — frozensets, not Python enums)
-- [ ] Theme.py references enums (not hardcoded strings)
-- [ ] Migration strategy for existing documents
-- [ ] Documentation of status semantics and lifecycle
+- [x] Enum definitions exist for specs, ADRs, policies, standards, memories (DE-075 phase 1)
+- [ ] Frontmatter schema validation enforces enum constraints (separate delta)
+- [x] Data models use enum types (frozensets — Python Enum migration deferred)
+- [x] Theme.py references enums (DE-075 phase 2 — 1:1 alignment verified)
+- [x] Migration strategy for existing documents (DE-075 phase 2 — 17 backlog items migrated)
+- [x] Documentation of status semantics and lifecycle (mem.fact.spec-driver.status-enums)
 
 ## Audit (2026-03-07)
 
@@ -141,23 +129,13 @@ a design choice with no canonical answer.
 - Related to: PROD-001 (spec creation), frontmatter validation architecture
 - Downstream: IMPR-010 (backlog prioritize UX — status-aware checkboxes)
 
-## Partial Resolution — DE-057 (backlog item statuses only)
+## Resolution History
 
-DE-057 delivered per-kind status frozensets in `backlog/models.py` (DEC-057-02,
-DEC-057-08):
-- `ISSUE_STATUSES`, `PROBLEM_STATUSES`, `IMPROVEMENT_STATUSES`, `RISK_STATUSES`
-- `BACKLOG_STATUSES` dict for lookup by kind
-- `DEFAULT_HIDDEN_STATUSES` for list view exclusion
-- `ALL_VALID_STATUSES` union set
-- `is_valid_status()` helper with permissive validation (warn on unknown)
+**DE-057** — per-kind backlog status frozensets (now superseded by unified set)
 
-**Remaining for full closure:**
-- Theme/rendering alignment: `theme.py` status colours don't match the defined
-  enums (gaps listed in audit section above)
-- Non-backlog entity types (specs, ADRs, deltas, requirements, etc.) still lack
-  status enums
-- Frontmatter schema validation not yet enforcing enum constraints
-- Status: `in-progress` — backlog modelling done, broader scope remains
-- DE-068 (`edit --status`) will consume `ENUM_REGISTRY` for validation — adding
-  enums for remaining entity types will automatically enable CLI validation with
-  no further code changes
+**DE-075** — comprehensive enum coverage:
+- Phase 1: defined lifecycle constants for specs, ADRs, policies, standards, memories; unified backlog statuses; registered all in ENUM_REGISTRY
+- Phase 2: aligned theme.py 1:1 with enums; migrated 17 backlog items to unified statuses
+- Phase 3: updated memory, ISSUE-009 acceptance criteria
+
+**Remaining (separate deltas):** frontmatter schema enforcement, Python Enum types

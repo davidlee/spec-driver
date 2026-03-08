@@ -8580,3 +8580,341 @@ deltas:
         - id: 3.4
           description: Tests for all new flags
         risks: []
+  DE-074:
+    kind: delta
+    status: completed
+    name: Add --severity filter to backlog list commands
+    slug: add_severity_filter_to_backlog_list_commands
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-074-add_severity_filter_to_backlog_list_commands/DE-074.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-074
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-074
+        delta: DE-074
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-074-P01
+        - id: IP-074.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-074.PHASE-01
+        plan: IP-074
+        delta: DE-074
+        objective: None
+        entrance_criteria: []
+        exit_criteria: []
+        verification:
+          tests: []
+          evidence: []
+        tasks: []
+        risks: []
+      - id: IP-074-P01
+        phase: IP-074-P01
+  DE-075:
+    kind: delta
+    status: in-progress
+    name: Status enum coverage for governance artifacts
+    slug: status_fields_lack_enums_and_need_systematic_review
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-075-status_fields_lack_enums_and_need_systematic_review/DE-075.md
+    applies_to:
+      specs:
+      - SPEC-116
+      - SPEC-117
+      - SPEC-123
+      - SPEC-126
+      - SPEC-127
+      requirements: []
+    plan:
+      id: IP-075
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-075
+        delta: DE-075
+        revision_links:
+          aligns_with:
+          - DR-075
+        specs:
+          primary:
+          - SPEC-116
+          collaborators:
+          - SPEC-117
+          - SPEC-123
+          - SPEC-126
+          - SPEC-127
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-075.PHASE-01
+        - id: IP-075.PHASE-02
+        - id: IP-075.PHASE-03
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-075.PHASE-01
+        plan: IP-075
+        delta: DE-075
+        objective: Define status frozensets for all governance artifact types (specs,
+          ADRs, policies, standards, memories), unify backlog statuses, and register
+          all new paths in ENUM_REGISTRY.
+        entrance_criteria:
+        - DR-075 decisions accepted
+        exit_criteria:
+        - lifecycle.py exists for specs, decisions, policies, standards, memory
+        - backlog/models.py updated with unified BACKLOG_STATUSES
+        - ENUM_REGISTRY has entries for spec, adr, policy, standard, memory status
+        - All unit tests passing
+        - Linters clean
+        verification:
+          tests:
+          - VT-075-01
+          - VT-075-02
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Create specs/lifecycle.py with SPEC_STATUSES
+        - id: '1.2'
+          description: Create decisions/lifecycle.py with ADR_STATUSES
+        - id: '1.3'
+          description: Create policies/lifecycle.py with POLICY_STATUSES
+        - id: '1.4'
+          description: Create standards/lifecycle.py with STANDARD_STATUSES
+        - id: '1.5'
+          description: Create memory/lifecycle.py with MEMORY_STATUSES
+        - id: '1.6'
+          description: Unify backlog statuses in backlog/models.py
+        - id: '1.7'
+          description: Register all new paths in core/enums.py
+        - id: '1.8'
+          description: Update decisions/registry.py to reference ADR_STATUSES
+        - id: '1.9'
+          description: Write unit tests for all new constants and registry entries
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-075.PHASE-02
+        plan: IP-075
+        delta: DE-075
+        objective: Align theme.py colour mappings 1:1 with defined enums. Migrate
+          backlog items on disk to unified status values. Consolidate backlog theme
+          keys from per-kind to unified.
+        entrance_criteria:
+        - "Phase 1 complete \u2014 all constants defined and registered"
+        exit_criteria:
+        - theme.py mappings match enums exactly (no phantoms, no gaps)
+        - All backlog items on disk use unified status values
+        - No legacy per-kind status values remain in frontmatter
+        - get_backlog_status_style and callers updated for unified keys
+        - All tests passing, linters clean
+        verification:
+          tests: []
+          evidence:
+          - VA-075-01
+          - VA-075-02
+        tasks:
+        - id: '2.1'
+          description: 'Theme: remove spec.status.live'
+        - id: '2.2'
+          description: 'Theme: add adr.status.superseded'
+        - id: '2.3'
+          description: 'Theme: remove policy.status.active, add policy.status.required'
+        - id: '2.4'
+          description: 'Theme: remove memory.status.deprecated and memory.status.obsolete'
+        - id: '2.5'
+          description: 'Theme: consolidate backlog per-kind keys to backlog.status.*'
+        - id: '2.6'
+          description: 'Theme: update get_backlog_status_style to use backlog.status.{status}'
+        - id: '2.7'
+          description: "Migrate: captured \u2192 open (PROB-004)"
+        - id: '2.8'
+          description: "Migrate: closed \u2192 resolved (ISSUE-036)"
+        - id: '2.9'
+          description: "Migrate: implemented \u2192 resolved (ISSUE-040, ISSUE-025,\
+            \ ISSUE-022, ISSUE-015, IMPR-001 through IMPR-004, IMPR-008, IMPR-009)"
+        - id: '2.10'
+          description: "Migrate: idea \u2192 open (IMPR-005 through IMPR-007, IMPR-010\
+            \ through IMPR-012)"
+        - id: '2.11'
+          description: 'Verify: on-disk scan confirms no orphaned values (VA-075-02)'
+        - id: '2.12'
+          description: Update theme_test.py for new keys
+        risks:
+        - description: Backlog migration touches many files
+          mitigation: Small set (~17 files); enumerated and verified in phase planning
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-075.PHASE-03
+        plan: IP-075
+        delta: DE-075
+        objective: Update memories, skills, and agent guidance to reflect new status
+          enums and unified backlog lifecycle. Update ISSUE-009. Close delta.
+        entrance_criteria:
+        - "Phase 2 complete \u2014 theme aligned, migration done, CI green"
+        exit_criteria:
+        - Status enum memory updated or created
+        - Skills/guidance referencing old backlog statuses updated
+        - ISSUE-009 updated with resolution status
+        - Delta close-out criteria met
+        verification:
+          tests: []
+          evidence: []
+        tasks:
+        - id: '3.1'
+          description: Update mem.fact.spec-driver.status-enums with all enum values
+        - id: '3.2'
+          description: Update skills/guidance referencing old backlog status values
+        - id: '3.3'
+          description: "Update ISSUE-009 \u2014 mark enum/migration acceptance criteria\
+            \ done"
+        - id: '3.4'
+          description: Update glossary.md if status terminology changed
+        - id: '3.5'
+          description: Audit and close delta
+        risks: []
+  DE-076:
+    kind: delta
+    status: draft
+    name: Sync backlog requirements to requirements registry
+    slug: sync_backlog_requirements_to_requirements_registry
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-076-sync_backlog_requirements_to_requirements_registry/DE-076.md
+    applies_to:
+      specs:
+      - PROD-008
+      - SPEC-122
+      requirements:
+      - ISSUE-016.FR-016.001
+      - ISSUE-016.FR-016.002
+      - ISSUE-016.FR-016.004
+      - ISSUE-016.NF-016.001
+    plan:
+      id: IP-076
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-076
+        delta: DE-076
+        revision_links:
+          aligns_with:
+          - DR-076
+        specs:
+          primary:
+          - SPEC-122
+          collaborators:
+          - PROD-008
+          - SPEC-110
+        requirements:
+          targets:
+          - ISSUE-016.FR-016.001
+          - ISSUE-016.FR-016.002
+          - ISSUE-016.FR-016.004
+          - ISSUE-016.NF-016.001
+          dependencies: []
+        phases:
+        - id: IP-076.PHASE-01
+          name: Cleanup and refactor sync pipeline
+          objective: "Extract _upsert_record, eliminate _iter_plan_files, rename sync_from_specs\
+            \ \u2192 sync()"
+          entrance_criteria:
+          - DR-076 design decisions DEC-076-01, DEC-076-04 reviewed
+          - Existing test suite passing
+          exit_criteria:
+          - _upsert_record extracted, both call sites consolidated
+          - _iter_plan_files removed
+          - sync() is primary method, sync_from_specs is deprecated alias
+          - All existing tests pass unchanged
+          - Linters pass
+        - id: IP-076.PHASE-02
+          name: Backlog requirement sync and CLI filtering
+          objective: Add backlog source to sync, heading regex, source_kind fields,
+            CLI filter
+          entrance_criteria: &id009
+          - Phase 1 complete and committed
+          exit_criteria: &id010
+          - _REQUIREMENT_HEADING regex matches dotted backlog format
+          - RequirementRecord has source_kind/source_type fields with serialization
+          - sync() accepts backlog_registry, iterates items, extracts requirements
+          - CLI --source-kind filter works
+          - Source column in table output
+          - All new and regression tests pass
+          - Linters pass
+        - id: IP-076.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-076.PHASE-01
+        plan: IP-076
+        delta: DE-076
+        objective: "Extract _upsert_record, eliminate _iter_plan_files, rename sync_from_specs\
+          \ \u2192 sync()"
+        entrance_criteria:
+        - DR-076 design decisions DEC-076-01, DEC-076-04 reviewed
+        - Existing test suite passing
+        exit_criteria:
+        - All existing tests pass unchanged
+        - Linters pass
+        - _iter_plan_files removed
+        - _upsert_record extracted, both call sites consolidated
+        - sync() is primary method, sync_from_specs is deprecated alias
+        verification:
+          tests: []
+          evidence: []
+        tasks: []
+        risks: []
+      - id: IP-076.PHASE-02
+        name: Backlog requirement sync and CLI filtering
+        objective: Add backlog source to sync, heading regex, source_kind fields,
+          CLI filter
+        entrance_criteria: *id009
+        exit_criteria: *id010
+        phase: IP-076.PHASE-02
+  DE-077:
+    kind: delta
+    status: draft
+    name: 'CLI UX: schema discoverability and flag parsing'
+    slug: cli_ux_schema_discoverability_and_flag_parsing
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-077-cli_ux_schema_discoverability_and_flag_parsing/DE-077.md
+    applies_to:
+      specs:
+      - PROD-010
+      - SPEC-110
+      requirements:
+      - ISSUE-023
+      - ISSUE-043
+    plan:
+      id: IP-077
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-077
+        delta: DE-077
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-077-P01
+      phases:
+      - id: IP-077-P01
+        phase: IP-077-P01

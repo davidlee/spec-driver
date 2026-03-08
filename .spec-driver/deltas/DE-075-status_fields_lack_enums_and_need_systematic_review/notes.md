@@ -43,3 +43,16 @@
 ### Design note
 
 - `backlog.status.*` theme keys cover the full union of base + risk statuses (6 values), even though `backlog.status` in ENUM_REGISTRY returns only the base 4. This is correct: risk items look up via `backlog.status.{status}` and need `accepted`/`expired` themed.
+
+## Phase 3 — Docs, guidance, and close-out
+
+**Status**: complete
+
+### What's done
+
+- `mem.fact.spec-driver.status-enums` updated: added all governance + unified backlog enums, expanded scope paths, updated non-canonical terms
+- ISSUE-009 acceptance criteria: 6/7 done (schema enforcement deferred as separate delta)
+- ISSUE-009 current state, remaining scope, resolution history sections updated
+- IP-075 verification coverage: VT-075-01, VT-075-02, VA-075-01, VA-075-02 all → `verified`
+- Skills/guidance grep clean — no references to old per-kind backlog statuses
+- Glossary — no updates needed

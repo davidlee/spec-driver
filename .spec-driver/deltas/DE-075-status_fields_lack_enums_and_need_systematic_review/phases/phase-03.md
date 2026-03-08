@@ -4,7 +4,7 @@ slug: 075-status_fields_lack_enums_and_need_systematic_review-phase-03
 name: 'IP-075 Phase 03: docs, guidance, and close-out'
 created: '2026-03-09'
 updated: '2026-03-09'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -62,14 +62,14 @@ Ensure all downstream documentation, memories, skills, and agent guidance reflec
 
 ## 3. Entrance Criteria
 
-- [ ] Phase 2 complete — theme aligned, backlog migrated, CI green
+- [x] Phase 2 complete — theme aligned, backlog migrated, CI green
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `mem.fact.spec-driver.status-enums` updated with all new enums
-- [ ] Any skills/guidance referencing old per-kind backlog statuses updated
-- [ ] ISSUE-009 acceptance criteria updated (enum definitions done, migration done, theme aligned)
-- [ ] Glossary updated if terminology changed
+- [x] `mem.fact.spec-driver.status-enums` updated with all new enums
+- [x] Any skills/guidance referencing old per-kind backlog statuses updated (none found)
+- [x] ISSUE-009 acceptance criteria updated (enum definitions done, migration done, theme aligned)
+- [x] Glossary updated if terminology changed (no changes needed)
 - [ ] `just check` passes
 - [ ] Delta close-out: `/close-change DE-075`
 
@@ -88,8 +88,8 @@ Ensure all downstream documentation, memories, skills, and agent guidance reflec
 
 | Status | ID | Description | Parallel? | Notes |
 |---|---|---|---|---|
-| [ ] | 3.1 | Update status-enums memory | [P] | All enum values |
-| [ ] | 3.2 | Update skills/guidance for old backlog statuses | [P] | Grep for legacy values |
-| [ ] | 3.3 | Update ISSUE-009 acceptance criteria | [P] | |
-| [ ] | 3.4 | Update glossary if needed | [P] | |
-| [ ] | 3.5 | Close delta | [ ] | Depends on 3.1–3.4 |
+| [x] | 3.1 | Update status-enums memory | [P] | All enum values, scope paths, non-canonical terms |
+| [x] | 3.2 | Update skills/guidance for old backlog statuses | [P] | Grep clean — no references found |
+| [x] | 3.3 | Update ISSUE-009 acceptance criteria | [P] | 6/7 criteria done, schema enforcement deferred |
+| [x] | 3.4 | Update glossary if needed | [P] | No changes needed |
+| [ ] | 3.5 | Close delta | [ ] | Pending close-change |

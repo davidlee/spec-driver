@@ -4,7 +4,7 @@ slug: 068-edit_command_status_flag_for_programmatic_status_updates-phase-02
 name: CLI integration and edit drift
 created: '2026-03-08'
 updated: '2026-03-08'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -59,16 +59,16 @@ Wire the shared primitive and validation into the CLI edit subcommands. Add `--s
 - **Specs**: PROD-013.FR-004
 
 ## 3. Entrance Criteria
-- [ ] Phase 1 complete — `update_frontmatter_status()` and `validate_status_for_entity()` available
+- [x] Phase 1 complete — `update_frontmatter_status()` and `validate_status_for_entity()` available
 
 ## 4. Exit Criteria / Done When
-- [ ] All existing edit subcommands (spec, delta, revision, requirement, adr, policy, standard, card, plan, audit, memory, issue, problem, improvement, risk) accept `--status`
-- [ ] New `edit drift` subcommand works (resolves via `"drift_ledger"` key, validates via `"drift"` enum path)
-- [ ] `--status` skips editor launch (DEC-068-02)
-- [ ] Invalid status values rejected with helpful error message listing valid values
-- [ ] Empty/whitespace status values rejected
-- [ ] VT-068-02 and VT-068-03 tests pass
-- [ ] `just check` passes (tests + both linters)
+- [x] All existing edit subcommands (spec, delta, revision, requirement, adr, policy, standard, card, plan, audit, memory, issue, problem, improvement, risk) accept `--status`
+- [x] New `edit drift` subcommand works (resolves via `"drift_ledger"` key, validates via `"drift"` enum path)
+- [x] `--status` skips editor launch (DEC-068-02)
+- [x] Invalid status values rejected with helpful error message listing valid values
+- [x] Empty/whitespace status values rejected
+- [x] VT-068-02 and VT-068-03 tests pass
+- [x] `just check` passes (tests + both linters)
 
 ## 5. Verification
 - `just test` — full suite
@@ -84,10 +84,10 @@ Wire the shared primitive and validation into the CLI edit subcommands. Add `--s
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Add `--status` to existing edit subcommands | [ ] | 15 subcommands, uniform pattern |
-| [ ] | 2.2 | Add `edit drift` subcommand | [P] | New subcommand, uses `"drift_ledger"` resolver |
-| [ ] | 2.3 | CLI integration tests | [ ] | Depends on 2.1/2.2 |
-| [ ] | 2.4 | Final verification — `just check` | [ ] | Depends on 2.3 |
+| [x] | 2.1 | Add `--status` to existing edit subcommands | [ ] | 15 subcommands, uniform pattern |
+| [x] | 2.2 | Add `edit drift` subcommand | [P] | New subcommand, uses `"drift_ledger"` resolver |
+| [x] | 2.3 | CLI integration tests | [ ] | 30 tests, all passing |
+| [x] | 2.4 | Final verification — `just check` | [ ] | 3397 passed, pylint 9.71 |
 
 ### Task Details
 

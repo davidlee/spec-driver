@@ -294,3 +294,212 @@ class TestEditNewSubcommands:
       mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["improvement", "IMPR-001"])
       assert result.exit_code == 0
+
+
+# ── --status flag tests (DE-068, VT-068-02, VT-068-03) ──
+
+DELTA_FRONTMATTER = """\
+---
+id: DE-001
+name: Test Delta
+status: draft
+kind: delta
+created: '2026-01-01'
+updated: '2026-01-01'
+---
+
+# DE-001 – Test Delta
+"""
+
+
+class TestEditStatusFlag:
+  """Tests for --status flag on edit subcommands."""
+
+  def test_status_updates_frontmatter_skips_editor(self, tmp_path: Path) -> None:
+    """--status updates file and does not open editor."""
+    delta_file = tmp_path / "DE-001.md"
+    delta_file.write_text(DELTA_FRONTMATTER)
+    mock_artifact = MagicMock()
+    mock_artifact.path = delta_file
+
+    with (
+      patch("supekku.cli.edit.ChangeRegistry") as mock_cls,
+      patch("subprocess.run") as mock_run,
+    ):
+      mock_registry = MagicMock()
+      mock_registry.collect.return_value = {"DE-001": mock_artifact}
+      mock_cls.return_value = mock_registry
+
+      result = runner.invoke(app, ["delta", "DE-001", "--status", "in-progress"])
+      assert result.exit_code == 0
+      assert "in-progress" in result.output
+      mock_run.assert_not_called()
+
+    content = delta_file.read_text()
+    assert "status: in-progress" in content
+    assert "status: draft" not in content
+
+  def test_status_rejects_invalid_value_for_delta(self, tmp_path: Path) -> None:
+    """--status with invalid value for enum-covered entity type fails."""
+    delta_file = tmp_path / "DE-001.md"
+    delta_file.write_text(DELTA_FRONTMATTER)
+    mock_artifact = MagicMock()
+    mock_artifact.path = delta_file
+
+    with patch("supekku.cli.edit.ChangeRegistry") as mock_cls:
+      mock_registry = MagicMock()
+      mock_registry.collect.return_value = {"DE-001": mock_artifact}
+      mock_cls.return_value = mock_registry
+
+      result = runner.invoke(app, ["delta", "DE-001", "--status", "bogus"])
+      assert result.exit_code == 1
+      assert "Invalid status" in result.output
+      assert "Valid values" in result.output
+
+    # File should be unchanged
+    assert "status: draft" in delta_file.read_text()
+
+  def test_status_accepts_any_value_for_spec(self, tmp_path: Path) -> None:
+    """--status with any value for entity without enums succeeds."""
+    spec_file = tmp_path / "SPEC-001.md"
+    spec_file.write_text(
+      "---\nid: SPEC-001\nname: Test\nstatus: draft\n"
+      "updated: '2026-01-01'\n---\n# Spec\n"
+    )
+    mock_spec = MagicMock()
+    mock_spec.path = spec_file
+
+    with patch("supekku.cli.edit.SpecRegistry") as mock_cls:
+      mock_registry = MagicMock()
+      mock_registry.get.return_value = mock_spec
+      mock_cls.return_value = mock_registry
+
+      result = runner.invoke(app, ["spec", "SPEC-001", "--status", "anything-goes"])
+      assert result.exit_code == 0
+
+    assert "status: anything-goes" in spec_file.read_text()
+
+  def test_status_rejects_empty_value(self, tmp_path: Path) -> None:
+    """--status with empty string fails."""
+    delta_file = tmp_path / "DE-001.md"
+    delta_file.write_text(DELTA_FRONTMATTER)
+    mock_artifact = MagicMock()
+    mock_artifact.path = delta_file
+
+    with patch("supekku.cli.edit.ChangeRegistry") as mock_cls:
+      mock_registry = MagicMock()
+      mock_registry.collect.return_value = {"DE-001": mock_artifact}
+      mock_cls.return_value = mock_registry
+
+      result = runner.invoke(app, ["delta", "DE-001", "--status", ""], input="")
+      assert result.exit_code == 1
+      assert (
+        "empty" in result.output.lower() or "empty" in (result.stderr or "").lower()
+      )
+
+  def test_without_status_opens_editor(
+    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+  ) -> None:
+    """Default behaviour (no --status) still opens editor."""
+    monkeypatch.setenv("EDITOR", "vim")
+    delta_file = tmp_path / "DE-001.md"
+    delta_file.write_text(DELTA_FRONTMATTER)
+    mock_artifact = MagicMock()
+    mock_artifact.path = delta_file
+
+    with (
+      patch("supekku.cli.edit.ChangeRegistry") as mock_cls,
+      patch("subprocess.run") as mock_run,
+    ):
+      mock_registry = MagicMock()
+      mock_registry.collect.return_value = {"DE-001": mock_artifact}
+      mock_cls.return_value = mock_registry
+      mock_run.return_value = MagicMock(returncode=0)
+
+      result = runner.invoke(app, ["delta", "DE-001"])
+      assert result.exit_code == 0
+      mock_run.assert_called_once()
+
+
+class TestEditStatusResolveArtifact:
+  """Tests for --status on resolve_artifact-based subcommands."""
+
+  def test_issue_status_update(self, tmp_path: Path) -> None:
+    issue_file = tmp_path / "ISSUE-001.md"
+    issue_file.write_text(
+      "---\nid: ISSUE-001\nname: Test\nstatus: open\n"
+      "updated: '2026-01-01'\n---\n# Issue\n"
+    )
+    ref = MagicMock(id="ISSUE-001", path=issue_file)
+    with patch("supekku.cli.edit.resolve_artifact", return_value=ref):
+      result = runner.invoke(app, ["issue", "ISSUE-001", "--status", "in-progress"])
+      assert result.exit_code == 0
+    assert "status: in-progress" in issue_file.read_text()
+
+  def test_issue_status_rejects_invalid(self, tmp_path: Path) -> None:
+    issue_file = tmp_path / "ISSUE-001.md"
+    issue_file.write_text(
+      "---\nid: ISSUE-001\nname: Test\nstatus: open\n"
+      "updated: '2026-01-01'\n---\n# Issue\n"
+    )
+    ref = MagicMock(id="ISSUE-001", path=issue_file)
+    with patch("supekku.cli.edit.resolve_artifact", return_value=ref):
+      result = runner.invoke(app, ["issue", "ISSUE-001", "--status", "bogus"])
+      assert result.exit_code == 1
+    assert "status: open" in issue_file.read_text()
+
+
+class TestEditDrift:
+  """Tests for edit drift subcommand (new in DE-068)."""
+
+  def test_edit_drift_opens_editor(self, tmp_path: Path) -> None:
+    ledger_file = tmp_path / "DL-001.md"
+    ledger_file.write_text("---\nstatus: open\n---\n# Ledger\n")
+    ref = MagicMock(id="DL-001", path=ledger_file)
+    with (
+      patch("supekku.cli.edit.resolve_artifact", return_value=ref),
+      patch("subprocess.run") as mock_run,
+    ):
+      mock_run.return_value = MagicMock(returncode=0)
+      result = runner.invoke(app, ["drift", "DL-001"])
+      assert result.exit_code == 0
+      mock_run.assert_called_once()
+
+  def test_edit_drift_status_update(self, tmp_path: Path) -> None:
+    ledger_file = tmp_path / "DL-001.md"
+    ledger_file.write_text(
+      "---\nid: DL-001\nstatus: open\nupdated: '2026-01-01'\n---\n# Ledger\n"
+    )
+    ref = MagicMock(id="DL-001", path=ledger_file)
+    with patch("supekku.cli.edit.resolve_artifact", return_value=ref):
+      result = runner.invoke(app, ["drift", "DL-001", "--status", "closed"])
+      assert result.exit_code == 0
+    assert "status: closed" in ledger_file.read_text()
+
+  def test_edit_drift_rejects_invalid_status(self, tmp_path: Path) -> None:
+    ledger_file = tmp_path / "DL-001.md"
+    ledger_file.write_text(
+      "---\nid: DL-001\nstatus: open\nupdated: '2026-01-01'\n---\n# Ledger\n"
+    )
+    ref = MagicMock(id="DL-001", path=ledger_file)
+    with patch("supekku.cli.edit.resolve_artifact", return_value=ref):
+      result = runner.invoke(app, ["drift", "DL-001", "--status", "bogus"])
+      assert result.exit_code == 1
+      assert "Invalid status" in result.output
+    assert "status: open" in ledger_file.read_text()
+
+  def test_edit_drift_resolver_key(self, tmp_path: Path) -> None:
+    """Drift uses 'drift_ledger' resolver key, not 'drift'."""
+    ledger_file = tmp_path / "DL-001.md"
+    ledger_file.write_text("---\nstatus: open\n---\n# Ledger\n")
+    ref = MagicMock(id="DL-001", path=ledger_file)
+    with (
+      patch("supekku.cli.edit.resolve_artifact", return_value=ref) as mock_resolve,
+      patch("subprocess.run") as mock_run,
+    ):
+      mock_run.return_value = MagicMock(returncode=0)
+      runner.invoke(app, ["drift", "DL-001"])
+      mock_resolve.assert_called_once()
+      call_args = mock_resolve.call_args[0]
+      assert call_args[0] == "drift_ledger"
+      assert call_args[1] == "DL-001"

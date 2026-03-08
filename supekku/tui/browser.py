@@ -7,7 +7,7 @@ from pathlib import Path
 from textual.binding import Binding
 from textual.containers import Vertical
 from textual.screen import Screen
-from textual.widgets import DataTable
+from textual.widgets import DataTable, Footer
 
 from supekku.scripts.lib.core.artifact_view import (
   ArtifactEntry,
@@ -24,7 +24,7 @@ class BrowserScreen(Screen):
   """3-panel artifact browser screen (DEC-053-14, DEC-053-16)."""
 
   BINDINGS = [
-    Binding("f", "focus_files", "Files", show=False),
+    Binding("f", "focus_files", "Files"),
   ]
 
   def __init__(self, snapshot: ArtifactSnapshot, **kwargs) -> None:
@@ -40,6 +40,7 @@ class BrowserScreen(Screen):
     with Vertical(id="right-column"):
       yield ArtifactList(id="artifact-panel")
       yield PreviewPanel(id="preview-panel")
+    yield Footer()
 
   def on_mount(self) -> None:
     """Set border titles and select the first type on startup."""

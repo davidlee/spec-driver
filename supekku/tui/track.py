@@ -9,7 +9,7 @@ from textual import on
 from textual.binding import Binding
 from textual.containers import Vertical
 from textual.screen import Screen
-from textual.widgets import DataTable
+from textual.widgets import DataTable, Footer
 
 from supekku.tui.event_listener import DISPLAY_BUFFER_LIMIT
 from supekku.tui.widgets.bundle_tree import BundleFileSelected, BundleTree
@@ -25,7 +25,7 @@ class TrackScreen(Screen):
   """Track view: session list + event stream + artifact preview."""
 
   BINDINGS = [
-    Binding("f", "focus_files", "Files", show=False),
+    Binding("f", "focus_files", "Files"),
   ]
 
   def __init__(self, snapshot: ArtifactSnapshot | None = None, **kwargs) -> None:
@@ -42,6 +42,7 @@ class TrackScreen(Screen):
     with Vertical(id="track-right"):
       yield TrackPanel(id="track-panel")
       yield PreviewPanel(id="track-preview")
+    yield Footer()
 
   def on_mount(self) -> None:
     """Set border titles and replay buffered events."""

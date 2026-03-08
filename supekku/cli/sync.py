@@ -631,7 +631,7 @@ def _sync_requirements(root: Path) -> dict:
   revision_dirs = [revision_dir] if revision_dir.exists() else None
   audit_dirs = [audit_dir] if audit_dir.exists() else None
 
-  stats = req_registry.sync_from_specs(
+  stats = req_registry.sync(
     spec_registry=spec_registry,
     delta_dirs=delta_dirs,
     revision_dirs=revision_dirs,

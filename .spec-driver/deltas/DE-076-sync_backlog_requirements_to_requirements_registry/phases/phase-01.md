@@ -4,7 +4,7 @@ slug: 076-sync_backlog_requirements_to_requirements_registry-phase-01
 name: IP-076 Phase 01 — Cleanup and refactor sync pipeline
 created: '2026-03-09'
 updated: '2026-03-09'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -48,18 +48,18 @@ entrance_criteria:
   - item: "DR-076 design decisions DEC-076-01, DEC-076-04 reviewed"
     completed: true
   - item: "Existing test suite passing"
-    completed: false
+    completed: true
 exit_criteria:
   - item: "_upsert_record extracted, both call sites consolidated"
-    completed: false
+    completed: true
   - item: "_iter_plan_files removed"
-    completed: false
+    completed: true
   - item: "sync() is primary method, sync_from_specs is deprecated alias"
-    completed: false
+    completed: true
   - item: "All existing tests pass unchanged"
-    completed: false
+    completed: true
   - item: "Linters pass"
-    completed: false
+    completed: true
 ```
 
 # Phase 1 — Cleanup and refactor sync pipeline
@@ -75,14 +75,14 @@ Pure refactor of `RequirementsRegistry` in `registry.py` to reduce duplication a
 
 ## 3. Entrance Criteria
 - [x] DR-076 design decisions reviewed
-- [ ] Existing test suite passing (`just test`)
+- [x] Existing test suite passing (`just test`)
 
 ## 4. Exit Criteria / Done When
-- [ ] `_upsert_record(record, seen, stats)` extracted — single merge-or-create path
-- [ ] `_iter_plan_files` removed — call site uses `_iter_change_files(dirs, prefix="IP-")`
-- [ ] `sync()` is the primary method; `sync_from_specs` is a one-line deprecated alias
-- [ ] All existing tests pass unchanged
-- [ ] `just lint` and `just pylint-files supekku/scripts/lib/requirements/registry.py` pass
+- [x] `_upsert_record(record, seen, stats)` extracted — single merge-or-create path
+- [x] `_iter_plan_files` removed — call site uses `_iter_change_files(dirs, prefix="IP-")`
+- [x] `sync()` is the primary method; `sync_from_specs` is a one-line deprecated alias
+- [x] All existing tests pass unchanged (3492 passed, 4 skipped)
+- [x] `just lint` and `just pylint-files supekku/scripts/lib/requirements/registry.py` pass
 
 ## 5. Verification
 - Run `just test` — full suite must pass with zero failures
@@ -99,11 +99,11 @@ Pure refactor of `RequirementsRegistry` in `registry.py` to reduce duplication a
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | T1 | Extract `_upsert_record` helper | [ ] | DEC-076-04, DEC-076-06 |
-| [ ] | T2 | Eliminate `_iter_plan_files` | [P] | Independent of T1 |
-| [ ] | T3 | Rename `sync_from_specs` → `sync()` | [ ] | After T1 |
-| [ ] | T4 | Update all call sites | [ ] | After T3 |
-| [ ] | T5 | Run tests + linters | [ ] | After T1–T4 |
+| [x] | T1 | Extract `_upsert_record` helper | [ ] | DEC-076-04, DEC-076-06 |
+| [x] | T2 | Eliminate `_iter_plan_files` | [P] | Independent of T1 |
+| [x] | T3 | Rename `sync_from_specs` → `sync()` | [ ] | After T1 |
+| [x] | T4 | Update all call sites | [ ] | After T3 |
+| [x] | T5 | Run tests + linters | [ ] | After T1–T4 |
 
 ### Task Details
 

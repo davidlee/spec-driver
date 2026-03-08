@@ -122,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
     spec_dirs = DEFAULT_SPEC_DIRS.copy()
     if args.spec_dirs:
       spec_dirs.extend(Path(d) for d in args.spec_dirs)
-    registry.sync_from_specs(
+    registry.sync(
       spec_dirs,
       spec_registry=spec_registry,
       delta_dirs=DEFAULT_DELTA_DIRS,

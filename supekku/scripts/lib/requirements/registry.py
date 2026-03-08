@@ -258,7 +258,7 @@ class RequirementsRegistry:
     self.registry_path.write_text(text, encoding="utf-8")
 
   # ------------------------------------------------------------------
-  def sync_from_specs(
+  def sync(
     self,
     spec_dirs: Iterable[Path] | None = None,
     *,
@@ -289,17 +289,8 @@ class RequirementsRegistry:
           ),
         )
         for record in records:
-          seen.add(record.uid)
+          self._upsert_record(record, seen, stats)
           yielded_ids.add(spec.id)
-          existing = self.records.get(record.uid)
-          if existing is not None:
-            merged = existing.merge(record)
-            if merged != existing:
-              self.records[record.uid] = merged
-              stats.updated += 1
-          else:
-            self.records[record.uid] = record
-            stats.created += 1
 
         self._apply_spec_relationships(
           spec.id,
@@ -324,16 +315,7 @@ class RequirementsRegistry:
           ),
         )
         for record in records:
-          seen.add(record.uid)
-          existing = self.records.get(record.uid)
-          if existing is not None:
-            merged = existing.merge(record)
-            if merged != existing:
-              self.records[record.uid] = merged
-              stats.updated += 1
-          else:
-            self.records[record.uid] = record
-            stats.created += 1
+          self._upsert_record(record, seen, stats)
 
         try:
           body = spec_file.read_text(encoding="utf-8")
@@ -375,7 +357,7 @@ class RequirementsRegistry:
 
     plan_files = []
     if plan_dirs:
-      plan_files = list(self._iter_plan_files(plan_dirs))
+      plan_files = list(self._iter_change_files(plan_dirs, prefix="IP-"))
 
     audit_files = []
     if audit_dirs:
@@ -412,6 +394,32 @@ class RequirementsRegistry:
       self._validate_extraction(spec_registry, seen)
 
     return stats
+
+  sync_from_specs = sync  # Deprecated alias — use sync() instead.
+
+  def _upsert_record(
+    self,
+    record: RequirementRecord,
+    seen: set[str],
+    stats: SyncStats,
+    source_kind: str = "",  # pylint: disable=unused-argument  # phase 2
+    source_type: str = "",  # pylint: disable=unused-argument  # phase 2
+  ) -> None:
+    """Merge-or-create a requirement record, tracking it in *seen*.
+
+    *source_kind* and *source_type* are accepted now (phase 1) so the
+    signature is stable for phase 2 when RequirementRecord gains those fields.
+    """
+    seen.add(record.uid)
+    existing = self.records.get(record.uid)
+    if existing is not None:
+      merged = existing.merge(record)
+      if merged != existing:
+        self.records[record.uid] = merged
+        stats.updated += 1
+    else:
+      self.records[record.uid] = record
+      stats.created += 1
 
   def _iter_spec_files(self, spec_dirs: Iterable[Path]) -> Iterator[Path]:
     for directory in spec_dirs:
@@ -996,17 +1004,6 @@ class RequirementsRegistry:
           if file.name.startswith(prefix):
             yield file
 
-  def _iter_plan_files(self, dirs: Iterable[Path]) -> Iterator[Path]:
-    """Iterate over implementation plan files in directories."""
-    for directory in dirs:
-      if not directory.exists():
-        continue
-      for bundle in directory.iterdir():
-        if not bundle.is_dir():
-          continue
-        for file in bundle.glob("*.md"):
-          if file.name.startswith("IP-"):
-            yield file
 
   def _records_from_frontmatter(
     self,

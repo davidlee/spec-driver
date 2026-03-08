@@ -82,7 +82,7 @@ class Workspace:
   def sync_requirements(self) -> None:
     """Synchronize requirements registry from specs and changes."""
     registry = self.requirements
-    registry.sync_from_specs(
+    registry.sync(
       [get_tech_specs_dir(self.root), get_product_specs_dir(self.root)],
       spec_registry=self.specs,
       delta_dirs=[get_deltas_dir(self.root)],

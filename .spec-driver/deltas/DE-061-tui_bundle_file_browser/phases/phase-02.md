@@ -4,7 +4,7 @@ slug: 061-tui_bundle_file_browser-phase-02
 name: Browser integration — layout, wiring, visibility, focus, CSS
 created: '2026-03-08'
 updated: '2026-03-08'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -79,18 +79,18 @@ watch-triggered refresh keeps the tree current.
 - [x] Phase 1 complete
 
 ## 4. Exit Criteria / Done When
-- [ ] `#left-column` container wraps TypeSelector + BundleTree
-- [ ] CSS: `#left-column` borderless, each child has own border
-- [ ] CSS: `.has-bundle` toggles tree visibility and height split
-- [ ] `on_artifact_selected`: show tree for bundle, hide for non-bundle
-- [ ] `on_type_selected`: clear tree and remove `.has-bundle`
-- [ ] `on_bundle_file_selected`: update preview with file path
-- [ ] `f` focuses tree when visible, no-op otherwise
-- [ ] Tab from tree focuses `#artifact-table`
-- [ ] `refresh_snapshot` re-resolves entry and repopulates tree
-- [ ] Existing TUI tests pass (regression)
-- [ ] New pilot tests for above behaviours
-- [ ] Lint clean
+- [x] `#left-column` container wraps TypeSelector + BundleTree
+- [x] CSS: `#left-column` borderless, each child has own border
+- [x] CSS: `.has-bundle` toggles tree visibility and height split
+- [x] `on_artifact_selected`: show tree for bundle, hide for non-bundle
+- [x] `on_type_selected`: clear tree and remove `.has-bundle`
+- [x] `on_bundle_file_selected`: update preview with file path
+- [x] `f` focuses tree when visible, no-op otherwise
+- [x] Tab from tree focuses `#artifact-table`
+- [x] `refresh_snapshot` re-resolves entry and repopulates tree
+- [x] Existing TUI tests pass (regression)
+- [x] New pilot tests for above behaviours
+- [x] Lint clean
 
 ## 5. Verification
 - Textual headless pilot tests (extend `tui_test.py` or new file)
@@ -105,12 +105,12 @@ watch-triggered refresh keeps the tree current.
 
 | Status | ID | Description | Notes |
 | --- | --- | --- | --- |
-| [ ] | 2.1 | BrowserScreen layout — left-column container | Foundation for 2.2–2.6 |
-| [ ] | 2.2 | theme.tcss updates | Depends on 2.1 |
-| [ ] | 2.3 | Wire artifact selection → tree show/hide/clear | Depends on 2.1 |
-| [ ] | 2.4 | Wire BundleFileSelected → preview | Depends on 2.3 |
-| [ ] | 2.5 | Focus management (f/Tab) | Depends on 2.1 |
-| [ ] | 2.6 | Tree refresh + entry re-resolution | Depends on 2.3 |
+| [x] | 2.1 | BrowserScreen layout — left-column container | Vertical#left-column wraps TypeSelector + BundleTree |
+| [x] | 2.2 | theme.tcss updates | Width rules moved to #left-column, .has-bundle variant, focus-within accent |
+| [x] | 2.3 | Wire artifact selection → tree show/hide/clear | on_artifact_selected + on_type_selected handlers |
+| [x] | 2.4 | Wire BundleFileSelected → preview | on_bundle_file_selected handler, border title = filename |
+| [x] | 2.5 | Focus management (f/Tab) | Binding("f") on screen, Binding("tab") on BundleTree |
+| [x] | 2.6 | Tree refresh + entry re-resolution | refresh_snapshot re-resolves entry, repopulates tree |
 
 ### Task Details
 

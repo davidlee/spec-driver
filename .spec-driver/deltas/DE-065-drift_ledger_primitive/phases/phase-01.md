@@ -102,11 +102,11 @@ All test-driven, both linters clean.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | paths.py: add `DRIFT_SUBDIR` + `get_drift_dir()` | — | small, do first |
-| [ ] | 1.2 | models: `Source`, `Claim`, `DiscoveredBy`, `DriftEntry`, `DriftLedger`, lifecycle constants | [P] | |
-| [ ] | 1.3 | parser: `parse_ledger_body()` — heading split, YAML extraction, entry construction | [P] | depends on models |
-| [ ] | 1.4 | registry: `DriftLedgerRegistry` — discover, find, iter | — | depends on models + parser |
-| [ ] | 1.5 | tests: VT-065-models, VT-065-parser, VT-065-registry | — | TDD — write alongside |
+| [x] | 1.1 | paths.py: add `DRIFT_SUBDIR` + `get_drift_dir()` | — | done |
+| [x] | 1.2 | models: `Source`, `Claim`, `DiscoveredBy`, `DriftEntry`, `DriftLedger`, lifecycle constants | [P] | 26 tests |
+| [x] | 1.3 | parser: `parse_ledger_body()` — heading split, YAML extraction, entry construction | [P] | 24 tests, all contract edge cases |
+| [x] | 1.4 | registry: `DriftLedgerRegistry` — discover, find, iter | — | 15 tests |
+| [x] | 1.5 | tests: VT-065-models, VT-065-parser, VT-065-registry | — | 65 total, all passing |
 
 ### Task Details
 
@@ -158,13 +158,19 @@ All test-driven, both linters clean.
 | `load_markdown_file()` may not suit ledger frontmatter | Verify compatibility before building registry | open |
 
 ## 9. Decisions & Outcomes
-*(recorded during execution)*
+- 2026-03-08: `_split_sections` returns `tuple[str, list[tuple[str, str]]]` instead of mixed union list — cleaner type contract
+- 2026-03-08: `broad-exception-caught` in registry narrowed to `(OSError, ValueError, KeyError)`
+- 2026-03-08: `too-many-instance-attributes` for DriftEntry (17) and DriftLedger (10) accepted — inherent to domain
+- 2026-03-08: Fixed pre-existing PROB-001 test reference (deleted item)
+- 2026-03-08: Updated package_utils_test.py KNOWN_LEAF_PACKAGES with new `drift` package
 
 ## 10. Findings / Research Notes
-*(recorded during execution)*
+- `load_markdown_file()` from `core/spec_utils.py` works well for ledger frontmatter parsing — returns `(dict, str)` tuple
+- Fence-aware heading split is a simple state machine — `in_fence` boolean toggle on ``` lines, only split on `### ` when not in fence
+- Parser pylint score: 9.93/10 (only inherent too-many-instance-attributes)
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Phase sheet updated with outcomes
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (65 tests passing, linters clean)
+- [x] Phase sheet updated with outcomes
 - [ ] Hand-off notes to phase 2

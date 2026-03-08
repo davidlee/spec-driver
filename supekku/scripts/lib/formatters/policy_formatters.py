@@ -9,7 +9,11 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.formatters.column_defs import POLICY_COLUMNS, column_labels
+from supekku.scripts.lib.formatters.column_defs import (
+  EXT_ID_COLUMN,
+  POLICY_COLUMNS,
+  column_labels,
+)
 from supekku.scripts.lib.formatters.table_utils import (
   format_as_json,
   format_list_table,
@@ -24,11 +28,17 @@ if TYPE_CHECKING:
 
 def _format_basic_fields(policy: PolicyRecord) -> list[str]:
   """Format basic policy fields (id, title, status)."""
-  return [
+  lines = [
     f"ID: {policy.id}",
     f"Title: {policy.title}",
     f"Status: {policy.status}",
   ]
+  if policy.ext_id:
+    ext_line = f"External: {policy.ext_id}"
+    if policy.ext_url:
+      ext_line += f" ({policy.ext_url})"
+    lines.append(ext_line)
+  return lines
 
 
 def _format_timestamps(policy: PolicyRecord) -> list[str]:
@@ -192,6 +202,8 @@ def format_policy_list_table(
   policies: Sequence[PolicyRecord],
   format_type: str = "table",
   truncate: bool = False,
+  *,
+  show_external: bool = False,
 ) -> str:
   """Format policies as table, JSON, or TSV.
 
@@ -199,20 +211,37 @@ def format_policy_list_table(
     policies: List of PolicyRecord objects to format
     format_type: Output format (table|json|tsv)
     truncate: If True, truncate long fields (default: False, show full content)
+    show_external: If True, show ext_id column after ID
 
   Returns:
     Formatted string in requested format
   """
+  col_defs = list(POLICY_COLUMNS)
+  if show_external:
+    col_defs.insert(1, EXT_ID_COLUMN)
+
+  def _row(policy: PolicyRecord) -> list[str]:
+    row = _prepare_policy_row(policy)
+    if show_external:
+      row.insert(1, policy.ext_id)
+    return row
+
+  def _tsv_row(policy: PolicyRecord) -> list[str]:
+    row = _prepare_policy_tsv_row(policy)
+    if show_external:
+      row.insert(1, policy.ext_id)
+    return row
+
   return format_list_table(
     policies,
-    columns=column_labels(POLICY_COLUMNS),
+    columns=column_labels(col_defs),
     title="Policies",
-    prepare_row=_prepare_policy_row,
-    prepare_tsv_row=_prepare_policy_tsv_row,
+    prepare_row=_row,
+    prepare_tsv_row=_tsv_row,
     to_json=format_policy_list_json,
     format_type=format_type,
     truncate=truncate,
-    column_widths=_calculate_column_widths,
+    column_widths=_calculate_column_widths if not show_external else None,
   )
 
 
@@ -225,8 +254,9 @@ def format_policy_list_json(policies: Sequence[PolicyRecord]) -> str:
   Returns:
     JSON string representation
   """
-  policy_dicts = [
-    {
+  policy_dicts = []
+  for policy in policies:
+    d: dict[str, object] = {
       "id": policy.id,
       "title": policy.title,
       "status": policy.status,
@@ -234,6 +264,9 @@ def format_policy_list_json(policies: Sequence[PolicyRecord]) -> str:
       "summary": policy.summary,
       "path": policy.path,
     }
-    for policy in policies
-  ]
+    if policy.ext_id:
+      d["ext_id"] = policy.ext_id
+    if policy.ext_url:
+      d["ext_url"] = policy.ext_url
+    policy_dicts.append(d)
   return format_as_json(policy_dicts)

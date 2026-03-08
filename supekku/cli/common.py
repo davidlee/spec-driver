@@ -162,6 +162,15 @@ CaseInsensitiveOption = Annotated[
   ),
 ]
 
+ExternalOption = Annotated[
+  bool,
+  typer.Option(
+    "--external",
+    "-e",
+    help="Show external system ID column (ext_id)",
+  ),
+]
+
 
 def matches_regexp(
   pattern: str | None,

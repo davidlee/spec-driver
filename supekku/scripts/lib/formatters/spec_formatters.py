@@ -6,9 +6,13 @@ Formatters take Spec objects and return formatted strings for display.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from supekku.scripts.lib.formatters.column_defs import SPEC_COLUMNS, column_labels
+from supekku.scripts.lib.formatters.column_defs import (
+  EXT_ID_COLUMN,
+  SPEC_COLUMNS,
+  column_labels,
+)
 from supekku.scripts.lib.formatters.table_utils import (
   add_row_with_truncation,
   calculate_column_widths,
@@ -83,6 +87,8 @@ def format_spec_list_table(
   format_type: str = "table",
   no_truncate: bool = False,
   include_packages: bool = False,
+  *,
+  show_external: bool = False,
 ) -> str:
   """Format specs as table, JSON, or TSV.
 
@@ -91,6 +97,7 @@ def format_spec_list_table(
     format_type: Output format (table|json|tsv)
     no_truncate: If True, don't truncate long fields
     include_packages: Include package list in output
+    show_external: If True, show ext_id column after ID
 
   Returns:
     Formatted string in requested format
@@ -101,14 +108,20 @@ def format_spec_list_table(
   if format_type == "tsv":
     rows = []
     for spec in specs:
-      row = [spec.id, spec.name, spec.status]
+      row = [spec.id]
+      if show_external:
+        row.append(spec.ext_id)
+      row.extend([spec.name, spec.status])
       if include_packages:
         row.append(format_package_list(spec.packages))
       rows.append(row)
     return format_as_tsv(rows)
 
   # table format
-  columns = column_labels(SPEC_COLUMNS)
+  col_defs = list(SPEC_COLUMNS)
+  if show_external:
+    col_defs.insert(1, EXT_ID_COLUMN)
+  columns = column_labels(col_defs)
   if include_packages:
     columns.append("Packages")
 
@@ -119,17 +132,18 @@ def format_spec_list_table(
   max_widths = calculate_column_widths(terminal_width, num_columns=num_cols)
 
   for spec in specs:
-    # Apply styling
     styled_id = f"[spec.id]{spec.id}[/spec.id]"
 
-    # Format tags as comma-separated list with styling
     tags = ", ".join(spec.tags) if spec.tags else ""
     tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
 
     status_style = get_spec_status_style(spec.status)
     styled_status = f"[{status_style}]{spec.status}[/{status_style}]"
 
-    row_data = [styled_id, spec.name, tags_styled, styled_status]
+    row_data = [styled_id]
+    if show_external:
+      row_data.append(spec.ext_id)
+    row_data.extend([spec.name, tags_styled, styled_status])
     if include_packages:
       row_data.append(format_package_list(spec.packages))
 
@@ -174,6 +188,16 @@ def _format_taxonomy(spec: Spec) -> list[str]:
   return lines
 
 
+def _format_external_refs(spec: Spec) -> list[str]:
+  """Format external reference fields if present."""
+  if not spec.ext_id:
+    return []
+  ext_line = f"External: {spec.ext_id}"
+  if spec.ext_url:
+    ext_line += f" ({spec.ext_url})"
+  return [ext_line]
+
+
 def _format_file_path(spec: Spec, root: Path | None = None) -> list[str]:
   """Format file path section."""
   if root:
@@ -198,6 +222,7 @@ def format_spec_details(spec: Spec, root: Path | None = None) -> str:
   sections = [
     _format_basic_fields(spec),
     _format_taxonomy(spec),
+    _format_external_refs(spec),
     _format_packages(spec),
     _format_file_path(spec, root),
   ]
@@ -218,7 +243,7 @@ def format_spec_list_json(specs: Sequence[Spec]) -> str:
   """
   items = []
   for spec in specs:
-    item = {
+    item: dict[str, Any] = {
       "id": spec.id,
       "slug": spec.slug,
       "name": spec.name,
@@ -227,6 +252,10 @@ def format_spec_list_json(specs: Sequence[Spec]) -> str:
       "path": spec.path.as_posix(),
       "packages": spec.packages if spec.packages else [],
     }
+    if spec.ext_id:
+      item["ext_id"] = spec.ext_id
+    if spec.ext_url:
+      item["ext_url"] = spec.ext_url
     items.append(item)
 
   return format_as_json(items)

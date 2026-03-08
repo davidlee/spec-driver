@@ -9,7 +9,11 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.formatters.column_defs import STANDARD_COLUMNS, column_labels
+from supekku.scripts.lib.formatters.column_defs import (
+  EXT_ID_COLUMN,
+  STANDARD_COLUMNS,
+  column_labels,
+)
 from supekku.scripts.lib.formatters.table_utils import (
   format_as_json,
   format_list_table,
@@ -24,11 +28,17 @@ if TYPE_CHECKING:
 
 def _format_basic_fields(standard: StandardRecord) -> list[str]:
   """Format basic standard fields (id, title, status)."""
-  return [
+  lines = [
     f"ID: {standard.id}",
     f"Title: {standard.title}",
     f"Status: {standard.status}",
   ]
+  if standard.ext_id:
+    ext_line = f"External: {standard.ext_id}"
+    if standard.ext_url:
+      ext_line += f" ({standard.ext_url})"
+    lines.append(ext_line)
+  return lines
 
 
 def _format_timestamps(standard: StandardRecord) -> list[str]:
@@ -192,6 +202,8 @@ def format_standard_list_table(
   standards: Sequence[StandardRecord],
   format_type: str = "table",
   truncate: bool = False,
+  *,
+  show_external: bool = False,
 ) -> str:
   """Format standards as table, JSON, or TSV.
 
@@ -199,20 +211,37 @@ def format_standard_list_table(
     standards: List of StandardRecord objects to format
     format_type: Output format (table|json|tsv)
     truncate: If True, truncate long fields (default: False, show full content)
+    show_external: If True, show ext_id column after ID
 
   Returns:
     Formatted string in requested format
   """
+  col_defs = list(STANDARD_COLUMNS)
+  if show_external:
+    col_defs.insert(1, EXT_ID_COLUMN)
+
+  def _row(standard: StandardRecord) -> list[str]:
+    row = _prepare_standard_row(standard)
+    if show_external:
+      row.insert(1, standard.ext_id)
+    return row
+
+  def _tsv_row(standard: StandardRecord) -> list[str]:
+    row = _prepare_standard_tsv_row(standard)
+    if show_external:
+      row.insert(1, standard.ext_id)
+    return row
+
   return format_list_table(
     standards,
-    columns=column_labels(STANDARD_COLUMNS),
+    columns=column_labels(col_defs),
     title="Standards",
-    prepare_row=_prepare_standard_row,
-    prepare_tsv_row=_prepare_standard_tsv_row,
+    prepare_row=_row,
+    prepare_tsv_row=_tsv_row,
     to_json=format_standard_list_json,
     format_type=format_type,
     truncate=truncate,
-    column_widths=_calculate_column_widths,
+    column_widths=_calculate_column_widths if not show_external else None,
   )
 
 
@@ -225,8 +254,9 @@ def format_standard_list_json(standards: Sequence[StandardRecord]) -> str:
   Returns:
     JSON string representation
   """
-  standard_dicts = [
-    {
+  standard_dicts = []
+  for standard in standards:
+    d: dict[str, object] = {
       "id": standard.id,
       "title": standard.title,
       "status": standard.status,
@@ -234,6 +264,9 @@ def format_standard_list_json(standards: Sequence[StandardRecord]) -> str:
       "summary": standard.summary,
       "path": standard.path,
     }
-    for standard in standards
-  ]
+    if standard.ext_id:
+      d["ext_id"] = standard.ext_id
+    if standard.ext_url:
+      d["ext_url"] = standard.ext_url
+    standard_dicts.append(d)
   return format_as_json(standard_dicts)

@@ -215,6 +215,130 @@ class TestFormatRequirementListJson(unittest.TestCase):
     assert data["items"][0]["verified_by"] == ["AUD-002"]
 
 
+class TestRequirementExternalFields(unittest.TestCase):
+  """Tests for ext_id/ext_url support in requirement formatters (VT-067-002)."""
+
+  def test_details_with_ext_id_only(self) -> None:
+    """Test detail formatter shows ext_id without url."""
+    req = RequirementRecord(
+      uid="SPEC-001.FR-010",
+      label="FR-010",
+      title="External req",
+      status="active",
+      ext_id="JIRA-200",
+    )
+    result = format_requirement_details(req)
+    assert "External: JIRA-200" in result
+    assert "(" not in result.split("External:")[1].split("\n")[0]
+
+  def test_details_with_ext_id_and_url(self) -> None:
+    """Test detail formatter shows ext_id with url."""
+    req = RequirementRecord(
+      uid="SPEC-001.FR-010",
+      label="FR-010",
+      title="External req",
+      status="active",
+      ext_id="JIRA-200",
+      ext_url="https://jira.example.com/JIRA-200",
+    )
+    result = format_requirement_details(req)
+    assert "External: JIRA-200 (https://jira.example.com/JIRA-200)" in result
+
+  def test_details_without_ext_id_omits_line(self) -> None:
+    """Test detail formatter omits External line when no ext_id."""
+    req = RequirementRecord(
+      uid="SPEC-001.FR-010",
+      label="FR-010",
+      title="No external",
+      status="active",
+    )
+    result = format_requirement_details(req)
+    assert "External:" not in result
+
+  def test_json_includes_ext_fields(self) -> None:
+    """Test JSON output includes ext_id and ext_url when present."""
+    req = RequirementRecord(
+      uid="SPEC-001.FR-010",
+      label="FR-010",
+      title="External req",
+      status="active",
+      ext_id="GH-42",
+      ext_url="https://github.com/org/repo/issues/42",
+    )
+    result = format_requirement_list_json([req])
+    data = json.loads(result)
+    assert data["items"][0]["ext_id"] == "GH-42"
+    assert data["items"][0]["ext_url"] == "https://github.com/org/repo/issues/42"
+
+  def test_json_omits_ext_fields_when_empty(self) -> None:
+    """Test JSON output omits ext_id/ext_url when empty."""
+    req = RequirementRecord(
+      uid="SPEC-001.FR-010",
+      label="FR-010",
+      title="No external",
+      status="active",
+    )
+    result = format_requirement_list_json([req])
+    data = json.loads(result)
+    assert "ext_id" not in data["items"][0]
+    assert "ext_url" not in data["items"][0]
+
+  def test_tsv_show_external_inserts_ext_id(self) -> None:
+    """Test TSV includes ext_id after Label when show_external=True."""
+    req = RequirementRecord(
+      uid="SPEC-001.FR-010",
+      label="FR-010",
+      title="External",
+      status="active",
+      primary_spec="SPEC-001",
+      specs=["SPEC-001"],
+      ext_id="LIN-88",
+    )
+    result = format_requirement_list_table(
+      [req], format_type="tsv", show_external=True,
+    )
+    fields = result.strip().split("\t")
+    assert fields[0] == "SPEC-001"
+    assert fields[1] == "FR-010"
+    assert fields[2] == "LIN-88"
+
+  def test_tsv_no_external_omits_ext_id(self) -> None:
+    """Test TSV omits ext_id when show_external=False."""
+    req = RequirementRecord(
+      uid="SPEC-001.FR-010",
+      label="FR-010",
+      title="External",
+      status="active",
+      primary_spec="SPEC-001",
+      specs=["SPEC-001"],
+      ext_id="LIN-88",
+    )
+    result = format_requirement_list_table(
+      [req], format_type="tsv", show_external=False,
+    )
+    fields = result.strip().split("\t")
+    assert fields[0] == "SPEC-001"
+    assert fields[1] == "FR-010"
+    assert fields[2] == "-"  # category
+
+  def test_table_show_external_includes_column(self) -> None:
+    """Test table includes ExtID column when show_external=True."""
+    req = RequirementRecord(
+      uid="SPEC-001.FR-010",
+      label="FR-010",
+      title="External",
+      status="active",
+      primary_spec="SPEC-001",
+      specs=["SPEC-001"],
+      ext_id="LIN-88",
+    )
+    result = format_requirement_list_table(
+      [req], format_type="table", show_external=True,
+    )
+    assert "ExtID" in result
+    assert "LIN-88" in result
+
+
 class TestFormatRequirementDetails(unittest.TestCase):
   """Tests for format_requirement_details function."""
 

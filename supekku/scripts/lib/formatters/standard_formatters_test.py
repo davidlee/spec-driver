@@ -349,5 +349,119 @@ class TestFormatStandardListTable(unittest.TestCase):
     assert "—" in result or "N/A" in result
 
 
+class TestStandardExternalFields(unittest.TestCase):
+  """Tests for ext_id/ext_url support in standard formatters (VT-067-002)."""
+
+  def test_details_with_ext_id_only(self) -> None:
+    """Test detail formatter shows ext_id without url."""
+    standard = StandardRecord(
+      id="STD-010",
+      title="External Standard",
+      status="required",
+      ext_id="JIRA-400",
+    )
+    result = format_standard_details(standard)
+    assert "External: JIRA-400" in result
+    assert "(" not in result.split("External:")[1].split("\n")[0]
+
+  def test_details_with_ext_id_and_url(self) -> None:
+    """Test detail formatter shows ext_id with url."""
+    standard = StandardRecord(
+      id="STD-010",
+      title="External Standard",
+      status="required",
+      ext_id="JIRA-400",
+      ext_url="https://jira.example.com/JIRA-400",
+    )
+    result = format_standard_details(standard)
+    assert "External: JIRA-400 (https://jira.example.com/JIRA-400)" in result
+
+  def test_details_without_ext_id_omits_line(self) -> None:
+    """Test detail formatter omits External line when no ext_id."""
+    standard = StandardRecord(
+      id="STD-010",
+      title="No external",
+      status="required",
+    )
+    result = format_standard_details(standard)
+    assert "External:" not in result
+
+  def test_json_includes_ext_fields(self) -> None:
+    """Test JSON output includes ext_id and ext_url when present."""
+    standard = StandardRecord(
+      id="STD-010",
+      title="External Standard",
+      status="required",
+      updated=date(2024, 1, 1),
+      ext_id="GH-42",
+      ext_url="https://github.com/org/repo/issues/42",
+    )
+    result = format_standard_list_json([standard])
+    data = json.loads(result)
+    assert data["items"][0]["ext_id"] == "GH-42"
+    assert data["items"][0]["ext_url"] == "https://github.com/org/repo/issues/42"
+
+  def test_json_omits_ext_fields_when_empty(self) -> None:
+    """Test JSON output omits ext_id/ext_url when empty."""
+    standard = StandardRecord(
+      id="STD-010",
+      title="No external",
+      status="required",
+      updated=date(2024, 1, 1),
+    )
+    result = format_standard_list_json([standard])
+    data = json.loads(result)
+    assert "ext_id" not in data["items"][0]
+    assert "ext_url" not in data["items"][0]
+
+  def test_tsv_show_external_inserts_ext_id(self) -> None:
+    """Test TSV includes ext_id after ID when show_external=True."""
+    standard = StandardRecord(
+      id="STD-010",
+      title="External Standard",
+      status="required",
+      updated=date(2024, 1, 1),
+      ext_id="LIN-66",
+    )
+    result = format_standard_list_table(
+      [standard], format_type="tsv", show_external=True,
+    )
+    fields = result.strip().split("\t")
+    assert fields[0] == "STD-010"
+    assert fields[1] == "LIN-66"
+    assert fields[2] == "required"
+
+  def test_tsv_no_external_omits_ext_id(self) -> None:
+    """Test TSV omits ext_id when show_external=False."""
+    standard = StandardRecord(
+      id="STD-010",
+      title="External Standard",
+      status="required",
+      updated=date(2024, 1, 1),
+      ext_id="LIN-66",
+    )
+    result = format_standard_list_table(
+      [standard], format_type="tsv", show_external=False,
+    )
+    fields = result.strip().split("\t")
+    assert fields[0] == "STD-010"
+    assert fields[1] == "required"
+
+  def test_table_show_external_includes_column(self) -> None:
+    """Test table includes ExtID column when show_external=True."""
+    standard = StandardRecord(
+      id="STD-010",
+      title="External Standard",
+      status="required",
+      updated=date(2024, 1, 1),
+      ext_id="LIN-66",
+    )
+    result = format_standard_list_table(
+      [standard], format_type="table", show_external=True,
+    )
+    assert "ExtID" in result
+    assert "LIN-66" in result
+
+
 if __name__ == "__main__":
   unittest.main()

@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, Any
 from supekku.scripts.lib.blocks.plan import extract_phase_tracking
 from supekku.scripts.lib.formatters.column_defs import (
   CHANGE_COLUMNS,
+  EXT_ID_COLUMN,
   PHASE_COLUMNS,
   PLAN_COLUMNS,
   column_labels,
@@ -128,6 +129,8 @@ def format_change_list_table(
   changes: Sequence[ChangeArtifact],
   format_type: str = "table",
   no_truncate: bool = False,
+  *,
+  show_external: bool = False,
 ) -> str:
   """Format change artifacts as table, JSON, or TSV.
 
@@ -135,6 +138,7 @@ def format_change_list_table(
     changes: List of ChangeArtifact objects to format
     format_type: Output format (table|json|tsv)
     no_truncate: If True, don't truncate long fields
+    show_external: If True, show ext_id column after ID
 
   Returns:
     Formatted string in requested format
@@ -145,37 +149,46 @@ def format_change_list_table(
   if format_type == "tsv":
     rows = []
     for change in changes:
-      rows.append([change.id, change.status, change.name])
+      row = [change.id]
+      if show_external:
+        row.append(change.ext_id)
+      row.extend([change.status, change.name])
+      rows.append(row)
     return format_as_tsv(rows)
 
   # table format
+  col_defs = list(CHANGE_COLUMNS)
+  if show_external:
+    col_defs.insert(1, EXT_ID_COLUMN)
   table = create_table(
-    columns=column_labels(CHANGE_COLUMNS),
+    columns=column_labels(col_defs),
     title="Change Artifacts",
   )
 
   terminal_width = get_terminal_width()
-  max_widths = calculate_column_widths(terminal_width, num_columns=4)
+  max_widths = calculate_column_widths(terminal_width, num_columns=len(col_defs))
 
   for change in changes:
-    # Apply styling
     styled_id = f"[change.id]{change.id}[/change.id]"
 
-    # Strip "Delta - " prefix from delta names for cleaner display
     display_name = change.name
     if change.kind == "delta" and display_name.startswith("Delta - "):
-      display_name = display_name[8:]  # Remove "Delta - " (8 chars)
+      display_name = display_name[8:]
 
-    # Format tags as comma-separated list with styling
     tags = ", ".join(change.tags) if change.tags else ""
     tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
 
     status_style = get_change_status_style(change.status)
     styled_status = f"[{status_style}]{change.status}[/{status_style}]"
 
+    row = [styled_id]
+    if show_external:
+      row.append(change.ext_id)
+    row.extend([display_name, tags_styled, styled_status])
+
     add_row_with_truncation(
       table,
-      [styled_id, display_name, tags_styled, styled_status],
+      row,
       max_widths=max_widths if not no_truncate else None,
     )
 
@@ -184,12 +197,18 @@ def format_change_list_table(
 
 def _format_change_basic_fields(artifact: ChangeArtifact) -> list[str]:
   """Format basic change artifact fields."""
-  return [
+  lines = [
     f"Delta: {artifact.id}",
     f"Name: {artifact.name}",
     f"Status: {artifact.status}",
     f"Kind: {artifact.kind}",
   ]
+  if artifact.ext_id:
+    ext_line = f"External: {artifact.ext_id}"
+    if artifact.ext_url:
+      ext_line += f" ({artifact.ext_url})"
+    lines.append(ext_line)
+  return lines
 
 
 def _format_applies_to(artifact: ChangeArtifact) -> list[str]:
@@ -524,12 +543,18 @@ def format_delta_details(
 
 def _format_revision_basic_fields(artifact: ChangeArtifact) -> list[str]:
   """Format basic revision artifact fields."""
-  return [
+  lines = [
     f"Revision: {artifact.id}",
     f"Name: {artifact.name}",
     f"Status: {artifact.status}",
     f"Kind: {artifact.kind}",
   ]
+  if artifact.ext_id:
+    ext_line = f"External: {artifact.ext_id}"
+    if artifact.ext_url:
+      ext_line += f" ({artifact.ext_url})"
+    lines.append(ext_line)
+  return lines
 
 
 def _format_affects(artifact: ChangeArtifact) -> list[str]:
@@ -741,6 +766,10 @@ def format_change_list_json(changes: Sequence[ChangeArtifact]) -> str:
       item["applies_to"] = change.applies_to
     if change.relations:
       item["relations"] = change.relations
+    if change.ext_id:
+      item["ext_id"] = change.ext_id
+    if change.ext_url:
+      item["ext_url"] = change.ext_url
 
     items.append(item)
 

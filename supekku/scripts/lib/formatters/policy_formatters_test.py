@@ -331,5 +331,119 @@ class TestFormatPolicyListTable(unittest.TestCase):
     assert "—" in result or "N/A" in result
 
 
+class TestPolicyExternalFields(unittest.TestCase):
+  """Tests for ext_id/ext_url support in policy formatters (VT-067-002)."""
+
+  def test_details_with_ext_id_only(self) -> None:
+    """Test detail formatter shows ext_id without url."""
+    policy = PolicyRecord(
+      id="POL-010",
+      title="External Policy",
+      status="active",
+      ext_id="JIRA-300",
+    )
+    result = format_policy_details(policy)
+    assert "External: JIRA-300" in result
+    assert "(" not in result.split("External:")[1].split("\n")[0]
+
+  def test_details_with_ext_id_and_url(self) -> None:
+    """Test detail formatter shows ext_id with url."""
+    policy = PolicyRecord(
+      id="POL-010",
+      title="External Policy",
+      status="active",
+      ext_id="JIRA-300",
+      ext_url="https://jira.example.com/JIRA-300",
+    )
+    result = format_policy_details(policy)
+    assert "External: JIRA-300 (https://jira.example.com/JIRA-300)" in result
+
+  def test_details_without_ext_id_omits_line(self) -> None:
+    """Test detail formatter omits External line when no ext_id."""
+    policy = PolicyRecord(
+      id="POL-010",
+      title="No external",
+      status="active",
+    )
+    result = format_policy_details(policy)
+    assert "External:" not in result
+
+  def test_json_includes_ext_fields(self) -> None:
+    """Test JSON output includes ext_id and ext_url when present."""
+    policy = PolicyRecord(
+      id="POL-010",
+      title="External Policy",
+      status="active",
+      updated=date(2024, 1, 1),
+      ext_id="GH-42",
+      ext_url="https://github.com/org/repo/issues/42",
+    )
+    result = format_policy_list_json([policy])
+    data = json.loads(result)
+    assert data["items"][0]["ext_id"] == "GH-42"
+    assert data["items"][0]["ext_url"] == "https://github.com/org/repo/issues/42"
+
+  def test_json_omits_ext_fields_when_empty(self) -> None:
+    """Test JSON output omits ext_id/ext_url when empty."""
+    policy = PolicyRecord(
+      id="POL-010",
+      title="No external",
+      status="active",
+      updated=date(2024, 1, 1),
+    )
+    result = format_policy_list_json([policy])
+    data = json.loads(result)
+    assert "ext_id" not in data["items"][0]
+    assert "ext_url" not in data["items"][0]
+
+  def test_tsv_show_external_inserts_ext_id(self) -> None:
+    """Test TSV includes ext_id after ID when show_external=True."""
+    policy = PolicyRecord(
+      id="POL-010",
+      title="External Policy",
+      status="active",
+      updated=date(2024, 1, 1),
+      ext_id="LIN-77",
+    )
+    result = format_policy_list_table(
+      [policy], format_type="tsv", show_external=True,
+    )
+    fields = result.strip().split("\t")
+    assert fields[0] == "POL-010"
+    assert fields[1] == "LIN-77"
+    assert fields[2] == "active"
+
+  def test_tsv_no_external_omits_ext_id(self) -> None:
+    """Test TSV omits ext_id when show_external=False."""
+    policy = PolicyRecord(
+      id="POL-010",
+      title="External Policy",
+      status="active",
+      updated=date(2024, 1, 1),
+      ext_id="LIN-77",
+    )
+    result = format_policy_list_table(
+      [policy], format_type="tsv", show_external=False,
+    )
+    fields = result.strip().split("\t")
+    assert fields[0] == "POL-010"
+    assert fields[1] == "active"
+
+  def test_table_show_external_includes_column(self) -> None:
+    """Test table includes ExtID column when show_external=True."""
+    policy = PolicyRecord(
+      id="POL-010",
+      title="External Policy",
+      status="active",
+      updated=date(2024, 1, 1),
+      ext_id="LIN-77",
+    )
+    result = format_policy_list_table(
+      [policy], format_type="table", show_external=True,
+    )
+    assert "ExtID" in result
+    assert "LIN-77" in result
+
+
 if __name__ == "__main__":
   unittest.main()

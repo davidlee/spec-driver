@@ -16,6 +16,7 @@ from supekku.cli.common import (
   EXIT_FAILURE,
   EXIT_SUCCESS,
   CaseInsensitiveOption,
+  ExternalOption,
   FormatOption,
   RegexpOption,
   RootOption,
@@ -166,6 +167,7 @@ def list_specs(
       help="Include package list in the output",
     ),
   ] = False,
+  external: ExternalOption = False,
 ) -> None:
   """List SPEC/PROD artifacts with optional filtering.
 
@@ -341,6 +343,7 @@ def list_specs(
         format_type=format_type,
         no_truncate=not truncate,
         include_packages=packages,
+        show_external=external,
       )
       typer.echo(output)
 
@@ -401,6 +404,7 @@ def list_deltas(
       help="Show related specs, requirements, and phases (TSV format only)",
     ),
   ] = False,
+  external: ExternalOption = False,
 ) -> None:
   """List deltas with optional filtering and status grouping.
 
@@ -496,6 +500,7 @@ def list_deltas(
         filtered_artifacts,
         format_type=format_type,
         no_truncate=not truncate,
+        show_external=external,
       )
       typer.echo(output)
 
@@ -579,6 +584,7 @@ def list_changes(
       help="Include plan overview for deltas (TSV format only)",
     ),
   ] = False,
+  external: ExternalOption = False,
 ) -> None:
   """List change artifacts (deltas, revisions, audits) with optional filters.
 
@@ -704,6 +710,7 @@ def list_changes(
         artifacts_only,
         format_type=format_type,
         no_truncate=not truncate,
+        show_external=external,
       )
       typer.echo(output)
 
@@ -927,6 +934,7 @@ def list_policies(
     ),
   ] = False,
   truncate: TruncateOption = False,
+  external: ExternalOption = False,
 ) -> None:
   """List policies with optional filtering.
 
@@ -982,7 +990,9 @@ def list_policies(
 
     # Sort and format
     policies_sorted = sorted(policies, key=lambda p: p.id)
-    output = format_policy_list_table(policies_sorted, format_type, truncate)
+    output = format_policy_list_table(
+      policies_sorted, format_type, truncate, show_external=external
+    )
     typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
@@ -1059,6 +1069,7 @@ def list_standards(
     ),
   ] = False,
   truncate: TruncateOption = False,
+  external: ExternalOption = False,
 ) -> None:
   """List standards with optional filtering.
 
@@ -1114,7 +1125,9 @@ def list_standards(
 
     # Sort and format
     standards_sorted = sorted(standards, key=lambda s: s.id)
-    output = format_standard_list_table(standards_sorted, format_type, truncate)
+    output = format_standard_list_table(
+      standards_sorted, format_type, truncate, show_external=external
+    )
     typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
@@ -1183,6 +1196,7 @@ def list_requirements(
     ),
   ] = False,
   truncate: TruncateOption = False,
+  external: ExternalOption = False,
 ) -> None:
   """List requirements with optional filtering.
 
@@ -1302,7 +1316,9 @@ def list_requirements(
 
     # Sort and format
     requirements.sort(key=lambda r: r.uid)
-    output = format_requirement_list_table(requirements, format_type, truncate)
+    output = format_requirement_list_table(
+      requirements, format_type, truncate, show_external=external
+    )
     typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
@@ -1571,6 +1587,7 @@ def list_backlog(
       help="Display output using pager for scrolling",
     ),
   ] = False,
+  external: ExternalOption = False,
 ) -> None:
   """List backlog items with optional filtering.
 
@@ -1705,7 +1722,9 @@ def list_backlog(
       items = items[:limit]
 
     # Format and output
-    output = format_backlog_list_table(items, format_type, truncate)
+    output = format_backlog_list_table(
+      items, format_type, truncate, show_external=external
+    )
 
     # Add pagination info if results were limited
     if limit is not None and total_count > limit and format_type == "table":

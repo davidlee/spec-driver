@@ -273,3 +273,124 @@ class TestFormatBacklogDetails(unittest.TestCase):
     )
     result = format_backlog_details(item)
     assert "Likelihood: 0.2" in result
+
+
+class TestBacklogExternalFields(unittest.TestCase):
+  """Tests for ext_id/ext_url support in backlog formatters (VT-067-002)."""
+
+  def test_details_with_ext_id_only(self) -> None:
+    """Test detail formatter shows ext_id without url."""
+    item = BacklogItem(
+      id="ISSUE-010",
+      kind="issue",
+      status="open",
+      title="External tracked issue",
+      path=Path("backlog/issues/ISSUE-010/ISSUE-010.md"),
+      ext_id="JIRA-500",
+    )
+    result = format_backlog_details(item)
+    assert "External: JIRA-500" in result
+    assert "(" not in result.split("External:")[1].split("\n")[0]
+
+  def test_details_with_ext_id_and_url(self) -> None:
+    """Test detail formatter shows ext_id with url."""
+    item = BacklogItem(
+      id="ISSUE-010",
+      kind="issue",
+      status="open",
+      title="External tracked issue",
+      path=Path("backlog/issues/ISSUE-010/ISSUE-010.md"),
+      ext_id="JIRA-500",
+      ext_url="https://jira.example.com/JIRA-500",
+    )
+    result = format_backlog_details(item)
+    assert "External: JIRA-500 (https://jira.example.com/JIRA-500)" in result
+
+  def test_details_without_ext_id_omits_line(self) -> None:
+    """Test detail formatter omits External line when no ext_id."""
+    item = BacklogItem(
+      id="ISSUE-010",
+      kind="issue",
+      status="open",
+      title="No external",
+      path=Path("backlog/issues/ISSUE-010/ISSUE-010.md"),
+    )
+    result = format_backlog_details(item)
+    assert "External:" not in result
+
+  def test_json_includes_ext_fields(self) -> None:
+    """Test JSON output includes ext_id and ext_url when present."""
+    item = BacklogItem(
+      id="ISSUE-010",
+      kind="issue",
+      status="open",
+      title="External",
+      path=Path("backlog/issues/ISSUE-010/ISSUE-010.md"),
+      ext_id="GH-42",
+      ext_url="https://github.com/org/repo/issues/42",
+    )
+    result = format_backlog_list_json([item])
+    data = json.loads(result)
+    assert data["items"][0]["ext_id"] == "GH-42"
+    assert data["items"][0]["ext_url"] == "https://github.com/org/repo/issues/42"
+
+  def test_json_omits_ext_fields_when_empty(self) -> None:
+    """Test JSON output omits ext_id/ext_url when empty."""
+    item = BacklogItem(
+      id="ISSUE-010",
+      kind="issue",
+      status="open",
+      title="No external",
+      path=Path("backlog/issues/ISSUE-010/ISSUE-010.md"),
+    )
+    result = format_backlog_list_json([item])
+    data = json.loads(result)
+    assert "ext_id" not in data["items"][0]
+    assert "ext_url" not in data["items"][0]
+
+  def test_tsv_show_external_inserts_ext_id(self) -> None:
+    """Test TSV output includes ext_id after ID when show_external=True."""
+    item = BacklogItem(
+      id="ISSUE-010",
+      kind="issue",
+      status="open",
+      title="External",
+      path=Path("backlog/issues/ISSUE-010/ISSUE-010.md"),
+      ext_id="LIN-55",
+    )
+    result = format_backlog_list_table([item], format_type="tsv", show_external=True)
+    fields = result.strip().split("\t")
+    assert fields[0] == "ISSUE-010"
+    assert fields[1] == "LIN-55"
+    assert fields[2] == "issue"
+
+  def test_tsv_no_external_omits_ext_id(self) -> None:
+    """Test TSV output omits ext_id when show_external=False."""
+    item = BacklogItem(
+      id="ISSUE-010",
+      kind="issue",
+      status="open",
+      title="External",
+      path=Path("backlog/issues/ISSUE-010/ISSUE-010.md"),
+      ext_id="LIN-55",
+    )
+    result = format_backlog_list_table([item], format_type="tsv", show_external=False)
+    fields = result.strip().split("\t")
+    assert fields[0] == "ISSUE-010"
+    assert fields[1] == "issue"
+
+  def test_table_show_external_includes_column(self) -> None:
+    """Test table output includes ExtID column when show_external=True."""
+    item = BacklogItem(
+      id="ISSUE-010",
+      kind="issue",
+      status="open",
+      title="External",
+      path=Path("backlog/issues/ISSUE-010/ISSUE-010.md"),
+      ext_id="LIN-55",
+    )
+    result = format_backlog_list_table(
+      [item], format_type="table", show_external=True,
+    )
+    assert "ExtID" in result
+    assert "LIN-55" in result

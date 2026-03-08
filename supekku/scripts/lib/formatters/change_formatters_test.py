@@ -11,6 +11,8 @@ from supekku.scripts.lib.core.paths import AUDITS_SUBDIR, DELTAS_SUBDIR, SPEC_DR
 from supekku.scripts.lib.formatters.change_formatters import (
   format_audit_details,
   format_change_list_item,
+  format_change_list_json,
+  format_change_list_table,
   format_change_with_context,
   format_delta_details,
   format_phase_summary,
@@ -783,6 +785,106 @@ class FormatPlanListTableTest(unittest.TestCase):
     plans = [self._plan(name="A" * 200)]
     result = format_plan_list_table(plans, truncate=True)
     assert "..." in result
+
+
+class TestChangeExternalFields(unittest.TestCase):
+  """Tests for ext_id/ext_url support in change formatters (VT-067-002)."""
+
+  def _make_delta(self, **overrides: object) -> ChangeArtifact:
+    defaults: dict[str, object] = {
+      "id": "DE-050",
+      "kind": "delta",
+      "status": "draft",
+      "name": "External Delta",
+      "slug": "external-delta",
+      "path": Path("/repo/change/deltas/DE-050/DE-050.md"),
+      "updated": None,
+    }
+    defaults.update(overrides)
+    return ChangeArtifact(**defaults)
+
+  def test_delta_details_with_ext_id_only(self) -> None:
+    """Test delta detail shows ext_id without url."""
+    artifact = self._make_delta(ext_id="JIRA-100")
+    result = format_delta_details(artifact)
+    assert "External: JIRA-100" in result
+    assert "(" not in result.split("External:")[1].split("\n")[0]
+
+  def test_delta_details_with_ext_id_and_url(self) -> None:
+    """Test delta detail shows ext_id with url."""
+    artifact = self._make_delta(
+      ext_id="JIRA-100",
+      ext_url="https://jira.example.com/JIRA-100",
+    )
+    result = format_delta_details(artifact)
+    assert "External: JIRA-100 (https://jira.example.com/JIRA-100)" in result
+
+  def test_delta_details_without_ext_id_omits_line(self) -> None:
+    """Test delta detail omits External line when no ext_id."""
+    artifact = self._make_delta()
+    result = format_delta_details(artifact)
+    assert "External:" not in result
+
+  def test_revision_details_with_ext_id(self) -> None:
+    """Test revision detail shows ext_id."""
+    artifact = self._make_delta(
+      id="RE-010",
+      kind="revision",
+      name="External Revision",
+      ext_id="GH-77",
+      ext_url="https://github.com/org/repo/issues/77",
+    )
+    result = format_revision_details(artifact)
+    assert "External: GH-77 (https://github.com/org/repo/issues/77)" in result
+
+  def test_json_includes_ext_fields(self) -> None:
+    """Test JSON output includes ext_id and ext_url when present."""
+    artifact = self._make_delta(
+      ext_id="GH-42",
+      ext_url="https://github.com/org/repo/issues/42",
+    )
+    result = format_change_list_json([artifact])
+    data = json.loads(result)
+    assert data["items"][0]["ext_id"] == "GH-42"
+    assert data["items"][0]["ext_url"] == "https://github.com/org/repo/issues/42"
+
+  def test_json_omits_ext_fields_when_empty(self) -> None:
+    """Test JSON output omits ext_id/ext_url when empty."""
+    artifact = self._make_delta()
+    result = format_change_list_json([artifact])
+    data = json.loads(result)
+    assert "ext_id" not in data["items"][0]
+    assert "ext_url" not in data["items"][0]
+
+  def test_tsv_show_external_inserts_ext_id(self) -> None:
+    """Test TSV includes ext_id after ID when show_external=True."""
+    artifact = self._make_delta(ext_id="LIN-33")
+    result = format_change_list_table(
+      [artifact], format_type="tsv", show_external=True,
+    )
+    fields = result.strip().split("\t")
+    assert fields[0] == "DE-050"
+    assert fields[1] == "LIN-33"
+    assert fields[2] == "draft"
+
+  def test_tsv_no_external_omits_ext_id(self) -> None:
+    """Test TSV omits ext_id when show_external=False."""
+    artifact = self._make_delta(ext_id="LIN-33")
+    result = format_change_list_table(
+      [artifact], format_type="tsv", show_external=False,
+    )
+    fields = result.strip().split("\t")
+    assert fields[0] == "DE-050"
+    assert fields[1] == "draft"
+
+  def test_table_show_external_includes_column(self) -> None:
+    """Test table includes ExtID column when show_external=True."""
+    artifact = self._make_delta(ext_id="LIN-33")
+    result = format_change_list_table(
+      [artifact], format_type="table", show_external=True,
+    )
+    assert "ExtID" in result
+    assert "LIN-33" in result
 
 
 if __name__ == "__main__":

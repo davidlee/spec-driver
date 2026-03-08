@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import unittest
 from pathlib import Path
 from unittest.mock import Mock
@@ -10,6 +11,8 @@ from supekku.scripts.lib.formatters.spec_formatters import (
   format_package_list,
   format_spec_details,
   format_spec_list_item,
+  format_spec_list_json,
+  format_spec_list_table,
 )
 
 
@@ -161,6 +164,7 @@ class TestFormatSpecDetails(unittest.TestCase):
     spec_id: str = "SPEC-001",
     name: str = "Test Specification",
     slug: str = "test-spec",
+    *,
     kind: str = "spec",
     status: str = "draft",
     packages: list[str] | None = None,
@@ -303,6 +307,108 @@ class TestFormatSpecDetails(unittest.TestCase):
 
     assert "Category" not in result
     assert "C4 Level" not in result
+
+
+class TestSpecExternalFields(unittest.TestCase):
+  """Tests for ext_id/ext_url support in spec formatters (VT-067-002)."""
+
+  def _create_mock_spec(
+    self,
+    spec_id: str = "SPEC-001",
+    name: str = "Test Spec",
+    slug: str = "test-spec",
+    *,
+    kind: str = "spec",
+    status: str = "active",
+    ext_id: str = "",
+    ext_url: str = "",
+    packages: list[str] | None = None,
+    tags: list[str] | None = None,
+  ) -> Mock:
+    spec = Mock()
+    spec.id = spec_id
+    spec.name = name
+    spec.slug = slug
+    spec.kind = kind
+    spec.status = status
+    spec.ext_id = ext_id
+    spec.ext_url = ext_url
+    spec.packages = packages or []
+    spec.tags = tags or []
+    spec.category = ""
+    spec.c4_level = ""
+    spec.path = Path(f"/repo/specify/tech/{spec_id}/{spec_id}.md")
+    return spec
+
+  def test_details_with_ext_id_only(self) -> None:
+    """Test detail formatter shows ext_id without url."""
+    spec = self._create_mock_spec(ext_id="JIRA-123")
+    result = format_spec_details(spec)
+    assert "External: JIRA-123" in result
+    assert "(" not in result.split("External:")[1].split("\n")[0]
+
+  def test_details_with_ext_id_and_url(self) -> None:
+    """Test detail formatter shows ext_id with url."""
+    spec = self._create_mock_spec(
+      ext_id="JIRA-123",
+      ext_url="https://jira.example.com/JIRA-123",
+    )
+    result = format_spec_details(spec)
+    assert "External: JIRA-123 (https://jira.example.com/JIRA-123)" in result
+
+  def test_details_without_ext_id_omits_line(self) -> None:
+    """Test detail formatter omits External line when no ext_id."""
+    spec = self._create_mock_spec()
+    result = format_spec_details(spec)
+    assert "External:" not in result
+
+  def test_json_includes_ext_fields(self) -> None:
+    """Test JSON output includes ext_id and ext_url when present."""
+    spec = self._create_mock_spec(
+      ext_id="GH-42",
+      ext_url="https://github.com/org/repo/issues/42",
+    )
+    result = format_spec_list_json([spec])
+    data = json.loads(result)
+    assert data["items"][0]["ext_id"] == "GH-42"
+    assert data["items"][0]["ext_url"] == "https://github.com/org/repo/issues/42"
+
+  def test_json_omits_ext_fields_when_empty(self) -> None:
+    """Test JSON output omits ext_id/ext_url when empty."""
+    spec = self._create_mock_spec()
+    result = format_spec_list_json([spec])
+    data = json.loads(result)
+    assert "ext_id" not in data["items"][0]
+    assert "ext_url" not in data["items"][0]
+
+  def test_table_show_external_includes_column(self) -> None:
+    """Test table output includes ExtID column when show_external=True."""
+    spec = self._create_mock_spec(ext_id="LIN-99")
+    result = format_spec_list_table([spec], format_type="table", show_external=True)
+    assert "ExtID" in result
+    assert "LIN-99" in result
+
+  def test_table_no_external_omits_column(self) -> None:
+    """Test table output omits ExtID column when show_external=False."""
+    spec = self._create_mock_spec(ext_id="LIN-99")
+    result = format_spec_list_table([spec], format_type="table", show_external=False)
+    assert "ExtID" not in result
+
+  def test_tsv_show_external_inserts_ext_id(self) -> None:
+    """Test TSV output includes ext_id after ID when show_external=True."""
+    spec = self._create_mock_spec(ext_id="LIN-99")
+    result = format_spec_list_table([spec], format_type="tsv", show_external=True)
+    fields = result.strip().split("\t")
+    assert fields[0] == "SPEC-001"
+    assert fields[1] == "LIN-99"
+
+  def test_tsv_no_external_omits_ext_id(self) -> None:
+    """Test TSV output omits ext_id when show_external=False."""
+    spec = self._create_mock_spec(ext_id="LIN-99")
+    result = format_spec_list_table([spec], format_type="tsv", show_external=False)
+    fields = result.strip().split("\t")
+    assert fields[0] == "SPEC-001"
+    assert fields[1] == "Test Spec"
 
 
 if __name__ == "__main__":

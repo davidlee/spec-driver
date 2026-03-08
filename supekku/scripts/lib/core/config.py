@@ -15,7 +15,7 @@ from .paths import SPEC_DRIVER_DIR
 _TRANSIENT_PATH_MARKERS = (".venv", ".cache/uv")
 
 DEFAULT_CONFIG: dict = {
-  "ceremony": "pioneer",
+  "ceremony": "town_planner",
   "strict_mode": False,
   "tool": {
     "exec": "uv run spec-driver",
@@ -24,7 +24,7 @@ DEFAULT_CONFIG: dict = {
     "command": "just check",
   },
   "kanban": {
-    "enabled": True,
+    "enabled": False,
     "root": "kanban",
     "lanes": ["backlog", "next", "doing", "finishing", "done"],
     "id_prefix": "T",
@@ -33,14 +33,14 @@ DEFAULT_CONFIG: dict = {
   },
   "policy": {
     "adrs": True,
-    "policies": False,
-    "standards": False,
+    "policies": True,
+    "standards": True,
   },
   "events": {
     "enabled": True,
   },
   "sync": {
-    "spec_autocreate": False,
+    "spec_autocreate": True,
   },
   "contracts": {
     "enabled": True,

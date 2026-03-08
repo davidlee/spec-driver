@@ -39,8 +39,9 @@ def _marker_path(root: Path) -> Path:
 class TestSpecAutocreateEnabled:
   """Tests for spec_autocreate_enabled()."""
 
-  def test_false_when_no_toml_key_and_no_marker(self, repo_root: Path) -> None:
-    assert spec_autocreate_enabled(repo_root) is False
+  def test_true_when_no_toml_key_and_no_marker(self, repo_root: Path) -> None:
+    """Default is now True (town_planner defaults)."""
+    assert spec_autocreate_enabled(repo_root) is True
 
   def test_true_when_toml_key_set(self, repo_root: Path) -> None:
     doc = tomlkit.parse(_toml_path(repo_root).read_text(encoding="utf-8"))
@@ -68,8 +69,9 @@ class TestSpecAutocreateEnabled:
     _marker_path(repo_root).touch()
     assert spec_autocreate_enabled(repo_root) is True
 
-  def test_false_when_spec_driver_dir_missing(self, tmp_path: Path) -> None:
-    assert spec_autocreate_enabled(tmp_path) is False
+  def test_true_when_spec_driver_dir_missing(self, tmp_path: Path) -> None:
+    """Falls back to DEFAULT_CONFIG which has spec_autocreate=True."""
+    assert spec_autocreate_enabled(tmp_path) is True
 
 
 class TestPersistSpecAutocreate:

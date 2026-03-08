@@ -28,12 +28,67 @@ def check_config(ws: Workspace) -> list[DiagnosticResult]:
   sd_root = get_spec_driver_root(root)
 
   results.append(_check_workflow_toml(sd_root))
+  results.append(_check_version_staleness(sd_root))
   results.append(_check_claude_md(root))
   results.append(_check_skills_allowlist(sd_root))
   results.append(_check_agents_dir(sd_root))
   results.extend(_check_skills_exposure(root, sd_root))
 
   return results
+
+
+def _check_version_staleness(sd_root: Path) -> DiagnosticResult:
+  """Warn when workflow.toml version stamp differs from the running package."""
+  from supekku.scripts.lib.core.version import get_package_version  # noqa: PLC0415
+
+  wf = sd_root / "workflow.toml"
+  if not wf.is_file():
+    return DiagnosticResult(
+      category=CATEGORY,
+      name="version-staleness",
+      status="warn",
+      message="workflow.toml missing — cannot check version",
+      suggestion="Run: spec-driver install",
+    )
+
+  try:
+    with wf.open("rb") as f:
+      data = tomllib.load(f)
+  except (tomllib.TOMLDecodeError, OSError):
+    return DiagnosticResult(
+      category=CATEGORY,
+      name="version-staleness",
+      status="warn",
+      message="workflow.toml unreadable — cannot check version",
+    )
+
+  installed = data.get("spec_driver_installed_version")
+  current = get_package_version()
+
+  if installed is None:
+    return DiagnosticResult(
+      category=CATEGORY,
+      name="version-staleness",
+      status="warn",
+      message="no version stamp in workflow.toml",
+      suggestion="Run: spec-driver install",
+    )
+
+  if installed != current:
+    return DiagnosticResult(
+      category=CATEGORY,
+      name="version-staleness",
+      status="warn",
+      message=f"installed {installed}, running {current}",
+      suggestion="Run: spec-driver install",
+    )
+
+  return DiagnosticResult(
+    category=CATEGORY,
+    name="version-staleness",
+    status="pass",
+    message=f"version {current} matches workflow.toml",
+  )
 
 
 def _check_workflow_toml(sd_root: Path) -> DiagnosticResult:

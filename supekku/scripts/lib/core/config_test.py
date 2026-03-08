@@ -133,7 +133,7 @@ def test_invalid_toml_warns_and_returns_defaults(
 
 def test_defaults_have_expected_structure() -> None:
   """DEFAULT_CONFIG has all expected top-level keys and section shapes."""
-  assert DEFAULT_CONFIG["ceremony"] == "pioneer"
+  assert DEFAULT_CONFIG["ceremony"] == "town_planner"
   assert isinstance(DEFAULT_CONFIG["tool"], dict)
   assert isinstance(DEFAULT_CONFIG["kanban"], dict)
   assert isinstance(DEFAULT_CONFIG["policy"], dict)
@@ -236,7 +236,7 @@ def test_legacy_docs_merged_into_kanban(tmp_path: Path) -> None:
   assert config["kanban"]["artefacts_root"] == "my/artefacts"
   assert config["kanban"]["plans_root"] == "my/plans"
   # Kanban defaults filled
-  assert config["kanban"]["enabled"] is True
+  assert config["kanban"]["enabled"] is False
 
 
 def test_legacy_cards_and_docs_both_migrate(tmp_path: Path) -> None:
@@ -424,8 +424,8 @@ class TestGenerateDefaultWorkflowToml:
     toml_text = "\n".join(uncommented_lines)
     parsed = tomllib.loads(toml_text)
     # Verify a sample of parsed values match defaults
-    assert parsed["ceremony"] == "pioneer"
-    assert parsed["kanban"]["enabled"] is True
+    assert parsed["ceremony"] == "town_planner"
+    assert parsed["kanban"]["enabled"] is False
     assert parsed["dirs"]["memory"] == "memory"
 
   def test_tool_section_is_uncommented(self) -> None:

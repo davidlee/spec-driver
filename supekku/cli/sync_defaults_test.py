@@ -85,7 +85,7 @@ class SyncDefaultsTest(unittest.TestCase):
     mock_sync_specs: MagicMock,
     mock_sync_reqs: MagicMock,
   ) -> None:
-    """VT-SYNC-DEFAULTS-001: fresh repo, bare `sync` → no spec creation."""
+    """VT-001: fresh repo, bare sync → specs + contracts (default on)."""
     mock_root.return_value = self.root
     mock_sync_specs.return_value = _SYNC_SPECS_SUCCESS
     mock_sync_reqs.return_value = _SYNC_REQS_SUCCESS
@@ -95,9 +95,8 @@ class SyncDefaultsTest(unittest.TestCase):
     assert result.exit_code == 0, result.output
     mock_sync_specs.assert_called_once()
     call_kwargs = mock_sync_specs.call_args
-    assert call_kwargs.kwargs["create_specs"] is False
+    assert call_kwargs.kwargs["create_specs"] is True
     assert call_kwargs.kwargs["generate_contracts"] is True
-    assert not _read_toml_autocreate(self.root)
 
   # -- VT-002: --specs → persist + subsequent bare sync inherits --
 
@@ -162,7 +161,7 @@ class SyncDefaultsTest(unittest.TestCase):
     mock_sync_specs: MagicMock,
     mock_sync_reqs: MagicMock,
   ) -> None:
-    """VT-SYNC-DEFAULTS-004: populated registry → implicit opt-in via TOML."""
+    """VT-SYNC-DEFAULTS-004: populated registry → spec creation active (default on)."""
     mock_root.return_value = self.root
     mock_sync_specs.return_value = _SYNC_SPECS_SUCCESS
     mock_sync_reqs.return_value = _SYNC_REQS_SUCCESS
@@ -177,10 +176,8 @@ class SyncDefaultsTest(unittest.TestCase):
     result = self._invoke()
 
     assert result.exit_code == 0, result.output
-    assert _read_toml_autocreate(self.root), "TOML key should be set by heuristic"
     mock_sync_specs.assert_called_once()
     assert mock_sync_specs.call_args.kwargs["create_specs"] is True
-    assert "Existing specs detected" in result.output
 
   # -- VT-005: fresh dir → hint message on stderr --
 
@@ -193,7 +190,7 @@ class SyncDefaultsTest(unittest.TestCase):
     mock_sync_specs: MagicMock,
     mock_sync_reqs: MagicMock,
   ) -> None:
-    """VT-SYNC-DEFAULTS-005: fresh dir sync emits hint about --specs."""
+    """VT-005: no specs-off hint when default is on."""
     mock_root.return_value = self.root
     mock_sync_specs.return_value = _SYNC_SPECS_SUCCESS
     mock_sync_reqs.return_value = _SYNC_REQS_SUCCESS
@@ -201,8 +198,7 @@ class SyncDefaultsTest(unittest.TestCase):
     result = self._invoke()
 
     assert result.exit_code == 0, result.output
-    assert "Spec auto-creation is off" in result.output
-    assert "--specs" in result.output
+    assert "Spec auto-creation is off" not in result.output
 
 
 if __name__ == "__main__":

@@ -587,9 +587,9 @@ def test_initialize_workspace_renders_agent_docs_with_defaults(
   exec_content = (agents_dir / "exec.md").read_text()
   assert "uv run spec-driver" in exec_content
 
-  # Other defaults: ceremony=pioneer, kanban.enabled=True
+  # Other defaults: ceremony=town_planner
   workflow_content = (agents_dir / "workflow.md").read_text()
-  assert "pioneer" in workflow_content
+  assert "town_planner" in workflow_content
 
   glossary_content = (agents_dir / "glossary.md").read_text()
   assert "Card" in glossary_content

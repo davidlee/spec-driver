@@ -47,11 +47,13 @@ app = typer.Typer(
 )
 
 
-def _init_paths_from_config() -> None:
+def _init_paths_from_config() -> dict | None:
   """Initialize path constants from workflow.toml if in a repo.
 
   Silently skips if not in a repo — commands like --help and install
   must work without a workspace.
+
+  Returns the loaded config dict, or ``None`` if not in a workspace.
   """
   from supekku.scripts.lib.core.config import load_workflow_config  # noqa: PLC0415
   from supekku.scripts.lib.core.paths import init_paths  # noqa: PLC0415
@@ -60,15 +62,48 @@ def _init_paths_from_config() -> None:
   try:
     root = find_repo_root()
   except RuntimeError:
-    return
+    return None
   config = load_workflow_config(root)
   init_paths(config)
+  return config
+
+
+def _warn_if_version_stale(config: dict) -> None:
+  """Emit a stderr warning when the installed version has drifted.
+
+  Compares ``spec_driver_installed_version`` in *config* (from
+  ``workflow.toml``) against the running package version.  Skipped
+  when the active command is ``install`` (which will stamp the version
+  itself).
+  """
+  if "install" in sys.argv[1:2]:
+    return
+
+  from supekku.scripts.lib.core.version import get_package_version  # noqa: PLC0415
+
+  installed = config.get("spec_driver_installed_version")
+  current = get_package_version()
+
+  if installed == current:
+    return
+
+  if installed is None:
+    detail = "no version stamp found in workflow.toml"
+  else:
+    detail = f"workflow.toml has {installed}, running {current}"
+
+  sys.stderr.write(
+    f"Warning: spec-driver may need re-install ({detail}).\n"
+    "  Run: spec-driver install\n"
+  )
 
 
 @app.callback()
 def _app_callback(_version: VersionOption = None) -> None:
   """Process global options and initialize path configuration."""
-  _init_paths_from_config()
+  config = _init_paths_from_config()
+  if config is not None:
+    _warn_if_version_stale(config)
 
 
 # Top-level commands

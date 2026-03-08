@@ -474,15 +474,14 @@ _VERSION_RE = re.compile(rf'^{_VERSION_KEY}\s*=\s*".*"', re.MULTILINE)
 
 
 def _get_package_version() -> str:
-  """Get the installed spec-driver package version."""
-  from importlib.metadata import PackageNotFoundError, version  # noqa: PLC0415
+  """Get the installed spec-driver package version.
 
-  try:
-    return version("spec-driver")
-  except PackageNotFoundError:
-    from supekku import __version__  # noqa: PLC0415
+  Thin wrapper around :func:`supekku.scripts.lib.core.version.get_package_version`
+  kept for internal backward compatibility.
+  """
+  from supekku.scripts.lib.core.version import get_package_version  # noqa: PLC0415
 
-    return __version__
+  return get_package_version()
 
 
 def _stamp_installed_version(

@@ -6,8 +6,11 @@ import tempfile
 import unittest
 from dataclasses import dataclass
 from pathlib import Path
+from unittest.mock import patch
 
 from supekku.scripts.lib.diagnostics.checks.config import check_config
+
+_VERSION_MODULE = "supekku.scripts.lib.core.version.get_package_version"
 
 
 @dataclass
@@ -15,11 +18,14 @@ class _FakeWorkspace:
   root: Path
 
 
-def _make_full_workspace(tmp: Path) -> _FakeWorkspace:
+def _make_full_workspace(tmp: Path, *, version: str = "1.0.0") -> _FakeWorkspace:
   """Create a workspace with all config files present."""
   sd = tmp / ".spec-driver"
   sd.mkdir()
-  (sd / "workflow.toml").write_text('[workflow]\nceremony = "town_planner"\n')
+  (sd / "workflow.toml").write_text(
+    f'spec_driver_installed_version = "{version}"\n'
+    '[workflow]\nceremony = "town_planner"\n'
+  )
   (sd / "agents").mkdir()
   (sd / "skills.allowlist").write_text("boot\ndoctrine\n")
 
@@ -43,7 +49,8 @@ def _make_full_workspace(tmp: Path) -> _FakeWorkspace:
 class TestCheckConfig(unittest.TestCase):
   """Tests for check_config function."""
 
-  def test_full_config_all_pass(self) -> None:
+  @patch(_VERSION_MODULE, return_value="1.0.0")
+  def test_full_config_all_pass(self, _mock_ver) -> None:
     """Complete configuration should produce no warns or fails."""
     with tempfile.TemporaryDirectory() as td:
       ws = _make_full_workspace(Path(td))
@@ -134,12 +141,66 @@ class TestCheckConfig(unittest.TestCase):
       ]
       assert all(r.status == "warn" for r in target_results)
 
-  def test_all_results_have_config_category(self) -> None:
+  @patch(_VERSION_MODULE, return_value="1.0.0")
+  def test_all_results_have_config_category(self, _mock_ver) -> None:
     """Every result should be in the config category."""
     with tempfile.TemporaryDirectory() as td:
       ws = _make_full_workspace(Path(td))
       results = check_config(ws)
       assert all(r.category == "config" for r in results)
+
+
+class TestVersionStaleness(unittest.TestCase):
+  """Tests for version-staleness diagnostic check."""
+
+  @patch(_VERSION_MODULE, return_value="1.0.0")
+  def test_matching_version_passes(self, _mock_ver) -> None:
+    """Matching version should pass."""
+    with tempfile.TemporaryDirectory() as td:
+      ws = _make_full_workspace(Path(td), version="1.0.0")
+      results = check_config(ws)
+      vs = next(r for r in results if r.name == "version-staleness")
+      assert vs.status == "pass"
+      assert "1.0.0" in vs.message
+
+  @patch(_VERSION_MODULE, return_value="2.0.0")
+  def test_stale_version_warns(self, _mock_ver) -> None:
+    """Outdated version should warn with install suggestion."""
+    with tempfile.TemporaryDirectory() as td:
+      ws = _make_full_workspace(Path(td), version="1.0.0")
+      results = check_config(ws)
+      vs = next(r for r in results if r.name == "version-staleness")
+      assert vs.status == "warn"
+      assert "1.0.0" in vs.message
+      assert "2.0.0" in vs.message
+      assert vs.suggestion and "install" in vs.suggestion
+
+  @patch(_VERSION_MODULE, return_value="1.0.0")
+  def test_missing_version_stamp_warns(self, _mock_ver) -> None:
+    """Missing version key should warn."""
+    with tempfile.TemporaryDirectory() as td:
+      root = Path(td)
+      sd = root / ".spec-driver"
+      sd.mkdir()
+      (sd / "workflow.toml").write_text('[workflow]\nceremony = "settler"\n')
+      (sd / "agents").mkdir()
+      ws = _FakeWorkspace(root=root)
+      results = check_config(ws)
+      vs = next(r for r in results if r.name == "version-staleness")
+      assert vs.status == "warn"
+      assert vs.suggestion and "install" in vs.suggestion
+
+  @patch(_VERSION_MODULE, return_value="1.0.0")
+  def test_missing_workflow_toml_warns(self, _mock_ver) -> None:
+    """Missing workflow.toml should warn for version check too."""
+    with tempfile.TemporaryDirectory() as td:
+      root = Path(td)
+      (root / ".spec-driver").mkdir()
+      (root / ".spec-driver" / "agents").mkdir()
+      ws = _FakeWorkspace(root=root)
+      results = check_config(ws)
+      vs = next(r for r in results if r.name == "version-staleness")
+      assert vs.status == "warn"
 
 
 if __name__ == "__main__":

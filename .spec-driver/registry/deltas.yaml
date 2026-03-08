@@ -6249,7 +6249,7 @@ deltas:
     status: in-progress
     name: Delta - Tighten skill routing and boot-time workflow guidance
     slug: tighten_skill_routing_and_boot_time_workflow_guidance
-    updated: '2026-03-08'
+    updated: '2026-03-09'
     path: .spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/DE-055.md
     applies_to:
       specs:
@@ -6314,6 +6314,9 @@ deltas:
           status: completed
         - id: IP-055.PHASE-13
           name: Add doctrine pass to DR authoring
+          status: completed
+        - id: IP-055.PHASE-14
+          name: Nudge backlog updates during delta closure
           status: completed
       phases:
       - schema: supekku.phase.overview
@@ -6753,6 +6756,45 @@ deltas:
             from the actual design surface.
           mitigation: tie `/doctrine` to relevant articles of truth for the current
             DR and route ambiguity to `/consult`.
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-14
+        plan: IP-055
+        delta: DE-055
+        objective: Make delta close-out explicitly revisit any originating backlog
+          entries so closure leaves backlog state and traceability in sync with the
+          completed work.
+        entrance_criteria:
+        - A DE-055 follow-up has been approved to improve backlog follow-through during
+          delta closure.
+        - Current close-change guidance has been reviewed alongside delta-completion
+          memory and backlog-status ambiguity.
+        exit_criteria:
+        - close-change explicitly checks for originating backlog entries during closure.
+        - close-change nudges status/note/link updates for those backlog entries.
+        - the guidance tells the agent to `/consult` instead of inventing non-canonical
+          backlog statuses.
+        verification:
+          tests:
+          - uv run spec-driver skills sync
+          evidence:
+          - Packaged and installed close-change wording reflects backlog follow-through.
+          - Delta-completion memory includes the backlog step.
+        tasks:
+        - id: 14.1
+          title: Add backlog follow-through to close-change
+          status: done
+        - id: 14.2
+          title: Update delta-completion memory with backlog step and ambiguity guardrail
+          status: done
+        - id: 14.3
+          title: Update DE-055 structured artefacts and notes
+          status: done
+        risks:
+        - description: Close-out guidance could imply a canonical backlog status model
+            that the repo has not actually defined yet.
+          mitigation: phrase the step as a nudge plus `/consult` escalation when the
+            correct backlog transition is unclear.
       - id: IP-055.PHASE-10
         name: Improve memory retrieval and capture workflow guidance
         status: completed
@@ -8219,10 +8261,10 @@ deltas:
         phase: IP-070-P01
   DE-071:
     kind: delta
-    status: draft
+    status: completed
     name: 'CLI verb-noun taxonomy: consistency pass'
     slug: cli_verb_noun_taxonomy_consistency_pass
-    updated: '2026-03-08'
+    updated: '2026-03-09'
     path: .spec-driver/deltas/DE-071-cli_verb_noun_taxonomy_consistency_pass/DE-071.md
     applies_to:
       specs:
@@ -8241,7 +8283,202 @@ deltas:
         plan: IP-071
         delta: DE-071
         revision_links:
+          aligns_with:
+          - DR-071
+        specs:
+          primary:
+          - SPEC-110
+          collaborators:
+          - PROD-010
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-071.PHASE-01
+        - id: IP-071.PHASE-02
+        - id: IP-071.PHASE-03
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-071.PHASE-01
+        plan: IP-071
+        delta: DE-071
+        objective: Move schema commands into show/list, create admin group for compact/resolve/backfill,
+          remove skills group. All tests pass, linters clean.
+        entrance_criteria:
+        - DR-071 accepted
+        exit_criteria:
+        - All new command paths work (admin, show schema, list schemas)
+        - Old top-level schema/skills/compact/resolve/backfill removed from main.py
+        - All tests pass (just test)
+        - Linters clean (just lint, just pylint-report)
+        verification:
+          tests:
+          - VT-071-01
+          - VT-071-02
+          - VT-071-03
+          - VT-071-04
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Move schema into show/list
+        - id: '1.2'
+          description: Create admin group
+        - id: '1.3'
+          description: Remove skills group
+        - id: '1.4'
+          description: Update main.py registrations
+        - id: '1.5'
+          description: Adapt/create tests
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-071.PHASE-02
+        plan: IP-071
+        delta: DE-071
+        objective: Surface sync_skills result in install command output so users see
+          what changed.
+        entrance_criteria:
+        - P01 complete (skills group removed)
+        exit_criteria:
+        - install reports skill install/prune/symlink changes
+        - tests pass, linters clean
+        verification:
+          tests:
+          - VT-071-04
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Capture and format sync_skills result in install
+        - id: '2.2'
+          description: Test install skill-change output
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-071.PHASE-03
+        plan: IP-071
+        delta: DE-071
+        objective: Update all agent guidance (memories, skills, docs) to reference
+          new command shapes. Verify no stale references remain.
+        entrance_criteria:
+        - P02 complete
+        exit_criteria:
+        - No stale command references in guidance layer (VA-071-01)
+        - Memories, skills, generated docs all reference current commands
+        verification:
+          tests: []
+          evidence:
+          - VA-071-01
+        tasks:
+        - id: '3.1'
+          description: Grep for stale command references
+        - id: '3.2'
+          description: Update memories referencing old commands
+        - id: '3.3'
+          description: Update skills referencing old commands
+        - id: '3.4'
+          description: Update CLAUDE.md and generated docs
+        - id: '3.5'
+          description: Re-run install to regenerate AGENTS.md
+        - id: '3.6'
+          description: Final verification grep
+        risks: []
+  DE-072:
+    kind: delta
+    status: in-progress
+    name: Delta - remove installer backward-compat symlinks
+    slug: remove_installer_backward_compat_symlinks
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-072-remove_installer_backward_compat_symlinks/DE-072.md
+    applies_to:
+      specs:
+      - SPEC-129
+      requirements: []
+    plan:
+      id: IP-072
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-072
+        delta: DE-072
+        revision_links:
           aligns_with: []
+        specs:
+          primary:
+          - SPEC-129
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-072-P01
+        - id: IP-072.PHASE-01
+        - id: IP-072.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-072.PHASE-01
+        plan: IP-072
+        delta: DE-072
+        objective: Remove installer-created compatibility symlinks and align installer
+          tests and output with canonical-only workspace creation, including ADR reconciliation.
+        entrance_criteria:
+        - DE-072, DR-072, and IP-072 reviewed.
+        - Affected installer code and tests identified.
+        exit_criteria:
+        - Installer code no longer creates compatibility symlinks.
+        - Installer tests verify the new layout expectations.
+        - ADR-006 no longer describes installer-created compatibility symlinks as
+          the default install behavior.
+        - Targeted verification for touched files passes.
+        verification:
+          tests:
+          - pytest supekku/scripts/lib/install_test.py
+          - just pylint-files supekku/scripts/install.py supekku/scripts/lib/install_test.py
+          evidence:
+          - '`uv run pytest supekku/scripts/lib/install_test.py` passed.'
+          - '`just pylint-files supekku/scripts/install.py supekku/scripts/lib/install_test.py`
+            reported only pre-existing warnings.'
+        tasks:
+        - id: 1.1
+          title: Remove compatibility symlink creation from installer flow.
+          status: done
+        - id: 1.2
+          title: Update installer tests and output messaging for canonical-only layout.
+          status: done
+        - id: 1.3
+          title: Reconcile ADR-006 with the new installer behavior.
+          status: done
+        - id: 1.4
+          title: Run targeted verification and capture outcomes.
+          status: done
+        risks:
+        - Installer tests may still assume legacy root paths are created on fresh
+          install.
+      - id: IP-072-P01
+        phase: IP-072-P01
+      - id: IP-072.PHASE-02
+        phase: IP-072.PHASE-02
+  DE-073:
+    kind: delta
+    status: in-progress
+    name: CLI output selectors, view UX, and resolve-links improvements
+    slug: standardize_show_output_selectors
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-073-standardize_show_output_selectors/DE-073.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-073
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-073
+        delta: DE-073
+        revision_links:
+          aligns_with:
+          - DR-073
         specs:
           primary: []
           collaborators: []
@@ -8249,7 +8486,36 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-071-P01
+        - id: IP-073.PHASE-01
+        - id: IP-073.PHASE-02
+        - id: IP-073.PHASE-03
       phases:
-      - id: IP-071-P01
-        phase: IP-071-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-073.PHASE-01
+        plan: IP-073
+        delta: DE-073
+        objective: Add unified --content-type/-c option to show subcommands, starting
+          with show memory, then extending to other artifact types.
+        entrance_criteria:
+        - DR-073 accepted
+        - No -c flag conflicts on show subcommands (confirmed by exploration)
+        exit_criteria:
+        - show memory -c markdown|frontmatter|yaml produces correct output
+        - --content-type coexists with --raw/--json/--body-only
+        - Tests pass, lint clean
+        verification:
+          tests:
+          - VT-073-01
+          evidence: []
+        tasks:
+        - '1.1: Define ContentType enum and shared option'
+        - '1.2: Implement -c on show memory'
+        - '1.3: Extend -c to remaining show subcommands'
+        - '1.4: Tests'
+        risks:
+        - -c flag may conflict with existing options
+      - id: IP-073.PHASE-02
+        phase: IP-073.PHASE-02
+      - id: IP-073.PHASE-03
+        phase: IP-073.PHASE-03

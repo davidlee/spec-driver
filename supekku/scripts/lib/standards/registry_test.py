@@ -24,6 +24,37 @@ class TestStandardRecord(unittest.TestCase):
     assert result["title"] == "Test Standard"
     assert result["status"] == "default"
     assert result["summary"] == ""
+    assert "ext_id" not in result  # Empty ext_id omitted
+    assert "ext_url" not in result  # Empty ext_url omitted
+
+  def test_to_dict_ext_id_ext_url(self) -> None:
+    """Test ext_id/ext_url appear in serialized dict when populated."""
+    record = StandardRecord(
+      id="STD-002",
+      title="External Standard",
+      status="required",
+      ext_id="EXT-STD-42",
+      ext_url="https://example.com/std-42",
+    )
+
+    result = record.to_dict(Path("/tmp"))
+
+    assert result["ext_id"] == "EXT-STD-42"
+    assert result["ext_url"] == "https://example.com/std-42"
+
+  def test_to_dict_ext_url_only(self) -> None:
+    """Test ext_url without ext_id — only ext_url appears."""
+    record = StandardRecord(
+      id="STD-003",
+      title="URL-Only Standard",
+      status="draft",
+      ext_url="https://example.com/std-url",
+    )
+
+    result = record.to_dict(Path("/tmp"))
+
+    assert "ext_id" not in result
+    assert result["ext_url"] == "https://example.com/std-url"
 
   def test_default_status(self) -> None:
     """Test that 'default' status is supported."""

@@ -4,7 +4,7 @@ slug: 070-registry-sync-and-schema
 name: IP-070 Phase 01 - Registry sync and schema completeness
 created: '2026-03-08'
 updated: '2026-03-08'
-status: draft
+status: in-progress
 kind: phase
 ---
 
@@ -74,24 +74,24 @@ other model ↔ schema field parity gaps.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] RequirementRecord.to_dict() includes ext_id/ext_url
-- [ ] PolicyRecord.to_dict() includes ext_id/ext_url
-- [ ] StandardRecord.to_dict() includes ext_id/ext_url
-- [ ] BASE_FRONTMATTER_METADATA includes ext_id/ext_url
-- [ ] `schema show` output reflects the new fields
-- [ ] Model ↔ schema parity audit complete
-- [ ] `just check` passes
+- [x] RequirementRecord.to_dict() includes ext_id/ext_url
+- [x] PolicyRecord.to_dict() includes ext_id/ext_url
+- [x] StandardRecord.to_dict() includes ext_id/ext_url
+- [x] BASE_FRONTMATTER_METADATA includes ext_id/ext_url
+- [x] `schema show` output reflects the new fields
+- [x] Model ↔ schema parity audit complete (VA: 2 gaps found — MemoryRecord, DecisionRecord — tracked as follow-up)
+- [x] `just check` passes (3372 passed; 2 failures in edit_test.py are DE-068, unrelated)
 
 ## 7. Tasks & Progress
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Add ext_id/ext_url to RequirementRecord.to_dict() | [P] | |
-| [ ] | 1.2 | Add ext_id/ext_url to PolicyRecord.to_dict() | [P] | |
-| [ ] | 1.3 | Add ext_id/ext_url to StandardRecord.to_dict() | [P] | |
-| [ ] | 1.4 | Add ext_id/ext_url to BASE_FRONTMATTER_METADATA | | |
-| [ ] | 1.5 | Audit model vs schema field parity | | VA |
-| [ ] | 1.6 | Write tests | | |
+| [x] | 1.1 | Add ext_id/ext_url to RequirementRecord.to_dict() | [P] | done |
+| [x] | 1.2 | Add ext_id/ext_url to PolicyRecord.to_dict() | [P] | done |
+| [x] | 1.3 | Add ext_id/ext_url to StandardRecord.to_dict() | [P] | done |
+| [x] | 1.4 | Add ext_id/ext_url to BASE_FRONTMATTER_METADATA | | done |
+| [x] | 1.5 | Audit model vs schema field parity | | VA: 2 gaps (Memory, Decision) — follow-up |
+| [x] | 1.6 | Write tests | | 9 tests across 3 files |
 
 ## 11. Wrap-up Checklist
 

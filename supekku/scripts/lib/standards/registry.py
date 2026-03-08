@@ -103,6 +103,10 @@ class StandardRecord:
       data["tags"] = self.tags
     if self.backlinks:
       data["backlinks"] = self.backlinks
+    if self.ext_id:
+      data["ext_id"] = self.ext_id
+    if self.ext_url:
+      data["ext_url"] = self.ext_url
 
     return data
 

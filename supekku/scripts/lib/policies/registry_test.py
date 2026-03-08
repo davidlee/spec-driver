@@ -28,6 +28,8 @@ class TestPolicyRecord(unittest.TestCase):
     assert result["status"] == "required"
     assert result["summary"] == ""
     assert "owners" not in result  # Empty lists are omitted
+    assert "ext_id" not in result  # Empty ext_id omitted
+    assert "ext_url" not in result  # Empty ext_url omitted
 
   def test_to_dict_full(self) -> None:
     """Test serialization with all fields populated."""
@@ -60,6 +62,35 @@ class TestPolicyRecord(unittest.TestCase):
     assert result["requirements"] == ["SPEC-100.FR-001"]
     assert result["tags"] == ["security", "compliance"]
     assert result["summary"] == "A comprehensive policy"
+
+  def test_to_dict_ext_id_ext_url(self) -> None:
+    """Test ext_id/ext_url appear in serialized dict when populated."""
+    record = PolicyRecord(
+      id="POL-003",
+      title="External Policy",
+      status="required",
+      ext_id="EXT-POL-99",
+      ext_url="https://example.com/pol-99",
+    )
+
+    result = record.to_dict(Path("/tmp"))
+
+    assert result["ext_id"] == "EXT-POL-99"
+    assert result["ext_url"] == "https://example.com/pol-99"
+
+  def test_to_dict_ext_id_only(self) -> None:
+    """Test ext_id without ext_url — only ext_id appears."""
+    record = PolicyRecord(
+      id="POL-004",
+      title="Partial External",
+      status="draft",
+      ext_id="EXT-POL-100",
+    )
+
+    result = record.to_dict(Path("/tmp"))
+
+    assert result["ext_id"] == "EXT-POL-100"
+    assert "ext_url" not in result
 
 
 class TestPolicyRegistry(unittest.TestCase):

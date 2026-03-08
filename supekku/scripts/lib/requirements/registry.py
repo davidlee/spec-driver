@@ -104,7 +104,7 @@ class RequirementRecord:
 
   def to_dict(self) -> dict[str, object]:
     """Convert requirement record to dictionary for serialization."""
-    return {
+    d: dict[str, object] = {
       "label": self.label,
       "title": self.title,
       "specs": self.specs,
@@ -120,6 +120,11 @@ class RequirementRecord:
       "coverage_entries": self.coverage_entries,
       "path": self.path,
     }
+    if self.ext_id:
+      d["ext_id"] = self.ext_id
+    if self.ext_url:
+      d["ext_url"] = self.ext_url
+    return d
 
   @classmethod
   def from_dict(cls, uid: str, data: dict[str, object]) -> RequirementRecord:

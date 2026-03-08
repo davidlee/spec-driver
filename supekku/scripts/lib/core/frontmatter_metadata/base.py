@@ -117,6 +117,16 @@ BASE_FRONTMATTER_METADATA = BlockMetadata(
       items=FieldMetadata(type="string", pattern=r".+", description="Tag value"),
       description="Discovery tags for loose categorization",
     ),
+    "ext_id": FieldMetadata(
+      type="string",
+      required=False,
+      description="External system identifier (e.g., JIRA-1234, GH-567)",
+    ),
+    "ext_url": FieldMetadata(
+      type="string",
+      required=False,
+      description="URL to external resource (e.g., ticket, discussion)",
+    ),
     "relations": FieldMetadata(
       type="array",
       required=False,

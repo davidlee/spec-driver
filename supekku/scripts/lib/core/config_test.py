@@ -88,9 +88,6 @@ root = "api-contracts"
 [bootstrap]
 doctrine_path = "custom/doctrine.md"
 
-[authoring]
-engine = "spec_driver"
-
 [integration]
 agents_md = false
 claude_md = false
@@ -113,7 +110,6 @@ claude_md = false
   assert config["policy"]["policies"] is True
   assert config["contracts"]["root"] == "api-contracts"
   assert config["bootstrap"]["doctrine_path"] == "custom/doctrine.md"
-  assert config["authoring"]["engine"] == "spec_driver"
   assert config["integration"]["agents_md"] is False
 
 
@@ -139,7 +135,6 @@ def test_defaults_have_expected_structure() -> None:
   assert isinstance(DEFAULT_CONFIG["policy"], dict)
   assert isinstance(DEFAULT_CONFIG["contracts"], dict)
   assert isinstance(DEFAULT_CONFIG["bootstrap"], dict)
-  assert isinstance(DEFAULT_CONFIG["authoring"], dict)
   assert isinstance(DEFAULT_CONFIG["verification"], dict)
   assert isinstance(DEFAULT_CONFIG["integration"], dict)
   assert isinstance(DEFAULT_CONFIG["dirs"], dict)

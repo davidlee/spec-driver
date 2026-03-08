@@ -215,9 +215,7 @@ class CreateDeltaFromBacklogTest(unittest.TestCase):
 
   def _output(self, result):
     """Combine stdout and stderr for assertion."""
-    return (result.stdout or "") + (result.stderr or "") + str(
-      result.output or ""
-    )
+    return (result.stdout or "") + (result.stderr or "") + str(result.output or "")
 
   def _has_id_validation_error(self, result) -> bool:
     """Check output for backlog ID format error."""

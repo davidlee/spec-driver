@@ -66,7 +66,6 @@ app = typer.Typer(help="Create new artifacts", no_args_is_help=True)
 _BACKLOG_ID_RE = re.compile(r"^(ISSUE|PROB|IMPR|RISK)-\d+$")
 
 
-
 @app.command("spec")
 def create_spec(
   spec_name: Annotated[

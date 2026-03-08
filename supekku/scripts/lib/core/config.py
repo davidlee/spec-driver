@@ -28,8 +28,8 @@ DEFAULT_CONFIG: dict = {
     "root": "kanban",
     "lanes": ["backlog", "next", "doing", "finishing", "done"],
     "id_prefix": "T",
-    "artefacts_root": "doc/artefacts",
-    "plans_root": "doc/plans",
+    "artefacts_root": "docs/artefacts",
+    "plans_root": "docs/plans",
   },
   "policy": {
     "adrs": True,
@@ -48,9 +48,6 @@ DEFAULT_CONFIG: dict = {
   },
   "bootstrap": {
     "doctrine_path": ".spec-driver/doctrine.md",
-  },
-  "authoring": {
-    "engine": "superpowers",
   },
   "skills": {
     "targets": ["claude", "codex"],
@@ -285,7 +282,7 @@ _SECTION_COMMENTS: dict[str, list[str]] = {
     "Enable policies and standards for stricter governance.",
   ],
   "events": [
-    "Event logging for spec-driver operations.",
+    "Event logging for spec-driver operations (powers TUI track mode).",
   ],
   "sync": [
     "Controls for the sync subsystem.",
@@ -297,10 +294,6 @@ _SECTION_COMMENTS: dict[str, list[str]] = {
   ],
   "bootstrap": [
     "Path to the project doctrine file loaded by agents at boot.",
-  ],
-  "authoring": [
-    'Content authoring engine.  "superpowers" uses the supekku engine;',
-    '"spec_driver" uses the built-in spec-driver templates.',
   ],
   "skills": [
     "Agent skill sync targets.  Each entry is a directory name under",

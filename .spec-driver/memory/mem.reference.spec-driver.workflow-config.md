@@ -74,8 +74,8 @@ environment.
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `artefacts_root` | `"doc/artefacts"` | Design document directory |
-| `plans_root` | `"doc/plans"` | Implementation plan directory |
+| `artefacts_root` | `"docs/artefacts"` | Design document directory |
+| `plans_root` | `"docs/plans"` | Implementation plan directory |
 
 ### [policy]
 
@@ -109,12 +109,6 @@ environment.
 | Key | Default | Description |
 |-----|---------|-------------|
 | `doctrine_path` | `".spec-driver/doctrine.md"` | Project doctrine file loaded at agent boot |
-
-### [authoring]
-
-| Key | Default | Description |
-|-----|---------|-------------|
-| `engine` | `"superpowers"` | Content engine: `"superpowers"` (supekku) or `"spec_driver"` (built-in) |
 
 ### [skills]
 

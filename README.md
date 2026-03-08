@@ -11,8 +11,10 @@ Your specification-driven development framework construction toolkit, with multi
 - Use cheap, fast, deterministically generated contracts to complement and audit the work of messy, stochastic agents
 - The combination of markdown and YAML is a surprisingly powerful platform for structured, legible data
 - Tooling joins related entities through a registry for fast lookup, validation, and relational data
-- a low friction, conceptually coherent, unified CLI for spec-driven development you can adapt as your needs change
+- A low friction, conceptually coherent, unified CLI for spec-driven development you can adapt as your needs change
 - A TUI for browsing project documentation; live agent session follow mode
+- If all you care about is ADRs, turn the rest off - it's still super handy
+- Token footprint: < 3k to boot with everything activated; skills designed for token-efficiency
 
 **What's it for?**
 - a single framework which can scale from low-ceremony kanban, up to the robust process you need for large codebases
@@ -23,8 +25,7 @@ Your specification-driven development framework construction toolkit, with multi
 ![ADR list](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/adr-list.png)
 
 ![tui](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/tui.png)
-There's a nice little TUI for browsing docs, with fuzzy find.
-Shout out to [lazyspec](https://github.com/jkaloger/lazyspec/)
+A nice little TUI for browsing docs, with fuzzy find.
 
 ![follow](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/follow.png)
 Fun fact: TUI now supports following a claude code session in real time.
@@ -33,11 +34,13 @@ Fun fact: TUI now supports following a claude code session in real time.
 
 1. Install spec-driver.
 2. Run `spec-driver install` in your repo.
-3. Edit `.spec-driver/workflow.toml` to taste.
-4. Boot up Claude Code or Codex (presumably others work too)
+3. Tweak `.spec-driver/workflow.toml` to taste; `spec-driver install` again after edits.
+4. Boot up Claude Code or Codex.
 5. Tell it what you want to do.
 
-The agent guides the process according to your project settings, so you can learn the rest as you go.
+The agent runs the process according to your project settings, so you can learn the rest as you go. Ask it to explain the concepts as you need them.
+
+Add symlinks to the `.spec-driver` subfolders you want convenient access to (optional).
 
 ## Installation
 
@@ -124,6 +127,22 @@ the appropriate contract doc generator(s):
 
 ![workflow diagram](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/simple.svg)
 
+### Install Footprint
+
+All install locations are project-local - no change to your system ~/.claude etc
+
+```bash
+# Initialize spec-driver workspace structure
+spec-driver install
+
+# This installs :
+# - .spec-driver/ (YAML registries & configuration)
+# - .claude/ project-local settings & skills
+# - .agents/ project-local settings & skills
+# - CLAUDE.md - adds a line to invoke boot script
+# - AGENTS.md - adds a line to invoke boot script
+```
+
 ## Quick Start
 
 ```zsh
@@ -148,22 +167,7 @@ alias sdr="spec-driver"
 # or
 alias sdr="uv run spec-driver"
 ```
-
-### Installation & Setup
-
-```bash
-# Initialize spec-driver workspace structure
-spec-driver install
-
-# This installs (all files are project-local - no change to your system ~/.claude etc):
-# - .spec-driver/ (YAML registries & configuration)
-# - .claude/ project-local settings & skills
-# - .agents/ project-local settings & skills
-# - CLAUDE.md - adds a line to invoke boot script
-# - AGENTS.md - adds a line to invoke boot script
-```
-
-claude / agents entries are contingent on project settings.
+/ agents entries are contingent on project settings.
 
 ### Synchronization
 
@@ -229,6 +233,7 @@ Boot up, install, and ask the agent to show you around.
 - [A Socratic dialogue wherein I explain the issues with "spec-driven development" which led me to build this thing](https://supekku.dev)
 - [superpowers](https://github.com/obra/superpowers) - NGL, I intentionally stole a lot of great ideas from the author
 - [me](https://www.linkedin.com/in/davidlee-au/)
+- Shout out to [lazyspec](https://github.com/jkaloger/lazyspec/) for TUI ideas
 
 ## License
 

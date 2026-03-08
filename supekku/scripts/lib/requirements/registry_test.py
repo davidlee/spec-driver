@@ -2409,12 +2409,14 @@ class TestInlineRequirementTags(unittest.TestCase):
 
     security = registry.filter(tag="security")
     assert {r.uid for r in security} == {
-      "SPEC-870.FR-001", "SPEC-870.FR-003",
+      "SPEC-870.FR-001",
+      "SPEC-870.FR-003",
     }
 
     perf = registry.filter(tag="performance")
     assert {r.uid for r in perf} == {
-      "SPEC-870.FR-002", "SPEC-870.FR-003",
+      "SPEC-870.FR-002",
+      "SPEC-870.FR-003",
     }
 
     none = registry.filter(tag="nonexistent")

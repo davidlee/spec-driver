@@ -194,7 +194,6 @@ class TestListCommands:
     assert "--requirement" in result.stdout
     assert "--policy" in result.stdout
 
-
   def test_list_audits_help(self):
     """Test list audits command help."""
     result = runner.invoke(app, ["list", "audits", "--help"])

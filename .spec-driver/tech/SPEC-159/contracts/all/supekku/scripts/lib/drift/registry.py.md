@@ -1,0 +1,1 @@
+../../../../../../../../../.contracts/all/supekku/scripts/lib/drift/registry.py.md

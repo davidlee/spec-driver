@@ -427,3 +427,19 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 ### Verification status
 - Skill sync succeeded and `.spec-driver/AGENTS.md` now exposes `using-spec-driver` and `update-delta-docs`.
 - `uv run spec-driver validate` still fails on unrelated pre-existing errors in `DE-049`, `DE-052`, `DE-053`, and `DE-054`.
+
+## 2026-03-08
+
+### 2026-03-08 - phase 12 DR review-loop tightening
+- Extended `supekku/skills/draft-design-revision/SKILL.md` again to tighten the post-draft loop.
+- New guidance added there:
+  - keep DR authoring progressive and section-scoped rather than whole-file-by-default
+  - bias toward code-adjacent examples when they remove ambiguity about APIs, responsibilities, data shapes, or tricky seams
+  - require the planning agent to run an adversarial self-review of the DR before treating it as coherent
+  - after integrating that local feedback, offer to print a prompt for an external adversarial reviewer
+  - require reconciling `DE-XXX.md` after DR feedback and before offering `/plan-phases` or new phase-sheet work
+- Rationale:
+  - section-by-section drafting alone still leaves room for polished but under-specific DRs
+  - a mandatory internal challenge pass raises quality without forcing every DR through a second external agent
+  - planning from a stale DE recreates drift immediately, so DE reconciliation belongs inside the DR loop itself
+- Updated `DE-055.md`, `DR-055.md`, `IP-055.md`, and `IP-055.PHASE-12` to record the new accepted design direction.

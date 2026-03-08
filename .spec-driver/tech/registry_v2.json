@@ -15,6 +15,7 @@
       "supekku/scripts/lib/deletion": "SPEC-144",
       "supekku/scripts/lib/diagnostics/checks": "SPEC-158",
       "supekku/scripts/lib/docs/python": "SPEC-145",
+      "supekku/scripts/lib/drift": "SPEC-159",
       "supekku/scripts/lib/formatters": "SPEC-146",
       "supekku/scripts/lib/memory": "SPEC-147",
       "supekku/scripts/lib/policies": "SPEC-148",

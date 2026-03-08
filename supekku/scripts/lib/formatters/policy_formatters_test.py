@@ -406,7 +406,9 @@ class TestPolicyExternalFields(unittest.TestCase):
       ext_id="LIN-77",
     )
     result = format_policy_list_table(
-      [policy], format_type="tsv", show_external=True,
+      [policy],
+      format_type="tsv",
+      show_external=True,
     )
     fields = result.strip().split("\t")
     assert fields[0] == "POL-010"
@@ -423,7 +425,9 @@ class TestPolicyExternalFields(unittest.TestCase):
       ext_id="LIN-77",
     )
     result = format_policy_list_table(
-      [policy], format_type="tsv", show_external=False,
+      [policy],
+      format_type="tsv",
+      show_external=False,
     )
     fields = result.strip().split("\t")
     assert fields[0] == "POL-010"
@@ -439,7 +443,9 @@ class TestPolicyExternalFields(unittest.TestCase):
       ext_id="LIN-77",
     )
     result = format_policy_list_table(
-      [policy], format_type="table", show_external=True,
+      [policy],
+      format_type="table",
+      show_external=True,
     )
     assert "ExtID" in result
     assert "LIN-77" in result

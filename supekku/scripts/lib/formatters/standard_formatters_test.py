@@ -424,7 +424,9 @@ class TestStandardExternalFields(unittest.TestCase):
       ext_id="LIN-66",
     )
     result = format_standard_list_table(
-      [standard], format_type="tsv", show_external=True,
+      [standard],
+      format_type="tsv",
+      show_external=True,
     )
     fields = result.strip().split("\t")
     assert fields[0] == "STD-010"
@@ -441,7 +443,9 @@ class TestStandardExternalFields(unittest.TestCase):
       ext_id="LIN-66",
     )
     result = format_standard_list_table(
-      [standard], format_type="tsv", show_external=False,
+      [standard],
+      format_type="tsv",
+      show_external=False,
     )
     fields = result.strip().split("\t")
     assert fields[0] == "STD-010"
@@ -457,7 +461,9 @@ class TestStandardExternalFields(unittest.TestCase):
       ext_id="LIN-66",
     )
     result = format_standard_list_table(
-      [standard], format_type="table", show_external=True,
+      [standard],
+      format_type="table",
+      show_external=True,
     )
     assert "ExtID" in result
     assert "LIN-66" in result

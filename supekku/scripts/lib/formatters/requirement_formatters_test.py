@@ -295,7 +295,9 @@ class TestRequirementExternalFields(unittest.TestCase):
       ext_id="LIN-88",
     )
     result = format_requirement_list_table(
-      [req], format_type="tsv", show_external=True,
+      [req],
+      format_type="tsv",
+      show_external=True,
     )
     fields = result.strip().split("\t")
     assert fields[0] == "SPEC-001"
@@ -314,7 +316,9 @@ class TestRequirementExternalFields(unittest.TestCase):
       ext_id="LIN-88",
     )
     result = format_requirement_list_table(
-      [req], format_type="tsv", show_external=False,
+      [req],
+      format_type="tsv",
+      show_external=False,
     )
     fields = result.strip().split("\t")
     assert fields[0] == "SPEC-001"
@@ -333,7 +337,9 @@ class TestRequirementExternalFields(unittest.TestCase):
       ext_id="LIN-88",
     )
     result = format_requirement_list_table(
-      [req], format_type="table", show_external=True,
+      [req],
+      format_type="table",
+      show_external=True,
     )
     assert "ExtID" in result
     assert "LIN-88" in result

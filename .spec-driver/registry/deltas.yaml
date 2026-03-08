@@ -7766,7 +7766,7 @@ deltas:
         phase: IP-066-P01
   DE-067:
     kind: delta
-    status: draft
+    status: completed
     name: Add ext_id and ext_url support to artifact frontmatter
     slug: add_extid_and_exturl_support
     updated: '2026-03-08'
@@ -7791,13 +7791,196 @@ deltas:
         revision_links:
           aligns_with: []
         specs:
+          primary:
+          - PROD-004
+          - SPEC-116
+          collaborators:
+          - SPEC-122
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-067.PHASE-01
+        - id: IP-067.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-067.PHASE-01
+        plan: IP-067
+        delta: DE-067
+        objective: Add ext_id and ext_url optional fields to all domain models. Verify
+          frontmatter passthrough. Add column definitions.
+        entrance_criteria:
+        - Delta DE-067 scoped and accepted
+        exit_criteria:
+        - All domain models accept ext_id/ext_url
+        - Frontmatter roundtrip preserves the fields
+        - Column defs updated
+        - Unit tests pass, just check green
+        verification:
+          tests:
+          - VT-067-001
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Add ext_id/ext_url to domain models
+        - id: '1.2'
+          description: Verify frontmatter passthrough
+        - id: '1.3'
+          description: Add column definitions
+        - id: '1.4'
+          description: Write unit tests
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-067.PHASE-02
+        plan: IP-067
+        delta: DE-067
+        objective: Wire ext_id/ext_url into list/show/JSON formatters and add --external
+          CLI flag to list commands.
+        entrance_criteria:
+        - PHASE-01 complete
+        exit_criteria:
+        - list --external shows ext_id column for all artifact types
+        - show displays ext_id/ext_url when present
+        - JSON output includes ext_id/ext_url
+        - Tests pass, just check green
+        verification:
+          tests:
+          - VT-067-002
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Add ext_id/ext_url to JSON output in all formatters
+        - id: '2.2'
+          description: Add ext_id/ext_url to detail (show) formatters
+        - id: '2.3'
+          description: Add show_external param to list table formatters
+        - id: '2.4'
+          description: Add --external/-e flag to CLI list commands
+        - id: '2.5'
+          description: Write formatter and CLI tests
+        risks: []
+  DE-068:
+    kind: delta
+    status: draft
+    name: Delta - edit command --status flag for programmatic status updates
+    slug: edit_command_status_flag_for_programmatic_status_updates
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-068-edit_command_status_flag_for_programmatic_status_updates/DE-068.md
+    applies_to:
+      specs:
+      - PROD-013
+      requirements:
+      - PROD-013.FR-004
+    plan:
+      id: IP-068
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-068
+        delta: DE-068
+        revision_links:
+          aligns_with:
+          - DR-068
+        specs:
+          primary:
+          - PROD-013
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-013.FR-004
+          dependencies: []
+        phases:
+        - id: IP-068.PHASE-01
+        - id: IP-068.PHASE-02
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-068.PHASE-01
+        plan: IP-068
+        delta: DE-068
+        objective: Extract shared frontmatter status update primitive, expand ENUM_REGISTRY
+          with backlog and drift status entries, consolidate existing duplicate callers.
+        entrance_criteria:
+        - DR-068 design decisions settled
+        exit_criteria:
+        - update_frontmatter_status() exists in core/frontmatter_writer.py with tests
+        - ENUM_REGISTRY includes backlog kinds, drift, revision/audit aliases
+        - completion.py and complete_delta.py delegate to shared primitive
+        - existing completion tests pass
+        - just lint passes
+        verification:
+          tests:
+          - VT-068-01
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Create frontmatter_writer module with update_frontmatter_status()
+        - id: '1.2'
+          description: Expand ENUM_REGISTRY with backlog, drift, and alias entries
+        - id: '1.3'
+          description: Consolidate completion.py and complete_delta.py onto shared
+            primitive
+        - id: '1.4'
+          description: Add validate_status_for_entity() helper
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-068.PHASE-02
+        plan: IP-068
+        delta: DE-068
+        objective: Add --status option to all existing edit subcommands, add new edit
+          drift subcommand, wire up validation and frontmatter update, verify end-to-end.
+        entrance_criteria:
+        - "Phase 1 complete \u2014 shared primitive and enum expansion landed"
+        exit_criteria:
+        - all edit subcommands accept --status flag
+        - edit drift subcommand exists and works
+        - validation rejects invalid statuses for enum-covered entity types
+        - just check passes (tests + both linters)
+        verification:
+          tests:
+          - VT-068-02
+          - VT-068-03
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Add --status to existing edit subcommands
+        - id: '2.2'
+          description: Add edit drift subcommand
+        - id: '2.3'
+          description: CLI integration tests
+        - id: '2.4'
+          description: Final verification pass
+        risks: []
+  DE-069:
+    kind: delta
+    status: draft
+    name: Delta - Complete formatter migration to format_list_table generic helper
+    slug: complete_formatter_migration_to_format_list_table_generic_helper
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-069-complete_formatter_migration_to_format_list_table_generic_helper/DE-069.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-069
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-069
+        delta: DE-069
+        revision_links:
+          aligns_with: []
+        specs:
           primary: []
           collaborators: []
         requirements:
           targets: []
           dependencies: []
         phases:
-        - id: IP-067-P01
+        - id: IP-069-P01
       phases:
-      - id: IP-067-P01
-        phase: IP-067-P01
+      - id: IP-069-P01
+        phase: IP-069-P01

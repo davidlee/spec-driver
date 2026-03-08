@@ -860,7 +860,9 @@ class TestChangeExternalFields(unittest.TestCase):
     """Test TSV includes ext_id after ID when show_external=True."""
     artifact = self._make_delta(ext_id="LIN-33")
     result = format_change_list_table(
-      [artifact], format_type="tsv", show_external=True,
+      [artifact],
+      format_type="tsv",
+      show_external=True,
     )
     fields = result.strip().split("\t")
     assert fields[0] == "DE-050"
@@ -871,7 +873,9 @@ class TestChangeExternalFields(unittest.TestCase):
     """Test TSV omits ext_id when show_external=False."""
     artifact = self._make_delta(ext_id="LIN-33")
     result = format_change_list_table(
-      [artifact], format_type="tsv", show_external=False,
+      [artifact],
+      format_type="tsv",
+      show_external=False,
     )
     fields = result.strip().split("\t")
     assert fields[0] == "DE-050"
@@ -881,7 +885,9 @@ class TestChangeExternalFields(unittest.TestCase):
     """Test table includes ExtID column when show_external=True."""
     artifact = self._make_delta(ext_id="LIN-33")
     result = format_change_list_table(
-      [artifact], format_type="table", show_external=True,
+      [artifact],
+      format_type="table",
+      show_external=True,
     )
     assert "ExtID" in result
     assert "LIN-33" in result

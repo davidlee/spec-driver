@@ -170,7 +170,9 @@ class SpecExternalRefTest(RepoTestCase):
   def test_ext_url_property(self):
     root = self._make_repo_with_external_spec()
     registry = SpecRegistry(root)
-    assert registry.get("SPEC-010").ext_url == "https://jira.example.com/browse/JIRA-1234"
+    assert (
+      registry.get("SPEC-010").ext_url == "https://jira.example.com/browse/JIRA-1234"
+    )
 
   def test_missing_ext_fields_return_empty_string(self):
     root = self._make_repo_with_external_spec()

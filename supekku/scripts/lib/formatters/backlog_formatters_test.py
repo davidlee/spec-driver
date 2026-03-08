@@ -390,7 +390,9 @@ class TestBacklogExternalFields(unittest.TestCase):
       ext_id="LIN-55",
     )
     result = format_backlog_list_table(
-      [item], format_type="table", show_external=True,
+      [item],
+      format_type="table",
+      show_external=True,
     )
     assert "ExtID" in result
     assert "LIN-55" in result

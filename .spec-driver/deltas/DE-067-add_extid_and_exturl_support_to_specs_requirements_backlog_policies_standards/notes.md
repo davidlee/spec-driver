@@ -13,50 +13,21 @@
   ChangeArtifact load/to_dict
 - Commit: `c1a333a`
 
-## Phase 2 — Formatters and CLI (in progress, uncommitted)
+## Phase 2 — Formatters and CLI (complete)
 
-### Done
+- **JSON output**: ext_id/ext_url in all 6 JSON formatters (conditional)
+- **Detail (show) formatters**: `External: {ext_id} ({ext_url})` line in all 6
+- **List table formatters**: `show_external: bool = False` kwarg, ExtID column
+  insertion in table + TSV output
+- **CLI**: `ExternalOption` type alias in `common.py`, `--external`/`-e` on 7
+  list commands
+- **Tests**: 50 new tests across 6 formatter test files (VT-067-002)
+- 3335 tests pass, ruff clean
+- Commits: `85cc169` (code+tests), `c03e9ad` (workflow artefacts)
 
-- **JSON output**: Added ext_id/ext_url to JSON formatters for backlog, spec,
-  change, policy, standard, requirement (conditional: omitted when empty)
-- **Detail (show) formatters**: Added `External: {ext_id} ({ext_url})` line to
-  detail formatters for all 6 artifact types. Uses shared pattern:
-  `if item.ext_id:` → append line
-- **List table formatters**: Added `show_external: bool = False` kwarg to all
-  list table formatters. When True, inserts ExtID column after ID (or after
-  Label for requirements). Affects table, TSV output.
-  - Formatters using direct table construction (backlog, spec, change,
-    requirement): column insertion + row building adjusted inline
-  - Formatters using `format_list_table` utility (policy, standard): wrapper
-    closures insert ext_id into row prep callbacks
-- **CLI**: Added `ExternalOption` type alias in `common.py`. Added
-  `external: ExternalOption = False` param to: `list_specs`, `list_deltas`,
-  `list_changes`, `list_policies`, `list_standards`, `list_requirements`,
-  `list_backlog`
-- All 3285 tests pass, ruff clean
+### Deferred
 
-### Not yet done
-
-- Sub-commands `list_issues`, `list_problems`, `list_improvements`, `list_risks`
-  share backlog formatter but have their own command signatures — not yet wired
-  with `--external` (they call `format_backlog_list_table` directly). Low priority
-  since main `list backlog` covers them.
-- `list_revisions` uses `format_change_list_table` but not yet wired
-- No new formatter-level tests for `show_external=True` rendering — existing
-  tests pass but don't exercise the new column. Should add before closing.
-- `.spec-driver/` changes (phase-02 sheet, IP update) not yet committed — code
-  changes also uncommitted. Will commit together.
-
-### Observations
-
-- Policy/standard formatters use the `format_list_table` utility with callbacks,
-  which makes column insertion slightly awkward (closures wrapping the row prep).
-  Not worth refactoring the utility for this — the closure approach works.
-- Pyright diagnostics shown during work were all pre-existing (type issues in
-  policy/standard `to_dict` methods, missing module sources for yaml/typer/etc).
-  No new issues introduced.
-
-### Open questions
-
-- Should `list_issues`/`list_problems`/etc sub-commands also get `--external`?
-  Deferred for now.
+- Sub-commands `list_issues`/`list_problems`/`list_improvements`/`list_risks`
+  not wired with `--external` (they share `format_backlog_list_table` which
+  already supports it; only the CLI param is missing). Low priority.
+- `list_revisions` similarly not wired.

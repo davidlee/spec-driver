@@ -4,7 +4,7 @@ slug: 067-formatters-and-cli
 name: IP-067 Phase 02 - Formatters and CLI
 created: '2026-03-08'
 updated: '2026-03-08'
-status: in-progress
+status: complete
 kind: phase
 ---
 
@@ -67,25 +67,25 @@ add `--external`/`-e` flag to CLI list commands.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] JSON formatters include ext_id/ext_url when present
-- [ ] Detail (show) formatters display external refs when present
-- [ ] List table formatters accept `show_external` param
-- [ ] CLI list commands accept `--external`/`-e` flag
-- [ ] Tests cover all formatter changes
-- [ ] `just check` passes
+- [x] JSON formatters include ext_id/ext_url when present
+- [x] Detail (show) formatters display external refs when present
+- [x] List table formatters accept `show_external` param
+- [x] CLI list commands accept `--external`/`-e` flag
+- [x] Tests cover all formatter changes (50 new tests across 6 test files)
+- [x] `just check` passes (3335 tests, ruff clean)
 
 ## 7. Tasks & Progress
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Add ext_id/ext_url to JSON output | [P] | All formatters |
-| [ ] | 2.2 | Add ext_id/ext_url to detail formatters | [P] | show commands |
-| [ ] | 2.3 | Add show_external param to list formatters | | Table column insertion |
-| [ ] | 2.4 | Add --external/-e flag to CLI list commands | | After 2.3 |
-| [ ] | 2.5 | Write tests | | After 2.1-2.4 |
+| [x] | 2.1 | Add ext_id/ext_url to JSON output | [P] | All 6 formatters |
+| [x] | 2.2 | Add ext_id/ext_url to detail formatters | [P] | All 6 show commands |
+| [x] | 2.3 | Add show_external param to list formatters | | Table + TSV column insertion |
+| [x] | 2.4 | Add --external/-e flag to CLI list commands | | 7 list commands wired |
+| [x] | 2.5 | Write tests | | 50 tests across 6 test files |
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Hand-off notes to close-change
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (VT-067-002: 50 tests in 6 formatter test files)
+- [x] Hand-off notes to close-change

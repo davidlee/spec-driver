@@ -6998,3 +6998,291 @@ deltas:
           description: VH-060-01 manual smoke test
         risks:
         - Run dir may not exist when hook fires
+  DE-061:
+    kind: delta
+    status: completed
+    name: TUI bundle file browser
+    slug: tui_bundle_file_browser
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-061-tui_bundle_file_browser/DE-061.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: follows-up
+      target: DE-053
+      attributes: {}
+    - type: partial-of
+      target: IMPR-011
+      attributes: {}
+    plan:
+      id: IP-061
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-061
+        delta: DE-061
+        revision_links:
+          aligns_with:
+          - DR-061
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-061.PHASE-01
+        - id: IP-061.PHASE-02
+        - id: IP-061.PHASE-03
+        - id: IP-061.PHASE-04
+        - id: IP-061.PHASE-04
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-061.PHASE-01
+        plan: IP-061
+        delta: DE-061
+        objective: "Add bundle_dir field to ArtifactEntry, implement BundleTree widget\
+          \ with full test coverage, add non-markdown preview guard to PreviewPanel.\
+          \ No BrowserScreen integration yet \u2014 pure building blocks."
+        entrance_criteria:
+        - DR-061 accepted
+        exit_criteria:
+        - ArtifactEntry.bundle_dir populated correctly by adapt_record
+        - BundleTree widget populates, selects, clears, sorts correctly
+        - BundleTree skips symlinks and hidden files, respects depth limit
+        - PreviewPanel shows placeholder for non-markdown files
+        - All new tests pass
+        - Lint clean (ruff + pylint on touched files)
+        verification:
+          tests:
+          - VT-061-01 (BundleTree widget)
+          - VT-061-04 (PreviewPanel non-markdown)
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Add bundle_dir to ArtifactEntry + _detect_bundle_dir
+        - id: '1.2'
+          description: BundleTree widget with BundleFileSelected message
+        - id: '1.3'
+          description: PreviewPanel non-markdown guard
+        risks:
+        - description: Textual Tree API may not support cursor_line or data on nodes
+            as expected
+          mitigation: Spike early; if API differs, adapt widget design
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-061.PHASE-02
+        plan: IP-061
+        delta: DE-061
+        objective: "Integrate BundleTree into BrowserScreen: left-column layout container,\
+          \ CSS for visibility toggling, tree\u2194preview wiring, focus management\
+          \ (f/Tab), tree refresh on file-watch events, state clear on type/artifact\
+          \ change. Full headless pilot tests."
+        entrance_criteria:
+        - Phase 1 complete (ArtifactEntry.bundle_dir, BundleTree widget, PreviewPanel
+          guard)
+        exit_criteria:
+        - BrowserScreen composes
+        - Selecting a bundle artifact shows the tree; non-bundle hides it
+        - Tree file selection updates preview panel
+        - f focuses tree when visible; Tab from tree focuses artifact table
+        - File-watch refresh repopulates tree for selected bundle artifact
+        - Type change and non-bundle selection clear tree state
+        - theme.tcss updated with left-column and bundle-tree rules
+        - All VT-061-02 tests pass
+        - Existing TUI tests still pass (VT-061-05)
+        - Lint clean
+        verification:
+          tests:
+          - VT-061-02
+          - VT-061-05
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: "BrowserScreen layout \u2014 left-column container"
+        - id: '2.2'
+          description: "theme.tcss \u2014 left-column, bundle-tree visibility, borders"
+        - id: '2.3'
+          description: Wire artifact selection to tree show/hide/clear
+        - id: '2.4'
+          description: Wire BundleFileSelected to preview panel
+        - id: '2.5'
+          description: "Focus management \u2014 f binding and Tab override"
+        - id: '2.6'
+          description: Tree refresh on file-watch + re-resolve selected entry
+        risks:
+        - description: Container wrapper may affect existing CSS or test queries
+          mitigation: Run full TUI test suite after layout change
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-061.PHASE-03
+        plan: IP-061
+        delta: DE-061
+        objective: 'Wire track mode to bundle file paths: TrackPanel stores per-row
+          file paths from event argv, TrackScreen uses them for preview and navigation,
+          action_navigate_artifact gains optional file_path parameter, artifact_event.py
+          uses hook cwd for deterministic path relativity.'
+        entrance_criteria:
+        - Phase 2 complete (browser integration, tree visibility, focus, refresh)
+        exit_criteria:
+        - TrackPanel stores per-row file paths alongside artifact IDs
+        - TrackPanel.file_path_for_row() accessor works
+        - Row pruning and clear_and_replay clean _row_file_paths
+        - TrackScreen row highlight uses file path for preview (with ID fallback)
+        - TrackScreen row select navigates with file_path via action_navigate_artifact
+        - action_navigate_artifact accepts optional file_path, browser selects file
+          in tree
+        - artifact_event.py uses hook_input cwd as relativization base
+        - All VT-061-03 tests pass
+        - Existing track tests pass (VT-061-05)
+        - Lint clean
+        verification:
+          tests:
+          - VT-061-03
+          - VT-061-05
+          evidence: []
+        tasks:
+        - id: '3.1'
+          description: 'TrackPanel: _row_file_paths storage, file_path_for_row(),
+            pruning'
+        - id: '3.2'
+          description: 'TrackScreen: file-path preview on row highlight (with fallback)'
+        - id: '3.3'
+          description: 'TrackScreen: file-path navigation on row select'
+        - id: '3.4'
+          description: 'app.py: action_navigate_artifact optional file_path parameter'
+        - id: '3.5'
+          description: "browser.py: navigate_to_artifact optional file_path \u2192\
+            \ tree selection"
+        - id: '3.6'
+          description: 'artifact_event.py: use hook_input cwd for path relativization'
+        risks:
+        - description: Row key cleanup must track two dicts in lockstep
+          mitigation: Test pruning and clear_and_replay explicitly
+        - description: "file_path parameter threading through app \u2192 browser \u2192\
+            \ tree"
+          mitigation: Test end-to-end via pilot test
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-061.PHASE-04
+        plan: IP-061
+        delta: DE-061
+        objective: 'Add BundleTree to TrackScreen, driven by row highlight. Wrap SessionList
+          + BundleTree in Vertical#track-left (mirroring #left-column). Refactor CSS
+          to shared .bundle-column class. Parameterise BundleTree tab target. Tree
+          shows on highlight for bundle artifacts, clears for non-bundle, refreshes
+          on add_event. File selection updates track preview.'
+        entrance_criteria:
+        - Phase 3 complete (track file paths, preview, navigation)
+        exit_criteria:
+        - BundleTree tab_target param; action renamed to focus_tab_target (DEC-061-07)
+        - CSS refactored to .bundle-column shared class (DEC-061-08)
+        - TrackScreen composes Vertical#track-left with SessionList + BundleTree
+        - Session-list width rules moved to
+        - Row highlight shows tree for bundle artifact, hides for non-bundle
+        - Skip-if-same optimisation on highlight; repopulate on add_event (DEC-061-09)
+        - BundleFileSelected in tree updates
+        - f binding on TrackScreen to focus tree when visible
+        - Tab from tree focuses
+        - All VT-061-06 tests pass
+        - Existing tests pass (VT-061-05)
+        - Lint clean
+        verification:
+          tests:
+          - VT-061-06
+          - VT-061-05
+          evidence: []
+        tasks:
+        - id: '4.1'
+          description: 'BundleTree: tab_target param, rename action (DEC-061-07)'
+        - id: '4.2'
+          description: 'theme.tcss: refactor .bundle-column, add #track-left (DEC-061-08)'
+        - id: '4.3'
+          description: 'browser.py: add bundle-column class to #left-column compose'
+        - id: '4.4'
+          description: 'TrackScreen: compose #track-left with SessionList + BundleTree'
+        - id: '4.5'
+          description: 'TrackScreen: highlight-driven tree show/hide/clear'
+        - id: '4.6'
+          description: 'TrackScreen: skip-if-same + event-driven refresh (DEC-061-09)'
+        - id: '4.7'
+          description: 'TrackScreen: BundleFileSelected handler, f binding, focus
+            model'
+        - id: '4.8'
+          description: "Tests \u2014 VT-061-06"
+        risks:
+        - description: Layout change may break existing TrackScreen pilot tests
+          mitigation: Run full test suite after compose change
+        - description: Skip-if-same may miss edge cases beyond create/delete
+          mitigation: Event-driven refresh covers the only real mutation source
+  DE-062:
+    kind: delta
+    status: completed
+    name: 'workflow.toml: rich commented defaults and config memory'
+    slug: workflow_toml_rich_commented_defaults_and_config_memory
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-062-workflow_toml_rich_commented_defaults_and_config_memory/DE-062.md
+    applies_to:
+      specs:
+      - SPEC-129
+      requirements: []
+    plan:
+      id: IP-062
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-062
+        delta: DE-062
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-129
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-062-P01
+        - id: IP-062.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-062.PHASE-01
+        plan: IP-062
+        delta: DE-062
+        objective: Write a template generator that renders DEFAULT_CONFIG as commented
+          TOML, wire it into install.py, and create agent memory for the config surface.
+        entrance_criteria:
+        - DE-062 accepted
+        exit_criteria:
+        - Generated template contains all DEFAULT_CONFIG keys as comments
+        - Generated template is valid TOML when uncommented
+        - install.py uses new generator
+        - Agent memory is queryable
+        - just passes (tests + lint)
+        verification:
+          tests:
+          - VT-062-01: "template completeness \u2014 verified"
+          - VT-062-02: "template TOML validity \u2014 verified"
+          - VT-062-03: "install integration \u2014 verified"
+          evidence:
+          - VA-062-01: "memory accuracy \u2014 verified"
+        tasks:
+        - id: 1.1
+          description: Write generate_default_workflow_toml() in config.py
+          status: done
+        - id: 1.2
+          description: Tests for template generator
+          status: done
+        - id: 1.3
+          description: Wire into install.py
+          status: done
+        - id: 1.4
+          description: Create agent memory record
+          status: done
+        risks: []
+      - id: IP-062-P01
+        phase: IP-062-P01

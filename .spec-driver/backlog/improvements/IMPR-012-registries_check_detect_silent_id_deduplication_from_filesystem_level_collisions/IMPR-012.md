@@ -3,7 +3,7 @@ id: IMPR-012
 name: 'Registries check: detect silent ID deduplication from filesystem-level collisions'
 created: '2026-03-08'
 updated: '2026-03-08'
-status: idea
+status: open
 kind: improvement
 ---
 

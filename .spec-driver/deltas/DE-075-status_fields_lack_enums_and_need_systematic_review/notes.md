@@ -26,9 +26,20 @@
 - Old per-kind constant names (`ISSUE_STATUSES`, `PROBLEM_STATUSES`, `IMPROVEMENT_STATUSES`) are gone — any external consumers would break (none found in grep)
 - `decisions/registry.py` iterates `ADR_STATUSES` frozenset for dir inference — iteration order is arbitrary but functionally fine (first match wins, and status dirs are mutually exclusive)
 
-## Phase 2 — Theme alignment and backlog migration (next)
+## Phase 2 — Theme alignment and backlog migration
 
-### Open questions
+**Status**: complete
+**Verification**: `just test` 3492 passed, `just lint` clean; VA-075-01 PASS, VA-075-02 PASS
 
-- Backlog migration: several items use legacy statuses (`captured`, `idea`, `done`, `implemented`, `in-progress` on improvements). Need manual frontmatter edits per DEC-075-05 mapping.
-- Theme consolidation: per-kind backlog sections in `theme.py` (e.g. `backlog.issue.*`, `backlog.problem.*`) — collapse to unified `backlog.status.*` keys or keep per-kind keys pointing to shared colours?
+### What's done
+
+- **Theme removals**: `spec.status.live`, `policy.status.active`, `memory.status.deprecated`, `memory.status.obsolete`
+- **Theme additions**: `adr.status.superseded` (#3c3836 dark grey), `policy.status.required` (#8ec07c green)
+- **Backlog theme consolidation**: replaced 12 per-kind keys (`backlog.{issue,problem,improvement,risk}.*`) with 6 unified `backlog.status.*` keys
+- **`get_backlog_status_style`**: simplified from `(kind, status)` to `(status)`; caller in `backlog_formatters.py` updated
+- **Backlog migration**: 17 items updated on disk — `captured`→`open`, `closed`→`resolved`, `implemented`→`resolved`, `idea`→`open`
+- **theme_test.py**: updated parametrized style names (`policy.status.active`→`required`, `backlog.issue.open`→`backlog.status.open`, `backlog.improvement.idea`→`backlog.status.resolved`)
+
+### Design note
+
+- `backlog.status.*` theme keys cover the full union of base + risk statuses (6 values), even though `backlog.status` in ENUM_REGISTRY returns only the base 4. This is correct: risk items look up via `backlog.status.{status}` and need `accepted`/`expired` themed.

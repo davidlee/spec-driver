@@ -3,7 +3,7 @@ id: IMPR-003
 name: kanban support
 created: '2026-02-03'
 updated: '2026-02-03'
-status: implemented
+status: resolved
 kind: improvement
 ---
 

@@ -4,7 +4,7 @@ slug: 075-status_fields_lack_enums_and_need_systematic_review-phase-02
 name: 'IP-075 Phase 02: theme alignment and backlog migration'
 created: '2026-03-09'
 updated: '2026-03-09'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -85,14 +85,14 @@ Make theme.py colour mappings match defined enums exactly. Migrate backlog items
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `theme.py` — remove `spec.status.live`, `policy.status.active`, `memory.status.deprecated`, `memory.status.obsolete`
-- [ ] `theme.py` — add `adr.status.superseded`, `policy.status.required`
-- [ ] `theme.py` — replace per-kind backlog keys with unified `backlog.status.*`
-- [ ] `get_backlog_status_style()` simplified to `(status)` → `backlog.status.{status}`
-- [ ] All backlog items migrated per mapping below
-- [ ] VA-075-01: theme audit confirms 1:1 alignment with enums
-- [ ] VA-075-02: on-disk scan confirms no orphaned values
-- [ ] `just check` passes
+- [x] `theme.py` — remove `spec.status.live`, `policy.status.active`, `memory.status.deprecated`, `memory.status.obsolete`
+- [x] `theme.py` — add `adr.status.superseded`, `policy.status.required`
+- [x] `theme.py` — replace per-kind backlog keys with unified `backlog.status.*`
+- [x] `get_backlog_status_style()` simplified to `(status)` → `backlog.status.{status}`
+- [x] All backlog items migrated per mapping below
+- [x] VA-075-01: theme audit confirms 1:1 alignment with enums
+- [x] VA-075-02: on-disk scan confirms no orphaned values
+- [x] `just check` passes
 
 ## 5. Verification
 
@@ -161,15 +161,15 @@ Items already valid (no change): `open`, `in-progress`, `resolved`
 
 | Status | ID | Description | Notes |
 |---|---|---|---|
-| [ ] | 2.1 | Remove `spec.status.live` | |
-| [ ] | 2.2 | Add `adr.status.superseded` | |
-| [ ] | 2.3 | Replace `policy.status.active` with `policy.status.required` | |
-| [ ] | 2.4 | Remove `memory.status.deprecated`, `memory.status.obsolete` | |
-| [ ] | 2.5 | Replace per-kind backlog keys with `backlog.status.*` | |
-| [ ] | 2.6 | Update `get_backlog_status_style` signature and caller | |
-| [ ] | 2.7 | Migrate PROB-004: `captured` → `open` | |
-| [ ] | 2.8 | Migrate ISSUE-036: `closed` → `resolved` | |
-| [ ] | 2.9 | Migrate 10 items: `implemented` → `resolved` | |
-| [ ] | 2.10 | Migrate 6 items: `idea` → `open` | |
-| [ ] | 2.11 | VA-075-02: on-disk scan | |
-| [ ] | 2.12 | Update theme_test.py | |
+| [x] | 2.1 | Remove `spec.status.live` | done |
+| [x] | 2.2 | Add `adr.status.superseded` | dark grey (#3c3836) |
+| [x] | 2.3 | Replace `policy.status.active` with `policy.status.required` | done |
+| [x] | 2.4 | Remove `memory.status.deprecated`, `memory.status.obsolete` | done |
+| [x] | 2.5 | Replace per-kind backlog keys with `backlog.status.*` | 6 unified keys |
+| [x] | 2.6 | Update `get_backlog_status_style` signature and caller | (kind, status) → (status) |
+| [x] | 2.7 | Migrate PROB-004: `captured` → `open` | done |
+| [x] | 2.8 | Migrate ISSUE-036: `closed` → `resolved` | done |
+| [x] | 2.9 | Migrate 10 items: `implemented` → `resolved` | done |
+| [x] | 2.10 | Migrate 6 items: `idea` → `open` | done |
+| [x] | 2.11 | VA-075-02: on-disk scan | PASS — 60 values, all in {open, in-progress, resolved} |
+| [x] | 2.12 | Update theme_test.py | updated parametrized style names |

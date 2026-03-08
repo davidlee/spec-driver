@@ -3,7 +3,7 @@ id: IMPR-007
 name: Drift Ledger primitive
 created: '2026-03-05'
 updated: '2026-03-05'
-status: idea
+status: open
 kind: improvement
 ---
 

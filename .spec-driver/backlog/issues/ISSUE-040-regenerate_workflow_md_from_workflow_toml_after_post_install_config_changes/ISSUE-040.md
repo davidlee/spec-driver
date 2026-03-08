@@ -3,7 +3,7 @@ id: ISSUE-040
 name: Regenerate workflow.md from workflow.toml after post-install config changes
 created: '2026-03-05'
 updated: '2026-03-05'
-status: implemented
+status: resolved
 kind: issue
 categories: []
 severity: p3

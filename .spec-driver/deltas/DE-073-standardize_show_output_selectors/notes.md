@@ -25,13 +25,24 @@
 ### Commits
 - Uncommitted
 
-## Phase 2 — `view` refactor + `read` alias (next)
+## Phase 2 — `view` refactor + `read` alias (complete)
 
-### Scope
-- Remove default pager from `view`; render via glow → rich → raw stdout
-- `--pager/-p` flag for opt-in paged display ($PAGER → glow -p → rich --pager → ov → less → more)
-- `read` as alias for `view`
-- Reduce `view.py` duplication (~16 near-identical subcommands)
+### Done
+- `render_file()`: glow → rich → raw stdout (no pager by default)
+- `render_file_paged()`: $PAGER → glow -p → ov → less → more
+- `PagerOption` annotated type (`--pager/-p`)
+- `_view_artifact()` shared helper collapses 14 near-identical subcommands
+- `view.py` reduced from 432 → ~260 lines; eliminated all direct registry imports
+  except CardRegistry (lazy import for `--anywhere` flag)
+- `read` registered as second `add_typer` of same app instance — zero code duplication
+- `requirement` and `card` now use `resolve_artifact()` via `_view_artifact()`
+  (requirement formerly had inline path resolution; card retains `--anywhere`)
+- All 16 subcommands + inferred now accept `--pager/-p`
+- 41 view tests (17 new), 3446 total passing
+
+### Verification
+- `just lint` — clean
+- `just test` — 3446 passed, 2 failed (pre-existing, unrelated)
 
 ## Phase 3 — `resolve links` improvements (after phase 2)
 

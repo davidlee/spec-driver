@@ -4,7 +4,7 @@ slug: 073-standardize_show_output_selectors-phase-02
 name: "view refactor and read alias"
 created: '2026-03-09'
 updated: '2026-03-09'
-status: in-progress
+status: completed
 kind: phase
 ---
 
@@ -70,11 +70,11 @@ collapse duplicated subcommands, and register `read` alias.
 - [x] Phase 1 complete and committed (c2336ab)
 
 ## 4. Exit Criteria / Done When
-- [ ] `view <artifact>` renders via glow → rich → raw stdout (no pager)
-- [ ] `view --pager <artifact>` pages via $PAGER → glow -p → ov → less → more
-- [ ] `view.py` subcommand duplication collapsed via shared helper
-- [ ] `read` works identically to `view`
-- [ ] All tests pass, lint clean
+- [x] `view <artifact>` renders via glow → rich → raw stdout (no pager)
+- [x] `view --pager <artifact>` pages via $PAGER → glow -p → ov → less → more
+- [x] `view.py` subcommand duplication collapsed via shared helper
+- [x] `read` works identically to `view`
+- [x] All tests pass, lint clean
 
 ## 5. Verification
 - Unit tests for render_file / render_file_paged cascades (mock shutil.which)
@@ -86,9 +86,9 @@ collapse duplicated subcommands, and register `read` alias.
 
 | Status | ID | Description |
 | --- | --- | --- |
-| [ ] | 2.1 | Add render_file() and render_file_paged() to common.py |
-| [ ] | 2.2 | Add PagerOption annotated type |
-| [ ] | 2.3 | Create _view_artifact() shared helper in view.py |
-| [ ] | 2.4 | Collapse subcommands to use _view_artifact() |
-| [ ] | 2.5 | Register read alias in main.py |
-| [ ] | 2.6 | Update tests for new behavior |
+| [x] | 2.1 | Add render_file() and render_file_paged() to common.py |
+| [x] | 2.2 | Add PagerOption annotated type |
+| [x] | 2.3 | Create _view_artifact() shared helper in view.py |
+| [x] | 2.4 | Collapse subcommands to use _view_artifact() |
+| [x] | 2.5 | Register read alias in main.py |
+| [x] | 2.6 | Update tests for new behavior |

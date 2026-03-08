@@ -1,4 +1,4 @@
-"""View commands for opening artifacts in a pager."""
+"""View commands for rendering artifacts to stdout (or pager with -p)."""
 
 from __future__ import annotations
 
@@ -11,89 +11,35 @@ from supekku.cli.common import (
   EXIT_FAILURE,
   ArtifactNotFoundError,
   InferringGroup,
+  PagerOption,
   RootOption,
-  normalize_id,
-  open_in_pager,
+  render_file,
+  render_file_paged,
   resolve_artifact,
   resolve_by_id,
 )
-from supekku.scripts.lib.cards import CardRegistry
-from supekku.scripts.lib.changes.registry import ChangeRegistry
-from supekku.scripts.lib.core.repo import find_repo_root
-from supekku.scripts.lib.decisions.registry import DecisionRegistry
-from supekku.scripts.lib.policies.registry import PolicyRegistry
-from supekku.scripts.lib.requirements.registry import RequirementsRegistry
-from supekku.scripts.lib.specs.registry import SpecRegistry
-from supekku.scripts.lib.standards.registry import StandardRegistry
 
 app = typer.Typer(
-  help="View artifacts in pager",
+  help="View artifacts (rendered markdown; use -p for pager)",
   no_args_is_help=True,
   cls=InferringGroup,
 )
 
 
-@app.command("spec")
-def view_spec(
-  spec_id: Annotated[str, typer.Argument(help="Spec ID (e.g., SPEC-009, PROD-042)")],
-  root: RootOption = None,
+def _view_artifact(
+  artifact_type: str,
+  raw_id: str,
+  root: Path,
+  *,
+  pager: bool = False,
 ) -> None:
-  """View specification in pager."""
+  """Resolve an artifact and render it to stdout or pager."""
   try:
-    registry = SpecRegistry(root=root)
-    spec = registry.get(spec_id)
-
-    if not spec:
-      typer.echo(f"Error: Specification not found: {spec_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    open_in_pager(spec.path)
-  except typer.Exit:
-    raise
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except (FileNotFoundError, ValueError, KeyError) as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("delta")
-def view_delta(
-  delta_id: Annotated[str, typer.Argument(help="Delta ID (e.g., DE-003 or 003)")],
-  root: RootOption = None,
-) -> None:
-  """View delta in pager."""
-  try:
-    normalized_id = normalize_id("delta", delta_id)
-    registry = ChangeRegistry(root=root, kind="delta")
-    artifacts = registry.collect()
-    artifact = artifacts.get(normalized_id)
-
-    if not artifact:
-      typer.echo(f"Error: Delta not found: {normalized_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    open_in_pager(artifact.path)
-  except typer.Exit:
-    raise
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except (FileNotFoundError, ValueError, KeyError) as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("revision")
-def view_revision(
-  revision_id: Annotated[str, typer.Argument(help="Revision ID (e.g., RE-001 or 001)")],
-  root: RootOption = None,
-) -> None:
-  """View revision in pager."""
-  try:
-    ref = resolve_artifact("revision", revision_id, root)
-    open_in_pager(ref.path)
+    ref = resolve_artifact(artifact_type, raw_id, root)
+    if pager:
+      render_file_paged(ref.path)
+    else:
+      render_file(ref.path)
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
@@ -102,122 +48,158 @@ def view_revision(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
-@app.command("requirement")
-def view_requirement(
-  req_id: Annotated[str, typer.Argument(help="Requirement ID (e.g., SPEC-009.FR-001)")],
+@app.command("spec")
+def view_spec(
+  spec_id: Annotated[str, typer.Argument(help="Spec ID (e.g., SPEC-009, PROD-042)")],
+  pager: PagerOption = False,
   root: RootOption = None,
 ) -> None:
-  """View requirement's spec file in pager."""
-  try:
-    repo_root = find_repo_root(root)
-    registry_path = repo_root / ".spec-driver" / "registry" / "requirements.yaml"
-    registry = RequirementsRegistry(registry_path)
+  """View specification."""
+  _view_artifact("spec", spec_id, root, pager=pager)
 
-    requirement = registry.records.get(req_id)
 
-    if not requirement:
-      typer.echo(f"Error: Requirement not found: {req_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
+@app.command("delta")
+def view_delta(
+  delta_id: Annotated[str, typer.Argument(help="Delta ID (e.g., DE-003 or 003)")],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View delta."""
+  _view_artifact("delta", delta_id, root, pager=pager)
 
-    # Requirements are defined in spec files
-    req_dict = requirement.to_dict()
-    path_str = req_dict.get("path")
-    if not path_str or not isinstance(path_str, str):
-      typer.echo(f"Error: No path found for requirement: {req_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
 
-    path = repo_root / path_str
-    if not path.exists():
-      typer.echo(f"Error: Spec file not found for requirement: {req_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    open_in_pager(path)
-  except typer.Exit:
-    raise
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except (FileNotFoundError, ValueError, KeyError) as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
+@app.command("revision")
+def view_revision(
+  revision_id: Annotated[str, typer.Argument(help="Revision ID (e.g., RE-001 or 001)")],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View revision."""
+  _view_artifact("revision", revision_id, root, pager=pager)
 
 
 @app.command("adr")
 def view_adr(
   decision_id: Annotated[str, typer.Argument(help="Decision ID (e.g., ADR-001, 001)")],
+  pager: PagerOption = False,
   root: RootOption = None,
 ) -> None:
-  """View ADR in pager."""
-  try:
-    normalized_id = normalize_id("adr", decision_id)
-    registry = DecisionRegistry(root=root)
-    decision = registry.find(normalized_id)
-
-    if not decision:
-      typer.echo(f"Error: Decision not found: {normalized_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    open_in_pager(decision.path)
-  except typer.Exit:
-    raise
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except (FileNotFoundError, ValueError, KeyError) as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
+  """View ADR."""
+  _view_artifact("adr", decision_id, root, pager=pager)
 
 
 @app.command("policy")
 def view_policy(
   policy_id: Annotated[str, typer.Argument(help="Policy ID (e.g., POL-001 or 001)")],
+  pager: PagerOption = False,
   root: RootOption = None,
 ) -> None:
-  """View policy in pager."""
-  try:
-    normalized_id = normalize_id("policy", policy_id)
-    registry = PolicyRegistry(root=root)
-    policy = registry.find(normalized_id)
-
-    if not policy:
-      typer.echo(f"Error: Policy not found: {normalized_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    open_in_pager(policy.path)
-  except typer.Exit:
-    raise
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except (FileNotFoundError, ValueError, KeyError) as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
+  """View policy."""
+  _view_artifact("policy", policy_id, root, pager=pager)
 
 
 @app.command("standard")
 def view_standard(
   standard_id: Annotated[str, typer.Argument(help="Standard ID (e.g., STD-001, 001)")],
+  pager: PagerOption = False,
   root: RootOption = None,
 ) -> None:
-  """View standard in pager."""
-  try:
-    normalized_id = normalize_id("standard", standard_id)
-    registry = StandardRegistry(root=root)
-    standard = registry.find(normalized_id)
+  """View standard."""
+  _view_artifact("standard", standard_id, root, pager=pager)
 
-    if not standard:
-      typer.echo(f"Error: Standard not found: {normalized_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
 
-    open_in_pager(standard.path)
-  except typer.Exit:
-    raise
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except (FileNotFoundError, ValueError, KeyError) as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
+@app.command("plan")
+def view_plan(
+  plan_id: Annotated[str, typer.Argument(help="Plan ID (e.g., IP-041, 041)")],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View implementation plan."""
+  _view_artifact("plan", plan_id, root, pager=pager)
+
+
+@app.command("audit")
+def view_audit(
+  audit_id: Annotated[str, typer.Argument(help="Audit ID (e.g., AUD-001, 001)")],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View audit."""
+  _view_artifact("audit", audit_id, root, pager=pager)
+
+
+@app.command("memory")
+def view_memory(
+  memory_id: Annotated[
+    str, typer.Argument(help="Memory ID (e.g., mem.pattern.cli.skinny)")
+  ],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View memory record."""
+  _view_artifact("memory", memory_id, root, pager=pager)
+
+
+@app.command("drift")
+def view_drift(
+  ledger_id: Annotated[str, typer.Argument(help="Drift ledger ID (e.g., DL-047)")],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View drift ledger."""
+  _view_artifact("drift_ledger", ledger_id, root, pager=pager)
+
+
+@app.command("issue")
+def view_issue(
+  issue_id: Annotated[str, typer.Argument(help="Issue ID (e.g., ISSUE-001)")],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View issue."""
+  _view_artifact("issue", issue_id, root, pager=pager)
+
+
+@app.command("problem")
+def view_problem(
+  problem_id: Annotated[str, typer.Argument(help="Problem ID (e.g., PROB-001)")],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View problem."""
+  _view_artifact("problem", problem_id, root, pager=pager)
+
+
+@app.command("improvement")
+def view_improvement(
+  improvement_id: Annotated[
+    str, typer.Argument(help="Improvement ID (e.g., IMPR-001)")
+  ],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View improvement."""
+  _view_artifact("improvement", improvement_id, root, pager=pager)
+
+
+@app.command("risk")
+def view_risk(
+  risk_id: Annotated[str, typer.Argument(help="Risk ID (e.g., RISK-001)")],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View risk."""
+  _view_artifact("risk", risk_id, root, pager=pager)
+
+
+@app.command("requirement")
+def view_requirement(
+  req_id: Annotated[str, typer.Argument(help="Requirement ID (e.g., SPEC-009.FR-001)")],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View requirement's spec file."""
+  _view_artifact("requirement", req_id, root, pager=pager)
 
 
 @app.command("card")
@@ -231,163 +213,20 @@ def view_card(
       help="Search entire repo instead of just kanban/",
     ),
   ] = False,
+  pager: PagerOption = False,
   root: RootOption = None,
 ) -> None:
-  """View card in pager."""
+  """View card."""
+  from supekku.scripts.lib.cards import CardRegistry  # noqa: PLC0415
+
   try:
     registry = CardRegistry(root=root)
-    path = registry.resolve_path(card_id, anywhere=anywhere)
-
-    open_in_pager(Path(path))
-  except typer.Exit:
-    raise
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except FileNotFoundError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except ValueError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("plan")
-def view_plan(
-  plan_id: Annotated[str, typer.Argument(help="Plan ID (e.g., IP-041, 041)")],
-  root: RootOption = None,
-) -> None:
-  """View implementation plan in pager."""
-  try:
-    ref = resolve_artifact("plan", plan_id, root)
-    open_in_pager(ref.path)
-  except ArtifactNotFoundError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("audit")
-def view_audit(
-  audit_id: Annotated[str, typer.Argument(help="Audit ID (e.g., AUD-001, 001)")],
-  root: RootOption = None,
-) -> None:
-  """View audit in pager."""
-  try:
-    ref = resolve_artifact("audit", audit_id, root)
-    open_in_pager(ref.path)
-  except ArtifactNotFoundError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("memory")
-def view_memory(
-  memory_id: Annotated[
-    str, typer.Argument(help="Memory ID (e.g., mem.pattern.cli.skinny)")
-  ],
-  root: RootOption = None,
-) -> None:
-  """View memory record in pager."""
-  try:
-    ref = resolve_artifact("memory", memory_id, root)
-    open_in_pager(ref.path)
-  except ArtifactNotFoundError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("drift")
-def view_drift(
-  ledger_id: Annotated[str, typer.Argument(help="Drift ledger ID (e.g., DL-047)")],
-  root: RootOption = None,
-) -> None:
-  """View drift ledger in pager."""
-  try:
-    ref = resolve_artifact("drift_ledger", ledger_id, root)
-    open_in_pager(ref.path)
-  except ArtifactNotFoundError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("issue")
-def view_issue(
-  issue_id: Annotated[str, typer.Argument(help="Issue ID (e.g., ISSUE-001)")],
-  root: RootOption = None,
-) -> None:
-  """View issue in pager."""
-  try:
-    ref = resolve_artifact("issue", issue_id, root)
-    open_in_pager(ref.path)
-  except ArtifactNotFoundError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("problem")
-def view_problem(
-  problem_id: Annotated[str, typer.Argument(help="Problem ID (e.g., PROB-001)")],
-  root: RootOption = None,
-) -> None:
-  """View problem in pager."""
-  try:
-    ref = resolve_artifact("problem", problem_id, root)
-    open_in_pager(ref.path)
-  except ArtifactNotFoundError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("improvement")
-def view_improvement(
-  improvement_id: Annotated[
-    str, typer.Argument(help="Improvement ID (e.g., IMPR-001)")
-  ],
-  root: RootOption = None,
-) -> None:
-  """View improvement in pager."""
-  try:
-    ref = resolve_artifact("improvement", improvement_id, root)
-    open_in_pager(ref.path)
-  except ArtifactNotFoundError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except RuntimeError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("risk")
-def view_risk(
-  risk_id: Annotated[str, typer.Argument(help="Risk ID (e.g., RISK-001)")],
-  root: RootOption = None,
-) -> None:
-  """View risk in pager."""
-  try:
-    ref = resolve_artifact("risk", risk_id, root)
-    open_in_pager(ref.path)
-  except ArtifactNotFoundError as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-  except RuntimeError as e:
+    path = Path(registry.resolve_path(card_id, anywhere=anywhere))
+    if pager:
+      render_file_paged(path)
+    else:
+      render_file(path)
+  except (RuntimeError, FileNotFoundError, ValueError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
@@ -398,6 +237,7 @@ def view_risk(
 @app.command("inferred", hidden=True)
 def view_inferred(
   ctx: typer.Context,
+  pager: PagerOption = False,
   root: RootOption = None,
 ) -> None:
   """View an artifact by inferring its type from the ID."""
@@ -420,7 +260,10 @@ def view_inferred(
 
   _kind, ref = matches[0]
   try:
-    open_in_pager(ref.path)
+    if pager:
+      render_file_paged(ref.path)
+    else:
+      render_file(ref.path)
   except RuntimeError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e

@@ -193,6 +193,15 @@ ExternalOption = Annotated[
   ),
 ]
 
+PagerOption = Annotated[
+  bool,
+  typer.Option(
+    "--pager",
+    "-p",
+    help="Open in pager instead of rendering to stdout",
+  ),
+]
+
 
 def matches_regexp(
   pattern: str | None,
@@ -282,6 +291,59 @@ def open_in_pager(path: Path | str) -> None:
     msg = "No pager found. Set $PAGER or install less."
     raise RuntimeError(msg)
   subprocess.run([pager, str(path)], check=True)
+
+
+def render_file(path: Path | str) -> None:
+  """Render markdown file to stdout without paging.
+
+  Cascade: glow → rich → raw stdout.
+
+  Args:
+    path: Path to markdown file.
+
+  """
+  import shutil
+  import subprocess
+
+  path = Path(path)
+  if shutil.which("glow"):
+    subprocess.run(["glow", str(path)], check=False)
+  elif shutil.which("rich"):
+    subprocess.run(["rich", str(path)], check=False)
+  else:
+    typer.echo(path.read_text())
+
+
+def render_file_paged(path: Path | str) -> None:
+  """Render markdown file in a pager.
+
+  Cascade: $PAGER → glow -p → ov → less → more.
+
+  Args:
+    path: Path to markdown file.
+
+  Raises:
+    RuntimeError: If no pager or renderer is available.
+
+  """
+  import os
+  import shutil
+  import subprocess
+
+  path = Path(path)
+
+  if pager := os.environ.get("PAGER"):
+    subprocess.run([pager, str(path)], check=True)
+    return
+  if shutil.which("glow"):
+    subprocess.run(["glow", "-p", str(path)], check=True)
+    return
+  for cmd in ("ov", "less", "more"):
+    if shutil.which(cmd):
+      subprocess.run([cmd, str(path)], check=True)
+      return
+  msg = "No pager found. Set $PAGER or install glow/less."
+  raise RuntimeError(msg)
 
 
 def open_in_editor(path: Path | str) -> None:

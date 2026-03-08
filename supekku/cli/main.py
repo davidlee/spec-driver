@@ -114,7 +114,13 @@ app.add_typer(
 app.add_typer(
   view.app,
   name="view",
-  help="View artifacts in pager ($PAGER)",
+  help="View artifacts (rendered markdown; use -p for pager)",
+)
+
+app.add_typer(
+  view.app,
+  name="read",
+  help="Read artifacts (alias for view)",
 )
 
 app.add_typer(

@@ -6837,7 +6837,7 @@ deltas:
         risks: []
   DE-058:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - govern pylint signal and document lint standard
     slug: govern_pylint_signal_and_document_lint_standard
     updated: '2026-03-07'

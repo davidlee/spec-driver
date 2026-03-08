@@ -16,13 +16,15 @@ plan: IP-075
 delta: DE-075
 objective: >-
   Align theme.py colour mappings 1:1 with defined enums. Migrate backlog
-  items on disk to unified status values.
+  items on disk to unified status values. Consolidate backlog theme keys
+  from per-kind to unified.
 entrance_criteria:
   - Phase 1 complete — all constants defined and registered
 exit_criteria:
   - theme.py mappings match enums exactly (no phantoms, no gaps)
   - All backlog items on disk use unified status values
   - No legacy per-kind status values remain in frontmatter
+  - get_backlog_status_style and callers updated for unified keys
   - All tests passing, linters clean
 verification:
   tests: []
@@ -31,22 +33,32 @@ verification:
     - VA-075-02
 tasks:
   - id: '2.1'
-    description: Audit and update theme.py — specs section
+    description: 'Theme: remove spec.status.live'
   - id: '2.2'
-    description: Audit and update theme.py — ADR section
+    description: 'Theme: add adr.status.superseded'
   - id: '2.3'
-    description: Audit and update theme.py — policies section
+    description: 'Theme: remove policy.status.active, add policy.status.required'
   - id: '2.4'
-    description: Audit and update theme.py — memories section
+    description: 'Theme: remove memory.status.deprecated and memory.status.obsolete'
   - id: '2.5'
-    description: Audit and update theme.py — backlog sections (consolidate)
+    description: 'Theme: consolidate backlog per-kind keys to backlog.status.*'
   - id: '2.6'
-    description: Migrate backlog item frontmatter to unified statuses
+    description: 'Theme: update get_backlog_status_style to use backlog.status.{status}'
   - id: '2.7'
-    description: Verify no orphaned status values on disk
+    description: 'Migrate: captured → open (PROB-004)'
+  - id: '2.8'
+    description: 'Migrate: closed → resolved (ISSUE-036)'
+  - id: '2.9'
+    description: 'Migrate: implemented → resolved (ISSUE-040, ISSUE-025, ISSUE-022, ISSUE-015, IMPR-001 through IMPR-004, IMPR-008, IMPR-009)'
+  - id: '2.10'
+    description: 'Migrate: idea → open (IMPR-005 through IMPR-007, IMPR-010 through IMPR-012)'
+  - id: '2.11'
+    description: 'Verify: on-disk scan confirms no orphaned values (VA-075-02)'
+  - id: '2.12'
+    description: 'Update theme_test.py for new keys'
 risks:
   - description: Backlog migration touches many files
-    mitigation: Small set; manual review each change
+    mitigation: Small set (~17 files); enumerated and verified in phase planning
 ```
 
 ```yaml supekku:phase.tracking@v1
@@ -59,47 +71,105 @@ phase: IP-075.PHASE-02
 
 ## 1. Objective
 
-Make theme.py colour mappings match defined enums exactly. Migrate backlog items on disk from legacy per-kind statuses to the unified lifecycle.
+Make theme.py colour mappings match defined enums exactly. Migrate backlog items on disk from legacy per-kind statuses to the unified lifecycle. Consolidate backlog theme keys from `backlog.{kind}.{status}` to `backlog.status.{status}`.
 
 ## 2. Links & References
 
 - **Delta**: DE-075
-- **Design Revision**: DR-075 — DEC-075-01 (drop `live`), DEC-075-02 (add `superseded`), DEC-075-03 (drop policy `active`), DEC-075-04 (trim memory tail), DEC-075-05 (unified backlog)
+- **Design Revision**: DR-075 — DEC-075-01 through DEC-075-05
+- **Phase 1 commit**: `344c9d7`
 
 ## 3. Entrance Criteria
 
-- [ ] Phase 1 complete — all lifecycle.py files exist, ENUM_REGISTRY populated, tests passing
+- [x] Phase 1 complete — all lifecycle.py files exist, ENUM_REGISTRY populated, tests passing
 
 ## 4. Exit Criteria / Done When
 
 - [ ] `theme.py` — remove `spec.status.live`, `policy.status.active`, `memory.status.deprecated`, `memory.status.obsolete`
 - [ ] `theme.py` — add `adr.status.superseded`, `policy.status.required`
-- [ ] `theme.py` — consolidate backlog status colours to unified set
-- [ ] Backlog items migrated: `captured` → `open`, `idea` → `open`, `done`/`implemented`/`verified` → `resolved`, etc.
-- [ ] VA-075-01: theme audit confirms 1:1 alignment
+- [ ] `theme.py` — replace per-kind backlog keys with unified `backlog.status.*`
+- [ ] `get_backlog_status_style()` simplified to `(status)` → `backlog.status.{status}`
+- [ ] All backlog items migrated per mapping below
+- [ ] VA-075-01: theme audit confirms 1:1 alignment with enums
 - [ ] VA-075-02: on-disk scan confirms no orphaned values
 - [ ] `just check` passes
 
 ## 5. Verification
 
-- VA-075-01: Compare theme keys against enum members programmatically or by inspection
-- VA-075-02: `grep -r '^status:' .spec-driver/backlog/` and confirm all values in unified set
+- VA-075-01: Compare theme keys against enum members
+- VA-075-02: `grep -r '^status:' .spec-driver/backlog/` — all values in unified set
 - `just test` — no regressions
 - `just lint` — clean
 
-## 6. Assumptions & STOP Conditions
+## 6. Theme changes summary
 
-- Assumes phase 1 constants are stable
-- STOP if: migration reveals items with status values not anticipated by DR-075
+### Removals (phantom entries — styled but not in any enum)
+- `spec.status.live` (DEC-075-01: archaic synonym of `active`)
+- `policy.status.active` (DEC-075-02: replaced by `required`)
+- `memory.status.deprecated` (DEC-075-03: use `archived`)
+- `memory.status.obsolete` (DEC-075-03: use `archived` or `superseded`)
 
-## 7. Tasks & Progress
+### Additions (gap entries — in enum but not styled)
+- `adr.status.superseded` (DEC-075-04)
+- `policy.status.required` (DEC-075-02)
 
-| Status | ID | Description | Parallel? | Notes |
-|---|---|---|---|---|
-| [ ] | 2.1 | Update theme.py — spec statuses | [P] | Remove `live` |
-| [ ] | 2.2 | Update theme.py — ADR statuses | [P] | Add `superseded` |
-| [ ] | 2.3 | Update theme.py — policy statuses | [P] | Remove `active`, add `required` |
-| [ ] | 2.4 | Update theme.py — memory statuses | [P] | Remove `deprecated`, `obsolete` |
-| [ ] | 2.5 | Update theme.py — backlog statuses | [ ] | Consolidate per-kind → unified |
-| [ ] | 2.6 | Migrate backlog frontmatter | [ ] | Manual; per DEC-075-05 mapping |
-| [ ] | 2.7 | Verify on-disk scan | [ ] | VA-075-02 |
+### Backlog consolidation
+Replace per-kind keys:
+```
+backlog.issue.open         → backlog.status.open
+backlog.issue.in-progress  → backlog.status.in-progress
+backlog.issue.resolved     → backlog.status.resolved
+backlog.issue.closed       → (remove — not a valid status)
+backlog.problem.captured   → (remove — not a valid status)
+backlog.problem.analyzed   → (remove — not a valid status)
+backlog.problem.addressed  → (remove — not a valid status)
+backlog.improvement.idea   → (remove — not a valid status)
+backlog.improvement.planned → (remove — not a valid status)
+backlog.improvement.implemented → (remove — not a valid status)
+backlog.risk.suspected     → (remove — not a valid status)
+backlog.risk.confirmed     → (remove — not a valid status)
+backlog.risk.mitigated     → (remove — not a valid status)
+```
+
+New unified keys:
+```
+backlog.status.open         #cc241d  (red — needs attention)
+backlog.status.triaged      #00b8ff  (sky blue — assessed)
+backlog.status.in-progress  #d79921  (yellow — active)
+backlog.status.resolved     #8ec07c  (green — done)
+backlog.status.accepted     #7c7876  (mid grey — risk-specific, acknowledged)
+backlog.status.expired      #3c3836  (dark grey — risk-specific, stale)
+```
+
+### `get_backlog_status_style` change
+- Old: `get_backlog_status_style(kind, status)` → `backlog.{kind}.{status}`
+- New: `get_backlog_status_style(status)` → `backlog.status.{status}`
+- Update caller in `backlog_formatters.py`
+
+## 7. Backlog migration mapping
+
+| Old status | New status | Items |
+|---|---|---|
+| `captured` | `open` | PROB-004 |
+| `closed` | `resolved` | ISSUE-036 |
+| `implemented` | `resolved` | ISSUE-040, ISSUE-025, ISSUE-022, ISSUE-015, IMPR-001, IMPR-002, IMPR-003, IMPR-004, IMPR-008, IMPR-009 |
+| `idea` | `open` | IMPR-005, IMPR-006, IMPR-007, IMPR-010, IMPR-011, IMPR-012 |
+
+Items already valid (no change): `open`, `in-progress`, `resolved`
+
+## 8. Tasks & Progress
+
+| Status | ID | Description | Notes |
+|---|---|---|---|
+| [ ] | 2.1 | Remove `spec.status.live` | |
+| [ ] | 2.2 | Add `adr.status.superseded` | |
+| [ ] | 2.3 | Replace `policy.status.active` with `policy.status.required` | |
+| [ ] | 2.4 | Remove `memory.status.deprecated`, `memory.status.obsolete` | |
+| [ ] | 2.5 | Replace per-kind backlog keys with `backlog.status.*` | |
+| [ ] | 2.6 | Update `get_backlog_status_style` signature and caller | |
+| [ ] | 2.7 | Migrate PROB-004: `captured` → `open` | |
+| [ ] | 2.8 | Migrate ISSUE-036: `closed` → `resolved` | |
+| [ ] | 2.9 | Migrate 10 items: `implemented` → `resolved` | |
+| [ ] | 2.10 | Migrate 6 items: `idea` → `open` | |
+| [ ] | 2.11 | VA-075-02: on-disk scan | |
+| [ ] | 2.12 | Update theme_test.py | |

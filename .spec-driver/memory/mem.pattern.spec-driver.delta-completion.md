@@ -4,8 +4,8 @@ name: Delta Completion
 kind: memory
 status: active
 memory_type: pattern
-updated: '2026-03-04'
-verified: '2026-03-04'
+updated: '2026-03-09'
+verified: '2026-03-09'
 confidence: high
 tags:
 - spec-driver
@@ -13,7 +13,8 @@ tags:
 - completion
 - verification
 summary: 'Self-contained checklist for closing a delta: phase completion, verification
-  artifacts, spec coverage prerequisites, completion command, sync, and validation.'
+  artifacts, spec coverage prerequisites, completion command, sync, validation,
+  and backlog follow-through.'
 priority:
   severity: high
   weight: 9
@@ -108,7 +109,18 @@ Notes:
 - Completion can update revision sources for requirement lifecycle state and
   create completion revision updates for untracked requirements.
 
-## Step 6: Sync and Validate
+## Step 6: Update Originating Backlog Entries
+
+If the delta came from one or more backlog items, update those items so they do
+not keep stale status or notes after closure.
+
+Checklist:
+- confirm which backlog entries originated or tracked the delta
+- update their status, notes, and links as appropriate for the completed work
+- if the correct backlog transition is ambiguous, stop and `/consult` rather
+  than inventing a status vocabulary
+
+## Step 7: Sync and Validate
 
 ```bash
 uv run spec-driver sync                     # populates traceability arrays
@@ -128,6 +140,7 @@ uv run spec-driver show delta DE-XXX                    # should show 'completed
 - Using invalid coverage statuses (for example `passed` instead of `verified`)
 - Running `complete delta` before parent specs have verified coverage blocks
 - Bypassing coverage gates with `--force`/disabled enforcement without documented follow-up
+- Closing the delta while any originating backlog entry still tells an outdated story
 - Using wrong phase ID format (`phases: [phase-01]` instead of
   `phases: [{id: "IP-XXX.PHASE-01"}]`)
 - Marking delta complete with unchecked IP success criteria

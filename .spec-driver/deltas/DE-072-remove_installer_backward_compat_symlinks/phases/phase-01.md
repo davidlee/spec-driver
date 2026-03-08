@@ -4,7 +4,7 @@ slug: 072-remove_installer_backward_compat_symlinks-phase-01
 name: IP-072 Phase 01
 created: '2026-03-08'
 updated: '2026-03-08'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -30,21 +30,21 @@ verification:
     - pytest supekku/scripts/lib/install_test.py
     - just pylint-files supekku/scripts/install.py supekku/scripts/lib/install_test.py
   evidence:
-    - Updated installer tests passing locally.
-    - Touched-file pylint output clean.
+    - '`uv run pytest supekku/scripts/lib/install_test.py` passed.'
+    - '`just pylint-files supekku/scripts/install.py supekku/scripts/lib/install_test.py` reported only pre-existing warnings.'
 tasks:
   - id: 1.1
     title: Remove compatibility symlink creation from installer flow.
-    status: todo
+    status: done
   - id: 1.2
     title: Update installer tests and output messaging for canonical-only layout.
-    status: todo
+    status: done
   - id: 1.3
     title: Reconcile ADR-006 with the new installer behavior.
-    status: todo
+    status: done
   - id: 1.4
     title: Run targeted verification and capture outcomes.
-    status: todo
+    status: done
 risks:
   - Installer tests may still assume legacy root paths are created on fresh install.
 ```
@@ -72,10 +72,10 @@ Remove installer-created compatibility symlinks, update verification, and reconc
 - [x] Installer test module identified
 
 ## 4. Exit Criteria / Done When
-- [ ] Installer no longer creates `specify/`, `change/`, `backlog/`, or `memory/` compatibility paths during initialization
-- [ ] Installer output/messages no longer claim those paths are created
-- [ ] ADR-006 matches the new installer behavior
-- [ ] Targeted pytest and touched-file pylint verification pass
+- [x] Installer no longer creates `specify/`, `change/`, `backlog/`, or `memory/` compatibility paths during initialization
+- [x] Installer output/messages no longer claim those paths are created
+- [x] ADR-006 matches the new installer behavior
+- [x] Targeted pytest and touched-file pylint verification pass
 
 ## 5. Verification
 - Tests to run: `pytest supekku/scripts/lib/install_test.py`
@@ -91,10 +91,10 @@ Remove installer-created compatibility symlinks, update verification, and reconc
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Remove compatibility symlink creation from installer flow | [ ] | `supekku/scripts/install.py` |
-| [ ] | 1.2 | Update installer tests and output messaging to match canonical-only layout | [ ] | `supekku/scripts/lib/install_test.py` and installer output |
-| [ ] | 1.3 | Reconcile ADR-006 with the new installer default | [ ] | Decision record text only |
-| [ ] | 1.4 | Run targeted verification and record outcomes | [ ] | pytest + pylint |
+| [x] | 1.1 | Remove compatibility symlink creation from installer flow | [ ] | `supekku/scripts/install.py` |
+| [x] | 1.2 | Update installer tests and output messaging to match canonical-only layout | [ ] | `supekku/scripts/lib/install_test.py` and installer output |
+| [x] | 1.3 | Reconcile ADR-006 with the new installer default | [ ] | Decision record text only |
+| [x] | 1.4 | Run targeted verification and record outcomes | [ ] | pytest + pylint |
 
 ### Task Details
 - **1.1 Description**
@@ -125,13 +125,16 @@ Remove installer-created compatibility symlinks, update verification, and reconc
 
 ## 9. Decisions & Outcomes
 - `2026-03-08` - Keep the delta scoped to installer behavior and fresh-install verification only.
+- `2026-03-08` - Treat ADR-006 reconciliation as part of the same delta because the code change alters documented default installer behavior.
 
 ## 10. Findings / Research Notes
 - Compatibility symlink creation is centralized in `_create_compat_symlinks()` and called once from `initialize_workspace()`.
 - Installer tests live in `supekku/scripts/lib/install_test.py`, not beside the script module.
+- Verification: `uv run pytest supekku/scripts/lib/install_test.py` passed.
+- Verification: `just pylint-files supekku/scripts/install.py supekku/scripts/lib/install_test.py` reported only pre-existing warnings and no new undefined-name regressions after the patch.
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Spec/Delta/Plan updated with lessons
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Spec/Delta/Plan updated with lessons
 - [ ] Hand-off notes to next phase (if any)

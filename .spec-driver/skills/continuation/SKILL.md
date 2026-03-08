@@ -15,6 +15,9 @@ otherwise, create one, including:
 - relevant doctrines
 - any important user instructions or decisions
 - any incomplete work or loose ends
+- pending commit-state guidance, especially whether `.spec-driver` changes
+  should be committed now to keep the worktree clean, and whether they should go
+  out with code or separately per repo doctrine
 - other advice or knowledge applicable to the next task(s)
 - file paths for any files / documents referenced.
 

@@ -16,6 +16,7 @@ from pathlib import Path
 from textwrap import dedent
 
 from supekku.scripts.lib.cards import Card, CardRegistry
+from supekku.scripts.lib.core.templates import get_package_templates_dir
 
 
 class TestCardModel(unittest.TestCase):
@@ -302,7 +303,7 @@ class TestCardCreation(unittest.TestCase):
     self.assertIn("- And this", content)
 
   def test_auto_creates_template_if_missing(self) -> None:
-    """Auto-creates kanban/template.md if missing."""
+    """Auto-creates kanban/template.md from the packaged template asset."""
     kanban_dir = self.tmp_path / "kanban"
     kanban_dir.mkdir()
 
@@ -312,6 +313,12 @@ class TestCardCreation(unittest.TestCase):
     template = self.tmp_path / "kanban" / "template.md"
     self.assertTrue(template.exists())
     self.assertTrue(card.path.exists())
+    self.assertEqual(
+      template.read_text(encoding="utf-8"),
+      (get_package_templates_dir() / "kanban" / "template.md").read_text(
+        encoding="utf-8"
+      ),
+    )
 
   def test_respects_lane_flag(self) -> None:
     """Respects --lane flag (backlog/doing/done, default backlog)."""

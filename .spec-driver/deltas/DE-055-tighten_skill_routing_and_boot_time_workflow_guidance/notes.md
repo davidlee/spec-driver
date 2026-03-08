@@ -453,3 +453,15 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - Rationale:
   - governance is easy to treat as passive background reading unless the skill makes it an explicit step
   - the critical review loop should attack missing or weakly applied ADR/policy/standard constraints just as hard as vague prose or weak verification
+
+## 2026-03-09
+
+### 2026-03-09 - phase 14 backlog follow-through in close-change
+- Updated `supekku/skills/close-change/SKILL.md` so delta closure now:
+  - checks for originating backlog entries during pre-check
+  - revisits them during post-check
+  - nudges status/note/link updates instead of leaving backlog records stale after the delta completes
+- Updated `mem.pattern.spec-driver.delta-completion` with a dedicated backlog follow-through step.
+- Rationale:
+  - closing the delta without touching the originating backlog item leaves traceability and backlog state behind
+  - `ISSUE-009` still blocks inventing a canonical backlog status vocabulary, so the close-out skill should nudge and escalate ambiguity rather than guess

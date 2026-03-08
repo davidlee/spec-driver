@@ -23,11 +23,11 @@ It includes ALL referenced files.
 </boot-sequence>
 
 When it has been observed **in full** - print:
-  Agent ready.
+Δ ∴ ⊤
 
 Otherwise - print:
-  BOOT SEQUENCE ERROR !!!
+BOOT ERROR !!!
 
 Deviation will result in immediate process termination.
 
-After boot, you MUST use `/using-spec-driver` to route ANY substantive work before acting.
+After boot, you MUST use  `/using-spec-driver` to route ANY substantive work before acting.

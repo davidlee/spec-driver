@@ -45,8 +45,8 @@ content-type output to preserve context.
 
 ## Deltas
 - DE-045: `--links-to`, `--links-depth N`, `--body-only` (agent discoverability)
-- Remaining: `resolve links --verbose`, `--path/--id` scoped resolution,
-  backlog item resolution (see also ISSUE-034)
+- DE-073: `--content-type/-c` selector, `resolve links --verbose`, `--path/--id` scoped resolution
+- Remaining: backlog item resolution (see ISSUE-034)
 
 ## Related
 - ISSUE-034 (resolve links does not support backlog items)

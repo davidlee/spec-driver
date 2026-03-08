@@ -70,64 +70,22 @@ def test_initialize_workspace_creates_directories(tmp_path: Path) -> None:
   assert "improvements/" in content
 
 
-def test_initialize_workspace_creates_compat_symlinks(tmp_path: Path) -> None:
-  """VT-049-symlinks: installer creates backward-compat symlinks."""
+def test_initialize_workspace_does_not_create_compat_paths(tmp_path: Path) -> None:
+  """Fresh install leaves compatibility paths uncreated."""
   initialize_workspace(tmp_path, auto_yes=True)
-  sd = SPEC_DRIVER_DIR
-
-  # specify/ is a real dir with targeted symlinks (DEC-049-03)
-  specify = tmp_path / "specify"
-  assert specify.is_dir()
-  assert not specify.is_symlink()
-  for subdir in ["tech", "product", "decisions", "policies", "standards"]:
-    link = specify / subdir
-    assert link.is_symlink(), f"specify/{subdir} should be a symlink"
-    assert link.resolve() == (tmp_path / sd / subdir).resolve()
-
-  # change/ is a real dir with targeted symlinks
-  change = tmp_path / "change"
-  assert change.is_dir()
-  assert not change.is_symlink()
-  for subdir in ["deltas", "revisions", "audits"]:
-    link = change / subdir
-    assert link.is_symlink(), f"change/{subdir} should be a symlink"
-    assert link.resolve() == (tmp_path / sd / subdir).resolve()
-
-  # backlog/ and memory/ are direct symlinks
-  for name in ["backlog", "memory"]:
-    link = tmp_path / name
-    assert link.is_symlink(), f"{name} should be a symlink"
-    assert link.resolve() == (tmp_path / sd / name).resolve()
+  for name in ["specify", "change", "backlog", "memory"]:
+    assert not (tmp_path / name).exists()
 
 
-def test_initialize_workspace_compat_symlinks_idempotent(
+def test_initialize_workspace_does_not_create_compat_paths_on_reinstall(
   tmp_path: Path,
 ) -> None:
-  """VT-049-symlinks: second install doesn't error on existing symlinks."""
+  """Re-running install keeps compatibility paths absent."""
   initialize_workspace(tmp_path, auto_yes=True)
   initialize_workspace(tmp_path, auto_yes=True)  # Should not raise
 
-  # Symlinks still correct
-  assert (tmp_path / "specify" / "tech").is_symlink()
-  assert (tmp_path / "backlog").is_symlink()
-
-
-def test_initialize_workspace_compat_symlinks_resolve(
-  tmp_path: Path,
-) -> None:
-  """VT-049-symlinks: old paths resolve to content under .spec-driver/."""
-  initialize_workspace(tmp_path, auto_yes=True)
-  sd = SPEC_DRIVER_DIR
-
-  # Write a file via the new path
-  spec_dir = tmp_path / sd / "tech" / "SPEC-001"
-  spec_dir.mkdir(parents=True)
-  (spec_dir / "SPEC-001.md").write_text("# SPEC-001\n")
-
-  # Read it via the old compat path
-  compat_path = tmp_path / "specify" / "tech" / "SPEC-001" / "SPEC-001.md"
-  assert compat_path.exists()
-  assert compat_path.read_text() == "# SPEC-001\n"
+  for name in ["specify", "change", "backlog", "memory"]:
+    assert not (tmp_path / name).exists()
 
 
 def test_initialize_workspace_creates_registry_files(tmp_path: Path) -> None:
@@ -1373,7 +1331,7 @@ class TestInitializeWorkspaceMemories:
     """Fresh install creates memory directory with managed + seed files."""
     initialize_workspace(tmp_path, auto_yes=True)
 
-    memory_dir = tmp_path / MEMORY_DIR
+    memory_dir = tmp_path / SPEC_DRIVER_DIR / MEMORY_DIR
     assert memory_dir.is_dir()
 
     # Should have at least some managed memories
@@ -1393,7 +1351,7 @@ class TestInitializeWorkspaceMemories:
     initialize_workspace(tmp_path, auto_yes=True)
 
     # Customise a seed memory
-    wf = tmp_path / MEMORY_DIR / "mem.pattern.project.workflow.md"
+    wf = tmp_path / SPEC_DRIVER_DIR / MEMORY_DIR / "mem.pattern.project.workflow.md"
     assert wf.exists()
     wf.write_text("my custom workflow")
 
@@ -1407,7 +1365,7 @@ class TestInitializeWorkspaceMemories:
     tmp_path: Path,
   ) -> None:
     initialize_workspace(tmp_path, dry_run=True)
-    memory_dir = tmp_path / MEMORY_DIR
+    memory_dir = tmp_path / SPEC_DRIVER_DIR / MEMORY_DIR
     # Memory dir might be created (mkdir), but no files copied
     md_files = list(memory_dir.glob("*.md")) if memory_dir.exists() else []
     assert len(md_files) == 0

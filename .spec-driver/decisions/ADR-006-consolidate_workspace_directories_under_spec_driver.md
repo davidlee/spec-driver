@@ -22,7 +22,7 @@ tags:
   - architecture
   - workspace
   - install
-summary: 'Canonical spec-driver workspace directories move under .spec-driver/ with backward-compat root symlinks; migration tooling and content reference cleanup are deferred.'
+summary: 'Canonical spec-driver workspace directories move under .spec-driver/; migration tooling and broad content reference cleanup are deferred, while legacy compatibility paths are treated as optional non-default views.'
 ---
 
 # ADR-006: consolidate workspace directories under .spec-driver
@@ -64,8 +64,9 @@ cleanup of existing prose references.
 Adopt **Option A (flatten)** as the canonical default layout.
 
 Canonical spec-driver workspace directories will consolidate under
-`.spec-driver/`, with root-level backward-compatibility symlinks from the old
-top-level paths such as `specify/`, `change/`, and `backlog/`.
+`.spec-driver/`. Legacy top-level paths such as `specify/`, `change/`, and
+`backlog/` are compatibility views only and are not part of the default
+installer footprint.
 
 ### 1. Canonical footprint
 
@@ -85,16 +86,15 @@ Directories such as `decisions/`, `tech/`, `product/`, `deltas/`, `revisions/`,
 and `audits/` are already self-explanatory enough without another level of
 grouping. Flattening removes indirection rather than moving it.
 
-### 3. Backward-compatibility via symlinks
+### 3. Backward-compatibility views are optional
 
-Legacy top-level paths such as `specify/`, `change/`, and `backlog/` will be
-provided as backward-compatibility symlinks to the canonical locations under
-`.spec-driver/`.
+Legacy top-level paths such as `specify/`, `change/`, and `backlog/` are
+compatibility views that may exist in migrated or manually curated workspaces,
+but they are not required and are not created by default by the installer.
 
-These symlinks are convenience and compatibility views, not canonical storage.
-They are cosmetic rather than load-bearing. Users may rename, remove, or ignore
-them without changing where spec-driver considers the authoritative workspace to
-live.
+These views are convenience-only and not canonical storage. Users may create,
+rename, remove, or ignore them without changing where spec-driver considers the
+authoritative workspace to live.
 
 ### 4. Separate config from managed internals
 
@@ -153,7 +153,7 @@ spec-driver workspace rather than requiring several unrelated root paths.
 - Makes staging and reviewing spec-driver changes more atomic.
 - Removes unnecessary nesting such as `specify/decisions/`.
 - Clarifies which files are user-serviceable config versus managed internals.
-- Preserves existing path expectations through backward-compatibility symlinks.
+- Preserves a clean canonical install footprint under `.spec-driver/`.
 - Avoids premature investment in migration tooling and mass reference rewriting.
 
 ### Negative
@@ -163,7 +163,7 @@ spec-driver workspace rather than requiring several unrelated root paths.
 - A later migration command, if needed, will still require design and implementation work.
 
 ### Neutral
-- Existing root-level paths become compatibility views rather than canonical locations.
+- Existing root-level paths, when present, are compatibility views rather than canonical locations.
 - Cross-reference cleanup is deferred, not rejected permanently.
 - This ADR sets the default layout direction; implementation details still belong in follow-up change work.
 - The separate contracts corpus decision remains governed by existing specs and ADRs unless changed explicitly.
@@ -171,9 +171,9 @@ spec-driver workspace rather than requiring several unrelated root paths.
 ## Verification
 - Default workspace initialization creates the canonical directories under `.spec-driver/`.
 - User-serviceable files move under `.spec-driver/config/`, while managed internals remain outside that subdirectory.
-- Backward-compatibility symlinks from `specify/`, `change/`, and `backlog/` resolve to the canonical targets.
+- Fresh installs create the canonical directories under `.spec-driver/` without requiring root-level compatibility paths.
 - Internal path resolution treats `.spec-driver/` locations as canonical rather than depending on the symlinked views.
-- Existing content that references old top-level paths continues to resolve correctly through compatibility symlinks.
+- Existing content that references old top-level paths may continue to resolve in repositories that keep or add compatibility views, but those views are optional.
 - No migration command is required to satisfy this ADR initially.
 
 ## References

@@ -6,22 +6,13 @@ import re
 from collections.abc import Iterator
 from datetime import datetime
 from pathlib import Path
-from textwrap import dedent
 
 from supekku.scripts.lib.core import slugify
+from supekku.scripts.lib.core.templates import get_package_templates_dir
 
 from .models import Card
 
 VALID_LANES = {"backlog", "doing", "done"}
-DEFAULT_TEMPLATE = dedent("""
-  # T000: Placeholder
-
-  Created:
-
-  ## Description
-
-  ## Notes
-""").strip()
 
 
 class CardRegistry:
@@ -233,7 +224,8 @@ class CardRegistry:
     """Create default kanban/template.md if missing."""
     template_path = self.kanban_dir / "template.md"
     template_path.parent.mkdir(parents=True, exist_ok=True)
-    template_path.write_text(DEFAULT_TEMPLATE)
+    package_template = get_package_templates_dir() / "kanban" / "template.md"
+    template_path.write_text(package_template.read_text(encoding="utf-8"))
 
   @staticmethod
   def _rewrite_template(template: str, card_id: str, description: str) -> str:

@@ -469,62 +469,6 @@ def _install_hooks(
       shutil.copy2(src_file, dest_file)
 
 
-def _create_compat_symlinks(target_root: Path) -> None:
-  """Create backward-compat symlinks for old workspace paths (DEC-049-03).
-
-  Creates targeted symlinks so that old paths like ``specify/tech/`` and
-  ``change/deltas/`` resolve to their new locations under ``.spec-driver/``.
-
-  - ``specify/`` and ``change/`` are real directories containing per-subdir symlinks
-  - ``backlog/`` and ``memory/`` are direct symlinks to ``.spec-driver/`` children
-
-  Idempotent: skips symlinks that already exist with the correct target.
-  """
-  sd = SPEC_DRIVER_DIR
-
-  # Targeted symlinks inside real compat directories
-  _targeted_symlinks: dict[str, list[str]] = {
-    "specify": [
-      TECH_SPECS_SUBDIR,
-      PRODUCT_SPECS_SUBDIR,
-      DECISIONS_SUBDIR,
-      POLICIES_SUBDIR,
-      STANDARDS_SUBDIR,
-    ],
-    "change": [
-      DELTAS_SUBDIR,
-      REVISIONS_SUBDIR,
-      AUDITS_SUBDIR,
-    ],
-  }
-
-  for compat_dir, subdirs in _targeted_symlinks.items():
-    parent = target_root / compat_dir
-    parent.mkdir(exist_ok=True)
-    for subdir in subdirs:
-      link = parent / subdir
-      target = Path("..") / sd / subdir
-      if link.is_symlink():
-        if link.readlink() == target:
-          continue
-        link.unlink()
-      elif link.exists():
-        continue  # Real directory — don't clobber
-      link.symlink_to(target)
-
-  # Direct symlinks for backlog/ and memory/
-  for name in [BACKLOG_DIR, MEMORY_DIR]:
-    link = target_root / name
-    target = Path(sd) / name
-    if link.is_symlink():
-      if link.readlink() == target:
-        continue
-      link.unlink()
-    elif link.exists():
-      continue  # Real directory — don't clobber
-    link.symlink_to(target)
-
-
 _VERSION_KEY = "spec_driver_installed_version"
 _VERSION_RE = re.compile(rf'^{_VERSION_KEY}\s*=\s*".*"', re.MULTILINE)
 
@@ -633,9 +577,6 @@ def initialize_workspace(
   for dir_path in directories:
     full_path = target_root / dir_path
     full_path.mkdir(parents=True, exist_ok=True)
-
-  # Create backward-compat symlinks (DEC-049-03)
-  _create_compat_symlinks(target_root)
 
   # Create empty backlog/backlog.md file
   backlog_file = get_backlog_dir(target_root) / "backlog.md"

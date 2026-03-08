@@ -443,3 +443,13 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
   - a mandatory internal challenge pass raises quality without forcing every DR through a second external agent
   - planning from a stale DE recreates drift immediately, so DE reconciliation belongs inside the DR loop itself
 - Updated `DE-055.md`, `DR-055.md`, `IP-055.md`, and `IP-055.PHASE-12` to record the new accepted design direction.
+
+### 2026-03-08 - phase 13 doctrine in the DR loop
+- Updated `draft-design-revision` so it explicitly runs `/doctrine` before drafting.
+- The DR loop now treats governance as part of both:
+  - pre-draft design triage
+  - adversarial self-review
+- Added guidance to stop and `/consult` if the doctrine pass reveals conflicting or ambiguous ADR/policy/standard constraints.
+- Rationale:
+  - governance is easy to treat as passive background reading unless the skill makes it an explicit step
+  - the critical review loop should attack missing or weakly applied ADR/policy/standard constraints just as hard as vague prose or weak verification

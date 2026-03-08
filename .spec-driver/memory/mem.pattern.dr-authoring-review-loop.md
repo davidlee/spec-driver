@@ -12,8 +12,8 @@ tags:
 - workflow
 - design
 summary: 'For draft-design-revision work: keep the DR progressive, add code-adjacent
-  examples where needed, run an internal adversarial pass, reconcile DE, then optionally
-  print an external-review prompt before planning.'
+  examples where needed, consult doctrine, run an internal adversarial pass, reconcile
+  DE, then optionally print an external-review prompt before planning.'
 scope:
   paths:
   - supekku/skills/draft-design-revision/SKILL.md
@@ -41,6 +41,7 @@ links:
 - This pattern is the repo-approved import from brainstorming for DR authoring; it is not a universal workflow rule.
 
 ## Loop
+- Run `/doctrine` before drafting so relevant ADRs, policies, and standards are in view for the current design surface.
 - Keep the interaction progressive and section-scoped. Do not treat a full-file rewrite as the default unit of progress.
 - Add code-adjacent detail when prose stays vague:
   - sketch APIs or signatures
@@ -51,6 +52,7 @@ links:
   - attack weak verification
   - attack missing code-impact detail
   - attack hidden assumptions
+  - attack missing, misread, or weakly applied ADR/policy/standard constraints
 - Integrate that feedback into the DR before moving on.
 - Reconcile the owning delta after DR feedback so scope, risks, acceptance criteria, and follow-up direction match the revised design.
 - Only then offer to print an external adversarial-review prompt or initiate planning.

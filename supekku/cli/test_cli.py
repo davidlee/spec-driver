@@ -195,6 +195,23 @@ class TestListCommands:
     assert "--policy" in result.stdout
 
 
+  def test_list_audits_help(self):
+    """Test list audits command help."""
+    result = runner.invoke(app, ["list", "audits", "--help"])
+    assert result.exit_code == 0
+    assert "List audits" in result.stdout
+    assert "--status" in result.stdout
+    assert "--filter" in result.stdout
+    assert "--spec" in result.stdout
+    assert "--json" in result.stdout
+
+  def test_list_audit_singular_alias(self):
+    """Test list audit singular alias works."""
+    result = runner.invoke(app, ["list", "audit", "--help"])
+    assert result.exit_code == 0
+    assert "List audits" in result.stdout
+
+
 class TestShowCommands:
   """Test show command group."""
 
@@ -403,6 +420,26 @@ class TestJSONFlagConsistency:
     """Test --json produces same output as --format=json for revisions."""
     result_json = runner.invoke(app, ["list", "revisions", "--json"])
     result_format = runner.invoke(app, ["list", "revisions", "--format", "json"])
+    assert result_json.exit_code == 0
+    assert result_format.exit_code == 0
+    assert result_json.stdout == result_format.stdout
+
+  def test_list_audits_json_flag(self):
+    """Test list audits accepts --json flag."""
+    result = runner.invoke(app, ["list", "audits", "--json"])
+    assert result.exit_code == 0
+    import json
+
+    try:
+      data = json.loads(result.stdout)
+      assert isinstance(data, dict)
+    except json.JSONDecodeError:
+      pytest.fail("Output is not valid JSON")
+
+  def test_list_audits_json_equals_format_json(self):
+    """Test --json produces same output as --format=json for audits."""
+    result_json = runner.invoke(app, ["list", "audits", "--json"])
+    result_format = runner.invoke(app, ["list", "audits", "--format", "json"])
     assert result_json.exit_code == 0
     assert result_format.exit_code == 0
     assert result_json.stdout == result_format.stdout
@@ -835,6 +872,45 @@ class TestStandardCommands:
     assert "--status" in result.stdout
     # Check that status help mentions standard can be draft/required/default
     assert "Initial status" in result.stdout
+
+
+class TestListAudits:
+  """Test list audits command (DE-078)."""
+
+  def test_list_audits_basic(self):
+    """Test list audits returns successfully."""
+    result = runner.invoke(app, ["list", "audits"])
+    assert result.exit_code == 0
+
+  def test_list_audits_status_filter(self):
+    """Test list audits --status filter."""
+    result = runner.invoke(app, ["list", "audits", "-s", "draft"])
+    assert result.exit_code == 0
+
+  def test_list_audits_filter_substring(self):
+    """Test list audits --filter substring matching."""
+    result = runner.invoke(app, ["list", "audits", "-f", "nonexistent-xyz"])
+    assert result.exit_code == 0  # empty result is not an error
+
+  def test_list_audits_regexp(self):
+    """Test list audits --regexp filtering."""
+    result = runner.invoke(app, ["list", "audits", "--regexp", "AUD-.*"])
+    assert result.exit_code == 0
+
+  def test_list_audits_invalid_regexp(self):
+    """Test list audits with invalid regexp exits with failure."""
+    result = runner.invoke(app, ["list", "audits", "--regexp", "[invalid"])
+    assert result.exit_code == 1
+
+  def test_list_audits_tsv_format(self):
+    """Test list audits --format tsv."""
+    result = runner.invoke(app, ["list", "audits", "--format", "tsv"])
+    assert result.exit_code == 0
+
+  def test_list_audits_invalid_format(self):
+    """Test list audits with invalid format exits with failure."""
+    result = runner.invoke(app, ["list", "audits", "--format", "invalid"])
+    assert result.exit_code == 1
 
 
 class TestMultiValueFilters:

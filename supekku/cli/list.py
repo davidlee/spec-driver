@@ -1446,6 +1446,108 @@ def list_revisions(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("audits")
+def list_audits(
+  root: RootOption = None,
+  status: Annotated[
+    str | None,
+    typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  spec: Annotated[
+    str | None,
+    typer.Option("--spec", help="Filter by spec reference"),
+  ] = None,
+  substring: Annotated[
+    str | None,
+    typer.Option(
+      "--filter",
+      "-f",
+      help="Substring filter on ID or name (case-insensitive)",
+    ),
+  ] = None,
+  regexp: RegexpOption = None,
+  case_insensitive: CaseInsensitiveOption = False,
+  format_type: FormatOption = "table",
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output result as JSON (shorthand for --format=json)",
+    ),
+  ] = False,
+  truncate: TruncateOption = False,
+  external: ExternalOption = False,
+) -> None:
+  """List audits with optional filtering.
+
+  The --filter flag does substring matching (case-insensitive).
+  The --regexp flag does pattern matching on ID, slug, and name fields.
+  """
+  # --json flag overrides --format
+  if json_output:
+    format_type = "json"
+
+  # Validate format
+  if format_type not in ["table", "json", "tsv"]:
+    typer.echo(f"Error: invalid format: {format_type}", err=True)
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    registry = ChangeRegistry(root=root, kind="audit")
+    audits = list(registry.collect().values())
+
+    # Apply filters (multi-value status OR logic)
+    if status:
+      status_values = parse_multi_value_filter(status)
+      status_normalized = [s.lower() for s in status_values]
+      audits = [a for a in audits if a.status.lower() in status_normalized]
+    if spec:
+      spec_upper = spec.upper()
+      audits = [
+        a
+        for a in audits
+        if a.relations
+        and any(spec_upper in str(rel.get("target", "")).upper() for rel in a.relations)
+      ]
+    if substring:
+      filter_lower = substring.lower()
+      audits = [
+        a
+        for a in audits
+        if filter_lower in a.id.lower() or filter_lower in a.name.lower()
+      ]
+
+    # Apply regexp filter on id, slug, name
+    if regexp:
+      try:
+        audits = [
+          a
+          for a in audits
+          if matches_regexp(regexp, [a.id, a.slug, a.name], case_insensitive)
+        ]
+      except re.error as e:
+        typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
+        raise typer.Exit(EXIT_FAILURE) from e
+
+    if not audits:
+      raise typer.Exit(EXIT_SUCCESS)
+
+    # Sort and format
+    audits.sort(key=lambda a: a.id)
+    output = format_change_list_table(
+      audits,
+      format_type,
+      not truncate,
+      show_external=external,
+    )
+    typer.echo(output)
+
+    raise typer.Exit(EXIT_SUCCESS)
+  except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 @app.command("plans")
 def list_plans(
   root: RootOption = None,
@@ -2547,6 +2649,7 @@ _PLURAL_TO_SINGULAR = {
   "standards": "standard",
   "requirements": "requirement",
   "revisions": "revision",
+  "audits": "audit",
   "issues": "issue",
   "problems": "problem",
   "improvements": "improvement",

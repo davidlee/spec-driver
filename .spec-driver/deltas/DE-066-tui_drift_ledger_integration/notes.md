@@ -2,28 +2,23 @@
 
 ## Status
 
-Delta scoped. Ready for planning (`/plan-phases`).
+All phases complete. Delta ready for closure.
 
-## Assessment
+## Completed
 
-This is a mechanical integration — wiring DE-065's `DriftLedgerRegistry` into
-the existing `ArtifactType`/`ArtifactSnapshot` system used by the TUI. No new
-abstractions or design decisions needed. DR skipped (pure wiring, no design
-surface).
-
-## Integration points (from artifact_view.py)
-
-1. `ArtifactType` enum — add `DRIFT_LEDGER = "drift_ledger"` in Operational group
-2. `ARTIFACT_TYPE_META` — add `ArtifactTypeMeta("Drift Ledger", "Drift Ledgers", _OPS)`
-3. `_TITLE_ATTR` — add mapping (DriftLedger uses `name`)
-4. `_STATUS_ATTR` — add mapping (DriftLedger uses `status`)
-5. `_ID_ATTR` — add mapping (DriftLedger uses `id`)
-6. `_REGISTRY_FACTORIES` — add factory for `DriftLedgerRegistry`
-7. `path_to_artifact_type()` — add `DRIFT_SUBDIR` → `ArtifactType.DRIFT_LEDGER`
-8. Possibly: snapshot `_iter_records()` adapter if DriftLedgerRegistry interface differs
+- Phase 1: wired DRIFT_LEDGER into ArtifactType, metadata tables, registry factory, path mapping
+- 8 new tests (enum, metadata, factory, adapt, snapshot, path mapping)
+- `just check` green: 3293 tests, ruff clean, pylint 9.71
 
 ## Key files
 
-- `supekku/scripts/lib/core/artifact_view.py` — all enum/meta/factory wiring
-- `supekku/scripts/lib/drift/registry.py` — existing registry (DE-065)
-- `supekku/tui/` — should just work once artifact_view.py is wired
+- `supekku/scripts/lib/core/artifact_view.py` — enum, metadata, factory, path mapping
+- `supekku/scripts/lib/core/artifact_view_test.py` — 7 new tests
+- `supekku/tui/edge_cases_test.py` — 1 new test (drift path mapping)
+
+## Design notes
+
+- No custom adapter needed — DriftLedger has `id`, `name`, `status`, `path` (same shape as other records)
+- `_STATUS_ATTR` and `_ID_ATTR` use defaults (no entry needed — only CARD and REQUIREMENT override)
+- `_TITLE_ATTR` explicitly set to `"name"` for clarity, though it's the default
+- Single new `import-outside-toplevel` pylint message from `_make_drift_registry` — consistent with all other factory functions

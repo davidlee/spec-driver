@@ -71,13 +71,13 @@ into the `ArtifactType`/`ArtifactSnapshot` system in `artifact_view.py`.
 - [x] `DriftLedger` has `id`, `name`, `status`, `path` attributes
 
 ## 4. Exit Criteria / Done When
-- [ ] `ArtifactType.DRIFT_LEDGER` exists in enum (Operational group)
-- [ ] `ARTIFACT_TYPE_META`, `_TITLE_ATTR`, `_STATUS_ATTR`, `_ID_ATTR` entries added
-- [ ] `_REGISTRY_FACTORIES` entry wired
-- [ ] `path_to_artifact_type()` maps `DRIFT_SUBDIR`
-- [ ] Unit tests cover all wiring points
-- [ ] TUI shows drift ledgers in type selector
-- [ ] `just check` green
+- [x] `ArtifactType.DRIFT_LEDGER` exists in enum (Operational group)
+- [x] `ARTIFACT_TYPE_META`, `_TITLE_ATTR` entries added (STATUS/ID use defaults)
+- [x] `_REGISTRY_FACTORIES` entry wired
+- [x] `path_to_artifact_type()` maps `DRIFT_SUBDIR`
+- [x] Unit tests cover all wiring points (8 new tests)
+- [x] TUI shows drift ledgers in type selector
+- [x] `just check` green (3293 pass, ruff clean, pylint 9.71)
 
 ## 5. Verification
 - `just check` — all tests, linters clean
@@ -94,10 +94,10 @@ into the `ArtifactType`/`ArtifactSnapshot` system in `artifact_view.py`.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Add DRIFT_LEDGER to enum + metadata tables | — | |
-| [ ] | 1.2 | Add registry factory + path mapping | — | |
-| [ ] | 1.3 | Write tests | — | |
-| [ ] | 1.4 | Verify TUI end-to-end | — | |
+| [x] | 1.1 | Add DRIFT_LEDGER to enum + metadata tables | — | done |
+| [x] | 1.2 | Add registry factory + path mapping | — | done |
+| [x] | 1.3 | Write tests | — | 8 tests |
+| [x] | 1.4 | Verify TUI end-to-end | — | just check green |
 
 ### Task Details
 
@@ -131,6 +131,6 @@ into the `ArtifactType`/`ArtifactSnapshot` system in `artifact_view.py`.
 ## 10. Findings / Research Notes
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Phase sheet updated with outcomes
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (3293 tests, linters clean)
+- [x] Phase sheet updated with outcomes

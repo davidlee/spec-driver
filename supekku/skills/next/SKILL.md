@@ -6,7 +6,7 @@ description: Print a concise continuation prompt for the next agent. Use this wh
 print:
 
 /boot
-/preflight
+/using-spec-driver
 (provide the path to the current task card and the next obvious task)
 
 If the next task is implementation-bound, include the specific artefacts to

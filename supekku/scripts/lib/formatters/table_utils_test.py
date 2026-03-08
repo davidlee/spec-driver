@@ -19,7 +19,6 @@ from supekku.scripts.lib.formatters.table_utils import (
   get_terminal_width,
   is_tty,
   render_table,
-  truncate_text,
 )
 
 
@@ -60,43 +59,6 @@ class TestColumnWidthCalculation:
     # Should still provide minimum width
     assert all(w > 0 for w in widths.values())
 
-
-class TestTextTruncation:
-  """Test text truncation."""
-
-  def test_truncate_text_no_truncation_needed(self):
-    """Test that short text is not truncated."""
-    text = "Short"
-    result = truncate_text(text, max_width=20)
-    assert result == "Short"
-
-  def test_truncate_text_exact_width(self):
-    """Test text at exact max width."""
-    text = "Exactly20Characters!"
-    result = truncate_text(text, max_width=20)
-    assert result == "Exactly20Characters!"
-
-  def test_truncate_text_long_text(self):
-    """Test truncation of long text."""
-    text = "This is a very long text that needs truncation"
-    result = truncate_text(text, max_width=20)
-    assert len(result) == 20
-    assert result.endswith("...")
-    assert result == "This is a very lo..."
-
-  def test_truncate_text_custom_suffix(self):
-    """Test truncation with custom suffix."""
-    text = "Long text here"
-    result = truncate_text(text, max_width=10, suffix="…")
-    assert len(result) == 10
-    assert result.endswith("…")
-
-  def test_truncate_text_width_smaller_than_suffix(self):
-    """Test handling when max_width is smaller than suffix."""
-    text = "Test"
-    result = truncate_text(text, max_width=2, suffix="...")
-    assert len(result) == 2
-    assert result == ".."
 
 
 class TestTableCreation:
@@ -165,6 +127,85 @@ class TestRowAddition:
         max_widths=max_widths,
       )
     assert len(table.rows) == 3
+
+  def test_truncation_preserves_rich_markup_style(self):
+    """Truncation of Rich markup strings preserves styling on visible text."""
+    table = create_table(columns=["Status"])
+    # Markup string: display text is "active" (6 chars), but raw string is much longer
+    markup = "[memory.status.active]active[/memory.status.active]"
+    add_row_with_truncation(table, [markup], max_widths={0: 10})
+    assert len(table.rows) == 1
+    # Render and verify "active" appears without markup corruption
+    output = render_table(table)
+    assert "active" in output
+    assert "[memory" not in output  # no leaked markup tags
+
+  def test_truncation_of_long_markup_adds_ellipsis(self):
+    """Long display text with markup is truncated with ellipsis."""
+    table = create_table(columns=["Name"])
+    markup = "[bold]This is a very long name that should be truncated[/bold]"
+    add_row_with_truncation(table, [markup], max_widths={0: 15})
+    assert len(table.rows) == 1
+    output = render_table(table)
+    assert "..." in output
+    # Full text should not appear
+    assert "truncated" not in output
+
+  def test_short_markup_not_truncated(self):
+    """Markup string whose display text fits within max_width is not truncated."""
+    table = create_table(columns=["Status"])
+    markup = "[bold]OK[/bold]"
+    add_row_with_truncation(table, [markup], max_widths={0: 10})
+    output = render_table(table)
+    assert "OK" in output
+    assert "..." not in output
+
+  def test_plain_text_truncation_still_works(self):
+    """Plain strings (no markup) are still truncated correctly."""
+    table = create_table(columns=["Name"])
+    add_row_with_truncation(
+      table,
+      ["A very long plain text string"],
+      max_widths={0: 12},
+    )
+    output = render_table(table)
+    assert "..." in output
+    assert "A very long plain text string" not in output
+
+  def test_truncation_max_width_lte_3(self):
+    """Edge case: max_width <= 3 truncates without ellipsis."""
+    table = create_table(columns=["X"])
+    add_row_with_truncation(
+      table,
+      ["[bold]Hello World[/bold]"],
+      max_widths={0: 3},
+    )
+    output = render_table(table)
+    # Should truncate to 3 visible chars, no ellipsis
+    assert "..." not in output
+    assert "World" not in output
+
+  def test_mixed_markup_and_plain_row(self):
+    """Row with mixed markup and plain text columns truncates correctly."""
+    table = create_table(columns=["ID", "Status", "Name"])
+    row = [
+      "[spec.id]SPEC-042[/spec.id]",
+      "[spec.status.draft]draft[/spec.status.draft]",
+      "A plain name column that is quite long",
+    ]
+    max_widths = {0: 10, 1: 10, 2: 12}
+    add_row_with_truncation(table, row, max_widths=max_widths)
+    output = render_table(table)
+    assert "SPEC-042" in output
+    assert "draft" in output
+    assert "..." in output  # the long name column gets truncated
+    assert "[spec" not in output  # no leaked markup
+
+  def test_empty_string_not_truncated(self):
+    """Empty string is handled without error."""
+    table = create_table(columns=["X"])
+    add_row_with_truncation(table, [""], max_widths={0: 10})
+    assert len(table.rows) == 1
 
 
 class TestTableRendering:

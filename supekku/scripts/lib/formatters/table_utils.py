@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any
 from rich import box
 from rich.console import Console
 from rich.table import Table
+from rich.text import Text
 
 from supekku.scripts.lib.formatters.theme import SPEC_DRIVER_THEME
 
@@ -70,25 +71,6 @@ def calculate_column_widths(
   return dict.fromkeys(range(num_columns), col_width)
 
 
-def truncate_text(text: str, max_width: int, suffix: str = "...") -> str:
-  """Truncate text to maximum width with ellipsis.
-
-  Args:
-    text: Text to truncate
-    max_width: Maximum width (including suffix)
-    suffix: Suffix to append if truncated (default: "...")
-
-  Returns:
-    Truncated text with suffix if needed, or original if within width
-  """
-  if len(text) <= max_width:
-    return text
-
-  if max_width <= len(suffix):
-    return suffix[:max_width]
-
-  return text[: max_width - len(suffix)] + suffix
-
 
 def create_table(
   columns: Sequence[str],
@@ -127,11 +109,16 @@ def add_row_with_truncation(
   max_widths: dict[int, int] | None = None,
   no_truncate: bool = False,
 ) -> None:
-  """Add a row to the table with optional smart truncation.
+  """Add a row to the table with optional markup-aware truncation.
+
+  Uses ``rich.text.Text.from_markup()`` to measure display width (visible
+  characters only), so Rich markup tags are never counted toward the width
+  budget.  Truncated ``Text`` objects preserve styling on the remaining
+  characters.
 
   Args:
     table: Rich Table instance
-    row_data: Data for each column
+    row_data: Data for each column (may contain Rich markup)
     max_widths: Dictionary mapping column index to max width
     no_truncate: If True, don't truncate any fields
   """
@@ -139,10 +126,16 @@ def add_row_with_truncation(
     table.add_row(*row_data)
     return
 
-  truncated = []
+  truncated: list[Text] = []
   for i, value in enumerate(row_data):
     max_width = max_widths.get(i, 40)  # Default to 40 if not specified
-    truncated.append(truncate_text(value, max_width))
+    text = Text.from_markup(value)
+    if max_width <= 3:
+      text.truncate(max_width)
+    elif len(text) > max_width:
+      text.truncate(max_width - 3)
+      text.append("...")
+    truncated.append(text)
 
   table.add_row(*truncated)
 

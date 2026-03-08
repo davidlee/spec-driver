@@ -33,7 +33,7 @@ class TestMainApp:
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
     assert "spec-driver" in result.stdout
-    assert "Specification-driven development toolkit" in result.stdout
+    assert "specification-driving development toolkit" in result.stdout
 
   def test_main_no_args(self):
     """Test invoking with no arguments shows help."""

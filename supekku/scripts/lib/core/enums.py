@@ -33,6 +33,7 @@ from supekku.scripts.lib.requirements.lifecycle import (
 def _change_statuses() -> list[str]:
   return sorted(s for s in CHANGE_STATUSES if s != "complete")
 
+
 ENUM_REGISTRY: dict[str, Callable[[], list[str]]] = {
   # From lifecycle constants
   "delta.status": _change_statuses,

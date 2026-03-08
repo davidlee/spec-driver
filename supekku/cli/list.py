@@ -1416,7 +1416,10 @@ def list_revisions(
     # Sort and format
     revisions.sort(key=lambda r: r.id)
     output = format_change_list_table(
-      revisions, format_type, not truncate, show_external=external,
+      revisions,
+      format_type,
+      not truncate,
+      show_external=external,
     )
     typer.echo(output)
 

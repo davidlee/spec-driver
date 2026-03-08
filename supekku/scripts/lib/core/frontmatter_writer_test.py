@@ -42,9 +42,7 @@ class TestUpdateFrontmatterStatus:
     f = tmp_path / "DE-001.md"
     f.write_text(SAMPLE_FRONTMATTER, encoding="utf-8")
 
-    with patch(
-      "supekku.scripts.lib.core.frontmatter_writer.date"
-    ) as mock_date:
+    with patch("supekku.scripts.lib.core.frontmatter_writer.date") as mock_date:
       mock_date.today.return_value = date(2026, 3, 8)
       mock_date.side_effect = lambda *a, **kw: date(*a, **kw)
       update_frontmatter_status(f, "completed")

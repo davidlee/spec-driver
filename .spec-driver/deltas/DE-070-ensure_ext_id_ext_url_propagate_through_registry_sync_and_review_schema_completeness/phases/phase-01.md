@@ -4,7 +4,7 @@ slug: 070-registry-sync-and-schema
 name: IP-070 Phase 01 - Registry sync and schema completeness
 created: '2026-03-08'
 updated: '2026-03-08'
-status: in-progress
+status: complete
 kind: phase
 ---
 
@@ -95,6 +95,6 @@ other model ↔ schema field parity gaps.
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Hand-off notes to close-change
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (VT: 9 tests, VA: parity audit in notes.md)
+- [x] Hand-off notes to close-change

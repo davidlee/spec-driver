@@ -6249,7 +6249,7 @@ deltas:
     status: in-progress
     name: Delta - Tighten skill routing and boot-time workflow guidance
     slug: tighten_skill_routing_and_boot_time_workflow_guidance
-    updated: '2026-03-07'
+    updated: '2026-03-08'
     path: .spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/DE-055.md
     applies_to:
       specs:
@@ -6309,6 +6309,7 @@ deltas:
         - id: IP-055.PHASE-11
           name: Define configurable commit guidance for .spec-driver files
           status: completed
+        - id: IP-055.PHASE-12
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -6660,6 +6661,19 @@ deltas:
           mitigation: Keep the new structure narrowly tied to DR authoring and defer
             broader generalisation until shape-revision or another skill proves it
             out
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-055.PHASE-12
+        plan: IP-055
+        delta: DE-055
+        objective: None
+        entrance_criteria: []
+        exit_criteria: []
+        verification:
+          tests: []
+          evidence: []
+        tasks: []
+        risks: []
       - id: IP-055.PHASE-10
         name: Improve memory retrieval and capture workflow guidance
         status: completed
@@ -7863,7 +7877,7 @@ deltas:
         risks: []
   DE-068:
     kind: delta
-    status: draft
+    status: in-progress
     name: Delta - edit command --status flag for programmatic status updates
     slug: edit_command_status_flag_for_programmatic_status_updates
     updated: '2026-03-08'
@@ -7962,7 +7976,9 @@ deltas:
     updated: '2026-03-08'
     path: .spec-driver/deltas/DE-069-complete_formatter_migration_to_format_list_table_generic_helper/DE-069.md
     applies_to:
-      specs: []
+      specs:
+      - SPEC-120
+      - SPEC-146
       requirements: []
     plan:
       id: IP-069
@@ -7972,15 +7988,142 @@ deltas:
         plan: IP-069
         delta: DE-069
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-069
         specs:
-          primary: []
+          primary:
+          - SPEC-120
+          - SPEC-146
           collaborators: []
         requirements:
           targets: []
           dependencies: []
         phases:
-        - id: IP-069-P01
+        - id: IP-069.PHASE-01
+        - id: IP-069.PHASE-02
       phases:
-      - id: IP-069-P01
-        phase: IP-069-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-069.PHASE-01
+        plan: IP-069
+        delta: DE-069
+        objective: Create cell_helpers module, add governance_5col_widths to table_utils,
+          eliminate no_truncate param, and backport helpers into already-migrated
+          formatters.
+        entrance_criteria:
+        - DR-069 approved
+        exit_criteria:
+        - cell_helpers.py exists with format_tags_cell and format_date_cell
+        - cell_helpers_test.py passes with edge case coverage
+        - governance_5col_widths in table_utils.py
+        - no_truncate removed from add_row_with_truncation
+        - PACKAGES_COLUMN added to column_defs.py
+        - 4 already-migrated formatters (decision, policy, standard, memory) use cell_helpers
+        - 3 governance formatters (decision, policy, standard) use governance_5col_widths
+        - grep -r no_truncate supekku/ returns zero hits
+        - just check passes
+        verification:
+          tests:
+          - cell_helpers_test.py
+          - decision_formatters_test.py
+          - policy_formatters_test.py
+          - standard_formatters_test.py
+          - memory_formatters_test.py
+          - table_utils_test.py
+          evidence:
+          - VT-069-cell-helpers
+          - VA-069-no-truncate
+        tasks:
+        - id: '1.1'
+          summary: Create cell_helpers.py + tests
+        - id: '1.2'
+          summary: Add governance_5col_widths to table_utils.py
+        - id: '1.3'
+          summary: Remove no_truncate from add_row_with_truncation + fix tests and
+            CLI
+        - id: '1.4'
+          summary: Add PACKAGES_COLUMN to column_defs.py
+        - id: '1.5'
+          summary: Backport cell_helpers into decision_formatters
+        - id: '1.6'
+          summary: Backport cell_helpers + governance_5col_widths into policy_formatters
+        - id: '1.7'
+          summary: Backport cell_helpers + governance_5col_widths into standard_formatters
+        - id: '1.8'
+          summary: Backport cell_helpers into memory_formatters
+        risks: []
+      - id: IP-069.PHASE-02
+        phase: IP-069.PHASE-02
+  DE-070:
+    kind: delta
+    status: completed
+    name: ext_id/ext_url registry sync and schema completeness review
+    slug: ext_id_registry_sync_and_schema_review
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-070-ensure_ext_id_ext_url_propagate_through_registry_sync_and_review_schema_completeness/DE-070.md
+    applies_to:
+      specs:
+      - SPEC-116
+      requirements: []
+    relations:
+    - type: follows
+      target: DE-067
+      attributes: {}
+    plan:
+      id: IP-070
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-070
+        delta: DE-070
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-116
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-070-P01
+        - id: IP-070.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-070.PHASE-01
+        plan: IP-070
+        delta: DE-070
+        objective: Add ext_id/ext_url to registry YAML serialization for requirements,
+          policies, and standards. Add ext_id/ext_url to base frontmatter schema.
+          Audit model vs schema field parity.
+        entrance_criteria:
+        - DE-067 complete
+        exit_criteria:
+        - RequirementRecord.to_dict() includes ext_id/ext_url
+        - PolicyRecord.to_dict() includes ext_id/ext_url
+        - StandardRecord.to_dict() includes ext_id/ext_url
+        - Base frontmatter schema includes ext_id/ext_url
+        - schema show output reflects ext_id/ext_url
+        - Model vs schema parity audit complete (VA)
+        - Tests pass, just check green
+        verification:
+          tests:
+          - VT-070-001
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Add ext_id/ext_url to RequirementRecord.to_dict()
+        - id: '1.2'
+          description: Add ext_id/ext_url to PolicyRecord.to_dict()
+        - id: '1.3'
+          description: Add ext_id/ext_url to StandardRecord.to_dict()
+        - id: '1.4'
+          description: Add ext_id/ext_url to BASE_FRONTMATTER_METADATA
+        - id: '1.5'
+          description: Audit model vs schema field parity across all types
+        - id: '1.6'
+          description: Write tests
+        risks: []
+      - id: IP-070-P01
+        phase: IP-070-P01

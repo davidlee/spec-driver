@@ -108,13 +108,14 @@ categories follow in Phase 2.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Model: DiagnosticResult, CategorySummary, severity helpers | | Foundation — do first |
-| [ ] | 1.2 | Runner: run_checks orchestrator with CHECK_REGISTRY | | Depends on 1.1 |
-| [ ] | 1.3a | Check: deps (python, git, node, ts-doc-extract) | [P] | After 1.1 |
-| [ ] | 1.3b | Check: structure (directories, orphan bundles) | [P] | After 1.1 |
-| [ ] | 1.4 | Formatter: format_doctor_text, format_doctor_json stub | | After 1.1 |
-| [ ] | 1.5 | CLI: wire `workspace doctor` command | | After 1.2 + 1.4 |
-| [ ] | 1.6 | Lint + test pass | | Final gate |
+| [x] | 1.1 | Model: DiagnosticResult, CategorySummary, severity helpers | | 14 tests |
+| [x] | 1.2 | Runner: run_checks orchestrator with CHECK_REGISTRY | | 8 tests |
+| [x] | 1.3a | Check: deps (python, git, go, gomarkdoc, zig, zigmarkdoc, node, ts-doc-extract) | [P] | 11 tests; expanded per user request |
+| [x] | 1.3b | Check: structure (directories, orphan bundles) | [P] | 8 tests |
+| [x] | 1.3c | Check: config (workflow.toml, CLAUDE.md, skills allowlist, skills exposure) | [P] | 8 tests; pulled forward from P2 |
+| [x] | 1.4 | Formatter: format_doctor_text, format_doctor_json | | 13 tests; both fully implemented |
+| [x] | 1.5 | CLI: wire top-level `doctor` command | | --check, --json, --verbose, --root |
+| [x] | 1.6 | Lint + test pass | | 3120 pass, 2 pre-existing fail |
 
 ### Task Details
 

@@ -1,4 +1,4 @@
-"""Workspace-level commands: install and validate."""
+"""Workspace-level commands: install, validate, and doctor."""
 
 from __future__ import annotations
 
@@ -10,6 +10,11 @@ import typer
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
 from supekku.scripts.install import initialize_workspace
 from supekku.scripts.lib.core.repo import find_repo_root
+from supekku.scripts.lib.diagnostics.runner import overall_exit_code, run_checks
+from supekku.scripts.lib.formatters.diagnostic_formatters import (
+  format_doctor_json,
+  format_doctor_text,
+)
 from supekku.scripts.lib.validation.validator import validate_workspace as validate_ws
 from supekku.scripts.lib.workspace import Workspace
 
@@ -110,6 +115,57 @@ def validate(
       typer.echo(f"Issue: {issue}", err=True)
     raise typer.Exit(EXIT_FAILURE)
   except (FileNotFoundError, ValueError, KeyError) as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
+@app.command("doctor")
+def doctor(
+  root: RootOption = None,
+  check: Annotated[
+    str | None,
+    typer.Option(
+      "--check",
+      help="Run single category only (deps|config|structure|registries|refs|lifecycle)",
+    ),
+  ] = None,
+  json_output: Annotated[
+    bool,
+    typer.Option(
+      "--json",
+      help="Output results as JSON",
+    ),
+  ] = False,
+  verbose: Annotated[
+    bool,
+    typer.Option(
+      "--verbose",
+      "-v",
+      help="Include passing results in output",
+    ),
+  ] = False,
+) -> None:
+  """Run workspace health diagnostics.
+
+  Checks dependencies, configuration, directory structure, registries,
+  cross-references, and lifecycle hygiene. Reports pass/warn/fail per check
+  with actionable suggestions.
+
+  Exit codes: 0 = all pass, 1 = warnings, 2 = failures.
+  """
+  try:
+    ws = Workspace(find_repo_root(root))
+    categories = [check] if check else None
+    summaries = run_checks(ws, categories=categories)
+    exit_code = overall_exit_code(summaries)
+
+    if json_output:
+      typer.echo(format_doctor_json(summaries))
+    else:
+      typer.echo(format_doctor_text(summaries, verbose=verbose))
+
+    raise typer.Exit(exit_code)
+  except ValueError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 

@@ -46,7 +46,7 @@ click.Command.invoke = _tracking_invoke  # type: ignore[assignment]
 # Main Typer application
 app = typer.Typer(
   name="spec-driver",
-  help="Specification-driven development toolkit with multi-language spec sync",
+  help="The specification-driving development toolkit.",
   no_args_is_help=True,
 )
 
@@ -85,6 +85,11 @@ app.command(
   "validate",
   help="Validate workspace metadata and relationships",
 )(workspace.validate)
+
+app.command(
+  "doctor",
+  help="Run workspace health diagnostics",
+)(workspace.doctor)
 
 app.command(
   "sync",

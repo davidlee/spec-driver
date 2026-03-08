@@ -1,0 +1,27 @@
+"""Check category registry for workspace diagnostics."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from .config import check_config
+from .deps import check_deps
+from .structure import check_structure
+
+if TYPE_CHECKING:
+  from collections.abc import Callable
+
+  from supekku.scripts.lib.diagnostics.models import DiagnosticResult
+  from supekku.scripts.lib.workspace import Workspace
+
+  CheckFn = Callable[[Workspace], list[DiagnosticResult]]
+
+# Ordered registry of check categories.
+# Runner iterates this in order; --check filters by key.
+CHECK_REGISTRY: dict[str, CheckFn] = {
+  "deps": check_deps,
+  "config": check_config,
+  "structure": check_structure,
+}
+
+__all__ = ["CHECK_REGISTRY"]

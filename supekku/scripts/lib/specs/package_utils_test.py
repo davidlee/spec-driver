@@ -35,6 +35,7 @@ KNOWN_LEAF_PACKAGES = {
   "supekku/scripts/lib/contracts",
   "supekku/scripts/lib/core/frontmatter_metadata",
   "supekku/scripts/lib/decisions",
+  "supekku/scripts/lib/drift",
   "supekku/scripts/lib/deletion",
   "supekku/scripts/lib/diagnostics/checks",
   "supekku/scripts/lib/docs/python",

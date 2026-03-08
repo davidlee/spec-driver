@@ -635,9 +635,9 @@ class ShowNewSubcommandsTest(unittest.TestCase):
     assert result.exit_code == 1
 
   def test_show_problem_default(self) -> None:
-    result = self.runner.invoke(app, ["problem", "PROB-001"])
+    result = self.runner.invoke(app, ["problem", "PROB-002"])
     assert result.exit_code == 0, f"Failed: {result.stderr}"
-    assert "PROB-001" in result.stdout
+    assert "PROB-002" in result.stdout
 
   def test_show_improvement_default(self) -> None:
     result = self.runner.invoke(app, ["improvement", "IMPR-001"])

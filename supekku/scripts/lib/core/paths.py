@@ -30,6 +30,7 @@ REVISIONS_SUBDIR = "revisions"
 AUDITS_SUBDIR = "audits"
 
 BACKLOG_DIR = "backlog"
+DRIFT_SUBDIR = "drift"
 MEMORY_DIR = "memory"
 
 # --- Subdirectories within backlog/ ---
@@ -43,6 +44,7 @@ RISKS_SUBDIR = "risks"
 
 _CONFIG_KEY_TO_CONSTANT: dict[str, str] = {
   "backlog": "BACKLOG_DIR",
+  "drift": "DRIFT_SUBDIR",
   "memory": "MEMORY_DIR",
   "tech_specs": "TECH_SPECS_SUBDIR",
   "product_specs": "PRODUCT_SPECS_SUBDIR",
@@ -177,6 +179,11 @@ def get_backlog_dir(repo_root: Path | None = None) -> Path:
   return get_spec_driver_root(repo_root) / BACKLOG_DIR
 
 
+def get_drift_dir(repo_root: Path | None = None) -> Path:
+  """Get the drift ledgers directory."""
+  return get_spec_driver_root(repo_root) / DRIFT_SUBDIR
+
+
 def get_memory_dir(repo_root: Path | None = None) -> Path:
   """Get the memory directory."""
   return get_spec_driver_root(repo_root) / MEMORY_DIR
@@ -192,6 +199,7 @@ __all__ = [
   "BACKLOG_DIR",
   "DECISIONS_SUBDIR",
   "DELTAS_SUBDIR",
+  "DRIFT_SUBDIR",
   "IMPROVEMENTS_SUBDIR",
   "ISSUES_SUBDIR",
   "MEMORY_DIR",
@@ -209,6 +217,7 @@ __all__ = [
   "get_backlog_dir",
   "get_decisions_dir",
   "get_deltas_dir",
+  "get_drift_dir",
   "get_memory_dir",
   "get_package_skills_dir",
   "get_policies_dir",

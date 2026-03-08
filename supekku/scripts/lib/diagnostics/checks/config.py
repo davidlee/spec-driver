@@ -129,35 +129,35 @@ def _check_agents_dir(sd_root: Path) -> DiagnosticResult:
   )
 
 
-def _check_skills_exposure(
-  root: Path, sd_root: Path
-) -> list[DiagnosticResult]:
+def _check_skills_exposure(root: Path, sd_root: Path) -> list[DiagnosticResult]:
   """Check skill symlinks for each agent target."""
   results: list[DiagnosticResult] = []
   canonical = sd_root / "skills"
   if not canonical.is_dir():
-    results.append(DiagnosticResult(
-      category=CATEGORY,
-      name="skills-canonical",
-      status="warn",
-      message="canonical skills dir missing",
-      suggestion="Run: spec-driver skills sync",
-    ))
+    results.append(
+      DiagnosticResult(
+        category=CATEGORY,
+        name="skills-canonical",
+        status="warn",
+        message="canonical skills dir missing",
+        suggestion="Run: spec-driver skills sync",
+      )
+    )
     return results
 
   # Installed skill names from canonical dir
   installed = sorted(
-    d.name
-    for d in canonical.iterdir()
-    if d.is_dir() and (d / "SKILL.md").is_file()
+    d.name for d in canonical.iterdir() if d.is_dir() and (d / "SKILL.md").is_file()
   )
 
-  results.append(DiagnosticResult(
-    category=CATEGORY,
-    name="skills-installed",
-    status="pass",
-    message=f"{len(installed)} skills installed",
-  ))
+  results.append(
+    DiagnosticResult(
+      category=CATEGORY,
+      name="skills-installed",
+      status="pass",
+      message=f"{len(installed)} skills installed",
+    )
+  )
 
   # Check each agent target
   target_dirs = {
@@ -166,39 +166,42 @@ def _check_skills_exposure(
   }
   for target, target_dir in target_dirs.items():
     if not target_dir.is_dir():
-      results.append(DiagnosticResult(
-        category=CATEGORY,
-        name=f"skills-{target}",
-        status="warn",
-        message=f"{target} skills dir missing",
-        suggestion="Run: spec-driver skills sync",
-      ))
+      results.append(
+        DiagnosticResult(
+          category=CATEGORY,
+          name=f"skills-{target}",
+          status="warn",
+          message=f"{target} skills dir missing",
+          suggestion="Run: spec-driver skills sync",
+        )
+      )
       continue
 
     exposed = sorted(
-      d.name
-      for d in target_dir.iterdir()
-      if d.is_dir() and (d / "SKILL.md").is_file()
+      d.name for d in target_dir.iterdir() if d.is_dir() and (d / "SKILL.md").is_file()
     )
     skipped = sorted(set(installed) - set(exposed))
 
     if skipped:
-      results.append(DiagnosticResult(
-        category=CATEGORY,
-        name=f"skills-{target}",
-        status="warn",
-        message=(
-          f"{len(exposed)} exposed, "
-          f"{len(skipped)} skipped: {', '.join(skipped)}"
-        ),
-        suggestion="Run: spec-driver skills sync",
-      ))
+      results.append(
+        DiagnosticResult(
+          category=CATEGORY,
+          name=f"skills-{target}",
+          status="warn",
+          message=(
+            f"{len(exposed)} exposed, {len(skipped)} skipped: {', '.join(skipped)}"
+          ),
+          suggestion="Run: spec-driver skills sync",
+        )
+      )
     else:
-      results.append(DiagnosticResult(
-        category=CATEGORY,
-        name=f"skills-{target}",
-        status="pass",
-        message=f"{len(exposed)} skills exposed to {target}",
-      ))
+      results.append(
+        DiagnosticResult(
+          category=CATEGORY,
+          name=f"skills-{target}",
+          status="pass",
+          message=f"{len(exposed)} skills exposed to {target}",
+        )
+      )
 
   return results

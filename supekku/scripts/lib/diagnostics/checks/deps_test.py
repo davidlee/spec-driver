@@ -17,10 +17,14 @@ class _FakeWorkspace:
 
 
 _ALL_DEP_NAMES = {
-  "python", "git",
-  "go", "gomarkdoc",
-  "zig", "zigmarkdoc",
-  "node", "ts-doc-extract",
+  "python",
+  "git",
+  "go",
+  "gomarkdoc",
+  "zig",
+  "zigmarkdoc",
+  "node",
+  "ts-doc-extract",
 }
 
 
@@ -29,12 +33,9 @@ class TestCheckDeps(unittest.TestCase):
 
   def _run_with_all_available(self) -> list:
     with (
+      patch("supekku.scripts.lib.diagnostics.checks.deps.which") as mock_which,
       patch(
-        "supekku.scripts.lib.diagnostics.checks.deps.which"
-      ) as mock_which,
-      patch(
-        "supekku.scripts.lib.diagnostics.checks.deps."
-        "is_npm_package_available",
+        "supekku.scripts.lib.diagnostics.checks.deps.is_npm_package_available",
         return_value=True,
       ),
     ):
@@ -74,8 +75,7 @@ class TestCheckDeps(unittest.TestCase):
         side_effect=selective_which,
       ),
       patch(
-        "supekku.scripts.lib.diagnostics.checks.deps."
-        "is_npm_package_available",
+        "supekku.scripts.lib.diagnostics.checks.deps.is_npm_package_available",
         return_value=False,
       ),
     ):
@@ -93,8 +93,7 @@ class TestCheckDeps(unittest.TestCase):
         return_value=None,
       ),
       patch(
-        "supekku.scripts.lib.diagnostics.checks.deps."
-        "is_npm_package_available",
+        "supekku.scripts.lib.diagnostics.checks.deps.is_npm_package_available",
         return_value=False,
       ),
     ):
@@ -112,8 +111,7 @@ class TestCheckDeps(unittest.TestCase):
         return_value=None,
       ),
       patch(
-        "supekku.scripts.lib.diagnostics.checks.deps."
-        "is_npm_package_available",
+        "supekku.scripts.lib.diagnostics.checks.deps.is_npm_package_available",
         return_value=False,
       ),
     ):
@@ -131,8 +129,7 @@ class TestCheckDeps(unittest.TestCase):
         return_value=None,
       ),
       patch(
-        "supekku.scripts.lib.diagnostics.checks.deps."
-        "is_npm_package_available",
+        "supekku.scripts.lib.diagnostics.checks.deps.is_npm_package_available",
         return_value=False,
       ),
     ):
@@ -150,8 +147,7 @@ class TestCheckDeps(unittest.TestCase):
         return_value=None,
       ),
       patch(
-        "supekku.scripts.lib.diagnostics.checks.deps."
-        "is_npm_package_available",
+        "supekku.scripts.lib.diagnostics.checks.deps.is_npm_package_available",
         return_value=False,
       ),
     ):
@@ -169,8 +165,7 @@ class TestCheckDeps(unittest.TestCase):
         return_value=None,
       ),
       patch(
-        "supekku.scripts.lib.diagnostics.checks.deps."
-        "is_npm_package_available",
+        "supekku.scripts.lib.diagnostics.checks.deps.is_npm_package_available",
         return_value=False,
       ),
     ):
@@ -188,8 +183,7 @@ class TestCheckDeps(unittest.TestCase):
         return_value="/usr/bin/x",
       ),
       patch(
-        "supekku.scripts.lib.diagnostics.checks.deps."
-        "is_npm_package_available",
+        "supekku.scripts.lib.diagnostics.checks.deps.is_npm_package_available",
         return_value=False,
       ),
     ):

@@ -22,8 +22,13 @@ def _make_workspace(tmp_path: Path) -> _FakeWorkspace:
   """Create a minimal valid workspace structure."""
   sd = tmp_path / ".spec-driver"
   for subdir in (
-    "tech", "deltas", "decisions",
-    "backlog", "memory", "registry", "templates",
+    "tech",
+    "deltas",
+    "decisions",
+    "backlog",
+    "memory",
+    "registry",
+    "templates",
   ):
     (sd / subdir).mkdir(parents=True)
   return _FakeWorkspace(root=tmp_path)
@@ -57,7 +62,11 @@ class TestCheckStructure(unittest.TestCase):
       root = Path(td)
       sd = root / ".spec-driver"
       for subdir in (
-        "tech", "decisions", "backlog", "memory", "registry",
+        "tech",
+        "decisions",
+        "backlog",
+        "memory",
+        "registry",
       ):
         (sd / subdir).mkdir(parents=True)
       # Missing: deltas, templates

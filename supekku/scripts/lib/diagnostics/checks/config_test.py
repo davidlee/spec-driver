@@ -128,8 +128,9 @@ class TestCheckConfig(unittest.TestCase):
       ws = _FakeWorkspace(root=root)
       results = check_config(ws)
       target_results = [
-        r for r in results if r.name.startswith("skills-claude")
-        or r.name.startswith("skills-codex")
+        r
+        for r in results
+        if r.name.startswith("skills-claude") or r.name.startswith("skills-codex")
       ]
       assert all(r.status == "warn" for r in target_results)
 

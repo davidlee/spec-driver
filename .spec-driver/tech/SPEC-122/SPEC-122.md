@@ -102,7 +102,7 @@ capabilities:
       with lifecycle tracking (status, introduced, implemented_by, verified_by).
     success_criteria:
       - UID format is SPEC-ID.LABEL (e.g., SPEC-110.FR-001)
-      - Status values limited to: pending, in-progress, active, retired
+      - Status values limited to: pending, in-progress, active, retired, deprecated, superseded
       - Merge operation preserves lifecycle fields from existing record
       - Round-trip serialization maintains all fields
 
@@ -243,7 +243,7 @@ capabilities:
   - id: status-management
     name: Status Management
     responsibilities:
-      - Define valid requirement statuses (pending, in-progress, active, retired)
+      - Define valid requirement statuses (pending, in-progress, active, retired, deprecated, superseded)
       - Validate status transitions
       - Update requirement status with validation
       - Prevent invalid status values
@@ -303,6 +303,30 @@ entries:
     notes: |
       supekku/scripts/lib/requirements/lifecycle.py
       Defines status constants and VALID_STATUSES set for validation
+
+  - artefact: VT-081-001
+    kind: VT
+    requirement: SPEC-122.NF-002
+    status: verified
+    notes: |
+      registry_test.py::TestCoverageReplacementSemantics
+      Coverage replacement semantics, sync idempotency, removed block clears evidence (DE-081)
+
+  - artefact: VT-081-002
+    kind: VT
+    requirement: SPEC-122.FR-002
+    status: verified
+    notes: |
+      registry_test.py::TestTerminalStatusGuard
+      deprecated/superseded lifecycle statuses, terminal status guard (DE-081)
+
+  - artefact: VT-081-003
+    kind: VT
+    requirement: SPEC-122.FR-004
+    status: verified
+    notes: |
+      registry_test.py::TestInlineRequirementTags
+      Inline [tag] extraction, save/load round-trip, filter(tag=...) (DE-081)
 ```
 
 ## 1. Intent & Summary
@@ -366,7 +390,7 @@ The package provides three layers:
 ### Functional Requirements
 
 - **FR-001**: Define RequirementRecord dataclass with uid, label, title, specs, primary_spec, kind, status, introduced, implemented_by, verified_by, path fields
-- **FR-002**: Support requirement status values: pending, in-progress, active, retired
+- **FR-002**: Support requirement status values: pending, in-progress, active, retired, deprecated, superseded, deprecated, superseded
 - **FR-003**: Load and save requirements registry at `.spec-driver/registry/requirements.yaml`
 - **FR-004**: Extract requirements from spec markdown using pattern `- FR-NNN: Title` (case-insensitive, bold/italic tolerant)
 - **FR-005**: Parse structured spec.relationships blocks for explicit requirement lists (primary, collaborators)

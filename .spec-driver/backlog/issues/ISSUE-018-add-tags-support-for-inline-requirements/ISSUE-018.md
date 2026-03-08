@@ -3,7 +3,7 @@ id: ISSUE-018
 name: Add tags support for inline requirements
 created: '2025-11-04'
 updated: '2026-03-09'
-status: in-progress
+status: resolved
 kind: issue
 categories:
   - feature_gap

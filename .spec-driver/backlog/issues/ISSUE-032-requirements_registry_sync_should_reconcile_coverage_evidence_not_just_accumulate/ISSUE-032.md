@@ -3,7 +3,7 @@ id: ISSUE-032
 name: Requirements registry sync should reconcile coverage_evidence, not just accumulate
 created: '2026-03-03'
 updated: '2026-03-09'
-status: in-progress
+status: resolved
 kind: issue
 categories: []
 severity: p2

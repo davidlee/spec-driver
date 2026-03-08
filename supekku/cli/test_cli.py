@@ -78,15 +78,16 @@ class TestWorkspaceCommands:
       assert (workspace / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).exists()
       assert (workspace / ".spec-driver" / "registry").exists()
 
-      # Verify backlog structure
-      assert (workspace / BACKLOG_DIR / IMPROVEMENTS_SUBDIR).exists()
-      assert (workspace / BACKLOG_DIR / ISSUES_SUBDIR).exists()
-      assert (workspace / BACKLOG_DIR / PROBLEMS_SUBDIR).exists()
-      assert (workspace / BACKLOG_DIR / RISKS_SUBDIR).exists()
-      assert (workspace / BACKLOG_DIR / "backlog.md").exists()
+      # Verify backlog structure (under .spec-driver/)
+      backlog = workspace / SPEC_DRIVER_DIR / BACKLOG_DIR
+      assert (backlog / IMPROVEMENTS_SUBDIR).exists()
+      assert (backlog / ISSUES_SUBDIR).exists()
+      assert (backlog / PROBLEMS_SUBDIR).exists()
+      assert (backlog / RISKS_SUBDIR).exists()
+      assert (backlog / "backlog.md").exists()
 
       # Verify backlog.md content
-      backlog_content = (workspace / BACKLOG_DIR / "backlog.md").read_text()
+      backlog_content = (backlog / "backlog.md").read_text()
       assert "# Backlog" in backlog_content
       assert "improvements/" in backlog_content
 

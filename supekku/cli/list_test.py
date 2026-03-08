@@ -675,6 +675,138 @@ class ListSpecsCategoryFilterTest(unittest.TestCase):
     assert "SPEC-001" not in result.stdout  # kind=product excludes tech
 
 
+class ListBacklogSeverityFilterTest(unittest.TestCase):
+  """Test cases for --severity filter on backlog list commands (VT-DE-074)."""
+
+  def setUp(self) -> None:
+    """Set up test environment with backlog entries at different severities."""
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+
+    self._create_item("issue", "ISSUE-001", "Critical bug", "open", "p1")
+    self._create_item("issue", "ISSUE-002", "Minor bug", "open", "p2")
+    self._create_item("issue", "ISSUE-003", "Resolved bug", "resolved", "p1")
+    self._create_item("problem", "PROB-001", "Urgent problem", "captured", "p1")
+    self._create_item("problem", "PROB-002", "Low problem", "captured", "p3")
+    self._create_item("improvement", "IMPR-001", "Critical improvement", "idea", "p1")
+    self._create_item("improvement", "IMPR-002", "Nice-to-have", "idea", "p3")
+    self._create_item("risk", "RISK-001", "High risk", "identified", "p1")
+    self._create_item("risk", "RISK-002", "Low risk", "identified", "p2")
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_item(
+    self, kind: str, item_id: str, title: str, status: str, severity: str
+  ) -> None:
+    kind_subdir = {
+      "issue": ISSUES_SUBDIR,
+      "problem": PROBLEMS_SUBDIR,
+      "improvement": IMPROVEMENTS_SUBDIR,
+      "risk": RISKS_SUBDIR,
+    }[kind]
+    item_dir = self.root / SPEC_DRIVER_DIR / BACKLOG_DIR / kind_subdir / item_id
+    item_dir.mkdir(parents=True, exist_ok=True)
+    content = f"""---
+id: {item_id}
+name: {title}
+kind: {kind}
+status: {status}
+severity: {severity}
+created: '2025-11-04'
+---
+
+# {item_id} - {title}
+"""
+    (item_dir / f"{item_id}.md").write_text(content, encoding="utf-8")
+
+  def test_list_backlog_severity_filter(self) -> None:
+    """--severity on list backlog filters to matching severity."""
+    result = self.runner.invoke(
+      app,
+      ["backlog", "--root", str(self.root), "--severity", "p1"],
+    )
+    assert result.exit_code == 0
+    assert "ISSUE-001" in result.stdout
+    assert "PROB-001" in result.stdout
+    assert "IMPR-001" in result.stdout
+    assert "RISK-001" in result.stdout
+    assert "ISSUE-002" not in result.stdout  # p2
+    assert "PROB-002" not in result.stdout  # p3
+
+  def test_list_issues_severity_filter(self) -> None:
+    """--severity on list issues filters correctly."""
+    result = self.runner.invoke(
+      app,
+      ["issues", "--root", str(self.root), "--severity", "p1"],
+    )
+    assert result.exit_code == 0
+    assert "ISSUE-001" in result.stdout
+    assert "ISSUE-002" not in result.stdout  # p2
+    assert "ISSUE-003" not in result.stdout  # resolved, excluded by default
+
+  def test_list_problems_severity_filter(self) -> None:
+    """--severity on list problems filters correctly."""
+    result = self.runner.invoke(
+      app,
+      ["problems", "--root", str(self.root), "--severity", "p1"],
+    )
+    assert result.exit_code == 0
+    assert "PROB-001" in result.stdout
+    assert "PROB-002" not in result.stdout  # p3
+
+  def test_list_improvements_severity_filter(self) -> None:
+    """--severity on list improvements filters correctly."""
+    result = self.runner.invoke(
+      app,
+      ["improvements", "--root", str(self.root), "--severity", "p1"],
+    )
+    assert result.exit_code == 0
+    assert "IMPR-001" in result.stdout
+    assert "IMPR-002" not in result.stdout  # p3
+
+  def test_list_risks_severity_filter(self) -> None:
+    """--severity on list risks filters correctly."""
+    result = self.runner.invoke(
+      app,
+      ["risks", "--root", str(self.root), "--severity", "p1"],
+    )
+    assert result.exit_code == 0
+    assert "RISK-001" in result.stdout
+    assert "RISK-002" not in result.stdout  # p2
+
+  def test_severity_filter_case_insensitive(self) -> None:
+    """--severity matching is case-insensitive."""
+    result = self.runner.invoke(
+      app,
+      ["issues", "--root", str(self.root), "--severity", "P1"],
+    )
+    assert result.exit_code == 0
+    assert "ISSUE-001" in result.stdout
+    assert "ISSUE-002" not in result.stdout
+
+  def test_severity_filter_no_matches(self) -> None:
+    """--severity with no matches returns empty."""
+    result = self.runner.invoke(
+      app,
+      ["issues", "--root", str(self.root), "--severity", "p0"],
+    )
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
+
+  def test_severity_combined_with_status(self) -> None:
+    """--severity combined with --status narrows results."""
+    result = self.runner.invoke(
+      app,
+      ["issues", "--root", str(self.root), "--severity", "p1", "--all"],
+    )
+    assert result.exit_code == 0
+    assert "ISSUE-001" in result.stdout
+    assert "ISSUE-003" in result.stdout  # p1 + resolved, shown because --all
+
+
 class BacklogPrioritizationTest(unittest.TestCase):
   """Test cases for backlog prioritization feature (VT-015-005).
 

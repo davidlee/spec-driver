@@ -160,10 +160,12 @@ class TestValidatePackagePath:
     with pytest.raises(ValueError, match="must be a directory"):
       validate_package_path(Path("README.md"))
 
-  def test_raises_for_directory_without_init(self) -> None:
+  def test_raises_for_directory_without_init(self, tmp_path: Path) -> None:
     """Test that directories without __init__.py raise ValueError."""
+    bare_dir = tmp_path / "no_init_pkg"
+    bare_dir.mkdir()
     with pytest.raises(ValueError, match="missing __init__.py"):
-      validate_package_path(Path("change/deltas"))
+      validate_package_path(bare_dir)
 
 
 class TestFindAllLeafPackages:

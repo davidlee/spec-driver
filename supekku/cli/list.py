@@ -1542,6 +1542,13 @@ def list_backlog(
       help="Substring filter on title (case-insensitive)",
     ),
   ] = None,
+  severity: Annotated[
+    str | None,
+    typer.Option(
+      "--severity",
+      help="Filter by severity (e.g. p1, p2, p3)",
+    ),
+  ] = None,
   json_output: Annotated[
     bool,
     typer.Option(
@@ -1600,6 +1607,7 @@ def list_backlog(
   By default, items are sorted by priority (registry order → severity → ID) and
   resolved/implemented items are excluded. Use --all to include all statuses.
   Use --order to sort by: id, severity, status, or kind.
+  Use --severity to filter by priority level (e.g. p1, p2, p3).
 
   Use --prioritize to open the filtered items in your editor for interactive reordering.
   After saving, the registry will be updated with your new ordering.
@@ -1651,6 +1659,9 @@ def list_backlog(
     # Apply filters
     if status:
       items = [i for i in items if i.status.lower() == status.lower()]
+    if severity:
+      sev_lower = severity.lower()
+      items = [i for i in items if i.severity.lower() == sev_lower]
     if substring:
       filter_lower = substring.lower()
       items = [i for i in items if filter_lower in i.title.lower()]
@@ -1817,6 +1828,13 @@ def list_issues(
     str | None,
     typer.Option("--status", "-s", help="Filter by status"),
   ] = None,
+  severity: Annotated[
+    str | None,
+    typer.Option(
+      "--severity",
+      help="Filter by severity (e.g. p1, p2, p3)",
+    ),
+  ] = None,
   substring: Annotated[
     str | None,
     typer.Option(
@@ -1892,6 +1910,7 @@ def list_issues(
     root=root,
     kind="issue",
     status=status,
+    severity=severity,
     substring=substring,
     regexp=regexp,
     case_insensitive=case_insensitive,
@@ -1912,6 +1931,13 @@ def list_problems(
   status: Annotated[
     str | None,
     typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  severity: Annotated[
+    str | None,
+    typer.Option(
+      "--severity",
+      help="Filter by severity (e.g. p1, p2, p3)",
+    ),
   ] = None,
   substring: Annotated[
     str | None,
@@ -1988,6 +2014,7 @@ def list_problems(
     root=root,
     kind="problem",
     status=status,
+    severity=severity,
     substring=substring,
     regexp=regexp,
     case_insensitive=case_insensitive,
@@ -2008,6 +2035,13 @@ def list_improvements(
   status: Annotated[
     str | None,
     typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  severity: Annotated[
+    str | None,
+    typer.Option(
+      "--severity",
+      help="Filter by severity (e.g. p1, p2, p3)",
+    ),
   ] = None,
   substring: Annotated[
     str | None,
@@ -2084,6 +2118,7 @@ def list_improvements(
     root=root,
     kind="improvement",
     status=status,
+    severity=severity,
     substring=substring,
     regexp=regexp,
     case_insensitive=case_insensitive,
@@ -2104,6 +2139,13 @@ def list_risks(
   status: Annotated[
     str | None,
     typer.Option("--status", "-s", help="Filter by status"),
+  ] = None,
+  severity: Annotated[
+    str | None,
+    typer.Option(
+      "--severity",
+      help="Filter by severity (e.g. p1, p2, p3)",
+    ),
   ] = None,
   substring: Annotated[
     str | None,
@@ -2180,6 +2222,7 @@ def list_risks(
     root=root,
     kind="risk",
     status=status,
+    severity=severity,
     substring=substring,
     regexp=regexp,
     case_insensitive=case_insensitive,

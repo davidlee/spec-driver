@@ -44,6 +44,7 @@ from .lifecycle import (
 if TYPE_CHECKING:
   from pathlib import Path
 
+  from supekku.scripts.lib.backlog.registry import BacklogRegistry
   from supekku.scripts.lib.specs.registry import SpecRegistry
 
 logger = logging.getLogger(__name__)
@@ -54,6 +55,13 @@ logger = logging.getLogger(__name__)
 _REQUIREMENT_LINE = re.compile(
   r"^\s*[-*]\s*\*{0,2}\s*(?:[A-Z]+-\d{3}\.)?("
   r"FR|NF)-(\d{3})\s*\*{0,2}\s*(?:\(([^)]+)\))?\s*[:\-–]\s*(.+)$",
+  re.IGNORECASE,
+)
+
+# Heading format for backlog items: ### FR-016.001: Title
+# Matches dotted format only (NNN.MMM) — no overlap with spec bullet format.
+_REQUIREMENT_HEADING = re.compile(
+  r"^\s*#{1,4}\s+(FR|NF)-(\d{3})\.(\d{3})\s*[:\-–]\s*(.+)$",
   re.IGNORECASE,
 )
 
@@ -79,6 +87,8 @@ class RequirementRecord:
   path: str = ""
   ext_id: str = ""
   ext_url: str = ""
+  source_kind: str = ""
+  source_type: str = ""
 
   def merge(self, other: RequirementRecord) -> RequirementRecord:
     """Merge data from another record, preserving lifecycle fields."""
@@ -100,6 +110,8 @@ class RequirementRecord:
       ),
       coverage_entries=list(self.coverage_entries),
       path=other.path or self.path,
+      source_kind=other.source_kind or self.source_kind,
+      source_type=other.source_type or self.source_type,
     )
 
   def to_dict(self) -> dict[str, object]:
@@ -124,6 +136,10 @@ class RequirementRecord:
       d["ext_id"] = self.ext_id
     if self.ext_url:
       d["ext_url"] = self.ext_url
+    if self.source_kind:
+      d["source_kind"] = self.source_kind
+    if self.source_type:
+      d["source_type"] = self.source_type
     return d
 
   @classmethod
@@ -145,6 +161,8 @@ class RequirementRecord:
       coverage_evidence=list(data.get("coverage_evidence", [])),
       coverage_entries=list(data.get("coverage_entries", [])),
       path=str(data.get("path", "")),
+      source_kind=str(data.get("source_kind", "")),
+      source_type=str(data.get("source_type", "")),
     )
 
 
@@ -267,8 +285,9 @@ class RequirementsRegistry:
     revision_dirs: Iterable[Path] | None = None,
     audit_dirs: Iterable[Path] | None = None,
     plan_dirs: Iterable[Path] | None = None,
+    backlog_registry: BacklogRegistry | None = None,
   ) -> SyncStats:
-    """Sync requirements from specs and change artifacts, updating registry."""
+    """Sync requirements from specs, change artifacts, and backlog items."""
     repo_root = spec_registry.root if spec_registry else find_repo_root()
     stats = SyncStats()
     seen: set[str] = set()
@@ -344,6 +363,15 @@ class RequirementsRegistry:
     if audit_dirs:
       self._apply_audit_relations(audit_dirs)
 
+    # Sync requirements from backlog items
+    if backlog_registry:
+      self._sync_backlog_requirements(
+        backlog_registry,
+        repo_root,
+        seen,
+        stats,
+      )
+
     # Apply coverage blocks to update lifecycle from verification entries
     spec_files = []
     if spec_registry:
@@ -387,6 +415,8 @@ class RequirementsRegistry:
           implemented_by=sorted(set(record.implemented_by)),
           verified_by=sorted(set(record.verified_by)),
           path=record.path,
+          source_kind=record.source_kind,
+          source_type=record.source_type,
         )
 
     # Validation: warn about specs with no extracted requirements
@@ -402,24 +432,65 @@ class RequirementsRegistry:
     record: RequirementRecord,
     seen: set[str],
     stats: SyncStats,
-    source_kind: str = "",  # pylint: disable=unused-argument  # phase 2
-    source_type: str = "",  # pylint: disable=unused-argument  # phase 2
+    source_kind: str = "",
+    source_type: str = "",
   ) -> None:
     """Merge-or-create a requirement record, tracking it in *seen*.
 
-    *source_kind* and *source_type* are accepted now (phase 1) so the
-    signature is stable for phase 2 when RequirementRecord gains those fields.
+    If *source_kind* or *source_type* are provided they are stamped on the
+    record **after** merge so the freshly-extracted provenance wins.
     """
     seen.add(record.uid)
     existing = self.records.get(record.uid)
     if existing is not None:
       merged = existing.merge(record)
+      if source_kind:
+        merged = RequirementRecord(**{**merged.__dict__, "source_kind": source_kind})
+      if source_type:
+        merged = RequirementRecord(**{**merged.__dict__, "source_type": source_type})
       if merged != existing:
         self.records[record.uid] = merged
         stats.updated += 1
     else:
+      if source_kind:
+        record = RequirementRecord(**{**record.__dict__, "source_kind": source_kind})
+      if source_type:
+        record = RequirementRecord(**{**record.__dict__, "source_type": source_type})
       self.records[record.uid] = record
       stats.created += 1
+
+  def _sync_backlog_requirements(
+    self,
+    backlog_registry: BacklogRegistry,
+    repo_root: Path,
+    seen: set[str],
+    stats: SyncStats,
+  ) -> None:
+    """Extract and upsert requirements from backlog items."""
+    for item in backlog_registry.iter():
+      try:
+        frontmatter, body = load_markdown_file(item.path)
+      except OSError:
+        logger.warning("Cannot read backlog item %s at %s", item.id, item.path)
+        continue
+
+      records = list(
+        self._records_from_content(
+          item.id,
+          frontmatter,
+          body,
+          item.path,
+          repo_root,
+        ),
+      )
+      for record in records:
+        self._upsert_record(
+          record,
+          seen,
+          stats,
+          source_kind=item.kind,
+          source_type="backlog",
+        )
 
   def _iter_spec_files(self, spec_dirs: Iterable[Path]) -> Iterator[Path]:
     for directory in spec_dirs:
@@ -1004,7 +1075,6 @@ class RequirementsRegistry:
           if file.name.startswith(prefix):
             yield file
 
-
   def _records_from_frontmatter(
     self,
     spec_id: str,
@@ -1049,34 +1119,50 @@ class RequirementsRegistry:
       if re.search(r"\b(FR|NF)-\d{3}\b", line, re.IGNORECASE):
         requirement_like_lines.append(line.strip())
 
+      # Try bullet format first (spec requirements)
       match = _REQUIREMENT_LINE.match(line)
-      if not match:
+      if match:
+        extracted_count += 1
+        prefix, number, category, title = match.groups()
+        label = f"{prefix.upper()}-{number}"
+        uid = f"{spec_id}.{label}"
+        kind = "functional" if label.startswith("FR-") else "non-functional"
+        inline_category = category.strip() if category else None
+        frontmatter_category = _frontmatter.get("category")
+        final_category = inline_category or frontmatter_category
+
+        yield RequirementRecord(
+          uid=uid,
+          label=label,
+          title=title.strip(),
+          specs=[spec_id],
+          primary_spec=spec_id,
+          kind=kind,
+          category=final_category,
+          status=STATUS_PENDING,
+          path=path,
+        )
         continue
 
-      extracted_count += 1
-      prefix, number, category, title = match.groups()
-      label = f"{prefix.upper()}-{number}"
-      uid = f"{spec_id}.{label}"
-      kind = "functional" if label.startswith("FR-") else "non-functional"
+      # Try heading format (backlog dotted requirements)
+      heading_match = _REQUIREMENT_HEADING.match(line)
+      if heading_match:
+        extracted_count += 1
+        prefix, artifact_num, seq_num, title = heading_match.groups()
+        label = f"{prefix.upper()}-{artifact_num}.{seq_num}"
+        uid = f"{spec_id}.{label}"
+        kind = "functional" if label.startswith("FR-") else "non-functional"
 
-      # Extract category from inline syntax (strip whitespace if present)
-      inline_category = category.strip() if category else None
-
-      # Check frontmatter for category (body precedence: inline > frontmatter)
-      frontmatter_category = _frontmatter.get("category")
-      final_category = inline_category or frontmatter_category
-
-      yield RequirementRecord(
-        uid=uid,
-        label=label,
-        title=title.strip(),
-        specs=[spec_id],
-        primary_spec=spec_id,
-        kind=kind,
-        category=final_category,
-        status=STATUS_PENDING,
-        path=path,
-      )
+        yield RequirementRecord(
+          uid=uid,
+          label=label,
+          title=title.strip(),
+          specs=[spec_id],
+          primary_spec=spec_id,
+          kind=kind,
+          status=STATUS_PENDING,
+          path=path,
+        )
 
     # Warn if we found requirement-like lines but extracted none
     if requirement_like_lines and extracted_count == 0:

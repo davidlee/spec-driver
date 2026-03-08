@@ -72,7 +72,7 @@ class TestColumnLabels:
 
   def test_requirement_labels(self):
     labels = column_labels(REQUIREMENT_COLUMNS)
-    assert labels == ["Spec", "Label", "Category", "Title", "Tags", "Status"]
+    assert labels == ["Spec", "Label", "Source", "Category", "Title", "Tags", "Status"]
 
   def test_backlog_labels(self):
     labels = column_labels(BACKLOG_COLUMNS)
@@ -150,6 +150,7 @@ class TestAllColumnSetsExist:
     assert column_labels(REQUIREMENT_COLUMNS) == [
       "Spec",
       "Label",
+      "Source",
       "Category",
       "Title",
       "Tags",

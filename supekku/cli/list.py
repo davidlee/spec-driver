@@ -1195,6 +1195,13 @@ def list_requirements(
       help="Output result as JSON (shorthand for --format=json)",
     ),
   ] = False,
+  source_kind: Annotated[
+    str | None,
+    typer.Option(
+      "--source-kind",
+      help="Filter by source kind (spec,issue,problem,improvement).",
+    ),
+  ] = None,
   truncate: TruncateOption = False,
   external: ExternalOption = False,
 ) -> None:
@@ -1211,6 +1218,7 @@ def list_requirements(
     list requirements --verified-by "VT-CLI-*"   # Glob pattern match
     list requirements --vstatus verified --json   # Verification status filter
     list requirements --spec SPEC-110 --vkind VT  # Combined filters
+    list requirements --source-kind issue          # Filter by source
   """
   # --json flag overrides --format
   if json_output:
@@ -1255,6 +1263,15 @@ def list_requirements(
         r
         for r in requirements
         if any(r.label.startswith(prefix) for prefix in kind_prefixes)
+      ]
+
+    # Source kind filter (multi-value OR; "" passes all per DEC-076-05)
+    if source_kind:
+      sk_values = {v.lower() for v in parse_multi_value_filter(source_kind)}
+      requirements = [
+        r
+        for r in requirements
+        if not r.source_kind or r.source_kind.lower() in sk_values
       ]
 
     # Category filter (substring match, respects --case-insensitive)

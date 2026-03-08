@@ -55,6 +55,7 @@ PLAN_COLUMNS = [
 REQUIREMENT_COLUMNS = [
   ColumnDef(label="Spec", field="spec"),
   ColumnDef(label="Label", field="label", style_key="requirement.id"),
+  ColumnDef(label="Source", field="source_kind"),
   ColumnDef(label="Category", field="category", style_key="requirement.category"),
   ColumnDef(label="Title", field="title"),
   ColumnDef(label="Tags", field="tags"),

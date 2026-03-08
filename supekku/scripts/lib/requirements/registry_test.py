@@ -9,6 +9,7 @@ import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest.mock import MagicMock
 
 from supekku.scripts.lib.core.paths import (
   AUDITS_SUBDIR,
@@ -26,8 +27,10 @@ from supekku.scripts.lib.requirements.lifecycle import (
   STATUS_PENDING,
 )
 from supekku.scripts.lib.requirements.registry import (
+  _REQUIREMENT_HEADING,
   RequirementRecord,
   RequirementsRegistry,
+  SyncStats,
 )
 from supekku.scripts.lib.specs.registry import SpecRegistry
 
@@ -1791,6 +1794,279 @@ class TestRequirementsRegistryStandardSurface(unittest.TestCase):
   def test_filter_no_matches_returns_empty(self) -> None:
     registry, _ = self._make_registry()
     assert registry.filter(tag="nonexistent") == []
+
+
+class TestRequirementHeadingRegex(unittest.TestCase):
+  """VT-REGEX-076-001: _REQUIREMENT_HEADING regex matches dotted backlog format."""
+
+  def test_matches_fr_dotted(self) -> None:
+    m = _REQUIREMENT_HEADING.match("### FR-016.001: User can filter by source")
+    assert m is not None
+    assert m.group(1).upper() == "FR"
+    assert m.group(2) == "016"
+    assert m.group(3) == "001"
+    assert m.group(4).strip() == "User can filter by source"
+
+  def test_matches_nf_dotted(self) -> None:
+    m = _REQUIREMENT_HEADING.match("### NF-013.001: Performance under load")
+    assert m is not None
+    assert m.group(1).upper() == "NF"
+    assert m.group(2) == "013"
+    assert m.group(3) == "001"
+
+  def test_rejects_non_dotted(self) -> None:
+    assert _REQUIREMENT_HEADING.match("### FR-001: Title") is None
+
+  def test_rejects_bullet_format(self) -> None:
+    assert _REQUIREMENT_HEADING.match("- **FR-016.001**: Title") is None
+
+  def test_matches_h2(self) -> None:
+    m = _REQUIREMENT_HEADING.match("## FR-016.002: Another requirement")
+    assert m is not None
+
+  def test_matches_dash_separator(self) -> None:
+    m = _REQUIREMENT_HEADING.match("### FR-016.001 - Dash separated title")
+    assert m is not None
+    assert m.group(4).strip() == "Dash separated title"
+
+
+class TestSourceKindFields(unittest.TestCase):
+  """VT-UPSERT-076-003 / VT-COMPAT-076-005: source fields."""
+
+  def test_defaults_to_empty(self) -> None:
+    record = RequirementRecord(uid="SPEC-100.FR-001", label="FR-001", title="Test")
+    assert record.source_kind == ""
+    assert record.source_type == ""
+
+  def test_to_dict_omits_when_empty(self) -> None:
+    record = RequirementRecord(uid="SPEC-100.FR-001", label="FR-001", title="Test")
+    d = record.to_dict()
+    assert "source_kind" not in d
+    assert "source_type" not in d
+
+  def test_to_dict_includes_when_set(self) -> None:
+    record = RequirementRecord(
+      uid="ISSUE-016.FR-016.001",
+      label="FR-016.001",
+      title="Test",
+      source_kind="issue",
+      source_type="backlog",
+    )
+    d = record.to_dict()
+    assert d["source_kind"] == "issue"
+    assert d["source_type"] == "backlog"
+
+  def test_from_dict_defaults_missing(self) -> None:
+    record = RequirementRecord.from_dict(
+      "SPEC-100.FR-001",
+      {"label": "FR-001", "title": "T"},
+    )
+    assert record.source_kind == ""
+    assert record.source_type == ""
+
+  def test_from_dict_reads_present(self) -> None:
+    record = RequirementRecord.from_dict(
+      "ISSUE-016.FR-016.001",
+      {
+        "label": "FR-016.001",
+        "title": "T",
+        "source_kind": "issue",
+        "source_type": "backlog",
+      },
+    )
+    assert record.source_kind == "issue"
+    assert record.source_type == "backlog"
+
+  def test_merge_incoming_wins(self) -> None:
+    old = RequirementRecord(
+      uid="X.FR-001",
+      label="FR-001",
+      title="Old",
+      source_kind="",
+      source_type="",
+    )
+    new = RequirementRecord(
+      uid="X.FR-001",
+      label="FR-001",
+      title="New",
+      source_kind="issue",
+      source_type="backlog",
+    )
+    merged = old.merge(new)
+    assert merged.source_kind == "issue"
+    assert merged.source_type == "backlog"
+
+  def test_merge_preserves_existing_when_incoming_empty(self) -> None:
+    old = RequirementRecord(
+      uid="X.FR-001",
+      label="FR-001",
+      title="Old",
+      source_kind="spec",
+      source_type="tech",
+    )
+    new = RequirementRecord(uid="X.FR-001", label="FR-001", title="New")
+    merged = old.merge(new)
+    assert merged.source_kind == "spec"
+    assert merged.source_type == "tech"
+
+  def test_roundtrip_serialization(self) -> None:
+    original = RequirementRecord(
+      uid="ISSUE-016.FR-016.001",
+      label="FR-016.001",
+      title="Backlog req",
+      source_kind="issue",
+      source_type="backlog",
+    )
+    d = original.to_dict()
+    restored = RequirementRecord.from_dict(original.uid, d)
+    assert restored.source_kind == original.source_kind
+    assert restored.source_type == original.source_type
+
+
+class TestUpsertRecordProvenance(unittest.TestCase):
+  """VT-UPSERT-076-003: _upsert_record stamps source provenance."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+    self.tmpdir = tempfile.mkdtemp()
+    os.chdir(self.tmpdir)
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def test_upsert_stamps_source_kind_on_create(self) -> None:
+    registry_path = Path(self.tmpdir) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    record = RequirementRecord(uid="X.FR-001", label="FR-001", title="Test")
+    seen: set[str] = set()
+    stats = SyncStats()
+    registry._upsert_record(
+      record,
+      seen,
+      stats,
+      source_kind="issue",
+      source_type="backlog",
+    )
+
+    assert registry.records["X.FR-001"].source_kind == "issue"
+    assert registry.records["X.FR-001"].source_type == "backlog"
+    assert "X.FR-001" in seen
+    assert stats.created == 1
+
+  def test_upsert_stamps_source_kind_on_merge(self) -> None:
+    registry_path = Path(self.tmpdir) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    registry.records["X.FR-001"] = RequirementRecord(
+      uid="X.FR-001",
+      label="FR-001",
+      title="Old",
+    )
+    record = RequirementRecord(uid="X.FR-001", label="FR-001", title="New")
+    seen: set[str] = set()
+    stats = SyncStats()
+    registry._upsert_record(
+      record,
+      seen,
+      stats,
+      source_kind="problem",
+      source_type="backlog",
+    )
+
+    assert registry.records["X.FR-001"].source_kind == "problem"
+    assert registry.records["X.FR-001"].source_type == "backlog"
+    assert stats.updated == 1
+
+
+class TestBacklogRequirementSync(unittest.TestCase):
+  """VT-SYNC-076-002: Backlog items synced to requirements registry."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+    self.tmpdir = tempfile.mkdtemp()
+    self.root = Path(self.tmpdir)
+    os.chdir(self.tmpdir)
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def _make_backlog_item(self, item_id: str, kind: str, body: str) -> Path:
+    """Create a minimal backlog item file and return its path."""
+    backlog_dir = self.root / SPEC_DRIVER_DIR / "backlog" / f"{kind}s"
+    item_dir = backlog_dir / f"{item_id}-test"
+    item_dir.mkdir(parents=True, exist_ok=True)
+    item_path = item_dir / f"{item_id}.md"
+    frontmatter = {
+      "id": item_id,
+      "title": f"Test {kind}",
+      "status": "open",
+      "kind": kind,
+    }
+    dump_markdown_file(item_path, frontmatter, body)
+    return item_path
+
+  def test_sync_discovers_backlog_requirements(self) -> None:
+    """Backlog items with heading-format requirements appear in registry."""
+
+    item_path = self._make_backlog_item(
+      "ISSUE-016",
+      "issue",
+      textwrap.dedent("""\
+        ## Requirements
+
+        ### FR-016.001: Registry discovers backlog requirements
+        ### NF-016.001: Backward compatibility preserved
+      """),
+    )
+
+    # Mock BacklogRegistry
+    mock_backlog = MagicMock()
+    mock_item = MagicMock()
+    mock_item.id = "ISSUE-016"
+    mock_item.kind = "issue"
+    mock_item.path = item_path
+    mock_backlog.iter.return_value = [mock_item]
+
+    registry_path = self.root / SPEC_DRIVER_DIR / "registry" / "requirements.yaml"
+    registry_path.parent.mkdir(parents=True, exist_ok=True)
+    registry = RequirementsRegistry(registry_path)
+
+    stats = registry.sync(backlog_registry=mock_backlog)
+
+    assert stats.created == 2
+    assert "ISSUE-016.FR-016.001" in registry.records
+    assert "ISSUE-016.NF-016.001" in registry.records
+
+    fr = registry.records["ISSUE-016.FR-016.001"]
+    assert fr.source_kind == "issue"
+    assert fr.source_type == "backlog"
+    assert fr.label == "FR-016.001"
+    assert fr.title == "Registry discovers backlog requirements"
+
+  def test_sync_backlog_records_in_seen_set(self) -> None:
+    """Backlog-sourced records are added to seen and not purged by cleanup."""
+
+    item_path = self._make_backlog_item(
+      "PROB-001",
+      "problem",
+      "### FR-001.001: Problem requirement\n",
+    )
+
+    mock_backlog = MagicMock()
+    mock_item = MagicMock()
+    mock_item.id = "PROB-001"
+    mock_item.kind = "problem"
+    mock_item.path = item_path
+    mock_backlog.iter.return_value = [mock_item]
+
+    registry_path = self.root / SPEC_DRIVER_DIR / "registry" / "requirements.yaml"
+    registry_path.parent.mkdir(parents=True, exist_ok=True)
+    registry = RequirementsRegistry(registry_path)
+
+    registry.sync(backlog_registry=mock_backlog)
+
+    # Record exists after sync (not purged by cleanup)
+    assert "PROB-001.FR-001.001" in registry.records
+    assert registry.records["PROB-001.FR-001.001"].source_kind == "problem"
 
 
 if __name__ == "__main__":

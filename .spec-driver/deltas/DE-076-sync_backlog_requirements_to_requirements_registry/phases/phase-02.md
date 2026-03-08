@@ -4,7 +4,7 @@ slug: 076-sync_backlog_requirements_to_requirements_registry-phase-02
 name: IP-076 Phase 02 — Backlog requirement sync and CLI filtering
 created: '2026-03-09'
 updated: '2026-03-09'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -62,24 +62,24 @@ version: 1
 phase: IP-076.PHASE-02
 entrance_criteria:
   - item: "Phase 1 complete and committed"
-    completed: false
+    completed: true
 exit_criteria:
   - item: "_REQUIREMENT_HEADING regex matches dotted backlog format"
-    completed: false
+    completed: true
   - item: "RequirementRecord has source_kind/source_type with serialization"
-    completed: false
+    completed: true
   - item: "sync() accepts backlog_registry, iterates items, extracts requirements"
-    completed: false
+    completed: true
   - item: "CLI --source-kind filter works"
-    completed: false
+    completed: true
   - item: "Source column in table output"
-    completed: false
+    completed: true
   - item: "All VT artifacts verified"
-    completed: false
+    completed: true
   - item: "All existing tests pass (regression)"
-    completed: false
+    completed: true
   - item: "Linters pass"
-    completed: false
+    completed: true
 ```
 
 # Phase 2 — Backlog requirement sync and CLI filtering
@@ -94,16 +94,16 @@ Implement the core feature: backlog items with dotted-format requirements (`### 
 - **Primary Spec**: SPEC-122
 
 ## 3. Entrance Criteria
-- [ ] Phase 1 complete and committed (cleanup refactor)
+- [x] Phase 1 complete and committed (cleanup refactor)
 
 ## 4. Exit Criteria / Done When
-- [ ] `_REQUIREMENT_HEADING` regex matches `### FR-016.001:`, `### NF-013.001:`, rejects `### FR-001:`
-- [ ] `RequirementRecord` has `source_kind`/`source_type` with `to_dict`/`from_dict`/`merge` support
-- [ ] `sync()` accepts `backlog_registry`, iterates items, calls `_records_from_content`, upserts with provenance
-- [ ] `--source-kind` filter on `list requirements` (multi-value, `""` passes all)
-- [ ] Source column in table output
-- [ ] All VT artifacts have passing tests
-- [ ] `just` passes (tests + lint)
+- [x] `_REQUIREMENT_HEADING` regex matches `### FR-016.001:`, `### NF-013.001:`, rejects `### FR-001:`
+- [x] `RequirementRecord` has `source_kind`/`source_type` with `to_dict`/`from_dict`/`merge` support
+- [x] `sync()` accepts `backlog_registry`, iterates items, calls `_records_from_content`, upserts with provenance
+- [x] `--source-kind` filter on `list requirements` (multi-value, `""` passes all)
+- [x] Source column in table output
+- [x] All VT artifacts have passing tests (18 new tests)
+- [x] `just` passes (3510 tests + lint)
 
 ## 5. Verification
 - **VT-REGEX-076-001**: Unit tests for `_REQUIREMENT_HEADING` — match/reject cases
@@ -124,13 +124,13 @@ Implement the core feature: backlog items with dotted-format requirements (`### 
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | T1 | Add `_REQUIREMENT_HEADING` regex + tests | [P] | DEC-076-03, DEC-076-08 |
-| [ ] | T2 | Add `source_kind`/`source_type` to `RequirementRecord` | [P] | DEC-076-02 |
-| [ ] | T3 | Add backlog sync loop to `sync()` | [ ] | Depends on T1, T2. DEC-076-07 |
-| [ ] | T4 | Add `--source-kind` CLI filter | [ ] | Depends on T2. DEC-076-05 |
-| [ ] | T5 | Add Source column to formatter | [P] | DEC-076-02 |
-| [ ] | T6 | Wire up `cli/sync.py` | [ ] | Depends on T3 |
-| [ ] | T7 | Full test + lint pass | [ ] | After T1–T6 |
+| [x] | T1 | Add `_REQUIREMENT_HEADING` regex + tests | [P] | DEC-076-03, DEC-076-08 |
+| [x] | T2 | Add `source_kind`/`source_type` to `RequirementRecord` | [P] | DEC-076-02 |
+| [x] | T3 | Add backlog sync loop to `sync()` | [ ] | Depends on T1, T2. DEC-076-07 |
+| [x] | T4 | Add `--source-kind` CLI filter | [ ] | Depends on T2. DEC-076-05 |
+| [x] | T5 | Add Source column to formatter | [P] | DEC-076-02 |
+| [x] | T6 | Wire up `cli/sync.py` | [ ] | Depends on T3 |
+| [x] | T7 | Full test + lint pass | [ ] | After T1–T6 |
 
 ### Task Details
 

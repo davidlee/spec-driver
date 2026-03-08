@@ -36,9 +36,11 @@ def _prepare_requirement_row(req: RequirementRecord) -> list[str]:
   category_styled = f"[requirement.category]{category}[/requirement.category]"
   status_style = get_requirement_status_style(req.status)
   status_styled = f"[{status_style}]{req.status}[/{status_style}]"
+  source = req.source_kind or "—"
   return [
     spec_styled,
     label_styled,
+    source,
     category_styled,
     req.title,
     format_tags_cell(req.tags),
@@ -50,7 +52,8 @@ def _prepare_requirement_tsv_row(req: RequirementRecord) -> list[str]:
   """Prepare a single requirement as a plain TSV row."""
   spec = req.primary_spec or (req.specs[0] if req.specs else "")
   category = req.category or "-"
-  return [spec, req.label, category, req.title, req.status]
+  source = req.source_kind or "-"
+  return [spec, req.label, source, category, req.title, req.status]
 
 
 def _requirement_column_widths(
@@ -62,6 +65,7 @@ def _requirement_column_widths(
     reserved = 10
     spec_width = 10
     label_width = 8
+    source_width = 12
     ext_id_width = 14 if show_external else 0
     category_width = 12
     tags_width = 20
@@ -70,6 +74,7 @@ def _requirement_column_widths(
       terminal_width
       - spec_width
       - label_width
+      - source_width
       - ext_id_width
       - category_width
       - tags_width
@@ -79,7 +84,7 @@ def _requirement_column_widths(
     )
     col_idx = 0
     widths: dict[int, int] = {}
-    for w in [spec_width, label_width]:
+    for w in [spec_width, label_width, source_width]:
       widths[col_idx] = w
       col_idx += 1
     if show_external:
@@ -113,18 +118,18 @@ def format_requirement_list_table(
   """
   col_defs = list(REQUIREMENT_COLUMNS)
   if show_external:
-    col_defs.insert(2, EXT_ID_COLUMN)
+    col_defs.insert(3, EXT_ID_COLUMN)
 
   def _row(req: RequirementRecord) -> list[str]:
     row = _prepare_requirement_row(req)
     if show_external:
-      row.insert(2, req.ext_id)
+      row.insert(3, req.ext_id)
     return row
 
   def _tsv_row(req: RequirementRecord) -> list[str]:
     row = _prepare_requirement_tsv_row(req)
     if show_external:
-      row.insert(2, req.ext_id)
+      row.insert(3, req.ext_id)
     return row
 
   return format_list_table(
@@ -178,6 +183,10 @@ def format_requirement_list_json(requirements: Sequence[RequirementRecord]) -> s
       item["ext_id"] = req.ext_id
     if req.ext_url:
       item["ext_url"] = req.ext_url
+    if req.source_kind:
+      item["source_kind"] = req.source_kind
+    if req.source_type:
+      item["source_type"] = req.source_type
 
     items.append(item)
 
@@ -226,6 +235,12 @@ def format_requirement_details(requirement: RequirementRecord) -> str:
     lines.append(f"Coverage evidence: {', '.join(requirement.coverage_evidence)}")
   if requirement.verified_by:
     lines.append(f"Verified by: {', '.join(requirement.verified_by)}")
+
+  # Source provenance
+  if requirement.source_kind:
+    lines.append(f"Source: {requirement.source_kind}")
+  if requirement.source_type:
+    lines.append(f"Source Type: {requirement.source_type}")
 
   # Path
   if requirement.path:

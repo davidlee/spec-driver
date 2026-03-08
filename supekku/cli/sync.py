@@ -613,7 +613,8 @@ def _sync_adr(root: Path) -> dict:
 
 
 def _sync_requirements(root: Path) -> dict:
-  """Execute requirements registry synchronization from specs."""
+  """Execute requirements registry synchronization from specs and backlog."""
+  from supekku.scripts.lib.backlog.registry import BacklogRegistry
   from supekku.scripts.lib.core.paths import get_registry_dir
   from supekku.scripts.lib.requirements.registry import RequirementsRegistry
   from supekku.scripts.lib.specs.registry import SpecRegistry
@@ -631,11 +632,14 @@ def _sync_requirements(root: Path) -> dict:
   revision_dirs = [revision_dir] if revision_dir.exists() else None
   audit_dirs = [audit_dir] if audit_dir.exists() else None
 
+  backlog = BacklogRegistry(root=root)
+
   stats = req_registry.sync(
     spec_registry=spec_registry,
     delta_dirs=delta_dirs,
     revision_dirs=revision_dirs,
     audit_dirs=audit_dirs,
+    backlog_registry=backlog,
   )
   req_registry.save()
 

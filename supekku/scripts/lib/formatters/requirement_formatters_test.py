@@ -83,9 +83,10 @@ class TestFormatRequirementListTable(unittest.TestCase):
     fields = lines[0].split("\t")
     assert fields[0] == "SPEC-001"  # spec
     assert fields[1] == "FR-001"  # label
-    assert fields[2] == "-"  # category (none)
-    assert fields[3] == "User authentication"  # title
-    assert fields[4] == "active"  # status
+    assert fields[2] == "-"  # source (none)
+    assert fields[3] == "-"  # category (none)
+    assert fields[4] == "User authentication"  # title
+    assert fields[5] == "active"  # status
 
   def test_format_multiple_requirements(self) -> None:
     """Test formatting multiple requirements."""
@@ -158,9 +159,9 @@ class TestFormatRequirementListTable(unittest.TestCase):
       status="retired",
     )
     result = format_requirement_list_table([req], format_type="tsv")
-    # TSV should have spec (empty), label, category, title, status
+    # TSV should have spec (empty), label, source, category, title, status
     # Note: split('\t') doesn't create trailing empty field for leading empty
-    assert result == "\tFR-004\t-\tOrphaned requirement\tretired"
+    assert result == "\tFR-004\t-\t-\tOrphaned requirement\tretired"
 
 
 class TestFormatRequirementListJson(unittest.TestCase):
@@ -302,7 +303,8 @@ class TestRequirementExternalFields(unittest.TestCase):
     fields = result.strip().split("\t")
     assert fields[0] == "SPEC-001"
     assert fields[1] == "FR-010"
-    assert fields[2] == "LIN-88"
+    assert fields[2] == "-"  # source (empty)
+    assert fields[3] == "LIN-88"  # ext_id
 
   def test_tsv_no_external_omits_ext_id(self) -> None:
     """Test TSV omits ext_id when show_external=False."""

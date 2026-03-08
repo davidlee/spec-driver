@@ -7302,7 +7302,7 @@ deltas:
         phase: IP-062-P01
   DE-063:
     kind: delta
-    status: draft
+    status: completed
     name: 'CLI interface fixes: ID inference, list truncation bugs, flag parsing'
     slug: cli_interface_fixes_id_inference_list_truncation_bugs_flag_parsing
     updated: '2026-03-08'
@@ -7339,10 +7339,85 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-063-P01
+        - id: IP-063.PHASE-01
+        - id: IP-063.PHASE-02
+        - id: IP-063.PHASE-02
       phases:
-      - id: IP-063-P01
-        phase: IP-063-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-063.PHASE-01
+        plan: IP-063
+        delta: DE-063
+        objective: Fix markup-aware truncation in table_utils.py so list --truncate
+          renders correct status values instead of corrupted Rich markup fragments.
+        entrance_criteria:
+        - IP-063 approved
+        - "DR-063 \xA74b design agreed"
+        exit_criteria:
+        - add_row_with_truncation uses Text.from_markup() for display-width measurement
+        - Dead truncate_text() removed
+        - VT-063-03 tests passing
+        - Lint clean (ruff + pylint on changed files)
+        - Existing list tests still passing
+        verification:
+          tests:
+          - VT-063-03
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Implement markup-aware truncation in add_row_with_truncation
+        - id: '1.2'
+          description: Remove dead truncate_text() and update imports
+        - id: '1.3'
+          description: Write VT-063-03 tests
+        - id: '1.4'
+          description: Verify existing list tests pass, lint clean
+        risks:
+        - description: Text.from_markup() edge cases with malformed markup
+          mitigation: "Rich treats unrecognized tags as literal text \u2014 no crash\
+            \ risk; test explicitly"
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-063.PHASE-02
+        plan: IP-063
+        delta: DE-063
+        objective: Add type-inferring ID resolution to show/view commands so bare
+          IDs (DE-061, 61) resolve without specifying the entity subcommand.
+        entrance_criteria:
+        - P01 complete
+        - "DR-063 \xA74a design agreed"
+        exit_criteria:
+        - InferringGroup custom Click Group dispatches bare IDs correctly
+        - resolve_by_id() resolves prefixed, numeric, and ambiguous IDs
+        - Hidden "inferred" command accepts output flags (--json, --path, --raw)
+        - VT-063-01 and VT-063-02 tests passing
+        - Existing show/view tests still passing
+        - Lint clean
+        verification:
+          tests:
+          - VT-063-01
+          - VT-063-02
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Add PREFIX_TO_TYPE mapping and resolve_by_id() to common.py
+        - id: '2.2'
+          description: Create InferringGroup in common.py
+        - id: '2.3'
+          description: Add hidden "inferred" command to show.py
+        - id: '2.4'
+          description: Add hidden "inferred" command to view.py
+        - id: '2.5'
+          description: Write VT-063-01 tests (resolve_by_id)
+        - id: '2.6'
+          description: Write VT-063-02 tests (CliRunner integration)
+        - id: '2.7'
+          description: Verify existing tests + lint
+        risks:
+        - description: InferringGroup interaction with Typer internals
+          mitigation: Integration tests via CliRunner validate full chain
+        - description: _build_artifact_index perf for large repos
+          mitigation: Single scan, same cost as existing resolve links
   DE-064:
     kind: delta
     status: completed
@@ -7465,3 +7540,33 @@ deltas:
         risks: []
       - id: IP-064.PHASE-01
         phase: IP-064.PHASE-01
+  DE-065:
+    kind: delta
+    status: draft
+    name: Delta - Drift Ledger primitive
+    slug: drift_ledger_primitive
+    updated: '2026-03-08'
+    path: .spec-driver/deltas/DE-065-drift_ledger_primitive/DE-065.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-065
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-065
+        delta: DE-065
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-065-P01
+      phases:
+      - id: IP-065-P01
+        phase: IP-065-P01

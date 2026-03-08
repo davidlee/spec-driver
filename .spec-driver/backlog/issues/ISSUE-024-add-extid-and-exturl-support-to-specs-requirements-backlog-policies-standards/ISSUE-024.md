@@ -3,7 +3,7 @@ id: ISSUE-024
 name: Add ExtID and ExtURL support to specs, requirements, backlog, policies, standards
 created: '2025-11-08'
 updated: '2025-11-08'
-status: open
+status: resolved
 kind: issue
 categories: [enhancement, integration]
 severity: p3
@@ -123,14 +123,14 @@ Registries should capture ext_id/ext_url in YAML:
 
 ## Acceptance Criteria
 
-- [ ] Frontmatter schema supports `ext_id` and `ext_url` fields (optional)
-- [ ] All affected models include ext_id/ext_url attributes
-- [ ] `list` commands support `--external` / `-e` flag
-- [ ] External ID displays in correct column position when flag used
-- [ ] JSON output includes ext_id/ext_url fields
-- [ ] Show/detail views display external references when present
+- [x] Frontmatter schema supports `ext_id` and `ext_url` fields (optional)
+- [x] All affected models include ext_id/ext_url attributes
+- [x] `list` commands support `--external` / `-e` flag
+- [x] External ID displays in correct column position when flag used
+- [x] JSON output includes ext_id/ext_url fields
+- [x] Show/detail views display external references when present
 - [ ] Registries capture external ID/URL metadata
-- [ ] Tests cover new fields and formatting
+- [x] Tests cover new fields and formatting
 - [ ] Documentation updated
 
 ## Related Issues

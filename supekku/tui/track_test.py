@@ -1,7 +1,8 @@
-"""VT-054-05..08, VT-059-01..03 — Track view tests (DE-054, DE-059)."""
+"""VT-054-05..08, VT-059-01..03, VT-061-06 — Track view tests."""
 
 from __future__ import annotations
 
+import tempfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -16,6 +17,7 @@ from supekku.scripts.lib.core.artifact_view import (
 from supekku.tui.app import SpecDriverApp
 from supekku.tui.browser import BrowserScreen
 from supekku.tui.track import TrackScreen
+from supekku.tui.widgets.bundle_tree import BundleFileSelected, BundleTree
 from supekku.tui.widgets.preview_panel import PreviewPanel
 from supekku.tui.widgets.session_list import SessionList, SessionSelected
 from supekku.tui.widgets.track_panel import (
@@ -493,3 +495,325 @@ class TestTrackNavigateWithFilePath:
       app.action_navigate_artifact("DE-052")
       await pilot.pause()
       assert isinstance(app.screen, BrowserScreen)
+
+
+# --- VT-061-06: TrackScreen inline tree ---
+
+
+def _make_bundle_dir() -> tuple[Path, Path, Path]:
+  """Create a temp bundle directory with files. Returns (root, bundle_dir, primary)."""
+  root = Path(tempfile.mkdtemp())
+  bundle = root / ".spec-driver" / "deltas" / "DE-070-slug"
+  bundle.mkdir(parents=True)
+  primary = bundle / "DE-070.md"
+  primary.write_text("---\nid: DE-070\n---\n# DE-070\n")
+  (bundle / "DR-070.md").write_text("# DR-070\n")
+  (bundle / "IP-070.md").write_text("# IP-070\n")
+  return root, bundle, primary
+
+
+def _bundle_entries(
+  root: Path, bundle: Path, primary: Path
+) -> dict[ArtifactType, dict[str, ArtifactEntry]]:
+  """Test entries with a bundle artifact and a non-bundle artifact."""
+  return {
+    ArtifactType.DELTA: {
+      "DE-070": ArtifactEntry(
+        id="DE-070",
+        title="Bundle delta",
+        status="in-progress",
+        path=primary,
+        artifact_type=ArtifactType.DELTA,
+        bundle_dir=bundle,
+      ),
+      "DE-052": ArtifactEntry(
+        id="DE-052",
+        title="Event emitter",
+        status="completed",
+        path=root / "de-052.md",
+        artifact_type=ArtifactType.DELTA,
+      ),
+    },
+  }
+
+
+def _make_bundle_app() -> tuple[SpecDriverApp, Path]:
+  """App with a bundle artifact for tree tests."""
+  root, bundle, primary = _make_bundle_dir()
+  entries = _bundle_entries(root, bundle, primary)
+
+  snapshot = MagicMock(spec=ArtifactSnapshot)
+  snapshot._root = root
+  snapshot.counts_by_type.return_value = {
+    art_type: len(entries.get(art_type, {})) for art_type in ArtifactType
+  }
+  snapshot.all_entries.side_effect = lambda **kw: list(
+    entries.get(kw.get("type_filter", ArtifactType.ADR), {}).values()
+  )
+  snapshot.find_entry.side_effect = lambda aid: next(
+    (e for d in entries.values() for e in d.values() if e.id == aid), None
+  )
+
+  # Create the non-bundle file so path.is_file() works
+  (root / "de-052.md").write_text("# DE-052\n")
+
+  app = SpecDriverApp(root=root, snapshot=snapshot, listen=False)
+  return app, root
+
+
+_BUNDLE_EVENT = {
+  "v": 1,
+  "ts": "2026-03-08T15:00:00+00:00",
+  "session": "agent-1",
+  "cmd": "artifact.edit",
+  "argv": [
+    "artifact.edit",
+    ".spec-driver/deltas/DE-070-slug/DR-070.md",
+  ],
+  "artifacts": ["DE-070"],
+  "status": "ok",
+}
+
+_NON_BUNDLE_EVENT = {
+  "v": 1,
+  "ts": "2026-03-08T15:01:00+00:00",
+  "session": "agent-1",
+  "cmd": "artifact.read",
+  "argv": ["artifact.read", "de-052.md"],
+  "artifacts": ["DE-052"],
+  "status": "ok",
+}
+
+
+class TestTrackInlineTree:
+  """VT-061-06: TrackScreen inline BundleTree on row highlight."""
+
+  @pytest.mark.asyncio()
+  async def test_track_screen_composes_bundle_tree(self):
+    """TrackScreen includes a BundleTree in #track-left."""
+    app, _root = _make_bundle_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+      tree = screen.query_one("#bundle-tree", BundleTree)
+      assert tree is not None
+      # Tree starts hidden (no bundle highlighted)
+      assert not tree.display
+
+  @pytest.mark.asyncio()
+  async def test_highlight_bundle_row_shows_tree(self):
+    """Highlighting a bundle artifact row shows the tree."""
+    app, _root = _make_bundle_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      screen.add_event(_BUNDLE_EVENT)
+      await pilot.pause()
+
+      # Move cursor to the bundle event row
+      panel = screen.query_one("#track-panel", TrackPanel)
+      panel.move_cursor(row=0)
+      await pilot.pause()
+
+      tree = screen.query_one("#bundle-tree", BundleTree)
+      assert tree.display
+      assert tree.bundle_dir is not None
+      left = screen.query_one("#track-left")
+      assert left.has_class("has-bundle")
+
+  @pytest.mark.asyncio()
+  async def test_highlight_non_bundle_row_hides_tree(self):
+    """Highlighting a non-bundle row hides the tree."""
+    app, _root = _make_bundle_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      # Add both events
+      screen.add_event(_BUNDLE_EVENT)
+      screen.add_event(_NON_BUNDLE_EVENT)
+      await pilot.pause()
+
+      panel = screen.query_one("#track-panel", TrackPanel)
+
+      # First highlight a bundle row
+      panel.move_cursor(row=0)
+      await pilot.pause()
+      tree = screen.query_one("#bundle-tree", BundleTree)
+
+      # Now move to non-bundle row (events sorted reverse by time, so
+      # _NON_BUNDLE_EVENT is row 0, _BUNDLE_EVENT is row 1)
+      # Actually — sorted reverse by time, so 15:01 is row 0, 15:00 is row 1
+      # Row 0 = non-bundle (DE-052), Row 1 = bundle (DE-070)
+      panel.move_cursor(row=1)
+      await pilot.pause()
+      assert tree.display  # bundle row — tree visible
+
+      panel.move_cursor(row=0)
+      await pilot.pause()
+      assert not tree.display  # non-bundle row — tree hidden
+
+  @pytest.mark.asyncio()
+  async def test_skip_if_same_bundle(self):
+    """Same-bundle highlight doesn't repopulate the tree."""
+    app, _root = _make_bundle_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      # Add two events for the same bundle artifact
+      event2 = {**_BUNDLE_EVENT, "ts": "2026-03-08T15:02:00+00:00"}
+      screen.add_event(_BUNDLE_EVENT)
+      screen.add_event(event2)
+      await pilot.pause()
+
+      panel = screen.query_one("#track-panel", TrackPanel)
+      tree = screen.query_one("#bundle-tree", BundleTree)
+
+      # Highlight first bundle row
+      panel.move_cursor(row=1)
+      await pilot.pause()
+      assert tree.display
+      first_bundle_dir = tree.bundle_dir
+
+      # Highlight second bundle row (same bundle) — should skip repopulate
+      panel.move_cursor(row=0)
+      await pilot.pause()
+      assert tree.display
+      assert tree.bundle_dir == first_bundle_dir
+
+  @pytest.mark.asyncio()
+  async def test_add_event_refreshes_tree_for_same_bundle(self):
+    """New event touching the displayed bundle repopulates the tree."""
+    app, _root = _make_bundle_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      screen.add_event(_BUNDLE_EVENT)
+      await pilot.pause()
+
+      panel = screen.query_one("#track-panel", TrackPanel)
+      panel.move_cursor(row=0)
+      await pilot.pause()
+
+      tree = screen.query_one("#bundle-tree", BundleTree)
+      assert tree.display
+
+      # Count tree nodes before adding a new file
+      initial_nodes = len(list(tree._walk_nodes()))
+
+      # Create a new file in the bundle
+      bundle_dir = tree.bundle_dir
+      assert bundle_dir is not None
+      (bundle_dir / "notes.md").write_text("# Notes\n")
+
+      # Add another event for the same bundle — should refresh tree
+      event2 = {**_BUNDLE_EVENT, "ts": "2026-03-08T15:03:00+00:00"}
+      screen.add_event(event2)
+      await pilot.pause()
+
+      # Tree should now have one more node
+      refreshed_nodes = len(list(tree._walk_nodes()))
+      assert refreshed_nodes == initial_nodes + 1
+
+  @pytest.mark.asyncio()
+  async def test_bundle_file_selected_updates_preview(self):
+    """Selecting a file in the tree updates #track-preview."""
+    app, _root = _make_bundle_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      screen.add_event(_BUNDLE_EVENT)
+      await pilot.pause()
+
+      panel = screen.query_one("#track-panel", TrackPanel)
+      panel.move_cursor(row=0)
+      await pilot.pause()
+
+      tree = screen.query_one("#bundle-tree", BundleTree)
+      assert tree.display
+
+      # Simulate file selection in tree
+      dr_path = tree.bundle_dir / "DR-070.md"
+      screen.on_bundle_file_selected(BundleFileSelected(dr_path))
+      await pilot.pause()
+
+      preview = screen.query_one("#track-preview", PreviewPanel)
+      assert preview.border_title == "DR-070.md"
+
+  @pytest.mark.asyncio()
+  async def test_f_focuses_tree_when_visible(self):
+    """f binding focuses the bundle tree when visible."""
+    app, _root = _make_bundle_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      screen.add_event(_BUNDLE_EVENT)
+      await pilot.pause()
+
+      panel = screen.query_one("#track-panel", TrackPanel)
+      panel.move_cursor(row=0)
+      await pilot.pause()
+
+      tree = screen.query_one("#bundle-tree", BundleTree)
+      assert tree.display
+
+      # Focus tree via action
+      screen.action_focus_files()
+      await pilot.pause()
+      assert tree.has_focus
+
+  @pytest.mark.asyncio()
+  async def test_tab_from_tree_focuses_track_panel(self):
+    """Tab from tree focuses #track-panel (DEC-061-07)."""
+    app, _root = _make_bundle_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      app.action_toggle_track()
+      await pilot.pause()
+      screen = app.screen
+      assert isinstance(screen, TrackScreen)
+
+      screen.add_event(_BUNDLE_EVENT)
+      await pilot.pause()
+
+      panel = screen.query_one("#track-panel", TrackPanel)
+      panel.move_cursor(row=0)
+      await pilot.pause()
+
+      tree = screen.query_one("#bundle-tree", BundleTree)
+      assert tree.display
+
+      # Focus tree, then Tab
+      tree.focus()
+      await pilot.pause()
+      assert tree.has_focus
+
+      tree.action_focus_tab_target()
+      await pilot.pause()
+      assert panel.has_focus

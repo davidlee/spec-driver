@@ -34,7 +34,7 @@ class BrowserScreen(Screen):
 
   def compose(self):
     counts = self._snapshot.counts_by_type()
-    with Vertical(id="left-column"):
+    with Vertical(id="left-column", classes="bundle-column"):
       yield TypeSelector(counts=counts, id="type-selector")
       yield BundleTree(id="bundle-tree")
     with Vertical(id="right-column"):

@@ -6,11 +6,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from textual import on
+from textual.binding import Binding
 from textual.containers import Vertical
 from textual.screen import Screen
 from textual.widgets import DataTable
 
 from supekku.tui.event_listener import DISPLAY_BUFFER_LIMIT
+from supekku.tui.widgets.bundle_tree import BundleFileSelected, BundleTree
 from supekku.tui.widgets.preview_panel import PreviewPanel
 from supekku.tui.widgets.session_list import SessionList, SessionSelected
 from supekku.tui.widgets.track_panel import TrackPanel
@@ -22,6 +24,10 @@ if TYPE_CHECKING:
 class TrackScreen(Screen):
   """Track view: session list + event stream + artifact preview."""
 
+  BINDINGS = [
+    Binding("f", "focus_files", "Files", show=False),
+  ]
+
   def __init__(self, snapshot: ArtifactSnapshot | None = None, **kwargs) -> None:
     super().__init__(**kwargs)
     self._snapshot = snapshot
@@ -30,7 +36,9 @@ class TrackScreen(Screen):
     self._mounted = False
 
   def compose(self):
-    yield SessionList(id="session-list")
+    with Vertical(id="track-left", classes="bundle-column"):
+      yield SessionList(id="session-list")
+      yield BundleTree(id="bundle-tree", tab_target="#track-panel")
     with Vertical(id="track-right"):
       yield TrackPanel(id="track-panel")
       yield PreviewPanel(id="track-preview")
@@ -60,6 +68,21 @@ class TrackScreen(Screen):
     if self._session_filter is None or event.get("session") == self._session_filter:
       self.query_one("#track-panel", TrackPanel).append_event(event)
       self._update_preview_for_event(event)
+
+    # Refresh tree if new event touches the currently displayed bundle (DEC-061-09)
+    self._refresh_tree_for_event(event)
+
+  def _refresh_tree_for_event(self, event: dict) -> None:
+    """Repopulate tree if event references the currently displayed bundle."""
+    tree = self.query_one("#bundle-tree", BundleTree)
+    if tree.bundle_dir is None or self._snapshot is None:
+      return
+    artifacts = event.get("artifacts", [])
+    if not artifacts:
+      return
+    entry = self._snapshot.find_entry(artifacts[0])
+    if entry is not None and entry.bundle_dir == tree.bundle_dir:
+      tree.show_bundle(tree.bundle_dir, entry.path)
 
   def _update_preview_for_event(self, event: dict) -> None:
     """Show preview for the event's file path or first artifact (DEC-061-04)."""
@@ -117,26 +140,46 @@ class TrackScreen(Screen):
 
   @on(DataTable.RowHighlighted, "#track-panel")
   def _on_event_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
-    """Update preview when cursor moves to a different event row (DEC-061-04)."""
+    """Update preview and tree when cursor moves to a different event row."""
     panel = self.query_one("#track-panel", TrackPanel)
     preview = self.query_one("#track-preview", PreviewPanel)
+    tree = self.query_one("#bundle-tree", BundleTree)
+    left = self.query_one("#track-left")
 
-    # Prefer file path
+    # Resolve file path for preview
     file_path = panel.file_path_for_row(event.row_key.value)
     if file_path and self._snapshot is not None:
       resolved = self._resolve_event_path(file_path)
       if resolved is not None and resolved.is_file():
         preview.show_artifact(resolved)
         preview.border_title = resolved.name
-        return
 
-    # Fallback to artifact ID
+    # Resolve artifact entry for tree (DEC-061-09: skip-if-same)
     artifact_id = panel.artifact_for_row(event.row_key.value)
-    if artifact_id and self._snapshot is not None:
-      entry = self._snapshot.find_entry(artifact_id)
-      if entry is not None:
-        preview.show_artifact(entry.path)
-        preview.border_title = entry.id
+    entry = (
+      self._snapshot.find_entry(artifact_id)
+      if artifact_id and self._snapshot is not None
+      else None
+    )
+
+    if entry is not None and entry.bundle_dir:
+      if tree.bundle_dir != entry.bundle_dir:
+        tree.show_bundle(entry.bundle_dir, entry.path)
+        tree.border_title = "Files"
+        left.add_class("has-bundle")
+      # Highlight specific file if available
+      if file_path:
+        resolved = self._resolve_event_path(file_path)
+        if resolved is not None:
+          tree.select_file(resolved)
+    elif tree.bundle_dir is not None:
+      tree.clear_bundle()
+      left.remove_class("has-bundle")
+
+    # Preview fallback to artifact ID (when no file path resolved above)
+    if (not file_path or not self._snapshot) and entry is not None:
+      preview.show_artifact(entry.path)
+      preview.border_title = entry.id
 
   @on(DataTable.RowSelected, "#track-panel")
   def _on_event_row_selected(self, event: DataTable.RowSelected) -> None:
@@ -146,6 +189,19 @@ class TrackScreen(Screen):
     if artifact_id:
       file_path = panel.file_path_for_row(event.row_key.value) or None
       self.app.action_navigate_artifact(artifact_id, file_path=file_path)
+
+  def on_bundle_file_selected(self, message: BundleFileSelected) -> None:
+    """Handle file selection in bundle tree — update preview (DEC-061-07)."""
+    message.stop()
+    preview = self.query_one("#track-preview", PreviewPanel)
+    preview.show_artifact(message.path)
+    preview.border_title = message.path.name
+
+  def action_focus_files(self) -> None:
+    """Focus the bundle tree if visible (DEC-061-07)."""
+    tree = self.query_one("#bundle-tree", BundleTree)
+    if tree.display:
+      tree.focus()
 
   @property
   def event_buffer(self) -> list[dict]:

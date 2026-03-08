@@ -30,11 +30,12 @@ class BundleTree(Tree[Path]):
   """
 
   BINDINGS = [
-    Binding("tab", "focus_artifact_table", "Table", show=False),
+    Binding("tab", "focus_tab_target", "Table", show=False),
   ]
 
-  def __init__(self, **kwargs) -> None:
+  def __init__(self, *, tab_target: str = "#artifact-table", **kwargs) -> None:
     super().__init__("Bundle", **kwargs)
+    self._tab_target = tab_target
     self._bundle_dir: Path | None = None
     self._primary_path: Path | None = None
 
@@ -85,9 +86,9 @@ class BundleTree(Tree[Path]):
     if isinstance(path, Path) and path.is_file():
       self.post_message(BundleFileSelected(path))
 
-  def action_focus_artifact_table(self) -> None:
-    """Leave tree, focus artifact table (DEC-061-03)."""
-    self.screen.query_one("#artifact-table").focus()
+  def action_focus_tab_target(self) -> None:
+    """Leave tree, focus the configured tab target (DEC-061-03, DEC-061-07)."""
+    self.screen.query_one(self._tab_target).focus()
 
   def clear_bundle(self) -> None:
     """Reset to empty state."""

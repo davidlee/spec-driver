@@ -33,15 +33,18 @@ BrowserScreen {
   border-title-color: $accent;
 }
 
+/* --- Shared bundle column rules (DEC-061-08) --- */
+
 #bundle-tree {
   display: none;
 }
 
-#left-column.has-bundle #type-selector {
+.bundle-column.has-bundle #type-selector,
+.bundle-column.has-bundle #session-list {
   height: 1fr;
 }
 
-#left-column.has-bundle #bundle-tree {
+.bundle-column.has-bundle #bundle-tree {
   display: block;
   height: 2fr;
   border: round $surface-lighten-2;
@@ -115,10 +118,14 @@ TrackScreen {
   layout: horizontal;
 }
 
-#session-list {
+#track-left {
   width: 1fr;
   min-width: 20;
   max-width: 25;
+  height: 100%;
+}
+
+#session-list {
   height: 100%;
   border: round $surface-lighten-2;
   border-title-color: $text-muted;

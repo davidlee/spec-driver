@@ -6,6 +6,13 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.backlog.registry import discover_backlog_items
+from supekku.scripts.lib.changes.audit_check import resolve_audit_gate
+from supekku.scripts.lib.core.frontmatter_metadata.audit import (
+  AUDIT_MODE_CONFORMANCE,
+  VALID_OUTCOME_KINDS,
+  VALID_STATUS_KIND_PAIRS,
+)
+from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 if TYPE_CHECKING:
   from collections.abc import Iterable
@@ -125,6 +132,10 @@ class WorkspaceValidator:
     # Spec taxonomy validation (warn-only)
     self._validate_spec_taxonomy()
 
+    # Audit disposition and gate coverage (DE-079 phase 3)
+    self._validate_audit_disposition(audit_registry)
+    self._validate_audit_gate_coverage(delta_registry)
+
     return list(self.issues)
 
   # --------------------------------------------------------------
@@ -210,6 +221,124 @@ class WorkspaceValidator:
             decision_id,
             f"References {related_decision.status} decision {related_id}",
           )
+
+  def _validate_audit_disposition(
+    self,
+    audit_registry: dict[str, ChangeArtifact],
+  ) -> None:
+    """Validate finding dispositions in completed audits.
+
+    For each completed audit, checks every finding for:
+    - Missing disposition → warning
+    - Invalid status×kind pair → error
+    - Invalid outcome×kind pair → error
+    - closure_override without rationale → error
+    """
+    for audit_id, audit in audit_registry.items():
+      if audit.status != "completed":
+        continue
+
+      fm, _ = load_markdown_file(audit.path)
+      for finding in fm.get("findings", []):
+        finding_id = finding.get("id", "?")
+        label = f"{audit_id}/{finding_id}"
+
+        disposition = finding.get("disposition")
+        if not disposition:
+          self._warning(label, "Finding has no disposition")
+          continue
+
+        status = disposition.get("status")
+        kind = disposition.get("kind")
+        outcome = finding.get("outcome")
+
+        # Validate status×kind
+        if kind and status:
+          valid_statuses = VALID_STATUS_KIND_PAIRS.get(kind)
+          if valid_statuses is not None and status not in valid_statuses:
+            self._error(
+              label,
+              f"Invalid status×kind: status '{status}' is not valid for kind '{kind}'",
+            )
+
+        # Validate outcome×kind
+        if outcome and kind:
+          valid_kinds = VALID_OUTCOME_KINDS.get(outcome)
+          if valid_kinds is not None and kind not in valid_kinds:
+            self._error(
+              label,
+              f"Invalid outcome×kind: kind '{kind}' is not valid"
+              f" for outcome '{outcome}'",
+            )
+
+        # Validate closure_override has rationale
+        override = disposition.get("closure_override")
+        if override and not override.get("rationale"):
+          self._error(label, "closure_override is missing rationale")
+
+  def _validate_audit_gate_coverage(
+    self,
+    delta_registry: dict[str, ChangeArtifact],
+  ) -> None:
+    """Validate audit gate coverage for qualifying deltas.
+
+    For each delta, resolves audit_gate. If required and no completed
+    conformance audit exists → warning. If multiple audits have
+    colliding finding IDs → warning.
+    """
+    audit_by_delta = self._build_conformance_audit_index()
+
+    for delta_id, delta in delta_registry.items():
+      fm, _ = load_markdown_file(delta.path)
+      gate = resolve_audit_gate(
+        fm.get("audit_gate"),
+        delta.applies_to.get("requirements", []),
+      )
+      if gate != "required":
+        continue
+
+      matching = audit_by_delta.get(delta_id, [])
+      if not matching:
+        self._warning(
+          delta_id,
+          "Audit gate is required but no completed conformance audit found",
+        )
+      elif len(matching) > 1:
+        self._check_finding_id_collisions(delta_id, matching)
+
+  def _build_conformance_audit_index(
+    self,
+  ) -> dict[str, list[tuple[str, dict]]]:
+    """Index completed conformance audits by delta_ref."""
+    result: dict[str, list[tuple[str, dict]]] = {}
+    for audit_id, audit in self.workspace.audit_registry.collect().items():
+      if audit.status != "completed":
+        continue
+      fm, _ = load_markdown_file(audit.path)
+      if fm.get("mode") != AUDIT_MODE_CONFORMANCE:
+        continue
+      delta_ref = fm.get("delta_ref")
+      if delta_ref:
+        result.setdefault(delta_ref, []).append((audit_id, fm))
+    return result
+
+  def _check_finding_id_collisions(
+    self,
+    delta_id: str,
+    audits: list[tuple[str, dict]],
+  ) -> None:
+    """Warn if finding IDs collide across multi-audit union."""
+    seen: dict[str, str] = {}
+    for audit_id, fm in audits:
+      for finding in fm.get("findings", []):
+        fid = finding.get("id", "")
+        if fid in seen:
+          self._warning(
+            delta_id,
+            f"Finding ID '{fid}' collides across audits {seen[fid]} and {audit_id}",
+          )
+        else:
+          seen[fid] = audit_id
 
   def _validate_spec_taxonomy(self) -> None:
     """Warn when tech specs are missing taxonomy or have inconsistent values.

@@ -126,14 +126,17 @@ class WorkspaceValidatorTest(RepoTestCase):
     ws = Workspace(root)
     ws.sync_requirements()
     issues = validate_workspace(ws)
-    assert not issues
+    # Only audit gate warning expected (delta has requirements but no audit)
+    non_gate = [i for i in issues if "Audit gate" not in i.message]
+    assert not non_gate
 
     # Break requirement link
     ws.requirements.records["SPEC-300.FR-300"].implemented_by = ["DE-999"]
     ws.requirements.save()
     issues = validate_workspace(ws)
-    assert len(issues) == 1
-    assert "DE-999" in issues[0].message
+    errors = [i for i in issues if i.level == "error"]
+    assert len(errors) == 1
+    assert "DE-999" in errors[0].message
 
   def test_validator_checks_change_relations(self) -> None:
     """Test validator verifies change relations point to valid requirements."""
@@ -146,8 +149,9 @@ class WorkspaceValidatorTest(RepoTestCase):
     ws = Workspace(root)
     ws.sync_requirements()
     issues = validate_workspace(ws)
-    assert len(issues) == 1
-    assert "SPEC-999.FR-999" in issues[0].message
+    errors = [i for i in issues if i.level == "error"]
+    assert len(errors) == 1
+    assert "SPEC-999.FR-999" in errors[0].message
 
   def _write_adr(
     self,
@@ -598,6 +602,285 @@ class WorkspaceValidatorTest(RepoTestCase):
     errors = [i for i in issues if i.level == "error"]
     assert len(errors) == 1
     assert "ISSUE-999" in errors[0].message
+
+  # -- Audit disposition validation (DE-079 phase 3) --
+
+  def _write_completed_audit(
+    self,
+    root: Path,
+    audit_id: str,
+    *,
+    mode: str = "conformance",
+    delta_ref: str = "",
+    findings: list[dict] | None = None,
+  ) -> Path:
+    """Write a completed audit with mode, delta_ref, and findings."""
+    audit_dir = root / SPEC_DRIVER_DIR / AUDITS_SUBDIR / f"{audit_id}-sample"
+    audit_dir.mkdir(parents=True, exist_ok=True)
+    audit_path = audit_dir / f"{audit_id}.md"
+    frontmatter: dict[str, Any] = {
+      "id": audit_id,
+      "slug": audit_id.lower(),
+      "name": audit_id,
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "completed",
+      "kind": "audit",
+      "relations": [],
+      "mode": mode,
+    }
+    if delta_ref:
+      frontmatter["delta_ref"] = delta_ref
+    if findings is not None:
+      frontmatter["findings"] = findings
+    dump_markdown_file(audit_path, frontmatter, f"# {audit_id}\n")
+    return audit_path
+
+  def test_audit_disposition_warns_missing_disposition(self) -> None:
+    """Completed audit finding without disposition emits a warning."""
+    root = self._create_repo()
+    self._write_completed_audit(
+      root,
+      "AUD-100",
+      findings=[{"id": "FIND-001", "description": "Some drift", "outcome": "drift"}],
+    )
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    warnings = [
+      i for i in issues if i.level == "warning" and "no disposition" in i.message
+    ]
+    assert len(warnings) == 1
+    assert warnings[0].artifact == "AUD-100/FIND-001"
+
+  def test_audit_disposition_errors_invalid_status_kind(self) -> None:
+    """Invalid status×kind pair emits an error."""
+    root = self._create_repo()
+    # aligned kind only allows reconciled, not accepted
+    self._write_completed_audit(
+      root,
+      "AUD-101",
+      findings=[
+        {
+          "id": "FIND-001",
+          "description": "Aligned",
+          "outcome": "aligned",
+          "disposition": {"status": "accepted", "kind": "aligned"},
+        }
+      ],
+    )
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    errors = [i for i in issues if i.level == "error" and "status×kind" in i.message]
+    assert len(errors) == 1
+    assert errors[0].artifact == "AUD-101/FIND-001"
+
+  def test_audit_disposition_errors_invalid_outcome_kind(self) -> None:
+    """Invalid outcome×kind pair emits an error."""
+    root = self._create_repo()
+    # drift outcome cannot have aligned kind
+    self._write_completed_audit(
+      root,
+      "AUD-102",
+      findings=[
+        {
+          "id": "FIND-001",
+          "description": "Drift dispositioned as aligned",
+          "outcome": "drift",
+          "disposition": {"status": "reconciled", "kind": "aligned"},
+        }
+      ],
+    )
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    errors = [i for i in issues if i.level == "error" and "outcome×kind" in i.message]
+    assert len(errors) == 1
+    assert errors[0].artifact == "AUD-102/FIND-001"
+
+  def test_audit_disposition_errors_closure_override_no_rationale(self) -> None:
+    """closure_override without rationale emits an error."""
+    root = self._create_repo()
+    self._write_completed_audit(
+      root,
+      "AUD-103",
+      findings=[
+        {
+          "id": "FIND-001",
+          "description": "Override missing rationale",
+          "outcome": "drift",
+          "disposition": {
+            "status": "accepted",
+            "kind": "tolerated_drift",
+            "closure_override": {"effect": "warn"},
+          },
+        }
+      ],
+    )
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    errors = [
+      i for i in issues if i.level == "error" and "closure_override" in i.message
+    ]
+    assert len(errors) == 1
+    assert errors[0].artifact == "AUD-103/FIND-001"
+
+  def test_audit_disposition_valid_finding_no_issues(self) -> None:
+    """Valid disposition produces no audit-related issues."""
+    root = self._create_repo()
+    self._write_completed_audit(
+      root,
+      "AUD-104",
+      findings=[
+        {
+          "id": "FIND-001",
+          "description": "Aligned finding",
+          "outcome": "aligned",
+          "disposition": {"status": "reconciled", "kind": "aligned"},
+        }
+      ],
+    )
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    audit_issues = [i for i in issues if i.artifact.startswith("AUD-104")]
+    assert len(audit_issues) == 0
+
+  def test_audit_disposition_skips_draft_audits(self) -> None:
+    """Draft audits are not checked for disposition validity."""
+    root = self._create_repo()
+    # Write a draft audit with an invalid disposition — should not trigger
+    audit_dir = root / SPEC_DRIVER_DIR / AUDITS_SUBDIR / "AUD-105-sample"
+    audit_dir.mkdir(parents=True)
+    dump_markdown_file(
+      audit_dir / "AUD-105.md",
+      {
+        "id": "AUD-105",
+        "slug": "aud-105",
+        "name": "AUD-105",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "audit",
+        "relations": [],
+        "findings": [
+          {
+            "id": "FIND-001",
+            "description": "Bad pair",
+            "outcome": "drift",
+            "disposition": {"status": "accepted", "kind": "aligned"},
+          }
+        ],
+      },
+      "# AUD-105\n",
+    )
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    audit_issues = [i for i in issues if i.artifact.startswith("AUD-105")]
+    assert len(audit_issues) == 0
+
+  def test_audit_gate_warns_missing_conformance_audit(self) -> None:
+    """Delta with required gate but no conformance audit emits a warning."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-700", "FR-700")
+    # Delta with requirement → auto resolves to required
+    self._write_delta(root, "DE-700", "SPEC-700.FR-700")
+    ws = Workspace(root)
+    ws.sync_requirements()
+    issues = validate_workspace(ws)
+    warnings = [i for i in issues if i.level == "warning" and "Audit gate" in i.message]
+    assert len(warnings) == 1
+    assert warnings[0].artifact == "DE-700"
+
+  def test_audit_gate_no_warn_when_conformance_audit_exists(self) -> None:
+    """Delta with required gate and matching conformance audit is clean."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-701", "FR-701")
+    self._write_delta(root, "DE-701", "SPEC-701.FR-701")
+    self._write_completed_audit(
+      root,
+      "AUD-701",
+      mode="conformance",
+      delta_ref="DE-701",
+      findings=[
+        {
+          "id": "FIND-001",
+          "description": "All good",
+          "outcome": "aligned",
+          "disposition": {"status": "reconciled", "kind": "aligned"},
+        }
+      ],
+    )
+    ws = Workspace(root)
+    ws.sync_requirements()
+    issues = validate_workspace(ws)
+    gate_warnings = [i for i in issues if "Audit gate" in i.message]
+    assert len(gate_warnings) == 0
+
+  def test_audit_gate_no_warn_for_non_qualifying_delta(self) -> None:
+    """Delta without requirements (auto → non-gating) gets no audit warning."""
+    root = self._create_repo()
+    delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-702-sample"
+    delta_dir.mkdir(parents=True)
+    delta_path = delta_dir / "DE-702.md"
+    dump_markdown_file(
+      delta_path,
+      {
+        "id": "DE-702",
+        "slug": "de-702",
+        "name": "DE-702",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "delta",
+        "relations": [],
+        "applies_to": {"requirements": []},
+      },
+      "# DE-702\n",
+    )
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    gate_warnings = [i for i in issues if "Audit gate" in i.message]
+    assert len(gate_warnings) == 0
+
+  def test_audit_gate_warns_finding_id_collisions(self) -> None:
+    """Finding ID collision across multi-audit union emits a warning."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-703", "FR-703")
+    self._write_delta(root, "DE-703", "SPEC-703.FR-703")
+    # Two audits with same finding ID
+    self._write_completed_audit(
+      root,
+      "AUD-703a",
+      mode="conformance",
+      delta_ref="DE-703",
+      findings=[
+        {
+          "id": "FIND-001",
+          "description": "First audit finding",
+          "outcome": "aligned",
+          "disposition": {"status": "reconciled", "kind": "aligned"},
+        }
+      ],
+    )
+    self._write_completed_audit(
+      root,
+      "AUD-703b",
+      mode="conformance",
+      delta_ref="DE-703",
+      findings=[
+        {
+          "id": "FIND-001",
+          "description": "Colliding ID in second audit",
+          "outcome": "drift",
+          "disposition": {"status": "reconciled", "kind": "spec_patch"},
+        }
+      ],
+    )
+    ws = Workspace(root)
+    ws.sync_requirements()
+    issues = validate_workspace(ws)
+    collision_warnings = [i for i in issues if "collides" in i.message]
+    assert len(collision_warnings) == 1
+    assert collision_warnings[0].artifact == "DE-703"
+    assert "FIND-001" in collision_warnings[0].message
 
   # -- Non-breaking regression (VT-030-006) --
 

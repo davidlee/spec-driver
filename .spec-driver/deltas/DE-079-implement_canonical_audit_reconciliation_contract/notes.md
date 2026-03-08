@@ -80,3 +80,29 @@
 
 #### Phase 2 → Phase 3 handoff
 - Phase 3 is validation rules: audit-specific rules in validator.py — missing audits, undispositioned findings, invalid pairs, finding ID collisions, closure_override without rationale.
+
+### Phase 3 execution — complete
+
+#### All tasks completed
+- **3.1 _validate_audit_disposition**: validates each completed audit's findings for: missing disposition (warning), invalid status×kind (error), invalid outcome×kind (error), closure_override without rationale (error). Only completed audits are checked — drafts are skipped.
+- **3.2 _validate_audit_gate_coverage**: for each delta, resolves audit_gate via `resolve_audit_gate`. If required and no completed conformance audit exists → warning. Finding ID collisions across multi-audit union → warning. Refactored into 3 methods (`_validate_audit_gate_coverage`, `_build_conformance_audit_index`, `_check_finding_id_collisions`) to satisfy pylint complexity limits.
+- **3.3 Tests**: 11 new tests covering all 6 validation rules + positive/negative/skip cases. 2 existing tests updated (assertions now filter audit gate warnings that fire on deltas with requirements but no conformance audit).
+
+#### Verification status
+- `just check` passes: ruff clean, 3583 tests pass (30 in validator_test.py), pylint 9.72/10
+- `just pylint-files` on touched files: 9.92/10 (5 messages, all pre-existing/structural)
+
+#### Adaptations
+- Existing tests `test_validator_reports_missing_relation_targets` and `test_validator_checks_change_relations` needed assertion updates — they create deltas with requirements, which now triggers the audit gate warning. Fixed by filtering to error-level or excluding audit gate messages.
+- `_validate_audit_gate_coverage` initially had McCabe 12 and 18 locals — extracted `_build_conformance_audit_index` and `_check_finding_id_collisions` helpers to resolve.
+
+#### Imports / reuse
+- Reuses `resolve_audit_gate` from `audit_check.py` (not duplicated)
+- Reuses `VALID_STATUS_KIND_PAIRS`, `VALID_OUTCOME_KINDS`, `AUDIT_MODE_CONFORMANCE` from `audit.py`
+- Uses `load_markdown_file` directly (not the private `_load_audit_frontmatter` from audit_check.py)
+
+#### Commits
+- Uncommitted — code + .spec-driver changes ready to commit together.
+
+#### Phase 3 → Phase 4 handoff
+- Phase 4 is skill rewrite: `audit-change` as canonical reconciliation runsheet.

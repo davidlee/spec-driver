@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Annotated
 
@@ -162,7 +163,14 @@ def doctor(
     if json_output:
       typer.echo(format_doctor_json(summaries))
     else:
-      typer.echo(format_doctor_text(summaries, verbose=verbose))
+      use_color = sys.stdout.isatty() and not json_output
+      typer.echo(
+        format_doctor_text(
+          summaries,
+          verbose=verbose,
+          color=use_color,
+        )
+      )
 
     raise typer.Exit(exit_code)
   except ValueError as e:

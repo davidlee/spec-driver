@@ -75,9 +75,7 @@ class TestFormatDoctorText(unittest.TestCase):
       CategorySummary(
         category="test",
         results=(
-          DiagnosticResult(
-            category="test", name="a", status="pass", message="OK"
-          ),
+          DiagnosticResult(category="test", name="a", status="pass", message="OK"),
         ),
       )
     ]
@@ -87,6 +85,28 @@ class TestFormatDoctorText(unittest.TestCase):
   def test_empty_summaries(self) -> None:
     output = format_doctor_text([])
     assert "0 pass" in output
+
+  def test_color_false_no_ansi(self) -> None:
+    """color=False should produce no ANSI escape codes."""
+    output = format_doctor_text(_make_summaries(), color=False)
+    assert "\033[" not in output
+    assert "node" in output
+    assert "2 pass" in output
+
+  def test_color_true_has_ansi(self) -> None:
+    """color=True should include ANSI escape codes."""
+    output = format_doctor_text(_make_summaries(), color=True)
+    assert "\033[" in output
+
+  def test_color_warn_symbol_present(self) -> None:
+    """Warning symbol should be present in coloured output."""
+    output = format_doctor_text(_make_summaries(), color=True)
+    assert "\u26a0" in output  # ⚠
+
+  def test_color_pass_symbol_in_verbose(self) -> None:
+    """Pass symbol should appear in verbose coloured output."""
+    output = format_doctor_text(_make_summaries(), verbose=True, color=True)
+    assert "\u2713" in output  # ✓
 
 
 class TestFormatDoctorJson(unittest.TestCase):
@@ -126,9 +146,7 @@ class TestFormatDoctorJson(unittest.TestCase):
       CategorySummary(
         category="test",
         results=(
-          DiagnosticResult(
-            category="test", name="a", status="pass", message="OK"
-          ),
+          DiagnosticResult(category="test", name="a", status="pass", message="OK"),
         ),
       )
     ]

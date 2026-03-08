@@ -3,7 +3,7 @@ id: ISSUE-036
 name: Standardize show output selectors
 created: '2026-03-05'
 updated: '2026-03-05'
-status: open
+status: closed
 kind: issue
 ---
 
@@ -34,6 +34,10 @@ outputs without bespoke flags like `--raw`.
 - `--raw` remains supported or explicitly documented as deprecated with a
   migration note.
 - CLI help shows the new selector and example usage.
+
+## Resolution
+Fully addressed by DE-073 phase 1. All 15 `show` subcommands implement
+`--content-type/-c` with `markdown|frontmatter|yaml`. `--raw` preserved.
 
 ## Related
 - ISSUE-035 (memory CLI UX improvements)

@@ -8461,7 +8461,7 @@ deltas:
         phase: IP-072.PHASE-02
   DE-073:
     kind: delta
-    status: in-progress
+    status: completed
     name: CLI output selectors, view UX, and resolve-links improvements
     slug: standardize_show_output_selectors
     updated: '2026-03-09'
@@ -8515,7 +8515,68 @@ deltas:
         - '1.4: Tests'
         risks:
         - -c flag may conflict with existing options
-      - id: IP-073.PHASE-02
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-073.PHASE-02
-      - id: IP-073.PHASE-03
+        plan: IP-073
+        delta: DE-073
+        objective: Replace pager-by-default view with rendered stdout (glow > rich
+          > raw), add --pager/-p opt-in, collapse ~16 near-identical subcommands into
+          shared helper, and register read as alias for view.
+        entrance_criteria:
+        - Phase 1 complete and committed
+        exit_criteria:
+        - view renders to stdout by default (no pager)
+        - --pager/-p invokes pager with render cascade
+        - view.py duplication collapsed via shared helper
+        - read alias works identically to view
+        - tests pass, lint clean
+        verification:
+          tests:
+          - VT-073-02: render_file and render_file_paged cascades
+          - VT-073-04: read alias dispatches identically to view
+          evidence: []
+        tasks:
+        - id: 2.1
+          description: Add render_file() and render_file_paged() to common.py
+        - id: 2.2
+          description: Add PagerOption annotated type
+        - id: 2.3
+          description: Create _view_artifact() shared helper in view.py
+        - id: 2.4
+          description: Collapse subcommands to use _view_artifact()
+        - id: 2.5
+          description: Register read alias in main.py
+        - id: 2.6
+          description: Update tests for new behavior
+        risks:
+        - Typer may reject same app registered twice for read alias
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-073.PHASE-03
+        plan: IP-073
+        delta: DE-073
+        objective: Add --verbose, --path, and --id flags to resolve links for scoped
+          resolution and missing-target diagnostics.
+        entrance_criteria:
+        - Phase 2 complete and committed
+        exit_criteria:
+        - --verbose reports missing targets with containing file paths
+        - --path scopes resolution to a single file
+        - --id scopes resolution to a single memory record
+        - all flags composable with --dry-run and --link-mode
+        - tests pass, lint clean
+        verification:
+          tests:
+          - VT-073-03: resolve links --verbose/--path/--id
+          evidence: []
+        tasks:
+        - id: 3.1
+          description: Add --verbose flag with missing target + file reporting
+        - id: 3.2
+          description: Add --path flag for single-file scoped resolution
+        - id: 3.3
+          description: Add --id flag (convenience wrapper over --path)
+        - id: 3.4
+          description: Tests for all new flags
+        risks: []

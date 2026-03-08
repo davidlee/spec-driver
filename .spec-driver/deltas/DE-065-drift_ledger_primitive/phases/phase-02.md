@@ -82,15 +82,15 @@ dispatch system so `spec-driver show DL-047` works via prefix lookup.
 - [x] DR-065 §6 integration points read and understood
 
 ## 4. Exit Criteria / Done When
-- [ ] `drift_formatters.py` with `format_drift_list_table()` and `format_drift_details()`
-- [ ] Column defs and theme styles for drift ledgers
-- [ ] Drift creation function in `supekku/scripts/lib/drift/creation.py`
-- [ ] CLI `create drift`, `list drift`, `show drift` commands working
-- [ ] DE-063 integration: `DL` prefix in PREFIX_TO_TYPE, resolver, finder
-- [ ] `show_handlers` and `view` dispatch include drift_ledger
-- [ ] `build_artifact_index()` collects drift ledgers
-- [ ] All tests pass (`just test`)
-- [ ] Both linters clean
+- [x] `drift_formatters.py` with `format_drift_list_table()` and `format_drift_details()`
+- [x] Column defs and theme styles for drift ledgers
+- [x] Drift creation function in `supekku/scripts/lib/drift/creation.py`
+- [x] CLI `create drift`, `list drift`, `show drift` commands working
+- [x] DE-063 integration: `DL` prefix in PREFIX_TO_TYPE, resolver, finder
+- [x] `show_handlers` and `view` dispatch include drift_ledger
+- [x] `build_artifact_index()` collects drift ledgers
+- [x] All tests pass (`just test`) — 3285 passed
+- [x] Both linters clean — ruff 0 errors, new files pylint 10.00/10
 
 ## 5. Verification
 - `just test` — all unit tests
@@ -110,12 +110,12 @@ dispatch system so `spec-driver show DL-047` works via prefix lookup.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | `drift_formatters.py` — list table, detail, JSON | [P] | |
-| [ ] | 2.2 | theme styles + column defs for drift | [P] | |
-| [ ] | 2.3 | `drift/creation.py` — create_drift_ledger() | [P] | |
-| [ ] | 2.4 | CLI commands: create/list/show drift | — | depends on 2.1-2.3 |
-| [ ] | 2.5 | DE-063 integration: common, resolve, show, view | — | depends on 2.4 |
-| [ ] | 2.6 | tests: VT-065-formatters, VT-065-cli | — | throughout |
+| [x] | 2.1 | `drift_formatters.py` — list table, detail, JSON | [P] | used format_list_table() generic |
+| [x] | 2.2 | theme styles + column defs for drift | [P] | done |
+| [x] | 2.3 | `drift/creation.py` — create_drift_ledger() | [P] | done |
+| [x] | 2.4 | CLI commands: create/list/show drift | — | in verb modules, not separate drift.py |
+| [x] | 2.5 | DE-063 integration: common, resolve, show, view | — | all 6 extension points |
+| [x] | 2.6 | tests: VT-065-formatters, VT-065-cli | — | 41 tests, all passing |
 
 ### Task Details
 
@@ -153,15 +153,22 @@ dispatch system so `spec-driver show DL-047` works via prefix lookup.
 ## 8. Risks & Mitigations
 | Risk | Mitigation | Status |
 | --- | --- | --- |
-| common.py is already large | Minimal additions following exact existing pattern | open |
-| list.py exceeding 150 lines (already large) | Drift list command is small, follow existing pattern | open |
+| common.py is already large | Minimal additions following exact existing pattern | resolved |
+| list.py exceeding 150 lines (already large) | Drift list command is small, follow existing pattern | resolved |
 
 ## 9. Decisions & Outcomes
+- 2026-03-08: CLI commands added to verb modules (create.py, list.py, show.py) instead of separate drift.py — matches actual codebase pattern where all commands live in verb-grouped modules
+- 2026-03-08: Used `format_list_table()` generic helper instead of hand-rolling table setup — cleaner than backlog_formatters.py pattern
+- 2026-03-08: Extracted `_entry_to_dict()` from `format_drift_details_json()` to reduce McCabe complexity from 11 to acceptable levels
+- 2026-03-08: `--delta` flag implemented as optional on `create drift` (DR-065 open question resolved: yes, explicit flag)
 
 ## 10. Findings / Research Notes
+- DE-063 extension points are purely additive — adding to dispatch tables is mechanical and low-risk
+- `format_list_table()` in table_utils.py is the right abstraction for new list formatters — eliminates boilerplate
+- Pre-existing pylint warnings in CLI modules (import-outside-toplevel, duplicate-code) are endemic to the pattern, not introduced by drift additions
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Phase sheet updated with outcomes
-- [ ] Hand-off notes to phase 3
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (3285 tests, ruff clean, pylint 10.00/10 on new files)
+- [x] Phase sheet updated with outcomes
+- [x] Hand-off notes to phase 3 (in notes.md)

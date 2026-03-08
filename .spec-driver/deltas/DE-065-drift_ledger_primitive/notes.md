@@ -2,8 +2,7 @@
 
 ## Status
 
-Phase 1 (domain layer) complete. Phase 2 (formatters, CLI, DE-063 integration)
-is next. Delta is `in-progress`.
+Phase 2 (formatters, CLI, DE-063 integration) complete. Phase 3 (migration & close) is next. Delta is `in-progress`.
 
 ## Completed
 
@@ -17,6 +16,38 @@ is next. Delta is `in-progress`.
 - IP-065 planned with 3 phases
 - Phase 1 implemented: models, parser, registry, paths.py, 65 tests, linters clean
 - Pre-existing PROB-001 test failure fixed
+- Phase 2 implemented: formatters, CLI, DE-063 integration, 41 new tests
+
+### Phase 2 details
+
+- `drift_formatters.py`: list table (via `format_list_table`), detail view, JSON
+  - Used `format_list_table()` from table_utils (generic helper) rather than hand-rolling table setup
+  - Extracted `_entry_to_dict()` to keep McCabe complexity down on JSON serializer
+- `drift/creation.py`: `create_drift_ledger()` with sequential ID allocation
+  - Scans existing DL-*.md files for max ID, increments
+  - Creates `.spec-driver/drift/` directory on demand
+  - Template matches DR-065 §10 exactly
+- CLI commands added directly in `create.py`, `list.py`, `show.py` (not a separate drift.py — CLI commands live in the verb-grouped modules, not per-artifact modules)
+- DE-063 integration: 6 extension points wired per DR-065 §6 table
+  - `PREFIX_TO_TYPE["DL"] = "drift_ledger"`
+  - `_resolve_drift_ledger`, `_find_drift_ledgers` in common.py
+  - `_collect_drift_ledgers` in resolve.py → build_artifact_index()
+  - `show_drift` + show_handlers entry in show.py
+  - `view_drift` in view.py
+- Theme: drift ledger + entry status styles, `drift.id` style
+- Column defs: `DRIFT_COLUMNS` in column_defs.py
+- ID inference works: `spec-driver show DL-001` resolves via prefix
+
+### Phase 2 commits
+
+- `a53cde3` docs(DE-065): create phase 2 sheet
+- `46fe97d` feat(DE-065): add drift formatters, CLI commands, DE-063 integration (P02)
+
+## Verification
+
+- `just check` green: 3285 tests pass, ruff clean, formatter clean
+- New files score 10.00/10 on pylint
+- Pre-existing pylint warnings in CLI modules unchanged (import-outside-toplevel pattern, duplicate-code across similar show/view commands)
 
 ## New Agent Instructions
 
@@ -25,58 +56,39 @@ is next. Delta is `in-progress`.
 Delta: `.spec-driver/deltas/DE-065-drift_ledger_primitive/DE-065.md`
 Notes: `.spec-driver/deltas/DE-065-drift_ledger_primitive/notes.md`
 
-### Required reading
+### Next: Phase 3 — Migration & close
 
-- DR-065: `.spec-driver/deltas/DE-065-drift_ledger_primitive/DR-065.md`
-  - §6 (DE-063 CLI Integration) — extension points table
-  - §7 (Model Design) — model shapes
-  - §10 (Authoring & Creation) — creation template
-- IP-065: `.spec-driver/deltas/DE-065-drift_ledger_primitive/IP-065.md`
-- Phase 1 sheet: `.spec-driver/deltas/DE-065-drift_ledger_primitive/phases/phase-01.md`
+Create phase 3 sheet:
+  `uv run spec-driver create phase "Migration and close" --plan IP-065`
 
-### Key files (implemented in phase 1)
+Tasks:
+1. Migrate pilot DL-047 from `drift/` to `.spec-driver/drift/`
+   - Convert entry format from pilot list-item to fenced YAML blocks
+   - Update any references to old path
+2. End-to-end verification: `create drift`, `list drift`, `show drift DL-047`
+3. Delta closure: `spec-driver complete delta DE-065`
 
-- `supekku/scripts/lib/drift/__init__.py`
-- `supekku/scripts/lib/drift/models.py` — DriftLedger, DriftEntry, Source, Claim, DiscoveredBy
-- `supekku/scripts/lib/drift/parser.py` — parse_ledger_body()
-- `supekku/scripts/lib/drift/registry.py` — DriftLedgerRegistry
-- `supekku/scripts/lib/core/paths.py` — DRIFT_SUBDIR, get_drift_dir()
+### Key files (phase 2 — all implemented)
 
-### Key files (to modify/create in phase 2)
+- `supekku/scripts/lib/formatters/drift_formatters.py` — list table, detail, JSON
+- `supekku/scripts/lib/drift/creation.py` — create_drift_ledger()
+- `supekku/cli/common.py` — PREFIX_TO_TYPE, resolver, finder for drift_ledger
+- `supekku/cli/resolve.py` — _collect_drift_ledgers in build_artifact_index
+- `supekku/cli/create.py` — `create drift` command
+- `supekku/cli/list.py` — `list drift` command
+- `supekku/cli/show.py` — `show drift` command + show_handlers entry
+- `supekku/cli/view.py` — `view drift` command
+- `supekku/scripts/lib/formatters/column_defs.py` — DRIFT_COLUMNS
+- `supekku/scripts/lib/formatters/theme.py` — drift status/entry styles
 
-- `supekku/scripts/lib/formatters/drift_formatters.py` — NEW: pure format functions
-- `supekku/scripts/drift.py` — NEW: thin CLI (create/list/show)
-- `supekku/cli/common.py` — MODIFY: PREFIX_TO_TYPE, _ARTIFACT_RESOLVERS, _ARTIFACT_FINDERS
-- `supekku/cli/resolve.py` — MODIFY: build_artifact_index() + _collect_drift_ledgers()
-- `supekku/cli/show.py` — MODIFY: show_drift_ledger handler, show_handlers entry
-- `supekku/cli/view.py` — MODIFY: view_drift_ledger handler
+### Adaptations from DR-065
 
-### Pattern references (for phase 2)
-
-- Formatter pattern: `supekku/scripts/lib/formatters/backlog_formatters.py`
-- Table rendering: `supekku/scripts/lib/formatters/table_utils.py` — use `add_row_with_truncation()` with `Text.from_markup()`
-- CLI thin command pattern: `supekku/scripts/list_backlog.py` or similar
-- ID inference registration: `supekku/cli/common.py` lines 515-530 (PREFIX_TO_TYPE)
-- Resolver pattern: `supekku/cli/common.py` lines 466-482 (_ARTIFACT_RESOLVERS)
-- InferringGroup: `supekku/cli/common.py` lines 594-618 (TyperGroup subclass, 3-tuple return)
-- Cross-registry index: `supekku/cli/resolve.py` lines 145-163 (build_artifact_index)
-
-### Relevant decisions
-
-- DEC-065-02: entry data in fenced YAML blocks (not the pilot list-item format)
-- DR-065 §10 creation template: frontmatter + `## Entries` heading, no template entry
-- `--delta DE-NNN` flag on `create drift` recommended but open question
-- Formatters must use Rich markup-aware truncation (DE-063 pattern)
+- DR-065 listed `supekku/scripts/drift.py` as a new thin CLI file. Instead, commands were added to the existing verb-grouped modules (create.py, list.py, show.py) — this follows the actual codebase pattern where all CLI commands live in verb modules, not artifact modules.
+- `format_list_table()` generic helper was used instead of hand-building table setup (existed from a prior refactor, not known when DR-065 was drafted)
 
 ### Loose ends
 
-- Phase 2 sheet (`phases/phase-02.md`) needs to be created via `spec-driver create phase`
-- `.spec-driver/drift/` directory doesn't exist yet — `create drift` should create it
-- No `py.typed` or exports updated in `drift/__init__.py` yet
-- Pilot DL-047 migration is phase 3, not phase 2
-
-### Commit guidance
-
-- `.spec-driver/**` changes from phase sheet creation should be committed
-  promptly per doctrine (bias toward frequent small commits of workflow artefacts)
-- Code changes and `.spec-driver` changes can go together or separately
+- `drift/__init__.py` exports are still empty (`__all__: list[str] = []`) — acceptable for now, consumers import from submodules directly
+- Pilot DL-047 migration is phase 3
+- `--delta` flag on `create drift` is implemented (optional `--delta DE-NNN`)
+- No `ARTIFACT_PREFIXES` entry for drift (DL IDs don't use numeric-only normalization — DL-047 is always fully qualified). This is correct per current design.

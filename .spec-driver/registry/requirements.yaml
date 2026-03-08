@@ -1,4 +1,224 @@
 requirements:
+  IMPR-001.FR-042:
+    label: FR-042
+    title: User shall provide valid credentials
+    specs:
+    - IMPR-001
+    primary_spec: IMPR-001
+    kind: functional
+    category: authentication
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/improvements/IMPR-001-add-category-support-to-requirements/IMPR-001.md
+    source_kind: improvement
+    source_type: backlog
+  IMPR-001.NF-001:
+    label: NF-001
+    title: System shall respond within 100ms
+    specs:
+    - IMPR-001
+    primary_spec: IMPR-001
+    kind: non-functional
+    category: performance
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/improvements/IMPR-001-add-category-support-to-requirements/IMPR-001.md
+    source_kind: improvement
+    source_type: backlog
+  ISSUE-013.FR-013.001:
+    label: FR-013.001
+    title: IP Schema Restoration
+    specs:
+    - ISSUE-013
+    primary_spec: ISSUE-013
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/issues/ISSUE-013-revert-entry-exit-criteria-from-ip/ISSUE-013.md
+    source_kind: issue
+    source_type: backlog
+  ISSUE-013.FR-013.002:
+    label: FR-013.002
+    title: Phase Creation with Criteria Copy
+    specs:
+    - ISSUE-013
+    primary_spec: ISSUE-013
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/issues/ISSUE-013-revert-entry-exit-criteria-from-ip/ISSUE-013.md
+    source_kind: issue
+    source_type: backlog
+  ISSUE-013.FR-013.003:
+    label: FR-013.003
+    title: Drift Detection Warning
+    specs:
+    - ISSUE-013
+    primary_spec: ISSUE-013
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/issues/ISSUE-013-revert-entry-exit-criteria-from-ip/ISSUE-013.md
+    source_kind: issue
+    source_type: backlog
+  ISSUE-013.NF-013.001:
+    label: NF-013.001
+    title: Backward Compatibility
+    specs:
+    - ISSUE-013
+    primary_spec: ISSUE-013
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/issues/ISSUE-013-revert-entry-exit-criteria-from-ip/ISSUE-013.md
+    source_kind: issue
+    source_type: backlog
+  ISSUE-016.FR-016.001:
+    label: FR-016.001
+    title: Sync Backlog Requirements
+    specs:
+    - ISSUE-016
+    primary_spec: ISSUE-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-076
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/issues/ISSUE-016-sync-backlog-requirements-to-requirements-registry/ISSUE-016.md
+    source_kind: issue
+    source_type: backlog
+  ISSUE-016.FR-016.002:
+    label: FR-016.002
+    title: Filter Requirements by Source
+    specs:
+    - ISSUE-016
+    primary_spec: ISSUE-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-076
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/issues/ISSUE-016-sync-backlog-requirements-to-requirements-registry/ISSUE-016.md
+    source_kind: issue
+    source_type: backlog
+  ISSUE-016.FR-016.003:
+    label: FR-016.003
+    title: Requirement Migration Command
+    specs:
+    - ISSUE-016
+    primary_spec: ISSUE-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/issues/ISSUE-016-sync-backlog-requirements-to-requirements-registry/ISSUE-016.md
+    source_kind: issue
+    source_type: backlog
+  ISSUE-016.FR-016.004:
+    label: FR-016.004
+    title: Coverage Tracking for Backlog Requirements
+    specs:
+    - ISSUE-016
+    primary_spec: ISSUE-016
+    kind: functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-076
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/issues/ISSUE-016-sync-backlog-requirements-to-requirements-registry/ISSUE-016.md
+    source_kind: issue
+    source_type: backlog
+  ISSUE-016.NF-016.001:
+    label: NF-016.001
+    title: Backward Compatibility
+    specs:
+    - ISSUE-016
+    primary_spec: ISSUE-016
+    kind: non-functional
+    category: null
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by:
+    - DE-076
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/issues/ISSUE-016-sync-backlog-requirements-to-requirements-registry/ISSUE-016.md
+    source_kind: issue
+    source_type: backlog
+  ISSUE-020.FR-015:
+    label: FR-015
+    title: Per-file validation could validate SHA format
+    specs:
+    - ISSUE-020
+    primary_spec: ISSUE-020
+    kind: functional
+    category: PROD-010
+    status: pending
+    tags: []
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    coverage_evidence: []
+    coverage_entries: []
+    path: .spec-driver/backlog/issues/ISSUE-020-add-git-sha-tracking-to-artifact-frontmatter/ISSUE-020.md
+    source_kind: issue
+    source_type: backlog
   PROD-001.FR-001:
     label: FR-001
     title: Claude Command Provides Complete Workflow
@@ -3339,7 +3559,8 @@ requirements:
     status: active
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-078
     verified_by: []
     coverage_evidence:
     - VT-CLI-LIST-001
@@ -3404,7 +3625,8 @@ requirements:
     status: active
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-078
     verified_by: []
     coverage_evidence:
     - VT-CLI-COMMON-001
@@ -3438,7 +3660,8 @@ requirements:
     status: active
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-078
     verified_by: []
     coverage_evidence:
     - VT-CLI-FORMAT-001

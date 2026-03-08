@@ -341,6 +341,20 @@ def create_revision_cmd(
 @app.command("audit")
 def create_audit_cmd(
   title: Annotated[str, typer.Argument(help="Audit title")],
+  mode: Annotated[
+    str,
+    typer.Option(
+      "--mode",
+      help="Audit mode: conformance or discovery",
+    ),
+  ] = "conformance",
+  delta: Annotated[
+    str | None,
+    typer.Option(
+      "--delta",
+      help="Owning delta ID (e.g. DE-079)",
+    ),
+  ] = None,
   specs: Annotated[
     list[str] | None,
     typer.Option(
@@ -367,6 +381,8 @@ def create_audit_cmd(
   try:
     result = create_audit(
       title,
+      mode=mode,
+      delta_ref=delta,
       spec_refs=specs,
       prod_refs=prods,
       code_scope=code_scope,

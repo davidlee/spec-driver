@@ -415,6 +415,8 @@ def create_delta(
 def create_audit(
   name: str,
   *,
+  mode: str = "conformance",
+  delta_ref: str | None = None,
   spec_refs: Iterable[str] | None = None,
   prod_refs: Iterable[str] | None = None,
   code_scope: Iterable[str] | None = None,
@@ -424,6 +426,8 @@ def create_audit(
 
   Args:
     name: Audit name/title.
+    mode: Audit mode — 'conformance' or 'discovery'.
+    delta_ref: Owning delta ID (e.g. 'DE-079').
     spec_refs: Spec IDs referenced by the audit.
     prod_refs: Product spec IDs referenced by the audit.
     code_scope: Code path patterns inspected during audit.
@@ -450,7 +454,10 @@ def create_audit(
     "updated": today,
     "status": "draft",
     "kind": "audit",
+    "mode": mode,
   }
+  if delta_ref:
+    frontmatter["delta_ref"] = delta_ref
   if spec_refs:
     frontmatter["spec_refs"] = sorted(set(spec_refs))
   if prod_refs:

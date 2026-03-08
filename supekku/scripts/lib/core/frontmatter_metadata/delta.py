@@ -12,6 +12,18 @@ from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 
 from .base import BASE_FRONTMATTER_METADATA
 
+# -- Audit gate constants (DEC-079-003, DEC-079-010) --
+
+AUDIT_GATE_AUTO = "auto"
+AUDIT_GATE_REQUIRED = "required"
+AUDIT_GATE_EXEMPT = "exempt"
+
+AUDIT_GATE_VALUES: set[str] = {
+  AUDIT_GATE_AUTO,
+  AUDIT_GATE_REQUIRED,
+  AUDIT_GATE_EXEMPT,
+}
+
 DELTA_FRONTMATTER_METADATA = BlockMetadata(
   version=1,
   schema_id="supekku.frontmatter.delta",
@@ -112,6 +124,22 @@ DELTA_FRONTMATTER_METADATA = BlockMetadata(
       type="string",
       required=False,
       description=("Declarative description of target state after applying delta"),
+      persistence="optional",
+    ),
+    "audit_gate": FieldMetadata(
+      type="enum",
+      required=False,
+      enum_values=sorted(AUDIT_GATE_VALUES),
+      description=(
+        "Audit gating for delta completion: auto resolves from applies_to.requirements"
+      ),
+      persistence="default-omit",
+      default_value=AUDIT_GATE_AUTO,
+    ),
+    "audit_gate_rationale": FieldMetadata(
+      type="string",
+      required=False,
+      description="Required when audit_gate is exempt",
       persistence="optional",
     ),
     "risk_register": FieldMetadata(
@@ -218,5 +246,9 @@ DELTA_FRONTMATTER_METADATA = BlockMetadata(
 )
 
 __all__ = [
+  "AUDIT_GATE_AUTO",
+  "AUDIT_GATE_EXEMPT",
+  "AUDIT_GATE_REQUIRED",
+  "AUDIT_GATE_VALUES",
   "DELTA_FRONTMATTER_METADATA",
 ]

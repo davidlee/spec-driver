@@ -1,7 +1,8 @@
 """Audit frontmatter metadata for kind: audit artifacts.
 
 This module defines the metadata schema for audit frontmatter,
-extending the base metadata with audit-specific fields.
+extending the base metadata with audit-specific fields including
+the per-finding disposition contract (DEC-079-001).
 """
 
 from __future__ import annotations
@@ -10,13 +11,199 @@ from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 
 from .base import BASE_FRONTMATTER_METADATA
 
+# -- Disposition constants (DEC-079-001, DEC-079-007) --
+
+DISPOSITION_STATUS_RECONCILED = "reconciled"
+DISPOSITION_STATUS_ACCEPTED = "accepted"
+DISPOSITION_STATUS_PENDING = "pending"
+
+DISPOSITION_STATUSES: set[str] = {
+  DISPOSITION_STATUS_RECONCILED,
+  DISPOSITION_STATUS_ACCEPTED,
+  DISPOSITION_STATUS_PENDING,
+}
+
+DISPOSITION_KIND_ALIGNED = "aligned"
+DISPOSITION_KIND_SPEC_PATCH = "spec_patch"
+DISPOSITION_KIND_REVISION = "revision"
+DISPOSITION_KIND_FOLLOW_UP_DELTA = "follow_up_delta"
+DISPOSITION_KIND_FOLLOW_UP_BACKLOG = "follow_up_backlog"
+DISPOSITION_KIND_TOLERATED_DRIFT = "tolerated_drift"
+
+DISPOSITION_KINDS: set[str] = {
+  DISPOSITION_KIND_ALIGNED,
+  DISPOSITION_KIND_SPEC_PATCH,
+  DISPOSITION_KIND_REVISION,
+  DISPOSITION_KIND_FOLLOW_UP_DELTA,
+  DISPOSITION_KIND_FOLLOW_UP_BACKLOG,
+  DISPOSITION_KIND_TOLERATED_DRIFT,
+}
+
+# -- Finding outcome constants --
+
+FINDING_OUTCOME_ALIGNED = "aligned"
+FINDING_OUTCOME_DRIFT = "drift"
+FINDING_OUTCOME_RISK = "risk"
+
+FINDING_OUTCOMES: set[str] = {
+  FINDING_OUTCOME_ALIGNED,
+  FINDING_OUTCOME_DRIFT,
+  FINDING_OUTCOME_RISK,
+}
+
+# -- Audit mode constants --
+
+AUDIT_MODE_CONFORMANCE = "conformance"
+AUDIT_MODE_DISCOVERY = "discovery"
+
+AUDIT_MODES: set[str] = {
+  AUDIT_MODE_CONFORMANCE,
+  AUDIT_MODE_DISCOVERY,
+}
+
+# -- Validity matrices (DEC-079-007, DEC-079-009) --
+
+VALID_STATUS_KIND_PAIRS: dict[str, set[str]] = {
+  DISPOSITION_KIND_ALIGNED: {DISPOSITION_STATUS_RECONCILED},
+  DISPOSITION_KIND_SPEC_PATCH: {
+    DISPOSITION_STATUS_PENDING,
+    DISPOSITION_STATUS_RECONCILED,
+  },
+  DISPOSITION_KIND_REVISION: {
+    DISPOSITION_STATUS_PENDING,
+    DISPOSITION_STATUS_RECONCILED,
+  },
+  DISPOSITION_KIND_FOLLOW_UP_DELTA: {
+    DISPOSITION_STATUS_PENDING,
+    DISPOSITION_STATUS_ACCEPTED,
+  },
+  DISPOSITION_KIND_FOLLOW_UP_BACKLOG: {
+    DISPOSITION_STATUS_PENDING,
+    DISPOSITION_STATUS_ACCEPTED,
+  },
+  DISPOSITION_KIND_TOLERATED_DRIFT: {DISPOSITION_STATUS_ACCEPTED},
+}
+
+VALID_OUTCOME_KINDS: dict[str, set[str]] = {
+  FINDING_OUTCOME_ALIGNED: {DISPOSITION_KIND_ALIGNED},
+  FINDING_OUTCOME_DRIFT: {
+    DISPOSITION_KIND_SPEC_PATCH,
+    DISPOSITION_KIND_REVISION,
+    DISPOSITION_KIND_FOLLOW_UP_DELTA,
+    DISPOSITION_KIND_FOLLOW_UP_BACKLOG,
+    DISPOSITION_KIND_TOLERATED_DRIFT,
+  },
+  FINDING_OUTCOME_RISK: {
+    DISPOSITION_KIND_SPEC_PATCH,
+    DISPOSITION_KIND_REVISION,
+    DISPOSITION_KIND_FOLLOW_UP_DELTA,
+    DISPOSITION_KIND_FOLLOW_UP_BACKLOG,
+    DISPOSITION_KIND_TOLERATED_DRIFT,
+  },
+}
+
+# -- Structured ref sub-schema (shared by refs and drift_refs) --
+
+_REF_ITEM_SCHEMA = FieldMetadata(
+  type="object",
+  description="Structured reference",
+  properties={
+    "kind": FieldMetadata(
+      type="string",
+      required=True,
+      pattern=r".+",
+      description="Reference kind (e.g. spec, delta, drift_entry)",
+    ),
+    "ref": FieldMetadata(
+      type="string",
+      required=True,
+      pattern=r".+",
+      description="Reference ID (e.g. SPEC-101, DL-047.003)",
+    ),
+  },
+)
+
+# -- Disposition sub-schema (DEC-079-001) --
+
+_DISPOSITION_SCHEMA = FieldMetadata(
+  type="object",
+  required=False,
+  description="Per-finding disposition (DEC-079-001)",
+  properties={
+    "status": FieldMetadata(
+      type="enum",
+      required=True,
+      enum_values=sorted(DISPOSITION_STATUSES),
+      description="Whether this audit has finished routing the finding",
+    ),
+    "kind": FieldMetadata(
+      type="enum",
+      required=True,
+      enum_values=sorted(DISPOSITION_KINDS),
+      description="What routing path was taken",
+    ),
+    "refs": FieldMetadata(
+      type="array",
+      required=False,
+      items=_REF_ITEM_SCHEMA,
+      description="Reconciliation references (spec patches, revisions, follow-up work)",
+    ),
+    "drift_refs": FieldMetadata(
+      type="array",
+      required=False,
+      items=_REF_ITEM_SCHEMA,
+      description="Optional drift-ledger entry references",
+    ),
+    "rationale": FieldMetadata(
+      type="string",
+      required=False,
+      description="Why this disposition is correct",
+    ),
+    "closure_override": FieldMetadata(
+      type="object",
+      required=False,
+      description="Non-default gate relaxation (DEC-079-005)",
+      properties={
+        "effect": FieldMetadata(
+          type="enum",
+          required=True,
+          enum_values=["warn", "none"],
+          description="Relaxed closure effect (must be less strict than derived)",
+        ),
+        "rationale": FieldMetadata(
+          type="string",
+          required=True,
+          pattern=r".+",
+          description="Why the default gate is being relaxed",
+        ),
+      },
+    ),
+  },
+)
+
+# -- Audit frontmatter schema --
+
 AUDIT_FRONTMATTER_METADATA = BlockMetadata(
   version=1,
   schema_id="supekku.frontmatter.audit",
   description="Frontmatter fields for audits (kind: audit)",
   fields={
-    **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
-    # Audit-specific fields (all optional)
+    **BASE_FRONTMATTER_METADATA.fields,
+    # Audit-specific fields
+    "mode": FieldMetadata(
+      type="enum",
+      required=False,
+      enum_values=sorted(AUDIT_MODES),
+      description=(
+        "Audit mode: conformance (post-implementation) or discovery (backfill)"
+      ),
+    ),
+    "delta_ref": FieldMetadata(
+      type="string",
+      required=False,
+      pattern=r"^DE-\d+$",
+      description="Owning delta ID",
+    ),
     "spec_refs": FieldMetadata(
       type="array",
       required=False,
@@ -78,7 +265,7 @@ AUDIT_FRONTMATTER_METADATA = BlockMetadata(
           "outcome": FieldMetadata(
             type="enum",
             required=True,
-            enum_values=["drift", "aligned", "risk"],
+            enum_values=sorted(FINDING_OUTCOMES),
             description="Finding outcome",
           ),
           "linked_issue": FieldMetadata(
@@ -93,66 +280,16 @@ AUDIT_FRONTMATTER_METADATA = BlockMetadata(
             pattern=r".+",
             description="Related delta ID",
           ),
+          "disposition": _DISPOSITION_SCHEMA,
         },
       ),
-      description="Audit findings",
-    ),
-    "patch_level": FieldMetadata(
-      type="array",
-      required=False,
-      items=FieldMetadata(
-        type="object",
-        description="Patch-level alignment status",
-        properties={
-          "artefact": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="Artifact ID",
-          ),
-          "status": FieldMetadata(
-            type="enum",
-            required=True,
-            enum_values=["aligned", "divergent", "unknown"],
-            description="Alignment status",
-          ),
-          "notes": FieldMetadata(
-            type="string",
-            required=False,
-            description="Additional notes",
-          ),
-        },
-      ),
-      description="Per-artifact alignment status",
-    ),
-    "next_actions": FieldMetadata(
-      type="array",
-      required=False,
-      items=FieldMetadata(
-        type="object",
-        description="Recommended next action",
-        properties={
-          "type": FieldMetadata(
-            type="enum",
-            required=True,
-            enum_values=["delta", "issue", "spec", "requirement"],
-            description="Type of action",
-          ),
-          "id": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="Action artifact ID",
-          ),
-        },
-      ),
-      description="Recommended next actions from audit",
+      description="Audit findings with optional per-finding disposition",
     ),
   },
   examples=[
-    # Minimal audit (base fields only)
+    # Minimal audit
     {
-      "id": "AUDIT-001",
+      "id": "AUD-001",
       "name": "Example Audit",
       "slug": "audit-example",
       "kind": "audit",
@@ -160,16 +297,17 @@ AUDIT_FRONTMATTER_METADATA = BlockMetadata(
       "created": "2025-01-15",
       "updated": "2025-01-15",
     },
-    # Complete audit with all fields
+    # Conformance audit with disposition
     {
-      "id": "AUDIT-042",
+      "id": "AUD-042",
       "name": "Content Binding Alignment Review",
       "slug": "audit-content-binding",
       "kind": "audit",
-      "status": "approved",
-      "lifecycle": "verification",
+      "status": "completed",
       "created": "2024-06-01",
       "updated": "2024-06-08",
+      "mode": "conformance",
+      "delta_ref": "DE-021",
       "owners": ["qa-team"],
       "summary": (
         "Snapshot of how content reconciler aligns with SPEC-101 responsibilities"
@@ -187,20 +325,14 @@ AUDIT_FRONTMATTER_METADATA = BlockMetadata(
           "id": "FIND-001",
           "description": "Content reconciler deviates from SPEC-101 responsibility",
           "outcome": "drift",
-          "linked_issue": "ISSUE-018",
           "linked_delta": "DE-021",
+          "disposition": {
+            "status": "reconciled",
+            "kind": "spec_patch",
+            "refs": [{"kind": "spec", "ref": "SPEC-101"}],
+            "rationale": "Patched SPEC-101 to match observed behaviour",
+          },
         }
-      ],
-      "patch_level": [
-        {
-          "artefact": "SPEC-101",
-          "status": "divergent",
-          "notes": ("Implementation matches responsibilities except schema validation"),
-        }
-      ],
-      "next_actions": [
-        {"type": "delta", "id": "DE-021"},
-        {"type": "issue", "id": "ISSUE-052"},
       ],
     },
   ],
@@ -208,4 +340,24 @@ AUDIT_FRONTMATTER_METADATA = BlockMetadata(
 
 __all__ = [
   "AUDIT_FRONTMATTER_METADATA",
+  "AUDIT_MODE_CONFORMANCE",
+  "AUDIT_MODE_DISCOVERY",
+  "AUDIT_MODES",
+  "DISPOSITION_KIND_ALIGNED",
+  "DISPOSITION_KIND_FOLLOW_UP_BACKLOG",
+  "DISPOSITION_KIND_FOLLOW_UP_DELTA",
+  "DISPOSITION_KIND_REVISION",
+  "DISPOSITION_KIND_SPEC_PATCH",
+  "DISPOSITION_KIND_TOLERATED_DRIFT",
+  "DISPOSITION_KINDS",
+  "DISPOSITION_STATUS_ACCEPTED",
+  "DISPOSITION_STATUS_PENDING",
+  "DISPOSITION_STATUS_RECONCILED",
+  "DISPOSITION_STATUSES",
+  "FINDING_OUTCOME_ALIGNED",
+  "FINDING_OUTCOME_DRIFT",
+  "FINDING_OUTCOME_RISK",
+  "FINDING_OUTCOMES",
+  "VALID_OUTCOME_KINDS",
+  "VALID_STATUS_KIND_PAIRS",
 ]

@@ -37,6 +37,8 @@ class ChangeArtifact:
   applies_to: dict[str, Any] = field(default_factory=dict)
   relations: list[dict[str, Any]] = field(default_factory=list)
   plan: dict[str, Any] | None = None
+  ext_id: str = ""
+  ext_url: str = ""
 
   def to_dict(self, repo_root: Path) -> dict[str, Any]:
     """Convert artifact to dictionary for registry serialization.
@@ -62,6 +64,10 @@ class ChangeArtifact:
       data["relations"] = self.relations
     if self.plan:
       data["plan"] = self.plan
+    if self.ext_id:
+      data["ext_id"] = self.ext_id
+    if self.ext_url:
+      data["ext_url"] = self.ext_url
     return data
 
 
@@ -207,6 +213,8 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
     applies_to=applies_to_mapping,
     relations=relations,
     plan=plan_payload,
+    ext_id=str(frontmatter.get("ext_id", "")),
+    ext_url=str(frontmatter.get("ext_url", "")),
   )
 
 

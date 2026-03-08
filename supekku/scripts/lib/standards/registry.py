@@ -50,6 +50,8 @@ class StandardRecord:
   tags: list[str] = field(default_factory=list)
   summary: str = ""
   path: str = ""
+  ext_id: str = ""
+  ext_url: str = ""
   backlinks: dict[str, list[str]] = field(default_factory=dict)
 
   def to_dict(self, root: Path) -> dict[str, Any]:
@@ -192,6 +194,8 @@ class StandardRegistry:
       tags=frontmatter.get("tags", []),
       summary=frontmatter.get("summary", ""),
       path=str(standard_path),
+      ext_id=str(frontmatter.get("ext_id", "")),
+      ext_url=str(frontmatter.get("ext_url", "")),
     )
 
   def parse_date(self, date_value: Any) -> date | None:

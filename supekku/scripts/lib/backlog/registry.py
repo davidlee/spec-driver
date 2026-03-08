@@ -158,6 +158,8 @@ class BacklogRegistry:
       likelihood=float(frontmatter.get("likelihood", 0.0)),
       created=str(frontmatter.get("created", "")),
       updated=str(frontmatter.get("updated", "")),
+      ext_id=str(frontmatter.get("ext_id", "")),
+      ext_url=str(frontmatter.get("ext_url", "")),
     )
 
   def find(self, item_id: str) -> BacklogItem | None:

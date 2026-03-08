@@ -65,5 +65,37 @@ class IsValidStatusTest(unittest.TestCase):
       assert status in ALL_VALID_STATUSES, f"{status} not in any kind's status set"
 
 
+class BacklogItemExtFieldsTest(unittest.TestCase):
+  """VT-067-001: BacklogItem supports ext_id and ext_url fields."""
+
+  def test_ext_fields_default_to_empty(self) -> None:
+    from pathlib import Path  # noqa: PLC0415
+
+    from supekku.scripts.lib.backlog.models import BacklogItem  # noqa: PLC0415
+
+    item = BacklogItem(
+      id="ISSUE-001", kind="issue", status="open", title="Test", path=Path()
+    )
+    assert item.ext_id == ""
+    assert item.ext_url == ""
+
+  def test_ext_fields_populated(self) -> None:
+    from pathlib import Path  # noqa: PLC0415
+
+    from supekku.scripts.lib.backlog.models import BacklogItem  # noqa: PLC0415
+
+    item = BacklogItem(
+      id="ISSUE-002",
+      kind="issue",
+      status="open",
+      title="Test",
+      path=Path(),
+      ext_id="JIRA-999",
+      ext_url="https://jira.example.com/JIRA-999",
+    )
+    assert item.ext_id == "JIRA-999"
+    assert item.ext_url == "https://jira.example.com/JIRA-999"
+
+
 if __name__ == "__main__":
   unittest.main()

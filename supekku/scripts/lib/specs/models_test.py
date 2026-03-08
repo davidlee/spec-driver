@@ -116,3 +116,79 @@ class SpecTaxonomyTest(RepoTestCase):
     bare_dict = registry.get("SPEC-003").to_dict(root)
     assert "category" not in bare_dict
     assert "c4_level" not in bare_dict
+
+
+class SpecExternalRefTest(RepoTestCase):
+  """VT-067-001: Spec model exposes ext_id and ext_url from frontmatter."""
+
+  def _make_repo_with_external_spec(self):
+    root = self._make_repo()
+    tech_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
+
+    ext_dir = tech_dir / "SPEC-010"
+    ext_dir.mkdir(parents=True)
+    dump_markdown_file(
+      ext_dir / "SPEC-010.md",
+      {
+        "id": "SPEC-010",
+        "slug": "external-ref",
+        "name": "External Ref",
+        "kind": "spec",
+        "status": "draft",
+        "created": "2026-01-01",
+        "updated": "2026-01-01",
+        "ext_id": "JIRA-1234",
+        "ext_url": "https://jira.example.com/browse/JIRA-1234",
+      },
+      "# SPEC-010\n",
+    )
+
+    bare_dir = tech_dir / "SPEC-011"
+    bare_dir.mkdir(parents=True)
+    dump_markdown_file(
+      bare_dir / "SPEC-011.md",
+      {
+        "id": "SPEC-011",
+        "slug": "no-external",
+        "name": "No External",
+        "kind": "spec",
+        "status": "draft",
+        "created": "2026-01-01",
+        "updated": "2026-01-01",
+      },
+      "# SPEC-011\n",
+    )
+
+    os.chdir(root)
+    return root
+
+  def test_ext_id_property(self):
+    root = self._make_repo_with_external_spec()
+    registry = SpecRegistry(root)
+    assert registry.get("SPEC-010").ext_id == "JIRA-1234"
+
+  def test_ext_url_property(self):
+    root = self._make_repo_with_external_spec()
+    registry = SpecRegistry(root)
+    assert registry.get("SPEC-010").ext_url == "https://jira.example.com/browse/JIRA-1234"
+
+  def test_missing_ext_fields_return_empty_string(self):
+    root = self._make_repo_with_external_spec()
+    registry = SpecRegistry(root)
+    bare = registry.get("SPEC-011")
+    assert bare.ext_id == ""
+    assert bare.ext_url == ""
+
+  def test_to_dict_includes_ext_fields_when_present(self):
+    root = self._make_repo_with_external_spec()
+    registry = SpecRegistry(root)
+    data = registry.get("SPEC-010").to_dict(root)
+    assert data["ext_id"] == "JIRA-1234"
+    assert data["ext_url"] == "https://jira.example.com/browse/JIRA-1234"
+
+  def test_to_dict_omits_ext_fields_when_absent(self):
+    root = self._make_repo_with_external_spec()
+    registry = SpecRegistry(root)
+    data = registry.get("SPEC-011").to_dict(root)
+    assert "ext_id" not in data
+    assert "ext_url" not in data

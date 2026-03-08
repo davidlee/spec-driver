@@ -179,3 +179,71 @@ def test_plan_and_phase_overview_included(tmp_path: Path) -> None:
   assert artifact.plan["id"] == "IP-020"
   assert len(artifact.plan["phases"]) == 1
   assert artifact.plan["phases"][0].get("phase") == "IP-020.PHASE-01"
+
+
+def test_ext_id_and_ext_url_loaded_from_frontmatter(tmp_path: Path) -> None:
+  """VT-067-001: ext_id and ext_url are loaded from frontmatter."""
+  path = tmp_path / "DE-030.md"
+  dump_markdown_file(
+    path,
+    {
+      "id": "DE-030",
+      "slug": "ext-ref",
+      "name": "Delta – External Ref",
+      "created": "2024-01-01",
+      "updated": "2024-01-01",
+      "status": "draft",
+      "kind": "delta",
+      "ext_id": "GH-567",
+      "ext_url": "https://github.com/org/repo/issues/567",
+    },
+    "# DE-030\n",
+  )
+  artifact = load_change_artifact(path)
+  assert artifact
+  assert artifact.ext_id == "GH-567"
+  assert artifact.ext_url == "https://github.com/org/repo/issues/567"
+
+
+def test_ext_fields_default_to_empty_string(tmp_path: Path) -> None:
+  """VT-067-001: ext_id and ext_url default to empty string when absent."""
+  path = _write_delta(tmp_path, "# DE-010\n")
+  artifact = load_change_artifact(path)
+  assert artifact
+  assert artifact.ext_id == ""
+  assert artifact.ext_url == ""
+
+
+def test_to_dict_includes_ext_fields_when_present(tmp_path: Path) -> None:
+  """VT-067-001: to_dict includes ext_id/ext_url when populated."""
+  path = tmp_path / "DE-031.md"
+  dump_markdown_file(
+    path,
+    {
+      "id": "DE-031",
+      "slug": "ext-dict",
+      "name": "Delta – Dict",
+      "created": "2024-01-01",
+      "updated": "2024-01-01",
+      "status": "draft",
+      "kind": "delta",
+      "ext_id": "LIN-42",
+      "ext_url": "https://linear.app/team/LIN-42",
+    },
+    "# DE-031\n",
+  )
+  artifact = load_change_artifact(path)
+  assert artifact
+  data = artifact.to_dict(tmp_path)
+  assert data["ext_id"] == "LIN-42"
+  assert data["ext_url"] == "https://linear.app/team/LIN-42"
+
+
+def test_to_dict_omits_ext_fields_when_absent(tmp_path: Path) -> None:
+  """VT-067-001: to_dict omits ext_id/ext_url when empty."""
+  path = _write_delta(tmp_path, "# DE-010\n")
+  artifact = load_change_artifact(path)
+  assert artifact
+  data = artifact.to_dict(tmp_path)
+  assert "ext_id" not in data
+  assert "ext_url" not in data

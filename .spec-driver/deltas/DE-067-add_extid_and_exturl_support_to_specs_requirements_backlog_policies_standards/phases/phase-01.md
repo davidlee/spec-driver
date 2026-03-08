@@ -4,7 +4,7 @@ slug: 067-add_extid_and_exturl_support_to_specs_requirements_backlog_policies_st
 name: IP-067 Phase 01
 created: '2026-03-08'
 updated: '2026-03-08'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -66,11 +66,11 @@ Add column definitions for the external ID column.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] All domain models accept ext_id/ext_url as optional fields
-- [ ] Frontmatter roundtrip preserves ext_id/ext_url without validation errors
-- [ ] Column defs include external ID column definition
-- [ ] Unit tests cover model construction with/without fields
-- [ ] `just check` passes
+- [x] All domain models accept ext_id/ext_url as optional fields
+- [x] Frontmatter roundtrip preserves ext_id/ext_url without validation errors
+- [x] Column defs include external ID column definition
+- [x] Unit tests cover model construction with/without fields
+- [x] `just check` passes
 
 ## 5. Verification
 
@@ -88,10 +88,10 @@ Add column definitions for the external ID column.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Add ext_id/ext_url to domain models | [P] | All models can be done in parallel |
-| [ ] | 1.2 | Verify frontmatter passthrough | | Must confirm before relying on it |
-| [ ] | 1.3 | Add column defs for external ID | [P] | |
-| [ ] | 1.4 | Write unit tests | | After 1.1-1.3 |
+| [x] | 1.1 | Add ext_id/ext_url to domain models | [P] | All 6 models updated |
+| [x] | 1.2 | Verify frontmatter passthrough | | Confirmed: unknown fields survive in data dict |
+| [x] | 1.3 | Add column defs for external ID | [P] | EXT_ID_COLUMN added |
+| [x] | 1.4 | Write unit tests | | Spec, BacklogItem, ChangeArtifact tests added |
 
 ### Task Details
 

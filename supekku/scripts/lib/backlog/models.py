@@ -113,3 +113,5 @@ class BacklogItem:
   likelihood: float = 0.0
   created: str = ""
   updated: str = ""
+  ext_id: str = ""
+  ext_url: str = ""

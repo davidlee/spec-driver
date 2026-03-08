@@ -77,6 +77,8 @@ class RequirementRecord:
   coverage_evidence: list[str] = field(default_factory=list)
   coverage_entries: list[dict[str, Any]] = field(default_factory=list)
   path: str = ""
+  ext_id: str = ""
+  ext_url: str = ""
 
   def merge(self, other: RequirementRecord) -> RequirementRecord:
     """Merge data from another record, preserving lifecycle fields."""

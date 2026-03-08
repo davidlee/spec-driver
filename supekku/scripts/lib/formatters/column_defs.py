@@ -118,6 +118,9 @@ PHASE_COLUMNS = [
   ColumnDef(label="Objective", field="objective"),
 ]
 
+# Shared column for external system references (used with --external flag)
+EXT_ID_COLUMN = ColumnDef(label="ExtID", field="ext_id")
+
 
 def column_labels(columns: list[ColumnDef]) -> list[str]:
   """Extract label list from column definitions."""

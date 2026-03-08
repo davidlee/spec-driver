@@ -75,6 +75,16 @@ class Spec:
     """Return the C4 architecture level (e.g. 'code', 'component', or '')."""
     return str(self.frontmatter.data.get("c4_level", ""))
 
+  @property
+  def ext_id(self) -> str:
+    """Return external system identifier (e.g. 'JIRA-1234')."""
+    return str(self.frontmatter.data.get("ext_id", ""))
+
+  @property
+  def ext_url(self) -> str:
+    """Return external system URL."""
+    return str(self.frontmatter.data.get("ext_url", ""))
+
   def to_dict(self, root: Path) -> dict[str, str | list[str]]:
     """Convert to dictionary for JSON serialization.
 
@@ -103,6 +113,12 @@ class Spec:
       data["category"] = self.category
     if self.c4_level:
       data["c4_level"] = self.c4_level
+
+    # Add external reference fields if present
+    if self.ext_id:
+      data["ext_id"] = self.ext_id
+    if self.ext_url:
+      data["ext_url"] = self.ext_url
 
     return data
 

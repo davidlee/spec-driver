@@ -19,7 +19,7 @@ scope:
   - supekku/skills/draft-design-revision/SKILL.md
   - .spec-driver/skills/draft-design-revision/SKILL.md
   commands:
-  - uv run spec-driver skills sync
+  - uv run spec-driver install
 provenance:
   sources:
   - kind: delta

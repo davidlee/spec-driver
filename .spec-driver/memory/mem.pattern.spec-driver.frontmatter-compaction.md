@@ -20,8 +20,8 @@ priority:
   weight: 8
 scope:
   commands:
-  - uv run spec-driver compact delta
-  - uv run spec-driver compact delta --dry-run
+  - uv run spec-driver admin compact delta
+  - uv run spec-driver admin compact delta --dry-run
   globs:
   - supekku/scripts/lib/core/frontmatter_metadata/**
   - supekku/cli/compact*
@@ -66,7 +66,7 @@ Unknown fields are passed through unchanged for forward compatibility.
 
 - Core logic: `supekku/scripts/lib/core/frontmatter_metadata/compaction.py`
 - Field schema: `supekku/scripts/lib/blocks/metadata/schema.py`
-- CLI entry point: `supekku/cli/compact.py` (`uv run spec-driver compact delta`)
+- CLI entry point: `supekku/cli/compact.py` (`uv run spec-driver admin compact delta`)
 
 ## Contract
 

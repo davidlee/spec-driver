@@ -10,7 +10,7 @@ kind: issue
 # Resolve links does not support backlog items
 
 ## Summary
-`uv run spec-driver resolve links` does not resolve wikilinks to backlog items
+`uv run spec-driver admin resolve links` does not resolve wikilinks to backlog items
 (e.g., `[[PROB-002]]`). These show up as missing targets even when the files
 exist under `backlog/`.
 

@@ -1,4 +1,4 @@
-"""Tests for compact CLI command."""
+"""Tests for admin compact CLI command."""
 
 from __future__ import annotations
 
@@ -72,7 +72,7 @@ class TestCompactDelta(unittest.TestCase):
     _write_delta(self.root, BLOATED_DELTA)
     result = runner.invoke(
       app,
-      ["compact", "delta", "--dry-run", *_root_flag(self.root)],
+      ["admin", "compact", "delta", "--dry-run", *_root_flag(self.root)],
     )
     self.assertEqual(result.exit_code, 0, result.output)
     self.assertIn("DE-900", result.output)
@@ -83,7 +83,7 @@ class TestCompactDelta(unittest.TestCase):
     original = delta_file.read_text()
     runner.invoke(
       app,
-      ["compact", "delta", "--dry-run", *_root_flag(self.root)],
+      ["admin", "compact", "delta", "--dry-run", *_root_flag(self.root)],
     )
     self.assertEqual(delta_file.read_text(), original)
 
@@ -91,7 +91,7 @@ class TestCompactDelta(unittest.TestCase):
     delta_file = _write_delta(self.root, BLOATED_DELTA)
     result = runner.invoke(
       app,
-      ["compact", "delta", *_root_flag(self.root)],
+      ["admin", "compact", "delta", *_root_flag(self.root)],
     )
     self.assertEqual(result.exit_code, 0, result.output)
     self.assertIn("DE-900", result.output)
@@ -110,7 +110,7 @@ class TestCompactDelta(unittest.TestCase):
     delta_file = _write_delta(self.root, BLOATED_DELTA, body=body)
     runner.invoke(
       app,
-      ["compact", "delta", *_root_flag(self.root)],
+      ["admin", "compact", "delta", *_root_flag(self.root)],
     )
     text = delta_file.read_text()
     self.assertIn("Some content here.", text)
@@ -119,7 +119,7 @@ class TestCompactDelta(unittest.TestCase):
     _write_delta(self.root, MINIMAL_DELTA)
     result = runner.invoke(
       app,
-      ["compact", "delta", *_root_flag(self.root)],
+      ["admin", "compact", "delta", *_root_flag(self.root)],
     )
     self.assertEqual(result.exit_code, 0, result.output)
     self.assertIn("No deltas needed compaction", result.output)
@@ -129,7 +129,7 @@ class TestCompactDelta(unittest.TestCase):
     _write_delta(self.root, MINIMAL_DELTA)
     result = runner.invoke(
       app,
-      ["compact", "delta", "DE-900", *_root_flag(self.root)],
+      ["admin", "compact", "delta", "DE-900", *_root_flag(self.root)],
     )
     self.assertEqual(result.exit_code, 0, result.output)
     self.assertIn("DE-900", result.output)
@@ -139,7 +139,7 @@ class TestCompactDelta(unittest.TestCase):
     _write_delta(self.root, BLOATED_DELTA)
     result = runner.invoke(
       app,
-      ["compact", "delta", "DE-999", *_root_flag(self.root)],
+      ["admin", "compact", "delta", "DE-999", *_root_flag(self.root)],
     )
     self.assertNotEqual(result.exit_code, 0)
     self.assertIn("not found", result.output.lower())

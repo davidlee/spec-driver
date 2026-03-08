@@ -1,6 +1,6 @@
-"""CLI command for displaying YAML block schemas.
+"""Schema display functions for YAML block and frontmatter schemas.
 
-Thin CLI layer: parse args → load registry → format → output
+Library module — no Typer app. Called by show.py and list.py.
 """
 
 from __future__ import annotations
@@ -32,11 +32,9 @@ from supekku.scripts.lib.core.frontmatter_metadata import (
   get_frontmatter_metadata,
 )
 
-app = typer.Typer(help="Show YAML block schemas", no_args_is_help=True)
 console = Console()
 
 
-@app.command("list")
 def list_schemas(
   schema_type: Annotated[
     str | None,
@@ -109,7 +107,6 @@ def list_schemas(
       console.print(table)
 
 
-@app.command("show")
 def show_schema(
   block_type: Annotated[
     str | None,
@@ -507,4 +504,4 @@ def _render_yaml_example(schema) -> None:
     console.print("Use --format=markdown or --format=json for schema details.")
 
 
-__all__ = ["app"]
+__all__ = ["list_schemas", "show_schema"]

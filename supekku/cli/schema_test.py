@@ -1,4 +1,4 @@
-"""Tests for schema CLI commands."""
+"""Tests for schema CLI commands (via show schema / list schemas)."""
 
 from __future__ import annotations
 
@@ -6,19 +6,18 @@ import unittest
 
 from typer.testing import CliRunner
 
-from supekku.cli.schema import app
+from supekku.cli.main import app
 
 
 class SchemaCommandsTest(unittest.TestCase):
   """Test cases for schema CLI commands."""
 
   def setUp(self) -> None:
-    """Set up test environment."""
     self.runner = CliRunner()
 
   def test_list_schemas(self) -> None:
-    """Test listing all schemas."""
-    result = self.runner.invoke(app, ["list"])
+    """Test listing all schemas via 'list schemas'."""
+    result = self.runner.invoke(app, ["list", "schemas"])
 
     assert result.exit_code == 0
     assert "Available Block Schemas" in result.stdout
@@ -31,10 +30,9 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "revision.change" in result.stdout
 
   def test_show_schema_markdown_delta_relationships(self) -> None:
-    """Test showing delta.relationships schema in markdown format."""
     result = self.runner.invoke(
       app,
-      ["show", "delta.relationships", "--format", "markdown"],
+      ["show", "schema", "delta.relationships", "--format", "markdown"],
     )
 
     assert result.exit_code == 0
@@ -44,10 +42,9 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "primary_specs" in result.stdout
 
   def test_show_schema_markdown_plan_overview(self) -> None:
-    """Test showing plan.overview schema in markdown format."""
     result = self.runner.invoke(
       app,
-      ["show", "plan.overview", "--format", "markdown"],
+      ["show", "schema", "plan.overview", "--format", "markdown"],
     )
 
     assert result.exit_code == 0
@@ -57,10 +54,9 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "delta_id" in result.stdout
 
   def test_show_schema_markdown_phase_overview(self) -> None:
-    """Test showing phase.overview schema in markdown format."""
     result = self.runner.invoke(
       app,
-      ["show", "phase.overview", "--format", "markdown"],
+      ["show", "schema", "phase.overview", "--format", "markdown"],
     )
 
     assert result.exit_code == 0
@@ -69,10 +65,9 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "phase_id" in result.stdout
 
   def test_show_schema_markdown_verification_coverage(self) -> None:
-    """Test showing verification.coverage schema in markdown format."""
     result = self.runner.invoke(
       app,
-      ["show", "verification.coverage", "--format", "markdown"],
+      ["show", "schema", "verification.coverage", "--format", "markdown"],
     )
 
     assert result.exit_code == 0
@@ -82,10 +77,9 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "entries" in result.stdout
 
   def test_show_schema_markdown_spec_relationships(self) -> None:
-    """Test showing spec.relationships schema in markdown format."""
     result = self.runner.invoke(
       app,
-      ["show", "spec.relationships", "--format", "markdown"],
+      ["show", "schema", "spec.relationships", "--format", "markdown"],
     )
 
     assert result.exit_code == 0
@@ -94,10 +88,9 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "spec_id" in result.stdout
 
   def test_show_schema_markdown_spec_capabilities(self) -> None:
-    """Test showing spec.capabilities schema in markdown format."""
     result = self.runner.invoke(
       app,
-      ["show", "spec.capabilities", "--format", "markdown"],
+      ["show", "schema", "spec.capabilities", "--format", "markdown"],
     )
 
     assert result.exit_code == 0
@@ -107,10 +100,9 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "capabilities" in result.stdout
 
   def test_show_schema_markdown_revision_change(self) -> None:
-    """Test showing revision.change schema in markdown format."""
     result = self.runner.invoke(
       app,
-      ["show", "revision.change", "--format", "markdown"],
+      ["show", "schema", "revision.change", "--format", "markdown"],
     )
 
     assert result.exit_code == 0
@@ -119,10 +111,9 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "revision_id" in result.stdout
 
   def test_show_schema_json(self) -> None:
-    """Test showing schema in JSON format."""
     result = self.runner.invoke(
       app,
-      ["show", "delta.relationships", "--format", "json"],
+      ["show", "schema", "delta.relationships", "--format", "json"],
     )
 
     assert result.exit_code == 0
@@ -131,21 +122,18 @@ class SchemaCommandsTest(unittest.TestCase):
     assert '"version": 1' in result.stdout
 
   def test_show_schema_yaml_example(self) -> None:
-    """Test showing schema as YAML example."""
     result = self.runner.invoke(
       app,
-      ["show", "delta.relationships", "--format", "yaml-example"],
+      ["show", "schema", "delta.relationships", "--format", "yaml-example"],
     )
 
     assert result.exit_code == 0
-    # Should contain YAML block markers
     assert "```yaml" in result.stdout or "Example:" in result.stdout
 
   def test_show_unknown_block_type(self) -> None:
-    """Test error for unknown block type."""
     result = self.runner.invoke(
       app,
-      ["show", "nonexistent.block"],
+      ["show", "schema", "nonexistent.block"],
     )
 
     assert result.exit_code == 1
@@ -153,22 +141,19 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "nonexistent.block" in result.stdout
 
   def test_show_unknown_format(self) -> None:
-    """Test error for unknown format type."""
     result = self.runner.invoke(
       app,
-      ["show", "delta.relationships", "--format", "invalid"],
+      ["show", "schema", "delta.relationships", "--format", "invalid"],
     )
 
     assert result.exit_code == 1
     assert "Unknown format" in result.stdout
 
   def test_list_contains_all_expected_schemas(self) -> None:
-    """Test that list contains all 7 expected schemas."""
-    result = self.runner.invoke(app, ["list"])
+    result = self.runner.invoke(app, ["list", "schemas"])
 
     assert result.exit_code == 0
 
-    # Count occurrences - each schema should appear once
     expected_schemas = [
       "delta.relationships",
       "plan.overview",
@@ -179,22 +164,20 @@ class SchemaCommandsTest(unittest.TestCase):
       "revision.change",
     ]
 
-    for schema in expected_schemas:
-      assert schema in result.stdout, f"Missing schema: {schema}"
+    for schema_name in expected_schemas:
+      assert schema_name in result.stdout, f"Missing schema: {schema_name}"
 
   def test_show_format_short_option(self) -> None:
-    """Test using -f short option for format."""
     result = self.runner.invoke(
       app,
-      ["show", "delta.relationships", "-f", "json"],
+      ["show", "schema", "delta.relationships", "-f", "json"],
     )
 
     assert result.exit_code == 0
     assert '"name": "delta.relationships"' in result.stdout
 
   def test_list_frontmatter_schemas(self) -> None:
-    """Test listing only frontmatter schemas."""
-    result = self.runner.invoke(app, ["list", "frontmatter"])
+    result = self.runner.invoke(app, ["list", "schemas", "frontmatter"])
 
     assert result.exit_code == 0
     assert "Available Frontmatter Schemas" in result.stdout
@@ -203,8 +186,7 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "frontmatter.spec" in result.stdout
 
   def test_list_all_schemas(self) -> None:
-    """Test listing both block and frontmatter schemas."""
-    result = self.runner.invoke(app, ["list"])
+    result = self.runner.invoke(app, ["list", "schemas"])
 
     assert result.exit_code == 0
     assert "Available Block Schemas" in result.stdout
@@ -213,33 +195,28 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "frontmatter.prod" in result.stdout
 
   def test_show_frontmatter_json_schema(self) -> None:
-    """Test showing frontmatter prod schema as JSON Schema."""
     result = self.runner.invoke(
       app,
-      ["show", "frontmatter.prod", "--format", "json-schema"],
+      ["show", "schema", "frontmatter.prod", "--format", "json-schema"],
     )
 
     assert result.exit_code == 0
     assert "JSON Schema: frontmatter.prod" in result.stdout
-    # Check for JSON Schema standard fields
     assert '"$schema"' in result.stdout or "$schema" in result.stdout
     assert "properties" in result.stdout
     assert "required" in result.stdout
 
   def test_show_frontmatter_yaml_example(self) -> None:
-    """Test showing frontmatter delta schema as YAML example."""
     result = self.runner.invoke(
       app,
-      ["show", "frontmatter.delta", "--format", "yaml-example"],
+      ["show", "schema", "frontmatter.delta", "--format", "yaml-example"],
     )
 
     assert result.exit_code == 0
     assert "Example: frontmatter.delta" in result.stdout
-    # Should contain YAML content
     assert "id:" in result.stdout or "kind:" in result.stdout
 
   def test_show_all_frontmatter_kinds_json_schema(self) -> None:
-    """Test that all frontmatter kinds can be shown as JSON Schema."""
     from supekku.scripts.lib.core.frontmatter_metadata import (
       FRONTMATTER_METADATA_REGISTRY,
     )
@@ -247,14 +224,13 @@ class SchemaCommandsTest(unittest.TestCase):
     for kind in FRONTMATTER_METADATA_REGISTRY:
       result = self.runner.invoke(
         app,
-        ["show", f"frontmatter.{kind}", "--format", "json-schema"],
+        ["show", "schema", f"frontmatter.{kind}", "--format", "json-schema"],
       )
 
       assert result.exit_code == 0, f"Failed for frontmatter.{kind}"
       assert f"JSON Schema: frontmatter.{kind}" in result.stdout
 
   def test_show_all_frontmatter_kinds_yaml_example(self) -> None:
-    """Test that all frontmatter kinds can be shown as YAML example."""
     from supekku.scripts.lib.core.frontmatter_metadata import (
       FRONTMATTER_METADATA_REGISTRY,
     )
@@ -262,17 +238,16 @@ class SchemaCommandsTest(unittest.TestCase):
     for kind in FRONTMATTER_METADATA_REGISTRY:
       result = self.runner.invoke(
         app,
-        ["show", f"frontmatter.{kind}", "--format", "yaml-example"],
+        ["show", "schema", f"frontmatter.{kind}", "--format", "yaml-example"],
       )
 
       assert result.exit_code == 0, f"Failed for frontmatter.{kind}"
       assert f"Example: frontmatter.{kind}" in result.stdout
 
   def test_show_unknown_frontmatter_kind(self) -> None:
-    """Test error for unknown frontmatter kind."""
     result = self.runner.invoke(
       app,
-      ["show", "frontmatter.nonexistent"],
+      ["show", "schema", "frontmatter.nonexistent"],
     )
 
     assert result.exit_code == 1
@@ -280,34 +255,30 @@ class SchemaCommandsTest(unittest.TestCase):
     assert "nonexistent" in result.stdout
 
   def test_show_frontmatter_invalid_format(self) -> None:
-    """Test error for invalid format with frontmatter."""
     result = self.runner.invoke(
       app,
-      ["show", "frontmatter.prod", "--format", "markdown"],
+      ["show", "schema", "frontmatter.prod", "--format", "markdown"],
     )
 
     assert result.exit_code == 1
     assert "Unsupported format for frontmatter" in result.stdout
 
   def test_list_blocks_only(self) -> None:
-    """Test listing only block schemas."""
-    result = self.runner.invoke(app, ["list", "blocks"])
+    result = self.runner.invoke(app, ["list", "schemas", "blocks"])
 
     assert result.exit_code == 0
     assert "Available Block Schemas" in result.stdout
-    # Should not contain frontmatter table
     assert "Available Frontmatter Schemas" not in result.stdout
 
 
 class EnumIntrospectionTest(unittest.TestCase):
-  """Test cases for schema show enums.* commands."""
+  """Test cases for show schema enums.* commands."""
 
   def setUp(self) -> None:
     self.runner = CliRunner()
 
   def test_show_enums_bare_lists_all(self) -> None:
-    """schema show enums lists all available enum paths."""
-    result = self.runner.invoke(app, ["show", "enums"])
+    result = self.runner.invoke(app, ["show", "schema", "enums"])
     assert result.exit_code == 0
     assert "delta.status" in result.stdout
     assert "requirement.status" in result.stdout
@@ -318,8 +289,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     assert "command.format" in result.stdout
 
   def test_show_enums_delta_status(self) -> None:
-    """schema show enums.delta.status returns sorted JSON array."""
-    result = self.runner.invoke(app, ["show", "enums.delta.status"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.delta.status"])
     assert result.exit_code == 0
     import json
 
@@ -329,13 +299,11 @@ class EnumIntrospectionTest(unittest.TestCase):
     assert "in-progress" in values
     assert "completed" in values
     assert "deferred" in values
-    # Legacy "complete" should be excluded
     assert "complete" not in values
     assert values == sorted(values)
 
   def test_show_enums_requirement_status(self) -> None:
-    """schema show enums.requirement.status returns sorted JSON array."""
-    result = self.runner.invoke(app, ["show", "enums.requirement.status"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.requirement.status"])
     assert result.exit_code == 0
     import json
 
@@ -347,8 +315,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     assert values == sorted(values)
 
   def test_show_enums_verification_status(self) -> None:
-    """schema show enums.verification.status returns sorted JSON array."""
-    result = self.runner.invoke(app, ["show", "enums.verification.status"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.verification.status"])
     assert result.exit_code == 0
     import json
 
@@ -360,8 +327,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     assert values == sorted(values)
 
   def test_show_enums_verification_kind(self) -> None:
-    """schema show enums.verification.kind returns sorted JSON array."""
-    result = self.runner.invoke(app, ["show", "enums.verification.kind"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.verification.kind"])
     assert result.exit_code == 0
     import json
 
@@ -369,8 +335,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     assert values == ["VA", "VH", "VT"]
 
   def test_show_enums_spec_kind(self) -> None:
-    """schema show enums.spec.kind returns sorted JSON array."""
-    result = self.runner.invoke(app, ["show", "enums.spec.kind"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.spec.kind"])
     assert result.exit_code == 0
     import json
 
@@ -378,8 +343,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     assert values == ["prod", "tech"]
 
   def test_show_enums_requirement_kind(self) -> None:
-    """schema show enums.requirement.kind returns sorted JSON array."""
-    result = self.runner.invoke(app, ["show", "enums.requirement.kind"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.requirement.kind"])
     assert result.exit_code == 0
     import json
 
@@ -387,8 +351,7 @@ class EnumIntrospectionTest(unittest.TestCase):
     assert values == ["FR", "NF"]
 
   def test_show_enums_command_format(self) -> None:
-    """schema show enums.command.format returns sorted JSON array."""
-    result = self.runner.invoke(app, ["show", "enums.command.format"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.command.format"])
     assert result.exit_code == 0
     import json
 
@@ -396,14 +359,12 @@ class EnumIntrospectionTest(unittest.TestCase):
     assert values == ["json", "table", "tsv"]
 
   def test_show_enums_invalid_path(self) -> None:
-    """schema show enums.nonexistent.field returns error with available list."""
-    result = self.runner.invoke(app, ["show", "enums.nonexistent.field"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.nonexistent.field"])
     assert result.exit_code == 1
     assert "Unknown enum" in result.stdout
-    assert "delta.status" in result.stdout  # should list available
+    assert "delta.status" in result.stdout
 
   def test_show_enums_values_match_lifecycle_constants(self) -> None:
-    """Enum values match actual lifecycle constants (no drift)."""
     import json
 
     from supekku.scripts.lib.blocks.verification import (
@@ -419,20 +380,19 @@ class EnumIntrospectionTest(unittest.TestCase):
       VALID_STATUSES as REQ_STATUSES,
     )
 
-    result = self.runner.invoke(app, ["show", "enums.delta.status"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.delta.status"])
     delta_values = set(json.loads(result.stdout))
-    # delta enum should be subset of VALID_STATUSES (minus legacy "complete")
     assert delta_values <= CHANGE_STATUSES
 
-    result = self.runner.invoke(app, ["show", "enums.requirement.status"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.requirement.status"])
     req_values = set(json.loads(result.stdout))
     assert req_values == REQ_STATUSES
 
-    result = self.runner.invoke(app, ["show", "enums.verification.status"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.verification.status"])
     ver_status_values = set(json.loads(result.stdout))
     assert ver_status_values == VER_STATUSES
 
-    result = self.runner.invoke(app, ["show", "enums.verification.kind"])
+    result = self.runner.invoke(app, ["show", "schema", "enums.verification.kind"])
     ver_kind_values = set(json.loads(result.stdout))
     assert ver_kind_values == VER_KINDS
 

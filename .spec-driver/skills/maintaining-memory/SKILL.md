@@ -21,7 +21,7 @@ description: |
        - remove `audience` when it is just `[human, agent]`
        - remove `visibility` unless the memory is intentionally used for pre-read/write hook surfacing with concrete scope
        - remove generated `links` blocks unless an active consumer requires committed resolved links
-     - If you edited the body and it contains `[[...]]` references, run `spec-driver resolve links` to update `links.out`. Stale links are cleared automatically.
+     - If you edited the body and it contains `[[...]]` references, run `spec-driver admin resolve links` to update `links.out`. Stale links are cleared automatically.
 
   4) Handle lifecycle states aggressively:
      - If a record is wrong and replaced, mark the old one `superseded` and create/update the successor; link via `relations` (type + target + annotation) or `superseded_by`/`supersedes` if you use that convention.

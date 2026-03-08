@@ -71,12 +71,12 @@ schema move, admin group creation, skills removal.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `spec-driver show schema <name>` and `list schemas` work
-- [ ] `spec-driver admin compact delta`, `admin resolve links`, `admin backfill spec` work
-- [ ] `spec-driver skills` no longer exists
-- [ ] Top-level `schema`, `compact`, `resolve`, `backfill` removed
-- [ ] All tests pass
-- [ ] Linters clean
+- [x] `spec-driver show schema <name>` and `list schemas` work
+- [x] `spec-driver admin compact delta`, `admin resolve links`, `admin backfill spec` work
+- [x] `spec-driver skills` no longer exists
+- [x] Top-level `schema`, `compact`, `resolve`, `backfill` removed
+- [x] All tests pass (566 passed, 5 skipped, 1 pre-existing deselected)
+- [x] Linters clean (ruff zero warnings, pylint: admin.py 10/10)
 
 ## 5. Verification
 
@@ -96,11 +96,11 @@ schema move, admin group creation, skills removal.
 
 | Status | ID | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 1.1 | Move schema into show/list | [P] | schema.py → library, thin wrappers in show.py/list.py |
-| [ ] | 1.2 | Create admin group | [P] | New admin.py, mount compact/resolve/backfill sub-Typers |
-| [ ] | 1.3 | Remove skills group | [P] | Delete skills.py, skills_test.py |
-| [ ] | 1.4 | Update main.py | | Depends on 1.1–1.3 |
-| [ ] | 1.5 | Adapt/create tests | | Adapt schema_test.py, new admin_test.py |
+| [x] | 1.1 | Move schema into show/list | [P] | schema.py → library, thin wrappers in show.py/list.py |
+| [x] | 1.2 | Create admin group | [P] | New admin.py, mount compact/resolve/backfill sub-Typers |
+| [x] | 1.3 | Remove skills group | [P] | Deleted skills.py, skills_test.py |
+| [x] | 1.4 | Update main.py | | Removed old registrations, added admin |
+| [x] | 1.5 | Adapt/create tests | | schema_test.py adapted, admin_test.py created, compact_test.py updated |
 
 ### Task Details
 

@@ -22,7 +22,7 @@ Review procedure:
     - Visibility discipline: keep `visibility: [pre]` only for memories with strong `scope.*` and clear pre-hook value.
     - Actionability: does it contain executable steps/pointers (especially for pattern/signpost/system)? If not, rewrite to be procedural or convert to a signpost.
     - Duplication/conflict: does it overlap or contradict another memory? If yes, merge/supersede immediately.
-    - Links: run `spec-driver resolve links --dry-run` to check for broken `[[...]]` references. Missing targets may indicate renamed/deleted artifacts; only persist resolved `links` when needed.
+    - Links: run `spec-driver admin resolve links --dry-run` to check for broken `[[...]]` references. Missing targets may indicate renamed/deleted artifacts; only persist resolved `links` when needed.
 
 4) Thread hygiene (mandatory):
     - Threads are context-dependent and should not linger. Any thread that is not verified recently (or no longer relevant to current work) must be moved to `archived`, `superseded`, or converted into a durable fact/pattern/system record with proper scope and provenance.

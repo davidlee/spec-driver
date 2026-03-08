@@ -13,9 +13,12 @@ from supekku.cli.common import (
   EXIT_SUCCESS,
   ArtifactNotFoundError,
   ArtifactRef,
+  ContentType,
+  ContentTypeOption,
   InferringGroup,
   RootOption,
   emit_artifact,
+  extract_yaml_frontmatter,
   normalize_id,
   resolve_artifact,
   resolve_by_id,
@@ -62,11 +65,18 @@ def show_spec(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specification."""
   try:
-    if sum([json_output, path_only, raw_output]) > 1:
+    bool_flags = sum([json_output, path_only, raw_output])
+    if content_type is not None and bool_flags:
+      typer.echo(
+        "Warning: --content-type overrides --json/--path/--raw", err=True
+      )
+      json_output = path_only = raw_output = False
+    elif bool_flags > 1:
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
@@ -77,12 +87,18 @@ def show_spec(
       typer.echo(f"Error: Specification not found: {spec_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if path_only:
+    if content_type == ContentType.markdown:
+      typer.echo(spec.path.read_text())
+    elif content_type == ContentType.frontmatter:
+      typer.echo(format_spec_details(spec, root=root))
+    elif content_type == ContentType.yaml:
+      typer.echo(extract_yaml_frontmatter(spec.path))
+    elif path_only:
       typer.echo(spec.path)
     elif raw_output:
       typer.echo(spec.path.read_text())
     elif json_output:
-      from supekku.scripts.lib.core.repo import find_repo_root
+      from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
 
       repo_root = find_repo_root(root)
       output = spec.to_dict(repo_root)
@@ -104,11 +120,18 @@ def show_delta(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a delta."""
   try:
-    if sum([json_output, path_only, raw_output]) > 1:
+    bool_flags = sum([json_output, path_only, raw_output])
+    if content_type is not None and bool_flags:
+      typer.echo(
+        "Warning: --content-type overrides --json/--path/--raw", err=True
+      )
+      json_output = path_only = raw_output = False
+    elif bool_flags > 1:
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
@@ -121,7 +144,13 @@ def show_delta(
       typer.echo(f"Error: Delta not found: {normalized_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if path_only:
+    if content_type == ContentType.markdown:
+      typer.echo(artifact.path.read_text())
+    elif content_type == ContentType.frontmatter:
+      typer.echo(format_delta_details(artifact, root=root))
+    elif content_type == ContentType.yaml:
+      typer.echo(extract_yaml_frontmatter(artifact.path))
+    elif path_only:
       typer.echo(artifact.path)
     elif raw_output:
       typer.echo(artifact.path.read_text())
@@ -144,6 +173,7 @@ def show_revision(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a revision."""
@@ -154,6 +184,7 @@ def show_revision(
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
+      content_type=content_type,
       format_fn=lambda r: format_revision_details(r, root=root),
       json_fn=lambda r: json.dumps(r.to_dict(root), indent=2),
     )
@@ -221,11 +252,18 @@ def show_adr(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific decision/ADR."""
   try:
-    if sum([json_output, path_only, raw_output]) > 1:
+    bool_flags = sum([json_output, path_only, raw_output])
+    if content_type is not None and bool_flags:
+      typer.echo(
+        "Warning: --content-type overrides --json/--path/--raw", err=True
+      )
+      json_output = path_only = raw_output = False
+    elif bool_flags > 1:
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
@@ -237,12 +275,19 @@ def show_adr(
       typer.echo(f"Error: Decision not found: {normalized_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if path_only:
+    adr_path = Path(decision.path)
+    if content_type == ContentType.markdown:
+      typer.echo(adr_path.read_text())
+    elif content_type == ContentType.frontmatter:
+      typer.echo(format_decision_details(decision))
+    elif content_type == ContentType.yaml:
+      typer.echo(extract_yaml_frontmatter(adr_path))
+    elif path_only:
       typer.echo(decision.path)
     elif raw_output:
-      typer.echo(Path(decision.path).read_text())
+      typer.echo(adr_path.read_text())
     elif json_output:
-      from supekku.scripts.lib.core.repo import find_repo_root
+      from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
 
       repo_root = find_repo_root(root)
       output = decision.to_dict(repo_root)
@@ -264,11 +309,18 @@ def show_policy(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific policy."""
   try:
-    if sum([json_output, path_only, raw_output]) > 1:
+    bool_flags = sum([json_output, path_only, raw_output])
+    if content_type is not None and bool_flags:
+      typer.echo(
+        "Warning: --content-type overrides --json/--path/--raw", err=True
+      )
+      json_output = path_only = raw_output = False
+    elif bool_flags > 1:
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
@@ -280,12 +332,19 @@ def show_policy(
       typer.echo(f"Error: Policy not found: {normalized_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if path_only:
+    policy_path = Path(policy.path)
+    if content_type == ContentType.markdown:
+      typer.echo(policy_path.read_text())
+    elif content_type == ContentType.frontmatter:
+      typer.echo(format_policy_details(policy))
+    elif content_type == ContentType.yaml:
+      typer.echo(extract_yaml_frontmatter(policy_path))
+    elif path_only:
       typer.echo(policy.path)
     elif raw_output:
-      typer.echo(Path(policy.path).read_text())
+      typer.echo(policy_path.read_text())
     elif json_output:
-      from supekku.scripts.lib.core.repo import find_repo_root
+      from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
 
       repo_root = find_repo_root(root)
       output = policy.to_dict(repo_root)
@@ -307,11 +366,18 @@ def show_standard(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific standard."""
   try:
-    if sum([json_output, path_only, raw_output]) > 1:
+    bool_flags = sum([json_output, path_only, raw_output])
+    if content_type is not None and bool_flags:
+      typer.echo(
+        "Warning: --content-type overrides --json/--path/--raw", err=True
+      )
+      json_output = path_only = raw_output = False
+    elif bool_flags > 1:
       typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
@@ -323,12 +389,19 @@ def show_standard(
       typer.echo(f"Error: Standard not found: {normalized_id}", err=True)
       raise typer.Exit(EXIT_FAILURE)
 
-    if path_only:
+    std_path = Path(standard.path)
+    if content_type == ContentType.markdown:
+      typer.echo(std_path.read_text())
+    elif content_type == ContentType.frontmatter:
+      typer.echo(format_standard_details(standard))
+    elif content_type == ContentType.yaml:
+      typer.echo(extract_yaml_frontmatter(std_path))
+    elif path_only:
       typer.echo(standard.path)
     elif raw_output:
-      typer.echo(Path(standard.path).read_text())
+      typer.echo(std_path.read_text())
     elif json_output:
-      from supekku.scripts.lib.core.repo import find_repo_root
+      from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
 
       repo_root = find_repo_root(root)
       output = standard.to_dict(repo_root)
@@ -489,6 +562,7 @@ def show_memory(  # noqa: PLR0913
     bool,
     typer.Option("--tree", help="Show link graph as indented tree"),
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific memory record."""
@@ -546,6 +620,7 @@ def show_memory(  # noqa: PLR0913
       path_only=path_only,
       raw_output=raw_output,
       body_only=body_only,
+      content_type=content_type,
       format_fn=format_memory_details,
       json_fn=lambda r: json.dumps(r.to_dict(repo_root), indent=2),
     )
@@ -562,6 +637,7 @@ def show_plan(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about an implementation plan."""
@@ -572,6 +648,7 @@ def show_plan(
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
+      content_type=content_type,
       format_fn=lambda r: format_plan_details(r, root=root, path=ref.path),
       json_fn=lambda r: json.dumps(r, indent=2),
     )
@@ -588,6 +665,7 @@ def show_audit(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about an audit."""
@@ -598,6 +676,7 @@ def show_audit(
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
+      content_type=content_type,
       format_fn=lambda r: format_audit_details(r, root=root),
       json_fn=lambda r: json.dumps(r.to_dict(root), indent=2),
     )
@@ -614,6 +693,7 @@ def show_drift(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a drift ledger."""
@@ -629,6 +709,7 @@ def show_drift(
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
+      content_type=content_type,
       format_fn=format_drift_details,
       json_fn=format_drift_details_json,
     )
@@ -645,6 +726,7 @@ def show_issue(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about an issue."""
@@ -655,6 +737,7 @@ def show_issue(
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
+      content_type=content_type,
       format_fn=lambda r: (
         f"Issue: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
       ),
@@ -673,6 +756,7 @@ def show_problem(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a problem."""
@@ -683,6 +767,7 @@ def show_problem(
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
+      content_type=content_type,
       format_fn=lambda r: (
         f"Problem: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
       ),
@@ -703,6 +788,7 @@ def show_improvement(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about an improvement."""
@@ -713,6 +799,7 @@ def show_improvement(
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
+      content_type=content_type,
       format_fn=lambda r: (
         f"Improvement: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
       ),
@@ -731,6 +818,7 @@ def show_risk(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a risk."""
@@ -741,6 +829,7 @@ def show_risk(
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
+      content_type=content_type,
       format_fn=lambda r: (
         f"Risk: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
       ),
@@ -752,6 +841,27 @@ def show_risk(
 
 
 # --- ID inference fallback ---
+
+
+@app.command("schema")
+def show_schema_cmd(
+  block_type: Annotated[
+    str | None,
+    typer.Argument(help="Block type (e.g., 'delta.relationships', 'frontmatter.prod')"),
+  ] = None,
+  format_type: Annotated[
+    str,
+    typer.Option(
+      "--format",
+      "-f",
+      help="Output format (markdown, json, json-schema, yaml-example)",
+    ),
+  ] = "json-schema",
+) -> None:
+  """Show schema details for a block type or frontmatter kind."""
+  from supekku.cli.schema import show_schema  # noqa: PLC0415
+
+  show_schema(block_type=block_type, format_type=format_type)
 
 
 @app.command("inferred", hidden=True)

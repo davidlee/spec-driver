@@ -8,16 +8,12 @@ import click
 import typer
 
 from supekku.cli import (
-  backfill,
-  compact,
+  admin,
   complete,
   create,
   edit,
   find,
-  resolve,
-  schema,
   show,
-  skills,
   sync,
   view,
   workspace,
@@ -140,33 +136,9 @@ app.add_typer(
 )
 
 app.add_typer(
-  schema.app,
-  name="schema",
-  help="Show YAML block schemas",
-)
-
-app.add_typer(
-  resolve.app,
-  name="resolve",
-  help="Resolve cross-artifact references",
-)
-
-app.add_typer(
-  backfill.app,
-  name="backfill",
-  help="Backfill incomplete stub specifications",
-)
-
-app.add_typer(
-  skills.app,
-  name="skills",
-  help="Manage agent skill exposure",
-)
-
-app.add_typer(
-  compact.app,
-  name="compact",
-  help="Compact artifact frontmatter by stripping default/derived fields",
+  admin.app,
+  name="admin",
+  help="Workspace maintenance commands",
 )
 
 

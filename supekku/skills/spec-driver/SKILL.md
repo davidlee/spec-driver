@@ -74,9 +74,9 @@ listing the relevant entities instead of dumping every help screen.
 - Memory lookup is scope-aware:
   `spec-driver list memories -p <path> -c "<command terms>" --match-tag <tag>`.
 - Use schema introspection instead of guessing field names:
-  `spec-driver schema list`,
-  `spec-driver schema show frontmatter.delta -f yaml-example`,
-  `spec-driver schema show delta.relationships -f json-schema`.
+  `spec-driver list schemas`,
+  `spec-driver show schema frontmatter.delta -f yaml-example`,
+  `spec-driver show schema delta.relationships -f json-schema`.
 - `find` uses glob patterns, not regex, and accepts numeric shorthand:
   `spec-driver find delta "DE-04*"`, `spec-driver find delta 44`.
 - Hidden defaults that matter:

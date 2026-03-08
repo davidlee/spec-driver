@@ -683,7 +683,8 @@ def initialize_workspace(
         encoding="utf-8",
       )
 
-    sync_skills(target_root)
+    result = sync_skills(target_root)
+    _print_skills_summary(result)
 
   # Ensure .spec-driver/run/ is gitignored (runtime state, never committed)
   _ensure_gitignore_entry(target_root, f"{SPEC_DRIVER_DIR}/run/", dry_run=dry_run)
@@ -694,6 +695,27 @@ def initialize_workspace(
   # Repeat legacy warning so it isn't buried in output
   if _legacy_warning:
     print(f"\n{_legacy_warning}")
+
+
+def _print_skills_summary(result: dict) -> None:
+  """Print a concise summary of skill sync results during install."""
+  canonical = result["canonical"]
+  installed = canonical["installed"]
+  pruned = canonical["pruned"]
+
+  parts: list[str] = []
+  if installed:
+    parts.append(f"installed {len(installed)}")
+  if pruned:
+    parts.append(f"pruned {len(pruned)}")
+  if parts:
+    print(f"Skills: {', '.join(parts)}")
+  else:
+    print("Skills: up to date")
+
+  if result["warnings"]:
+    for name in result["warnings"]:
+      print(f"  Warning: skill '{name}' not found")
 
 
 def _ensure_gitignore_entry(

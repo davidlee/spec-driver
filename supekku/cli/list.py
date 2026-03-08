@@ -2464,6 +2464,19 @@ def list_memories(  # noqa: PLR0913
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("schemas")
+def list_schemas_cmd(
+  schema_type: Annotated[
+    str | None,
+    typer.Argument(help="Schema type: 'blocks', 'frontmatter', or omit for both"),
+  ] = None,
+) -> None:
+  """List available block and/or frontmatter schemas."""
+  from supekku.cli.schema import list_schemas  # noqa: PLC0415
+
+  list_schemas(schema_type=schema_type)
+
+
 # Singular command aliases - dynamically register
 _PLURAL_TO_SINGULAR = {
   "specs": "spec",
@@ -2482,6 +2495,9 @@ _PLURAL_TO_SINGULAR = {
   "memories": "memory",
   "plans": "plan",
 }
+
+# schemas uses a different function name, register singular alias directly
+app.command("schema", hidden=True)(list_schemas_cmd)
 
 for plural, singular in _PLURAL_TO_SINGULAR.items():
   plural_func = globals().get(f"list_{plural}")

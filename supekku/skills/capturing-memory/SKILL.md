@@ -54,5 +54,5 @@ Procedure:
       surface through those `--path` queries.
 
 7) Resolve inline links (if body contains `[[...]]`):
-    - `spec-driver resolve links` — populates `links.out` from body tokens.
+    - `spec-driver admin resolve links` — populates `links.out` from body tokens.
     - Prefer running this on-demand (or in bulk maintenance passes) rather than committing large generated link blocks by default.

@@ -40,6 +40,7 @@ class TestMemoryRecord(unittest.TestCase):
     self.assertIsNone(record.updated)
     self.assertIsNone(record.confidence)
     self.assertIsNone(record.verified)
+    self.assertIsNone(record.verified_sha)
     self.assertIsNone(record.review_by)
     self.assertEqual(record.summary, "")
     self.assertEqual(record.tags, [])
@@ -311,6 +312,56 @@ class TestMemoryRecord(unittest.TestCase):
     )
     d = record.to_dict(Path("/repo"))
     self.assertNotIn("links", d)
+
+
+class TestMemoryRecordVerifiedSha(unittest.TestCase):
+  """Tests for verified_sha field on MemoryRecord."""
+
+  SAMPLE_SHA = "a" * 40
+
+  def test_from_frontmatter_with_verified_sha(self) -> None:
+    fm = {
+      "id": "mem.fact.test",
+      "name": "Test",
+      "status": "active",
+      "memory_type": "fact",
+      "verified_sha": self.SAMPLE_SHA,
+    }
+    record = MemoryRecord.from_frontmatter(Path("/repo/mem.fact.test.md"), fm)
+    self.assertEqual(record.verified_sha, self.SAMPLE_SHA)
+
+  def test_from_frontmatter_without_verified_sha(self) -> None:
+    fm = {
+      "id": "mem.fact.test",
+      "name": "Test",
+      "status": "active",
+      "memory_type": "fact",
+    }
+    record = MemoryRecord.from_frontmatter(Path("/repo/mem.fact.test.md"), fm)
+    self.assertIsNone(record.verified_sha)
+
+  def test_to_dict_includes_verified_sha_when_present(self) -> None:
+    record = MemoryRecord(
+      id="mem.fact.test",
+      name="Test",
+      status="active",
+      memory_type="fact",
+      path="/repo/memory/mem.fact.test.md",
+      verified_sha=self.SAMPLE_SHA,
+    )
+    d = record.to_dict(Path("/repo"))
+    self.assertEqual(d["verified_sha"], self.SAMPLE_SHA)
+
+  def test_to_dict_omits_verified_sha_when_none(self) -> None:
+    record = MemoryRecord(
+      id="mem.fact.test",
+      name="Test",
+      status="active",
+      memory_type="fact",
+      path="/repo/memory/mem.fact.test.md",
+    )
+    d = record.to_dict(Path("/repo"))
+    self.assertNotIn("verified_sha", d)
 
 
 if __name__ == "__main__":

@@ -20,6 +20,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from supekku.scripts.lib.core.git import SHA_HEX_PATTERN
 
 from .base import BASE_FRONTMATTER_METADATA
 
@@ -78,16 +79,26 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
     ),
     "confidence": FieldMetadata(
       type="enum",
-      required=False,
+      required=True,
       enum_values=["low", "medium", "high"],
-      description="Confidence level in the record's accuracy",
-      persistence="optional",
+      description=(
+        "Confidence level: low=provisional/inferred, "
+        "medium=derived from context, high=verified against code/specs"
+      ),
+      default_value="medium",
     ),
     "verified": FieldMetadata(
       type="string",
       required=False,
       pattern=r"^\d{4}-\d{2}-\d{2}$",
       description=("ISO-8601 date of last verification against reality (YYYY-MM-DD)"),
+      persistence="optional",
+    ),
+    "verified_sha": FieldMetadata(
+      type="string",
+      required=False,
+      pattern=SHA_HEX_PATTERN,
+      description="Full git SHA of HEAD when memory was last explicitly verified",
       persistence="optional",
     ),
     "review_by": FieldMetadata(
@@ -329,6 +340,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
       "memory_type": "signpost",
       "confidence": "high",
       "verified": "2026-03-01",
+      "verified_sha": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
       "review_by": "2026-05-01",
       "owners": ["platform-team"],
       "summary": "Pre-read: ADR-11 before modifying auth flow",
@@ -356,7 +368,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
         {"type": "relates_to", "target": "ADR-011"},
       ],
     },
-    # Minimal memory (base fields + required memory_type only)
+    # Minimal memory (base fields + required memory_type + confidence)
     {
       "id": "mem.fact.example",
       "name": "Example Memory Record",
@@ -366,6 +378,7 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
       "created": "2026-03-01",
       "updated": "2026-03-01",
       "memory_type": "fact",
+      "confidence": "medium",
     },
   ],
 )

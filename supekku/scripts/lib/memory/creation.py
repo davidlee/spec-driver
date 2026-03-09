@@ -30,6 +30,7 @@ class MemoryCreationOptions:
   name: str
   memory_type: str
   status: str = "active"
+  confidence: str = "medium"
   tags: list[str] = field(default_factory=list)
   summary: str = ""
 
@@ -70,6 +71,8 @@ def build_memory_frontmatter(
     "memory_type": options.memory_type,
     "created": today,
     "updated": today,
+    "verified": today,
+    "confidence": options.confidence or "medium",
     "tags": options.tags,
     "summary": options.summary,
   }

@@ -54,6 +54,7 @@ class MemoryRecord:
   review_by: date | None = None
 
   # Optional scalars
+  verified_sha: str | None = None
   confidence: str | None = None
   summary: str = ""
 
@@ -91,6 +92,7 @@ class MemoryRecord:
       created=_parse_date(fm.get("created")),
       updated=_parse_date(fm.get("updated")),
       verified=_parse_date(fm.get("verified")),
+      verified_sha=fm.get("verified_sha"),
       review_by=_parse_date(fm.get("review_by")),
       confidence=fm.get("confidence"),
       summary=fm.get("summary", ""),
@@ -130,6 +132,8 @@ class MemoryRecord:
         data[date_field] = val.isoformat()
 
     # Optional scalars
+    if self.verified_sha:
+      data["verified_sha"] = self.verified_sha
     if self.confidence:
       data["confidence"] = self.confidence
     if self.summary:

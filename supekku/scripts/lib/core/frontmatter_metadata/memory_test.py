@@ -24,6 +24,7 @@ def _minimal_memory(**overrides: object) -> dict:
     "created": "2026-03-01",
     "updated": "2026-03-01",
     "memory_type": "fact",
+    "confidence": "medium",
   }
   data.update(overrides)
   return data

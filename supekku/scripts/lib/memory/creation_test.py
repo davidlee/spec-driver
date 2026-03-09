@@ -100,6 +100,54 @@ class TestBuildMemoryFrontmatter:
     assert isinstance(fm["created"], str)
     assert isinstance(fm["updated"], str)
 
+  def test_stamps_verified_date_at_creation(self) -> None:
+    opts = MemoryCreationOptions(
+      memory_id="mem.fact.test",
+      name="Test",
+      memory_type="fact",
+    )
+    fm = build_memory_frontmatter("mem.fact.test", opts)
+    assert "verified" in fm
+    assert fm["verified"] == fm["created"]
+
+  def test_does_not_stamp_verified_sha_at_creation(self) -> None:
+    opts = MemoryCreationOptions(
+      memory_id="mem.fact.test",
+      name="Test",
+      memory_type="fact",
+    )
+    fm = build_memory_frontmatter("mem.fact.test", opts)
+    assert "verified_sha" not in fm
+
+  def test_confidence_defaults_to_medium(self) -> None:
+    opts = MemoryCreationOptions(
+      memory_id="mem.fact.test",
+      name="Test",
+      memory_type="fact",
+    )
+    fm = build_memory_frontmatter("mem.fact.test", opts)
+    assert fm["confidence"] == "medium"
+
+  def test_confidence_custom_value(self) -> None:
+    opts = MemoryCreationOptions(
+      memory_id="mem.fact.test",
+      name="Test",
+      memory_type="fact",
+      confidence="high",
+    )
+    fm = build_memory_frontmatter("mem.fact.test", opts)
+    assert fm["confidence"] == "high"
+
+  def test_confidence_empty_string_defaults_to_medium(self) -> None:
+    opts = MemoryCreationOptions(
+      memory_id="mem.fact.test",
+      name="Test",
+      memory_type="fact",
+      confidence="",
+    )
+    fm = build_memory_frontmatter("mem.fact.test", opts)
+    assert fm["confidence"] == "medium"
+
 
 # --- create_memory ---
 

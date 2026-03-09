@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date as date_type
 from pathlib import Path
 from typing import Annotated
 
@@ -18,7 +19,11 @@ from supekku.cli.common import (
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.enums import validate_status_for_entity
-from supekku.scripts.lib.core.frontmatter_writer import update_frontmatter_status
+from supekku.scripts.lib.core.frontmatter_writer import (
+  update_frontmatter_fields,
+  update_frontmatter_status,
+)
+from supekku.scripts.lib.core.git import get_head_sha, short_sha
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.policies.registry import PolicyRegistry
@@ -372,11 +377,24 @@ def edit_memory(
     str, typer.Argument(help="Memory ID (e.g., mem.pattern.cli.skinny)")
   ],
   status: StatusOption = None,
+  verify: Annotated[
+    bool,
+    typer.Option("--verify", help="Attest memory accuracy at current HEAD"),
+  ] = False,
   root: RootOption = None,
 ) -> None:
   """Edit memory record in editor."""
   try:
+    if verify and status is not None:
+      typer.echo("Error: --verify and --status are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+
     ref = resolve_artifact("memory", memory_id, root)
+
+    if verify:
+      _verify_memory(ref.id, ref.path)
+      return
+
     if status is not None:
       _apply_status(ref.id, ref.path, "memory", status)
       return
@@ -389,6 +407,31 @@ def edit_memory(
   except RuntimeError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
+
+
+def _verify_memory(memory_id: str, path: Path) -> None:
+  """Stamp verification SHA and dates on a memory artifact.
+
+  Raises typer.Exit(EXIT_FAILURE) if git is unavailable.
+  """
+  sha = get_head_sha()
+  if sha is None:
+    typer.echo(
+      "Error: cannot verify — git not available or not in a repository",
+      err=True,
+    )
+    raise typer.Exit(EXIT_FAILURE)
+
+  today = date_type.today().isoformat()
+  update_frontmatter_fields(
+    path,
+    {
+      "verified": f"'{today}'",
+      "verified_sha": sha,
+      "updated": f"'{today}'",
+    },
+  )
+  typer.echo(f"Verified: {memory_id} at {short_sha(sha)}")
 
 
 @app.command("issue")

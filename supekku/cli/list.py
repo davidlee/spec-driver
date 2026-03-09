@@ -45,6 +45,7 @@ from supekku.scripts.lib.formatters.decision_formatters import (
 )
 from supekku.scripts.lib.formatters.memory_formatters import (
   format_memory_list_table,
+  format_staleness_table,
 )
 from supekku.scripts.lib.formatters.policy_formatters import format_policy_list_table
 from supekku.scripts.lib.formatters.requirement_formatters import (
@@ -59,6 +60,7 @@ from supekku.scripts.lib.formatters.standard_formatters import (
 )
 from supekku.scripts.lib.memory.registry import MemoryRegistry
 from supekku.scripts.lib.memory.selection import MatchContext, select
+from supekku.scripts.lib.memory.staleness import compute_batch_staleness
 from supekku.scripts.lib.policies.registry import PolicyRegistry
 from supekku.scripts.lib.relations.query import find_by_relation, find_related_to
 from supekku.scripts.lib.specs.registry import SpecRegistry
@@ -2624,6 +2626,13 @@ def list_memories(  # noqa: PLR0913
     ),
   ] = None,
   truncate: TruncateOption = False,
+  stale: Annotated[
+    bool,
+    typer.Option(
+      "--stale",
+      help="Show staleness ranking (three-tier scope-aware output)",
+    ),
+  ] = False,
 ) -> None:
   """List memory records with optional filtering and scope matching.
 
@@ -2711,13 +2720,29 @@ def list_memories(  # noqa: PLR0913
     if not records:
       raise typer.Exit(EXIT_SUCCESS)
 
-    output = format_memory_list_table(records, format_type, truncate)
+    if stale:
+      output = _format_stale_memories(records, root)
+    else:
+      output = format_memory_list_table(records, format_type, truncate)
     typer.echo(output)
 
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
+
+
+def _format_stale_memories(
+  records: list,
+  root: Path | None,
+) -> str:
+  """Compute staleness and format as tiered table."""
+  from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
+
+  repo_root = find_repo_root(root)
+  infos = compute_batch_staleness(records, repo_root)
+  records_by_id = {r.id: r for r in records}
+  return format_staleness_table(infos, records_by_id)
 
 
 @app.command("schemas")

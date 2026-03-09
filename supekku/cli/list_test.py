@@ -1337,5 +1337,105 @@ class ListSpecsRelationFilterTest(unittest.TestCase):
     assert "PROD-101" not in result.stdout
 
 
+# ── --stale flag tests (DE-086, VT-cli-list-stale) ──
+
+from unittest.mock import MagicMock, patch  # noqa: E402
+
+from supekku.scripts.lib.memory.models import MemoryRecord  # noqa: E402
+from supekku.scripts.lib.memory.staleness import StalenessInfo  # noqa: E402
+
+runner = CliRunner()
+
+
+def _make_memory_record(
+  memory_id: str = "mem.test",
+  **kwargs,
+) -> MemoryRecord:
+  """Build a minimal MemoryRecord for list tests."""
+  from datetime import date  # noqa: PLC0415
+
+  defaults = {
+    "id": memory_id,
+    "name": "Test memory",
+    "status": "active",
+    "memory_type": "pattern",
+    "path": "/fake/path.md",
+    "updated": date(2026, 3, 1),
+    "confidence": "medium",
+  }
+  defaults.update(kwargs)
+  return MemoryRecord(**defaults)
+
+
+class TestListMemoriesStale:
+  """Tests for --stale flag on list memories command."""
+
+  def test_stale_flag_produces_tiered_output(self) -> None:
+    """--stale flag shows tiered staleness output."""
+    from datetime import date  # noqa: PLC0415
+
+    records = [
+      _make_memory_record(
+        memory_id="mem.scoped",
+        verified=date(2026, 3, 1),
+        verified_sha="a" * 40,
+        scope={"paths": ["supekku/cli/"]},
+      ),
+      _make_memory_record(
+        memory_id="mem.unscoped",
+        verified=date(2026, 1, 15),
+      ),
+    ]
+    staleness = [
+      StalenessInfo(
+        memory_id="mem.scoped",
+        verified_sha="a" * 40,
+        verified_date=date(2026, 3, 1),
+        scope_paths=["supekku/cli/"],
+        commits_since=5,
+        days_since=9,
+        has_scope=True,
+      ),
+      StalenessInfo(
+        memory_id="mem.unscoped",
+        verified_sha=None,
+        verified_date=date(2026, 1, 15),
+        scope_paths=[],
+        commits_since=None,
+        days_since=54,
+        has_scope=False,
+      ),
+    ]
+    mock_registry = MagicMock()
+    mock_registry.iter.return_value = iter(records)
+
+    with (
+      patch("supekku.cli.list.MemoryRegistry", return_value=mock_registry),
+      patch(
+        "supekku.cli.list.compute_batch_staleness",
+        return_value=staleness,
+      ),
+    ):
+      result = runner.invoke(app, ["memories", "--stale"])
+
+    assert result.exit_code == 0
+    assert "scoped, attested" in result.output
+    assert "mem.scoped" in result.output
+    assert "mem.unscoped" in result.output
+
+  def test_stale_flag_empty_registry(self) -> None:
+    """--stale with no memories exits cleanly."""
+    mock_registry = MagicMock()
+    mock_registry.iter.return_value = iter([])
+
+    with patch(
+      "supekku.cli.list.MemoryRegistry",
+      return_value=mock_registry,
+    ):
+      result = runner.invoke(app, ["memories", "--stale"])
+
+    assert result.exit_code == 0
+
+
 if __name__ == "__main__":
   unittest.main()

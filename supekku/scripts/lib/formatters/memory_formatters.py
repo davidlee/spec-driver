@@ -7,7 +7,7 @@ Formatters take MemoryRecord objects and return formatted strings for display.
 from __future__ import annotations
 
 import json
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.formatters.cell_helpers import (
@@ -24,6 +24,7 @@ from supekku.scripts.lib.formatters.theme import get_memory_status_style
 if TYPE_CHECKING:
   from supekku.scripts.lib.memory.links import LinkGraphNode
   from supekku.scripts.lib.memory.models import MemoryRecord
+  from supekku.scripts.lib.memory.staleness import StalenessInfo
 
 
 # --- Detail view ---
@@ -276,6 +277,131 @@ def format_memory_list_json(records: Sequence[MemoryRecord]) -> str:
     items.append(item)
 
   return format_as_json(items)
+
+
+# --- Staleness views ---
+
+
+_TIER_LABELS = {
+  "attested": "scoped, attested",
+  "unattested": "scoped, unattested",
+  "unscoped": "unscoped",
+}
+
+_STALENESS_HEADER = (
+  f"{'ID':<36} {'Confidence':<12} {'Verified':<12} {'Stale':<10} {'Scope'}"
+)
+
+
+def format_staleness_table(
+  infos: Sequence[StalenessInfo],
+  records: Mapping[str, MemoryRecord],
+) -> str:
+  """Format staleness info as a three-tier plain-text table.
+
+  Tiers:
+    1. Scoped + attested — sorted by commits_since descending
+    2. Scoped + unattested — sorted by days_since descending
+    3. Unscoped — sorted by days_since descending
+
+  Empty tiers are omitted.
+
+  Args:
+    infos: StalenessInfo list from compute_batch_staleness.
+    records: Mapping of memory_id → MemoryRecord for metadata.
+
+  Returns:
+    Formatted multi-tier string, or empty string if no infos.
+  """
+  if not infos:
+    return ""
+
+  attested, unattested, unscoped = _partition_tiers(infos)
+  lines: list[str] = [_STALENESS_HEADER]
+
+  if attested:
+    attested.sort(
+      key=lambda i: i.commits_since or 0,
+      reverse=True,
+    )
+    lines.append(f"── {_TIER_LABELS['attested']} ──")
+    for info in attested:
+      lines.append(_format_staleness_row(info, records))
+
+  if unattested:
+    unattested.sort(
+      key=lambda i: i.days_since or 0,
+      reverse=True,
+    )
+    lines.append(f"── {_TIER_LABELS['unattested']} ──")
+    for info in unattested:
+      lines.append(_format_staleness_row(info, records))
+
+  if unscoped:
+    unscoped.sort(
+      key=lambda i: i.days_since or 0,
+      reverse=True,
+    )
+    lines.append(f"── {_TIER_LABELS['unscoped']} ──")
+    for info in unscoped:
+      lines.append(_format_staleness_row(info, records))
+
+  return "\n".join(lines)
+
+
+def _partition_tiers(
+  infos: Sequence[StalenessInfo],
+) -> tuple[
+  list[StalenessInfo],
+  list[StalenessInfo],
+  list[StalenessInfo],
+]:
+  """Split staleness infos into three tiers."""
+  attested: list[StalenessInfo] = []
+  unattested: list[StalenessInfo] = []
+  unscoped: list[StalenessInfo] = []
+
+  for info in infos:
+    if not info.has_scope:
+      unscoped.append(info)
+    elif info.verified_sha:
+      attested.append(info)
+    else:
+      unattested.append(info)
+
+  return attested, unattested, unscoped
+
+
+def _format_staleness_row(
+  info: StalenessInfo,
+  records: Mapping[str, MemoryRecord],
+) -> str:
+  """Format a single staleness row."""
+  record = records.get(info.memory_id)
+  confidence = (record.confidence or "") if record else ""
+  verified = info.verified_date.isoformat() if info.verified_date else "—"
+
+  stale = _format_stale_cell(info)
+  scope = _format_scope_cell(info)
+
+  return f"{info.memory_id:<36} {confidence:<12} {verified:<12} {stale:<10} {scope}"
+
+
+def _format_stale_cell(info: StalenessInfo) -> str:
+  """Format the staleness indicator cell."""
+  if info.has_scope and info.verified_sha and info.commits_since is not None:
+    return f"{info.commits_since}\u2191"
+  if info.days_since is not None:
+    suffix = ", no sha" if info.has_scope else ""
+    return f"({info.days_since}d{suffix})"
+  return "—"
+
+
+def _format_scope_cell(info: StalenessInfo) -> str:
+  """Format the scope summary cell."""
+  if info.scope_paths:
+    return ", ".join(info.scope_paths[:3])
+  return ""
 
 
 # --- Graph views ---

@@ -46,6 +46,7 @@ from .memory_formatters import (
   format_memory_details,
   format_memory_list_json,
   format_memory_list_table,
+  format_staleness_table,
 )
 from .policy_formatters import (
   format_policy_details,
@@ -102,6 +103,7 @@ __all__ = [
   "format_memory_details",
   "format_memory_list_json",
   "format_memory_list_table",
+  "format_staleness_table",
   "format_delta_details_json",
   "format_drift_details",
   "format_drift_details_json",

@@ -444,3 +444,171 @@ class TestFormatLinkGraphJson:
     parsed = json.loads(format_link_graph_json(_sample_nodes()))
     assert len(parsed) == 4
     assert parsed[2]["depth"] == 1
+
+
+# --- format_staleness_table ---
+
+
+from supekku.scripts.lib.formatters.memory_formatters import (  # noqa: E402
+  format_staleness_table,
+)
+from supekku.scripts.lib.memory.staleness import StalenessInfo  # noqa: E402
+
+
+def _make_staleness(
+  memory_id: str = "mem.test",
+  verified_sha: str | None = None,
+  verified_date: date | None = None,
+  scope_paths: list[str] | None = None,
+  commits_since: int | None = None,
+  days_since: int | None = None,
+  has_scope: bool = False,
+  confidence: str | None = None,
+) -> tuple[StalenessInfo, MemoryRecord]:
+  """Build a StalenessInfo + MemoryRecord pair for formatter tests."""
+  info = StalenessInfo(
+    memory_id=memory_id,
+    verified_sha=verified_sha,
+    verified_date=verified_date,
+    scope_paths=scope_paths or [],
+    commits_since=commits_since,
+    days_since=days_since,
+    has_scope=has_scope,
+  )
+  record = _make_record(
+    id=memory_id,
+    confidence=confidence or "medium",
+    verified=verified_date,
+    verified_sha=verified_sha,
+  )
+  return info, record
+
+
+class TestFormatStalenessTable:
+  """Tests for format_staleness_table."""
+
+  def test_empty_input(self) -> None:
+    output = format_staleness_table([], {})
+    assert output == ""
+
+  def test_scoped_attested_tier(self) -> None:
+    """Scoped+attested memories appear in tier 1."""
+    info, record = _make_staleness(
+      memory_id="mem.scoped.attested",
+      verified_sha="a" * 40,
+      verified_date=date(2026, 3, 1),
+      scope_paths=["supekku/cli/"],
+      commits_since=5,
+      days_since=8,
+      has_scope=True,
+      confidence="high",
+    )
+    records = {"mem.scoped.attested": record}
+    output = format_staleness_table([info], records)
+    assert "scoped, attested" in output
+    assert "mem.scoped.attested" in output
+    assert "5" in output  # commits_since
+
+  def test_scoped_unattested_tier(self) -> None:
+    """Scoped+unattested memories appear in tier 2."""
+    info, record = _make_staleness(
+      memory_id="mem.scoped.unattested",
+      verified_date=date(2026, 3, 1),
+      scope_paths=["supekku/tui/"],
+      days_since=8,
+      has_scope=True,
+    )
+    records = {"mem.scoped.unattested": record}
+    output = format_staleness_table([info], records)
+    assert "scoped, unattested" in output
+    assert "mem.scoped.unattested" in output
+
+  def test_unscoped_tier(self) -> None:
+    """Unscoped memories appear in tier 3."""
+    info, record = _make_staleness(
+      memory_id="mem.unscoped",
+      verified_date=date(2026, 1, 15),
+      days_since=53,
+      has_scope=False,
+    )
+    records = {"mem.unscoped": record}
+    output = format_staleness_table([info], records)
+    assert "unscoped" in output
+    assert "mem.unscoped" in output
+
+  def test_tier_ordering(self) -> None:
+    """Tiers appear in order: scoped+attested, scoped+unattested, unscoped."""
+    attested_info, attested_rec = _make_staleness(
+      memory_id="mem.attested",
+      verified_sha="a" * 40,
+      verified_date=date(2026, 3, 1),
+      scope_paths=["supekku/cli/"],
+      commits_since=3,
+      days_since=8,
+      has_scope=True,
+    )
+    unattested_info, unattested_rec = _make_staleness(
+      memory_id="mem.unattested",
+      verified_date=date(2026, 3, 1),
+      scope_paths=["supekku/tui/"],
+      days_since=8,
+      has_scope=True,
+    )
+    unscoped_info, unscoped_rec = _make_staleness(
+      memory_id="mem.unscoped",
+      days_since=53,
+      has_scope=False,
+    )
+    records = {
+      "mem.attested": attested_rec,
+      "mem.unattested": unattested_rec,
+      "mem.unscoped": unscoped_rec,
+    }
+    infos = [unscoped_info, attested_info, unattested_info]
+    output = format_staleness_table(infos, records)
+
+    # Tier headers should appear in order
+    idx_attested = output.find("scoped, attested")
+    idx_unattested = output.find("scoped, unattested")
+    idx_unscoped = output.find("unscoped")
+    assert idx_attested < idx_unattested < idx_unscoped
+
+  def test_sort_within_attested_tier(self) -> None:
+    """Attested tier sorts by commits_since descending."""
+    info_high, rec_high = _make_staleness(
+      memory_id="mem.high",
+      verified_sha="a" * 40,
+      verified_date=date(2026, 3, 1),
+      scope_paths=["a/"],
+      commits_since=50,
+      has_scope=True,
+    )
+    info_low, rec_low = _make_staleness(
+      memory_id="mem.low",
+      verified_sha="b" * 40,
+      verified_date=date(2026, 3, 1),
+      scope_paths=["b/"],
+      commits_since=2,
+      has_scope=True,
+    )
+    records = {"mem.high": rec_high, "mem.low": rec_low}
+    output = format_staleness_table(
+      [info_low, info_high],
+      records,
+    )
+    idx_high = output.find("mem.high")
+    idx_low = output.find("mem.low")
+    assert idx_high < idx_low
+
+  def test_empty_tier_omitted(self) -> None:
+    """Tiers with no entries are not shown."""
+    info, record = _make_staleness(
+      memory_id="mem.unscoped",
+      days_since=10,
+      has_scope=False,
+    )
+    records = {"mem.unscoped": record}
+    output = format_staleness_table([info], records)
+    assert "scoped, attested" not in output
+    assert "scoped, unattested" not in output
+    assert "unscoped" in output

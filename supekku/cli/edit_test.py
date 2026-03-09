@@ -521,3 +521,109 @@ class TestEditDrift:
       call_args = mock_resolve.call_args[0]
       assert call_args[0] == "drift_ledger"
       assert call_args[1] == "DL-001"
+
+
+# ── --verify flag tests (DE-086, VT-cli-edit-verify) ──
+
+MEMORY_FRONTMATTER = """\
+---
+id: mem.test.pattern
+name: Test Pattern
+status: active
+kind: memory
+memory_type: pattern
+created: '2026-03-01'
+updated: '2026-03-01'
+verified: '2026-03-01'
+confidence: medium
+---
+
+# Test Memory
+"""
+
+
+class TestEditMemoryVerify:
+  """Tests for --verify flag on edit memory command."""
+
+  def test_verify_stamps_sha_and_dates(self, tmp_path: Path) -> None:
+    """--verify stamps verified, verified_sha, updated in frontmatter."""
+    mem_file = tmp_path / "mem.test.pattern.md"
+    mem_file.write_text(MEMORY_FRONTMATTER)
+    ref = MagicMock(id="mem.test.pattern", path=mem_file)
+    fake_sha = "a" * 40
+
+    with (
+      patch("supekku.cli.edit.resolve_artifact", return_value=ref),
+      patch("supekku.cli.edit.get_head_sha", return_value=fake_sha),
+    ):
+      result = runner.invoke(app, ["memory", "mem.test.pattern", "--verify"])
+
+    assert result.exit_code == 0
+    assert "Verified" in result.output
+    assert "aaaaaaaa" in result.output  # short_sha
+
+    content = mem_file.read_text()
+    assert f"verified_sha: {fake_sha}" in content
+    assert "verified: '2026-03-01'" not in content  # date was updated
+
+  def test_verify_refuses_without_git(self, tmp_path: Path) -> None:
+    """--verify refuses when git is unavailable."""
+    mem_file = tmp_path / "mem.test.pattern.md"
+    mem_file.write_text(MEMORY_FRONTMATTER)
+    ref = MagicMock(id="mem.test.pattern", path=mem_file)
+
+    with (
+      patch("supekku.cli.edit.resolve_artifact", return_value=ref),
+      patch("supekku.cli.edit.get_head_sha", return_value=None),
+    ):
+      result = runner.invoke(app, ["memory", "mem.test.pattern", "--verify"])
+
+    assert result.exit_code == 1
+    assert "git" in result.output.lower() or "git" in (result.stderr or "").lower()
+
+  def test_verify_mutex_with_status(self) -> None:
+    """--verify and --status are mutually exclusive."""
+    ref = MagicMock(id="mem.test.pattern", path=Path("/fake.md"))
+
+    with patch("supekku.cli.edit.resolve_artifact", return_value=ref):
+      result = runner.invoke(
+        app, ["memory", "mem.test.pattern", "--verify", "--status", "deprecated"]
+      )
+
+    assert result.exit_code == 1
+    output = result.output.lower()
+    assert "mutually exclusive" in output or "cannot" in output
+
+  def test_verify_without_existing_sha_inserts_field(self, tmp_path: Path) -> None:
+    """--verify inserts verified_sha when not present in frontmatter."""
+    mem_file = tmp_path / "mem.test.pattern.md"
+    mem_file.write_text(MEMORY_FRONTMATTER)
+    ref = MagicMock(id="mem.test.pattern", path=mem_file)
+    fake_sha = "b" * 40
+
+    with (
+      patch("supekku.cli.edit.resolve_artifact", return_value=ref),
+      patch("supekku.cli.edit.get_head_sha", return_value=fake_sha),
+    ):
+      result = runner.invoke(app, ["memory", "mem.test.pattern", "--verify"])
+
+    assert result.exit_code == 0
+    content = mem_file.read_text()
+    assert f"verified_sha: {fake_sha}" in content
+
+  def test_verify_does_not_open_editor(self, tmp_path: Path) -> None:
+    """--verify does not open the editor."""
+    mem_file = tmp_path / "mem.test.pattern.md"
+    mem_file.write_text(MEMORY_FRONTMATTER)
+    ref = MagicMock(id="mem.test.pattern", path=mem_file)
+    fake_sha = "c" * 40
+
+    with (
+      patch("supekku.cli.edit.resolve_artifact", return_value=ref),
+      patch("supekku.cli.edit.get_head_sha", return_value=fake_sha),
+      patch("subprocess.run") as mock_run,
+    ):
+      result = runner.invoke(app, ["memory", "mem.test.pattern", "--verify"])
+
+    assert result.exit_code == 0
+    mock_run.assert_not_called()

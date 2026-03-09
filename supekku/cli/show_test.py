@@ -247,7 +247,8 @@ class ShowDeltaCommandTest(unittest.TestCase):
     result = self.runner.invoke(app, ["delta", "DE-999"])
 
     assert result.exit_code == 1
-    assert "Error: Delta not found: DE-999" in result.stderr
+    assert "not found" in result.stderr.lower()
+    assert "DE-999" in result.stderr
 
   def test_show_delta_json_includes_other_files(self) -> None:
     """Test that JSON output includes other files in delta bundle."""
@@ -407,7 +408,14 @@ class ShowPathFlagTest(unittest.TestCase):
 
   def test_path_and_json_mutually_exclusive(self) -> None:
     """Test that --path and --json are mutually exclusive."""
-    result = self.runner.invoke(app, ["delta", "DE-001", "--path", "--json"])
+    root = find_repo_root()
+    delta_dirs = sorted((root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).iterdir())
+    if not delta_dirs:
+      self.skipTest("No deltas found in repository")
+    # Dir name like "DE-003-some_slug" → "DE-003"
+    parts = delta_dirs[0].name.split("-")
+    delta_id = f"{parts[0]}-{parts[1]}"
+    result = self.runner.invoke(app, ["delta", delta_id, "--path", "--json"])
 
     assert result.exit_code == 1
     assert "mutually exclusive" in result.stderr.lower()
@@ -458,6 +466,10 @@ class ShowRawFlagTest(unittest.TestCase):
     """Set up test environment."""
     self.runner = CliRunner()
     self.root = find_repo_root()
+    delta_dirs = list((self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*"))
+    self.delta_id = (
+      f"DE-{delta_dirs[0].name.split('-')[1]}" if delta_dirs else None
+    )
 
   def test_show_delta_raw_flag(self) -> None:
     """Test --raw flag outputs raw file content."""
@@ -509,21 +521,29 @@ class ShowRawFlagTest(unittest.TestCase):
 
   def test_raw_and_json_mutually_exclusive(self) -> None:
     """Test that --raw and --json are mutually exclusive."""
-    result = self.runner.invoke(app, ["delta", "DE-001", "--raw", "--json"])
+    if not self.delta_id:
+      self.skipTest("No deltas found in repository")
+    result = self.runner.invoke(app, ["delta", self.delta_id, "--raw", "--json"])
 
     assert result.exit_code == 1
     assert "mutually exclusive" in result.stderr.lower()
 
   def test_raw_and_path_mutually_exclusive(self) -> None:
     """Test that --raw and --path are mutually exclusive."""
-    result = self.runner.invoke(app, ["delta", "DE-001", "--raw", "--path"])
+    if not self.delta_id:
+      self.skipTest("No deltas found in repository")
+    result = self.runner.invoke(app, ["delta", self.delta_id, "--raw", "--path"])
 
     assert result.exit_code == 1
     assert "mutually exclusive" in result.stderr.lower()
 
   def test_all_three_flags_mutually_exclusive(self) -> None:
     """Test that --raw, --json, and --path together fail."""
-    result = self.runner.invoke(app, ["delta", "DE-001", "--raw", "--json", "--path"])
+    if not self.delta_id:
+      self.skipTest("No deltas found in repository")
+    result = self.runner.invoke(
+      app, ["delta", self.delta_id, "--raw", "--json", "--path"]
+    )
 
     assert result.exit_code == 1
     assert "mutually exclusive" in result.stderr.lower()

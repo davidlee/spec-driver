@@ -13,21 +13,16 @@ from supekku.cli.common import (
   EXIT_SUCCESS,
   ArtifactNotFoundError,
   ArtifactRef,
-  ContentType,
   ContentTypeOption,
   InferringGroup,
   RootOption,
   emit_artifact,
-  extract_yaml_frontmatter,
-  normalize_id,
   resolve_artifact,
   resolve_by_id,
 )
 from supekku.scripts.lib.cards import CardRegistry
-from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.templates import TemplateNotFoundError, render_template
-from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.card_formatters import format_card_details
 from supekku.scripts.lib.formatters.change_formatters import (
   format_audit_details,
@@ -45,10 +40,6 @@ from supekku.scripts.lib.formatters.requirement_formatters import (
 from supekku.scripts.lib.formatters.spec_formatters import format_spec_details
 from supekku.scripts.lib.formatters.standard_formatters import format_standard_details
 from supekku.scripts.lib.memory.registry import MemoryRegistry
-from supekku.scripts.lib.policies.registry import PolicyRegistry
-from supekku.scripts.lib.requirements.registry import RequirementsRegistry
-from supekku.scripts.lib.specs.registry import SpecRegistry
-from supekku.scripts.lib.standards.registry import StandardRegistry
 
 app = typer.Typer(
   help="Show detailed artifact information",
@@ -70,42 +61,18 @@ def show_spec(
 ) -> None:
   """Show detailed information about a specification."""
   try:
-    bool_flags = sum([json_output, path_only, raw_output])
-    if content_type is not None and bool_flags:
-      typer.echo("Warning: --content-type overrides --json/--path/--raw", err=True)
-      json_output = path_only = raw_output = False
-    elif bool_flags > 1:
-      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    registry = SpecRegistry(root=root)
-    spec = registry.get(spec_id)
-
-    if not spec:
-      typer.echo(f"Error: Specification not found: {spec_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    if content_type == ContentType.markdown:
-      typer.echo(spec.path.read_text())
-    elif content_type == ContentType.frontmatter:
-      typer.echo(format_spec_details(spec, root=root))
-    elif content_type == ContentType.yaml:
-      typer.echo(extract_yaml_frontmatter(spec.path))
-    elif path_only:
-      typer.echo(spec.path)
-    elif raw_output:
-      typer.echo(spec.path.read_text())
-    elif json_output:
-      from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
-
-      repo_root = find_repo_root(root)
-      output = spec.to_dict(repo_root)
-      typer.echo(json.dumps(output, indent=2))
-    else:
-      typer.echo(format_spec_details(spec, root=root))
-
-    raise typer.Exit(EXIT_SUCCESS)
-  except (FileNotFoundError, ValueError, KeyError) as e:
+    ref = resolve_artifact("spec", spec_id, root)
+    repo_root = find_repo_root(root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      content_type=content_type,
+      format_fn=lambda r: format_spec_details(r, root=root),
+      json_fn=lambda r: json.dumps(r.to_dict(repo_root), indent=2),
+    )
+  except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
@@ -123,40 +90,17 @@ def show_delta(
 ) -> None:
   """Show detailed information about a delta."""
   try:
-    bool_flags = sum([json_output, path_only, raw_output])
-    if content_type is not None and bool_flags:
-      typer.echo("Warning: --content-type overrides --json/--path/--raw", err=True)
-      json_output = path_only = raw_output = False
-    elif bool_flags > 1:
-      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    normalized_id = normalize_id("delta", delta_id)
-    registry = ChangeRegistry(root=root, kind="delta")
-    artifacts = registry.collect()
-    artifact = artifacts.get(normalized_id)
-
-    if not artifact:
-      typer.echo(f"Error: Delta not found: {normalized_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    if content_type == ContentType.markdown:
-      typer.echo(artifact.path.read_text())
-    elif content_type == ContentType.frontmatter:
-      typer.echo(format_delta_details(artifact, root=root))
-    elif content_type == ContentType.yaml:
-      typer.echo(extract_yaml_frontmatter(artifact.path))
-    elif path_only:
-      typer.echo(artifact.path)
-    elif raw_output:
-      typer.echo(artifact.path.read_text())
-    elif json_output:
-      typer.echo(format_delta_details_json(artifact, root=root))
-    else:
-      typer.echo(format_delta_details(artifact, root=root))
-
-    raise typer.Exit(EXIT_SUCCESS)
-  except (FileNotFoundError, ValueError, KeyError) as e:
+    ref = resolve_artifact("delta", delta_id, root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      content_type=content_type,
+      format_fn=lambda r: format_delta_details(r, root=root),
+      json_fn=lambda r: format_delta_details_json(r, root=root),
+    )
+  except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
@@ -197,45 +141,22 @@ def show_requirement(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a requirement."""
   try:
-    if sum([json_output, path_only, raw_output]) > 1:
-      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    repo_root = find_repo_root(root)
-    registry_path = repo_root / ".spec-driver" / "registry" / "requirements.yaml"
-    registry = RequirementsRegistry(registry_path)
-
-    requirement = registry.records.get(req_id)
-
-    if not requirement:
-      typer.echo(f"Error: Requirement not found: {req_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    if path_only or raw_output:
-      req_dict = requirement.to_dict() if hasattr(requirement, "to_dict") else {}
-      path_str = req_dict.get("path", "")
-      if not path_str:
-        typer.echo(f"Error: No path found for requirement: {req_id}", err=True)
-        raise typer.Exit(EXIT_FAILURE)
-      full_path = repo_root / path_str
-      if path_only:
-        typer.echo(full_path)
-      else:
-        typer.echo(full_path.read_text())
-    elif json_output:
-      output = (
-        requirement.to_dict() if hasattr(requirement, "to_dict") else {"uid": req_id}
-      )
-      typer.echo(json.dumps(output, indent=2))
-    else:
-      typer.echo(format_requirement_details(requirement))
-
-    raise typer.Exit(EXIT_SUCCESS)
-  except (FileNotFoundError, ValueError, KeyError) as e:
+    ref = resolve_artifact("requirement", req_id, root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      content_type=content_type,
+      format_fn=format_requirement_details,
+      json_fn=lambda r: json.dumps(r.to_dict(), indent=2),
+    )
+  except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
@@ -253,44 +174,18 @@ def show_adr(
 ) -> None:
   """Show detailed information about a specific decision/ADR."""
   try:
-    bool_flags = sum([json_output, path_only, raw_output])
-    if content_type is not None and bool_flags:
-      typer.echo("Warning: --content-type overrides --json/--path/--raw", err=True)
-      json_output = path_only = raw_output = False
-    elif bool_flags > 1:
-      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    normalized_id = normalize_id("adr", decision_id)
-    registry = DecisionRegistry(root=root)
-    decision = registry.find(normalized_id)
-
-    if not decision:
-      typer.echo(f"Error: Decision not found: {normalized_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    adr_path = Path(decision.path)
-    if content_type == ContentType.markdown:
-      typer.echo(adr_path.read_text())
-    elif content_type == ContentType.frontmatter:
-      typer.echo(format_decision_details(decision))
-    elif content_type == ContentType.yaml:
-      typer.echo(extract_yaml_frontmatter(adr_path))
-    elif path_only:
-      typer.echo(decision.path)
-    elif raw_output:
-      typer.echo(adr_path.read_text())
-    elif json_output:
-      from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
-
-      repo_root = find_repo_root(root)
-      output = decision.to_dict(repo_root)
-      typer.echo(json.dumps(output, indent=2))
-    else:
-      typer.echo(format_decision_details(decision))
-
-    raise typer.Exit(EXIT_SUCCESS)
-  except (FileNotFoundError, ValueError, KeyError) as e:
+    ref = resolve_artifact("adr", decision_id, root)
+    repo_root = find_repo_root(root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      content_type=content_type,
+      format_fn=format_decision_details,
+      json_fn=lambda r: json.dumps(r.to_dict(repo_root), indent=2),
+    )
+  except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
@@ -308,44 +203,18 @@ def show_policy(
 ) -> None:
   """Show detailed information about a specific policy."""
   try:
-    bool_flags = sum([json_output, path_only, raw_output])
-    if content_type is not None and bool_flags:
-      typer.echo("Warning: --content-type overrides --json/--path/--raw", err=True)
-      json_output = path_only = raw_output = False
-    elif bool_flags > 1:
-      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    normalized_id = normalize_id("policy", policy_id)
-    registry = PolicyRegistry(root=root)
-    policy = registry.find(normalized_id)
-
-    if not policy:
-      typer.echo(f"Error: Policy not found: {normalized_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    policy_path = Path(policy.path)
-    if content_type == ContentType.markdown:
-      typer.echo(policy_path.read_text())
-    elif content_type == ContentType.frontmatter:
-      typer.echo(format_policy_details(policy))
-    elif content_type == ContentType.yaml:
-      typer.echo(extract_yaml_frontmatter(policy_path))
-    elif path_only:
-      typer.echo(policy.path)
-    elif raw_output:
-      typer.echo(policy_path.read_text())
-    elif json_output:
-      from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
-
-      repo_root = find_repo_root(root)
-      output = policy.to_dict(repo_root)
-      typer.echo(json.dumps(output, indent=2))
-    else:
-      typer.echo(format_policy_details(policy))
-
-    raise typer.Exit(EXIT_SUCCESS)
-  except (FileNotFoundError, ValueError, KeyError) as e:
+    ref = resolve_artifact("policy", policy_id, root)
+    repo_root = find_repo_root(root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      content_type=content_type,
+      format_fn=format_policy_details,
+      json_fn=lambda r: json.dumps(r.to_dict(repo_root), indent=2),
+    )
+  except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
@@ -363,44 +232,18 @@ def show_standard(
 ) -> None:
   """Show detailed information about a specific standard."""
   try:
-    bool_flags = sum([json_output, path_only, raw_output])
-    if content_type is not None and bool_flags:
-      typer.echo("Warning: --content-type overrides --json/--path/--raw", err=True)
-      json_output = path_only = raw_output = False
-    elif bool_flags > 1:
-      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    normalized_id = normalize_id("standard", standard_id)
-    registry = StandardRegistry(root=root)
-    standard = registry.find(normalized_id)
-
-    if not standard:
-      typer.echo(f"Error: Standard not found: {normalized_id}", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
-    std_path = Path(standard.path)
-    if content_type == ContentType.markdown:
-      typer.echo(std_path.read_text())
-    elif content_type == ContentType.frontmatter:
-      typer.echo(format_standard_details(standard))
-    elif content_type == ContentType.yaml:
-      typer.echo(extract_yaml_frontmatter(std_path))
-    elif path_only:
-      typer.echo(standard.path)
-    elif raw_output:
-      typer.echo(std_path.read_text())
-    elif json_output:
-      from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
-
-      repo_root = find_repo_root(root)
-      output = standard.to_dict(repo_root)
-      typer.echo(json.dumps(output, indent=2))
-    else:
-      typer.echo(format_standard_details(standard))
-
-    raise typer.Exit(EXIT_SUCCESS)
-  except (FileNotFoundError, ValueError, KeyError) as e:
+    ref = resolve_artifact("standard", standard_id, root)
+    repo_root = find_repo_root(root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      content_type=content_type,
+      format_fn=format_standard_details,
+      json_fn=lambda r: json.dumps(r.to_dict(repo_root), indent=2),
+    )
+  except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
@@ -477,38 +320,27 @@ def show_card(
       help="Search entire repo instead of just kanban/",
     ),
   ] = False,
+  content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
   """Show detailed information about a specific card."""
   try:
-    if sum([json_output, path_only, raw_output]) > 1:
-      typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
-      raise typer.Exit(EXIT_FAILURE)
-
     registry = CardRegistry(root=root)
-
-    if path_only:
-      # Path-only output for --path/-q flag
-      path = registry.resolve_path(card_id, anywhere=anywhere)
-      typer.echo(path)
-    elif raw_output:
-      path = registry.resolve_path(card_id, anywhere=anywhere)
-      typer.echo(Path(path).read_text())
-    elif json_output:
-      card = registry.resolve_card(card_id, anywhere=anywhere)
-      typer.echo(json.dumps(card.to_dict(), indent=2))
-    else:
-      # Full card details
-      card = registry.resolve_card(card_id, anywhere=anywhere)
-      typer.echo(format_card_details(card))
-
-    raise typer.Exit(EXIT_SUCCESS)
-
-  except FileNotFoundError as e:
+    card = registry.resolve_card(card_id, anywhere=anywhere)
+    ref = ArtifactRef(id=card_id, path=card.path, record=card)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      content_type=content_type,
+      format_fn=format_card_details,
+      json_fn=lambda r: json.dumps(r.to_dict(), indent=2),
+    )
+  except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
-  except ValueError as e:
-    # Ambiguity error
+  except (FileNotFoundError, ValueError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 

@@ -1,37 +1,39 @@
 # spec-driver
 
-Your specification-driven development framework construction toolkit, with multi-language spec sync and documentation generation.
+The specification-driving development toolkit. Clanker chauffeur for architects.
 
 ![spec-driver](./assets/spec-driver-redux.png)
 
 ## Slow is smooth. Smooth is fast.
 
-**Why should I care?**
-- Instead of expensive throwaway research, maintain verifiably accurate, evergreen specs
-- Use cheap, fast, deterministically generated contracts to complement and audit the work of messy, stochastic agents
-- The combination of markdown and YAML is a surprisingly powerful platform for structured, legible data
-- Tooling joins related entities through a registry for fast lookup, validation, and relational data
-- A low friction, conceptually coherent, unified CLI for spec-driven development you can adapt as your needs change
-- A TUI for browsing project documentation; live agent session follow mode
-- If all you care about is ADRs, turn the rest off - it's still super handy
-- Token footprint: < 3k to boot with everything activated; skills designed for token-efficiency
+**Why should you care?**
+- Designed for building sustainably with agents; supports "pioneer / settler / town planner" modes
+- A nice CLI for agents and humans.
+- Markdown + YAML + tooling = all the database you need.
+- Fast discovery, relational structure, and validation for your artifacts.
+- Instead of expensive throwaway research, maintain verifiably accurate, evergreen specs.
+- Cheap, fast, deterministically generated docs to help those messy, stochastic agents.
+- A TUI for browsing project documentation; live agent session follow mode.
+- If all you care about is ADRs, turn the rest off - it's still super handy.
+- Token footprint: < 3k to boot with everything activated; skills designed for token-efficiency.
+- Works great out of the box, but plenty of dials and escape hatches.
+- Agentic memory designed for hard use and repairability in humid environments.
 
 **What's it for?**
-- a single framework which can scale from low-ceremony kanban, up to the robust process you need for large codebases
-- greenfield spec-driven development with Claude Code & friends (Codex, etc)
-- legacy conversions (drift ledgers, incremental specification)
-- build your own methodology without reinventing wheels
+- a single framework which can scale from low-ceremony kanban, up to the robust process you need for serious codebases.
+- greenfield spec-driven development with Claude Code & friends (Codex, etc).
+- legacy conversions (drift ledgers, incremental specification).
 
 But more than anything else, it's for streamlined development which lets you
-focus on focus your attention on what's important.
+focus your attention on what's important.
 
 [honk if you like diagrams](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/process.svg)
 
-The machinery required is more complex than more naive approaches (research ->
+The machinery required is more complex than naive approaches (research ->
 specify -> plan -> execute) - but it's a very conscious tradeoff.
 
 Spec-driver is not a framework for development from disposable specifications.
-It's a framework which drives trustworthy specifications out of implementation.
+It's for driving trustworthy, evergreen specifications out of implementation.
 A machine, if you will, for converting change into truth.
 
 Because: when machines can code, what remains is system design. This is a
@@ -55,7 +57,7 @@ Fun fact: TUI now supports following a claude code session in real time.
 
 The agent runs the process according to your project settings, so you can learn the rest as you go. Ask it to explain the concepts as you need them.
 
-Add symlinks to the `.spec-driver` subfolders you want convenient access to (optional).
+Add symlinks into `.spec-driver` subfolders if you want convenient access to them.
 
 ## Installation
 

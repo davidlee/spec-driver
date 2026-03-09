@@ -208,4 +208,4 @@ Add CLI-visible relation discovery: `--related-to`, `--relation`, `--refs` flags
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Notes updated with findings
-- [ ] Hand-off notes to Phase 3
+- [x] Hand-off notes to Phase 3 — skill update + verification + coverage update only; no code changes

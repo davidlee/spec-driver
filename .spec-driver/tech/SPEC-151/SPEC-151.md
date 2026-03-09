@@ -166,11 +166,11 @@ entries:
   - artefact: VA-083-002
     kind: VA
     requirement: SPEC-151.FR-003
-    status: planned
-    notes: Review authorship-skill coverage across audit, revision, and spec-driver surfaces.
+    status: verified
+    notes: Authorship-skill gap review — no remaining gaps; audit→revision→spec-driver chain coherent.
   - artefact: VA-083-003
     kind: VA
     requirement: SPEC-151.FR-004
-    status: planned
-    notes: Worked examples confirm the branch order and reuse of existing spec creation.
+    status: verified
+    notes: Worked examples for spec_patch, revision, and revision-led new spec — all teachable.
 ```

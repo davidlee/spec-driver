@@ -4,7 +4,7 @@ name: Skinny CLI Pattern
 kind: memory
 status: active
 memory_type: pattern
-updated: '2026-03-02'
+updated: '2026-03-10'
 confidence: high
 tags:
 - architecture
@@ -33,6 +33,8 @@ provenance:
     ref: CLAUDE.md
 requires_reading:
 - CLAUDE.md
+verified: '2026-03-10'
+verified_sha: 81d9554da083f6a891dd37fabb59bb1c87186f6b
 ---
 
 # Skinny CLI Pattern

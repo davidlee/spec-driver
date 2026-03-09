@@ -140,8 +140,6 @@ the appropriate contract doc generator(s):
 - [zigmarkdoc](https://github.com/davidlee/zigmarkdoc)
 - [ts-doc-extract](https://www.npmjs.com/package/ts-doc-extract) - `npm install -g ts-doc-extract` or `npm install --save-dev ts-doc-extract`
 
-![workflow diagram](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/simple.svg)
-
 ### Install Footprint
 
 All install locations are project-local - no change to your system ~/.claude etc

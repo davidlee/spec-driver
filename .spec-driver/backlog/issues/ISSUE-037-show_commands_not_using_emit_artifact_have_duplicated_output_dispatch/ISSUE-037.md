@@ -2,8 +2,8 @@
 id: ISSUE-037
 name: Show commands not using emit_artifact have duplicated output dispatch
 created: '2026-03-05'
-updated: '2026-03-05'
-status: open
+updated: '2026-03-09'
+status: resolved
 kind: issue
 categories: []
 severity: p3

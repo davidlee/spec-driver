@@ -25,7 +25,7 @@ Your specification-driven development framework construction toolkit, with multi
 But more than anything else, it's for streamlined development which lets you
 focus on focus your attention on what's important.
 
-![workflow](./assets/process.png)
+![workflow](./assets/process.svg)
 
 The machinery required is more complex than more naive approaches (research ->
 specify -> plan -> execute) - but it's a very conscious tradeoff.

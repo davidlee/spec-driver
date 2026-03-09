@@ -9,7 +9,7 @@ classes: {
   process: {
     shape: parallelogram
     style: {
-      fill: "#cceeff"
+      fill: "#abefff"
       font: mono
       font-size: 16
     }
@@ -18,7 +18,7 @@ classes: {
   artifact: {
     shape: page
     style: {
-      fill: "#ffffcc"
+      fill: "#ffefab"
     }
   }
 
@@ -27,26 +27,37 @@ classes: {
       stroke-width: 4
     }
   }
-
-  creates: {
+  emits: {
+    label: defines
     style: {
-      # stroke-dash: 2
-      # stroke: "#555555"
+      stroke: "#777777"
     }
   }
-
-  relates: {
+  updates: {
+    label: updates
+    style: {
+      # stroke: "#777777"
+    }
+  }
+  informs: {
+    label: informs
     style: {
       stroke-dash: 4
       stroke: "#7799cc"
     }
   }
-
-  generates: {
-    style: {
-      stroke-dash: 3
-      stroke-width: 1
-      stroke: "#555555"
+}
+# #
+# #
+vars: {
+  d2-legend: {
+    d: {
+      label: "the important part"
+      class: important
+      style: {
+        fill: "#ff00ff"
+        font-color: "#ffffff"
+      }
     }
   }
 }
@@ -64,34 +75,29 @@ plan.class: process
 execute.class: process
 verify.class: process
 
-legend: {
-  legend: {
-    label: "important bits"
-    class: important
-    style: {
-      fill: "#ff00ff"
-      font-color: "#ffffff"
-    }
-  }
-}
-
 delta: {
+  style.fill: "#ffdecd"
+  style.stroke: "#cc7755"
   class: artifact
 
   design_revision: {
     class: important
     shape: page
-    label: "design revision"
+    label: "design\nrevision"
   }
 
   implementation_plan: {
     class: artifact
-    label: "implementation plan"
+    label: "implementation\nplan"
+    # phases: {
+    #   style.multiple: true
+    #   class: artifact
+    # }
   }
 }
 
 research: {
-  label: "normative truth"
+  label: "research | truth"
   product_spec: {
     class: artifact
     label: "product spec"
@@ -110,43 +116,63 @@ research: {
       style.multiple: true
       class: artifact
     }
+  }
 
-    contracts: {
-      class: artifact
-      label: "generated contracts"
-      style: {
-        fill: "#eeeeee"
-        multiple: true
-      }
+  contracts: {
+    class: artifact
+    label: "generated\ncontracts"
+    style: {
+      fill: "#eeeeee"
+      multiple: true
     }
   }
 }
-
-research -> delta: {class: relates; label: informs}
+research -> design: {class: informs}
+research -> plan: {class: informs}
 
 backlog: {
-  issue.class: artifact
-  improvement.class: artifact
-  problem.class: artifact
-  risk.class: artifact
+  ideas: {
+    style.multiple: true
+    class: artifact
+  }
+  issues: {
+    style.multiple: true
+    class: artifact
+  }
+  problems: {
+    style.multiple: true
+    class: artifact
+  }
+  risks: {
+    style.multiple: true
+    class: artifact
+  }
 }
+
+#
+# workflow
+#
 
 capture -> scope -> design -> plan -> execute -> verify: {class: critpath}
 
-capture -> backlog: {class: creates}
-backlog -> scope: {class: relates}
-scope -> delta: {class: creates}
-design -> delta.design_revision: {class: creates}
-plan -> delta.implementation_plan: {class: creates}
-execute -> code
-# verify -> audit
+capture -> backlog: {class: emits}
+backlog -> scope: {class: informs}
+scope -> delta: {class: emits}
+design -> delta.design_revision: {class: emits}
+plan -> delta.implementation_plan: {class: emits}
+execute -> code: {class: updates}
 
-code: {shape: hexagon}
-
-code -> research.tech_spec.contracts: {
-  class: generates
+code: {
+  label: codebase
+  shape: hexagon
 }
 
-delta -> verify: {class: relates}
-code -> verify: {class: relates}
-verify -> research: update
+code -> research.contracts: {
+  class: emits
+  label: emits
+}
+
+delta -> verify: {class: informs}
+code -> verify: {class: informs}
+verify -> research: {class: updates}
+research.contracts -> verify: {class: informs}

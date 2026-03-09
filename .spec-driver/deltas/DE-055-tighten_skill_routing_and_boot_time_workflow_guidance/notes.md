@@ -601,3 +601,20 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
   - packaged skills updated: `supekku/skills/using-spec-driver/SKILL.md`, `supekku/skills/scope-delta/SKILL.md`, `supekku/skills/plan-phases/SKILL.md`
   - generated workspace copies refreshed after rerunning the current install flow
   - verified generated copies now match the new DR-before-IP wording in `.spec-driver/skills/*`
+
+### 2026-03-09 - closure handoff and follow-up split
+- Reconciled the DE-055 bundle for close-out:
+  - added `IP-055.PHASE-15` to `DE-055.md`
+  - updated `IP-055.md` so the latest completed phase and phase-completion tracking match reality
+  - promoted `DEC-055-001` through `DEC-055-003` from proposed to accepted in `DR-055.md`
+  - replaced the stale DE/DR open-question pile with explicit handoff to `DE-079` and `DE-083`
+- Created follow-up delta `DE-083` for the remaining work that does not belong in DE-055 closure:
+  - strengthen the audit loop's bias toward reconciling into authoritative specs
+  - tune revision/spec authorship skills so audit findings flow into existing specs, revisions, or new specs with less ambiguity
+- Closure posture:
+  - `DE-055` now owns the landed routing/DR-loop/close-out guidance only
+  - `DE-079` owns runtime audit schema, validation, and completion gates
+  - `DE-083` owns the remaining skill-authoring and audit-to-spec follow-through work
+- Verification:
+  - `uv run spec-driver complete delta DE-055 --dry-run` succeeded
+  - formal close-out ceremony was intentionally deferred after the dry run so follow-up setup could be completed first

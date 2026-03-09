@@ -9157,7 +9157,7 @@ deltas:
         risks: []
   DE-079:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Implement canonical audit reconciliation contract
     slug: implement_canonical_audit_reconciliation_contract
     updated: '2026-03-09'
@@ -9657,7 +9657,7 @@ deltas:
         risks: []
   DE-085:
     kind: delta
-    status: draft
+    status: in-progress
     name: Delta - Surface relation and backlog metadata in CLI and skills
     slug: surface_relation_and_backlog_metadata_in_cli_and_skills
     updated: '2026-03-09'
@@ -9683,7 +9683,8 @@ deltas:
         plan: IP-085
         delta: DE-085
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-085
         specs:
           primary:
           - PROD-002
@@ -9694,7 +9695,111 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-085-P01
+        - id: IP-085.PHASE-01
+        - id: IP-085.PHASE-02
+        - id: IP-085.PHASE-03
       phases:
-      - id: IP-085-P01
-        phase: IP-085-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-085.PHASE-01
+        plan: IP-085
+        delta: DE-085
+        objective: Create the generic relation query layer (constants, Protocol, query
+          functions) and add .relations property to Spec model. Full test coverage
+          for all new code.
+        entrance_criteria:
+        - DR-085 reviewed and approved
+        exit_criteria:
+        - relation_types.py created with RELATION_TYPES and REFERENCE_SOURCES constants
+        - base.py imports RELATION_TYPES instead of inline list
+        - relations/query.py created with RelationQueryable Protocol, ReferenceHit,
+          and all query functions
+        - Spec model exposes .relations property
+        - VT-085-001 and VT-085-006 passing
+        - just check green
+        verification:
+          tests:
+          - VT-085-001
+          - VT-085-006
+          evidence: []
+        tasks:
+        - id: T01
+          summary: Create core/relation_types.py with named constants
+        - id: T02
+          summary: Update base.py to import RELATION_TYPES
+        - id: T03
+          summary: Create relations/query.py with Protocol, ReferenceHit, and query
+            functions
+        - id: T04
+          summary: Add .relations property to Spec model
+        - id: T05
+          summary: "Verify R1 \u2014 check Spec frontmatter.data shape for relations"
+        - id: T06
+          summary: Write comprehensive tests (VT-085-001, VT-085-006)
+        - id: T07
+          summary: Lint and full check
+        risks:
+        - id: R1
+          description: Spec frontmatter.data may store Relation objects not raw dicts
+          mitigation: Verify and adjust property implementation accordingly
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-085.PHASE-02
+        plan: IP-085
+        delta: DE-085
+        objective: Add --related-to, --relation, --refs CLI flags to list deltas and
+          list specs. Create relation formatters. Enhance create delta --from-backlog
+          to populate context_inputs and relations. Regression-safe on --implements
+          and --informed-by.
+        entrance_criteria:
+        - Phase 1 complete (query module, constants, Spec.relations)
+        exit_criteria:
+        - relation_formatters.py created with format_refs_count and format_refs_tsv
+        - list deltas supports --related-to, --relation, --refs flags
+        - list specs supports --related-to, --relation, --refs flags
+        - --relation TYPE:TARGET parsing with colon split and warning on unknown type
+        - create delta --from-backlog populates context_inputs and relations
+        - VT-085-002 through VT-085-005 and VT-085-007 passing
+        - VT-085-003 and VT-085-004 regression tests green
+        - just check green
+        verification:
+          tests:
+          - VT-085-002
+          - VT-085-003
+          - VT-085-004
+          - VT-085-005
+          - VT-085-007
+          evidence: []
+        tasks:
+        - id: T01
+          summary: Create relation_formatters.py with format_refs_count and format_refs_tsv
+        - id: T02
+          summary: Add --related-to, --relation, --refs flags to list deltas
+        - id: T03
+          summary: Add --related-to, --relation, --refs flags to list specs
+        - id: T04
+          summary: Enhance create delta --from-backlog to populate context_inputs
+            and relations
+        - id: T05
+          summary: Write formatter tests (VT-085-005)
+        - id: T06
+          summary: Write CLI integration tests (VT-085-002)
+        - id: T07
+          summary: Write --from-backlog tests (VT-085-007)
+        - id: T08
+          summary: Verify regression (VT-085-003, VT-085-004)
+        - id: T09
+          summary: Lint and full check
+        risks:
+        - id: R1
+          description: "list.py is already large \u2014 adding flags may push past\
+            \ 150-line function limits"
+          mitigation: Keep filter logic in query module; CLI just calls find_related_to/find_by_relation
+        - id: R2
+          description: --relation TYPE:TARGET colon parsing edge cases
+          mitigation: Split on first colon only; test empty type/target/no-colon
+        - id: R3
+          description: "Formatter R4 residual \u2014 pass list[ReferenceHit] not artifact"
+          mitigation: Formatters receive pre-collected hits per DR-085 R4
+      - id: IP-085.PHASE-03
+        phase: IP-085.PHASE-03

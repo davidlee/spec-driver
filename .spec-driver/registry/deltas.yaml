@@ -9524,11 +9524,11 @@ deltas:
       requirements: []
   DE-083:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Strengthen audit-to-spec reconciliation and spec/revision authorship
       skills
     slug: strengthen_audit_to_spec_reconciliation_and_spec_revision_authorship_skills
-    updated: '2026-03-09'
+    updated: '2026-03-10'
     path: .spec-driver/deltas/DE-083-strengthen_audit_to_spec_reconciliation_and_spec_revision_authorship_skills/DE-083.md
     applies_to:
       specs:
@@ -9571,7 +9571,7 @@ deltas:
           name: Verify audit-to-spec examples and reconcile docs
           objective: Prove the designed path with worked examples and keep DE/DR/IP/notes
             aligned.
-          status: planned
+          status: completed
       phases:
       - schema: supekku.phase.overview
         version: 1
@@ -9636,12 +9636,58 @@ deltas:
             without clear need
           mitigation: Treat PROD-001 and PROD-002 as opt-in edits gated by explicit
             wording gaps
-      - id: IP-083.PHASE-02
-        name: Verify audit-to-spec examples and reconcile docs
-        objective: Prove the designed path with worked examples and keep DE/DR/IP/notes
-          aligned.
-        status: planned
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-083.PHASE-02
+        plan: IP-083
+        delta: DE-083
+        objective: Prove the Phase 1 authorship path with worked examples covering
+          all three branches (existing-spec patch, revision, revision-led new spec),
+          execute the planned verification artefacts, and reconcile DE/DR/IP/notes
+          for closure.
+        entrance_criteria:
+        - Phase 1 complete with skill and governance surfaces updated
+        - VA-083-001/002/003 still planned (not yet executed)
+        - DR-083 design decisions remain current
+        exit_criteria:
+        - "VA-083-001 executed \u2014 decision path review confirms branch criteria\
+          \ are explicit and doctrine-aligned"
+        - "VA-083-002 executed \u2014 authorship-skill gap review confirms no remaining\
+          \ gaps requiring immediate work"
+        - "VA-083-003 executed \u2014 worked examples for all three branches are documented\
+          \ and teachable"
+        - DE/DR/IP/notes are reconciled and ready for closure handoff
+        - DR-083 status updated to accepted (or issues raised if design drift found)
+        verification:
+          tests:
+          - uv run spec-driver show delta DE-083
+          - just check
+          evidence:
+          - VA-083-001 decision path review documented in this phase sheet
+          - VA-083-002 skill gap review documented in this phase sheet
+          - VA-083-003 worked examples documented in this phase sheet
+          - IP-083 verification coverage entries updated to reflect execution
+        tasks:
+        - id: '2.1'
+          title: 'Execute VA-083-001: decision path review'
+          status: done
+        - id: '2.2'
+          title: 'Execute VA-083-002: authorship-skill gap review'
+          status: done
+        - id: '2.3'
+          title: 'Execute VA-083-003: worked-example walkthroughs'
+          status: done
+        - id: '2.4'
+          title: Reconcile DE/DR/IP/notes and update verification coverage
+          status: done
+        - id: '2.5'
+          title: Update DR-083 status and hand off to closure
+          status: done
+        risks:
+        - description: Worked examples reveal a gap that requires reopening Phase
+            1 skill changes
+          mitigation: Treat minor wording fixes as Phase 2 scope; major gaps trigger
+            STOP condition
   DE-084:
     kind: delta
     status: completed
@@ -10050,3 +10096,44 @@ deltas:
         - id: '3.7'
           description: Final verification sweep (just passes)
         risks: []
+  DE-087:
+    kind: delta
+    status: draft
+    name: Delta - Cross-artifact TUI fuzzy search with relational weighting
+    slug: cross_artifact_tui_fuzzy_search_with_relational_weighting
+    updated: '2026-03-10'
+    path: .spec-driver/deltas/DE-087-cross_artifact_tui_fuzzy_search_with_relational_weighting/DE-087.md
+    applies_to:
+      specs:
+      - PROD-010
+      - PROD-015
+      requirements: []
+    relations:
+    - type: relates_to
+      target: IMPR-011
+      attributes: {}
+    - type: depends_on
+      target: DE-085
+      attributes: {}
+    plan:
+      id: IP-087
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-087
+        delta: DE-087
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-010
+          - PROD-015
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-087-P01
+      phases:
+      - id: IP-087-P01
+        phase: IP-087-P01

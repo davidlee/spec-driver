@@ -274,11 +274,24 @@ class TestKeybindings:
       await pilot.press("q")
 
   @pytest.mark.asyncio()
-  async def test_search_focus_binding(self):
+  async def test_search_overlay_binding(self):
+    """/ opens the search overlay (DEC-087-04)."""
+    from supekku.tui.widgets.search_overlay import SearchOverlay  # noqa: PLC0415
+
     app = _make_app()
     async with app.run_test(size=(120, 40)) as pilot:
       await pilot.pause()
       await pilot.press("slash")
+      await pilot.pause()
+      assert isinstance(app.screen, SearchOverlay)
+
+  @pytest.mark.asyncio()
+  async def test_filter_focus_binding(self):
+    """Ctrl+F focuses the per-type search input (DEC-087-04)."""
+    app = _make_app()
+    async with app.run_test(size=(120, 40)) as pilot:
+      await pilot.pause()
+      await pilot.press("ctrl+f")
       await pilot.pause()
       search = app.screen.query_one("#search-input", Input)
       assert search.has_focus

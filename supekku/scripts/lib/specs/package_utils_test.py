@@ -49,6 +49,7 @@ KNOWN_LEAF_PACKAGES = {
   "supekku/scripts/lib/standards",
   "supekku/scripts/lib/sync/adapters",
   "supekku/scripts/lib/validation",
+  "supekku/tui/search",
   "supekku/tui/widgets",
 }
 

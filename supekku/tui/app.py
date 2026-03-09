@@ -12,6 +12,7 @@ from textual.app import App
 from textual.binding import Binding
 
 from supekku.scripts.lib.core.artifact_view import (
+  ArtifactEntry,
   ArtifactSnapshot,
   ArtifactType,
   path_to_artifact_type,
@@ -45,7 +46,8 @@ class SpecDriverApp(App):
     Binding("t", "toggle_track", "Track"),
     Binding("e", "edit", "Edit"),
     Binding("s", "cycle_status", "Status"),
-    Binding("slash", "focus_search", "Search", key_display="/"),
+    Binding("slash", "global_search", "Search", key_display="/"),
+    Binding("ctrl+f", "focus_search", "Filter"),
   ]
 
   def __init__(
@@ -119,8 +121,18 @@ class SpecDriverApp(App):
     except Exception:  # noqa: BLE001
       pass
 
+  def action_global_search(self) -> None:
+    """Open the cross-artifact search overlay (DEC-087-03)."""
+    from supekku.tui.widgets.search_overlay import SearchOverlay  # noqa: PLC0415
+
+    def _on_result(result: ArtifactEntry | None) -> None:
+      if result is not None:
+        self.action_navigate_artifact(result.id)
+
+    self.push_screen(SearchOverlay(root=self._root), _on_result)
+
   def action_focus_search(self) -> None:
-    """Focus the search input in the artifact list."""
+    """Focus the per-type search input in the artifact list."""
     try:
       search = self.screen.query_one("#search-input")
       search.focus()

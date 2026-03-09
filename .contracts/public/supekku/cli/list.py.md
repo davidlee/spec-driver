@@ -46,16 +46,21 @@ The --regexp flag does pattern matching on ID and title fields.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
-- @app.command(deltas) `list_deltas(root, ids, status, implements, substring, regexp, case_insensitive, format_type, json_output, truncate, details, external) -> None`: List deltas with optional filtering and status grouping.
+- @app.command(deltas) `list_deltas(root, ids, status, implements, substring, related_to, relation, refs, regexp, case_insensitive, format_type, json_output, truncate, details, external) -> None`: List deltas with optional filtering and status grouping.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag filters on ID, name, and slug fields.
 The --implements flag filters by requirement ID (reverse relationship query).
+The --related-to flag searches all reference slots.
+The --relation flag filters by TYPE:TARGET in .relations only.
 
 Examples:
-  list deltas -s draft,in-progress          # Multi-value status filter
-  list deltas --implements PROD-010.FR-004   # Reverse relationship query
-  list deltas --json                         # JSON output
+  list deltas -s draft,in-progress            # Multi-value status filter
+  list deltas --implements PROD-010.FR-004     # Reverse relationship query
+  list deltas --related-to IMPR-006            # Deltas referencing IMPR-006
+  list deltas --relation relates_to:IMPR-006   # By relation type and target
+  list deltas --refs                           # Include refs column
+  list deltas --json                           # JSON output
 - @app.command(drift) `list_drift(root, status, substring, regexp, case_insensitive, format_type, truncate) -> None`: List drift ledgers.
 - @app.command(improvements) `list_improvements(root, status, severity, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog improvements with optional filtering.
 
@@ -111,16 +116,21 @@ Shortcut for: list backlog --kind risk
 
 By default, resolved/implemented items are excluded. Use --all to show all.
 - @app.command(schemas) `list_schemas_cmd(schema_type) -> None`: List available block and/or frontmatter schemas.
-- @app.command(specs) `list_specs(root, kind, status, substring, package_filter, package_path, for_path, category, c4_level, informed_by, regexp, case_insensitive, format_type, json_output, truncate, paths, packages, external) -> None`: List SPEC/PROD artifacts with optional filtering.
+- @app.command(specs) `list_specs(root, kind, status, substring, package_filter, package_path, for_path, category, c4_level, informed_by, related_to, relation, refs, regexp, case_insensitive, format_type, json_output, truncate, paths, packages, external) -> None`: List SPEC/PROD artifacts with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
 The --informed-by flag filters by ADR ID (reverse relationship query).
+The --related-to flag searches all reference slots (relations, informed_by).
+The --relation flag filters by TYPE:TARGET in .relations only.
 
 Examples:
-  list specs -k prod,tech          # Multi-value kind filter
-  list specs -s active --json      # JSON output with status filter
-  list specs --informed-by ADR-001 # Specs informed by an ADR
+  list specs -k prod,tech            # Multi-value kind filter
+  list specs -s active --json        # JSON output with status filter
+  list specs --informed-by ADR-001   # Specs informed by an ADR
+  list specs --related-to ADR-001    # Specs referencing ADR-001 in any slot
+  list specs --relation implements:PROD-010  # By relation type and target
+  list specs --refs                  # Include refs column
 - @app.command(standards) `list_standards(root, status, tag, spec, delta, requirement_filter, policy, substring, regexp, case_insensitive, format_type, json_output, truncate, external) -> None`: List standards with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).

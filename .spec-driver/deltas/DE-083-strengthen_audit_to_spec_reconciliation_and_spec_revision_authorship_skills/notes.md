@@ -24,3 +24,10 @@
 - Resolved the main design boundary in `DR-083`: DE-083 should strengthen existing skills rather than introduce a dedicated spec-authoring skill.
 - Settled the branch order as `existing spec patch -> revision -> revision-led new spec`, keeping the new-spec case inside the existing `revision` audit disposition rather than reopening the `DE-079` contract.
 - Identified direct governance/spec revision targets as `PROD-011` and `SPEC-151`, with `PROD-002` and `PROD-001` treated as collaborator surfaces to confirm during implementation.
+
+### Phase planning update
+- Created `IP-083.PHASE-01` via `uv run spec-driver create phase "Shape audit-to-spec authorship design" --plan IP-083`, then re-scoped it to the first executable phase now that design shaping is already complete.
+- Collapsed the remaining execution plan to two phases:
+  - phase 1 applies the skill and direct governance changes
+  - phase 2 verifies worked examples and reconciles the delta docs
+- Added concrete entrance/exit criteria, verification expectations, STOP conditions, and task breakdown for phase 1.

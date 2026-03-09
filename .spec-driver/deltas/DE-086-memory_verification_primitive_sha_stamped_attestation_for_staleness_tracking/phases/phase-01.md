@@ -97,12 +97,12 @@ Build all foundational modules and changes needed before CLI or staleness work. 
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Create `core/git.py` | [P] | DR §5.1 |
-| [ ] | 1.2 | Add `verified_sha` to memory schema | [P] | DR §5.2; depends on 1.1 for constant import |
-| [ ] | 1.3 | Make `confidence` required in schema | [P] | DR §5.2 |
-| [ ] | 1.4 | Update `MemoryRecord` model | [P] | DR §5.3 |
-| [ ] | 1.5 | Extend frontmatter writer | [P] | DR §5.5 |
-| [ ] | 1.6 | Update memory creation path | — | DR §5.4; depends on 1.1 |
+| [x] | 1.1 | Create `core/git.py` | [P] | DR §5.1 — 23 tests |
+| [x] | 1.2 | Add `verified_sha` to memory schema | [P] | DR §5.2 |
+| [x] | 1.3 | Make `confidence` required in schema | [P] | DR §5.2 — updated test helper |
+| [x] | 1.4 | Update `MemoryRecord` model | [P] | DR §5.3 — 4 new tests |
+| [x] | 1.5 | Extend frontmatter writer | [P] | DR §5.5 — 13 new tests, pylint 10/10 |
+| [x] | 1.6 | Update memory creation path | — | DR §5.4 — 6 new tests |
 
 ### Task Details
 
@@ -144,3 +144,10 @@ Build all foundational modules and changes needed before CLI or staleness work. 
 
 ## 9. Decisions & Outcomes
 - All design decisions closed in DR-086 prior to phase start.
+- 2026-03-09: Refactored `update_frontmatter_fields` to reduce McCabe complexity from 12 to acceptable level by extracting `_replace_fields`, `_try_replace_line`, `_insert_missing_fields` helpers. Pylint 10/10.
+- 2026-03-09: Updated `_minimal_memory()` test helper in memory_test.py to include required `confidence` field.
+
+## 11. Wrap-up Checklist
+- [x] Exit criteria satisfied
+- [x] Verification evidence: 3742 passed, 0 failed; ruff clean; pylint 10/10 on writer
+- [ ] Hand-off to Phase 02

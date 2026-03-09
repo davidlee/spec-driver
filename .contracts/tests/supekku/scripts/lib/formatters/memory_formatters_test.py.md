@@ -5,6 +5,7 @@ Tests for memory display formatters.
 ## Functions
 
 - `_make_record() -> MemoryRecord`: Create a MemoryRecord with sensible defaults, overridable.
+- `_make_staleness(memory_id, verified_sha, verified_date, scope_paths, commits_since, days_since, has_scope, confidence) -> tuple[Tuple[StalenessInfo, MemoryRecord]]`: Build a StalenessInfo + MemoryRecord pair for formatter tests.
 - `_sample_nodes() -> list[LinkGraphNode]`
 
 ## Classes
@@ -94,3 +95,17 @@ Tests for format_memory_list_table.
 - `test_tsv_column_count(self) -> None`: TSV rows have exactly 6 columns: id, status, type, name, confidence, updated.
 - `test_tsv_format(self) -> None`
 - `test_tsv_no_confidence(self) -> None`: TSV renders empty string for missing confidence.
+
+### TestFormatStalenessTable
+
+Tests for format_staleness_table.
+
+#### Methods
+
+- `test_empty_input(self) -> None`
+- `test_empty_tier_omitted(self) -> None`: Tiers with no entries are not shown.
+- `test_scoped_attested_tier(self) -> None`: Scoped+attested memories appear in tier 1.
+- `test_scoped_unattested_tier(self) -> None`: Scoped+unattested memories appear in tier 2. - commits_since
+- `test_sort_within_attested_tier(self) -> None`: Attested tier sorts by commits_since descending.
+- `test_tier_ordering(self) -> None`: Tiers appear in order: scoped+attested, scoped+unattested, unscoped.
+- `test_unscoped_tier(self) -> None`: Unscoped memories appear in tier 3.

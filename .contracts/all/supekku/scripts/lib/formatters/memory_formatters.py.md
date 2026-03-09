@@ -5,6 +5,11 @@ Memory display formatters.
 Pure formatting functions with no business logic.
 Formatters take MemoryRecord objects and return formatted strings for display.
 
+## Constants
+
+- `_STALENESS_HEADER`
+- `_TIER_LABELS`
+
 ## Functions
 
 - `_calculate_column_widths(terminal_width) -> dict[Tuple[int, int]]`: Calculate column widths for memory table based on terminal width.
@@ -15,6 +20,10 @@ Formatters take MemoryRecord objects and return formatted strings for display.
 - `_format_provenance(provenance) -> list[str]`: Format provenance dict as indented sub-lines.
 - `_format_relations(relations) -> list[str]`: Format relations list as indented entries.
 - `_format_scope(scope) -> list[str]`: Format scope dict as indented sub-lines.
+- `_format_scope_cell(info) -> str`: Format the scope summary cell.
+- `_format_stale_cell(info) -> str`: Format the staleness indicator cell.
+- `_format_staleness_row(info, records) -> str`: Format a single staleness row.
+- `_partition_tiers(infos) -> tuple[Tuple[list[StalenessInfo], list[StalenessInfo], list[StalenessInfo]]]`: Split staleness infos into three tiers.
 - `_prepare_memory_row(record) -> list[str]`: Prepare a single row for the memory table.
 - `_prepare_memory_tsv_row(record) -> list[str]`: Prepare a single memory record as a plain TSV row (no markup).
 - `format_link_graph_json(nodes) -> str`: Format link graph nodes as JSON array.
@@ -65,3 +74,18 @@ Args:
 
 Returns:
   Formatted string in requested format.
+- `format_staleness_table(infos, records) -> str`: Format staleness info as a three-tier plain-text table.
+
+Tiers:
+  1. Scoped + attested — sorted by commits_since descending
+  2. Scoped + unattested — sorted by days_since descending
+  3. Unscoped — sorted by days_since descending
+
+Empty tiers are omitted.
+
+Args:
+  infos: StalenessInfo list from compute_batch_staleness.
+  records: Mapping of memory_id → MemoryRecord for metadata.
+
+Returns:
+  Formatted multi-tier string, or empty string if no infos.

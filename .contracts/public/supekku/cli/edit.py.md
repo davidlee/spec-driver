@@ -16,7 +16,7 @@ Edit commands for opening artifacts in an editor or updating status.
 - @app.command(drift) `edit_drift(ledger_id, status, root) -> None`: Edit drift ledger in editor.
 - @app.command(improvement) `edit_improvement(improvement_id, status, root) -> None`: Edit improvement in editor.
 - @app.command(issue) `edit_issue(issue_id, status, root) -> None`: Edit issue in editor.
-- @app.command(memory) `edit_memory(memory_id, status, root) -> None`: Edit memory record in editor.
+- @app.command(memory) `edit_memory(memory_id, status, verify, root) -> None`: Edit memory record in editor.
 - @app.command(plan) `edit_plan(plan_id, status, root) -> None`: Edit implementation plan in editor.
 - @app.command(policy) `edit_policy(policy_id, status, root) -> None`: Edit policy in editor.
 - @app.command(problem) `edit_problem(problem_id, status, root) -> None`: Edit problem in editor.

@@ -16,8 +16,13 @@ Tests for build_memory_frontmatter.
 
 #### Methods
 
+- `test_confidence_custom_value(self) -> None`
+- `test_confidence_defaults_to_medium(self) -> None`
+- `test_confidence_empty_string_defaults_to_medium(self) -> None`
 - `test_dates_are_iso_strings(self) -> None`
+- `test_does_not_stamp_verified_sha_at_creation(self) -> None`
 - `test_minimal(self) -> None`
+- `test_stamps_verified_date_at_creation(self) -> None`
 - `test_with_all_options(self) -> None`
 
 ### TestCreateMemory

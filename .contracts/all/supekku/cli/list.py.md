@@ -12,6 +12,7 @@ Display formatting is delegated to supekku.scripts.lib.formatters
 
 ## Functions
 
+- `_format_stale_memories(records, root) -> str`: Compute staleness and format as tiered table.
 - `_parse_relation_filter(value) -> tuple[Tuple[str, str]]`: Parse ``TYPE:TARGET`` from ``--relation`` flag.
 
 Splits on the first colon. Raises :class:`typer.BadParameter` if no colon
@@ -77,7 +78,7 @@ By default, resolved/implemented items are excluded. Use --all to show all.
 Shortcut for: list backlog --kind issue
 
 By default, resolved/implemented items are excluded. Use --all to show all.
-- @app.command(memories) `list_memories(root, status, memory_type, tag, path, command, match_tag, include_draft, limit, substring, regexp, case_insensitive, format_type, json_output, links_to, truncate) -> None`: List memory records with optional filtering and scope matching.
+- @app.command(memories) `list_memories(root, status, memory_type, tag, path, command, match_tag, include_draft, limit, substring, regexp, case_insensitive, format_type, json_output, links_to, truncate, stale) -> None`: List memory records with optional filtering and scope matching.
 
 The --filter flag does substring matching (case-insensitive).
 Metadata pre-filters (--type, --status, --tag) apply first (AND logic).

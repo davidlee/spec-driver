@@ -72,7 +72,7 @@ By default, resolved/implemented items are excluded. Use --all to show all.
 Shortcut for: list backlog --kind issue
 
 By default, resolved/implemented items are excluded. Use --all to show all.
-- @app.command(memories) `list_memories(root, status, memory_type, tag, path, command, match_tag, include_draft, limit, substring, regexp, case_insensitive, format_type, json_output, links_to, truncate) -> None`: List memory records with optional filtering and scope matching.
+- @app.command(memories) `list_memories(root, status, memory_type, tag, path, command, match_tag, include_draft, limit, substring, regexp, case_insensitive, format_type, json_output, links_to, truncate, stale) -> None`: List memory records with optional filtering and scope matching.
 
 The --filter flag does substring matching (case-insensitive).
 Metadata pre-filters (--type, --status, --tag) apply first (AND logic).

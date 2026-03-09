@@ -55,3 +55,18 @@ Args:
 
 Returns:
   Formatted string in requested format.
+- `format_staleness_table(infos, records) -> str`: Format staleness info as a three-tier plain-text table.
+
+Tiers:
+  1. Scoped + attested — sorted by commits_since descending
+  2. Scoped + unattested — sorted by days_since descending
+  3. Unscoped — sorted by days_since descending
+
+Empty tiers are omitted.
+
+Args:
+  infos: StalenessInfo list from compute_batch_staleness.
+  records: Mapping of memory_id → MemoryRecord for metadata.
+
+Returns:
+  Formatted multi-tier string, or empty string if no infos.

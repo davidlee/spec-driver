@@ -1,6 +1,6 @@
 # supekku.scripts.lib.skills.sync
 
-Allowlist-driven skills sync: install, prune, and expose skills in AGENTS.md.
+Allowlist-driven skills install: install, prune, and expose skills in AGENTS.md.
 
 Reads `.spec-driver/skills.allowlist`, installs allowlisted skills from the
 package source (`supekku/skills/`) to `.spec-driver/skills/` (the canonical

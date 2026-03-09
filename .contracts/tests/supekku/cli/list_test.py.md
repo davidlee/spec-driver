@@ -2,6 +2,14 @@
 
 Tests for list CLI commands (backlog shortcuts).
 
+## Constants
+
+- `runner` - noqa: E402
+
+## Functions
+
+- `_make_memory_record(memory_id) -> MemoryRecord`: Build a minimal MemoryRecord for list tests.
+
 ## Classes
 
 ### BacklogPrioritizationTest
@@ -66,6 +74,25 @@ Test cases for backlog listing shortcut commands.
 - `_create_sample_issue(self, issue_id, title, status) -> None`: Helper to create a sample issue file.
 - `_create_sample_problem(self, prob_id, title, status) -> None`: Helper to create a sample problem file.
 - `_create_sample_risk(self, risk_id, title, status) -> None`: Helper to create a sample risk file.
+
+### ListDeltasRelationFilterTest
+
+VT-085-002: --related-to, --relation, --refs on list deltas.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_refs_column_table(self) -> None`
+- `test_refs_column_tsv(self) -> None`
+- `test_related_to_case_insensitive(self) -> None`
+- `test_related_to_finds_matching_delta(self) -> None`
+- `test_related_to_no_match(self) -> None`
+- `test_relation_bad_format_errors(self) -> None`
+- `test_relation_type_target(self) -> None`
+- `_create_deltas(self) -> None`
 
 ### ListFilterBackfillTest
 
@@ -145,3 +172,28 @@ VT-030-003: list specs --category and --c4-level filters.
 - `test_kind_product_ignores_category(self) -> None`: --kind product is unaffected by --category. - kind=tech excludes products
 - `test_kind_tech_with_category_filter(self) -> None`: --kind tech + default category still hides unit specs. - c4_level: unknown
 - `_create_spec(self, tech_dir, spec_id, slug, name) -> None`
+
+### ListSpecsRelationFilterTest
+
+VT-085-002: --related-to, --relation, --refs on list specs.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_refs_column_tsv(self) -> None`
+- `test_related_to_via_informed_by(self) -> None`
+- `test_related_to_via_relations(self) -> None`
+- `test_relation_filter(self) -> None`
+- `_create_specs(self) -> None`
+
+### TestListMemoriesStale
+
+Tests for --stale flag on list memories command.
+
+#### Methods
+
+- `test_stale_flag_empty_registry(self) -> None`: --stale with no memories exits cleanly.
+- `test_stale_flag_produces_tiered_output(self) -> None`: --stale flag shows tiered staleness output.

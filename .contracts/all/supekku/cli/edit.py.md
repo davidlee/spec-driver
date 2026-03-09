@@ -17,6 +17,9 @@ Returns normally on success.
 IMPORTANT: typer.Exit inherits from RuntimeError. Callers with
 ``except RuntimeError`` MUST guard with ``except typer.Exit: raise``
 first, or use an early ``return`` after this call.
+- `_verify_memory(memory_id, path) -> None`: Stamp verification SHA and dates on a memory artifact.
+
+Raises typer.Exit(EXIT_FAILURE) if git is unavailable.
 - @app.command(adr) `edit_adr(decision_id, status, root) -> None`: Edit ADR in editor.
 - @app.command(audit) `edit_audit(audit_id, status, root) -> None`: Edit audit in editor.
 - @app.command(card) `edit_card(card_id, status, anywhere, root) -> None`: Edit card in editor.
@@ -24,7 +27,7 @@ first, or use an early ``return`` after this call.
 - @app.command(drift) `edit_drift(ledger_id, status, root) -> None`: Edit drift ledger in editor.
 - @app.command(improvement) `edit_improvement(improvement_id, status, root) -> None`: Edit improvement in editor.
 - @app.command(issue) `edit_issue(issue_id, status, root) -> None`: Edit issue in editor.
-- @app.command(memory) `edit_memory(memory_id, status, root) -> None`: Edit memory record in editor.
+- @app.command(memory) `edit_memory(memory_id, status, verify, root) -> None`: Edit memory record in editor.
 - @app.command(plan) `edit_plan(plan_id, status, root) -> None`: Edit implementation plan in editor.
 - @app.command(policy) `edit_policy(policy_id, status, root) -> None`: Edit policy in editor.
 - @app.command(problem) `edit_problem(problem_id, status, root) -> None`: Edit problem in editor.

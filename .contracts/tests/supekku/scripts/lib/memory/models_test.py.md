@@ -27,3 +27,16 @@ Test MemoryRecord dataclass construction and serialization.
 - `test_to_dict_omits_empty_links(self) -> None`: to_dict omits links when empty.
 - `test_to_dict_path_relativization(self) -> None`: to_dict relativizes path against root.
 - `test_to_dict_with_links(self) -> None`: to_dict includes links when non-empty.
+
+### TestMemoryRecordVerifiedSha
+
+Tests for verified_sha field on MemoryRecord.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_from_frontmatter_with_verified_sha(self) -> None`
+- `test_from_frontmatter_without_verified_sha(self) -> None`
+- `test_to_dict_includes_verified_sha_when_present(self) -> None`
+- `test_to_dict_omits_verified_sha_when_none(self) -> None`

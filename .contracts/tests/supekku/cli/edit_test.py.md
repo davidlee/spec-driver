@@ -5,6 +5,7 @@ Tests for edit command.
 ## Constants
 
 - `DELTA_FRONTMATTER` - ── --status flag tests (DE-068, VT-068-02, VT-068-03) ──
+- `MEMORY_FRONTMATTER` - ── --verify flag tests (DE-086, VT-cli-edit-verify) ──
 - `runner`
 
 ## Classes
@@ -52,6 +53,18 @@ Tests for edit drift subcommand (new in DE-068).
 - `test_edit_drift_rejects_invalid_status(self, tmp_path) -> None`
 - `test_edit_drift_resolver_key(self, tmp_path) -> None`: Drift uses 'drift_ledger' resolver key, not 'drift'.
 - `test_edit_drift_status_update(self, tmp_path) -> None`
+
+### TestEditMemoryVerify
+
+Tests for --verify flag on edit memory command.
+
+#### Methods
+
+- `test_verify_does_not_open_editor(self, tmp_path) -> None`: --verify does not open the editor.
+- `test_verify_mutex_with_status(self) -> None`: --verify and --status are mutually exclusive.
+- `test_verify_refuses_without_git(self, tmp_path) -> None`: --verify refuses when git is unavailable. - date was updated
+- `test_verify_stamps_sha_and_dates(self, tmp_path) -> None`: --verify stamps verified, verified_sha, updated in frontmatter.
+- `test_verify_without_existing_sha_inserts_field(self, tmp_path) -> None`: --verify inserts verified_sha when not present in frontmatter.
 
 ### TestEditNewSubcommands
 

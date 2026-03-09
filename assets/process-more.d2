@@ -1,0 +1,189 @@
+classes: {
+  important: {
+    style: {
+      fill: "#ff00ff"
+      font-color: "#ffffff"
+    }
+  }
+
+  process: {
+    shape: parallelogram
+    style: {
+      fill: "#cceeff"
+      font: mono
+      font-size: 16
+    }
+  }
+
+  artifact: {
+    shape: page
+    style: {
+      fill: "#ffffcc"
+    }
+  }
+
+  critpath: {
+    style: {
+      stroke-width: 4
+    }
+  }
+
+  creates: {
+    style: {
+      # stroke-dash: 2
+      # stroke: "#555555"
+    }
+  }
+
+  relates: {
+    style: {
+      stroke-dash: 4
+      stroke: "#7799cc"
+    }
+  }
+
+  generates: {
+    style: {
+      stroke-dash: 3
+      stroke-width: 1
+      stroke: "#999999"
+    }
+  }
+}
+
+capture.class: process
+prioritize.class: process
+scope.class: process
+design: {
+  class: process
+  style: {
+    fill: "#ff00ff"
+    font-color: "#ffffff"
+  }
+}
+plan.class: process
+execute.class: process
+verify.class: process
+
+legend: {
+  legend: {
+    label: "important bits"
+    class: important
+    style: {
+      fill: "#ff00ff"
+      font-color: "#ffffff"
+    }
+  }
+}
+# legend -> design
+
+delta: {
+  class: artifact
+
+  design_revision: {
+    class: important
+    shape: page
+    label: "design revision"
+  }
+
+  implementation_plan: {
+    class: artifact
+    label: "implementation plan"
+    # phase_sheet_1: {
+    #   label: "phase sheets"
+    #   class: artifact
+    #   style.multiple: true
+    # }
+  }
+
+  # design_revision -> implementation_plan: {
+  #   class: relates
+  #   label: informs
+  # }
+}
+
+research: {
+  label: "normative truth"
+  product_spec: {
+    class: artifact
+    label: "product spec"
+    style.fill: "#eeefff"
+    requirements: {
+      style.multiple: true
+      class: artifact
+    }
+  }
+
+  tech_spec: {
+    class: artifact
+    label: "tech spec"
+    style.fill: "#feefef"
+    requirements: {
+      style.multiple: true
+      class: artifact
+    }
+
+    contracts: {
+      class: artifact
+      label: "generated contracts"
+      style: {
+        fill: "#eeeeee"
+        multiple: true
+      }
+    }
+  }
+
+  revision: {
+    class: artifact
+    style.multiple: true
+    label: revisions
+  }
+
+  revision -> product_spec: update
+  revision -> tech_spec: update
+}
+
+research -> delta: {class: relates; label: informs}
+
+backlog: {
+  issue.class: artifact
+  improvement.class: artifact
+  problem.class: artifact
+  risk.class: artifact
+}
+
+audit: {
+  class: artifact
+}
+
+# drift_ledger: {
+#   label: "drift ledger"
+#   class: artifact
+# }
+
+capture -> prioritize -> scope -> design -> plan -> execute -> verify: {class: critpath}
+
+capture -> backlog: {class: creates}
+prioritize -> backlog: {class: relates}
+scope -> delta: {class: creates}
+design -> delta.design_revision: {class: creates}
+plan -> delta.implementation_plan: {class: creates}
+execute -> code
+verify -> audit
+
+code
+
+code -> research.tech_spec.contracts: {
+  class: generates
+}
+# delta.implementation_plan -> execute: {class: relates}
+
+backlog -> delta: {class: relates}
+audit -> research.revision: {class: creates}
+
+# audit
+
+delta -> audit: {class: relates}
+code -> audit: {class: relates}
+# research -> audit: {class: relates}
+# research.tech_spec.contracts -> audit: {class: relates}

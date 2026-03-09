@@ -22,6 +22,21 @@ Your specification-driven development framework construction toolkit, with multi
 - legacy conversions (drift ledgers, incremental specification)
 - build your own methodology without reinventing wheels
 
+But more than anything else, it's for streamlined development which lets you
+focus on focus your attention on what's important.
+
+[workflow](./assets/process.svg)
+
+The machinery required is more complex than more naive approaches (research ->
+specify -> plan -> execute) - but it's a very conscious tradeoff.
+
+Spec-driver is not a framework for development from disposable specifications.
+It's a framework which drives trustworthy specifications out of implementation.
+A machine, if you will, for converting change into truth.
+
+Because: when machines can code, what remains is system design. This is a
+system designed to take care of the rest.
+
 ![cli](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/related.png)
 
 ![tui](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/tui.png)

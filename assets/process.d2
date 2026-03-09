@@ -1,0 +1,152 @@
+classes: {
+  important: {
+    style: {
+      fill: "#ff00ff"
+      font-color: "#ffffff"
+    }
+  }
+
+  process: {
+    shape: parallelogram
+    style: {
+      fill: "#cceeff"
+      font: mono
+      font-size: 16
+    }
+  }
+
+  artifact: {
+    shape: page
+    style: {
+      fill: "#ffffcc"
+    }
+  }
+
+  critpath: {
+    style: {
+      stroke-width: 4
+    }
+  }
+
+  creates: {
+    style: {
+      # stroke-dash: 2
+      # stroke: "#555555"
+    }
+  }
+
+  relates: {
+    style: {
+      stroke-dash: 4
+      stroke: "#7799cc"
+    }
+  }
+
+  generates: {
+    style: {
+      stroke-dash: 3
+      stroke-width: 1
+      stroke: "#555555"
+    }
+  }
+}
+
+capture.class: process
+scope.class: process
+design: {
+  class: process
+  style: {
+    fill: "#ff00ff"
+    font-color: "#ffffff"
+  }
+}
+plan.class: process
+execute.class: process
+verify.class: process
+
+legend: {
+  legend: {
+    label: "important bits"
+    class: important
+    style: {
+      fill: "#ff00ff"
+      font-color: "#ffffff"
+    }
+  }
+}
+
+delta: {
+  class: artifact
+
+  design_revision: {
+    class: important
+    shape: page
+    label: "design revision"
+  }
+
+  implementation_plan: {
+    class: artifact
+    label: "implementation plan"
+  }
+}
+
+research: {
+  label: "normative truth"
+  product_spec: {
+    class: artifact
+    label: "product spec"
+    style.fill: "#eeefff"
+    requirements: {
+      style.multiple: true
+      class: artifact
+    }
+  }
+
+  tech_spec: {
+    class: artifact
+    label: "tech spec"
+    style.fill: "#feefef"
+    requirements: {
+      style.multiple: true
+      class: artifact
+    }
+
+    contracts: {
+      class: artifact
+      label: "generated contracts"
+      style: {
+        fill: "#eeeeee"
+        multiple: true
+      }
+    }
+  }
+}
+
+research -> delta: {class: relates; label: informs}
+
+backlog: {
+  issue.class: artifact
+  improvement.class: artifact
+  problem.class: artifact
+  risk.class: artifact
+}
+
+capture -> scope -> design -> plan -> execute -> verify: {class: critpath}
+
+capture -> backlog: {class: creates}
+backlog -> scope: {class: relates}
+scope -> delta: {class: creates}
+design -> delta.design_revision: {class: creates}
+plan -> delta.implementation_plan: {class: creates}
+execute -> code
+# verify -> audit
+
+code: {shape: hexagon}
+
+code -> research.tech_spec.contracts: {
+  class: generates
+}
+
+delta -> verify: {class: relates}
+code -> verify: {class: relates}
+verify -> research: update

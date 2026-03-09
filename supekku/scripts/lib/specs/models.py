@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -48,6 +48,16 @@ class Spec:
   def status(self) -> str:
     """Return the status of this spec (e.g., 'draft', 'active')."""
     return str(self.frontmatter.data.get("status", "draft"))
+
+  @property
+  def relations(self) -> list[dict[str, Any]]:
+    """Return list of relation dicts from frontmatter."""
+    raw = self.frontmatter.data.get("relations", [])
+    if not isinstance(raw, list):
+      return []
+    return [
+      dict(r) for r in raw if isinstance(r, Mapping) and "type" in r and "target" in r
+    ]
 
   @property
   def informed_by(self) -> list[str]:

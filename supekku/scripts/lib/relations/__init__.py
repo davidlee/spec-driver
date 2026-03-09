@@ -1,8 +1,26 @@
 """Relations domain - managing relationships between artifacts.
 
-This package handles artifact relationships and references.
+This package handles artifact relationships, references, and queries.
 """
 
 from __future__ import annotations
 
-__all__: list[str] = []
+from .query import (
+  ReferenceHit,
+  RelationQueryable,
+  collect_references,
+  find_by_relation,
+  find_related_to,
+  matches_related_to,
+  matches_relation,
+)
+
+__all__: list[str] = [
+  "ReferenceHit",
+  "RelationQueryable",
+  "collect_references",
+  "find_by_relation",
+  "find_related_to",
+  "matches_related_to",
+  "matches_relation",
+]

@@ -8,6 +8,7 @@ generation.
 from __future__ import annotations
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from supekku.scripts.lib.core.relation_types import RELATION_TYPES
 
 BASE_FRONTMATTER_METADATA = BlockMetadata(
   version=1,
@@ -137,20 +138,7 @@ BASE_FRONTMATTER_METADATA = BlockMetadata(
           "type": FieldMetadata(
             type="enum",
             required=True,
-            enum_values=[
-              "implements",
-              "verifies",
-              "depends_on",
-              "collaborates_with",
-              "provides_for",
-              "supersedes",
-              "superseded_by",
-              "relates_to",
-              "blocks",
-              "blocked_by",
-              "decomposes",
-              "tracked_by",
-            ],
+            enum_values=sorted(RELATION_TYPES),
             description="Relationship type",
           ),
           "target": FieldMetadata(

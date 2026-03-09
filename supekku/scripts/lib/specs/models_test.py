@@ -194,3 +194,78 @@ class SpecExternalRefTest(RepoTestCase):
     data = registry.get("SPEC-011").to_dict(root)
     assert "ext_id" not in data
     assert "ext_url" not in data
+
+
+class SpecRelationsTest(RepoTestCase):
+  """VT-085-006: Spec model exposes .relations property from frontmatter."""
+
+  def _make_repo_with_relations_spec(self):
+    root = self._make_repo()
+    tech_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
+
+    # Spec with relations
+    rel_dir = tech_dir / "SPEC-020"
+    rel_dir.mkdir(parents=True)
+    dump_markdown_file(
+      rel_dir / "SPEC-020.md",
+      {
+        "id": "SPEC-020",
+        "slug": "with-relations",
+        "name": "With Relations",
+        "kind": "spec",
+        "status": "draft",
+        "created": "2026-01-01",
+        "updated": "2026-01-01",
+        "relations": [
+          {"type": "implements", "target": "PROD-010"},
+          {"type": "depends_on", "target": "SPEC-100", "annotation": "core dep"},
+        ],
+      },
+      "# SPEC-020\n",
+    )
+
+    # Spec without relations
+    bare_dir = tech_dir / "SPEC-021"
+    bare_dir.mkdir(parents=True)
+    dump_markdown_file(
+      bare_dir / "SPEC-021.md",
+      {
+        "id": "SPEC-021",
+        "slug": "no-relations",
+        "name": "No Relations",
+        "kind": "spec",
+        "status": "draft",
+        "created": "2026-01-01",
+        "updated": "2026-01-01",
+      },
+      "# SPEC-021\n",
+    )
+
+    os.chdir(root)
+    return root
+
+  def test_relations_present(self):
+    root = self._make_repo_with_relations_spec()
+    registry = SpecRegistry(root)
+    spec = registry.find("SPEC-020")
+    rels = spec.relations
+    assert len(rels) == 2
+    assert rels[0]["type"] == "implements"
+    assert rels[0]["target"] == "PROD-010"
+    assert rels[1]["type"] == "depends_on"
+    assert rels[1]["target"] == "SPEC-100"
+
+  def test_relations_absent_returns_empty(self):
+    root = self._make_repo_with_relations_spec()
+    registry = SpecRegistry(root)
+    spec = registry.find("SPEC-021")
+    assert spec.relations == []
+
+  def test_relations_are_dicts(self):
+    root = self._make_repo_with_relations_spec()
+    registry = SpecRegistry(root)
+    spec = registry.find("SPEC-020")
+    for rel in spec.relations:
+      assert isinstance(rel, dict)
+      assert "type" in rel
+      assert "target" in rel

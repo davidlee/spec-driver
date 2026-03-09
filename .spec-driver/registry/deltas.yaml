@@ -9596,3 +9596,105 @@ deltas:
           aligned.
         status: planned
         phase: IP-083.PHASE-03
+  DE-084:
+    kind: delta
+    status: completed
+    name: Migrate remaining show commands to emit_artifact
+    slug: show_commands_not_using_emit_artifact_have_duplicated_output_dispatch
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-084-show_commands_not_using_emit_artifact_have_duplicated_output_dispatch/DE-084.md
+    applies_to:
+      specs:
+      - PROD-010
+      - PROD-013
+      requirements: []
+    plan:
+      id: IP-084
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-084
+        delta: DE-084
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators:
+          - PROD-010
+          - PROD-013
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-084.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-084.PHASE-01
+        plan: IP-084
+        delta: DE-084
+        objective: Migrate show requirement and show card to emit_artifact, eliminating
+          the last two inline output dispatch blocks in cli/show.py.
+        entrance_criteria:
+        - DE-084 accepted
+        exit_criteria:
+        - Zero inline sum([json_output...]) checks in cli/show.py
+        - All existing show_test.py tests pass
+        - just lint clean
+        - just pylint-files on touched files clean
+        verification:
+          tests:
+          - show_test.py (existing suite)
+          evidence:
+          - VA-084-01
+        tasks:
+        - id: '1.1'
+          description: Migrate show requirement to emit_artifact
+        - id: '1.2'
+          description: Migrate show card to emit_artifact
+        - id: '1.3'
+          description: Verify and lint
+        risks: []
+  DE-085:
+    kind: delta
+    status: draft
+    name: Delta - Surface relation and backlog metadata in CLI and skills
+    slug: surface_relation_and_backlog_metadata_in_cli_and_skills
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-085-surface_relation_and_backlog_metadata_in_cli_and_skills/DE-085.md
+    applies_to:
+      specs:
+      - PROD-002
+      - PROD-004
+      - PROD-010
+      requirements: []
+    relations:
+    - type: relates_to
+      target: IMPR-006
+      attributes: {}
+    - type: relates_to
+      target: IMPR-011
+      attributes: {}
+    plan:
+      id: IP-085
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-085
+        delta: DE-085
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-002
+          - PROD-004
+          - PROD-010
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-085-P01
+      phases:
+      - id: IP-085-P01
+        phase: IP-085-P01

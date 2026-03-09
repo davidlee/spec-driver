@@ -467,9 +467,7 @@ class ShowRawFlagTest(unittest.TestCase):
     self.runner = CliRunner()
     self.root = find_repo_root()
     delta_dirs = list((self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR).glob("DE-*"))
-    self.delta_id = (
-      f"DE-{delta_dirs[0].name.split('-')[1]}" if delta_dirs else None
-    )
+    self.delta_id = f"DE-{delta_dirs[0].name.split('-')[1]}" if delta_dirs else None
 
   def test_show_delta_raw_flag(self) -> None:
     """Test --raw flag outputs raw file content."""

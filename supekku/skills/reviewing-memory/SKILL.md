@@ -6,8 +6,12 @@ description: |
 
 Review procedure:
 1) Pull the highest-impact set first:
-    - List by severity/weight with minimal filters:
-      `spec-driver list memories --limit N`
+    - Start with the staleness-ranked view:
+      `spec-driver list memories --stale`
+    - Prioritize tier 1 (scoped, attested, high commit count) — these are the
+      highest-value review targets because they have scope and attestation but
+      their scoped files have changed significantly since last verification.
+    - Flag unscoped memories separately for manual review based on age.
     - Then run contextual reviews for the active area:
       `spec-driver list memories -p <subsystem paths>... -c "<common commands>" --match-tag <subsystem tags>... --limit N`
 

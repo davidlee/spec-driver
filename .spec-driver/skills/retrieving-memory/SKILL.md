@@ -37,4 +37,13 @@ Output discipline:
 - When starting work on a new file cluster, do the scoped query before deep
   reading or editing so glob-scoped gotchas surface while the change is still
   cheap.
+- **Staleness awareness** — when presenting a retrieved memory, surface its
+  verification state qualitatively:
+  - No `verified_sha`: "this memory has not been attested against the codebase"
+  - High staleness (many commits since attestation): "many commits have affected
+    its scope since last attestation — treat with caution"
+  - Low staleness (few/no commits since attestation): "recently attested, scope
+    is quiet"
+  - Do not use numeric thresholds — qualitative language is more robust across
+    different repo cadences and avoids magic numbers.
 ---

@@ -1,0 +1,1 @@
+../../../../../../../../../.contracts/tests/supekku/scripts/lib/formatters/relation_formatters_test.py.md

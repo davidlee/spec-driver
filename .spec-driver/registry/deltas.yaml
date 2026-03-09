@@ -9657,7 +9657,7 @@ deltas:
         risks: []
   DE-085:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Surface relation and backlog metadata in CLI and skills
     slug: surface_relation_and_backlog_metadata_in_cli_and_skills
     updated: '2026-03-09'
@@ -9801,5 +9801,41 @@ deltas:
         - id: R3
           description: "Formatter R4 residual \u2014 pass list[ReferenceHit] not artifact"
           mitigation: Formatters receive pre-collected hits per DR-085 R4
-      - id: IP-085.PHASE-03
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-085.PHASE-03
+        plan: IP-085
+        delta: DE-085
+        objective: Update scope-delta skill to guide consistent metadata population
+          when creating deltas from backlog items. Execute VA-085-001 agent verification.
+          Update IP-085 verification coverage entries. Reconcile artefacts for closure.
+        entrance_criteria:
+        - Phase 2 complete (CLI flags, formatters, --from-backlog enhancement)
+        exit_criteria:
+        - "scope-delta skill updated with context_inputs/relations guidance per DR-085\
+          \ \xA75.9"
+        - VA-085-001 agent verification executed and documented
+        - IP-085 verification.coverage entries updated to verified
+        - IP-085 active phase reference updated
+        - just check green
+        - Delta ready for audit/closure via /close-change
+        verification:
+          tests: []
+          evidence:
+          - VA-085-001
+        tasks:
+        - id: T01
+          summary: Update scope-delta skill with backlog metadata guidance
+        - id: T02
+          summary: Execute VA-085-001 agent verification
+        - id: T03
+          summary: Update IP-085 verification coverage entries
+        - id: T04
+          summary: Reconcile IP-085 and DE-085 artefacts for closure
+        - id: T05
+          summary: Run just check to confirm green
+        risks:
+        - id: R1
+          description: "VA-085-001 scope unclear \u2014 manual walkthrough vs automated"
+          mitigation: Define as documented agent analysis; dry-run create delta --from-backlog
+            and inspect output

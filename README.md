@@ -24,13 +24,13 @@ The specification-driving development toolkit. Clanker chauffeur for architects.
 - greenfield spec-driven development with Claude Code & friends (Codex, etc).
 - legacy conversions (drift ledgers, incremental specification).
 
-But more than anything else, it's for streamlined development which lets you
+But more than anything else, it's for streamlining development to let you
 focus your attention on what's important.
 
 [honk if you like diagrams](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/process.svg)
 
-The machinery required is more complex than naive approaches (research ->
-specify -> plan -> execute) - but it's a very conscious tradeoff.
+The machinery required is more complex than naive approaches (`research ->
+specify -> plan -> execute`) - but it's a very conscious tradeoff.
 
 Spec-driver is not a framework for development from disposable specifications.
 It's for driving trustworthy, evergreen specifications out of implementation.
@@ -45,7 +45,7 @@ system designed to take care of the rest.
 A nice little TUI for browsing docs, with fuzzy find.
 
 ![follow](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/follow.png)
-Fun fact: TUI now supports following a claude code session in real time.
+Fun fact: you can follow the artifacts a claude code session interacts with, in real time.
 
 ## Getting Started
 

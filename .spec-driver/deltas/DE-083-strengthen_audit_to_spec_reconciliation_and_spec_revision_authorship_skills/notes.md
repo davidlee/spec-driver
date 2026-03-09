@@ -19,3 +19,8 @@
 ### Verification
 - `uv run spec-driver show delta DE-083` succeeded after the delta/DR/IP rewrites.
 - The plan currently has three planned phases and no phase sheet yet, by design; phase creation is deferred until `DR-083` is current.
+
+### DR shaping update
+- Resolved the main design boundary in `DR-083`: DE-083 should strengthen existing skills rather than introduce a dedicated spec-authoring skill.
+- Settled the branch order as `existing spec patch -> revision -> revision-led new spec`, keeping the new-spec case inside the existing `revision` audit disposition rather than reopening the `DE-079` contract.
+- Identified direct governance/spec revision targets as `PROD-011` and `SPEC-151`, with `PROD-002` and `PROD-001` treated as collaborator surfaces to confirm during implementation.

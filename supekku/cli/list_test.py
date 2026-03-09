@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import yaml
 from typer.testing import CliRunner
 
 from supekku.cli.list import app
@@ -1083,6 +1084,257 @@ applies_to:
     assert result.exit_code == 0
     assert "DE-101" in result.stdout
     assert "DE-100" not in result.stdout
+
+
+class ListDeltasRelationFilterTest(unittest.TestCase):
+  """VT-085-002: --related-to, --relation, --refs on list deltas."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_deltas()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_deltas(self) -> None:
+    for delta_id, name, status, relations, context_inputs in [
+      (
+        "DE-100",
+        "Alpha feature",
+        "draft",
+        [{"type": "relates_to", "target": "IMPR-006"}],
+        [{"type": "issue", "id": "IMPR-006"}],
+      ),
+      (
+        "DE-101",
+        "Beta bugfix",
+        "in-progress",
+        [{"type": "implements", "target": "PROD-010"}],
+        [],
+      ),
+      ("DE-102", "Gamma cleanup", "draft", [], []),
+    ]:
+      delta_dir = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
+      delta_dir.mkdir(parents=True, exist_ok=True)
+      frontmatter = {
+        "id": delta_id,
+        "slug": f"{delta_id.lower()}_sample",
+        "name": name,
+        "created": "2026-03-01",
+        "updated": "2026-03-02",
+        "status": status,
+        "kind": "delta",
+        "relations": relations,
+        "context_inputs": context_inputs,
+        "applies_to": {"specs": [], "requirements": []},
+      }
+      fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+      content = f"---\n{fm_yaml}---\n\n# {delta_id}\n"
+      (delta_dir / f"{delta_id}.md").write_text(content, encoding="utf-8")
+
+  def test_related_to_finds_matching_delta(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "deltas",
+        "--root",
+        str(self.root),
+        "--related-to",
+        "IMPR-006",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "DE-100" in result.stdout
+    assert "DE-101" not in result.stdout
+
+  def test_related_to_no_match(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["deltas", "--root", str(self.root), "--related-to", "NONEXISTENT"],
+    )
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
+
+  def test_relation_type_target(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "deltas",
+        "--root",
+        str(self.root),
+        "--relation",
+        "implements:PROD-010",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "DE-101" in result.stdout
+    assert "DE-100" not in result.stdout
+
+  def test_relation_bad_format_errors(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["deltas", "--root", str(self.root), "--relation", "no_colon"],
+    )
+    assert result.exit_code != 0
+
+  def test_refs_column_tsv(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "deltas",
+        "--root",
+        str(self.root),
+        "--refs",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    # DE-100 has relations and context_inputs
+    lines = result.stdout.strip().split("\n")
+    de100_line = [line for line in lines if "DE-100" in line]
+    assert de100_line
+    assert "relation.relates_to:IMPR-006" in de100_line[0]
+
+  def test_refs_column_table(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["deltas", "--root", str(self.root), "--refs"],
+    )
+    assert result.exit_code == 0
+    assert "Refs" in result.stdout
+
+  def test_related_to_case_insensitive(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "deltas",
+        "--root",
+        str(self.root),
+        "--related-to",
+        "impr-006",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "DE-100" in result.stdout
+
+
+class ListSpecsRelationFilterTest(unittest.TestCase):
+  """VT-085-002: --related-to, --relation, --refs on list specs."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_specs()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_specs(self) -> None:
+    for spec_id, name, relations, informed_by in [
+      (
+        "PROD-100",
+        "Product spec alpha",
+        [{"type": "implements", "target": "ADR-001"}],
+        [],
+      ),
+      ("PROD-101", "Product spec beta", [], ["ADR-002"]),
+      ("PROD-102", "Product spec gamma", [], []),
+    ]:
+      spec_dir = self.root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR
+      spec_dir.mkdir(parents=True, exist_ok=True)
+      frontmatter = {
+        "id": spec_id,
+        "slug": spec_id.lower(),
+        "name": name,
+        "created": "2026-03-01",
+        "updated": "2026-03-02",
+        "status": "active",
+        "kind": "product",
+        "relations": relations,
+        "informed_by": informed_by,
+      }
+      fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+      content = f"---\n{fm_yaml}---\n\n# {spec_id}\n"
+      (spec_dir / f"{spec_id}.md").write_text(content, encoding="utf-8")
+
+  def test_related_to_via_relations(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "specs",
+        "--root",
+        str(self.root),
+        "--related-to",
+        "ADR-001",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "PROD-100" in result.stdout
+
+  def test_related_to_via_informed_by(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "specs",
+        "--root",
+        str(self.root),
+        "--related-to",
+        "ADR-002",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "PROD-101" in result.stdout
+
+  def test_refs_column_tsv(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "specs",
+        "--root",
+        str(self.root),
+        "--refs",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    lines = result.stdout.strip().split("\n")
+    prod100_line = [line for line in lines if "PROD-100" in line]
+    assert prod100_line
+    assert "relation.implements:ADR-001" in prod100_line[0]
+
+  def test_relation_filter(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "specs",
+        "--root",
+        str(self.root),
+        "--relation",
+        "implements:ADR-001",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "PROD-100" in result.stdout
+    assert "PROD-101" not in result.stdout
 
 
 if __name__ == "__main__":

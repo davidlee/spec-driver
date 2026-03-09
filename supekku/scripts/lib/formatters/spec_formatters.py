@@ -12,14 +12,20 @@ from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
   EXT_ID_COLUMN,
   PACKAGES_COLUMN,
+  REFS_COLUMN,
   SPEC_COLUMNS,
   column_labels,
+)
+from supekku.scripts.lib.formatters.relation_formatters import (
+  format_refs_count,
+  format_refs_tsv,
 )
 from supekku.scripts.lib.formatters.table_utils import (
   format_as_json,
   format_list_table,
 )
 from supekku.scripts.lib.formatters.theme import get_spec_status_style
+from supekku.scripts.lib.relations.query import collect_references
 
 if TYPE_CHECKING:
   from collections.abc import Sequence
@@ -86,6 +92,7 @@ def format_spec_list_table(
   include_packages: bool = False,
   *,
   show_external: bool = False,
+  show_refs: bool = False,
 ) -> str:
   """Format specs as table, JSON, or TSV.
 
@@ -95,6 +102,7 @@ def format_spec_list_table(
     truncate: If True, truncate long fields to fit terminal width
     include_packages: Include package list in output
     show_external: If True, show ext_id column after ID
+    show_refs: If True, show refs column (count in table, pairs in TSV)
 
   Returns:
     Formatted string in requested format
@@ -104,6 +112,8 @@ def format_spec_list_table(
     col_defs.insert(1, EXT_ID_COLUMN)
   if include_packages:
     col_defs.append(PACKAGES_COLUMN)
+  if show_refs:
+    col_defs.append(REFS_COLUMN)
 
   def _row(spec: Spec) -> list[str]:
     styled_id = f"[spec.id]{spec.id}[/spec.id]"
@@ -115,6 +125,8 @@ def format_spec_list_table(
     row.extend([spec.name, format_tags_cell(spec.tags), styled_status])
     if include_packages:
       row.append(format_package_list(spec.packages))
+    if show_refs:
+      row.append(format_refs_count(collect_references(spec)))
     return row
 
   def _tsv_row(spec: Spec) -> list[str]:
@@ -124,6 +136,8 @@ def format_spec_list_table(
     row.extend([spec.name, spec.status])
     if include_packages:
       row.append(format_package_list(spec.packages))
+    if show_refs:
+      row.append(format_refs_tsv(collect_references(spec)))
     return row
 
   return format_list_table(

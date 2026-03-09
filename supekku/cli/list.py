@@ -28,6 +28,7 @@ from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_stat
 from supekku.scripts.lib.changes.registry import ChangeRegistry, discover_plans
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
 from supekku.scripts.lib.core.paths import get_tech_specs_dir
+from supekku.scripts.lib.core.relation_types import RELATION_TYPES
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.formatters.backlog_formatters import format_backlog_list_table
 from supekku.scripts.lib.formatters.card_formatters import (
@@ -59,10 +60,33 @@ from supekku.scripts.lib.formatters.standard_formatters import (
 from supekku.scripts.lib.memory.registry import MemoryRegistry
 from supekku.scripts.lib.memory.selection import MatchContext, select
 from supekku.scripts.lib.policies.registry import PolicyRegistry
+from supekku.scripts.lib.relations.query import find_by_relation, find_related_to
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.standards.registry import StandardRegistry
 
 app = typer.Typer(help="List artifacts", no_args_is_help=True)
+
+
+def _parse_relation_filter(value: str) -> tuple[str, str]:
+  """Parse ``TYPE:TARGET`` from ``--relation`` flag.
+
+  Splits on the first colon. Raises :class:`typer.BadParameter` if no colon
+  is present. Emits a warning on stderr for unrecognised relation types.
+  """
+  if ":" not in value:
+    msg = f"--relation requires TYPE:TARGET (got '{value}')"
+    raise typer.BadParameter(msg)
+  rel_type, target = value.split(":", 1)
+  rel_type = rel_type.strip()
+  target = target.strip()
+  if not rel_type or not target:
+    msg = f"--relation requires non-empty TYPE and TARGET (got '{value}')"
+    raise typer.BadParameter(msg)
+  if rel_type not in RELATION_TYPES:
+    import sys
+
+    print(f"Warning: unknown relation type '{rel_type}'", file=sys.stderr)
+  return rel_type, target
 
 
 @app.command("specs")
@@ -142,6 +166,27 @@ def list_specs(
       help="Filter by ADR ID (e.g., ADR-001)",
     ),
   ] = None,
+  related_to: Annotated[
+    str | None,
+    typer.Option(
+      "--related-to",
+      help="Show specs referencing ID in any slot (relations, informed_by)",
+    ),
+  ] = None,
+  relation: Annotated[
+    str | None,
+    typer.Option(
+      "--relation",
+      help="Filter by relation TYPE:TARGET (e.g., implements:PROD-010)",
+    ),
+  ] = None,
+  refs: Annotated[
+    bool,
+    typer.Option(
+      "--refs",
+      help="Include refs column (count in table, type:target in TSV)",
+    ),
+  ] = False,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -174,11 +219,16 @@ def list_specs(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID, slug, and name fields.
   The --informed-by flag filters by ADR ID (reverse relationship query).
+  The --related-to flag searches all reference slots (relations, informed_by).
+  The --relation flag filters by TYPE:TARGET in .relations only.
 
   Examples:
-    list specs -k prod,tech          # Multi-value kind filter
-    list specs -s active --json      # JSON output with status filter
-    list specs --informed-by ADR-001 # Specs informed by an ADR
+    list specs -k prod,tech            # Multi-value kind filter
+    list specs -s active --json        # JSON output with status filter
+    list specs --informed-by ADR-001   # Specs informed by an ADR
+    list specs --related-to ADR-001    # Specs referencing ADR-001 in any slot
+    list specs --relation implements:PROD-010  # By relation type and target
+    list specs --refs                  # Include refs column
   """
   # --json flag overrides --format
   if json_output:
@@ -243,6 +293,13 @@ def list_specs(
       specs = registry.find_by_informed_by(informed_by)
     else:
       specs = registry.all_specs()
+
+    # Apply generic relation filters (after reverse relationship query)
+    if related_to:
+      specs = find_related_to(specs, related_to)
+    if relation:
+      rel_type, rel_target = _parse_relation_filter(relation)
+      specs = find_by_relation(specs, relation_type=rel_type, target=rel_target)
 
     # Apply status filter (multi-value OR logic)
     if status:
@@ -344,6 +401,7 @@ def list_specs(
         truncate=truncate,
         include_packages=packages,
         show_external=external,
+        show_refs=refs,
       )
       typer.echo(output)
 
@@ -385,6 +443,27 @@ def list_deltas(
       help="Substring filter on ID or name (case-insensitive)",
     ),
   ] = None,
+  related_to: Annotated[
+    str | None,
+    typer.Option(
+      "--related-to",
+      help="Show deltas referencing ID in any slot",
+    ),
+  ] = None,
+  relation: Annotated[
+    str | None,
+    typer.Option(
+      "--relation",
+      help="Filter by relation TYPE:TARGET (e.g., relates_to:IMPR-006)",
+    ),
+  ] = None,
+  refs: Annotated[
+    bool,
+    typer.Option(
+      "--refs",
+      help="Include refs column (count in table, type:target in TSV)",
+    ),
+  ] = False,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -411,11 +490,16 @@ def list_deltas(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag filters on ID, name, and slug fields.
   The --implements flag filters by requirement ID (reverse relationship query).
+  The --related-to flag searches all reference slots.
+  The --relation flag filters by TYPE:TARGET in .relations only.
 
   Examples:
-    list deltas -s draft,in-progress          # Multi-value status filter
-    list deltas --implements PROD-010.FR-004   # Reverse relationship query
-    list deltas --json                         # JSON output
+    list deltas -s draft,in-progress            # Multi-value status filter
+    list deltas --implements PROD-010.FR-004     # Reverse relationship query
+    list deltas --related-to IMPR-006            # Deltas referencing IMPR-006
+    list deltas --relation relates_to:IMPR-006   # By relation type and target
+    list deltas --refs                           # Include refs column
+    list deltas --json                           # JSON output
   """
   # --json flag overrides --format
   if json_output:
@@ -483,6 +567,15 @@ def list_deltas(
 
       filtered_artifacts.append(artifact)
 
+    # Apply generic relation filters
+    if related_to:
+      filtered_artifacts = find_related_to(filtered_artifacts, related_to)
+    if relation:
+      rel_type, rel_target = _parse_relation_filter(relation)
+      filtered_artifacts = find_by_relation(
+        filtered_artifacts, relation_type=rel_type, target=rel_target
+      )
+
     if not filtered_artifacts:
       raise typer.Exit(EXIT_SUCCESS)
 
@@ -501,6 +594,7 @@ def list_deltas(
         format_type=format_type,
         truncate=truncate,
         show_external=external,
+        show_refs=refs,
       )
       typer.echo(output)
 

@@ -163,6 +163,8 @@ def create_delta_cmd(
   Can create from scratch with a title, or populate from a backlog item
   using --from-backlog ITEM-ID (where ITEM-ID is passed as the name argument).
   """
+  backlog_context_inputs: list[dict[str, str]] | None = None
+  backlog_relations: list[dict[str, str]] | None = None
   try:
     # If --from-backlog, treat name as a backlog item ID
     if from_backlog:
@@ -184,6 +186,7 @@ def create_delta_cmd(
         raise typer.Exit(EXIT_FAILURE)
 
       # Pre-populate from backlog item
+      backlog_id = item.id
       name = item.title
 
       if not requirements and item.frontmatter:
@@ -191,10 +194,15 @@ def create_delta_cmd(
         if related_reqs:
           requirements = related_reqs
 
-      typer.echo(f"Creating delta from backlog item: {item.id}")
+      # Auto-populate context_inputs and relations (DR-085 §5.7)
+      backlog_context_inputs = [{"type": "issue", "id": backlog_id}]
+      backlog_relations = [{"type": "relates_to", "target": backlog_id}]
+
+      typer.echo(f"Creating delta from backlog item: {backlog_id}")
       typer.echo(f"  Title: {item.title}")
       if requirements:
         typer.echo(f"  Requirements: {', '.join(requirements)}")
+      typer.echo(f"  Context: {backlog_id}")
       typer.echo("")
 
     # Name is required
@@ -209,6 +217,8 @@ def create_delta_cmd(
       name,
       specs=specs,
       requirements=requirements,
+      context_inputs=backlog_context_inputs,
+      relations=backlog_relations,
       allow_missing_plan=allow_missing_plan,
     )
     typer.echo(f"Delta created: {result.artifact_id}")

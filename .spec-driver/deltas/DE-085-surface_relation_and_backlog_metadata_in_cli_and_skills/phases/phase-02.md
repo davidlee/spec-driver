@@ -90,17 +90,17 @@ Add CLI-visible relation discovery: `--related-to`, `--relation`, `--refs` flags
 - [x] Phase 1 complete — query module, constants, Spec.relations all working
 
 ## 4. Exit Criteria / Done When
-- [ ] `formatters/relation_formatters.py` created with `format_refs_count()` and `format_refs_tsv()`
-- [ ] `list deltas` supports `--related-to ID`, `--relation TYPE:TARGET`, `--refs`
-- [ ] `list specs` supports `--related-to ID`, `--relation TYPE:TARGET`, `--refs`
-- [ ] `--relation` parses on first colon; unknown type emits stderr warning
-- [ ] `create delta --from-backlog` populates `context_inputs` and `relations`
-- [ ] VT-085-002 passing (CLI integration tests)
-- [ ] VT-085-003 regression green (--implements unchanged)
-- [ ] VT-085-004 regression green (--informed-by unchanged)
-- [ ] VT-085-005 passing (formatter tests)
-- [ ] VT-085-007 passing (--from-backlog enhancement)
-- [ ] `just check` green
+- [x] `formatters/relation_formatters.py` created with `format_refs_count()` and `format_refs_tsv()`
+- [x] `list deltas` supports `--related-to ID`, `--relation TYPE:TARGET`, `--refs`
+- [x] `list specs` supports `--related-to ID`, `--relation TYPE:TARGET`, `--refs`
+- [x] `--relation` parses on first colon; unknown type emits stderr warning
+- [x] `create delta --from-backlog` populates `context_inputs` and `relations`
+- [x] VT-085-002 passing (CLI integration tests)
+- [x] VT-085-003 regression green (--implements unchanged)
+- [x] VT-085-004 regression green (--informed-by unchanged)
+- [x] VT-085-005 passing (formatter tests)
+- [x] VT-085-007 passing (--from-backlog enhancement)
+- [x] `just check` green
 
 ## 5. Verification
 - `just test` — VT-085-002 through VT-085-005, VT-085-007
@@ -117,15 +117,15 @@ Add CLI-visible relation discovery: `--related-to`, `--relation`, `--refs` flags
 
 | Status | ID | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | T01 | Create `formatters/relation_formatters.py` | [P] | Pure functions; receive `list[ReferenceHit]` per R4 |
-| [ ] | T02 | Add `--related-to`, `--relation`, `--refs` to `list deltas` | | Depends on T01 for `--refs` column |
-| [ ] | T03 | Add `--related-to`, `--relation`, `--refs` to `list specs` | | Depends on T01 for `--refs` column |
-| [ ] | T04 | Enhance `create delta --from-backlog` | [P] | Independent of T01-T03 |
-| [ ] | T05 | Formatter tests (VT-085-005) | [P] | Can start with T01 |
-| [ ] | T06 | CLI integration tests (VT-085-002) | | Depends on T02, T03 |
-| [ ] | T07 | `--from-backlog` tests (VT-085-007) | [P] | Can start with T04 |
-| [ ] | T08 | Regression verification (VT-085-003, VT-085-004) | | Run existing tests, confirm unchanged |
-| [ ] | T09 | Lint + full check | | Final gate |
+| [x] | T01 | Create `formatters/relation_formatters.py` | [P] | Done — 2 pure functions, 10 tests |
+| [x] | T02 | Add `--related-to`, `--relation`, `--refs` to `list deltas` | | Done |
+| [x] | T03 | Add `--related-to`, `--relation`, `--refs` to `list specs` | | Done |
+| [x] | T04 | Enhance `create delta --from-backlog` | [P] | Done — context_inputs + relations auto-populated |
+| [x] | T05 | Formatter tests (VT-085-005) | [P] | Done — 10 tests |
+| [x] | T06 | CLI integration tests (VT-085-002) | | Done — 11 tests (7 delta, 4 spec) |
+| [x] | T07 | `--from-backlog` tests (VT-085-007) | [P] | Done — 2 tests in creation_test.py |
+| [x] | T08 | Regression verification (VT-085-003, VT-085-004) | | 3697 pass, 0 fail |
+| [x] | T09 | Lint + full check | | `just check` green, new files pylint 10/10 |
 
 ### Task Details
 
@@ -188,7 +188,10 @@ Add CLI-visible relation discovery: `--related-to`, `--relation`, `--refs` flags
 | R3: Formatter purity (R4) | Formatters take list[ReferenceHit], not artifact | Open |
 
 ## 9. Decisions & Outcomes
-*(none yet)*
+- 2026-03-09: Moved relation_formatters imports to top-level (no circular dependency exists); ruff PLC0415 forbids lazy imports.
+- 2026-03-09: `_parse_relation_filter()` helper in list.py — splits on first colon, uses `typer.BadParameter` for invalid format, warns on unknown type to stderr.
+- 2026-03-09: `create_delta()` extended with `context_inputs` and `relations` params; defaults to `[]` in frontmatter so all new deltas have consistent schema.
+- 2026-03-09: Relation filters applied after the main filter loop in list_deltas (post-dict-to-list conversion), before sorting. In list_specs they're applied after --informed-by, before status filters.
 
 ## 10. Findings / Research Notes
 
@@ -202,7 +205,7 @@ Add CLI-visible relation discovery: `--related-to`, `--relation`, `--refs` flags
 - `create_delta()` signature needs investigation — may need `context_inputs` and `relations` parameters added
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated with findings
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Notes updated with findings
 - [ ] Hand-off notes to Phase 3

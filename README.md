@@ -22,7 +22,7 @@ Your specification-driven development framework construction toolkit, with multi
 - legacy conversions (drift ledgers, incremental specification)
 - build your own methodology without reinventing wheels
 
-![ADR list](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/adr-list.png)
+![cli](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/related.png)
 
 ![tui](https://raw.githubusercontent.com/davidlee/spec-driver/refs/heads/main/assets/tui.png)
 A nice little TUI for browsing docs, with fuzzy find.

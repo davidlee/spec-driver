@@ -19,7 +19,12 @@ from supekku.scripts.lib.formatters.column_defs import (
   EXT_ID_COLUMN,
   PHASE_COLUMNS,
   PLAN_COLUMNS,
+  REFS_COLUMN,
   column_labels,
+)
+from supekku.scripts.lib.formatters.relation_formatters import (
+  format_refs_count,
+  format_refs_tsv,
 )
 from supekku.scripts.lib.formatters.table_utils import (
   create_table,
@@ -28,6 +33,7 @@ from supekku.scripts.lib.formatters.table_utils import (
   render_table,
 )
 from supekku.scripts.lib.formatters.theme import get_change_status_style
+from supekku.scripts.lib.relations.query import collect_references
 
 if TYPE_CHECKING:
   from collections.abc import Sequence
@@ -144,6 +150,7 @@ def format_change_list_table(
   truncate: bool = False,
   *,
   show_external: bool = False,
+  show_refs: bool = False,
 ) -> str:
   """Format change artifacts as table, JSON, or TSV.
 
@@ -152,6 +159,7 @@ def format_change_list_table(
     format_type: Output format (table|json|tsv)
     truncate: If True, truncate long fields to fit terminal width
     show_external: If True, show ext_id column after ID
+    show_refs: If True, show refs column (count in table, pairs in TSV)
 
   Returns:
     Formatted string in requested format
@@ -159,17 +167,23 @@ def format_change_list_table(
   col_defs = list(CHANGE_COLUMNS)
   if show_external:
     col_defs.insert(1, EXT_ID_COLUMN)
+  if show_refs:
+    col_defs.append(REFS_COLUMN)
 
   def _row(change: ChangeArtifact) -> list[str]:
     row = _prepare_change_row(change)
     if show_external:
       row.insert(1, change.ext_id)
+    if show_refs:
+      row.append(format_refs_count(collect_references(change)))
     return row
 
   def _tsv_row(change: ChangeArtifact) -> list[str]:
     row = _prepare_change_tsv_row(change)
     if show_external:
       row.insert(1, change.ext_id)
+    if show_refs:
+      row.append(format_refs_tsv(collect_references(change)))
     return row
 
   return format_list_table(

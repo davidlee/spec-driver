@@ -122,6 +122,7 @@ PHASE_COLUMNS = [
 # Shared optional columns (used with flags like --external, --packages)
 EXT_ID_COLUMN = ColumnDef(label="ExtID", field="ext_id")
 PACKAGES_COLUMN = ColumnDef(label="Packages", field="packages")
+REFS_COLUMN = ColumnDef(label="Refs", field="refs")
 
 
 def column_labels(columns: list[ColumnDef]) -> list[str]:

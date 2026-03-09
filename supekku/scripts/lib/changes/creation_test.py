@@ -146,6 +146,34 @@ class CreateChangeTest(unittest.TestCase):
     # Verify exactly 4 files: delta, DR, IP, notes
     assert len(result.extras) == 3  # DR, IP, notes (not counting primary delta file)
 
+  def test_create_delta_with_context_inputs_and_relations(self) -> None:
+    """VT-085-007: create_delta populates context_inputs and relations."""
+    root = self._make_repo()
+    ctx = [{"type": "issue", "id": "IMPR-006"}]
+    rels = [{"type": "relates_to", "target": "IMPR-006"}]
+    result = create_delta(
+      "Surface relation metadata",
+      specs=["PROD-010"],
+      context_inputs=ctx,
+      relations=rels,
+      repo_root=root,
+    )
+    frontmatter, _ = load_markdown_file(result.primary_path)
+    assert frontmatter["context_inputs"] == ctx
+    assert frontmatter["relations"] == rels
+
+  def test_create_delta_without_context_inputs_has_empty_list(self) -> None:
+    """VT-085-007: omitted context_inputs defaults to empty list."""
+    root = self._make_repo()
+    result = create_delta(
+      "Plain delta",
+      specs=["SPEC-100"],
+      repo_root=root,
+    )
+    frontmatter, _ = load_markdown_file(result.primary_path)
+    assert frontmatter.get("context_inputs") == []
+    assert frontmatter.get("relations") == []
+
   def test_create_delta_without_plan_still_adds_design_revision(self) -> None:
     """Delta creation without plan still scaffolds a design revision."""
     root = self._make_repo()

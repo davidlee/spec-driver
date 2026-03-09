@@ -52,6 +52,10 @@ from .policy_formatters import (
   format_policy_list_json,
   format_policy_list_table,
 )
+from .relation_formatters import (
+  format_refs_count,
+  format_refs_tsv,
+)
 from .requirement_formatters import (
   format_requirement_details,
   format_requirement_list_json,
@@ -104,6 +108,8 @@ __all__ = [
   "format_drift_list_table",
   "format_package_list",
   "format_phase_summary",
+  "format_refs_count",
+  "format_refs_tsv",
   "format_plan_list_table",
   "format_policy_details",
   "format_policy_list_json",

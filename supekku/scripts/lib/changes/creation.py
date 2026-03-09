@@ -283,6 +283,8 @@ def create_delta(
   *,
   specs: Iterable[str] | None = None,
   requirements: Iterable[str] | None = None,
+  context_inputs: list[dict[str, str]] | None = None,
+  relations: list[dict[str, str]] | None = None,
   repo_root: Path | None = None,
   allow_missing_plan: bool = False,
 ) -> ChangeArtifactCreated:
@@ -292,6 +294,8 @@ def create_delta(
     name: Delta name/title.
     specs: Spec IDs impacted.
     requirements: Requirement IDs impacted.
+    context_inputs: Context input dicts (``{"type": ..., "id": ...}``).
+    relations: Relation dicts (``{"type": ..., "target": ...}``).
     repo_root: Optional repository root. Auto-detected if not provided.
     allow_missing_plan: If True, skip creating implementation plan and phases.
 
@@ -317,7 +321,8 @@ def create_delta(
     "status": "draft",
     "kind": "delta",
     "aliases": [],
-    "relations": [],
+    "relations": list(relations or []),
+    "context_inputs": list(context_inputs or []),
     "applies_to": {
       "specs": sorted(set(specs or [])),
       "requirements": sorted(set(requirements or [])),

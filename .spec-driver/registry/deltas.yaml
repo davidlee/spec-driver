@@ -6246,7 +6246,7 @@ deltas:
           mitigation: wrap=False enforced, single-line events
   DE-055:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Tighten skill routing and boot-time workflow guidance
     slug: tighten_skill_routing_and_boot_time_workflow_guidance
     updated: '2026-03-09'
@@ -9522,3 +9522,77 @@ deltas:
     applies_to:
       specs: []
       requirements: []
+  DE-083:
+    kind: delta
+    status: draft
+    name: Delta - Strengthen audit-to-spec reconciliation and spec/revision authorship
+      skills
+    slug: strengthen_audit_to_spec_reconciliation_and_spec_revision_authorship_skills
+    updated: '2026-03-09'
+    path: .spec-driver/deltas/DE-083-strengthen_audit_to_spec_reconciliation_and_spec_revision_authorship_skills/DE-083.md
+    applies_to:
+      specs:
+      - PROD-002
+      - PROD-011
+      - SPEC-151
+      requirements: []
+    relations:
+    - type: depends_on
+      target: DE-055
+      attributes: {}
+    - type: depends_on
+      target: DE-079
+      attributes: {}
+    plan:
+      id: IP-083
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-083
+        delta: DE-083
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-002
+          - PROD-011
+          - SPEC-151
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-083.PHASE-01
+          name: Shape audit-to-spec authorship design
+          objective: Settle the authorship-skill boundary and the preferred reconciliation
+            path from audit findings into specs.
+          status: planned
+        - id: IP-083.PHASE-02
+          name: Apply revision/spec authorship skill changes
+          objective: Update the chosen skill surfaces so the authorship path is concrete
+            and doctrine-aware.
+          status: planned
+        - id: IP-083.PHASE-03
+          name: Verify audit-to-spec examples and reconcile docs
+          objective: Prove the designed path with worked examples and keep DE/DR/IP/notes
+            aligned.
+          status: planned
+      phases:
+      - id: IP-083.PHASE-01
+        name: Shape audit-to-spec authorship design
+        objective: Settle the authorship-skill boundary and the preferred reconciliation
+          path from audit findings into specs.
+        status: planned
+        phase: IP-083.PHASE-01
+      - id: IP-083.PHASE-02
+        name: Apply revision/spec authorship skill changes
+        objective: Update the chosen skill surfaces so the authorship path is concrete
+          and doctrine-aware.
+        status: planned
+        phase: IP-083.PHASE-02
+      - id: IP-083.PHASE-03
+        name: Verify audit-to-spec examples and reconcile docs
+        objective: Prove the designed path with worked examples and keep DE/DR/IP/notes
+          aligned.
+        status: planned
+        phase: IP-083.PHASE-03

@@ -20,7 +20,9 @@ class TestGetHeadSha:
   def test_returns_sha_on_success(self) -> None:
     with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
       mock_run.return_value = subprocess.CompletedProcess(
-        args=[], returncode=0, stdout=f"{SAMPLE_SHA}\n",
+        args=[],
+        returncode=0,
+        stdout=f"{SAMPLE_SHA}\n",
       )
       result = get_head_sha()
 
@@ -29,14 +31,19 @@ class TestGetHeadSha:
   def test_strips_whitespace(self) -> None:
     with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
       mock_run.return_value = subprocess.CompletedProcess(
-        args=[], returncode=0, stdout=f"  {SAMPLE_SHA}  \n",
+        args=[],
+        returncode=0,
+        stdout=f"  {SAMPLE_SHA}  \n",
       )
       assert get_head_sha() == SAMPLE_SHA
 
   def test_returns_none_on_nonzero_exit(self) -> None:
     with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
       mock_run.return_value = subprocess.CompletedProcess(
-        args=[], returncode=128, stdout="", stderr="not a git repo",
+        args=[],
+        returncode=128,
+        stdout="",
+        stderr="not a git repo",
       )
       assert get_head_sha() is None
 
@@ -54,7 +61,9 @@ class TestGetHeadSha:
     root = Path("/some/repo")
     with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
       mock_run.return_value = subprocess.CompletedProcess(
-        args=[], returncode=0, stdout=f"{SAMPLE_SHA}\n",
+        args=[],
+        returncode=0,
+        stdout=f"{SAMPLE_SHA}\n",
       )
       get_head_sha(root)
 
@@ -64,7 +73,9 @@ class TestGetHeadSha:
   def test_defaults_to_none_cwd(self) -> None:
     with patch("supekku.scripts.lib.core.git.subprocess.run") as mock_run:
       mock_run.return_value = subprocess.CompletedProcess(
-        args=[], returncode=0, stdout=f"{SAMPLE_SHA}\n",
+        args=[],
+        returncode=0,
+        stdout=f"{SAMPLE_SHA}\n",
       )
       get_head_sha()
 
@@ -98,23 +109,29 @@ class TestShortSha:
 class TestShaHexPattern:
   """Tests for SHA_HEX_PATTERN constant."""
 
-  @pytest.mark.parametrize("sha", [
-    "a" * 40,
-    "0123456789abcdef" * 2 + "01234567",
-    "f" * 40,
-    "0" * 40,
-  ])
+  @pytest.mark.parametrize(
+    "sha",
+    [
+      "a" * 40,
+      "0123456789abcdef" * 2 + "01234567",
+      "f" * 40,
+      "0" * 40,
+    ],
+  )
   def test_valid_shas(self, sha: str) -> None:
     assert re.match(SHA_HEX_PATTERN, sha)
 
-  @pytest.mark.parametrize("sha", [
-    "a" * 39,       # too short
-    "a" * 41,       # too long
-    "a" * 7,        # way too short
-    "g" * 40,       # invalid hex char
-    "A" * 40,       # uppercase
-    "",             # empty
-    "abc123",       # short SHA (not accepted by pattern)
-  ])
+  @pytest.mark.parametrize(
+    "sha",
+    [
+      "a" * 39,  # too short
+      "a" * 41,  # too long
+      "a" * 7,  # way too short
+      "g" * 40,  # invalid hex char
+      "A" * 40,  # uppercase
+      "",  # empty
+      "abc123",  # short SHA (not accepted by pattern)
+    ],
+  )
   def test_invalid_shas(self, sha: str) -> None:
     assert not re.match(SHA_HEX_PATTERN, sha)

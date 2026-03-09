@@ -128,7 +128,7 @@ Usage notes:
 
 <skill>
 <name>shape-revision</name>
-<description>Shape a spec revision when requirements/responsibilities move. Use this before delta scoping when policy/doctrine requires revision-first flow.</description>
+<description>Shape a spec revision when requirements/responsibilities move. Use this before delta scoping when policy/doctrine requires revision-first flow, or when audit reconciliation shows authority must move.</description>
 <location>project</location>
 </skill>
 

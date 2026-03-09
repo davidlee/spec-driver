@@ -197,10 +197,13 @@ class TestUpdateFrontmatterFields:
     f = tmp_path / "mem.fact.test.md"
     f.write_text(MEMORY_FRONTMATTER, encoding="utf-8")
 
-    result = update_frontmatter_fields(f, {
-      "verified": "'2026-03-09'",
-      "updated": "'2026-03-09'",
-    })
+    result = update_frontmatter_fields(
+      f,
+      {
+        "verified": "'2026-03-09'",
+        "updated": "'2026-03-09'",
+      },
+    )
 
     content = f.read_text(encoding="utf-8")
     assert "verified: '2026-03-09'" in content
@@ -224,11 +227,14 @@ class TestUpdateFrontmatterFields:
     f.write_text(MEMORY_FRONTMATTER, encoding="utf-8")
 
     sha = "b" * 40
-    result = update_frontmatter_fields(f, {
-      "verified": "'2026-03-09'",
-      "verified_sha": sha,
-      "updated": "'2026-03-09'",
-    })
+    result = update_frontmatter_fields(
+      f,
+      {
+        "verified": "'2026-03-09'",
+        "verified_sha": sha,
+        "updated": "'2026-03-09'",
+      },
+    )
 
     content = f.read_text(encoding="utf-8")
     assert "verified: '2026-03-09'" in content
@@ -238,7 +244,8 @@ class TestUpdateFrontmatterFields:
     assert result.inserted == {"verified_sha"}
 
   def test_inserted_field_appears_before_closing_marker(
-    self, tmp_path: Path,
+    self,
+    tmp_path: Path,
   ) -> None:
     f = tmp_path / "mem.fact.test.md"
     f.write_text(MEMORY_FRONTMATTER, encoding="utf-8")
@@ -248,9 +255,7 @@ class TestUpdateFrontmatterFields:
     content = f.read_text(encoding="utf-8")
     lines = content.splitlines()
     # Find the closing --- and the verified_sha line
-    sha_idx = next(
-      i for i, line in enumerate(lines) if "verified_sha:" in line
-    )
+    sha_idx = next(i for i, line in enumerate(lines) if "verified_sha:" in line)
     # The closing --- after frontmatter
     closing_idx = next(
       i for i, line in enumerate(lines) if line.strip() == "---" and i > 0
@@ -280,7 +285,8 @@ class TestUpdateFrontmatterFields:
     assert "created: '2026-01-01'" in content
 
   def test_does_not_modify_body_lines_matching_field_name(
-    self, tmp_path: Path,
+    self,
+    tmp_path: Path,
   ) -> None:
     content_with_body_field = """\
 ---
@@ -319,10 +325,13 @@ status: this should not change
     f = tmp_path / "test.md"
     f.write_text(MEMORY_FRONTMATTER, encoding="utf-8")
 
-    update_frontmatter_fields(f, {
-      "field_a": "val_a",
-      "field_b": "val_b",
-    })
+    update_frontmatter_fields(
+      f,
+      {
+        "field_a": "val_a",
+        "field_b": "val_b",
+      },
+    )
 
     content = f.read_text(encoding="utf-8")
     idx_a = content.index("field_a:")

@@ -20,8 +20,7 @@ consistency issues that hurt discoverability and learnability.
 
 ## Known Issues
 
-1. **`skills sync`** — NOUN VERB, violates the VERB NOUN convention
-   used by `create`, `list`, `show`, `edit`, `find`, `complete`.
+1. ~~**`skills sync`**~~ — resolved: replaced by `install`
 2. **`schema`** — NOUN group with no verb. Should probably be
    `show schema` or similar.
 3. **`sync`** — overloaded top-level command with ~12 flags and

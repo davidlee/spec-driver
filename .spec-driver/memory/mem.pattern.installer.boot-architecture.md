@@ -96,7 +96,7 @@ Templates live in `supekku/templates/`:
 Rendering uses Jinja2 via `render_template()` with `{"config": workflow_config}`
 as context. Falls back to static defaults if templates are missing.
 
-## Skills Sync
+## Skills Install
 
 `sync_skills()` (callable standalone or from installer):
 1. Reads `.spec-driver/skills.allowlist`

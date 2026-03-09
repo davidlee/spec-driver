@@ -21,9 +21,10 @@ guiding_principles:
   - Workflow commands are customizable hooks, not prescriptive fixed processes
   - Configuration over convention - IP metadata drives automation preferences
   - Constitution (ADRs, policies, standards) embedded in commands and validated by tooling
-  - Support varied workflows (delta-first, spec-first, backlog-first) through flexible primitives
+  - Support variant entry paths without treating them as co-equal canon
   - Manual workflow always remains valid - commands are optional helpers
   - State inferred from artifacts, no hidden state files
+  - Audit and revision work reconcile observed truth back into authoritative specs before closure
 assumptions:
   - Users have Claude Code or compatible agent environment
   - Projects may use different VCS tools (git, jj, etc)
@@ -242,9 +243,10 @@ Guided implementation workflows directly impact:
 1. **Customizable hooks, not prescriptive process**: Like templates, workflow commands are locally installed and modifiable
 2. **Configuration over convention**: IP metadata and project defaults control automation behavior
 3. **Executable constitution**: ADRs/policies/standards embedded in commands and validated by tooling
-4. **Support varied workflows**: Delta-first, spec-first, backlog-first all supported through flexible primitives
+4. **Support variant entry paths without diluting canon**: Flexible primitives may support backlog-first or revision-first entry, but the canonical loop still runs through audit, revision/spec reconciliation, and closure
 5. **Manual always valid**: Commands are optional helpers, never required
 6. **State from artifacts**: No hidden state - infer everything from existing files
+7. **Observed truth must be reconciled explicitly**: Audit and revision work feed authoritative specs before closure instead of leaving findings as loose narrative follow-up
 
 ### Assumptions
 
@@ -253,6 +255,18 @@ Guided implementation workflows directly impact:
 - Teams have varied preferences for commit workflow and automation
 - Implementation plans created before phases (PROD-006 dependency)
 - Phase-01 should benefit from IP intelligence like phases 2+
+
+### Canonical Workflow Posture
+
+This spec governs execution helpers and workflow guidance, so it must follow the
+project's canonical doctrine rather than present workflow variants as peer
+truths.
+
+- Canonical code-changing flow is `delta -> DR -> IP/phases -> implement -> audit -> revision/spec reconcile -> close`
+- Revision-first and backlog-first remain supported entry variants, not co-equal end-to-end canon
+- Workflow helpers should bias audit findings back into authoritative specs in this order:
+  existing spec patch, revision, then revision-led new spec only when the
+  current authority boundary is genuinely wrong
 
 ## 2. Stakeholders & Journeys
 

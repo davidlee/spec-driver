@@ -3,8 +3,8 @@ id: IP-083.PHASE-01
 slug: 083-strengthen_audit_to_spec_reconciliation_and_spec_revision_authorship_skills-phase-01
 name: "IP-083 Phase 01 — Apply authorship skill changes"
 created: '2026-03-09'
-updated: '2026-03-09'
-status: draft
+updated: '2026-03-10'
+status: completed
 kind: phase
 ---
 
@@ -30,7 +30,7 @@ exit_criteria:
   - Installed skill copies and delta docs are reconciled after the packaged changes
 verification:
   tests:
-    - uv run spec-driver skills sync
+    - uv run spec-driver install -y .
     - uv run spec-driver show delta DE-083
   evidence:
     - Updated packaged and installed skill wording for audit-change and shape-revision
@@ -103,16 +103,16 @@ design questions.
 - [x] DE-079 ownership boundary is clear and excludes runtime/schema changes from this phase
 
 ## 4. Exit Criteria / Done When
-- [ ] `audit-change` teaches `spec_patch -> revision -> revision-led new spec`
-- [ ] `shape-revision` teaches post-audit triage, doctrine consultation, and section-by-section authorship
-- [ ] `PROD-011` reflects the canonical audit-to-spec reconciliation path
-- [ ] `SPEC-151` captures the strengthened skills subsystem responsibilities
-- [ ] Need for `PROD-001` or `PROD-002` edits is resolved, with any required edits applied
-- [ ] Packaged and installed skill copies are synchronized and DE/IP/notes reflect the work
+- [x] `audit-change` teaches `spec_patch -> revision -> revision-led new spec`
+- [x] `shape-revision` teaches post-audit triage, doctrine consultation, and section-by-section authorship
+- [x] `PROD-011` reflects the canonical audit-to-spec reconciliation path
+- [x] `SPEC-151` captures the strengthened skills subsystem responsibilities
+- [x] Need for `PROD-001` or `PROD-002` edits is resolved, with any required edits applied
+- [x] Packaged and installed skill copies are synchronized and DE/IP/notes reflect the work
 
 ## 5. Verification
 - Tests to run:
-  - `uv run spec-driver skills sync`
+  - `uv run spec-driver install -y .`
   - `uv run spec-driver show delta DE-083`
 - Tooling/commands:
   - `sed -n '1,260p' supekku/skills/audit-change/SKILL.md`
@@ -138,30 +138,32 @@ design questions.
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Update `audit-change` with explicit authorship ordering | [ ] | Closure-grade skill surface |
-| [ ] | 1.2 | Upgrade `shape-revision` into the post-audit authorship loop | [ ] | Reuse DR authoring patterns where justified |
-| [ ] | 1.3 | Reassess `spec-driver` wording for revision-led `create spec` | [P] | Only if current wording leaves a real gap |
-| [ ] | 1.4 | Revise `PROD-011` for canonical audit-to-spec reconciliation | [ ] | Direct governance target |
-| [ ] | 1.5 | Replace the `SPEC-151` stub boundary with explicit responsibilities | [ ] | Direct technical target |
-| [ ] | 1.6 | Patch `PROD-001` or `PROD-002` only if needed | [P] | Collaborator surfaces, not defaults |
-| [ ] | 1.7 | Sync installed skills and reconcile DE/IP/notes | [ ] | Finish with aligned artefacts |
+| [x] | 1.1 | Update `audit-change` with explicit authorship ordering | [ ] | Closure-grade skill surface |
+| [x] | 1.2 | Upgrade `shape-revision` into the post-audit authorship loop | [ ] | Reuse DR authoring patterns where justified |
+| [x] | 1.3 | Reassess `spec-driver` wording for revision-led `create spec` | [P] | Existing command path was sufficient; only doctrinal wording was added |
+| [x] | 1.4 | Revise `PROD-011` for canonical audit-to-spec reconciliation | [ ] | Direct governance target |
+| [x] | 1.5 | Replace the `SPEC-151` stub boundary with explicit responsibilities | [ ] | Direct technical target |
+| [x] | 1.6 | Patch `PROD-001` or `PROD-002` only if needed | [P] | No direct wording gap found, so both stayed untouched |
+| [x] | 1.7 | Sync installed skills and reconcile DE/IP/notes | [ ] | `uv run spec-driver install -y .` is the current install/sync path |
 
 ## 8. Risks & Mitigations
 | Risk | Mitigation | Status |
 | --- | --- | --- |
 | New-spec wording drifts into a peer audit disposition | keep every touched surface aligned with `revision -> optional new spec` | active |
 | Collaborator-surface edits sprawl | require an explicit wording gap before touching `PROD-001` or `PROD-002` | active |
-| Packaged and installed skill copies diverge | run `uv run spec-driver skills sync` before phase close-out | active |
+| Packaged and installed skill copies diverge | run `uv run spec-driver install -y .` before phase close-out | active |
 
 ## 9. Decisions & Outcomes
 - `2026-03-09` - Phase planning starts at execution, not retrospective design capture. Rationale: DR-083 already settled the design questions before the first phase sheet was created.
+- `2026-03-10` - `uv run spec-driver install -y .` replaced the stale `uv run spec-driver skills sync` note as the real packaged-skill install path in this repo.
 
 ## 10. Findings / Research Notes
 - DR-083 settled the branch order as existing-spec patch -> revision -> revision-led new spec.
 - Direct revision targets are `PROD-011` and `SPEC-151`; `PROD-001` and `PROD-002` are collaborator surfaces to justify before touching.
+- `PROD-001` and `PROD-002` did not require edits once the branch order was made explicit in `audit-change`, `shape-revision`, `spec-driver`, and `PROD-011`.
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Spec/Delta/Plan updated with lessons
-- [ ] Hand-off notes to next phase (if any)
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Spec/Delta/Plan updated with lessons
+- [x] Hand-off notes to next phase (if any)

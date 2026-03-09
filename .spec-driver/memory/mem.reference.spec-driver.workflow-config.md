@@ -143,7 +143,7 @@ Directory name overrides for `.spec-driver/` subdirectories:
 - **Template generation**: `generate_default_workflow_toml()` in same file
 - **Path initialisation from [dirs]**: `supekku/scripts/lib/core/paths.py`
 - **Agent template rendering**: `supekku/scripts/lib/core/agent_docs.py`
-- **Skills sync ([skills], [integration])**: `supekku/scripts/lib/skills/sync.py`
+- **Skills install ([skills], [integration])**: `supekku/scripts/lib/skills/sync.py`
 - **Sync preferences ([sync])**: `supekku/scripts/lib/core/sync_preferences.py`
 - **Event gating ([events])**: `supekku/cli/main.py`
 - **Strict mode**: `supekku/scripts/complete_delta.py`

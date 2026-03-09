@@ -14,7 +14,7 @@ summary: 'Start here before creating or refining spec-driver skills: boot, route
   keep packaged skills uniform, and use DE-055 as the current synthesis.'
 scope:
   commands:
-  - uv run spec-driver skills sync
+  - uv run spec-driver install
   - uv run spec-driver create memory
   paths:
   - supekku/skills

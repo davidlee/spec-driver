@@ -34,7 +34,7 @@ provenance:
 requires_reading:
 - CLAUDE.md
 verified: '2026-03-10'
-verified_sha: 81d9554da083f6a891dd37fabb59bb1c87186f6b
+verified_sha: 61e8069ffd9f99fb76859f41fe5bd91e45485924
 ---
 
 # Skinny CLI Pattern

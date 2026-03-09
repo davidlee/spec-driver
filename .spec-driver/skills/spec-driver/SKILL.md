@@ -61,6 +61,10 @@ listing the relevant entities instead of dumping every help screen.
 
 ## Tips
 
+- For audit-driven authorship work, keep the decision path doctrinally narrow:
+  `spec_patch -> revision -> revision-led create spec`.
+  Do not invent a peer "new spec" audit disposition when the right route is to
+  create the spec through the existing revision branch.
 - Regex flags parse left-to-right. Use `-ir "pattern"` or `-r "pattern" -i`,
   not `-ri "pattern"`.
 - Many `list` commands share the same core filters and outputs:

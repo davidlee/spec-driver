@@ -636,7 +636,7 @@ Must achieve before declaring feature complete:
 **RISK-006**: Onboarding references drift from the canonical boot path and agents miss current guidance
 - **Likelihood**: Medium (live bootstrap is now installed automatically, but stale local/project guidance can still drift)
 - **Impact**: Medium (agents may read stale instructions or miss local conventions)
-- **Mitigation**: Installer and skills sync must maintain the canonical bootstrap path via `@.spec-driver/agents/boot.md`, `@.spec-driver/AGENTS.md`, and `.spec-driver/README.md`; legacy onboarding docs such as `INIT.md` should not be part of the live boot path
+- **Mitigation**: Installer must maintain the canonical bootstrap path via `@.spec-driver/agents/boot.md`, `@.spec-driver/AGENTS.md`, and `.spec-driver/README.md`; legacy onboarding docs such as `INIT.md` should not be part of the live boot path
 - **Status**: Mitigated - no longer a blocker for FR-001
 
 **RISK-007**: No workflow for completing existing/vestigial specs

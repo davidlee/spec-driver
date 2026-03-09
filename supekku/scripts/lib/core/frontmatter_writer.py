@@ -117,7 +117,10 @@ def update_frontmatter_fields(
 
   result_lines, found_fields, closing_marker_idx = _replace_fields(lines, updates)
   missing = _insert_missing_fields(
-    result_lines, updates, found_fields, closing_marker_idx,
+    result_lines,
+    updates,
+    found_fields,
+    closing_marker_idx,
   )
 
   path.write_text("\n".join(result_lines) + "\n", encoding="utf-8")
@@ -144,9 +147,7 @@ def _replace_fields(
       continue
 
     replaced = (
-      _try_replace_line(line, updates, found_fields)
-      if in_frontmatter
-      else None
+      _try_replace_line(line, updates, found_fields) if in_frontmatter else None
     )
     result_lines.append(replaced if replaced is not None else line)
 

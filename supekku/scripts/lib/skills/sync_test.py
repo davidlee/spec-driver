@@ -1,4 +1,4 @@
-"""Tests for skills sync: allowlist, metadata, rendering, install, prune, symlinks."""
+"""Tests for skills install: allowlist, metadata, rendering, prune, symlinks."""
 
 from __future__ import annotations
 

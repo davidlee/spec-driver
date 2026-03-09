@@ -9524,7 +9524,7 @@ deltas:
       requirements: []
   DE-083:
     kind: delta
-    status: draft
+    status: in-progress
     name: Delta - Strengthen audit-to-spec reconciliation and spec/revision authorship
       skills
     slug: strengthen_audit_to_spec_reconciliation_and_spec_revision_authorship_skills
@@ -9563,39 +9563,85 @@ deltas:
           dependencies: []
         phases:
         - id: IP-083.PHASE-01
-          name: Shape audit-to-spec authorship design
-          objective: Settle the authorship-skill boundary and the preferred reconciliation
-            path from audit findings into specs.
-          status: planned
+          name: Apply revision/spec authorship changes
+          objective: Update the affected skills and direct governance surfaces to
+            implement the settled audit-to-spec authorship path.
+          status: completed
         - id: IP-083.PHASE-02
-          name: Apply revision/spec authorship skill changes
-          objective: Update the chosen skill surfaces so the authorship path is concrete
-            and doctrine-aware.
-          status: planned
-        - id: IP-083.PHASE-03
           name: Verify audit-to-spec examples and reconcile docs
           objective: Prove the designed path with worked examples and keep DE/DR/IP/notes
             aligned.
           status: planned
       phases:
-      - id: IP-083.PHASE-01
-        name: Shape audit-to-spec authorship design
-        objective: Settle the authorship-skill boundary and the preferred reconciliation
-          path from audit findings into specs.
-        status: planned
+      - schema: supekku.phase.overview
+        version: 1
         phase: IP-083.PHASE-01
+        plan: IP-083
+        delta: DE-083
+        objective: Update the affected skills and direct governance surfaces so the
+          settled audit-to-spec authorship path is executable without reopening design.
+        entrance_criteria:
+        - DR-083 resolves the dedicated-skill question and the branch criteria
+        - DE-079 boundary is accepted: no schema or gating changes in this phase
+        - Direct revision targets are identified as PROD-011 and SPEC-151
+        exit_criteria:
+        - audit-change teaches existing-spec patch -> revision -> revision-led new
+          spec
+        - shape-revision teaches post-audit triage, doctrine pass, and section-by-section
+          authorship
+        - PROD-011 reflects the canonical audit-to-spec reconciliation path and concession
+          posture
+        - SPEC-151 states the strengthened skills subsystem responsibilities
+        - Need for PROD-001 or PROD-002 edits is resolved and any required edits are
+          applied
+        - Installed skill copies and delta docs are reconciled after the packaged
+          changes
+        verification:
+          tests:
+          - uv run spec-driver install -y .
+          - uv run spec-driver show delta DE-083
+          evidence:
+          - Updated packaged and installed skill wording for audit-change and shape-revision
+          - Revised PROD-011 and SPEC-151 text aligned with DR-083
+          - Notes capturing whether PROD-001 and PROD-002 required direct changes
+        tasks:
+        - id: '1.1'
+          title: Update audit-change with explicit authorship ordering
+          status: todo
+        - id: '1.2'
+          title: Upgrade shape-revision into the post-audit authorship loop
+          status: todo
+        - id: '1.3'
+          title: Reassess spec-driver wording for the revision-led create-spec branch
+          status: todo
+        - id: '1.4'
+          title: Revise PROD-011 for canonical audit-to-spec reconciliation
+          status: todo
+        - id: '1.5'
+          title: Replace the SPEC-151 stub boundary with explicit responsibilities
+          status: todo
+        - id: '1.6'
+          title: Patch PROD-001 or PROD-002 only if implementation proves a direct
+            wording gap
+          status: todo
+        - id: '1.7'
+          title: Sync installed skills and reconcile DE/IP/notes
+          status: todo
+        risks:
+        - description: New-spec wording could drift into a peer audit disposition
+            and conflict with DE-079
+          mitigation: Keep the new-spec case nested under revision in every touched
+            surface
+        - description: Direct spec revisions could sprawl into collaborator surfaces
+            without clear need
+          mitigation: Treat PROD-001 and PROD-002 as opt-in edits gated by explicit
+            wording gaps
       - id: IP-083.PHASE-02
-        name: Apply revision/spec authorship skill changes
-        objective: Update the chosen skill surfaces so the authorship path is concrete
-          and doctrine-aware.
-        status: planned
-        phase: IP-083.PHASE-02
-      - id: IP-083.PHASE-03
         name: Verify audit-to-spec examples and reconcile docs
         objective: Prove the designed path with worked examples and keep DE/DR/IP/notes
           aligned.
         status: planned
-        phase: IP-083.PHASE-03
+        phase: IP-083.PHASE-02
   DE-084:
     kind: delta
     status: completed
@@ -9839,3 +9885,168 @@ deltas:
           description: "VA-085-001 scope unclear \u2014 manual walkthrough vs automated"
           mitigation: Define as documented agent analysis; dry-run create delta --from-backlog
             and inspect output
+  DE-086:
+    kind: delta
+    status: completed
+    name: 'Delta - Memory verification primitive: SHA-stamped attestation for staleness
+      tracking'
+    slug: memory_verification_primitive_sha_stamped_attestation_for_staleness_tracking
+    updated: '2026-03-10'
+    path: .spec-driver/deltas/DE-086-memory_verification_primitive_sha_stamped_attestation_for_staleness_tracking/DE-086.md
+    applies_to:
+      specs:
+      - SPEC-116
+      - SPEC-132
+      requirements: []
+    relations:
+    - type: relates_to
+      target: ISSUE-047
+      attributes: {}
+    plan:
+      id: IP-086
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-086
+        delta: DE-086
+        revision_links:
+          aligns_with:
+          - DR-086
+        specs:
+          primary:
+          - SPEC-132
+          collaborators:
+          - SPEC-116
+          - SPEC-110
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-086.PHASE-01
+        - id: IP-086.PHASE-02
+        - id: IP-086.PHASE-03
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-086.PHASE-01
+        plan: IP-086
+        delta: DE-086
+        objective: 'Build the foundation: git SHA utility, schema addition, model
+          update, frontmatter writer extension, and creation path changes. All with
+          tests.'
+        entrance_criteria:
+        - DR-086 reviewed and all design decisions closed
+        - IP-086 accepted
+        exit_criteria:
+        - "core/git.py exists with get_head_sha, short_sha, SHA_HEX_PATTERN \u2014\
+          \ tested"
+        - "memory schema includes verified_sha (optional) and confidence (required,\
+          \ default medium) \u2014 tested"
+        - "MemoryRecord parses and emits verified_sha \u2014 tested"
+        - "update_frontmatter_fields works with FieldUpdateResult \u2014 tested"
+        - "build_memory_frontmatter stamps verified date + confidence, not verified_sha\
+          \ \u2014 tested"
+        - existing frontmatter_writer tests still pass
+        - ruff + pylint clean on all touched files
+        verification:
+          tests:
+          - VT-memory-verified-sha (creation path)
+          - VT-frontmatter-writer
+          - VT-confidence-required
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Create core/git.py
+        - id: '1.2'
+          description: Add verified_sha to memory schema
+        - id: '1.3'
+          description: Make confidence required in memory schema
+        - id: '1.4'
+          description: Update MemoryRecord model
+        - id: '1.5'
+          description: Extend frontmatter writer
+        - id: '1.6'
+          description: Update memory creation path
+        risks:
+        - description: Import cycle between core/git.py and schema
+          mitigation: git.py has no internal dependencies; schema imports constant
+            only
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-086.PHASE-02
+        plan: IP-086
+        delta: DE-086
+        objective: Wire SHA-stamped verification into the CLI edit command, implement
+          batched staleness computation, and add tiered staleness listing to the memory
+          list command.
+        entrance_criteria:
+        - Phase 01 complete (core primitives tested and committed)
+        exit_criteria:
+        - "edit memory --verify stamps verified, verified_sha, updated \u2014 tested"
+        - "edit memory --verify refuses without git \u2014 tested"
+        - "edit memory --verify and --status are mutually exclusive \u2014 tested"
+        - "staleness.py computes batch staleness with single git invocation \u2014\
+          \ tested"
+        - "staleness.py handles paths, globs, unscoped, unattested \u2014 tested"
+        - "list memories --stale shows three-tier output \u2014 tested"
+        - ruff + pylint clean on all touched files
+        verification:
+          tests:
+          - VT-cli-edit-verify
+          - VT-memory-staleness
+          - VT-cli-list-stale
+          evidence: []
+        tasks:
+        - id: '2.1'
+          description: Create memory/staleness.py module
+        - id: '2.2'
+          description: Add --verify flag to edit memory CLI
+        - id: '2.3'
+          description: Add staleness formatter to memory_formatters.py
+        - id: '2.4'
+          description: Add --stale flag to list memories CLI
+        risks:
+        - description: Complex glob patterns don't translate to git pathspecs
+          mitigation: Current corpus uses simple directory prefixes; warn on untranslatable
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-086.PHASE-03
+        plan: IP-086
+        delta: DE-086
+        objective: Update memory skills with confidence calibration and staleness
+          awareness, validate backward compatibility, sweep verification coverage,
+          and create backlog item for list.py factoring.
+        entrance_criteria:
+        - Phase 02 complete (CLI + staleness tested and committed)
+        exit_criteria:
+        - "/capturing-memory skill includes confidence calibration guidance per DR\
+          \ \xA75.9"
+        - "/retrieving-memory skill surfaces staleness qualitatively per DR \xA75.9"
+        - "/reviewing-memory skill uses list --stale as default review queue per DR\
+          \ \xA75.9"
+        - Existing memories without verified_sha or confidence load and display correctly
+        - list memories (without --stale) still works normally
+        - just passes (tests + ruff + pylint report)
+        - IP-086 verification coverage entries updated to reflect actual state
+        - Backlog item created for list.py factoring review
+        verification:
+          tests:
+          - VA-skill-integration
+          - VA-backward-compat
+          evidence: []
+        tasks:
+        - id: '3.1'
+          description: Update /capturing-memory with confidence calibration guidance
+        - id: '3.2'
+          description: Update /retrieving-memory with staleness qualitative surfacing
+        - id: '3.3'
+          description: Update /reviewing-memory to use list --stale as review queue
+        - id: '3.4'
+          description: Validate backward compatibility
+        - id: '3.5'
+          description: Update IP-086 verification coverage entries
+        - id: '3.6'
+          description: Create backlog item for list.py factoring
+        - id: '3.7'
+          description: Final verification sweep (just passes)
+        risks: []

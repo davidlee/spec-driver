@@ -144,7 +144,7 @@ def _check_skills_allowlist(sd_root: Path) -> DiagnosticResult:
       name="skills-allowlist",
       status="warn",
       message="skills.allowlist not found",
-      suggestion="Run: spec-driver skills sync",
+      suggestion="Run: spec-driver install",
     )
   lines = [
     ln.strip()
@@ -195,7 +195,7 @@ def _check_skills_exposure(root: Path, sd_root: Path) -> list[DiagnosticResult]:
         name="skills-canonical",
         status="warn",
         message="canonical skills dir missing",
-        suggestion="Run: spec-driver skills sync",
+        suggestion="Run: spec-driver install",
       )
     )
     return results
@@ -227,7 +227,7 @@ def _check_skills_exposure(root: Path, sd_root: Path) -> list[DiagnosticResult]:
           name=f"skills-{target}",
           status="warn",
           message=f"{target} skills dir missing",
-          suggestion="Run: spec-driver skills sync",
+          suggestion="Run: spec-driver install",
         )
       )
       continue
@@ -246,7 +246,7 @@ def _check_skills_exposure(root: Path, sd_root: Path) -> list[DiagnosticResult]:
           message=(
             f"{len(exposed)} exposed, {len(skipped)} skipped: {', '.join(skipped)}"
           ),
-          suggestion="Run: spec-driver skills sync",
+          suggestion="Run: spec-driver install",
         )
       )
     else:

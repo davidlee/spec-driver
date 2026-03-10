@@ -55,21 +55,34 @@ Instead:
 7. Before declaring readiness, produce a critical assessment with these headings:
   - confirmed inputs
   - assumptions you would carry into the next step
-  - unresolved questions
-  - tensions or ambiguities across DE/DR/IP/phase sheets/mockups/code
-8. If the task is implementation-bound, do not conclude "ready to proceed",
-   "no blockers", or equivalent unless you explicitly state one of:
+  - unresolved questions, risks, or dependencies
+  - tensions or ambiguities (including any apparent contradictions between artifacts, or design & implementation surface)
+8. If the task is implementation-bound, do not conclude "ready to proceed", "no blockers", or equivalent unless you explicitly state one of:
   - no open questions remain after reading the governing artefacts
   - open questions remain, but they are consciously accepted as implementation assumptions
 9. Treat scope-shaping uncertainty as important even when it is not a hard blocker.
-   Call out things like interaction semantics, ownership of mappings/constants,
-   phase-boundary ambiguity, widget/API choice, or design-vs-discretion gaps.
+   Call out things like interaction semantics, ownership of mappings/constants, phase-boundary ambiguity, widget/API choice, or design-vs-discretion gaps.
 10. Present any significant discoveries, open questions, unresolved tradeoffs to the user.
-11. Indicate the next governing step; suggest the next skill or workflow transition.
+11. Indicate the next governing step; suggest the next skill or workflow transition, or further investigation required.
 
-Repeat, if the user indicates to.
+Repeat this process to clarify further, if the user indicates to.
 
-Guardrails:
+## Guidance
+
+Breadth first: start broad and high level, drill down as necessary.
+
+Search order:
+- provided artifact(s)
+- related / linked files, documents, artifacts
+- related governance (ADRs, standards, policies)
+- related specs
+- `/retrieving-memories`
+- contracts
+- related artifacts (provisional: may be out of date)
+- code
+
+## Guardrails:
+
 - Do not let `/preflight` steal the job of `/using-spec-driver`.
 - Do not treat bounded research as permission to start implementation.
 - Do not widen scope just because new curiosities appear.

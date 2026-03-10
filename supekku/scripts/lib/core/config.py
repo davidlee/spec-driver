@@ -40,7 +40,7 @@ DEFAULT_CONFIG: dict = {
     "enabled": True,
   },
   "sync": {
-    "spec_autocreate": True,
+    "spec_autocreate": False,
   },
   "contracts": {
     "enabled": True,

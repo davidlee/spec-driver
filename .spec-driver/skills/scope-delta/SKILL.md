@@ -8,6 +8,8 @@ Inputs:
 - Target requirements/specs, or a backlog item.
 - Policy/doctrine constraints (including any revision-first gate).
 
+
+
 Process:
 1. Read:
    - `.spec-driver/agents/workflow.md`
@@ -28,15 +30,15 @@ Process:
    - `DE-XXX.md`
    - `DR-XXX.md` (if non-trivial change)
    - `IP-XXX.md`
-   - At least one phase sheet (create via `/plan-phases`)
 5. Update `DE-XXX.md` to make scope explicit:
    - `applies_to` specs/requirements
    - Context inputs and risks
    - Verification/closure intent
-6. If design is non-trivial, run `/draft-design-revision` before `/plan-phases`.
-7. Do not treat IP or phase creation as a substitute for missing design. `/plan-phases` comes after DR work for non-trivial changes, not instead of it.
+6. You MUST run `/draft-design-revision` before `/plan-phases` unless **explicitly instructed** by the user to skip a DR.
+7. Do not treat IP or phase creation as a substitute for missing design. `/plan-phases` comes after DR work, not instead of it.
 8. Run `/plan-phases` to create/refine phase sheets before implementation.
 
 Outcomes:
 - A delta exists with clear scope and traceability targets.
+- A DR has been fleshed out with a robust design, and `DE-XXX` is consistent with it.
 - Next step (design/planning/implementation) is explicit.

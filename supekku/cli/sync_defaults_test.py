@@ -85,7 +85,7 @@ class SyncDefaultsTest(unittest.TestCase):
     mock_sync_specs: MagicMock,
     mock_sync_reqs: MagicMock,
   ) -> None:
-    """VT-001: fresh repo, bare sync → specs + contracts (default on)."""
+    """VT-001: fresh repo, bare sync → contracts only (spec autocreate off)."""
     mock_root.return_value = self.root
     mock_sync_specs.return_value = _SYNC_SPECS_SUCCESS
     mock_sync_reqs.return_value = _SYNC_REQS_SUCCESS
@@ -95,7 +95,7 @@ class SyncDefaultsTest(unittest.TestCase):
     assert result.exit_code == 0, result.output
     mock_sync_specs.assert_called_once()
     call_kwargs = mock_sync_specs.call_args
-    assert call_kwargs.kwargs["create_specs"] is True
+    assert call_kwargs.kwargs["create_specs"] is False
     assert call_kwargs.kwargs["generate_contracts"] is True
 
   # -- VT-002: --specs → persist + subsequent bare sync inherits --
@@ -190,7 +190,7 @@ class SyncDefaultsTest(unittest.TestCase):
     mock_sync_specs: MagicMock,
     mock_sync_reqs: MagicMock,
   ) -> None:
-    """VT-005: no specs-off hint when default is on."""
+    """VT-005: specs-off hint shown when default is off."""
     mock_root.return_value = self.root
     mock_sync_specs.return_value = _SYNC_SPECS_SUCCESS
     mock_sync_reqs.return_value = _SYNC_REQS_SUCCESS
@@ -198,7 +198,7 @@ class SyncDefaultsTest(unittest.TestCase):
     result = self._invoke()
 
     assert result.exit_code == 0, result.output
-    assert "Spec auto-creation is off" not in result.output
+    assert "Spec auto-creation is off" in result.output
 
 
 if __name__ == "__main__":

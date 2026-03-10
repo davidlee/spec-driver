@@ -12,9 +12,10 @@ Inputs:
 Process:
 1. Read DE/DR/IP together.
 2. Confirm planning is not getting ahead of design:
-   - if the change is non-trivial and `DR-XXX.md` is missing, stop and run `/draft-design-revision`
-   - if `DR-XXX.md` exists but is stale relative to the current ask or DE scope, reconcile the DR first
-   - do not treat IP or phase creation as a substitute for unresolved design
+   - `DR-XXX.md` is missing or blank, stop and run `/draft-design-revision` unless you have been **expicitly instructed** otherwise.
+   - if `DR-XXX.md` exists but is stale relative to the current ask or DE scope, reconcile the DR first. Clarify with the user if ambiguous.
+   - you MUST NOT treat IP or phase creation as a substitute for unresolved design.
+   - if planning surfaces substantive new design problems, run `/draft-design-revision` to revise or append to the DR.
 3. Refine `IP-XXX.md`:
    - Phase objectives
    - Entry/exit criteria per phase

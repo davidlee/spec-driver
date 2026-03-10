@@ -667,6 +667,120 @@ class ShowNewSubcommandsTest(unittest.TestCase):
     assert result.exit_code == 1
 
 
+# ── VT-088: show backlog alias tests ──────────────────────────
+
+
+class ShowBacklogTest(unittest.TestCase):
+  """Integration tests for show backlog subcommand (DE-088 / ISSUE-045)."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+
+  def test_show_backlog_issue(self) -> None:
+    """show backlog ISSUE-004 resolves an issue."""
+    result = self.runner.invoke(app, ["backlog", "ISSUE-004"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "ISSUE-004" in result.stdout
+    assert "Kind: issue" in result.stdout
+
+  def test_show_backlog_problem(self) -> None:
+    """show backlog PROB-002 resolves a problem."""
+    result = self.runner.invoke(app, ["backlog", "PROB-002"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "PROB-002" in result.stdout
+    assert "Kind: problem" in result.stdout
+
+  def test_show_backlog_improvement(self) -> None:
+    """show backlog IMPR-001 resolves an improvement."""
+    result = self.runner.invoke(app, ["backlog", "IMPR-001"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "IMPR-001" in result.stdout
+    assert "Kind: improvement" in result.stdout
+
+  def test_show_backlog_path_flag(self) -> None:
+    """show backlog --path returns the file path."""
+    result = self.runner.invoke(app, ["backlog", "ISSUE-004", "--path"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    output = result.stdout.strip()
+    assert output.endswith(".md")
+    assert "ISSUE-004" in output
+
+  def test_show_backlog_json_flag(self) -> None:
+    """show backlog --json returns valid JSON."""
+    result = self.runner.invoke(app, ["backlog", "ISSUE-004", "--json"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    parsed = json.loads(result.stdout)
+    assert parsed["id"] == "ISSUE-004"
+    assert parsed["kind"] == "issue"
+
+  def test_show_backlog_raw_flag(self) -> None:
+    """show backlog --raw returns raw file content."""
+    result = self.runner.invoke(app, ["backlog", "ISSUE-004", "--raw"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "---" in result.stdout
+    assert "id: ISSUE-004" in result.stdout
+
+  def test_show_backlog_not_found(self) -> None:
+    """show backlog with nonexistent ID fails gracefully."""
+    result = self.runner.invoke(app, ["backlog", "ISSUE-999"])
+    assert result.exit_code == 1
+    assert "not found" in result.stderr.lower()
+
+  def test_show_backlog_in_help(self) -> None:
+    """backlog subcommand appears in show help."""
+    result = self.runner.invoke(app, ["--help"])
+    assert "backlog" in result.stdout
+
+
+class ShowBareNumericIdTest(unittest.TestCase):
+  """Tests for bare numeric ID normalisation (DE-088 / ISSUE-045)."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+
+  def test_show_issue_bare_number(self) -> None:
+    """show issue 4 resolves to ISSUE-004."""
+    result = self.runner.invoke(app, ["issue", "4"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "ISSUE-004" in result.stdout
+
+  def test_show_issue_zero_padded(self) -> None:
+    """show issue 004 resolves to ISSUE-004."""
+    result = self.runner.invoke(app, ["issue", "004"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "ISSUE-004" in result.stdout
+
+  def test_show_problem_bare_number(self) -> None:
+    """show problem 2 resolves to PROB-002."""
+    result = self.runner.invoke(app, ["problem", "2"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "PROB-002" in result.stdout
+
+  def test_show_improvement_bare_number(self) -> None:
+    """show improvement 1 resolves to IMPR-001."""
+    result = self.runner.invoke(app, ["improvement", "1"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "IMPR-001" in result.stdout
+
+  def test_show_audit_bare_number(self) -> None:
+    """show audit 1 resolves to AUD-001."""
+    result = self.runner.invoke(app, ["audit", "1"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "AUD-001" in result.stdout
+
+  def test_show_plan_bare_number(self) -> None:
+    """show plan 41 resolves to IP-041."""
+    result = self.runner.invoke(app, ["plan", "41"])
+    assert result.exit_code == 0, f"Failed: {result.stderr}"
+    assert "IP-041" in result.stdout
+
+  def test_show_issue_not_found_bare_number(self) -> None:
+    """show issue 999 with nonexistent ID fails gracefully."""
+    result = self.runner.invoke(app, ["issue", "999"])
+    assert result.exit_code == 1
+    assert "not found" in result.stderr.lower()
+
+
 # ── VT-063-02: ID inference integration tests ─────────────────
 
 

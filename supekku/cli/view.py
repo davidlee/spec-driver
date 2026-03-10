@@ -202,6 +202,16 @@ def view_requirement(
   _view_artifact("requirement", req_id, root, pager=pager)
 
 
+@app.command("backlog")
+def view_backlog(
+  item_id: Annotated[str, typer.Argument(help="Backlog item ID (e.g., ISSUE-009)")],
+  pager: PagerOption = False,
+  root: RootOption = None,
+) -> None:
+  """View a backlog item (issue, problem, improvement, or risk)."""
+  _view_artifact("backlog", item_id, root, pager=pager)
+
+
 @app.command("card")
 def view_card(
   card_id: Annotated[str, typer.Argument(help="Card ID (e.g., T123)")],

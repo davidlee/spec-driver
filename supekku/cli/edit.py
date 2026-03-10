@@ -528,6 +528,29 @@ def edit_risk(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("backlog")
+def edit_backlog(
+  item_id: Annotated[str, typer.Argument(help="Backlog item ID (e.g., ISSUE-009)")],
+  status: StatusOption = None,
+  root: RootOption = None,
+) -> None:
+  """Edit a backlog item (issue, problem, improvement, or risk)."""
+  try:
+    ref = resolve_artifact("backlog", item_id, root)
+    if status is not None:
+      _apply_status(ref.id, ref.path, ref.record.kind, status)
+      return
+    open_in_editor(ref.path)
+  except typer.Exit:
+    raise
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+  except RuntimeError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 @app.command("drift")
 def edit_drift(
   ledger_id: Annotated[str, typer.Argument(help="Drift ledger ID (e.g., DL-047)")],

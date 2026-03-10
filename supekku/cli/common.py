@@ -374,6 +374,13 @@ ARTIFACT_PREFIXES: dict[str, str] = {
   "revision": "RE-",
   "policy": "POL-",
   "standard": "STD-",
+  "issue": "ISSUE-",
+  "problem": "PROB-",
+  "improvement": "IMPR-",
+  "risk": "RISK-",
+  "plan": "IP-",
+  "audit": "AUD-",
+  "drift_ledger": "DL-",
 }
 
 
@@ -557,12 +564,14 @@ def _resolve_plan(root: Path, raw_id: str) -> ArtifactRef:
 def _resolve_backlog(root: Path, raw_id: str, kind: str) -> ArtifactRef:
   from supekku.scripts.lib.backlog.registry import BacklogRegistry  # noqa: PLC0415
 
+  normalized = normalize_id(kind, raw_id) if kind else raw_id
   registry = BacklogRegistry(root=root)
-  item = registry.find(raw_id)
+  item = registry.find(normalized)
+  error_label = kind or "backlog item"
   if item is None:
-    raise ArtifactNotFoundError(kind, raw_id)
+    raise ArtifactNotFoundError(error_label, normalized)
   if kind and item.kind != kind:
-    raise ArtifactNotFoundError(kind, raw_id)
+    raise ArtifactNotFoundError(error_label, normalized)
   return ArtifactRef(id=item.id, path=item.path, record=item)
 
 
@@ -584,6 +593,7 @@ _ARTIFACT_RESOLVERS: dict[str, Any] = {
   "problem": lambda root, raw_id: _resolve_backlog(root, raw_id, "problem"),
   "improvement": lambda root, raw_id: _resolve_backlog(root, raw_id, "improvement"),
   "risk": lambda root, raw_id: _resolve_backlog(root, raw_id, "risk"),
+  "backlog": lambda root, raw_id: _resolve_backlog(root, raw_id, ""),
 }
 
 

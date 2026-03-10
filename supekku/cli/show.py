@@ -662,6 +662,36 @@ def show_risk(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("backlog")
+def show_backlog(
+  item_id: Annotated[str, typer.Argument(help="Backlog item ID (e.g., ISSUE-009)")],
+  json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
+  path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
+  raw_output: Annotated[
+    bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  content_type: ContentTypeOption = None,
+  root: RootOption = None,
+) -> None:
+  """Show a backlog item (issue, problem, improvement, or risk)."""
+  try:
+    ref = resolve_artifact("backlog", item_id, root)
+    emit_artifact(
+      ref,
+      json_output=json_output,
+      path_only=path_only,
+      raw_output=raw_output,
+      content_type=content_type,
+      format_fn=lambda r: (
+        f"{r.kind.title()}: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
+      ),
+      json_fn=lambda r: json.dumps(r.frontmatter, indent=2, default=str),
+    )
+  except ArtifactNotFoundError as e:
+    typer.echo(f"Error: {e}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from e
+
+
 # --- ID inference fallback ---
 
 

@@ -163,10 +163,12 @@ class BrowserScreen(Screen):
       if target.is_file():
         preview.show_artifact(target)
         preview.border_title = target.name
+        preview.focus()
         return True
     preview.show_artifact(entry.path)
     preview.border_title = entry.id
 
+    preview.focus()
     return True
 
   def refresh_snapshot(self, art_type: ArtifactType) -> None:

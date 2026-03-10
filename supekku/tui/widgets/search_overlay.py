@@ -5,8 +5,6 @@ Design reference: DR-087 DEC-087-03, DEC-087-04.
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from textual import on
 from textual.app import ComposeResult
 from textual.binding import Binding
@@ -16,7 +14,8 @@ from textual.screen import ModalScreen
 from textual.widgets import DataTable, Input, Static
 
 from supekku.scripts.lib.core.artifact_view import ArtifactEntry
-from supekku.tui.search.index import SearchEntry, build_search_index
+from supekku.scripts.lib.formatters.theme import styled_text
+from supekku.tui.search.index import SearchEntry
 from supekku.tui.search.scorer import search
 
 # Column layout for results table.
@@ -38,15 +37,25 @@ class SearchResult(Message):
 class _SearchInput(Input):
   """Search input that forwards navigation keys to the results table."""
 
+  _NAV_KEYS: dict[str, str] = {
+    "down": "action_cursor_down",
+    "up": "action_cursor_up",
+    "pagedown": "action_page_down",
+    "pageup": "action_page_up",
+  }
+
   def on_key(self, event: Key) -> None:
     """Forward navigation keys to the results table."""
     table = self.screen.query_one("#search-results", DataTable)
-    if event.key == "down":
+    if action := self._NAV_KEYS.get(event.key):
       event.prevent_default()
-      table.action_cursor_down()
-    elif event.key == "up":
+      getattr(table, action)()
+    elif event.key == "ctrl+delete":
       event.prevent_default()
-      table.action_cursor_up()
+      self.action_delete_right_word()
+    elif event.key == "ctrl+backspace":
+      event.prevent_default()
+      self.action_delete_left_word()
     elif event.key == "enter" and table.row_count > 0:
       event.prevent_default()
       table.action_select_cursor()
@@ -93,10 +102,9 @@ class SearchOverlay(ModalScreen[ArtifactEntry | None]):
   }
   """
 
-  def __init__(self, *, root: Path, **kwargs) -> None:
+  def __init__(self, *, index: list[SearchEntry], **kwargs) -> None:
     super().__init__(**kwargs)
-    self._root = root
-    self._index: list[SearchEntry] = []
+    self._index = index
 
   def compose(self) -> ComposeResult:
     with Static(id="search-container"):
@@ -107,11 +115,10 @@ class SearchOverlay(ModalScreen[ArtifactEntry | None]):
       yield DataTable(id="search-results", cursor_type="row")
 
   def on_mount(self) -> None:
-    """Set up results table columns and build the search index."""
+    """Set up results table columns."""
     table = self.query_one("#search-results", DataTable)
     for label, key, width in _COLUMNS:
       table.add_column(label, key=key, width=width)
-    self._index = build_search_index(root=self._root)
 
   @on(Input.Changed, "#search-box")
   def _on_search_changed(self, event: Input.Changed) -> None:
@@ -126,8 +133,15 @@ class SearchOverlay(ModalScreen[ArtifactEntry | None]):
     hits = search(query, self._index)
     for se in hits:
       entry = se.entry
-      type_label = entry.artifact_type.singular
-      table.add_row(type_label, entry.id, entry.title, key=entry.id)
+      art_type = entry.artifact_type
+      type_style = f"artifact.group.{art_type.group.value}"
+      id_style = f"{art_type.value}.id"
+      table.add_row(
+        styled_text(art_type.singular, type_style),
+        styled_text(entry.id, id_style),
+        entry.title,
+        key=entry.id,
+      )
 
   @on(DataTable.RowSelected, "#search-results")
   def _on_result_selected(

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from textual.widgets import DataTable, Input
@@ -59,14 +59,17 @@ def _mock_snapshot() -> ArtifactSnapshot:
 
 
 def _make_app(snapshot: ArtifactSnapshot | None = None):
-  """Create a SpecDriverApp with a mock snapshot."""
+  """Create a SpecDriverApp with a mock snapshot and empty search index."""
   snap = snapshot or _mock_snapshot()
-  return SpecDriverApp(
+  app = SpecDriverApp(
     root=Path("/tmp"),
     snapshot=snap,
     listen=False,
     watch=False,
   )
+  # Pre-populate search index cache to avoid real registry access.
+  app._search_index = []  # noqa: SLF001
+  return app
 
 
 class TestSearchOverlayLifecycle:
@@ -80,14 +83,9 @@ class TestSearchOverlayLifecycle:
       await pilot.pause()
       assert isinstance(app.screen, BrowserScreen)
 
-      # Mock build_search_index to avoid real registry access.
-      with patch(
-        "supekku.tui.widgets.search_overlay.build_search_index",
-        return_value=[],
-      ):
-        await pilot.press("slash")
-        await pilot.pause()
-        assert isinstance(app.screen, SearchOverlay)
+      await pilot.press("slash")
+      await pilot.pause()
+      assert isinstance(app.screen, SearchOverlay)
 
   @pytest.mark.asyncio()
   async def test_escape_dismisses_overlay(self):
@@ -95,17 +93,13 @@ class TestSearchOverlayLifecycle:
     app = _make_app()
     async with app.run_test(size=(120, 40)) as pilot:
       await pilot.pause()
-      with patch(
-        "supekku.tui.widgets.search_overlay.build_search_index",
-        return_value=[],
-      ):
-        await pilot.press("slash")
-        await pilot.pause()
-        assert isinstance(app.screen, SearchOverlay)
+      await pilot.press("slash")
+      await pilot.pause()
+      assert isinstance(app.screen, SearchOverlay)
 
-        await pilot.press("escape")
-        await pilot.pause()
-        assert isinstance(app.screen, BrowserScreen)
+      await pilot.press("escape")
+      await pilot.pause()
+      assert isinstance(app.screen, BrowserScreen)
 
   @pytest.mark.asyncio()
   async def test_overlay_has_search_input(self):
@@ -113,17 +107,13 @@ class TestSearchOverlayLifecycle:
     app = _make_app()
     async with app.run_test(size=(120, 40)) as pilot:
       await pilot.pause()
-      with patch(
-        "supekku.tui.widgets.search_overlay.build_search_index",
-        return_value=[],
-      ):
-        await pilot.press("slash")
-        await pilot.pause()
-        search_input = app.screen.query_one(
-          "#search-box",
-          Input,
-        )
-        assert search_input is not None
+      await pilot.press("slash")
+      await pilot.pause()
+      search_input = app.screen.query_one(
+        "#search-box",
+        Input,
+      )
+      assert search_input is not None
 
   @pytest.mark.asyncio()
   async def test_overlay_has_results_table(self):
@@ -131,17 +121,13 @@ class TestSearchOverlayLifecycle:
     app = _make_app()
     async with app.run_test(size=(120, 40)) as pilot:
       await pilot.pause()
-      with patch(
-        "supekku.tui.widgets.search_overlay.build_search_index",
-        return_value=[],
-      ):
-        await pilot.press("slash")
-        await pilot.pause()
-        table = app.screen.query_one(
-          "#search-results",
-          DataTable,
-        )
-        assert table is not None
+      await pilot.press("slash")
+      await pilot.pause()
+      table = app.screen.query_one(
+        "#search-results",
+        DataTable,
+      )
+      assert table is not None
 
 
 class TestSearchOverlayCtrlF:

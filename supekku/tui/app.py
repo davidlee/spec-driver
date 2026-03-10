@@ -69,6 +69,7 @@ class SpecDriverApp(App):
     self._listener_task: asyncio.Task | None = None
     self._browser_screen: BrowserScreen | None = None
     self._track_screen: TrackScreen | None = None
+    self._search_index: list | None = None
 
   def on_mount(self) -> None:
     """Install screens, start file watcher and event listener."""
@@ -106,6 +107,7 @@ class SpecDriverApp(App):
             screen = self.screen
             if isinstance(screen, BrowserScreen):
               screen.refresh_snapshot(art_type)
+        self._invalidate_search_index()
     except asyncio.CancelledError:
       pass
     except Exception:  # noqa: BLE001
@@ -121,15 +123,27 @@ class SpecDriverApp(App):
     except Exception:  # noqa: BLE001
       pass
 
+  def _build_search_index(self) -> list:
+    """Build or return cached search index."""
+    if self._search_index is None:
+      from supekku.tui.search.index import build_search_index  # noqa: PLC0415
+
+      self._search_index = build_search_index(root=self._root)
+    return self._search_index
+
+  def _invalidate_search_index(self) -> None:
+    """Clear cached search index so it rebuilds on next open."""
+    self._search_index = None
+
   def action_global_search(self) -> None:
     """Open the cross-artifact search overlay (DEC-087-03)."""
     from supekku.tui.widgets.search_overlay import SearchOverlay  # noqa: PLC0415
 
     def _on_result(result: ArtifactEntry | None) -> None:
       if result is not None:
-        self.action_navigate_artifact(result.id)
+        self.call_later(self.action_navigate_artifact, result.id)
 
-    self.push_screen(SearchOverlay(root=self._root), _on_result)
+    self.push_screen(SearchOverlay(index=self._build_search_index()), _on_result)
 
   def action_focus_search(self) -> None:
     """Focus the per-type search input in the artifact list."""
@@ -190,7 +204,8 @@ class SpecDriverApp(App):
     self, artifact_id: str, *, file_path: str | None = None
   ) -> None:
     """Navigate to an artifact in the browser (DEC-054-06, DEC-061-04)."""
-    self.switch_screen("browser")
+    if not isinstance(self.screen, BrowserScreen):
+      self.switch_screen("browser")
     screen = self.screen
     if isinstance(screen, BrowserScreen) and not screen.navigate_to_artifact(
       artifact_id, file_path=file_path

@@ -7,8 +7,6 @@ Design reference: DR-087 DEC-087-02.
 
 from __future__ import annotations
 
-from textual.fuzzy import Matcher
-
 from supekku.tui.search.index import (
   FIELD_ID,
   FIELD_TITLE,
@@ -29,13 +27,52 @@ _FIELD_WEIGHTS: dict[str, float] = {
 
 _DEFAULT_LIMIT = 50
 
+# Bonus for substring (contiguous) matches vs scattered subsequence.
+_SUBSTRING_BONUS = 2.0
+# Bonus for matching at the start of the text.
+_PREFIX_BONUS = 1.5
+
 
 def _field_weight(field_name: str) -> float:
   """Return the scoring weight for a searchable field."""
   return _FIELD_WEIGHTS.get(field_name, WEIGHT_ATTRIBUTE)
 
 
-def score_entry(query: str, entry: SearchEntry) -> float:
+def _fuzzy_score(query: str, text: str) -> float:
+  """Score *query* against *text* using linear subsequence matching.
+
+  Returns 0.0 if *query* is not a subsequence of *text*.
+  Otherwise returns a score based on match compactness, contiguity,
+  and position.  O(n) per candidate — no combinatorial explosion.
+  """
+  q_lower = query.lower()
+  t_lower = text.lower()
+
+  # Fast path: contiguous substring match.
+  sub_pos = t_lower.find(q_lower)
+  if sub_pos >= 0:
+    score = len(q_lower) * _SUBSTRING_BONUS
+    if sub_pos == 0:
+      score *= _PREFIX_BONUS
+    return score
+
+  # Subsequence match: greedy left-to-right scan.
+  positions: list[int] = []
+  start = 0
+  for ch in q_lower:
+    idx = t_lower.find(ch, start)
+    if idx < 0:
+      return 0.0
+    positions.append(idx)
+    start = idx + 1
+
+  # Score: query length penalised by how spread out the match is.
+  span = positions[-1] - positions[0] + 1
+  compactness = len(q_lower) / span
+  return len(q_lower) * compactness
+
+
+def score_entry(entry: SearchEntry, query: str) -> float:
   """Score a single :class:`SearchEntry` against *query*.
 
   Returns ``max(weight * fuzzy_score)`` across all searchable fields
@@ -44,21 +81,20 @@ def score_entry(query: str, entry: SearchEntry) -> float:
   if not query:
     return 0.0
 
-  matcher = Matcher(query)
   best = 0.0
 
   # Score searchable fields with per-field weights.
   for field_name, text in entry.searchable_fields.items():
     if not text:
       continue
-    raw = matcher.match(text)
+    raw = _fuzzy_score(query, text)
     if raw > 0:
       weighted = _field_weight(field_name) * raw
       best = max(best, weighted)
 
   # Score each relation target individually (DEC-087-02).
   for target in entry.relation_targets:
-    raw = matcher.match(target)
+    raw = _fuzzy_score(query, target)
     if raw > 0:
       weighted = WEIGHT_RELATION_TARGET * raw
       best = max(best, weighted)
@@ -79,7 +115,7 @@ def search(
   if not query:
     return []
 
-  scored = [(entry, score_entry(query, entry)) for entry in index]
+  scored = [(entry, score_entry(entry, query)) for entry in index]
   hits = [(e, s) for e, s in scored if s > 0]
   hits.sort(key=lambda pair: pair[1], reverse=True)
   return [e for e, _s in hits[:limit]]

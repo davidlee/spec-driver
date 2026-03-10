@@ -39,25 +39,25 @@ verification:
 tasks:
   - id: "1.1"
     title: Update audit-change with explicit authorship ordering
-    status: todo
+    status: done
   - id: "1.2"
     title: Upgrade shape-revision into the post-audit authorship loop
-    status: todo
+    status: done
   - id: "1.3"
     title: Reassess spec-driver wording for the revision-led create-spec branch
-    status: todo
+    status: done
   - id: "1.4"
     title: Revise PROD-011 for canonical audit-to-spec reconciliation
-    status: todo
+    status: done
   - id: "1.5"
     title: Replace the SPEC-151 stub boundary with explicit responsibilities
-    status: todo
+    status: done
   - id: "1.6"
     title: Patch PROD-001 or PROD-002 only if implementation proves a direct wording gap
-    status: todo
+    status: done
   - id: "1.7"
     title: Sync installed skills and reconcile DE/IP/notes
-    status: todo
+    status: done
 risks:
   - description: New-spec wording could drift into a peer audit disposition and conflict with DE-079
     mitigation: Keep the new-spec case nested under revision in every touched surface

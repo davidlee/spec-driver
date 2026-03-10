@@ -1,0 +1,1 @@
+../../../../../../../../.contracts/all/supekku/tui/search/index.py.md

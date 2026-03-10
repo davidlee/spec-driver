@@ -174,4 +174,4 @@ revision analysis.
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (§10)
 - [x] Spec/Delta/Plan updated with lessons
-- [ ] Hand-off to audit/closure
+- [x] Hand-off to audit/closure

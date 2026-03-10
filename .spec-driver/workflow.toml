@@ -90,5 +90,3 @@ exec = "uv run spec-driver"
 # improvements = "improvements"
 # risks = "risks"
 
-[sync]
-spec_autocreate = true

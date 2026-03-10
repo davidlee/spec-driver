@@ -11,6 +11,7 @@ View commands for rendering artifacts to stdout (or pager with -p).
 - `_view_artifact(artifact_type, raw_id, root) -> None`: Resolve an artifact and render it to stdout or pager.
 - @app.command(adr) `view_adr(decision_id, pager, root) -> None`: View ADR.
 - @app.command(audit) `view_audit(audit_id, pager, root) -> None`: View audit.
+- @app.command(backlog) `view_backlog(item_id, pager, root) -> None`: View a backlog item (issue, problem, improvement, or risk).
 - @app.command(card) `view_card(card_id, anywhere, pager, root) -> None`: View card.
 - @app.command(delta) `view_delta(delta_id, pager, root) -> None`: View delta.
 - @app.command(drift) `view_drift(ledger_id, pager, root) -> None`: View drift ledger.

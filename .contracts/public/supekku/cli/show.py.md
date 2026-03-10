@@ -10,6 +10,7 @@ Show commands for displaying detailed information about artifacts.
 
 - @app.command(adr) `show_adr(decision_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about a specific decision/ADR.
 - @app.command(audit) `show_audit(audit_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about an audit.
+- @app.command(backlog) `show_backlog(item_id, json_output, path_only, raw_output, content_type, root) -> None`: Show a backlog item (issue, problem, improvement, or risk).
 - @app.command(card) `show_card(card_id, json_output, path_only, raw_output, anywhere, content_type, root) -> None`: Show detailed information about a specific card.
 - @app.command(delta) `show_delta(delta_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about a delta.
 - @app.command(drift) `show_drift(ledger_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about a drift ledger.

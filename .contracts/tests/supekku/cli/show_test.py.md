@@ -4,6 +4,41 @@ Tests for show CLI commands.
 
 ## Classes
 
+### ShowBacklogTest
+
+Integration tests for show backlog subcommand (DE-088 / ISSUE-045).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `test_show_backlog_improvement(self) -> None`: show backlog IMPR-001 resolves an improvement.
+- `test_show_backlog_in_help(self) -> None`: backlog subcommand appears in show help.
+- `test_show_backlog_issue(self) -> None`: show backlog ISSUE-004 resolves an issue.
+- `test_show_backlog_json_flag(self) -> None`: show backlog --json returns valid JSON.
+- `test_show_backlog_not_found(self) -> None`: show backlog with nonexistent ID fails gracefully.
+- `test_show_backlog_path_flag(self) -> None`: show backlog --path returns the file path.
+- `test_show_backlog_problem(self) -> None`: show backlog PROB-002 resolves a problem.
+- `test_show_backlog_raw_flag(self) -> None`: show backlog --raw returns raw file content.
+
+### ShowBareNumericIdTest
+
+Tests for bare numeric ID normalisation (DE-088 / ISSUE-045).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `test_show_audit_bare_number(self) -> None`: show audit 1 resolves to AUD-001.
+- `test_show_improvement_bare_number(self) -> None`: show improvement 1 resolves to IMPR-001.
+- `test_show_issue_bare_number(self) -> None`: show issue 4 resolves to ISSUE-004.
+- `test_show_issue_not_found_bare_number(self) -> None`: show issue 999 with nonexistent ID fails gracefully.
+- `test_show_issue_zero_padded(self) -> None`: show issue 004 resolves to ISSUE-004.
+- `test_show_plan_bare_number(self) -> None`: show plan 41 resolves to IP-041.
+- `test_show_problem_bare_number(self) -> None`: show problem 2 resolves to PROB-002.
+
 ### ShowCardJsonFlagTest
 
 Test cases for --json flag on show card command.

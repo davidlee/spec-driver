@@ -11,6 +11,7 @@ Edit commands for opening artifacts in an editor or updating status.
 
 - @app.command(adr) `edit_adr(decision_id, status, root) -> None`: Edit ADR in editor.
 - @app.command(audit) `edit_audit(audit_id, status, root) -> None`: Edit audit in editor.
+- @app.command(backlog) `edit_backlog(item_id, status, root) -> None`: Edit a backlog item (issue, problem, improvement, or risk).
 - @app.command(card) `edit_card(card_id, status, anywhere, root) -> None`: Edit card in editor.
 - @app.command(delta) `edit_delta(delta_id, status, root) -> None`: Edit delta in editor.
 - @app.command(drift) `edit_drift(ledger_id, status, root) -> None`: Edit drift ledger in editor.

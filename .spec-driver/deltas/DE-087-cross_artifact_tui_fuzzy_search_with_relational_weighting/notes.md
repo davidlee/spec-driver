@@ -41,3 +41,49 @@
 - Broad exception catches at registry/record boundaries match `_collect_safe` pattern in `artifact_view.py`
 - All 32 new tests passing, 3805 total tests passing, both linters clean
 
+## Phase 03 — Verification, edge cases, and closure
+
+### 2026-03-10: VA-087-001 walkthrough
+
+**Walkthrough results (human-verified):**
+
+| Scenario | Result | Notes |
+| --- | --- | --- |
+| Partial ID → correct artifact | PASS | Works across types |
+| Tag name → matching artifacts | PASS | |
+| Referenced artifact ID → referencing artifacts | PASS | Below own-ID matches as designed |
+| Empty query → no results | PASS | Blank on open |
+| Escape → overlay dismisses | PASS | Clean dismiss |
+| Enter on result → browser navigates | PASS | After fix (see below) |
+| Ctrl+F → per-type search | PASS | Unaffected |
+
+**Issues found and fixed:**
+
+1. **Performance: exponential fuzzy matcher** — Textual's `Matcher.match()` is
+   combinatorial on long queries with scattered character positions (46s for
+   "specification" across 574 entries). Replaced with linear O(n) subsequence
+   scorer (`_fuzzy_score`): substring bonus, prefix bonus, compactness scoring.
+   Sub-millisecond for all query lengths.
+
+2. **Navigation: screen transition race** — `action_navigate_artifact` called
+   `switch_screen("browser")` after modal dismiss, re-pushing the already-active
+   browser and causing a remount. Fixed: guard with `isinstance` check + defer
+   callback via `call_later`.
+
+3. **Preview focus** — Added `preview.focus()` after search navigation so
+   keyboard scrolling works immediately.
+
+**UX improvements added:**
+
+- PageUp/PageDown key forwarding from search input to results table
+- Ctrl+Delete / Ctrl+Backspace for word deletion in search input
+- Search index cached on app, invalidated on file changes (406ms → 0ms on reopen)
+- Per-type colour styling on IDs and type labels in search results
+
+**Backlog items created:**
+- IMPR-013: TUI requirements type performance
+- IMPR-014: Search overlay relation context display
+- IMPR-015: Browser all-types view in primary navigation
+
+**Test results:** 3826 passed, 4 skipped, both linters clean.
+

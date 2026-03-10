@@ -10098,7 +10098,7 @@ deltas:
         risks: []
   DE-087:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Cross-artifact TUI fuzzy search with relational weighting
     slug: cross_artifact_tui_fuzzy_search_with_relational_weighting
     updated: '2026-03-10'
@@ -10123,7 +10123,8 @@ deltas:
         plan: IP-087
         delta: DE-087
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-087
         specs:
           primary:
           - PROD-010
@@ -10133,7 +10134,208 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-087-P01
+        - id: IP-087.PHASE-01
+        - id: IP-087.PHASE-02
+        - id: IP-087.PHASE-03
       phases:
-      - id: IP-087-P01
-        phase: IP-087-P01
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-087.PHASE-01
+        plan: IP-087
+        delta: DE-087
+        objective: Create the SearchEntry model, self-contained index builder, and
+          weighted scorer as pure functions with full test coverage. No TUI code in
+          this phase.
+        entrance_criteria:
+        - DR-087 accepted with all design decisions resolved
+        exit_criteria:
+        - SearchEntry dataclass defined with searchable_fields and relation_targets
+        - build_search_index(root) produces entries for all artifact types
+        - score_entry(query, search_entry) applies tiered weights correctly
+        - Per-tag scoring works (not joined string)
+        - VT-087-001, VT-087-002, VT-087-003 passing
+        - just check green
+        verification:
+          tests:
+          - VT-087-001
+          - VT-087-002
+          - VT-087-003
+          evidence: []
+        tasks:
+        - id: '1.1'
+          summary: SearchEntry dataclass and field/weight constants
+        - id: '1.2'
+          summary: "Index builder \u2014 _extract_searchable_fields, _extract_relation_targets,\
+            \ build_search_index"
+        - id: '1.3'
+          summary: "Scorer \u2014 score_entry with tiered weights"
+        - id: '1.4'
+          summary: Tests for all of the above
+        risks:
+        - description: getattr fragility on heterogeneous records
+          mitigation: Test against all ArtifactType values with mock records
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-087.PHASE-02
+        plan: IP-087
+        delta: DE-087
+        objective: Build the search overlay widget, rebind keybindings, and integrate
+          result selection with BrowserScreen.navigate_to_artifact(). Functional end-to-end
+          search in the TUI.
+        entrance_criteria:
+        - "Phase 01 complete \u2014 search core tests passing"
+        exit_criteria:
+        - Search overlay opens on / with empty input
+        - Typing filters results across all artifact types in real-time
+        - Results show type badge, ID, title sorted by score
+        - Enter navigates to selected artifact in browser
+        - Escape dismisses overlay
+        - Ctrl+F focuses per-type inline search
+        - just check green
+        verification:
+          tests: []
+          evidence:
+          - VA-087-001
+        tasks:
+        - id: '2.1'
+          summary: Search overlay widget (ModalScreen)
+        - id: '2.2'
+          summary: Keybinding changes in app.py
+        - id: '2.3'
+          summary: "Browser integration \u2014 overlay mounting and result handling"
+        - id: '2.4'
+          summary: Overlay widget tests
+        risks:
+        - description: Textual ModalScreen API may not support needed focus patterns
+          mitigation: Verify API before building; fall back to Screen with overlay
+            CSS
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-087.PHASE-03
+        plan: IP-087
+        delta: DE-087
+        objective: Execute VA-087-001 walkthrough, address edge cases, update verification
+          coverage entries, and prepare delta for closure.
+        entrance_criteria:
+        - "Phase 02 complete \u2014 overlay functional, just check green"
+        exit_criteria:
+        - VA-087-001 documented with pass/fail evidence
+        - All VT artefacts passing
+        - IP-087 verification.coverage entries updated to verified
+        - spec-driver complete delta DE-087 succeeds (or force-reason documented)
+        verification:
+          tests:
+          - VT-087-001
+          - VT-087-002
+          - VT-087-003
+          evidence:
+          - VA-087-001
+        tasks:
+        - id: '3.1'
+          summary: VA-087-001 manual walkthrough
+        - id: '3.2'
+          summary: Edge case review and fixes
+        - id: '3.3'
+          summary: Update verification coverage and delta artefacts
+        - id: '3.4'
+          summary: Delta closure
+        risks: []
+  DE-088:
+    kind: delta
+    status: draft
+    name: Delta - bare numeric ID normalisation and show/view backlog alias
+    slug: bare_numeric_ids_and_show_backlog_alias
+    updated: '2026-03-10'
+    path: .spec-driver/deltas/DE-088-show_view_commands_lack_id_inference_require_redundant_subcommand_and_full_prefix/DE-088.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: relates_to
+      target: ISSUE-045
+      attributes: {}
+    plan:
+      id: IP-088
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-088
+        delta: DE-088
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-088-P01
+      phases:
+      - id: IP-088-P01
+        phase: IP-088-P01
+  DE-089:
+    kind: delta
+    status: in-progress
+    name: Delta - no separate install requirements for tui
+    slug: no_separate_install_requirements_for_tui
+    updated: '2026-03-10'
+    path: .spec-driver/deltas/DE-089-no_separate_install_requirements_for_tui/DE-089.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: relates_to
+      target: ISSUE-049
+      attributes: {}
+    plan:
+      id: IP-089
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-089
+        delta: DE-089
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-089-P01
+        - id: IP-089.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-089.PHASE-01
+        plan: IP-089
+        delta: DE-089
+        objective: Merge TUI dependencies into main install and remove conditional
+          import gates.
+        entrance_criteria:
+        - DE-089 accepted
+        exit_criteria:
+        - TUI deps in [project.dependencies]
+        - tui extras group removed or aliased
+        - conditional imports cleaned up
+        - uv lock refreshed
+        - lints pass
+        - TUI commands work without extras
+        verification:
+          tests: []
+          evidence:
+          - VA-089-01
+        tasks:
+        - id: '1.1'
+          description: Move TUI deps from optional-dependencies to dependencies
+        - id: '1.2'
+          description: Remove or alias tui extras group
+        - id: '1.3'
+          description: Remove conditional/guarded TUI imports
+        - id: '1.4'
+          description: Refresh uv.lock and verify install
+        risks: []
+      - id: IP-089-P01
+        phase: IP-089-P01

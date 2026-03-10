@@ -10276,7 +10276,7 @@ deltas:
         phase: IP-088-P01
   DE-089:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - no separate install requirements for tui
     slug: no_separate_install_requirements_for_tui
     updated: '2026-03-10'

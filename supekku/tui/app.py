@@ -91,11 +91,7 @@ class SpecDriverApp(App):
 
   async def _watch_files(self) -> None:
     """Watch workspace for file changes and refresh affected registries."""
-    try:
-      from watchfiles import awatch  # noqa: PLC0415
-    except ImportError:
-      logger.debug("watchfiles not available, file watching disabled")
-      return
+    from watchfiles import awatch  # noqa: PLC0415
 
     try:
       async for changes in awatch(self._root, watch_filter=_spec_driver_filter):

@@ -1,6 +1,6 @@
 [project]
 name = "spec-driver"
-version = "0.7.7"
+version = "0.7.9"
 description = "Specification-driving development toolkit"
 authors = [
     { name = "David Lee", email = "dav@davlee.com" }
@@ -13,8 +13,10 @@ dependencies = [
     "jinja2>=3.1.0",
     "pyyaml>=6.0.3",
     "python-frontmatter>=1.1.0",
+    "textual>=8.0,<9.0",
     "tomlkit>=0.13.0",
     "typer>=0.15.0",
+    "watchfiles>=1.0,<2.0",
 ]
 keywords = ["specification", "documentation", "adr", "architecture-decision-records", "spec-sync"]
 classifiers = [
@@ -36,12 +38,6 @@ Repository = "https://github.com/davidlee/spec-driver"
 Issues = "https://github.com/davidlee/spec-driver/issues"
 Website = "https://supekku.dev/"
 
-
-[project.optional-dependencies]
-tui = [
-    "textual>=8.0,<9.0",
-    "watchfiles>=1.0,<2.0",
-]
 
 [project.scripts]
 spec-driver = "supekku.cli.main:main"
@@ -102,7 +98,6 @@ dev = [
     "ruff>=0.14.0",
     "pylint>=4.0.2",
     "pylint-per-file-ignores>=3.1.0",
-    "spec-driver[tui]",
 ]
 
 [tool.pytest.ini_options]

@@ -186,18 +186,8 @@ app.add_typer(
 @app.command("tui", help="Launch the TUI artifact browser")
 def tui_command() -> None:
   """Launch the interactive TUI artifact browser."""
-  try:
-    from supekku.tui.app import SpecDriverApp  # noqa: PLC0415
-  except ImportError:
-    typer.echo(
-      "TUI dependencies not installed. Install with:\n"
-      '  uv pip install -e ".[tui]"\n'
-      "  # or: uv sync --extra tui",
-      err=True,
-    )
-    raise typer.Exit(code=1) from None
-
   from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
+  from supekku.tui.app import SpecDriverApp  # noqa: PLC0415
 
   root = find_repo_root()
   app_instance = SpecDriverApp(root=root)

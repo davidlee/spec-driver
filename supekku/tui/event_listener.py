@@ -137,11 +137,7 @@ async def _tail_log(
   Uses watchfiles to detect changes to events.jsonl. Reads from
   initial_offset forward. Design: DEC-054-02, DEC-054-05.
   """
-  try:
-    from watchfiles import awatch  # noqa: PLC0415
-  except ImportError:
-    logger.warning("watchfiles not available, log-tail mode disabled")
-    return
+  from watchfiles import awatch  # noqa: PLC0415
 
   log_path = run_dir / LOG_FILENAME
   offset = initial_offset

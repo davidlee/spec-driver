@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import io
 import os
+import sys
 import unittest
 from typing import TYPE_CHECKING
 
@@ -205,6 +207,55 @@ class TestDiscoverPlans(RepoTestCase):
 
     assert len(result) == 1
     assert result[0].id == "IP-101"
+
+  def test_malformed_yaml_block_warns_and_skips(self) -> None:
+    """VT-090-P0-3: valid frontmatter but bad plan.overview YAML → warn + skip."""
+    root = self._create_repo()
+    # Write a plan with valid frontmatter but malformed YAML block
+    delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-100-sample"
+    delta_dir.mkdir(parents=True, exist_ok=True)
+    path = delta_dir / "IP-100.md"
+    bad_block = (
+      "```yaml supekku:plan.overview@v1\n"
+      "schema: supekku.plan.overview\n"
+      "version: 1\n"
+      "plan: IP-100\n"
+      "delta: DE-100\n"
+      "phases:\n"
+      "  - id: IP-100-P01\n"
+      "- id: IP-100.PHASE-01\n"  # ← indentation error
+      "```"
+    )
+    frontmatter = {
+      "id": "IP-100",
+      "slug": "de-100_test",
+      "name": "Implementation Plan - IP-100",
+      "created": "2026-03-01",
+      "updated": "2026-03-02",
+      "status": "draft",
+      "kind": "plan",
+    }
+    dump_markdown_file(path, frontmatter, bad_block)
+
+    # Also write a valid plan
+    _write_plan(root, "DE-101", "IP-101")
+
+    captured = io.StringIO()
+    old_stderr = sys.stderr
+    sys.stderr = captured
+    try:
+      result = discover_plans(root)
+    finally:
+      sys.stderr = old_stderr
+
+    # Valid plan returned, broken one skipped
+    assert len(result) == 1
+    assert result[0].id == "IP-101"
+
+    # Warning emitted to stderr
+    warning = captured.getvalue()
+    assert "Warning" in warning
+    assert "IP-100" in warning
 
   def test_plan_summary_is_frozen(self) -> None:
     root = self._create_repo()

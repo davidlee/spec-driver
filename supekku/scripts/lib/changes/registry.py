@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
@@ -207,6 +208,8 @@ def discover_plans(root: Path) -> list[PlanSummary]:
       try:
         frontmatter, body = load_markdown_file(plan_file)
       except Exception:  # noqa: BLE001
+        msg = f"Warning: skipping {plan_file.name}: failed to parse frontmatter"
+        print(msg, file=sys.stderr)
         continue
 
       plan_id = str(frontmatter.get("id", "")).strip()
@@ -216,7 +219,11 @@ def discover_plans(root: Path) -> list[PlanSummary]:
       # Extract delta and phases from plan.overview block
       delta_id = ""
       phase_list: list[dict[str, Any]] = []
-      overview = extract_plan_overview(body, source_path=plan_file)
+      try:
+        overview = extract_plan_overview(body, source_path=plan_file)
+      except ValueError as e:
+        print(f"Warning: skipping {plan_file.name}: {e}", file=sys.stderr)
+        continue
       if overview:
         delta_id = str(overview.data.get("delta", ""))
         phase_list = list(overview.data.get("phases", []))

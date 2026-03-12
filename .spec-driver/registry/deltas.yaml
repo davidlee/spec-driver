@@ -9607,26 +9607,26 @@ deltas:
         tasks:
         - id: '1.1'
           title: Update audit-change with explicit authorship ordering
-          status: todo
+          status: done
         - id: '1.2'
           title: Upgrade shape-revision into the post-audit authorship loop
-          status: todo
+          status: done
         - id: '1.3'
           title: Reassess spec-driver wording for the revision-led create-spec branch
-          status: todo
+          status: done
         - id: '1.4'
           title: Revise PROD-011 for canonical audit-to-spec reconciliation
-          status: todo
+          status: done
         - id: '1.5'
           title: Replace the SPEC-151 stub boundary with explicit responsibilities
-          status: todo
+          status: done
         - id: '1.6'
           title: Patch PROD-001 or PROD-002 only if implementation proves a direct
             wording gap
-          status: todo
+          status: done
         - id: '1.7'
           title: Sync installed skills and reconcile DE/IP/notes
-          status: todo
+          status: done
         risks:
         - description: New-spec wording could drift into a peer audit disposition
             and conflict with DE-079
@@ -10339,3 +10339,146 @@ deltas:
         risks: []
       - id: IP-089-P01
         phase: IP-089-P01
+  DE-090:
+    kind: delta
+    status: draft
+    name: 'Delta - CLI relational navigation: filters, show output, and cross-entity
+      queries'
+    slug: cli_relational_navigation_filters_show_output_and_cross_entity_queries
+    updated: '2026-03-12'
+    path: .spec-driver/deltas/DE-090-cli_relational_navigation_filters_show_output_and_cross_entity_queries/DE-090.md
+    applies_to:
+      specs:
+      - PROD-010
+      - SPEC-110
+      requirements:
+      - PROD-010.FR-005
+    relations:
+    - type: relates_to
+      target: PROD-010
+      attributes:
+        description: CLI UX improvements for relational navigation
+    plan:
+      id: IP-090
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-090
+        delta: DE-090
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-090-P01
+      phases:
+      - id: IP-090-P01
+        phase: IP-090-P01
+  DE-091:
+    kind: delta
+    status: completed
+    name: 'Delta - Cache-optimised boot: pre-hook generates static governance rule
+      file'
+    slug: cache_optimised_boot_pre_hook_generates_static_governance_rule_file
+    updated: '2026-03-12'
+    path: .spec-driver/deltas/DE-091-cache_optimised_boot_pre_hook_generates_static_governance_rule_file/DE-091.md
+    applies_to:
+      specs:
+      - SPEC-129
+      requirements: []
+    plan:
+      id: IP-091
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-091
+        delta: DE-091
+        revision_links:
+          aligns_with:
+          - DR-091
+        specs:
+          primary:
+          - SPEC-129
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-091.PHASE-01
+        - id: IP-091.PHASE-02
+        - id: IP-091.PHASE-03
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-091.PHASE-01
+        plan: IP-091
+        delta: DE-091
+        objective: Implement core preboot module and admin preboot CLI command with
+          tests.
+        entrance_criteria:
+        - DR-091 accepted
+        exit_criteria:
+        - spec-driver admin preboot generates correct output file
+        - All tests pass (just test)
+        - Lints clean (just lint, just pylint-report)
+        verification:
+          tests:
+          - VT-preboot-concat
+          - VT-preboot-idempotent
+          - VT-preboot-tsv
+          evidence: []
+        tasks:
+        - id: '1.1'
+          summary: Create preboot.py core module
+        - id: '1.2'
+          summary: Add admin preboot CLI subcommand
+        - id: '1.3'
+          summary: Write tests for preboot
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-091.PHASE-02
+        plan: IP-091
+        delta: DE-091
+        objective: Wire preboot into startup hook, installer symlink, and boot skill
+          validator.
+        entrance_criteria:
+        - "P01 complete \u2014 preboot command works"
+        exit_criteria:
+        - startup.sh calls preboot before JSON output
+        - Installer creates .claude/rules/ symlink
+        - Boot skill is lightweight validator
+        - All tests pass
+        - Lints clean
+        verification:
+          tests:
+          - VA-boot-validator
+          - VA-graceful-degradation
+          evidence: []
+        tasks:
+        - id: '2.1'
+          summary: Update startup.sh to call preboot
+        - id: '2.2'
+          summary: Installer creates symlink and .agents/ dir
+        - id: '2.3'
+          summary: Boot skill becomes lightweight validator
+        - id: '2.4'
+          summary: Tests for installer changes
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-091.PHASE-03
+        plan: IP-091
+        delta: DE-091
+        objective: None
+        entrance_criteria: []
+        exit_criteria: []
+        verification:
+          tests: []
+          evidence: []
+        tasks: []
+        risks: []

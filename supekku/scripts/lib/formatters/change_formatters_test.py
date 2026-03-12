@@ -345,8 +345,8 @@ class TestFormatRevisionDetails(unittest.TestCase):
       path=Path("/repo/test.md"),
       updated=None,
       relations=[
-        {"kind": "documents", "target": "DE-003"},
-        {"kind": "affects", "target": "SPEC-009"},
+        {"type": "documents", "target": "DE-003"},
+        {"type": "affects", "target": "SPEC-009"},
       ],
     )
 
@@ -371,8 +371,8 @@ class TestFormatRevisionDetails(unittest.TestCase):
         "requirements": ["SPEC-100.FR-001", "SPEC-101.NF-001"],
       },
       relations=[
-        {"kind": "documents", "target": "DE-100"},
-        {"kind": "affects", "target": "SPEC-100"},
+        {"type": "documents", "target": "DE-100"},
+        {"type": "affects", "target": "SPEC-100"},
       ],
     )
     root = Path("/repo")
@@ -476,8 +476,8 @@ class TestFormatDeltaDetails(unittest.TestCase):
       path=Path("/repo/test.md"),
       updated=None,
       relations=[
-        {"kind": "implements", "target": "SPEC-150"},
-        {"kind": "documented_by", "target": "RE-003"},
+        {"type": "implements", "target": "SPEC-150"},
+        {"type": "documented_by", "target": "RE-003"},
       ],
     )
 
@@ -525,8 +525,8 @@ class TestFormatDeltaDetails(unittest.TestCase):
         ],
       },
       relations=[
-        {"kind": "implements", "target": "SPEC-100"},
-        {"kind": "documented_by", "target": "RE-010"},
+        {"type": "implements", "target": "SPEC-100"},
+        {"type": "documented_by", "target": "RE-010"},
       ],
     )
     root = Path("/repo")
@@ -686,7 +686,7 @@ class FormatAuditDetailsTest(unittest.TestCase):
 
   def test_with_relations(self) -> None:
     audit = self._make_audit(
-      relations=[{"kind": "audits", "target": "DE-041"}],
+      relations=[{"type": "audits", "target": "DE-041"}],
     )
     result = format_audit_details(audit)
     assert "audits: DE-041" in result

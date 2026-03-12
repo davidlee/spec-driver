@@ -457,9 +457,9 @@ def _format_relations(artifact: ChangeArtifact) -> list[str]:
 
   lines = ["", "Relations:"]
   for relation in artifact.relations:
-    kind = relation.get("kind", "")
+    rel_type = relation.get("type", "")
     target = relation.get("target", "")
-    lines.append(f"  - {kind}: {target}")
+    lines.append(f"  - {rel_type}: {target}")
 
   return lines
 

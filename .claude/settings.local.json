@@ -44,7 +44,10 @@
       "Bash(git status:*)",
       "Bash(git ls-files:*)",
       "WebFetch(domain:docs.claude.ai)",
-      "WebFetch(domain:docs.anthropic.com)"
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(yes:*)",
+      "Bash(go list:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []

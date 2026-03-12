@@ -4,7 +4,7 @@ slug: 091-cache_optimised_boot_pre_hook_generates_static_governance_rule_file-ph
 name: IP-091 Phase 02
 created: '2026-03-12'
 updated: '2026-03-12'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -61,11 +61,11 @@ Wire the preboot command into the session lifecycle: startup hook invokes it, in
 - [x] P01 complete — `spec-driver admin preboot` works
 
 ## 4. Exit Criteria / Done When
-- [ ] `startup.sh` calls `spec-driver admin preboot` before JSON output
-- [ ] Installer creates `.agents/` dir and `.claude/rules/spec-driver-boot.md` symlink
-- [ ] Boot skill checks for preboot file, warns if missing, prints sigil
-- [ ] `just test` passes
-- [ ] `just lint` passes
+- [x] `startup.sh` calls `spec-driver admin preboot` before JSON output
+- [x] Installer creates `.agents/` dir and `.claude/rules/spec-driver-boot.md` symlink
+- [x] Boot skill checks for preboot file, warns if missing, prints sigil
+- [x] `just test` passes (3856 passed)
+- [x] `just lint` passes
 
 ## 5. Verification
 - `just test`
@@ -81,10 +81,10 @@ Wire the preboot command into the session lifecycle: startup hook invokes it, in
 
 | Status | ID | Description | Parallel? | Notes |
 |---|---|---|---|---|
-| [ ] | 2.1 | Update `startup.sh` to call preboot | | Add one line before JSON output |
-| [ ] | 2.2 | Installer creates symlink + `.agents/` dir | | In `install.py` |
-| [ ] | 2.3 | Boot skill becomes lightweight validator | | `supekku/skills/boot/SKILL.md` |
-| [ ] | 2.4 | Tests for installer symlink creation | | In `admin_test.py` or new test |
+| [x] | 2.1 | Update `startup.sh` to call preboot | | Add one line before JSON output |
+| [x] | 2.2 | Installer creates symlink + `.agents/` dir | | In `install.py` — `_ensure_preboot_symlink()` |
+| [x] | 2.3 | Boot skill becomes lightweight validator | | `supekku/skills/boot/SKILL.md` |
+| [x] | 2.4 | Tests for installer symlink creation | | 7 tests in `install_test.py::TestEnsurePrebootSymlink` |
 
 ### Task Details
 

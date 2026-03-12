@@ -8,6 +8,8 @@ from pathlib import Path
 from unittest.mock import Mock
 
 from supekku.scripts.lib.formatters.spec_formatters import (
+  _format_requirements_summary,
+  _format_spec_relations,
   format_package_list,
   format_spec_details,
   format_spec_list_item,
@@ -51,6 +53,7 @@ class TestFormatSpecListItem(unittest.TestCase):
     spec.slug = slug
     spec.packages = packages or []
     spec.path = path or Path("/tmp/specs/SPEC-001.md")
+    spec.frontmatter.relations = ()
     return spec
 
   def test_basic_format(self) -> None:
@@ -179,6 +182,7 @@ class TestFormatSpecDetails(unittest.TestCase):
     spec.status = status
     spec.packages = packages or []
     spec.path = path or Path("/repo/specify/tech/SPEC-001/SPEC-001.md")
+    spec.frontmatter.relations = ()
     return spec
 
   def test_minimal_spec(self) -> None:
@@ -338,6 +342,7 @@ class TestSpecExternalFields(unittest.TestCase):
     spec.category = ""
     spec.c4_level = ""
     spec.path = Path(f"/repo/specify/tech/{spec_id}/{spec_id}.md")
+    spec.frontmatter.relations = ()
     return spec
 
   def test_details_with_ext_id_only(self) -> None:
@@ -409,6 +414,98 @@ class TestSpecExternalFields(unittest.TestCase):
     fields = result.strip().split("\t")
     assert fields[0] == "SPEC-001"
     assert fields[1] == "Test Spec"
+
+
+# ── VT-090-P0-2: spec relations and requirements summary ────────
+
+
+class TestFormatSpecRelations(unittest.TestCase):
+  """Tests for _format_spec_relations (VT-090-P0-2)."""
+
+  def _make_spec(
+    self,
+    relations: tuple[object, ...] = (),
+  ) -> Mock:
+    spec = Mock()
+    spec.id = "SPEC-001"
+    spec.name = "Test Spec"
+    spec.slug = "test"
+    spec.kind = "spec"
+    spec.status = "active"
+    spec.packages = []
+    spec.ext_id = ""
+    spec.ext_url = ""
+    spec.category = ""
+    spec.c4_level = ""
+    spec.path = Path("/repo/SPEC-001.md")
+    fm = Mock()
+    fm.relations = relations
+    spec.frontmatter = fm
+    return spec
+
+  def _make_relation(self, rel_type: str, target: str) -> Mock:
+    rel = Mock()
+    rel.type = rel_type
+    rel.target = target
+    return rel
+
+  def test_no_relations_returns_empty(self) -> None:
+    spec = self._make_spec(relations=())
+    assert _format_spec_relations(spec) == []
+
+  def test_single_relation(self) -> None:
+    rel = self._make_relation("informs", "SPEC-110")
+    spec = self._make_spec(relations=(rel,))
+    result = _format_spec_relations(spec)
+    assert "Relations:" in result
+    assert "  - informs: SPEC-110" in result
+
+  def test_multiple_relations(self) -> None:
+    rels = (
+      self._make_relation("informs", "SPEC-110"),
+      self._make_relation("supersedes", "SPEC-050"),
+    )
+    spec = self._make_spec(relations=rels)
+    result = _format_spec_relations(spec)
+    assert "  - informs: SPEC-110" in result
+    assert "  - supersedes: SPEC-050" in result
+
+  def test_relations_in_format_spec_details(self) -> None:
+    """Relations section appears in full spec details output."""
+    rel = self._make_relation("informs", "SPEC-110")
+    spec = self._make_spec(relations=(rel,))
+    result = format_spec_details(spec)
+    assert "Relations:" in result
+    assert "informs: SPEC-110" in result
+
+  def test_no_relations_omitted_from_details(self) -> None:
+    """No relations section when spec has none."""
+    spec = self._make_spec(relations=())
+    result = format_spec_details(spec)
+    assert "Relations:" not in result
+
+
+class TestFormatRequirementsSummary(unittest.TestCase):
+  """Tests for _format_requirements_summary (VT-090-P0-2)."""
+
+  def test_no_requirements(self) -> None:
+    assert _format_requirements_summary(0, 0) == []
+
+  def test_fr_only(self) -> None:
+    result = _format_requirements_summary(5, 0)
+    assert "Requirements: 5 FR" in result
+
+  def test_nf_only(self) -> None:
+    result = _format_requirements_summary(0, 3)
+    assert "Requirements: 3 NF" in result
+
+  def test_mixed(self) -> None:
+    result = _format_requirements_summary(10, 3)
+    assert "Requirements: 10 FR, 3 NF" in result
+
+  def test_with_other(self) -> None:
+    result = _format_requirements_summary(5, 2, 1)
+    assert "Requirements: 5 FR, 2 NF, 1 other" in result
 
 
 if __name__ == "__main__":

@@ -205,12 +205,57 @@ def _format_file_path(spec: Spec, root: Path | None = None) -> list[str]:
   return ["", f"File: {spec.path.as_posix()}"]
 
 
-def format_spec_details(spec: Spec, root: Path | None = None) -> str:
+def _format_spec_relations(spec: Spec) -> list[str]:
+  """Format relations section for spec details."""
+  if not spec.frontmatter.relations:
+    return []
+  lines: list[str] = ["", "Relations:"]
+  for rel in spec.frontmatter.relations:
+    lines.append(f"  - {rel.type}: {rel.target}")
+  return lines
+
+
+def _format_requirements_summary(
+  fr_count: int,
+  nf_count: int,
+  other_count: int = 0,
+) -> list[str]:
+  """Format requirements count summary for spec details.
+
+  Args:
+    fr_count: Number of functional requirements.
+    nf_count: Number of non-functional requirements.
+    other_count: Number of other requirements.
+
+  Returns:
+    Lines for the requirements summary, or empty if all counts are zero.
+  """
+  parts: list[str] = []
+  if fr_count:
+    parts.append(f"{fr_count} FR")
+  if nf_count:
+    parts.append(f"{nf_count} NF")
+  if other_count:
+    parts.append(f"{other_count} other")
+  return ["", f"Requirements: {', '.join(parts)}"] if parts else []
+
+
+def format_spec_details(
+  spec: Spec,
+  root: Path | None = None,
+  *,
+  fr_count: int = 0,
+  nf_count: int = 0,
+  other_req_count: int = 0,
+) -> str:
   """Format spec details as multi-line string for display.
 
   Args:
     spec: Specification object to format
     root: Repository root for relative path calculation (optional)
+    fr_count: Number of functional requirements (from RequirementsRegistry)
+    nf_count: Number of non-functional requirements
+    other_req_count: Number of other requirements
 
   Returns:
     Formatted string with all spec details
@@ -220,6 +265,8 @@ def format_spec_details(spec: Spec, root: Path | None = None) -> str:
     _format_taxonomy(spec),
     _format_external_refs(spec),
     _format_packages(spec),
+    _format_spec_relations(spec),
+    _format_requirements_summary(fr_count, nf_count, other_req_count),
     _format_file_path(spec, root),
   ]
 

@@ -63,13 +63,36 @@ def show_spec(
   try:
     ref = resolve_artifact("spec", spec_id, root)
     repo_root = find_repo_root(root)
+
+    # Count requirements for this spec
+    fr_count = nf_count = other_req_count = 0
+    try:
+      from supekku.scripts.lib.requirements.registry import (
+        RequirementsRegistry,  # noqa: PLC0415
+      )
+
+      req_registry = RequirementsRegistry(root=repo_root)
+      for rec in req_registry.iter():
+        if ref.id in rec.specs:
+          if rec.kind == "functional":
+            fr_count += 1
+          elif rec.kind in ("non_functional", "non-functional"):
+            nf_count += 1
+          else:
+            other_req_count += 1
+    except (FileNotFoundError, ValueError):
+      pass  # No requirements registry — counts stay at zero
+
     emit_artifact(
       ref,
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
       content_type=content_type,
-      format_fn=lambda r: format_spec_details(r, root=root),
+      format_fn=lambda r: format_spec_details(
+        r, root=root, fr_count=fr_count, nf_count=nf_count,
+        other_req_count=other_req_count,
+      ),
       json_fn=lambda r: json.dumps(r.to_dict(repo_root), indent=2),
     )
   except ArtifactNotFoundError as e:

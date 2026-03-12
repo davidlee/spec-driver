@@ -11,6 +11,7 @@ import yaml
 
 from supekku.scripts.install import (
   _classify_memory,
+  _ensure_preboot_symlink,
   _find_memory_source,
   _install_claude_config,
   _install_hooks,
@@ -1370,3 +1371,68 @@ class TestInitializeWorkspaceMemories:
     # Memory dir might be created (mkdir), but no files copied
     md_files = list(memory_dir.glob("*.md")) if memory_dir.exists() else []
     assert len(md_files) == 0
+
+
+class TestEnsurePrebootSymlink:
+  """Tests for _ensure_preboot_symlink."""
+
+  def test_creates_symlink(self, tmp_path: Path) -> None:
+    """Creates .claude/rules/spec-driver-boot.md symlink."""
+    _ensure_preboot_symlink(tmp_path)
+
+    link = tmp_path / ".claude" / "rules" / "spec-driver-boot.md"
+    assert link.is_symlink()
+    expected_target = Path("..") / ".." / ".agents" / "spec-driver-boot.md"
+    assert str(link.readlink()) == str(expected_target)
+
+  def test_creates_agents_directory(self, tmp_path: Path) -> None:
+    """Creates .agents/ directory if missing."""
+    _ensure_preboot_symlink(tmp_path)
+
+    assert (tmp_path / ".agents").is_dir()
+
+  def test_creates_rules_directory(self, tmp_path: Path) -> None:
+    """Creates .claude/rules/ directory if missing."""
+    _ensure_preboot_symlink(tmp_path)
+
+    assert (tmp_path / ".claude" / "rules").is_dir()
+
+  def test_idempotent(self, tmp_path: Path) -> None:
+    """Running twice does not fail or change the symlink."""
+    _ensure_preboot_symlink(tmp_path)
+    _ensure_preboot_symlink(tmp_path)
+
+    link = tmp_path / ".claude" / "rules" / "spec-driver-boot.md"
+    assert link.is_symlink()
+
+  def test_skips_real_file(self, tmp_path: Path) -> None:
+    """Does not overwrite a real file at the symlink path."""
+    rules_dir = tmp_path / ".claude" / "rules"
+    rules_dir.mkdir(parents=True)
+    real_file = rules_dir / "spec-driver-boot.md"
+    real_file.write_text("custom content", encoding="utf-8")
+
+    _ensure_preboot_symlink(tmp_path)
+
+    assert not real_file.is_symlink()
+    assert real_file.read_text(encoding="utf-8") == "custom content"
+
+  def test_dry_run(self, tmp_path: Path) -> None:
+    """Dry run does not create symlink."""
+    _ensure_preboot_symlink(tmp_path, dry_run=True)
+
+    link = tmp_path / ".claude" / "rules" / "spec-driver-boot.md"
+    assert not link.exists()
+
+  def test_replaces_stale_symlink(self, tmp_path: Path) -> None:
+    """Replaces a symlink pointing to the wrong target."""
+    rules_dir = tmp_path / ".claude" / "rules"
+    rules_dir.mkdir(parents=True)
+    link = rules_dir / "spec-driver-boot.md"
+    link.symlink_to("/nonexistent/path")
+
+    _ensure_preboot_symlink(tmp_path)
+
+    assert link.is_symlink()
+    expected_target = Path("..") / ".." / ".agents" / "spec-driver-boot.md"
+    assert str(link.readlink()) == str(expected_target)

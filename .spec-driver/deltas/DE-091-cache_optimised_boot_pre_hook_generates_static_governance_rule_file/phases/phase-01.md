@@ -4,7 +4,7 @@ slug: 091-cache_optimised_boot_pre_hook_generates_static_governance_rule_file-ph
 name: IP-091 Phase 01
 created: '2026-03-12'
 updated: '2026-03-12'
-status: draft
+status: complete
 kind: phase
 ---
 
@@ -58,13 +58,13 @@ Implement `supekku/scripts/lib/core/preboot.py` and wire it into `spec-driver ad
 - [x] DR-091 reviewed and accepted
 
 ## 4. Exit Criteria / Done When
-- [ ] `spec-driver admin preboot` generates `.agents/spec-driver-boot.md` with correct content
-- [ ] Generated file contains all 7 boot-sequence source files
-- [ ] Generated file contains 3 governance listings as TSV
-- [ ] Running twice produces identical output (idempotent)
-- [ ] `just test` passes
-- [ ] `just lint` passes
-- [ ] `just pylint-report` — no new warnings in touched files
+- [x] `spec-driver admin preboot` generates `.agents/spec-driver-boot.md` with correct content
+- [x] Generated file contains all 7 boot-sequence source files
+- [x] Generated file contains 3 governance listings as TSV
+- [x] Running twice produces identical output (idempotent)
+- [x] `just test` passes (3849 passed)
+- [x] `just lint` passes
+- [x] `just pylint-report` — no new warnings in touched files
 
 ## 5. Verification
 - `just test` — new `preboot_test.py` tests
@@ -80,9 +80,9 @@ Implement `supekku/scripts/lib/core/preboot.py` and wire it into `spec-driver ad
 
 | Status | ID | Description | Parallel? | Notes |
 |---|---|---|---|---|
-| [ ] | 1.1 | Create `preboot.py` core module | | Pure logic: read files, run CLI, concatenate |
-| [ ] | 1.2 | Add `admin preboot` CLI subcommand | | Thin CLI wiring |
-| [ ] | 1.3 | Write `preboot_test.py` | [P] with 1.1 | TDD — write tests alongside core module |
+| [x] | 1.1 | Create `preboot.py` core module | | Pure logic: read files, run CLI, concatenate |
+| [x] | 1.2 | Add `admin preboot` CLI subcommand | | Thin CLI wiring |
+| [x] | 1.3 | Write `preboot_test.py` | [P] with 1.1 | TDD — 14 tests covering all VT criteria |
 
 ### Task Details
 
@@ -115,6 +115,20 @@ Implement `supekku/scripts/lib/core/preboot.py` and wire it into `spec-driver ad
 | exec resolution edge cases | Check existing `detect_exec_command` usage | Open |
 
 ## 9. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Phase tracking updated
+- [x] Exit criteria satisfied
+- [x] Phase tracking updated
 - [ ] Hand-off notes for P02 (integration)
+
+## Hand-off to P02
+
+P01 delivered:
+- `supekku/scripts/lib/core/preboot.py` — `generate_preboot_content()` and `write_preboot_file()`
+- `supekku/cli/admin.py` — `preboot` subcommand under `admin` group
+- 14 tests in `preboot_test.py`
+- Generated output at `.agents/spec-driver-boot.md` (197 lines)
+
+P02 needs:
+- Wire `startup.sh` to call `uv run spec-driver admin preboot "$PWD"` before JSON output
+- Installer creates `.claude/rules/spec-driver-boot.md` symlink → `../../.agents/spec-driver-boot.md`
+- Boot skill (`supekku/skills/boot/SKILL.md`) becomes lightweight validator
+- Admin CLI group already exists; no `admin` subcommand concerns remain

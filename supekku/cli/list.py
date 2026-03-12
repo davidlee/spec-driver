@@ -445,6 +445,10 @@ def list_deltas(
       help="Substring filter on ID or name (case-insensitive)",
     ),
   ] = None,
+  spec_filter: Annotated[
+    str | None,
+    typer.Option("--spec", help="Filter by spec reference"),
+  ] = None,
   related_to: Annotated[
     str | None,
     typer.Option(
@@ -492,12 +496,14 @@ def list_deltas(
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag filters on ID, name, and slug fields.
   The --implements flag filters by requirement ID (reverse relationship query).
+  The --spec flag filters by spec reference (applies_to.specs + relations).
   The --related-to flag searches all reference slots.
   The --relation flag filters by TYPE:TARGET in .relations only.
 
   Examples:
     list deltas -s draft,in-progress            # Multi-value status filter
     list deltas --implements PROD-010.FR-004     # Reverse relationship query
+    list deltas --spec PROD-010                  # Deltas touching a spec
     list deltas --related-to IMPR-006            # Deltas referencing IMPR-006
     list deltas --relation relates_to:IMPR-006   # By relation type and target
     list deltas --refs                           # Include refs column
@@ -570,6 +576,19 @@ def list_deltas(
       filtered_artifacts.append(artifact)
 
     # Apply generic relation filters
+    if spec_filter:
+      spec_upper = spec_filter.upper()
+      filtered_artifacts = [
+        d
+        for d in filtered_artifacts
+        if spec_upper in [s.upper() for s in (d.applies_to or {}).get("specs", [])]
+        or (
+          d.relations
+          and any(
+            spec_upper in str(rel.get("target", "")).upper() for rel in d.relations
+          )
+        )
+      ]
     if related_to:
       filtered_artifacts = find_related_to(filtered_artifacts, related_to)
     if relation:
@@ -1291,6 +1310,13 @@ def list_requirements(
       help="Output result as JSON (shorthand for --format=json)",
     ),
   ] = False,
+  implemented_by: Annotated[
+    str | None,
+    typer.Option(
+      "--implemented-by",
+      help="Filter to requirements implemented by delta ID (e.g., DE-090 or 90)",
+    ),
+  ] = None,
   source_kind: Annotated[
     str | None,
     typer.Option(
@@ -1307,6 +1333,7 @@ def list_requirements(
   The --regexp flag does pattern matching on UID, label, title, and category fields.
   The --category flag does substring matching on category field.
   The --verified-by flag filters by verification artifact (supports glob patterns).
+  The --implemented-by flag filters to requirements a delta implements.
   Use --case-insensitive (-i) to make regexp and category filters case-insensitive.
 
   Examples:
@@ -1315,6 +1342,7 @@ def list_requirements(
     list requirements --vstatus verified --json   # Verification status filter
     list requirements --spec SPEC-110 --vkind VT  # Combined filters
     list requirements --source-kind issue          # Filter by source
+    list requirements --implemented-by DE-090      # Requirements delta implements
   """
   # --json flag overrides --format
   if json_output:
@@ -1344,6 +1372,32 @@ def list_requirements(
     # Apply filters
     if spec:
       requirements = [r for r in requirements if spec.upper() in r.specs]
+
+    if implemented_by:
+      from supekku.cli.common import normalize_id  # noqa: PLC0415
+      from supekku.scripts.lib.blocks.delta import (  # noqa: PLC0415
+        extract_delta_relationships,
+      )
+      from supekku.scripts.lib.core.spec_utils import (  # noqa: PLC0415
+        load_markdown_file,
+      )
+
+      delta_id = normalize_id("delta", implemented_by)
+      delta_registry = ChangeRegistry(root=root, kind="delta")
+      delta_art = delta_registry.find(delta_id)
+      if delta_art is None:
+        typer.echo(f"Error: delta not found: {delta_id}", err=True)
+        raise typer.Exit(EXIT_FAILURE)
+
+      _, body = load_markdown_file(delta_art.path)
+      rels_block = extract_delta_relationships(body)
+      impl_ids: set[str] = set()
+      if rels_block:
+        impl_ids = {
+          r.upper()
+          for r in rels_block.data.get("requirements", {}).get("implements", [])
+        }
+      requirements = [r for r in requirements if r.uid.upper() in impl_ids]
 
     # Multi-value status filter (OR logic)
     if status:
@@ -1451,6 +1505,10 @@ def list_revisions(
     str | None,
     typer.Option("--spec", help="Filter by spec reference"),
   ] = None,
+  delta: Annotated[
+    str | None,
+    typer.Option("--delta", help="Filter by delta reference (e.g., DE-090 or 90)"),
+  ] = None,
   substring: Annotated[
     str | None,
     typer.Option(
@@ -1503,6 +1561,18 @@ def list_revisions(
         if r.relations
         and any(spec_upper in str(rel.get("target", "")).upper() for rel in r.relations)
       ]
+    if delta:
+      from supekku.cli.common import normalize_id  # noqa: PLC0415
+
+      delta_normalized = normalize_id("delta", delta)
+      revisions = [
+        r
+        for r in revisions
+        if r.relations
+        and any(
+          delta_normalized == str(rel.get("target", "")).upper() for rel in r.relations
+        )
+      ]
     if substring:
       filter_lower = substring.lower()
       revisions = [
@@ -1552,6 +1622,10 @@ def list_audits(
   spec: Annotated[
     str | None,
     typer.Option("--spec", help="Filter by spec reference"),
+  ] = None,
+  delta: Annotated[
+    str | None,
+    typer.Option("--delta", help="Filter by delta reference (e.g., DE-090 or 90)"),
   ] = None,
   substring: Annotated[
     str | None,
@@ -1604,6 +1678,18 @@ def list_audits(
         for a in audits
         if a.relations
         and any(spec_upper in str(rel.get("target", "")).upper() for rel in a.relations)
+      ]
+    if delta:
+      from supekku.cli.common import normalize_id  # noqa: PLC0415
+
+      delta_normalized = normalize_id("delta", delta)
+      audits = [
+        a
+        for a in audits
+        if a.relations
+        and any(
+          delta_normalized == str(rel.get("target", "")).upper() for rel in a.relations
+        )
       ]
     if substring:
       filter_lower = substring.lower()
@@ -1764,6 +1850,13 @@ def list_backlog(
       help="Filter by severity (e.g. p1, p2, p3)",
     ),
   ] = None,
+  related_to: Annotated[
+    str | None,
+    typer.Option(
+      "--related-to",
+      help="Filter items referencing ID in relations (e.g., DE-090, SPEC-110)",
+    ),
+  ] = None,
   json_output: Annotated[
     bool,
     typer.Option(
@@ -1880,6 +1973,17 @@ def list_backlog(
     if substring:
       filter_lower = substring.lower()
       items = [i for i in items if filter_lower in i.title.lower()]
+    if related_to:
+      target_upper = related_to.upper()
+      items = [
+        item
+        for item in items
+        if item.frontmatter.get("relations")
+        and any(
+          target_upper in str(rel.get("target", "")).upper()
+          for rel in item.frontmatter.get("relations", [])
+        )
+      ]
 
     # Apply regexp filter on id, title
     if regexp:

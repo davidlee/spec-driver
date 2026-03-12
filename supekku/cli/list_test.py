@@ -1437,5 +1437,408 @@ class TestListMemoriesStale:
     assert result.exit_code == 0
 
 
+class ListAuditsDeltaFilterTest(unittest.TestCase):
+  """VT-090-P1-4: list audits --delta filters by relation target."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_audits()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_audits(self) -> None:
+    for audit_id, name, relations in [
+      ("AUD-001", "Audit for DE-090", [{"type": "audits", "target": "DE-090"}]),
+      ("AUD-002", "Audit for DE-091", [{"type": "audits", "target": "DE-091"}]),
+      ("AUD-003", "Audit no relations", []),
+    ]:
+      audit_dir = self.root / SPEC_DRIVER_DIR / "audits" / f"{audit_id}-sample"
+      audit_dir.mkdir(parents=True, exist_ok=True)
+      frontmatter = {
+        "id": audit_id,
+        "slug": f"{audit_id.lower()}_sample",
+        "name": name,
+        "created": "2026-03-01",
+        "updated": "2026-03-02",
+        "status": "draft",
+        "kind": "audit",
+        "relations": relations,
+      }
+      fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+      content = f"---\n{fm_yaml}---\n\n# {audit_id}\n"
+      (audit_dir / f"{audit_id}.md").write_text(content, encoding="utf-8")
+
+  def test_delta_filter_matches(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["audits", "--root", str(self.root), "--delta", "DE-090", "--format", "tsv"],
+    )
+    assert result.exit_code == 0
+    assert "AUD-001" in result.stdout
+    assert "AUD-002" not in result.stdout
+
+  def test_delta_filter_bare_numeric(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["audits", "--root", str(self.root), "--delta", "90", "--format", "tsv"],
+    )
+    assert result.exit_code == 0
+    assert "AUD-001" in result.stdout
+
+  def test_delta_filter_no_match(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["audits", "--root", str(self.root), "--delta", "DE-999"],
+    )
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
+
+
+class ListRevisionsDeltaFilterTest(unittest.TestCase):
+  """VT-090-P1-5: list revisions --delta filters by relation target."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_revisions()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_revisions(self) -> None:
+    for rev_id, name, relations in [
+      ("RE-010", "Revision from DE-090", [{"type": "introduces", "target": "DE-090"}]),
+      ("RE-011", "Revision from DE-091", [{"type": "introduces", "target": "DE-091"}]),
+    ]:
+      rev_dir = self.root / SPEC_DRIVER_DIR / "revisions" / f"{rev_id}-sample"
+      rev_dir.mkdir(parents=True, exist_ok=True)
+      frontmatter = {
+        "id": rev_id,
+        "slug": f"{rev_id.lower()}_sample",
+        "name": name,
+        "created": "2026-03-01",
+        "updated": "2026-03-02",
+        "status": "draft",
+        "kind": "revision",
+        "relations": relations,
+      }
+      fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+      content = f"---\n{fm_yaml}---\n\n# {rev_id}\n"
+      (rev_dir / f"{rev_id}.md").write_text(content, encoding="utf-8")
+
+  def test_delta_filter_matches(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["revisions", "--root", str(self.root), "--delta", "DE-090", "--format", "tsv"],
+    )
+    assert result.exit_code == 0
+    assert "RE-010" in result.stdout
+    assert "RE-011" not in result.stdout
+
+  def test_delta_filter_bare_numeric(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["revisions", "--root", str(self.root), "--delta", "90", "--format", "tsv"],
+    )
+    assert result.exit_code == 0
+    assert "RE-010" in result.stdout
+
+  def test_delta_filter_no_match(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["revisions", "--root", str(self.root), "--delta", "DE-999"],
+    )
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
+
+
+class ListRequirementsImplementedByTest(unittest.TestCase):
+  """VT-090-P1-6: list requirements --implemented-by filters via delta lookup."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_fixtures()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_fixtures(self) -> None:
+    # Create a delta with relationships block implementing PROD-010.FR-005
+    delta_dir = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-090-sample"
+    delta_dir.mkdir(parents=True, exist_ok=True)
+    frontmatter = {
+      "id": "DE-090",
+      "slug": "sample_delta",
+      "name": "Sample Delta",
+      "created": "2026-03-01",
+      "updated": "2026-03-02",
+      "status": "in-progress",
+      "kind": "delta",
+      "relations": [],
+      "applies_to": {"specs": ["PROD-010"], "requirements": ["PROD-010.FR-005"]},
+    }
+    fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+    rels_block = (
+      "```yaml supekku:delta.relationships@v1\n"
+      "schema: supekku.delta.relationships\n"
+      "version: 1\n"
+      "delta: DE-090\n"
+      "requirements:\n"
+      "  implements:\n"
+      "  - PROD-010.FR-005\n"
+      "  updates: []\n"
+      "  verifies: []\n"
+      "```\n"
+    )
+    content = f"---\n{fm_yaml}---\n\n# DE-090\n\n{rels_block}"
+    (delta_dir / "DE-090.md").write_text(content, encoding="utf-8")
+
+    # Create requirements registry with matching and non-matching requirements
+    registry_dir = self.root / SPEC_DRIVER_DIR / "registry"
+    registry_dir.mkdir(parents=True, exist_ok=True)
+    reqs = {
+      "requirements": {
+        "PROD-010.FR-005": {
+          "uid": "PROD-010.FR-005",
+          "label": "FR-005",
+          "title": "Reverse relationship queries",
+          "status": "draft",
+          "specs": ["PROD-010"],
+          "source_kind": "spec",
+        },
+        "PROD-010.FR-006": {
+          "uid": "PROD-010.FR-006",
+          "label": "FR-006",
+          "title": "Other requirement",
+          "status": "draft",
+          "specs": ["PROD-010"],
+          "source_kind": "spec",
+        },
+      }
+    }
+    (registry_dir / "requirements.yaml").write_text(
+      yaml.dump(reqs, default_flow_style=False), encoding="utf-8"
+    )
+
+  def test_implemented_by_matches(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "requirements",
+        "--root",
+        str(self.root),
+        "--implemented-by",
+        "DE-090",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "FR-005" in result.stdout
+    assert "FR-006" not in result.stdout
+
+  def test_implemented_by_bare_numeric(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "requirements",
+        "--root",
+        str(self.root),
+        "--implemented-by",
+        "90",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "FR-005" in result.stdout
+
+  def test_implemented_by_not_found(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "requirements",
+        "--root",
+        str(self.root),
+        "--implemented-by",
+        "DE-999",
+      ],
+    )
+    assert result.exit_code != 0
+    combined = result.stdout.lower() + (result.stderr or "").lower()
+    assert "not found" in combined
+
+
+class ListDeltasSpecFilterTest(unittest.TestCase):
+  """VT-090-P1-7: list deltas --spec filters by applies_to.specs and relations."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_deltas()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_deltas(self) -> None:
+    for delta_id, name, applies_to, relations in [
+      (
+        "DE-100",
+        "Touches PROD-010 via applies_to",
+        {"specs": ["PROD-010"], "requirements": []},
+        [],
+      ),
+      (
+        "DE-101",
+        "Touches PROD-010 via relation",
+        {"specs": [], "requirements": []},
+        [{"type": "relates_to", "target": "PROD-010"}],
+      ),
+      (
+        "DE-102",
+        "No spec reference",
+        {"specs": ["SPEC-200"], "requirements": []},
+        [],
+      ),
+    ]:
+      delta_dir = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
+      delta_dir.mkdir(parents=True, exist_ok=True)
+      frontmatter = {
+        "id": delta_id,
+        "slug": f"{delta_id.lower()}_sample",
+        "name": name,
+        "created": "2026-03-01",
+        "updated": "2026-03-02",
+        "status": "draft",
+        "kind": "delta",
+        "relations": relations,
+        "applies_to": applies_to,
+      }
+      fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+      content = f"---\n{fm_yaml}---\n\n# {delta_id}\n"
+      (delta_dir / f"{delta_id}.md").write_text(content, encoding="utf-8")
+
+  def test_spec_filter_matches_applies_to(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["deltas", "--root", str(self.root), "--spec", "PROD-010", "--format", "tsv"],
+    )
+    assert result.exit_code == 0
+    assert "DE-100" in result.stdout
+    assert "DE-101" in result.stdout
+    assert "DE-102" not in result.stdout
+
+  def test_spec_filter_case_insensitive(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["deltas", "--root", str(self.root), "--spec", "prod-010", "--format", "tsv"],
+    )
+    assert result.exit_code == 0
+    assert "DE-100" in result.stdout
+
+  def test_spec_filter_no_match(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["deltas", "--root", str(self.root), "--spec", "SPEC-999"],
+    )
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
+
+
+class ListBacklogRelatedToTest(unittest.TestCase):
+  """VT-090-P1-8: list backlog --related-to filters by frontmatter relations."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_backlog_items()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_backlog_items(self) -> None:
+    for issue_id, title, relations in [
+      (
+        "ISSUE-010",
+        "Issue referencing SPEC-110",
+        [{"type": "relates_to", "target": "SPEC-110"}],
+      ),
+      (
+        "ISSUE-011",
+        "Issue referencing DE-090",
+        [{"type": "relates_to", "target": "DE-090"}],
+      ),
+      ("ISSUE-012", "Issue with no relations", []),
+    ]:
+      issue_dir = self.root / SPEC_DRIVER_DIR / BACKLOG_DIR / ISSUES_SUBDIR / issue_id
+      issue_dir.mkdir(parents=True, exist_ok=True)
+      frontmatter = {
+        "id": issue_id,
+        "name": title,
+        "created": "2026-03-01",
+        "updated": "2026-03-02",
+        "status": "open",
+        "kind": "issue",
+        "relations": relations,
+      }
+      fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+      content = f"---\n{fm_yaml}---\n\n# {issue_id}\n"
+      (issue_dir / f"{issue_id}.md").write_text(content, encoding="utf-8")
+
+  def test_related_to_matches(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "backlog",
+        "--root",
+        str(self.root),
+        "--related-to",
+        "SPEC-110",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "ISSUE-010" in result.stdout
+    assert "ISSUE-011" not in result.stdout
+
+  def test_related_to_case_insensitive(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "backlog",
+        "--root",
+        str(self.root),
+        "--related-to",
+        "de-090",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "ISSUE-011" in result.stdout
+
+  def test_related_to_no_match(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["backlog", "--root", str(self.root), "--related-to", "NONEXISTENT"],
+    )
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ""
+
+
 if __name__ == "__main__":
   unittest.main()

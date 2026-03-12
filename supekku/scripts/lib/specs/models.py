@@ -130,6 +130,10 @@ class Spec:
     if self.ext_url:
       data["ext_url"] = self.ext_url
 
+    # Add relations if present
+    if self.relations:
+      data["relations"] = self.relations
+
     return data
 
 

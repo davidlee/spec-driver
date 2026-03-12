@@ -269,3 +269,19 @@ class SpecRelationsTest(RepoTestCase):
       assert isinstance(rel, dict)
       assert "type" in rel
       assert "target" in rel
+
+  def test_to_dict_includes_relations_when_present(self):
+    root = self._make_repo_with_relations_spec()
+    registry = SpecRegistry(root)
+    data = registry.find("SPEC-020").to_dict(root)
+    assert "relations" in data
+    assert len(data["relations"]) == 2
+    assert data["relations"][0] == {"type": "implements", "target": "PROD-010"}
+    assert data["relations"][1]["type"] == "depends_on"
+    assert data["relations"][1]["target"] == "SPEC-100"
+
+  def test_to_dict_omits_relations_when_absent(self):
+    root = self._make_repo_with_relations_spec()
+    registry = SpecRegistry(root)
+    data = registry.find("SPEC-021").to_dict(root)
+    assert "relations" not in data

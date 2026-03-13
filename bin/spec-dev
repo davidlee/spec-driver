@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+repo_name="$(basename "$repo_root")"
+
+sandbox_base="${XDG_STATE_HOME:-$HOME/.local/state}/pi-mono-sandboxes"
+sandbox_root="${sandbox_base}/${repo_name}"
+
+mkdir -p \
+  "${sandbox_root}/home" \
+  "${sandbox_root}/cache" \
+  "${sandbox_root}/state"
+
+# Minimal inherited env.
+# Add TERM/LANG because shells and some CLIs get grumpy without them.
+exec env -i \
+  HOME="$HOME" \
+  PATH="$PATH" \
+  TERM="xterm-256color" \
+  LANG="${LANG:-C.UTF-8}" \
+  LC_ALL="${LC_ALL:-}" \
+  PROJECT_ROOT="$repo_root" \
+  SANDBOX_ROOT="$sandbox_root" \
+  nix run --impure .#spec-dev-agent -- "$@"

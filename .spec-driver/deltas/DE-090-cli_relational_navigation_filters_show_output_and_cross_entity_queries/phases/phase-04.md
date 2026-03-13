@@ -89,12 +89,12 @@ This unblocks P4 (--referenced-by) and P5 (--related).
 - [x] DR-090 §P3 designed with concrete code examples
 
 ## 4. Exit Criteria / Done When
-- [ ] 4 collectors + dispatcher in `relations/query.py`
-- [ ] `REFERENCE_SOURCES` updated with `domain_field`, `backlog_field`
-- [ ] `collect_references()` chains `_collect_from_domain_fields()`
-- [ ] `list backlog --related-to` uses `matches_related_to()` (replaces raw frontmatter)
-- [ ] VT-090-P3-1 through P3-8 all passing
-- [ ] `just` clean
+- [x] 4 collectors + dispatcher in `relations/query.py`
+- [x] `REFERENCE_SOURCES` updated with `domain_field`, `backlog_field`
+- [x] `collect_references()` chains `_collect_from_domain_fields()`
+- [x] `list backlog --related-to` uses `matches_related_to()` (replaces raw frontmatter)
+- [x] VT-090-P3-1 through P3-8 all passing
+- [x] `just` clean (3935 tests pass, ruff clean)
 
 ## 5. Verification
 - `just test` — full suite
@@ -110,15 +110,15 @@ This unblocks P4 (--referenced-by) and P5 (--related).
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 4.1 | Add domain_field, backlog_field to REFERENCE_SOURCES | [ ] | relation_types.py |
-| [ ] | 4.2 | _collect_from_decision_fields() | [x] | 11 list fields |
-| [ ] | 4.3 | _collect_from_governance_fields() | [x] | Policy/Standard, 8 fields |
-| [ ] | 4.4 | _collect_from_requirement_fields() | [x] | 4 list + scalar primary_spec |
-| [ ] | 4.5 | _collect_from_backlog_fields() | [x] | frontmatter.linked_deltas, related_requirements |
-| [ ] | 4.6 | _collect_from_domain_fields() dispatcher | [ ] | chains 4.2–4.5 |
-| [ ] | 4.7 | Wire into collect_references() | [ ] | depends on 4.6 |
-| [ ] | 4.8 | Update backlog --related-to | [ ] | replace raw frontmatter with matches_related_to() |
-| [ ] | 4.9 | Tests (VT-090-P3-1 through P3-8) | [ ] | TDD: write before/alongside |
+| [x] | 4.1 | Add domain_field, backlog_field to REFERENCE_SOURCES | [ ] | relation_types.py |
+| [x] | 4.2 | _collect_from_decision_fields() | [x] | 11 list fields |
+| [x] | 4.3 | _collect_from_governance_fields() | [x] | 9 fields (includes policies) |
+| [x] | 4.4 | _collect_from_requirement_fields() | [x] | 4 list + scalar primary_spec |
+| [x] | 4.5 | _collect_from_backlog_fields() | [x] | + frontmatter relations |
+| [x] | 4.6 | _collect_from_domain_fields() dispatcher | [ ] | chains 4.2–4.5 |
+| [x] | 4.7 | Wire into collect_references() | [ ] | depends on 4.6 |
+| [x] | 4.8 | Update backlog --related-to | [ ] | matches_related_to() |
+| [x] | 4.9 | Tests (VT-090-P3-1 through P3-8) | [ ] | 87 tests, TDD |
 
 ## 8. Risks & Mitigations
 | Risk | Mitigation | Status |
@@ -127,7 +127,10 @@ This unblocks P4 (--referenced-by) and P5 (--related).
 | Semantic overlap between domain_field and backlog_field sources | Distinct provenance by design (DR-090 §P3-1 vs §P3-2) | resolved |
 
 ## 9. Decisions & Outcomes
-- 2026-03-14 — Following DR-090 exactly: getattr-based collectors, `source="domain_field"` for typed models, `source="backlog_field"` for BacklogItem frontmatter dict.
+- 2026-03-14 — Following DR-090 with minor adaptations: getattr-based collectors, `source="domain_field"` for typed models, `source="backlog_field"` for BacklogItem frontmatter dict.
+- 2026-03-14 — `supersedes`/`superseded_by` detail values overlap with RELATION_TYPES. Semantic separation enforced by `source` field, not detail uniqueness. Test updated.
+- 2026-03-14 — Extracted `_collect_from_list_fields()` helper to DRY the 3 typed model collectors.
+- 2026-03-14 — Added frontmatter `relations` handling to backlog collector since BacklogItem.relations is not a dataclass field.
 
 ## 10. Findings / Research Notes
 - DecisionRecord: 11 fields confirmed (specs, deltas, requirements, revisions, audits, policies, standards, related_decisions, related_policies, supersedes, superseded_by)
@@ -137,7 +140,7 @@ This unblocks P4 (--referenced-by) and P5 (--related).
 - BacklogItem.frontmatter is dict[str, Any]; keys: linked_deltas, related_requirements
 
 ## 11. Wrap-up Checklist
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Spec/Delta/Plan updated with lessons
-- [ ] Hand-off notes to next phase (if any)
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (3935 tests, ruff clean)
+- [x] Spec/Delta/Plan updated with lessons
+- [x] Hand-off notes to next phase: P5 — P4 reverse reference filtering

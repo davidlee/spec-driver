@@ -67,3 +67,28 @@
 - `format_delta_details_json()` returns a JSON string, not a dict — had to parse/enrich/re-encode for delta reverse lookup JSON enrichment.
 
 **Next**: Phase 04 — P3 domain collectors.
+
+### 2026-03-14 — Phase 04 complete
+
+**Done**: All P3 tasks (4.1–4.9) implemented with tests.
+- 4.1: Added `domain_field` and `backlog_field` to `REFERENCE_SOURCES` in `core/relation_types.py`
+- 4.2: `_collect_from_decision_fields()` — 11 list fields via shared `_collect_from_list_fields()` helper
+- 4.3: `_collect_from_governance_fields()` — 9 fields (specs, requirements, deltas, standards, policies, related_policies, related_standards, supersedes, superseded_by)
+- 4.4: `_collect_from_requirement_fields()` — 4 list fields + scalar `primary_spec`
+- 4.5: `_collect_from_backlog_fields()` — `linked_deltas`, `related_requirements`, and `frontmatter["relations"]`
+- 4.6: `_collect_from_domain_fields()` dispatcher chaining all 4 collectors
+- 4.7: Wired into `collect_references()` as final collector
+- 4.8: `list backlog --related-to` now uses `matches_related_to()` instead of raw frontmatter access
+- 4.9: 87 tests covering all collectors, dispatcher, integration, and semantic separation
+
+**Verification**: `pytest` passes — 3935 tests, ruff clean, pylint 10/10 on changed files.
+
+**Findings**:
+- `BacklogItem.relations` not a dataclass field — relations live in `frontmatter["relations"]` dict. `_collect_from_relations()` (getattr-based) misses them. Fixed by adding frontmatter relations handling to `_collect_from_backlog_fields()` with `source="relation"` to preserve semantic meaning.
+- `supersedes`/`superseded_by` field names collide with `RELATION_TYPES` values. DR-090's semantic separation invariant (detail not in RELATION_TYPES) doesn't hold for these. Separation is enforced by `source` ("domain_field" vs "relation"), not detail uniqueness. Tests updated to reflect this reality.
+- Extracted `_collect_from_list_fields(artifact, field_names, source)` shared helper to DRY the 3 typed model collectors (Decision, Governance, Requirement). All use getattr with defaults so non-matching models safely yield no hits.
+- Governance collector has 9 fields (includes `policies`) not 8 as DR stated — StandardRecord has `policies` field that governance collector correctly captures.
+
+**Commits**: `a624653` (phase sheet), `b5597c7` (implementation)
+
+**Next**: Phase 05 — P4 reverse reference filtering.

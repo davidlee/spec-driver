@@ -10242,10 +10242,10 @@ deltas:
         risks: []
   DE-088:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - bare numeric ID normalisation and show/view backlog alias
     slug: bare_numeric_ids_and_show_backlog_alias
-    updated: '2026-03-10'
+    updated: '2026-03-12'
     path: .spec-driver/deltas/DE-088-show_view_commands_lack_id_inference_require_redundant_subcommand_and_full_prefix/DE-088.md
     applies_to:
       specs: []

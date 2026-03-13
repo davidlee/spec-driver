@@ -4,7 +4,7 @@ slug: 090-cli_relational_navigation_filters_show_output_and_cross_entity_queries
 name: IP-090 Phase 05 — P4 reverse reference filtering
 created: '2026-03-14'
 updated: '2026-03-14'
-status: in-progress
+status: completed
 kind: phase
 ---
 
@@ -87,13 +87,13 @@ Implement generic reverse reference filtering infrastructure and CLI surface:
 - [x] DR-090 §P4 design approved
 
 ## 4. Exit Criteria / Done When
-- [ ] `collect_reverse_reference_targets()` and `partition_by_reverse_references()` working
-- [ ] `load_all_artifacts()` in `cli/common.py`
-- [ ] `--referenced-by` / `--not-referenced-by` on list deltas, requirements, audits
-- [ ] `--unaudited` on list deltas
-- [ ] `--unimplemented` on list requirements
-- [ ] VT-090-P4-1 through VT-090-P4-7 passing
-- [ ] Lint clean
+- [x] `collect_reverse_reference_targets()` and `partition_by_reverse_references()` working
+- [x] `load_all_artifacts()` in `cli/common.py`
+- [x] `--referenced-by` / `--not-referenced-by` on list deltas, requirements, audits
+- [x] `--unaudited` on list deltas
+- [x] `--unimplemented` on list requirements
+- [x] VT-090-P4-1 through VT-090-P4-7 passing
+- [x] Lint clean
 
 ## 5. Verification
 - `pytest supekku/scripts/lib/relations/query_test.py -v`
@@ -108,11 +108,11 @@ Implement generic reverse reference filtering infrastructure and CLI surface:
 
 | Status | ID | Description | Notes |
 | --- | --- | --- | --- |
-| [ ] | 5.1 | Query infra: `collect_reverse_reference_targets()`, `partition_by_reverse_references()` | query.py |
-| [ ] | 5.2 | `load_all_artifacts()` helper | cli/common.py |
-| [ ] | 5.3 | `--referenced-by` / `--not-referenced-by` on list deltas | list.py |
-| [ ] | 5.4 | Same flags on list requirements | list.py |
-| [ ] | 5.5 | Same flags on list audits | list.py |
-| [ ] | 5.6 | `--unaudited` alias on list deltas | list.py |
-| [ ] | 5.7 | `--unimplemented` alias on list requirements | list.py |
-| [ ] | 5.8 | Tests for VT-090-P4-1 through P4-7 | query_test.py, list_test.py |
+| [x] | 5.1 | Query infra: `collect_reverse_reference_targets()`, `partition_by_reverse_references()` | query.py |
+| [x] | 5.2 | `load_all_artifacts()` helper | cli/common.py |
+| [x] | 5.3 | `--referenced-by` / `--not-referenced-by` on list deltas | list.py |
+| [x] | 5.4 | Same flags on list requirements | list.py |
+| [x] | 5.5 | Same flags on list audits | list.py |
+| [x] | 5.6 | `--unaudited` alias on list deltas | list.py |
+| [x] | 5.7 | `--unimplemented` alias on list requirements | list.py |
+| [x] | 5.8 | Tests for VT-090-P4-1 through P4-7 | query_test.py, list_test.py |

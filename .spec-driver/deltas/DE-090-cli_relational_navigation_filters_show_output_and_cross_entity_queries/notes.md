@@ -92,3 +92,25 @@
 **Commits**: `a624653` (phase sheet), `b5597c7` (implementation)
 
 **Next**: Phase 05 — P4 reverse reference filtering.
+
+### 2026-03-14 — Phase 05 complete
+
+**Done**: All P4 tasks (5.1–5.8) implemented with tests.
+- 5.1: `collect_reverse_reference_targets()` — collects all uppercased targets from referrers via `collect_references()`
+- 5.2: `partition_by_reverse_references()` — partitions candidates into (referenced, unreferenced) with custom `candidate_id_fn` (needed for requirements using `.uid`)
+- 5.3: `load_all_artifacts()` in `cli/common.py` — shared registry loader for cross-registry queries, lazy imports matching existing patterns
+- 5.4–5.6: `--referenced-by <type>` / `--not-referenced-by <type>` on list deltas, requirements, audits (mutually exclusive)
+- 5.7: `--unaudited` alias on list deltas — expands to `--not-referenced-by audit` + forces `--status completed`; errors on conflict with `--status` or `--not-referenced-by`
+- 5.8: `--unimplemented` alias on list requirements — expands to `--not-referenced-by delta`; errors on conflict with `--not-referenced-by`
+
+**Verification**: `uv run pytest` passes — 3955 tests, ruff clean (only pre-existing UP042 on ContentType).
+
+**Findings**:
+- Used PEP 695 type parameter syntax (`def partition_by_reverse_references[T]`) to satisfy ruff UP047 rule. Works on Python 3.12+.
+- Requirements use `.uid` not `.id` — needed `candidate_id_fn=lambda r: r.uid` in the requirements partition call. This was known from phase 03 notes.
+- `load_all_artifacts()` handles all registry types via lazy imports; `RequirementsRegistry` accepts `root=` kwarg directly.
+- The `ruff format` auto-reformatted 5 files (including our changes) — consistent with project style.
+
+**Commits**: `e31eca9` (phase sheet + implementation + tests)
+
+**Next**: Phase 06 — P5 neighbourhood view (`show --related`).

@@ -18,9 +18,7 @@ from supekku.scripts.lib.core.preboot import (
   write_preboot_file,
 )
 
-_SUBPROCESS_TARGET = (
-  "supekku.scripts.lib.core.preboot.subprocess.run"
-)
+_SUBPROCESS_TARGET = "supekku.scripts.lib.core.preboot.subprocess.run"
 
 
 @contextmanager
@@ -149,6 +147,7 @@ class TestGeneratePrebootContent:
 
   def test_failed_listing(self, workspace: Path) -> None:
     """Failed governance listing produces a comment, not an error."""
+
     def fail_all(cmd, **_kwargs):
       return type("Result", (), {"returncode": 1, "stdout": "", "stderr": "err"})()
 

@@ -90,7 +90,10 @@ def show_spec(
       raw_output=raw_output,
       content_type=content_type,
       format_fn=lambda r: format_spec_details(
-        r, root=root, fr_count=fr_count, nf_count=nf_count,
+        r,
+        root=root,
+        fr_count=fr_count,
+        nf_count=nf_count,
         other_req_count=other_req_count,
       ),
       json_fn=lambda r: json.dumps(r.to_dict(repo_root), indent=2),

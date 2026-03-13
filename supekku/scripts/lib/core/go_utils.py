@@ -98,7 +98,7 @@ def normalize_go_package(pkg: str, module: str) -> str:
       module: Go module name
 
   Returns:
-      Relative package path
+      Relative package path ("." for root package)
 
   Example:
       >>> normalize_go_package(
@@ -106,7 +106,11 @@ def normalize_go_package(pkg: str, module: str) -> str:
       ...     "github.com/user/repo"
       ... )
       "internal/foo"
+      >>> normalize_go_package("github.com/user/repo", "github.com/user/repo")
+      "."
   """
+  if pkg == module:
+    return "."
   if pkg.startswith(module + "/"):
     return pkg[len(module) + 1 :]
   return pkg

@@ -184,13 +184,13 @@ class TestNormalizeGoPackage:
     assert result == "internal/foo"
 
   def test_root_package(self) -> None:
-    """Test root package (module itself)."""
+    """Test root package (module itself) returns '.'."""
     pkg = "github.com/user/repo"
     module = "github.com/user/repo"
 
     result = normalize_go_package(pkg, module)
 
-    assert result == "github.com/user/repo"
+    assert result == "."
 
   def test_nested_package(self) -> None:
     """Test deeply nested package."""

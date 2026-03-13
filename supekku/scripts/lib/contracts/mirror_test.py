@@ -277,6 +277,21 @@ class TestGoMirrorEntries(unittest.TestCase):
     assert public.mirror_path == "internal/foo/bar/interfaces.md"
     assert internal.mirror_path == "internal/foo/bar/internals.md"
 
+  def test_root_package(self) -> None:
+    """Test Go root package '.' maps to __root__/ directory."""
+    (self.contracts_dir / "interfaces.md").write_text("Public API")
+    (self.contracts_dir / "internals.md").write_text("Internals")
+    entries, _ = go_mirror_entries(
+      "SPEC-100",
+      self.contracts_dir,
+      ".",
+    )
+    assert len(entries) == 2
+    public = next(e for e in entries if e.view == "public")
+    internal = next(e for e in entries if e.view == "internal")
+    assert public.mirror_path == "__root__/interfaces.md"
+    assert internal.mirror_path == "__root__/internals.md"
+
 
 class TestTsMirrorEntries(unittest.TestCase):
   """Test TypeScript contract mirror entry production."""
@@ -339,6 +354,15 @@ class TestResolveGoVariantOutputs(unittest.TestCase):
     assert result == {
       "public": root / "public" / "pkg" / "interfaces.md",
       "internal": root / "internal" / "pkg" / "internals.md",
+    }
+
+  def test_root_package(self) -> None:
+    """Test root package '.' maps to __root__/ directory."""
+    root = Path("/repo/.contracts")
+    result = resolve_go_variant_outputs(".", root)
+    assert result == {
+      "public": root / "public" / "__root__" / "interfaces.md",
+      "internal": root / "internal" / "__root__" / "internals.md",
     }
 
 

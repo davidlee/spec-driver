@@ -55,10 +55,12 @@ def resolve_go_variant_outputs(
 
   Go preserves adapter filenames (interfaces.md, internals.md).
   Canonical path: .contracts/<view>/<identifier>/<contract_name>
+  Root package '.' maps to __root__/ with original filenames preserved.
   """
+  dir_name = "__root__" if identifier == "." else identifier
   return {
-    "public": contracts_root / "public" / identifier / "interfaces.md",
-    "internal": contracts_root / "internal" / identifier / "internals.md",
+    "public": contracts_root / "public" / dir_name / "interfaces.md",
+    "internal": contracts_root / "internal" / dir_name / "internals.md",
   }
 
 
@@ -234,10 +236,15 @@ def go_mirror_entries(
     if not contract_path.exists():
       continue
 
+    if identifier == ".":
+      mirror_path = f"__root__/{contract_name}"
+    else:
+      mirror_path = f"{identifier}/{contract_name}"
+
     entries.append(
       MirrorEntry(
         view=view,
-        mirror_path=f"{identifier}/{contract_name}",
+        mirror_path=mirror_path,
         contract_path=contract_path,
         spec_id=spec_id,
       )

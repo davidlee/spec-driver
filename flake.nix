@@ -32,32 +32,39 @@
           then inputs.jailed-agents.lib.${system}.jailed-agents
           else {};
 
+        spec-driver = pkgs.python3Packages.buildPythonApplication {
+          pname = "spec-driver";
+          version = builtins.replaceStrings ["\n"] [""] (builtins.readFile ./VERSION);
+          src = ./.;
+          pyproject = true;
+
+          build-system = with pkgs.python3Packages; [hatchling];
+
+          dependencies = with pkgs.python3Packages; [
+            jinja2
+            pyyaml
+            python-frontmatter
+            textual
+            tomlkit
+            typer
+            watchfiles
+          ];
+
+          doCheck = false;
+        };
+
+        projectPkgs = [spec-driver];
+
         jailPkgs = lib.optionalAttrs isLinux {
-          jailed-pi = jailLib.makeJailedPi {};
-          # jailed-crush = jailLib.makeJailedCrush {};
-          jailed-opencode = jailLib.makeJailedOpencode {};
+          jailed-pi = jailLib.makeJailedPi {extraPkgs = projectPkgs;};
+          # jailed-crush = jailLib.makeJailedCrush {extraPkgs = projectPkgs;};
+          jailed-opencode = jailLib.makeJailedOpencode {extraPkgs = projectPkgs;};
         };
       in {
         packages =
           jailPkgs
           // {
-            default = pkgs.python3Packages.buildPythonApplication {
-              pname = "spec-driver";
-              version = builtins.replaceStrings ["\n"] [""] (builtins.readFile ./VERSION);
-              src = ./.;
-              pyproject = true;
-
-              build-system = with pkgs.python3Packages; [hatchling];
-
-              dependencies = with pkgs.python3Packages; [
-                jinja2
-                pyyaml
-                python-frontmatter
-                typer
-              ];
-
-              doCheck = false;
-            };
+            default = spec-driver;
           };
 
         devshells.default = {

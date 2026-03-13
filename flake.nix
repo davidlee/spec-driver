@@ -43,7 +43,7 @@
           // {
             default = pkgs.python3Packages.buildPythonApplication {
               pname = "spec-driver";
-              version = "0.6.2";
+              version = builtins.replaceStrings ["\n"] [""] (builtins.readFile ./VERSION);
               src = ./.;
               pyproject = true;
 

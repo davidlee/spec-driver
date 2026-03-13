@@ -1,6 +1,6 @@
 [project]
 name = "spec-driver"
-version = "0.7.10"
+dynamic = ["version"]
 description = "Specification-driving development toolkit"
 authors = [
     { name = "David Lee", email = "dav@davlee.com" }
@@ -49,6 +49,10 @@ spec-driver = "supekku.cli.main:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "VERSION"
+pattern = "(?P<version>.+)"
 
 [tool.hatch.build.targets.wheel]
 packages = ["supekku"]

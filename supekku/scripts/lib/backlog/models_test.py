@@ -121,5 +121,76 @@ class BacklogItemExtFieldsTest(unittest.TestCase):
     assert item.ext_url == "https://jira.example.com/JIRA-999"
 
 
+class BacklogItemToDictTest(unittest.TestCase):
+  """VT-090-P2-4: BacklogItem.to_dict() with consistent relational fields."""
+
+  def _make_item(self, **kwargs):  # type: ignore[no-untyped-def]
+    from pathlib import Path  # noqa: PLC0415
+
+    from supekku.scripts.lib.backlog.models import BacklogItem  # noqa: PLC0415
+
+    defaults = {
+      "id": "ISSUE-001",
+      "kind": "issue",
+      "status": "open",
+      "title": "Test issue",
+      "path": Path(),
+    }
+    defaults.update(kwargs)
+    return BacklogItem(**defaults)
+
+  def test_always_includes_linked_deltas(self) -> None:
+    item = self._make_item()
+    data = item.to_dict()
+    assert data["linked_deltas"] == []
+
+  def test_always_includes_related_requirements(self) -> None:
+    item = self._make_item()
+    data = item.to_dict()
+    assert data["related_requirements"] == []
+
+  def test_populated_linked_deltas(self) -> None:
+    item = self._make_item(
+      frontmatter={"linked_deltas": ["DE-081", "DE-090"]},
+    )
+    data = item.to_dict()
+    assert data["linked_deltas"] == ["DE-081", "DE-090"]
+
+  def test_populated_related_requirements(self) -> None:
+    item = self._make_item(
+      frontmatter={"related_requirements": ["PROD-010.FR-005"]},
+    )
+    data = item.to_dict()
+    assert data["related_requirements"] == ["PROD-010.FR-005"]
+
+  def test_basic_fields(self) -> None:
+    item = self._make_item()
+    data = item.to_dict()
+    assert data["id"] == "ISSUE-001"
+    assert data["kind"] == "issue"
+    assert data["status"] == "open"
+    assert data["title"] == "Test issue"
+
+  def test_optional_fields_omitted_when_empty(self) -> None:
+    item = self._make_item()
+    data = item.to_dict()
+    assert "severity" not in data
+    assert "ext_id" not in data
+
+  def test_optional_fields_included_when_populated(self) -> None:
+    item = self._make_item(severity="p1", ext_id="LIN-42")
+    data = item.to_dict()
+    assert data["severity"] == "p1"
+    assert data["ext_id"] == "LIN-42"
+
+  def test_none_linked_deltas_becomes_empty_list(self) -> None:
+    """Frontmatter linked_deltas=None should not leak as None."""
+    item = self._make_item(
+      frontmatter={"linked_deltas": None},
+    )
+    data = item.to_dict()
+    assert data["linked_deltas"] == []
+
+
 if __name__ == "__main__":
   unittest.main()

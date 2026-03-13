@@ -92,3 +92,37 @@ class BacklogItem:
   updated: str = ""
   ext_id: str = ""
   ext_url: str = ""
+
+  def to_dict(self) -> dict[str, Any]:
+    """Serialize to dict with consistent relational fields.
+
+    Always includes ``linked_deltas`` and ``related_requirements`` with ``[]``
+    defaults, ensuring JSON parity between ``list`` and ``show`` output.
+    """
+    data: dict[str, Any] = {
+      "id": self.id,
+      "kind": self.kind,
+      "status": self.status,
+      "title": self.title,
+      "linked_deltas": self.frontmatter.get("linked_deltas", []) or [],
+      "related_requirements": self.frontmatter.get("related_requirements", []) or [],
+    }
+    if self.tags:
+      data["tags"] = self.tags
+    if self.severity:
+      data["severity"] = self.severity
+    if self.categories:
+      data["categories"] = self.categories
+    if self.impact:
+      data["impact"] = self.impact
+    if self.likelihood:
+      data["likelihood"] = self.likelihood
+    if self.created:
+      data["created"] = self.created
+    if self.updated:
+      data["updated"] = self.updated
+    if self.ext_id:
+      data["ext_id"] = self.ext_id
+    if self.ext_url:
+      data["ext_url"] = self.ext_url
+    return data

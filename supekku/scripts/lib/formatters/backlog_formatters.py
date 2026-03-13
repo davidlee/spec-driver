@@ -149,35 +149,7 @@ def format_backlog_list_json(items: Sequence[BacklogItem]) -> str:
   Returns:
     JSON string with structure: {"items": [...]}
   """
-  json_items = []
-  for item in items:
-    json_item = {
-      "id": item.id,
-      "kind": item.kind,
-      "status": item.status,
-      "title": item.title,
-    }
-    # Add optional fields based on kind (only if not empty)
-    if hasattr(item, "severity") and item.severity:
-      json_item["severity"] = item.severity
-    if hasattr(item, "categories") and item.categories:
-      json_item["categories"] = item.categories
-    if hasattr(item, "impact") and item.impact:
-      json_item["impact"] = item.impact
-    if hasattr(item, "likelihood") and item.likelihood:
-      json_item["likelihood"] = item.likelihood
-    if hasattr(item, "created") and item.created:
-      json_item["created"] = item.created
-    if hasattr(item, "updated") and item.updated:
-      json_item["updated"] = item.updated
-    if item.ext_id:
-      json_item["ext_id"] = item.ext_id
-    if item.ext_url:
-      json_item["ext_url"] = item.ext_url
-
-    json_items.append(json_item)
-
-  return format_as_json(json_items)
+  return format_as_json([item.to_dict() for item in items])
 
 
 def format_backlog_details(item: BacklogItem) -> str:

@@ -110,11 +110,11 @@ Enrich `show spec` and `show delta` with reverse lookup information — what oth
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 3.0 | Audit backfill — add relations to 8 audits | [ ] | Prerequisite for 3.3 |
-| [ ] | 3.1 | show spec reverse lookup counts | [ ] | |
-| [ ] | 3.2 | show spec --requirements flag | [x] | Parallel with 3.1 |
-| [ ] | 3.3 | show delta reverse lookups | [x] | Parallel with 3.1/3.2 after 3.0 |
-| [ ] | 3.4 | Backlog JSON consistency | [x] | Parallel with 3.1-3.3 |
+| [x] | 3.0 | Audit backfill — add relations to 6 audits | [ ] | AUD-003–008; AUD-001/002 have no delta |
+| [x] | 3.1 | show spec reverse lookup counts | [ ] | |
+| [x] | 3.2 | show spec --requirements flag | [x] | |
+| [x] | 3.3 | show delta reverse lookups | [x] | |
+| [x] | 3.4 | Backlog JSON consistency | [x] | |
 
 ### Task Details
 

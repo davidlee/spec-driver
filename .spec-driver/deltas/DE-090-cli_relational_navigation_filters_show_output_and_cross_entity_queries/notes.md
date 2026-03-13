@@ -49,3 +49,21 @@
 2. Run `just` (full check)
 3. Update phase-01 tracking, mark exit criteria
 4. Hand off to Phase 02 (P1 filters)
+
+### 2026-03-14 — Phase 03 complete
+
+**Done**: All P2 tasks (3.0–3.4) implemented with tests.
+- 3.0: Audit backfill — added `relations: [{type: documents, target: DE-xxx}]` to AUD-003–008 (6 audits; AUD-001/002 have no delta reference)
+- 3.1: `show spec` reverse lookup counts — `_format_reverse_lookup_counts()` in spec_formatters; show.py loads ChangeRegistry per kind (delta/revision/audit), calls `find_related_to()`, passes counts. JSON includes `reverse_lookup_counts` dict.
+- 3.2: `show spec --requirements` — `_format_requirements_list()` in spec_formatters; replaces count summary with full (uid, kind_label, title) list.
+- 3.3: `show delta` reverse lookups — `_format_delta_reverse_lookups()` in change_formatters; show.py loads audit/revision registries, finds related. JSON includes `linked_audits`/`linked_revisions` arrays.
+- 3.4: Backlog JSON consistency — `BacklogItem.to_dict()` always includes `linked_deltas: []` and `related_requirements: []`. Updated `format_backlog_list_json()` to use `to_dict()`. Updated show issue/problem/improvement/risk/backlog JSON to use `to_dict()`.
+
+**Verification**: `just` passes — 3906 tests, ruff clean, pylint 9.72/10 (no new warnings).
+
+**Findings**:
+- `RequirementRecord` uses `.uid` not `.id` — caught during smoke test.
+- AUD-001 (discovery audit) and AUD-002 (test audit) have no delta reference — only 6 of 8 audits needed backfill.
+- `format_delta_details_json()` returns a JSON string, not a dict — had to parse/enrich/re-encode for delta reverse lookup JSON enrichment.
+
+**Next**: Phase 04 — P3 domain collectors.

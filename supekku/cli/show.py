@@ -49,12 +49,15 @@ app = typer.Typer(
 
 
 @app.command("spec")
-def show_spec(
+def show_spec(  # noqa: PLR0913
   spec_id: Annotated[str, typer.Argument(help="Spec ID (e.g., SPEC-009, PROD-042)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  requirements: Annotated[
+    bool, typer.Option("--requirements", help="Show full requirements list")
   ] = False,
   content_type: ContentTypeOption = None,
   root: RootOption = None,
@@ -66,22 +69,76 @@ def show_spec(
 
     # Count requirements for this spec
     fr_count = nf_count = other_req_count = 0
+    requirements_list: list[tuple[str, str, str]] | None = None
     try:
       from supekku.scripts.lib.requirements.registry import (
         RequirementsRegistry,  # noqa: PLC0415
       )
 
       req_registry = RequirementsRegistry(root=repo_root)
+      if requirements:
+        requirements_list = []
       for rec in req_registry.iter():
         if ref.id in rec.specs:
           if rec.kind == "functional":
             fr_count += 1
+            label = "FR"
           elif rec.kind in ("non_functional", "non-functional"):
             nf_count += 1
+            label = "NF"
           else:
             other_req_count += 1
+            label = rec.kind
+          if requirements_list is not None:
+            requirements_list.append((rec.uid, label, rec.title))
     except (FileNotFoundError, ValueError):
       pass  # No requirements registry — counts stay at zero
+
+    # Reverse lookup counts: which change artifacts reference this spec
+    delta_count = revision_count = audit_count = 0
+    try:
+      from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
+      from supekku.scripts.lib.relations.query import find_related_to  # noqa: PLC0415
+
+      for kind in ("delta", "revision", "audit"):
+        change_reg = ChangeRegistry(root=repo_root, kind=kind)
+        related = find_related_to(change_reg.iter(), ref.id)
+        if kind == "delta":
+          delta_count = len(related)
+        elif kind == "revision":
+          revision_count = len(related)
+        else:
+          audit_count = len(related)
+    except (FileNotFoundError, ValueError):
+      pass  # No change registry — counts stay at zero
+
+    def _format(r):  # type: ignore[no-untyped-def]
+      return format_spec_details(
+        r,
+        root=root,
+        fr_count=fr_count,
+        nf_count=nf_count,
+        other_req_count=other_req_count,
+        delta_count=delta_count,
+        revision_count=revision_count,
+        audit_count=audit_count,
+        requirements_list=requirements_list,
+      )
+
+    def _json(r):  # type: ignore[no-untyped-def]
+      data = r.to_dict(repo_root)
+      if delta_count or revision_count or audit_count:
+        data["reverse_lookup_counts"] = {
+          "deltas": delta_count,
+          "revisions": revision_count,
+          "audits": audit_count,
+        }
+      if requirements_list is not None:
+        data["requirements"] = [
+          {"id": rid, "kind": kind, "title": title}
+          for rid, kind, title in requirements_list
+        ]
+      return json.dumps(data, indent=2)
 
     emit_artifact(
       ref,
@@ -89,14 +146,8 @@ def show_spec(
       path_only=path_only,
       raw_output=raw_output,
       content_type=content_type,
-      format_fn=lambda r: format_spec_details(
-        r,
-        root=root,
-        fr_count=fr_count,
-        nf_count=nf_count,
-        other_req_count=other_req_count,
-      ),
-      json_fn=lambda r: json.dumps(r.to_dict(repo_root), indent=2),
+      format_fn=_format,
+      json_fn=_json,
     )
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
@@ -117,14 +168,54 @@ def show_delta(
   """Show detailed information about a delta."""
   try:
     ref = resolve_artifact("delta", delta_id, root)
+    repo_root = find_repo_root(root)
+
+    # Reverse lookups: audits and revisions referencing this delta
+    linked_audits: list[tuple[str, str]] = []
+    linked_revisions: list[tuple[str, str]] = []
+    try:
+      from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
+      from supekku.scripts.lib.relations.query import find_related_to  # noqa: PLC0415
+
+      for kind, dest in (("audit", linked_audits), ("revision", linked_revisions)):
+        change_reg = ChangeRegistry(root=repo_root, kind=kind)
+        for artifact in find_related_to(change_reg.iter(), ref.id):
+          dest.append((artifact.id, artifact.name))
+    except (FileNotFoundError, ValueError):
+      pass
+
+    def _format(r):  # type: ignore[no-untyped-def]
+      return format_delta_details(
+        r,
+        root=root,
+        linked_audits=linked_audits,
+        linked_revisions=linked_revisions,
+      )
+
+    def _json(r):  # type: ignore[no-untyped-def]
+      data = format_delta_details_json(r, root=root)
+      # format_delta_details_json returns a JSON string; parse, enrich, re-encode
+      import json as _json_mod  # noqa: PLC0415
+
+      parsed = _json_mod.loads(data)
+      if linked_audits:
+        parsed["linked_audits"] = [
+          {"id": aid, "name": aname} for aid, aname in linked_audits
+        ]
+      if linked_revisions:
+        parsed["linked_revisions"] = [
+          {"id": rid, "name": rname} for rid, rname in linked_revisions
+        ]
+      return _json_mod.dumps(parsed, indent=2)
+
     emit_artifact(
       ref,
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
       content_type=content_type,
-      format_fn=lambda r: format_delta_details(r, root=root),
-      json_fn=lambda r: format_delta_details_json(r, root=root),
+      format_fn=_format,
+      json_fn=_json,
     )
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
@@ -589,7 +680,7 @@ def show_issue(
       format_fn=lambda r: (
         f"Issue: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
       ),
-      json_fn=lambda r: json.dumps(r.frontmatter, indent=2, default=str),
+      json_fn=lambda r: json.dumps(r.to_dict(), indent=2, default=str),
     )
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
@@ -619,7 +710,7 @@ def show_problem(
       format_fn=lambda r: (
         f"Problem: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
       ),
-      json_fn=lambda r: json.dumps(r.frontmatter, indent=2, default=str),
+      json_fn=lambda r: json.dumps(r.to_dict(), indent=2, default=str),
     )
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
@@ -651,7 +742,7 @@ def show_improvement(
       format_fn=lambda r: (
         f"Improvement: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
       ),
-      json_fn=lambda r: json.dumps(r.frontmatter, indent=2, default=str),
+      json_fn=lambda r: json.dumps(r.to_dict(), indent=2, default=str),
     )
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
@@ -681,7 +772,7 @@ def show_risk(
       format_fn=lambda r: (
         f"Risk: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
       ),
-      json_fn=lambda r: json.dumps(r.frontmatter, indent=2, default=str),
+      json_fn=lambda r: json.dumps(r.to_dict(), indent=2, default=str),
     )
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
@@ -711,7 +802,7 @@ def show_backlog(
       format_fn=lambda r: (
         f"{r.kind.title()}: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
       ),
-      json_fn=lambda r: json.dumps(r.frontmatter, indent=2, default=str),
+      json_fn=lambda r: json.dumps(r.to_dict(), indent=2, default=str),
     )
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)

@@ -240,6 +240,52 @@ def _format_requirements_summary(
   return ["", f"Requirements: {', '.join(parts)}"] if parts else []
 
 
+def _format_reverse_lookup_counts(
+  delta_count: int = 0,
+  revision_count: int = 0,
+  audit_count: int = 0,
+) -> list[str]:
+  """Format reverse lookup counts for spec details.
+
+  Args:
+    delta_count: Number of deltas referencing this spec.
+    revision_count: Number of revisions referencing this spec.
+    audit_count: Number of audits referencing this spec.
+
+  Returns:
+    Lines for "Related:" section, or empty if all counts are zero.
+  """
+  entries: list[str] = []
+  if delta_count:
+    entries.append(f"  Deltas: {delta_count}")
+  if revision_count:
+    entries.append(f"  Revisions: {revision_count}")
+  if audit_count:
+    entries.append(f"  Audits: {audit_count}")
+  if not entries:
+    return []
+  return ["", "Related:", *entries]
+
+
+def _format_requirements_list(
+  requirements: list[tuple[str, str, str]],
+) -> list[str]:
+  """Format expanded requirements list for --requirements flag.
+
+  Args:
+    requirements: List of (id, kind_label, title) tuples.
+
+  Returns:
+    Lines for the requirements list.
+  """
+  if not requirements:
+    return []
+  lines: list[str] = ["", "Requirements:"]
+  for req_id, kind_label, title in requirements:
+    lines.append(f"  {req_id}  [{kind_label}]  {title}")
+  return lines
+
+
 def format_spec_details(
   spec: Spec,
   root: Path | None = None,
@@ -247,6 +293,10 @@ def format_spec_details(
   fr_count: int = 0,
   nf_count: int = 0,
   other_req_count: int = 0,
+  delta_count: int = 0,
+  revision_count: int = 0,
+  audit_count: int = 0,
+  requirements_list: list[tuple[str, str, str]] | None = None,
 ) -> str:
   """Format spec details as multi-line string for display.
 
@@ -256,17 +306,28 @@ def format_spec_details(
     fr_count: Number of functional requirements (from RequirementsRegistry)
     nf_count: Number of non-functional requirements
     other_req_count: Number of other requirements
+    delta_count: Number of deltas referencing this spec
+    revision_count: Number of revisions referencing this spec
+    audit_count: Number of audits referencing this spec
+    requirements_list: Expanded requirements list (id, kind_label, title) when
+      --requirements flag is used. When provided, replaces the count summary.
 
   Returns:
     Formatted string with all spec details
   """
+  if requirements_list is not None:
+    req_section = _format_requirements_list(requirements_list)
+  else:
+    req_section = _format_requirements_summary(fr_count, nf_count, other_req_count)
+
   sections = [
     _format_basic_fields(spec),
     _format_taxonomy(spec),
     _format_external_refs(spec),
     _format_packages(spec),
     _format_spec_relations(spec),
-    _format_requirements_summary(fr_count, nf_count, other_req_count),
+    req_section,
+    _format_reverse_lookup_counts(delta_count, revision_count, audit_count),
     _format_file_path(spec, root),
   ]
 

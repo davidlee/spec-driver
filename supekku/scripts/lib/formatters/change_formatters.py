@@ -464,6 +464,29 @@ def _format_relations(artifact: ChangeArtifact) -> list[str]:
   return lines
 
 
+def _format_delta_reverse_lookups(
+  linked_audits: list[tuple[str, str]],
+  linked_revisions: list[tuple[str, str]],
+) -> list[str]:
+  """Format reverse lookup section for delta details.
+
+  Args:
+    linked_audits: List of (id, name) tuples for audits referencing this delta.
+    linked_revisions: List of (id, name) for revisions referencing this delta.
+
+  Returns:
+    Lines for the reverse lookup section, or empty if none.
+  """
+  lines: list[str] = []
+  for audit_id, audit_name in linked_audits:
+    lines.append(f"Audit: {audit_id} — {audit_name}")
+  for rev_id, rev_name in linked_revisions:
+    lines.append(f"Revision: {rev_id} — {rev_name}")
+  if lines:
+    lines.insert(0, "")
+  return lines
+
+
 def _format_other_files(
   artifact: ChangeArtifact,
   root: Path | None = None,
@@ -520,12 +543,17 @@ def _format_file_path_for_change(
 def format_delta_details(
   artifact: ChangeArtifact,
   root: Path | None = None,
+  *,
+  linked_audits: list[tuple[str, str]] | None = None,
+  linked_revisions: list[tuple[str, str]] | None = None,
 ) -> str:
   """Format delta details as multi-line string for display.
 
   Args:
     artifact: ChangeArtifact to format
     root: Repository root for relative path calculation (optional)
+    linked_audits: List of (id, name) for audits referencing this delta.
+    linked_revisions: List of (id, name) for revisions referencing this delta.
 
   Returns:
     Formatted string with all delta details
@@ -535,6 +563,10 @@ def format_delta_details(
     _format_applies_to(artifact),
     _format_plan_overview(artifact, root),
     _format_relations(artifact),
+    _format_delta_reverse_lookups(
+      linked_audits or [],
+      linked_revisions or [],
+    ),
     _format_other_files(artifact, root),
     _format_file_path_for_change(artifact, root),
   ]

@@ -8,7 +8,9 @@ from pathlib import Path
 from unittest.mock import Mock
 
 from supekku.scripts.lib.formatters.spec_formatters import (
+  _format_requirements_list,
   _format_requirements_summary,
+  _format_reverse_lookup_counts,
   _format_spec_relations,
   format_package_list,
   format_spec_details,
@@ -506,6 +508,101 @@ class TestFormatRequirementsSummary(unittest.TestCase):
   def test_with_other(self) -> None:
     result = _format_requirements_summary(5, 2, 1)
     assert "Requirements: 5 FR, 2 NF, 1 other" in result
+
+
+class TestFormatReverseLookupCounts(unittest.TestCase):
+  """Tests for _format_reverse_lookup_counts (VT-090-P2-1)."""
+
+  def test_all_zero(self) -> None:
+    assert _format_reverse_lookup_counts(0, 0, 0) == []
+
+  def test_deltas_only(self) -> None:
+    result = _format_reverse_lookup_counts(delta_count=3)
+    assert "Related:" in result
+    assert "  Deltas: 3" in result
+    assert "Revisions" not in "\n".join(result)
+
+  def test_all_populated(self) -> None:
+    result = _format_reverse_lookup_counts(9, 3, 2)
+    text = "\n".join(result)
+    assert "Deltas: 9" in text
+    assert "Revisions: 3" in text
+    assert "Audits: 2" in text
+
+  def test_in_format_spec_details(self) -> None:
+    """Reverse lookup counts appear in full spec details output."""
+    spec = Mock()
+    spec.id = "PROD-010"
+    spec.name = "CLI UX"
+    spec.slug = "cli-ux"
+    spec.kind = "prod"
+    spec.status = "draft"
+    spec.packages = []
+    spec.path = Path("/repo/specs/PROD-010.md")
+    spec.frontmatter.relations = ()
+    result = format_spec_details(spec, delta_count=5, revision_count=2, audit_count=1)
+    assert "Related:" in result
+    assert "Deltas: 5" in result
+    assert "Audits: 1" in result
+
+  def test_no_reverse_lookups_omits_section(self) -> None:
+    spec = Mock()
+    spec.id = "SPEC-001"
+    spec.name = "Test"
+    spec.slug = "test"
+    spec.kind = "spec"
+    spec.status = "draft"
+    spec.packages = []
+    spec.path = Path("/repo/specs/SPEC-001.md")
+    spec.frontmatter.relations = ()
+    result = format_spec_details(spec)
+    assert "Related:" not in result
+
+
+class TestFormatRequirementsList(unittest.TestCase):
+  """Tests for _format_requirements_list (VT-090-P2-2)."""
+
+  def test_empty(self) -> None:
+    assert _format_requirements_list([]) == []
+
+  def test_single_requirement(self) -> None:
+    reqs = [("PROD-010.FR-001", "FR", "Reverse relationship queries")]
+    result = _format_requirements_list(reqs)
+    text = "\n".join(result)
+    assert "Requirements:" in text
+    assert "PROD-010.FR-001  [FR]  Reverse relationship queries" in text
+
+  def test_mixed_kinds(self) -> None:
+    reqs = [
+      ("SPEC-110.FR-001", "FR", "List commands"),
+      ("SPEC-110.NF-001", "NF", "Response time"),
+    ]
+    result = _format_requirements_list(reqs)
+    text = "\n".join(result)
+    assert "[FR]" in text
+    assert "[NF]" in text
+
+  def test_replaces_count_in_details(self) -> None:
+    """When requirements_list is provided, it replaces the count summary."""
+    spec = Mock()
+    spec.id = "SPEC-001"
+    spec.name = "Test"
+    spec.slug = "test"
+    spec.kind = "spec"
+    spec.status = "draft"
+    spec.packages = []
+    spec.path = Path("/repo/specs/SPEC-001.md")
+    spec.frontmatter.relations = ()
+    reqs = [("SPEC-001.FR-001", "FR", "Feature A")]
+    result = format_spec_details(
+      spec,
+      fr_count=1,
+      nf_count=0,
+      requirements_list=reqs,
+    )
+    # Should show full list, not count summary
+    assert "SPEC-001.FR-001  [FR]  Feature A" in result
+    assert "Requirements: 1 FR" not in result
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ from pathlib import Path
 from supekku.scripts.lib.changes.artifacts import ChangeArtifact
 from supekku.scripts.lib.core.paths import AUDITS_SUBDIR, DELTAS_SUBDIR, SPEC_DRIVER_DIR
 from supekku.scripts.lib.formatters.change_formatters import (
+  _format_delta_reverse_lookups,
   format_audit_details,
   format_change_list_item,
   format_change_list_json,
@@ -891,6 +892,59 @@ class TestChangeExternalFields(unittest.TestCase):
     )
     assert "ExtID" in result
     assert "LIN-33" in result
+
+
+class TestFormatDeltaReverseLookups(unittest.TestCase):
+  """Tests for _format_delta_reverse_lookups (VT-090-P2-3)."""
+
+  def test_no_lookups(self) -> None:
+    result = _format_delta_reverse_lookups([], [])
+    assert result == []
+
+  def test_single_audit(self) -> None:
+    result = _format_delta_reverse_lookups(
+      [("AUD-003", "DE-081 conformance")],
+      [],
+    )
+    text = "\n".join(result)
+    assert "Audit: AUD-003 — DE-081 conformance" in text
+
+  def test_single_revision(self) -> None:
+    result = _format_delta_reverse_lookups(
+      [],
+      [("RE-037", "Delta DE-081 completion")],
+    )
+    text = "\n".join(result)
+    assert "Revision: RE-037 — Delta DE-081 completion" in text
+
+  def test_mixed(self) -> None:
+    result = _format_delta_reverse_lookups(
+      [("AUD-003", "Conformance audit")],
+      [("RE-037", "Completion revision")],
+    )
+    text = "\n".join(result)
+    assert "Audit: AUD-003" in text
+    assert "Revision: RE-037" in text
+
+  def test_in_format_delta_details(self) -> None:
+    """Reverse lookups appear in full delta details output."""
+    artifact = ChangeArtifact(
+      id="DE-081",
+      name="Test Delta",
+      slug="test-delta",
+      kind="delta",
+      status="completed",
+      updated="2026-03-01",
+      path=Path("/repo/.spec-driver/deltas/DE-081/DE-081.md"),
+    )
+
+    result = format_delta_details(
+      artifact,
+      linked_audits=[("AUD-003", "Conformance audit")],
+      linked_revisions=[("RE-037", "Completion")],
+    )
+    assert "Audit: AUD-003 — Conformance audit" in result
+    assert "Revision: RE-037 — Completion" in result
 
 
 if __name__ == "__main__":

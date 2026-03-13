@@ -1840,5 +1840,80 @@ class ListBacklogRelatedToTest(unittest.TestCase):
     assert result.stdout.strip() == ""
 
 
+class ListBacklogRelatedToLinkedDeltasTest(unittest.TestCase):
+  """VT-090-P3-8: list backlog --related-to picks up linked_deltas via collector."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_backlog_items()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_backlog_items(self) -> None:
+    for issue_id, title, extra_fm in [
+      (
+        "ISSUE-020",
+        "Issue with linked_deltas",
+        {"linked_deltas": ["DE-050"]},
+      ),
+      (
+        "ISSUE-021",
+        "Issue with related_requirements",
+        {"related_requirements": ["SPEC-100.FR-001"]},
+      ),
+      ("ISSUE-022", "Issue with no links", {}),
+    ]:
+      issue_dir = self.root / SPEC_DRIVER_DIR / BACKLOG_DIR / ISSUES_SUBDIR / issue_id
+      issue_dir.mkdir(parents=True, exist_ok=True)
+      frontmatter = {
+        "id": issue_id,
+        "name": title,
+        "created": "2026-03-01",
+        "updated": "2026-03-02",
+        "status": "open",
+        "kind": "issue",
+        **extra_fm,
+      }
+      fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+      content = f"---\n{fm_yaml}---\n\n# {issue_id}\n"
+      (issue_dir / f"{issue_id}.md").write_text(content, encoding="utf-8")
+
+  def test_linked_deltas_match(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "backlog", "--root", str(self.root),
+        "--related-to", "DE-050", "--format", "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "ISSUE-020" in result.stdout
+    assert "ISSUE-021" not in result.stdout
+
+  def test_related_requirements_match(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "backlog", "--root", str(self.root),
+        "--related-to", "SPEC-100.FR-001", "--format", "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "ISSUE-021" in result.stdout
+    assert "ISSUE-020" not in result.stdout
+
+  def test_no_links_no_match(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["backlog", "--root", str(self.root), "--related-to", "DE-050"],
+    )
+    assert result.exit_code == 0
+    assert "ISSUE-022" not in result.stdout
+
+
 if __name__ == "__main__":
   unittest.main()

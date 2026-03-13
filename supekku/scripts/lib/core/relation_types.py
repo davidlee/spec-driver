@@ -32,6 +32,8 @@ REFERENCE_SOURCES: frozenset[str] = frozenset(
     "applies_to",
     "context_input",
     "informed_by",
+    "domain_field",
+    "backlog_field",
   }
 )
 

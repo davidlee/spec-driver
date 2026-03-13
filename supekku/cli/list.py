@@ -62,7 +62,11 @@ from supekku.scripts.lib.memory.registry import MemoryRegistry
 from supekku.scripts.lib.memory.selection import MatchContext, select
 from supekku.scripts.lib.memory.staleness import compute_batch_staleness
 from supekku.scripts.lib.policies.registry import PolicyRegistry
-from supekku.scripts.lib.relations.query import find_by_relation, find_related_to
+from supekku.scripts.lib.relations.query import (
+  find_by_relation,
+  find_related_to,
+  matches_related_to,
+)
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.standards.registry import StandardRegistry
 
@@ -1974,16 +1978,7 @@ def list_backlog(
       filter_lower = substring.lower()
       items = [i for i in items if filter_lower in i.title.lower()]
     if related_to:
-      target_upper = related_to.upper()
-      items = [
-        item
-        for item in items
-        if item.frontmatter.get("relations")
-        and any(
-          target_upper in str(rel.get("target", "")).upper()
-          for rel in item.frontmatter.get("relations", [])
-        )
-      ]
+      items = [item for item in items if matches_related_to(item, related_to)]
 
     # Apply regexp filter on id, title
     if regexp:

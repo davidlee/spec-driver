@@ -40,7 +40,7 @@ class ReferenceHit:
     target: The referenced artifact ID.
     source: Which slot the reference came from
         (``"relation"``, ``"applies_to"``, ``"context_input"``,
-        ``"informed_by"``).
+        ``"informed_by"``, ``"domain_field"``, ``"backlog_field"``).
     detail: Slot-specific qualifier whose meaning varies by *source*:
 
         - ``source="relation"``: the relation type
@@ -50,6 +50,10 @@ class ReferenceHit:
         - ``source="context_input"``: the context input type
           (e.g. ``"issue"``, ``"research"``)
         - ``source="informed_by"``: always ``"adr"``
+        - ``source="domain_field"``: the field name
+          (e.g. ``"specs"``, ``"implemented_by"``)
+        - ``source="backlog_field"``: the field name
+          (e.g. ``"linked_delta"``, ``"related_requirement"``)
   """
 
   target: str
@@ -115,6 +119,120 @@ def _collect_from_informed_by(artifact: Any) -> list[ReferenceHit]:
   return hits
 
 
+# --- Domain-field collectors (DR-090 §P3) ---
+
+_DECISION_REFERENCE_FIELDS: tuple[str, ...] = (
+  "specs", "deltas", "requirements", "revisions", "audits",
+  "policies", "standards", "related_decisions", "related_policies",
+  "supersedes", "superseded_by",
+)
+
+_GOVERNANCE_REFERENCE_FIELDS: tuple[str, ...] = (
+  "specs", "requirements", "deltas", "standards", "policies",
+  "related_policies", "related_standards",
+  "supersedes", "superseded_by",
+)
+
+_REQUIREMENT_REFERENCE_FIELDS: tuple[str, ...] = (
+  "specs", "implemented_by", "verified_by", "coverage_evidence",
+)
+
+
+def _collect_from_list_fields(
+  artifact: Any,
+  field_names: tuple[str, ...],
+  source: str,
+) -> list[ReferenceHit]:
+  """Extract references from named list-of-str fields on *artifact*."""
+  hits: list[ReferenceHit] = []
+  for field_name in field_names:
+    for target in getattr(artifact, field_name, None) or []:
+      target_str = str(target).strip()
+      if target_str:
+        hits.append(ReferenceHit(
+          target=target_str, source=source, detail=field_name,
+        ))
+  return hits
+
+
+def _collect_from_decision_fields(artifact: Any) -> list[ReferenceHit]:
+  """Extract references from DecisionRecord domain fields."""
+  return _collect_from_list_fields(artifact, _DECISION_REFERENCE_FIELDS, "domain_field")
+
+
+def _collect_from_governance_fields(artifact: Any) -> list[ReferenceHit]:
+  """Extract references from Policy/Standard domain fields."""
+  return _collect_from_list_fields(
+    artifact, _GOVERNANCE_REFERENCE_FIELDS, "domain_field",
+  )
+
+
+def _collect_from_requirement_fields(artifact: Any) -> list[ReferenceHit]:
+  """Extract references from RequirementRecord domain fields."""
+  hits: list[ReferenceHit] = []
+  # Scalar field
+  primary = getattr(artifact, "primary_spec", None)
+  if primary:
+    hits.append(ReferenceHit(
+      target=str(primary).strip(), source="domain_field", detail="primary_spec",
+    ))
+  # List fields
+  hits.extend(_collect_from_list_fields(
+    artifact, _REQUIREMENT_REFERENCE_FIELDS, "domain_field",
+  ))
+  return hits
+
+
+def _collect_from_backlog_fields(artifact: Any) -> list[ReferenceHit]:
+  """Extract references from backlog-specific frontmatter fields.
+
+  BacklogItem stores references in ``frontmatter`` (a dict), not as
+  dataclass fields.  This collector handles ``linked_deltas``,
+  ``related_requirements``, and ``relations`` from the frontmatter dict.
+  """
+  hits: list[ReferenceHit] = []
+  frontmatter = getattr(artifact, "frontmatter", None)
+  if not isinstance(frontmatter, dict):
+    return hits
+  for delta_id in frontmatter.get("linked_deltas", []):
+    target = str(delta_id).strip()
+    if target:
+      hits.append(ReferenceHit(
+        target=target, source="backlog_field", detail="linked_delta",
+      ))
+  for req_id in frontmatter.get("related_requirements", []):
+    target = str(req_id).strip()
+    if target:
+      hits.append(ReferenceHit(
+        target=target, source="backlog_field", detail="related_requirement",
+      ))
+  # BacklogItem.relations live in frontmatter dict, not as a dataclass field
+  for rel in frontmatter.get("relations", []):
+    if not isinstance(rel, dict):
+      continue
+    target = str(rel.get("target", "")).strip()
+    if target:
+      rel_type = str(rel.get("type", "")).strip()
+      hits.append(ReferenceHit(
+        target=target, source="relation", detail=rel_type,
+      ))
+  return hits
+
+
+def _collect_from_domain_fields(artifact: Any) -> list[ReferenceHit]:
+  """Extract references from domain-specific fields (non-relation).
+
+  Chains all domain-family collectors. Uses ``getattr`` with defaults
+  so fields that don't exist on a given model yield no hits.
+  """
+  return (
+    _collect_from_decision_fields(artifact)
+    + _collect_from_governance_fields(artifact)
+    + _collect_from_requirement_fields(artifact)
+    + _collect_from_backlog_fields(artifact)
+  )
+
+
 def collect_references(artifact: Any) -> list[ReferenceHit]:
   """Collect all forward references from an artifact.
 
@@ -124,6 +242,8 @@ def collect_references(artifact: Any) -> list[ReferenceHit]:
   - ``.applies_to`` — ``dict`` with ``specs``, ``requirements``, ``prod`` keys
   - ``.context_inputs`` — ``list[dict]`` with ``type`` and ``id`` keys
   - ``.informed_by`` — ``list[str]`` (spec-specific)
+  - Domain-specific fields via dedicated collectors (Decision, Governance,
+    Requirement, BacklogItem models)
 
   Returns:
     List of :class:`ReferenceHit` with provenance for each reference found.
@@ -133,6 +253,7 @@ def collect_references(artifact: Any) -> list[ReferenceHit]:
     + _collect_from_applies_to(artifact)
     + _collect_from_context_inputs(artifact)
     + _collect_from_informed_by(artifact)
+    + _collect_from_domain_fields(artifact)
   )
 
 
@@ -211,6 +332,11 @@ def find_by_relation(
 __all__ = [
   "ReferenceHit",
   "RelationQueryable",
+  "_collect_from_backlog_fields",
+  "_collect_from_decision_fields",
+  "_collect_from_domain_fields",
+  "_collect_from_governance_fields",
+  "_collect_from_requirement_fields",
   "collect_references",
   "find_by_relation",
   "find_related_to",

@@ -1,4 +1,4 @@
-"""VT-085-001: Tests for generic relation query functions."""
+"""VT-085-001 / VT-090-P3: Tests for generic relation query functions."""
 
 from __future__ import annotations
 
@@ -6,9 +6,15 @@ import unittest
 from dataclasses import dataclass, field
 from typing import Any
 
+from supekku.scripts.lib.core.relation_types import RELATION_TYPES
 from supekku.scripts.lib.relations.query import (
   ReferenceHit,
   RelationQueryable,
+  _collect_from_backlog_fields,
+  _collect_from_decision_fields,
+  _collect_from_domain_fields,
+  _collect_from_governance_fields,
+  _collect_from_requirement_fields,
   collect_references,
   find_by_relation,
   find_related_to,
@@ -54,6 +60,79 @@ class MockBare:
   """Artifact with no reference slots at all."""
 
   id: str = "BARE-001"
+
+
+@dataclass(frozen=True)
+class MockDecision:
+  """Artifact mimicking DecisionRecord domain fields."""
+
+  id: str = "ADR-001"
+  specs: list[str] = field(default_factory=list)
+  deltas: list[str] = field(default_factory=list)
+  requirements: list[str] = field(default_factory=list)
+  revisions: list[str] = field(default_factory=list)
+  audits: list[str] = field(default_factory=list)
+  policies: list[str] = field(default_factory=list)
+  standards: list[str] = field(default_factory=list)
+  related_decisions: list[str] = field(default_factory=list)
+  related_policies: list[str] = field(default_factory=list)
+  supersedes: list[str] = field(default_factory=list)
+  superseded_by: list[str] = field(default_factory=list)
+  relations: list[dict[str, Any]] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class MockPolicy:
+  """Artifact mimicking PolicyRecord domain fields."""
+
+  id: str = "POL-001"
+  specs: list[str] = field(default_factory=list)
+  requirements: list[str] = field(default_factory=list)
+  deltas: list[str] = field(default_factory=list)
+  standards: list[str] = field(default_factory=list)
+  related_policies: list[str] = field(default_factory=list)
+  related_standards: list[str] = field(default_factory=list)
+  supersedes: list[str] = field(default_factory=list)
+  superseded_by: list[str] = field(default_factory=list)
+  relations: list[dict[str, Any]] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class MockStandard:
+  """Artifact mimicking StandardRecord domain fields."""
+
+  id: str = "STD-001"
+  specs: list[str] = field(default_factory=list)
+  requirements: list[str] = field(default_factory=list)
+  deltas: list[str] = field(default_factory=list)
+  policies: list[str] = field(default_factory=list)
+  related_policies: list[str] = field(default_factory=list)
+  related_standards: list[str] = field(default_factory=list)
+  supersedes: list[str] = field(default_factory=list)
+  superseded_by: list[str] = field(default_factory=list)
+  relations: list[dict[str, Any]] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class MockRequirement:
+  """Artifact mimicking RequirementRecord domain fields."""
+
+  id: str = "FR-001"
+  primary_spec: str = ""
+  specs: list[str] = field(default_factory=list)
+  implemented_by: list[str] = field(default_factory=list)
+  verified_by: list[str] = field(default_factory=list)
+  coverage_evidence: list[str] = field(default_factory=list)
+  relations: list[dict[str, Any]] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class MockBacklogItem:
+  """Artifact mimicking BacklogItem with frontmatter dict."""
+
+  id: str = "ISSUE-001"
+  frontmatter: dict[str, Any] = field(default_factory=dict)
+  relations: list[dict[str, Any]] = field(default_factory=list)
 
 
 # --- RelationQueryable Protocol ---
@@ -385,6 +464,365 @@ class FindByRelationTest(unittest.TestCase):
     )
     result = find_by_relation([d1], target="IMPR-006")
     assert result == []
+
+
+# --- VT-090-P3-1: _collect_from_decision_fields ---
+
+
+class CollectFromDecisionFieldsTest(unittest.TestCase):
+  def test_all_11_fields_yield_hits(self) -> None:
+    adr = MockDecision(
+      specs=["SPEC-100"],
+      deltas=["DE-001"],
+      requirements=["FR-001"],
+      revisions=["RE-001"],
+      audits=["AUD-001"],
+      policies=["POL-001"],
+      standards=["STD-001"],
+      related_decisions=["ADR-002"],
+      related_policies=["POL-002"],
+      supersedes=["ADR-000"],
+      superseded_by=["ADR-003"],
+    )
+    hits = _collect_from_decision_fields(adr)
+    assert len(hits) == 11
+    targets = {h.target for h in hits}
+    assert "SPEC-100" in targets
+    assert "DE-001" in targets
+    assert "ADR-002" in targets
+    assert "ADR-000" in targets
+    assert "ADR-003" in targets
+
+  def test_all_hits_have_domain_field_source(self) -> None:
+    adr = MockDecision(specs=["SPEC-100"], deltas=["DE-001"])
+    hits = _collect_from_decision_fields(adr)
+    assert all(h.source == "domain_field" for h in hits)
+
+  def test_detail_is_field_name(self) -> None:
+    adr = MockDecision(specs=["SPEC-100"])
+    hits = _collect_from_decision_fields(adr)
+    assert hits[0].detail == "specs"
+
+  def test_empty_decision_returns_empty(self) -> None:
+    assert _collect_from_decision_fields(MockDecision()) == []
+
+  def test_bare_artifact_returns_empty(self) -> None:
+    assert _collect_from_decision_fields(MockBare()) == []
+
+  def test_multiple_values_in_one_field(self) -> None:
+    adr = MockDecision(specs=["SPEC-100", "SPEC-101", "SPEC-102"])
+    hits = _collect_from_decision_fields(adr)
+    assert len(hits) == 3
+    assert all(h.detail == "specs" for h in hits)
+
+  def test_whitespace_stripped(self) -> None:
+    adr = MockDecision(specs=[" SPEC-100 "])
+    hits = _collect_from_decision_fields(adr)
+    assert hits[0].target == "SPEC-100"
+
+  def test_empty_string_skipped(self) -> None:
+    adr = MockDecision(specs=["", "SPEC-100"])
+    hits = _collect_from_decision_fields(adr)
+    assert len(hits) == 1
+    assert hits[0].target == "SPEC-100"
+
+
+# --- VT-090-P3-2: _collect_from_governance_fields ---
+
+
+class CollectFromGovernanceFieldsTest(unittest.TestCase):
+  def test_policy_fields(self) -> None:
+    pol = MockPolicy(
+      specs=["SPEC-100"],
+      requirements=["FR-001"],
+      deltas=["DE-001"],
+      standards=["STD-001"],
+      related_policies=["POL-002"],
+      related_standards=["STD-002"],
+      supersedes=["POL-000"],
+      superseded_by=["POL-003"],
+    )
+    hits = _collect_from_governance_fields(pol)
+    assert len(hits) == 8
+    assert all(h.source == "domain_field" for h in hits)
+
+  def test_standard_fields(self) -> None:
+    std = MockStandard(
+      specs=["SPEC-100"],
+      requirements=["FR-001"],
+      deltas=["DE-001"],
+      policies=["POL-001"],
+      related_policies=["POL-002"],
+      related_standards=["STD-002"],
+      supersedes=["STD-000"],
+      superseded_by=["STD-003"],
+    )
+    hits = _collect_from_governance_fields(std)
+    # policies field is not in _GOVERNANCE_REFERENCE_FIELDS (Decision-only)
+    # but it IS in Standard model — governance collector covers shared fields
+    assert len(hits) == 8
+    assert all(h.source == "domain_field" for h in hits)
+
+  def test_empty_governance_returns_empty(self) -> None:
+    assert _collect_from_governance_fields(MockPolicy()) == []
+
+  def test_bare_artifact_returns_empty(self) -> None:
+    assert _collect_from_governance_fields(MockBare()) == []
+
+
+# --- VT-090-P3-3: _collect_from_requirement_fields ---
+
+
+class CollectFromRequirementFieldsTest(unittest.TestCase):
+  def test_all_fields_including_primary_spec(self) -> None:
+    req = MockRequirement(
+      primary_spec="SPEC-100",
+      specs=["SPEC-100", "SPEC-101"],
+      implemented_by=["DE-001"],
+      verified_by=["VT-001"],
+      coverage_evidence=["CE-001"],
+    )
+    hits = _collect_from_requirement_fields(req)
+    # 1 scalar + 2 specs + 1 implemented_by + 1 verified_by + 1 coverage_evidence
+    assert len(hits) == 6
+    targets = {h.target for h in hits}
+    assert "SPEC-100" in targets
+    assert "SPEC-101" in targets
+    assert "DE-001" in targets
+
+  def test_scalar_primary_spec(self) -> None:
+    req = MockRequirement(primary_spec="SPEC-100")
+    hits = _collect_from_requirement_fields(req)
+    assert len(hits) == 1
+    assert hits[0] == ReferenceHit(
+      target="SPEC-100", source="domain_field", detail="primary_spec",
+    )
+
+  def test_empty_primary_spec_skipped(self) -> None:
+    req = MockRequirement(primary_spec="")
+    assert _collect_from_requirement_fields(req) == []
+
+  def test_no_primary_spec_attribute(self) -> None:
+    assert _collect_from_requirement_fields(MockBare()) == []
+
+  def test_all_hits_have_domain_field_source(self) -> None:
+    req = MockRequirement(specs=["SPEC-100"], implemented_by=["DE-001"])
+    hits = _collect_from_requirement_fields(req)
+    assert all(h.source == "domain_field" for h in hits)
+
+
+# --- VT-090-P3-4: _collect_from_backlog_fields ---
+
+
+class CollectFromBacklogFieldsTest(unittest.TestCase):
+  def test_linked_deltas(self) -> None:
+    item = MockBacklogItem(
+      frontmatter={"linked_deltas": ["DE-001", "DE-002"]},
+    )
+    hits = _collect_from_backlog_fields(item)
+    assert len(hits) == 2
+    assert all(h.source == "backlog_field" for h in hits)
+    assert all(h.detail == "linked_delta" for h in hits)
+    assert hits[0].target == "DE-001"
+    assert hits[1].target == "DE-002"
+
+  def test_related_requirements(self) -> None:
+    item = MockBacklogItem(
+      frontmatter={"related_requirements": ["FR-001", "NF-002"]},
+    )
+    hits = _collect_from_backlog_fields(item)
+    assert len(hits) == 2
+    assert all(h.detail == "related_requirement" for h in hits)
+
+  def test_mixed_frontmatter(self) -> None:
+    item = MockBacklogItem(
+      frontmatter={
+        "linked_deltas": ["DE-001"],
+        "related_requirements": ["FR-001"],
+      },
+    )
+    hits = _collect_from_backlog_fields(item)
+    assert len(hits) == 2
+
+  def test_empty_frontmatter(self) -> None:
+    item = MockBacklogItem(frontmatter={})
+    assert _collect_from_backlog_fields(item) == []
+
+  def test_no_frontmatter_attribute(self) -> None:
+    assert _collect_from_backlog_fields(MockBare()) == []
+
+  def test_non_dict_frontmatter(self) -> None:
+    item = MockBacklogItem(frontmatter="not-a-dict")  # type: ignore[arg-type]
+    assert _collect_from_backlog_fields(item) == []
+
+  def test_empty_string_skipped(self) -> None:
+    item = MockBacklogItem(
+      frontmatter={"linked_deltas": ["", "DE-001"]},
+    )
+    hits = _collect_from_backlog_fields(item)
+    assert len(hits) == 1
+    assert hits[0].target == "DE-001"
+
+  def test_whitespace_stripped(self) -> None:
+    item = MockBacklogItem(
+      frontmatter={"linked_deltas": [" DE-001 "]},
+    )
+    hits = _collect_from_backlog_fields(item)
+    assert hits[0].target == "DE-001"
+
+  def test_frontmatter_relations(self) -> None:
+    item = MockBacklogItem(
+      frontmatter={"relations": [{"type": "relates_to", "target": "DE-090"}]},
+    )
+    hits = _collect_from_backlog_fields(item)
+    assert len(hits) == 1
+    assert hits[0] == ReferenceHit(
+      target="DE-090", source="relation", detail="relates_to",
+    )
+
+  def test_frontmatter_relations_skips_non_dict(self) -> None:
+    item = MockBacklogItem(
+      frontmatter={"relations": ["not-a-dict"]},
+    )
+    assert _collect_from_backlog_fields(item) == []
+
+  def test_frontmatter_relations_skips_empty_target(self) -> None:
+    item = MockBacklogItem(
+      frontmatter={"relations": [{"type": "relates_to", "target": ""}]},
+    )
+    assert _collect_from_backlog_fields(item) == []
+
+
+# --- VT-090-P3-5: _collect_from_domain_fields dispatcher ---
+
+
+class CollectFromDomainFieldsTest(unittest.TestCase):
+  def test_chains_decision_collector(self) -> None:
+    adr = MockDecision(specs=["SPEC-100"])
+    hits = _collect_from_domain_fields(adr)
+    assert any(h.target == "SPEC-100" and h.source == "domain_field" for h in hits)
+
+  def test_chains_governance_collector(self) -> None:
+    pol = MockPolicy(standards=["STD-001"])
+    hits = _collect_from_domain_fields(pol)
+    assert any(h.target == "STD-001" and h.source == "domain_field" for h in hits)
+
+  def test_chains_requirement_collector(self) -> None:
+    req = MockRequirement(primary_spec="SPEC-100")
+    hits = _collect_from_domain_fields(req)
+    assert any(h.target == "SPEC-100" and h.detail == "primary_spec" for h in hits)
+
+  def test_chains_backlog_collector(self) -> None:
+    item = MockBacklogItem(frontmatter={"linked_deltas": ["DE-001"]})
+    hits = _collect_from_domain_fields(item)
+    assert any(h.target == "DE-001" and h.source == "backlog_field" for h in hits)
+
+  def test_bare_artifact_returns_empty(self) -> None:
+    assert _collect_from_domain_fields(MockBare()) == []
+
+
+# --- VT-090-P3-6: collect_references picks up domain fields ---
+
+
+class CollectReferencesDomainFieldsTest(unittest.TestCase):
+  def test_decision_audits_via_collect_references(self) -> None:
+    # Use a decision-only field to avoid overlap with other collectors
+    adr = MockDecision(audits=["AUD-001"])
+    hits = collect_references(adr)
+    domain_hits = [h for h in hits if h.source == "domain_field"]
+    assert len(domain_hits) == 1
+    assert domain_hits[0].target == "AUD-001"
+
+  def test_backlog_linked_deltas_via_collect_references(self) -> None:
+    item = MockBacklogItem(frontmatter={"linked_deltas": ["DE-001"]})
+    hits = collect_references(item)
+    backlog_hits = [h for h in hits if h.source == "backlog_field"]
+    assert len(backlog_hits) == 1
+    assert backlog_hits[0].target == "DE-001"
+
+  def test_domain_fields_combined_with_relations(self) -> None:
+    adr = MockDecision(
+      relations=[_rel("implements", "PROD-010")],
+      audits=["AUD-001"],
+    )
+    hits = collect_references(adr)
+    sources = {h.source for h in hits}
+    assert "relation" in sources
+    assert "domain_field" in sources
+
+
+# --- VT-090-P3-7: find_related_to matches domain fields ---
+
+
+class FindRelatedToDomainFieldsTest(unittest.TestCase):
+  def test_match_decision_specs(self) -> None:
+    adr = MockDecision(id="ADR-001", specs=["SPEC-100"])
+    result = find_related_to([adr], "SPEC-100")
+    assert len(result) == 1
+    assert result[0].id == "ADR-001"
+
+  def test_match_requirement_implemented_by(self) -> None:
+    req = MockRequirement(id="FR-001", implemented_by=["DE-090"])
+    result = find_related_to([req], "DE-090")
+    assert len(result) == 1
+
+  def test_match_backlog_linked_deltas(self) -> None:
+    item = MockBacklogItem(
+      id="ISSUE-001",
+      frontmatter={"linked_deltas": ["DE-090"]},
+    )
+    result = find_related_to([item], "DE-090")
+    assert len(result) == 1
+
+  def test_no_match_domain_field(self) -> None:
+    adr = MockDecision(id="ADR-001", specs=["SPEC-100"])
+    result = find_related_to([adr], "SPEC-999")
+    assert result == []
+
+
+# --- VT-090-P3-8: semantic separation invariant ---
+
+# Field names "supersedes" and "superseded_by" overlap with RELATION_TYPES
+# by design — they exist in both domains. Semantic separation is enforced
+# by source ("domain_field" vs "relation"), not by detail uniqueness.
+_KNOWN_OVERLAP_FIELDS = {"supersedes", "superseded_by"}
+
+
+class DomainFieldSemanticSeparationTest(unittest.TestCase):
+  """Domain collectors use source="domain_field"/"backlog_field", not "relation"."""
+
+  def test_decision_source_is_domain_field(self) -> None:
+    adr = MockDecision(
+      specs=["SPEC-100"], deltas=["DE-001"], supersedes=["ADR-000"],
+    )
+    hits = _collect_from_decision_fields(adr)
+    assert all(h.source == "domain_field" for h in hits)
+
+  def test_governance_source_is_domain_field(self) -> None:
+    pol = MockPolicy(specs=["SPEC-100"], supersedes=["POL-000"])
+    hits = _collect_from_governance_fields(pol)
+    assert all(h.source == "domain_field" for h in hits)
+
+  def test_requirement_source_is_domain_field(self) -> None:
+    req = MockRequirement(primary_spec="SPEC-100", specs=["SPEC-100"])
+    hits = _collect_from_requirement_fields(req)
+    assert all(h.source == "domain_field" for h in hits)
+
+  def test_backlog_source_is_backlog_field(self) -> None:
+    item = MockBacklogItem(
+      frontmatter={"linked_deltas": ["DE-001"], "related_requirements": ["FR-001"]},
+    )
+    hits = _collect_from_backlog_fields(item)
+    assert all(h.source == "backlog_field" for h in hits)
+
+  def test_non_overlap_details_not_in_relation_types(self) -> None:
+    adr = MockDecision(specs=["SPEC-100"], audits=["AUD-001"])
+    hits = _collect_from_decision_fields(adr)
+    non_overlap = [h for h in hits if h.detail not in _KNOWN_OVERLAP_FIELDS]
+    for h in non_overlap:
+      assert h.detail not in RELATION_TYPES, (
+        f"detail={h.detail!r} unexpectedly collides with RELATION_TYPES"
+      )
 
 
 if __name__ == "__main__":

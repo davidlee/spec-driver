@@ -10,7 +10,7 @@ Design reference: DR-085 §5.2.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol, runtime_checkable
 
@@ -122,19 +122,36 @@ def _collect_from_informed_by(artifact: Any) -> list[ReferenceHit]:
 # --- Domain-field collectors (DR-090 §P3) ---
 
 _DECISION_REFERENCE_FIELDS: tuple[str, ...] = (
-  "specs", "deltas", "requirements", "revisions", "audits",
-  "policies", "standards", "related_decisions", "related_policies",
-  "supersedes", "superseded_by",
+  "specs",
+  "deltas",
+  "requirements",
+  "revisions",
+  "audits",
+  "policies",
+  "standards",
+  "related_decisions",
+  "related_policies",
+  "supersedes",
+  "superseded_by",
 )
 
 _GOVERNANCE_REFERENCE_FIELDS: tuple[str, ...] = (
-  "specs", "requirements", "deltas", "standards", "policies",
-  "related_policies", "related_standards",
-  "supersedes", "superseded_by",
+  "specs",
+  "requirements",
+  "deltas",
+  "standards",
+  "policies",
+  "related_policies",
+  "related_standards",
+  "supersedes",
+  "superseded_by",
 )
 
 _REQUIREMENT_REFERENCE_FIELDS: tuple[str, ...] = (
-  "specs", "implemented_by", "verified_by", "coverage_evidence",
+  "specs",
+  "implemented_by",
+  "verified_by",
+  "coverage_evidence",
 )
 
 
@@ -149,9 +166,13 @@ def _collect_from_list_fields(
     for target in getattr(artifact, field_name, None) or []:
       target_str = str(target).strip()
       if target_str:
-        hits.append(ReferenceHit(
-          target=target_str, source=source, detail=field_name,
-        ))
+        hits.append(
+          ReferenceHit(
+            target=target_str,
+            source=source,
+            detail=field_name,
+          )
+        )
   return hits
 
 
@@ -163,7 +184,9 @@ def _collect_from_decision_fields(artifact: Any) -> list[ReferenceHit]:
 def _collect_from_governance_fields(artifact: Any) -> list[ReferenceHit]:
   """Extract references from Policy/Standard domain fields."""
   return _collect_from_list_fields(
-    artifact, _GOVERNANCE_REFERENCE_FIELDS, "domain_field",
+    artifact,
+    _GOVERNANCE_REFERENCE_FIELDS,
+    "domain_field",
   )
 
 
@@ -173,13 +196,21 @@ def _collect_from_requirement_fields(artifact: Any) -> list[ReferenceHit]:
   # Scalar field
   primary = getattr(artifact, "primary_spec", None)
   if primary:
-    hits.append(ReferenceHit(
-      target=str(primary).strip(), source="domain_field", detail="primary_spec",
-    ))
+    hits.append(
+      ReferenceHit(
+        target=str(primary).strip(),
+        source="domain_field",
+        detail="primary_spec",
+      )
+    )
   # List fields
-  hits.extend(_collect_from_list_fields(
-    artifact, _REQUIREMENT_REFERENCE_FIELDS, "domain_field",
-  ))
+  hits.extend(
+    _collect_from_list_fields(
+      artifact,
+      _REQUIREMENT_REFERENCE_FIELDS,
+      "domain_field",
+    )
+  )
   return hits
 
 
@@ -197,15 +228,23 @@ def _collect_from_backlog_fields(artifact: Any) -> list[ReferenceHit]:
   for delta_id in frontmatter.get("linked_deltas", []):
     target = str(delta_id).strip()
     if target:
-      hits.append(ReferenceHit(
-        target=target, source="backlog_field", detail="linked_delta",
-      ))
+      hits.append(
+        ReferenceHit(
+          target=target,
+          source="backlog_field",
+          detail="linked_delta",
+        )
+      )
   for req_id in frontmatter.get("related_requirements", []):
     target = str(req_id).strip()
     if target:
-      hits.append(ReferenceHit(
-        target=target, source="backlog_field", detail="related_requirement",
-      ))
+      hits.append(
+        ReferenceHit(
+          target=target,
+          source="backlog_field",
+          detail="related_requirement",
+        )
+      )
   # BacklogItem.relations live in frontmatter dict, not as a dataclass field
   for rel in frontmatter.get("relations", []):
     if not isinstance(rel, dict):
@@ -213,9 +252,13 @@ def _collect_from_backlog_fields(artifact: Any) -> list[ReferenceHit]:
     target = str(rel.get("target", "")).strip()
     if target:
       rel_type = str(rel.get("type", "")).strip()
-      hits.append(ReferenceHit(
-        target=target, source="relation", detail=rel_type,
-      ))
+      hits.append(
+        ReferenceHit(
+          target=target,
+          source="relation",
+          detail=rel_type,
+        )
+      )
   return hits
 
 
@@ -301,6 +344,40 @@ def matches_relation(
   return False
 
 
+def collect_reverse_reference_targets(
+  referrers: Iterable[Any],
+) -> set[str]:
+  """Collect all target IDs referenced by a set of artifacts.
+
+  Returns a set of uppercased target IDs for O(1) membership testing.
+  """
+  targets: set[str] = set()
+  for referrer in referrers:
+    for hit in collect_references(referrer):
+      targets.add(hit.target.upper())
+  return targets
+
+
+def partition_by_reverse_references[T](
+  candidates: Sequence[T],
+  referrers: Iterable[Any],
+  candidate_id_fn: Callable[[T], str] = lambda c: c.id,  # type: ignore[attr-defined]
+) -> tuple[list[T], list[T]]:
+  """Partition candidates into (referenced, unreferenced) by referrers.
+
+  Returns a tuple of two lists:
+    - candidates whose ID appears as a target in any referrer's references
+    - candidates whose ID does not
+  """
+  targets = collect_reverse_reference_targets(referrers)
+  referenced: list[T] = []
+  unreferenced: list[T] = []
+  for c in candidates:
+    bucket = referenced if candidate_id_fn(c).upper() in targets else unreferenced
+    bucket.append(c)
+  return referenced, unreferenced
+
+
 def find_related_to(
   artifacts: Iterable[Any],
   target_id: str,
@@ -338,8 +415,10 @@ __all__ = [
   "_collect_from_governance_fields",
   "_collect_from_requirement_fields",
   "collect_references",
+  "collect_reverse_reference_targets",
   "find_by_relation",
   "find_related_to",
   "matches_related_to",
   "matches_relation",
+  "partition_by_reverse_references",
 ]

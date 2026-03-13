@@ -21,6 +21,7 @@ from supekku.cli.common import (
   RegexpOption,
   RootOption,
   TruncateOption,
+  load_all_artifacts,
   matches_regexp,
 )
 from supekku.scripts.lib.cards import CardRegistry
@@ -66,6 +67,7 @@ from supekku.scripts.lib.relations.query import (
   find_by_relation,
   find_related_to,
   matches_related_to,
+  partition_by_reverse_references,
 )
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.standards.registry import StandardRegistry
@@ -467,6 +469,30 @@ def list_deltas(
       help="Filter by relation TYPE:TARGET (e.g., relates_to:IMPR-006)",
     ),
   ] = None,
+  referenced_by: Annotated[
+    str | None,
+    typer.Option(
+      "--referenced-by",
+      help="Keep deltas targeted by artifacts of TYPE (e.g., audit, delta)",
+    ),
+  ] = None,
+  not_referenced_by: Annotated[
+    str | None,
+    typer.Option(
+      "--not-referenced-by",
+      help="Keep deltas NOT targeted by artifacts of TYPE",
+    ),
+  ] = None,
+  unaudited: Annotated[
+    bool,
+    typer.Option(
+      "--unaudited",
+      help=(
+        "Show completed deltas with no audit "
+        "(alias for --not-referenced-by audit -s completed)"
+      ),
+    ),
+  ] = False,
   refs: Annotated[
     bool,
     typer.Option(
@@ -503,6 +529,8 @@ def list_deltas(
   The --spec flag filters by spec reference (applies_to.specs + relations).
   The --related-to flag searches all reference slots.
   The --relation flag filters by TYPE:TARGET in .relations only.
+  The --referenced-by/--not-referenced-by flags filter by reverse references.
+  The --unaudited flag is sugar for --not-referenced-by audit -s completed.
 
   Examples:
     list deltas -s draft,in-progress            # Multi-value status filter
@@ -512,10 +540,34 @@ def list_deltas(
     list deltas --relation relates_to:IMPR-006   # By relation type and target
     list deltas --refs                           # Include refs column
     list deltas --json                           # JSON output
+    list deltas --unaudited                      # Completed deltas without an audit
+    list deltas --referenced-by audit            # Deltas referenced by any audit
   """
   # --json flag overrides --format
   if json_output:
     format_type = "json"
+
+  # --unaudited alias expansion
+  if unaudited:
+    if not_referenced_by:
+      typer.echo(
+        "Error: --unaudited and --not-referenced-by are mutually exclusive",
+        err=True,
+      )
+      raise typer.Exit(EXIT_FAILURE)
+    if status:
+      typer.echo("Error: --unaudited and --status are mutually exclusive", err=True)
+      raise typer.Exit(EXIT_FAILURE)
+    not_referenced_by = "audit"
+    status = "completed"
+
+  # Mutual exclusion: --referenced-by vs --not-referenced-by
+  if referenced_by and not_referenced_by:
+    typer.echo(
+      "Error: --referenced-by and --not-referenced-by are mutually exclusive",
+      err=True,
+    )
+    raise typer.Exit(EXIT_FAILURE)
 
   # Validate format
   if format_type not in ["table", "json", "tsv"]:
@@ -600,6 +652,16 @@ def list_deltas(
       filtered_artifacts = find_by_relation(
         filtered_artifacts, relation_type=rel_type, target=rel_target
       )
+
+    # Apply reverse reference filtering
+    if referenced_by or not_referenced_by:
+      ref_type = referenced_by or not_referenced_by
+      referrers = load_all_artifacts(root, ref_type)
+      referenced, unreferenced = partition_by_reverse_references(
+        filtered_artifacts,
+        referrers,
+      )
+      filtered_artifacts = referenced if referenced_by else unreferenced
 
     if not filtered_artifacts:
       raise typer.Exit(EXIT_SUCCESS)
@@ -1321,6 +1383,30 @@ def list_requirements(
       help="Filter to requirements implemented by delta ID (e.g., DE-090 or 90)",
     ),
   ] = None,
+  referenced_by: Annotated[
+    str | None,
+    typer.Option(
+      "--referenced-by",
+      help="Keep requirements targeted by artifacts of TYPE (e.g., delta)",
+    ),
+  ] = None,
+  not_referenced_by: Annotated[
+    str | None,
+    typer.Option(
+      "--not-referenced-by",
+      help="Keep requirements NOT targeted by artifacts of TYPE",
+    ),
+  ] = None,
+  unimplemented: Annotated[
+    bool,
+    typer.Option(
+      "--unimplemented",
+      help=(
+        "Show requirements not implemented by any delta "
+        "(alias for --not-referenced-by delta)"
+      ),
+    ),
+  ] = False,
   source_kind: Annotated[
     str | None,
     typer.Option(
@@ -1347,10 +1433,30 @@ def list_requirements(
     list requirements --spec SPEC-110 --vkind VT  # Combined filters
     list requirements --source-kind issue          # Filter by source
     list requirements --implemented-by DE-090      # Requirements delta implements
+    list requirements --unimplemented              # Requirements without a delta
+    list requirements --referenced-by delta        # Requirements referenced by deltas
   """
   # --json flag overrides --format
   if json_output:
     format_type = "json"
+
+  # --unimplemented alias expansion
+  if unimplemented:
+    if not_referenced_by:
+      typer.echo(
+        "Error: --unimplemented and --not-referenced-by are mutually exclusive",
+        err=True,
+      )
+      raise typer.Exit(EXIT_FAILURE)
+    not_referenced_by = "delta"
+
+  # Mutual exclusion: --referenced-by vs --not-referenced-by
+  if referenced_by and not_referenced_by:
+    typer.echo(
+      "Error: --referenced-by and --not-referenced-by are mutually exclusive",
+      err=True,
+    )
+    raise typer.Exit(EXIT_FAILURE)
 
   # Validate format
   if format_type not in ["table", "json", "tsv"]:
@@ -1481,6 +1587,17 @@ def list_requirements(
         for r in requirements
         if any(e.get("kind") in vkind_set for e in r.coverage_entries)
       ]
+
+    # Apply reverse reference filtering
+    if referenced_by or not_referenced_by:
+      ref_type = referenced_by or not_referenced_by
+      referrers = load_all_artifacts(repo_root, ref_type)
+      referenced, unreferenced = partition_by_reverse_references(
+        requirements,
+        referrers,
+        candidate_id_fn=lambda r: r.uid,
+      )
+      requirements = referenced if referenced_by else unreferenced
 
     if not requirements:
       raise typer.Exit(EXIT_SUCCESS)
@@ -1649,6 +1766,20 @@ def list_audits(
       help="Output result as JSON (shorthand for --format=json)",
     ),
   ] = False,
+  referenced_by: Annotated[
+    str | None,
+    typer.Option(
+      "--referenced-by",
+      help="Keep audits targeted by artifacts of TYPE",
+    ),
+  ] = None,
+  not_referenced_by: Annotated[
+    str | None,
+    typer.Option(
+      "--not-referenced-by",
+      help="Keep audits NOT targeted by artifacts of TYPE",
+    ),
+  ] = None,
   truncate: TruncateOption = False,
   external: ExternalOption = False,
 ) -> None:
@@ -1656,10 +1787,19 @@ def list_audits(
 
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag does pattern matching on ID, slug, and name fields.
+  The --referenced-by/--not-referenced-by flags filter by reverse references.
   """
   # --json flag overrides --format
   if json_output:
     format_type = "json"
+
+  # Mutual exclusion: --referenced-by vs --not-referenced-by
+  if referenced_by and not_referenced_by:
+    typer.echo(
+      "Error: --referenced-by and --not-referenced-by are mutually exclusive",
+      err=True,
+    )
+    raise typer.Exit(EXIT_FAILURE)
 
   # Validate format
   if format_type not in ["table", "json", "tsv"]:
@@ -1714,6 +1854,16 @@ def list_audits(
       except re.error as e:
         typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
         raise typer.Exit(EXIT_FAILURE) from e
+
+    # Apply reverse reference filtering
+    if referenced_by or not_referenced_by:
+      ref_type = referenced_by or not_referenced_by
+      referrers = load_all_artifacts(root, ref_type)
+      referenced, unreferenced = partition_by_reverse_references(
+        audits,
+        referrers,
+      )
+      audits = referenced if referenced_by else unreferenced
 
     if not audits:
       raise typer.Exit(EXIT_SUCCESS)

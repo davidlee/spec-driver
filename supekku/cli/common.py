@@ -575,6 +575,62 @@ def _resolve_backlog(root: Path, raw_id: str, kind: str) -> ArtifactRef:
   return ArtifactRef(id=item.id, path=item.path, record=item)
 
 
+def load_all_artifacts(root: Path, artifact_type: str) -> list[Any]:
+  """Load all artifacts of a given type for cross-registry queries.
+
+  Used by ``--referenced-by`` / ``--not-referenced-by`` CLI flags to load
+  referrer registries.  Uses lazy imports matching existing common.py patterns.
+
+  Args:
+    root: Repository root path.
+    artifact_type: Artifact type key (e.g. 'audit', 'delta', 'spec').
+
+  Returns:
+    List of artifact records from the resolved registry.
+
+  Raises:
+    typer.BadParameter: If artifact_type is unknown.
+  """
+  if artifact_type in ("delta", "revision", "audit"):
+    from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
+
+    return list(ChangeRegistry(root=root, kind=artifact_type).iter())
+  if artifact_type == "spec":
+    from supekku.scripts.lib.specs.registry import SpecRegistry  # noqa: PLC0415
+
+    return list(SpecRegistry(root=root).all_specs())
+  if artifact_type in ("issue", "problem", "improvement", "risk"):
+    from supekku.scripts.lib.backlog.registry import BacklogRegistry  # noqa: PLC0415
+
+    return [i for i in BacklogRegistry(root=root).iter() if i.kind == artifact_type]
+  if artifact_type == "backlog":
+    from supekku.scripts.lib.backlog.registry import BacklogRegistry  # noqa: PLC0415
+
+    return list(BacklogRegistry(root=root).iter())
+  if artifact_type == "adr":
+    from supekku.scripts.lib.decisions.registry import DecisionRegistry  # noqa: PLC0415
+
+    return list(DecisionRegistry(root=root).iter())
+  if artifact_type == "policy":
+    from supekku.scripts.lib.policies.registry import PolicyRegistry  # noqa: PLC0415
+
+    return list(PolicyRegistry(root=root).iter())
+  if artifact_type == "standard":
+    from supekku.scripts.lib.standards.registry import StandardRegistry  # noqa: PLC0415
+
+    return list(StandardRegistry(root=root).iter())
+  if artifact_type == "requirement":
+    from supekku.scripts.lib.requirements.registry import (  # noqa: PLC0415
+      RequirementsRegistry,
+    )
+
+    return list(RequirementsRegistry(root=root).iter())
+  msg = (
+    f"Unknown artifact type for --referenced-by/--not-referenced-by: {artifact_type}"
+  )
+  raise typer.BadParameter(msg)
+
+
 # Dispatch table: artifact_type -> resolver(root, raw_id) -> ArtifactRef
 _ARTIFACT_RESOLVERS: dict[str, Any] = {
   "spec": _resolve_spec,

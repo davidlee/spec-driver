@@ -1886,8 +1886,13 @@ class ListBacklogRelatedToLinkedDeltasTest(unittest.TestCase):
     result = self.runner.invoke(
       app,
       [
-        "backlog", "--root", str(self.root),
-        "--related-to", "DE-050", "--format", "tsv",
+        "backlog",
+        "--root",
+        str(self.root),
+        "--related-to",
+        "DE-050",
+        "--format",
+        "tsv",
       ],
     )
     assert result.exit_code == 0
@@ -1898,8 +1903,13 @@ class ListBacklogRelatedToLinkedDeltasTest(unittest.TestCase):
     result = self.runner.invoke(
       app,
       [
-        "backlog", "--root", str(self.root),
-        "--related-to", "SPEC-100.FR-001", "--format", "tsv",
+        "backlog",
+        "--root",
+        str(self.root),
+        "--related-to",
+        "SPEC-100.FR-001",
+        "--format",
+        "tsv",
       ],
     )
     assert result.exit_code == 0
@@ -1913,6 +1923,322 @@ class ListBacklogRelatedToLinkedDeltasTest(unittest.TestCase):
     )
     assert result.exit_code == 0
     assert "ISSUE-022" not in result.stdout
+
+
+class ListDeltasReferencedByTest(unittest.TestCase):
+  """VT-090-P4-3/4: --referenced-by / --not-referenced-by on list deltas."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_deltas()
+    self._create_audits()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_deltas(self) -> None:
+    for delta_id, name, status in [
+      ("DE-200", "Audited delta", "completed"),
+      ("DE-201", "Unaudited delta", "completed"),
+      ("DE-202", "Draft delta", "draft"),
+    ]:
+      delta_dir = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
+      delta_dir.mkdir(parents=True, exist_ok=True)
+      frontmatter = {
+        "id": delta_id,
+        "slug": f"{delta_id.lower()}_sample",
+        "name": name,
+        "created": "2026-03-01",
+        "updated": "2026-03-02",
+        "status": status,
+        "kind": "delta",
+        "relations": [],
+        "applies_to": {"specs": [], "requirements": []},
+      }
+      fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+      (delta_dir / f"{delta_id}.md").write_text(
+        f"---\n{fm_yaml}---\n\n# {delta_id}\n", encoding="utf-8"
+      )
+
+  def _create_audits(self) -> None:
+    # AUD-010 references DE-200
+    audit_dir = self.root / SPEC_DRIVER_DIR / "audits" / "AUD-010-sample"
+    audit_dir.mkdir(parents=True, exist_ok=True)
+    frontmatter = {
+      "id": "AUD-010",
+      "slug": "aud_010_sample",
+      "name": "Audit for DE-200",
+      "created": "2026-03-01",
+      "updated": "2026-03-02",
+      "status": "completed",
+      "kind": "audit",
+      "relations": [{"type": "documents", "target": "DE-200"}],
+    }
+    fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+    (audit_dir / "AUD-010.md").write_text(
+      f"---\n{fm_yaml}---\n\n# AUD-010\n", encoding="utf-8"
+    )
+
+  def test_referenced_by_audit(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "deltas",
+        "--root",
+        str(self.root),
+        "--referenced-by",
+        "audit",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "DE-200" in result.stdout
+    assert "DE-201" not in result.stdout
+    assert "DE-202" not in result.stdout
+
+  def test_not_referenced_by_audit(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "deltas",
+        "--root",
+        str(self.root),
+        "--not-referenced-by",
+        "audit",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "DE-200" not in result.stdout
+    assert "DE-201" in result.stdout
+    assert "DE-202" in result.stdout
+
+  def test_mutual_exclusion_error(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "deltas",
+        "--root",
+        str(self.root),
+        "--referenced-by",
+        "audit",
+        "--not-referenced-by",
+        "audit",
+      ],
+    )
+    assert result.exit_code != 0
+    assert (
+      "mutually exclusive" in result.stderr
+      if result.stderr
+      else "mutually exclusive" in result.stdout
+    )
+
+
+class ListDeltasUnauditedTest(unittest.TestCase):
+  """VT-090-P4-5/7: --unaudited alias on list deltas."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_deltas()
+    self._create_audits()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_deltas(self) -> None:
+    for delta_id, name, status in [
+      ("DE-300", "Audited completed", "completed"),
+      ("DE-301", "Unaudited completed", "completed"),
+      ("DE-302", "Draft delta", "draft"),
+    ]:
+      delta_dir = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
+      delta_dir.mkdir(parents=True, exist_ok=True)
+      frontmatter = {
+        "id": delta_id,
+        "slug": f"{delta_id.lower()}_sample",
+        "name": name,
+        "created": "2026-03-01",
+        "updated": "2026-03-02",
+        "status": status,
+        "kind": "delta",
+        "relations": [],
+        "applies_to": {"specs": [], "requirements": []},
+      }
+      fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+      (delta_dir / f"{delta_id}.md").write_text(
+        f"---\n{fm_yaml}---\n\n# {delta_id}\n", encoding="utf-8"
+      )
+
+  def _create_audits(self) -> None:
+    audit_dir = self.root / SPEC_DRIVER_DIR / "audits" / "AUD-020-sample"
+    audit_dir.mkdir(parents=True, exist_ok=True)
+    frontmatter = {
+      "id": "AUD-020",
+      "slug": "aud_020_sample",
+      "name": "Audit for DE-300",
+      "created": "2026-03-01",
+      "updated": "2026-03-02",
+      "status": "completed",
+      "kind": "audit",
+      "relations": [{"type": "documents", "target": "DE-300"}],
+    }
+    fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+    (audit_dir / "AUD-020.md").write_text(
+      f"---\n{fm_yaml}---\n\n# AUD-020\n", encoding="utf-8"
+    )
+
+  def test_unaudited_shows_completed_without_audit(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["deltas", "--root", str(self.root), "--unaudited", "--format", "tsv"],
+    )
+    assert result.exit_code == 0
+    # DE-301 is completed and has no audit
+    assert "DE-301" in result.stdout
+    # DE-300 is completed but has audit
+    assert "DE-300" not in result.stdout
+    # DE-302 is draft (not completed), excluded by status filter
+    assert "DE-302" not in result.stdout
+
+  def test_unaudited_with_status_conflict(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["deltas", "--root", str(self.root), "--unaudited", "--status", "draft"],
+    )
+    assert result.exit_code != 0
+
+  def test_unaudited_with_not_referenced_by_conflict(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "deltas",
+        "--root",
+        str(self.root),
+        "--unaudited",
+        "--not-referenced-by",
+        "delta",
+      ],
+    )
+    assert result.exit_code != 0
+
+
+class ListRequirementsUnimplementedTest(unittest.TestCase):
+  """VT-090-P4-6: --unimplemented alias on list requirements."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_requirements()
+    self._create_deltas()
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_requirements(self) -> None:
+    registry_dir = self.root / ".spec-driver" / "registry"
+    registry_dir.mkdir(parents=True)
+    registry_content = """---
+requirements:
+  SPEC-001.FR-001:
+    uid: SPEC-001.FR-001
+    label: FR-001
+    title: Implemented requirement
+    kind: FR
+    status: pending
+    specs:
+      - SPEC-001
+    primary_spec: SPEC-001
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: .spec-driver/tech/SPEC-001/SPEC-001.md
+    category: null
+  SPEC-001.FR-002:
+    uid: SPEC-001.FR-002
+    label: FR-002
+    title: Unimplemented requirement
+    kind: FR
+    status: pending
+    specs:
+      - SPEC-001
+    primary_spec: SPEC-001
+    introduced: null
+    implemented_by: []
+    verified_by: []
+    path: .spec-driver/tech/SPEC-001/SPEC-001.md
+    category: null
+"""
+    (registry_dir / "requirements.yaml").write_text(registry_content)
+
+  def _create_deltas(self) -> None:
+    # Delta that references SPEC-001.FR-001 via applies_to.requirements
+    delta_dir = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-400-sample"
+    delta_dir.mkdir(parents=True, exist_ok=True)
+    frontmatter = {
+      "id": "DE-400",
+      "slug": "de_400_sample",
+      "name": "Delta implementing FR-001",
+      "created": "2026-03-01",
+      "updated": "2026-03-02",
+      "status": "completed",
+      "kind": "delta",
+      "relations": [],
+      "applies_to": {"specs": ["SPEC-001"], "requirements": ["SPEC-001.FR-001"]},
+    }
+    fm_yaml = yaml.dump(frontmatter, default_flow_style=False)
+    (delta_dir / "DE-400.md").write_text(
+      f"---\n{fm_yaml}---\n\n# DE-400\n", encoding="utf-8"
+    )
+
+  def test_unimplemented_shows_unreferenced(self) -> None:
+    result = self.runner.invoke(
+      app,
+      ["requirements", "--root", str(self.root), "--unimplemented", "--format", "tsv"],
+    )
+    assert result.exit_code == 0
+    assert "FR-002" in result.stdout
+    assert "FR-001" not in result.stdout
+
+  def test_referenced_by_delta(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "requirements",
+        "--root",
+        str(self.root),
+        "--referenced-by",
+        "delta",
+        "--format",
+        "tsv",
+      ],
+    )
+    assert result.exit_code == 0
+    assert "FR-001" in result.stdout
+    assert "FR-002" not in result.stdout
+
+  def test_unimplemented_with_not_referenced_by_conflict(self) -> None:
+    result = self.runner.invoke(
+      app,
+      [
+        "requirements",
+        "--root",
+        str(self.root),
+        "--unimplemented",
+        "--not-referenced-by",
+        "audit",
+      ],
+    )
+    assert result.exit_code != 0
 
 
 if __name__ == "__main__":

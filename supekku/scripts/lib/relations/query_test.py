@@ -16,10 +16,12 @@ from supekku.scripts.lib.relations.query import (
   _collect_from_governance_fields,
   _collect_from_requirement_fields,
   collect_references,
+  collect_reverse_reference_targets,
   find_by_relation,
   find_related_to,
   matches_related_to,
   matches_relation,
+  partition_by_reverse_references,
 )
 
 
@@ -595,7 +597,9 @@ class CollectFromRequirementFieldsTest(unittest.TestCase):
     hits = _collect_from_requirement_fields(req)
     assert len(hits) == 1
     assert hits[0] == ReferenceHit(
-      target="SPEC-100", source="domain_field", detail="primary_spec",
+      target="SPEC-100",
+      source="domain_field",
+      detail="primary_spec",
     )
 
   def test_empty_primary_spec_skipped(self) -> None:
@@ -677,7 +681,9 @@ class CollectFromBacklogFieldsTest(unittest.TestCase):
     hits = _collect_from_backlog_fields(item)
     assert len(hits) == 1
     assert hits[0] == ReferenceHit(
-      target="DE-090", source="relation", detail="relates_to",
+      target="DE-090",
+      source="relation",
+      detail="relates_to",
     )
 
   def test_frontmatter_relations_skips_non_dict(self) -> None:
@@ -793,7 +799,9 @@ class DomainFieldSemanticSeparationTest(unittest.TestCase):
 
   def test_decision_source_is_domain_field(self) -> None:
     adr = MockDecision(
-      specs=["SPEC-100"], deltas=["DE-001"], supersedes=["ADR-000"],
+      specs=["SPEC-100"],
+      deltas=["DE-001"],
+      supersedes=["ADR-000"],
     )
     hits = _collect_from_decision_fields(adr)
     assert all(h.source == "domain_field" for h in hits)
@@ -823,6 +831,125 @@ class DomainFieldSemanticSeparationTest(unittest.TestCase):
       assert h.detail not in RELATION_TYPES, (
         f"detail={h.detail!r} unexpectedly collides with RELATION_TYPES"
       )
+
+
+class CollectReverseReferenceTargetsTest(unittest.TestCase):
+  """VT-090-P4-1: Tests for collect_reverse_reference_targets()."""
+
+  def test_empty_referrers(self) -> None:
+
+    targets = collect_reverse_reference_targets([])
+    assert targets == set()
+
+  def test_single_referrer_with_relations(self) -> None:
+
+    referrer = MockDelta(
+      id="AUD-001",
+      relations=[_rel("documents", "DE-090")],
+    )
+    targets = collect_reverse_reference_targets([referrer])
+    assert "DE-090" in targets
+
+  def test_multiple_referrers_aggregated(self) -> None:
+
+    referrers = [
+      MockDelta(id="AUD-001", relations=[_rel("documents", "DE-090")]),
+      MockDelta(id="AUD-002", relations=[_rel("documents", "DE-091")]),
+    ]
+    targets = collect_reverse_reference_targets(referrers)
+    assert "DE-090" in targets
+    assert "DE-091" in targets
+
+  def test_uppercased(self) -> None:
+
+    referrer = MockDelta(
+      id="AUD-001",
+      relations=[_rel("documents", "de-090")],
+    )
+    targets = collect_reverse_reference_targets([referrer])
+    assert "DE-090" in targets
+
+  def test_applies_to_also_collected(self) -> None:
+
+    referrer = MockDelta(
+      id="DE-001",
+      applies_to={"specs": ["SPEC-110"], "requirements": ["PROD-010.FR-005"]},
+    )
+    targets = collect_reverse_reference_targets([referrer])
+    assert "SPEC-110" in targets
+    assert "PROD-010.FR-005" in targets
+
+  def test_duplicates_merged(self) -> None:
+
+    referrers = [
+      MockDelta(id="AUD-001", relations=[_rel("documents", "DE-090")]),
+      MockDelta(id="AUD-002", relations=[_rel("reviews", "DE-090")]),
+    ]
+    targets = collect_reverse_reference_targets(referrers)
+    assert targets == {"DE-090"}
+
+
+class PartitionByReverseReferencesTest(unittest.TestCase):
+  """VT-090-P4-2: Tests for partition_by_reverse_references()."""
+
+  def test_basic_partition(self) -> None:
+
+    candidates = [
+      MockDelta(id="DE-090"),
+      MockDelta(id="DE-091"),
+      MockDelta(id="DE-092"),
+    ]
+    referrers = [
+      MockDelta(id="AUD-001", relations=[_rel("documents", "DE-090")]),
+    ]
+    referenced, unreferenced = partition_by_reverse_references(candidates, referrers)
+    assert [c.id for c in referenced] == ["DE-090"]
+    assert [c.id for c in unreferenced] == ["DE-091", "DE-092"]
+
+  def test_empty_referrers_all_unreferenced(self) -> None:
+
+    candidates = [MockDelta(id="DE-090"), MockDelta(id="DE-091")]
+    referenced, unreferenced = partition_by_reverse_references(candidates, [])
+    assert referenced == []
+    assert len(unreferenced) == 2
+
+  def test_custom_id_fn(self) -> None:
+
+    @dataclass(frozen=True)
+    class ReqLike:
+      uid: str
+
+    candidates = [ReqLike(uid="PROD-010.FR-001"), ReqLike(uid="PROD-010.FR-002")]
+    referrers = [
+      MockDelta(
+        id="DE-001",
+        applies_to={"specs": [], "requirements": ["PROD-010.FR-001"]},
+      ),
+    ]
+    referenced, unreferenced = partition_by_reverse_references(
+      candidates,
+      referrers,
+      candidate_id_fn=lambda c: c.uid,
+    )
+    assert [c.uid for c in referenced] == ["PROD-010.FR-001"]
+    assert [c.uid for c in unreferenced] == ["PROD-010.FR-002"]
+
+  def test_case_insensitive_matching(self) -> None:
+
+    candidates = [MockDelta(id="de-090")]
+    referrers = [
+      MockDelta(id="AUD-001", relations=[_rel("documents", "DE-090")]),
+    ]
+    referenced, _ = partition_by_reverse_references(candidates, referrers)
+    assert len(referenced) == 1
+
+  def test_self_reference_included(self) -> None:
+
+    # An artifact that references itself should appear in referenced
+    referrer = MockDelta(id="DE-090", relations=[_rel("updates", "DE-090")])
+    candidates = [MockDelta(id="DE-090")]
+    referenced, _ = partition_by_reverse_references(candidates, [referrer])
+    assert len(referenced) == 1
 
 
 if __name__ == "__main__":

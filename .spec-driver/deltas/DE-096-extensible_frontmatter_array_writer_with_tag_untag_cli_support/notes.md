@@ -48,20 +48,44 @@
 - 59 writer tests (CompactDumper + update_frontmatter + list ops + backward-compat wrappers)
 - pylint 10.00/10 on touched files
 
-## Outstanding — Phase 3
+## 2026-03-14 – Phase 3: Normalisation + prettier convergence
 
-### Not yet done
+### Prettier compatibility changes to CompactDumper
 
-- [ ] One-time normalisation of all `.spec-driver/**/*.md` frontmatter
+User requested prettier convergence testing. Initial normalisation revealed conflicts between CompactDumper and prettier:
+
+1. **Quote style**: YAML single-quotes vs prettier double-quotes for date/bool/null-like strings
+2. **Sequence indentation**: YAML indentless sequences vs prettier indented-under-parent
+3. **Line width**: PyYAML mid-value wrapping at width=120 vs prettier's 80-char print width
+
+Resolved with targeted CompactDumper changes:
+
+- `_NEEDS_QUOTING_RE` pattern detects strings YAML would single-quote → force double-quote
+- When string contains `"`, use single quotes (prettier prefers whichever avoids escaping)
+- `increase_indent` override: never use indentless sequences
+- `_FLOW_LIST_WIDTH_LIMIT = 60` (was 80) — room for key prefix on same line
+- `width=10000` — prevents PyYAML from wrapping long scalars mid-value
+- Match YAML-reserved start chars (`@`, backtick, quotes)
+- Strings with flow indicators (`,`, `[]`, `{}`) added to quoting pattern
+
+### Data fix
+
+- `DE-085.outcome_summary` had trailing newline causing oscillation — stripped.
+
+### Verification
+
+- 724 files normalised
+- Idempotent: second normalise pass = 0 changes
+- `prettier .spec-driver --check` = all files match
+- 4044 tests pass (3 new: ambiguous quoting, plain strings, double-quote-containing strings)
+
+### Commits
+
+- `b9e0dc1` — Initial normalisation (old CompactDumper)
+- `93367f4` — Prettier-compatible CompactDumper
+- `e5c3af46` — Re-normalise with prettier-compat dumper
+
+## Outstanding
+
 - [ ] Backlog item for client repo migration strategy
-- [ ] Phase sheet updates
-- [ ] Audit and closure
-
-### Normalisation approach
-
-Write a script that walks all `.spec-driver/**/*.md`, calls `load_markdown_file` → `dump_markdown_file` (which now uses CompactDumper). Body untouched. One atomic commit.
-
-### Gotcha for next agent
-
-- The user has already run prettier over all markdown. Body content may have changed formatting. The normalisation commit should only touch frontmatter YAML — `dump_markdown_file` already handles this correctly since it preserves body as-is.
-- `_FLOW_LIST_WIDTH_LIMIT = 80` in frontmatter_writer.py controls the flow/block heuristic threshold. This is a tuning knob if output doesn't look right on real files.
+- [ ] Audit and close delta

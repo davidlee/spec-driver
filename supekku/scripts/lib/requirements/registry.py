@@ -299,6 +299,11 @@ class RequirementsRegistry:
 
     relationships_validator = RelationshipsBlockValidator()
 
+    # Collect (spec_id, body) pairs for deferred relationship application.
+    # Relationships reference requirements from other specs, so all
+    # requirements must be created before any relationship block is applied.
+    deferred_relationships: list[tuple[str, str]] = []
+
     if spec_registry:
       for spec in spec_registry.all_specs():
         records = list(
@@ -314,11 +319,7 @@ class RequirementsRegistry:
           self._upsert_record(record, seen, stats)
           yielded_ids.add(spec.id)
 
-        self._apply_spec_relationships(
-          spec.id,
-          spec.body,
-          validator=relationships_validator,
-        )
+        deferred_relationships.append((spec.id, spec.body))
 
     directories = list(spec_dirs or [])
     if directories:
@@ -343,11 +344,15 @@ class RequirementsRegistry:
           body = spec_file.read_text(encoding="utf-8")
         except OSError:
           body = ""
-        self._apply_spec_relationships(
-          spec_id,
-          body,
-          validator=relationships_validator,
-        )
+        deferred_relationships.append((spec_id, body))
+
+    # Apply all relationship blocks now that every requirement exists.
+    for spec_id, body in deferred_relationships:
+      self._apply_spec_relationships(
+        spec_id,
+        body,
+        validator=relationships_validator,
+      )
 
     delta_validator = DeltaRelationshipsValidator()
     if delta_dirs:

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -55,8 +56,9 @@ class JustfileIntegrationTest(unittest.TestCase):
     os.chdir(project_root)
 
     cmd = [
-      "python",
-      "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+      sys.executable,
+      "-m",
+      "supekku.scripts.cli.deterministic_ast_doc_generator",
       str(self.package_dir),
       "--type",
       doc_type,
@@ -135,8 +137,9 @@ class JustfileIntegrationTest(unittest.TestCase):
     os.chdir(project_root)
 
     cmd = [
-      "python",
-      "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+      sys.executable,
+      "-m",
+      "supekku.scripts.cli.deterministic_ast_doc_generator",
       str(self.package_dir),
       "--type",
       "public",
@@ -174,8 +177,9 @@ class JustfileIntegrationTest(unittest.TestCase):
     os.chdir(project_root)
 
     cmd = [
-      "python",
-      "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+      sys.executable,
+      "-m",
+      "supekku.scripts.cli.deterministic_ast_doc_generator",
       str(self.package_dir),
       "--type",
       "invalid",
@@ -193,8 +197,9 @@ class JustfileIntegrationTest(unittest.TestCase):
 
     nonexistent_dir = self.temp_path / "nonexistent"
     cmd = [
-      "python",
-      "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+      sys.executable,
+      "-m",
+      "supekku.scripts.cli.deterministic_ast_doc_generator",
       str(nonexistent_dir),
       "--type",
       "public",
@@ -245,8 +250,9 @@ CONSTANT_VALUE = 42
     # Generate all three types of documentation
     for doc_type in ["public", "all", "tests"]:
       cmd = [
-        "python",
-        "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+        sys.executable,
+        "-m",
+        "supekku.scripts.cli.deterministic_ast_doc_generator",
         str(package_dir),
         "--type",
         doc_type,
@@ -264,8 +270,9 @@ CONSTANT_VALUE = 42
     # Verify check mode passes for all generated docs
     for doc_type in ["public", "all", "tests"]:
       cmd = [
-        "python",
-        "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+        sys.executable,
+        "-m",
+        "supekku.scripts.cli.deterministic_ast_doc_generator",
         str(package_dir),
         "--type",
         doc_type,
@@ -300,8 +307,9 @@ class MyClass:
 
     # Generate initial documentation
     cmd = [
-      "python",
-      "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+      sys.executable,
+      "-m",
+      "supekku.scripts.cli.deterministic_ast_doc_generator",
       str(package_dir),
       "--type",
       "public",
@@ -315,8 +323,9 @@ class MyClass:
 
     # Verify check mode passes
     cmd = [
-      "python",
-      "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+      sys.executable,
+      "-m",
+      "supekku.scripts.cli.deterministic_ast_doc_generator",
       str(package_dir),
       "--type",
       "public",
@@ -343,8 +352,9 @@ class MyClass:
 
     # Check mode should now fail (docs are outdated)
     cmd = [
-      "python",
-      "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+      sys.executable,
+      "-m",
+      "supekku.scripts.cli.deterministic_ast_doc_generator",
       str(package_dir),
       "--type",
       "public",
@@ -356,8 +366,9 @@ class MyClass:
 
     # Regenerate documentation
     cmd = [
-      "python",
-      "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+      sys.executable,
+      "-m",
+      "supekku.scripts.cli.deterministic_ast_doc_generator",
       str(package_dir),
       "--type",
       "public",
@@ -368,8 +379,9 @@ class MyClass:
 
     # Check mode should now pass again
     cmd = [
-      "python",
-      "supekku/scripts/cli/deterministic_ast_doc_generator.py",
+      sys.executable,
+      "-m",
+      "supekku.scripts.cli.deterministic_ast_doc_generator",
       str(package_dir),
       "--type",
       "public",

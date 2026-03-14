@@ -48,12 +48,8 @@ class TestGetEditor:
 class TestEditAdr:
   """Tests for edit adr command."""
 
-  def test_edit_adr_calls_editor(
-    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-  ) -> None:
+  def test_edit_adr_calls_editor(self, tmp_path: Path) -> None:
     """Edit adr opens file in editor."""
-    monkeypatch.setenv("EDITOR", "vim")
-
     with patch("supekku.cli.edit.DecisionRegistry") as mock_registry_class:
       mock_registry = MagicMock()
       mock_decision = MagicMock()
@@ -62,18 +58,13 @@ class TestEditAdr:
       mock_registry.find.return_value = mock_decision
       mock_registry_class.return_value = mock_registry
 
-      with patch("subprocess.run") as mock_run:
-        mock_run.return_value = MagicMock(returncode=0)
+      with patch("supekku.cli.edit.open_in_editor") as mock_open:
         result = runner.invoke(app, ["adr", "ADR-001"])
         assert result.exit_code == 0
-        mock_run.assert_called_once()
-        call_args = mock_run.call_args[0][0]
-        assert call_args[0] == "vim"
+        mock_open.assert_called_once_with(mock_decision.path)
 
-  def test_edit_adr_not_found(self, monkeypatch: pytest.MonkeyPatch) -> None:
+  def test_edit_adr_not_found(self) -> None:
     """Edit adr shows error when not found."""
-    monkeypatch.setenv("EDITOR", "vim")
-
     with patch("supekku.cli.edit.DecisionRegistry") as mock_registry_class:
       mock_registry = MagicMock()
       mock_registry.find.return_value = None
@@ -87,12 +78,8 @@ class TestEditAdr:
 class TestEditSpec:
   """Tests for edit spec command."""
 
-  def test_edit_spec_calls_editor(
-    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-  ) -> None:
+  def test_edit_spec_calls_editor(self, tmp_path: Path) -> None:
     """Edit spec opens file in editor."""
-    monkeypatch.setenv("EDITOR", "vim")
-
     with patch("supekku.cli.edit.SpecRegistry") as mock_registry_class:
       mock_registry = MagicMock()
       mock_spec = MagicMock()
@@ -101,21 +88,17 @@ class TestEditSpec:
       mock_registry.get.return_value = mock_spec
       mock_registry_class.return_value = mock_registry
 
-      with patch("subprocess.run") as mock_run:
-        mock_run.return_value = MagicMock(returncode=0)
+      with patch("supekku.cli.edit.open_in_editor") as mock_open:
         result = runner.invoke(app, ["spec", "SPEC-001"])
         assert result.exit_code == 0
+        mock_open.assert_called_once()
 
 
 class TestEditDelta:
   """Tests for edit delta command."""
 
-  def test_edit_delta_calls_editor(
-    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-  ) -> None:
+  def test_edit_delta_calls_editor(self, tmp_path: Path) -> None:
     """Edit delta opens file in editor."""
-    monkeypatch.setenv("EDITOR", "vim")
-
     with patch("supekku.cli.edit.ChangeRegistry") as mock_registry_class:
       mock_registry = MagicMock()
       mock_artifact = MagicMock()
@@ -124,10 +107,10 @@ class TestEditDelta:
       mock_registry.collect.return_value = {"DE-001": mock_artifact}
       mock_registry_class.return_value = mock_registry
 
-      with patch("subprocess.run") as mock_run:
-        mock_run.return_value = MagicMock(returncode=0)
+      with patch("supekku.cli.edit.open_in_editor") as mock_open:
         result = runner.invoke(app, ["delta", "DE-001"])
         assert result.exit_code == 0
+        mock_open.assert_called_once()
 
 
 class TestNoEditorAvailable:
@@ -154,12 +137,8 @@ class TestNoEditorAvailable:
 class TestEditAdrShorthand:
   """Tests for edit adr with shorthand IDs."""
 
-  def test_edit_adr_numeric_shorthand(
-    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-  ) -> None:
+  def test_edit_adr_numeric_shorthand(self, tmp_path: Path) -> None:
     """Edit adr accepts numeric shorthand like '001'."""
-    monkeypatch.setenv("EDITOR", "vim")
-
     with patch("supekku.cli.edit.DecisionRegistry") as mock_registry_class:
       mock_registry = MagicMock()
       mock_decision = MagicMock()
@@ -168,8 +147,7 @@ class TestEditAdrShorthand:
       mock_registry.find.return_value = mock_decision
       mock_registry_class.return_value = mock_registry
 
-      with patch("subprocess.run") as mock_run:
-        mock_run.return_value = MagicMock(returncode=0)
+      with patch("supekku.cli.edit.open_in_editor"):
         result = runner.invoke(app, ["adr", "001"])
         assert result.exit_code == 0
         # Verify registry was called with normalized ID
@@ -179,12 +157,8 @@ class TestEditAdrShorthand:
 class TestEditDeltaShorthand:
   """Tests for edit delta with shorthand IDs."""
 
-  def test_edit_delta_numeric_shorthand(
-    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-  ) -> None:
+  def test_edit_delta_numeric_shorthand(self, tmp_path: Path) -> None:
     """Edit delta accepts numeric shorthand like '23'."""
-    monkeypatch.setenv("EDITOR", "vim")
-
     with patch("supekku.cli.edit.ChangeRegistry") as mock_registry_class:
       mock_registry = MagicMock()
       mock_artifact = MagicMock()
@@ -193,8 +167,7 @@ class TestEditDeltaShorthand:
       mock_registry.collect.return_value = {"DE-023": mock_artifact}
       mock_registry_class.return_value = mock_registry
 
-      with patch("subprocess.run") as mock_run:
-        mock_run.return_value = MagicMock(returncode=0)
+      with patch("supekku.cli.edit.open_in_editor"):
         result = runner.invoke(app, ["delta", "23"])
         assert result.exit_code == 0
 
@@ -212,18 +185,16 @@ class TestEditRevisionRegression:
     if not rev_paths:
       pytest.skip("RE-001 not found")
 
-    with patch("subprocess.run") as mock_run:
-      mock_run.return_value = MagicMock(returncode=0)
+    with patch("supekku.cli.edit.open_in_editor") as mock_open:
       result = runner.invoke(app, ["revision", "RE-001"])
       assert result.exit_code == 0
-      mock_run.assert_called_once()
-      editor_args = mock_run.call_args[0][0]
-      assert str(editor_args[-1]).endswith(".md")
+      mock_open.assert_called_once()
+      call_path = mock_open.call_args[0][0]
+      assert str(call_path).endswith(".md")
 
   def test_edit_revision_numeric_shorthand(self) -> None:
     """edit revision 1 resolves to RE-001."""
-    with patch("subprocess.run") as mock_run:
-      mock_run.return_value = MagicMock(returncode=0)
+    with patch("supekku.cli.edit.open_in_editor"):
       result = runner.invoke(app, ["revision", "1"])
       assert result.exit_code == 0
 
@@ -243,11 +214,11 @@ class TestEditNewSubcommands:
     ref = MagicMock(id="IP-001", path=plan_file)
     with (
       patch("supekku.cli.edit.resolve_artifact", return_value=ref),
-      patch("subprocess.run") as mock_run,
+      patch("supekku.cli.edit.open_in_editor") as mock_open,
     ):
-      mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["plan", "IP-001"])
       assert result.exit_code == 0
+      mock_open.assert_called_once_with(plan_file)
 
   def test_edit_plan_not_found(self) -> None:
     from supekku.cli.common import ArtifactNotFoundError  # noqa: PLC0415
@@ -265,11 +236,11 @@ class TestEditNewSubcommands:
     ref = MagicMock(id="AUD-001", path=audit_file)
     with (
       patch("supekku.cli.edit.resolve_artifact", return_value=ref),
-      patch("subprocess.run") as mock_run,
+      patch("supekku.cli.edit.open_in_editor") as mock_open,
     ):
-      mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["audit", "AUD-001"])
       assert result.exit_code == 0
+      mock_open.assert_called_once_with(audit_file)
 
   def test_edit_issue(self, tmp_path: Path) -> None:
     issue_file = tmp_path / "ISSUE-001.md"
@@ -277,11 +248,11 @@ class TestEditNewSubcommands:
     ref = MagicMock(id="ISSUE-001", path=issue_file)
     with (
       patch("supekku.cli.edit.resolve_artifact", return_value=ref),
-      patch("subprocess.run") as mock_run,
+      patch("supekku.cli.edit.open_in_editor") as mock_open,
     ):
-      mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["issue", "ISSUE-001"])
       assert result.exit_code == 0
+      mock_open.assert_called_once_with(issue_file)
 
   def test_edit_improvement(self, tmp_path: Path) -> None:
     impr_file = tmp_path / "IMPR-001.md"
@@ -289,11 +260,11 @@ class TestEditNewSubcommands:
     ref = MagicMock(id="IMPR-001", path=impr_file)
     with (
       patch("supekku.cli.edit.resolve_artifact", return_value=ref),
-      patch("subprocess.run") as mock_run,
+      patch("supekku.cli.edit.open_in_editor") as mock_open,
     ):
-      mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["improvement", "IMPR-001"])
       assert result.exit_code == 0
+      mock_open.assert_called_once_with(impr_file)
 
 
 # ── --status flag tests (DE-068, VT-068-02, VT-068-03) ──
@@ -324,7 +295,7 @@ class TestEditStatusFlag:
 
     with (
       patch("supekku.cli.edit.ChangeRegistry") as mock_cls,
-      patch("subprocess.run") as mock_run,
+      patch("supekku.cli.edit.open_in_editor") as mock_open,
     ):
       mock_registry = MagicMock()
       mock_registry.collect.return_value = {"DE-001": mock_artifact}
@@ -333,7 +304,7 @@ class TestEditStatusFlag:
       result = runner.invoke(app, ["delta", "DE-001", "--status", "in-progress"])
       assert result.exit_code == 0
       assert "in-progress" in result.output
-      mock_run.assert_not_called()
+      mock_open.assert_not_called()
 
     content = delta_file.read_text()
     assert "status: in-progress" in content
@@ -415,11 +386,8 @@ class TestEditStatusFlag:
         "empty" in result.output.lower() or "empty" in (result.stderr or "").lower()
       )
 
-  def test_without_status_opens_editor(
-    self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-  ) -> None:
+  def test_without_status_opens_editor(self, tmp_path: Path) -> None:
     """Default behaviour (no --status) still opens editor."""
-    monkeypatch.setenv("EDITOR", "vim")
     delta_file = tmp_path / "DE-001.md"
     delta_file.write_text(DELTA_FRONTMATTER)
     mock_artifact = MagicMock()
@@ -427,16 +395,15 @@ class TestEditStatusFlag:
 
     with (
       patch("supekku.cli.edit.ChangeRegistry") as mock_cls,
-      patch("subprocess.run") as mock_run,
+      patch("supekku.cli.edit.open_in_editor") as mock_open,
     ):
       mock_registry = MagicMock()
       mock_registry.collect.return_value = {"DE-001": mock_artifact}
       mock_cls.return_value = mock_registry
-      mock_run.return_value = MagicMock(returncode=0)
 
       result = runner.invoke(app, ["delta", "DE-001"])
       assert result.exit_code == 0
-      mock_run.assert_called_once()
+      mock_open.assert_called_once()
 
 
 class TestEditStatusResolveArtifact:
@@ -476,12 +443,11 @@ class TestEditDrift:
     ref = MagicMock(id="DL-001", path=ledger_file)
     with (
       patch("supekku.cli.edit.resolve_artifact", return_value=ref),
-      patch("subprocess.run") as mock_run,
+      patch("supekku.cli.edit.open_in_editor") as mock_open,
     ):
-      mock_run.return_value = MagicMock(returncode=0)
       result = runner.invoke(app, ["drift", "DL-001"])
       assert result.exit_code == 0
-      mock_run.assert_called_once()
+      mock_open.assert_called_once_with(ledger_file)
 
   def test_edit_drift_status_update(self, tmp_path: Path) -> None:
     ledger_file = tmp_path / "DL-001.md"
@@ -513,9 +479,8 @@ class TestEditDrift:
     ref = MagicMock(id="DL-001", path=ledger_file)
     with (
       patch("supekku.cli.edit.resolve_artifact", return_value=ref) as mock_resolve,
-      patch("subprocess.run") as mock_run,
+      patch("supekku.cli.edit.open_in_editor"),
     ):
-      mock_run.return_value = MagicMock(returncode=0)
       runner.invoke(app, ["drift", "DL-001"])
       mock_resolve.assert_called_once()
       call_args = mock_resolve.call_args[0]
@@ -621,9 +586,9 @@ class TestEditMemoryVerify:
     with (
       patch("supekku.cli.edit.resolve_artifact", return_value=ref),
       patch("supekku.cli.edit.get_head_sha", return_value=fake_sha),
-      patch("subprocess.run") as mock_run,
+      patch("supekku.cli.edit.open_in_editor") as mock_open,
     ):
       result = runner.invoke(app, ["memory", "mem.test.pattern", "--verify"])
 
     assert result.exit_code == 0
-    mock_run.assert_not_called()
+    mock_open.assert_not_called()

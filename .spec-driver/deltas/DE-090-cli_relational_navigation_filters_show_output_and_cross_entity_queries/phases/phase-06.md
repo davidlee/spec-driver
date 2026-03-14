@@ -4,7 +4,7 @@ slug: 090-cli_relational_navigation_filters_show_output_and_cross_entity_queries
 name: IP-090 Phase 06 — P5 neighbourhood view (show --related)
 created: '2026-03-14'
 updated: '2026-03-14'
-status: draft
+status: completed
 kind: phase
 ---
 
@@ -85,16 +85,16 @@ For `show spec`, `--related` **replaces** the count-based "Related:" section (DE
 - [x] DR-090 §P5 design approved
 
 ## 4. Exit Criteria / Done When
-- [ ] `format_related_section()` in `relation_formatters.py`
-- [ ] `--related` flag on `show spec` (replaces count view)
-- [ ] `--related` flag on `show delta`
-- [ ] `--related` flag on `show requirement`
-- [ ] `--related` flag on `show issue`
-- [ ] `--related --json` output includes `related` key with `forward` + `referenced_by` structure
-- [ ] Entity with no references → no "Referenced by" section
-- [ ] Per-kind registry loading (DEC-090-15)
-- [ ] VT-090-P5-1 through VT-090-P5-5 passing
-- [ ] Lint clean
+- [x] `format_related_section()` in `relation_formatters.py`
+- [x] `--related` flag on `show spec` (replaces count view)
+- [x] `--related` flag on `show delta`
+- [x] `--related` flag on `show requirement`
+- [x] `--related` flag on `show issue`
+- [x] `--related --json` output includes `related` key with `forward` + `referenced_by` structure
+- [x] Entity with no references → no "Referenced by" section
+- [x] Per-kind registry loading (DEC-090-15)
+- [x] VT-090-P5-1 through VT-090-P5-5 passing
+- [ ] Lint clean (ruff binary not available in env; AST-parses clean, patterns match existing code)
 
 ## 5. Verification
 - `pytest supekku/scripts/lib/formatters/relation_formatters_test.py -v`
@@ -110,13 +110,13 @@ For `show spec`, `--related` **replaces** the count-based "Related:" section (DE
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 6.1 | `format_related_section()` formatter | [x] | relation_formatters.py |
-| [ ] | 6.2 | `--related` on `show spec` | [ ] | Replaces count view; loads delta/revision/audit/adr/requirement/policy/standard registries |
-| [ ] | 6.3 | `--related` on `show delta` | [x] | Loads audit/revision/backlog registries |
-| [ ] | 6.4 | `--related` on `show requirement` | [x] | Loads delta/adr/policy/standard registries |
-| [ ] | 6.5 | `--related` on `show issue` | [x] | Loads delta registries |
-| [ ] | 6.6 | `--related --json` output | [ ] | Depends on 6.2–6.5; forward + referenced_by structure |
-| [ ] | 6.7 | Tests (VT-090-P5-1 through P5-5) | [ ] | Depends on 6.1–6.6 |
+| [x] | 6.1 | `format_related_section()` formatter | [x] | relation_formatters.py |
+| [x] | 6.2 | `--related` on `show spec` | [ ] | Replaces count view; loads 7 registry types |
+| [x] | 6.3 | `--related` on `show delta` | [x] | Loads audit/revision/backlog registries |
+| [x] | 6.4 | `--related` on `show requirement` | [x] | Loads delta/adr/policy/standard registries |
+| [x] | 6.5 | `--related` on `show issue` | [x] | Loads delta registries |
+| [x] | 6.6 | `--related --json` output | [ ] | forward + referenced_by structure |
+| [x] | 6.7 | Tests (VT-090-P5-1 through P5-5) | [ ] | 13 tests (5 formatter + 8 integration) |
 
 ### Task Details
 

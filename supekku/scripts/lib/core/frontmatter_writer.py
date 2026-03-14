@@ -7,6 +7,7 @@ Body content (including code-fenced YAML blocks) passes through untouched.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
@@ -31,12 +32,34 @@ from supekku.scripts.lib.core.spec_utils import (
 _FLOW_LIST_WIDTH_LIMIT = 80
 
 
-class CompactDumper(yaml.SafeDumper):
-  """YAML dumper producing compact, deterministic frontmatter.
+# Date-string pattern: double-quote to match prettier convention.
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
-  Short scalar lists render as flow-style ``[a, b, c]``.
-  Long lists and lists containing dicts render as block-style.
+
+class CompactDumper(yaml.SafeDumper):
+  """YAML dumper producing compact, prettier-compatible frontmatter.
+
+  - Short scalar lists render as flow-style ``[a, b, c]``.
+  - Long lists and lists containing dicts render as block-style.
+  - Sequences always indent under their parent key (no indentless).
+  - Date-like strings are double-quoted.
   """
+
+  def increase_indent(  # noqa: D102
+    self,
+    flow: bool = False,
+    indentless: bool = False,  # noqa: ARG002
+  ) -> None:
+    # Never use indentless sequences — always indent under parent key.
+    # This matches prettier's YAML formatter behaviour.
+    return super().increase_indent(flow=flow, indentless=False)
+
+
+def _represent_str(dumper: CompactDumper, data: str) -> yaml.Node:
+  """Double-quote date-pattern strings to match prettier convention."""
+  if _DATE_RE.match(data):
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style='"')
+  return dumper.represent_scalar("tag:yaml.org,2002:str", data)
 
 
 def _represent_list(dumper: CompactDumper, data: list) -> yaml.Node:
@@ -45,11 +68,10 @@ def _represent_list(dumper: CompactDumper, data: list) -> yaml.Node:
     all(isinstance(x, (str, int, float, bool)) for x in data)
     and sum(len(str(x)) for x in data) + 2 * len(data) < _FLOW_LIST_WIDTH_LIMIT
   )
-  return dumper.represent_sequence(
-    "tag:yaml.org,2002:seq", data, flow_style=use_flow
-  )
+  return dumper.represent_sequence("tag:yaml.org,2002:seq", data, flow_style=use_flow)
 
 
+CompactDumper.add_representer(str, _represent_str)
 CompactDumper.add_representer(list, _represent_list)
 
 
@@ -63,7 +85,7 @@ def dump_frontmatter_yaml(data: dict[str, Any]) -> str:
     Dumper=CompactDumper,
     sort_keys=False,
     allow_unicode=True,
-    width=120,
+    width=10000,
   ).strip()
 
 

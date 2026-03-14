@@ -7,7 +7,6 @@ from unittest.mock import patch
 import pytest
 
 from .frontmatter_writer import (
-  CompactDumper,
   FieldUpdateResult,
   ListUpdateResult,
   add_frontmatter_list_items,
@@ -114,7 +113,7 @@ class TestCompactDumper:
 
   def test_date_string_quoted(self) -> None:
     out = dump_frontmatter_yaml({"created": "2025-01-15"})
-    assert "created: '2025-01-15'" in out
+    assert 'created: "2025-01-15"' in out
 
   def test_key_order_preserved(self) -> None:
     data = {"z": 1, "a": 2, "m": 3}
@@ -399,9 +398,7 @@ class TestUpdateFrontmatterFields:
     assert fm["kind"] == "memory"
     assert fm["created"] == "2026-01-01"
 
-  def test_does_not_modify_body_lines_matching_field_name(
-    self, tmp_path: Path
-  ) -> None:
+  def test_does_not_modify_body_lines_matching_field_name(self, tmp_path: Path) -> None:
     content = "---\nid: X\nstatus: active\nupdated: '2026-01-01'\n---\n\n# Title\n\nstatus: body line\n"
     f = tmp_path / "test.md"
     f.write_text(content, encoding="utf-8")

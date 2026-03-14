@@ -1,9 +1,9 @@
 ---
 id: IP-071.PHASE-02
 slug: 071-install-feedback
-name: 'P02: Install skill-change feedback'
-created: '2026-03-09'
-updated: '2026-03-09'
+name: "P02: Install skill-change feedback"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---
@@ -26,9 +26,9 @@ verification:
     - VT-071-04
   evidence: []
 tasks:
-  - id: '2.1'
+  - id: "2.1"
     description: Capture and format sync_skills result in install
-  - id: '2.2'
+  - id: "2.2"
     description: Test install skill-change output
 risks: []
 ```
@@ -61,10 +61,10 @@ Surface the `sync_skills()` return value in `install` output.
 
 ## 5. Tasks
 
-| Status | ID | Description | Notes |
-|--------|-----|-------------|-------|
-| [ ] | 2.1 | Capture `sync_skills()` result in `install.py`, print summary | Reuse pattern from deleted `skills.py` |
-| [ ] | 2.2 | Test install skill-change output | |
+| Status | ID  | Description                                                   | Notes                                  |
+| ------ | --- | ------------------------------------------------------------- | -------------------------------------- |
+| [ ]    | 2.1 | Capture `sync_skills()` result in `install.py`, print summary | Reuse pattern from deleted `skills.py` |
+| [ ]    | 2.2 | Test install skill-change output                              |                                        |
 
 ### Detail
 

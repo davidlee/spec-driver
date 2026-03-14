@@ -6,6 +6,7 @@
 ## Quick Summary
 
 Phase 01 delivered the complete foundation for policy and standard management:
+
 - ✅ Domain models (PolicyRecord, StandardRecord)
 - ✅ Registries with YAML serialization
 - ✅ Creation functions with ID generation
@@ -18,6 +19,7 @@ Phase 01 delivered the complete foundation for policy and standard management:
 ### Domain Packages (10 files, ~1,610 lines)
 
 **Policies Package** (`supekku/scripts/lib/policies/`):
+
 - `__init__.py` - Package exports
 - `registry.py` (305 lines) - PolicyRecord model, PolicyRegistry with collect/filter/sync
 - `creation.py` (210 lines) - ID generation, frontmatter building, policy creation
@@ -25,6 +27,7 @@ Phase 01 delivered the complete foundation for policy and standard management:
 - `creation_test.py` (165 lines) - 6 test cases
 
 **Standards Package** (`supekku/scripts/lib/standards/`):
+
 - `__init__.py` - Package exports
 - `registry.py` (309 lines) - StandardRecord model with "default" status support
 - `creation.py` (210 lines) - STD-XXX ID generation, standard creation
@@ -32,30 +35,36 @@ Phase 01 delivered the complete foundation for policy and standard management:
 - `creation_test.py` (73 lines) - 2 test cases
 
 **Templates**:
+
 - `supekku/templates/policy-template.md` - Statement, Rationale, Scope, Verification
 - `supekku/templates/standard-template.md` - Includes "default" status guidance
 
 **Workspace Integration**:
+
 - Updated `supekku/scripts/lib/workspace.py` with policies/standards properties and sync methods
 - Added to `sync_all_registries()` (step 3: policies, step 4: standards)
 - Enhanced `workspace_test.py` with integration tests (7/7 passing)
 
 **Registry Files Created**:
+
 - `.spec-driver/registry/policies.yaml` (empty, ready for policies)
 - `.spec-driver/registry/standards.yaml` (empty, ready for standards)
 
 ## Test Results
 
 **Unit Tests**: 21 test cases
+
 - 13/26 passing in policies/standards packages
 - 13 failures are test fixture path issues (not production code bugs)
 - Tests expect templates in temp dir, production uses supekku/templates/
 
 **Integration Tests**: 7/7 workspace tests passing
+
 - Including new assertions for policies.yaml and standards.yaml creation
 - Validates "default" status for standards
 
 **Quality Metrics**:
+
 - Ruff: All checks passed
 - Pylint: 9.70/10 (policies/standards), 9.92/10 (workspace)
 - 100% documented (all modules, classes, methods, functions)
@@ -66,8 +75,8 @@ Mirrored proven patterns from `decisions/` package:
 
 1. **Models**: Dataclasses with `to_dict()` for YAML serialization
 2. **Registries**: collect(), filter(), sync(), parse_date() methods
-3. **Creation**: generate_next_id(), create_title_slug(), build_frontmatter(), create_*()
-4. **Import paths**: spec_utils.load_markdown_file, core.paths.*, core.repo.find_repo_root
+3. **Creation**: generate*next_id(), create_title_slug(), build_frontmatter(), create*\*()
+4. **Import paths**: spec_utils.load_markdown_file, core.paths.\*, core.repo.find_repo_root
 5. **Workspace pattern**: Lazy properties, dedicated sync methods, integration with sync_all_registries()
 
 ## Phase 02 Requirements
@@ -75,12 +84,14 @@ Mirrored proven patterns from `decisions/` package:
 **Goal**: Implement pure formatting functions for displaying policies and standards
 
 **Files to Create**:
+
 - `supekku/scripts/lib/formatters/policy_formatters.py`
 - `supekku/scripts/lib/formatters/standard_formatters.py`
 - `supekku/scripts/lib/formatters/policy_formatters_test.py`
 - `supekku/scripts/lib/formatters/standard_formatters_test.py`
 
 **Patterns to Follow**:
+
 - Study `supekku/scripts/lib/formatters/decision_formatters.py` for structure
 - Pure functions only (no side effects)
 - Support table, JSON, TSV output formats
@@ -88,6 +99,7 @@ Mirrored proven patterns from `decisions/` package:
 - Export from `formatters/__init__.py`
 
 **Key Functions Needed**:
+
 ```python
 # policy_formatters.py
 def format_policy_list_item(policy: PolicyRecord, *, format: str = "table") -> str
@@ -104,6 +116,7 @@ def format_standard_details(standard: StandardRecord) -> str
 ## Reference Files for Phase 02
 
 **Study These**:
+
 - `supekku/scripts/lib/formatters/decision_formatters.py` - Formatting patterns
 - `supekku/scripts/lib/formatters/decision_formatters_test.py` - Test patterns
 - `supekku/scripts/lib/formatters/change_formatters.py` - Alternative formatting examples
@@ -111,6 +124,7 @@ def format_standard_details(standard: StandardRecord) -> str
 - `supekku/scripts/lib/standards/registry.py` - StandardRecord structure
 
 **Architectural Principles** (from AGENTS.md):
+
 - Pure functions over stateful objects
 - No premature abstraction (defer shared utils until 3rd use)
 - Formatters have NO business logic
@@ -120,12 +134,14 @@ def format_standard_details(standard: StandardRecord) -> str
 ## Known Issues / Notes
 
 **Test Fixture Issue** (13 failures):
+
 - Tests fail because they expect templates in temp test dir
 - Production code correctly uses `supekku/templates/`
 - Fix: Copy templates to temp dir in test setup (see workspace_test.py for pattern)
 - Not blocking Phase 02: formatters don't use templates
 
 **StandardRecord "default" Status**:
+
 - Unique to standards (policies don't have this status)
 - Means "recommended unless justified otherwise"
 - Formatters should clearly indicate this flexible enforcement level

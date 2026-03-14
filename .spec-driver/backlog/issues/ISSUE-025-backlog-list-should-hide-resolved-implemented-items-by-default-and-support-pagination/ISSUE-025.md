@@ -1,8 +1,8 @@
 ---
 id: ISSUE-025
 name: Backlog list should hide resolved/implemented items by default and support pagination
-created: '2025-11-08'
-updated: '2025-11-08'
+created: "2025-11-08"
+updated: "2025-11-08"
 status: resolved
 kind: issue
 categories: [enhancement, ux]
@@ -82,6 +82,7 @@ uv run spec-driver list backlog --pager
 `supekku/cli/list.py` - `list_backlog()` command:
 
 Add new flags:
+
 - `--all / -a`: Include resolved/implemented items (default: False)
 - `--limit`: Maximum items to display (default: 20)
 - `--pager / -P`: Use typer pager for output (default: False)
@@ -91,6 +92,7 @@ Add new flags:
 `supekku/scripts/lib/backlog/registry.py`:
 
 Default filter should exclude:
+
 - `status: resolved`
 - `status: implemented`
 
@@ -99,6 +101,7 @@ When `--all` is passed, include all statuses.
 ### Prioritization Integration
 
 When `--prioritize` is used:
+
 - Apply same default filtering (exclude resolved/implemented)
 - Only open filtered items in editor
 - Respect `--all` flag if user explicitly wants to prioritize everything
@@ -106,6 +109,7 @@ When `--prioritize` is used:
 ### Pagination Implementation
 
 Use Rich's console.pager for `--pager` flag:
+
 ```python
 from rich.console import Console
 
@@ -118,6 +122,7 @@ else:
 ```
 
 Apply `--limit` before formatting:
+
 ```python
 items = filtered_items[:limit] if limit else filtered_items
 ```
@@ -128,6 +133,7 @@ items = filtered_items[:limit] if limit else filtered_items
 
 Formatters should handle truncated lists appropriately.
 Consider adding footer message when results are limited:
+
 ```
 Showing 20 of 45 items. Use --limit or --all to see more.
 ```
@@ -148,4 +154,3 @@ Showing 20 of 45 items. Use --limit or --all to see more.
 
 - Related to backlog registry implementation
 - Complements ISSUE-024 (external ID support)
-

@@ -1,8 +1,8 @@
 ---
 id: ISSUE-045
 name: "show/view commands lack ID inference \u2014 require redundant subcommand and full prefix"
-created: '2026-03-07'
-updated: '2026-03-12'
+created: "2026-03-07"
+updated: "2026-03-12"
 status: resolved
 kind: issue
 categories:

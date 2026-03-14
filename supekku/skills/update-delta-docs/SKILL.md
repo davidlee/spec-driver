@@ -2,6 +2,7 @@
 name: update-delta-docs
 description: Reconcile DE/IP/phase/DR execution artefacts during delta work. Use this when implementation changes structured execution state, not just notes.
 ---
+
 This skill is for structured delta execution documentation.
 
 Do not use it as a replacement for `/notes`.
@@ -11,6 +12,7 @@ Use `/update-delta-docs` when execution changed the structured artefacts that
 govern or describe the work.
 
 Inputs:
+
 - `DE-XXX.md`
 - `IP-XXX.md`
 - Active phase sheet (`IP-XXX.PHASE-XX`)
@@ -18,6 +20,7 @@ Inputs:
 - `notes.md` for the companion execution log
 
 Use this skill when any of the following became true:
+
 - phase task/checklist/status state changed
 - IP phase state or active phase changed
 - DE scope, risks, dependencies, or open questions changed during execution
@@ -25,6 +28,7 @@ Use this skill when any of the following became true:
 - verification state/evidence in execution artefacts changed
 
 Process:
+
 1. Read the active `DE`, `IP`, and phase sheet together.
 2. Update the phase sheet first:
    - task statuses
@@ -41,6 +45,7 @@ Process:
 7. If the required doc changes imply a broader design/workflow change than the active phase assumed, stop and `/consult`.
 
 Outcomes:
+
 - Delta execution artefacts stay coherent while work is in progress.
 - Phase/IP/DE/DR state does not drift away from notes or implementation reality.
 - `/notes` remains a lightweight execution log rather than a hidden structured-doc workflow.

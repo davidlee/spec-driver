@@ -2,8 +2,8 @@
 id: IP-053.PHASE-03
 slug: 053-tui_artifact_browser_mvp_with_textual-phase-03
 name: IP-053 Phase 03
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: draft
 kind: phase
 ---
@@ -71,6 +71,7 @@ edge cases with tests, pass the manual smoke gate, and scope the follow-up
 delta. This completes DE-053.
 
 ## 2. Links & References
+
 - **Delta**: [DE-053](../DE-053.md)
 - **Design Revision**: [DR-053](../DR-053.md)
   - DEC-053-07 (snapshot-on-load with watch-triggered invalidation)
@@ -80,12 +81,14 @@ delta. This completes DE-053.
 - **Spike findings**: [notes.md](../notes.md)
 
 ## 3. Entrance Criteria
+
 - [x] Phase 2 complete (2c63db6)
 - [x] `watchfiles` available (`[tui]` extra)
 - [x] `ArtifactSnapshot.refresh(art_type)` API exists
 - [x] `BrowserScreen.refresh_snapshot(art_type)` API exists
 
 ## 4. Exit Criteria / Done When
+
 - [x] `spec-driver tui` command works (import guard + launch)
 - [x] File watching triggers per-registry refresh
 - [x] `$EDITOR` unset → helpful error on `e` keybinding
@@ -95,12 +98,14 @@ delta. This completes DE-053.
 - [x] `just` passes (2855 tests, ruff clean, pylint 9.51)
 
 ## 5. Verification
+
 - `just test` — all existing + new tests
 - `just lint` + `just pylint` — zero warnings
 - VT-053-edge-cases: import guard, $EDITOR unset, empty registries
 - VH-053-smoke: launch, browse all types, filter, search, edit, watch
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: `watchfiles.awatch` integrates cleanly with Textual's asyncio
   event loop via `asyncio.create_task`.
 - **Assumption**: `app.suspend()` + subprocess editor works on Linux terminals.
@@ -111,14 +116,14 @@ delta. This completes DE-053.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | P03-T01 | CLI entry point (`tui` command + import guard) | | main.py |
-| [x] | P03-T02 | File watching (watchfiles.awatch integration) | | app.py |
-| [x] | P03-T03 | Editor integration (`$EDITOR` + `app.suspend()`) | [P] | app.py keybinding |
-| [x] | P03-T04 | VT-053-edge-cases tests | | 16 tests |
-| [x] | P03-T05 | VH-053-smoke manual verification | | passed + polish |
-| [x] | P03-T06 | Scope follow-up delta (BacklogRegistry) | | DE-057 |
+| Status | ID      | Description                                      | Parallel? | Notes             |
+| ------ | ------- | ------------------------------------------------ | --------- | ----------------- |
+| [x]    | P03-T01 | CLI entry point (`tui` command + import guard)   |           | main.py           |
+| [x]    | P03-T02 | File watching (watchfiles.awatch integration)    |           | app.py            |
+| [x]    | P03-T03 | Editor integration (`$EDITOR` + `app.suspend()`) | [P]       | app.py keybinding |
+| [x]    | P03-T04 | VT-053-edge-cases tests                          |           | 16 tests          |
+| [x]    | P03-T05 | VH-053-smoke manual verification                 |           | passed + polish   |
+| [x]    | P03-T06 | Scope follow-up delta (BacklogRegistry)          |           | DE-057            |
 
 ### Task Details
 
@@ -169,11 +174,11 @@ delta. This completes DE-053.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| watchfiles/asyncio conflict | watchfiles async API is asyncio-native | open |
-| app.suspend() terminal restore | Textual docs confirm pattern; VH gate | open |
-| Path-to-ArtifactType mapping misses edge cases | Use paths.py getters for directory resolution | open |
+| Risk                                           | Mitigation                                    | Status |
+| ---------------------------------------------- | --------------------------------------------- | ------ |
+| watchfiles/asyncio conflict                    | watchfiles async API is asyncio-native        | open   |
+| app.suspend() terminal restore                 | Textual docs confirm pattern; VH gate         | open   |
+| Path-to-ArtifactType mapping misses edge cases | Use paths.py getters for directory resolution | open   |
 
 ## 9. Decisions & Outcomes
 
@@ -182,6 +187,7 @@ Decisions inherited from DR-053. No phase-specific decisions expected.
 ## 10. Findings / Research Notes
 
 **From Phase 2 handoff** (save debugging time):
+
 - `DataTable` needs `cursor_type="row"` for `RowSelected` events
 - `Select.clear()` to reset; `select.is_blank()` to check blank state
 - `app.screen.query_one()` not `app.query_one()` for pushed screens
@@ -190,6 +196,7 @@ Decisions inherited from DR-053. No phase-specific decisions expected.
 - `watchfiles` async API compatible with asyncio
 
 ## 11. Wrap-up Checklist
+
 - [ ] Exit criteria satisfied
 - [ ] Verification evidence stored
 - [ ] Notes updated with findings

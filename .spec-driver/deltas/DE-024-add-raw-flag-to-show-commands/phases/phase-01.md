@@ -2,8 +2,8 @@
 id: IP-024.PHASE-01
 slug: 024-add-raw-flag-to-show-commands-phase-01
 name: IP-024 Phase 01 - Implement --raw flag
-created: '2026-02-05'
-updated: '2026-02-05'
+created: "2026-02-05"
+updated: "2026-02-05"
 status: complete
 kind: phase
 ---
@@ -108,16 +108,17 @@ Add `--raw` flag to all `show` subcommands that outputs the raw file content wit
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Update mutual exclusivity check | | 3-way check |
-| [x] | 1.2-1.9 | Add --raw to each subcommand | [P] | Parallel |
-| [x] | 1.10 | Write tests | | 7 tests added |
-| [x] | 1.11 | Lint and verify | | Passed |
+| Status | ID      | Description                     | Parallel? | Notes         |
+| ------ | ------- | ------------------------------- | --------- | ------------- |
+| [x]    | 1.1     | Update mutual exclusivity check |           | 3-way check   |
+| [x]    | 1.2-1.9 | Add --raw to each subcommand    | [P]       | Parallel      |
+| [x]    | 1.10    | Write tests                     |           | 7 tests added |
+| [x]    | 1.11    | Lint and verify                 |           | Passed        |
 
 ### Task Details
 
 - **1.1**: Update mutual exclusivity from 2-way to 3-way check
+
   ```python
   if sum([json_output, path_only, raw_output]) > 1:
     typer.echo("Error: --json, --path, and --raw are mutually exclusive", err=True)
@@ -125,6 +126,7 @@ Add `--raw` flag to all `show` subcommands that outputs the raw file content wit
   ```
 
 - **1.2-1.9**: Add `--raw` flag and handler to each show subcommand
+
   ```python
   raw_output: Annotated[bool, typer.Option("--raw", help="Output raw file content")] = False
   # ...
@@ -138,8 +140,8 @@ Add `--raw` flag to all `show` subcommands that outputs the raw file content wit
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+| Risk              | Mitigation                  | Status   |
+| ----------------- | --------------------------- | -------- |
 | Large file output | None needed - user's choice | Accepted |
 
 ## 9. Decisions & Outcomes

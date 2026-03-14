@@ -2,8 +2,8 @@
 id: IP-036.PHASE-03
 slug: 036-frontmatter_metadata_compaction_and_canonicalization_controls-phase-03
 name: IP-036 Phase 03 - Generalized Framework Pilot
-created: '2026-03-03'
-updated: '2026-03-03'
+created: "2026-03-03"
+updated: "2026-03-03"
 status: complete
 kind: phase
 ---
@@ -64,9 +64,11 @@ phase: IP-036.PHASE-03
 # Phase 2 - Generalized Framework Pilot
 
 ## 1. Objective
+
 Implement a shared compaction profile mechanism that uses `FieldMetadata.persistence` and `default_value` to omit default/derived fields during write, and pilot it on delta frontmatter (DEC-036-003).
 
 ## 2. Links & References
+
 - **Delta**: DE-036
 - **Design Revision**: DR-036 §4 (code impact), §7 (DEC-036-003, DEC-036-004)
 - **Phase 0**: phases/phase-01.md §10.3 (delta canonical/derived matrix), §10.5 (compaction semantics)
@@ -74,9 +76,11 @@ Implement a shared compaction profile mechanism that uses `FieldMetadata.persist
 - **Key code**: `frontmatter_metadata/delta.py`, `blocks/metadata/schema.py`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete (FieldMetadata has persistence + default_value; delta fields annotated)
 
 ## 4. Exit Criteria / Done When
+
 - [x] `compact_frontmatter(data, metadata)` function implemented
 - [x] Compaction respects all four persistence classifications (canonical/derived/optional/default-omit)
 - [x] Delta frontmatter round-trips without semantic loss
@@ -85,28 +89,31 @@ Implement a shared compaction profile mechanism that uses `FieldMetadata.persist
 - [x] All tests pass, linters clean
 
 ## 5. Verification
+
 - `just test` — all tests pass
 - `just lint` + `just pylint` — zero warnings
 - Round-trip tests: compact then parse, assert semantic equivalence
 - VA-036-001 prep: before/after byte count on delta corpus
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumes `default_value` equality check is sufficient (no deep structural matching needed)
 - STOP if: compaction function needs to understand nested block semantics beyond top-level field matching
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 2.1 | Implement compact_frontmatter() | Pure function in `compaction.py`, 25 tests |
-| [x] | 2.2 | Round-trip tests for delta compaction | 8 delta-specific round-trip tests |
-| [x] | 2.3 | Integrate into sync write path (if applicable) | Resolved: `spec-driver compact delta` CLI command (8be91c4) |
-| [x] | 2.4 | Before/after size measurement on delta corpus | 37/37 files reducible, 7.1% avg, 26% max |
+| Status | ID  | Description                                    | Notes                                                       |
+| ------ | --- | ---------------------------------------------- | ----------------------------------------------------------- |
+| [x]    | 2.1 | Implement compact_frontmatter()                | Pure function in `compaction.py`, 25 tests                  |
+| [x]    | 2.2 | Round-trip tests for delta compaction          | 8 delta-specific round-trip tests                           |
+| [x]    | 2.3 | Integrate into sync write path (if applicable) | Resolved: `spec-driver compact delta` CLI command (8be91c4) |
+| [x]    | 2.4 | Before/after size measurement on delta corpus  | 37/37 files reducible, 7.1% avg, 26% max                    |
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Compaction strips fields downstream consumers expect | Round-trip tests; full mode fallback | Mitigated |
+
+| Risk                                                                 | Mitigation                            | Status             |
+| -------------------------------------------------------------------- | ------------------------------------- | ------------------ |
+| Compaction strips fields downstream consumers expect                 | Round-trip tests; full mode fallback  | Mitigated          |
 | `applies_to` default shape mismatch (`prod` key absent from default) | Equality check, not structural subset | Mitigated (tested) |
 
 ## 9. Decisions & Outcomes
@@ -118,6 +125,7 @@ Implement a shared compaction profile mechanism that uses `FieldMetadata.persist
 ## 10. Findings / Research Notes
 
 ### Delta corpus compaction measurement
+
 - **Corpus**: 37 delta files
 - **All 37 files** have reduction potential
 - **Total reduction**: 1011 bytes (7.1% of frontmatter)
@@ -126,12 +134,14 @@ Implement a shared compaction profile mechanism that uses `FieldMetadata.persist
 - **Note**: Delta frontmatter is relatively small (avg ~386 bytes) so absolute savings are modest; the value is in noise reduction and diff cleanliness.
 
 ### Implementation details
+
 - `compact_frontmatter(data, metadata, mode="compact")` — 42 lines of code, pure function
 - Helper `_should_keep(persistence, value, default_value)` implements the four-rule semantics table
 - Unknown fields (not in metadata) pass through — safe for forward compatibility
 - `mode="full"` returns a shallow copy unchanged — no-op for non-compacting paths
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (§10)
 - [x] Notes updated

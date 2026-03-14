@@ -8,45 +8,45 @@
 
 ### spec-driver bucket (22 files — platform-owned, replaced on update)
 
-| # | ID | Type |
-|---|---|---|
-| 1 | mem.concept.spec-driver.audit | concept |
-| 2 | mem.concept.spec-driver.backlog | concept |
-| 3 | mem.concept.spec-driver.ceremony.pioneer | concept |
-| 4 | mem.concept.spec-driver.ceremony.settler | concept |
-| 5 | mem.concept.spec-driver.ceremony.town-planner | concept |
-| 6 | mem.concept.spec-driver.contract | concept |
-| 7 | mem.concept.spec-driver.delta | concept |
-| 8 | mem.concept.spec-driver.design-revision | concept |
-| 9 | mem.concept.spec-driver.philosophy | concept |
-| 10 | mem.concept.spec-driver.plan | concept |
-| 11 | mem.concept.spec-driver.posture | concept |
-| 12 | mem.concept.spec-driver.relations | concept |
-| 13 | mem.concept.spec-driver.revision | concept |
-| 14 | mem.concept.spec-driver.spec | concept |
-| 15 | mem.concept.spec-driver.truth-model | concept |
-| 16 | mem.concept.spec-driver.verification | concept |
-| 17 | mem.fact.spec-driver.coverage-gate | fact |
-| 18 | mem.fact.spec-driver.status-enums | fact |
-| 19 | mem.pattern.spec-driver.core-loop | pattern |
-| 20 | mem.pattern.spec-driver.delta-completion | pattern |
-| 21 | mem.pattern.spec-driver.frontmatter-compaction | pattern |
-| 22 | mem.signpost.spec-driver.ceremony | signpost |
+| #   | ID                                             | Type     |
+| --- | ---------------------------------------------- | -------- |
+| 1   | mem.concept.spec-driver.audit                  | concept  |
+| 2   | mem.concept.spec-driver.backlog                | concept  |
+| 3   | mem.concept.spec-driver.ceremony.pioneer       | concept  |
+| 4   | mem.concept.spec-driver.ceremony.settler       | concept  |
+| 5   | mem.concept.spec-driver.ceremony.town-planner  | concept  |
+| 6   | mem.concept.spec-driver.contract               | concept  |
+| 7   | mem.concept.spec-driver.delta                  | concept  |
+| 8   | mem.concept.spec-driver.design-revision        | concept  |
+| 9   | mem.concept.spec-driver.philosophy             | concept  |
+| 10  | mem.concept.spec-driver.plan                   | concept  |
+| 11  | mem.concept.spec-driver.posture                | concept  |
+| 12  | mem.concept.spec-driver.relations              | concept  |
+| 13  | mem.concept.spec-driver.revision               | concept  |
+| 14  | mem.concept.spec-driver.spec                   | concept  |
+| 15  | mem.concept.spec-driver.truth-model            | concept  |
+| 16  | mem.concept.spec-driver.verification           | concept  |
+| 17  | mem.fact.spec-driver.coverage-gate             | fact     |
+| 18  | mem.fact.spec-driver.status-enums              | fact     |
+| 19  | mem.pattern.spec-driver.core-loop              | pattern  |
+| 20  | mem.pattern.spec-driver.delta-completion       | pattern  |
+| 21  | mem.pattern.spec-driver.frontmatter-compaction | pattern  |
+| 22  | mem.signpost.spec-driver.ceremony              | signpost |
 
 ### seed bucket (2 files — project-owned starters, install-if-missing)
 
-| # | ID | Type | References |
-|---|---|---|---|
-| 1 | mem.pattern.project.workflow | pattern | [[mem.pattern.spec-driver.core-loop]] |
-| 2 | mem.pattern.project.completion | pattern | [[mem.pattern.spec-driver.delta-completion]] |
+| #   | ID                             | Type    | References                                   |
+| --- | ------------------------------ | ------- | -------------------------------------------- |
+| 1   | mem.pattern.project.workflow   | pattern | [[mem.pattern.spec-driver.core-loop]]        |
+| 2   | mem.pattern.project.completion | pattern | [[mem.pattern.spec-driver.delta-completion]] |
 
 ### unmanaged (3 files — local, never touched by installer)
 
-| # | ID | Type | Rationale |
-|---|---|---|---|
-| 1 | mem.concept.spec.assembly-only-taxonomy | concept | project-local taxonomy note |
-| 2 | mem.pattern.cli.skinny | pattern | project-local coding pattern |
-| 3 | mem.pattern.formatters.soc | pattern | project-local coding pattern |
+| #   | ID                                      | Type    | Rationale                    |
+| --- | --------------------------------------- | ------- | ---------------------------- |
+| 1   | mem.concept.spec.assembly-only-taxonomy | concept | project-local taxonomy note  |
+| 2   | mem.pattern.cli.skinny                  | pattern | project-local coding pattern |
+| 3   | mem.pattern.formatters.soc              | pattern | project-local coding pattern |
 
 ### Actions taken
 
@@ -56,23 +56,26 @@
 
 ### Totals
 
-| Bucket | Count | Installer behavior |
-|---|---|---|
-| spec-driver | 22 | Replace/refresh from package source |
-| seed | 2 | Install if missing; never overwrite |
-| unmanaged | 3 | Ignored by installer |
-| **Total** | **27** | |
+| Bucket      | Count  | Installer behavior                  |
+| ----------- | ------ | ----------------------------------- |
+| spec-driver | 22     | Replace/refresh from package source |
+| seed        | 2      | Install if missing; never overwrite |
+| unmanaged   | 3      | Ignored by installer                |
+| **Total**   | **27** |                                     |
 
 ## Implementation Summary
 
 ### Phase 0 — Classification & Sifting
+
 - Classified all 27 memory files by ID namespace
 - Authored 2 seed stubs: `mem.pattern.project.workflow`, `mem.pattern.project.completion`
 - Removed stale `seed` tag from 19 files
 - Configured hatch `force-include` for wheel builds
 
 ### Phase 1 — Installer Semantics
+
 New functions in `supekku/scripts/install.py`:
+
 - `_classify_memory(filename)` — namespace-based classifier
 - `_find_memory_source(package_root)` — dual discovery (package, then dev repo root)
 - `_install_seed_memories()` — create-if-missing, never overwrite
@@ -84,26 +87,31 @@ New functions in `supekku/scripts/install.py`:
 Integrated into `initialize_workspace()` between agent docs and skills install.
 
 ### Phase 2+3 — UX, Safety & Verification
+
 - 32 new tests (55 total install tests, 2210 total suite)
 - All 5 VT/VA artefacts verified
 - Dry-run, idempotence, and integration coverage complete
 
 ### Decisions made during implementation
+
 - Managed memories auto-apply (no prompt) — consistent with agent docs pattern
 - `auto_yes` parameter reserved for future prompt-per-category support
 - Reporting uses `_MemoryChanges` dataclass to keep functions simple
 
 ### Commits
+
 - `cc762df` phase 0 — classify corpus, author seed stubs
 - `8963790` phase 1 — two-bucket memory install in installer
 - `5dbe15e` phase 2+3 — integration tests, verification, close-out
 
 ### Verification
+
 - `just test`: 2210 passed, 3 skipped (last run after final commit)
 - `just lint`: all checks passed
 - `just pylint`: 9.54/10 (no new warnings from DE-037 code)
 
 ### Potential rough edges / follow-ups
+
 - `auto_yes` param is wired but unused — activate when prompt-per-category UX is wanted
 - No wheel build test yet — `force-include` config is untested in actual `hatch build`
 - Pruning has no undo — if a managed ID is accidentally removed from source, it's gone from workspace on next install (mitigated: memories are in git)

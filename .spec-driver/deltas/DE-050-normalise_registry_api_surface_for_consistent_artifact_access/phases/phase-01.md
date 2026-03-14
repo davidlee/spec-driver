@@ -2,8 +2,8 @@
 id: IP-050.PHASE-01
 slug: 050-normalise_registry_api_surface_for_consistent_artifact_access-phase-01
 name: IP-050 Phase 01 - Group B registries
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: draft
 kind: phase
 ---
@@ -62,16 +62,19 @@ the lowest-risk registries to normalise: both are class-based with constructors
 already close to the target pattern, and changes are purely additive.
 
 ## 2. Links & References
+
 - **Delta**: [DE-050](../DE-050.md)
 - **Design Revision**: [DR-050](../DR-050.md) §4 — Tier 1 code impact table
 - **ADR**: ADR-009 §1-§3 — required surface and return conventions
 - **Research**: [research.md](../research.md) — §1 SpecRegistry, §3 ChangeRegistry
 
 ## 3. Entrance Criteria
+
 - [x] DR-050 authored
 - [x] ADR-009 accepted
 
 ## 4. Exit Criteria / Done When
+
 - [x] SpecRegistry: `find()`, `collect()`, `iter()`, `filter()` implemented
 - [x] SpecRegistry: `get()` emits `DeprecationWarning`, delegates to `find()`
 - [x] ChangeRegistry: `find()`, `iter()`, `filter()` implemented
@@ -80,11 +83,13 @@ already close to the target pattern, and changes are purely additive.
 - [x] `just` passes (tests + both linters)
 
 ## 5. Verification
+
 - Run: `just test` (full suite)
 - Run: `just lint` + `just pylint`
 - Inspect: deprecation warning emitted when `SpecRegistry.get()` called
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: SpecRegistry's `_specs` dict is the canonical cache; `collect()`
   wraps it. ChangeRegistry's `collect()` already returns dict; `find()` delegates.
 - STOP when: if `filter()` domain params are unclear for either registry, consult
@@ -92,14 +97,14 @@ already close to the target pattern, and changes are purely additive.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | SpecRegistry: add `find()`, `collect()`, `iter()`, `filter()` | [P] | done |
-| [x] | 1.2 | SpecRegistry: deprecate `get()` → `find()` with warning | | done |
-| [x] | 1.3 | ChangeRegistry: add `find()`, `iter()`, `filter()` | [P] | done |
-| [x] | 1.4 | Tests for SpecRegistry new methods | | 16 new tests |
-| [x] | 1.5 | Tests for ChangeRegistry new methods | | 7 new tests |
-| [x] | 1.6 | Lint + full test suite | | 2673 pass, ruff clean, pylint 9.55 |
+| Status | ID  | Description                                                   | Parallel? | Notes                              |
+| ------ | --- | ------------------------------------------------------------- | --------- | ---------------------------------- |
+| [x]    | 1.1 | SpecRegistry: add `find()`, `collect()`, `iter()`, `filter()` | [P]       | done                               |
+| [x]    | 1.2 | SpecRegistry: deprecate `get()` → `find()` with warning       |           | done                               |
+| [x]    | 1.3 | ChangeRegistry: add `find()`, `iter()`, `filter()`            | [P]       | done                               |
+| [x]    | 1.4 | Tests for SpecRegistry new methods                            |           | 16 new tests                       |
+| [x]    | 1.5 | Tests for ChangeRegistry new methods                          |           | 7 new tests                        |
+| [x]    | 1.6 | Lint + full test suite                                        |           | 2673 pass, ruff clean, pylint 9.55 |
 
 ### Task Details
 
@@ -113,7 +118,7 @@ already close to the target pattern, and changes are purely additive.
 
 - **1.2 SpecRegistry: deprecate get()**
   - **Approach**: `get()` calls `self.find()`, emits `warnings.warn("Use find()",
-    DeprecationWarning, stacklevel=2)`.
+DeprecationWarning, stacklevel=2)`.
 
 - **1.3 ChangeRegistry: standard surface**
   - **Files**: `supekku/scripts/lib/changes/registry.py`
@@ -124,16 +129,17 @@ already close to the target pattern, and changes are purely additive.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| `get()` deprecation confuses callers | Alias delegates to `find()`; warning includes migration hint | open |
-| `filter()` param design unclear | Check Group A filter patterns; keep minimal | open |
+| Risk                                 | Mitigation                                                   | Status |
+| ------------------------------------ | ------------------------------------------------------------ | ------ |
+| `get()` deprecation confuses callers | Alias delegates to `find()`; warning includes migration hint | open   |
+| `filter()` param design unclear      | Check Group A filter patterns; keep minimal                  | open   |
 
 ## 9. Decisions & Outcomes
 
 ## 10. Findings / Research Notes
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (`just` passes — 2673 tests, ruff clean, pylint 9.55)
 - [x] Notes updated

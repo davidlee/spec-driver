@@ -4,40 +4,41 @@ name: Delta Completion Coverage Gate
 kind: memory
 status: active
 memory_type: fact
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: "2026-03-03"
+verified: "2026-03-03"
 confidence: high
 tags:
-- spec-driver
-- coverage
-- verification
-- delta
-- completion
-- sharp-edge
-summary: complete delta requires verified parent-spec coverage for each delta requirement
+  - spec-driver
+  - coverage
+  - verification
+  - delta
+  - completion
+  - sharp-edge
+summary:
+  complete delta requires verified parent-spec coverage for each delta requirement
   unless bypassed with force/disabled enforcement.
 priority:
   severity: high
   weight: 10
 scope:
   commands:
-  - uv run spec-driver complete delta
-  - complete delta
+    - uv run spec-driver complete delta
+    - complete delta
   paths:
-  - supekku/scripts/lib/changes/coverage_check.py
-  - supekku/scripts/complete_delta.py
-  - supekku/cli/complete.py
+    - supekku/scripts/lib/changes/coverage_check.py
+    - supekku/scripts/complete_delta.py
+    - supekku/cli/complete.py
 provenance:
   sources:
-  - kind: code
-    note: Coverage enforcement switch and per-requirement checks
-    ref: supekku/scripts/lib/changes/coverage_check.py
-  - kind: code
-    note: Completion orchestration and force/env bypass behavior
-    ref: supekku/scripts/complete_delta.py
-  - kind: code
-    note: Canonical coverage status enum
-    ref: supekku/scripts/lib/blocks/verification.py
+    - kind: code
+      note: Coverage enforcement switch and per-requirement checks
+      ref: supekku/scripts/lib/changes/coverage_check.py
+    - kind: code
+      note: Completion orchestration and force/env bypass behavior
+      ref: supekku/scripts/complete_delta.py
+    - kind: code
+      note: Canonical coverage status enum
+      ref: supekku/scripts/lib/blocks/verification.py
 ---
 
 # Delta Completion Coverage Gate
@@ -48,6 +49,7 @@ provenance:
 `delta.applies_to.requirements` against the parent spec coverage block.
 
 Normal completion requires:
+
 - parent spec exists
 - `supekku:verification.coverage@v1` block exists
 - requirement entry exists in that block

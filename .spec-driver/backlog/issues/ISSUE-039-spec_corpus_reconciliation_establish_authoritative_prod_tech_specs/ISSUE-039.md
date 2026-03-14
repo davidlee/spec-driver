@@ -1,8 +1,8 @@
 ---
 id: ISSUE-039
-name: 'Spec corpus reconciliation: establish authoritative PROD & TECH specs'
-created: '2026-03-05'
-updated: '2026-03-05'
+name: "Spec corpus reconciliation: establish authoritative PROD & TECH specs"
+created: "2026-03-05"
+updated: "2026-03-05"
 status: open
 kind: issue
 categories: [specs, governance, quality]
@@ -47,6 +47,7 @@ real content. Contradictions are resolved and codified as ADRs.
 
 Agent-assisted survey of all PROD specs, ADRs, policies, CLAUDE.md, and
 glossary to systematically flag:
+
 - Statements that contradict other documents
 - Ambiguous or undefined concepts used inconsistently
 - Outdated assumptions that no longer hold
@@ -62,6 +63,7 @@ codified as ADRs (if architectural) or spec revisions (if local).
 ### Phase B — PROD spec reconciliation
 
 For each PROD spec, in priority order:
+
 1. Apply resolved contradictions / new ADRs
 2. Compare stated intent against implemented reality
 3. Revise content (via spec revision RE-xxx)
@@ -81,12 +83,12 @@ support and which subsystems are actively changing.
 
 ## Deltas
 
-| Phase | Delta | Description |
-|-------|-------|-------------|
-| A | TBD | Contradiction discovery & ADR resolution |
-| B | TBD | PROD spec reconciliation & promotion |
-| C | TBD | TECH spec reset & renumbering |
-| D | TBD | TECH spec backfill (may be multiple deltas) |
+| Phase | Delta | Description                                 |
+| ----- | ----- | ------------------------------------------- |
+| A     | TBD   | Contradiction discovery & ADR resolution    |
+| B     | TBD   | PROD spec reconciliation & promotion        |
+| C     | TBD   | TECH spec reset & renumbering               |
+| D     | TBD   | TECH spec backfill (may be multiple deltas) |
 
 ## Risks
 
@@ -96,4 +98,3 @@ support and which subsystems are actively changing.
   "active-ready" as a clear bar, not perfection.
 - **Renumbering churn**: TECH spec renumbering touches many cross-references.
   Mitigate by doing it in one clean pass after stubs are deleted.
-

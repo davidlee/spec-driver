@@ -6,10 +6,11 @@ Treat it as the minimum context required to begin work safely.
 ## Goal (what changes)
 
 - `.contracts/**` becomes the canonical contract corpus (real files, derived/deterministic).
-- `specify/tech/SPEC-*/contracts/**` becomes compatibility-only (symlinks pointing *into* `.contracts/**`).
+- `specify/tech/SPEC-*/contracts/**` becomes compatibility-only (symlinks pointing _into_ `.contracts/**`).
 - Adapters stop hardcoding `spec_dir / "contracts"`; the caller decides destination.
 
 Authoritative docs:
+
 - Delta: `change/deltas/DE-029-canonical_contract_storage/DE-029.md`
 - Design: `change/deltas/DE-029-canonical_contract_storage/DR-029.md`
 - Plan: `change/deltas/DE-029-canonical_contract_storage/IP-029.md`
@@ -19,7 +20,7 @@ Authoritative docs:
 - **Python multiplicity**: stage+distribute (do not push mirror mapping into adapters).
 - **`DocVariant.path` semantics**: relative to `contracts_dir`, centrally validated (Python may be scan-based).
 - **Compat**: invert mirror — `SPEC-*/contracts/*` symlinks → `.contracts/**`; warn when replacing a non-symlink file.
-- **Fresh repo story**: spec-independent discovery is *not* in this delta (deferred to DE-030).
+- **Fresh repo story**: spec-independent discovery is _not_ in this delta (deferred to DE-030).
 
 ## Seam / invariants
 
@@ -30,16 +31,19 @@ Authoritative docs:
 ## Pre-read (10 minutes, in order)
 
 Product & decisions:
+
 - `specify/product/PROD-014/PROD-014.md` (FR-008/011/012)
 - `change/revisions/RE-015-contracts_canonical_storage_sync_less_generation/RE-015.md`
 - `specify/decisions/ADR-003-separate_unit_and_assembly_specs.md`
 
 Sync semantics (don’t regress flags):
+
 - `specify/product/PROD-012/PROD-012.md` (FR-006 now points to `.contracts/**`; VH-906 note)
 - `change/revisions/RE-016-sync_defaults_contracts_first_opt_in_spec_creation/RE-016.md`
 - `supekku/cli/sync.py` (Typer flags: `--specs/--no-specs`, `--contracts/--no-contracts`)
 
 Core code touchpoints:
+
 - `supekku/scripts/sync_specs.py` (`MultiLanguageSpecManager.process_source_unit`)
 - `supekku/scripts/lib/sync/adapters/base.py` + all 4 adapters’ `generate()`
 - `supekku/scripts/lib/contracts/mirror.py` (reuse mapping + Python module-name parsing)
@@ -59,6 +63,7 @@ Core code touchpoints:
 ## Checklist (verification)
 
 Run (or ensure CI runs):
+
 - `just` (tests + lint + pylint)
 - Specific: the VT suite referenced in `DR-029.md` (storage, compat, drift, adapter contract, path validation).
 
@@ -67,6 +72,7 @@ Run (or ensure CI runs):
 Phase 1 tasks 1.1–1.9 are complete. Two post-phase bugs fixed. `just` is green (1667 passed, pylint 9.67).
 
 ### What works
+
 - Adapter interface changed: `spec_dir → variant_outputs` across all 4 adapters + base ABC
 - Path resolvers extracted in `mirror.py`: `resolve_{go,zig,ts}_variant_outputs()`, `python_staging_dir()`
 - `process_source_unit._resolve_variant_outputs()` dispatches correctly

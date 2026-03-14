@@ -2,8 +2,8 @@
 id: IP-065.PHASE-03
 slug: 065-drift_ledger_primitive-phase-03
 name: Migration and close
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---
@@ -57,21 +57,25 @@ phase: IP-065.PHASE-03
 # Phase 3 — Migration and close
 
 ## 1. Objective
+
 Migrate the pilot drift ledger DL-047 from `drift/` to `.spec-driver/drift/`,
 converting all 21 entries from the old list-item format to fenced YAML blocks
 (DEC-065-02). Verify end-to-end CLI operations, then close DE-065.
 
 ## 2. Links & References
+
 - **Delta**: DE-065
 - **Design Revision**: DR-065 §10 (creation template), DEC-065-02 (fenced YAML format)
 - **Pilot file**: `drift/DL-047-spec-corpus-reconciliation.md`
 - **Parser contract**: DR-065 DEC-065-03 edge case table
 
 ## 3. Entrance Criteria
+
 - [x] Phase 2 complete (formatters & CLI working)
 - [x] Pilot DL-047 exists at `drift/DL-047-spec-corpus-reconciliation.md`
 
 ## 4. Exit Criteria / Done When
+
 - [x] DL-047 migrated to `.spec-driver/drift/DL-047-spec-corpus-reconciliation.md`
 - [x] All 21 entries converted to fenced YAML block format
 - [x] Parser roundtrips all entries (verified via `show drift DL-047`)
@@ -81,11 +85,13 @@ converting all 21 entries from the old list-item format to fenced YAML blocks
 - [x] `spec-driver complete delta DE-065` succeeds
 
 ## 5. Verification
+
 - `uv run spec-driver list drift` — shows DL-047
 - `uv run spec-driver show drift DL-047` — renders all entries
 - `just check` — all tests, linters clean
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - Pilot entries can be mechanically converted (same fields, just different syntax)
   - No uncommitted changes in `drift/` directory
@@ -95,12 +101,12 @@ converting all 21 entries from the old list-item format to fenced YAML blocks
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 3.1 | Convert DL-047 entries to fenced YAML format | — | 21 entries converted |
-| [x] | 3.2 | Move to .spec-driver/drift/, remove old drift/ | — | done |
-| [x] | 3.3 | End-to-end CLI verification | — | list/show/parse all work |
-| [x] | 3.4 | Delta closure | — | completed without --force |
+| Status | ID  | Description                                    | Parallel? | Notes                     |
+| ------ | --- | ---------------------------------------------- | --------- | ------------------------- |
+| [x]    | 3.1 | Convert DL-047 entries to fenced YAML format   | —         | 21 entries converted      |
+| [x]    | 3.2 | Move to .spec-driver/drift/, remove old drift/ | —         | done                      |
+| [x]    | 3.3 | End-to-end CLI verification                    | —         | list/show/parse all work  |
+| [x]    | 3.4 | Delta closure                                  | —         | completed without --force |
 
 ### Task Details
 
@@ -127,12 +133,14 @@ converting all 21 entries from the old list-item format to fenced YAML blocks
   - If force needed: document reason, create follow-up
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Pilot entries have fields parser doesn't expect | Parser is permissive — extra fields go to `extra` dict | open |
-| 21 entries is tedious to convert manually | Systematic conversion, verify each | open |
+
+| Risk                                            | Mitigation                                             | Status |
+| ----------------------------------------------- | ------------------------------------------------------ | ------ |
+| Pilot entries have fields parser doesn't expect | Parser is permissive — extra fields go to `extra` dict | open   |
+| 21 entries is tedious to convert manually       | Systematic conversion, verify each                     | open   |
 
 ## 9. Decisions & Outcomes
+
 - 2026-03-08: Manual conversion chosen over programmatic — single file, one-time operation
 - 2026-03-08: `analysis` field content moved outside YAML fence as freeform markdown per DEC-065-02
 - 2026-03-08: `evidence` field kept inside YAML fence as list of strings
@@ -140,6 +148,7 @@ converting all 21 entries from the old list-item format to fenced YAML blocks
 ## 10. Findings / Research Notes
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (3285 tests, linters clean)
 - [x] Phase sheet updated with outcomes

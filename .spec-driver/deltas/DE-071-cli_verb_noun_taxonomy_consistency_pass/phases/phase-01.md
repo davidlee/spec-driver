@@ -1,9 +1,9 @@
 ---
 id: IP-071.PHASE-01
 slug: 071-cli-restructure
-name: 'P01: CLI restructure'
-created: '2026-03-09'
-updated: '2026-03-09'
+name: "P01: CLI restructure"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---
@@ -32,15 +32,15 @@ verification:
     - VT-071-04
   evidence: []
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     description: Move schema into show/list
-  - id: '1.2'
+  - id: "1.2"
     description: Create admin group
-  - id: '1.3'
+  - id: "1.3"
     description: Remove skills group
-  - id: '1.4'
+  - id: "1.4"
     description: Update main.py registrations
-  - id: '1.5'
+  - id: "1.5"
     description: Adapt/create tests
 risks: []
 ```
@@ -94,13 +94,13 @@ schema move, admin group creation, skills removal.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [x] | 1.1 | Move schema into show/list | [P] | schema.py → library, thin wrappers in show.py/list.py |
-| [x] | 1.2 | Create admin group | [P] | New admin.py, mount compact/resolve/backfill sub-Typers |
-| [x] | 1.3 | Remove skills group | [P] | Deleted skills.py, skills_test.py |
-| [x] | 1.4 | Update main.py | | Removed old registrations, added admin |
-| [x] | 1.5 | Adapt/create tests | | schema_test.py adapted, admin_test.py created, compact_test.py updated |
+| Status | ID  | Description                | Parallel? | Notes                                                                  |
+| ------ | --- | -------------------------- | --------- | ---------------------------------------------------------------------- |
+| [x]    | 1.1 | Move schema into show/list | [P]       | schema.py → library, thin wrappers in show.py/list.py                  |
+| [x]    | 1.2 | Create admin group         | [P]       | New admin.py, mount compact/resolve/backfill sub-Typers                |
+| [x]    | 1.3 | Remove skills group        | [P]       | Deleted skills.py, skills_test.py                                      |
+| [x]    | 1.4 | Update main.py             |           | Removed old registrations, added admin                                 |
+| [x]    | 1.5 | Adapt/create tests         |           | schema_test.py adapted, admin_test.py created, compact_test.py updated |
 
 ### Task Details
 

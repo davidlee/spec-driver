@@ -1,8 +1,8 @@
 ---
 id: ISSUE-009
 name: Status fields lack enums and need systematic review
-created: '2025-11-02'
-updated: '2026-03-08'
+created: "2025-11-02"
+updated: "2026-03-08"
 status: resolved
 kind: issue
 categories:
@@ -28,16 +28,16 @@ Status fields across core entities (specs, ADRs, deltas, requirements, etc.) are
 
 **All entity types now have domain-level status enums:**
 
-| Entity type | Enum location | Source |
-|---|---|---|
-| Deltas, revisions, audits | `changes/lifecycle.py` → `VALID_STATUSES` | Pre-existing |
-| Requirements | `requirements/lifecycle.py` → `VALID_STATUSES` | Pre-existing |
-| Backlog (all kinds) | `backlog/models.py` → `BACKLOG_BASE_STATUSES` + `RISK_EXTRA_STATUSES` | DE-057 → DE-075 (unified) |
-| Specs | `specs/lifecycle.py` → `SPEC_STATUSES` | DE-075 |
-| ADRs/Decisions | `decisions/lifecycle.py` → `ADR_STATUSES` | DE-075 |
-| Policies | `policies/lifecycle.py` → `POLICY_STATUSES` | DE-075 |
-| Standards | `standards/lifecycle.py` → `STANDARD_STATUSES` | DE-075 |
-| Memories | `memory/lifecycle.py` → `MEMORY_STATUSES` | DE-075 |
+| Entity type               | Enum location                                                         | Source                    |
+| ------------------------- | --------------------------------------------------------------------- | ------------------------- |
+| Deltas, revisions, audits | `changes/lifecycle.py` → `VALID_STATUSES`                             | Pre-existing              |
+| Requirements              | `requirements/lifecycle.py` → `VALID_STATUSES`                        | Pre-existing              |
+| Backlog (all kinds)       | `backlog/models.py` → `BACKLOG_BASE_STATUSES` + `RISK_EXTRA_STATUSES` | DE-057 → DE-075 (unified) |
+| Specs                     | `specs/lifecycle.py` → `SPEC_STATUSES`                                | DE-075                    |
+| ADRs/Decisions            | `decisions/lifecycle.py` → `ADR_STATUSES`                             | DE-075                    |
+| Policies                  | `policies/lifecycle.py` → `POLICY_STATUSES`                           | DE-075                    |
+| Standards                 | `standards/lifecycle.py` → `STANDARD_STATUSES`                        | DE-075                    |
+| Memories                  | `memory/lifecycle.py` → `MEMORY_STATUSES`                             | DE-075                    |
 
 All exposed via `ENUM_REGISTRY` in `core/enums.py`. Theme 1:1 aligned with enums (VA-075-01).
 
@@ -48,12 +48,14 @@ All exposed via `ENUM_REGISTRY` in `core/enums.py`. Theme 1:1 aligned with enums
 ## Impact
 
 **Recent example (DE-005)**:
+
 - Changed sync to use `status: "stub"` instead of `status: "draft"`
 - Had to manually verify theme.py had a color for "stub"
 - Could have accidentally introduced an orphaned status value
 - No validation would have caught the error
 
 **Systemic issues**:
+
 - Developers must guess valid status values
 - Status value changes require coordinated updates across multiple files
 - Theme definitions can diverge from actual usage
@@ -70,6 +72,7 @@ All exposed via `ENUM_REGISTRY` in `core/enums.py`. Theme 1:1 aligned with enums
 ## Remaining Scope
 
 All enum definitions are complete. Remaining work (separate deltas):
+
 - Frontmatter schema enforcement (replace `".+"` patterns with enum constraints)
 - Python `Enum` type migration (frozensets → enums)
 - Status lifecycle documentation / semantics (PROD-009)
@@ -93,23 +96,24 @@ define `status` as free-form string (`"pattern": ".+"`). No enums.
 
 **Theme styles** (`theme.py:68-84`) define colours for these statuses:
 
-| Kind | Styled statuses |
-|------|----------------|
-| issue | `open`, `in-progress`, `resolved`, `closed` |
-| problem | `captured`, `analyzed` |
-| improvement | `idea`, `planned`, `implemented` |
-| risk | `suspected` (no style!), `confirmed`, `mitigated` |
+| Kind        | Styled statuses                                   |
+| ----------- | ------------------------------------------------- |
+| issue       | `open`, `in-progress`, `resolved`, `closed`       |
+| problem     | `captured`, `analyzed`                            |
+| improvement | `idea`, `planned`, `implemented`                  |
+| risk        | `suspected` (no style!), `confirmed`, `mitigated` |
 
 **Actually in use** (from backlog items on disk):
 
-| Kind | Statuses in use |
-|------|----------------|
-| issue | `open`, `in-progress`, `done`, `resolved`, `implemented` |
-| problem | `captured` |
-| improvement | `idea`, `in-progress` |
-| risk | `mitigated` |
+| Kind        | Statuses in use                                          |
+| ----------- | -------------------------------------------------------- |
+| issue       | `open`, `in-progress`, `done`, `resolved`, `implemented` |
+| problem     | `captured`                                               |
+| improvement | `idea`, `in-progress`                                    |
+| risk        | `mitigated`                                              |
 
 **Gaps found**:
+
 - `done` and `implemented` used on issues but not styled
 - `in-progress` used on improvements but not styled (only `planned` is)
 - `suspected` is the risk default but has no theme style
@@ -134,6 +138,7 @@ a design choice with no canonical answer.
 **DE-057** — per-kind backlog status frozensets (now superseded by unified set)
 
 **DE-075** — comprehensive enum coverage:
+
 - Phase 1: defined lifecycle constants for specs, ADRs, policies, standards, memories; unified backlog statuses; registered all in ENUM_REGISTRY
 - Phase 2: aligned theme.py 1:1 with enums; migrated 17 backlog items to unified statuses
 - Phase 3: updated memory, ISSUE-009 acceptance criteria

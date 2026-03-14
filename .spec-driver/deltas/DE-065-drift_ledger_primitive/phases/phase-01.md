@@ -2,8 +2,8 @@
 id: IP-065.PHASE-01
 slug: 065-drift_ledger_primitive-phase-01
 name: Domain layer — models, parser, registry
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---
@@ -58,21 +58,25 @@ phase: IP-065.PHASE-01
 # Phase 1 — Domain layer
 
 ## 1. Objective
+
 Build the drift ledger domain package (`supekku/scripts/lib/drift/`) with
 models, lifecycle constants, fenced-YAML parser, and read-only registry.
 All test-driven, both linters clean.
 
 ## 2. Links & References
+
 - **Delta**: DE-065
 - **Design Revision**: DR-065 sections 5 (decisions), 6 (DE-063 integration), 7 (model design)
 - **Parser contract**: DR-065 DEC-065-03 edge case table
 - **Pattern reference**: `supekku/scripts/lib/backlog/` (registry/models pattern)
 
 ## 3. Entrance Criteria
+
 - [x] DR-065 accepted
 - [x] paths.py extension point identified (line 33, `DRIFT_SUBDIR`)
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `supekku/scripts/lib/drift/` package exists with `__init__.py`, `models.py`, `parser.py`, `registry.py`
 - [ ] Models construct correctly: DriftLedger, DriftEntry, Source, Claim, DiscoveredBy
 - [ ] Lifecycle constants defined and validation works (permissive, with warnings)
@@ -85,11 +89,13 @@ All test-driven, both linters clean.
 - [ ] Both linters clean (`just lint`, `just pylint-files` on new files)
 
 ## 5. Verification
+
 - `just test` — all unit tests
 - `just lint` — ruff
 - `just pylint-files supekku/scripts/lib/drift/*.py` — pylint on new files
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - No existing `supekku/scripts/lib/drift/` directory
   - `paths.py` follows the established pattern for adding new subdirs
@@ -100,13 +106,13 @@ All test-driven, both linters clean.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | paths.py: add `DRIFT_SUBDIR` + `get_drift_dir()` | — | done |
-| [x] | 1.2 | models: `Source`, `Claim`, `DiscoveredBy`, `DriftEntry`, `DriftLedger`, lifecycle constants | [P] | 26 tests |
-| [x] | 1.3 | parser: `parse_ledger_body()` — heading split, YAML extraction, entry construction | [P] | 24 tests, all contract edge cases |
-| [x] | 1.4 | registry: `DriftLedgerRegistry` — discover, find, iter | — | 15 tests |
-| [x] | 1.5 | tests: VT-065-models, VT-065-parser, VT-065-registry | — | 65 total, all passing |
+| Status | ID  | Description                                                                                 | Parallel? | Notes                             |
+| ------ | --- | ------------------------------------------------------------------------------------------- | --------- | --------------------------------- |
+| [x]    | 1.1 | paths.py: add `DRIFT_SUBDIR` + `get_drift_dir()`                                            | —         | done                              |
+| [x]    | 1.2 | models: `Source`, `Claim`, `DiscoveredBy`, `DriftEntry`, `DriftLedger`, lifecycle constants | [P]       | 26 tests                          |
+| [x]    | 1.3 | parser: `parse_ledger_body()` — heading split, YAML extraction, entry construction          | [P]       | 24 tests, all contract edge cases |
+| [x]    | 1.4 | registry: `DriftLedgerRegistry` — discover, find, iter                                      | —         | 15 tests                          |
+| [x]    | 1.5 | tests: VT-065-models, VT-065-parser, VT-065-registry                                        | —         | 65 total, all passing             |
 
 ### Task Details
 
@@ -152,12 +158,14 @@ All test-driven, both linters clean.
   - Parse body via `parse_ledger_body()`
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Fence-aware heading split is trickier than expected | Simple state machine: track fence open/close, only split on headings outside fences | open |
-| `load_markdown_file()` may not suit ledger frontmatter | Verify compatibility before building registry | open |
+
+| Risk                                                   | Mitigation                                                                          | Status |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------- | ------ |
+| Fence-aware heading split is trickier than expected    | Simple state machine: track fence open/close, only split on headings outside fences | open   |
+| `load_markdown_file()` may not suit ledger frontmatter | Verify compatibility before building registry                                       | open   |
 
 ## 9. Decisions & Outcomes
+
 - 2026-03-08: `_split_sections` returns `tuple[str, list[tuple[str, str]]]` instead of mixed union list — cleaner type contract
 - 2026-03-08: `broad-exception-caught` in registry narrowed to `(OSError, ValueError, KeyError)`
 - 2026-03-08: `too-many-instance-attributes` for DriftEntry (17) and DriftLedger (10) accepted — inherent to domain
@@ -165,11 +173,13 @@ All test-driven, both linters clean.
 - 2026-03-08: Updated package_utils_test.py KNOWN_LEAF_PACKAGES with new `drift` package
 
 ## 10. Findings / Research Notes
+
 - `load_markdown_file()` from `core/spec_utils.py` works well for ledger frontmatter parsing — returns `(dict, str)` tuple
-- Fence-aware heading split is a simple state machine — `in_fence` boolean toggle on ``` lines, only split on `### ` when not in fence
+- Fence-aware heading split is a simple state machine — `in_fence` boolean toggle on ```lines, only split on`### ` when not in fence
 - Parser pylint score: 9.93/10 (only inherent too-many-instance-attributes)
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (65 tests passing, linters clean)
 - [x] Phase sheet updated with outcomes

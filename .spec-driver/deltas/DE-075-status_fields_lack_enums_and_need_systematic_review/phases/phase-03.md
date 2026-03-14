@@ -1,9 +1,9 @@
 ---
 id: IP-075.PHASE-03
 slug: 075-status_fields_lack_enums_and_need_systematic_review-phase-03
-name: 'IP-075 Phase 03: docs, guidance, and close-out'
-created: '2026-03-09'
-updated: '2026-03-09'
+name: "IP-075 Phase 03: docs, guidance, and close-out"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: complete
 kind: phase
 ---
@@ -28,15 +28,15 @@ verification:
   tests: []
   evidence: []
 tasks:
-  - id: '3.1'
+  - id: "3.1"
     description: Update mem.fact.spec-driver.status-enums with all enum values
-  - id: '3.2'
+  - id: "3.2"
     description: Update skills/guidance referencing old backlog status values
-  - id: '3.3'
+  - id: "3.3"
     description: Update ISSUE-009 — mark enum/migration acceptance criteria done
-  - id: '3.4'
+  - id: "3.4"
     description: Update glossary.md if status terminology changed
-  - id: '3.5'
+  - id: "3.5"
     description: Audit and close delta
 risks: []
 ```
@@ -86,10 +86,10 @@ Ensure all downstream documentation, memories, skills, and agent guidance reflec
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-|---|---|---|---|---|
-| [x] | 3.1 | Update status-enums memory | [P] | All enum values, scope paths, non-canonical terms |
-| [x] | 3.2 | Update skills/guidance for old backlog statuses | [P] | Grep clean — no references found |
-| [x] | 3.3 | Update ISSUE-009 acceptance criteria | [P] | 6/7 criteria done, schema enforcement deferred |
-| [x] | 3.4 | Update glossary if needed | [P] | No changes needed |
-| [ ] | 3.5 | Close delta | [ ] | Pending close-change |
+| Status | ID  | Description                                     | Parallel? | Notes                                             |
+| ------ | --- | ----------------------------------------------- | --------- | ------------------------------------------------- |
+| [x]    | 3.1 | Update status-enums memory                      | [P]       | All enum values, scope paths, non-canonical terms |
+| [x]    | 3.2 | Update skills/guidance for old backlog statuses | [P]       | Grep clean — no references found                  |
+| [x]    | 3.3 | Update ISSUE-009 acceptance criteria            | [P]       | 6/7 criteria done, schema enforcement deferred    |
+| [x]    | 3.4 | Update glossary if needed                       | [P]       | No changes needed                                 |
+| [ ]    | 3.5 | Close delta                                     | [ ]       | Pending close-change                              |

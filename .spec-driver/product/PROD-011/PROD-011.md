@@ -2,8 +2,8 @@
 id: PROD-011
 slug: implementation-execution-workflow
 name: Implementation Execution Workflow
-created: '2025-11-04'
-updated: '2025-11-04'
+created: "2025-11-04"
+updated: "2025-11-04"
 status: draft
 kind: prod
 aliases: []
@@ -41,16 +41,16 @@ version: 1
 spec: PROD-011
 requirements:
   primary:
-    - PROD-011.FR-001  # Remove phase-01 auto-creation
-    - PROD-011.FR-002  # Enable phase creation with no phases
-    - PROD-011.FR-003  # Hook installation system
-    - PROD-011.FR-004  # Default workflow hooks (5 commands)
-    - PROD-011.FR-005  # IP metadata for automation preferences
-    - PROD-011.FR-006  # Constitution integration in commands
-    - PROD-011.FR-007  # Constitution validation tooling
-    - PROD-011.FR-008  # VCS abstraction
-    - PROD-011.NF-001  # Workflow adoption
-    - PROD-011.NF-002  # Delta quality improvement
+    - PROD-011.FR-001 # Remove phase-01 auto-creation
+    - PROD-011.FR-002 # Enable phase creation with no phases
+    - PROD-011.FR-003 # Hook installation system
+    - PROD-011.FR-004 # Default workflow hooks (5 commands)
+    - PROD-011.FR-005 # IP metadata for automation preferences
+    - PROD-011.FR-006 # Constitution integration in commands
+    - PROD-011.FR-007 # Constitution validation tooling
+    - PROD-011.FR-008 # VCS abstraction
+    - PROD-011.NF-001 # Workflow adoption
+    - PROD-011.NF-002 # Delta quality improvement
   collaborators: []
 interactions:
   - with: PROD-002
@@ -224,6 +224,7 @@ Phase-01 is created by `create delta` before the Implementation Plan is fleshed 
 
 **Expanded Problem** (discovered through clarification):
 Beyond the phase-01 timing issue, developers lack:
+
 - **Customizable workflow support**: Commands are fixed, can't adapt to team/project needs
 - **Configuration**: No way to control automation level (commits, messages, agent activity)
 - **Constitution enforcement**: ADRs/policies/standards exist but aren't enforced in workflow
@@ -232,6 +233,7 @@ Beyond the phase-01 timing issue, developers lack:
 ### Value Signals
 
 Guided implementation workflows directly impact:
+
 - **Developer productivity**: 20% time reduction in delta lifecycle (less workflow friction)
 - **Documentation completeness**: 95% complete verification artifacts (vs 70% baseline)
 - **Quality consistency**: 50% reduction in incomplete deltas
@@ -273,24 +275,28 @@ truths.
 ### Personas
 
 **1. Solo Developer (Sam)**
+
 - Context: Personal project using spec-driver
 - Goals: Maintain discipline without team pressure, customize workflow to their style
 - Pains: Default workflow too heavy for small changes; wants commit-per-phase not commit-per-task
 - Expectations: Can modify commands to match their process
 
 **2. Team Lead (Taylor)**
+
 - Context: Team of 5 using spec-driver with jj (not git)
 - Goals: Establish team workflow, enforce coding standards, adapt to jj commands
 - Pains: Hardcoded git assumptions; can't enforce team's ADRs automatically
 - Expectations: Configure automation level, customize commands for team, validate against constitution
 
 **3. New Developer (Nathan)**
+
 - Context: First week using spec-driver
 - Goals: Understand implementation workflow, follow team conventions
 - Pains: Doesn't know what ADRs exist, unclear what automation is happening
 - Expectations: Onboarding shows constitution, default workflow teaches process
 
 **4. OSS Contributor (Charlie)**
+
 - Context: Contributing to project using spec-driver, different workflow than their own projects
 - Goals: Follow project conventions without modifying their local defaults
 - Pains: Can't easily see what's different about this project's workflow
@@ -381,16 +387,16 @@ Result: Constitution visible, enforced, helps Nathan follow standards
 **FR-001: Remove Phase-01 Auto-Creation**
 System MUST NOT create phase-01.md when running `create delta`. Delta creation produces only: delta file, design revision, implementation plan, and notes file.
 
-*Rationale*: This is the original problem - phase-01 created too early can't benefit from IP intelligence
+_Rationale_: This is the original problem - phase-01 created too early can't benefit from IP intelligence
 
-*Verification*: VT-011-001 - Test create delta output, verify no phases/ directory
+_Verification_: VT-011-001 - Test create delta output, verify no phases/ directory
 
 **FR-002: Enable Phase Creation When No Phases Exist**
 System MUST support `create phase --plan IP-XXX` when plan has zero existing phases, creating phase-01 with entry/exit criteria copied from implementation plan.
 
-*Rationale*: Phase-01 needs same intelligence as phases 2+ (the whole point!)
+_Rationale_: Phase-01 needs same intelligence as phases 2+ (the whole point!)
 
-*Verification*: VT-011-002 - Test create phase on empty plan, verify phase-01 created with IP criteria
+_Verification_: VT-011-002 - Test create phase on empty plan, verify phase-01 created with IP criteria
 
 ---
 
@@ -399,21 +405,23 @@ System MUST support `create phase --plan IP-XXX` when plan has zero existing pha
 **FR-003: Hook Installation System**
 System MUST provide command to install workflow hooks to `.claude/commands/` directory as customizable markdown files, preserving modifications across updates.
 
-*Rationale*: Like templates, workflow commands should be locally customizable
+_Rationale_: Like templates, workflow commands should be locally customizable
 
-*Implementation*:
+_Implementation_:
+
 - `spec-driver install workflow-hooks` copies default commands to `.claude/commands/`
 - Checks for existing modified commands, preserves them
 - Updates only if user confirms overwrite
 
-*Verification*: VT-011-003 - Test installation, modification preservation, update behavior
+_Verification_: VT-011-003 - Test installation, modification preservation, update behavior
 
 **FR-004: Default Workflow Hooks**
 System MUST provide default workflow hooks for five stages: implementation planning, phase planning, task execution, phase completion, delta completion.
 
-*Rationale*: Provide canonical workflow as starting point for customization
+_Rationale_: Provide canonical workflow as starting point for customization
 
-*Commands*:
+_Commands_:
+
 1. `/supekku.plan` - Flesh out IP/DR, research, set delta in-progress
 2. `/supekku.phase` - Create phase with IP criteria, validate entry gates, plan tasks
 3. `/supekku.task` - Update progress, record notes, commit reminders
@@ -422,7 +430,7 @@ System MUST provide default workflow hooks for five stages: implementation plann
 
 NOTE/TODO: - probably also a "wrap up phase sheet for handover" command
 
-*Verification*: VT-011-004 - Test each command in default configuration
+_Verification_: VT-011-004 - Test each command in default configuration
 
 ---
 
@@ -431,11 +439,12 @@ NOTE/TODO: - probably also a "wrap up phase sheet for handover" command
 **FR-005: IP Automation Metadata Schema**
 System MUST support automation preferences in IP frontmatter, with CLI flag support in create delta / phase, controlling agent behavior during workflow execution.
 
-*Rationale*: Teams have varied preferences for automation level and commit workflow
+_Rationale_: Teams have varied preferences for automation level and commit workflow
 
-flags: `--stage-commits [true|phase]`, `--perform-commits [true|phase]` 
+flags: `--stage-commits [true|phase]`, `--perform-commits [true|phase]`
 
-*Schema*:
+_Schema_:
+
 ```yaml
 schema: supekku.plan.overview
 version: 1
@@ -443,26 +452,26 @@ plan: IP-XXX
 delta: DE-XXX
 automation:
   stage_for_commit: false (default) | true | phase # end of phase only
-  perfom_commit: false (default) | true | phase # end of phase only 
+  perfom_commit: false (default) | true | phase # end of phase only
 phases: [...]
 ```
 
+Future consideration: _Project Defaults_: `.spec-driver/config.yaml` includes `automation` section with project-wide defaults
 
-Future consideration: *Project Defaults*: `.spec-driver/config.yaml` includes `automation` section with project-wide defaults
-
-*Verification*: VT-011-005 - Test schema validation, behavior changes per config
+_Verification_: VT-011-005 - Test schema validation, behavior changes per config
 
 **FR-008: VCS Abstraction**
 System MUST abstract VCS operations to support git, jj, and other version control tools through configuration, not hardcoded commands.
 
-*Rationale*: Different projects use different VCS tools
+_Rationale_: Different projects use different VCS tools
 
-*Implementation*:
+_Implementation_:
+
 - VCS commands specified in IP metadata or project config
 - Workflow hooks use abstracted operations (commit, status, diff)
 - Default to git if not specified
 
-*Verification*: VT-011-008 - Test workflow with git and jj configurations
+_Verification_: VT-011-008 - Test workflow with git and jj configurations
 
 ---
 
@@ -471,26 +480,28 @@ System MUST abstract VCS operations to support git, jj, and other version contro
 **FR-006: Constitution Integration in Commands**
 Default workflow hooks MUST embed constitution (ADRs, policies, standards) by referencing relevant documents and reminding users of applicable constraints.
 
-*Rationale*: Constitution should be enforced through workflow, not just documentation
+_Rationale_: Constitution should be enforced through workflow, not just documentation
 
-*Implementation*:
+_Implementation_:
+
 - Default commands include constitution discovery and reference
 - `/supekku.plan` checks for ADRs related to delta scope
 - Phase/delta completion validate against standards
 
-*Verification*: VT-011-006 - Test default commands include constitution checks
+_Verification_: VT-011-006 - Test default commands include constitution checks
 
 **FR-007: Constitution Validation Tooling**
 System MUST provide tooling to discover and validate against constitution: onboarding command listing active elements, pre-flight checks before critical operations.
 
-*Rationale*: Constitution must be visible and enforceable, not hidden
+_Rationale_: Constitution must be visible and enforceable, not hidden
 
-*Commands*:
+_Commands_:
+
 - `spec-driver onboard` - Show constitution + workflow overview (uses PROD-010.FR-012-014 help system)
 - `spec-driver governance` - Check work against ADRs/policies/standards
 - Pre-flight hooks in workflow commands
 
-*Verification*: VT-011-007 - Test onboarding shows constitution, validate catches violations
+_Verification_: VT-011-007 - Test onboarding shows constitution, validate catches violations
 
 ---
 
@@ -499,12 +510,12 @@ System MUST provide tooling to discover and validate against constitution: onboa
 **NF-001: High Workflow Adoption**
 Developers (the primary author) finds them valuable and has no major friction points identified. Community users positive sentiment overall (github issues, etc).
 
-*Measurement*: VH-011-001 - Vibe check.
+_Measurement_: VH-011-001 - Vibe check.
 
 **NF-002: Improved Delta Quality**
 Deltas completed using workflow commands MUST have 95%+ complete verification artifacts, compared to 70% baseline without commands.
 
-*Measurement*: VA-011-001 - Audit delta completion quality before/after workflow introduction
+_Measurement_: VA-011-001 - Audit delta completion quality before/after workflow introduction
 
 ### Success Metrics
 
@@ -554,19 +565,24 @@ Hooks live in `.claude/commands/` as markdown files:
 You are helping the user complete implementation planning for a delta.
 
 ## Context Discovery
+
 1. Identify current delta (from working directory or user specification)
 2. Read delta, DR, IP files
 3. Load automation preferences from IP frontmatter or project defaults
 4. Check relevant ADRs using `spec-driver list adrs --status accepted`
 
 ## Constitution Check
+
 Review ADRs for guidance on:
+
 - Architecture decisions relevant to delta scope
 - Standards for testing, documentation, naming
 - Policies for review, verification, commits
 
 ## Implementation Plan Completion
+
 Guide user through:
+
 1. Design Revision (current/target behavior, hotspots, impacts)
 2. Phase breakdown (objectives, sequencing)
 3. Entry/exit criteria (per phase)
@@ -574,12 +590,15 @@ Guide user through:
 5. Dependencies and risks
 
 ## Automation Behavior
+
 Per IP automation config:
+
 - If agent_prepares_commits: prepare commit with message "plan: complete IP and DR for DE-XXX"
 - If commit_strategy == on_demand: ask user if they want to commit now
 - Use vcs_commands.commit from config
 
 ## Deliverables
+
 - DR fleshed out with concrete details
 - IP phase overview complete
 - Delta status updated to in-progress
@@ -587,6 +606,7 @@ Per IP automation config:
 ```
 
 Users can modify this file to:
+
 - Change constitution references
 - Adjust automation prompts
 - Add team-specific checks
@@ -603,7 +623,7 @@ plan: IP-XXX
 delta: DE-XXX
 automation:
   # Commit strategy: when to prepare commits
-  commit_strategy: per_task  # per_task | per_phase | manual | on_demand
+  commit_strategy: per_task # per_task | per_phase | manual | on_demand
 
   # Agent responsibilities
   agent_prepares_commits: true
@@ -631,7 +651,7 @@ phases: [...]
 automation:
   default_commit_strategy: per_phase
   default_vcs: git
-  constitution_enforcement: strict  # strict | warn | off
+  constitution_enforcement: strict # strict | warn | off
 
 help:
   workflow_docs_dir: docs/workflow/
@@ -648,6 +668,7 @@ hooks:
 ### Constitution Integration Points
 
 1. **Onboarding Command** (leverages PROD-010.FR-012-014):
+
    ```bash
    $ spec-driver onboard
 
@@ -685,6 +706,7 @@ hooks:
    - `/supekku.delta-complete` runs constitution validation
 
 3. **Constitution Validator**:
+
    ```bash
    $ spec-driver validate constitution [--delta DE-XXX]
 
@@ -865,25 +887,30 @@ Result: Flexibility for experienced users, validation prevents mistakes
 ### Testing Strategy
 
 **Unit Tests**:
+
 - VT-011-001: Delta creation (no phase-01)
 - VT-011-002: Phase creation with empty plan
 - VT-011-005: Automation metadata parsing and behavior
 
 **Integration Tests**:
+
 - VT-011-003: Hook installation and modification preservation
 - VT-011-004: Default workflow hooks end-to-end
 - VT-011-008: VCS abstraction with git and jj
 
 **System Tests**:
+
 - VT-011-006: Constitution integration in commands
 - VT-011-007: Constitution validation tooling
 
 **User Testing**:
+
 - VH-011-001: 5 developers (2 new, 2 experienced, 1 team lead)
   - Measure: adoption rate, customization usage, satisfaction
   - Observe: friction points, confusion, successful adaptations
 
 **Metrics Validation**:
+
 - VA-011-001: Delta quality audit
   - Before: 70% verification artifact completeness
   - After: Target 95%
@@ -906,12 +933,14 @@ Result: Flexibility for experienced users, validation prevents mistakes
 ### Observability
 
 **Telemetry** (privacy-preserving):
+
 - Command usage frequency (which hooks used)
 - Customization rate (% projects with modified hooks)
 - Automation config distribution (commit strategies)
 - Constitution validation runs and violations
 
 **Success Indicators**:
+
 - Workflow adoption trending toward 70%+
 - Delta quality improving toward 95%
 - Time-to-completion decreasing
@@ -922,16 +951,19 @@ Result: Flexibility for experienced users, validation prevents mistakes
 ### Dependencies
 
 **Blocking**:
+
 - PROD-006 (Phase Management): create phase intelligence
 - PROD-010.FR-012 to FR-014 (Help System): documentation infrastructure
 
 **Related**:
+
 - PROD-002 (Delta Creation): extends with workflow
 - All specs: constitution validation applies to all work
 
 ### Enabling Delta
 
 **DE-TBD: Implement Workflow Hook System**
+
 - Priority: High
 - Complexity: Medium-High
 - Phases:
@@ -945,6 +977,7 @@ Result: Flexibility for experienced users, validation prevents mistakes
 ### Future Enhancements
 
 **Out of Scope for Initial Cut**:
+
 - Workflow state machine (planned → in-progress → blocked → complete)
 - Workflow visualization (progress diagrams, phase trees)
 - Advanced constitution analysis (ADR conflict detection)
@@ -956,40 +989,46 @@ Result: Flexibility for experienced users, validation prevents mistakes
 ### Related ADRs
 
 **Needed**:
+
 - ADR-TBD: Workflow hook architecture and customization strategy
 - ADR-TBD: VCS abstraction design
 - ADR-TBD: Constitution enforcement levels (strict vs warn)
 
 ### Known Risks
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Hook customization causes breakage on update | Medium | Medium | Version hooks, migration guide, preserve modifications |
-| VCS abstraction incomplete for some tools | Medium | Low | Start with git/jj, document extension points |
-| Constitution enforcement too rigid | Low | High | Support enforcement levels (strict/warn/off), user feedback |
-| Automation metadata too complex | Medium | Medium | Provide sensible defaults, progressive disclosure |
-| Adoption lower than expected | Low | Medium | Strong defaults, clear value prop, user feedback loop |
+| Risk                                         | Likelihood | Impact | Mitigation                                                  |
+| -------------------------------------------- | ---------- | ------ | ----------------------------------------------------------- |
+| Hook customization causes breakage on update | Medium     | Medium | Version hooks, migration guide, preserve modifications      |
+| VCS abstraction incomplete for some tools    | Medium     | Low    | Start with git/jj, document extension points                |
+| Constitution enforcement too rigid           | Low        | High   | Support enforcement levels (strict/warn/off), user feedback |
+| Automation metadata too complex              | Medium     | Medium | Provide sensible defaults, progressive disclosure           |
+| Adoption lower than expected                 | Low        | Medium | Strong defaults, clear value prop, user feedback loop       |
 
 ## 8. Open Questions
 
 **Q1: Should workflow hooks be versioned?**
+
 - Proposal: Yes, version in filename (supekku-plan-v1.md) or frontmatter
 - Benefit: Can migrate hooks when schema changes
 - Cost: More complexity for users
 
 **Q2: How to handle hook updates when user modified?**
+
 - Proposal: Three-way merge (base, user, new) with conflict markers
 - Alternative: Side-by-side install (supekku-plan.md vs supekku-plan-new.md)
 
 **Q3: Should constitution enforcement levels be per-ADR or global?**
+
 - Proposal: Global with per-ADR override
 - Example: strict by default, but ADR-031 (commit format) is warn-only
 
 **Q4: How to discover project-specific constitution?**
+
 - Proposal: Scan specify/decisions/ for accepted ADRs, .spec-driver/ for policies
 - Need: Standard location for policies and standards files
 
 **Q5: Should help system integration be phase 1 or later phase?**
+
 - Proposal: Phase 2 - core fix and hooks first, help integration after PROD-010 complete
 - Rationale: Don't block on PROD-010 implementation timeline
 
@@ -998,6 +1037,7 @@ Result: Flexibility for experienced users, validation prevents mistakes
 ## Changes from Original PROD-011
 
 **Added**:
+
 - Customizable workflow hook system (FR-003)
 - Metadata-driven automation preferences (FR-005)
 - Constitution integration and tooling (FR-006, FR-007)
@@ -1007,6 +1047,7 @@ Result: Flexibility for experienced users, validation prevents mistakes
 - Team/project customization scenarios
 
 **Preserved**:
+
 - Core fix (remove phase-01 auto-creation)
 - Enable create phase when no phases exist
 - Five default workflow commands
@@ -1014,6 +1055,7 @@ Result: Flexibility for experienced users, validation prevents mistakes
 - Manual workflow always valid
 
 **Removed/Deferred**:
+
 - Prescriptive single workflow assumption
 - Hardcoded git commands
 - Fixed automation behavior

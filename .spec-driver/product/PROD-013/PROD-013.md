@@ -2,8 +2,8 @@
 id: PROD-013
 slug: cli-artifact-file-access
 name: CLI Artifact File Access
-created: '2026-02-04'
-updated: '2026-02-04'
+created: "2026-02-04"
+updated: "2026-02-04"
 status: draft
 kind: prod
 aliases: [artifact-access, file-access]
@@ -191,11 +191,13 @@ entries:
 ### Personas / Actors
 
 **Developer (Human)**
+
 - Goals: Quickly view/edit specs, ADRs, deltas without path lookup
 - Pains: Remembering file paths; inconsistent CLI flags
 - Expectations: `spec-driver edit adr 001` just works
 
 **AI Agent**
+
 - Goals: Retrieve artifact paths for file operations
 - Pains: Must parse formatted output or guess paths
 - Expectations: `--path` or `--json` gives structured data
@@ -203,6 +205,7 @@ entries:
 ### Primary Journeys / Flows
 
 **Journey 1: Quick Edit**
+
 ```
 GIVEN developer wants to edit ADR-012
 WHEN runs `spec-driver edit adr 012`
@@ -211,6 +214,7 @@ AND developer can immediately edit
 ```
 
 **Journey 2: Shell Composition**
+
 ```
 GIVEN developer wants to grep an ADR
 WHEN runs `spec-driver show adr 012 --raw | grep -i 'decision'`
@@ -218,6 +222,7 @@ THEN sees matching lines from the raw file
 ```
 
 **Journey 3: Agent Path Lookup**
+
 ```
 GIVEN agent needs file path for SPEC-009
 WHEN runs `spec-driver show spec SPEC-009 --path`
@@ -228,11 +233,13 @@ AND can use path for file operations
 ### Edge Cases & Non-goals
 
 **Non-goals:**
+
 - GUI/TUI interfaces (terminal-only)
 - Multi-file artifacts (return primary file only for --path)
 - Creating new artifacts (handled by `create` command)
 
 **Edge Cases:**
+
 - Missing $EDITOR/$PAGER: fall back to sensible defaults
 - Artifact not found: clear error message with suggestions
 - Multiple files match (delta bundles): return primary file
@@ -246,33 +253,33 @@ See `supekku:spec.capabilities@v1` block above.
 ### Functional Requirements
 
 - **FR-001**: All `show` subcommands MUST support `--path` flag that outputs only the file path
-  *Verification*: VT-001 - Test on all show subcommands
+  _Verification_: VT-001 - Test on all show subcommands
 
 - **FR-002**: All `show` subcommands MUST support `--raw` flag that outputs raw file content
-  *Verification*: VT-002 - Test raw output matches file content
+  _Verification_: VT-002 - Test raw output matches file content
 
 - **FR-003**: System MUST provide `view` command that opens artifact in `$PAGER` (fallback: less, more)
-  *Verification*: VT-003 - Test pager invocation
+  _Verification_: VT-003 - Test pager invocation
 
 - **FR-004**: System MUST provide `edit` command that opens artifact in `$EDITOR` (fallback: $VISUAL, vi)
-  *Verification*: VT-004 - Test editor invocation
+  _Verification_: VT-004 - Test editor invocation
 
 - **FR-005**: `find` command MUST support all artifact types (spec, delta, adr, revision, requirement, policy, standard), not just card
-  *Verification*: VT-005 - Test find subcommands exist and work
+  _Verification_: VT-005 - Test find subcommands exist and work
 
 - **FR-006**: All `show` subcommands MUST support `--json` flag for structured output
-  *Verification*: VT-006 - Test --json on show card (currently missing)
+  _Verification_: VT-006 - Test --json on show card (currently missing)
 
 - **FR-007**: `--json` output MUST include `path` field for all artifacts
-  *Verification*: VT-006 - Verify path in JSON output
+  _Verification_: VT-006 - Verify path in JSON output
 
 ### Non-Functional Requirements
 
 - **NF-001**: Path resolution MUST complete in <100ms for any artifact
-  *Measurement*: Timing tests on cold cache
+  _Measurement_: Timing tests on cold cache
 
 - **NF-002**: CLI flag names MUST be consistent across all artifact types
-  *Measurement*: Automated flag audit
+  _Measurement_: Automated flag audit
 
 ### Success Metrics / Signals
 
@@ -284,6 +291,7 @@ See `supekku:spec.capabilities@v1` block above.
 ### User Experience / Outcomes
 
 **New Commands:**
+
 ```bash
 # View artifact in pager
 spec-driver view adr ADR-012
@@ -297,6 +305,7 @@ spec-driver edit delta DE-005
 ```
 
 **New Flags on `show`:**
+
 ```bash
 # Output path only (composable)
 spec-driver show adr ADR-012 --path
@@ -312,6 +321,7 @@ spec-driver show adr ADR-012 --json
 ```
 
 **Extended `find`:**
+
 ```bash
 # Find files for any artifact type
 spec-driver find spec SPEC-009
@@ -328,6 +338,7 @@ Path resolution uses existing registry infrastructure. Each artifact type's regi
 ### Primary Flows
 
 **Flow 1: show --path**
+
 1. User runs `spec-driver show adr ADR-012 --path`
 2. System loads decision registry
 3. Finds ADR-012 entry
@@ -335,6 +346,7 @@ Path resolution uses existing registry infrastructure. Each artifact type's regi
 5. Exit 0
 
 **Flow 2: view command**
+
 1. User runs `spec-driver view adr ADR-012`
 2. System resolves path (as above)
 3. Reads $PAGER (fallback: less, more)
@@ -342,6 +354,7 @@ Path resolution uses existing registry infrastructure. Each artifact type's regi
 5. Pager displays file
 
 **Flow 3: edit command**
+
 1. User runs `spec-driver edit adr ADR-012`
 2. System resolves path
 3. Reads $EDITOR (fallback: $VISUAL, vi)
@@ -385,6 +398,7 @@ Path resolution uses existing registry infrastructure. Each artifact type's regi
 | card | ✗ | ✓ (-q) | ✗ | ✓ | -a/--anywhere |
 
 **Gaps identified:**
+
 - `show card` missing `--json`
 - All show commands missing `--path` (except card has `-q`)
 - All show commands missing `--raw`
@@ -402,6 +416,7 @@ Path resolution uses existing registry infrastructure. Each artifact type's regi
 | standards | ✓ | ✓ | ✓ | ✓ | ✗ |
 
 **Gaps identified:**
+
 - `list cards` missing `--truncate`, `--regexp`
 - Several list commands missing `--paths`
 
@@ -415,11 +430,13 @@ Path resolution uses existing registry infrastructure. Each artifact type's regi
 ### Open Decisions
 
 **Q1: Relative vs Absolute Paths**
+
 - Current: Most paths are relative to repo root
 - Proposal: Keep relative, add `--absolute` flag if needed
 - Status: Use relative paths (consistent with existing behavior)
 
 **Q2: Multi-file Artifacts**
+
 - Delta bundles contain multiple files (DE-xxx.md, DR-xxx.md, IP-xxx.md, phases/)
 - Proposal: `--path` returns primary file (DE-xxx.md); `find` returns all files
 - Status: Needs confirmation

@@ -2,31 +2,31 @@
 id: SPEC-124
 slug: supekku-scripts-lib-sync-adapters
 name: supekku/scripts/lib/sync/adapters Specification
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: draft
 kind: spec
 category: unit
 c4_level: code
 responsibilities:
-- Language-specific source code discovery
-- AST-based documentation generation
-- Multi-language adapter abstraction
-- Source validation and git tracking
+  - Language-specific source code discovery
+  - AST-based documentation generation
+  - Multi-language adapter abstraction
+  - Source validation and git tracking
 aliases: []
 packages:
-- supekku/scripts/lib/sync/adapters
+  - supekku/scripts/lib/sync/adapters
 sources:
-- language: python
-  identifier: supekku/scripts/lib/sync/adapters
-  module: supekku.scripts.lib.sync.adapters
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/scripts/lib/sync/adapters
+    module: supekku.scripts.lib.sync.adapters
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
 owners: []
 auditers: []
 relations: []
@@ -263,7 +263,6 @@ entries:
   - Package managers: npm, pnpm, bun (TypeScript/JavaScript)
 
 - **Primary Journeys / Flows**:
-
   1. **Discover Sources**:
      - Given: Repository root and optional requested identifiers
      - When: `discover_targets()` is called
@@ -301,42 +300,42 @@ The base `LanguageAdapter` abstract class ensures consistency while allowing lan
 ### Functional Requirements
 
 - **SPEC-124.FR-001**: LanguageAdapter base class MUST define abstract methods for `discover_targets()`, `describe()`, `generate()`, and `supports_identifier()`
-  *Verification*: VT-001 - Base class interface tests
+  _Verification_: VT-001 - Base class interface tests
 
 - **SPEC-124.FR-002**: LanguageAdapter MUST provide `validate_source_exists()` to check file/directory existence and git tracking status
-  *Verification*: VT-002 - Source validation tests
+  _Verification_: VT-002 - Source validation tests
 
 - **SPEC-124.FR-003**: PythonAdapter MUST discover Python modules using package structure and `__init__.py` detection
-  *Verification*: VT-003 - Python discovery tests
+  _Verification_: VT-003 - Python discovery tests
 
 - **SPEC-124.FR-004**: PythonAdapter MUST generate AST-based documentation preserving docstring formatting (including indentation)
-  *Verification*: VT-004 - Docstring preservation tests
+  _Verification_: VT-004 - Docstring preservation tests
 
 - **SPEC-124.FR-005**: GoAdapter MUST discover Go packages using `go list` command
-  *Verification*: VT-005 - Go package discovery tests
+  _Verification_: VT-005 - Go package discovery tests
 
 - **SPEC-124.FR-006**: GoAdapter MUST validate Go toolchain and gomarkdoc availability before generation
-  *Verification*: VT-006 - Toolchain validation tests
+  _Verification_: VT-006 - Toolchain validation tests
 
 - **SPEC-124.FR-007**: TypeScriptAdapter MUST discover logical modules (directories with index.ts/js, standalone files, src/ subdirectories)
-  *Verification*: VT-007 - TypeScript discovery tests
+  _Verification_: VT-007 - TypeScript discovery tests
 
 - **SPEC-124.FR-008**: TypeScriptAdapter MUST extract AST using ts-morph via ts-doc-extract subprocess
-  *Verification*: VT-008 - AST extraction tests
+  _Verification_: VT-008 - AST extraction tests
 
 - **SPEC-124.FR-009**: TypeScriptAdapter MUST detect and support npm, pnpm, and bun package managers
-  *Verification*: VT-009 - Package manager detection tests
+  _Verification_: VT-009 - Package manager detection tests
 
 ### Non-Functional Requirements
 
 - **SPEC-124.NF-001**: All adapters MUST generate deterministic output (same input → same output)
-  *Measurement*: VT-010 - Deterministic output verification tests
+  _Measurement_: VT-010 - Deterministic output verification tests
 
 - **SPEC-124.NF-002**: Adapters MUST fail gracefully with descriptive errors when required toolchains are unavailable
-  *Measurement*: VT-011 - Error handling tests for missing Go/Node.js
+  _Measurement_: VT-011 - Error handling tests for missing Go/Node.js
 
 - **SPEC-124.NF-003**: TypeScriptAdapter MUST support multiple package managers without requiring explicit configuration
-  *Measurement*: VT-012 - Package manager auto-detection tests
+  _Measurement_: VT-012 - Package manager auto-detection tests
 
 ### Operational Targets
 
@@ -379,16 +378,19 @@ Concrete Adapters:
 ### Data Models
 
 **SourceUnit** (from `supekku.scripts.lib.sync.models`):
+
 - `identifier`: Language-specific source identifier (e.g., module path, package name)
 - `language`: Language type (python, go, typescript)
 - `path`: Filesystem path to source
 
 **SourceDescriptor**:
+
 - `slug_parts`: List of slug components for contract filenames
 - `frontmatter`: Default frontmatter metadata
 - `variants`: List of documentation variant types to generate
 
 **DocVariant**:
+
 - `name`: Variant name (public, all, tests)
 - `path`: Output path for generated contract
 - `content`: Generated markdown content
@@ -525,6 +527,7 @@ class LanguageAdapter(ABC):
 ### Verification Coverage
 
 All functional requirements have corresponding unit tests (VT-001 through VT-012). Tests validate:
+
 - Abstract interface enforcement
 - Source discovery for each language
 - Documentation generation with toolchains

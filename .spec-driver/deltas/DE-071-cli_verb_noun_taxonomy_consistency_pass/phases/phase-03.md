@@ -1,9 +1,9 @@
 ---
 id: IP-071.PHASE-03
 slug: 071-guidance-sweep
-name: 'P03: Guidance sweep'
-created: '2026-03-09'
-updated: '2026-03-09'
+name: "P03: Guidance sweep"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---
@@ -27,17 +27,17 @@ verification:
   evidence:
     - VA-071-01
 tasks:
-  - id: '3.1'
+  - id: "3.1"
     description: Grep for stale command references
-  - id: '3.2'
+  - id: "3.2"
     description: Update memories referencing old commands
-  - id: '3.3'
+  - id: "3.3"
     description: Update skills referencing old commands
-  - id: '3.4'
+  - id: "3.4"
     description: Update CLAUDE.md and generated docs
-  - id: '3.5'
+  - id: "3.5"
     description: Re-run install to regenerate AGENTS.md
-  - id: '3.6'
+  - id: "3.6"
     description: Final verification grep
 risks: []
 ```
@@ -84,11 +84,11 @@ Search scope: `.spec-driver/`, `CLAUDE.md`, memory records, skill files.
 
 ## 6. Tasks
 
-| Status | ID | Description | Notes |
-|--------|-----|-------------|-------|
-| [ ] | 3.1 | Grep for stale patterns | List all hits |
-| [ ] | 3.2 | Update memory records | `/maintaining-memory` |
-| [ ] | 3.3 | Update skill files | |
-| [ ] | 3.4 | Update CLAUDE.md, README.md, generated docs | |
-| [ ] | 3.5 | Re-run `spec-driver install` to regenerate AGENTS.md | |
-| [ ] | 3.6 | Final verification grep (VA-071-01) | Must be zero hits |
+| Status | ID  | Description                                          | Notes                 |
+| ------ | --- | ---------------------------------------------------- | --------------------- |
+| [ ]    | 3.1 | Grep for stale patterns                              | List all hits         |
+| [ ]    | 3.2 | Update memory records                                | `/maintaining-memory` |
+| [ ]    | 3.3 | Update skill files                                   |                       |
+| [ ]    | 3.4 | Update CLAUDE.md, README.md, generated docs          |                       |
+| [ ]    | 3.5 | Re-run `spec-driver install` to regenerate AGENTS.md |                       |
+| [ ]    | 3.6 | Final verification grep (VA-071-01)                  | Must be zero hits     |

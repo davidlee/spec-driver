@@ -2,8 +2,8 @@
 id: SPEC-112
 slug: supekku-scripts-cli
 name: supekku/scripts/cli Specification
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: stub
 kind: spec
 category: unit
@@ -11,18 +11,18 @@ c4_level: code
 responsibilities: []
 aliases: []
 packages:
-- supekku/scripts/cli
+  - supekku/scripts/cli
 sources:
-- language: python
-  identifier: supekku/scripts/cli
-  module: supekku.scripts.cli
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/scripts/cli
+    module: supekku.scripts.cli
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
 owners: []
 auditers: []
 relations: []
@@ -261,42 +261,42 @@ The CLI package provides four main capabilities:
 ### Functional Requirements
 
 - **SPEC-112.FR-001**: CLI MUST accept a path argument (file or directory) and validate it exists before processing
-  *Example*: `ast_doc_generator.py /path/to/package` validates path exists
-  *Verification*: VT-001 - Path validation test
+  _Example_: `ast_doc_generator.py /path/to/package` validates path exists
+  _Verification_: VT-001 - Path validation test
 
 - **SPEC-112.FR-002**: CLI MUST support `--type` argument with choices: `public` (default), `all`, `tests` to control documentation variants
-  *Example*: `--type all` generates documentation including private symbols
-  *Verification*: VT-002 - Variant selection test
+  _Example_: `--type all` generates documentation including private symbols
+  _Verification_: VT-002 - Variant selection test
 
 - **SPEC-112.FR-003**: CLI MUST exit with code 1 for invalid inputs (missing path, permission errors, invalid arguments) and print clear error messages
-  *Example*: Non-existent path prints "Error: <path> does not exist" and exits 1
-  *Verification*: VT-003 - Error handling test
+  _Example_: Non-existent path prints "Error: <path> does not exist" and exits 1
+  _Verification_: VT-003 - Error handling test
 
 - **SPEC-112.FR-004**: CLI MUST support `--check` mode that verifies documentation matches code without writing files, exiting 0 if unchanged or 1 if changes detected
-  *Example*: `--check` compares content hashes and exits 1 if any doc is stale
-  *Verification*: VT-004 - Check mode comparison test
+  _Example_: `--check` compares content hashes and exits 1 if any doc is stale
+  _Verification_: VT-004 - Check mode comparison test
 
 - **SPEC-112.FR-005**: CLI MUST format results with status symbols: `+` (created), `~` (changed), `=` (unchanged), `✗` (error), with `✓`/`✗` in check mode
-  *Example*: Output shows `+ contracts/module.md: created`
-  *Verification*: VT-005 - Status symbol formatting test
+  _Example_: Output shows `+ contracts/module.md: created`
+  _Verification_: VT-005 - Status symbol formatting test
 
 - **SPEC-112.FR-006**: CLI MUST print summary statistics showing counts by status (created, changed, unchanged, errors) after processing multiple files
-  *Example*: "Summary: 3 created, 1 changed, 5 unchanged (9 files total)"
-  *Verification*: VT-006 - Summary statistics test
+  _Example_: "Summary: 3 created, 1 changed, 5 unchanged (9 files total)"
+  _Verification_: VT-006 - Summary statistics test
 
 - **SPEC-112.FR-007**: CLI MUST maintain backward compatibility with original interface including all argument names, default values, and exit codes
-  *Example*: Existing scripts using old CLI continue to work without modification
-  *Verification*: VT-007 - Backward compatibility integration test
+  _Example_: Existing scripts using old CLI continue to work without modification
+  _Verification_: VT-007 - Backward compatibility integration test
 
 ### Non-Functional Requirements
 
 - **SPEC-112.NF-001**: CLI MUST complete documentation generation for typical package (≤100 files) in ≤5 seconds (wall time) on modern hardware
-  *Example*: Generate docs for `supekku/scripts/lib` package in <5s
-  *Measurement*: VA-001 - Performance benchmark with time measurement
+  _Example_: Generate docs for `supekku/scripts/lib` package in <5s
+  _Measurement_: VA-001 - Performance benchmark with time measurement
 
 - **SPEC-112.NF-002**: CLI MUST preserve all original argument names, defaults, and behaviors to ensure zero-modification migration for existing scripts
-  *Example*: Scripts using `--output-dir`, `--cache-dir`, `--no-cache` work unchanged
-  *Measurement*: VH-001 - Manual verification with existing automation scripts
+  _Example_: Scripts using `--output-dir`, `--cache-dir`, `--no-cache` work unchanged
+  _Measurement_: VH-001 - Manual verification with existing automation scripts
 
 ### Operational Targets
 
@@ -354,6 +354,7 @@ The CLI package provides four main capabilities:
 ### Data & Contracts
 
 **Input Arguments** (argparse namespace):
+
 ```python
 {
   'path': Path,           # Required: file or directory to document
@@ -368,6 +369,7 @@ The CLI package provides four main capabilities:
 ```
 
 **Library API Contract** (`generate_docs()`):
+
 ```python
 generate_docs(
   unit: Path,                # File or directory to process
@@ -380,6 +382,7 @@ generate_docs(
 ```
 
 **DocResult Model** (from library):
+
 ```python
 DocResult(
   path: Path,        # Output file path
@@ -393,6 +396,7 @@ DocResult(
 ### Interfaces
 
 **Public CLI Interface** (both scripts):
+
 ```bash
 # Basic usage
 <script> <path> [--type {public|all|tests}] [--output-dir DIR]
@@ -409,6 +413,7 @@ deterministic_ast_doc_generator.py <path> --verbose
 ```
 
 **Exit Codes**:
+
 - `0`: Success (or check mode with all docs up-to-date)
 - `1`: Failure (errors, invalid input, or check mode with stale docs)
 
@@ -442,24 +447,29 @@ deterministic_ast_doc_generator.py <path> --verbose
 ### Error Handling / Guards
 
 **Invalid Path**:
+
 - Guard: Check `path.exists()` before calling library
 - Response: Print "Error: <path> does not exist", exit 1
 
 **Permission Error**:
+
 - Guard: Catch `PermissionError` from library
 - Response: Print error message, exit 1
 
 **Invalid Variant Type**:
+
 - Guard: Argument parser choices constraint
 - Response: argparse prints usage, exit 2 (argparse convention)
 
 **Library API Error**:
+
 - Guard: Catch generic `Exception` from `generate_docs()`
 - Response: Print "Error generating documentation: <message>", exit 1
 
 ### State Transitions
 
 CLI scripts are stateless - each invocation is independent:
+
 ```
 START → Parse Args → Validate Inputs → Call Library → Format Results → EXIT
 ```
@@ -471,6 +481,7 @@ No persistent state between invocations. All state management delegated to libra
 ### Testing Strategy
 
 **Unit Tests** (VT-001 through VT-007):
+
 - Test argument parser with valid/invalid inputs
 - Test variant type mapping to VariantSpec
 - Test error handling paths (missing path, permission errors)
@@ -480,16 +491,19 @@ No persistent state between invocations. All state management delegated to libra
 - Test backward compatibility helpers
 
 **Integration Tests**:
+
 - End-to-end CLI invocation with real library
 - Test full workflow: args → library → formatting → output
 - Verify exit codes match expected values
 
 **Performance Tests** (VA-001):
+
 - Benchmark typical package (≤100 files) generation time
 - Target: ≤5 seconds wall time
 - Environment: Modern hardware (4-core, SSD)
 
 **Manual Tests** (VH-001):
+
 - Run existing automation scripts without modification
 - Verify all original arguments still work
 - Confirm output format unchanged
@@ -497,32 +511,38 @@ No persistent state between invocations. All state management delegated to libra
 ### Observability & Analysis
 
 **Output Logging**:
+
 - Status for each file processed
 - Summary statistics at completion
 - Error messages for failures
 
 **Cache Statistics** (optional):
+
 - Hit/miss counts via `--cache-stats`
 - Invalidation tracking
 - Hit rate percentage
 
 **Exit Codes**:
+
 - Track success/failure rates in CI/CD metrics
 - Alert on unexpected exit code patterns
 
 ### Security & Compliance
 
 **Input Validation**:
+
 - Path existence check before processing
 - argparse validates argument types and choices
 - No shell injection risk (uses library API, not subprocess)
 
 **File System Access**:
+
 - Reads Python source files (read-only)
 - Writes documentation files (controlled by `--output-dir`)
 - No arbitrary file access beyond specified paths
 
 **No Authentication/Authorization**:
+
 - CLI tools run with invoking user's permissions
 - Rely on OS-level file permissions for access control
 
@@ -531,12 +551,14 @@ No persistent state between invocations. All state management delegated to libra
 All requirements mapped to verification artifacts (see `supekku:verification.coverage@v1` YAML block).
 
 **Coverage Summary**:
+
 - 7 functional requirements → 7 unit tests (VT-001 to VT-007)
 - 2 non-functional requirements → 1 performance test (VA-001) + 1 manual test (VH-001)
 
 ### Acceptance Gates
 
 **For Release**:
+
 - [ ] All unit tests passing (VT-001 to VT-007)
 - [ ] Performance benchmark meets ≤5s target (VA-001)
 - [ ] Backward compatibility verified with existing scripts (VH-001)
@@ -556,16 +578,19 @@ All requirements mapped to verification artifacts (see `supekku:verification.cov
 ### Risks & Mitigations
 
 **RISK-001: Library API Changes Break CLI**
+
 - Likelihood: Medium
 - Impact: High
 - Mitigation: Maintain integration tests covering full CLI workflow; version library API
 
 **RISK-002: Backward Compatibility Violations**
+
 - Likelihood: Low
 - Impact: High
 - Mitigation: Explicit backward compatibility tests; manual verification with existing scripts
 
 **RISK-003: Performance Degradation**
+
 - Likelihood: Low
 - Impact: Medium
 - Mitigation: Performance benchmarks in test suite; cache optimization in library
@@ -585,11 +610,13 @@ None. Implementation is complete and stable.
 Both scripts provide similar functionality with slight implementation differences:
 
 **ast_doc_generator.py**:
+
 - Simpler result handling
 - Focused on core workflow
 - Minimal output formatting
 
 **deterministic_ast_doc_generator.py**:
+
 - More detailed result formatting
 - Verbose mode with hash display
 - Backward compatibility helpers for tests

@@ -2,8 +2,8 @@
 id: IP-055.PHASE-06
 slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-06
 name: IP-055 Phase 06
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: completed
 kind: phase
 ---
@@ -57,10 +57,12 @@ phase: IP-055.PHASE-06
 # Phase 6 - Draft evergreen GPT skill-authoring reference
 
 ## 1. Objective
+
 Compress the DE-055 research and local doctrine into a startup-friendly
 reference that future GPT agents can read before changing spec-driver skills.
 
 ## 2. Links & References
+
 - **Delta**: DE-055
 - **Design Revision Sections**:
   - Problem & Constraints
@@ -77,16 +79,19 @@ reference that future GPT agents can read before changing spec-driver skills.
   - `evidence-based-skill-development.md`
 
 ## 3. Entrance Criteria
+
 - [x] DE-055 research inputs and local doctrine loaded
 - [x] Current packaged skill boundaries reviewed
 - [x] Need confirmed for a shorter, reusable startup-facing synthesis
 
 ## 4. Exit Criteria / Done When
+
 - [x] Startup-facing reference created in the delta bundle
 - [x] Imported vs rejected Superpowers patterns are explicit
 - [x] Follow-up memory extraction path captured
 
 ## 5. Verification
+
 - Tests to run: none; this phase is documentation synthesis
 - Tooling/commands:
   - `uv run spec-driver list/show ...`
@@ -97,6 +102,7 @@ reference that future GPT agents can read before changing spec-driver skills.
   - notes entry linking the document to future memory work
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - A delta-bundle document is the right immediate output even if the final
     durable form becomes one or more memories.
@@ -105,15 +111,17 @@ reference that future GPT agents can read before changing spec-driver skills.
     of routing to it
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 6.1 | Synthesize doctrine and DE-055 findings into a short GPT startup guide | [ ] | New bundle doc created |
-| [x] | 6.2 | Record what to import, reject, and preserve from Superpowers | [ ] | Anchored to ADR-004, ADR-005, and PROD-016 |
-| [x] | 6.3 | Capture likely future memory split | [ ] | Added candidate split section to the new guide |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                                            | Parallel? | Notes                                          |
+| ------ | --- | ---------------------------------------------------------------------- | --------- | ---------------------------------------------- |
+| [x]    | 6.1 | Synthesize doctrine and DE-055 findings into a short GPT startup guide | [ ]       | New bundle doc created                         |
+| [x]    | 6.2 | Record what to import, reject, and preserve from Superpowers           | [ ]       | Anchored to ADR-004, ADR-005, and PROD-016     |
+| [x]    | 6.3 | Capture likely future memory split                                     | [ ]       | Added candidate split section to the new guide |
 
 ### Task Details
+
 - **6.1 Description**
   - **Design / Approach**: Start from local doctrine and existing DE-055
     decisions, then compress only the parts that materially shape skill work.
@@ -144,16 +152,19 @@ reference that future GPT agents can read before changing spec-driver skills.
   - **Commits / References**: uncommitted work
 
 ## 8. Risks & Mitigations
+
 | Risk | Mitigation | Status |
-| --- | --- | --- |
+| ---- | ---------- | ------ |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-07` - Create a startup-oriented synthesis doc in the DE-055 bundle
   now, then extract durable pieces into memories later. Rationale: the project
   needs immediate agent-facing guidance, but ADR-005 argues against letting
   another prose layer become permanent canon.
 
 ## 10. Findings / Research Notes
+
 - The strongest imports from Superpowers are trigger-only descriptions,
   empirical skill testing, and explicit anti-rationalization structure for
   discipline skills.
@@ -163,6 +174,7 @@ reference that future GPT agents can read before changing spec-driver skills.
   packages them for faster reuse.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

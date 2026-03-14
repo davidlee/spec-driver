@@ -2,8 +2,8 @@
 id: IP-073.PHASE-03
 slug: 073-standardize_show_output_selectors-phase-03
 name: "resolve links improvements"
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---
@@ -50,17 +50,21 @@ phase: IP-073.PHASE-03
 # Phase 3 - Resolve links improvements
 
 ## 1. Objective
+
 Add `--verbose`, `--path`, and `--id` flags to `resolve links`.
 
 ## 2. Links & References
+
 - **Delta**: DE-073
 - **Design Revision**: DR-073 §7
 - **Key files**: `supekku/cli/resolve.py`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 2 complete and committed (7559102)
 
 ## 4. Exit Criteria / Done When
+
 - [x] `resolve links --verbose` reports missing targets with file locations
 - [x] `resolve links --path <file>` scopes to a single file
 - [x] `resolve links --id <mem-id>` scopes to a single memory record
@@ -69,9 +73,9 @@ Add `--verbose`, `--path`, and `--id` flags to `resolve links`.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description |
-| --- | --- | --- |
-| [x] | 3.1 | --verbose: track and report missing targets with source files |
-| [x] | 3.2 | --path: scope resolution to a single file |
-| [x] | 3.3 | --id: resolve memory ID to path, delegate to --path logic |
-| [x] | 3.4 | Tests for all new flags |
+| Status | ID  | Description                                                   |
+| ------ | --- | ------------------------------------------------------------- |
+| [x]    | 3.1 | --verbose: track and report missing targets with source files |
+| [x]    | 3.2 | --path: scope resolution to a single file                     |
+| [x]    | 3.3 | --id: resolve memory ID to path, delegate to --path logic     |
+| [x]    | 3.4 | Tests for all new flags                                       |

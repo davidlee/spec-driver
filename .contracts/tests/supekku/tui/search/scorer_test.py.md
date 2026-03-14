@@ -55,7 +55,7 @@ VT-087-003: Own-ID outranks relation-target for equivalent match quality.
 #### Methods
 
 - `test_own_id_beats_relation_target_for_same_query(self)`: Artifact with own ID 'DE-085' should outrank artifact that
-references DE-085 via relation, when query is 'DE-085'.
-- `test_perfect_relation_beats_weak_own_id(self)`: A perfect relation match (0.5 * high) should beat a weak
-own-ID match (1.0 * low).
+  references DE-085 via relation, when query is 'DE-085'.
+- `test_perfect_relation_beats_weak_own_id(self)`: A perfect relation match (0.5 _ high) should beat a weak
+  own-ID match (1.0 _ low).
 - `test_weight_constants_ordering(self)`: Verify the weight hierarchy is as documented.

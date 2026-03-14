@@ -5,6 +5,7 @@
 Phase 1 complete. All 6 tasks done. 1660 tests pass, `just` green (9.67/10 pylint).
 
 Remaining wrap-up:
+
 - RE-016 actions update
 - Manual smoke test
 - Delta completion (`uv run spec-driver complete delta DE-028`)
@@ -30,11 +31,13 @@ Wrap-up remaining: RE-016 action update, manual smoke test, delta completion.
 ## Implementation Log
 
 ### Tasks 1.1–1.3 (previous session)
+
 - sync_preferences module + 7 tests
 - generate_contracts param on process_source_unit
 - CLI flag wiring (tri-state --specs, --contracts/--no-contracts)
 
 ### Task 1.4 — Preference resolution
+
 - Entry guard: `if specs:` → `if resolved_specs or contracts:`
 - Resolution: explicit flag > marker > False
 - `_sync_specs` gains `create_specs` + `generate_contracts` keyword params
@@ -43,11 +46,13 @@ Wrap-up remaining: RE-016 action update, manual smoke test, delta completion.
 - Hint message to stderr when specs off
 
 ### Task 1.5 — Backward compat
+
 - Lazy RegistryV2 import + load when registry exists and no marker
 - `any(registry.languages.values())` — language-agnostic check
 - Writes marker + stderr message before preference resolution
 
 ### Task 1.6 — Integration tests
+
 - New file `supekku/cli/sync_defaults_test.py`, 5 VTs
 - Typer CliRunner mixes stderr into output (no `mix_stderr` option)
 - VT-002 exercises two sequential invocations for persistence

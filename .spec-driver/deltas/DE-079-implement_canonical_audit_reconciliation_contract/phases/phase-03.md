@@ -2,8 +2,8 @@
 id: IP-079.PHASE-03
 slug: 079-implement_canonical_audit_reconciliation_contract-phase-03
 name: "IP-079 Phase 03 — Validation rules"
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---
@@ -61,6 +61,7 @@ phase: IP-079.PHASE-03
 Add audit-specific validation rules to `WorkspaceValidator` so that `spec-driver validate` surfaces audit disposition issues (invalid pairs, missing dispositions, missing audits for qualifying deltas, and multi-audit collisions).
 
 ## 2. Links & References
+
 - **Delta**: DE-079
 - **Design Revision**: DR-079 §4 (valid status×kind pairs, valid outcome×kind pairs, closure-effect derivation rules)
 - **Design Decisions**: DEC-079-007 (status×kind validity), DEC-079-009 (outcome×kind validity), DEC-079-003 (audit_gate)
@@ -68,9 +69,11 @@ Add audit-specific validation rules to `WorkspaceValidator` so that `spec-driver
 - **Pattern**: Existing `_validate_change_relations`, `_validate_spec_taxonomy` methods in `validator.py`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 2 complete — audit_check.py landed
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `_validate_audit_disposition` checks each audit's findings for:
   - Findings without disposition → warning
   - Invalid status×kind pairs → error
@@ -85,11 +88,13 @@ Add audit-specific validation rules to `WorkspaceValidator` so that `spec-driver
 - [ ] `just pylint-files` clean on touched files
 
 ## 5. Verification
+
 - `uv run pytest supekku/scripts/lib/validation/validator_test.py -v`
 - `just lint`
 - `just pylint-files supekku/scripts/lib/validation/validator.py supekku/scripts/lib/validation/validator_test.py`
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - Audit frontmatter is accessible via `load_markdown_file` on audit paths (confirmed in phase 2)
   - The constants from `audit.py` (VALID_STATUS_KIND_PAIRS, VALID_OUTCOME_KINDS) are the source of truth for validation
@@ -99,15 +104,15 @@ Add audit-specific validation rules to `WorkspaceValidator` so that `spec-driver
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 3.1 | Add _validate_audit_disposition | [ ] | Per-finding validation |
-| [ ] | 3.2 | Add _validate_audit_gate_coverage | [P] | Per-delta check |
-| [ ] | 3.3 | Write validation tests | [ ] | Depends on 3.1, 3.2 |
+| Status | ID  | Description                        | Parallel? | Notes                  |
+| ------ | --- | ---------------------------------- | --------- | ---------------------- |
+| [ ]    | 3.1 | Add \_validate_audit_disposition   | [ ]       | Per-finding validation |
+| [ ]    | 3.2 | Add \_validate_audit_gate_coverage | [P]       | Per-delta check        |
+| [ ]    | 3.3 | Write validation tests             | [ ]       | Depends on 3.1, 3.2    |
 
 ### Task Details
 
-- **3.1 _validate_audit_disposition**
+- **3.1 \_validate_audit_disposition**
   - **Files**: `supekku/scripts/lib/validation/validator.py`
   - **What**: For each completed audit, load raw frontmatter, iterate findings. Check:
     - Finding has no `disposition` → warning (undispositioned finding)
@@ -116,7 +121,7 @@ Add audit-specific validation rules to `WorkspaceValidator` so that `spec-driver
     - `disposition.closure_override` present but missing `rationale` → error
   - **Imports**: VALID_STATUS_KIND_PAIRS, VALID_OUTCOME_KINDS from audit.py; load_markdown_file from spec_utils
 
-- **3.2 _validate_audit_gate_coverage**
+- **3.2 \_validate_audit_gate_coverage**
   - **Files**: `supekku/scripts/lib/validation/validator.py`
   - **What**: For each delta, resolve audit_gate. If required, check whether a completed conformance audit with matching delta_ref exists. If not → warning. If multiple audits exist, check for finding ID collisions → warning.
   - **Imports**: resolve_audit_gate from audit_check.py
@@ -127,20 +132,23 @@ Add audit-specific validation rules to `WorkspaceValidator` so that `spec-driver
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Test fixture complexity | Follow existing validator_test.py patterns | open |
-| Validation noise on legacy audits | Only validate completed audits with findings | open |
+| Risk                              | Mitigation                                   | Status |
+| --------------------------------- | -------------------------------------------- | ------ |
+| Test fixture complexity           | Follow existing validator_test.py patterns   | open   |
+| Validation noise on legacy audits | Only validate completed audits with findings | open   |
 
 ## 9. Decisions & Outcomes
+
 - Design decisions governing this phase: DEC-079-003, DEC-079-007, DEC-079-009
 
 ## 10. Findings / Research Notes
+
 - `WorkspaceValidator` already loads `audit_registry` at line 42 — no new registry access needed
 - Existing pattern: add private `_validate_*` method, call from `validate()`
 - `audit_registry.collect()` returns `dict[str, ChangeArtifact]` — need `load_markdown_file(artifact.path)` for raw frontmatter
 
 ## 11. Wrap-up Checklist
+
 - [ ] Exit criteria satisfied
 - [ ] Verification evidence stored
 - [ ] Notes updated

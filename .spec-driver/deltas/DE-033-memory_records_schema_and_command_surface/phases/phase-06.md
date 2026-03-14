@@ -2,8 +2,8 @@
 id: IP-033.PHASE-06
 slug: 033-memory_records_schema_and_command_surface-phase-06
 name: IP-033 Phase 06 - Semantic Memory ID Scheme
-created: '2026-03-02'
-updated: '2026-03-02'
+created: "2026-03-02"
+updated: "2026-03-02"
 status: completed
 kind: phase
 ---
@@ -72,22 +72,26 @@ phase: IP-033.PHASE-06
 # Phase 6 — Semantic Memory ID Scheme
 
 ## 1. Objective
+
 Replace sequential `MEM-NNN` IDs with semantic dot-separated IDs
 (`mem.<type>.<domain>.<subject>[.<purpose>]`) per the ID spec in the delta
 bundle. This improves human readability, makes IDs greppable by domain, and
 prepares for `[[obsidian]]` link resolution in a future phase.
 
 ## 2. Links & References
+
 - **ID Spec**: `id-spec.md` (delta bundle)
 - **Delta**: DE-033
 - **Existing code**: `creation.py`, `registry.py`, `common.py`, `find.py`, `show.py`
 - **Test files**: `memory_test.py`, `registry_test.py`, `selection_test.py`, `models_test.py`, `creation_test.py`, `memory_formatters_test.py`, `frontmatter_metadata/memory_test.py`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 5 complete
 - [x] ID spec reviewed
 
 ## 4. Exit Criteria / Done When
+
 - [x] ID validation function: `validate_memory_id(raw) -> canonical | error`
 - [x] `normalize_memory_id(raw) -> canonical` (prepend `mem.` if missing)
 - [x] `extract_type_from_id(id) -> str | None` (second segment)
@@ -102,6 +106,7 @@ prepares for `[[obsidian]]` link resolution in a future phase.
 - [x] Ruff clean, pylint 9.68
 
 ## 5. Verification
+
 - `uv run pytest supekku/ -v --tb=short`
 - `uv run spec-driver create memory mem.test.smoke --type fact`
 - `uv run spec-driver list memories`
@@ -110,6 +115,7 @@ prepares for `[[obsidian]]` link resolution in a future phase.
 - `just lint` + `just pylint`
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - ID charset is `[a-z0-9-]+` per segment, separated by `.`
   - 3–6 segments recommended; 2 minimum (`mem.<type>`)
@@ -121,15 +127,15 @@ prepares for `[[obsidian]]` link resolution in a future phase.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 6.1 | ID validation module | `memory/ids.py`: validate, normalize, extract_type, filename_from_id. 35 tests. |
-| [x] | 6.2 | Rewrite creation.py | User-supplied ID, normalize on create, type mismatch warning, filename_from_id. 13 tests. |
-| [x] | 6.3 | Update registry.py | `mem.*.md` glob, frontmatter-first ID, filename-stem fallback. 21 tests (2 new). |
-| [x] | 6.4 | Update CLI commands | create takes semantic ID positional + --name, find/show shorthand normalization, common.py prefix removed. |
-| [x] | 6.5 | Migrate existing records | MEM-001 → mem.pattern.cli.skinny, MEM-002 → mem.pattern.formatters.soc. Cross-refs updated. |
-| [x] | 6.6 | Update test fixtures | ~195 MEM- refs replaced across 7 test files. 1984 tests pass. |
-| [x] | 6.7 | Update docs and schema examples | frontmatter metadata examples updated, __init__.py exports ids functions. |
+| Status | ID  | Description                     | Notes                                                                                                      |
+| ------ | --- | ------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| [x]    | 6.1 | ID validation module            | `memory/ids.py`: validate, normalize, extract_type, filename_from_id. 35 tests.                            |
+| [x]    | 6.2 | Rewrite creation.py             | User-supplied ID, normalize on create, type mismatch warning, filename_from_id. 13 tests.                  |
+| [x]    | 6.3 | Update registry.py              | `mem.*.md` glob, frontmatter-first ID, filename-stem fallback. 21 tests (2 new).                           |
+| [x]    | 6.4 | Update CLI commands             | create takes semantic ID positional + --name, find/show shorthand normalization, common.py prefix removed. |
+| [x]    | 6.5 | Migrate existing records        | MEM-001 → mem.pattern.cli.skinny, MEM-002 → mem.pattern.formatters.soc. Cross-refs updated.                |
+| [x]    | 6.6 | Update test fixtures            | ~195 MEM- refs replaced across 7 test files. 1984 tests pass.                                              |
+| [x]    | 6.7 | Update docs and schema examples | frontmatter metadata examples updated, **init**.py exports ids functions.                                  |
 
 ### Task Details
 
@@ -180,13 +186,15 @@ prepares for `[[obsidian]]` link resolution in a future phase.
   - Phase 5 real records: update body/frontmatter cross-references if needed
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Test fixture churn (~271 refs) | Mechanical replacement, run suite per file | open |
-| Shorthand ambiguity | Simple prefix rule, no registry lookup | open |
-| Type mismatch | Warn only, frontmatter authoritative | open |
+
+| Risk                           | Mitigation                                 | Status |
+| ------------------------------ | ------------------------------------------ | ------ |
+| Test fixture churn (~271 refs) | Mechanical replacement, run suite per file | open   |
+| Shorthand ambiguity            | Simple prefix rule, no registry lookup     | open   |
+| Type mismatch                  | Warn only, frontmatter authoritative       | open   |
 
 ## 9. Decisions & Outcomes
+
 - Canonical form: `mem.<type>.<domain>.<subject>[.<purpose>]`
 - Charset: `[a-z0-9-]+` per segment, `.` separator, lowercase enforced
 - File naming: `<canonical_id>.md` (e.g., `mem.pattern.cli.skinny.md`)
@@ -194,6 +202,7 @@ prepares for `[[obsidian]]` link resolution in a future phase.
 - No auto-generation; user supplies ID at creation time
 
 ## 10. Findings / Research Notes
+
 - `common.py` `ARTIFACT_PREFIXES` table used by `normalize_id()` for numeric shorthand — memory entry must be removed since new IDs aren't numeric
 - `find.py` uses fnmatch patterns — works naturally with dot-separated IDs
 - `registry.py` glob is the main discovery mechanism; changing the pattern is straightforward

@@ -8,7 +8,7 @@ Tests for drift ledger CLI commands (create, list, show).
 
 Tests for `create drift` CLI command.
 
-**Inherits from:** _DriftTestBase
+**Inherits from:** \_DriftTestBase
 
 #### Methods
 
@@ -20,7 +20,7 @@ Tests for `create drift` CLI command.
 
 Tests for ID inference dispatch to drift ledgers.
 
-**Inherits from:** _DriftTestBase
+**Inherits from:** \_DriftTestBase
 
 #### Methods
 
@@ -30,7 +30,7 @@ Tests for ID inference dispatch to drift ledgers.
 
 Tests for `list drift` CLI command.
 
-**Inherits from:** _DriftTestBase
+**Inherits from:** \_DriftTestBase
 
 #### Methods
 
@@ -44,7 +44,7 @@ Tests for `list drift` CLI command.
 
 Tests for `show drift` CLI command.
 
-**Inherits from:** _DriftTestBase
+**Inherits from:** \_DriftTestBase
 
 #### Methods
 
@@ -54,7 +54,7 @@ Tests for `show drift` CLI command.
 - `test_show_drift_path(self) -> None`
 - `test_show_drift_raw(self) -> None`
 
-### _DriftTestBase
+### \_DriftTestBase
 
 Shared setup for drift CLI tests.
 

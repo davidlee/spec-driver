@@ -34,6 +34,7 @@
 Decided: **Option A — unified `BacklogRegistry`** with `kind` as filter param.
 
 Rationale:
+
 - Items share single model cleanly
 - Priority ordering operates across types
 - Unified backlog view is the primary interaction surface
@@ -57,6 +58,7 @@ Rationale:
 ### Reference Registries (ADR-009 conformant)
 
 Target pattern from DecisionRegistry/PolicyRegistry/StandardRegistry/MemoryRegistry:
+
 - `find(id) -> Record | None`
 - `collect() -> dict[str, Record]`
 - `iter(status=None) -> Iterator[Record]`
@@ -66,6 +68,7 @@ Target pattern from DecisionRegistry/PolicyRegistry/StandardRegistry/MemoryRegis
 ### Existing Status Values (observed)
 
 From TEMPLATES dict and frontmatter:
+
 - **issue**: open, in-progress, resolved, done, implemented
 - **problem**: captured, investigating, mitigated, resolved
 - **improvement**: idea, planned, in-progress, implemented

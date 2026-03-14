@@ -2,8 +2,8 @@
 id: IP-009.PHASE-01
 slug: cli-json-consistency-fixes-phase-01
 name: IP-009 Phase 01
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: completed
 kind: phase
 ---
@@ -140,6 +140,7 @@ Implement all Priority 1 consistency fixes from PROD-010 to eliminate agent work
 ## 5. Verification
 
 **Unit Tests**:
+
 ```bash
 # JSON flag tests for list commands
 uv run pytest supekku/cli/test_cli.py::TestListCommands::test_json_flag_consistency -v
@@ -158,6 +159,7 @@ uv run pytest supekku/cli/test_cli.py::TestJSONRegression -v
 ```
 
 **Integration Tests**:
+
 ```bash
 # Full suite
 just test
@@ -168,6 +170,7 @@ just pylint
 ```
 
 **Manual Validation**:
+
 ```bash
 # Test JSON flag consistency
 spec-driver list specs --json
@@ -188,6 +191,7 @@ spec-driver show spec --help | grep -A2 json
 ```
 
 **Evidence to Capture**:
+
 - Test output showing all new tests passing
 - Before/after JSON schema comparison (validate stability)
 - Help text screenshots/output for modified commands
@@ -196,12 +200,14 @@ spec-driver show spec --help | grep -A2 json
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - Existing `--format=json` implementations are correct and stable
 - Existing status filter patterns (deltas, adrs) are the canonical reference
 - JSON formatters in SPEC-120 follow consistent structure conventions
 - Typer framework supports flag aliasing for `--json` → `--format=json`
 
 **STOP Conditions**:
+
 - If JSON schemas must change incompatibly, STOP and create breaking change plan
 - If status filter semantics differ fundamentally between artifact types, STOP for clarification
 - If test coverage drops below 90% for modified code, STOP and add tests
@@ -209,24 +215,25 @@ spec-driver show spec --help | grep -A2 json
 
 ## 7. Tasks & Progress
 
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Research existing patterns | [ ] | Completed: patterns documented below |
-| [x] | 1.2 | Write tests: --json on list commands | [ ] | 14 tests added to TestJSONFlagConsistency |
-| [x] | 1.3 | Implement --json for list commands | [ ] | 5 commands updated (deltas, adrs, requirements, revisions, changes) |
-| [x] | 1.4 | Write tests: --json on show commands | [x] | 9 tests added to TestShowCommandJSON |
-| [x] | 1.5 | Implement --json for show commands | [ ] | 4 commands updated (spec, adr, requirement, revision) |
-| [x] | 1.6 | Write tests: status filter on specs | [x] | 7 tests added to TestStatusFilterParity |
-| [x] | 1.7 | Implement status filter for specs | [ ] | Status filter using normalize_status() |
-| [x] | 1.8 | Update help text | [ ] | Auto-generated via typer.Option() |
-| [x] | 1.9 | Full test suite + linters | [ ] | 74/74 CLI tests pass, ruff + pylint pass |
-| [x] | 1.10 | Manual UX validation | [ ] | Validated via comprehensive automated tests |
+| Status | ID   | Description                          | Parallel? | Notes                                                               |
+| ------ | ---- | ------------------------------------ | --------- | ------------------------------------------------------------------- |
+| [x]    | 1.1  | Research existing patterns           | [ ]       | Completed: patterns documented below                                |
+| [x]    | 1.2  | Write tests: --json on list commands | [ ]       | 14 tests added to TestJSONFlagConsistency                           |
+| [x]    | 1.3  | Implement --json for list commands   | [ ]       | 5 commands updated (deltas, adrs, requirements, revisions, changes) |
+| [x]    | 1.4  | Write tests: --json on show commands | [x]       | 9 tests added to TestShowCommandJSON                                |
+| [x]    | 1.5  | Implement --json for show commands   | [ ]       | 4 commands updated (spec, adr, requirement, revision)               |
+| [x]    | 1.6  | Write tests: status filter on specs  | [x]       | 7 tests added to TestStatusFilterParity                             |
+| [x]    | 1.7  | Implement status filter for specs    | [ ]       | Status filter using normalize_status()                              |
+| [x]    | 1.8  | Update help text                     | [ ]       | Auto-generated via typer.Option()                                   |
+| [x]    | 1.9  | Full test suite + linters            | [ ]       | 74/74 CLI tests pass, ruff + pylint pass                            |
+| [x]    | 1.10 | Manual UX validation                 | [ ]       | Validated via comprehensive automated tests                         |
 
 ### Task Details
 
 #### **1.1 Research existing patterns**
+
 - **Design / Approach**:
   - Read existing `list specs` implementation (`supekku/cli/list.py`)
   - Identify current JSON flag: `--json` → maps to format internally
@@ -241,10 +248,11 @@ spec-driver show spec --help | grep -A2 json
   - `supekku/scripts/lib/formatters/spec_formatters.py` - JSON formatters
   - `supekku/scripts/lib/formatters/change_formatters.py` - status filtering reference
 - **Testing**: No tests for research phase
-- **Observations & AI Notes**: *Record findings here*
+- **Observations & AI Notes**: _Record findings here_
 - **Commits / References**: N/A
 
 #### **1.2 Write tests: --json on list commands (TDD)**
+
 - **Design / Approach**:
   - Write tests BEFORE implementation (TDD)
   - Test each list command accepts `--json` flag
@@ -257,10 +265,11 @@ spec-driver show spec --help | grep -A2 json
   - `supekku/cli/test_cli.py` - add TestListCommands::test_json_equals_format_json
   - `supekku/cli/test_cli.py` - add TestJSONRegression::test_schema_stability
 - **Testing**: Tests will initially FAIL (TDD red phase)
-- **Observations & AI Notes**: *Record test patterns, edge cases discovered*
-- **Commits / References**: *Commit hash after tests written*
+- **Observations & AI Notes**: _Record test patterns, edge cases discovered_
+- **Commits / References**: _Commit hash after tests written_
 
 #### **1.3 Implement --json for list commands**
+
 - **Design / Approach**:
   - Add `--json` flag to each list command function signature
   - Map `--json=True` to `format="json"` internally
@@ -272,10 +281,11 @@ spec-driver show spec --help | grep -A2 json
   - `supekku/cli/list.py` - modify all list command functions
   - `supekku/cli/common.py` - potentially add JsonFlagOption if pattern emerges
 - **Testing**: Run tests from 1.2; all should now PASS (TDD green phase)
-- **Observations & AI Notes**: *Record implementation decisions, any challenges*
-- **Commits / References**: *Commit hash after implementation*
+- **Observations & AI Notes**: _Record implementation decisions, any challenges_
+- **Commits / References**: _Commit hash after implementation_
 
 #### **1.4 Write tests: --json on show commands (TDD)**
+
 - **Design / Approach**:
   - Write tests BEFORE implementation
   - Test each show command accepts `--json` flag
@@ -287,10 +297,11 @@ spec-driver show spec --help | grep -A2 json
   - `supekku/cli/test_cli.py` - add TestShowCommands::test_json_flag_availability
   - `supekku/cli/test_cli.py` - add TestShowCommands::test_json_output_structure
 - **Testing**: Tests will initially FAIL for show spec (TDD red phase)
-- **Observations & AI Notes**: *Record expected JSON structure per command*
-- **Commits / References**: *Commit hash after tests written*
+- **Observations & AI Notes**: _Record expected JSON structure per command_
+- **Commits / References**: _Commit hash after tests written_
 
 #### **1.5 Implement --json for show commands**
+
 - **Design / Approach**:
   - Add `--json` flag to each show command function signature
   - Create/update JSON formatters for show commands
@@ -305,10 +316,11 @@ spec-driver show spec --help | grep -A2 json
   - `supekku/scripts/lib/formatters/decision_formatters.py` - verify JSON formatter exists
   - `supekku/scripts/lib/formatters/requirement_formatters.py` - verify JSON formatter exists
 - **Testing**: Run tests from 1.4; all should now PASS
-- **Observations & AI Notes**: *Record formatter implementation details*
-- **Commits / References**: *Commit hash after implementation*
+- **Observations & AI Notes**: _Record formatter implementation details_
+- **Commits / References**: _Commit hash after implementation_
 
 #### **1.6 Write tests: status filter on specs (TDD)**
+
 - **Design / Approach**:
   - Write tests BEFORE implementation
   - Test `list specs -s draft` returns only draft specs
@@ -321,10 +333,11 @@ spec-driver show spec --help | grep -A2 json
   - `supekku/cli/test_cli.py` - add TestListCommands::test_specs_status_filter
   - `supekku/cli/test_cli.py` - add TestListCommands::test_status_filter_parity
 - **Testing**: Tests will initially FAIL (TDD red phase)
-- **Observations & AI Notes**: *Record valid status values, edge cases*
-- **Commits / References**: *Commit hash after tests written*
+- **Observations & AI Notes**: _Record valid status values, edge cases_
+- **Commits / References**: _Commit hash after tests written_
 
 #### **1.7 Implement status filter for specs**
+
 - **Design / Approach**:
   - Add `-s`/`--status` option to `list_specs` function signature
   - Follow exact pattern from `list_deltas` implementation
@@ -335,10 +348,11 @@ spec-driver show spec --help | grep -A2 json
   - `supekku/cli/list.py` - modify list_specs function
   - `supekku/scripts/lib/formatters/spec_formatters.py` - add status filtering if needed
 - **Testing**: Run tests from 1.6; all should now PASS
-- **Observations & AI Notes**: *Record filtering approach, any challenges*
-- **Commits / References**: *Commit hash after implementation*
+- **Observations & AI Notes**: _Record filtering approach, any challenges_
+- **Commits / References**: _Commit hash after implementation_
 
 #### **1.8 Update help text**
+
 - **Design / Approach**:
   - Review help text for all modified commands
   - Document `--json` flag availability on list commands
@@ -350,10 +364,11 @@ spec-driver show spec --help | grep -A2 json
   - `supekku/cli/list.py` - update docstrings and option help text
   - `supekku/cli/show.py` - update docstrings and option help text
 - **Testing**: Manual validation of help text output
-- **Observations & AI Notes**: *Capture help text patterns, consistency notes*
-- **Commits / References**: *Commit hash after help text updates*
+- **Observations & AI Notes**: _Capture help text patterns, consistency notes_
+- **Commits / References**: _Commit hash after help text updates_
 
 #### **1.9 Full test suite + linters**
+
 - **Design / Approach**:
   - Run full test suite: `just test`
   - Run both linters: `just lint`, `just pylint`
@@ -362,10 +377,11 @@ spec-driver show spec --help | grep -A2 json
   - Validate test coverage ≥90% for modified code
 - **Files / Components**: All modified files
 - **Testing**: Full suite validation
-- **Observations & AI Notes**: *Record any issues found, fixes applied*
-- **Commits / References**: *Commit hash for fixes*
+- **Observations & AI Notes**: _Record any issues found, fixes applied_
+- **Commits / References**: _Commit hash for fixes_
 
 #### **1.10 Manual UX validation**
+
 - **Design / Approach**:
   - Cross-reference implementation against UX research Section 12 (Priority 1)
   - Test agent workflows manually:
@@ -377,17 +393,17 @@ spec-driver show spec --help | grep -A2 json
   - Document findings against PROD-010.NF-003
 - **Files / Components**: N/A (manual testing)
 - **Testing**: Manual workflow validation
-- **Observations & AI Notes**: *Record validation results, any gaps found*
+- **Observations & AI Notes**: _Record validation results, any gaps found_
 - **Commits / References**: N/A
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+| Risk                                        | Mitigation                                                              | Status    |
+| ------------------------------------------- | ----------------------------------------------------------------------- | --------- |
 | Breaking JSON schema changes disrupt agents | Comprehensive regression tests validate stability; compare before/after | Mitigated |
-| Status filter differs from other commands | Reuse exact patterns from list_deltas; test for parity | Mitigated |
-| Help text becomes inconsistent | Systematic review; automated help text tests | Mitigated |
-| Performance regression on large registries | Status filtering uses existing patterns; no new bottlenecks | Mitigated |
+| Status filter differs from other commands   | Reuse exact patterns from list_deltas; test for parity                  | Mitigated |
+| Help text becomes inconsistent              | Systematic review; automated help text tests                            | Mitigated |
+| Performance regression on large registries  | Status filtering uses existing patterns; no new bottlenecks             | Mitigated |
 
 ## 9. Decisions & Outcomes
 
@@ -400,20 +416,23 @@ spec-driver show spec --help | grep -A2 json
 
 ## 10. Findings / Research Notes
 
-*(Use for code spelunking results, pattern discoveries, reference links)*
+_(Use for code spelunking results, pattern discoveries, reference links)_
 
 **Existing Patterns to Replicate**:
+
 - `list specs`: Had `--json` flag mapping to `format_type="json"` internally
 - Other list commands: Only supported `--format json`, no shorthand
 - `show delta`: Had `--json` flag; other show commands lacked JSON support
 - Status filter: `-s`/`--status` pattern from `list_deltas` using `normalize_status()`
 
 **JSON Schema Structure**:
+
 - List commands: Return `{"items": [...]}` structure with artifact arrays
 - Show commands: Use `.to_dict()` if available, otherwise minimal fallback
 - Backward compatible: Existing `--format=json` output unchanged
 
 **Status Filter Patterns**:
+
 - Pattern: `normalize_status(spec.status) == normalize_status(filter_value)`
 - Applied early in filter chain for performance
 - Valid spec statuses: draft, active, deprecated, superseded
@@ -433,6 +452,7 @@ spec-driver show spec --help | grep -A2 json
 **Implementation Status**: ✅ **COMPLETE** - All Phase 01 tasks executed successfully
 
 **What Was Delivered**:
+
 1. **JSON Flag Consistency** (PROD-010.FR-001, FR-002)
    - Added `--json` shorthand to 5 list commands: deltas, adrs, requirements, revisions, changes
    - Added `--json` flag to 4 show commands: spec, adr, requirement, revision
@@ -449,17 +469,20 @@ spec-driver show spec --help | grep -A2 json
    - Comprehensive coverage of new functionality and backward compatibility
 
 **Files Modified**:
+
 - `supekku/cli/list.py` - JSON flags + status filter (5 list commands + specs filter)
 - `supekku/cli/show.py` - JSON flags (4 show commands)
 - `supekku/cli/test_cli.py` - 35 new tests (3 test classes)
 
 **Quality Metrics**:
+
 - CLI Tests: 74/74 passed ✅
 - Ruff: All changes pass ✅
 - Pylint: 9.36/10 (acceptable) ✅
 - Test Coverage: Comprehensive (35 new tests for ~100 LOC changes)
 
 **Next Steps for Completion**:
+
 1. Update DE-009.md with implementation summary
 2. Update PROD-010 verification coverage blocks with test artifact references
 3. Update IP-009 metadata with completion status
@@ -467,10 +490,12 @@ spec-driver show spec --help | grep -A2 json
 5. Consider follow-up deltas: DE-010 (Priority 2), DE-011 (Priority 3), DE-012 (Priority 3)
 
 **Known Issues**:
+
 - 2 pre-existing test failures in `specs/package_utils_test.py` (unrelated to this work)
 - 1 pre-existing ruff error in `standards/registry.py` (unrelated to this work)
 
 **Architectural Notes**:
+
 - Followed "Skinny CLI" pattern from CLAUDE.md
 - Pure functions, no stateful changes
 - Formatter separation maintained

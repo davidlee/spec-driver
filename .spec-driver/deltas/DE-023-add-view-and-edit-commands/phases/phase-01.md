@@ -2,8 +2,8 @@
 id: IP-023.PHASE-01
 slug: 023-add-view-and-edit-commands-phase-01
 name: IP-023 Phase 01 - Implement view and edit commands
-created: '2026-02-05'
-updated: '2026-02-05'
+created: "2026-02-05"
+updated: "2026-02-05"
 status: complete
 kind: phase
 ---
@@ -97,14 +97,14 @@ Add `view` and `edit` top-level commands that open artifacts in $PAGER and $EDIT
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add helpers to common.py | | Foundation |
-| [x] | 1.2 | Create view.py | | After 1.1 |
-| [x] | 1.3 | Create edit.py | [P] | Parallel with 1.2 |
-| [x] | 1.4 | Register in main.py | | After 1.2, 1.3 |
-| [x] | 1.5 | Write tests | | After 1.4 |
-| [x] | 1.6 | Lint and verify | | Final |
+| Status | ID  | Description              | Parallel? | Notes             |
+| ------ | --- | ------------------------ | --------- | ----------------- |
+| [x]    | 1.1 | Add helpers to common.py |           | Foundation        |
+| [x]    | 1.2 | Create view.py           |           | After 1.1         |
+| [x]    | 1.3 | Create edit.py           | [P]       | Parallel with 1.2 |
+| [x]    | 1.4 | Register in main.py      |           | After 1.2, 1.3    |
+| [x]    | 1.5 | Write tests              |           | After 1.4         |
+| [x]    | 1.6 | Lint and verify          |           | Final             |
 
 ### Task Details
 
@@ -123,6 +123,7 @@ Add `view` and `edit` top-level commands that open artifacts in $PAGER and $EDIT
   - Use `open_in_editor()` instead
 
 - **1.4**: Register in `main.py`
+
   ```python
   from supekku.cli import view, edit
   app.add_typer(view.app, name="view")
@@ -136,9 +137,9 @@ Add `view` and `edit` top-level commands that open artifacts in $PAGER and $EDIT
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Platform differences | Test on Linux; document | Open |
+| Risk                 | Mitigation              | Status |
+| -------------------- | ----------------------- | ------ |
+| Platform differences | Test on Linux; document | Open   |
 
 ## 9. Decisions & Outcomes
 

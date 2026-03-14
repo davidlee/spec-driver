@@ -2,8 +2,8 @@
 id: IP-054.PHASE-02
 slug: 054-tui_track_mode_real_time_agent_session_following-phase-02
 name: IP-054 Phase 02 — TrackScreen and app integration
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: draft
 kind: phase
 ---
@@ -76,6 +76,7 @@ toggle, EventListener lifecycle, and cross-screen artifact navigation. Add
 theme style keys and layout CSS.
 
 ## 2. Links & References
+
 - **Delta**: DE-054
 - **Design Revision Sections**: DEC-054-01 (TrackScreen), DEC-054-04 (sessions),
   DEC-054-06 (navigation), DEC-054-07 (TrackPanel)
@@ -83,10 +84,12 @@ theme style keys and layout CSS.
 - **Existing TUI**: `supekku/tui/app.py`, `browser.py`, `widgets/`
 
 ## 3. Entrance Criteria
+
 - [ ] Phase 1 complete — EventListener VTs passing
 - [ ] `just` green
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `t` toggles between BrowserScreen and TrackScreen
 - [ ] TrackScreen shows live events from socket (or log-tail)
 - [ ] Session list shows discovered sessions with stable colours
@@ -98,6 +101,7 @@ theme style keys and layout CSS.
 - [ ] `just` green
 
 ## 5. Verification
+
 - `just test` — unit + pilot tests
 - `just lint` + `just pylint` — zero warnings
 - VT-054-05: Session filter — "all" returns all, specific ID returns subset
@@ -112,6 +116,7 @@ theme style keys and layout CSS.
   falls back to log-tail, both show events
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - `install_screen` + `switch_screen` preserves both screens' widget state
     (confirmed via Textual API verification)
@@ -123,20 +128,21 @@ theme style keys and layout CSS.
   - `DataTable.RowSelected` doesn't fire on row click — escalate
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | P02-T1 | Theme style keys | [P] | 13 track.* keys added |
-| [x] | P02-T2 | TrackPanel widget | [P] | DataTable, not RichLog (DEC-054-07 rev) |
-| [x] | P02-T3 | SessionList widget | [P] | OptionList + SessionSelected msg |
-| [x] | P02-T4 | TrackScreen | | 2-panel compose, event buffer |
-| [x] | P02-T5 | ArtifactSnapshot.find_entry() | [P] | Cross-type dict lookup |
-| [x] | P02-T6 | BrowserScreen.navigate_to_artifact() | | Type switch + row cursor |
-| [x] | P02-T7 | App integration | | install+push, toggle, navigate, listener |
-| [x] | P02-T8 | TrackScreen layout CSS | | Horizontal split, border conventions |
-| [x] | P02-T9 | Tests VT-054-05..08 | | 20 tests + 4 find_entry tests |
-| [x] | P02-T10 | VH manual attestation | | VH-054-01 + VH-054-02 attested |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID      | Description                          | Parallel? | Notes                                    |
+| ------ | ------- | ------------------------------------ | --------- | ---------------------------------------- |
+| [x]    | P02-T1  | Theme style keys                     | [P]       | 13 track.\* keys added                   |
+| [x]    | P02-T2  | TrackPanel widget                    | [P]       | DataTable, not RichLog (DEC-054-07 rev)  |
+| [x]    | P02-T3  | SessionList widget                   | [P]       | OptionList + SessionSelected msg         |
+| [x]    | P02-T4  | TrackScreen                          |           | 2-panel compose, event buffer            |
+| [x]    | P02-T5  | ArtifactSnapshot.find_entry()        | [P]       | Cross-type dict lookup                   |
+| [x]    | P02-T6  | BrowserScreen.navigate_to_artifact() |           | Type switch + row cursor                 |
+| [x]    | P02-T7  | App integration                      |           | install+push, toggle, navigate, listener |
+| [x]    | P02-T8  | TrackScreen layout CSS               |           | Horizontal split, border conventions     |
+| [x]    | P02-T9  | Tests VT-054-05..08                  |           | 20 tests + 4 find_entry tests            |
+| [x]    | P02-T10 | VH manual attestation                |           | VH-054-01 + VH-054-02 attested           |
 
 ### Task Details
 
@@ -190,7 +196,7 @@ theme style keys and layout CSS.
 
 - **P02-T7: App integration**
   - **Design**: DEC-054-01, DEC-054-05, DEC-054-06. Add `Binding("t",
-    "toggle_track", "Track")`. `action_toggle_track`: `switch_screen`
+"toggle_track", "Track")`. `action_toggle_track`: `switch_screen`
     between `"browser"` and `"track"`. `on_mount`: install both screens,
     create EventListener, replay events into TrackScreen, start listener
     task. `action_navigate_artifact(id)`: switch to browser, call
@@ -220,11 +226,11 @@ theme style keys and layout CSS.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| DataTable row pruning at cap | remove_row on oldest; 500-row cap is small | open |
-| Screen state across switch_screen | install_screen preserves mounted state (verified) | open |
-| TrackEvent delivery to non-active screen | App bridges events to TrackScreen regardless of stack position | open |
+| Risk                                     | Mitigation                                                     | Status |
+| ---------------------------------------- | -------------------------------------------------------------- | ------ |
+| DataTable row pruning at cap             | remove_row on oldest; 500-row cap is small                     | open   |
+| Screen state across switch_screen        | install_screen preserves mounted state (verified)              | open   |
+| TrackEvent delivery to non-active screen | App bridges events to TrackScreen regardless of stack position | open   |
 
 ## 9. Decisions & Outcomes
 
@@ -237,6 +243,7 @@ theme style keys and layout CSS.
 ## 10. Findings / Research Notes
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] VH-054-01 attested — live events appear <200ms in track view
 - [x] VH-054-02 attested — second TUI falls back to log-tail, both receive events

@@ -1,8 +1,8 @@
 ---
 id: IMPR-011
 name: TUI polish, navigation, and relational display
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: open
 kind: improvement
 relations:

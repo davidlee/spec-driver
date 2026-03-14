@@ -7,6 +7,7 @@ Ensure /notes on the task card are up to date.
 
 If there is already a 'New Agent Instructions' section, read and update it.
 otherwise, create one, including:
+
 - task card code
 - required reading
 - related documents

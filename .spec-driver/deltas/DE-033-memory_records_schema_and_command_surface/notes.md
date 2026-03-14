@@ -55,8 +55,8 @@
    - `to_dict(root)` — serializes for YAML registry output, relativizes paths, omits empty optionals.
    - `_parse_date()` module-level helper for date string/object parsing.
 
-3. **MemoryRegistry** (`registry.py`): Discovery and query engine for MEM-*.md files.
-   - `collect()` — globs MEM-*.md, parses frontmatter, returns dict[id, MemoryRecord].
+3. **MemoryRegistry** (`registry.py`): Discovery and query engine for MEM-\*.md files.
+   - `collect()` — globs MEM-\*.md, parses frontmatter, returns dict[id, MemoryRecord].
    - `find(id)` — lookup by ID.
    - `iter(status=)` — iterate with optional status filter.
    - `filter(memory_type=, status=, tag=)` — multi-criteria AND filter.
@@ -116,11 +116,13 @@
 6. **Lint**: ruff clean, pylint 10.00/10 on new modules. list.py at 2067 lines (under 2100 threshold).
 
 ### Design decisions
+
 - Inline body template instead of Jinja template file — simpler for now
 - `--tag` repeatable on create, single-value on list (consistent with other list commands)
 - No `sync_registry` on create — MemoryRegistry has no YAML registry sync yet (future phase)
 
 ### Observations
+
 - Phase 5 ("Formatters & Docs") scope reduced — formatters done in Phase 3. Phase 5 is now docs/refinement only.
 - `list.py` approaching size limit — next artifact type may need sub-module refactor
 
@@ -129,6 +131,7 @@
 Phase 3 complete. Next: Phase 4 (selection & deterministic filtering/ordering).
 
 Commits so far:
+
 - `d1bca98` — Phase 1: memory frontmatter metadata schema
 - `df69d6c` — Phase 2: MemoryRecord model and MemoryRegistry
 - (pending) — Phase 3: CLI surface

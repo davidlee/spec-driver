@@ -2,8 +2,8 @@
 id: IP-011.PHASE-02
 slug: 011-cli-enhanced-filtering-and-self-documentation-phase-02
 name: IP-011 Phase 02 - Self-Documentation
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: complete
 kind: phase
 ---
@@ -122,6 +122,7 @@ eliminating documentation lookups and trial-and-error:
 ## 5. Verification
 
 **Unit Tests**:
+
 ```bash
 # Enum introspection tests
 uv run pytest supekku/cli/schema_test.py -v -k enums
@@ -131,6 +132,7 @@ uv run pytest supekku/cli/test_cli.py -v -k help_text
 ```
 
 **Integration Tests**:
+
 ```bash
 just test
 just lint
@@ -138,6 +140,7 @@ just pylint
 ```
 
 **Manual Validation**:
+
 ```bash
 # Enum introspection
 uv run spec-driver schema show enums.delta.status
@@ -153,34 +156,37 @@ uv run spec-driver show spec --help
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - Enum values sourced from existing lifecycle constants (not hardcoded duplicates)
 - `schema show enums` namespace fits naturally under existing schema command
 - Help text changes are additive (no existing behavior broken)
 - Typer epilog or docstring extension sufficient for help text enrichment
 
 **STOP Conditions**:
+
 - If enum values cannot be reliably extracted from constants (e.g. spec.kind has no constant),
   STOP to decide: hardcode or introspect frontmatter metadata
 - If help text changes exceed Typer's formatting capabilities, STOP to evaluate alternatives
 
 ## 7. Tasks & Progress
 
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Research enum sources + schema extension points | [ ] | Done — see Section 10 |
-| [x] | 2.2 | Write enum introspection tests (TDD) | [ ] | 10 tests, TDD red→green |
-| [x] | 2.3 | Implement enum registry + schema show enums | [ ] | core/enums.py + schema.py routing |
-| [x] | 2.4 | Write help text content tests (TDD) | [x] | 10 tests, TDD red→green |
-| [x] | 2.5 | Add Output Formats to list command help | [ ] | 4 docstrings updated |
-| [x] | 2.6 | Update show command help | [x] | Skipped — show commands already document flags |
-| [x] | 2.7 | Full test suite + linters | [ ] | 2514 passed, ruff clean, pylint 9.63 |
-| [x] | 2.8 | Manual validation | [ ] | All enum paths + help text verified |
+| Status | ID  | Description                                     | Parallel? | Notes                                          |
+| ------ | --- | ----------------------------------------------- | --------- | ---------------------------------------------- |
+| [x]    | 2.1 | Research enum sources + schema extension points | [ ]       | Done — see Section 10                          |
+| [x]    | 2.2 | Write enum introspection tests (TDD)            | [ ]       | 10 tests, TDD red→green                        |
+| [x]    | 2.3 | Implement enum registry + schema show enums     | [ ]       | core/enums.py + schema.py routing              |
+| [x]    | 2.4 | Write help text content tests (TDD)             | [x]       | 10 tests, TDD red→green                        |
+| [x]    | 2.5 | Add Output Formats to list command help         | [ ]       | 4 docstrings updated                           |
+| [x]    | 2.6 | Update show command help                        | [x]       | Skipped — show commands already document flags |
+| [x]    | 2.7 | Full test suite + linters                       | [ ]       | 2514 passed, ruff clean, pylint 9.63           |
+| [x]    | 2.8 | Manual validation                               | [ ]       | All enum paths + help text verified            |
 
 ### Task Details
 
 #### **2.1 Research enum sources + schema extension points**
+
 - **Design / Approach**:
   - Catalogue all enum sources and their module locations:
     - `changes/lifecycle.py` → `VALID_STATUSES` (delta/revision/audit status)
@@ -198,6 +204,7 @@ uv run spec-driver show spec --help
 - **Testing**: No tests for research phase
 
 #### **2.2 Write enum introspection tests (TDD)**
+
 - **Design / Approach**:
   - Create `supekku/cli/schema_test.py` (or add to existing test file)
   - Test `schema show enums.delta.status` → sorted JSON array
@@ -211,6 +218,7 @@ uv run spec-driver show spec --help
 - **Testing**: Tests will initially FAIL (TDD red phase)
 
 #### **2.3 Implement enum registry + schema show enums**
+
 - **Design / Approach**:
   - Create `supekku/scripts/lib/core/enums.py` — lightweight enum registry:
     ```python
@@ -233,6 +241,7 @@ uv run spec-driver show spec --help
 - **Testing**: Run tests from 2.2; should now PASS (TDD green phase)
 
 #### **2.4 Write help text content tests (TDD)**
+
 - **Design / Approach**:
   - Test that each list command's help text contains:
     - "Output Formats" (or equivalent heading)
@@ -245,6 +254,7 @@ uv run spec-driver show spec --help
 - **Testing**: Tests will initially FAIL (TDD red phase)
 
 #### **2.5 Add Output Formats to list command help**
+
 - **Design / Approach**:
   - Extend each list command docstring with an "Output Formats" section:
     - table (default): human-readable Rich table
@@ -259,6 +269,7 @@ uv run spec-driver show spec --help
 - **Testing**: Run tests from 2.4; should now PASS
 
 #### **2.6 Update show command help**
+
 - **Design / Approach**:
   - Document `--json`, `--path`, `--raw` options in show command docstrings
   - Add brief usage guidance: when to use each format
@@ -268,6 +279,7 @@ uv run spec-driver show spec --help
 - **Testing**: Help text tests from 2.4
 
 #### **2.7 Full test suite + linters**
+
 - **Design / Approach**:
   - `just test` — full suite green
   - `just lint` — ruff clean
@@ -276,6 +288,7 @@ uv run spec-driver show spec --help
 - **Files / Components**: All modified files
 
 #### **2.8 Manual validation**
+
 - **Design / Approach**:
   - Run enum introspection commands, verify output
   - Check help text renders correctly in terminal
@@ -285,12 +298,12 @@ uv run spec-driver show spec --help
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Enum values scattered, no single source of truth for all | Enum registry with lazy imports; document source per entry | Planned |
+| Risk                                                     | Mitigation                                                      | Status  |
+| -------------------------------------------------------- | --------------------------------------------------------------- | ------- |
+| Enum values scattered, no single source of truth for all | Enum registry with lazy imports; document source per entry      | Planned |
 | spec.kind / requirement.kind have no lifecycle constants | Hardcode with comment citing source; create constants if reused | Planned |
-| Help text too verbose for Typer rendering | Test rendering; use epilog for extended examples | Planned |
-| Help text examples drift from actual behavior | Tests assert help content; catch drift in CI | Planned |
+| Help text too verbose for Typer rendering                | Test rendering; use epilog for extended examples                | Planned |
+| Help text examples drift from actual behavior            | Tests assert help content; catch drift in CI                    | Planned |
 
 ## 9. Decisions & Outcomes
 
@@ -300,17 +313,17 @@ uv run spec-driver show spec --help
 
 **Enum Sources (confirmed)**:
 
-| Enum Path | Source | Values |
-|-----------|--------|--------|
-| `delta.status` | `changes/lifecycle.VALID_STATUSES` | draft, pending, in-progress, completed, deferred (exclude legacy "complete") |
-| `requirement.status` | `requirements/lifecycle.VALID_STATUSES` | pending, in-progress, active, retired |
-| `verification.status` | `blocks/verification.VALID_STATUSES` | planned, in-progress, verified, failed, blocked |
-| `verification.kind` | `blocks/verification.VALID_KINDS` | VA, VH, VT |
-| `spec.kind` | **no constant** — hardcode | prod, tech |
-| `requirement.kind` | **no constant** — hardcode | FR, NF |
-| `command.format` | **no constant** — hardcode | json, table, tsv |
-| `artifact.kind` | `frontmatter_metadata/base.py` enum_values | audit, delta, ... (16 values) |
-| `lifecycle` | `frontmatter_metadata/base.py` enum_values | discovery, design, implementation, verification, maintenance |
+| Enum Path             | Source                                     | Values                                                                       |
+| --------------------- | ------------------------------------------ | ---------------------------------------------------------------------------- |
+| `delta.status`        | `changes/lifecycle.VALID_STATUSES`         | draft, pending, in-progress, completed, deferred (exclude legacy "complete") |
+| `requirement.status`  | `requirements/lifecycle.VALID_STATUSES`    | pending, in-progress, active, retired                                        |
+| `verification.status` | `blocks/verification.VALID_STATUSES`       | planned, in-progress, verified, failed, blocked                              |
+| `verification.kind`   | `blocks/verification.VALID_KINDS`          | VA, VH, VT                                                                   |
+| `spec.kind`           | **no constant** — hardcode                 | prod, tech                                                                   |
+| `requirement.kind`    | **no constant** — hardcode                 | FR, NF                                                                       |
+| `command.format`      | **no constant** — hardcode                 | json, table, tsv                                                             |
+| `artifact.kind`       | `frontmatter_metadata/base.py` enum_values | audit, delta, ... (16 values)                                                |
+| `lifecycle`           | `frontmatter_metadata/base.py` enum_values | discovery, design, implementation, verification, maintenance                 |
 
 **Extension strategy**: Add `enums.*` prefix routing in `schema.py:show_schema`, alongside existing `frontmatter.*` routing. New `core/enums.py` module provides the registry.
 

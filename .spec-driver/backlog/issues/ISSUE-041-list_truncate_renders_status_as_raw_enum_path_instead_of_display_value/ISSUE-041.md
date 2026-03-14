@@ -1,8 +1,8 @@
 ---
 id: ISSUE-041
 name: list --truncate renders status as raw enum path instead of display value
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: open
 kind: issue
 categories: []
@@ -39,5 +39,4 @@ then truncate normally if the column is too narrow.
 
 The truncation pass is operating on the raw status object/enum repr rather
 than its string display value. The status field is probably being converted
-to string *after* truncation rather than before.
-
+to string _after_ truncation rather than before.

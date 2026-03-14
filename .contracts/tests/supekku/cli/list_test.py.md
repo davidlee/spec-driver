@@ -29,6 +29,51 @@ Tests the --prioritize flag and interactive editor workflow integration.
 - `_create_sample_improvement(self, impr_id, title, status) -> None`: Helper to create a sample improvement file.
 - `_create_sample_issue(self, issue_id, title, status, severity) -> None`: Helper to create a sample issue file.
 
+### ListAuditsDeltaFilterTest
+
+VT-090-P1-4: list audits --delta filters by relation target.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_delta_filter_bare_numeric(self) -> None`
+- `test_delta_filter_matches(self) -> None`
+- `test_delta_filter_no_match(self) -> None`
+- `_create_audits(self) -> None`
+
+### ListBacklogRelatedToLinkedDeltasTest
+
+VT-090-P3-8: list backlog --related-to picks up linked_deltas via collector.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_linked_deltas_match(self) -> None`
+- `test_no_links_no_match(self) -> None`
+- `test_related_requirements_match(self) -> None`
+- `_create_backlog_items(self) -> None`
+
+### ListBacklogRelatedToTest
+
+VT-090-P1-8: list backlog --related-to filters by frontmatter relations.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_related_to_case_insensitive(self) -> None`
+- `test_related_to_matches(self) -> None`
+- `test_related_to_no_match(self) -> None`
+- `_create_backlog_items(self) -> None`
+
 ### ListBacklogSeverityFilterTest
 
 Test cases for --severity filter on backlog list commands (VT-DE-074).
@@ -75,6 +120,22 @@ Test cases for backlog listing shortcut commands.
 - `_create_sample_problem(self, prob_id, title, status) -> None`: Helper to create a sample problem file.
 - `_create_sample_risk(self, risk_id, title, status) -> None`: Helper to create a sample risk file.
 
+### ListDeltasReferencedByTest
+
+VT-090-P4-3/4: --referenced-by / --not-referenced-by on list deltas.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_mutual_exclusion_error(self) -> None`
+- `test_not_referenced_by_audit(self) -> None`
+- `test_referenced_by_audit(self) -> None`
+- `_create_audits(self) -> None`
+- `_create_deltas(self) -> None`
+
 ### ListDeltasRelationFilterTest
 
 VT-085-002: --related-to, --relation, --refs on list deltas.
@@ -92,6 +153,37 @@ VT-085-002: --related-to, --relation, --refs on list deltas.
 - `test_related_to_no_match(self) -> None`
 - `test_relation_bad_format_errors(self) -> None`
 - `test_relation_type_target(self) -> None`
+- `_create_deltas(self) -> None`
+
+### ListDeltasSpecFilterTest
+
+VT-090-P1-7: list deltas --spec filters by applies_to.specs and relations.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_spec_filter_case_insensitive(self) -> None`
+- `test_spec_filter_matches_applies_to(self) -> None`
+- `test_spec_filter_no_match(self) -> None`
+- `_create_deltas(self) -> None`
+
+### ListDeltasUnauditedTest
+
+VT-090-P4-5/7: --unaudited alias on list deltas.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_unaudited_shows_completed_without_audit(self) -> None`
+- `test_unaudited_with_not_referenced_by_conflict(self) -> None`
+- `test_unaudited_with_status_conflict(self) -> None`
+- `_create_audits(self) -> None`
 - `_create_deltas(self) -> None`
 
 ### ListFilterBackfillTest
@@ -152,6 +244,52 @@ VT-017-004: Category display tests
 - `test_regexp_filter_category_case_insensitive(self) -> None`: VT-017-003: Test -r with -i flag makes category search case-insensitive. - category: security
 - `test_regexp_filter_includes_category(self) -> None`: VT-017-003: Test -r regexp filter searches category field.
 - `test_uncategorized_requirements_show_placeholder(self) -> None`: VT-017-004: Test uncategorized requirements display correctly.
+
+### ListRequirementsImplementedByTest
+
+VT-090-P1-6: list requirements --implemented-by filters via delta lookup.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_implemented_by_bare_numeric(self) -> None`
+- `test_implemented_by_matches(self) -> None`
+- `test_implemented_by_not_found(self) -> None`
+- `_create_fixtures(self) -> None`
+
+### ListRequirementsUnimplementedTest
+
+VT-090-P4-6: --unimplemented alias on list requirements.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_referenced_by_delta(self) -> None`
+- `test_unimplemented_shows_unreferenced(self) -> None`
+- `test_unimplemented_with_not_referenced_by_conflict(self) -> None`
+- `_create_deltas(self) -> None`
+- `_create_requirements(self) -> None`
+
+### ListRevisionsDeltaFilterTest
+
+VT-090-P1-5: list revisions --delta filters by relation target.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_delta_filter_bare_numeric(self) -> None`
+- `test_delta_filter_matches(self) -> None`
+- `test_delta_filter_no_match(self) -> None`
+- `_create_revisions(self) -> None`
 
 ### ListSpecsCategoryFilterTest
 

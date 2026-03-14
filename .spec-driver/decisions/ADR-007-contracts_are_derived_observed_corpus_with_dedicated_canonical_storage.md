@@ -1,10 +1,10 @@
 ---
 id: ADR-007
-title: 'ADR-007: contracts are derived observed corpus with dedicated canonical storage'
+title: "ADR-007: contracts are derived observed corpus with dedicated canonical storage"
 status: accepted
-created: '2026-03-06'
-updated: '2026-03-06'
-reviewed: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
+reviewed: "2026-03-06"
 owners: []
 supersedes: []
 superseded_by: []
@@ -27,7 +27,7 @@ tags:
   - contracts
   - architecture
   - sync
-summary: 'Contracts are derived observation artefacts, not competing intent; they belong in a dedicated canonical contracts corpus, while spec-bundle and index paths remain derived compatibility or navigation views.'
+summary: "Contracts are derived observation artefacts, not competing intent; they belong in a dedicated canonical contracts corpus, while spec-bundle and index paths remain derived compatibility or navigation views."
 ---
 
 # ADR-007: contracts are derived observed corpus with dedicated canonical storage
@@ -115,6 +115,7 @@ mirror-of-source.
 ## Consequences
 
 ### Positive
+
 - Resolves the main contracts contradiction across `PROD-005`, `PROD-012`,
   and `PROD-014`.
 - Makes the truth model legible: contracts are observed interface truth, specs
@@ -125,12 +126,14 @@ mirror-of-source.
 - Keeps the decision compatible with future configurable path work.
 
 ### Negative
+
 - Older specs and examples that still point at `SPEC-*/contracts/` become
   explicit drift to revise.
 - Some users may prefer spec-local browsing and see dedicated corpus storage as less immediately contextual.
 - Supporting compatibility views and alternate indexes still adds implementation and maintenance cost.
 
 ### Neutral
+
 - This ADR does not require every compatibility path to exist forever; it only
   classifies them as derived rather than canonical.
 - This ADR does not force an immediate move of the corpus under `.spec-driver/`;
@@ -139,6 +142,7 @@ mirror-of-source.
   question so long as they do not compete with the canonical corpus.
 
 ## Verification
+
 - Generated contracts are written to the canonical contracts corpus, not authored
   spec bundles.
 - Deleting the canonical contracts corpus and regenerating it reproduces the same
@@ -151,6 +155,7 @@ mirror-of-source.
 - Follow-up revisions reconcile `PROD-005`, `PROD-012`, and `PROD-014` to this decision.
 
 ## References
+
 - `drift/DL-047-spec-corpus-reconciliation.md`
 - `specify/decisions/ADR-003-separate_unit_and_assembly_specs.md`
 - `specify/decisions/ADR-004-canonical_workflow_loop.md`

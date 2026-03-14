@@ -2,8 +2,8 @@
 id: IP-066.PHASE-01
 slug: 066-tui_drift_ledger_integration-phase-01
 name: Wire and verify
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---
@@ -56,21 +56,25 @@ phase: IP-066.PHASE-01
 # Phase 1 — Wire and verify
 
 ## 1. Objective
+
 Add drift ledgers as a TUI-browsable artifact type by wiring `DriftLedgerRegistry`
 into the `ArtifactType`/`ArtifactSnapshot` system in `artifact_view.py`.
 
 ## 2. Links & References
+
 - **Delta**: DE-066
 - **Dependency**: DE-065 (drift primitive — completed)
 - **Key file**: `supekku/scripts/lib/core/artifact_view.py`
 - **Registry**: `supekku/scripts/lib/drift/registry.py`
 
 ## 3. Entrance Criteria
+
 - [x] DE-065 complete
 - [x] `DriftLedgerRegistry.collect()` returns `dict[str, DriftLedger]` (compatible interface)
 - [x] `DriftLedger` has `id`, `name`, `status`, `path` attributes
 
 ## 4. Exit Criteria / Done When
+
 - [x] `ArtifactType.DRIFT_LEDGER` exists in enum (Operational group)
 - [x] `ARTIFACT_TYPE_META`, `_TITLE_ATTR` entries added (STATUS/ID use defaults)
 - [x] `_REGISTRY_FACTORIES` entry wired
@@ -80,10 +84,12 @@ into the `ArtifactType`/`ArtifactSnapshot` system in `artifact_view.py`.
 - [x] `just check` green (3293 pass, ruff clean, pylint 9.71)
 
 ## 5. Verification
+
 - `just check` — all tests, linters clean
 - Manual: `uv run spec-driver tui` — select Drift Ledger, verify DL-047 appears
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - `adapt_record()` handles DriftLedger via `_TITLE_ATTR`/`_ID_ATTR` mappings (no special adapter needed)
   - TUI widgets (type selector, list, preview) work generically with any ArtifactType
@@ -92,12 +98,12 @@ into the `ArtifactType`/`ArtifactSnapshot` system in `artifact_view.py`.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add DRIFT_LEDGER to enum + metadata tables | — | done |
-| [x] | 1.2 | Add registry factory + path mapping | — | done |
-| [x] | 1.3 | Write tests | — | 8 tests |
-| [x] | 1.4 | Verify TUI end-to-end | — | just check green |
+| Status | ID  | Description                                | Parallel? | Notes            |
+| ------ | --- | ------------------------------------------ | --------- | ---------------- |
+| [x]    | 1.1 | Add DRIFT_LEDGER to enum + metadata tables | —         | done             |
+| [x]    | 1.2 | Add registry factory + path mapping        | —         | done             |
+| [x]    | 1.3 | Write tests                                | —         | 8 tests          |
+| [x]    | 1.4 | Verify TUI end-to-end                      | —         | just check green |
 
 ### Task Details
 
@@ -122,8 +128,9 @@ into the `ArtifactType`/`ArtifactSnapshot` system in `artifact_view.py`.
   - `uv run spec-driver tui` — confirm type selector, list, preview
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+
+| Risk                                                    | Mitigation                                      | Status   |
+| ------------------------------------------------------- | ----------------------------------------------- | -------- |
 | DriftLedger record shape incompatible with adapt_record | Pre-checked: id, name, status, path all present | resolved |
 
 ## 9. Decisions & Outcomes
@@ -131,6 +138,7 @@ into the `ArtifactType`/`ArtifactSnapshot` system in `artifact_view.py`.
 ## 10. Findings / Research Notes
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (3293 tests, linters clean)
 - [x] Phase sheet updated with outcomes

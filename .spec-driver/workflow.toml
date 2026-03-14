@@ -92,3 +92,4 @@ exec = "uv run spec-driver"
 
 [sync]
 # spec_autocreate = true
+spec_autocreate = true

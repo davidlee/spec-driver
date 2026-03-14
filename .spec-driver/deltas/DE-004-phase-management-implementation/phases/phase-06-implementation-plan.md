@@ -5,6 +5,7 @@
 **Problem**: Significant duplication between `plan.overview` phases array and `phase.overview` blocks in phase sheets.
 
 **Current Behavior**:
+
 - `show delta --json` already reads from phase files (confirmed)
 - Display uses phase.overview as canonical source
 - plan.overview duplicates all phase metadata unnecessarily
@@ -75,6 +76,7 @@ phases:
 ```
 
 **Also update the example** (lines ~150-175):
+
 ```python
 "phases": [
   {"id": "PLN-001-P01"},
@@ -93,6 +95,7 @@ Only keep `id` as required field.
 **Function**: `create_phase()` or wherever plan metadata is updated
 
 **Changes**:
+
 - When adding phase to plan.overview, only write `{id: phase_id}`
 - Remove code that copies name/objective/criteria to plan
 - Keep phase ordering logic (append to phases array)
@@ -104,11 +107,13 @@ Only keep `id` as required field.
 **File**: `supekku/scripts/lib/blocks/plan.py` and `plan_metadata.py`
 
 **Changes**:
+
 - Update parser to handle both old format (with metadata) and new format (ID-only) for backward compatibility
 - Validation should accept ID-only phases
 - Consider migration helper: if old format found, warn but continue
 
 **Backward Compatibility Strategy**:
+
 ```python
 # Parser should handle both:
 # Old: {id: X, name: Y, objective: Z, ...}
@@ -125,6 +130,7 @@ Only keep `id` as required field.
 **Current Behavior**: Already reads from phase files (confirmed)
 
 **Changes Needed**:
+
 - Verify it doesn't rely on plan.overview metadata
 - Likely just needs phase IDs to locate files
 - May need to handle None/missing fields gracefully during transition
@@ -136,6 +142,7 @@ Only keep `id` as required field.
 **File**: `.spec-driver/templates/implementation-plan-template.md`
 
 **Changes**:
+
 ```yaml
 phases:
   - id: PLAN-ID.PHASE-01
@@ -150,6 +157,7 @@ Remove example metadata from phases array.
 **File**: JSON schema for plan.overview (metadata system)
 
 **Changes**:
+
 - Update `description` field to reflect simplified structure
 - Update `examples` array in JSON schema
 - Ensure `schema show plan.overview --format=yaml-example` shows new format
@@ -157,11 +165,13 @@ Remove example metadata from phases array.
 ### 7. Update Tests
 
 **Files to check**:
+
 - `supekku/scripts/lib/changes/creation_test.py` (VT-PHASE-006)
 - `supekku/scripts/lib/formatters/change_formatters_test.py`
 - `supekku/scripts/lib/blocks/plan_test.py` (if exists)
 
 **Changes**:
+
 - Update test fixtures to use ID-only format
 - Add backward compatibility tests (old format still works)
 - Update assertions that check plan.overview structure
@@ -169,10 +179,12 @@ Remove example metadata from phases array.
 ### 8. Migration for Existing Files
 
 **Files to update manually**:
+
 - `change/deltas/DE-004-phase-management-implementation/IP-004.md`
 - Any other existing IP files
 
 **Process**:
+
 1. Backup current file
 2. Remove metadata from phases array, keep only IDs
 3. Verify `show delta` still works correctly
@@ -181,6 +193,7 @@ Remove example metadata from phases array.
 ### 9. Update Documentation
 
 **Files**:
+
 - `PROD-006.md` (if it shows plan.overview example)
 - Any ADRs or docs mentioning phase metadata in plans
 - Update glossary if it describes plan.overview structure
@@ -188,6 +201,7 @@ Remove example metadata from phases array.
 ## Testing Strategy
 
 ### Unit Tests
+
 - [ ] Plan parser accepts ID-only phases
 - [ ] Plan parser accepts old format (backward compat)
 - [ ] Validator enforces `id` field required
@@ -195,12 +209,14 @@ Remove example metadata from phases array.
 - [ ] create_phase() writes only ID to plan
 
 ### Integration Tests
+
 - [ ] Create new phase → plan.overview updated with ID only
 - [ ] show delta → displays full phase metadata (from phase files)
 - [ ] show delta --json → includes full phase.overview data
 - [ ] schema show plan.overview → shows simplified example
 
 ### Manual Testing
+
 - [ ] Update IP-004.md to simplified format
 - [ ] Run `uv run spec-driver show delta DE-004`
 - [ ] Verify output identical to before
@@ -208,6 +224,7 @@ Remove example metadata from phases array.
 - [ ] Verify plan.overview only has ID for new phase
 
 ### Backward Compatibility
+
 - [ ] Old format plans still parse correctly
 - [ ] Old format plans display correctly
 - [ ] Migration path documented
@@ -215,32 +232,36 @@ Remove example metadata from phases array.
 ## Files Checklist
 
 ### Must Change
+
 - [ ] `supekku/scripts/lib/blocks/plan_metadata.py` - PLAN_OVERVIEW_METADATA phases field
 - [ ] `supekku/scripts/lib/changes/creation.py` - create_phase function
 - [ ] `.spec-driver/templates/implementation-plan-template.md` - template phases array
 - [ ] `supekku/scripts/lib/changes/creation_test.py` - VT-PHASE-006 tests
 
 ### Likely Change
+
 - [ ] `supekku/scripts/lib/blocks/plan.py` (parser)
 - [ ] `supekku/scripts/lib/blocks/plan_metadata.py` (if separate)
 
 ### Verify No Change Needed
+
 - [ ] `supekku/scripts/lib/formatters/change_formatters.py` (already reads phase files)
 - [ ] Phase template (phase.md) - no changes needed
 
 ### Update After Implementation
+
 - [ ] IP-004.md (this plan itself)
 - [ ] Any other existing IP files
 - [ ] PROD-006.md examples (if applicable)
 
 ## Risks & Mitigations
 
-| Risk | Mitigation |
-|------|-----------|
-| Breaking existing IPs | Maintain backward compatibility in parser |
-| Formatter breaks | Test thoroughly; formatter already uses phase files |
-| Schema validation too strict | Allow old format, warn on validation |
-| Tests assume old structure | Update fixtures systematically |
+| Risk                         | Mitigation                                          |
+| ---------------------------- | --------------------------------------------------- |
+| Breaking existing IPs        | Maintain backward compatibility in parser           |
+| Formatter breaks             | Test thoroughly; formatter already uses phase files |
+| Schema validation too strict | Allow old format, warn on validation                |
+| Tests assume old structure   | Update fixtures systematically                      |
 
 ## Definition of Done
 

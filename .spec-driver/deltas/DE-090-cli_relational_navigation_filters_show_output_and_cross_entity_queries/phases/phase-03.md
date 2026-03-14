@@ -1,9 +1,9 @@
 ---
 id: IP-090.PHASE-03
 slug: 090-cli_relational_navigation_filters_show_output_and_cross_entity_queries-phase-03
-name: 'IP-090 Phase 03: P2 show enrichment'
-created: '2026-03-13'
-updated: '2026-03-13'
+name: "IP-090 Phase 03: P2 show enrichment"
+created: "2026-03-13"
+updated: "2026-03-13"
 status: draft
 kind: phase
 ---
@@ -64,6 +64,7 @@ phase: IP-090.PHASE-03
 Enrich `show spec` and `show delta` with reverse lookup information — what other artifacts reference this entity. Add `--requirements` expansion flag on `show spec`. Ensure backlog JSON output is consistent between `list` and `show` commands. Backfill existing audits with proper `relations` entries linking them to their deltas.
 
 ## 2. Links & References
+
 - **Delta**: DE-090
 - **Design Revision Sections**: DR-090 §P2-1 (show spec enrichment), §P2-2 (show delta reverse lookups), §P2-3 (backlog JSON consistency)
 - **Specs / PRODs**: PROD-010.FR-005
@@ -76,10 +77,12 @@ Enrich `show spec` and `show delta` with reverse lookup information — what oth
   - `supekku/scripts/lib/backlog/models.py` — BacklogItem (no to_dict yet)
 
 ## 3. Entrance Criteria
+
 - [x] P02 complete (P1 filter flags shipped, commit 22d00a8)
 - [x] DR-090 P2 design approved
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `show spec` displays "Related:" section with reverse lookup counts (deltas, revisions, audits referencing this spec)
 - [ ] `show spec --requirements` expands full requirements list (FR/NF labels + titles) instead of count
 - [ ] `show spec --json` includes `reverse_lookup_counts` when computed
@@ -92,11 +95,13 @@ Enrich `show spec` and `show delta` with reverse lookup information — what oth
 - [ ] `just` passes
 
 ## 5. Verification
+
 - **Unit tests**: spec_formatters_test.py, change_formatters_test.py, show_test.py, relation_formatters_test.py
 - **Commands**: `just test`, `just lint`, `just pylint-report`, `just`
 - **Manual smoke**: `uv run spec-driver show spec PROD-010`, `uv run spec-driver show delta DE-090`
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - `find_related_to()` returns artifacts referencing a target ID across all relation slots — confirmed
   - `ChangeRegistry(root, kind=...)` can be instantiated per-kind (delta/revision/audit) — confirmed
@@ -106,15 +111,16 @@ Enrich `show spec` and `show delta` with reverse lookup information — what oth
   - BacklogItem serialisation requires schema changes beyond additive defaults
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 3.0 | Audit backfill — add relations to 6 audits | [ ] | AUD-003–008; AUD-001/002 have no delta |
-| [x] | 3.1 | show spec reverse lookup counts | [ ] | |
-| [x] | 3.2 | show spec --requirements flag | [x] | |
-| [x] | 3.3 | show delta reverse lookups | [x] | |
-| [x] | 3.4 | Backlog JSON consistency | [x] | |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                | Parallel? | Notes                                  |
+| ------ | --- | ------------------------------------------ | --------- | -------------------------------------- |
+| [x]    | 3.0 | Audit backfill — add relations to 6 audits | [ ]       | AUD-003–008; AUD-001/002 have no delta |
+| [x]    | 3.1 | show spec reverse lookup counts            | [ ]       |                                        |
+| [x]    | 3.2 | show spec --requirements flag              | [x]       |                                        |
+| [x]    | 3.3 | show delta reverse lookups                 | [x]       |                                        |
+| [x]    | 3.4 | Backlog JSON consistency                   | [x]       |                                        |
 
 ### Task Details
 
@@ -149,22 +155,26 @@ Enrich `show spec` and `show delta` with reverse lookup information — what oth
   - **Notes**: DEC-090-14: additive contract change, documented explicitly.
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Audit backfill requires identifying correct delta per audit | Audit names typically include delta ID; can verify via body content | Open |
+
+| Risk                                                                      | Mitigation                                                                                                                                                                              | Status   |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| Audit backfill requires identifying correct delta per audit               | Audit names typically include delta ID; can verify via body content                                                                                                                     | Open     |
 | `find_related_to()` won't see audit→delta links until P3 collectors exist | It will — audits have `.relations` (frontmatter relations), which `_collect_from_relations()` already handles. P3 collectors are for domain-specific fields, not frontmatter relations. | Resolved |
-| show_spec loading 3 registries adds latency | Bounded: current corpus ~150 artifacts total; no benchmark threshold claimed | Accepted |
+| show_spec loading 3 registries adds latency                               | Bounded: current corpus ~150 artifacts total; no benchmark threshold claimed                                                                                                            | Accepted |
 
 ## 9. Decisions & Outcomes
-*(Record decisions made during implementation)*
+
+_(Record decisions made during implementation)_
 
 ## 10. Findings / Research Notes
+
 - `format_spec_details()` already has slots for relations and requirements summary (P0 work) — extend, don't restructure
 - `relation_formatters.py` already exists — good home for `_format_reverse_lookup_counts()`
 - `BacklogItem` has no `to_dict()` — needs adding
 - `find_related_to()` searches `.relations`, `.applies_to`, `.context_inputs`, `.informed_by` — audit→delta via `.relations` is already covered
 
 ## 11. Wrap-up Checklist
+
 - [ ] Exit criteria satisfied
 - [ ] Verification evidence stored
 - [ ] Spec/Delta/Plan updated with lessons

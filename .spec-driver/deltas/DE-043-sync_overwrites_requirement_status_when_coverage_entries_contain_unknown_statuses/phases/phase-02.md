@@ -2,8 +2,8 @@
 id: IP-043.PHASE-02
 slug: 043-guidance-and-memory
 name: IP-043 Phase 02 - Guidance and memory
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: completed
 kind: phase
 ---
@@ -29,13 +29,13 @@ verification:
   evidence:
     - VA-043-001
 tasks:
-  - id: '2.1'
+  - id: "2.1"
     description: Create mem.guide.spec-driver.requirement-lifecycle
-  - id: '2.2'
+  - id: "2.2"
     description: Fix mem.concept.spec-driver.verification drift
-  - id: '2.3'
+  - id: "2.3"
     description: Update mem.fact.spec-driver.status-enums
-  - id: '2.4'
+  - id: "2.4"
     description: Verify discoverability via scope queries
 risks:
   - description: Guidance memory becomes stale as lifecycle evolves
@@ -97,12 +97,12 @@ cross-references.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Create `mem.guide.spec-driver.requirement-lifecycle` | | Updated existing `mem.concept.*` — `guide` type not supported; added all 4 corner cases |
-| [x] | 2.2 | Fix `mem.concept.spec-driver.verification` drift | [P] | `passed` → `verified`, `in_progress` → `in-progress`, added `blocked` |
-| [x] | 2.3 | Update `mem.fact.spec-driver.status-enums` | [P] | Added DE-043 validation note to caveat section |
-| [x] | 2.4 | Verify discoverability via scope queries | | Tag + path queries succeed; `-c` requires CLI commands not keywords |
+| Status | ID  | Description                                          | Parallel? | Notes                                                                                   |
+| ------ | --- | ---------------------------------------------------- | --------- | --------------------------------------------------------------------------------------- |
+| [x]    | 2.1 | Create `mem.guide.spec-driver.requirement-lifecycle` |           | Updated existing `mem.concept.*` — `guide` type not supported; added all 4 corner cases |
+| [x]    | 2.2 | Fix `mem.concept.spec-driver.verification` drift     | [P]       | `passed` → `verified`, `in_progress` → `in-progress`, added `blocked`                   |
+| [x]    | 2.3 | Update `mem.fact.spec-driver.status-enums`           | [P]       | Added DE-043 validation note to caveat section                                          |
+| [x]    | 2.4 | Verify discoverability via scope queries             |           | Tag + path queries succeed; `-c` requires CLI commands not keywords                     |
 
 ### Task Details
 
@@ -138,9 +138,9 @@ cross-references.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Guidance becomes stale | Provenance links to canonical code | Open |
+| Risk                   | Mitigation                         | Status |
+| ---------------------- | ---------------------------------- | ------ |
+| Guidance becomes stale | Provenance links to canonical code | Open   |
 
 ## 9. Decisions & Outcomes
 

@@ -45,4 +45,3 @@ consistency issues that hurt discoverability and learnability.
 
 Design task — needs a brief audit + proposal before implementation.
 Consider a small ADR for the CLI grammar conventions.
-

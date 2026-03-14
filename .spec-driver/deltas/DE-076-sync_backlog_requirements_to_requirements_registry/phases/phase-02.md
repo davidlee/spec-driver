@@ -2,8 +2,8 @@
 id: IP-076.PHASE-02
 slug: 076-sync_backlog_requirements_to_requirements_registry-phase-02
 name: IP-076 Phase 02 — Backlog requirement sync and CLI filtering
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---
@@ -85,18 +85,22 @@ exit_criteria:
 # Phase 2 — Backlog requirement sync and CLI filtering
 
 ## 1. Objective
+
 Implement the core feature: backlog items with dotted-format requirements (`### FR-016.001: Title`) are discovered by the requirements registry sync, tracked with source provenance, and filterable in the CLI.
 
 ## 2. Links & References
+
 - **Delta**: [DE-076](../DE-076.md)
 - **Design Revision**: [DR-076](../DR-076.md) — DEC-076-02, DEC-076-03, DEC-076-05, DEC-076-07, DEC-076-08
 - **Requirements**: ISSUE-016.FR-016.001, FR-016.002, FR-016.004, NF-016.001
 - **Primary Spec**: SPEC-122
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete and committed (cleanup refactor)
 
 ## 4. Exit Criteria / Done When
+
 - [x] `_REQUIREMENT_HEADING` regex matches `### FR-016.001:`, `### NF-013.001:`, rejects `### FR-001:`
 - [x] `RequirementRecord` has `source_kind`/`source_type` with `to_dict`/`from_dict`/`merge` support
 - [x] `sync()` accepts `backlog_registry`, iterates items, calls `_records_from_content`, upserts with provenance
@@ -106,6 +110,7 @@ Implement the core feature: backlog items with dotted-format requirements (`### 
 - [x] `just` passes (3510 tests + lint)
 
 ## 5. Verification
+
 - **VT-REGEX-076-001**: Unit tests for `_REQUIREMENT_HEADING` — match/reject cases
 - **VT-SYNC-076-002**: Sync with mock backlog items → records appear with correct UIDs and `source_kind`
 - **VT-UPSERT-076-003**: `_upsert_record` sets `source_kind`/`source_type` after merge
@@ -115,6 +120,7 @@ Implement the core feature: backlog items with dotted-format requirements (`### 
 - Run `just` (tests + lint + pylint)
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: Backlog items use `### FR-NNN.MMM: Title` heading format for requirements
 - **Assumption**: `BacklogRegistry` is importable from requirements registry without circular deps
 - **STOP when**: Circular import detected between requirements and backlog packages
@@ -122,15 +128,15 @@ Implement the core feature: backlog items with dotted-format requirements (`### 
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | T1 | Add `_REQUIREMENT_HEADING` regex + tests | [P] | DEC-076-03, DEC-076-08 |
-| [x] | T2 | Add `source_kind`/`source_type` to `RequirementRecord` | [P] | DEC-076-02 |
-| [x] | T3 | Add backlog sync loop to `sync()` | [ ] | Depends on T1, T2. DEC-076-07 |
-| [x] | T4 | Add `--source-kind` CLI filter | [ ] | Depends on T2. DEC-076-05 |
-| [x] | T5 | Add Source column to formatter | [P] | DEC-076-02 |
-| [x] | T6 | Wire up `cli/sync.py` | [ ] | Depends on T3 |
-| [x] | T7 | Full test + lint pass | [ ] | After T1–T6 |
+| Status | ID  | Description                                            | Parallel? | Notes                         |
+| ------ | --- | ------------------------------------------------------ | --------- | ----------------------------- |
+| [x]    | T1  | Add `_REQUIREMENT_HEADING` regex + tests               | [P]       | DEC-076-03, DEC-076-08        |
+| [x]    | T2  | Add `source_kind`/`source_type` to `RequirementRecord` | [P]       | DEC-076-02                    |
+| [x]    | T3  | Add backlog sync loop to `sync()`                      | [ ]       | Depends on T1, T2. DEC-076-07 |
+| [x]    | T4  | Add `--source-kind` CLI filter                         | [ ]       | Depends on T2. DEC-076-05     |
+| [x]    | T5  | Add Source column to formatter                         | [P]       | DEC-076-02                    |
+| [x]    | T6  | Wire up `cli/sync.py`                                  | [ ]       | Depends on T3                 |
+| [x]    | T7  | Full test + lint pass                                  | [ ]       | After T1–T6                   |
 
 ### Task Details
 
@@ -167,13 +173,15 @@ Implement the core feature: backlog items with dotted-format requirements (`### 
   - **Testing**: Integration — run sync, verify backlog requirements appear
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Circular import (requirements ↔ backlog) | Import BacklogRegistry under TYPE_CHECKING; runtime import in sync() | open |
-| Backlog items with unusual requirement format | Graceful skip; warning log | open |
-| Code fence false positives (pre-existing) | Out of scope; noted in DR-076 | accepted |
+
+| Risk                                          | Mitigation                                                           | Status   |
+| --------------------------------------------- | -------------------------------------------------------------------- | -------- |
+| Circular import (requirements ↔ backlog)     | Import BacklogRegistry under TYPE_CHECKING; runtime import in sync() | open     |
+| Backlog items with unusual requirement format | Graceful skip; warning log                                           | open     |
+| Code fence false positives (pre-existing)     | Out of scope; noted in DR-076                                        | accepted |
 
 ## 9. Decisions & Outcomes
+
 - DEC-076-03: Two regexes, format-specific
 - DEC-076-05: Sync backfills source_kind; CLI treats "" as pass-all
 - DEC-076-07: BacklogRegistry for iteration, load_markdown_file for body

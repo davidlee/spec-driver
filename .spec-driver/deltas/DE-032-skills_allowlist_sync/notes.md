@@ -8,6 +8,7 @@ Make OpenSkills-based distribution compatible with conditional, config-driven ex
 - Agent discovery happens via the `<skills_system>` XML block in `AGENTS.md`.
 
 This delta adds `spec-driver skills sync` which:
+
 - reads `.spec-driver/skills.allowlist`
 - reads project skill metadata from `.agent/skills/*/SKILL.md` frontmatter
 - rewrites only the `AGENTS.md` skills table region (between `SKILLS_TABLE_START/END`)
@@ -22,6 +23,7 @@ This delta adds `spec-driver skills sync` which:
 ## Notes on format (pinned)
 
 Reference format captured from `/tmp/pooper/AGENTS.md`:
+
 - `<!-- SKILLS_TABLE_START -->` / `<!-- SKILLS_TABLE_END -->` markers
 - `<available_skills>` with repeated `<skill>` blocks:
   - `<name>folder-name</name>`

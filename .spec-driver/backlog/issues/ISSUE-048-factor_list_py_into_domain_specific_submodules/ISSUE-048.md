@@ -1,8 +1,8 @@
 ---
 id: ISSUE-048
 name: Factor list.py into domain-specific submodules
-created: '2026-03-10'
-updated: '2026-03-10'
+created: "2026-03-10"
+updated: "2026-03-10"
 status: open
 kind: issue
 categories: []

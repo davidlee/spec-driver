@@ -2,8 +2,8 @@
 id: IP-007.PHASE-01
 slug: lifecycle-coverage-enforcement-phase-01
 name: IP-007 Phase 01
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: completed
 kind: phase
 ---
@@ -81,11 +81,13 @@ Integrate verification coverage block parsing into the requirements registry syn
 ## 5. Verification
 
 **Tests to run:**
+
 - `uv run pytest supekku/scripts/lib/requirements/registry_test.py -v`
 - `just test` (full suite to catch regressions)
 - `just lint && just pylint`
 
 **Evidence to capture:**
+
 - Registry sync log showing coverage block processing
 - Warning output demonstrating drift detection
 - Test coverage report for new code paths
@@ -93,49 +95,55 @@ Integrate verification coverage block parsing into the requirements registry syn
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions:**
+
 - Coverage parser (`verification.py`) is stable and well-tested
 - Registry sync already handles multiple artifact types sequentially
 - Performance impact of additional parsing is negligible (<100ms overhead)
 
 **STOP when:**
+
 - Registry regression tests fail and root cause unclear
 - Coverage parsing errors exceed 10% of processed files
 - Memory usage increases beyond acceptable thresholds (>50MB)
 
 ## 7. Tasks & Progress
 
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add `_iter_plan_files()` helper method | [ ] | Clean implementation following existing pattern |
-| [x] | 1.2 | Implement `_apply_coverage_blocks()` aggregation | [ ] | Handles all artifact types; graceful error handling |
-| [x] | 1.3 | Add coverage status → requirement status mapping | [ ] | Maps to existing lifecycle statuses (live/in-progress/pending) |
-| [x] | 1.4 | Implement drift detection logic | [ ] | Emits actionable warnings to stderr when conflicts detected |
-| [x] | 1.5 | Integrate into `sync_from_specs()` workflow | [ ] | Added plan_dirs parameter; processes after all relations |
-| [x] | 1.6 | Create test fixtures with coverage blocks | [P] | SPEC-900/901 fixtures with verified/in-progress/planned + drift |
-| [x] | 1.7 | Write integration tests for VT-902 | [ ] | Full sync test + drift detection test passing |
-| [x] | 1.8 | Add unit tests for status aggregation | [P] | Comprehensive coverage of precedence rules |
-| [x] | 1.9 | Run regression suite and fix issues | [ ] | 11/11 tests passing, no regressions |
-| [x] | 1.10 | Lint and fix all warnings | [ ] | Both ruff and pylint clean |
+| Status | ID   | Description                                      | Parallel? | Notes                                                           |
+| ------ | ---- | ------------------------------------------------ | --------- | --------------------------------------------------------------- |
+| [x]    | 1.1  | Add `_iter_plan_files()` helper method           | [ ]       | Clean implementation following existing pattern                 |
+| [x]    | 1.2  | Implement `_apply_coverage_blocks()` aggregation | [ ]       | Handles all artifact types; graceful error handling             |
+| [x]    | 1.3  | Add coverage status → requirement status mapping | [ ]       | Maps to existing lifecycle statuses (live/in-progress/pending)  |
+| [x]    | 1.4  | Implement drift detection logic                  | [ ]       | Emits actionable warnings to stderr when conflicts detected     |
+| [x]    | 1.5  | Integrate into `sync_from_specs()` workflow      | [ ]       | Added plan_dirs parameter; processes after all relations        |
+| [x]    | 1.6  | Create test fixtures with coverage blocks        | [P]       | SPEC-900/901 fixtures with verified/in-progress/planned + drift |
+| [x]    | 1.7  | Write integration tests for VT-902               | [ ]       | Full sync test + drift detection test passing                   |
+| [x]    | 1.8  | Add unit tests for status aggregation            | [P]       | Comprehensive coverage of precedence rules                      |
+| [x]    | 1.9  | Run regression suite and fix issues              | [ ]       | 11/11 tests passing, no regressions                             |
+| [x]    | 1.10 | Lint and fix all warnings                        | [ ]       | Both ruff and pylint clean                                      |
 
 ### Task Details
 
 #### 1.1 Add `_iter_plan_files()` helper method
 
 **Design / Approach:**
+
 - Follow pattern of existing `_iter_change_files()` in registry.py:650
-- Iterate through plan directories looking for IP-*.md files
+- Iterate through plan directories looking for IP-\*.md files
 - Return generator yielding Path objects
 
 **Files / Components:**
+
 - `supekku/scripts/lib/requirements/registry.py`
 
 **Testing:**
+
 - Unit test: create temp directory with IP files, verify iteration
 - Edge cases: empty directory, non-markdown files, missing directory
 
 **Code:**
+
 ```python
 def _iter_plan_files(self, dirs: Iterable[Path]) -> Iterator[Path]:
   """Iterate over implementation plan files in directories."""
@@ -155,16 +163,19 @@ def _iter_plan_files(self, dirs: Iterable[Path]) -> Iterator[Path]:
 #### 1.2 Implement `_apply_coverage_blocks()` aggregation
 
 **Design / Approach:**
+
 - Extract coverage blocks from all artifact types (specs, deltas, IPs, audits)
 - Build map: `{requirement_id: [coverage_entries...]}`
 - For each requirement, aggregate artefact IDs into `verified_by` list
 - Call after existing relationship processing in `sync_from_specs()`
 
 **Files / Components:**
+
 - `supekku/scripts/lib/requirements/registry.py` - new method
 - `supekku/scripts/lib/blocks/verification.py` - import and use `load_coverage_blocks()`
 
 **Algorithm:**
+
 ```
 coverage_map = defaultdict(list)
 
@@ -195,6 +206,7 @@ for req_id, entries in coverage_map.items():
 ```
 
 **Testing:**
+
 - Test with spec containing multiple coverage entries
 - Test aggregation across spec + IP + audit
 - Test graceful handling of missing requirement IDs
@@ -205,6 +217,7 @@ for req_id, entries in coverage_map.items():
 #### 1.3 Add coverage status → requirement status mapping
 
 **Design / Approach:**
+
 - Aggregate coverage entry statuses for each requirement
 - Apply precedence rules:
   - ANY 'failed' → requirement status = 'at-risk'
@@ -215,10 +228,12 @@ for req_id, entries in coverage_map.items():
   - MIXED → requirement status = 'in-progress'
 
 **Files / Components:**
+
 - `supekku/scripts/lib/requirements/registry.py`
 - May need to update `lifecycle.py` if 'at-risk' status doesn't exist
 
 **Code:**
+
 ```python
 def _compute_status_from_coverage(self, entries: list[dict]) -> RequirementStatus:
   """Compute requirement status from aggregated coverage entries."""
@@ -242,6 +257,7 @@ def _compute_status_from_coverage(self, entries: list[dict]) -> RequirementStatu
 ```
 
 **Testing:**
+
 - Test each status precedence rule
 - Test empty entries list
 - Test unknown statuses (should default to pending)
@@ -251,15 +267,18 @@ def _compute_status_from_coverage(self, entries: list[dict]) -> RequirementStatu
 #### 1.4 Implement drift detection logic
 
 **Design / Approach:**
+
 - After aggregating coverage entries, check for conflicts
 - Warn when same requirement has conflicting statuses across artifacts
 - Log to stderr with actionable message format
 - Track which artifact types disagree (spec vs IP vs audit)
 
 **Files / Components:**
+
 - `supekku/scripts/lib/requirements/registry.py`
 
 **Warning Format:**
+
 ```
 WARNING: Coverage drift detected for PROD-008.FR-001
   PROD-008.md: status=verified (VT-902)
@@ -268,6 +287,7 @@ WARNING: Coverage drift detected for PROD-008.FR-001
 ```
 
 **Testing:**
+
 - Test warning emission when spec='verified', IP='planned'
 - Test no warning when statuses agree
 - Test warning includes all conflicting sources
@@ -277,14 +297,17 @@ WARNING: Coverage drift detected for PROD-008.FR-001
 #### 1.5 Integrate into `sync_from_specs()` workflow
 
 **Design / Approach:**
+
 - Call `_apply_coverage_blocks()` after `_apply_audit_relations()`
 - Pass spec_dirs, delta_dirs, ip_dirs (new parameter), audit_dirs
 - Ensure coverage processing happens in single pass during sync
 
 **Files / Components:**
+
 - `supekku/scripts/lib/requirements/registry.py:148` - `sync_from_specs()` method
 
 **Testing:**
+
 - Integration test calling full sync with coverage-enabled fixtures
 - Verify lifecycle fields updated correctly
 - Verify drift warnings appear in output
@@ -294,23 +317,29 @@ WARNING: Coverage drift detected for PROD-008.FR-001
 #### 1.6 Create test fixtures with coverage blocks
 
 **Design / Approach:**
+
 - Create `tests/fixtures/requirements/coverage/` directory
 - Add sample spec, IP, delta, audit with coverage blocks
 - Include scenarios: all verified, mixed statuses, drift cases
 
 **Files / Components:**
+
 - `tests/fixtures/requirements/coverage/SPEC-900.md` - sample spec
 - `tests/fixtures/requirements/coverage/IP-900.md` - sample plan
 - `tests/fixtures/requirements/coverage/DE-900.md` - sample delta
 - `tests/fixtures/requirements/coverage/AUD-900.md` - sample audit
 
 **Fixture Structure:**
-```markdown
+
+````markdown
 # SPEC-900.md
+
 ---
-id: SPEC-900
----
+
+## id: SPEC-900
+
 ## Requirements
+
 - FR-001: Sample requirement
 
 ```yaml supekku:verification.coverage@v1
@@ -323,21 +352,25 @@ entries:
     requirement: SPEC-900.FR-001
     status: verified
 ```
+````
 
 ---
 
 #### 1.7 Write integration tests for VT-902
 
 **Design / Approach:**
+
 - Test full sync with coverage fixtures
 - Verify `verified_by` populated
 - Verify status transitions (planned → verified)
 - Verify drift warnings emitted
 
 **Files / Components:**
+
 - `supekku/scripts/lib/requirements/registry_test.py` - extend existing suite
 
 **Test Cases:**
+
 ```python
 def test_sync_processes_coverage_blocks():
   """VT-902: Registry sync updates lifecycle from coverage."""
@@ -358,11 +391,13 @@ def test_coverage_drift_detection():
 #### 1.8 Add unit tests for status aggregation
 
 **Design / Approach:**
+
 - Isolated tests for `_compute_status_from_coverage()`
 - Test each precedence rule
 - Test edge cases
 
 **Files / Components:**
+
 - `supekku/scripts/lib/requirements/registry_test.py`
 
 ---
@@ -370,6 +405,7 @@ def test_coverage_drift_detection():
 #### 1.9 Run regression suite and fix issues
 
 **Design / Approach:**
+
 - Run full test suite: `just test`
 - Fix any failing tests
 - Ensure no performance degradation
@@ -379,17 +415,18 @@ def test_coverage_drift_detection():
 #### 1.10 Lint and fix all warnings
 
 **Design / Approach:**
+
 - `just lint` - must pass with zero warnings
 - `just pylint` - must meet threshold
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Registry regression affecting existing specs | Add regression test suite before changes; run sync against sample corpus | Planned |
-| Performance impact from parsing many files | Profile sync with 100+ specs; optimize if >100ms overhead | Monitored |
-| Coverage blocks with invalid YAML | Use existing validator; log and skip invalid blocks gracefully | Handled by parser |
-| Memory usage spike from coverage map | Use generator patterns; process artifacts in sequence | Design addresses |
+| Risk                                         | Mitigation                                                               | Status            |
+| -------------------------------------------- | ------------------------------------------------------------------------ | ----------------- |
+| Registry regression affecting existing specs | Add regression test suite before changes; run sync against sample corpus | Planned           |
+| Performance impact from parsing many files   | Profile sync with 100+ specs; optimize if >100ms overhead                | Monitored         |
+| Coverage blocks with invalid YAML            | Use existing validator; log and skip invalid blocks gracefully           | Handled by parser |
+| Memory usage spike from coverage map         | Use generator patterns; process artifacts in sequence                    | Design addresses  |
 
 ## 9. Decisions & Outcomes
 
@@ -425,6 +462,7 @@ def test_coverage_drift_detection():
 **Implementation:** Successfully integrated verification coverage blocks into requirements registry sync process. Core functionality complete and tested.
 
 **Key Deliverables:**
+
 - Coverage block extraction from specs, IPs, deltas, audits
 - Lifecycle status computation with precedence rules
 - Drift detection and warnings
@@ -433,6 +471,7 @@ def test_coverage_drift_detection():
 
 **Hand-off to Phase 02:**
 Registry infrastructure is ready. The `_apply_coverage_blocks()` method successfully:
+
 - Extracts coverage from all artifact types
 - Updates `verified_by` lists with artefact IDs
 - Computes lifecycle status from aggregated coverage

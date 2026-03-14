@@ -1,8 +1,8 @@
 ---
 id: ISSUE-024
 name: Add ExtID and ExtURL support to specs, requirements, backlog, policies, standards
-created: '2025-11-08'
-updated: '2025-11-08'
+created: "2025-11-08"
+updated: "2025-11-08"
 status: resolved
 kind: issue
 categories: [enhancement, integration]
@@ -31,11 +31,11 @@ Add two optional frontmatter fields to all artifact types:
 
 ### Artifact Types Affected
 
-- Specs (SPEC-*, PROD-*)
-- Requirements (FR-*, NF-*)
+- Specs (SPEC-_, PROD-_)
+- Requirements (FR-_, NF-_)
 - Backlog items (issues, problems, improvements, risks)
-- Policies (POL-*)
-- Standards (STD-*)
+- Policies (POL-\*)
+- Standards (STD-\*)
 
 ### Display Changes
 
@@ -58,6 +58,7 @@ FR-001  GH-42  pending  User authentication
 ```
 
 Display position:
+
 - For artifacts with ID column: immediately right of internal ID
 - For requirements: immediately right of Label column
 
@@ -90,6 +91,7 @@ Status: active
 ### Model Changes
 
 Each domain model needs optional fields:
+
 - `supekku/scripts/lib/specs/models.py` - Spec model
 - `supekku/scripts/lib/requirements/models.py` - Requirement model
 - `supekku/scripts/lib/backlog/models.py` - BacklogItem model
@@ -103,6 +105,7 @@ Each domain model needs optional fields:
 - Policy/standard formatters (when implemented)
 
 Each needs:
+
 - Add `show_external: bool = False` parameter to list formatters
 - Conditionally include ext_id column in table output
 - Include ext_id/ext_url in JSON output
@@ -111,12 +114,14 @@ Each needs:
 ### CLI Changes
 
 Add `--external` / `-e` flag to list commands:
+
 - `supekku/cli/list.py` - add flag to all list subcommands
 - Pass through to formatter functions
 
 ### Registry Changes
 
 Registries should capture ext_id/ext_url in YAML:
+
 - `.spec-driver/registry/specs.yaml`
 - `.spec-driver/registry/requirements.yaml`
 - `.spec-driver/registry/backlog.yaml`
@@ -138,4 +143,3 @@ Registries should capture ext_id/ext_url in YAML:
 - ISSUE-007: CLI commands missing JSON output support
 - ISSUE-010: Add path field to requirements JSON output
 - ISSUE-011: Add path field to backlog items JSON output
-

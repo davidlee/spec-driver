@@ -2,8 +2,8 @@
 id: IP-038.PHASE-02
 slug: 038-canonical_workflow_alignment-phase-02
 name: IP-038 Phase 02
-created: '2026-03-03'
-updated: '2026-03-03'
+created: "2026-03-03"
+updated: "2026-03-03"
 status: completed
 kind: phase
 ---
@@ -58,9 +58,11 @@ phase: IP-038.PHASE-02
 # Phase 02 - Memory Review Pass
 
 ## 1. Objective
+
 Execute the memory review pass so workflow-critical memories consistently reflect the DE-038 contract (delta-first default, strict-mode baseline semantics, coverage gate reality, and advisory ceremony posture).
 
 ## 2. Links & References
+
 - **Delta**: DE-038
 - **Design Revision Sections**:
   - [DR-038.md](../DR-038.md) - memory change intent and strict-mode contract
@@ -75,16 +77,19 @@ Execute the memory review pass so workflow-critical memories consistently reflec
   - `/home/david/dev/spec-driver/supekku/scripts/lib/changes/coverage_check.py`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 01 contract-freeze complete and documented
 - [x] Memory review target set listed in IP-038
 - [x] Memory files loaded for baseline read and drift capture
 
 ## 4. Exit Criteria / Done When
+
 - [x] Target memories updated/confirmed aligned with DE-038 contract
 - [x] Provenance and claim wording are code-truth aligned
 - [x] No residual contradiction across core-loop/revision/delta-completion/posture/ceremony memory set
 
 ## 5. Verification
+
 - Verification type: VA (memory consistency + source-truth audit)
 - Tooling/commands:
   - `uv run spec-driver find memory "*spec-driver*"`
@@ -96,6 +101,7 @@ Execute the memory review pass so workflow-critical memories consistently reflec
   - notes entry with open risks and handoff guidance
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - Memory updates remain documentation-only and do not require runtime code changes.
   - Strict-mode baseline policy is already decided; this phase applies it consistently.
@@ -104,16 +110,18 @@ Execute the memory review pass so workflow-critical memories consistently reflec
   - a requested memory change would materially alter DE-038 scope.
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Baseline-read all target memories and log drift | [ ] | Captured revision-first default drift, ceremony enforcement drift, and missing fact memories |
-| [x] | 2.2 | Update core workflow memories | [ ] | Updated `core-loop`, `revision`, `delta-completion` with code-backed framing |
-| [x] | 2.3 | Update posture/ceremony memories + create fact memories | [ ] | Updated `posture`, `ceremony*`; added `coverage-gate` and `status-enums` facts |
-| [x] | 2.4 | Run coherence readback and finalize memory notes | [ ] | Completed grep/readback checks and updated DE-038 notes |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                             | Parallel? | Notes                                                                                        |
+| ------ | --- | ------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------- |
+| [x]    | 2.1 | Baseline-read all target memories and log drift         | [ ]       | Captured revision-first default drift, ceremony enforcement drift, and missing fact memories |
+| [x]    | 2.2 | Update core workflow memories                           | [ ]       | Updated `core-loop`, `revision`, `delta-completion` with code-backed framing                 |
+| [x]    | 2.3 | Update posture/ceremony memories + create fact memories | [ ]       | Updated `posture`, `ceremony*`; added `coverage-gate` and `status-enums` facts               |
+| [x]    | 2.4 | Run coherence readback and finalize memory notes        | [ ]       | Completed grep/readback checks and updated DE-038 notes                                      |
 
 ### Task Details
+
 - **2.1 Description**
   - **Design / Approach**: inspect each target memory and classify statements as aligned, stale, or ambiguous.
   - **Files / Components**: memory files listed under IP-038 section 5.
@@ -142,19 +150,22 @@ Execute the memory review pass so workflow-critical memories consistently reflec
   - **Observations & AI Notes**: capture residual risks for phase 03.
   - **Commits / References**: uncommitted work in DE-038 bundle.
 
-*(Repeat detail blocks per task as needed)*
+_(Repeat detail blocks per task as needed)_
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Memory provenance remains tied to stale docs | Add/refresh provenance entries with current code/doc references | Open |
-| Narrative over-correction suppresses valid concession paths | Keep explicit town-planner concession language where applicable | Open |
-| Memory set drifts internally after partial edits | Perform full-set coherence readback before phase close | Open |
+
+| Risk                                                        | Mitigation                                                      | Status |
+| ----------------------------------------------------------- | --------------------------------------------------------------- | ------ |
+| Memory provenance remains tied to stale docs                | Add/refresh provenance entries with current code/doc references | Open   |
+| Narrative over-correction suppresses valid concession paths | Keep explicit town-planner concession language where applicable | Open   |
+| Memory set drifts internally after partial edits            | Perform full-set coherence readback before phase close          | Open   |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-03` - Phase scaffolded; execution checklist prefilled with target memory set from IP-038.
 
 ## 10. Findings / Research Notes
+
 - Drift captured against source-of-truth code:
   - `core-loop` incorrectly led with revision intent instead of delta-first scope.
   - `revision` framed as default entry step instead of post-audit reconciliation or town-planner concession path.
@@ -170,6 +181,7 @@ Execute the memory review pass so workflow-critical memories consistently reflec
   - `supekku/scripts/lib/blocks/verification.py`
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

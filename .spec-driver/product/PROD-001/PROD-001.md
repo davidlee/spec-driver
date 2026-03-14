@@ -2,8 +2,8 @@
 id: PROD-001
 slug: streamline-spec-creation
 name: streamline spec creation
-created: '2025-11-01'
-updated: '2025-11-01'
+created: "2025-11-01"
+updated: "2025-11-01"
 status: draft
 kind: prod
 aliases: []
@@ -158,7 +158,7 @@ entries:
 
 - **Change History**:
   - 2025-11-01: Initial draft based on current friction points
-  - 2025-11-02: Refined based on supekku.specify command implementation 
+  - 2025-11-02: Refined based on supekku.specify command implementation
 
 ## 2. Stakeholders & Journeys
 
@@ -193,6 +193,7 @@ entries:
 **Journey 1: First-Time User Creates Product Spec**
 
 Given Sarah has just installed spec-driver and wants to document a new feature
+
 1. Sarah types `/supekku.specify implement user preferences dashboard`
 2. Agent generates concise spec name: "user-preferences-dashboard"
 3. Agent invokes `uv run spec-driver create spec user-preferences-dashboard --kind product --json`
@@ -210,6 +211,7 @@ And she experienced zero "what do I do now?" moments
 **Journey 2: Team Developer Creates Tech Spec with Relationships**
 
 Given Aisha needs to document a new API client component that integrates with existing auth system
+
 1. Aisha types `/supekku.specify create oauth2 api client with token refresh`
 2. Agent creates tech spec (includes testing companion automatically)
 3. Agent asks: "Which existing specs handle authentication?" and offers to search
@@ -227,6 +229,7 @@ And the team can understand the architecture through spec relationships
 **Journey 3: Agent-Driven Spec Creation During Implementation**
 
 Given Claude is implementing a feature and realizes a spec should exist
+
 1. Claude recognizes: "This background job needs documentation"
 2. Claude invokes `/supekku.specify background job for data export with retry logic`
 3. Claude uses existing code context to infer technical details
@@ -242,6 +245,7 @@ And requirements are traceable to code and tests
 ### Edge Cases & Non-goals
 
 **Edge Cases**:
+
 - User specifies obscure spec type → Agent defaults to tech, asks for confirmation
 - Spec name conflicts with existing spec → spec-driver returns error, agent suggests alternative
 - User provides minimal description → Agent makes maximum informed assumptions, documents them clearly
@@ -249,6 +253,7 @@ And requirements are traceable to code and tests
 - User wants to update existing spec → Out of scope (different workflow/command)
 
 **Non-goals**:
+
 - **Editing/updating existing specs** (separate `/supekku.refine-spec` or `/supekku.complete-spec` command, see RISK-007)
   - Use case: User manually created spec or sync generated placeholder tech spec
   - Need: Complete existing spec without re-running full creation workflow
@@ -266,18 +271,21 @@ And requirements are traceable to code and tests
 See capabilities YAML block above for complete capability definitions. Key behaviors:
 
 **Frictionless Spec Creation** ensures users can invoke a single command and receive a complete, validated specification without needing to:
+
 - Manually edit YAML blocks (agent fills them using schema documentation)
 - Look up requirement naming conventions (agent follows established patterns)
 - Understand directory structure (spec-driver handles path resolution)
 - Debug validation errors manually (integrated validation with clear error messages)
 
 **Adaptive Guidance** minimizes cognitive load by:
+
 - Asking only critical clarification questions (max 3, prioritized by impact)
 - Making informed assumptions for non-critical details (documented in spec)
 - Tailoring section content to spec type (product: user journeys; tech: architecture)
 - Offering to discover relationships through spec-driver queries
 
 **Integrated Validation** prevents errors from reaching the registry by:
+
 - Validating YAML block syntax against schemas during editing
 - Verifying requirement IDs follow naming conventions before finalization
 - Confirming all verification coverage entries map to actual requirements
@@ -287,33 +295,33 @@ See capabilities YAML block above for complete capability definitions. Key behav
 
 - **FR-001**(workflow): Claude Command Provides Complete Workflow
   The `.claude/commands/supekku.specify.md` command file contains all instructions necessary for an agent to guide a user from feature description to validated, registry-synced specification without external documentation.
-  *Verification*: VT-001 - Test agent follows command from start to finish with zero external lookups
+  _Verification_: VT-001 - Test agent follows command from start to finish with zero external lookups
 
 - **FR-002**(automation): Agent Completes All YAML Blocks Without Manual Editing
   The workflow instructs agents to fetch schema documentation via `spec-driver schema show` and use it to generate valid YAML blocks for `spec.relationships`, `spec.capabilities`, and `verification.coverage` without requiring users to manually edit YAML syntax.
-  *Verification*: VT-002 - Validate 100 generated specs have valid YAML blocks with zero manual corrections
+  _Verification_: VT-002 - Validate 100 generated specs have valid YAML blocks with zero manual corrections
 
 - **FR-003**(ux): Clarification Questions Limited to Critical Decisions
   Agents ask maximum 3 clarification questions, prioritized by scope > security > UX impact, making informed assumptions for all other details and documenting those assumptions in the spec's Intent & Summary section.
-  *Verification*: VT-003 - Analyze 50 spec creation sessions, confirm ≤3 questions asked, all assumptions documented
+  _Verification_: VT-003 - Analyze 50 spec creation sessions, confirm ≤3 questions asked, all assumptions documented
 
 - **FR-004**(workflow): Spec Type Determines Section Content Adaptation
   Product specs emphasize user personas, journeys, and business value; tech specs emphasize architecture, components, and integration contracts. The workflow instructs agents to adapt section content appropriately based on `--kind` flag.
-  *Verification*: Manual review of 20 product specs and 20 tech specs confirms appropriate content focus
+  _Verification_: Manual review of 20 product specs and 20 tech specs confirms appropriate content focus
 
 - **FR-005**(validation): Validation Integrated Before Workflow Completion
   The workflow requires agents to run `spec-driver sync` and `spec-driver validate` commands before declaring spec creation complete, catching errors (invalid relationships, missing requirements, YAML syntax issues) before user moves to next task.
-  *Verification*: VT-002 - Confirm validation catches all common error types (tested via intentional error injection)
+  _Verification_: VT-002 - Confirm validation catches all common error types (tested via intentional error injection)
 
 ### Non-Functional Requirements
 
 - **NF-001**(ux): First-Time User Experience Requires Minimal Cognitive Load
   Users with zero spec-driver experience can complete their first spec creation in under 1 hour with zero "what do I do now?" friction points.
-  *Measurement*: VA-001 - User testing with 10 first-time users, measure time-to-completion and friction point incidents (target: 0 critical friction points)
+  _Measurement_: VA-001 - User testing with 10 first-time users, measure time-to-completion and friction point incidents (target: 0 critical friction points)
 
 - **NF-002**(reliability): Registry Sync Success Rate >95% on First Attempt
   Specs created through this workflow sync to the registry without errors on first attempt in >95% of cases, indicating validation catches errors early.
-  *Measurement*: VA-002 - Track sync success rate over 200 spec creations across diverse projects
+  _Measurement_: VA-002 - Track sync success rate over 200 spec creations across diverse projects
 
 ### Success Metrics / Signals
 
@@ -355,6 +363,7 @@ See capabilities YAML block above for complete capability definitions. Key behav
    - Agent automatically fixes and re-validates
 
 **Acceptance Criteria**:
+
 - First-time user completes workflow without consulting external documentation
 - Workflow duration: 5-15 minutes depending on clarification complexity
 - User confidence: "I understand what just happened and could do it again"
@@ -363,6 +372,7 @@ See capabilities YAML block above for complete capability definitions. Key behav
 ### Data & Contracts
 
 **Claude Command Structure** (`.claude/commands/supekku.specify.md`):
+
 ```yaml
 ---
 description: Create or refine a product or tech specification using spec-driver
@@ -377,6 +387,7 @@ $ARGUMENTS (feature description from user)
 ```
 
 **spec-driver CLI Contracts**:
+
 ```bash
 # Create spec bundle
 uv run spec-driver create spec <name> --kind <product|tech> --json
@@ -392,11 +403,13 @@ uv run spec-driver validate # Checks metadata consistency
 ```
 
 **YAML Block Schemas** (see `spec-driver schema show` for details):
+
 - `supekku:spec.relationships@v1`: Links spec to requirements and other specs
 - `supekku:spec.capabilities@v1`: Defines capabilities with success criteria
 - `supekku:verification.coverage@v1`: Maps requirements to verification artifacts
 
 **Spec Template Structure** (Jinja2 template at `supekku/templates/spec.md`):
+
 - Frontmatter: id, slug, name, status, kind
 - YAML blocks (placeholder variables for spec_id, requirements, etc.)
 - 7 sections: Intent, Stakeholders, Requirements, Solution, Behaviour, Quality, Backlog
@@ -448,26 +461,31 @@ uv run spec-driver validate # Checks metadata consistency
 ### Error Handling / Guards
 
 **Guard: Spec Name Conflicts**
+
 - Condition: Generated name matches existing spec slug
 - Response: spec-driver returns error with existing spec ID
 - Recovery: Agent appends differentiator (e.g., "payment-processing-v2" or "payment-processing-api")
 
 **Guard: Invalid YAML Syntax**
+
 - Condition: Agent-generated YAML has syntax errors
 - Response: Validation catches before sync attempt
 - Recovery: Agent re-generates using schema documentation, validates syntax locally first
 
 **Guard: Incomplete Requirements**
+
 - Condition: Verification coverage references requirement not defined in FR/NF sections
 - Response: Validation error with specific requirement ID
 - Recovery: Agent adds missing requirement or removes verification entry
 
 **Guard: User Abandons Mid-Workflow**
+
 - Condition: User doesn't respond to clarification questions within reasonable time
 - Response: Agent saves work-in-progress spec with [NEEDS CLARIFICATION] markers
 - Recovery: User can resume later; spec marked as draft status
 
 **Guard: Registry Sync Failures**
+
 - Condition: File permission issues, git conflicts, corrupted registry
 - Response: Sync command returns specific error
 - Recovery: Agent reports error to user with troubleshooting steps (check permissions, resolve conflicts, run repair)
@@ -477,6 +495,7 @@ uv run spec-driver validate # Checks metadata consistency
 ### Testing Strategy
 
 **VT-001: End-to-End Workflow Testing** (PROD-001.FR-001)
+
 - **Scope**: Full workflow from `/supekku.specify` invocation to validated spec in registry
 - **Method**: Automated test with Claude API simulating user interaction
 - **Test Cases**:
@@ -486,6 +505,7 @@ uv run spec-driver validate # Checks metadata consistency
 - **Success Criteria**: 100% workflow completion without manual intervention
 
 **VT-002: YAML Block Validation Testing** (PROD-001.FR-002, PROD-001.FR-005)
+
 - **Scope**: YAML block generation and schema compliance
 - **Method**: Generate 100 specs across diverse feature types, validate syntax and semantics
 - **Test Cases**:
@@ -496,6 +516,7 @@ uv run spec-driver validate # Checks metadata consistency
 - **Success Criteria**: 100% valid YAML, 95% first-attempt sync success
 
 **VT-003: Clarification Limiting Testing** (PROD-001.FR-003)
+
 - **Scope**: Adaptive guidance and assumption documentation
 - **Method**: Analyze 50 spec creation sessions, count questions and check assumption documentation
 - **Test Cases**:
@@ -505,6 +526,7 @@ uv run spec-driver validate # Checks metadata consistency
 - **Success Criteria**: Zero sessions exceed 3 questions; all assumptions documented
 
 **VA-001: First-Time User Experience Research** (PROD-001.NF-001)
+
 - **Scope**: Cognitive load and friction point identification
 - **Method**: User testing with 10 participants (zero spec-driver experience)
 - **Protocol**:
@@ -515,6 +537,7 @@ uv run spec-driver validate # Checks metadata consistency
 - **Success Criteria**: <1 hour completion, zero critical friction points, 80%+ confidence rating
 
 **VA-002: Registry Sync Success Analysis** (PROD-001.NF-002)
+
 - **Scope**: Validation effectiveness and error patterns
 - **Method**: Track sync outcomes over 200 real spec creations across multiple projects
 - **Metrics**:
@@ -526,16 +549,19 @@ uv run spec-driver validate # Checks metadata consistency
 ### Research / Validation
 
 **Hypothesis 1**: Schema documentation in agent context eliminates manual YAML editing
+
 - **Test**: Compare YAML error rates with/without schema documentation access
 - **Metric**: YAML syntax errors per 100 specs
 - **Target**: <2 errors per 100 specs with schema docs vs >20 without
 
 **Hypothesis 2**: Three-question limit doesn't compromise spec quality
+
 - **Test**: Compare completeness scores of 3-question-limited specs vs unlimited questions
 - **Metric**: Completeness audit score (0-100) based on section fill quality
 - **Target**: <5 point difference between limited and unlimited approaches
 
 **Hypothesis 3**: First-time users prefer guided workflow over documentation
+
 - **Test**: A/B test: guided command vs "read the docs then create manually"
 - **Metric**: Time to first valid spec, user satisfaction (1-10 scale)
 - **Target**: Guided workflow 3x faster, +2 points higher satisfaction
@@ -543,6 +569,7 @@ uv run spec-driver validate # Checks metadata consistency
 ### Observability & Analysis
 
 **Workflow Telemetry** (optional, privacy-respecting):
+
 - Spec creation duration (start to sync completion)
 - Question count per session
 - Validation error categories and frequencies
@@ -550,6 +577,7 @@ uv run spec-driver validate # Checks metadata consistency
 - Agent type (Claude, Codex, other) correlation with success rates
 
 **Dashboard Metrics**:
+
 - Weekly spec creation count (trend)
 - First-attempt sync success rate (rolling 30-day)
 - Average clarification question count
@@ -559,11 +587,13 @@ uv run spec-driver validate # Checks metadata consistency
 ### Security & Compliance
 
 **Data Privacy**:
+
 - Spec content may include sensitive business logic → no external telemetry without opt-in
 - Local-only validation and registry operations
 - User controls all data; spec-driver makes no external API calls
 
 **Agent Capabilities**:
+
 - Agents require file system write access (spec creation)
 - Agents execute CLI commands (spec-driver invocation)
 - Command injection risk mitigated: spec-driver uses argument parsing, not shell execution
@@ -571,6 +601,7 @@ uv run spec-driver validate # Checks metadata consistency
 ### Verification Coverage
 
 See `supekku:verification.coverage@v1` YAML block above. Summary:
+
 - VT-001 → PROD-001.FR-001 (workflow completeness)
 - VT-002 → PROD-001.FR-002, FR-005 (YAML generation and validation)
 - VT-003 → PROD-001.FR-003 (clarification limiting)
@@ -594,12 +625,15 @@ Must achieve before declaring feature complete:
 ### Related Specs / PROD
 
 **Direct Dependencies**:
+
 - **SPEC-110** (supekku/cli): CLI package providing create, templates, schema commands
 
 **Collaborators**:
+
 - **SPEC-110** (supekku/cli): CLI package with sync and validate commands
 
 **Future Integration Candidates** (noted for policies/ADRs):
+
 - Version control workflow integration (git branch creation, commit automation)
 - Project planning tool integration (Jira, Linear, etc.)
 - Team notification hooks (Slack, Discord) on spec creation
@@ -608,38 +642,45 @@ Must achieve before declaring feature complete:
 ### Risks & Mitigations
 
 **RISK-001**: Agent context window limitations prevent including full schema documentation
+
 - **Likelihood**: Medium (larger projects with many specs strain context)
 - **Impact**: High (incomplete schema docs → YAML errors)
 - **Mitigation**: Implement schema summary mode with "full details on request"; progressive disclosure
 
 **RISK-002**: Validation edge cases not caught until production use
+
 - **Likelihood**: Medium (spec-driver validation evolves; new edge cases emerge)
 - **Impact**: Medium (sync failures frustrate users but recoverable)
 - **Mitigation**: Comprehensive test suite with intentional error injection; user feedback loop for new error types
 
 **RISK-003**: Different agent platforms (Claude, Codex, Gemini) interpret workflow differently
+
 - **Likelihood**: High (each platform has quirks)
 - **Impact**: Medium (workflow works well on Claude, fails on others)
 - **Mitigation**: Platform-specific command variants if needed; abstract common patterns; test on multiple platforms
 
 **RISK-004**: Template customization by users breaks workflow assumptions
+
 - **Likelihood**: Medium (users modify templates to fit team needs)
 - **Impact**: Low (workflow still functions; generated content may not fit custom structure)
 - **Mitigation**: Document template extension points; version command file with template schema
 
 **RISK-005**: Orphan detection deletes manually created tech specs during sync
+
 - **Likelihood**: High (sync engine sees specs without matching code packages)
 - **Impact**: Critical (data loss; user-created specs deleted incorrectly)
 - **Mitigation**: Implement protection mechanism - specs without code package links marked as "manual" (via frontmatter flag or detection heuristic); sync skips deletion for manual specs; add `--dry-run` mode to show what would be deleted
 - **Status**: CRITICAL - must address before widespread adoption
 
 **RISK-006**: Onboarding references drift from the canonical boot path and agents miss current guidance
+
 - **Likelihood**: Medium (live bootstrap is now installed automatically, but stale local/project guidance can still drift)
 - **Impact**: Medium (agents may read stale instructions or miss local conventions)
 - **Mitigation**: Installer must maintain the canonical bootstrap path via `@.spec-driver/agents/boot.md`, `@.spec-driver/AGENTS.md`, and `.spec-driver/README.md`; legacy onboarding docs such as `INIT.md` should not be part of the live boot path
 - **Status**: Mitigated - no longer a blocker for FR-001
 
 **RISK-007**: No workflow for completing existing/vestigial specs
+
 - **Likelihood**: Very High (users manually create specs, sync creates placeholder tech specs)
 - **Impact**: High (current workflow assumes new spec creation; user must manually sync 3 different commands)
 - **Mitigation**: Create separate `/supekku.refine-spec` or `/supekku.complete-spec` command that: (a) detects existing spec file, (b) skips `create spec` invocation, (c) fills incomplete sections, (d) same validation/sync workflow
@@ -649,6 +690,7 @@ Must achieve before declaring feature complete:
 ### Known Gaps / Debt
 
 **Gaps**:
+
 - Multi-agent platform testing not yet conducted → test on Codex, Gemini beyond Claude
 - Relationship discovery heuristics basic → could leverage NLP/semantic search for better suggestions
 - **HIGH PRIORITY**: No spec refinement/completion workflow → users with existing specs (manual or sync-generated) can't use guided workflow
@@ -657,6 +699,7 @@ Must achieve before declaring feature complete:
 - **CRITICAL**: Orphan detection lacks manual spec protection → risk of data loss
 
 **Backlog Items**:
+
 - `ISSUE-005`: Implement orphan detection protection for manual specs (CRITICAL)
 - `ISSUE-006`: Create spec refinement/completion workflow for existing specs (HIGH PRIORITY)
 - TODO: Test workflow on Codex and Gemini platforms
@@ -666,19 +709,23 @@ Must achieve before declaring feature complete:
 ### Open Decisions / Questions
 
 **Decision 1**: Should command support batch spec creation (multiple specs from single description)?
+
 - **Context**: User describes system with multiple components
 - **Options**: (A) Single command creates all related specs, (B) Separate invocations per spec
 - **Leaning**: B (simpler, more controllable) but flag for discussion
 
 **Decision 2**: How to handle template versioning when command evolves?
+
 - **Context**: Command file references template structure; templates may change
 - **Options**: (A) Version command alongside templates, (B) Command detects template version and adapts
 - **Status**: Unresolved; needs ADR
 
 **Decision 3**: Should failed validation allow "save draft anyway" option?
+
 - **Context**: User might want to save progress even if validation fails
 - **Options**: (A) Force fix before save, (B) Allow draft save with warnings
 - **Leaning**: B (user autonomy) with clear warning markers
 
 ## Appendices (Optional)
+
 - Glossary, detailed research, extended API examples, migration history, etc.

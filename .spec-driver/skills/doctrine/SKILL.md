@@ -2,6 +2,7 @@
 name: doctrine
 description: Understand project governance to avoid spreading heresy. you
 ---
+
 read @.spec-driver/hooks/doctrine.md
 
 - identify the articles of truth for this project

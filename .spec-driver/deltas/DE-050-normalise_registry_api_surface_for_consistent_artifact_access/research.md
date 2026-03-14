@@ -6,17 +6,17 @@ Comprehensive audit of registry implementations to scope normalisation work.
 
 ### Comparison Matrix
 
-| Registry | Class? | Constructor | Collection | ID Lookup | `iter()` | `filter()` | Sync | Model Location |
-|---|---|---|---|---|---|---|---|---|
-| **Spec** | Yes | `(root=None)` positional | `reload()` + cache, `all_specs()` -> list | `get(id)` | No | `find_by_*()` x2 | `reload()` | models.py |
-| **Decision** | Yes | `(*, root=None)` kw-only | `collect()` -> dict | `find(id)` | Yes | `filter(tag,spec,delta,req,pol,std)` | `sync()` + symlinks | inline |
-| **Change** | Yes | `(*, root=None, kind)` kw-only | `collect()` -> dict | None | No | `find_by_implements()` | `sync()` | artifacts.py |
-| **Requirements** | Yes | `(registry_path)` positional, required | `.records` dict (eager) | None | No | `search()` + 3 `find_by_*()` | `save()` | inline |
-| **Backlog** | **Functions** | N/A | `discover_backlog_items()` | `find_backlog_items_by_id()` -> list | No | kind param on discover | `sync_backlog_registry()` | models.py |
-| **Policy** | Yes | `(*, root=None)` kw-only | `collect()` -> dict | `find(id)` | Yes | `filter(tag,spec,delta,req,std)` | `sync()` | inline |
-| **Standard** | Yes | `(*, root=None)` kw-only | `collect()` -> dict | `find(id)` | Yes | `filter(tag,spec,delta,req,pol)` | `sync()` | inline |
-| **Memory** | Yes | `(*, root=None, directory=None)` kw-only | `collect()` -> dict | `find(id)` | Yes | `filter(memory_type,status,tag)` | None | models.py |
-| **Card** | Yes | `(root)` positional, required | `all_cards()` -> list | `resolve_card(id)` raises | `cards_by_lane()` | None | None | models.py |
+| Registry         | Class?        | Constructor                              | Collection                                | ID Lookup                            | `iter()`          | `filter()`                           | Sync                      | Model Location |
+| ---------------- | ------------- | ---------------------------------------- | ----------------------------------------- | ------------------------------------ | ----------------- | ------------------------------------ | ------------------------- | -------------- |
+| **Spec**         | Yes           | `(root=None)` positional                 | `reload()` + cache, `all_specs()` -> list | `get(id)`                            | No                | `find_by_*()` x2                     | `reload()`                | models.py      |
+| **Decision**     | Yes           | `(*, root=None)` kw-only                 | `collect()` -> dict                       | `find(id)`                           | Yes               | `filter(tag,spec,delta,req,pol,std)` | `sync()` + symlinks       | inline         |
+| **Change**       | Yes           | `(*, root=None, kind)` kw-only           | `collect()` -> dict                       | None                                 | No                | `find_by_implements()`               | `sync()`                  | artifacts.py   |
+| **Requirements** | Yes           | `(registry_path)` positional, required   | `.records` dict (eager)                   | None                                 | No                | `search()` + 3 `find_by_*()`         | `save()`                  | inline         |
+| **Backlog**      | **Functions** | N/A                                      | `discover_backlog_items()`                | `find_backlog_items_by_id()` -> list | No                | kind param on discover               | `sync_backlog_registry()` | models.py      |
+| **Policy**       | Yes           | `(*, root=None)` kw-only                 | `collect()` -> dict                       | `find(id)`                           | Yes               | `filter(tag,spec,delta,req,std)`     | `sync()`                  | inline         |
+| **Standard**     | Yes           | `(*, root=None)` kw-only                 | `collect()` -> dict                       | `find(id)`                           | Yes               | `filter(tag,spec,delta,req,pol)`     | `sync()`                  | inline         |
+| **Memory**       | Yes           | `(*, root=None, directory=None)` kw-only | `collect()` -> dict                       | `find(id)`                           | Yes               | `filter(memory_type,status,tag)`     | None                      | models.py      |
+| **Card**         | Yes           | `(root)` positional, required            | `all_cards()` -> list                     | `resolve_card(id)` raises            | `cards_by_lane()` | None                                 | None                      | models.py      |
 
 ---
 
@@ -30,21 +30,23 @@ Comprehensive audit of registry implementations to scope normalisation work.
 
 - **Class:** `SpecRegistry` (no parent)
 - **Constructor** (lines 21-26):
+
   ```python
   def __init__(self, root: Path | None = None) -> None:
   ```
+
   - Positional `root`, optional, auto-discovers via `find_repo_root()`
   - **Eager**: calls `reload()` at construction, populating `self._specs: dict[str, Spec]`
 
 #### B. Core API
 
-| Method | Signature | Line | Semantics |
-|---|---|---|---|
-| **ID lookup** | `get(spec_id: str) -> Spec \| None` | 42-44 | Returns None if not found |
-| **Collection** | `all_specs() -> list[Spec]` | 46-48 | Returns list (not dict) |
-| **Filter** | `find_by_package(package: str) -> list[Spec]` | 50-52 | Empty list if no matches |
-| **Filter** | `find_by_informed_by(adr_id: str \| None) -> list[Spec]` | 54-68 | Empty list if None/empty |
-| **Persistence** | `reload() -> None` | 28-40 | Clears cache, re-scans filesystem |
+| Method          | Signature                                                | Line  | Semantics                         |
+| --------------- | -------------------------------------------------------- | ----- | --------------------------------- |
+| **ID lookup**   | `get(spec_id: str) -> Spec \| None`                      | 42-44 | Returns None if not found         |
+| **Collection**  | `all_specs() -> list[Spec]`                              | 46-48 | Returns list (not dict)           |
+| **Filter**      | `find_by_package(package: str) -> list[Spec]`            | 50-52 | Empty list if no matches          |
+| **Filter**      | `find_by_informed_by(adr_id: str \| None) -> list[Spec]` | 54-68 | Empty list if None/empty          |
+| **Persistence** | `reload() -> None`                                       | 28-40 | Clears cache, re-scans filesystem |
 
 No `find()`, `collect()`, `iter()`, or `filter()`.
 
@@ -67,24 +69,27 @@ No `find()`, `collect()`, `iter()`, or `filter()`.
 
 - **Class:** `DecisionRegistry` (no parent)
 - **Constructor** (lines 116-119):
+
   ```python
   def __init__(self, *, root: Path | None = None) -> None:
   ```
+
   - Keyword-only `root`, optional, auto-discovers
   - **Lazy**: does NOT load in `__init__`
+
 - **Class method:** `load(root=None) -> DecisionRegistry` (lines 121-124)
 
 #### B. Core API
 
-| Method | Signature | Line | Semantics |
-|---|---|---|---|
-| **Collection** | `collect() -> dict[str, DecisionRecord]` | 126-143 | Re-parses files each call |
-| **ID lookup** | `find(decision_id: str) -> DecisionRecord \| None` | 294-297 | Returns None |
-| **Iteration** | `iter(status: str \| None = None) -> Iterator[DecisionRecord]` | 287-292 | Optional status filter |
-| **Filter** | `filter(tag, spec, delta, requirement, policy, standard) -> list[DecisionRecord]` | 299-332 | AND logic |
-| **Persistence** | `write(path=None) -> None` | 243-262 | Collects, builds backlinks, writes YAML |
-| **Persistence** | `sync() -> None` | 283-285 | Wrapper for `write()` |
-| **Persistence** | `sync_with_symlinks() -> None` | 393-397 | write + rebuild status symlinks |
+| Method          | Signature                                                                         | Line    | Semantics                               |
+| --------------- | --------------------------------------------------------------------------------- | ------- | --------------------------------------- |
+| **Collection**  | `collect() -> dict[str, DecisionRecord]`                                          | 126-143 | Re-parses files each call               |
+| **ID lookup**   | `find(decision_id: str) -> DecisionRecord \| None`                                | 294-297 | Returns None                            |
+| **Iteration**   | `iter(status: str \| None = None) -> Iterator[DecisionRecord]`                    | 287-292 | Optional status filter                  |
+| **Filter**      | `filter(tag, spec, delta, requirement, policy, standard) -> list[DecisionRecord]` | 299-332 | AND logic                               |
+| **Persistence** | `write(path=None) -> None`                                                        | 243-262 | Collects, builds backlinks, writes YAML |
+| **Persistence** | `sync() -> None`                                                                  | 283-285 | Wrapper for `write()`                   |
+| **Persistence** | `sync_with_symlinks() -> None`                                                    | 393-397 | write + rebuild status symlinks         |
 
 #### C. Model Location
 
@@ -105,20 +110,22 @@ No `find()`, `collect()`, `iter()`, or `filter()`.
 
 - **Class:** `ChangeRegistry` (no parent)
 - **Constructor** (lines 39-46):
+
   ```python
   def __init__(self, *, root: Path | None = None, kind: str) -> None:
   ```
+
   - Keyword-only `root` + required `kind` (delta/revision/audit)
   - Raises `ValueError` if kind invalid
   - **Lazy**: no loading in `__init__`
 
 #### B. Core API
 
-| Method | Signature | Line | Semantics |
-|---|---|---|---|
-| **Collection** | `collect() -> dict[str, ChangeArtifact]` | 48-85 | Handles bundles + flat files |
-| **Filter** | `find_by_implements(requirement_id: str \| None) -> list[ChangeArtifact]` | 100-126 | Empty list if None |
-| **Persistence** | `sync() -> None` | 87-98 | Collects + writes YAML |
+| Method          | Signature                                                                 | Line    | Semantics                    |
+| --------------- | ------------------------------------------------------------------------- | ------- | ---------------------------- |
+| **Collection**  | `collect() -> dict[str, ChangeArtifact]`                                  | 48-85   | Handles bundles + flat files |
+| **Filter**      | `find_by_implements(requirement_id: str \| None) -> list[ChangeArtifact]` | 100-126 | Empty list if None           |
+| **Persistence** | `sync() -> None`                                                          | 87-98   | Collects + writes YAML       |
 
 No `find()`, `iter()`, or generic `filter()`.
 
@@ -143,26 +150,28 @@ Also: `discover_plans()` function (lines 143-197) and `PlanSummary` dataclass (l
 
 - **Class:** `RequirementsRegistry` (no parent)
 - **Constructor** (lines 155-158):
+
   ```python
   def __init__(self, registry_path: Path) -> None:
   ```
+
   - **Positional required `registry_path`** — NOT `root`
   - No auto-discovery of repo root
   - **Eager**: calls `_load()` at construction
 
 #### B. Core API
 
-| Method | Signature | Line | Semantics |
-|---|---|---|---|
-| **Collection** | `.records: dict[str, RequirementRecord]` | 157 | Public mutable attribute |
-| **Persistence** | `save() -> None` | 170-179 | Writes YAML |
-| **Sync** | `sync_from_specs(...) -> SyncStats` | 182-335 | Complex multi-source sync |
-| **Search** | `search(query, status, spec, implemented_by, introduced_by, verified_by) -> list` | 1079-1108 | Free-text + filters |
-| **Filter** | `find_by_verified_by(artifact_pattern) -> list` | 1124-1155 | Glob pattern on verified_by |
-| **Filter** | `find_by_verification_status(statuses) -> list` | 1157-1181 | OR logic on coverage status |
-| **Filter** | `find_by_verification_kind(kinds) -> list` | 1183-1207 | OR logic on coverage kind |
-| **Mutation** | `move_requirement(uid, new_spec_id, ...) -> str` | 1032-1076 | Raises KeyError/ValueError |
-| **Mutation** | `set_status(uid, status) -> None` | 1110-1122 | Raises ValueError if invalid |
+| Method          | Signature                                                                         | Line      | Semantics                    |
+| --------------- | --------------------------------------------------------------------------------- | --------- | ---------------------------- |
+| **Collection**  | `.records: dict[str, RequirementRecord]`                                          | 157       | Public mutable attribute     |
+| **Persistence** | `save() -> None`                                                                  | 170-179   | Writes YAML                  |
+| **Sync**        | `sync_from_specs(...) -> SyncStats`                                               | 182-335   | Complex multi-source sync    |
+| **Search**      | `search(query, status, spec, implemented_by, introduced_by, verified_by) -> list` | 1079-1108 | Free-text + filters          |
+| **Filter**      | `find_by_verified_by(artifact_pattern) -> list`                                   | 1124-1155 | Glob pattern on verified_by  |
+| **Filter**      | `find_by_verification_status(statuses) -> list`                                   | 1157-1181 | OR logic on coverage status  |
+| **Filter**      | `find_by_verification_kind(kinds) -> list`                                        | 1183-1207 | OR logic on coverage kind    |
+| **Mutation**    | `move_requirement(uid, new_spec_id, ...) -> str`                                  | 1032-1076 | Raises KeyError/ValueError   |
+| **Mutation**    | `set_status(uid, status) -> None`                                                 | 1110-1122 | Raises ValueError if invalid |
 
 No `find()`, `collect()`, `iter()`, or generic `filter()`.
 
@@ -185,14 +194,14 @@ No `find()`, `collect()`, `iter()`, or generic `filter()`.
 
 **No class.** Module-level functions:
 
-| Function | Signature | Line | Semantics |
-|---|---|---|---|
-| **Load** | `load_backlog_registry(root=None) -> list[str]` | 90-115 | Returns ordered ID list |
-| **Save** | `save_backlog_registry(ordering, root=None) -> None` | 118-143 | Writes ordering YAML |
-| **Sync** | `sync_backlog_registry(root=None) -> dict[str, int]` | 146-192 | Returns stats dict |
-| **Discover** | `discover_backlog_items(root=None, kind="all") -> list[BacklogItem]` | 324-418 | Sorted by ID |
+| Function      | Signature                                                                 | Line    | Semantics                |
+| ------------- | ------------------------------------------------------------------------- | ------- | ------------------------ |
+| **Load**      | `load_backlog_registry(root=None) -> list[str]`                           | 90-115  | Returns ordered ID list  |
+| **Save**      | `save_backlog_registry(ordering, root=None) -> None`                      | 118-143 | Writes ordering YAML     |
+| **Sync**      | `sync_backlog_registry(root=None) -> dict[str, int]`                      | 146-192 | Returns stats dict       |
+| **Discover**  | `discover_backlog_items(root=None, kind="all") -> list[BacklogItem]`      | 324-418 | Sorted by ID             |
 | **ID lookup** | `find_backlog_items_by_id(item_id, root, kind=None) -> list[BacklogItem]` | 421-491 | Returns list (may be >1) |
-| **Create** | `create_backlog_entry(kind, name, repo_root) -> Path` | 218-263 | Template-based |
+| **Create**    | `create_backlog_entry(kind, name, repo_root) -> Path`                     | 218-263 | Template-based           |
 
 #### B. Model Location
 
@@ -214,23 +223,26 @@ No `find()`, `collect()`, `iter()`, or generic `filter()`.
 
 - **Class:** `PolicyRegistry` (no parent)
 - **Constructor** (lines 102-105):
+
   ```python
   def __init__(self, *, root: Path | None = None) -> None:
   ```
+
   - Keyword-only, optional root, auto-discovers
   - **Lazy**
+
 - **Class method:** `load(root=None)` (lines 107-110)
 
 #### B. Core API
 
-| Method | Signature | Line | Semantics |
-|---|---|---|---|
-| **Collection** | `collect() -> dict[str, PolicyRecord]` | 112-129 | |
-| **ID lookup** | `find(policy_id: str) -> PolicyRecord \| None` | 276-279 | Returns None |
-| **Iteration** | `iter(status=None) -> Iterator[PolicyRecord]` | 269-274 | |
-| **Filter** | `filter(tag, spec, delta, requirement, standard) -> list` | 281-311 | AND logic |
-| **Persistence** | `write(path=None) -> None` | 209-228 | Builds backlinks |
-| **Persistence** | `sync() -> None` | 265-267 | |
+| Method          | Signature                                                 | Line    | Semantics        |
+| --------------- | --------------------------------------------------------- | ------- | ---------------- |
+| **Collection**  | `collect() -> dict[str, PolicyRecord]`                    | 112-129 |                  |
+| **ID lookup**   | `find(policy_id: str) -> PolicyRecord \| None`            | 276-279 | Returns None     |
+| **Iteration**   | `iter(status=None) -> Iterator[PolicyRecord]`             | 269-274 |                  |
+| **Filter**      | `filter(tag, spec, delta, requirement, standard) -> list` | 281-311 | AND logic        |
+| **Persistence** | `write(path=None) -> None`                                | 209-228 | Builds backlinks |
+| **Persistence** | `sync() -> None`                                          | 265-267 |                  |
 
 #### C. Model Location
 
@@ -248,23 +260,26 @@ Near-identical to DecisionRegistry.
 
 - **Class:** `StandardRegistry` (no parent)
 - **Constructor** (lines 111-114):
+
   ```python
   def __init__(self, *, root: Path | None = None) -> None:
   ```
+
   - Keyword-only, optional root, auto-discovers
   - **Lazy**
+
 - **Class method:** `load(root=None)` (lines 116-119)
 
 #### B. Core API
 
-| Method | Signature | Line | Semantics |
-|---|---|---|---|
-| **Collection** | `collect() -> dict[str, StandardRecord]` | 121-138 | |
-| **ID lookup** | `find(standard_id: str) -> StandardRecord \| None` | 304-307 | Returns None |
-| **Iteration** | `iter(status=None) -> Iterator[StandardRecord]` | 297-302 | |
-| **Filter** | `filter(tag, spec, delta, requirement, policy) -> list` | 309-339 | AND logic |
-| **Persistence** | `write(path=None) -> None` | 218-237 | Builds backlinks from Decisions + Policies |
-| **Persistence** | `sync() -> None` | 293-295 | |
+| Method          | Signature                                               | Line    | Semantics                                  |
+| --------------- | ------------------------------------------------------- | ------- | ------------------------------------------ |
+| **Collection**  | `collect() -> dict[str, StandardRecord]`                | 121-138 |                                            |
+| **ID lookup**   | `find(standard_id: str) -> StandardRecord \| None`      | 304-307 | Returns None                               |
+| **Iteration**   | `iter(status=None) -> Iterator[StandardRecord]`         | 297-302 |                                            |
+| **Filter**      | `filter(tag, spec, delta, requirement, policy) -> list` | 309-339 | AND logic                                  |
+| **Persistence** | `write(path=None) -> None`                              | 218-237 | Builds backlinks from Decisions + Policies |
+| **Persistence** | `sync() -> None`                                        | 293-295 |                                            |
 
 #### C. Model Location
 
@@ -282,21 +297,23 @@ Near-identical to PolicyRegistry. Builds backlinks from both DecisionRegistry an
 
 - **Class:** `MemoryRegistry` (no parent)
 - **Constructor** (lines 26-33):
+
   ```python
   def __init__(self, *, root: Path | None = None, directory: Path | None = None) -> None:
   ```
+
   - Keyword-only, optional root + optional directory override
   - **Lazy**
 
 #### B. Core API
 
-| Method | Signature | Line | Semantics |
-|---|---|---|---|
-| **Collection** | `collect() -> dict[str, MemoryRecord]` | 35-53 | |
-| **Collection** | `collect_bodies() -> dict[str, str]` | 77-92 | Body text for graph ops |
-| **ID lookup** | `find(memory_id: str) -> MemoryRecord \| None` | 94-103 | Returns None |
-| **Iteration** | `iter(status=None) -> Iterator[MemoryRecord]` | 105-116 | |
-| **Filter** | `filter(memory_type, status, tag) -> list` | 118-144 | AND logic |
+| Method         | Signature                                      | Line    | Semantics               |
+| -------------- | ---------------------------------------------- | ------- | ----------------------- |
+| **Collection** | `collect() -> dict[str, MemoryRecord]`         | 35-53   |                         |
+| **Collection** | `collect_bodies() -> dict[str, str]`           | 77-92   | Body text for graph ops |
+| **ID lookup**  | `find(memory_id: str) -> MemoryRecord \| None` | 94-103  | Returns None            |
+| **Iteration**  | `iter(status=None) -> Iterator[MemoryRecord]`  | 105-116 |                         |
+| **Filter**     | `filter(memory_type, status, tag) -> list`     | 118-144 | AND logic               |
 
 No sync/write (read-only).
 
@@ -314,22 +331,24 @@ No sync/write (read-only).
 
 - **Class:** `CardRegistry` (no parent)
 - **Constructor** (lines 29-36):
+
   ```python
   def __init__(self, root: Path) -> None:
   ```
+
   - **Positional required `root`** — no auto-discovery
   - **Lazy**
 
 #### B. Core API
 
-| Method | Signature | Line | Semantics |
-|---|---|---|---|
-| **Discovery** | `all_cards() -> list[Card]` | 38-57 | Sorted list |
-| **Lane** | `cards_by_lane(lane: str) -> list[Card]` | 59-68 | |
-| **ID alloc** | `next_id() -> str` | 70-90 | Max+1 |
-| **Create** | `create_card(description, lane) -> Card` | 92-133 | Template-based |
+| Method         | Signature                                 | Line    | Semantics                               |
+| -------------- | ----------------------------------------- | ------- | --------------------------------------- |
+| **Discovery**  | `all_cards() -> list[Card]`               | 38-57   | Sorted list                             |
+| **Lane**       | `cards_by_lane(lane: str) -> list[Card]`  | 59-68   |                                         |
+| **ID alloc**   | `next_id() -> str`                        | 70-90   | Max+1                                   |
+| **Create**     | `create_card(description, lane) -> Card`  | 92-133  | Template-based                          |
 | **Resolution** | `resolve_card(card_id, anywhere) -> Card` | 135-169 | **Raises** FileNotFoundError/ValueError |
-| **Resolution** | `resolve_path(card_id, anywhere) -> str` | 171-182 | |
+| **Resolution** | `resolve_path(card_id, anywhere) -> str`  | 171-182 |                                         |
 
 No `find()`, `collect()`, `iter()`, `filter()`, or `sync()`.
 
@@ -352,17 +371,17 @@ No `find()`, `collect()`, `iter()`, `filter()`, or `sync()`.
 
 Each follows pattern: `_resolve_X(root, raw_id) -> ArtifactRef`
 
-| Artifact | Function | Lines | Registry Pattern | Workarounds |
-|---|---|---|---|---|
-| spec | `_resolve_spec` | 333-340 | `registry.get(raw_id)` | None |
-| change | `_resolve_change` | 343-352 | `registry.collect()` then dict access | No `find()` — must collect all |
-| decision | `_resolve_decision` | 355-363 | `registry.find(normalized)` | None |
-| policy | `_resolve_policy` | 366-374 | `registry.find(normalized)` | None |
-| standard | `_resolve_standard` | 377-385 | `registry.find(normalized)` | None |
-| requirement | `_resolve_requirement` | 388-402 | `registry.records.get(normalized)` | Takes `registry_path` not `root`; colon->dot normalisation |
-| card | `_resolve_card` | 405-413 | `registry.resolve_card(raw_id)` | Try/except for FileNotFoundError/ValueError |
-| memory | `_resolve_memory` | 416-423 | `registry.find(raw_id)` | None |
-| backlog | `_resolve_backlog` | 456-467 | `find_backlog_items_by_id()` function | Ambiguity handling; function not method |
+| Artifact    | Function               | Lines   | Registry Pattern                      | Workarounds                                                |
+| ----------- | ---------------------- | ------- | ------------------------------------- | ---------------------------------------------------------- |
+| spec        | `_resolve_spec`        | 333-340 | `registry.get(raw_id)`                | None                                                       |
+| change      | `_resolve_change`      | 343-352 | `registry.collect()` then dict access | No `find()` — must collect all                             |
+| decision    | `_resolve_decision`    | 355-363 | `registry.find(normalized)`           | None                                                       |
+| policy      | `_resolve_policy`      | 366-374 | `registry.find(normalized)`           | None                                                       |
+| standard    | `_resolve_standard`    | 377-385 | `registry.find(normalized)`           | None                                                       |
+| requirement | `_resolve_requirement` | 388-402 | `registry.records.get(normalized)`    | Takes `registry_path` not `root`; colon->dot normalisation |
+| card        | `_resolve_card`        | 405-413 | `registry.resolve_card(raw_id)`       | Try/except for FileNotFoundError/ValueError                |
+| memory      | `_resolve_memory`      | 416-423 | `registry.find(raw_id)`               | None                                                       |
+| backlog     | `_resolve_backlog`     | 456-467 | `find_backlog_items_by_id()` function | Ambiguity handling; function not method                    |
 
 ### ID Normalisation
 
@@ -382,6 +401,7 @@ Each follows pattern: `_resolve_X(root, raw_id) -> ArtifactRef`
 ### Group A: Target Pattern (4 registries)
 
 Decision, Policy, Standard, Memory all share:
+
 - `__init__(*, root=None)` keyword-only
 - `collect() -> dict[str, Record]`
 - `find(id) -> Record | None`
@@ -406,15 +426,15 @@ This is the target convention.
 
 ## Risk Assessment
 
-| Change | Risk | Mitigation |
-|---|---|---|
-| Add `find()` to Change, Requirements, Card | Low | Additive, no breaking changes |
-| Rename `get()` -> `find()` on Spec | Medium | Deprecation alias, grep for callers |
-| Add `collect()` to Spec | Low | Wrapper around existing cache |
-| Add `iter()` everywhere | Low | Additive |
-| Normalise constructors to kw-only | Medium | Keyword-only is breaking for positional callers |
-| Class-ify Backlog | High | All callers must change; functional API must be preserved |
-| RequirementsRegistry constructor change | Medium | Many callers construct with path directly |
+| Change                                     | Risk   | Mitigation                                                |
+| ------------------------------------------ | ------ | --------------------------------------------------------- |
+| Add `find()` to Change, Requirements, Card | Low    | Additive, no breaking changes                             |
+| Rename `get()` -> `find()` on Spec         | Medium | Deprecation alias, grep for callers                       |
+| Add `collect()` to Spec                    | Low    | Wrapper around existing cache                             |
+| Add `iter()` everywhere                    | Low    | Additive                                                  |
+| Normalise constructors to kw-only          | Medium | Keyword-only is breaking for positional callers           |
+| Class-ify Backlog                          | High   | All callers must change; functional API must be preserved |
+| RequirementsRegistry constructor change    | Medium | Many callers construct with path directly                 |
 
 ---
 

@@ -4,41 +4,42 @@ name: Delta Completion
 kind: memory
 status: active
 memory_type: pattern
-updated: '2026-03-04'
-verified: '2026-03-04'
+updated: "2026-03-04"
+verified: "2026-03-04"
 confidence: high
 tags:
-- spec-driver
-- delta
-- completion
-- verification
-summary: 'Self-contained checklist for closing a delta: phase completion, verification
-  artifacts, spec coverage prerequisites, completion command, sync, and validation.'
+  - spec-driver
+  - delta
+  - completion
+  - verification
+summary:
+  "Self-contained checklist for closing a delta: phase completion, verification
+  artifacts, spec coverage prerequisites, completion command, sync, and validation."
 priority:
   severity: high
   weight: 9
 scope:
   commands:
-  - uv run spec-driver complete delta
-  - complete delta
+    - uv run spec-driver complete delta
+    - complete delta
   paths:
-  - supekku/scripts/complete_delta.py
-  - supekku/scripts/lib/changes/coverage_check.py
-  - supekku/cli/complete.py
+    - supekku/scripts/complete_delta.py
+    - supekku/scripts/lib/changes/coverage_check.py
+    - supekku/cli/complete.py
 provenance:
   sources:
-  - kind: code
-    note: Canonical completion command behavior and lifecycle updates
-    ref: supekku/scripts/complete_delta.py
-  - kind: code
-    note: Coverage gate enforcement and bypass conditions
-    ref: supekku/scripts/lib/changes/coverage_check.py
-  - kind: code
-    note: Coverage status vocabulary
-    ref: supekku/scripts/lib/blocks/verification.py
-  - kind: doc
-    note: Canonical close-out framing for this delta
-    ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
+    - kind: code
+      note: Canonical completion command behavior and lifecycle updates
+      ref: supekku/scripts/complete_delta.py
+    - kind: code
+      note: Coverage gate enforcement and bypass conditions
+      ref: supekku/scripts/lib/changes/coverage_check.py
+    - kind: code
+      note: Coverage status vocabulary
+      ref: supekku/scripts/lib/blocks/verification.py
+    - kind: doc
+      note: Canonical close-out framing for this delta
+      ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
 ---
 
 # Delta Completion
@@ -95,6 +96,7 @@ uv run spec-driver complete delta DE-XXX
 ```
 
 Notes:
+
 - Fix coverage gate failures (`missing_block`, `missing_entry`, `not_verified`,
   invalid requirement IDs, or missing parent specs), then retry.
 - Requirements with status `retired` block normal requirement lifecycle updates.

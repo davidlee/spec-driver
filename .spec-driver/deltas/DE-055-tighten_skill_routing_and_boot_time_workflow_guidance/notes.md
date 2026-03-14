@@ -3,6 +3,7 @@
 ## 2026-03-07
 
 ### What was done
+
 - Created `DE-055`, `DR-055`, `IP-055`, and `IP-055.PHASE-01`.
 - Reviewed current doctrine and workflow guidance:
   - `ADR-004`, `ADR-005`, `ADR-008`
@@ -16,6 +17,7 @@
 - Ran `uv run spec-driver skills sync` successfully after sandbox escalation to refresh installed skills and `.spec-driver/AGENTS.md`.
 
 ### Key observations
+
 - The current `spec-driver` skill is already effective at reducing CLI misuse and should probably stay narrow.
 - The biggest useful import from `using-superpowers` is earlier and stricter selection of the governing skill, not its universal ceremony.
 - `PROD-016` already points toward the right customisation model:
@@ -30,11 +32,13 @@
   - `supekku/scripts/install.py`
 
 ### Current leaning
+
 - Link `spec-driver` more explicitly into boot-time routing.
 - Introduce routing as a separate concern rather than broadening `spec-driver` into a meta-skill.
 - Preserve uniform packaged skills across installs and keep repo-specific adaptation in hook stubs and generated docs.
 
 ### Open threads
+
 - Determine the clean customisation seam for routing guidance.
 - Check whether governance already states the packaged-skill plus hook-stub principle explicitly enough.
 - Decide whether the routing layer should be a distinct skill, boot prose, or both.
@@ -52,6 +56,7 @@
 - Treat `ISSUE-009` as a dependency for backlog-oriented skill workflows, because backlog status semantics are not yet canonical.
 
 ### 2026-03-07 - backlog dependency linkage
+
 - Linked `ISSUE-009` into DE-055 as the current blocker for backlog-oriented skill workflow design.
 - Rationale:
   - backlog capture/promotion/closure skills need canonical status semantics to prescribe transitions confidently
@@ -59,6 +64,7 @@
   - this is an obstacle for defining workflow wording around backlog items without inventing non-canonical lifecycle states
 
 ### 2026-03-07 - phase 03 decision
+
 - Chose the guidance-layer fix for the `draft` delta failure mode instead of changing `complete delta` in this phase.
 - Rationale:
   - by close-out time the damage is already done; the misleading state exists during implementation
@@ -67,6 +73,7 @@
 - Runtime gating in `complete delta` remains a separate design question, not part of this change.
 
 ### 2026-03-07 - phase 03 work
+
 - Updated `supekku/skills/execute-phase/SKILL.md` to:
   - make invocation mandatory and explicit before implementation work
   - call out that leaving the delta in `draft` is not harmless bookkeeping
@@ -75,6 +82,7 @@
 - Created and filled `IP-055.PHASE-03` for the lifecycle-guidance tightening work.
 
 ### 2026-03-07 - phase 04 decision
+
 - Chose to strengthen `using-spec-driver` rather than `execute-phase` or boot for the DR -> IP -> phase -> implementation ordering gap.
 - Rationale:
   - the missing guardrail is in routing, where the agent decides the next governing skill
@@ -82,12 +90,14 @@
   - the failure mode is jumping from "there is a delta" to implementation before the bundle is execution-ready
 
 ### 2026-03-07 - phase 04 work
+
 - Updated `supekku/skills/using-spec-driver/SKILL.md` to:
   - make execution readiness distinct from merely having a delta
   - route missing revision/scoping/planning work before `/execute-phase`
   - add a direct guardrail against treating an existing delta as permission to start implementing
 
 ### 2026-03-07 - phase 05 decision
+
 - Keep `/notes` generic over cards and add a delta-specific execution documentation skill instead of overloading notes.
 - Rationale:
   - compact implementation journaling and structured DE/IP/phase/DR reconciliation are different responsibilities
@@ -95,16 +105,19 @@
   - delta execution needs a stricter place to maintain phase/IP/DE/DR state without turning notes into a hidden workflow meta-skill
 
 ### 2026-03-07 - phase 05 work
+
 - Added `supekku/skills/update-delta-docs/SKILL.md` as the delta-specific structured-doc maintenance skill.
 - Updated `supekku/skills/execute-phase/SKILL.md` to call `/update-delta-docs` alongside `/notes`.
 - Added `update-delta-docs` to `.spec-driver/skills.allowlist` for sync exposure.
 - Ran `uv run spec-driver skills sync`; the first attempt hit sandbox restrictions writing `.agents/skills`, and the escalated retry succeeded.
 
 ### 2026-03-07 - queued research input
+
 - Added `evidence-based-skill-development.md` to the DE-055 bundle as a pending research input.
 - Do not read it yet for this delta thread; another agent is preparing a compressed extract of the relevant parts.
 
 ### 2026-03-07 - phase 07 case study and decision
+
 - Captured a DE-053 multi-phase handover failure mode:
   - the handover named the right artefacts and next command
   - preflight summarized scope and entrance criteria
@@ -115,12 +128,14 @@
   - reinforce `/execute-phase` so unresolved ambiguity discovered in preflight becomes a `/consult` trigger before improvisation
 
 ### 2026-03-07 - phase 07 work
+
 - Updated `supekku/skills/preflight/SKILL.md` to require an explicit critical-assessment section and a stricter readiness standard for implementation-bound work.
 - Updated `supekku/skills/continuation/SKILL.md` and `supekku/skills/next/SKILL.md` so handoff prompts must preserve unresolved assumptions, questions, and tensions.
 - Updated `supekku/skills/execute-phase/SKILL.md` so `/preflight` is explicitly about surfacing assumptions and tensions before coding, and unresolved ambiguity routes to `/consult`.
 - Ran `uv run spec-driver skills sync` successfully; installed skills and `.spec-driver/AGENTS.md` now reflect the stronger preflight and handoff wording.
 
 ### 2026-03-07 - evergreen GPT startup reference
+
 - Added `gpt-skill-authoring-reference.md` to the DE-055 bundle.
 - Purpose:
   - give GPT agents a short startup document before they touch spec-driver skill work
@@ -144,12 +159,14 @@
   ADR/spec/memory sources.
 
 ### 2026-03-07 - skills allowlist gotcha
+
 - `.spec-driver/skills.allowlist` controls which packaged skills are installed into generated surfaces such as `.spec-driver/skills`, `.agents`, and `.claude`.
 - If a skill is missing from the allowlist, `uv run spec-driver skills sync` will not expose it there even if the packaged skill exists under `supekku/skills/`.
 - On a fresh install the allowlist is created with the full skill list.
 - Deleting `.spec-driver/skills.allowlist` and rerunning sync repopulates it.
 
 ### 2026-03-07 - phase 08 brainstorming decomposition
+
 - Re-read `/tmp/superpowers/skills/brainstorming/SKILL.md` against current DE-055 direction.
 - Conclusion:
   - the imported value is not one thing
@@ -168,6 +185,7 @@
   - a lighter delta/capture loop later if the generic question-resolution pattern proves stable
 
 ### 2026-03-07 - phase 09 DR-first authoring import
+
 - Applied the first artifact-specific brainstorming import to `draft-design-revision`.
 - Changes made there:
   - require explicit pre-draft triage of open questions, risks, underspecified areas, assumptions, and critical design decisions
@@ -181,6 +199,7 @@
 - Ran `uv run spec-driver skills sync` successfully; installed skills and `.spec-driver/AGENTS.md` now reflect the stronger DR authoring wording.
 
 ### Observed failure modes
+
 - `complete delta` still tolerates lifecycle status `draft`; execute-phase now mitigates the earlier drift, but runtime closure semantics remain undecided.
 - Agents were eager to skip DR, IP, or phase sheets and proceed directly to implementation; routing and execute-phase guidance now address the main guidance gap, but the remaining question is whether stronger reinforcement is still needed.
 - Multi-phase handovers can preserve the right artefact list while still flattening unresolved design questions, leading preflight to overstate implementation readiness.
@@ -191,6 +210,7 @@
 - There is no dedicated capture skill, and the connective tissue from backlog capture into delta creation and back to updating/resolving originating backlog items is weak.
 
 ### Work completed so far
+
 - Created and populated the `DE-055` bundle for this workflow-improvement thread.
 - Added and synced the new `using-spec-driver` routing skill.
 - Strengthened `using-spec-driver` description and opening language for Claude-style underuse of skills.
@@ -209,6 +229,7 @@
 ## Fresh-agent onboarding
 
 ### Read this first
+
 - `DE-055.md`
 - `DR-055.md`
 - `IP-055.md`
@@ -225,6 +246,7 @@
 - `phases/phase-09.md`
 
 ### Read these only if needed
+
 - `supekku/skills/using-spec-driver/SKILL.md`
 - `supekku/skills/preflight/SKILL.md`
 - `supekku/skills/execute-phase/SKILL.md`
@@ -241,6 +263,7 @@
 ## 2026-03-09 - audit-loop design narrowing
 
 ### What was done
+
 - Re-read the DE-055 audit-loop section in `DR-055` against:
   - `ADR-004`
   - `ADR-008`
@@ -255,6 +278,7 @@
   - what per-finding disposition data must exist for closure to reason from audit output
 
 ### Design decisions captured
+
 - Treat audit gating as a closure rule for deltas that change requirement-bearing or spec-governed technical reality, not for every delta indiscriminately.
 - Require a standalone `AUD-*` artifact for qualifying gated audits so closure, validation, and handoff all have a stable reconciliation anchor.
 - Keep non-qualifying or exploratory discovery work flexible: embedded evidence is still acceptable there, but it does not satisfy the canonical gated audit checkpoint.
@@ -263,6 +287,7 @@
 - Replace loose narrative audit outcomes with machine-checkable per-finding disposition data; exact final schema shape is still open.
 
 ### Assumptions carried forward explicitly
+
 - The user wants DR/design work only for now; no implementation or runtime-gate changes were attempted in this pass.
 - Doctrine still says `implement -> audit/contracts -> revision/spec reconcile -> close`.
 - Runtime still only hard-gates delta closure on coverage today; the stronger audit gate remains design intent, not current behavior.
@@ -270,6 +295,7 @@
 - `uv run spec-driver validate` is still failing on unrelated pre-existing `DE-076` errors, so that failure should not be treated as a regression from DE-055 design edits.
 
 ### Remaining open threads
+
 - Final audit lifecycle/status enum vocabulary still needs settling.
 - Final schema shape for per-finding disposition is still open:
   - nested disposition object
@@ -278,6 +304,7 @@
 - Need a policy for which discovery/backfill warnings should become blockers before any future runtime strictness lands.
 
 ### 2026-03-09 - audit/disposition compatibility with drift ledger
+
 - Follow-up design clarification after the audit-loop narrowing pass:
   - audit finding disposition should be compatible with DE-065 drift ledgers
   - drift-ledger linkage should be optional, not required for every audit finding
@@ -292,6 +319,7 @@
   - avoids forcing extra ceremony on every conformance audit
 
 ### Governing context already established
+
 - `ADR-004` is the workflow canon.
 - `ADR-005` says skills and memories own guidance.
 - `PROD-016` is the key anchor for generated guidance vs user-owned hooks.
@@ -304,6 +332,7 @@
 Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 
 ### Current design state
+
 - `using-spec-driver` now exists and is synced into generated agent metadata.
 - `preflight` has been narrowed so it should no longer compete with `using-spec-driver` for first-touch routing.
 - `preflight` now also requires a critical assessment before implementation-readiness claims.
@@ -315,6 +344,7 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 ## 2026-03-08 - phase 10 memory-effectiveness follow-up
 
 ### Decision
+
 - Improve memory effectiveness in the skill layer first, not via a new runtime hook in this phase.
 - Rationale:
   - the request is explicitly for a skills-based solution
@@ -322,25 +352,30 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
   - the main gaps were not missing primitives, but missing prompts in the execution and close-out skills
 
 ### Work in progress
+
 - Created `IP-055.PHASE-10` to track this follow-up under the existing plan.
 - Updated `supekku/skills/retrieving-memory/SKILL.md` so agents query memories with concrete `--path` targets before touching a subsystem; memories scoped by `scope.globs` should surface through those path queries.
 - Updated `supekku/skills/execute-phase/SKILL.md` and `supekku/skills/implement/SKILL.md` so scoped memory lookup happens before deep subsystem work and durable discoveries trigger memory capture/maintenance during execution.
 - Updated `supekku/skills/notes/SKILL.md`, `supekku/skills/capturing-memory/SKILL.md`, and `supekku/skills/close-change/SKILL.md` so phase and delta wrap-up explicitly review for durable facts, patterns, and gotchas worth preserving in memory.
 
 ### Expected verification
+
 - `uv run spec-driver skills sync`
 - targeted pytest on skill sync/install CLI surfaces
 
 ### Verification results
+
 - `uv run spec-driver skills sync` passed; `.spec-driver/skills` was refreshed and both agent targets reported all skill symlinks `ok`.
 - `uv run pytest supekku/scripts/lib/skills/sync_test.py supekku/scripts/lib/install_test.py supekku/cli/skills_test.py` passed: 148 tests.
 - Created `mem.pattern.git.spec-driver-commit-cleanliness` and confirmed it surfaces for:
   - `uv run spec-driver list memories -p .spec-driver/hooks/doctrine.md -c "git commit"`
 
 ### Open edge
+
 - This does not solve proactive surfacing automatically on every file read/write. `PROB-004` still captures that possible hook-based follow-up if the skill-layer prompts prove insufficient.
 
 ### Verification results
+
 - `uv run spec-driver skills sync` passed; `.spec-driver/skills` was refreshed and both agent targets reported all skill symlinks `ok`.
 - `uv run pytest supekku/scripts/lib/skills/sync_test.py supekku/scripts/lib/install_test.py supekku/cli/skills_test.py` passed: 148 tests.
 - Created `mem.pattern.skills.memory-retrieval-and-wrapup` and confirmed it surfaces for both:
@@ -350,10 +385,12 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 ## 2026-03-08 - phase 11 configurable `.spec-driver` commit guidance
 
 ### Decision
+
 - Put the repo-specific `.spec-driver` commit preference in `.spec-driver/hooks/doctrine.md`.
 - Keep packaged skill guidance generic: follow doctrine, and absent stronger repo guidance prefer frequent, small `.spec-driver` commits with a clean-repo bias.
 
 ### Work in progress
+
 - Created `IP-055.PHASE-11` for this follow-up.
 - Updated `.spec-driver/hooks/doctrine.md` with the local default:
   - prefer frequent, small `.spec-driver` commits
@@ -364,6 +401,7 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 - Updated `supekku/skills/execute-phase/SKILL.md`, `supekku/skills/notes/SKILL.md`, `supekku/skills/close-change/SKILL.md`, and `supekku/skills/continuation/SKILL.md` so agents check doctrine and keep pending `.spec-driver` commit state explicit.
 
 ### Expected verification
+
 - `uv run spec-driver skills sync`
 - targeted pytest on skill sync/install CLI surfaces
   - keep `spec-driver` narrow
@@ -372,6 +410,7 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
   - preserve project-specific customisation through generated docs and hooks
 
 ### Open threads worth working next
+
 - Decide whether `complete delta` should still permit `draft` after the execute-phase guidance change
 - Make `/notes` a stronger invariant
 - Define commit-policy defaults and confirmation behaviour
@@ -387,6 +426,7 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 - Incorporate the compressed DE-055-relevant extract from `evidence-based-skill-development.md` once it is available
 
 ### Verification caveats
+
 - `uv run spec-driver skills sync` succeeded after escalation and is not the current blocker.
 - `uv run spec-driver validate` still fails on unrelated pre-existing errors in:
   - `DE-049`
@@ -397,6 +437,7 @@ Do not spend tokens re-reading broad repo docs unless a new conflict appears.
 Do not treat those validation failures as evidence that `DE-055` is broken.
 
 ### Efficient next-step pattern
+
 1. Read the delta bundle files listed above.
 2. Inspect only the specific skill or sync/install file needed for the chosen failure mode.
 3. Update `DE-055`, `DR-055`, `IP-055`, `notes.md`, and the active phase as you go.
@@ -405,9 +446,11 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 ## New Agent Instructions
 
 ### Task card code
+
 - `DE-055`
 
 ### Required reading
+
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/DE-055.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/DR-055.md`
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/IP-055.md`
@@ -424,12 +467,14 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - `/home/david/dev/spec-driver/.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-14.md`
 
 ### Related documents
+
 - `/home/david/dev/spec-driver/specify/decisions/ADR-004-canonical_workflow_loop.md`
 - `/home/david/dev/spec-driver/specify/decisions/ADR-005-memories_and_skills_are_the_canonical_guidance_layer.md`
 - `/home/david/dev/spec-driver/specify/decisions/ADR-008-normative_lifecycle_truth_and_observed_evidence_reconciliation.md`
 - `/home/david/dev/spec-driver/.spec-driver/product/PROD-016/PROD-016.md`
 
 ### Key files
+
 - `/home/david/dev/spec-driver/supekku/skills/using-spec-driver/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/preflight/SKILL.md`
 - `/home/david/dev/spec-driver/supekku/skills/execute-phase/SKILL.md`
@@ -449,6 +494,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - `/home/david/dev/spec-driver/.spec-driver/AGENTS.md`
 
 ### Relevant memories
+
 - `mem.pattern.spec-driver.core-loop`
 - `mem.concept.spec-driver.posture`
 - `mem.concept.spec-driver.audit`
@@ -457,12 +503,14 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - `mem.signpost.spec-driver.skill-authoring`
 
 ### Relevant doctrines
+
 - Delta-first canon from `ADR-004`
 - Skills/memories as guidance layers from `ADR-005`
 - Observed evidence triggers explicit reconciliation, not silent overwrite, from `ADR-008`
 - Generated guidance plus user-owned hook split from `PROD-016`
 
 ### Important user instructions and decisions
+
 - Keep `spec-driver` narrow.
 - Keep routing separate.
 - Stronger description/opening language matters because Claude under-uses skills.
@@ -472,6 +520,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
   - adversarial review for fresh-agent challenge passes
 
 ### Incomplete work / loose ends
+
 - Decide how to address:
   - whether `complete delta` should still accept `draft`
   - missing `/notes` at task end
@@ -488,6 +537,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - Use `evidence-based-skill-development.md` only after the compressed delta-relevant extract is available.
 
 ### Pending commit-state guidance
+
 - Repo doctrine prefers frequent, small `.spec-driver` commits, but do not commit blindly here.
 - Current worktree is not clean:
   - intended design-doc changes: `DE-055.md`, `DR-055.md`
@@ -496,18 +546,21 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - Next agent should inspect the worktree before committing and avoid bundling unrelated code changes with this DE-055 design work unless the user explicitly wants that.
 
 ### Other advice
+
 - Do not re-discover the whole repo. The context is already concentrated in `DE-055`.
 - `uv run spec-driver validate` currently fails on unrelated pre-existing errors in `DE-076`.
 - `uv run spec-driver skills sync` has already succeeded after escalation; use escalation again if sync must write to `.agents/skills`.
 - `uv run spec-driver sync` succeeded in this turn and refreshed generated docs plus the requirements registry.
 
 ### Next logical activity
+
 - `/using-spec-driver` for `DE-055`, then either:
   - `/preflight` any remaining DE-055 doctrine/workflow question that is still unresolved, or
   - switch to the `DE-079` bundle for audit schema/runtime implementation and review, or
   - fold in the compressed `evidence-based-skill-development.md` extract once available and reconcile it against the updated DR.
 
 ### Verification status
+
 - Skill sync succeeded and `.spec-driver/AGENTS.md` now exposes `using-spec-driver` and `update-delta-docs`.
 - `uv run spec-driver show delta DE-055` passed.
 - `uv run spec-driver sync` passed.
@@ -516,6 +569,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 ## 2026-03-08
 
 ### 2026-03-08 - phase 12 DR review-loop tightening
+
 - Extended `supekku/skills/draft-design-revision/SKILL.md` again to tighten the post-draft loop.
 - New guidance added there:
   - keep DR authoring progressive and section-scoped rather than whole-file-by-default
@@ -530,6 +584,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 - Updated `DE-055.md`, `DR-055.md`, `IP-055.md`, and `IP-055.PHASE-12` to record the new accepted design direction.
 
 ### 2026-03-08 - phase 13 doctrine in the DR loop
+
 - Updated `draft-design-revision` so it explicitly runs `/doctrine` before drafting.
 - The DR loop now treats governance as part of both:
   - pre-draft design triage
@@ -542,6 +597,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
 ## 2026-03-09
 
 ### 2026-03-09 - phase 14 backlog follow-through in close-change
+
 - Updated `supekku/skills/close-change/SKILL.md` so delta closure now:
   - checks for originating backlog entries during pre-check
   - revisits them during post-check
@@ -552,6 +608,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
   - `ISSUE-009` still blocks inventing a canonical backlog status vocabulary, so the close-out skill should nudge and escalate ambiguity rather than guess
 
 ### 2026-03-09 - audit-loop DR extension
+
 - Treated the user request as design only, not implementation.
 - Extended `DR-055.md` and reconciled `DE-055.md` to cover the missing canonical audit loop:
   - documented the doctrine/runtime gap between `ADR-004` and `ADR-008` and the current workflow behavior
@@ -573,6 +630,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
   - there are unrelated pre-existing code/worktree changes outside DE-055; do not assume a clean tree
 
 ### 2026-03-09 - DE-079 dependency scoping pass
+
 - Re-scoped `DE-055`/`DR-055` so the audit loop stays doctrine-first here and the concrete contract now clearly belongs to `DE-079`.
 - Changes made:
   - updated `DE-055.md` earlier in the turn to say `DE-079` owns canonical audit reconciliation implementation
@@ -584,6 +642,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
   - use `DR-079` when the question is about audit schema, validation rules, lifecycle enums, or `complete delta` gate mechanics
 
 ### 2026-03-09 - phase 15 DR-before-IP handoff tightening
+
 - Follow-up issue observed during live use: agents still too often try to skip DR work and jump straight into IP or phase planning.
 - Root cause captured:
   - `draft-design-revision` itself was strong
@@ -603,6 +662,7 @@ Do not treat those validation failures as evidence that `DE-055` is broken.
   - verified generated copies now match the new DR-before-IP wording in `.spec-driver/skills/*`
 
 ### 2026-03-09 - closure handoff and follow-up split
+
 - Reconciled the DE-055 bundle for close-out:
   - added `IP-055.PHASE-15` to `DE-055.md`
   - updated `IP-055.md` so the latest completed phase and phase-completion tracking match reality

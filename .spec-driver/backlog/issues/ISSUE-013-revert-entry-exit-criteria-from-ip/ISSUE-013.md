@@ -1,8 +1,8 @@
 ---
 id: ISSUE-013
 name: Restore entry/exit criteria to IP and phase.overview schemas
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: resolved
 kind: issue
 categories:
@@ -29,11 +29,13 @@ During DE-004 Phase 06 (schema simplification), entry and exit criteria were rem
 2. **Phase Sheet Sync**: While phase sheets also have entry/exit criteria in their markdown sections and `phase.tracking` blocks, these can drift from the original plan. The IP should remain the source of truth for the planned gates, with tooling to detect and warn about drift.
 
 **Current State**: Entry/exit criteria exist only in:
+
 - Phase sheet markdown (sections 3 & 4)
 - `phase.tracking@v1` blocks (optional, structured format)
 - IP markdown table (Section 4 - manual duplication, no validation)
 
 **Desired State**: Entry/exit criteria also in:
+
 - `plan.overview@v1` phases array (upfront planning contract)
 - `phase.overview@v1` blocks (copied from IP during `create phase`)
 - Tooling warns when phase criteria drift from IP baseline
@@ -43,27 +45,30 @@ During DE-004 Phase 06 (schema simplification), entry and exit criteria were rem
 **Commit**: 6f69db8 "feat(DE-004): Phase 06 - schema simplification & phase.tracking metadata"
 
 **What was removed from plan.overview phases**:
+
 ```yaml
 phases:
   - id: IP-004.PHASE-01
-    name: "Phase 01 - Create Phase Command"  # REMOVED
-    objective: "Implement create phase..."   # REMOVED
-    entrance_criteria:                        # REMOVED
+    name: "Phase 01 - Create Phase Command" # REMOVED
+    objective: "Implement create phase..." # REMOVED
+    entrance_criteria: # REMOVED
       - "DE-004 delta approved"
       - "PROD-006 spec reviewed"
-    exit_criteria:                           # REMOVED
+    exit_criteria: # REMOVED
       - "create_phase() function implemented"
       - "CLI command wired"
       - "VT-PHASE-001, 002, 004 passing"
 ```
 
 **Current simplified format**:
+
 ```yaml
 phases:
   - id: IP-004.PHASE-01
 ```
 
 **Why this matters**:
+
 - IPs are created during planning, before implementation begins
 - Entry/exit criteria are quality gates that must be defined upfront
 - Phase sheets are created just-in-time during execution
@@ -75,6 +80,7 @@ phases:
 ### 1. Restore to IP Schema (plan.overview@v1)
 
 Add back to `PLAN_OVERVIEW_METADATA.fields.phases.items.properties`:
+
 ```python
 "name": FieldMetadata(
   type="string",
@@ -107,11 +113,13 @@ Phase metadata already has these fields - ensure they're populated during `creat
 ### 3. Tooling Support
 
 **During `create phase --plan IP-XXX`**:
+
 1. Read entry/exit criteria from IP's `plan.overview` phases array
 2. Copy them into the new phase's `phase.overview` block
 3. Copy them into the `phase.tracking` block if using structured tracking
 
 **Drift Detection (future enhancement)**:
+
 - `spec-driver validate workspace` compares phase criteria to IP baseline
 - Warns if criteria have drifted (additions, deletions, modifications)
 - Suggests either updating the phase or updating the IP if scope changed
@@ -121,6 +129,7 @@ Phase metadata already has these fields - ensure they're populated during `creat
 **Backward Compatibility**: Keep fields optional so existing ID-only plans continue working.
 
 **Migration Path**:
+
 - New IPs created with full metadata (name, objective, criteria)
 - Existing IPs can be enhanced incrementally when revised
 - `create phase` works with both formats (full metadata preferred, ID-only fallback)
@@ -128,9 +137,11 @@ Phase metadata already has these fields - ensure they're populated during `creat
 ## Requirements
 
 ### FR-013.001: IP Schema Restoration
+
 **Statement**: The `plan.overview@v1` schema SHALL support `name`, `objective`, `entrance_criteria`, and `exit_criteria` fields in the phases array.
 
 **Acceptance Criteria**:
+
 - Schema metadata updated in `plan_metadata.py`
 - Fields are optional for backward compatibility
 - JSON Schema generation includes new fields
@@ -139,9 +150,11 @@ Phase metadata already has these fields - ensure they're populated during `creat
 **Verification**: VT-SCHEMA-013-001 (unit tests for schema validation)
 
 ### FR-013.002: Phase Creation with Criteria Copy
+
 **Statement**: The `create phase` command SHALL copy entry/exit criteria from the IP's plan.overview block into the new phase's phase.overview and phase.tracking blocks.
 
 **Acceptance Criteria**:
+
 - Criteria copied from IP phases array to phase.overview
 - Criteria copied to phase.tracking entrance_criteria/exit_criteria arrays
 - If IP has no criteria, phase is created without them (graceful fallback)
@@ -150,11 +163,13 @@ Phase metadata already has these fields - ensure they're populated during `creat
 **Verification**: VT-CREATE-013-002 (unit tests for create_phase with criteria)
 
 ### FR-013.003: Drift Detection Warning
+
 **Statement**: The workspace validator SHOULD warn when phase entry/exit criteria differ from the IP baseline.
 
 **Priority**: P2 (can be deferred to separate delta)
 
 **Acceptance Criteria**:
+
 - `validate workspace` compares phase.overview/tracking criteria to IP
 - Warnings logged for additions, deletions, or modifications
 - Warning includes phase ID and specific drifts
@@ -163,9 +178,11 @@ Phase metadata already has these fields - ensure they're populated during `creat
 **Verification**: VT-VALIDATE-013-003 (validator tests for drift detection)
 
 ### NF-013.001: Backward Compatibility
+
 **Statement**: The schema changes MUST NOT break existing IP files using ID-only phase format.
 
 **Acceptance Criteria**:
+
 - All existing IPs continue to parse correctly
 - `show delta` works with both formats
 - `create phase` works with both formats (prefers full, falls back to ID-only)
@@ -176,21 +193,26 @@ Phase metadata already has these fields - ensure they're populated during `creat
 ## Affected Files
 
 **Schema Definitions**:
+
 - `supekku/scripts/lib/blocks/plan_metadata.py` - PLAN_OVERVIEW_METADATA
 - `supekku/scripts/lib/blocks/phase_metadata.py` - PHASE_OVERVIEW_METADATA (already has fields)
 
 **Creation Logic**:
+
 - `supekku/scripts/lib/changes/creation.py` - create_phase() function
 - `supekku/cli/create.py` - phase creation command
 
 **Validation** (future):
+
 - `supekku/scripts/lib/validation/validator.py` - drift detection
 
 **Templates**:
+
 - `supekku/templates/plan.md` - update Phase Overview table guidance
 - `supekku/templates/phase.md` - already has criteria sections
 
 **Tests**:
+
 - `supekku/scripts/lib/blocks/plan_metadata_test.py` - schema tests
 - `supekku/scripts/lib/changes/creation_test.py` - create_phase tests
 - `supekku/scripts/lib/validation/validator_test.py` - drift detection tests (future)
@@ -208,12 +230,14 @@ Phase metadata already has these fields - ensure they're populated during `creat
 
 **Why not remove from phase.overview too?**
 Phase sheets need their own copy because:
+
 1. They're created just-in-time, long after IP planning
 2. They may legitimately evolve during implementation
 3. Having both allows drift detection (IP = baseline, phase = reality)
 
 **Why this is P2 not P3?**
 This affects the core implementation workflow contract. Without upfront criteria in the IP:
+
 - Planning is incomplete (no quality gates defined)
 - Phase sheets start without clear baseline
 - Drift is undetectable

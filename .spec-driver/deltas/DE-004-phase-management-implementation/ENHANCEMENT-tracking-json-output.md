@@ -10,6 +10,7 @@ Enhanced `show delta --json` output to include detailed task and criteria status
 ## Changes
 
 ### Before
+
 ```json
 {
   "tasks_completed": 8,
@@ -18,6 +19,7 @@ Enhanced `show delta --json` output to include detailed task and criteria status
 ```
 
 ### After
+
 ```json
 {
   "tasks": [
@@ -34,14 +36,8 @@ Enhanced `show delta --json` output to include detailed task and criteria status
     "blocked": 1,
     "total": 5
   },
-  "entrance_criteria": [
-    "[x] Phase 01 complete",
-    "[ ] User approval received"
-  ],
-  "exit_criteria": [
-    "[x] Tests passing",
-    "[ ] Documentation updated"
-  ]
+  "entrance_criteria": ["[x] Phase 01 complete", "[ ] User approval received"],
+  "exit_criteria": ["[x] Tests passing", "[ ] Documentation updated"]
 }
 ```
 
@@ -58,6 +54,7 @@ Enhanced `show delta --json` output to include detailed task and criteria status
 **Function**: `_enrich_phase_data()`
 
 ### Logic
+
 1. Parse `phase.tracking@v1` block from phase file
 2. Extract tasks with status → convert to checkbox format
 3. Count tasks by status → build `task_status` object
@@ -65,6 +62,7 @@ Enhanced `show delta --json` output to include detailed task and criteria status
 5. Add to phase data for JSON serialization
 
 ### Backward Compatibility
+
 - Phases without tracking blocks fall back to regex checkbox counting
 - Returns old format (`tasks_completed`, `tasks_total`) for compatibility
 

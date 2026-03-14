@@ -24,6 +24,7 @@ exit_criteria:
 ## 1. Objective
 
 Execute the migration from file-level to package-level tech spec granularity:
+
 - Delete any existing file-level tech specs
 - Generate 16 package-level specs (one per leaf package)
 - Update PROD spec relationships if needed
@@ -70,7 +71,7 @@ This is a breaking change but acceptable for a solo-developer project.
 
 - [x] Existing file-level specs deleted (111 specs removed)
 - [x] 16 package-level specs created in `specify/tech/` (SPEC-110 to SPEC-125)
-- [x] All SPEC-* references in PROD specs updated to package-level IDs
+- [x] All SPEC-\* references in PROD specs updated to package-level IDs
 - [x] All frontmatter metadata updated (relations, interactions in PROD-001, 003, 004)
 - [x] All body references updated (markdown links, mentions)
 - [x] PythonAdapter updated for package-level discovery
@@ -81,11 +82,13 @@ This is a breaking change but acceptable for a solo-developer project.
 ## 5. Verification
 
 **Manual Verification**:
+
 - Count specs before: `find specify/tech -name "SPEC-*.md" | wc -l`
 - Count specs after: should be 16
 - Verify one spec per leaf package
 
 **Automated Verification**:
+
 ```bash
 # Sync registry
 uv run spec-driver sync
@@ -100,43 +103,48 @@ just test
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - No existing file-level tech specs to delete (fresh state)
 - Manual spec creation acceptable (16 specs, ~15 minutes)
 - PROD specs don't reference non-existent tech specs
 - Solo developer - no coordination needed
 
 **STOP Conditions**:
+
 - STOP if sync fails with errors (escalate design issue)
 - STOP if validation reveals broken relationships
 - STOP if test suite regresses
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Check for existing file-level specs | [ ] | ✓ Found 111, deleted all |
-| [x] | 2.2 | Update PythonAdapter + sync | [ ] | ✓ 16 specs created via tooling |
-| [x] | 2.3 | Update PROD spec relationships | [ ] | ✓ 3 PROD specs updated |
-| [x] | 2.4 | Sync registry | [ ] | ✓ Completed successfully |
-| [x] | 2.5 | Validate workspace | [ ] | ✓ Passing |
-| [x] | 2.6 | Run test suite | [ ] | ✓ 1094 tests passing |
+| Status | ID  | Description                         | Parallel? | Notes                          |
+| ------ | --- | ----------------------------------- | --------- | ------------------------------ |
+| [x]    | 2.1 | Check for existing file-level specs | [ ]       | ✓ Found 111, deleted all       |
+| [x]    | 2.2 | Update PythonAdapter + sync         | [ ]       | ✓ 16 specs created via tooling |
+| [x]    | 2.3 | Update PROD spec relationships      | [ ]       | ✓ 3 PROD specs updated         |
+| [x]    | 2.4 | Sync registry                       | [ ]       | ✓ Completed successfully       |
+| [x]    | 2.5 | Validate workspace                  | [ ]       | ✓ Passing                      |
+| [x]    | 2.6 | Run test suite                      | [ ]       | ✓ 1094 tests passing           |
 
 ### Task Details
 
 **2.1 Check for Existing File-Level Specs**
-- **Design / Approach**: Check `specify/tech/` for any SPEC-*.md files
+
+- **Design / Approach**: Check `specify/tech/` for any SPEC-\*.md files
 - **Files / Components**: `specify/tech/` directory
 - **Testing**: Manual inspection
 - **Observations**: Found 111 existing file-level specs (SPEC-001 to SPEC-111)
 - **Action Taken**: Deleted all 111 specs with `rm -rf specify/tech/SPEC-*`
 
 **2.2 Update PythonAdapter for Package Discovery**
+
 - **Design / Approach**:
   - Import `find_all_leaf_packages` from Phase 01 utilities
   - Replace file-based discovery with package-based discovery
   - Update `describe()` to add `packages` field to frontmatter
   - Run `spec-driver sync` to generate specs via tooling (not manual)
 - **Spec Template**:
+
   ```yaml
   ---
   id: SPEC-XXX
@@ -149,19 +157,20 @@ just test
   packages:
     - <package/path>
   ---
-  
+
   # SPEC-XXX – <package.path>
-  
+
   Package-level specification for <package.path>.
-  
+
   ## Purpose
-  
+
   [TODO: Describe package purpose and responsibilities]
-  
+
   ## Architecture
-  
+
   [TODO: Package-level design notes]
   ```
+
 - **Files Modified**:
   - `supekku/scripts/lib/sync/adapters/python.py`:
     - Line 8: Added `find_all_leaf_packages` import
@@ -189,8 +198,9 @@ just test
 - **Testing**: All specs validated via `spec-driver validate`
 
 **2.3 Update PROD Spec Relationships**
+
 - **Design / Approach**:
-  - Search for any SPEC-* references in PROD spec frontmatter and body
+  - Search for any SPEC-\* references in PROD spec frontmatter and body
   - Map old file-level SPEC IDs to new package-level IDs
   - Update frontmatter `relations:` and `interactions:` blocks
   - Update body references in "Related Specs" sections
@@ -214,6 +224,7 @@ just test
 - **Testing**: `spec-driver validate` confirms no broken references
 
 **2.4 Sync Registry**
+
 - **Design / Approach**: Run `uv run spec-driver sync`
 - **Result**: Completed successfully
   - Reported 107 orphaned units (old file-level specs marked as deleted)
@@ -221,12 +232,14 @@ just test
   - Rebuilt symlink indices successfully
 
 **2.5 Validate Workspace**
+
 - **Design / Approach**: Run `uv run spec-driver validate`
 - **Result**: ✓ Workspace validation passed
   - All SPEC references resolved correctly
   - No broken relationships detected
 
 **2.6 Run Test Suite**
+
 - **Design / Approach**: Run `just test`
 - **Result**: ✓ All 1094 tests passing
   - Fixed 1 test that expected file-level discovery
@@ -234,13 +247,13 @@ just test
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| PROD specs reference non-existent tech specs | Search and update before sync | ✓ Resolved - 3 PROD specs updated |
-| Spec ID numbering conflicts | Use sequential IDs from SPEC-110 | ✓ Resolved - No conflicts |
-| Manual spec creation errors | Used tooling (sync) instead | ✓ Avoided - Automated |
-| Sync fails with new package-level specs | Phase 01 validated registry compatibility | ✓ Mitigated - Sync successful |
-| Test regressions | Updated failing test for package discovery | ✓ Resolved - 1 test fixed |
+| Risk                                         | Mitigation                                 | Status                            |
+| -------------------------------------------- | ------------------------------------------ | --------------------------------- |
+| PROD specs reference non-existent tech specs | Search and update before sync              | ✓ Resolved - 3 PROD specs updated |
+| Spec ID numbering conflicts                  | Use sequential IDs from SPEC-110           | ✓ Resolved - No conflicts         |
+| Manual spec creation errors                  | Used tooling (sync) instead                | ✓ Avoided - Automated             |
+| Sync fails with new package-level specs      | Phase 01 validated registry compatibility  | ✓ Mitigated - Sync successful     |
+| Test regressions                             | Updated failing test for package discovery | ✓ Resolved - 1 test fixed         |
 
 ## 9. Decisions & Outcomes
 
@@ -253,17 +266,20 @@ just test
 ## 10. Findings / Research Notes
 
 **Pre-Migration State**:
+
 - 111 existing file-level specs (SPEC-001 to SPEC-111)
 - All were auto-generated placeholders from previous sync runs
 - 16 leaf packages confirmed in Phase 01
 
 **Post-Migration State**:
+
 - 16 package-level specs (SPEC-110 to SPEC-125)
 - Each spec has `packages: [path]` frontmatter field
 - All specs auto-generated via `spec-driver sync`
 - Registry successfully indexes package-level specs
 
 **Code Changes Summary**:
+
 1. **python.py** (3 sections modified):
    - Import section: Added `find_all_leaf_packages`
    - `discover_targets()`: Package discovery instead of file discovery
@@ -278,6 +294,7 @@ just test
    - PROD-004: 1 SPEC ref → 1 SPEC ref (SPEC-116)
 
 **Orphaned Specs**:
+
 - Sync reported 107 orphaned units (old file-level sources)
 - These can be pruned with `--prune` flag if needed
 - Not a blocker - just informational warnings
@@ -304,22 +321,24 @@ just test
 **Actual Metadata References Found**:
 
 ### PROD-001 (Spec Creation Workflow)
+
 ```yaml
 interactions:
-  - with: SPEC-003  # CLI create commands
-  - with: SPEC-041  # Templates
-  - with: SPEC-085  # Schema show
+  - with: SPEC-003 # CLI create commands
+  - with: SPEC-041 # Templates
+  - with: SPEC-085 # Schema show
 ```
 
 ### PROD-003 (Policy & Standard Artifacts)
+
 ```yaml
 relations:
   - type: extends
-    target: SPEC-003  # CLI create commands
+    target: SPEC-003 # CLI create commands
   - type: extends
-    target: SPEC-004  # CLI list commands
+    target: SPEC-004 # CLI list commands
   - type: collaborates
-    target: SPEC-043  # Registry pattern
+    target: SPEC-043 # Registry pattern
 interactions:
   - with: SPEC-003
   - with: SPEC-004
@@ -327,16 +346,18 @@ interactions:
 ```
 
 ### PROD-004 (Frontmatter Metadata Validation)
+
 ```yaml
 relations:
   - type: implements
-    target: SPEC-036  # Replaces imperative validation
+    target: SPEC-036 # Replaces imperative validation
 interactions:
   - with: SPEC-036
 ```
 
 **Action Required**:
 These SPEC IDs need to be mapped to the new package-level specs once created. The mapping will be:
+
 - Old file-level SPEC-XXX → New package-level SPEC-YYY (based on which package contains the file)
 
 **Note**: Most other SPEC references in PROD specs are illustrative examples in the body text and don't need updating.
@@ -348,12 +369,14 @@ These SPEC IDs need to be mapped to the new package-level specs once created. Th
 ### What Was Accomplished
 
 **Core Migration**:
+
 - ✅ 111 file-level specs deleted
 - ✅ 16 package-level specs created via `spec-driver sync`
 - ✅ PythonAdapter now discovers packages instead of files
 - ✅ All PROD spec references updated (7 old refs → 4 package refs)
 
 **Files Modified** (5 total):
+
 1. `supekku/scripts/lib/sync/adapters/python.py` - Package discovery
 2. `supekku/scripts/lib/sync/adapters/python_test.py` - Test updated
 3. `specify/product/PROD-001/PROD-001.md` - Relationships updated
@@ -361,6 +384,7 @@ These SPEC IDs need to be mapped to the new package-level specs once created. Th
 5. `specify/product/PROD-004/PROD-004.md` - Relationships updated
 
 **Quality Metrics**:
+
 - Tests: 1094/1094 passing ✓
 - Validation: Workspace validation passed ✓
 - Linters: All passing ✓
@@ -368,24 +392,28 @@ These SPEC IDs need to be mapped to the new package-level specs once created. Th
 ### What Phase 03 Needs to Do
 
 **Remaining Work** (from IP-002):
+
 1. **VT-003**: Integration test for sync with package-level specs (5 packages)
 2. **VT-004**: File-to-package resolution tests (`--for-path` queries)
 3. **VA-001**: Git diff stability analysis (verify no spurious changes)
 4. **Documentation**: Update README/docs about package-level granularity
 
 **Key Files for Phase 03**:
+
 - VT-003 location: `supekku/scripts/lib/sync/adapters/python_test.py` (add integration test)
 - VT-004 location: `supekku/scripts/lib/specs/registry_test.py` (add resolution tests)
 - VA-001: Manual analysis (generate contracts, make code change, regenerate, check diff)
 - Docs: README.md or create docs/package-level-specs.md
 
 **Current State for Testing**:
+
 - 16 package-level specs exist at `specify/tech/SPEC-110` through `SPEC-125`
 - Each spec has `packages: [path]` field in frontmatter
 - Registry indexes them correctly (proven by validation passing)
 - Sync operation works end-to-end
 
 **Notes for Next Implementer**:
+
 - All Phase 02 work is in production code, not test fixtures
 - The pattern is proven - sync creates real specs
 - Phase 03 is primarily verification and documentation

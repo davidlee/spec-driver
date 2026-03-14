@@ -2,8 +2,8 @@
 id: IP-055.PHASE-10
 slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-10
 name: IP-055 Phase 10
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: completed
 kind: phase
 ---
@@ -60,10 +60,12 @@ phase: IP-055.PHASE-10
 # Phase 10 - Improve memory retrieval and capture workflow guidance
 
 ## 1. Objective
+
 Make scoped memory retrieval before subsystem work and memory capture during
 phase or delta wrap-up explicit in the execution skills.
 
 ## 2. Links & References
+
 - **Delta**: DE-055
 - **Design Revision Sections**:
   - `DR-055` routing boundary and guidance-layer decisions
@@ -78,33 +80,39 @@ phase or delta wrap-up explicit in the execution skills.
   - `mem.pattern.spec-driver.core-loop`
 
 ## 3. Entrance Criteria
+
 - [x] DE-055 remains `in-progress`
 - [x] Existing memory and execution skills reviewed for current gaps
 
 ## 4. Exit Criteria / Done When
+
 - [x] Relevant skill sources require scoped retrieval before touching a subsystem
 - [x] Wrap-up skills require explicit review for durable memory capture candidates
 - [x] Generated skill copies are resynced and verification evidence is recorded
 
 ## 5. Verification
+
 - `uv run spec-driver skills sync`
 - `uv run pytest supekku/scripts/lib/skills/sync_test.py supekku/scripts/lib/install_test.py supekku/cli/skills_test.py`
 - Evidence: sync output, targeted test pass, notes update
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: the right place for this behavior is the canonical skill layer, not a new runtime hook in this phase.
 - STOP when: implementation reveals the skill-only approach conflicts with existing doctrine or needs schema/runtime changes.
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 10.1 | Update retrieval and execution skills for scoped memory lookup | [ ] | retrieving-memory, execute-phase, and implement updated |
-| [x] | 10.2 | Update wrap-up skills for memory capture | [ ] | notes, capturing-memory, and close-change updated |
-| [x] | 10.3 | Resync installed skills and verify propagation | [ ] | sync and targeted tests passed |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID   | Description                                                    | Parallel? | Notes                                                   |
+| ------ | ---- | -------------------------------------------------------------- | --------- | ------------------------------------------------------- |
+| [x]    | 10.1 | Update retrieval and execution skills for scoped memory lookup | [ ]       | retrieving-memory, execute-phase, and implement updated |
+| [x]    | 10.2 | Update wrap-up skills for memory capture                       | [ ]       | notes, capturing-memory, and close-change updated       |
+| [x]    | 10.3 | Resync installed skills and verify propagation                 | [ ]       | sync and targeted tests passed                          |
 
 ### Task Details
+
 - **10.1 Description**
   - **Design / Approach**: make scoped `spec-driver list memories -p ...` retrieval explicit before deep subsystem work so `scope.globs` memories surface through concrete file queries.
   - **Files / Components**: `supekku/skills/retrieving-memory/SKILL.md`, `supekku/skills/execute-phase/SKILL.md`, `supekku/skills/implement/SKILL.md`
@@ -126,24 +134,28 @@ phase or delta wrap-up explicit in the execution skills.
   - **Observations & AI Notes**: sync refreshed the checked-in skill projections cleanly; targeted test coverage stayed green.
   - **Commits / References**: uncommitted work
 
-*(Repeat detail blocks per task as needed)*
+_(Repeat detail blocks per task as needed)_
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Guidance change does not propagate to checked-in skill copies | Run skill sync before closing the phase | Mitigated |
-| Wrap-up prompt becomes too noisy | Keep wording focused on durable, reusable guidance only | Monitoring |
+
+| Risk                                                          | Mitigation                                              | Status     |
+| ------------------------------------------------------------- | ------------------------------------------------------- | ---------- |
+| Guidance change does not propagate to checked-in skill copies | Run skill sync before closing the phase                 | Mitigated  |
+| Wrap-up prompt becomes too noisy                              | Keep wording focused on durable, reusable guidance only | Monitoring |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-08` - Land this as a skill-layer improvement inside DE-055 rather than a runtime hook or new subsystem. Rationale: the user asked for a skills-based solution, and ADR-005 says skills own procedural guidance.
 
 ## 10. Findings / Research Notes
+
 - Existing execution skills did not require scoped memory lookup before touching a subsystem.
 - Existing wrap-up skills did not explicitly require checking for durable memory candidates before phase or delta close-out.
 - `PROB-004` remains relevant prior art for a later runtime-hook solution, but this phase intentionally stays in the skill layer.
 - Created `mem.pattern.skills.memory-retrieval-and-wrapup` so the new workflow is retrievable without re-reading DE-055 notes.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

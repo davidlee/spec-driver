@@ -90,7 +90,7 @@ Regression tests for find revision — must pass before AND after migration.
 - `test_find_revision_exact(self) -> None`: find revision RE-001 returns its path.
 - `test_find_revision_no_match(self) -> None`: find revision with nonexistent pattern returns empty (exit 0).
 - `test_find_revision_numeric_shorthand(self) -> None`: find revision 1 resolves to RE-001.
-- `test_find_revision_wildcard(self) -> None`: find revision RE-* returns paths for all revisions.
+- `test_find_revision_wildcard(self) -> None`: find revision RE-\* returns paths for all revisions.
 
 ### FindSpecCommandTest
 

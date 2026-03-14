@@ -2,8 +2,8 @@
 id: IP-038.PHASE-03
 slug: 038-canonical_workflow_alignment-phase-03
 name: IP-038 Phase 03
-created: '2026-03-03'
-updated: '2026-03-03'
+created: "2026-03-03"
+updated: "2026-03-03"
 status: completed
 kind: phase
 ---
@@ -58,9 +58,11 @@ phase: IP-038.PHASE-03
 # Phase 03 - Skill Review Pass
 
 ## 1. Objective
+
 Review and align workflow-facing skill guidance so agent behavior matches the frozen DE-038 contract (delta-first default, strict-mode hard-fail baseline, advisory ceremony runtime).
 
 ## 2. Links & References
+
 - **Delta**: DE-038
 - **Design Revision Sections**:
   - [DR-038.md](../DR-038.md) - strict-mode and memory/skill alignment intent
@@ -74,16 +76,19 @@ Review and align workflow-facing skill guidance so agent behavior matches the fr
   - `/home/david/dev/spec-driver/supekku/templates/agents/workflow.md`
 
 ## 3. Entrance Criteria
+
 - [x] Contract wording in DE/DR/research is stable
 - [x] Skill review target set listed in IP-038
 - [x] Skill/template files loaded and baselined for drift
 
 ## 4. Exit Criteria / Done When
+
 - [x] Skill/template workflow guidance is aligned with canonical model
 - [x] No reviewed skill implies ceremony runtime enforcement today
 - [x] Handoff notes include any remaining follow-up scope
 
 ## 5. Verification
+
 - Verification type: VA (skill guidance coherence audit)
 - Tooling/commands:
   - `rg -n` and `nl -ba` over `.agents/skills/**`, `supekku/skills/**`, and agent templates
@@ -94,6 +99,7 @@ Review and align workflow-facing skill guidance so agent behavior matches the fr
   - list of deferred skill-level gaps (if any)
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - Skill updates remain documentation-only and should not introduce new runtime behavior.
   - Strict-mode policy decisions are already fixed in earlier phases.
@@ -102,16 +108,18 @@ Review and align workflow-facing skill guidance so agent behavior matches the fr
   - template/skill conflicts cannot be resolved without changing DE/DR/research contract text.
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 3.1 | Inventory workflow-facing skills/templates and baseline drift | [ ] | Drift was mostly omission: workflow docs lacked explicit canonical/advisory wording |
-| [x] | 3.2 | Patch core skill guidance to canonical model | [ ] | Updated workflow template/runtime docs and implement skill source guidance |
-| [x] | 3.3 | Cross-check skill output against reviewed memories | [ ] | Readback confirms no ceremony-as-runtime-enforcement claim remains in reviewed files |
-| [x] | 3.4 | Final notes and handoff | [ ] | Notes updated; next activity points to retrieval precision phase |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                                   | Parallel? | Notes                                                                                |
+| ------ | --- | ------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------ |
+| [x]    | 3.1 | Inventory workflow-facing skills/templates and baseline drift | [ ]       | Drift was mostly omission: workflow docs lacked explicit canonical/advisory wording  |
+| [x]    | 3.2 | Patch core skill guidance to canonical model                  | [ ]       | Updated workflow template/runtime docs and implement skill source guidance           |
+| [x]    | 3.3 | Cross-check skill output against reviewed memories            | [ ]       | Readback confirms no ceremony-as-runtime-enforcement claim remains in reviewed files |
+| [x]    | 3.4 | Final notes and handoff                                       | [ ]       | Notes updated; next activity points to retrieval precision phase                     |
 
 ### Task Details
+
 - **3.1 Description**
   - **Design / Approach**: enumerate workflow-impacting skills/templates and tag each claim as aligned/stale/ambiguous.
   - **Files / Components**: `.agents/skills/**`, `supekku/skills/**`, `supekku/templates/agents/**`.
@@ -140,19 +148,22 @@ Review and align workflow-facing skill guidance so agent behavior matches the fr
   - **Observations & AI Notes**: to be populated during execution.
   - **Commits / References**: uncommitted work in DE-038 bundle.
 
-*(Repeat detail blocks per task as needed)*
+_(Repeat detail blocks per task as needed)_
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Skill text and agent templates diverge | Update paired sources in same pass and run readback | Open |
-| Over-editing skills beyond DE-038 scope | Constrain edits to sequencing/enforcement claims only | Open |
-| Residual drift remains hidden | Capture deferred items explicitly in notes/gaps | Open |
+
+| Risk                                    | Mitigation                                            | Status |
+| --------------------------------------- | ----------------------------------------------------- | ------ |
+| Skill text and agent templates diverge  | Update paired sources in same pass and run readback   | Open   |
+| Over-editing skills beyond DE-038 scope | Constrain edits to sequencing/enforcement claims only | Open   |
+| Residual drift remains hidden           | Capture deferred items explicitly in notes/gaps       | Open   |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-03` - Phase scaffolded; execution checklist prefilled for skill-review pass.
 
 ## 10. Findings / Research Notes
+
 - Baseline inventory covered:
   - `.agents/skills/*` and `supekku/skills/*` skill pairs
   - `.spec-driver/agents/workflow.md`
@@ -169,6 +180,7 @@ Review and align workflow-facing skill guidance so agent behavior matches the fr
   - Skill edits were applied to `supekku/skills/*/SKILL.md` sources to avoid overwrite by skill sync.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

@@ -48,6 +48,7 @@ uv run spec-driver create spec <short-name> --kind <product|tech> --json
 ```
 
 **CRITICAL**:
+
 - Use `--json` flag to get machine-readable output with file paths
 - The JSON output contains `spec_path` and optionally `testing_path`
 - Tech specs automatically include a testing companion file (`--testing` is default)
@@ -55,6 +56,7 @@ uv run spec-driver create spec <short-name> --kind <product|tech> --json
 - Store these paths for subsequent editing
 
 **Example output structure**:
+
 ```json
 {
   "spec_id": "SPEC-001",
@@ -77,6 +79,7 @@ uv run spec-driver schema show verification.coverage
 Use these to understand required and optional fields in the structured blocks.
 
 **Template includes examples**: The generated spec file contains helpful examples for:
+
 - Functional requirements (FR) format: `- **FR-001**: Requirement statement`
 - Non-functional requirements (NF) format: `- **NF-001**: Performance/quality constraint`
 - Product vs tech spec differences (user-facing vs technical focus)
@@ -131,15 +134,17 @@ Using the spec template and user's description, systematically complete each sec
      - `notes`: Optional context or evidence pointer
 
 **Then expand in prose**:
+
 - Capability overview referencing YAML capabilities
 - Functional Requirements (FR): `SPEC-XXX.FR-001` – clear, testable statement – how verified
 - Non-Functional Requirements (NF): `SPEC-XXX.NF-001` – measurable constraint – measurement approach
 - Success metrics (product) / Operational targets (tech)
 
 **Discovering relationships**:
+
 - It's valuable and important to determine and record related entities correctly.
 - The User likely has some, but not all, of the relevant details.
-- Ask them 2-5 focused, short-answer questions to begin to fill in the metadata. 
+- Ask them 2-5 focused, short-answer questions to begin to fill in the metadata.
 - Then, perform targeted research using `spec-driver` to assist in discovery and navigation.
 - Check with the User periodically if you should continue your research, or ask further questions.
 
@@ -199,6 +204,7 @@ When the user's description lacks detail:
 Before declaring completion, validate the spec:
 
 **Content Quality**:
+
 - [ ] Product specs: No implementation details (languages, frameworks, specific tools)
 - [ ] Tech specs: Implementation details grounded in project architecture
 - [ ] Both: Clear, testable requirements
@@ -207,6 +213,7 @@ Before declaring completion, validate the spec:
 - [ ] YAML blocks valid and complete
 
 **Requirement Completeness**:
+
 - [ ] ≤3 [NEEDS CLARIFICATION] markers (preferably 0)
 - [ ] Every FR/NF has verification approach
 - [ ] Capabilities link to requirements
@@ -214,6 +221,7 @@ Before declaring completion, validate the spec:
 - [ ] Dependencies and assumptions documented
 
 **YAML Block Validation**:
+
 - [ ] All blocks have correct schema markers
 - [ ] Required fields populated
 - [ ] Requirement codes follow naming convention (`SPEC-XXX.FR-NNN`, `SPEC-XXX.NF-NNN`)
@@ -234,12 +242,12 @@ If [NEEDS CLARIFICATION] markers remain after your best effort:
 
 **Options**:
 
-| Choice | Answer | Implications |
-|--------|--------|--------------|
-| A | [First option] | [What this means] |
-| B | [Second option] | [What this means] |
-| C | [Third option] | [What this means] |
-| Custom | Your answer | Provide alternative |
+| Choice | Answer          | Implications        |
+| ------ | --------------- | ------------------- |
+| A      | [First option]  | [What this means]   |
+| B      | [Second option] | [What this means]   |
+| C      | [Third option]  | [What this means]   |
+| Custom | Your answer     | Provide alternative |
 
 **Your choice**: _[Wait for response]_
 ```
@@ -254,15 +262,19 @@ If [NEEDS CLARIFICATION] markers remain after your best effort:
 Once the spec is complete and validated:
 
 1. **Sync the registry**:
+
    ```bash
    uv run spec-driver sync
    ```
+
    This updates registries and validates relationships.
 
 2. **Verify the spec**:
+
    ```bash
    uv run spec-driver validate
    ```
+
    Check for metadata consistency and relationship integrity.
 
 3. **Report completion**:
@@ -285,6 +297,7 @@ Once the spec is complete and validated:
 ### Product vs Tech Spec Differences
 
 **Product Specs** (`--kind product`):
+
 - Focus on WHAT and WHY
 - User-centric language
 - Business value and outcomes
@@ -293,6 +306,7 @@ Once the spec is complete and validated:
 - No testing companion
 
 **Tech Specs** (`--kind tech`):
+
 - Focus on HOW
 - Technical architecture and components
 - Implementation constraints
@@ -303,6 +317,7 @@ Once the spec is complete and validated:
 ### Testing Companion (Tech Specs Only)
 
 The auto-generated `.testing.md` file covers:
+
 - Test strategy per requirement
 - Test levels (unit, integration, e2e)
 - Test data and fixtures
@@ -333,7 +348,6 @@ Only for critical, high-impact decisions:
 - Data privacy requirements (regulatory implications)
 
 ## Tooling Reference
-
 
 ## Final Checklist
 

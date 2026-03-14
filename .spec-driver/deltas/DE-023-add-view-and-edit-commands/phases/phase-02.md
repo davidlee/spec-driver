@@ -2,8 +2,8 @@
 id: IP-023.PHASE-02
 slug: 023-add-view-and-edit-commands-phase-02
 name: IP-023 Phase 02 - Support numeric ID shorthand
-created: '2026-02-05'
-updated: '2026-02-05'
+created: "2026-02-05"
+updated: "2026-02-05"
 status: complete
 kind: phase
 ---
@@ -58,6 +58,7 @@ phase: IP-023.PHASE-02
 ## 1. Objective
 
 Allow users to omit the prefix for artifact types with unambiguous prefixes:
+
 - `spec-driver view adr 001` → resolves to `ADR-001`
 - `spec-driver edit delta 5` → resolves to `DE-005`
 
@@ -93,17 +94,18 @@ Allow users to omit the prefix for artifact types with unambiguous prefixes:
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Add normalize_id() to common.py | | Foundation |
-| [x] | 2.2 | Update view.py | | After 2.1 |
-| [x] | 2.3 | Update edit.py | [P] | Parallel with 2.2 |
-| [x] | 2.4 | Add tests | | After 2.2, 2.3 |
-| [x] | 2.5 | Lint and verify | | Final |
+| Status | ID  | Description                     | Parallel? | Notes             |
+| ------ | --- | ------------------------------- | --------- | ----------------- |
+| [x]    | 2.1 | Add normalize_id() to common.py |           | Foundation        |
+| [x]    | 2.2 | Update view.py                  |           | After 2.1         |
+| [x]    | 2.3 | Update edit.py                  | [P]       | Parallel with 2.2 |
+| [x]    | 2.4 | Add tests                       |           | After 2.2, 2.3    |
+| [x]    | 2.5 | Lint and verify                 |           | Final             |
 
 ### Task Details
 
 - **2.1**: Add to `common.py`
+
   ```python
   # Unambiguous prefix mapping
   ARTIFACT_PREFIXES = {
@@ -138,9 +140,9 @@ Allow users to omit the prefix for artifact types with unambiguous prefixes:
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Zero-padding mismatch | Use 3-digit padding consistently | Open |
+| Risk                  | Mitigation                       | Status |
+| --------------------- | -------------------------------- | ------ |
+| Zero-padding mismatch | Use 3-digit padding consistently | Open   |
 
 ## 9. Decisions & Outcomes
 

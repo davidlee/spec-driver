@@ -3,6 +3,7 @@
 ## Historical Context - What Was Removed
 
 ### Initial Schema (commit cb4b6a8 - 2025-11-02)
+
 When `plan_metadata.py` was first created, the `plan.overview@v1` phases array included full metadata:
 
 ```python
@@ -22,6 +23,7 @@ When `plan_metadata.py` was first created, the `plan.overview@v1` phases array i
 ```
 
 Example from initial schema:
+
 ```yaml
 phases:
   - id: PLN-001-P01
@@ -37,6 +39,7 @@ phases:
 ```
 
 ### Simplification (commit 71f1abe - 2025-11-03)
+
 The schema was simplified to ID-only format to eliminate perceived duplication with `phase.overview` blocks:
 
 ```python
@@ -53,6 +56,7 @@ The schema was simplified to ID-only format to eliminate perceived duplication w
 ```
 
 Example after simplification:
+
 ```yaml
 phases:
   - id: IP-004.PHASE-01
@@ -60,6 +64,7 @@ phases:
 ```
 
 **Removed fields**:
+
 - `name` (string)
 - `objective` (string)
 - `entrance_criteria` (array of strings)
@@ -88,4 +93,3 @@ phases:
 2. **create_phase never copied criteria** - the functionality to copy from IP to phase was never implemented
 3. **This is additive work** - restoring the fields is backward compatible (all fields will be optional)
 4. **Reference diff**: `git diff c527a48..71f1abe -- supekku/scripts/lib/blocks/plan_metadata.py`
-

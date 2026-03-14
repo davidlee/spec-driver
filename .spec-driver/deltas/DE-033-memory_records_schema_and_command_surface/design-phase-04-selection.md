@@ -30,12 +30,12 @@ Normalize to repo-relative, POSIX-style. No leading `./`, resolve `..`.
 OR logic across match dimensions. A dimension only participates if the context
 provides input for it (empty list / None = dimension inactive).
 
-| Dimension | Match rule | Notes |
-|-----------|-----------|-------|
-| Path exact | any `context.paths` == any `scope["paths"]` | Trailing `/` on scope entry = prefix match |
-| Path glob | any `context.paths` matches any `scope["globs"]` | Custom `_glob_match`/`_match_segments` with proper `**` globstar support (`PurePosixPath.full_match()` is Python 3.13+ only; venv is 3.12) |
-| Command | scope command tokens are a prefix of context command tokens | `shlex.split` both sides; all scope tokens must match corresponding context tokens exactly |
-| Tag | `set(context.tags) & set(record.tags)` non-empty | Only if `context.tags` is non-empty |
+| Dimension  | Match rule                                                  | Notes                                                                                                                                      |
+| ---------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Path exact | any `context.paths` == any `scope["paths"]`                 | Trailing `/` on scope entry = prefix match                                                                                                 |
+| Path glob  | any `context.paths` matches any `scope["globs"]`            | Custom `_glob_match`/`_match_segments` with proper `**` globstar support (`PurePosixPath.full_match()` is Python 3.13+ only; venv is 3.12) |
+| Command    | scope command tokens are a prefix of context command tokens | `shlex.split` both sides; all scope tokens must match corresponding context tokens exactly                                                 |
+| Tag        | `set(context.tags) & set(record.tags)` non-empty            | Only if `context.tags` is non-empty                                                                                                        |
 
 Records with no scope keys and no tags → `False` (reachable only by explicit ID).
 
@@ -49,6 +49,7 @@ Records with no scope keys and no tags → `False` (reachable only by explicit I
 #### Command semantics
 
 Token-prefix matching via `shlex.split`:
+
 - `scope: ["test"]` matches `"test auth --verbose"` (prefix)
 - `scope: ["make lint"]` matches `"make lint --fix"` (prefix)
 - `scope: ["test"]` does NOT match `"pytest"` (different token)
@@ -58,28 +59,29 @@ Token-prefix matching via `shlex.split`:
 
 Returns MAX specificity across matched dimensions:
 
-| Score | Dimension |
-|-------|-----------|
-| 3 | Matched via `scope.paths` (exact or prefix) |
-| 2 | Matched via `scope.globs` |
-| 1 | Matched via `scope.commands` |
-| 0 | Matched via tags only / no context |
+| Score | Dimension                                   |
+| ----- | ------------------------------------------- |
+| 3     | Matched via `scope.paths` (exact or prefix) |
+| 2     | Matched via `scope.globs`                   |
+| 1     | Matched via `scope.commands`                |
+| 0     | Matched via tags only / no context          |
 
 ### `sort_key(record, context=None, *, today=None) -> tuple`
 
 5-level deterministic key per JAMMS §5.4:
 
-| Level | Source | Direction | Default |
-|-------|--------|-----------|---------|
-| 1. severity | `priority.get("severity", "none")` | critical=0 → none=4 | "none" → 4 |
-| 2. weight | `priority.get("weight", 0)` | descending (negate) | 0 |
-| 3. specificity | `scope_specificity(record, context)` | descending (negate) | 0 |
-| 4. verified | days since `record.verified` | ascending (null → maxint) | maxint |
-| 5. id | `record.id` | lexicographic | — |
+| Level          | Source                               | Direction                 | Default    |
+| -------------- | ------------------------------------ | ------------------------- | ---------- |
+| 1. severity    | `priority.get("severity", "none")`   | critical=0 → none=4       | "none" → 4 |
+| 2. weight      | `priority.get("weight", 0)`          | descending (negate)       | 0          |
+| 3. specificity | `scope_specificity(record, context)` | descending (negate)       | 0          |
+| 4. verified    | days since `record.verified`         | ascending (null → maxint) | maxint     |
+| 5. id          | `record.id`                          | lexicographic             | —          |
 
 ### `is_surfaceable(record, context=None, *, include_draft, thread_recency_days, today) -> bool`
 
 Returns `False` (excluded) when:
+
 - `status ∈ {deprecated, superseded, obsolete}`
 - `status == "draft"` and not `include_draft`
 - `memory_type == "thread"` AND any of:
@@ -90,6 +92,7 @@ Returns `False` (excluded) when:
 ### `select(records, context=None, *, include_draft=False, thread_recency_days=14, limit=None, today=None) -> list[MemoryRecord]`
 
 Composed pipeline:
+
 1. Filter by `is_surfaceable()`
 2. If context provided, further filter non-thread records by `matches_scope()`
    (threads already handled by `is_surfaceable`)
@@ -102,13 +105,13 @@ Composed pipeline:
 
 ### New options on `list memories`
 
-| Option | Type | Purpose |
-|--------|------|---------|
-| `--path` / `-p` | `list[str]` (repeatable) | Paths for scope matching |
-| `--command` / `-c` | `str` | Command string for scope matching |
-| `--match-tag` | `str` (repeatable) | Tags for scope matching (distinct from `--tag` metadata filter) |
-| `--include-draft` | `bool` | Include draft memories |
-| `--limit` | `int` | Cap output count |
+| Option             | Type                     | Purpose                                                         |
+| ------------------ | ------------------------ | --------------------------------------------------------------- |
+| `--path` / `-p`    | `list[str]` (repeatable) | Paths for scope matching                                        |
+| `--command` / `-c` | `str`                    | Command string for scope matching                               |
+| `--match-tag`      | `str` (repeatable)       | Tags for scope matching (distinct from `--tag` metadata filter) |
+| `--include-draft`  | `bool`                   | Include draft memories                                          |
+| `--limit`          | `int`                    | Cap output count                                                |
 
 ### Pipeline
 
@@ -128,18 +131,18 @@ registry.collect()
 
 ## Edge cases
 
-| Case | Behavior |
-|------|----------|
-| Empty scope `{}` | No scope → matches only via tags/explicit ID |
-| `scope.globs: ["**"]` | Matches all paths (universal/global memory) |
-| No context | All non-excluded records included; specificity=0; order by severity/weight/verified/id |
-| Threads without context | Excluded (context-dependent by nature) |
-| Missing `priority.severity` | Default `"none"` (rank 4) |
-| Missing `priority.weight` | Default `0` |
-| Missing `record.verified` | Sorted last (maxint days) |
-| Unknown severity value | Treated as `"none"` |
-| Missing `record.tags` | Empty set (no tag matches) |
-| Missing scope keys | Empty list (dimension inactive) |
+| Case                        | Behavior                                                                               |
+| --------------------------- | -------------------------------------------------------------------------------------- |
+| Empty scope `{}`            | No scope → matches only via tags/explicit ID                                           |
+| `scope.globs: ["**"]`       | Matches all paths (universal/global memory)                                            |
+| No context                  | All non-excluded records included; specificity=0; order by severity/weight/verified/id |
+| Threads without context     | Excluded (context-dependent by nature)                                                 |
+| Missing `priority.severity` | Default `"none"` (rank 4)                                                              |
+| Missing `priority.weight`   | Default `0`                                                                            |
+| Missing `record.verified`   | Sorted last (maxint days)                                                              |
+| Unknown severity value      | Treated as `"none"`                                                                    |
+| Missing `record.tags`       | Empty set (no tag matches)                                                             |
+| Missing scope keys          | Empty list (dimension inactive)                                                        |
 
 ## Deferred
 

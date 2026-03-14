@@ -30,6 +30,7 @@ Simplify `plan.overview` schema to remove duplication. Change phases array from 
 ## Before/After
 
 ### Before (Current - Duplicated)
+
 ```yaml
 phases:
   - id: IP-004.PHASE-01
@@ -40,6 +41,7 @@ phases:
 ```
 
 ### After (Simplified - ID Only)
+
 ```yaml
 phases:
   - id: IP-004.PHASE-01
@@ -65,6 +67,7 @@ uv run spec-driver create phase "Test Phase" --plan IP-004
 ## Backward Compatibility
 
 Parser must accept BOTH formats:
+
 - Old: `{id: X, name: Y, objective: Z, ...}` → extract ID, ignore rest
 - New: `{id: X}` → extract ID
 

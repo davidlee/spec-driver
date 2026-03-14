@@ -17,8 +17,8 @@ The **ledger** is the artifact (one file per initiative/scope of work).
 ---
 id: DL-047
 name: Spec corpus reconciliation
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: open
 kind: drift_ledger
 delta_ref: DE-047
@@ -64,7 +64,7 @@ delta_ref: DE-047
 - `severity`: blocking | significant | cosmetic
 - `topic`: lifecycle | taxonomy | contracts | governance | workflow | cli | other
 - `owner`
- - At least one `source` OR evidence note explaining why sources are not yet identified
+- At least one `source` OR evidence note explaining why sources are not yet identified
 
 ### Full schema
 
@@ -130,8 +130,8 @@ evidence:
 ---
 id: DL-047
 name: Spec corpus reconciliation
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: open
 kind: drift_ledger
 delta_ref: DE-047

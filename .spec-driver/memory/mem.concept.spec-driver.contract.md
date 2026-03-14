@@ -4,25 +4,25 @@ name: Contracts
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-06'
-verified: '2026-03-06'
+updated: "2026-03-06"
+verified: "2026-03-06"
 confidence: high
 tags:
-- spec-driver
-- contracts
-summary: 'Contracts are auto-generated API documentation — the canonical record
-  of what the code actually exposes. Observed truth, not authored intent.'
+  - spec-driver
+  - contracts
+summary: "Contracts are auto-generated API documentation — the canonical record
+  of what the code actually exposes. Observed truth, not authored intent."
 priority:
   severity: medium
   weight: 6
 provenance:
   sources:
-  - kind: adr
-    ref: ADR-003
-  - kind: adr
-    ref: ADR-004
-  - kind: doc
-    ref: CLAUDE.md
+    - kind: adr
+      ref: ADR-003
+    - kind: adr
+      ref: ADR-004
+    - kind: doc
+      ref: CLAUDE.md
 ---
 
 # Contracts

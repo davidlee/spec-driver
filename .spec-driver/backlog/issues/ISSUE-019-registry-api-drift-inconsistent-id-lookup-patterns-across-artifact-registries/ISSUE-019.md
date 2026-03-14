@@ -1,8 +1,8 @@
 ---
 id: ISSUE-019
-name: 'Registry API drift: inconsistent ID lookup patterns across artifact registries'
-created: '2025-11-04'
-updated: '2025-11-04'
+name: "Registry API drift: inconsistent ID lookup patterns across artifact registries"
+created: "2025-11-04"
+updated: "2025-11-04"
 status: resolved
 kind: issue
 categories: [architecture, technical-debt]
@@ -22,11 +22,13 @@ Registries have evolved with inconsistent APIs for ID-based artifact lookup, mak
 **Three different ID lookup patterns:**
 
 1. **`get(id)` pattern**: SpecRegistry only
+
    ```python
    spec = spec_registry.get("SPEC-001")  # Returns Spec | None
    ```
 
 2. **`find(id)` pattern**: DecisionRegistry, StandardRegistry, PolicyRegistry
+
    ```python
    adr = decision_registry.find("ADR-023")  # Returns DecisionRecord | None
    ```
@@ -39,6 +41,7 @@ Registries have evolved with inconsistent APIs for ID-based artifact lookup, mak
    ```
 
 **Architectural inconsistency:**
+
 - Backlog is functional (`discover_backlog_items()`) vs class-based registries
 - SpecRegistry uses `reload()` while others use `sync()`
 - Different collection methods: `all_specs()` vs `collect()` vs `discover_*()`
@@ -54,17 +57,18 @@ Registries have evolved with inconsistent APIs for ID-based artifact lookup, mak
 
 Analysis of auto-generated contracts in `specify/tech/by-package/supekku/scripts/lib/*/spec/contracts/*-registry-public.md` shows:
 
-| Registry | ID Lookup Method | Notes |
-|----------|-----------------|-------|
-| Specs | `get(id)` | Only registry using `get()` |
-| Decisions | `find(id)` | Newer pattern |
-| Standards | `find(id)` | Follows Decisions pattern |
-| Policies | `find(id)` | Follows Decisions pattern |
-| Changes | ❌ None | Has `find_by_implements()` only |
-| Requirements | ❌ None | Uses `search()` with complex filters |
-| Backlog | ❌ None | Uses `discover_backlog_items()` |
+| Registry     | ID Lookup Method | Notes                                |
+| ------------ | ---------------- | ------------------------------------ |
+| Specs        | `get(id)`        | Only registry using `get()`          |
+| Decisions    | `find(id)`       | Newer pattern                        |
+| Standards    | `find(id)`       | Follows Decisions pattern            |
+| Policies     | `find(id)`       | Follows Decisions pattern            |
+| Changes      | ❌ None          | Has `find_by_implements()` only      |
+| Requirements | ❌ None          | Uses `search()` with complex filters |
+| Backlog      | ❌ None          | Uses `discover_backlog_items()`      |
 
 **Convergence observed**: Recent registries (Decisions, Standards, Policies) share common patterns:
+
 - `collect() -> dict[str, Record]`
 - `find(id) -> Record | None`
 - `filter(...) -> list[Record]`
@@ -103,6 +107,7 @@ Analysis of auto-generated contracts in `specify/tech/by-package/supekku/scripts
 
 Addressed by DE-050 (normalise registry API surface for consistent artifact
 access), which:
+
 - Added `find(id)` to all registries that lacked it
 - Added `collect()`, `iter()` for consistency
 - Established ADR-009 as the governing convention for registry design

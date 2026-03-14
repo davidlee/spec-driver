@@ -2,8 +2,8 @@
 id: IP-083.PHASE-02
 slug: 083-strengthen_audit_to_spec_reconciliation_and_spec_revision_authorship_skills-phase-02
 name: "IP-083 Phase 02 — Verify audit-to-spec examples and reconcile docs"
-created: '2026-03-10'
-updated: '2026-03-10'
+created: "2026-03-10"
+updated: "2026-03-10"
 status: completed
 kind: phase
 ---
@@ -67,11 +67,13 @@ phase: IP-083.PHASE-02
 # Phase 2 — Verify audit-to-spec examples and reconcile docs
 
 ## 1. Objective
+
 Prove the Phase 1 authorship path with worked examples covering all three
 branches, execute the three planned verification artefacts (VA-083-001/002/003),
 and reconcile delta documentation for closure handoff.
 
 ## 2. Links & References
+
 - **Delta**: DE-083
 - **Design Revision**: DR-083 (§4 Branch Criteria, §6 Verification Alignment)
 - **Specs / PRODs**: PROD-011, SPEC-151
@@ -82,11 +84,13 @@ and reconcile delta documentation for closure handoff.
   - Phase 1 sheet: `phases/phase-01.md`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete with all exit criteria satisfied
 - [x] VA-083-001/002/003 still at `planned` status
 - [x] DR-083 design decisions remain current (no design drift from Phase 1)
 
 ## 4. Exit Criteria / Done When
+
 - [x] VA-083-001: decision path review confirms branch criteria are explicit and doctrine-aligned
 - [x] VA-083-002: authorship-skill gap review confirms no remaining gaps requiring immediate work
 - [x] VA-083-003: worked examples for all three branches documented and teachable
@@ -94,6 +98,7 @@ and reconcile delta documentation for closure handoff.
 - [x] DR-083 status updated to `accepted`
 
 ## 5. Verification
+
 - Commands:
   - `uv run spec-driver show delta DE-083`
   - `just check`
@@ -104,6 +109,7 @@ and reconcile delta documentation for closure handoff.
   - IP-083 verification coverage entries updated to `verified`
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - Phase 1 skill wording is substantially correct; Phase 2 fixes are limited to minor wording
   - The three VA artefacts can be executed as document reviews, not runtime tests
@@ -113,21 +119,23 @@ and reconcile delta documentation for closure handoff.
   - A new skill surface appears necessary to express the authorship path
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Execute VA-083-001: decision path review | [P] | PASS — branch criteria explicit and doctrine-aligned across all 5 surfaces |
-| [x] | 2.2 | Execute VA-083-002: authorship-skill gap review | [P] | PASS — no remaining gaps; audit→revision→spec-driver chain is coherent |
-| [x] | 2.3 | Execute VA-083-003: worked-example walkthroughs | [ ] | PASS — 3 examples covering spec_patch, revision, revision-led new spec |
-| [x] | 2.4 | Reconcile DE/DR/IP/notes and update verification coverage | [ ] | IP-083 and SPEC-151 verification entries updated to verified |
-| [x] | 2.5 | Update DR-083 status and hand off to closure | [ ] | DR-083 accepted; ready for audit/closure |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                               | Parallel? | Notes                                                                      |
+| ------ | --- | --------------------------------------------------------- | --------- | -------------------------------------------------------------------------- |
+| [x]    | 2.1 | Execute VA-083-001: decision path review                  | [P]       | PASS — branch criteria explicit and doctrine-aligned across all 5 surfaces |
+| [x]    | 2.2 | Execute VA-083-002: authorship-skill gap review           | [P]       | PASS — no remaining gaps; audit→revision→spec-driver chain is coherent     |
+| [x]    | 2.3 | Execute VA-083-003: worked-example walkthroughs           | [ ]       | PASS — 3 examples covering spec_patch, revision, revision-led new spec     |
+| [x]    | 2.4 | Reconcile DE/DR/IP/notes and update verification coverage | [ ]       | IP-083 and SPEC-151 verification entries updated to verified               |
+| [x]    | 2.5 | Update DR-083 status and hand off to closure              | [ ]       | DR-083 accepted; ready for audit/closure                                   |
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+
+| Risk                                                  | Mitigation                                                     | Status |
+| ----------------------------------------------------- | -------------------------------------------------------------- | ------ |
 | Worked examples reveal a gap requiring Phase 1 rework | Minor wording fixes are Phase 2 scope; major gaps trigger STOP | active |
-| Verification becomes rubber-stamping | Use concrete audit scenarios, not abstract summaries | active |
+| Verification becomes rubber-stamping                  | Use concrete audit scenarios, not abstract summaries           | active |
 
 ## 9. Decisions & Outcomes
 
@@ -139,6 +147,7 @@ Branch criteria from DR-083 §4 are present and correctly ordered across all fiv
 touched surfaces (audit-change, shape-revision, spec-driver, PROD-011, SPEC-151).
 
 Doctrine alignment:
+
 - ADR-004 (audit→reconcile→close): all surfaces follow spec_patch→revision→revision-led new spec
 - ADR-005 (skills=procedures): audit-change and shape-revision are procedural runsheets
 - ADR-008 (explicit reconciliation): all branches require explicit disposition
@@ -147,6 +156,7 @@ Doctrine alignment:
 ### VA-083-002: Authorship-skill gap review — PASS
 
 No remaining gaps requiring immediate work:
+
 - audit-change: explicit branch ordering, rationalization counters, reconciliation before closure
 - shape-revision: doctrine pass, triage before creation, section-by-section authorship, new-spec inside revision
 - spec-driver: narrow CLI routing with explicit authorship tip
@@ -171,6 +181,7 @@ to remove overlap and link. Not a peer disposition because the new-spec decision
 revision analysis.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (§10)
 - [x] Spec/Delta/Plan updated with lessons

@@ -1,10 +1,10 @@
 ---
 id: ADR-005
-title: 'ADR-005: Memories and skills are the canonical guidance layer'
+title: "ADR-005: Memories and skills are the canonical guidance layer"
 status: accepted
-created: '2026-03-06'
-updated: '2026-03-06'
-reviewed: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
+reviewed: "2026-03-06"
 owners:
   - david
 supersedes: []
@@ -25,7 +25,7 @@ tags:
   - memories
   - skills
   - doctrine
-summary: 'Declare agent memories as the canonical conceptual guidance for spec-driver and skills as the canonical procedural guidance layer; reduce other documentation to minimal routing, reference, or derived views.'
+summary: "Declare agent memories as the canonical conceptual guidance for spec-driver and skills as the canonical procedural guidance layer; reduce other documentation to minimal routing, reference, or derived views."
 ---
 
 # ADR-005: Memories and skills are the canonical guidance layer
@@ -184,6 +184,7 @@ Not all of that must happen immediately. This ADR makes the direction explicit.
 ## Consequences
 
 ### Positive
+
 - Establishes a clear guidance hierarchy.
 - Reduces drift pressure by removing duplicate handbook surfaces.
 - Makes agent operation cheaper by reducing low-authority reading.
@@ -192,17 +193,20 @@ Not all of that must happen immediately. This ADR makes the direction explicit.
 - Keeps README-style docs short without making them useless.
 
 ### Negative
+
 - Memories and skills now carry more responsibility and must be maintained carefully.
 - Some users may expect richer prose docs and find the lighter documentation style unfamiliar.
 - Cleanup will require deleting or shrinking documentation that may feel useful locally.
 
 ### Neutral
+
 - This ADR does not eliminate governance docs, specs, or ADRs.
 - This ADR does not require every supporting file to disappear; it requires those
   files to stop competing for doctrinal ownership.
 - Some generated/reference docs will still exist where they add value without duplicating canon.
 
 ## Verification
+
 - `.spec-driver/README.md` becomes a short router rather than a handbook.
 - Memory records cover the main spec-driver concepts and workflow questions.
 - Skills, not prose handbooks, carry the procedural guidance for common work.
@@ -210,6 +214,7 @@ Not all of that must happen immediately. This ADR makes the direction explicit.
 - Future reviews of `docs/`, `wub`, and the top-level `README` use this ADR as the authority source.
 
 ## References
+
 - `specify/decisions/ADR-004-canonical_workflow_loop.md`
 - `specify/product/PROD-016/PROD-016.md`
 - `.spec-driver/AGENTS.md`

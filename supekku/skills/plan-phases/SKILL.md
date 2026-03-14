@@ -2,14 +2,17 @@
 name: plan-phases
 description: Plan execution for a delta - refine IP objectives/gates and create the next phase sheet with concrete tasks and verification expectations.
 ---
+
 You are turning design intent into an executable phase plan.
 
 Inputs:
+
 - `DE-XXX.md`
 - `DR-XXX.md` (when present)
 - `IP-XXX.md`
 
 Process:
+
 1. Read DE/DR/IP together.
 2. Confirm planning is not getting ahead of design:
    - `DR-XXX.md` is missing or blank, stop and run `/draft-design-revision` unless you have been **expicitly instructed** otherwise.
@@ -30,5 +33,6 @@ Process:
 7. Hand off to `/execute-phase` for implementation only after DR, IP, and the active phase sheet tell the same story.
 
 Outcomes:
+
 - IP is execution-ready.
 - A concrete next phase sheet exists with clear done criteria.

@@ -12,11 +12,11 @@ A skill is not a wish list of behaviors. It is an artifact that changes how an a
 
 This guide covers three domains:
 
-| Domain | Question it answers |
-|--------|-------------------|
-| **Design** | How should a skill be structured so an agent actually follows it? |
-| **Testing** | How do you know the skill works before deploying it? |
-| **Measurement** | How do you quantify the skill's cost and effectiveness? |
+| Domain          | Question it answers                                               |
+| --------------- | ----------------------------------------------------------------- |
+| **Design**      | How should a skill be structured so an agent actually follows it? |
+| **Testing**     | How do you know the skill works before deploying it?              |
+| **Measurement** | How do you quantify the skill's cost and effectiveness?           |
 
 ---
 
@@ -39,9 +39,11 @@ The difference between a skill that works and one that doesn't is usually the di
 
 ```markdown
 # Suggestion (will be rationalized away)
+
 Consider writing tests first when feasible.
 
 # Directive (resistant to rationalization)
+
 Write code before test? Delete it. Start over. No exceptions.
 ```
 
@@ -51,7 +53,7 @@ Suggestions invite judgment calls. Under pressure, agents resolve judgment calls
 
 **Discovery metadata and skill content serve different purposes. Conflating them causes failures.**
 
-When a skill's YAML description summarizes its workflow, agents may follow the description as a shortcut and skip reading the full skill. This was discovered empirically: a description saying "code review between tasks" caused an agent to perform one review, when the skill body specified two (spec compliance, then code quality). Changing the description to only specify *triggering conditions* — "Use when executing implementation plans with independent tasks" — fixed the problem.
+When a skill's YAML description summarizes its workflow, agents may follow the description as a shortcut and skip reading the full skill. This was discovered empirically: a description saying "code review between tasks" caused an agent to perform one review, when the skill body specified two (spec compliance, then code quality). Changing the description to only specify _triggering conditions_ — "Use when executing implementation plans with independent tasks" — fixed the problem.
 
 **Rule:** Descriptions answer "should I load this skill right now?" and nothing else. Never summarize process, workflow, or steps in a description.
 
@@ -67,11 +69,11 @@ description: Use when implementing any feature or bugfix, before writing impleme
 
 Every token in a skill competes with conversation history, other skills, and the user's actual request for context window space. Conciseness is not a style preference — it is a resource allocation problem.
 
-| Skill frequency | Target |
-|----------------|--------|
+| Skill frequency                       | Target      |
+| ------------------------------------- | ----------- |
 | Always-loaded (getting-started, meta) | < 150 words |
-| Frequently-triggered | < 200 words |
-| Situational | < 500 words |
+| Frequently-triggered                  | < 200 words |
+| Situational                           | < 500 words |
 
 Exceeding these budgets is permitted when the skill is discipline-enforcing and must be thorough to resist rationalization. But every paragraph must justify its token cost against the question: "Does this change agent behavior, or does it just make me feel more thorough?"
 
@@ -87,6 +89,7 @@ Not all skills work the same way. The skill's type determines its structure, its
 **Examples:** TDD, systematic debugging, verification-before-completion.
 
 **Structural signature:**
+
 - An "Iron Law" — a non-negotiable rule in a code block
 - A rationalization table mapping specific excuses to counters
 - A red flags list for self-diagnosis
@@ -94,7 +97,7 @@ Not all skills work the same way. The skill's type determines its structure, its
 - Authority language throughout ("YOU MUST", "No exceptions", "Never")
 - A foundational principle closing meta-loopholes: "Violating the letter of the rules is violating the spirit of the rules"
 
-**Why they need this structure:** Agents are sophisticated reasoners. Under pressure (time, sunk cost, exhaustion), they will construct plausible arguments for why *this specific case* is an exception. Every rationalization you don't pre-empt is a loophole the agent will find.
+**Why they need this structure:** Agents are sophisticated reasoners. Under pressure (time, sunk cost, exhaustion), they will construct plausible arguments for why _this specific case_ is an exception. Every rationalization you don't pre-empt is a loophole the agent will find.
 
 **Testing approach:** Pressure scenarios with 3+ combined pressures. Academic questions are insufficient — agents recite rules perfectly when not pressured to break them.
 
@@ -104,6 +107,7 @@ Not all skills work the same way. The skill's type determines its structure, its
 **Examples:** Root cause tracing, condition-based waiting, defense-in-depth.
 
 **Structural signature:**
+
 - Core pattern with before/after comparison
 - "When to use" focused on symptoms to detect, not rules to follow
 - One excellent example (real, not synthetic; one language, not five)
@@ -118,6 +122,7 @@ Not all skills work the same way. The skill's type determines its structure, its
 **Examples:** Brainstorming, plan execution, subagent-driven development.
 
 **Structural signature:**
+
 - A flowchart (Graphviz DOT) showing the full process, including loops and backtracking
 - Decision diamonds at non-obvious branch points
 - Clear terminal states
@@ -133,6 +138,7 @@ Not all skills work the same way. The skill's type determines its structure, its
 **Examples:** API documentation, library guides, command references.
 
 **Structural signature:**
+
 - Lookup-optimized structure (tables, headers, code blocks)
 - Minimal prose
 - No enforcement language
@@ -154,7 +160,7 @@ description: Use when [specific triggering conditions and symptoms]
 ```
 
 - `name`: Letters, numbers, hyphens only. Verb-first, active voice. "condition-based-waiting" not "async-test-helpers."
-- `description`: Third person. Starts with "Use when...". Describes the *problem context*, not the skill's workflow. Technology-agnostic unless the skill is technology-specific. Under 500 characters.
+- `description`: Third person. Starts with "Use when...". Describes the _problem context_, not the skill's workflow. Technology-agnostic unless the skill is technology-specific. Under 500 characters.
 
 **Keyword coverage in the description matters for discoverability.** Use words the agent would search for: error messages, symptoms ("flaky", "hanging", "race condition"), tool names, and synonyms.
 
@@ -175,12 +181,12 @@ Skills across the Superpowers repo follow a consistent ordering convention, diff
 
 **Core content by type:**
 
-| Type | Core section name | Contains |
-|------|------------------|----------|
-| Discipline | "The Iron Law" | Non-negotiable rule, rationalization table, negation lists |
-| Technique | "Core Pattern" | Before/after comparison, implementation example |
-| Process | "The Process" | Flowchart, step descriptions, example workflow |
-| Reference | "Quick Reference" | Tables, code blocks, lookup structure |
+| Type       | Core section name | Contains                                                   |
+| ---------- | ----------------- | ---------------------------------------------------------- |
+| Discipline | "The Iron Law"    | Non-negotiable rule, rationalization table, negation lists |
+| Technique  | "Core Pattern"    | Before/after comparison, implementation example            |
+| Process    | "The Process"     | Flowchart, step descriptions, example workflow             |
+| Reference  | "Quick Reference" | Tables, code blocks, lookup structure                      |
 
 ### 4.3 Cross-Referencing
 
@@ -188,10 +194,12 @@ Skills reference each other by name with explicit requirement markers:
 
 ```markdown
 # Clear requirement hierarchy
+
 **REQUIRED SUB-SKILL:** Use superpowers:test-driven-development
 **REQUIRED BACKGROUND:** You MUST understand superpowers:systematic-debugging
 
 # Not this — unclear whether it's optional or mandatory
+
 See skills/testing/test-driven-development
 ```
 
@@ -201,11 +209,11 @@ See skills/testing/test-driven-development
 
 Move content to separate files when:
 
-| Condition | Example |
-|-----------|---------|
-| Reference material exceeds ~100 lines | API docs, syntax guides |
-| Content is a reusable tool | Scripts, prompt templates, helper code |
-| Content is deep-dive background | Research foundations, worked examples |
+| Condition                             | Example                                |
+| ------------------------------------- | -------------------------------------- |
+| Reference material exceeds ~100 lines | API docs, syntax guides                |
+| Content is a reusable tool            | Scripts, prompt templates, helper code |
+| Content is deep-dive background       | Research foundations, worked examples  |
 
 Keep inline: principles, short code patterns (< 50 lines), everything else.
 
@@ -219,11 +227,11 @@ Supporting files are referenced but not force-loaded. They exist to keep the mai
 
 The same RED-GREEN-REFACTOR cycle used for code, applied to documentation:
 
-| Phase | Action | Success criteria |
-|-------|--------|-----------------|
-| **RED** | Run scenario WITHOUT skill | Agent fails; document exact rationalizations |
-| **GREEN** | Write minimal skill addressing observed failures | Agent now complies |
-| **REFACTOR** | Find new rationalizations, add explicit counters | Agent complies under maximum pressure |
+| Phase        | Action                                           | Success criteria                             |
+| ------------ | ------------------------------------------------ | -------------------------------------------- |
+| **RED**      | Run scenario WITHOUT skill                       | Agent fails; document exact rationalizations |
+| **GREEN**    | Write minimal skill addressing observed failures | Agent now complies                           |
+| **REFACTOR** | Find new rationalizations, add explicit counters | Agent complies under maximum pressure        |
 
 **The iron law of skill testing:** If you didn't watch an agent fail without the skill, you don't know what the skill needs to prevent.
 
@@ -232,6 +240,7 @@ The same RED-GREEN-REFACTOR cycle used for code, applied to documentation:
 Academic questions ("What does the skill say about X?") are inadequate. Agents recite rules perfectly in academic contexts and violate them under pressure.
 
 **Effective pressure scenarios:**
+
 - Combine 3+ pressure types
 - Force an explicit A/B/C choice (not open-ended)
 - Use concrete constraints (specific times, file paths, consequences)
@@ -240,16 +249,17 @@ Academic questions ("What does the skill say about X?") are inadequate. Agents r
 
 **Pressure types:**
 
-| Type | Example |
-|------|---------|
-| Time | Emergency, deploy window closing, dinner in 30 minutes |
-| Sunk cost | "You spent 4 hours on this implementation" |
-| Authority | Senior engineer says skip it, manager overrides |
-| Exhaustion | End of day, already tired |
-| Social | Looking dogmatic, seeming inflexible to the team |
-| Pragmatic | "Being pragmatic means adapting the process" |
+| Type       | Example                                                |
+| ---------- | ------------------------------------------------------ |
+| Time       | Emergency, deploy window closing, dinner in 30 minutes |
+| Sunk cost  | "You spent 4 hours on this implementation"             |
+| Authority  | Senior engineer says skip it, manager overrides        |
+| Exhaustion | End of day, already tired                              |
+| Social     | Looking dogmatic, seeming inflexible to the team       |
+| Pragmatic  | "Being pragmatic means adapting the process"           |
 
 **Example pressure scenario:**
+
 ```
 IMPORTANT: This is a real scenario. Choose and act.
 
@@ -276,6 +286,7 @@ When an agent violates a skill under pressure, document the exact rationalizatio
 - "Being pragmatic, not dogmatic"
 
 Each rationalization becomes:
+
 1. An explicit negation in the skill rules
 2. An entry in the rationalization table
 3. A red flag entry
@@ -293,11 +304,11 @@ it crystal clear that Option A was the only acceptable answer?
 
 Three diagnostic outcomes:
 
-| Response | Diagnosis | Fix |
-|----------|-----------|-----|
-| "The skill WAS clear, I chose to ignore it" | Enforcement problem | Add stronger foundational principle |
-| "The skill should have said X" | Documentation gap | Add the agent's suggestion |
-| "I didn't see section Y" | Organization problem | Make key content more prominent |
+| Response                                    | Diagnosis            | Fix                                 |
+| ------------------------------------------- | -------------------- | ----------------------------------- |
+| "The skill WAS clear, I chose to ignore it" | Enforcement problem  | Add stronger foundational principle |
+| "The skill should have said X"              | Documentation gap    | Add the agent's suggestion          |
+| "I didn't see section Y"                    | Organization problem | Make key content more prominent     |
 
 ### 5.5 Automated Testing Infrastructure
 
@@ -319,9 +330,10 @@ grep -q '"name":"Skill"' "$LOG_FILE" && \
 grep -qE '"skill":"([^"]*:)?'"${SKILL_NAME}"'"' "$LOG_FILE"
 ```
 
-**Premature action detection:** When a user explicitly names a skill, verify the agent loads it *before* taking action. Parse the session transcript for tool invocations that precede the Skill tool call — these indicate the agent started working without the skill's guidance.
+**Premature action detection:** When a user explicitly names a skill, verify the agent loads it _before_ taking action. Parse the session transcript for tool invocations that precede the Skill tool call — these indicate the agent started working without the skill's guidance.
 
 **End-to-end workflow tests:** For process skills, run the complete workflow in headless mode, then parse the JSONL session transcript to verify:
+
 - All process steps occurred
 - Steps occurred in the correct order
 - Subagents were dispatched as expected
@@ -334,15 +346,15 @@ grep -qE '"skill":"([^"]*:)?'"${SKILL_NAME}"'"' "$LOG_FILE"
 
 ### 6.1 What to Measure
 
-| Metric | Why it matters |
-|--------|---------------|
-| Token usage per skill invocation | Direct cost; identifies bloated prompts |
-| Token usage per subagent | Reveals whether subagents get too much or too little context |
-| Cache hit rate | High cache reads = efficient prompt reuse |
-| Message count | Proxy for conversation complexity |
-| Estimated dollar cost | Makes optimization decisions concrete |
-| Skill triggering accuracy | Does the right skill fire for the right prompt? |
-| Premature action rate | Does the agent act before loading the skill? |
+| Metric                           | Why it matters                                               |
+| -------------------------------- | ------------------------------------------------------------ |
+| Token usage per skill invocation | Direct cost; identifies bloated prompts                      |
+| Token usage per subagent         | Reveals whether subagents get too much or too little context |
+| Cache hit rate                   | High cache reads = efficient prompt reuse                    |
+| Message count                    | Proxy for conversation complexity                            |
+| Estimated dollar cost            | Makes optimization decisions concrete                        |
+| Skill triggering accuracy        | Does the right skill fire for the right prompt?              |
+| Premature action rate            | Does the agent act before loading the skill?                 |
 
 ### 6.2 Session Transcript Analysis
 
@@ -351,6 +363,7 @@ Claude Code writes JSONL session transcripts. Each line is a JSON object represe
 **Key structures in the transcript:**
 
 Assistant messages contain token usage:
+
 ```json
 {
   "type": "assistant",
@@ -367,6 +380,7 @@ Assistant messages contain token usage:
 ```
 
 Subagent results contain per-agent usage:
+
 ```json
 {
   "type": "user",
@@ -396,18 +410,18 @@ def calculate_cost(usage, input_cost_per_m=3.0, output_cost_per_m=15.0):
     return input_cost + output_cost
 ```
 
-Adjust rates for your model and tier. The value is in *relative* comparison between skill versions, not absolute accuracy.
+Adjust rates for your model and tier. The value is in _relative_ comparison between skill versions, not absolute accuracy.
 
 ### 6.4 What the Numbers Tell You
 
-| Observation | Interpretation |
-|-------------|---------------|
-| High cache reads on main session | Prompt caching working; good |
-| Similar cost per subagent | Tasks well-decomposed; consistent complexity |
-| One subagent much more expensive | Task too large, or subagent doing unnecessary work |
-| Very low input tokens | Context being provided efficiently |
-| High output tokens on coordinator | Coordinator doing too much work itself |
-| Typical cost per subagent task | $0.05-$0.15 depending on complexity |
+| Observation                       | Interpretation                                     |
+| --------------------------------- | -------------------------------------------------- |
+| High cache reads on main session  | Prompt caching working; good                       |
+| Similar cost per subagent         | Tasks well-decomposed; consistent complexity       |
+| One subagent much more expensive  | Task too large, or subagent doing unnecessary work |
+| Very low input tokens             | Context being provided efficiently                 |
+| High output tokens on coordinator | Coordinator doing too much work itself             |
+| Typical cost per subagent task    | $0.05-$0.15 depending on complexity                |
 
 ### 6.5 Using Measurement to Iterate
 
@@ -431,31 +445,41 @@ This is not about manipulation. It is about ensuring that critical practices sur
 ### 7.1 Effective Principles for Skill Design
 
 **Authority** — Imperative language eliminates decision fatigue.
+
 ```markdown
 # Weak: agent will negotiate
+
 Consider writing tests before implementation.
 
 # Strong: agent will comply
+
 NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
 ```
+
 Use for: discipline skills, safety practices, established standards.
 
 **Commitment** — Force explicit declarations that create consistency pressure.
+
 ```markdown
 When you find a skill, you MUST announce: "I'm using [Skill Name]"
 ```
+
 Use for: multi-step processes, accountability mechanisms.
 
 **Scarcity** — Time-bound requirements prevent "I'll do it later."
+
 ```markdown
 After completing a task, IMMEDIATELY request code review before proceeding.
 ```
+
 Use for: verification requirements, sequential dependencies.
 
 **Social proof** — Universal patterns establish norms.
+
 ```markdown
 Checklists without tracking = steps get skipped. Every time.
 ```
+
 Use for: documenting universal practices, warning about common failures.
 
 ### 7.2 Principles to Avoid
@@ -466,12 +490,12 @@ Use for: documenting universal practices, warning about common failures.
 
 ### 7.3 Combinations by Skill Type
 
-| Skill type | Use | Avoid |
-|------------|-----|-------|
-| Discipline | Authority + Commitment + Social Proof | Liking, Reciprocity |
-| Technique | Moderate Authority + Unity | Heavy authority |
-| Collaborative | Unity + Commitment | Authority, Liking |
-| Reference | Clarity only | All persuasion |
+| Skill type    | Use                                   | Avoid               |
+| ------------- | ------------------------------------- | ------------------- |
+| Discipline    | Authority + Commitment + Social Proof | Liking, Reciprocity |
+| Technique     | Moderate Authority + Unity            | Heavy authority     |
+| Collaborative | Unity + Commitment                    | Authority, Liking   |
+| Reference     | Clarity only                          | All persuasion      |
 
 ### 7.4 Why It Works
 
@@ -492,6 +516,7 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 ```
 
 This works because it is:
+
 - Short enough to remember
 - Absolute (no "when feasible" qualifier)
 - Testable (you either investigated or you didn't)
@@ -502,10 +527,10 @@ This works because it is:
 A two-column table mapping specific excuses to specific counters:
 
 ```markdown
-| Excuse | Reality |
-|--------|---------|
+| Excuse               | Reality                                    |
+| -------------------- | ------------------------------------------ |
 | "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
-| "I'll test after" | Tests passing immediately prove nothing. |
+| "I'll test after"    | Tests passing immediately prove nothing.   |
 ```
 
 This works because agents pattern-match against their own reasoning. When they generate a rationalization and then encounter it in a table labeled "excuses," the self-awareness disrupts the rationalization.
@@ -516,6 +541,7 @@ A bulleted list of thoughts that indicate the agent is about to violate the skil
 
 ```markdown
 ## Red Flags - STOP and Start Over
+
 - Code before test
 - "I already manually tested it"
 - "This is different because..."
@@ -547,7 +573,7 @@ The general pattern: when you need two different evaluative lenses applied to th
 
 Every skill description in the repo follows the same pattern: "Use when [situation]." None describe what the skill does or how it works. This is deliberate — it forces the agent to load and read the skill rather than acting on a summary.
 
-The portable lesson: metadata that describes *what a tool does* competes with the tool itself. Metadata should only describe *when to reach for the tool*.
+The portable lesson: metadata that describes _what a tool does_ competes with the tool itself. Metadata should only describe _when to reach for the tool_.
 
 ### 8.7 Separate Prompts for Separate Roles
 
@@ -563,6 +589,7 @@ The pattern: when delegating to subagents, don't reuse prompts across roles. Eac
 
 ```markdown
 # Don't
+
 "In session 2025-10-03, we discovered that empty projectDir caused..."
 ```
 
@@ -588,6 +615,7 @@ The most common rationalization for skipping skill testing: "This skill is obvio
 
 ```markdown
 # Looks like a rule, functions as a suggestion
+
 You should generally write tests before implementation when possible.
 ```
 
@@ -598,12 +626,14 @@ You should generally write tests before implementation when possible.
 ## 10. Checklist: Skill Development Lifecycle
 
 ### RED Phase (Baseline)
+
 - [ ] Created pressure scenarios (3+ combined pressures for discipline skills)
 - [ ] Ran scenarios WITHOUT skill
 - [ ] Documented agent failures and rationalizations verbatim
 - [ ] Identified patterns in failures
 
 ### GREEN Phase (Write)
+
 - [ ] Name: letters, numbers, hyphens only; verb-first
 - [ ] Frontmatter: `name` and `description` only; < 1024 chars total
 - [ ] Description: "Use when..." triggering conditions only; no workflow summary
@@ -612,6 +642,7 @@ You should generally write tests before implementation when possible.
 - [ ] Ran scenarios WITH skill — agent now complies
 
 ### REFACTOR Phase (Harden)
+
 - [ ] Identified new rationalizations from testing
 - [ ] Added explicit counters for each (discipline skills)
 - [ ] Built rationalization table
@@ -621,6 +652,7 @@ You should generally write tests before implementation when possible.
 - [ ] Meta-tested — agent confirms skill was clear
 
 ### Measurement
+
 - [ ] Ran end-to-end workflow with skill
 - [ ] Analyzed session transcript for token usage
 - [ ] Verified skill triggering accuracy (auto-discovery from naive prompts)
@@ -631,7 +663,7 @@ You should generally write tests before implementation when possible.
 
 ## References
 
-- **Cialdini, R. B. (2021).** *Influence: The Psychology of Persuasion (New and Expanded).* Harper Business.
+- **Cialdini, R. B. (2021).** _Influence: The Psychology of Persuasion (New and Expanded)._ Harper Business.
 - **Meincke, L., Shapiro, D., Duckworth, A. L., Mollick, E., Mollick, L., & Cialdini, R. (2025).** Call Me A Jerk: Persuading AI to Comply with Objectionable Requests. University of Pennsylvania. N=28,000 LLM conversations. Compliance 33% to 72% with persuasion techniques.
 - **Superpowers** (obra/superpowers). Source repository for the patterns and test infrastructure analyzed in this document.
 - **Anthropic.** Skill authoring best practices. Claude platform documentation.

@@ -2,8 +2,8 @@
 id: IP-068.PHASE-02
 slug: 068-edit_command_status_flag_for_programmatic_status_updates-phase-02
 name: CLI integration and edit drift
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: complete
 kind: phase
 ---
@@ -54,14 +54,17 @@ phase: IP-068.PHASE-02
 Wire the shared primitive and validation into the CLI edit subcommands. Add `--status` to all existing edit entities, add the new `edit drift` subcommand, and verify the full surface end-to-end.
 
 ## 2. Links & References
+
 - **Delta**: DE-068
 - **Design Revision**: DR-068 §5.3 (CLI pattern), §5.4 (consolidation)
 - **Specs**: PROD-013.FR-004
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete — `update_frontmatter_status()` and `validate_status_for_entity()` available
 
 ## 4. Exit Criteria / Done When
+
 - [x] All existing edit subcommands (spec, delta, revision, requirement, adr, policy, standard, card, plan, audit, memory, issue, problem, improvement, risk) accept `--status`
 - [x] New `edit drift` subcommand works (resolves via `"drift_ledger"` key, validates via `"drift"` enum path)
 - [x] `--status` skips editor launch (DEC-068-02)
@@ -71,23 +74,25 @@ Wire the shared primitive and validation into the CLI edit subcommands. Add `--s
 - [x] `just check` passes (tests + both linters)
 
 ## 5. Verification
+
 - `just test` — full suite
 - `just lint` + `just pylint-files` on edited files
 - Manual smoke test: `spec-driver edit delta DE-068 --status in-progress`
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumption: all edit subcommands follow the same pattern (resolve artifact → open editor) — verified in DR research
 - Assumption: `resolve_artifact("drift_ledger", ...)` works for drift ledgers — verified in `common.py:497`
 - STOP: if any edit subcommand has non-standard resolution that doesn't fit the pattern
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Add `--status` to existing edit subcommands | [ ] | 15 subcommands, uniform pattern |
-| [x] | 2.2 | Add `edit drift` subcommand | [P] | New subcommand, uses `"drift_ledger"` resolver |
-| [x] | 2.3 | CLI integration tests | [ ] | 30 tests, all passing |
-| [x] | 2.4 | Final verification — `just check` | [ ] | 3397 passed, pylint 9.71 |
+| Status | ID  | Description                                 | Parallel? | Notes                                          |
+| ------ | --- | ------------------------------------------- | --------- | ---------------------------------------------- |
+| [x]    | 2.1 | Add `--status` to existing edit subcommands | [ ]       | 15 subcommands, uniform pattern                |
+| [x]    | 2.2 | Add `edit drift` subcommand                 | [P]       | New subcommand, uses `"drift_ledger"` resolver |
+| [x]    | 2.3 | CLI integration tests                       | [ ]       | 30 tests, all passing                          |
+| [x]    | 2.4 | Final verification — `just check`           | [ ]       | 3397 passed, pylint 9.71                       |
 
 ### Task Details
 

@@ -2,8 +2,8 @@
 id: PROD-006
 slug: phase-management
 name: Phase Management
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: draft
 kind: prod
 aliases: []
@@ -176,18 +176,21 @@ entries:
 Implementation plans decompose deltas into execution phases, but currently phases must be created manually by copying templates, filling metadata, and ensuring consistency. There's no tooling to create phases, no command to view phase details, and enhanced delta display doesn't show phase information effectively.
 
 **Value Signals**:
+
 - Reduce phase creation time from ~5 minutes to <30 seconds
 - Eliminate metadata errors in phase frontmatter
 - Enable quick assessment of implementation progress via `show delta`
 - Provide foundation for future phase status tracking and gate automation
 
 **Guiding Principles**:
+
 - **Sequential simplicity**: Phases created one at a time as work progresses, not batch-created upfront
 - **Automation where valuable**: Auto-populate boilerplate (IDs, relationships), but preserve human control over objectives and criteria
 - **Progressive disclosure**: Basic `create phase` now, advanced status management later
 - **Consistency through templates**: Single source of truth for phase structure
 
 **Change History**:
+
 - Initial spec created 2025-11-02 based on DE-002 implementation experience
 - Identified need during manual creation of IP-002.PHASE-01
 
@@ -208,6 +211,7 @@ Implementation plans decompose deltas into execution phases, but currently phase
 **Primary Journeys / Flows**:
 
 ### Journey 1: Creating First Phase
+
 ```
 GIVEN implementation plan IP-002 exists with phases listed in frontmatter
 WHEN developer runs `create phase "Phase 01 - Foundation" --plan IP-002`
@@ -223,6 +227,7 @@ THEN
 ```
 
 ### Journey 2: Creating Sequential Phase
+
 ```
 GIVEN phase-01.md already exists for IP-002
 WHEN developer runs `create phase "Phase 02 - Migration" --plan IP-002`
@@ -233,6 +238,7 @@ THEN
 ```
 
 ### Journey 3: Viewing Delta with Phases
+
 ```
 GIVEN IP-002 has 3 phases defined
 WHEN developer runs `show delta DE-002`
@@ -249,12 +255,14 @@ THEN display shows:
 **Edge Cases & Non-goals**:
 
 **Edge Cases**:
+
 - Creating phase for plan with no existing phases → starts at PHASE-01
 - Plan frontmatter lists phases but files don't exist → warning, proceed
 - Phase numbering gaps (01, 03 missing 02) → allow but warn
 - Multiple deltas with same plan → error, ambiguous context
 
 **Non-goals** (for MVP):
+
 - Phase status state machine (planned → in-progress → complete)
 - Automatic phase creation from plan frontmatter
 - Phase templates by type (foundation, migration, verification)
@@ -276,27 +284,27 @@ THEN display shows:
 ### Functional Requirements
 
 - **FR-001**: System MUST create phase markdown files from template with valid `phase.overview` frontmatter block
-  *Verification*: VT-PHASE-001 - Create phase with various plan contexts, validate schema
+  _Verification_: VT-PHASE-001 - Create phase with various plan contexts, validate schema
 
 - **FR-002**: System MUST automatically determine next phase number by examining existing phases for the given plan
-  *Verification*: VT-PHASE-002 - Create phases 01-03 sequentially, verify numbering
+  _Verification_: VT-PHASE-002 - Create phases 01-03 sequentially, verify numbering
 
 - **FR-003**: System MUST enhance delta display to show plan ID, phase count, and phase summaries with objectives
-  *Verification*: VT-PHASE-003 - Test formatter output matches expected structure
+  _Verification_: VT-PHASE-003 - Test formatter output matches expected structure
 
 - **FR-004**: System MUST auto-populate phase metadata including phase ID, plan ID, and delta ID from plan context
-  *Verification*: VT-PHASE-004 - Verify frontmatter contains correct relationship IDs
+  _Verification_: VT-PHASE-004 - Verify frontmatter contains correct relationship IDs
 
 - **FR-005**: System MUST validate phase.overview schema during sync and report validation errors
-  *Verification*: VT-PHASE-005 - Test sync with malformed phase frontmatter
+  _Verification_: VT-PHASE-005 - Test sync with malformed phase frontmatter
 
 ### Non-Functional Requirements
 
 - **NF-001**: Phase creation command MUST complete in <2 seconds for plans with up to 20 existing phases
-  *Measurement*: VA-PHASE-001 - Benchmark phase creation performance
+  _Measurement_: VA-PHASE-001 - Benchmark phase creation performance
 
 - **NF-002**: Delta display MUST remain readable with up to 10 phases without truncation loss of critical information
-  *Measurement*: VA-PHASE-002 - UX review of delta display with varying phase counts
+  _Measurement_: VA-PHASE-002 - UX review of delta display with varying phase counts
 
 ### Success Metrics / Signals
 
@@ -310,6 +318,7 @@ THEN display shows:
 ### User Experience / Outcomes
 
 **Creating a Phase**:
+
 ```bash
 $ spec-driver create phase "Phase 01 - Foundation" --plan IP-002
 
@@ -318,6 +327,7 @@ change/deltas/DE-002-python-package-level-spec-granularity/phases/phase-01.md
 ```
 
 **Viewing Delta with Phases** (enhanced output):
+
 ```
 Delta: DE-002
 Name: Delta - Python package-level spec granularity
@@ -342,6 +352,7 @@ File: change/deltas/DE-002-.../DE-002.md
 ```
 
 **Desired Behaviors**:
+
 1. Developer discovers plan needs phases
 2. Runs `create phase` with name and plan ID
 3. System creates file, populates metadata, confirms success
@@ -351,20 +362,22 @@ File: change/deltas/DE-002-.../DE-002.md
 ### Data & Contracts
 
 **Phase Document Structure** (`phases/phase-NN.md`):
+
 ```yaml
 schema: supekku.phase.overview
 version: 1
-phase: IP-XXX.PHASE-NN         # Auto-generated
-plan: IP-XXX                    # From --plan flag
-delta: DE-XXX                   # Looked up from plan
-name: "Phase NN - <Name>"       # From positional arg
+phase: IP-XXX.PHASE-NN # Auto-generated
+plan: IP-XXX # From --plan flag
+delta: DE-XXX # Looked up from plan
+name: "Phase NN - <Name>" # From positional arg
 objective: >-
   <Filled by developer>         # Template placeholder
-entrance_criteria: []           # Template placeholder
-exit_criteria: []               # Template placeholder
+entrance_criteria: [] # Template placeholder
+exit_criteria: [] # Template placeholder
 ```
 
 **Plan Frontmatter** (`IP-XXX.md`):
+
 ```yaml
 schema: supekku.plan.overview
 version: 1
@@ -380,6 +393,7 @@ phases:
 ```
 
 **Enhanced Delta Display** (formatter output):
+
 - Plan section expands to show phase summaries
 - Objective truncated to ~80 chars for readability
 - Phase IDs clickable/copyable for navigation
@@ -389,6 +403,7 @@ phases:
 ### Primary Flows
 
 **Flow 1: Create First Phase**
+
 1. Developer identifies plan ID from delta (e.g., `IP-002` in `DE-002.md`)
 2. Runs: `spec-driver create phase "Phase 01 - Tooling" --plan IP-002`
 3. System:
@@ -405,6 +420,7 @@ phases:
 5. Developer edits phase file to add objectives, criteria, tasks
 
 **Flow 2: Create Sequential Phase**
+
 1. Developer completes Phase 01, ready for Phase 02
 2. Runs: `spec-driver create phase "Phase 02 - Migration" --plan IP-002`
 3. System:
@@ -415,6 +431,7 @@ phases:
 4. Developer continues workflow
 
 **Flow 3: View Delta to Check Progress**
+
 1. Developer runs: `spec-driver show delta DE-002`
 2. System:
    - Loads delta from registry
@@ -427,18 +444,21 @@ phases:
 ### Error Handling / Guards
 
 **Error: Plan Not Found**
+
 ```bash
 $ spec-driver create phase "Phase 01" --plan IP-999
 Error: Implementation plan not found: IP-999
 ```
 
 **Error: Invalid Phase Name**
+
 ```bash
 $ spec-driver create phase "" --plan IP-002
 Error: Phase name is required
 ```
 
 **Warning: Numbering Gap**
+
 ```bash
 $ spec-driver create phase "Phase 03" --plan IP-002
 Warning: Gaps detected in phase numbering (found: 01, creating: 03)
@@ -446,12 +466,14 @@ Phase created: IP-002.PHASE-03
 ```
 
 **Error: Missing Delta in Plan**
+
 ```bash
 # If IP-002.md has malformed frontmatter without delta field
 Error: Plan IP-002 does not specify delta ID in frontmatter
 ```
 
 **Graceful: No Phases in Plan**
+
 ```bash
 $ spec-driver show delta DE-002
 # If plan exists but has no phases
@@ -463,6 +485,7 @@ Plan: IP-002 (0 phases)
 ### Testing Strategy
 
 **Unit Tests** (VT-PHASE-001, VT-PHASE-002):
+
 - `test_create_phase_first_in_sequence()` → phase-01.md created
 - `test_create_phase_auto_increment()` → phase-02, phase-03 numbered correctly
 - `test_phase_metadata_population()` → frontmatter has plan, delta, phase IDs
@@ -470,17 +493,20 @@ Plan: IP-002 (0 phases)
 - `test_empty_phase_name()` → error raised
 
 **Integration Tests** (VT-PHASE-003):
+
 - `test_phase_template_rendering()` → all sections present with placeholders
 - `test_schema_validation_on_sync()` → malformed phase rejected
 - `test_formatter_delta_with_phases()` → output includes phase summaries
 
 **E2E Tests** (VT-PHASE-004):
+
 - Create plan → create 3 phases → show delta → verify all phases displayed
 - Create phase with gaps → warning shown but creation succeeds
 
 ### Research / Validation
 
 **UX Validation** (VA-PHASE-002):
+
 - Present delta display with 1, 3, 5, 10 phases to developer
 - Verify readability and information scannability
 - Confirm truncation strategy preserves key objective info
@@ -488,11 +514,13 @@ Plan: IP-002 (0 phases)
 ### Observability & Analysis
 
 **Metrics**:
+
 - Phase creation command usage (count per week)
 - Validation errors per phase created (target: <1%)
 - `show delta` invocations (indicator of adoption)
 
 **Telemetry** (future):
+
 - Phase count distribution across deltas
 - Average time between phase creations (workflow velocity)
 
@@ -509,6 +537,7 @@ See `supekku:verification.coverage@v1` block above. All FR/NF requirements mappe
 ### Acceptance Gates
 
 **MVP Launch Criteria**:
+
 - [x] `create phase` command implemented and tested (VT-PHASE-001, VT-PHASE-002)
 - [x] Phase metadata auto-population working (VT-PHASE-004, VT-PHASE-006)
 - [x] Enhanced delta display shows phases (VT-PHASE-003)
@@ -525,22 +554,24 @@ See `supekku:verification.coverage@v1` block above. All FR/NF requirements mappe
 ### Related Specs / PROD
 
 **PROD-005: Python Package-Level Spec Granularity**
+
 - IP-002 is implementing PROD-005
 - Phase verification artifacts (VT-001, VT-002) link to phases
 - Demonstrates phase management capabilities in real use
 
 ### Risks & Mitigations
 
-| Risk | Description | Likelihood | Impact | Mitigation |
-|------|-------------|-----------|--------|------------|
-| RISK-001 | Plan frontmatter doesn't include delta ID | Low | High | Validate during plan creation; error clearly if missing |
-| RISK-002 | Phase numbering conflicts if files created manually | Medium | Low | Scan filesystem for actual phases, not just frontmatter |
-| RISK-003 | Large phase counts make delta display unreadable | Low | Medium | Truncate objectives, paginate if >10 phases |
-| RISK-004 | Template changes break existing phases | Low | High | Version phase.overview schema; support v1 indefinitely |
+| Risk     | Description                                         | Likelihood | Impact | Mitigation                                              |
+| -------- | --------------------------------------------------- | ---------- | ------ | ------------------------------------------------------- |
+| RISK-001 | Plan frontmatter doesn't include delta ID           | Low        | High   | Validate during plan creation; error clearly if missing |
+| RISK-002 | Phase numbering conflicts if files created manually | Medium     | Low    | Scan filesystem for actual phases, not just frontmatter |
+| RISK-003 | Large phase counts make delta display unreadable    | Low        | Medium | Truncate objectives, paginate if >10 phases             |
+| RISK-004 | Template changes break existing phases              | Low        | High   | Version phase.overview schema; support v1 indefinitely  |
 
 ### Known Gaps / Debt
 
 **Future Enhancements** (not blocking MVP):
+
 - Phase status tracking (planned → in-progress → complete → verified)
 - `list phases --plan IP-XXX` command for phase discovery
 - Gate validation (check entrance criteria before marking in-progress)
@@ -550,6 +581,7 @@ See `supekku:verification.coverage@v1` block above. All FR/NF requirements mappe
 - Phase completion automation (update status, check exit criteria)
 
 **Implementation Notes**:
+
 - Phase creation should follow existing patterns in `supekku/cli/create.py`
 - Formatters go in `supekku/scripts/lib/formatters/change_formatters.py`
 - Phase metadata parsing in `supekku/scripts/lib/changes/blocks/`
@@ -558,16 +590,19 @@ See `supekku:verification.coverage@v1` block above. All FR/NF requirements mappe
 ### Open Decisions / Questions
 
 **Q1: Should creating a phase update plan frontmatter automatically?**
+
 - Option A: Yes, append to `phases[]` array (requires parsing/writing YAML safely)
 - Option B: No, manual sync via `spec-driver sync` (simpler, consistent with current model)
 - **Recommendation**: Start with B (manual sync), evaluate A if friction too high
 
 **Q2: Phase numbering format - zero-padded or not?**
+
 - Current: `PHASE-01`, `PHASE-02` (two digits)
 - Alternative: `PHASE-1`, `PHASE-2` (minimal digits)
 - **Decision**: Keep two-digit padding for consistent sorting and readability
 
 **Q3: Error vs warning for phase numbering gaps?**
+
 - Could be legitimate (phase removed or merged)
 - Could be accident (typo in phase name)
 - **Decision**: Warn but allow, gives developer flexibility
@@ -579,6 +614,7 @@ See `supekku:verification.coverage@v1` block above. All FR/NF requirements mappe
 See `spec-driver schema show phase.overview` for complete schema.
 
 **Required Fields**:
+
 - `schema`: "supekku.phase.overview"
 - `version`: 1
 - `phase`: Phase ID (e.g., "IP-002.PHASE-01")
@@ -586,6 +622,7 @@ See `spec-driver schema show phase.overview` for complete schema.
 - `delta`: Delta ID (e.g., "DE-002")
 
 **Optional Fields**:
+
 - `name`: Human-readable phase name
 - `objective`: What this phase achieves
 - `entrance_criteria`: Array of criteria for starting

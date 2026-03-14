@@ -1,10 +1,10 @@
 ---
 id: ADR-008
-title: 'ADR-008: normative lifecycle truth and observed evidence reconciliation'
+title: "ADR-008: normative lifecycle truth and observed evidence reconciliation"
 status: accepted
-created: '2026-03-06'
-updated: '2026-03-06'
-reviewed: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
+reviewed: "2026-03-06"
 owners: []
 supersedes: []
 superseded_by: []
@@ -24,7 +24,7 @@ tags:
   - lifecycle
   - requirements
   - architecture
-summary: 'Specs own normative lifecycle truth; audits, deltas, and contracts contribute observed evidence overlays; drift is reconciled explicitly rather than silently by timestamp precedence.'
+summary: "Specs own normative lifecycle truth; audits, deltas, and contracts contribute observed evidence overlays; drift is reconciled explicitly rather than silently by timestamp precedence."
 ---
 
 # ADR-008: normative lifecycle truth and observed evidence reconciliation
@@ -120,6 +120,7 @@ that must be shown as such.
 ## Consequences
 
 ### Positive
+
 - Preserves `PROD-008`'s core rule that specs remain authoritative.
 - Keeps observed evidence useful without turning it into a silent competing truth source.
 - Makes lifecycle drift actionable instead of implicit.
@@ -127,16 +128,19 @@ that must be shown as such.
 - Gives `asserted` and `legacy_verified` precise semantics for revisions and UI/CLI output.
 
 ### Negative
+
 - Lifecycle UIs and registries become more nuanced because they must show both normative and observed states when they differ.
 - Some previously simpler "effective status" language in `PROD-009` becomes explicit drift/reconciliation logic instead.
 - More disagreements will surface as warnings or follow-up work instead of being auto-resolved by precedence rules.
 
 ### Neutral
+
 - This ADR does not forbid computed summaries or effective-status projections; it limits their authority.
 - This ADR does not require every observed mismatch to block work immediately; governance decides how hard to gate on drift.
 - Existing implementation details may remain temporarily more permissive than this ADR until follow-up revisions and code changes land.
 
 ## Verification
+
 - Specs remain the authoritative home for lifecycle state in revised product docs.
 - Registry and CLI views present lifecycle as a derived projection with provenance, not as an independent authority source.
 - Validation surfaces disagreements between spec claims and observed evidence instead of silently applying timestamp precedence.
@@ -144,6 +148,7 @@ that must be shown as such.
 - Follow-up revisions reconcile `PROD-008` and `PROD-009` to this doctrine.
 
 ## References
+
 - `drift/DL-047-spec-corpus-reconciliation.md`
 - `specify/decisions/ADR-004-canonical_workflow_loop.md`
 - `specify/product/PROD-008/PROD-008.md`

@@ -14,11 +14,13 @@ Add Tags column to table output for all artifact list commands, following the pa
 From `policy_formatters.py`, the pattern involves:
 
 1. **Column definition** in `_format_as_table()`:
+
    ```python
    columns=["ID", "Title", "Tags", "Status", "Updated"]
    ```
 
 2. **Row preparation** in `_prepare_policy_row()`:
+
    ```python
    tags = ", ".join(policy.tags) if policy.tags else ""
    tags_styled = f"[#d79921]{tags}[/#d79921]" if tags else ""
@@ -34,29 +36,35 @@ From `policy_formatters.py`, the pattern involves:
 ## Current State Analysis
 
 ### decision_formatters.py
+
 - **Current columns**: `["ID", "Title", "Status", "Updated"]`
 - **Current row**: `[decision_id, title, status_styled, updated_date]`
 - **Needs**: Add Tags column after Status, before Updated
 
 ### spec_formatters.py
+
 - **Note**: Uses different implementation (no `_format_as_table` function)
 - **Current**: `format_spec_list_table()` uses simple list formatting
 - **Needs**: Add Tags column to table rendering
 
 ### change_formatters.py
+
 - **Note**: Uses different implementation (no `_format_as_table` function)
 - **Current**: `format_change_list_table()` handles deltas, revisions, audits
 - **Needs**: Add Tags column
 
 ### requirement_formatters.py
+
 - **Needs investigation**: Check current implementation pattern
 
 ### backlog_formatters.py
+
 - **Needs investigation**: Check current implementation pattern
 
 ## Implementation Tasks
 
 ### Phase 1: Research & Pattern Verification
+
 1. ✅ Read policy_formatters.py to understand DE-010 pattern
 2. ✅ Identify all formatters needing updates
 3. ⬜ Read each formatter file to understand current structure
@@ -68,34 +76,40 @@ From `policy_formatters.py`, the pattern involves:
 For each formatter, apply the pattern:
 
 #### 2.1 decision_formatters.py
+
 - Update `_format_as_table()`: Add "Tags" to columns list
 - Update `_prepare_decision_row()`: Add tags formatting and return tags_styled
 - Update `_calculate_column_widths()`: Add tags_width calculation
 - Update docstrings to reflect new column
 
 #### 2.2 spec_formatters.py
+
 - Investigate current implementation
 - Add Tags column following established pattern
 - Maintain consistency with other formatters
 
 #### 2.3 change_formatters.py
+
 - Investigate current implementation
 - Add Tags column following established pattern
 - Handle deltas, revisions, audits uniformly
 
 #### 2.4 requirement_formatters.py
+
 - Investigate current implementation
 - Add Tags column following established pattern
 
 #### 2.5 backlog_formatters.py
+
 - Investigate current implementation
 - Add Tags column following established pattern
 
 ### Phase 3: Comprehensive Testing
 
-For each formatter (*_formatters_test.py):
+For each formatter (\*\_formatters_test.py):
 
 #### 3.1 Test cases needed:
+
 - Empty tags (no tags on artifact)
 - Single tag
 - Multiple tags (2-3 tags)
@@ -104,6 +118,7 @@ For each formatter (*_formatters_test.py):
 - Integration with table rendering
 
 #### 3.2 Test files to update:
+
 - decision_formatters_test.py
 - spec_formatters_test.py
 - change_formatters_test.py
@@ -136,6 +151,7 @@ For each formatter (*_formatters_test.py):
 ## Design Decisions
 
 ### Tags Column Placement
+
 - **Decision**: Placement varies by formatter based on artifact priorities
 - **Rationale**: Different artifacts have different column priorities
 - **Examples**:
@@ -144,11 +160,13 @@ For each formatter (*_formatters_test.py):
   - Requirements: ID, Type, Status, Tags, Name
 
 ### Tags Column Width
+
 - **Decision**: 20 characters (following DE-010)
 - **Rationale**: Balances discoverability with space for other columns
 - **Truncation**: If needed, handled by table rendering utilities
 
 ### Tags Styling
+
 - **Decision**: Use `[#d79921]` color for tags (following DE-010)
 - **Rationale**: Consistent visual treatment across artifact types
 - **Empty tags**: Show empty string, not "—" or "N/A"

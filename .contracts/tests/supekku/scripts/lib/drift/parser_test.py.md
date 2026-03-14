@@ -58,7 +58,7 @@ DR-065 DEC-065-03 parser contract table.
 
 - `test_duplicate_entry_ids(self)`: Duplicate IDs → warning, both entries preserved.
 - `test_entry_with_no_yaml_block(self)`: No YAML block → warning, heading-only entry.
-- `test_malformed_yaml_block(self)`: Malformed YAML → warning, entry with _parse_error in extra.
+- `test_malformed_yaml_block(self)`: Malformed YAML → warning, entry with \_parse_error in extra.
 - `test_missing_required_claim_keys(self)`: Missing kind or text → warning, malformed claim skipped.
 - `test_missing_required_source_keys(self)`: Missing required nested keys → warning, malformed record skipped.
 - `test_multiple_yaml_blocks_first_wins(self)`: Multiple fenced YAML blocks → first parsed, rest is analysis. - no data

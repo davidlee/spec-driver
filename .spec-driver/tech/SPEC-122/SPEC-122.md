@@ -2,33 +2,33 @@
 id: SPEC-122
 slug: supekku-scripts-lib-requirements
 name: supekku/scripts/lib/requirements Specification
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: draft
 kind: spec
 category: unit
 c4_level: code
 responsibilities:
-- Manage requirement records with comprehensive lifecycle tracking
-- Synchronize requirements from specs and change artifacts into central registry
-- Support requirement movement and reassignment between specs
-- Track requirement implementation and verification status
-- Provide flexible querying and filtering of requirements
-- Maintain bidirectional links between requirements and change artifacts
+  - Manage requirement records with comprehensive lifecycle tracking
+  - Synchronize requirements from specs and change artifacts into central registry
+  - Support requirement movement and reassignment between specs
+  - Track requirement implementation and verification status
+  - Provide flexible querying and filtering of requirements
+  - Maintain bidirectional links between requirements and change artifacts
 aliases: []
 packages:
-- supekku/scripts/lib/requirements
+  - supekku/scripts/lib/requirements
 sources:
-- language: python
-  identifier: supekku/scripts/lib/requirements
-  module: supekku.scripts.lib.requirements
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/scripts/lib/requirements
+    module: supekku.scripts.lib.requirements
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
 owners: []
 auditers: []
 relations: []
@@ -344,16 +344,19 @@ The `supekku/scripts/lib/requirements` package manages the central requirements 
 ### Primary Users
 
 **CLI Commands** (via SPEC-110)
+
 - Load requirements for listing, filtering, status updates
 - Trigger sync operations to rebuild registry
 - Query requirements by spec, status, change artifact
 
 **Change Management** (via SPEC-115)
+
 - Link deltas to requirements they implement
 - Track requirement introductions via revisions
 - Record verification through audits
 
 **Workspace Validation** (via SPEC-125)
+
 - Validate requirement lifecycle completeness
 - Check for orphaned requirements
 - Verify bidirectional artifact links
@@ -361,18 +364,21 @@ The `supekku/scripts/lib/requirements` package manages the central requirements 
 ### User Journeys
 
 **Requirement Discovery**
+
 1. Spec author writes requirements in spec markdown (FR-001: text)
 2. User runs `spec-driver sync requirements`
 3. Registry extracts requirements, assigns UIDs (SPEC-ID.LABEL)
 4. Requirements queryable via `spec-driver list requirements`
 
 **Lifecycle Tracking**
+
 1. Delta created with `applies_to.requirements: [SPEC-110.FR-001]`
 2. Sync operation links delta to requirement via `implemented_by`
 3. Delta completion updates requirement status to `active`
 4. Audit verification adds audit ID to requirement's `verified_by` list
 
 **Requirement Refactoring**
+
 1. User splits spec, needs to move requirements
 2. Create revision with structured move block
 3. Sync processes revision, updates requirement UIDs and specs lists
@@ -383,6 +389,7 @@ The `supekku/scripts/lib/requirements` package manages the central requirements 
 ### Capability Overview
 
 The package provides three layers:
+
 1. **Domain Model** (RequirementRecord) - immutable requirement representation
 2. **Registry** (RequirementsRegistry) - CRUD operations and persistence
 3. **Synchronization** - multi-source requirement extraction and lifecycle tracking
@@ -424,11 +431,13 @@ requirements/
 ```
 
 **Key Classes**:
+
 - `RequirementRecord`: Immutable requirement representation with lifecycle tracking
 - `RequirementsRegistry`: Central registry with CRUD, sync, search operations
 - `SyncStats`: Statistics tracking for sync operations (created, updated counts)
 
 **Dependencies**:
+
 - `supekku.scripts.lib.specs` - SpecRegistry for spec iteration
 - `supekku.scripts.lib.blocks` - Extracting structured YAML blocks
 - `supekku.scripts.lib.relations` - Listing requirement relations
@@ -437,6 +446,7 @@ requirements/
 ### Data & Contracts
 
 **RequirementRecord Fields**:
+
 ```python
 uid: str                    # SPEC-ID.LABEL (e.g., SPEC-110.FR-001)
 label: str                  # FR-001, NF-001
@@ -452,6 +462,7 @@ path: str                   # Relative path to primary spec file
 ```
 
 **Registry YAML Format**:
+
 ```yaml
 requirements:
   SPEC-110.FR-001:
@@ -468,6 +479,7 @@ requirements:
 ```
 
 **Sync API**:
+
 ```python
 sync_from_specs(
   spec_dirs: Iterable[Path] | None = None,
@@ -479,6 +491,7 @@ sync_from_specs(
 ```
 
 **Search API**:
+
 ```python
 search(
   query: str | None = None,
@@ -495,6 +508,7 @@ search(
 ### Primary Flows
 
 **Sync from Specs**:
+
 1. Iterate spec files or SpecRegistry.all_specs()
 2. For each spec:
    - Extract inline requirements via regex pattern
@@ -509,6 +523,7 @@ search(
 5. Save registry and return stats
 
 **Requirement Movement**:
+
 1. Validate source requirement exists
 2. Validate target spec exists (if SpecRegistry provided)
 3. Pop old record from registry
@@ -519,6 +534,7 @@ search(
 8. Store updated record under new uid
 
 **Revision Block Processing**:
+
 1. Load revision blocks from file
 2. For each requirement in block:
    - Find existing record by origin or create placeholder
@@ -531,17 +547,20 @@ search(
 ### Error Handling / Guards
 
 **Graceful Degradation**:
+
 - Missing registry file → empty registry (not error)
 - Invalid YAML in spec → skip spec, continue sync
 - Missing spec in move operation → error with clear message
 - Duplicate requirement ID in target spec → error with clear message
 
 **Validation**:
+
 - Status values validated against VALID_STATUSES
 - UIDs validated to match SPEC-ID.LABEL pattern
 - Paths validated to be relative to repo root
 
 **Error Messages**:
+
 - Include requirement UID in all errors
 - Include list of valid statuses for status errors
 - Include spec ID for missing spec errors
@@ -551,6 +570,7 @@ search(
 ### Testing Strategy
 
 **Unit Tests** (registry_test.py):
+
 - RequirementRecord creation, serialization, merge
 - Registry load/save operations
 - Sync from specs (pattern matching, relationship blocks)
@@ -560,11 +580,13 @@ search(
 - Status validation
 
 **Integration Tests**:
+
 - Full workspace sync (specs + changes)
 - Revision block processing with placeholder creation
 - Requirement movement with SpecRegistry
 
 **Property Tests**:
+
 - Sync idempotency (sync twice → same result)
 - Round-trip serialization (record → dict → record)
 - Merge commutativity (A.merge(B) preserves lifecycle)
@@ -572,11 +594,13 @@ search(
 ### Observability & Analysis
 
 **Logging**:
+
 - Info: Sync stats (created/updated counts)
 - Warning: Unparseable requirement lines
 - Error: Invalid revision blocks, missing specs
 
 **Metrics** (for future):
+
 - Sync duration by artifact type
 - Requirements per spec histogram
 - Lifecycle status distribution
@@ -584,11 +608,13 @@ search(
 ### Security & Compliance
 
 **File System Access**:
+
 - Registry writes atomic (temp file + rename)
 - UTF-8 encoding enforced for YAML files
 - Path traversal prevented via relative path validation
 
 **Data Integrity**:
+
 - UID uniqueness enforced
 - Lifecycle field lists maintain sorted order
 - Specs lists deduplicated
@@ -610,6 +636,7 @@ See `supekku:verification.coverage@v1` block above for detailed test coverage ma
 ### Related Specs / PROD
 
 **Upstream Dependencies**:
+
 - SPEC-123: SpecRegistry for spec iteration during sync
 - SPEC-115: Change artifact models and registries
 - SPEC-TBD (core.repo): Repository root detection
@@ -617,6 +644,7 @@ See `supekku:verification.coverage@v1` block above for detailed test coverage ma
 - SPEC-TBD (blocks): Relationship/revision block parsing
 
 **Downstream Consumers**:
+
 - SPEC-110: CLI commands (list requirements, sync, set-status)
 - SPEC-120: Formatters for requirement display
 - SPEC-125: Workspace validation (lifecycle completeness)
@@ -624,12 +652,15 @@ See `supekku:verification.coverage@v1` block above for detailed test coverage ma
 ### Risks & Mitigations
 
 **Risk**: Requirement pattern matching too strict
+
 - Mitigation: Case-insensitive, tolerates bold/italic markers, broad whitespace handling
 
 **Risk**: Registry merge conflicts in concurrent edits
+
 - Mitigation: Atomic writes, single source of truth (specs), rerun sync to rebuild
 
 **Risk**: Large workspace performance degradation
+
 - Mitigation: Stream processing, early filtering, lazy loading where possible
 
 ### Known Gaps / Debt

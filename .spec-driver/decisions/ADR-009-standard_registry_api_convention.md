@@ -1,10 +1,10 @@
 ---
 id: ADR-009
-title: 'ADR-009: standard registry API convention'
+title: "ADR-009: standard registry API convention"
 status: accepted
-created: '2026-03-06'
-updated: '2026-03-06'
-reviewed: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
+reviewed: "2026-03-06"
 owners: []
 supersedes: []
 superseded_by: []
@@ -23,7 +23,7 @@ tags:
   - api
   - registry
   - conventions
-summary: 'Codify the canonical registry API surface from the converged registries: find, collect, iter, domain-specific filter, and keyword-only root auto-discovery, while deferring Protocol/ABC standardisation.'
+summary: "Codify the canonical registry API surface from the converged registries: find, collect, iter, domain-specific filter, and keyword-only root auto-discovery, while deferring Protocol/ABC standardisation."
 ---
 
 # ADR-009: standard registry API convention
@@ -181,6 +181,7 @@ normalisation, it clearly reduces duplication without forcing misleading commona
 ## Consequences
 
 ### Positive
+
 - Gives DE-050 a concrete target pattern derived from existing successful code
   rather than a fresh abstraction.
 - Reduces future drift by making the minimum registry contract explicit.
@@ -194,6 +195,7 @@ normalisation, it clearly reduces duplication without forcing misleading commona
   stabilised across the whole corpus.
 
 ### Negative
+
 - Some registries will temporarily carry both legacy and canonical methods while
   DE-050 normalises them additively.
 - The convention still does not fully unify filter semantics, so some caller-side
@@ -202,6 +204,7 @@ normalisation, it clearly reduces duplication without forcing misleading commona
   predictable from the signature alone.
 
 ### Neutral
+
 - This ADR governs the minimum API surface, not registry internals.
 - Functional registries such as backlog are not required by this ADR to become
   class-based immediately, though future work may wrap them to align.
@@ -214,6 +217,7 @@ normalisation, it clearly reduces duplication without forcing misleading commona
   frontmatter.
 
 ## Verification
+
 - DE-050 normalisation work adds or adapts registry tests so affected registries
   expose `find()`, `collect()`, `iter(status=None)`, and `filter(...)` with the
   documented return semantics.
@@ -227,6 +231,7 @@ normalisation, it clearly reduces duplication without forcing misleading commona
   corpus has actually converged enough to justify formalisation.
 
 ## References
+
 - `change/deltas/DE-050-normalise_registry_api_surface_for_consistent_artifact_access/DE-050.md`
 - `change/deltas/DE-050-normalise_registry_api_surface_for_consistent_artifact_access/DR-050.md`
 - `change/deltas/DE-050-normalise_registry_api_surface_for_consistent_artifact_access/research.md`

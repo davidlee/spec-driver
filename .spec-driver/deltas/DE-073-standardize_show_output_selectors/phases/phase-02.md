@@ -2,8 +2,8 @@
 id: IP-073.PHASE-02
 slug: 073-standardize_show_output_selectors-phase-02
 name: "view refactor and read alias"
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---
@@ -57,19 +57,23 @@ phase: IP-073.PHASE-02
 # Phase 2 - View refactor and read alias
 
 ## 1. Objective
+
 Replace pager-by-default `view` with rendered stdout, add `--pager/-p` opt-in,
 collapse duplicated subcommands, and register `read` alias.
 
 ## 2. Links & References
+
 - **Delta**: DE-073
 - **Design Revision Sections**: DR-073 §DEC-073-01 (two cascades), §DEC-073-03
   (read alias), §DEC-073-04 (view renders to stdout)
 - **Key files**: `supekku/cli/view.py`, `supekku/cli/common.py`, `supekku/cli/main.py`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete and committed (c2336ab)
 
 ## 4. Exit Criteria / Done When
+
 - [x] `view <artifact>` renders via glow → rich → raw stdout (no pager)
 - [x] `view --pager <artifact>` pages via $PAGER → glow -p → ov → less → more
 - [x] `view.py` subcommand duplication collapsed via shared helper
@@ -77,6 +81,7 @@ collapse duplicated subcommands, and register `read` alias.
 - [x] All tests pass, lint clean
 
 ## 5. Verification
+
 - Unit tests for render_file / render_file_paged cascades (mock shutil.which)
 - CLI integration tests for --pager flag
 - `read` alias dispatches identically to `view`
@@ -84,11 +89,11 @@ collapse duplicated subcommands, and register `read` alias.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description |
-| --- | --- | --- |
-| [x] | 2.1 | Add render_file() and render_file_paged() to common.py |
-| [x] | 2.2 | Add PagerOption annotated type |
-| [x] | 2.3 | Create _view_artifact() shared helper in view.py |
-| [x] | 2.4 | Collapse subcommands to use _view_artifact() |
-| [x] | 2.5 | Register read alias in main.py |
-| [x] | 2.6 | Update tests for new behavior |
+| Status | ID  | Description                                            |
+| ------ | --- | ------------------------------------------------------ |
+| [x]    | 2.1 | Add render_file() and render_file_paged() to common.py |
+| [x]    | 2.2 | Add PagerOption annotated type                         |
+| [x]    | 2.3 | Create \_view_artifact() shared helper in view.py      |
+| [x]    | 2.4 | Collapse subcommands to use \_view_artifact()          |
+| [x]    | 2.5 | Register read alias in main.py                         |
+| [x]    | 2.6 | Update tests for new behavior                          |

@@ -2,8 +2,8 @@
 id: SPEC-147
 slug: supekku-scripts-lib-memory
 name: supekku/scripts/lib/memory Specification
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: stub
 kind: spec
 category: unit
@@ -11,18 +11,18 @@ c4_level: code
 responsibilities: []
 aliases: []
 packages:
-- supekku/scripts/lib/memory
+  - supekku/scripts/lib/memory
 sources:
-- language: python
-  identifier: supekku/scripts/lib/memory
-  module: supekku.scripts.lib.memory
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/scripts/lib/memory
+    module: supekku.scripts.lib.memory
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
 ---
 
 # SPEC-147 – supekku/scripts/lib/memory

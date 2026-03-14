@@ -1,9 +1,9 @@
 ---
 id: IP-044.PHASE-01
 slug: 044-centralize_hardcoded_workspace_directory_paths-phase-01
-name: 'P01: Constants and helpers'
-created: '2026-03-05'
-updated: '2026-03-05'
+name: "P01: Constants and helpers"
+created: "2026-03-05"
+updated: "2026-03-05"
 status: complete
 kind: phase
 ---
@@ -30,17 +30,17 @@ verification:
     - VT-044-paths
   evidence: []
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     summary: Add workspace root constants
-  - id: '1.2'
+  - id: "1.2"
     summary: Add subdirectory constants
-  - id: '1.3'
+  - id: "1.3"
     summary: Add get_* helper functions
-  - id: '1.4'
+  - id: "1.4"
     summary: Update __all__ exports
-  - id: '1.5'
+  - id: "1.5"
     summary: Write unit tests
-  - id: '1.6'
+  - id: "1.6"
     summary: Lint and verify
 risks: []
 ```
@@ -61,15 +61,18 @@ Add all workspace directory constants and `get_*()` helper functions to
 this phase.
 
 ## 2. Links & References
+
 - **Delta**: [DE-044](../DE-044.md)
 - **Design Revision**: [DR-044 §4.1](../DR-044.md) — constant and helper definitions
 - **Existing code**: `supekku/scripts/lib/core/paths.py`
 
 ## 3. Entrance Criteria
+
 - [x] DR-044 reviewed
 - [x] Existing `paths.py` read and understood
 
 ## 4. Exit Criteria / Done When
+
 - [x] Constants defined: `SPECS_DIR`, `CHANGES_DIR`, `BACKLOG_DIR`, `MEMORY_DIR`
 - [x] Subdirectory constants defined (see DR-044 §4.1)
 - [x] Helper functions defined: `get_specs_dir`, `get_tech_specs_dir`, `get_product_specs_dir`, `get_decisions_dir`, `get_policies_dir`, `get_standards_dir`, `get_changes_dir`, `get_deltas_dir`, `get_revisions_dir`, `get_audits_dir`, `get_backlog_dir`, `get_memory_dir`
@@ -78,25 +81,27 @@ this phase.
 - [x] `just lint` + `just pylint` clean (pylint 10.00/10)
 
 ## 5. Verification
+
 - `uv run pytest supekku/scripts/lib/core/paths_test.py -v`
 - `just lint`
 - `just pylint supekku/scripts/lib/core/paths.py`
 - `just test` (full regression)
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: The existing `get_*` helper pattern (auto-discover root when `None`) is the right approach
 - STOP when: import cycle detected (unlikely — `paths.py` only imports `repo.py`)
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add workspace root constants (`SPECS_DIR`, `CHANGES_DIR`, `BACKLOG_DIR`, `MEMORY_DIR`) | — | Done |
-| [x] | 1.2 | Add subdirectory constants (`TECH_SPECS_SUBDIR`, `DELTAS_SUBDIR`, etc.) | [P] with 1.1 | 12 constants |
-| [x] | 1.3 | Add `get_*` helper functions (12 functions per DR-044 §4.1) | — | 12 helpers, all composing via parent |
-| [x] | 1.4 | Update `__all__` exports | — | 16 constants + 12 helpers added |
-| [x] | 1.5 | Write unit tests for all constants and helpers | — | 31 tests in paths_test.py |
-| [x] | 1.6 | Lint and full test suite verification | — | 2571 passed, ruff clean, pylint 10/10 |
+| Status | ID  | Description                                                                            | Parallel?    | Notes                                 |
+| ------ | --- | -------------------------------------------------------------------------------------- | ------------ | ------------------------------------- |
+| [x]    | 1.1 | Add workspace root constants (`SPECS_DIR`, `CHANGES_DIR`, `BACKLOG_DIR`, `MEMORY_DIR`) | —            | Done                                  |
+| [x]    | 1.2 | Add subdirectory constants (`TECH_SPECS_SUBDIR`, `DELTAS_SUBDIR`, etc.)                | [P] with 1.1 | 12 constants                          |
+| [x]    | 1.3 | Add `get_*` helper functions (12 functions per DR-044 §4.1)                            | —            | 12 helpers, all composing via parent  |
+| [x]    | 1.4 | Update `__all__` exports                                                               | —            | 16 constants + 12 helpers added       |
+| [x]    | 1.5 | Write unit tests for all constants and helpers                                         | —            | 31 tests in paths_test.py             |
+| [x]    | 1.6 | Lint and full test suite verification                                                  | —            | 2571 passed, ruff clean, pylint 10/10 |
 
 ### Task Details
 

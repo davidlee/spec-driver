@@ -1,8 +1,8 @@
 ---
 id: ISSUE-037
 name: Show commands not using emit_artifact have duplicated output dispatch
-created: '2026-03-05'
-updated: '2026-03-09'
+created: "2026-03-05"
+updated: "2026-03-09"
 status: resolved
 kind: issue
 categories: []
@@ -22,6 +22,7 @@ each command individually instead of being available via the shared path.
 ## Affected commands
 
 Commands **not** using `emit_artifact` (roll their own dispatch):
+
 - `show spec` (line 50)
 - `show delta` (line 92)
 - `show requirement` (line 158)
@@ -32,6 +33,7 @@ Commands **not** using `emit_artifact` (roll their own dispatch):
 - `show memory` (line 446) — **being migrated in DE-045**
 
 Commands already using `emit_artifact`:
+
 - `show revision`, `show plan`, `show audit`, `show issue`, `show problem`, `show improvement`, `show risk`
 
 ## Evidence

@@ -1,9 +1,9 @@
 ---
 id: IP-052.PHASE-01
 slug: 052-event_infrastructure_jsonl_log_and_unix_domain_socket_emitter-phase-01
-name: 'Phase 1: Core module and process-boundary wrapper'
-created: '2026-03-07'
-updated: '2026-03-07'
+name: "Phase 1: Core module and process-boundary wrapper"
+created: "2026-03-07"
+updated: "2026-03-07"
 status: complete
 kind: phase
 ---
@@ -66,17 +66,20 @@ process-boundary wrapper in `main.py`, supporting changes to `paths.py` and
 `config.py`, and comprehensive test coverage for all VTs.
 
 ## 2. Links & References
+
 - **Delta**: DE-052
 - **Design Revision**: DR-052 (DEC-052-01 through DEC-052-06)
 - **Key DR sections**: DEC-052-01 boundary table, DEC-052-05 event schema
 
 ## 3. Entrance Criteria
+
 - [x] DR-052 approved
 
 ## 4. Exit Criteria / Done When
+
 - [x] `core/events.py` implements: `emit_event()`, `record_artifact()`,
-  `mark_command_invoked()`, `command_was_invoked()`, `_drain_artifacts()`,
-  `_write_log()`, `_send_socket()`, `_detect_session()`
+      `mark_command_invoked()`, `command_was_invoked()`, `_drain_artifacts()`,
+      `_write_log()`, `_send_socket()`, `_detect_session()`
 - [x] `main.py` wrapper intercepts `Command.invoke`, gates emission on flag
 - [x] `paths.py` has `get_run_dir()`
 - [x] `config.py` has `[events]` section in `DEFAULT_CONFIG`
@@ -107,6 +110,7 @@ All tests in `supekku/scripts/lib/core/events_test.py`:
 Commands: `just test`, `just lint`, `just pylint`, `just`
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumption: `click.Command.invoke` can be monkey-patched reliably in
   `main.py` before `app()` is called
 - STOP if: interception doesn't work with typer's command registration
@@ -114,14 +118,14 @@ Commands: `just test`, `just lint`, `just pylint`, `just`
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add `get_run_dir()` to `paths.py` | [P] | Trivial — hardcoded `.spec-driver/run/` |
-| [x] | 1.2 | Add `[events]` to `config.py` DEFAULT_CONFIG | [P] | `enabled = true` only |
-| [x] | 1.3 | Implement `core/events.py` | | Depends on 1.1, 1.2 |
-| [x] | 1.4 | Wire wrapper in `main.py` | | Depends on 1.3 |
-| [x] | 1.5 | Write `events_test.py` — all VTs | | TDD: write with 1.3/1.4 |
-| [x] | 1.6 | Lint and full test pass | | `just` green |
+| Status | ID  | Description                                  | Parallel? | Notes                                   |
+| ------ | --- | -------------------------------------------- | --------- | --------------------------------------- |
+| [x]    | 1.1 | Add `get_run_dir()` to `paths.py`            | [P]       | Trivial — hardcoded `.spec-driver/run/` |
+| [x]    | 1.2 | Add `[events]` to `config.py` DEFAULT_CONFIG | [P]       | `enabled = true` only                   |
+| [x]    | 1.3 | Implement `core/events.py`                   |           | Depends on 1.1, 1.2                     |
+| [x]    | 1.4 | Wire wrapper in `main.py`                    |           | Depends on 1.3                          |
+| [x]    | 1.5 | Write `events_test.py` — all VTs             |           | TDD: write with 1.3/1.4                 |
+| [x]    | 1.6 | Lint and full test pass                      |           | `just` green                            |
 
 ### Task Details
 
@@ -147,7 +151,7 @@ Commands: `just test`, `just lint`, `just pylint`, `just`
     exceptions silently
   - `_detect_session`: check `SPEC_DRIVER_SESSION` → `CLAUDECODE` → `None`
   - `_resolve_cmd`: parse argv to extract command path (e.g. `["create",
-    "delta", "test"]` → `"create delta"`)
+"delta", "test"]` → `"create delta"`)
 
 - **1.4 — main.py wrapper**
   - Import `click` and `events` module
@@ -167,18 +171,21 @@ Commands: `just test`, `just lint`, `just pylint`, `just`
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| `Command.invoke` patch doesn't fire for typer-registered commands | Test with real app in VT-052-05; if broken, try custom `cls` approach | Open |
-| Import cycle: events.py ↔ paths.py | events.py imports paths lazily inside functions | Open |
+| Risk                                                              | Mitigation                                                            | Status |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------- | ------ |
+| `Command.invoke` patch doesn't fire for typer-registered commands | Test with real app in VT-052-05; if broken, try custom `cls` approach | Open   |
+| Import cycle: events.py ↔ paths.py                               | events.py imports paths lazily inside functions                       | Open   |
 
 ## 9. Decisions & Outcomes
+
 - 2026-03-07 — DR-052 approved after two adversarial review rounds
 
 ## 10. Findings / Research Notes
+
 - See `DE-052/notes.md` for design evolution and Click source references
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Notes updated

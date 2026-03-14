@@ -15,6 +15,7 @@ Verify that the package-level spec pattern does not preclude future addition of 
 The default pattern (Phase 01-03) establishes **leaf-package granularity**: one spec per leaf package. However, future users may want a parent package to "roll up" multiple child packages into a single spec.
 
 **Example**:
+
 - Default: `supekku/scripts/lib/formatters/` (leaf package) → `SPEC-045`
 - With rollup: `supekku/scripts/lib/` (parent) → `SPEC-050` covers all child packages under `lib/`
 
@@ -38,25 +39,27 @@ rollup:
     - supekku/scripts/lib/decisions
     - supekku/scripts/lib/specs
 sources:
-- language: python
-  identifier: supekku/scripts/lib  # Parent package
-  module: supekku.scripts.lib
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/scripts/lib # Parent package
+    module: supekku.scripts.lib
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
 ---
 ```
 
 **Contract generation logic**:
+
 - If `rollup.enabled == true`, aggregate all files from listed child packages
 - Use existing `sorted(path.rglob("*.py"))` across all children
 - Deterministic ordering maintained
 
 **Query resolution** (`--for-path`):
+
 - Check if file's package is in any spec's `rollup.children` list
 - Return parent spec if found, otherwise return leaf package spec
 - Fall back to current behavior if no rollup configured
@@ -104,11 +107,13 @@ rollups:
 ### Migration Impact
 
 **For existing specs** (post-Phase 02):
+
 - No migration needed
 - All specs remain valid (rollup is opt-in)
 - Users can add rollup incrementally
 
 **For future users**:
+
 - Default behavior: leaf packages (no rollup)
 - Opt-in: Add `rollup` frontmatter when needed
 - Tool support: `spec-driver create spec --rollup` flag

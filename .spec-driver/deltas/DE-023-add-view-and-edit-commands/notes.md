@@ -24,6 +24,7 @@
 ### Tests Status
 
 All 18 new tests pass:
+
 ```bash
 uv run pytest supekku/cli/view_test.py supekku/cli/edit_test.py -v
 # 18 passed
@@ -81,13 +82,13 @@ spec-driver edit delta DE-023     # Opens in $EDITOR
 
 Added support for numeric shorthand IDs for artifact types with unambiguous prefixes:
 
-| Type | Prefix | Example |
-|------|--------|---------|
-| ADR | `ADR-` | `001` → `ADR-001` |
-| Delta | `DE-` | `23` → `DE-023` |
-| Revision | `RE-` | `1` → `RE-001` |
-| Policy | `POL-` | `42` → `POL-042` |
-| Standard | `STD-` | `7` → `STD-007` |
+| Type     | Prefix | Example           |
+| -------- | ------ | ----------------- |
+| ADR      | `ADR-` | `001` → `ADR-001` |
+| Delta    | `DE-`  | `23` → `DE-023`   |
+| Revision | `RE-`  | `1` → `RE-001`    |
+| Policy   | `POL-` | `42` → `POL-042`  |
+| Standard | `STD-` | `7` → `STD-007`   |
 
 Spec/Requirement/Card unchanged (ambiguous prefixes).
 

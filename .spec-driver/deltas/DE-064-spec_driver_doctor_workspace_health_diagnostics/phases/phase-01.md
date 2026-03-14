@@ -2,8 +2,8 @@
 id: IP-064.PHASE-01
 slug: 064-spec_driver_doctor_workspace_health_diagnostics-phase-01
 name: IP-064 Phase 01 — Model, runner, first checks, CLI wiring
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---
@@ -70,6 +70,7 @@ Two categories (deps, structure) prove the pattern works end-to-end. Remaining
 categories follow in Phase 2.
 
 ## 2. Links & References
+
 - **Delta**: DE-064
 - **Design Revision**: DR-064 §4 (code impact), §5 (data model), §6 (check implementations), §8 (package structure)
 - **Existing code**:
@@ -79,10 +80,12 @@ categories follow in Phase 2.
   - `supekku/scripts/lib/formatters/` — formatter conventions
 
 ## 3. Entrance Criteria
+
 - [x] DR-064 authored and approved
 - [x] Existing code reviewed during preflight
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `DiagnosticResult` and `CategorySummary` dataclasses with severity aggregation tested
 - [ ] `run_checks(ws)` returns `list[CategorySummary]`, supports `categories` filter
 - [ ] `check_deps(ws)` tests python, git, node, ts-doc-extract — pass and fail paths tested
@@ -92,12 +95,14 @@ categories follow in Phase 2.
 - [ ] `just check` passes
 
 ## 5. Verification
+
 - `just test` — all new test files pass
 - `just lint` — zero warnings on new files
 - `just pylint-files` on all new/modified files
 - Manual: `uv run spec-driver workspace doctor` runs in this workspace
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - `Workspace` class provides sufficient accessors (root, config)
   - Python version detectable via `sys.version_info`
@@ -106,16 +111,16 @@ categories follow in Phase 2.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Model: DiagnosticResult, CategorySummary, severity helpers | | 14 tests |
-| [x] | 1.2 | Runner: run_checks orchestrator with CHECK_REGISTRY | | 8 tests |
-| [x] | 1.3a | Check: deps (python, git, go, gomarkdoc, zig, zigmarkdoc, node, ts-doc-extract) | [P] | 11 tests; expanded per user request |
-| [x] | 1.3b | Check: structure (directories, orphan bundles) | [P] | 8 tests |
-| [x] | 1.3c | Check: config (workflow.toml, CLAUDE.md, skills allowlist, skills exposure) | [P] | 8 tests; pulled forward from P2 |
-| [x] | 1.4 | Formatter: format_doctor_text, format_doctor_json | | 13 tests; both fully implemented |
-| [x] | 1.5 | CLI: wire top-level `doctor` command | | --check, --json, --verbose, --root |
-| [x] | 1.6 | Lint + test pass | | 3120 pass, 2 pre-existing fail |
+| Status | ID   | Description                                                                     | Parallel? | Notes                               |
+| ------ | ---- | ------------------------------------------------------------------------------- | --------- | ----------------------------------- |
+| [x]    | 1.1  | Model: DiagnosticResult, CategorySummary, severity helpers                      |           | 14 tests                            |
+| [x]    | 1.2  | Runner: run_checks orchestrator with CHECK_REGISTRY                             |           | 8 tests                             |
+| [x]    | 1.3a | Check: deps (python, git, go, gomarkdoc, zig, zigmarkdoc, node, ts-doc-extract) | [P]       | 11 tests; expanded per user request |
+| [x]    | 1.3b | Check: structure (directories, orphan bundles)                                  | [P]       | 8 tests                             |
+| [x]    | 1.3c | Check: config (workflow.toml, CLAUDE.md, skills allowlist, skills exposure)     | [P]       | 8 tests; pulled forward from P2     |
+| [x]    | 1.4  | Formatter: format_doctor_text, format_doctor_json                               |           | 13 tests; both fully implemented    |
+| [x]    | 1.5  | CLI: wire top-level `doctor` command                                            |           | --check, --json, --verbose, --root  |
+| [x]    | 1.6  | Lint + test pass                                                                |           | 3120 pass, 2 pre-existing fail      |
 
 ### Task Details
 
@@ -162,18 +167,21 @@ categories follow in Phase 2.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Test isolation for binary detection | Mock `shutil.which` and npm_utils | Open |
-| Orphan bundle detection edge cases | Start simple (dir without matching .md), extend if needed | Open |
+| Risk                                | Mitigation                                                | Status |
+| ----------------------------------- | --------------------------------------------------------- | ------ |
+| Test isolation for binary detection | Mock `shutil.which` and npm_utils                         | Open   |
+| Orphan bundle detection edge cases  | Start simple (dir without matching .md), extend if needed | Open   |
 
 ## 9. Decisions & Outcomes
+
 - 2026-03-08 — Phase 1 covers deps + structure only; remaining 4 categories in Phase 2
 
 ## 10. Findings / Research Notes
+
 - See preflight notes in conversation
 
 ## 11. Wrap-up Checklist
+
 - [ ] Exit criteria satisfied
 - [ ] Verification evidence stored
 - [ ] Phase sheet updated with outcomes

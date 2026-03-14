@@ -29,4 +29,4 @@ Tests for check_deps function.
 - `test_zigmarkdoc_missing_warns(self) -> None`: Missing zigmarkdoc should warn with install link.
 - `_run_with_all_available(self) -> list`
 
-### _FakeWorkspace
+### \_FakeWorkspace

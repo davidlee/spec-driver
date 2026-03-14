@@ -1,6 +1,7 @@
 # Notes for DE-038
 
 ## 2026-03-03
+
 - Added [IP-038.md](./IP-038.md) with three phases and explicit memory-review + skill-review passes.
 - Penciled in concrete review targets:
   - memory set: core-loop, revision, delta-completion, posture, ceremony signpost/settler, plus new coverage-gate + status-enums memories.
@@ -11,6 +12,7 @@
 - Verification status: `just`, `just test`, `just lint`, and `just pylint` not run in this step (documentation-only edits).
 
 ## 2026-03-03 (phase sheet setup)
+
 - Created phase sheet via CLI: `IP-038.PHASE-01` at `phases/phase-01.md`.
 - Prefilled Phase 01 (Contract Freeze) checklist, tasks, verification evidence, and wrap-up outcomes.
 - Updated `IP-038.md` to point at active phase sheet.
@@ -18,18 +20,21 @@
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation-only.
 
 ## 2026-03-03 (phase 02 scaffold)
+
 - Created phase sheet via CLI: `IP-038.PHASE-02` at `phases/phase-02.md`.
 - Prefilled Phase 02 (Memory Review Pass) with execution checklist, task map (`2.1`-`2.4`), verification expectations, and stop conditions.
 - Surprise encountered again: `create phase` appended duplicate `IP-038.PHASE-02` in `IP-038` plan overview; cleaned manually and switched active phase reference to `phase-02.md`.
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation-only.
 
 ## 2026-03-03 (phase 03 scaffold)
+
 - Created phase sheet via CLI: `IP-038.PHASE-03` at `phases/phase-03.md`.
 - Prefilled Phase 03 (Skill Review Pass) with execution checklist, task map (`3.1`-`3.4`), verification expectations, and stop conditions.
 - Duplicate `IP-038.PHASE-03` was appended by scaffold in `IP-038` plan overview; cleaned manually and active phase reference switched to `phase-03.md`.
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation-only.
 
 ## 2026-03-03 (phase 02 memory review pass execution)
+
 - Executed Phase 02 tasks `2.1`-`2.4` from `phases/phase-02.md`.
 - Updated workflow-critical memories:
   - `mem.pattern.spec-driver.core-loop` (delta-first canonical narrative; revision-first now concession path)
@@ -49,6 +54,7 @@
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation/memory-only.
 
 ## 2026-03-03 (retrieval precision pass added)
+
 - Added explicit Phase 04 retrieval-precision pass:
   - updated `IP-038.md` phase overview/progress to include `IP-038.PHASE-04`.
   - added [phases/phase-04.md](./phases/phase-04.md) with baseline-query, scope-tuning, and before/after ranking verification tasks.
@@ -59,6 +65,7 @@
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation/skill-guidance-only.
 
 ## 2026-03-03 (phase 03 skill review pass execution)
+
 - Executed Phase 03 tasks `3.1`-`3.4` from `phases/phase-03.md`.
 - Workflow-facing skill/template updates:
   - Added explicit delta-first canonical stance and advisory-ceremony/runtime-gate distinction to:
@@ -74,6 +81,7 @@
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was documentation/skill-guidance-only.
 
 ## 2026-03-03 (phase 04 retrieval precision pass execution)
+
 - Executed Phase 04 tasks `4.1`-`4.4` from `phases/phase-04.md`.
 - Captured baseline retrieval outputs using the exact phase query set:
   - `uv run spec-driver list memories -c "uv run spec-driver complete delta" --match-tag spec-driver --limit 12 --format tsv`
@@ -97,6 +105,7 @@
 - Verification status: no runtime/test/lint commands run (`just`, `just test`, `just lint`, `just pylint` not run) because this was metadata/docs-only memory tuning.
 
 ## 2026-03-04 (verification gate closeout for IP-038)
+
 - Consolidated verification coverage statuses in `IP-038`:
   - `VA-038-001` -> `verified` (DE/DR/workflow-research strict-mode coherence)
   - `VA-038-002` -> `verified` (memory review + retrieval precision evidence)
@@ -107,6 +116,7 @@
 - Verification commands not run in this step (`just`, `just test`, `just lint`, `just pylint`), as this update records verification state rather than code changes.
 
 ## 2026-03-04 (gaps register status clarification)
+
 - Reworked `gaps-to-adoption.md` into a dated status snapshot (`resolved` / `partial` / `remains` / `deferred`) so unresolved adoption items are explicit.
 - Clarified carry-forward status per gap category:
   - resolved in DE-038: revision-first memory-loop drift
@@ -117,6 +127,7 @@
 - No runtime behavior changes; docs-only update.
 
 ## 2026-03-04 (lifecycle doc drift remediation)
+
 - Rewrote `supekku/about/lifecycle.md` to match current code-truth:
   - canonical requirement statuses: `pending`, `in-progress`, `active`, `retired`
   - coverage aggregation precedence and drift-warning behavior from requirements registry sync
@@ -130,6 +141,7 @@
 - No runtime behavior changes; docs-only update.
 
 ## 2026-03-04 (README closure + policy-layer remediation)
+
 - Updated `supekku/about/README.md` to remove stale Constitution reference and align governance language:
   - replaced Constitution bullet with Policy layer (`ADRs`, `Policies`, `Standards`)
   - corrected design artifact naming to `Design Revision (DR)` / `kind: design_revision`
@@ -141,6 +153,7 @@
 - No runtime behavior changes; docs-only update.
 
 ## 2026-03-04 (RUN.md retirement + coverage callout migration)
+
 - Added explicit `complete delta` coverage prerequisite section to `docs/commands-workflow.md` (parent spec coverage entries must be `verified`).
 - Updated `supekku/about/lifecycle.md` coverage references to point at canonical workflow docs + code source, removing `RUN.md` dependency.
 - Removed `supekku/about/RUN.md` as obsolete operational guidance after migration into canonical docs/memories.
@@ -153,6 +166,7 @@
 - No runtime behavior changes; docs-only update.
 
 ## New Agent Instructions
+
 - Task card code: DE-038 (`canonical_workflow_alignment`)
 - Next activity: run delta close-out flow (`complete delta --dry-run` then `complete delta`) when directed.
 - Required reading:

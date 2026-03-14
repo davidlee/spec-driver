@@ -2,9 +2,11 @@
 name: draft-design-revision
 description: Draft or refine a design revision (DR) for a delta. Use it when a DR needs concrete design shaping, explicit question triage, and section-by-section validation before implementation planning.
 ---
+
 You are translating delta intent into implementable design.
 
 Inputs:
+
 - `DE-XXX.md`
 - Existing `DR-XXX.md` (or scaffolded design artifact)
 - Relevant specs/requirements/backlog
@@ -54,7 +56,6 @@ You MUST create a task for each of these items and complete them in order. Each 
   </state>
 </Process State Machine>
 
-
 ## Process (detail)
 
 ### Explore context
@@ -88,6 +89,7 @@ At each step:
    - recommend one, with rationale
 
 Operating principles:
+
 - Prefer multiple choice questions when possible, but open-ended is fine too
 - Only one question per message - if a topic needs more exploration, break it
   into multiple questions
@@ -147,6 +149,7 @@ If meaningful tradeoffs or uncertainty remain unresolved, stop and `/consult`.
 ## Guardrails
 
 The design revision is canon for design intent.
+
 - If DR and plan conflict, reconcile via DR first.
 - Do not present "the whole design" as settled before the foundational sections and decisions have been validated.
 - Do not hide unresolved assumptions inside polished prose; name them explicitly.

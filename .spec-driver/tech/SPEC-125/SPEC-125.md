@@ -2,31 +2,31 @@
 id: SPEC-125
 slug: supekku-scripts-lib-validation
 name: supekku/scripts/lib/validation Specification
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: draft
 kind: spec
 category: unit
 c4_level: code
 responsibilities:
-- Validate workspace consistency and artifact relationships
-- Detect broken references between requirements, changes, and decisions
-- Enforce lifecycle link integrity across registries
-- Provide structured validation issue reporting
+  - Validate workspace consistency and artifact relationships
+  - Detect broken references between requirements, changes, and decisions
+  - Enforce lifecycle link integrity across registries
+  - Provide structured validation issue reporting
 aliases: []
 packages:
-- supekku/scripts/lib/validation
+  - supekku/scripts/lib/validation
 sources:
-- language: python
-  identifier: supekku/scripts/lib/validation
-  module: supekku.scripts.lib.validation
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/scripts/lib/validation
+    module: supekku.scripts.lib.validation
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
 owners: []
 auditers: []
 relations: []
@@ -246,35 +246,35 @@ The validation module provides three core capabilities as defined in the YAML bl
 
 ### Functional Requirements
 
-- **SPEC-125.FR-001**: Validator MUST validate all requirement lifecycle links (implemented_by, introduced_by, verified_by) point to existing artifacts
-  *Rationale*: Prevents orphaned lifecycle references that break automation and traceability
-  *Verification*: VT-VALIDATOR-001 - Lifecycle link validation tests
+- **SPEC-125.FR-001**: Validator MUST validate all requirement lifecycle links (implemented*by, introduced_by, verified_by) point to existing artifacts
+  \_Rationale*: Prevents orphaned lifecycle references that break automation and traceability
+  _Verification_: VT-VALIDATOR-001 - Lifecycle link validation tests
 
 - **SPEC-125.FR-002**: Validator MUST detect when change artifact relations reference non-existent requirements
-  *Rationale*: Ensures change artifacts only reference valid requirements from the requirements registry
-  *Verification*: VT-VALIDATOR-002 - Relation target validation tests
+  _Rationale_: Ensures change artifacts only reference valid requirements from the requirements registry
+  _Verification_: VT-VALIDATOR-002 - Relation target validation tests
 
 - **SPEC-125.FR-003**: Validator MUST validate change artifact `applies_to.requirements` fields reference existing requirements
-  *Rationale*: Ensures applies_to metadata is accurate and usable for filtering/reporting
-  *Verification*: VT-VALIDATOR-003 - applies_to validation tests
+  _Rationale_: Ensures applies*to metadata is accurate and usable for filtering/reporting
+  \_Verification*: VT-VALIDATOR-003 - applies_to validation tests
 
 - **SPEC-125.FR-004**: Validator MUST validate all ADR `related_decisions` references point to existing decision IDs
-  *Rationale*: Prevents broken ADR relationship graphs that confuse architectural understanding
-  *Verification*: VT-VALIDATOR-004 - ADR reference validation tests
+  _Rationale_: Prevents broken ADR relationship graphs that confuse architectural understanding
+  _Verification_: VT-VALIDATOR-004 - ADR reference validation tests
 
 - **SPEC-125.FR-005**: Validator MUST warn (in strict mode) when active ADRs reference deprecated or superseded ADRs
-  *Rationale*: Surfaces potentially problematic dependencies on outdated architectural decisions
-  *Verification*: VT-VALIDATOR-005 - ADR status compatibility tests
+  _Rationale_: Surfaces potentially problematic dependencies on outdated architectural decisions
+  _Verification_: VT-VALIDATOR-005 - ADR status compatibility tests
 
 - **SPEC-125.FR-006**: Validator MUST return structured ValidationIssue objects with level, artifact, and message
-  *Rationale*: Enables automated processing and clear human-readable reporting of validation results
-  *Verification*: VT-VALIDATOR-006 - ValidationIssue structure tests
+  _Rationale_: Enables automated processing and clear human-readable reporting of validation results
+  _Verification_: VT-VALIDATOR-006 - ValidationIssue structure tests
 
 ### Non-Functional Requirements
 
 - **SPEC-125.NF-001**: Validator MUST complete full workspace validation in <5 seconds for typical workspace size (100 specs, 500 requirements, 50 changes, 30 ADRs)
-  *Rationale*: Ensures validation doesn't become a bottleneck in pre-commit workflows
-  *Measurement*: VT-VALIDATOR-007 - Performance tests with realistic workspace fixtures
+  _Rationale_: Ensures validation doesn't become a bottleneck in pre-commit workflows
+  _Measurement_: VT-VALIDATOR-007 - Performance tests with realistic workspace fixtures
 
 ### Operational Targets
 
@@ -288,13 +288,14 @@ The validation module provides three core capabilities as defined in the YAML bl
 
 The validation module follows a simple validator pattern:
 
-| Component | Responsibility | Key Methods |
-|-----------|---------------|-------------|
-| `ValidationIssue` | Immutable dataclass representing a single validation issue | N/A (data only) |
-| `WorkspaceValidator` | Stateful validator that collects issues during validation | `validate()`, `_validate_change_relations()`, `_validate_decision_references()`, `_validate_decision_status_compatibility()` |
-| `validate_workspace()` | Convenience function for one-shot validation | Creates validator and returns issues |
+| Component              | Responsibility                                             | Key Methods                                                                                                                  |
+| ---------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `ValidationIssue`      | Immutable dataclass representing a single validation issue | N/A (data only)                                                                                                              |
+| `WorkspaceValidator`   | Stateful validator that collects issues during validation  | `validate()`, `_validate_change_relations()`, `_validate_decision_references()`, `_validate_decision_status_compatibility()` |
+| `validate_workspace()` | Convenience function for one-shot validation               | Creates validator and returns issues                                                                                         |
 
 **Validation Flow**:
+
 ```
 Workspace → WorkspaceValidator
   ├─ Load all registries (specs, requirements, changes, decisions)
@@ -309,6 +310,7 @@ Workspace → WorkspaceValidator
 ### Data & Contracts
 
 **ValidationIssue** (frozen dataclass):
+
 ```python
 @dataclass(frozen=True)
 class ValidationIssue:
@@ -318,6 +320,7 @@ class ValidationIssue:
 ```
 
 **WorkspaceValidator API**:
+
 ```python
 class WorkspaceValidator:
   def __init__(self, workspace: Workspace, strict: bool = False) -> None
@@ -325,11 +328,13 @@ class WorkspaceValidator:
 ```
 
 **Module API**:
+
 ```python
 def validate_workspace(workspace: Workspace, strict: bool = False) -> list[ValidationIssue]
 ```
 
 **Registry Contracts** (from collaborators):
+
 - `workspace.requirements.records` - dict of requirement IDs → RequirementRecord
 - `workspace.decisions.collect()` - dict of decision IDs → Decision
 - `workspace.delta_registry.collect()` - dict of delta IDs → ChangeArtifact
@@ -341,6 +346,7 @@ def validate_workspace(workspace: Workspace, strict: bool = False) -> list[Valid
 ### Primary Flows
 
 **Flow 1: Full Workspace Validation** (FR-001, FR-002, FR-003, FR-004, FR-005, FR-006)
+
 1. Client calls `validate_workspace(workspace, strict=False/True)`
 2. Validator instantiates and clears issue list
 3. Validator loads all registries:
@@ -368,12 +374,14 @@ def validate_workspace(workspace: Workspace, strict: bool = False) -> list[Valid
 9. Return `list[ValidationIssue]`
 
 **Flow 2: Requirement Lifecycle Validation** (FR-001)
+
 1. Given requirement record with `implemented_by: [DE-001, DE-002]`
 2. Validator checks if `DE-001` in delta_ids set → yes, OK
 3. Validator checks if `DE-002` in delta_ids set → no, error
 4. Validator appends `ValidationIssue(level="error", artifact=req_id, message="...missing delta DE-002")`
 
 **Flow 3: ADR Status Compatibility Check** (FR-005, strict mode only)
+
 1. Given ADR-001 (status: accepted) with `related_decisions: [ADR-002]`
 2. Given ADR-002 (status: deprecated)
 3. Validator skips if ADR-001 is deprecated/superseded → no, continue
@@ -406,17 +414,18 @@ Between calls, the validator can be reused (calling `validate()` again clears `s
 
 All requirements are verified at the **unit test level** using `supekku/scripts/lib/validation/validator_test.py`:
 
-| Requirement | Test Coverage | Test Level |
-|-------------|--------------|-----------|
-| FR-001 | `test_validator_checks_change_relations` | Unit |
-| FR-002 | `test_validator_reports_missing_relation_targets` | Unit |
-| FR-003 | `test_validator_checks_change_relations` | Unit |
-| FR-004 | `test_validator_checks_adr_reference_validation` | Unit |
-| FR-005 | `test_validator_checks_adr_status_compatibility` | Unit |
-| FR-006 | `test_validator_adr_mixed_validation_scenarios` | Unit |
-| NF-001 | Performance measured in test suite | Unit |
+| Requirement | Test Coverage                                     | Test Level |
+| ----------- | ------------------------------------------------- | ---------- |
+| FR-001      | `test_validator_checks_change_relations`          | Unit       |
+| FR-002      | `test_validator_reports_missing_relation_targets` | Unit       |
+| FR-003      | `test_validator_checks_change_relations`          | Unit       |
+| FR-004      | `test_validator_checks_adr_reference_validation`  | Unit       |
+| FR-005      | `test_validator_checks_adr_status_compatibility`  | Unit       |
+| FR-006      | `test_validator_adr_mixed_validation_scenarios`   | Unit       |
+| NF-001      | Performance measured in test suite                | Unit       |
 
 **Test Strategy**:
+
 - Use `RepoTestCase` base to create temporary git repositories with test fixtures
 - Helper methods (`_write_adr`, `_write_delta`, `_write_spec`, etc.) generate realistic artifacts
 - Test both positive cases (valid workspaces) and negative cases (broken references)
@@ -456,24 +465,27 @@ All FRs and NFs have associated test coverage in `validator_test.py`.
 ### Related Specs / PROD
 
 **Direct Dependencies**:
+
 - **SPEC-122** (RequirementsRegistry): Provides `requirements.records` with lifecycle links to validate
 - **SPEC-117** (DecisionRegistry): Provides `decisions.collect()` for ADR validation
 - **SPEC-115** (ChangeArtifact): Provides change artifact model with `relations` and `applies_to` fields
 
 **Workspace Integration**:
+
 - **SPEC-TBD** (Workspace): Facade providing unified access to all registries; validator consumes workspace instance
 
 **CLI Integration**:
+
 - **SPEC-TBD** (CLI validation command): Orchestrates `validate_workspace()` and formats output for developers
 
 ### Risks & Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| Performance degradation with large workspaces | Medium | Medium | Use ID sets for O(1) lookups; add performance tests with large fixtures |
-| False positives from race conditions (registry updates during validation) | Low | High | Validation is snapshot-based (registries collected upfront); document that validation reflects point-in-time state |
-| Schema changes in collaborating modules break validation logic | Medium | High | Comprehensive integration tests; type hints ensure compile-time checks |
-| Validator doesn't catch new artifact types | Low | Medium | Design is extensible; new artifact types require explicit validation logic addition |
+| Risk                                                                      | Likelihood | Impact | Mitigation                                                                                                         |
+| ------------------------------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------ |
+| Performance degradation with large workspaces                             | Medium     | Medium | Use ID sets for O(1) lookups; add performance tests with large fixtures                                            |
+| False positives from race conditions (registry updates during validation) | Low        | High   | Validation is snapshot-based (registries collected upfront); document that validation reflects point-in-time state |
+| Schema changes in collaborating modules break validation logic            | Medium     | High   | Comprehensive integration tests; type hints ensure compile-time checks                                             |
+| Validator doesn't catch new artifact types                                | Low        | Medium | Design is extensible; new artifact types require explicit validation logic addition                                |
 
 ### Known Gaps / Debt
 

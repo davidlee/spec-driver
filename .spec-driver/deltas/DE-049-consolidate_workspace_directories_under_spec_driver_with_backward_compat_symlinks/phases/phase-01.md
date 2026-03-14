@@ -2,8 +2,8 @@
 id: IP-049.PHASE-01
 slug: 049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks-phase-01
 name: IP-049 Phase 01 — Structural migration
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: complete
 kind: phase
 ---
@@ -60,16 +60,19 @@ Move all content from `specify/`, `change/`, `backlog/`, `memory/` into
 continue to resolve. No code changes in this phase.
 
 ## 2. Links & References
+
 - **Delta**: DE-049
 - **Design Revision**: DR-049 §4 (path model before/after), §7 DEC-049-03 (targeted symlinks), DEC-049-05 (migration sequence)
 - **IMPR-008 spike**: Q4 (symlink feasibility), Q6 (migration scope)
 
 ## 3. Entrance Criteria
+
 - [x] DR-049 approved (2 rounds of adversarial review)
 - [x] ADR-004 accepted
 - [x] DE-048 completed
 
 ## 4. Exit Criteria / Done When
+
 - [x] Derived symlinks deleted and committed (843f9b1)
 - [x] Content `git mv`'d into `.spec-driver/` and committed (4d5649a)
 - [x] Compat symlink structures created and committed (981abac)
@@ -77,6 +80,7 @@ continue to resolve. No code changes in this phase.
 - [x] Git working tree clean
 
 ## 5. Verification
+
 - Manual: `ls -la specify/tech/` shows symlink → `../.spec-driver/tech/`
 - Manual: `cat specify/tech/SPEC-001/SPEC-001.md` resolves content
 - Manual: `cat change/deltas/DE-049-*/DE-049.md` resolves content
@@ -84,18 +88,19 @@ continue to resolve. No code changes in this phase.
 - Manual: `cat memory/` shows memory files
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: `git mv` preserves history for moved directories
 - **Assumption**: Relative symlink targets work cross-platform (Linux/macOS/WSL)
 - **STOP**: If any `git mv` fails due to existing `.spec-driver/` subdirs conflicting with content dirs (e.g., `.spec-driver/registry/` already exists as a real dir)
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Delete derived symlinks | No | 388 entries deleted, committed 843f9b1 |
-| [x] | 1.2 | git mv content into .spec-driver/ | No | 526 renames, committed 4d5649a |
-| [x] | 1.3 | Create compat symlink structures | No | 10 symlinks, committed 981abac |
-| [x] | 1.4 | Verify and final commit | No | All 5 spot-checks pass, tree clean |
+| Status | ID  | Description                       | Parallel? | Notes                                  |
+| ------ | --- | --------------------------------- | --------- | -------------------------------------- |
+| [x]    | 1.1 | Delete derived symlinks           | No        | 388 entries deleted, committed 843f9b1 |
+| [x]    | 1.2 | git mv content into .spec-driver/ | No        | 526 renames, committed 4d5649a         |
+| [x]    | 1.3 | Create compat symlink structures  | No        | 10 symlinks, committed 981abac         |
+| [x]    | 1.4 | Verify and final commit           | No        | All 5 spot-checks pass, tree clean     |
 
 ### Task Details
 
@@ -151,11 +156,11 @@ continue to resolve. No code changes in this phase.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| `.spec-driver/` subdir name conflicts | Pre-checked: no overlap between content and existing managed dirs | Clear |
-| Large diff | Derived symlink deletion in separate commit (1.1) | Mitigated — 388 entries in own commit |
-| Broken cross-references | Compat symlinks tested in 1.4 | Clear — all 5 spot-checks pass |
+| Risk                                  | Mitigation                                                        | Status                                |
+| ------------------------------------- | ----------------------------------------------------------------- | ------------------------------------- |
+| `.spec-driver/` subdir name conflicts | Pre-checked: no overlap between content and existing managed dirs | Clear                                 |
+| Large diff                            | Derived symlink deletion in separate commit (1.1)                 | Mitigated — 388 entries in own commit |
+| Broken cross-references               | Compat symlinks tested in 1.4                                     | Clear — all 5 spot-checks pass        |
 
 ## 9. Decisions & Outcomes
 
@@ -170,6 +175,7 @@ continue to resolve. No code changes in this phase.
 - All git mv operations preserved rename detection (100% similarity)
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (spot-checks documented above)
 - [x] Notes updated (notes.md — Phase 1 section)

@@ -4,39 +4,40 @@ name: Verification
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-06'
-verified: '2026-03-06'
+updated: "2026-03-06"
+verified: "2026-03-06"
 confidence: high
 tags:
-- spec-driver
-- verification
-- evidence
-summary: Three verification artifact types (VT, VA, VH) provide evidence that requirements
+  - spec-driver
+  - verification
+  - evidence
+summary:
+  Three verification artifact types (VT, VA, VH) provide evidence that requirements
   are satisfied. Coverage blocks in specs track their status.
 priority:
   severity: medium
   weight: 7
 provenance:
   sources:
-  - kind: code
-    ref: supekku/scripts/lib/blocks/verification.py
-  - kind: doc
-    ref: supekku/about/lifecycle.md
+    - kind: code
+      ref: supekku/scripts/lib/blocks/verification.py
+    - kind: doc
+      ref: supekku/about/lifecycle.md
 ---
 
 # Verification
 
 ## Three Artifact Types
 
-| Type | Name | How |
-|------|------|-----|
-| **VT** | Verification Test | Automated tests proving functionality |
-| **VA** | Verification by Agent | Agent-generated analysis or test report |
+| Type   | Name                  | How                                           |
+| ------ | --------------------- | --------------------------------------------- |
+| **VT** | Verification Test     | Automated tests proving functionality         |
+| **VA** | Verification by Agent | Agent-generated analysis or test report       |
 | **VH** | Verification by Human | Manual testing, usability review, attestation |
 
 ## Coverage Blocks
 
-Specs (typically PROD-*) track verification status in
+Specs (typically PROD-\*) track verification status in
 `supekku:verification.coverage` YAML blocks:
 
 ```yaml
@@ -44,7 +45,7 @@ entries:
   - artefact: VT-001
     kind: VT
     requirement: PROD-005.FR-001
-    status: planned      # planned → in-progress → verified | failed | blocked
+    status: planned # planned → in-progress → verified | failed | blocked
     notes: Verify leaf package identification
 ```
 

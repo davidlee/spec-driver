@@ -1,10 +1,10 @@
 ---
 id: ADR-006
-title: 'ADR-006: consolidate workspace directories under .spec-driver'
+title: "ADR-006: consolidate workspace directories under .spec-driver"
 status: accepted
-created: '2026-03-06'
-updated: '2026-03-06'
-reviewed: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
+reviewed: "2026-03-06"
 owners: []
 supersedes: []
 superseded_by: []
@@ -22,7 +22,7 @@ tags:
   - architecture
   - workspace
   - install
-summary: 'Canonical spec-driver workspace directories move under .spec-driver/; migration tooling and broad content reference cleanup are deferred, while legacy compatibility paths are treated as optional non-default views.'
+summary: "Canonical spec-driver workspace directories move under .spec-driver/; migration tooling and broad content reference cleanup are deferred, while legacy compatibility paths are treated as optional non-default views."
 ---
 
 # ADR-006: consolidate workspace directories under .spec-driver
@@ -149,6 +149,7 @@ spec-driver workspace rather than requiring several unrelated root paths.
 ## Consequences
 
 ### Positive
+
 - Consolidates the canonical workspace under one top-level directory.
 - Makes staging and reviewing spec-driver changes more atomic.
 - Removes unnecessary nesting such as `specify/decisions/`.
@@ -157,18 +158,21 @@ spec-driver workspace rather than requiring several unrelated root paths.
 - Avoids premature investment in migration tooling and mass reference rewriting.
 
 ### Negative
+
 - The `.spec-driver/` root will have more direct child directories.
 - Some users may prefer explicit root-level directories for casual shell browsing.
 - Existing documentation and content will continue to contain old path spellings for a while.
 - A later migration command, if needed, will still require design and implementation work.
 
 ### Neutral
+
 - Existing root-level paths, when present, are compatibility views rather than canonical locations.
 - Cross-reference cleanup is deferred, not rejected permanently.
 - This ADR sets the default layout direction; implementation details still belong in follow-up change work.
 - The separate contracts corpus decision remains governed by existing specs and ADRs unless changed explicitly.
 
 ## Verification
+
 - Default workspace initialization creates the canonical directories under `.spec-driver/`.
 - User-serviceable files move under `.spec-driver/config/`, while managed internals remain outside that subdirectory.
 - Fresh installs create the canonical directories under `.spec-driver/` without requiring root-level compatibility paths.
@@ -177,6 +181,7 @@ spec-driver workspace rather than requiring several unrelated root paths.
 - No migration command is required to satisfy this ADR initially.
 
 ## References
+
 - `backlog/improvements/IMPR-008-configurable_workspace_directory_layout_with_migration_support/IMPR-008.md`
 - `backlog/improvements/IMPR-008-configurable_workspace_directory_layout_with_migration_support/spike.md`
 - `specify/decisions/ADR-001-use-spec-driver-to-build-spec-driver.md`

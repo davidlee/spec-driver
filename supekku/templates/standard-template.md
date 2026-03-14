@@ -15,6 +15,7 @@ Why this standard exists. What benefits does following it provide?
 Where and when this standard applies. What is included and excluded?
 
 Examples:
+
 - Applies to: All Go code in services/
 - Recommended for: New modules (legacy code may deviate)
 
@@ -23,6 +24,7 @@ Examples:
 How adoption of this standard is tracked or measured (if applicable).
 
 Examples:
+
 - Linter rules
 - Style guide compliance checks
 - Code review guidelines

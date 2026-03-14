@@ -94,8 +94,8 @@ exports it as `SPEC_DRIVER_SESSION` via `CLAUDE_ENV_FILE`.
 All six tasks complete. Files created/modified:
 
 - `supekku/scripts/lib/core/events.py` — new: emit_event, record_artifact,
-  mark_command_invoked, command_was_invoked, _detect_session, _resolve_cmd,
-  _write_log, _send_socket, _drain_artifacts, _reset (test helper)
+  mark_command_invoked, command_was_invoked, \_detect_session, \_resolve_cmd,
+  \_write_log, \_send_socket, \_drain_artifacts, \_reset (test helper)
 - `supekku/scripts/lib/core/events_test.py` — new: 30 tests covering
   VT-052-01 through VT-052-08
 - `supekku/scripts/lib/core/paths.py` — added get_run_dir()

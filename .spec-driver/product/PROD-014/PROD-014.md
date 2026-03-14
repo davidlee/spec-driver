@@ -2,8 +2,8 @@
 id: PROD-014
 slug: contract_mirror_tree_index
 name: Contract Mirror Tree Index
-created: '2026-02-20'
-updated: '2026-03-06'
+created: "2026-02-20"
+updated: "2026-03-06"
 status: draft
 kind: prod
 scope: Provide a canonical, mirror-of-source contracts corpus under `.contracts/` for discovery, search, and generation (including legacy “no spec yet” workflows).
@@ -193,6 +193,7 @@ entries:
 ```
 
 ## 1. Intent & Summary
+
 - **Problem / Purpose**: The current contract storage and symlink views make it harder than it should be to locate the right contract artefact from a source path (and vice versa), and to search contracts using a source-mirroring structure.
 - **Value Signals**:
   - Humans/agents can go from a source path → contract path with zero “index knowledge”.
@@ -208,6 +209,7 @@ entries:
   - 2026-03-06: RE-035 — ADR-007 accepted; confirms PROD-014's mirror-of-source model as primary navigation. PROD-012 by-language/by-package trees are derived navigation indexes that augment, not compete (ADR-007 §5–6).
 
 ## 2. Stakeholders & Journeys
+
 - **Personas / Actors**:
   - **Developer**: wants fast, predictable navigation from code to contracts and back.
   - **Agent**: wants a deterministic corpus to search and cite to avoid hallucination.
@@ -230,12 +232,12 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
 ### Functional Requirements
 
 - **FR-001**: System MUST generate a repo-root `.contracts/` directory as a deterministic, rebuildable index of generated contracts.
-  *Verification*: VT-CONTRACT-MIRROR-001
+  _Verification_: VT-CONTRACT-MIRROR-001
 
 - **FR-002**: System MUST mirror repo-relative source paths inside `.contracts/<view>/...` as the canonical navigation shape for contracts.
   - In v1, `.contracts/**` entries MAY be symlinks to contract artefacts stored under `specify/tech/SPEC-*/contracts/`.
   - In v2, `.contracts/**` entries SHOULD be real files (see FR-008).
-  *Verification*: VT-CONTRACT-MIRROR-002
+    _Verification_: VT-CONTRACT-MIRROR-002
 
 - **FR-003**: For each supported language, the index builder MUST map registered source units to mirror paths using language-appropriate rules:
   - **Zig (file-based)**:
@@ -244,44 +246,45 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
   - **Go (package-based)**: `<identifier>/` maps to `.contracts/public/<identifier>/interfaces.md` and `.contracts/internal/<identifier>/internals.md`.
   - **TypeScript/JavaScript (file-based)**: `<identifier>.{ts,tsx,js,jsx}` maps to `.contracts/public/<identifier>.<ext>.md` (api) and `.contracts/internal/<identifier>.<ext>.md` (internal, if generated).
   - **Python (module-based contracts)**: Each module contract MUST map to `.contracts/<view>/<module_path>.py.md` where `<module_path>` is derived from the contract’s module identifier (e.g. `supekku.scripts.lib.backlog.priority` → `supekku/scripts/lib/backlog/priority.py`).
-  *Verification*: VT-CONTRACT-MIRROR-002
+    _Verification_: VT-CONTRACT-MIRROR-002
 
 - **FR-004**: System MUST create idiom alias paths as symlinks:
   - `.contracts/api` MUST be a symlink to `.contracts/public`
   - `.contracts/implementation` MUST be a symlink to `.contracts/all`
   - Aliases MAY be omitted when the target view would be empty (to avoid misleading navigation).
-  *Verification*: VT-CONTRACT-MIRROR-001
+    _Verification_: VT-CONTRACT-MIRROR-001
 
 - **FR-005**: Rebuilding the mirror MUST remove stale entries and MUST only write within `.contracts/` (no changes elsewhere in the repo).
-  *Verification*: VT-CONTRACT-MIRROR-003
+  _Verification_: VT-CONTRACT-MIRROR-003
 
 - **FR-006**: Mirror generation MUST be driven by existing registry + existing contract outputs, without requiring code parsing or toolchain execution (beyond reading contract markdown for mapping when required).
-  *Verification*: VT-CONTRACT-MIRROR-002
+  _Verification_: VT-CONTRACT-MIRROR-002
 
 - **FR-007**: Mirror generation MUST handle missing/absent variants gracefully:
   - If a contract artefact is missing, the mirror entry for that variant MUST be skipped (with a warning/report), not treated as a hard failure.
   - If a language suppresses a variant by design (e.g. identical TS api/internal collapsing), the mirror MUST reflect only what exists.
   - If two artefacts would map to the same mirror destination path, the mirror generation MUST warn but MUST still produce a mirror link by applying a deterministic precedence rule. Conflict detection SHOULD also be surfaced by registry validation/spec creation workflows.
-  *Verification*: VT-CONTRACT-MIRROR-002
+    _Verification_: VT-CONTRACT-MIRROR-002
 
 - **FR-008**: System MUST support generating and storing contract artefacts as real files under `.contracts/<view>/...` using the mirror-of-source path mapping rules (FR-003).
   - Contract generation MUST be deterministic: unchanged source MUST produce byte-identical `.contracts/**` output.
   - `.contracts/` MUST be safe to delete and regenerate without losing unique information (derived corpus).
-  *Verification*: VT-CONTRACTS-STORAGE-001
+    _Verification_: VT-CONTRACTS-STORAGE-001
 
 - **FR-009**: System MUST support generating contracts for explicit targets without requiring pre-existing specs or registry entries.
   - Output MUST be written under `.contracts/**` (FR-008), using the same mapping rules as sync-based generation.
-  *Verification*: VT-CONTRACTS-GEN-001
+    _Verification_: VT-CONTRACTS-GEN-001
 
 - **FR-010**: System SHOULD support generating contracts for “all discoverable targets” of a language without first creating/specifying SPEC bundles.
-  *Verification*: VT-CONTRACTS-GEN-002
+  _Verification_: VT-CONTRACTS-GEN-002
 
 - **FR-011**: System SHOULD provide an explicit backwards-compatibility strategy for legacy access paths.
   - At minimum, existing workflows that navigate `specify/tech/SPEC-*/contracts/` MUST have a documented compatibility story (e.g., reverse symlinks, deprecation, or an index view).
-  *Verification*: VT-CONTRACTS-COMPAT-001
+    _Verification_: VT-CONTRACTS-COMPAT-001
 
 - **FR-012**: System MUST warn when contract artefacts exist but `.contracts/**` generation yields zero entries for their owning spec/source unit(s) (convention drift / mapper mismatch).
-  *Verification*: VT-CONTRACTS-DRIFT-001
+  _Verification_: VT-CONTRACTS-DRIFT-001
+
 ### Non-Functional Requirements
 
 - **NF-001**: Mirror rebuild MUST be fast enough for interactive use (target: <2s for ~10k contract artefacts on a typical dev machine; linear in number of artefacts).
@@ -292,6 +295,7 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
 - **Adoption**: Contract discovery tasks (“find the contract for this source path”) are consistently solved via `.contracts/**` rather than memorizing `SPEC-*/contracts/*` or `by-*` index layouts.
 
 ## 4. Solution Outline
+
 - **User Experience / Outcomes**:
   - The path under `.contracts/**` is a mirror of the source tree, enabling muscle-memory navigation.
   - Alias directories (`api`, `implementation`) reduce friction for language-idiomatic workflows.
@@ -307,6 +311,7 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
     - `.contracts/api` and `.contracts/implementation` alias symlinks
 
 ## 5. Behaviour & Scenarios
+
 - **Scenario A — Source → Contract (Zig)**:
   - **Given** a registered Zig source file `src/domain/combat/agent.zig`
   - **When** a user opens `.contracts/public/src/domain/combat/agent.zig.md`
@@ -328,6 +333,7 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
     - The warning SHOULD include all conflicting `SPEC-###` ids and contract target paths to make cleanup actionable.
 
 ## 6. Quality & Verification
+
 - **Testing Strategy**:
   - Unit tests for path mapping rules per language (FR-003).
   - Integration-style tests that build a temp tech dir with minimal spec bundles and assert `.contracts/**` links exist (FR-001/FR-002/FR-005).
@@ -337,11 +343,13 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
   - Rebuild is deterministic and safe to ignore in git (NF-002).
 
 ## 7. Backlog Hooks & Dependencies
+
 - **Related Specs / PROD**: Extends PROD-012’s contract discovery goals by adding mirror-of-source navigation.
 - **Open Decisions / Questions**:
   - Clarify which legacy paths remain supported once `.contracts/` is canonical storage (FR-011).
   - Decide whether “sync-less generate all” updates the registry (discoverability) or stays purely “no-spec corpus” (clean legacy onboarding).
-  - ~~Does mirror-of-source replace or augment PROD-012 by-* trees?~~ **Resolved by ADR-007**: mirror-of-source is primary; by-* trees augment as derived indexes.
+  - ~~Does mirror-of-source replace or augment PROD-012 by-\* trees?~~ **Resolved by ADR-007**: mirror-of-source is primary; by-\* trees augment as derived indexes.
 
 ## Appendices (Optional)
+
 - Glossary, detailed research, extended API examples, migration history, etc.

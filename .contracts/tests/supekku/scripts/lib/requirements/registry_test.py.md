@@ -53,6 +53,23 @@ VT-SYNC-076-002: Backlog items synced to requirements registry.
 - `test_sync_discovers_backlog_requirements(self) -> None`: Backlog items with heading-format requirements appear in registry.
 - `_make_backlog_item(self, item_id, kind, body) -> Path`: Create a minimal backlog item file and return its path.
 
+### TestBreakoutFrontmatterSync
+
+DE-095: Sync reads tags/ext_id/ext_url from breakout requirement files.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_breakout_ext_id_and_ext_url(self) -> None`: ext_id/ext_url from breakout frontmatter populate the record.
+- `test_breakout_tags_merged_with_inline(self) -> None`: Frontmatter tags from breakout file merge with inline tags.
+- `test_breakout_tags_only(self) -> None`: Breakout with tags but no ext fields.
+- `test_breakout_via_spec_registry(self) -> None`: Breakout enrichment works through spec_registry path too.
+- `test_breakout_without_metadata_no_effect(self) -> None`: Breakout file without tags/ext_id/ext_url leaves record unchanged.
+- `_make_repo(self) -> Path`
+- `_write_breakout(self, root, spec_id, req_id, frontmatter) -> None`
+- `_write_spec(self, root, spec_id, body) -> Path`
+
 ### TestCoverageReplacementSemantics
 
 VT-081-001: Coverage evidence is rebuilt fresh each sync.
@@ -126,7 +143,7 @@ VT-081-003: Inline tag extraction from [tag1, tag2] syntax.
 
 Test that coverage_entries field is populated during registry sync.
 
-After _apply_coverage_blocks(), each RequirementRecord should have a
+After \_apply_coverage_blocks(), each RequirementRecord should have a
 coverage_entries field containing the structured verification data
 (artefact, kind, status) from coverage blocks.
 
@@ -146,7 +163,7 @@ coverage_entries field containing the structured verification data
 
 ### TestRequirementHeadingRegex
 
-VT-REGEX-076-001: _REQUIREMENT_HEADING regex matches dotted backlog format.
+VT-REGEX-076-001: \_REQUIREMENT_HEADING regex matches dotted backlog format.
 
 **Inherits from:** unittest.TestCase
 
@@ -256,7 +273,7 @@ VT-081-002: Terminal statuses not overwritten by coverage derivation.
 
 ### TestUpsertRecordProvenance
 
-VT-UPSERT-076-003: _upsert_record stamps source provenance.
+VT-UPSERT-076-003: \_upsert_record stamps source provenance.
 
 **Inherits from:** unittest.TestCase
 

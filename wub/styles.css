@@ -100,7 +100,7 @@ h1 { font-size: 4rem;}
  * sticky footer
  */
 body {
-  mi n-height:100dvh;
+  min-height:100dvh;
   display: flex;
   flex-direction: column;
   main {

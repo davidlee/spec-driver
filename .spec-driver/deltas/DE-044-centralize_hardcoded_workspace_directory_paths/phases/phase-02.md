@@ -1,9 +1,9 @@
 ---
 id: IP-044.PHASE-02
 slug: 044-centralize_hardcoded_workspace_directory_paths-phase-02
-name: 'P02: Production code'
-created: '2026-03-05'
-updated: '2026-03-05'
+name: "P02: Production code"
+created: "2026-03-05"
+updated: "2026-03-05"
 status: complete
 kind: phase
 ---
@@ -29,17 +29,17 @@ verification:
     - VT-044-regression
   evidence: []
 tasks:
-  - id: '2.1'
+  - id: "2.1"
     summary: Update registries
-  - id: '2.2'
+  - id: "2.2"
     summary: Update workspace.py
-  - id: '2.3'
+  - id: "2.3"
     summary: Update install.py
-  - id: '2.4'
+  - id: "2.4"
     summary: Update CLI commands
-  - id: '2.5'
+  - id: "2.5"
     summary: Update remaining production scripts
-  - id: '2.6'
+  - id: "2.6"
     summary: Lint and full test suite verification
 risks:
   - description: Missed import causes runtime NameError
@@ -61,14 +61,17 @@ Python files with imports from `core/paths.py`. No behaviour change — only
 import + reference swap.
 
 ## 2. Links & References
+
 - **Delta**: [DE-044](../DE-044.md)
 - **Design Revision**: [DR-044 §4.2–4.5](../DR-044.md)
 - **Phase 1**: [phase-01.md](./phase-01.md) — constants and helpers now available
 
 ## 3. Entrance Criteria
+
 - [x] P01 complete — constants and helpers exist in `core/paths.py`
 
 ## 4. Exit Criteria / Done When
+
 - [x] All registries use path helpers
 - [x] `workspace.py` uses path helpers
 - [x] `install.py` uses path constants
@@ -78,24 +81,26 @@ import + reference swap.
 - [x] `just lint` + `just pylint` clean (no regression)
 
 ## 5. Verification
+
 - `just test` after each task group
 - `just lint` after each file
 - Final: `rg '"specify"' --type py -g '!*_test.py'` should show zero path-construction hits (same for `"change/"`, `"backlog"`, `"memory/"`)
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: all call sites pass an explicit `root` (no auto-discovery changes needed)
 - STOP when: a registry constructor signature needs changing (would ripple to callers)
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Update registries | — | 7 registries: specs, decisions, policies, standards, changes, backlog, memory |
-| [x] | 2.2 | Update `workspace.py` | — | sync_requirements() path refs → helpers |
-| [x] | 2.3 | Update `install.py` | [P] | Directory list + backlog/memory refs → constants |
-| [x] | 2.4 | Update CLI commands | — | sync.py, common.py, list.py, resolve.py |
-| [x] | 2.5 | Update remaining scripts | — | creation.py, executor.py, specs/creation.py, mirror.py, list_specs.py, requirements.py, complete_delta.py, sync_specs.py, validate_revision_blocks.py |
-| [x] | 2.6 | Lint and full test suite | — | 2606 passed, ruff clean, pylint 9.56/10 (unchanged) |
+| Status | ID  | Description              | Parallel? | Notes                                                                                                                                                 |
+| ------ | --- | ------------------------ | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [x]    | 2.1 | Update registries        | —         | 7 registries: specs, decisions, policies, standards, changes, backlog, memory                                                                         |
+| [x]    | 2.2 | Update `workspace.py`    | —         | sync_requirements() path refs → helpers                                                                                                               |
+| [x]    | 2.3 | Update `install.py`      | [P]       | Directory list + backlog/memory refs → constants                                                                                                      |
+| [x]    | 2.4 | Update CLI commands      | —         | sync.py, common.py, list.py, resolve.py                                                                                                               |
+| [x]    | 2.5 | Update remaining scripts | —         | creation.py, executor.py, specs/creation.py, mirror.py, list_specs.py, requirements.py, complete_delta.py, sync_specs.py, validate_revision_blocks.py |
+| [x]    | 2.6 | Lint and full test suite | —         | 2606 passed, ruff clean, pylint 9.56/10 (unchanged)                                                                                                   |
 
 ### Task Details
 
@@ -127,22 +132,26 @@ import + reference swap.
   - Various `scripts/lib/` modules with path references
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Missed import → runtime NameError | Run full test suite after each task group | open |
-| Subtle path difference (trailing slash, etc.) | Tests catch any path mismatch | open |
+
+| Risk                                          | Mitigation                                | Status |
+| --------------------------------------------- | ----------------------------------------- | ------ |
+| Missed import → runtime NameError             | Run full test suite after each task group | open   |
+| Subtle path difference (trailing slash, etc.) | Tests catch any path mismatch             | open   |
 
 ## 9. Decisions & Outcomes
+
 - `install.py` pkg_memory refs (`package_root / "memory"`) intentionally left as-is — these are package directory lookups, not workspace paths
 - `_KIND_TO_DIR` mapping in changes/registry.py kept — the ChangeRegistry composes `get_changes_dir(root) / subdir` rather than using per-kind helpers, which is clean since the mapping is local knowledge
 - Fixed 3 test files (edit_test, show_test, view_test) that used ISSUE-003 (deleted fixture) — converted to mocked resolution or updated IDs
 
 ## 10. Findings / Research Notes
+
 - ~25 production files had hardcoded workspace path strings
 - No import cycle issues — paths.py only depends on repo.py
 - No runtime NameErrors — full test suite green after each task group
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence: `just` passes (2606 tests, ruff clean, pylint 9.56/10)
 - [x] Grep verification: zero path-construction hits in production code

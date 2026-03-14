@@ -2,8 +2,8 @@
 id: IP-005.PHASE-01
 slug: implement-spec-backfill-phase-01
 name: IP-005 Phase 01
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: complete
 kind: phase
 ---
@@ -53,6 +53,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 **Design Change (2025-11-02)**: See `REVISED-DESIGN.md` - removed Task 1.3 (completion module), simplified Task 1.4 (CLI just replaces body), revised Task 1.5 (agent does completion).
 
 ## 2. Links & References
+
 - **Delta**: [DE-005](../DE-005.md)
 - **Specs / PRODs**: PROD-007.FR-001, FR-002, FR-005, FR-006
 - **Support Docs**:
@@ -61,12 +62,14 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - `supekku/templates/spec.md` (Jinja2 template)
 
 ## 3. Entrance Criteria
+
 - [x] PROD-007 complete and validated
 - [x] Contracts generation working (via sync)
 - [x] SpecRegistry supports reading/writing specs (confirmed in `supekku/scripts/lib/specs/registry.py`)
 - [x] Template rendering infrastructure exists (confirmed: `supekku/templates/spec.md` with Jinja2)
 
 ## 4. Exit Criteria / Done When
+
 - [x] `spec-driver show template <kind>` returns valid template markdown (Task 1.1 complete)
 - [x] Stub detection correctly identifies stub vs. modified specs (Task 1.2 complete)
 - [x] `spec-driver backfill spec SPEC-123` replaces body with template (Task 1.4 complete)
@@ -85,6 +88,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 - [x] End-to-end integration test with real spec (Task 1.6 complete - SPEC-125, SPEC-110, CONTRACT_REVIEW)
 
 ## 5. Verification
+
 - **Unit tests**: `supekku/scripts/lib/specs/completion_test.py`, `supekku/cli/backfill_test.py`
 - **Integration test**: End-to-end workflow with real stub spec
 - **Commands**:
@@ -96,6 +100,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 - **Evidence**: Successful backfill of PROD-007 itself (dogfooding)
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumptions**:
   - Template structure stable (no breaking changes during implementation)
   - Contracts available for test specs
@@ -106,28 +111,30 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Manual content overwrite occurs in testing
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[REMOVED]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add `show template` command to CLI | [x] | Complete: 8 tests passing, both linters 10/10 |
-| [x] | 1.2 | Implement stub detection logic | [x] | Complete: 7 tests passing, both linters 10/10 |
-| [REMOVED] | 1.3 | Create completion module | N/A | Removed - agent does completion, not code |
-| [x] | 1.4 | Build CLI `backfill spec` command (SIMPLIFIED) | [x] | Complete: 2 tests passing, both linters 10/10 |
-| [x] | 1.5 | Write agent command (REVISED) | [x] | Complete: `.claude/commands/supekku.backfill.md` created |
-| [x] | 1.5.1 | Set auto-created specs to status='stub' | [x] | Complete: sync_specs.py:114 + orphan messages + --prune safety |
-| [x] | 1.5.2 | Migrate existing stub specs | [x] | Complete: 16 specs migrated (migrate_stub_status.py) |
-| [x] | 1.5.3 | Add stub status theming to formatters | [x] | Complete: stub=mid-grey, draft=light-grey |
-| [x] | 1.5.4 | Add path/kind to list/show JSON outputs | [x] | Complete: Added kind+path to specs, path to changes/decisions |
-| [x] | 1.5.5 | Add schema reference commands to backfill workflow | [x] | Complete: schema show commands documented |
-| [x] | 1.5.6 | Add status field management to backfill workflow | [x] | Complete: automated validation with jq |
-| [x] | 1.5.7 | Enhance collaboration analysis guidance | [x] | Complete: import-based analysis prompts |
-| [x] | 1.5.8 | Mandate reading all public contracts | [x] | Complete: validated with CONTRACT_REVIEW.md |
-| [x] | 1.6 | Integration testing | [x] | Complete: SPEC-125 successful, SPEC-110 revealed gap |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[REMOVED]`)_
+
+| Status    | ID    | Description                                        | Parallel? | Notes                                                          |
+| --------- | ----- | -------------------------------------------------- | --------- | -------------------------------------------------------------- |
+| [x]       | 1.1   | Add `show template` command to CLI                 | [x]       | Complete: 8 tests passing, both linters 10/10                  |
+| [x]       | 1.2   | Implement stub detection logic                     | [x]       | Complete: 7 tests passing, both linters 10/10                  |
+| [REMOVED] | 1.3   | Create completion module                           | N/A       | Removed - agent does completion, not code                      |
+| [x]       | 1.4   | Build CLI `backfill spec` command (SIMPLIFIED)     | [x]       | Complete: 2 tests passing, both linters 10/10                  |
+| [x]       | 1.5   | Write agent command (REVISED)                      | [x]       | Complete: `.claude/commands/supekku.backfill.md` created       |
+| [x]       | 1.5.1 | Set auto-created specs to status='stub'            | [x]       | Complete: sync_specs.py:114 + orphan messages + --prune safety |
+| [x]       | 1.5.2 | Migrate existing stub specs                        | [x]       | Complete: 16 specs migrated (migrate_stub_status.py)           |
+| [x]       | 1.5.3 | Add stub status theming to formatters              | [x]       | Complete: stub=mid-grey, draft=light-grey                      |
+| [x]       | 1.5.4 | Add path/kind to list/show JSON outputs            | [x]       | Complete: Added kind+path to specs, path to changes/decisions  |
+| [x]       | 1.5.5 | Add schema reference commands to backfill workflow | [x]       | Complete: schema show commands documented                      |
+| [x]       | 1.5.6 | Add status field management to backfill workflow   | [x]       | Complete: automated validation with jq                         |
+| [x]       | 1.5.7 | Enhance collaboration analysis guidance            | [x]       | Complete: import-based analysis prompts                        |
+| [x]       | 1.5.8 | Mandate reading all public contracts               | [x]       | Complete: validated with CONTRACT_REVIEW.md                    |
+| [x]       | 1.6   | Integration testing                                | [x]       | Complete: SPEC-125 successful, SPEC-110 revealed gap           |
 
 ### Task Details
 
 **1.1 Add `show template` command**
+
 - **Design**: Add subcommand to `supekku/cli/show.py`: `@app.command("template")`
 - **Files**:
   - `supekku/cli/show.py` - Add command function
@@ -153,6 +160,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Both outputs match expected template structure
 
 **1.2 Implement stub detection**
+
 - **Design**: Status-based detection with line-count fallback (REVISED 2025-11-02)
 - **Files**:
   - `supekku/scripts/lib/specs/detection.py` - New module
@@ -168,6 +176,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
      - Much simpler than template-matching approach
      - Fast: O(1) file read vs Jinja2 rendering
 - **Implementation**:
+
   ```python
   def is_stub_spec(spec_path: Path) -> bool:
       """Detect if spec is a stub based on status and line count."""
@@ -181,6 +190,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
       total_lines = spec_path.read_text().count('\n') + 1
       return total_lines <= 30
   ```
+
 - **Testing**:
   - Test: `test_is_stub_spec_status_stub()` - status="stub" → True
   - Test: `test_is_stub_spec_line_count()` - 28 lines → True
@@ -194,16 +204,19 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Simple, maintainable code
 
 **1.3 Create completion module** [REMOVED]
+
 - **Reason**: Overengineered - agents can complete specs better than programmatic logic
 - **Replacement**: Agent command (Task 1.5) handles intelligent completion
 - **Design Change**: CLI does mechanics (Task 1.4), agent does intelligence (Task 1.5)
 
 **~~Original Design (archived for reference)~~**:
+
 - **Design**: Core business logic module for spec completion
 - **Files**:
   - `supekku/scripts/lib/specs/completion.py` - New module
   - `supekku/scripts/lib/specs/completion_test.py` - Tests
 - **Data Models**:
+
   ```python
   @dataclass
   class CompletionResult:
@@ -223,6 +236,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
       signature: str | None
       docstring: str | None
   ```
+
 - **Implementation Details**:
   1. `complete_spec(spec_id: str, *, interactive: bool = True, root: Path | None = None) -> CompletionResult`:
      - Load spec from SpecRegistry
@@ -286,6 +300,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Interactive mode asks ≤3 questions
 
 **1.4 Build CLI backfill command** (SIMPLIFIED)
+
 - **Design**: Replace stub spec body with fresh template (preserving frontmatter)
 - **Philosophy**: CLI does mechanics only - agent handles intelligence (see Task 1.5)
 - **Files**:
@@ -293,6 +308,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - `supekku/cli/backfill_test.py` - Tests
   - Update main CLI to register command
 - **Command Structure**:
+
   ```python
   app = typer.Typer(help="Backfill incomplete specifications", no_args_is_help=True)
 
@@ -303,6 +319,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
       root: RootOption = None,
   ) -> None:
   ```
+
 - **Implementation Details**:
   1. Load spec from SpecRegistry
   2. Check if spec exists → error if not
@@ -345,6 +362,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Error messages clear and actionable
 
 **1.5 Write agent command** (REVISED)
+
 - **Design**: Agent workflow orchestrating intelligent spec completion
 - **Philosophy**: CLI resets spec to template (Task 1.4), agent fills sections intelligently
 - **File**: `.claude/commands/supekku.backfill.md`
@@ -392,6 +410,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
      - [ ] `uv run spec-driver validate` passed
      - [ ] Evidence/decisions documented
 - **Key Commands**:
+
   ```bash
   # Reset spec to template
   uv run spec-driver backfill spec SPEC-123
@@ -403,6 +422,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   uv run spec-driver sync
   uv run spec-driver validate
   ```
+
 - **Testing**:
   - Manual test: Agent completes real stub spec end-to-end
   - Verify: ≤3 questions asked
@@ -415,6 +435,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Quality maintained (validation passes)
 
 **1.5.1 Set auto-created specs to status='stub'**
+
 - **Design**: Update sync code to mark auto-generated specs as stubs
 - **Files**:
   - `supekku/scripts/sync_specs.py` - Change status field
@@ -439,6 +460,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Both linters pass
 
 **1.5.2 Migrate existing stub specs**
+
 - **Design**: One-time update of existing draft specs that are actually stubs
 - **Approach**: Script to find and update specs matching stub criteria
 - **Implementation Details**:
@@ -475,6 +497,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Can be run idempotently
 
 **1.5.3 Add stub status theming to formatters**
+
 - **Design**: Visual distinction for stub status in CLI list output
 - **Files**:
   - `supekku/scripts/lib/formatters/spec_formatters.py` - Add color logic
@@ -504,6 +527,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Tests and linters pass
 
 **1.5.4 Add path/kind to list/show JSON outputs**
+
 - **Design**: Fix jq commands in backfill workflow by including missing fields in JSON output
 - **Problem**: `.claude/commands/supekku.backfill.md` uses jq to extract `path` and `kind` fields, but they're missing from JSON output (see `JQ_VALIDATION_REPORT.md`)
 - **Files**:
@@ -571,12 +595,14 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Both linters clean
 
 **1.5.5 Add schema reference commands to backfill workflow**
+
 - **Design**: Document available schema commands so agents know about this expensive help
 - **Problem**: Agents have to manually construct YAML blocks without knowing schema commands exist
 - **File**: `.claude/commands/supekku.backfill.md`
 - **Implementation Details**:
   1. Add new section "4.5 Review YAML Block Schemas" before "Complete Sections Intelligently":
-     ```markdown
+
+     ````markdown
      #### D. Review YAML Block Schemas
 
      Before filling YAML blocks, review the schemas to understand structure:
@@ -590,15 +616,21 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
      # JSON format also available (will be default once json-schema support added)
      uv run spec-driver schema show spec.relationships -f json
      ```
+     ````
 
      These show:
      - Required vs optional fields
      - Field types and constraints
      - Example values and structure
      - Common patterns
+
      ```
+
+     ```
+
   2. Reference these commands in section 5 when completing YAML blocks
   3. Add to quality checklist: "[ ] YAML blocks match schema (verified with schema show)"
+
 - **Rationale**:
   - Schema commands already exist and are well-tested
   - Agents don't know to use them without documentation
@@ -614,21 +646,25 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Quality checklist includes schema verification
 
 **1.5.6 Add status field management to backfill workflow**
+
 - **Design**: Add explicit instructions for updating status field when backfill is complete
 - **Problem**: Agent testing claimed to set status to 'completed' but SPEC-112 still shows 'stub'
 - **File**: `.claude/commands/supekku.backfill.md`
 - **Implementation Details**:
   1. Add to "Complete Sections Intelligently" guidance:
+
      ```markdown
      ### Status Field Progression
 
      Update the frontmatter `status` field as you complete the spec:
+
      - `stub` → `draft` when backfill is complete (sections filled, YAML valid)
      - `draft` → `active` after validation passes and peer review (if applicable)
      - Never use `completed` (not a valid status)
 
      Valid status values: stub, draft, active, deprecated, superseded
      ```
+
   2. Add to final checklist (section 7):
      ```markdown
      - [ ] Frontmatter status updated: `stub` → `draft`
@@ -642,6 +678,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
      grep "^status:" "$spec_path"
      # Should show: status: draft (not stub)
      ```
+
 - **Rationale**:
   - Status field is in frontmatter, easy to overlook
   - Agent confused about valid values ('completed' doesn't exist)
@@ -658,12 +695,14 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Example shows correct before/after values
 
 **1.5.7 Enhance collaboration analysis guidance**
+
 - **Design**: Add specific prompts to identify external collaborators (not just internal structure)
 - **Problem**: SPEC-112 listed only 1 collaborator when it likely uses many more packages
 - **File**: `.claude/commands/supekku.backfill.md`
 - **Implementation Details**:
   1. Update section 4.B "Examine Related Code" to emphasize collaboration:
-     ```markdown
+
+     ````markdown
      #### B. Identify External Collaborators
 
      Focus on what this package DEPENDS ON (external collaborators), not its internal structure:
@@ -679,6 +718,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
      # For each import like "supekku.scripts.lib.formatters":
      uv run spec-driver list specs --package formatters
      ```
+     ````
 
      Look for usage of:
      - Registries (SpecRegistry, ChangeRegistry, DecisionRegistry, etc.)
@@ -690,28 +730,38 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
      **Key distinction**:
      - ✓ External: Uses SpecRegistry from `supekku.scripts.lib.specs.registry`
      - ✗ Internal: Has classes `FooCommand`, `BarCommand` (that's internal structure)
+
      ```
+
+     ```
+
   2. Add to "Complete Sections Intelligently":
-     ```markdown
+
+     ````markdown
      When filling the `spec.relationships` block:
+
      - `interactions`: External specs this package depends on or collaborates with
      - Use `type: uses` for dependencies
      - Use `type: extends` for inheritance/augmentation
      - Include description of what functionality is used
 
      Example:
+
      ```yaml
      interactions:
-       - spec: SPEC-XXX  # Registry module
+       - spec: SPEC-XXX # Registry module
          type: uses
          description: Uses SpecRegistry to load and filter specifications
-       - spec: SPEC-YYY  # Formatter module
+       - spec: SPEC-YYY # Formatter module
          type: uses
          description: Uses spec formatters for table/JSON/TSV output
      ```
+     ````
+
   3. Add to quality checklist:
      - [ ] Collaboration analysis: checked imports to identify dependencies
      - [ ] YAML relationships block: includes key external collaborators
+
 - **Rationale**:
   - Agents naturally focus on internal structure (classes/methods)
   - Need explicit prompting to think about external dependencies
@@ -729,6 +779,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Quality checklist includes collaboration verification
 
 **1.5.8 Mandate reading all public contracts**
+
 - **Design**: Require agents to read ALL `*-public.md` contract files systematically
 - **Problem**: SPEC-110 rewrite "reads like a spec for a completely different codebase" - agent cherry-picked contracts, missed scope
 - **File**: `.claude/commands/supekku.backfill.md`
@@ -770,6 +821,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
   - Warnings about consequences of selective reading
 
 **1.6 Integration testing & dogfooding**
+
 - **Purpose**: Validate entire workflow with real data
 - **Approach**:
   1. **Setup Test Fixtures**:
@@ -818,11 +870,11 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Stub detection false positives | Exact string matching; comprehensive test suite | Not started |
-| Template rendering varies by environment | Pin Jinja2 version; test on multiple systems | Not started |
-| Performance issues with large specs | Optimize string comparison; benchmark | Not started |
+| Risk                                     | Mitigation                                      | Status      |
+| ---------------------------------------- | ----------------------------------------------- | ----------- |
+| Stub detection false positives           | Exact string matching; comprehensive test suite | Not started |
+| Template rendering varies by environment | Pin Jinja2 version; test on multiple systems    | Not started |
+| Performance issues with large specs      | Optimize string comparison; benchmark           | Not started |
 
 ## 9. Decisions & Outcomes
 
@@ -835,6 +887,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 ## 10. Findings / Research Notes
 
 **Confirmed Infrastructure**:
+
 - Template: `supekku/templates/spec.md` (unified for both product and tech via `{% if kind == 'prod' %}`)
   - Variables: `spec_id`, `name`, `kind`, plus YAML block variables
   - No separate product template needed
@@ -858,12 +911,14 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 ### What's Complete
 
 **Core Infrastructure (Tasks 1.1-1.5)**:
+
 - ✅ CLI `show template` command working (8 tests)
 - ✅ Stub detection logic (status-based + line count fallback, 7 tests)
 - ✅ CLI `backfill spec` command (2 tests, fixes applied)
 - ✅ Agent command documented (`.claude/commands/supekku.backfill.md`)
 
 **Auto-Generated Spec Improvements (Tasks 1.5.1-1.5.3)**:
+
 - ✅ Sync creates specs with `status: 'stub'` (`sync_specs.py:114`)
 - ✅ Orphan messages improved ("source deleted" → generic, works for dirs/files)
 - ✅ `--prune` safety: stubs OK, non-stubs require `--force`
@@ -875,6 +930,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 ### Phase 01 Complete
 
 **All core functionality delivered**:
+
 - ✅ CLI backfill command working
 - ✅ Agent workflow tested and validated (SPEC-125)
 - ✅ Status progression working (stub → draft)
@@ -883,6 +939,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 - ✅ All quality checks passing
 
 **Task 1.5.4 Complete**:
+
 - ✅ Added `kind` and `path` fields to spec JSON formatter
 - ✅ Added `path` field to change JSON formatter
 - ✅ Added `path` field to decision JSON formatter
@@ -890,6 +947,7 @@ Implement simplified single-spec backfill: CLI replaces stub body with template 
 - ✅ Both linters clean (ruff: pass, pylint: 9.89/10)
 
 **Phase 02 (Batch Mode)** - Deferred:
+
 - Batch processing (PROD-007.FR-003, FR-004)
 - Progress reporting
 - Error isolation
@@ -913,11 +971,13 @@ supekku/scripts/lib/sync/adapters/base.py # Generic orphan messages
 **None** - Phase 01 complete and functional
 
 **Enhancement Opportunities**:
+
 - ISSUE-010: Add path field to requirements JSON output
 - ISSUE-011: Add path field to backlog items JSON output
 - Task 1.5.4: Add path/kind to formatters for consistency (optional)
 
 **ISSUE-009**: Status fields lack enum validation
+
 - Status values are free-form strings (no validation)
 - Theme.py serves as de facto documentation (backwards)
 - Needs systematic review across all entity types
@@ -950,18 +1010,21 @@ uv run ruff check supekku/cli/backfill.py supekku/cli/sync.py supekku/scripts/sy
 ### Deliverables Complete
 
 **Core Infrastructure**:
+
 - ✅ CLI `backfill spec` command (2 tests, all linters passing)
 - ✅ Stub detection with dual strategy (status + line count)
 - ✅ Template rendering system
 - ✅ Agent workflow documentation
 
 **Quality Improvements from Testing**:
+
 - ✅ Schema help commands documented (Tasks 1.5.5)
 - ✅ Status validation automated with jq (Task 1.5.6)
 - ✅ Collaboration analysis guidance (Task 1.5.7)
 - ✅ Import-based dependency discovery
 
 **Integration Testing Success**:
+
 - ✅ SPEC-125 completed successfully with agent workflow
 - ✅ Agent researched collaborators systematically
 - ✅ Agent used schema documentation
@@ -971,6 +1034,7 @@ uv run ruff check supekku/cli/backfill.py supekku/cli/sync.py supekku/scripts/sy
 - ✅ CONTRACT_REVIEW.md validated mandatory contract reading (17k tokens, 8 critical findings)
 
 **Metrics**:
+
 - 17 unit tests passing
 - Both linters clean (ruff + pylint)
 - 1 successful end-to-end backfill (SPEC-125)
@@ -979,6 +1043,7 @@ uv run ruff check supekku/cli/backfill.py supekku/cli/sync.py supekku/scripts/sy
 ### Phase 01 Objectives Met
 
 All entrance and exit criteria satisfied:
+
 1. ✅ Stub detection working reliably
 2. ✅ CLI command functional and tested
 3. ✅ Agent workflow documented and proven

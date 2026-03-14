@@ -4,14 +4,15 @@ name: Project Posture
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: "2026-03-03"
+verified: "2026-03-03"
 confidence: high
 tags:
-- spec-driver
-- posture
-- ceremony
-summary: The framework is permissive; the project chooses its constraints. Posture
+  - spec-driver
+  - posture
+  - ceremony
+summary:
+  The framework is permissive; the project chooses its constraints. Posture
   is configured via workflow.toml. Ceremony mode is advisory; runtime enforcement
   comes from explicit command gates and validations.
 priority:
@@ -19,25 +20,25 @@ priority:
   weight: 9
 scope:
   commands:
-  - uv run spec-driver sync
-  - uv run spec-driver validate
+    - uv run spec-driver sync
+    - uv run spec-driver validate
   paths:
-  - .spec-driver/workflow.toml
-  - supekku/scripts/lib/core/config.py
+    - .spec-driver/workflow.toml
+    - supekku/scripts/lib/core/config.py
 provenance:
   sources:
-  - kind: code
-    note: Workflow configuration loading only
-    ref: supekku/scripts/lib/core/config.py
-  - kind: code
-    note: Completion and coverage enforcement path
-    ref: supekku/scripts/complete_delta.py
-  - kind: code
-    note: Coverage gate implementation
-    ref: supekku/scripts/lib/changes/coverage_check.py
-  - kind: doc
-    note: Canonical posture wording for this delta
-    ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
+    - kind: code
+      note: Workflow configuration loading only
+      ref: supekku/scripts/lib/core/config.py
+    - kind: code
+      note: Completion and coverage enforcement path
+      ref: supekku/scripts/complete_delta.py
+    - kind: code
+      note: Coverage gate implementation
+      ref: supekku/scripts/lib/changes/coverage_check.py
+    - kind: doc
+      note: Canonical posture wording for this delta
+      ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
 ---
 
 # Project Posture
@@ -92,6 +93,7 @@ rather than aspiration.
 ## Kanban Cards
 
 Cards (`T123-*.md`) are an escape hatch. Depending on posture, they may be:
+
 - The primary work-tracking mechanism (pioneer)
 - A lightweight complement to deltas (settler)
 - A deprecated legacy artifact being phased out

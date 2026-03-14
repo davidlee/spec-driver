@@ -2,8 +2,8 @@
 id: IP-010.PHASE-03
 slug: 010-policy-and-standard-management-phase-03
 name: IP-010 Phase 03
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: completed
 kind: phase
 ---
@@ -171,9 +171,11 @@ tasks:
 # Phase 03 - CLI Integration
 
 ## 1. Objective
+
 Add create/list/show commands for policies and standards to the spec-driver CLI. Follow the skinny CLI pattern: parse args → load registry → filter → format → output. Keep all business logic in domain packages and display logic in formatters.
 
 ## 2. Links & References
+
 - **Delta**: [DE-010](../DE-010.md)
 - **Implementation Plan**: [IP-010](../IP-010.md)
 - **Specs / PRODs**:
@@ -186,12 +188,14 @@ Add create/list/show commands for policies and standards to the spec-driver CLI.
   - AGENTS.md - Skinny CLI pattern (lines 36-54)
 
 ## 3. Entrance Criteria
+
 - [x] Phase 02 complete - formatters working (29/29 tests passing)
 - [x] CLI architecture patterns understood (list.py, show.py, create.py reviewed)
 - [x] PolicyRegistry and StandardRegistry with collect/filter methods available
-- [x] Formatters exported and tested (format_policy_*, format_standard_*)
+- [x] Formatters exported and tested (format*policy*_, format*standard*_)
 
 ## 4. Exit Criteria / Done When
+
 - [x] CLI commands implemented for policies and standards
 - [x] All commands follow skinny CLI pattern (delegate to registries/formatters)
 - [x] Integration tests passing (10 new tests, 84/84 CLI tests passing)
@@ -199,6 +203,7 @@ Add create/list/show commands for policies and standards to the spec-driver CLI.
 - [x] All linters passing (ruff clean, pylint 9.68/10)
 
 ## 5. Verification
+
 - **Integration Tests**: CLI command tests in `supekku/cli/test_cli.py`
   - `test_list_policies_*` - List with various filters
   - `test_show_policy_*` - Show policy details
@@ -211,6 +216,7 @@ Add create/list/show commands for policies and standards to the spec-driver CLI.
 - **Evidence**: Manual smoke tests + integration tests passing
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumptions**:
   - list.py/show.py/create.py patterns are stable
   - Filter flags consistent across artifact types (--status, --filter, --format)
@@ -220,20 +226,22 @@ Add create/list/show commands for policies and standards to the spec-driver CLI.
   - Registry API doesn't support needed filtering
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 3.1 | Add policy list command to list.py | [ ] | 113 lines added to list.py |
-| [x] | 3.2 | Add standard list command to list.py | [x] | Parallel with 3.1 |
-| [x] | 3.3 | Add policy show command to show.py | [ ] | 28 lines added to show.py |
-| [x] | 3.4 | Add standard show command to show.py | [x] | Parallel with 3.3 |
-| [x] | 3.5 | Add policy create command to create.py | [ ] | 51 lines added to create.py |
-| [x] | 3.6 | Add standard create command to create.py | [x] | Parallel with 3.5 |
-| [x] | 3.7 | Write CLI integration tests | [ ] | 10 new tests (TestPolicyCommands, TestStandardCommands) |
-| [x] | 3.8 | Lint and test all code | [ ] | Ruff clean, pylint 9.68/10, 84/84 CLI tests passing |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                              | Parallel? | Notes                                                   |
+| ------ | --- | ---------------------------------------- | --------- | ------------------------------------------------------- |
+| [x]    | 3.1 | Add policy list command to list.py       | [ ]       | 113 lines added to list.py                              |
+| [x]    | 3.2 | Add standard list command to list.py     | [x]       | Parallel with 3.1                                       |
+| [x]    | 3.3 | Add policy show command to show.py       | [ ]       | 28 lines added to show.py                               |
+| [x]    | 3.4 | Add standard show command to show.py     | [x]       | Parallel with 3.3                                       |
+| [x]    | 3.5 | Add policy create command to create.py   | [ ]       | 51 lines added to create.py                             |
+| [x]    | 3.6 | Add standard create command to create.py | [x]       | Parallel with 3.5                                       |
+| [x]    | 3.7 | Write CLI integration tests              | [ ]       | 10 new tests (TestPolicyCommands, TestStandardCommands) |
+| [x]    | 3.8 | Lint and test all code                   | [ ]       | Ruff clean, pylint 9.68/10, 84/84 CLI tests passing     |
 
 ### Task Details
+
 - **3.1/3.2 Add list commands**
   - **Design / Approach**: Follow list_adrs pattern in list.py
   - **Files / Components**:
@@ -265,29 +273,33 @@ Add create/list/show commands for policies and standards to the spec-driver CLI.
   - **Quality**: Ruff passing, Pylint threshold maintained
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| CLI flags inconsistent across artifact types | Review existing patterns; maintain consistency | Open |
-| Filter logic duplicated across commands | Defer abstraction until 3rd use (architectural principle) | Accepted |
-| create.py file too large | Keep commands thin; delegate to creation functions | Open |
+
+| Risk                                         | Mitigation                                                | Status   |
+| -------------------------------------------- | --------------------------------------------------------- | -------- |
+| CLI flags inconsistent across artifact types | Review existing patterns; maintain consistency            | Open     |
+| Filter logic duplicated across commands      | Defer abstraction until 3rd use (architectural principle) | Accepted |
+| create.py file too large                     | Keep commands thin; delegate to creation functions        | Open     |
 
 ## 9. Decisions & Outcomes
-*(To be filled during implementation)*
+
+_(To be filled during implementation)_
 
 ## 10. Findings / Research Notes
 
 ### Preflight Check (2025-11-03)
 
 **Entrance Criteria Status**: ✅ ALL SATISFIED
+
 - ✅ Phase 02 complete - 29/29 formatter tests passing
 - ✅ CLI patterns understood - list.py, show.py, create.py reviewed
 - ✅ Registries available - PolicyRegistry/StandardRegistry with collect() methods
-- ✅ Formatters exported - format_policy_*, format_standard_* in formatters/__init__.py
+- ✅ Formatters exported - format*policy*_, format*standard*_ in formatters/**init**.py
 
 **System Health**:
+
 - ✅ Ruff: All checks passed
 - ✅ Pylint: 9.68/10
-- ⚠️  Tests: 1275/1276 passing (1 failure in DE-005 unrelated to DE-010)
+- ⚠️ Tests: 1275/1276 passing (1 failure in DE-005 unrelated to DE-010)
   - Failed test: `test_show_delta_text_includes_task_completion` (existing issue)
   - All Phase 01/02 tests passing
 
@@ -296,6 +308,7 @@ Add create/list/show commands for policies and standards to the spec-driver CLI.
 ## 10. Findings / Research Notes (Continued)
 
 ### CLI Command Pattern (from list.py)
+
 ```python
 @app.command("artifacts")
 def list_artifacts(
@@ -324,12 +337,14 @@ def list_artifacts(
 ```
 
 ### Common Imports Needed
+
 - `PolicyRegistry`, `StandardRegistry` from domain packages
 - `format_policy_list_table`, `format_policy_details` from formatters
 - `create_policy`, `create_standard` from creation modules
 - Common CLI utilities from `supekku.cli.common`
 
 ## 11. Wrap-up Checklist
+
 - [ ] Exit criteria satisfied
 - [ ] Verification evidence stored
 - [ ] IP-010 updated with progress
@@ -340,12 +355,14 @@ def list_artifacts(
 **Phase 03 Complete** ✅ (2025-11-03)
 
 **Delivered**:
+
 - ✅ 6 new CLI commands (list/show/create for policies and standards)
 - ✅ 10 new integration tests (all passing)
 - ✅ Clean code quality (Ruff passing, Pylint 9.68/10)
 - ✅ Consistent UX with existing commands (ADRs, specs)
 
 **Code Changes**:
+
 - `supekku/cli/list.py`: +233 lines (policies and standards list commands)
 - `supekku/cli/show.py`: +59 lines (policy and standard show commands)
 - `supekku/cli/create.py`: +108 lines (policy and standard create commands)
@@ -353,6 +370,7 @@ def list_artifacts(
 - Total: ~486 lines new CLI code
 
 **CLI Commands Available**:
+
 ```bash
 # List commands
 uv run spec-driver list policies [--status draft|required|deprecated] [--tag TAG] [--spec SPEC] [--json]
@@ -368,17 +386,20 @@ uv run spec-driver create standard "Title" [--status draft|required|default] [--
 ```
 
 **Test Results**:
+
 - CLI test suite: 84/84 passing (10 new policy/standard tests)
 - Ruff: All checks passed
 - Pylint: 9.68/10 (maintained threshold)
 
 **Architectural Compliance**:
+
 - ✅ Skinny CLI pattern followed (delegate to registries + formatters)
 - ✅ All commands <150 lines individual functions
 - ✅ Consistent help text and flags with ADR commands
 - ✅ No business logic in CLI layer
 
 **Ready for Phase 04** - Cross-References & Backlinks
+
 - Need: Bidirectional policy ↔ standard references
 - Need: Policy/standard references in ADRs
 - Need: Backlink maintenance in registries

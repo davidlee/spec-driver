@@ -14,7 +14,7 @@ Test PythonAdapter functionality.
 
 - `setUp(self) -> None`: Set up test fixtures.
 - `test_describe_python_module(self) -> None`: Test describe method generates correct metadata for Python modules.
-- `test_describe_python_package_init(self) -> None`: Test describe method handles __init__.py files correctly.
+- `test_describe_python_package_init(self) -> None`: Test describe method handles **init**.py files correctly.
 - `test_describe_rejects_non_python_unit(self) -> None`: Test describe method rejects non-Python source units.
 - @patch(pathlib.Path.exists) @patch(supekku.scripts.lib.sync.adapters.python.find_all_leaf_packages) `test_discover_targets_auto_discovery(self, mock_find_packages, mock_exists) -> None`: Test discover_targets auto-discovers Python packages.
 - @patch(pathlib.Path.exists) `test_discover_targets_requested_modules(self, mock_exists) -> None`: Test discover_targets processes requested modules.
@@ -24,9 +24,9 @@ Test PythonAdapter functionality.
 - @patch(pathlib.Path.exists) `test_generate_missing_file(self, mock_exists) -> None`: Test generate method handles missing files gracefully.
 - `test_generate_rejects_non_python_unit(self) -> None`: Test generate method rejects non-Python source units.
 - `test_language_identifier(self) -> None`: Test that PythonAdapter has correct language identifier.
-- `test_should_not_skip_regular_files(self) -> None`: Test _should_skip_file allows regular Python files.
-- `test_should_skip_file_patterns(self) -> None`: Test _should_skip_file identifies files to skip.
-- `test_should_skip_init_files(self) -> None`: Test __init__.py files are skipped.
+- `test_should_not_skip_regular_files(self) -> None`: Test \_should_skip_file allows regular Python files.
+- `test_should_skip_file_patterns(self) -> None`: Test \_should_skip_file identifies files to skip.
+- `test_should_skip_init_files(self) -> None`: Test **init**.py files are skipped.
 - `test_supports_identifier_invalid_identifiers(self) -> None`: Test supports_identifier returns False for non-Python identifiers.
 - `test_supports_identifier_valid_python_modules(self) -> None`: Test supports_identifier returns True for valid Python identifiers.
 - `test_sync_package_level_integration(self) -> None`: VT-003: Integration test for sync with package-level specs.

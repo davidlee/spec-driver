@@ -16,13 +16,15 @@ Main CLI entry point for spec-driver unified interface.
 Silently skips if not in a repo — commands like --help and install
 must work without a workspace.
 
-Returns the loaded config dict, or ``None`` if not in a workspace.
+Returns the loaded config dict, or `None` if not in a workspace.
+
 - `_tracking_invoke(self, ctx)` - type: ignore[no-untyped-def]
 - `_warn_if_version_stale(config) -> None`: Emit a stderr warning when the installed version has drifted.
 
-Compares ``spec_driver_installed_version`` in *config* (from
-``workflow.toml``) against the running package version.  Skipped
-when the active command is ``install`` (which will stamp the version
+Compares `spec_driver_installed_version` in _config_ (from
+`workflow.toml`) against the running package version. Skipped
+when the active command is `install` (which will stamp the version
 itself).
+
 - `main() -> None`: Spec-driver CLI main entry point.
 - @app.command(tui, help=Launch the TUI artifact browser) `tui_command() -> None`: Launch the interactive TUI artifact browser.

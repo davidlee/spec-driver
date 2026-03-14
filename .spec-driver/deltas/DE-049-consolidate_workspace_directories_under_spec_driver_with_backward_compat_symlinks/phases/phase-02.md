@@ -2,8 +2,8 @@
 id: IP-049.PHASE-02
 slug: 049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks-phase-02
 name: IP-049 Phase 02 — Flatten path model and update config defaults
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: complete
 kind: phase
 ---
@@ -76,14 +76,17 @@ This phase changes only `paths.py`, `config.py`, and their tests. Callers that
 import removed symbols will break — that's Phase 3.
 
 ## 2. Links & References
+
 - **Delta**: DE-049
 - **DR-049**: §4 (path model before/after), §7 DEC-049-01 (flatten), DEC-049-02 (leaf resolution), DEC-049-06 (config keys)
 - **Predecessor**: Phase 1 (structural migration, commits 843f9b1..981abac)
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 committed (structural migration complete)
 
 ## 4. Exit Criteria / Done When
+
 - [x] `SPECS_DIR` and `CHANGES_DIR` constants removed from `paths.py`
 - [x] `get_specs_dir()` and `get_changes_dir()` removed from `paths.py`
 - [x] All leaf helpers resolve as `get_spec_driver_root() / SUBDIR`
@@ -97,26 +100,28 @@ import removed symbols will break — that's Phase 3.
 - [x] Paths/config tests pass (69/69)
 
 ## 5. Verification
+
 - `uv run pytest supekku/scripts/lib/core/paths_test.py -v`
 - `uv run pytest supekku/scripts/lib/core/config_test.py -v` (if changed)
 - `just lint`
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: Callers that import `SPECS_DIR`, `CHANGES_DIR`, `get_specs_dir`, `get_changes_dir` will break — fixed in Phase 3
 - **STOP**: If more than ~5 callers import the removed symbols, consider whether to deprecate-then-remove instead
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Flatten path constants | No | SPECS_DIR, CHANGES_DIR removed |
-| [x] | 2.2 | Rewrite helpers | No | All leaf helpers → get_spec_driver_root() |
-| [x] | 2.3 | Update config mapping + defaults | No | specs/changes keys removed |
-| [x] | 2.4 | Add unknown-key warning to init_paths | No | warnings.warn() for unrecognized keys |
-| [x] | 2.5 | Rewrite paths_test.py | No | 40 tests, all pass |
-| [x] | 2.6 | Update config_test.py | No | 2 tests updated |
-| [x] | 2.7 | Lint and test | No | ruff clean, pylint 9.72, 69 tests pass |
-| [x] | 2.8 | Fix production callers (pulled from P3) | No | registry.py + executor.py — import chain required |
+| Status | ID  | Description                             | Parallel? | Notes                                             |
+| ------ | --- | --------------------------------------- | --------- | ------------------------------------------------- |
+| [x]    | 2.1 | Flatten path constants                  | No        | SPECS_DIR, CHANGES_DIR removed                    |
+| [x]    | 2.2 | Rewrite helpers                         | No        | All leaf helpers → get_spec_driver_root()         |
+| [x]    | 2.3 | Update config mapping + defaults        | No        | specs/changes keys removed                        |
+| [x]    | 2.4 | Add unknown-key warning to init_paths   | No        | warnings.warn() for unrecognized keys             |
+| [x]    | 2.5 | Rewrite paths_test.py                   | No        | 40 tests, all pass                                |
+| [x]    | 2.6 | Update config_test.py                   | No        | 2 tests updated                                   |
+| [x]    | 2.7 | Lint and test                           | No        | ruff clean, pylint 9.72, 69 tests pass            |
+| [x]    | 2.8 | Fix production callers (pulled from P3) | No        | registry.py + executor.py — import chain required |
 
 ### Task Details
 
@@ -155,10 +160,10 @@ import removed symbols will break — that's Phase 3.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Callers break on removed symbols | Expected — Phase 3 scope | Accepted |
-| _ORIGINAL_DEFAULTS stale after constant removal | Computed at import time from new constants | Clear |
+| Risk                                             | Mitigation                                 | Status   |
+| ------------------------------------------------ | ------------------------------------------ | -------- |
+| Callers break on removed symbols                 | Expected — Phase 3 scope                   | Accepted |
+| \_ORIGINAL_DEFAULTS stale after constant removal | Computed at import time from new constants | Clear    |
 
 ## 9. Decisions & Outcomes
 
@@ -179,6 +184,7 @@ import removed symbols will break — that's Phase 3.
   (pylint W0613) — not introduced by this change, left as-is
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (69 tests pass, both linters clean)
 - [x] Notes updated (notes.md — Phase 2 section)

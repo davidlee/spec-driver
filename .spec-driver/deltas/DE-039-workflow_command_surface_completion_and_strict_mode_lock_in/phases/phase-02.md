@@ -2,8 +2,8 @@
 id: IP-039.PHASE-02
 slug: 039-workflow_command_surface_completion_and_strict_mode_lock_in-phase-02
 name: IP-039 Phase 02
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: completed
 kind: phase
 ---
@@ -68,10 +68,12 @@ phase: IP-039.PHASE-02
 # Phase 02 — Command Surface Completion
 
 ## 1. Objective
+
 Add first-class `create audit` and `complete revision` CLI commands so these
 lifecycle flows are discoverable and executable without ad-hoc file scaffolding.
 
 ## 2. Links & References
+
 - **Delta**: DE-039
 - **Design Revision**: DR-039 §4 (code impact table: `cli/create.py`, `cli/complete.py`)
 - **Specs / PRODs**:
@@ -84,37 +86,42 @@ lifecycle flows are discoverable and executable without ad-hoc file scaffolding.
   - Revision creation pattern: `supekku/scripts/lib/changes/creation.py:73-140`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete — commit `aee0446`
 - [x] Audit template exists at `supekku/templates/audit.md`
 - [x] ChangeRegistry already handles `kind="audit"` with `AUD-` prefix
 
 ## 4. Exit Criteria / Done When
+
 - [x] `create audit` command creates `AUD-NNN` directory under `change/audits/`
 - [x] `complete revision` command transitions revision status to `completed`
 - [x] Tests pass for both command flows
 - [x] `just lint` and `just pylint` clean on changed files
 
 ## 5. Verification
+
 - `uv run pytest -q` on new/updated test files
 - `uv run ruff check` on all changed files
 - `uv run pylint --indent-string "  "` on new modules
 - Evidence: VT-039-003 test output
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: no new lifecycle statuses needed; `completed` is the target status for both.
 - STOP when: audit verification block rendering requires substantial new infrastructure (escalate).
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Add `create_audit()` in `changes/creation.py` | [x] | Follows `create_revision()` pattern; renders `audit_verification_block=""` |
-| [x] | 2.2 | Add `create audit` CLI command in `cli/create.py` | [ ] | Thin: title + --spec/--prod/--code-scope → create_audit() |
-| [x] | 2.3 | Add `complete_revision()` domain function | [x] | In `completion.py`; extracted `_update_artifact_frontmatter_status()` helper |
-| [x] | 2.4 | Add `complete revision` CLI in `cli/complete.py` | [ ] | Thin: revision_id + --force → complete_revision_impl() |
-| [x] | 2.5 | Write tests for both flows | [ ] | 16 new tests: 4 audit creation, 7 complete_revision domain, 5 CLI |
-| [x] | 2.6 | Run verification, lint, update evidence | [ ] | 2226 pass, 0 fail; ruff clean; pylint 9.82/10 (no new warnings) |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                       | Parallel? | Notes                                                                        |
+| ------ | --- | ------------------------------------------------- | --------- | ---------------------------------------------------------------------------- |
+| [x]    | 2.1 | Add `create_audit()` in `changes/creation.py`     | [x]       | Follows `create_revision()` pattern; renders `audit_verification_block=""`   |
+| [x]    | 2.2 | Add `create audit` CLI command in `cli/create.py` | [ ]       | Thin: title + --spec/--prod/--code-scope → create_audit()                    |
+| [x]    | 2.3 | Add `complete_revision()` domain function         | [x]       | In `completion.py`; extracted `_update_artifact_frontmatter_status()` helper |
+| [x]    | 2.4 | Add `complete revision` CLI in `cli/complete.py`  | [ ]       | Thin: revision_id + --force → complete_revision_impl()                       |
+| [x]    | 2.5 | Write tests for both flows                        | [ ]       | 16 new tests: 4 audit creation, 7 complete_revision domain, 5 CLI            |
+| [x]    | 2.6 | Run verification, lint, update evidence           | [ ]       | 2226 pass, 0 fail; ruff clean; pylint 9.82/10 (no new warnings)              |
 
 ### Task Details
 
@@ -178,24 +185,28 @@ lifecycle flows are discoverable and executable without ad-hoc file scaffolding.
   - Update this phase sheet with evidence and task notes.
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Audit template placeholder needs block renderer | Render empty string — no infrastructure needed | Resolved |
+
+| Risk                                                 | Mitigation                                                                                                      | Status   |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------- |
+| Audit template placeholder needs block renderer      | Render empty string — no infrastructure needed                                                                  | Resolved |
 | Frontmatter update duplication across delta/revision | Extracted `_update_artifact_frontmatter_status()` in `completion.py` — reusable if third artifact type needs it | Resolved |
 
 ## 9. Decisions & Outcomes
+
 - `audit_verification_block` rendered as empty string — sufficient for now; can be enhanced later.
 - `complete_revision()` placed in `completion.py` alongside `create_completion_revision()`.
 - Extracted `_update_artifact_frontmatter_status()` as a reusable helper (updates both `status` and `updated` date). Could replace `update_delta_frontmatter()` in `complete_delta.py` in a future cleanup pass.
 - `complete_revision` is idempotent: already-completed revisions return success.
 
 ## 10. Findings / Research Notes
+
 - `create_revision()` at `creation.py:73-140` is the canonical pattern for `create_audit()`.
 - Audit statuses in template include `in-review` which is non-standard vs lifecycle.py — use `draft` as initial status regardless.
 - `complete_delta.py:update_delta_frontmatter()` is the pattern for frontmatter status transition.
 - `_update_artifact_frontmatter_status()` is strictly better: also updates the `updated:` field.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (2226 pass, ruff clean, pylint 9.82)
 - [x] Spec/Delta/Plan updated with lessons

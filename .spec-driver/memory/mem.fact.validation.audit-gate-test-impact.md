@@ -4,13 +4,14 @@ name: validator audit gate fires on requirement-bearing deltas
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 tags:
-- validation
-- audit
-- testing
-summary: WorkspaceValidator._validate_audit_gate_coverage warns when a delta has applies_to.requirements
+  - validation
+  - audit
+  - testing
+summary:
+  WorkspaceValidator._validate_audit_gate_coverage warns when a delta has applies_to.requirements
   but no completed conformance audit. Tests creating deltas with requirements must
   filter by level or message content, not assert exact issue counts.
 scope:
@@ -23,7 +24,7 @@ provenance:
   sources:
     - DE-079
     - 1d6f835
-verified: '2026-03-09'
+verified: "2026-03-09"
 ---
 
 # validator audit gate fires on requirement-bearing deltas

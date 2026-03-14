@@ -2,8 +2,8 @@
 id: SPEC-129
 slug: sync-installer-component
 name: sync installer-component
-created: '2025-11-08'
-updated: '2025-11-08'
+created: "2025-11-08"
+updated: "2025-11-08"
 status: draft
 kind: spec
 category: unit
@@ -55,12 +55,14 @@ entries:
 ```
 
 ## 1. Intent & Summary
+
 - **Scope / Boundaries**: <What systems/components are in or out.>
 - **Value Signals**: <Key outcomes, success metrics, or operational targets.>
 - **Guiding Principles**: <Heuristics, applicable wisdom, what to optimise for.>
 - **Change History**: <Latest delta/audit/revision influencing this spec.>
 
 ## 2. Stakeholders & Journeys
+
 - **Systems / Integrations**: <External systems, contracts, constraints.>
 - **Primary Journeys / Flows**: Given–When–Then narratives or sequence steps.
 - **Edge Cases & Non-goals**: <Scenarios we deliberately exclude; failure/guard rails.>
@@ -84,29 +86,31 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
 -->
 
 - **FR-001**: Component MUST [specific technical capability]
-  *Example*: Parser MUST handle JSON documents up to 10MB without memory overflow
-  *Verification*: VT-001 - Large document parsing test
+  _Example_: Parser MUST handle JSON documents up to 10MB without memory overflow
+  _Verification_: VT-001 - Large document parsing test
 
 - **FR-002**: System MUST [integration or contract requirement]
-  *Example*: API client MUST retry failed requests with exponential backoff (max 3 attempts)
-  *Verification*: VT-002 - Retry behavior test
+  _Example_: API client MUST retry failed requests with exponential backoff (max 3 attempts)
+  _Verification_: VT-002 - Retry behavior test
 
 - **FR-003**: Component MUST [data handling or state management]
-  *Example*: Cache MUST invalidate entries after 5 minutes TTL
-  *Verification*: VT-003 - TTL expiration test
+  _Example_: Cache MUST invalidate entries after 5 minutes TTL
+  _Verification_: VT-003 - TTL expiration test
+
 ### Non-Functional Requirements
 
 - **NF-001**: [Performance constraint with specific metrics]
-  *Example*: API endpoint MUST handle 1000 req/sec with p95 latency < 100ms
-  *Measurement*: VA-001 - Load testing with sustained traffic
+  _Example_: API endpoint MUST handle 1000 req/sec with p95 latency < 100ms
+  _Measurement_: VA-001 - Load testing with sustained traffic
 
 - **NF-002**: [Scalability or resource requirement]
-  *Example*: Service MUST scale horizontally to 10 instances under load
-  *Measurement*: VA-002 - Horizontal scaling test with traffic ramp
+  _Example_: Service MUST scale horizontally to 10 instances under load
+  _Measurement_: VA-002 - Horizontal scaling test with traffic ramp
 
 - **NF-003**: [Reliability or fault tolerance]
-  *Example*: System MUST maintain 99.9% uptime over 30-day rolling window
-  *Measurement*: VA-003 - Uptime monitoring and SLO tracking
+  _Example_: System MUST maintain 99.9% uptime over 30-day rolling window
+  _Measurement_: VA-003 - Uptime monitoring and SLO tracking
+
 ### Operational Targets
 
 - **Performance**: [Specific latency/throughput targets]
@@ -114,15 +118,18 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
 - **Maintainability**: [Code quality or test coverage targets]
 
 ## 4. Solution Outline
+
 - **Architecture / Components**: tables or diagrams covering components, interfaces, data/state.
 - **Data & Contracts**: Key entities, schemas, API/interface snippets relevant to both audiences.
 
 ## 5. Behaviour & Scenarios
+
 - **Primary Flows**: Step lists linking actors/components/requirements.
 - **Error Handling / Guards**: Edge-case branching, fallback behaviour, recovery expectations.
 - **State Transitions**: Diagrams or tables if stateful.
 
 ## 6. Quality & Verification
+
 - **Testing Strategy**: Mapping of requirements/capabilities to test levels; reference testing companion if present.
 - **Observability & Analysis**: Metrics, telemetry, analytics dashboards, alerting.
 - **Security & Compliance**: Authn/z, data handling, privacy, regulatory notes.
@@ -130,10 +137,12 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
 - **Acceptance Gates**: Launch criteria tying back to FR/NF/metrics.
 
 ## 7. Backlog Hooks & Dependencies
+
 - **Related Specs / PROD**: How they collaborate or depend.
 - **Risks & Mitigations**: Risk ID – description – likelihood/impact – mitigation.
 - **Known Gaps / Debt**: Link backlog issues (`ISSUE-`, `PROB-`, `RISK-`) tracking outstanding work.
 - **Open Decisions / Questions**: Outstanding clarifications for agents or stakeholders.
 
 ## Appendices (Optional)
+
 - Glossary, detailed research, extended API examples, migration history, etc.

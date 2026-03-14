@@ -2,8 +2,8 @@
 id: IP-017.PHASE-01
 slug: add-category-support-to-requirements-phase-01
 name: IP-017 Phase 01
-created: '2025-11-04'
-updated: '2025-11-04'
+created: "2025-11-04"
+updated: "2025-11-04"
 status: draft
 kind: phase
 ---
@@ -36,23 +36,23 @@ verification:
     - Test output showing all parsing scenarios pass
     - Lint output showing zero warnings
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     description: Add category field to RequirementRecord dataclass
-  - id: '1.2'
+  - id: "1.2"
     description: Update to_dict and from_dict methods for category serialization
-  - id: '1.3'
+  - id: "1.3"
     description: Extend _REQUIREMENT_LINE regex to capture (category) group
-  - id: '1.4'
+  - id: "1.4"
     description: Update _records_from_content to extract category from inline and frontmatter
-  - id: '1.5'
+  - id: "1.5"
     description: Update RequirementRecord.merge to handle category with body precedence
-  - id: '1.6'
+  - id: "1.6"
     description: Add category field to SPEC_FRONTMATTER_METADATA and PROD_FRONTMATTER_METADATA
-  - id: '1.7'
+  - id: "1.7"
     description: Write VT-017-001 unit tests for category parsing
-  - id: '1.8'
+  - id: "1.8"
     description: Write VT-017-002 unit tests for merge precedence
-  - id: '1.9'
+  - id: "1.9"
     description: Run linters and fix any issues
 risks:
   - risk: Regex complexity introduces parsing bugs
@@ -72,8 +72,8 @@ Extend the requirements subsystem data model and parser to support optional cate
 - **Implementation Plan**: [IP-017](../IP-017.md)
 - **Code Hotspots**:
   - `supekku/scripts/lib/requirements/registry.py:56-124` - RequirementRecord
-  - `supekku/scripts/lib/requirements/registry.py:50-54` - _REQUIREMENT_LINE regex
-  - `supekku/scripts/lib/requirements/registry.py:961-1015` - _records_from_content
+  - `supekku/scripts/lib/requirements/registry.py:50-54` - \_REQUIREMENT_LINE regex
+  - `supekku/scripts/lib/requirements/registry.py:961-1015` - \_records_from_content
   - `supekku/scripts/lib/core/frontmatter_metadata/spec.py` - SPEC_FRONTMATTER_METADATA
   - `supekku/scripts/lib/core/frontmatter_metadata/prod.py` - PROD_FRONTMATTER_METADATA
 
@@ -100,6 +100,7 @@ Extend the requirements subsystem data model and parser to support optional cate
 ## 5. Verification
 
 **Tests to run**:
+
 ```bash
 # Unit tests for requirements registry
 just test supekku/scripts/lib/requirements/registry_test.py
@@ -113,6 +114,7 @@ just pylint supekku/scripts/lib/requirements/registry.py
 ```
 
 **Test Coverage** (VT-017-001):
+
 - Parse `**FR-001**(auth): desc` → category="auth"
 - Parse frontmatter `category: security` → category="security"
 - Missing category → category=None
@@ -121,62 +123,70 @@ just pylint supekku/scripts/lib/requirements/registry.py
 - Nested parens: `(auth(v2))` → graceful handling
 
 **Merge Precedence** (VT-017-002):
+
 - Body category + frontmatter category → body wins
 - Body category only → use body
 - Frontmatter category only → use frontmatter
 - Neither → category=None
 
 **Evidence to capture**:
+
 - Test output (pytest summary)
 - Lint output (zero warnings)
 
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - Existing test infrastructure is adequate
 - Regex can capture category without breaking existing parsing
 - Category field defaults to None for backward compatibility
 
 **STOP when**:
+
 - Regex breaks existing requirement parsing (run full test suite to check)
 - Merge logic conflicts with existing lifecycle fields
 - Unable to achieve zero lint warnings
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add category field to RequirementRecord | [ ] | Added category: str \| None = None field |
-| [x] | 1.2 | Update serialization methods | [ ] | Updated to_dict/from_dict with category field |
-| [x] | 1.3 | Extend _REQUIREMENT_LINE regex | [ ] | Added (?:\(([^)]+)\))? capture group |
-| [x] | 1.4 | Update _records_from_content parser | [ ] | Extracts from inline + frontmatter, body precedence |
-| [x] | 1.5 | Update RequirementRecord.merge | [ ] | category=other.category or self.category |
-| [x] | 1.6 | Update frontmatter schema metadata | [ ] | Added to SPEC/PROD_FRONTMATTER_METADATA |
-| [x] | 1.7 | Write VT-017-001 parsing tests | [ ] | 4 tests: inline, frontmatter, merge, serialization |
-| [x] | 1.8 | Write VT-017-002 merge tests | [ ] | Included in test suite (1352 tests passing) |
-| [x] | 1.9 | Run linters and fix issues | [ ] | All linters passing (ruff + pylint) |
+| Status | ID  | Description                             | Parallel? | Notes                                               |
+| ------ | --- | --------------------------------------- | --------- | --------------------------------------------------- |
+| [x]    | 1.1 | Add category field to RequirementRecord | [ ]       | Added category: str \| None = None field            |
+| [x]    | 1.2 | Update serialization methods            | [ ]       | Updated to_dict/from_dict with category field       |
+| [x]    | 1.3 | Extend \_REQUIREMENT_LINE regex         | [ ]       | Added (?:\(([^)]+)\))? capture group                |
+| [x]    | 1.4 | Update \_records_from_content parser    | [ ]       | Extracts from inline + frontmatter, body precedence |
+| [x]    | 1.5 | Update RequirementRecord.merge          | [ ]       | category=other.category or self.category            |
+| [x]    | 1.6 | Update frontmatter schema metadata      | [ ]       | Added to SPEC/PROD_FRONTMATTER_METADATA             |
+| [x]    | 1.7 | Write VT-017-001 parsing tests          | [ ]       | 4 tests: inline, frontmatter, merge, serialization  |
+| [x]    | 1.8 | Write VT-017-002 merge tests            | [ ]       | Included in test suite (1352 tests passing)         |
+| [x]    | 1.9 | Run linters and fix issues              | [ ]       | All linters passing (ruff + pylint)                 |
 
 ### Task Details
 
 **1.1 Add category field to RequirementRecord**
+
 - **Design / Approach**: Add `category: str | None = None` to dataclass
 - **Files / Components**: `supekku/scripts/lib/requirements/registry.py:56-124`
 - **Testing**: Field exists, defaults to None
 - **Observations & AI Notes**: Added at line 67, positioned after kind field for logical grouping
 
 **1.2 Update serialization methods**
+
 - **Design / Approach**: Add "category" to to_dict return dict; parse from data.get("category") in from_dict
 - **Files / Components**: `RequirementRecord.to_dict()`, `RequirementRecord.from_dict()`
 - **Testing**: Round-trip serialization preserves category
 - **Observations & AI Notes**: Positioned after kind field. from_dict uses data.get("category") directly (returns None if missing)
 
-**1.3 Extend _REQUIREMENT_LINE regex**
+**1.3 Extend \_REQUIREMENT_LINE regex**
+
 - **Design / Approach**: Insert `(?:\(([^)]+)\))?` after requirement ID to capture optional category in parens
 - **Files / Components**: `_REQUIREMENT_LINE` at registry.py:50-54
 - **Testing**: Regex matches with/without category, existing requirements still parse
 - **Observations & AI Notes**: Regex now has 4 groups: (1) prefix, (2) number, (3) category, (4) title. All existing tests pass.
 
-**1.4 Update _records_from_content parser**
+**1.4 Update \_records_from_content parser**
+
 - **Design / Approach**:
   - Extract category from regex match group (strip whitespace)
   - Check frontmatter for `category` key
@@ -186,12 +196,14 @@ just pylint supekku/scripts/lib/requirements/registry.py
 - **Observations & AI Notes**: Implemented at lines 1001-1006. Extracts category from match group 3, strips whitespace, applies inline > frontmatter precedence.
 
 **1.5 Update RequirementRecord.merge**
+
 - **Design / Approach**: Add `category=other.category or self.category` to merge return
 - **Files / Components**: `RequirementRecord.merge()` at registry.py:73-90
 - **Testing**: Merge precedence tests in VT-017-002
 - **Observations & AI Notes**: Follow existing pattern for title/kind/path
 
 **1.6 Update frontmatter schema metadata**
+
 - **Design / Approach**: Add optional category field to SPEC_FRONTMATTER_METADATA and PROD_FRONTMATTER_METADATA for documentation
 - **Files / Components**:
   - `supekku/scripts/lib/core/frontmatter_metadata/spec.py`
@@ -200,18 +212,21 @@ just pylint supekku/scripts/lib/requirements/registry.py
 - **Observations & AI Notes**: Schema metadata is for documentation only, not validation
 
 **1.7 Write VT-017-001 parsing tests**
+
 - **Design / Approach**: Test cases for all parsing scenarios (see section 5)
 - **Files / Components**: New tests in `supekku/scripts/lib/requirements/registry_test.py`
 - **Testing**: pytest
 - **Observations & AI Notes**: Added 4 comprehensive tests (lines 680-858): test_category_parsing_inline_syntax, test_category_parsing_frontmatter, test_category_merge_precedence, test_category_serialization_round_trip. All edge cases covered (delimiters, whitespace, precedence).
 
 **1.8 Write VT-017-002 merge tests**
+
 - **Design / Approach**: Test merge precedence scenarios
 - **Files / Components**: New tests in `registry_test.py`
 - **Testing**: pytest
 - **Observations & AI Notes**: Implemented alongside VT-017-001 (test_category_merge_precedence + test_category_serialization_round_trip). Tests cover all merge scenarios: body wins, fallback to existing, both None.
 
 **1.9 Run linters and fix issues**
+
 - **Design / Approach**: `just lint`, `just pylint`, fix warnings
 - **Files / Components**: All modified files
 - **Testing**: Linters pass with zero warnings
@@ -219,11 +234,11 @@ just pylint supekku/scripts/lib/requirements/registry.py
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Regex complexity breaks existing parsing | Run full test suite after regex change | ✓ Mitigated - 1352 tests passing |
-| Edge cases not covered | Comprehensive test scenarios (special chars, whitespace, nested parens) | ✓ Mitigated - Tested /, ., whitespace |
-| Lint issues block progress | Lint as you go after each task | ✓ Mitigated - All linters passing |
+| Risk                                     | Mitigation                                                              | Status                                |
+| ---------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------- |
+| Regex complexity breaks existing parsing | Run full test suite after regex change                                  | ✓ Mitigated - 1352 tests passing      |
+| Edge cases not covered                   | Comprehensive test scenarios (special chars, whitespace, nested parens) | ✓ Mitigated - Tested /, ., whitespace |
+| Lint issues block progress               | Lint as you go after each task                                          | ✓ Mitigated - All linters passing     |
 
 ## 9. Decisions & Outcomes
 
@@ -233,6 +248,7 @@ just pylint supekku/scripts/lib/requirements/registry.py
 ## 10. Findings / Research Notes
 
 **Existing Precedence Pattern** (from `RequirementRecord.merge`):
+
 ```python
 return RequirementRecord(
   title=other.title,           # new record (body) wins
@@ -240,9 +256,11 @@ return RequirementRecord(
   path=other.path or self.path,  # new record preferred
 )
 ```
+
 Category follows same pattern: `category=other.category or self.category`
 
 **Implementation Notes**:
+
 - Regex change was backward compatible - all existing 1348 tests passed immediately
 - Category field positioned after kind for logical grouping (both are descriptive metadata)
 - Frontmatter schema update is documentation-only (no validation enforcement)

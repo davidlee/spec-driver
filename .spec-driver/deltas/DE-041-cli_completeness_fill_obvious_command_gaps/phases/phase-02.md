@@ -2,8 +2,8 @@
 id: IP-041.PHASE-02
 slug: 041-cli_completeness_fill_obvious_command_gaps-phase-02
 name: "IP-041 Phase 02 — Domain additions + new commands"
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: complete
 kind: phase
 ---
@@ -115,17 +115,20 @@ This requires domain support first (resolvers, finders, formatters, create_plan)
 then wiring the thin CLI commands on top.
 
 ## 2. Links & References
+
 - **Delta**: [DE-041](../DE-041.md)
 - **Design Revision**: [DR-041](../DR-041.md) §4.2–4.10
 - **Specs**: PROD-010 (CLI UX), PROD-013 (CLI Artifact File Access)
 - **Phase 1 helpers**: `supekku/cli/common.py` (resolve_artifact, emit_artifact, find_artifacts)
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete (shared helpers tested, revision migration done)
 - [x] Existing test suite passing (`just check`)
 - [x] DR-041 §4.2–4.10 reviewed
 
 ## 4. Exit Criteria / Done When
+
 - [x] Plan resolver + finder in dispatch tables
 - [x] Backlog resolvers + finders in dispatch tables
 - [x] `find_backlog_items_by_id()` tested
@@ -137,6 +140,7 @@ then wiring the thin CLI commands on top.
 - [x] `just check` green
 
 ## 5. Verification
+
 ```bash
 # Unit tests for new domain functions
 uv run pytest supekku/scripts/lib/backlog/registry_test.py -k backlog_items_by_id -v
@@ -157,32 +161,34 @@ just check
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - BacklogItem model has enough data for show/view/edit (id, path, frontmatter)
-- Plan files (IP-*.md) have frontmatter parseable by standard YAML loader
+- Plan files (IP-\*.md) have frontmatter parseable by standard YAML loader
 - create_plan logic in creation.py:251-298 can be extracted without breaking create_delta
 
 **STOP when**:
+
 - BacklogItem model needs significant extension to support show --json
 - Plan frontmatter requires a new registry type (should be simpler than that)
 - create_plan extraction breaks existing create_delta tests
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | find_backlog_items_by_id() | [ ] | Domain function, foundation for backlog resolvers |
-| [x] | 2.2 | Plan resolver + finder in common.py | [P] | Can parallel with 2.1 |
-| [x] | 2.3 | Backlog resolvers + finders in common.py | [ ] | Depends on 2.1 |
-| [x] | 2.4 | Unit tests for new resolvers/finders | [ ] | After 2.1–2.3 |
-| [x] | 2.5 | format_audit_details() + format_plan_details() | [P] | Independent of 2.1–2.3 |
-| [x] | 2.6 | Unit tests for formatters | [ ] | After 2.5 |
-| [x] | 2.7 | Extract create_plan() + tests | [P] | Independent of 2.1–2.6 |
-| [x] | 2.8 | Wire new show subcommands | [ ] | After 2.4 + 2.6 |
-| [x] | 2.9 | Wire new view/edit subcommands | [P] | Can parallel with 2.8 |
-| [x] | 2.10 | Wire new find subcommands | [P] | Can parallel with 2.8 |
-| [x] | 2.11 | Wire create plan --delta | [ ] | After 2.7 |
-| [x] | 2.12 | Integration tests for new commands | [ ] | After 2.8–2.11 |
-| [x] | 2.13 | Final verification | [ ] | After 2.12 |
+| Status | ID   | Description                                    | Parallel? | Notes                                             |
+| ------ | ---- | ---------------------------------------------- | --------- | ------------------------------------------------- |
+| [x]    | 2.1  | find_backlog_items_by_id()                     | [ ]       | Domain function, foundation for backlog resolvers |
+| [x]    | 2.2  | Plan resolver + finder in common.py            | [P]       | Can parallel with 2.1                             |
+| [x]    | 2.3  | Backlog resolvers + finders in common.py       | [ ]       | Depends on 2.1                                    |
+| [x]    | 2.4  | Unit tests for new resolvers/finders           | [ ]       | After 2.1–2.3                                     |
+| [x]    | 2.5  | format_audit_details() + format_plan_details() | [P]       | Independent of 2.1–2.3                            |
+| [x]    | 2.6  | Unit tests for formatters                      | [ ]       | After 2.5                                         |
+| [x]    | 2.7  | Extract create_plan() + tests                  | [P]       | Independent of 2.1–2.6                            |
+| [x]    | 2.8  | Wire new show subcommands                      | [ ]       | After 2.4 + 2.6                                   |
+| [x]    | 2.9  | Wire new view/edit subcommands                 | [P]       | Can parallel with 2.8                             |
+| [x]    | 2.10 | Wire new find subcommands                      | [P]       | Can parallel with 2.8                             |
+| [x]    | 2.11 | Wire create plan --delta                       | [ ]       | After 2.7                                         |
+| [x]    | 2.12 | Integration tests for new commands             | [ ]       | After 2.8–2.11                                    |
+| [x]    | 2.13 | Final verification                             | [ ]       | After 2.12                                        |
 
 ### Task Details
 
@@ -243,19 +249,22 @@ just check
   - `just check` (tests + ruff + pylint). Fix any issues.
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| BacklogItem lacks to_dict for --json | Use simple dict from frontmatter attrs | Planned |
-| Plan frontmatter not standard ChangeArtifact | Custom resolver loads YAML directly | Planned |
-| create_plan extraction breaks create_delta | Extract as function called by create_delta; existing tests catch breakage | Planned |
+
+| Risk                                         | Mitigation                                                                | Status  |
+| -------------------------------------------- | ------------------------------------------------------------------------- | ------- |
+| BacklogItem lacks to_dict for --json         | Use simple dict from frontmatter attrs                                    | Planned |
+| Plan frontmatter not standard ChangeArtifact | Custom resolver loads YAML directly                                       | Planned |
+| create_plan extraction breaks create_delta   | Extract as function called by create_delta; existing tests catch breakage | Planned |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-04` — Phase scope: all new commands + domain support. List improvements deferred to Phase 3.
 - `2026-03-04` — view/edit memory already exist in codebase; task 2.9 skips them.
 
 ## 10. Findings / Research Notes
 
 **Pre-phase exploration**:
+
 - `format_audit_details` and `format_plan_details` don't exist yet — need creation
 - `find_backlog_items_by_id` doesn't exist — need creation
 - `create_plan` is inline in `create_delta` at creation.py:251-298 — extraction target
@@ -264,6 +273,7 @@ just check
 - `discover_backlog_items()` does full O(n) scan — `find_backlog_items_by_id()` uses targeted path lookup
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] IP-041 updated with Phase 2 results

@@ -2,8 +2,8 @@
 id: IP-045.PHASE-02
 slug: 045-memory_graph_navigation_for_agent_discoverability-phase-02
 name: CLI wiring + integration tests
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: complete
 kind: phase
 ---
@@ -37,19 +37,19 @@ verification:
     - VA-agent-walkthrough
   evidence: []
 tasks:
-  - id: '2.1'
+  - id: "2.1"
     name: MemoryRegistry.collect_bodies() helper
     status: done
-  - id: '2.2'
+  - id: "2.2"
     name: Wire --links-to into list memories
     status: done
-  - id: '2.3'
+  - id: "2.3"
     name: Wire --links-depth and --tree into show memory
     status: done
-  - id: '2.4'
+  - id: "2.4"
     name: CLI integration tests
     status: done
-  - id: '2.5'
+  - id: "2.5"
     name: Agent walkthrough (VA)
     status: done
 risks:
@@ -85,13 +85,13 @@ into CLI commands. Thin orchestration only — no new business logic.
 
 ## 4. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 2.1 | `MemoryRegistry.collect_bodies()` helper | 3 tests; returns {id: body_text} for graph operations |
-| [x] | 2.2 | Wire `--links-to` into `list memories` | 5 integration tests; normalizes shorthand IDs |
-| [x] | 2.3 | Wire `--links-depth` and `--tree` into `show memory` | 5 integration tests; supports --json/--tree/table |
-| [x] | 2.4 | CLI integration tests | 3 body-only tests; 13 total new CLI tests |
-| [x] | 2.5 | Agent walkthrough (VA) | See §5 below |
+| Status | ID  | Description                                          | Notes                                                 |
+| ------ | --- | ---------------------------------------------------- | ----------------------------------------------------- |
+| [x]    | 2.1 | `MemoryRegistry.collect_bodies()` helper             | 3 tests; returns {id: body_text} for graph operations |
+| [x]    | 2.2 | Wire `--links-to` into `list memories`               | 5 integration tests; normalizes shorthand IDs         |
+| [x]    | 2.3 | Wire `--links-depth` and `--tree` into `show memory` | 5 integration tests; supports --json/--tree/table     |
+| [x]    | 2.4 | CLI integration tests                                | 3 body-only tests; 13 total new CLI tests             |
+| [x]    | 2.5 | Agent walkthrough (VA)                               | See §5 below                                          |
 
 ## 5. Agent Walkthrough (VA)
 

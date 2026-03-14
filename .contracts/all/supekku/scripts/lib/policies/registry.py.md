@@ -19,10 +19,10 @@ Record representing a Policy with metadata.
 - `to_dict(self, root) -> dict[Tuple[str, Any]]`: Convert to dictionary for YAML serialization.
 
 Args:
-    root: Repository root path for relativizing file paths
+root: Repository root path for relativizing file paths
 
 Returns:
-    Dictionary representation suitable for YAML serialization
+Dictionary representation suitable for YAML serialization
 
 ### PolicyRegistry
 
@@ -45,5 +45,6 @@ Per ADR-002, backlinks are computed at runtime from forward references,
 not stored in frontmatter.
 
 Args:
-    policies: Dictionary of PolicyRecords to populate with backlinks
+policies: Dictionary of PolicyRecords to populate with backlinks
+
 - `_parse_policy_file(self, policy_path) -> <BinOp>`: Parse an individual policy file into a PolicyRecord.

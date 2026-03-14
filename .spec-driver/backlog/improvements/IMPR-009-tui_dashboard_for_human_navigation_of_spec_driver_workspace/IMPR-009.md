@@ -1,8 +1,8 @@
 ---
 id: IMPR-009
 name: TUI dashboard for human navigation of spec-driver workspace
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: resolved
 kind: improvement
 deltas:
@@ -57,20 +57,28 @@ aimed at humans watching an agent work.
 
 **Architecture: event log + Unix domain socket hybrid**
 
-| Concern | Solution |
-|---|---|
-| Persistent audit trail | JSONL event log at `.spec-driver/run/events.jsonl` |
-| Real-time TUI updates | Unix domain socket at `.spec-driver/run/tui.sock` |
-| Session attribution | `SPEC_DRIVER_SESSION` env var set by agent/hook |
-| Follow specific session | TUI filters on session ID |
-| Follow all activity | TUI shows unfiltered stream |
-| No TUI running | Socket send fails silently; log still written |
+| Concern                 | Solution                                           |
+| ----------------------- | -------------------------------------------------- |
+| Persistent audit trail  | JSONL event log at `.spec-driver/run/events.jsonl` |
+| Real-time TUI updates   | Unix domain socket at `.spec-driver/run/tui.sock`  |
+| Session attribution     | `SPEC_DRIVER_SESSION` env var set by agent/hook    |
+| Follow specific session | TUI filters on session ID                          |
+| Follow all activity     | TUI shows unfiltered stream                        |
+| No TUI running          | Socket send fails silently; log still written      |
 
 **CLI side (emitter):** Every `spec-driver` CLI invocation appends a structured
 JSONL event and fire-and-forgets a UDP datagram to the socket if it exists:
 
 ```jsonl
-{"ts":"...","session":"claude-abc123","cmd":"create delta","artifacts":["DE-049"],"status":"ok"}
+{
+  "ts": "...",
+  "session": "claude-abc123",
+  "cmd": "create delta",
+  "artifacts": [
+    "DE-049"
+  ],
+  "status": "ok"
+}
 ```
 
 The socket emit is non-blocking, stdlib-only (`socket.AF_UNIX`,
@@ -94,6 +102,7 @@ live events. On startup, replays recent history from the event log to catch up.
 Selecting an event navigates to that artifact in the browser panel.
 
 **Session modes:**
+
 - Follow specific session (by ID or selection)
 - Follow all local activity (grouped/colored by session)
 - Replay recent events from log on launch

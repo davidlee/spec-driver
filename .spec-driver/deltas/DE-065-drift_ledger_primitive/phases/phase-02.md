@@ -2,8 +2,8 @@
 id: IP-065.PHASE-02
 slug: 065-drift_ledger_primitive-phase-02
 name: Formatters, CLI, DE-063 integration
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---
@@ -59,11 +59,13 @@ phase: IP-065.PHASE-02
 # Phase 2 — Formatters, CLI, DE-063 integration
 
 ## 1. Objective
+
 Build the display and CLI layers for drift ledgers: pure formatters, thin CLI
 commands (create/list/show), and integration with the DE-063 ID inference and
 dispatch system so `spec-driver show DL-047` works via prefix lookup.
 
 ## 2. Links & References
+
 - **Delta**: DE-065
 - **Design Revision**: DR-065 §6 (DE-063 integration), §10 (creation template)
 - **Pattern references**:
@@ -78,10 +80,12 @@ dispatch system so `spec-driver show DL-047` works via prefix lookup.
   - View dispatch: `supekku/cli/view.py`
 
 ## 3. Entrance Criteria
+
 - [x] P01 complete (models, parser, registry implemented, 65 tests)
 - [x] DR-065 §6 integration points read and understood
 
 ## 4. Exit Criteria / Done When
+
 - [x] `drift_formatters.py` with `format_drift_list_table()` and `format_drift_details()`
 - [x] Column defs and theme styles for drift ledgers
 - [x] Drift creation function in `supekku/scripts/lib/drift/creation.py`
@@ -93,11 +97,13 @@ dispatch system so `spec-driver show DL-047` works via prefix lookup.
 - [x] Both linters clean — ruff 0 errors, new files pylint 10.00/10
 
 ## 5. Verification
+
 - `just test` — all unit tests
 - `just lint` — ruff
 - `just pylint-files` on new/modified files
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - Phase 1 domain layer is stable and tested
   - DE-063 dispatch tables are additive (append-only extension)
@@ -108,14 +114,14 @@ dispatch system so `spec-driver show DL-047` works via prefix lookup.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | `drift_formatters.py` — list table, detail, JSON | [P] | used format_list_table() generic |
-| [x] | 2.2 | theme styles + column defs for drift | [P] | done |
-| [x] | 2.3 | `drift/creation.py` — create_drift_ledger() | [P] | done |
-| [x] | 2.4 | CLI commands: create/list/show drift | — | in verb modules, not separate drift.py |
-| [x] | 2.5 | DE-063 integration: common, resolve, show, view | — | all 6 extension points |
-| [x] | 2.6 | tests: VT-065-formatters, VT-065-cli | — | 41 tests, all passing |
+| Status | ID  | Description                                      | Parallel? | Notes                                  |
+| ------ | --- | ------------------------------------------------ | --------- | -------------------------------------- |
+| [x]    | 2.1 | `drift_formatters.py` — list table, detail, JSON | [P]       | used format_list_table() generic       |
+| [x]    | 2.2 | theme styles + column defs for drift             | [P]       | done                                   |
+| [x]    | 2.3 | `drift/creation.py` — create_drift_ledger()      | [P]       | done                                   |
+| [x]    | 2.4 | CLI commands: create/list/show drift             | —         | in verb modules, not separate drift.py |
+| [x]    | 2.5 | DE-063 integration: common, resolve, show, view  | —         | all 6 extension points                 |
+| [x]    | 2.6 | tests: VT-065-formatters, VT-065-cli             | —         | 41 tests, all passing                  |
 
 ### Task Details
 
@@ -133,7 +139,7 @@ dispatch system so `spec-driver show DL-047` works via prefix lookup.
 
 - **2.3 creation**
   - `create_drift_ledger(name, delta_ref=None, repo_root=None) -> Path`
-  - Next-ID allocation: scan existing DL-*.md, pick max+1
+  - Next-ID allocation: scan existing DL-\*.md, pick max+1
   - Template per DR-065 §10
   - Creates `.spec-driver/drift/` directory if needed
 
@@ -151,23 +157,27 @@ dispatch system so `spec-driver show DL-047` works via prefix lookup.
   - `view_drift_ledger` handler in view.py
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| common.py is already large | Minimal additions following exact existing pattern | resolved |
+
+| Risk                                        | Mitigation                                           | Status   |
+| ------------------------------------------- | ---------------------------------------------------- | -------- |
+| common.py is already large                  | Minimal additions following exact existing pattern   | resolved |
 | list.py exceeding 150 lines (already large) | Drift list command is small, follow existing pattern | resolved |
 
 ## 9. Decisions & Outcomes
+
 - 2026-03-08: CLI commands added to verb modules (create.py, list.py, show.py) instead of separate drift.py — matches actual codebase pattern where all commands live in verb-grouped modules
 - 2026-03-08: Used `format_list_table()` generic helper instead of hand-rolling table setup — cleaner than backlog_formatters.py pattern
 - 2026-03-08: Extracted `_entry_to_dict()` from `format_drift_details_json()` to reduce McCabe complexity from 11 to acceptable levels
 - 2026-03-08: `--delta` flag implemented as optional on `create drift` (DR-065 open question resolved: yes, explicit flag)
 
 ## 10. Findings / Research Notes
+
 - DE-063 extension points are purely additive — adding to dispatch tables is mechanical and low-risk
 - `format_list_table()` in table_utils.py is the right abstraction for new list formatters — eliminates boilerplate
 - Pre-existing pylint warnings in CLI modules (import-outside-toplevel, duplicate-code) are endemic to the pattern, not introduced by drift additions
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (3285 tests, ruff clean, pylint 10.00/10 on new files)
 - [x] Phase sheet updated with outcomes

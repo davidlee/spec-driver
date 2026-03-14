@@ -2,8 +2,8 @@
 id: IP-055.PHASE-09
 slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-09
 name: IP-055 Phase 09
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: completed
 kind: phase
 ---
@@ -55,10 +55,12 @@ phase: IP-055.PHASE-09
 # Phase 9 - Apply section-by-section authoring to draft-design-revision
 
 ## 1. Objective
+
 Land the first artifact-specific authoring improvement from the brainstorming
 decomposition in the DR workflow.
 
 ## 2. Links & References
+
 - **Delta**: DE-055
 - **Design Revision Sections**:
   - Design Decisions & Trade-offs
@@ -74,15 +76,18 @@ decomposition in the DR workflow.
   - `phases/phase-08.md`
 
 ## 3. Entrance Criteria
+
 - [x] DRs have been identified as the strongest first target for section-by-section authoring guidance
 - [x] draft-design-revision still needed explicit triage and validation structure
 
 ## 4. Exit Criteria / Done When
+
 - [x] draft-design-revision requires explicit design-question triage before drafting
 - [x] draft-design-revision supports one-question-at-a-time closure and section-by-section validation
 - [x] DE-055 notes and plan state capture the DR-first import and remaining rollout question
 
 ## 5. Verification
+
 - Tests to run: none beyond sync/propagation for this skill-text change
 - Tooling/commands:
   - `uv run spec-driver skills sync`
@@ -92,33 +97,39 @@ decomposition in the DR workflow.
   - notes entry summarising the DR-first import
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - DR authoring benefits enough from the pattern to justify landing it before broader generalisation
 - STOP when:
   - the skill starts absorbing implementation planning or turns into a generic framework instead of a DR runsheet
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 9.1 | Strengthen draft-design-revision around explicit design triage | [ ] | questions, risks, assumptions, and critical decisions are now a named pre-draft step |
-| [x] | 9.2 | Add section-by-section validation guidance for DR drafting | [ ] | the skill now prefers iterative section closure over a full speculative draft |
-| [x] | 9.3 | Record the DR-first import in DE-055 artefacts | [ ] | notes, plan, and DR all updated in the same change-set |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                                    | Parallel? | Notes                                                                                |
+| ------ | --- | -------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------ |
+| [x]    | 9.1 | Strengthen draft-design-revision around explicit design triage | [ ]       | questions, risks, assumptions, and critical decisions are now a named pre-draft step |
+| [x]    | 9.2 | Add section-by-section validation guidance for DR drafting     | [ ]       | the skill now prefers iterative section closure over a full speculative draft        |
+| [x]    | 9.3 | Record the DR-first import in DE-055 artefacts                 | [ ]       | notes, plan, and DR all updated in the same change-set                               |
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+
+| Risk                                | Mitigation                                                                                                            | Status |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------ |
 | DR authoring becomes too ceremonial | keep the pattern focused on foundational sections and concrete design detail, not mandatory ritual for every sentence | active |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-07` - Apply the first artifact-specific brainstorming import to `draft-design-revision`. Rationale: DRs benefit most from early correction of foundational assumptions and from concrete design detail before planning work begins.
 
 ## 10. Findings / Research Notes
+
 - The one-question-at-a-time closure pattern is useful inside DR authoring when there are still unresolved design branches.
 - Section-by-section validation is most valuable where early sections strongly constrain later ones.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

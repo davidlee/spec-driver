@@ -4,27 +4,28 @@ name: BacklogItem relations live in frontmatter dict
 kind: memory
 status: active
 memory_type: fact
-updated: '2026-03-14'
-verified: '2026-03-14'
+updated: "2026-03-14"
+verified: "2026-03-14"
 confidence: high
 tags:
-- backlog
-- relations
-- gotcha
-summary: BacklogItem.relations is not a dataclass field. Relations are stored in frontmatter
+  - backlog
+  - relations
+  - gotcha
+summary:
+  BacklogItem.relations is not a dataclass field. Relations are stored in frontmatter
   dict, so getattr returns None. Use frontmatter.get('relations', []).
 scope:
   paths:
-  - supekku/scripts/lib/backlog/models.py
-  - supekku/scripts/lib/relations/query.py
+    - supekku/scripts/lib/backlog/models.py
+    - supekku/scripts/lib/relations/query.py
   globs:
-  - supekku/scripts/lib/backlog/**
+    - supekku/scripts/lib/backlog/**
 provenance:
   sources:
-  - kind: code
-    ref: supekku/scripts/lib/backlog/models.py
-  - kind: delta
-    ref: DE-090
+    - kind: code
+      ref: supekku/scripts/lib/backlog/models.py
+    - kind: delta
+      ref: DE-090
 ---
 
 # BacklogItem relations live in frontmatter dict

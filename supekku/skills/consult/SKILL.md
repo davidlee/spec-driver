@@ -11,6 +11,7 @@ DO NOT DO THIS.
 If you encounter unanticipated obstacles: YOU MUST consider stopping to discuss them.
 
 If these obstacles:
+
 - require adaptations with the potential to alter planned functionality
 - present multiple possible solutions with different tradeoffs
 - require substantial research, debugging, or divert you from your task
@@ -21,6 +22,7 @@ If these obstacles:
 YOU MUST STOP IMMEDIATELY.
 
 Present the situation with context: summarise
+
 - any relevant task code, plan, design doc, doctrines
 - what you're trying to do
 - the nature of the obstacle

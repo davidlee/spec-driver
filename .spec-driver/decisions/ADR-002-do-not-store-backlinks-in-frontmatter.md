@@ -1,10 +1,10 @@
 ---
 id: ADR-002
-title: 'ADR-002: Do not store backlinks in frontmatter'
+title: "ADR-002: Do not store backlinks in frontmatter"
 status: accepted
-created: '2025-11-02'
-updated: '2025-11-02'
-reviewed: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
+reviewed: "2025-11-02"
 owners: []
 supersedes: []
 superseded_by: []

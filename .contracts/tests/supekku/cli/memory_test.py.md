@@ -37,7 +37,7 @@ Test cases for find memory CLI command.
 - `test_find_memory_exact(self) -> None`: Find memory with exact ID.
 - `test_find_memory_no_match(self) -> None`: Find memory with no match exits cleanly.
 - `test_find_memory_shorthand(self) -> None`: Find memory with shorthand (omitted mem. prefix).
-- `test_find_memory_wildcard(self) -> None`: Find memory with mem.* pattern.
+- `test_find_memory_wildcard(self) -> None`: Find memory with mem.\* pattern.
 
 ### ListMemoriesCommandTest
 

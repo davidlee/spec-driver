@@ -1,8 +1,8 @@
 ---
 id: ISSUE-033
 name: sync overwrites requirement status when coverage entries contain unknown statuses
-created: '2026-03-05'
-updated: '2026-03-09'
+created: "2026-03-05"
+updated: "2026-03-09"
 status: resolved
 kind: issue
 categories: [bug, data-integrity]
@@ -70,4 +70,3 @@ Two layers of defence:
 
 External usage report from `../test-driver/` project, observed during DE-003
 closure (2026-03-05).
-

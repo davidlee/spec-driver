@@ -4,22 +4,23 @@ name: typer.Exit inherits from RuntimeError
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 tags:
-- typer
-- cli
-- gotcha
-summary: "typer.Exit (click.exceptions.Exit) inherits from RuntimeError \u2014 except\
+  - typer
+  - cli
+  - gotcha
+summary:
+  "typer.Exit (click.exceptions.Exit) inherits from RuntimeError \u2014 except\
   \ RuntimeError handlers will swallow it silently"
 scope:
   globs:
-  - supekku/cli/**
-verified: '2026-03-08'
+    - supekku/cli/**
+verified: "2026-03-08"
 provenance:
   sources:
-  - DE-068
-  - supekku/cli/edit.py
+    - DE-068
+    - supekku/cli/edit.py
 ---
 
 # typer.Exit inherits from RuntimeError

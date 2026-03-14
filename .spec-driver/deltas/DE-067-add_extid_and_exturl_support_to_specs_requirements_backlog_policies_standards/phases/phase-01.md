@@ -2,8 +2,8 @@
 id: IP-067.PHASE-01
 slug: 067-add_extid_and_exturl_support_to_specs_requirements_backlog_policies_standards-phase-01
 name: IP-067 Phase 01
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: completed
 kind: phase
 ---
@@ -86,12 +86,12 @@ Add column definitions for the external ID column.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add ext_id/ext_url to domain models | [P] | All 6 models updated |
-| [x] | 1.2 | Verify frontmatter passthrough | | Confirmed: unknown fields survive in data dict |
-| [x] | 1.3 | Add column defs for external ID | [P] | EXT_ID_COLUMN added |
-| [x] | 1.4 | Write unit tests | | Spec, BacklogItem, ChangeArtifact tests added |
+| Status | ID  | Description                         | Parallel? | Notes                                          |
+| ------ | --- | ----------------------------------- | --------- | ---------------------------------------------- |
+| [x]    | 1.1 | Add ext_id/ext_url to domain models | [P]       | All 6 models updated                           |
+| [x]    | 1.2 | Verify frontmatter passthrough      |           | Confirmed: unknown fields survive in data dict |
+| [x]    | 1.3 | Add column defs for external ID     | [P]       | EXT_ID_COLUMN added                            |
+| [x]    | 1.4 | Write unit tests                    |           | Spec, BacklogItem, ChangeArtifact tests added  |
 
 ### Task Details
 
@@ -122,9 +122,9 @@ Add column definitions for the external ID column.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Missing a model class | Enumerated all 6 above; VA-067-001 will confirm | open |
+| Risk                  | Mitigation                                      | Status |
+| --------------------- | ----------------------------------------------- | ------ |
+| Missing a model class | Enumerated all 6 above; VA-067-001 will confirm | open   |
 
 ## 11. Wrap-up Checklist
 

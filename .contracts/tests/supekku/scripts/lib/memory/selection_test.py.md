@@ -63,7 +63,7 @@ OR logic across match dimensions.
 
 ### TestMatchesScopeGlobs
 
-Scope matching via scope.globs with proper ** support.
+Scope matching via scope.globs with proper \*\* support.
 
 **Inherits from:** unittest.TestCase
 

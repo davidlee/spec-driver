@@ -55,14 +55,14 @@ Implemented `phase.tracking@v1` YAML block for structured progress tracking in p
 ```yaml
 schema: supekku.phase.tracking
 version: 1
-phase: IP-XXX.PHASE-NN  # Required
-entrance_criteria:       # Optional
+phase: IP-XXX.PHASE-NN # Required
+entrance_criteria: # Optional
   - item: string
     completed: boolean
-exit_criteria:           # Optional
+exit_criteria: # Optional
   - item: string
     completed: boolean
-tasks:                   # Optional
+tasks: # Optional
   - id: string
     description: string
     status: pending | in_progress | completed | blocked

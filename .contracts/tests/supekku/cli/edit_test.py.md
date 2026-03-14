@@ -16,8 +16,8 @@ Tests for edit adr command.
 
 #### Methods
 
-- `test_edit_adr_calls_editor(self, tmp_path, monkeypatch) -> None`: Edit adr opens file in editor.
-- `test_edit_adr_not_found(self, monkeypatch) -> None`: Edit adr shows error when not found.
+- `test_edit_adr_calls_editor(self, tmp_path) -> None`: Edit adr opens file in editor.
+- `test_edit_adr_not_found(self) -> None`: Edit adr shows error when not found.
 
 ### TestEditAdrShorthand
 
@@ -25,7 +25,7 @@ Tests for edit adr with shorthand IDs.
 
 #### Methods
 
-- `test_edit_adr_numeric_shorthand(self, tmp_path, monkeypatch) -> None`: Edit adr accepts numeric shorthand like '001'.
+- `test_edit_adr_numeric_shorthand(self, tmp_path) -> None`: Edit adr accepts numeric shorthand like '001'.
 
 ### TestEditDelta
 
@@ -33,7 +33,7 @@ Tests for edit delta command.
 
 #### Methods
 
-- `test_edit_delta_calls_editor(self, tmp_path, monkeypatch) -> None`: Edit delta opens file in editor.
+- `test_edit_delta_calls_editor(self, tmp_path) -> None`: Edit delta opens file in editor.
 
 ### TestEditDeltaShorthand
 
@@ -41,7 +41,7 @@ Tests for edit delta with shorthand IDs.
 
 #### Methods
 
-- `test_edit_delta_numeric_shorthand(self, tmp_path, monkeypatch) -> None`: Edit delta accepts numeric shorthand like '23'.
+- `test_edit_delta_numeric_shorthand(self, tmp_path) -> None`: Edit delta accepts numeric shorthand like '23'.
 
 ### TestEditDrift
 
@@ -94,7 +94,7 @@ Tests for edit spec command.
 
 #### Methods
 
-- `test_edit_spec_calls_editor(self, tmp_path, monkeypatch) -> None`: Edit spec opens file in editor.
+- `test_edit_spec_calls_editor(self, tmp_path) -> None`: Edit spec opens file in editor.
 
 ### TestEditStatusFlag
 
@@ -107,7 +107,7 @@ Tests for --status flag on edit subcommands.
 - `test_status_rejects_invalid_value_for_delta(self, tmp_path) -> None`: --status with invalid value for enum-covered entity type fails.
 - `test_status_rejects_invalid_value_for_spec(self, tmp_path) -> None`: --status with invalid spec status fails.
 - `test_status_updates_frontmatter_skips_editor(self, tmp_path) -> None`: --status updates file and does not open editor.
-- `test_without_status_opens_editor(self, tmp_path, monkeypatch) -> None`: Default behaviour (no --status) still opens editor.
+- `test_without_status_opens_editor(self, tmp_path) -> None`: Default behaviour (no --status) still opens editor.
 
 ### TestEditStatusResolveArtifact
 

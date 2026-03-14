@@ -1,9 +1,9 @@
 ---
 id: IP-075.PHASE-01
 slug: 075-status_fields_lack_enums_and_need_systematic_review-phase-01
-name: 'IP-075 Phase 01: define constants and register enums'
-created: '2026-03-09'
-updated: '2026-03-09'
+name: "IP-075 Phase 01: define constants and register enums"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---
@@ -32,23 +32,23 @@ verification:
     - VT-075-02
   evidence: []
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     description: Create specs/lifecycle.py with SPEC_STATUSES
-  - id: '1.2'
+  - id: "1.2"
     description: Create decisions/lifecycle.py with ADR_STATUSES
-  - id: '1.3'
+  - id: "1.3"
     description: Create policies/lifecycle.py with POLICY_STATUSES
-  - id: '1.4'
+  - id: "1.4"
     description: Create standards/lifecycle.py with STANDARD_STATUSES
-  - id: '1.5'
+  - id: "1.5"
     description: Create memory/lifecycle.py with MEMORY_STATUSES
-  - id: '1.6'
+  - id: "1.6"
     description: Unify backlog statuses in backlog/models.py
-  - id: '1.7'
+  - id: "1.7"
     description: Register all new paths in core/enums.py
-  - id: '1.8'
+  - id: "1.8"
     description: Update decisions/registry.py to reference ADR_STATUSES
-  - id: '1.9'
+  - id: "1.9"
     description: Write unit tests for all new constants and registry entries
 risks: []
 ```
@@ -101,14 +101,14 @@ Create lifecycle.py modules for five governance artifact types, unify backlog st
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-|---|---|---|---|---|
-| [ ] | 1.1 | Create `specs/lifecycle.py` with `SPEC_STATUSES` | [P] | DEC-075-01 |
-| [ ] | 1.2 | Create `decisions/lifecycle.py` with `ADR_STATUSES` | [P] | DEC-075-04 |
-| [ ] | 1.3 | Create `policies/lifecycle.py` with `POLICY_STATUSES` | [P] | DEC-075-02 |
-| [ ] | 1.4 | Create `standards/lifecycle.py` with `STANDARD_STATUSES` | [P] | DEC-075-02 |
-| [ ] | 1.5 | Create `memory/lifecycle.py` with `MEMORY_STATUSES` | [P] | DEC-075-03 |
-| [ ] | 1.6 | Unify backlog statuses in `backlog/models.py` | [ ] | DEC-075-05; update dependent code |
-| [ ] | 1.7 | Register new paths in `core/enums.py` | [ ] | Depends on 1.1–1.6 |
-| [ ] | 1.8 | Update `decisions/registry.py` to use `ADR_STATUSES` | [ ] | Depends on 1.2 |
-| [ ] | 1.9 | Write unit tests | [ ] | Depends on 1.1–1.8 |
+| Status | ID  | Description                                              | Parallel? | Notes                             |
+| ------ | --- | -------------------------------------------------------- | --------- | --------------------------------- |
+| [ ]    | 1.1 | Create `specs/lifecycle.py` with `SPEC_STATUSES`         | [P]       | DEC-075-01                        |
+| [ ]    | 1.2 | Create `decisions/lifecycle.py` with `ADR_STATUSES`      | [P]       | DEC-075-04                        |
+| [ ]    | 1.3 | Create `policies/lifecycle.py` with `POLICY_STATUSES`    | [P]       | DEC-075-02                        |
+| [ ]    | 1.4 | Create `standards/lifecycle.py` with `STANDARD_STATUSES` | [P]       | DEC-075-02                        |
+| [ ]    | 1.5 | Create `memory/lifecycle.py` with `MEMORY_STATUSES`      | [P]       | DEC-075-03                        |
+| [ ]    | 1.6 | Unify backlog statuses in `backlog/models.py`            | [ ]       | DEC-075-05; update dependent code |
+| [ ]    | 1.7 | Register new paths in `core/enums.py`                    | [ ]       | Depends on 1.1–1.6                |
+| [ ]    | 1.8 | Update `decisions/registry.py` to use `ADR_STATUSES`     | [ ]       | Depends on 1.2                    |
+| [ ]    | 1.9 | Write unit tests                                         | [ ]       | Depends on 1.1–1.8                |

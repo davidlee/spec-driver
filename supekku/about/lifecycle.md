@@ -1,7 +1,7 @@
 ---
 verified_at:
-  date: '2026-03-05'
-  sha: '01753be0aa705c00f094a63af39e54d3df0d62bd'
+  date: "2026-03-05"
+  sha: "01753be0aa705c00f094a63af39e54d3df0d62bd"
 ---
 
 # Requirement Lifecycle & Traceability (Code-Truth)
@@ -20,6 +20,7 @@ Requirement lifecycle statuses are:
 Source of truth: `supekku/scripts/lib/requirements/lifecycle.py`.
 
 Coverage (verification) statuses are:
+
 - `planned`
 - `in-progress`
 - `verified`
@@ -29,6 +30,7 @@ Coverage (verification) statuses are:
 Source of truth: `supekku/scripts/lib/blocks/verification.py`.
 
 Change artifact statuses (delta / revision / audit) are:
+
 - `draft`
 - `pending`
 - `in-progress`
@@ -97,6 +99,7 @@ Requirements are canonical when present in SPEC/PROD markdown files.
 
 Some specs also include `requirements/*.md` files in their bundle. Current
 behavior:
+
 - These files are not consumed by sync or lifecycle logic.
 - Requirement identity still must appear in the spec markdown to be tracked.
 
@@ -134,6 +137,7 @@ Source of truth:
 3. Reconcile any mixed or drifting coverage statuses
 
 Notes:
+
 - Retrospective flow is typically higher maturity: audits surface reality first,
   then revisions are applied to reconcile specs with codebase truth.
 

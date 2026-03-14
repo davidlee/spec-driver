@@ -2,8 +2,8 @@
 id: PROD-004
 slug: frontmatter-metadata-validation
 name: Frontmatter Metadata Validation
-created: '2025-11-02'
-updated: '2026-03-03'
+created: "2025-11-02"
+updated: "2026-03-03"
 status: draft
 kind: prod
 aliases: []
@@ -197,18 +197,21 @@ entries:
 ### Problem / Purpose
 
 Frontmatter validation currently uses imperative code (`frontmatter_schema.py`) which:
+
 - Only validates base fields common to all artifacts
 - Lacks kind-specific validation (all kinds use same base rules)
 - Cannot generate JSON Schema for agent consumption
 - Hides validation logic in procedural code rather than declarative metadata
 
 This creates friction for:
+
 - **Developers** extending frontmatter schemas (must edit validation code)
 - **Agents** writing YAML frontmatter (no schema documentation available)
 - **Architects/Team Leads** understanding validation rules (buried in code)
 - **Tooling maintainers** keeping documentation synchronized with implementation
 
 The metadata-driven approach proven in Phases 1-5 (YAML block validators) provides:
+
 - Declarative schemas as single source of truth
 - JSON Schema generation for agent guidance
 - Self-documenting validation logic
@@ -217,16 +220,19 @@ The metadata-driven approach proven in Phases 1-5 (YAML block validators) provid
 ### Value Signals
 
 **Developer Productivity**:
+
 - Reduce time to add new frontmatter kinds from hours to minutes
 - Zero documentation drift between schemas and validation
 - Clear validation errors guide corrections
 
 **Agent Effectiveness**:
+
 - Agents receive accurate JSON Schema for all frontmatter kinds
 - Reduced validation failures when agents write frontmatter YAML
 - Self-service schema discovery via CLI
 
 **System Quality**:
+
 - Comprehensive kind-specific validation (not just base fields)
 - Per-schema test suites covering all registered kinds (maintained via CI)
 - Backward compatibility maintained throughout migration
@@ -251,21 +257,25 @@ The metadata-driven approach proven in Phases 1-5 (YAML block validators) provid
 ### Personas / Actors
 
 **Developer (extending schemas)**:
+
 - **Goals**: Add new frontmatter kind or extend existing kind with minimal friction
 - **Pains**: Currently must edit imperative validation code, easy to introduce bugs
 - **Expectations**: Declarative metadata definition that self-validates
 
 **Agent (writing frontmatter YAML)**:
+
 - **Goals**: Generate valid frontmatter for specs, deltas, policies, etc.
 - **Pains**: No JSON Schema documentation available, trial-and-error validation
 - **Expectations**: Accurate schema via CLI query before writing YAML
 
 **Architect/Team Lead (understanding system)**:
+
 - **Goals**: Understand validation rules for governance and tooling decisions
 - **Pains**: Validation logic buried in procedural code, hard to extract rules
 - **Expectations**: Readable metadata definitions serving as documentation
 
 **Maintainer (ensuring quality)**:
+
 - **Goals**: Prevent regressions during migration, ensure comprehensive validation
 - **Pains**: Risk of breaking existing code during validator replacement
 - **Expectations**: Dual-validation tests confirming behavioral equivalence
@@ -277,6 +287,7 @@ The metadata-driven approach proven in Phases 1-5 (YAML block validators) provid
 **Given** an agent needs to create a delta artifact with frontmatter
 **When** agent runs `spec-driver schema show frontmatter.delta --format=json-schema`
 **Then** agent receives complete JSON Schema including:
+
 - Required fields (id, name, slug, kind, status, created, updated, applies_to, context_inputs)
 - Optional fields (summary, tags, relations, risk_register, outcome_summary)
 - Field types, patterns, and nested structures
@@ -288,6 +299,7 @@ The metadata-driven approach proven in Phases 1-5 (YAML block validators) provid
 **Given** a developer needs to add frontmatter validation for a new artifact kind
 **When** developer creates `supekku/scripts/lib/core/frontmatter_metadata/newkind.py`
 **Then** developer:
+
 1. Defines `NEWKIND_FRONTMATTER_METADATA` using FieldMetadata composition
 2. Includes base fields via `**BASE_FRONTMATTER_METADATA.fields`
 3. Adds kind-specific fields with types, constraints, descriptions
@@ -300,6 +312,7 @@ The metadata-driven approach proven in Phases 1-5 (YAML block validators) provid
 **Given** existing code uses `validate_frontmatter()` imperative validator
 **When** maintainer opts into metadata-driven validation
 **Then**:
+
 1. Call `validate_frontmatter_metadata(frontmatter, kind)` instead
 2. Receive identical `FrontmatterValidationResult` (compatible API)
 3. Run dual-validation tests confirming no regressions
@@ -308,12 +321,14 @@ The metadata-driven approach proven in Phases 1-5 (YAML block validators) provid
 ### Edge Cases & Non-goals
 
 **Edge Cases**:
+
 - **Nested structures**: Relations array with object items requiring type/target fields
 - **Date formats**: Accept both ISO string and date objects (pre-processor normalizes)
 - **Optional fields**: Different kinds have different optional field sets
 - **Conditional requirements**: Some fields required only for specific kinds (e.g., `delta_ref` for design_revision)
 
 **Non-goals**:
+
 - **Target validation**: Validating relation targets exist in registry (separate concern)
 - **Graph validation**: Cross-artifact consistency checks (separate from frontmatter validation)
 - **Custom validators**: Complex logic beyond metadata capabilities (minimize, document exceptions)
@@ -338,62 +353,62 @@ This product delivers three core capabilities:
   - 15 unique metadata definitions; plan/phase/task share one schema
   - Each kind has dedicated metadata in `supekku/scripts/lib/core/frontmatter_metadata/{kind}.py`
   - Validation driven by `BlockMetadata` with `FieldMetadata` definitions
-  - *Verification*: VT-001 - Comprehensive test suite covering all kinds
+  - _Verification_: VT-001 - Comprehensive test suite covering all kinds
 
 - **FR-002**: System MUST enforce kind-specific required fields and constraints
   - Example: `kind: delta` requires `applies_to`, `context_inputs` beyond base fields
   - Example: `kind: verification` requires `verification_kind`, `covers`, `procedure`
   - Example: `kind: requirement` requires `requirement_kind`, `rfc2119_level`
   - Conditional validation based on kind field value
-  - *Verification*: VT-002 - Kind-specific validation tests
+  - _Verification_: VT-002 - Kind-specific validation tests
 
 - **FR-003**: System MUST generate JSON Schema from frontmatter metadata definitions
   - Use `JSONSchemaGenerator` from metadata engine
   - Output compliant with JSON Schema Draft 2020-12
   - Include examples, descriptions, and complete constraint information
-  - *Verification*: VT-003 - JSON Schema generation tests
+  - _Verification_: VT-003 - JSON Schema generation tests
 
 - **FR-004**: CLI MUST support `schema show frontmatter.{kind}` commands for all kinds
   - Example: `spec-driver schema show frontmatter.spec --format=json-schema`
   - Example: `spec-driver schema show frontmatter.delta --format=yaml-example`
   - Return formatted JSON Schema or YAML example
-  - *Verification*: VT-004 - CLI integration tests
+  - _Verification_: VT-004 - CLI integration tests
 
 - **FR-005**: System MUST maintain backward compatibility during migration
   - New `validate_frontmatter_metadata()` returns compatible `FrontmatterValidationResult`
   - Existing `validate_frontmatter()` remains available during transition
   - Both validators produce equivalent results for same input
-  - *Verification*: VT-005 - Backward compatibility tests
+  - _Verification_: VT-005 - Backward compatibility tests
 
 - **FR-006**: System MUST support gradual per-call-site opt-in migration
   - Each code path chooses when to migrate independently
   - No forced migration or breaking changes
   - Deprecation warnings only after full ecosystem migration
-  - *Verification*: VT-005 - Migration path tests
+  - _Verification_: VT-005 - Migration path tests
 
 - **FR-007**: Metadata definitions MUST support canonical/derived field classification enabling compaction profiles
   - `FieldMetadata` extended with persistence semantics (e.g., `canonical`, `derived`, `optional`)
   - Compaction profiles omit derived and default-valued fields during serialization
   - Read paths reconstruct omitted fields transparently (no information loss)
   - Agent-facing JSON Schema reflects full structure regardless of compaction state
-  - *Verification*: VT-007 - Compaction profile round-trip and classification tests
+  - _Verification_: VT-007 - Compaction profile round-trip and classification tests
 
 ### Non-Functional Requirements
 
 - **NF-001**: Validation behavior MUST match imperative validator (zero regressions)
   - Dual-validation test pattern: same input validates with both, assert same errors
   - Per-schema test suites covering all registered kinds (counts maintained via CI)
-  - *Measurement*: VT-006 - Dual-validation pattern across all test suites
+  - _Measurement_: VT-006 - Dual-validation pattern across all test suites
 
 - **NF-002**: JSON Schema generation MUST complete in <100ms per kind
   - Schema cached after first generation
   - Agent queries return immediately
-  - *Measurement*: Performance tests during VT-003
+  - _Measurement_: Performance tests during VT-003
 
 - **NF-003**: Migration MUST not break existing code at any point
   - All existing tests pass throughout migration phases
   - No changes to public API signatures until deprecation
-  - *Measurement*: Continuous test suite execution during migration
+  - _Measurement_: Continuous test suite execution during migration
 
 ### Success Metrics / Signals
 
@@ -409,16 +424,19 @@ This product delivers three core capabilities:
 ### User Experience / Outcomes
 
 **For Developers**:
+
 - Add new frontmatter kind: Create single metadata file with declarative schema
 - No touching imperative validation code, no risk of breaking unrelated kinds
 - Tests guide via dual-validation pattern (compare old vs. new)
 
 **For Agents**:
+
 - Query schema before writing: `spec-driver schema show frontmatter.delta --format=json-schema`
 - Receive accurate, complete schema with examples
 - Reduce validation errors through upfront understanding
 
 **For Architects/Team Leads**:
+
 - Read metadata definitions to understand validation rules
 - Schema serves as living documentation
 - No code archaeology required to extract constraints
@@ -633,26 +651,31 @@ def validate_frontmatter_metadata(
 ### Error Handling / Guards
 
 **Missing required field**:
+
 - Input: `{"id": "SPEC-001", "name": "Test"}` (missing slug, kind, status, dates)
 - Error: `FrontmatterValidationError: Missing required field: slug`
 - Recovery: User adds missing field to frontmatter
 
 **Invalid field type**:
+
 - Input: `{"created": "tomorrow"}` (invalid date format)
 - Error: `FrontmatterValidationError: Field 'created' does not match pattern ^\d{4}-\d{2}-\d{2}$`
 - Recovery: User corrects to ISO format `"2025-11-02"`
 
 **Invalid enum value**:
+
 - Input: `{"kind": "unknown"}` (not in enum_values)
 - Error: `FrontmatterValidationError: Field 'kind' must be one of: spec, prod, delta, ...`
 - Recovery: User selects valid kind value
 
 **Nested structure violation**:
+
 - Input: `{"relations": [{"target": "SPEC-001"}]}` (missing required `type` field)
 - Error: `FrontmatterValidationError: relations[0] missing required field: type`
 - Recovery: User adds `type` field to relation object
 
 **Unknown kind**:
+
 - Input: `validate_frontmatter_metadata(fm, kind="nonexistent")`
 - Behavior: Falls back to `BASE_FRONTMATTER_METADATA` (validates only base fields)
 - Logging: Warning logged about unknown kind fallback
@@ -662,9 +685,11 @@ def validate_frontmatter_metadata(
 ### Testing Strategy
 
 **Dual-Validation Pattern** (prevents regressions):
+
 - Each test validates same frontmatter with both old and new validators
 - Assert both produce same errors (or both pass)
 - Example:
+
   ```python
   def test_missing_slug_dual_validation():
     frontmatter = {"id": "SPEC-001", "name": "Test"}  # Missing slug
@@ -683,6 +708,7 @@ def validate_frontmatter_metadata(
   ```
 
 **Test Coverage Per Schema** (minimum per kind):
+
 - Valid complete example: 1 test
 - Valid minimal example: 1 test
 - Missing required fields: 3-5 tests (one per required field)
@@ -693,6 +719,7 @@ def validate_frontmatter_metadata(
 - **Total**: ~25-40 tests per schema across all registered kinds (exact counts tracked in CI)
 
 **Test Levels**:
+
 - **Unit**: Each metadata definition tested in isolation (e.g., `base_test.py`)
 - **Integration**: Validator + metadata working together
 - **Regression**: Dual-validation comparing old and new validators
@@ -705,11 +732,13 @@ Not applicable (internal tooling improvement, no user research needed).
 ### Observability & Analysis
 
 **Validation Metrics**:
+
 - Count of validation errors by kind (which kinds fail most often?)
 - Count of validation errors by field (which fields cause most errors?)
 - Validation latency per kind (performance monitoring)
 
 **Migration Metrics**:
+
 - Percentage of code paths migrated to metadata validation
 - Count of dual-validation test failures (should be zero)
 - Deprecation warning count (when old validator still used)
@@ -717,11 +746,13 @@ Not applicable (internal tooling improvement, no user research needed).
 ### Security & Compliance
 
 **Input Validation**:
+
 - Frontmatter is user-controlled YAML, but validation prevents injection
 - No code execution from frontmatter values (pure data validation)
 - Pattern matching prevents malicious date/ID formats
 
 **No External Data**:
+
 - Validation happens on local frontmatter only
 - No network requests or external dependencies
 - Registry lookup for relation targets is separate concern (not in scope)
@@ -733,30 +764,35 @@ Aligned with `supekku:verification.coverage@v1` YAML block above.
 ### Acceptance Gates
 
 **Phase 6A (Base) Complete When**:
+
 - `BASE_FRONTMATTER_METADATA` defined with all common fields
 - `base_test.py` has 25-40 tests passing
 - Dual-validation tests confirm no regressions
 - Ruff and Pylint pass
 
 **Phase 6B-6D (Kind Schemas) Complete When**:
+
 - All registered kind metadata definitions created (15 unique definitions)
 - Per-schema test suites passing across all kinds
 - JSON Schema generation working for all kinds
 - Ruff and Pylint pass
 
 **Phase 6E (Integration) Complete When**:
+
 - `validate_frontmatter_metadata()` API compatible with existing code
 - All existing code paths continue working
 - Opt-in migration proven with at least 2 code paths
 - No test failures introduced
 
 **Phase 6F (CLI) Complete When**:
+
 - `spec-driver schema show frontmatter.{kind}` works for all kinds
 - `--format=json-schema` and `--format=yaml-example` both supported
 - CLI help documentation updated
 - Examples included in all metadata definitions
 
 **Overall Product Complete When**:
+
 - All registered frontmatter kinds validated via metadata
 - JSON Schema available for all kinds via CLI
 - Zero validation regressions (dual-validation tests passing)
@@ -802,6 +838,7 @@ Aligned with `supekku:verification.coverage@v1` YAML block above.
 ### Open Decisions / Questions
 
 None - user provided clear answers during discovery:
+
 - All registered kinds will be implemented (not MVP subset)
 - Replace/supplement imperative validator (minimize parallel implementations)
 - Primary beneficiaries are developers, architects, and agents
@@ -811,38 +848,38 @@ None - user provided clear answers during discovery:
 
 ### Frontmatter Kinds Summary
 
-| Kind | Frontmatter ID Pattern | Key Unique Fields |
-|------|------------------------|-------------------|
-| Base | N/A (all share) | id, name, slug, kind, status, created, updated, relations |
-| Spec | SPEC-### | c4_level, packages, sources, concerns, responsibilities |
-| Product | PROD-### | scope, problems, value_proposition, product_requirements |
-| Delta | DELTA-### | applies_to, context_inputs, risk_register, outcome_summary |
-| Requirement | REQ-### | requirement_kind, rfc2119_level, acceptance_criteria |
-| Verification | VT/VA/VH-### | verification_kind, covers, procedure |
-| Design Revision | REV-### | delta_ref, source_context, code_impacts, design_decisions |
-| Problem | PROB-### | problem_statement, context, success_criteria |
-| Risk | RISK-### | risk_statement, likelihood, impact, mitigation_strategy |
-| Issue | ISSUE-### | categories, severity, impact, problem_refs |
-| Memory | mem.{type}.{topic} | memory_type, confidence, scope, priority, provenance, links |
-| Audit | AUD-### | spec_refs, audit_window, findings, next_actions |
-| Plan/Phase/Task | IP-### | objective, entrance_criteria, exit_criteria |
-| Policy | POL-### | statement, rationale, scope, enforcement |
-| Standard | STD-### | statement, rationale, scope, flexibility |
+| Kind            | Frontmatter ID Pattern | Key Unique Fields                                           |
+| --------------- | ---------------------- | ----------------------------------------------------------- |
+| Base            | N/A (all share)        | id, name, slug, kind, status, created, updated, relations   |
+| Spec            | SPEC-###               | c4_level, packages, sources, concerns, responsibilities     |
+| Product         | PROD-###               | scope, problems, value_proposition, product_requirements    |
+| Delta           | DELTA-###              | applies_to, context_inputs, risk_register, outcome_summary  |
+| Requirement     | REQ-###                | requirement_kind, rfc2119_level, acceptance_criteria        |
+| Verification    | VT/VA/VH-###           | verification_kind, covers, procedure                        |
+| Design Revision | REV-###                | delta_ref, source_context, code_impacts, design_decisions   |
+| Problem         | PROB-###               | problem_statement, context, success_criteria                |
+| Risk            | RISK-###               | risk_statement, likelihood, impact, mitigation_strategy     |
+| Issue           | ISSUE-###              | categories, severity, impact, problem_refs                  |
+| Memory          | mem.{type}.{topic}     | memory_type, confidence, scope, priority, provenance, links |
+| Audit           | AUD-###                | spec_refs, audit_window, findings, next_actions             |
+| Plan/Phase/Task | IP-###                 | objective, entrance_criteria, exit_criteria                 |
+| Policy          | POL-###                | statement, rationale, scope, enforcement                    |
+| Standard        | STD-###                | statement, rationale, scope, flexibility                    |
 
 ### Migration Timeline Reference
 
 From `FRONTMATTER_METADATA_MIGRATION_PLAN.md`:
 
-| Phase | Scope | Estimated Time |
-|-------|-------|----------------|
-| 6A | Base frontmatter schema | 3-4 hours |
-| 6B | Spec frontmatter schema | 2-3 hours |
-| 6C | Delta frontmatter schema | 2-3 hours |
-| 6D | Remaining schemas (problem, risk, verification, requirement, design_revision, issue, memory, audit, plan/phase/task) | 8-16 hours |
-| 6E | Integration and migration (compatibility layer, opt-in migration) | 4-6 hours |
-| 6F | JSON Schema CLI integration (`schema show frontmatter.*`) | 2-3 hours |
-| 6G | Compaction profiles — canonical/derived classification + pilot (FR-007, DE-036) | TBD |
-| **Total** | End-to-end (excluding 6G) | **21-35 hours** |
+| Phase     | Scope                                                                                                                | Estimated Time  |
+| --------- | -------------------------------------------------------------------------------------------------------------------- | --------------- |
+| 6A        | Base frontmatter schema                                                                                              | 3-4 hours       |
+| 6B        | Spec frontmatter schema                                                                                              | 2-3 hours       |
+| 6C        | Delta frontmatter schema                                                                                             | 2-3 hours       |
+| 6D        | Remaining schemas (problem, risk, verification, requirement, design_revision, issue, memory, audit, plan/phase/task) | 8-16 hours      |
+| 6E        | Integration and migration (compatibility layer, opt-in migration)                                                    | 4-6 hours       |
+| 6F        | JSON Schema CLI integration (`schema show frontmatter.*`)                                                            | 2-3 hours       |
+| 6G        | Compaction profiles — canonical/derived classification + pilot (FR-007, DE-036)                                      | TBD             |
+| **Total** | End-to-end (excluding 6G)                                                                                            | **21-35 hours** |
 
 ### References
 

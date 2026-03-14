@@ -2,8 +2,8 @@
 id: IP-064.PHASE-03
 slug: 064-spec_driver_doctor_workspace_health_diagnostics-phase-03
 name: IP-064 Phase 03 — Polish and verification
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---
@@ -64,13 +64,16 @@ Confirm all CLI options work across all 6 categories. Update verification
 artifacts. Prepare for delta closure.
 
 ## 2. Links & References
+
 - **Delta**: DE-064
 - **Design Revision**: DR-064 §7 (CLI interface)
 
 ## 3. Entrance Criteria
+
 - [x] Phase 2 complete (all 6 check categories)
 
 ## 4. Exit Criteria / Done When
+
 - [x] JSON output includes all 6 categories — verified
 - [x] `--check` filter works for each category — verified (lifecycle, refs tested)
 - [x] `--verbose` shows pass results — verified
@@ -78,6 +81,7 @@ artifacts. Prepare for delta closure.
 - [x] Verification coverage updated in IP-064
 
 ## 5. Verification
+
 - `spec-driver doctor` — 91 pass, 1 warn, 0 fail
 - `spec-driver doctor --json` — valid JSON with all 6 categories
 - `spec-driver doctor --check lifecycle --verbose` — shows per-delta results
@@ -88,17 +92,19 @@ artifacts. Prepare for delta closure.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 3.1 | Verify JSON output with all 6 categories | | Valid, parseable |
-| [x] | 3.2 | Verify --check filter for new categories | | lifecycle, refs confirmed |
-| [x] | 3.3 | Full lint and test pass | | 9.71/10 pylint, ruff clean |
-| [x] | 3.4 | Update verification coverage in IP-064 | | |
+| Status | ID  | Description                              | Parallel? | Notes                      |
+| ------ | --- | ---------------------------------------- | --------- | -------------------------- |
+| [x]    | 3.1 | Verify JSON output with all 6 categories |           | Valid, parseable           |
+| [x]    | 3.2 | Verify --check filter for new categories |           | lifecycle, refs confirmed  |
+| [x]    | 3.3 | Full lint and test pass                  |           | 9.71/10 pylint, ruff clean |
+| [x]    | 3.4 | Update verification coverage in IP-064   |           |                            |
 
 ## 9. Decisions & Outcomes
+
 - 2026-03-08 — Phase 3 is largely verification-only since Phases 1-2 already implemented all features and CLI options
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (in this sheet)
 - [x] Notes updated

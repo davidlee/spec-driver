@@ -6,10 +6,10 @@ Tests for contract mirror tree builder.
 
 ### TestContractMirrorTreeBuilder
 
-Test ContractMirrorTreeBuilder: compat symlinks SPEC-*/contracts/ → .contracts/.
+Test ContractMirrorTreeBuilder: compat symlinks SPEC-\*/contracts/ → .contracts/.
 
 Canonical contract files live in .contracts/<view>/<path>.
-rebuild() creates compat symlinks from SPEC-*/contracts/ pointing back
+rebuild() creates compat symlinks from SPEC-\*/contracts/ pointing back
 into .contracts/ so that spec-relative tooling still works.
 
 **Inherits from:** unittest.TestCase
@@ -31,12 +31,12 @@ into .contracts/ so that spec-relative tooling still works.
 - `test_no_drift_warning_when_contracts_dir_missing(self) -> None`: No drift warning when SPEC has no contracts/ directory at all.
 - `test_python_compat_symlinks(self) -> None`: Python: compat symlinks for distributed contract files.
 - `test_rebuild_is_idempotent(self) -> None`: Consecutive rebuilds produce identical results.
-- `test_replaces_non_symlink_with_warning(self) -> None`: Replacing a real file in SPEC-*/contracts/ emits a warning.
+- `test_replaces_non_symlink_with_warning(self) -> None`: Replacing a real file in SPEC-\*/contracts/ emits a warning.
 - `test_symlinks_use_relative_paths(self) -> None`: Compat symlink targets are relative, not absolute. - -- properties --
 - `test_ts_compat_symlinks(self) -> None`: TypeScript: compat symlinks for file-based identifiers.
-- `test_zig_compat_symlinks(self) -> None`: Zig: compat symlinks in SPEC-*/contracts/ → .contracts/. - -- per-language compat symlinks --
-- `test_zig_root_package(self) -> None`: Zig root package '.' maps to __root__/ directory.
-- `_compat_link(self, spec_id, view, rel_path) -> Path`: Return expected compat symlink path in SPEC-*/contracts/.
+- `test_zig_compat_symlinks(self) -> None`: Zig: compat symlinks in SPEC-\*/contracts/ → .contracts/. - -- per-language compat symlinks --
+- `test_zig_root_package(self) -> None`: Zig root package '.' maps to **root**/ directory.
+- `_compat_link(self, spec_id, view, rel_path) -> Path`: Return expected compat symlink path in SPEC-\*/contracts/.
 - `_create_canonical(self, view, rel_path) -> Path`: Create a canonical contract file in .contracts/<view>/<rel_path>.
 - `_create_registry(self, languages) -> None`
 
@@ -68,6 +68,7 @@ Test Go contract mirror entry production.
 - `setUp(self) -> None`: Set up temp contracts directory.
 - `tearDown(self) -> None`: Clean up temp directory.
 - `test_package_based(self) -> None`: Test Go package identifier preserves contract filename in path.
+- `test_root_package(self) -> None`: Test Go root package '.' maps to **root**/ directory.
 
 ### TestPythonMirrorEntries
 
@@ -134,6 +135,7 @@ Test Go pre-generation path resolution.
 
 #### Methods
 
+- `test_root_package(self) -> None`: Test root package '.' maps to **root**/ directory.
 - `test_simple_package(self) -> None`: Test single-segment Go package.
 - `test_standard_package(self) -> None`: Test Go package produces dir/filename canonical paths.
 
@@ -156,7 +158,7 @@ Test Zig pre-generation path resolution.
 #### Methods
 
 - `test_file_identifier(self) -> None`: Test Zig file produces {identifier}.md leaf.
-- `test_root_package(self) -> None`: Test root '.' maps to __root__/ with original filenames.
+- `test_root_package(self) -> None`: Test root '.' maps to **root**/ with original filenames.
 
 ### TestTsMirrorEntries
 
@@ -184,4 +186,4 @@ Test Zig contract mirror entry production.
 - `test_file_based_identifier(self) -> None`: Test Zig file identifier produces entries for both views.
 - `test_missing_variant(self) -> None`: Test only existing contract files produce entries.
 - `test_no_contracts(self) -> None`: Test empty contracts directory returns empty.
-- `test_root_package(self) -> None`: Test root package '.' maps to __root__/ directory.
+- `test_root_package(self) -> None`: Test root package '.' maps to **root**/ directory.

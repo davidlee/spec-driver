@@ -2,6 +2,7 @@
 name: execute-phase
 description: Mandatory execution skill for any delta/IP implementation phase. Use it before code changes, move the owning delta to in-progress, keep notes current, reconcile structured execution docs, and surface blockers early.
 ---
+
 This skill is mandatory for implementation work under a delta or implementation
 plan.
 
@@ -15,12 +16,14 @@ actual state of work.
 You are executing one phase of planned work.
 
 Inputs:
+
 - Active phase sheet (`IP-XXX.PHASE-XX`)
 - `IP-XXX.md`
 - `DR-XXX.md` (when present, canonical design reference)
 - `DE-XXX.md`
 
 Process:
+
 1. Confirm entry criteria are met for the active phase.
 2. Read DR + IP + phase sheet before coding and use `/preflight` to surface
    confirmed inputs, assumptions, unresolved questions, and tensions before
@@ -42,14 +45,15 @@ Process:
    artefacts drift in a stale uncommitted pile while waiting for the perfect
    bundle.
 10. If `/preflight` or implementation reveals unresolved design ambiguity,
-   unexpected obstacles, tradeoffs, or policy ambiguity, stop and `/consult`
-   before improvising past it.
+    unexpected obstacles, tradeoffs, or policy ambiguity, stop and `/consult`
+    before improvising past it.
 11. Keep verification evidence current as work progresses (`planned` -> `in-progress` -> `verified` as appropriate).
 12. Before declaring the phase ready for audit, review the touched subsystems
     and notes once more for missed memory-capture candidates.
 13. When exit criteria are met, hand off to `/audit-change` for verification and spec reconciliation.
 
 Outcomes:
+
 - Phase objectives are implemented with traceable evidence.
 - Delta lifecycle state matches reality during implementation, not only at closure.
 - Notes and structured execution artefacts stay current throughout execution.

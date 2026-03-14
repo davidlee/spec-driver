@@ -32,10 +32,13 @@ findings:
 {{ audit_verification_block }}
 
 ## Observations
+
 - …
 
 ## Evidence
+
 - Code references, logs, test results
 
 ## Recommendations
+
 - …

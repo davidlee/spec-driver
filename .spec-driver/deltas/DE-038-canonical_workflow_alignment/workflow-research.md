@@ -64,17 +64,17 @@ delta -> (optional DR/IP/phases) -> implement -> update parent spec coverage -> 
 
 ## B. Path Compatibility Matrix (Including Flags)
 
-| Path | Default Runtime (Today) | Strict Mode (Future, Proposed) | Relevant Flags | Evidence |
-|------|--------------------------|------------------------------------------|----------------|----------|
-| Delta full: `delta -> DR -> IP -> phases -> implement -> ...` | Supported | Canonical | `--allow-missing-plan` (off) | `changes/creation.py` |
-| Delta lean: `delta -> implement -> ...` without IP/phases | Supported (no IP, no phases) | Non-canonical; strict mode hard-fails | `--allow-missing-plan` | `cli/create.py` + `changes/creation.py` |
-| Backlog-driven delta creation | Supported | Supported (if sequence after delta is canonical) | `--from-backlog` | `cli/create.py` |
-| Complete delta with requirement updates | Supported/default | Supported/default | (none) | `scripts/complete_delta.py`, `cli/complete.py` |
-| Complete delta while skipping requirement updates | Supported | Non-canonical; strict mode hard-fails | `--skip-update-requirements` | `cli/complete.py`, `scripts/complete_delta.py` |
-| Coverage-bypass close-out | Supported | Non-canonical; strict mode hard-fails | `--force`, `SPEC_DRIVER_ENFORCE_COVERAGE=false` | `scripts/complete_delta.py`, `coverage_check.py` |
-| Complete delta before audit/revision/spec patch | Supported | Non-canonical; strict mode hard-fails | (none) | sequence is not currently enforced |
-| Audit -> revision -> patch specs before close | Supported (manual sequencing) | Canonical | (none) | docs + manual flow support |
-| Revision-first workflow | Supported/concession | Non-canonical; strict mode hard-fails | (none) | `cli/create.py`, `docs/commands-workflow.md` |
+| Path                                                          | Default Runtime (Today)       | Strict Mode (Future, Proposed)                   | Relevant Flags                                  | Evidence                                         |
+| ------------------------------------------------------------- | ----------------------------- | ------------------------------------------------ | ----------------------------------------------- | ------------------------------------------------ |
+| Delta full: `delta -> DR -> IP -> phases -> implement -> ...` | Supported                     | Canonical                                        | `--allow-missing-plan` (off)                    | `changes/creation.py`                            |
+| Delta lean: `delta -> implement -> ...` without IP/phases     | Supported (no IP, no phases)  | Non-canonical; strict mode hard-fails            | `--allow-missing-plan`                          | `cli/create.py` + `changes/creation.py`          |
+| Backlog-driven delta creation                                 | Supported                     | Supported (if sequence after delta is canonical) | `--from-backlog`                                | `cli/create.py`                                  |
+| Complete delta with requirement updates                       | Supported/default             | Supported/default                                | (none)                                          | `scripts/complete_delta.py`, `cli/complete.py`   |
+| Complete delta while skipping requirement updates             | Supported                     | Non-canonical; strict mode hard-fails            | `--skip-update-requirements`                    | `cli/complete.py`, `scripts/complete_delta.py`   |
+| Coverage-bypass close-out                                     | Supported                     | Non-canonical; strict mode hard-fails            | `--force`, `SPEC_DRIVER_ENFORCE_COVERAGE=false` | `scripts/complete_delta.py`, `coverage_check.py` |
+| Complete delta before audit/revision/spec patch               | Supported                     | Non-canonical; strict mode hard-fails            | (none)                                          | sequence is not currently enforced               |
+| Audit -> revision -> patch specs before close                 | Supported (manual sequencing) | Canonical                                        | (none)                                          | docs + manual flow support                       |
+| Revision-first workflow                                       | Supported/concession          | Non-canonical; strict mode hard-fails            | (none)                                          | `cli/create.py`, `docs/commands-workflow.md`     |
 
 ---
 

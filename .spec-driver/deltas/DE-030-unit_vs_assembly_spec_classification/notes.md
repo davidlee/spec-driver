@@ -3,6 +3,7 @@
 This delta operationalizes ADR-003 via **non-breaking taxonomy metadata** and **navigation tooling**.
 
 ## Locked decisions
+
 - Reserved tech spec taxonomy values:
   - `category: unit` (1:1 with a language unit)
   - `category: assembly` (cross-unit / subsystem / integration)
@@ -16,6 +17,7 @@ This delta operationalizes ADR-003 via **non-breaking taxonomy metadata** and **
 ## Progress
 
 ### Phase 1 — COMPLETE ✓
+
 All tasks done, tests passing, lint clean.
 
 - **1.1** `Spec` model: added `category` and `c4_level` properties + `to_dict` inclusion (`specs/models.py`)
@@ -51,12 +53,15 @@ All tasks done, tests passing, lint clean.
   - 3 new tests in `spec_formatters_test.py`
 
 ### Test counts
+
 - 1699 passed, 3 skipped, 0 failed
 - `just lint` clean, pylint: index.py + spec_formatters.py at 9.71/10
 
 ## Don'ts (scope control)
+
 - Don't tighten the schema to an enum for `category` in v1 (too breaking; existing freeform use may exist).
 - Don't introduce a new top-level folder split yet (defer migration until taxonomy proves value).
 
 ## ADR-003
+
 Status changed from `draft` → `accepted` at start of implementation.

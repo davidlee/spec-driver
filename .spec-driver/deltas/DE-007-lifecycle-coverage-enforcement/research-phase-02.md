@@ -9,6 +9,7 @@
 ### PROD-008: Requirements Lifecycle Coherence
 
 **Core Contract:**
+
 - **FR-001**: Specs frontmatter and coverage blocks are THE authoritative record of requirement lifecycle state
 - **FR-002**: Every delta changing requirement behavior MUST document VT/VA/VH in implementation plan and **promote final state back to spec coverage block before completion**
 - **FR-003**: Audits reconcile observed vs spec, raise drift warnings until corrected
@@ -18,6 +19,7 @@
 ### PROD-009: Requirement Lifecycle Semantics
 
 **Core Semantics:**
+
 - **FR-001**: Specs declare baseline lifecycle statuses (planned, asserted, legacy_verified, deprecated)
 - **FR-002**: Lifecycle engine overlays statuses from deltas and audits using timestamp precedence
 - **FR-003**: Validation emits warnings when overlays disagree
@@ -31,6 +33,7 @@
 ### File: `supekku/scripts/complete_delta.py`
 
 **Current Flow** (lines 344-458):
+
 1. Load workspace and delta registry
 2. Validate delta exists and status is appropriate
 3. Collect requirements from `delta.applies_to.requirements`
@@ -46,12 +49,14 @@
 13. Sync delta registry
 
 **Key Functions:**
+
 - `complete_delta()` - main orchestration (line 344)
 - `validate_delta_status()` - checks delta status (line 54)
 - `collect_requirements_to_update()` - gets requirements from delta (line 77)
 - `update_requirements_in_revision_sources()` - persists requirement updates (line 207)
 
 **Existing Flags:**
+
 - `--dry-run` - preview without changes
 - `--force` - skip all prompts
 - `--skip-sync` - skip spec sync prompt
@@ -60,6 +65,7 @@
 ### File: `supekku/cli/complete.py`
 
 **Structure**: Thin wrapper around `complete_delta_impl()`
+
 - Uses Typer for CLI argument parsing
 - Maps flags to implementation function
 - Simple error handling and exit codes
@@ -71,12 +77,14 @@
 ### File: `supekku/scripts/lib/blocks/verification.py`
 
 **Available Tools:**
+
 - `load_coverage_blocks(path: Path)` - extracts coverage blocks from markdown files
 - `extract_coverage_blocks(text: str)` - parses coverage from text
 - `VerificationCoverageBlock` - dataclass with `raw_yaml` and `data` fields
 - `VerificationCoverageValidator` - validates block schema and entries
 
 **Coverage Entry Structure:**
+
 ```python
 {
   'artefact': 'VT-902',      # V[TAH]-###
@@ -89,12 +97,14 @@
 ```
 
 **Constants:**
+
 - `VALID_STATUSES = {"planned", "in-progress", "verified", "failed", "blocked"}`
 - `VALID_KINDS = {"VT", "VA", "VH"}`
 
 ## Requirements Registry Integration (Phase 01)
 
 **From Phase 01 completion notes:**
+
 - Registry already processes coverage blocks via `_apply_coverage_blocks()`
 - Coverage extracted from specs, IPs, deltas, audits
 - `RequirementRecord.verified_by` populated with artefact IDs
@@ -102,6 +112,7 @@
 - Drift detection emits warnings to stderr
 
 **Registry Access:**
+
 ```python
 workspace = Workspace.from_cwd()
 requirements_registry = workspace.requirements
@@ -117,6 +128,7 @@ requirements_registry = workspace.requirements
 **Location**: `supekku/scripts/lib/changes/coverage_check.py` (new module, keeps CLI thin)
 
 **Signature:**
+
 ```python
 def check_coverage_completeness(
   delta_id: str,
@@ -130,6 +142,7 @@ def check_coverage_completeness(
 ```
 
 **Algorithm:**
+
 1. Load delta from workspace.delta_registry
 2. Extract `applies_to.requirements` list
 3. For each requirement:
@@ -142,6 +155,7 @@ def check_coverage_completeness(
 4. Return (all_verified, missing_list)
 
 **Data Structure for Missing Coverage:**
+
 ```python
 @dataclass
 class CoverageMissing:
@@ -155,6 +169,7 @@ class CoverageMissing:
 ### Integration Point
 
 **Insert before line 426** in `complete_delta()`:
+
 ```python
 # Confirm unless force mode
 if not force and not prompt_yes_no("Proceed with completion?", default=False):
@@ -172,6 +187,7 @@ elif not force:
 ```
 
 **Rationale**:
+
 - After preview and spec sync, before final confirmation
 - Skip if `--force` flag (emergency override)
 - Skip if environment variable disables enforcement
@@ -191,7 +207,8 @@ def is_coverage_enforcement_enabled() -> bool:
 **Function**: `display_coverage_error(delta_id, missing_list)`
 
 **Format:**
-```
+
+````
 ERROR: Cannot complete {delta_id} - coverage verification required
 
 The following requirements need verified coverage in their specs:
@@ -208,12 +225,13 @@ entries:
     requirement: {requirement_id}
     status: verified  # ← Update this
     notes: Description of verification
-```
+````
 
 See: .spec-driver/RUN.md for coverage workflow documentation
 
 To bypass this check (emergency only):
-  uv run spec-driver complete delta {delta_id} --force
+uv run spec-driver complete delta {delta_id} --force
+
 ```
 
 ## Testing Strategy
@@ -321,3 +339,4 @@ Add to "Before Completing Delta" checklist:
 **Files to Update:**
 - `AGENTS.md` - add coverage checklist
 - `supekku/scripts/lib/changes/__init__.py` - export new functions if needed
+```

@@ -1,8 +1,8 @@
 ---
 id: ISSUE-016
 name: Sync backlog requirements to requirements registry
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: resolved
 kind: issue
 categories:
@@ -27,11 +27,13 @@ Requirements defined in backlog issues (like ISSUE-013) are invisible to the req
 5. **Coverage Blind Spot**: Verification coverage tracking can't link to issue-based requirements
 
 **Current State**:
+
 - Requirements registry only syncs from `specify/product/` and `specify/tech/` specs
 - Backlog issues can define requirements (e.g., `ISSUE-013.FR-013.001`) but they're orphaned
 - No way to see the full picture of all requirements across the system
 
 **Desired State**:
+
 - Requirements registry includes all requirements from all sources (specs, issues, problems, improvements)
 - Can filter by source kind: `--kind spec`, `--kind issue`, `--kind problem`, etc.
 - Tooling to migrate requirements from backlog to specs when they mature
@@ -40,6 +42,7 @@ Requirements defined in backlog issues (like ISSUE-013) are invisible to the req
 ## Context
 
 **Discovery**: While completing DE-012, we defined requirements in ISSUE-013:
+
 - FR-013.001: IP Schema Restoration
 - FR-013.002: Phase Creation with Criteria Copy
 - FR-013.003: Drift Detection Warning
@@ -48,6 +51,7 @@ Requirements defined in backlog issues (like ISSUE-013) are invisible to the req
 These requirements are properly structured and verified, but don't appear in `spec-driver list requirements` output.
 
 **Impact**:
+
 - Planners can't see complete requirement landscape
 - Coverage analysis is incomplete
 - Requirement migration requires manual work
@@ -70,6 +74,7 @@ def sync(self):
 ```
 
 **Requirement ID Pattern**:
+
 - Specs: `SPEC-100.FR-001`, `PROD-005.NF-002`
 - Issues: `ISSUE-013.FR-013.001`, `ISSUE-013.NF-013.001`
 - Problems: `PROB-001.FR-001`
@@ -92,6 +97,7 @@ class RequirementRecord:
 ### 3. Add Filtering by Source
 
 **CLI Support**:
+
 ```bash
 # Show all requirements
 spec-driver list requirements
@@ -124,6 +130,7 @@ spec-driver migrate requirement ISSUE-013.FR-013.001 --to SPEC-114
 ### 5. Registry Schema Updates
 
 Update `.spec-driver/registry/requirements.yaml` to include:
+
 ```yaml
 requirements:
   ISSUE-013.FR-013.001:
@@ -173,9 +180,11 @@ entries:
 ## Requirements
 
 ### FR-016.001: Sync Backlog Requirements
+
 **Statement**: The requirements registry SHALL sync requirements from backlog issues, problems, and improvements in addition to specs.
 
 **Acceptance Criteria**:
+
 - `RequirementsRegistry.sync()` discovers requirements in `backlog/issues/`, `backlog/problems/`, `backlog/improvements/`
 - Requirements parsed from structured sections (same format as specs)
 - Requirement IDs follow pattern: `{ARTIFACT_ID}.{KIND}-{NUMBER}`
@@ -184,9 +193,11 @@ entries:
 **Verification**: VT-SYNC-016-001 (unit tests for backlog requirement discovery)
 
 ### FR-016.002: Filter Requirements by Source
+
 **Statement**: The `list requirements` command SHALL support filtering by source_kind and source_type.
 
 **Acceptance Criteria**:
+
 - `--source-kind {spec|issue|problem|improvement}` filters by artifact kind
 - `--source-type {prod|tech|backlog}` filters by source type
 - Multiple filters can be combined
@@ -195,9 +206,11 @@ entries:
 **Verification**: VT-FILTER-016-002 (CLI tests for filtering)
 
 ### FR-016.003: Requirement Migration Command
+
 **Statement**: The system SHALL provide a command to migrate requirements from backlog artifacts to specs.
 
 **Acceptance Criteria**:
+
 - `migrate requirement SOURCE_ID --to TARGET_SPEC` migrates requirement
 - Updates all references (deltas, verification coverage, etc.)
 - Marks source as migrated/superseded
@@ -207,9 +220,11 @@ entries:
 **Verification**: VT-MIGRATE-016-003 (migration command tests)
 
 ### FR-016.004: Coverage Tracking for Backlog Requirements
+
 **Statement**: Verification coverage tracking SHALL support backlog-sourced requirements.
 
 **Acceptance Criteria**:
+
 - Verification blocks can reference `ISSUE-XXX.FR-YYY` requirements
 - `show delta --json` includes backlog requirement coverage
 - Coverage validation works for all source kinds
@@ -218,9 +233,11 @@ entries:
 **Verification**: VT-COVERAGE-016-004 (coverage tracking tests)
 
 ### NF-016.001: Backward Compatibility
+
 **Statement**: Registry changes MUST NOT break existing spec-only workflows.
 
 **Acceptance Criteria**:
+
 - Existing requirement IDs still work (`SPEC-100.FR-001`)
 - Default `list requirements` behavior unchanged (shows all)
 - Existing verification coverage continues working
@@ -231,20 +248,24 @@ entries:
 ## Affected Components
 
 **Core**:
+
 - `supekku/scripts/lib/requirements/registry.py` - Extend sync logic
 - `supekku/scripts/lib/requirements/models.py` - Add source metadata
 - `supekku/scripts/lib/backlog/registry.py` - Issue/problem discovery
 - `.spec-driver/registry/requirements.yaml` - Schema extension
 
 **CLI**:
+
 - `supekku/cli/list.py` - Add filtering options
 - New: `supekku/cli/migrate.py` - Requirement migration command
 
 **Validation**:
+
 - `supekku/scripts/lib/validation/validator.py` - Support backlog requirements
 - `supekku/scripts/lib/changes/coverage_check.py` - Handle all source kinds
 
 **Tests**:
+
 - `supekku/scripts/lib/requirements/registry_test.py` - Sync tests
 - `supekku/cli/migrate_test.py` - Migration tests
 - Integration tests for end-to-end workflows
@@ -262,12 +283,14 @@ entries:
 ## Notes
 
 **Migration Strategy**:
+
 - Phase 1: Read-only sync (discovery + display)
 - Phase 2: Filtering support
 - Phase 3: Migration tooling
 - Phase 4: Advanced features (bulk migration, automatic promotion rules)
 
 **Design Decisions**:
+
 - Use same requirement format in backlog as in specs (consistency)
 - Source kind/type as metadata, not separate registries (unified view)
 - Migration preserves history via explicit links (traceability)
@@ -275,14 +298,15 @@ entries:
 **Partial fix (2026-03-07)**: Validator `_validate_change_relations` rejected
 `implements -> IMPR-xxx` because it checked against `requirement_ids` only
 (FR/NF). Two changes applied:
+
 1. Switched validator from `load_backlog_registry` (ordering YAML, easily stale)
    to `discover_backlog_items` (filesystem discovery) for building `backlog_ids`.
 2. Added `backlog_ids` to the valid target set for `implements` relations, not
    just `applies_to`. Deltas legitimately implement backlog improvements.
 
 **Future Enhancements**:
+
 - Automatic requirement promotion (issue → problem → spec)
 - Requirement maturity lifecycle tracking
 - Requirement coverage dashboards by source
 - Orphaned requirement detection across all sources
-

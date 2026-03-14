@@ -1,8 +1,8 @@
 ---
 id: IMPR-012
-name: 'Registries check: detect silent ID deduplication from filesystem-level collisions'
-created: '2026-03-08'
-updated: '2026-03-08'
+name: "Registries check: detect silent ID deduplication from filesystem-level collisions"
+created: "2026-03-08"
+updated: "2026-03-08"
 status: open
 kind: improvement
 ---
@@ -26,4 +26,3 @@ artifact ID. Report as `fail` with both paths so the user can resolve.
 Discovered during DE-064 Phase 2 preflight. Explicitly deferred from Phase 2
 scope to keep the registries check focused on load-without-error and basic
 integrity.
-

@@ -26,6 +26,7 @@ exit_criteria:
 ## 1. Objective
 
 Implement and validate the foundational utilities for package-level spec granularity:
+
 - Package detection logic (leaf package identification)
 - Validate deterministic file ordering already works
 - Audit registry for package-level compatibility
@@ -66,23 +67,27 @@ This phase ensures the technical foundation is solid before executing the migrat
 ## 5. Verification
 
 **VT-001: Package Detection Unit Tests**
+
 - Test leaf package identification (16 known leaf packages)
 - Test non-leaf package detection (8 parent packages)
 - Test validation errors for non-packages
 - Test edge cases: single-file packages, deeply nested
 
 **VT-002: Deterministic Ordering Validation**
+
 - Location: `supekku/scripts/lib/docs/python/variants_test.py` (enhance)
 - Run contract generation 10 times on `supekku/scripts/lib/formatters/`
 - Verify byte-identical output (MD5 hash comparison)
 - Test with packages of varying file counts
 
 **VA-002: Rollup Extensibility Design Review**
+
 - Document how rollup mechanism could be added
 - Confirm configuration-driven approach viable
 - Verify no breaking changes required
 
 **Commands**:
+
 ```bash
 # Run VT-001
 uv run pytest supekku/scripts/lib/specs/package_utils_test.py -v
@@ -101,31 +106,33 @@ just pylint
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - Existing `sorted(path.rglob("*.py"))` provides deterministic ordering (needs validation)
 - Registry already package-aware via `find_by_package()` and `Spec.packages`
 - 16 leaf packages is manageable count for manual migration in Phase 02
 - macOS and Linux ordering behavior is identical
 
 **STOP Conditions**:
+
 - STOP if deterministic ordering fails on current platform
 - STOP if registry requires major refactoring (escalate design review)
 - STOP if leaf package count differs significantly from 16 (re-estimate effort)
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Implement package detection utilities | [ ] | ✓ 201 lines, 10.00/10 pylint |
-| [x] | 1.2 | Write VT-001 package detection tests | [x] | ✓ 29 tests passing |
-| [x] | 1.3 | Enhance VT-002 deterministic ordering tests | [x] | ✓ 8 tests passing |
-| [x] | 1.4 | Document VA-002 rollup extensibility | [x] | ✓ Design complete |
-| [x] | 1.5 | Audit registry implementation | [x] | ✓ No changes needed |
-| [x] | 1.6 | Run full test suite and lint | [ ] | ✓ 1094 tests, 9.68/10 |
-
+| Status | ID  | Description                                 | Parallel? | Notes                        |
+| ------ | --- | ------------------------------------------- | --------- | ---------------------------- |
+| [x]    | 1.1 | Implement package detection utilities       | [ ]       | ✓ 201 lines, 10.00/10 pylint |
+| [x]    | 1.2 | Write VT-001 package detection tests        | [x]       | ✓ 29 tests passing           |
+| [x]    | 1.3 | Enhance VT-002 deterministic ordering tests | [x]       | ✓ 8 tests passing            |
+| [x]    | 1.4 | Document VA-002 rollup extensibility        | [x]       | ✓ Design complete            |
+| [x]    | 1.5 | Audit registry implementation               | [x]       | ✓ No changes needed          |
+| [x]    | 1.6 | Run full test suite and lint                | [ ]       | ✓ 1094 tests, 9.68/10        |
 
 ### Task Details
 
 **1.1 Package Detection Utilities**
+
 - **Design / Approach**: Pure functions following `core/` utilities pattern
   - `is_leaf_package(path)` - Check `__init__.py` + no child packages
   - `find_package_for_file(file_path)` - Traverse up to find package
@@ -137,35 +144,40 @@ just pylint
 - **Testing**: Covered by task 1.2
 
 **1.2 VT-001 Package Detection Tests**
+
 - **Design / Approach**: Comprehensive unit tests using real supekku/ structure
 - **Files / Components**: New `supekku/scripts/lib/specs/package_utils_test.py`
 - **Testing**: Self-contained verification
 
 **1.3 VT-002 Deterministic Ordering Tests**
+
 - **Design / Approach**: Enhance existing test file
 - **Files / Components**: Enhance `supekku/scripts/lib/docs/python/variants_test.py`
 - **Testing**: Run with `pytest -v`
 
 **1.4 VA-002 Rollup Extensibility Design Review**
+
 - **Design / Approach**: Document rollup mechanism approach
 - **Files / Components**: New `change/deltas/DE-002-.../VA-002-rollup-extensibility.md`
 - **Testing**: N/A (design document)
 
 **1.5 Registry Audit**
+
 - **Design / Approach**: Read-only code review
 - **Files / Components**: Review `registry.py` and `models.py`
 - **Observations**: Already compatible - no changes needed
 
 **1.6 Run Full Test Suite and Lint**
+
 - **Testing**: `just test`, `just lint`, `just pylint`
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Deterministic ordering fails on platform | VT-002 validates early | Pending |
-| Registry requires major refactoring | Audit complete (none needed) | ✓ Mitigated |
-| Leaf package count estimate wrong | Already counted: 16 packages | ✓ Mitigated |
+| Risk                                     | Mitigation                   | Status      |
+| ---------------------------------------- | ---------------------------- | ----------- |
+| Deterministic ordering fails on platform | VT-002 validates early       | Pending     |
+| Registry requires major refactoring      | Audit complete (none needed) | ✓ Mitigated |
+| Leaf package count estimate wrong        | Already counted: 16 packages | ✓ Mitigated |
 
 ## 9. Decisions & Outcomes
 
@@ -181,6 +193,7 @@ just pylint
 **Deterministic Ordering** (`variants.py:40-50`): `sorted(rglob())` works ✓
 
 **16 Leaf Packages**:
+
 ```
 supekku/cli
 supekku/scripts/backlog

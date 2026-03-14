@@ -1,8 +1,8 @@
 ---
 id: ISSUE-042
-name: 'Short flag -ri breaks: -r consumes i as its regex value'
-created: '2026-03-06'
-updated: '2026-03-09'
+name: "Short flag -ri breaks: -r consumes i as its regex value"
+created: "2026-03-06"
+updated: "2026-03-09"
 status: resolved
 kind: issue
 categories: []
@@ -44,4 +44,3 @@ argument. The actual pattern `"cli"` becomes an orphan positional.
 
 Option 3 is probably the best UX — case-sensitive regex on artifact names
 is rarely what you want.
-

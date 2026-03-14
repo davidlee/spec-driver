@@ -2,8 +2,8 @@
 id: IP-041.PHASE-03
 slug: 041-cli_completeness_fill_obvious_command_gaps-phase-03
 name: "IP-041 Phase 03 — List improvements + final verification"
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: complete
 kind: phase
 ---
@@ -88,17 +88,20 @@ subcommand, backfill the `--filter` flag on 6 commands that lack it, add
 `--truncate` to `list cards`, and close out all verification artifacts.
 
 ## 2. Links & References
+
 - **Delta**: [DE-041](../DE-041.md)
 - **Design Revision**: [DR-041](../DR-041.md) §4.8, §4.10
 - **Specs**: PROD-010 (CLI UX), PROD-013 (CLI Artifact File Access)
 - **Existing pattern**: `list changes` has the canonical `--filter` implementation
 
 ## 3. Entrance Criteria
+
 - [x] Phase 2 complete (all show/view/edit/find subcommands wired and tested)
 - [x] Existing test suite passing (`just check`)
 - [x] DR-041 §4.8 reviewed
 
 ## 4. Exit Criteria / Done When
+
 - [x] `list plans` with `--json/--format/--filter/--status/--truncate`
 - [x] `format_plan_list_table()` tested
 - [x] `--filter` on: deltas, adrs, policies, standards, memories
@@ -108,6 +111,7 @@ subcommand, backfill the `--filter` flag on 6 commands that lack it, add
 - [x] `just check` green
 
 ## 5. Verification
+
 ```bash
 # Formatter tests
 uv run pytest supekku/scripts/lib/formatters/change_formatters_test.py -k plan_list -v
@@ -122,27 +126,29 @@ just check
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
-- Plan files (IP-*.md) have frontmatter with id, name, status, kind fields
+
+- Plan files (IP-\*.md) have frontmatter with id, name, status, kind fields
 - The `--filter` backfill follows the exact pattern from `list changes` (substring match on id/slug/name)
 - Card formatter can accept a truncate parameter following the same convention as other formatters
 - `format_plan_list_table` follows existing table formatter patterns (rich Table)
 
 **STOP when**:
+
 - Plan frontmatter is too inconsistent to display in a table (would need registry-level normalization)
 - Card formatter truncate requires changing the Card model
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 3.1 | format_plan_list_table() + tests | [ ] | Foundation for list plans |
-| [x] | 3.2 | Plan discovery function | [P] | `PlanSummary` + `discover_plans()` in `changes/registry.py`; 10 tests |
-| [x] | 3.3 | Wire list plans subcommand | [ ] | `list plans` with --status/--filter/--regexp/--json/--format/--truncate |
-| [x] | 3.4 | --filter on list deltas | [P] | Substring filter before regexp |
-| [x] | 3.5 | --filter on adrs/policies/standards/memories | [P] | Same pattern; 4 commands |
-| [x] | 3.6 | --filter + --truncate on list cards | [P] | Substring filter + truncate passed to formatter |
-| [x] | 3.7 | Integration tests (VT-list-filters) | [ ] | 8 tests: 5 list plans + 3 list deltas filter |
-| [x] | 3.8 | IP verification update + final check | [ ] | All VTs verified, VA-lint verified, just check green |
+| Status | ID  | Description                                  | Parallel? | Notes                                                                   |
+| ------ | --- | -------------------------------------------- | --------- | ----------------------------------------------------------------------- |
+| [x]    | 3.1 | format_plan_list_table() + tests             | [ ]       | Foundation for list plans                                               |
+| [x]    | 3.2 | Plan discovery function                      | [P]       | `PlanSummary` + `discover_plans()` in `changes/registry.py`; 10 tests   |
+| [x]    | 3.3 | Wire list plans subcommand                   | [ ]       | `list plans` with --status/--filter/--regexp/--json/--format/--truncate |
+| [x]    | 3.4 | --filter on list deltas                      | [P]       | Substring filter before regexp                                          |
+| [x]    | 3.5 | --filter on adrs/policies/standards/memories | [P]       | Same pattern; 4 commands                                                |
+| [x]    | 3.6 | --filter + --truncate on list cards          | [P]       | Substring filter + truncate passed to formatter                         |
+| [x]    | 3.7 | Integration tests (VT-list-filters)          | [ ]       | 8 tests: 5 list plans + 3 list deltas filter                            |
+| [x]    | 3.8 | IP verification update + final check         | [ ]       | All VTs verified, VA-lint verified, just check green                    |
 
 ### Task Details
 
@@ -182,19 +188,22 @@ just check
   - Update IP-041 progress tracking: Phase 3 complete.
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| list.py exceeds maintainable size | Each change is small and follows proven patterns; track line count | Monitor |
-| Plan discovery O(n) over delta dirs | Typically <50 delta dirs; acceptable | Accepted |
-| Card formatter truncate param changes API | Backward-compatible: default to no-truncate | Planned |
+
+| Risk                                      | Mitigation                                                         | Status   |
+| ----------------------------------------- | ------------------------------------------------------------------ | -------- |
+| list.py exceeds maintainable size         | Each change is small and follows proven patterns; track line count | Monitor  |
+| Plan discovery O(n) over delta dirs       | Typically <50 delta dirs; acceptable                               | Accepted |
+| Card formatter truncate param changes API | Backward-compatible: default to no-truncate                        | Planned  |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-04` — Phase scope: all list improvements from DR-041 §4.8 + delta closure verification.
 - `2026-03-04` — Tasks 3.4–3.6 are mechanical and independent; can be done in parallel or batched.
 
 ## 10. Findings / Research Notes
 
 **Pre-phase analysis**:
+
 - `--filter` already exists on 8 list commands (specs, changes, requirements, revisions, backlog, issues, problems, improvements, risks)
 - Missing from 6: deltas, adrs, policies, standards, memories, cards
 - `--truncate` exists on 14/15 list commands; missing from cards only
@@ -203,6 +212,7 @@ just check
 - `list_deltas` already has `--regexp`; `--filter` is the simpler complement
 
 ## 11. Wrap-up Checklist
+
 - [ ] Exit criteria satisfied
 - [ ] Verification evidence stored
 - [ ] IP-041 updated with Phase 3 results

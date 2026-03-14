@@ -2,8 +2,8 @@
 id: IP-027.PHASE-01
 slug: 027-contract_mirror_tree_index-phase-01
 name: IP-027 Phase 01 - Core builder and path mapping
-created: '2026-02-20'
-updated: '2026-02-20'
+created: "2026-02-20"
+updated: "2026-02-20"
 status: complete
 kind: phase
 ---
@@ -64,11 +64,13 @@ phase: IP-027.PHASE-01
 # Phase 1 - Core builder and path mapping
 
 ## 1. Objective
+
 Implement `ContractMirrorTreeBuilder` with per-language path mapping and full test coverage.
 The builder reads `registry_v2.json` + scans `SPEC-*/contracts/` directories, then creates
 a `.contracts/<view>/<source-path>.md` symlink tree.
 
 ## 2. Links & References
+
 - **Delta**: [DE-027](../DE-027.md)
 - **Design Revision**: [DR-027](../DR-027.md) — sections 7.1–7.8
 - **Specs**: PROD-014 (FR-001 through FR-007, NF-001, NF-002)
@@ -76,11 +78,13 @@ a `.contracts/<view>/<source-path>.md` symlink tree.
 - **Registry**: `specify/tech/registry_v2.json`
 
 ## 3. Entrance Criteria
+
 - [x] DE-027 and DR-027 drafted with clear design decisions
 - [x] SpecIndexBuilder pattern understood
 - [x] Contract naming conventions confirmed from real filesystem
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `ContractMirrorTreeBuilder.rebuild()` produces correct `.contracts/` tree
 - [ ] Python path mapping: header-based module identity → mirror path
 - [ ] Zig path mapping: file-based identifier → mirror path (including `"."` → `__root__/`)
@@ -91,6 +95,7 @@ a `.contracts/<view>/<source-path>.md` symlink tree.
 - [ ] `just lint` and `just pylint` clean
 
 ## 5. Verification
+
 - `just test` — all unit and integration tests
 - `just lint` — ruff
 - `just pylint` — pylint threshold
@@ -98,21 +103,24 @@ a `.contracts/<view>/<source-path>.md` symlink tree.
 - VT-CONTRACT-MIRROR-002: Per-language path mapping, missing variants, conflicts
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: All Python contracts begin with `# dotted.module.name` header
 - STOP when: Contract header format varies from expected pattern
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Per-language path mapping functions | [P] | Pure functions, all 4 languages |
-| [x] | 1.2 | ContractMirrorTreeBuilder core | | Rebuild, clean, conflict resolution, aliases |
-| [x] | 1.3 | Unit tests for path mapping | [P] | 29 unit tests |
-| [x] | 1.4 | Integration tests for tree building | | 15 integration tests |
-| [x] | 1.5 | Lint and final checks | | ruff + pylint 10/10, 1646 tests pass |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                         | Parallel? | Notes                                        |
+| ------ | --- | ----------------------------------- | --------- | -------------------------------------------- |
+| [x]    | 1.1 | Per-language path mapping functions | [P]       | Pure functions, all 4 languages              |
+| [x]    | 1.2 | ContractMirrorTreeBuilder core      |           | Rebuild, clean, conflict resolution, aliases |
+| [x]    | 1.3 | Unit tests for path mapping         | [P]       | 29 unit tests                                |
+| [x]    | 1.4 | Integration tests for tree building |           | 15 integration tests                         |
+| [x]    | 1.5 | Lint and final checks               |           | ruff + pylint 10/10, 1646 tests pass         |
 
 ### Task Details
+
 - **1.1 Per-language path mapping**
   - **Design**: Pure functions per DR-027 §7.2–7.3. Python reads first header line. Zig/Go/TS use filename lookup.
   - **Files**: `supekku/scripts/lib/contracts/mirror.py`
@@ -132,22 +140,26 @@ a `.contracts/<view>/<source-path>.md` symlink tree.
   - `just test`, `just lint`, `just pylint`
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+
+| Risk                          | Mitigation                                  | Status    |
+| ----------------------------- | ------------------------------------------- | --------- |
 | Python contract header varies | Confirmed consistent format from real files | mitigated |
-| Deep symlink paths | Use `os.path.relpath` per DR-027 §7.6 | mitigated |
+| Deep symlink paths            | Use `os.path.relpath` per DR-027 §7.6       | mitigated |
 
 ## 9. Decisions & Outcomes
+
 - 2026-02-20 — Python mapper deduplicates by SPEC ID to avoid redundant scanning when multiple identifiers map to the same SPEC.
 - 2026-02-20 — `shutil.rmtree` for cleanup (simpler than selective symlink removal; `.contracts/` is entirely generated).
 - 2026-02-20 — `MirrorEntry` and `ContractMirrorTreeBuilder` both get `pylint: disable=too-few-public-methods` (dataclass and single-responsibility builder).
 
 ## 10. Findings / Research Notes
+
 - Updated `package_utils_test.py` to account for new `contracts` leaf package (19 -> 20).
 - Python contract headers confirmed consistent: always `# dotted.module.name` as first line.
 - `ruff` import sorting auto-fix needed on test file (expected).
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

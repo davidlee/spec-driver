@@ -191,7 +191,7 @@ find_artifacts raises ValueError for unknown types.
 
 ### TestParsePrefix
 
-_parse_prefix extracts alphabetic prefix from dash-separated IDs.
+\_parse_prefix extracts alphabetic prefix from dash-separated IDs.
 
 #### Methods
 

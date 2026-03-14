@@ -1,8 +1,8 @@
 ---
 id: ISSUE-038
 name: list memories --truncate renders status column with file path
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: open
 kind: issue
 categories: []

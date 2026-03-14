@@ -57,13 +57,13 @@
 
 ### Risks updated post-spike
 
-| Risk | Status | Notes |
-|---|---|---|
-| Rich markup in Textual | **Resolved** | Pre-resolved Text objects are the path |
-| DataTable vs formatter mismatch | **Resolved** | Skip formatters, build rows directly |
-| Textual version pin | **Low risk** | 8.0.2 available, `>=3.0` pin is fine |
-| BacklogRegistry divergence | **Known** | Adapter shim needed, small scope |
-| CardRegistry lane≠status | **Known** | Map lane to status slot in adapter |
+| Risk                            | Status       | Notes                                  |
+| ------------------------------- | ------------ | -------------------------------------- |
+| Rich markup in Textual          | **Resolved** | Pre-resolved Text objects are the path |
+| DataTable vs formatter mismatch | **Resolved** | Skip formatters, build rows directly   |
+| Textual version pin             | **Low risk** | 8.0.2 available, `>=3.0` pin is fine   |
+| BacklogRegistry divergence      | **Known**    | Adapter shim needed, small scope       |
+| CardRegistry lane≠status        | **Known**    | Map lane to status slot in adapter     |
 
 ### Commits
 
@@ -98,6 +98,7 @@ DE-053 exit criteria requires a follow-up delta to normalise BacklogRegistry
 from function-based to class-based (`collect/find/iter/filter`).
 
 Related backlog items to evaluate as potential riders:
+
 - ISSUE-016, ISSUE-024, ISSUE-026, ISSUE-034, ISSUE-043, ISSUE-045
 - IMPR-010
 
@@ -125,6 +126,7 @@ ride the normalisation delta — triage when scoping.
 ### Files created/modified
 
 New:
+
 - `supekku/scripts/lib/formatters/theme_test.py` (21 tests)
 - `supekku/scripts/lib/formatters/column_defs.py`
 - `supekku/scripts/lib/formatters/column_defs_test.py` (15 tests)
@@ -132,6 +134,7 @@ New:
 - `supekku/scripts/lib/core/artifact_view_test.py` (13 tests)
 
 Modified:
+
 - `supekku/scripts/lib/formatters/theme.py` (additive: 2 functions)
 - All 9 `*_formatters.py` files (import + column_labels() substitution)
 
@@ -148,6 +151,7 @@ Uncommitted. Ready to commit when user approves.
 ### Handoff to Phase 2
 
 Phase 1 infrastructure is ready. Phase 2 (TUI core) can now:
+
 - Import `styled_text()` from `formatters/theme.py`
 - Import `column_labels()` and `*_COLUMNS` from `formatters/column_defs.py`
 - Import `ArtifactSnapshot`, `ArtifactType`, `ArtifactEntry` from
@@ -274,6 +278,7 @@ Phase 2 infrastructure is ready. Phase 3 (integration & close) needs:
    criteria for DE-053).
 
 **Key Textual API findings from Phase 2** (save the next agent debugging time):
+
 - `DataTable` needs `cursor_type="row"` for `RowSelected` events
 - `Select.clear()` to reset; `select.is_blank()` to check blank state
 - `app.screen.query_one()` not `app.query_one()` for pushed screens

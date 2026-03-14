@@ -1,8 +1,8 @@
 ---
 id: ISSUE-046
 name: spec-driver should warn and suggest install when workflow.toml version is stale
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: resolved
 kind: issue
 categories: []
@@ -32,4 +32,3 @@ install` should be re-run to update agent docs, skills, and workspace structure.
 3. **Shared helper** — extract `_get_package_version()` from `install.py` to
    a shared location (e.g. `core/version.py`) so both sites can use it
    without import cycles.
-

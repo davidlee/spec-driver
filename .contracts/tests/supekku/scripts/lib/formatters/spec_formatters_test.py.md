@@ -16,6 +16,47 @@ Tests for format_package_list function.
 - `test_multiple_packages(self) -> None`: Test formatting multiple packages.
 - `test_single_package(self) -> None`: Test formatting single package.
 
+### TestFormatRequirementsList
+
+Tests for \_format_requirements_list (VT-090-P2-2).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_empty(self) -> None`
+- `test_mixed_kinds(self) -> None`
+- `test_replaces_count_in_details(self) -> None`: When requirements_list is provided, it replaces the count summary.
+- `test_single_requirement(self) -> None`
+
+### TestFormatRequirementsSummary
+
+Tests for \_format_requirements_summary (VT-090-P0-2).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_fr_only(self) -> None`
+- `test_mixed(self) -> None`
+- `test_nf_only(self) -> None`
+- `test_no_requirements(self) -> None`
+- `test_with_other(self) -> None`
+
+### TestFormatReverseLookupCounts
+
+Tests for \_format_reverse_lookup_counts (VT-090-P2-1).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_all_populated(self) -> None`
+- `test_all_zero(self) -> None`
+- `test_deltas_only(self) -> None`
+- `test_in_format_spec_details(self) -> None`: Reverse lookup counts appear in full spec details output.
+- `test_no_reverse_lookups_omits_section(self) -> None`
+
 ### TestFormatSpecDetails
 
 Tests for format_spec_details function.
@@ -54,6 +95,22 @@ Tests for format_spec_list_item function.
 - `test_format_with_path_outside_root(self) -> None`: Test path formatting when spec path is outside root.
 - `test_product_spec(self) -> None`: Test formatting product spec.
 - `_create_mock_spec(self, spec_id, slug, packages, path) -> Mock`: Create a mock Spec object.
+
+### TestFormatSpecRelations
+
+Tests for \_format_spec_relations (VT-090-P0-2).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_multiple_relations(self) -> None`
+- `test_no_relations_omitted_from_details(self) -> None`: No relations section when spec has none.
+- `test_no_relations_returns_empty(self) -> None`
+- `test_relations_in_format_spec_details(self) -> None`: Relations section appears in full spec details output.
+- `test_single_relation(self) -> None`
+- `_make_relation(self, rel_type, target) -> Mock`
+- `_make_spec(self, relations) -> Mock`
 
 ### TestSpecExternalFields
 

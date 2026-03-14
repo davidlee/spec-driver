@@ -1,8 +1,8 @@
 ---
 id: ISSUE-021
 name: Fix ts-doc-extract dependency handling
-created: '2025-11-08'
-updated: '2025-11-08'
+created: "2025-11-08"
+updated: "2025-11-08"
 status: resolved
 kind: issue
 categories: [installation, dependencies, typescript]
@@ -37,6 +37,7 @@ $ spec-driver sync
 **Code location:** `supekku/scripts/lib/sync/adapters/typescript.py:353-416`
 
 The `_extract_ast()` method calls `subprocess.run()` with a 30s timeout but:
+
 - If `ts-doc-extract` is not installed, `npx`/`pnpm dlx`/`bunx` may hang waiting for install confirmation
 - Or fail silently without helpful output
 - Exception handling doesn't distinguish "command not found" from other errors
@@ -66,7 +67,7 @@ Install ts-doc-extract now? [Y/n] n
 
 ### 2. README Documents Dependency
 
-```markdown
+````markdown
 ## Installation
 
 ### Optional Dependencies
@@ -82,9 +83,11 @@ pnpm add -g ts-doc-extract
 # Or
 bun add -g ts-doc-extract
 ```
+````
 
 Without this, `spec-driver sync` will skip TypeScript files.
-```
+
+````
 
 ### 3. Sync Command Validates Dependency
 
@@ -103,7 +106,7 @@ Install it with one of:
 Then run: spec-driver sync
 
 Exit code: 1
-```
+````
 
 **Implementation:** Check in `TypeScriptAdapter.generate()` before calling `_extract_ast()`
 
@@ -131,6 +134,7 @@ All error paths must `sys.exit(1)` or raise exceptions that propagate to CLI exi
    - Cache result to avoid repeated checks
 
 2. Update `generate()` to check before processing:
+
    ```python
    if not self._is_ts_doc_extract_available():
        raise TsDocExtractNotFoundError(
@@ -190,6 +194,7 @@ result = subprocess.run(
 ```
 
 **Problem:** If `ts-doc-extract` isn't installed:
+
 - `npx` may prompt "Need to install the following packages: ts-doc-extract"
 - This hangs waiting for stdin input that never comes
 - Timeout eventually fires but produces confusing error

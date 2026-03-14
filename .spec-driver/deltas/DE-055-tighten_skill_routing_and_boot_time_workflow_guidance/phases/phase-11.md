@@ -2,8 +2,8 @@
 id: IP-055.PHASE-11
 slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-11
 name: IP-055 Phase 11
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: completed
 kind: phase
 ---
@@ -61,10 +61,12 @@ phase: IP-055.PHASE-11
 # Phase 11 - Define configurable commit guidance for .spec-driver files
 
 ## 1. Objective
+
 Make `.spec-driver` commit guidance configurable while defaulting to frequent,
 small workflow-artifact commits and a clean repo.
 
 ## 2. Links & References
+
 - **Delta**: DE-055
 - **Design Revision Sections**:
   - `DR-055` commit-policy open question and customisation seam
@@ -78,33 +80,39 @@ small workflow-artifact commits and a clean repo.
   - `.spec-driver/hooks/doctrine.md`
 
 ## 3. Entrance Criteria
+
 - [x] DE-055 remains `in-progress`
 - [x] Current doctrine and skill surfaces reviewed for commit guidance gaps
 
 ## 4. Exit Criteria / Done When
+
 - [x] Repo doctrine records the local default for `.spec-driver` commit behavior
 - [x] Relevant packaged skills direct agents to follow doctrine and avoid mixed uncommitted piles by default
 - [x] Generated skill copies are resynced and verification evidence is recorded
 
 ## 5. Verification
+
 - `uv run spec-driver skills sync`
 - `uv run pytest supekku/scripts/lib/skills/sync_test.py supekku/scripts/lib/install_test.py supekku/cli/skills_test.py`
 - Evidence: sync output, targeted test pass, notes update
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: doctrine hooks are the right per-repo customisation seam for commit policy, and package skills should remain generic.
 - STOP when: the user wants a hard config/runtime enforcement mechanism instead of skill-layer guidance.
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 11.1 | Record repo-local default in doctrine hook | [ ] | frequent, small `.spec-driver` commit preference recorded |
-| [x] | 11.2 | Update packaged skills to respect doctrine and avoid mixed uncommitted piles | [ ] | execute-phase, notes, close-change, continuation updated |
-| [x] | 11.3 | Resync installed skills and verify propagation | [ ] | sync, targeted tests, and memory surface check passed |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID   | Description                                                                  | Parallel? | Notes                                                     |
+| ------ | ---- | ---------------------------------------------------------------------------- | --------- | --------------------------------------------------------- |
+| [x]    | 11.1 | Record repo-local default in doctrine hook                                   | [ ]       | frequent, small `.spec-driver` commit preference recorded |
+| [x]    | 11.2 | Update packaged skills to respect doctrine and avoid mixed uncommitted piles | [ ]       | execute-phase, notes, close-change, continuation updated  |
+| [x]    | 11.3 | Resync installed skills and verify propagation                               | [ ]       | sync, targeted tests, and memory surface check passed     |
 
 ### Task Details
+
 - **11.1 Description**
   - **Design / Approach**: put the repo-specific default in the user-owned doctrine hook so the behavior is configurable without forking packaged skills.
   - **Files / Components**: `.spec-driver/hooks/doctrine.md`
@@ -126,25 +134,29 @@ small workflow-artifact commits and a clean repo.
   - **Observations & AI Notes**: sync refreshed the checked-in skill projections cleanly; targeted tests and commit-policy memory retrieval stayed green after shifting from split-first to cleanliness-first guidance.
   - **Commits / References**: uncommitted work
 
-*(Repeat detail blocks per task as needed)*
+_(Repeat detail blocks per task as needed)_
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Packaged skills overfit this repo's commit habit | Keep the hard rule in doctrine and only a soft default in package skills | Mitigated |
-| Agents still leave `.spec-driver` changes uncommitted through handoff | Make pending commit state explicit in notes and continuation | Monitoring |
+
+| Risk                                                                  | Mitigation                                                               | Status     |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------ | ---------- |
+| Packaged skills overfit this repo's commit habit                      | Keep the hard rule in doctrine and only a soft default in package skills | Mitigated  |
+| Agents still leave `.spec-driver` changes uncommitted through handoff | Make pending commit state explicit in notes and continuation             | Monitoring |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-08` - Put `.spec-driver` commit policy in the doctrine hook and make skills defer to doctrine. Rationale: this keeps the behavior configurable per repo while letting this repo prefer frequent, small workflow-artifact commits and a clean tree.
 - `2026-03-08` - Refined the default from "workflow-only commit first" to "keep the worktree clean; commit `.spec-driver` changes either with code or separately, whichever comes first." Rationale: cleanliness and short conventional commits matter more than enforcing a rigid split.
 
 ## 10. Findings / Research Notes
+
 - DE-055 already identified commit policy as an unresolved workflow question.
 - There was no existing memory or skill guidance telling agents to prefer prompt `.spec-driver` commits over waiting for perfect relatedness.
 - The current repo customisation model already points to `.spec-driver/hooks/doctrine.md` as the right place for local policy.
 - Created `mem.pattern.git.spec-driver-commit-cleanliness` so the local commit convention is retrievable without re-reading doctrine or DE-055 notes.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

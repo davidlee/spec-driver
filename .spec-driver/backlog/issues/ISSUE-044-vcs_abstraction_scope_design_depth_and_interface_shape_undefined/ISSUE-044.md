@@ -1,8 +1,8 @@
 ---
 id: ISSUE-044
 name: "VCS abstraction scope \u2014 design depth and interface shape undefined"
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: open
 kind: issue
 categories: []

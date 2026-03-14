@@ -1,10 +1,10 @@
 ---
 id: POL-001
-title: 'POL-001: maximise code reuse, minimise sprawl'
+title: "POL-001: maximise code reuse, minimise sprawl"
 status: required
-created: '2025-11-04'
-updated: '2026-03-05'
-reviewed: '2026-03-05'
+created: "2025-11-04"
+updated: "2026-03-05"
+reviewed: "2026-03-05"
 owners: []
 supersedes: []
 superseded_by: []
@@ -15,7 +15,7 @@ deltas: []
 related_policies: [POL-002]
 related_standards: []
 tags: [coding, maintainability, architecture]
-summary: 'Prefer reuse and consolidation over copy/paste; avoid needless duplication and sprawl.'
+summary: "Prefer reuse and consolidation over copy/paste; avoid needless duplication and sprawl."
 ---
 
 # POL-001: maximise code reuse, minimise sprawl

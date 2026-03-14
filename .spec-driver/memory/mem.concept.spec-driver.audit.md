@@ -4,30 +4,31 @@ name: Audits
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-10'
-verified: '2026-03-10'
+updated: "2026-03-10"
+verified: "2026-03-10"
 confidence: high
 tags:
-- spec-driver
-- audit
-- verification
-summary: Audits (AUD-*) compare implementation against specs. They reconcile realised
+  - spec-driver
+  - audit
+  - verification
+summary:
+  Audits (AUD-*) compare implementation against specs. They reconcile realised
   behavior against intent and feed explicit spec reconciliation before closure.
 priority:
   severity: medium
   weight: 6
 provenance:
   sources:
-  - kind: adr
-    ref: ADR-004
-  - kind: code
-    ref: supekku/cli/create.py
-  - kind: doc
-    note: Retrospective (Audit-driven) workflow
-    ref: supekku/about/lifecycle.md
-  - kind: delta
-    ref: DE-083
-    note: Settled post-audit authorship branch criteria
+    - kind: adr
+      ref: ADR-004
+    - kind: code
+      ref: supekku/cli/create.py
+    - kind: doc
+      note: Retrospective (Audit-driven) workflow
+      ref: supekku/about/lifecycle.md
+    - kind: delta
+      ref: DE-083
+      note: Settled post-audit authorship branch criteria
 ---
 
 # Audits
@@ -41,12 +42,14 @@ patched to match that observed truth before final closure.
 ## Two Modes
 
 **Conformance audit** (typical in town-planner):
+
 - Validates that implementation matches spec intent
 - Produces `verifies` [[mem.concept.spec-driver.relations|relations]]
 - Projects evidence back into [[mem.concept.spec-driver.verification|coverage]]
 - Drives any required post-audit spec reconciliation
 
 **Discovery/backfill audit** (typical in settler):
+
 - Applied to existing code that predates spec-driver
 - Discovers what the code actually does
 - Feeds spec/requirement creation or updates

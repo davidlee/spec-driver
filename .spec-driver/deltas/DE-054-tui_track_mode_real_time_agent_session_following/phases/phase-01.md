@@ -2,8 +2,8 @@
 id: IP-054.PHASE-01
 slug: 054-tui_track_mode_real_time_agent_session_following-phase-01
 name: IP-054 Phase 01 — EventListener infrastructure
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: completed
 kind: phase
 ---
@@ -71,6 +71,7 @@ This phase produces no visible UI changes — it delivers the plumbing that
 Phase 2's TrackScreen consumes.
 
 ## 2. Links & References
+
 - **Delta**: DE-054
 - **Design Revision Sections**: DEC-054-02 (socket probe/fallback),
   DEC-054-03 (replay), DEC-054-05 (EventListener abstraction)
@@ -78,17 +79,20 @@ Phase 2's TrackScreen consumes.
   (emitter — the other end of the socket)
 
 ## 3. Entrance Criteria
+
 - [x] DR-054 reviewed (adversarial, all findings incorporated)
 - [x] DE-052 completed (events.py, socket emitter)
 - [x] DE-053 completed (watchfiles dependency available)
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `event_listener.py` implements: replay, probe, socket-mode, log-tail-mode,
-  bootstrap drain, start/stop lifecycle
+      bootstrap drain, start/stop lifecycle
 - [ ] `event_listener_test.py` covers VT-054-01 through VT-054-04
 - [ ] `just` green (lint + test)
 
 ## 5. Verification
+
 - `just test` — unit tests for replay, probe, socket, log-tail
 - `just lint` + `just pylint` — zero warnings on new files
 - VT-054-01: Replay parses JSONL, respects N-line bound, skips malformed,
@@ -101,6 +105,7 @@ Phase 2's TrackScreen consumes.
   events, skips malformed
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - `asyncio.get_running_loop()` is available when called from Textual
     app context (confirmed by existing `asyncio.create_task` usage in app.py)
@@ -113,17 +118,18 @@ Phase 2's TrackScreen consumes.
   - `watchfiles` directory watch misses appended lines on the target platform
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | P01-T1 | JSONL replay | [P] | Pure function, no async |
-| [x] | P01-T2 | Socket probe | [P] | Pure function, no async |
-| [x] | P01-T3 | Socket-mode listener | | Pre-bound sock= approach works |
-| [x] | P01-T4 | Log-tail-mode listener | [P] | Directory watch + offset tracking |
-| [x] | P01-T5 | Bootstrap drain | | _drain_from_offset reused by T4 |
-| [x] | P01-T6 | EventListener public API | | Composes T1-T5 |
-| [x] | P01-T7 | Tests VT-054-01..04 | | 24 tests, all passing |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID     | Description              | Parallel? | Notes                             |
+| ------ | ------ | ------------------------ | --------- | --------------------------------- |
+| [x]    | P01-T1 | JSONL replay             | [P]       | Pure function, no async           |
+| [x]    | P01-T2 | Socket probe             | [P]       | Pure function, no async           |
+| [x]    | P01-T3 | Socket-mode listener     |           | Pre-bound sock= approach works    |
+| [x]    | P01-T4 | Log-tail-mode listener   | [P]       | Directory watch + offset tracking |
+| [x]    | P01-T5 | Bootstrap drain          |           | \_drain_from_offset reused by T4  |
+| [x]    | P01-T6 | EventListener public API |           | Composes T1-T5                    |
+| [x]    | P01-T7 | Tests VT-054-01..04      |           | 24 tests, all passing             |
 
 ### Task Details
 
@@ -182,17 +188,18 @@ Phase 2's TrackScreen consumes.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| macOS socket probe errno | Defensive OSError fallback to log-tail | open |
-| `create_datagram_endpoint` with pre-bound socket | Verified approach in DR-054; STOP if it fails | open |
-| watchfiles misses appends to events.jsonl | Watch directory not file; verified ~300ms latency on Linux | open |
+| Risk                                             | Mitigation                                                 | Status |
+| ------------------------------------------------ | ---------------------------------------------------------- | ------ |
+| macOS socket probe errno                         | Defensive OSError fallback to log-tail                     | open   |
+| `create_datagram_endpoint` with pre-bound socket | Verified approach in DR-054; STOP if it fails              | open   |
+| watchfiles misses appends to events.jsonl        | Watch directory not file; verified ~300ms latency on Linux | open   |
 
 ## 9. Decisions & Outcomes
 
 ## 10. Findings / Research Notes
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied — 24 tests passing, `just` green (2925 passed)
 - [x] Verification evidence: VT-054-01..04 covered by event_listener_test.py
 - [x] Hand-off to Phase 2: EventListener ready for app integration

@@ -2,7 +2,7 @@
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST** consider it before proceeding with the prompt (if not empty).
 
-If you were not given a filename, requirement code or other information that would allow you to investigate and complete the following task, you should read the following with the expectation you will be given such information shortly in a follow-up. 
+If you were not given a filename, requirement code or other information that would allow you to investigate and complete the following task, you should read the following with the expectation you will be given such information shortly in a follow-up.
 
 ## Context
 
@@ -12,12 +12,13 @@ Refer to `.spec-driver/about/README.md` and `.spec-driver/about/glossary.md` for
 
 ## Commands to Run
 
-
 1. `just supekku::print-revision-block-schema` - Get the JSON schema for the YAML revision block format. Read this before writing the revision block.
 2. `just supekku::validate-workspace-revision-blocks` - Validate all revision blocks in the workspace. Validation must be successful for the task to be complete.
 
 ## Block Format
+
 Refer to the JSON schema as the canonical source for a valid revision block. As a guide (refer to schema) the block must be formatted as:
+
 ```yaml supekku:revision.change@v1
 schema: supekku.revision.change
 version: 1

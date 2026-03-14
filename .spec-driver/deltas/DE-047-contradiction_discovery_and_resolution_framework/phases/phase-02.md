@@ -2,8 +2,8 @@
 id: IP-047.PHASE-02
 slug: 047-human-resolution-adr-and-re-creation
 name: Human resolution — ADR and RE creation
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: in_progress
 kind: phase
 ---
@@ -115,21 +115,21 @@ backlog items) and link them back to the ledger as resolution references.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Adjudicate all triaged DL entries | | 11 entries resolved in human review session |
-| [ ] | 2.2 | Draft contracts ADR | | Covers .003, .004, .013: role, location, navigation |
-| [ ] | 2.3 | Draft lifecycle ADR | | Covers .009, .017, .018: normative vs observed truth |
-| [x] | 2.3a | Draft core loop ADR | | `ADR-004` drafted; now the canonical workflow doctrine for .021 |
-| [ ] | 2.4 | Draft RE on PROD-002 | | Covers .001, .011: phase-01 auto-creation reversal |
-| [ ] | 2.5 | Draft RE on PROD-003 | | Covers .005, .015: backlinks → runtime computed |
-| [ ] | 2.6 | Draft RE on PROD-012 | [P] | Covers .002, .012: flows aligned to contracts ADR |
-| [ ] | 2.7 | Draft RE on PROD-008/009 | [P] | Covers .009, .017, .018: lifecycle per ADR |
-| [ ] | 2.8 | Draft RE on PROD-016 | [P] | Covers .014: installer config semantics |
-| [ ] | 2.9 | Patch ADR-003 + CLAUDE.md | [P] | Covers .016: remove "interaction" c4_level |
-| [~] | 2.10 | Patch doctrine/workflow/glossary | [P] | Broadened into guidance-layer cleanup: ADR-005, `.spec-driver/README.md`, `about/` + `docs/` reduction, memory updates |
-| [~] | 2.11 | Create backlog items | [P] | `.006` resolved directly in DE-047; `.010/.019/.020` still candidates for backlog/follow-up |
-| [ ] | 2.12 | Populate resolution_ref on DL entries | | After artifacts exist |
+| Status | ID   | Description                           | Parallel? | Notes                                                                                                                  |
+| ------ | ---- | ------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------- |
+| [x]    | 2.1  | Adjudicate all triaged DL entries     |           | 11 entries resolved in human review session                                                                            |
+| [ ]    | 2.2  | Draft contracts ADR                   |           | Covers .003, .004, .013: role, location, navigation                                                                    |
+| [ ]    | 2.3  | Draft lifecycle ADR                   |           | Covers .009, .017, .018: normative vs observed truth                                                                   |
+| [x]    | 2.3a | Draft core loop ADR                   |           | `ADR-004` drafted; now the canonical workflow doctrine for .021                                                        |
+| [ ]    | 2.4  | Draft RE on PROD-002                  |           | Covers .001, .011: phase-01 auto-creation reversal                                                                     |
+| [ ]    | 2.5  | Draft RE on PROD-003                  |           | Covers .005, .015: backlinks → runtime computed                                                                        |
+| [ ]    | 2.6  | Draft RE on PROD-012                  | [P]       | Covers .002, .012: flows aligned to contracts ADR                                                                      |
+| [ ]    | 2.7  | Draft RE on PROD-008/009              | [P]       | Covers .009, .017, .018: lifecycle per ADR                                                                             |
+| [ ]    | 2.8  | Draft RE on PROD-016                  | [P]       | Covers .014: installer config semantics                                                                                |
+| [ ]    | 2.9  | Patch ADR-003 + CLAUDE.md             | [P]       | Covers .016: remove "interaction" c4_level                                                                             |
+| [~]    | 2.10 | Patch doctrine/workflow/glossary      | [P]       | Broadened into guidance-layer cleanup: ADR-005, `.spec-driver/README.md`, `about/` + `docs/` reduction, memory updates |
+| [~]    | 2.11 | Create backlog items                  | [P]       | `.006` resolved directly in DE-047; `.010/.019/.020` still candidates for backlog/follow-up                            |
+| [ ]    | 2.12 | Populate resolution_ref on DL entries |           | After artifacts exist                                                                                                  |
 
 ### Task Details
 
@@ -186,11 +186,11 @@ backlog items) and link them back to the ledger as resolution references.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| ADR drafting cascades into design work | ADRs codify decisions already made; keep minimal | clear |
-| RE volume is high (5+ specs) | REs are lightweight — frontmatter + change summary | clear |
-| Dependency chain: REs wait on ADRs | Draft ADRs first (2.2, 2.3), then parallel REs | planned |
+| Risk                                   | Mitigation                                         | Status  |
+| -------------------------------------- | -------------------------------------------------- | ------- |
+| ADR drafting cascades into design work | ADRs codify decisions already made; keep minimal   | clear   |
+| RE volume is high (5+ specs)           | REs are lightweight — frontmatter + change summary | clear   |
+| Dependency chain: REs wait on ADRs     | Draft ADRs first (2.2, 2.3), then parallel REs     | planned |
 
 ## 9. Decisions & Outcomes
 

@@ -7,11 +7,13 @@ Completed investigation of all formatters to understand their current implementa
 ### Formatter Implementation Patterns
 
 #### Pattern A: Dedicated Helper Functions (policy, standard, decision)
+
 - Uses `_format_as_table()`, `_prepare_*_row()`, `_calculate_column_widths()`
 - Example: `policy_formatters.py` (DE-010 reference implementation)
 - **decision_formatters.py** follows this pattern
 
 #### Pattern B: Inline Implementation (spec, change, requirement, backlog)
+
 - Table creation and row preparation done inline in `format_*_list_table()`
 - No separate helper functions
 - Examples: spec_formatters.py, change_formatters.py, requirement_formatters.py, backlog_formatters.py
@@ -56,6 +58,7 @@ Conventional order: Title/Name, Tags, Status (following decision_formatters patt
 ### Implementation Approach
 
 For each formatter:
+
 1. Add Tags to columns list
 2. Format tags: `", ".join(artifact.tags) if artifact.tags else ""`
 3. Style tags (if applicable): `f"[#d79921]{tags}[/#d79921]" if tags else ""`
@@ -65,6 +68,7 @@ For each formatter:
 ### Data Model Verification Needed
 
 Must verify that all artifact models have `tags` attribute:
+
 - Decision (ADR) - likely has tags
 - Spec (SPEC/PROD) - likely has tags
 - ChangeArtifact (Delta/Revision/Audit) - likely has tags
@@ -74,6 +78,7 @@ Must verify that all artifact models have `tags` attribute:
 ### Testing Strategy
 
 For each formatter:
+
 - Test empty tags (no tags)
 - Test single tag
 - Test multiple tags

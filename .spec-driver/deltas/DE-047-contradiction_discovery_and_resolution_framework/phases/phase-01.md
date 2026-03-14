@@ -2,8 +2,8 @@
 id: IP-047.PHASE-01
 slug: 047-agent-survey-and-ledger-population
 name: Agent survey and ledger population
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: complete
 kind: phase
 ---
@@ -100,14 +100,14 @@ with all identified drift.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Create DL-047 ledger file | | drift/DL-047-spec-corpus-reconciliation.md |
-| [x] | 1.2 | Extract claims from PROD specs | [P] | 3 parallel agents: PROD-001–008, PROD-009–016, governance |
-| [x] | 1.3 | Extract claims from governance docs | [P] | All 11 governance/framework docs covered |
-| [x] | 1.4 | Cross-reference and populate entries | | 20 entries: 2 blocking, 11 significant, 7 cosmetic |
-| [x] | 1.5 | Triage all entries | | All entries at triaged status with severity, topic, owner |
-| [x] | 1.6 | Verify corpus coverage (VA-047-001) | | 27/27 docs surveyed; 19 with findings, 8 clean |
+| Status | ID  | Description                          | Parallel? | Notes                                                     |
+| ------ | --- | ------------------------------------ | --------- | --------------------------------------------------------- |
+| [x]    | 1.1 | Create DL-047 ledger file            |           | drift/DL-047-spec-corpus-reconciliation.md                |
+| [x]    | 1.2 | Extract claims from PROD specs       | [P]       | 3 parallel agents: PROD-001–008, PROD-009–016, governance |
+| [x]    | 1.3 | Extract claims from governance docs  | [P]       | All 11 governance/framework docs covered                  |
+| [x]    | 1.4 | Cross-reference and populate entries |           | 20 entries: 2 blocking, 11 significant, 7 cosmetic        |
+| [x]    | 1.5 | Triage all entries                   |           | All entries at triaged status with severity, topic, owner |
+| [x]    | 1.6 | Verify corpus coverage (VA-047-001)  |           | 27/27 docs surveyed; 19 with findings, 8 clean            |
 
 ### Task Details
 
@@ -152,31 +152,33 @@ with all identified drift.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Long PROD specs bury contradictions | Structured extraction by section; focus on §1, §3, §4 | mitigated |
-| Too many entries to manage manually | STOP condition at ~50; reassess tooling if hit | clear (20 entries) |
-| Agent misinterprets design intent | Entries are flagged for human review, not auto-resolved | mitigated |
+| Risk                                | Mitigation                                              | Status             |
+| ----------------------------------- | ------------------------------------------------------- | ------------------ |
+| Long PROD specs bury contradictions | Structured extraction by section; focus on §1, §3, §4   | mitigated          |
+| Too many entries to manage manually | STOP condition at ~50; reassess tooling if hit          | clear (20 entries) |
+| Agent misinterprets design intent   | Entries are flagged for human review, not auto-resolved | mitigated          |
 
 ## 9. Findings Summary
 
 **20 entries** across 6 topic areas:
 
-| Topic | Blocking | Significant | Cosmetic | Total |
-| --- | --- | --- | --- | --- |
-| Workflow | 2 | 1 | 1 | 4 |
-| Contracts | — | 5 | 1 | 6 |
-| Governance | — | 3 | — | 3 |
-| Lifecycle | — | 2 | 1 | 3 |
-| Taxonomy | — | — | 1 | 1 |
-| Other | — | — | 3 | 3 |
-| **Total** | **2** | **11** | **7** | **20** |
+| Topic      | Blocking | Significant | Cosmetic | Total  |
+| ---------- | -------- | ----------- | -------- | ------ |
+| Workflow   | 2        | 1           | 1        | 4      |
+| Contracts  | —        | 5           | 1        | 6      |
+| Governance | —        | 3           | —        | 3      |
+| Lifecycle  | —        | 2           | 1        | 3      |
+| Taxonomy   | —        | —           | 1        | 1      |
+| Other      | —        | —           | 3        | 3      |
+| **Total**  | **2**    | **11**      | **7**    | **20** |
 
 **Blocking entries** (must resolve before any PROD promotion):
+
 - DL-047.001 + .011: Phase-01 auto-creation — PROD-011 reversed PROD-002
   but PROD-002 was never formally revised. Same underlying issue.
 
 **Cluster observations**:
+
 - **Contracts** (6 entries): densest topic. Canonical location, navigation
   structure, and storage model evolved PROD-005 → PROD-012 → PROD-014
   without back-propagating revisions.
@@ -191,6 +193,7 @@ DL-047 is populated and triaged. Phase 2 is human resolution — review entries
 grouped by topic, make design calls, codify as ADRs or spec revisions.
 
 Suggested resolution order (blocking first, then by cluster density):
+
 1. **Workflow blocking** (.001, .011) — single decision resolves both
 2. **Contracts cluster** (.002, .003, .004, .012, .013) — likely one ADR
 3. **Lifecycle cluster** (.009, .017, .018) — likely one ADR

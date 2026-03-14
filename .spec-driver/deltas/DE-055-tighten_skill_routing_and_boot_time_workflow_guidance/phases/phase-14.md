@@ -2,8 +2,8 @@
 id: IP-055.PHASE-14
 slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-14
 name: IP-055 Phase 14
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---
@@ -54,10 +54,12 @@ phase: IP-055.PHASE-14
 # Phase 14 - Nudge backlog updates during delta closure
 
 ## 1. Objective
+
 Ensure delta closure explicitly checks whether any originating backlog entries
 need follow-through updates before the work is treated as fully closed.
 
 ## 2. Links & References
+
 - **Delta**: DE-055
 - **Design Revision Sections**:
   - Design Decisions & Trade-offs
@@ -72,16 +74,19 @@ need follow-through updates before the work is treated as fully closed.
   - `.spec-driver/backlog/issues/ISSUE-009-status-fields-lack-enums-and-need-systematic-review/ISSUE-009.md`
 
 ## 3. Entrance Criteria
+
 - [x] Follow-up scope for close-out backlog nudging has been approved
 - [x] Existing close-change guidance and backlog-status ambiguity have been reviewed together
 
 ## 4. Exit Criteria / Done When
+
 - [x] close-change checks for originating backlog entries
 - [x] close-change nudges backlog status/note/link updates
 - [x] close-change routes backlog-status ambiguity to `/consult`
 - [x] DE/IP/phase notes record the change
 
 ## 5. Verification
+
 - Tests to run: `uv run spec-driver skills sync`
 - Tooling/commands:
   - `sed -n '1,260p' supekku/skills/close-change/SKILL.md`
@@ -92,6 +97,7 @@ need follow-through updates before the work is treated as fully closed.
   - delta-completion memory includes backlog step and ambiguity guardrail
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - close-change is the right place for this nudge because it owns formal delta closure
   - the repo still lacks a stable enough backlog-status vocabulary for stronger automation
@@ -100,27 +106,32 @@ need follow-through updates before the work is treated as fully closed.
   - the correct originating-backlog linkage cannot be discovered from current delta artifacts
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 14.1 | Add backlog follow-through to close-change | [ ] | pre-check plus post-check nudge |
-| [x] | 14.2 | Update delta-completion memory | [ ] | add backlog step and ambiguity guardrail |
-| [x] | 14.3 | Update DE-055 artefacts and notes | [ ] | keep the delta bundle aligned |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID   | Description                                | Parallel? | Notes                                    |
+| ------ | ---- | ------------------------------------------ | --------- | ---------------------------------------- |
+| [x]    | 14.1 | Add backlog follow-through to close-change | [ ]       | pre-check plus post-check nudge          |
+| [x]    | 14.2 | Update delta-completion memory             | [ ]       | add backlog step and ambiguity guardrail |
+| [x]    | 14.3 | Update DE-055 artefacts and notes          | [ ]       | keep the delta bundle aligned            |
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+
+| Risk                                                            | Mitigation                                                        | Status |
+| --------------------------------------------------------------- | ----------------------------------------------------------------- | ------ |
 | Close-out wording implies unsupported backlog status automation | keep the wording at nudge level and route ambiguity to `/consult` | active |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-09` - Add backlog follow-through to `close-change` and delta-completion guidance, but keep it advisory where backlog status semantics are still unsettled. Rationale: originating backlog items should not silently drift stale after delta closure.
 
 ## 10. Findings / Research Notes
+
 - `close-change` is the narrowest workflow surface that already owns formal delta closure.
 - `ISSUE-009` remains the blocker on any stronger, status-specific backlog automation.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

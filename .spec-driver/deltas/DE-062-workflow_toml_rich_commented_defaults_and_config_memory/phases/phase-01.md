@@ -2,8 +2,8 @@
 id: IP-062.PHASE-01
 slug: 062-workflow_toml_rich_commented_defaults_and_config_memory-phase-01
 name: IP-062 Phase 01 - template generator, install wiring, config memory
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: completed
 kind: phase
 ---
@@ -79,12 +79,12 @@ Replace the spartan 2-line workflow.toml init with a richly-commented template g
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 1.1 | `generate_default_workflow_toml(exec_cmd)` in config.py | Uses `##` for prose, `#` for config |
-| [x] | 1.2 | Tests for generator | 7 tests: completeness, TOML validity, tool uncommented, exec substitution, sections commented, prose comments, roundtrip |
-| [x] | 1.3 | Wire into install.py | Replaced lines 678-680, added import |
-| [x] | 1.4 | Agent memory record | `mem.reference.spec-driver.workflow-config` — full config reference |
+| Status | ID  | Description                                             | Notes                                                                                                                    |
+| ------ | --- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| [x]    | 1.1 | `generate_default_workflow_toml(exec_cmd)` in config.py | Uses `##` for prose, `#` for config                                                                                      |
+| [x]    | 1.2 | Tests for generator                                     | 7 tests: completeness, TOML validity, tool uncommented, exec substitution, sections commented, prose comments, roundtrip |
+| [x]    | 1.3 | Wire into install.py                                    | Replaced lines 678-680, added import                                                                                     |
+| [x]    | 1.4 | Agent memory record                                     | `mem.reference.spec-driver.workflow-config` — full config reference                                                      |
 
 ## 9. Decisions & Outcomes
 

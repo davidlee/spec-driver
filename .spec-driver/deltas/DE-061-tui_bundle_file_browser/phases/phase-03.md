@@ -2,8 +2,8 @@
 id: IP-061.PHASE-03
 slug: 061-tui_bundle_file_browser-phase-03
 name: Track integration — per-row file paths, preview, navigation, hook fix
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: complete
 kind: phase
 ---
@@ -38,18 +38,18 @@ verification:
     - VT-061-05
   evidence: []
 tasks:
-  - id: '3.1'
-    description: 'TrackPanel: _row_file_paths storage, file_path_for_row(), pruning'
-  - id: '3.2'
-    description: 'TrackScreen: file-path preview on row highlight (with fallback)'
-  - id: '3.3'
-    description: 'TrackScreen: file-path navigation on row select'
-  - id: '3.4'
-    description: 'app.py: action_navigate_artifact optional file_path parameter'
-  - id: '3.5'
-    description: 'browser.py: navigate_to_artifact optional file_path → tree selection'
-  - id: '3.6'
-    description: 'artifact_event.py: use hook_input cwd for path relativization'
+  - id: "3.1"
+    description: "TrackPanel: _row_file_paths storage, file_path_for_row(), pruning"
+  - id: "3.2"
+    description: "TrackScreen: file-path preview on row highlight (with fallback)"
+  - id: "3.3"
+    description: "TrackScreen: file-path navigation on row select"
+  - id: "3.4"
+    description: "app.py: action_navigate_artifact optional file_path parameter"
+  - id: "3.5"
+    description: "browser.py: navigate_to_artifact optional file_path → tree selection"
+  - id: "3.6"
+    description: "artifact_event.py: use hook_input cwd for path relativization"
 risks:
   - description: Row key cleanup must track two dicts in lockstep
     mitigation: Test pruning and clear_and_replay explicitly
@@ -73,15 +73,18 @@ specific bundle files, and artifact_event.py is fixed to use deterministic
 cwd-relative paths.
 
 ## 2. Links & References
+
 - **Delta**: DE-061
 - **Design Revision**: DR-061 §5 (DEC-061-04, DEC-061-06)
 - **Phase 2 deliverables**: BrowserScreen with BundleTree, navigate_to_artifact
 - **Key files**: `track_panel.py`, `track.py`, `app.py`, `browser.py`, `artifact_event.py`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 2 complete
 
 ## 4. Exit Criteria / Done When
+
 - [x] `TrackPanel._row_file_paths` stores file paths per row
 - [x] `TrackPanel.file_path_for_row()` returns file path for a row key
 - [x] Row pruning and `clear_and_replay` clean `_row_file_paths`
@@ -95,25 +98,27 @@ cwd-relative paths.
 - [x] Lint clean
 
 ## 5. Verification
+
 - Extend `track_test.py` for file path storage/retrieval/pruning/navigation
 - Unit test for `artifact_event.py` cwd fix
 - `just test` + `just lint`
 
 ## 6. Assumptions & STOP Conditions
+
 - Event `argv[1]` reliably contains the file path (confirmed by existing hook code)
 - `_resolve_event_path` helper may need creation or adaptation from existing preview logic
 - STOP if `action_navigate_artifact` signature change breaks external callers
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 3.1 | TrackPanel: _row_file_paths, accessor, pruning | Done |
-| [x] | 3.2 | TrackScreen: file-path preview on highlight | Done — with ID fallback |
-| [x] | 3.3 | TrackScreen: file-path navigation on select | Done |
-| [x] | 3.4 | app.py: action_navigate_artifact + file_path | Done |
-| [x] | 3.5 | browser.py: navigate_to_artifact + file_path → tree | Done |
-| [x] | 3.6 | artifact_event.py: cwd fix | Done — uses hook_input cwd |
+| Status | ID  | Description                                         | Notes                      |
+| ------ | --- | --------------------------------------------------- | -------------------------- |
+| [x]    | 3.1 | TrackPanel: \_row_file_paths, accessor, pruning     | Done                       |
+| [x]    | 3.2 | TrackScreen: file-path preview on highlight         | Done — with ID fallback    |
+| [x]    | 3.3 | TrackScreen: file-path navigation on select         | Done                       |
+| [x]    | 3.4 | app.py: action_navigate_artifact + file_path        | Done                       |
+| [x]    | 3.5 | browser.py: navigate_to_artifact + file_path → tree | Done                       |
+| [x]    | 3.6 | artifact_event.py: cwd fix                          | Done — uses hook_input cwd |
 
 ### Task Details
 

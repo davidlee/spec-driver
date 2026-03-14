@@ -3,36 +3,40 @@
 {{ plan_verification_block }}
 
 ## 1. Summary
+
 - **Delta**: {{ delta_id }} - <title>
 - **Specs Impacted**: SPEC-002, PROD-YYY
 - **Problems / Issues**: ISSUE-123, PROB-456
 - **Desired Outcome**: <one-line description of the end state>
 
 ## 2. Context & Constraints
+
 - **Current Behaviour**: <brief note or link to audit finding>
 - **Target Behaviour**: <reference spec section / requirement IDs>
 - **Dependencies**: <other deltas, releases, ops windows>
 - **Constraints**: <time, rollout, tech debt>
 
 ## 3. Gate Check
+
 - [ ] Backlog items linked and prioritised
 - [ ] Spec(s) updated or delta specifies required changes
 - [ ] Test strategy identified (unit/integration/system)
 - [ ] Workspace/config changes assessed
 
-
 > Tip: Plan phases up front, then create the phase sheet for the current phase only. Update later phases when you are ready to execute them.
 
 ## 4. Phase Overview
-| Phase | Objective | Entrance Criteria | Exit Criteria / Done When | Phase Sheet |
-| --- | --- | --- | --- | --- |
-| Phase 0 - Research & Validation | Confirm assumptions, gather refs | Delta accepted, backlog reviewed | Open questions resolved, risks logged | `phases/phase-01.md` |
-| Phase 1 - Design Revision Application | Apply design revision changes | Phase 0 complete | Code + tests updated, local checks passing | `phases/phase-02.md` |
-| Phase 2 - Verification & Cleanup | Run verification suite, update docs | Phase 1 complete, CI green | All gates passed, docs updated | `phases/phase-03.md` |
 
-*Adjust/add phases as needed; every phase must have clear gates. Phase sheets are authored one at a time using `supekku/templates/phase-sheet-template.md`.*
+| Phase                                 | Objective                           | Entrance Criteria                | Exit Criteria / Done When                  | Phase Sheet          |
+| ------------------------------------- | ----------------------------------- | -------------------------------- | ------------------------------------------ | -------------------- |
+| Phase 0 - Research & Validation       | Confirm assumptions, gather refs    | Delta accepted, backlog reviewed | Open questions resolved, risks logged      | `phases/phase-01.md` |
+| Phase 1 - Design Revision Application | Apply design revision changes       | Phase 0 complete                 | Code + tests updated, local checks passing | `phases/phase-02.md` |
+| Phase 2 - Verification & Cleanup      | Run verification suite, update docs | Phase 1 complete, CI green       | All gates passed, docs updated             | `phases/phase-03.md` |
+
+_Adjust/add phases as needed; every phase must have clear gates. Phase sheets are authored one at a time using `supekku/templates/phase-sheet-template.md`._
 
 ## 5. Phase Detail Snapshot
+
 - **Research Notes**: `{{ delta_id }}/notes.md` (Phase 0 output)
 - **Design Revision**: `{{ delta_id }}/DR-XXX.md`
 - **Active Phase Sheet**: <link once created>
@@ -40,6 +44,7 @@
 - **Plan Updates**: Update this plan when phase outcomes change (new risks, scope adjustments)
 
 ## 6. Testing & Verification Plan
+
 - **Updated Suites**: <list unit/integration/system tests>
 - **New Cases**: <outline key scenarios>
 - **Tooling/Fixtures**: <mention new helpers/mocks>
@@ -47,20 +52,27 @@
 - **Verification Coverage**: Cross-check `supekku:verification.coverage@v1` entries against phases and requirements.
 
 ## 7. Risks & Mitigations
-| Risk | Mitigation | Owner |
-| --- | --- | --- |
-| e.g. `.viceignore` misconfiguration | Provide defaults, add logging | Dev |
+
+| Risk                                | Mitigation                    | Owner |
+| ----------------------------------- | ----------------------------- | ----- |
+| e.g. `.viceignore` misconfiguration | Provide defaults, add logging | Dev   |
 
 ## 8. Open Questions & Decisions
+
 - [ ] Question/decision placeholder (resolve before exit)
 
 ## 9. Progress Tracking
+
 - [ ] Phase 0 complete
 - [ ] Phase 1 complete
 - [ ] Phase 2 complete
 - [ ] Verification gates passed
 
 ## 10. Notes / Links
+
 - Audit reference: AUD-XXX (pending)
 - Supporting docs: <links>
+
+```
+
 ```

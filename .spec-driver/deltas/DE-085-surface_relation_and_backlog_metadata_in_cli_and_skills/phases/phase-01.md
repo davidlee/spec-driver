@@ -2,8 +2,8 @@
 id: IP-085.PHASE-01
 slug: 085-surface_relation_and_backlog_metadata_in_cli_and_skills-phase-01
 name: "Foundation: constants, query module, Spec model"
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---
@@ -65,14 +65,17 @@ phase: IP-085.PHASE-01
 Create the generic relation query layer and Spec model update that all subsequent phases depend on. This phase produces no CLI-visible changes — it builds the reusable internals.
 
 ## 2. Links & References
+
 - **Delta**: [DE-085](../DE-085.md)
 - **Design Revision**: [DR-085](../DR-085.md) §5.1 (constants), §5.2 (query functions), §5.3 (Spec model)
 - **Specs**: PROD-004 (frontmatter metadata), PROD-010 (CLI UX)
 
 ## 3. Entrance Criteria
+
 - [x] DR-085 reviewed and approved
 
 ## 4. Exit Criteria / Done When
+
 - [x] `core/relation_types.py` created with `RELATION_TYPES` and `REFERENCE_SOURCES` frozensets
 - [x] `base.py` imports `RELATION_TYPES` — no inline string list for relation enum
 - [x] `relations/query.py` created with `RelationQueryable`, `ReferenceHit`, `collect_references()`, `matches_related_to()`, `matches_relation()`, `find_related_to()`, `find_by_relation()`
@@ -82,26 +85,28 @@ Create the generic relation query layer and Spec model update that all subsequen
 - [x] `just check` green
 
 ## 5. Verification
+
 - `just test` — VT-085-001, VT-085-006
 - `just lint` — zero warnings on new and modified files
 - `just pylint-files` on all touched files
 - `just check` — full suite
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: `frontmatter.data["relations"]` contains raw YAML dicts (not parsed `Relation` objects). Verify in T05.
 - **STOP if**: `frontmatter.data` shape is unexpected — `/consult` before adapting.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [x] | T01 | Create `core/relation_types.py` | [P] | Done — `RELATION_TYPES` + `REFERENCE_SOURCES` frozensets |
-| [x] | T02 | Update `base.py` to import `RELATION_TYPES` | | Done — inline list replaced with `sorted(RELATION_TYPES)` |
-| [x] | T03 | Create `relations/query.py` | [P] | Done — extracted to 4 private helpers, pylint 10/10 |
-| [x] | T04 | Add `Spec.relations` property | [P] | Done — reads from `frontmatter.data`, validates shape |
-| [x] | T05 | Verify R1: Spec frontmatter.data shape | | Resolved — `frontmatter.data["relations"]` contains raw dicts (line 86 of frontmatter_schema.py) |
-| [x] | T06 | Write tests (VT-085-001, VT-085-006) | | Done — 42 query tests + 3 Spec.relations tests, all passing |
-| [x] | T07 | Lint + full check | | `just check` green (3674 pass), pylint 10/10 on query.py |
+| Status | ID  | Description                                 | Parallel? | Notes                                                                                            |
+| ------ | --- | ------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------ |
+| [x]    | T01 | Create `core/relation_types.py`             | [P]       | Done — `RELATION_TYPES` + `REFERENCE_SOURCES` frozensets                                         |
+| [x]    | T02 | Update `base.py` to import `RELATION_TYPES` |           | Done — inline list replaced with `sorted(RELATION_TYPES)`                                        |
+| [x]    | T03 | Create `relations/query.py`                 | [P]       | Done — extracted to 4 private helpers, pylint 10/10                                              |
+| [x]    | T04 | Add `Spec.relations` property               | [P]       | Done — reads from `frontmatter.data`, validates shape                                            |
+| [x]    | T05 | Verify R1: Spec frontmatter.data shape      |           | Resolved — `frontmatter.data["relations"]` contains raw dicts (line 86 of frontmatter_schema.py) |
+| [x]    | T06 | Write tests (VT-085-001, VT-085-006)        |           | Done — 42 query tests + 3 Spec.relations tests, all passing                                      |
+| [x]    | T07 | Lint + full check                           |           | `just check` green (3674 pass), pylint 10/10 on query.py                                         |
 
 ### Task Details
 
@@ -135,11 +140,12 @@ Create the generic relation query layer and Spec model update that all subsequen
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|------------|--------|
-| R1: Spec frontmatter.data shape | Verify in T05 before implementing T04 | Open |
+| Risk                            | Mitigation                            | Status |
+| ------------------------------- | ------------------------------------- | ------ |
+| R1: Spec frontmatter.data shape | Verify in T05 before implementing T04 | Open   |
 
 ## 9. Decisions & Outcomes
+
 - 2026-03-09: R1 resolved — `frontmatter.data["relations"]` holds raw `list[dict]`, not `Relation` objects. `Spec.relations` property reads from `.data` directly.
 - 2026-03-09: ruff formatter auto-reformatted 6 files on `just check` — all formatting now canonical.
 - 2026-03-09: T07 resolved — extracted `collect_references` into 4 private `_collect_from_*` helpers. Protocol gets `pylint: disable=too-few-public-methods` + `unnecessary-ellipsis` (both correct by design). Pylint 10/10.
@@ -157,6 +163,7 @@ supekku/scripts/lib/relations/query.py:28  missing-function-docstring  (Protocol
 ```
 
 **Fix approach**: Extract `collect_references` into 4 private slot-collection helpers:
+
 - `_collect_from_relations(artifact) -> list[ReferenceHit]`
 - `_collect_from_applies_to(artifact) -> list[ReferenceHit]`
 - `_collect_from_context_inputs(artifact) -> list[ReferenceHit]`
@@ -169,6 +176,7 @@ For `too-few-public-methods` on Protocol: add a pylint disable comment (Protocol
 For `missing-function-docstring` on the Protocol property: add a one-line docstring.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Notes updated with findings

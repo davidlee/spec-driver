@@ -2,8 +2,8 @@
 id: IP-029.PHASE-02
 slug: 029-canonical_contract_storage-phase-02
 name: IP-029 Phase 02 — Drift warnings & dead code cleanup
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: complete
 kind: phase
 ---
@@ -60,16 +60,19 @@ phase: IP-029.PHASE-02
 Implement convention drift warnings per DR-029 §7.5 and PROD-014.FR-012: when a spec has a non-empty `contracts/` directory but canonical generation produced zero `.contracts/**` entries for that spec's source unit, emit a warning. Fix the check-mode gate that skips contract generation for specless source units (same class of bug as Phase 1 Bug 1). Remove dead code orphaned by the Phase 1 mirror inversion.
 
 ## 2. Links & References
+
 - **Delta**: [DE-029](../DE-029.md)
 - **Design Revision**: [DR-029](../DR-029.md) — §7.5 (drift warnings)
 - **Requirements**: PROD-014.FR-012 (convention drift warnings)
 - **Phase 1**: [phase-01.md](./phase-01.md) — §10 documents dead code list
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete (adapters write canonical files, compat symlinks inverted)
 - [x] `rebuild()` already returns a warnings list (infrastructure exists)
 
 ## 4. Exit Criteria / Done When
+
 - [x] Drift warning emitted when SPEC has non-empty `contracts/` but zero canonical entries
 - [x] Empty `contracts/` dirs do NOT trigger warning (no false positives)
 - [x] VT-CONTRACTS-DRIFT-001 passes
@@ -79,11 +82,13 @@ Implement convention drift warnings per DR-029 §7.5 and PROD-014.FR-012: when a
 - [x] `just` green (5 pre-existing failures in unrelated `TestVerificationStatusFilters`)
 
 ## 5. Verification
+
 - `just test` — full test suite
 - `just lint` + `just pylint` — zero warnings
 - VT-CONTRACTS-DRIFT-001: create spec with non-empty `contracts/` dir, ensure mapper produces zero canonical entries, assert warning emitted
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - `rebuild()` has access to the registry (knows which specs exist and their tech dirs)
   - Canonical `.contracts/` entries are written before `rebuild()` runs (Phase 1 guarantee)
@@ -91,15 +96,16 @@ Implement convention drift warnings per DR-029 §7.5 and PROD-014.FR-012: when a
   - Drift detection requires information not available during `rebuild()` (e.g. which source units were processed)
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Implement drift detection in `rebuild()` | | `_detect_drift()` method added; checks non-empty spec contracts/ vs canonical entries |
-| [x] | 2.2 | Write VT-CONTRACTS-DRIFT-001 test | | 5 tests: positive (zig, python), negative (empty dir, missing dir, canonical exists) |
-| [x] | 2.3 | Fix check-mode gate for specless contract generation | | Restructured early return; check mode now falls through to contract generation |
-| [x] | 2.4 | Remove dead code from `mirror.py` + `__init__.py` | [P] | Removed `_collect_entries`, `_resolve_conflicts`, `_create_symlinks`; `MirrorEntry` kept (used by `*_mirror_entries`) but removed from `__init__.py` exports |
-| [x] | 2.5 | Update IP-029 verification coverage + progress | | All 5 VTs → verified; §9 checkboxes updated |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                          | Parallel? | Notes                                                                                                                                                        |
+| ------ | --- | ---------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [x]    | 2.1 | Implement drift detection in `rebuild()`             |           | `_detect_drift()` method added; checks non-empty spec contracts/ vs canonical entries                                                                        |
+| [x]    | 2.2 | Write VT-CONTRACTS-DRIFT-001 test                    |           | 5 tests: positive (zig, python), negative (empty dir, missing dir, canonical exists)                                                                         |
+| [x]    | 2.3 | Fix check-mode gate for specless contract generation |           | Restructured early return; check mode now falls through to contract generation                                                                               |
+| [x]    | 2.4 | Remove dead code from `mirror.py` + `__init__.py`    | [P]       | Removed `_collect_entries`, `_resolve_conflicts`, `_create_symlinks`; `MirrorEntry` kept (used by `*_mirror_entries`) but removed from `__init__.py` exports |
+| [x]    | 2.5 | Update IP-029 verification coverage + progress       |           | All 5 VTs → verified; §9 checkboxes updated                                                                                                                  |
 
 ### Task Details
 
@@ -129,21 +135,25 @@ Implement convention drift warnings per DR-029 §7.5 and PROD-014.FR-012: when a
   - **Updates**: VT coverage entries `planned` → `verified`, §9 progress checkboxes
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Drift detection needs source-unit-to-spec mapping | Registry already maps specs to source units; `_canonical_paths_for()` exists | resolved |
-| Removing MirrorEntry breaks external imports | Kept class (used by `*_mirror_entries`); only removed from `__init__.py` exports | resolved |
+
+| Risk                                              | Mitigation                                                                       | Status   |
+| ------------------------------------------------- | -------------------------------------------------------------------------------- | -------- |
+| Drift detection needs source-unit-to-spec mapping | Registry already maps specs to source units; `_canonical_paths_for()` exists     | resolved |
+| Removing MirrorEntry breaks external imports      | Kept class (used by `*_mirror_entries`); only removed from `__init__.py` exports | resolved |
 
 ## 9. Decisions & Outcomes
+
 - 2026-03-04 — `MirrorEntry` kept as internal class (used by `*_mirror_entries` return types); only removed from public exports in `__init__.py`
 - 2026-03-04 — Check-mode gate fix: `not create_specs and not generate_contracts` check moved before check_mode guard, so check-mode with contracts enabled still generates
 
 ## 10. Findings / Research Notes
+
 - `_scan_python_contracts()` crashed when `.contracts/` dir didn't exist — added `is_dir()` guard (bugfix)
 - `_detect_drift()` deduplicates by spec_id to avoid multiple warnings for multi-identifier specs
 - 5 pre-existing test failures in `TestVerificationStatusFilters` (CLI test, unrelated to DE-029)
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (2320 passed, lint clean, pylint 9.70)
 - [x] Phase notes updated

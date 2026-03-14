@@ -5,16 +5,19 @@
 ### Completed
 
 **P0-1: Relation type key fix** (`87cc7b7`)
+
 - `_format_relations()` in `change_formatters.py` read `"kind"` but actual data uses `"type"` (confirmed via `Relation` dataclass, `list_relations()`, and creation code).
 - All test fixtures in `change_formatters_test.py` also used `"kind"` — matching the bug. Fixed both.
 
 **P0-2: Enrich show spec** (`0f3cd3e`)
+
 - Added `_format_spec_relations()` — uses `spec.frontmatter.relations` (tuple of `Relation` objects with `.type`/`.target`).
 - Added `_format_requirements_summary(fr_count, nf_count, other_count)` — pure function, counts passed by caller.
 - `show_spec` in `show.py` loads `RequirementsRegistry`, counts by spec ID, passes to formatter.
 - Existing mock specs in tests needed `spec.frontmatter.relations = ()` to avoid Mock truthiness issue.
 
 **P0-3: Plan parse resilience** (`8b3aec0`)
+
 - `extract_plan_overview()` raises `ValueError` on bad YAML — this escaped the `except Exception` around `load_markdown_file`.
 - Wrapped the extract call in its own `try/except ValueError`, prints warning to stderr.
 - Also added stderr warning for the existing frontmatter parse catch (was silently skipping).
@@ -22,6 +25,7 @@
 ### In progress
 
 **P0-2b: Spec.to_dict() relations** — interrupted mid-task.
+
 - `Spec` model already has a `.relations` property (line 53-60 in `models.py`) returning `list[dict]`.
 - `to_dict()` (line 98-133) currently omits relations. Need to add `if self.relations: data["relations"] = self.relations`.
 - Simple addition — no test written yet.
@@ -53,6 +57,7 @@
 ### 2026-03-14 — Phase 03 complete
 
 **Done**: All P2 tasks (3.0–3.4) implemented with tests.
+
 - 3.0: Audit backfill — added `relations: [{type: documents, target: DE-xxx}]` to AUD-003–008 (6 audits; AUD-001/002 have no delta reference)
 - 3.1: `show spec` reverse lookup counts — `_format_reverse_lookup_counts()` in spec_formatters; show.py loads ChangeRegistry per kind (delta/revision/audit), calls `find_related_to()`, passes counts. JSON includes `reverse_lookup_counts` dict.
 - 3.2: `show spec --requirements` — `_format_requirements_list()` in spec_formatters; replaces count summary with full (uid, kind_label, title) list.
@@ -62,6 +67,7 @@
 **Verification**: `just` passes — 3906 tests, ruff clean, pylint 9.72/10 (no new warnings).
 
 **Findings**:
+
 - `RequirementRecord` uses `.uid` not `.id` — caught during smoke test.
 - AUD-001 (discovery audit) and AUD-002 (test audit) have no delta reference — only 6 of 8 audits needed backfill.
 - `format_delta_details_json()` returns a JSON string, not a dict — had to parse/enrich/re-encode for delta reverse lookup JSON enrichment.
@@ -71,6 +77,7 @@
 ### 2026-03-14 — Phase 04 complete
 
 **Done**: All P3 tasks (4.1–4.9) implemented with tests.
+
 - 4.1: Added `domain_field` and `backlog_field` to `REFERENCE_SOURCES` in `core/relation_types.py`
 - 4.2: `_collect_from_decision_fields()` — 11 list fields via shared `_collect_from_list_fields()` helper
 - 4.3: `_collect_from_governance_fields()` — 9 fields (specs, requirements, deltas, standards, policies, related_policies, related_standards, supersedes, superseded_by)
@@ -84,6 +91,7 @@
 **Verification**: `pytest` passes — 3935 tests, ruff clean, pylint 10/10 on changed files.
 
 **Findings**:
+
 - `BacklogItem.relations` not a dataclass field — relations live in `frontmatter["relations"]` dict. `_collect_from_relations()` (getattr-based) misses them. Fixed by adding frontmatter relations handling to `_collect_from_backlog_fields()` with `source="relation"` to preserve semantic meaning.
 - `supersedes`/`superseded_by` field names collide with `RELATION_TYPES` values. DR-090's semantic separation invariant (detail not in RELATION_TYPES) doesn't hold for these. Separation is enforced by `source` ("domain_field" vs "relation"), not detail uniqueness. Tests updated to reflect this reality.
 - Extracted `_collect_from_list_fields(artifact, field_names, source)` shared helper to DRY the 3 typed model collectors (Decision, Governance, Requirement). All use getattr with defaults so non-matching models safely yield no hits.
@@ -96,6 +104,7 @@
 ### 2026-03-14 — Phase 05 complete
 
 **Done**: All P4 tasks (5.1–5.8) implemented with tests.
+
 - 5.1: `collect_reverse_reference_targets()` — collects all uppercased targets from referrers via `collect_references()`
 - 5.2: `partition_by_reverse_references()` — partitions candidates into (referenced, unreferenced) with custom `candidate_id_fn` (needed for requirements using `.uid`)
 - 5.3: `load_all_artifacts()` in `cli/common.py` — shared registry loader for cross-registry queries, lazy imports matching existing patterns
@@ -106,6 +115,7 @@
 **Verification**: `uv run pytest` passes — 3955 tests, ruff clean (only pre-existing UP042 on ContentType).
 
 **Findings**:
+
 - Used PEP 695 type parameter syntax (`def partition_by_reverse_references[T]`) to satisfy ruff UP047 rule. Works on Python 3.12+.
 - Requirements use `.uid` not `.id` — needed `candidate_id_fn=lambda r: r.uid` in the requirements partition call. This was known from phase 03 notes.
 - `load_all_artifacts()` handles all registry types via lazy imports; `RequirementsRegistry` accepts `root=` kwarg directly.

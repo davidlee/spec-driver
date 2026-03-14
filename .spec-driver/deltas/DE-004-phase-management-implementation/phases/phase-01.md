@@ -2,8 +2,8 @@
 id: IP-004.PHASE-01
 slug: phase-management-implementation-phase-01
 name: IP-004 Phase 01
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: completed
 kind: phase
 ---
@@ -50,12 +50,14 @@ risks:
 ## 1. Objective
 
 Implement the core `spec-driver create phase` command that enables automated phase creation with:
+
 - Auto-incrementing phase numbering (PHASE-01, PHASE-02, ...)
 - Automatic metadata population (phase ID, plan ID, delta ID)
 - Template rendering with variable substitution
 - Error handling for invalid inputs
 
 ## 2. Links & References
+
 - **Delta**: DE-004
 - **Plan**: IP-004
 - **Specs / PRODs**: PROD-006 (all requirements, focus on FR-001, FR-002, FR-004)
@@ -69,12 +71,14 @@ Implement the core `spec-driver create phase` command that enables automated pha
   - Schema: `spec-driver schema show phase.overview`
 
 ## 3. Entrance Criteria
+
 - [x] DE-004 delta created and reviewed
 - [x] PROD-006 spec complete and synced
 - [x] IP-004 plan detailed with 3 phases
 - [x] Research complete on existing creation patterns
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `create_phase()` function exists in `supekku/scripts/lib/changes/creation.py`
 - [ ] CLI command `phase` added to `supekku/cli/create.py`
 - [ ] VT-PHASE-001 passing (phase creation unit tests)
@@ -87,6 +91,7 @@ Implement the core `spec-driver create phase` command that enables automated pha
 ## 5. Verification
 
 **VT-PHASE-001: Phase Creation Unit Tests**
+
 - Location: `supekku/scripts/lib/changes/creation_test.py` (new file or enhance existing)
 - Tests:
   - `test_create_phase_first_in_sequence()` → creates phase-01.md
@@ -96,6 +101,7 @@ Implement the core `spec-driver create phase` command that enables automated pha
 - Command: `uv run pytest supekku/scripts/lib/changes/creation_test.py::test_create_phase* -v`
 
 **VT-PHASE-002: Auto-Numbering Tests**
+
 - Same location as VT-PHASE-001
 - Tests:
   - `test_phase_numbering_starts_at_01()`
@@ -104,6 +110,7 @@ Implement the core `spec-driver create phase` command that enables automated pha
 - Command: Same pytest command, different test names
 
 **VT-PHASE-004: Metadata Population Tests**
+
 - Same location
 - Tests:
   - `test_phase_id_format()` → matches `IP-XXX.PHASE-NN`
@@ -118,6 +125,7 @@ Implement the core `spec-driver create phase` command that enables automated pha
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - Template at `supekku/templates/phase.md` is correct structure
 - Plan documents always have `delta:` field in frontmatter
 - Phase directory is always `{delta_dir}/phases/`
@@ -125,26 +133,28 @@ Implement the core `spec-driver create phase` command that enables automated pha
 - Existing `create_delta()` pattern is good reference
 
 **STOP Conditions**:
+
 - STOP if template rendering requires major refactoring
 - STOP if plan lookup logic is significantly complex (escalate design review)
 - STOP if test framework doesn't support filesystem fixtures easily
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [WIP] | 1.1 | Research existing create_delta pattern | [ ] | Reading creation.py |
-| [ ] | 1.2 | Implement create_phase() function | [ ] | Depends on 1.1 |
-| [ ] | 1.3 | Add phase CLI command | [x] | Can start with 1.2 |
-| [ ] | 1.4 | Write VT-PHASE-001 tests | [x] | Can start with 1.2 |
-| [ ] | 1.5 | Write VT-PHASE-002 tests | [x] | Can start with 1.2 |
-| [ ] | 1.6 | Write VT-PHASE-004 tests | [x] | Can start with 1.2 |
-| [ ] | 1.7 | Run full test suite | [ ] | Final gate |
-| [ ] | 1.8 | Manual test with IP-002 | [ ] | Final verification |
+| Status | ID  | Description                            | Parallel? | Notes               |
+| ------ | --- | -------------------------------------- | --------- | ------------------- |
+| [WIP]  | 1.1 | Research existing create_delta pattern | [ ]       | Reading creation.py |
+| [ ]    | 1.2 | Implement create_phase() function      | [ ]       | Depends on 1.1      |
+| [ ]    | 1.3 | Add phase CLI command                  | [x]       | Can start with 1.2  |
+| [ ]    | 1.4 | Write VT-PHASE-001 tests               | [x]       | Can start with 1.2  |
+| [ ]    | 1.5 | Write VT-PHASE-002 tests               | [x]       | Can start with 1.2  |
+| [ ]    | 1.6 | Write VT-PHASE-004 tests               | [x]       | Can start with 1.2  |
+| [ ]    | 1.7 | Run full test suite                    | [ ]       | Final gate          |
+| [ ]    | 1.8 | Manual test with IP-002                | [ ]       | Final verification  |
 
 ### Task Details
 
 **1.1 Research Existing Patterns**
+
 - **Design / Approach**: Read `create_delta()` to understand:
   - How it finds delta directory
   - How it renders templates
@@ -155,6 +165,7 @@ Implement the core `spec-driver create phase` command that enables automated pha
 - **Observations & AI Notes**: [To be filled]
 
 **1.2 Implement create_phase() Function**
+
 - **Design / Approach**:
   - Function signature: `create_phase(name: str, plan_id: str, root: Path | None = None) -> PhaseCreationResult`
   - Steps:
@@ -174,6 +185,7 @@ Implement the core `spec-driver create phase` command that enables automated pha
 - **Observations & AI Notes**: [To be filled]
 
 **1.3 Add Phase CLI Command**
+
 - **Design / Approach**: Follow existing `create_delta` pattern in `create.py`
   ```python
   @app.command("phase")
@@ -197,6 +209,7 @@ Implement the core `spec-driver create phase` command that enables automated pha
 - **Observations & AI Notes**: [To be filled]
 
 **1.4-1.6 Write Test Suites**
+
 - **Design / Approach**: Use pytest with temporary directory fixtures
   - Create temp directory structure
   - Create mock plan + delta documents
@@ -208,10 +221,12 @@ Implement the core `spec-driver create phase` command that enables automated pha
 - **Observations & AI Notes**: [To be filled]
 
 **1.7 Run Full Test Suite**
+
 - **Testing**: `just test` (runs all tests including new ones)
 - **Observations & AI Notes**: [To be filled]
 
 **1.8 Manual Test with IP-002**
+
 - **Design / Approach**:
   ```bash
   spec-driver create phase "Phase 04 - Manual Test" --plan IP-002
@@ -223,18 +238,21 @@ Implement the core `spec-driver create phase` command that enables automated pha
 - **Observations & AI Notes**: [To be filled]
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Phase number parsing complex | Use simple regex, test edge cases | Pending |
-| Template rendering escaping needed | Test with special chars in name | Pending |
-| Plan lookup failure modes | Clear error messages, test invalid IDs | Pending |
+
+| Risk                               | Mitigation                             | Status  |
+| ---------------------------------- | -------------------------------------- | ------- |
+| Phase number parsing complex       | Use simple regex, test edge cases      | Pending |
+| Template rendering escaping needed | Test with special chars in name        | Pending |
+| Plan lookup failure modes          | Clear error messages, test invalid IDs | Pending |
 
 ## 9. Decisions & Outcomes
+
 - `2025-11-02` - Phase numbering: zero-padded two digits (PHASE-01, not PHASE-1)
 - `2025-11-02` - Gaps in numbering: warn but allow (flexibility over strictness)
 - `2025-11-02` - Function location: `creation.py` (alongside create_delta)
 
 ## 9. Decisions & Outcomes (continued)
+
 - `2025-11-03` - Scope expansion: Plan metadata updates moved from "out of scope" to new Phase 04
   - Rationale: `show delta --json` relies on plan frontmatter, manual sync causes inconsistency
   - Impact: Phase 01 complete as-is; new phase needed for automatic updates
@@ -242,6 +260,7 @@ Implement the core `spec-driver create phase` command that enables automated pha
 ## 10. Findings / Research Notes
 
 **2025-11-03 - Phase 01 Completion Review**:
+
 - All code already implemented prior to phase start (create_phase function, CLI command, tests)
 - 5/5 phase-specific tests passing (VT-PHASE-001, VT-PHASE-002, VT-PHASE-004 coverage complete)
 - Full test suite: 1161 tests passing
@@ -251,6 +270,7 @@ Implement the core `spec-driver create phase` command that enables automated pha
 - **Decision**: Add Phase 04 to scope for automatic plan metadata updates
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied (all original criteria met)
 - [x] All tests passing (VT-PHASE-001, VT-PHASE-002, VT-PHASE-004)
 - [x] Linters passing (ruff + pylint)

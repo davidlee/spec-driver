@@ -2,28 +2,28 @@
 id: PROD-010
 slug: cli-ux
 name: CLI UX
-created: '2025-11-03'
-updated: '2025-11-08'
+created: "2025-11-03"
+updated: "2025-11-08"
 status: draft
 kind: prod
 aliases: []
 relations:
-- type: informs
-  target: SPEC-110
-  description: Drives CLI implementation requirements for both human and agent workflows
+  - type: informs
+    target: SPEC-110
+    description: Drives CLI implementation requirements for both human and agent workflows
 guiding_principles:
-- Consistency enables automation - agents learn patterns once, apply everywhere
-- Predictability over features - stable contracts more valuable than rich options
-- Machine-readable first - JSON output and schemas enable agent autonomy
-- Progressive disclosure - simple defaults, opt-in detail flags for token efficiency
-- Ergonomic for humans, optimized for agents - intelligent input handling reduces friction
-- Forgiving input parsing - accept natural variations (plural/singular, abbreviated IDs)
+  - Consistency enables automation - agents learn patterns once, apply everywhere
+  - Predictability over features - stable contracts more valuable than rich options
+  - Machine-readable first - JSON output and schemas enable agent autonomy
+  - Progressive disclosure - simple defaults, opt-in detail flags for token efficiency
+  - Ergonomic for humans, optimized for agents - intelligent input handling reduces friction
+  - Forgiving input parsing - accept natural variations (plural/singular, abbreviated IDs)
 assumptions:
-- Agents primarily consume JSON output for parsing and decision-making
-- CLI is the primary interface for both human and agent workflows
-- Agent workflows prioritize token efficiency and predictable structure
-- Human workflows prioritize ergonomics and discoverability
-- Existing CLI architecture (SPEC-110) supports these enhancements
+  - Agents primarily consume JSON output for parsing and decision-making
+  - CLI is the primary interface for both human and agent workflows
+  - Agent workflows prioritize token efficiency and predictable structure
+  - Human workflows prioritize ergonomics and discoverability
+  - Existing CLI architecture (SPEC-110) supports these enhancements
 ---
 
 # PROD-010 – CLI UX
@@ -509,34 +509,34 @@ The CLI UX improvements provide nine core capabilities:
 **Priority 1: Consistency (Critical for agent reliability)**
 
 - **PROD-010.FR-001**: All list commands MUST support both `--json` (shorthand) and `--format=json` flags with identical behavior
-  *Rationale*: Eliminates command-specific logic; agents use single pattern across all list operations
-  *Current Gap*: `list specs` has `--json`, others use `--format json`
-  *Verification*: VT-PROD010-JSON-001 - Test JSON availability on specs, deltas, adrs, requirements, revisions, changes
+  _Rationale_: Eliminates command-specific logic; agents use single pattern across all list operations
+  _Current Gap_: `list specs` has `--json`, others use `--format json`
+  _Verification_: VT-PROD010-JSON-001 - Test JSON availability on specs, deltas, adrs, requirements, revisions, changes
 
 - **PROD-010.FR-002**: All show commands MUST support `--json` flag for structured output
-  *Rationale*: Enables programmatic access to detailed artifact information
-  *Current Gap*: `show delta --json` works but undocumented; `show spec --json` missing
-  *Verification*: VT-PROD010-JSON-002 - Test JSON on show spec/delta/adr/requirement/revision
+  _Rationale_: Enables programmatic access to detailed artifact information
+  _Current Gap_: `show delta --json` works but undocumented; `show spec --json` missing
+  _Verification_: VT-PROD010-JSON-002 - Test JSON on show spec/delta/adr/requirement/revision
 
 - **PROD-010.FR-003**: All list commands MUST support `-s`/`--status` filter for consistent status-based filtering
-  *Rationale*: Status filtering is universal need across all artifact types
-  *Current Gap*: `list specs` lacks status filter entirely
-  *Verification*: VT-PROD010-FILTER-001 - Test status filter on specs command
+  _Rationale_: Status filtering is universal need across all artifact types
+  _Current Gap_: `list specs` lacks status filter entirely
+  _Verification_: VT-PROD010-FILTER-001 - Test status filter on specs command
 
 **Priority 2: Enhanced Filtering (High value for agent workflows)**
 
 - **PROD-010.FR-004**: All list commands MUST support multi-value filters via comma-separated values (e.g., `-s draft,in-progress`)
-  *Rationale*: Eliminates need for regex workarounds or multiple commands
-  *Current Gap*: Only single-value filters supported; agents use complex regex
-  *Verification*: VT-PROD010-FILTER-002 - Test multi-value status, kind, and custom filters
+  _Rationale_: Eliminates need for regex workarounds or multiple commands
+  _Current Gap_: Only single-value filters supported; agents use complex regex
+  _Verification_: VT-PROD010-FILTER-002 - Test multi-value status, kind, and custom filters
 
 - **PROD-010.FR-005**: List commands MUST support reverse relationship queries:
   - `list deltas --implements SPEC-110.FR-001` (deltas implementing requirement)
   - `list requirements --verified-by VT-*` (requirements verified by test pattern)
   - `list specs --informed-by ADR-001` (specs informed by decision)
-  *Rationale*: Enables discovery without post-processing with jq/grep
-  *Current Gap*: Requires manual JSON parsing or grep pipelines
-  *Verification*: VT-PROD010-FILTER-003 - Test reverse relationship queries
+    _Rationale_: Enables discovery without post-processing with jq/grep
+    _Current Gap_: Requires manual JSON parsing or grep pipelines
+    _Verification_: VT-PROD010-FILTER-003 - Test reverse relationship queries
 
 **Priority 3: Self-Documentation (Reduces external dependencies)**
 
@@ -544,66 +544,66 @@ The CLI UX improvements provide nine core capabilities:
   - `schema show enums.delta.status` → `["draft", "in-progress", "completed", "deferred"]`
   - `schema show enums.spec.kind` → `["prod", "tech"]`
   - `schema show enums.requirement.kind` → `["FR", "NF"]`
-  *Rationale*: Agents discover valid values without documentation
-  *Current Gap*: No introspection; agents guess or fail
-  *Verification*: VT-PROD010-SCHEMA-001 - Test enum introspection for all artifact types
+    _Rationale_: Agents discover valid values without documentation
+    _Current Gap_: No introspection; agents guess or fail
+    _Verification_: VT-PROD010-SCHEMA-001 - Test enum introspection for all artifact types
 
 - **PROD-010.FR-007**: All list command help text MUST document output format differences (table/json/tsv) with examples
-  *Rationale*: Clarifies when to use each format and what fields are included
-  *Current Gap*: Format differences undocumented
-  *Verification*: VT-PROD010-SCHEMA-002 - Validate help text includes format documentation
+  _Rationale_: Clarifies when to use each format and what fields are included
+  _Current Gap_: Format differences undocumented
+  _Verification_: VT-PROD010-SCHEMA-002 - Validate help text includes format documentation
 
 - **PROD-010.FR-012**: CLI MUST provide help command showing core concepts, workflows, and conventions from markdown sources
-  *Rationale*: Agents and users need discoverable help without consulting external docs or web searches
-  *Commands*: `help concepts`, `help workflows`, `help conventions`
-  *Current Gap*: No built-in help system; users must read GitHub docs or local files manually
-  *Verification*: VT-PROD010-HELP-001 - Test help command displays markdown content correctly
+  _Rationale_: Agents and users need discoverable help without consulting external docs or web searches
+  _Commands_: `help concepts`, `help workflows`, `help conventions`
+  _Current Gap_: No built-in help system; users must read GitHub docs or local files manually
+  _Verification_: VT-PROD010-HELP-001 - Test help command displays markdown content correctly
 
 - **PROD-010.FR-013**: Help system MUST distinguish between immutable (spec-driver core) and customizable (project-specific) documentation
-  *Rationale*: Users need to know what they can modify vs what represents framework fundamentals
-  *Implementation*: Immutable docs from package, customizable docs from project directory
-  *Current Gap*: No distinction between framework docs and project docs
-  *Verification*: VT-PROD010-HELP-002 - Test help command shows source type (core vs project)
+  _Rationale_: Users need to know what they can modify vs what represents framework fundamentals
+  _Implementation_: Immutable docs from package, customizable docs from project directory
+  _Current Gap_: No distinction between framework docs and project docs
+  _Verification_: VT-PROD010-HELP-002 - Test help command shows source type (core vs project)
 
 - **PROD-010.FR-014**: CLI MUST support installing customizable help docs to project for user modification
-  *Rationale*: Projects need to document their own workflows and conventions alongside framework docs
-  *Commands*: `help install workflows` or `install help-templates`
-  *Current Gap*: No mechanism to bootstrap project-specific help docs
-  *Verification*: VT-PROD010-HELP-003 - Test installing help templates to project
+  _Rationale_: Projects need to document their own workflows and conventions alongside framework docs
+  _Commands_: `help install workflows` or `install help-templates`
+  _Current Gap_: No mechanism to bootstrap project-specific help docs
+  _Verification_: VT-PROD010-HELP-003 - Test installing help templates to project
 
 - **PROD-010.FR-015**: CLI MUST support per-file validation of frontmatter and YAML blocks
-  *Rationale*: Users need to validate individual files during authoring without running full workspace validation
-  *Commands*: `validate file <path>` validates frontmatter schema and all embedded YAML blocks
-  *Current Gap*: Only workspace-level validation exists; no targeted file validation
-  *Verification*: VT-PROD010-VALIDATE-001 - Test file validation catches schema errors, invalid blocks
+  _Rationale_: Users need to validate individual files during authoring without running full workspace validation
+  _Commands_: `validate file <path>` validates frontmatter schema and all embedded YAML blocks
+  _Current Gap_: Only workspace-level validation exists; no targeted file validation
+  _Verification_: VT-PROD010-VALIDATE-001 - Test file validation catches schema errors, invalid blocks
 
 - **PROD-010.FR-016**: CLI MUST accept intelligent variations of artifact IDs and keywords:
   - Artifact IDs: `ISSUE-001` == `001` == `issue-001` (case-insensitive, prefix optional)
   - Keywords: `spec` == `specs`, `prod` == `product`, `delta` == `deltas`
   - Kind filters: `-k prod` == `-k product`, `-k issue` == `-k issues`
-  *Rationale*: Reduces cognitive overhead for humans, reduces token usage for agents (shorter IDs), eliminates trivial input errors
-  *Examples*:
+    _Rationale_: Reduces cognitive overhead for humans, reduces token usage for agents (shorter IDs), eliminates trivial input errors
+    _Examples_:
     - `spec-driver show delta 005` → resolves to `DE-005`
     - `spec-driver list specs -k prod` → same as `-k product`
     - `spec-driver show issue 42` → resolves to `ISSUE-042`
-  *Current Gap*: Exact ID format and keyword matching required; users/agents must remember canonical forms
-  *Verification*: VT-PROD010-INPUT-001 - Test ID normalization across all show commands
-  *Verification*: VT-PROD010-INPUT-002 - Test keyword variations across all list commands
+      _Current Gap_: Exact ID format and keyword matching required; users/agents must remember canonical forms
+      _Verification_: VT-PROD010-INPUT-001 - Test ID normalization across all show commands
+      _Verification_: VT-PROD010-INPUT-002 - Test keyword variations across all list commands
 
 - **PROD-010.FR-017**: CLI MUST provide edit command to open artifacts in $EDITOR:
   - `spec-driver edit delta DE-005` → opens delta file in $EDITOR
   - `spec-driver edit spec SPEC-110` → opens spec file in $EDITOR
   - `spec-driver edit issue 42` → opens issue file in $EDITOR
   - `spec-driver edit delta DE-005 --json` → returns `{"path": "/path/to/DE-005.md"}` (agent mode)
-  *Rationale*: Eliminates context-switch to file system; humans get integrated workflow, agents get file paths for programmatic access
-  *Current Gap*: Users must manually navigate file system or use grep to find artifact files
-  *Behavior*:
+    _Rationale_: Eliminates context-switch to file system; humans get integrated workflow, agents get file paths for programmatic access
+    _Current Gap_: Users must manually navigate file system or use grep to find artifact files
+    _Behavior_:
     - Honors $EDITOR environment variable (falls back to $VISUAL, then `vim`, then `nano`)
     - `--json` mode returns file path instead of opening editor (for scripting/agents)
     - Multi-file artifacts (e.g., deltas with phases) open primary file (DE-XXX.md)
     - Invalid artifact ID shows helpful error with suggestions
-  *Verification*: VT-PROD010-EDIT-001 - Test edit command with mocked $EDITOR
-  *Verification*: VT-PROD010-EDIT-002 - Test edit --json returns correct file paths
+      _Verification_: VT-PROD010-EDIT-001 - Test edit command with mocked $EDITOR
+      _Verification_: VT-PROD010-EDIT-002 - Test edit --json returns correct file paths
 
 **Priority 4: Machine-Readable Mode (Token efficiency)**
 
@@ -611,16 +611,16 @@ The CLI UX improvements provide nine core capabilities:
   - `--format=json` (structured output)
   - `--compact` (no whitespace in JSON)
   - `--no-color` (no ANSI escape codes)
-  *Rationale*: Single flag optimizes for agent consumption
-  *Current Gap*: Agents must specify multiple flags
-  *Verification*: VT-PROD010-MACHINE-001 - Test machine-readable flag behavior
+    _Rationale_: Single flag optimizes for agent consumption
+    _Current Gap_: Agents must specify multiple flags
+    _Verification_: VT-PROD010-MACHINE-001 - Test machine-readable flag behavior
 
 - **PROD-010.FR-009**: List commands MUST support pagination for large result sets (>100 items):
   - `--limit N --offset M` (SQL-style pagination)
   - Alternative: `--page N --per-page M` (page-based pagination)
-  *Rationale*: Prevents token exhaustion on large registries
-  *Current Gap*: All results returned at once (77 requirements in single response)
-  *Verification*: VT-PROD010-MACHINE-002 - Test pagination on large result sets
+    _Rationale_: Prevents token exhaustion on large registries
+    _Current Gap_: All results returned at once (77 requirements in single response)
+    _Verification_: VT-PROD010-MACHINE-002 - Test pagination on large result sets
 
 **Priority 5: Error Guidance (Self-correction)**
 
@@ -629,32 +629,32 @@ The CLI UX improvements provide nine core capabilities:
   - Invalid enum value → list valid choices
   - Unknown artifact ID → suggest similar IDs (fuzzy match)
   - Missing required arg → show example usage
-  *Rationale*: Enables agent self-correction without user intervention
-  *Current Gap*: Errors like "invalid format: xml" don't show valid formats
-  *Verification*: VT-PROD010-ERROR-001 - Test error message quality across scenarios
+    _Rationale_: Enables agent self-correction without user intervention
+    _Current Gap_: Errors like "invalid format: xml" don't show valid formats
+    _Verification_: VT-PROD010-ERROR-001 - Test error message quality across scenarios
 
 **Priority 6: Command Consistency (Reduces cognitive load)**
 
 - **PROD-010.FR-011**: CLI MUST provide kind-specific backlog list shortcuts (issues/problems/improvements/risks)
-  *Rationale*: Consistent with other artifact patterns (specs/deltas/adrs/requirements); reduces cognitive load
-  *Commands*: list issues, list problems, list improvements, list risks (equivalent to list backlog with kind filter)
-  *Current Gap*: Must use list backlog -k kind for type-specific views; inconsistent with create commands
-  *Consistency*: Matches create pattern with list pattern
-  *Verification*: VT-PROD010-BACKLOG-001 - Test all four kind-specific list commands with filters
+  _Rationale_: Consistent with other artifact patterns (specs/deltas/adrs/requirements); reduces cognitive load
+  _Commands_: list issues, list problems, list improvements, list risks (equivalent to list backlog with kind filter)
+  _Current Gap_: Must use list backlog -k kind for type-specific views; inconsistent with create commands
+  _Consistency_: Matches create pattern with list pattern
+  _Verification_: VT-PROD010-BACKLOG-001 - Test all four kind-specific list commands with filters
 
 ### Non-Functional Requirements
 
 - **PROD-010.NF-001**: Compact JSON mode MUST reduce token usage by 30-50% compared to table format for typical workflows
-  *Rationale*: Token efficiency critical for agent economics
-  *Measurement*: VA-PROD010-TOKEN-001 - Measure token usage across representative workflows (list, filter, show)
+  _Rationale_: Token efficiency critical for agent economics
+  _Measurement_: VA-PROD010-TOKEN-001 - Measure token usage across representative workflows (list, filter, show)
 
 - **PROD-010.NF-002**: Common agent workflows (discover → filter → show) MUST complete without consulting external documentation
-  *Rationale*: Self-documenting CLI reduces cognitive load and latency
-  *Measurement*: VH-PROD010-AGENT-001 - Agent workflow testing with zero-knowledge baseline
+  _Rationale_: Self-documenting CLI reduces cognitive load and latency
+  _Measurement_: VH-PROD010-AGENT-001 - Agent workflow testing with zero-knowledge baseline
 
 - **PROD-010.NF-003**: Implemented improvements MUST address all Priority 1-2 findings from 2025-11-03 UX research report
-  *Rationale*: Validates solution solves documented pain points
-  *Measurement*: VH-PROD010-UX-001 - Cross-reference implementation with research findings
+  _Rationale_: Validates solution solves documented pain points
+  _Measurement_: VH-PROD010-UX-001 - Cross-reference implementation with research findings
 
 ### Success Metrics / Signals
 
@@ -669,6 +669,7 @@ The CLI UX improvements provide nine core capabilities:
 - **User Experience / Outcomes**:
 
   **Agent Workflow Before Improvements**:
+
   ```bash
   # Agent tries to list active specs - fails
   $ spec-driver list specs --status active --json
@@ -685,6 +686,7 @@ The CLI UX improvements provide nine core capabilities:
   ```
 
   **Agent Workflow After Improvements**:
+
   ```bash
   # Status filter works everywhere
   $ spec-driver list specs --status active --json
@@ -713,6 +715,7 @@ The CLI UX improvements provide nine core capabilities:
 - **Data & Contracts**:
 
   **Standard JSON Response Schema** (all list commands):
+
   ```json
   {
     "items": [<array of artifacts>],
@@ -723,6 +726,7 @@ The CLI UX improvements provide nine core capabilities:
   ```
 
   **Enum Schema Response** (schema commands):
+
   ```json
   {
     "type": "enum",
@@ -734,6 +738,7 @@ The CLI UX improvements provide nine core capabilities:
   ```
 
   **Error Response Schema** (consistent across all commands):
+
   ```json
   {
     "error": "<error message>",
@@ -748,6 +753,7 @@ The CLI UX improvements provide nine core capabilities:
 ### Primary Flows
 
 **Standard List Command Flow** (with enhancements):
+
 1. Parse arguments (filters, format, pagination, machine-readable)
 2. If `--machine-readable`: Set format=json, compact=true, no-color=true
 3. Detect repository root
@@ -759,6 +765,7 @@ The CLI UX improvements provide nine core capabilities:
 9. Exit with appropriate code
 
 **Schema Introspection Flow** (new):
+
 1. Parse arguments (schema type: enums.<artifact>.<field>)
 2. Load schema registry
 3. Extract enum definition for requested field
@@ -767,6 +774,7 @@ The CLI UX improvements provide nine core capabilities:
 6. Exit SUCCESS
 
 **Reverse Relationship Query Flow** (new):
+
 1. Parse arguments (relationship filter: --implements, --verified-by, --informed-by)
 2. Load registry and related registries (requirements, deltas, specs)
 3. Build reverse index from relationships
@@ -777,12 +785,14 @@ The CLI UX improvements provide nine core capabilities:
 ### Error Handling / Guards
 
 **Enhanced Error Messages**:
+
 - **Invalid option**: "No such option: --status. Available for specs: --kind, --package, --filter, --regexp. See 'spec-driver list specs --help'"
 - **Invalid enum**: "Invalid status: activ. Did you mean: active? Valid: draft, active, deprecated, superseded"
 - **Invalid format**: "Invalid format: xml. Valid formats: table, json, tsv. Try: --format json"
 - **Unknown artifact**: "Delta not found: DE-999. Similar: DE-009, DE-099. List all: spec-driver list deltas"
 
 **Guards**:
+
 - Validate status/kind values against known enums before filtering
 - Check artifact existence before show operations
 - Limit pagination to reasonable bounds (max 1000 per page)
@@ -793,6 +803,7 @@ The CLI UX improvements provide nine core capabilities:
 ### Testing Strategy
 
 **Unit Tests** (per requirement):
+
 - FR-001/FR-002: Test JSON flag availability and output schema stability
 - FR-003: Test status filter on specs command
 - FR-004: Test multi-value filter parsing and application
@@ -804,6 +815,7 @@ The CLI UX improvements provide nine core capabilities:
 - FR-010: Test error message quality and suggestions
 
 **Integration Tests**:
+
 - End-to-end agent workflows (discover → filter → show)
 - Cross-command consistency (same flags work identically)
 - Performance regression testing (commands stay <2s)
@@ -814,6 +826,7 @@ The CLI UX improvements provide nine core capabilities:
 ### Research / Validation
 
 **Validation Plan**:
+
 1. **Baseline Measurement**: Token usage for 10 common agent workflows (before improvements)
 2. **Implementation**: Apply Priority 1-3 improvements
 3. **Validation Testing**: Run same workflows, measure token reduction and success rate
@@ -824,6 +837,7 @@ The CLI UX improvements provide nine core capabilities:
    - 100% workflow completion without external docs
 
 **Research Traceability**:
+
 - FR-001/FR-002 address UX Research Section 2 (JSON inconsistency - HIGH priority)
 - FR-003 addresses Section 8 (Status filter gaps - HIGH priority)
 - FR-004 addresses Section 8 (Multi-value filters - MEDIUM priority)
@@ -834,12 +848,14 @@ The CLI UX improvements provide nine core capabilities:
 ### Observability & Analysis
 
 **Metrics** (optional telemetry for validation):
+
 - JSON output parsing success rate by command
 - Token usage per command type (table vs JSON vs compact)
 - Error self-correction rate (retry success after initial failure)
 - Documentation lookup frequency (external vs CLI-based discovery)
 
 **Success Signals**:
+
 - Zero special-case handling required in agent code for CLI operations
 - Agent workflows complete without user intervention in 95% of cases
 - Token budget preserved for analysis phase (not consumed by discovery)
@@ -875,40 +891,45 @@ All requirements have planned test coverage across unit (VT), analysis (VA), and
 ### Related Specs / PROD
 
 **Direct Dependencies**:
+
 - **SPEC-110** (supekku/cli): Implementation target for all agent UX requirements
   - Relationship: PROD-010 informs SPEC-110 functional requirements
   - Impact: SPEC-110 FR/NF requirements must align with PROD-010
   - Collaboration: PROD-010 drives CLI architecture decisions for agent workflows
 
 **Informed By**:
+
 - **docs/ux-research-cli-2025-11-03.md**: Comprehensive UX research identifying agent pain points
   - Priority 1-3 findings mapped to FR-001 through FR-010
   - Medium-term enhancements (FR-004, FR-005) selected based on research recommendations
 
 ### Risks & Mitigations
 
-| Risk ID | Description | Likelihood | Impact | Mitigation |
-|---------|-------------|-----------|--------|------------|
-| RISK-001 | Breaking changes to existing JSON schemas disrupt agent workflows | Medium | High | Version JSON schemas; provide migration period; test with existing agent code |
-| RISK-002 | Performance degradation with pagination overhead | Low | Medium | Lazy loading in registries; benchmark pagination vs full load |
-| RISK-003 | Enum introspection exposes implementation details | Low | Low | Document only user-facing enum values; exclude internal states |
-| RISK-004 | Multi-value filters complicate filtering logic | Medium | Low | Use standard parsing library; comprehensive test coverage |
-| RISK-005 | Reverse relationship queries require index maintenance | Medium | Medium | Build indices lazily; cache for performance; document rebuild process |
+| Risk ID  | Description                                                       | Likelihood | Impact | Mitigation                                                                    |
+| -------- | ----------------------------------------------------------------- | ---------- | ------ | ----------------------------------------------------------------------------- |
+| RISK-001 | Breaking changes to existing JSON schemas disrupt agent workflows | Medium     | High   | Version JSON schemas; provide migration period; test with existing agent code |
+| RISK-002 | Performance degradation with pagination overhead                  | Low        | Medium | Lazy loading in registries; benchmark pagination vs full load                 |
+| RISK-003 | Enum introspection exposes implementation details                 | Low        | Low    | Document only user-facing enum values; exclude internal states                |
+| RISK-004 | Multi-value filters complicate filtering logic                    | Medium     | Low    | Use standard parsing library; comprehensive test coverage                     |
+| RISK-005 | Reverse relationship queries require index maintenance            | Medium     | Medium | Build indices lazily; cache for performance; document rebuild process         |
 
 ### Known Gaps / Debt
 
 **Assumptions Requiring Validation**:
+
 - Token reduction estimates (30-50%) based on typical workflows; actual reduction depends on agent usage patterns
 - Pagination limits (max 1000 per page) may need tuning based on registry growth
 - Reverse relationship query performance acceptable for current registry sizes; may need optimization at scale
 
 **Future Enhancements** (explicitly deferred):
+
 - Interactive TUI mode for exploration (UX Research Section 13, Long-Term item 6)
 - Workflow-specific commands (audit coverage, audit drift) - Section 13, Long-Term item 5
 - Natural language query translation (not in research scope)
 - Streaming JSON output for very large result sets (Section 13, Long-Term item 4)
 
 **Backlog Items to Create**:
+
 - Create ISSUE for JSON schema versioning strategy
 - Create IMPROVEMENT for workflow-specific convenience commands
 - Create RISK for registry performance at scale (>1000 artifacts per type)
@@ -923,42 +944,46 @@ None remaining. All scope and priority decisions resolved via user clarification
 
 Mapping of UX Research findings to requirements:
 
-| Research Finding | Priority | Requirement | Status |
-|------------------|----------|-------------|--------|
-| JSON output inconsistency (--json vs --format) | HIGH | FR-001, FR-002 | Scoped |
-| Status filter missing from specs | HIGH | FR-003 | Scoped |
-| Missing usage examples | MEDIUM | FR-007 | Scoped |
-| TSV detail flags inconsistent | MEDIUM | Deferred | Out of scope (human-focused) |
-| Show commands missing --json docs | MEDIUM | FR-002 | Scoped |
-| Error messages lack guidance | MEDIUM | FR-010 | Scoped |
-| No machine-readable mode | HIGH | FR-008 | Scoped |
-| Schema introspection partial | MEDIUM | FR-006 | Scoped |
-| No streaming/pagination | MEDIUM | FR-009 | Scoped |
-| Multi-value filters unavailable | MEDIUM | FR-004 | Scoped |
-| Reverse relationship queries unavailable | MEDIUM | FR-005 | Scoped |
+| Research Finding                               | Priority | Requirement    | Status                       |
+| ---------------------------------------------- | -------- | -------------- | ---------------------------- |
+| JSON output inconsistency (--json vs --format) | HIGH     | FR-001, FR-002 | Scoped                       |
+| Status filter missing from specs               | HIGH     | FR-003         | Scoped                       |
+| Missing usage examples                         | MEDIUM   | FR-007         | Scoped                       |
+| TSV detail flags inconsistent                  | MEDIUM   | Deferred       | Out of scope (human-focused) |
+| Show commands missing --json docs              | MEDIUM   | FR-002         | Scoped                       |
+| Error messages lack guidance                   | MEDIUM   | FR-010         | Scoped                       |
+| No machine-readable mode                       | HIGH     | FR-008         | Scoped                       |
+| Schema introspection partial                   | MEDIUM   | FR-006         | Scoped                       |
+| No streaming/pagination                        | MEDIUM   | FR-009         | Scoped                       |
+| Multi-value filters unavailable                | MEDIUM   | FR-004         | Scoped                       |
+| Reverse relationship queries unavailable       | MEDIUM   | FR-005         | Scoped                       |
 
 ### B. Implementation Priorities
 
 Recommended delta breakdown for implementation:
 
 **Delta 1: Critical Consistency (P1)**
+
 - FR-001: Standardize --json across list commands
 - FR-002: Add --json to show commands
 - FR-003: Add status filter to specs
 - NF-003: Validate against UX research findings
 
 **Delta 2: Enhanced Filtering (P2)**
+
 - FR-004: Multi-value filter support
 - FR-005: Reverse relationship queries
 - NF-001: Token efficiency validation
 
 **Delta 3: Self-Documentation (P3)**
+
 - FR-006: Enum introspection
 - FR-007: Help text enhancement
 - FR-010: Error message improvements
 - NF-002: Agent workflow validation
 
 **Delta 4: Machine-Readable Mode (P3)**
+
 - FR-008: --machine-readable flag
 - FR-009: Pagination support
 - NF-001: Token efficiency final validation
@@ -966,6 +991,7 @@ Recommended delta breakdown for implementation:
 ### C. Agent Workflow Examples
 
 **Example 1: Delta Implementation Planning**
+
 ```bash
 # Discover draft deltas
 $ spec-driver list deltas -s draft --json
@@ -981,6 +1007,7 @@ $ spec-driver list requirements --verified-by VT-* --json
 ```
 
 **Example 2: Spec Coverage Analysis**
+
 ```bash
 # List active specs
 $ spec-driver list specs -s active --machine-readable
@@ -996,6 +1023,7 @@ $ spec-driver validate --strict
 ```
 
 **Example 3: Discovery Without Documentation**
+
 ```bash
 # Discover valid delta statuses
 $ spec-driver schema show enums.delta.status

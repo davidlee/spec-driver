@@ -2,6 +2,7 @@
 name: implement
 description: implement a well-defined task or implementation plan
 ---
+
 `spec-driver find card $ARGUMENTS`
 
 Read the card, design doc. (if you haven't already)
@@ -11,11 +12,13 @@ touch before deep reading or editing; use `spec-driver list memories -p <path>`
 queries so glob-scoped memories can surface
 
 If there's an implementation plan, read it and
+
 - if it's already begun, you don't need /preflight
 
 NOTE: the design doc is canon; the plan is guidance. If they conflict meaningfully: /consult
 
 Workflow alignment reminders:
+
 - Default to delta-first execution flow for implementation work.
 - Treat revision-first as a concession path, not the default.
 - Treat ceremony mode as guidance posture; do not assume runtime enforcement from ceremony alone.

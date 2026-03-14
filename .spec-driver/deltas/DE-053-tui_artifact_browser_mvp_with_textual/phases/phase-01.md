@@ -2,8 +2,8 @@
 id: IP-053.PHASE-01
 slug: 053-tui_artifact_browser_mvp_with_textual-phase-01
 name: IP-053 Phase 01
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: draft
 kind: phase
 ---
@@ -60,6 +60,7 @@ Build the reusable foundation that both TUI and CLI consume. Three modules,
 no TUI dependency, fully testable independently.
 
 ## 2. Links & References
+
 - **Delta**: [DE-053](../DE-053.md)
 - **Design Revision**: [DR-053](../DR-053.md)
   - DEC-053-01 (styled_text API)
@@ -71,11 +72,13 @@ no TUI dependency, fully testable independently.
 - **Spike findings**: [notes.md](../notes.md)
 
 ## 3. Entrance Criteria
+
 - [x] DR-053 approved (all decisions decided, no open questions)
 - [x] DE-050 completed (normalised registry API available)
 - [x] Spike validated styling approach
 
 ## 4. Exit Criteria / Done When
+
 - [x] `resolve_style()` and `styled_text()` added to `formatters/theme.py`
 - [x] `formatters/column_defs.py` created with defs for all artifact types
 - [x] Existing `*_formatters.py` refactored to consume `column_defs.py`
@@ -88,12 +91,14 @@ no TUI dependency, fully testable independently.
 - [x] `just` passes (ruff clean, pylint 9.52/10, 2805 tests pass)
 
 ## 5. Verification
+
 - `just test` — all existing + new tests
 - `just lint` + `just pylint` — zero warnings
 - Manual: `uv run spec-driver list specs`, `list adrs`, etc. — confirm CLI
   output unchanged after column_defs refactor
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: Existing formatter tests are sufficient to catch regression
   from column_defs extraction. If not, add targeted regression tests.
 - **Assumption**: BacklogRegistry shim is ~30 lines wrapping existing functions.
@@ -105,12 +110,12 @@ no TUI dependency, fully testable independently.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | P01-T01 | Add `resolve_style()` / `styled_text()` to `theme.py` | [P] | 21 tests, TDD |
-| [x] | P01-T02 | Create `column_defs.py` + refactor formatters | | All 9 formatters refactored, 261 formatter tests pass |
-| [x] | P01-T03 | Build `core/artifact_view.py` | [P] | 13 tests, verified against real workspace (496 artifacts) |
-| [x] | P01-T04 | Write VT-053-adapter, VT-053-column-defs, VT-053-styled-text | | TDD throughout; 49 new tests total |
+| Status | ID      | Description                                                  | Parallel? | Notes                                                     |
+| ------ | ------- | ------------------------------------------------------------ | --------- | --------------------------------------------------------- |
+| [x]    | P01-T01 | Add `resolve_style()` / `styled_text()` to `theme.py`        | [P]       | 21 tests, TDD                                             |
+| [x]    | P01-T02 | Create `column_defs.py` + refactor formatters                |           | All 9 formatters refactored, 261 formatter tests pass     |
+| [x]    | P01-T03 | Build `core/artifact_view.py`                                | [P]       | 13 tests, verified against real workspace (496 artifacts) |
+| [x]    | P01-T04 | Write VT-053-adapter, VT-053-column-defs, VT-053-styled-text |           | TDD throughout; 49 new tests total                        |
 
 ### Task Details
 
@@ -162,11 +167,11 @@ no TUI dependency, fully testable independently.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Formatter refactor breaks CLI output | Existing tests + manual output diff | open |
-| Column defs extraction too invasive | STOP if >50% of signatures change; consult | open |
-| BacklogRegistry shim grows beyond ~30 lines | Reassess; may need normalisation first | open |
+| Risk                                        | Mitigation                                 | Status |
+| ------------------------------------------- | ------------------------------------------ | ------ |
+| Formatter refactor breaks CLI output        | Existing tests + manual output diff        | open   |
+| Column defs extraction too invasive         | STOP if >50% of signatures change; consult | open   |
+| BacklogRegistry shim grows beyond ~30 lines | Reassess; may need normalisation first     | open   |
 
 ## 9. Decisions & Outcomes
 
@@ -178,6 +183,7 @@ STOP conditions trigger.
 (Populated during execution.)
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence: `just` passes (2805 tests, ruff clean, pylint 9.52)
 - [x] Notes updated with findings

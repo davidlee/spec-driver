@@ -2,8 +2,8 @@
 id: IP-046.PHASE-01
 slug: 046-fix-silent-failure
 name: IP-046 Phase 01 - Fix silent failure and diff-based validation
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: completed
 kind: phase
 ---
@@ -33,13 +33,13 @@ verification:
     - VT-046-003
   evidence: []
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     description: Fix silent RevisionUpdateError catch in complete_delta.py
-  - id: '1.2'
+  - id: "1.2"
     description: Audit all error paths in complete_delta.py for missing stderr output
-  - id: '1.3'
+  - id: "1.3"
     description: Implement diff-based validation in updater.py
-  - id: '1.4'
+  - id: "1.4"
     description: Write tests for error output and diff-based validation
 risks:
   - description: Diff-based validation too permissive
@@ -83,12 +83,12 @@ resilient to pre-existing validation issues in revision blocks.
 
 ## 5. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 1.1 | Fix silent `except RevisionUpdateError` in `complete_delta.py` | L307-308: now prints error to stderr |
-| [x] | 1.2 | Audit all error paths in `complete_delta.py` | Fixed 7 silent paths: delta not found, requirements error, sync failure, revision update error, update failure, frontmatter failure, already-completed handler |
-| [x] | 1.3 | Implement diff-based validation in `updater.py` | DEC-046-01: validates before+after, only rejects new errors |
-| [x] | 1.4 | Write tests | VT-046-001 (stderr output), VT-046-002 (pre-existing errors tolerated), VT-046-003 (22 tests pass) |
+| Status | ID  | Description                                                    | Notes                                                                                                                                                          |
+| ------ | --- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [x]    | 1.1 | Fix silent `except RevisionUpdateError` in `complete_delta.py` | L307-308: now prints error to stderr                                                                                                                           |
+| [x]    | 1.2 | Audit all error paths in `complete_delta.py`                   | Fixed 7 silent paths: delta not found, requirements error, sync failure, revision update error, update failure, frontmatter failure, already-completed handler |
+| [x]    | 1.3 | Implement diff-based validation in `updater.py`                | DEC-046-01: validates before+after, only rejects new errors                                                                                                    |
+| [x]    | 1.4 | Write tests                                                    | VT-046-001 (stderr output), VT-046-002 (pre-existing errors tolerated), VT-046-003 (22 tests pass)                                                             |
 
 ## 6. Assumptions & STOP Conditions
 

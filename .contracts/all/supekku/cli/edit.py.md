@@ -15,11 +15,13 @@ Raises typer.Exit(EXIT_FAILURE) on validation or write failure.
 Returns normally on success.
 
 IMPORTANT: typer.Exit inherits from RuntimeError. Callers with
-``except RuntimeError`` MUST guard with ``except typer.Exit: raise``
-first, or use an early ``return`` after this call.
+`except RuntimeError` MUST guard with `except typer.Exit: raise`
+first, or use an early `return` after this call.
+
 - `_verify_memory(memory_id, path) -> None`: Stamp verification SHA and dates on a memory artifact.
 
 Raises typer.Exit(EXIT_FAILURE) if git is unavailable.
+
 - @app.command(adr) `edit_adr(decision_id, status, root) -> None`: Edit ADR in editor.
 - @app.command(audit) `edit_audit(audit_id, status, root) -> None`: Edit audit in editor.
 - @app.command(backlog) `edit_backlog(item_id, status, root) -> None`: Edit a backlog item (issue, problem, improvement, or risk).

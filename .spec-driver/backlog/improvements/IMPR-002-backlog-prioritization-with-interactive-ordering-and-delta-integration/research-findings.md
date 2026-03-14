@@ -5,23 +5,27 @@
 ### Backlog Architecture
 
 **Domain Model** (`supekku/scripts/lib/backlog/models.py`):
+
 - `BacklogItem` dataclass with fields: id, kind, status, title, path, frontmatter
 - Kind-specific fields: severity (p1/p2/p3), categories, impact, likelihood, created, updated
 - No priority or ordering field currently exists
 
 **Registry** (`supekku/scripts/lib/backlog/registry.py`):
+
 - `discover_backlog_items()` - discovers items from filesystem
 - Returns items **sorted by ID** (line 320): `return sorted(items, key=lambda x: x.id)`
 - No ordering persistence mechanism exists
 - No backlog registry YAML file (unlike deltas, decisions, requirements which have `.spec-driver/registry/*.yaml`)
 
 **CLI** (`supekku/cli/list.py`):
+
 - `list_backlog()` command at line 1168-1245
 - Supports filters: `--kind`, `--status`, `--filter` (substring), `--regexp`
 - Outputs: table (default), json, tsv
 - No ordering options currently available
 
 **Formatters** (`supekku/scripts/lib/formatters/backlog_formatters.py`):
+
 - `format_backlog_list_table()` - renders items as rich table
 - Displays: ID, Kind, Status, Title, Severity columns
 - Severity field already exists and is displayed
@@ -30,13 +34,15 @@
 ### Existing Prioritization Concept
 
 From `supekku/about/backlog.md` (lines 23-24):
+
 > "Prioritisation lives in dedicated Markdown lists (e.g. `backlog/backlog.md`). The list order is canonical; scripts ensure new artefacts get appended, while humans/agents reorder lines to reflect priority."
 
-**Key insight:** There's a documented *intent* for priority lists but it's not currently implemented in the tooling.
+**Key insight:** There's a documented _intent_ for priority lists but it's not currently implemented in the tooling.
 
 ### Severity Field
 
 Actual values from backlog items: `p1`, `p2`, `p3` (with p3 being most common in current data)
+
 - Issues have severity field
 - Improvements do not have severity field
 - Current ordering is purely chronological by ID
@@ -48,42 +54,47 @@ Actual values from backlog items: `p1`, `p2`, `p3` (with p3 being most common in
 **Options:**
 
 A. **Backlog Registry** (recommended, aligns with existing patterns):
-   - Create `.spec-driver/registry/backlog.yaml`
-   - Store ordering metadata alongside item metadata
-   - Parallel to decisions.yaml, requirements.yaml, etc.
-   - Structure:
-     ```yaml
-     items:
-       ISSUE-003:
-         kind: issue
-         status: in-progress
-         priority_index: 1
-       IMPR-002:
-         kind: improvement
-         status: idea
-         priority_index: 2
-     ```
+
+- Create `.spec-driver/registry/backlog.yaml`
+- Store ordering metadata alongside item metadata
+- Parallel to decisions.yaml, requirements.yaml, etc.
+- Structure:
+  ```yaml
+  items:
+    ISSUE-003:
+      kind: issue
+      status: in-progress
+      priority_index: 1
+    IMPR-002:
+      kind: improvement
+      status: idea
+      priority_index: 2
+  ```
 
 B. **Priority field in frontmatter**:
-   - Add `priority: <int>` to each backlog item's frontmatter
-   - More distributed, harder to maintain consistency
-   - Doesn't align with existing registry pattern
+
+- Add `priority: <int>` to each backlog item's frontmatter
+- More distributed, harder to maintain consistency
+- Doesn't align with existing registry pattern
 
 C. **Separate priority list file**:
-   - `backlog/priority-order.md` or `.spec-driver/backlog-order.yaml`
-   - Just ordered list of IDs
-   - Simpler but loses context
+
+- `backlog/priority-order.md` or `.spec-driver/backlog-order.yaml`
+- Just ordered list of IDs
+- Simpler but loses context
 
 **Recommendation:** Option A (Backlog Registry) - consistent with existing architecture patterns
 
 ### 2. Ordering Logic
 
 **Default Sort Order (when implemented):**
+
 1. User-specified priority (if exists)
 2. Severity (p1 > p2 > p3) for items without user priority
 3. ID (chronological fallback)
 
 **Implementation location:**
+
 - New function in `supekku/scripts/lib/backlog/registry.py`
 - `def sort_backlog_items(items: list[BacklogItem], *, order_by: str = "priority") -> list[BacklogItem]`
 - Read priority data from backlog registry
@@ -91,6 +102,7 @@ C. **Separate priority list file**:
 ### 3. Interactive Editor Flow
 
 **New CLI command flag:**
+
 - Add `--prioritize` / `--prioritise` to `list_backlog()` and related commands
 - When enabled:
   1. Get filtered items based on other flags
@@ -101,6 +113,7 @@ C. **Separate priority list file**:
   6. Write to backlog registry
 
 **Editor format:**
+
 ```markdown
 # Backlog Priority Order
 
@@ -112,6 +125,7 @@ Reorder items below by moving lines up/down. Save and exit to apply.
 ```
 
 **Components needed:**
+
 - Editor invocation utility (new in `supekku/scripts/lib/core/`)
 - Markdown list parser
 - Priority merge algorithm (handles sparse/filtered lists)
@@ -119,22 +133,26 @@ Reorder items below by moving lines up/down. Save and exit to apply.
 ### 4. Registry Sync
 
 **New sync operation:**
+
 - Add `sync backlog` command
 - Scan `backlog/*/` directories
 - Generate/update `.spec-driver/registry/backlog.yaml`
 - Similar to existing `sync decisions`, `sync specs` commands
 
 **Location:**
+
 - `supekku/cli/sync.py` - add new command
 - `supekku/scripts/lib/backlog/registry.py` - add sync function
 
 ### 5. CLI Enhancements
 
 **New flags for `list backlog`:**
+
 - `--prioritize` / `--prioritise` - interactive ordering mode
 - `--order-by-id` / `-o` - explicit ID-based ordering (current behavior)
 
 **Default behavior change:**
+
 - When registry exists with priority data: use priority ordering
 - When registry doesn't exist: fallback to ID ordering
 - User can always override with `--order-by-id`
@@ -146,6 +164,7 @@ Reorder items below by moving lines up/down. Save and exit to apply.
 Location: `supekku/cli/create.py` - enhance existing `create_delta()` command
 
 Template population:
+
 - Read backlog item frontmatter
 - Extract title, status, related requirements
 - Pre-populate delta template with context
@@ -156,6 +175,7 @@ Template population:
 ### External Dependencies
 
 No new external dependencies required. Use existing:
+
 - `typer` - CLI framework
 - `rich` - table formatting
 - `yaml` - registry files
@@ -171,6 +191,7 @@ No new external dependencies required. Use existing:
 ### Integration Points
 
 **Files requiring modification:**
+
 - `supekku/scripts/lib/backlog/models.py` - add priority field to BacklogItem
 - `supekku/scripts/lib/backlog/registry.py` - add ordering, sync, merge functions
 - `supekku/cli/list.py` - add --prioritize, --order-by-id flags
@@ -178,6 +199,7 @@ No new external dependencies required. Use existing:
 - `supekku/cli/create.py` - add --from-backlog flag to create delta
 
 **New files needed:**
+
 - `supekku/scripts/lib/core/editor.py` - editor invocation utility
 - `supekku/scripts/lib/backlog/priority.py` - priority management logic
 - `.spec-driver/registry/backlog.yaml` - registry file (generated)
@@ -192,6 +214,7 @@ The core challenge is merging user-provided ordering (from filtered subset) with
 Think of the ordered list as partitions of `(shown_item, [unshown_followers])` pairs:
 
 **Example:**
+
 ```
 Original items: a b c d e f g h i
 Filtered view (shows only): B F G
@@ -204,6 +227,7 @@ Partitioned structure:
 ```
 
 When user reorders to `G, B, F`, the **tails move atomically with their heads**:
+
 ```
 [G, [h,i]]      # G's tail moves with it
 [B, [c,d,e]]    # B's tail moves with it
@@ -276,11 +300,13 @@ def merge_ordering(prefix, partitions, new_filtered_order):
 ### Complexity Assessment
 
 **Simple:**
+
 - Building partitions: O(n) single pass
 - Reordering partitions: O(m) where m = filtered items
 - Flattening: O(n)
 
 **Edge cases handled:**
+
 - Empty filter (no shown items): all items stay in original order
 - All items filtered: straightforward reorder with no tails
 - Items created during edit session: append to end

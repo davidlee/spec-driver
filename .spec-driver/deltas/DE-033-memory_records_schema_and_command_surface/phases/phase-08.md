@@ -2,8 +2,8 @@
 id: IP-033.PHASE-08
 slug: 033-memory_records_schema_and_command_surface-phase-08
 name: IP-033 Phase 08 - Inline Link Parsing & Resolution
-created: '2026-03-03'
-updated: '2026-03-03'
+created: "2026-03-03"
+updated: "2026-03-03"
 status: completed
 kind: phase
 ---
@@ -73,11 +73,13 @@ phase: IP-033.PHASE-08
 # Phase 8 — Inline Link Parsing & Resolution
 
 ## 1. Objective
+
 Implement `[[...]]` wikilink parsing in memory body content per obs-link-spec,
 resolve targets against project artifact registries, persist results in
 frontmatter `links` field, and provide CLI + sync integration.
 
 ## 2. Links & References
+
 - **Obs-link-spec**: `obs-link-spec.md` (delta bundle)
 - **Phase 8 plan**: `phase8-exploration-summary.md` (delta bundle)
 - **ID classifier**: `supekku/scripts/lib/core/artifact_ids.py`
@@ -87,16 +89,18 @@ frontmatter `links` field, and provide CLI + sync integration.
 - **Requirement**: MEM-FR-004
 
 ## 3. Entrance Criteria
+
 - [x] Phase 6 complete
 - [x] obs-link-spec reviewed
 
 ## 4. Exit Criteria / Done When
+
 - [x] `core/artifact_ids.py` — shared ID classification (34 tests)
 - [x] `memory/links.py` — parser + resolver + serializer (43 tests)
 - [x] `frontmatter_metadata/memory.py` — links FieldMetadata (5 tests)
 - [x] `memory/models.py` — links field round-trip (4 tests)
 - [x] `memory/__init__.py` — exports updated
-- [x] `formatters/memory_formatters.py` — _format_links() (6 tests)
+- [x] `formatters/memory_formatters.py` — \_format_links() (6 tests)
 - [x] `cli/resolve.py` — resolve links command (8 tests)
 - [x] `cli/main.py` — resolve group registered
 - [x] `cli/sync.py` — --memory-links flag
@@ -107,6 +111,7 @@ frontmatter `links` field, and provide CLI + sync integration.
 - [x] IP-033 phase overview updated
 
 ## 5. Verification
+
 ```bash
 uv run pytest supekku/ -q --tb=short        # 2087 passed
 just lint                                     # All checks passed
@@ -117,20 +122,22 @@ uv run spec-driver resolve --help             # Shows links subcommand
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 8.0 | Shared artifact ID classifier | `core/artifact_ids.py`: 10 patterns, classify + is_artifact_id. 34 tests. |
-| [x] | 8.1 | Link parser | `memory/links.py`: parse_links(), code fence/inline skipping, dedup. 23 parser tests. |
-| [x] | 8.2 | Link resolver | Same file: resolve_parsed_link(), resolve_all_links(), links_to_frontmatter(). 20 resolver tests. |
-| [x] | 8.3 | Schema + model | links FieldMetadata (out/missing arrays), MemoryRecord.links field. 9 tests. |
-| [x] | 8.4 | CLI + sync | `cli/resolve.py` resolve links [--dry-run], sync --memory-links. 8 CLI tests. |
-| [x] | 8.5 | Formatter | _format_links(), wired into details + JSON. 6 formatter tests. |
-| [x] | 8.6 | Verification | pylint 10.00 (extracted collectors + top-level imports), IP-033 updated. |
+| Status | ID  | Description                   | Notes                                                                                             |
+| ------ | --- | ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| [x]    | 8.0 | Shared artifact ID classifier | `core/artifact_ids.py`: 10 patterns, classify + is_artifact_id. 34 tests.                         |
+| [x]    | 8.1 | Link parser                   | `memory/links.py`: parse_links(), code fence/inline skipping, dedup. 23 parser tests.             |
+| [x]    | 8.2 | Link resolver                 | Same file: resolve_parsed_link(), resolve_all_links(), links_to_frontmatter(). 20 resolver tests. |
+| [x]    | 8.3 | Schema + model                | links FieldMetadata (out/missing arrays), MemoryRecord.links field. 9 tests.                      |
+| [x]    | 8.4 | CLI + sync                    | `cli/resolve.py` resolve links [--dry-run], sync --memory-links. 8 CLI tests.                     |
+| [x]    | 8.5 | Formatter                     | \_format_links(), wired into details + JSON. 6 formatter tests.                                   |
+| [x]    | 8.6 | Verification                  | pylint 10.00 (extracted collectors + top-level imports), IP-033 updated.                          |
 
 ## 8. Outstanding Work
 
 ### Pylint cleanup (8.6, blocking completion)
+
 `resolve.py` scores 9.33/10 due to:
+
 - `_build_artifact_index` too complex (McCabe 13) — needs extraction into per-registry helpers
 - `import-outside-toplevel` x6 — lazy imports are intentional (registry dependencies optional) but pylint flags them
 - `broad-exception-caught` x4 — used to gracefully skip missing registries
@@ -139,19 +146,23 @@ uv run spec-driver resolve --help             # Shows links subcommand
 **Recommended fix**: Extract `_collect_memory_artifacts()`, `_collect_decisions()`, `_collect_specs()`, `_collect_changes()` helper functions. Move `load_markdown_file`/`dump_markdown_file` imports to top level in `_resolve_memory_links`.
 
 ### `links.py` minor
+
 - `resolve_parsed_link` has 7 return statements (max 6) — could combine early-return paths
 
 ### IP-033 updates (blocking completion)
+
 - Update VT-MEM-LINKS-001 status: `planned` → `verified`
 - Add Phase 8 to phase overview table
 - Update progress tracking section
 
 ### Follow-up (out of scope)
+
 - Update `blocks/revision.py` and `blocks/verification.py` to import from `core/artifact_ids.py`
 - `[[slug]]` resolution (deferred per obs-link-spec adjustments)
 - `mem:` URI scheme (dropped — `mem.` prefix sufficient)
 
 ## 9. Decisions
+
 - Dropped `mem:` URI scheme — canonical `mem.` dot prefix is unambiguous
 - Dropped `[[slug]]` resolution — semantic IDs are the primary mechanism
 - Resolution rule: classify_artifact_id() for SPEC/ADR/DE etc, normalize_memory_id() for dotted targets
@@ -162,15 +173,17 @@ uv run spec-driver resolve --help             # Shows links subcommand
 ## 10. Files Changed
 
 ### New
+
 - `supekku/scripts/lib/core/artifact_ids.py` + `_test.py` — shared ID classification
 - `supekku/scripts/lib/memory/links.py` + `_test.py` — parser, resolver, serializer
 - `supekku/cli/resolve.py` + `_test.py` — CLI command
 - `change/deltas/DE-033-.../phase8-exploration-summary.md` — research notes
 
 ### Modified
+
 - `supekku/scripts/lib/core/frontmatter_metadata/memory.py` + `_test.py` — links field
 - `supekku/scripts/lib/memory/models.py` + `_test.py` — links attribute
 - `supekku/scripts/lib/memory/__init__.py` — exports
-- `supekku/scripts/lib/formatters/memory_formatters.py` + `_test.py` — _format_links
+- `supekku/scripts/lib/formatters/memory_formatters.py` + `_test.py` — \_format_links
 - `supekku/cli/main.py` — resolve group
 - `supekku/cli/sync.py` — --memory-links flag

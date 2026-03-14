@@ -1,9 +1,9 @@
 ---
 id: IP-052.PHASE-02
 slug: 052-event_infrastructure_jsonl_log_and_unix_domain_socket_emitter-phase-02
-name: 'Phase 2: Integration — session hook, artifact wiring, gitignore'
-created: '2026-03-07'
-updated: '2026-03-07'
+name: "Phase 2: Integration — session hook, artifact wiring, gitignore"
+created: "2026-03-07"
+updated: "2026-03-07"
 status: complete
 kind: phase
 ---
@@ -62,18 +62,21 @@ domain-layer `record_artifact()` calls, `startup.sh` session extraction,
 `.gitignore` management via install, and acceptance-level tests.
 
 ## 2. Links & References
+
 - **Delta**: DE-052
 - **Design Revision**: DR-052 (DEC-052-03 session attribution, DEC-052-06 artifact collector)
 - **Phase 1**: IP-052.PHASE-01 (complete, 648f82b)
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete and committed (648f82b)
 
 ## 4. Exit Criteria / Done When
+
 - [x] `record_artifact()` calls in: changes/creation.py, decisions/creation.py,
-  memory/creation.py, specs/creation.py, policies/creation.py, complete_delta.py
+      memory/creation.py, specs/creation.py, policies/creation.py, complete_delta.py
 - [x] `startup.sh` extracts `session_id` and exports `SPEC_DRIVER_SESSION`
-  via `CLAUDE_ENV_FILE`
+      via `CLAUDE_ENV_FILE`
 - [x] `.spec-driver/run/` added to `.gitignore` during `spec-driver install`
 - [x] VT-052-09 pass (3 wiring tests)
 - [x] VT-052-10 verified (shell-level, manual)
@@ -98,6 +101,7 @@ New tests in `supekku/scripts/lib/core/events_test.py` (or domain test files):
 Commands: `just test`, `just lint`, `just pylint`, `just`
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumption: `startup.sh` stdin is consumed exactly once; the boot prompt
   JSON is written to stdout (not stdin), so reading stdin for `session_id`
   doesn't interfere
@@ -108,13 +112,13 @@ Commands: `just test`, `just lint`, `just pylint`, `just`
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Wire `record_artifact()` into domain creation functions | [P] | 6 files |
-| [x] | 2.2 | Add session extraction to `startup.sh` | [P] | DEC-052-03 |
-| [x] | 2.3 | Add `.spec-driver/run/` to `.gitignore` via install | [P] | Check install flow |
-| [x] | 2.4 | Write VT-052-09 through VT-052-12 | | Depends on 2.1–2.3 |
-| [x] | 2.5 | Lint and full test pass | | `just` green |
+| Status | ID  | Description                                             | Parallel? | Notes              |
+| ------ | --- | ------------------------------------------------------- | --------- | ------------------ |
+| [x]    | 2.1 | Wire `record_artifact()` into domain creation functions | [P]       | 6 files            |
+| [x]    | 2.2 | Add session extraction to `startup.sh`                  | [P]       | DEC-052-03         |
+| [x]    | 2.3 | Add `.spec-driver/run/` to `.gitignore` via install     | [P]       | Check install flow |
+| [x]    | 2.4 | Write VT-052-09 through VT-052-12                       |           | Depends on 2.1–2.3 |
+| [x]    | 2.5 | Lint and full test pass                                 |           | `just` green       |
 
 ### Task Details
 
@@ -131,7 +135,7 @@ Commands: `just test`, `just lint`, `just pylint`, `just`
   - `policies/creation.py`: `create_policy()` → `policy_id` (line ~148)
   - `complete_delta.py`: after `create_completion_revision()` → `revision_id`
     (line ~321)
-  Import: `from supekku.scripts.lib.core.events import record_artifact`
+    Import: `from supekku.scripts.lib.core.events import record_artifact`
 
 - **2.2 — startup.sh session extraction**
   Per DEC-052-03:
@@ -158,22 +162,25 @@ Commands: `just test`, `just lint`, `just pylint`, `just`
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| startup.sh stdin consumption breaks boot prompt | DEC-052-03 specifies `INPUT=$(cat)` then echo prompt separately | Open |
-| Import cycle from domain modules → events | events.py has no domain imports; one-way dependency | Resolved |
-| Install lacks gitignore management | Fall back to manual + follow-up issue | Open |
+| Risk                                            | Mitigation                                                      | Status   |
+| ----------------------------------------------- | --------------------------------------------------------------- | -------- |
+| startup.sh stdin consumption breaks boot prompt | DEC-052-03 specifies `INPUT=$(cat)` then echo prompt separately | Open     |
+| Import cycle from domain modules → events       | events.py has no domain imports; one-way dependency             | Resolved |
+| Install lacks gitignore management              | Fall back to manual + follow-up issue                           | Open     |
 
 ## 9. Decisions & Outcomes
+
 - 2026-03-07 — Phase 2 scoped from IP-052 and DR-052 DEC-052-03/06
 
 ## 10. Findings / Research Notes
+
 - Install flow (`workspace.py`) has no existing `.gitignore` management
 - `startup.sh` is installer-owned, overwritten on `spec-driver install`
 - Domain creation functions all follow the same pattern: assign ID → write
   files → return result dataclass
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Notes updated

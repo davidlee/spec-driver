@@ -2,8 +2,8 @@
 id: IP-050.PHASE-02
 slug: 050-normalise_registry_api_surface_for_consistent_artifact_access-phase-02
 name: IP-050 Phase 02 - Group C registries
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: in-progress
 kind: phase
 ---
@@ -60,10 +60,10 @@ concessions.
 
 ## 2. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 2.1 | RequirementsRegistry: find(), collect(), iter(), filter(), root kw | done |
-| [x] | 2.2 | CardRegistry: find(), collect(), iter(lane=), filter(lane=) | done |
-| [x] | 2.3 | BacklogRegistry: find_item() convenience function | done |
-| [x] | 2.4 | Tests for all new methods | 27 new tests |
-| [x] | 2.5 | Lint + full test suite | 2700 pass, ruff clean, pylint 9.54 |
+| Status | ID  | Description                                                        | Notes                              |
+| ------ | --- | ------------------------------------------------------------------ | ---------------------------------- |
+| [x]    | 2.1 | RequirementsRegistry: find(), collect(), iter(), filter(), root kw | done                               |
+| [x]    | 2.2 | CardRegistry: find(), collect(), iter(lane=), filter(lane=)        | done                               |
+| [x]    | 2.3 | BacklogRegistry: find_item() convenience function                  | done                               |
+| [x]    | 2.4 | Tests for all new methods                                          | 27 new tests                       |
+| [x]    | 2.5 | Lint + full test suite                                             | 2700 pass, ruff clean, pylint 9.54 |

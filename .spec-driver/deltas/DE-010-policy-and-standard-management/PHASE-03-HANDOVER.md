@@ -6,6 +6,7 @@
 ## Executive Summary
 
 Phase 03 delivered complete CLI integration for policies and standards:
+
 - ✅ 6 new CLI commands (list/show/create for both artifact types)
 - ✅ 10 new integration tests (all passing)
 - ✅ ~486 lines of clean, tested CLI code
@@ -15,6 +16,7 @@ Phase 03 delivered complete CLI integration for policies and standards:
 ## What's Complete (Phases 01-03)
 
 ### Phase 01 - Foundation & Domain Models ✅
+
 - PolicyRecord/StandardRecord dataclass models
 - PolicyRegistry/StandardRegistry with collect/filter/sync
 - Creation functions with ID generation and templates
@@ -22,6 +24,7 @@ Phase 03 delivered complete CLI integration for policies and standards:
 - 28 unit tests passing
 
 ### Phase 02 - Formatters & Display ✅
+
 - policy_formatters.py (265 lines, 14 functions)
 - standard_formatters.py (268 lines, 14 functions)
 - Theme integration (8 new status styles)
@@ -29,6 +32,7 @@ Phase 03 delivered complete CLI integration for policies and standards:
 - Support for table/JSON/TSV output formats
 
 ### Phase 03 - CLI Integration ✅
+
 - **List Commands**:
   - `list policies` - Filter by status/tag/spec/delta/requirement/standard
   - `list standards` - Filter by status/tag/spec/delta/requirement/policy
@@ -44,6 +48,7 @@ Phase 03 delivered complete CLI integration for policies and standards:
 ## Code Inventory
 
 ### Files Modified
+
 ```
 supekku/cli/list.py          +233 lines (policies/standards list commands)
 supekku/cli/show.py          +59 lines  (policy/standard show commands)
@@ -52,6 +57,7 @@ supekku/cli/test_cli.py      +86 lines  (TestPolicyCommands, TestStandardCommand
 ```
 
 ### Files Created (Phases 01-03)
+
 ```
 # Domain packages
 supekku/scripts/lib/policies/
@@ -94,6 +100,7 @@ change/deltas/DE-010-policy-and-standard-management/
 ```
 
 ### Total Code Delivered (Phases 01-03)
+
 - **Domain logic**: ~1,610 lines (policies + standards packages)
 - **Formatters**: ~1,164 lines (code + tests)
 - **CLI**: ~486 lines (commands + tests)
@@ -103,6 +110,7 @@ change/deltas/DE-010-policy-and-standard-management/
 ## Test Coverage
 
 ### Unit Tests
+
 - Policy domain: 16 tests (creation + registry)
 - Standard domain: 5 tests (creation + registry)
 - Policy formatters: 14 tests
@@ -110,10 +118,12 @@ change/deltas/DE-010-policy-and-standard-management/
 - Workspace integration: 7 tests (policies/standards sync)
 
 ### Integration Tests
+
 - CLI policy commands: 5 tests
 - CLI standard commands: 5 tests
 
 ### Test Results
+
 - **Formatter tests**: 29/29 passing
 - **CLI tests**: 84/84 passing (10 new)
 - **Workspace validation**: ✅ Passing
@@ -129,6 +139,7 @@ change/deltas/DE-010-policy-and-standard-management/
 ## Available CLI Commands
 
 ### List Commands
+
 ```bash
 # Policies
 uv run spec-driver list policies [OPTIONS]
@@ -156,12 +167,14 @@ uv run spec-driver list standards [OPTIONS]
 ```
 
 ### Show Commands
+
 ```bash
 uv run spec-driver show policy POL-XXX [--json]
 uv run spec-driver show standard STD-XXX [--json]
 ```
 
 ### Create Commands
+
 ```bash
 uv run spec-driver create policy "Title" [OPTIONS]
   --status draft|required
@@ -177,7 +190,9 @@ uv run spec-driver create standard "Title" [OPTIONS]
 ## Architectural Patterns Applied
 
 ### Skinny CLI Pattern ✅
+
 All CLI commands follow the proven pattern:
+
 1. Parse args
 2. Load registry
 3. Filter (delegate to registry methods)
@@ -185,18 +200,22 @@ All CLI commands follow the proven pattern:
 5. Output
 
 **No business logic in CLI layer** - all delegated to:
+
 - `PolicyRegistry.collect()`, `PolicyRegistry.filter()`
 - `StandardRegistry.collect()`, `StandardRegistry.filter()`
 - `format_policy_list_table()`, `format_policy_details()`
 - `format_standard_list_table()`, `format_standard_details()`
 
 ### Pure Functions ✅
+
 All formatters are pure functions:
+
 - Same input → same output
 - No side effects
 - No state mutation
 
 ### Separation of Concerns ✅
+
 - **Domain packages**: Business logic only
 - **Formatters**: Display logic only
 - **CLI**: Orchestration only
@@ -206,12 +225,14 @@ All formatters are pure functions:
 **Objective**: Bidirectional policy ↔ standard ↔ ADR cross-references
 
 ### Entry Criteria
+
 - [x] Phase 03 complete - CLI working
 - [x] PolicyRecord/StandardRecord models have reference fields
 - [ ] ADR schema extended with policy/standard fields
 - [ ] Cross-reference patterns understood
 
 ### Key Tasks
+
 1. Extend ADR frontmatter schema (add `policies:`, `standards:` fields)
 2. Update DecisionRecord model to include policy/standard references
 3. Implement backlink maintenance in registries
@@ -220,6 +241,7 @@ All formatters are pure functions:
 6. Write cross-reference integrity tests
 
 ### Verification
+
 - VT-PROD-003-007: Bidirectional policy ↔ standard references
 - VT-PROD-003-008: Policy/standard references in ADRs
 - Integration tests for cross-reference integrity

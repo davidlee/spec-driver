@@ -2,8 +2,8 @@
 id: IP-025.PHASE-01
 slug: 025-extend-find-command-to-all-artifact-types-phase-01
 name: IP-025 Phase 01 - Implement find subcommands
-created: '2026-02-05'
-updated: '2026-02-05'
+created: "2026-02-05"
+updated: "2026-02-05"
 status: complete
 kind: phase
 ---
@@ -91,7 +91,7 @@ Add `find` subcommands for all artifact types (spec, delta, adr, revision, polic
 - [x] `spec-driver find revision RE-*` works
 - [x] `spec-driver find policy POL-*` works
 - [x] `spec-driver find standard STD-*` works
-- [x] Pattern matching (*, ?) works
+- [x] Pattern matching (\*, ?) works
 - [x] Tests passing (`just test`)
 - [x] Lint clean (`just lint`)
 
@@ -108,20 +108,21 @@ Add `find` subcommands for all artifact types (spec, delta, adr, revision, polic
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add find spec | [P] | |
-| [x] | 1.2 | Add find delta | [P] | |
-| [x] | 1.3 | Add find adr | [P] | |
-| [x] | 1.4 | Add find revision | [P] | |
-| [x] | 1.5 | Add find policy | [P] | |
-| [x] | 1.6 | Add find standard | [P] | |
-| [x] | 1.7 | Write tests | | 13 tests |
-| [x] | 1.8 | Lint and verify | | Passed |
+| Status | ID  | Description       | Parallel? | Notes    |
+| ------ | --- | ----------------- | --------- | -------- |
+| [x]    | 1.1 | Add find spec     | [P]       |          |
+| [x]    | 1.2 | Add find delta    | [P]       |          |
+| [x]    | 1.3 | Add find adr      | [P]       |          |
+| [x]    | 1.4 | Add find revision | [P]       |          |
+| [x]    | 1.5 | Add find policy   | [P]       |          |
+| [x]    | 1.6 | Add find standard | [P]       |          |
+| [x]    | 1.7 | Write tests       |           | 13 tests |
+| [x]    | 1.8 | Lint and verify   |           | Passed   |
 
 ### Task Details
 
 - **1.1-1.6**: Add find subcommands following pattern:
+
   ```python
   @app.command("spec")
   def find_spec(
@@ -143,9 +144,9 @@ Add `find` subcommands for all artifact types (spec, delta, adr, revision, polic
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Registry iteration varies | Check each registry's API | Open |
+| Risk                      | Mitigation                | Status |
+| ------------------------- | ------------------------- | ------ |
+| Registry iteration varies | Check each registry's API | Open   |
 
 ## 9. Decisions & Outcomes
 

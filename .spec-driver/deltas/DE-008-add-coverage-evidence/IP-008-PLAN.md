@@ -36,9 +36,11 @@
 ## Phasing Strategy
 
 ### Phase 01: Schema & Sync Foundation
+
 **Objective**: Add coverage_evidence field and update sync logic without breaking existing functionality.
 
 **Scope**:
+
 - RequirementRecord dataclass changes
 - Serialization/deserialization
 - Coverage sync logic update
@@ -47,9 +49,11 @@
 **Rationale**: Establish data foundation before validation/display changes.
 
 ### Phase 02: Validation & Display
+
 **Objective**: Implement validation warnings and update all display logic.
 
 **Scope**:
+
 - Validation warning logic
 - Formatter updates
 - CLI/JSON output changes

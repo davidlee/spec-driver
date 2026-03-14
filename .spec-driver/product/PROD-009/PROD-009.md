@@ -2,8 +2,8 @@
 id: PROD-009
 slug: requirement-lifecycle-semantics
 name: Requirement Lifecycle Semantics
-created: '2025-11-03'
-updated: '2026-03-06'
+created: "2025-11-03"
+updated: "2026-03-06"
 status: draft
 kind: prod
 aliases: []
@@ -92,6 +92,7 @@ entries:
 ```
 
 ## 1. Intent & Summary
+
 - **Problem / Purpose**: Teams need to declare current reality for legacy systems without receipts while still trusting future overlays from deltas and audits.
 - **Value Signals**: Every requirement shows an explicit lifecycle status with provenance; discrepancies between artefacts raise actionable warnings instead of silently drifting.
 - **Guiding Principles**: Specs own the baseline, evidence overlays never delete history, and validation shepherds humans back to coherence.
@@ -100,11 +101,12 @@ entries:
   - 2026-03-06: RE-032 — Replaced timestamp precedence with explicit reconciliation per ADR-008; added formal definitions for `asserted` and `legacy_verified`.
 
 ## 2. Stakeholders & Journeys
+
 - **Personas / Actors**:
-  - *Spec authors / system owners* asserting existing behaviour.
-  - *Implementation agents* closing deltas and updating evidence.
-  - *Auditors / reviewers* capturing observational truth.
-  - *Product owners* prioritising unimplemented requirements.
+  - _Spec authors / system owners_ asserting existing behaviour.
+  - _Implementation agents_ closing deltas and updating evidence.
+  - _Auditors / reviewers_ capturing observational truth.
+  - _Product owners_ prioritising unimplemented requirements.
 - **Primary Journeys / Flows**:
   1. **Baseline assertion** – Given a requirement exists in production, when the author marks it `status: asserted` in the spec coverage block, then the registry reports it as “asserted (spec)” instead of “unknown”.
   2. **Evidence overlay** – Given a delta closes, when it records coverage `status: verified` with timestamp, then the registry shows both the spec baseline and the delta evidence with provenance. If they agree, no action needed. If they diverge, a drift warning is raised.
@@ -118,44 +120,51 @@ entries:
 ## 3. Responsibilities & Requirements
 
 ### Capability Overview
+
 The lifecycle-semantics capability ensures every requirement has a baseline status, overlays that respect recency and evidence strength, provenance for the effective state, and guidance whenever states diverge.
 
 ### Functional Requirements
+
 - **FR-001**: Specs MUST allow authors to declare baseline lifecycle statuses (`planned`, `asserted`, `legacy_verified`, `deprecated`) directly in coverage entries.
   - `asserted`: a normative claim recorded in the spec without supporting verification evidence yet. Means "we state this is true/required, but do not currently have receipts in the system" (ADR-008 §6).
   - `legacy_verified`: grandfathered observed truth accepted as verified from before the current evidence system existed. Means "treated as verified, but the original verification provenance predates or sits outside the current machinery" (ADR-008 §6).
-  *Verification*: VH-330 – Stakeholder walkthrough confirming spec-driven status updates.
+    _Verification_: VH-330 – Stakeholder walkthrough confirming spec-driven status updates.
 - **FR-002**: The lifecycle engine MUST surface evidence from deltas and audits alongside spec baseline statuses, presenting both normative and observed truth with provenance. When normative and observed truth diverge, the system MUST raise drift warnings for explicit human reconciliation rather than silently determining an effective status by timestamp or artefact-kind precedence (per ADR-008 §3–4).
-  *Verification*: VA-421 – Validation dry run covering drift surfacing scenarios.
+  _Verification_: VA-421 – Validation dry run covering drift surfacing scenarios.
 - **FR-003**: Validation MUST emit corrective warnings when overlays disagree and keep humans informed until a new delta or audit resolves the conflict.
-  *Verification*: VT-940 – Automated validator tests exercising discrepancy rules.
+  _Verification_: VT-940 – Automated validator tests exercising discrepancy rules.
 
 ### Non-Functional Requirements
+
 - **NF-001**: Lifecycle projections MUST expose provenance (source artefact, timestamp, actor) for the effective status.
-  *Measurement*: VT-940 – Snapshot inspection confirms provenance fields present.
+  _Measurement_: VT-940 – Snapshot inspection confirms provenance fields present.
 - **NF-002**: Warning messages SHOULD be actionable within one hop (point to artefacts and remediation) and default to warning severity rather than errors.
-  *Measurement*: VA-421 – Expert review of warning copy across conflict scenarios.
+  _Measurement_: VA-421 – Expert review of warning copy across conflict scenarios.
 
 ### Success Metrics / Signals
+
 - ≥95% of tracked requirements carry explicit baseline statuses post-adoption.
 - ≤10% of lifecycle warnings stay unresolved longer than one business day.
 - Agent satisfaction survey reports ≥4/5 clarity on lifecycle provenance and warnings.
 
 ## 4. Solution Outline
+
 - **User Experience / Outcomes**: Spec editors declare baseline state; delta completion and audit ingestion update overlays; UI/CLI displays “verified (audit AUD-021 · 2025-11-01)” vs “asserted (spec PROD-009 · 2025-11-03)” so humans understand context.
 - **Status Model**: Baseline statuses from spec (normative); delta statuses (`in-progress`, `implemented`, `verified`) and audit statuses (`verified`, `failed`, `blocked`) as observed evidence. When normative and observed diverge, the system surfaces drift for explicit reconciliation rather than computing an "effective status" by timestamp precedence (per ADR-008).
 - **Metadata & Priorities**: Coverage entries may include optional `priority`, `category`, and `sequence` fields; registry and reporting surface them for backlog work.
 - **Warning Heuristics**: Spec asserts verified with no evidence for 30 days → warning; delta evidence diverges from spec baseline → drift warning until explicit reconciliation; coverage missing for referenced requirement → error (enforced by DE-007).
 
 ## 5. Behaviour & Scenarios
+
 - **Primary Flows**:
-  - *Baseline declaration*: Author updates coverage → registry records `asserted (spec)` → no warnings unless conflicting overlays arrive.
-  - *Delta overlay*: Delta completion records coverage `verified (delta)` → if spec baseline agrees, no action; if divergent, drift warning raised for reconciliation.
-  - *Audit overlay*: Audit reports `failed` → drift warning raised showing spec baseline vs audit finding → explicit reconciliation required (spec update, follow-up delta, or documented acceptance).
-  - *Resolution*: Spec explicitly reconciled (coverage updated, revision recorded) → drift warning cleared.
+  - _Baseline declaration_: Author updates coverage → registry records `asserted (spec)` → no warnings unless conflicting overlays arrive.
+  - _Delta overlay_: Delta completion records coverage `verified (delta)` → if spec baseline agrees, no action; if divergent, drift warning raised for reconciliation.
+  - _Audit overlay_: Audit reports `failed` → drift warning raised showing spec baseline vs audit finding → explicit reconciliation required (spec update, follow-up delta, or documented acceptance).
+  - _Resolution_: Spec explicitly reconciled (coverage updated, revision recorded) → drift warning cleared.
 - **Error Handling / Guards**: Simultaneous updates keep both entries with provenance, emit review warning for explicit reconciliation; missing priority metadata yields informational notice only.
 
 ## 6. Quality & Verification
+
 - **Testing Strategy**: Extend registry tests for overlay precedence and provenance (VT-940); CLI integration tests for warning messaging (VA-421); manual workshop confirms lifecycle matrix (VH-330).
 - **Research / Validation**: Interview three teams tackling legacy systems to confirm workflow clarity; capture insights in backlog entry.
 - **Observability & Analysis**: Track count and age of lifecycle warnings in validation dashboards; alert if unresolved warnings >24h.
@@ -163,15 +172,16 @@ The lifecycle-semantics capability ensures every requirement has a baseline stat
 - **Acceptance Gates**: Lifecycle projections expose provenance, warnings exercised end-to-end, documentation updated for agents.
 
 ## 7. Backlog Hooks & Dependencies
+
 - **Related Specs / PROD**: PROD-008 (coverage contract), SPEC-122 (requirements registry).
 - **Risks & Mitigations**:
-  - *RISK-LIFE-001*: Teams ignore warnings → Add severity levels and dashboards (ISSUE-420).
-  - *RISK-LIFE-002*: Legacy assertions never receive evidence → Schedule quarterly review ritual (PROB-140).
+  - _RISK-LIFE-001_: Teams ignore warnings → Add severity levels and dashboards (ISSUE-420).
+  - _RISK-LIFE-002_: Legacy assertions never receive evidence → Schedule quarterly review ritual (PROB-140).
 - **Known Gaps / Debt**: ISSUE-421 – UI surfacing of lifecycle provenance; ISSUE-422 – Optional custom precedence rules per requirement.
 - **Open Decisions / Questions**:
-  - Should we introduce an `acknowledged_drift` status for long-running gaps? *(Owner: lifecycle-team, Due: 2025-11-14)*
-  - Do we allow per-requirement override of precedence rules? *(Owner: product, Due: 2025-11-21)*
-
+  - Should we introduce an `acknowledged_drift` status for long-running gaps? _(Owner: lifecycle-team, Due: 2025-11-14)_
+  - Do we allow per-requirement override of precedence rules? _(Owner: product, Due: 2025-11-21)_
 
 ## Appendices (Optional)
+
 - Glossary, detailed research, extended API examples, migration history, etc.

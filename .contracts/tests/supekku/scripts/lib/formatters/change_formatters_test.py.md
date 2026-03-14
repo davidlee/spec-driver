@@ -125,6 +125,20 @@ Verifies PROD-006.FR-003: Enhanced delta display shows phases.
 - `test_delta_with_three_phases(self) -> None`: Test delta with 3 phases shows all with proper formatting.
 - `test_delta_with_zero_phases(self) -> None`: Test delta with plan but no phases shows plan ID.
 
+### TestFormatDeltaReverseLookups
+
+Tests for \_format_delta_reverse_lookups (VT-090-P2-3).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_in_format_delta_details(self) -> None`: Reverse lookups appear in full delta details output.
+- `test_mixed(self) -> None`
+- `test_no_lookups(self) -> None`
+- `test_single_audit(self) -> None`
+- `test_single_revision(self) -> None`
+
 ### TestFormatPhaseSummary
 
 Tests for format_phase_summary function.

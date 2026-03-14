@@ -31,6 +31,8 @@ _MAX_SOCKET_PATH_LEN = 104
 
 # --- Artifact path patterns ---
 # Each tuple: (regex pattern against relative path, artifact_type, ID group index)
+# SYNC: mirrored in supekku/pi.extensions/spec-driver-artifact-events.ts
+#       see mem.artifact-pattern-sync
 
 _ARTIFACT_PATTERNS: list[tuple[re.Pattern[str], str]] = [
   (re.compile(r"\.spec-driver/deltas/(DE-\d+)[^/]*/phases/"), "phase"),

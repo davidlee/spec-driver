@@ -2,8 +2,8 @@
 id: IP-037.PHASE-03
 slug: 037-install_and_refresh_seed_memories_during_workspace_install-phase-03
 name: IP-037 Phase 03
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: draft
 kind: phase
 ---
@@ -30,11 +30,11 @@ verification:
   evidence:
     - Integration test results
 tasks:
-  - id: '3.1'
+  - id: "3.1"
     description: Add integration and dry-run reporting tests
-  - id: '3.2'
+  - id: "3.2"
     description: Verify all VT/VA artefacts satisfied
-  - id: '3.3'
+  - id: "3.3"
     description: Update notes and phase sheets
 risks: []
 ```
@@ -48,12 +48,15 @@ phase: IP-037.PHASE-03
 # Phase 2+3 — UX, Safety & Verification
 
 ## 1. Objective
+
 Integration-level tests for dry-run/reporting; verify all VT/VA artefacts; close out.
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete
 
 ## 4. Exit Criteria / Done When
+
 - [x] VT-037-001: seed create-only — covered by TestInstallMemoriesSeed (3 tests)
 - [x] VT-037-002: managed refresh — covered by TestInstallMemoriesManaged (5 tests)
 - [x] VT-037-003: unmanaged preservation — covered by TestInstallMemoriesUnmanaged (2 tests)
@@ -64,13 +67,14 @@ Integration-level tests for dry-run/reporting; verify all VT/VA artefacts; close
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 3.1 | Add integration and dry-run reporting tests | | 5 new tests |
-| [x] | 3.2 | Verify all VT/VA artefacts satisfied | | All covered |
-| [x] | 3.3 | Update notes and phase sheets | | |
+| Status | ID  | Description                                 | Parallel? | Notes       |
+| ------ | --- | ------------------------------------------- | --------- | ----------- |
+| [x]    | 3.1 | Add integration and dry-run reporting tests |           | 5 new tests |
+| [x]    | 3.2 | Verify all VT/VA artefacts satisfied        |           | All covered |
+| [x]    | 3.3 | Update notes and phase sheets               |           |             |
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated

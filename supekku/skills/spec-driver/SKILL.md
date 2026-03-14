@@ -41,6 +41,7 @@ Use `spec-driver ...`.
 - Complete a lifecycle action: `spec-driver complete <kind> <id>`
 
 Common `kind` values include:
+
 - `adr`
 - `spec`
 - `delta`

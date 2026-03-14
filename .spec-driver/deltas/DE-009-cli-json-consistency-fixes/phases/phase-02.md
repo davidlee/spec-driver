@@ -2,8 +2,8 @@
 id: IP-009.PHASE-02
 slug: cli-json-consistency-fixes-phase-02
 name: IP-009 Phase 02
-created: '2025-01-04'
-updated: '2025-01-04'
+created: "2025-01-04"
+updated: "2025-01-04"
 status: completed
 kind: phase
 ---
@@ -106,6 +106,7 @@ tasks_total: 13
 ## 1. Objective
 
 Complete PROD-010.FR-002 by fixing the broken/incomplete `--json` flag implementations for show commands. Currently:
+
 - ✅ `show delta --json` - works (uses dedicated formatter)
 - ✅ `show requirement --json` - works
 - ❌ `show spec --json` - returns minimal `{"id": "SPEC-XXX"}` instead of full data
@@ -152,11 +153,13 @@ Complete PROD-010.FR-002 by fixing the broken/incomplete `--json` flag implement
 ## 5. Verification
 
 **Tests to run**:
+
 - Unit tests: `uv run pytest supekku/cli/test_cli.py::TestShowCommandJSON -v`
 - Full test suite: `just test`
 - Lint checks: `just lint && just pylint`
 
 **Manual validation commands**:
+
 ```bash
 # Test each show command with --json
 uv run spec-driver show spec PROD-010 --json
@@ -171,6 +174,7 @@ uv run spec-driver show adr ADR-001 --json | jq '.'
 ```
 
 **Evidence to capture**:
+
 - Before/after JSON output samples
 - Test coverage report showing new tests
 - Linter output showing zero warnings
@@ -178,35 +182,37 @@ uv run spec-driver show adr ADR-001 --json | jq '.'
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - Pattern from `show delta` (using dedicated formatter) is the preferred approach
 - Alternative: Adding `to_dict()` methods to model classes is acceptable
 - Spec/DecisionRecord/PolicyRecord/StandardRecord models are safe to modify
 - No breaking changes to existing JSON output from working commands
 
 **STOP when**:
+
 - Discover that models are used elsewhere and to_dict() would break things
 - JSON schema changes would break existing agent code
 - Uncertainty about correct data structure to return
 
 ## 7. Tasks & Progress
 
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Research model structures and patterns | [ ] | Understand Spec/DecisionRecord structure |
-| [ ] | 2.2 | Write tests for show spec --json (TDD) | [ ] | Test should expect full spec data |
-| [ ] | 2.3 | Implement Spec JSON serialization | [ ] | Add to_dict() or formatter |
-| [ ] | 2.4 | Update show spec to use JSON serialization | [ ] | Modify supekku/cli/show.py:35-60 |
-| [ ] | 2.5 | Write tests for show adr --json (TDD) | [ ] | Test should expect full decision data |
-| [ ] | 2.6 | Implement DecisionRecord to_dict() | [ ] | Fix AttributeError |
-| [ ] | 2.7 | Update show adr to use JSON serialization | [ ] | Modify supekku/cli/show.py:151-178 |
-| [ ] | 2.8 | Write tests for show policy/standard --json | [ ] | TDD for both commands |
-| [ ] | 2.9 | Implement PolicyRecord/StandardRecord to_dict() | [ ] | Same pattern as DecisionRecord |
-| [ ] | 2.10 | Update show policy/standard commands | [ ] | Modify supekku/cli/show.py:180-236 |
-| [ ] | 2.11 | Run full test suite and linters | [ ] | Ensure all tests pass |
-| [ ] | 2.12 | Manual validation of all show commands | [ ] | Test each command manually |
-| [ ] | 2.13 | Update PROD-010 coverage block | [ ] | Mark FR-002 as verified |
+| Status | ID   | Description                                     | Parallel? | Notes                                    |
+| ------ | ---- | ----------------------------------------------- | --------- | ---------------------------------------- |
+| [ ]    | 2.1  | Research model structures and patterns          | [ ]       | Understand Spec/DecisionRecord structure |
+| [ ]    | 2.2  | Write tests for show spec --json (TDD)          | [ ]       | Test should expect full spec data        |
+| [ ]    | 2.3  | Implement Spec JSON serialization               | [ ]       | Add to_dict() or formatter               |
+| [ ]    | 2.4  | Update show spec to use JSON serialization      | [ ]       | Modify supekku/cli/show.py:35-60         |
+| [ ]    | 2.5  | Write tests for show adr --json (TDD)           | [ ]       | Test should expect full decision data    |
+| [ ]    | 2.6  | Implement DecisionRecord to_dict()              | [ ]       | Fix AttributeError                       |
+| [ ]    | 2.7  | Update show adr to use JSON serialization       | [ ]       | Modify supekku/cli/show.py:151-178       |
+| [ ]    | 2.8  | Write tests for show policy/standard --json     | [ ]       | TDD for both commands                    |
+| [ ]    | 2.9  | Implement PolicyRecord/StandardRecord to_dict() | [ ]       | Same pattern as DecisionRecord           |
+| [ ]    | 2.10 | Update show policy/standard commands            | [ ]       | Modify supekku/cli/show.py:180-236       |
+| [ ]    | 2.11 | Run full test suite and linters                 | [ ]       | Ensure all tests pass                    |
+| [ ]    | 2.12 | Manual validation of all show commands          | [ ]       | Test each command manually               |
+| [ ]    | 2.13 | Update PROD-010 coverage block                  | [ ]       | Mark FR-002 as verified                  |
 
 ### Task Details
 
@@ -314,12 +320,12 @@ uv run spec-driver show adr ADR-001 --json | jq '.'
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Adding to_dict() breaks existing code | Comprehensive test coverage; grep for existing usage of these models | Not started |
-| JSON schema inconsistency confuses agents | Follow consistent pattern across all show commands; document schema | Not started |
-| Date serialization issues (datetime objects) | Use isoformat() or str() for dates; test with various date fields | Not started |
-| Performance impact from serialization | Measure performance; keep serialization simple | Low priority |
+| Risk                                         | Mitigation                                                           | Status       |
+| -------------------------------------------- | -------------------------------------------------------------------- | ------------ |
+| Adding to_dict() breaks existing code        | Comprehensive test coverage; grep for existing usage of these models | Not started  |
+| JSON schema inconsistency confuses agents    | Follow consistent pattern across all show commands; document schema  | Not started  |
+| Date serialization issues (datetime objects) | Use isoformat() or str() for dates; test with various date fields    | Not started  |
+| Performance impact from serialization        | Measure performance; keep serialization simple                       | Low priority |
 
 ## 9. Decisions & Outcomes
 
@@ -333,6 +339,7 @@ uv run spec-driver show adr ADR-001 --json | jq '.'
 **From Investigation (2025-01-04)**:
 
 Current state of show commands:
+
 ```bash
 # ✅ Working correctly
 show delta --json      # Uses format_delta_details_json() formatter
@@ -354,12 +361,14 @@ show standard --json   # Probably incomplete/broken
 **Code Pattern Analysis**:
 
 Working pattern (show delta):
+
 ```python
 if json_output:
     typer.echo(format_delta_details_json(artifact, root=root))
 ```
 
 Broken pattern (show spec/adr/policy/standard):
+
 ```python
 if json_output:
     output = obj.to_dict() if hasattr(obj, "to_dict") else {"id": obj.id}
@@ -367,6 +376,7 @@ if json_output:
 ```
 
 The hasattr() check is defensive but fails because:
+
 - Spec lacks to_dict() → fallback to minimal {"id": ...}
 - DecisionRecord lacks to_dict() → crashes when hasattr returns False incorrectly
 

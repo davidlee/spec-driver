@@ -1,8 +1,8 @@
 ---
 id: IMPR-002
 name: Backlog prioritization with interactive ordering and delta integration
-created: '2025-11-04'
-updated: '2025-11-04'
+created: "2025-11-04"
+updated: "2025-11-04"
 status: resolved
 kind: improvement
 ---
@@ -88,6 +88,7 @@ Extend `create delta` command:
 How should the prioritization mechanism interact with severity fields (p1/p2/p3)?
 
 **Possible approach:**
+
 - Default ordering: severity takes precedence (p1 before p2 before p3) UNLESS user has explicitly assigned relative priority
 - User-specified priority overrides severity-based ordering
 - Items without explicit user priority fall back to severity-based ordering
@@ -96,10 +97,12 @@ How should the prioritization mechanism interact with severity fields (p1/p2/p3)
 ### Ordering Modes
 
 Default behavior once implemented:
+
 - Priority-based ordering becomes the default (severity → user priority → ID fallback)
 - Items naturally sort by importance/urgency rather than chronological ID
 
 Add `--order-by-id` / `-o` flag to `list backlog` commands:
+
 - Explicitly requests ID-based ordering (current behavior)
 - Useful for chronological views or when working with specific ID ranges
 - Provides escape hatch from priority-based ordering when needed

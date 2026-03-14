@@ -2,8 +2,8 @@
 id: IP-011.PHASE-01
 slug: cli-enhanced-filtering-and-self-documentation-phase-01
 name: IP-011 Phase 01 - Enhanced Filtering
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: complete
 kind: phase
 ---
@@ -159,6 +159,7 @@ Implement advanced filtering capabilities to eliminate agent post-processing wor
 ## 5. Verification
 
 **Unit Tests**:
+
 ```bash
 # Multi-value filter tests
 uv run pytest supekku/cli/test_cli.py::TestMultiValueFilters -v
@@ -177,6 +178,7 @@ uv run pytest supekku/cli/test_cli.py::TestReverseQueryPerformance -v
 ```
 
 **Integration Tests**:
+
 ```bash
 # Full suite
 just test
@@ -187,6 +189,7 @@ just pylint
 ```
 
 **Manual Validation**:
+
 ```bash
 # Test multi-value filters
 spec-driver list deltas -s draft,in-progress --json
@@ -228,6 +231,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 ```
 
 **Evidence to Capture**:
+
 - Test output showing all new tests passing
 - Performance benchmark results (query execution times)
 - Before/after examples showing multi-value vs post-processing workflows
@@ -236,12 +240,14 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - Comma (`,`) is appropriate separator (no conflicts with existing usage)
 - Registry metadata includes relationship fields (`implements`, `verified_by`, `informed_by`)
 - Glob pattern matching uses Python `fnmatch` or similar (standard glob syntax)
 - Performance target of <2s is achievable without complex indexing
 
 **STOP Conditions**:
+
 - If comma separator conflicts with existing regex filters, STOP for alternative design
 - If reverse query performance exceeds 5s on typical registries, STOP for indexing strategy
 - If backward compatibility tests fail, STOP for root cause analysis
@@ -249,28 +255,29 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 
 ## 7. Tasks & Progress
 
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Research existing patterns | [ ] | Completed - see Section 10 |
-| [x] | 1.2 | Create core/filters.py module | [ ] | Completed - pylint 10/10 |
-| [x] | 1.3 | Write multi-value filter tests | [x] | Completed - 24 tests |
-| [x] | 1.4 | Implement multi-value filters | [ ] | Completed - 6 commands updated |
-| [x] | 1.5 | Write reverse query tests | [x] | Completed - 49 tests (TDD red) |
-| [x] | 1.6 | Add reverse query methods to registries | [ ] | Completed - 29 tests pass (TDD green) |
-| [x] | 1.7 | Implement reverse query flags | [ ] | Completed - 14 CLI tests pass |
-| [x] | 1.8 | Add glob pattern support | [ ] | Completed in 1.6 - fnmatch |
-| [x] | 1.9 | Write vstatus/vkind filter tests | [x] | Completed - 31 tests (TDD red→green) |
-| [x] | 1.10 | Implement vstatus/vkind flags | [ ] | Completed - coverage_entries + 2 methods + CLI |
-| [x] | 1.11 | Write backward compat tests | [x] | Completed - 14 tests |
-| [x] | 1.12 | Full test suite + linters | [ ] | Skipped (user) — covered by prior task commits |
-| [x] | 1.13 | Performance testing | [ ] | Completed — all <0.4s (target <2s) |
-| [x] | 1.14 | Manual validation | [ ] | Completed — all categories pass |
+| Status | ID   | Description                             | Parallel? | Notes                                          |
+| ------ | ---- | --------------------------------------- | --------- | ---------------------------------------------- |
+| [x]    | 1.1  | Research existing patterns              | [ ]       | Completed - see Section 10                     |
+| [x]    | 1.2  | Create core/filters.py module           | [ ]       | Completed - pylint 10/10                       |
+| [x]    | 1.3  | Write multi-value filter tests          | [x]       | Completed - 24 tests                           |
+| [x]    | 1.4  | Implement multi-value filters           | [ ]       | Completed - 6 commands updated                 |
+| [x]    | 1.5  | Write reverse query tests               | [x]       | Completed - 49 tests (TDD red)                 |
+| [x]    | 1.6  | Add reverse query methods to registries | [ ]       | Completed - 29 tests pass (TDD green)          |
+| [x]    | 1.7  | Implement reverse query flags           | [ ]       | Completed - 14 CLI tests pass                  |
+| [x]    | 1.8  | Add glob pattern support                | [ ]       | Completed in 1.6 - fnmatch                     |
+| [x]    | 1.9  | Write vstatus/vkind filter tests        | [x]       | Completed - 31 tests (TDD red→green)           |
+| [x]    | 1.10 | Implement vstatus/vkind flags           | [ ]       | Completed - coverage_entries + 2 methods + CLI |
+| [x]    | 1.11 | Write backward compat tests             | [x]       | Completed - 14 tests                           |
+| [x]    | 1.12 | Full test suite + linters               | [ ]       | Skipped (user) — covered by prior task commits |
+| [x]    | 1.13 | Performance testing                     | [ ]       | Completed — all <0.4s (target <2s)             |
+| [x]    | 1.14 | Manual validation                       | [ ]       | Completed — all categories pass                |
 
 ### Task Details
 
 #### **1.1 Research existing patterns** ✅
+
 - **Design / Approach**:
   - Review current filter implementations in `list deltas`, `list adrs`, `list requirements`
   - Examine registry query methods in `ChangeRegistry`, `SpecRegistry`, `RequirementRegistry`
@@ -292,6 +299,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Commits / References**: Phase sheet updated with research findings
 
 #### **1.2 Create core/filters.py module** ✅
+
 - **Design / Approach**:
   - Create new module `supekku/scripts/lib/core/filters.py`
   - Implement `parse_multi_value_filter(value: str) -> list[str]` utility
@@ -311,6 +319,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Commits / References**: Next commit
 
 #### **1.3 Write multi-value filter tests (TDD)** ✅
+
 - **Design / Approach**:
   - Write tests BEFORE implementation (TDD)
   - Test `parse_multi_value_filter()` utility:
@@ -339,6 +348,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Commits / References**: Next commit
 
 #### **1.4 Implement multi-value filters** ✅
+
 - **Design / Approach**:
   - Update all list commands to use `parse_multi_value_filter()` for status, kind filters
   - Modify filter logic: `status in parse_multi_value_filter(status_arg)`
@@ -360,6 +370,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Commits / References**: Next commit
 
 #### **1.5 Write reverse query tests (TDD)** ✅
+
 - **Design / Approach**:
   - Write tests BEFORE implementation (TDD red phase)
   - Test registry reverse query methods:
@@ -372,7 +383,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
     - `list specs --informed-by ADR-001 --json`
   - Test glob pattern matching:
     - `list requirements --verified-by "VT-*"` matches all VT artifacts
-    - `list requirements --verified-by "VT-CLI-*"` matches VT-CLI-* only
+    - `list requirements --verified-by "VT-CLI-*"` matches VT-CLI-\* only
 - **Files / Components**:
   - `supekku/scripts/lib/changes/registry_test.py` - added TestChangeRegistryReverseQueries (11 tests)
   - `supekku/scripts/lib/requirements/registry_test.py` - added TestRequirementsRegistryReverseQueries (13 tests)
@@ -392,6 +403,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Commits / References**: Next commit (Task 1.5 complete)
 
 #### **1.6 Add reverse query methods to registries** ✅
+
 - **Design / Approach**:
   - Implement `ChangeRegistry.find_by_implements(req_id)` method
   - Implement `RequirementRegistry.find_by_verified_by(artifact_pattern)` with glob support
@@ -420,6 +432,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Commits / References**: Next commit (Task 1.6 complete)
 
 #### **1.7 Implement reverse query flags in list commands** ✅
+
 - **Design / Approach**:
   - Add `--implements` flag to `list deltas` command
   - Add `--verified-by` flag to `list requirements` command
@@ -445,6 +458,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Commits / References**: Next commit
 
 #### **1.8 Add glob pattern support** ✅
+
 - **Design / Approach**:
   - Ensure `find_by_verified_by()` uses `fnmatch` for pattern matching
   - Test glob patterns: `VT-*`, `VA-*`, `VT-CLI-*`, etc.
@@ -459,10 +473,11 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Task 1.8 was completed as part of Task 1.6 implementation
   - Registry method `find_by_verified_by()` includes glob matching via fnmatch
   - CLI flag `--verified-by` accepts glob patterns directly
-  - Tests validate patterns like "VT-*", "VA-*", "VT-CLI-*"
+  - Tests validate patterns like "VT-_", "VA-_", "VT-CLI-\*"
 - **Commits / References**: Included in Task 1.6 commit
 
 #### **1.9 Write tests for verification status/kind filters (TDD)** ✅
+
 - **Design / Approach**:
   - Write tests BEFORE implementation (TDD)
   - **Key design decision**: `RequirementRecord` needs `coverage_entries: list[dict]` populated
@@ -481,6 +496,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Commits / References**: Uncommitted
 
 #### **1.10 Implement --vstatus and --vkind flags for list requirements** ✅
+
 - **Design / Approach**:
   - **Step A**: Added `coverage_entries: list[dict[str, Any]]` field to `RequirementRecord`
     with `field(default_factory=list)`. Updated `to_dict()`, `from_dict()`, `merge()`.
@@ -503,6 +519,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Commits / References**: Uncommitted
 
 #### **1.11 Write backward compatibility tests** ✅
+
 - **Design / Approach**:
   - TestFilterBackwardCompatibility class with 14 tests covering:
     - Single-value status/kind filters on deltas, specs, requirements, adrs (5 tests)
@@ -520,6 +537,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Commits / References**: Uncommitted
 
 #### **1.10 Full test suite + linters**
+
 - **Design / Approach**:
   - Run full test suite: `just test`
   - Run both linters: `just lint`, `just pylint`
@@ -528,10 +546,11 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Validate test coverage for new code (aim for >90%)
 - **Files / Components**: All modified files
 - **Testing**: Full suite validation
-- **Observations & AI Notes**: *Record issues found, fixes applied*
-- **Commits / References**: *Commit hash for fixes*
+- **Observations & AI Notes**: _Record issues found, fixes applied_
+- **Commits / References**: _Commit hash for fixes_
 
 #### **1.11 Performance testing**
+
 - **Design / Approach**:
   - Benchmark reverse query performance on typical registries
   - Measure time for `list deltas --implements SPEC-110.FR-001`
@@ -541,14 +560,16 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Files / Components**:
   - `supekku/cli/test_cli.py` - add TestReverseQueryPerformance class (optional)
 - **Testing**: Manual timing with `time` command; optional automated tests
-- **Observations & AI Notes**: *Record performance results, bottlenecks*
+- **Observations & AI Notes**: _Record performance results, bottlenecks_
 - **Commits / References**: N/A (performance validation)
 
 #### **1.12 Full test suite + linters** ✅
+
 - **Design / Approach**: Skipped at user's direction — prior task commits each ran tests and linters.
 - **Observations & AI Notes**: Deferred to task 1.11 commit which ran full suite (2286 passed, 3 skipped).
 
 #### **1.13 Performance testing** ✅
+
 - **Design / Approach**: Timed reverse queries and combined filters against real registries.
 - **Testing**: Manual timing with `time` command.
 - **Observations & AI Notes**:
@@ -558,6 +579,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - All well under 2s target. No indexing needed at current registry size.
 
 #### **1.14 Manual validation** ✅
+
 - **Design / Approach**: Ran all commands from Section 5 against live project data.
 - **Testing**: Manual workflow validation.
 - **Observations & AI Notes**:
@@ -572,12 +594,12 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Multi-value parsing breaks regex filters | Comprehensive backward compatibility tests; escape comma if needed | Planned |
-| Reverse queries too slow (>2s) | In-memory filtering first; add indexing only if needed | Planned |
-| Glob patterns conflict with shell expansion | Quote patterns in examples; document shell escaping | Planned |
-| Relationship metadata missing in registries | Verify metadata structure in research phase; add if missing | Planned |
+| Risk                                        | Mitigation                                                         | Status  |
+| ------------------------------------------- | ------------------------------------------------------------------ | ------- |
+| Multi-value parsing breaks regex filters    | Comprehensive backward compatibility tests; escape comma if needed | Planned |
+| Reverse queries too slow (>2s)              | In-memory filtering first; add indexing only if needed             | Planned |
+| Glob patterns conflict with shell expansion | Quote patterns in examples; document shell escaping                | Planned |
+| Relationship metadata missing in registries | Verify metadata structure in research phase; add if missing        | Planned |
 
 ## 9. Decisions & Outcomes
 
@@ -588,9 +610,10 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 
 ## 10. Findings / Research Notes
 
-*(Use for code spelunking results, pattern discoveries, reference links)*
+_(Use for code spelunking results, pattern discoveries, reference links)_
 
 **Existing Filter Patterns**:
+
 - **Single-value status filters**: All list commands use simple string comparison
   - `list_deltas`: `normalize_status(artifact.status) != normalize_status(status)` - line 331
   - `list_requirements`: `r.status.lower() == status.lower()` - line 985
@@ -600,6 +623,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 - **Filter combination**: AND logic (all filters must match)
 
 **Registry Query Methods**:
+
 - **ChangeRegistry** (registry.py:30-92):
   - `collect()` - returns dict of artifacts
   - No filtering methods - filtering done in CLI layer
@@ -614,6 +638,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - This is a good reference pattern for reverse queries!
 
 **Relationship Metadata Structure**:
+
 - **Delta registry** (deltas.yaml):
   - `applies_to.requirements` - list of requirement IDs (e.g., PROD-005.FR-001)
   - `applies_to.specs` - list of spec IDs
@@ -625,11 +650,13 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Note: Both `verified_by` and `coverage_evidence` could match verification artifacts!
 
 **Glob Pattern Support**:
+
 - Python standard library `fnmatch` is appropriate choice
 - Already used in codebase (found in sync adapters)
 - Pattern: `fnmatch.fnmatch(artifact_id, pattern)`
 
 **Key Insights**:
+
 1. No multi-value parsing exists - need to create utility
 2. DecisionRegistry.filter() provides good pattern for reverse queries
 3. Requirements have TWO fields for verification: `verified_by` and `coverage_evidence`
@@ -651,6 +678,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 ### Current Progress (2025-11-04)
 
 **Completed Tasks:**
+
 - ✅ **Task 1.1**: Research existing filter patterns
   - All findings documented in Section 10
   - Key decision: `--verified-by` searches both `verified_by` AND `coverage_evidence` fields
@@ -705,6 +733,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Fixed one test assertion (ChangeArtifact structure)
 
 **Completed Tasks (2025-11-04):**
+
 - ✅ **Task 1.7**: Implement reverse query flags in list commands - COMPLETED
   - Added --implements flag to `list deltas` command
   - Added --verified-by flag to `list requirements` command
@@ -715,9 +744,10 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 
 - ✅ **Task 1.8**: Add glob pattern support - COMPLETED (in Task 1.6)
   - Glob pattern support already implemented via fnmatch in Task 1.6
-  - Tests already passing for patterns like "VT-*", "VA-*", "VT-CLI-*"
+  - Tests already passing for patterns like "VT-_", "VA-_", "VT-CLI-\*"
 
 **Next Tasks (Ready to Start):**
+
 - 🔜 **Task 1.9**: Write tests for verification status/kind filters (TDD)
   - Write tests for --vstatus flag on `list requirements`
   - Write tests for --vkind flag on `list requirements`
@@ -725,6 +755,7 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
   - Test interaction with existing filters
 
 **Important Context for Next Developer:**
+
 1. **TDD Discipline**: Task 1.3 must write tests BEFORE Task 1.4 implementation
 2. **Multi-value filter fields**: status, kind (any categorical field)
 3. **Backward compatibility**: Single values must still work ("draft" not "draft,")
@@ -732,28 +763,33 @@ time spec-driver list requirements --vstatus verified --vkind VT --json  # Shoul
 5. **Testing scope**: Need unit tests for utility + integration tests for CLI
 
 **Reference Code Locations:**
+
 - Existing filter patterns: `supekku/cli/list.py` lines 273-379 (list_deltas)
 - Requirements filtering: `supekku/cli/list.py` lines 923-1023 (list_requirements)
 - Status normalization: `supekku/scripts/lib/changes/artifacts.py`
 - Test examples: `supekku/cli/test_cli.py` (existing CLI tests)
 
 **Design Decisions Made:**
+
 - Comma separator for multi-value: "draft,in-progress"
 - Whitespace handling: strip() on each value
 - Empty/None handling: return [] (simplifies caller logic)
 - No validation in utility - let CLI/registry validate enum values
 
 **For Phase 2** (Self-Documentation):
+
 - Multi-value filter patterns established; can reference for consistency
 - Registry query methods available for introspection in enum commands
 - Test patterns established for CLI flag additions
 - Performance baseline: reverse queries complete in <2s
 
 **Known Limitations**:
+
 - No indexing yet; performance adequate for current registry sizes but may need optimization for larger registries
 - Glob pattern support limited to `fnmatch` syntax (not full regex)
 
 **Files Modified So Far:**
+
 - `change/deltas/DE-011-.../phases/phase-01.md` - research findings, task updates
 - `supekku/scripts/lib/core/filters.py` - NEW pure filter utility (Task 1.2)
 - `supekku/scripts/lib/core/__init__.py` - export parse_multi_value_filter (Task 1.2)

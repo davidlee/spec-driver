@@ -2,8 +2,8 @@
 id: IP-076.PHASE-01
 slug: 076-sync_backlog_requirements_to_requirements_registry-phase-01
 name: IP-076 Phase 01 — Cleanup and refactor sync pipeline
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---
@@ -65,19 +65,23 @@ exit_criteria:
 # Phase 1 — Cleanup and refactor sync pipeline
 
 ## 1. Objective
+
 Pure refactor of `RequirementsRegistry` in `registry.py` to reduce duplication and prepare for the backlog sync feature in phase 2. No behavioral change — all existing tests must pass identically.
 
 ## 2. Links & References
+
 - **Delta**: [DE-076](../DE-076.md)
 - **Design Revision**: [DR-076](../DR-076.md) — DEC-076-01 (rename), DEC-076-04 (cleanup), DEC-076-06 (seen set)
 - **Primary Spec**: SPEC-122
 - **File**: `supekku/scripts/lib/requirements/registry.py`
 
 ## 3. Entrance Criteria
+
 - [x] DR-076 design decisions reviewed
 - [x] Existing test suite passing (`just test`)
 
 ## 4. Exit Criteria / Done When
+
 - [x] `_upsert_record(record, seen, stats)` extracted — single merge-or-create path
 - [x] `_iter_plan_files` removed — call site uses `_iter_change_files(dirs, prefix="IP-")`
 - [x] `sync()` is the primary method; `sync_from_specs` is a one-line deprecated alias
@@ -85,25 +89,27 @@ Pure refactor of `RequirementsRegistry` in `registry.py` to reduce duplication a
 - [x] `just lint` and `just pylint-files supekku/scripts/lib/requirements/registry.py` pass
 
 ## 5. Verification
+
 - Run `just test` — full suite must pass with zero failures
 - Run `just lint` — zero warnings
 - Run `just pylint-files supekku/scripts/lib/requirements/registry.py` — no regression
 - Verify `sync_from_specs` alias: grep for all call sites, confirm they still work
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: The merge-or-create loop at lines 291–302 and 326–336 is functionally identical
 - **Assumption**: `_iter_plan_files` has no callers outside `sync_from_specs`
 - **STOP when**: Any existing test fails after refactor — investigate before proceeding
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | T1 | Extract `_upsert_record` helper | [ ] | DEC-076-04, DEC-076-06 |
-| [x] | T2 | Eliminate `_iter_plan_files` | [P] | Independent of T1 |
-| [x] | T3 | Rename `sync_from_specs` → `sync()` | [ ] | After T1 |
-| [x] | T4 | Update all call sites | [ ] | After T3 |
-| [x] | T5 | Run tests + linters | [ ] | After T1–T4 |
+| Status | ID  | Description                         | Parallel? | Notes                  |
+| ------ | --- | ----------------------------------- | --------- | ---------------------- |
+| [x]    | T1  | Extract `_upsert_record` helper     | [ ]       | DEC-076-04, DEC-076-06 |
+| [x]    | T2  | Eliminate `_iter_plan_files`        | [P]       | Independent of T1      |
+| [x]    | T3  | Rename `sync_from_specs` → `sync()` | [ ]       | After T1               |
+| [x]    | T4  | Update all call sites               | [ ]       | After T3               |
+| [x]    | T5  | Run tests + linters                 | [ ]       | After T1–T4            |
 
 ### Task Details
 
@@ -128,10 +134,12 @@ Pure refactor of `RequirementsRegistry` in `registry.py` to reduce duplication a
   - **Files**: `supekku/cli/sync.py`, `supekku/scripts/lib/requirements/registry_test.py`
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Missed call site for `sync_from_specs` | grep + alias as safety net | open |
+
+| Risk                                   | Mitigation                 | Status |
+| -------------------------------------- | -------------------------- | ------ |
+| Missed call site for `sync_from_specs` | grep + alias as safety net | open   |
 
 ## 9. Decisions & Outcomes
+
 - DEC-076-04: Pre-implementation cleanup approved in DR
 - T1 adds `source_kind`/`source_type` params to `_upsert_record` now (empty defaults) to prepare for phase 2

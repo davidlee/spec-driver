@@ -2,8 +2,8 @@
 id: IP-041.PHASE-01
 slug: 041-cli_completeness_fill_obvious_command_gaps-phase-01
 name: "IP-041 Phase 01 — Foundation: shared helpers + migration PoC"
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: draft
 kind: phase
 ---
@@ -94,18 +94,21 @@ as a proof-of-concept. This is the riskiest phase — everything in Phase 2/3
 depends on these helpers working correctly.
 
 ## 2. Links & References
+
 - **Delta**: [DE-041](../DE-041.md)
 - **Design Revision**: [DR-041](../DR-041.md) §4.1 (shared helpers), §4.5 (migration)
 - **Specs**: PROD-010 (CLI UX), PROD-013 (CLI Artifact File Access)
 - **Existing patterns**: `supekku/cli/show.py`, `view.py`, `edit.py`, `find.py`
 
 ## 3. Entrance Criteria
+
 - [x] DR-041 reviewed and contradictions resolved
 - [x] Gate check passed (IP-041 §3)
 - [ ] Existing test suite passing (`just check`)
 - [ ] Familiarity with existing show/view/edit/find patterns
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `ArtifactRef`, `ArtifactNotFoundError`, `AmbiguousArtifactError` in common.py
 - [ ] `resolve_artifact()` handles all existing artifact types
 - [ ] `emit_artifact()` with required `json_fn` (no fallback)
@@ -118,6 +121,7 @@ depends on these helpers working correctly.
 - [ ] `just check` green
 
 ## 5. Verification
+
 ```bash
 # Unit tests for helpers
 uv run pytest supekku/cli/common_test.py -v
@@ -135,27 +139,29 @@ just check
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - The resolve→lookup→dispatch pattern is truly common across all verb groups (confirmed by codebase exploration)
 - `ChangeRegistry` with `kind="revision"` provides adequate revision lookup
 - All existing resolver patterns can be captured in a dispatch table
 
 **STOP when**:
+
 - Resolver dispatch table cannot handle an artifact type without per-type branching >5 lines
 - Migration reveals that `emit_artifact` needs more than format_fn/json_fn to cover existing behavior
 - Pre-migration regression tests reveal untested behavior that changes scope
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Implement data types (ArtifactRef, errors) | [ ] | Foundation for everything else |
-| [ ] | 1.2 | Implement resolve_artifact() with dispatch table | [ ] | Depends on 1.1 |
-| [ ] | 1.3 | Implement emit_artifact() | [P] | Can parallel with 1.2 |
-| [ ] | 1.4 | Implement find_artifacts() | [P] | Can parallel with 1.2 |
-| [ ] | 1.5 | Unit tests for helpers | [ ] | After 1.1-1.4 |
-| [ ] | 1.6 | Pre-migration regression tests for revision commands | [P] | Independent of 1.1-1.4 |
-| [ ] | 1.7 | Migrate revision commands + fix --json bug | [ ] | After 1.5 + 1.6 |
-| [ ] | 1.8 | Final verification: just check | [ ] | After 1.7 |
+| Status | ID  | Description                                          | Parallel? | Notes                          |
+| ------ | --- | ---------------------------------------------------- | --------- | ------------------------------ |
+| [ ]    | 1.1 | Implement data types (ArtifactRef, errors)           | [ ]       | Foundation for everything else |
+| [ ]    | 1.2 | Implement resolve_artifact() with dispatch table     | [ ]       | Depends on 1.1                 |
+| [ ]    | 1.3 | Implement emit_artifact()                            | [P]       | Can parallel with 1.2          |
+| [ ]    | 1.4 | Implement find_artifacts()                           | [P]       | Can parallel with 1.2          |
+| [ ]    | 1.5 | Unit tests for helpers                               | [ ]       | After 1.1-1.4                  |
+| [ ]    | 1.6 | Pre-migration regression tests for revision commands | [P]       | Independent of 1.1-1.4         |
+| [ ]    | 1.7 | Migrate revision commands + fix --json bug           | [ ]       | After 1.5 + 1.6                |
+| [ ]    | 1.8 | Final verification: just check                       | [ ]       | After 1.7                      |
 
 ### Task Details
 
@@ -200,18 +206,21 @@ just check
   - **Testing**: Full suite
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Dispatch table doesn't handle per-type quirks | PoC migration of revision validates design; adjust if needed | Planned |
+
+| Risk                                                   | Mitigation                                                          | Status  |
+| ------------------------------------------------------ | ------------------------------------------------------------------- | ------- |
+| Dispatch table doesn't handle per-type quirks          | PoC migration of revision validates design; adjust if needed        | Planned |
 | emit_artifact needs more params than format_fn/json_fn | Revision migration reveals requirements; extend signature if needed | Planned |
-| Pre-migration tests reveal untested edge cases | Document and scope-limit; don't let perfect block good | Planned |
+| Pre-migration tests reveal untested edge cases         | Document and scope-limit; don't let perfect block good              | Planned |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-04` — Phase scope: helpers + revision migration only. New commands and domain additions deferred to Phase 2.
 
 ## 10. Findings / Research Notes
 
 **Codebase exploration findings** (pre-phase):
+
 - show.py: 513 lines, 10 commands. Boilerplate: mutual-exclusivity check + registry lookup + output-mode dispatch (~30 lines each)
 - view.py: 254 lines, 8 commands. Pattern: registry lookup + pager open (~20 lines each)
 - edit.py: 254 lines, 8 commands. Identical to view but with editor
@@ -221,6 +230,7 @@ just check
 - Test coverage: show_test.py (525L), view_test.py (232L), edit_test.py (198L), find_test.py (199L), list_test.py (792L)
 
 ## 11. Wrap-up Checklist
+
 - [ ] Exit criteria satisfied
 - [ ] Verification evidence stored
 - [ ] IP-041 updated with Phase 1 results

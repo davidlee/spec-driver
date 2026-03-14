@@ -2,8 +2,8 @@
 id: PROD-005
 slug: python-package-level-specs
 name: Python Package-Level Specs
-created: '2025-11-02'
-updated: '2026-03-06'
+created: "2025-11-02"
+updated: "2026-03-06"
 status: active
 kind: prod
 aliases: []
@@ -197,6 +197,7 @@ entries:
 **Journey 1: Developer Creates Package-Level Spec**
 
 Given a developer implements new Python package `supekku/scripts/lib/export/`
+
 1. Developer runs `spec-driver create spec "Export Module" --kind tech`
 2. Tooling detects this is Python code (language conventions)
 3. Spec generated references package path: `supekku/scripts/lib/export/`
@@ -209,6 +210,7 @@ And contract lists all symbols from all files in predictable order
 **Journey 2: Developer Queries Spec for File**
 
 Given developer working on `supekku/scripts/lib/formatters/change_formatters.py`
+
 1. Developer runs `spec-driver list specs --for-path supekku/scripts/lib/formatters/change_formatters.py`
 2. Tooling resolves file to package `supekku/scripts/lib/formatters/`
 3. Returns package-level spec: `SPEC-045: Output Formatters`
@@ -220,6 +222,7 @@ And spec describes complete formatter package, not isolated file
 **Journey 3: Developer Refactors Within Package**
 
 Given developer splits `formatters/decision_formatters.py` into `formatters/decision/base.py` and `formatters/decision/table.py`
+
 1. Code refactoring creates new subpackage structure
 2. Developer runs `spec-driver sync`
 3. Tooling updates contracts (new files added to sorted list)
@@ -232,11 +235,13 @@ And design documentation remains accurate
 ### Edge Cases & Non-goals
 
 **Edge Cases**:
+
 - **Deep nesting**: Packages like `supekku/scripts/lib/core/frontmatter_metadata/` → treat as leaf package initially
 - **Single-file packages**: Package with one `.py` file still gets package-level spec (consistency over optimization)
 - **Test-only packages**: Packages containing only `*_test.py` files still generate spec (documents test infrastructure)
 
 **Non-goals**:
+
 - **Parent/child rollup mechanism**: Deferred until 2+ real users request it
 - **File-level specs**: Explicitly rejected; contracts provide file-level detail
 - **Migration tooling**: One-time manual cleanup sufficient for current user
@@ -257,29 +262,29 @@ And design documentation remains accurate
 
 - **FR-001**: Leaf Python Package Identification
   Python tech specs MUST map to leaf packages (directories containing `__init__.py` with no child packages containing `__init__.py`), establishing one spec per leaf package as the default granularity.
-  *Verification*: VT-001 - Test package detection across various directory structures
+  _Verification_: VT-001 - Test package detection across various directory structures
 
 - **FR-002**: Deterministic File Ordering Within Packages
   Contract generation MUST process Python files within a package in deterministic sorted order (already implemented via `sorted(path.rglob("*.py"))`) to ensure identical output for identical package state across platforms and runs.
-  *Verification*: VT-002 - Verify contract generation produces identical output across multiple runs
+  _Verification_: VT-002 - Verify contract generation produces identical output across multiple runs
 
 - **FR-003**: Sync Operation Package Support
   The `spec-driver sync` command MUST correctly index and validate package-level tech specs, recognizing Python packages (not individual files) as the fundamental unit for relationship tracking and registry operations.
-  *Verification*: VT-003 - Test sync with package-level specs across various package structures
+  _Verification_: VT-003 - Test sync with package-level specs across various package structures
 
 - **FR-004**: File-to-Package Resolution
   Query operations (e.g., `spec-driver list specs --for-path <file>`) MUST resolve individual Python files to their containing package's spec, enabling developers to discover relevant specs from any file within the package.
-  *Verification*: VT-004 - Test --for-path with files at various depths in package hierarchy
+  _Verification_: VT-004 - Test --for-path with files at various depths in package hierarchy
 
 ### Non-Functional Requirements
 
 - **NF-001**: Git Diff Stability
   Contract regeneration MUST produce stable, meaningful git diffs with changes reflecting only actual code modifications (new files, removed files, symbol changes), not spurious reordering or formatting variations.
-  *Measurement*: VA-001 - Analyze contract diffs across 10+ regeneration cycles for spurious changes
+  _Measurement_: VA-001 - Analyze contract diffs across 10+ regeneration cycles for spurious changes
 
 - **NF-002**: Design Extensibility
   The package-level pattern MUST NOT preclude future addition of opt-in rollup mechanisms (parent package specs covering child packages) without breaking changes to existing specs or tooling.
-  *Measurement*: VA-002 - Design review confirms rollup mechanism can be added via configuration without migration
+  _Measurement_: VA-002 - Design review confirms rollup mechanism can be added via configuration without migration
 
 ### Success Metrics / Signals
 
@@ -302,6 +307,7 @@ And design documentation remains accurate
 5. **Stable Diffs**: Git shows meaningful changes (new symbols, removed files), not spurious reordering
 
 **User Expectations**:
+
 - Package boundaries defined by `__init__.py` presence (Python standard)
 - Specs cover packages, contracts cover files (separation of concerns)
 - Tooling handles all file ordering/aggregation mechanics
@@ -317,24 +323,26 @@ id: SPEC-045
 slug: supekku-scripts-lib-formatters
 name: supekku/scripts/lib/formatters Specification
 sources:
-- language: python
-  identifier: supekku/scripts/lib/formatters
-  module: supekku.scripts.lib.formatters
-  variants:
-  - name: public
-    path: contracts/public.md
-  - name: all
-    path: contracts/all.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/scripts/lib/formatters
+    module: supekku.scripts.lib.formatters
+    variants:
+      - name: public
+        path: contracts/public.md
+      - name: all
+        path: contracts/all.md
+      - name: tests
+        path: contracts/tests.md
 ```
 
 **Contract Generation** (existing mechanism):
+
 - `sorted(path.rglob("*.py"))` ensures deterministic file order
 - Filters: exclude `__init__.py`, exclude `*_test.py` (except tests variant)
 - Output: All symbols from all package files in predictable sequence
 
 **Registry Indexing**:
+
 - Package path stored as primary identifier: `supekku/scripts/lib/formatters`
 - File-to-package resolution via path prefix matching
 - Backward index: package → list of files (for contract regeneration triggers)
@@ -373,16 +381,19 @@ sources:
 ### Error Handling / Guards
 
 **Guard: Non-Package Path**
+
 - User tries to create spec for path without `__init__.py`
-- Error: "Path is not a Python package (missing __init__.py)"
+- Error: "Path is not a Python package (missing **init**.py)"
 - Suggestion: "Did you mean the parent package at <nearest __init__.py>?"
 
 **Guard: Parent Package Spec**
+
 - User tries to create spec for `supekku/scripts/lib/` when child packages already have specs
 - Warning: "Child packages have existing specs. Use --force-parent to create rollup spec."
 - (Rollup mechanism deferred, so --force-parent not implemented initially)
 
 **Guard: Duplicate Package Spec**
+
 - Spec already exists for package
 - Error: "SPEC-045 already covers supekku/scripts/lib/formatters/"
 - Suggestion: "Use `spec-driver show SPEC-045` to view existing spec"
@@ -392,17 +403,20 @@ sources:
 ### Testing Strategy
 
 **VT-001: Package Detection** (FR-001)
+
 - Test cases: leaf packages, nested packages, single-file packages, test-only packages
 - Verify correct identification of package boundaries via `__init__.py`
 - Success: 100% accurate package boundary detection
 
 **VT-002: Deterministic Ordering** (FR-002)
+
 - Run contract generation 10 times on same package state
 - Verify byte-identical output across all runs
 - Test on Linux and macOS (different filesystem iteration orders)
 - Success: Zero variation across runs/platforms
 
 **VT-003: Sync Integration** (FR-003)
+
 - Create package-level specs for 5 diverse packages
 - Run `spec-driver sync`
 - Verify registry correctly indexes all packages
@@ -410,12 +424,14 @@ sources:
 - Success: Sync completes without errors, registry queries work
 
 **VT-004: File-to-Package Resolution** (FR-004)
+
 - Query `--for-path` for files at various depths
 - Verify correct package spec returned
 - Test edge cases: files in parent dirs, files in child packages
 - Success: 100% correct resolution
 
 **VA-001: Git Diff Stability** (NF-001)
+
 - Generate contracts for package
 - Make code change (add function)
 - Regenerate contracts
@@ -423,6 +439,7 @@ sources:
 - Success: Zero spurious changes
 
 **VA-002: Rollup Extensibility** (NF-002)
+
 - Design review: propose rollup mechanism design
 - Verify: no breaking changes to existing package specs
 - Verify: configuration-driven (e.g., frontmatter flag or config file)
@@ -431,11 +448,13 @@ sources:
 ### Research / Validation
 
 **Hypothesis 1**: Package-level granularity reduces spec count by 70-80%
+
 - Test: Count file-level specs (101), count leaf packages (~25-30)
 - Target: 70%+ reduction
 - Evidence: Already validated via directory structure analysis
 
 **Hypothesis 2**: Deterministic ordering already implemented
+
 - Test: Review `supekku/scripts/lib/docs/python/variants.py`
 - Verify: `sorted()` used in `get_files_for_variant()`
 - Evidence: Code review confirms (line 40-50)
@@ -443,15 +462,18 @@ sources:
 ### Observability & Analysis
 
 **Package Spec Metrics**:
+
 - Number of package-level specs created
 - Average files per package spec
 - Package depth distribution (how nested are packages)
 
 **Resolution Metrics**:
+
 - `--for-path` query success rate
 - Average resolution time (should be instant)
 
 **Contract Stability**:
+
 - Contract regeneration frequency
 - Git diff size (lines changed per regeneration)
 - Spurious change rate (should be 0%)
@@ -476,9 +498,11 @@ sources:
 ### Related Specs / PROD
 
 **Direct Dependencies**:
+
 - **PROD-001** (Streamline Spec Creation): This spec extends PROD-001's workflow to Python packages; spec creation mechanics remain the same, granularity changes
 
 **Future Candidates**:
+
 - **Opt-in Rollup Mechanism** (deferred): Allow parent package specs to roll up child packages via configuration
 - **JS/TS Granularity Evaluation** (deferred): Determine appropriate granularity for JavaScript/TypeScript projects
 - **Cross-Language Consistency** (future): Ensure patterns remain coherent across Go/Python/JS ecosystems
@@ -486,21 +510,25 @@ sources:
 ### Risks & Mitigations
 
 **RISK-001**: Deep package nesting creates too many specs
+
 - **Likelihood**: Low (Python codebases rarely nest beyond 3-4 levels)
 - **Impact**: Medium (spec count higher than desired)
 - **Mitigation**: Rollup mechanism addresses this if it occurs; defer until real evidence
 
 **RISK-002**: Developers expect file-level detail in specs
+
 - **Likelihood**: Medium (habit from file-level approach)
 - **Impact**: Low (contracts provide file-level detail)
 - **Mitigation**: Documentation clarifies: specs = package design, contracts = file detail
 
 **RISK-003**: Package refactoring (splitting/merging packages) disrupts specs
+
 - **Likelihood**: Low (package structure relatively stable)
 - **Impact**: Medium (spec needs rewrite when package boundaries change)
 - **Mitigation**: Acceptable trade-off; package refactoring is deliberate architectural change
 
 **RISK-004**: Rollup mechanism never gets designed
+
 - **Likelihood**: Medium (solo user may not need it)
 - **Impact**: Low (leaf-package granularity works well)
 - **Mitigation**: Design accommodates future addition (NF-002); no urgency
@@ -508,28 +536,33 @@ sources:
 ### Known Gaps / Debt
 
 **Gaps**:
+
 - No rollup mechanism (intentionally deferred)
 - No JS/TS granularity decision (different language, separate evaluation)
 - No migration tooling (manual cleanup acceptable for current user)
 - Package-level spec creation guidance in documentation (needs update)
 
 **Technical Debt**:
+
 - Existing 101 file-level specs need deletion (one-time manual task)
 - Registry may have file-level indexing assumptions (audit needed)
 
 ### Open Decisions / Questions
 
 **Decision 1**: Should package specs include sub-package relationships explicitly?
+
 - **Context**: If `supekku/scripts/lib/` has spec, should it list child packages?
 - **Options**: (A) Yes, explicit list (B) No, inferred from filesystem (C) Optional metadata
 - **Leaning**: B (inferred from filesystem) - reduces maintenance burden
 
-**Decision 2**: What happens when __init__.py removed from package?
+**Decision 2**: What happens when **init**.py removed from package?
+
 - **Context**: Package boundary disappears, becomes parent package
 - **Options**: (A) Spec becomes orphaned (error) (B) Spec automatically associates with parent (C) User must manually update
 - **Leaning**: A (orphaned/error) - deliberate package structure change should be deliberate spec change
 
 **Decision 3**: Should contract variants live in package or spec directory?
+
 - **Context**: Originally contracts in `specify/tech/SPEC-XXX/contracts/`; later moved to dedicated canonical corpus.
 - **Options**: (A) Keep in spec dir (original) (B) Near code (C) Dedicated canonical corpus at `.contracts/`
 - **Decision**: C — ADR-007 (accepted) establishes `.contracts/**` as the canonical contracts corpus. Spec-bundle paths (`SPEC-*/contracts/`) are compatibility views only. Contracts are derived observation artefacts, always safe to delete and regenerate.
@@ -550,6 +583,7 @@ sources:
 **Target State**: ~25-30 leaf-package specs
 
 **Migration Steps** (manual, one-time):
+
 1. Identify leaf packages in `supekku/` directory tree
 2. Delete existing file-level specs: `rm -rf specify/tech/SPEC-0*`
 3. Create package-level spec for each leaf package via `spec-driver create spec`
@@ -562,21 +596,25 @@ sources:
 ### Design Rationale: Why Not Other Granularities?
 
 **File-level (rejected)**:
+
 - 101 specs for 108 files = unsustainable maintenance
 - Cognitive fragmentation (features span multiple files)
 - Refactoring tax (file renames/moves break specs)
 
 **Capability/feature-level (considered)**:
+
 - Overlaps with PROD specs (which are capability-focused)
 - Harder to automate (subjective boundaries)
 - TECH specs should map to code structure, PROD specs to user features
 
 **Component/cohesion-based (considered)**:
+
 - Requires subjective decisions ("is this cohesive enough?")
 - Inconsistent across projects/developers
 - Automation difficult without heuristics
 
 **Leaf-package level (chosen)**:
+
 - Predictable, automatable (follows filesystem structure)
 - Matches Go proven pattern from vice
 - Reduces spec count by 75% while maintaining traceability

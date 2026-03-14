@@ -1,8 +1,8 @@
 ---
 id: ISSUE-011
 name: Add path field to backlog items JSON output for automation workflows
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: resolved
 kind: issue
 categories: [enhancement, json-output]
@@ -66,4 +66,3 @@ uv run spec-driver list backlog --json | jq '.items[0]'
 - [ ] Path allows direct file access for automation
 - [ ] Tests updated for new JSON structure
 - [ ] Formatters maintain backward compatibility where possible
-

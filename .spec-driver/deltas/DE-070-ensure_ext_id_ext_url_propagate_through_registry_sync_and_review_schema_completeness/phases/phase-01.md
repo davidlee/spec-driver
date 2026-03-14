@@ -2,8 +2,8 @@
 id: IP-070.PHASE-01
 slug: 070-registry-sync-and-schema
 name: IP-070 Phase 01 - Registry sync and schema completeness
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: complete
 kind: phase
 ---
@@ -84,14 +84,14 @@ other model ↔ schema field parity gaps.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add ext_id/ext_url to RequirementRecord.to_dict() | [P] | done |
-| [x] | 1.2 | Add ext_id/ext_url to PolicyRecord.to_dict() | [P] | done |
-| [x] | 1.3 | Add ext_id/ext_url to StandardRecord.to_dict() | [P] | done |
-| [x] | 1.4 | Add ext_id/ext_url to BASE_FRONTMATTER_METADATA | | done |
-| [x] | 1.5 | Audit model vs schema field parity | | VA: 2 gaps (Memory, Decision) — follow-up |
-| [x] | 1.6 | Write tests | | 9 tests across 3 files |
+| Status | ID  | Description                                       | Parallel? | Notes                                     |
+| ------ | --- | ------------------------------------------------- | --------- | ----------------------------------------- |
+| [x]    | 1.1 | Add ext_id/ext_url to RequirementRecord.to_dict() | [P]       | done                                      |
+| [x]    | 1.2 | Add ext_id/ext_url to PolicyRecord.to_dict()      | [P]       | done                                      |
+| [x]    | 1.3 | Add ext_id/ext_url to StandardRecord.to_dict()    | [P]       | done                                      |
+| [x]    | 1.4 | Add ext_id/ext_url to BASE_FRONTMATTER_METADATA   |           | done                                      |
+| [x]    | 1.5 | Audit model vs schema field parity                |           | VA: 2 gaps (Memory, Decision) — follow-up |
+| [x]    | 1.6 | Write tests                                       |           | 9 tests across 3 files                    |
 
 ## 11. Wrap-up Checklist
 

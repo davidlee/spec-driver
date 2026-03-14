@@ -2,14 +2,17 @@
 name: shape-revision
 description: Shape a spec revision when requirements/responsibilities move. Use this before delta scoping when policy/doctrine requires revision-first flow, or when audit reconciliation shows authority must move.
 ---
+
 You are establishing the spec-change intent before implementation work.
 
 Inputs:
+
 - A change request that moves/rewrites requirements or responsibilities.
 - Candidate source/destination specs and requirement IDs.
 - Owning audit, delta, or DR context when this is post-audit reconciliation work.
 
 Process:
+
 1. Read:
    - `.spec-driver/agents/workflow.md`
    - `.spec-driver/agents/policy.md`
@@ -50,6 +53,7 @@ Process:
 9. If policy implications, unresolved ownership conflicts, or unclear spec boundaries appear, stop and `/consult`.
 
 Outcomes:
+
 - Existing specs are patched directly when revision is unnecessary.
 - A revision exists when authority or lineage really changed, and it captures that spec-change intent unambiguously.
 - New spec creation, when justified, stays nested under revision rather than becoming a competing workflow.

@@ -5,6 +5,7 @@
 ### Context
 
 User identified that openskills (external npm tool) is an unnecessary dependency with multiple limitations:
+
 - Can't CLI-select a subset of skills from a repo
 - `--universal` installs to `.agent/` but Codex reads `.agents/` (plural)
 - Skills are tightly coupled to spec-driver anyway
@@ -41,17 +42,17 @@ User identified that openskills (external npm tool) is an unnecessary dependency
 
 **Files changed (9):**
 
-| File | Change |
-|---|---|
-| `core/paths.py` | Added `get_package_skills_dir()` (deferred import to avoid circularity) |
-| `core/config.py` | Added `"skills": {"targets": ["claude", "codex"]}` to `DEFAULT_CONFIG` |
-| `skills/sync.py` | Replaced `SKILLS_CACHE_DIR` → `SKILL_TARGET_DIRS`; added `get_package_skill_names()`, `install_skills_to_target()`, `prune_skills_from_target()`, `_skill_dir_matches()`, `_sync_to_targets()`, `_write_agents_md()`; refactored `_collect_skills()` and `sync_skills()` |
-| `skills/__init__.py` | Updated docstring |
-| `cli/skills.py` | Per-target install/prune reporting |
-| `scripts/install.py` | Calls `sync_skills()` at end of `initialize_workspace()` (skipped in dry-run) |
-| `skills/sync_test.py` | Rewritten: 46 tests |
-| `cli/skills_test.py` | Updated: 4 tests using `skills_source_dir` mock |
-| `install_test.py` | Fixed 2 affected tests + 2 new integration tests |
+| File                  | Change                                                                                                                                                                                                                                                                   |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `core/paths.py`       | Added `get_package_skills_dir()` (deferred import to avoid circularity)                                                                                                                                                                                                  |
+| `core/config.py`      | Added `"skills": {"targets": ["claude", "codex"]}` to `DEFAULT_CONFIG`                                                                                                                                                                                                   |
+| `skills/sync.py`      | Replaced `SKILLS_CACHE_DIR` → `SKILL_TARGET_DIRS`; added `get_package_skill_names()`, `install_skills_to_target()`, `prune_skills_from_target()`, `_skill_dir_matches()`, `_sync_to_targets()`, `_write_agents_md()`; refactored `_collect_skills()` and `sync_skills()` |
+| `skills/__init__.py`  | Updated docstring                                                                                                                                                                                                                                                        |
+| `cli/skills.py`       | Per-target install/prune reporting                                                                                                                                                                                                                                       |
+| `scripts/install.py`  | Calls `sync_skills()` at end of `initialize_workspace()` (skipped in dry-run)                                                                                                                                                                                            |
+| `skills/sync_test.py` | Rewritten: 46 tests                                                                                                                                                                                                                                                      |
+| `cli/skills_test.py`  | Updated: 4 tests using `skills_source_dir` mock                                                                                                                                                                                                                          |
+| `install_test.py`     | Fixed 2 affected tests + 2 new integration tests                                                                                                                                                                                                                         |
 
 ### Surprises / adaptations
 

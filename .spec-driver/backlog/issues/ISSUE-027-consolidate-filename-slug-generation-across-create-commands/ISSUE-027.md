@@ -1,8 +1,8 @@
 ---
 id: ISSUE-027
-name: 'Consolidate filename slug generation across create commands'
-created: '2026-02-06'
-updated: '2026-02-06'
+name: "Consolidate filename slug generation across create commands"
+created: "2026-02-06"
+updated: "2026-02-06"
 status: resolved
 kind: issue
 categories:
@@ -27,12 +27,12 @@ Multiple `create` commands generate file paths from titles (ADR, issue, improvem
 
 ## Examples
 
-| Input | Expected slug |
-|-------|---------------|
+| Input                      | Expected slug             |
+| -------------------------- | ------------------------- |
 | `ADR-001: use spec-driver` | `adr_001_use_spec_driver` |
-| `Fix bug -- urgent` | `fix_bug_urgent` |
-| `foo___bar` | `foo_bar` |
-| `title: with: colons` | `title_with_colons` |
+| `Fix bug -- urgent`        | `fix_bug_urgent`          |
+| `foo___bar`                | `foo_bar`                 |
+| `title: with: colons`      | `title_with_colons`       |
 
 ## Acceptance Criteria
 

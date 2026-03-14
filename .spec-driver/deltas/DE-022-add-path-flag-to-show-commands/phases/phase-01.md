@@ -2,8 +2,8 @@
 id: IP-022.PHASE-01
 slug: 022-add-path-flag-to-show-commands-phase-01
 name: IP-022 Phase 01 - Implement --path and --json flags
-created: '2026-02-04'
-updated: '2026-02-04'
+created: "2026-02-04"
+updated: "2026-02-04"
 status: complete
 kind: phase
 ---
@@ -108,18 +108,18 @@ Add `--path` flag to all `show` subcommands and `--json` flag to `show card` for
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add --path to show_spec | [P] | |
-| [x] | 1.2 | Add --path to show_delta | [P] | |
-| [x] | 1.3 | Add --path to show_revision | [P] | |
-| [x] | 1.4 | Add --path to show_requirement | [P] | |
-| [x] | 1.5 | Add --path to show_adr | [P] | |
-| [x] | 1.6 | Add --path to show_policy | [P] | |
-| [x] | 1.7 | Add --path to show_standard | [P] | |
-| [x] | 1.8 | Update show_card (--json, --path) | | -q alias kept |
-| [x] | 1.9 | Write tests | | 6 new tests |
-| [x] | 1.10 | Lint and verify | | Final |
+| Status | ID   | Description                       | Parallel? | Notes         |
+| ------ | ---- | --------------------------------- | --------- | ------------- |
+| [x]    | 1.1  | Add --path to show_spec           | [P]       |               |
+| [x]    | 1.2  | Add --path to show_delta          | [P]       |               |
+| [x]    | 1.3  | Add --path to show_revision       | [P]       |               |
+| [x]    | 1.4  | Add --path to show_requirement    | [P]       |               |
+| [x]    | 1.5  | Add --path to show_adr            | [P]       |               |
+| [x]    | 1.6  | Add --path to show_policy         | [P]       |               |
+| [x]    | 1.7  | Add --path to show_standard       | [P]       |               |
+| [x]    | 1.8  | Update show_card (--json, --path) |           | -q alias kept |
+| [x]    | 1.9  | Write tests                       |           | 6 new tests   |
+| [x]    | 1.10 | Lint and verify                   |           | Final         |
 
 ### Task Details
 
@@ -140,8 +140,8 @@ Add `--path` flag to all `show` subcommands and `--json` flag to `show card` for
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+| Risk                | Mitigation               | Status      |
+| ------------------- | ------------------------ | ----------- |
 | Registry lacks path | Verify JSON output first | Verified OK |
 
 ## 9. Decisions & Outcomes

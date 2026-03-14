@@ -3,6 +3,7 @@
 Comprehensive tests for metadata validation engine and JSON Schema generation.
 
 Test coverage:
+
 - Field type validation (string, int, bool, const, enum, object, array)
 - Pattern matching for strings
 - Array constraints (min_items, max_items)

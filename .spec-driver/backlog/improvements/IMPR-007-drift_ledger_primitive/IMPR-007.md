@@ -1,8 +1,8 @@
 ---
 id: IMPR-007
 name: Drift Ledger primitive
-created: '2026-03-05'
-updated: '2026-03-09'
+created: "2026-03-05"
+updated: "2026-03-09"
 status: resolved
 kind: improvement
 ---
@@ -10,23 +10,27 @@ kind: improvement
 # Drift Ledger primitive
 
 ## Summary
+
 Introduce a Drift Ledger (DL) primitive to track divergence between normative
 truth (specs/ADRs/policies), observed truth (code/contracts/runtime), and
 ambiguous or missing intent. The ledger is the adjudication queue and
 resolution record, distinct from audits, revisions, and deltas.
 
 ## Why this matters
+
 Current workflows have to improvise reconciliation registers. A first-class DL
 would unify contradiction discovery, design adjudication, and resolution
 tracking across projects and maturity levels.
 
 ## Scope (initial)
+
 - Support contradictions between documents
 - Support canon vs implementation drift
 - Track ambiguous intent and open questions
 - Capture adjudication + resolution links
 
 ## Out of Scope (initial)
+
 - Automated adjudication
 - Mandatory enforcement in runtime gates
 
@@ -37,7 +41,7 @@ reviewing the parity ledger pattern from deck_of_dwarf.
 
 ### D1. Storage model — ledger-as-file
 
-The *ledger* is the artifact, not the individual entry. Each ledger is a
+The _ledger_ is the artifact, not the individual entry. Each ledger is a
 standalone markdown file in `drift/`: `drift/DL-NNN-slug.md`. Entries are
 sections within the ledger, not standalone files.
 
@@ -64,13 +68,14 @@ External references use the full form. Cross-ledger references are infrequent
 enough that the verbosity is acceptable — follows the same pattern as spec
 requirements (e.g. `SPEC-122.FR-003`).
 
-The *ledger* ID (`DL-NNN`) is repo-global auto-incrementing, consistent with
+The _ledger_ ID (`DL-NNN`) is repo-global auto-incrementing, consistent with
 other artifact types.
 
 ### D4. Scope field — removed
 
 The original `scope` field was ambiguous (artifact drifting? artifact affected?
 resolution scope?). Removed in favour of:
+
 - `sources[]` — where the drift appears (already existed)
 - `affected_artifacts[]` — what needs updating when resolved (new)
 
@@ -92,6 +97,7 @@ divergence. `disputed` = under review. `not_drift` = false positive.
 
 Claims now have `kind` (assertion | observation | gap | question) and an
 optional `label` (expected/observed, A/B, or freeform). This supports:
+
 - Contradictions: two `assertion` claims with labels A/B
 - Implementation drift: `assertion` (expected) + `observation` (observed)
 - Missing decisions: single `gap` claim
@@ -104,7 +110,7 @@ fit other entry types.
 
 Added `discovered_by` with `kind` (audit | survey | agent | human) and `ref`.
 Audits become a discovery mechanism that produces DL entries. The relationship
-is: audit *discovers* drift → DL entry tracks resolution.
+is: audit _discovers_ drift → DL entry tracks resolution.
 
 This clarifies the audit/DL boundary: audits are point-in-time assessments, DL
 entries are open items requiring resolution.
@@ -164,7 +170,7 @@ case.
 
 ## Open questions (remaining)
 
-- **Audit template changes**: D7 establishes that audits *discover* DL entries.
+- **Audit template changes**: D7 establishes that audits _discover_ DL entries.
   Does this imply changes to the audit template? Or is it sufficient for audits
   to reference DL entries in their findings?
 - **Lifecycle enforcement**: When the registry arrives, should `spec-driver`
@@ -181,10 +187,12 @@ case.
   discovery order with topic headings may be more natural.
 
 ## Proposed next step
+
 Draft a DL schema and format and test it on DE-047 (spec corpus reconciliation).
 See `drift-ledger-schema-draft.md` in this folder.
 
 ## Current Draft Notes
+
 - Progressive strictness (minimal capture → triage → adjudication → resolution)
 - Evidence is append-only, timeline style
 - CLI MVP: `create drift`, `schema show drift.entry`, `--create-ledger`

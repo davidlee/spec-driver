@@ -2,8 +2,8 @@
 id: IP-061.PHASE-04
 slug: 061-tui_bundle_file_browser-phase-04
 name: Track mode inline tree — BundleTree in TrackScreen on highlight
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: complete
 kind: phase
 ---
@@ -41,21 +41,21 @@ verification:
     - VT-061-05
   evidence: []
 tasks:
-  - id: '4.1'
-    description: 'BundleTree: tab_target param, rename action (DEC-061-07)'
-  - id: '4.2'
-    description: 'theme.tcss: refactor .bundle-column, add #track-left (DEC-061-08)'
-  - id: '4.3'
-    description: 'browser.py: add bundle-column class to #left-column compose'
-  - id: '4.4'
-    description: 'TrackScreen: compose #track-left with SessionList + BundleTree'
-  - id: '4.5'
-    description: 'TrackScreen: highlight-driven tree show/hide/clear'
-  - id: '4.6'
-    description: 'TrackScreen: skip-if-same + event-driven refresh (DEC-061-09)'
-  - id: '4.7'
-    description: 'TrackScreen: BundleFileSelected handler, f binding, focus model'
-  - id: '4.8'
+  - id: "4.1"
+    description: "BundleTree: tab_target param, rename action (DEC-061-07)"
+  - id: "4.2"
+    description: "theme.tcss: refactor .bundle-column, add #track-left (DEC-061-08)"
+  - id: "4.3"
+    description: "browser.py: add bundle-column class to #left-column compose"
+  - id: "4.4"
+    description: "TrackScreen: compose #track-left with SessionList + BundleTree"
+  - id: "4.5"
+    description: "TrackScreen: highlight-driven tree show/hide/clear"
+  - id: "4.6"
+    description: "TrackScreen: skip-if-same + event-driven refresh (DEC-061-09)"
+  - id: "4.7"
+    description: "TrackScreen: BundleFileSelected handler, f binding, focus model"
+  - id: "4.8"
     description: Tests — VT-061-06
 risks:
   - description: Layout change may break existing TrackScreen pilot tests
@@ -80,15 +80,18 @@ Mirror BrowserScreen's left-column pattern. Refactor CSS to share
 target so it works on both screens.
 
 ## 2. Links & References
+
 - **Delta**: DE-061
 - **Design Revision**: DR-061 §5 (DEC-061-07, DEC-061-08, DEC-061-09)
 - **Phase 3 deliverables**: TrackPanel file paths, TrackScreen preview/navigation
 - **Key files**: `bundle_tree.py`, `track.py`, `browser.py`, `theme.tcss`, `track_test.py`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 3 complete
 
 ## 4. Exit Criteria / Done When
+
 - [x] BundleTree accepts `tab_target` param; action renamed
 - [x] CSS uses `.bundle-column` shared class for both screens
 - [x] `#track-left` wraps SessionList + BundleTree
@@ -103,26 +106,28 @@ target so it works on both screens.
 - [x] Lint clean
 
 ## 5. Verification
+
 - Extend `track_test.py` with VT-061-06 tests
 - `just test` + `just lint`
 
 ## 6. Assumptions & STOP Conditions
+
 - Textual screen-scoped `query_one` isolates the two `#bundle-tree` instances
 - `SessionList` message bubbling unaffected by Vertical wrapper
 - STOP if layout container changes break existing TrackScreen tests fundamentally
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 4.1 | BundleTree: tab_target param, rename action | DEC-061-07 |
-| [x] | 4.2 | theme.tcss: .bundle-column refactor, #track-left | DEC-061-08 |
-| [x] | 4.3 | browser.py: add bundle-column class to #left-column | Minimal — one kwarg |
-| [x] | 4.4 | TrackScreen: compose #track-left + BundleTree | Layout change |
-| [x] | 4.5 | TrackScreen: highlight-driven tree show/hide | Wire _on_event_row_highlighted |
-| [x] | 4.6 | TrackScreen: skip-if-same + event refresh | DEC-061-09 |
-| [x] | 4.7 | TrackScreen: BundleFileSelected, f binding, Tab | Focus model |
-| [x] | 4.8 | Tests — VT-061-06 | 8 pilot tests, all passing |
+| Status | ID  | Description                                         | Notes                           |
+| ------ | --- | --------------------------------------------------- | ------------------------------- |
+| [x]    | 4.1 | BundleTree: tab_target param, rename action         | DEC-061-07                      |
+| [x]    | 4.2 | theme.tcss: .bundle-column refactor, #track-left    | DEC-061-08                      |
+| [x]    | 4.3 | browser.py: add bundle-column class to #left-column | Minimal — one kwarg             |
+| [x]    | 4.4 | TrackScreen: compose #track-left + BundleTree       | Layout change                   |
+| [x]    | 4.5 | TrackScreen: highlight-driven tree show/hide        | Wire \_on_event_row_highlighted |
+| [x]    | 4.6 | TrackScreen: skip-if-same + event refresh           | DEC-061-09                      |
+| [x]    | 4.7 | TrackScreen: BundleFileSelected, f binding, Tab     | Focus model                     |
+| [x]    | 4.8 | Tests — VT-061-06                                   | 8 pilot tests, all passing      |
 
 ### Task Details
 

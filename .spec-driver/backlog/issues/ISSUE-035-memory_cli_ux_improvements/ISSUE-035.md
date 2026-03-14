@@ -1,8 +1,8 @@
 ---
 id: ISSUE-035
 name: Memory CLI UX improvements
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: open
 kind: issue
 ---
@@ -10,11 +10,13 @@ kind: issue
 # Memory CLI UX improvements
 
 ## Summary
+
 Memory command ergonomics make it harder than necessary to find, verify, and
 navigate memories. Add scoped link resolution, verbose reporting, and optional
 content-type output to preserve context.
 
 ## Proposed Improvements
+
 - `resolve links --verbose`: print missing targets and the files containing them.
 - `resolve links --path <file>|--id <mem-id>`: scoped resolution for faster iteration.
 - `list memories --links-to <id>`: backlinks / reverse edges for graph traversal.
@@ -25,10 +27,12 @@ content-type output to preserve context.
   `markdown|frontmatter|yaml` to preserve context while trimming noise.
 
 ## Impact
+
 - Faster onboarding and lower friction when exploring memory graph.
 - Reduced noise in link resolution and clearer missing-target debugging.
 
 ## Notes
+
 - `show memory --raw` already exists; `--content-type` could standardize this
   across artifact types and serve as a short-hand.
 - ADR-002 prohibits storing backlinks in frontmatter — `--links-to` must use
@@ -44,11 +48,13 @@ content-type output to preserve context.
   computation is not a concern at this scale.
 
 ## Deltas
+
 - DE-045: `--links-to`, `--links-depth N`, `--body-only` (agent discoverability)
 - DE-073: `--content-type/-c` selector, `resolve links --verbose`, `--path/--id` scoped resolution
 - Remaining: backlog item resolution (see ISSUE-034)
 
 ## Related
+
 - ISSUE-034 (resolve links does not support backlog items)
 - ISSUE-036 (standardize show output selectors)
 - ADR-002 (do not store backlinks in frontmatter)

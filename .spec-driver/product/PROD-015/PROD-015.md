@@ -2,8 +2,8 @@
 id: PROD-015
 slug: spec_taxonomy_and_navigation
 name: spec taxonomy and navigation
-created: '2026-02-21'
-updated: '2026-02-21'
+created: "2026-02-21"
+updated: "2026-02-21"
 status: draft
 kind: prod
 aliases: []
@@ -133,6 +133,7 @@ entries:
 ```
 
 ## 1. Intent & Summary
+
 - **Problem / Purpose**: `sync` can generate many code-bound specs, but teams also need a small number of cross-cutting “assembly” specs (subsystems, integrations, functional slices). Without an explicit taxonomy and navigation support, assembly specs get drowned out, and humans/agents can’t reliably infer whether a spec expresses intended design vs observed code reality.
 - **Value Signals**:
   - Assembly spec creation in legacy codebases feels tractable (no “unworkably messy” unit-stub sprawl).
@@ -143,10 +144,11 @@ entries:
   - 2026-02-21: Introduced to operationalize ADR-003 via taxonomy metadata + navigation tooling.
 
 ## 2. Stakeholders & Journeys
+
 - **Personas / Actors**:
-  - *Legacy adopter*: wants to write 5–20 subsystem specs without generating 500 confusing unit stubs.
-  - *Agent*: needs to quickly locate the assembly spec that constrains a change, and distinguish it from unit stubs.
-  - *Maintainer*: wants guardrails (warnings) when specs are unclassified or inconsistent.
+  - _Legacy adopter_: wants to write 5–20 subsystem specs without generating 500 confusing unit stubs.
+  - _Agent_: needs to quickly locate the assembly spec that constrains a change, and distinguish it from unit stubs.
+  - _Maintainer_: wants guardrails (warnings) when specs are unclassified or inconsistent.
 - **Primary Journeys / Flows**:
   1. Given a maintainer writes a cross-cutting subsystem spec, when they mark `category: assembly`, then they can browse/list only assembly specs and ignore unit stubs.
   2. Given a repo opts into unit-spec auto-creation, when sync creates a unit spec, then it is clearly labeled `category: unit` / `c4_level: code` and appears under the unit view.
@@ -174,39 +176,42 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
 -->
 
 - **FR-001**: Tech specs MUST support explicit taxonomy via frontmatter fields: `category` and `c4_level`.
-  *Verification*: VT-001 – Schema + registry roundtrip preserves the fields.
+  _Verification_: VT-001 – Schema + registry roundtrip preserves the fields.
 
 - **FR-002**: Sync-created unit specs MUST default to `category: unit` and `c4_level: code`.
-  *Verification*: VT-001 – Sync stub creation produces consistent classification.
+  _Verification_: VT-001 – Sync stub creation produces consistent classification.
 
 - **FR-003**: The CLI MUST support filtering spec listings by `category` and `c4_level`.
-  *Notes*: Missing fields MUST be addressable via `--category unknown` / `--c4-level unknown`.
-  *Verification*: VT-002 – Filter flags produce expected subsets.
+  _Notes_: Missing fields MUST be addressable via `--category unknown` / `--c4-level unknown`.
+  _Verification_: VT-002 – Filter flags produce expected subsets.
 
 - **FR-004**: The system MUST provide deterministic filesystem “views” for navigation by `category` and `c4_level` (e.g. `specify/tech/by-category/assembly/…`).
-  *Notes*: Views MUST include an `unknown/` bucket for unclassified specs.
-  *Verification*: VT-003 – Index build is deterministic and stable.
+  _Notes_: Views MUST include an `unknown/` bucket for unclassified specs.
+  _Verification_: VT-003 – Index build is deterministic and stable.
 
 - **FR-005**: Validation MUST warn (not error) when a tech spec is missing taxonomy fields or uses inconsistent combinations (e.g. `category: unit` with non-`code` `c4_level`).
-  *Notes*: Warnings apply to tech specs only (`SPEC-*` / `kind: spec`).
-  *Verification*: VT-003 – Validation emits warnings with actionable remediation.
+  _Notes_: Warnings apply to tech specs only (`SPEC-*` / `kind: spec`).
+  _Verification_: VT-003 – Validation emits warnings with actionable remediation.
+
 ### Non-Functional Requirements
 
 - **NF-001**: Taxonomy views and CLI filtering MUST remain fast enough for interactive use (target: <2s on typical repos).
-  *Measurement*: VA-001 – Benchmark list/index operations.
+  _Measurement_: VA-001 – Benchmark list/index operations.
 
 - **NF-002**: Taxonomy adoption MUST be non-breaking: existing spec IDs, paths, and registries remain valid.
-  *Measurement*: VT-003 – No registry resolution regressions during index build.
+  _Measurement_: VT-003 – No registry resolution regressions during index build.
+
 ### Success Metrics / Signals
 
 - **Adoption**: [Quantifiable usage metric]
-  *Example*: 80% of target users complete onboarding within first week
+  _Example_: 80% of target users complete onboarding within first week
 - **Quality**: [Error rate or satisfaction metric]
-  *Example*: <5% of user sessions encounter errors
+  _Example_: <5% of user sessions encounter errors
 - **Business Value**: [Measurable business outcome]
-  *Example*: Reduce support tickets by 40% compared to previous solution
+  _Example_: Reduce support tickets by 40% compared to previous solution
 
 ## 4. Solution Outline
+
 - **User Experience / Outcomes**:
   - “Assembly spec first”: humans/agents can browse/list assembly specs without wading through unit stubs.
   - “Unit stubs are clearly labeled”: when unit stubs exist, they’re discoverable and consistently categorized.
@@ -215,10 +220,12 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
   - Taxonomy is expressed as spec frontmatter metadata (no new block schemas required in v1).
 
 ## 5. Behaviour & Scenarios
+
 - **Primary Flows**: Step lists linking actors/components/requirements.
 - **Error Handling / Guards**: Edge-case branching, fallback behaviour, recovery expectations.
 
 ## 6. Quality & Verification
+
 - **Testing Strategy**: Mapping of requirements/capabilities to test levels; reference testing companion if present.
 - **Research / Validation**: UX research, experiments, hypothesis tracking.
 - **Observability & Analysis**: Metrics, telemetry, analytics dashboards, alerting.
@@ -227,10 +234,12 @@ Expand each capability from the `supekku:spec.capabilities@v1` YAML block above,
 - **Acceptance Gates**: Launch criteria tying back to FR/NF/metrics.
 
 ## 7. Backlog Hooks & Dependencies
+
 - **Related Specs / PROD**: How they collaborate or depend.
 - **Risks & Mitigations**: Risk ID – description – likelihood/impact – mitigation.
 - **Known Gaps / Debt**: Link backlog issues (`ISSUE-`, `PROB-`, `RISK-`) tracking outstanding work.
 - **Open Decisions / Questions**: Outstanding clarifications for agents or stakeholders.
 
 ## Appendices (Optional)
+
 - Glossary, detailed research, extended API examples, migration history, etc.

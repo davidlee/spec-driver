@@ -2,15 +2,16 @@
 name: scope-delta
 description: Scope intentional change as a delta. Define applies-to specs/requirements, risks, and closure targets before implementation.
 ---
+
 You are converting intent into a concrete change bundle.
 
 Inputs:
+
 - Target requirements/specs, or a backlog item.
 - Policy/doctrine constraints (including any revision-first gate).
 
-
-
 Process:
+
 1. Read:
    - `.spec-driver/agents/workflow.md`
    - `.spec-driver/agents/policy.md`
@@ -39,6 +40,7 @@ Process:
 8. Run `/plan-phases` to create/refine phase sheets before implementation.
 
 Outcomes:
+
 - A delta exists with clear scope and traceability targets.
 - A DR has been fleshed out with a robust design, and `DE-XXX` is consistent with it.
 - Next step (design/planning/implementation) is explicit.

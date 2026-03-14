@@ -1,8 +1,8 @@
 ---
 id: ISSUE-018
 name: Add tags support for inline requirements
-created: '2025-11-04'
-updated: '2026-03-09'
+created: "2025-11-04"
+updated: "2026-03-09"
 status: resolved
 kind: issue
 categories:
@@ -18,6 +18,7 @@ impact: user
 Requirements extracted from specs have a `tags` field in the requirements registry, but there's currently no mechanism to populate it. The extraction code in `RequirementsRegistry._records_from_content()` uses pure regex matching on markdown list items and doesn't parse any YAML blocks or extract tag metadata.
 
 Current state:
+
 - Requirements registry schema includes `tags: []` field
 - All requirements have empty tags arrays
 - No way to categorize/tag requirements for filtering or discovery
@@ -26,6 +27,7 @@ Current state:
 ## Current Behavior
 
 The `_records_from_content()` method in `supekku/scripts/lib/requirements/registry.py`:
+
 - Uses regex pattern `_REQUIREMENT_LINE` to match lines like `- **FR-001**(category): Title`
 - Extracts: label (FR-001), category, and title
 - Does NOT parse YAML blocks (e.g., `supekku:spec.relationships@v1` or similar)
@@ -35,6 +37,7 @@ The `_records_from_content()` method in `supekku/scripts/lib/requirements/regist
 ## Expected Behavior
 
 Requirements should support tags for:
+
 - Cross-cutting concerns (security, performance, accessibility)
 - Technical domains (api, database, ui)
 - Priority/importance markers
@@ -52,6 +55,7 @@ Options to consider:
 ## Impact
 
 Without tags support:
+
 - Limited requirement discovery and filtering capabilities
 - Can't easily identify cross-cutting concerns
 - Reduced value of the tags field in the registry schema
@@ -64,4 +68,3 @@ Without tags support:
 - Extraction method: `RequirementsRegistry._records_from_content()` (line ~970)
 - Registry schema includes tags field but never populated
 - Frontmatter schema (`supekku/about/frontmatter-schema.md`) documents tags for requirements
-

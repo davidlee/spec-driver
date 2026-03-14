@@ -15,10 +15,10 @@ phase: IP-XXX.PHASE-NN
 
 # Phase-level file references (OPTIONAL)
 files:
-  references:  # Specs, docs, exemplar code consulted
+  references: # Specs, docs, exemplar code consulted
     - "specify/product/PROD-XXX/PROD-XXX.md"
     - "path/to/exemplar_code.py"
-  context:     # Related phases, similar implementations (supports globs)
+  context: # Related phases, similar implementations (supports globs)
     - "change/deltas/DE-*/phases/phase-*.md"
 
 # Entrance/exit criteria with completion tracking (OPTIONAL)
@@ -34,8 +34,8 @@ exit_criteria:
 tasks:
   - id: "1.1"
     description: "Task description"
-    status: pending  # pending | in_progress | completed | blocked
-    files:  # OPTIONAL
+    status: pending # pending | in_progress | completed | blocked
+    files: # OPTIONAL
       added:
         - "path/to/new_file.py"
       modified:
@@ -49,6 +49,7 @@ tasks:
 ## Key Features
 
 ### 1. Structured Progress Tracking
+
 - Task completion calculated from structured data (not regex)
 - Boolean criteria completion (entrance/exit)
 - Four task statuses: `pending | in_progress | completed | blocked`
@@ -56,17 +57,20 @@ tasks:
 ### 2. File Path Traceability
 
 #### Phase Level
+
 - **references**: What specs/docs/code did we read?
 - **context**: What related phases/implementations provided context?
 - Supports glob patterns for pattern matching
 
 #### Task Level
+
 - **added**: New files created
 - **modified**: Existing files changed
 - **removed**: Files deleted
 - **tests**: Test files (added or run)
 
 ### 3. Validation & Quality
+
 - Comprehensive schema validation with clear error messages
 - Optional fields (backward compatible)
 - 19 comprehensive tests - all passing

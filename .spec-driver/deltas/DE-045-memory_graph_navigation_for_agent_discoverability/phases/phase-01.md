@@ -2,8 +2,8 @@
 id: IP-045.PHASE-01
 slug: 045-memory_graph_navigation_for_agent_discoverability-phase-01
 name: Graph domain + shared infrastructure
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: complete
 kind: phase
 ---
@@ -36,19 +36,19 @@ verification:
     - VT-emit-body
   evidence: []
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     name: compute_backlinks pure function
     status: pending
-  - id: '1.2'
+  - id: "1.2"
     name: expand_link_graph pure function
     status: pending
-  - id: '1.3'
+  - id: "1.3"
     name: Graph formatters (table + tree)
     status: pending
-  - id: '1.4'
+  - id: "1.4"
     name: Add body_only to emit_artifact
     status: pending
-  - id: '1.5'
+  - id: "1.5"
     name: Migrate show_memory to emit_artifact
     status: pending
 risks:
@@ -108,13 +108,13 @@ Simultaneously improve consistency by migrating `show_memory` to the shared
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 1.1 | `compute_backlinks` pure function | 9 tests, handles self-links, normalization, non-memory artifacts |
-| [x] | 1.2 | `expand_link_graph` pure function | 9 tests, BFS with cycle protection, depth cap at 5 |
-| [x] | 1.3 | Graph formatters (table + tree + json) | 10 tests across 3 formatter functions |
-| [x] | 1.4 | Add `body_only` to `emit_artifact` | 3 tests (body extraction + 2 mutual exclusivity) |
-| [x] | 1.5 | Migrate `show_memory` to `emit_artifact` | Zero regression across 36 existing tests; `--body-only/-b` wired |
+| Status | ID  | Description                              | Notes                                                            |
+| ------ | --- | ---------------------------------------- | ---------------------------------------------------------------- |
+| [x]    | 1.1 | `compute_backlinks` pure function        | 9 tests, handles self-links, normalization, non-memory artifacts |
+| [x]    | 1.2 | `expand_link_graph` pure function        | 9 tests, BFS with cycle protection, depth cap at 5               |
+| [x]    | 1.3 | Graph formatters (table + tree + json)   | 10 tests across 3 formatter functions                            |
+| [x]    | 1.4 | Add `body_only` to `emit_artifact`       | 3 tests (body extraction + 2 mutual exclusivity)                 |
+| [x]    | 1.5 | Migrate `show_memory` to `emit_artifact` | Zero regression across 36 existing tests; `--body-only/-b` wired |
 
 ### Task Details
 

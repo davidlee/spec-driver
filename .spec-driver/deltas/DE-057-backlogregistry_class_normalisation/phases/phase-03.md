@@ -2,8 +2,8 @@
 id: IP-057.PHASE-03
 slug: 057-backlogregistry_class_normalisation-phase-03
 name: IP-057 Phase 03 - Closure
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: draft
 kind: phase
 ---
@@ -29,13 +29,13 @@ verification:
     - VT-057-regression
   evidence: []
 tasks:
-  - id: '3.1'
+  - id: "3.1"
     description: Full verification pass
-  - id: '3.2'
+  - id: "3.2"
     description: Update backlog items
-  - id: '3.3'
+  - id: "3.3"
     description: Update notes and memory
-  - id: '3.4'
+  - id: "3.4"
     description: Close delta
 risks: []
 ```
@@ -65,7 +65,7 @@ DE-057 notes, and close the delta.
 ## 4. Exit Criteria / Done When
 
 - [ ] `just` passes clean
-- [ ] All VT-057-* tests pass
+- [ ] All VT-057-\* tests pass
 - [ ] ISSUE-026 marked resolved
 - [ ] ISSUE-034 marked resolved
 - [ ] ISSUE-043 updated with partial mitigation note
@@ -78,7 +78,7 @@ DE-057 notes, and close the delta.
 ## 5. Verification
 
 - `just` — full test + lint pass
-- Review all VT-057-* test results
+- Review all VT-057-\* test results
 - Verify `spec-driver complete delta DE-057` succeeds without `--force`
 
 ## 6. Assumptions & STOP Conditions
@@ -88,12 +88,12 @@ DE-057 notes, and close the delta.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 3.1 | Full verification pass (`just`) | | |
-| [ ] | 3.2 | Update backlog items | [P] | |
-| [ ] | 3.3 | Update notes and memory | [P] | |
-| [ ] | 3.4 | Close delta | | After 3.1-3.3 |
+| Status | ID  | Description                     | Parallel? | Notes         |
+| ------ | --- | ------------------------------- | --------- | ------------- |
+| [ ]    | 3.1 | Full verification pass (`just`) |           |               |
+| [ ]    | 3.2 | Update backlog items            | [P]       |               |
+| [ ]    | 3.3 | Update notes and memory         | [P]       |               |
+| [ ]    | 3.4 | Close delta                     |           | After 3.1-3.3 |
 
 ### Task Details
 
@@ -120,9 +120,9 @@ DE-057 notes, and close the delta.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Coverage gates fail on complete | Investigate before forcing; may need VT evidence | open |
+| Risk                            | Mitigation                                       | Status |
+| ------------------------------- | ------------------------------------------------ | ------ |
+| Coverage gates fail on complete | Investigate before forcing; may need VT evidence | open   |
 
 ## 11. Wrap-up Checklist
 

@@ -2,8 +2,8 @@
 id: IP-049.PHASE-04
 slug: 049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks-phase-04
 name: IP-049 Phase 04 — Regression, skill symlinks, and cleanup
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: active
 kind: phase
 ---
@@ -67,15 +67,18 @@ install location, with dir-level symlinks for agent targets (`.claude/skills`,
 old directory paths. Full regression pass.
 
 ## 2. Links & References
+
 - **Delta**: DE-049
 - **DR-049**: DEC-049-03 (symlink strategy)
 - **Predecessor**: Phase 3 (installer + callers, commit 4cedc0a)
 - **Notes**: Phase 3 hand-off in notes.md
 
 ## 3. Entrance Criteria
+
 - [x] Phase 3 committed (4cedc0a)
 
 ## 4. Exit Criteria / Done When
+
 - [x] `sync.py` installs skills to `.spec-driver/skills/` (not directly to targets)
 - [x] `.claude/skills` and `.agents/skills` are dir-level symlinks to `../.spec-driver/skills`
 - [x] Prune operates on `.spec-driver/skills/` only
@@ -86,24 +89,26 @@ old directory paths. Full regression pass.
 - [x] Both linters clean
 
 ## 5. Verification
+
 - `uv run pytest supekku/scripts/lib/skills/sync_test.py -v`
 - `uv run pytest supekku/cli/skills_test.py -v`
 - `just`
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: All agent targets see the same skill set (same allowlist)
 - **Assumption**: No per-agent skill differentiation needed today
 - **STOP**: If any agent target needs different skills, switch to per-skill symlinks
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 4.1 | Refactor skill sync | No | Install to .spec-driver/skills/, symlink targets |
-| [x] | 4.2 | Update skill sync tests | No | 58 tests (was 30), +11 new for symlinks/migration |
-| [x] | 4.3 | Scan/fix agent instruction files | Yes | glossary template + rendered copy updated |
-| [x] | 4.4 | Update file-map memory | Yes | mem.signpost.spec-driver.file-map rewritten |
-| [x] | 4.5 | Full regression | No | 2641 passed, pylint 9.56, just green |
+| Status | ID  | Description                      | Parallel? | Notes                                             |
+| ------ | --- | -------------------------------- | --------- | ------------------------------------------------- |
+| [x]    | 4.1 | Refactor skill sync              | No        | Install to .spec-driver/skills/, symlink targets  |
+| [x]    | 4.2 | Update skill sync tests          | No        | 58 tests (was 30), +11 new for symlinks/migration |
+| [x]    | 4.3 | Scan/fix agent instruction files | Yes       | glossary template + rendered copy updated         |
+| [x]    | 4.4 | Update file-map memory           | Yes       | mem.signpost.spec-driver.file-map rewritten       |
+| [x]    | 4.5 | Full regression                  | No        | 2641 passed, pylint 9.56, just green              |
 
 ### Task Details
 
@@ -139,10 +144,10 @@ old directory paths. Full regression pass.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Skill sync refactor breaks install | Existing tests; symlink is simpler than copy | Open |
-| Generated agent docs have old paths | Compat symlinks keep them working | Low |
+| Risk                                | Mitigation                                   | Status |
+| ----------------------------------- | -------------------------------------------- | ------ |
+| Skill sync refactor breaks install  | Existing tests; symlink is simpler than copy | Open   |
+| Generated agent docs have old paths | Compat symlinks keep them working            | Low    |
 
 ## 9. Decisions & Outcomes
 
@@ -165,6 +170,7 @@ old directory paths. Full regression pass.
 - `CONVERGENCE.md` was stale — deleted as part of cleanup.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (2647 pass, ruff clean, pylint 9.56)
 - [x] Notes updated (notes.md — Phase 4 section)

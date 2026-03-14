@@ -1,8 +1,8 @@
 ---
 id: ISSUE-023
 name: CLI create commands should show schema inspection commands
-created: '2025-11-08'
-updated: '2025-11-08'
+created: "2025-11-08"
+updated: "2025-11-08"
 status: resolved
 kind: issue
 categories: [cli, ux, discoverability]
@@ -17,6 +17,7 @@ impact: user
 When users run `spec-driver create` commands (delta, phase, revision, etc.), the output shows the created file path but doesn't provide guidance on how to inspect the YAML schemas within the generated document.
 
 **Current behavior:**
+
 ```bash
 $ spec-driver create phase --plan IP-019 "Phase 1"
 Phase created: IP-019.PHASE-01
@@ -52,14 +53,16 @@ Need centralized mapping of templates to their embedded schemas. Currently schem
 
 **A. Embed schema metadata in template files**
 Add YAML comment at top of each template listing schemas:
+
 ```markdown
-<!-- schemas: phase.overview, phase.tracking -->
----
+## <!-- schemas: phase.overview, phase.tracking -->
+
 id: ...
 ```
 
 **B. Central mapping in code**
 Create mapping in `supekku/scripts/lib/core/` (e.g., `template_schemas.py`):
+
 ```python
 TEMPLATE_SCHEMAS = {
     "phase-sheet-template.md": ["phase.overview", "phase.tracking"],
@@ -71,12 +74,14 @@ TEMPLATE_SCHEMAS = {
 
 **C. Parse templates to detect schemas**
 Scan template files for `schema: <name>` in YAML blocks at generation time.
+
 - Pro: No duplicate maintenance
 - Con: Runtime parsing overhead, fragile to template changes
 
 ### 2. Output Location
 
 Show schema commands after success message, before file path:
+
 ```
 <Entity> created: <ID>
 
@@ -90,6 +95,7 @@ Inspect schemas with:
 ### 3. Affected Commands
 
 All `spec-driver create` commands that generate templated files:
+
 - `create delta`
 - `create phase`
 - `create revision`

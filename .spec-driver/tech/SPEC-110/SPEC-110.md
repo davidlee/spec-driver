@@ -2,32 +2,32 @@
 id: SPEC-110
 slug: supekku-cli
 name: supekku/cli Specification
-created: '2025-11-02'
-updated: '2025-11-03'
+created: "2025-11-02"
+updated: "2025-11-03"
 status: draft
 kind: spec
 category: unit
 c4_level: code
 responsibilities:
-- Provide unified command-line interface for spec-driver operations
-- Orchestrate thin command layers that delegate to registries and formatters
-- Enforce consistent flag patterns across all list/show/create commands
-- Support multiple output formats (table, JSON, TSV) for automation workflows
-- Handle user input validation and error reporting with clear exit codes
+  - Provide unified command-line interface for spec-driver operations
+  - Orchestrate thin command layers that delegate to registries and formatters
+  - Enforce consistent flag patterns across all list/show/create commands
+  - Support multiple output formats (table, JSON, TSV) for automation workflows
+  - Handle user input validation and error reporting with clear exit codes
 aliases: []
 packages:
-- supekku/cli
+  - supekku/cli
 sources:
-- language: python
-  identifier: supekku/cli
-  module: supekku.cli
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/cli
+    module: supekku.cli
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
 owners: []
 auditers: []
 relations: []
@@ -466,20 +466,20 @@ The CLI module provides five core capabilities as defined in the YAML block abov
 ### Functional Requirements
 
 - **SPEC-110.FR-001**(cli): CLI MUST provide single unified entry point (`spec-driver`) routing to all subcommand groups (list, show, create, sync, schema, backfill, complete, workspace)
-  *Rationale*: Single tool reduces cognitive load and installation complexity
-  *Verification*: VT-CLI-LIST-001 - All commands accessible via `spec-driver` main entry point
+  _Rationale_: Single tool reduces cognitive load and installation complexity
+  _Verification_: VT-CLI-LIST-001 - All commands accessible via `spec-driver` main entry point
 
 - **SPEC-110.FR-002**(architecture): List commands MUST delegate all data access to registries and all formatting to formatters (zero business logic in CLI)
-  *Rationale*: Skinny CLI pattern keeps code maintainable and testable
-  *Verification*: VT-CLI-LIST-001 - Tests verify thin orchestration: args → registry → filter → format → output
+  _Rationale_: Skinny CLI pattern keeps code maintainable and testable
+  _Verification_: VT-CLI-LIST-001 - Tests verify thin orchestration: args → registry → filter → format → output
 
 - **SPEC-110.FR-003**(automation): Backfill command MUST detect stub specs (status='stub' or ≤30 lines) and replace body with template while preserving frontmatter
-  *Rationale*: Enables spec completion workflow (reduces backfill time from 2hrs to 10min)
-  *Verification*: VT-CLI-BACKFILL-001 - Stub detection and template replacement tests
+  _Rationale_: Enables spec completion workflow (reduces backfill time from 2hrs to 10min)
+  _Verification_: VT-CLI-BACKFILL-001 - Stub detection and template replacement tests
 
 - **SPEC-110.FR-004**(integration): Sync command MUST delegate to sync adapters for multi-language code-to-spec synchronization (Python, Go, TypeScript) and MUST support separate ADR registry synchronization via `--adr` flag
-  *Rationale*: Thin CLI layer orchestrates; adapters implement language-specific logic; ADR sync is opt-in
-  *Verification*: VT-CLI-SYNC-001 - Sync delegation tests, ADR sync flag tests
+  _Rationale_: Thin CLI layer orchestrates; adapters implement language-specific logic; ADR sync is opt-in
+  _Verification_: VT-CLI-SYNC-001 - Sync delegation tests, ADR sync flag tests
 
 - **SPEC-110.FR-005**(cli): All list commands MUST support consistent flag patterns (--format, --json, --filter, --regexp, --case-insensitive, --root) and MUST apply regexp filtering to artifact-specific fields:
   - ADRs: title, summary
@@ -489,16 +489,16 @@ The CLI module provides five core capabilities as defined in the YAML block abov
   - Specs: ID, slug, name
 
   The --json flag is a shorthand for --format=json and takes precedence when both are specified.
-  *Rationale*: Consistent UX enables muscle memory; field-specific filtering ensures relevant matches; --json shorthand improves CLI ergonomics
-  *Verification*: VT-CLI-COMMON-001, VT-CLI-FILTER-001, VT-CLI-REGEXP-001, VT-CLI-JSON-001 - Flag pattern and filtering tests
+  _Rationale_: Consistent UX enables muscle memory; field-specific filtering ensures relevant matches; --json shorthand improves CLI ergonomics
+  _Verification_: VT-CLI-COMMON-001, VT-CLI-FILTER-001, VT-CLI-REGEXP-001, VT-CLI-JSON-001 - Flag pattern and filtering tests
 
 - **SPEC-110.FR-006**(cli): All list commands MUST support output formats: table (default), json, tsv; list specs command MUST additionally support --status/-s filter for filtering by spec status (draft, active, deprecated, superseded)
-  *Rationale*: JSON output enables automation; table output optimizes human readability; status filtering enables focused spec exploration
-  *Verification*: VT-CLI-FORMAT-001, VT-CLI-STATUS-FILTER-001, VT-CLI-JSON-SCHEMA-001 - Output format tests verify JSON is parseable and stable, status filtering works correctly
+  _Rationale_: JSON output enables automation; table output optimizes human readability; status filtering enables focused spec exploration
+  _Verification_: VT-CLI-FORMAT-001, VT-CLI-STATUS-FILTER-001, VT-CLI-JSON-SCHEMA-001 - Output format tests verify JSON is parseable and stable, status filtering works correctly
 
 - **SPEC-110.FR-007**(documentation): Schema commands MUST list block schemas and frontmatter schemas separately (via `schema list blocks|frontmatter|all`) and MUST display schema details in json-schema or yaml-example formats
-  *Rationale*: Self-documentation reduces external documentation burden; separate listing enables focused exploration
-  *Verification*: VT-CLI-SCHEMA-001 - Schema listing and display tests for both block and frontmatter types
+  _Rationale_: Self-documentation reduces external documentation burden; separate listing enables focused exploration
+  _Verification_: VT-CLI-SCHEMA-001 - Schema listing and display tests for both block and frontmatter types
 
 - **SPEC-110.FR-008**(cli): Create commands MUST support all artifact types using templates:
   - Specifications (SPEC/PROD)
@@ -506,26 +506,26 @@ The CLI module provides five core capabilities as defined in the YAML block abov
   - Decisions: ADRs
   - Requirements: breakout requirement files
   - Backlog: issues, problems, improvements, risks
-  *Rationale*: Template-based creation ensures consistency and completeness across all artifact types
-  *Verification*: VT-CLI-CREATE-001 - Create command tests for all artifact types
+    _Rationale_: Template-based creation ensures consistency and completeness across all artifact types
+    _Verification_: VT-CLI-CREATE-001 - Create command tests for all artifact types
 
 - **SPEC-110.FR-009**(cli): Show commands MUST display detailed artifact information for all major types (specs, deltas, revisions, ADRs, requirements) and MUST include `show template` for displaying spec templates
-  *Rationale*: Separation of concerns: CLI orchestrates, formatters implement display logic; template display aids spec creation
-  *Verification*: VT-CLI-SHOW-001 - Show command delegation tests
+  _Rationale_: Separation of concerns: CLI orchestrates, formatters implement display logic; template display aids spec creation
+  _Verification_: VT-CLI-SHOW-001 - Show command delegation tests
 
 - **SPEC-110.FR-010**(automation): Complete delta command MUST mark delta as completed AND update associated requirement statuses to 'live' in revision source files
-  *Rationale*: Automates requirement lifecycle transitions; prevents manual status update errors; maintains traceability
-  *Verification*: VT-CLI-COMPLETE-001 - Delta completion with requirement lifecycle tests
+  _Rationale_: Automates requirement lifecycle transitions; prevents manual status update errors; maintains traceability
+  _Verification_: VT-CLI-COMPLETE-001 - Delta completion with requirement lifecycle tests
 
 ### Non-Functional Requirements
 
 - **SPEC-110.NF-001**(performance): CLI commands MUST complete typical operations (list, show, create) in <2 seconds on standard hardware
-  *Rationale*: Fast response times keep interactive workflows fluid
-  *Measurement*: VT-CLI-INTEGRATION-001 - Integration tests measure command responsiveness
+  _Rationale_: Fast response times keep interactive workflows fluid
+  _Measurement_: VT-CLI-INTEGRATION-001 - Integration tests measure command responsiveness
 
 - **SPEC-110.NF-002**(architecture): CLI modules MUST average <200 lines per file to maintain thin orchestration pattern
-  *Rationale*: Enforces architectural constraint that business logic stays out of CLI
-  *Measurement*: Static analysis of CLI file line counts (current average: ~150 lines)
+  _Rationale_: Enforces architectural constraint that business logic stays out of CLI
+  _Measurement_: Static analysis of CLI file line counts (current average: ~150 lines)
 
 ### Operational Targets
 
@@ -537,20 +537,21 @@ The CLI module provides five core capabilities as defined in the YAML block abov
 
 ### Architecture / Components
 
-| Component | Responsibility | Key Commands |
-|-----------|---------------|-------------|
-| `main.py` | Entry point, version handling, Typer app routing | N/A (routing only) |
-| `common.py` | Shared option types, flag standardization, utility functions | `FormatOption`, `RootOption`, `matches_regexp()` |
-| `list.py` | List commands for all artifact types | `list specs`, `list deltas`, `list requirements`, `list adrs`, `list changes`, `list backlog` |
-| `show.py` | Show commands for detailed views | `show spec`, `show delta`, `show adr`, `show requirement`, `show revision`, `show template` |
-| `create.py` | Create commands for artifact generation | `create spec`, `create delta`, `create revision`, `create adr`, `create requirement`, `create phase`, `create issue`, `create problem`, `create improvement`, `create risk` |
-| `sync.py` | Code-to-spec and ADR registry synchronization | `sync` (delegates to adapters; `--adr` for ADR sync) |
-| `schema.py` | Schema documentation commands | `schema list [blocks\|frontmatter\|all]`, `schema show <type>` |
-| `backfill.py` | Spec backfill workflow | `backfill spec` |
-| `complete.py` | Delta completion with requirement lifecycle updates | `complete delta` |
-| `workspace.py` | Workspace management and validation | `install`, `validate` |
+| Component      | Responsibility                                               | Key Commands                                                                                                                                                                |
+| -------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `main.py`      | Entry point, version handling, Typer app routing             | N/A (routing only)                                                                                                                                                          |
+| `common.py`    | Shared option types, flag standardization, utility functions | `FormatOption`, `RootOption`, `matches_regexp()`                                                                                                                            |
+| `list.py`      | List commands for all artifact types                         | `list specs`, `list deltas`, `list requirements`, `list adrs`, `list changes`, `list backlog`                                                                               |
+| `show.py`      | Show commands for detailed views                             | `show spec`, `show delta`, `show adr`, `show requirement`, `show revision`, `show template`                                                                                 |
+| `create.py`    | Create commands for artifact generation                      | `create spec`, `create delta`, `create revision`, `create adr`, `create requirement`, `create phase`, `create issue`, `create problem`, `create improvement`, `create risk` |
+| `sync.py`      | Code-to-spec and ADR registry synchronization                | `sync` (delegates to adapters; `--adr` for ADR sync)                                                                                                                        |
+| `schema.py`    | Schema documentation commands                                | `schema list [blocks\|frontmatter\|all]`, `schema show <type>`                                                                                                              |
+| `backfill.py`  | Spec backfill workflow                                       | `backfill spec`                                                                                                                                                             |
+| `complete.py`  | Delta completion with requirement lifecycle updates          | `complete delta`                                                                                                                                                            |
+| `workspace.py` | Workspace management and validation                          | `install`, `validate`                                                                                                                                                       |
 
 **Thin CLI Pattern** (enforced across all commands):
+
 ```
 User Input → Typer Parse → Load Registry → Apply Filters → Delegate Format → Output → Exit
 ```
@@ -558,6 +559,7 @@ User Input → Typer Parse → Load Registry → Apply Filters → Delegate Form
 ### Data & Contracts
 
 **Standard Option Types** (defined in `common.py` and list commands):
+
 ```python
 FormatOption = Annotated[str, typer.Option(..., help="Output format: table|json|tsv")]
 JsonOutputOption = Annotated[bool, typer.Option("--json", help="Output as JSON (shorthand for --format=json)")]
@@ -569,16 +571,19 @@ TruncateOption = Annotated[bool, typer.Option(..., help="Truncate fields in tabl
 ```
 
 **Exit Codes**:
+
 - `EXIT_SUCCESS = 0`: Operation completed successfully
 - `EXIT_FAILURE = 1`: Operation failed (validation error, missing file, etc.)
 
 **Registry Contracts** (from collaborators):
+
 - `SpecRegistry(root).all_specs()` → iterable of Spec objects
 - `DecisionRegistry(root).collect()` → dict of decision_id → Decision
 - `RequirementsRegistry(root)` → registry with records
 - `ChangeRegistry(root, kind).collect()` → dict of change_id → ChangeArtifact
 
 **Formatter Contracts** (from SPEC-120):
+
 - `format_spec_list_table(specs, options)` → Rich Table
 - `format_decision_list_table(decisions, options)` → Rich Table
 - `format_spec_details(spec)` → formatted output
@@ -589,6 +594,7 @@ TruncateOption = Annotated[bool, typer.Option(..., help="Truncate fields in tabl
 ### Primary Flows
 
 **Standard List Command Flow** (all list commands follow this pattern):
+
 1. Parse arguments (filters, format, root)
 2. Detect/validate repository root
 3. Load appropriate registry
@@ -598,6 +604,7 @@ TruncateOption = Annotated[bool, typer.Option(..., help="Truncate fields in tabl
 7. Exit with appropriate code
 
 **Standard Create Command Flow**:
+
 1. Parse arguments (title, metadata, root)
 2. Validate inputs (e.g., spec ID doesn't exist)
 3. Load template via `core.templates`
@@ -608,6 +615,7 @@ TruncateOption = Annotated[bool, typer.Option(..., help="Truncate fields in tabl
 8. Exit SUCCESS
 
 **Sync Command Flow** (delegates to adapters):
+
 1. Parse arguments (language, targets, options, `--adr` flag)
 2. Detect repository root
 3. If spec sync: Route to appropriate adapter (Python/Go/TypeScript)
@@ -620,6 +628,7 @@ TruncateOption = Annotated[bool, typer.Option(..., help="Truncate fields in tabl
 6. Exit with appropriate code
 
 **Complete Delta Flow** (lifecycle automation):
+
 1. Parse arguments (delta_id, flags: `--dry-run`, `--force`, `--skip-sync`, `--skip-update-requirements`)
 2. Load delta and validate status
 3. If not `--skip-sync`: Run workspace sync
@@ -632,6 +641,7 @@ TruncateOption = Annotated[bool, typer.Option(..., help="Truncate fields in tabl
 7. Exit SUCCESS
 
 **Validate Workspace Flow** (delegates to validator):
+
 1. Parse arguments (root, `--sync`, `--strict` flags)
 2. If `--sync`: Run workspace sync first
 3. Detect repository root
@@ -655,22 +665,23 @@ TruncateOption = Annotated[bool, typer.Option(..., help="Truncate fields in tabl
 
 All requirements verified at **unit and integration test levels**:
 
-| Requirement | Test Module | Test Level |
-|-------------|------------|-----------|
-| FR-001 | `test_cli.py` | Integration |
-| FR-002 | `test_cli.py`, per-command tests | Unit + Integration |
-| FR-003 | `backfill_test.py` | Unit |
-| FR-004 | `sync_test.py` | Unit |
-| FR-005 | `test_cli.py` (TestJSONFlagConsistency, TestRegexpFiltering) | Integration |
-| FR-006 | `test_cli.py` (TestStatusFilterParity, TestJSONSchemaRegression) | Integration |
-| FR-007 | `schema_test.py` | Unit |
-| FR-008 | `create_test.py` | Unit |
-| FR-009 | `show_test.py`, `test_cli.py` (TestShowCommandJSON) | Unit + Integration |
-| FR-010 | `test_cli.py` (TestCompleteCommands) | Integration |
-| NF-001 | `test_cli.py` | Integration (timing) |
-| NF-002 | Static analysis | N/A |
+| Requirement | Test Module                                                      | Test Level           |
+| ----------- | ---------------------------------------------------------------- | -------------------- |
+| FR-001      | `test_cli.py`                                                    | Integration          |
+| FR-002      | `test_cli.py`, per-command tests                                 | Unit + Integration   |
+| FR-003      | `backfill_test.py`                                               | Unit                 |
+| FR-004      | `sync_test.py`                                                   | Unit                 |
+| FR-005      | `test_cli.py` (TestJSONFlagConsistency, TestRegexpFiltering)     | Integration          |
+| FR-006      | `test_cli.py` (TestStatusFilterParity, TestJSONSchemaRegression) | Integration          |
+| FR-007      | `schema_test.py`                                                 | Unit                 |
+| FR-008      | `create_test.py`                                                 | Unit                 |
+| FR-009      | `show_test.py`, `test_cli.py` (TestShowCommandJSON)              | Unit + Integration   |
+| FR-010      | `test_cli.py` (TestCompleteCommands)                             | Integration          |
+| NF-001      | `test_cli.py`                                                    | Integration (timing) |
+| NF-002      | Static analysis                                                  | N/A                  |
 
 **Test Strategy**:
+
 - Use temporary directories for filesystem operations
 - Mock registries where appropriate to isolate CLI logic
 - Test all flag combinations
@@ -712,6 +723,7 @@ All FRs and NFs have associated test coverage in CLI test modules.
 ### Related Specs / PROD
 
 **Direct Dependencies** (external collaborators):
+
 - **SPEC-123** (SpecRegistry): Load and filter specifications
 - **SPEC-117** (DecisionRegistry): ADR operations and ADR registry synchronization
 - **SPEC-122** (RequirementsRegistry): Requirement listing, filtering, and lifecycle status updates
@@ -720,6 +732,7 @@ All FRs and NFs have associated test coverage in CLI test modules.
 - **SPEC-120** (Formatters): All output formatting
 
 **Dependency on Core Modules** (SPEC-TBD):
+
 - **core.repo**: Repository root detection (`find_repo_root`)
 - **core.templates**: Template loading and rendering
 - **core.paths**: Path utilities for workspace structure
@@ -728,12 +741,12 @@ All FRs and NFs have associated test coverage in CLI test modules.
 
 ### Risks & Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| CLI files grow beyond thin orchestration threshold | Medium | Medium | Enforce <200 line limit in code review; refactor if exceeded |
-| Inconsistent flag patterns across commands | Low | High | Reusable option types in `common.py`; enforce in tests |
-| JSON output schema breaks | Low | High | Integration tests verify JSON structure; version contract if needed |
-| Performance degradation with large registries | Medium | Low | Lazy loading in registries; filter early to reduce processing |
+| Risk                                               | Likelihood | Impact | Mitigation                                                          |
+| -------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------- |
+| CLI files grow beyond thin orchestration threshold | Medium     | Medium | Enforce <200 line limit in code review; refactor if exceeded        |
+| Inconsistent flag patterns across commands         | Low        | High   | Reusable option types in `common.py`; enforce in tests              |
+| JSON output schema breaks                          | Low        | High   | Integration tests verify JSON structure; version contract if needed |
+| Performance degradation with large registries      | Medium     | Low    | Lazy loading in registries; filter early to reduce processing       |
 
 ### Known Gaps / Debt
 

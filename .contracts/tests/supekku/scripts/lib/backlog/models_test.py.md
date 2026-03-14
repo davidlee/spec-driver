@@ -15,6 +15,24 @@ VT-067-001: BacklogItem supports ext_id and ext_url fields.
 - `test_ext_fields_default_to_empty(self) -> None`
 - `test_ext_fields_populated(self) -> None`
 
+### BacklogItemToDictTest
+
+VT-090-P2-4: BacklogItem.to_dict() with consistent relational fields.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_always_includes_linked_deltas(self) -> None`
+- `test_always_includes_related_requirements(self) -> None`
+- `test_basic_fields(self) -> None`
+- `test_none_linked_deltas_becomes_empty_list(self) -> None`: Frontmatter linked_deltas=None should not leak as None.
+- `test_optional_fields_included_when_populated(self) -> None`
+- `test_optional_fields_omitted_when_empty(self) -> None`
+- `test_populated_linked_deltas(self) -> None`
+- `test_populated_related_requirements(self) -> None`
+- `_make_item(self)` - type: ignore[no-untyped-def]
+
 ### IsValidStatusTest
 
 Test is_valid_status() helper.

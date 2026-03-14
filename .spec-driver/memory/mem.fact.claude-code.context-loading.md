@@ -4,14 +4,14 @@ name: Claude Code Context Loading & Token Caching
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-12'
-updated: '2026-03-12'
-verified: '2026-03-12'
+created: "2026-03-12"
+updated: "2026-03-12"
+verified: "2026-03-12"
 confidence: high
 tags:
-- claude-code
-- token-caching
-- agent-guidance
+  - claude-code
+  - token-caching
+  - agent-guidance
 summary: How Claude Code loads instructions into context and which sources are cache-friendly
 ---
 
@@ -19,10 +19,10 @@ summary: How Claude Code loads instructions into context and which sources are c
 
 ## How Claude Code loads instructions into context
 
-| Source | When loaded | Cache-friendly? |
-|---|---|---|
-| CLAUDE.md (all levels) | Session start, automatically | Yes — stable prefix |
-| `.claude/rules/` (no `paths` frontmatter) | Session start, automatically | Yes — stable prefix |
+| Source                                      | When loaded                  | Cache-friendly?                        |
+| ------------------------------------------- | ---------------------------- | -------------------------------------- |
+| CLAUDE.md (all levels)                      | Session start, automatically | Yes — stable prefix                    |
+| `.claude/rules/` (no `paths` frontmatter)   | Session start, automatically | Yes — stable prefix                    |
 | `.claude/rules/` (with `paths` frontmatter) | On file access matching glob | No — injected dynamically after prefix |
 
 - CLAUDE.md files are read from disk and injected as conversation-level context before the first turn. They appear under a `# claudeMd` heading. No tool call required.

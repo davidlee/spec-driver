@@ -13,7 +13,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Overview
 
 Given a spec ID (e.g., `SPEC-123`), replace an auto-generated stub with a
-*METICULOUSLY RESEARCHED* and **comprehensive architecture specification**.
+_METICULOUSLY RESEARCHED_ and **comprehensive architecture specification**.
 
 You will read **EVERY public interface**, understand relationships with all
 collaborators, and perform **additional targeted research** in order to ensure
@@ -31,12 +31,12 @@ important details.
 Once completed, this spec will serve as a core artefact in the system: an
 evergreen reference to the subsystem which will be used to design and evolve it
 for the rest of its useful life. Its quality - or failings - will have a
-  compound effect.
+compound effect.
 
 IMPORTANT: IF YOU SKIP ANY INSTRUCTIONS, STEPS, OR FILES:
 
 - well-behaved children will be boiled alive
-- kittens will be born with painful and monstrous deformities 
+- kittens will be born with painful and monstrous deformities
 - commercial aircraft will crash into crowded shopping centres
 - you will immediately and personally be held accountable and fined $100,000,000.59
 
@@ -44,18 +44,19 @@ We are lucky, aren't we, that you are a patient, diligent and expert analyst
 and software architect?
 
 ### Process
+
 1. Reset the spec to a clean template state (preserving frontmatter)
-2. Perform **comprehensive** research & analysis 
-2. Summarise - do not hallucinate or infer - your findings to complete
+2. Perform **comprehensive** research & analysis
+3. Summarise - do not hallucinate or infer - your findings to complete
    Intelligently complete sections, marking unknowns for later clarification.
    Incremental or partial progress is fine, as long as ambiguities or questions are
    clearly identified.
-3. Validate the completed draft spec to ensure YAML frontmatter / code blocks are structurally correct
-
+4. Validate the completed draft spec to ensure YAML frontmatter / code blocks are structurally correct
 
 ## When to Use This Command
 
 Use this command when:
+
 - A spec has `status: stub` or is clearly auto-generated (≤30 lines)
 - Contracts exist in `specify/{kind}/{spec-id}/contracts/` (generated via `spec-driver sync`)
 
@@ -68,6 +69,7 @@ From the user input, extract the spec ID. If not provided, ask:
 **Spec ID to backfill**: _[Wait for response like SPEC-123]_
 
 Validate the spec exists:
+
 ```bash
 uv run spec-driver list specs --filter <spec-id>
 ```
@@ -81,12 +83,14 @@ uv run spec-driver backfill spec <spec-id>
 ```
 
 **What this does**:
+
 - Preserves all frontmatter (id, slug, name, status, kind, packages, etc.)
 - Replaces body with clean template sections
 - Fills in `spec_id`, `name`, `kind` from frontmatter
 - Leaves YAML blocks as boilerplate for you to complete
 
 **If the command fails**:
+
 - "Specification not found" → Verify spec ID is correct
 - "has been modified" → Spec is not a stub; use `--force` only if user confirms
 - Other errors → Report and stop
@@ -105,6 +109,7 @@ cat "$spec_path"
 ```
 
 Note:
+
 - The frontmatter contains key metadata (id, name, kind, packages, responsibilities)
 - The body has template sections waiting to be filled
 - YAML blocks are boilerplate placeholders
@@ -139,18 +144,19 @@ done
 ```
 
 **Contract file types**:
+
 - `*-public.md` - **REQUIRED**: Public API surface, interfaces, exports
 - `*-tests.md` - Optional: Test coverage and behavior verification
 - `*-all.md` - Optional: Full implementation including private functions
 
 **Critical**: Do not skip any `*-public.md` files. Each represents a module's public interface:
+
 - Missing any public contract = incomplete spec coverage
 - Lost functionality and missing requirements
 - Spec will describe wrong/partial scope
 
 **Note**: Reading `*-all.md` has duplication with `*-public.md` (all includes public).
 Only read `*-all.md` if you need implementation details beyond public API.
-
 
 #### B. Identify External Collaborators
 
@@ -172,6 +178,7 @@ uv run spec-driver list specs --package formatters
 ```
 
 Look for usage of:
+
 - Registries (SpecRegistry, ChangeRegistry, DecisionRegistry, RequirementsRegistry, etc.)
 - Formatters (for output display)
 - Core utilities (paths, repo, frontmatter, templates)
@@ -179,10 +186,12 @@ Look for usage of:
 - Other domain packages
 
 **Key distinction**:
+
 - ✓ **External**: Uses SpecRegistry from `supekku.scripts.lib.specs.registry` → this IS a collaborator
 - ✗ **Internal**: Has classes `ListCommand`, `ShowCommand` → this is internal structure, NOT a collaborator
 
 You can also read the code files if needed for behavior insights:
+
 ```bash
 # Read relevant code files
 # Use your Read tool to examine implementation details
@@ -216,6 +225,7 @@ uv run spec-driver schema show spec.relationships -f json
 ```
 
 These commands show:
+
 - Required vs optional fields
 - Field types and constraints
 - Example values and structure
@@ -236,6 +246,7 @@ Now fill in the spec sections using the gathered context. Follow the principle:
 - **Change History**: Check git history or related deltas if relevant
 
 **Example approach**:
+
 ```markdown
 ## 1. Intent & Summary
 
@@ -258,6 +269,7 @@ Now fill in the spec sections using the gathered context. Follow the principle:
 #### Section 2: Stakeholders & Journeys
 
 For tech specs:
+
 - **Systems / Integrations**: What external systems does this interact with?
 - **Primary Journeys / Flows**: Main usage patterns (Given-When-Then)
 - **Edge Cases & Non-goals**: What's explicitly out of scope?
@@ -271,7 +283,8 @@ This is the most critical section. Complete in this order:
 ##### 3.1. Complete YAML Blocks First
 
 **`supekku:spec.relationships@v1`**:
-```yaml
+
+````yaml
 ```yaml supekku:spec.relationships@v1
 schema: supekku.spec.relationships
 version: 1
@@ -289,8 +302,9 @@ interactions:
   - spec: SPEC-YYY  # Formatter module
     type: uses
     description: Uses spec formatters for table/JSON/TSV output
-```
-```
+````
+
+````
 
 **Generate requirements** by analyzing contracts:
 - One FR per major function/capability
@@ -323,8 +337,9 @@ capabilities:
     success_criteria:
       - Measurable indicator of success
       - Another metric or observable outcome
-```
-```
+````
+
+````
 
 **`supekku:verification.coverage@v1`**:
 ```yaml
@@ -338,8 +353,9 @@ entries:
     requirement: <spec-id>.FR-001
     status: planned
     notes: Description of test artifact
-```
-```
+````
+
+````
 
 ##### 3.2. Expand in Prose
 
@@ -356,18 +372,20 @@ After YAML blocks, write prose requirements:
 - **<spec-id>.FR-002**: [Component] MUST [behavior or constraint]
   *Example*: Sync adapter MUST preserve docstring formatting (including indentation)
   *Verification*: VT-002 - Docstring preservation test
-```
+````
 
 **Non-Functional Requirements**:
+
 ```markdown
 ### Non-Functional Requirements
 
 - **<spec-id>.NF-001**: [Quality attribute] MUST [measurable constraint]
-  *Example*: Sync MUST process 1000 Python files in <30 seconds
-  *Verification*: VA-001 - Performance benchmark
+  _Example_: Sync MUST process 1000 Python files in <30 seconds
+  _Verification_: VA-001 - Performance benchmark
 ```
 
 **Inference Guidelines**:
+
 - Infer FRs from function names and docstrings
 - Infer NFs from code patterns (caching → performance, error handling → reliability)
 - Make reasonable assumptions about implicit requirements
@@ -376,6 +394,7 @@ After YAML blocks, write prose requirements:
 #### Section 4: Solution Outline
 
 For tech specs:
+
 - **Architecture**: Component structure, data flow, key abstractions
 - **Components**: Main classes/modules and their roles
 - **Interfaces**: Public APIs, contracts with other systems
@@ -390,6 +409,7 @@ For tech specs:
 - **State Transitions**: If stateful, describe state machine
 
 **Example**:
+
 ```markdown
 ## 5. Behaviour & Scenarios
 
@@ -427,6 +447,7 @@ To maintain workflow efficiency (≤10 min per spec):
 **Maximum Clarification Questions**: **3 total**
 
 Only ask when:
+
 - Critical decision significantly impacts design
 - Multiple valid interpretations with different trade-offs
 - Security/compliance implications
@@ -435,6 +456,7 @@ Only ask when:
 **For everything else**: Make informed assumptions and document them.
 
 **Assumption Documentation Format**:
+
 ```markdown
 [ASSUMPTION: Based on contract signatures, assuming synchronous operation.
 If async is required, add async/await wrappers in FR-004.]
@@ -491,21 +513,25 @@ Record what you did:
 5. **Validation status**: Pass/fail with details
 
 **Example**:
+
 ```markdown
 ## Backfill Summary: SPEC-112
 
 **Completed**: 2025-11-02
 **Path**: `specify/tech/SPEC-112/SPEC-112.md`
 **Contracts Used**:
+
 - `contracts/supekku-cli-schema-all.md`
 - `contracts/supekku-cli-schema-public.md`
 
 **Key Inferences**:
+
 - Requirements derived from function signatures in contracts
 - Performance target (NF-001) based on typical CLI response times
 - Verification strategy aligned with existing test patterns
 
 **Assumptions**:
+
 - Schema validation uses JSON Schema Draft 7 (not specified in contracts)
 - CLI errors printed to stderr (standard practice)
 
@@ -551,6 +577,7 @@ uv run spec-driver schema show verification.coverage
 ### Document Assumptions
 
 When you infer or assume:
+
 - Mark clearly with `[ASSUMPTION: ...]`
 - Explain basis for assumption
 - Note what would change if assumption is wrong
@@ -574,6 +601,7 @@ When you infer or assume:
 ### When Contracts Are Rich
 
 If contracts have detailed docstrings and signatures:
+
 - Extract FRs directly from function purposes
 - Infer NFs from code patterns (error handling, validation, etc.)
 - Build capability structure from module organization
@@ -582,6 +610,7 @@ If contracts have detailed docstrings and signatures:
 ### When Contracts Are Sparse
 
 If contracts lack detail:
+
 - Read actual code files for context
 - Infer from function names and structure
 - Make reasonable assumptions about typical behavior
@@ -590,6 +619,7 @@ If contracts lack detail:
 ### When Packages Are Small
 
 For small, focused specs (1-2 packages):
+
 - Simple capability structure (maybe just 1-2 capabilities)
 - Focused requirements (3-5 FRs typical)
 - Straightforward architecture
@@ -598,6 +628,7 @@ For small, focused specs (1-2 packages):
 ### When Packages Are Large
 
 For complex specs (many packages):
+
 - Break into multiple capabilities (by concern or layer)
 - More requirements (10+ FRs possible)
 - Richer architecture section

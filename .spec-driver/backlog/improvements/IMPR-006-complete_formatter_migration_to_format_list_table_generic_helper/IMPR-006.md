@@ -1,8 +1,8 @@
 ---
 id: IMPR-006
 name: Complete formatter migration to format_list_table generic helper
-created: '2026-03-05'
-updated: '2026-03-09'
+created: "2026-03-05"
+updated: "2026-03-09"
 status: resolved
 kind: improvement
 ---
@@ -20,12 +20,12 @@ that eliminates the repeated dispatch + table-setup boilerplate shared by all
 
 ### 1. Moderate migrations (extract helpers first, then rewire)
 
-| Formatter | Effort | Notes |
-|---|---|---|
-| `spec_formatters` | ~30 min | Inline logic; `include_packages` dynamic columns; rename `no_truncate` → `truncate` |
-| `change_formatters` | ~20 min | Inline row logic; rename `no_truncate` → `truncate` |
-| `backlog_formatters` | ~30 min | All inline; 3 helpers to extract |
-| `requirement_formatters` | ~30 min | All inline; 3 helpers to extract |
+| Formatter                | Effort  | Notes                                                                               |
+| ------------------------ | ------- | ----------------------------------------------------------------------------------- |
+| `spec_formatters`        | ~30 min | Inline logic; `include_packages` dynamic columns; rename `no_truncate` → `truncate` |
+| `change_formatters`      | ~20 min | Inline row logic; rename `no_truncate` → `truncate`                                 |
+| `backlog_formatters`     | ~30 min | All inline; 3 helpers to extract                                                    |
+| `requirement_formatters` | ~30 min | All inline; 3 helpers to extract                                                    |
 
 ### 2. DRY helpers to extract
 
@@ -40,4 +40,3 @@ that eliminates the repeated dispatch + table-setup boilerplate shared by all
 ## Estimated effort
 
 ~3 hours total for all remaining migrations + DRY helpers.
-

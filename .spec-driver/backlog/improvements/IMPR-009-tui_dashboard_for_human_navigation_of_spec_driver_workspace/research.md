@@ -9,14 +9,14 @@ Research pass to inform design decisions before scoping a delta.
 All registries follow the same pattern by convention. No base class — deliberate
 per project doctrine (specific before generic).
 
-| Method | Signature | Returns | Notes |
-|---|---|---|---|
-| constructor | `(root=None)` | — | Most keyword-only; SpecRegistry positional |
-| `collect()` | `() → dict[str, Record]` | dict keyed by ID | Rescans filesystem each call |
-| `find(id)` | `(str) → Record \| None` | single record | Calls `collect()` internally |
-| `iter(status=)` | `(str \| None) → Iterator` | filtered iterator | Optional status filter |
-| `filter(...)` | domain-specific kwargs | `list[Record]` | AND logic; params vary |
-| `sync()` | `() → None` | — | Writes registry YAML |
+| Method          | Signature                  | Returns           | Notes                                      |
+| --------------- | -------------------------- | ----------------- | ------------------------------------------ |
+| constructor     | `(root=None)`              | —                 | Most keyword-only; SpecRegistry positional |
+| `collect()`     | `() → dict[str, Record]`   | dict keyed by ID  | Rescans filesystem each call               |
+| `find(id)`      | `(str) → Record \| None`   | single record     | Calls `collect()` internally               |
+| `iter(status=)` | `(str \| None) → Iterator` | filtered iterator | Optional status filter                     |
+| `filter(...)`   | domain-specific kwargs     | `list[Record]`    | AND logic; params vary                     |
+| `sync()`        | `() → None`                | —                 | Writes registry YAML                       |
 
 ### Universal model attributes
 
@@ -25,14 +25,14 @@ Most also have: `tags`, `created`, `updated`, relationship lists.
 
 ### Divergences
 
-| Registry | Divergence |
-|---|---|
-| **SpecRegistry** | Eager-loads in `__init__` (caches `_specs`). Exposes `all_specs()` list, not `collect()` dict. |
+| Registry                 | Divergence                                                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| **SpecRegistry**         | Eager-loads in `__init__` (caches `_specs`). Exposes `all_specs()` list, not `collect()` dict.                                  |
 | **RequirementsRegistry** | Takes `registry_path: Path` not `root`. Eager-loads from YAML. Has `merge()`, `move_requirement()`. Complex lifecycle tracking. |
-| **CardRegistry** | Stateful — `create_card()` writes files. `next_id()` allocates. Requires `root` (no default). |
-| **BacklogRegistry** | No class — pure functions only (`discover_backlog_items()`, `find_backlog_items_by_id()`, etc.). |
-| **MemoryRegistry** | Has `collect_bodies()` for body text. Optional `directory` override. Different filter params (`memory_type`). |
-| **DecisionRegistry** | Has `rebuild_status_symlinks()` — filesystem side-effects beyond YAML. |
+| **CardRegistry**         | Stateful — `create_card()` writes files. `next_id()` allocates. Requires `root` (no default).                                   |
+| **BacklogRegistry**      | No class — pure functions only (`discover_backlog_items()`, `find_backlog_items_by_id()`, etc.).                                |
+| **MemoryRegistry**       | Has `collect_bodies()` for body text. Optional `directory` override. Different filter params (`memory_type`).                   |
+| **DecisionRegistry**     | Has `rebuild_status_symlinks()` — filesystem side-effects beyond YAML.                                                          |
 
 ### TUI implications
 
@@ -135,6 +135,7 @@ truth for styling — Textual CSS should derive from it, not duplicate it.
 ### IMPR-008 relationship
 
 IMPR-008 (`idea` status) plans to:
+
 1. Add `[dirs]` config section to workflow.toml
 2. Make `paths.py` resolve from config instead of constants
 3. Provide migration tooling
@@ -158,6 +159,7 @@ inherits configurability for free. No hardcoded paths in TUI code.
 
 **Option A (minimal, recommended for MVP)**:
 Add a `core/events.py` module with:
+
 - `emit_event(cmd, artifacts, status)` — appends JSONL + sends to socket
 - Session ID from `SPEC_DRIVER_SESSION` env var
 - Called explicitly at end of commands that mutate state
@@ -167,10 +169,12 @@ Cons: Must add call sites manually to each command.
 
 **Option B (Typer callback wrapper)**:
 Wrap command functions with a decorator that emits post-execution events.
+
 ```python
 @emit_on_complete
 def create_delta(...): ...
 ```
+
 Pros: Consistent, less manual wiring.
 Cons: Typer's callback model is limited; may need custom subclass.
 
@@ -204,10 +208,10 @@ Rich is transitive via typer, not declared explicitly.
 
 ### TUI additions needed
 
-| Package | Purpose | Size |
-|---|---|---|
-| `textual>=3.0` | TUI framework | ~2MB (includes Rich) |
-| `watchfiles>=1.0` | File watching (Rust-backed, fast) | ~1MB |
+| Package           | Purpose                           | Size                 |
+| ----------------- | --------------------------------- | -------------------- |
+| `textual>=3.0`    | TUI framework                     | ~2MB (includes Rich) |
+| `watchfiles>=1.0` | File watching (Rust-backed, fast) | ~1MB                 |
 
 ### Optional extra vs core dependency
 
@@ -228,18 +232,19 @@ stays in core.
 
 ### Widget mapping
 
-| TUI feature | Textual widget | Notes |
-|---|---|---|
-| Type selector | `OptionList` or `ListView` | Sidebar with counts |
-| Artifact list | `DataTable` | Sortable, filterable |
-| Markdown preview | `MarkdownViewer` | Built-in, handles most MD |
-| Search | `Input` + `OptionList` | Modal overlay |
-| Track/event log | `RichLog` | Append-only, scrollable |
-| Editor launch | `app.suspend()` | Textual 1.0+ supports this |
+| TUI feature      | Textual widget             | Notes                      |
+| ---------------- | -------------------------- | -------------------------- |
+| Type selector    | `OptionList` or `ListView` | Sidebar with counts        |
+| Artifact list    | `DataTable`                | Sortable, filterable       |
+| Markdown preview | `MarkdownViewer`           | Built-in, handles most MD  |
+| Search           | `Input` + `OptionList`     | Modal overlay              |
+| Track/event log  | `RichLog`                  | Append-only, scrollable    |
+| Editor launch    | `app.suspend()`            | Textual 1.0+ supports this |
 
 ### Async architecture
 
 Textual is fully async (built on `asyncio`). This is ideal for:
+
 - Socket listener (non-blocking `asyncio.DatagramProtocol`)
 - File watching (`watchfiles` has async API)
 - Background registry refresh
@@ -254,27 +259,27 @@ keeps the single source of truth.
 
 ## 7. Design Decisions to Make Before Scoping
 
-| # | Decision | Options | Recommendation |
-|---|---|---|---|
-| 1 | Optional extra vs core dep | `[tui]` extra / always installed | Optional extra |
-| 2 | Formatter reuse strategy | Markup strings / Rich objects / Textual-native | Markup strings first, Rich objects if needed |
-| 3 | Event emission approach | Explicit calls / decorator / filesystem | Explicit calls (Option A) |
-| 4 | Registry abstraction | Protocol / per-type adapters / none | Per-type adapters, no Protocol |
-| 5 | Theme source of truth | theme.py generates .tcss / duplicate / shared | Generate .tcss from theme.py |
-| 6 | Track mode transport | Socket only / log only / hybrid | Hybrid (socket + JSONL) |
-| 7 | IMPR-008 dependency | Block on it / use paths.py as-is | Use paths.py as-is |
+| #   | Decision                   | Options                                        | Recommendation                               |
+| --- | -------------------------- | ---------------------------------------------- | -------------------------------------------- |
+| 1   | Optional extra vs core dep | `[tui]` extra / always installed               | Optional extra                               |
+| 2   | Formatter reuse strategy   | Markup strings / Rich objects / Textual-native | Markup strings first, Rich objects if needed |
+| 3   | Event emission approach    | Explicit calls / decorator / filesystem        | Explicit calls (Option A)                    |
+| 4   | Registry abstraction       | Protocol / per-type adapters / none            | Per-type adapters, no Protocol               |
+| 5   | Theme source of truth      | theme.py generates .tcss / duplicate / shared  | Generate .tcss from theme.py                 |
+| 6   | Track mode transport       | Socket only / log only / hybrid                | Hybrid (socket + JSONL)                      |
+| 7   | IMPR-008 dependency        | Block on it / use paths.py as-is               | Use paths.py as-is                           |
 
 ---
 
 ## 8. Risk Register
 
-| Risk | Likelihood | Impact | Mitigation |
-|---|---|---|---|
-| Rich markup doesn't render cleanly in Textual widgets | Medium | Medium | Spike early; fall back to Option B (Rich objects) |
-| 13 artifact types make generic browser unwieldy | Low | Medium | Group by category; progressive disclosure |
-| Event emission adds latency to CLI commands | Low | High | Fire-and-forget socket; async JSONL append |
-| Textual version churn breaks TUI | Medium | Low | Pin to stable minor; TUI is optional extra |
-| IMPR-008 path changes break TUI | Low | Low | Use paths.py getters exclusively; no hardcoding |
+| Risk                                                  | Likelihood | Impact | Mitigation                                        |
+| ----------------------------------------------------- | ---------- | ------ | ------------------------------------------------- |
+| Rich markup doesn't render cleanly in Textual widgets | Medium     | Medium | Spike early; fall back to Option B (Rich objects) |
+| 13 artifact types make generic browser unwieldy       | Low        | Medium | Group by category; progressive disclosure         |
+| Event emission adds latency to CLI commands           | Low        | High   | Fire-and-forget socket; async JSONL append        |
+| Textual version churn breaks TUI                      | Medium     | Low    | Pin to stable minor; TUI is optional extra        |
+| IMPR-008 path changes break TUI                       | Low        | Low    | Use paths.py getters exclusively; no hardcoding   |
 
 ---
 

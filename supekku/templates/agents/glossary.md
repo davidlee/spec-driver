@@ -44,11 +44,12 @@ ID format: `{{ config.kanban.id_prefix }}NNN-slug`
 ## Governance
 
 {% if config.policy.adrs -%}
+
 - **ADR** (`ADR-xxx`): Architecture Decision Record. Location: `.spec-driver/decisions/ADR-xxx-slug.md`.
-{% endif -%}
-{% if config.contracts.enabled -%}
+  {% endif -%}
+  {% if config.contracts.enabled -%}
 - **Contract**: Auto-generated API documentation. Location: `{{ config.contracts.root }}/`.
-{% endif -%}
+  {% endif -%}
 
 ## Backlog
 

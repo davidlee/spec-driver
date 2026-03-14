@@ -1,8 +1,8 @@
 ---
 id: IMPR-004
 name: Use zigmarkdoc for Zig documentation generation
-created: '2026-02-06'
-updated: '2026-02-06'
+created: "2026-02-06"
+updated: "2026-02-06"
 status: resolved
 kind: improvement
 ---
@@ -16,6 +16,7 @@ Replace the basic doc comment parsing in ZigAdapter with zigmarkdoc for proper Z
 ## Current State
 
 The ZigAdapter currently uses a simple regex-based parser to extract `///` and `//!` doc comments from Zig source files. This approach:
+
 - Misses complex documentation patterns
 - Doesn't handle comptime, inline fn, or other Zig-specific constructs well
 - Produces inconsistent output compared to standard Zig docs

@@ -4,33 +4,34 @@ name: Settler Ceremony Mode
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-06'
-verified: '2026-03-06'
+updated: "2026-03-06"
+verified: "2026-03-06"
 confidence: high
 tags:
-- spec-driver
-- ceremony
-- settler
-summary: 'Medium ceremony: delta-first delivery with selective specs, backlog intake,
-  and flexible evidence capture. The default mode for most projects.'
+  - spec-driver
+  - ceremony
+  - settler
+summary:
+  "Medium ceremony: delta-first delivery with selective specs, backlog intake,
+  and flexible evidence capture. The default mode for most projects."
 priority:
   severity: medium
   weight: 7
 scope:
   commands:
-  - uv run spec-driver create delta
+    - uv run spec-driver create delta
   paths:
-  - specify/decisions/ADR-004-canonical_workflow_loop.md
+    - specify/decisions/ADR-004-canonical_workflow_loop.md
 provenance:
   sources:
-  - kind: adr
-    ref: ADR-004
-  - kind: code
-    note: Delta completion coverage and lifecycle behavior
-    ref: supekku/scripts/complete_delta.py
-  - kind: code
-    note: Coverage gate specifics and enforcement defaults
-    ref: supekku/scripts/lib/changes/coverage_check.py
+    - kind: adr
+      ref: ADR-004
+    - kind: code
+      note: Delta completion coverage and lifecycle behavior
+      ref: supekku/scripts/complete_delta.py
+    - kind: code
+      note: Coverage gate specifics and enforcement defaults
+      ref: supekku/scripts/lib/changes/coverage_check.py
 ---
 
 # Settler Ceremony Mode
@@ -52,11 +53,13 @@ capture. Traceability without governance overhead.
 ## Typical Flows
 
 **Prospective** (planned work):
+
 ```text
 [optional backlog item] -> delta -> [recommended DR for significant change] -> [IP/phases when execution scope warrants] -> implement -> audit/reconcile -> close
 ```
 
 **Retrospective** (existing code):
+
 ```
 audit (discovery/backfill) -> spec/requirement updates -> follow-up delta(s)
 ```

@@ -2,8 +2,8 @@
 id: IP-079.PHASE-02
 slug: 079-implement_canonical_audit_reconciliation_contract-phase-02
 name: "IP-079 Phase 02 — Audit gating module"
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---
@@ -75,6 +75,7 @@ phase: IP-079.PHASE-02
 Build `audit_check.py` following the `coverage_check.py` pattern: a self-contained module that resolves audit gates, collects gating findings from conformance audits, derives closure effects, and reports audit completeness. Wire it into `complete_delta.py` as a pre-check.
 
 ## 2. Links & References
+
 - **Delta**: DE-079
 - **Design Revision**: DR-079 §3 (State Transitions / Lifecycle Impact), §4 (closure-effect derivation rules)
 - **Design Decisions**: DEC-079-003 (audit_gate), DEC-079-005 (closure_effect derived), DEC-079-006 (tolerated_drift blocks), DEC-079-008 (multi-audit union), DEC-079-011 (separate module)
@@ -82,9 +83,11 @@ Build `audit_check.py` following the `coverage_check.py` pattern: a self-contain
 - **Pattern**: `supekku/scripts/lib/changes/coverage_check.py` — structural pattern for the new module
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete — audit/delta schema foundation committed
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `audit_check.py` exists at `supekku/scripts/lib/changes/audit_check.py`
 - [ ] `resolve_audit_gate(delta) -> str` — resolves `auto` to `required`/`non-gating` based on `applies_to.requirements`
 - [ ] `collect_gating_findings(delta_id, audit_registry) -> list[Finding]` — collects findings from all completed conformance audits with matching `delta_ref`
@@ -102,12 +105,14 @@ Build `audit_check.py` following the `coverage_check.py` pattern: a self-contain
 - [ ] `just pylint-files` clean on touched files
 
 ## 5. Verification
+
 - `uv run pytest supekku/scripts/lib/changes/audit_check_test.py -v`
 - `uv run pytest supekku/scripts/complete_delta_test.py -v` (if integration tests added there)
 - `just lint`
 - `just pylint-files supekku/scripts/lib/changes/audit_check.py supekku/scripts/complete_delta.py`
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - Audit frontmatter (mode, delta_ref, findings) is accessible via `load_markdown_file` on audit artifact paths
   - `ChangeRegistry(kind="audit")` collects all AUD artefacts; filtering by `delta_ref` is done in `collect_gating_findings`
@@ -118,16 +123,16 @@ Build `audit_check.py` following the `coverage_check.py` pattern: a self-contain
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Implement resolve_audit_gate | [P] | Pure function |
-| [x] | 2.2 | Implement collect_gating_findings | [ ] | Multi-audit union + collision detection |
-| [x] | 2.3 | Implement derive_closure_effect | [P] | All DR-079 rules implemented |
-| [x] | 2.4 | Implement check_audit_completeness | [ ] | Top-level orchestrator |
-| [x] | 2.5 | Wire audit check into complete_delta.py | [ ] | After coverage check |
-| [x] | 2.6 | Write VT-079-002 tests (closure-effect) | [P] | 15 tests |
-| [x] | 2.7 | Write VT-079-003 tests (gate resolution) | [P] | 9 tests |
-| [x] | 2.8 | Write VT-079-004 tests (integration) | [ ] | 7 tests + existing test updated |
+| Status | ID  | Description                              | Parallel? | Notes                                   |
+| ------ | --- | ---------------------------------------- | --------- | --------------------------------------- |
+| [x]    | 2.1 | Implement resolve_audit_gate             | [P]       | Pure function                           |
+| [x]    | 2.2 | Implement collect_gating_findings        | [ ]       | Multi-audit union + collision detection |
+| [x]    | 2.3 | Implement derive_closure_effect          | [P]       | All DR-079 rules implemented            |
+| [x]    | 2.4 | Implement check_audit_completeness       | [ ]       | Top-level orchestrator                  |
+| [x]    | 2.5 | Wire audit check into complete_delta.py  | [ ]       | After coverage check                    |
+| [x]    | 2.6 | Write VT-079-002 tests (closure-effect)  | [P]       | 15 tests                                |
+| [x]    | 2.7 | Write VT-079-003 tests (gate resolution) | [P]       | 9 tests                                 |
+| [x]    | 2.8 | Write VT-079-004 tests (integration)     | [ ]       | 7 tests + existing test updated         |
 
 ### Task Details
 
@@ -175,22 +180,25 @@ Build `audit_check.py` following the `coverage_check.py` pattern: a self-contain
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| complete_delta.py complexity | Separate module; only import+call in complete_delta | open |
-| ChangeArtifact missing audit fields | Read raw frontmatter via load_markdown_file | open |
-| Multi-audit union edge cases | Test with 0, 1, 2+ audits; test ID collisions | open |
+| Risk                                | Mitigation                                          | Status |
+| ----------------------------------- | --------------------------------------------------- | ------ |
+| complete_delta.py complexity        | Separate module; only import+call in complete_delta | open   |
+| ChangeArtifact missing audit fields | Read raw frontmatter via load_markdown_file         | open   |
+| Multi-audit union edge cases        | Test with 0, 1, 2+ audits; test ID collisions       | open   |
 
 ## 9. Decisions & Outcomes
+
 - Design decisions governing this phase: DEC-079-003, DEC-079-005, DEC-079-006, DEC-079-008, DEC-079-011
 
 ## 10. Findings / Research Notes
+
 - `ChangeArtifact` exposes `path` reliably — confirmed in `artifacts.py:34`
 - `ChangeRegistry(kind="audit").collect()` returns all AUD artefacts — confirmed in `registry.py:44–93`
 - `complete_delta.py` coverage check pattern at lines 490–505 is the structural template for audit check integration
 - Delta frontmatter `audit_gate` is not on `ChangeArtifact` dataclass — will need to read raw frontmatter from delta path too (same as audit)
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (just check passes, pylint reviewed)
 - [x] Notes updated

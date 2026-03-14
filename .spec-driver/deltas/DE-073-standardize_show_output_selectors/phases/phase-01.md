@@ -2,8 +2,8 @@
 id: IP-073.PHASE-01
 slug: 073-content_type_on_show-phase-01
 name: "Phase 1 - --content-type on show"
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: complete
 kind: phase
 ---
@@ -46,19 +46,23 @@ phase: IP-073.PHASE-01
 # Phase 1 — `--content-type` on `show`
 
 ## 1. Objective
+
 Add `--content-type/-c` (`markdown|frontmatter|yaml`) to `show` subcommands
 as a unified output selector per DEC-073-02.
 
 ## 2. Links & References
+
 - **Delta**: DE-073
 - **Design Revision**: DR-073 §DEC-073-02
 - **Issues**: ISSUE-036
 
 ## 3. Entrance Criteria
+
 - [x] DR-073 accepted with DEC-073-02 resolved
 - [x] Confirm no `-c` flag conflicts on `show` subcommands
 
 ## 4. Exit Criteria / Done When
+
 - [x] `show memory -c markdown` outputs full file content
 - [x] `show memory -c frontmatter` outputs structured metadata
 - [x] `show memory -c yaml` outputs raw YAML frontmatter block
@@ -67,22 +71,24 @@ as a unified output selector per DEC-073-02.
 - [x] Tests pass (`just test`), lint clean (`just lint`)
 
 ## 5. Verification
+
 - Unit tests for each `-c` value on `show memory`
 - Test conflict resolution when both `-c` and `--raw` specified
 - Regression tests for existing `--raw`/`--json`/`--path` unchanged
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: `-c` is not used on any `show` subcommand (confirmed by exploration)
 - STOP when: unexpected `-c` conflict found on a subcommand
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Define `ContentType` enum + shared Typer option in `common.py` | | Done |
-| [x] | 1.2 | Implement `-c` on `show memory` | | Done |
-| [x] | 1.3 | Extend `-c` to other `show` subcommands | [P] | All 15 subcommands |
-| [x] | 1.4 | Tests for all `-c` values and conflict resolution | | Done |
+| Status | ID  | Description                                                    | Parallel? | Notes              |
+| ------ | --- | -------------------------------------------------------------- | --------- | ------------------ |
+| [x]    | 1.1 | Define `ContentType` enum + shared Typer option in `common.py` |           | Done               |
+| [x]    | 1.2 | Implement `-c` on `show memory`                                |           | Done               |
+| [x]    | 1.3 | Extend `-c` to other `show` subcommands                        | [P]       | All 15 subcommands |
+| [x]    | 1.4 | Tests for all `-c` values and conflict resolution              |           | Done               |
 
 ### Task Details
 
@@ -108,14 +114,17 @@ as a unified output selector per DEC-073-02.
   - **Testing**: Typer CLI runner tests for each `-c` value. Conflict warning test.
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+
+| Risk                           | Mitigation                                 | Status    |
+| ------------------------------ | ------------------------------------------ | --------- |
 | `-c` conflicts on a subcommand | Audit done during exploration — none found | mitigated |
 
 ## 9. Decisions & Outcomes
+
 - Per DEC-073-02: `-c` coexists with existing flags, wins on conflict with warning.
 
 ## 10. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence: 171 tests pass (common_test + show_test), lint clean
 - [x] IP-073 progress tracking updated

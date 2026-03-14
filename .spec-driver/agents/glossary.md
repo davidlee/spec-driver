@@ -39,8 +39,9 @@ The term "card" in skills and workflows refers to whichever of these the project
 ## Governance
 
 - **ADR** (`ADR-xxx`): Architecture Decision Record. Location: `.spec-driver/decisions/ADR-xxx-slug.md`.
-- **Contract**: Auto-generated API documentation. Location: `.contracts/`.
-## Backlog
+  - **Contract**: Auto-generated API documentation. Location: `.contracts/`.
+
+  ## Backlog
 
 - **Issue**: Actionable defect or gap. Location: `.spec-driver/backlog/issues/`.
 - **Problem Statement**: Articulation of user/system pain. Location: `.spec-driver/backlog/problems/`.

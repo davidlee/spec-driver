@@ -4,7 +4,12 @@
  * Ported from supekku/claude.hooks/artifact_event_test.py.
  * Run: node --experimental-strip-types supekku/pi.extensions/spec-driver-artifact-events.test.ts
  */
-import { classifyPath, buildEvent, writeLog, sendSocket } from "./spec-driver-artifact-events.ts";
+import {
+  classifyPath,
+  buildEvent,
+  writeLog,
+  sendSocket,
+} from "./spec-driver-artifact-events.ts";
 import { readFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -29,15 +34,27 @@ function test(name: string, fn: () => void): void {
 const CLASSIFY_CASES: [string, string, string | null][] = [
   ["/proj/.spec-driver/deltas/DE-060-slug/DE-060.md", "delta", "DE-060"],
   [".spec-driver/deltas/DE-001-foo/notes.md", "delta", "DE-001"],
-  ["/proj/.spec-driver/deltas/DE-060-slug/DR-060.md", "design_revision", "DE-060"],
+  [
+    "/proj/.spec-driver/deltas/DE-060-slug/DR-060.md",
+    "design_revision",
+    "DE-060",
+  ],
   ["/proj/.spec-driver/deltas/DE-060-slug/IP-060.md", "plan", "DE-060"],
-  ["/proj/.spec-driver/deltas/DE-060-slug/phases/phase-01.md", "phase", "DE-060"],
+  [
+    "/proj/.spec-driver/deltas/DE-060-slug/phases/phase-01.md",
+    "phase",
+    "DE-060",
+  ],
   ["/proj/.spec-driver/tech/SPEC-042/SPEC-042.md", "spec", "SPEC-042"],
   ["/proj/.spec-driver/decisions/ADR-007-some-decision.md", "adr", "ADR-007"],
   ["/proj/.spec-driver/revisions/RE-003.md", "revision", "RE-003"],
   ["/proj/.spec-driver/audits/AUD-001.md", "audit", "AUD-001"],
   ["/proj/.spec-driver/backlog/issues/ISSUE-042.md", "backlog", null],
-  ["/proj/.spec-driver/product/PROD-001/PROD-001.md", "product_spec", "PROD-001"],
+  [
+    "/proj/.spec-driver/product/PROD-001/PROD-001.md",
+    "product_spec",
+    "PROD-001",
+  ],
   ["/proj/.spec-driver/policies/POL-001.md", "policy", "POL-001"],
   ["/proj/.spec-driver/standards/STD-002.md", "standard", "STD-002"],
 ];
@@ -54,13 +71,17 @@ for (const [path, expectedType, expectedId] of CLASSIFY_CASES) {
 }
 
 test("phase before generic delta", () => {
-  const result = classifyPath("/proj/.spec-driver/deltas/DE-060-slug/phases/phase-01.md");
+  const result = classifyPath(
+    "/proj/.spec-driver/deltas/DE-060-slug/phases/phase-01.md",
+  );
   assert.notEqual(result, null);
   assert.equal(result![0], "phase");
 });
 
 test("DR before generic delta", () => {
-  const result = classifyPath("/proj/.spec-driver/deltas/DE-060-slug/DR-060.md");
+  const result = classifyPath(
+    "/proj/.spec-driver/deltas/DE-060-slug/DR-060.md",
+  );
   assert.notEqual(result, null);
   assert.equal(result![0], "design_revision");
 });
@@ -148,7 +169,10 @@ test("cwd used for relativization", () => {
     artifactId: "DE-061",
     cwd: "/proj",
   });
-  assert.equal((event.argv as string[])[1], ".spec-driver/deltas/DE-061-slug/DE-061.md");
+  assert.equal(
+    (event.argv as string[])[1],
+    ".spec-driver/deltas/DE-061-slug/DE-061.md",
+  );
 });
 
 // --- writeLog ---

@@ -2,8 +2,8 @@
 id: IP-053.PHASE-02
 slug: 053-tui_artifact_browser_mvp_with_textual-phase-02
 name: IP-053 Phase 02
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: draft
 kind: phase
 ---
@@ -82,6 +82,7 @@ and markdown preview. App launches headlessly for testing; CLI entry point is
 Phase 3.
 
 ## 2. Links & References
+
 - **Delta**: [DE-053](../DE-053.md)
 - **Design Revision**: [DR-053](../DR-053.md)
   - DEC-053-01 (styled_text API)
@@ -97,6 +98,7 @@ Phase 3.
 - **Spike findings**: [notes.md](../notes.md)
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete (4a203df)
 - [x] Textual 8.0.2 available and importable
 - [x] DR-053 decisions DEC-053-11 through DEC-053-16 resolved
@@ -104,6 +106,7 @@ Phase 3.
 - [x] Select supports dynamic `set_options()` rebuild (verified in preflight)
 
 ## 4. Exit Criteria / Done When
+
 - [x] `ArtifactGroup` + `ArtifactTypeMeta` in `core/artifact_view.py` with tests
 - [x] 4 `artifact.group.*` theme entries added to `theme.py`
 - [x] `supekku/tui/` package: app, browser, widgets, theme.tcss
@@ -117,6 +120,7 @@ Phase 3.
 - [x] `just` passes (ruff clean, pylint 9.51/10, 2839 tests pass)
 
 ## 5. Verification
+
 - `just test` — all existing + new tests
 - `just lint` + `just pylint` — zero warnings
 - VT-053-pilot: headless pilot tests covering widget composition, DataTable
@@ -125,6 +129,7 @@ Phase 3.
   `rgb[a]?(` patterns — fail if found (POL-002)
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: Textual's `Screen` + `Footer` + `OptionList` + `DataTable` +
   `Select` + `Markdown` compose without layout conflicts at reasonable terminal
   sizes (80x24 minimum).
@@ -137,18 +142,18 @@ Phase 3.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | P02-T01 | `ArtifactGroup` + `ArtifactTypeMeta` in `artifact_view.py` | [P] | DEC-053-11, 16 tests |
-| [x] | P02-T02 | `artifact.group.*` theme entries in `theme.py` | [P] | 4 group colours |
-| [x] | P02-T03 | `tui/` package structure + `theme.tcss` | | POL-002 compliant |
-| [x] | P02-T04 | `tui/widgets/type_selector.py` | | styled Text + TypeSelected msg |
-| [x] | P02-T05 | `tui/widgets/artifact_list.py` + status filter | | DataTable + Select + Input |
-| [x] | P02-T06 | `tui/widgets/preview_panel.py` | [P] | Markdown widget |
-| [x] | P02-T07 | `tui/browser.py` — BrowserScreen | | Message wiring, Screen subclass |
-| [x] | P02-T08 | `tui/app.py` — App subclass | | snapshot param for testability |
-| [x] | P02-T09 | VT-053-pilot headless tests | | 12 tests, mock snapshot |
-| [x] | P02-T10 | VT-053-tcss-lint | [P] | 3 tests, hex+rgb scan |
+| Status | ID      | Description                                                | Parallel? | Notes                           |
+| ------ | ------- | ---------------------------------------------------------- | --------- | ------------------------------- |
+| [x]    | P02-T01 | `ArtifactGroup` + `ArtifactTypeMeta` in `artifact_view.py` | [P]       | DEC-053-11, 16 tests            |
+| [x]    | P02-T02 | `artifact.group.*` theme entries in `theme.py`             | [P]       | 4 group colours                 |
+| [x]    | P02-T03 | `tui/` package structure + `theme.tcss`                    |           | POL-002 compliant               |
+| [x]    | P02-T04 | `tui/widgets/type_selector.py`                             |           | styled Text + TypeSelected msg  |
+| [x]    | P02-T05 | `tui/widgets/artifact_list.py` + status filter             |           | DataTable + Select + Input      |
+| [x]    | P02-T06 | `tui/widgets/preview_panel.py`                             | [P]       | Markdown widget                 |
+| [x]    | P02-T07 | `tui/browser.py` — BrowserScreen                           |           | Message wiring, Screen subclass |
+| [x]    | P02-T08 | `tui/app.py` — App subclass                                |           | snapshot param for testability  |
+| [x]    | P02-T09 | VT-053-pilot headless tests                                |           | 12 tests, mock snapshot         |
+| [x]    | P02-T10 | VT-053-tcss-lint                                           | [P]       | 3 tests, hex+rgb scan           |
 
 ### Task Details
 
@@ -233,12 +238,12 @@ Phase 3.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| OptionList/Select dynamic rebuild flicker | Batch updates; test in pilot | open |
-| Layout doesn't fit 80x24 minimum | Iterate .tcss proportions; test with `run_test(size=(80,24))` | open |
-| Message bubbling not reaching screen handler | Verified: Textual messages bubble by default | low risk |
-| Pilot can't inspect DataTable row content | Spike confirmed Pilot API works for DataTable | low risk |
+| Risk                                         | Mitigation                                                    | Status   |
+| -------------------------------------------- | ------------------------------------------------------------- | -------- |
+| OptionList/Select dynamic rebuild flicker    | Batch updates; test in pilot                                  | open     |
+| Layout doesn't fit 80x24 minimum             | Iterate .tcss proportions; test with `run_test(size=(80,24))` | open     |
+| Message bubbling not reaching screen handler | Verified: Textual messages bubble by default                  | low risk |
+| Pilot can't inspect DataTable row content    | Spike confirmed Pilot API works for DataTable                 | low risk |
 
 ## 9. Decisions & Outcomes
 
@@ -248,6 +253,7 @@ No phase-specific decisions expected unless STOP conditions trigger.
 ## 10. Findings / Research Notes
 
 **Preflight API verification (2026-03-07)**:
+
 - `OptionList.Option(prompt: VisualType)` accepts Rich `Text` — verified with
   styled text, styles preserved in rendered output.
 - `Select.__init__(options: Iterable[tuple[RenderableType, SelectType]])` —
@@ -256,6 +262,7 @@ No phase-specific decisions expected unless STOP conditions trigger.
 - Both widgets confirmed compatible with `styled_text()` approach.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence: `just` passes (2839 tests, ruff clean, pylint 9.51)
 - [x] Notes updated with findings

@@ -4,14 +4,15 @@ name: Specifications
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-06'
-verified: '2026-03-06'
+updated: "2026-03-06"
+verified: "2026-03-06"
 confidence: high
 tags:
-- spec-driver
-- spec
-- requirements
-summary: Tech Specs (SPEC-*) and Product Specs (PROD-*) define system behaviour, architecture,
+  - spec-driver
+  - spec
+  - requirements
+summary:
+  Tech Specs (SPEC-*) and Product Specs (PROD-*) define system behaviour, architecture,
   and product intent. In high-rigor flows, canonical spec state is finalized after
   audit/contracts reconciliation.
 priority:
@@ -19,12 +20,12 @@ priority:
   weight: 8
 provenance:
   sources:
-  - kind: adr
-    ref: ADR-004
-  - kind: adr
-    ref: ADR-003
-  - kind: code
-    ref: supekku/cli/create.py
+    - kind: adr
+      ref: ADR-004
+    - kind: adr
+      ref: ADR-003
+    - kind: code
+      ref: supekku/cli/create.py
 ---
 
 # Specifications
@@ -38,16 +39,17 @@ ahead of implementation.
 
 ## Two Families
 
-- **Tech Spec (SPEC-*)** — system responsibilities, architecture, behaviour,
+- **Tech Spec (SPEC-\*)** — system responsibilities, architecture, behaviour,
   quality requirements, testing strategy. Lives in `specify/tech/SPEC-*/`.
-- **Product Spec (PROD-*)** — user problems, hypotheses, success metrics,
+- **Product Spec (PROD-\*)** — user problems, hypotheses, success metrics,
   business value. Lives in `specify/product/PROD-*/`.
 
 ## Requirements
 
 Specs contain requirements:
-- **FR-*** (Functional Requirements) — testable behavioural requirements
-- **NF-*** (Non-Functional Requirements) — quality requirements with measurement
+
+- **FR-\*** (Functional Requirements) — testable behavioural requirements
+- **NF-\*** (Non-Functional Requirements) — quality requirements with measurement
 
 Requirements have their own lifecycle tracked in the
 [[mem.concept.spec-driver.relations|requirements registry]].

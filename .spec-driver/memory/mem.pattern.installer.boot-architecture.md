@@ -4,15 +4,15 @@ name: Installer & Agent Boot Architecture
 kind: memory
 status: active
 memory_type: pattern
-updated: '2026-03-12'
-verified: '2026-03-12'
+updated: "2026-03-12"
+verified: "2026-03-12"
 confidence: high
 tags:
-- spec-driver
-- installer
-- skills
-- boot
-- agent-guidance
+  - spec-driver
+  - installer
+  - skills
+  - boot
+  - agent-guidance
 summary: >-
   How the installer sets up agent guidance, skills, and boot references.
   Covers file ownership (managed vs authored), the agents/boot.md / AGENTS.md
@@ -22,26 +22,26 @@ priority:
   weight: 9
 scope:
   commands:
-  - uv run spec-driver install
+    - uv run spec-driver install
   paths:
-  - supekku/scripts/install.py
-  - supekku/scripts/lib/skills/sync.py
-  - supekku/scripts/lib/core/config.py
-  - supekku/scripts/lib/core/preboot.py
-  - supekku/claude.hooks/startup.sh
-  - supekku/templates/
+    - supekku/scripts/install.py
+    - supekku/scripts/lib/skills/sync.py
+    - supekku/scripts/lib/core/config.py
+    - supekku/scripts/lib/core/preboot.py
+    - supekku/claude.hooks/startup.sh
+    - supekku/templates/
 provenance:
   sources:
-  - kind: code
-    ref: supekku/scripts/install.py
-  - kind: code
-    ref: supekku/scripts/lib/skills/sync.py
-  - kind: code
-    ref: supekku/scripts/lib/core/config.py
-  - kind: code
-    ref: supekku/scripts/lib/core/preboot.py
-  - kind: delta
-    ref: DE-091
+    - kind: code
+      ref: supekku/scripts/install.py
+    - kind: code
+      ref: supekku/scripts/lib/skills/sync.py
+    - kind: code
+      ref: supekku/scripts/lib/core/config.py
+    - kind: code
+      ref: supekku/scripts/lib/core/preboot.py
+    - kind: delta
+      ref: DE-091
 ---
 
 # Installer & Agent Boot Architecture
@@ -55,29 +55,31 @@ provenance:
 
 ### Managed (overwritten on install/sync)
 
-| File | Writer | Content |
-|---|---|---|
-| `.spec-driver/AGENTS.md` | `sync_skills` | `<skills_system>` XML block with allowlisted skill metadata |
-| `.spec-driver/agents/*.md` | installer | Jinja2-rendered agent guidance (boot, exec, workflow, glossary, policy) |
-| `.agents/spec-driver-boot.md` | `spec-driver admin preboot` | Concatenated boot context (governance files + listings) |
-| `.claude/rules/spec-driver-boot.md` | installer (symlink) | Symlink → `../../.agents/spec-driver-boot.md` |
+| File                                | Writer                      | Content                                                                 |
+| ----------------------------------- | --------------------------- | ----------------------------------------------------------------------- |
+| `.spec-driver/AGENTS.md`            | `sync_skills`               | `<skills_system>` XML block with allowlisted skill metadata             |
+| `.spec-driver/agents/*.md`          | installer                   | Jinja2-rendered agent guidance (boot, exec, workflow, glossary, policy) |
+| `.agents/spec-driver-boot.md`       | `spec-driver admin preboot` | Concatenated boot context (governance files + listings)                 |
+| `.claude/rules/spec-driver-boot.md` | installer (symlink)         | Symlink → `../../.agents/spec-driver-boot.md`                           |
 
 ### Authored (created if missing, never overwritten)
 
-| File | Content |
-|---|---|
+| File             | Content                                                            |
+| ---------------- | ------------------------------------------------------------------ |
 | Root `AGENTS.md` | Project-specific agent instructions; gets `@`-references prepended |
 | Root `CLAUDE.md` | Project-specific Claude instructions; gets `@`-reference prepended |
 
 ## Reference Architecture
 
 Root **AGENTS.md** receives (prepended, idempotent):
+
 ```
 @.spec-driver/agents/boot.md ← triggers /boot
 @.spec-driver/AGENTS.md      ← skills XML
 ```
 
 Root **CLAUDE.md** receives (prepended, idempotent):
+
 ```
 @.spec-driver/agents/boot.md ← triggers /boot (no skills XML)
 ```
@@ -89,14 +91,15 @@ AGENTS.md natively for skill discovery.
 
 `[integration]` section in `.spec-driver/workflow.toml`:
 
-| Key | Default | Effect |
-|---|---|---|
-| `agents_md` | `true` | Prepend references to root AGENTS.md |
-| `claude_md` | `true` | Prepend boot reference to root CLAUDE.md |
+| Key         | Default | Effect                                   |
+| ----------- | ------- | ---------------------------------------- |
+| `agents_md` | `true`  | Prepend references to root AGENTS.md     |
+| `claude_md` | `true`  | Prepend boot reference to root CLAUDE.md |
 
 ## Template Pipeline
 
 Templates live in `supekku/templates/`:
+
 - `agents/*.md` → `.spec-driver/agents/*.md` (rendered with workflow config via Jinja2)
 - `hooks/*` → `.spec-driver/hooks/*` (create-if-missing, never overwritten)
 - Top-level `*.md` → `.spec-driver/templates/*.md` (artifact templates)
@@ -107,6 +110,7 @@ as context. Falls back to static defaults if templates are missing.
 ## Skills Install
 
 `sync_skills()` (callable standalone or from installer):
+
 1. Reads `.spec-driver/skills.allowlist`
 2. Installs skill dirs to targets (`.claude/skills/`, `.agents/skills/`)
 3. Writes `.spec-driver/AGENTS.md` (skills XML)

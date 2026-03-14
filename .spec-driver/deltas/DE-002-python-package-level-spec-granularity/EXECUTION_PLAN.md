@@ -9,10 +9,12 @@
 ### Current State Analysis
 
 **Package Count**:
+
 - Total packages: 24 (all directories with `__init__.py`)
 - **Leaf packages: 16** (packages with no child packages)
 
 **Leaf Packages Identified**:
+
 ```
 supekku/cli
 supekku/scripts/backlog
@@ -61,6 +63,7 @@ supekku/scripts/lib/validation
 **File**: `supekku/scripts/lib/specs/package_utils.py` (new)
 
 **Functions**:
+
 ```python
 def is_leaf_package(path: Path) -> bool:
     """Check if path is a leaf package (has __init__.py, no child packages)."""
@@ -80,6 +83,7 @@ def find_all_leaf_packages(root: Path) -> list[Path]:
 ### Task 2: VT-001 - Package Detection Tests
 
 **Test Cases**:
+
 - Leaf package identification (16 known leaf packages)
 - Non-leaf package rejection (8 parent packages)
 - Non-package path rejection (no `__init__.py`)
@@ -93,6 +97,7 @@ def find_all_leaf_packages(root: Path) -> list[Path]:
 **Enhancement to**: `supekku/scripts/lib/docs/python/variants_test.py`
 
 **Test Cases**:
+
 - Run contract generation 10 times on `supekku/scripts/lib/formatters/`
 - Verify byte-identical output
 - Test with different file counts (1 file, 5 files, 10+ files)
@@ -102,6 +107,7 @@ def find_all_leaf_packages(root: Path) -> list[Path]:
 ### Task 4: Registry Audit
 
 **Findings**:
+
 - `SpecRegistry.find_by_package()` already exists ✓
 - `Spec.packages` property already exists ✓
 - **Action**: Document in VA-002 that no breaking changes needed
@@ -111,6 +117,7 @@ def find_all_leaf_packages(root: Path) -> list[Path]:
 **Document**: `change/deltas/DE-002-python-package-level-spec-granularity/VA-002-rollup-extensibility.md`
 
 **Contents**:
+
 - How rollup mechanism could be added via frontmatter (`rollup: true`)
 - No breaking changes to existing package specs
 - Configuration-driven approach viable
@@ -129,6 +136,7 @@ def find_all_leaf_packages(root: Path) -> list[Path]:
 **Actual count**: 16 leaf packages (not ~25-30 as estimated)
 
 **Migration**:
+
 1. Delete existing file-level specs (if any exist)
 2. Generate 16 package-level specs (one per leaf package)
 3. Update registry sync
@@ -137,6 +145,7 @@ def find_all_leaf_packages(root: Path) -> list[Path]:
 ## Phase 03 Preview
 
 **Verification**:
+
 - VT-003: Sync integration (test with 5 package specs)
 - VT-004: File-to-package resolution
 - VA-001: Git diff stability analysis
@@ -144,6 +153,7 @@ def find_all_leaf_packages(root: Path) -> list[Path]:
 ## Implementation Notes
 
 **Time Estimates (revised)**:
+
 - Phase 01: 2-3 hours ✓
 - Phase 02: 1 hour (fewer specs than expected)
 - Phase 03: 1 hour

@@ -1,8 +1,8 @@
 ---
 id: ISSUE-017
 name: Add Tags column to list table output for all artifact types
-created: '2025-11-04'
-updated: '2025-11-04'
+created: "2025-11-04"
+updated: "2025-11-04"
 status: resolved
 kind: issue
 categories: [ux, cli]
@@ -21,6 +21,7 @@ All artifact list commands (`list adrs`, `list specs`, `list deltas`, etc.) supp
 Table output shows: `ID | Title | Status | Updated`
 
 Example:
+
 ```bash
 uv run spec-driver list adrs
 # ID      │Title                                 │Status   │Updated
@@ -32,6 +33,7 @@ uv run spec-driver list adrs
 Table output should include tags: `ID | Title | Status | Tags | Updated`
 
 Example:
+
 ```bash
 uv run spec-driver list adrs
 # ID      │Title                │Status   │Tags            │Updated
@@ -41,6 +43,7 @@ uv run spec-driver list adrs
 ## Scope
 
 Affected formatters (all need Tags column added):
+
 - ✅ `policy_formatters.py` - Being fixed in DE-010
 - ✅ `standard_formatters.py` - Being fixed in DE-010
 - ❌ `decision_formatters.py` - ADRs
@@ -52,6 +55,7 @@ Affected formatters (all need Tags column added):
 ## Implementation Notes
 
 Pattern to follow (from DE-010 fix):
+
 1. Add "Tags" to columns list in `_format_as_table()`
 2. Update `_prepare_*_row()` to include formatted tags
 3. Update `_calculate_column_widths()` to include tags column width

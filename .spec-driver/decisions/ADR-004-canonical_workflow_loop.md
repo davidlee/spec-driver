@@ -1,10 +1,10 @@
 ---
 id: ADR-004
-title: 'ADR-004: canonical core workflow loop'
+title: "ADR-004: canonical core workflow loop"
 status: accepted
-created: '2026-03-06'
-updated: '2026-03-06'
-reviewed: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
+reviewed: "2026-03-06"
 owners:
   - david
 supersedes: []
@@ -29,7 +29,7 @@ tags:
   - workflow
   - doctrine
   - lifecycle
-summary: 'Define the single canonical spec-driver workflow loop, distinguish supported variants from canon, and reject spec-first aspirational doctrine as the default for code-changing work.'
+summary: "Define the single canonical spec-driver workflow loop, distinguish supported variants from canon, and reject spec-first aspirational doctrine as the default for code-changing work."
 ---
 
 # ADR-004: canonical core workflow loop
@@ -263,6 +263,7 @@ Closure requires reconciliation of the owning records:
 ## Consequences
 
 ### Positive
+
 - Gives the repo one authoritative answer to “what is the golden path?”
 - Distinguishes flexibility from doctrinal equivalence.
 - Preserves legitimate lifecycle nuance for PROD specs without normalizing
@@ -275,12 +276,14 @@ Closure requires reconciliation of the owning records:
   which in turn reduces the need for repeated exploratory research.
 
 ### Negative
+
 - Some existing docs and product specs will need revision because they currently
   imply or teach spec-first sequencing.
 - The doctrine is stricter than a simple linear workflow slogan.
 - Users may find the difference between tolerated practice and canonical practice uncomfortable.
 
 ### Neutral
+
 - This ADR does not require strict runtime enforcement today.
 - This ADR does not forbid revision-first or low-ceremony workflows.
 - This ADR establishes canon first; enforcement remains a separate concern for
@@ -288,6 +291,7 @@ Closure requires reconciliation of the owning records:
 - The framework remains heavier than ad-hoc workflows during execution, by design.
 
 ## Verification
+
 - `.spec-driver/agents/workflow.md` and related generated guidance describe the
   canonical loop in ADR-consistent terms.
 - Core overview docs do not teach spec-first sequencing as the default for
@@ -297,6 +301,7 @@ Closure requires reconciliation of the owning records:
 - DE-047 closure links the resulting REs/patches back to this ADR.
 
 ## References
+
 - `drift/DL-047-spec-corpus-reconciliation.md`
 - `.spec-driver/agents/workflow.md`
 - `.spec-driver/about/lifecycle.md`

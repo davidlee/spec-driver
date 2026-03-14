@@ -2,8 +2,8 @@
 id: PROD-003
 slug: policy-and-standard-management
 name: Policy and Standard Management
-created: '2025-11-02'
-updated: '2026-03-06'
+created: "2025-11-02"
+updated: "2026-03-06"
 status: draft
 kind: prod
 aliases: []
@@ -249,6 +249,7 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 **Given** an architect identifies a recurring problem that requires a project-wide rule
 **When** they run `spec-driver create policy "Code must have tests"`
 **Then**:
+
 1. System generates POL-001 with unique ID
 2. System creates file at `specify/policies/POL-001-code-must-have-tests.md`
 3. File contains frontmatter with status=draft and simplified template sections
@@ -262,6 +263,7 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 **Given** a tech lead wants to recommend (but not mandate) a coding style guide
 **When** they create STD-001 "Google Go Style Guide" with status=default
 **Then**:
+
 1. System creates standard with flexible enforcement level
 2. Documentation clarifies: "recommended unless justified otherwise"
 3. Developers reference STD-001 in ADRs when following the guide
@@ -273,6 +275,7 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 **Given** a developer is creating an ADR for test strategy
 **When** they add `policies: [POL-001]` to the ADR frontmatter
 **Then**:
+
 1. ADR explicitly cites governing policy
 2. Policy's computed reverse references automatically include this ADR
 3. `spec-driver show POL-001` displays all implementing ADRs
@@ -284,6 +287,7 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 **Given** a new developer wants to understand project rules
 **When** they run `spec-driver list policies --status required`
 **Then**:
+
 1. System displays all active (required) policies
 2. Developer reviews each policy's Statement and Scope
 3. Developer understands what rules apply to their work
@@ -292,12 +296,14 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 ### Edge Cases & Non-goals
 
 **Edge Cases**:
+
 - **Conflicting policies**: Two required policies that contradict each other (requires architectural resolution, not tooling)
 - **Policy without verification**: Valid but indicates governance gap (flagged in reports)
 - **Standard that becomes policy**: Use supersession to deprecate STD-XXX and create POL-XXX
 - **Deprecated policy still referenced**: Computed reverse references show usage; requires cleanup (detected by validation)
 
 **Non-goals**:
+
 - **Automated enforcement**: spec-driver documents policies/standards but doesn't enforce them in CI/CD (integration point for future)
 - **Policy authoring permissions**: No access control within spec-driver (handled by git/PR workflows)
 - **Policy voting/approval workflows**: Lifecycle management exists, but approval processes are external
@@ -318,36 +324,36 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 ### Functional Requirements
 
 - **FR-001**: System MUST enable creation of policies with unique POL-XXX identifiers
-  *Verification*: VT-PROD-003-001 - Create policy via CLI, verify ID assignment and file creation
+  _Verification_: VT-PROD-003-001 - Create policy via CLI, verify ID assignment and file creation
 
 - **FR-002**: System MUST support policy lifecycle statuses: draft, required, deprecated
-  *Verification*: VT-PROD-003-002 - Test status transitions and supersession relationships
+  _Verification_: VT-PROD-003-002 - Test status transitions and supersession relationships
 
 - **FR-003**: System MUST enable creation of standards with unique STD-XXX identifiers
-  *Verification*: VT-PROD-003-003 - Create standard via CLI, verify ID assignment and file creation
+  _Verification_: VT-PROD-003-003 - Create standard via CLI, verify ID assignment and file creation
 
 - **FR-004**: System MUST support standard statuses: draft, required, default, deprecated (where "default" indicates recommended unless justified)
-  *Verification*: VT-PROD-003-004 - Test default status behavior and documentation
+  _Verification_: VT-PROD-003-004 - Test default status behavior and documentation
 
 - **FR-005**: System MUST provide CLI commands to list policies and standards with filtering (by status, tags, references)
-  *Verification*: VT-PROD-003-005 - Test list commands with various filter combinations
+  _Verification_: VT-PROD-003-005 - Test list commands with various filter combinations
 
 - **FR-006**: System MUST provide CLI commands to display full policy/standard details including metadata and cross-references
-  *Verification*: VT-PROD-003-006 - Test show commands with all metadata fields populated
+  _Verification_: VT-PROD-003-006 - Test show commands with all metadata fields populated
 
 - **FR-007**: System MUST support bidirectional cross-references between policies and standards (policies can reference standards and vice versa)
-  *Verification*: VT-PROD-003-007 - Test mutual forward references and computed reverse reference resolution
+  _Verification_: VT-PROD-003-007 - Test mutual forward references and computed reverse reference resolution
 
 - **FR-008**: System MUST allow ADRs, specs, deltas, and other artifacts to reference policies and standards via frontmatter fields
-  *Verification*: VT-PROD-003-008 - Test policy/standard references from ADRs with forward reference validation
+  _Verification_: VT-PROD-003-008 - Test policy/standard references from ADRs with forward reference validation
 
 ### Non-Functional Requirements
 
 - **NF-001**: Policies and standards MUST use consistent template structure (Statement, Rationale, Scope, Verification) for predictable authoring experience
-  *Measurement*: VA-PROD-003-001 - Template structure validation across all POL/STD files
+  _Measurement_: VA-PROD-003-001 - Template structure validation across all POL/STD files
 
 - **NF-002**: CLI commands for policies/standards MUST follow existing spec-driver UX patterns (argument structure, output formats, filtering semantics)
-  *Measurement*: VA-PROD-003-001 - UX consistency review against ADR/spec CLI commands
+  _Measurement_: VA-PROD-003-001 - UX consistency review against ADR/spec CLI commands
 
 ### Success Metrics / Signals
 
@@ -361,6 +367,7 @@ Without this capability, teams resort to documenting policies in ADRs (conflatin
 ### User Experience / Outcomes
 
 **Creating a Policy**:
+
 ```bash
 $ spec-driver create policy "Code must have tests"
 Policy created: POL-001
@@ -368,13 +375,14 @@ specify/policies/POL-001-code-must-have-tests.md
 ```
 
 **Policy Template** (specify/policies/POL-001-code-must-have-tests.md):
+
 ```markdown
 ---
 id: POL-001
-title: 'POL-001: Code must have tests'
+title: "POL-001: Code must have tests"
 status: draft
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 owners: []
 supersedes: []
 superseded_by: []
@@ -385,30 +393,36 @@ deltas: []
 related_policies: []
 related_standards: []
 tags: []
-summary: ''
+summary: ""
 ---
 
 # POL-001: Code must have tests
 
 ## Statement
+
 All production code must be accompanied by automated tests.
 
 ## Rationale
+
 Ensures code quality, enables safe refactoring, documents expected behavior.
 
 ## Scope
+
 Applies to all production code in main codebase. Excludes prototypes, spikes, and explicitly marked experimental code.
 
 ## Verification
+
 - Pre-commit hooks verify test existence
 - CI fails on untested code
 - Code review checklist includes test coverage
 
 ## References
+
 - [Testing Strategy ADR-XXX]
 ```
 
 **Creating a Standard** (with default status):
+
 ```bash
 $ spec-driver create standard "Use Google Go Style Guide"
 Standard created: STD-001
@@ -416,6 +430,7 @@ specify/standards/STD-001-use-google-go-style-guide.md
 ```
 
 **Listing Policies**:
+
 ```bash
 $ spec-driver list policies --status required
 ID       Title                          Status    Updated
@@ -424,6 +439,7 @@ POL-002  Never store unencrypted PII    required  2025-11-01
 ```
 
 **Listing Standards**:
+
 ```bash
 $ spec-driver list standards
 ID       Title                          Status    Updated
@@ -433,6 +449,7 @@ STD-003  Structured logging format      required  2025-10-30
 ```
 
 **Showing Policy Details**:
+
 ```bash
 $ spec-driver show policy POL-001
 ID: POL-001
@@ -451,6 +468,7 @@ Reverse References (computed at runtime):
 ```
 
 **Referencing in ADR**:
+
 ```yaml
 ---
 id: ADR-023
@@ -463,6 +481,7 @@ standards: [STD-003]
 ### Data & Contracts
 
 **PolicyRecord / StandardRecord Data Model** (mirrors DecisionRecord):
+
 ```python
 @dataclass
 class PolicyRecord:
@@ -490,19 +509,21 @@ class PolicyRecord:
 ```
 
 **StandardRecord** (same structure, but status includes "default"):
+
 - status: draft | required | default | deprecated
 
 **Registry YAML Output** (specify/.registry/policies.yaml):
+
 ```yaml
 policies:
   POL-001:
     id: POL-001
-    title: 'POL-001: Code must have tests'
+    title: "POL-001: Code must have tests"
     status: required
     path: specify/policies/POL-001-code-must-have-tests.md
     summary: All production code must be accompanied by automated tests
-    created: '2025-11-02'
-    updated: '2025-11-02'
+    created: "2025-11-02"
+    updated: "2025-11-02"
     standards: [STD-003]
     specs: []
     requirements: []
@@ -564,16 +585,19 @@ policies:
 ### Testing Strategy
 
 **Unit Tests** (formatters, ID generation, status validation):
+
 - policy_formatters_test.py: Table/JSON/TSV output formatting
 - standard_formatters_test.py: Display formatting with "default" status
 - creation_test.py: ID generation, frontmatter building, template rendering
 
 **Integration Tests** (registry, CLI commands, cross-references):
+
 - registry_test.py: File parsing, YAML serialization, filtering, computed reverse references
 - CLI integration: Create → sync → list → show → validate workflows
 - Cross-reference integrity: Policy ↔ standard ↔ ADR bidirectional links
 
 **E2E Tests** (full workflows):
+
 - Create policy → reference from ADR → verify computed reverse references
 - Create standard with "default" status → verify documentation
 - Supersede policy → verify deprecation cascade
@@ -582,12 +606,14 @@ policies:
 ### Observability & Analysis
 
 **Governance Metrics**:
+
 - Count of active policies/standards (by status)
 - Policy reference frequency (which policies are most cited)
 - Standard adoption rate (% of ADRs citing defaults vs deviating)
 - Orphan detection (policies with no reverse references = not implemented)
 
 **Registry Health**:
+
 - Broken reference detection (references to non-existent IDs)
 - Supersession chain validation (no cycles, complete chains)
 - Template conformance (all required sections present)
@@ -601,6 +627,7 @@ policies:
 ### Verification Coverage
 
 All requirements mapped to test artifacts in the `supekku:verification.coverage@v1` block above. Testing strategy ensures:
+
 - Every FR has corresponding VT (verification test)
 - Every NF has corresponding VA (verification analysis/audit)
 - Coverage includes unit, integration, and E2E levels
@@ -608,7 +635,8 @@ All requirements mapped to test artifacts in the `supekku:verification.coverage@
 ### Acceptance Gates
 
 Before feature launch:
-- [ ] All VT-PROD-003-* tests passing
+
+- [ ] All VT-PROD-003-\* tests passing
 - [ ] `just test` passes with new tests
 - [ ] `just lint` and `just pylint` pass
 - [ ] Can create POL-001 and STD-001 via CLI
@@ -627,18 +655,19 @@ Before feature launch:
 - **SPEC-111** (supekku/scripts/lib/formatters): Reuses formatter patterns
 
 **Interaction nature**:
+
 - **Extends**: Policies/standards add new commands to existing CLI modules
 - **Reuses**: Registry, creation, and formatter patterns from decisions domain
 - **Integrates**: Cross-references from ADRs, specs, deltas to policies/standards
 
 ### Risks & Mitigations
 
-| Risk ID | Description | Likelihood | Impact | Mitigation |
-|---------|-------------|------------|--------|------------|
-| RISK-001 | Policy/standard proliferation (too many governance artifacts) | Medium | Medium | Establish creation criteria; periodic review/consolidation |
-| RISK-002 | Inconsistent enforcement (policies documented but not followed) | Medium | High | Link policies to verification artifacts; CI integration (future) |
-| RISK-003 | Confusion between policies and standards | Low | Medium | Clear documentation; status naming ("required" vs "default") |
-| RISK-004 | Orphaned policies (no implementing ADRs) | Medium | Low | Registry reports; encourage linking during ADR creation |
+| Risk ID  | Description                                                     | Likelihood | Impact | Mitigation                                                       |
+| -------- | --------------------------------------------------------------- | ---------- | ------ | ---------------------------------------------------------------- |
+| RISK-001 | Policy/standard proliferation (too many governance artifacts)   | Medium     | Medium | Establish creation criteria; periodic review/consolidation       |
+| RISK-002 | Inconsistent enforcement (policies documented but not followed) | Medium     | High   | Link policies to verification artifacts; CI integration (future) |
+| RISK-003 | Confusion between policies and standards                        | Low        | Medium | Clear documentation; status naming ("required" vs "default")     |
+| RISK-004 | Orphaned policies (no implementing ADRs)                        | Medium     | Low    | Registry reports; encourage linking during ADR creation          |
 
 ### Known Gaps / Debt
 
@@ -673,16 +702,19 @@ Before feature launch:
 ### Examples of Policies vs Standards
 
 **Policies** (required compliance):
+
 - POL-001: Code must have tests
 - POL-002: Never store unencrypted PII
 - POL-003: All APIs must use authentication
 - POL-004: Security vulnerabilities must be patched within 48 hours
 
 **Standards** (required):
+
 - STD-003: Use structured logging format (required for production services)
 - STD-007: Database migrations must be reversible (required for deployments)
 
 **Standards** (default):
+
 - STD-001: Use Google Go Style Guide (recommended unless project-specific needs differ)
 - STD-002: Prefer focused dependencies with active maintainers (sensible default)
 - STD-004: Use UTC for all timestamps (recommended convention)
@@ -691,6 +723,7 @@ Before feature launch:
 ### Migration from Existing Governance Docs
 
 Teams with existing governance documentation can:
+
 1. Identify hard rules → create policies
 2. Identify conventions → create standards with "default" status
 3. Link from ADRs → add `policies:` and `standards:` frontmatter

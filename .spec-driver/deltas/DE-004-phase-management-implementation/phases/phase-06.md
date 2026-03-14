@@ -2,8 +2,8 @@
 id: IP-004.PHASE-06
 slug: 004-phase-management-implementation-phase-06
 name: IP-004 Phase 06 - Schema Completion & Verification
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: draft
 kind: phase
 ---
@@ -146,6 +146,7 @@ tasks:
 ## 1. Objective
 
 Complete the phase management implementation by:
+
 1. **Simplify plan.overview schema** - Remove duplication by storing only phase IDs (not full metadata)
 2. **Add JSON schema for phase.tracking@v1** (currently only has registration)
 3. **Execute verification artifacts** VA-PHASE-001 and VA-PHASE-002
@@ -164,6 +165,7 @@ This is the final phase - all core functionality is implemented and tested.
 - **Related Phase**: Phase 05 implemented phase.tracking but didn't add JSON schema
 
 **Key Files:**
+
 - Schema registry: `supekku/scripts/lib/blocks/schema_registry.py`
 - Metadata schemas: `supekku/scripts/lib/blocks/metadata/`
 - Tracking implementation: `supekku/scripts/lib/blocks/plan.py`
@@ -188,6 +190,7 @@ This is the final phase - all core functionality is implemented and tested.
 ## 5. Verification
 
 **VA-PHASE-001: Performance Benchmark**
+
 ```bash
 # Create test plan with 0 phases
 # Time creation of 20 sequential phases
@@ -196,6 +199,7 @@ This is the final phase - all core functionality is implemented and tested.
 ```
 
 **VA-PHASE-002: UX Review**
+
 ```bash
 # View deltas with different phase counts:
 uv run spec-driver show delta DE-004  # 5 phases
@@ -205,6 +209,7 @@ uv run spec-driver show delta DE-002  # 3 phases (if exists)
 ```
 
 **Schema Validation:**
+
 ```bash
 uv run spec-driver schema show phase.tracking
 # Should display JSON schema, not "not migrated yet" message
@@ -213,34 +218,37 @@ uv run spec-driver schema show phase.tracking
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions:**
+
 - Metadata-driven validation pattern follows existing schemas (phase.overview, plan.overview, etc.)
 - Performance will meet threshold (early tests show <1sec per phase)
 - Delta display already readable (formatter working in practice)
 
 **STOP Conditions:**
+
 - If metadata-driven validation requires major refactoring → escalate to user
 - If performance significantly below threshold → need optimization phase
 - If schema migration breaks existing functionality → rollback required
 
 ## 7. Tasks & Progress
 
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 6.1 | Simplify plan.overview schema (ID-only) | [ ] | See phase-06-implementation-plan.md |
-| [ ] | 6.2 | Update create_phase (write ID only) | [ ] | Backward compat required |
-| [ ] | 6.3 | Update parser for backward compat | [ ] | Handle old + new formats |
-| [ ] | 6.4 | Update plan template | [ ] | Simplified phases array |
-| [ ] | 6.5 | Update and run all tests | [ ] | VT-PHASE-006, formatters |
-| [ ] | 6.6 | Migrate IP-004.md | [ ] | Test with real data |
-| [ ] | 6.7 | Add phase.tracking JSON schema | [P] | Can parallelize with 6.1-6.6 |
-| [ ] | 6.8 | Execute VAs (performance + UX) | [P] | Can parallelize |
-| [ ] | 6.9 | Update registry + DE-004 completion | [ ] | Final step |
+| Status | ID  | Description                             | Parallel? | Notes                               |
+| ------ | --- | --------------------------------------- | --------- | ----------------------------------- |
+| [ ]    | 6.1 | Simplify plan.overview schema (ID-only) | [ ]       | See phase-06-implementation-plan.md |
+| [ ]    | 6.2 | Update create_phase (write ID only)     | [ ]       | Backward compat required            |
+| [ ]    | 6.3 | Update parser for backward compat       | [ ]       | Handle old + new formats            |
+| [ ]    | 6.4 | Update plan template                    | [ ]       | Simplified phases array             |
+| [ ]    | 6.5 | Update and run all tests                | [ ]       | VT-PHASE-006, formatters            |
+| [ ]    | 6.6 | Migrate IP-004.md                       | [ ]       | Test with real data                 |
+| [ ]    | 6.7 | Add phase.tracking JSON schema          | [P]       | Can parallelize with 6.1-6.6        |
+| [ ]    | 6.8 | Execute VAs (performance + UX)          | [P]       | Can parallelize                     |
+| [ ]    | 6.9 | Update registry + DE-004 completion     | [ ]       | Final step                          |
 
 ### Task Details
 
 #### 6.1 Research Metadata-Driven Validation
+
 - **Design / Approach**:
   - Examine `supekku/scripts/lib/blocks/metadata/schema.py`
   - Study how `phase.overview` was migrated to JSON schema
@@ -253,9 +261,10 @@ uv run spec-driver schema show phase.tracking
   - Existing schemas in `metadata/` directory as examples
 
 - **Testing**: Manual review of existing schemas
-- **Observations & AI Notes**: *(To be filled)*
+- **Observations & AI Notes**: _(To be filled)_
 
 #### 6.2 Create JSON Schema for phase.tracking@v1
+
 - **Design / Approach**:
   - Define JSON schema matching PhaseTrackingBlock structure
   - Include file path tracking (references, context, task files)
@@ -267,9 +276,10 @@ uv run spec-driver schema show phase.tracking
   - Or extend existing schema file if pattern suggests it
 
 - **Testing**: Validate against existing phase-05.md tracking block
-- **Observations & AI Notes**: *(To be filled)*
+- **Observations & AI Notes**: _(To be filled)_
 
 #### 6.3 Register Schema in Metadata System
+
 - **Design / Approach**:
   - Add phase.tracking registration to schema_registry
   - Ensure backward compatibility (existing code still works)
@@ -279,9 +289,10 @@ uv run spec-driver schema show phase.tracking
   - Modify: `supekku/scripts/lib/blocks/schema_registry.py`
 
 - **Testing**: Run `schema list` and `schema show phase.tracking`
-- **Observations & AI Notes**: *(To be filled)*
+- **Observations & AI Notes**: _(To be filled)_
 
 #### 6.5 Execute VA-PHASE-001 (Performance Benchmark)
+
 - **Design / Approach**:
   - Create temporary test plan
   - Time 20 sequential phase creations
@@ -289,9 +300,10 @@ uv run spec-driver schema show phase.tracking
   - Document results
 
 - **Acceptance**: All creations <2 seconds
-- **Observations & AI Notes**: *(To be filled)*
+- **Observations & AI Notes**: _(To be filled)_
 
 #### 6.6 Execute VA-PHASE-002 (UX Review)
+
 - **Design / Approach**:
   - Review delta display with varying phase counts
   - Assess readability, truncation effectiveness
@@ -299,25 +311,26 @@ uv run spec-driver schema show phase.tracking
   - Document any UX improvements for future
 
 - **Acceptance**: Display readable and informative
-- **Observations & AI Notes**: *(To be filled)*
+- **Observations & AI Notes**: _(To be filled)_
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Metadata migration requires complex refactoring | Study existing patterns first; ask user if complex | - |
-| JSON schema doesn't support file path structures | Use array of strings, add validation in code if needed | - |
-| Performance benchmark fails threshold | Profile and optimize; acceptable if close (e.g., 2.5sec) | - |
-| Breaking changes to existing tracking blocks | Ensure backward compatibility; test with phase-05.md | - |
+| Risk                                             | Mitigation                                               | Status |
+| ------------------------------------------------ | -------------------------------------------------------- | ------ |
+| Metadata migration requires complex refactoring  | Study existing patterns first; ask user if complex       | -      |
+| JSON schema doesn't support file path structures | Use array of strings, add validation in code if needed   | -      |
+| Performance benchmark fails threshold            | Profile and optimize; acceptable if close (e.g., 2.5sec) | -      |
+| Breaking changes to existing tracking blocks     | Ensure backward compatibility; test with phase-05.md     | -      |
 
 ## 9. Decisions & Outcomes
 
 - `2025-11-03` - Phase 06 scope: Schema completion + verification artifacts (not a full verification phase)
-- *(Update as work progresses)*
+- _(Update as work progresses)_
 
 ## 10. Findings / Research Notes
 
 **Current Status (2025-11-03):**
+
 - `phase.overview` has full JSON schema support ✅
 - `phase.tracking` is registered but says "JSON Schema not yet available" ❌
 - Display already reads from phase files (confirmed via JSON output) ✅
@@ -344,6 +357,7 @@ of all components requiring changes (schema, creation, parser, template, tests).
 ### Work Completed
 
 **Workstream A: Schema Simplification** ✅
+
 - Simplified `plan.overview@v1` schema to ID-only phases array
 - Updated `PLAN_OVERVIEW_METADATA` in `plan_metadata.py`
 - Updated `render_plan_overview_block()` to remove metadata fields
@@ -352,12 +366,14 @@ of all components requiring changes (schema, creation, parser, template, tests).
 - All 101 phase/plan tests passing
 
 **Workstream B: phase.tracking JSON Schema** ✅
+
 - Created `tracking_metadata.py` with complete `PHASE_TRACKING_METADATA`
 - Registered in schema CLI (`supekku/cli/schema.py`)
 - `schema show phase.tracking` now outputs full JSON Schema
 - `schema show phase.tracking --format=yaml-example` works perfectly
 
 ### Files Modified
+
 - `supekku/scripts/lib/blocks/plan_metadata.py` - simplified phases schema
 - `supekku/scripts/lib/blocks/plan.py` - updated render function
 - `supekku/scripts/lib/blocks/plan_render_test.py` - updated test
@@ -367,12 +383,14 @@ of all components requiring changes (schema, creation, parser, template, tests).
 - `change/deltas/*/IP-*.md` - migrated 10 plans to simplified format
 
 ### Quality Gates
+
 - ✅ All tests passing (1235 passed, 13 unrelated failures in policies/standards)
 - ✅ Ruff lint clean
 - ✅ 101 phase/plan tests passing
 - ✅ Schema commands verified working
 
 ### Deferred to Next Session
+
 - VA-PHASE-001 (performance benchmark) - lightweight, can be done during delta completion
 - VA-PHASE-002 (UX review) - lightweight, can be done during delta completion
 - Requirements registry update - will do with final delta completion

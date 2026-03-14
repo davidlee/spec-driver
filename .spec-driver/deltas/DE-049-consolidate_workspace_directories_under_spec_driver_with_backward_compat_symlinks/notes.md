@@ -23,15 +23,15 @@
 
 ### Key source files
 
-| File | Why |
-|---|---|
-| `supekku/scripts/lib/core/paths.py` | Path constants, helpers, `init_paths()`/`reset_paths()`, `_CONFIG_KEY_TO_CONSTANT` |
-| `supekku/scripts/lib/core/config.py` | `DEFAULT_CONFIG["dirs"]`, `load_workflow_config()`, merge logic |
-| `supekku/scripts/install.py` | `initialize_workspace()` — directory creation, memory install, agent docs. **Imports constants directly (violates DE-048 invariant)** |
-| `supekku/scripts/lib/changes/registry.py` | Only real production caller of `get_changes_dir()` (line 45) |
-| `supekku/scripts/lib/deletion/executor.py` | Dead assignment of `get_changes_dir()` (line 299) |
-| `supekku/scripts/lib/sync/adapters/base.py` | Hardcoded `"/specify/"` and `"/change/"` string check (line 92) — only production hardcoded path |
-| `supekku/scripts/lib/core/paths_test.py` | Structural invariant tests that must be rewritten |
+| File                                        | Why                                                                                                                                   |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `supekku/scripts/lib/core/paths.py`         | Path constants, helpers, `init_paths()`/`reset_paths()`, `_CONFIG_KEY_TO_CONSTANT`                                                    |
+| `supekku/scripts/lib/core/config.py`        | `DEFAULT_CONFIG["dirs"]`, `load_workflow_config()`, merge logic                                                                       |
+| `supekku/scripts/install.py`                | `initialize_workspace()` — directory creation, memory install, agent docs. **Imports constants directly (violates DE-048 invariant)** |
+| `supekku/scripts/lib/changes/registry.py`   | Only real production caller of `get_changes_dir()` (line 45)                                                                          |
+| `supekku/scripts/lib/deletion/executor.py`  | Dead assignment of `get_changes_dir()` (line 299)                                                                                     |
+| `supekku/scripts/lib/sync/adapters/base.py` | Hardcoded `"/specify/"` and `"/change/"` string check (line 92) — only production hardcoded path                                      |
+| `supekku/scripts/lib/core/paths_test.py`    | Structural invariant tests that must be rewritten                                                                                     |
 
 ### Relevant memories
 
@@ -50,21 +50,14 @@
 ### Known resolved issues from adversarial review
 
 **Round 1:**
+
 1. Symlink leakiness — resolved by targeted symlinks (DEC-049-03)
 2. This repo's migration unaddressed — resolved by git mv approach (DEC-049-05)
 3. Config override semantics change silently — documented in DEC-049-06
 4. Parent-child test assertions wrong by design — noted in DEC-049-01 consequences
 5. `deletion/executor.py` caller is dead code — corrected in code impact table
 
-**Round 2:**
-6. `install.py` imports constants directly (violates DE-048 invariant) — added to code impact table
-7. `sync/adapters/base.py:92` hardcodes `"/specify/"` and `"/change/"` — added to code impact table
-8. `contracts/` shown in "After" diagram but not in scope — removed from diagram (stays at repo root)
-9. ~400 derived symlinks should be deleted before `git mv` — added as step 0 in migration sequence
-10. `get_backlog_dir()`/`get_memory_dir()` resolution anchor change not in code impact table — added with callers
-11. `init_paths()` should warn on unrecognized `[dirs]` keys — added to DEC-049-06 and code impact table
-12. Decision status symlinks not mentioned — included in step 0 cleanup
-13. DEC-049-04/06 tension noted — flagged as known follow-up interaction
+**Round 2:** 6. `install.py` imports constants directly (violates DE-048 invariant) — added to code impact table 7. `sync/adapters/base.py:92` hardcodes `"/specify/"` and `"/change/"` — added to code impact table 8. `contracts/` shown in "After" diagram but not in scope — removed from diagram (stays at repo root) 9. ~400 derived symlinks should be deleted before `git mv` — added as step 0 in migration sequence 10. `get_backlog_dir()`/`get_memory_dir()` resolution anchor change not in code impact table — added with callers 11. `init_paths()` should warn on unrecognized `[dirs]` keys — added to DEC-049-06 and code impact table 12. Decision status symlinks not mentioned — included in step 0 cleanup 13. DEC-049-04/06 tension noted — flagged as known follow-up interaction
 
 ---
 
@@ -73,6 +66,7 @@
 ### What's done
 
 Three commits, clean sequence:
+
 1. `843f9b1` — Deleted 388 derived symlinks (spec index dirs, alias symlinks, contract mirror symlinks, decision status symlinks, registry_v2.json)
 2. `4d5649a` — `git mv` of 526 files: all content from `specify/`, `change/`, `backlog/`, `memory/` into `.spec-driver/`
 3. `981abac` — Created 10 backward-compat symlinks per DEC-049-03
@@ -87,6 +81,7 @@ Three commits, clean sequence:
 ### Verification
 
 Manual spot-checks pass:
+
 - `specify/tech/SPEC-110/SPEC-110.md` resolves
 - `change/deltas/DE-049-*/DE-049.md` resolves
 - `backlog/improvements/IMPR-008-*/spike.md` resolves
@@ -107,6 +102,7 @@ strategy is formalized.
 ### What's done
 
 One commit: `f6b5d97`
+
 - `paths.py`: removed `SPECS_DIR`, `CHANGES_DIR`, `get_specs_dir()`, `get_changes_dir()`.
   All leaf helpers now resolve under `get_spec_driver_root()`. `init_paths()` warns
   on unrecognized `[dirs]` keys.
@@ -138,6 +134,7 @@ hardcoded path filter also needs updating. `install.py` needs restructuring.
 Uncommitted. All changes in working tree.
 
 **Production code:**
+
 - `install.py`: removed `SPECS_DIR`/`CHANGES_DIR` imports, replaced with
   `SPEC_DRIVER_DIR` + subdirs. Directory creation restructured for flat
   `.spec-driver/` layout. Added `_create_compat_symlinks()` — creates targeted
@@ -148,6 +145,7 @@ Uncommitted. All changes in working tree.
   `"/specify/" or "/change/"` to `"/.spec-driver/"`.
 
 **Test files updated (~34 files total):**
+
 - 22 test files: replaced `SPECS_DIR`/`CHANGES_DIR` imports with `SPEC_DRIVER_DIR`
   in import lines and all fixture path constructions.
 - 12 additional test files discovered via second grep sweep (not in original
@@ -191,6 +189,7 @@ in function bodies.
 ### Hand-off to Phase 4
 
 Phase 4 (regression + cleanup):
+
 - Full regression already passes (`just` green)
 - Agent instruction files may reference old paths — check and update
 - Memory files (`mem.signpost.spec-driver.file-map` etc.) need updating
@@ -213,6 +212,7 @@ Phase 4 (regression + cleanup):
 ### What's done
 
 **Skill sync refactor (`sync.py`):**
+
 - Skills install once to `.spec-driver/skills/` (canonical dir), prune once
   from canonical dir, then ensure **per-skill symlinks** in agent target dirs.
 - New functions: `_is_pre_migration_layout()`, `_ensure_target_symlinks()`,
@@ -221,6 +221,7 @@ Phase 4 (regression + cleanup):
   per-skill outcome dicts).
 
 **Per-skill symlinks (revised from dir-level):**
+
 - Initial implementation used dir-level symlinks (`.claude/skills → ../.spec-driver/skills`).
 - Revised to per-skill symlinks (`.claude/skills/boot → ../../.spec-driver/skills/boot`)
   because dir-level symlinks couldn't represent this repo's post-migration state
@@ -228,6 +229,7 @@ Phase 4 (regression + cleanup):
 - Per-skill approach also allows future per-agent skill differentiation.
 
 **Version stamping (`install.py`):**
+
 - New `_stamp_installed_version()`: writes/updates `spec_driver_installed_version`
   in `workflow.toml` on every install. Uses regex replacement (idempotent).
 - `_get_package_version()`: reads from `importlib.metadata`, falls back to
@@ -235,6 +237,7 @@ Phase 4 (regression + cleanup):
 - Called from `initialize_workspace()` after directory creation.
 
 **Migration detection (revised):**
+
 - `_is_pre_migration_layout()` originally used `_COMPAT_CHILDREN` heuristic
   (checking if `specify/` and `change/` subdirs were real dirs vs symlinks).
 - Revised to check for `spec_driver_installed_version` key in `workflow.toml`.
@@ -243,10 +246,12 @@ Phase 4 (regression + cleanup):
 - `_COMPAT_CHILDREN` constant removed.
 
 **Config (`config.py`):**
+
 - `_merge_defaults()` now preserves user keys not in `DEFAULT_CONFIG`.
   Required for `spec_driver_installed_version` to survive config load/merge.
 
 **Agent docs updated:**
+
 - `supekku/templates/agents/glossary.md`: all `specify/`, `change/`,
   `backlog/` location references → `.spec-driver/` equivalents.
 - `.spec-driver/agents/glossary.md`: same (rendered copy).
@@ -254,16 +259,19 @@ Phase 4 (regression + cleanup):
 - `kanban/` references left as-is — not in DE-049 scope.
 
 **Memory updated:**
+
 - `mem.signpost.spec-driver.file-map`: rewritten for consolidated layout,
   includes skills, symlink structure, all `.spec-driver/` subdirs.
 
 **This repo migrated:**
+
 - Real `.claude/skills/*/SKILL.md` and `.agents/skills/*/SKILL.md` files
   replaced with per-skill symlinks to `../../.spec-driver/skills/*/`.
 - `CONVERGENCE.md` deleted (stale).
 - `workflow.toml` now contains `spec_driver_installed_version`.
 
 **Tests:**
+
 - `sync_test.py`: comprehensive coverage for per-skill symlinks, migration
   detection, canonical install, prune, and e2e sync.
 - `skills_test.py`: updated for new output format (per-skill outcomes).

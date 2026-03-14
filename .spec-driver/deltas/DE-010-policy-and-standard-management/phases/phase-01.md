@@ -2,8 +2,8 @@
 id: IP-010.PHASE-01
 slug: policy-and-standard-management-phase-01
 name: IP-010 Phase 01
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: draft
 kind: phase
 ---
@@ -70,9 +70,11 @@ risks:
 # Phase 01 - Foundation & Domain Models
 
 ## 1. Objective
+
 Build the foundational domain packages for policies and standards with models, registries, and creation logic. Mirror the proven architecture from `supekku/scripts/lib/decisions/` while following architectural principles (SRP, pure functions, no premature abstraction).
 
 ## 2. Links & References
+
 - **Delta**: [DE-010](../DE-010.md)
 - **Implementation Plan**: [IP-010](../IP-010.md)
 - **Specs / PRODs**:
@@ -83,11 +85,13 @@ Build the foundational domain packages for policies and standards with models, r
   - AGENTS.md - Architecture principles
 
 ## 3. Entrance Criteria
+
 - [x] Delta DE-010 approved and PROD-003 reviewed
 - [x] Decisions package structure understood (research complete)
 - [x] Template structure defined (Statement, Rationale, Scope, Verification)
 
 ## 4. Exit Criteria / Done When
+
 - [x] PolicyRecord and StandardRecord models implemented with full frontmatter support
 - [x] PolicyRegistry and StandardRegistry with YAML serialization working
 - [x] Creation functions generate valid files with ID generation and frontmatter
@@ -98,6 +102,7 @@ Build the foundational domain packages for policies and standards with models, r
 - [x] Workspace integration complete (sync_all_registries includes policies/standards)
 
 ## 5. Verification
+
 - **Unit Tests**:
   - `supekku/scripts/lib/policies/registry_test.py` - PolicyRegistry CRUD, filtering, serialization
   - `supekku/scripts/lib/policies/creation_test.py` - ID generation, frontmatter, template rendering
@@ -108,6 +113,7 @@ Build the foundational domain packages for policies and standards with models, r
 - **Evidence**: Test output showing all tests passing, lint output clean
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumptions**:
   - Decisions package patterns are stable and suitable for reuse
   - YAML serialization approach from decisions package works for policies/standards
@@ -118,22 +124,23 @@ Build the foundational domain packages for policies and standards with models, r
   - Registry performance issues discovered (requires architectural discussion)
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Research decisions package architecture | [ ] | DecisionRecord patterns documented |
-| [x] | 1.2 | Create policies/ package structure | [ ] | Complete with __init__, registry, creation |
-| [x] | 1.3 | Create standards/ package structure | [x] | Complete with __init__, registry, creation |
-| [x] | 1.4 | Implement PolicyRecord and StandardRecord models | [ ] | Dataclasses with 19 fields each |
-| [x] | 1.5 | Implement PolicyRegistry with YAML serialization | [ ] | 305 lines, full collect/filter/sync |
-| [x] | 1.6 | Implement StandardRegistry with YAML serialization | [x] | 309 lines, includes "default" status |
-| [x] | 1.7 | Implement policy creation with ID generation | [ ] | 210 lines, POL-XXX generation |
-| [x] | 1.8 | Implement standard creation with ID generation | [x] | 210 lines, STD-XXX generation |
-| [x] | 1.9 | Create policy and standard templates | [ ] | Jinja2 templates in supekku/templates/ |
-| [x] | 1.10 | Write comprehensive unit tests | [ ] | 21 test cases (776 lines total) |
-| [x] | 1.11 | Lint and validate all code | [ ] | Ruff: pass, Pylint: 9.70/10 |
-| [x] | 1.12 | Integrate with Workspace.sync_all_registries | [ ] | Added to central sync, 7/7 tests pass |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID   | Description                                        | Parallel? | Notes                                      |
+| ------ | ---- | -------------------------------------------------- | --------- | ------------------------------------------ |
+| [x]    | 1.1  | Research decisions package architecture            | [ ]       | DecisionRecord patterns documented         |
+| [x]    | 1.2  | Create policies/ package structure                 | [ ]       | Complete with **init**, registry, creation |
+| [x]    | 1.3  | Create standards/ package structure                | [x]       | Complete with **init**, registry, creation |
+| [x]    | 1.4  | Implement PolicyRecord and StandardRecord models   | [ ]       | Dataclasses with 19 fields each            |
+| [x]    | 1.5  | Implement PolicyRegistry with YAML serialization   | [ ]       | 305 lines, full collect/filter/sync        |
+| [x]    | 1.6  | Implement StandardRegistry with YAML serialization | [x]       | 309 lines, includes "default" status       |
+| [x]    | 1.7  | Implement policy creation with ID generation       | [ ]       | 210 lines, POL-XXX generation              |
+| [x]    | 1.8  | Implement standard creation with ID generation     | [x]       | 210 lines, STD-XXX generation              |
+| [x]    | 1.9  | Create policy and standard templates               | [ ]       | Jinja2 templates in supekku/templates/     |
+| [x]    | 1.10 | Write comprehensive unit tests                     | [ ]       | 21 test cases (776 lines total)            |
+| [x]    | 1.11 | Lint and validate all code                         | [ ]       | Ruff: pass, Pylint: 9.70/10                |
+| [x]    | 1.12 | Integrate with Workspace.sync_all_registries       | [ ]       | Added to central sync, 7/7 tests pass      |
 
 ### Task Details
 
@@ -230,13 +237,15 @@ Build the foundational domain packages for policies and standards with models, r
   - **Testing**: `just lint`, `just pylint`
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Decisions package uses internal APIs | Extract patterns, implement independently | Monitored |
-| Template structure needs iteration | Start with spec, refine as needed | Accepted |
-| Duplication with decisions code | Defer abstraction until 3rd use (architectural principle) | Planned |
+
+| Risk                                 | Mitigation                                                | Status    |
+| ------------------------------------ | --------------------------------------------------------- | --------- |
+| Decisions package uses internal APIs | Extract patterns, implement independently                 | Monitored |
+| Template structure needs iteration   | Start with spec, refine as needed                         | Accepted  |
+| Duplication with decisions code      | Defer abstraction until 3rd use (architectural principle) | Planned   |
 
 ## 9. Decisions & Outcomes
+
 - **2025-11-03**: Mirrored DecisionRecord architecture for PolicyRecord/StandardRecord - proven pattern reduces risk
 - **2025-11-03**: Used `spec_utils.load_markdown_file` not `frontmatter.load_markdown_file` - correct import path discovered during testing
 - **2025-11-03**: Added policies/standards to Workspace.sync_all_registries per commit 80bed9d pattern - ensures consistency
@@ -245,7 +254,9 @@ Build the foundational domain packages for policies and standards with models, r
 ## 10. Findings / Research Notes
 
 ### Research Findings (Task 1.1)
+
 **DecisionRecord Architecture** (`supekku/scripts/lib/decisions/`):
+
 - **Model**: 87-line dataclass with 23 fields, `to_dict()` for YAML serialization
 - **Registry**: 259-line class with `collect()`, `filter()`, `sync()`, `sync_with_symlinks()`
 - **Creation**: 194-line module with ID generation, slug creation, frontmatter building, Jinja2 templating
@@ -254,31 +265,37 @@ Build the foundational domain packages for policies and standards with models, r
 - **ID format**: ADR-001 through ADR-999 (3-digit zero-padded)
 
 **Patterns Applied**:
+
 - Registry YAML output to `specify/.registry/{artifact}.yaml`
 - Status-based symlink directories for ADRs (accepted/, draft/, deprecated/)
 - Pure functions for formatting (to be implemented in Phase 02)
 - Frontmatter fields: id, title, status, created, updated, reviewed, owners, supersedes, superseded_by, tags, summary, path, backlinks
 
 ### Implementation Notes
+
 **Code Quality**:
+
 - Total: ~1,610 lines new code (domain logic + tests)
 - Pylint scores: 9.70/10 (policies/standards), 9.92/10 (workspace)
 - Duplicate code warnings acceptable (policies/standards intentionally similar)
 - 13 test failures are test fixture setup issues (template paths), not production code bugs
 
 **Test Coverage**:
+
 - 21 test cases across 4 test files
 - registry_test.py: to_dict, collect, filter, iter, find, write
 - creation_test.py: ID generation, slug creation, frontmatter, file creation
 - workspace_test.py: integration with sync_all_registries
 
 **Workspace Integration** (commit 80bed9d pattern):
+
 - Added `_policies` and `_standards` lazy properties
 - Added `sync_policies()` and `sync_standards()` methods
 - Updated `sync_all_registries()` to include policies (step 3) and standards (step 4)
 - 7/7 workspace tests passing including new assertions for policies.yaml and standards.yaml
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (test output, lint results in findings)
 - [x] IP-010 updated with lessons learned
@@ -287,6 +304,7 @@ Build the foundational domain packages for policies and standards with models, r
 ## 12. Handover Notes for Next Phase
 
 **What's Complete**:
+
 - ✅ Full domain logic: PolicyRecord, StandardRecord, registries, creation functions
 - ✅ Templates: policy-template.md, standard-template.md
 - ✅ Workspace integration: policies/standards in sync_all_registries
@@ -294,6 +312,7 @@ Build the foundational domain packages for policies and standards with models, r
 - ✅ Lint clean: ruff passing, pylint 9.70/10
 
 **Ready for Phase 02 - Formatters**:
+
 - Need: `supekku/scripts/lib/formatters/policy_formatters.py`
 - Need: `supekku/scripts/lib/formatters/standard_formatters.py`
 - Pattern: Follow `decision_formatters.py` (pure functions, table/JSON/TSV output)
@@ -301,11 +320,13 @@ Build the foundational domain packages for policies and standards with models, r
 - Export: Add to `formatters/__init__.py`
 
 **Key Files to Reference**:
+
 - `supekku/scripts/lib/decisions/registry.py` - DecisionRecord model
 - `supekku/scripts/lib/formatters/decision_formatters.py` - Formatter patterns
 - `supekku/scripts/lib/formatters/decision_formatters_test.py` - Test patterns
 
 **Known Issues**:
+
 - 13 test failures in policies/standards unit tests due to template path setup (tests expect templates in temp dir, not supekku/templates/)
 - Not blocking: production code works, workspace tests pass
 - Can be fixed by adjusting test fixtures to copy templates to temp dir

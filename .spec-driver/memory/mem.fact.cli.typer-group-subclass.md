@@ -4,24 +4,25 @@ name: Typer custom Group must subclass TyperGroup
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 tags:
-- cli
-- typer
-summary: Typer cls= parameter requires subclass of typer.core.TyperGroup, not click.Group.
+  - cli
+  - typer
+summary:
+  Typer cls= parameter requires subclass of typer.core.TyperGroup, not click.Group.
   Asserted at app construction time.
-verified: '2026-03-08'
-review_by: '2027-03-08'
+verified: "2026-03-08"
+review_by: "2027-03-08"
 confidence: high
 scope:
   globs:
-  - supekku/cli/**
+    - supekku/cli/**
 provenance:
   sources:
-  - kind: commit
-    ref: e93bc5d
-    note: DE-063 P02 — discovered during implementation
+    - kind: commit
+      ref: e93bc5d
+      note: DE-063 P02 — discovered during implementation
 ---
 
 # Typer custom Group must subclass TyperGroup

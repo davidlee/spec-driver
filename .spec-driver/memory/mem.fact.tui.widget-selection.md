@@ -1,31 +1,31 @@
 ---
 id: mem.fact.tui.widget-selection
-name: 'Widget selection: DataTable vs RichLog vs OptionList vs Tree'
+name: "Widget selection: DataTable vs RichLog vs OptionList vs Tree"
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 tags:
-- tui
-- textual
-- widgets
+  - tui
+  - textual
+  - widgets
 summary: When to use which Textual widget for list-like content in the TUI
 scope:
   globs:
-  - supekku/tui/**
+    - supekku/tui/**
 ---
 
 # Widget selection: DataTable vs RichLog vs OptionList vs Tree
 
 ## Decision heuristic
 
-| Need | Widget | Why |
-|---|---|---|
-| Row selection (click/Enter/cursor) | **DataTable** | Built-in cursor, `RowSelected` message, `move_cursor()` |
-| Append-only log, no selection needed | **RichLog** | `max_lines` auto-pruning, `write(Text)`, no row model |
-| Categorical picker (small list) | **OptionList** | `OptionSelected` message, simple label+id options |
-| Hierarchical/nested navigation | **Tree** | `NodeSelected` message, expand/collapse, `data` on nodes |
+| Need                                 | Widget         | Why                                                      |
+| ------------------------------------ | -------------- | -------------------------------------------------------- |
+| Row selection (click/Enter/cursor)   | **DataTable**  | Built-in cursor, `RowSelected` message, `move_cursor()`  |
+| Append-only log, no selection needed | **RichLog**    | `max_lines` auto-pruning, `write(Text)`, no row model    |
+| Categorical picker (small list)      | **OptionList** | `OptionSelected` message, simple label+id options        |
+| Hierarchical/nested navigation       | **Tree**       | `NodeSelected` message, expand/collapse, `data` on nodes |
 
 ## DataTable specifics
 

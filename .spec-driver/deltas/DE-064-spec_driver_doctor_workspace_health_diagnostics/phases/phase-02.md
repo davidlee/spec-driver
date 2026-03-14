@@ -2,8 +2,8 @@
 id: IP-064.PHASE-02
 slug: 064-spec_driver_doctor_workspace_health_diagnostics-phase-02
 name: IP-064 Phase 02 — Remaining checks (refs, registries, lifecycle)
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---
@@ -65,6 +65,7 @@ categories defined in DR-064. Each check follows the established pattern from
 Phase 1: pure function `(Workspace) -> list[DiagnosticResult]`.
 
 ## 2. Links & References
+
 - **Delta**: DE-064
 - **Design Revision**: DR-064 §6 (check implementations), §5 (validator bridge)
 - **Existing code**:
@@ -74,11 +75,13 @@ Phase 1: pure function `(Workspace) -> list[DiagnosticResult]`.
   - `supekku/scripts/lib/diagnostics/checks/__init__.py` — CHECK_REGISTRY
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete (deps, config, structure checks working)
 - [x] DR-064 §6 reviewed during preflight
 - [x] validator.py and workspace.py APIs confirmed
 
 ## 4. Exit Criteria / Done When
+
 - [x] `check_refs(ws)` delegates to `validate_workspace()`, translates error→fail, warning→warn, info→pass
 - [x] `check_registries(ws)` loads specs, deltas, revisions, audits, decisions without error
 - [x] `check_lifecycle(ws)` detects in-progress deltas older than N days (default 5, from config)
@@ -87,11 +90,13 @@ Phase 1: pure function `(Workspace) -> list[DiagnosticResult]`.
 - [x] `just lint` passes; `just test` passes (2 pre-existing failures only)
 
 ## 5. Verification
+
 - `just test` — new test files pass
 - `just lint` — zero warnings on new files
 - `just pylint-files` on all new/modified files
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - `validate_workspace()` returns issues rather than raising on broken refs
   - Registry `.collect()` raises on parse errors (the value we're testing)
@@ -101,13 +106,13 @@ Phase 1: pure function `(Workspace) -> list[DiagnosticResult]`.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | check_refs: delegate to validate_workspace | [P] | 7 tests |
-| [x] | 2.2 | check_registries: load all registries, catch errors | [P] | 6 tests |
-| [x] | 2.3 | check_lifecycle: stale in-progress deltas | [P] | 10 tests |
-| [x] | 2.4 | Register in CHECK_REGISTRY | | 6 categories total |
-| [x] | 2.5 | Lint and test pass | | 3143 pass, 2 pre-existing fail |
+| Status | ID  | Description                                         | Parallel? | Notes                          |
+| ------ | --- | --------------------------------------------------- | --------- | ------------------------------ |
+| [x]    | 2.1 | check_refs: delegate to validate_workspace          | [P]       | 7 tests                        |
+| [x]    | 2.2 | check_registries: load all registries, catch errors | [P]       | 6 tests                        |
+| [x]    | 2.3 | check_lifecycle: stale in-progress deltas           | [P]       | 10 tests                       |
+| [x]    | 2.4 | Register in CHECK_REGISTRY                          |           | 6 categories total             |
+| [x]    | 2.5 | Lint and test pass                                  |           | 3143 pass, 2 pre-existing fail |
 
 ### Task Details
 
@@ -135,18 +140,21 @@ Phase 1: pure function `(Workspace) -> list[DiagnosticResult]`.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Validator raises instead of returning issues | Wrap in try/except, translate to fail | Open |
-| Registry collect() doesn't raise on parse errors | Verify during implementation; adjust if needed | Open |
+| Risk                                             | Mitigation                                     | Status |
+| ------------------------------------------------ | ---------------------------------------------- | ------ |
+| Validator raises instead of returning issues     | Wrap in try/except, translate to fail          | Open   |
+| Registry collect() doesn't raise on parse errors | Verify during implementation; adjust if needed | Open   |
 
 ## 9. Decisions & Outcomes
+
 - 2026-03-08 — Silent ID dedup detection deferred to IMPR-012
 
 ## 10. Findings / Research Notes
+
 - See preflight in conversation
 
 ## 11. Wrap-up Checklist
+
 - [ ] Exit criteria satisfied
 - [ ] Verification evidence stored
 - [ ] Phase sheet updated with outcomes

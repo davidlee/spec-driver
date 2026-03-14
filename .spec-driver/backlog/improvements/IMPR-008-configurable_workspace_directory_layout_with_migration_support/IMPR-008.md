@@ -1,8 +1,8 @@
 ---
 id: IMPR-008
 name: Configurable workspace directory layout with migration support
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: resolved
 kind: improvement
 resolved_by: DE-049
@@ -78,6 +78,7 @@ directly under `.spec-driver/`:
 ```
 
 Benefits:
+
 - **Single top-level footprint** — zero repo root pollution
 - **Flatter** — no `specify/decisions/` indirection; `decisions/` is self-evident
 - **Config separation** — `config/` groups tooling config (templates, workflow,
@@ -85,6 +86,7 @@ Benefits:
 - **Clearer ownership** — everything spec-driver creates lives under `.spec-driver/`
 
 Trade-offs:
+
 - More siblings at the `.spec-driver/` level (mitigated by clear naming)
 - `config/` is new grouping — current `workflow.toml`, `doctrine.md`, and
   `templates/` live directly in `.spec-driver/`; this moves them one level down
@@ -105,10 +107,12 @@ Keep `specify/` and `change/` grouping but move under `.spec-driver/`:
 ```
 
 Benefits:
+
 - Single footprint, minimal conceptual change
 - Smaller migration (just move dirs down one level)
 
 Trade-offs:
+
 - Retains the `specify/decisions/` indirection
 - Deeper paths for daily browsing
 

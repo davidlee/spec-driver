@@ -1,9 +1,9 @@
 ---
 id: IP-081.PHASE-01
 slug: 081-requirements_subsystem_sync_integrity_lifecycle_and_tags-phase-01
-name: 'IP-081 Phase 01 — Implementation'
-created: '2026-03-09'
-updated: '2026-03-09'
+name: "IP-081 Phase 01 — Implementation"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---
@@ -35,19 +35,19 @@ verification:
     - VT-081-003
   evidence: []
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     description: Add deprecated/superseded constants to lifecycle.py
-  - id: '1.2'
+  - id: "1.2"
     description: Coverage replacement — clear and rebuild in _apply_coverage_blocks
-  - id: '1.3'
+  - id: "1.3"
     description: Terminal status guard in coverage derivation
-  - id: '1.4'
+  - id: "1.4"
     description: Extend _REQUIREMENT_LINE regex for [tag] syntax
-  - id: '1.5'
+  - id: "1.5"
     description: Add tag parameter to filter()
-  - id: '1.6'
+  - id: "1.6"
     description: Tests for all objectives
-  - id: '1.7'
+  - id: "1.7"
     description: Lint and verify
 risks:
   - description: Regex change breaks existing parsing
@@ -68,15 +68,18 @@ Implement all three DE-081 objectives in a single phase. The changes are small,
 tightly scoped to `requirements/`, and naturally tested together.
 
 ## 2. Links & References
+
 - **Delta**: [DE-081](../DE-081.md)
 - **Design Revision**: [DR-081](../DR-081.md) — DEC-081-01 through DEC-081-03
 - **Specs**: SPEC-122.FR-002 (statuses), SPEC-122.NF-002 (idempotency), SPEC-122.FR-004 (extraction)
 - **ADR-008**: Registry is derived; coverage replacement is correct
 
 ## 3. Entrance Criteria
+
 - [x] DR-081 drafted with all design decisions resolved
 
 ## 4. Exit Criteria / Done When
+
 - [ ] Coverage evidence rebuilt fresh each sync
 - [ ] Sync idempotency: run twice → identical registry
 - [ ] `deprecated`/`superseded` accepted as valid statuses
@@ -88,26 +91,28 @@ tightly scoped to `requirements/`, and naturally tested together.
 - [ ] `just pylint-files` on changed files clean
 
 ## 5. Verification
+
 - Run: `just test` (full suite — coverage tests are in registry_test.py)
 - Run: `just lint` and `just pylint-files supekku/scripts/lib/requirements/lifecycle.py supekku/scripts/lib/requirements/registry.py supekku/scripts/lib/requirements/registry_test.py`
 - Evidence: test output captured in notes
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: No other code outside `requirements/` depends on the exact contents of `coverage_evidence` (it's a registry-derived field).
 - STOP when: Existing tests fail in unexpected ways suggesting coverage_evidence is consumed elsewhere.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Add `deprecated`/`superseded` constants + `TERMINAL_STATUSES` to `lifecycle.py` | [P] | POL-002: named constants |
-| [ ] | 1.2 | Clear + rebuild coverage fields in `_apply_coverage_blocks()` | [P] | DEC-081-01 |
-| [ ] | 1.3 | Guard terminal statuses from coverage-derived overwrite | | Depends on 1.1 |
-| [ ] | 1.4 | Extend `_REQUIREMENT_LINE` regex for `[tag1, tag2]` syntax | [P] | DEC-081-03 |
-| [ ] | 1.5 | Populate `tags` in `_records_from_content()` and merge in `RequirementRecord.merge()` | | Depends on 1.4 |
-| [ ] | 1.6 | Add `tag` parameter to `filter()` | | Depends on 1.5 |
-| [ ] | 1.7 | Write tests for all objectives | | TDD — interleave with above |
-| [ ] | 1.8 | Lint and verify | | Final gate |
+| Status | ID  | Description                                                                           | Parallel? | Notes                       |
+| ------ | --- | ------------------------------------------------------------------------------------- | --------- | --------------------------- |
+| [ ]    | 1.1 | Add `deprecated`/`superseded` constants + `TERMINAL_STATUSES` to `lifecycle.py`       | [P]       | POL-002: named constants    |
+| [ ]    | 1.2 | Clear + rebuild coverage fields in `_apply_coverage_blocks()`                         | [P]       | DEC-081-01                  |
+| [ ]    | 1.3 | Guard terminal statuses from coverage-derived overwrite                               |           | Depends on 1.1              |
+| [ ]    | 1.4 | Extend `_REQUIREMENT_LINE` regex for `[tag1, tag2]` syntax                            | [P]       | DEC-081-03                  |
+| [ ]    | 1.5 | Populate `tags` in `_records_from_content()` and merge in `RequirementRecord.merge()` |           | Depends on 1.4              |
+| [ ]    | 1.6 | Add `tag` parameter to `filter()`                                                     |           | Depends on 1.5              |
+| [ ]    | 1.7 | Write tests for all objectives                                                        |           | TDD — interleave with above |
+| [ ]    | 1.8 | Lint and verify                                                                       |           | Final gate                  |
 
 ### Task Details
 
@@ -140,7 +145,8 @@ tightly scoped to `requirements/`, and naturally tested together.
   - **New cases**: Coverage replacement (add/remove/re-sync), idempotency, terminal status guard, tag extraction (with/without category, multiple tags, no tags), tag filter.
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Regex group index shift breaks existing captures | Careful: new group inserted between category and title; update all group references | Open |
-| Coverage clear affects requirements consumed elsewhere | Check for external consumers of coverage_evidence before changing | Open |
+
+| Risk                                                   | Mitigation                                                                          | Status |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------- | ------ |
+| Regex group index shift breaks existing captures       | Careful: new group inserted between category and title; update all group references | Open   |
+| Coverage clear affects requirements consumed elsewhere | Check for external consumers of coverage_evidence before changing                   | Open   |

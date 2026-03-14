@@ -158,6 +158,24 @@ Test cases for --raw flag on show commands.
 - `test_show_raw_flag_in_help(self) -> None`: Test that --raw flag is documented in help.
 - `test_show_spec_raw_flag(self) -> None`: Test --raw flag on show spec.
 
+### ShowRelatedFlagTest
+
+VT-090-P5: Tests for --related neighbourhood view.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `test_show_delta_related(self) -> None`: VT-090-P5-2: show delta --related works.
+- `test_show_delta_related_json(self) -> None`: VT-090-P5-3 (delta): --related --json includes forward refs. - (This test may need adjustment if ISSUE-005 gains reverse refs)
+- `test_show_issue_related_json(self) -> None`: VT-090-P5-3 (issue): --related --json includes related key.
+- `test_show_no_references_no_section(self) -> None`: VT-090-P5-5: Entity with no reverse references → no Referenced by section.
+- `test_show_related_json_output(self) -> None`: VT-090-P5-3: --related --json includes related key with structure.
+- `test_show_requirement_related(self) -> None`: VT-090-P5-1 (requirement): show requirement --related works.
+- `test_show_spec_related_one_hop(self) -> None`: VT-090-P5-1: show spec --related includes referenced-by section.
+- `test_show_spec_related_replaces_count_view(self) -> None`: VT-090-P5-4: --related replaces the count-based Related: section.
+
 ### ShowRevisionRegressionTest
 
 Regression tests for show revision — must pass before AND after migration.

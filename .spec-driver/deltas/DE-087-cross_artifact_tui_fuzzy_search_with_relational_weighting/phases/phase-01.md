@@ -2,8 +2,8 @@
 id: IP-087.PHASE-01
 slug: 087-cross_artifact_tui_fuzzy_search_with_relational_weighting-phase-01
 name: Search core — SearchEntry, index builder, scorer
-created: '2026-03-10'
-updated: '2026-03-10'
+created: "2026-03-10"
+updated: "2026-03-10"
 status: draft
 kind: phase
 ---
@@ -33,13 +33,13 @@ verification:
     - VT-087-003
   evidence: []
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     summary: SearchEntry dataclass and field/weight constants
-  - id: '1.2'
+  - id: "1.2"
     summary: Index builder — _extract_searchable_fields, _extract_relation_targets, build_search_index
-  - id: '1.3'
+  - id: "1.3"
     summary: Scorer — score_entry with tiered weights
-  - id: '1.4'
+  - id: "1.4"
     summary: Tests for all of the above
 risks:
   - description: getattr fragility on heterogeneous records
@@ -55,18 +55,22 @@ phase: IP-087.PHASE-01
 # Phase 01 — Search core
 
 ## 1. Objective
+
 Create the `supekku/tui/search/` package with `SearchEntry`, index builder, and scorer as pure functions. No TUI widget code — this phase is entirely testable without Textual.
 
 ## 2. Links & References
+
 - **Delta**: [DE-087](../DE-087.md)
 - **Design Revision**: [DR-087](../DR-087.md) — DEC-087-01 (SearchEntry), DEC-087-02 (weights), DEC-087-05 (self-contained builder)
 - **Specs**: PROD-010, PROD-015
 - **Reused code**: `artifact_view._REGISTRY_FACTORIES`, `artifact_view.adapt_record`, `relations.query.collect_references`
 
 ## 3. Entrance Criteria
+
 - [x] DR-087 accepted with all design decisions resolved
 
 ## 4. Exit Criteria / Done When
+
 - [x] `supekku/tui/search/__init__.py` exists
 - [x] `SearchEntry` dataclass with `entry`, `searchable_fields`, `relation_targets`
 - [x] `build_search_index(root=)` produces entries for all registry types
@@ -76,6 +80,7 @@ Create the `supekku/tui/search/` package with `SearchEntry`, index builder, and 
 - [x] `just check` green (tests + both linters)
 
 ## 5. Verification
+
 - `just test` — all new tests pass
 - `just lint` — zero warnings on new files
 - `just pylint-files supekku/tui/search/*.py` — no new warnings
@@ -84,18 +89,19 @@ Create the `supekku/tui/search/` package with `SearchEntry`, index builder, and 
 - VT-087-003: ranking invariant — own-ID at moderate match beats relation-target at perfect match
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: `_REGISTRY_FACTORIES` from `artifact_view.py` can be imported and called independently of `ArtifactSnapshot`
 - **Assumption**: All registry `collect()` methods return `dict[str, record]` per ADR-009
 - **STOP**: If any registry's `collect()` signature diverges from ADR-009 convention, consult before adapting
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | SearchEntry dataclass + constants | [ ] | |
-| [x] | 1.2 | Index builder | [ ] | |
-| [x] | 1.3 | Scorer | [ ] | |
-| [x] | 1.4 | Tests | [ ] | 32 tests passing |
+| Status | ID  | Description                       | Parallel? | Notes            |
+| ------ | --- | --------------------------------- | --------- | ---------------- |
+| [x]    | 1.1 | SearchEntry dataclass + constants | [ ]       |                  |
+| [x]    | 1.2 | Index builder                     | [ ]       |                  |
+| [x]    | 1.3 | Scorer                            | [ ]       |                  |
+| [x]    | 1.4 | Tests                             | [ ]       | 32 tests passing |
 
 ### Task Details
 

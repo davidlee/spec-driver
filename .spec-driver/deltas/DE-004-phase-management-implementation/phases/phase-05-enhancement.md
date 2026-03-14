@@ -12,15 +12,16 @@ Added file path tracking to `phase.tracking@v1` schema for better traceability a
 
 ```yaml
 files:
-  references:  # Research/reference materials consulted
+  references: # Research/reference materials consulted
     - "path/to/spec.md"
     - "path/to/exemplar_code.py"
-  context:     # Related phases, similar implementations (supports globs)
+  context: # Related phases, similar implementations (supports globs)
     - "path/to/similar/phase.md"
-    - "change/deltas/DE-*/phases/phase-*.md"  # Glob patterns work
+    - "change/deltas/DE-*/phases/phase-*.md" # Glob patterns work
 ```
 
 **Use cases**:
+
 - **references**: Document which specs/docs/code were referenced during phase
 - **context**: Point to similar phases, related implementations for context
 - Audit trail: "What did we read to understand this?"
@@ -34,17 +35,18 @@ tasks:
     description: "..."
     status: completed
     files:
-      added:     # New files created
+      added: # New files created
         - "path/to/new_file.py"
-      modified:  # Existing files changed
+      modified: # Existing files changed
         - "path/to/updated_file.py"
-      removed:   # Files deleted
+      removed: # Files deleted
         - "path/to/old_file.py"
-      tests:     # Test files (added or run)
+      tests: # Test files (added or run)
         - "path/to/test_file.py"
 ```
 
 **Use cases**:
+
 - Track which files were touched per task
 - Link tasks to specific code changes
 - Identify test coverage per task
@@ -78,12 +80,12 @@ tasks:
 ```yaml
 files:
   references:
-    - "supekku/scripts/lib/blocks/plan.py"  # Existing pattern to follow
-    - "supekku/scripts/lib/blocks/verification_test.py"  # Test example
-    - "specify/product/PROD-006/PROD-006.md"  # Spec
+    - "supekku/scripts/lib/blocks/plan.py" # Existing pattern to follow
+    - "supekku/scripts/lib/blocks/verification_test.py" # Test example
+    - "specify/product/PROD-006/PROD-006.md" # Spec
   context:
-    - "change/deltas/DE-004-*/phases/phase-01.md"  # Similar phase
-    - "change/deltas/DE-004-*/phases/phase-04.md"  # Another similar phase
+    - "change/deltas/DE-004-*/phases/phase-01.md" # Similar phase
+    - "change/deltas/DE-004-*/phases/phase-04.md" # Another similar phase
 
 tasks:
   - id: "5.1"
@@ -133,6 +135,7 @@ tasks:
 ## Summary
 
 File path tracking makes the phase.tracking@v1 schema **even more delicious** by adding:
+
 - Phase-level context (what we referenced)
 - Task-level granularity (what we changed)
 - Optional fields (no breaking changes)

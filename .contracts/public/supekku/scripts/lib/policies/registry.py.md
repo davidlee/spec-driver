@@ -15,10 +15,10 @@ Record representing a Policy with metadata.
 - `to_dict(self, root) -> dict[Tuple[str, Any]]`: Convert to dictionary for YAML serialization.
 
 Args:
-    root: Repository root path for relativizing file paths
+root: Repository root path for relativizing file paths
 
 Returns:
-    Dictionary representation suitable for YAML serialization
+Dictionary representation suitable for YAML serialization
 
 ### PolicyRegistry
 

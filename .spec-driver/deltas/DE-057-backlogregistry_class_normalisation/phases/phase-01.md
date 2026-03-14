@@ -2,8 +2,8 @@
 id: IP-057.PHASE-01
 slug: 057-backlogregistry_class_normalisation-phase-01
 name: IP-057 Phase 01 - Core Modelling
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: draft
 kind: phase
 ---
@@ -31,13 +31,13 @@ verification:
     - VT-057-status-enums
   evidence: []
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     description: Define per-kind status sets in models.py
-  - id: '1.2'
+  - id: "1.2"
     description: Implement BacklogRegistry class in registry.py
-  - id: '1.3'
+  - id: "1.3"
     description: Convert module-level functions to thin wrappers
-  - id: '1.4'
+  - id: "1.4"
     description: Write tests for registry class and status sets
 risks:
   - description: Status sets incomplete
@@ -120,14 +120,14 @@ consumers.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Define per-kind status sets in models.py | [P] | DEC-057-02, -08 |
-| [ ] | 1.2 | Implement BacklogRegistry class | | DEC-057-01, -05 |
-| [ ] | 1.3 | Convert module-level functions to wrappers | | DEC-057-04; after 1.2 |
-| [ ] | 1.4 | Write VT-057-registry tests | | After 1.2 |
-| [ ] | 1.5 | Write VT-057-status-enums tests | [P] | After 1.1 |
-| [ ] | 1.6 | Lint + full test pass | | After all above |
+| Status | ID  | Description                                | Parallel? | Notes                 |
+| ------ | --- | ------------------------------------------ | --------- | --------------------- |
+| [ ]    | 1.1 | Define per-kind status sets in models.py   | [P]       | DEC-057-02, -08       |
+| [ ]    | 1.2 | Implement BacklogRegistry class            |           | DEC-057-01, -05       |
+| [ ]    | 1.3 | Convert module-level functions to wrappers |           | DEC-057-04; after 1.2 |
+| [ ]    | 1.4 | Write VT-057-registry tests                |           | After 1.2             |
+| [ ]    | 1.5 | Write VT-057-status-enums tests            | [P]       | After 1.1             |
+| [ ]    | 1.6 | Lint + full test pass                      |           | After all above       |
 
 ### Task Details
 
@@ -175,10 +175,10 @@ consumers.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Wrapper functions change subtle behaviour | Grep all callers; test existing behaviour before wrapping | open |
-| Status sets miss valid values | Permissive validation (warn, don't reject) | mitigated |
+| Risk                                      | Mitigation                                                | Status    |
+| ----------------------------------------- | --------------------------------------------------------- | --------- |
+| Wrapper functions change subtle behaviour | Grep all callers; test existing behaviour before wrapping | open      |
+| Status sets miss valid values             | Permissive validation (warn, don't reject)                | mitigated |
 
 ## 9. Decisions & Outcomes
 

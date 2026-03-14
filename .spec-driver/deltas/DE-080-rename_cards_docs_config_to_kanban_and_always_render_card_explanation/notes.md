@@ -18,4 +18,3 @@
 
 - `just check` passes (3507 tests, 0 failures, ruff clean)
 - Regenerated agent docs via `spec-driver install` — glossary renders card explanation with `kanban.enabled = false`
-

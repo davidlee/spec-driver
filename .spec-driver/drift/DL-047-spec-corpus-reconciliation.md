@@ -1,8 +1,8 @@
 ---
 id: DL-047
 name: Spec corpus reconciliation
-created: '2026-03-05'
-updated: '2026-03-06'
+created: "2026-03-05"
+updated: "2026-03-06"
 status: open # 20 resolved, 1 dismissed — all entries addressed
 kind: drift_ledger
 delta_ref: DE-047
@@ -16,40 +16,40 @@ docs.
 
 ## Corpus coverage
 
-| Document | Surveyed | Entries |
-| --- | --- | --- |
-| PROD-001 | yes | .006 |
-| PROD-002 | yes | .001, .011 |
-| PROD-003 | yes | .005, .015 |
-| PROD-004 | yes | — clean |
-| PROD-005 | yes | .003 |
-| PROD-006 | yes | — clean |
-| PROD-007 | yes | — clean |
-| PROD-008 | yes | .009, .017 |
-| PROD-009 | yes | .009, .017, .018 |
-| PROD-010 | yes | — clean |
-| PROD-011 | yes | .001, .020 |
-| PROD-012 | yes | .002, .003, .004, .012, .013 |
-| PROD-013 | yes | — clean |
-| PROD-014 | yes | .004, .013 |
-| PROD-015 | yes | .016 |
-| PROD-016 | yes | .007, .010, .014 |
-| ADR-001 | yes | — clean |
-| ADR-002 | yes | .005, .015 |
-| ADR-003 | yes | .003, .010, .016 |
-| POL-001 | yes | — clean |
-| POL-002 | yes | — clean |
-| CLAUDE.md | yes | .003 |
-| glossary.md | yes | .008, .019 |
-| workflow.md | yes | .007, .008 |
-| agents/glossary.md | yes | .008 |
-| doctrine.md | yes | .008, .014 |
-| INIT.md | yes | .019 |
-| .spec-driver/about/README.md | yes | .021 |
-| .spec-driver/about/glossary.md | yes | .021 |
-| .spec-driver/about/backlog.md | yes | .021 |
-| .spec-driver/about/processes.md | yes | .021 |
-| .spec-driver/about/lifecycle.md | yes | — clean |
+| Document                        | Surveyed | Entries                      |
+| ------------------------------- | -------- | ---------------------------- |
+| PROD-001                        | yes      | .006                         |
+| PROD-002                        | yes      | .001, .011                   |
+| PROD-003                        | yes      | .005, .015                   |
+| PROD-004                        | yes      | — clean                      |
+| PROD-005                        | yes      | .003                         |
+| PROD-006                        | yes      | — clean                      |
+| PROD-007                        | yes      | — clean                      |
+| PROD-008                        | yes      | .009, .017                   |
+| PROD-009                        | yes      | .009, .017, .018             |
+| PROD-010                        | yes      | — clean                      |
+| PROD-011                        | yes      | .001, .020                   |
+| PROD-012                        | yes      | .002, .003, .004, .012, .013 |
+| PROD-013                        | yes      | — clean                      |
+| PROD-014                        | yes      | .004, .013                   |
+| PROD-015                        | yes      | .016                         |
+| PROD-016                        | yes      | .007, .010, .014             |
+| ADR-001                         | yes      | — clean                      |
+| ADR-002                         | yes      | .005, .015                   |
+| ADR-003                         | yes      | .003, .010, .016             |
+| POL-001                         | yes      | — clean                      |
+| POL-002                         | yes      | — clean                      |
+| CLAUDE.md                       | yes      | .003                         |
+| glossary.md                     | yes      | .008, .019                   |
+| workflow.md                     | yes      | .007, .008                   |
+| agents/glossary.md              | yes      | .008                         |
+| doctrine.md                     | yes      | .008, .014                   |
+| INIT.md                         | yes      | .019                         |
+| .spec-driver/about/README.md    | yes      | .021                         |
+| .spec-driver/about/glossary.md  | yes      | .021                         |
+| .spec-driver/about/backlog.md   | yes      | .021                         |
+| .spec-driver/about/processes.md | yes      | .021                         |
+| .spec-driver/about/lifecycle.md | yes      | — clean                      |
 
 ## Entries
 
@@ -157,7 +157,7 @@ affected_artifacts:
   - CLAUDE.md
 evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
-  - "2026-03-05 adjudicated: contracts are derived, deterministic, and canonical as a record of what code exposes — but not a competing source of intent. One ADR for \"contract role and canonical location\" then REs to align affected specs. ADR should establish role and derivation model firmly but leave default location configurable (DE-044 is pursuing configurable paths; possible future move of defaults into .spec-driver/)."
+  - '2026-03-05 adjudicated: contracts are derived, deterministic, and canonical as a record of what code exposes — but not a competing source of intent. One ADR for "contract role and canonical location" then REs to align affected specs. ADR should establish role and derivation model firmly but leave default location configurable (DE-044 is pursuing configurable paths; possible future move of defaults into .spec-driver/).'
 ```
 
 PROD-005 made a deliberate decision to keep contracts in spec bundles. Later specs (PROD-012, PROD-014) and ADR-003 reversed this. PROD-005 was never revised to acknowledge the change.
@@ -316,13 +316,14 @@ affected_artifacts:
   - .spec-driver/agents/glossary.md
 evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
-  - "2026-03-06 adjudicated: configuration-dependent, not a contradiction. Kanban = low-ceremony gateway; \"card\" = polymorphic work-tracking artifact. Patch docs for clarity; full resolution via PROD-016 installer."
+  - '2026-03-06 adjudicated: configuration-dependent, not a contradiction. Kanban = low-ceremony gateway; "card" = polymorphic work-tracking artifact. Patch docs for clarity; full resolution via PROD-016 installer.'
   - "2026-03-06 resolved: patched doctrine.md (polymorphic card definition, ceremony-mode framing) and workflow.md (bridging sentence for low-ceremony kanban path). glossary.md already correct."
 ```
 
 Not a true contradiction — it's configuration-dependent, ultimately resolved by the interview-based installer (PROD-016.FR-004) setting workflow options per project. Depending on ceremony level, kanban cards or deltas (or both) may be active.
 
 Key clarifications:
+
 1. Kanban is a simpler, looser mode — a gateway drug to spec-driven work. Not deprecated, but positioned as low-ceremony entry point.
 2. "Card" is intentionally overloaded in boot scripts to mean "whatever artifact tracks active work in this project" — could be kanban card, delta, revision, or audit. It's the identifying thing you search for and write up work on.
 3. The apparent conflict between doctrine and workflow dissolves once ceremony mode properly maps to default artifact types — which is installer/config territory, not a doc-level decision.
@@ -567,7 +568,7 @@ affected_artifacts:
   - CLAUDE.md
 evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
-  - "2026-03-05 adjudicated: remove \"interaction\" from c4_level enum (ADR-003, CLAUDE.md). Suspected confabulation — C4 is wrong home for UX specs. Backlog item for UX/interaction spec concept."
+  - '2026-03-05 adjudicated: remove "interaction" from c4_level enum (ADR-003, CLAUDE.md). Suspected confabulation — C4 is wrong home for UX specs. Backlog item for UX/interaction spec concept.'
 ```
 
 Likely agent confabulation based on a desire to home UX/interaction design specs. C4 is the wrong model for this — C4 levels describe system decomposition, not interaction modalities. Remove "interaction" from the c4_level enum in ADR-003 and CLAUDE.md. Backlog the idea of a proper home for UX/visual design/interactivity specifications as a separate concept (not a C4 level).
@@ -627,7 +628,7 @@ affected_artifacts:
   - PROD-009
 evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
-  - "2026-03-05 adjudicated: define in lifecycle ADR (.009). \"asserted\" = normative claim without evidence; \"legacy_verified\" = grandfathered observed truth. RE on PROD-009 to add definitions."
+  - '2026-03-05 adjudicated: define in lifecycle ADR (.009). "asserted" = normative claim without evidence; "legacy_verified" = grandfathered observed truth. RE on PROD-009 to add definitions.'
 ```
 
 These statuses support the normative/observed distinction. "asserted" = claimed without evidence (normative baseline for pre-existing requirements). "legacy_verified" = considered verified before the system existed (grandfathered observed truth). Definitions should be formalized in the lifecycle ADR and reflected in PROD-009 RE.
@@ -753,6 +754,7 @@ evidence:
 This is arguably the most important gap in the corpus. The core loop is the foundational concept — if agents can't converge on a consistent description, everything downstream wobbles. Individual specs are consistent on their piece of the loop, but no document owns the full narrative with all permutations precisely defined. An ADR should canonically stake out the loop and its variants. May ultimately deserve its own PROD spec.
 
 Heresy audit of .spec-driver/about/ found active contamination:
+
 - README.md lines 71-78: describes a spec-first waterfall loop (Capture → Specify → Scope → ...) that contradicts delta-first doctrine. Worst offender.
 - README.md line 72: positions spec creation/update before delta scoping.
 - README.md line 72: implies revision is an alternative to delta for non-code changes, conflating their purposes.

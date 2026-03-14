@@ -15,7 +15,7 @@
 ### Design notes for Phase 2
 
 - `EventListener.get_replay_events()` returns `list[dict]` and records the
-  file offset internally. Call it *before* `start()` — the bootstrap drain
+  file offset internally. Call it _before_ `start()` — the bootstrap drain
   in `start()` reads from that offset forward.
 - `EventListener.start(app)` posts `TrackEvent` messages to the app. The app
   must bridge these to the active TrackScreen (events arrive at the app level,
@@ -84,4 +84,3 @@
 - ruff: zero warnings
 - pylint on edited files: 9.70+ (all messages pre-existing)
 - Uncommitted work
-

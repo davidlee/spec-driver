@@ -1,8 +1,8 @@
 ---
 id: IMPR-003
 name: kanban support
-created: '2026-02-03'
-updated: '2026-02-03'
+created: "2026-02-03"
+updated: "2026-02-03"
 status: resolved
 kind: improvement
 ---
@@ -16,6 +16,7 @@ but SpecDriver currently treats them as “just files”, which makes it easy fo
 workflows to break when folders change.
 
 Primary value:
+
 - ID-based linking (T-cards, ADRs, SPEC/PROD, deltas/plans) that survives folder moves.
 - Simple dependency expression and query (`T123` depends on `T120`, etc).
 - Fast find/show commands for the “where is this ID?” workflow.
@@ -62,15 +63,18 @@ Primary value:
 ### Metadata (minimal, markdown-first)
 
 Required by convention:
+
 - First H1: `# T###: <title>`
 - `Created: YYYY-MM-DD` line (written/updated on create)
 
 Optional, parsed for dependencies/links (no YAML required):
+
 - A section containing lines like:
   - `Depends: T120, ADR-003, SPEC-210`
   - `Related: T100, PROD-042`
 
 Rules:
+
 - Parsing must be tolerant: missing sections/lines yield empty sets.
 - Only IDs are interpreted; everything else remains freeform Markdown.
 
@@ -94,12 +98,14 @@ Rules:
 ### Domain
 
 Add `supekku/scripts/lib/cards/`:
+
 - `models.py`: `Card` dataclass (id, title, lane, path, created, depends, related)
 - `registry.py`: `CardRegistry` for discovery, id allocation, creation, resolution
 
 ### Formatters
 
 Add `supekku/scripts/lib/formatters/card_formatters.py` (pure functions):
+
 - `format_card_list_table(cards, format_type, truncate)`
 - `format_card_details(card)`
 
@@ -134,4 +140,3 @@ Add `supekku/scripts/lib/formatters/card_formatters.py` (pure functions):
 - `uv run spec-driver show card T123 -q` prints a single path when unambiguous.
 - `uv run spec-driver find card T123` lists all matching `T123-*.md` in repo.
 - `uv run spec-driver list cards --format json` emits machine-readable output.
-

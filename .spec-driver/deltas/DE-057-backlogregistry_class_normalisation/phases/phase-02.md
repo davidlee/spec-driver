@@ -2,8 +2,8 @@
 id: IP-057.PHASE-02
 slug: 057-backlogregistry_class_normalisation-phase-02
 name: IP-057 Phase 02 - Integration
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: draft
 kind: phase
 ---
@@ -38,19 +38,19 @@ verification:
     - VT-057-regression
   evidence: []
 tasks:
-  - id: '2.1'
+  - id: "2.1"
     description: Remove artifact_view.py shim, add factory
-  - id: '2.2'
+  - id: "2.2"
     description: Update cli/common.py resolvers
-  - id: '2.3'
+  - id: "2.3"
     description: Update cli/list.py to use BacklogRegistry
-  - id: '2.4'
+  - id: "2.4"
     description: Fix ISSUE-026 — dry_run threading in sync.py
-  - id: '2.5'
+  - id: "2.5"
     description: Fix ISSUE-034 — link resolver backlog support
-  - id: '2.6'
+  - id: "2.6"
     description: Fix ISSUE-043 — --from-backlog validation callback
-  - id: '2.7'
+  - id: "2.7"
     description: Write/update tests for all integration changes
 risks:
   - description: Shim removal changes error behaviour
@@ -134,16 +134,16 @@ and fix the three operational gaps (ISSUE-026, -034, -043).
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Remove artifact_view.py shim, add factory | | DEC-057-09 |
-| [ ] | 2.2 | Update cli/common.py resolvers | | Preserve kind scoping |
-| [ ] | 2.3 | Update cli/list.py | | Use DEFAULT_HIDDEN_STATUSES |
-| [ ] | 2.4 | Fix ISSUE-026 — dry_run in sync.py | [P] | Independent |
-| [ ] | 2.5 | Fix ISSUE-034 — link resolver | [P] | Independent |
-| [ ] | 2.6 | Fix ISSUE-043 — --from-backlog callback | [P] | DEC-057-07 |
-| [ ] | 2.7 | Write/update tests | | After 2.1-2.6 |
-| [ ] | 2.8 | Lint + full test pass | | After all above |
+| Status | ID  | Description                               | Parallel? | Notes                       |
+| ------ | --- | ----------------------------------------- | --------- | --------------------------- |
+| [ ]    | 2.1 | Remove artifact_view.py shim, add factory |           | DEC-057-09                  |
+| [ ]    | 2.2 | Update cli/common.py resolvers            |           | Preserve kind scoping       |
+| [ ]    | 2.3 | Update cli/list.py                        |           | Use DEFAULT_HIDDEN_STATUSES |
+| [ ]    | 2.4 | Fix ISSUE-026 — dry_run in sync.py        | [P]       | Independent                 |
+| [ ]    | 2.5 | Fix ISSUE-034 — link resolver             | [P]       | Independent                 |
+| [ ]    | 2.6 | Fix ISSUE-043 — --from-backlog callback   | [P]       | DEC-057-07                  |
+| [ ]    | 2.7 | Write/update tests                        |           | After 2.1-2.6               |
+| [ ]    | 2.8 | Lint + full test pass                     |           | After all above             |
 
 ### Task Details
 
@@ -198,11 +198,11 @@ and fix the three operational gaps (ISSUE-026, -034, -043).
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Shim removal error behaviour change | Test per-record placeholders explicitly (DEC-057-09) | open |
-| common.py drops kind scoping | Preserve kind validation in resolver (adversarial review finding) | open |
-| --from-backlog still greedy for --help | Acknowledged as Click limitation; mitigation only (DEC-057-07) | accepted |
+| Risk                                   | Mitigation                                                        | Status   |
+| -------------------------------------- | ----------------------------------------------------------------- | -------- |
+| Shim removal error behaviour change    | Test per-record placeholders explicitly (DEC-057-09)              | open     |
+| common.py drops kind scoping           | Preserve kind validation in resolver (adversarial review finding) | open     |
+| --from-backlog still greedy for --help | Acknowledged as Click limitation; mitigation only (DEC-057-07)    | accepted |
 
 ## 9. Decisions & Outcomes
 

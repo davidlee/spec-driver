@@ -4,22 +4,23 @@ name: Pioneer Ceremony Mode
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-06'
-verified: '2026-03-06'
+updated: "2026-03-06"
+verified: "2026-03-06"
 confidence: high
 tags:
-- spec-driver
-- ceremony
-- pioneer
-summary: 'Low ceremony: ship and learn. Cards for most work, optional ADRs, minimal
-  spec-driver overhead. Speed over traceability.'
+  - spec-driver
+  - ceremony
+  - pioneer
+summary:
+  "Low ceremony: ship and learn. Cards for most work, optional ADRs, minimal
+  spec-driver overhead. Speed over traceability."
 priority:
   severity: medium
   weight: 7
 provenance:
   sources:
-  - kind: adr
-    ref: ADR-004
+    - kind: adr
+      ref: ADR-004
 ---
 
 # Pioneer Ceremony Mode

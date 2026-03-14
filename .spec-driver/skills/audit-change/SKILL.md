@@ -2,14 +2,17 @@
 name: audit-change
 description: Canonical reconciliation runsheet for AUD artefacts. Create or update the audit, disposition every finding, reconcile specs/contracts, and hand off to closure only when audit state supports it.
 ---
+
 You are running the canonical audit reconciliation loop.
 
 Inputs:
+
 - Delta/phase outputs, relevant specs, contracts, and verification artifacts.
 - Owning delta/phase/DR context when this is post-implementation conformance work.
 - Ceremony/policy posture from generated agent docs.
 
 Process:
+
 1. Determine audit mode and owner:
    - `conformance` for post-implementation audit tied to a delta
    - `discovery` for backfill or existing-code investigation
@@ -56,14 +59,18 @@ Process:
    - create follow-up deltas or backlog items only when immediate reconciliation is not the right path
    - keep the audit as the closure-grade record; optional drift-ledger linkage does not replace disposition
 10. Run the repository reconciliation commands:
-   - `uv run spec-driver sync`
-   - `uv run spec-driver validate`
+
+- `uv run spec-driver sync`
+- `uv run spec-driver validate`
+
 11. Decide the handoff:
-   - if this is qualifying conformance work and any blocking finding remains unresolved, do not hand off to `/close-change`
-   - if findings route to follow-up work or tolerated drift with material tradeoffs, `/consult` before normalizing around them
-   - hand off to `/close-change` only after the audit artefact, owning specs, and follow-up refs tell a coherent closure story
+
+- if this is qualifying conformance work and any blocking finding remains unresolved, do not hand off to `/close-change`
+- if findings route to follow-up work or tolerated drift with material tradeoffs, `/consult` before normalizing around them
+- hand off to `/close-change` only after the audit artefact, owning specs, and follow-up refs tell a coherent closure story
 
 Outcomes:
+
 - Audit evidence is recorded in a canonical `AUD-*` artefact.
 - Every finding ends with an explicit, machine-checkable disposition.
 - Specs/contracts/follow-up artefacts are reconciled before closure handoff, with an explicit preference order of `spec_patch -> revision -> revision-led new spec`.

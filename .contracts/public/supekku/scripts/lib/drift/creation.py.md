@@ -13,12 +13,12 @@ Allocates the next DL-NNN ID by scanning existing files. Creates
 .spec-driver/drift/ directory if needed.
 
 Args:
-  name: Ledger name/title.
-  delta_ref: Optional owning delta (e.g. "DE-065").
-  repo_root: Repository root (auto-detected if None).
+name: Ledger name/title.
+delta_ref: Optional owning delta (e.g. "DE-065").
+repo_root: Repository root (auto-detected if None).
 
 Returns:
-  Path to the created ledger file.
+Path to the created ledger file.
 
 Raises:
-  ValueError: If name is empty.
+ValueError: If name is empty.

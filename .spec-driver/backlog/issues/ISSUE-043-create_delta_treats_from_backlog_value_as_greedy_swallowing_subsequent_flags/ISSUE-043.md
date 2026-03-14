@@ -1,8 +1,8 @@
 ---
 id: ISSUE-043
 name: create delta treats --from-backlog value as greedy, swallowing subsequent flags
-created: '2026-03-06'
-updated: '2026-03-07'
+created: "2026-03-06"
+updated: "2026-03-07"
 status: resolved
 kind: issue
 categories: []
@@ -45,4 +45,3 @@ the option value — Click's parser grabs the next token before the callback run
 A full fix would require changing the CLI shape (e.g. making `--from-backlog` a
 boolean flag with the ID as a separate argument). Status: `in-progress` — root
 cause remains.
-

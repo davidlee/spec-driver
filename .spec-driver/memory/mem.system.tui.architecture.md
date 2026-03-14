@@ -1,24 +1,25 @@
 ---
 id: mem.system.tui.architecture
-name: 'TUI app architecture: screens, widgets, listener, watcher'
+name: "TUI app architecture: screens, widgets, listener, watcher"
 kind: memory
 status: active
 memory_type: system
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 tags:
-- tui
-- textual
-- architecture
-summary: How SpecDriverApp composes screens, EventListener, file watcher, and test
+  - tui
+  - textual
+  - architecture
+summary:
+  How SpecDriverApp composes screens, EventListener, file watcher, and test
   harness
 scope:
   globs:
-  - supekku/tui/**
+    - supekku/tui/**
 links:
   missing:
-  - raw: DEC-053-14
-  - raw: DEC-054-01
+    - raw: DEC-053-14
+    - raw: DEC-054-01
 ---
 
 # TUI app architecture: screens, widgets, listener, watcher
@@ -45,7 +46,7 @@ SpecDriverApp (supekku/tui/app.py)
 - **Events**: CLI → `.spec-driver/run/events.jsonl` + `tui.sock` → EventListener → `TrackEvent` message → App.on_track_event → TrackScreen.add_event
 - **Artifacts**: registries → ArtifactSnapshot (with bundle_dir detection) → BrowserScreen widgets
 - **Navigation**: TrackPanel row select → TrackScreen → App.action_navigate_artifact → switch to browser + BrowserScreen.navigate_to_artifact
-- **File watch**: watchfiles → App._watch_files → BrowserScreen.refresh_snapshot
+- **File watch**: watchfiles → App.\_watch_files → BrowserScreen.refresh_snapshot
 
 ## Test harness
 

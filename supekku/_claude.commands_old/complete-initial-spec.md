@@ -1,15 +1,18 @@
 # Agent Playbook: Complete Initial Spec (Claude Sonnet)
 
 ## Purpose
+
 You are filling out a brand-new SPEC (tech or product) using the templates under `.spec-driver/templates/`. Your job is to extract the current behaviour from the codebase and produce a plausible, traceable description that humans and other agents can refine.
 
 ## Inputs
+
 - Spec directory scaffolded via `.spec-driver/scripts/create-new-spec.py Name Here`.
 - Newly created spec file, e.g. `doc/specify/tech/SPEC-XYZ-*/SPEC-XYZ.md` (and `SPEC-XYZ.tests.md` when present).
 - Reference corpus under `doc/reference/`, existing PROD/SPEC docs, ADRs, policies, backlog notes.
 - Source code (Go) and tests (`internal/`, `cmd/`, `test/`, etc.).
 
 ## Preparation Checklist
+
 - [ ] Locate the spec directory (`doc/specify/tech/SPEC-XYZ-name-here`) and open the main spec file alongside the testing companion (if present).
 - [ ] Skim related reference docs (`doc/reference`, linked ADRs/policies) to understand context.
 - [ ] Identify primary packages/modules by searching for the spec’s responsibility keywords (use `rg` / `fd`).
@@ -17,6 +20,7 @@ You are filling out a brand-new SPEC (tech or product) using the templates under
 - [ ] Note any existing decision records relevant to this area (`decisions/approved`).
 
 ## Procedure
+
 1. **Anchor the Intent (Section 1)**
    - Summarise current behaviour in plain English.
    - Link to any authoritative references (design docs, research, ADRs, policies).
@@ -70,7 +74,9 @@ You are filling out a brand-new SPEC (tech or product) using the templates under
     - Add diagrams (D2/Mermaid), expanded API examples, or migration details if they aid comprehension.
 
 ## Quality Gate
+
 Before finishing:
+
 - [ ] Spec and optional testing guide have no `PLACEHOLDER` markers.
 - [ ] Every section either filled or marked `[NOT APPLICABLE - TO REMOVE]`.
 - [ ] Frontmatter tags, relations, and IDs align with document body.
@@ -78,12 +84,14 @@ Before finishing:
 - [ ] Language is concise, actionable, and references code paths (file:line where useful).
 
 ## Tooling Tips
+
 - Use `rg` / `fd` / `go list ./...` to explore code quickly.
 - Generate diagrams with D2 (save to `SPEC-XYZ` directory).
 - Reference templates in `.spec-driver/templates/` for structure cues.
 - Consult `.spec-driver/about/frontmatter-schema.md` for frontmatter rules.
 
 ## Handover
+
 - Commit spec changes or stage for review per project norms (no branch automation here).
 - Notify maintainers if new issues/problems were created or need manual confirmation.
 - If significant uncertainty remains, flag sections with `[NEEDS CLARIFICATION: ...]` and document next steps.

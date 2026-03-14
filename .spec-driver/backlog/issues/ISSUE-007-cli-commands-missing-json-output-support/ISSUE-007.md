@@ -1,8 +1,8 @@
 ---
 id: ISSUE-007
 name: CLI commands missing --json output support
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: resolved
 kind: issue
 categories:
@@ -32,15 +32,18 @@ Many CLI commands advertise `--json` output support in slash command documentati
 ## Evidence
 
 **Commands that fail with `--json`**:
+
 - `spec-driver create issue <title> --json` → Error: No such option: --json
 - `spec-driver list specs --json` → Error: No such option: --json
 
 **Commands that work with `--json`**:
+
 - `spec-driver create spec <name> --kind product --json` ✓
 
 ## Expected Behavior
 
 All `create` and `list` commands should support `--json` output for:
+
 - Machine-readable results (file paths, IDs, metadata)
 - Agent integration and automation
 - Consistent CLI interface patterns
@@ -68,6 +71,7 @@ All `create` and `list` commands should support `--json` output for:
 **Resolved by**: DE-006 (Standardize CLI JSON output support)
 
 **Changes implemented**:
+
 1. Added `--json` flag to all `create` subcommands (issue, problem, improvement, risk)
    - Returns JSON: `{"id": "...", "path": "...", "kind": "...", "status": "..."}`
    - Preserves existing text output as default
@@ -81,6 +85,7 @@ All `create` and `list` commands should support `--json` output for:
    - Ruff and Pylint: 100% clean
 
 **Verification**:
+
 ```bash
 # Create commands with JSON output
 uv run spec-driver create issue "Test" --json

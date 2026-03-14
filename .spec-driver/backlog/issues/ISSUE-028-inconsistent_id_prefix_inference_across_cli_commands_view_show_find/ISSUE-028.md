@@ -1,8 +1,8 @@
 ---
 id: ISSUE-028
-name: 'Inconsistent ID prefix inference across CLI commands (view/show/find)'
-created: '2026-02-06'
-updated: '2026-02-06'
+name: "Inconsistent ID prefix inference across CLI commands (view/show/find)"
+created: "2026-02-06"
+updated: "2026-02-06"
 status: resolved
 kind: issue
 categories:
@@ -27,6 +27,7 @@ s find adr 003   # no results
 ## Expected
 
 All commands should consistently infer prefixes when context is unambiguous:
+
 - `show adr 003` → lookup `ADR-003`
 - `find adr 003` → search for `ADR-003`
 - Same for SPEC, PROD, ISSUE, DE, etc.

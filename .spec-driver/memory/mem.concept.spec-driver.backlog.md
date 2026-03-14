@@ -4,25 +4,26 @@ name: Backlog
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-06'
-verified: '2026-03-06'
+updated: "2026-03-06"
+verified: "2026-03-06"
 confidence: high
 tags:
-- spec-driver
-- backlog
-summary: 'Work intake layer: issues, problems, improvements, and risks. Feeds delta
-  scoping and prioritisation.'
+  - spec-driver
+  - backlog
+summary:
+  "Work intake layer: issues, problems, improvements, and risks. Feeds delta
+  scoping and prioritisation."
 priority:
   severity: medium
   weight: 5
 provenance:
   sources:
-  - kind: code
-    ref: supekku/cli/create.py
-  - kind: code
-    ref: supekku/cli/list.py
-  - kind: code
-    ref: supekku/scripts/lib/backlog/registry.py
+    - kind: code
+      ref: supekku/cli/create.py
+    - kind: code
+      ref: supekku/cli/list.py
+    - kind: code
+      ref: supekku/scripts/lib/backlog/registry.py
 ---
 
 # Backlog
@@ -35,12 +36,12 @@ Need for change enters here before being scoped into
 
 ## Four Item Types
 
-| Type | Purpose | Command |
-|------|---------|---------|
-| **Issue** | Actionable defect or gap | `uv run spec-driver create issue "Title"` |
-| **Problem** | User/system pain with evidence | `uv run spec-driver create problem "Title"` |
-| **Improvement** | Opportunity to enhance | `uv run spec-driver create improvement "Title"` |
-| **Risk** | Identified risk to track | `uv run spec-driver create risk "Title"` |
+| Type            | Purpose                        | Command                                         |
+| --------------- | ------------------------------ | ----------------------------------------------- |
+| **Issue**       | Actionable defect or gap       | `uv run spec-driver create issue "Title"`       |
+| **Problem**     | User/system pain with evidence | `uv run spec-driver create problem "Title"`     |
+| **Improvement** | Opportunity to enhance         | `uv run spec-driver create improvement "Title"` |
+| **Risk**        | Identified risk to track       | `uv run spec-driver create risk "Title"`        |
 
 ## Where They Live
 

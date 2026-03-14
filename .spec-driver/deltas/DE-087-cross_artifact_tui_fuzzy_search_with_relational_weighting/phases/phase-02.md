@@ -2,8 +2,8 @@
 id: IP-087.PHASE-02
 slug: 087-cross_artifact_tui_fuzzy_search_with_relational_weighting-phase-02
 name: TUI overlay — widget, keybindings, browser integration
-created: '2026-03-10'
-updated: '2026-03-10'
+created: "2026-03-10"
+updated: "2026-03-10"
 status: draft
 kind: phase
 ---
@@ -33,13 +33,13 @@ verification:
   evidence:
     - VA-087-001
 tasks:
-  - id: '2.1'
+  - id: "2.1"
     summary: Search overlay widget (ModalScreen)
-  - id: '2.2'
+  - id: "2.2"
     summary: Keybinding changes in app.py
-  - id: '2.3'
+  - id: "2.3"
     summary: Browser integration — overlay mounting and result handling
-  - id: '2.4'
+  - id: "2.4"
     summary: Overlay widget tests
 risks:
   - description: Textual ModalScreen API may not support needed focus patterns
@@ -55,18 +55,22 @@ phase: IP-087.PHASE-02
 # Phase 02 — TUI overlay
 
 ## 1. Objective
+
 Build the search overlay widget, change keybindings, and wire result selection to browser navigation. After this phase the feature is functionally complete.
 
 ## 2. Links & References
+
 - **Delta**: [DE-087](../DE-087.md)
 - **Design Revision**: [DR-087](../DR-087.md) — DEC-087-03 (overlay UX), DEC-087-04 (keybindings)
 - **Phase 01**: [phase-01.md](./phase-01.md) — provides `build_search_index`, `search`, `SearchEntry`
 - **Existing code**: `supekku/tui/app.py`, `supekku/tui/browser.py`, `supekku/tui/widgets/artifact_list.py`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 01 complete — search core tests passing, `just check` green
 
 ## 4. Exit Criteria / Done When
+
 - [x] `/` opens search overlay with empty input focused
 - [x] Real-time filtering across all artifact types as user types
 - [x] Results display: `[Type]  ID  Title`
@@ -76,22 +80,24 @@ Build the search overlay widget, change keybindings, and wire result selection t
 - [x] `just check` green — 3811 tests passing
 
 ## 5. Verification
+
 - Widget tests where feasible (Textual's `App.run_test()` for basic lifecycle)
 - VA-087-001: Manual walkthrough documented in notes.md
 
 ## 6. Assumptions & STOP Conditions
+
 - **Assumption**: Textual's `ModalScreen` (or `Screen` with modal CSS) supports the needed overlay pattern
 - **Assumption**: `BrowserScreen.navigate_to_artifact()` works correctly for all artifact types (already tested by DE-053/DE-061)
 - **STOP**: If Textual's modal/focus management doesn't support the overlay pattern cleanly, consult
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Search overlay widget | [ ] | ModalScreen + _SearchInput key forwarding |
-| [x] | 2.2 | Keybinding changes | [P] | / → global_search, Ctrl+F → focus_search |
-| [x] | 2.3 | Browser integration | [ ] | push_screen callback → action_navigate_artifact |
-| [x] | 2.4 | Tests | [ ] | 5 overlay tests + updated tui_test keybinding tests |
+| Status | ID  | Description           | Parallel? | Notes                                               |
+| ------ | --- | --------------------- | --------- | --------------------------------------------------- |
+| [x]    | 2.1 | Search overlay widget | [ ]       | ModalScreen + \_SearchInput key forwarding          |
+| [x]    | 2.2 | Keybinding changes    | [P]       | / → global_search, Ctrl+F → focus_search            |
+| [x]    | 2.3 | Browser integration   | [ ]       | push_screen callback → action_navigate_artifact     |
+| [x]    | 2.4 | Tests                 | [ ]       | 5 overlay tests + updated tui_test keybinding tests |
 
 ### Task Details
 
@@ -116,12 +122,14 @@ Build the search overlay widget, change keybindings, and wire result selection t
   - **Coverage**: Overlay mounts, input triggers search, result selection posts message, escape dismisses. Use Textual's `app.run_test()` pattern.
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Textual ModalScreen API gaps | Verify API first; fall back to Screen + CSS overlay | Open |
-| Focus management between overlay input and results | Test with `app.run_test()`; handle key forwarding like `_SearchInput` | Open |
+
+| Risk                                               | Mitigation                                                            | Status |
+| -------------------------------------------------- | --------------------------------------------------------------------- | ------ |
+| Textual ModalScreen API gaps                       | Verify API first; fall back to Screen + CSS overlay                   | Open   |
+| Focus management between overlay input and results | Test with `app.run_test()`; handle key forwarding like `_SearchInput` | Open   |
 
 ## 11. Wrap-up Checklist
+
 - [ ] Exit criteria satisfied
 - [ ] VA-087-001 walkthrough documented
 - [ ] Hand-off notes to Phase 03

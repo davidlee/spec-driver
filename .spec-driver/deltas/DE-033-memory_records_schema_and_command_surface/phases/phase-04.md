@@ -2,8 +2,8 @@
 id: IP-033.PHASE-04
 slug: 033-memory_records_schema_and_command_surface-phase-04
 name: IP-033 Phase 04 - Selection and Filtering
-created: '2026-03-02'
-updated: '2026-03-02'
+created: "2026-03-02"
+updated: "2026-03-02"
 status: complete
 kind: phase
 ---
@@ -63,12 +63,14 @@ phase: IP-033.PHASE-04
 # Phase 4 - Selection and Filtering
 
 ## 1. Objective
+
 Implement deterministic scope matching, filtering, and ordering for memory
 records per MEM-FR-003. All selection logic lives in pure functions in
 `memory/selection.py`. CLI integration adds context-aware filtering to
 `list memories`.
 
 ## 2. Links & References
+
 - **Delta**: DE-033
 - **Design**: `design-phase-04-selection.md` (approved)
 - **DR Sections**: DR-033 §12 (MEM-FR-003)
@@ -76,11 +78,13 @@ records per MEM-FR-003. All selection logic lives in pure functions in
 - **Requirement**: MEM-FR-003 — Deterministic Selection + Filtering
 
 ## 3. Entrance Criteria
+
 - [x] Phase 2 complete (MemoryRecord + MemoryRegistry)
 - [x] Phase 3 complete (CLI surface working)
 - [x] Design document reviewed and approved
 
 ## 4. Exit Criteria / Done When
+
 - [x] `memory/selection.py` implements all functions from design
 - [x] Deterministic ordering: same input set → same output across runs
 - [x] CLI `list memories` supports `--path`, `--command`, `--match-tag`, `--include-draft`, `--limit`
@@ -89,25 +93,28 @@ records per MEM-FR-003. All selection logic lives in pure functions in
 - [x] Tests passing, linters clean
 
 ## 5. Verification
+
 - `uv run pytest supekku/scripts/lib/memory/selection_test.py -v`
 - `uv run pytest supekku -v` (full suite)
 - `just lint` + `just pylint`
 - Smoke: `uv run spec-driver list memories --path <path>` with fixture data
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: `PurePosixPath.full_match()` available (Python 3.12+, confirmed 3.13)
 - STOP when: scope matching semantics produce surprising results in real usage
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 4.1 | Core selection: normalize_path, matches_scope, scope_specificity (TDD) | 43 tests |
-| [x] | 4.2 | Ordering/filtering: sort_key, is_surfaceable, select (TDD) | 73 tests total (incl skip_status_filter) |
-| [x] | 4.3 | CLI integration: new options on list memories | All 22 existing CLI tests pass |
-| [x] | 4.4 | Integration tests and smoke tests | 13 CLI integration tests added, all 35 CLI memory tests pass |
+| Status | ID  | Description                                                            | Notes                                                        |
+| ------ | --- | ---------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [x]    | 4.1 | Core selection: normalize_path, matches_scope, scope_specificity (TDD) | 43 tests                                                     |
+| [x]    | 4.2 | Ordering/filtering: sort_key, is_surfaceable, select (TDD)             | 73 tests total (incl skip_status_filter)                     |
+| [x]    | 4.3 | CLI integration: new options on list memories                          | All 22 existing CLI tests pass                               |
+| [x]    | 4.4 | Integration tests and smoke tests                                      | 13 CLI integration tests added, all 35 CLI memory tests pass |
 
 ### Task Details
+
 - **4.1 Core selection functions**
   - **Files**: `supekku/scripts/lib/memory/selection.py`, `supekku/scripts/lib/memory/selection_test.py`
   - **Testing**: TDD — tests first for normalize_path, matches_scope, scope_specificity
@@ -128,18 +135,21 @@ records per MEM-FR-003. All selection logic lives in pure functions in
   - **Testing**: End-to-end with fixture memory files
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| `full_match()` edge cases | Custom `_glob_match` with comprehensive test matrix | mitigated |
-| `shlex.split` on malformed input | Fallback to whitespace split, tested | mitigated |
-| Tag semantics confusion | Clear `--tag` vs `--match-tag` naming + help text | mitigated |
+
+| Risk                             | Mitigation                                          | Status    |
+| -------------------------------- | --------------------------------------------------- | --------- |
+| `full_match()` edge cases        | Custom `_glob_match` with comprehensive test matrix | mitigated |
+| `shlex.split` on malformed input | Fallback to whitespace split, tested                | mitigated |
+| Tag semantics confusion          | Clear `--tag` vs `--match-tag` naming + help text   | mitigated |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-02` - Design approved: pure functions, separated tag semantics, token-prefix commands, trailing-/ prefix paths
 - `2026-03-02` - `PurePosixPath.full_match()` not available in venv Python 3.12; implemented custom `_glob_match`/`_match_segments` using segment-by-segment matching with fnmatch.fnmatchcase per segment. `*` matches single segment, `**` matches zero or more.
 - `2026-03-02` - Added `skip_status_filter` param to `is_surfaceable`/`select` — when user passes explicit `--status`, the status-based exclusion is bypassed (user is in control). Thread recency still applies.
 
 ## 10. Findings / Research Notes
+
 - `PurePosixPath.full_match()` is Python 3.13+ only. Venv runs 3.12.10. Custom glob matcher implemented.
 - `fnmatch.fnmatch()` treats `*` and `**` identically (both cross `/`), so it's unsuitable for proper globstar semantics.
 - Existing `backlog/priority.py` `sort_by_priority()` served as reference pattern for multi-level sort keys.
@@ -148,6 +158,7 @@ records per MEM-FR-003. All selection logic lives in pure functions in
 ## Implementation State (handover)
 
 ### Completed
+
 - **`supekku/scripts/lib/memory/selection.py`** — full module with all functions from design:
   - `MatchContext` dataclass
   - `normalize_path()` — repo-relative POSIX normalization
@@ -191,11 +202,13 @@ records per MEM-FR-003. All selection logic lives in pure functions in
   - Combined `--path` + `--type` metadata/scope AND logic
 
 ### Verification
+
 - Full test suite: 1935 passed, 3 skipped (pre-existing skips)
 - Ruff: clean
 - Pylint: 9.65/10 (R0913 on test helper only; threshold 0.75)
 
 ### Closeout
+
 - Design doc updated: `full_match` → custom `_glob_match` note, status → implemented
 - IP-033 updated: Phase 4 → completed, VT-MEM-SELECTION-001 → verified
 - All exit criteria satisfied

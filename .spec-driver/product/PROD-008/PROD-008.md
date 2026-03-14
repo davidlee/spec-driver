@@ -2,8 +2,8 @@
 id: PROD-008
 slug: requirements-lifecycle-coherence
 name: Requirements Lifecycle Coherence
-created: '2025-11-03'
-updated: '2026-03-06'
+created: "2025-11-03"
+updated: "2026-03-06"
 status: draft
 kind: prod
 aliases: []
@@ -79,6 +79,7 @@ entries:
 ```
 
 ## 1. Intent & Summary
+
 - **Problem / Purpose**: Requirements regularly fall out of sync between specs, the registry, deltas, and audits. This spec defines a single lifecycle contract so humans and agents always know which artefact is authoritative.
 - **Value Signals**: Registry accuracy ≥ 99%, zero “unknown” requirement states after delta close, audits raise actionable drift within one business day.
 - **Guiding Principles**: Frontmatter declares ownership and context; coverage blocks publish verified evidence; deltas and plans describe execution and must hand updates back into specs; audits observe reality and trigger reconciliation.
@@ -87,10 +88,11 @@ entries:
   - 2026-03-06: RE-031 — Aligned with ADR-008 normative/observed truth model; clarified registry as derived.
 
 ## 2. Stakeholders & Journeys
+
 - **Personas / Actors**:
-  - *Spec authors*: need a reliable checklist for promoting requirements through the lifecycle and knowing which metadata to update.
-  - *Implementation agents*: need authoritative instructions for updating specs when wrapping a delta.
-  - *Auditors*: need to confirm the documented state matches reality and flag deviations.
+  - _Spec authors_: need a reliable checklist for promoting requirements through the lifecycle and knowing which metadata to update.
+  - _Implementation agents_: need authoritative instructions for updating specs when wrapping a delta.
+  - _Auditors_: need to confirm the documented state matches reality and flag deviations.
 - **Primary Journeys / Flows**:
   1. **Capture** – Given we introduce a new requirement, when we author a spec frontmatter entry and add it to the coverage block with `status: planned`, then the registry marks the requirement as “introduced”.
   2. **Deliver** – Given a delta implements the requirement, when the implementation plan marks the VT/VA/VH as `in-progress` and later `verified`, then the delta close checklist must copy that status into the spec coverage block.
@@ -107,19 +109,20 @@ The lifecycle contract capability ensures every lifecycle transition has an owni
 
 ### Functional Requirements
 
-
-- **FR-001**: The specs frontmatter and coverage block MUST be the authoritative record of each requirement’s *normative* lifecycle state and supporting evidence. Evidence overlays from deltas, audits, and contracts record *observed* truth and may disagree with the spec — such disagreement is drift to be reconciled explicitly, not a silent override (per ADR-008). The requirements registry is a derived projection of this data, not itself an authoritative source.
-  *Verification*: VH-201 – Lifecycle walkthrough confirming spec updates after delta closure.
+- **FR-001**: The specs frontmatter and coverage block MUST be the authoritative record of each requirement’s _normative_ lifecycle state and supporting evidence. Evidence overlays from deltas, audits, and contracts record _observed_ truth and may disagree with the spec — such disagreement is drift to be reconciled explicitly, not a silent override (per ADR-008). The requirements registry is a derived projection of this data, not itself an authoritative source.
+  _Verification_: VH-201 – Lifecycle walkthrough confirming spec updates after delta closure.
 - **FR-002**: Every delta that changes requirement behaviour MUST provide an implementation plan documenting planned VT/VA/VH artefacts and promote the final state back into the owning spec coverage block before completion.
-  *Verification*: VA-320 – Validation session exercising the delta close checklist.
+  _Verification_: VA-320 – Validation session exercising the delta close checklist.
 - **FR-003**: Audits MUST surface observed behaviour against the spec coverage block and raise drift through validation warnings until the spec is explicitly reconciled or follow-up work is scheduled. Audit findings do not silently override spec truth — they trigger explicit reconciliation (per ADR-008).
-  *Verification*: VT-902 – Automated registry sync test simulating audit failure vs spec state.
+  _Verification_: VT-902 – Automated registry sync test simulating audit failure vs spec state.
+
 ### Non-Functional Requirements
 
 - **NF-001**: Lifecycle updates MUST propagate through the registry within one sync cycle (< 5 minutes) after a spec change.
-  *Measurement*: VT-905 – Integration test exercising `uv run spec-driver sync`.
+  _Measurement_: VT-905 – Integration test exercising `uv run spec-driver sync`.
 - **NF-002**: Validation warnings about lifecycle drift MUST be actionable, surfacing responsible artefacts and suggested remediation steps.
-  *Measurement*: VA-322 – Expert review of validator messaging across sample drift scenarios.
+  _Measurement_: VA-322 – Expert review of validator messaging across sample drift scenarios.
+
 ### Success Metrics / Signals
 
 - **Coverage Freshness**: ≥ 95% of requirements transition from `planned` to `verified` within 24 hours of delta completion.
@@ -127,6 +130,7 @@ The lifecycle contract capability ensures every lifecycle transition has an owni
 - **Validation Confidence**: ≥ 90% of agents report that lifecycle guidance is “clear” or “very clear” in quarterly surveys.
 
 ## 4. Solution Outline
+
 - **User Experience / Outcomes**: Spec authors always begin with frontmatter and coverage updates, agents rely on implementation plan templates, and audits provide crisp “here’s the drift” messaging. The workflow reads as: author spec → deliver via delta + plan → verify via coverage → observe via audit.
 - **Data & Contracts**:
   - `supekku:verification.coverage@v1` — canonical mapping of requirement → VT/VA/VH artefacts.
@@ -134,15 +138,17 @@ The lifecycle contract capability ensures every lifecycle transition has an owni
   - Registry sync contracts (`.spec-driver/registry/*.yaml`) — derived lifecycle projections aggregating normative data from specs and observed evidence from deltas/audits (per ADR-008, the registry is not itself authoritative).
 
 ## 5. Behaviour & Scenarios
+
 - **Primary Flows**:
-  - *Introduce*: Author adds requirement to spec frontmatter + coverage (`status: planned`) → Registry marks “introduced”.
-  - *Implement*: Delta plan sets coverage entry to `in-progress` → On completion, spec block becomes `verified` → Registry marks “implemented/verified”.
-  - *Audit*: Audit coverage entry reports `failed` → Validation warning raised → Actionable follow-up logged → Spec coverage updated once fixed.
+  - _Introduce_: Author adds requirement to spec frontmatter + coverage (`status: planned`) → Registry marks “introduced”.
+  - _Implement_: Delta plan sets coverage entry to `in-progress` → On completion, spec block becomes `verified` → Registry marks “implemented/verified”.
+  - _Audit_: Audit coverage entry reports `failed` → Validation warning raised → Actionable follow-up logged → Spec coverage updated once fixed.
 - **Error Handling / Guards**:
   - If a delta closes without spec updates, the validation CLI raises an error referencing the missing coverage update.
   - If an audit references unknown requirements, the registry sync surfaces a “missing mapping” warning requiring spec owners to review.
 
 ## 6. Quality & Verification
+
 - **Testing Strategy**: Lifecycle integration tests exercise registry sync and validator warnings. Manual validation sessions confirm that agents following the delta close checklist update the spec correctly. Automated drift detection runs after each audit import.
 - **Research / Validation**: Interview spec authors and auditors quarterly to confirm the workflow remains clear; capture feedback in backlog improvements.
 - **Observability & Analysis**: Track lifecycle transition counts and drift warnings in the validation dashboard; alert if drift remains unresolved beyond 24 hours.
@@ -151,14 +157,16 @@ The lifecycle contract capability ensures every lifecycle transition has an owni
 - **Acceptance Gates**: No delta closes without spec coverage update; registry sync shows 0 “unknown” states; latest audit has no outstanding drift on PROD-008 requirements.
 
 ## 7. Backlog Hooks & Dependencies
+
 - **Related Specs / PROD**: SPEC-036 documents the metadata-driven validation engine that will consume these coverage blocks; PROD-001 captures broader spec authoring workflows.
 - **Risks & Mitigations**:
-  - *RISK-REQ-001*: Forgetting to update spec coverage after a delta close – *Mitigation*: Extend close checklist and add validator hard failure (Tracked in ISSUE-412).
-  - *RISK-REQ-002*: Audit warnings ignored – *Mitigation*: Validation gating in CI and weekly lifecycle review ritual.
+  - _RISK-REQ-001_: Forgetting to update spec coverage after a delta close – _Mitigation_: Extend close checklist and add validator hard failure (Tracked in ISSUE-412).
+  - _RISK-REQ-002_: Audit warnings ignored – _Mitigation_: Validation gating in CI and weekly lifecycle review ritual.
 - **Known Gaps / Debt**: ISSUE-413 – “Automation to compare plan vs spec coverage”; PROB-128 – “Audit tooling should auto-open follow-up deltas”.
 - **Open Decisions / Questions**:
-  - Should audits automatically propose spec edits? *(Owner: david, Due: 2025-11-10)*
-  - Can we auto-suggest coverage updates from registry diffs? *(Owner: automation-team, Due: 2025-11-17)*
+  - Should audits automatically propose spec edits? _(Owner: david, Due: 2025-11-10)_
+  - Can we auto-suggest coverage updates from registry diffs? _(Owner: automation-team, Due: 2025-11-17)_
 
 ## Appendices (Optional)
+
 - Glossary, detailed research, extended API examples, migration history, etc.

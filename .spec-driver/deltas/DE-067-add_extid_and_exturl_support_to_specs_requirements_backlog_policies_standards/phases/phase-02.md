@@ -2,8 +2,8 @@
 id: IP-067.PHASE-02
 slug: 067-formatters-and-cli
 name: IP-067 Phase 02 - Formatters and CLI
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: complete
 kind: phase
 ---
@@ -76,13 +76,13 @@ add `--external`/`-e` flag to CLI list commands.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Add ext_id/ext_url to JSON output | [P] | All 6 formatters |
-| [x] | 2.2 | Add ext_id/ext_url to detail formatters | [P] | All 6 show commands |
-| [x] | 2.3 | Add show_external param to list formatters | | Table + TSV column insertion |
-| [x] | 2.4 | Add --external/-e flag to CLI list commands | | 7 list commands wired |
-| [x] | 2.5 | Write tests | | 50 tests across 6 test files |
+| Status | ID  | Description                                 | Parallel? | Notes                        |
+| ------ | --- | ------------------------------------------- | --------- | ---------------------------- |
+| [x]    | 2.1 | Add ext_id/ext_url to JSON output           | [P]       | All 6 formatters             |
+| [x]    | 2.2 | Add ext_id/ext_url to detail formatters     | [P]       | All 6 show commands          |
+| [x]    | 2.3 | Add show_external param to list formatters  |           | Table + TSV column insertion |
+| [x]    | 2.4 | Add --external/-e flag to CLI list commands |           | 7 list commands wired        |
+| [x]    | 2.5 | Write tests                                 |           | 50 tests across 6 test files |
 
 ## 11. Wrap-up Checklist
 

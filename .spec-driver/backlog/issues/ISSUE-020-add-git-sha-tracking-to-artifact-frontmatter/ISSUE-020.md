@@ -1,8 +1,8 @@
 ---
 id: ISSUE-020
 name: Add git SHA tracking to artifact frontmatter
-created: '2025-11-08'
-updated: '2025-11-08'
+created: "2025-11-08"
+updated: "2025-11-08"
 status: open
 kind: issue
 categories: [metadata, traceability]
@@ -28,38 +28,41 @@ Extend frontmatter schema to include git SHA tracking for key lifecycle events:
 ```yaml
 ---
 id: SPEC-110
-created: '2025-11-01'
-updated: '2025-11-08'
+created: "2025-11-01"
+updated: "2025-11-08"
 git_shas:
-  created: abc123def456  # Commit where artifact was created
-  last_material_update: def789abc012  # Last substantive content change (not typos/formatting)
-  last_sync: ghi345jkl678  # For tech specs: last code sync
-  last_review: mno901pqr234  # Last review confirming accuracy
+  created: abc123def456 # Commit where artifact was created
+  last_material_update: def789abc012 # Last substantive content change (not typos/formatting)
+  last_sync: ghi345jkl678 # For tech specs: last code sync
+  last_review: mno901pqr234 # Last review confirming accuracy
 ---
 ```
 
 ### Artifact-Specific Fields
 
 **All artifacts:**
+
 - `git_shas.created` - commit where artifact was first created
 - `git_shas.last_material_update` - last substantive content change
 
 **Tech specs only:**
+
 - `git_shas.last_sync` - last sync with codebase (when contracts/code analysis ran)
 
 **All artifacts (optional):**
+
 - `git_shas.last_review` - commit where artifact was reviewed and deemed accurate
 
 ## Affected Artifacts
 
-- Product specs (PROD-*)
-- Tech specs (SPEC-*)
+- Product specs (PROD-\*)
+- Tech specs (SPEC-\*)
 - ADRs
 - Policies
 - Standards
-- Deltas (DE-*)
-- Revisions (RE-*)
-- Audits (AUD-*)
+- Deltas (DE-\*)
+- Revisions (RE-\*)
+- Audits (AUD-\*)
 - Backlog items (issues, problems, improvements, risks)
 
 ## Implementation Considerations
@@ -93,4 +96,3 @@ git_shas:
 2. Should `last_material_update` auto-update on every content change, or require manual flag?
 3. How to distinguish "material" vs "non-material" updates (formatting, typos)?
 4. Should we track multiple SHAs per event type (e.g., sync history array)?
-

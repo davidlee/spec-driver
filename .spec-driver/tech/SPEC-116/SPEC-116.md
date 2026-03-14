@@ -2,34 +2,34 @@
 id: SPEC-116
 slug: frontmatter-metadata-registry
 name: supekku/scripts/lib/core/frontmatter_metadata Specification
-created: '2025-11-02'
-updated: '2025-11-03'
+created: "2025-11-02"
+updated: "2025-11-03"
 status: draft
 kind: spec
 category: unit
 c4_level: code
 responsibilities:
-- Provide metadata-driven frontmatter validation schema definitions for all artifact kinds
-- Define field schemas with types, patterns, enums, and validation rules using BlockMetadata
-- Maintain artifact-specific metadata extending base frontmatter schema
-- Enable JSON Schema generation from metadata for tooling and documentation
-- Support dual-validation compatibility between new metadata-driven and legacy validators
+  - Provide metadata-driven frontmatter validation schema definitions for all artifact kinds
+  - Define field schemas with types, patterns, enums, and validation rules using BlockMetadata
+  - Maintain artifact-specific metadata extending base frontmatter schema
+  - Enable JSON Schema generation from metadata for tooling and documentation
+  - Support dual-validation compatibility between new metadata-driven and legacy validators
 aliases:
-- frontmatter-metadata
-- frontmatter-registry
+  - frontmatter-metadata
+  - frontmatter-registry
 packages:
-- supekku/scripts/lib/core/frontmatter_metadata
+  - supekku/scripts/lib/core/frontmatter_metadata
 sources:
-- language: python
-  identifier: supekku/scripts/lib/core/frontmatter_metadata
-  module: supekku.scripts.lib.core.frontmatter_metadata
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/scripts/lib/core/frontmatter_metadata
+    module: supekku.scripts.lib.core.frontmatter_metadata
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
 owners: []
 auditers: []
 relations: []
@@ -199,6 +199,7 @@ This package serves as the **single source of truth** for frontmatter field defi
 ### R1: Base Schema Definition
 
 Provide `BASE_FRONTMATTER_METADATA` defining common fields for all artifacts:
+
 - Identity fields: `id`, `name`, `slug`, `kind`, `status`
 - Lifecycle fields: `lifecycle`, `created`, `updated`
 - Ownership fields: `owners`, `auditers`
@@ -208,6 +209,7 @@ Provide `BASE_FRONTMATTER_METADATA` defining common fields for all artifacts:
 ### R2: Artifact-Specific Schemas
 
 Provide metadata modules for each artifact kind:
+
 - **spec**: Specifications with responsibilities, concerns, principles, hypotheses
 - **prod**: Product specs with user problems, hypotheses, outcomes
 - **delta**: Change bundles with applies_to, context_inputs, outcome_summary, risk_register
@@ -225,6 +227,7 @@ Provide metadata modules for each artifact kind:
 ### R3: Centralized Registry
 
 Maintain `FRONTMATTER_METADATA_REGISTRY` mapping artifact kinds to metadata:
+
 - Dictionary structure: `{kind: BlockMetadata}`
 - Lookup function: `get_frontmatter_metadata(kind) -> BlockMetadata`
 - Fallback to base metadata for unknown kinds
@@ -233,6 +236,7 @@ Maintain `FRONTMATTER_METADATA_REGISTRY` mapping artifact kinds to metadata:
 ### R4: Validation Support
 
 Enable metadata-driven validation:
+
 - Metadata structures compatible with `MetadataValidator`
 - Support for JSON Schema generation
 - Clear field descriptions for error messages
@@ -241,6 +245,7 @@ Enable metadata-driven validation:
 ### R5: Extensibility
 
 Support schema evolution and extension:
+
 - Artifact schemas extend base schema via dict unpacking
 - Optional fields allow forward compatibility
 - Relationship edges support additional fields beyond validated set
@@ -249,6 +254,7 @@ Support schema evolution and extension:
 ### R6: Testing Infrastructure
 
 Provide comprehensive test coverage:
+
 - Dual-validation tests comparing new and legacy validators
 - Valid/invalid case testing for all schemas
 - Edge case coverage (empty fields, wrong types, missing required)
@@ -310,6 +316,7 @@ ARTIFACT_FRONTMATTER_METADATA = BlockMetadata(
 ### Field Type System
 
 Supported field types from `BlockMetadata`:
+
 - `string`: Text with optional pattern validation
 - `int`: Integer values
 - `bool`: Boolean flags
@@ -321,6 +328,7 @@ Supported field types from `BlockMetadata`:
 ### Extension Strategy
 
 Artifact schemas extend base via dictionary unpacking:
+
 ```python
 fields={
   **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
@@ -329,6 +337,7 @@ fields={
 ```
 
 This ensures:
+
 - All base fields inherited automatically
 - Artifact-specific fields added cleanly
 - Base schema changes propagate to all artifacts
@@ -382,27 +391,32 @@ if errors:
 ## 5. System Invariants
 
 ### I1: Schema Completeness
+
 - Every artifact kind in base `kind` enum has corresponding metadata module
 - Registry contains entry for every supported artifact kind
 - All metadata modules export properly structured `BlockMetadata`
 
 ### I2: Base Schema Inheritance
+
 - All artifact-specific schemas include all base fields
 - Base field definitions remain consistent across all artifacts
 - Extension via dict unpacking preserves all base properties
 
 ### I3: Validation Consistency
+
 - Metadata schemas produce same validation outcomes as legacy validators
 - Dual-validation tests pass for all artifact kinds
 - Error messages clear and actionable
 
 ### I4: Type Safety
+
 - All field types match supported `FieldMetadata` types
 - Enum fields define complete set of allowed values
 - Required fields explicitly marked in metadata
 - Pattern validation uses valid regex
 
 ### I5: Testing Coverage
+
 - Every metadata module has corresponding test file
 - Tests cover valid, invalid, and edge cases
 - Dual-validation compatibility verified for all schemas
@@ -412,6 +426,7 @@ if errors:
 ### Performance
 
 **NF-001: Fast Metadata Lookup**
+
 - `get_frontmatter_metadata()` completes in <1ms
 - Registry lookup is O(1) dictionary access
 - No runtime schema compilation overhead
@@ -419,6 +434,7 @@ if errors:
 ### Maintainability
 
 **NF-002: Clear Schema Definitions**
+
 - Field descriptions explain purpose and usage
 - Examples demonstrate valid usage patterns
 - Schema structure follows consistent patterns
@@ -427,6 +443,7 @@ if errors:
 ### Reliability
 
 **NF-003: Validation Correctness**
+
 - Metadata schemas reject all invalid frontmatter
 - Metadata schemas accept all valid frontmatter
 - Dual-validation compatibility maintained
@@ -437,6 +454,7 @@ if errors:
 ### Test Organization
 
 Each metadata module has dedicated test file following pattern:
+
 ```
 {artifact}_test.py
   - Test valid minimal frontmatter
@@ -449,6 +467,7 @@ Each metadata module has dedicated test file following pattern:
 ### Dual-Validation Testing
 
 Tests compare new metadata-driven validator with legacy validator:
+
 ```python
 def _validate_both(self, data: dict) -> tuple[str | None, list[str]]:
     # Old validator
@@ -490,9 +509,9 @@ def _validate_both(self, data: dict) -> tuple[str | None, list[str]]:
 
 ## 9. Change History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2025-11-02 | Initial specification created during backfill effort |
+| Version | Date       | Changes                                              |
+| ------- | ---------- | ---------------------------------------------------- |
+| 1.0     | 2025-11-02 | Initial specification created during backfill effort |
 
 ## 10. Related Artifacts
 

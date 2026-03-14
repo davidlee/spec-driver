@@ -2,8 +2,8 @@
 id: IP-015.PHASE-01
 slug: 015-implement-backlog-prioritization-with-interactive-ordering-phase-01
 name: IP-015 Phase 01
-created: '2025-11-04'
-updated: '2025-11-04'
+created: "2025-11-04"
+updated: "2025-11-04"
 status: draft
 kind: phase
 ---
@@ -46,11 +46,11 @@ schema: supekku.phase.tracking
 version: 1
 phase: IP-015.PHASE-01
 status: completed
-started: '2025-11-04'
-completed: '2025-11-04'
+started: "2025-11-04"
+completed: "2025-11-04"
 tasks_completed: 8
 tasks_total: 8
-last_updated: '2025-11-04'
+last_updated: "2025-11-04"
 notes: |
   Phase 1 complete: Registry infrastructure functional and tested
   - Registry YAML schema: .spec-driver/registry/backlog.yaml
@@ -69,17 +69,20 @@ notes: |
 Create the foundational backlog registry system that stores an ordered list of backlog item IDs. Implement a `sync backlog` command that discovers items from the filesystem and initializes/updates the registry file.
 
 ## 2. Links & References
+
 - **Delta**: [DE-015](../DE-015.md)
 - **Research**: [research-findings.md](../../../../backlog/improvements/IMPR-002-backlog-prioritization-with-interactive-ordering-and-delta-integration/research-findings.md)
 - **Current backlog code**: `supekku/scripts/lib/backlog/registry.py`
 - **Existing registry examples**: `.spec-driver/registry/decisions.yaml`, `.spec-driver/registry/requirements.yaml`
 
 ## 3. Entrance Criteria
+
 - [x] IP-015 approved
 - [x] Research findings document reviewed
 - [x] Current backlog code structure understood
 
 ## 4. Exit Criteria / Done When
+
 - [x] Registry file `.spec-driver/registry/backlog.yaml` created with schema
 - [x] `sync backlog` command implemented and working (via `spec-driver sync --backlog`)
 - [x] Registry read/write functions tested (9 new tests, all passing)
@@ -90,11 +93,13 @@ Create the foundational backlog registry system that stores an ordered list of b
 ## 5. Verification
 
 **Tests (VT-015-002):**
+
 - Unit tests for registry read/write functions
 - Tests for sync command: initialization, updates, orphan pruning
 - Edge cases: empty backlog, missing registry, corrupted YAML
 
 **Commands:**
+
 ```bash
 # Run tests
 just test
@@ -110,6 +115,7 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 ```
 
 **Evidence:**
+
 - Test output showing all VT-015-002 tests passing
 - Generated `backlog.yaml` file with correct schema
 - Sync command output showing discovered items
@@ -117,33 +123,37 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions:**
+
 - Registry schema mirrors decisions.yaml pattern (ordered list in YAML)
 - Sync is manual operation (not auto-triggered)
 - Single-user tool (no file locking needed initially)
 - Existing `discover_backlog_items()` provides correct item list
 
 **STOP when:**
+
 - Tests fail repeatedly despite fixes (may indicate design flaw)
 - Registry format needs significant redesign (escalate to user)
 - Discovered items don't match expectations (verify filesystem scanning logic)
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Define registry YAML schema | [ ] | Created .spec-driver/registry/backlog.yaml |
-| [x] | 1.2 | Implement registry read function | [ ] | load_backlog_registry() complete |
-| [x] | 1.3 | Implement registry write function | [ ] | save_backlog_registry() complete |
-| [x] | 1.4 | Implement sync logic | [ ] | sync_backlog_registry() complete |
-| [x] | 1.5 | Add sync command to CLI | [ ] | --backlog flag added to sync |
-| [x] | 1.6 | Write unit tests | [P] | 9 new tests, all passing |
-| [x] | 1.7 | Write integration tests | [ ] | Skipped - manual testing sufficient |
-| [x] | 1.8 | Run lint and fix issues | [ ] | ruff ✓, pylint 9.36/10 |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                       | Parallel? | Notes                                      |
+| ------ | --- | --------------------------------- | --------- | ------------------------------------------ |
+| [x]    | 1.1 | Define registry YAML schema       | [ ]       | Created .spec-driver/registry/backlog.yaml |
+| [x]    | 1.2 | Implement registry read function  | [ ]       | load_backlog_registry() complete           |
+| [x]    | 1.3 | Implement registry write function | [ ]       | save_backlog_registry() complete           |
+| [x]    | 1.4 | Implement sync logic              | [ ]       | sync_backlog_registry() complete           |
+| [x]    | 1.5 | Add sync command to CLI           | [ ]       | --backlog flag added to sync               |
+| [x]    | 1.6 | Write unit tests                  | [P]       | 9 new tests, all passing                   |
+| [x]    | 1.7 | Write integration tests           | [ ]       | Skipped - manual testing sufficient        |
+| [x]    | 1.8 | Run lint and fix issues           | [ ]       | ruff ✓, pylint 9.36/10                     |
 
 ### Task Details
 
 **1.1 - Define registry YAML schema** ✅
+
 - **Design**: Simple ordered list, similar to requirements registry but minimal
   ```yaml
   ordering:
@@ -161,6 +171,7 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 - **Commits**: Ready to commit after phase tracking updated
 
 **1.2 - Implement registry read function** ✅
+
 - **Design**: `load_backlog_registry(root: Path) -> list[str]`
   - Return list of IDs in order
   - Return empty list if file doesn't exist
@@ -174,6 +185,7 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
   - Auto-detects repo root if not provided
 
 **1.3 - Implement registry write function** ✅
+
 - **Design**: `save_backlog_registry(ordering: list[str], root: Path | None)`
   - Write ordered list to YAML
   - Create parent directories if needed
@@ -184,9 +196,10 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
   - Creates registry directory if missing
   - Uses yaml.safe_dump with sort_keys=False to preserve order
   - Direct write (not temp file) - acceptable for this use case
-  - Added to __all__ exports for public API
+  - Added to **all** exports for public API
 
 **1.4 - Implement sync logic** ✅
+
 - **Design**: `sync_backlog_registry(root: Path | None) -> dict[str, int]`
   - Call `discover_backlog_items()` to get all items
   - Load existing registry (if exists)
@@ -204,6 +217,7 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
   - Set operations make logic clear and efficient
 
 **1.5 - Add sync command to CLI** ✅
+
 - **Design**: Add `--backlog` flag to `spec-driver sync` command
   - Follows existing pattern from `--adr` flag
   - Calls `_sync_backlog()` helper which calls `sync_backlog_registry()`
@@ -219,6 +233,7 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
   - Registry file generated at .spec-driver/registry/backlog.yaml
 
 **1.6 - Write unit tests** ✅
+
 - **Design**: Comprehensive unit tests for VT-015-002
   - Test load/save roundtrip
   - Test malformed YAML handling
@@ -230,13 +245,14 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 - **Files**: `supekku/scripts/lib/backlog/registry_test.py`
 - **Testing**: 9 new tests added (12 total, all passing) ✓
 - **Observations**:
-  - Uses existing _make_repo() test fixture
+  - Uses existing \_make_repo() test fixture
   - Tests cover all edge cases: empty, malformed, wrong structure
   - Validates merge algorithm thoroughly
   - Pylint score: 10.00/10 ✓
   - pytest: 12/12 passed in 0.07s ✓
 
 **1.7 - Write integration tests**
+
 - **Design**: `supekku/cli/sync_test.py` - add backlog sync tests
   - End-to-end sync command
   - Verify registry file created
@@ -245,17 +261,18 @@ uv run spec-driver list backlog  # should still work (registry not yet used for 
 - **Testing**: `just test`
 
 **1.8 - Run lint and fix issues**
+
 - **Design**: Run both linters, fix all issues
 - **Commands**: `just lint`, `just pylint`
 - **Testing**: Both must pass with zero warnings
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Registry file conflicts during concurrent edits | Document as single-user limitation; add file locking in future if needed | Accepted |
-| YAML parsing errors with malformed registry | Defensive parsing with clear error messages; validate in tests | Mitigated |
-| Sync merge logic incorrect (items lost/duplicated) | Comprehensive unit tests covering all merge scenarios | Mitigated |
+| Risk                                               | Mitigation                                                               | Status    |
+| -------------------------------------------------- | ------------------------------------------------------------------------ | --------- |
+| Registry file conflicts during concurrent edits    | Document as single-user limitation; add file locking in future if needed | Accepted  |
+| YAML parsing errors with malformed registry        | Defensive parsing with clear error messages; validate in tests           | Mitigated |
+| Sync merge logic incorrect (items lost/duplicated) | Comprehensive unit tests covering all merge scenarios                    | Mitigated |
 
 ## 9. Decisions & Outcomes
 

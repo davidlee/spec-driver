@@ -3,9 +3,9 @@
 `uv run spec-driver`
 
 before submitting code for user approval, run
-`just` 
+`just`
 
-ensure all tests and lint warnings are green - no exceptions(*).
+ensure all tests and lint warnings are green - no exceptions(\*).
 You cannot suppress lint warnings without user approval.
 The point of linting is to improve the quality of the code.
 
@@ -16,7 +16,7 @@ for quicker checks while you work
 
 NEVER prioritise task completion over technical quality or delivering value to users.
 
-(*) - exception: we are currently working towards "lint zero". for this to be
+(\*) - exception: we are currently working towards "lint zero". for this to be
 practical, you must fix all lint warnings in any file you touch, but can leave
 untouched files.
 

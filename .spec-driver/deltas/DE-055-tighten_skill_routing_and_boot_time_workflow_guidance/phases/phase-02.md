@@ -2,8 +2,8 @@
 id: IP-055.PHASE-02
 slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-02
 name: IP-055 Phase 02
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: completed
 kind: phase
 ---
@@ -54,9 +54,11 @@ phase: IP-055.PHASE-02
 # Phase 2 - Verify routing skill integration and decide follow-up patterns
 
 ## 1. Objective
+
 Confirm the initial routing-skill implementation is exposed correctly and capture the next decisions around optional brainstorming and adversarial review.
 
 ## 2. Links & References
+
 - **Delta**: DE-055
 - **Design Revision Sections**:
   - Code Impact Summary
@@ -73,16 +75,19 @@ Confirm the initial routing-skill implementation is exposed correctly and captur
   - `supekku/skills/boot/SKILL.md`
 
 ## 3. Entrance Criteria
+
 - [x] Routing skill added to package skills
 - [x] Allowlist updated
 - [x] Skills sync completed successfully
 
 ## 4. Exit Criteria / Done When
+
 - [x] Generated agent metadata exposes `using-spec-driver`
 - [x] Notes and phase state fully reflect the implementation
 - [x] Follow-up direction for brainstorming and adversarial review is explicit
 
 ## 5. Verification
+
 - Tests to run: none yet beyond sync/integration checks
 - Tooling/commands:
   - `uv run spec-driver skills sync`
@@ -93,34 +98,40 @@ Confirm the initial routing-skill implementation is exposed correctly and captur
   - delta notes on next follow-up patterns
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - It is acceptable to land the routing skill before optional brainstorming or adversarial-review features are designed.
 - STOP when:
   - follow-up patterns would require a larger workflow redesign instead of a composable addition
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Verify generated agent metadata and installed skill exposure | [ ] | `.spec-driver/AGENTS.md` now includes `using-spec-driver` |
-| [x] | 2.2 | Record implementation results back into delta notes and plan state | [ ] | Notes and plan state updated in the DE-055 bundle |
-| [x] | 2.3 | Decide follow-up shape for optional brainstorming and adversarial review | [ ] | Kept as explicit optional future patterns rather than blockers for routing work |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                                              | Parallel? | Notes                                                                           |
+| ------ | --- | ------------------------------------------------------------------------ | --------- | ------------------------------------------------------------------------------- |
+| [x]    | 2.1 | Verify generated agent metadata and installed skill exposure             | [ ]       | `.spec-driver/AGENTS.md` now includes `using-spec-driver`                       |
+| [x]    | 2.2 | Record implementation results back into delta notes and plan state       | [ ]       | Notes and plan state updated in the DE-055 bundle                               |
+| [x]    | 2.3 | Decide follow-up shape for optional brainstorming and adversarial review | [ ]       | Kept as explicit optional future patterns rather than blockers for routing work |
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+
+| Risk                                                       | Mitigation                                                                    | Status |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------- | ------ |
 | Verification remains too shallow and misses behaviour gaps | Add targeted tests if the routing surface grows beyond skills and sync wiring | active |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-07` - Implemented the first routing-skill cut before deciding the optional follow-up patterns. Rationale: the routing gap was immediate and independent of those later additions.
 
 ## 10. Findings / Research Notes
+
 - `using-spec-driver` now appears in `.spec-driver/AGENTS.md`.
 - Boot now explicitly points to `/using-spec-driver` after startup.
 - Brainstorming and adversarial review remain open as optional composable patterns, not blockers for the routing-skill cut.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec, delta, and plan updated with lessons

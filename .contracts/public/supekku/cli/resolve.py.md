@@ -16,10 +16,11 @@ Collects IDs from all known registries: decisions, specs,
 deltas, revisions, audits, memory records, and backlog items.
 
 Args:
-  root: Repository root path.
+root: Repository root path.
 
 Returns:
-  Dict mapping artifact ID to (relative_path, kind).
+Dict mapping artifact ID to (relative_path, kind).
+
 - @app.command(links) `resolve_links(dry_run, link_mode, verbose, scope_path, scope_id) -> None`: Resolve [[...]] links in memory record bodies.
 
 Parses wikilink tokens from memory body text, resolves them

@@ -17,7 +17,10 @@
  *       supekku/claude.hooks/artifact_event.py (_ARTIFACT_PATTERNS)
  *       see mem.artifact-pattern-sync
  */
-import type { ExtensionAPI, ExtensionFactory } from "@mariozechner/pi-coding-agent";
+import type {
+  ExtensionAPI,
+  ExtensionFactory,
+} from "@mariozechner/pi-coding-agent";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { join, relative } from "node:path";
 

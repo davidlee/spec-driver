@@ -2,8 +2,8 @@
 id: IP-068.PHASE-01
 slug: 068-edit_command_status_flag_for_programmatic_status_updates-phase-01
 name: Shared primitive and enum expansion
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: in-progress
 kind: phase
 ---
@@ -54,14 +54,17 @@ phase: IP-068.PHASE-01
 Extract the duplicated frontmatter status update logic into a shared primitive, expand the enum registry to cover all entity types that have status definitions, and consolidate existing callers.
 
 ## 2. Links & References
+
 - **Delta**: DE-068
 - **Design Revision**: DR-068 §5.1 (primitive), §5.2 (validation dispatch)
 - **Specs**: PROD-013.FR-004
 
 ## 3. Entrance Criteria
+
 - [x] DR-068 design decisions settled (DEC-068-01 through DEC-068-03)
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `core/frontmatter_writer.py` exists with `update_frontmatter_status()`
 - [ ] `validate_status_for_entity()` helper exists (in frontmatter_writer or enums module)
 - [ ] `ENUM_REGISTRY` includes: `issue.status`, `problem.status`, `improvement.status`, `risk.status`, `drift.status`, `revision.status`, `audit.status`
@@ -72,23 +75,25 @@ Extract the duplicated frontmatter status update logic into a shared primitive, 
 - [ ] `just lint` passes
 
 ## 5. Verification
+
 - `just test` — all tests including new frontmatter_writer_test.py
 - `just lint` — zero warnings
 - Regression: `complete_delta` and `complete_revision` test suites
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumption: unquoted `status: value` format is universal (verified)
 - Assumption: `startswith("status:")` line matching is safe within frontmatter blocks (battle-tested in production)
 - STOP: if any existing frontmatter uses quoted status values or multi-line status fields
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 1.1 | Create `core/frontmatter_writer.py` + tests | [ ] | DR-068 §5.1 |
-| [ ] | 1.2 | Expand `ENUM_REGISTRY` in `core/enums.py` | [P] | DR-068 §5.2 |
-| [ ] | 1.3 | Consolidate `completion.py` + `complete_delta.py` | [ ] | Depends on 1.1 |
-| [ ] | 1.4 | Add `validate_status_for_entity()` + tests | [P] | DR-068 §5.2 |
+| Status | ID  | Description                                       | Parallel? | Notes          |
+| ------ | --- | ------------------------------------------------- | --------- | -------------- |
+| [ ]    | 1.1 | Create `core/frontmatter_writer.py` + tests       | [ ]       | DR-068 §5.1    |
+| [ ]    | 1.2 | Expand `ENUM_REGISTRY` in `core/enums.py`         | [P]       | DR-068 §5.2    |
+| [ ]    | 1.3 | Consolidate `completion.py` + `complete_delta.py` | [ ]       | Depends on 1.1 |
+| [ ]    | 1.4 | Add `validate_status_for_entity()` + tests        | [P]       | DR-068 §5.2    |
 
 ### Task Details
 

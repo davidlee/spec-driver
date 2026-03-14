@@ -2,8 +2,8 @@
 id: IP-038.PHASE-01
 slug: 038-canonical_workflow_alignment-phase-01
 name: IP-038 Phase 01
-created: '2026-03-03'
-updated: '2026-03-03'
+created: "2026-03-03"
+updated: "2026-03-03"
 status: draft
 kind: phase
 ---
@@ -55,9 +55,11 @@ phase: IP-038.PHASE-01
 # Phase 01 - Contract Freeze
 
 ## 1. Objective
+
 Freeze DE-038 policy/doc language so the strict-mode contract and follow-up implementation surface are clear before memory and skill review phases.
 
 ## 2. Links & References
+
 - **Delta**: DE-038
 - **Design Revision Sections**:
   - [DR-038.md](../DR-038.md) - strict-mode contract and enforcement touchpoints
@@ -70,16 +72,19 @@ Freeze DE-038 policy/doc language so the strict-mode contract and follow-up impl
   - [notes.md](../notes.md)
 
 ## 3. Entrance Criteria
+
 - [x] DE-038, DR-038, and workflow-research drafts exist in the bundle
 - [x] Strict-mode baseline direction agreed: hard-fail non-canonical paths
 - [x] Gaps document exists in the bundle
 
 ## 4. Exit Criteria / Done When
+
 - [x] DE/DR/research are coherent on strict_mode contract wording
 - [x] v1 coverage precedence + mixed-status warning policy is documented
 - [x] Open questions reduced to feasibility/scope follow-ups only
 
 ## 5. Verification
+
 - Verification type: VA (documentation/code-truth review)
 - Tooling/commands:
   - `nl -ba` and `rg -n` spot checks across DE/DR/research and source-of-truth scripts
@@ -90,6 +95,7 @@ Freeze DE-038 policy/doc language so the strict-mode contract and follow-up impl
   - `notes.md` update for the phase work
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - This phase remains documentation-only and does not alter runtime code behavior.
   - Policy decisions captured here are inputs to a follow-up implementation delta.
@@ -98,15 +104,17 @@ Freeze DE-038 policy/doc language so the strict-mode contract and follow-up impl
   - code-truth verification reveals a contradiction that requires design escalation.
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Align strict_mode contract language across DE/DR/research | [ ] | Hard-fail + no exception knobs captured |
-| [x] | 1.2 | Add v1 coverage precedence and mixed-status warning policy | [ ] | Conservative aggregation, warn-level drift checks |
-| [x] | 1.3 | Create `phase-01.md` and prefill contract-freeze checklist | [ ] | Includes gate/exit/verification details |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                                | Parallel? | Notes                                             |
+| ------ | --- | ---------------------------------------------------------- | --------- | ------------------------------------------------- |
+| [x]    | 1.1 | Align strict_mode contract language across DE/DR/research  | [ ]       | Hard-fail + no exception knobs captured           |
+| [x]    | 1.2 | Add v1 coverage precedence and mixed-status warning policy | [ ]       | Conservative aggregation, warn-level drift checks |
+| [x]    | 1.3 | Create `phase-01.md` and prefill contract-freeze checklist | [ ]       | Includes gate/exit/verification details           |
 
 ### Task Details
+
 - **1.1 Description**
   - **Design / Approach**: Normalize all strict-mode references to one concrete `workflow.toml` key with explicit enabled/disabled behavior.
   - **Files / Components**: `DE-038.md`, `DR-038.md`, `workflow-research.md`
@@ -128,23 +136,27 @@ Freeze DE-038 policy/doc language so the strict-mode contract and follow-up impl
   - **Observations & AI Notes**: scaffold appended duplicate phase ID in `IP-038` plan overview; cleaned manually.
   - **Commits / References**: uncommitted work in DE-038 bundle.
 
-*(Repeat detail blocks per task as needed)*
+_(Repeat detail blocks per task as needed)_
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Strict-mode wording drifts across documents | Use line-cited readback against all three artifacts before phase close | Mitigated |
-| Policy text overstates current runtime behavior | Keep explicit "documentation-only, no runtime branching yet" framing | Mitigated |
+
+| Risk                                            | Mitigation                                                             | Status    |
+| ----------------------------------------------- | ---------------------------------------------------------------------- | --------- |
+| Strict-mode wording drifts across documents     | Use line-cited readback against all three artifacts before phase close | Mitigated |
+| Policy text overstates current runtime behavior | Keep explicit "documentation-only, no runtime branching yet" framing   | Mitigated |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-03` - Baseline strict-mode contract frozen: hard-fail non-canonical paths, no exception knobs in this delta.
 - `2026-03-03` - Recommended v1 coverage precedence frozen: mixed statuses resolve to `in-progress` with warning-level validation.
 
 ## 10. Findings / Research Notes
+
 - Coverage remains primary close-out gate; other hard failures (invalid requirement IDs, missing parent spec, retired requirement) were kept explicit in contract docs.
 - Plan coverage in default sync remains a follow-up scope question contingent on precedence+warning implementation.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

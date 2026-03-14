@@ -2,8 +2,8 @@
 id: IP-048.PHASE-01
 slug: 048-config-dirs-wiring
 name: Config [dirs] wiring and paths initialization
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: done
 kind: phase
 ---
@@ -23,7 +23,7 @@ entrance_criteria:
   - core/paths.py and core/config.py read and understood
 exit_criteria:
   - init_paths(config) and reset_paths() implemented and tested
-  - '[dirs] section in DEFAULT_CONFIG with all directory name defaults'
+  - "[dirs] section in DEFAULT_CONFIG with all directory name defaults"
   - CLI entry point calls init_paths after config load
   - RepoTestCase.tearDown calls reset_paths
   - All VT gates satisfied
@@ -94,15 +94,15 @@ current layout.
 
 ## 5. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 1.1 | Add `[dirs]` section to `DEFAULT_CONFIG` in `config.py` | 16 keys added, defaults match paths.py constants |
-| [x] | 1.2 | Implement `init_paths(config)` and `reset_paths()` in `paths.py` | `_CONFIG_KEY_TO_CONSTANT` mapping + `_ORIGINAL_DEFAULTS` snapshot; `globals()` override |
-| [x] | 1.3 | Write `paths_test.py` | 15 new tests: TestInitPaths (4), TestResetPaths (2), TestCustomDirsHelpers (9) |
-| [x] | 1.4 | Update `config_test.py` for `[dirs]` parsing | 3 new tests + 1 assertion added to structure test |
-| [x] | 1.5 | Wire `init_paths()` into CLI entry point | `@app.callback()` in main.py; uses `find_repo_root()` with RuntimeError fallback |
-| [x] | 1.6 | Add `reset_paths()` to `RepoTestCase.tearDown` | No conftest.py exists; tearDown is sufficient |
-| [x] | 1.7 | Run `just` — full regression | 2651 passed, 3 skipped, pylint 9.56/10 (unchanged) |
+| Status | ID  | Description                                                      | Notes                                                                                   |
+| ------ | --- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [x]    | 1.1 | Add `[dirs]` section to `DEFAULT_CONFIG` in `config.py`          | 16 keys added, defaults match paths.py constants                                        |
+| [x]    | 1.2 | Implement `init_paths(config)` and `reset_paths()` in `paths.py` | `_CONFIG_KEY_TO_CONSTANT` mapping + `_ORIGINAL_DEFAULTS` snapshot; `globals()` override |
+| [x]    | 1.3 | Write `paths_test.py`                                            | 15 new tests: TestInitPaths (4), TestResetPaths (2), TestCustomDirsHelpers (9)          |
+| [x]    | 1.4 | Update `config_test.py` for `[dirs]` parsing                     | 3 new tests + 1 assertion added to structure test                                       |
+| [x]    | 1.5 | Wire `init_paths()` into CLI entry point                         | `@app.callback()` in main.py; uses `find_repo_root()` with RuntimeError fallback        |
+| [x]    | 1.6 | Add `reset_paths()` to `RepoTestCase.tearDown`                   | No conftest.py exists; tearDown is sufficient                                           |
+| [x]    | 1.7 | Run `just` — full regression                                     | 2651 passed, 3 skipped, pylint 9.56/10 (unchanged)                                      |
 
 ## 6. Assumptions & STOP Conditions
 

@@ -25,6 +25,7 @@ exit_criteria:
 ## 1. Objective
 
 Complete the verification and documentation for the package-level spec migration:
+
 - VT-003: Integration test for sync operation with package-level specs
 - VT-004: File-to-package resolution tests
 - VA-001: Git diff stability analysis (verify no spurious changes)
@@ -72,18 +73,21 @@ This phase ensures the migration is fully verified and documented.
 ## 5. Verification
 
 **VT-003: Integration Test for Sync with Package-Level Specs**
+
 - Location: `supekku/scripts/lib/sync/adapters/python_test.py`
 - Test sync operation discovers and syncs 5 test packages
 - Verify each spec has `packages: [path]` field
 - Verify deterministic ordering across multiple runs
 
 **VT-004: File-to-Package Resolution Tests**
+
 - Location: `supekku/scripts/lib/specs/registry_test.py` or new test file
 - Test `--for-path` queries resolve to package-level specs
 - Test resolution at various depths (leaf file, nested file, package root)
 - Verify queries for files in same package return same spec
 
 **VA-001: Git Diff Stability Analysis**
+
 - Manual verification process:
   1. Generate contracts for a package
   2. Make a trivial code change (comment)
@@ -91,6 +95,7 @@ This phase ensures the migration is fully verified and documented.
   4. Verify diff only shows the comment change, no spurious reordering
 
 **Commands**:
+
 ```bash
 # Run VT-003
 uv run pytest supekku/scripts/lib/sync/adapters/python_test.py::test_sync_package_level_integration -v
@@ -109,12 +114,14 @@ just pylint
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions**:
+
 - Phase 02 completed successfully with all gates passing
 - 16 package-level specs created via tooling (not manual)
 - Registry already handles package queries (proven in Phase 01)
 - Deterministic ordering already validated (VT-002 in Phase 01)
 
 **STOP Conditions**:
+
 - STOP if VT-003 reveals sync issues with package-level specs
 - STOP if VT-004 shows file-to-package resolution broken
 - STOP if VA-001 reveals unstable contract generation
@@ -122,18 +129,19 @@ just pylint
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 3.1 | Implement VT-003 integration test | [ ] | ✓ 5 test packages |
-| [x] | 3.2 | Implement VT-004 resolution tests | [x] | ✓ File-to-package resolution |
-| [x] | 3.3 | Execute VA-001 stability analysis | [x] | ✓ Analysis document created |
-| [x] | 3.4 | Update documentation | [ ] | ✓ PROD-005 + glossary |
-| [x] | 3.5 | Run full test suite and lint | [ ] | ✓ 1096 tests, 9.68/10 |
-| [ ] | 3.6 | Mark DE-002 complete | [ ] | Update status |
+| Status | ID  | Description                       | Parallel? | Notes                        |
+| ------ | --- | --------------------------------- | --------- | ---------------------------- |
+| [x]    | 3.1 | Implement VT-003 integration test | [ ]       | ✓ 5 test packages            |
+| [x]    | 3.2 | Implement VT-004 resolution tests | [x]       | ✓ File-to-package resolution |
+| [x]    | 3.3 | Execute VA-001 stability analysis | [x]       | ✓ Analysis document created  |
+| [x]    | 3.4 | Update documentation              | [ ]       | ✓ PROD-005 + glossary        |
+| [x]    | 3.5 | Run full test suite and lint      | [ ]       | ✓ 1096 tests, 9.68/10        |
+| [ ]    | 3.6 | Mark DE-002 complete              | [ ]       | Update status                |
 
 ### Task Details
 
 **3.1 VT-003: Integration Test for Sync with Package-Level Specs**
+
 - **Design / Approach**:
   - Create test fixture with 5 Python packages in temporary directory
   - Run PythonAdapter sync operation
@@ -147,6 +155,7 @@ just pylint
 - **Commits / References**: [To be filled]
 
 **3.2 VT-004: File-to-Package Resolution Tests**
+
 - **Design / Approach**:
   - Test `find_by_package()` resolves files to package specs
   - Test various file depths: `pkg/__init__.py`, `pkg/module.py`, `pkg/sub/deep.py`
@@ -159,6 +168,7 @@ just pylint
 - **Observations & AI Notes**: [To be filled]
 
 **3.3 VA-001: Git Diff Stability Analysis**
+
 - **Design / Approach**:
   - Pick a test package (e.g., `supekku/scripts/lib/formatters`)
   - Generate contracts via sync
@@ -170,6 +180,7 @@ just pylint
 - **Observations & AI Notes**: [To be filled]
 
 **3.4 Update Documentation**
+
 - **Design / Approach**:
   - Update README.md or create `docs/package-level-specs.md`
   - Document: package-level granularity decision, leaf package pattern, how to query specs
@@ -179,21 +190,23 @@ just pylint
 - **Observations & AI Notes**: [To be filled]
 
 **3.5 Run Full Test Suite and Lint**
+
 - **Design / Approach**: Final gate check before marking complete
 - **Testing**: `just test`, `just lint`, `just pylint`
 
 **3.6 Mark DE-002 Complete**
+
 - **Design / Approach**: Update delta status to completed
 - **Files / Components**: `change/deltas/DE-002-python-package-level-spec-granularity/DE-002.md`
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| VT-003 reveals sync issues | Phase 02 already validated sync works | Low risk |
-| VT-004 resolution broken | Phase 01 validated package detection | Low risk |
-| VA-001 shows unstable diffs | VT-002 already validated ordering | Low risk |
-| Documentation unclear | Review with examples from real usage | Pending |
+| Risk                        | Mitigation                            | Status   |
+| --------------------------- | ------------------------------------- | -------- |
+| VT-003 reveals sync issues  | Phase 02 already validated sync works | Low risk |
+| VT-004 resolution broken    | Phase 01 validated package detection  | Low risk |
+| VA-001 shows unstable diffs | VT-002 already validated ordering     | Low risk |
+| Documentation unclear       | Review with examples from real usage  | Pending  |
 
 ## 9. Decisions & Outcomes
 
@@ -202,6 +215,7 @@ just pylint
 ## 10. Findings / Research Notes
 
 **From Phase 02 Handover**:
+
 - 16 package-level specs created (SPEC-110 to SPEC-125)
 - All specs have `packages: [path]` field in frontmatter
 - Registry indexes correctly (validation passing)
@@ -209,6 +223,7 @@ just pylint
 - 1094 tests passing, all linters passing
 
 **VT-003 Test Structure** (planned):
+
 ```python
 def test_sync_package_level_integration(tmp_path):
   # Create 5 test packages with __init__.py
@@ -218,6 +233,7 @@ def test_sync_package_level_integration(tmp_path):
 ```
 
 **VT-004 Test Structure** (planned):
+
 ```python
 def test_file_to_package_resolution():
   # Test find_by_package() for various file paths
@@ -244,20 +260,24 @@ def test_file_to_package_resolution():
 ## 12. Completion Summary
 
 **Files Modified** (3 total):
+
 1. `supekku/scripts/lib/sync/adapters/python_test.py` - Added VT-003 integration test
 2. `supekku/scripts/lib/specs/registry_test.py` - Added VT-004 resolution test
 3. `supekku/about/glossary.md` - Added VT/VH/VA definitions
 
 **Files Created** (2 total):
+
 1. `change/deltas/DE-002-.../VA-001-git-diff-stability.md` - Stability analysis
 2. `change/deltas/DE-002-.../phases/phase-03.md` - This phase sheet
 
 **Test Coverage**:
+
 - VT-003: Integration test with 5 packages, frontmatter validation, deterministic ordering
 - VT-004: File-to-package resolution at 4 depth levels, edge cases
 - VA-001: Agent analysis confirming git diff stability
 
 **Verification Results**:
+
 - VT-003: ✅ PASSING (1 test added)
 - VT-004: ✅ PASSING (1 test added)
 - VA-001: ✅ PASSING (analysis complete)
@@ -266,6 +286,7 @@ def test_file_to_package_resolution():
 - Ruff: All checks passing
 
 **Key Achievements**:
+
 - Comprehensive verification suite for package-level pattern
 - Automated tests ensure pattern sustainability
 - Agent analysis confirms stability meets requirements

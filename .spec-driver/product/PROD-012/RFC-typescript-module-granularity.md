@@ -25,6 +25,7 @@ for file in src_dir.glob("**/*.ts"):
 ```
 
 **Result**: Medium NextJS project (~1134 files) → **119 specs**
+
 - Most contracts <100 lines (only ~3 have >100 lines)
 - Navigation difficult: deep symlink trees mirroring individual files
 - Violates FR-015: specs not cohesive or right-sized
@@ -32,6 +33,7 @@ for file in src_dir.glob("**/*.ts"):
 ### Why Python/Go Don't Have This Problem
 
 **Python:**
+
 ```
 supekku/
   scripts/
@@ -41,11 +43,13 @@ supekku/
         change_formatters.py
         spec_formatters.py
 ```
+
 - `__init__.py` defines package boundaries (language requirement)
 - Leaf package detection: packages with no child packages
 - Natural, deterministic, hierarchical structure
 
 **Go:**
+
 ```
 pkg/
   registry/
@@ -53,11 +57,13 @@ pkg/
     registry.go
     types.go
 ```
+
 - `go.mod` defines module boundaries (language requirement)
 - One module per directory (implicit from language design)
 - Clear architectural boundaries
 
 **TypeScript:**
+
 ```
 src/
   services/
@@ -65,6 +71,7 @@ src/
     cartService.ts       ← No package marker
     userService.ts       ← No package marker
 ```
+
 - **No language-level package system**
 - `index.ts` is convention, not requirement
 - Arbitrary filesystem organization
@@ -100,6 +107,7 @@ def is_leaf_module(path: Path) -> bool:
 ```
 
 **Evaluation**:
+
 - ✅ Deterministic: Based on filesystem
 - ✅ Stable: Only changes when index files added/removed
 - ✅ Respects developer intent where used
@@ -108,6 +116,7 @@ def is_leaf_module(path: Path) -> bool:
 - ❌ **Only works for libraries**: Doesn't work for apps, services, models
 
 **Test case**: NextJS project with 1134 files → **6 specs** (only components have index files)
+
 - `src/services/` (12 files): No spec ❌
 - `src/models/` (20 files): No spec ❌
 - `src/app/` (50+ routes): No spec ❌
@@ -127,12 +136,14 @@ def find_modules(package_root: Path) -> list[Path]:
 ```
 
 **Result**:
+
 - `src/services/` → 1 spec
 - `src/models/` → 1 spec
 - `src/app/` → 1 spec
 - `src/components/` → 1 spec
 
 **Evaluation**:
+
 - ✅ Deterministic: Based on filesystem
 - ✅ Stable: Only changes with architectural refactoring
 - ✅ Exhaustive: Everything under src/ covered
@@ -142,6 +153,7 @@ def find_modules(package_root: Path) -> list[Path]:
 - ❌ **Breaks on monorepos**: Ignores package boundaries entirely
 
 **Monorepo example**:
+
 ```
 packages/
   ui-library/src/components/  (100+ files) → 1 spec ❌
@@ -167,14 +179,17 @@ def find_modules(repo_root: Path) -> list[Path]:
 ```
 
 **Monorepo result**:
+
 - `packages/ui-library/` → 1 spec (100+ files)
 - `packages/api-client/` → 1 spec (200+ files)
 - `packages/admin-app/` → 1 spec (300+ files)
 
 **Single-package result**:
+
 - `/` → 1 spec (entire project, 1000+ files)
 
 **Evaluation**:
+
 - ✅ Deterministic: Based on package.json presence
 - ✅ Stable: Package structure rarely changes
 - ✅ Exhaustive: All files within package covered
@@ -201,6 +216,7 @@ sources:
 ```
 
 **Evaluation**:
+
 - ✅ Deterministic: Explicit is deterministic
 - ✅ Flexible: Can represent any grouping
 - ✅ Stable: Metadata changes are deliberate
@@ -245,6 +261,7 @@ spec-driver sync --stub
 ```
 
 Creates one spec per `package.json`:
+
 - Monorepo: One spec per workspace package
 - Single-package: One spec for entire project
 
@@ -254,11 +271,12 @@ Creates one spec per `package.json`:
 # SPEC-042.md
 sources:
   - language: typescript
-    package: packages/api-client  # Required: which package.json
-    subtree: src/services         # Optional: subdirectory within package
+    package: packages/api-client # Required: which package.json
+    subtree: src/services # Optional: subdirectory within package
 ```
 
 **Rules**:
+
 - `subtree` must be a directory path, not a glob (deterministic)
 - Within a package, all subtrees must be non-overlapping (exclusive)
 - Within a package, union of subtrees must cover all files (exhaustive)
@@ -275,7 +293,9 @@ spec-driver split SPEC-042 src/services/auth
 ```
 
 **Behavior**:
+
 1. Create SPEC-043 with:
+
    ```yaml
    sources:
      - language: typescript
@@ -284,17 +304,19 @@ spec-driver split SPEC-042 src/services/auth
    ```
 
 2. Update SPEC-042 to exclude that subtree:
+
    ```yaml
    sources:
      - language: typescript
        package: packages/api-client
-       subtree: .  # Implicitly excludes src/services/auth
+       subtree: . # Implicitly excludes src/services/auth
    ```
 
 3. Move contracts from SPEC-042 to SPEC-043
 4. Update symlink trees
 
 **Validation** (on sync/validate):
+
 - Within each package, verify subtrees are:
   - Non-overlapping (exclusive)
   - Complete (exhaustive)
@@ -335,6 +357,7 @@ src/
 ```
 
 **Rejected because**:
+
 - Pollutes codebase with spec-driver-specific files
 - Instability: Moving `.pkg` files moves code between specs
 - Not better than subtree metadata (same information, worse location)
@@ -346,6 +369,7 @@ src/
 **Question**: Should `sync --stub` auto-split large packages?
 
 **Options**:
+
 1. **No auto-split**: Always one spec per package.json
    - Pro: Simple, predictable
    - Con: Poor initial UX for large single-package projects
@@ -365,6 +389,7 @@ src/
 **Scenario**: User splits SPEC-042 into SPEC-042 + SPEC-043, later decides to merge back.
 
 **Options**:
+
 1. **Manual**: User deletes SPEC-043, removes subtree from SPEC-042 metadata
    - Pro: Explicit control
    - Con: Contracts orphaned, symlinks broken
@@ -380,6 +405,7 @@ src/
 **Question**: Should subtree be `src/services/auth` (path) or `src/services/auth/**/*.ts` (glob)?
 
 **Trade-offs**:
+
 - **Path**: Simple, deterministic, easier to validate
 - **Glob**: Flexible, can express complex scopes, harder to validate
 
@@ -390,10 +416,12 @@ src/
 **Question**: Can SPEC-043 have `subtree: src/services/auth/oauth`?
 
 **Valid**:
+
 - SPEC-042: `subtree: src/services`
 - SPEC-043: `subtree: src/services/auth` (nested under SPEC-042's scope)
 
 **Options**:
+
 1. **Allow**: Subtrees can nest
    - Pro: Maximum flexibility
    - Con: Complex validation (tree structure)
@@ -409,6 +437,7 @@ src/
 **Question**: How to migrate repositories with existing fine-grained specs?
 
 **Options**:
+
 1. **Manual migration**: Users delete stubs, re-run sync --stub, split as needed
 2. **Consolidation tool**: `spec-driver consolidate` merges related specs
 3. **Leave as-is**: Don't force migration
@@ -422,6 +451,7 @@ src/
 **Scope**: Replace current per-file detection with package.json boundaries
 
 **Changes**:
+
 - `typescript.py`: Replace `_find_logical_modules()` to find package.json files
 - Update spec frontmatter to include `package` field
 - Generate one spec per package.json
@@ -434,6 +464,7 @@ src/
 **Scope**: Add support for subtree refinement in spec metadata
 
 **Changes**:
+
 - Add `subtree` field to spec frontmatter schema
 - Update contract generation to respect subtree scope
 - Add validation: check exhaustive + exclusive within package
@@ -446,6 +477,7 @@ src/
 **Scope**: Add `spec-driver split` command for safe spec division
 
 **Changes**:
+
 - New CLI command: `spec-driver split SPEC-ID SUBTREE --id NEW-ID`
 - Validation: ensure subtree exists, doesn't overlap
 - Update both specs' metadata
@@ -459,6 +491,7 @@ src/
 **Scope**: Add `spec-driver merge` for consolidation
 
 **Changes**:
+
 - New CLI command: `spec-driver merge SPEC-SRC --into SPEC-DEST`
 - Validation: ensure both specs in same package
 - Merge contracts

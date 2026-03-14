@@ -2,8 +2,8 @@
 id: IP-039.PHASE-01
 slug: 039-workflow_command_surface_completion_and_strict_mode_lock_in-phase-01
 name: IP-039 Phase 01
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: completed
 kind: phase
 ---
@@ -53,10 +53,12 @@ phase: IP-039.PHASE-01
 # Phase 01 - Command UX + Messaging
 
 ## 1. Objective
+
 Harden `complete delta` for non-interactive use and remove stale runtime guidance
 so automation behavior is deterministic and discoverable.
 
 ## 2. Links & References
+
 - **Delta**: DE-039
 - **Design Revision Sections**:
   - DR-039 §2 Problem & Constraints
@@ -69,33 +71,39 @@ so automation behavior is deterministic and discoverable.
   - `docs/commands-workflow.md`
 
 ## 3. Entrance Criteria
+
 - [x] Delta scoped and linked to target requirements
 - [x] Phase sheet created and plan references updated
 
 ## 4. Exit Criteria / Done When
+
 - [x] Non-interactive completion path executes without stdin choreography
 - [x] Coverage error message references canonical active docs
 - [x] Targeted tests pass and evidence is recorded
 
 ## 5. Verification
+
 - `uv run pytest -q supekku/scripts/complete_delta_test.py supekku/scripts/lib/changes/coverage_check_test.py`
 - `uv run ruff check supekku/scripts/complete_delta.py supekku/scripts/complete_delta_test.py supekku/scripts/lib/changes/coverage_check.py`
 - Evidence: VT-039-002 test output + diff references.
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions: this phase does not yet implement strict-mode runtime branching or new CLI verbs.
 - STOP when: lifecycle semantics for revision/audit completion are ambiguous and require product decision.
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Validate and lock deterministic non-interactive prompt handling | [ ] | `complete_delta.py` + tests |
-| [x] | 1.2 | Update coverage-gate runtime documentation pointer and tests | [ ] | `coverage_check.py` |
-| [x] | 1.3 | Re-run focused verification and record evidence | [ ] | pytest + lint |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                                     | Parallel? | Notes                       |
+| ------ | --- | --------------------------------------------------------------- | --------- | --------------------------- |
+| [x]    | 1.1 | Validate and lock deterministic non-interactive prompt handling | [ ]       | `complete_delta.py` + tests |
+| [x]    | 1.2 | Update coverage-gate runtime documentation pointer and tests    | [ ]       | `coverage_check.py`         |
+| [x]    | 1.3 | Re-run focused verification and record evidence                 | [ ]       | pytest + lint               |
 
 ### Task Details
+
 - **1.1 Description**
   - **Design / Approach**: Use TTY-aware prompt defaults with explicit fallback behavior.
   - **Files / Components**: `supekku/scripts/complete_delta.py`, `supekku/scripts/complete_delta_test.py`
@@ -116,21 +124,25 @@ so automation behavior is deterministic and discoverable.
   - **Evidence**: VT-039-002 — `pytest -q` 23/23 pass; `ruff check` clean.
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Headless defaults cause unintended auto-confirmation | Keep sync default false; document completion/update defaults | Open |
+
+| Risk                                                 | Mitigation                                                   | Status |
+| ---------------------------------------------------- | ------------------------------------------------------------ | ------ |
+| Headless defaults cause unintended auto-confirmation | Keep sync default false; document completion/update defaults | Open   |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-04` - Added deterministic non-interactive prompt policy to avoid stdin choreography in automation.
 - `2026-03-04` - Locked strict-mode policy: universally block force-style bypass paths when `strict_mode=true`.
 - `2026-03-04` - Coverage gate doc pointer updated from nonexistent `.spec-driver/RUN.md` to `docs/commands-workflow.md`.
 
 ## 10. Findings / Research Notes
+
 - Existing `complete_delta` flow had unguarded `input()` calls causing EOF aborts in non-interactive use.
 - `.spec-driver/RUN.md` was never created; the stale pointer was likely a placeholder from early scaffolding.
 - Non-interactive default policy: sync=skip(false), completion-confirm=proceed(true), update-requirements=proceed(true).
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

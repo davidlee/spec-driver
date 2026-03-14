@@ -4,29 +4,30 @@ name: pi APPEND_SYSTEM.md auto-discovery
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-14'
-updated: '2026-03-14'
-verified: '2026-03-14'
+created: "2026-03-14"
+updated: "2026-03-14"
+verified: "2026-03-14"
 confidence: high
 tags:
-- pi
-- system-prompt
-- context-injection
+  - pi
+  - system-prompt
+  - context-injection
 summary: pi auto-discovers .pi/APPEND_SYSTEM.md and appends it to system prompt
 scope:
   paths:
-  - .pi/APPEND_SYSTEM.md
+    - .pi/APPEND_SYSTEM.md
   globs:
-  - .pi/**
+    - .pi/**
 provenance:
   sources:
-  - "@mariozechner/pi-coding-agent/dist/core/resource-loader.js (discoverAppendSystemPromptFile)"
-  - DE-093
+    - "@mariozechner/pi-coding-agent/dist/core/resource-loader.js (discoverAppendSystemPromptFile)"
+    - DE-093
 ---
 
 # pi APPEND_SYSTEM.md auto-discovery
 
 pi looks for `APPEND_SYSTEM.md` in two locations (first match wins):
+
 1. `.pi/APPEND_SYSTEM.md` — project-local (under `CONFIG_DIR_NAME`, which is `.pi`)
 2. `~/.pi/agent/APPEND_SYSTEM.md` — global
 

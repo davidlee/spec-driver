@@ -2,8 +2,8 @@
 id: IP-007.PHASE-02
 slug: 007-lifecycle-coverage-enforcement-phase-02
 name: IP-007 Phase 02
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: completed
 kind: phase
 ---
@@ -85,6 +85,7 @@ Enforce verification coverage updates during delta completion, blocking completi
 - [x] Example deltas with requirements identified for testing (DE-007 itself used for validation)
 
 **Phase 01 Hand-off Notes:**
+
 - Registry infrastructure complete: `_apply_coverage_blocks()` method ready
 - Coverage extraction works for specs, IPs, deltas, audits via `plan_dirs` parameter
 - Lifecycle status updates based on coverage: verified→live, planned→pending, failed/blocked→in-progress
@@ -108,6 +109,7 @@ Enforce verification coverage updates during delta completion, blocking completi
 ## 5. Verification
 
 **Tests to run:**
+
 - `uv run pytest supekku/scripts/complete_delta_test.py -v` (if exists)
 - `uv run pytest supekku/cli/complete_test.py -v` (if exists)
 - Manual test: attempt to complete delta without coverage (should fail)
@@ -116,6 +118,7 @@ Enforce verification coverage updates during delta completion, blocking completi
 - `just lint && just pylint`
 
 **Evidence to capture:**
+
 - CLI output showing enforcement error message
 - CLI output showing `--force` warning
 - Screenshot/log of successful completion after coverage update
@@ -124,39 +127,42 @@ Enforce verification coverage updates during delta completion, blocking completi
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions:**
+
 - Delta frontmatter `applies_to.requirements` lists touched requirements
 - Parent specs are discoverable from requirement IDs
 - Coverage blocks exist in specs (or gracefully warn if missing)
 - Registry is synced before completion check
 
 **STOP when:**
+
 - Cannot reliably discover parent spec from requirement ID
 - False positive rate exceeds 20% in testing
 - Performance impact exceeds 2 seconds for completion check
 
 ## 7. Tasks & Progress
 
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Add `check_coverage_completeness()` function | [ ] | Core enforcement logic |
-| [ ] | 2.2 | Add `--force` flag to completion command | [ ] | Emergency override |
-| [ ] | 2.3 | Add environment variable check | [ ] | Feature toggle |
-| [ ] | 2.4 | Integrate check into completion workflow | [ ] | Depends on 2.1, 2.2, 2.3 |
-| [ ] | 2.5 | Implement actionable error messages | [ ] | User experience |
-| [ ] | 2.6 | Update RUN.md with coverage workflow | [P] | Can run parallel |
-| [ ] | 2.7 | Update AGENTS.md/CLAUDE.md with checklist | [P] | Can run parallel |
-| [ ] | 2.8 | Create completion workflow tests | [ ] | Depends on 2.4 |
-| [ ] | 2.9 | VA-320: Guided completion validation | [ ] | Manual verification |
-| [ ] | 2.10 | VH-201: Manual drift workflow validation | [ ] | Manual verification |
-| [ ] | 2.11 | Lint and fix all warnings | [ ] | Final cleanup |
+| Status | ID   | Description                                  | Parallel? | Notes                    |
+| ------ | ---- | -------------------------------------------- | --------- | ------------------------ |
+| [ ]    | 2.1  | Add `check_coverage_completeness()` function | [ ]       | Core enforcement logic   |
+| [ ]    | 2.2  | Add `--force` flag to completion command     | [ ]       | Emergency override       |
+| [ ]    | 2.3  | Add environment variable check               | [ ]       | Feature toggle           |
+| [ ]    | 2.4  | Integrate check into completion workflow     | [ ]       | Depends on 2.1, 2.2, 2.3 |
+| [ ]    | 2.5  | Implement actionable error messages          | [ ]       | User experience          |
+| [ ]    | 2.6  | Update RUN.md with coverage workflow         | [P]       | Can run parallel         |
+| [ ]    | 2.7  | Update AGENTS.md/CLAUDE.md with checklist    | [P]       | Can run parallel         |
+| [ ]    | 2.8  | Create completion workflow tests             | [ ]       | Depends on 2.4           |
+| [ ]    | 2.9  | VA-320: Guided completion validation         | [ ]       | Manual verification      |
+| [ ]    | 2.10 | VH-201: Manual drift workflow validation     | [ ]       | Manual verification      |
+| [ ]    | 2.11 | Lint and fix all warnings                    | [ ]       | Final cleanup            |
 
 ### Task Details
 
 #### 2.1 Add `check_coverage_completeness()` function
 
 **Design / Approach:**
+
 - Create function in `complete_delta.py` or shared module
 - Input: delta_id, requirements_registry, repo_root
 - Output: (is_complete: bool, missing_coverage: list[dict])
@@ -172,10 +178,12 @@ Enforce verification coverage updates during delta completion, blocking completi
   4. Return completeness status and details
 
 **Files / Components:**
+
 - `supekku/scripts/complete_delta.py` - new function
 - Or `supekku/scripts/lib/completion/coverage_check.py` - new module if keeping CLI thin
 
 **Code Structure:**
+
 ```python
 def check_coverage_completeness(
   delta_id: str,
@@ -197,6 +205,7 @@ def check_coverage_completeness(
 ```
 
 **Testing:**
+
 - Test with delta having all requirements verified → (True, [])
 - Test with delta having some planned coverage → (False, [list])
 - Test with spec missing coverage blocks → graceful handling
@@ -207,15 +216,18 @@ def check_coverage_completeness(
 #### 2.2 Add `--force` flag to completion command
 
 **Design / Approach:**
+
 - Add `--force` boolean flag to CLI command
 - When set, bypass coverage check but log warning
 - Log should include delta ID and timestamp for audit trail
 
 **Files / Components:**
+
 - `supekku/cli/complete.py` - add flag parameter
 - `supekku/scripts/complete_delta.py` - accept force parameter
 
 **Code:**
+
 ```python
 @app.command("complete")
 def complete_delta(
@@ -236,6 +248,7 @@ def complete_delta(
 ```
 
 **Testing:**
+
 - Test flag is recognized by CLI parser
 - Test warning message appears when used
 - Test completion proceeds when flag set
@@ -245,15 +258,18 @@ def complete_delta(
 #### 2.3 Add environment variable check
 
 **Design / Approach:**
+
 - Check `SPEC_DRIVER_ENFORCE_COVERAGE` environment variable
 - Default to 'true' (enforcement enabled)
 - Values: 'true', '1', 'yes' → enforce; 'false', '0', 'no' → skip
 - Log when enforcement is disabled via env var
 
 **Files / Components:**
+
 - `supekku/scripts/complete_delta.py`
 
 **Code:**
+
 ```python
 def is_coverage_enforcement_enabled() -> bool:
   """Check if coverage enforcement is enabled via environment."""
@@ -262,6 +278,7 @@ def is_coverage_enforcement_enabled() -> bool:
 ```
 
 **Testing:**
+
 - Test with env var unset (default true)
 - Test with env var='false' (enforcement disabled)
 - Test with env var='true' (enforcement enabled)
@@ -271,6 +288,7 @@ def is_coverage_enforcement_enabled() -> bool:
 #### 2.4 Integrate check into completion workflow
 
 **Design / Approach:**
+
 - Call coverage check before marking delta complete
 - Flow:
   1. Existing pre-completion validations
@@ -282,10 +300,12 @@ def is_coverage_enforcement_enabled() -> bool:
   5. Continue with existing completion logic
 
 **Files / Components:**
+
 - `supekku/scripts/complete_delta.py` - main completion function
 - `supekku/cli/complete.py` - CLI entry point
 
 **Integration Point:**
+
 ```python
 def complete_delta(delta_id: str, force: bool = False):
   # ... existing setup ...
@@ -301,6 +321,7 @@ def complete_delta(delta_id: str, force: bool = False):
 ```
 
 **Testing:**
+
 - Integration test: full completion workflow with enforcement
 - Test enforcement enabled + incomplete coverage → exits
 - Test enforcement disabled → proceeds
@@ -311,6 +332,7 @@ def complete_delta(delta_id: str, force: bool = False):
 #### 2.5 Implement actionable error messages
 
 **Design / Approach:**
+
 - Error message should include:
   - Delta ID
   - List of requirements needing coverage updates
@@ -319,7 +341,8 @@ def complete_delta(delta_id: str, force: bool = False):
   - Link to documentation
 
 **Format:**
-```
+
+````
 ERROR: Cannot complete DE-007 - coverage updates required
 
 The following requirements need verified coverage in their specs:
@@ -343,13 +366,14 @@ entries:
     requirement: PROD-008.FR-001
     status: verified  # ← Update this
     notes: Registry sync integration test
-```
+````
 
 See: .spec-driver/RUN.md for coverage workflow documentation
 
 To bypass this check (not recommended):
-  uv run spec-driver complete DE-007 --force
-```
+uv run spec-driver complete DE-007 --force
+
+````
 
 **Files / Components:**
 - `supekku/scripts/complete_delta.py` - error formatting function
@@ -396,7 +420,7 @@ parent spec's coverage blocks to reflect verification status.
 3. Run completion command:
    ```bash
    uv run spec-driver complete DE-XXX
-   ```
+````
 
 4. If coverage check fails:
    - Review error message for requirements needing updates
@@ -406,6 +430,7 @@ parent spec's coverage blocks to reflect verification status.
 ### Emergency Override
 
 For emergencies, use --force flag (creates audit trail):
+
 ```bash
 uv run spec-driver complete DE-XXX --force
 ```
@@ -413,11 +438,13 @@ uv run spec-driver complete DE-XXX --force
 ### Disabling Enforcement
 
 Set environment variable to disable (not recommended):
+
 ```bash
 export SPEC_DRIVER_ENFORCE_COVERAGE=false
 uv run spec-driver complete DE-XXX
 ```
-```
+
+````
 
 **Testing:**
 - Review for clarity
@@ -445,9 +472,10 @@ uv run spec-driver complete DE-XXX
 - [ ] `uv run spec-driver complete DE-XXX` succeeds without --force
 - [ ] Tests passing (`just test`)
 - [ ] Linters passing (`just lint` + `just pylint`)
-```
+````
 
 **Testing:**
+
 - Ensure consistent with existing documentation style
 
 ---
@@ -455,6 +483,7 @@ uv run spec-driver complete DE-XXX
 #### 2.8 Create completion workflow tests
 
 **Design / Approach:**
+
 - Test file: `supekku/scripts/complete_delta_test.py` or similar
 - Test cases:
   - Complete with all coverage verified → success
@@ -464,10 +493,12 @@ uv run spec-driver complete DE-XXX
   - Error message contains correct requirements
 
 **Files / Components:**
+
 - `supekku/scripts/complete_delta_test.py` (new or extend existing)
 - Test fixtures: sample delta + specs with coverage blocks
 
 **Test Structure:**
+
 ```python
 def test_completion_enforces_coverage_verified():
   """Completion fails when coverage not verified."""
@@ -489,6 +520,7 @@ def test_completion_respects_env_var():
 ```
 
 **Testing:**
+
 - Run tests: `uv run pytest -v`
 - Ensure all test cases pass
 
@@ -497,12 +529,14 @@ def test_completion_respects_env_var():
 #### 2.9 VA-320: Guided completion validation
 
 **Design / Approach:**
+
 - Manual validation session with agent/human
 - Scenario: Complete a sample delta through full workflow
 - Verify enforcement messaging is clear
 - Verify completion succeeds after coverage update
 
 **Process:**
+
 1. Create test delta (or use existing)
 2. Attempt completion without coverage updates
 3. Review error message for clarity and actionability
@@ -511,6 +545,7 @@ def test_completion_respects_env_var():
 6. Document observations
 
 **Evidence:**
+
 - Session transcript or recording
 - Before/after coverage blocks
 - CLI output screenshots
@@ -520,12 +555,14 @@ def test_completion_respects_env_var():
 #### 2.10 VH-201: Manual drift workflow validation
 
 **Design / Approach:**
+
 - Manual validation of drift detection (from Phase 01)
 - Scenario: Audit reports requirement failed, spec says verified
 - Verify registry sync emits drift warning
 - Verify warning message is actionable
 
 **Process:**
+
 1. Create spec with coverage: status=verified
 2. Create audit with coverage: status=failed (or IP with status=planned)
 3. Run registry sync
@@ -534,6 +571,7 @@ def test_completion_respects_env_var():
 6. Re-sync, verify warning clears
 
 **Evidence:**
+
 - Sync output with drift warning
 - Documentation of remediation steps
 
@@ -542,21 +580,23 @@ def test_completion_respects_env_var():
 #### 2.11 Lint and fix all warnings
 
 **Design / Approach:**
+
 - Run `just lint` - must pass with zero warnings
 - Run `just pylint` - must meet threshold
 - Fix any violations
 
 **Testing:**
+
 - `just lint && just pylint`
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Enforcement blocks emergency fix | Provide `--force` flag, log usage, create follow-up backlog entry | Implemented |
-| False positives for legacy specs | Gracefully handle missing coverage blocks, document adoption path | Design addresses |
-| Unclear error messages confuse users | User testing (VA-320, VH-201), iterate on messaging | Planned |
-| Performance impact on completion | Profile check; should be <2s overhead | Monitored |
+| Risk                                 | Mitigation                                                        | Status           |
+| ------------------------------------ | ----------------------------------------------------------------- | ---------------- |
+| Enforcement blocks emergency fix     | Provide `--force` flag, log usage, create follow-up backlog entry | Implemented      |
+| False positives for legacy specs     | Gracefully handle missing coverage blocks, document adoption path | Design addresses |
+| Unclear error messages confuse users | User testing (VA-320, VH-201), iterate on messaging               | Planned          |
+| Performance impact on completion     | Profile check; should be <2s overhead                             | Monitored        |
 
 ## 9. Decisions & Outcomes
 
@@ -589,6 +629,7 @@ def test_completion_respects_env_var():
 **Implementation Status:** Core functionality complete, manual validation pending.
 
 **Key Deliverables:**
+
 - ✅ Coverage completeness check module (`coverage_check.py`, 287 lines, 10.00/10 pylint)
 - ✅ Integration into delta completion workflow (line ~430 in `complete_delta.py`)
 - ✅ Comprehensive test suite (19 tests, 100% passing, 10.00/10 pylint)
@@ -598,17 +639,20 @@ def test_completion_respects_env_var():
 **Implementation Details:**
 
 **Files Created:**
+
 - `supekku/scripts/lib/changes/coverage_check.py` - Core enforcement logic
 - `supekku/scripts/lib/changes/coverage_check_test.py` - Test suite
 - `.spec-driver/RUN.md` - Operational documentation
 
 **Files Modified:**
+
 - `supekku/scripts/complete_delta.py` - Added coverage enforcement (+13 lines)
 - `supekku/scripts/lib/changes/__init__.py` - Updated docstring
 - `AGENTS.md` - Added "Before completing a delta" checklist
 - `CLAUDE.md` - Auto-synced from AGENTS.md
 
 **Features Implemented:**
+
 1. **Environment Variable Control:** `SPEC_DRIVER_ENFORCE_COVERAGE` (default: enabled)
 2. **Emergency Override:** `--force` flag bypasses check with warning
 3. **Actionable Error Messages:** Shows spec paths, current status, example YAML
@@ -616,6 +660,7 @@ def test_completion_respects_env_var():
 5. **Comprehensive Validation:** Checks all requirements in `delta.applies_to.requirements`
 
 **Test Coverage:**
+
 - Environment variable handling (3 tests)
 - Requirement ID parsing (2 tests)
 - Coverage validation (5 tests)
@@ -623,11 +668,13 @@ def test_completion_respects_env_var():
 - Error message formatting (5 tests)
 
 **Lint Results:**
+
 - Ruff: All checks passed
 - Pylint: 9.96/10 (complexity warnings pre-existing)
 - Zero new lint issues introduced
 
 **Next Steps for Completion:**
+
 1. **VA-320:** Manual guided completion validation session
 2. **VH-201:** Manual drift workflow validation
 3. Update IP-007 coverage blocks to `status: verified`
@@ -635,6 +682,7 @@ def test_completion_respects_env_var():
 5. Consider creating follow-up delta for completion workflow improvements
 
 **Notes:**
+
 - Implementation follows AGENTS.md principles (skinny CLI, pure functions, no premature abstraction)
 - Coverage check runs before final confirmation, after preview and sync
 - Error messages reference RUN.md and include copy-paste examples

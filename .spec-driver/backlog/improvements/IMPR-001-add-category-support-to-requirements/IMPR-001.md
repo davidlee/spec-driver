@@ -1,8 +1,8 @@
 ---
 id: IMPR-001
 name: Add category support to requirements
-created: '2025-11-04'
-updated: '2025-11-04'
+created: "2025-11-04"
+updated: "2025-11-04"
 status: resolved
 kind: improvement
 ---
@@ -59,20 +59,24 @@ requirements:
 ## Implementation Scope
 
 ### Parser Changes
+
 - Extend requirement inline syntax parser to capture category from parenthetical notation
 - Extend YAML frontmatter parser to read `category` attribute
 - Update requirement model to include optional `category` field
 
 ### CLI Changes
+
 - Add `--category` option to `spec-driver list requirements`
 - Add category column to default list output format
 - Extend regexp and case-insensitive filters to operate on category field
 
 ### Registry Changes
+
 - Include `category` in requirements registry YAML
 - Update registry sync to preserve category metadata
 
 ### Testing
+
 - Unit tests for category parsing (inline and YAML)
 - Integration tests for category filtering
 - Test edge cases: missing category, special characters, whitespace
@@ -80,6 +84,7 @@ requirements:
 ## Examples
 
 ### Filtering by category
+
 ```bash
 # Show all performance requirements
 spec-driver list requirements --category performance
@@ -92,6 +97,7 @@ spec-driver list requirements --category 'auth|security' -r
 ```
 
 ### List output with categories
+
 ```
 ID       Category        Status      Description
 FR-001   authentication  proposed    User login with credentials
@@ -103,7 +109,9 @@ NF-002   reliability     proposed    99.9% uptime SLA
 ## Architectural Decisions
 
 ### Hierarchy Support
+
 Categories support user-defined hierarchy delimiters (e.g., `/`, `.`, `::`). No formal hierarchy structure is enforced - users are free to adopt conventions that suit their needs:
+
 - `security/authentication`
 - `performance.database`
 - `ui::accessibility`
@@ -111,22 +119,27 @@ Categories support user-defined hierarchy delimiters (e.g., `/`, `.`, `::`). No 
 Filtering treats categories as simple strings (substring/regexp matching), allowing flexible querying regardless of delimiter choice.
 
 ### Taxonomy Validation
+
 No predefined taxonomy. Categories are freeform text, promoting ease of use and adaptability to different domain models. Teams can establish conventions in their project documentation if desired.
 
 ### Categorization Requirement
+
 Categories are **optional**. Uncategorized requirements display an empty category column or a configurable placeholder (e.g., `-` or `uncategorized`).
 
 ### Precedence Rules
+
 Following existing requirement merge patterns:
 
 **Body content takes precedence over frontmatter** for descriptive fields (consistent with current `title`, `kind`, `path` behavior).
 
 When a requirement is defined in both locations:
+
 1. **Body syntax** `**FR-001**(auth): description` → category is `auth`
 2. **Frontmatter YAML** includes `category: security` → ignored during merge
 3. **Result**: category = `auth` (body wins)
 
 This ensures:
+
 - Source of truth is visible in the spec body where requirements are read
 - Consistent with existing merge behavior for `title` and `kind`
 - Simple mental model: body content is authoritative for requirement definition
@@ -134,7 +147,9 @@ This ensures:
 **Fallback behavior**: If only frontmatter defines category (no inline category in body), use frontmatter value. This supports legacy specs or alternative authoring styles.
 
 ### Implementation Notes
+
 The merge strategy in `RequirementRecord.merge()` already establishes this pattern:
+
 ```python
 return RequirementRecord(
   # ... existing fields preserved

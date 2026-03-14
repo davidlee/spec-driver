@@ -1,8 +1,8 @@
 ---
 id: IMPR-010
-name: 'Backlog prioritize UX: status-aware checkboxes and status toggling'
-created: '2026-03-07'
-updated: '2026-03-07'
+name: "Backlog prioritize UX: status-aware checkboxes and status toggling"
+created: "2026-03-07"
+updated: "2026-03-07"
 status: open
 kind: improvement
 relations:
@@ -31,11 +31,11 @@ they don't reflect item status. The checkboxes are purely for priority ordering
 
 Pending ISSUE-009 (status enum definitions), a reasonable default:
 
-| Checkbox | Statuses |
-|----------|----------|
-| `[ ]` | open, captured, idea, suspected, identified |
-| `[-]` | in-progress, triaged, analyzed, planned, confirmed |
-| `[x]` | done, resolved, implemented, closed, mitigated, validated |
+| Checkbox | Statuses                                                  |
+| -------- | --------------------------------------------------------- |
+| `[ ]`    | open, captured, idea, suspected, identified               |
+| `[-]`    | in-progress, triaged, analyzed, planned, confirmed        |
+| `[x]`    | done, resolved, implemented, closed, mitigated, validated |
 
 ## Dependencies
 
@@ -48,7 +48,7 @@ Pending ISSUE-009 (status enum definitions), a reasonable default:
 
 - Read path (display current status as checkbox) is straightforward.
 - Write path (toggling checkbox updates frontmatter) requires deciding what
-  status to transition *to* when a box is checked — e.g. does checking an
+  status to transition _to_ when a box is checked — e.g. does checking an
   issue set it to `resolved` or `done`? This needs per-kind default targets.
 - The priority editor already parses markdown checkboxes; the infrastructure
   is partially there.

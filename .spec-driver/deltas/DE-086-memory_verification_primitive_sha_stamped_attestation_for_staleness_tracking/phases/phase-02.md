@@ -1,9 +1,9 @@
 ---
 id: IP-086.PHASE-02
 slug: 086-memory_verification_primitive_sha_stamped_attestation_for_staleness_tracking-phase-02
-name: 'IP-086 Phase 02: CLI and staleness'
-created: '2026-03-09'
-updated: '2026-03-09'
+name: "IP-086 Phase 02: CLI and staleness"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---
@@ -35,13 +35,13 @@ verification:
     - VT-cli-list-stale
   evidence: []
 tasks:
-  - id: '2.1'
+  - id: "2.1"
     description: Create memory/staleness.py module
-  - id: '2.2'
+  - id: "2.2"
     description: Add --verify flag to edit memory CLI
-  - id: '2.3'
+  - id: "2.3"
     description: Add staleness formatter to memory_formatters.py
-  - id: '2.4'
+  - id: "2.4"
     description: Add --stale flag to list memories CLI
 risks:
   - description: Complex glob patterns don't translate to git pathspecs
@@ -57,17 +57,21 @@ phase: IP-086.PHASE-02
 # Phase 02 — CLI and Staleness
 
 ## 1. Objective
+
 Wire the Phase 01 foundation into user-facing CLI commands. Implement batched staleness computation as a domain module and surface it through `list memories --stale` with three-tier output.
 
 ## 2. Links & References
+
 - **Delta**: [DE-086](../DE-086.md)
 - **Design Revision**: [DR-086](../DR-086.md) §5.6–§5.8
 - **Specs**: SPEC-132 (memory), SPEC-110 (CLI)
 
 ## 3. Entrance Criteria
+
 - [x] Phase 01 complete (core primitives tested and committed)
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `edit memory --verify` stamps `verified`, `verified_sha`, `updated` via `update_frontmatter_fields`
 - [ ] `edit memory --verify` refuses when `get_head_sha()` returns None
 - [ ] `edit memory --verify` and `--status` are mutually exclusive
@@ -80,23 +84,25 @@ Wire the Phase 01 foundation into user-facing CLI commands. Implement batched st
 - [ ] `just pylint-files` clean on all touched files
 
 ## 5. Verification
+
 - Run: `just test`
 - Run: `just lint`
 - Run: `just pylint-files supekku/cli/edit.py supekku/cli/list.py supekku/scripts/lib/memory/staleness.py supekku/scripts/lib/formatters/memory_formatters.py`
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumes Phase 01 code is committed and stable
 - STOP if `update_frontmatter_fields` doesn't handle `verified_sha` insertion correctly
 - STOP if list.py refactoring temptation arises — note it but don't pursue in this phase
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 2.1 | Create `memory/staleness.py` | [P] | DR §5.7 — 17 tests, pylint 10/10 |
-| [x] | 2.2 | Add `--verify` to `edit memory` | [P] | DR §5.6 — 5 tests, pylint 10/10 |
-| [x] | 2.3 | Add staleness formatter | — | DR §5.8 — 7 tests, pylint 10/10 |
-| [x] | 2.4 | Add `--stale` to `list memories` | — | DR §5.8 — 2 CLI tests |
+| Status | ID  | Description                      | Parallel? | Notes                            |
+| ------ | --- | -------------------------------- | --------- | -------------------------------- |
+| [x]    | 2.1 | Create `memory/staleness.py`     | [P]       | DR §5.7 — 17 tests, pylint 10/10 |
+| [x]    | 2.2 | Add `--verify` to `edit memory`  | [P]       | DR §5.6 — 5 tests, pylint 10/10  |
+| [x]    | 2.3 | Add staleness formatter          | —         | DR §5.8 — 7 tests, pylint 10/10  |
+| [x]    | 2.4 | Add `--stale` to `list memories` | —         | DR §5.8 — 2 CLI tests            |
 
 ### Task Details
 
@@ -121,18 +127,21 @@ Wire the Phase 01 foundation into user-facing CLI commands. Implement batched st
   - **Testing**: CLI integration with mocked staleness. Output format.
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Complex globs → git pathspecs | Current corpus is simple prefixes; warn on untranslatable | Low risk |
-| list.py growing large | Note for backlog; keep addition minimal, delegate to domain + formatters | Accepted |
+
+| Risk                          | Mitigation                                                               | Status   |
+| ----------------------------- | ------------------------------------------------------------------------ | -------- |
+| Complex globs → git pathspecs | Current corpus is simple prefixes; warn on untranslatable                | Low risk |
+| list.py growing large         | Note for backlog; keep addition minimal, delegate to domain + formatters | Accepted |
 
 ## 9. Decisions & Outcomes
+
 - All design decisions closed in DR-086 prior to phase start.
 - 2026-03-10: Distinguished "git failed" (returns None) from "0 commits" (returns empty list) in `_query_git_log` to avoid falsely reporting 0 commits when git is unavailable.
 - 2026-03-10: `_verify_memory` extracted as a helper in edit.py to keep the command function thin.
 - 2026-03-10: Staleness formatter uses plain text (not Rich table) for tiered output — simpler, avoids coupling to Rich for a special-purpose view.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence: 3773 passed, 0 failed; ruff clean; pylint 10/10 on new files
 - [ ] Hand-off to Phase 03

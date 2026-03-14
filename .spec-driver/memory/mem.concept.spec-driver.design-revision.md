@@ -4,23 +4,24 @@ name: Design Revisions
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-06'
-verified: '2026-03-06'
+updated: "2026-03-06"
+verified: "2026-03-06"
 confidence: high
 tags:
-- spec-driver
-- design-revision
-summary: 'Design Revisions (DR-*) translate delta intent into concrete code-level
-  design: current vs target behaviour, hotspots, and test impacts.'
+  - spec-driver
+  - design-revision
+summary:
+  "Design Revisions (DR-*) translate delta intent into concrete code-level
+  design: current vs target behaviour, hotspots, and test impacts."
 priority:
   severity: medium
   weight: 5
 provenance:
   sources:
-  - kind: adr
-    ref: ADR-004
-  - kind: code
-    ref: supekku/scripts/lib/changes/creation.py
+    - kind: adr
+      ref: ADR-004
+    - kind: code
+      ref: supekku/scripts/lib/changes/creation.py
 ---
 
 # Design Revisions

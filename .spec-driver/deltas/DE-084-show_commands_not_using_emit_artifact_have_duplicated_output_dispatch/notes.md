@@ -12,6 +12,7 @@ Migrated all 7 show commands (`spec`, `delta`, `requirement`, `adr`, `policy`,
 `standard`, `card`) from inline output dispatch to `resolve_artifact` + `emit_artifact`.
 
 Key patterns:
+
 - Most commands: `resolve_artifact(type, id, root)` → `emit_artifact(ref, ...)`
 - `show card`: kept manual `CardRegistry.resolve_card(id, anywhere=anywhere)` then
   constructed `ArtifactRef` before passing to `emit_artifact` (for `--anywhere` support)

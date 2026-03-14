@@ -2,8 +2,8 @@
 id: IP-079.PHASE-01
 slug: 079-implement_canonical_audit_reconciliation_contract-phase-01
 name: "IP-079 Phase 01 — Schema foundation"
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---
@@ -70,15 +70,18 @@ phase: IP-079.PHASE-01
 Build the data model foundation that all subsequent phases depend on: audit disposition sub-schema, delta audit_gate field, disposition constants, updated template, extended creation, and cleanup of deprecated fields.
 
 ## 2. Links & References
+
 - **Delta**: DE-079
 - **Design Revision**: DR-079 §4 (Code Impact Summary), DEC-079-001 through DEC-079-004, DEC-079-007, DEC-079-009, DEC-079-010
 - **Specs**: SPEC-116 (frontmatter_metadata)
 - **Pattern**: `supekku/scripts/lib/drift/models.py:115–170` for structured ref pattern
 
 ## 3. Entrance Criteria
+
 - [x] DR-079 accepted with all design decisions resolved
 
 ## 4. Exit Criteria / Done When
+
 - [x] Audit frontmatter schema has `mode`, `delta_ref`, and `disposition` sub-schema per finding
 - [x] Disposition constants defined: `DISPOSITION_STATUS_*`, `DISPOSITION_KIND_*`, validity tables
 - [x] Delta frontmatter schema has `audit_gate` (enum: auto|required|exempt) and `audit_gate_rationale`
@@ -92,12 +95,14 @@ Build the data model foundation that all subsequent phases depend on: audit disp
 - [x] `just pylint-files` clean on all touched files (9.71/10; new messages are structural, not quality regressions)
 
 ## 5. Verification
+
 - `uv run pytest` on new and modified test files
 - `just lint` (ruff)
 - `just pylint-files <paths>`
 - Manual review of template rendering via `create audit` dry test
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - The existing `FieldMetadata` system in `blocks/metadata.py` supports nested object schemas (it does — `audit_window` is precedent)
   - `create_audit` CLI passes through to `creation.py` — check the CLI layer for any needed parameter additions
@@ -107,15 +112,15 @@ Build the data model foundation that all subsequent phases depend on: audit disp
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Define disposition constants module | [ ] | In audit.py |
-| [x] | 1.2 | Update audit frontmatter metadata schema | [ ] | Depends on 1.1 |
-| [x] | 1.3 | Add audit_gate to delta frontmatter schema | [P] | Independent of 1.1/1.2 |
-| [x] | 1.4 | Update audit template | [ ] | Depends on 1.2 |
-| [x] | 1.5 | Extend create_audit with mode, delta_ref | [ ] | Depends on 1.2, 1.4 |
-| [x] | 1.6 | Edit existing audits (remove deprecated fields) | [P] | AUD-001, AUD-002 migrated |
-| [x] | 1.7 | Write VT-079-001 tests | [ ] | 25 tests, all pass |
+| Status | ID  | Description                                     | Parallel? | Notes                     |
+| ------ | --- | ----------------------------------------------- | --------- | ------------------------- |
+| [x]    | 1.1 | Define disposition constants module             | [ ]       | In audit.py               |
+| [x]    | 1.2 | Update audit frontmatter metadata schema        | [ ]       | Depends on 1.1            |
+| [x]    | 1.3 | Add audit_gate to delta frontmatter schema      | [P]       | Independent of 1.1/1.2    |
+| [x]    | 1.4 | Update audit template                           | [ ]       | Depends on 1.2            |
+| [x]    | 1.5 | Extend create_audit with mode, delta_ref        | [ ]       | Depends on 1.2, 1.4       |
+| [x]    | 1.6 | Edit existing audits (remove deprecated fields) | [P]       | AUD-001, AUD-002 migrated |
+| [x]    | 1.7 | Write VT-079-001 tests                          | [ ]       | 25 tests, all pass        |
 
 ### Task Details
 
@@ -177,18 +182,21 @@ Build the data model foundation that all subsequent phases depend on: audit disp
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| FieldMetadata depth limit | Check audit_window precedent; escalate if nested objects in arrays are unsupported | open |
-| Existing audit parsing breaks | Test both existing audits explicitly after schema change | open |
+| Risk                          | Mitigation                                                                         | Status |
+| ----------------------------- | ---------------------------------------------------------------------------------- | ------ |
+| FieldMetadata depth limit     | Check audit_window precedent; escalate if nested objects in arrays are unsupported | open   |
+| Existing audit parsing breaks | Test both existing audits explicitly after schema change                           | open   |
 
 ## 9. Decisions & Outcomes
+
 - Design decisions governing this phase: DEC-079-001, DEC-079-002, DEC-079-004, DEC-079-007, DEC-079-009, DEC-079-010
 
 ## 10. Findings / Research Notes
+
 (to be filled during execution)
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored (just check passes, pylint reviewed)
 - [x] Notes updated

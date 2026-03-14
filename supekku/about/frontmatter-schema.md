@@ -42,6 +42,7 @@ relations: []
 ```
 
 **Field notes**
+
 - `id` is globally unique. Prefix indicates artefact family (`SPEC-`, `FR-`, `NF-`, `VT-`, `RE-`, `DE-`, `FE-`, etc.).
 - `slug` supports file moves: links can resolve `obsidian://vice/spec-records-fields-schemas` style IDs.
 - `kind` identifies the document family (spec, requirement, plan, etc.); use `c4_level` metadata for C4 granularity when needed.
@@ -79,6 +80,7 @@ relations:
 ```
 
 **Supported relation types**
+
 - `implements`: Artefact fulfils a requirement or higher-level spec.
 - `verifies`: Artefact provides evidence for a requirement/spec (tests, monitoring, manual checks).
 - `depends_on`: Implementation correctness depends on another artefact.
@@ -170,10 +172,11 @@ sources:
       - name: implementation
         path: contracts/python/workspace-implementation.md
 packages:
-  - internal/application/services/git  # Legacy field for Go compatibility
+  - internal/application/services/git # Legacy field for Go compatibility
 ```
 
 **Multi-language source tracking**
+
 - `sources` field enables tracking multiple implementation languages per specification
 - Each source entry specifies `language`, `identifier`, and documentation `variants`
 - Supported languages: `go`, `python`, `typescript` (stub)
@@ -183,8 +186,9 @@ packages:
 - `packages` field maintained for backwards compatibility with Go-only specs
 
 **Concerns vs responsibilities**
-- *Concerns* describe the enduring problem space or quality dimensions the artefact must watch: the stuff that keeps its owners awake at night.
-- *Responsibilities* are the explicit services or behaviours the artefact promises to deliver. They are actionable commitments that produce value or enforce constraints.
+
+- _Concerns_ describe the enduring problem space or quality dimensions the artefact must watch: the stuff that keeps its owners awake at night.
+- _Responsibilities_ are the explicit services or behaviours the artefact promises to deliver. They are actionable commitments that produce value or enforce constraints.
 - `guiding_principles` articulate enduring heuristics that shape solutions.
 - `assumptions` note beliefs that need validation; `hypotheses` and `decisions` track the evolution of those beliefs.
 
@@ -194,7 +198,7 @@ Specifications continue to hold detailed requirements and verification notes ins
 
 Structured verification maps live outside frontmatter using embedded YAML blocks so artefacts can evolve without schema churn. The shared schema is:
 
-```text
+````text
 ```yaml supekku:verification.coverage@v1
 schema: supekku.verification.coverage
 version: 1
@@ -207,8 +211,9 @@ entries:
     status: planned|in-progress|verified|failed|blocked
     notes: >-
       Optional context, evidence links, or validation results.
-```
-```
+````
+
+````
 
 - `subject` references the owning artefact (`SPEC-`, `PROD-`, `IP-`, `AUD-`, etc.).
 - Each entry ties a verification artefact (test, validation activity, human review) to the requirement it covers.
@@ -227,7 +232,7 @@ acceptance_criteria:
 verification_refs:
   - VT-210
   - VH-044
-```
+````
 
 Lifecycle metadata such as `status`, `introduced`, `implemented_by`, and `verified_by` is managed in the generated requirements registry (`.spec-driver/registry/requirements.yaml`). Those fields are derived from specs, deltas, revisions, and audits rather than stored directly in requirement frontmatter.
 

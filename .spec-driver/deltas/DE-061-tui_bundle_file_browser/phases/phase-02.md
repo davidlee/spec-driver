@@ -2,8 +2,8 @@
 id: IP-061.PHASE-02
 slug: 061-tui_bundle_file_browser-phase-02
 name: Browser integration — layout, wiring, visibility, focus, CSS
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: complete
 kind: phase
 ---
@@ -38,17 +38,17 @@ verification:
     - VT-061-05
   evidence: []
 tasks:
-  - id: '2.1'
+  - id: "2.1"
     description: BrowserScreen layout — left-column container
-  - id: '2.2'
+  - id: "2.2"
     description: theme.tcss — left-column, bundle-tree visibility, borders
-  - id: '2.3'
+  - id: "2.3"
     description: Wire artifact selection to tree show/hide/clear
-  - id: '2.4'
+  - id: "2.4"
     description: Wire BundleFileSelected to preview panel
-  - id: '2.5'
+  - id: "2.5"
     description: Focus management — f binding and Tab override
-  - id: '2.6'
+  - id: "2.6"
     description: Tree refresh on file-watch + re-resolve selected entry
 risks:
   - description: Container wrapper may affect existing CSS or test queries
@@ -70,15 +70,18 @@ based on selected artifact, files are previewable, focus model works, and
 watch-triggered refresh keeps the tree current.
 
 ## 2. Links & References
+
 - **Delta**: DE-061
 - **Design Revision**: DR-061 §5 (DEC-061-02, DEC-061-03, DEC-061-06), §4
 - **Phase 1 deliverables**: `ArtifactEntry.bundle_dir`, `BundleTree`, `PreviewPanel` non-md guard
 - **Key files**: `browser.py`, `theme.tcss`, `app.py`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 1 complete
 
 ## 4. Exit Criteria / Done When
+
 - [x] `#left-column` container wraps TypeSelector + BundleTree
 - [x] CSS: `#left-column` borderless, each child has own border
 - [x] CSS: `.has-bundle` toggles tree visibility and height split
@@ -93,24 +96,26 @@ watch-triggered refresh keeps the tree current.
 - [x] Lint clean
 
 ## 5. Verification
+
 - Textual headless pilot tests (extend `tui_test.py` or new file)
 - `just test` + `just lint`
 
 ## 6. Assumptions & STOP Conditions
+
 - Wrapping TypeSelector in Vertical doesn't break OptionList message bubbling
 - CSS `display: none`/`display: block` toggles work on Tree widget
 - STOP if layout container changes break existing tests fundamentally
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Notes |
-| --- | --- | --- | --- |
-| [x] | 2.1 | BrowserScreen layout — left-column container | Vertical#left-column wraps TypeSelector + BundleTree |
-| [x] | 2.2 | theme.tcss updates | Width rules moved to #left-column, .has-bundle variant, focus-within accent |
-| [x] | 2.3 | Wire artifact selection → tree show/hide/clear | on_artifact_selected + on_type_selected handlers |
-| [x] | 2.4 | Wire BundleFileSelected → preview | on_bundle_file_selected handler, border title = filename |
-| [x] | 2.5 | Focus management (f/Tab) | Binding("f") on screen, Binding("tab") on BundleTree |
-| [x] | 2.6 | Tree refresh + entry re-resolution | refresh_snapshot re-resolves entry, repopulates tree |
+| Status | ID  | Description                                    | Notes                                                                       |
+| ------ | --- | ---------------------------------------------- | --------------------------------------------------------------------------- |
+| [x]    | 2.1 | BrowserScreen layout — left-column container   | Vertical#left-column wraps TypeSelector + BundleTree                        |
+| [x]    | 2.2 | theme.tcss updates                             | Width rules moved to #left-column, .has-bundle variant, focus-within accent |
+| [x]    | 2.3 | Wire artifact selection → tree show/hide/clear | on_artifact_selected + on_type_selected handlers                            |
+| [x]    | 2.4 | Wire BundleFileSelected → preview              | on_bundle_file_selected handler, border title = filename                    |
+| [x]    | 2.5 | Focus management (f/Tab)                       | Binding("f") on screen, Binding("tab") on BundleTree                        |
+| [x]    | 2.6 | Tree refresh + entry re-resolution             | refresh_snapshot re-resolves entry, repopulates tree                        |
 
 ### Task Details
 

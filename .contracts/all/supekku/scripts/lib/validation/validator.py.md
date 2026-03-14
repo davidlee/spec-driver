@@ -31,6 +31,7 @@ Validates workspace consistency and artifact relationships.
 - `_validate_audit_disposition(self, audit_registry) -> None`: Validate finding dispositions in completed audits.
 
 For each completed audit, checks every finding for:
+
 - Missing disposition → warning
 - Invalid status×kind pair → error
 - Invalid outcome×kind pair → error
@@ -40,13 +41,16 @@ For each completed audit, checks every finding for:
 For each delta, resolves audit_gate. If required and no completed
 conformance audit exists → warning. If multiple audits have
 colliding finding IDs → warning.
+
 - `_validate_change_relations(self, artifacts, requirement_ids) -> None` - --------------------------------------------------------------
 - `_validate_decision_references(self, decisions, decision_ids) -> None`: Validate that all related_decisions references point to existing ADRs.
 - `_validate_decision_status_compatibility(self, decisions) -> None`: Warn if active ADR references deprecated or superseded ADRs.
 
 Only applies in strict mode.
+
 - `_validate_spec_taxonomy(self) -> None`: Warn when tech specs are missing taxonomy or have inconsistent values.
 
-Scoped to tech specs (SPEC-*) only. PROD specs are excluded.
+Scoped to tech specs (SPEC-\*) only. PROD specs are excluded.
 Emits warnings only — never errors.
+
 - `_warning(self, artifact, message) -> None`

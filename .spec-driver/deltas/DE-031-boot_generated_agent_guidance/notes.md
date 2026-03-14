@@ -6,12 +6,14 @@ Generate config-tailored, token-cheap agent guidance modules under `.spec-driver
 can `@reference` them instead of hardcoding paths or dynamically parsing config.
 
 Target outputs (installer-owned, overwriteable):
+
 - `.spec-driver/agents/exec.md`
 - `.spec-driver/agents/workflow.md`
 - `.spec-driver/agents/glossary.md`
 - `.spec-driver/agents/policy.md`
 
 Source inputs:
+
 - `.spec-driver/workflow.toml` (switchboard)
 - `.spec-driver/doctrine.md` (escape hatch; small bespoke text)
 
@@ -48,7 +50,7 @@ templates maintainable.
 ## Suggested test strategy
 
 - Add unit tests for “render from config” using a temp repo root:
-  1) write `.spec-driver/workflow.toml` with known paths/toggles
-  2) run `initialize_workspace(tmp_root, auto_yes=True)`
-  3) assert the four files exist and contain expected substitutions (e.g. `kanban/{...}`, `doc/artefacts`, `.contracts`)
-  4) assert disabled primitives are absent from `glossary.md` / `policy.md`
+  1. write `.spec-driver/workflow.toml` with known paths/toggles
+  2. run `initialize_workspace(tmp_root, auto_yes=True)`
+  3. assert the four files exist and contain expected substitutions (e.g. `kanban/{...}`, `doc/artefacts`, `.contracts`)
+  4. assert disabled primitives are absent from `glossary.md` / `policy.md`

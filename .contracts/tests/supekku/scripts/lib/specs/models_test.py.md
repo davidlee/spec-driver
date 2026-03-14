@@ -30,6 +30,8 @@ VT-085-006: Spec model exposes .relations property from frontmatter.
 - `test_relations_absent_returns_empty(self)`
 - `test_relations_are_dicts(self)`
 - `test_relations_present(self)`
+- `test_to_dict_includes_relations_when_present(self)`
+- `test_to_dict_omits_relations_when_absent(self)`
 - `_make_repo_with_relations_spec(self)`
 
 ### SpecTaxonomyTest

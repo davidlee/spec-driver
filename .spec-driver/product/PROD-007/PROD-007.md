@@ -2,8 +2,8 @@
 id: PROD-007
 slug: agent-tech-spec-backfill
 name: Agent tech spec backfill
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: draft
 kind: prod
 aliases: []
@@ -135,11 +135,13 @@ entries:
 ### Personas / Actors
 
 **Team Lead (Marcus)** - Managing codebase with 50+ packages
+
 - **Goals**: Complete all auto-generated specs to establish baseline documentation
 - **Pains**: Manual completion too time-consuming; inconsistent quality across team
 - **Expectations**: Bulk operation that handles 50 specs in reasonable time (<30 min); can review/adjust after
 
 **Solo Developer (Sarah)** - Working on OSS project
+
 - **Goals**: Document the 5 new packages she just added
 - **Pains**: Forgets YAML syntax between sessions; wants guidance not manual work
 - **Expectations**: Interactive workflow that asks her key questions, fills in technical details automatically
@@ -149,6 +151,7 @@ entries:
 **Journey 1: Solo developer elevates single spec**
 
 Given Sarah ran `spec-driver sync` and has placeholder spec SPEC-042 for her new `auth` package
+
 1. Sarah types `/supekku.bacfill SPEC-042`
 2. Agent reads existing placeholder spec
 3. Agent reads auto-generated contracts (API documentation) for `auth` package
@@ -164,6 +167,7 @@ And she didn't manually edit any YAML
 **Journey 2: Team lead batch-elevates 50 specs**
 
 Given Marcus has 50 placeholder specs from recent sync operation
+
 1. Marcus types `/supekku.elevate --batch "specify/tech/SPEC-*.md"`
 2. Agent discovers 50 incomplete specs
 3. Agent asks: "Interactive or automated mode?"
@@ -178,11 +182,13 @@ And can focus manual effort on the 3 edge cases
 ### Edge Cases & Non-goals
 
 **Edge Cases**:
+
 - Spec has partial manual content → preserve / skip
 - Contracts missing for package → complete with limited context OR verify existence of code files, mark for review
 - User wants to restart failed batch → support resuming from failures
 
 **Non-goals**:
+
 - Creating new specs from scratch (PROD-001 handles this)
 - Editing arbitrary spec content (use text editor)
 - Real-time collaboration (out of scope)
@@ -199,29 +205,29 @@ And can focus manual effort on the 3 edge cases
 
 - **FR-001**: Users MUST be able to complete placeholder specs through guided agent workflow
   Agent command reads existing spec, identifies incomplete sections, uses contracts for context, asks clarifying questions (≤3), fills sections, validates, and reports completion status.
-  *Verification*: VT-001 - End-to-end workflow test with real placeholder spec
+  _Verification_: VT-001 - End-to-end workflow test with real placeholder spec
 
 - **FR-002**: System MUST preserve manually-created spec content during completion
   Detection logic identifies human-written vs. placeholder text; only placeholder sections are modified.
-  *Verification*: VT-002 - Test with partially-completed spec; verify manual content unchanged
+  _Verification_: VT-002 - Test with partially-completed spec; verify manual content unchanged
 
 - **FR-003**: Users MUST be able to complete multiple specs in batch mode
   Support glob pattern matching for multi-spec selection; show progress indicators; continue on errors.
-  *Verification*: VT-003 - Batch workflow with 10 specs, 2 intentional failures
+  _Verification_: VT-003 - Batch workflow with 10 specs, 2 intentional failures
 
 - **FR-004**: Users MUST be able to choose automation level for batch operations
   Interactive mode (ask questions per spec) vs. automated mode (infer from contracts, make assumptions).
-  *Verification*: VT-003 - Test both modes with same batch
+  _Verification_: VT-003 - Test both modes with same batch
 
 ### Non-Functional Requirements
 
 - **NF-001**: Batch operations MUST show clear progress and complete in reasonable time
   10 specs in <15 minutes (automated mode); 50 specs in <30 minutes acceptable.
-  *Measurement*: VA-001 - User testing with real batches of 5-50 specs
+  _Measurement_: VA-001 - User testing with real batches of 5-50 specs
 
 - **NF-002**: Interactive mode MUST minimize user questions
   ≤3 questions per spec for typical cases; more allowed for complex edge cases if user opts in.
-  *Measurement*: VA-002 - Track question count across 50 completion sessions
+  _Measurement_: VA-002 - Track question count across 50 completion sessions
 
 ### Success Metrics / Signals
 
@@ -235,6 +241,7 @@ And can focus manual effort on the 3 edge cases
 ### User Experience / Outcomes
 
 **Desired Behaviors**:
+
 - User types single command (`/supekku.elevate SPEC-123`) and receives completed spec
 - Agent shows what it's doing: "Reading contracts... Analyzing 3 classes... Filling Section 3..."
 - Questions are focused and easy to answer: "Public API only or include internals?"
@@ -242,6 +249,7 @@ And can focus manual effort on the 3 edge cases
 - Errors are clear and actionable: "SPEC-042 failed: contracts directory not found. Run sync first."
 
 **Acceptance Notes**:
+
 - Zero manual YAML editing required
 - User doesn't need to remember spec-driver conventions
 - Batch failures don't lose progress on successful specs
@@ -250,11 +258,13 @@ And can focus manual effort on the 3 edge cases
 ### Data & Contracts
 
 **Key Entities**:
+
 - Placeholder spec: Auto-generated spec with template boilerplate, no real content
 - Contracts: AST-generated API documentation (functions, classes, types) in `contracts/` directory
 - Completion status: pending, in_progress, completed, failed
 
 **User-Facing Interactions**:
+
 - Command: `/supekku.elevate <spec-id>` or `/supekku.elevate --batch <pattern>`
 - Progress indicators: "3/10 complete..."
 - Completion report: Summary of successes/failures with actionable next steps
@@ -285,10 +295,12 @@ See Section 2 (Stakeholders & Journeys) for detailed user flows.
 ### Research / Validation
 
 **Hypothesis 1**: Users prefer automated batch mode over interactive for 10+ specs
+
 - **Test**: A/B test with 20 users completing 15-spec batch
 - **Metric**: Mode preference, completion time, satisfaction score
 
 **Hypothesis 2**: Contract-based completion produces acceptable quality
+
 - **Test**: Compare agent-completed vs. manually-completed specs
 - **Metric**: Completeness score, validation success rate, reviewer feedback
 
@@ -316,16 +328,19 @@ See Section 2 (Stakeholders & Journeys) for detailed user flows.
 ### Risks & Mitigations
 
 **RISK-001**: Contract quality varies; completion quality suffers
+
 - **Likelihood**: Medium (contracts are auto-generated, quality depends on code)
 - **Impact**: Medium (specs incomplete or inaccurate)
 - **Mitigation**: Mark low-confidence sections for review; allow manual override
 
 **RISK-002**: Users expect perfect AI completion; disappointed by limitations
+
 - **Likelihood**: High (AI hype sets unrealistic expectations)
 - **Impact**: Low (feature still useful despite limitations)
 - **Mitigation**: Clear documentation of capabilities/limits; mark assumptions in specs
 
 **RISK-003**: Batch mode overwrites manual work due to detection bugs
+
 - **Likelihood**: Low (conservative detection logic)
 - **Impact**: Critical (data loss)
 - **Mitigation**: Dry-run mode; comprehensive tests; err on side of preservation
@@ -340,10 +355,12 @@ See Section 2 (Stakeholders & Journeys) for detailed user flows.
 ### Open Decisions / Questions
 
 **Decision 1**: Default to interactive or automated for batch mode?
+
 - **Options**: (A) Interactive (safer), (B) Automated (faster)
 - **Leaning**: A (interactive) with clear option to switch
 
 **Decision 2**: How to handle incomplete contracts (some functions missing docs)?
+
 - **Options**: (A) Mark spec incomplete, (B) Complete with available info + note gaps
 - **Leaning**: B (partial completion better than none)
 

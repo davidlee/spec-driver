@@ -10,6 +10,7 @@ Replaced inline phase display with Rich table formatting for much better readabi
 ## Changes
 
 ### Before (inline format)
+
 ```
 Plan: IP-004 (6 phases)
   File: change/deltas/DE-004-phase-management-implementation/IP-004.md
@@ -20,12 +21,14 @@ Plan: IP-004 (6 phases)
 ```
 
 Issues:
+
 - Truncated objectives at 60 chars (hard to read)
 - Verbose phase IDs with plan prefix
 - File paths clutter the display
 - No visual structure
 
 ### After (Rich table format)
+
 ```
 Plan: IP-004 (6 phases)
   File: change/deltas/DE-004-phase-management-implementation/IP-004.md
@@ -69,6 +72,7 @@ Plan: IP-004 (6 phases)
 **Function**: `_format_plan_overview()`
 
 Uses Rich table utilities from `table_utils.py`:
+
 - `create_table()` - Creates table with standard styling
 - `render_table()` - Renders to string with spec-driver theme
 

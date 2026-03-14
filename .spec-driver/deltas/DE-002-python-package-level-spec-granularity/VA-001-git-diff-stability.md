@@ -33,24 +33,28 @@ Rationale: Well-established package with multiple modules, good test subject for
 Current state verified via git status - no pending changes in test package.
 
 Existing spec: `SPEC-120` for `supekku/scripts/lib/formatters`
+
 - 20 contract files generated
 - MD5 checksums recorded for baseline comparison
 
 ### Step 3: Analysis of Deterministic Behavior
 
 **Evidence from Phase 01 (VT-002)**:
+
 - Test `test_deterministic_ordering` validates that contract generation produces identical output across multiple runs
 - Test runs contract generation 10 times and compares MD5 hashes
 - All hashes match, proving deterministic ordering
 - Located in: `supekku/scripts/lib/docs/python/variants_test.py:62-110`
 
 **Evidence from Phase 02**:
+
 - 16 package-level specs created (SPEC-110 to SPEC-125)
 - All specs validated successfully
 - Sync operation completed cleanly with no spurious changes
 - Git status shows clean working tree after sync
 
 **Current State Analysis**:
+
 - Package `supekku/scripts/lib/formatters` has 20 contract files
 - Each module in package has 3 variants: `-all`, `-public`, `-tests`
 - File naming follows pattern: `{package}-{module}-{variant}.md`
@@ -59,16 +63,19 @@ Existing spec: `SPEC-120` for `supekku/scripts/lib/formatters`
 ### Step 4: Verification of Stability Characteristics
 
 **Ordering Stability**:
+
 - ✅ Files are generated in sorted order (verified by `sorted(rglob("*.py"))` in PythonAdapter)
 - ✅ VT-002 from Phase 01 proves deterministic ordering across 10 runs
 - ✅ MD5 hash comparison shows byte-identical output
 
 **Content Stability**:
+
 - ✅ Contract generation uses deterministic AST parsing (not source text parsing)
 - ✅ No timestamps or random elements in generated contracts
 - ✅ Package-level aggregation maintains file order within package
 
 **Metadata Stability**:
+
 - ✅ Frontmatter `packages` field consistently populated
 - ✅ No spurious changes observed in Phase 02 migration (111 specs deleted, 16 created)
 - ✅ Registry validation passing after sync
@@ -106,6 +113,7 @@ Existing spec: `SPEC-120` for `supekku/scripts/lib/formatters`
 Package-level spec granularity produces **deterministic, stable git diffs** with no spurious changes.
 
 **Evidence**:
+
 - VT-002 automated test validates deterministic ordering
 - Phase 02 migration completed with clean diffs
 - Current contracts show stable, sorted file structure

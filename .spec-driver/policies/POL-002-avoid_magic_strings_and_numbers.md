@@ -1,10 +1,10 @@
 ---
 id: POL-002
-title: 'POL-002: Avoid magic strings and numbers'
+title: "POL-002: Avoid magic strings and numbers"
 status: required
-created: '2026-03-05'
-updated: '2026-03-05'
-reviewed: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
+reviewed: "2026-03-05"
 owners: []
 supersedes: []
 superseded_by: []
@@ -15,7 +15,7 @@ deltas: []
 related_policies: [POL-001]
 related_standards: []
 tags: [coding, maintainability, readability]
-summary: 'Avoid unexplained literal strings/numbers in production code; use named constants, enums, or config.'
+summary: "Avoid unexplained literal strings/numbers in production code; use named constants, enums, or config."
 ---
 
 # POL-002: Avoid magic strings and numbers

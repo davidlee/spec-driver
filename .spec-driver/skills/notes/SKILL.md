@@ -8,6 +8,7 @@ Update the card with implementation notes.
 If you don't know where it is, find it with `spec-driver find`.
 
 be concise, but record:
+
 - what's done
 - any
   - surprises encountered or adaptations required

@@ -1,9 +1,9 @@
 ---
 id: IP-077.PHASE-02
 slug: 077-cli_ux_schema_discoverability_and_flag_parsing-phase-02
-name: 'IP-077 Phase 02: Verification and polish'
-created: '2026-03-09'
-updated: '2026-03-09'
+name: "IP-077 Phase 02: Verification and polish"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---
@@ -28,11 +28,11 @@ verification:
     - VT-077-from-backlog
   evidence: []
 tasks:
-  - id: '2.1'
+  - id: "2.1"
     description: Run full test suite
-  - id: '2.2'
+  - id: "2.2"
     description: Run both linters on full codebase
-  - id: '2.3'
+  - id: "2.3"
     description: Manual smoke test of create commands
 risks: []
 ```
@@ -46,16 +46,20 @@ phase: IP-077.PHASE-02
 # Phase 2 — Verification and polish
 
 ## 1. Objective
+
 Ensure no regressions, both linters clean on full codebase, manual smoke test of key create commands.
 
 ## 2. Links & References
+
 - **Delta**: DE-077
 - **Phase 1**: `phases/phase-01.md`
 
 ## 3. Entrance Criteria
+
 - [ ] Phase 1 exit criteria satisfied
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `just test` passes (full suite)
 - [ ] `just lint` passes (ruff, zero warnings)
 - [ ] `just pylint-report` score not regressed
@@ -63,14 +67,15 @@ Ensure no regressions, both linters clean on full codebase, manual smoke test of
 - [ ] Smoke: `create delta` output includes schema hints
 
 ## 5. Verification
+
 - `just` — all checks
 - Manual: `uv run spec-driver create delta --from-backlog --help`
 - Manual: verify schema hint output on a test creation
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 2.1 | `just test` | | |
-| [ ] | 2.2 | `just lint` + `just pylint-report` | | |
-| [ ] | 2.3 | Manual smoke tests | | After 2.1–2.2 |
+| Status | ID  | Description                        | Parallel? | Notes         |
+| ------ | --- | ---------------------------------- | --------- | ------------- |
+| [ ]    | 2.1 | `just test`                        |           |               |
+| [ ]    | 2.2 | `just lint` + `just pylint-report` |           |               |
+| [ ]    | 2.3 | Manual smoke tests                 |           | After 2.1–2.2 |

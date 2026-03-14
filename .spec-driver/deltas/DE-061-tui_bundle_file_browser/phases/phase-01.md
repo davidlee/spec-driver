@@ -2,8 +2,8 @@
 id: IP-061.PHASE-01
 slug: 061-tui_bundle_file_browser-phase-01
 name: Data model, BundleTree widget, PreviewPanel guard
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---
@@ -33,11 +33,11 @@ verification:
     - VT-061-04 (PreviewPanel non-markdown)
   evidence: []
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     description: Add bundle_dir to ArtifactEntry + _detect_bundle_dir
-  - id: '1.2'
+  - id: "1.2"
     description: BundleTree widget with BundleFileSelected message
-  - id: '1.3'
+  - id: "1.3"
     description: PreviewPanel non-markdown guard
 risks:
   - description: Textual Tree API may not support cursor_line or data on nodes as expected
@@ -55,6 +55,7 @@ phase: IP-061.PHASE-01
 ## 1. Objective
 
 Build the three independent components needed before browser integration:
+
 - `ArtifactEntry.bundle_dir` field with ID-based detection
 - `BundleTree` widget (Textual `Tree` subclass)
 - `PreviewPanel` non-markdown file guard
@@ -62,15 +63,18 @@ Build the three independent components needed before browser integration:
 All three are testable in isolation without TUI integration.
 
 ## 2. Links & References
+
 - **Delta**: DE-061
 - **Design Revision**: DR-061 §5 (DEC-061-01, DEC-061-05), §6
 - **Key files**: `artifact_view.py`, `widgets/preview_panel.py`
 
 ## 3. Entrance Criteria
+
 - [x] DR-061 reviewed and accepted
 - [x] All entrance criteria met
 
 ## 4. Exit Criteria / Done When
+
 - [x] `_detect_bundle_dir(record_id, path)` returns correct `Path | None`
 - [x] `ArtifactEntry.bundle_dir` populated in `adapt_record`
 - [x] `BundleTree.show_bundle()` populates tree from directory
@@ -84,6 +88,7 @@ All three are testable in isolation without TUI integration.
 - [x] `just lint` clean on touched files (ruff + pylint 10/10)
 
 ## 5. Verification
+
 - `just test` — new test files:
   - `supekku/scripts/lib/core/artifact_view_test.py` (extend with `_detect_bundle_dir` tests)
   - `supekku/tui/widgets/bundle_tree_test.py`
@@ -91,17 +96,18 @@ All three are testable in isolation without TUI integration.
 - `just lint` + `just pylint-files` on touched files
 
 ## 6. Assumptions & STOP Conditions
+
 - Textual `Tree[Path]` supports `.data` attribute on nodes and `NodeSelected` message
 - `cursor_line` property is settable on Tree widget
 - STOP if Tree widget API is fundamentally incompatible — `/consult` before workaround
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | `_detect_bundle_dir` + `ArtifactEntry.bundle_dir` | [P] | Pure function + dataclass field |
-| [x] | 1.2 | `BundleTree` widget | [P] | New file `widgets/bundle_tree.py` |
-| [x] | 1.3 | `PreviewPanel` non-markdown guard | [P] | Small edit to existing widget |
+| Status | ID  | Description                                       | Parallel? | Notes                             |
+| ------ | --- | ------------------------------------------------- | --------- | --------------------------------- |
+| [x]    | 1.1 | `_detect_bundle_dir` + `ArtifactEntry.bundle_dir` | [P]       | Pure function + dataclass field   |
+| [x]    | 1.2 | `BundleTree` widget                               | [P]       | New file `widgets/bundle_tree.py` |
+| [x]    | 1.3 | `PreviewPanel` non-markdown guard                 | [P]       | Small edit to existing widget     |
 
 ### Task Details
 
@@ -131,12 +137,15 @@ All three are testable in isolation without TUI integration.
   - **Testing**: Extend existing preview tests with `.txt`, `.yaml`, no-extension cases.
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Tree API mismatch | Spike `Tree[Path]` constructor and `NodeSelected` early | open |
+
+| Risk              | Mitigation                                              | Status |
+| ----------------- | ------------------------------------------------------- | ------ |
+| Tree API mismatch | Spike `Tree[Path]` constructor and `NodeSelected` early | open   |
 
 ## 9. Decisions & Outcomes
+
 (populated during execution)
 
 ## 10. Findings / Research Notes
+
 (populated during execution)

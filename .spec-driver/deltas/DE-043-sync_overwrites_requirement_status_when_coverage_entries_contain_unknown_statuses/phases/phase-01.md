@@ -2,8 +2,8 @@
 id: IP-043.PHASE-01
 slug: 043-code-fix-and-tests
 name: IP-043 Phase 01 - Code fix and tests
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: draft
 kind: phase
 ---
@@ -34,15 +34,15 @@ verification:
     - VT-043-003
   evidence: []
 tasks:
-  - id: '1.1'
+  - id: "1.1"
     description: Add VALID_COVERAGE_STATUSES alias to verification.py
-  - id: '1.2'
+  - id: "1.2"
     description: Write tests for unknown status filtering (TDD)
-  - id: '1.3'
+  - id: "1.3"
     description: Add validation in _apply_coverage_blocks()
-  - id: '1.4'
+  - id: "1.4"
     description: Refactor _compute_status_from_coverage() to use canonical set
-  - id: '1.5'
+  - id: "1.5"
     description: Verify all checks pass
 risks:
   - description: Extraction loop duplication makes the filter insertion repetitive
@@ -71,7 +71,7 @@ set. Write comprehensive tests.
 - **Specs**: PROD-008.FR-001, PROD-009.FR-001, PROD-009.FR-003
 - **Key Files**:
   - `supekku/scripts/lib/blocks/verification.py` (VALID_STATUSES)
-  - `supekku/scripts/lib/requirements/registry.py` (_apply_coverage_blocks, _compute_status_from_coverage)
+  - `supekku/scripts/lib/requirements/registry.py` (\_apply_coverage_blocks, \_compute_status_from_coverage)
   - `supekku/scripts/lib/requirements/registry_test.py` (existing tests)
 
 ## 3. Entrance Criteria
@@ -104,13 +104,13 @@ set. Write comprehensive tests.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Add `VALID_COVERAGE_STATUSES` alias to `verification.py` | | DEC-043-02 |
-| [x] | 1.2 | Write tests for unknown status filtering (TDD) | | VT-043-001, VT-043-002 |
-| [x] | 1.3 | Add validation in `_apply_coverage_blocks()` | | DR-043 §4; extracted `_extract_coverage_entries` helper |
-| [x] | 1.4 | Refactor `_compute_status_from_coverage()` to use canonical set | | DR-043 §4 |
-| [x] | 1.5 | Run `just check` and verify all gates pass | | 2605 passed, 9.56/10 pylint |
+| Status | ID  | Description                                                     | Parallel? | Notes                                                   |
+| ------ | --- | --------------------------------------------------------------- | --------- | ------------------------------------------------------- |
+| [x]    | 1.1 | Add `VALID_COVERAGE_STATUSES` alias to `verification.py`        |           | DEC-043-02                                              |
+| [x]    | 1.2 | Write tests for unknown status filtering (TDD)                  |           | VT-043-001, VT-043-002                                  |
+| [x]    | 1.3 | Add validation in `_apply_coverage_blocks()`                    |           | DR-043 §4; extracted `_extract_coverage_entries` helper |
+| [x]    | 1.4 | Refactor `_compute_status_from_coverage()` to use canonical set |           | DR-043 §4                                               |
+| [x]    | 1.5 | Run `just check` and verify all gates pass                      |           | 2605 passed, 9.56/10 pylint                             |
 
 ### Task Details
 
@@ -158,10 +158,10 @@ set. Write comprehensive tests.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Four identical extraction loops → repetitive filter insertion | Extracted `_extract_coverage_entries` helper | Resolved |
-| Filtering at ingestion vs derivation is a design fork | Both: warn at ingestion, filter at derivation | Resolved |
+| Risk                                                          | Mitigation                                    | Status   |
+| ------------------------------------------------------------- | --------------------------------------------- | -------- |
+| Four identical extraction loops → repetitive filter insertion | Extracted `_extract_coverage_entries` helper  | Resolved |
+| Filtering at ingestion vs derivation is a design fork         | Both: warn at ingestion, filter at derivation | Resolved |
 
 ## 9. Decisions & Outcomes
 

@@ -2,15 +2,18 @@
 name: close-change
 description: Close a delta safely - satisfy coverage gates, complete the delta command, and verify owning-record lifecycle updates.
 ---
+
 You are executing formal closure, not just marking work done.
 
 Inputs:
+
 - Completed implementation phases/tasks
 - Coverage/evidence updates in owning artifacts
 - Target delta ID (`DE-XXX`)
 - Any originating backlog item IDs linked to the delta, if present
 
 Process:
+
 1. Pre-check:
    - Phase/IP criteria complete
    - Specs patched to match contracts + audit findings
@@ -38,12 +41,14 @@ Process:
    Δ ∴ ⊤
 
 Semantics:
+
 - Closure happens after audit/contracts-driven spec reconciliation, not before.
 - Closure should update owning records and requirement lifecycle to current states (for this codebase, typically `active`, not legacy `implemented`).
 - Prefer deterministic, repeatable close-out over manual ad-hoc edits.
 - Backlog follow-through matters, but this skill should not invent non-canonical backlog statuses; if the correct backlog transition is unclear, stop and `/consult`.
 
 Outcomes:
+
 - Delta is completed.
 - Lifecycle/evidence state is coherent across delta/spec/registry surfaces.
 - Durable workflow or subsystem guidance from the delta is either captured in

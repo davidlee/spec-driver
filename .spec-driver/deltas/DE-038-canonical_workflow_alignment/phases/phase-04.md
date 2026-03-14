@@ -2,8 +2,8 @@
 id: IP-038.PHASE-04
 slug: 038-canonical_workflow_alignment-phase-04
 name: IP-038 Phase 04
-created: '2026-03-03'
-updated: '2026-03-03'
+created: "2026-03-03"
+updated: "2026-03-03"
 status: completed
 kind: phase
 ---
@@ -58,10 +58,12 @@ phase: IP-038.PHASE-04
 # Phase 04 - Retrieval Precision Pass
 
 ## 1. Objective
+
 Reduce memory retrieval noise by tuning scope metadata so command/path-context
 queries prioritize actionable workflow records without removing conceptual context.
 
 ## 2. Links & References
+
 - **Delta**: DE-038
 - **Design Revision Sections**:
   - [DR-038.md](../DR-038.md) - retrieval precision pass intent
@@ -73,16 +75,19 @@ queries prioritize actionable workflow records without removing conceptual conte
   - `/home/david/dev/spec-driver/supekku/skills/retrieving-memory/SKILL.md`
 
 ## 3. Entrance Criteria
+
 - [x] Phase 03 outcomes reviewed for skill-level wording dependencies
 - [x] Baseline noisy query set captured
 - [x] Candidate memory set selected for scope tuning
 
 ## 4. Exit Criteria / Done When
+
 - [x] Scope metadata updated on target memories
 - [x] Baseline vs after query set shows improved operational surfacing
 - [x] Residual risks documented for future maintenance
 
 ## 5. Verification
+
 - Verification type: VA (retrieval quality and ranking coherence)
 - Tooling/commands:
   - `uv run spec-driver list memories -c "uv run spec-driver complete delta" --match-tag spec-driver --limit 12 --format tsv`
@@ -94,6 +99,7 @@ queries prioritize actionable workflow records without removing conceptual conte
   - notes summary for unresolved ranking noise
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - Scope tuning is metadata-only and does not alter command/runtime behavior.
   - Current memory wording/provenance from phase 02 remains valid during this pass.
@@ -102,26 +108,30 @@ queries prioritize actionable workflow records without removing conceptual conte
   - retrieval behavior cannot be improved without changing ranking algorithm (out of scope for DE-038).
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 4.1 | Capture baseline query outputs and identify noisy top results | [ ] | All three baseline queries returned near-identical top ordering with broad conceptual records leading |
-| [x] | 4.2 | Apply scope metadata updates to target memories | [ ] | Added/tuned `scope.commands`/`scope.paths` on all eight target memories |
-| [x] | 4.3 | Re-run query set and compare ordering | [ ] | `coverage-gate`/`status-enums` now lead close-out/path contexts; `core-loop` leads `create delta` context |
-| [x] | 4.4 | Finalize notes and update handoff guidance | [ ] | Residual ranking noise captured below and propagated to notes |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                                   | Parallel? | Notes                                                                                                     |
+| ------ | --- | ------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------- |
+| [x]    | 4.1 | Capture baseline query outputs and identify noisy top results | [ ]       | All three baseline queries returned near-identical top ordering with broad conceptual records leading     |
+| [x]    | 4.2 | Apply scope metadata updates to target memories               | [ ]       | Added/tuned `scope.commands`/`scope.paths` on all eight target memories                                   |
+| [x]    | 4.3 | Re-run query set and compare ordering                         | [ ]       | `coverage-gate`/`status-enums` now lead close-out/path contexts; `core-loop` leads `create delta` context |
+| [x]    | 4.4 | Finalize notes and update handoff guidance                    | [ ]       | Residual ranking noise captured below and propagated to notes                                             |
 
 ## 8. Risks & Mitigations
-| Risk | Mitigation | Status |
-| --- | --- | --- |
+
+| Risk                                           | Mitigation                                                                           | Status              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------- |
 | Operational memories still not surfacing first | Increase scope specificity (`scope.commands` + `scope.paths`) and re-check query set | Partially mitigated |
-| Concept memories become undiscoverable | Keep tags/provenance unchanged; tune scope only for command/path contexts | Mitigated |
+| Concept memories become undiscoverable         | Keep tags/provenance unchanged; tune scope only for command/path contexts            | Mitigated           |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-03` - Phase added to explicitly address retrieval-precision risk surfaced in phase 02 notes.
 - `2026-03-03` - Scope tuning completed on the phase target memory set using command/path anchors only; no runtime behavior changes.
 
 ## 10. Findings / Research Notes
+
 - Baseline query outputs (top results before scope tuning):
   - `-c "uv run spec-driver complete delta"`: `philosophy` ranked #1; operational memories were interleaved lower.
   - `-c "uv run spec-driver create delta"`: `philosophy` ranked #1; `core-loop` did not lead.
@@ -144,6 +154,7 @@ queries prioritize actionable workflow records without removing conceptual conte
   - Follow-up (optional): evaluate adding explicit scope to non-target broad conceptual memories if stricter operational-first ranking is required.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

@@ -2,8 +2,8 @@
 id: IP-055.PHASE-04
 slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-04
 name: IP-055 Phase 04
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: completed
 kind: phase
 ---
@@ -54,10 +54,12 @@ phase: IP-055.PHASE-04
 # Phase 4 - Strengthen routing for DR-IP-phase ordering
 
 ## 1. Objective
+
 Make the routing layer explicitly block premature implementation when DR/IP/phase
 artefacts are still missing.
 
 ## 2. Links & References
+
 - **Delta**: DE-055
 - **Design Revision Sections**:
   - Problem & Constraints
@@ -75,15 +77,18 @@ artefacts are still missing.
   - `.spec-driver/agents/workflow.md`
 
 ## 3. Entrance Criteria
+
 - [x] Ordering gap identified as an active DE-055 failure mode
 - [x] Preflight narrowed the fix to routing guidance rather than new runtime enforcement
 
 ## 4. Exit Criteria / Done When
+
 - [x] using-spec-driver distinguishes planning work from execution-ready phase work
 - [x] Installed using-spec-driver skill has been refreshed and verified
 - [x] DE-055 notes and plan state reflect the new ordering guardrail
 
 ## 5. Verification
+
 - Tests to run: none beyond sync/propagation for this skill-text change
 - Tooling/commands:
   - `uv run spec-driver skills sync`
@@ -93,32 +98,38 @@ artefacts are still missing.
   - notes entry summarising the routing decision
 
 ## 6. Assumptions & STOP Conditions
+
 - Assumptions:
   - The right fix is to strengthen routing rather than make execute-phase or boot carry the full ordering contract.
 - STOP when:
   - stronger ordering would require new runtime gates or a broader workflow redesign.
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 4.1 | Strengthen using-spec-driver ordering guardrails | [ ] | Missing DR/IP/phase work now routes before execute-phase |
-| [x] | 4.2 | Sync installed skills and verify propagation | [ ] | `uv run spec-driver skills sync` refreshed installed skills and AGENTS output |
-| [x] | 4.3 | Record ordering decision in DE-055 artefacts | [ ] | DE-055 artefacts updated in the same change-set |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                                      | Parallel? | Notes                                                                         |
+| ------ | --- | ------------------------------------------------ | --------- | ----------------------------------------------------------------------------- |
+| [x]    | 4.1 | Strengthen using-spec-driver ordering guardrails | [ ]       | Missing DR/IP/phase work now routes before execute-phase                      |
+| [x]    | 4.2 | Sync installed skills and verify propagation     | [ ]       | `uv run spec-driver skills sync` refreshed installed skills and AGENTS output |
+| [x]    | 4.3 | Record ordering decision in DE-055 artefacts     | [ ]       | DE-055 artefacts updated in the same change-set                               |
 
 ## 8. Risks & Mitigations
+
 | Risk | Mitigation | Status |
-| --- | --- | --- |
+| ---- | ---------- | ------ |
 
 ## 9. Decisions & Outcomes
+
 - `2026-03-07` - Put the DR/IP/phase ordering guardrail in using-spec-driver. Rationale: routing is where agents choose the next governing skill, so that is the right point to stop premature execution.
 
 ## 10. Findings / Research Notes
+
 - scope-delta, plan-phases, and execute-phase already encode the intended sequence.
 - The main gap was that using-spec-driver treated "active delta phase or plan" as sufficient without explicitly routing missing planning work first.
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied
 - [x] Verification evidence stored
 - [x] Spec/Delta/Plan updated with lessons

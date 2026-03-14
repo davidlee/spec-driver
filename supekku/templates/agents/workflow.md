@@ -11,6 +11,7 @@ Ceremony mode: **{{ config.ceremony }}**
 - Current runtime enforcement comes from explicit command gates (for example coverage checks in `complete delta`) and command flags.
 
 {% if config.kanban.enabled -%}
+
 ## Kanban
 
 Cards root: `{{ config.kanban.root }}`

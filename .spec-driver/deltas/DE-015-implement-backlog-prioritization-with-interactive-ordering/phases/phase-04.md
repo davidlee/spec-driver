@@ -2,8 +2,8 @@
 id: IP-015.PHASE-04
 slug: 015-implement-backlog-prioritization-with-interactive-ordering-phase-04
 name: IP-015 Phase 04
-created: '2025-11-04'
-updated: '2025-11-04'
+created: "2025-11-04"
+updated: "2025-11-04"
 status: draft
 kind: phase
 ---
@@ -54,11 +54,11 @@ schema: supekku.phase.tracking
 version: 1
 phase: IP-015.PHASE-04
 status: completed
-started: '2025-11-04'
-completed: '2025-11-04'
+started: "2025-11-04"
+completed: "2025-11-04"
 tasks_completed: 6
 tasks_total: 6
-last_updated: '2025-11-04'
+last_updated: "2025-11-04"
 notes: |
   Phase 4 complete: CLI integration and delta support operational
   - --prioritize flag added to list backlog (with both spellings)
@@ -78,6 +78,7 @@ notes: |
 Wire the interactive prioritization flow into the `list backlog` command and implement delta creation from backlog items. This final phase completes the user-facing feature by connecting all infrastructure from Phases 1-3.
 
 ## 2. Links & References
+
 - **Delta**: [DE-015](../DE-015.md)
 - **Implementation Plan**: [IP-015](../IP-015.md)
 - **Phase 3**: [phase-03.md](./phase-03.md) (editor utility ready)
@@ -87,12 +88,14 @@ Wire the interactive prioritization flow into the `list backlog` command and imp
 - **Create CLI**: `supekku/cli/create.py` (delta creation command)
 
 ## 3. Entrance Criteria
+
 - [x] Phase 3 complete (editor utility and markdown functions working)
 - [x] `edit_backlog_ordering()` available in `priority.py:245-318`
 - [x] Registry sync working (`sync backlog` command from Phase 1)
 - [x] Priority ordering working (default display from Phase 2)
 
 ## 4. Exit Criteria / Done When
+
 - [ ] `--prioritize` / `--prioritise` flag added to `list backlog` command
 - [ ] Interactive editor opens with filtered items when flag used
 - [ ] Registry updated after successful edit
@@ -105,6 +108,7 @@ Wire the interactive prioritization flow into the `list backlog` command and imp
 ## 5. Verification
 
 **Tests (VT-015-005):**
+
 - CLI integration tests for `--prioritize` flag (mocked editor)
 - Test registry updates after edit
 - Test cancellation handling (no changes when user cancels)
@@ -112,6 +116,7 @@ Wire the interactive prioritization flow into the `list backlog` command and imp
 - Test interaction with existing filters (--status, --kind, etc.)
 
 **Manual Verification (VH-015-001):**
+
 - Run `list backlog --prioritize` with actual $EDITOR
 - Verify items display correctly
 - Reorder items in editor, save
@@ -122,6 +127,7 @@ Wire the interactive prioritization flow into the `list backlog` command and imp
 - Test with malformed edits
 
 **Commands:**
+
 ```bash
 # Run integration tests
 just test supekku/cli/list_test.py
@@ -139,6 +145,7 @@ uv run spec-driver create delta --from-backlog IMPR-002
 ```
 
 **Evidence:**
+
 - Test output showing all VT-015-005 tests passing
 - Screenshots/output of manual editor workflow
 - Registry file showing updated ordering
@@ -147,32 +154,36 @@ uv run spec-driver create delta --from-backlog IMPR-002
 ## 6. Assumptions & STOP Conditions
 
 **Assumptions:**
+
 - User has $EDITOR or $VISUAL set (warning if not)
 - Registry file writable (permissions ok)
 - Existing list backlog filters work correctly
 - Delta template supports arbitrary context insertion
 
 **STOP when:**
+
 - Editor workflow confusing/broken in manual testing
 - Registry corruption issues discovered
 - Filter interaction produces unexpected results
 - Template population requires significant redesign
 
 ## 7. Tasks & Progress
-*(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)*
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [ ] | 4.1 | Add --prioritize flag to list backlog | [ ] | Main integration |
-| [ ] | 4.2 | Add --order-by-id flag | [ ] | Simple flag |
-| [ ] | 4.3 | Implement create delta --from-backlog | [ ] | Template population |
-| [ ] | 4.4 | Write CLI integration tests | [P] | Can parallel with 4.1-4.3 |
-| [ ] | 4.5 | Perform manual verification | [ ] | After 4.1-4.4 |
-| [ ] | 4.6 | Run lint and fix issues | [ ] | Final cleanup |
+_(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
+
+| Status | ID  | Description                           | Parallel? | Notes                     |
+| ------ | --- | ------------------------------------- | --------- | ------------------------- |
+| [ ]    | 4.1 | Add --prioritize flag to list backlog | [ ]       | Main integration          |
+| [ ]    | 4.2 | Add --order-by-id flag                | [ ]       | Simple flag               |
+| [ ]    | 4.3 | Implement create delta --from-backlog | [ ]       | Template population       |
+| [ ]    | 4.4 | Write CLI integration tests           | [P]       | Can parallel with 4.1-4.3 |
+| [ ]    | 4.5 | Perform manual verification           | [ ]       | After 4.1-4.4             |
+| [ ]    | 4.6 | Run lint and fix issues               | [ ]       | Final cleanup             |
 
 ### Task Details
 
 **4.1 - Add --prioritize flag to list backlog command**
+
 - **Design**:
   ```python
   # In supekku/cli/list.py, list_backlog() function
@@ -196,6 +207,7 @@ uv run spec-driver create delta --from-backlog IMPR-002
   - Cancellation → inform user, no changes made
 
 **4.2 - Add --order-by-id flag for chronological fallback**
+
 - **Design**:
   ```python
   @click.option("--order-by-id", "-o", is_flag=True,
@@ -209,6 +221,7 @@ uv run spec-driver create delta --from-backlog IMPR-002
 - **Note**: Phase 2 already implemented priority as default, this just adds opt-out
 
 **4.3 - Implement create delta --from-backlog ITEM-ID**
+
 - **Design**:
   ```python
   # In supekku/cli/create.py, create_delta() function
@@ -227,6 +240,7 @@ uv run spec-driver create delta --from-backlog IMPR-002
 - **Template updates**: May need to update delta template to accept optional context
 
 **4.4 - Write CLI integration tests (VT-015-005)**
+
 - **Design**:
   - Mock editor return values in test
   - Verify registry file updated
@@ -239,6 +253,7 @@ uv run spec-driver create delta --from-backlog IMPR-002
 - **Parallel**: Can write tests while implementing 4.1-4.3
 
 **4.5 - Perform manual verification (VH-015-001)**
+
 - **Process**:
   1. Test with actual $EDITOR (not mocked)
   2. Verify end-to-end flow
@@ -257,27 +272,30 @@ uv run spec-driver create delta --from-backlog IMPR-002
 - **Evidence**: Screenshots, terminal output, registry file diffs
 
 **4.6 - Run lint and fix issues**
+
 - **Commands**: `just lint`, `just pylint`
 - **Target**: All checks passing
 - **Files**: All modified CLI files
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| User confused by --prioritize not showing list | Clear help text: "Opens editor for reordering" | Planned |
-| Registry not persisted after edit | Explicit save call + success message | Planned |
-| Filter interaction produces wrong items in editor | Test all filter combinations | Planned |
-| Delta template doesn't support context | Check template, add context support if needed | Investigate |
+| Risk                                              | Mitigation                                     | Status      |
+| ------------------------------------------------- | ---------------------------------------------- | ----------- |
+| User confused by --prioritize not showing list    | Clear help text: "Opens editor for reordering" | Planned     |
+| Registry not persisted after edit                 | Explicit save call + success message           | Planned     |
+| Filter interaction produces wrong items in editor | Test all filter combinations                   | Planned     |
+| Delta template doesn't support context            | Check template, add context support if needed  | Investigate |
 
 ## 9. Decisions & Outcomes
 
 **Design Decisions:**
+
 - **2025-11-04** - Made `name` argument optional in `create delta` when using `--from-backlog` - better UX
 - **2025-11-04** - Fixed BacklogItem unhashability by using ID-based lookups in partition/merge logic
 - **2025-11-04** - Inline partition/merge logic in `edit_backlog_ordering()` instead of calling generic functions - avoids hashability issues
 
 **Implementation Outcomes:**
+
 - `--prioritize` flag fully functional with proper error handling
 - Editor integration works correctly (tested with vim)
 - `--from-backlog` successfully pre-populates delta templates
@@ -286,6 +304,7 @@ uv run spec-driver create delta --from-backlog IMPR-002
 ## 10. Findings / Research Notes
 
 **Current list backlog implementation (Phase 2 baseline):**
+
 - Location: `supekku/cli/list.py:1192-1289`
 - Already loads registry and uses `sort_by_priority()` by default
 - Filter logic: kind, status, filter (substring), regexp
@@ -293,17 +312,20 @@ uv run spec-driver create delta --from-backlog IMPR-002
 - Task: Add prioritize flag to existing flow
 
 **Existing create delta:**
+
 - Location: `supekku/cli/create.py`
 - Template: `.spec-driver/templates/delta-template.md`
 - Current: Prompts for name/slug, generates from template
 - Task: Add --from-backlog to pre-populate context
 
 **Key integration points:**
+
 - `edit_backlog_ordering()` from Phase 3 (priority.py:245-318)
 - `save_backlog_registry()` from Phase 1 (registry.py:117-142)
 - `sort_by_priority()` from Phase 2 (priority.py:117-154)
 
 ## 11. Wrap-up Checklist
+
 - [x] Exit criteria satisfied (all flags working)
 - [x] VT-015-005 CLI integration tests passing (2 tests, all passing)
 - [x] VH-015-001 manual verification complete (tested with actual editor)

@@ -12,6 +12,7 @@
 **Data Model & Parser** - All 9 tasks completed successfully.
 
 **Key Deliverables**:
+
 - ✅ Category field added to RequirementRecord (`category: str | None`)
 - ✅ Regex extended to parse `**FR-001**(category): description` syntax
 - ✅ Frontmatter category parsing with body precedence
@@ -20,11 +21,13 @@
 - ✅ All linters passing (ruff + pylint)
 
 **Test Results**:
+
 - 1352 tests passing (4 new category tests added)
 - Zero lint warnings
 - Backward compatible - all existing tests pass
 
 **Commits**:
+
 1. `d217830` - feat: category field + parsing (tasks 1.1-1.6)
 2. `aa533e7` - test: VT-017-001 and VT-017-002 (tasks 1.7-1.9)
 3. `9a03f92` - docs: phase-01 completion tracking
@@ -35,6 +38,7 @@
 ### Category Syntax Supported
 
 **Inline (body precedence)**:
+
 ```markdown
 - **FR-001**(auth): Authentication requirement
 - **FR-002**(security/auth): Hierarchical category
@@ -42,6 +46,7 @@
 ```
 
 **Frontmatter (fallback)**:
+
 ```yaml
 ---
 category: security
@@ -53,20 +58,24 @@ category: security
 ### Files Modified
 
 **Core Implementation**:
+
 - `supekku/scripts/lib/requirements/registry.py` - RequirementRecord model, regex, parser
 - `supekku/scripts/lib/core/frontmatter_metadata/spec.py` - Schema metadata
 - `supekku/scripts/lib/core/frontmatter_metadata/prod.py` - Schema metadata
 
 **Tests**:
+
 - `supekku/scripts/lib/requirements/registry_test.py` - 4 new test methods
 
 **Documentation**:
+
 - `change/deltas/DE-017-add-category-support-to-requirements/phases/phase-01.md` - Complete
 - `change/deltas/DE-017-add-category-support-to-requirements/phases/phase-02.md` - Ready
 
 ## What's Next: Phase 2
 
 ### Objective
+
 Add category filtering and display to the `list requirements` CLI command.
 
 ### Key Tasks (8 total)
@@ -83,6 +92,7 @@ Add category filtering and display to the `list requirements` CLI command.
 ### Starting Points
 
 **Find list requirements CLI**:
+
 ```bash
 # Locate the command
 grep -r "def.*list.*requirement" supekku/
@@ -94,6 +104,7 @@ uv run spec-driver list requirements --help
 ```
 
 **Review formatter patterns**:
+
 ```bash
 # Existing formatters as templates
 cat supekku/scripts/lib/formatters/decision_formatters.py
@@ -104,6 +115,7 @@ cat AGENTS.md  # Section: Adding a Formatter
 ```
 
 **Expected output format**:
+
 ```
 label    status    category    title
 FR-001   pending   auth        Authentication requirement
@@ -156,12 +168,14 @@ uv run spec-driver list requirements
 ## Implementation Philosophy
 
 **Follow AGENTS.md principles**:
+
 - SRP - Formatters have NO business logic
 - Pure functions - `(input) -> output` with no side effects
 - Skinny CLI - Orchestrate, never implement
 - Avoid premature abstraction - Start specific, generalize later
 
 **TDD Approach**:
+
 1. Write tests first (VT-017-003, VT-017-004)
 2. Implement formatters (pure functions)
 3. Update CLI (thin orchestration)
@@ -175,6 +189,7 @@ Starting Phase 2 continuation: ~97k of ~150k practical tokens remaining (adequat
 ## Questions?
 
 Refer to:
+
 - `DE-017.md` - Delta motivation and scope
 - `DR-017.md` - Design decisions
 - `IP-017.md` - Implementation plan overview

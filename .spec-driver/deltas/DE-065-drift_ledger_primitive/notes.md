@@ -24,7 +24,7 @@ All 3 phases complete. Delta closed.
   - Used `format_list_table()` from table_utils (generic helper) rather than hand-rolling table setup
   - Extracted `_entry_to_dict()` to keep McCabe complexity down on JSON serializer
 - `drift/creation.py`: `create_drift_ledger()` with sequential ID allocation
-  - Scans existing DL-*.md files for max ID, increments
+  - Scans existing DL-\*.md files for max ID, increments
   - Creates `.spec-driver/drift/` directory on demand
   - Template matches DR-065 §10 exactly
 - CLI commands added directly in `create.py`, `list.py`, `show.py` (not a separate drift.py — CLI commands live in the verb-grouped modules, not per-artifact modules)
@@ -59,9 +59,10 @@ Notes: `.spec-driver/deltas/DE-065-drift_ledger_primitive/notes.md`
 ### Next: Phase 3 — Migration & close
 
 Create phase 3 sheet:
-  `uv run spec-driver create phase "Migration and close" --plan IP-065`
+`uv run spec-driver create phase "Migration and close" --plan IP-065`
 
 Tasks:
+
 1. Migrate pilot DL-047 from `drift/` to `.spec-driver/drift/`
    - Convert entry format from pilot list-item to fenced YAML blocks
    - Update any references to old path
@@ -73,7 +74,7 @@ Tasks:
 - `supekku/scripts/lib/formatters/drift_formatters.py` — list table, detail, JSON
 - `supekku/scripts/lib/drift/creation.py` — create_drift_ledger()
 - `supekku/cli/common.py` — PREFIX_TO_TYPE, resolver, finder for drift_ledger
-- `supekku/cli/resolve.py` — _collect_drift_ledgers in build_artifact_index
+- `supekku/cli/resolve.py` — \_collect_drift_ledgers in build_artifact_index
 - `supekku/cli/create.py` — `create drift` command
 - `supekku/cli/list.py` — `list drift` command
 - `supekku/cli/show.py` — `show drift` command + show_handlers entry

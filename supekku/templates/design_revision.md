@@ -1,6 +1,7 @@
 # {{ design_revision_id }} – {{ name }}
 
 ## 1. Executive Summary
+
 - **Delta**: [{{ delta_id }}](./{{ delta_id }}.md)
 - **Status**: draft (update when approved)
 - **Owners / Team**: <names or teams accountable>
@@ -8,12 +9,14 @@
 - **Synopsis**: <one-liner describing the architectural shift>
 
 ## 2. Problem & Constraints
+
 - **Current Behaviour**: <describe pain, instability, or limitation>
 - **Drivers / Inputs**: <link research, decisions, audits that justify the work>
 - **Constraints / Guardrails**: <operational limits, rollout boundaries, observability, compliance>
 - **Out of Scope**: <explicit non-goals, deferred ideas>
 
 ## 3. Architecture Intent
+
 - **Target Outcomes**:
   - <Outcome 1 tied to requirement/spec>
   - <Outcome 2>
@@ -21,39 +24,46 @@
 - **State Transitions / Lifecycle Impact**: <how lifecycle/status values evolve>
 
 ## 4. Code Impact Summary
-| Path | Current State | Target State |
-| --- | --- | --- |
+
+| Path                    | Current State     | Target State             |
+| ----------------------- | ----------------- | ------------------------ |
 | `src/example/module.py` | <behaviour today> | <behaviour after change> |
 
 > Capture each affected component with concise before/after statements. Align this table with the `code_impacts` frontmatter entries.
 
 ## 5. Verification Alignment
-| Verification | Impact | Notes |
-| --- | --- | --- |
-| VT-XXX | regression | <existing coverage that must be updated> |
-| VA-YYY | new | <new artefact or analysis to add> |
+
+| Verification | Impact     | Notes                                    |
+| ------------ | ---------- | ---------------------------------------- |
+| VT-XXX       | regression | <existing coverage that must be updated> |
+| VA-YYY       | new        | <new artefact or analysis to add>        |
 
 > Keep the table in sync with `verification_alignment` metadata so tooling can audit impacts.
 
 ## 6. Supporting Context
+
 - **Research**: RC-### – <insight or takeaway>
 - **Hypotheses**: PROD-###.HYP-## – <assumption being validated>
 - **Related Deltas / Specs**: DE-###, SPEC-### – <traceability notes>
 
 ## 7. Design Decisions & Trade-offs
+
 - DEC-### – <decision summary, rationale, consequences>
 - <Additional decisions, even if pending approval>
 
 ## 8. Open Questions
+
 - [ ] Question text – Owner (@name) – due YYYY-MM-DD
 - [ ] …
 
 ## 9. Rollout & Operational Notes
+
 - **Migration / Backfill**: <data movements, toggles, sequencing>
 - **Observability / Alerts**: <metrics, telemetry changes, dashboards>
 - **Recovery / Rollback**: <how to detect bad rollout and undo>
 
 ## 10. References & Links
+
 - Diagrams: <link to draw.io/miro>
 - Demo / Prototype: <link>
 - Additional Reading: <links>

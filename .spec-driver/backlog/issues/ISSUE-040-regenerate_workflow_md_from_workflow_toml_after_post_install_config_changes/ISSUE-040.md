@@ -1,8 +1,8 @@
 ---
 id: ISSUE-040
 name: Regenerate workflow.md from workflow.toml after post-install config changes
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: resolved
 kind: issue
 categories: []
@@ -34,4 +34,3 @@ A command like `spec-driver install --regenerate` or `spec-driver configure
 Implemented in DE-051: `sync` now regenerates agent docs from workflow.toml
 as an early step, before spec/contract synchronization. The render function
 was extracted from the installer to `core/agent_docs.py` for reuse.
-

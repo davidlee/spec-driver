@@ -9,9 +9,9 @@ from typing import Annotated, Any
 import typer
 
 from supekku.cli.common import (
+  ARTIFACT_PREFIXES,
   EXIT_FAILURE,
   EXIT_SUCCESS,
-  ARTIFACT_PREFIXES,
   ArtifactNotFoundError,
   ArtifactRef,
   ContentTypeOption,
@@ -36,12 +36,12 @@ from supekku.scripts.lib.formatters.change_formatters import (
 from supekku.scripts.lib.formatters.decision_formatters import format_decision_details
 from supekku.scripts.lib.formatters.memory_formatters import format_memory_details
 from supekku.scripts.lib.formatters.policy_formatters import format_policy_details
+from supekku.scripts.lib.formatters.relation_formatters import format_related_section
 from supekku.scripts.lib.formatters.requirement_formatters import (
   format_requirement_details,
 )
 from supekku.scripts.lib.formatters.spec_formatters import format_spec_details
 from supekku.scripts.lib.formatters.standard_formatters import format_standard_details
-from supekku.scripts.lib.formatters.relation_formatters import format_related_section
 from supekku.scripts.lib.memory.registry import MemoryRegistry
 
 # Reverse mapping: ID prefix → artifact kind for forward reference grouping.
@@ -135,7 +135,7 @@ def show_spec(  # noqa: PLR0913
     bool, typer.Option("--requirements", help="Show full requirements list")
   ] = False,
   related: Annotated[
-    bool, typer.Option("--related", help="Show one-hop neighbourhood (forward + reverse references)")
+    bool, typer.Option("--related", help="Show forward and reverse references")
   ] = False,
   content_type: ContentTypeOption = None,
   root: RootOption = None,
@@ -260,7 +260,7 @@ def show_delta(
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
   related: Annotated[
-    bool, typer.Option("--related", help="Show one-hop neighbourhood (forward + reverse references)")
+    bool, typer.Option("--related", help="Show forward and reverse references")
   ] = False,
   content_type: ContentTypeOption = None,
   root: RootOption = None,
@@ -299,7 +299,10 @@ def show_delta(
       )
       if related:
         # Append full neighbourhood (excluding audit/revision already shown)
-        extra_refs = {k: v for k, v in reverse_refs.items() if k not in ("audit", "revision")}
+        skip = ("audit", "revision")
+        extra_refs = {
+          k: v for k, v in reverse_refs.items() if k not in skip
+        }
         if extra_refs:
           related_lines = format_related_section(extra_refs)
           return base + "\n".join(related_lines)
@@ -380,7 +383,7 @@ def show_requirement(  # noqa: PLR0913
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
   related: Annotated[
-    bool, typer.Option("--related", help="Show one-hop neighbourhood (forward + reverse references)")
+    bool, typer.Option("--related", help="Show forward and reverse references")
   ] = False,
   content_type: ContentTypeOption = None,
   root: RootOption = None,
@@ -815,7 +818,7 @@ def show_issue(  # noqa: PLR0913
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
   related: Annotated[
-    bool, typer.Option("--related", help="Show one-hop neighbourhood (forward + reverse references)")
+    bool, typer.Option("--related", help="Show forward and reverse references")
   ] = False,
   content_type: ContentTypeOption = None,
   root: RootOption = None,

@@ -53,7 +53,18 @@
           doCheck = false;
         };
 
-        projectPkgs = [spec-driver];
+        projectPkgs = with pkgs; [
+          spec-driver
+          uv
+          ruff
+          python3Packages.pylint
+          python3Packages.pytest
+          pyright
+          gomarkdoc
+          go
+          d2
+          tree-sitter
+        ];
 
         jailPkgs = lib.optionalAttrs isLinux {
           jailed-pi = jailLib.makeJailedPi {

@@ -1,11 +1,15 @@
 """Pre-boot context generation for cache-optimised agent sessions.
 
 Concatenates boot-sequence governance files and governance artifact
-listings into a single static markdown file.  When loaded into
-``.claude/rules/`` (via symlink), this file lands in Claude Code's
-cacheable prefix — eliminating per-session tool-call overhead.
+listings into a single static markdown file.  Outputs to two locations:
 
-See: DE-091, DR-091, mem.fact.claude-code.context-loading
+- ``.agents/spec-driver-boot.md`` — for Claude Code (symlinked into .claude/rules/)
+- ``.pi/APPEND_SYSTEM.md`` — for pi (auto-discovered, appended to system prompt)
+
+Both outputs are identical. Content-diffing avoids unnecessary writes
+that would bust token caches.
+
+See: DE-091, DR-091, DE-093, mem.fact.claude-code.context-loading
 """
 
 from __future__ import annotations
@@ -16,9 +20,13 @@ from pathlib import Path
 from .config import load_workflow_config
 from .paths import SPEC_DRIVER_DIR
 
-# Output location (relative to repo root)
+# Output locations (relative to repo root)
 PREBOOT_OUTPUT_DIR = Path(".agents")
 PREBOOT_OUTPUT_FILE = "spec-driver-boot.md"
+
+# pi-native output: .pi/APPEND_SYSTEM.md (auto-discovered by pi)
+PI_OUTPUT_DIR = Path(".pi")
+PI_OUTPUT_FILE = "APPEND_SYSTEM.md"
 
 # Boot-sequence files in canonical order.
 # Each tuple: (section_heading, path_relative_to_repo_root)
@@ -113,29 +121,41 @@ def generate_preboot_content(repo_root: Path) -> str:
   return "\n".join(sections)
 
 
-def write_preboot_file(repo_root: Path) -> Path:
-  """Generate and write the preboot context file.
+def _write_if_changed(path: Path, content: str) -> bool:
+  """Write content to path only if it differs. Returns True if written."""
+  path.parent.mkdir(parents=True, exist_ok=True)
+  if path.is_file():
+    existing = path.read_text(encoding="utf-8")
+    if existing == content:
+      return False
+  path.write_text(content, encoding="utf-8")
+  return True
 
-  Writes to ``.agents/spec-driver-boot.md`` under the repo root.
-  Only writes if content has changed (avoids unnecessary file touches).
+
+def write_preboot_file(repo_root: Path) -> Path:
+  """Generate and write preboot context files.
+
+  Writes to:
+    - ``.agents/spec-driver-boot.md`` — for Claude Code (via symlink into .claude/rules/)
+    - ``.pi/APPEND_SYSTEM.md`` — for pi (auto-discovered, appended to system prompt)
+
+  Both files receive identical content. Only writes if content has changed
+  (avoids unnecessary file touches that would bust token caches).
 
   Args:
     repo_root: Repository root path.
 
   Returns:
-    Path to the written file.
+    Path to the primary output file (.agents/spec-driver-boot.md).
   """
-  output_dir = repo_root / PREBOOT_OUTPUT_DIR
-  output_dir.mkdir(parents=True, exist_ok=True)
-  output_path = output_dir / PREBOOT_OUTPUT_FILE
-
   content = generate_preboot_content(repo_root)
 
-  # Only write if changed (avoids unnecessary mtime updates)
-  if output_path.is_file():
-    existing = output_path.read_text(encoding="utf-8")
-    if existing == content:
-      return output_path
+  # Primary output (Claude Code)
+  primary_path = repo_root / PREBOOT_OUTPUT_DIR / PREBOOT_OUTPUT_FILE
+  _write_if_changed(primary_path, content)
 
-  output_path.write_text(content, encoding="utf-8")
-  return output_path
+  # pi-native output (auto-discovered as APPEND_SYSTEM.md)
+  pi_path = repo_root / PI_OUTPUT_DIR / PI_OUTPUT_FILE
+  _write_if_changed(pi_path, content)
+
+  return primary_path

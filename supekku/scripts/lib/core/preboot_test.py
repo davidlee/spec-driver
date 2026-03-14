@@ -12,6 +12,8 @@ from supekku.scripts.lib.core.preboot import (
   BOOT_SEQUENCE,
   GENERATED_HEADER,
   GOVERNANCE_LISTINGS,
+  PI_OUTPUT_DIR,
+  PI_OUTPUT_FILE,
   PREBOOT_OUTPUT_DIR,
   PREBOOT_OUTPUT_FILE,
   generate_preboot_content,
@@ -241,3 +243,33 @@ class TestWritePrebootFile:
     updated = path.read_text(encoding="utf-8")
     assert updated != original
     assert "Updated Dogma" in updated
+
+  def test_writes_pi_append_system(self, workspace: Path) -> None:
+    """Also writes .pi/APPEND_SYSTEM.md for pi auto-discovery."""
+    with _patch_subprocess(_mock_run()):
+      write_preboot_file(workspace)
+
+    pi_path = workspace / PI_OUTPUT_DIR / PI_OUTPUT_FILE
+    assert pi_path.is_file()
+
+  def test_pi_output_matches_primary(self, workspace: Path) -> None:
+    """pi output is identical to primary output."""
+    with _patch_subprocess(_mock_run()):
+      primary = write_preboot_file(workspace)
+
+    pi_path = workspace / PI_OUTPUT_DIR / PI_OUTPUT_FILE
+    assert primary.read_text(encoding="utf-8") == pi_path.read_text(encoding="utf-8")
+
+  def test_pi_output_skips_write_when_unchanged(self, workspace: Path) -> None:
+    """pi output not rewritten if content is identical."""
+    mock = _mock_run()
+    with _patch_subprocess(mock):
+      write_preboot_file(workspace)
+      pi_path = workspace / PI_OUTPUT_DIR / PI_OUTPUT_FILE
+      mtime1 = pi_path.stat().st_mtime_ns
+
+    with _patch_subprocess(mock):
+      write_preboot_file(workspace)
+      mtime2 = pi_path.stat().st_mtime_ns
+
+    assert mtime1 == mtime2

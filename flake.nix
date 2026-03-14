@@ -66,12 +66,13 @@
           tree-sitter
         ];
 
-        jailPkgs = lib.optionalAttrs isLinux {
-          jailed-pi = jailLib.makeJailedPi {
+        # Raw jailed agents (no preboot wrapper)
+        jailedAgents = lib.optionalAttrs isLinux {
+          jailed-pi-raw = jailLib.makeJailedPi {
             profile = "specDev";
             extraPkgs = projectPkgs;
           };
-          jailed-pi-research = jailLib.makeJailedPi {
+          jailed-pi-research-raw = jailLib.makeJailedPi {
             name = "pi-research";
             profile = "research";
             extraPkgs = projectPkgs;
@@ -81,6 +82,19 @@
             extraPkgs = projectPkgs;
           };
         };
+
+        # Wrap jailed-pi with preboot (belt — runs before pi reads AGENTS.md)
+        jailPkgs = lib.optionalAttrs isLinux (jailedAgents
+          // {
+            jailed-pi = pkgs.writeShellScriptBin "jailed-pi" ''
+              ${lib.getExe spec-driver} admin preboot "$PWD" >/dev/null 2>&1
+              exec ${lib.getExe jailedAgents.jailed-pi-raw} "$@"
+            '';
+            jailed-pi-research = pkgs.writeShellScriptBin "jailed-pi-research" ''
+              ${lib.getExe spec-driver} admin preboot "$PWD" >/dev/null 2>&1
+              exec ${lib.getExe jailedAgents.jailed-pi-research-raw} "$@"
+            '';
+          });
       in {
         packages =
           jailPkgs

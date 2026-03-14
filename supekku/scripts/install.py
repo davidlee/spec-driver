@@ -493,6 +493,46 @@ def _ensure_preboot_symlink(
   link_path.symlink_to(link_target)
 
 
+def _collect_pi_sources(
+  package_root: Path,
+) -> list[Path]:
+  """Collect pi extension sources from the package.
+
+  Returns:
+    List of extension source file paths.
+  """
+  extensions_src = package_root / "pi.extensions"
+  if not extensions_src.is_dir():
+    return []
+  return sorted(f for f in extensions_src.iterdir() if f.is_file())
+
+
+def _install_pi_config(
+  package_root: Path, target_root: Path, *, dry_run: bool = False
+) -> None:
+  """Install .pi/ extensions from package source.
+
+  Copies pi extension files into .pi/extensions/ in the target workspace.
+  These are installer-owned and overwritten on every install.
+  """
+  extension_sources = _collect_pi_sources(package_root)
+
+  if not extension_sources:
+    return
+
+  if dry_run:
+    print("\n[DRY RUN] pi config:")
+    for src in extension_sources:
+      print(f"  + .pi/extensions/{src.name}")
+    return
+
+  extensions_dest = target_root / ".pi" / "extensions"
+  extensions_dest.mkdir(parents=True, exist_ok=True)
+  for src in extension_sources:
+    dest = extensions_dest / src.name
+    shutil.copy2(src, dest)
+
+
 def _install_hooks(
   package_root: Path, target_root: Path, *, dry_run: bool = False
 ) -> None:
@@ -704,6 +744,9 @@ def initialize_workspace(
 
   # Install .claude/ settings and hooks (installer-owned, overwrite)
   _install_claude_config(package_root, target_root, dry_run=dry_run)
+
+  # Install .pi/ extensions (installer-owned, overwrite)
+  _install_pi_config(package_root, target_root, dry_run=dry_run)
 
   # Create preboot symlink (.claude/rules/ → .agents/)
   _ensure_preboot_symlink(target_root, dry_run=dry_run)

@@ -49,6 +49,7 @@
 - `0c16582` — fix(DE-093): resolve jailed-pi name collision and getExe warning
 - `6132f94` — mem(DE-093): pi APPEND_SYSTEM.md discovery and session_shutdown hook timing
 - `8304e69` — feat(DE-093): install pi extensions via spec-driver install
+- `f89f6e5` — feat(DE-093): add _install_pi_config tests and .pi/APPEND_SYSTEM.md gitignore entry
 
 ### Verification
 - Nix flake builds successfully after collision fix
@@ -57,10 +58,11 @@
 - User to test `spec-driver install` in a fresh session
 
 ### Rough edges / follow-ups
-- No test for `_install_pi_config()` in install_test.py yet — should mirror the
-  `_install_claude_config` test pattern
+- ~~No test for `_install_pi_config()` in install_test.py yet~~ — **done** (`f89f6e5`):
+  `TestInstallPiConfig` (6 unit tests) + `TestInitializeWorkspacePiConfig` (2 integration tests)
+- ~~`.pi/APPEND_SYSTEM.md` should probably also be in a default `.gitignore` entry~~ —
+  **done** (`f89f6e5`): `_ensure_gitignore_entry(target_root, ".pi/APPEND_SYSTEM.md")`
+  added to `initialize_workspace()`, with 2 tests (`TestInitializeWorkspaceGitignorePiAppend`)
 - No test for the `.ts` file being included in the wheel build
 - The `artifact_event.py` equivalent for pi (tool-call observation via RPC events)
   is deferred to future work (DE-092 or successor)
-- `.pi/APPEND_SYSTEM.md` should probably also be in a default `.gitignore` entry
-  added by `_ensure_gitignore_entry()` during install

@@ -56,15 +56,21 @@
 
         projectPkgs = with pkgs; [
           spec-driver
+
+          tree-sitter
+
           uv
-          ruff
           python3Packages.pylint
           python3Packages.pytest
           pyright
-          gomarkdoc
+          ruff
+
+          nodejs_latest
+
           go
+          gomarkdoc
+
           d2
-          tree-sitter
         ];
 
         # Raw jailed agents (no preboot wrapper)

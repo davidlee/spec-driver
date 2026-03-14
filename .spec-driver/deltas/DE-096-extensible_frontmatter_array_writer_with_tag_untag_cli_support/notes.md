@@ -87,5 +87,5 @@ Resolved with targeted CompactDumper changes:
 
 ## Outstanding
 
-- [ ] Backlog item for client repo migration strategy
+- [x] Backlog item for client repo migration strategy → IMPR-017
 - [ ] Audit and close delta

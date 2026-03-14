@@ -34,7 +34,7 @@ updated: "2026-03-14"
 
 ### 3. Backlog item
 
-- [ ] Create backlog item for client repo migration strategy (progressive reformatting on first edit, potential `spec-driver format` command)
+- [x] Create backlog item for client repo migration strategy → IMPR-017
 
 ### 4. Closure
 
@@ -44,5 +44,5 @@ updated: "2026-03-14"
 ## Exit Criteria
 
 - [x] All `.spec-driver` frontmatter is canonical
-- [ ] Backlog item exists for client migration
+- [x] Backlog item exists for client migration (IMPR-017)
 - [ ] Delta closed

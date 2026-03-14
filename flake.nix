@@ -84,6 +84,8 @@
               uv
               python3Packages.python-lsp-server
               python3Packages.python-lsp-ruff
+              python3Packages.pytest
+
               watchexec
 
               nodejs_latest

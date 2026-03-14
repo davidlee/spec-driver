@@ -10808,3 +10808,42 @@ deltas:
         risks: []
       - id: IP-094-P01
         phase: IP-094-P01
+  DE-095:
+    kind: delta
+    status: completed
+    name: 'Delta - Requirement frontmatter: populate tags, ext_id, ext_url in creation
+      and sync'
+    slug: requirement_frontmatter_populate_tags_ext_id_ext_url_in_creation_and_sync
+    updated: '2026-03-14'
+    path: .spec-driver/deltas/DE-095-requirement_frontmatter_populate_tags_ext_id_ext_url_in_creation_and_sync/DE-095.md
+    applies_to:
+      specs:
+      - PROD-008
+      - PROD-009
+      requirements:
+      - PROD-008.FR-001
+      - PROD-009.FR-001
+    plan:
+      id: IP-095
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-095
+        delta: DE-095
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-008
+          - PROD-009
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-008.FR-001
+          - PROD-009.FR-001
+          dependencies: []
+        phases:
+        - id: IP-095-P01
+      phases:
+      - id: IP-095-P01
+        phase: IP-095-P01

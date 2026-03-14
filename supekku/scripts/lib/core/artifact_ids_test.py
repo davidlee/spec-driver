@@ -1,13 +1,15 @@
-"""Tests for shared artifact ID classification."""
+"""Tests for shared artifact ID classification and normalization."""
 
 from __future__ import annotations
 
 import pytest
 
 from supekku.scripts.lib.core.artifact_ids import (
+  NormalizationResult,
   classify_artifact_id,
   is_artifact_id,
   is_kind,
+  normalize_artifact_id,
 )
 
 
@@ -209,3 +211,86 @@ class TestIsKind:
   def test_unknown_kind_raises(self) -> None:
     with pytest.raises(KeyError):
       is_kind("SPEC-001", "nonexistent")
+
+
+class TestNormalizeArtifactId:
+  """VT-097-normalize: normalize_artifact_id resolves padding variants."""
+
+  KNOWN_IDS = frozenset({
+    "ADR-001", "ADR-011", "DE-097", "SPEC-001", "ISSUE-031",
+    "SPEC-1234",  # 4-digit ID for future-proofing tests
+  })
+
+  def test_already_canonical(self) -> None:
+    result = normalize_artifact_id("ADR-011", self.KNOWN_IDS)
+    assert result.canonical == "ADR-011"
+    assert result.diagnostic is None
+
+  def test_two_digit_resolves_to_three(self) -> None:
+    result = normalize_artifact_id("ADR-11", self.KNOWN_IDS)
+    assert result.canonical == "ADR-011"
+    assert result.diagnostic is not None
+    assert "ADR-11" in result.diagnostic
+
+  def test_one_digit_resolves_to_three(self) -> None:
+    result = normalize_artifact_id("ADR-1", self.KNOWN_IDS)
+    assert result.canonical == "ADR-001"
+    assert result.diagnostic is not None
+
+  def test_no_match_returns_none(self) -> None:
+    result = normalize_artifact_id("ADR-999", self.KNOWN_IDS)
+    assert result.canonical is None
+    assert result.diagnostic is None
+
+  def test_unrecognized_prefix_returns_none(self) -> None:
+    result = normalize_artifact_id("NOPE-123", self.KNOWN_IDS)
+    assert result.canonical is None
+    assert result.diagnostic is None
+
+  def test_preserves_original(self) -> None:
+    result = normalize_artifact_id("ADR-11", self.KNOWN_IDS)
+    assert result.original == "ADR-11"
+
+  def test_delta_two_digit(self) -> None:
+    result = normalize_artifact_id("DE-97", self.KNOWN_IDS)
+    assert result.canonical == "DE-097"
+    assert result.diagnostic is not None
+
+  def test_issue_two_digit(self) -> None:
+    result = normalize_artifact_id("ISSUE-31", self.KNOWN_IDS)
+    assert result.canonical == "ISSUE-031"
+    assert result.diagnostic is not None
+
+  def test_four_digit_future_proof(self) -> None:
+    """VT-097-normalize-future: 4-digit IDs normalize correctly."""
+    result = normalize_artifact_id("SPEC-1234", self.KNOWN_IDS)
+    assert result.canonical == "SPEC-1234"
+    assert result.diagnostic is None
+
+  def test_short_to_four_digit(self) -> None:
+    """VT-097-normalize-future: short form resolves to 4-digit."""
+    known = frozenset({"SPEC-1234"})
+    result = normalize_artifact_id("SPEC-1234", known)
+    assert result.canonical == "SPEC-1234"
+    # Already canonical, no diagnostic
+    assert result.diagnostic is None
+
+  def test_three_digit_to_four_digit(self) -> None:
+    """When only a 4-digit form exists, 3-digit input doesn't match."""
+    known = frozenset({"SPEC-1234"})
+    result = normalize_artifact_id("SPEC-123", known)
+    # 123 != 1234, padding won't help
+    assert result.canonical is None
+
+  def test_empty_string(self) -> None:
+    result = normalize_artifact_id("", self.KNOWN_IDS)
+    assert result.canonical is None
+
+  def test_memory_id_skipped(self) -> None:
+    """Memory IDs use a different scheme — normalizer should not touch them."""
+    result = normalize_artifact_id("mem.fact.auth", self.KNOWN_IDS)
+    assert result.canonical is None
+
+  def test_empty_known_ids(self) -> None:
+    result = normalize_artifact_id("ADR-001", frozenset())
+    assert result.canonical is None

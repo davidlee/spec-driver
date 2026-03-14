@@ -1,9 +1,9 @@
 ---
 id: IP-050.PHASE-02
-slug: 050-normalise_registry_api_surface_for_consistent_artifact_access-phase-02
+slug: "050-normalise_registry_api_surface_for_consistent_artifact_access-phase-02"
 name: IP-050 Phase 02 - Group C registries
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: in-progress
 kind: phase
 ---

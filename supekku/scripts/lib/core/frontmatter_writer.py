@@ -25,15 +25,23 @@ from supekku.scripts.lib.core.spec_utils import (
 # CompactDumper — canonical YAML formatting
 # ---------------------------------------------------------------------------
 
-# Threshold for flow-style list rendering.  Lists whose total rendered
-# item-character count (plus separators) stays below this limit are emitted
-# in compact flow style ``[a, b, c]``; longer or complex lists use block
-# style.
-_FLOW_LIST_WIDTH_LIMIT = 80
+# Maximum rendered width of the ``[a, b, c]`` portion for flow-style lists.
+# Kept well under prettier's 80-char print width to leave room for the key
+# name and any indent prefix on the same line.
+_FLOW_LIST_WIDTH_LIMIT = 60
 
 
-# Date-string pattern: double-quote to match prettier convention.
-_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+# Strings that YAML would single-quote in block or flow context.
+# We force double-quote to match prettier's convention.
+_NEEDS_QUOTING_RE = re.compile(
+  r"^$"  # empty string
+  r"|^\d{4}-\d{2}-\d{2}$"  # date-like
+  r"|^(true|false|yes|no|on|off|null|~)$"  # bool/null-like
+  r"|^[0-9]"  # starts with digit
+  r"|^[@`'\"]"  # YAML-reserved start chars
+  r"|[:#,\[\]{}]",  # special chars (block + flow indicators)
+  re.IGNORECASE,
+)
 
 
 class CompactDumper(yaml.SafeDumper):
@@ -56,9 +64,15 @@ class CompactDumper(yaml.SafeDumper):
 
 
 def _represent_str(dumper: CompactDumper, data: str) -> yaml.Node:
-  """Double-quote date-pattern strings to match prettier convention."""
-  if _DATE_RE.match(data):
-    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style='"')
+  """Quote strings to match prettier convention.
+
+  Double-quote when quoting is needed, unless the string itself contains
+  double-quote characters — prettier prefers whichever quote style avoids
+  escaping.
+  """
+  if _NEEDS_QUOTING_RE.search(data):
+    style = "'" if '"' in data else '"'
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=style)
   return dumper.represent_scalar("tag:yaml.org,2002:str", data)
 
 

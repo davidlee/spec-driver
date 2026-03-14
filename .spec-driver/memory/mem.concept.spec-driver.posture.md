@@ -4,32 +4,33 @@ name: Project Posture
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: "2026-03-03"
+verified: "2026-03-03"
 confidence: high
 tags: [spec-driver, posture, ceremony]
-summary: The framework is permissive; the project chooses its constraints. Posture is configured via workflow.toml. Ceremony
-  mode is advisory; runtime enforcement comes from explicit command gates and validations.
+summary: The framework is permissive; the project chooses its constraints. Posture is configured via workflow.toml. Ceremony mode is advisory; runtime enforcement comes from explicit command gates and validations.
 priority:
   severity: high
   weight: 9
 scope:
   commands: [uv run spec-driver sync, uv run spec-driver validate]
-  paths: [.spec-driver/workflow.toml, supekku/scripts/lib/core/config.py]
+  paths:
+    - .spec-driver/workflow.toml
+    - supekku/scripts/lib/core/config.py
 provenance:
   sources:
-  - kind: code
-    note: Workflow configuration loading only
-    ref: supekku/scripts/lib/core/config.py
-  - kind: code
-    note: Completion and coverage enforcement path
-    ref: supekku/scripts/complete_delta.py
-  - kind: code
-    note: Coverage gate implementation
-    ref: supekku/scripts/lib/changes/coverage_check.py
-  - kind: doc
-    note: Canonical posture wording for this delta
-    ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
+    - kind: code
+      note: Workflow configuration loading only
+      ref: supekku/scripts/lib/core/config.py
+    - kind: code
+      note: Completion and coverage enforcement path
+      ref: supekku/scripts/complete_delta.py
+    - kind: code
+      note: Coverage gate implementation
+      ref: supekku/scripts/lib/changes/coverage_check.py
+    - kind: doc
+      note: Canonical posture wording for this delta
+      ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
 ---
 
 # Project Posture

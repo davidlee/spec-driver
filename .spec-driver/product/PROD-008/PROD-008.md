@@ -2,20 +2,20 @@
 id: PROD-008
 slug: requirements-lifecycle-coherence
 name: Requirements Lifecycle Coherence
-created: '2025-11-03'
-updated: '2026-03-06'
+created: "2025-11-03"
+updated: "2026-03-06"
 status: draft
 kind: prod
 aliases: []
 relations: []
 guiding_principles:
-- Specs own normative lifecycle truth; observed evidence triggers explicit reconciliation (ADR-008).
-- Make lifecycle shifts observable to both humans and agents.
-- Prefer explicit handoffs (spec ⇄ delta ⇄ audit) over implicit updates.
+  - Specs own normative lifecycle truth; observed evidence triggers explicit reconciliation (ADR-008).
+  - Make lifecycle shifts observable to both humans and agents.
+  - Prefer explicit handoffs (spec ⇄ delta ⇄ audit) over implicit updates.
 assumptions:
-- Specs remain the authoritative artefact for long-lived requirements.
-- Implementation plans exist for every delta that edits a requirement.
-- Audits will continue to be produced after major releases.
+  - Specs remain the authoritative artefact for long-lived requirements.
+  - Implementation plans exist for every delta that edits a requirement.
+  - Audits will continue to be produced after major releases.
 ---
 
 # PROD-008 – Requirements Lifecycle Coherence

@@ -1,9 +1,9 @@
 ---
 id: IP-086.PHASE-01
-slug: 086-memory_verification_primitive_sha_stamped_attestation_for_staleness_tracking-phase-01
-name: 'IP-086 Phase 01: Core primitives'
-created: '2026-03-09'
-updated: '2026-03-09'
+slug: "086-memory_verification_primitive_sha_stamped_attestation_for_staleness_tracking-phase-01"
+name: "IP-086 Phase 01: Core primitives"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---

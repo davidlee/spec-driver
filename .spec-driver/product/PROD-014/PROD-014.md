@@ -2,14 +2,12 @@
 id: PROD-014
 slug: contract_mirror_tree_index
 name: Contract Mirror Tree Index
-created: '2026-02-20'
-updated: '2026-03-06'
+created: "2026-02-20"
+updated: "2026-03-06"
 status: draft
 kind: prod
-scope: Provide a canonical, mirror-of-source contracts corpus under `.contracts/` for discovery, search, and generation (including
-  legacy “no spec yet” workflows).
-value_proposition: Make it trivial for humans/agents to go source-path ↔ contract-artefact, ripgrep contracts in a source-mirroring
-  tree, and generate a deterministic contracts corpus without spec stubbing.
+scope: "Provide a canonical, mirror-of-source contracts corpus under `.contracts/` for discovery, search, and generation (including legacy “no spec yet” workflows)."
+value_proposition: "Make it trivial for humans/agents to go source-path ↔ contract-artefact, ripgrep contracts in a source-mirroring tree, and generate a deterministic contracts corpus without spec stubbing."
 aliases: []
 relations: []
 guiding_principles: []

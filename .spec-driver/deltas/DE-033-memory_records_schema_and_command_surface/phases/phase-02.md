@@ -2,8 +2,8 @@
 id: IP-033.PHASE-02
 slug: memory-domain-model-and-registry
 name: IP-033 Phase 02 - Domain Model & Registry
-created: '2026-03-02'
-updated: '2026-03-02'
+created: "2026-03-02"
+updated: "2026-03-02"
 status: completed
 kind: phase
 ---

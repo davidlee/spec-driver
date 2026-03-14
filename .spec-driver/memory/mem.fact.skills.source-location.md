@@ -4,13 +4,13 @@ name: Skill source vs installed location
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 tags: [skills, gotcha]
-summary: Edit skills at supekku/skills/, not .spec-driver/skills/. The installed copies are derived and overwritten on sync.
+summary: "Edit skills at supekku/skills/, not .spec-driver/skills/. The installed copies are derived and overwritten on sync."
 scope:
   globs: [supekku/skills/**, .spec-driver/skills/**]
-verified: '2026-03-09'
+verified: "2026-03-09"
 provenance:
   sources: [DE-085]
 ---

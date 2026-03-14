@@ -1,9 +1,9 @@
 ---
 id: IP-008.PHASE-02
-slug: 008-add-coverage-evidence-phase-02
+slug: "008-add-coverage-evidence-phase-02"
 name: IP-008 Phase 02 - Validation & display
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: completed
 kind: phase
 ---

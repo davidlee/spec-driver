@@ -1,9 +1,9 @@
 ---
 id: IP-011.PHASE-02
-slug: 011-cli-enhanced-filtering-and-self-documentation-phase-02
+slug: "011-cli-enhanced-filtering-and-self-documentation-phase-02"
 name: IP-011 Phase 02 - Self-Documentation
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: complete
 kind: phase
 ---

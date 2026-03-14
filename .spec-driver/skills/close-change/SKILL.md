@@ -1,7 +1,6 @@
 ---
 name: close-change
-description: Close a delta safely - satisfy coverage gates, complete the delta command, and verify owning-record lifecycle
-  updates.
+description: "Close a delta safely - satisfy coverage gates, complete the delta command, and verify owning-record lifecycle updates."
 ---
 
 You are executing formal closure, not just marking work done.

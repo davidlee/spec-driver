@@ -1,9 +1,9 @@
 ---
 id: IP-079.PHASE-01
-slug: 079-implement_canonical_audit_reconciliation_contract-phase-01
+slug: "079-implement_canonical_audit_reconciliation_contract-phase-01"
 name: IP-079 Phase 01 — Schema foundation
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---

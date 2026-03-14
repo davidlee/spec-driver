@@ -1,9 +1,9 @@
 ---
 id: IP-079.PHASE-03
-slug: 079-implement_canonical_audit_reconciliation_contract-phase-03
+slug: "079-implement_canonical_audit_reconciliation_contract-phase-03"
 name: IP-079 Phase 03 — Validation rules
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---

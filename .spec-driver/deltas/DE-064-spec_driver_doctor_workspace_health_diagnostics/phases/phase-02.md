@@ -1,9 +1,9 @@
 ---
 id: IP-064.PHASE-02
-slug: 064-spec_driver_doctor_workspace_health_diagnostics-phase-02
-name: IP-064 Phase 02 — Remaining checks (refs, registries, lifecycle)
-created: '2026-03-08'
-updated: '2026-03-08'
+slug: "064-spec_driver_doctor_workspace_health_diagnostics-phase-02"
+name: "IP-064 Phase 02 — Remaining checks (refs, registries, lifecycle)"
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---

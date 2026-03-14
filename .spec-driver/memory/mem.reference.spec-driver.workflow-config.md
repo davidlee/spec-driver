@@ -4,18 +4,18 @@ name: workflow.toml Configuration Reference
 kind: memory
 status: active
 memory_type: reference
-updated: '2026-03-08'
-verified: '2026-03-08'
+updated: "2026-03-08"
+verified: "2026-03-08"
 confidence: high
 tags: [spec-driver, configuration, workflow]
-summary: Complete reference for all workflow.toml configuration options, their defaults, and where they are used.
+summary: "Complete reference for all workflow.toml configuration options, their defaults, and where they are used."
 priority:
   severity: high
   weight: 9
 provenance:
   sources:
-  - kind: code
-    ref: supekku/scripts/lib/core/config.py
+    - kind: code
+      ref: supekku/scripts/lib/core/config.py
 ---
 
 # workflow.toml Configuration Reference

@@ -1,9 +1,9 @@
 ---
 id: IP-048.PHASE-01
-slug: 048-config-dirs-wiring
-name: Config [dirs] wiring and paths initialization
-created: '2026-03-06'
-updated: '2026-03-06'
+slug: "048-config-dirs-wiring"
+name: "Config [dirs] wiring and paths initialization"
+created: "2026-03-06"
+updated: "2026-03-06"
 status: done
 kind: phase
 ---

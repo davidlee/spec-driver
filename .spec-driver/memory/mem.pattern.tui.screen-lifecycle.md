@@ -1,18 +1,18 @@
 ---
 id: mem.pattern.tui.screen-lifecycle
-name: 'TUI screen lifecycle: install + push/switch'
+name: "TUI screen lifecycle: install + push/switch"
 kind: memory
 status: active
 memory_type: pattern
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 tags: [tui, textual, screens]
-summary: 'Screen lifecycle: install_screen + push/switch, not push/pop for persistent screens'
+summary: "Screen lifecycle: install_screen + push/switch, not push/pop for persistent screens"
 scope:
   globs: [supekku/tui/**]
 links:
   missing:
-  - raw: DEC-054-01
+    - raw: DEC-054-01
 ---
 
 # TUI screen lifecycle: install + push/switch

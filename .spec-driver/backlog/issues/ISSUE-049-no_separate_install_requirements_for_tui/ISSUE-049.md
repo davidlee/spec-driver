@@ -1,8 +1,8 @@
 ---
 id: ISSUE-049
 name: no separate install requirements for tui
-created: '2026-03-10'
-updated: '2026-03-10'
+created: "2026-03-10"
+updated: "2026-03-10"
 status: resolved
 kind: issue
 categories: []

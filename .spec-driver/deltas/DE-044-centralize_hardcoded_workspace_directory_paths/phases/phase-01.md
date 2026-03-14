@@ -1,9 +1,9 @@
 ---
 id: IP-044.PHASE-01
-slug: 044-centralize_hardcoded_workspace_directory_paths-phase-01
-name: 'P01: Constants and helpers'
-created: '2026-03-05'
-updated: '2026-03-05'
+slug: "044-centralize_hardcoded_workspace_directory_paths-phase-01"
+name: "P01: Constants and helpers"
+created: "2026-03-05"
+updated: "2026-03-05"
 status: complete
 kind: phase
 ---

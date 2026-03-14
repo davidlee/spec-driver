@@ -2,32 +2,32 @@
 id: SPEC-122
 slug: supekku-scripts-lib-requirements
 name: supekku/scripts/lib/requirements Specification
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: draft
 kind: spec
 category: unit
 c4_level: code
 responsibilities:
-- Manage requirement records with comprehensive lifecycle tracking
-- Synchronize requirements from specs and change artifacts into central registry
-- Support requirement movement and reassignment between specs
-- Track requirement implementation and verification status
-- Provide flexible querying and filtering of requirements
-- Maintain bidirectional links between requirements and change artifacts
+  - Manage requirement records with comprehensive lifecycle tracking
+  - Synchronize requirements from specs and change artifacts into central registry
+  - Support requirement movement and reassignment between specs
+  - Track requirement implementation and verification status
+  - Provide flexible querying and filtering of requirements
+  - Maintain bidirectional links between requirements and change artifacts
 aliases: []
 packages: [supekku/scripts/lib/requirements]
 sources:
-- language: python
-  identifier: supekku/scripts/lib/requirements
-  module: supekku.scripts.lib.requirements
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/scripts/lib/requirements
+    module: supekku.scripts.lib.requirements
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
 owners: []
 auditers: []
 relations: []

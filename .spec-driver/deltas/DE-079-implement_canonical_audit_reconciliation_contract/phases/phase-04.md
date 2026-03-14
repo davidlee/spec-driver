@@ -1,9 +1,9 @@
 ---
 id: IP-079.PHASE-04
-slug: 079-implement_canonical_audit_reconciliation_contract-phase-04
+slug: "079-implement_canonical_audit_reconciliation_contract-phase-04"
 name: Rewrite audit-change as canonical reconciliation runsheet
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---

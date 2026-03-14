@@ -1,8 +1,8 @@
 ---
 id: IMPR-009
 name: TUI dashboard for human navigation of spec-driver workspace
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: resolved
 kind: improvement
 deltas: [DE-052, DE-053, DE-054, DE-061]

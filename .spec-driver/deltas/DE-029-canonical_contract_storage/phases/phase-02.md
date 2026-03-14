@@ -1,9 +1,9 @@
 ---
 id: IP-029.PHASE-02
-slug: 029-canonical_contract_storage-phase-02
+slug: "029-canonical_contract_storage-phase-02"
 name: IP-029 Phase 02 — Drift warnings & dead code cleanup
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: complete
 kind: phase
 ---

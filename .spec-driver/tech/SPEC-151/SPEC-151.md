@@ -2,39 +2,37 @@
 id: SPEC-151
 slug: supekku-scripts-lib-skills
 name: supekku/scripts/lib/skills Specification
-created: '2026-03-07'
-updated: '2026-03-09'
+created: "2026-03-07"
+updated: "2026-03-09"
 status: draft
 kind: spec
 category: unit
 c4_level: code
 responsibilities:
-- Define the skill subsystem boundary between packaged skill sources, installed skill copies, and the supporting sync/install
-  library.
-- Keep routing and execution guidance procedural in packaged skills rather than duplicating it across generated docs or ad
-  hoc prose.
-- Preserve the source-of-truth split where `supekku/skills/**` is edited and `.spec-driver/skills/**` is derived via sync.
-- Support reuse of existing spec-driver entity commands from skills instead of proliferating parallel creation workflows.
+  - "Define the skill subsystem boundary between packaged skill sources, installed skill copies, and the supporting sync/install library."
+  - Keep routing and execution guidance procedural in packaged skills rather than duplicating it across generated docs or ad hoc prose.
+  - Preserve the source-of-truth split where `supekku/skills/**` is edited and `.spec-driver/skills/**` is derived via sync.
+  - Support reuse of existing spec-driver entity commands from skills instead of proliferating parallel creation workflows.
 aliases: []
 packages: [supekku/scripts/lib/skills]
 sources:
-- language: python
-  identifier: supekku/scripts/lib/skills
-  module: supekku.scripts.lib.skills
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
-- language: markdown
-  identifier: supekku/skills
-  variants:
-  - name: packaged-skills
-    path: /home/david/dev/spec-driver/supekku/skills
-  - name: installed-skills
-    path: /home/david/dev/spec-driver/.spec-driver/skills
+  - language: python
+    identifier: supekku/scripts/lib/skills
+    module: supekku.scripts.lib.skills
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
+  - language: markdown
+    identifier: supekku/skills
+    variants:
+      - name: packaged-skills
+        path: /home/david/dev/spec-driver/supekku/skills
+      - name: installed-skills
+        path: /home/david/dev/spec-driver/.spec-driver/skills
 ---
 
 # SPEC-151 – supekku/scripts/lib/skills

@@ -5,8 +5,8 @@ kind: phase
 status: complete
 delta: DE-095
 plan: IP-095
-created: '2026-03-14'
-updated: '2026-03-14'
+created: "2026-03-14"
+updated: "2026-03-14"
 ---
 
 # Phase 1 – Creation + Sync + Tests

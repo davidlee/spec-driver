@@ -1,9 +1,9 @@
 ---
 id: IP-043.PHASE-01
-slug: 043-code-fix-and-tests
+slug: "043-code-fix-and-tests"
 name: IP-043 Phase 01 - Code fix and tests
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: draft
 kind: phase
 ---

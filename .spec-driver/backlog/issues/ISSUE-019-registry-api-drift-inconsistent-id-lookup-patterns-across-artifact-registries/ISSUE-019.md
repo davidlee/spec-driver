@@ -1,8 +1,8 @@
 ---
 id: ISSUE-019
-name: 'Registry API drift: inconsistent ID lookup patterns across artifact registries'
-created: '2025-11-04'
-updated: '2025-11-04'
+name: "Registry API drift: inconsistent ID lookup patterns across artifact registries"
+created: "2025-11-04"
+updated: "2025-11-04"
 status: resolved
 kind: issue
 categories: [architecture, technical-debt]

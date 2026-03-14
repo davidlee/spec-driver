@@ -4,13 +4,12 @@ name: Formatter Separation of Concerns
 kind: memory
 status: active
 memory_type: pattern
-updated: '2026-03-02'
-verified: '2026-03-02'
-review_by: '2026-06-02'
+updated: "2026-03-02"
+verified: "2026-03-02"
+review_by: "2026-06-02"
 confidence: high
 tags: [architecture, formatters]
-summary: Formatters are pure functions in formatters/. No business logic. No side effects. Same input always produces same
-  output.
+summary: Formatters are pure functions in formatters/. No business logic. No side effects. Same input always produces same output.
 priority:
   severity: medium
   weight: 5
@@ -19,9 +18,9 @@ scope:
   languages: [py]
 provenance:
   sources:
-  - kind: doc
-    note: Pure Functions Over Stateful Objects section
-    ref: CLAUDE.md
+    - kind: doc
+      note: Pure Functions Over Stateful Objects section
+      ref: CLAUDE.md
 requires_reading: [CLAUDE.md]
 ---
 

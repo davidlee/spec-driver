@@ -1,9 +1,9 @@
 ---
 id: IP-070.PHASE-01
-slug: 070-registry-sync-and-schema
+slug: "070-registry-sync-and-schema"
 name: IP-070 Phase 01 - Registry sync and schema completeness
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: complete
 kind: phase
 ---

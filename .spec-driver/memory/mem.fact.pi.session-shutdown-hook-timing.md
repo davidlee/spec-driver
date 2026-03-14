@@ -4,9 +4,9 @@ name: pi session_shutdown fires before /reload resource re-read
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-14'
-updated: '2026-03-14'
-verified: '2026-03-14'
+created: "2026-03-14"
+updated: "2026-03-14"
+verified: "2026-03-14"
 confidence: high
 tags: [pi, extension, hooks, reload]
 summary: session_shutdown is awaited before resourceLoader.reload() — the correct hook for pre-reload file generation
@@ -14,8 +14,8 @@ scope:
   globs: [.pi/extensions/**]
 provenance:
   sources:
-  - '@mariozechner/pi-coding-agent/dist/core/agent-session.js (reload method, lines 1784-1801)'
-  - DE-093
+    - "@mariozechner/pi-coding-agent/dist/core/agent-session.js (reload method, lines 1784-1801)"
+    - DE-093
 ---
 
 # pi session_shutdown fires before /reload resource re-read

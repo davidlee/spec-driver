@@ -1,10 +1,10 @@
 ---
 id: IP-021.PHASE-02
-slug: 021-kanban-card-support-phase-02
+slug: "021-kanban-card-support-phase-02"
 name: IP-021 Phase 02
-created: '2026-02-03'
-updated: '2026-02-03'
-completed: '2026-02-03'
+created: "2026-02-03"
+updated: "2026-02-03"
+completed: "2026-02-03"
 status: complete
 kind: phase
 ---

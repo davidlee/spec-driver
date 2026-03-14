@@ -1,8 +1,8 @@
 ---
 id: ISSUE-036
 name: Standardize show output selectors
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: resolved
 kind: issue
 ---

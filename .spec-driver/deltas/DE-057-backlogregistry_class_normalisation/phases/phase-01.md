@@ -1,9 +1,9 @@
 ---
 id: IP-057.PHASE-01
-slug: 057-backlogregistry_class_normalisation-phase-01
+slug: "057-backlogregistry_class_normalisation-phase-01"
 name: IP-057 Phase 01 - Core Modelling
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: draft
 kind: phase
 ---

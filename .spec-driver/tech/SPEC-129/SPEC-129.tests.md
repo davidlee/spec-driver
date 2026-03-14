@@ -2,8 +2,8 @@
 id: SPEC-129.TESTS
 slug: sync-installer-component-tests
 name: sync installer-component Testing Guide
-created: '2025-11-08'
-updated: '2025-11-08'
+created: "2025-11-08"
+updated: "2025-11-08"
 status: draft
 kind: guidance
 aliases: []

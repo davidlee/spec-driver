@@ -1,9 +1,9 @@
 ---
 id: IP-055.PHASE-12
-slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-12
+slug: "055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-12"
 name: IP-055 Phase 12
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: completed
 kind: phase
 ---

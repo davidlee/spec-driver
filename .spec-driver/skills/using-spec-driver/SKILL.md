@@ -1,7 +1,6 @@
 ---
 name: using-spec-driver
-description: Mandatory routing skill for ANY substantive work in a spec-driver project. Choose the governing skill before
-  acting, and do not start implementation until the required delta/design/plan/phase artefacts exist.
+description: "Mandatory routing skill for ANY substantive work in a spec-driver project. Choose the governing skill before acting, and do not start implementation until the required delta/design/plan/phase artefacts exist."
 ---
 
 You MUST choose the governing workflow skill before doing substantive work.

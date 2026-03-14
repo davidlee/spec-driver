@@ -1,9 +1,9 @@
 ---
 id: IP-071.PHASE-01
-slug: 071-cli-restructure
-name: 'P01: CLI restructure'
-created: '2026-03-09'
-updated: '2026-03-09'
+slug: "071-cli-restructure"
+name: "P01: CLI restructure"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---

@@ -1,8 +1,8 @@
 ---
 id: ISSUE-020
 name: Add git SHA tracking to artifact frontmatter
-created: '2025-11-08'
-updated: '2025-11-08'
+created: "2025-11-08"
+updated: "2025-11-08"
 status: open
 kind: issue
 categories: [metadata, traceability]

@@ -1,7 +1,6 @@
 ---
 name: execute-phase
-description: Mandatory execution skill for any delta/IP implementation phase. Use it before code changes, move the owning
-  delta to in-progress, keep notes current, reconcile structured execution docs, and surface blockers early.
+description: "Mandatory execution skill for any delta/IP implementation phase. Use it before code changes, move the owning delta to in-progress, keep notes current, reconcile structured execution docs, and surface blockers early."
 ---
 
 This skill is mandatory for implementation work under a delta or implementation

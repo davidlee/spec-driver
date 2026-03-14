@@ -1,8 +1,8 @@
 ---
 id: PROB-002
 name: Requirement lifecycle guidance drift
-created: '2026-03-05'
-updated: '2026-03-08'
+created: "2026-03-05"
+updated: "2026-03-08"
 status: resolved
 resolved_by: [DE-043, DE-047]
 kind: problem

@@ -2,31 +2,31 @@
 id: SPEC-116
 slug: frontmatter-metadata-registry
 name: supekku/scripts/lib/core/frontmatter_metadata Specification
-created: '2025-11-02'
-updated: '2025-11-03'
+created: "2025-11-02"
+updated: "2025-11-03"
 status: draft
 kind: spec
 category: unit
 c4_level: code
 responsibilities:
-- Provide metadata-driven frontmatter validation schema definitions for all artifact kinds
-- Define field schemas with types, patterns, enums, and validation rules using BlockMetadata
-- Maintain artifact-specific metadata extending base frontmatter schema
-- Enable JSON Schema generation from metadata for tooling and documentation
-- Support dual-validation compatibility between new metadata-driven and legacy validators
+  - Provide metadata-driven frontmatter validation schema definitions for all artifact kinds
+  - "Define field schemas with types, patterns, enums, and validation rules using BlockMetadata"
+  - Maintain artifact-specific metadata extending base frontmatter schema
+  - Enable JSON Schema generation from metadata for tooling and documentation
+  - Support dual-validation compatibility between new metadata-driven and legacy validators
 aliases: [frontmatter-metadata, frontmatter-registry]
 packages: [supekku/scripts/lib/core/frontmatter_metadata]
 sources:
-- language: python
-  identifier: supekku/scripts/lib/core/frontmatter_metadata
-  module: supekku.scripts.lib.core.frontmatter_metadata
-  variants:
-  - name: api
-    path: contracts/api.md
-  - name: implementation
-    path: contracts/implementation.md
-  - name: tests
-    path: contracts/tests.md
+  - language: python
+    identifier: supekku/scripts/lib/core/frontmatter_metadata
+    module: supekku.scripts.lib.core.frontmatter_metadata
+    variants:
+      - name: api
+        path: contracts/api.md
+      - name: implementation
+        path: contracts/implementation.md
+      - name: tests
+        path: contracts/tests.md
 owners: []
 auditers: []
 relations: []

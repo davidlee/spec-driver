@@ -1,11 +1,11 @@
 ---
 id: mem.fact.tui.widget-selection
-name: 'Widget selection: DataTable vs RichLog vs OptionList vs Tree'
+name: "Widget selection: DataTable vs RichLog vs OptionList vs Tree"
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 tags: [tui, textual, widgets]
 summary: When to use which Textual widget for list-like content in the TUI
 scope:

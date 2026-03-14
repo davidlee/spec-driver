@@ -115,6 +115,31 @@ class TestCompactDumper:
     out = dump_frontmatter_yaml({"created": "2025-01-15"})
     assert 'created: "2025-01-15"' in out
 
+  def test_ambiguous_strings_double_quoted(self) -> None:
+    """Strings that YAML would single-quote use double quotes (prettier compat)."""
+    out = dump_frontmatter_yaml({
+      "title": "STD-001: use typer",
+      "empty": "",
+      "bool_like": "true",
+      "null_like": "null",
+      "number_like": "123",
+    })
+    assert 'title: "STD-001: use typer"' in out
+    assert 'empty: ""' in out
+    assert 'bool_like: "true"' in out
+    assert 'null_like: "null"' in out
+    assert 'number_like: "123"' in out
+
+  def test_plain_strings_unquoted(self) -> None:
+    """Strings that don't need quoting remain plain."""
+    out = dump_frontmatter_yaml({"name": "hello world"})
+    assert "name: hello world" in out
+
+  def test_double_quote_containing_strings_use_single_quotes(self) -> None:
+    """Strings with embedded double-quotes use single quotes (prettier compat)."""
+    out = dump_frontmatter_yaml({"notes": 'value with "quotes" inside: x'})
+    assert "notes: 'value with \"quotes\" inside: x'" in out
+
   def test_key_order_preserved(self) -> None:
     data = {"z": 1, "a": 2, "m": 3}
     out = dump_frontmatter_yaml(data)

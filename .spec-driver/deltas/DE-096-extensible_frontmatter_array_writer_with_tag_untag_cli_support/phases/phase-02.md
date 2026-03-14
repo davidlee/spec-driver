@@ -5,8 +5,8 @@ kind: phase
 status: complete
 delta: DE-096
 plan: IP-096
-created: '2026-03-14'
-updated: '2026-03-14'
+created: "2026-03-14"
+updated: "2026-03-14"
 ---
 
 # Phase 2 – CLI Wiring

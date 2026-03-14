@@ -1,8 +1,8 @@
 ---
 id: IMPR-014
-name: 'Search overlay: show relation context for selected result'
-created: '2026-03-10'
-updated: '2026-03-10'
+name: "Search overlay: show relation context for selected result"
+created: "2026-03-10"
+updated: "2026-03-10"
 status: idea
 kind: improvement
 ---

@@ -1,9 +1,9 @@
 ---
 id: IP-055.PHASE-14
-slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-14
+slug: "055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-14"
 name: IP-055 Phase 14
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---

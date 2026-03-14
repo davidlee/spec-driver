@@ -1,9 +1,9 @@
 ---
 id: IP-055.PHASE-15
-slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-15
+slug: "055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-15"
 name: Require DR before IP handoff
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---

@@ -2,8 +2,8 @@
 id: SPEC-128.TESTS
 slug: no-repo-tests
 name: No Repo Testing Guide
-created: '2025-11-04'
-updated: '2025-11-04'
+created: "2025-11-04"
+updated: "2025-11-04"
 status: draft
 kind: guidance
 aliases: []

@@ -1,9 +1,9 @@
 ---
 id: IP-074.PHASE-01
-slug: 074-add_severity_filter_to_backlog_list_commands-phase-01
+slug: "074-add_severity_filter_to_backlog_list_commands-phase-01"
 name: IP-074 Phase 01
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---

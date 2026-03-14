@@ -2,8 +2,8 @@
 id: PROD-007
 slug: agent-tech-spec-backfill
 name: Agent tech spec backfill
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: draft
 kind: prod
 aliases: []

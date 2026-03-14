@@ -2,28 +2,28 @@
 id: PROD-002
 slug: delta-creation-workflow
 name: Delta Creation Workflow
-created: '2025-11-02'
-updated: '2026-03-06'
+created: "2025-11-02"
+updated: "2026-03-06"
 status: draft
 kind: prod
 aliases: []
 relations:
-- type: informs
-  target: ADR-002
-  nature: Follows proven workflow pattern from spec creation
+  - type: informs
+    target: ADR-002
+    nature: Follows proven workflow pattern from spec creation
 guiding_principles:
-- Mirror PROD-001 pattern for consistency
-- Automate scaffolding
-- Guide comprehensively via agent command
-- Validate early to catch errors
-- Hybrid discovery (user input + agent suggestions)
-- Plan by default, flag to skip
+  - Mirror PROD-001 pattern for consistency
+  - Automate scaffolding
+  - Guide comprehensively via agent command
+  - Validate early to catch errors
+  - Hybrid discovery (user input + agent suggestions)
+  - "Plan by default, flag to skip"
 assumptions:
-- Users have spec-driver installed
-- Agents can access registries for discovery
-- Projects have delta/plan/phase templates
-- Users understand delta/plan/phase artifact structure
-- Default workflow creates delta + DR + plan (phase sheets created just-in-time per ADR-004)
+  - Users have spec-driver installed
+  - Agents can access registries for discovery
+  - Projects have delta/plan/phase templates
+  - Users understand delta/plan/phase artifact structure
+  - Default workflow creates delta + DR + plan (phase sheets created just-in-time per ADR-004)
 ---
 
 # PROD-002 – Delta Creation Workflow

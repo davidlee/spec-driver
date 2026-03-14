@@ -1,9 +1,9 @@
 ---
 id: IP-061.PHASE-04
-slug: 061-tui_bundle_file_browser-phase-04
+slug: "061-tui_bundle_file_browser-phase-04"
 name: Track mode inline tree — BundleTree in TrackScreen on highlight
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: complete
 kind: phase
 ---

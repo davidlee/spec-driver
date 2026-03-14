@@ -2,8 +2,8 @@
 id: IP-005.PHASE-01
 slug: implement-spec-backfill-phase-01
 name: IP-005 Phase 01
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: complete
 kind: phase
 ---

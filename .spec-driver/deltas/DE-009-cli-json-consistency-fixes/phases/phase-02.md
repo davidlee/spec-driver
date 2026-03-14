@@ -2,8 +2,8 @@
 id: IP-009.PHASE-02
 slug: cli-json-consistency-fixes-phase-02
 name: IP-009 Phase 02
-created: '2025-01-04'
-updated: '2025-01-04'
+created: "2025-01-04"
+updated: "2025-01-04"
 status: completed
 kind: phase
 ---

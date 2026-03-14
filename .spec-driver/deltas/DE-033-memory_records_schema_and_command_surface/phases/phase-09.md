@@ -1,9 +1,9 @@
 ---
 id: IP-033.PHASE-09
-slug: 033-memory_records_schema_and_command_surface-phase-09
+slug: "033-memory_records_schema_and_command_surface-phase-09"
 name: IP-033 Phase 09 - Consolidate Artifact ID Patterns
-created: '2026-03-03'
-updated: '2026-03-03'
+created: "2026-03-03"
+updated: "2026-03-03"
 status: completed
 kind: phase
 ---

@@ -2,30 +2,30 @@
 id: PROD-004
 slug: frontmatter-metadata-validation
 name: Frontmatter Metadata Validation
-created: '2025-11-02'
-updated: '2026-03-03'
+created: "2025-11-02"
+updated: "2026-03-03"
 status: draft
 kind: prod
 aliases: []
 relations:
-- type: implements
-  target: SPEC-116
-  nature: Replaces imperative validation with metadata-driven validation in core/frontmatter_metadata package
-- type: enables
-  target: PROD-003
-  nature: Provides validation infrastructure for policy/standard frontmatter
+  - type: implements
+    target: SPEC-116
+    nature: Replaces imperative validation with metadata-driven validation in core/frontmatter_metadata package
+  - type: enables
+    target: PROD-003
+    nature: Provides validation infrastructure for policy/standard frontmatter
 guiding_principles:
-- Metadata as single source of truth for validation logic
-- Declarative schemas enable agent understanding via JSON Schema
-- Consistency across all artifact kinds (specs, deltas, policies, etc.)
-- Backward compatibility during migration to prevent breakage
+  - Metadata as single source of truth for validation logic
+  - Declarative schemas enable agent understanding via JSON Schema
+  - "Consistency across all artifact kinds (specs, deltas, policies, etc.)"
+  - Backward compatibility during migration to prevent breakage
 assumptions:
-- Phases 1-5 metadata migration patterns are proven and stable
-- All registered frontmatter kinds documented in supekku/about/frontmatter-schema.md
-- 15 unique metadata definitions across 17 registry entries (plan/phase/task share one schema)
-- Memory kind added via DE-033; included in registry and schema coverage
-- Existing code uses FrontmatterValidationResult and can be gradually migrated
-- JSON Schema output will benefit agents and future external tooling
+  - Phases 1-5 metadata migration patterns are proven and stable
+  - All registered frontmatter kinds documented in supekku/about/frontmatter-schema.md
+  - "15 unique metadata definitions across 17 registry entries (plan/phase/task share one schema)"
+  - Memory kind added via DE-033; included in registry and schema coverage
+  - Existing code uses FrontmatterValidationResult and can be gradually migrated
+  - JSON Schema output will benefit agents and future external tooling
 ---
 
 # PROD-004 – Frontmatter Metadata Validation

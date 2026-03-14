@@ -1,8 +1,8 @@
 ---
 id: IMPR-015
-name: 'Browser: All-types view in primary navigation'
-created: '2026-03-10'
-updated: '2026-03-10'
+name: "Browser: All-types view in primary navigation"
+created: "2026-03-10"
+updated: "2026-03-10"
 status: idea
 kind: improvement
 ---

@@ -1,9 +1,9 @@
 ---
 id: IP-027.PHASE-02
-slug: 027-contract_mirror_tree_index-phase-02
+slug: "027-contract_mirror_tree_index-phase-02"
 name: IP-027 Phase 02 - Sync integration and polish
-created: '2026-02-20'
-updated: '2026-02-20'
+created: "2026-02-20"
+updated: "2026-02-20"
 status: complete
 kind: phase
 ---

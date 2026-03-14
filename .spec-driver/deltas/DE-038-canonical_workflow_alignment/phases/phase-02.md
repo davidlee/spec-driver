@@ -1,9 +1,9 @@
 ---
 id: IP-038.PHASE-02
-slug: 038-canonical_workflow_alignment-phase-02
+slug: "038-canonical_workflow_alignment-phase-02"
 name: IP-038 Phase 02
-created: '2026-03-03'
-updated: '2026-03-03'
+created: "2026-03-03"
+updated: "2026-03-03"
 status: completed
 kind: phase
 ---

@@ -2,20 +2,20 @@
 id: PROD-009
 slug: requirement-lifecycle-semantics
 name: Requirement Lifecycle Semantics
-created: '2025-11-03'
-updated: '2026-03-06'
+created: "2025-11-03"
+updated: "2026-03-06"
 status: draft
 kind: prod
 aliases: []
 relations: []
 guiding_principles:
-- Requirements always carry an explicit lifecycle status even before evidence exists.
-- Evidence overlays surface drift for explicit reconciliation; they never silently override spec truth (ADR-008).
-- Validation should guide teams back to coherence with warnings before blocking work.
+  - Requirements always carry an explicit lifecycle status even before evidence exists.
+  - Evidence overlays surface drift for explicit reconciliation; they never silently override spec truth (ADR-008).
+  - Validation should guide teams back to coherence with warnings before blocking work.
 assumptions:
-- Some legacy requirements will be asserted without receipts.
-- Delta and audit metadata include timestamps we can compare reliably.
-- Teams will capture priority/category metadata to drive backlogs.
+  - Some legacy requirements will be asserted without receipts.
+  - Delta and audit metadata include timestamps we can compare reliably.
+  - Teams will capture priority/category metadata to drive backlogs.
 ---
 
 # PROD-009 – Requirement Lifecycle Semantics

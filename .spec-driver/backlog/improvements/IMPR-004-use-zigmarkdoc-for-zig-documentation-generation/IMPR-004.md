@@ -1,8 +1,8 @@
 ---
 id: IMPR-004
 name: Use zigmarkdoc for Zig documentation generation
-created: '2026-02-06'
-updated: '2026-02-06'
+created: "2026-02-06"
+updated: "2026-02-06"
 status: resolved
 kind: improvement
 ---

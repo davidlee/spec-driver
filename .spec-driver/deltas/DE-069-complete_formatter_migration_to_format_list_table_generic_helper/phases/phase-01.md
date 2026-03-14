@@ -1,9 +1,9 @@
 ---
 id: IP-069.PHASE-01
-slug: 069-complete_formatter_migration_to_format_list_table_generic_helper-phase-01
-name: 'IP-069 Phase 01: Foundation'
-created: '2026-03-08'
-updated: '2026-03-08'
+slug: "069-complete_formatter_migration_to_format_list_table_generic_helper-phase-01"
+name: "IP-069 Phase 01: Foundation"
+created: "2026-03-08"
+updated: "2026-03-08"
 status: completed
 kind: phase
 ---

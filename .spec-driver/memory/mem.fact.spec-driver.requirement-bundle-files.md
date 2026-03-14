@@ -4,20 +4,21 @@ name: Requirement Bundle Files Are Supplemental
 kind: memory
 status: active
 memory_type: fact
-updated: '2026-03-05'
-verified: '2026-03-05'
+updated: "2026-03-05"
+verified: "2026-03-05"
 tags: [spec-driver, requirements, sharp-edge]
-summary: Requirement detail files under requirements/ are not consumed by sync; canonical identity and lifecycle remain in
-  spec markdown.
+summary: Requirement detail files under requirements/ are not consumed by sync; canonical identity and lifecycle remain in spec markdown.
 scope:
-  paths: [supekku/scripts/lib/requirements/registry.py, supekku/about/lifecycle.md]
+  paths:
+    - supekku/scripts/lib/requirements/registry.py
+    - supekku/about/lifecycle.md
 provenance:
   sources:
-  - kind: code
-    note: Requirements are extracted only from SPEC-/PROD- markdown files
-    ref: supekku/scripts/lib/requirements/registry.py
-  - kind: doc
-    ref: supekku/about/lifecycle.md
+    - kind: code
+      note: Requirements are extracted only from SPEC-/PROD- markdown files
+      ref: supekku/scripts/lib/requirements/registry.py
+    - kind: doc
+      ref: supekku/about/lifecycle.md
 ---
 
 # Requirement Bundle Files Are Supplemental

@@ -4,24 +4,23 @@ name: Truth Model
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-06'
-verified: '2026-03-06'
+updated: "2026-03-06"
+verified: "2026-03-06"
 confidence: high
 tags: [spec-driver, truth-model, contracts, specs]
-summary: Contracts record observed truth (what code exposes). Specs express intent and constraints. Never let them become
-  competing sources of truth.
+summary: Contracts record observed truth (what code exposes). Specs express intent and constraints. Never let them become competing sources of truth.
 priority:
   severity: high
   weight: 9
 provenance:
   sources:
-  - kind: adr
-    ref: ADR-004
-  - kind: adr
-    ref: ADR-003
-  - kind: doc
-    note: Contracts, Sync, and Truth section
-    ref: CLAUDE.md
+    - kind: adr
+      ref: ADR-004
+    - kind: adr
+      ref: ADR-003
+    - kind: doc
+      note: "Contracts, Sync, and Truth section"
+      ref: CLAUDE.md
 ---
 
 # Truth Model

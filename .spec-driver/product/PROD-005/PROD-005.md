@@ -2,25 +2,25 @@
 id: PROD-005
 slug: python-package-level-specs
 name: Python Package-Level Specs
-created: '2025-11-02'
-updated: '2026-03-06'
+created: "2025-11-02"
+updated: "2026-03-06"
 status: active
 kind: prod
 aliases: []
 relations:
-- type: extends
-  target: PROD-001
-  nature: Applies spec creation workflow pattern to Python package-level granularity
+  - type: extends
+    target: PROD-001
+    nature: Applies spec creation workflow pattern to Python package-level granularity
 guiding_principles:
-- Follow proven Go package-level pattern from vice
-- Deterministic ordering for stable git diffs
-- Zero maintenance burden for auto-generated contracts
-- Leaf-package default with future opt-in rollup
+  - Follow proven Go package-level pattern from vice
+  - Deterministic ordering for stable git diffs
+  - Zero maintenance burden for auto-generated contracts
+  - Leaf-package default with future opt-in rollup
 assumptions:
-- Python packages use __init__.py to define package boundaries
-- Users prefer predictable automation over subjective cohesion decisions
-- Contract generation already handles deterministic file ordering (sorted())
-- Migration is one-time manual cleanup (no tooling needed)
+  - Python packages use __init__.py to define package boundaries
+  - Users prefer predictable automation over subjective cohesion decisions
+  - Contract generation already handles deterministic file ordering (sorted())
+  - Migration is one-time manual cleanup (no tooling needed)
 ---
 
 # PROD-005 – Python Package-Level Specs

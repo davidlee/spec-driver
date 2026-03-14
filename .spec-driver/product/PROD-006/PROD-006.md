@@ -2,21 +2,21 @@
 id: PROD-006
 slug: phase-management
 name: Phase Management
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: draft
 kind: prod
 aliases: []
 relations: []
 guiding_principles:
-- Phases organize implementation work into manageable, verifiable chunks
-- Sequential execution with clear gates reduces risk and enables progress tracking
-- Automation should reduce toil while preserving human oversight of critical transitions
+  - "Phases organize implementation work into manageable, verifiable chunks"
+  - Sequential execution with clear gates reduces risk and enables progress tracking
+  - Automation should reduce toil while preserving human oversight of critical transitions
 assumptions:
-- Implementation plans are created before phases
-- Phases are primarily created sequentially as work progresses
-- Phase templates provide consistent structure across different delta types
-- Developers work on one phase at a time per implementation plan
+  - Implementation plans are created before phases
+  - Phases are primarily created sequentially as work progresses
+  - Phase templates provide consistent structure across different delta types
+  - Developers work on one phase at a time per implementation plan
 ---
 
 # PROD-006 – Phase Management

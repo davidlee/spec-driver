@@ -1,7 +1,6 @@
 ---
 name: shape-revision
-description: Shape a spec revision when requirements/responsibilities move. Use this before delta scoping when policy/doctrine
-  requires revision-first flow, or when audit reconciliation shows authority must move.
+description: "Shape a spec revision when requirements/responsibilities move. Use this before delta scoping when policy/doctrine requires revision-first flow, or when audit reconciliation shows authority must move."
 ---
 
 You are establishing the spec-change intent before implementation work.

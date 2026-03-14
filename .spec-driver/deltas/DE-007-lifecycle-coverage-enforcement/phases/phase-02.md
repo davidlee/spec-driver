@@ -1,9 +1,9 @@
 ---
 id: IP-007.PHASE-02
-slug: 007-lifecycle-coverage-enforcement-phase-02
+slug: "007-lifecycle-coverage-enforcement-phase-02"
 name: IP-007 Phase 02
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: completed
 kind: phase
 ---

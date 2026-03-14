@@ -4,29 +4,30 @@ name: Ceremony Mode Selection
 kind: memory
 status: active
 memory_type: signpost
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: "2026-03-03"
+verified: "2026-03-03"
 confidence: high
 tags: [spec-driver, ceremony]
-summary: Check workflow.toml for the active ceremony mode, then read the corresponding mode memory for operational guidance.
-  Ceremony is advisory; enforcement comes from explicit command gates.
+summary: "Check workflow.toml for the active ceremony mode, then read the corresponding mode memory for operational guidance. Ceremony is advisory; enforcement comes from explicit command gates."
 priority:
   severity: high
   weight: 9
 scope:
   commands: [uv run spec-driver validate]
-  paths: [.spec-driver/workflow.toml, supekku/scripts/lib/core/config.py]
+  paths:
+    - .spec-driver/workflow.toml
+    - supekku/scripts/lib/core/config.py
 provenance:
   sources:
-  - kind: code
-    note: Workflow config loading (advisory posture selection)
-    ref: supekku/scripts/lib/core/config.py
-  - kind: code
-    note: Completion gate path that enforces coverage independently of ceremony
-    ref: supekku/scripts/complete_delta.py
-  - kind: doc
-    note: Ceremony and strict-mode framing
-    ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
+    - kind: code
+      note: Workflow config loading (advisory posture selection)
+      ref: supekku/scripts/lib/core/config.py
+    - kind: code
+      note: Completion gate path that enforces coverage independently of ceremony
+      ref: supekku/scripts/complete_delta.py
+    - kind: doc
+      note: Ceremony and strict-mode framing
+      ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
 ---
 
 # Ceremony Mode Selection

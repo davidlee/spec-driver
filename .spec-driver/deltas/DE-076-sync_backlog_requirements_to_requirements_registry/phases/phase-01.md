@@ -1,9 +1,9 @@
 ---
 id: IP-076.PHASE-01
-slug: 076-sync_backlog_requirements_to_requirements_registry-phase-01
+slug: "076-sync_backlog_requirements_to_requirements_registry-phase-01"
 name: IP-076 Phase 01 — Cleanup and refactor sync pipeline
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---

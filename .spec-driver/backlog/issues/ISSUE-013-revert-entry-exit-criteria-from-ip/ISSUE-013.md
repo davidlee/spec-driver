@@ -1,8 +1,8 @@
 ---
 id: ISSUE-013
 name: Restore entry/exit criteria to IP and phase.overview schemas
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: resolved
 kind: issue
 categories: [process_gap, schema_design]

@@ -1,17 +1,17 @@
 ---
 id: IMPR-008
 name: Configurable workspace directory layout with migration support
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: resolved
 kind: improvement
 resolved_by: DE-049
 tags: [architecture, install, usability]
 relations:
-- type: follows-from
-  target: DE-044
-- type: addresses
-  target: PROB-003
+  - type: follows-from
+    target: DE-044
+  - type: addresses
+    target: PROB-003
 ---
 
 # Configurable workspace directory layout with migration support

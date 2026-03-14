@@ -1,9 +1,9 @@
 ---
 id: IP-077.PHASE-01
-slug: 077-cli_ux_schema_discoverability_and_flag_parsing-phase-01
-name: 'IP-077 Phase 01: Implementation'
-created: '2026-03-09'
-updated: '2026-03-09'
+slug: "077-cli_ux_schema_discoverability_and_flag_parsing-phase-01"
+name: "IP-077 Phase 01: Implementation"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---

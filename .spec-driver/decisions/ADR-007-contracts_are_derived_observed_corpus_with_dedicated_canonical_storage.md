@@ -1,10 +1,10 @@
 ---
 id: ADR-007
-title: 'ADR-007: contracts are derived observed corpus with dedicated canonical storage'
+title: "ADR-007: contracts are derived observed corpus with dedicated canonical storage"
 status: accepted
-created: '2026-03-06'
-updated: '2026-03-06'
-reviewed: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
+reviewed: "2026-03-06"
 owners: []
 supersedes: []
 superseded_by: []
@@ -17,8 +17,7 @@ audits: []
 related_decisions: [ADR-003, ADR-004, ADR-006]
 related_policies: []
 tags: [contracts, architecture, sync]
-summary: Contracts are derived observation artefacts, not competing intent; they belong in a dedicated canonical contracts
-  corpus, while spec-bundle and index paths remain derived compatibility or navigation views.
+summary: "Contracts are derived observation artefacts, not competing intent; they belong in a dedicated canonical contracts corpus, while spec-bundle and index paths remain derived compatibility or navigation views."
 ---
 
 # ADR-007: contracts are derived observed corpus with dedicated canonical storage

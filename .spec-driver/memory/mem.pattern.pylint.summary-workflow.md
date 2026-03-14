@@ -4,27 +4,26 @@ name: Pylint Summary Workflow
 kind: memory
 status: active
 memory_type: pattern
-updated: '2026-03-07'
-verified: '2026-03-07'
+updated: "2026-03-07"
+verified: "2026-03-07"
 tags: [pylint, lint, workflow]
-summary: Use just pylint-files during implementation and just pylint-report before final full-repo verification; both persist
-  full json and print compact summaries.
+summary: Use just pylint-files during implementation and just pylint-report before final full-repo verification; both persist full json and print compact summaries.
 scope:
   paths:
-  - Justfile
-  - supekku/scripts/pylint_report.py
-  - supekku/scripts/lib/core/pylint_report.py
+    - Justfile
+    - supekku/scripts/pylint_report.py
+    - supekku/scripts/lib/core/pylint_report.py
   commands: [just pylint-files, just pylint-report, just pylint]
 provenance:
   sources:
-  - kind: code
-    ref: Justfile
-  - kind: code
-    ref: supekku/scripts/pylint_report.py
-  - kind: code
-    ref: supekku/scripts/lib/core/pylint_report.py
-  - kind: delta
-    ref: DE-058
+    - kind: code
+      ref: Justfile
+    - kind: code
+      ref: supekku/scripts/pylint_report.py
+    - kind: code
+      ref: supekku/scripts/lib/core/pylint_report.py
+    - kind: delta
+      ref: DE-058
 ---
 
 # Pylint Summary Workflow

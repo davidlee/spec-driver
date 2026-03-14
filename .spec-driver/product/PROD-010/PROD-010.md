@@ -2,28 +2,28 @@
 id: PROD-010
 slug: cli-ux
 name: CLI UX
-created: '2025-11-03'
-updated: '2025-11-08'
+created: "2025-11-03"
+updated: "2025-11-08"
 status: draft
 kind: prod
 aliases: []
 relations:
-- type: informs
-  target: SPEC-110
-  description: Drives CLI implementation requirements for both human and agent workflows
+  - type: informs
+    target: SPEC-110
+    description: Drives CLI implementation requirements for both human and agent workflows
 guiding_principles:
-- Consistency enables automation - agents learn patterns once, apply everywhere
-- Predictability over features - stable contracts more valuable than rich options
-- Machine-readable first - JSON output and schemas enable agent autonomy
-- Progressive disclosure - simple defaults, opt-in detail flags for token efficiency
-- Ergonomic for humans, optimized for agents - intelligent input handling reduces friction
-- Forgiving input parsing - accept natural variations (plural/singular, abbreviated IDs)
+  - "Consistency enables automation - agents learn patterns once, apply everywhere"
+  - Predictability over features - stable contracts more valuable than rich options
+  - Machine-readable first - JSON output and schemas enable agent autonomy
+  - "Progressive disclosure - simple defaults, opt-in detail flags for token efficiency"
+  - "Ergonomic for humans, optimized for agents - intelligent input handling reduces friction"
+  - "Forgiving input parsing - accept natural variations (plural/singular, abbreviated IDs)"
 assumptions:
-- Agents primarily consume JSON output for parsing and decision-making
-- CLI is the primary interface for both human and agent workflows
-- Agent workflows prioritize token efficiency and predictable structure
-- Human workflows prioritize ergonomics and discoverability
-- Existing CLI architecture (SPEC-110) supports these enhancements
+  - Agents primarily consume JSON output for parsing and decision-making
+  - CLI is the primary interface for both human and agent workflows
+  - Agent workflows prioritize token efficiency and predictable structure
+  - Human workflows prioritize ergonomics and discoverability
+  - Existing CLI architecture (SPEC-110) supports these enhancements
 ---
 
 # PROD-010 – CLI UX

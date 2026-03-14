@@ -1,9 +1,9 @@
 ---
 id: IP-033.PHASE-08
-slug: 033-memory_records_schema_and_command_surface-phase-08
+slug: "033-memory_records_schema_and_command_surface-phase-08"
 name: IP-033 Phase 08 - Inline Link Parsing & Resolution
-created: '2026-03-03'
-updated: '2026-03-03'
+created: "2026-03-03"
+updated: "2026-03-03"
 status: completed
 kind: phase
 ---

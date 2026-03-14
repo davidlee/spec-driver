@@ -4,20 +4,19 @@ name: Project Development Workflow
 kind: memory
 status: active
 memory_type: pattern
-updated: '2026-03-04'
-verified: '2026-03-04'
+updated: "2026-03-04"
+verified: "2026-03-04"
 confidence: high
 tags: [project, workflow]
-summary: Project-owned development workflow stub. Defaults to the spec-driver core loop; edit to add local shortcuts, required
-  steps, or ceremony overrides.
+summary: "Project-owned development workflow stub. Defaults to the spec-driver core loop; edit to add local shortcuts, required steps, or ceremony overrides."
 priority:
   severity: high
   weight: 10
 provenance:
   sources:
-  - kind: memory
-    note: Default development loop (platform reference)
-    ref: mem.pattern.spec-driver.core-loop
+    - kind: memory
+      note: Default development loop (platform reference)
+      ref: mem.pattern.spec-driver.core-loop
 ---
 
 # Project Development Workflow

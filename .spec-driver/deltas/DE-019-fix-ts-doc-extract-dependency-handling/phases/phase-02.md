@@ -1,9 +1,9 @@
 ---
 id: IP-019.PHASE-02
-slug: 019-fix-ts-doc-extract-dependency-handling-phase-02
+slug: "019-fix-ts-doc-extract-dependency-handling-phase-02"
 name: IP-019 Phase 02 - TypeScriptAdapter refactor
-created: '2025-11-08'
-updated: '2025-11-08'
+created: "2025-11-08"
+updated: "2025-11-08"
 status: draft
 kind: phase
 ---

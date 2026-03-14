@@ -4,22 +4,22 @@ name: Lifecycle Guidance Start Here
 kind: memory
 status: active
 memory_type: signpost
-updated: '2026-03-05'
-verified: '2026-03-05'
+updated: "2026-03-05"
+verified: "2026-03-05"
 tags: [spec-driver, lifecycle, guidance]
 summary: Entry point for requirement lifecycle guidance and code-truth references.
 scope:
   paths:
-  - supekku/about/lifecycle.md
-  - supekku/scripts/lib/requirements/registry.py
-  - supekku/scripts/lib/requirements/lifecycle.py
+    - supekku/about/lifecycle.md
+    - supekku/scripts/lib/requirements/registry.py
+    - supekku/scripts/lib/requirements/lifecycle.py
   commands: [uv run spec-driver sync, uv run spec-driver validate]
 provenance:
   sources:
-  - kind: doc
-    ref: supekku/about/lifecycle.md
-  - kind: memory
-    ref: mem.concept.spec-driver.requirement-lifecycle
+    - kind: doc
+      ref: supekku/about/lifecycle.md
+    - kind: memory
+      ref: mem.concept.spec-driver.requirement-lifecycle
 ---
 
 # Lifecycle Guidance Start Here

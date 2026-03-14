@@ -1,9 +1,9 @@
 ---
 id: IP-045.PHASE-02
-slug: 045-memory_graph_navigation_for_agent_discoverability-phase-02
+slug: "045-memory_graph_navigation_for_agent_discoverability-phase-02"
 name: CLI wiring + integration tests
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: complete
 kind: phase
 ---

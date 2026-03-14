@@ -1,9 +1,9 @@
 ---
 id: IP-071.PHASE-02
-slug: 071-install-feedback
-name: 'P02: Install skill-change feedback'
-created: '2026-03-09'
-updated: '2026-03-09'
+slug: "071-install-feedback"
+name: "P02: Install skill-change feedback"
+created: "2026-03-09"
+updated: "2026-03-09"
 status: draft
 kind: phase
 ---

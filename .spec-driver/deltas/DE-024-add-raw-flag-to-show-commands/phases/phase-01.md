@@ -1,9 +1,9 @@
 ---
 id: IP-024.PHASE-01
-slug: 024-add-raw-flag-to-show-commands-phase-01
+slug: "024-add-raw-flag-to-show-commands-phase-01"
 name: IP-024 Phase 01 - Implement --raw flag
-created: '2026-02-05'
-updated: '2026-02-05'
+created: "2026-02-05"
+updated: "2026-02-05"
 status: complete
 kind: phase
 ---

@@ -1,8 +1,8 @@
 ---
 id: ISSUE-051
 name: sync does not prune stale requirements from registry
-created: '2026-03-10'
-updated: '2026-03-10'
+created: "2026-03-10"
+updated: "2026-03-10"
 status: open
 kind: issue
 categories: []

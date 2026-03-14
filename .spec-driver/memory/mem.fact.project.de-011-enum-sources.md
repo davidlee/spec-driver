@@ -4,21 +4,21 @@ name: DE-011 enum sources hardcoded
 kind: memory
 status: active
 memory_type: fact
-updated: '2026-03-05'
-verified: '2026-03-05'
+updated: "2026-03-05"
+verified: "2026-03-05"
 tags: [internal, de-011, enums, cli]
 summary: DE-011 will hardcode enum sources for spec.kind and requirement.kind (no lifecycle constants available).
 scope:
   paths:
-  - change/deltas/DE-011-cli-enhanced-filtering-and-self-documentation/phases/phase-02.md
+    - change/deltas/DE-011-cli-enhanced-filtering-and-self-documentation/phases/phase-02.md
 provenance:
   sources:
-  - kind: doc
-    note: Phase 2 sheet open question + enum list
-    ref: change/deltas/DE-011-cli-enhanced-filtering-and-self-documentation/phases/phase-02.md
-  - kind: conversation
-    note: User decision on 2026-03-05
-    ref: session
+    - kind: doc
+      note: Phase 2 sheet open question + enum list
+      ref: change/deltas/DE-011-cli-enhanced-filtering-and-self-documentation/phases/phase-02.md
+    - kind: conversation
+      note: User decision on 2026-03-05
+      ref: session
 ---
 
 # DE-011 enum sources hardcoded

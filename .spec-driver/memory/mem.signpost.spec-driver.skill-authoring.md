@@ -4,30 +4,31 @@ name: Skill authoring in spec-driver
 kind: memory
 status: active
 memory_type: signpost
-updated: '2026-03-07'
-verified: '2026-03-07'
+updated: "2026-03-07"
+verified: "2026-03-07"
 tags: [spec-driver, skills, workflow]
-summary: 'Start here before creating or refining spec-driver skills: boot, route early, keep packaged skills uniform, and
-  use DE-055 as the current synthesis.'
+summary: "Start here before creating or refining spec-driver skills: boot, route early, keep packaged skills uniform, and use DE-055 as the current synthesis."
 scope:
-  commands: [uv run spec-driver install, uv run spec-driver create memory]
+  commands:
+    - uv run spec-driver install
+    - uv run spec-driver create memory
   paths:
-  - supekku/skills
-  - .spec-driver/agents
-  - .spec-driver/hooks
-  - .spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance
+    - supekku/skills
+    - .spec-driver/agents
+    - .spec-driver/hooks
+    - .spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance
 provenance:
   sources:
-  - kind: adr
-    ref: ADR-004
-  - kind: adr
-    ref: ADR-005
-  - kind: spec
-    ref: PROD-016
-  - kind: memory
-    ref: mem.pattern.installer.boot-architecture
-  - kind: delta
-    ref: DE-055
+    - kind: adr
+      ref: ADR-004
+    - kind: adr
+      ref: ADR-005
+    - kind: spec
+      ref: PROD-016
+    - kind: memory
+      ref: mem.pattern.installer.boot-architecture
+    - kind: delta
+      ref: DE-055
 ---
 
 # Skill authoring in spec-driver

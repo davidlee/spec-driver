@@ -1,9 +1,9 @@
 ---
 id: IP-023.PHASE-01
-slug: 023-add-view-and-edit-commands-phase-01
+slug: "023-add-view-and-edit-commands-phase-01"
 name: IP-023 Phase 01 - Implement view and edit commands
-created: '2026-02-05'
-updated: '2026-02-05'
+created: "2026-02-05"
+updated: "2026-02-05"
 status: complete
 kind: phase
 ---

@@ -1,9 +1,9 @@
 ---
 id: IP-053.PHASE-01
-slug: 053-tui_artifact_browser_mvp_with_textual-phase-01
+slug: "053-tui_artifact_browser_mvp_with_textual-phase-01"
 name: IP-053 Phase 01
-created: '2026-03-07'
-updated: '2026-03-07'
+created: "2026-03-07"
+updated: "2026-03-07"
 status: draft
 kind: phase
 ---

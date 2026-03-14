@@ -1,9 +1,9 @@
 ---
 id: IP-026.PHASE-01
-slug: 026-use_zigmarkdoc_for_zig_documentation_generation-phase-01
+slug: "026-use_zigmarkdoc_for_zig_documentation_generation-phase-01"
 name: IP-026 Phase 01
-created: '2026-02-16'
-updated: '2026-02-16'
+created: "2026-02-16"
+updated: "2026-02-16"
 status: draft
 kind: phase
 ---

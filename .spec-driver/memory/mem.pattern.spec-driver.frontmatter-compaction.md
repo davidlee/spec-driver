@@ -4,39 +4,40 @@ name: Frontmatter compaction via FieldMetadata persistence annotations
 kind: memory
 status: active
 memory_type: pattern
-created: '2026-03-03'
-updated: '2026-03-03'
-verified: '2026-03-03'
+created: "2026-03-03"
+updated: "2026-03-03"
+verified: "2026-03-03"
 confidence: high
 tags: [spec-driver, frontmatter, compaction, metadata]
-summary: Compact frontmatter serialization is driven by FieldMetadata persistence/default annotations with write-side-only
-  semantics and read-side tolerance.
+summary: Compact frontmatter serialization is driven by FieldMetadata persistence/default annotations with write-side-only semantics and read-side tolerance.
 priority:
   severity: high
   weight: 8
 scope:
-  commands: [uv run spec-driver compact delta, uv run spec-driver compact delta --dry-run]
+  commands:
+    - uv run spec-driver compact delta
+    - uv run spec-driver compact delta --dry-run
   globs:
-  - supekku/scripts/lib/core/frontmatter_metadata/**
-  - supekku/cli/compact*
-  - supekku/scripts/lib/blocks/metadata/schema.py
+    - supekku/scripts/lib/core/frontmatter_metadata/**
+    - supekku/cli/compact*
+    - supekku/scripts/lib/blocks/metadata/schema.py
 provenance:
   sources:
-  - kind: doc
-    note: DE-036 design decisions and contract
-    ref: change/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/DR-036.md
-  - kind: doc
-    note: Compaction semantics matrix (§10.5)
-    ref: change/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/phases/phase-01.md
-  - kind: code
-    note: Compaction pure function entry point
-    ref: supekku/scripts/lib/core/frontmatter_metadata/compaction.py
-  - kind: code
-    note: FieldMetadata persistence/default annotations
-    ref: supekku/scripts/lib/blocks/metadata/schema.py
-  - kind: code
-    note: Compact CLI command surface
-    ref: supekku/cli/compact.py
+    - kind: doc
+      note: DE-036 design decisions and contract
+      ref: change/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/DR-036.md
+    - kind: doc
+      note: Compaction semantics matrix (§10.5)
+      ref: change/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/phases/phase-01.md
+    - kind: code
+      note: Compaction pure function entry point
+      ref: supekku/scripts/lib/core/frontmatter_metadata/compaction.py
+    - kind: code
+      note: FieldMetadata persistence/default annotations
+      ref: supekku/scripts/lib/blocks/metadata/schema.py
+    - kind: code
+      note: Compact CLI command surface
+      ref: supekku/cli/compact.py
 ---
 
 # Frontmatter compaction via FieldMetadata persistence annotations

@@ -1,9 +1,9 @@
 ---
 id: IP-027.PHASE-01
-slug: 027-contract_mirror_tree_index-phase-01
+slug: "027-contract_mirror_tree_index-phase-01"
 name: IP-027 Phase 01 - Core builder and path mapping
-created: '2026-02-20'
-updated: '2026-02-20'
+created: "2026-02-20"
+updated: "2026-02-20"
 status: complete
 kind: phase
 ---

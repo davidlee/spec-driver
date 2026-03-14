@@ -2,8 +2,8 @@
 id: IP-008.PHASE-01
 slug: add-coverage-evidence-phase-01
 name: IP-008 Phase 01 - Schema & sync foundation
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: completed
 kind: phase
 ---

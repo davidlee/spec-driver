@@ -1,9 +1,9 @@
 ---
 id: IP-069.PHASE-02
-slug: 069-complete_formatter_migration_to_format_list_table_generic_helper-phase-02
+slug: "069-complete_formatter_migration_to_format_list_table_generic_helper-phase-02"
 name: IP-069 Phase 02
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---

@@ -1,10 +1,10 @@
 ---
 id: ADR-004
-title: 'ADR-004: canonical core workflow loop'
+title: "ADR-004: canonical core workflow loop"
 status: accepted
-created: '2026-03-06'
-updated: '2026-03-06'
-reviewed: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
+reviewed: "2026-03-06"
 owners: [david]
 supersedes: []
 superseded_by: []
@@ -17,8 +17,7 @@ audits: []
 related_decisions: [ADR-001, ADR-003]
 related_policies: []
 tags: [workflow, doctrine, lifecycle]
-summary: Define the single canonical spec-driver workflow loop, distinguish supported variants from canon, and reject spec-first
-  aspirational doctrine as the default for code-changing work.
+summary: "Define the single canonical spec-driver workflow loop, distinguish supported variants from canon, and reject spec-first aspirational doctrine as the default for code-changing work."
 ---
 
 # ADR-004: canonical core workflow loop

@@ -1,8 +1,8 @@
 ---
 id: ISSUE-034
 name: Resolve links does not support backlog items
-created: '2026-03-05'
-updated: '2026-03-07'
+created: "2026-03-05"
+updated: "2026-03-07"
 status: resolved
 kind: issue
 ---

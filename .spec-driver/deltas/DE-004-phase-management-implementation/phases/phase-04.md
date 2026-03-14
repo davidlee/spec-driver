@@ -1,9 +1,9 @@
 ---
 id: IP-004.PHASE-04
-slug: 004-phase-management-implementation-phase-04
+slug: "004-phase-management-implementation-phase-04"
 name: IP-004 Phase 04
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: completed
 kind: phase
 ---

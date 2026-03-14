@@ -1,9 +1,9 @@
 ---
 id: IP-061.PHASE-03
-slug: 061-tui_bundle_file_browser-phase-03
-name: Track integration — per-row file paths, preview, navigation, hook fix
-created: '2026-03-08'
-updated: '2026-03-08'
+slug: "061-tui_bundle_file_browser-phase-03"
+name: "Track integration — per-row file paths, preview, navigation, hook fix"
+created: "2026-03-08"
+updated: "2026-03-08"
 status: complete
 kind: phase
 ---

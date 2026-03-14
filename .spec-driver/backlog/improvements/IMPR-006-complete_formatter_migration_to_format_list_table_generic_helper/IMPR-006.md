@@ -1,8 +1,8 @@
 ---
 id: IMPR-006
 name: Complete formatter migration to format_list_table generic helper
-created: '2026-03-05'
-updated: '2026-03-09'
+created: "2026-03-05"
+updated: "2026-03-09"
 status: resolved
 kind: improvement
 ---

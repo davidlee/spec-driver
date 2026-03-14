@@ -1,9 +1,9 @@
 ---
 id: IP-037.PHASE-02
-slug: 037-install_and_refresh_seed_memories_during_workspace_install-phase-02
+slug: "037-install_and_refresh_seed_memories_during_workspace_install-phase-02"
 name: IP-037 Phase 02
-created: '2026-03-04'
-updated: '2026-03-04'
+created: "2026-03-04"
+updated: "2026-03-04"
 status: draft
 kind: phase
 ---

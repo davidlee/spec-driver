@@ -1,9 +1,9 @@
 ---
 id: IP-063.PHASE-01
-slug: 063-truncation-fix
-name: 'P01: Truncation fix'
-created: '2026-03-08'
-updated: '2026-03-08'
+slug: "063-truncation-fix"
+name: "P01: Truncation fix"
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---

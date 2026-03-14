@@ -1,14 +1,13 @@
 ---
 id: mem.gotcha.textual.tab-key-handling
-name: 'Textual Tab key: use Binding, not key_tab'
+name: "Textual Tab key: use Binding, not key_tab"
 kind: memory
 status: active
 memory_type: gotcha
-created: '2026-03-08'
-updated: '2026-03-08'
+created: "2026-03-08"
+updated: "2026-03-08"
 tags: [textual, tui, keybindings, focus]
-summary: Textual app-level focus chain consumes Tab before widget key_tab handlers fire. Use Binding('tab', 'action_name')
-  on the widget instead.
+summary: "Textual app-level focus chain consumes Tab before widget key_tab handlers fire. Use Binding('tab', 'action_name') on the widget instead."
 ---
 
 # Textual Tab key: use Binding, not key_tab

@@ -1,9 +1,9 @@
 ---
 id: IP-076.PHASE-02
-slug: 076-sync_backlog_requirements_to_requirements_registry-phase-02
+slug: "076-sync_backlog_requirements_to_requirements_registry-phase-02"
 name: IP-076 Phase 02 — Backlog requirement sync and CLI filtering
-created: '2026-03-09'
-updated: '2026-03-09'
+created: "2026-03-09"
+updated: "2026-03-09"
 status: completed
 kind: phase
 ---

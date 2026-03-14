@@ -4,23 +4,22 @@ name: Specifications
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-06'
-verified: '2026-03-06'
+updated: "2026-03-06"
+verified: "2026-03-06"
 confidence: high
 tags: [spec-driver, spec, requirements]
-summary: Tech Specs (SPEC-*) and Product Specs (PROD-*) define system behaviour, architecture, and product intent. In high-rigor
-  flows, canonical spec state is finalized after audit/contracts reconciliation.
+summary: "Tech Specs (SPEC-*) and Product Specs (PROD-*) define system behaviour, architecture, and product intent. In high-rigor flows, canonical spec state is finalized after audit/contracts reconciliation."
 priority:
   severity: high
   weight: 8
 provenance:
   sources:
-  - kind: adr
-    ref: ADR-004
-  - kind: adr
-    ref: ADR-003
-  - kind: code
-    ref: supekku/cli/create.py
+    - kind: adr
+      ref: ADR-004
+    - kind: adr
+      ref: ADR-003
+    - kind: code
+      ref: supekku/cli/create.py
 ---
 
 # Specifications

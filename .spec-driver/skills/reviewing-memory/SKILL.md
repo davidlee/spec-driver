@@ -1,11 +1,6 @@
 ---
 name: reviewing-memory
-description: 'Invoke this skill as a deliberate review pass whenever stability matters: (1) before a release/migration/large
-  refactor; (2) at the start of work in an unfamiliar subsystem; (3) when you see repeated agent confusion; (4) when thread-type
-  working sets accumulate; (5) when you suspect stale guidance is causing defects. This is not ad-hoc maintenance; it is a
-  structured audit to prevent systemic drift.
-
-  '
+description: "Invoke this skill as a deliberate review pass whenever stability matters: (1) before a release/migration/large refactor; (2) at the start of work in an unfamiliar subsystem; (3) when you see repeated agent confusion; (4) when thread-type working sets accumulate; (5) when you suspect stale guidance is causing defects. This is not ad-hoc maintenance; it is a structured audit to prevent systemic drift.\n"
 ---
 
 Review procedure:

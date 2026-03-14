@@ -1,8 +1,8 @@
 ---
 id: ISSUE-029
 name: no obvious path for requirement deprecation
-created: '2026-02-20'
-updated: '2026-03-09'
+created: "2026-02-20"
+updated: "2026-03-09"
 status: resolved
 kind: issue
 categories: []

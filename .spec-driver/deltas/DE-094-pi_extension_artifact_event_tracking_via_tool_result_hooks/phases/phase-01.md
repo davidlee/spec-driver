@@ -1,9 +1,9 @@
 ---
 id: IP-094.PHASE-01
-slug: 094-pi_extension_artifact_event_tracking_via_tool_result_hooks-phase-01
-name: 'IP-094 Phase 01: implement extension and tests'
-created: '2026-03-14'
-updated: '2026-03-14'
+slug: "094-pi_extension_artifact_event_tracking_via_tool_result_hooks-phase-01"
+name: "IP-094 Phase 01: implement extension and tests"
+created: "2026-03-14"
+updated: "2026-03-14"
 status: draft
 kind: phase
 ---

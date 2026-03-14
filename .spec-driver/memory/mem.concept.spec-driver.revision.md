@@ -4,12 +4,11 @@ name: Spec Revisions
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-03'
-verified: '2026-03-03'
+updated: "2026-03-03"
+verified: "2026-03-03"
 confidence: high
 tags: [spec-driver, revision]
-summary: Spec Revisions (RE-*) document requirement/spec change intent and lineage. In canonical delta-first flow they typically
-  follow audit findings; revision-first is a town-planner concession path.
+summary: Spec Revisions (RE-*) document requirement/spec change intent and lineage. In canonical delta-first flow they typically follow audit findings; revision-first is a town-planner concession path.
 priority:
   severity: medium
   weight: 6
@@ -18,15 +17,15 @@ scope:
   paths: [supekku/scripts/lib/requirements/registry.py]
 provenance:
   sources:
-  - kind: code
-    note: Completion path can auto-create revision updates for requirements
-    ref: supekku/scripts/complete_delta.py
-  - kind: code
-    note: Completion updates revision sources for requirement lifecycle changes
-    ref: supekku/scripts/lib/requirements/registry.py
-  - kind: doc
-    note: Canonical vs concession-path framing
-    ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
+    - kind: code
+      note: Completion path can auto-create revision updates for requirements
+      ref: supekku/scripts/complete_delta.py
+    - kind: code
+      note: Completion updates revision sources for requirement lifecycle changes
+      ref: supekku/scripts/lib/requirements/registry.py
+    - kind: doc
+      note: Canonical vs concession-path framing
+      ref: change/deltas/DE-038-canonical_workflow_alignment/DR-038.md
 ---
 
 # Spec Revisions

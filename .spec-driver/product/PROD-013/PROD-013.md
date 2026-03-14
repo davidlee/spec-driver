@@ -2,21 +2,21 @@
 id: PROD-013
 slug: cli-artifact-file-access
 name: CLI Artifact File Access
-created: '2026-02-04'
-updated: '2026-02-04'
+created: "2026-02-04"
+updated: "2026-02-04"
 status: draft
 kind: prod
 aliases: [artifact-access, file-access]
 relations: []
 guiding_principles:
-- Composable commands for shell pipelines
-- Consistent flags across artifact types
-- Minimal friction to view/edit artifacts
-- Follow Unix conventions ($PAGER, $EDITOR)
+  - Composable commands for shell pipelines
+  - Consistent flags across artifact types
+  - Minimal friction to view/edit artifacts
+  - "Follow Unix conventions ($PAGER, $EDITOR)"
 assumptions:
-- Users work primarily in terminal environments
-- Shell composability (piping, subshells) is valuable
-- Consistency reduces cognitive load
+  - Users work primarily in terminal environments
+  - "Shell composability (piping, subshells) is valuable"
+  - Consistency reduces cognitive load
 ---
 
 # PROD-013 – CLI Artifact File Access

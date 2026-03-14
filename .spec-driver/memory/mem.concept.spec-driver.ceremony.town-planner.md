@@ -4,19 +4,18 @@ name: Town Planner Ceremony Mode
 kind: memory
 status: active
 memory_type: concept
-updated: '2026-03-06'
-verified: '2026-03-06'
+updated: "2026-03-06"
+verified: "2026-03-06"
 confidence: high
 tags: [spec-driver, ceremony, town-planner]
-summary: 'High ceremony: full governance with revisions before deltas, evidence discipline, and explicit spec reconciliation
-  after audit/contracts.'
+summary: "High ceremony: full governance with revisions before deltas, evidence discipline, and explicit spec reconciliation after audit/contracts."
 priority:
   severity: medium
   weight: 7
 provenance:
   sources:
-  - kind: adr
-    ref: ADR-004
+    - kind: adr
+      ref: ADR-004
 ---
 
 # Town Planner Ceremony Mode

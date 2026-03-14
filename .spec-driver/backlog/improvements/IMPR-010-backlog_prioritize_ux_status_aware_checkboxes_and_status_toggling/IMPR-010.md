@@ -1,13 +1,13 @@
 ---
 id: IMPR-010
-name: 'Backlog prioritize UX: status-aware checkboxes and status toggling'
-created: '2026-03-07'
-updated: '2026-03-07'
+name: "Backlog prioritize UX: status-aware checkboxes and status toggling"
+created: "2026-03-07"
+updated: "2026-03-07"
 status: open
 kind: improvement
 relations:
-- type: depends_on
-  target: ISSUE-009
+  - type: depends_on
+    target: ISSUE-009
 ---
 
 # Backlog prioritize UX: status-aware checkboxes and status toggling

@@ -1,8 +1,8 @@
 ---
 id: ISSUE-016
 name: Sync backlog requirements to requirements registry
-created: '2025-11-03'
-updated: '2025-11-03'
+created: "2025-11-03"
+updated: "2025-11-03"
 status: resolved
 kind: issue
 categories: [process_gap, tooling_enhancement]

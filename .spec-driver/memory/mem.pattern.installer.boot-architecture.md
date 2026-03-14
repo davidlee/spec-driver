@@ -4,36 +4,35 @@ name: Installer & Agent Boot Architecture
 kind: memory
 status: active
 memory_type: pattern
-updated: '2026-03-12'
-verified: '2026-03-12'
+updated: "2026-03-12"
+verified: "2026-03-12"
 confidence: high
 tags: [spec-driver, installer, skills, boot, agent-guidance]
-summary: How the installer sets up agent guidance, skills, and boot references. Covers file ownership (managed vs authored),
-  the agents/boot.md / AGENTS.md reference architecture, and the template-driven rendering pipeline.
+summary: "How the installer sets up agent guidance, skills, and boot references. Covers file ownership (managed vs authored), the agents/boot.md / AGENTS.md reference architecture, and the template-driven rendering pipeline."
 priority:
   severity: high
   weight: 9
 scope:
   commands: [uv run spec-driver install]
   paths:
-  - supekku/scripts/install.py
-  - supekku/scripts/lib/skills/sync.py
-  - supekku/scripts/lib/core/config.py
-  - supekku/scripts/lib/core/preboot.py
-  - supekku/claude.hooks/startup.sh
-  - supekku/templates/
+    - supekku/scripts/install.py
+    - supekku/scripts/lib/skills/sync.py
+    - supekku/scripts/lib/core/config.py
+    - supekku/scripts/lib/core/preboot.py
+    - supekku/claude.hooks/startup.sh
+    - supekku/templates/
 provenance:
   sources:
-  - kind: code
-    ref: supekku/scripts/install.py
-  - kind: code
-    ref: supekku/scripts/lib/skills/sync.py
-  - kind: code
-    ref: supekku/scripts/lib/core/config.py
-  - kind: code
-    ref: supekku/scripts/lib/core/preboot.py
-  - kind: delta
-    ref: DE-091
+    - kind: code
+      ref: supekku/scripts/install.py
+    - kind: code
+      ref: supekku/scripts/lib/skills/sync.py
+    - kind: code
+      ref: supekku/scripts/lib/core/config.py
+    - kind: code
+      ref: supekku/scripts/lib/core/preboot.py
+    - kind: delta
+      ref: DE-091
 ---
 
 # Installer & Agent Boot Architecture

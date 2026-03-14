@@ -1,9 +1,9 @@
 ---
 id: IP-047.PHASE-01
-slug: 047-agent-survey-and-ledger-population
+slug: "047-agent-survey-and-ledger-population"
 name: Agent survey and ledger population
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: complete
 kind: phase
 ---

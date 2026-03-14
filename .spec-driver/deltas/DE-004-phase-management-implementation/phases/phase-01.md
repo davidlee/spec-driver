@@ -2,8 +2,8 @@
 id: IP-004.PHASE-01
 slug: phase-management-implementation-phase-01
 name: IP-004 Phase 01
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: completed
 kind: phase
 ---

@@ -1,9 +1,6 @@
 ---
 name: spec-driver
-description: Use this skill any time work involves creating, listing, finding, showing, editing, completing, syncing, or otherwise
-  interacting with spec-driver entities via the CLI. Trigger it whenever a user asks to create or inspect ADRs, specs, deltas,
-  revisions, audits, memories, policies, standards, backlog items, or related workflow artefacts, especially if there is any
-  temptation to guess IDs, paths, or command shapes.
+description: "Use this skill any time work involves creating, listing, finding, showing, editing, completing, syncing, or otherwise interacting with spec-driver entities via the CLI. Trigger it whenever a user asks to create or inspect ADRs, specs, deltas, revisions, audits, memories, policies, standards, backlog items, or related workflow artefacts, especially if there is any temptation to guess IDs, paths, or command shapes."
 ---
 
 # Spec Driver

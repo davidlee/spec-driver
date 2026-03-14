@@ -1,9 +1,9 @@
 ---
 id: IP-065.PHASE-01
-slug: 065-drift_ledger_primitive-phase-01
-name: Domain layer — models, parser, registry
-created: '2026-03-08'
-updated: '2026-03-08'
+slug: "065-drift_ledger_primitive-phase-01"
+name: "Domain layer — models, parser, registry"
+created: "2026-03-08"
+updated: "2026-03-08"
 status: draft
 kind: phase
 ---

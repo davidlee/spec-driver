@@ -1,9 +1,9 @@
 ---
 id: IP-045.PHASE-01
-slug: 045-memory_graph_navigation_for_agent_discoverability-phase-01
+slug: "045-memory_graph_navigation_for_agent_discoverability-phase-01"
 name: Graph domain + shared infrastructure
-created: '2026-03-05'
-updated: '2026-03-05'
+created: "2026-03-05"
+updated: "2026-03-05"
 status: complete
 kind: phase
 ---

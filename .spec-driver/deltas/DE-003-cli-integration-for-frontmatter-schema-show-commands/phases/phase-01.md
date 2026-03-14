@@ -2,8 +2,8 @@
 id: IP-003.PHASE-01
 slug: cli-integration-for-frontmatter-schema-show-commands-phase-01
 name: IP-003 Phase 01 - CLI Implementation
-created: '2025-11-02'
-updated: '2025-11-02'
+created: "2025-11-02"
+updated: "2025-11-02"
 status: completed
 kind: phase
 ---

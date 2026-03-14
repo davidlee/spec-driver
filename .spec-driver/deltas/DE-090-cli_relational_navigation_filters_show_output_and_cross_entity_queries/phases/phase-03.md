@@ -1,9 +1,9 @@
 ---
 id: IP-090.PHASE-03
-slug: 090-cli_relational_navigation_filters_show_output_and_cross_entity_queries-phase-03
-name: 'IP-090 Phase 03: P2 show enrichment'
-created: '2026-03-13'
-updated: '2026-03-13'
+slug: "090-cli_relational_navigation_filters_show_output_and_cross_entity_queries-phase-03"
+name: "IP-090 Phase 03: P2 show enrichment"
+created: "2026-03-13"
+updated: "2026-03-13"
 status: draft
 kind: phase
 ---

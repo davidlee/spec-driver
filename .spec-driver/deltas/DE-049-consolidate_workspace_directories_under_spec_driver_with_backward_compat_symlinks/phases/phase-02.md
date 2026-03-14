@@ -1,9 +1,9 @@
 ---
 id: IP-049.PHASE-02
-slug: 049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks-phase-02
+slug: "049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks-phase-02"
 name: IP-049 Phase 02 — Flatten path model and update config defaults
-created: '2026-03-06'
-updated: '2026-03-06'
+created: "2026-03-06"
+updated: "2026-03-06"
 status: complete
 kind: phase
 ---

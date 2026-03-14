@@ -504,7 +504,11 @@ def _collect_pi_sources(
   extensions_src = package_root / "pi.extensions"
   if not extensions_src.is_dir():
     return []
-  return sorted(f for f in extensions_src.iterdir() if f.is_file())
+  return sorted(
+    f
+    for f in extensions_src.iterdir()
+    if f.is_file() and ".test." not in f.name
+  )
 
 
 def _install_pi_config(

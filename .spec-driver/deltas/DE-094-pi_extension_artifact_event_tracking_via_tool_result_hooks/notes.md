@@ -11,11 +11,13 @@
 - `writeLog()` — JSONL append to `.spec-driver/run/events.jsonl`
 - `SYNC:` comments cross-referencing `artifact_event.py`
 
-**No Unix socket** — Node.js `dgram` doesn't support `AF_UNIX` datagram sockets.
-TUI falls back to log-tail mode automatically (watchfiles on `events.jsonl`).
-This is sufficient — socket is a latency optimisation, not required.
+**Unix socket via pi.exec** — Node.js `dgram` lacks `AF_UNIX` support, so
+`sendSocket()` shells out to `python3` via `pi.exec()` with a one-liner that
+opens `AF_UNIX SOCK_DGRAM`, sends the JSON payload, and closes. Async,
+fire-and-forget, fail-silent. Python is guaranteed available in spec-driver
+projects.
 
-**spec-driver-artifact-events.test.ts** — 29 tests
+**spec-driver-artifact-events.test.ts** — 31 tests
 - Classification: all 13 artifact types + priority ordering (phase > delta, DR > delta)
 - Non-artifact paths: 7 cases returning null
 - Event schema: 5 tests (v1 fields, actions, relativization, no-id case)
@@ -28,16 +30,16 @@ This is sufficient — socket is a latency optimisation, not required.
 
 ### Surprises / adaptations
 - Node.js `dgram` only supports `udp4`/`udp6`, not Unix domain sockets.
-  Python's `socket.AF_UNIX, socket.SOCK_DGRAM` has no Node equivalent.
-  Dropped socket emission; TUI log-tail fallback is automatic and sufficient.
+  Solved by shelling out to `python3` via `pi.exec()` for the datagram send.
 - `import type` from `@mariozechner/pi-coding-agent` is stripped by Node's
   `--experimental-strip-types`, so tests run without the pi package installed.
 
 ### Commits
 - `7e6c263` — feat(DE-094): pi artifact event extension + tests, exclude test files from install
+- `f4a3173` — feat(DE-094): restore socket emission via pi.exec python3 dgram
 
 ### Verification
-- 29 TS tests pass (classification, schema, JSONL write)
+- 31 TS tests pass (classification, schema, JSONL write, socket delegation)
 - 103 Python install tests pass (no regressions)
 - 35 Python artifact_event tests pass
 - Lint clean (ruff)

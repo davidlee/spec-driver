@@ -61,7 +61,7 @@ publish-pypi:
 brew-tap := justfile_directory() / "../homebrew-spec-driver"
 
 # extract version from pyproject.toml
-version := `python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])"`
+version := `cat VERSION`
 
 brew-update:
   #!/usr/bin/env bash

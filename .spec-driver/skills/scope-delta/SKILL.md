@@ -1,6 +1,6 @@
 ---
 name: scope-delta
-description: "Scope intentional change as a delta. Define applies-to specs/requirements, risks, and closure targets before implementation."
+description: Scope intentional change as a delta. Define applies-to specs/requirements, risks, and closure targets before implementation.
 ---
 
 You are converting intent into a concrete change bundle.

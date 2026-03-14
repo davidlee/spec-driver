@@ -1,6 +1,6 @@
 ---
 name: spec-driver
-description: "Use this skill any time work involves creating, listing, finding, showing, editing, completing, syncing, or otherwise interacting with spec-driver entities via the CLI. Trigger it whenever a user asks to create or inspect ADRs, specs, deltas, revisions, audits, memories, policies, standards, backlog items, or related workflow artefacts, especially if there is any temptation to guess IDs, paths, or command shapes."
+description: Use this skill any time work involves creating, listing, finding, showing, editing, completing, syncing, or otherwise interacting with spec-driver entities via the CLI. Trigger it whenever a user asks to create or inspect ADRs, specs, deltas, revisions, audits, memories, policies, standards, backlog items, or related workflow artefacts, especially if there is any temptation to guess IDs, paths, or command shapes.
 ---
 
 # Spec Driver
@@ -50,6 +50,8 @@ Common `kind` values include:
 - `memory`
 - `policy`
 - `standard`
+- `backlog` (also: `issue`, `problem`, `improvement`, `risk`)
+- `drift`
 
 ## Command discovery
 
@@ -84,6 +86,18 @@ listing the relevant entities instead of dumping every help screen.
   `spec-driver show schema delta.relationships -f json-schema`.
 - `find` uses glob patterns, not regex, and accepts numeric shorthand:
   `spec-driver find delta "DE-04*"`, `spec-driver find delta 44`.
+- **Bare numeric IDs** work everywhere: `spec-driver show delta 88` resolves
+  to `DE-088`. Same for `find`, `view`, `edit`, `show`.
+- `read` is an alias for `view`.
+- `show backlog` / `view backlog` resolve any backlog item type by ID
+  (issue, problem, improvement, risk) without needing the specific subcommand.
+- `edit` subcommands support `--tag`/`--untag` for in-place frontmatter tag
+  edits without opening an editor: `spec-driver edit delta DE-088 --tag wip --untag stale`.
+  Available on all 17 edit subcommands. `--status` sets status similarly.
+- `create requirement` supports `--tag`, `--ext-id`, `--ext-url` for discovery
+  metadata at creation time.
+- `admin preboot` generates the static boot context file for cache-optimised
+  agent sessions. Run after governance changes (ADRs, policies, standards).
 - Hidden defaults that matter:
   `list specs` hides unit specs unless you use `-c all`;
   `list backlog` defaults to `--limit 20` and excludes resolved/implemented items unless you use `-a`;

@@ -1,6 +1,6 @@
 ---
 name: consult
-description: "Identify and address obstacles, significant decisions, or emergent complexity. You MUST use this skill if you encounter unanticipated obstacles during implementation."
+description: Identify and address obstacles, significant decisions, or emergent complexity. You MUST use this skill if you encounter unanticipated obstacles during implementation.
 ---
 
 The user has strong feelings about architecture, plan adherence, and especially

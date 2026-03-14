@@ -1,6 +1,6 @@
 ---
 name: draft-design-revision
-description: "Draft or refine a design revision (DR) for a delta. Use it when a DR needs concrete design shaping, explicit question triage, and section-by-section validation before implementation planning."
+description: Draft or refine a design revision (DR) for a delta. Use it when a DR needs concrete design shaping, explicit question triage, and section-by-section validation before implementation planning.
 ---
 
 You are translating delta intent into implementable design.

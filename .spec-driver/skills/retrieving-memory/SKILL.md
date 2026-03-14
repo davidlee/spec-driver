@@ -1,6 +1,8 @@
 ---
 name: retrieving-memory
-description: "Invoke this skill before making non-trivial assumptions in a large codebase. Mandatory triggers: (1) you are about to modify a subsystem you have not touched in this run; (2) you are about to run, change, or suggest a command pipeline (tests, builds, releases, migrations); (3) you see conflicting cues in code/docs; (4) you are asked “what is the right way here?”; (5) you are debugging a recurring failure mode; (6) you are about to answer with “probably/usually/likely”.\nDefault rule: if you cannot cite a source-of-truth file/doc/ADR/SPEC from the repo, you must consult memories first and then proceed.\n"
+description: |
+  Invoke this skill before making non-trivial assumptions in a large codebase. Mandatory triggers: (1) you are about to modify a subsystem you have not touched in this run; (2) you are about to run, change, or suggest a command pipeline (tests, builds, releases, migrations); (3) you see conflicting cues in code/docs; (4) you are asked “what is the right way here?”; (5) you are debugging a recurring failure mode; (6) you are about to answer with “probably/usually/likely”.
+  Default rule: if you cannot cite a source-of-truth file/doc/ADR/SPEC from the repo, you must consult memories first and then proceed.
 ---
 
 Retrieval procedure (fast → thorough):

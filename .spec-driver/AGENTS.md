@@ -6,17 +6,15 @@
 When users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.
 
 How to use skills:
-
 - Check available skills in <available_skills> below
 - Skills are loaded via slash commands or agent tooling
 - Each skill contains detailed instructions for completing specific tasks
 
 Usage notes:
-
 - Only use skills listed in <available_skills> below
 - Do not invoke a skill that is already loaded in your context
 - Each skill invocation is stateless
-  </usage>
+</usage>
 
 <available_skills>
 

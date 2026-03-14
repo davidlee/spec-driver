@@ -40,9 +40,10 @@ The term "card" in skills and workflows refers to whichever of these the project
 
 - **ADR** (`ADR-xxx`): Architecture Decision Record. Location: `.spec-driver/decisions/ADR-xxx-slug.md`.
   - **Contract**: Auto-generated API documentation. Location: `.contracts/`.
-
   ## Backlog
 
 - **Issue**: Actionable defect or gap. Location: `.spec-driver/backlog/issues/`.
 - **Problem Statement**: Articulation of user/system pain. Location: `.spec-driver/backlog/problems/`.
 - **Improvement**: Enhancement opportunity. Location: `.spec-driver/backlog/improvements/`.
+- **Risk**: Identified risk with likelihood/impact assessment. Location: `.spec-driver/backlog/risks/`.
+- **Drift Ledger** (`DL-xxx`): Tracked spec-vs-reality divergence. Location: `.spec-driver/drift/`.

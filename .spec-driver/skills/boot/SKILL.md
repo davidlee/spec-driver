@@ -1,6 +1,6 @@
 ---
 name: boot
-description: "Mandatory onboarding. Every agent MUST execute this on startup, or as soon as becoming aware of it."
+description: Mandatory onboarding. Every agent MUST execute this on startup, or as soon as becoming aware of it.
 ---
 
 Boot context is pre-generated and loaded into your context automatically

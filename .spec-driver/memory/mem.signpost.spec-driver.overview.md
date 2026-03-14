@@ -4,8 +4,8 @@ name: Spec-Driver Overview
 kind: memory
 status: active
 memory_type: signpost
-updated: "2026-03-05"
-verified: "2026-03-05"
+updated: "2026-03-15"
+verified: "2026-03-15"
 tags: [spec-driver, overview, workflow]
 summary: "Concise overview of spec-driver: core loop, ceremony modes, key artifacts, and common commands."
 scope:
@@ -66,7 +66,10 @@ project’s ceremony mode and read the matching guidance:
 - `uv run spec-driver sync`
 - `uv run spec-driver validate`
 - `uv run spec-driver list requirements --spec SPEC-XXX`
-- `uv run spec-driver show delta DE-XXX`
+- `uv run spec-driver show delta DE-XXX` (bare numeric: `show delta 88`)
+- `uv run spec-driver edit delta DE-XXX --tag wip --untag stale`
+- `uv run spec-driver show backlog ISSUE-045` (resolves any backlog type)
+- `uv run spec-driver admin preboot` (regenerate static boot context)
 
 ## File Map
 

@@ -56,3 +56,5 @@ ID format: `{{ config.kanban.id_prefix }}NNN-slug`
 - **Issue**: Actionable defect or gap. Location: `.spec-driver/backlog/issues/`.
 - **Problem Statement**: Articulation of user/system pain. Location: `.spec-driver/backlog/problems/`.
 - **Improvement**: Enhancement opportunity. Location: `.spec-driver/backlog/improvements/`.
+- **Risk**: Identified risk with likelihood/impact assessment. Location: `.spec-driver/backlog/risks/`.
+- **Drift Ledger** (`DL-xxx`): Tracked spec-vs-reality divergence. Location: `.spec-driver/drift/`.

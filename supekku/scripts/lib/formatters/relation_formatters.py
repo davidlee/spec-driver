@@ -35,7 +35,29 @@ def format_refs_tsv(refs: list[ReferenceHit]) -> str:
   return ",".join(parts)
 
 
+def format_related_section(
+  referenced_by: dict[str, list[tuple[str, str]]],
+) -> list[str]:
+  """Format the 'Referenced by' section for ``--related`` output.
+
+  *referenced_by* maps artifact kind (e.g. ``"delta"``) to a list of
+  ``(id, name)`` tuples.  Returns formatted lines ready for ``\\n.join()``.
+  An empty *referenced_by* dict produces an empty list (no section header).
+  """
+  if not referenced_by:
+    return []
+  lines: list[str] = ["", "Referenced by:"]
+  for kind in sorted(referenced_by):
+    refs = referenced_by[kind]
+    kind_label = kind.replace("_", " ").title() + "s"
+    lines.append(f"  {kind_label} ({len(refs)}):")
+    for ref_id, ref_name in refs:
+      lines.append(f"    {ref_id}  {ref_name}")
+  return lines
+
+
 __all__ = [
   "format_refs_count",
   "format_refs_tsv",
+  "format_related_section",
 ]

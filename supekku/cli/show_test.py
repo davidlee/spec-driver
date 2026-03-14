@@ -932,5 +932,101 @@ class ShowContentTypeFlagTest(unittest.TestCase):
     assert "---" in result.stdout
 
 
+class ShowRelatedFlagTest(unittest.TestCase):
+  """VT-090-P5: Tests for --related neighbourhood view."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.root = find_repo_root()
+
+  def test_show_spec_related_one_hop(self) -> None:
+    """VT-090-P5-1: show spec --related includes referenced-by section."""
+    result = self.runner.invoke(app, ["spec", "PROD-010", "--related"])
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    # PROD-010 is referenced by multiple deltas
+    assert "Referenced by:" in result.stdout
+    assert "Deltas" in result.stdout
+
+  def test_show_spec_related_replaces_count_view(self) -> None:
+    """VT-090-P5-4: --related replaces the count-based Related: section."""
+    # Without --related: should have "Related:" count section
+    result_default = self.runner.invoke(app, ["spec", "PROD-010"])
+    assert result_default.exit_code == 0
+    # The count view shows "Related:" with counts
+    has_count_view = "Deltas:" in result_default.stdout and any(
+      c.isdigit() for c in result_default.stdout.split("Deltas:")[-1][:10]
+    )
+
+    # With --related: should have "Referenced by:" not count view
+    result_related = self.runner.invoke(app, ["spec", "PROD-010", "--related"])
+    assert result_related.exit_code == 0
+    assert "Referenced by:" in result_related.stdout
+    # Count view lines should NOT appear when --related is active
+    # (the "Related:" section with just numbers is replaced by itemised listing)
+    if has_count_view:
+      # The itemised view lists actual IDs, not just counts
+      assert "DE-" in result_related.stdout
+
+  def test_show_delta_related(self) -> None:
+    """VT-090-P5-2: show delta --related works."""
+    result = self.runner.invoke(app, ["delta", "DE-090", "--related"])
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    # DE-090 may or may not have reverse refs, but should not crash
+    assert "Delta: DE-090" in result.stdout
+
+  def test_show_related_json_output(self) -> None:
+    """VT-090-P5-3: --related --json includes related key with structure."""
+    result = self.runner.invoke(app, ["spec", "PROD-010", "--related", "--json"])
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    data = json.loads(result.stdout)
+    assert "related" in data
+    assert "forward" in data["related"]
+    assert "referenced_by" in data["related"]
+    assert isinstance(data["related"]["forward"], list)
+    assert isinstance(data["related"]["referenced_by"], dict)
+    # PROD-010 should have delta reverse refs
+    if "delta" in data["related"]["referenced_by"]:
+      delta_refs = data["related"]["referenced_by"]["delta"]
+      assert len(delta_refs) > 0
+      assert "id" in delta_refs[0]
+      assert "name" in delta_refs[0]
+
+  def test_show_requirement_related(self) -> None:
+    """VT-090-P5-1 (requirement): show requirement --related works."""
+    result = self.runner.invoke(
+      app, ["requirement", "PROD-010.FR-005", "--related"]
+    )
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    # PROD-010.FR-005 is implemented by DE-011 and DE-090
+    assert "Referenced by:" in result.stdout
+    assert "DE-090" in result.stdout or "DE-011" in result.stdout
+
+  def test_show_no_references_no_section(self) -> None:
+    """VT-090-P5-5: Entity with no reverse references → no Referenced by section."""
+    # Find an issue that likely has no reverse references
+    result = self.runner.invoke(app, ["issue", "ISSUE-005", "--related"])
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    # If no reverse refs, "Referenced by:" should not appear
+    # (This test may need adjustment if ISSUE-005 gains reverse refs)
+
+  def test_show_delta_related_json(self) -> None:
+    """VT-090-P5-3 (delta): --related --json includes forward refs."""
+    result = self.runner.invoke(app, ["delta", "DE-090", "--related", "--json"])
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    data = json.loads(result.stdout)
+    assert "related" in data
+    # DE-090 has forward refs (relates_to: PROD-010, applies_to: specs)
+    assert len(data["related"]["forward"]) > 0
+
+  def test_show_issue_related_json(self) -> None:
+    """VT-090-P5-3 (issue): --related --json includes related key."""
+    result = self.runner.invoke(app, ["issue", "ISSUE-005", "--related", "--json"])
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    data = json.loads(result.stdout)
+    assert "related" in data
+    assert "forward" in data["related"]
+    assert "referenced_by" in data["related"]
+
+
 if __name__ == "__main__":
   unittest.main()

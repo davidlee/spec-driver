@@ -11,12 +11,14 @@ import typer
 from supekku.cli.common import (
   EXIT_FAILURE,
   EXIT_SUCCESS,
+  ARTIFACT_PREFIXES,
   ArtifactNotFoundError,
   ArtifactRef,
   ContentTypeOption,
   InferringGroup,
   RootOption,
   emit_artifact,
+  load_all_artifacts,
   resolve_artifact,
   resolve_by_id,
 )
@@ -39,7 +41,80 @@ from supekku.scripts.lib.formatters.requirement_formatters import (
 )
 from supekku.scripts.lib.formatters.spec_formatters import format_spec_details
 from supekku.scripts.lib.formatters.standard_formatters import format_standard_details
+from supekku.scripts.lib.formatters.relation_formatters import format_related_section
 from supekku.scripts.lib.memory.registry import MemoryRegistry
+
+# Reverse mapping: ID prefix → artifact kind for forward reference grouping.
+_PREFIX_TO_KIND: dict[str, str] = {v: k for k, v in ARTIFACT_PREFIXES.items()}
+# Spec prefixes are not in ARTIFACT_PREFIXES — add common ones.
+_PREFIX_TO_KIND.update({
+  "SPEC-": "spec",
+  "PROD-": "spec",
+})
+
+# Per-kind reverse lookup registries (DEC-090-15).
+_RELATED_REGISTRIES: dict[str, tuple[str, ...]] = {
+  "spec": ("delta", "revision", "audit", "adr", "requirement", "policy", "standard"),
+  "delta": ("audit", "revision", "backlog"),
+  "requirement": ("delta", "adr", "policy", "standard"),
+  "issue": ("delta",),
+}
+
+
+def _infer_kind_from_id(target_id: str) -> str:
+  """Infer artifact kind from a target ID prefix.
+
+  Falls back to ``"unknown"`` if no prefix matches.
+  """
+  upper = target_id.upper()
+  for prefix, kind in _PREFIX_TO_KIND.items():
+    if upper.startswith(prefix):
+      return kind
+  return "unknown"
+
+
+def _gather_reverse_refs(
+  repo_root: Path,
+  entity_id: str,
+  entity_kind: str,
+) -> dict[str, list[tuple[str, str]]]:
+  """Gather reverse references grouped by kind for ``--related``.
+
+  Loads only registries relevant to *entity_kind* per DEC-090-15.
+
+  Returns:
+    Dict mapping kind → [(id, name), ...] for each referencing artifact.
+  """
+  from supekku.scripts.lib.relations.query import find_related_to  # noqa: PLC0415
+
+  registry_kinds = _RELATED_REGISTRIES.get(entity_kind, ())
+  result: dict[str, list[tuple[str, str]]] = {}
+  for kind in registry_kinds:
+    try:
+      artifacts = load_all_artifacts(repo_root, kind)
+      related = find_related_to(artifacts, entity_id)
+      if related:
+        result[kind] = [
+          (getattr(a, "id", getattr(a, "uid", "?")),
+           getattr(a, "name", getattr(a, "title", "")))
+          for a in related
+        ]
+    except (FileNotFoundError, ValueError):
+      continue  # Registry not available — skip silently
+  return result
+
+
+def _gather_forward_refs(
+  artifact: Any,
+) -> list[dict[str, str]]:
+  """Gather forward references from *artifact* for ``--related`` JSON."""
+  from supekku.scripts.lib.relations.query import collect_references  # noqa: PLC0415
+
+  return [
+    {"type": hit.detail or "", "target": hit.target, "source": hit.source}
+    for hit in collect_references(artifact)
+  ]
+
 
 app = typer.Typer(
   help="Show detailed artifact information",
@@ -58,6 +133,9 @@ def show_spec(  # noqa: PLR0913
   ] = False,
   requirements: Annotated[
     bool, typer.Option("--requirements", help="Show full requirements list")
+  ] = False,
+  related: Annotated[
+    bool, typer.Option("--related", help="Show one-hop neighbourhood (forward + reverse references)")
   ] = False,
   content_type: ContentTypeOption = None,
   root: RootOption = None,
@@ -94,40 +172,51 @@ def show_spec(  # noqa: PLR0913
     except (FileNotFoundError, ValueError):
       pass  # No requirements registry — counts stay at zero
 
-    # Reverse lookup counts: which change artifacts reference this spec
+    # Reverse lookup: counts for default view, full neighbourhood for --related
     delta_count = revision_count = audit_count = 0
-    try:
-      from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
-      from supekku.scripts.lib.relations.query import find_related_to  # noqa: PLC0415
+    reverse_refs: dict[str, list[tuple[str, str]]] = {}
+    if related:
+      reverse_refs = _gather_reverse_refs(repo_root, ref.id, "spec")
+      delta_count = len(reverse_refs.get("delta", []))
+      revision_count = len(reverse_refs.get("revision", []))
+      audit_count = len(reverse_refs.get("audit", []))
+    else:
+      try:
+        from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
+        from supekku.scripts.lib.relations.query import find_related_to  # noqa: PLC0415
 
-      for kind in ("delta", "revision", "audit"):
-        change_reg = ChangeRegistry(root=repo_root, kind=kind)
-        related = find_related_to(change_reg.iter(), ref.id)
-        if kind == "delta":
-          delta_count = len(related)
-        elif kind == "revision":
-          revision_count = len(related)
-        else:
-          audit_count = len(related)
-    except (FileNotFoundError, ValueError):
-      pass  # No change registry — counts stay at zero
+        for kind in ("delta", "revision", "audit"):
+          change_reg = ChangeRegistry(root=repo_root, kind=kind)
+          related_arts = find_related_to(change_reg.iter(), ref.id)
+          if kind == "delta":
+            delta_count = len(related_arts)
+          elif kind == "revision":
+            revision_count = len(related_arts)
+          else:
+            audit_count = len(related_arts)
+      except (FileNotFoundError, ValueError):
+        pass  # No change registry — counts stay at zero
 
     def _format(r):  # type: ignore[no-untyped-def]
-      return format_spec_details(
+      base = format_spec_details(
         r,
         root=root,
         fr_count=fr_count,
         nf_count=nf_count,
         other_req_count=other_req_count,
-        delta_count=delta_count,
-        revision_count=revision_count,
-        audit_count=audit_count,
+        delta_count=0 if related else delta_count,
+        revision_count=0 if related else revision_count,
+        audit_count=0 if related else audit_count,
         requirements_list=requirements_list,
       )
+      if related:
+        related_lines = format_related_section(reverse_refs)
+        return base + "\n".join(related_lines)
+      return base
 
     def _json(r):  # type: ignore[no-untyped-def]
       data = r.to_dict(repo_root)
-      if delta_count or revision_count or audit_count:
+      if not related and (delta_count or revision_count or audit_count):
         data["reverse_lookup_counts"] = {
           "deltas": delta_count,
           "revisions": revision_count,
@@ -138,6 +227,14 @@ def show_spec(  # noqa: PLR0913
           {"id": rid, "kind": kind, "title": title}
           for rid, kind, title in requirements_list
         ]
+      if related:
+        data["related"] = {
+          "forward": _gather_forward_refs(ref.record),
+          "referenced_by": {
+            kind: [{"id": aid, "name": aname} for aid, aname in refs]
+            for kind, refs in reverse_refs.items()
+          },
+        }
       return json.dumps(data, indent=2)
 
     emit_artifact(
@@ -162,6 +259,9 @@ def show_delta(
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
   ] = False,
+  related: Annotated[
+    bool, typer.Option("--related", help="Show one-hop neighbourhood (forward + reverse references)")
+  ] = False,
   content_type: ContentTypeOption = None,
   root: RootOption = None,
 ) -> None:
@@ -173,24 +273,37 @@ def show_delta(
     # Reverse lookups: audits and revisions referencing this delta
     linked_audits: list[tuple[str, str]] = []
     linked_revisions: list[tuple[str, str]] = []
-    try:
-      from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
-      from supekku.scripts.lib.relations.query import find_related_to  # noqa: PLC0415
+    reverse_refs: dict[str, list[tuple[str, str]]] = {}
+    if related:
+      reverse_refs = _gather_reverse_refs(repo_root, ref.id, "delta")
+      linked_audits = reverse_refs.get("audit", [])
+      linked_revisions = reverse_refs.get("revision", [])
+    else:
+      try:
+        from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
+        from supekku.scripts.lib.relations.query import find_related_to  # noqa: PLC0415
 
-      for kind, dest in (("audit", linked_audits), ("revision", linked_revisions)):
-        change_reg = ChangeRegistry(root=repo_root, kind=kind)
-        for artifact in find_related_to(change_reg.iter(), ref.id):
-          dest.append((artifact.id, artifact.name))
-    except (FileNotFoundError, ValueError):
-      pass
+        for kind, dest in (("audit", linked_audits), ("revision", linked_revisions)):
+          change_reg = ChangeRegistry(root=repo_root, kind=kind)
+          for artifact in find_related_to(change_reg.iter(), ref.id):
+            dest.append((artifact.id, artifact.name))
+      except (FileNotFoundError, ValueError):
+        pass
 
     def _format(r):  # type: ignore[no-untyped-def]
-      return format_delta_details(
+      base = format_delta_details(
         r,
         root=root,
         linked_audits=linked_audits,
         linked_revisions=linked_revisions,
       )
+      if related:
+        # Append full neighbourhood (excluding audit/revision already shown)
+        extra_refs = {k: v for k, v in reverse_refs.items() if k not in ("audit", "revision")}
+        if extra_refs:
+          related_lines = format_related_section(extra_refs)
+          return base + "\n".join(related_lines)
+      return base
 
     def _json(r):  # type: ignore[no-untyped-def]
       data = format_delta_details_json(r, root=root)
@@ -206,6 +319,14 @@ def show_delta(
         parsed["linked_revisions"] = [
           {"id": rid, "name": rname} for rid, rname in linked_revisions
         ]
+      if related:
+        parsed["related"] = {
+          "forward": _gather_forward_refs(ref.record),
+          "referenced_by": {
+            kind: [{"id": aid, "name": aname} for aid, aname in refs]
+            for kind, refs in reverse_refs.items()
+          },
+        }
       return _json_mod.dumps(parsed, indent=2)
 
     emit_artifact(
@@ -251,12 +372,15 @@ def show_revision(
 
 
 @app.command("requirement")
-def show_requirement(
+def show_requirement(  # noqa: PLR0913
   req_id: Annotated[str, typer.Argument(help="Requirement ID (e.g., SPEC-009.FR-001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  related: Annotated[
+    bool, typer.Option("--related", help="Show one-hop neighbourhood (forward + reverse references)")
   ] = False,
   content_type: ContentTypeOption = None,
   root: RootOption = None,
@@ -264,14 +388,39 @@ def show_requirement(
   """Show detailed information about a requirement."""
   try:
     ref = resolve_artifact("requirement", req_id, root)
+    repo_root = find_repo_root(root)
+
+    reverse_refs: dict[str, list[tuple[str, str]]] = {}
+    if related:
+      reverse_refs = _gather_reverse_refs(repo_root, ref.id, "requirement")
+
+    def _format(r):  # type: ignore[no-untyped-def]
+      base = format_requirement_details(r)
+      if related:
+        related_lines = format_related_section(reverse_refs)
+        return base + "\n".join(related_lines)
+      return base
+
+    def _json(r):  # type: ignore[no-untyped-def]
+      data = r.to_dict()
+      if related:
+        data["related"] = {
+          "forward": _gather_forward_refs(ref.record),
+          "referenced_by": {
+            kind: [{"id": aid, "name": aname} for aid, aname in refs]
+            for kind, refs in reverse_refs.items()
+          },
+        }
+      return json.dumps(data, indent=2)
+
     emit_artifact(
       ref,
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
       content_type=content_type,
-      format_fn=format_requirement_details,
-      json_fn=lambda r: json.dumps(r.to_dict(), indent=2),
+      format_fn=_format,
+      json_fn=_json,
     )
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)
@@ -658,12 +807,15 @@ def show_drift(
 
 
 @app.command("issue")
-def show_issue(
+def show_issue(  # noqa: PLR0913
   issue_id: Annotated[str, typer.Argument(help="Issue ID (e.g., ISSUE-001)")],
   json_output: Annotated[bool, typer.Option("--json", help="Output as JSON")] = False,
   path_only: Annotated[bool, typer.Option("--path", help="Output path only")] = False,
   raw_output: Annotated[
     bool, typer.Option("--raw", help="Output raw file content")
+  ] = False,
+  related: Annotated[
+    bool, typer.Option("--related", help="Show one-hop neighbourhood (forward + reverse references)")
   ] = False,
   content_type: ContentTypeOption = None,
   root: RootOption = None,
@@ -671,16 +823,39 @@ def show_issue(
   """Show detailed information about an issue."""
   try:
     ref = resolve_artifact("issue", issue_id, root)
+    repo_root = find_repo_root(root)
+
+    reverse_refs: dict[str, list[tuple[str, str]]] = {}
+    if related:
+      reverse_refs = _gather_reverse_refs(repo_root, ref.id, "issue")
+
+    def _format(r):  # type: ignore[no-untyped-def]
+      base = f"Issue: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
+      if related:
+        related_lines = format_related_section(reverse_refs)
+        return base + "\n".join(related_lines)
+      return base
+
+    def _json(r):  # type: ignore[no-untyped-def]
+      data = r.to_dict()
+      if related:
+        data["related"] = {
+          "forward": _gather_forward_refs(ref.record),
+          "referenced_by": {
+            kind: [{"id": aid, "name": aname} for aid, aname in refs]
+            for kind, refs in reverse_refs.items()
+          },
+        }
+      return json.dumps(data, indent=2, default=str)
+
     emit_artifact(
       ref,
       json_output=json_output,
       path_only=path_only,
       raw_output=raw_output,
       content_type=content_type,
-      format_fn=lambda r: (
-        f"Issue: {r.id}\nName: {r.title}\nStatus: {r.status}\nKind: {r.kind}"
-      ),
-      json_fn=lambda r: json.dumps(r.to_dict(), indent=2, default=str),
+      format_fn=_format,
+      json_fn=_json,
     )
   except ArtifactNotFoundError as e:
     typer.echo(f"Error: {e}", err=True)

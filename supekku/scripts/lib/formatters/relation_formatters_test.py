@@ -1,8 +1,8 @@
-"""Tests for relation_formatters — VT-085-005."""
+"""Tests for relation_formatters — VT-085-005 and VT-090-P5."""
 
 from supekku.scripts.lib.relations.query import ReferenceHit
 
-from .relation_formatters import format_refs_count, format_refs_tsv
+from .relation_formatters import format_refs_count, format_refs_tsv, format_related_section
 
 
 class TestFormatRefsCount:
@@ -60,3 +60,44 @@ class TestFormatRefsTsv:
   def test_applies_to_source(self) -> None:
     refs = [ReferenceHit(target="REQ-001", source="applies_to", detail="requirement")]
     assert format_refs_tsv(refs) == "applies_to.requirement:REQ-001"
+
+
+class TestFormatRelatedSection:
+  """VT-090-P5-4/P5-5: format_related_section rendering."""
+
+  def test_empty_dict_returns_empty_list(self) -> None:
+    """VT-090-P5-5: No references → no section."""
+    assert format_related_section({}) == []
+
+  def test_single_kind(self) -> None:
+    refs = {"delta": [("DE-009", "CLI JSON fixes"), ("DE-011", "Enhanced filtering")]}
+    result = format_related_section(refs)
+    assert "Referenced by:" in result
+    assert "  Deltas (2):" in result
+    assert "    DE-009  CLI JSON fixes" in result
+    assert "    DE-011  Enhanced filtering" in result
+
+  def test_multiple_kinds_sorted(self) -> None:
+    refs = {
+      "revision": [("RE-024", "Delta completion")],
+      "audit": [("AUD-004", "Conformance")],
+      "delta": [("DE-009", "Fixes")],
+    }
+    result = format_related_section(refs)
+    # Kinds should be sorted alphabetically
+    kind_lines = [line for line in result if "(" in line and "):" in line]
+    assert len(kind_lines) == 3
+    assert "Audits" in kind_lines[0]
+    assert "Deltas" in kind_lines[1]
+    assert "Revisions" in kind_lines[2]
+
+  def test_kind_label_replaces_underscore(self) -> None:
+    refs = {"drift_ledger": [("DL-001", "Spec drift")]}
+    result = format_related_section(refs)
+    assert "  Drift Ledgers (1):" in result
+
+  def test_starts_with_blank_line(self) -> None:
+    refs = {"delta": [("DE-001", "Test")]}
+    result = format_related_section(refs)
+    assert result[0] == ""
+    assert result[1] == "Referenced by:"

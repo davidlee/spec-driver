@@ -2,7 +2,7 @@
 id: IP-096-P03
 name: Normalisation + closure
 kind: phase
-status: in-progress
+status: completed
 delta: DE-096
 plan: IP-096
 created: "2026-03-14"
@@ -38,11 +38,11 @@ updated: "2026-03-14"
 
 ### 4. Closure
 
-- [ ] Update IP-096 progress tracking
-- [ ] Audit (AUD) and close delta
+- [x] Update IP-096 progress tracking
+- [x] Audit (AUD-011) and close delta
 
 ## Exit Criteria
 
 - [x] All `.spec-driver` frontmatter is canonical
 - [x] Backlog item exists for client migration (IMPR-017)
-- [ ] Delta closed
+- [x] Delta closed

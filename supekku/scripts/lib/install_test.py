@@ -16,6 +16,7 @@ from supekku.scripts.install import (
   _install_claude_config,
   _install_hooks,
   _install_memories,
+  _install_pi_config,
   _stamp_installed_version,
   get_package_root,
   initialize_workspace,
@@ -878,6 +879,155 @@ class TestInitializeWorkspaceClaudeConfig:
     # .claude/ may exist from skills dry-run skipping, but settings shouldn't
     settings = tmp_path / ".claude" / "settings.json"
     assert not settings.exists()
+
+
+# --- Pi config installation tests ---
+
+
+class TestInstallPiConfig:
+  """Tests for .pi/ extensions installation."""
+
+  def _make_pi_source(self, package_root: Path) -> None:
+    """Create package source files for pi extensions."""
+    ext_dir = package_root / "pi.extensions"
+    ext_dir.mkdir(parents=True)
+    (ext_dir / "spec-driver-preboot.ts").write_text(
+      'export default { hooks: { session_shutdown: () => {} } };',
+      encoding="utf-8",
+    )
+
+  def test_installs_extensions(self, tmp_path: Path) -> None:
+    """Fresh install creates .pi/extensions/ with extension files."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_pi_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_pi_config(pkg, target, dry_run=False)
+
+    ext = target / ".pi" / "extensions" / "spec-driver-preboot.ts"
+    assert ext.exists()
+    assert "session_shutdown" in ext.read_text()
+
+  def test_overwrites_on_reinstall(self, tmp_path: Path) -> None:
+    """Extensions are overwritten (installer-owned)."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_pi_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_pi_config(pkg, target, dry_run=False)
+
+    # Modify installed file
+    ext = target / ".pi" / "extensions" / "spec-driver-preboot.ts"
+    ext.write_text("modified")
+
+    # Reinstall
+    _install_pi_config(pkg, target, dry_run=False)
+
+    assert "session_shutdown" in ext.read_text()
+
+  def test_dry_run_does_not_write(self, tmp_path: Path, capsys) -> None:
+    """Dry-run reports without creating files."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_pi_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_pi_config(pkg, target, dry_run=True)
+
+    assert not (target / ".pi" / "extensions").exists()
+
+    captured = capsys.readouterr()
+    assert "[DRY RUN]" in captured.out
+    assert "spec-driver-preboot.ts" in captured.out
+
+  def test_creates_directories(self, tmp_path: Path) -> None:
+    """Creates .pi/extensions/ if it doesn't exist."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_pi_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_pi_config(pkg, target, dry_run=False)
+
+    assert (target / ".pi" / "extensions").is_dir()
+
+  def test_idempotent(self, tmp_path: Path) -> None:
+    """Repeated installs produce identical results."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_pi_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_pi_config(pkg, target, dry_run=False)
+    first = (target / ".pi" / "extensions" / "spec-driver-preboot.ts").read_text()
+
+    _install_pi_config(pkg, target, dry_run=False)
+    second = (target / ".pi" / "extensions" / "spec-driver-preboot.ts").read_text()
+
+    assert first == second
+
+  def test_skips_if_no_source_extensions(self, tmp_path: Path) -> None:
+    """No-op when package has no pi.extensions/ directory."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_pi_config(pkg, target, dry_run=False)
+
+    assert not (target / ".pi").exists()
+
+
+class TestInitializeWorkspacePiConfig:
+  """Integration: initialize_workspace installs .pi/ config."""
+
+  def test_installs_pi_extensions(self, tmp_path: Path) -> None:
+    """initialize_workspace copies pi extensions."""
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    ext_dir = tmp_path / ".pi" / "extensions"
+    assert ext_dir.is_dir(), ".pi/extensions/ not created"
+
+    # At least the preboot extension should exist
+    ts_files = list(ext_dir.glob("*.ts"))
+    assert len(ts_files) > 0, "No .ts extension files installed"
+
+  def test_dry_run_does_not_install_pi_config(self, tmp_path: Path) -> None:
+    """Dry-run does not create .pi/ files."""
+    initialize_workspace(tmp_path, dry_run=True)
+
+    assert not (tmp_path / ".pi" / "extensions").exists()
+
+
+# --- Gitignore entry for .pi/APPEND_SYSTEM.md ---
+
+
+class TestInitializeWorkspaceGitignorePiAppend:
+  """initialize_workspace adds .pi/APPEND_SYSTEM.md to .gitignore."""
+
+  def test_adds_pi_append_system_to_gitignore(self, tmp_path: Path) -> None:
+    """Fresh install adds .pi/APPEND_SYSTEM.md to .gitignore."""
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    gitignore = tmp_path / ".gitignore"
+    assert gitignore.exists()
+    content = gitignore.read_text(encoding="utf-8")
+    assert ".pi/APPEND_SYSTEM.md" in content
+
+  def test_pi_append_gitignore_idempotent(self, tmp_path: Path) -> None:
+    """Re-running install does not duplicate the gitignore entry."""
+    initialize_workspace(tmp_path, auto_yes=True)
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    content = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+    assert content.count(".pi/APPEND_SYSTEM.md") == 1
 
 
 # --- Hook file installation tests ---

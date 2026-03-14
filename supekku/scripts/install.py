@@ -786,6 +786,9 @@ def initialize_workspace(
   # Ensure .spec-driver/run/ is gitignored (runtime state, never committed)
   _ensure_gitignore_entry(target_root, f"{SPEC_DRIVER_DIR}/run/", dry_run=dry_run)
 
+  # Ensure .pi/APPEND_SYSTEM.md is gitignored (generated preboot context)
+  _ensure_gitignore_entry(target_root, ".pi/APPEND_SYSTEM.md", dry_run=dry_run)
+
   # Check optional dependencies (informational only)
   _check_optional_dependencies(target_root, auto_yes=auto_yes)
 

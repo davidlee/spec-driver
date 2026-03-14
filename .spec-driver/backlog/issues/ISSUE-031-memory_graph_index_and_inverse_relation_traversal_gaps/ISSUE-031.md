@@ -3,7 +3,7 @@ id: ISSUE-031
 name: Memory graph index and inverse relation traversal gaps
 created: "2026-03-02"
 updated: "2026-03-02"
-status: open
+status: resolved
 kind: issue
 categories: []
 severity: p3

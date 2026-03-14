@@ -3,7 +3,7 @@ id: ISSUE-035
 name: Memory CLI UX improvements
 created: "2026-03-05"
 updated: "2026-03-05"
-status: open
+status: resolved
 kind: issue
 ---
 

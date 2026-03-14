@@ -248,6 +248,14 @@ class WorkspaceValidator:
           self._warning(label, "Finding has no disposition")
           continue
 
+        if not isinstance(disposition, dict):
+          self._error(
+            label,
+            f"Disposition must be a mapping with 'status' and 'kind' keys,"
+            f" got {type(disposition).__name__}: {disposition!r}",
+          )
+          continue
+
         status = disposition.get("status")
         kind = disposition.get("kind")
         outcome = finding.get("outcome")
@@ -258,7 +266,9 @@ class WorkspaceValidator:
           if valid_statuses is not None and status not in valid_statuses:
             self._error(
               label,
-              f"Invalid status×kind: status '{status}' is not valid for kind '{kind}'",
+              f"Invalid status×kind: status '{status}' is not valid"
+              f" for kind '{kind}'"
+              f" (valid: {', '.join(sorted(valid_statuses))})",
             )
 
         # Validate outcome×kind
@@ -268,7 +278,8 @@ class WorkspaceValidator:
             self._error(
               label,
               f"Invalid outcome×kind: kind '{kind}' is not valid"
-              f" for outcome '{outcome}'",
+              f" for outcome '{outcome}'"
+              f" (valid: {', '.join(sorted(valid_kinds))})",
             )
 
         # Validate closure_override has rationale

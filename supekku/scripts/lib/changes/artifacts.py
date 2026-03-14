@@ -93,11 +93,13 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
 
   # Validate status against known values
   if status and status not in VALID_STATUSES:
-    valid_list = ", ".join(sorted(VALID_STATUSES))
-    msg = f"Invalid status '{status}' in {path}\nValid statuses: {valid_list}"
-    raise ValueError(
-      msg,
+    # Show only canonical statuses (exclude legacy aliases like 'complete')
+    canonical = sorted(s for s in VALID_STATUSES if normalize_status(s) == s)
+    msg = (
+      f"Invalid status '{raw_status}' in {path}."
+      f" Valid statuses: {', '.join(canonical)}"
     )
+    raise ValueError(msg)
 
   name = str(frontmatter.get("name", artifact_id))
   slug = str(frontmatter.get("slug", artifact_id.lower()))

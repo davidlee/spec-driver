@@ -4,8 +4,8 @@ name: Audits
 kind: memory
 status: active
 memory_type: concept
-updated: "2026-03-10"
-verified: "2026-03-10"
+updated: "2026-03-15"
+verified: "2026-03-15"
 confidence: high
 tags: [spec-driver, audit, verification]
 summary: Audits (AUD-*) compare implementation against specs. They reconcile realised behavior against intent and feed explicit spec reconciliation before closure.
@@ -72,6 +72,42 @@ When audit findings require spec reconciliation, the branch order is:
 New-spec creation is never a default — it requires explicit justification that
 existing authority boundaries are insufficient. See DE-083 / DR-083 for the
 full design rationale.
+
+## Finding Disposition Schema
+
+Each finding's `disposition` **must be a mapping**, not a plain string.
+Required keys: `status`, `kind`. Optional: `refs`, `drift_refs`, `rationale`,
+`closure_override`.
+
+**Sharp edge**: writing `disposition: aligned` (a bare string) will crash
+the validator. Always use the structured form:
+
+```yaml
+disposition:
+  status: reconciled
+  kind: aligned
+```
+
+### Valid `status` × `kind` pairs
+
+| kind                | valid statuses          |
+|---------------------|------------------------|
+| `aligned`           | `reconciled`            |
+| `spec_patch`        | `pending`, `reconciled` |
+| `revision`          | `pending`, `reconciled` |
+| `follow_up_delta`   | `pending`, `accepted`   |
+| `follow_up_backlog` | `pending`, `accepted`   |
+| `tolerated_drift`   | `accepted`              |
+
+### Valid `outcome` → `kind` mapping
+
+| outcome   | valid kinds                                                                    |
+|-----------|--------------------------------------------------------------------------------|
+| `aligned` | `aligned`                                                                      |
+| `drift`   | `spec_patch`, `revision`, `follow_up_delta`, `follow_up_backlog`, `tolerated_drift` |
+| `risk`    | `spec_patch`, `revision`, `follow_up_delta`, `follow_up_backlog`, `tolerated_drift` |
+
+Authority: [[SPEC-116]], `supekku/scripts/lib/core/frontmatter_metadata/audit.py`
 
 ## Posture Variance
 

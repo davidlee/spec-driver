@@ -3,40 +3,64 @@
 ## Implementation Notes (2026-03-14)
 
 ### What's done
-- `preboot.py`: extended `write_preboot_file()` to dual-output
-  - `.agents/spec-driver-boot.md` (Claude Code, existing)
-  - `.pi/APPEND_SYSTEM.md` (pi, new — auto-discovered by pi as append-system-prompt)
-  - Extracted `_write_if_changed()` helper; both outputs use content-diffing
-- `.pi/extensions/spec-driver-preboot.ts`: hooks `session_shutdown` → runs `spec-driver admin preboot ctx.cwd`
-- `flake.nix`: wraps `jailed-pi` and `jailed-pi-research` with host-side preboot before jail entry
-- `.gitignore`: added `.pi/APPEND_SYSTEM.md` (generated file)
-- `preboot_test.py`: 3 new tests for pi output (existence, parity, skip-when-unchanged)
 
-### Key discovery: pi doesn't resolve `@` includes in AGENTS.md
-The root `AGENTS.md` uses Claude Code `@path` syntax, which pi reads as literal text.
-Used `.pi/APPEND_SYSTEM.md` (pi's native auto-discovery for appended system prompt)
-instead of trying to modify AGENTS.md. This cleanly separates the two agents' context paths.
+**preboot.py** — dual output
+- `write_preboot_file()` now writes to both `.agents/spec-driver-boot.md` (Claude Code)
+  and `.pi/APPEND_SYSTEM.md` (pi auto-discovery)
+- Extracted `_write_if_changed()` helper; content-diffing on both outputs
+- Docstring updated to reference both agents and DE-093
 
-### Key discovery: `session_shutdown` is the correct hook for `/reload` freshness
-pi's reload sequence: `session_shutdown` (awaited) → `resourceLoader.reload()` → `session_start`.
-The extension must hook `session_shutdown` not `session_start` to ensure preboot runs
-before AGENTS.md is re-read. Verified from pi source (`agent-session.js` lines 1784-1801).
+**pi extension** — `supekku/pi.extensions/spec-driver-preboot.ts`
+- ~10 LOC; hooks `session_shutdown` → runs `spec-driver admin preboot ctx.cwd`
+- Source lives in `supekku/pi.extensions/` (package source), installed to `.pi/extensions/` by `spec-driver install`
+
+**install.py** — pi config installer
+- `_install_pi_config()` copies `supekku/pi.extensions/*` → `.pi/extensions/`
+- Installer-owned, overwritten on every install (same semantics as claude.hooks)
+- Wired into `initialize_workspace()` alongside `_install_claude_config()`
+
+**pyproject.toml** — wheel packaging
+- `force-include` for `supekku/pi.extensions` (no .py files, wouldn't be picked up otherwise)
+
+**flake.nix** — Nix wrapper (belt)
+- `jailed-pi` and `jailed-pi-research` wrapped with host-side preboot before jail entry
+- Fixed name collision (raw + wrapper both producing `bin/jailed-pi`)
+- Fixed `lib.getExe` warning → `lib.getExe'` + `meta.mainProgram`
+
+**.gitignore** — `.pi/APPEND_SYSTEM.md` (generated)
+
+**preboot_test.py** — 3 new tests for pi output (existence, parity, skip-when-unchanged)
+
+**memories** — 2 captured
+- `mem.fact.pi.append-system-md-discovery` — `.pi/APPEND_SYSTEM.md` auto-discovery
+- `mem.fact.pi.session-shutdown-hook-timing` — `/reload` event ordering
 
 ### Surprises / adaptations
-- pi's `APPEND_SYSTEM.md` discovery was not documented in README — found by reading
-  `resource-loader.js` source. Looks for `.pi/APPEND_SYSTEM.md` (project) or
-  `~/.pi/agent/APPEND_SYSTEM.md` (global).
-- System prompt survives compaction (only messages are replaced) — so preboot content
-  stays in context without needing per-turn re-injection.
+- pi doesn't resolve `@` includes in AGENTS.md — Claude Code syntax is literal text to pi.
+  Used `.pi/APPEND_SYSTEM.md` (pi-native auto-discovery) instead.
+- `APPEND_SYSTEM.md` discovery is undocumented in pi README; found in `resource-loader.js`.
+- System prompt survives compaction (only messages replaced) — preboot content persists
+  without per-turn re-injection.
+- `hatch` includes non-.py files under the package dir if .py files are present in the
+  same dir, but `pi.extensions/` has only `.ts` — needed `force-include`.
 
 ### Commits
 - `c9b6561` — feat(DE-093): preboot hook for pi — belt and suspenders
+- `0c16582` — fix(DE-093): resolve jailed-pi name collision and getExe warning
+- `6132f94` — mem(DE-093): pi APPEND_SYSTEM.md discovery and session_shutdown hook timing
+- `8304e69` — feat(DE-093): install pi extensions via spec-driver install
 
 ### Verification
-- Tests not yet run (installed spec-driver is Nix-built, doesn't reflect source changes).
-  User will test in a new session.
+- Nix flake builds successfully after collision fix
+- pi confirmed loading preboot governance context (ADRs, policies, standards) into system prompt
+- Tests not yet run against source (installed spec-driver is Nix-built, doesn't reflect changes)
+- User to test `spec-driver install` in a fresh session
 
-### Follow-ups
-- Consider a memory for the `APPEND_SYSTEM.md` discovery path and the
-  `session_shutdown` hook timing — both are non-obvious and would save future agents time.
-- The preboot docstring now references DE-093 alongside DE-091 for traceability.
+### Rough edges / follow-ups
+- No test for `_install_pi_config()` in install_test.py yet — should mirror the
+  `_install_claude_config` test pattern
+- No test for the `.ts` file being included in the wheel build
+- The `artifact_event.py` equivalent for pi (tool-call observation via RPC events)
+  is deferred to future work (DE-092 or successor)
+- `.pi/APPEND_SYSTEM.md` should probably also be in a default `.gitignore` entry
+  added by `_ensure_gitignore_entry()` during install

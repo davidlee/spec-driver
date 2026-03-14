@@ -1,9 +1,9 @@
 ---
 id: IP-073.PHASE-03
 slug: 073-standardize_show_output_selectors-phase-03
-name: "resolve links improvements"
-created: "2026-03-09"
-updated: "2026-03-09"
+name: resolve links improvements
+created: '2026-03-09'
+updated: '2026-03-09'
 status: completed
 kind: phase
 ---

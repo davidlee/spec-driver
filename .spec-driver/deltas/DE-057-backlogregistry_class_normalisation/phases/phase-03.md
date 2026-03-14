@@ -2,8 +2,8 @@
 id: IP-057.PHASE-03
 slug: 057-backlogregistry_class_normalisation-phase-03
 name: IP-057 Phase 03 - Closure
-created: "2026-03-07"
-updated: "2026-03-07"
+created: '2026-03-07'
+updated: '2026-03-07'
 status: draft
 kind: phase
 ---

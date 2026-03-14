@@ -2,21 +2,21 @@
 id: PROD-016
 slug: agentic_sdlc_configurator
 name: agentic sdlc configurator
-created: "2026-02-23"
-updated: "2026-03-04"
+created: '2026-02-23'
+updated: '2026-03-04'
 status: draft
 kind: prod
 aliases: []
 relations: []
 guiding_principles:
-  - Prefer small, composable primitives over a single rigid workflow.
-  - Support legacy repos first; scale up ceremony when justified.
-  - Make “the right next step” obvious without hard constraints.
-  - Keep agent onboarding token-cheap (prescription short; runsheets on demand).
-  - Provider-neutral skills first; provider wrappers are thin adapters.
+- Prefer small, composable primitives over a single rigid workflow.
+- Support legacy repos first; scale up ceremony when justified.
+- Make “the right next step” obvious without hard constraints.
+- Keep agent onboarding token-cheap (prescription short; runsheets on demand).
+- Provider-neutral skills first; provider wrappers are thin adapters.
 assumptions:
-  - Teams adopt spec-driver gradually and unevenly; partial activation is normal.
-  - An 80/20 set of knobs plus a small doctrine escape hatch covers most real projects.
+- Teams adopt spec-driver gradually and unevenly; partial activation is normal.
+- An 80/20 set of knobs plus a small doctrine escape hatch covers most real projects.
 ---
 
 # PROD-016 – agentic sdlc configurator

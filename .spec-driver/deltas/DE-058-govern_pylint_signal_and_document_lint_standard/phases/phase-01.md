@@ -2,8 +2,8 @@
 id: IP-058.PHASE-01
 slug: 058-govern_pylint_signal_and_document_lint_standard-phase-01
 name: IP-058 Phase 01
-created: "2026-03-07"
-updated: "2026-03-07"
+created: '2026-03-07'
+updated: '2026-03-07'
 status: in-progress
 kind: phase
 ---

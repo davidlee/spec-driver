@@ -2,8 +2,8 @@
 id: IP-015.PHASE-04
 slug: 015-implement-backlog-prioritization-with-interactive-ordering-phase-04
 name: IP-015 Phase 04
-created: "2025-11-04"
-updated: "2025-11-04"
+created: '2025-11-04'
+updated: '2025-11-04'
 status: draft
 kind: phase
 ---

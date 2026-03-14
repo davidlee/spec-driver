@@ -2,8 +2,8 @@
 id: IP-054.PHASE-01
 slug: 054-tui_track_mode_real_time_agent_session_following-phase-01
 name: IP-054 Phase 01 — EventListener infrastructure
-created: "2026-03-07"
-updated: "2026-03-07"
+created: '2026-03-07'
+updated: '2026-03-07'
 status: completed
 kind: phase
 ---

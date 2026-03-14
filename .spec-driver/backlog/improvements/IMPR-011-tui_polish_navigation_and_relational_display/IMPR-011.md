@@ -1,15 +1,15 @@
 ---
 id: IMPR-011
 name: TUI polish, navigation, and relational display
-created: "2026-03-07"
-updated: "2026-03-07"
+created: '2026-03-07'
+updated: '2026-03-07'
 status: open
 kind: improvement
 relations:
-  - type: follows-up
-    target: DE-053
-  - type: related-to
-    target: IMPR-009
+- type: follows-up
+  target: DE-053
+- type: related-to
+  target: IMPR-009
 ---
 
 # TUI polish, navigation, and relational display

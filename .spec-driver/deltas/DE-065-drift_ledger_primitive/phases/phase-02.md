@@ -2,8 +2,8 @@
 id: IP-065.PHASE-02
 slug: 065-drift_ledger_primitive-phase-02
 name: Formatters, CLI, DE-063 integration
-created: "2026-03-08"
-updated: "2026-03-08"
+created: '2026-03-08'
+updated: '2026-03-08'
 status: draft
 kind: phase
 ---

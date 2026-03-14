@@ -2,32 +2,31 @@
 id: SPEC-110
 slug: supekku-cli
 name: supekku/cli Specification
-created: "2025-11-02"
-updated: "2025-11-03"
+created: '2025-11-02'
+updated: '2025-11-03'
 status: draft
 kind: spec
 category: unit
 c4_level: code
 responsibilities:
-  - Provide unified command-line interface for spec-driver operations
-  - Orchestrate thin command layers that delegate to registries and formatters
-  - Enforce consistent flag patterns across all list/show/create commands
-  - Support multiple output formats (table, JSON, TSV) for automation workflows
-  - Handle user input validation and error reporting with clear exit codes
+- Provide unified command-line interface for spec-driver operations
+- Orchestrate thin command layers that delegate to registries and formatters
+- Enforce consistent flag patterns across all list/show/create commands
+- Support multiple output formats (table, JSON, TSV) for automation workflows
+- Handle user input validation and error reporting with clear exit codes
 aliases: []
-packages:
-  - supekku/cli
+packages: [supekku/cli]
 sources:
-  - language: python
-    identifier: supekku/cli
-    module: supekku.cli
-    variants:
-      - name: api
-        path: contracts/api.md
-      - name: implementation
-        path: contracts/implementation.md
-      - name: tests
-        path: contracts/tests.md
+- language: python
+  identifier: supekku/cli
+  module: supekku.cli
+  variants:
+  - name: api
+    path: contracts/api.md
+  - name: implementation
+    path: contracts/implementation.md
+  - name: tests
+    path: contracts/tests.md
 owners: []
 auditers: []
 relations: []

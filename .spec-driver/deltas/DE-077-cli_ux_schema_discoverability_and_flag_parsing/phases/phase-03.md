@@ -1,9 +1,9 @@
 ---
 id: IP-077.PHASE-03
 slug: 077-cli_ux_schema_discoverability_and_flag_parsing-phase-03
-name: "IP-077 Phase 03: Skills and memory coverage"
-created: "2026-03-09"
-updated: "2026-03-09"
+name: 'IP-077 Phase 03: Skills and memory coverage'
+created: '2026-03-09'
+updated: '2026-03-09'
 status: draft
 kind: phase
 ---

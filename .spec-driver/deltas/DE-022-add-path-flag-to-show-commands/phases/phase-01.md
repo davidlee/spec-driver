@@ -2,8 +2,8 @@
 id: IP-022.PHASE-01
 slug: 022-add-path-flag-to-show-commands-phase-01
 name: IP-022 Phase 01 - Implement --path and --json flags
-created: "2026-02-04"
-updated: "2026-02-04"
+created: '2026-02-04'
+updated: '2026-02-04'
 status: complete
 kind: phase
 ---

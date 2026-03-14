@@ -2,8 +2,8 @@
 id: IP-036.PHASE-02
 slug: 036-frontmatter_metadata_compaction_and_canonicalization_controls-phase-02
 name: IP-036 Phase 02 - Memory Controls
-created: "2026-03-03"
-updated: "2026-03-03"
+created: '2026-03-03'
+updated: '2026-03-03'
 status: complete
 kind: phase
 ---

@@ -1,8 +1,8 @@
 ---
 id: ISSUE-025
 name: Backlog list should hide resolved/implemented items by default and support pagination
-created: "2025-11-08"
-updated: "2025-11-08"
+created: '2025-11-08'
+updated: '2025-11-08'
 status: resolved
 kind: issue
 categories: [enhancement, ux]

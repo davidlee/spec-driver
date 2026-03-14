@@ -1,15 +1,14 @@
 ---
 id: ISSUE-047
-name: "Memory verification primitive: SHA-stamped attestation for staleness tracking"
-created: "2026-03-09"
-updated: "2026-03-10"
+name: 'Memory verification primitive: SHA-stamped attestation for staleness tracking'
+created: '2026-03-09'
+updated: '2026-03-10'
 status: resolved
 kind: issue
 categories: [memory, traceability, verification]
 severity: p2
 impact: system
-related:
-  - ISSUE-020
+related: [ISSUE-020]
 ---
 
 # Memory verification primitive: SHA-stamped attestation for staleness tracking

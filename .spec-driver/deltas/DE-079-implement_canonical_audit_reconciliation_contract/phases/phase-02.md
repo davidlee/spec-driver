@@ -1,9 +1,9 @@
 ---
 id: IP-079.PHASE-02
 slug: 079-implement_canonical_audit_reconciliation_contract-phase-02
-name: "IP-079 Phase 02 — Audit gating module"
-created: "2026-03-09"
-updated: "2026-03-09"
+name: IP-079 Phase 02 — Audit gating module
+created: '2026-03-09'
+updated: '2026-03-09'
 status: completed
 kind: phase
 ---

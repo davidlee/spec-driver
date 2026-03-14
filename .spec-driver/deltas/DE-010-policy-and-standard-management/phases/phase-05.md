@@ -2,8 +2,8 @@
 id: IP-010.PHASE-05
 slug: 010-policy-and-standard-management-phase-05
 name: IP-010 Phase 05
-created: "2025-11-04"
-updated: "2025-11-04"
+created: '2025-11-04'
+updated: '2025-11-04'
 status: draft
 kind: phase
 ---

@@ -2,8 +2,8 @@
 id: IP-043.PHASE-02
 slug: 043-guidance-and-memory
 name: IP-043 Phase 02 - Guidance and memory
-created: "2026-03-05"
-updated: "2026-03-05"
+created: '2026-03-05'
+updated: '2026-03-05'
 status: completed
 kind: phase
 ---

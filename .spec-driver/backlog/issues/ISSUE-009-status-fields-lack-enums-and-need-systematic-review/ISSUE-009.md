@@ -1,13 +1,11 @@
 ---
 id: ISSUE-009
 name: Status fields lack enums and need systematic review
-created: "2025-11-02"
-updated: "2026-03-08"
+created: '2025-11-02'
+updated: '2026-03-08'
 status: resolved
 kind: issue
-categories:
-  - architecture
-  - data-model
+categories: [architecture, data-model]
 severity: p2
 impact: maintainability
 ---

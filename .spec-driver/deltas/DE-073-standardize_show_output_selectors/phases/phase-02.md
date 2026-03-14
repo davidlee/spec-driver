@@ -1,9 +1,9 @@
 ---
 id: IP-073.PHASE-02
 slug: 073-standardize_show_output_selectors-phase-02
-name: "view refactor and read alias"
-created: "2026-03-09"
-updated: "2026-03-09"
+name: view refactor and read alias
+created: '2026-03-09'
+updated: '2026-03-09'
 status: completed
 kind: phase
 ---

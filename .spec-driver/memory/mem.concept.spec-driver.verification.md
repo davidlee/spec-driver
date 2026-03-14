@@ -4,25 +4,21 @@ name: Verification
 kind: memory
 status: active
 memory_type: concept
-updated: "2026-03-06"
-verified: "2026-03-06"
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
-tags:
-  - spec-driver
-  - verification
-  - evidence
-summary:
-  Three verification artifact types (VT, VA, VH) provide evidence that requirements
-  are satisfied. Coverage blocks in specs track their status.
+tags: [spec-driver, verification, evidence]
+summary: Three verification artifact types (VT, VA, VH) provide evidence that requirements are satisfied. Coverage blocks
+  in specs track their status.
 priority:
   severity: medium
   weight: 7
 provenance:
   sources:
-    - kind: code
-      ref: supekku/scripts/lib/blocks/verification.py
-    - kind: doc
-      ref: supekku/about/lifecycle.md
+  - kind: code
+    ref: supekku/scripts/lib/blocks/verification.py
+  - kind: doc
+    ref: supekku/about/lifecycle.md
 ---
 
 # Verification

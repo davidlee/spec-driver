@@ -1,13 +1,11 @@
 ---
 id: ISSUE-026
-name: "Make sync dry-run/check semantics consistent for ADR/backlog/requirements"
-created: "2026-02-06"
-updated: "2026-03-07"
+name: Make sync dry-run/check semantics consistent for ADR/backlog/requirements
+created: '2026-02-06'
+updated: '2026-03-07'
 status: in-progress
 kind: issue
-categories:
-  - cli
-  - sync
+categories: [cli, sync]
 severity: p3
 impact: user
 ---

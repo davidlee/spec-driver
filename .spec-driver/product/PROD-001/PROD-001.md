@@ -2,8 +2,8 @@
 id: PROD-001
 slug: streamline-spec-creation
 name: streamline spec creation
-created: "2025-11-01"
-updated: "2025-11-01"
+created: '2025-11-01'
+updated: '2025-11-01'
 status: draft
 kind: prod
 aliases: []

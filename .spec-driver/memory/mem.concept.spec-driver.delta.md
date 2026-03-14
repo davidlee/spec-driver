@@ -4,29 +4,25 @@ name: Deltas
 kind: memory
 status: active
 memory_type: concept
-updated: "2026-03-06"
-verified: "2026-03-06"
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
-tags:
-  - spec-driver
-  - delta
-summary:
-  "Deltas (DE-*) are declarative change bundles \u2014 the mechanism for applying\
-  \ revision intent to code. They scope work, link requirements, and carry verification\
-  \ strategy toward audit/reconciliation."
+tags: [spec-driver, delta]
+summary: Deltas (DE-*) are declarative change bundles — the mechanism for applying revision intent to code. They scope work,
+  link requirements, and carry verification strategy toward audit/reconciliation.
 priority:
   severity: high
   weight: 8
 provenance:
   sources:
-    - kind: adr
-      ref: ADR-004
-    - kind: code
-      ref: supekku/cli/create.py
-    - kind: code
-      ref: supekku/scripts/lib/changes/creation.py
-    - kind: code
-      ref: supekku/scripts/complete_delta.py
+  - kind: adr
+    ref: ADR-004
+  - kind: code
+    ref: supekku/cli/create.py
+  - kind: code
+    ref: supekku/scripts/lib/changes/creation.py
+  - kind: code
+    ref: supekku/scripts/complete_delta.py
 ---
 
 # Deltas

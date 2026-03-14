@@ -1,6 +1,7 @@
 ---
 name: audit-change
-description: Canonical reconciliation runsheet for AUD artefacts. Create or update the audit, disposition every finding, reconcile specs/contracts, and hand off to closure only when audit state supports it.
+description: Canonical reconciliation runsheet for AUD artefacts. Create or update the audit, disposition every finding, reconcile
+  specs/contracts, and hand off to closure only when audit state supports it.
 ---
 
 You are running the canonical audit reconciliation loop.

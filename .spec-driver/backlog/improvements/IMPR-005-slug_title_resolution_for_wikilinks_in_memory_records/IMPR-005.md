@@ -1,8 +1,8 @@
 ---
 id: IMPR-005
 name: Slug/title resolution for [[...]] wikilinks in memory records
-created: "2026-03-03"
-updated: "2026-03-03"
+created: '2026-03-03'
+updated: '2026-03-03'
 status: open
 kind: improvement
 ---

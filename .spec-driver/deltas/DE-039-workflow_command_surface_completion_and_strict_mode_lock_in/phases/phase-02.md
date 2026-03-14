@@ -2,8 +2,8 @@
 id: IP-039.PHASE-02
 slug: 039-workflow_command_surface_completion_and_strict_mode_lock_in-phase-02
 name: IP-039 Phase 02
-created: "2026-03-04"
-updated: "2026-03-04"
+created: '2026-03-04'
+updated: '2026-03-04'
 status: completed
 kind: phase
 ---

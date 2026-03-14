@@ -2,8 +2,8 @@
 id: IP-017.PHASE-02
 slug: 017-add-category-support-to-requirements-phase-02
 name: IP-017 Phase 02
-created: "2025-11-04"
-updated: "2025-11-04"
+created: '2025-11-04'
+updated: '2025-11-04'
 status: completed
 kind: phase
 ---

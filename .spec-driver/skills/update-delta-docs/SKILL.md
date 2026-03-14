@@ -1,6 +1,7 @@
 ---
 name: update-delta-docs
-description: Reconcile DE/IP/phase/DR execution artefacts during delta work. Use this when implementation changes structured execution state, not just notes.
+description: Reconcile DE/IP/phase/DR execution artefacts during delta work. Use this when implementation changes structured
+  execution state, not just notes.
 ---
 
 This skill is for structured delta execution documentation.

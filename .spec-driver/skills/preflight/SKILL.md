@@ -1,6 +1,7 @@
 ---
 name: preflight
-description: Use after routing has already happened, when the next step is bounded up-front research to understand a substantive task, surface unknowns and tensions, and assess readiness without drifting into implementation or open-ended exploration.
+description: Use after routing has already happened, when the next step is bounded up-front research to understand a substantive
+  task, surface unknowns and tensions, and assess readiness without drifting into implementation or open-ended exploration.
 ---
 
 This is NOT the first routing skill for work in a spec-driver repo.

@@ -2,8 +2,8 @@
 id: IP-004.PHASE-05
 slug: 004-phase-management-implementation-phase-05
 name: IP-004 Phase 05
-created: "2025-11-03"
-updated: "2025-11-03"
+created: '2025-11-03'
+updated: '2025-11-03'
 status: draft
 kind: phase
 ---

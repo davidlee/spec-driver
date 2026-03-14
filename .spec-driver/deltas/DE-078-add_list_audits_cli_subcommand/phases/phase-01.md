@@ -2,8 +2,8 @@
 id: IP-078.PHASE-01
 slug: 078-add_list_audits_cli_subcommand-phase-01
 name: Implement list audits subcommand
-created: "2026-03-09"
-updated: "2026-03-09"
+created: '2026-03-09'
+updated: '2026-03-09'
 status: completed
 kind: phase
 ---

@@ -1,9 +1,9 @@
 ---
 id: IP-063.PHASE-02
 slug: 063-id-inference
-name: "P02: ID inference for show/view"
-created: "2026-03-08"
-updated: "2026-03-08"
+name: 'P02: ID inference for show/view'
+created: '2026-03-08'
+updated: '2026-03-08'
 status: draft
 kind: phase
 ---

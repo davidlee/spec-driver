@@ -4,29 +4,24 @@ name: Spec-Driver Overview
 kind: memory
 status: active
 memory_type: signpost
-updated: "2026-03-05"
-verified: "2026-03-05"
-tags:
-  - spec-driver
-  - overview
-  - workflow
-summary:
-  "Concise overview of spec-driver: core loop, ceremony modes, key artifacts,
-  and common commands."
+updated: '2026-03-05'
+verified: '2026-03-05'
+tags: [spec-driver, overview, workflow]
+summary: 'Concise overview of spec-driver: core loop, ceremony modes, key artifacts, and common commands.'
 scope:
   commands:
-    - uv run spec-driver create delta
-    - uv run spec-driver complete delta
-    - uv run spec-driver sync
-    - uv run spec-driver validate
+  - uv run spec-driver create delta
+  - uv run spec-driver complete delta
+  - uv run spec-driver sync
+  - uv run spec-driver validate
 provenance:
   sources:
-    - kind: memory
-      ref: mem.pattern.spec-driver.core-loop
-    - kind: memory
-      ref: mem.signpost.spec-driver.ceremony
-    - kind: memory
-      ref: mem.signpost.spec-driver.file-map
+  - kind: memory
+    ref: mem.pattern.spec-driver.core-loop
+  - kind: memory
+    ref: mem.signpost.spec-driver.ceremony
+  - kind: memory
+    ref: mem.signpost.spec-driver.file-map
 ---
 
 # Spec-Driver Overview

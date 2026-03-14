@@ -2,8 +2,8 @@
 id: IP-066.PHASE-01
 slug: 066-tui_drift_ledger_integration-phase-01
 name: Wire and verify
-created: "2026-03-08"
-updated: "2026-03-08"
+created: '2026-03-08'
+updated: '2026-03-08'
 status: draft
 kind: phase
 ---

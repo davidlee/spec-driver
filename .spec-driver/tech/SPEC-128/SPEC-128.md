@@ -2,8 +2,8 @@
 id: SPEC-128
 slug: no-repo
 name: No Repo
-created: "2025-11-04"
-updated: "2025-11-04"
+created: '2025-11-04'
+updated: '2025-11-04'
 status: draft
 kind: spec
 category: unit

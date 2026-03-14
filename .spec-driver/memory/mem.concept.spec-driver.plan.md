@@ -4,29 +4,25 @@ name: Implementation Plans
 kind: memory
 status: active
 memory_type: concept
-updated: "2026-03-06"
-verified: "2026-03-06"
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
-tags:
-  - spec-driver
-  - plan
-  - phases
-summary:
-  Implementation Plans (IP-*) break delta execution into verifiable phases
-  with entrance/exit criteria. Phase sheets track detailed task progress.
+tags: [spec-driver, plan, phases]
+summary: Implementation Plans (IP-*) break delta execution into verifiable phases with entrance/exit criteria. Phase sheets
+  track detailed task progress.
 priority:
   severity: medium
   weight: 6
 provenance:
   sources:
-    - kind: adr
-      ref: ADR-004
-    - kind: code
-      ref: supekku/cli/create.py
-    - kind: code
-      ref: supekku/scripts/lib/changes/creation.py
-    - kind: code
-      ref: supekku/scripts/lib/changes/creation.py
+  - kind: adr
+    ref: ADR-004
+  - kind: code
+    ref: supekku/cli/create.py
+  - kind: code
+    ref: supekku/scripts/lib/changes/creation.py
+  - kind: code
+    ref: supekku/scripts/lib/changes/creation.py
 ---
 
 # Implementation Plans

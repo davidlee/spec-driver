@@ -2,8 +2,8 @@
 id: IP-067.PHASE-01
 slug: 067-add_extid_and_exturl_support_to_specs_requirements_backlog_policies_standards-phase-01
 name: IP-067 Phase 01
-created: "2026-03-08"
-updated: "2026-03-08"
+created: '2026-03-08'
+updated: '2026-03-08'
 status: completed
 kind: phase
 ---

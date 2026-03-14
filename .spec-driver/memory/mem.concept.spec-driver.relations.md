@@ -4,29 +4,24 @@ name: Relations and Traceability
 kind: memory
 status: active
 memory_type: concept
-updated: "2026-03-06"
-verified: "2026-03-06"
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
-tags:
-  - spec-driver
-  - relations
-  - traceability
-summary:
-  "Relations link artefacts via frontmatter. Traceability arrays are automatic
-  via sync. Requirement lifecycle is derived from coverage and revisions, not edited
-  directly in the registry."
+tags: [spec-driver, relations, traceability]
+summary: Relations link artefacts via frontmatter. Traceability arrays are automatic via sync. Requirement lifecycle is derived
+  from coverage and revisions, not edited directly in the registry.
 priority:
   severity: high
   weight: 8
 provenance:
   sources:
-    - kind: doc
-      note: Traceability semantics
-      ref: supekku/about/lifecycle.md
-    - kind: code
-      ref: supekku/scripts/lib/requirements/registry.py
-    - kind: code
-      ref: supekku/scripts/lib/blocks/relationships.py
+  - kind: doc
+    note: Traceability semantics
+    ref: supekku/about/lifecycle.md
+  - kind: code
+    ref: supekku/scripts/lib/requirements/registry.py
+  - kind: code
+    ref: supekku/scripts/lib/blocks/relationships.py
 ---
 
 # Relations and Traceability

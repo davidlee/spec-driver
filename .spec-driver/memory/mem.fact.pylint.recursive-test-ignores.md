@@ -4,32 +4,26 @@ name: Pylint Recursive Test Ignores
 kind: memory
 status: active
 memory_type: fact
-updated: "2026-03-07"
-verified: "2026-03-07"
-tags:
-  - pylint
-  - lint
-  - tests
-summary:
-  pylint-per-file-ignores needs recursive glob patterns here; plain *_test.py
-  only matches repo-root files and leaves nested test warnings unsuppressed.
+updated: '2026-03-07'
+verified: '2026-03-07'
+tags: [pylint, lint, tests]
+summary: pylint-per-file-ignores needs recursive glob patterns here; plain *_test.py only matches repo-root files and leaves
+  nested test warnings unsuppressed.
 scope:
   paths:
-    - pyproject.toml
-    - .venv/lib/python3.12/site-packages/pylint_per_file_ignores/_plugin.py
-  commands:
-    - just pylint
-    - uv run pylint
+  - pyproject.toml
+  - .venv/lib/python3.12/site-packages/pylint_per_file_ignores/_plugin.py
+  commands: [just pylint, uv run pylint]
 provenance:
   sources:
-    - kind: code
-      ref: pyproject.toml
-      note: Current pylint per-file ignore configuration
-    - kind: code
-      ref: .venv/lib/python3.12/site-packages/pylint_per_file_ignores/_plugin.py
-      note: Plugin loads file matches via glob.glob(pattern, recursive=True)
-    - kind: delta
-      ref: DE-058
+  - kind: code
+    ref: pyproject.toml
+    note: Current pylint per-file ignore configuration
+  - kind: code
+    ref: .venv/lib/python3.12/site-packages/pylint_per_file_ignores/_plugin.py
+    note: Plugin loads file matches via glob.glob(pattern, recursive=True)
+  - kind: delta
+    ref: DE-058
 ---
 
 # Pylint Recursive Test Ignores

@@ -1,10 +1,10 @@
 ---
 id: ADR-003
-title: "ADR-003: Separate unit and assembly specs"
+title: 'ADR-003: Separate unit and assembly specs'
 status: accepted
-created: "2026-02-20"
-updated: "2026-02-21"
-reviewed: "2026-02-21"
+created: '2026-02-20'
+updated: '2026-02-21'
+reviewed: '2026-02-21'
 owners: []
 supersedes: []
 superseded_by: []
@@ -17,7 +17,8 @@ audits: []
 related_decisions: []
 related_policies: []
 tags: []
-summary: "Introduce explicit separation between auto-generated unit specs (1:1 with code units) and human-authored assembly specs (cross-unit), with a clear truth/precedence model."
+summary: Introduce explicit separation between auto-generated unit specs (1:1 with code units) and human-authored assembly
+  specs (cross-unit), with a clear truth/precedence model.
 ---
 
 # ADR-003: Separate unit and assembly specs

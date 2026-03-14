@@ -1,8 +1,8 @@
 ---
 id: ISSUE-023
 name: CLI create commands should show schema inspection commands
-created: "2025-11-08"
-updated: "2025-11-08"
+created: '2025-11-08'
+updated: '2025-11-08'
 status: resolved
 kind: issue
 categories: [cli, ux, discoverability]

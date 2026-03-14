@@ -2,8 +2,8 @@
 id: IP-067.PHASE-02
 slug: 067-formatters-and-cli
 name: IP-067 Phase 02 - Formatters and CLI
-created: "2026-03-08"
-updated: "2026-03-08"
+created: '2026-03-08'
+updated: '2026-03-08'
 status: complete
 kind: phase
 ---

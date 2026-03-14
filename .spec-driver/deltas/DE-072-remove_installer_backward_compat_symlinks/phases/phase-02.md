@@ -2,8 +2,8 @@
 id: IP-072.PHASE-02
 slug: 072-remove_installer_backward_compat_symlinks-phase-02
 name: IP-072 Phase 02
-created: "2026-03-08"
-updated: "2026-03-08"
+created: '2026-03-08'
+updated: '2026-03-08'
 status: completed
 kind: phase
 ---

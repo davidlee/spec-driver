@@ -1,9 +1,9 @@
 ---
 id: IP-075.PHASE-02
 slug: 075-status_fields_lack_enums_and_need_systematic_review-phase-02
-name: "IP-075 Phase 02: theme alignment and backlog migration"
-created: "2026-03-09"
-updated: "2026-03-09"
+name: 'IP-075 Phase 02: theme alignment and backlog migration'
+created: '2026-03-09'
+updated: '2026-03-09'
 status: complete
 kind: phase
 ---

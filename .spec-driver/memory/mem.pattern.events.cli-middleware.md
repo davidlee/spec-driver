@@ -4,16 +4,12 @@ name: Event emission via process-boundary wrapper
 kind: memory
 status: active
 memory_type: pattern
-created: "2026-03-07"
-updated: "2026-03-07"
-tags:
-  - architecture
-  - events
-  - cli
-summary: CLI event emission uses a process-boundary wrapper in main() to emit
-  events after every command, rather than scattering explicit emit_event() calls
-  in each command function. result_callback is unsound because all commands exit
-  via raise typer.Exit(), which bypasses it.
+created: '2026-03-07'
+updated: '2026-03-07'
+tags: [architecture, events, cli]
+summary: CLI event emission uses a process-boundary wrapper in main() to emit events after every command, rather than scattering
+  explicit emit_event() calls in each command function. result_callback is unsound because all commands exit via raise typer.Exit(),
+  which bypasses it.
 ---
 
 # Event emission via process-boundary wrapper

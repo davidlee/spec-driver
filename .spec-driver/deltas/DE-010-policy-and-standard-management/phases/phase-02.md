@@ -2,8 +2,8 @@
 id: IP-010.PHASE-02
 slug: 010-policy-and-standard-management-phase-02
 name: IP-010 Phase 02
-created: "2025-11-03"
-updated: "2025-11-03"
+created: '2025-11-03'
+updated: '2025-11-03'
 status: completed
 kind: phase
 aliases: []

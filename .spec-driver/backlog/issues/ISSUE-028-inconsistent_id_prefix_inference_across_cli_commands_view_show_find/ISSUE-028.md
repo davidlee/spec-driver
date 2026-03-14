@@ -1,13 +1,11 @@
 ---
 id: ISSUE-028
-name: "Inconsistent ID prefix inference across CLI commands (view/show/find)"
-created: "2026-02-06"
-updated: "2026-02-06"
+name: Inconsistent ID prefix inference across CLI commands (view/show/find)
+created: '2026-02-06'
+updated: '2026-02-06'
 status: resolved
 kind: issue
-categories:
-  - cli
-  - ux
+categories: [cli, ux]
 severity: p3
 impact: user
 ---

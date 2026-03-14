@@ -1,8 +1,8 @@
 ---
 id: ISSUE-024
 name: Add ExtID and ExtURL support to specs, requirements, backlog, policies, standards
-created: "2025-11-08"
-updated: "2025-11-08"
+created: '2025-11-08'
+updated: '2025-11-08'
 status: resolved
 kind: issue
 categories: [enhancement, integration]

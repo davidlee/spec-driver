@@ -1,30 +1,24 @@
 ---
 id: ADR-008
-title: "ADR-008: normative lifecycle truth and observed evidence reconciliation"
+title: 'ADR-008: normative lifecycle truth and observed evidence reconciliation'
 status: accepted
-created: "2026-03-06"
-updated: "2026-03-06"
-reviewed: "2026-03-06"
+created: '2026-03-06'
+updated: '2026-03-06'
+reviewed: '2026-03-06'
 owners: []
 supersedes: []
 superseded_by: []
 policies: []
-specs:
-  - PROD-008
-  - PROD-009
+specs: [PROD-008, PROD-009]
 requirements: []
-deltas:
-  - DE-047
+deltas: [DE-047]
 revisions: []
 audits: []
-related_decisions:
-  - ADR-004
+related_decisions: [ADR-004]
 related_policies: []
-tags:
-  - lifecycle
-  - requirements
-  - architecture
-summary: "Specs own normative lifecycle truth; audits, deltas, and contracts contribute observed evidence overlays; drift is reconciled explicitly rather than silently by timestamp precedence."
+tags: [lifecycle, requirements, architecture]
+summary: Specs own normative lifecycle truth; audits, deltas, and contracts contribute observed evidence overlays; drift is
+  reconciled explicitly rather than silently by timestamp precedence.
 ---
 
 # ADR-008: normative lifecycle truth and observed evidence reconciliation

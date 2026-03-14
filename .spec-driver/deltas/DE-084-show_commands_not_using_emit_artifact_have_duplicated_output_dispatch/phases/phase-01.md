@@ -2,8 +2,8 @@
 id: IP-084.PHASE-01
 slug: migrate-show-requirement-and-card
 name: Migrate show requirement and show card to emit_artifact
-created: "2026-03-09"
-updated: "2026-03-09"
+created: '2026-03-09'
+updated: '2026-03-09'
 status: draft
 kind: phase
 ---

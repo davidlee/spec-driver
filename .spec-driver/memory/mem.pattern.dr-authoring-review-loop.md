@@ -4,32 +4,26 @@ name: DR authoring review loop
 kind: memory
 status: active
 memory_type: pattern
-created: "2026-03-08"
-updated: "2026-03-08"
-verified: "2026-03-08"
-tags:
-  - skills
-  - workflow
-  - design
-summary:
-  "For draft-design-revision work: keep the DR progressive, add code-adjacent
-  examples where needed, consult doctrine, run an internal adversarial pass, reconcile
-  DE, then optionally print an external-review prompt before planning."
+created: '2026-03-08'
+updated: '2026-03-08'
+verified: '2026-03-08'
+tags: [skills, workflow, design]
+summary: 'For draft-design-revision work: keep the DR progressive, add code-adjacent examples where needed, consult doctrine,
+  run an internal adversarial pass, reconcile DE, then optionally print an external-review prompt before planning.'
 scope:
   paths:
-    - supekku/skills/draft-design-revision/SKILL.md
-    - .spec-driver/skills/draft-design-revision/SKILL.md
-  commands:
-    - uv run spec-driver install
+  - supekku/skills/draft-design-revision/SKILL.md
+  - .spec-driver/skills/draft-design-revision/SKILL.md
+  commands: [uv run spec-driver install]
 provenance:
   sources:
-    - kind: delta
-      ref: DE-055
-    - kind: design_revision
-      ref: DR-055
+  - kind: delta
+    ref: DE-055
+  - kind: design_revision
+    ref: DR-055
 links:
   missing:
-    - raw: DR-055
+  - raw: DR-055
 ---
 
 # DR authoring review loop

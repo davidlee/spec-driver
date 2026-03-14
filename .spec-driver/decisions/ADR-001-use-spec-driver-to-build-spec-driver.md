@@ -1,10 +1,10 @@
 ---
 id: ADR-001
-title: "ADR-001: use spec-driver to build spec-driver"
+title: 'ADR-001: use spec-driver to build spec-driver'
 status: accepted
-created: "2025-11-01"
-updated: "2025-11-01"
-reviewed: "2025-11-01"
+created: '2025-11-01'
+updated: '2025-11-01'
+reviewed: '2025-11-01'
 owners: []
 supersedes: []
 superseded_by: []
@@ -17,7 +17,7 @@ audits: []
 related_decisions: []
 related_policies: []
 tags: []
-summary: ""
+summary: ''
 ---
 
 # ADR-001: use spec-driver to build spec-driver

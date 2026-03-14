@@ -2,28 +2,28 @@
 id: PROD-012
 slug: code-contract-documentation
 name: Code Contract Documentation
-created: "2025-11-10"
-updated: "2026-03-06"
+created: '2025-11-10'
+updated: '2026-03-06'
 status: draft
 kind: prod
 aliases: [docgen, sync]
 relations: []
 guiding_principles:
-  - Support both agent and human developer ergonomics as equal citizens
-  - Support both legacy and greenfield development
-  - Make it easy to identify code changes not covered by specs
-  - Support incremental convergence toward accuracy, completeness & currency
-  - Be unsurprising
-  - Format as compact and minimal as possible without compromising legibility
-  - Use existing tools where suitable, otherwise build using AST
-  - Make it easy to traverse between code & generated docs
-  - Aim for consistency between languages except where it harms utility
-  - Don't require configuration to obtain useful results
+- Support both agent and human developer ergonomics as equal citizens
+- Support both legacy and greenfield development
+- Make it easy to identify code changes not covered by specs
+- Support incremental convergence toward accuracy, completeness & currency
+- Be unsurprising
+- Format as compact and minimal as possible without compromising legibility
+- Use existing tools where suitable, otherwise build using AST
+- Make it easy to traverse between code & generated docs
+- Aim for consistency between languages except where it harms utility
+- Don't require configuration to obtain useful results
 assumptions:
-  - Teams value evergreen, verifiable technical documentation
-  - Code documentation must stay synchronized with implementation
-  - Agents and humans have different but equally valid documentation needs
-  - Deterministic output enables reliable change detection
+- Teams value evergreen, verifiable technical documentation
+- Code documentation must stay synchronized with implementation
+- Agents and humans have different but equally valid documentation needs
+- Deterministic output enables reliable change detection
 ---
 
 # PROD-012 – code-contract-documentation

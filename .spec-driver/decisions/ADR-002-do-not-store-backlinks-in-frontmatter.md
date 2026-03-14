@@ -1,28 +1,24 @@
 ---
 id: ADR-002
-title: "ADR-002: Do not store backlinks in frontmatter"
+title: 'ADR-002: Do not store backlinks in frontmatter'
 status: accepted
-created: "2025-11-02"
-updated: "2025-11-02"
-reviewed: "2025-11-02"
+created: '2025-11-02'
+updated: '2025-11-02'
+reviewed: '2025-11-02'
 owners: []
 supersedes: []
 superseded_by: []
 policies: []
-specs:
-  - PROD-003
+specs: [PROD-003]
 requirements: []
 deltas: []
 revisions: []
 audits: []
-related_decisions:
-  - ADR-001
+related_decisions: [ADR-001]
 related_policies: []
-tags:
-  - architecture
-  - data-model
-  - governance
-summary: Backlinks between artifacts must be computed at runtime from forward references, not stored in frontmatter, to prevent data consistency issues and maintain single source of truth.
+tags: [architecture, data-model, governance]
+summary: Backlinks between artifacts must be computed at runtime from forward references, not stored in frontmatter, to prevent
+  data consistency issues and maintain single source of truth.
 ---
 
 # ADR-002: Do not store backlinks in frontmatter

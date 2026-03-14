@@ -1,9 +1,9 @@
 ---
 id: IP-083.PHASE-01
 slug: 083-strengthen_audit_to_spec_reconciliation_and_spec_revision_authorship_skills-phase-01
-name: "IP-083 Phase 01 — Apply authorship skill changes"
-created: "2026-03-09"
-updated: "2026-03-10"
+name: IP-083 Phase 01 — Apply authorship skill changes
+created: '2026-03-09'
+updated: '2026-03-10'
 status: completed
 kind: phase
 ---

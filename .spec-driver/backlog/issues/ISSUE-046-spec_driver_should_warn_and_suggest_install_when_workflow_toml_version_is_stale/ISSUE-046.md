@@ -1,8 +1,8 @@
 ---
 id: ISSUE-046
 name: spec-driver should warn and suggest install when workflow.toml version is stale
-created: "2026-03-09"
-updated: "2026-03-09"
+created: '2026-03-09'
+updated: '2026-03-09'
 status: resolved
 kind: issue
 categories: []

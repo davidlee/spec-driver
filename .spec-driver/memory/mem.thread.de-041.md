@@ -4,40 +4,29 @@ name: DE-041 CLI completeness
 kind: memory
 status: active
 memory_type: thread
-updated: "2026-03-04"
-tags:
-  - cli
-  - DE-041
-  - delta
-summary:
-  "Working context for DE-041: shared CLI helpers, new commands, list flag
-  backfill"
+updated: '2026-03-04'
+tags: [cli, DE-041, delta]
+summary: 'Working context for DE-041: shared CLI helpers, new commands, list flag backfill'
 scope:
   globs:
-    - supekku/cli/**
-    - supekku/scripts/lib/changes/creation.py
-    - supekku/scripts/lib/formatters/change_formatters.py
-    - supekku/scripts/lib/backlog/registry.py
-  commands:
-    - show
-    - view
-    - edit
-    - find
-    - list
-    - create plan
+  - supekku/cli/**
+  - supekku/scripts/lib/changes/creation.py
+  - supekku/scripts/lib/formatters/change_formatters.py
+  - supekku/scripts/lib/backlog/registry.py
+  commands: [show, view, edit, find, list, create plan]
 priority:
   severity: high
   weight: 8
 confidence: high
-review_by: "2026-03-18"
+review_by: '2026-03-18'
 provenance:
   sources:
-    - kind: delta
-      ref: DE-041
-      note: Delta, DR, and IP for CLI completeness
-    - kind: doc
-      ref: CLAUDE.md
-      note: "Architecture guide \u2014 skinny CLI, formatter SoC"
+  - kind: delta
+    ref: DE-041
+    note: Delta, DR, and IP for CLI completeness
+  - kind: doc
+    ref: CLAUDE.md
+    note: Architecture guide — skinny CLI, formatter SoC
 ---
 
 # DE-041 CLI completeness — working context

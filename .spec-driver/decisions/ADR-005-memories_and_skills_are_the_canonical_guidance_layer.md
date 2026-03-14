@@ -1,31 +1,24 @@
 ---
 id: ADR-005
-title: "ADR-005: Memories and skills are the canonical guidance layer"
+title: 'ADR-005: Memories and skills are the canonical guidance layer'
 status: accepted
-created: "2026-03-06"
-updated: "2026-03-06"
-reviewed: "2026-03-06"
-owners:
-  - david
+created: '2026-03-06'
+updated: '2026-03-06'
+reviewed: '2026-03-06'
+owners: [david]
 supersedes: []
 superseded_by: []
 policies: []
-specs:
-  - PROD-016
+specs: [PROD-016]
 requirements: []
-deltas:
-  - DE-047
+deltas: [DE-047]
 revisions: []
 audits: []
-related_decisions:
-  - ADR-004
+related_decisions: [ADR-004]
 related_policies: []
-tags:
-  - documentation
-  - memories
-  - skills
-  - doctrine
-summary: "Declare agent memories as the canonical conceptual guidance for spec-driver and skills as the canonical procedural guidance layer; reduce other documentation to minimal routing, reference, or derived views."
+tags: [documentation, memories, skills, doctrine]
+summary: Declare agent memories as the canonical conceptual guidance for spec-driver and skills as the canonical procedural
+  guidance layer; reduce other documentation to minimal routing, reference, or derived views.
 ---
 
 # ADR-005: Memories and skills are the canonical guidance layer

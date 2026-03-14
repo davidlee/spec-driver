@@ -1,8 +1,8 @@
 ---
 id: IMPR-002
 name: Backlog prioritization with interactive ordering and delta integration
-created: "2025-11-04"
-updated: "2025-11-04"
+created: '2025-11-04'
+updated: '2025-11-04'
 status: resolved
 kind: improvement
 ---

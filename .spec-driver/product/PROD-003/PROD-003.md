@@ -2,26 +2,26 @@
 id: PROD-003
 slug: policy-and-standard-management
 name: Policy and Standard Management
-created: "2025-11-02"
-updated: "2026-03-06"
+created: '2025-11-02'
+updated: '2026-03-06'
 status: draft
 kind: prod
 aliases: []
 relations:
-  - type: extends
-    target: SPEC-110
-    nature: CLI create and list commands
-  - type: collaborates
-    target: SPEC-117
-    nature: Registry pattern reuse from decisions package
+- type: extends
+  target: SPEC-110
+  nature: CLI create and list commands
+- type: collaborates
+  target: SPEC-117
+  nature: Registry pattern reuse from decisions package
 guiding_principles:
-  - Policies enforce hard rules; standards provide flexible guidance
-  - Bidirectional traceability between policies, standards, and decisions (reverse references computed at runtime per ADR-002)
-  - Simple, focused metadata structure (Statement, Rationale, Scope, Verification)
+- Policies enforce hard rules; standards provide flexible guidance
+- Bidirectional traceability between policies, standards, and decisions (reverse references computed at runtime per ADR-002)
+- Simple, focused metadata structure (Statement, Rationale, Scope, Verification)
 assumptions:
-  - Teams already use ADRs and understand the decision registry pattern
-  - Policy/standard lifecycle mirrors ADR lifecycle (draft → required/default → deprecated)
-  - Cross-artifact referencing is valuable for navigating governance relationships
+- Teams already use ADRs and understand the decision registry pattern
+- Policy/standard lifecycle mirrors ADR lifecycle (draft → required/default → deprecated)
+- Cross-artifact referencing is valuable for navigating governance relationships
 ---
 
 # PROD-003 – Policy and Standard Management

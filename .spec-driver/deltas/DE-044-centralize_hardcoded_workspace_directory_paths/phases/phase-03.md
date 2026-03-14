@@ -1,9 +1,9 @@
 ---
 id: IP-044.PHASE-03
 slug: 044-centralize_hardcoded_workspace_directory_paths-phase-03
-name: "P03: Test fixtures & verification"
-created: "2026-03-05"
-updated: "2026-03-05"
+name: 'P03: Test fixtures & verification'
+created: '2026-03-05'
+updated: '2026-03-05'
 status: complete
 kind: phase
 ---

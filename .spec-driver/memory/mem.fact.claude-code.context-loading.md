@@ -4,14 +4,11 @@ name: Claude Code Context Loading & Token Caching
 kind: memory
 status: active
 memory_type: fact
-created: "2026-03-12"
-updated: "2026-03-12"
-verified: "2026-03-12"
+created: '2026-03-12'
+updated: '2026-03-12'
+verified: '2026-03-12'
 confidence: high
-tags:
-  - claude-code
-  - token-caching
-  - agent-guidance
+tags: [claude-code, token-caching, agent-guidance]
 summary: How Claude Code loads instructions into context and which sources are cache-friendly
 ---
 

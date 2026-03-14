@@ -2,8 +2,8 @@
 id: IP-087.PHASE-03
 slug: 087-cross_artifact_tui_fuzzy_search_with_relational_weighting-phase-03
 name: Verification, edge cases, and closure
-created: "2026-03-10"
-updated: "2026-03-10"
+created: '2026-03-10'
+updated: '2026-03-10'
 status: draft
 kind: phase
 ---

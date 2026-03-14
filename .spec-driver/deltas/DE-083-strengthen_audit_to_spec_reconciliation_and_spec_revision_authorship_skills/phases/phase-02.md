@@ -1,9 +1,9 @@
 ---
 id: IP-083.PHASE-02
 slug: 083-strengthen_audit_to_spec_reconciliation_and_spec_revision_authorship_skills-phase-02
-name: "IP-083 Phase 02 — Verify audit-to-spec examples and reconcile docs"
-created: "2026-03-10"
-updated: "2026-03-10"
+name: IP-083 Phase 02 — Verify audit-to-spec examples and reconcile docs
+created: '2026-03-10'
+updated: '2026-03-10'
 status: completed
 kind: phase
 ---

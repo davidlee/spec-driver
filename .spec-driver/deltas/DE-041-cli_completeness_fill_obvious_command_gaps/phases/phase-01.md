@@ -1,9 +1,9 @@
 ---
 id: IP-041.PHASE-01
 slug: 041-cli_completeness_fill_obvious_command_gaps-phase-01
-name: "IP-041 Phase 01 — Foundation: shared helpers + migration PoC"
-created: "2026-03-04"
-updated: "2026-03-04"
+name: 'IP-041 Phase 01 — Foundation: shared helpers + migration PoC'
+created: '2026-03-04'
+updated: '2026-03-04'
 status: draft
 kind: phase
 ---

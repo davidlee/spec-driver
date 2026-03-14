@@ -2,8 +2,8 @@
 id: IP-033.PHASE-06
 slug: 033-memory_records_schema_and_command_surface-phase-06
 name: IP-033 Phase 06 - Semantic Memory ID Scheme
-created: "2026-03-02"
-updated: "2026-03-02"
+created: '2026-03-02'
+updated: '2026-03-02'
 status: completed
 kind: phase
 ---

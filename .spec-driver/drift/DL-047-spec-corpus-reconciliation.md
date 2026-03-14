@@ -1,9 +1,9 @@
 ---
 id: DL-047
 name: Spec corpus reconciliation
-created: "2026-03-05"
-updated: "2026-03-06"
-status: open # 20 resolved, 1 dismissed — all entries addressed
+created: '2026-03-05'
+updated: '2026-03-06'
+status: open
 kind: drift_ledger
 delta_ref: DE-047
 ---

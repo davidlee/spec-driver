@@ -1,10 +1,10 @@
 ---
 id: STD-001
-title: "STD-001: use typer / rich for cli ux elements"
+title: 'STD-001: use typer / rich for cli ux elements'
 status: default
-created: "2025-11-04"
-updated: "2025-11-04"
-reviewed: "2025-11-04"
+created: '2025-11-04'
+updated: '2025-11-04'
+reviewed: '2025-11-04'
 owners: []
 supersedes: []
 superseded_by: []
@@ -15,7 +15,7 @@ deltas: []
 related_policies: []
 related_standards: []
 tags: [cli, ui]
-summary: ""
+summary: ''
 ---
 
 # STD-001: use typer / rich for cli ux elements

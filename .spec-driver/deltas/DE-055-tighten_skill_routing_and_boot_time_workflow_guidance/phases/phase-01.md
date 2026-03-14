@@ -2,8 +2,8 @@
 id: IP-055.PHASE-01
 slug: 055-tighten_skill_routing_and_boot_time_workflow_guidance-phase-01
 name: IP-055 Phase 01
-created: "2026-03-07"
-updated: "2026-03-07"
+created: '2026-03-07'
+updated: '2026-03-07'
 status: draft
 kind: phase
 ---

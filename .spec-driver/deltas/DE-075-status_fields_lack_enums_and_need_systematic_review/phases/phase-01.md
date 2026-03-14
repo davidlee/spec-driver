@@ -1,9 +1,9 @@
 ---
 id: IP-075.PHASE-01
 slug: 075-status_fields_lack_enums_and_need_systematic_review-phase-01
-name: "IP-075 Phase 01: define constants and register enums"
-created: "2026-03-09"
-updated: "2026-03-09"
+name: 'IP-075 Phase 01: define constants and register enums'
+created: '2026-03-09'
+updated: '2026-03-09'
 status: draft
 kind: phase
 ---

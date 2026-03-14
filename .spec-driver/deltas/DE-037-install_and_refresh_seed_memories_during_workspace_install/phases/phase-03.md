@@ -2,8 +2,8 @@
 id: IP-037.PHASE-03
 slug: 037-install_and_refresh_seed_memories_during_workspace_install-phase-03
 name: IP-037 Phase 03
-created: "2026-03-04"
-updated: "2026-03-04"
+created: '2026-03-04'
+updated: '2026-03-04'
 status: draft
 kind: phase
 ---

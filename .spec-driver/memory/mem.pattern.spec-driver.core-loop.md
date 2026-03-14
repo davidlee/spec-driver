@@ -4,40 +4,33 @@ name: Core Development Loop
 kind: memory
 status: active
 memory_type: pattern
-updated: "2026-03-06"
-verified: "2026-03-06"
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
-tags:
-  - spec-driver
-  - workflow
-  - core-loop
-summary:
-  "The canonical spec-driver loop is delta-first and observation-led: optional
-  capture or revision trigger -> delta bundle -> implement -> audit/contracts -> revision/spec
-  reconciliation -> closure. Revision-first is a concession path."
+tags: [spec-driver, workflow, core-loop]
+summary: 'The canonical spec-driver loop is delta-first and observation-led: optional capture or revision trigger -> delta
+  bundle -> implement -> audit/contracts -> revision/spec reconciliation -> closure. Revision-first is a concession path.'
 priority:
   severity: high
   weight: 10
 scope:
-  commands:
-    - uv run spec-driver create delta
-    - uv run spec-driver create phase
+  commands: [uv run spec-driver create delta, uv run spec-driver create phase]
   paths:
-    - supekku/scripts/lib/changes/creation.py
-    - specify/decisions/ADR-004-canonical_workflow_loop.md
+  - supekku/scripts/lib/changes/creation.py
+  - specify/decisions/ADR-004-canonical_workflow_loop.md
 provenance:
   sources:
-    - kind: adr
-      ref: ADR-004
-    - kind: code
-      note: Delta creation and plan scaffolding behavior
-      ref: supekku/scripts/lib/changes/creation.py
-    - kind: code
-      note: Completion flow and coverage gate orchestration
-      ref: supekku/scripts/complete_delta.py
-    - kind: doc
-      note: Canonical and permissive workflow mapping
-      ref: change/deltas/DE-038-canonical_workflow_alignment/workflow-research.md
+  - kind: adr
+    ref: ADR-004
+  - kind: code
+    note: Delta creation and plan scaffolding behavior
+    ref: supekku/scripts/lib/changes/creation.py
+  - kind: code
+    note: Completion flow and coverage gate orchestration
+    ref: supekku/scripts/complete_delta.py
+  - kind: doc
+    note: Canonical and permissive workflow mapping
+    ref: change/deltas/DE-038-canonical_workflow_alignment/workflow-research.md
 ---
 
 # Core Development Loop

@@ -2,8 +2,8 @@
 id: IP-089.PHASE-01
 slug: 089-no_separate_install_requirements_for_tui-phase-01
 name: IP-089 Phase 01
-created: "2026-03-10"
-updated: "2026-03-10"
+created: '2026-03-10'
+updated: '2026-03-10'
 status: draft
 kind: phase
 ---

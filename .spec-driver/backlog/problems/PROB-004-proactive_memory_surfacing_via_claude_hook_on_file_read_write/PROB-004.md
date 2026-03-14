@@ -1,8 +1,8 @@
 ---
 id: PROB-004
 name: Proactive memory surfacing via Claude hook on file read/write
-created: "2026-03-08"
-updated: "2026-03-08"
+created: '2026-03-08'
+updated: '2026-03-08'
 status: open
 kind: problem
 ---

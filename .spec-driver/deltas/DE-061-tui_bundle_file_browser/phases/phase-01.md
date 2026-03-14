@@ -2,8 +2,8 @@
 id: IP-061.PHASE-01
 slug: 061-tui_bundle_file_browser-phase-01
 name: Data model, BundleTree widget, PreviewPanel guard
-created: "2026-03-08"
-updated: "2026-03-08"
+created: '2026-03-08'
+updated: '2026-03-08'
 status: draft
 kind: phase
 ---

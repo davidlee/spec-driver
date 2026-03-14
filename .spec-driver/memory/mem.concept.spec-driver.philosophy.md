@@ -4,28 +4,24 @@ name: Spec-Driver Philosophy
 kind: memory
 status: active
 memory_type: concept
-updated: "2026-03-06"
-verified: "2026-03-06"
+updated: '2026-03-06'
+verified: '2026-03-06'
 confidence: high
-tags:
-  - spec-driver
-  - philosophy
-summary:
-  Spec-driver treats specifications as the evergreen source of truth for a
-  system, but canonical spec finalization happens after implementation and audit reconciliation.
-  Change is explicit, auditable, and agent-native. Start here.
+tags: [spec-driver, philosophy]
+summary: Spec-driver treats specifications as the evergreen source of truth for a system, but canonical spec finalization
+  happens after implementation and audit reconciliation. Change is explicit, auditable, and agent-native. Start here.
 priority:
   severity: high
   weight: 10
 provenance:
   sources:
-    - kind: adr
-      ref: ADR-004
-    - kind: adr
-      ref: ADR-005
-    - kind: doc
-      note: Three tenets
-      ref: supekku/about/dogma.md
+  - kind: adr
+    ref: ADR-004
+  - kind: adr
+    ref: ADR-005
+  - kind: doc
+    note: Three tenets
+    ref: supekku/about/dogma.md
 ---
 
 # Spec-Driver Philosophy

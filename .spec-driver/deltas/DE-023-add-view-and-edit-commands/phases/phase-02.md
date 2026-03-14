@@ -2,8 +2,8 @@
 id: IP-023.PHASE-02
 slug: 023-add-view-and-edit-commands-phase-02
 name: IP-023 Phase 02 - Support numeric ID shorthand
-created: "2026-02-05"
-updated: "2026-02-05"
+created: '2026-02-05'
+updated: '2026-02-05'
 status: complete
 kind: phase
 ---

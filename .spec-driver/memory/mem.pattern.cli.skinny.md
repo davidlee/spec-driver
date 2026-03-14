@@ -4,37 +4,25 @@ name: Skinny CLI Pattern
 kind: memory
 status: active
 memory_type: pattern
-updated: "2026-03-10"
+updated: '2026-03-10'
 confidence: high
-tags:
-  - architecture
-  - cli
-summary:
-  CLI files orchestrate only — no business logic or formatting inline. Delegate
-  to domain packages + formatters.
+tags: [architecture, cli]
+summary: CLI files orchestrate only — no business logic or formatting inline. Delegate to domain packages + formatters.
 priority:
   severity: medium
   weight: 5
 scope:
-  commands:
-    - create memory
-    - list memories
-    - show memory
-  globs:
-    - supekku/cli/**
-  languages:
-    - py
-  paths:
-    - supekku/cli/memory.py
-    - supekku/cli/list.py
+  commands: [create memory, list memories, show memory]
+  globs: [supekku/cli/**]
+  languages: [py]
+  paths: [supekku/cli/memory.py, supekku/cli/list.py]
 provenance:
   sources:
-    - kind: doc
-      note: Skinny CLI section in Architecture Guide
-      ref: CLAUDE.md
-requires_reading:
-  - CLAUDE.md
-verified: "2026-03-10"
+  - kind: doc
+    note: Skinny CLI section in Architecture Guide
+    ref: CLAUDE.md
+requires_reading: [CLAUDE.md]
+verified: '2026-03-10'
 verified_sha: 61e8069ffd9f99fb76859f41fe5bd91e45485924
 ---
 

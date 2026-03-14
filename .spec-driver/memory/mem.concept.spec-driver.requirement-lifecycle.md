@@ -4,38 +4,30 @@ name: Requirement Lifecycle Guidance
 kind: memory
 status: active
 memory_type: concept
-updated: "2026-03-05"
-verified: "2026-03-05"
-tags:
-  - spec-driver
-  - lifecycle
-  - requirements
-  - coverage
-summary:
-  Agent-facing model for requirement lifecycle, coverage statuses, and traceability
-  grounded in current implementation.
+updated: '2026-03-05'
+verified: '2026-03-05'
+tags: [spec-driver, lifecycle, requirements, coverage]
+summary: Agent-facing model for requirement lifecycle, coverage statuses, and traceability grounded in current implementation.
 scope:
   paths:
-    - supekku/about/lifecycle.md
-    - supekku/scripts/lib/requirements/registry.py
-    - supekku/scripts/lib/requirements/lifecycle.py
-    - supekku/scripts/lib/blocks/verification.py
-    - supekku/scripts/lib/changes/lifecycle.py
-  commands:
-    - uv run spec-driver sync
-    - uv run spec-driver validate
+  - supekku/about/lifecycle.md
+  - supekku/scripts/lib/requirements/registry.py
+  - supekku/scripts/lib/requirements/lifecycle.py
+  - supekku/scripts/lib/blocks/verification.py
+  - supekku/scripts/lib/changes/lifecycle.py
+  commands: [uv run spec-driver sync, uv run spec-driver validate]
 provenance:
   sources:
-    - kind: doc
-      ref: supekku/about/lifecycle.md
-    - kind: code
-      ref: supekku/scripts/lib/requirements/registry.py
-    - kind: code
-      ref: supekku/scripts/lib/requirements/lifecycle.py
-    - kind: code
-      ref: supekku/scripts/lib/blocks/verification.py
-    - kind: code
-      ref: supekku/scripts/lib/changes/lifecycle.py
+  - kind: doc
+    ref: supekku/about/lifecycle.md
+  - kind: code
+    ref: supekku/scripts/lib/requirements/registry.py
+  - kind: code
+    ref: supekku/scripts/lib/requirements/lifecycle.py
+  - kind: code
+    ref: supekku/scripts/lib/blocks/verification.py
+  - kind: code
+    ref: supekku/scripts/lib/changes/lifecycle.py
 ---
 
 # Requirement Lifecycle Guidance

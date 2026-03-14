@@ -1,9 +1,9 @@
 ---
 id: IP-086.PHASE-03
 slug: 086-memory_verification_primitive_sha_stamped_attestation_for_staleness_tracking-phase-03
-name: "IP-086 Phase 03: Skills and cleanup"
-created: "2026-03-10"
-updated: "2026-03-10"
+name: 'IP-086 Phase 03: Skills and cleanup'
+created: '2026-03-10'
+updated: '2026-03-10'
 status: draft
 kind: phase
 ---

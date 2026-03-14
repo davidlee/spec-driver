@@ -1,9 +1,9 @@
 ---
 id: IP-041.PHASE-02
 slug: 041-cli_completeness_fill_obvious_command_gaps-phase-02
-name: "IP-041 Phase 02 — Domain additions + new commands"
-created: "2026-03-04"
-updated: "2026-03-04"
+name: IP-041 Phase 02 — Domain additions + new commands
+created: '2026-03-04'
+updated: '2026-03-04'
 status: complete
 kind: phase
 ---

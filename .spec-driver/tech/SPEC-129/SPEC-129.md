@@ -2,8 +2,8 @@
 id: SPEC-129
 slug: sync-installer-component
 name: sync installer-component
-created: "2025-11-08"
-updated: "2025-11-08"
+created: '2025-11-08'
+updated: '2025-11-08'
 status: draft
 kind: spec
 category: unit

@@ -1,9 +1,9 @@
 ---
 id: IP-085.PHASE-01
 slug: 085-surface_relation_and_backlog_metadata_in_cli_and_skills-phase-01
-name: "Foundation: constants, query module, Spec model"
-created: "2026-03-09"
-updated: "2026-03-09"
+name: 'Foundation: constants, query module, Spec model'
+created: '2026-03-09'
+updated: '2026-03-09'
 status: draft
 kind: phase
 ---

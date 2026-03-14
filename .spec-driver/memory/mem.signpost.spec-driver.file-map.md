@@ -4,25 +4,19 @@ name: Spec-Driver File Map
 kind: memory
 status: active
 memory_type: signpost
-updated: "2026-03-07"
-verified: "2026-03-07"
-tags:
-  - spec-driver
-  - navigation
-  - files
-summary:
-  Key spec-driver files and directories under consolidated .spec-driver/ layout
-  with backward-compat symlinks at old paths.
+updated: '2026-03-07'
+verified: '2026-03-07'
+tags: [spec-driver, navigation, files]
+summary: Key spec-driver files and directories under consolidated .spec-driver/ layout with backward-compat symlinks at old
+  paths.
 scope:
-  paths:
-    - .spec-driver
-    - .contracts
+  paths: [.spec-driver, .contracts]
 provenance:
   sources:
-    - kind: doc
-      ref: .spec-driver/README.md
-    - kind: delta
-      ref: DE-049
+  - kind: doc
+    ref: .spec-driver/README.md
+  - kind: delta
+    ref: DE-049
 ---
 
 # Spec-Driver File Map

@@ -2,8 +2,8 @@
 id: IP-054.PHASE-02
 slug: 054-tui_track_mode_real_time_agent_session_following-phase-02
 name: IP-054 Phase 02 — TrackScreen and app integration
-created: "2026-03-07"
-updated: "2026-03-07"
+created: '2026-03-07'
+updated: '2026-03-07'
 status: draft
 kind: phase
 ---

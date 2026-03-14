@@ -1,8 +1,8 @@
 ---
 id: ISSUE-039
-name: "Spec corpus reconciliation: establish authoritative PROD & TECH specs"
-created: "2026-03-05"
-updated: "2026-03-05"
+name: 'Spec corpus reconciliation: establish authoritative PROD & TECH specs'
+created: '2026-03-05'
+updated: '2026-03-05'
 status: open
 kind: issue
 categories: [specs, governance, quality]

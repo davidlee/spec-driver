@@ -1,10 +1,10 @@
 ---
 id: STD-002
-title: "STD-002: govern lint signal and prioritise pylint fixes"
+title: 'STD-002: govern lint signal and prioritise pylint fixes'
 status: required
-created: "2026-03-07"
-updated: "2026-03-07"
-reviewed: "2026-03-07"
+created: '2026-03-07'
+updated: '2026-03-07'
+reviewed: '2026-03-07'
 owners: []
 supersedes: []
 superseded_by: []
@@ -15,7 +15,8 @@ deltas: [DE-058]
 related_policies: []
 related_standards: []
 tags: [lint, pylint, quality, maintenance]
-summary: "Keep pylint output decision-useful: do not excuse new warnings with existing debt, prioritize high-signal message families, and treat test docstring noise as low-priority."
+summary: 'Keep pylint output decision-useful: do not excuse new warnings with existing debt, prioritize high-signal message
+  families, and treat test docstring noise as low-priority.'
 ---
 
 # STD-002: govern lint signal and prioritise pylint fixes

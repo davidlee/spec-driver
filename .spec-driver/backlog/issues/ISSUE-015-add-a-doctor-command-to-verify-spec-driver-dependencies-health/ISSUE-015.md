@@ -1,8 +1,8 @@
 ---
 id: ISSUE-015
 name: add a doctor command to verify spec-driver dependencies & health
-created: "2025-11-03"
-updated: "2026-03-08"
+created: '2025-11-03'
+updated: '2026-03-08'
 status: resolved
 kind: issue
 categories: []

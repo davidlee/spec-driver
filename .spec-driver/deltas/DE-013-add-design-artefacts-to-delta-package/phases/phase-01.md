@@ -2,8 +2,8 @@
 id: IP-013.PHASE-01
 slug: add-design-artefacts-to-delta-package-phase-01
 name: IP-013 Phase 01
-created: "2025-11-04"
-updated: "2025-11-04"
+created: '2025-11-04'
+updated: '2025-11-04'
 status: in-progress
 kind: phase
 ---

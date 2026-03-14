@@ -1,8 +1,14 @@
 ---
 name: maintaining-memory
-description: |
-  Invoke this skill whenever you observe memory drift or when your actions would invalidate existing memories. Mandatory triggers: (1) you change a workflow/command, move files, rename modules, or change invariants; (2) you discover a memory is wrong, missing provenance, or stale; (3) you see a memory record guiding behaviour that is no longer true; (4) you find duplicates or near-duplicates; (5) you are about to add a new memory that overlaps an existing one.
-  Core rule: if you change reality, you must change memory in the same change-set (or immediately after) so future agents do not inherit incorrect guidance.
+description: 'Invoke this skill whenever you observe memory drift or when your actions would invalidate existing memories.
+  Mandatory triggers: (1) you change a workflow/command, move files, rename modules, or change invariants; (2) you discover
+  a memory is wrong, missing provenance, or stale; (3) you see a memory record guiding behaviour that is no longer true; (4)
+  you find duplicates or near-duplicates; (5) you are about to add a new memory that overlaps an existing one.
+
+  Core rule: if you change reality, you must change memory in the same change-set (or immediately after) so future agents
+  do not inherit incorrect guidance.
+
+  '
 ---
 
 Procedure:

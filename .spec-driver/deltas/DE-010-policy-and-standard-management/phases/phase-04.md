@@ -2,8 +2,8 @@
 id: IP-010.PHASE-04
 slug: 010-policy-and-standard-management-phase-04
 name: IP-010 Phase 04
-created: "2025-11-03"
-updated: "2025-11-03"
+created: '2025-11-03'
+updated: '2025-11-03'
 status: completed
 kind: phase
 ---

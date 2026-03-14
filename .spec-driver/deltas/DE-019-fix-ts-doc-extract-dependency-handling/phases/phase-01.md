@@ -2,8 +2,8 @@
 id: IP-019.PHASE-01
 slug: 019-fix-ts-doc-extract-dependency-handling-phase-01
 name: IP-019 Phase 01 - npm_utils module (TDD)
-created: "2025-11-08"
-updated: "2025-11-08"
+created: '2025-11-08'
+updated: '2025-11-08'
 status: draft
 kind: phase
 ---

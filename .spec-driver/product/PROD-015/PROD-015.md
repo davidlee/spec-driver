@@ -2,20 +2,20 @@
 id: PROD-015
 slug: spec_taxonomy_and_navigation
 name: spec taxonomy and navigation
-created: "2026-02-21"
-updated: "2026-02-21"
+created: '2026-02-21'
+updated: '2026-02-21'
 status: draft
 kind: prod
 aliases: []
 relations: []
 guiding_principles:
-  - Default to non-breaking metadata before any filesystem migration.
-  - Keep unit specs discoverable but not dominant in human workflows.
-  - Treat contracts/code as observed truth; treat specs as intent and constraints.
-  - Prefer warnings over hard validation failures during adoption.
+- Default to non-breaking metadata before any filesystem migration.
+- Keep unit specs discoverable but not dominant in human workflows.
+- Treat contracts/code as observed truth; treat specs as intent and constraints.
+- Prefer warnings over hard validation failures during adoption.
 assumptions:
-  - Teams will create some cross-cutting specs before or alongside code.
-  - Auto-generated unit specs are useful, but only when they do not drown out assembly specs.
+- Teams will create some cross-cutting specs before or alongside code.
+- Auto-generated unit specs are useful, but only when they do not drown out assembly specs.
 ---
 
 # PROD-015 – spec taxonomy and navigation

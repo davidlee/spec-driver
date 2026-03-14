@@ -2,8 +2,8 @@
 id: IP-029.PHASE-01
 slug: 029-canonical_contract_storage-phase-01
 name: IP-029 Phase 01 — Canonical storage
-created: "2026-02-21"
-updated: "2026-02-21"
+created: '2026-02-21'
+updated: '2026-02-21'
 status: draft
 kind: phase
 ---

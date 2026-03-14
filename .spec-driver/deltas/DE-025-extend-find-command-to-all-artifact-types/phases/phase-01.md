@@ -2,8 +2,8 @@
 id: IP-025.PHASE-01
 slug: 025-extend-find-command-to-all-artifact-types-phase-01
 name: IP-025 Phase 01 - Implement find subcommands
-created: "2026-02-05"
-updated: "2026-02-05"
+created: '2026-02-05'
+updated: '2026-02-05'
 status: complete
 kind: phase
 ---

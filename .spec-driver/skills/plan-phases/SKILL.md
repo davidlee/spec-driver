@@ -1,6 +1,7 @@
 ---
 name: plan-phases
-description: Plan execution for a delta - refine IP objectives/gates and create the next phase sheet with concrete tasks and verification expectations.
+description: Plan execution for a delta - refine IP objectives/gates and create the next phase sheet with concrete tasks and
+  verification expectations.
 ---
 
 You are turning design intent into an executable phase plan.

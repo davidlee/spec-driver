@@ -1,22 +1,17 @@
 ---
 id: ISSUE-007
 name: CLI commands missing --json output support
-created: "2025-11-02"
-updated: "2025-11-02"
+created: '2025-11-02'
+updated: '2025-11-02'
 status: resolved
 kind: issue
-categories:
-  - cli
-  - consistency
+categories: [cli, consistency]
 severity: p2
 impact: user
-problem_refs:
-  - Inconsistent CLI interface
-  - Agent tooling integration blocked
+problem_refs: [Inconsistent CLI interface, Agent tooling integration blocked]
 related_requirements: []
 affected_verifications: []
-linked_deltas:
-  - DE-006
+linked_deltas: [DE-006]
 ---
 
 # CLI commands missing --json output support

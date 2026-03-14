@@ -1,10 +1,10 @@
 ---
 id: ADR-006
-title: "ADR-006: consolidate workspace directories under .spec-driver"
+title: 'ADR-006: consolidate workspace directories under .spec-driver'
 status: accepted
-created: "2026-03-06"
-updated: "2026-03-06"
-reviewed: "2026-03-06"
+created: '2026-03-06'
+updated: '2026-03-06'
+reviewed: '2026-03-06'
 owners: []
 supersedes: []
 superseded_by: []
@@ -14,15 +14,11 @@ requirements: []
 deltas: []
 revisions: []
 audits: []
-related_decisions:
-  - ADR-001
-  - ADR-003
+related_decisions: [ADR-001, ADR-003]
 related_policies: []
-tags:
-  - architecture
-  - workspace
-  - install
-summary: "Canonical spec-driver workspace directories move under .spec-driver/; migration tooling and broad content reference cleanup are deferred, while legacy compatibility paths are treated as optional non-default views."
+tags: [architecture, workspace, install]
+summary: Canonical spec-driver workspace directories move under .spec-driver/; migration tooling and broad content reference
+  cleanup are deferred, while legacy compatibility paths are treated as optional non-default views.
 ---
 
 # ADR-006: consolidate workspace directories under .spec-driver

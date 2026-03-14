@@ -1,29 +1,24 @@
 ---
 id: ADR-009
-title: "ADR-009: standard registry API convention"
+title: 'ADR-009: standard registry API convention'
 status: accepted
-created: "2026-03-06"
-updated: "2026-03-06"
-reviewed: "2026-03-06"
+created: '2026-03-06'
+updated: '2026-03-06'
+reviewed: '2026-03-06'
 owners: []
 supersedes: []
 superseded_by: []
 policies: []
 specs: []
 requirements: []
-deltas:
-  - DE-050
+deltas: [DE-050]
 revisions: []
 audits: []
-related_decisions:
-  - ADR-002
+related_decisions: [ADR-002]
 related_policies: []
-tags:
-  - architecture
-  - api
-  - registry
-  - conventions
-summary: "Codify the canonical registry API surface from the converged registries: find, collect, iter, domain-specific filter, and keyword-only root auto-discovery, while deferring Protocol/ABC standardisation."
+tags: [architecture, api, registry, conventions]
+summary: 'Codify the canonical registry API surface from the converged registries: find, collect, iter, domain-specific filter,
+  and keyword-only root auto-discovery, while deferring Protocol/ABC standardisation.'
 ---
 
 # ADR-009: standard registry API convention

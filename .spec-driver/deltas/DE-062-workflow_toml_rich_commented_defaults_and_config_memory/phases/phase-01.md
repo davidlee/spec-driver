@@ -2,8 +2,8 @@
 id: IP-062.PHASE-01
 slug: 062-workflow_toml_rich_commented_defaults_and_config_memory-phase-01
 name: IP-062 Phase 01 - template generator, install wiring, config memory
-created: "2026-03-08"
-updated: "2026-03-08"
+created: '2026-03-08'
+updated: '2026-03-08'
 status: completed
 kind: phase
 ---

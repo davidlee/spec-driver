@@ -2,8 +2,8 @@
 id: IP-068.PHASE-01
 slug: 068-edit_command_status_flag_for_programmatic_status_updates-phase-01
 name: Shared primitive and enum expansion
-created: "2026-03-08"
-updated: "2026-03-08"
+created: '2026-03-08'
+updated: '2026-03-08'
 status: in-progress
 kind: phase
 ---

@@ -2,8 +2,8 @@
 id: IP-038.PHASE-01
 slug: 038-canonical_workflow_alignment-phase-01
 name: IP-038 Phase 01
-created: "2026-03-03"
-updated: "2026-03-03"
+created: '2026-03-03'
+updated: '2026-03-03'
 status: draft
 kind: phase
 ---

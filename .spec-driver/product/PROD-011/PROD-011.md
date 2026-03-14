@@ -2,35 +2,35 @@
 id: PROD-011
 slug: implementation-execution-workflow
 name: Implementation Execution Workflow
-created: "2025-11-04"
-updated: "2025-11-04"
+created: '2025-11-04'
+updated: '2025-11-04'
 status: draft
 kind: prod
 aliases: []
 relations:
-  - type: informs
-    target: PROD-002
-    description: Extends delta creation with implementation lifecycle guidance
-  - type: informs
-    target: PROD-006
-    description: Enhances phase management with guided workflow commands
-  - type: depends_on
-    target: PROD-010
-    description: Uses help system (FR-012 to FR-014) for workflow documentation
+- type: informs
+  target: PROD-002
+  description: Extends delta creation with implementation lifecycle guidance
+- type: informs
+  target: PROD-006
+  description: Enhances phase management with guided workflow commands
+- type: depends_on
+  target: PROD-010
+  description: Uses help system (FR-012 to FR-014) for workflow documentation
 guiding_principles:
-  - Workflow commands are customizable hooks, not prescriptive fixed processes
-  - Configuration over convention - IP metadata drives automation preferences
-  - Constitution (ADRs, policies, standards) embedded in commands and validated by tooling
-  - Support variant entry paths without treating them as co-equal canon
-  - Manual workflow always remains valid - commands are optional helpers
-  - State inferred from artifacts, no hidden state files
-  - Audit and revision work reconcile observed truth back into authoritative specs before closure
+- Workflow commands are customizable hooks, not prescriptive fixed processes
+- Configuration over convention - IP metadata drives automation preferences
+- Constitution (ADRs, policies, standards) embedded in commands and validated by tooling
+- Support variant entry paths without treating them as co-equal canon
+- Manual workflow always remains valid - commands are optional helpers
+- State inferred from artifacts, no hidden state files
+- Audit and revision work reconcile observed truth back into authoritative specs before closure
 assumptions:
-  - Users have Claude Code or compatible agent environment
-  - Projects may use different VCS tools (git, jj, etc)
-  - Teams have varied preferences for commit workflow and automation
-  - Implementation plans created before phases (PROD-006)
-  - Phase-01 benefits from IP intelligence like later phases (original motivation)
+- Users have Claude Code or compatible agent environment
+- Projects may use different VCS tools (git, jj, etc)
+- Teams have varied preferences for commit workflow and automation
+- Implementation plans created before phases (PROD-006)
+- Phase-01 benefits from IP intelligence like later phases (original motivation)
 ---
 
 # PROD-011 – Implementation Execution Workflow

@@ -5,10 +5,9 @@ created: '2026-03-02'
 updated: '2026-03-09'
 status: resolved
 kind: issue
-categories: []
+categories: [design, cli, dx]
 severity: p2
 impact: user
-categories: [design, cli, dx]
 ---
 
 # CLI verb-noun taxonomy: consistency pass

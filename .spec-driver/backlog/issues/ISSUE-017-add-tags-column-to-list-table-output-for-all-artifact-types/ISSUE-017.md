@@ -1,8 +1,8 @@
 ---
 id: ISSUE-017
 name: Add Tags column to list table output for all artifact types
-created: "2025-11-04"
-updated: "2025-11-04"
+created: '2025-11-04'
+updated: '2025-11-04'
 status: resolved
 kind: issue
 categories: [ux, cli]

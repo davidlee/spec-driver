@@ -4,39 +4,31 @@ name: Scoped memory retrieval and wrap-up capture
 kind: memory
 status: active
 memory_type: pattern
-updated: "2026-03-08"
-verified: "2026-03-08"
-tags:
-  - skills
-  - memory
-  - workflow
-  - retrieval
-  - close-out
-summary:
-  Before touching a subsystem, query memories with concrete file paths so glob-scoped
-  records surface; during phase or delta wrap-up, promote durable findings into memories.
+updated: '2026-03-08'
+verified: '2026-03-08'
+tags: [skills, memory, workflow, retrieval, close-out]
+summary: Before touching a subsystem, query memories with concrete file paths so glob-scoped records surface; during phase
+  or delta wrap-up, promote durable findings into memories.
 priority:
   severity: high
   weight: 8
 scope:
-  commands:
-    - uv run spec-driver list memories
-    - uv run spec-driver complete delta
+  commands: [uv run spec-driver list memories, uv run spec-driver complete delta]
   paths:
-    - supekku/skills/retrieving-memory/SKILL.md
-    - supekku/skills/execute-phase/SKILL.md
-    - supekku/skills/notes/SKILL.md
-    - supekku/skills/capturing-memory/SKILL.md
-    - supekku/skills/close-change/SKILL.md
+  - supekku/skills/retrieving-memory/SKILL.md
+  - supekku/skills/execute-phase/SKILL.md
+  - supekku/skills/notes/SKILL.md
+  - supekku/skills/capturing-memory/SKILL.md
+  - supekku/skills/close-change/SKILL.md
 provenance:
   sources:
-    - kind: adr
-      ref: ADR-005
-    - kind: delta
-      ref: DE-055
-    - kind: doc
-      note: Phase 10 follow-up notes
-      ref: .spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-10.md
+  - kind: adr
+    ref: ADR-005
+  - kind: delta
+    ref: DE-055
+  - kind: doc
+    note: Phase 10 follow-up notes
+    ref: .spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-10.md
 ---
 
 # Scoped memory retrieval and wrap-up capture

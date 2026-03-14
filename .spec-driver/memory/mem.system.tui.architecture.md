@@ -1,25 +1,19 @@
 ---
 id: mem.system.tui.architecture
-name: "TUI app architecture: screens, widgets, listener, watcher"
+name: 'TUI app architecture: screens, widgets, listener, watcher'
 kind: memory
 status: active
 memory_type: system
-created: "2026-03-08"
-updated: "2026-03-08"
-tags:
-  - tui
-  - textual
-  - architecture
-summary:
-  How SpecDriverApp composes screens, EventListener, file watcher, and test
-  harness
+created: '2026-03-08'
+updated: '2026-03-08'
+tags: [tui, textual, architecture]
+summary: How SpecDriverApp composes screens, EventListener, file watcher, and test harness
 scope:
-  globs:
-    - supekku/tui/**
+  globs: [supekku/tui/**]
 links:
   missing:
-    - raw: DEC-053-14
-    - raw: DEC-054-01
+  - raw: DEC-053-14
+  - raw: DEC-054-01
 ---
 
 # TUI app architecture: screens, widgets, listener, watcher

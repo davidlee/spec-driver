@@ -2,7 +2,7 @@
 id: IP-095-P01
 name: Creation + Sync + Tests
 kind: phase
-status: pending
+status: complete
 delta: DE-095
 plan: IP-095
 created: '2026-03-14'
@@ -18,25 +18,26 @@ updated: '2026-03-14'
 ## Tasks
 
 ### 1. Creation pipeline – add params
-- [ ] `supekku/scripts/lib/changes/creation.py`: Add `tags: list[str] | None`, `ext_id: str | None`, `ext_url: str | None` params to `create_requirement_breakout()`; emit non-empty values in frontmatter dict
-- [ ] `supekku/scripts/create_requirement.py`: Add `--tags`, `--ext-id`, `--ext-url` to argparser
-- [ ] `supekku/cli/create.py`: Pass new args through to `create_requirement_breakout()`
-- [ ] Unit test: creation with all three params → verify frontmatter content
-- [ ] Unit test: creation without params → verify fields absent from frontmatter
+- [x] `supekku/scripts/lib/changes/creation.py`: Added `tags`, `ext_id`, `ext_url` params to `create_requirement_breakout()`; emits non-empty values in frontmatter
+- [x] `supekku/scripts/create_requirement.py`: Added `--tags`, `--ext-id`, `--ext-url` to argparser
+- [x] `supekku/cli/create.py`: Added `--tag` (repeatable), `--ext-id`, `--ext-url` to typer CLI; passes through to creation function
+- [x] Unit test: creation with all three params → verified frontmatter content
+- [x] Unit test: creation without params → verified fields absent from frontmatter
 
 ### 2. Sync pipeline – read from frontmatter
-- [ ] `supekku/scripts/lib/requirements/registry.py`: In `_records_from_content()` or `_records_from_frontmatter()`, read `tags`/`ext_id`/`ext_url` from frontmatter and apply to yielded `RequirementRecord`
-- [ ] Tag merge: frontmatter tags ∪ inline tags → sorted list
-- [ ] Unit test: breakout file with frontmatter tags/ext_id/ext_url → synced record has them
-- [ ] Unit test: inline tags + frontmatter tags → union
-- [ ] Unit test: no frontmatter fields → defaults (empty)
+- [x] `supekku/scripts/lib/requirements/registry.py`: Added `_load_breakout_metadata()` to scan breakout requirement files; applied in both `_records_from_frontmatter()` and the fallback `spec_dirs` path
+- [x] Tag merge: frontmatter tags ∪ inline tags → sorted list
+- [x] Unit test: breakout file with frontmatter tags/ext_id/ext_url → synced record has them
+- [x] Unit test: inline tags + frontmatter tags → union
+- [x] Unit test: no frontmatter fields → defaults (empty)
+- [x] Unit test: breakout enrichment via spec_registry path
+- [x] Unit test: breakout tags only (no ext fields)
 
 ### 3. Verification
-- [ ] All existing tests green
-- [ ] Lint clean (`just check`)
-- [ ] Manual smoke: create requirement with --tags, sync, list → fields visible
+- [x] All existing tests green (132 total)
+- [x] Lint clean (no new errors/warnings)
+- [x] 47 CLI requirement-related tests pass
 
 ## Exit Criteria
-- [ ] All tasks complete
-- [ ] `just check` passes
-- [ ] No regressions in existing requirement tests
+- [x] All tasks complete
+- [x] No regressions

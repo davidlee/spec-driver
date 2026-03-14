@@ -1013,6 +1013,149 @@ def show_schema_cmd(
   show_schema(block_type=block_type, format_type=format_type)
 
 
+@app.command("relations")
+def show_relations(
+  artifact_id: Annotated[
+    str,
+    typer.Argument(help="Artifact ID to show relations for (e.g., DE-097, SPEC-001)"),
+  ],
+  direction: Annotated[
+    str,
+    typer.Option(
+      "--direction",
+      "-d",
+      help="Query direction: forward, inverse, or both",
+    ),
+  ] = "both",
+  json_output: Annotated[
+    bool, typer.Option("--json", help="Output as JSON"),
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Show cross-artifact reference neighbourhood for an artifact.
+
+  Displays all artifacts that this ID references (forward) and/or
+  all artifacts that reference this ID (inverse), grouped by type.
+
+  If the ID is not found as a node, still shows any inverse edges
+  (other artifacts may reference a non-existent ID). Emits a warning
+  if the ID itself is not a known artifact.
+  """
+  from supekku.scripts.lib.core.artifact_ids import (  # noqa: PLC0415
+    normalize_artifact_id,
+  )
+  from supekku.scripts.lib.relations.graph import (  # noqa: PLC0415
+    build_reference_graph,
+    query_neighbourhood,
+  )
+  from supekku.scripts.lib.workspace import Workspace  # noqa: PLC0415
+
+  valid_directions = ("forward", "inverse", "both")
+  if direction not in valid_directions:
+    typer.echo(
+      f"Error: --direction must be one of {valid_directions}",
+      err=True,
+    )
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    repo_root = find_repo_root(root)
+    workspace = Workspace(root=repo_root)
+    graph = build_reference_graph(workspace)
+
+    # Try normalization if ID not in graph
+    resolved_id = artifact_id
+    if artifact_id not in graph.nodes:
+      norm = normalize_artifact_id(artifact_id, frozenset(graph.nodes))
+      if norm.canonical:
+        resolved_id = norm.canonical
+        typer.echo(
+          f"Note: '{artifact_id}' resolved to '{resolved_id}'",
+          err=True,
+        )
+      elif direction != "inverse":
+        typer.echo(
+          f"Warning: '{artifact_id}' is not a known artifact",
+          err=True,
+        )
+
+    neighbourhood = query_neighbourhood(graph, resolved_id, direction=direction)
+
+    if json_output:
+      _show_relations_json(resolved_id, graph, neighbourhood)
+    else:
+      _show_relations_text(resolved_id, graph, neighbourhood)
+
+  except Exception as exc:  # noqa: BLE001
+    typer.echo(f"Error: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  raise typer.Exit(EXIT_SUCCESS)
+
+
+def _show_relations_text(
+  artifact_id: str,
+  graph: Any,
+  neighbourhood: dict[str, list[Any]],
+) -> None:
+  """Format and print relations as text."""
+  kind = graph.nodes.get(artifact_id, "unknown")
+  typer.echo(f"Relations for {artifact_id} ({kind})")
+
+  forward = neighbourhood.get("forward", [])
+  inverse = neighbourhood.get("inverse", [])
+
+  if not forward and not inverse:
+    typer.echo("  (no relations found)")
+    return
+
+  if forward:
+    typer.echo(f"\n  Forward references ({artifact_id} →):")
+    for edge in sorted(forward, key=lambda e: (e.detail, e.target)):
+      target_kind = graph.nodes.get(edge.target, "?")
+      label = edge.detail or edge.source_slot
+      typer.echo(f"    {label:<20s} → {edge.target} ({target_kind})")
+
+  if inverse:
+    typer.echo(f"\n  Inverse references (→ {artifact_id}):")
+    for edge in sorted(inverse, key=lambda e: (e.detail, e.source)):
+      source_kind = graph.nodes.get(edge.source, "?")
+      label = edge.detail or edge.source_slot
+      typer.echo(f"    {edge.source:<20s} ← {label} ({source_kind})")
+
+  if graph.diagnostics:
+    typer.echo("\n  Diagnostics:")
+    for diag in graph.diagnostics:
+      typer.echo(f"    ⚠ {diag}")
+
+
+def _show_relations_json(
+  artifact_id: str,
+  graph: Any,
+  neighbourhood: dict[str, list[Any]],
+) -> None:
+  """Format and print relations as JSON."""
+  data: dict[str, Any] = {
+    "artifact_id": artifact_id,
+    "kind": graph.nodes.get(artifact_id, "unknown"),
+  }
+  for direction_key in ("forward", "inverse"):
+    edges = neighbourhood.get(direction_key, [])
+    data[direction_key] = [
+      {
+        "source": e.source,
+        "target": e.target,
+        "source_slot": e.source_slot,
+        "detail": e.detail,
+        "target_kind": graph.nodes.get(e.target, "unknown"),
+      }
+      for e in edges
+    ]
+  if graph.diagnostics:
+    data["diagnostics"] = graph.diagnostics
+  typer.echo(json.dumps(data, indent=2))
+
+
 @app.command("inferred", hidden=True)
 def show_inferred(
   ctx: typer.Context,

@@ -136,6 +136,9 @@ class WorkspaceValidator:
     self._validate_audit_disposition(audit_registry)
     self._validate_audit_gate_coverage(delta_registry)
 
+    # Cross-artifact unresolved reference check (DE-097)
+    self._validate_unresolved_references()
+
     return list(self.issues)
 
   # --------------------------------------------------------------
@@ -378,6 +381,43 @@ class WorkspaceValidator:
           f"Inconsistent taxonomy: category 'unit' typically implies "
           f"c4_level 'code', but found '{spec.c4_level}'.",
         )
+
+  def _validate_unresolved_references(self) -> None:
+    """Validate that frontmatter references resolve to known artifacts.
+
+    Uses ``build_reference_graph`` to get the full edge set, then checks
+    each edge target against the node index. Non-canonical forms that
+    resolve via normalization produce warnings. Targets that don't
+    resolve at all produce warnings (or errors in strict mode).
+
+    Design reference: DR-097 §4.4.
+    """
+    from supekku.scripts.lib.relations.graph import (  # noqa: PLC0415  # pylint: disable=import-outside-toplevel
+      build_reference_graph,
+      find_unresolved_references,
+    )
+
+    try:
+      graph = build_reference_graph(self.workspace)
+    except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
+      self._warning(
+        "graph",
+        "Could not build reference graph for unresolved reference check",
+      )
+      return
+
+    # Surface normalization diagnostics
+    for diag in graph.diagnostics:
+      self._warning("normalization", diag)
+
+    # Surface unresolved references
+    emit = self._error if self.strict else self._warning
+    for edge in find_unresolved_references(graph):
+      emit(
+        edge.source,
+        f"References unresolved artifact '{edge.target}' "
+        f"(via {edge.source_slot}.{edge.detail})",
+      )
 
 
 def validate_workspace(

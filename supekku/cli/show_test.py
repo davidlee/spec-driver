@@ -1026,5 +1026,57 @@ class ShowRelatedFlagTest(unittest.TestCase):
     assert "referenced_by" in data["related"]
 
 
+class ShowRelationsCommandTest(unittest.TestCase):
+  """VT-097-show-relations: show relations command."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.root = find_repo_root()
+
+  def test_show_relations_known_artifact(self) -> None:
+    """show relations for a known delta shows forward refs."""
+    # DE-097 has relations to ISSUE-031, ISSUE-035, DE-045, DE-073
+    result = self.runner.invoke(app, ["relations", "DE-097"])
+    assert result.exit_code == 0, f"Command failed: {result.stderr}"
+    assert "Relations for DE-097" in result.stdout
+    assert "ISSUE-031" in result.stdout
+
+  def test_show_relations_direction_forward(self) -> None:
+    result = self.runner.invoke(
+      app, ["relations", "DE-097", "--direction", "forward"],
+    )
+    assert result.exit_code == 0
+    assert "Forward references" in result.stdout
+    assert "Inverse references" not in result.stdout
+
+  def test_show_relations_direction_inverse(self) -> None:
+    result = self.runner.invoke(
+      app, ["relations", "ISSUE-031", "--direction", "inverse"],
+    )
+    assert result.exit_code == 0
+    assert "Inverse references" in result.stdout
+    assert "DE-097" in result.stdout
+
+  def test_show_relations_json_output(self) -> None:
+    result = self.runner.invoke(app, ["relations", "DE-097", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    assert data["artifact_id"] == "DE-097"
+    assert "forward" in data
+    assert "inverse" in data
+    assert isinstance(data["forward"], list)
+
+  def test_show_relations_unknown_id_warns(self) -> None:
+    result = self.runner.invoke(app, ["relations", "NONEXISTENT-999"])
+    # Should still exit 0 but warn
+    assert "Warning" in (result.stderr or result.output)
+
+  def test_show_relations_invalid_direction(self) -> None:
+    result = self.runner.invoke(
+      app, ["relations", "DE-097", "--direction", "invalid"],
+    )
+    assert result.exit_code != 0
+
+
 if __name__ == "__main__":
   unittest.main()

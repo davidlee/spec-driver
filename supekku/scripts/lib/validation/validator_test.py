@@ -906,5 +906,70 @@ class WorkspaceValidatorTest(RepoTestCase):
     assert not any(e.artifact in ("SPEC-600", "SPEC-601", "PROD-700") for e in errors)
 
 
+class TestUnresolvedReferenceValidation(RepoTestCase):
+  """VT-097-unresolved: unresolved frontmatter references detected."""
+
+  def _create_workspace_with_delta(
+    self, *, target: str,
+  ) -> Workspace:
+    """Create a minimal workspace with a delta referencing a target."""
+    root = self._make_repo()
+
+    # Create spec-driver dirs
+    spec_dir = root / SPEC_DRIVER_DIR
+    (spec_dir / TECH_SPECS_SUBDIR).mkdir(parents=True)
+    (spec_dir / PRODUCT_SPECS_SUBDIR).mkdir(parents=True)
+    (spec_dir / DECISIONS_SUBDIR).mkdir(parents=True)
+    (spec_dir / DELTAS_SUBDIR).mkdir(parents=True)
+    (spec_dir / REVISIONS_SUBDIR).mkdir(parents=True)
+    (spec_dir / AUDITS_SUBDIR).mkdir(parents=True)
+
+    # Create a delta with a relation to the target
+    delta_dir = spec_dir / DELTAS_SUBDIR / "DE-001-test"
+    delta_dir.mkdir(parents=True)
+    dump_markdown_file(
+      delta_dir / "DE-001.md",
+      {
+        "id": "DE-001",
+        "name": "Test delta",
+        "status": "draft",
+        "kind": "delta",
+        "relations": [{"type": "implements", "target": target}],
+        "applies_to": {"specs": [], "requirements": []},
+      },
+      "# DE-001\n",
+    )
+
+    os.chdir(root)
+    return Workspace(root=root)
+
+  def test_unresolved_ref_produces_warning(self) -> None:
+    """Unresolved target in relation emits a warning."""
+    ws = self._create_workspace_with_delta(target="NONEXISTENT-999")
+    issues = validate_workspace(ws)
+    unresolved = [
+      i for i in issues
+      if "NONEXISTENT-999" in i.message and i.level == "warning"
+    ]
+    assert len(unresolved) >= 1, f"Expected warning for unresolved ref, got: {issues}"
+
+  def test_unresolved_ref_strict_produces_error(self) -> None:
+    """In strict mode, unresolved target emits an error."""
+    ws = self._create_workspace_with_delta(target="NONEXISTENT-999")
+    issues = validate_workspace(ws, strict=True)
+    unresolved = [
+      i for i in issues
+      if "NONEXISTENT-999" in i.message and i.level == "error"
+    ]
+    assert len(unresolved) >= 1, f"Expected error for unresolved ref, got: {issues}"
+
+  def test_resolved_ref_no_warning(self) -> None:
+    """Known target does not produce an unresolved warning."""
+    ws = self._create_workspace_with_delta(target="DE-001")
+    issues = validate_workspace(ws)
+    unresolved = [i for i in issues if "unresolved" in i.message.lower()]
+    assert len(unresolved) == 0, f"Unexpected unresolved warnings: {unresolved}"
+
+
 if __name__ == "__main__":
   unittest.main()

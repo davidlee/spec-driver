@@ -51,6 +51,7 @@
           ];
 
           doCheck = false;
+          meta.mainProgram = "spec-driver";
         };
 
         projectPkgs = with pkgs; [
@@ -84,17 +85,17 @@
         };
 
         # Wrap jailed-pi with preboot (belt — runs before pi reads AGENTS.md)
-        jailPkgs = lib.optionalAttrs isLinux (jailedAgents
-          // {
-            jailed-pi = pkgs.writeShellScriptBin "jailed-pi" ''
-              ${lib.getExe spec-driver} admin preboot "$PWD" >/dev/null 2>&1
-              exec ${lib.getExe jailedAgents.jailed-pi-raw} "$@"
-            '';
-            jailed-pi-research = pkgs.writeShellScriptBin "jailed-pi-research" ''
-              ${lib.getExe spec-driver} admin preboot "$PWD" >/dev/null 2>&1
-              exec ${lib.getExe jailedAgents.jailed-pi-research-raw} "$@"
-            '';
-          });
+        jailPkgs = lib.optionalAttrs isLinux {
+          jailed-pi = pkgs.writeShellScriptBin "jailed-pi" ''
+            ${lib.getExe' spec-driver "spec-driver"} admin preboot "$PWD" >/dev/null 2>&1
+            exec ${lib.getExe' jailedAgents.jailed-pi-raw "jailed-pi"} "$@"
+          '';
+          jailed-pi-research = pkgs.writeShellScriptBin "jailed-pi-research" ''
+            ${lib.getExe' spec-driver "spec-driver"} admin preboot "$PWD" >/dev/null 2>&1
+            exec ${lib.getExe' jailedAgents.jailed-pi-research-raw "jailed-pi"} "$@"
+          '';
+          inherit (jailedAgents) jailed-opencode;
+        };
       in {
         packages =
           jailPkgs

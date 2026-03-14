@@ -1,48 +1,51 @@
 ---
 id: IP-096-P01
-name: Writer infrastructure
+name: CompactDumper + writer + dump_markdown_file
 kind: phase
 status: pending
 delta: DE-096
 plan: IP-096
-created: "2026-03-14"
-updated: "2026-03-14"
+created: '2026-03-14'
+updated: '2026-03-14'
 ---
 
-# Phase 1 – Writer Infrastructure
+# Phase 1 – CompactDumper + Writer + dump_markdown_file
 
 ## Entrance Criteria
-
-- [x] Delta DE-096 scoped
-- [x] DR-096 drafted
+- [x] DR-096 approved
 
 ## Tasks
 
-### 1. Core writer functions
+### 1. CompactDumper
+- [ ] `CompactDumper` class in `frontmatter_writer.py`
+- [ ] Flow-style for short scalar lists (< 80 chars total), block otherwise
+- [ ] `dump_frontmatter(data) -> str` function using CompactDumper with canonical settings
+- [ ] Tests: idempotency, flow/block heuristic, unicode, empty lists, date quoting
 
+### 2. update_frontmatter core primitive
+- [ ] `update_frontmatter(path, mutator)` — load, mutate, bump updated, write
+- [ ] Body content preserved exactly
+- [ ] Tests: mutation, updated-date bump, body preservation, error cases
+
+### 3. List operation convenience functions
 - [ ] `ListUpdateResult` dataclass
-- [ ] `add_frontmatter_list_items(path, field, items, *, sort=True)` — add items, create field if absent, dedup, bump updated
-- [ ] `remove_frontmatter_list_items(path, field, items)` — remove items, bump updated
-- [ ] Internal helpers: parse flow-style `[a, b]`, parse block-style `- a`, detect format, emit in matching format
+- [ ] `add_frontmatter_list_items(path, field, items, *, sort=True)`
+- [ ] `remove_frontmatter_list_items(path, field, items)`
+- [ ] Tests: add, remove, dedup, sort, create-when-absent, empty-after-remove, idempotent
 
-### 2. Tests
+### 4. Reimplement existing functions
+- [ ] `update_frontmatter_status` as thin wrapper around `update_frontmatter`
+- [ ] `update_frontmatter_fields` as thin wrapper around `update_frontmatter`
+- [ ] Existing tests still pass
 
-- [ ] Flow-style: add to existing, add duplicates (dedup), remove, remove last item → `[]`
-- [ ] Block-style: add to existing, remove
-- [ ] Absent field: add creates flow-style
-- [ ] Sort behaviour (default on, explicit off)
-- [ ] Body content preservation
-- [ ] Idempotent add (already present)
-- [ ] Remove non-existent item (no-op)
-- [ ] `updated:` date bumped
-- [ ] Error cases: missing file
+### 5. dump_markdown_file alignment
+- [ ] Switch `spec_utils.py:dump_markdown_file` to use `dump_frontmatter`
+- [ ] Existing creation tests still pass
 
-### 3. Lint
-
-- [ ] `pylint` clean on touched files
+### 6. Lint
+- [ ] pylint clean on touched files
 
 ## Exit Criteria
-
-- [ ] All writer tests green
-- [ ] Existing `frontmatter_writer_test.py` tests unaffected
+- [ ] All new + existing writer tests green
+- [ ] Full test suite green
 - [ ] Lint clean

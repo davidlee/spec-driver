@@ -36,15 +36,15 @@ provenance:
 
 ## Design choices (DE-096)
 
-| Concern | CompactDumper approach | Why |
-|---|---|---|
-| Quote style | Double-quote strings YAML would single-quote | Prettier uses double quotes |
-| Embedded `"` | Use single quotes when value contains `"` | Prettier avoids escaping |
-| Sequence indent | Never indentless (`increase_indent` override) | Prettier indents sequences under parent |
-| Flow list width | `_FLOW_LIST_WIDTH_LIMIT = 60` | Room for key prefix under prettier's 80-char width |
-| Line width | `width=10000` | Prevent PyYAML mid-value wrapping |
-| Reserved starts | `@`, backtick, `'`, `"` trigger quoting | YAML indicators need quoting |
-| Flow indicators | `,`, `[]`, `{}` trigger quoting | Needed for flow list context |
+| Concern         | CompactDumper approach                        | Why                                                |
+| --------------- | --------------------------------------------- | -------------------------------------------------- |
+| Quote style     | Double-quote strings YAML would single-quote  | Prettier uses double quotes                        |
+| Embedded `"`    | Use single quotes when value contains `"`     | Prettier avoids escaping                           |
+| Sequence indent | Never indentless (`increase_indent` override) | Prettier indents sequences under parent            |
+| Flow list width | `_FLOW_LIST_WIDTH_LIMIT = 60`                 | Room for key prefix under prettier's 80-char width |
+| Line width      | `width=10000`                                 | Prevent PyYAML mid-value wrapping                  |
+| Reserved starts | `@`, backtick, `'`, `"` trigger quoting       | YAML indicators need quoting                       |
+| Flow indicators | `,`, `[]`, `{}` trigger quoting               | Needed for flow list context                       |
 
 ## Quoting regex
 

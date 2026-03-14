@@ -47,10 +47,12 @@ from supekku.scripts.lib.memory.registry import MemoryRegistry
 # Reverse mapping: ID prefix → artifact kind for forward reference grouping.
 _PREFIX_TO_KIND: dict[str, str] = {v: k for k, v in ARTIFACT_PREFIXES.items()}
 # Spec prefixes are not in ARTIFACT_PREFIXES — add common ones.
-_PREFIX_TO_KIND.update({
-  "SPEC-": "spec",
-  "PROD-": "spec",
-})
+_PREFIX_TO_KIND.update(
+  {
+    "SPEC-": "spec",
+    "PROD-": "spec",
+  }
+)
 
 # Per-kind reverse lookup registries (DEC-090-15).
 _RELATED_REGISTRIES: dict[str, tuple[str, ...]] = {
@@ -95,8 +97,10 @@ def _gather_reverse_refs(
       related = find_related_to(artifacts, entity_id)
       if related:
         result[kind] = [
-          (getattr(a, "id", getattr(a, "uid", "?")),
-           getattr(a, "name", getattr(a, "title", "")))
+          (
+            getattr(a, "id", getattr(a, "uid", "?")),
+            getattr(a, "name", getattr(a, "title", "")),
+          )
           for a in related
         ]
     except (FileNotFoundError, ValueError):
@@ -300,9 +304,7 @@ def show_delta(
       if related:
         # Append full neighbourhood (excluding audit/revision already shown)
         skip = ("audit", "revision")
-        extra_refs = {
-          k: v for k, v in reverse_refs.items() if k not in skip
-        }
+        extra_refs = {k: v for k, v in reverse_refs.items() if k not in skip}
         if extra_refs:
           related_lines = format_related_section(extra_refs)
           return base + "\n".join(related_lines)

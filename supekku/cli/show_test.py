@@ -993,9 +993,7 @@ class ShowRelatedFlagTest(unittest.TestCase):
 
   def test_show_requirement_related(self) -> None:
     """VT-090-P5-1 (requirement): show requirement --related works."""
-    result = self.runner.invoke(
-      app, ["requirement", "PROD-010.FR-005", "--related"]
-    )
+    result = self.runner.invoke(app, ["requirement", "PROD-010.FR-005", "--related"])
     assert result.exit_code == 0, f"Command failed: {result.stderr}"
     # PROD-010.FR-005 is implemented by DE-011 and DE-090
     assert "Referenced by:" in result.stdout

@@ -505,9 +505,7 @@ def _collect_pi_sources(
   if not extensions_src.is_dir():
     return []
   return sorted(
-    f
-    for f in extensions_src.iterdir()
-    if f.is_file() and ".test." not in f.name
+    f for f in extensions_src.iterdir() if f.is_file() and ".test." not in f.name
   )
 
 

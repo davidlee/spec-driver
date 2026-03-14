@@ -892,7 +892,7 @@ class TestInstallPiConfig:
     ext_dir = package_root / "pi.extensions"
     ext_dir.mkdir(parents=True)
     (ext_dir / "spec-driver-preboot.ts").write_text(
-      'export default { hooks: { session_shutdown: () => {} } };',
+      "export default { hooks: { session_shutdown: () => {} } };",
       encoding="utf-8",
     )
 

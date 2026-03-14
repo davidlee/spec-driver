@@ -42,16 +42,15 @@ automatically.
   content.
 - Example:
 
-
-    1     # pip install python-frontmatter
-    2     import frontmatter
-    3
-    4     def load_markdown_file(path: Path | str) -> frontmatter.Post:
-    5         # This single call replaces _split_frontmatter and yaml.safe_load
-    6         return frontmatter.load(path)
-    7
-    8     def dump_markdown_file(path: Path | str, post: frontmatter.Post) -> None:
-    9         # The library handles the serialization and file writing
+  1 # pip install python-frontmatter
+  2 import frontmatter
+  3
+  4 def load_markdown_file(path: Path | str) -> frontmatter.Post:
+  5 # This single call replaces \_split_frontmatter and yaml.safe_load
+  6 return frontmatter.load(path)
+  7
+  8 def dump_markdown_file(path: Path | str, post: frontmatter.Post) -> None:
+  9 # The library handles the serialization and file writing
 
 10 frontmatter.dump(post, path)
 11
@@ -68,25 +67,24 @@ This is the most impactful extension. The library should be the canonical source
 - Rationale: Enforces consistency, prevents errors, and allows agents to operate with confidence. This is the core of "tools, not rules."
 - Example: You could use a library like Pydantic or jsonschema to define your frontmatter rules.
 
-
-    1     # (Conceptual example using Pydantic)
-    2     from pydantic import BaseModel, Field
-    3     from typing import List, Literal
-    4
-    5     class BaseSpec(BaseModel):
-    6         id: str
-    7         name: str
-    8         kind: Literal['spec', 'prod', 'delta', 'audit', 'etc']
-    9         status: Literal['draft', 'approved', 'active', 'superseded']
+  1 # (Conceptual example using Pydantic)
+  2 from pydantic import BaseModel, Field
+  3 from typing import List, Literal
+  4
+  5 class BaseSpec(BaseModel):
+  6 id: str
+  7 name: str
+  8 kind: Literal['spec', 'prod', 'delta', 'audit', 'etc']
+  9 status: Literal['draft', 'approved', 'active', 'superseded']
 
 10 # ... other common fields
 11
 12 class TechSpec(BaseSpec):
 13 kind: Literal['spec']
-14 packages: List[str] = Field(default_factory=list)
+14 packages: List[str] = Field(default*factory=list)
 15 responsibilities: List[str] = Field(default_factory=list)
 16
-17 SCHEMA_KINDS = {"spec": TechSpec, /_ ... other kinds _/}
+17 SCHEMA_KINDS = {"spec": TechSpec, /* ... other kinds \_/}
 18
 19 def validate_frontmatter(frontmatter: dict) -> BaseModel:
 20 kind = frontmatter.get("kind")
@@ -109,16 +107,15 @@ Centralize the logic for finding specs. Agents shouldn't need to scan the filesy
 - Rationale: Decouples agents from the physical directory structure and provides a fast, reliable way to resolve artifact IDs.
 - Example:
 
-
-    1     # (Assumes a registry.json mapping ID -> file_path)
-    2     class SpecFinder:
-    3         def __init__(self, root_dir: Path):
-    4             self._registry_path = root_dir / "doc/specify/tech/registry.json"
-    5             self._registry = self._load_registry()
-    6
-    7         def _load_registry(self) -> dict:
-    8             # Load and cache the registry file
-    9             ...
+  1 # (Assumes a registry.json mapping ID -> file_path)
+  2 class SpecFinder:
+  3 def **init**(self, root_dir: Path):
+  4 self.\_registry_path = root_dir / "doc/specify/tech/registry.json"
+  5 self.\_registry = self.\_load_registry()
+  6
+  7 def \_load_registry(self) -> dict:
+  8 # Load and cache the registry file
+  9 ...
 
 10
 11 def find_path_by_id(self, spec_id: str) -> Path | None:
@@ -139,16 +136,15 @@ artifacts.
   without calling an external process.
 - Example:
 
-
-    1     def create_artifact(
-    2         kind: str,
-    3         name: str,
-    4         directory: Path,
-    5         # ... other metadata
-    6     ) -> Path:
-    7         # 1. Determine the next available ID (e.g., SPEC-042)
-    8         # 2. Load the correct template file from .specify/templates/
-    9         # 3. Populate the frontmatter
+  1 def create_artifact(
+  2 kind: str,
+  3 name: str,
+  4 directory: Path,
+  5 # ... other metadata
+  6 ) -> Path:
+  7 # 1. Determine the next available ID (e.g., SPEC-042)
+  8 # 2. Load the correct template file from .specify/templates/
+  9 # 3. Populate the frontmatter
 
 10 # 4. Create the directory and file
 11 # 5. Return the path to the new file
@@ -162,16 +158,15 @@ Provide helper functions for reading and modifying the relations field in the fr
   mistakes.
 - Example:
 
-
-    1     def add_relation(
-    2         spec_path: Path,
-    3         type: str,
-    4         target: str,
-    5         annotation: str | None = None
-    6     ) -> bool:
-    7         post = load_markdown_file(spec_path)
-    8         relations = post.metadata.setdefault("relations", [])
-    9
+  1 def add_relation(
+  2 spec_path: Path,
+  3 type: str,
+  4 target: str,
+  5 annotation: str | None = None
+  6 ) -> bool:
+  7 post = load_markdown_file(spec_path)
+  8 relations = post.metadata.setdefault("relations", [])
+  9
 
 10 new_relation = {"type": type, "target": target}
 11 if annotation:

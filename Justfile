@@ -31,7 +31,7 @@ pylint-only *args:
   uv run pylint supekku --disable=all --extension-pkg-allow-list=pylint.extensions.mccabe --enable={{args}}
 
 format-markdown:
-  prettier supekku .spec-driver --write
+  prettier supekku .spec-driver .contracts --write
 
 
 ## helpers

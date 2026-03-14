@@ -638,7 +638,9 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
       with (
         patch.object(TypeScriptAdapter, "is_node_available", return_value=True),
         patch.object(
-          TypeScriptAdapter, "_ensure_ts_doc_extract_available", return_value=True,
+          TypeScriptAdapter,
+          "_ensure_ts_doc_extract_available",
+          return_value=True,
         ),
         patch.object(TypeScriptAdapter, "_extract_ast", return_value=ast_data),
       ):

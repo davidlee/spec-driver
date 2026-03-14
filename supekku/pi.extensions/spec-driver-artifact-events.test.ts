@@ -4,7 +4,7 @@
  * Ported from supekku/claude.hooks/artifact_event_test.py.
  * Run: node --experimental-strip-types supekku/pi.extensions/spec-driver-artifact-events.test.ts
  */
-import { classifyPath, buildEvent, writeLog } from "./spec-driver-artifact-events.ts";
+import { classifyPath, buildEvent, writeLog, sendSocket } from "./spec-driver-artifact-events.ts";
 import { readFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -186,6 +186,48 @@ test("creates run dir recursively", () => {
   } finally {
     rmSync(tmp, { recursive: true });
   }
+});
+
+// --- sendSocket ---
+
+console.log("sendSocket — pi.exec delegation");
+
+test("calls pi.exec with python3 dgram script", () => {
+  const calls: { cmd: string; args: string[] }[] = [];
+  const mockPi = {
+    exec(cmd: string, args: string[]) {
+      calls.push({ cmd, args });
+      return Promise.resolve({ exitCode: 0, stdout: "", stderr: "" });
+    },
+  };
+
+  const event = { v: 1, cmd: "artifact.read" };
+  sendSocket(event, "/proj/.spec-driver/run", mockPi as any);
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].cmd, "python3");
+  assert.equal(calls[0].args[0], "-c");
+  // Script should contain AF_UNIX and SOCK_DGRAM
+  assert.ok(calls[0].args[1].includes("AF_UNIX"));
+  assert.ok(calls[0].args[1].includes("SOCK_DGRAM"));
+  // Data and socket path passed as args
+  assert.equal(calls[0].args[2], JSON.stringify(event));
+  assert.equal(calls[0].args[3], "/proj/.spec-driver/run/tui.sock");
+});
+
+test("skips when socket path exceeds max length", () => {
+  const calls: unknown[] = [];
+  const mockPi = {
+    exec(...args: unknown[]) {
+      calls.push(args);
+      return Promise.resolve({ exitCode: 0, stdout: "", stderr: "" });
+    },
+  };
+
+  const longDir = "/proj/" + "a".repeat(120) + "/.spec-driver/run";
+  sendSocket({ v: 1 }, longDir, mockPi as any);
+
+  assert.equal(calls.length, 0);
 });
 
 // --- Summary ---

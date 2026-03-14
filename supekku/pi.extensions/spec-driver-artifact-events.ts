@@ -3,11 +3,11 @@
  *
  * Hooks `tool_result` for read/edit/write tools, classifies file paths
  * against spec-driver artifact patterns, and emits v1 events to
- * `.spec-driver/run/events.jsonl`.
+ * `.spec-driver/run/events.jsonl` + `tui.sock` Unix datagram.
  *
- * The TUI picks up events via log-tail (watchfiles). Unix datagram socket
- * (used by the Python Claude Code hook) is not available from Node.js
- * dgram — log-tail fallback is automatic and sufficient.
+ * JSONL is written synchronously (append). Socket datagram is sent via
+ * `pi.exec("python3", ...)` because Node.js dgram lacks AF_UNIX support.
+ * Socket send is async, fire-and-forget, fail-silent.
  *
  * Fail-silent: all exceptions are swallowed (DEC-094-02).
  *
@@ -17,7 +17,7 @@
  *       supekku/claude.hooks/artifact_event.py (_ARTIFACT_PATTERNS)
  *       see mem.artifact-pattern-sync
  */
-import type { ExtensionFactory } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionFactory } from "@mariozechner/pi-coding-agent";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { join, relative } from "node:path";
 
@@ -48,6 +48,8 @@ const TOOL_TO_ACTION: Record<string, string> = {
 
 const EVENT_SCHEMA_VERSION = 1;
 const LOG_FILENAME = "events.jsonl";
+const SOCKET_FILENAME = "tui.sock";
+const MAX_SOCKET_PATH_LEN = 104;
 
 // --- Pure functions ---
 
@@ -95,6 +97,32 @@ export function writeLog(event: Record<string, unknown>, runDir: string): void {
   appendFileSync(join(runDir, LOG_FILENAME), line, "utf-8");
 }
 
+/**
+ * Send a JSON datagram to the TUI Unix socket via python3.
+ *
+ * Node.js dgram lacks AF_UNIX support, so we shell out to Python.
+ * Async, fire-and-forget — errors are silently ignored.
+ */
+export function sendSocket(
+  event: Record<string, unknown>,
+  runDir: string,
+  pi: ExtensionAPI,
+): void {
+  const sockPath = join(runDir, SOCKET_FILENAME);
+  if (sockPath.length > MAX_SOCKET_PATH_LEN) return;
+
+  const data = JSON.stringify(event);
+  // One-liner: open AF_UNIX DGRAM socket, send, close.
+  const script =
+    "import socket,sys;" +
+    "s=socket.socket(socket.AF_UNIX,socket.SOCK_DGRAM);" +
+    "s.sendto(sys.argv[1].encode(),sys.argv[2]);" +
+    "s.close()";
+
+  // Fire-and-forget — don't await, don't check result
+  pi.exec("python3", ["-c", script, data, sockPath]).catch(() => {});
+}
+
 // --- Extension entry point ---
 
 const extension: ExtensionFactory = (pi) => {
@@ -120,6 +148,7 @@ const extension: ExtensionFactory = (pi) => {
 
       const runDir = join(ctx.cwd, ".spec-driver", "run");
       writeLog(ev, runDir);
+      sendSocket(ev, runDir, pi);
     } catch {
       /* fail-silent: never interfere with pi operation (DEC-094-02) */
     }

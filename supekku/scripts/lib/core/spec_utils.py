@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 try:
-  import yaml
+  import yaml  # noqa: F401  # pylint: disable=unused-import
 except ImportError as exc:
   msg = "PyYAML is required for spec tooling. Install with `pip install PyYAML`."
   raise SystemExit(
@@ -48,8 +48,10 @@ def dump_markdown_file(
   body: str,
 ) -> None:
   """Write frontmatter and content to a markdown file."""
+  from .frontmatter_writer import dump_frontmatter_yaml  # noqa: PLC0415
+
   path = Path(path)
-  frontmatter_yaml = yaml.safe_dump(frontmatter, sort_keys=False).strip()
+  frontmatter_yaml = dump_frontmatter_yaml(frontmatter)
   body = body.lstrip("\n")
   if body and not body.endswith("\n"):
     body = body + "\n"

@@ -426,9 +426,9 @@ def _verify_memory(memory_id: str, path: Path) -> None:
   update_frontmatter_fields(
     path,
     {
-      "verified": f"'{today}'",
+      "verified": today,
       "verified_sha": sha,
-      "updated": f"'{today}'",
+      "updated": today,
     },
   )
   typer.echo(f"Verified: {memory_id} at {short_sha(sha)}")

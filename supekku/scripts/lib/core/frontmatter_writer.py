@@ -1,35 +1,127 @@
-"""Safe line-level frontmatter field updates.
+"""Canonical frontmatter writer with YAML round-trip formatting.
 
-Provides shared primitives for updating YAML frontmatter fields without
-a full YAML round-trip, preserving all other file content byte-for-byte.
+Provides primitives for reading, mutating, and writing YAML frontmatter
+using a deterministic ``CompactDumper`` that produces idempotent output.
+Body content (including code-fenced YAML blocks) passes through untouched.
 """
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
+from typing import Any
+
+import yaml
+
+from supekku.scripts.lib.core.spec_utils import (
+  dump_markdown_file,
+  load_markdown_file,
+)
+
+# ---------------------------------------------------------------------------
+# CompactDumper — canonical YAML formatting
+# ---------------------------------------------------------------------------
+
+# Threshold for flow-style list rendering.  Lists whose total rendered
+# item-character count (plus separators) stays below this limit are emitted
+# in compact flow style ``[a, b, c]``; longer or complex lists use block
+# style.
+_FLOW_LIST_WIDTH_LIMIT = 80
+
+
+class CompactDumper(yaml.SafeDumper):
+  """YAML dumper producing compact, deterministic frontmatter.
+
+  Short scalar lists render as flow-style ``[a, b, c]``.
+  Long lists and lists containing dicts render as block-style.
+  """
+
+
+def _represent_list(dumper: CompactDumper, data: list) -> yaml.Node:
+  """Flow-style for short scalar lists, block-style otherwise."""
+  use_flow = (
+    all(isinstance(x, (str, int, float, bool)) for x in data)
+    and sum(len(str(x)) for x in data) + 2 * len(data) < _FLOW_LIST_WIDTH_LIMIT
+  )
+  return dumper.represent_sequence(
+    "tag:yaml.org,2002:seq", data, flow_style=use_flow
+  )
+
+
+CompactDumper.add_representer(list, _represent_list)
+
+
+def dump_frontmatter_yaml(data: dict[str, Any]) -> str:
+  """Render a frontmatter dict as canonical YAML text (no ``---`` markers).
+
+  Uses ``CompactDumper`` for deterministic, idempotent output.
+  """
+  return yaml.dump(
+    data,
+    Dumper=CompactDumper,
+    sort_keys=False,
+    allow_unicode=True,
+    width=120,
+  ).strip()
+
+
+# ---------------------------------------------------------------------------
+# Core mutator primitive
+# ---------------------------------------------------------------------------
+
+
+def update_frontmatter(
+  path: Path,
+  mutator: Callable[[dict[str, Any]], None],
+) -> dict[str, Any]:
+  """Load frontmatter, apply *mutator*, bump ``updated``, and write back.
+
+  Body content (including code-fenced YAML blocks) passes through
+  untouched.  The frontmatter is re-serialised with ``CompactDumper``
+  for canonical formatting.
+
+  Args:
+    path: Path to the artifact markdown file (must exist).
+    mutator: Callable that modifies the frontmatter dict in-place.
+
+  Returns:
+    The mutated frontmatter dict.
+
+  Raises:
+    FileNotFoundError: If *path* does not exist.
+  """
+  if not path.exists():
+    msg = f"File not found: {path}"
+    raise FileNotFoundError(msg)
+
+  frontmatter_data, body = load_markdown_file(path)
+  mutator(frontmatter_data)
+  frontmatter_data["updated"] = date.today().isoformat()
+  dump_markdown_file(path, frontmatter_data, body)
+  return frontmatter_data
+
+
+# ---------------------------------------------------------------------------
+# Scalar field operations (backward-compatible wrappers)
+# ---------------------------------------------------------------------------
 
 
 def update_frontmatter_status(path: Path, status: str) -> bool:
-  """Update status and updated date in artifact frontmatter.
-
-  Performs a line-level replacement within the YAML frontmatter block,
-  writing ``status`` unquoted and ``updated`` single-quoted to match
-  project convention.
+  """Update ``status`` and ``updated`` date in artifact frontmatter.
 
   Args:
     path: Path to the artifact markdown file (must exist).
     status: New status value (must be non-empty after stripping).
 
   Returns:
-    True if a ``status:`` field was found and updated.
-    False if no ``status:`` field exists in the frontmatter.
+    True if a ``status`` field was found and updated.
+    False if no ``status`` field exists in the frontmatter.
 
   Raises:
     FileNotFoundError: If *path* does not exist.
     ValueError: If *status* is empty or whitespace-only.
-
   """
   if not status or not status.strip():
     msg = "Status must not be empty"
@@ -39,32 +131,13 @@ def update_frontmatter_status(path: Path, status: str) -> bool:
     msg = f"File not found: {path}"
     raise FileNotFoundError(msg)
 
-  content = path.read_text(encoding="utf-8")
-  lines = content.splitlines()
-  today = date.today().isoformat()
-
-  in_frontmatter = False
-  updated_lines: list[str] = []
-  status_updated = False
-
-  for line in lines:
-    if line.strip() == "---":
-      in_frontmatter = not in_frontmatter
-      updated_lines.append(line)
-      continue
-
-    if in_frontmatter and line.startswith("status:"):
-      updated_lines.append(f"status: {status}")
-      status_updated = True
-    elif in_frontmatter and line.startswith("updated:"):
-      updated_lines.append(f"updated: '{today}'")
-    else:
-      updated_lines.append(line)
-
-  if not status_updated:
+  frontmatter_data, body = load_markdown_file(path)
+  if "status" not in frontmatter_data:
     return False
 
-  path.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
+  frontmatter_data["status"] = status
+  frontmatter_data["updated"] = date.today().isoformat()
+  dump_markdown_file(path, frontmatter_data, body)
   return True
 
 
@@ -83,19 +156,14 @@ def update_frontmatter_fields(
   path: Path,
   updates: dict[str, str],
 ) -> FieldUpdateResult:
-  """Update multiple frontmatter fields via line-level replacement.
+  """Update multiple frontmatter fields.
 
-  For each key in *updates*, finds ``key: ...`` in frontmatter and
-  replaces the value. Only operates on simple scalar fields (not
-  nested objects or multiline values).
-
-  Fields not found in existing frontmatter are inserted before the
-  closing ``---`` marker, in dict iteration order.
+  For each key in *updates*, sets the field to the given value.
+  Tracks which fields already existed (updated) vs were new (inserted).
 
   Args:
     path: Path to the artifact markdown file (must exist).
     updates: Mapping of field name to new value string.
-      Values are written as-is (caller is responsible for quoting).
 
   Returns:
     FieldUpdateResult with sets of updated and inserted field names.
@@ -112,80 +180,154 @@ def update_frontmatter_fields(
     msg = f"File not found: {path}"
     raise FileNotFoundError(msg)
 
-  content = path.read_text(encoding="utf-8")
-  lines = content.splitlines()
+  frontmatter_data, body = load_markdown_file(path)
+  existing_keys = set(frontmatter_data.keys())
 
-  result_lines, found_fields, closing_marker_idx = _replace_fields(lines, updates)
-  missing = _insert_missing_fields(
-    result_lines,
-    updates,
-    found_fields,
-    closing_marker_idx,
+  for key, value in updates.items():
+    frontmatter_data[key] = value
+
+  frontmatter_data["updated"] = date.today().isoformat()
+  dump_markdown_file(path, frontmatter_data, body)
+
+  updated_keys = set(updates.keys()) & existing_keys
+  inserted_keys = set(updates.keys()) - existing_keys
+  return FieldUpdateResult(updated=updated_keys, inserted=inserted_keys)
+
+
+# ---------------------------------------------------------------------------
+# List field operations
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class ListUpdateResult:
+  """Result of a frontmatter list field operation."""
+
+  field: str
+  """Field name that was operated on."""
+
+  added: list[str] = field(default_factory=list)
+  """Items actually added (were not already present)."""
+
+  removed: list[str] = field(default_factory=list)
+  """Items actually removed (were present)."""
+
+  final: list[str] = field(default_factory=list)
+  """Resulting list after the operation."""
+
+
+def add_frontmatter_list_items(
+  path: Path,
+  field_name: str,
+  items: list[str],
+  *,
+  sort: bool = True,
+) -> ListUpdateResult:
+  """Add items to a frontmatter list field.
+
+  Creates the field if absent.  Deduplicates items.  Optionally sorts
+  the resulting list (default: True).
+
+  Args:
+    path: Path to the artifact markdown file (must exist).
+    field_name: Frontmatter field name (e.g. ``"tags"``).
+    items: Items to add.
+    sort: Whether to sort the resulting list.
+
+  Returns:
+    ListUpdateResult describing what changed.
+
+  Raises:
+    FileNotFoundError: If *path* does not exist.
+    ValueError: If *items* is empty.
+  """
+  if not items:
+    msg = "Items must not be empty"
+    raise ValueError(msg)
+
+  added: list[str] = []
+
+  def _mutate(fm: dict[str, Any]) -> None:
+    current = fm.get(field_name)
+    if not isinstance(current, list):
+      current = []
+    existing = set(current)
+    for item in items:
+      if item not in existing:
+        current.append(item)
+        existing.add(item)
+        added.append(item)
+    if sort:
+      current.sort()
+    fm[field_name] = current
+
+  result_fm = update_frontmatter(path, _mutate)
+  final = result_fm.get(field_name, [])
+  return ListUpdateResult(
+    field=field_name,
+    added=added,
+    removed=[],
+    final=list(final),
   )
 
-  path.write_text("\n".join(result_lines) + "\n", encoding="utf-8")
 
-  return FieldUpdateResult(updated=found_fields, inserted=set(missing))
+def remove_frontmatter_list_items(
+  path: Path,
+  field_name: str,
+  items: list[str],
+) -> ListUpdateResult:
+  """Remove items from a frontmatter list field.
 
+  Missing items are silently ignored.  The field is retained (as an
+  empty list) even when all items are removed.
 
-def _replace_fields(
-  lines: list[str],
-  updates: dict[str, str],
-) -> tuple[list[str], set[str], int | None]:
-  """Replace matching frontmatter fields, tracking which were found."""
-  in_frontmatter = False
-  result_lines: list[str] = []
-  found_fields: set[str] = set()
-  closing_marker_idx: int | None = None
+  Args:
+    path: Path to the artifact markdown file (must exist).
+    field_name: Frontmatter field name (e.g. ``"tags"``).
+    items: Items to remove.
 
-  for line in lines:
-    if line.strip() == "---":
-      if in_frontmatter:
-        closing_marker_idx = len(result_lines)
-      in_frontmatter = not in_frontmatter
-      result_lines.append(line)
-      continue
+  Returns:
+    ListUpdateResult describing what changed.
 
-    replaced = (
-      _try_replace_line(line, updates, found_fields) if in_frontmatter else None
-    )
-    result_lines.append(replaced if replaced is not None else line)
+  Raises:
+    FileNotFoundError: If *path* does not exist.
+    ValueError: If *items* is empty.
+  """
+  if not items:
+    msg = "Items must not be empty"
+    raise ValueError(msg)
 
-  return result_lines, found_fields, closing_marker_idx
+  removed: list[str] = []
 
+  def _mutate(fm: dict[str, Any]) -> None:
+    current = fm.get(field_name)
+    if not isinstance(current, list):
+      fm[field_name] = []
+      return
+    to_remove = set(items)
+    for item in current:
+      if item in to_remove:
+        removed.append(item)
+    fm[field_name] = [x for x in current if x not in to_remove]
 
-def _try_replace_line(
-  line: str,
-  updates: dict[str, str],
-  found_fields: set[str],
-) -> str | None:
-  """Try to match a frontmatter line against updates. Returns replacement or None."""
-  for field_name, value in updates.items():
-    if line.startswith(f"{field_name}:"):
-      found_fields.add(field_name)
-      return f"{field_name}: {value}"
-  return None
-
-
-def _insert_missing_fields(
-  result_lines: list[str],
-  updates: dict[str, str],
-  found_fields: set[str],
-  closing_marker_idx: int | None,
-) -> list[str]:
-  """Insert fields not found during replacement before the closing ---."""
-  missing = [k for k in updates if k not in found_fields]
-  if missing and closing_marker_idx is not None:
-    for offset, field_name in enumerate(missing):
-      result_lines.insert(
-        closing_marker_idx + offset,
-        f"{field_name}: {updates[field_name]}",
-      )
-  return missing
+  result_fm = update_frontmatter(path, _mutate)
+  final = result_fm.get(field_name, [])
+  return ListUpdateResult(
+    field=field_name,
+    added=[],
+    removed=removed,
+    final=list(final),
+  )
 
 
 __all__ = [
+  "CompactDumper",
   "FieldUpdateResult",
+  "ListUpdateResult",
+  "add_frontmatter_list_items",
+  "dump_frontmatter_yaml",
+  "remove_frontmatter_list_items",
+  "update_frontmatter",
   "update_frontmatter_fields",
   "update_frontmatter_status",
 ]

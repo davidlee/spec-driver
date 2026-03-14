@@ -58,6 +58,7 @@
           spec-driver
 
           tree-sitter
+          prettier
 
           uv
           python3Packages.pylint

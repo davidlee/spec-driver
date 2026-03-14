@@ -117,13 +117,15 @@ class TestCompactDumper:
 
   def test_ambiguous_strings_double_quoted(self) -> None:
     """Strings that YAML would single-quote use double quotes (prettier compat)."""
-    out = dump_frontmatter_yaml({
-      "title": "STD-001: use typer",
-      "empty": "",
-      "bool_like": "true",
-      "null_like": "null",
-      "number_like": "123",
-    })
+    out = dump_frontmatter_yaml(
+      {
+        "title": "STD-001: use typer",
+        "empty": "",
+        "bool_like": "true",
+        "null_like": "null",
+        "number_like": "123",
+      }
+    )
     assert 'title: "STD-001: use typer"' in out
     assert 'empty: ""' in out
     assert 'bool_like: "true"' in out

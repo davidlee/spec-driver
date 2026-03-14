@@ -5,7 +5,6 @@ from __future__ import annotations
 import pytest
 
 from supekku.scripts.lib.core.artifact_ids import (
-  NormalizationResult,
   classify_artifact_id,
   is_artifact_id,
   is_kind,
@@ -216,10 +215,16 @@ class TestIsKind:
 class TestNormalizeArtifactId:
   """VT-097-normalize: normalize_artifact_id resolves padding variants."""
 
-  KNOWN_IDS = frozenset({
-    "ADR-001", "ADR-011", "DE-097", "SPEC-001", "ISSUE-031",
-    "SPEC-1234",  # 4-digit ID for future-proofing tests
-  })
+  KNOWN_IDS = frozenset(
+    {
+      "ADR-001",
+      "ADR-011",
+      "DE-097",
+      "SPEC-001",
+      "ISSUE-031",
+      "SPEC-1234",  # 4-digit ID for future-proofing tests
+    }
+  )
 
   def test_already_canonical(self) -> None:
     result = normalize_artifact_id("ADR-011", self.KNOWN_IDS)

@@ -4,7 +4,7 @@ slug: "097-verification-regression-cleanup"
 name: "Phase 3: Verification, regression, and cleanup"
 created: "2026-03-15"
 updated: "2026-03-15"
-status: draft
+status: in-progress
 kind: phase
 ---
 

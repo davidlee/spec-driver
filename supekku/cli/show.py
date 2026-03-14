@@ -1028,7 +1028,8 @@ def show_relations(
     ),
   ] = "both",
   json_output: Annotated[
-    bool, typer.Option("--json", help="Output as JSON"),
+    bool,
+    typer.Option("--json", help="Output as JSON"),
   ] = False,
   root: RootOption = None,
 ) -> None:

@@ -910,7 +910,9 @@ class TestUnresolvedReferenceValidation(RepoTestCase):
   """VT-097-unresolved: unresolved frontmatter references detected."""
 
   def _create_workspace_with_delta(
-    self, *, target: str,
+    self,
+    *,
+    target: str,
   ) -> Workspace:
     """Create a minimal workspace with a delta referencing a target."""
     root = self._make_repo()
@@ -948,8 +950,7 @@ class TestUnresolvedReferenceValidation(RepoTestCase):
     ws = self._create_workspace_with_delta(target="NONEXISTENT-999")
     issues = validate_workspace(ws)
     unresolved = [
-      i for i in issues
-      if "NONEXISTENT-999" in i.message and i.level == "warning"
+      i for i in issues if "NONEXISTENT-999" in i.message and i.level == "warning"
     ]
     assert len(unresolved) >= 1, f"Expected warning for unresolved ref, got: {issues}"
 
@@ -958,8 +959,7 @@ class TestUnresolvedReferenceValidation(RepoTestCase):
     ws = self._create_workspace_with_delta(target="NONEXISTENT-999")
     issues = validate_workspace(ws, strict=True)
     unresolved = [
-      i for i in issues
-      if "NONEXISTENT-999" in i.message and i.level == "error"
+      i for i in issues if "NONEXISTENT-999" in i.message and i.level == "error"
     ]
     assert len(unresolved) >= 1, f"Expected error for unresolved ref, got: {issues}"
 

@@ -1043,7 +1043,8 @@ class ShowRelationsCommandTest(unittest.TestCase):
 
   def test_show_relations_direction_forward(self) -> None:
     result = self.runner.invoke(
-      app, ["relations", "DE-097", "--direction", "forward"],
+      app,
+      ["relations", "DE-097", "--direction", "forward"],
     )
     assert result.exit_code == 0
     assert "Forward references" in result.stdout
@@ -1051,7 +1052,8 @@ class ShowRelationsCommandTest(unittest.TestCase):
 
   def test_show_relations_direction_inverse(self) -> None:
     result = self.runner.invoke(
-      app, ["relations", "ISSUE-031", "--direction", "inverse"],
+      app,
+      ["relations", "ISSUE-031", "--direction", "inverse"],
     )
     assert result.exit_code == 0
     assert "Inverse references" in result.stdout
@@ -1073,7 +1075,8 @@ class ShowRelationsCommandTest(unittest.TestCase):
 
   def test_show_relations_invalid_direction(self) -> None:
     result = self.runner.invoke(
-      app, ["relations", "DE-097", "--direction", "invalid"],
+      app,
+      ["relations", "DE-097", "--direction", "invalid"],
     )
     assert result.exit_code != 0
 

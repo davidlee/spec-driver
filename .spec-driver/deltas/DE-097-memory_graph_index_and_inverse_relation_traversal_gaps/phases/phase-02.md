@@ -4,7 +4,7 @@ slug: "097-cli-and-validation-integration"
 name: "Phase 2: CLI and validation integration"
 created: "2026-03-15"
 updated: "2026-03-15"
-status: in-progress
+status: complete
 kind: phase
 ---
 

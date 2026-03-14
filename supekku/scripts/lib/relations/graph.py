@@ -116,12 +116,14 @@ def build_reference_graph_from_artifacts(
           if result.diagnostic:
             diagnostics.append(result.diagnostic)
 
-      edges.append(GraphEdge(
-        source=art_id,
-        target=target,
-        source_slot=hit.source,
-        detail=hit.detail,
-      ))
+      edges.append(
+        GraphEdge(
+          source=art_id,
+          target=target,
+          source_slot=hit.source,
+          detail=hit.detail,
+        )
+      )
 
   graph = ReferenceGraph(
     nodes=nodes,
@@ -203,9 +205,10 @@ def _collect_standalone_registry_artifacts(
   out: list[tuple[str, str, Any]],
 ) -> None:
   """Collect artifacts from registries not exposed on Workspace."""
-  from supekku.scripts.lib.backlog.registry import BacklogRegistry  # noqa: PLC0415  # pylint: disable=import-outside-toplevel
-  from supekku.scripts.lib.drift.registry import DriftLedgerRegistry  # noqa: PLC0415  # pylint: disable=import-outside-toplevel
-  from supekku.scripts.lib.memory.registry import MemoryRegistry  # noqa: PLC0415  # pylint: disable=import-outside-toplevel
+  # pylint: disable=import-outside-toplevel
+  from supekku.scripts.lib.backlog.registry import BacklogRegistry  # noqa: PLC0415
+  from supekku.scripts.lib.drift.registry import DriftLedgerRegistry  # noqa: PLC0415
+  from supekku.scripts.lib.memory.registry import MemoryRegistry  # noqa: PLC0415
 
   for mem_id, mem in MemoryRegistry(root=root).collect().items():
     out.append((mem_id, "memory", mem))

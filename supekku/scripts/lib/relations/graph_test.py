@@ -5,18 +5,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-import pytest
-
 from supekku.scripts.lib.relations.graph import (
-  GraphEdge,
-  ReferenceGraph,
   build_reference_graph_from_artifacts,
   find_unresolved_references,
   query_forward,
   query_inverse,
   query_neighbourhood,
 )
-
 
 # ── Test fixtures ─────────────────────────────────────────────
 
@@ -96,8 +91,7 @@ class TestBuildReferenceGraph:
   def test_edges_from_applies_to(self) -> None:
     graph = build_reference_graph_from_artifacts(_make_artifacts())
     applies_edges = [
-      e for e in graph.edges
-      if e.source == "DE-097" and e.source_slot == "applies_to"
+      e for e in graph.edges if e.source == "DE-097" and e.source_slot == "applies_to"
     ]
     assert len(applies_edges) == 1
     assert applies_edges[0].target == "SPEC-001"
@@ -211,10 +205,14 @@ class TestFindUnresolvedReferences:
 
   def test_unresolved_target(self) -> None:
     arts = [
-      ("DE-001", "delta", FakeArtifact(
-        id="DE-001",
-        relations=[{"type": "implements", "target": "SPEC-999"}],
-      )),
+      (
+        "DE-001",
+        "delta",
+        FakeArtifact(
+          id="DE-001",
+          relations=[{"type": "implements", "target": "SPEC-999"}],
+        ),
+      ),
     ]
     graph = build_reference_graph_from_artifacts(arts)
     unresolved = find_unresolved_references(graph)
@@ -232,10 +230,14 @@ class TestGraphNormalization:
   def test_non_canonical_target_normalized(self) -> None:
     """ADR-11 in a relation should resolve to ADR-011 if in nodes."""
     arts = [
-      ("DE-001", "delta", FakeArtifact(
-        id="DE-001",
-        relations=[{"type": "relates_to", "target": "ADR-11"}],
-      )),
+      (
+        "DE-001",
+        "delta",
+        FakeArtifact(
+          id="DE-001",
+          relations=[{"type": "relates_to", "target": "ADR-11"}],
+        ),
+      ),
       ("ADR-011", "adr", FakeArtifact(id="ADR-011")),
     ]
     graph = build_reference_graph_from_artifacts(arts)
@@ -247,10 +249,14 @@ class TestGraphNormalization:
 
   def test_canonical_target_no_diagnostic(self) -> None:
     arts = [
-      ("DE-001", "delta", FakeArtifact(
-        id="DE-001",
-        relations=[{"type": "relates_to", "target": "ADR-011"}],
-      )),
+      (
+        "DE-001",
+        "delta",
+        FakeArtifact(
+          id="DE-001",
+          relations=[{"type": "relates_to", "target": "ADR-011"}],
+        ),
+      ),
       ("ADR-011", "adr", FakeArtifact(id="ADR-011")),
     ]
     graph = build_reference_graph_from_artifacts(arts)

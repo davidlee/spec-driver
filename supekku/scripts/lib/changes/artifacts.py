@@ -96,8 +96,7 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
     # Show only canonical statuses (exclude legacy aliases like 'complete')
     canonical = sorted(s for s in VALID_STATUSES if normalize_status(s) == s)
     msg = (
-      f"Invalid status '{raw_status}' in {path}."
-      f" Valid statuses: {', '.join(canonical)}"
+      f"Invalid status '{raw_status}' in {path}. Valid statuses: {', '.join(canonical)}"
     )
     raise ValueError(msg)
 

@@ -410,9 +410,15 @@ class WorkspaceValidator:
     for diag in graph.diagnostics:
       self._warning("normalization", diag)
 
-    # Surface unresolved references
+    # Surface unresolved references.
+    # Skip domain_field and backlog_field slots — those have dedicated
+    # validators (_validate_decision_references, _validate_change_relations,
+    # etc.) that already emit targeted errors.
     emit = self._error if self.strict else self._warning
+    covered_slots = frozenset({"domain_field", "backlog_field"})
     for edge in find_unresolved_references(graph):
+      if edge.source_slot in covered_slots:
+        continue
       emit(
         edge.source,
         f"References unresolved artifact '{edge.target}' "

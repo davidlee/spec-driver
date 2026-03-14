@@ -286,6 +286,28 @@ def create_requirement(
       help="Requirement kind (functional, non-functional, policy, standard)",
     ),
   ] = None,
+  tags: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Discovery tag (repeatable)",
+    ),
+  ] = None,
+  ext_id: Annotated[
+    str | None,
+    typer.Option(
+      "--ext-id",
+      help="External system identifier (e.g. JIRA-1234)",
+    ),
+  ] = None,
+  ext_url: Annotated[
+    str | None,
+    typer.Option(
+      "--ext-url",
+      help="URL to external resource",
+    ),
+  ] = None,
 ) -> None:
   """Create a breakout requirement file under a spec."""
   if kind and kind not in ["functional", "non-functional", "policy", "standard"]:
@@ -298,6 +320,9 @@ def create_requirement(
       requirement,
       title=title,
       kind=kind,
+      tags=tags or None,
+      ext_id=ext_id,
+      ext_url=ext_url,
     )
     typer.echo(f"Requirement created: {requirement} under {spec}")
     typer.echo(str(path))

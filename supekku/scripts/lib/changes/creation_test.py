@@ -260,6 +260,37 @@ class CreateChangeTest(unittest.TestCase):
     assert frontmatter["kind"] == "requirement"
     assert frontmatter["spec"] == "SPEC-100"
 
+  def test_create_requirement_breakout_with_tags_ext(self) -> None:
+    """DE-095: Creation emits tags, ext_id, ext_url in frontmatter."""
+    root = self._make_repo()
+    path = create_requirement_breakout(
+      "SPEC-100",
+      "FR-201",
+      title="Track externally",
+      tags=["auth", "security"],
+      ext_id="JIRA-999",
+      ext_url="https://jira.example.com/JIRA-999",
+      repo_root=root,
+    )
+    frontmatter, _ = load_markdown_file(path)
+    assert frontmatter["tags"] == ["auth", "security"]
+    assert frontmatter["ext_id"] == "JIRA-999"
+    assert frontmatter["ext_url"] == "https://jira.example.com/JIRA-999"
+
+  def test_create_requirement_breakout_without_tags_ext(self) -> None:
+    """DE-095: Omitted tags/ext_id/ext_url do not appear in frontmatter."""
+    root = self._make_repo()
+    path = create_requirement_breakout(
+      "SPEC-100",
+      "FR-202",
+      title="No extras",
+      repo_root=root,
+    )
+    frontmatter, _ = load_markdown_file(path)
+    assert "tags" not in frontmatter
+    assert "ext_id" not in frontmatter
+    assert "ext_url" not in frontmatter
+
   def test_create_phase_first_in_sequence(self) -> None:
     """VT-016-002: Test creating phase-01 when no phases exist (PROD-011.FR-002)."""
     root = self._make_repo()

@@ -2440,5 +2440,165 @@ class TestInlineRequirementTags(unittest.TestCase):
     assert merged.tags == ["alpha", "beta", "gamma"]
 
 
+class TestBreakoutFrontmatterSync(unittest.TestCase):
+  """DE-095: Sync reads tags/ext_id/ext_url from breakout requirement files."""
+
+  def _make_repo(self) -> Path:
+    root = Path(tempfile.mkdtemp())
+    (root / ".git").mkdir()
+    return root
+
+  def _write_spec(self, root: Path, spec_id: str, body: str) -> Path:
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / spec_id.lower()
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    dump_markdown_file(
+      spec_dir / f"{spec_id}.md",
+      {"id": spec_id, "status": "draft", "kind": "spec"},
+      body,
+    )
+    return root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR
+
+  def _write_breakout(
+    self,
+    root: Path,
+    spec_id: str,
+    req_id: str,
+    frontmatter: dict,
+  ) -> None:
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / spec_id.lower()
+    req_dir = spec_dir / "requirements"
+    req_dir.mkdir(parents=True, exist_ok=True)
+    fm = {
+      "id": f"{spec_id}.{req_id}",
+      "status": "draft",
+      "kind": "requirement",
+      **frontmatter,
+    }
+    dump_markdown_file(req_dir / f"{req_id}.md", fm, f"# {req_id}\n")
+
+  def test_breakout_tags_merged_with_inline(self) -> None:
+    """Frontmatter tags from breakout file merge with inline tags."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**[inline-tag]: Requirement with inline tag
+    """)
+    specs_root = self._write_spec(root, "SPEC-900", body)
+    self._write_breakout(
+      root, "SPEC-900", "FR-001", {"tags": ["breakout-tag", "inline-tag"]}
+    )
+
+    registry.sync(spec_dirs=[specs_root])
+
+    record = registry.records["SPEC-900.FR-001"]
+    assert record.tags == ["breakout-tag", "inline-tag"]
+
+  def test_breakout_ext_id_and_ext_url(self) -> None:
+    """ext_id/ext_url from breakout frontmatter populate the record."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: A requirement
+    """)
+    specs_root = self._write_spec(root, "SPEC-901", body)
+    self._write_breakout(
+      root,
+      "SPEC-901",
+      "FR-001",
+      {"ext_id": "JIRA-42", "ext_url": "https://jira.example.com/JIRA-42"},
+    )
+
+    registry.sync(spec_dirs=[specs_root])
+
+    record = registry.records["SPEC-901.FR-001"]
+    assert record.ext_id == "JIRA-42"
+    assert record.ext_url == "https://jira.example.com/JIRA-42"
+
+  def test_breakout_without_metadata_no_effect(self) -> None:
+    """Breakout file without tags/ext_id/ext_url leaves record unchanged."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: Plain requirement
+    """)
+    specs_root = self._write_spec(root, "SPEC-902", body)
+    self._write_breakout(root, "SPEC-902", "FR-001", {})
+
+    registry.sync(spec_dirs=[specs_root])
+
+    record = registry.records["SPEC-902.FR-001"]
+    assert record.tags == []
+    assert record.ext_id == ""
+    assert record.ext_url == ""
+
+  def test_breakout_tags_only(self) -> None:
+    """Breakout with tags but no ext fields."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: Tagged requirement
+    """)
+    specs_root = self._write_spec(root, "SPEC-903", body)
+    self._write_breakout(root, "SPEC-903", "FR-001", {"tags": ["security", "auth"]})
+
+    registry.sync(spec_dirs=[specs_root])
+
+    record = registry.records["SPEC-903.FR-001"]
+    assert record.tags == ["auth", "security"]
+    assert record.ext_id == ""
+
+  def test_breakout_via_spec_registry(self) -> None:
+    """Breakout enrichment works through spec_registry path too."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: Requirement
+    """)
+    # Write spec with full frontmatter for SpecRegistry
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-904"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    dump_markdown_file(
+      spec_dir / "SPEC-904.md",
+      {
+        "id": "SPEC-904",
+        "slug": "spec-904",
+        "name": "Test Spec",
+        "status": "draft",
+        "kind": "spec",
+        "created": "2025-01-01",
+        "updated": "2025-01-01",
+      },
+      body,
+    )
+    self._write_breakout(
+      root,
+      "SPEC-904",
+      "FR-001",
+      {"ext_id": "GH-77", "tags": ["ci"]},
+    )
+
+    spec_registry = SpecRegistry(root)
+    registry.sync(spec_registry=spec_registry)
+
+    record = registry.records["SPEC-904.FR-001"]
+    assert record.ext_id == "GH-77"
+    assert record.tags == ["ci"]
+
+
 if __name__ == "__main__":
   unittest.main()

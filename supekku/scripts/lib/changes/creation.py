@@ -498,6 +498,9 @@ def create_requirement_breakout(
   *,
   title: str,
   kind: str | None = None,
+  tags: list[str] | None = None,
+  ext_id: str | None = None,
+  ext_url: str | None = None,
   repo_root: Path | None = None,
 ) -> Path:
   """Create a breakout requirement file under a spec.
@@ -507,6 +510,9 @@ def create_requirement_breakout(
     requirement_id: Requirement code (e.g., FR-010).
     title: Requirement title.
     kind: Optional requirement kind. Defaults based on requirement_id prefix.
+    tags: Optional discovery tags for categorisation.
+    ext_id: Optional external system identifier (e.g., JIRA-1234).
+    ext_url: Optional URL to external resource.
     repo_root: Optional repository root. Auto-detected if not provided.
 
   Returns:
@@ -534,7 +540,7 @@ def create_requirement_breakout(
   requirement_slug = slugify(title) or requirement_id.lower()
   path = requirements_dir / f"{requirement_id}.md"
 
-  frontmatter = {
+  frontmatter: dict[str, object] = {
     "id": f"{spec_id}.{requirement_id}",
     "slug": requirement_slug,
     "name": f"Requirement - {title}",
@@ -545,6 +551,12 @@ def create_requirement_breakout(
     "requirement_kind": requirement_kind,
     "spec": spec_id,
   }
+  if tags:
+    frontmatter["tags"] = sorted(tags)
+  if ext_id:
+    frontmatter["ext_id"] = ext_id
+  if ext_url:
+    frontmatter["ext_url"] = ext_url
   body = f"""# {requirement_id} - {title}
 
 ## Statement

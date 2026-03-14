@@ -328,6 +328,7 @@ class RequirementsRegistry:
         spec_id = str(frontmatter.get("id", "")).strip()
         if not spec_id or spec_id in yielded_ids:
           continue
+        breakout_meta = self._load_breakout_metadata(spec_file)
         records = list(
           self._records_from_content(
             spec_id,
@@ -338,6 +339,14 @@ class RequirementsRegistry:
           ),
         )
         for record in records:
+          meta = breakout_meta.get(record.uid, {})
+          if meta:
+            if "tags" in meta:
+              record.tags = sorted(set(record.tags) | set(meta["tags"]))
+            if "ext_id" in meta:
+              record.ext_id = meta["ext_id"]
+            if "ext_url" in meta:
+              record.ext_url = meta["ext_url"]
           self._upsert_record(record, seen, stats)
 
         try:
@@ -1097,6 +1106,45 @@ class RequirementsRegistry:
           if file.name.startswith(prefix):
             yield file
 
+  @staticmethod
+  def _load_breakout_metadata(
+    spec_path: Path,
+  ) -> dict[str, dict[str, Any]]:
+    """Load metadata from breakout requirement files under a spec.
+
+    Scans ``spec_path.parent / "requirements"`` for ``*.md`` files and
+    extracts ``tags``, ``ext_id``, and ``ext_url`` from their frontmatter.
+
+    Returns:
+      Mapping from qualified requirement ID (e.g. ``SPEC-100.FR-010``)
+      to a dict of metadata fields.
+    """
+    requirements_dir = spec_path.parent / "requirements"
+    if not requirements_dir.is_dir():
+      return {}
+    result: dict[str, dict[str, Any]] = {}
+    for file in requirements_dir.glob("*.md"):
+      try:
+        fm, _ = load_markdown_file(file)
+      except (OSError, ValueError):
+        continue
+      req_id = str(fm.get("id", "")).strip()
+      if not req_id:
+        continue
+      meta: dict[str, Any] = {}
+      fm_tags = fm.get("tags")
+      if isinstance(fm_tags, list):
+        meta["tags"] = [str(t) for t in fm_tags if str(t).strip()]
+      fm_ext_id = fm.get("ext_id")
+      if fm_ext_id:
+        meta["ext_id"] = str(fm_ext_id)
+      fm_ext_url = fm.get("ext_url")
+      if fm_ext_url:
+        meta["ext_url"] = str(fm_ext_url)
+      if meta:
+        result[req_id] = meta
+    return result
+
   def _records_from_frontmatter(
     self,
     spec_id: str,
@@ -1108,13 +1156,23 @@ class RequirementsRegistry:
     data = getattr(frontmatter, "data", frontmatter)
     mapping = dict(data) if isinstance(data, Mapping) else {}
     mapping.setdefault("id", spec_id)
-    yield from self._records_from_content(
+    breakout_meta = self._load_breakout_metadata(spec_path)
+    for record in self._records_from_content(
       spec_id,
       mapping,
       body,
       spec_path,
       repo_root,
-    )
+    ):
+      meta = breakout_meta.get(record.uid, {})
+      if meta:
+        if "tags" in meta:
+          record.tags = sorted(set(record.tags) | set(meta["tags"]))
+        if "ext_id" in meta:
+          record.ext_id = meta["ext_id"]
+        if "ext_url" in meta:
+          record.ext_url = meta["ext_url"]
+      yield record
 
   def _records_from_content(
     self,

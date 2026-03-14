@@ -25,6 +25,20 @@ def build_parser() -> argparse.ArgumentParser:
     choices=["functional", "non-functional", "policy", "standard"],
     help="Requirement kind override",
   )
+  parser.add_argument(
+    "--tags",
+    help="Comma-separated discovery tags",
+  )
+  parser.add_argument(
+    "--ext-id",
+    dest="ext_id",
+    help="External system identifier (e.g. JIRA-1234)",
+  )
+  parser.add_argument(
+    "--ext-url",
+    dest="ext_url",
+    help="URL to external resource",
+  )
   return parser
 
 
@@ -39,11 +53,15 @@ def main(argv: list[str] | None = None) -> int:
   """
   parser = build_parser()
   args = parser.parse_args(argv)
+  tags = [t.strip() for t in args.tags.split(",") if t.strip()] if args.tags else None
   create_requirement_breakout(
     args.spec,
     args.requirement,
     title=args.title,
     kind=args.kind,
+    tags=tags,
+    ext_id=args.ext_id,
+    ext_url=args.ext_url,
   )
   return 0
 

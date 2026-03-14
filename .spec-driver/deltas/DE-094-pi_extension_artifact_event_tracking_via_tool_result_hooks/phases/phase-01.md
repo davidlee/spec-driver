@@ -56,20 +56,20 @@ extension that observes `tool_result` events and emits v1 artifact events.
 - [x] Install pipeline working (DE-093)
 
 ## 4. Exit Criteria
-- [ ] Extension installed to `.pi/extensions/` via `spec-driver install`
-- [ ] Classification matches all patterns from `artifact_event.py`
-- [ ] JSONL events written to `.spec-driver/run/events.jsonl`
-- [ ] Socket datagram sent to `.spec-driver/run/tui.sock` (fail-silent)
-- [ ] Tests pass
-- [ ] Lint clean
+- [x] Extension installed to `.pi/extensions/` via `spec-driver install`
+- [x] Classification matches all patterns from `artifact_event.py`
+- [x] JSONL events written to `.spec-driver/run/events.jsonl`
+- [x] Socket dropped — Node.js dgram lacks AF_UNIX; TUI log-tail fallback is automatic
+- [x] Tests pass (29 TS + 103 Python install + 35 Python artifact_event)
+- [x] Lint clean
 
 ## 5. Tasks
 
 | Status | ID | Description |
 | --- | --- | --- |
-| [ ] | T1 | Write `supekku/pi.extensions/spec-driver-artifact-events.ts` |
-| [ ] | T2 | Write tests for classification, event schema, JSONL write |
-| [ ] | T3 | Lint, format, verify full test suite |
+| [x] | T1 | Write `supekku/pi.extensions/spec-driver-artifact-events.ts` |
+| [x] | T2 | Write tests for classification, event schema, JSONL write |
+| [x] | T3 | Lint, format, verify full test suite |
 
 ### T1 — Extension implementation
 

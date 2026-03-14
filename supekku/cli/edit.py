@@ -20,6 +20,8 @@ from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.enums import validate_status_for_entity
 from supekku.scripts.lib.core.frontmatter_writer import (
+  add_frontmatter_list_items,
+  remove_frontmatter_list_items,
   update_frontmatter_fields,
   update_frontmatter_status,
 )
@@ -37,6 +39,41 @@ StatusOption = Annotated[
   str | None,
   typer.Option("--status", "-s", help="Set status (skip editor)"),
 ]
+
+TagOption = Annotated[
+  list[str] | None,
+  typer.Option("--tag", "-t", help="Add tag (repeatable, skip editor)"),
+]
+
+UntagOption = Annotated[
+  list[str] | None,
+  typer.Option("--untag", help="Remove tag (repeatable, skip editor)"),
+]
+
+
+def _apply_tags(
+  artifact_id: str,
+  path: Path | str,
+  tags: list[str] | None,
+  untags: list[str] | None,
+) -> None:
+  """Add and/or remove tags on an artifact's frontmatter.
+
+  Raises typer.Exit on error.
+  """
+  path = Path(path)
+  if tags:
+    result = add_frontmatter_list_items(path, "tags", tags)
+    if result.added:
+      typer.echo(f"Added tags to {artifact_id}: {', '.join(result.added)}")
+    else:
+      typer.echo(f"Tags already present on {artifact_id}")
+  if untags:
+    result = remove_frontmatter_list_items(path, "tags", untags)
+    if result.removed:
+      typer.echo(f"Removed tags from {artifact_id}: {', '.join(result.removed)}")
+    else:
+      typer.echo(f"Tags not found on {artifact_id}")
 
 
 def _apply_status(
@@ -76,6 +113,8 @@ def _apply_status(
 def edit_spec(
   spec_id: Annotated[str, typer.Argument(help="Spec ID (e.g., SPEC-009, PROD-042)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit specification in editor."""
@@ -89,6 +128,9 @@ def edit_spec(
 
     if status is not None:
       _apply_status(spec_id, spec.path, "spec", status)
+      return
+    if tag or untag:
+      _apply_tags(spec_id, spec.path, tag, untag)
       return
     open_in_editor(spec.path)
   except typer.Exit:
@@ -105,6 +147,8 @@ def edit_spec(
 def edit_delta(
   delta_id: Annotated[str, typer.Argument(help="Delta ID (e.g., DE-003 or 003)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit delta in editor."""
@@ -121,6 +165,9 @@ def edit_delta(
     if status is not None:
       _apply_status(normalized_id, artifact.path, "delta", status)
       return
+    if tag or untag:
+      _apply_tags(normalized_id, artifact.path, tag, untag)
+      return
     open_in_editor(artifact.path)
   except typer.Exit:
     raise
@@ -136,6 +183,8 @@ def edit_delta(
 def edit_revision(
   revision_id: Annotated[str, typer.Argument(help="Revision ID (e.g., RE-001 or 001)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit revision in editor."""
@@ -143,6 +192,9 @@ def edit_revision(
     ref = resolve_artifact("revision", revision_id, root)
     if status is not None:
       _apply_status(ref.id, ref.path, "revision", status)
+      return
+    if tag or untag:
+      _apply_tags(ref.id, ref.path, tag, untag)
       return
     open_in_editor(ref.path)
   except typer.Exit:
@@ -159,6 +211,8 @@ def edit_revision(
 def edit_requirement(
   req_id: Annotated[str, typer.Argument(help="Requirement ID (e.g., SPEC-009.FR-001)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit requirement's spec file in editor."""
@@ -188,6 +242,9 @@ def edit_requirement(
     if status is not None:
       _apply_status(req_id, path, "requirement", status)
       return
+    if tag or untag:
+      _apply_tags(req_id, path, tag, untag)
+      return
     open_in_editor(path)
   except typer.Exit:
     raise
@@ -203,6 +260,8 @@ def edit_requirement(
 def edit_adr(
   decision_id: Annotated[str, typer.Argument(help="Decision ID (e.g., ADR-001, 001)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit ADR in editor."""
@@ -217,6 +276,9 @@ def edit_adr(
 
     if status is not None:
       _apply_status(normalized_id, decision.path, "adr", status)
+      return
+    if tag or untag:
+      _apply_tags(normalized_id, decision.path, tag, untag)
       return
     open_in_editor(decision.path)
   except typer.Exit:
@@ -233,6 +295,8 @@ def edit_adr(
 def edit_policy(
   policy_id: Annotated[str, typer.Argument(help="Policy ID (e.g., POL-001 or 001)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit policy in editor."""
@@ -247,6 +311,9 @@ def edit_policy(
 
     if status is not None:
       _apply_status(normalized_id, policy.path, "policy", status)
+      return
+    if tag or untag:
+      _apply_tags(normalized_id, policy.path, tag, untag)
       return
     open_in_editor(policy.path)
   except typer.Exit:
@@ -263,6 +330,8 @@ def edit_policy(
 def edit_standard(
   standard_id: Annotated[str, typer.Argument(help="Standard ID (e.g., STD-001, 001)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit standard in editor."""
@@ -277,6 +346,9 @@ def edit_standard(
 
     if status is not None:
       _apply_status(normalized_id, standard.path, "standard", status)
+      return
+    if tag or untag:
+      _apply_tags(normalized_id, standard.path, tag, untag)
       return
     open_in_editor(standard.path)
   except typer.Exit:
@@ -293,6 +365,8 @@ def edit_standard(
 def edit_card(
   card_id: Annotated[str, typer.Argument(help="Card ID (e.g., T123)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   anywhere: Annotated[
     bool,
     typer.Option(
@@ -310,6 +384,9 @@ def edit_card(
 
     if status is not None:
       _apply_status(card_id, path, "card", status)
+      return
+    if tag or untag:
+      _apply_tags(card_id, path, tag, untag)
       return
     open_in_editor(path)
   except typer.Exit:
@@ -329,6 +406,8 @@ def edit_card(
 def edit_plan(
   plan_id: Annotated[str, typer.Argument(help="Plan ID (e.g., IP-041, 041)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit implementation plan in editor."""
@@ -336,6 +415,9 @@ def edit_plan(
     ref = resolve_artifact("plan", plan_id, root)
     if status is not None:
       _apply_status(ref.id, ref.path, "plan", status)
+      return
+    if tag or untag:
+      _apply_tags(ref.id, ref.path, tag, untag)
       return
     open_in_editor(ref.path)
   except typer.Exit:
@@ -352,6 +434,8 @@ def edit_plan(
 def edit_audit(
   audit_id: Annotated[str, typer.Argument(help="Audit ID (e.g., AUD-001, 001)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit audit in editor."""
@@ -359,6 +443,9 @@ def edit_audit(
     ref = resolve_artifact("audit", audit_id, root)
     if status is not None:
       _apply_status(ref.id, ref.path, "audit", status)
+      return
+    if tag or untag:
+      _apply_tags(ref.id, ref.path, tag, untag)
       return
     open_in_editor(ref.path)
   except typer.Exit:
@@ -377,6 +464,8 @@ def edit_memory(
     str, typer.Argument(help="Memory ID (e.g., mem.pattern.cli.skinny)")
   ],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   verify: Annotated[
     bool,
     typer.Option("--verify", help="Attest memory accuracy at current HEAD"),
@@ -397,6 +486,9 @@ def edit_memory(
 
     if status is not None:
       _apply_status(ref.id, ref.path, "memory", status)
+      return
+    if tag or untag:
+      _apply_tags(ref.id, ref.path, tag, untag)
       return
     open_in_editor(ref.path)
   except typer.Exit:
@@ -438,6 +530,8 @@ def _verify_memory(memory_id: str, path: Path) -> None:
 def edit_issue(
   issue_id: Annotated[str, typer.Argument(help="Issue ID (e.g., ISSUE-001)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit issue in editor."""
@@ -445,6 +539,9 @@ def edit_issue(
     ref = resolve_artifact("issue", issue_id, root)
     if status is not None:
       _apply_status(ref.id, ref.path, "issue", status)
+      return
+    if tag or untag:
+      _apply_tags(ref.id, ref.path, tag, untag)
       return
     open_in_editor(ref.path)
   except typer.Exit:
@@ -461,6 +558,8 @@ def edit_issue(
 def edit_problem(
   problem_id: Annotated[str, typer.Argument(help="Problem ID (e.g., PROB-001)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit problem in editor."""
@@ -468,6 +567,9 @@ def edit_problem(
     ref = resolve_artifact("problem", problem_id, root)
     if status is not None:
       _apply_status(ref.id, ref.path, "problem", status)
+      return
+    if tag or untag:
+      _apply_tags(ref.id, ref.path, tag, untag)
       return
     open_in_editor(ref.path)
   except typer.Exit:
@@ -486,6 +588,8 @@ def edit_improvement(
     str, typer.Argument(help="Improvement ID (e.g., IMPR-001)")
   ],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit improvement in editor."""
@@ -493,6 +597,9 @@ def edit_improvement(
     ref = resolve_artifact("improvement", improvement_id, root)
     if status is not None:
       _apply_status(ref.id, ref.path, "improvement", status)
+      return
+    if tag or untag:
+      _apply_tags(ref.id, ref.path, tag, untag)
       return
     open_in_editor(ref.path)
   except typer.Exit:
@@ -509,6 +616,8 @@ def edit_improvement(
 def edit_risk(
   risk_id: Annotated[str, typer.Argument(help="Risk ID (e.g., RISK-001)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit risk in editor."""
@@ -516,6 +625,9 @@ def edit_risk(
     ref = resolve_artifact("risk", risk_id, root)
     if status is not None:
       _apply_status(ref.id, ref.path, "risk", status)
+      return
+    if tag or untag:
+      _apply_tags(ref.id, ref.path, tag, untag)
       return
     open_in_editor(ref.path)
   except typer.Exit:
@@ -532,6 +644,8 @@ def edit_risk(
 def edit_backlog(
   item_id: Annotated[str, typer.Argument(help="Backlog item ID (e.g., ISSUE-009)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit a backlog item (issue, problem, improvement, or risk)."""
@@ -539,6 +653,9 @@ def edit_backlog(
     ref = resolve_artifact("backlog", item_id, root)
     if status is not None:
       _apply_status(ref.id, ref.path, ref.record.kind, status)
+      return
+    if tag or untag:
+      _apply_tags(ref.id, ref.path, tag, untag)
       return
     open_in_editor(ref.path)
   except typer.Exit:
@@ -555,6 +672,8 @@ def edit_backlog(
 def edit_drift(
   ledger_id: Annotated[str, typer.Argument(help="Drift ledger ID (e.g., DL-047)")],
   status: StatusOption = None,
+  tag: TagOption = None,
+  untag: UntagOption = None,
   root: RootOption = None,
 ) -> None:
   """Edit drift ledger in editor."""
@@ -562,6 +681,9 @@ def edit_drift(
     ref = resolve_artifact("drift_ledger", ledger_id, root)
     if status is not None:
       _apply_status(ref.id, ref.path, "drift", status)
+      return
+    if tag or untag:
+      _apply_tags(ref.id, ref.path, tag, untag)
       return
     open_in_editor(ref.path)
   except typer.Exit:

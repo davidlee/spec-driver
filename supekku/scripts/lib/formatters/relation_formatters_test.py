@@ -2,7 +2,11 @@
 
 from supekku.scripts.lib.relations.query import ReferenceHit
 
-from .relation_formatters import format_refs_count, format_refs_tsv, format_related_section
+from .relation_formatters import (
+  format_refs_count,
+  format_refs_tsv,
+  format_related_section,
+)
 
 
 class TestFormatRefsCount:

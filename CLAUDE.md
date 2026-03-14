@@ -1,3 +1,5 @@
+@.spec-driver/agents/boot.md
+
 # SpecDriver Architecture Guide
 
 Quick reference for agents maintaining architectural integrity.

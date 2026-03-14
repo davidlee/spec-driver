@@ -10736,11 +10736,11 @@ deltas:
         phase: IP-092-P01
   DE-093:
     kind: delta
-    status: draft
+    status: completed
     name: 'pi extension: preboot hook for fresh governance context on startup and
       reload'
     slug: pi_extension_preboot_hook_for_fresh_governance_context_on_startup_and_reload
-    updated: '2026-03-14'
+    updated: '2026-03-15'
     path: .spec-driver/deltas/DE-093-pi_extension_preboot_hook_for_fresh_governance_context_on_startup_and_reload/DE-093.md
     applies_to:
       specs: []

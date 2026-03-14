@@ -4,6 +4,19 @@ Tests for validator module.
 
 ## Classes
 
+### TestUnresolvedReferenceValidation
+
+VT-097-unresolved: unresolved frontmatter references detected.
+
+**Inherits from:** RepoTestCase
+
+#### Methods
+
+- `test_resolved_ref_no_warning(self) -> None`: Known target does not produce an unresolved warning.
+- `test_unresolved_ref_produces_warning(self) -> None`: Unresolved target in relation emits a warning.
+- `test_unresolved_ref_strict_produces_error(self) -> None`: In strict mode, unresolved target emits an error.
+- `_create_workspace_with_delta(self) -> Workspace`: Create a minimal workspace with a delta referencing a target.
+
 ### WorkspaceValidatorTest
 
 Test cases for workspace validation functionality.

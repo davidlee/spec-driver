@@ -143,7 +143,7 @@ VT-081-003: Inline tag extraction from [tag1, tag2] syntax.
 
 Test that coverage_entries field is populated during registry sync.
 
-After \_apply_coverage_blocks(), each RequirementRecord should have a
+After _apply_coverage_blocks(), each RequirementRecord should have a
 coverage_entries field containing the structured verification data
 (artefact, kind, status) from coverage blocks.
 
@@ -163,7 +163,7 @@ coverage_entries field containing the structured verification data
 
 ### TestRequirementHeadingRegex
 
-VT-REGEX-076-001: \_REQUIREMENT_HEADING regex matches dotted backlog format.
+VT-REGEX-076-001: _REQUIREMENT_HEADING regex matches dotted backlog format.
 
 **Inherits from:** unittest.TestCase
 
@@ -273,7 +273,7 @@ VT-081-002: Terminal statuses not overwritten by coverage derivation.
 
 ### TestUpsertRecordProvenance
 
-VT-UPSERT-076-003: \_upsert_record stamps source provenance.
+VT-UPSERT-076-003: _upsert_record stamps source provenance.
 
 **Inherits from:** unittest.TestCase
 

@@ -19,7 +19,7 @@ Tests for check_registries function.
 - `test_one_broken_others_still_checked(self) -> None`: A failure in one registry should not prevent checking others.
 - `test_registry_error_produces_fail(self) -> None`: A registry that raises on collect() should produce a fail result.
 
-### \_FakeRegistry
+### _FakeRegistry
 
 Minimal registry stub with collect().
 
@@ -27,7 +27,7 @@ Minimal registry stub with collect().
 
 - `collect(self) -> dict`
 
-### \_FakeWorkspace
+### _FakeWorkspace
 
 #### Methods
 

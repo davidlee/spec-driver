@@ -12,5 +12,4 @@ Complete commands for marking artifacts as completed.
 
 Marks a delta as completed and optionally updates associated requirements
 to 'active' status in revision source files.
-
 - @app.command(revision) `complete_revision(revision_id, force) -> None`: Complete a revision and transition its status to completed.

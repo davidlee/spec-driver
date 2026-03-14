@@ -17,32 +17,29 @@ Formatters take PolicyRecord objects and return formatted strings for display.
 - `_prepare_policy_row(policy) -> list[str]`: Prepare a single policy row with styling.
 
 Returns:
-List of formatted cell values [id, title, tags, status, updated]
-
+  List of formatted cell values [id, title, tags, status, updated]
 - `_prepare_policy_tsv_row(policy) -> list[str]`: Prepare a single policy as a plain TSV row (no markup).
 - `format_policy_details(policy) -> str`: Format policy details as multi-line string for display.
 
 Args:
-policy: PolicyRecord object to format
+  policy: PolicyRecord object to format
 
 Returns:
-Formatted string with all policy details
-
+  Formatted string with all policy details
 - `format_policy_list_json(policies) -> str`: Format policies as JSON array.
 
 Args:
-policies: List of PolicyRecord objects
+  policies: List of PolicyRecord objects
 
 Returns:
-JSON string representation
-
+  JSON string representation
 - `format_policy_list_table(policies, format_type, truncate) -> str`: Format policies as table, JSON, or TSV.
 
 Args:
-policies: List of PolicyRecord objects to format
-format_type: Output format (table|json|tsv)
-truncate: If True, truncate long fields (default: False, show full content)
-show_external: If True, show ext_id column after ID
+  policies: List of PolicyRecord objects to format
+  format_type: Output format (table|json|tsv)
+  truncate: If True, truncate long fields (default: False, show full content)
+  show_external: If True, show ext_id column after ID
 
 Returns:
-Formatted string in requested format
+  Formatted string in requested format

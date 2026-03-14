@@ -28,7 +28,7 @@ BundleTree.clear_bundle resets state.
 
 ### TestBundleTreeDepthLimit
 
-BundleTree respects \_MAX_TREE_DEPTH.
+BundleTree respects _MAX_TREE_DEPTH.
 
 #### Methods
 

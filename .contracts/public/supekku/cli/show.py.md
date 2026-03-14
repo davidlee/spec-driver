@@ -21,6 +21,14 @@ Show commands for displaying detailed information about artifacts.
 - @app.command(plan) `show_plan(plan_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about an implementation plan.
 - @app.command(policy) `show_policy(policy_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about a specific policy.
 - @app.command(problem) `show_problem(problem_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about a problem.
+- @app.command(relations) `show_relations(artifact_id, direction, json_output, root) -> None`: Show cross-artifact reference neighbourhood for an artifact.
+
+Displays all artifacts that this ID references (forward) and/or
+all artifacts that reference this ID (inverse), grouped by type.
+
+If the ID is not found as a node, still shows any inverse edges
+(other artifacts may reference a non-existent ID). Emits a warning
+if the ID itself is not a known artifact.
 - @app.command(requirement) `show_requirement(req_id, json_output, path_only, raw_output, related, content_type, root) -> None`: Show detailed information about a requirement. - noqa: PLR0913
 - @app.command(revision) `show_revision(revision_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about a revision.
 - @app.command(risk) `show_risk(risk_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about a risk.

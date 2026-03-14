@@ -10,7 +10,7 @@ Design reference: DR-087 DEC-087-03, DEC-087-04.
 
 Modal overlay for cross-artifact fuzzy search.
 
-Opens with an empty search input. Results update as the user types.
+Opens with an empty search input.  Results update as the user types.
 Enter selects a result and dismisses; Escape dismisses without selection.
 
 **Inherits from:** ModalScreen[<BinOp>]

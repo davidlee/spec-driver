@@ -39,7 +39,6 @@ VT-077-from-backlog: --from-backlog as boolean flag.
 
 This is the root cause fix for ISSUE-043: --from-backlog is now
 a boolean flag that doesn't greedily consume the next token.
-
 - `test_from_backlog_with_non_id_name_shows_error(self) -> None`: --from-backlog with non-ID name shows format error.
 - `test_from_backlog_without_name_shows_error(self) -> None`: --from-backlog without a name argument shows usage error.
 - `_has_id_validation_error(self, result) -> bool`: Check output for backlog ID format error.

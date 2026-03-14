@@ -10,24 +10,23 @@ Memory IDs are user-supplied semantic dot-separated identifiers
 - `build_memory_frontmatter(memory_id, options) -> dict`: Build frontmatter dictionary for a memory artifact.
 
 Args:
-memory_id: Canonical memory ID (e.g., 'mem.pattern.cli.skinny').
-options: Creation options.
+  memory_id: Canonical memory ID (e.g., 'mem.pattern.cli.skinny').
+  options: Creation options.
 
 Returns:
-Dictionary containing memory frontmatter.
-
+  Dictionary containing memory frontmatter.
 - `create_memory(registry, options) -> MemoryCreationResult`: Create a new memory artifact with user-supplied semantic ID.
 
 Args:
-registry: Memory registry for uniqueness check.
-options: Memory creation options (must include memory_id).
+  registry: Memory registry for uniqueness check.
+  options: Memory creation options (must include memory_id).
 
 Returns:
-MemoryCreationResult with ID, path, filename, and any warnings.
+  MemoryCreationResult with ID, path, filename, and any warnings.
 
 Raises:
-ValueError: If the memory ID is malformed.
-MemoryAlreadyExistsError: If a memory with this ID already exists.
+  ValueError: If the memory ID is malformed.
+  MemoryAlreadyExistsError: If a memory with this ID already exists.
 
 ## Classes
 

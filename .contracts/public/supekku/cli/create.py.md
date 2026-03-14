@@ -15,7 +15,6 @@ Create commands for specs, deltas, requirements, revisions, and ADRs.
 
 Can create from scratch with a title, or populate from a backlog item
 using --from-backlog ITEM-ID (where ITEM-ID is passed as the name argument).
-
 - @app.command(drift) `create_drift_cmd(name, delta, root) -> None`: Create a new drift ledger.
 - @app.command(improvement) `create_improvement(title, json_output, root) -> None`: Create a new improvement backlog entry.
 - @app.command(issue) `create_issue(title, json_output, root) -> None`: Create a new issue backlog entry.
@@ -23,7 +22,6 @@ using --from-backlog ITEM-ID (where ITEM-ID is passed as the name argument).
 
 ID format: mem.<type>.<domain>.<subject>[.<purpose>]
 The 'mem.' prefix is prepended automatically if omitted.
-
 - @app.command(phase) `create_phase_cmd(name, plan, root) -> None`: Create a new phase for an implementation plan.
 - @app.command(plan) `create_plan_cmd(delta, root) -> None`: Create an implementation plan for an existing delta.
 - @app.command(policy) `create_policy(title, status, author, author_email, root) -> None`: Create a new policy with the next available ID.

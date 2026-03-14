@@ -176,6 +176,22 @@ VT-090-P5: Tests for --related neighbourhood view.
 - `test_show_spec_related_one_hop(self) -> None`: VT-090-P5-1: show spec --related includes referenced-by section.
 - `test_show_spec_related_replaces_count_view(self) -> None`: VT-090-P5-4: --related replaces the count-based Related: section.
 
+### ShowRelationsCommandTest
+
+VT-097-show-relations: show relations command.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `test_show_relations_direction_forward(self) -> None`
+- `test_show_relations_direction_inverse(self) -> None`
+- `test_show_relations_invalid_direction(self) -> None`
+- `test_show_relations_json_output(self) -> None`
+- `test_show_relations_known_artifact(self) -> None`: show relations for a known delta shows forward refs.
+- `test_show_relations_unknown_id_warns(self) -> None`
+
 ### ShowRevisionRegressionTest
 
 Regression tests for show revision — must pass before AND after migration.

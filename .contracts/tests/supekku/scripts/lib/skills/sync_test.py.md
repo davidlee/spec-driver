@@ -18,7 +18,6 @@ Tests for skills install: allowlist, metadata, rendering, prune, symlinks.
 
 Returns (repo_root, skills_source_dir).
 Post-migration layout: specify/tech is a symlink (not a real dir).
-
 - `_setup_repo_with_config(tmp_path) -> tuple[Tuple[Path, Path]]`: Create repo with workflow.toml integration config.
 - `test_config_agents_md_false_skips_reference(tmp_path) -> None`: When integration.agents_md is false, root AGENTS.md is not touched.
 - `test_config_claude_md_false_skips_reference(tmp_path) -> None`: When integration.claude_md is false, root CLAUDE.md is not touched.

@@ -13,7 +13,6 @@ deprecated statuses.
 Record representing a Standard with metadata.
 
 Standards differ from policies in status options:
-
 - draft: Work in progress
 - required: Must comply (like a policy)
 - default: Recommended unless justified otherwise
@@ -24,10 +23,10 @@ Standards differ from policies in status options:
 - `to_dict(self, root) -> dict[Tuple[str, Any]]`: Convert to dictionary for YAML serialization.
 
 Args:
-root: Repository root path for relativizing file paths
+    root: Repository root path for relativizing file paths
 
 Returns:
-Dictionary representation suitable for YAML serialization
+    Dictionary representation suitable for YAML serialization
 
 ### StandardRegistry
 

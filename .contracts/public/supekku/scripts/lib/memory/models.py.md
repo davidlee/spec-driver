@@ -16,16 +16,15 @@ All other fields are optional with safe defaults.
 - @classmethod `from_frontmatter(cls, path, fm) -> MemoryRecord`: Construct a MemoryRecord from parsed frontmatter.
 
 Args:
-path: Filesystem path to the memory file.
-fm: Parsed frontmatter dictionary.
+  path: Filesystem path to the memory file.
+  fm: Parsed frontmatter dictionary.
 
 Returns:
-Populated MemoryRecord.
-
+  Populated MemoryRecord.
 - `to_dict(self, root) -> dict[Tuple[str, Any]]`: Convert to dictionary for YAML serialization.
 
 Args:
-root: Repository root for relativizing file paths.
+  root: Repository root for relativizing file paths.
 
 Returns:
-Dictionary with non-empty fields only.
+  Dictionary with non-empty fields only.

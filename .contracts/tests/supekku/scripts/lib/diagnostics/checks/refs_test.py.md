@@ -21,4 +21,4 @@ Tests for check_refs function.
 - @patch(supekku.scripts.lib.diagnostics.checks.refs.validate_workspace) `test_validator_exception_produces_fail(self, mock_validate) -> None`: If the validator raises, check_refs should return a fail result.
 - @patch(supekku.scripts.lib.diagnostics.checks.refs.validate_workspace) `test_warning_translates_to_warn(self, mock_validate) -> None`: Validator warning level should translate to warn status.
 
-### \_FakeWorkspace
+### _FakeWorkspace

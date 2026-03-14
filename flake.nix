@@ -120,6 +120,7 @@
               python3Packages.pytest
 
               watchexec
+              prettier
 
               nodejs_latest
               bun

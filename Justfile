@@ -30,6 +30,10 @@ pylint-files *args:
 pylint-only *args:
   uv run pylint supekku --disable=all --extension-pkg-allow-list=pylint.extensions.mccabe --enable={{args}}
 
+format-markdown:
+  prettier . --help
+
+
 ## helpers
 tech id:
   glow $(spec-driver show spec TECH-{{id}} --path) --pager

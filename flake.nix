@@ -56,9 +56,19 @@
         projectPkgs = [spec-driver];
 
         jailPkgs = lib.optionalAttrs isLinux {
-          jailed-pi = jailLib.makeJailedPi {extraPkgs = projectPkgs;};
-          # jailed-crush = jailLib.makeJailedCrush {extraPkgs = projectPkgs;};
-          jailed-opencode = jailLib.makeJailedOpencode {extraPkgs = projectPkgs;};
+          jailed-pi = jailLib.makeJailedPi {
+            profile = "specDev";
+            extraPkgs = projectPkgs;
+          };
+          jailed-pi-research = jailLib.makeJailedPi {
+            name = "pi-research";
+            profile = "research";
+            extraPkgs = projectPkgs;
+          };
+          jailed-opencode = jailLib.makeJailedOpencode {
+            profile = "specDev";
+            extraPkgs = projectPkgs;
+          };
         };
       in {
         packages =

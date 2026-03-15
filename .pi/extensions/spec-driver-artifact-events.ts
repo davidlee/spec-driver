@@ -130,6 +130,14 @@ export function sendSocket(
 // --- Extension entry point ---
 
 const extension: ExtensionFactory = (pi) => {
+  // Expose session ID to child processes (e.g. spec-driver CLI via bash tool)
+  pi.on("session_start", (_event, ctx) => {
+    const sessionId = ctx.sessionManager.getSessionId();
+    if (sessionId) {
+      process.env.SPEC_DRIVER_SESSION = sessionId;
+    }
+  });
+
   pi.on("tool_result", (event, ctx) => {
     try {
       const action = TOOL_TO_ACTION[event.toolName];

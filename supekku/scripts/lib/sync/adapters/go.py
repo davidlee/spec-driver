@@ -299,13 +299,19 @@ class GoAdapter(LanguageAdapter):
         str(output_path),
         module_pkg,
       ]
-      subprocess.run(
-        cmd,
-        check=True,
-        capture_output=True,
-        text=True,
-        cwd=self.repo_root,
-      )
+      try:
+        subprocess.run(
+          cmd,
+          check=True,
+          capture_output=True,
+          text=True,
+          cwd=self.repo_root,
+        )
+      except subprocess.CalledProcessError as exc:
+        detail = (exc.stderr or exc.stdout or "").strip()
+        raise RuntimeError(
+          f"gomarkdoc failed for {module_pkg} ({name}): {detail}"
+        ) from exc
 
       if output_path.exists():
         content = output_path.read_text(encoding="utf-8")

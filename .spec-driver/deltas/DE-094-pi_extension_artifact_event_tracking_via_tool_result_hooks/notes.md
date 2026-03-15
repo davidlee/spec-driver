@@ -12,13 +12,11 @@
 - `writeLog()` — JSONL append to `.spec-driver/run/events.jsonl`
 - `SYNC:` comments cross-referencing `artifact_event.py`
 
-**Unix socket via pi.exec** — Node.js `dgram` lacks `AF_UNIX` support, so
-`sendSocket()` shells out to `python3` via `pi.exec()` with a one-liner that
-opens `AF_UNIX SOCK_DGRAM`, sends the JSON payload, and closes. Async,
-fire-and-forget, fail-silent. Python is guaranteed available in spec-driver
-projects.
+**Unix socket send** — `spawnSync("python3", ...)` sends AF_UNIX SOCK_DGRAM
+datagram to `tui.sock`. Synchronous, fail-silent. Python is guaranteed
+available in spec-driver projects (must be on PATH in jail environments).
 
-**spec-driver-artifact-events.test.ts** — 31 tests
+**spec-driver-artifact-events.test.ts** — 30 tests
 
 - Classification: all 13 artifact types + priority ordering (phase > delta, DR > delta)
 - Non-artifact paths: 7 cases returning null
@@ -34,7 +32,11 @@ projects.
 ### Surprises / adaptations
 
 - Node.js `dgram` only supports `udp4`/`udp6`, not Unix domain sockets.
-  Solved by shelling out to `python3` via `pi.exec()` for the datagram send.
+  Initially solved by `pi.exec("python3", ...)` (async fire-and-forget).
+- `pi.exec` socket sends didn't reach the TUI reliably — replaced with
+  `spawnSync("python3", ...)` for synchronous, reliable delivery.
+- `python3` must be on PATH inside bubblewrap jails — added to `projectPkgs`
+  in `flake.nix`.
 - `import type` from `@mariozechner/pi-coding-agent` is stripped by Node's
   `--experimental-strip-types`, so tests run without the pi package installed.
 
@@ -42,11 +44,24 @@ projects.
 
 - `7e6c263` — feat(DE-094): pi artifact event extension + tests, exclude test files from install
 - `f4a3173` — feat(DE-094): restore socket emission via pi.exec python3 dgram
+- `e85f4bfc` — fix(DE-094): add python3 to jail extraPkgs for unix socket send
+- `8b5ba965` — fix(DE-094): replace pi.exec with spawnSync for socket send reliability
 
 ### Verification
 
-- 31 TS tests pass (classification, schema, JSONL write, socket delegation)
+- 30 TS tests pass (classification, schema, JSONL write)
 - 103 Python install tests pass (no regressions)
 - 35 Python artifact_event tests pass
 - Lint clean (ruff)
 - Install pipeline correctly picks up new extension, excludes test file
+- JSONL events confirmed in live session
+- Socket datagram delivery confirmed via test listener
+- TUI integration pending user verification after spawnSync fix
+
+### Rough edges / follow-ups
+
+- Session ID is always `null` — pi doesn't expose session IDs in tool_result
+  events. Noted as out-of-scope in DE-094 §4.
+- No test for the `.ts` file being included in the wheel build
+- `artifact_event.py` equivalent for pi (tool-call observation via RPC events)
+  is deferred to future work (DE-092 or successor)

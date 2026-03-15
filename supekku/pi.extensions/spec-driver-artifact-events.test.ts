@@ -116,7 +116,7 @@ test("produces valid v1 event", () => {
     cwd: "/proj",
   });
   assert.equal(event.v, 1);
-  assert.equal(event.session, null);
+  assert.equal(event.session, null, "null when no sessionId provided");
   assert.equal(event.cmd, "artifact.edit");
   assert.deepEqual(event.artifacts, ["DE-060"]);
   assert.equal(event.exit_code, 0);
@@ -148,6 +148,18 @@ test("write action", () => {
     cwd: "/proj",
   });
   assert.equal(event.cmd, "artifact.write");
+});
+
+test("includes sessionId when provided", () => {
+  const event = buildEvent({
+    toolName: "read",
+    filePath: "/proj/.spec-driver/deltas/DE-060-slug/DE-060.md",
+    artifactType: "delta",
+    artifactId: "DE-060",
+    cwd: "/proj",
+    sessionId: "abc-123-def",
+  });
+  assert.equal(event.session, "abc-123-def");
 });
 
 test("no artifact id", () => {

@@ -6,8 +6,7 @@
  * `.spec-driver/run/events.jsonl` + `tui.sock` Unix datagram.
  *
  * JSONL is written synchronously (append). Socket datagram is sent via
- * `pi.exec("python3", ...)` because Node.js dgram lacks AF_UNIX support.
- * Socket send is async, fire-and-forget, fail-silent.
+ * `spawnSync("python3", ...)` because Node.js dgram lacks AF_UNIX support.
  *
  * Fail-silent: all exceptions are swallowed (DEC-094-02).
  *
@@ -72,6 +71,7 @@ export function buildEvent(opts: {
   artifactType: string;
   artifactId: string | null;
   cwd: string;
+  sessionId?: string | null;
 }): Record<string, unknown> {
   const action = TOOL_TO_ACTION[opts.toolName] ?? opts.toolName;
   let relPath: string;
@@ -84,7 +84,7 @@ export function buildEvent(opts: {
   return {
     v: EVENT_SCHEMA_VERSION,
     ts: new Date().toISOString(),
-    session: null,
+    session: opts.sessionId ?? null,
     cmd: `artifact.${action}`,
     argv: [`artifact.${action}`, relPath],
     artifacts: opts.artifactId ? [opts.artifactId] : [],
@@ -148,6 +148,7 @@ const extension: ExtensionFactory = (pi) => {
         artifactType,
         artifactId,
         cwd: ctx.cwd,
+        sessionId: ctx.sessionManager.getSessionId(),
       });
 
       const runDir = join(ctx.cwd, ".spec-driver", "run");

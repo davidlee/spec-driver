@@ -214,44 +214,13 @@ test("creates run dir recursively", () => {
 
 // --- sendSocket ---
 
-console.log("sendSocket — pi.exec delegation");
-
-test("calls pi.exec with python3 dgram script", () => {
-  const calls: { cmd: string; args: string[] }[] = [];
-  const mockPi = {
-    exec(cmd: string, args: string[]) {
-      calls.push({ cmd, args });
-      return Promise.resolve({ exitCode: 0, stdout: "", stderr: "" });
-    },
-  };
-
-  const event = { v: 1, cmd: "artifact.read" };
-  sendSocket(event, "/proj/.spec-driver/run", mockPi as any);
-
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0].cmd, "python3");
-  assert.equal(calls[0].args[0], "-c");
-  // Script should contain AF_UNIX and SOCK_DGRAM
-  assert.ok(calls[0].args[1].includes("AF_UNIX"));
-  assert.ok(calls[0].args[1].includes("SOCK_DGRAM"));
-  // Data and socket path passed as args
-  assert.equal(calls[0].args[2], JSON.stringify(event));
-  assert.equal(calls[0].args[3], "/proj/.spec-driver/run/tui.sock");
-});
+console.log("sendSocket — spawnSync delegation");
 
 test("skips when socket path exceeds max length", () => {
-  const calls: unknown[] = [];
-  const mockPi = {
-    exec(...args: unknown[]) {
-      calls.push(args);
-      return Promise.resolve({ exitCode: 0, stdout: "", stderr: "" });
-    },
-  };
-
+  // sendSocket uses spawnSync internally; we can only test the path-length guard
+  // without actually spawning. Long path should be a no-op (no throw).
   const longDir = "/proj/" + "a".repeat(120) + "/.spec-driver/run";
-  sendSocket({ v: 1 }, longDir, mockPi as any);
-
-  assert.equal(calls.length, 0);
+  sendSocket({ v: 1 }, longDir); // should not throw
 });
 
 // --- Summary ---

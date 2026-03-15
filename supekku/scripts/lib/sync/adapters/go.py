@@ -26,6 +26,15 @@ if TYPE_CHECKING:
   from collections.abc import Sequence
 
 
+def _has_source_files(pkg_path: Path) -> bool:
+  """Check if a Go package directory contains non-test source files."""
+  return any(
+    f.suffix == ".go" and not f.name.endswith("_test.go")
+    for f in pkg_path.iterdir()
+    if f.is_file()
+  )
+
+
 class GoToolchainNotAvailableError(RuntimeError):
   """Raised when Go toolchain is required but not available."""
 
@@ -103,8 +112,8 @@ class GoAdapter(LanguageAdapter):
       rel_pkg = normalize_go_package(module_pkg, module)
       pkg_path = repo_root / rel_pkg
 
-      # Only include if package directory exists
-      if pkg_path.exists():
+      # Only include if package directory exists and has non-test source files
+      if pkg_path.exists() and _has_source_files(pkg_path):
         source_units.append(
           SourceUnit(
             language=self.language,

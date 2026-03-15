@@ -18,9 +18,9 @@
  *       see mem.artifact-pattern-sync
  */
 import type {
-  ExtensionAPI,
   ExtensionFactory,
 } from "@mariozechner/pi-coding-agent";
+import { spawnSync } from "node:child_process";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { join, relative } from "node:path";
 
@@ -103,27 +103,28 @@ export function writeLog(event: Record<string, unknown>, runDir: string): void {
 /**
  * Send a JSON datagram to the TUI Unix socket via python3.
  *
- * Node.js dgram lacks AF_UNIX support, so we shell out to Python.
- * Async, fire-and-forget — errors are silently ignored.
+ * Node.js dgram lacks AF_UNIX support, so we shell out to Python
+ * synchronously (spawnSync). This avoids async fire-and-forget
+ * reliability issues with pi.exec().
  */
 export function sendSocket(
   event: Record<string, unknown>,
   runDir: string,
-  pi: ExtensionAPI,
 ): void {
   const sockPath = join(runDir, SOCKET_FILENAME);
   if (sockPath.length > MAX_SOCKET_PATH_LEN) return;
 
   const data = JSON.stringify(event);
-  // One-liner: open AF_UNIX DGRAM socket, send, close.
   const script =
     "import socket,sys;" +
     "s=socket.socket(socket.AF_UNIX,socket.SOCK_DGRAM);" +
     "s.sendto(sys.argv[1].encode(),sys.argv[2]);" +
     "s.close()";
 
-  // Fire-and-forget — don't await, don't check result
-  pi.exec("python3", ["-c", script, data, sockPath]).catch(() => {});
+  spawnSync("python3", ["-c", script, data, sockPath], {
+    stdio: "ignore",
+    timeout: 2000,
+  });
 }
 
 // --- Extension entry point ---
@@ -151,7 +152,7 @@ const extension: ExtensionFactory = (pi) => {
 
       const runDir = join(ctx.cwd, ".spec-driver", "run");
       writeLog(ev, runDir);
-      sendSocket(ev, runDir, pi);
+      sendSocket(ev, runDir);
     } catch {
       /* fail-silent: never interfere with pi operation (DEC-094-02) */
     }

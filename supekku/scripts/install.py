@@ -128,7 +128,7 @@ def _install_seed_memories(
     else:
       created.append(src.name)
       if not dry_run:
-        shutil.copy2(src, dest)
+        shutil.copy(src, dest)
   return created, skipped
 
 
@@ -149,11 +149,11 @@ def _refresh_managed_memories(
     if not dest.exists():
       new.append(src.name)
       if not dry_run:
-        shutil.copy2(src, dest)
+        shutil.copy(src, dest)
     elif src.read_bytes() != dest.read_bytes():
       updated.append(src.name)
       if not dry_run:
-        shutil.copy2(src, dest)
+        shutil.copy(src, dest)
   return new, updated
 
 
@@ -357,7 +357,7 @@ def copy_directory_if_changed(
       src_file = src / rel_path
       dest_file = dest / rel_path
       dest_file.parent.mkdir(parents=True, exist_ok=True)
-      shutil.copy2(src_file, dest_file)
+      shutil.copy(src_file, dest_file)
 
 
 def _render_agent_docs(
@@ -430,14 +430,15 @@ def _install_claude_config(
   claude_dir.mkdir(parents=True, exist_ok=True)
 
   if settings_src:
-    shutil.copy2(settings_src, claude_dir / "settings.json")
+    dest = claude_dir / "settings.json"
+    shutil.copy(settings_src, dest)
 
   if hook_sources:
     hooks_dest = claude_dir / "hooks"
     hooks_dest.mkdir(parents=True, exist_ok=True)
     for src in hook_sources:
       dest = hooks_dest / src.name
-      shutil.copy2(src, dest)
+      shutil.copy(src, dest)
       dest.chmod(dest.stat().st_mode | 0o111)
 
 
@@ -532,7 +533,7 @@ def _install_pi_config(
   extensions_dest.mkdir(parents=True, exist_ok=True)
   for src in extension_sources:
     dest = extensions_dest / src.name
-    shutil.copy2(src, dest)
+    shutil.copy(src, dest)
 
 
 def _install_hooks(
@@ -560,7 +561,7 @@ def _install_hooks(
       print("\n[DRY RUN] hook file:")
       print(f"  + ./{SPEC_DRIVER_DIR}/hooks/{src_file.name}")
     else:
-      shutil.copy2(src_file, dest_file)
+      shutil.copy(src_file, dest_file)
 
 
 _VERSION_KEY = "spec_driver_installed_version"

@@ -61,6 +61,7 @@
           prettier
 
           uv
+          python3
           python3Packages.pylint
           python3Packages.pytest
           pyright

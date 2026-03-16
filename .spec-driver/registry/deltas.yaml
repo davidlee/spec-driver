@@ -11076,3 +11076,65 @@ deltas:
           description: Update notes, prepare for audit/closure
           status: todo
         risks: []
+  DE-098:
+    kind: delta
+    status: draft
+    name: Delta - improve pi skill adherence for spec-driver installed skills
+    slug: improve_pi_skill_adherence_for_spec_driver_installed_skills
+    updated: '2026-03-16'
+    path: .spec-driver/deltas/DE-098-improve_pi_skill_adherence_for_spec_driver_installed_skills/DE-098.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-098
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-098
+        delta: DE-098
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-098-P01
+      phases:
+      - id: IP-098-P01
+        phase: IP-098-P01
+  DE-099:
+    kind: delta
+    status: completed
+    name: 'fix: ensure u+w on files copied from read-only sources'
+    slug: fix_ensure_u_w_on_files_copied_from_read_only_sources
+    updated: '2026-03-16'
+    path: .spec-driver/deltas/DE-099-fix_ensure_u_w_on_files_copied_from_read_only_sources/DE-099.md
+    applies_to:
+      specs:
+      - SPEC-129
+      requirements: []
+    plan:
+      id: IP-099
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-099
+        delta: DE-099
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-129
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-099-P01
+      phases:
+      - id: IP-099-P01
+        phase: IP-099-P01

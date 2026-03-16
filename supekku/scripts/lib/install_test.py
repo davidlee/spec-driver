@@ -837,6 +837,31 @@ class TestInstallClaudeConfig:
 
     assert not (target / ".claude" / "settings.json").exists()
 
+  def test_readonly_source_produces_writable_dest(self, tmp_path: Path) -> None:
+    """Files from read-only sources (Nix store, wheels) become writable."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_claude_source(pkg)
+
+    # Make source files read-only (simulates Nix store / wheel)
+    settings_src = pkg / "claude.settings.json"
+    settings_src.chmod(0o444)
+    for hook in (pkg / "claude.hooks").iterdir():
+      hook.chmod(0o444)
+
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_claude_config(pkg, target, dry_run=False)
+
+    settings = target / ".claude" / "settings.json"
+    assert settings.exists()
+    assert os.access(settings, os.W_OK), "settings.json should be writable"
+
+    startup = target / ".claude" / "hooks" / "startup.sh"
+    assert startup.exists()
+    assert os.access(startup, os.W_OK), "hook scripts should be writable"
+
   def test_hooks_without_settings(self, tmp_path: Path) -> None:
     """Hooks are installed even if settings.json is absent."""
     pkg = tmp_path / "pkg"

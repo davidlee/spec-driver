@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 import re
-import shutil
 import subprocess as _subprocess
 import sys
 from dataclasses import dataclass, field
@@ -50,6 +49,7 @@ from supekku.scripts.lib.core.templates import TemplateNotFoundError
 # Import after path setup to avoid circular imports
 from supekku.scripts.lib.file_ops import (
   FileChanges,
+  copy_with_write_permission,
   format_change_summary,
   format_detailed_changes,
   scan_directory_changes,
@@ -128,7 +128,7 @@ def _install_seed_memories(
     else:
       created.append(src.name)
       if not dry_run:
-        shutil.copy(src, dest)
+        copy_with_write_permission(src, dest)
   return created, skipped
 
 
@@ -149,11 +149,11 @@ def _refresh_managed_memories(
     if not dest.exists():
       new.append(src.name)
       if not dry_run:
-        shutil.copy(src, dest)
+        copy_with_write_permission(src, dest)
     elif src.read_bytes() != dest.read_bytes():
       updated.append(src.name)
       if not dry_run:
-        shutil.copy(src, dest)
+        copy_with_write_permission(src, dest)
   return new, updated
 
 
@@ -357,7 +357,7 @@ def copy_directory_if_changed(
       src_file = src / rel_path
       dest_file = dest / rel_path
       dest_file.parent.mkdir(parents=True, exist_ok=True)
-      shutil.copy(src_file, dest_file)
+      copy_with_write_permission(src_file, dest_file)
 
 
 def _render_agent_docs(
@@ -431,14 +431,14 @@ def _install_claude_config(
 
   if settings_src:
     dest = claude_dir / "settings.json"
-    shutil.copy(settings_src, dest)
+    copy_with_write_permission(settings_src, dest)
 
   if hook_sources:
     hooks_dest = claude_dir / "hooks"
     hooks_dest.mkdir(parents=True, exist_ok=True)
     for src in hook_sources:
       dest = hooks_dest / src.name
-      shutil.copy(src, dest)
+      copy_with_write_permission(src, dest)
       dest.chmod(dest.stat().st_mode | 0o111)
 
 
@@ -533,7 +533,7 @@ def _install_pi_config(
   extensions_dest.mkdir(parents=True, exist_ok=True)
   for src in extension_sources:
     dest = extensions_dest / src.name
-    shutil.copy(src, dest)
+    copy_with_write_permission(src, dest)
 
 
 def _install_hooks(
@@ -561,7 +561,7 @@ def _install_hooks(
       print("\n[DRY RUN] hook file:")
       print(f"  + ./{SPEC_DRIVER_DIR}/hooks/{src_file.name}")
     else:
-      shutil.copy(src_file, dest_file)
+      copy_with_write_permission(src_file, dest_file)
 
 
 _VERSION_KEY = "spec_driver_installed_version"

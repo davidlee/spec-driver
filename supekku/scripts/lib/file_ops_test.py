@@ -5,6 +5,8 @@ from pathlib import Path
 
 from supekku.scripts.lib.file_ops import (
   FileChanges,
+  copy_with_write_permission,
+  copytree_with_write_permission,
   format_change_summary,
   format_detailed_changes,
   scan_directory_changes,
@@ -307,3 +309,51 @@ def test_format_detailed_changes_with_dest_dir(tmp_path):
     assert "~ existing.txt" not in result
   finally:
     os.chdir(original_cwd)
+
+
+def test_copy_with_write_permission_readonly_source(tmp_path):
+  """copy_with_write_permission ensures u+w even when source is read-only."""
+  src = tmp_path / "src.txt"
+  src.write_text("hello")
+  src.chmod(0o444)
+
+  dest = tmp_path / "dest.txt"
+  copy_with_write_permission(src, dest)
+
+  assert dest.read_text() == "hello"
+  assert os.access(dest, os.W_OK), "dest should be user-writable"
+
+
+def test_copy_with_write_permission_overwrites_readonly_dest(tmp_path):
+  """copy_with_write_permission can overwrite a previously read-only dest."""
+  src = tmp_path / "src.txt"
+  src.write_text("v2")
+
+  dest = tmp_path / "dest.txt"
+  dest.write_text("v1")
+  dest.chmod(0o444)  # simulate prior bad install
+
+  copy_with_write_permission(src, dest)
+
+  assert dest.read_text() == "v2"
+  assert os.access(dest, os.W_OK)
+
+
+def test_copytree_with_write_permission_readonly_source(tmp_path):
+  """copytree_with_write_permission ensures u+w on all files."""
+  src_dir = tmp_path / "src"
+  src_dir.mkdir()
+  (src_dir / "a.txt").write_text("aaa")
+  (src_dir / "a.txt").chmod(0o444)
+  sub = src_dir / "sub"
+  sub.mkdir()
+  (sub / "b.txt").write_text("bbb")
+  (sub / "b.txt").chmod(0o444)
+
+  dest_dir = tmp_path / "dest"
+  copytree_with_write_permission(src_dir, dest_dir)
+
+  assert (dest_dir / "a.txt").read_text() == "aaa"
+  assert os.access(dest_dir / "a.txt", os.W_OK)
+  assert (dest_dir / "sub" / "b.txt").read_text() == "bbb"
+  assert os.access(dest_dir / "sub" / "b.txt", os.W_OK)

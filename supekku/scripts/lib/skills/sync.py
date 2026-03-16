@@ -23,6 +23,7 @@ import yaml
 
 from supekku.scripts.lib.core.config import load_workflow_config
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, get_package_skills_dir
+from supekku.scripts.lib.file_ops import copytree_with_write_permission
 
 # Canonical install location (relative to repo root)
 CANONICAL_SKILLS_DIR = Path(SPEC_DRIVER_DIR) / "skills"
@@ -262,7 +263,7 @@ def install_skills_to_target(
     # Copy entire skill directory
     if dest.exists():
       shutil.rmtree(dest)
-    shutil.copytree(src, dest)
+    copytree_with_write_permission(src, dest)
     installed.append(name)
 
   return {"installed": installed, "up_to_date": up_to_date}

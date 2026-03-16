@@ -1,7 +1,42 @@
 """Reusable file operations for workspace management."""
 
+import os
+import shutil
+import stat
 from dataclasses import dataclass
 from pathlib import Path
+
+
+def _ensure_writable(path: Path) -> None:
+  """Add ``u+w`` to *path* if missing."""
+  st = path.stat().st_mode
+  if not st & stat.S_IWUSR:
+    path.chmod(st | stat.S_IWUSR)
+
+
+def copy_with_write_permission(src: Path, dest: Path) -> None:
+  """Copy a file, ensuring the destination has user-write permission.
+
+  If *dest* already exists and is read-only (e.g. from a previous
+  install off a read-only source), it is made writable first so
+  :func:`shutil.copy` can overwrite it.  The result is always ``u+w``.
+  """
+  if dest.exists():
+    _ensure_writable(dest)
+  shutil.copy(src, dest)
+  _ensure_writable(dest)
+
+
+def copytree_with_write_permission(src: Path, dest: Path) -> None:
+  """Copy a directory tree, ensuring all destination files have ``u+w``.
+
+  Wraps :func:`shutil.copytree` and then walks the result to add
+  ``S_IWUSR`` to any file lacking it.
+  """
+  shutil.copytree(src, dest)
+  for dirpath, _dirnames, filenames in os.walk(dest):
+    for fname in filenames:
+      _ensure_writable(Path(dirpath) / fname)
 
 
 @dataclass

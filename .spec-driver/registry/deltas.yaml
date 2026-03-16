@@ -11138,3 +11138,84 @@ deltas:
       phases:
       - id: IP-099-P01
         phase: IP-099-P01
+  DE-100:
+    kind: delta
+    status: completed
+    name: Delta - Uniform --tag filtering across all list commands
+    slug: uniform_tag_conventions_match_tag_for_queries_tag_for_mutations
+    updated: '2026-03-17'
+    path: .spec-driver/deltas/DE-100-uniform_tag_conventions_match_tag_for_queries_tag_for_mutations/DE-100.md
+    applies_to:
+      specs:
+      - PROD-010
+      requirements: []
+    relations:
+    - type: follows
+      target: DE-096
+      attributes:
+        summary: DE-096 landed --tag/--untag on all edit commands; this delta completes
+          the query side
+    plan:
+      id: IP-100
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-100
+        delta: DE-100
+        revision_links:
+          aligns_with:
+          - DR-100
+        specs:
+          primary:
+          - PROD-010
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-100-P01
+          name: Add --tag filtering to all list commands
+          status: planned
+        - id: IP-100.PHASE-01
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-100.PHASE-01
+        plan: IP-100
+        delta: DE-100
+        objective: Add repeatable --tag/-t filtering to all list commands for frontmatter-bearing
+          entities. Make existing --tag on ADRs/policies/standards repeatable. Add
+          tags to PlanSummary model.
+        entrance_criteria:
+        - DR-100 approved
+        exit_criteria:
+        - All taggable list commands have --tag/-t (repeatable, OR logic)
+        - PlanSummary has tags field populated from frontmatter
+        - Existing tests updated for repeatable --tag
+        - New tests for all added commands
+        - just check green
+        verification:
+          tests:
+          - CLI tests for --tag on each added command
+          - Repeatable OR logic tests (multiple tags)
+          - AND interaction with --status, --filter
+          evidence: []
+        tasks:
+        - id: '1.1'
+          description: Add tags to PlanSummary model and populate in discover_plans()
+        - id: '1.2'
+          description: Make --tag repeatable (list[str]) on list adrs/policies/standards
+        - id: '1.3'
+          description: Add --tag to list backlog (+ sub-kind wrappers)
+        - id: '1.4'
+          description: Add --tag to list specs, list requirements
+        - id: '1.5'
+          description: Add --tag to list deltas, list changes, list revisions, list
+            audits, list plans
+        - id: '1.6'
+          description: Tests and verification
+        risks: []
+      - id: IP-100-P01
+        name: Add --tag filtering to all list commands
+        status: planned
+        phase: IP-100-P01

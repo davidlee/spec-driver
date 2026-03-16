@@ -178,6 +178,7 @@ class PlanSummary:
   path: Path
   updated: str
   delta_id: str
+  tags: list[str] = field(default_factory=list)
   phases: list[dict[str, Any]] = field(default_factory=list)
 
 
@@ -228,6 +229,9 @@ def discover_plans(root: Path) -> list[PlanSummary]:
         delta_id = str(overview.data.get("delta", ""))
         phase_list = list(overview.data.get("phases", []))
 
+      raw_tags = frontmatter.get("tags", [])
+      tags_list = [str(t) for t in raw_tags] if isinstance(raw_tags, list) else []
+
       plans.append(
         PlanSummary(
           id=plan_id,
@@ -237,6 +241,7 @@ def discover_plans(root: Path) -> list[PlanSummary]:
           path=plan_file,
           updated=str(frontmatter.get("updated", "")),
           delta_id=delta_id,
+          tags=tags_list,
           phases=phase_list,
         )
       )

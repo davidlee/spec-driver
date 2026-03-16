@@ -188,6 +188,14 @@ def list_specs(
       help="Filter by relation TYPE:TARGET (e.g., implements:PROD-010)",
     ),
   ] = None,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
+    ),
+  ] = None,
   refs: Annotated[
     bool,
     typer.Option(
@@ -337,6 +345,9 @@ def list_specs(
       except re.error as e:
         typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
         raise typer.Exit(EXIT_FAILURE) from e
+
+    if tag:
+      specs = [s for s in specs if any(t in s.tags for t in tag)]
 
     if package_exact:
       specs = [spec for spec in specs if spec.id in package_exact]
@@ -500,6 +511,14 @@ def list_deltas(
       help="Include refs column (count in table, type:target in TSV)",
     ),
   ] = False,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -628,6 +647,10 @@ def list_deltas(
         except re.error as e:
           typer.echo(f"Error: invalid regexp pattern: {e}", err=True)
           raise typer.Exit(EXIT_FAILURE) from e
+
+      # Check tag filter (repeatable, OR logic)
+      if tag and not any(t in artifact.tags for t in tag):
+        continue
 
       filtered_artifacts.append(artifact)
 
@@ -758,6 +781,14 @@ def list_changes(
       help="Include applies_to.requirements list (TSV format only)",
     ),
   ] = False,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
+    ),
+  ] = None,
   plan: Annotated[
     bool,
     typer.Option(
@@ -829,6 +860,10 @@ def list_changes(
 
         # Check status filter (multi-value OR logic)
         if status_normalized and artifact.status.lower() not in status_normalized:
+          continue
+
+        # Check tag filter (repeatable, OR logic)
+        if tag and not any(t in artifact.tags for t in tag):
           continue
 
         # Check applies_to filter
@@ -913,11 +948,11 @@ def list_adrs(
     ),
   ] = None,
   tag: Annotated[
-    str | None,
+    list[str] | None,
     typer.Option(
       "--tag",
       "-t",
-      help="Filter by tag",
+      help="Filter by tag (repeatable, OR logic)",
     ),
   ] = None,
   spec: Annotated[
@@ -1000,10 +1035,9 @@ def list_adrs(
   try:
     registry = DecisionRegistry(root=root)
 
-    # Apply structured filters
-    if any([tag, spec, delta, requirement_filter, policy, standard]):
+    # Apply structured filters (tag handled separately for repeatable OR)
+    if any([spec, delta, requirement_filter, policy, standard]):
       decisions = registry.filter(
-        tag=tag,
         spec=spec,
         delta=delta,
         requirement=requirement_filter,
@@ -1012,6 +1046,10 @@ def list_adrs(
       )
     else:
       decisions = list(registry.iter(status=status))
+
+    # Tag filter (repeatable, OR logic)
+    if tag:
+      decisions = [d for d in decisions if any(t in d.tags for t in tag)]
 
     # Apply substring filter
     if substring:
@@ -1060,11 +1098,11 @@ def list_policies(
     ),
   ] = None,
   tag: Annotated[
-    str | None,
+    list[str] | None,
     typer.Option(
       "--tag",
       "-t",
-      help="Filter by tag",
+      help="Filter by tag (repeatable, OR logic)",
     ),
   ] = None,
   spec: Annotated[
@@ -1135,10 +1173,9 @@ def list_policies(
   try:
     registry = PolicyRegistry(root=root)
 
-    # Apply structured filters
-    if any([tag, spec, delta, requirement_filter, standard]):
+    # Apply structured filters (tag handled separately for repeatable OR)
+    if any([spec, delta, requirement_filter, standard]):
       policies = registry.filter(
-        tag=tag,
         spec=spec,
         delta=delta,
         requirement=requirement_filter,
@@ -1146,6 +1183,10 @@ def list_policies(
       )
     else:
       policies = list(registry.iter(status=status))
+
+    # Tag filter (repeatable, OR logic)
+    if tag:
+      policies = [p for p in policies if any(t in p.tags for t in tag)]
 
     # Apply substring filter
     if substring:
@@ -1194,11 +1235,11 @@ def list_standards(
     ),
   ] = None,
   tag: Annotated[
-    str | None,
+    list[str] | None,
     typer.Option(
       "--tag",
       "-t",
-      help="Filter by tag",
+      help="Filter by tag (repeatable, OR logic)",
     ),
   ] = None,
   spec: Annotated[
@@ -1270,10 +1311,9 @@ def list_standards(
   try:
     registry = StandardRegistry(root=root)
 
-    # Apply structured filters
-    if any([tag, spec, delta, requirement_filter, policy]):
+    # Apply structured filters (tag handled separately for repeatable OR)
+    if any([spec, delta, requirement_filter, policy]):
       standards = registry.filter(
-        tag=tag,
         spec=spec,
         delta=delta,
         requirement=requirement_filter,
@@ -1281,6 +1321,10 @@ def list_standards(
       )
     else:
       standards = list(registry.iter(status=status))
+
+    # Tag filter (repeatable, OR logic)
+    if tag:
+      standards = [s for s in standards if any(t in s.tags for t in tag)]
 
     # Apply substring filter
     if substring:
@@ -1414,6 +1458,14 @@ def list_requirements(
       help="Filter by source kind (spec,issue,problem,improvement).",
     ),
   ] = None,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
+    ),
+  ] = None,
   truncate: TruncateOption = False,
   external: ExternalOption = False,
 ) -> None:
@@ -1534,6 +1586,9 @@ def list_requirements(
         if not r.source_kind or r.source_kind.lower() in sk_values
       ]
 
+    if tag:
+      requirements = [r for r in requirements if any(t in r.tags for t in tag)]
+
     # Category filter (substring match, respects --case-insensitive)
     if category:
       if case_insensitive:
@@ -1630,6 +1685,14 @@ def list_revisions(
     str | None,
     typer.Option("--delta", help="Filter by delta reference (e.g., DE-090 or 90)"),
   ] = None,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
+    ),
+  ] = None,
   substring: Annotated[
     str | None,
     typer.Option(
@@ -1694,6 +1757,8 @@ def list_revisions(
           delta_normalized == str(rel.get("target", "")).upper() for rel in r.relations
         )
       ]
+    if tag:
+      revisions = [r for r in revisions if any(t in r.tags for t in tag)]
     if substring:
       filter_lower = substring.lower()
       revisions = [
@@ -1747,6 +1812,14 @@ def list_audits(
   delta: Annotated[
     str | None,
     typer.Option("--delta", help="Filter by delta reference (e.g., DE-090 or 90)"),
+  ] = None,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
+    ),
   ] = None,
   substring: Annotated[
     str | None,
@@ -1835,6 +1908,8 @@ def list_audits(
           delta_normalized == str(rel.get("target", "")).upper() for rel in a.relations
         )
       ]
+    if tag:
+      audits = [a for a in audits if any(t in a.tags for t in tag)]
     if substring:
       filter_lower = substring.lower()
       audits = [
@@ -1899,6 +1974,14 @@ def list_plans(
       help="Substring filter on ID or name (case-insensitive)",
     ),
   ] = None,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
+    ),
+  ] = None,
   regexp: RegexpOption = None,
   case_insensitive: CaseInsensitiveOption = False,
   format_type: FormatOption = "table",
@@ -1933,6 +2016,8 @@ def list_plans(
       status_values = parse_multi_value_filter(status)
       status_normalized = [s.lower() for s in status_values]
       plans = [p for p in plans if p.status.lower() in status_normalized]
+    if tag:
+      plans = [p for p in plans if any(t in p.tags for t in tag)]
     if substring:
       filter_lower = substring.lower()
       plans = [
@@ -2009,6 +2094,14 @@ def list_backlog(
     typer.Option(
       "--related-to",
       help="Filter items referencing ID in relations (e.g., DE-090, SPEC-110)",
+    ),
+  ] = None,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
     ),
   ] = None,
   json_output: Annotated[
@@ -2129,6 +2222,8 @@ def list_backlog(
       items = [i for i in items if filter_lower in i.title.lower()]
     if related_to:
       items = [item for item in items if matches_related_to(item, related_to)]
+    if tag:
+      items = [i for i in items if any(t in i.tags for t in tag)]
 
     # Apply regexp filter on id, title
     if regexp:
@@ -2299,6 +2394,14 @@ def list_issues(
       help="Filter by severity (e.g. p1, p2, p3)",
     ),
   ] = None,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
+    ),
+  ] = None,
   substring: Annotated[
     str | None,
     typer.Option(
@@ -2375,6 +2478,7 @@ def list_issues(
     kind="issue",
     status=status,
     severity=severity,
+    tag=tag,
     substring=substring,
     regexp=regexp,
     case_insensitive=case_insensitive,
@@ -2401,6 +2505,14 @@ def list_problems(
     typer.Option(
       "--severity",
       help="Filter by severity (e.g. p1, p2, p3)",
+    ),
+  ] = None,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
     ),
   ] = None,
   substring: Annotated[
@@ -2479,6 +2591,7 @@ def list_problems(
     kind="problem",
     status=status,
     severity=severity,
+    tag=tag,
     substring=substring,
     regexp=regexp,
     case_insensitive=case_insensitive,
@@ -2505,6 +2618,14 @@ def list_improvements(
     typer.Option(
       "--severity",
       help="Filter by severity (e.g. p1, p2, p3)",
+    ),
+  ] = None,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
     ),
   ] = None,
   substring: Annotated[
@@ -2583,6 +2704,7 @@ def list_improvements(
     kind="improvement",
     status=status,
     severity=severity,
+    tag=tag,
     substring=substring,
     regexp=regexp,
     case_insensitive=case_insensitive,
@@ -2609,6 +2731,14 @@ def list_risks(
     typer.Option(
       "--severity",
       help="Filter by severity (e.g. p1, p2, p3)",
+    ),
+  ] = None,
+  tag: Annotated[
+    list[str] | None,
+    typer.Option(
+      "--tag",
+      "-t",
+      help="Filter by tag (repeatable, OR logic)",
     ),
   ] = None,
   substring: Annotated[
@@ -2687,6 +2817,7 @@ def list_risks(
     kind="risk",
     status=status,
     severity=severity,
+    tag=tag,
     substring=substring,
     regexp=regexp,
     case_insensitive=case_insensitive,

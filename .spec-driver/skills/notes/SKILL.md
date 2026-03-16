@@ -1,6 +1,6 @@
 ---
 name: notes
-description: Whenever you complete a task or phase - record implementation notes.
+description: You MUST invoke ANY TIME you complete a task or phase to record implementation notes.
 ---
 
 Update the card with implementation notes.
@@ -14,6 +14,7 @@ be concise, but record:
   - surprises encountered or adaptations required
   - potential rough edges, omissions, or refactorings for later
   - follow-up actions advisable
+  - anything that could do with refactoring
   - open questions relating to completed or upcoming work
   - durable facts, patterns, or gotchas that should become a memory
   - relevant commit hash(es), or: uncommitted work

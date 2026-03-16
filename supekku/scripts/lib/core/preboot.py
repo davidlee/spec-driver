@@ -35,6 +35,7 @@ BOOT_SEQUENCE: list[tuple[str, str]] = [
   ("Execution Environment", f"{SPEC_DRIVER_DIR}/agents/exec.md"),
   ("Glossary", f"{SPEC_DRIVER_DIR}/agents/glossary.md"),
   ("Workflow", f"{SPEC_DRIVER_DIR}/agents/workflow.md"),
+  ("Skill Routing", f"{SPEC_DRIVER_DIR}/agents/routing.md"),
   ("Policy & Governance", f"{SPEC_DRIVER_DIR}/agents/policy.md"),
   ("Memory", f"{SPEC_DRIVER_DIR}/agents/memory.md"),
   ("Project Doctrine", f"{SPEC_DRIVER_DIR}/hooks/doctrine.md"),

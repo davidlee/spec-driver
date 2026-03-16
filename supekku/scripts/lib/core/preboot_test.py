@@ -41,6 +41,7 @@ def workspace(tmp_path: Path) -> Path:
     "agents/exec.md": "# Execution\n\nRun via: `uv run spec-driver`",
     "agents/glossary.md": "# Glossary\n\n## Card\n\nA card is a task.",
     "agents/workflow.md": "# Workflow\n\nCeremony: town_planner",
+    "agents/routing.md": "# Skill Routing\n\nChoose the governing skill.",
     "agents/policy.md": "# Policy\n\nADRs are enabled.",
     "agents/memory.md": "# Memory\n\nUse /retrieving-memory.",
     "hooks/doctrine.md": "# Doctrine\n\n- Kanban IDs: T123-*",

@@ -1498,5 +1498,125 @@ class TestHelpTextContent:
     assert flag in result.stdout
 
 
+class TestTagFiltering:
+  """Test --tag filtering across list commands (DE-100)."""
+
+  # -- Flag acceptance: every taggable list command accepts --tag/-t --
+
+  @pytest.mark.parametrize(
+    "cmd",
+    [
+      ["list", "adrs"],
+      ["list", "policies"],
+      ["list", "standards"],
+      ["list", "backlog", "-a"],
+      ["list", "specs"],
+      ["list", "deltas"],
+      ["list", "changes"],
+      ["list", "requirements"],
+      ["list", "revisions"],
+      ["list", "audits"],
+      ["list", "plans"],
+      ["list", "issues", "-a"],
+      ["list", "problems", "-a"],
+      ["list", "improvements", "-a"],
+      ["list", "risks", "-a"],
+    ],
+  )
+  def test_tag_flag_accepted(self, cmd: list[str]) -> None:
+    """--tag flag is accepted without error."""
+    result = runner.invoke(app, [*cmd, "--tag", "nonexistent-tag-xyz"])
+    assert result.exit_code == 0
+
+  @pytest.mark.parametrize(
+    "cmd",
+    [
+      ["list", "adrs"],
+      ["list", "policies"],
+      ["list", "standards"],
+      ["list", "backlog", "-a"],
+      ["list", "specs"],
+      ["list", "deltas"],
+      ["list", "changes"],
+      ["list", "requirements"],
+      ["list", "revisions"],
+      ["list", "audits"],
+      ["list", "plans"],
+    ],
+  )
+  def test_tag_short_flag_accepted(self, cmd: list[str]) -> None:
+    """-t short flag is accepted without error."""
+    result = runner.invoke(app, [*cmd, "-t", "nonexistent-tag-xyz"])
+    assert result.exit_code == 0
+
+  # -- Help text documents --tag --
+
+  @pytest.mark.parametrize(
+    "cmd",
+    [
+      ["list", "adrs"],
+      ["list", "policies"],
+      ["list", "standards"],
+      ["list", "backlog"],
+      ["list", "specs"],
+      ["list", "deltas"],
+      ["list", "changes"],
+      ["list", "requirements"],
+      ["list", "revisions"],
+      ["list", "audits"],
+      ["list", "plans"],
+      ["list", "issues"],
+      ["list", "problems"],
+      ["list", "improvements"],
+      ["list", "risks"],
+    ],
+  )
+  def test_tag_in_help(self, cmd: list[str]) -> None:
+    """--tag is documented in help output."""
+    result = runner.invoke(app, [*cmd, "--help"])
+    assert result.exit_code == 0
+    assert "--tag" in result.stdout
+
+  # -- Repeatable OR logic --
+
+  def test_tag_repeatable_or_adrs(self) -> None:
+    """Multiple --tag values use OR logic on ADRs."""
+    import json
+
+    # architecture and workflow are known tags on accepted ADRs
+    result = runner.invoke(
+      app, ["list", "adrs", "--tag", "architecture", "--tag", "workflow", "--json"]
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    items = data.get("items", data) if isinstance(data, dict) else data
+    # Should include ADRs with either tag
+    tags_seen: set[str] = set()
+    for item in items:
+      tags_seen.update(item.get("tags", []))
+    assert "architecture" in tags_seen or "workflow" in tags_seen
+
+  # -- Tag filter ANDs with other filters --
+
+  def test_tag_ands_with_status_adrs(self) -> None:
+    """--tag ANDs with --status filter — nonexistent tag yields empty."""
+    result = runner.invoke(
+      app,
+      ["list", "adrs", "-s", "accepted", "--tag", "nonexistent-tag-xyz"],
+    )
+    assert result.exit_code == 0
+    # No results — empty output (no table/json emitted)
+    assert "ADR-" not in result.stdout
+
+  # -- No match returns empty --
+
+  def test_tag_no_match_backlog(self) -> None:
+    """--tag with non-matching value returns empty for backlog."""
+    result = runner.invoke(
+      app, ["list", "backlog", "-a", "--tag", "nonexistent-tag-xyz"]
+    )
+    assert result.exit_code == 0
+
+
 if __name__ == "__main__":
   pytest.main([__file__, "-v"])

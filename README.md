@@ -252,4 +252,5 @@ Boot up, install, and ask the agent to show you around.
 
 ## License
 
-MIT, go nuts.
+FSL, converts to Apache2 in two years. Just a precaution against vampires.
+

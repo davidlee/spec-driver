@@ -157,7 +157,7 @@ CLI dependency direction: CLI → Formatters → Domain → Core
 1. **Choose the right package** based on responsibility
 2. **Create models** (`models.py` or `registry.py`)
 3. **Implement business logic** (pure functions preferred)
-4. **Write tests FIRST** (TDD)
+4. **Write tests FIRST** (red/green TDD)
 5. **Keep formatters separate** - no display logic in domain
 
 ### CLI Commands

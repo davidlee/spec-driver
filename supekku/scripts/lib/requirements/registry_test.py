@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import logging
 import os
 import sys
 import tempfile
@@ -34,6 +35,7 @@ from supekku.scripts.lib.requirements.registry import (
   RequirementRecord,
   RequirementsRegistry,
   SyncStats,
+  _is_requirement_like_line,
 )
 from supekku.scripts.lib.specs.registry import SpecRegistry
 
@@ -2598,6 +2600,187 @@ class TestBreakoutFrontmatterSync(unittest.TestCase):
     record = registry.records["SPEC-904.FR-001"]
     assert record.ext_id == "GH-77"
     assert record.tags == ["ci"]
+
+
+class TestIsRequirementLikeLine(unittest.TestCase):
+  """Test _is_requirement_like_line heuristic for false-positive suppression.
+
+  The heuristic distinguishes lines that plausibly *define* a requirement
+  (and may have a format problem) from lines that merely *reference* one.
+  """
+
+  # -- Lines that ARE plausible definition attempts -----------------------
+
+  def test_bold_bullet_definition(self) -> None:
+    """Standard bold-bullet definition format is requirement-like."""
+    assert _is_requirement_like_line("- **FR-001**: Some title")
+
+  def test_plain_bullet_definition(self) -> None:
+    """Bullet with bare ID (no bold) is requirement-like."""
+    assert _is_requirement_like_line("- FR-001: Some title")
+
+  def test_qualified_bullet_definition(self) -> None:
+    """Qualified ID (SPEC-100.FR-001) in bullet is requirement-like."""
+    assert _is_requirement_like_line("- **SPEC-100.FR-001**: Some title")
+
+  def test_heading_definition(self) -> None:
+    """Heading with FR/NF ID as subject is requirement-like."""
+    assert _is_requirement_like_line("### FR-016.001: Some title")
+
+  def test_nf_definition(self) -> None:
+    """Non-functional requirement definition is requirement-like."""
+    assert _is_requirement_like_line("- **NF-001**: Performance target")
+
+  def test_badly_formatted_definition(self) -> None:
+    """Missing bold markers — still looks like a definition attempt."""
+    assert _is_requirement_like_line("- FR-001 Some badly formatted requirement")
+
+  def test_heading_with_nf_subject(self) -> None:
+    """Heading where NF-001 is the subject (not a cross-ref)."""
+    assert _is_requirement_like_line(
+      "# Formal NF-001 benchmark test for materialisation performance",
+    )
+
+  # -- Lines that are NOT definitions (cross-references) ------------------
+
+  def test_per_crossref_in_parenthetical(self) -> None:
+    """'per PROD-004.FR-007' inside parentheses is a cross-reference."""
+    assert not _is_requirement_like_line(
+      "- clap command definitions (noun-verb families per PROD-004.FR-007)",
+    )
+
+  def test_per_crossref_qualified(self) -> None:
+    """'per SPEC-003.FR-006' is a cross-reference."""
+    assert not _is_requirement_like_line(
+      "- Contractual properties (must match bough per SPEC-003.FR-006)",
+    )
+
+  def test_per_crossref_in_heading(self) -> None:
+    """Heading ending with 'per NF-001' is a cross-reference."""
+    assert not _is_requirement_like_line(
+      "# Structured logging implementation per NF-001",
+    )
+
+  def test_parenthetical_only_mention(self) -> None:
+    """ID only inside parentheses — citation, not definition."""
+    assert not _is_requirement_like_line(
+      "Some prose mentioning (FR-007) in parens only",
+    )
+
+  def test_parenthetical_qualified_mention(self) -> None:
+    """Qualified ID only inside parentheses."""
+    assert not _is_requirement_like_line(
+      "- some responsibility (PROD-004.FR-007)",
+    )
+
+  def test_no_requirement_id(self) -> None:
+    """Line without any FR/NF ID at all."""
+    assert not _is_requirement_like_line("- Just a normal bullet point")
+
+  def test_plain_prose_mention(self) -> None:
+    """Prose line with bare ID — ambiguous, retained as requirement-like.
+
+    Without a clear cross-reference signal (per/parenthetical), the
+    heuristic conservatively flags this to catch misformatted definitions.
+    """
+    assert _is_requirement_like_line(
+      "This satisfies FR-001 from the product spec.",
+    )
+
+  # -- Edge cases ---------------------------------------------------------
+
+  def test_mixed_definition_and_crossref(self) -> None:
+    """Line with both a definition-position ID and a parenthetical ref.
+
+    If 'per' appears, the whole line is treated as a cross-reference
+    because the heuristic errs on the side of suppressing false positives.
+    """
+    assert not _is_requirement_like_line(
+      "- FR-001: Implements constraint per NF-002",
+    )
+
+  def test_multiple_parenthetical_refs(self) -> None:
+    """Multiple IDs all inside parentheses — still a citation."""
+    assert not _is_requirement_like_line(
+      "- Auth module (FR-001) and perf (NF-002) integration",
+    )
+
+  def test_case_insensitive(self) -> None:
+    """Lowercase fr/nf should still be detected."""
+    assert _is_requirement_like_line("- **fr-001**: lowercase definition")
+
+  def test_empty_line(self) -> None:
+    """Empty line is not requirement-like."""
+    assert not _is_requirement_like_line("")
+
+  def test_whitespace_only(self) -> None:
+    """Whitespace-only line is not requirement-like."""
+    assert not _is_requirement_like_line("   ")
+
+
+class TestRecordsFromContentCrossRefSuppression(unittest.TestCase):
+  """Integration test: _records_from_content does not warn on cross-references."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def _make_repo(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+    return root
+
+  def test_crossref_only_spec_no_warning(self) -> None:
+    """Spec with only cross-references should not trigger extraction warning."""
+    root = self._make_repo()
+
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-010-example"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / "SPEC-010.md"
+    frontmatter = {
+      "id": "SPEC-010",
+      "slug": "spec-010",
+      "name": "Cross-ref only spec",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+    }
+    body = (
+      "# SPEC-010\n\n"
+      "## Responsibilities\n\n"
+      "- clap command definitions (noun-verb families per PROD-004.FR-007)\n"
+      "- Contractual properties (must match bough per SPEC-003.FR-006)\n"
+      "- Some other thing (PROD-004.NF-001)\n"
+    )
+    dump_markdown_file(spec_path, frontmatter, body)
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    with self.assertLogs("supekku", level="WARNING") as cm:
+      # Add a dummy log to ensure assertLogs doesn't fail on no logs
+      logging.getLogger("supekku").warning("SENTINEL")
+      list(
+        registry._records_from_content(
+          "SPEC-010",
+          dict(frontmatter),
+          body,
+          spec_path,
+          root,
+        ),
+      )
+
+    # Only the sentinel should be present, not a requirement-like warning
+    for msg in cm.output:
+      assert "requirement-like" not in msg, (
+        f"Unexpected requirement-like warning: {msg}"
+      )
 
 
 if __name__ == "__main__":

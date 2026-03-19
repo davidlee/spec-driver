@@ -68,6 +68,49 @@ _REQUIREMENT_HEADING = re.compile(
   re.IGNORECASE,
 )
 
+# Cross-reference patterns: "per FR-007", "per PROD-004.FR-007".
+# These mention a requirement without defining it.
+_REQUIREMENT_CROSSREF = re.compile(
+  r"\bper\s+(?:[A-Z]+-\d{3}\.)?(FR|NF)-\d{3}\b",
+  re.IGNORECASE,
+)
+
+# Parenthetical mention: "(…FR-007…)" or "(…PROD-004.FR-007…)".
+# When all FR/NF references on a line are inside parentheses, the line
+# is citing requirements, not defining them.
+_REQUIREMENT_IN_PARENS = re.compile(
+  r"\([^)]*\b(?:[A-Z]+-\d{3}\.)?(FR|NF)-\d{3}\b[^)]*\)",
+  re.IGNORECASE,
+)
+
+
+_BARE_REQUIREMENT_ID = re.compile(
+  r"\b(?:[A-Z]+-\d{3}\.)?(FR|NF)-\d{3}\b",
+  re.IGNORECASE,
+)
+
+
+def _is_requirement_like_line(line: str) -> bool:
+  """Return True if *line* plausibly attempts to define a requirement.
+
+  A line is "requirement-like" if it contains an FR/NF-xxx ID and the
+  ID is not purely a cross-reference.  Cross-reference patterns:
+  - "per FR-007" / "per PROD-004.FR-007"
+  - All IDs on the line are inside parentheses
+
+  Lines with no FR/NF ID at all return False.
+  """
+  if not _BARE_REQUIREMENT_ID.search(line):
+    return False
+
+  # "per <ID>" is a citation, not a definition
+  if _REQUIREMENT_CROSSREF.search(line):
+    return False
+
+  # If every FR/NF ID on the line is inside parentheses, it's a citation
+  stripped = _REQUIREMENT_IN_PARENS.sub("", line)
+  return bool(_BARE_REQUIREMENT_ID.search(stripped))
+
 
 @dataclass
 class RequirementRecord:
@@ -1197,8 +1240,10 @@ class RequirementsRegistry:
     extracted_count = 0
 
     for line in body.splitlines():
-      # Track lines that look like requirements for diagnostics
-      if re.search(r"\b(FR|NF)-\d{3}\b", line, re.IGNORECASE):
+      # Track lines that plausibly *define* a requirement for diagnostics.
+      # Skip cross-references: "per FR-007", parenthetical mentions like
+      # "(per PROD-004.FR-007)" — these cite, not define.
+      if _is_requirement_like_line(line):
         requirement_like_lines.append(line.strip())
 
       # Try bullet format first (spec requirements)

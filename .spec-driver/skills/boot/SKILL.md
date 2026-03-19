@@ -19,4 +19,4 @@ When boot context has been observed — print:
 Otherwise — print:
 BOOT ERROR !!!
 
-After boot, you MUST EXPLICITLY INVOKE `/using-spec-driver` to route ANY substantive work before acting.
+After boot, you MUST use `/using-spec-driver` to route ANY substantive work before acting.

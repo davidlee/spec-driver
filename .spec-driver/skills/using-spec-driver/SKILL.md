@@ -3,10 +3,6 @@ name: using-spec-driver
 description: Mandatory routing skill for ANY substantive work in a spec-driver project. Choose the governing skill before acting, and do not start implementation until the required delta/design/plan/phase artefacts exist.
 ---
 
-Core routing rules are loaded in boot context (see "Skill Routing" section).
-This skill provides extended guardrails and failure-mode guidance beyond the
-routing table.
-
 You MUST choose the governing workflow skill before doing substantive work.
 
 This skill is not optional process fluff. It is the routing layer for work in a

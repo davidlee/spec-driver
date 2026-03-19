@@ -42,5 +42,5 @@ Process:
 Outcomes:
 
 - A delta exists with clear scope and traceability targets.
-- A DR has been fleshed out with a robust, APPROVED design, and `DE-XXX` is consistent with it.
+- A DR has been fleshed out with a robust design, and `DE-XXX` is consistent with it.
 - Next step (design/planning/implementation) is explicit.

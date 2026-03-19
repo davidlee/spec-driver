@@ -4,8 +4,8 @@ name: Requirement Lifecycle Guidance
 kind: memory
 status: active
 memory_type: concept
-updated: "2026-03-05"
-verified: "2026-03-05"
+updated: "2026-03-18"
+verified: "2026-03-18"
 tags: [spec-driver, lifecycle, requirements, coverage]
 summary: "Agent-facing model for requirement lifecycle, coverage statuses, and traceability grounded in current implementation."
 scope:
@@ -38,6 +38,21 @@ provenance:
 - Requirement lifecycle status is derived from coverage entries on sync.
 - Coverage status and requirement status are distinct enums; do not mix them.
 - See `supekku/about/lifecycle.md` for code-truth details.
+
+## Recognised Requirement Syntax
+
+Sync extracts requirements from spec body lines matching these formats:
+
+- **Bullet (primary):** `- **FR-001**: Title` or `- **SPEC-100.FR-001**: Title`
+- **Heading (backlog dotted):** `### FR-016.001: Title`
+
+The label inside `**bold**` must be bare — ID only, no description or em-dash
+title. For example, `**FR-001 — Workspace resolution**:` will **not** match.
+
+Optional inline category and tags are supported after the label:
+`- **FR-001**(category)[tag1, tag2]: Title`
+
+The separator after the label/bold may be `:`, `-`, `–`, or `—`.
 
 ## Canonical Status Sets
 

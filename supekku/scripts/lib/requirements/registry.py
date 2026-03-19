@@ -541,7 +541,9 @@ class RequirementsRegistry:
       if len(extracted) == 0:
         print(
           f"WARNING: Spec {spec.id} ({spec.kind}) has 0 extracted requirements. "
-          f"Check requirement format in {spec.path.name}",
+          f"Expected format: '- **FR-001**: Title' or '- **SPEC-100.FR-001**: Title' "
+          f"(label inside **bold** must be bare — no description). "
+          f"Check {spec.path.name}",
           file=sys.stderr,
         )
         logger.warning(
@@ -1254,7 +1256,9 @@ class RequirementsRegistry:
     if requirement_like_lines and extracted_count == 0:
       logger.warning(
         "Spec %s at %s: Found %d requirement-like lines but extracted 0. "
-        "First line: %s",
+        "Expected format: '- **FR-001**: Title' or '- **SPEC-100.FR-001**: Title'. "
+        "The label inside **bold** must be bare (no description). "
+        "First unmatched line: %s",
         spec_id,
         spec_path.name,
         len(requirement_like_lines),

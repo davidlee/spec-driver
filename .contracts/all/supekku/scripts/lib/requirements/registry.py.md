@@ -4,10 +4,24 @@ Requirements management and processing utilities.
 
 ## Constants
 
+- `_BARE_REQUIREMENT_ID`
+- `_REQUIREMENT_CROSSREF` - These mention a requirement without defining it.
 - `_REQUIREMENT_HEADING` - Matches dotted format only (NNN.MMM) — no overlap with spec bullet format.
+- `_REQUIREMENT_IN_PARENS` - is citing requirements, not defining them.
 - `_REQUIREMENT_LINE` - Optional tags in square brackets after category: **FR-001**(cat)[tag1, tag2]: Title
 - `__all__`
 - `logger`
+
+## Functions
+
+- `_is_requirement_like_line(line) -> bool`: Return True if *line* plausibly attempts to define a requirement.
+
+A line is "requirement-like" if it contains an FR/NF-xxx ID and the
+ID is not purely a cross-reference.  Cross-reference patterns:
+- "per FR-007" / "per PROD-004.FR-007"
+- All IDs on the line are inside parentheses
+
+Lines with no FR/NF ID at all return False.
 
 ## Classes
 

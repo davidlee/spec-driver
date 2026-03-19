@@ -11219,3 +11219,33 @@ deltas:
         name: Add --tag filtering to all list commands
         status: planned
         phase: IP-100-P01
+  DE-101:
+    kind: delta
+    status: completed
+    name: 'Delta - fix: requirement extraction false-positive warnings on cross-references'
+    slug: fix_requirement_extraction_false_positive_warnings_on_cross_references
+    updated: '2026-03-19'
+    path: .spec-driver/deltas/DE-101-fix_requirement_extraction_false_positive_warnings_on_cross_references/DE-101.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-101
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-101
+        delta: DE-101
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-101-P01
+      phases:
+      - id: IP-101-P01
+        phase: IP-101-P01

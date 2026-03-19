@@ -21,12 +21,12 @@ Examples:
   list adrs -s accepted             # Filter by status
   list adrs --spec SPEC-110 --json  # ADRs referencing a spec
   list adrs -t cli                  # Filter by tag
-- @app.command(audits) `list_audits(root, status, spec, delta, substring, regexp, case_insensitive, format_type, json_output, referenced_by, not_referenced_by, truncate, external) -> None`: List audits with optional filtering.
+- @app.command(audits) `list_audits(root, status, spec, delta, tag, substring, regexp, case_insensitive, format_type, json_output, referenced_by, not_referenced_by, truncate, external) -> None`: List audits with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
 The --referenced-by/--not-referenced-by flags filter by reverse references.
-- @app.command(backlog) `list_backlog(root, kind, status, substring, severity, related_to, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog items with optional filtering.
+- @app.command(backlog) `list_backlog(root, kind, status, substring, severity, related_to, tag, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog items with optional filtering.
 
 By default, items are sorted by priority (registry order → severity → ID) and
 resolved/implemented items are excluded. Use --all to include all statuses.
@@ -43,11 +43,11 @@ The --regexp flag does pattern matching on ID and title fields.
 By default, hides cards in done/ and archived/ lanes. Use --all to show everything.
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID and title fields.
-- @app.command(changes) `list_changes(root, kind, substring, status, applies_to, regexp, case_insensitive, format_type, json_output, truncate, paths, relations, applies, plan, external) -> None`: List change artifacts (deltas, revisions, audits) with optional filters.
+- @app.command(changes) `list_changes(root, kind, substring, status, applies_to, regexp, case_insensitive, format_type, json_output, truncate, paths, relations, applies, tag, plan, external) -> None`: List change artifacts (deltas, revisions, audits) with optional filters.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
-- @app.command(deltas) `list_deltas(root, ids, status, implements, substring, spec_filter, related_to, relation, referenced_by, not_referenced_by, unaudited, refs, regexp, case_insensitive, format_type, json_output, truncate, details, external) -> None`: List deltas with optional filtering and status grouping.
+- @app.command(deltas) `list_deltas(root, ids, status, implements, substring, spec_filter, related_to, relation, referenced_by, not_referenced_by, unaudited, refs, tag, regexp, case_insensitive, format_type, json_output, truncate, details, external) -> None`: List deltas with optional filtering and status grouping.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag filters on ID, name, and slug fields.
@@ -69,12 +69,12 @@ Examples:
   list deltas --unaudited                      # Completed deltas without an audit
   list deltas --referenced-by audit            # Deltas referenced by any audit
 - @app.command(drift) `list_drift(root, status, substring, regexp, case_insensitive, format_type, truncate) -> None`: List drift ledgers.
-- @app.command(improvements) `list_improvements(root, status, severity, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog improvements with optional filtering.
+- @app.command(improvements) `list_improvements(root, status, severity, tag, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog improvements with optional filtering.
 
 Shortcut for: list backlog --kind improvement
 
 By default, resolved/implemented items are excluded. Use --all to show all.
-- @app.command(issues) `list_issues(root, status, severity, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog issues with optional filtering.
+- @app.command(issues) `list_issues(root, status, severity, tag, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog issues with optional filtering.
 
 Shortcut for: list backlog --kind issue
 
@@ -85,7 +85,7 @@ The --filter flag does substring matching (case-insensitive).
 Metadata pre-filters (--type, --status, --tag) apply first (AND logic).
 Scope matching (--path, --command, --match-tag) filters by context (OR).
 Results ordered deterministically by severity/weight/specificity/recency/id. - noqa: PLR0913
-- @app.command(plans) `list_plans(root, status, substring, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List implementation plans with optional filtering.
+- @app.command(plans) `list_plans(root, status, substring, tag, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List implementation plans with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
@@ -94,12 +94,12 @@ The --regexp flag does pattern matching on ID, slug, and name fields.
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag filters on title and summary fields.
 Other flags filter on specific structured fields (status, tags, references).
-- @app.command(problems) `list_problems(root, status, severity, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog problems with optional filtering.
+- @app.command(problems) `list_problems(root, status, severity, tag, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog problems with optional filtering.
 
 Shortcut for: list backlog --kind problem
 
 By default, resolved/implemented items are excluded. Use --all to show all.
-- @app.command(requirements) `list_requirements(root, spec, status, kind, category, verified_by, vstatus, vkind, substring, regexp, case_insensitive, format_type, json_output, implemented_by, referenced_by, not_referenced_by, unimplemented, source_kind, truncate, external) -> None`: List requirements with optional filtering.
+- @app.command(requirements) `list_requirements(root, spec, status, kind, category, verified_by, vstatus, vkind, substring, regexp, case_insensitive, format_type, json_output, implemented_by, referenced_by, not_referenced_by, unimplemented, source_kind, tag, truncate, external) -> None`: List requirements with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on UID, label, title, and category fields.
@@ -117,17 +117,17 @@ Examples:
   list requirements --implemented-by DE-090      # Requirements delta implements
   list requirements --unimplemented              # Requirements without a delta
   list requirements --referenced-by delta        # Requirements referenced by deltas
-- @app.command(revisions) `list_revisions(root, status, spec, delta, substring, regexp, case_insensitive, format_type, json_output, truncate, external) -> None`: List revisions with optional filtering.
+- @app.command(revisions) `list_revisions(root, status, spec, delta, tag, substring, regexp, case_insensitive, format_type, json_output, truncate, external) -> None`: List revisions with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
-- @app.command(risks) `list_risks(root, status, severity, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog risks with optional filtering.
+- @app.command(risks) `list_risks(root, status, severity, tag, substring, json_output, regexp, case_insensitive, format_type, truncate, order, prioritize, show_all, limit, pager, external) -> None`: List backlog risks with optional filtering.
 
 Shortcut for: list backlog --kind risk
 
 By default, resolved/implemented items are excluded. Use --all to show all.
 - @app.command(schemas) `list_schemas_cmd(schema_type) -> None`: List available block and/or frontmatter schemas.
-- @app.command(specs) `list_specs(root, kind, status, substring, package_filter, package_path, for_path, category, c4_level, informed_by, related_to, relation, refs, regexp, case_insensitive, format_type, json_output, truncate, paths, packages, external) -> None`: List SPEC/PROD artifacts with optional filtering.
+- @app.command(specs) `list_specs(root, kind, status, substring, package_filter, package_path, for_path, category, c4_level, informed_by, related_to, relation, tag, refs, regexp, case_insensitive, format_type, json_output, truncate, paths, packages, external) -> None`: List SPEC/PROD artifacts with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.

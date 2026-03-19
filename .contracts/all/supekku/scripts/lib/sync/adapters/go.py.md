@@ -2,6 +2,10 @@
 
 Go language adapter for specification synchronization.
 
+## Functions
+
+- `_has_source_files(pkg_path) -> bool`: Check if a Go package directory contains non-test source files.
+
 ## Classes
 
 ### GoAdapter

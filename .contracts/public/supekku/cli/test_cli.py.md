@@ -295,6 +295,19 @@ Test sync command.
 - `test_sync_help(self)`: Test sync command help.
 - `test_sync_prune_flag_in_help(self)`: Test that --prune flag is documented in help.
 
+### TestTagFiltering
+
+Test --tag filtering across list commands (DE-100).
+
+#### Methods
+
+- `test_tag_ands_with_status_adrs(self) -> None`: --tag ANDs with --status filter — nonexistent tag yields empty. - -- Tag filter ANDs with other filters --
+- @pytest.mark.parametrize(cmd, List[List[list, adrs], List[list, policies], List[list, standards], List[list, backlog, -a], List[list, specs], List[list, deltas], List[list, changes], List[list, requirements], List[list, revisions], List[list, audits], List[list, plans], List[list, issues, -a], List[list, problems, -a], List[list, improvements, -a], List[list, risks, -a]]) `test_tag_flag_accepted(self, cmd) -> None`: --tag flag is accepted without error.
+- @pytest.mark.parametrize(cmd, List[List[list, adrs], List[list, policies], List[list, standards], List[list, backlog], List[list, specs], List[list, deltas], List[list, changes], List[list, requirements], List[list, revisions], List[list, audits], List[list, plans], List[list, issues], List[list, problems], List[list, improvements], List[list, risks]]) `test_tag_in_help(self, cmd) -> None`: --tag is documented in help output.
+- `test_tag_no_match_backlog(self) -> None`: --tag with non-matching value returns empty for backlog. - -- No match returns empty --
+- `test_tag_repeatable_or_adrs(self) -> None`: Multiple --tag values use OR logic on ADRs. - -- Repeatable OR logic --
+- @pytest.mark.parametrize(cmd, List[List[list, adrs], List[list, policies], List[list, standards], List[list, backlog, -a], List[list, specs], List[list, deltas], List[list, changes], List[list, requirements], List[list, revisions], List[list, audits], List[list, plans]]) `test_tag_short_flag_accepted(self, cmd) -> None`: -t short flag is accepted without error.
+
 ### TestVerificationStatusFilters
 
 Test --vstatus and --vkind flags for list requirements.

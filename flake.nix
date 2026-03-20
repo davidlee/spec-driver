@@ -5,7 +5,9 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     devshell.url = "github:numtide/devshell";
-    jailed-agents.url = "github:davidlee/nix-config?dir=flakes/pub";
+    # TODO: revert to github:davidlee/nix-config?dir=flakes/pub after push
+    pub.url = "path:/home/david/flakes/pub";
+    llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
   outputs = inputs @ {flake-parts, ...}:
@@ -29,7 +31,7 @@
 
         jailLib =
           if isLinux
-          then inputs.jailed-agents.lib.${system}.jailed-agents
+          then inputs.pub.lib.${system}.mkJailedAgents {inherit (inputs) llm-agents;}
           else {};
 
         spec-driver = pkgs.python3Packages.buildPythonApplication {
@@ -75,13 +77,12 @@
           d2
         ];
 
-        # Raw jailed agents (no preboot wrapper)
-        jailedAgents = lib.optionalAttrs isLinux {
-          jailed-pi-raw = jailLib.makeJailedPi {
+        jailPkgs = lib.optionalAttrs isLinux {
+          jailed-pi = jailLib.makeJailedPi {
             profile = "specDev";
             extraPkgs = projectPkgs;
           };
-          jailed-pi-research-raw = jailLib.makeJailedPi {
+          jailed-pi-research = jailLib.makeJailedPi {
             name = "pi-research";
             profile = "research";
             extraPkgs = projectPkgs;
@@ -90,19 +91,18 @@
             profile = "specDev";
             extraPkgs = projectPkgs;
           };
-        };
-
-        # Wrap jailed-pi with preboot (belt — runs before pi reads AGENTS.md)
-        jailPkgs = lib.optionalAttrs isLinux {
-          jailed-pi = pkgs.writeShellScriptBin "jailed-pi" ''
-            ${lib.getExe' spec-driver "spec-driver"} admin preboot "$PWD" >/dev/null 2>&1
-            exec ${lib.getExe' jailedAgents.jailed-pi-raw "jailed-pi"} "$@"
-          '';
-          jailed-pi-research = pkgs.writeShellScriptBin "jailed-pi-research" ''
-            ${lib.getExe' spec-driver "spec-driver"} admin preboot "$PWD" >/dev/null 2>&1
-            exec ${lib.getExe' jailedAgents.jailed-pi-research-raw "jailed-pi"} "$@"
-          '';
-          inherit (jailedAgents) jailed-opencode;
+          jailed-claude = jailLib.makeJailedClaude {
+            profile = "specDev";
+            extraPkgs = projectPkgs;
+          };
+          jailed-codex = jailLib.makeJailedCodex {
+            profile = "specDev";
+            extraPkgs = projectPkgs;
+          };
+          jailed-gemini = jailLib.makeJailedGemini {
+            profile = "specDev";
+            extraPkgs = projectPkgs;
+          };
         };
       in {
         packages =

@@ -3,12 +3,10 @@
     "blueprint": {
       "inputs": {
         "nixpkgs": [
-          "jailed-agents",
           "llm-agents",
           "nixpkgs"
         ],
         "systems": [
-          "jailed-agents",
           "llm-agents",
           "systems"
         ]
@@ -30,23 +28,19 @@
     "bun2nix": {
       "inputs": {
         "flake-parts": [
-          "jailed-agents",
           "llm-agents",
           "flake-parts"
         ],
         "import-tree": "import-tree",
         "nixpkgs": [
-          "jailed-agents",
           "llm-agents",
           "nixpkgs"
         ],
         "systems": [
-          "jailed-agents",
           "llm-agents",
           "systems"
         ],
         "treefmt-nix": [
-          "jailed-agents",
           "llm-agents",
           "treefmt-nix"
         ]
@@ -104,7 +98,6 @@
     "flake-parts_2": {
       "inputs": {
         "nixpkgs-lib": [
-          "jailed-agents",
           "llm-agents",
           "nixpkgs"
         ]
@@ -125,7 +118,7 @@
     },
     "flake-utils": {
       "inputs": {
-        "systems": "systems"
+        "systems": "systems_2"
       },
       "locked": {
         "lastModified": 1731533236,
@@ -171,44 +164,21 @@
         "type": "sourcehut"
       }
     },
-    "jailed-agents": {
-      "inputs": {
-        "flake-utils": "flake-utils",
-        "jail-nix": "jail-nix",
-        "llm-agents": "llm-agents",
-        "nixpkgs": "nixpkgs_3"
-      },
-      "locked": {
-        "dir": "flakes/pub",
-        "lastModified": 1773910767,
-        "narHash": "sha256-c7cU84U0Sp2Rm0NyPWLsrbo8dI9aVrfTnCCyRhVKjag=",
-        "owner": "davidlee",
-        "repo": "nix-config",
-        "rev": "ab7c2ca93221d1cbfc19bff4105f762a313cf91c",
-        "type": "github"
-      },
-      "original": {
-        "dir": "flakes/pub",
-        "owner": "davidlee",
-        "repo": "nix-config",
-        "type": "github"
-      }
-    },
     "llm-agents": {
       "inputs": {
         "blueprint": "blueprint",
         "bun2nix": "bun2nix",
         "flake-parts": "flake-parts_2",
         "nixpkgs": "nixpkgs_2",
-        "systems": "systems_2",
+        "systems": "systems",
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1773890325,
-        "narHash": "sha256-a+dGcpr6+LX2XKcFR5n2soeS2oS9w7zTTxb3m5a3cwY=",
+        "lastModified": 1773979202,
+        "narHash": "sha256-cFe/HoD9XFkCQALm+y1kTOBvKGQA8p0YsBxLpWCsZAw=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "1b0a1d7396b2d3999b8ebe9246d97db8741438fb",
+        "rev": "124f2bbdf02a73235a74bc353fc9c706a3b0e015",
         "type": "github"
       },
       "original": {
@@ -266,22 +236,6 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1773282481,
-        "narHash": "sha256-b/GV2ysM8mKHhinse2wz+uP37epUrSE+sAKXy/xvBY4=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "fe416aaedd397cacb33a610b33d60ff2b431b127",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_4": {
-      "locked": {
         "lastModified": 1773821835,
         "narHash": "sha256-TJ3lSQtW0E2JrznGVm8hOQGVpXjJyXY2guAxku2O9A4=",
         "owner": "NixOS",
@@ -296,12 +250,46 @@
         "type": "github"
       }
     },
+    "nixpkgs_4": {
+      "locked": {
+        "lastModified": 1773282481,
+        "narHash": "sha256-b/GV2ysM8mKHhinse2wz+uP37epUrSE+sAKXy/xvBY4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "fe416aaedd397cacb33a610b33d60ff2b431b127",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "pub": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "jail-nix": "jail-nix",
+        "nixpkgs": "nixpkgs_4"
+      },
+      "locked": {
+        "lastModified": 1774011681,
+        "narHash": "sha256-e4Pod+BHWWkGs6oGDiwhfMpyiVx+z8qfuYe8gksZF5A=",
+        "path": "/home/david/flakes/pub",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/david/flakes/pub",
+        "type": "path"
+      }
+    },
     "root": {
       "inputs": {
         "devshell": "devshell",
         "flake-parts": "flake-parts",
-        "jailed-agents": "jailed-agents",
-        "nixpkgs": "nixpkgs_4"
+        "llm-agents": "llm-agents",
+        "nixpkgs": "nixpkgs_3",
+        "pub": "pub"
       }
     },
     "systems": {
@@ -337,7 +325,6 @@
     "treefmt-nix": {
       "inputs": {
         "nixpkgs": [
-          "jailed-agents",
           "llm-agents",
           "nixpkgs"
         ]

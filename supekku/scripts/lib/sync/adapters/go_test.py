@@ -319,7 +319,7 @@ class TestGoAdapter(unittest.TestCase):
       "internal": Path("/test/output/internal.md"),
     }
 
-    with pytest.raises(subprocess.CalledProcessError):
+    with pytest.raises(RuntimeError, match="gomarkdoc failed"):
       self.adapter.generate(unit, variant_outputs=variant_outputs)
 
 

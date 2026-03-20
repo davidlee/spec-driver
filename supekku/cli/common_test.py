@@ -413,6 +413,7 @@ class TestResolveArtifactBacklog:
     assert ref.path == md
 
   def test_raises_not_found_for_missing_backlog(self, tmp_path: Path) -> None:
+    (tmp_path / SPEC_DRIVER_DIR).mkdir()
     with pytest.raises(ArtifactNotFoundError):
       resolve_artifact("issue", "ISSUE-999", tmp_path)
 

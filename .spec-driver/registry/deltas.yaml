@@ -11249,3 +11249,58 @@ deltas:
       phases:
       - id: IP-101-P01
         phase: IP-101-P01
+  DE-102:
+    kind: delta
+    status: completed
+    name: Delta - handover and review orchestration
+    slug: handover_and_review_orchestration
+    updated: '2026-03-21'
+    path: .spec-driver/deltas/DE-102-handover_and_review_orchestration/DE-102.md
+    applies_to:
+      specs:
+      - PROD-011
+      requirements: []
+    relations:
+    - type: relates_to
+      target: IMPR-019
+      attributes: {}
+    plan:
+      id: IP-102
+      overview: {}
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-102.PHASE-01
+        plan: IP-102
+        delta: DE-102
+        objective: Re-audit DR-102 against IMPR-019 evaluation criteria, reconcile
+          DE-102, and close the delta.
+        entrance_criteria:
+        - DR-102 has passed two external adversarial review rounds with all findings
+          integrated
+        - No unresolved architectural blockers (confirmed by reviewer round 2, finding
+          5)
+        exit_criteria:
+        - AUD-014 re-audit completed with concrete findings against revised DR-102
+        - AUD-014 verification coverage block populated with requirement/criteria
+          refs
+        - DE-102 reconciled with final DR-102 state
+        - Delta closed via spec-driver complete delta
+        verification:
+          tests: []
+          evidence:
+          - AUD-014.md with populated findings and verification coverage
+          - DE-102 status = completed
+        tasks:
+        - id: '1.1'
+          summary: Re-audit DR-102 against IMPR-019 evaluation criteria
+        - id: '1.2'
+          summary: Populate AUD-014 verification coverage and findings
+        - id: '1.3'
+          summary: Reconcile DE-102 scope/risks/follow-ups with final DR
+        - id: '1.4'
+          summary: Close delta
+        risks:
+        - description: Audit surfaces new design issues requiring DR revision
+          mitigation: Consult user; if material, create new phase rather than blocking
+            closure

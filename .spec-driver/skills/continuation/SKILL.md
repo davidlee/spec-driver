@@ -27,6 +27,37 @@ Then, print the path to the task card.
 If the task card is a delta, use its `notes.md` file for onboarding, and
 reference both it and the parent delta.
 
+## Structured Handoff (workflow orchestration)
+
+If the task card is a delta with an active workflow state
+(`workflow/state.yaml` exists in the delta bundle), you **must** invoke the
+CLI to create a structured handoff:
+
+```
+uv run spec-driver create handoff <DELTA-ID> --to <role>
+```
+
+Where `<role>` is the appropriate next role (e.g. `reviewer`, `implementer`,
+`architect`).
+
+If you are completing a phase, use `phase complete` instead — it marks the
+phase done and emits a handoff automatically:
+
+```
+uv run spec-driver phase complete <DELTA-ID>
+```
+
+Pass `--to reviewer` if the next step is review.
+
+**Do not silently fall back to prose-only handoff** if the CLI command fails.
+The failure must be surfaced and resolved. The structured handoff ensures
+deterministic state transitions and machine-readable handoff payloads.
+
+When `workflow/state.yaml` does not exist (no orchestration active), continue
+with the prose-only handoff as before.
+
+## Next Agent Instructions
+
 Then identify the next logical activity, and print instructions for the next agent.
 
 Usually this means a simple instruction to invoke `/using-spec-driver` or one

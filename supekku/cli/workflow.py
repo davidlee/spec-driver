@@ -1174,6 +1174,197 @@ def review_teardown_command(
   raise typer.Exit(EXIT_SUCCESS)
 
 
+# ---------------------------------------------------------------------------
+# phase complete
+# ---------------------------------------------------------------------------
+
+
+@phase_app.command("complete")
+def phase_complete_command(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  to_role: Annotated[
+    str | None,
+    typer.Option("--to", help="Target role for auto-handoff (overrides bridge/policy)"),
+  ] = None,
+  no_handoff: Annotated[
+    bool,
+    typer.Option("--no-handoff", help="Skip auto-handoff emission"),
+  ] = False,
+  root: RootOption = None,
+) -> None:
+  """Mark the current phase as complete. Emits handoff per policy/bridge."""
+  from supekku.scripts.lib.core.git import (  # noqa: PLC0415
+    get_branch,
+    get_head_sha,
+    has_staged_changes,
+    has_uncommitted_changes,
+    short_sha,
+  )
+  from supekku.scripts.lib.workflow.bridge import extract_phase_bridge  # noqa: PLC0415
+  from supekku.scripts.lib.workflow.handoff_io import (  # noqa: PLC0415
+    HandoffValidationError,
+    build_handoff,
+    write_handoff,
+  )
+  from supekku.scripts.lib.workflow.state_io import (  # noqa: PLC0415
+    StateNotFoundError,
+    StateValidationError,
+    read_state,
+    update_state_workflow,
+    write_state,
+  )
+  from supekku.scripts.lib.workflow.state_machine import WorkflowState  # noqa: PLC0415
+
+  repo_root = find_repo_root(root)
+  delta_dir = _resolve_delta_dir(delta, repo_root)
+  delta_id = delta.upper()
+
+  # Read state
+  try:
+    state_data = read_state(delta_dir)
+  except StateNotFoundError as exc:
+    typer.echo(f"No workflow state for {delta_id}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+  except StateValidationError as exc:
+    typer.echo(f"Invalid workflow state: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  current_status = state_data["workflow"]["status"]
+  if current_status not in (
+    WorkflowState.IMPLEMENTING.value,
+    WorkflowState.CHANGES_REQUESTED.value,
+  ):
+    typer.echo(
+      f"Cannot complete phase in state '{current_status}' "
+      "(must be implementing or changes_requested)",
+      err=True,
+    )
+    raise typer.Exit(EXIT_FAILURE)
+
+  phase = state_data.get("phase", {})
+  phase_id = phase.get("id", "unknown")
+
+  # Check if already complete (idempotent for handoff re-emission)
+  already_complete = phase.get("status") == "complete"
+
+  # Step 1: Mark phase complete in state.yaml
+  if not already_complete:
+    state_data["phase"]["status"] = "complete"
+
+  # Determine handoff emission
+  should_emit_handoff = False
+  handoff_role = to_role
+  config = _load_workflow_config(repo_root)
+
+  if not no_handoff:
+    # Check phase-bridge block in phase sheet
+    bridge_data = None
+    phase_path = phase.get("path")
+    if phase_path:
+      abs_phase_path = repo_root / phase_path
+      if abs_phase_path.exists():
+        bridge_data = extract_phase_bridge(
+          abs_phase_path.read_text(encoding="utf-8"),
+        )
+
+    if bridge_data:
+      # Bridge block takes precedence
+      should_emit_handoff = bridge_data.get("handoff_ready", False)
+      if should_emit_handoff and not handoff_role:
+        handoff_role = (
+          "reviewer" if bridge_data.get("review_required") else
+          config.get("workflow", {}).get("default_next_role", "implementer")
+        )
+    elif config.get("workflow", {}).get("auto_handoff_on_phase_complete", True):
+      # Policy fallback
+      should_emit_handoff = True
+      if not handoff_role:
+        handoff_role = config.get("workflow", {}).get(
+          "default_next_role", "implementer",
+        )
+
+  # Write state with phase complete (step 1)
+  try:
+    write_state(delta_dir, state_data)
+  except StateValidationError as exc:
+    typer.echo(f"State validation failed: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  typer.echo(f"Phase complete: {phase_id}")
+
+  # Step 2+3: Emit handoff if requested
+  if should_emit_handoff and handoff_role:
+    artifact = state_data.get("artifact", {})
+    plan = state_data.get("plan", {})
+
+    # Assemble required_reading
+    required_reading: list[str] = []
+    if artifact.get("path"):
+      required_reading.append(f"{artifact['path']}/{delta_id}.md")
+    if plan.get("path"):
+      required_reading.append(plan["path"])
+    if phase.get("path"):
+      required_reading.append(phase["path"])
+    if artifact.get("notes_path"):
+      required_reading.append(artifact["notes_path"])
+    if not required_reading:
+      required_reading.append(delta_id)
+
+    activity_kind = "review" if handoff_role == "reviewer" else "implementation"
+
+    head_sha = get_head_sha(repo_root)
+    git_head = short_sha(head_sha) if head_sha else None
+    git_branch = get_branch(repo_root)
+    uncommitted = has_uncommitted_changes(repo_root)
+    staged = has_staged_changes(repo_root)
+
+    handoff_data = build_handoff(
+      artifact_id=delta_id,
+      artifact_kind=artifact.get("kind", "delta"),
+      from_role=state_data["workflow"]["active_role"],
+      to_role=handoff_role,
+      phase_id=phase_id,
+      phase_status="complete",
+      required_reading=required_reading,
+      boundary=config.get("workflow", {}).get("handoff_boundary", "phase"),
+      next_activity_kind=activity_kind,
+      git_head=git_head,
+      git_branch=git_branch,
+      has_uncommitted=uncommitted,
+      has_staged=staged,
+    )
+
+    try:
+      hp = write_handoff(delta_dir, handoff_data)
+    except HandoffValidationError as exc:
+      typer.echo(f"Handoff validation failed: {exc}", err=True)
+      raise typer.Exit(EXIT_FAILURE) from exc
+
+    # Update state to awaiting_handoff
+    update_state_workflow(
+      state_data,
+      status=WorkflowState.AWAITING_HANDOFF.value,
+      next_role=handoff_role,
+      claimed_by=None,
+    )
+
+    try:
+      write_state(delta_dir, state_data)
+    except StateValidationError as exc:
+      typer.echo(f"State update failed: {exc}", err=True)
+      raise typer.Exit(EXIT_FAILURE) from exc
+
+    typer.echo(f"  handoff emitted → {handoff_role}")
+    typer.echo(f"  file: {hp}")
+
+  raise typer.Exit(EXIT_SUCCESS)
+
+
+# ---------------------------------------------------------------------------
+# Teardown helper
+# ---------------------------------------------------------------------------
+
+
 def _do_teardown(delta_dir: Path, delta_id: str) -> None:
   """Delete reviewer state files."""
   from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415

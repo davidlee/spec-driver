@@ -208,6 +208,12 @@ app.add_typer(
   help="Accept workflow artifacts (handoffs)",
 )
 
+app.add_typer(
+  workflow.review_app,
+  name="review",
+  help="Review lifecycle commands",
+)
+
 app.command("block", help="Block a workflow (transitions to blocked state)")(
   workflow.block_command
 )

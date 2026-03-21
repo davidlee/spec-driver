@@ -100,10 +100,44 @@ def short_sha(sha: str, length: int = DEFAULT_SHORT_SHA_LENGTH) -> str:
   return sha[:length]
 
 
+def get_changed_files(
+  from_ref: str,
+  to_ref: str = "HEAD",
+  root: Path | None = None,
+) -> list[str]:
+  """Return list of files changed between two refs.
+
+  Uses ``git diff --name-only``.  Returns empty list on failure.
+
+  Args:
+    from_ref: Base commit ref.
+    to_ref: Target commit ref (default HEAD).
+    root: Working directory for the git command.
+
+  Returns:
+    List of changed file paths (relative to repo root).
+  """
+  try:
+    result = subprocess.run(  # noqa: S603, S607
+      ["git", "diff", "--name-only", from_ref, to_ref],
+      capture_output=True,
+      text=True,
+      timeout=10,
+      cwd=root,
+      check=False,
+    )
+    if result.returncode != 0:
+      return []
+    return [f for f in result.stdout.strip().split("\n") if f]
+  except (FileNotFoundError, subprocess.TimeoutExpired):
+    return []
+
+
 __all__ = [
   "DEFAULT_SHORT_SHA_LENGTH",
   "SHA_HEX_PATTERN",
   "get_branch",
+  "get_changed_files",
   "get_head_sha",
   "has_staged_changes",
   "has_uncommitted_changes",

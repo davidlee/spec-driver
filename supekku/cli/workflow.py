@@ -9,6 +9,9 @@ Commands:
   block / unblock — transition to/from blocked
   create handoff — write handoff.current.yaml, transition to awaiting_handoff
   accept handoff — claim + transition to implementing/reviewing
+  review prime — generate review-index.yaml + review-bootstrap.md
+  review complete — write review-findings.yaml, transition state
+  review teardown — delete reviewer state files
 """
 
 from __future__ import annotations
@@ -703,3 +706,494 @@ def accept_handoff_command(
     f"(claimed by {caller})",
   )
   raise typer.Exit(EXIT_SUCCESS)
+
+
+# ---------------------------------------------------------------------------
+# review commands
+# ---------------------------------------------------------------------------
+
+review_app = typer.Typer(help="Review lifecycle commands", no_args_is_help=True)
+
+
+@review_app.command("prime")
+def review_prime_command(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  root: RootOption = None,
+) -> None:
+  """Generate review-index.yaml + review-bootstrap.md from current state.
+
+  Evaluates staleness of existing cache, rebuilds or incrementally
+  updates as appropriate per DR-102 §8.
+  """
+  from supekku.scripts.lib.core.git import (  # noqa: PLC0415
+    get_changed_files,
+    get_head_sha,
+    short_sha,
+  )
+  from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
+    ReviewIndexNotFoundError,
+    ReviewIndexValidationError,
+    bootstrap_path,
+    build_review_index,
+    read_review_index,
+    write_review_index,
+  )
+  from supekku.scripts.lib.workflow.staleness import (  # noqa: PLC0415
+    BootstrapStatus,
+    check_domain_map_files_exist,
+    evaluate_staleness,
+  )
+  from supekku.scripts.lib.workflow.state_io import (  # noqa: PLC0415
+    StateNotFoundError,
+    StateValidationError,
+    read_state,
+  )
+
+  repo_root = find_repo_root(root)
+  delta_dir = _resolve_delta_dir(delta, repo_root)
+  delta_id = delta.upper()
+
+  # Read current state
+  try:
+    state_data = read_state(delta_dir)
+  except StateNotFoundError as exc:
+    typer.echo(f"No workflow state for {delta_id}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+  except StateValidationError as exc:
+    typer.echo(f"Invalid workflow state: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  phase_id = state_data.get("phase", {}).get("id", "unknown")
+  head_sha = get_head_sha(repo_root)
+  git_head = short_sha(head_sha) if head_sha else "unknown"
+
+  config = _load_workflow_config(repo_root)
+  review_config = config.get("review", {})
+  bootstrap_config = review_config.get("bootstrap", {})
+  session_scope = review_config.get("session_scope")
+
+  # Check existing cache
+  existing_index = None
+  cache_status = BootstrapStatus.COLD
+
+  try:
+    existing_index = read_review_index(delta_dir)
+  except ReviewIndexNotFoundError:
+    pass  # Cold start
+  except ReviewIndexValidationError:
+    cache_status = BootstrapStatus.INVALID
+
+  if existing_index:
+    # Evaluate staleness
+    changed_files = None
+    cached_head = existing_index.get("staleness", {}).get(
+      "cache_key", {},
+    ).get("head", "")
+    if cached_head and cached_head != git_head:
+      changed_files = get_changed_files(cached_head, "HEAD", repo_root)
+
+    # Check for deleted domain_map files
+    deleted = check_domain_map_files_exist(
+      existing_index.get("domain_map", []), repo_root,
+    )
+    if deleted:
+      cache_status = BootstrapStatus.INVALID
+      typer.echo(f"  invalidated: {len(deleted)} domain_map files deleted")
+    else:
+      result = evaluate_staleness(
+        existing_index,
+        current_phase_id=phase_id,
+        current_head=git_head,
+        changed_files=changed_files,
+      )
+      cache_status = result.status
+      if result.triggers:
+        typer.echo(f"  staleness triggers: {', '.join(result.triggers)}")
+
+  # Build domain_map from delta bundle context
+  domain_map = _build_domain_map(delta_dir, repo_root, bootstrap_config)
+
+  # Carry forward optional sections from existing index when doing incremental update
+  invariants = None
+  risk_areas = None
+  review_focus = None
+  known_decisions = None
+
+  if cache_status == BootstrapStatus.REUSABLE and existing_index:
+    invariants = existing_index.get("invariants")
+    risk_areas = existing_index.get("risk_areas")
+    review_focus = existing_index.get("review_focus")
+    known_decisions = existing_index.get("known_decisions")
+
+  # Build review index
+  source_handoff = None
+  handoff_file = delta_dir / "workflow" / "handoff.current.yaml"
+  if handoff_file.exists():
+    source_handoff = "workflow/handoff.current.yaml"
+
+  index_data = build_review_index(
+    artifact_id=delta_id,
+    bootstrap_status=BootstrapStatus.WARM,
+    phase_id=phase_id,
+    git_head=git_head,
+    domain_map=domain_map,
+    session_scope=session_scope,
+    source_handoff=source_handoff,
+    invariants=invariants,
+    risk_areas=risk_areas,
+    review_focus=review_focus,
+    known_decisions=known_decisions,
+  )
+
+  # Write order per DR-102 §5: 1. review-index, 2. bootstrap.md, 3. state
+  try:
+    idx_path = write_review_index(delta_dir, index_data)
+  except ReviewIndexValidationError as exc:
+    typer.echo(f"Review index validation failed: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Generate bootstrap markdown
+  bootstrap_md = _generate_bootstrap_markdown(
+    delta_id=delta_id,
+    state_data=state_data,
+    index_data=index_data,
+    delta_dir=delta_dir,
+    repo_root=repo_root,
+    config=bootstrap_config,
+    cache_status=cache_status,
+  )
+  bp = bootstrap_path(delta_dir)
+  bp.parent.mkdir(parents=True, exist_ok=True)
+  bp.write_text(bootstrap_md, encoding="utf-8")
+
+  action = "rebuilt" if cache_status in (
+    BootstrapStatus.COLD, BootstrapStatus.INVALID, BootstrapStatus.STALE,
+  ) else "updated" if cache_status == BootstrapStatus.REUSABLE else "created"
+
+  typer.echo(f"Review primed: {delta_id} ({action})")
+  typer.echo(f"  index: {idx_path}")
+  typer.echo(f"  bootstrap: {bp}")
+  raise typer.Exit(EXIT_SUCCESS)
+
+
+def _build_domain_map(
+  delta_dir: Path,
+  repo_root: Path,
+  bootstrap_config: dict,
+) -> list[dict]:
+  """Build domain_map from delta bundle files.
+
+  Assembles areas from the delta's key files: DE, IP, phase sheets,
+  notes, and workflow artifacts.
+  """
+  areas: list[dict] = []
+
+  # Delta documentation area
+  doc_files: list[str] = []
+  for f in sorted(delta_dir.glob("*.md")):
+    doc_files.append(str(f.relative_to(repo_root)))
+  if doc_files:
+    areas.append({
+      "area": "delta_docs",
+      "purpose": "delta and plan documentation",
+      "files": doc_files,
+    })
+
+  # Phase sheets
+  phases_dir = delta_dir / "phases"
+  if phases_dir.is_dir():
+    phase_files = [
+      str(f.relative_to(repo_root))
+      for f in sorted(phases_dir.glob("*.md"))
+    ]
+    if phase_files:
+      areas.append({
+        "area": "phase_sheets",
+        "purpose": "per-phase execution records",
+        "files": phase_files,
+      })
+
+  # Workflow artifacts
+  wf_dir = delta_dir / "workflow"
+  if wf_dir.is_dir():
+    wf_files = [
+      str(f.relative_to(repo_root))
+      for f in sorted(wf_dir.iterdir())
+      if f.is_file()
+    ]
+    if wf_files:
+      areas.append({
+        "area": "workflow_state",
+        "purpose": "orchestration control plane files",
+        "files": wf_files,
+      })
+
+  # Ensure at least one area (schema requires min 1)
+  if not areas:
+    areas.append({
+      "area": "delta_root",
+      "purpose": "delta bundle",
+      "files": [str(delta_dir.relative_to(repo_root))],
+    })
+
+  return areas
+
+
+def _generate_bootstrap_markdown(
+  *,
+  delta_id: str,
+  state_data: dict,
+  index_data: dict,
+  delta_dir: Path,
+  repo_root: Path,
+  config: dict,
+  cache_status: str,
+) -> str:
+  """Generate review-bootstrap.md content."""
+  lines: list[str] = []
+  lines.append(f"# Review Bootstrap — {delta_id}")
+  lines.append("")
+  lines.append(f"**Cache status:** {cache_status} → warm")
+  lines.append(f"**Phase:** {state_data.get('phase', {}).get('id', '?')}")
+  lines.append(
+    f"**Workflow status:** {state_data.get('workflow', {}).get('status', '?')}",
+  )
+  lines.append("")
+
+  # Required reading
+  lines.append("## Required Reading")
+  lines.append("")
+  artifact = state_data.get("artifact", {})
+  plan = state_data.get("plan", {})
+  phase = state_data.get("phase", {})
+
+  if artifact.get("path"):
+    lines.append(f"- Delta: `{artifact['path']}/{delta_id}.md`")
+  if plan.get("path"):
+    lines.append(f"- Plan: `{plan['path']}`")
+  if phase.get("path"):
+    lines.append(f"- Active phase: `{phase['path']}`")
+  if artifact.get("notes_path"):
+    lines.append(f"- Notes: `{artifact['notes_path']}`")
+
+  # Domain map
+  lines.append("")
+  lines.append("## Domain Map")
+  lines.append("")
+  for entry in index_data.get("domain_map", []):
+    lines.append(f"### {entry['area']}")
+    lines.append(f"**Purpose:** {entry['purpose']}")
+    lines.append("")
+    for f in entry.get("files", []):
+      lines.append(f"- `{f}`")
+    lines.append("")
+
+  # Invariants
+  invariants = index_data.get("invariants", [])
+  if invariants:
+    lines.append("## Invariants")
+    lines.append("")
+    for inv in invariants:
+      lines.append(f"- **{inv['id']}**: {inv['summary']}")
+    lines.append("")
+
+  # Risk areas
+  risk_areas = index_data.get("risk_areas", [])
+  if risk_areas:
+    lines.append("## Risk Areas")
+    lines.append("")
+    for ra in risk_areas:
+      lines.append(f"- **{ra['id']}**: {ra['summary']}")
+    lines.append("")
+
+  # Review focus
+  review_focus = index_data.get("review_focus", [])
+  if review_focus:
+    lines.append("## Review Focus")
+    lines.append("")
+    for rf in review_focus:
+      lines.append(f"- {rf}")
+    lines.append("")
+
+  # Staleness info
+  cache_key = index_data.get("staleness", {}).get("cache_key", {})
+  lines.append("## Cache Key")
+  lines.append("")
+  lines.append(f"- Phase: `{cache_key.get('phase_id', '?')}`")
+  lines.append(f"- HEAD: `{cache_key.get('head', '?')}`")
+  lines.append("")
+
+  return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# review complete
+# ---------------------------------------------------------------------------
+
+
+@review_app.command("complete")
+def review_complete_command(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  status: Annotated[
+    str,
+    typer.Option(
+      "--status", "-s",
+      help="Review outcome: changes_requested or approved",
+    ),
+  ],
+  summary: Annotated[
+    str | None,
+    typer.Option("--summary", help="Round summary"),
+  ] = None,
+  root: RootOption = None,
+) -> None:
+  """Complete a review round, writing findings and transitioning state."""
+  from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
+    FindingsValidationError,
+    build_findings,
+    next_round_number,
+    write_findings,
+  )
+  from supekku.scripts.lib.workflow.state_io import (  # noqa: PLC0415
+    StateNotFoundError,
+    StateValidationError,
+    read_state,
+    update_state_workflow,
+    write_state,
+  )
+  from supekku.scripts.lib.workflow.state_machine import (  # noqa: PLC0415
+    TransitionCommand,
+    TransitionError,
+    WorkflowState,
+    apply_transition,
+  )
+
+  if status not in ("changes_requested", "approved"):
+    typer.echo(
+      f"Invalid status: {status} (must be 'changes_requested' or 'approved')",
+      err=True,
+    )
+    raise typer.Exit(EXIT_FAILURE)
+
+  repo_root = find_repo_root(root)
+  delta_dir = _resolve_delta_dir(delta, repo_root)
+  delta_id = delta.upper()
+
+  # Read state
+  try:
+    state_data = read_state(delta_dir)
+  except StateNotFoundError as exc:
+    typer.echo(f"No workflow state for {delta_id}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+  except StateValidationError as exc:
+    typer.echo(f"Invalid workflow state: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Validate transition
+  current = WorkflowState(state_data["workflow"]["status"])
+  command = (
+    TransitionCommand.REVIEW_COMPLETE_APPROVED
+    if status == "approved"
+    else TransitionCommand.REVIEW_COMPLETE_CHANGES_REQUESTED
+  )
+
+  try:
+    result = apply_transition(current, command)
+  except TransitionError as exc:
+    typer.echo(f"Cannot complete review: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Determine round number
+  round_num = next_round_number(delta_dir)
+
+  # Build history entry
+  history = None
+  if summary:
+    history = [{"round": round_num, "summary": summary}]
+
+  findings_data = build_findings(
+    artifact_id=delta_id,
+    round_number=round_num,
+    status=status,
+    reviewer_role=state_data["workflow"].get("active_role"),
+    history=history,
+  )
+
+  # Write order per DR-102 §5: 1. findings, 2. state
+  try:
+    fp = write_findings(delta_dir, findings_data)
+  except FindingsValidationError as exc:
+    typer.echo(f"Findings validation failed: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Auto-teardown on approved if policy says so
+  config = _load_workflow_config(repo_root)
+  review_config = config.get("review", {})
+  teardown_on = review_config.get("teardown_on", ["approved", "abandoned"])
+  should_teardown = status == "approved" and "approved" in teardown_on
+
+  update_state_workflow(
+    state_data,
+    status=result.new_state.value,
+  )
+
+  try:
+    write_state(delta_dir, state_data)
+  except StateValidationError as exc:
+    typer.echo(f"State update failed: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  typer.echo(
+    f"Review complete: {delta_id} round {round_num} → {status} "
+    f"({current.value} → {result.new_state.value})",
+  )
+  typer.echo(f"  findings: {fp}")
+
+  if should_teardown:
+    _do_teardown(delta_dir, delta_id)
+
+  raise typer.Exit(EXIT_SUCCESS)
+
+
+# ---------------------------------------------------------------------------
+# review teardown
+# ---------------------------------------------------------------------------
+
+
+@review_app.command("teardown")
+def review_teardown_command(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  root: RootOption = None,
+) -> None:
+  """Delete reviewer state files (review-index, findings, bootstrap)."""
+  repo_root = find_repo_root(root)
+  delta_dir = _resolve_delta_dir(delta, repo_root)
+  delta_id = delta.upper()
+
+  _do_teardown(delta_dir, delta_id)
+  raise typer.Exit(EXIT_SUCCESS)
+
+
+def _do_teardown(delta_dir: Path, delta_id: str) -> None:
+  """Delete reviewer state files."""
+  from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
+    bootstrap_path,
+    findings_path,
+    index_path,
+  )
+
+  deleted: list[str] = []
+  for path_fn, name in [
+    (index_path, "review-index"),
+    (findings_path, "review-findings"),
+    (bootstrap_path, "review-bootstrap"),
+  ]:
+    p = path_fn(delta_dir)
+    if p.exists():
+      p.unlink()
+      deleted.append(name)
+
+  if deleted:
+    typer.echo(f"Teardown: {delta_id} — deleted {', '.join(deleted)}")
+  else:
+    typer.echo(f"Teardown: {delta_id} — no reviewer state to delete")

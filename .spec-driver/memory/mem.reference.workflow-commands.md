@@ -39,8 +39,8 @@ provenance:
 
 | Command | Effect | State transition |
 |---------|--------|------------------|
-| `spec-driver phase start <delta>` | Init `workflow/state.yaml` | planned → implementing |
-| `spec-driver phase complete <delta>` | Mark phase done, auto-handoff | (phase status → complete, optionally → awaiting_handoff) |
+| `spec-driver phase start <delta>` | Init `workflow/state.yaml`, update phase frontmatter to `in-progress` | planned → implementing |
+| `spec-driver phase complete <delta>` | Update phase frontmatter to `completed`, mark state.yaml, auto-handoff | (phase frontmatter → completed, state.yaml → complete, optionally → awaiting_handoff) |
 | `spec-driver create handoff <delta> --to <role>` | Write `handoff.current.yaml` | implementing/changes_requested → awaiting_handoff |
 | `spec-driver accept handoff <delta> [--identity <name>]` | Claim + transition | awaiting_handoff → implementing/reviewing |
 | `spec-driver review prime <delta>` | Generate `review-index.yaml` + `review-bootstrap.md` | (no state change) |
@@ -52,7 +52,8 @@ provenance:
 
 ## Key Patterns
 
-- **Write ordering**: handoff first, then state. Findings first, then state. Re-run safe.
+- **Phase frontmatter sync** (DE-104): `phase start` and `phase complete` update phase sheet frontmatter (normative, lifecycle vocabulary: `in-progress`/`completed`) before `state.yaml` (transient, control-plane vocabulary: `in_progress`/`complete`). Two vocabularies for two domains.
+- **Write ordering**: handoff first, then state. Findings first, then state. Frontmatter before state.yaml. Re-run safe.
 - **Claim guard**: `accept handoff` checks `claimed_by`. Different identity → error. Same identity → idempotent.
 - **Auto-teardown**: `review complete --status approved` deletes reviewer state per `[review].teardown_on` policy.
 - **Phase-bridge**: Fenced YAML in phase sheets controls auto-handoff. `handoff_ready: false` suppresses.

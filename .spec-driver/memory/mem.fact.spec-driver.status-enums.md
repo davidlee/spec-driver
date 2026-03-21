@@ -25,6 +25,9 @@ scope:
     - supekku/scripts/lib/requirements/registry.py
     - supekku/scripts/lib/changes/lifecycle.py
     - supekku/scripts/lib/blocks/verification.py
+    - supekku/scripts/lib/core/enums.py
+    - supekku/cli/workflow.py
+    - .spec-driver/deltas/*/phases/phase-*.md
 provenance:
   sources:
     - kind: code
@@ -58,9 +61,14 @@ provenance:
 - `completed`
 - `deferred`
 
-Legacy alias:
+Applies to: deltas, revisions, audits, **phases** (DE-104).
 
-- `complete` is normalized to `completed`
+Legacy/observed aliases normalised by `normalize_status()`:
+
+- `complete` → `completed`
+- `done` → `completed`
+- `active` → `in-progress`
+- `in_progress` → `in-progress`
 
 ## Verification Coverage Statuses
 

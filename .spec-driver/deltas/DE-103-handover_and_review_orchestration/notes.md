@@ -346,3 +346,60 @@ Files:
 ### Follow-up
 
 - Phase 06: configuration, docs, integration testing, end-to-end verification
+
+---
+
+## New Agent Instructions
+
+### Task Card
+
+**Delta:** `.spec-driver/deltas/DE-103-handover_and_review_orchestration/DE-103.md`
+**Notes:** `.spec-driver/deltas/DE-103-handover_and_review_orchestration/notes.md` (this file)
+**Status:** in-progress — Phases 01–05 complete, Phase 06 next.
+
+### Next Activity
+
+**Plan and execute Phase 06 — Configuration, docs, integration testing.**
+
+Phase 06 scope (from IP-103 §4):
+- workflow.toml extensions verification (already present from Phase 02)
+- Memory updates for new workflow commands
+- Documentation updates
+- End-to-end integration tests (full workflow cycle per DR-102 §12)
+- Regression tests (existing deltas without workflow/ work unchanged)
+- VA-103-001 and VA-103-002 verification
+
+### Required Reading
+
+- `.spec-driver/deltas/DE-103-handover_and_review_orchestration/DE-103.md`
+- `.spec-driver/deltas/DE-103-handover_and_review_orchestration/IP-103.md`
+- `.spec-driver/deltas/DE-102-handover_and_review_orchestration/DR-102.md` §12 (evaluation criteria)
+
+### Key Files
+
+- `supekku/scripts/lib/workflow/` — all domain modules (state_machine, state_io, handoff_io, review_io, staleness, bridge)
+- `supekku/cli/workflow.py` — all CLI commands
+- `supekku/cli/workflow_*.py` — CLI test files
+- `supekku/scripts/lib/blocks/workflow_metadata.py` — schema definitions
+- `supekku/scripts/lib/core/config.py` — `[workflow]`/`[review]` config defaults
+- `supekku/skills/continuation/SKILL.md` — refit skill
+
+### Test Summary
+
+- 159 total workflow tests passing
+- 68 schema tests (Phase 01)
+- 25 state machine + 22 state I/O (Phase 02)
+- 14 handoff I/O + 16 handoff CLI (Phase 03)
+- 24 review I/O + 16 staleness + 21 review CLI (Phase 04)
+- 13 bridge + 8 phase complete CLI (Phase 05)
+
+### Commit State
+
+- Worktree clean for DE-103. Only `flake.lock`/`flake.nix` + `IP-103.md` modified (unrelated).
+
+### Advice
+
+- Phase 06 is primarily verification and documentation, not new feature work.
+- Focus on DR-102 §12 evaluation criteria — each must be demonstrably satisfied.
+- Memory records should cover the new CLI commands and workflow patterns.
+- `operations.py` remains unused — decide whether to keep or remove.

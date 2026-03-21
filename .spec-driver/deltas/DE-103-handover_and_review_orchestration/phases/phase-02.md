@@ -4,7 +4,7 @@ slug: "103-handover_and_review_orchestration-phase-02"
 name: State machine and core commands
 created: "2026-03-21"
 updated: "2026-03-21"
-status: draft
+status: done
 kind: phase
 ---
 
@@ -86,17 +86,17 @@ schema validation and workflow.toml config loader extensions.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] State machine module implements all 7 states and transitions from DR-102 §4
-- [ ] Invalid transitions are rejected with clear errors
-- [ ] `state.yaml` writer validates output against `WORKFLOW_STATE_METADATA` before writing
-- [ ] `state.yaml` reader loads and validates existing state files
-- [ ] Atomic writes (write-to-temp + rename) for state.yaml
-- [ ] `spec-driver phase start` initialises `workflow/state.yaml` (planned → implementing)
-- [ ] `spec-driver workflow status` reads and renders human-readable summary
-- [ ] `spec-driver block` / `spec-driver unblock` transitions to/from blocked
-- [ ] `unblock` restores previous state (saved in state.yaml)
-- [ ] `workflow.toml` loader has `[workflow]` and `[review]` section defaults
-- [ ] Lint clean, all tests passing
+- [x] State machine module implements all 7 states and transitions from DR-102 §4
+- [x] Invalid transitions are rejected with clear errors
+- [x] `state.yaml` writer validates output against `WORKFLOW_STATE_METADATA` before writing
+- [x] `state.yaml` reader loads and validates existing state files
+- [x] Atomic writes (write-to-temp + rename) for state.yaml
+- [x] `spec-driver phase start` initialises `workflow/state.yaml` (planned → implementing)
+- [x] `spec-driver workflow status` reads and renders human-readable summary
+- [x] `spec-driver block` / `spec-driver unblock` transitions to/from blocked
+- [x] `unblock` restores previous state (saved in state.yaml)
+- [x] `workflow.toml` loader has `[workflow]` and `[review]` section defaults
+- [x] Lint clean, all tests passing
 
 ## 5. Verification
 
@@ -117,14 +117,14 @@ schema validation and workflow.toml config loader extensions.
 
 | Status | ID  | Description | Notes |
 |--------|-----|-------------|-------|
-| [ ] | T01 | Create `supekku/scripts/lib/workflow/` package — state machine | States, transitions, transition validation |
-| [ ] | T02 | State.yaml reader/writer with validation | Atomic writes, MetadataValidator integration |
-| [ ] | T03 | Extend `workflow.toml` config loader | `[workflow]` and `[review]` section defaults |
-| [ ] | T04 | CLI `phase start` command | New `phase` group; initialise state.yaml |
-| [ ] | T05 | CLI `workflow status` command | New `workflow` group; human-readable output |
-| [ ] | T06 | CLI `block` / `unblock` commands | Top-level; previous-state preservation |
-| [ ] | T07 | Tests | State machine unit tests, reader/writer tests, CLI integration tests |
-| [ ] | T08 | Lint and verify | ruff clean, all tests pass |
+| [x] | T01 | Create `supekku/scripts/lib/workflow/` package — state machine | `state_machine.py` — 7 states, transition table, claim guard |
+| [x] | T02 | State.yaml reader/writer with validation | `state_io.py` — atomic writes, MetadataValidator, init/update helpers |
+| [x] | T03 | Extend `workflow.toml` config loader | Already done — `[workflow]` + `[review]` in DEFAULT_CONFIG + section comments |
+| [x] | T04 | CLI `phase start` command | `phase_app` group in `workflow.py`; auto-discovers plan/phase |
+| [x] | T05 | CLI `workflow status` command | `workflow_app` group; human-readable output |
+| [x] | T06 | CLI `block` / `unblock` commands | Top-level via main.py; previous-state preservation |
+| [x] | T07 | Tests | 25 state machine + 22 state I/O + 19 CLI = 66 tests |
+| [x] | T08 | Lint and verify | ruff clean, all tests pass |
 
 ## 8. Risks & Mitigations
 
@@ -135,15 +135,29 @@ schema validation and workflow.toml config loader extensions.
 
 ## 9. Decisions & Outcomes
 
-_(to be filled during implementation)_
+- 2026-03-21 — `workflow.py` CLI delegates directly to `state_machine.py` and
+  `state_io.py`. The other agent created an `operations.py` domain layer
+  (skinny CLI pattern) but it's unused — kept for potential future refactor.
+- 2026-03-21 — `previous_state` field added to workflow.state schema metadata
+  to support block/unblock persistence.
+- 2026-03-21 — `phase start` auto-discovers the latest phase by sorting
+  `phases/phase-*.md` numerically. `--phase` override available.
+- 2026-03-21 — `block`/`unblock` registered as top-level commands per DR-102 §5.
+  Also available under `workflow` group.
+- 2026-03-21 — Config loader already had `[workflow]` and `[review]` sections
+  with correct defaults — no additional work needed (T03).
 
 ## 10. Findings / Research Notes
 
-_(to be filled during implementation)_
+- Two agents ran concurrently on Phase 02 — other agent created `operations.py`,
+  modified `main.py`, `workflow_metadata.py`, `config.py`. Changes were
+  complementary; merged cleanly.
+- `flake.lock`/`flake.nix` had unrelated changes from the other session — left
+  as-is (not Phase 02 scope).
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (66 tests, lint clean)
+- [x] Notes updated
 - [ ] Hand-off notes to Phase 03

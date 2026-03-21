@@ -86,8 +86,50 @@ Files:
 
 ### Follow-up
 
-- Phase 03: handoff commands (`create handoff`, `accept handoff` with claim guard)
-- `operations.py` exists but is unused — consider refactoring CLI to delegate
-  through it (skinny CLI pattern) in a future pass
-- Placeholder renderers from Phase 01 still in place — real renderers needed
-  when commands emit YAML for non-state schemas
+- Phase 03: handoff commands — done (see below)
+
+## Phase 03 — Handoff commands
+
+### What's done
+
+`create handoff` and `accept handoff` CLI commands implemented per DR-102 §4/§5:
+
+- **Handoff I/O** (`handoff_io.py`): Read/write/build with schema validation,
+  atomic writes. `build_handoff` constructs payloads from structured inputs.
+- **Git helpers**: `get_branch`, `has_uncommitted_changes`, `has_staged_changes`
+  added to `supekku/scripts/lib/core/git.py`.
+- **CLI `create handoff`**: Registered under `create` group. Assembles payload
+  from state.yaml (required_reading, phase, artifact), git state, and config
+  (handoff_boundary). Write order: handoff first, state second (DR-102 §5).
+  Clears `claimed_by` on new handoff. Infers `next_activity_kind` from `to_role`.
+- **CLI `accept handoff`**: Registered under new `accept` group. Claim guard:
+  rejects if claimed by different identity, idempotent for same identity.
+  Defaults `--identity` to `$USER`. Transitions to `reviewing` or `implementing`
+  based on `to_role` from handoff payload.
+
+Files:
+- `supekku/scripts/lib/workflow/handoff_io.py` — handoff I/O + builder
+- `supekku/scripts/lib/workflow/handoff_io_test.py` — 14 tests
+- `supekku/scripts/lib/core/git.py` — new git helpers
+- `supekku/cli/workflow.py` — `create_handoff_command`, `accept_handoff_command`, `accept_app`
+- `supekku/cli/workflow_handoff_test.py` — 16 CLI tests
+- `supekku/cli/create.py` — thin `create handoff` wrapper
+- `supekku/cli/main.py` — `accept` group registration
+
+### Verification
+
+- 14 handoff I/O tests + 16 CLI tests = 30 new tests
+- 96 total workflow tests passing
+- 195 existing CLI tests still passing
+- ruff clean
+
+### Commits
+
+- `d39362af` — chore(DE-103): phase-03 sheet
+- `d92757ca` — feat(DE-103): create handoff + accept handoff CLI commands with claim guard
+
+### Follow-up
+
+- Phase 04: review commands (`review prime`, `review complete`, `review teardown`)
+- `operations.py` still unused — future skinny-CLI refactor opportunity
+- Placeholder renderers from Phase 01 still in place

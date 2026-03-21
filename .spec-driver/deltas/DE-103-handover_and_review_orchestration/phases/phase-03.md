@@ -4,7 +4,7 @@ slug: "103-handover_and_review_orchestration-phase-03"
 name: Handoff commands
 created: "2026-03-21"
 updated: "2026-03-21"
-status: in-progress
+status: done
 kind: phase
 ---
 
@@ -84,34 +84,46 @@ handoff` claims the handoff with identity-based guard and transitions to
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `create handoff --to <role>` writes valid `handoff.current.yaml`
-- [ ] `create handoff` transitions state: implementing/changes_requested → awaiting_handoff
-- [ ] `create handoff` clears `claimed_by` in state.yaml
-- [ ] `create handoff` assembles required_reading from delta bundle paths
-- [ ] `create handoff` captures git state (head, branch, worktree)
-- [ ] `accept handoff` transitions to implementing (non-reviewer) or reviewing (reviewer)
-- [ ] `accept handoff` writes `claimed_by` with `--identity` or `$USER` default
-- [ ] `accept handoff` is idempotent for same identity
-- [ ] `accept handoff` fails with error for different identity (claim guard)
-- [ ] Write ordering: handoff.current.yaml first, state.yaml second
-- [ ] Re-run `create handoff` produces same end state
-- [ ] Lint clean, all tests passing
+- [x] `create handoff --to <role>` writes valid `handoff.current.yaml`
+- [x] `create handoff` transitions state: implementing/changes_requested → awaiting_handoff
+- [x] `create handoff` clears `claimed_by` in state.yaml
+- [x] `create handoff` assembles required_reading from delta bundle paths
+- [x] `create handoff` captures git state (head, branch, worktree)
+- [x] `accept handoff` transitions to implementing (non-reviewer) or reviewing (reviewer)
+- [x] `accept handoff` writes `claimed_by` with `--identity` or `$USER` default
+- [x] `accept handoff` is idempotent for same identity
+- [x] `accept handoff` fails with error for different identity (claim guard)
+- [x] Write ordering: handoff.current.yaml first, state.yaml second
+- [x] Re-run `create handoff` produces same end state
+- [x] Lint clean, all tests passing
 
 ## 5. Tasks & Progress
 
 | Status | ID  | Description | Notes |
 |--------|-----|-------------|-------|
-| [ ] | T01 | Handoff I/O module | `handoff_io.py` — read/write with validation, atomic writes |
-| [ ] | T02 | Create handoff domain logic | Payload assembly from state + git + paths |
-| [ ] | T03 | CLI `create handoff` command | Under `create` group |
-| [ ] | T04 | Accept handoff domain logic | Claim guard check + state transition |
-| [ ] | T05 | CLI `accept handoff` command | Under `accept` group or top-level |
-| [ ] | T06 | Tests | Handoff I/O, domain, CLI integration, claim guard |
-| [ ] | T07 | Lint and verify | ruff clean, all tests pass |
+| [x] | T01 | Handoff I/O module | `handoff_io.py` — read/write/build with validation, atomic writes |
+| [x] | T02 | Create handoff domain logic | Payload assembly from state + git + paths in `workflow.py` |
+| [x] | T03 | CLI `create handoff` command | Under `create` group, delegates to `workflow.create_handoff_command` |
+| [x] | T04 | Accept handoff domain logic | Claim guard + transition in `workflow.py` |
+| [x] | T05 | CLI `accept handoff` command | Under `accept` group via `accept_app` |
+| [x] | T06 | Tests | 14 handoff I/O + 16 CLI = 30 tests |
+| [x] | T07 | Lint and verify | ruff clean, 96 total workflow tests pass |
 
-## 6. Wrap-up Checklist
+## 6. Decisions & Outcomes
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
+- 2026-03-21 — `create handoff` registered as subcommand of `create` group
+  (thin wrapper in `create.py` → delegates to `workflow.create_handoff_command`)
+- 2026-03-21 — `accept handoff` registered under new `accept_app` Typer group
+- 2026-03-21 — Git helpers `get_branch`, `has_uncommitted_changes`,
+  `has_staged_changes` added to `supekku/scripts/lib/core/git.py`
+- 2026-03-21 — `build_handoff` infers `next_activity_kind = "review"` when
+  `to_role == "reviewer"`, defaults to `"implementation"` otherwise
+- 2026-03-21 — `accept handoff` marks the handoff transition status as
+  `"accepted"` but suppresses validation errors (state is authoritative)
+
+## 7. Wrap-up Checklist
+
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (30 new tests, 96 total workflow tests)
+- [x] Notes updated
 - [ ] Hand-off notes to Phase 04

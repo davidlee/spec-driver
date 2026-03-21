@@ -1065,6 +1065,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
+    - DE-106
     verified_by: []
     coverage_evidence:
     - VT-PHASE-001
@@ -1113,6 +1114,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
+    - DE-106
     verified_by: []
     coverage_evidence:
     - VT-PHASE-003
@@ -1135,6 +1137,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
+    - DE-106
     verified_by: []
     coverage_evidence:
     - VT-PHASE-004
@@ -1161,6 +1164,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
+    - DE-106
     verified_by: []
     coverage_evidence:
     - VT-PHASE-005
@@ -1205,6 +1209,7 @@ requirements:
     introduced: null
     implemented_by:
     - DE-004
+    - DE-106
     verified_by: []
     coverage_evidence:
     - VA-PHASE-002

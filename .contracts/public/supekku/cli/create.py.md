@@ -16,6 +16,7 @@ Create commands for specs, deltas, requirements, revisions, and ADRs.
 Can create from scratch with a title, or populate from a backlog item
 using --from-backlog ITEM-ID (where ITEM-ID is passed as the name argument).
 - @app.command(drift) `create_drift_cmd(name, delta, root) -> None`: Create a new drift ledger.
+- @app.command(handoff) `create_handoff_cmd(delta, to_role, next_kind, next_summary, root) -> None`: Create a structured handoff for a delta.
 - @app.command(improvement) `create_improvement(title, json_output, root) -> None`: Create a new improvement backlog entry.
 - @app.command(issue) `create_issue(title, json_output, root) -> None`: Create a new issue backlog entry.
 - @app.command(memory) `create_memory_cmd(memory_id, name, memory_type, status, tag, summary, root) -> None`: Create a new memory record with a semantic ID.

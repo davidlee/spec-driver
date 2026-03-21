@@ -26,6 +26,7 @@
       "supekku/scripts/lib/standards": "SPEC-153",
       "supekku/scripts/lib/sync/adapters": "SPEC-154",
       "supekku/scripts/lib/validation": "SPEC-155",
+      "supekku/scripts/lib/workflow": "SPEC-161",
       "supekku/tui/search": "SPEC-160",
       "supekku/tui/widgets": "SPEC-157"
     },

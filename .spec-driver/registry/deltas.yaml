@@ -11304,3 +11304,284 @@ deltas:
         - description: Audit surfaces new design issues requiring DR revision
           mitigation: Consult user; if material, create new phase rather than blocking
             closure
+  DE-103:
+    kind: delta
+    status: completed
+    name: Delta - implement workflow orchestration control plane
+    slug: handover_and_review_orchestration
+    updated: '2026-03-21'
+    path: .spec-driver/deltas/DE-103-handover_and_review_orchestration/DE-103.md
+    applies_to:
+      specs:
+      - PROD-011
+      requirements: []
+    relations:
+    - type: relates_to
+      target: IMPR-019
+      attributes: {}
+    - type: follows
+      target: DE-102
+      attributes: {}
+    plan:
+      id: IP-103
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-103
+        delta: DE-103
+        revision_links:
+          aligns_with:
+          - DR-102
+        specs:
+          primary:
+          - PROD-011
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-103.PHASE-01
+        - id: IP-103.PHASE-02
+        - id: IP-103.PHASE-03
+        - id: IP-103.PHASE-04
+        - id: IP-103.PHASE-05
+        - id: IP-103.PHASE-06
+        - id: IP-103.PHASE-03
+        - id: IP-103.PHASE-04
+        - id: IP-103.PHASE-05
+        - id: IP-103.PHASE-06
+      phases:
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-103.PHASE-01
+        plan: IP-103
+        delta: DE-103
+        objective: "Define metadata-driven validators for all 7 workflow/bridge schemas\
+          \ from DR-102 \xA73/\xA77 and register them in the block schema registry."
+        entrance_criteria:
+        - DR-102 approved (yes)
+        - "Open questions resolved (yes \u2014 DEC-103-001, DEC-103-002)"
+        exit_criteria:
+        - All 7 schemas defined as BlockMetadata instances
+        - MetadataValidator produces correct errors for invalid input
+        - MetadataValidator accepts valid input for all schemas
+        - Schemas registered and visible via `spec-driver list schemas`
+        - Lint clean, tests passing
+        verification:
+          tests:
+          - VT-103-001 schema validation tests
+          evidence: []
+        tasks:
+        - id: T01
+          description: Create workflow schema metadata module
+        - id: T02
+          description: Create bridge schema metadata module
+        - id: T03
+          description: Register schemas in block schema registry
+        - id: T04
+          description: Add side-effect import in cli/schema.py
+        - id: T05
+          description: Write tests for all schema validation
+        - id: T06
+          description: Lint and verify
+        risks: []
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-103.PHASE-02
+        plan: IP-103
+        delta: DE-103
+        objective: Implement the 7-state workflow state machine with explicit CLI-driven
+          transitions, core CLI commands (phase start, workflow status, block/unblock),
+          state.yaml reading/writing with schema validation, and workflow.toml config
+          loader extensions for [workflow] and [review] sections.
+        entrance_criteria:
+        - Phase 01 complete (schemas registered)
+        exit_criteria:
+        - "State machine module with all 7 states and transitions per DR-102 \xA74"
+        - state.yaml writer validates output against schema before writing
+        - state.yaml reader loads and validates existing state
+        - "CLI phase start initialises workflow/state.yaml (planned \u2192 implementing)"
+        - CLI workflow status reads state.yaml and prints human-readable summary
+        - CLI block/unblock transitions to/from blocked (previous state preserved)
+        - workflow.toml config loader supports [workflow] and [review] sections
+        - All transitions reject invalid source states
+        - Lint clean, tests passing
+        verification:
+          tests:
+          - VT-103-002 state machine transition tests
+          - "VT-103-003 CLI command output and state transition tests (partial \u2014\
+            \ phase start, workflow status, block/unblock)"
+          evidence: []
+        tasks:
+        - id: T01
+          description: "Create supekku/scripts/lib/workflow/ package \u2014 state\
+            \ machine module"
+        - id: T02
+          description: Create state.yaml reader/writer with schema validation
+        - id: T03
+          description: Extend workflow.toml config loader with [workflow] and [review]
+            defaults
+        - id: T04
+          description: "CLI command \u2014 phase start"
+        - id: T05
+          description: "CLI command \u2014 workflow status"
+        - id: T06
+          description: "CLI commands \u2014 block / unblock"
+        - id: T07
+          description: Tests for state machine, reader/writer, CLI commands
+        - id: T08
+          description: Lint and verify
+        risks:
+        - description: CLI command routing may conflict with existing `create phase`
+            command
+          mitigation: "New `phase` and `workflow` are separate Typer groups \u2014\
+            \ no collision with `create phase`"
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-103.PHASE-03
+        plan: IP-103
+        delta: DE-103
+        objective: "Implement create handoff and accept handoff CLI commands with\
+          \ claim guard, handoff payload assembly, and write-ordering per DR-102 \xA7\
+          4/\xA75."
+        entrance_criteria:
+        - Phase 02 complete (state machine, state I/O, core CLI commands)
+        exit_criteria:
+        - create handoff writes handoff.current.yaml and transitions state to awaiting_handoff
+        - create handoff assembles payload from state, phase, notes, git state
+        - create handoff clears claimed_by (new handoff resets claim)
+        - accept handoff transitions to implementing or reviewing based on to_role
+        - accept handoff writes claimed_by with identity (claim guard)
+        - accept handoff is idempotent for same identity
+        - accept handoff fails if already claimed by different identity
+        - Write ordering correct (handoff first, then state)
+        - "Re-run safety \u2014 idempotent end state"
+        - Lint clean, tests passing
+        verification:
+          tests:
+          - VT-103-003 CLI command output and state transition tests (create/accept
+            handoff)
+          - VT-103-004 Claim guard tests
+          - VT-103-008 Write ordering and re-run safety
+          evidence: []
+        tasks:
+        - id: T01
+          description: Implement handoff I/O module (read/write handoff.current.yaml)
+        - id: T02
+          description: Implement create handoff domain logic (payload assembly)
+        - id: T03
+          description: CLI create handoff command
+        - id: T04
+          description: Implement accept handoff domain logic (claim guard + transition)
+        - id: T05
+          description: CLI accept handoff command
+        - id: T06
+          description: Tests for handoff I/O, domain logic, CLI commands
+        - id: T07
+          description: Lint and verify
+        risks:
+        - description: "Handoff payload assembly requires git state \u2014 tests need\
+            \ subprocess mocking"
+          mitigation: Use existing git.py helpers; mock at subprocess level in tests
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-103.PHASE-04
+        plan: IP-103
+        delta: DE-103
+        objective: "Implement review prime, review complete, and review teardown CLI\
+          \ commands with staleness/invalidation lifecycle per DR-102 \xA73.3, \xA7\
+          3.4, \xA75, \xA78."
+        entrance_criteria:
+        - Phase 03 complete (handoff commands working, 96 workflow tests passing)
+        exit_criteria:
+        - review prime generates review-index.yaml + review-bootstrap.md
+        - review complete writes review-findings.yaml and transitions state
+        - review teardown deletes reviewer state files respecting session_scope policy
+        - "staleness/invalidation lifecycle enforced per DR-102 \xA78"
+        - all new code lint-clean (ruff)
+        - all existing tests still passing
+        verification:
+          tests:
+          - VT-103-005 staleness/invalidation/reusability lifecycle
+          evidence: []
+        tasks:
+        - id: '4.1'
+          summary: "Review I/O module (review_io.py) \u2014 read/write/build for review-index\
+            \ and review-findings"
+        - id: '4.2'
+          summary: "Git diff helper \u2014 get_changed_files(from_ref, to_ref)"
+        - id: '4.3'
+          summary: "Staleness evaluator \u2014 evaluate bootstrap_status from cache_key\
+            \ vs current state"
+        - id: '4.4'
+          summary: 'CLI: review prime command'
+        - id: '4.5'
+          summary: 'CLI: review complete command'
+        - id: '4.6'
+          summary: 'CLI: review teardown command'
+        risks:
+        - id: R1
+          summary: "review prime complexity \u2014 domain_map assembly, staleness,\
+            \ bootstrap markdown"
+          mitigation: Split into small testable functions; test each independently
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-103.PHASE-05
+        plan: IP-103
+        delta: DE-103
+        objective: Implement phase complete command with auto-handoff, bridge block
+          read/write support, and continuation skill refit to invoke CLI.
+        entrance_criteria:
+        - Phase 04 complete (review commands working, 138 workflow tests passing)
+        exit_criteria:
+        - phase complete marks phase done, emits handoff per policy/bridge
+        - notes-bridge and phase-bridge blocks can be written and read
+        - continuation skill invokes CLI for structured handoff
+        - feature-gated by workflow/state.yaml presence
+        - all tests passing, ruff clean
+        verification:
+          tests:
+          - VT-103-006 continuation skill
+          - VT-103-007 bridge blocks
+          evidence: []
+        tasks:
+        - id: '5.1'
+          summary: "phase complete command \u2014 mark phase done, auto-handoff"
+        - id: '5.2'
+          summary: "Bridge block reader \u2014 parse phase-bridge from phase sheets"
+        - id: '5.3'
+          summary: "Continuation skill refit \u2014 invoke CLI for structured handoff"
+        risks:
+        - id: R1
+          summary: Continuation skill refit must be feature-gated
+          mitigation: Detect workflow/state.yaml; preserve old behaviour when absent
+      - schema: supekku.phase.overview
+        version: 1
+        phase: IP-103.PHASE-06
+        plan: IP-103
+        delta: DE-103
+        objective: "End-to-end integration tests, DR-102 \xA712 verification, regression\
+          \ tests, memory updates, cleanup."
+        entrance_criteria:
+        - Phase 05 complete (all commands working, 159 workflow tests passing)
+        exit_criteria:
+        - End-to-end workflow cycle test passing
+        - "DR-102 \xA712 criteria all demonstrably satisfied"
+        - Existing deltas without workflow/ work unchanged
+        - Memory records created for workflow commands
+        - ruff clean
+        verification:
+          tests:
+          - VA-103-001 DR-102 evaluation criteria
+          - VA-103-002 existing deltas unchanged
+          evidence: []
+        tasks:
+        - id: '6.1'
+          summary: End-to-end integration test
+        - id: '6.2'
+          summary: "Regression test \u2014 existing deltas work"
+        - id: '6.3'
+          summary: "Cleanup \u2014 remove unused operations.py"
+        - id: '6.4'
+          summary: Memory record for workflow commands
+        risks: []

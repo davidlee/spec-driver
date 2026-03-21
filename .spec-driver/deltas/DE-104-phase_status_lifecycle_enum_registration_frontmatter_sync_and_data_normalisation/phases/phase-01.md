@@ -55,21 +55,24 @@ entrance_criteria:
     completed: true
 exit_criteria:
   - item: "phase.status in ENUM_REGISTRY"
-    completed: false
+    completed: true
   - item: "CANONICAL_STATUS_MAP extended with observed variants"
-    completed: false
+    completed: true
   - item: "phase start updates frontmatter to in-progress before state.yaml"
-    completed: false
+    completed: true
   - item: "phase complete updates frontmatter to completed before state.yaml"
-    completed: false
+    completed: true
   - item: "Idempotency guard handles both STATUS_COMPLETED and STATUS_COMPLETE"
-    completed: false
+    completed: true
+    notes: "Guard uses == 'complete' (state.yaml vocabulary); see deviation note in notes.md"
   - item: "create_phase uses STATUS_DRAFT constant"
-    completed: false
+    completed: true
   - item: "All new and modified tests pass"
-    completed: false
+    completed: true
+    notes: "77 tests pass"
   - item: "Lint clean"
-    completed: false
+    completed: true
+    notes: "No new warnings"
 ```
 
 # Phase 01 — Enum registration, lifecycle map, CLI frontmatter sync
@@ -116,12 +119,12 @@ Register `phase.status` in the enum infrastructure, extend the canonical status 
 
 | Status | ID  | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 1.1 | Register `phase.status` in `ENUM_REGISTRY` | [ ] | |
-| [ ] | 1.2 | Extend `CANONICAL_STATUS_MAP` | [P] | Can parallel with 1.1 |
-| [ ] | 1.3 | `phase_start` frontmatter update | [ ] | Depends on 1.1 for imports |
-| [ ] | 1.4 | `phase_complete` frontmatter + idempotency | [ ] | Depends on 1.1 for imports |
-| [ ] | 1.5 | `create_phase` constant | [P] | Independent |
-| [ ] | 1.6 | Tests | [ ] | After 1.1–1.5 |
+| [x] | 1.1 | Register `phase.status` in `ENUM_REGISTRY` | [ ] | 1 line in enums.py |
+| [x] | 1.2 | Extend `CANONICAL_STATUS_MAP` | [P] | 3 entries: done, active, in_progress |
+| [x] | 1.3 | `phase_start` frontmatter update | [ ] | Frontmatter before state.yaml per DEC-104-08 |
+| [x] | 1.4 | `phase_complete` frontmatter + idempotency | [ ] | See deviation note re state.yaml vocabulary |
+| [x] | 1.5 | `create_phase` constant | [P] | STATUS_DRAFT import + usage |
+| [x] | 1.6 | Tests | [ ] | 77 pass, no new lint warnings |
 
 ### Task Details
 

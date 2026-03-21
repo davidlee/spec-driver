@@ -133,7 +133,8 @@ class PhaseCompleteBasicTest(_PhaseCompleteTestBase):
     self._start_phase()
 
     result = self.runner.invoke(
-      app, ["phase", "complete", "DE-100", "--no-handoff"],
+      app,
+      ["phase", "complete", "DE-100", "--no-handoff"],
     )
     assert result.exit_code == 0, result.output
     assert "handoff emitted" not in result.output
@@ -154,7 +155,8 @@ class PhaseCompleteBasicTest(_PhaseCompleteTestBase):
     self._start_phase()
 
     result = self.runner.invoke(
-      app, ["phase", "complete", "DE-100", "--to", "reviewer"],
+      app,
+      ["phase", "complete", "DE-100", "--to", "reviewer"],
     )
     assert result.exit_code == 0, result.output
     assert "reviewer" in result.output
@@ -255,7 +257,8 @@ handoff_ready: false
 
     # Idempotent second run (still implementing since --no-handoff)
     result = self.runner.invoke(
-      app, ["phase", "complete", "DE-100", "--no-handoff"],
+      app,
+      ["phase", "complete", "DE-100", "--no-handoff"],
     )
     assert result.exit_code == 0, result.output
 
@@ -275,11 +278,13 @@ class PhaseFrontmatterTest(_PhaseCompleteTestBase):
     # Verify frontmatter starts as draft (phase start changes it to in-progress)
     phase_file = delta_dir / "phases" / "phase-02.md"
     from supekku.scripts.lib.core.spec_utils import load_markdown_file
+
     fm, _ = load_markdown_file(phase_file)
     assert fm["status"] == "in-progress"
 
     result = self.runner.invoke(
-      app, ["phase", "complete", "DE-100", "--no-handoff"],
+      app,
+      ["phase", "complete", "DE-100", "--no-handoff"],
     )
     assert result.exit_code == 0, result.output
 
@@ -292,11 +297,12 @@ class PhaseFrontmatterTest(_PhaseCompleteTestBase):
   @patch("supekku.scripts.lib.core.git.has_staged_changes", return_value=False)
   def test_phase_complete_tolerates_missing_frontmatter(self, *_mocks) -> None:
     """Phase complete succeeds when phase file has no frontmatter status."""
-    delta_dir = _create_delta_bundle(self.root, phase_frontmatter=False)
+    _create_delta_bundle(self.root, phase_frontmatter=False)
     self._start_phase()
 
     result = self.runner.invoke(
-      app, ["phase", "complete", "DE-100", "--no-handoff"],
+      app,
+      ["phase", "complete", "DE-100", "--no-handoff"],
     )
     assert result.exit_code == 0, result.output
     assert "Phase complete" in result.output
@@ -311,7 +317,8 @@ class PhaseFrontmatterTest(_PhaseCompleteTestBase):
     self._start_phase()
 
     self.runner.invoke(
-      app, ["phase", "complete", "DE-100", "--no-handoff"],
+      app,
+      ["phase", "complete", "DE-100", "--no-handoff"],
     )
 
     state = yaml.safe_load(

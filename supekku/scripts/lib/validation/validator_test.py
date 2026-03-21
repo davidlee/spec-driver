@@ -18,7 +18,7 @@ from supekku.scripts.lib.core.paths import (
   SPEC_DRIVER_DIR,
   TECH_SPECS_SUBDIR,
 )
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 from supekku.scripts.lib.relations.manager import add_relation
 from supekku.scripts.lib.test_base import RepoTestCase
 from supekku.scripts.lib.validation.validator import validate_workspace
@@ -995,7 +995,9 @@ class PhaseValidationTest(RepoTestCase):
 
     body = "# Phase 01\n\nContent.\n"
     if overview_block:
-      body += "\n```yaml supekku:phase.overview@v1\nschema: supekku.phase.overview\n```\n"
+      body += (
+        "\n```yaml supekku:phase.overview@v1\nschema: supekku.phase.overview\n```\n"
+      )
 
     dump_markdown_file(phases_dir / filename, fm, body)
 
@@ -1032,8 +1034,8 @@ class PhaseValidationTest(RepoTestCase):
     phase_file = (
       root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-200-test" / "phases" / "phase-01.md"
     )
-    from supekku.scripts.lib.core.spec_utils import load_markdown_file as load_md
-    fm, _ = load_md(phase_file)
+
+    fm, _ = load_markdown_file(phase_file)
     assert fm["status"] == "completed"
 
   def test_fix_idempotent(self) -> None:
@@ -1080,18 +1082,20 @@ class PhaseValidationTest(RepoTestCase):
     ws = Workspace(root)
     issues = validate_workspace(ws, fix=True)
     phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
-    assert any("Fixed" in i.message and "'complete' → 'completed'" in i.message
-               for i in phase_issues)
+    assert any(
+      "Fixed" in i.message and "'complete' → 'completed'" in i.message
+      for i in phase_issues
+    )
 
   def test_active_variant_normalised_by_fix(self) -> None:
     root = self._create_repo_with_phase(status="active")
     ws = Workspace(root)
-    issues = validate_workspace(ws, fix=True)
+    validate_workspace(ws, fix=True)
     phase_file = (
       root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-200-test" / "phases" / "phase-01.md"
     )
-    from supekku.scripts.lib.core.spec_utils import load_markdown_file as load_md
-    fm, _ = load_md(phase_file)
+
+    fm, _ = load_markdown_file(phase_file)
     assert fm["status"] == "in-progress"
 
 

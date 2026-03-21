@@ -106,6 +106,7 @@ def _load_workflow_config(root: Path) -> dict:
   """Load workflow.toml config, returning empty dict on failure."""
   try:
     from supekku.scripts.lib.core.config import load_workflow_config  # noqa: PLC0415
+
     return load_workflow_config(root)
   except Exception:  # noqa: BLE001
     return {}
@@ -255,8 +256,7 @@ def workflow_status(
     data = read_state(delta_dir)
   except StateNotFoundError as exc:
     typer.echo(
-      f"No workflow state for {delta.upper()} "
-      "(workflow/state.yaml not found)",
+      f"No workflow state for {delta.upper()} (workflow/state.yaml not found)",
     )
     raise typer.Exit(EXIT_SUCCESS) from exc
   except StateValidationError as exc:
@@ -511,9 +511,7 @@ def create_handoff_command(
     raise typer.Exit(EXIT_FAILURE) from exc
 
   # Infer next_activity_kind if not provided
-  activity_kind = next_kind or (
-    "review" if to_role == "reviewer" else "implementation"
-  )
+  activity_kind = next_kind or ("review" if to_role == "reviewer" else "implementation")
 
   # Assemble required_reading from delta bundle
   artifact = state_data.get("artifact", {})
@@ -546,7 +544,8 @@ def create_handoff_command(
 
   config = _load_workflow_config(repo_root)
   boundary = config.get("workflow", {}).get(
-    "handoff_boundary", "phase",
+    "handoff_boundary",
+    "phase",
   )
 
   handoff_data = build_handoff(
@@ -588,8 +587,7 @@ def create_handoff_command(
     raise typer.Exit(EXIT_FAILURE) from exc
 
   typer.echo(
-    f"Handoff created: {delta_id} → {to_role} "
-    f"({current.value} → awaiting_handoff)",
+    f"Handoff created: {delta_id} → {to_role} ({current.value} → awaiting_handoff)",
   )
   typer.echo(f"  file: {handoff_path}")
   raise typer.Exit(EXIT_SUCCESS)
@@ -603,7 +601,8 @@ def create_handoff_command(
 @accept_app.command("handoff")
 def accept_handoff_command(
   delta: Annotated[
-    str, typer.Argument(help="Delta ID (e.g. DE-103)"),
+    str,
+    typer.Argument(help="Delta ID (e.g. DE-103)"),
   ],
   identity: Annotated[
     str | None,
@@ -684,7 +683,9 @@ def accept_handoff_command(
   current = WorkflowState(state_data["workflow"]["status"])
   try:
     result = apply_transition(
-      current, TransitionCommand.ACCEPT_HANDOFF, to_role=to_role,
+      current,
+      TransitionCommand.ACCEPT_HANDOFF,
+      to_role=to_role,
     )
   except TransitionError as exc:
     typer.echo(f"Cannot accept handoff: {exc}", err=True)
@@ -715,8 +716,7 @@ def accept_handoff_command(
     write_handoff(delta_dir, handoff_data)
 
   typer.echo(
-    f"Handoff accepted: {delta_id} → {to_role} "
-    f"(claimed by {caller})",
+    f"Handoff accepted: {delta_id} → {to_role} (claimed by {caller})",
   )
   raise typer.Exit(EXIT_SUCCESS)
 
@@ -799,15 +799,21 @@ def review_prime_command(
   if existing_index:
     # Evaluate staleness
     changed_files = None
-    cached_head = existing_index.get("staleness", {}).get(
-      "cache_key", {},
-    ).get("head", "")
+    cached_head = (
+      existing_index.get("staleness", {})
+      .get(
+        "cache_key",
+        {},
+      )
+      .get("head", "")
+    )
     if cached_head and cached_head != git_head:
       changed_files = get_changed_files(cached_head, "HEAD", repo_root)
 
     # Check for deleted domain_map files
     deleted = check_domain_map_files_exist(
-      existing_index.get("domain_map", []), repo_root,
+      existing_index.get("domain_map", []),
+      repo_root,
     )
     if deleted:
       cache_status = BootstrapStatus.INVALID
@@ -879,9 +885,18 @@ def review_prime_command(
   bp.parent.mkdir(parents=True, exist_ok=True)
   bp.write_text(bootstrap_md, encoding="utf-8")
 
-  action = "rebuilt" if cache_status in (
-    BootstrapStatus.COLD, BootstrapStatus.INVALID, BootstrapStatus.STALE,
-  ) else "updated" if cache_status == BootstrapStatus.REUSABLE else "created"
+  action = (
+    "rebuilt"
+    if cache_status
+    in (
+      BootstrapStatus.COLD,
+      BootstrapStatus.INVALID,
+      BootstrapStatus.STALE,
+    )
+    else "updated"
+    if cache_status == BootstrapStatus.REUSABLE
+    else "created"
+  )
 
   typer.echo(f"Review primed: {delta_id} ({action})")
   typer.echo(f"  index: {idx_path}")
@@ -906,48 +921,53 @@ def _build_domain_map(
   for f in sorted(delta_dir.glob("*.md")):
     doc_files.append(str(f.relative_to(repo_root)))
   if doc_files:
-    areas.append({
-      "area": "delta_docs",
-      "purpose": "delta and plan documentation",
-      "files": doc_files,
-    })
+    areas.append(
+      {
+        "area": "delta_docs",
+        "purpose": "delta and plan documentation",
+        "files": doc_files,
+      }
+    )
 
   # Phase sheets
   phases_dir = delta_dir / "phases"
   if phases_dir.is_dir():
     phase_files = [
-      str(f.relative_to(repo_root))
-      for f in sorted(phases_dir.glob("*.md"))
+      str(f.relative_to(repo_root)) for f in sorted(phases_dir.glob("*.md"))
     ]
     if phase_files:
-      areas.append({
-        "area": "phase_sheets",
-        "purpose": "per-phase execution records",
-        "files": phase_files,
-      })
+      areas.append(
+        {
+          "area": "phase_sheets",
+          "purpose": "per-phase execution records",
+          "files": phase_files,
+        }
+      )
 
   # Workflow artifacts
   wf_dir = delta_dir / "workflow"
   if wf_dir.is_dir():
     wf_files = [
-      str(f.relative_to(repo_root))
-      for f in sorted(wf_dir.iterdir())
-      if f.is_file()
+      str(f.relative_to(repo_root)) for f in sorted(wf_dir.iterdir()) if f.is_file()
     ]
     if wf_files:
-      areas.append({
-        "area": "workflow_state",
-        "purpose": "orchestration control plane files",
-        "files": wf_files,
-      })
+      areas.append(
+        {
+          "area": "workflow_state",
+          "purpose": "orchestration control plane files",
+          "files": wf_files,
+        }
+      )
 
   # Ensure at least one area (schema requires min 1)
   if not areas:
-    areas.append({
-      "area": "delta_root",
-      "purpose": "delta bundle",
-      "files": [str(delta_dir.relative_to(repo_root))],
-    })
+    areas.append(
+      {
+        "area": "delta_root",
+        "purpose": "delta bundle",
+        "files": [str(delta_dir.relative_to(repo_root))],
+      }
+    )
 
   return areas
 
@@ -1050,7 +1070,8 @@ def review_complete_command(
   status: Annotated[
     str,
     typer.Option(
-      "--status", "-s",
+      "--status",
+      "-s",
       help="Review outcome: changes_requested or approved",
     ),
   ],
@@ -1267,7 +1288,7 @@ def phase_complete_command(
   # Check if already complete (idempotent for handoff re-emission)
   already_complete = phase.get("status") == "complete"
 
-  # Step 0: Update phase frontmatter (normative) before state.yaml (transient) — DEC-104-08
+  # Update phase frontmatter (normative) before state.yaml (transient) — DEC-104-08
   phase_path_val = phase.get("path")
   if phase_path_val:
     abs_phase = repo_root / phase_path_val
@@ -1299,15 +1320,17 @@ def phase_complete_command(
       should_emit_handoff = bridge_data.get("handoff_ready", False)
       if should_emit_handoff and not handoff_role:
         handoff_role = (
-          "reviewer" if bridge_data.get("review_required") else
-          config.get("workflow", {}).get("default_next_role", "implementer")
+          "reviewer"
+          if bridge_data.get("review_required")
+          else config.get("workflow", {}).get("default_next_role", "implementer")
         )
     elif config.get("workflow", {}).get("auto_handoff_on_phase_complete", True):
       # Policy fallback
       should_emit_handoff = True
       if not handoff_role:
         handoff_role = config.get("workflow", {}).get(
-          "default_next_role", "implementer",
+          "default_next_role",
+          "implementer",
         )
 
   # Write state with phase complete (step 1)

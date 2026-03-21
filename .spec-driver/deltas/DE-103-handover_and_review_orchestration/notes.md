@@ -133,3 +133,95 @@ Files:
 - Phase 04: review commands (`review prime`, `review complete`, `review teardown`)
 - `operations.py` still unused — future skinny-CLI refactor opportunity
 - Placeholder renderers from Phase 01 still in place
+
+---
+
+## New Agent Instructions
+
+### Task Card
+
+**Delta:** `.spec-driver/deltas/DE-103-handover_and_review_orchestration/DE-103.md`
+**Notes:** `.spec-driver/deltas/DE-103-handover_and_review_orchestration/notes.md` (this file)
+**Status:** in-progress — Phases 01–03 complete, Phase 04 next.
+
+### Next Activity
+
+**Plan and execute Phase 04 — Review commands.**
+
+Phase 04 scope (from IP-103 §4):
+- `review prime` — generates `review-index.yaml` + `review-bootstrap.md` from current state
+- `review complete --status <status>` — writes `review-findings.yaml`; transitions to `changes_requested` or `approved`
+- `review teardown` — deletes reviewer state files
+- Staleness/invalidation/reusability lifecycle for review-index (DR-102 §8)
+
+### Required Reading
+
+- `.spec-driver/deltas/DE-103-handover_and_review_orchestration/DE-103.md` — delta
+- `.spec-driver/deltas/DE-103-handover_and_review_orchestration/IP-103.md` — plan (Phase 04 row)
+- `.spec-driver/deltas/DE-102-handover_and_review_orchestration/DR-102.md` — design authority
+  - §3.3 (review-index schema), §3.4 (review-findings schema)
+  - §5 (CLI commands — `review prime`, `review complete`, `review teardown`, write ordering)
+  - §8 (lifecycle and invalidation rules — staleness, reusability, teardown)
+  - §9 (workflow.toml `[review]` config — `session_scope`, `teardown_on`, `bootstrap` settings)
+
+### Related Documents
+
+- `.spec-driver/backlog/improvements/IMPR-019-handover_and_review_orchestration/IMPR-019.md`
+- `.spec-driver/backlog/improvements/IMPR-019-handover_and_review_orchestration/schema.md`
+
+### Key Files
+
+- `supekku/scripts/lib/workflow/` — state machine, state I/O, handoff I/O (Phases 02–03)
+- `supekku/scripts/lib/blocks/workflow_metadata.py` — all 7 schema definitions (Phase 01); review-index and review-findings schemas already defined here
+- `supekku/cli/workflow.py` — CLI commands (`workflow_app`, `phase_app`, `accept_app`, `create_handoff_command`)
+- `supekku/cli/create.py` — `create handoff` thin wrapper (pattern for `create` subcommands)
+- `supekku/cli/main.py` — command group registration
+- `supekku/scripts/lib/core/git.py` — `get_head_sha`, `get_branch`, `short_sha`, `has_uncommitted_changes`, `has_staged_changes`
+- `supekku/scripts/lib/core/config.py` — `[review]` and `[review.bootstrap]` config defaults
+
+### Relevant Memories
+
+- `mem.pattern.cli.skinny` — CLI files are thin orchestration; delegate to domain packages
+- `mem.reference.spec-driver.workflow-config` — workflow.toml structure reference
+
+### Unresolved Assumptions & Design Tensions
+
+1. **`review prime` is complex.** It must: assemble domain_map from changed files,
+   compute staleness from cache_key, build a markdown briefing, and handle
+   incremental vs full rebuild. DR-102 §8 specifies all rules but implementation
+   may surface edge cases (e.g., diff base selection for changed-file detection).
+   Assess before coding.
+
+2. **`review complete` needs review-findings I/O.** Similar pattern to handoff I/O
+   but with round tracking and finding ID management. Round numbers are
+   monotonically increasing — check how to read/increment from existing findings.
+
+3. **`review teardown` policy gating.** Teardown behaviour depends on
+   `[review].session_scope` and `[review].teardown_on` from workflow.toml.
+   The config loader already supports these. Teardown deletes review-index,
+   review-findings, and review-bootstrap.md.
+
+4. **`operations.py` exists but is unused.** A previous agent created it as a
+   domain layer for skinny CLI. It covers `phase_start`, `workflow_status`,
+   `block_workflow`, `unblock_workflow` but not handoff or review operations.
+   Decision: use it or continue the current pattern. Not blocking.
+
+5. **Placeholder renderers** from Phase 01 are still registered for all 7
+   schemas. Phase 04 review commands may need real renderers for review-index
+   and review-findings if they need to be rendered for display.
+
+### Commit State
+
+- Worktree is clean for DE-103 code. Only `flake.lock`/`flake.nix` are modified
+  (unrelated nix changes from another session — not DE-103 scope).
+- No pending `.spec-driver` changes to commit.
+
+### Advice
+
+- Follow the same TDD pattern used in Phases 02–03: write I/O module + tests
+  first, then CLI commands + tests.
+- `review prime` is the most complex command in this phase — consider splitting
+  it into smaller functions (domain map assembly, staleness evaluation,
+  bootstrap markdown generation) and testing each independently.
+- The `handoff_io.py` module is a good pattern to follow for review I/O.
+- Phase 04 entrance criteria: Phase 03 complete ✓ (all handoff commands working).

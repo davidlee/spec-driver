@@ -7,15 +7,20 @@ from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.backlog.registry import discover_backlog_items
 from supekku.scripts.lib.changes.audit_check import resolve_audit_gate
+from supekku.scripts.lib.changes.lifecycle import normalize_status
+from supekku.scripts.lib.core.enums import get_enum_values
 from supekku.scripts.lib.core.frontmatter_metadata.audit import (
   AUDIT_MODE_CONFORMANCE,
   VALID_OUTCOME_KINDS,
   VALID_STATUS_KIND_PAIRS,
 )
+from supekku.scripts.lib.core.frontmatter_writer import update_frontmatter_status
+from supekku.scripts.lib.core.paths import get_deltas_dir
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 if TYPE_CHECKING:
   from collections.abc import Iterable
+  from pathlib import Path
 
   from .changes.artifacts import ChangeArtifact
   from .workspace import Workspace
@@ -33,10 +38,13 @@ class ValidationIssue:
 class WorkspaceValidator:
   """Validates workspace consistency and artifact relationships."""
 
-  def __init__(self, workspace: Workspace, strict: bool = False) -> None:
+  def __init__(
+    self, workspace: Workspace, strict: bool = False, *, fix: bool = False,
+  ) -> None:
     self.workspace = workspace
     self.issues: list[ValidationIssue] = []
     self.strict = strict
+    self.fix = fix
 
   def validate(self) -> list[ValidationIssue]:
     """Validate workspace for missing references and inconsistencies."""
@@ -138,6 +146,9 @@ class WorkspaceValidator:
 
     # Cross-artifact unresolved reference check (DE-097)
     self._validate_unresolved_references()
+
+    # Phase status validation (DE-104)
+    self._validate_phase_statuses()
 
     return list(self.issues)
 
@@ -426,12 +437,71 @@ class WorkspaceValidator:
       )
 
 
+  # -----------------------------------------------------------
+  # Phase status validation (DE-104)
+  # -----------------------------------------------------------
+
+  def _validate_phase_statuses(self) -> None:
+    """Validate phase frontmatter statuses across all delta bundles."""
+    deltas_dir = get_deltas_dir(self.workspace.root)
+    if not deltas_dir.exists():
+      return
+    valid = get_enum_values("phase.status")
+    if valid is None:
+      return  # pragma: no cover — defensive; enum should always exist
+    for delta_dir in sorted(deltas_dir.iterdir()):
+      if not delta_dir.is_dir():
+        continue
+      phases_dir = delta_dir / "phases"
+      if not phases_dir.is_dir():
+        continue
+      for phase_file in sorted(phases_dir.glob("phase-[0-9][0-9].md")):
+        self._validate_single_phase(phase_file, valid)
+
+  def _validate_single_phase(
+    self,
+    phase_file: "Path",
+    valid_statuses: list[str],
+  ) -> None:
+    """Validate a single phase file's frontmatter and structure."""
+    try:
+      fm, _ = load_markdown_file(phase_file)
+    except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
+      self._warning(str(phase_file.name), "Could not parse frontmatter")
+      return
+
+    artifact = fm.get("id", phase_file.name)
+
+    # Status check
+    status = fm.get("status")
+    if status is None:
+      self._warning(artifact, "Missing status field in frontmatter")
+    elif status not in valid_statuses:
+      canonical = normalize_status(status)
+      if self.fix and canonical in valid_statuses:
+        update_frontmatter_status(phase_file, canonical)
+        self._info(artifact, f"Fixed phase status: '{status}' → '{canonical}'")
+      else:
+        self._warning(artifact, f"Non-canonical phase status: '{status}'")
+
+    # Kind check
+    if fm.get("kind") != "phase":
+      self._warning(artifact, "Missing or incorrect kind (expected 'phase')")
+
+    # Overview block check
+    content = phase_file.read_text(encoding="utf-8")
+    if "supekku:phase.overview" not in content:
+      self._warning(artifact, "Missing phase.overview block")
+
+
 def validate_workspace(
-  workspace: Workspace,
+  workspace: "Workspace",
   strict: bool = False,
+  *,
+  fix: bool = False,
 ) -> list[ValidationIssue]:
   """Validate the given workspace and return a list of validation issues."""
-  validator = WorkspaceValidator(workspace, strict=strict)
+  validator = WorkspaceValidator(workspace, strict=strict, fix=fix)
   return validator.validate()
 
 

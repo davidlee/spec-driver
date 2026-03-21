@@ -971,5 +971,129 @@ class TestUnresolvedReferenceValidation(RepoTestCase):
     assert len(unresolved) == 0, f"Unexpected unresolved warnings: {unresolved}"
 
 
+class PhaseValidationTest(RepoTestCase):
+  """Tests for phase status validation and --fix (DE-104)."""
+
+  def _create_repo_with_phase(
+    self,
+    *,
+    status: str | None = "draft",
+    kind: str | None = "phase",
+    overview_block: bool = True,
+    filename: str = "phase-01.md",
+  ) -> Path:
+    root = self._create_repo()
+    delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-200-test"
+    phases_dir = delta_dir / "phases"
+    phases_dir.mkdir(parents=True)
+
+    fm: dict[str, Any] = {"id": "IP-200.PHASE-01"}
+    if status is not None:
+      fm["status"] = status
+    if kind is not None:
+      fm["kind"] = kind
+
+    body = "# Phase 01\n\nContent.\n"
+    if overview_block:
+      body += "\n```yaml supekku:phase.overview@v1\nschema: supekku.phase.overview\n```\n"
+
+    dump_markdown_file(phases_dir / filename, fm, body)
+
+    # Minimal delta file so workspace doesn't complain
+    dump_markdown_file(
+      delta_dir / "DE-200.md",
+      {"id": "DE-200", "status": "in-progress", "kind": "delta"},
+      "# DE-200\n",
+    )
+    return root
+
+  def test_canonical_status_no_issue(self) -> None:
+    root = self._create_repo_with_phase(status="draft")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert len(phase_issues) == 0
+
+  def test_non_canonical_status_warns(self) -> None:
+    root = self._create_repo_with_phase(status="done")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert any("Non-canonical" in i.message for i in phase_issues)
+
+  def test_fix_normalises_status(self) -> None:
+    root = self._create_repo_with_phase(status="done")
+    ws = Workspace(root)
+    issues = validate_workspace(ws, fix=True)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert any("Fixed" in i.message for i in phase_issues)
+
+    # Verify file was updated
+    phase_file = (
+      root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-200-test" / "phases" / "phase-01.md"
+    )
+    from supekku.scripts.lib.core.spec_utils import load_markdown_file as load_md
+    fm, _ = load_md(phase_file)
+    assert fm["status"] == "completed"
+
+  def test_fix_idempotent(self) -> None:
+    root = self._create_repo_with_phase(status="done")
+    ws = Workspace(root)
+    validate_workspace(ws, fix=True)
+    # Second run — no changes
+    ws2 = Workspace(root)
+    issues = validate_workspace(ws2, fix=True)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert len(phase_issues) == 0
+
+  def test_missing_status_warns(self) -> None:
+    root = self._create_repo_with_phase(status=None)
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert any("Missing status" in i.message for i in phase_issues)
+
+  def test_missing_overview_block_warns(self) -> None:
+    root = self._create_repo_with_phase(overview_block=False)
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert any("Missing phase.overview" in i.message for i in phase_issues)
+
+  def test_wrong_kind_warns(self) -> None:
+    root = self._create_repo_with_phase(kind="plan")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert any("kind" in i.message for i in phase_issues)
+
+  def test_non_standard_filename_not_discovered(self) -> None:
+    """phase-05-plan.md is not matched by phase-[0-9][0-9].md glob (DEC-104-06)."""
+    root = self._create_repo_with_phase(filename="phase-05-plan.md")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert len(phase_issues) == 0
+
+  def test_complete_variant_normalised_by_fix(self) -> None:
+    root = self._create_repo_with_phase(status="complete")
+    ws = Workspace(root)
+    issues = validate_workspace(ws, fix=True)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert any("Fixed" in i.message and "'complete' → 'completed'" in i.message
+               for i in phase_issues)
+
+  def test_active_variant_normalised_by_fix(self) -> None:
+    root = self._create_repo_with_phase(status="active")
+    ws = Workspace(root)
+    issues = validate_workspace(ws, fix=True)
+    phase_file = (
+      root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-200-test" / "phases" / "phase-01.md"
+    )
+    from supekku.scripts.lib.core.spec_utils import load_markdown_file as load_md
+    fm, _ = load_md(phase_file)
+    assert fm["status"] == "in-progress"
+
+
 if __name__ == "__main__":
   unittest.main()

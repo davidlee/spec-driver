@@ -87,6 +87,13 @@ def validate(
       help="Show info-level messages (planned verification artifacts, etc.)",
     ),
   ] = False,
+  fix: Annotated[
+    bool,
+    typer.Option(
+      "--fix",
+      help="Auto-fix safe normalisations (e.g. non-canonical phase statuses)",
+    ),
+  ] = False,
 ) -> None:
   """Validate workspace metadata and relationships.
 
@@ -95,6 +102,9 @@ def validate(
 
   By default, only errors and warnings are shown. Use --verbose to see
   info-level messages about planned verification artifacts.
+
+  Use --fix to auto-repair known-safe normalisations (e.g. non-canonical
+  phase status values). Run without --fix first to preview findings.
   """
   try:
     ws = Workspace(find_repo_root(root))
@@ -102,7 +112,7 @@ def validate(
     if sync:
       ws.sync_all_registries()
 
-    issues = validate_ws(ws, strict=strict)
+    issues = validate_ws(ws, strict=strict, fix=fix)
 
     # Filter issues based on verbosity
     if not verbose:

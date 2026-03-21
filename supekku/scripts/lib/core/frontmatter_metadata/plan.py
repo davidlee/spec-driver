@@ -87,7 +87,7 @@ PLAN_FRONTMATTER_METADATA = BlockMetadata(
       "name": "Authentication Phase 1",
       "slug": "phase-auth-1",
       "kind": "phase",
-      "status": "active",
+      "status": "in-progress",
       "created": "2024-08-01",
       "updated": "2025-01-15",
       "objective": "Implement core OAuth2 flows",

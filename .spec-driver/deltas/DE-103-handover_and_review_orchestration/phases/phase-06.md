@@ -4,7 +4,7 @@ slug: "103-handover_and_review_orchestration-phase-06"
 name: "IP-103 Phase 06 — Configuration, docs, integration testing"
 created: "2026-03-21"
 updated: "2026-03-21"
-status: in_progress
+status: complete
 kind: phase
 ---
 
@@ -63,7 +63,7 @@ create memory records, clean up.
 
 | Status | ID  | Description | Notes |
 | ------ | --- | ----------- | ----- |
-| [ ]    | 6.1 | End-to-end integration test | Full workflow cycle |
-| [ ]    | 6.2 | Regression test | Existing deltas without workflow/ |
-| [ ]    | 6.3 | Cleanup | Remove unused operations.py |
-| [ ]    | 6.4 | Memory record | Workflow commands reference |
+| [x]    | 6.1 | End-to-end integration test | Full cycle + phase complete + block/unblock |
+| [x]    | 6.2 | Regression test | Existing deltas without workflow/ verified |
+| [x]    | 6.3 | Cleanup | Removed unused operations.py |
+| [x]    | 6.4 | Memory record | mem.reference.workflow-commands created |

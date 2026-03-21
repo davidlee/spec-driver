@@ -349,57 +349,78 @@ Files:
 
 ---
 
+## Phase 06 — Configuration, docs, integration testing
+
+### What's done
+
+- **End-to-end integration test**: Full workflow cycle
+  (start → implement → handoff → review → changes_requested → handoff →
+  implement → handoff → review → approved) with auto-teardown. Verifies all
+  DR-102 §12 evaluation criteria.
+- **Phase complete cycle test**: Auto-handoff emission verified.
+- **Block/unblock cycle test**: Round-trip state preservation verified.
+- **Claim guard integration test**: Cross-identity rejection verified.
+- **Regression test (VA-103-002)**: Existing deltas without `workflow/`
+  continue to work. `workflow status` returns cleanly. Delta files untouched
+  by workflow commands.
+- **Memory record**: `mem.reference.workflow-commands` — quick reference for
+  all workflow CLI commands, state transitions, file layout, domain modules.
+- **Cleanup**: Removed unused `operations.py`.
+
+Files:
+- `supekku/cli/workflow_integration_test.py` — 6 integration tests
+- `.spec-driver/memory/mem.reference.workflow-commands.md` — workflow reference
+
+### Verification
+
+- 6 new integration tests
+- 165 total workflow tests passing
+- ruff clean
+
+### Commits
+
+- `2ed7bfad` — feat(DE-103): phase 06 — integration tests, memory, cleanup
+
+---
+
 ## New Agent Instructions
 
 ### Task Card
 
 **Delta:** `.spec-driver/deltas/DE-103-handover_and_review_orchestration/DE-103.md`
 **Notes:** `.spec-driver/deltas/DE-103-handover_and_review_orchestration/notes.md` (this file)
-**Status:** in-progress — Phases 01–05 complete, Phase 06 next.
+**Status:** in-progress — Phases 01–06 complete. Ready for audit and closure.
 
 ### Next Activity
 
-**Plan and execute Phase 06 — Configuration, docs, integration testing.**
+**Audit and close DE-103.**
 
-Phase 06 scope (from IP-103 §4):
-- workflow.toml extensions verification (already present from Phase 02)
-- Memory updates for new workflow commands
-- Documentation updates
-- End-to-end integration tests (full workflow cycle per DR-102 §12)
-- Regression tests (existing deltas without workflow/ work unchanged)
-- VA-103-001 and VA-103-002 verification
+All 6 phases are complete. 165 workflow tests passing. DR-102 §12 criteria
+verified end-to-end. Next step is `/audit-change` then `/close-change`.
 
 ### Required Reading
 
 - `.spec-driver/deltas/DE-103-handover_and_review_orchestration/DE-103.md`
 - `.spec-driver/deltas/DE-103-handover_and_review_orchestration/IP-103.md`
-- `.spec-driver/deltas/DE-102-handover_and_review_orchestration/DR-102.md` §12 (evaluation criteria)
+- `.spec-driver/deltas/DE-102-handover_and_review_orchestration/DR-102.md` §12
 
 ### Key Files
 
-- `supekku/scripts/lib/workflow/` — all domain modules (state_machine, state_io, handoff_io, review_io, staleness, bridge)
-- `supekku/cli/workflow.py` — all CLI commands
-- `supekku/cli/workflow_*.py` — CLI test files
-- `supekku/scripts/lib/blocks/workflow_metadata.py` — schema definitions
+- `supekku/scripts/lib/workflow/` — state_machine, state_io, handoff_io, review_io, staleness, bridge
+- `supekku/cli/workflow.py` — all CLI commands (phase start/complete, create/accept handoff, review prime/complete/teardown, workflow status, block/unblock)
+- `supekku/cli/workflow_*.py` — 4 test files (handoff, review, phase_complete, integration)
+- `supekku/scripts/lib/blocks/workflow_metadata.py` — 7 schema definitions
 - `supekku/scripts/lib/core/config.py` — `[workflow]`/`[review]` config defaults
 - `supekku/skills/continuation/SKILL.md` — refit skill
 
 ### Test Summary
 
-- 159 total workflow tests passing
-- 68 schema tests (Phase 01)
-- 25 state machine + 22 state I/O (Phase 02)
-- 14 handoff I/O + 16 handoff CLI (Phase 03)
-- 24 review I/O + 16 staleness + 21 review CLI (Phase 04)
-- 13 bridge + 8 phase complete CLI (Phase 05)
+- 165 total workflow tests passing
+- 68 schema (Phase 01) + 47 state/IO (Phase 02) + 30 handoff (Phase 03)
+- 61 review (Phase 04) + 21 bridge/phase-complete (Phase 05) + 6 integration (Phase 06)
 
-### Commit State
+### Remaining Work
 
-- Worktree clean for DE-103. Only `flake.lock`/`flake.nix` + `IP-103.md` modified (unrelated).
-
-### Advice
-
-- Phase 06 is primarily verification and documentation, not new feature work.
-- Focus on DR-102 §12 evaluation criteria — each must be demonstrably satisfied.
-- Memory records should cover the new CLI commands and workflow patterns.
-- `operations.py` remains unused — decide whether to keep or remove.
+- IP-103 progress tracking checkboxes need updating
+- Placeholder renderers from Phase 01 still registered (not blocking — real rendering not needed)
+- `operations.py` removed — skinny-CLI refactor deferred

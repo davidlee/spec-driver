@@ -78,6 +78,15 @@ class TestGetEnumValues:
   def test_audit_status_matches_delta_status(self) -> None:
     assert get_enum_values("audit.status") == get_enum_values("delta.status")
 
+  def test_phase_status_matches_delta_status(self) -> None:
+    assert get_enum_values("phase.status") == get_enum_values("delta.status")
+
+  def test_phase_status_values(self) -> None:
+    values = get_enum_values("phase.status")
+    assert values is not None
+    assert set(values) == {"completed", "deferred", "draft", "in-progress", "pending"}
+    assert "complete" not in values
+
   def test_backlog_kind_statuses_registered(self) -> None:
     for kind in ("issue", "problem", "improvement", "risk"):
       values = get_enum_values(f"{kind}.status")
@@ -172,6 +181,7 @@ class TestListEnumPaths:
       "issue.status",
       "improvement.status",
       "memory.status",
+      "phase.status",
       "policy.status",
       "problem.status",
       "requirement.status",

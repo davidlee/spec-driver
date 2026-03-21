@@ -28,6 +28,7 @@ from supekku.scripts.lib.core.paths import (
   get_revisions_dir,
   get_templates_dir,
 )
+from supekku.scripts.lib.changes.lifecycle import STATUS_DRAFT
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 from supekku.scripts.lib.specs.creation import (
   extract_template_body,
@@ -911,7 +912,7 @@ def create_phase(
     "name": f"{plan_id} Phase {phase_num:02d}",
     "created": today,
     "updated": today,
-    "status": "draft",
+    "status": STATUS_DRAFT,
     "kind": "phase",
   }
 

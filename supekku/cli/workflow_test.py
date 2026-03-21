@@ -134,6 +134,34 @@ class PhaseStartTest(unittest.TestCase):
     data = yaml.safe_load((delta_dir / "workflow" / "state.yaml").read_text())
     assert data["plan"]["id"] == "IP-100"
 
+  def test_updates_phase_frontmatter_to_in_progress(self) -> None:
+    """phase start writes 'in-progress' to phase sheet frontmatter (DE-104)."""
+    from supekku.scripts.lib.core.spec_utils import load_markdown_file
+
+    delta_dir = _create_delta_bundle(self.root)
+    phase_file = delta_dir / "phases" / "phase-02.md"
+
+    # Verify starts as draft
+    fm, _ = load_markdown_file(phase_file)
+    assert fm["status"] == "draft"
+
+    result = self.runner.invoke(app, ["phase", "start", "DE-100"])
+    assert result.exit_code == 0, result.output
+
+    fm, _ = load_markdown_file(phase_file)
+    assert fm["status"] == "in-progress"
+
+  def test_frontmatter_tolerates_no_status_field(self) -> None:
+    """phase start succeeds when phase file lacks frontmatter status."""
+    delta_dir = _create_delta_bundle(self.root, phases=0)
+    phases_dir = delta_dir / "phases"
+    phases_dir.mkdir(exist_ok=True)
+    # Phase file without frontmatter
+    (phases_dir / "phase-01.md").write_text("# Phase 01\n\nContent.\n")
+
+    result = self.runner.invoke(app, ["phase", "start", "DE-100"])
+    assert result.exit_code == 0, result.output
+
 
 class WorkflowStatusTest(unittest.TestCase):
   """Test `spec-driver workflow status`."""

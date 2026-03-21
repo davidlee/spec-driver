@@ -24,8 +24,15 @@ def _create_delta_bundle(
   slug: str = "test-delta",
   plan_id: str = "IP-100",
   phases: int = 2,
+  *,
+  phase_frontmatter: bool = False,
 ) -> Path:
-  """Create a minimal delta bundle for testing."""
+  """Create a minimal delta bundle for testing.
+
+  Args:
+    phase_frontmatter: If True, generate phase files with proper frontmatter
+      (status: draft) so update_frontmatter_status can operate on them.
+  """
   bundle_name = f"{delta_id}-{slug}"
   delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / bundle_name
   delta_dir.mkdir(parents=True, exist_ok=True)
@@ -41,9 +48,14 @@ def _create_delta_bundle(
   phases_dir = delta_dir / "phases"
   phases_dir.mkdir(exist_ok=True)
   for i in range(1, phases + 1):
-    (phases_dir / f"phase-{i:02d}.md").write_text(
-      f"# Phase {i:02d}\n\nContent.\n",
-    )
+    if phase_frontmatter:
+      content = (
+        f"---\nid: {plan_id}.PHASE-{i:02d}\nstatus: draft\nkind: phase\n---\n"
+        f"\n# Phase {i:02d}\n\nContent.\n"
+      )
+    else:
+      content = f"# Phase {i:02d}\n\nContent.\n"
+    (phases_dir / f"phase-{i:02d}.md").write_text(content)
 
   return delta_dir
 
@@ -246,6 +258,66 @@ handoff_ready: false
       app, ["phase", "complete", "DE-100", "--no-handoff"],
     )
     assert result.exit_code == 0, result.output
+
+
+class PhaseFrontmatterTest(_PhaseCompleteTestBase):
+  """Test that phase complete updates phase sheet frontmatter (DE-104)."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  @patch("supekku.scripts.lib.core.git.get_branch", return_value="main")
+  @patch("supekku.scripts.lib.core.git.has_uncommitted_changes", return_value=False)
+  @patch("supekku.scripts.lib.core.git.has_staged_changes", return_value=False)
+  def test_phase_complete_updates_frontmatter_to_completed(self, *_mocks) -> None:
+    """Phase complete writes 'completed' to phase sheet frontmatter (DEC-104-08)."""
+    delta_dir = _create_delta_bundle(self.root, phase_frontmatter=True)
+    self._start_phase()
+
+    # Verify frontmatter starts as draft (phase start changes it to in-progress)
+    phase_file = delta_dir / "phases" / "phase-02.md"
+    from supekku.scripts.lib.core.spec_utils import load_markdown_file
+    fm, _ = load_markdown_file(phase_file)
+    assert fm["status"] == "in-progress"
+
+    result = self.runner.invoke(
+      app, ["phase", "complete", "DE-100", "--no-handoff"],
+    )
+    assert result.exit_code == 0, result.output
+
+    fm, _ = load_markdown_file(phase_file)
+    assert fm["status"] == "completed"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  @patch("supekku.scripts.lib.core.git.get_branch", return_value="main")
+  @patch("supekku.scripts.lib.core.git.has_uncommitted_changes", return_value=False)
+  @patch("supekku.scripts.lib.core.git.has_staged_changes", return_value=False)
+  def test_phase_complete_tolerates_missing_frontmatter(self, *_mocks) -> None:
+    """Phase complete succeeds when phase file has no frontmatter status."""
+    delta_dir = _create_delta_bundle(self.root, phase_frontmatter=False)
+    self._start_phase()
+
+    result = self.runner.invoke(
+      app, ["phase", "complete", "DE-100", "--no-handoff"],
+    )
+    assert result.exit_code == 0, result.output
+    assert "Phase complete" in result.output
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  @patch("supekku.scripts.lib.core.git.get_branch", return_value="main")
+  @patch("supekku.scripts.lib.core.git.has_uncommitted_changes", return_value=False)
+  @patch("supekku.scripts.lib.core.git.has_staged_changes", return_value=False)
+  def test_state_yaml_still_uses_complete(self, *_mocks) -> None:
+    """state.yaml uses control-plane vocabulary ('complete'), not lifecycle."""
+    delta_dir = _create_delta_bundle(self.root, phase_frontmatter=True)
+    self._start_phase()
+
+    self.runner.invoke(
+      app, ["phase", "complete", "DE-100", "--no-handoff"],
+    )
+
+    state = yaml.safe_load(
+      (delta_dir / "workflow" / "state.yaml").read_text(),
+    )
+    assert state["phase"]["status"] == "complete"
 
 
 if __name__ == "__main__":

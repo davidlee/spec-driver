@@ -40,6 +40,7 @@ def _change_statuses() -> list[str]:
 ENUM_REGISTRY: dict[str, Callable[[], list[str]]] = {
   # From lifecycle constants
   "delta.status": _change_statuses,
+  "phase.status": _change_statuses,
   "revision.status": _change_statuses,
   "audit.status": _change_statuses,
   "requirement.status": lambda: sorted(REQUIREMENT_STATUSES),

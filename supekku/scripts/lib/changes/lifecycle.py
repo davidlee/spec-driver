@@ -28,12 +28,15 @@ VALID_STATUSES: set[ChangeStatus] = {
 
 # Canonical mapping for normalization
 CANONICAL_STATUS_MAP: dict[str, str] = {
+  "active": STATUS_IN_PROGRESS,  # Observed phase variant
   "complete": STATUS_COMPLETED,  # Normalize legacy status
   "completed": STATUS_COMPLETED,
-  "draft": STATUS_DRAFT,
-  "pending": STATUS_PENDING,
-  "in-progress": STATUS_IN_PROGRESS,
   "deferred": STATUS_DEFERRED,
+  "done": STATUS_COMPLETED,  # Observed phase variant
+  "draft": STATUS_DRAFT,
+  "in-progress": STATUS_IN_PROGRESS,
+  "in_progress": STATUS_IN_PROGRESS,  # Observed underscore variant
+  "pending": STATUS_PENDING,
 }
 
 

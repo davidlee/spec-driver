@@ -206,6 +206,19 @@ def phase_start(
     config=config,
   )
 
+  # Update phase frontmatter (normative) before state.yaml (transient) — DEC-104-08
+  if phase_path:
+    from supekku.scripts.lib.changes.lifecycle import (  # noqa: PLC0415
+      STATUS_IN_PROGRESS,
+    )
+    from supekku.scripts.lib.core.frontmatter_writer import (  # noqa: PLC0415
+      update_frontmatter_status,
+    )
+
+    abs_phase = Path(phase_path)
+    if abs_phase.exists():
+      update_frontmatter_status(abs_phase, STATUS_IN_PROGRESS)
+
   try:
     written = write_state(delta_dir, data)
   except StateValidationError as exc:
@@ -1241,13 +1254,27 @@ def phase_complete_command(
     )
     raise typer.Exit(EXIT_FAILURE)
 
+  from supekku.scripts.lib.changes.lifecycle import (  # noqa: PLC0415
+    STATUS_COMPLETED,
+  )
+  from supekku.scripts.lib.core.frontmatter_writer import (  # noqa: PLC0415
+    update_frontmatter_status,
+  )
+
   phase = state_data.get("phase", {})
   phase_id = phase.get("id", "unknown")
 
   # Check if already complete (idempotent for handoff re-emission)
   already_complete = phase.get("status") == "complete"
 
-  # Step 1: Mark phase complete in state.yaml
+  # Step 0: Update phase frontmatter (normative) before state.yaml (transient) — DEC-104-08
+  phase_path_val = phase.get("path")
+  if phase_path_val:
+    abs_phase = repo_root / phase_path_val
+    if abs_phase.exists():
+      update_frontmatter_status(abs_phase, STATUS_COMPLETED)
+
+  # Step 1: Mark phase complete in state.yaml (control-plane vocabulary)
   if not already_complete:
     state_data["phase"]["status"] = "complete"
 

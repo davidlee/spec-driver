@@ -56,6 +56,30 @@ DEFAULT_CONFIG: dict = {
     "agents_md": True,
     "claude_md": True,
   },
+  "workflow": {
+    "state_dir": "workflow",
+    "handoff_boundary": "phase",
+    "auto_handoff_on_phase_complete": True,
+    "render_continuation_prompt": True,
+    "update_notes_new_agent_instructions": True,
+    "default_next_role": "implementer",
+  },
+  "review": {
+    "persistent_session": True,
+    "bootstrap_cache": True,
+    "session_scope": "artifact",
+    "teardown_on": ["approved", "abandoned"],
+    "recreate_on": ["major_scope_change", "cache_invalid", "session_unrecoverable"],
+    "bootstrap": {
+      "include_delta": True,
+      "include_plan": True,
+      "include_active_phase": True,
+      "include_notes": True,
+      "include_findings": True,
+      "include_changed_files": True,
+      "max_historical_rounds": 2,
+    },
+  },
   "dirs": {
     "backlog": "backlog",
     "memory": "memory",
@@ -303,6 +327,18 @@ _SECTION_COMMENTS: dict[str, list[str]] = {
     "Controls @-references injected into root agent config files.",
     "Disable if you manage AGENTS.md / CLAUDE.md yourself.",
   ],
+  "workflow": [
+    "Workflow orchestration settings (DR-102).",
+    "state_dir: subdirectory within delta bundle for workflow YAML files.",
+    "handoff_boundary: default trigger boundary (phase | task | manual).",
+    "auto_handoff_on_phase_complete: emit handoff when phase completes.",
+    "default_next_role: role to hand off to when not otherwise specified.",
+  ],
+  "review": [
+    "Review session and bootstrap cache settings (DR-102 §8/§9).",
+    "session_scope: artifact | phase — controls teardown granularity.",
+    "bootstrap: controls what is included in reviewer bootstrap cache.",
+  ],
   "dirs": [
     "Directory name overrides for spec-driver workspace subdirectories.",
     "All paths are relative to .spec-driver/.  Change these if your",
@@ -339,8 +375,16 @@ def _emit_prose(lines: list[str], key: str) -> None:
 def _emit_section(lines: list[str], key: str, section: dict) -> None:
   """Append a commented-out TOML section."""
   lines.append(f"# [{key}]")
+  deferred_subtables: list[tuple[str, dict]] = []
   for sub_key, sub_val in section.items():
-    lines.append(f"# {sub_key} = {_toml_value(sub_val)}")
+    if isinstance(sub_val, dict):
+      deferred_subtables.append((sub_key, sub_val))
+    else:
+      lines.append(f"# {sub_key} = {_toml_value(sub_val)}")
+  for sub_key, sub_val in deferred_subtables:
+    lines.append(f"# [{key}.{sub_key}]")
+    for inner_key, inner_val in sub_val.items():
+      lines.append(f"# {inner_key} = {_toml_value(inner_val)}")
 
 
 def generate_default_workflow_toml(exec_cmd: str = "uv run spec-driver") -> str:

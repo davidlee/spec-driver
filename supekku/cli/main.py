@@ -23,6 +23,7 @@ from supekku.cli import (
   show,
   sync,
   view,
+  workflow,
   workspace,
 )
 from supekku.cli import list as list_module
@@ -187,6 +188,26 @@ app.add_typer(
   admin.app,
   name="admin",
   help="Workspace maintenance commands",
+)
+
+app.add_typer(
+  workflow.phase_app,
+  name="phase",
+  help="Workflow phase operations",
+)
+
+app.add_typer(
+  workflow.workflow_app,
+  name="workflow",
+  help="Workflow orchestration commands",
+)
+
+app.command("block", help="Block a workflow (transitions to blocked state)")(
+  workflow.block_command
+)
+
+app.command("unblock", help="Unblock a workflow (restores previous state)")(
+  workflow.unblock_command
 )
 
 

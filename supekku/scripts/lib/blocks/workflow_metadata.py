@@ -296,6 +296,12 @@ WORKFLOW_STATE_METADATA = BlockMetadata(
           required=False,
           description="Agent/operator identity holding the claim (null when unclaimed)",
         ),
+        "previous_state": FieldMetadata(
+          type="enum",
+          required=False,
+          enum_values=WORKFLOW_STATUS_VALUES,
+          description="State before blocking (set by block, cleared by unblock)",
+        ),
       },
     ),
     "pointers": FieldMetadata(

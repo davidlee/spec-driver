@@ -56,6 +56,14 @@ but not a general-purpose access layer.
   other artifacts. If phases are primarily accessed through their owning delta,
   the registry may be over-engineering.
 
+## Known gap: `deferred` status has no CLI path
+
+DE-104 skill guidance says "do not hand-edit phase frontmatter status" but
+provides an explicit exception for `deferred` — the one status not covered by
+`phase start` / `phase complete`. A narrow `phase defer <delta>` command (~15
+lines, mirrors existing pattern) would close this gap without requiring a full
+PhaseRegistry. Consider adding it alongside or instead of the full registry.
+
 ## When to revisit
 
 - If `list phases` / `show phase` become requested features

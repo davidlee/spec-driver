@@ -21,6 +21,7 @@ import supekku.scripts.lib.blocks.plan  # noqa: F401  # pylint: disable=unused-i
 import supekku.scripts.lib.blocks.relationships  # noqa: F401  # pylint: disable=unused-import
 import supekku.scripts.lib.blocks.revision  # noqa: F401  # pylint: disable=unused-import
 import supekku.scripts.lib.blocks.verification  # noqa: F401  # pylint: disable=unused-import
+import supekku.scripts.lib.blocks.workflow_metadata  # noqa: F401  # pylint: disable=unused-import
 from supekku.scripts.lib.blocks.metadata import metadata_to_json_schema
 from supekku.scripts.lib.blocks.schema_registry import (
   get_block_schema,

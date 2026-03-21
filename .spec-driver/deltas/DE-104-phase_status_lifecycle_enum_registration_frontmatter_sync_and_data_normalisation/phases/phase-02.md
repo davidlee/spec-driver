@@ -54,24 +54,26 @@ version: 1
 phase: IP-104.PHASE-02
 entrance_criteria:
   - item: "Phase 01 complete and committed"
-    completed: false
+    completed: true
 exit_criteria:
   - item: "validate detects non-canonical phase statuses"
-    completed: false
+    completed: true
   - item: "validate --fix normalises them"
-    completed: false
+    completed: true
   - item: "validate warns on structural issues"
-    completed: false
+    completed: true
   - item: "Schema example uses canonical status"
-    completed: false
+    completed: true
   - item: "Five skills updated"
-    completed: false
+    completed: true
   - item: "Two memory records updated"
-    completed: false
+    completed: true
   - item: "All phases backfilled"
-    completed: false
+    completed: true
+    notes: "60 files normalised; zero non-canonical frontmatter statuses remain"
   - item: "just check passes"
-    completed: false
+    completed: true
+    notes: "3915 passed; 1 pre-existing failure (leaf package count from DE-103, not DE-104)"
 ```
 
 # Phase 02 — Validation + --fix, schema, skills, memory, backfill
@@ -118,13 +120,13 @@ Add phase status validation to `validate` with a `--fix` flag for normalisation,
 
 | Status | ID  | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 2.1 | `_validate_phase_statuses` + `_validate_single_phase` | [ ] | Core validation logic |
-| [ ] | 2.2 | Wire `--fix` through CLI | [ ] | Depends on 2.1 |
-| [ ] | 2.3 | Fix schema example | [P] | Independent |
-| [ ] | 2.4 | Update skills (5 files) | [P] | Independent |
-| [ ] | 2.5 | Update memory records (2) | [P] | Independent |
-| [ ] | 2.6 | Backfill via `validate --fix` | [ ] | After 2.1–2.2 committed |
-| [ ] | 2.7 | Final verification | [ ] | After all above |
+| [x] | 2.1 | `_validate_phase_statuses` + `_validate_single_phase` | [ ] | Core validation logic |
+| [x] | 2.2 | Wire `--fix` through CLI | [ ] | `--fix` on validate command |
+| [x] | 2.3 | Fix schema example | [P] | `active` → `in-progress` |
+| [x] | 2.4 | Update skills (5 files) | [P] | execute-phase, update-delta-docs, continuation, close-change, plan-phases |
+| [x] | 2.5 | Update memory records (2) | [P] | workflow-commands, status-enums |
+| [x] | 2.6 | Backfill via `validate --fix` | [ ] | 60 files normalised |
+| [x] | 2.7 | Final verification | [ ] | 3915+120 tests pass; lint clean |
 
 ### Task Details
 

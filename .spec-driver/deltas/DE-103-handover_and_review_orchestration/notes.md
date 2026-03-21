@@ -225,3 +225,83 @@ Phase 04 scope (from IP-103 §4):
   bootstrap markdown generation) and testing each independently.
 - The `handoff_io.py` module is a good pattern to follow for review I/O.
 - Phase 04 entrance criteria: Phase 03 complete ✓ (all handoff commands working).
+
+---
+
+## Phase 04 — Review commands
+
+### What's done
+
+All three review CLI commands implemented per DR-102 §3.3, §3.4, §5, §8:
+
+- **Review I/O** (`review_io.py`): Read/write/build with schema validation for
+  both `review-index.yaml` and `review-findings.yaml`. Atomic writes.
+  `build_review_index` and `build_findings` construct payloads from structured
+  inputs. `next_round_number` reads/increments round counter.
+- **Staleness evaluator** (`staleness.py`): Evaluates bootstrap_status
+  transitions per DR-102 §8 — commit drift, phase boundary crossing, major
+  scope change, dependency surface expansion. Determines warm/stale/reusable/
+  invalid status. `check_domain_map_files_exist` for filesystem-level
+  invalidation.
+- **Git helper**: `get_changed_files(from_ref, to_ref)` added to `git.py`.
+- **CLI `review prime`**: Generates `review-index.yaml` + `review-bootstrap.md`.
+  Evaluates existing cache staleness, rebuilds or incrementally updates.
+  Builds domain_map from delta bundle files. Carries forward invariants/
+  risk_areas/review_focus/known_decisions on incremental update. Records
+  source_handoff when present.
+- **CLI `review complete --status <status>`**: Writes `review-findings.yaml`
+  with monotonically increasing round numbers. Transitions reviewing →
+  changes_requested or reviewing → approved. Auto-teardown on approved per
+  `[review].teardown_on` policy.
+- **CLI `review teardown`**: Deletes review-index, review-findings, and
+  review-bootstrap.md.
+
+Files:
+- `supekku/scripts/lib/workflow/review_io.py` — review I/O
+- `supekku/scripts/lib/workflow/review_io_test.py` — 24 tests
+- `supekku/scripts/lib/workflow/staleness.py` — staleness evaluator
+- `supekku/scripts/lib/workflow/staleness_test.py` — 16 tests
+- `supekku/scripts/lib/core/git.py` — `get_changed_files` helper
+- `supekku/cli/workflow.py` — `review_app` with `prime`, `complete`, `teardown`
+- `supekku/cli/workflow_review_test.py` — 21 CLI tests
+- `supekku/cli/main.py` — `review` group registration
+
+### Design Decisions
+
+- **Domain map assembly**: Built from delta bundle files (delta docs, phase
+  sheets, workflow artifacts). Git-diff-based changed-file discovery used for
+  staleness evaluation of existing caches, not for initial domain map population.
+  This keeps `review prime` usable without complex git history analysis.
+
+- **Auto-teardown on approved**: When `[review].teardown_on` includes "approved"
+  (the default), `review complete --status approved` automatically deletes
+  reviewer state files after writing findings and transitioning state. This
+  matches DR-102 §8.
+
+- **Incremental update on reusable cache**: When staleness evaluator returns
+  `reusable`, existing invariants/risk_areas/review_focus/known_decisions are
+  preserved. Cache key is refreshed. Full rebuild otherwise.
+
+- **Diff-base for staleness**: Compare `staleness.cache_key.head` to current
+  HEAD. No merge-base complexity. `get_changed_files` wrapper uses
+  `git diff --name-only`.
+
+### Verification
+
+- 24 review I/O tests + 16 staleness tests + 21 CLI tests = 61 new tests
+- 138 total workflow tests passing
+- 4378 total tests passing (2 pre-existing failures in package_utils_test)
+- ruff clean
+
+### Commits
+
+- `13a3575f` — chore(DE-103): phase-04 sheet — review commands
+- `3d203203` — feat(DE-103): review prime, review complete, review teardown CLI commands
+
+### Follow-up
+
+- Phase 05: phase complete, bridges, continuation refit
+- `operations.py` still unused — future skinny-CLI refactor opportunity
+- Placeholder renderers from Phase 01 still in place
+- Git-diff-based domain_map construction (assembling code areas from changed
+  files) deferred — current approach uses delta bundle structure

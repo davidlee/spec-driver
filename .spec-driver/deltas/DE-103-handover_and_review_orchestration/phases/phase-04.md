@@ -4,7 +4,7 @@ slug: "103-handover_and_review_orchestration-phase-04"
 name: "IP-103 Phase 04 — Review commands"
 created: "2026-03-21"
 updated: "2026-03-21"
-status: in_progress
+status: complete
 kind: phase
 ---
 
@@ -77,11 +77,11 @@ commands with staleness/invalidation lifecycle per DR-102 §3.3, §3.4, §5, §8
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `review prime` generates `review-index.yaml` + `review-bootstrap.md`
-- [ ] `review complete` writes `review-findings.yaml` and transitions state
-- [ ] `review teardown` deletes reviewer state files respecting policy
-- [ ] Staleness evaluation works per DR-102 §8
-- [ ] All tests passing, ruff clean
+- [x] `review prime` generates `review-index.yaml` + `review-bootstrap.md`
+- [x] `review complete` writes `review-findings.yaml` and transitions state
+- [x] `review teardown` deletes reviewer state files respecting policy
+- [x] Staleness evaluation works per DR-102 §8
+- [x] All tests passing, ruff clean
 
 ## 5. Verification
 
@@ -111,12 +111,12 @@ commands with staleness/invalidation lifecycle per DR-102 §3.3, §3.4, §5, §8
 
 | Status | ID  | Description | Notes |
 | ------ | --- | ----------- | ----- |
-| [ ]    | 4.1 | Review I/O module | read/write/build for review-index + review-findings |
-| [ ]    | 4.2 | Staleness evaluator | evaluate bootstrap_status from cache_key |
-| [ ]    | 4.3 | CLI: review prime | generates review-index.yaml + review-bootstrap.md |
-| [ ]    | 4.4 | CLI: review complete | writes review-findings.yaml, transitions state |
-| [ ]    | 4.5 | CLI: review teardown | deletes reviewer state files |
-| [ ]    | 4.6 | Integration verification | full lifecycle test |
+| [x]    | 4.1 | Review I/O module | 24 tests — read/write/build for review-index + review-findings |
+| [x]    | 4.2 | Staleness evaluator | 16 tests — evaluate bootstrap_status from cache_key |
+| [x]    | 4.3 | CLI: review prime | generates review-index.yaml + review-bootstrap.md |
+| [x]    | 4.4 | CLI: review complete | writes review-findings.yaml, transitions state |
+| [x]    | 4.5 | CLI: review teardown | deletes reviewer state files |
+| [x]    | 4.6 | Integration verification | 21 CLI tests cover full lifecycle |
 
 ## 8. Risks & Mitigations
 

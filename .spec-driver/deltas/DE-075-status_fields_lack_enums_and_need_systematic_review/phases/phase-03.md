@@ -3,8 +3,8 @@ id: IP-075.PHASE-03
 slug: "075-status_fields_lack_enums_and_need_systematic_review-phase-03"
 name: "IP-075 Phase 03: docs, guidance, and close-out"
 created: "2026-03-09"
-updated: "2026-03-09"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

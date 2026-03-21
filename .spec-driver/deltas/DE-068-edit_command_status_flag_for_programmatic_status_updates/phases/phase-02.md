@@ -3,8 +3,8 @@ id: IP-068.PHASE-02
 slug: "068-edit_command_status_flag_for_programmatic_status_updates-phase-02"
 name: CLI integration and edit drift
 created: "2026-03-08"
-updated: "2026-03-08"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

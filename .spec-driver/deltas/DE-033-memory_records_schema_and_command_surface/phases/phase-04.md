@@ -3,8 +3,8 @@ id: IP-033.PHASE-04
 slug: "033-memory_records_schema_and_command_surface-phase-04"
 name: IP-033 Phase 04 - Selection and Filtering
 created: "2026-03-02"
-updated: "2026-03-02"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

@@ -2,11 +2,11 @@
 id: IP-096-P01
 name: CompactDumper + writer + dump_markdown_file
 kind: phase
-status: complete
+status: completed
 delta: DE-096
 plan: IP-096
 created: "2026-03-14"
-updated: "2026-03-14"
+updated: "2026-03-21"
 ---
 
 # Phase 1 – CompactDumper + Writer + dump_markdown_file

@@ -3,8 +3,8 @@ id: IP-049.PHASE-01
 slug: "049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks-phase-01"
 name: IP-049 Phase 01 — Structural migration
 created: "2026-03-06"
-updated: "2026-03-06"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

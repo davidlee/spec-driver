@@ -2,11 +2,11 @@
 id: IP-096-P02
 name: CLI wiring
 kind: phase
-status: complete
+status: completed
 delta: DE-096
 plan: IP-096
 created: "2026-03-14"
-updated: "2026-03-14"
+updated: "2026-03-21"
 ---
 
 # Phase 2 – CLI Wiring

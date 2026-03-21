@@ -4,7 +4,7 @@ slug: "103-handover_and_review_orchestration-phase-05"
 name: "IP-103 Phase 05 — Phase complete, bridges, continuation refit"
 created: "2026-03-21"
 updated: "2026-03-21"
-status: complete
+status: completed
 kind: phase
 ---
 

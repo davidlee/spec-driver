@@ -3,9 +3,9 @@ id: IP-021.PHASE-03
 slug: "021-kanban-card-support-phase-03"
 name: IP-021 Phase 03
 created: "2026-02-03"
-updated: "2026-02-03"
+updated: "2026-03-21"
 completed: "2026-02-03"
-status: complete
+status: completed
 kind: phase
 ---
 

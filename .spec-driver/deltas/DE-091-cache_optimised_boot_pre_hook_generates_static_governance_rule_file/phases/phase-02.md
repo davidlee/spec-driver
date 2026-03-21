@@ -3,8 +3,8 @@ id: IP-091.PHASE-02
 slug: "091-cache_optimised_boot_pre_hook_generates_static_governance_rule_file-phase-02"
 name: IP-091 Phase 02
 created: "2026-03-12"
-updated: "2026-03-12"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

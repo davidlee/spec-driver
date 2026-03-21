@@ -3,8 +3,8 @@ id: IP-006.PHASE-01
 slug: standardize-cli-json-output-support-phase-01
 name: IP-006 Phase 01 - Add JSON support to CLI commands
 created: "2025-11-02"
-updated: "2025-11-02"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

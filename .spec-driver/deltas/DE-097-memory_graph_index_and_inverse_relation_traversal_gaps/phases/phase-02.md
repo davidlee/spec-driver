@@ -3,8 +3,8 @@ id: IP-097.PHASE-02
 slug: "097-cli-and-validation-integration"
 name: "Phase 2: CLI and validation integration"
 created: "2026-03-15"
-updated: "2026-03-15"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

@@ -1,10 +1,10 @@
 ---
 id: IP-103.PHASE-04
 slug: "103-handover_and_review_orchestration-phase-04"
-name: "IP-103 Phase 04 — Review commands"
+name: IP-103 Phase 04 — Review commands
 created: "2026-03-21"
 updated: "2026-03-21"
-status: complete
+status: completed
 kind: phase
 ---
 

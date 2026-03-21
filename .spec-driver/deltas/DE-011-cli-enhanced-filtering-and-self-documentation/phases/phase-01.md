@@ -3,8 +3,8 @@ id: IP-011.PHASE-01
 slug: cli-enhanced-filtering-and-self-documentation-phase-01
 name: IP-011 Phase 01 - Enhanced Filtering
 created: "2025-11-03"
-updated: "2025-11-03"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

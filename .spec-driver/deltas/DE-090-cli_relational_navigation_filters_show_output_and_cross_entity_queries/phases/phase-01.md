@@ -3,8 +3,8 @@ id: IP-090.PHASE-01
 slug: "090-p0-bug-fixes"
 name: "P0 bug fixes: relation display, show spec, plan resilience"
 created: "2026-03-13"
-updated: "2026-03-13"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

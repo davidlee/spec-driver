@@ -4,7 +4,7 @@ slug: "103-handover_and_review_orchestration-phase-02"
 name: State machine and core commands
 created: "2026-03-21"
 updated: "2026-03-21"
-status: done
+status: completed
 kind: phase
 ---
 

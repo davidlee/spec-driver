@@ -3,8 +3,8 @@ id: IP-036.PHASE-01
 slug: "036-frontmatter_metadata_compaction_and_canonicalization_controls-phase-01"
 name: IP-036 Phase 01 - Baseline and Taxonomy
 created: "2026-03-03"
-updated: "2026-03-03"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

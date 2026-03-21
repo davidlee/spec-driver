@@ -3,8 +3,8 @@ id: IP-097.PHASE-01
 slug: "097-domain-layer-graph-builder-query-api-id-normalizer"
 name: "Phase 1: Domain layer — graph builder, query API, ID normalizer"
 created: "2026-03-15"
-updated: "2026-03-15"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

@@ -3,8 +3,8 @@ id: IP-047.PHASE-02
 slug: "047-human-resolution-adr-and-re-creation"
 name: Human resolution — ADR and RE creation
 created: "2026-03-06"
-updated: "2026-03-06"
-status: in_progress
+updated: "2026-03-21"
+status: in-progress
 kind: phase
 ---
 

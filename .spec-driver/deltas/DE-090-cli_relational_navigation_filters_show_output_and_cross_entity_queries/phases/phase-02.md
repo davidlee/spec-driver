@@ -3,8 +3,8 @@ id: IP-090.PHASE-02
 slug: "090-p1-relational-filters"
 name: "P1 relational filters: --delta, --spec, --implemented-by, --related-to"
 created: "2026-03-13"
-updated: "2026-03-13"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

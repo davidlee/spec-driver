@@ -3,8 +3,8 @@ id: IP-061.PHASE-02
 slug: "061-tui_bundle_file_browser-phase-02"
 name: "Browser integration — layout, wiring, visibility, focus, CSS"
 created: "2026-03-08"
-updated: "2026-03-08"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

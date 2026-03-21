@@ -3,8 +3,8 @@ id: IP-073.PHASE-01
 slug: "073-content_type_on_show-phase-01"
 name: Phase 1 - --content-type on show
 created: "2026-03-09"
-updated: "2026-03-09"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

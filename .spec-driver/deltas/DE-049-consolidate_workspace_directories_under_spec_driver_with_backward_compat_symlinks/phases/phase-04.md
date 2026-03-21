@@ -3,8 +3,8 @@ id: IP-049.PHASE-04
 slug: "049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks-phase-04"
 name: "IP-049 Phase 04 — Regression, skill symlinks, and cleanup"
 created: "2026-03-06"
-updated: "2026-03-06"
-status: active
+updated: "2026-03-21"
+status: in-progress
 kind: phase
 ---
 

@@ -2,11 +2,11 @@
 id: IP-095-P01
 name: Creation + Sync + Tests
 kind: phase
-status: complete
+status: completed
 delta: DE-095
 plan: IP-095
 created: "2026-03-14"
-updated: "2026-03-14"
+updated: "2026-03-21"
 ---
 
 # Phase 1 – Creation + Sync + Tests

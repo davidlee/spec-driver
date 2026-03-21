@@ -3,8 +3,8 @@ id: IP-041.PHASE-03
 slug: "041-cli_completeness_fill_obvious_command_gaps-phase-03"
 name: IP-041 Phase 03 — List improvements + final verification
 created: "2026-03-04"
-updated: "2026-03-04"
-status: complete
+updated: "2026-03-21"
+status: completed
 kind: phase
 ---
 

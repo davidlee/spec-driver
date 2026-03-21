@@ -74,9 +74,9 @@ close the delta.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] AUD-014 re-audit completed with concrete findings
-- [ ] AUD-014 verification coverage block references IMPR-019 criteria
-- [ ] DE-102 reconciled with final DR state
+- [x] AUD-014 re-audit completed with concrete findings
+- [x] AUD-014 verification coverage block references IMPR-019 criteria
+- [x] DE-102 reconciled with final DR state
 - [ ] Delta closed
 
 ## 5. Verification
@@ -94,9 +94,9 @@ close the delta.
 
 | Status | ID  | Description | Notes |
 | ------ | --- | ----------- | ----- |
-| [ ] | 1.1 | Re-audit DR-102 against IMPR-019 evaluation criteria | Use AUD skill |
-| [ ] | 1.2 | Populate AUD-014 verification coverage and findings | |
-| [ ] | 1.3 | Reconcile DE-102 with final DR state | Scope, risks, follow-ups |
+| [x] | 1.1 | Re-audit DR-102 against IMPR-019 evaluation criteria | 14 findings, all aligned |
+| [x] | 1.2 | Populate AUD-014 verification coverage and findings | 7 IMPR-019 criteria verified |
+| [x] | 1.3 | Reconcile DE-102 with final DR state | Updated summary, risks, notes |
 | [ ] | 1.4 | Close delta | `spec-driver complete delta DE-102` |
 
 ## 8. Risks & Mitigations

@@ -202,6 +202,12 @@ app.add_typer(
   help="Workflow orchestration commands",
 )
 
+app.add_typer(
+  workflow.accept_app,
+  name="accept",
+  help="Accept workflow artifacts (handoffs)",
+)
+
 app.command("block", help="Block a workflow (transitions to blocked state)")(
   workflow.block_command
 )

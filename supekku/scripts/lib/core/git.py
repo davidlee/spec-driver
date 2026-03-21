@@ -38,6 +38,55 @@ def get_head_sha(root: Path | None = None) -> str | None:
     return None
 
 
+def get_branch(root: Path | None = None) -> str | None:
+  """Return current branch name, or None if detached/not in a repo."""
+  try:
+    result = subprocess.run(  # noqa: S603, S607
+      ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+      capture_output=True,
+      text=True,
+      timeout=5,
+      cwd=root,
+      check=False,
+    )
+    if result.returncode != 0:
+      return None
+    branch = result.stdout.strip()
+    return None if branch == "HEAD" else branch  # detached
+  except (FileNotFoundError, subprocess.TimeoutExpired):
+    return None
+
+
+def has_uncommitted_changes(root: Path | None = None) -> bool:
+  """Check if working tree has uncommitted changes (unstaged)."""
+  try:
+    result = subprocess.run(  # noqa: S603, S607
+      ["git", "diff", "--quiet"],
+      capture_output=True,
+      timeout=5,
+      cwd=root,
+      check=False,
+    )
+    return result.returncode != 0
+  except (FileNotFoundError, subprocess.TimeoutExpired):
+    return False
+
+
+def has_staged_changes(root: Path | None = None) -> bool:
+  """Check if index has staged changes."""
+  try:
+    result = subprocess.run(  # noqa: S603, S607
+      ["git", "diff", "--cached", "--quiet"],
+      capture_output=True,
+      timeout=5,
+      cwd=root,
+      check=False,
+    )
+    return result.returncode != 0
+  except (FileNotFoundError, subprocess.TimeoutExpired):
+    return False
+
+
 def short_sha(sha: str, length: int = DEFAULT_SHORT_SHA_LENGTH) -> str:
   """Truncate a full SHA for display purposes.
 
@@ -54,6 +103,9 @@ def short_sha(sha: str, length: int = DEFAULT_SHORT_SHA_LENGTH) -> str:
 __all__ = [
   "DEFAULT_SHORT_SHA_LENGTH",
   "SHA_HEX_PATTERN",
+  "get_branch",
   "get_head_sha",
+  "has_staged_changes",
+  "has_uncommitted_changes",
   "short_sha",
 ]

@@ -852,6 +852,36 @@ def create_memory_cmd(
     raise typer.Exit(EXIT_FAILURE) from e
 
 
+@app.command("handoff")
+def create_handoff_cmd(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  to_role: Annotated[
+    str, typer.Option("--to", help="Target role"),
+  ] = "",
+  next_kind: Annotated[
+    str,
+    typer.Option("--next-kind", help="Next activity kind"),
+  ] = "",
+  next_summary: Annotated[
+    str | None,
+    typer.Option("--next-summary", help="Summary of next activity"),
+  ] = None,
+  root: RootOption = None,
+) -> None:
+  """Create a structured handoff for a delta."""
+  from supekku.cli.workflow import (  # noqa: PLC0415
+    create_handoff_command,
+  )
+
+  create_handoff_command(
+    delta=delta,
+    to_role=to_role,
+    next_kind=next_kind,
+    next_summary=next_summary,
+    root=root,
+  )
+
+
 # For direct testing
 if __name__ == "__main__":  # pragma: no cover
   app()

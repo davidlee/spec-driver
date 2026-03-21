@@ -7,6 +7,8 @@ Commands:
   phase start  — initialise workflow/state.yaml (planned → implementing)
   workflow status — read and display human-readable workflow state
   block / unblock — transition to/from blocked
+  create handoff — write handoff.current.yaml, transition to awaiting_handoff
+  accept handoff — claim + transition to implementing/reviewing
 """
 
 from __future__ import annotations
@@ -25,6 +27,7 @@ from supekku.scripts.lib.core.repo import find_repo_root
 
 workflow_app = typer.Typer(help="Workflow orchestration commands", no_args_is_help=True)
 phase_app = typer.Typer(help="Phase lifecycle commands", no_args_is_help=True)
+accept_app = typer.Typer(help="Accept workflow artifacts", no_args_is_help=True)
 
 
 # ---------------------------------------------------------------------------
@@ -415,4 +418,288 @@ def unblock_command(
     raise typer.Exit(EXIT_FAILURE) from exc
 
   typer.echo(f"Unblocked: {delta.upper()} (blocked → {result.new_state.value})")
+  raise typer.Exit(EXIT_SUCCESS)
+
+
+# ---------------------------------------------------------------------------
+# create handoff
+# ---------------------------------------------------------------------------
+
+
+def create_handoff_command(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  to_role: Annotated[
+    str,
+    typer.Option("--to", help="Target role"),
+  ],
+  next_kind: Annotated[
+    str,
+    typer.Option(
+      "--next-kind",
+      help="Next activity kind",
+    ),
+  ] = "",
+  next_summary: Annotated[
+    str | None,
+    typer.Option("--next-summary", help="Summary of next activity"),
+  ] = None,
+  root: RootOption = None,
+) -> None:
+  """Create a structured handoff, transitioning to awaiting_handoff."""
+  from supekku.scripts.lib.core.git import (  # noqa: PLC0415
+    get_branch,
+    get_head_sha,
+    has_staged_changes,
+    has_uncommitted_changes,
+    short_sha,
+  )
+  from supekku.scripts.lib.workflow.handoff_io import (  # noqa: PLC0415
+    HandoffValidationError,
+    build_handoff,
+    write_handoff,
+  )
+  from supekku.scripts.lib.workflow.state_io import (  # noqa: PLC0415
+    StateNotFoundError,
+    StateValidationError,
+    read_state,
+    update_state_workflow,
+    write_state,
+  )
+  from supekku.scripts.lib.workflow.state_machine import (  # noqa: PLC0415
+    TransitionCommand,
+    TransitionError,
+    WorkflowState,
+    apply_transition,
+  )
+
+  repo_root = find_repo_root(root)
+  delta_dir = _resolve_delta_dir(delta, repo_root)
+  delta_id = delta.upper()
+
+  # Read current state
+  try:
+    state_data = read_state(delta_dir)
+  except StateNotFoundError as exc:
+    typer.echo(f"No workflow state for {delta_id}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+  except StateValidationError as exc:
+    typer.echo(f"Invalid workflow state: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Validate transition
+  current = WorkflowState(state_data["workflow"]["status"])
+  try:
+    apply_transition(current, TransitionCommand.CREATE_HANDOFF)
+  except TransitionError as exc:
+    typer.echo(f"Cannot create handoff: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Infer next_activity_kind if not provided
+  activity_kind = next_kind or (
+    "review" if to_role == "reviewer" else "implementation"
+  )
+
+  # Assemble required_reading from delta bundle
+  artifact = state_data.get("artifact", {})
+  phase = state_data.get("phase", {})
+  plan = state_data.get("plan", {})
+
+  required_reading: list[str] = []
+  if artifact.get("path"):
+    # Add DE-*.md
+    delta_path = artifact["path"]
+    delta_md = f"{delta_path}/{delta_id}.md"
+    required_reading.append(delta_md)
+  if plan.get("path"):
+    required_reading.append(plan["path"])
+  if phase.get("path"):
+    required_reading.append(phase["path"])
+  if artifact.get("notes_path"):
+    required_reading.append(artifact["notes_path"])
+
+  if not required_reading:
+    # Fallback — at least one entry required
+    required_reading.append(f"{delta_id}")
+
+  # Git state
+  head_sha = get_head_sha(repo_root)
+  git_head = short_sha(head_sha) if head_sha else None
+  git_branch = get_branch(repo_root)
+  uncommitted = has_uncommitted_changes(repo_root)
+  staged = has_staged_changes(repo_root)
+
+  config = _load_workflow_config(repo_root)
+  boundary = config.get("workflow", {}).get(
+    "handoff_boundary", "phase",
+  )
+
+  handoff_data = build_handoff(
+    artifact_id=delta_id,
+    artifact_kind=artifact.get("kind", "delta"),
+    from_role=state_data["workflow"]["active_role"],
+    to_role=to_role,
+    phase_id=phase.get("id", "unknown"),
+    phase_status=phase.get("status"),
+    required_reading=required_reading,
+    boundary=boundary,
+    next_activity_kind=activity_kind,
+    next_activity_summary=next_summary,
+    git_head=git_head,
+    git_branch=git_branch,
+    has_uncommitted=uncommitted,
+    has_staged=staged,
+  )
+
+  # Write order per DR-102 §5: 1. handoff, 2. state
+  try:
+    handoff_path = write_handoff(delta_dir, handoff_data)
+  except HandoffValidationError as exc:
+    typer.echo(f"Handoff validation failed: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Update state: transition + clear claimed_by
+  update_state_workflow(
+    state_data,
+    status=WorkflowState.AWAITING_HANDOFF.value,
+    next_role=to_role,
+    claimed_by=None,  # New handoff resets claim (DR-102 §4)
+  )
+
+  try:
+    write_state(delta_dir, state_data)
+  except StateValidationError as exc:
+    typer.echo(f"State update failed: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  typer.echo(
+    f"Handoff created: {delta_id} → {to_role} "
+    f"({current.value} → awaiting_handoff)",
+  )
+  typer.echo(f"  file: {handoff_path}")
+  raise typer.Exit(EXIT_SUCCESS)
+
+
+# ---------------------------------------------------------------------------
+# accept handoff
+# ---------------------------------------------------------------------------
+
+
+@accept_app.command("handoff")
+def accept_handoff_command(
+  delta: Annotated[
+    str, typer.Argument(help="Delta ID (e.g. DE-103)"),
+  ],
+  identity: Annotated[
+    str | None,
+    typer.Option(
+      "--identity",
+      help="Claiming identity (defaults to $USER)",
+    ),
+  ] = None,
+  root: RootOption = None,
+) -> None:
+  """Accept a pending handoff, claiming it with identity guard."""
+  import os as _os  # noqa: PLC0415
+
+  from supekku.scripts.lib.workflow.handoff_io import (  # noqa: PLC0415
+    HandoffNotFoundError,
+    HandoffValidationError,
+    read_handoff,
+    write_handoff,
+  )
+  from supekku.scripts.lib.workflow.state_io import (  # noqa: PLC0415
+    StateNotFoundError,
+    StateValidationError,
+    read_state,
+    update_state_workflow,
+    write_state,
+  )
+  from supekku.scripts.lib.workflow.state_machine import (  # noqa: PLC0415
+    ClaimError,
+    TransitionCommand,
+    TransitionError,
+    WorkflowState,
+    apply_transition,
+    check_claim,
+  )
+
+  repo_root = find_repo_root(root)
+  delta_dir = _resolve_delta_dir(delta, repo_root)
+  delta_id = delta.upper()
+  caller = identity or _os.environ.get("USER", "unknown")
+
+  # Read state
+  try:
+    state_data = read_state(delta_dir)
+  except StateNotFoundError as exc:
+    typer.echo(f"No workflow state for {delta_id}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+  except StateValidationError as exc:
+    typer.echo(f"Invalid workflow state: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Read handoff
+  try:
+    handoff_data = read_handoff(delta_dir)
+  except HandoffNotFoundError as exc:
+    typer.echo(f"No pending handoff for {delta_id}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+  except HandoffValidationError as exc:
+    typer.echo(f"Invalid handoff: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Check claim guard
+  current_claimant = state_data["workflow"].get("claimed_by")
+  try:
+    check_claim(current_claimant, caller)
+  except ClaimError as exc:
+    typer.echo(f"Claim guard: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Idempotent: if already claimed by same identity, no-op
+  if current_claimant == caller:
+    typer.echo(f"Already claimed by {caller}: {delta_id}")
+    raise typer.Exit(EXIT_SUCCESS)
+
+  # Determine to_role from handoff
+  to_role = handoff_data["transition"]["to_role"]
+
+  # Validate transition
+  current = WorkflowState(state_data["workflow"]["status"])
+  try:
+    result = apply_transition(
+      current, TransitionCommand.ACCEPT_HANDOFF, to_role=to_role,
+    )
+  except TransitionError as exc:
+    typer.echo(f"Cannot accept handoff: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Update state: transition + set claimed_by + set active_role
+  update_state_workflow(
+    state_data,
+    status=result.new_state.value,
+    active_role=to_role,
+    claimed_by=caller,
+    next_role=None,
+  )
+  # Clear next_role from workflow dict
+  state_data["workflow"].pop("next_role", None)
+
+  try:
+    write_state(delta_dir, state_data)
+  except StateValidationError as exc:
+    typer.echo(f"State update failed: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Mark handoff as accepted (non-critical — state is authoritative)
+  import contextlib  # noqa: PLC0415
+
+  handoff_data["transition"]["status"] = "accepted"
+  with contextlib.suppress(HandoffValidationError):
+    write_handoff(delta_dir, handoff_data)
+
+  typer.echo(
+    f"Handoff accepted: {delta_id} → {to_role} "
+    f"(claimed by {caller})",
+  )
   raise typer.Exit(EXIT_SUCCESS)

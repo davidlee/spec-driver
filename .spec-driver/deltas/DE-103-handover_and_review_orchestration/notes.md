@@ -300,8 +300,49 @@ Files:
 
 ### Follow-up
 
-- Phase 05: phase complete, bridges, continuation refit
+- Phase 05: phase complete, bridges, continuation refit — done (see below)
 - `operations.py` still unused — future skinny-CLI refactor opportunity
 - Placeholder renderers from Phase 01 still in place
 - Git-diff-based domain_map construction (assembling code areas from changed
   files) deferred — current approach uses delta bundle structure
+
+---
+
+## Phase 05 — Phase complete, bridges, continuation refit
+
+### What's done
+
+- **`phase complete` command**: Marks phase complete in state.yaml. Emits
+  auto-handoff per policy (`auto_handoff_on_phase_complete`) or bridge block
+  (`handoff_ready: true`). Bridge block takes precedence over policy. `--to`
+  flag overrides target role. `--no-handoff` suppresses emission. Idempotent
+  re-run supported.
+- **Bridge block I/O** (`bridge.py`): Extract phase-bridge and notes-bridge
+  from markdown using fenced YAML block patterns. Render both bridge types.
+  Full roundtrip extraction tested.
+- **Continuation skill refit**: Updated SKILL.md to instruct agents to invoke
+  `spec-driver create handoff` or `spec-driver phase complete` when
+  `workflow/state.yaml` exists. No silent fallback to prose-only mode. Prose
+  handoff preserved when no orchestration is active.
+
+Files:
+- `supekku/scripts/lib/workflow/bridge.py` — bridge extraction and rendering
+- `supekku/scripts/lib/workflow/bridge_test.py` — 13 tests
+- `supekku/cli/workflow.py` — `phase complete` command
+- `supekku/cli/workflow_phase_complete_test.py` — 8 CLI tests
+- `supekku/skills/continuation/SKILL.md` — refit
+- `.spec-driver/skills/continuation/SKILL.md` — synced copy
+
+### Verification
+
+- 13 bridge tests + 8 phase complete CLI tests = 21 new tests
+- 159 total workflow tests passing
+- ruff clean
+
+### Commits
+
+- `c2ace647` — feat(DE-103): phase complete, bridge blocks, continuation skill refit
+
+### Follow-up
+
+- Phase 06: configuration, docs, integration testing, end-to-end verification

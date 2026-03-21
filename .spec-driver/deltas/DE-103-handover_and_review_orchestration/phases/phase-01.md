@@ -4,7 +4,7 @@ slug: "103-handover_and_review_orchestration-phase-01"
 name: Schema definitions and registration
 created: "2026-03-21"
 updated: "2026-03-21"
-status: in_progress
+status: done
 kind: phase
 ---
 
@@ -74,11 +74,11 @@ so they appear in `spec-driver list schemas` and `spec-driver show schema`.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] All 7 schemas defined as `BlockMetadata` instances with correct required/optional/enum fields
-- [ ] `MetadataValidator` produces correct errors for invalid input
-- [ ] `MetadataValidator` accepts valid input for all schemas
-- [ ] Schemas registered and visible via `spec-driver list schemas`
-- [ ] Lint clean, all tests passing
+- [x] All 7 schemas defined as `BlockMetadata` instances with correct required/optional/enum fields
+- [x] `MetadataValidator` produces correct errors for invalid input
+- [x] `MetadataValidator` accepts valid input for all schemas
+- [x] Schemas registered and visible via `spec-driver list schemas`
+- [x] Lint clean, all tests passing
 
 ## 5. Verification
 
@@ -95,12 +95,12 @@ so they appear in `spec-driver list schemas` and `spec-driver show schema`.
 
 | Status | ID  | Description | Notes |
 |--------|-----|-------------|-------|
-| [ ] | T01 | Create `workflow_metadata.py` — 5 workflow schema definitions | state, handoff, review-index, review-findings, sessions |
-| [ ] | T02 | Add bridge schema definitions | notes-bridge, phase-bridge |
-| [ ] | T03 | Register all 7 schemas in block schema registry | Via `register_block_schema` at module level |
-| [ ] | T04 | Add side-effect import in `cli/schema.py` | So schemas are registered when CLI lists them |
-| [ ] | T05 | Write `workflow_metadata_test.py` | Valid/invalid cases for all 7 schemas |
-| [ ] | T06 | Lint and verify | ruff, pytest, `list schemas` |
+| [x] | T01 | Create `workflow_metadata.py` — 5 workflow schema definitions | state, handoff, review-index, review-findings, sessions |
+| [x] | T02 | Add bridge schema definitions | notes-bridge, phase-bridge |
+| [x] | T03 | Register all 7 schemas in block schema registry | Via `register_block_schema` at module level |
+| [x] | T04 | Add side-effect import in `cli/schema.py` | So schemas are registered when CLI lists them |
+| [x] | T05 | Write `workflow_metadata_test.py` | 68 tests — valid/invalid cases for all 7 schemas |
+| [x] | T06 | Lint and verify | ruff clean, 320 tests passing, `list schemas` verified |
 
 ## 8. Risks & Mitigations
 
@@ -110,15 +110,22 @@ so they appear in `spec-driver list schemas` and `spec-driver show schema`.
 
 ## 9. Decisions & Outcomes
 
-_To be filled during implementation._
+- 2026-03-21 — Sessions schema uses sentinel `_entry_shape` property to satisfy
+  FieldMetadata's non-empty-properties requirement for object type. Dynamic
+  role-name keys validated at command level in Phase 02+.
+- 2026-03-21 — Placeholder renderers registered. Real renderers deferred to
+  phases that implement CLI commands.
 
 ## 10. Findings / Research Notes
 
-_To be filled during implementation._
+- The existing `BlockMetadata`/`FieldMetadata`/`MetadataValidator` system
+  handles all DR-102 constraints except cross-field uniqueness (e.g., finding
+  IDs unique across blocking/non_blocking/resolved/waived lists). This will
+  need command-level validation.
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (68 tests, lint clean)
+- [x] Notes updated
 - [ ] Hand-off notes to Phase 02

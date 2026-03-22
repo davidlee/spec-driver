@@ -39,31 +39,40 @@ class TransitionTableTest(unittest.TestCase):
 
   def test_accept_handoff_to_implementing(self) -> None:
     result = apply_transition(
-      _S.AWAITING_HANDOFF, _C.ACCEPT_HANDOFF, to_role="implementer",
+      _S.AWAITING_HANDOFF,
+      _C.ACCEPT_HANDOFF,
+      to_role="implementer",
     )
     assert result.new_state == _S.IMPLEMENTING
 
   def test_accept_handoff_to_implementing_for_architect(self) -> None:
     result = apply_transition(
-      _S.AWAITING_HANDOFF, _C.ACCEPT_HANDOFF, to_role="architect",
+      _S.AWAITING_HANDOFF,
+      _C.ACCEPT_HANDOFF,
+      to_role="architect",
     )
     assert result.new_state == _S.IMPLEMENTING
 
   def test_accept_handoff_to_implementing_for_operator(self) -> None:
     result = apply_transition(
-      _S.AWAITING_HANDOFF, _C.ACCEPT_HANDOFF, to_role="operator",
+      _S.AWAITING_HANDOFF,
+      _C.ACCEPT_HANDOFF,
+      to_role="operator",
     )
     assert result.new_state == _S.IMPLEMENTING
 
   def test_accept_handoff_to_reviewing(self) -> None:
     result = apply_transition(
-      _S.AWAITING_HANDOFF, _C.ACCEPT_HANDOFF, to_role="reviewer",
+      _S.AWAITING_HANDOFF,
+      _C.ACCEPT_HANDOFF,
+      to_role="reviewer",
     )
     assert result.new_state == _S.REVIEWING
 
   def test_review_complete_changes_requested(self) -> None:
     result = apply_transition(
-      _S.REVIEWING, _C.REVIEW_COMPLETE_CHANGES_REQUESTED,
+      _S.REVIEWING,
+      _C.REVIEW_COMPLETE_CHANGES_REQUESTED,
     )
     assert result.new_state == _S.CHANGES_REQUESTED
 
@@ -93,7 +102,9 @@ class BlockUnblockTest(unittest.TestCase):
       if prev == _S.BLOCKED:
         continue
       result = apply_transition(
-        _S.BLOCKED, _C.UNBLOCK, previous_state=prev,
+        _S.BLOCKED,
+        _C.UNBLOCK,
+        previous_state=prev,
       )
       assert result.new_state == prev
 
@@ -170,8 +181,13 @@ class WorkflowStateEnumTest(unittest.TestCase):
   def test_all_seven_states(self) -> None:
     assert len(WorkflowState) == 7
     expected = {
-      "planned", "implementing", "awaiting_handoff", "reviewing",
-      "changes_requested", "approved", "blocked",
+      "planned",
+      "implementing",
+      "awaiting_handoff",
+      "reviewing",
+      "changes_requested",
+      "approved",
+      "blocked",
     }
     assert {s.value for s in WorkflowState} == expected
 

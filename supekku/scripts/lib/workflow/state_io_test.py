@@ -156,7 +156,9 @@ class InitStateTest(unittest.TestCase):
   def test_init_respects_config(self) -> None:
     config = {"workflow": {"handoff_boundary": "task"}}
     data = init_state(
-      artifact_id="DE-100", phase_id="IP-100.PHASE-01", config=config,
+      artifact_id="DE-100",
+      phase_id="IP-100.PHASE-01",
+      config=config,
     )
     assert data["workflow"]["handoff_boundary"] == "task"
 

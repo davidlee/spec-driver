@@ -4,6 +4,26 @@ Tests for validator module.
 
 ## Classes
 
+### PhaseValidationTest
+
+Tests for phase status validation and --fix (DE-104).
+
+**Inherits from:** RepoTestCase
+
+#### Methods
+
+- `test_active_variant_normalised_by_fix(self) -> None`
+- `test_canonical_status_no_issue(self) -> None`
+- `test_complete_variant_normalised_by_fix(self) -> None`
+- `test_fix_idempotent(self) -> None`
+- `test_fix_normalises_status(self) -> None`
+- `test_missing_overview_block_warns(self) -> None`
+- `test_missing_status_warns(self) -> None`
+- `test_non_canonical_status_warns(self) -> None`
+- `test_non_standard_filename_not_discovered(self) -> None`: phase-05-plan.md is not matched by phase-[0-9][0-9].md glob (DEC-104-06).
+- `test_wrong_kind_warns(self) -> None`
+- `_create_repo_with_phase(self) -> Path`
+
 ### TestUnresolvedReferenceValidation
 
 VT-097-unresolved: unresolved frontmatter references detected.

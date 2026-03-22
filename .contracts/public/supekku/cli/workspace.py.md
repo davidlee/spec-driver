@@ -19,10 +19,13 @@ Exit codes: 0 = all pass, 1 = warnings, 2 = failures.
 
 Creates the necessary directory structure and initializes registry files
 for a new spec-driver workspace.
-- @app.command(validate) `validate(root, sync, strict, verbose) -> None`: Validate workspace metadata and relationships.
+- @app.command(validate) `validate(root, sync, strict, verbose, fix) -> None`: Validate workspace metadata and relationships.
 
 Checks workspace integrity, validates cross-references between documents,
 and reports any issues found.
 
 By default, only errors and warnings are shown. Use --verbose to see
 info-level messages about planned verification artifacts.
+
+Use --fix to auto-repair known-safe normalisations (e.g. non-canonical
+phase status values). Run without --fix first to preview findings.

@@ -312,7 +312,7 @@ class CreateChangeTest(unittest.TestCase):
 
     # VT-016-002: Create first phase when none exist (PROD-011.FR-002)
     result = create_phase("Phase 01 - Foundation", plan_id, repo_root=root)
-    assert result.phase_id == f"{plan_id}.PHASE-01"
+    assert result.phase_id == f"{plan_id}-P01"
     assert result.plan_id == plan_id
     assert result.phase_path.exists()
     assert result.phase_path.name == "phase-01.md"
@@ -323,7 +323,7 @@ class CreateChangeTest(unittest.TestCase):
     # Verify frontmatter
     frontmatter, _ = load_markdown_file(result.phase_path)
     assert frontmatter["kind"] == "phase"
-    assert frontmatter["id"] == f"{plan_id}.PHASE-01"
+    assert frontmatter["id"] == f"{plan_id}-P01"
 
   def test_create_phase_auto_increment(self) -> None:
     """VT-016-004: Test phase numbering automatically increments from 01 onwards."""
@@ -340,17 +340,17 @@ class CreateChangeTest(unittest.TestCase):
 
     # Create first phase (none exist yet per FR-001)
     result1 = create_phase("Phase 01 - Foundation", plan_id, repo_root=root)
-    assert result1.phase_id == f"{plan_id}.PHASE-01"
+    assert result1.phase_id == f"{plan_id}-P01"
     assert result1.phase_path.name == "phase-01.md"
 
     # Create second phase
     result2 = create_phase("Phase 02 - Next", plan_id, repo_root=root)
-    assert result2.phase_id == f"{plan_id}.PHASE-02"
+    assert result2.phase_id == f"{plan_id}-P02"
     assert result2.phase_path.name == "phase-02.md"
 
     # Create third phase
     result3 = create_phase("Phase 03 - Final", plan_id, repo_root=root)
-    assert result3.phase_id == f"{plan_id}.PHASE-03"
+    assert result3.phase_id == f"{plan_id}-P03"
     assert result3.phase_path.name == "phase-03.md"
 
   def test_create_phase_invalid_plan(self) -> None:
@@ -386,14 +386,14 @@ class CreateChangeTest(unittest.TestCase):
 
     # Verify all metadata fields
     frontmatter, body = load_markdown_file(result.phase_path)
-    assert frontmatter["id"] == f"{plan_id}.PHASE-01"
+    assert frontmatter["id"] == f"{plan_id}-P01"
     assert frontmatter["kind"] == "phase"
     assert frontmatter["status"] == "draft"
     assert "created" in frontmatter
     assert "updated" in frontmatter
 
     # Check YAML block in body contains correct IDs
-    assert f"phase: {plan_id}.PHASE-01" in body
+    assert f"phase: {plan_id}-P01" in body
     assert f"plan: {plan_id}" in body
     assert f"delta: {delta_id}" in body
 
@@ -414,8 +414,7 @@ class CreateChangeTest(unittest.TestCase):
     # Read plan before creating phases (should have no phases initially per FR-001)
     content_before = plan_path.read_text(encoding="utf-8")
     assert "phases:" in content_before
-    # Should have empty phases array initially
-    assert f"{plan_id}.PHASE-01" not in content_before
+    assert f"{plan_id}-P01" in content_before
 
     # Create first phase
     result1 = create_phase("Phase 01 - Test", plan_id, repo_root=root)
@@ -429,8 +428,8 @@ class CreateChangeTest(unittest.TestCase):
     # Verify both phases added to plan.overview
     assert f"- id: {result1.phase_id}" in content_after
     assert f"- id: {result2.phase_id}" in content_after
-    assert f"- id: {plan_id}.PHASE-01" in content_after
-    assert f"- id: {plan_id}.PHASE-02" in content_after
+    assert f"- id: {plan_id}-P01" in content_after
+    assert f"- id: {plan_id}-P02" in content_after
 
     # Verify both phases present
     assert content_after.count("- id: ") >= 2
@@ -453,7 +452,7 @@ class CreateChangeTest(unittest.TestCase):
 
     # Read after phase-01 created
     content_after_01 = plan_path.read_text(encoding="utf-8")
-    assert f"{plan_id}.PHASE-01" in content_after_01
+    assert f"{plan_id}-P01" in content_after_01
 
     # Create phase-02
     create_phase("Phase 02", plan_id, repo_root=root)
@@ -463,14 +462,13 @@ class CreateChangeTest(unittest.TestCase):
 
     # Verify all three phases present and phase-01 not corrupted
     content_after = plan_path.read_text(encoding="utf-8")
-    assert f"{plan_id}.PHASE-01" in content_after
-    assert f"{plan_id}.PHASE-02" in content_after
-    assert f"{plan_id}.PHASE-03" in content_after
+    assert f"{plan_id}-P01" in content_after
+    assert f"{plan_id}-P02" in content_after
+    assert f"{plan_id}-P03" in content_after
 
     # Verify structure still valid (phases as list)
     assert "phases:" in content_after
-    # Count should be 4: 1 placeholder (IP-001-P01) + 3 created phases
-    assert content_after.count("- id: ") == 4
+    assert content_after.count("- id: ") == 3
 
   def test_create_phase_copies_criteria_from_plan(self) -> None:
     """VT-CREATE-013-002: Test phase criteria copied from IP metadata."""
@@ -566,6 +564,45 @@ class CreateChangeTest(unittest.TestCase):
     assert result.phase_path.exists()
     phase_content = result.phase_path.read_text(encoding="utf-8")
     assert f"phase: {plan_id}.PHASE-01" in phase_content
+
+  def test_create_phase_hyphenated_manual_plan_entries_do_not_duplicate(self) -> None:
+    """Regression: hand-authored `-P##` plans stay stable under create_phase."""
+    root = self._make_repo()
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+
+    plan_content = plan_path.read_text(encoding="utf-8")
+    updated_plan = plan_content.replace(
+      f"  - id: {plan_id}-P01",
+      dedent(
+        f"""\
+          - id: {plan_id}-P01
+            name: Phase 01
+            objective: Foundation
+          - id: {plan_id}-P02
+            name: Phase 02
+            objective: Follow-up"""
+      ),
+    )
+    plan_path.write_text(updated_plan, encoding="utf-8")
+
+    result = create_phase("Foundation", plan_id, repo_root=root)
+
+    assert result.phase_id == f"{plan_id}-P01"
+    phase_content = result.phase_path.read_text(encoding="utf-8")
+    assert f"phase: {plan_id}-P01" in phase_content
+    assert "Foundation" in phase_content
+
+    updated = plan_path.read_text(encoding="utf-8")
+    assert updated.count(f"- id: {plan_id}-P01") == 1
+    assert updated.count(f"- id: {plan_id}-P02") == 1
 
   def test_create_phase_partial_metadata_handles_correctly(self) -> None:
     """VT-CREATE-013-002: Test partial metadata (some fields present)."""

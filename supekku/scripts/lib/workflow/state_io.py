@@ -111,7 +111,9 @@ def write_state(
 
   # Atomic write: temp file + rename (same dir for same-fs rename)
   fd, tmp = tempfile.mkstemp(
-    dir=path.parent, suffix=".tmp", prefix="state_",
+    dir=path.parent,
+    suffix=".tmp",
+    prefix="state_",
   )
   closed = False
   try:

@@ -99,7 +99,9 @@ def write_handoff(
   content = yaml.dump(data, default_flow_style=False, sort_keys=False)
 
   fd, tmp = tempfile.mkstemp(
-    dir=path.parent, suffix=".tmp", prefix="handoff_",
+    dir=path.parent,
+    suffix=".tmp",
+    prefix="handoff_",
   )
   closed = False
   try:

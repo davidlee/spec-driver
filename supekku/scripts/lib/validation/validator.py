@@ -39,7 +39,11 @@ class WorkspaceValidator:
   """Validates workspace consistency and artifact relationships."""
 
   def __init__(
-    self, workspace: Workspace, strict: bool = False, *, fix: bool = False,
+    self,
+    workspace: Workspace,
+    strict: bool = False,
+    *,
+    fix: bool = False,
   ) -> None:
     self.workspace = workspace
     self.issues: list[ValidationIssue] = []
@@ -436,7 +440,6 @@ class WorkspaceValidator:
         f"(via {edge.source_slot}.{edge.detail})",
       )
 
-
   # -----------------------------------------------------------
   # Phase status validation (DE-104)
   # -----------------------------------------------------------
@@ -460,7 +463,7 @@ class WorkspaceValidator:
 
   def _validate_single_phase(
     self,
-    phase_file: "Path",
+    phase_file: Path,
     valid_statuses: list[str],
   ) -> None:
     """Validate a single phase file's frontmatter and structure."""
@@ -495,7 +498,7 @@ class WorkspaceValidator:
 
 
 def validate_workspace(
-  workspace: "Workspace",
+  workspace: Workspace,
   strict: bool = False,
   *,
   fix: bool = False,

@@ -72,7 +72,8 @@ class _ReviewTestBase(unittest.TestCase):
     assert result.exit_code == 0, result.output
 
   def _create_handoff_and_accept_as_reviewer(
-    self, delta_id: str = "DE-100",
+    self,
+    delta_id: str = "DE-100",
   ) -> None:
     """Create handoff to reviewer and accept it."""
     with (
@@ -82,10 +83,12 @@ class _ReviewTestBase(unittest.TestCase):
       patch("supekku.scripts.lib.core.git.has_staged_changes", return_value=False),
     ):
       self.runner.invoke(
-        app, ["create", "handoff", delta_id, "--to", "reviewer"],
+        app,
+        ["create", "handoff", delta_id, "--to", "reviewer"],
       )
     self.runner.invoke(
-      app, ["accept", "handoff", delta_id, "--identity", "reviewer-1"],
+      app,
+      ["accept", "handoff", delta_id, "--identity", "reviewer-1"],
     )
 
 
@@ -154,7 +157,8 @@ class ReviewPrimeTest(_ReviewTestBase):
 
     # First prime
     with patch(
-      "supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40,
+      "supekku.scripts.lib.core.git.get_head_sha",
+      return_value="a" * 40,
     ):
       self.runner.invoke(app, ["review", "prime", "DE-100"])
 
@@ -165,7 +169,8 @@ class ReviewPrimeTest(_ReviewTestBase):
 
     # Second prime with new HEAD
     with patch(
-      "supekku.scripts.lib.core.git.get_head_sha", return_value="b" * 40,
+      "supekku.scripts.lib.core.git.get_head_sha",
+      return_value="b" * 40,
     ):
       self.runner.invoke(app, ["review", "prime", "DE-100"])
 
@@ -203,7 +208,8 @@ class ReviewCompleteTest(_ReviewTestBase):
     self._create_handoff_and_accept_as_reviewer()
 
     result = self.runner.invoke(
-      app, ["review", "complete", "DE-100", "--status", "changes_requested"],
+      app,
+      ["review", "complete", "DE-100", "--status", "changes_requested"],
     )
     assert result.exit_code == 0, result.output
     assert "changes_requested" in result.output
@@ -226,7 +232,8 @@ class ReviewCompleteTest(_ReviewTestBase):
     self._create_handoff_and_accept_as_reviewer()
 
     result = self.runner.invoke(
-      app, ["review", "complete", "DE-100", "--status", "approved"],
+      app,
+      ["review", "complete", "DE-100", "--status", "approved"],
     )
     assert result.exit_code == 0, result.output
     assert "approved" in result.output
@@ -261,10 +268,12 @@ class ReviewCompleteTest(_ReviewTestBase):
       patch("supekku.scripts.lib.core.git.has_staged_changes", return_value=False),
     ):
       self.runner.invoke(
-        app, ["create", "handoff", "DE-100", "--to", "reviewer"],
+        app,
+        ["create", "handoff", "DE-100", "--to", "reviewer"],
       )
     self.runner.invoke(
-      app, ["accept", "handoff", "DE-100", "--identity", "reviewer-2"],
+      app,
+      ["accept", "handoff", "DE-100", "--identity", "reviewer-2"],
     )
 
     # Round 2 — use changes_requested to avoid auto-teardown deleting findings
@@ -299,7 +308,8 @@ class ReviewCompleteTest(_ReviewTestBase):
     _create_delta_bundle(self.root)
     self._start_phase()
     result = self.runner.invoke(
-      app, ["review", "complete", "DE-100", "--status", "invalid"],
+      app,
+      ["review", "complete", "DE-100", "--status", "invalid"],
     )
     assert result.exit_code == 1
 
@@ -310,7 +320,8 @@ class ReviewCompleteTest(_ReviewTestBase):
     self._start_phase()
     # Still implementing, not reviewing
     result = self.runner.invoke(
-      app, ["review", "complete", "DE-100", "--status", "approved"],
+      app,
+      ["review", "complete", "DE-100", "--status", "approved"],
     )
     assert result.exit_code == 1
 
@@ -324,9 +335,13 @@ class ReviewCompleteTest(_ReviewTestBase):
     result = self.runner.invoke(
       app,
       [
-        "review", "complete", "DE-100",
-        "--status", "changes_requested",
-        "--summary", "Needs revision",
+        "review",
+        "complete",
+        "DE-100",
+        "--status",
+        "changes_requested",
+        "--summary",
+        "Needs revision",
       ],
     )
     assert result.exit_code == 0, result.output
@@ -348,7 +363,8 @@ class ReviewCompleteTest(_ReviewTestBase):
     assert (delta_dir / "workflow" / "review-index.yaml").exists()
 
     self.runner.invoke(
-      app, ["review", "complete", "DE-100", "--status", "approved"],
+      app,
+      ["review", "complete", "DE-100", "--status", "approved"],
     )
 
     # Teardown should have deleted review-index and bootstrap
@@ -424,14 +440,16 @@ class WriteOrderTest(_ReviewTestBase):
 
   @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
   def test_review_complete_creates_findings_and_updates_state(
-    self, *_mocks,
+    self,
+    *_mocks,
   ) -> None:
     delta_dir = _create_delta_bundle(self.root)
     self._start_phase()
     self._create_handoff_and_accept_as_reviewer()
 
     self.runner.invoke(
-      app, ["review", "complete", "DE-100", "--status", "changes_requested"],
+      app,
+      ["review", "complete", "DE-100", "--status", "changes_requested"],
     )
 
     assert (delta_dir / "workflow" / "review-findings.yaml").exists()

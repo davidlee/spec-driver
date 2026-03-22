@@ -72,7 +72,8 @@ def evaluate_staleness(
   # 3. Major scope change (delta updated timestamp newer than cache)
   if delta_updated:
     cache_bootstrapped = cached_index.get("review", {}).get(
-      "last_bootstrapped_at", "",
+      "last_bootstrapped_at",
+      "",
     )
     if delta_updated > cache_bootstrapped:
       triggers.append("major_scope_change")
@@ -89,7 +90,8 @@ def evaluate_staleness(
 
   # Check invalidation rules (stale → invalid)
   invalidation_reasons = _check_invalidation(
-    cached_index, changed_files=changed_files,
+    cached_index,
+    changed_files=changed_files,
   )
   if invalidation_reasons:
     return StalenessResult(

@@ -21,6 +21,7 @@ from supekku.scripts.lib.blocks.plan import (
   render_plan_overview_block,
 )
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
+from supekku.scripts.lib.changes.lifecycle import STATUS_DRAFT
 from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.core.paths import (
   get_audits_dir,
@@ -28,7 +29,6 @@ from supekku.scripts.lib.core.paths import (
   get_revisions_dir,
   get_templates_dir,
 )
-from supekku.scripts.lib.changes.lifecycle import STATUS_DRAFT
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
 from supekku.scripts.lib.specs.creation import (
   extract_template_body,
@@ -631,6 +631,121 @@ def _parse_phase_number(filename: str) -> int | None:
   return None
 
 
+PHASE_ID_FORMAT_HYPHEN = "hyphen"
+PHASE_ID_FORMAT_DOTTED = "dotted"
+_PHASE_ID_PATTERN = re.compile(
+  r"^(?P<plan>IP-\d{3,})(?:(?:-P)|(?:\.PHASE-))(?P<num>\d{2})$"
+)
+
+
+def _parse_phase_identity(phase_id: str) -> tuple[str, int, str] | None:
+  """Parse a phase ID into plan, sequence number, and spelling convention."""
+
+  match = _PHASE_ID_PATTERN.match(str(phase_id).strip())
+  if not match:
+    return None
+  raw = match.group(0)
+  return (
+    match.group("plan"),
+    int(match.group("num")),
+    PHASE_ID_FORMAT_DOTTED if ".PHASE-" in raw else PHASE_ID_FORMAT_HYPHEN,
+  )
+
+
+def _phase_sequence_from_id(phase_id: str, *, plan_id: str) -> int | None:
+  """Return phase sequence number when the ID belongs to the given plan."""
+
+  parsed = _parse_phase_identity(phase_id)
+  if parsed is None:
+    return None
+  parsed_plan_id, phase_num, _ = parsed
+  if parsed_plan_id != plan_id:
+    return None
+  return phase_num
+
+
+def _phase_ids_equivalent(left: str, right: str) -> bool:
+  """Return True when two phase IDs refer to the same logical phase."""
+
+  left_parsed = _parse_phase_identity(left)
+  right_parsed = _parse_phase_identity(right)
+  if left_parsed is None or right_parsed is None:
+    return left == right
+  return left_parsed[:2] == right_parsed[:2]
+
+
+def _render_phase_id(plan_id: str, phase_num: int, *, spelling: str) -> str:
+  """Render a phase ID using the requested spelling convention."""
+
+  if spelling == PHASE_ID_FORMAT_DOTTED:
+    return f"{plan_id}.PHASE-{phase_num:02d}"
+  return f"{plan_id}-P{phase_num:02d}"
+
+
+def _plan_phase_entries(plan_content: str) -> list[dict[str, object]]:
+  """Return normalized phase entries from a plan overview block."""
+
+  block = extract_plan_overview(plan_content)
+  if block is None:
+    return []
+  phases = block.data.get("phases", [])
+  if not isinstance(phases, list):
+    return []
+  return [phase for phase in phases if isinstance(phase, dict)]
+
+
+def _select_phase_sequence(
+  *,
+  plan_id: str,
+  plan_content: str,
+  phases_dir: Path,
+) -> tuple[int, str]:
+  """Choose the next phase sequence and spelling for create_phase.
+
+  Prefer the first plan-authored phase entry that does not yet have a phase
+  file, so `create phase` materializes the intended phase sheet instead of
+  inventing a parallel identifier. When every planned phase already has a file,
+  allocate the next sequence number after the highest known phase.
+  """
+
+  planned_numbers: list[int] = []
+  planned_spellings: dict[int, str] = {}
+  for phase in _plan_phase_entries(plan_content):
+    phase_id = phase.get("id")
+    if not isinstance(phase_id, str):
+      continue
+    parsed = _parse_phase_identity(phase_id)
+    if parsed is None or parsed[0] != plan_id:
+      continue
+    _, phase_num, spelling = parsed
+    planned_numbers.append(phase_num)
+    planned_spellings.setdefault(phase_num, spelling)
+
+  existing_file_numbers: set[int] = set()
+  if phases_dir.exists():
+    for entry in phases_dir.iterdir():
+      if entry.is_file():
+        file_number = _parse_phase_number(entry.name)
+        if file_number is not None:
+          existing_file_numbers.add(file_number)
+
+  for planned_number in sorted(set(planned_numbers)):
+    if planned_number not in existing_file_numbers:
+      return planned_number, planned_spellings.get(
+        planned_number,
+        PHASE_ID_FORMAT_HYPHEN,
+      )
+
+  known_numbers = set(planned_numbers) | existing_file_numbers
+  next_number = max(known_numbers, default=0) + 1
+  fallback_spelling = (
+    planned_spellings[min(planned_numbers)]
+    if planned_numbers
+    else PHASE_ID_FORMAT_HYPHEN
+  )
+  return next_number, fallback_spelling
+
+
 def _find_next_phase_number(phases_dir: Path) -> int:
   """Find next phase number by scanning existing phase files.
 
@@ -688,8 +803,16 @@ def _update_plan_overview_phases(
     msg = f"plan.overview phases is not a list in {plan_path}"
     raise ValueError(msg)
 
-  # Add phase with minimal metadata (id only)
+  # Add phase with minimal metadata (id only) unless an equivalent phase exists.
   phases.append({"id": phase_id})
+  for existing_phase in phases[:-1]:
+    if not isinstance(existing_phase, dict):
+      continue
+    existing_phase_id = existing_phase.get("id")
+    if isinstance(existing_phase_id, str) and _phase_ids_equivalent(
+      existing_phase_id, phase_id
+    ):
+      return
   data["phases"] = phases
 
   # Re-serialize YAML block
@@ -751,7 +874,10 @@ def _extract_phase_metadata_from_plan(
   for phase in phases:
     if not isinstance(phase, dict):
       continue
-    if phase.get("id") != phase_id:
+    candidate_phase_id = phase.get("id")
+    if not isinstance(candidate_phase_id, str):
+      continue
+    if not _phase_ids_equivalent(candidate_phase_id, phase_id):
       continue
 
     # Found the phase - extract optional metadata
@@ -845,11 +971,15 @@ def create_phase(
   phases_dir = delta_dir / "phases"
   _ensure_directory(phases_dir)
 
-  # Determine next phase number
-  phase_num = _find_next_phase_number(phases_dir)
+  # Determine next phase number and spelling convention from plan + filesystem.
+  phase_num, phase_id_spelling = _select_phase_sequence(
+    plan_id=plan_id,
+    plan_content=content,
+    phases_dir=phases_dir,
+  )
 
   # Generate phase ID
-  phase_id = f"{plan_id}.PHASE-{phase_num:02d}"
+  phase_id = _render_phase_id(plan_id, phase_num, spelling=phase_id_spelling)
   record_artifact(phase_id)
 
   # Get current date

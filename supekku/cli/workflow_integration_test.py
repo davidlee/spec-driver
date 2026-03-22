@@ -30,8 +30,7 @@ def _create_delta_bundle(
   delta_dir.mkdir(parents=True, exist_ok=True)
 
   (delta_dir / f"{delta_id}.md").write_text(
-    f"---\nid: {delta_id}\nstatus: in-progress\nkind: delta\n---\n"
-    f"# {delta_id}\n",
+    f"---\nid: {delta_id}\nstatus: in-progress\nkind: delta\n---\n# {delta_id}\n",
   )
   (delta_dir / f"{plan_id}.md").write_text(
     f"---\nid: {plan_id}\nstatus: draft\nkind: plan\n---\n",
@@ -81,9 +80,7 @@ class _IntegrationTestBase(unittest.TestCase):
 
   def _run(self, *args: str) -> str:
     result = self.runner.invoke(app, list(args))
-    assert result.exit_code == 0, (
-      f"Command failed: {args}\n{result.output}"
-    )
+    assert result.exit_code == 0, f"Command failed: {args}\n{result.output}"
     return result.output
 
 
@@ -134,8 +131,13 @@ class FullWorkflowCycleTest(_IntegrationTestBase):
 
     # 6. Review complete — changes_requested (round 1)
     out = self._run(
-      "review", "complete", d, "--status", "changes_requested",
-      "--summary", "Fix schema validation",
+      "review",
+      "complete",
+      d,
+      "--status",
+      "changes_requested",
+      "--summary",
+      "Fix schema validation",
     )
     assert "changes_requested" in out
     findings = yaml.safe_load(
@@ -175,7 +177,11 @@ class FullWorkflowCycleTest(_IntegrationTestBase):
 
     # 12. Review complete — approved (round 2)
     out = self._run(
-      "review", "complete", d, "--status", "approved",
+      "review",
+      "complete",
+      d,
+      "--status",
+      "approved",
     )
     assert "approved" in out
     state = yaml.safe_load(
@@ -291,7 +297,8 @@ class ClaimGuardCycleTest(_IntegrationTestBase):
 
     # Different identity should fail
     result = self.runner.invoke(
-      app, ["accept", "handoff", d, "--identity", "agent-B"],
+      app,
+      ["accept", "handoff", d, "--identity", "agent-B"],
     )
     assert result.exit_code == 1
     assert "agent-A" in result.output

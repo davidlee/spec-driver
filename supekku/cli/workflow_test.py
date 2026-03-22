@@ -97,7 +97,8 @@ class PhaseStartTest(unittest.TestCase):
   def test_explicit_phase_override(self) -> None:
     delta_dir = _create_delta_bundle(self.root)
     result = self.runner.invoke(
-      app, ["phase", "start", "DE-100", "--phase", "IP-100.PHASE-01"],
+      app,
+      ["phase", "start", "DE-100", "--phase", "IP-100.PHASE-01"],
     )
     assert result.exit_code == 0, result.output
 
@@ -122,9 +123,11 @@ class PhaseStartTest(unittest.TestCase):
     phases_dir = delta_dir / "phases"
     if phases_dir.exists():
       import shutil
+
       shutil.rmtree(phases_dir)
     result = self.runner.invoke(
-      app, ["phase", "start", "DE-100", "--phase", "IP-100.PHASE-01"],
+      app,
+      ["phase", "start", "DE-100", "--phase", "IP-100.PHASE-01"],
     )
     assert result.exit_code == 0, result.output
 
@@ -236,7 +239,8 @@ class BlockUnblockTest(unittest.TestCase):
     _create_delta_bundle(self.root)
     self.runner.invoke(app, ["phase", "start", "DE-100"])
     result = self.runner.invoke(
-      app, ["block", "DE-100", "--reason", "waiting on review"],
+      app,
+      ["block", "DE-100", "--reason", "waiting on review"],
     )
     assert result.exit_code == 0
     assert "waiting on review" in result.output

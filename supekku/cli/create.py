@@ -856,7 +856,8 @@ def create_memory_cmd(
 def create_handoff_cmd(
   delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
   to_role: Annotated[
-    str, typer.Option("--to", help="Target role"),
+    str,
+    typer.Option("--to", help="Target role"),
   ] = "",
   next_kind: Annotated[
     str,

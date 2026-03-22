@@ -135,8 +135,12 @@ class BuildHandoffTest(unittest.TestCase):
 
   def test_build_with_open_items(self) -> None:
     items = [
-      {"id": "OI-001", "kind": "next_step",
-       "summary": "Do phase 04", "blocking": False},
+      {
+        "id": "OI-001",
+        "kind": "next_step",
+        "summary": "Do phase 04",
+        "blocking": False,
+      },
     ]
     data = build_handoff(
       artifact_id="DE-100",

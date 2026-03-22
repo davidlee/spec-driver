@@ -38,6 +38,7 @@ from .workflow_metadata import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _validate(metadata, data):
   """Run MetadataValidator and return error strings."""
   v = MetadataValidator(metadata)
@@ -47,6 +48,7 @@ def _validate(metadata, data):
 # ---------------------------------------------------------------------------
 # 3.1  Workflow State
 # ---------------------------------------------------------------------------
+
 
 class WorkflowStateTest(unittest.TestCase):
   """Tests for supekku.workflow.state schema."""
@@ -174,6 +176,7 @@ class WorkflowStateTest(unittest.TestCase):
 # 3.2  Handoff
 # ---------------------------------------------------------------------------
 
+
 class WorkflowHandoffTest(unittest.TestCase):
   """Tests for supekku.workflow.handoff schema."""
 
@@ -216,12 +219,14 @@ class WorkflowHandoffTest(unittest.TestCase):
         "has_staged_changes": False,
       },
     }
-    data["open_items"] = [{
-      "id": "OI-001",
-      "kind": "next_step",
-      "summary": "Implement Phase 06",
-      "blocking": False,
-    }]
+    data["open_items"] = [
+      {
+        "id": "OI-001",
+        "kind": "next_step",
+        "summary": "Implement Phase 06",
+        "blocking": False,
+      }
+    ]
     data["design_tensions"] = []
     data["unresolved_assumptions"] = []
     data["decisions_to_preserve"] = ["use uid not id"]
@@ -293,6 +298,7 @@ class WorkflowHandoffTest(unittest.TestCase):
 # 3.3  Review Index
 # ---------------------------------------------------------------------------
 
+
 class ReviewIndexTest(unittest.TestCase):
   """Tests for supekku.workflow.review-index schema."""
 
@@ -305,11 +311,13 @@ class ReviewIndexTest(unittest.TestCase):
         "bootstrap_status": "warm",
         "last_bootstrapped_at": "2026-03-21T10:25:00Z",
       },
-      "domain_map": [{
-        "area": "cli",
-        "purpose": "command routing",
-        "files": ["supekku/cli/common.py"],
-      }],
+      "domain_map": [
+        {
+          "area": "cli",
+          "purpose": "command routing",
+          "files": ["supekku/cli/common.py"],
+        }
+      ],
       "staleness": {
         "cache_key": {
           "phase_id": "IP-090.PHASE-05",
@@ -393,6 +401,7 @@ class ReviewIndexTest(unittest.TestCase):
 # 3.4  Review Findings
 # ---------------------------------------------------------------------------
 
+
 class ReviewFindingsTest(unittest.TestCase):
   """Tests for supekku.workflow.review-findings schema."""
 
@@ -414,26 +423,32 @@ class ReviewFindingsTest(unittest.TestCase):
     data["review"]["round"] = 3
     data["review"]["status"] = "changes_requested"
     data["review"]["reviewer_role"] = "reviewer"
-    data["blocking"] = [{
-      "id": "R3-001",
-      "title": "Output regression",
-      "summary": "Field change breaks consumers",
-      "status": "open",
-      "files": ["supekku/cli/output.py"],
-      "related_invariants": ["INV-001"],
-    }]
-    data["non_blocking"] = [{
-      "id": "R3-002",
-      "title": "Add regression test",
-      "summary": "Coverage gap",
-      "status": "open",
-    }]
-    data["resolved"] = [{
-      "id": "R2-001",
-      "title": "ID mismatch",
-      "status": "resolved",
-      "resolution_summary": "Switched to uid",
-    }]
+    data["blocking"] = [
+      {
+        "id": "R3-001",
+        "title": "Output regression",
+        "summary": "Field change breaks consumers",
+        "status": "open",
+        "files": ["supekku/cli/output.py"],
+        "related_invariants": ["INV-001"],
+      }
+    ]
+    data["non_blocking"] = [
+      {
+        "id": "R3-002",
+        "title": "Add regression test",
+        "summary": "Coverage gap",
+        "status": "open",
+      }
+    ]
+    data["resolved"] = [
+      {
+        "id": "R2-001",
+        "title": "ID mismatch",
+        "status": "resolved",
+        "resolution_summary": "Switched to uid",
+      }
+    ]
     data["waived"] = []
     data["history"] = [
       {"round": 1, "summary": "Initial review"},
@@ -464,12 +479,14 @@ class ReviewFindingsTest(unittest.TestCase):
 
   def test_invalid_finding_status(self):
     data = self._minimal_valid()
-    data["blocking"] = [{
-      "id": "R1-001",
-      "title": "Bug",
-      "summary": "Bad",
-      "status": "fixed",
-    }]
+    data["blocking"] = [
+      {
+        "id": "R1-001",
+        "title": "Bug",
+        "summary": "Bad",
+        "status": "fixed",
+      }
+    ]
     errors = _validate(REVIEW_FINDINGS_METADATA, data)
     assert any("status" in e for e in errors)
 
@@ -489,6 +506,7 @@ class ReviewFindingsTest(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # 3.5  Sessions
 # ---------------------------------------------------------------------------
+
 
 class WorkflowSessionsTest(unittest.TestCase):
   """Tests for supekku.workflow.sessions schema."""
@@ -539,6 +557,7 @@ class WorkflowSessionsTest(unittest.TestCase):
 # 7.1  Notes Bridge
 # ---------------------------------------------------------------------------
 
+
 class NotesBridgeTest(unittest.TestCase):
   """Tests for supekku.workflow.notes-bridge schema."""
 
@@ -585,6 +604,7 @@ class NotesBridgeTest(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # 7.2  Phase Bridge
 # ---------------------------------------------------------------------------
+
 
 class PhaseBridgeTest(unittest.TestCase):
   """Tests for supekku.workflow.phase-bridge schema."""
@@ -655,6 +675,7 @@ class PhaseBridgeTest(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # Cross-cutting: schema/version constants match
 # ---------------------------------------------------------------------------
+
 
 class SchemaConstantsTest(unittest.TestCase):
   """Verify schema constants are consistent."""

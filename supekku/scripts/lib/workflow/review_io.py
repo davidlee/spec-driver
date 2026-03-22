@@ -110,7 +110,9 @@ def _atomic_write(path: Path, content: str) -> Path:
   """Write content atomically via temp-file + rename."""
   path.parent.mkdir(parents=True, exist_ok=True)
   fd, tmp = tempfile.mkstemp(
-    dir=path.parent, suffix=".tmp", prefix=path.stem + "_",
+    dir=path.parent,
+    suffix=".tmp",
+    prefix=path.stem + "_",
   )
   closed = False
   try:

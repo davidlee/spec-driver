@@ -41,10 +41,12 @@ Test `spec-driver phase start`.
 - `test_auto_discovers_latest_phase(self) -> None`
 - `test_creates_state_yaml(self) -> None`
 - `test_explicit_phase_override(self) -> None`
+- `test_frontmatter_tolerates_no_status_field(self) -> None`: phase start succeeds when phase file lacks frontmatter status.
 - `test_idempotent_when_already_implementing(self) -> None`
 - `test_no_phases_dir_with_explicit_phase(self) -> None`: phase start works with --phase even if phases/ is empty.
 - `test_records_plan_info(self) -> None`
 - `test_unknown_delta_fails(self) -> None`
+- `test_updates_phase_frontmatter_to_in_progress(self) -> None`: phase start writes 'in-progress' to phase sheet frontmatter (DE-104).
 
 ### TopLevelBlockTest
 

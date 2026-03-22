@@ -85,7 +85,8 @@ class CreateHandoffTest(_HandoffTestBase):
     self._start_phase()
 
     result = self.runner.invoke(
-      app, ["create", "handoff", "DE-100", "--to", "reviewer"],
+      app,
+      ["create", "handoff", "DE-100", "--to", "reviewer"],
     )
     assert result.exit_code == 0, result.output
     assert "Handoff created" in result.output
@@ -107,7 +108,8 @@ class CreateHandoffTest(_HandoffTestBase):
     self._start_phase()
 
     self.runner.invoke(
-      app, ["create", "handoff", "DE-100", "--to", "reviewer"],
+      app,
+      ["create", "handoff", "DE-100", "--to", "reviewer"],
     )
 
     state = yaml.safe_load(
@@ -131,7 +133,8 @@ class CreateHandoffTest(_HandoffTestBase):
     state_file.write_text(yaml.dump(state, sort_keys=False))
 
     self.runner.invoke(
-      app, ["create", "handoff", "DE-100", "--to", "implementer"],
+      app,
+      ["create", "handoff", "DE-100", "--to", "implementer"],
     )
 
     state = yaml.safe_load(state_file.read_text())
@@ -146,7 +149,8 @@ class CreateHandoffTest(_HandoffTestBase):
     self._start_phase()
 
     self.runner.invoke(
-      app, ["create", "handoff", "DE-100", "--to", "reviewer"],
+      app,
+      ["create", "handoff", "DE-100", "--to", "reviewer"],
     )
 
     data = yaml.safe_load(
@@ -166,7 +170,8 @@ class CreateHandoffTest(_HandoffTestBase):
     self._start_phase()
 
     self.runner.invoke(
-      app, ["create", "handoff", "DE-100", "--to", "reviewer"],
+      app,
+      ["create", "handoff", "DE-100", "--to", "reviewer"],
     )
 
     data = yaml.safe_load(
@@ -181,7 +186,8 @@ class CreateHandoffTest(_HandoffTestBase):
     """Cannot create handoff before phase start."""
     _create_delta_bundle(self.root)
     result = self.runner.invoke(
-      app, ["create", "handoff", "DE-100", "--to", "reviewer"],
+      app,
+      ["create", "handoff", "DE-100", "--to", "reviewer"],
     )
     assert result.exit_code == 1
 
@@ -196,7 +202,8 @@ class CreateHandoffTest(_HandoffTestBase):
 
     # First handoff to implementer
     self.runner.invoke(
-      app, ["create", "handoff", "DE-100", "--to", "implementer"],
+      app,
+      ["create", "handoff", "DE-100", "--to", "implementer"],
     )
     # Accept it — goes back to implementing (non-reviewer)
     self.runner.invoke(
@@ -205,7 +212,8 @@ class CreateHandoffTest(_HandoffTestBase):
     )
     # Second handoff (from implementing again)
     result = self.runner.invoke(
-      app, ["create", "handoff", "DE-100", "--to", "architect"],
+      app,
+      ["create", "handoff", "DE-100", "--to", "architect"],
     )
     assert result.exit_code == 0, result.output
 
@@ -223,7 +231,8 @@ class CreateHandoffTest(_HandoffTestBase):
     self._start_phase()
 
     self.runner.invoke(
-      app, ["create", "handoff", "DE-100", "--to", "reviewer"],
+      app,
+      ["create", "handoff", "DE-100", "--to", "reviewer"],
     )
 
     data = yaml.safe_load(
@@ -301,9 +310,7 @@ class AcceptHandoffTest(_HandoffTestBase):
     self._create_handoff()
 
     # Manually set claimed_by to simulate prior claim
-    delta_dir = (
-      self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-100-test-delta"
-    )
+    delta_dir = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-100-test-delta"
     state_file = delta_dir / "workflow" / "state.yaml"
     state = yaml.safe_load(state_file.read_text())
     state["workflow"]["claimed_by"] = "agent-1"
@@ -354,7 +361,8 @@ class AcceptHandoffTest(_HandoffTestBase):
 
     with patch.dict(os.environ, {"USER": "test-user"}):
       result = self.runner.invoke(
-        app, ["accept", "handoff", "DE-100"],
+        app,
+        ["accept", "handoff", "DE-100"],
       )
     assert result.exit_code == 0, result.output
 
@@ -370,9 +378,7 @@ class AcceptHandoffTest(_HandoffTestBase):
     # No handoff created, still implementing
 
     # Manually create handoff file without transitioning state
-    delta_dir = (
-      self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-100-test-delta"
-    )
+    delta_dir = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-100-test-delta"
     wf_dir = delta_dir / "workflow"
     handoff = {
       "schema": "supekku.workflow.handoff",
@@ -414,7 +420,8 @@ class WriteOrderTest(_HandoffTestBase):
 
     # Get timestamps before
     self.runner.invoke(
-      app, ["create", "handoff", "DE-100", "--to", "reviewer"],
+      app,
+      ["create", "handoff", "DE-100", "--to", "reviewer"],
     )
 
     # Both files exist

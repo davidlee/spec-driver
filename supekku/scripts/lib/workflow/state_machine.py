@@ -65,8 +65,7 @@ class ClaimError(Exception):
     self.current_claimant = current_claimant
     self.requested_by = requested_by
     super().__init__(
-      f"handoff already claimed by '{current_claimant}' "
-      f"(requested by '{requested_by}')"
+      f"handoff already claimed by '{current_claimant}' (requested by '{requested_by}')"
     )
 
 
@@ -137,9 +136,7 @@ def apply_transition(
     if current != _S.BLOCKED:
       raise TransitionError(current, command, "not currently blocked")
     if previous_state is None:
-      raise TransitionError(
-        current, command, "previous_state required for unblock"
-      )
+      raise TransitionError(current, command, "previous_state required for unblock")
     return TransitionResult(
       previous_state=current,
       new_state=previous_state,

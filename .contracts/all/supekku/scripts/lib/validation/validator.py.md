@@ -45,6 +45,8 @@ colliding finding IDs → warning.
 - `_validate_decision_status_compatibility(self, decisions) -> None`: Warn if active ADR references deprecated or superseded ADRs.
 
 Only applies in strict mode.
+- `_validate_phase_statuses(self) -> None`: Validate phase frontmatter statuses across all delta bundles. - -----------------------------------------------------------
+- `_validate_single_phase(self, phase_file, valid_statuses) -> None`: Validate a single phase file's frontmatter and structure.
 - `_validate_spec_taxonomy(self) -> None`: Warn when tech specs are missing taxonomy or have inconsistent values.
 
 Scoped to tech specs (SPEC-*) only. PROD specs are excluded.

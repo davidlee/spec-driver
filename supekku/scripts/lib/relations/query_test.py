@@ -837,12 +837,10 @@ class CollectReverseReferenceTargetsTest(unittest.TestCase):
   """VT-090-P4-1: Tests for collect_reverse_reference_targets()."""
 
   def test_empty_referrers(self) -> None:
-
     targets = collect_reverse_reference_targets([])
     assert targets == set()
 
   def test_single_referrer_with_relations(self) -> None:
-
     referrer = MockDelta(
       id="AUD-001",
       relations=[_rel("documents", "DE-090")],
@@ -851,7 +849,6 @@ class CollectReverseReferenceTargetsTest(unittest.TestCase):
     assert "DE-090" in targets
 
   def test_multiple_referrers_aggregated(self) -> None:
-
     referrers = [
       MockDelta(id="AUD-001", relations=[_rel("documents", "DE-090")]),
       MockDelta(id="AUD-002", relations=[_rel("documents", "DE-091")]),
@@ -861,7 +858,6 @@ class CollectReverseReferenceTargetsTest(unittest.TestCase):
     assert "DE-091" in targets
 
   def test_uppercased(self) -> None:
-
     referrer = MockDelta(
       id="AUD-001",
       relations=[_rel("documents", "de-090")],
@@ -870,7 +866,6 @@ class CollectReverseReferenceTargetsTest(unittest.TestCase):
     assert "DE-090" in targets
 
   def test_applies_to_also_collected(self) -> None:
-
     referrer = MockDelta(
       id="DE-001",
       applies_to={"specs": ["SPEC-110"], "requirements": ["PROD-010.FR-005"]},
@@ -880,7 +875,6 @@ class CollectReverseReferenceTargetsTest(unittest.TestCase):
     assert "PROD-010.FR-005" in targets
 
   def test_duplicates_merged(self) -> None:
-
     referrers = [
       MockDelta(id="AUD-001", relations=[_rel("documents", "DE-090")]),
       MockDelta(id="AUD-002", relations=[_rel("reviews", "DE-090")]),
@@ -893,7 +887,6 @@ class PartitionByReverseReferencesTest(unittest.TestCase):
   """VT-090-P4-2: Tests for partition_by_reverse_references()."""
 
   def test_basic_partition(self) -> None:
-
     candidates = [
       MockDelta(id="DE-090"),
       MockDelta(id="DE-091"),
@@ -907,14 +900,12 @@ class PartitionByReverseReferencesTest(unittest.TestCase):
     assert [c.id for c in unreferenced] == ["DE-091", "DE-092"]
 
   def test_empty_referrers_all_unreferenced(self) -> None:
-
     candidates = [MockDelta(id="DE-090"), MockDelta(id="DE-091")]
     referenced, unreferenced = partition_by_reverse_references(candidates, [])
     assert referenced == []
     assert len(unreferenced) == 2
 
   def test_custom_id_fn(self) -> None:
-
     @dataclass(frozen=True)
     class ReqLike:
       uid: str
@@ -935,7 +926,6 @@ class PartitionByReverseReferencesTest(unittest.TestCase):
     assert [c.uid for c in unreferenced] == ["PROD-010.FR-002"]
 
   def test_case_insensitive_matching(self) -> None:
-
     candidates = [MockDelta(id="de-090")]
     referrers = [
       MockDelta(id="AUD-001", relations=[_rel("documents", "DE-090")]),
@@ -944,7 +934,6 @@ class PartitionByReverseReferencesTest(unittest.TestCase):
     assert len(referenced) == 1
 
   def test_self_reference_included(self) -> None:
-
     # An artifact that references itself should appear in referenced
     referrer = MockDelta(id="DE-090", relations=[_rel("updates", "DE-090")])
     candidates = [MockDelta(id="DE-090")]

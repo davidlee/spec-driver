@@ -48,7 +48,15 @@ class TestCanonicalStatusMap:
 
   def test_all_observed_variants_mapped(self) -> None:
     """Ensure all 6 observed phase variants are in the map."""
-    observed = {"draft", "completed", "complete", "done", "in-progress", "active", "in_progress"}
+    observed = {
+      "draft",
+      "completed",
+      "complete",
+      "done",
+      "in-progress",
+      "active",
+      "in_progress",
+    }
     for v in observed:
       assert v in CANONICAL_STATUS_MAP, f"'{v}' missing from CANONICAL_STATUS_MAP"
 

@@ -5,11 +5,11 @@ from __future__ import annotations
 import sys
 
 if sys.version_info < (3, 12):  # noqa: UP036 — defensive guard for broken installs
-    sys.exit(
-        f"spec-driver requires Python >= 3.12 "
-        f"(running {sys.version_info.major}.{sys.version_info.minor}). "
-        f"Install with: uv tool install spec-driver --python 3.12"
-    )
+  sys.exit(
+    f"spec-driver requires Python >= 3.12 "
+    f"(running {sys.version_info.major}.{sys.version_info.minor}). "
+    f"Install with: uv tool install spec-driver --python 3.12"
+  )
 
 import click
 import typer

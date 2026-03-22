@@ -1,18 +1,16 @@
 ---
 id: IP-112-P03
 slug: "112-kind_aware_pydantic_validation-phase-03"
-name: "Phase 03 — Fix historical validation noise"
+name: Phase 03 — Fix historical validation noise
 created: "2026-03-22"
 updated: "2026-03-22"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-112
 delta: DE-112
-objective: >-
-  Fix AUD-012 disposition vocabulary, legacy phase frontmatter gaps,
-  and IP-109 status format. Reduce validate output to real issues only.
+objective: "Fix AUD-012 disposition vocabulary, legacy phase frontmatter gaps, and IP-109 status format. Reduce validate output to real issues only."
 entrance_criteria:
-  - Phase 2 complete (new validation wired in, so we can verify cleanup)
+  - "Phase 2 complete (new validation wired in, so we can verify cleanup)"
 exit_criteria:
   - AUD-012 findings use 'reconciled' instead of 'resolved' for aligned dispositions
   - Legacy phase files have kind and status in frontmatter

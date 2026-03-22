@@ -3,27 +3,25 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping, Sequence
-from dataclasses import dataclass, field
 from datetime import date
-from types import MappingProxyType
 from typing import Any
+
+from pydantic import BaseModel
 
 
 class FrontmatterValidationError(ValueError):
   """Raised when frontmatter metadata fails schema validation."""
 
 
-@dataclass(frozen=True)
-class Relation:
+class Relation(BaseModel, frozen=True):
   """Represents a relationship between specifications or changes."""
 
   type: str
   target: str
-  attributes: Mapping[str, Any] = field(default_factory=dict)
+  attributes: dict[str, Any] = {}
 
 
-@dataclass(frozen=True)
-class FrontmatterValidationResult:
+class FrontmatterValidationResult(BaseModel, frozen=True):
   """Result of validating frontmatter against schema requirements."""
 
   id: str
@@ -36,11 +34,7 @@ class FrontmatterValidationResult:
   owners: tuple[str, ...]
   auditers: tuple[str, ...]
   relations: tuple[Relation, ...]
-  data: Mapping[str, Any]
-
-  def dict(self) -> Mapping[str, Any]:
-    """Return the validated frontmatter as an immutable mapping."""
-    return self.data
+  data: dict[str, Any]
 
 
 def validate_frontmatter(
@@ -62,7 +56,7 @@ def validate_frontmatter(
     raise FrontmatterValidationError(msg)
 
   required_fields = ("id", "name", "slug", "status", "created", "updated")
-  missing = [field for field in required_fields if field not in payload]
+  missing = [f for f in required_fields if f not in payload]
   if missing:
     msg = f"frontmatter missing required field(s): {', '.join(sorted(missing))}"
     raise FrontmatterValidationError(
@@ -85,8 +79,6 @@ def validate_frontmatter(
   relations_list, relation_objs = _normalize_relations(payload)
   payload["relations"] = relations_list
 
-  immutable_payload = MappingProxyType(payload)
-
   return FrontmatterValidationResult(
     id=id_value,
     name=name_value,
@@ -98,7 +90,7 @@ def validate_frontmatter(
     owners=tuple(owners),
     auditers=tuple(auditers),
     relations=relation_objs,
-    data=immutable_payload,
+    data=payload,
   )
 
 
@@ -207,7 +199,7 @@ def _normalize_relations(
       Relation(
         type=relation_type,
         target=relation_target,
-        attributes=MappingProxyType(dict(extras)) if extras else MappingProxyType({}),
+        attributes=dict(extras),
       ),
     )
   return normalized, tuple(relation_objs)

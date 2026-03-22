@@ -4,7 +4,7 @@ slug: "112-kind_aware_pydantic_validation-phase-01"
 name: "Phase 01 — Convert FrontmatterValidationResult and Relation"
 created: "2026-03-22"
 updated: "2026-03-22"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-112
 delta: DE-112

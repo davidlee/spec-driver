@@ -4,7 +4,7 @@ slug: "112-kind_aware_pydantic_validation-phase-03"
 name: Phase 03 — Fix historical validation noise
 created: "2026-03-22"
 updated: "2026-03-22"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-112
 delta: DE-112
@@ -26,10 +26,10 @@ exit_criteria:
 
 | Status | ID  | Description | Notes |
 | ------ | --- | ----------- | ----- |
-| [ ]    | 3.1 | Fix AUD-012: status 'resolved' → 'reconciled' for aligned findings | 11 findings in YAML blocks |
-| [ ]    | 3.2 | Fix legacy phase files: add missing kind/status frontmatter | DE-002, DE-004, DE-028, DE-031, DE-051 |
-| [ ]    | 3.3 | Fix IP-109 phase status: 'in_progress' → 'in-progress' | Or use spec-driver validate --fix |
-| [ ]    | 3.4 | Run spec-driver validate, confirm noise reduction | |
+| [x]    | 3.1 | Fix AUD-012: status 'resolved' → 'reconciled' for aligned findings | 11 findings fixed |
+| [x]    | 3.2 | Fix legacy phase files: add missing kind/status frontmatter | DE-002 (3 files), DE-028, DE-031, DE-051 |
+| [n/a]  | 3.3 | Fix IP-109 phase status: 'in_progress' → 'in-progress' | Already canonical — no fix needed |
+| [x]    | 3.4 | Run spec-driver validate, confirm noise reduction | 11 errors → 0, 56 warnings → 43 |
 
 ### Inventory
 

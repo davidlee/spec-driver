@@ -69,12 +69,26 @@ Read this file first, then the phase sheets and DR.
 
 | Phase | Scope | Status |
 |-------|-------|--------|
-| **P01** | Convert FrontmatterValidationResult + Relation to Pydantic | Planned |
-| **P02** | Wire kind-aware validation into validator | Planned |
-| **P03** | Fix historical validation noise | Planned |
+| **P01** | Convert FrontmatterValidationResult + Relation to Pydantic | ✅ Complete |
+| **P02** | Wire kind-aware validation into validator | ✅ Complete |
+| **P03** | Fix historical validation noise | ✅ Complete |
 
-### Commit State
+### Implementation Notes
 
-- All `.spec-driver/` changes committed (`6a27b90`).
-- Worktree is clean.
-- No pending code or workflow artefact changes.
+**Phase 1** — Mechanical conversion. Adversarial review found two issues not in the original DR:
+- `.dict()` method collision with Pydantic (DEC-112-004) — dropped, zero callers
+- `MappingProxyType` incompatible with Pydantic (DEC-112-005) — simplified to `dict[str, Any]`
+
+**Phase 2** — Three validation + three traversal methods added. Broad `Exception` catch (not just `ValidationError`) matches existing PhaseSheet pattern. Models are permissive by design (`extra="ignore"`, optional fields default), so only genuinely malformed data triggers warnings.
+
+**Phase 3** — IP-109 status was already canonical (no fix needed). 2 remaining "Missing phase.overview block" warnings are from DE-002/DE-031 legacy phases that now have frontmatter but lack overview block content — acceptable.
+
+### Validation Before/After
+
+- **Before**: 11 errors, 56 warnings
+- **After**: 0 errors, 43 warnings
+- Remaining 43 warnings: 29 audit-gate (historical), 5 AUD-001 findings, 5 unresolved refs, 2 legacy overview blocks, 2 other
+
+### Next Steps
+
+All 3 phases complete. Ready for `/audit-change` then `/close-change`.

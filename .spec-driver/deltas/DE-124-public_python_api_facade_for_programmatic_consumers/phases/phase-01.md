@@ -57,20 +57,20 @@ Extract review orchestration logic from CLI command functions into `spec_driver/
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-|---|---|---|---|---|
-| [x] | 1.1 | Run existing tests (baseline) | — | 69 passed |
-| [x] | 1.2 | Create `operations.py` with new types | — | Types already existed from workshopping |
-| [x] | 1.3 | Extract `resolve_delta_dir` | — | ~15 lines, DeltaNotFoundError |
-| [x] | 1.4 | Extract `prime_review` | — | ~120 lines, config via _load_config |
-| [x] | 1.5 | Extract `complete_review` | — | ~100 lines, approval guard, auto_teardown |
-| [x] | 1.6 | Extract `disposition_finding` | — | Typed kwargs, hard validation only |
-| [x] | 1.7 | Extract `teardown_review` | — | ~15 lines |
-| [x] | 1.8 | Implement `summarize_review` | — | New operation, reads findings+index |
-| [x] | 1.9 | Refactor CLI commands to thin wrappers | — | Deleted _do_teardown, helpers migrated |
-| [x] | 1.10 | Run existing tests (regression) | — | 69 passed (matches baseline) |
-| [x] | 1.11 | Write `operations_test.py` | — | 33 unit tests, all passing |
-| [x] | 1.12 | Lint + format | — | 4640 passed, 0 failures, clean lint |
+| Status | ID   | Description                            | Parallel? | Notes                                     |
+| ------ | ---- | -------------------------------------- | --------- | ----------------------------------------- |
+| [x]    | 1.1  | Run existing tests (baseline)          | —         | 69 passed                                 |
+| [x]    | 1.2  | Create `operations.py` with new types  | —         | Types already existed from workshopping   |
+| [x]    | 1.3  | Extract `resolve_delta_dir`            | —         | ~15 lines, DeltaNotFoundError             |
+| [x]    | 1.4  | Extract `prime_review`                 | —         | ~120 lines, config via \_load_config      |
+| [x]    | 1.5  | Extract `complete_review`              | —         | ~100 lines, approval guard, auto_teardown |
+| [x]    | 1.6  | Extract `disposition_finding`          | —         | Typed kwargs, hard validation only        |
+| [x]    | 1.7  | Extract `teardown_review`              | —         | ~15 lines                                 |
+| [x]    | 1.8  | Implement `summarize_review`           | —         | New operation, reads findings+index       |
+| [x]    | 1.9  | Refactor CLI commands to thin wrappers | —         | Deleted \_do_teardown, helpers migrated   |
+| [x]    | 1.10 | Run existing tests (regression)        | —         | 69 passed (matches baseline)              |
+| [x]    | 1.11 | Write `operations_test.py`             | —         | 33 unit tests, all passing                |
+| [x]    | 1.12 | Lint + format                          | —         | 4640 passed, 0 failures, clean lint       |
 
 ### Task Details
 
@@ -124,11 +124,11 @@ Extract review orchestration logic from CLI command functions into `spec_driver/
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|---|---|---|
-| `_load_workflow_config` import creates circular dependency | It wraps `supekku.scripts.lib.core.config.load_workflow_config` — import that directly if needed | resolved — no circular dep |
-| `_generate_bootstrap_markdown` has hidden CLI dependency | Code review during extraction; it only uses data params | resolved — pure function |
-| Disposition validation needs finding category (blocking/non-blocking) | Look up finding in rounds data before applying validation rules | resolved — `_find_finding_with_category` helper; hard constraints only at disposition time |
+| Risk                                                                  | Mitigation                                                                                       | Status                                                                                     |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `_load_workflow_config` import creates circular dependency            | It wraps `supekku.scripts.lib.core.config.load_workflow_config` — import that directly if needed | resolved — no circular dep                                                                 |
+| `_generate_bootstrap_markdown` has hidden CLI dependency              | Code review during extraction; it only uses data params                                          | resolved — pure function                                                                   |
+| Disposition validation needs finding category (blocking/non-blocking) | Look up finding in rounds data before applying validation rules                                  | resolved — `_find_finding_with_category` helper; hard constraints only at disposition time |
 
 ## 9. Decisions & Outcomes
 

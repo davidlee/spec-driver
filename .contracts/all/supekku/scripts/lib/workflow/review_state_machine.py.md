@@ -31,7 +31,7 @@ returns a BootstrapStatus rather than StalenessResult.
 Returns the new ReviewStatus.
 
 Raises:
-ReviewTransitionError: If the transition is invalid. - ---------------------------------------------------------------------------
+ReviewTransitionError: If the transition is invalid.
 
 - `can_approve(blocking_findings) -> tuple[Tuple[bool, list[str]]]`: Check whether approval is permitted.
 
@@ -39,14 +39,14 @@ Evaluates disposition constraints on all blocking findings.
 The guard checks disposition, not status — status is derived from
 disposition and checking both creates short-circuit bugs.
 
-Returns (allowed, reasons) where reasons lists blocking violations. - ---------------------------------------------------------------------------
+Returns (allowed, reasons) where reasons lists blocking violations.
 
 - `collect_blocking_findings(rounds) -> list[ReviewFinding]`: Collect all blocking findings from all rounds.
 
 Finding IDs are round-scoped (R{round}-{seq}) and unique across
 rounds — no deduplication is needed. Dispositions are applied
 in-place within the originating round, so each finding's current
-disposition state is always in its originating entry. - ---------------------------------------------------------------------------
+disposition state is always in its originating entry.
 
 - `derive_bootstrap_status(index) -> BootstrapStatus`: Derive current bootstrap status from observable context.
 
@@ -54,7 +54,7 @@ Deterministic — no I/O, no mutation. The only code that writes
 bootstrap_status is review prime, which always writes WARM.
 
 When previous_status is provided, raises AssertionError if the
-derived transition is illegal (indicates a derivation logic bug). - ---------------------------------------------------------------------------
+derived transition is illegal (indicates a derivation logic bug).
 
 - `derive_finding_status(disposition) -> FindingStatus`: Derive finding status from disposition action.
 
@@ -69,8 +69,6 @@ Bootstrap status values (DR-109 §3.2).
 Derived, not command-driven. The stored value is a snapshot —
 true status comes from observable context.
 
-_---------------------------------------------------------------------------_
-
 **Inherits from:** StrEnum
 
 ### DispositionAuthority
@@ -82,8 +80,6 @@ Who made the disposition decision (DR-109 §3.4).
 ### FindingDisposition
 
 Structured disposition record for a review finding.
-
-_---------------------------------------------------------------------------_
 
 **Inherits from:** BaseModel
 

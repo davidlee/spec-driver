@@ -6,10 +6,6 @@ This module implements the priority ordering logic for backlog items,
 including the head-tail partition algorithm used for smart merging of
 filtered item reordering.
 
-## Constants
-
-- `T`
-
 ## Functions
 
 - `build_partitions(all_items, filtered_items) -> tuple[Tuple[list[T], list[tuple[Tuple[T, list[T]]]]]]`: Partition items into (shown, [unshown_followers]) pairs.

@@ -151,13 +151,13 @@ Phase 3 can move code without smuggling the old lateral-coupling pattern into
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Parallel? | Notes |
-| ------ | --- | ----------- | --------- | ----- |
-| [ ] | 2.1 | Draft `Domain Internal Layers` contract in `pyproject.toml` | — | Use DR-125 ordering |
-| [ ] | 2.2 | Specify exact target paths for relations pilots | — | `spec_driver/domain/relations/{query,manager}.py` |
-| [ ] | 2.3 | Define policy backlink seam outside `PolicyRegistry` | — | Candidate: `domain/relations/backlinks.py` |
-| [ ] | 2.4 | Record deferred scope for requirements registry and validator | — | Prevent premature moves |
-| [ ] | 2.5 | Prepare Phase 3 sheet once 2.1-2.4 are stable | — | Code-moving phase only after seam decisions |
+| Status | ID  | Description                                                   | Parallel? | Notes                                             |
+| ------ | --- | ------------------------------------------------------------- | --------- | ------------------------------------------------- |
+| [ ]    | 2.1 | Draft `Domain Internal Layers` contract in `pyproject.toml`   | —         | Use DR-125 ordering                               |
+| [ ]    | 2.2 | Specify exact target paths for relations pilots               | —         | `spec_driver/domain/relations/{query,manager}.py` |
+| [ ]    | 2.3 | Define policy backlink seam outside `PolicyRegistry`          | —         | Candidate: `domain/relations/backlinks.py`        |
+| [ ]    | 2.4 | Record deferred scope for requirements registry and validator | —         | Prevent premature moves                           |
+| [ ]    | 2.5 | Prepare Phase 3 sheet once 2.1-2.4 are stable                 | —         | Code-moving phase only after seam decisions       |
 
 ### Task Details
 
@@ -196,11 +196,11 @@ Phase 3 can move code without smuggling the old lateral-coupling pattern into
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| ---- | ---------- | ------ |
-| `relations.manager` is really shared infrastructure | Reclassify to `core` before moving | open |
-| Governance backlink extraction still leaves sibling registry reach-through | Make backlinks a dedicated relation/query seam | open |
-| Requirements sync still acts as an integration hub | Defer registry move until relation/orchestration split is clearer | open |
+| Risk                                                                       | Mitigation                                                        | Status |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------ |
+| `relations.manager` is really shared infrastructure                        | Reclassify to `core` before moving                                | open   |
+| Governance backlink extraction still leaves sibling registry reach-through | Make backlinks a dedicated relation/query seam                    | open   |
+| Requirements sync still acts as an integration hub                         | Defer registry move until relation/orchestration split is clearer | open   |
 
 ## 9. Decisions & Outcomes
 

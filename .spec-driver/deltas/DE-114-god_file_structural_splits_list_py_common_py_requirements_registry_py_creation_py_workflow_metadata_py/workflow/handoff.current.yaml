@@ -12,14 +12,14 @@ phase:
   id: IP-114-P03
   status: complete
 required_reading:
-- .spec-driver/deltas/DE-114-god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py/DE-114.md
-- .spec-driver/deltas/DE-114-god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py/IP-114.md
-- .spec-driver/deltas/DE-114-god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py/phases/phase-03.md
-- .spec-driver/deltas/DE-114-god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py/notes.md
+  - .spec-driver/deltas/DE-114-god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py/DE-114.md
+  - .spec-driver/deltas/DE-114-god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py/IP-114.md
+  - .spec-driver/deltas/DE-114-god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py/phases/phase-03.md
+  - .spec-driver/deltas/DE-114-god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py/notes.md
 next_activity:
   kind: implementation
 timestamps:
-  emitted_at: '2026-03-22T13:57:39+00:00'
+  emitted_at: "2026-03-22T13:57:39+00:00"
 git:
   head: aa1b0e8c
   branch: main

@@ -27,7 +27,7 @@ Tests for the generic format_list_table helper.
 - `test_empty_items_tsv(self)`
 - `test_json_format_delegates_to_callback(self)`
 - `test_table_format_is_default(self)`
-- `test_table_format_renders_columns_and_data(self)`
+- `test_table_format_renders_columns_and_data(self)` - type: ignore[invalid-argument-type]
 - `test_title_appears_in_table(self)`
 - `test_truncate_false_preserves_all_content(self)`
 - `test_truncate_true_shortens_content(self)`

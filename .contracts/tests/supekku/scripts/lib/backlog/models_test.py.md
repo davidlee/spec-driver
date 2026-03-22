@@ -23,7 +23,7 @@ VT-090-P2-4: BacklogItem.to_dict() with consistent relational fields.
 
 #### Methods
 
-- `test_always_includes_linked_deltas(self) -> None`
+- `test_always_includes_linked_deltas(self) -> None` - type: ignore[invalid-argument-type]
 - `test_always_includes_related_requirements(self) -> None`
 - `test_basic_fields(self) -> None`
 - `test_none_linked_deltas_becomes_empty_list(self) -> None`: Frontmatter linked_deltas=None should not leak as None.

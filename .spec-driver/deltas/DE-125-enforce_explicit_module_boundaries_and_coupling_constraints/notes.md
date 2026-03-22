@@ -18,6 +18,7 @@
 - Explicitly deferred `requirements.registry`, `policies.registry`, and
   `validation.validator` as too coupled for first-wave migration.
 - Created `phases/phase-02.md` for verification and seam extraction.
-- Verification not yet run after these doc changes; run `spec-driver validate`
-  before treating the bundle as settled.
+- Ran `spec-driver validate` after the doc updates. Current output is back to the
+  repo's pre-existing warning baseline; no new DE-125-specific validation issues
+  remain.
 - Work remains uncommitted.

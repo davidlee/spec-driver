@@ -12,7 +12,7 @@ Tests for format_audit_details (VT-format-audit).
 
 #### Methods
 
-- `test_basic_fields(self) -> None`
+- `test_basic_fields(self) -> None` - type: ignore[invalid-argument-type]
 - `test_with_applies_to(self) -> None`
 - `test_with_relations(self) -> None`
 - `test_with_root_shows_relative_path(self) -> None`
@@ -58,7 +58,7 @@ Tests for ext_id/ext_url support in change formatters (VT-067-002).
 #### Methods
 
 - `test_delta_details_with_ext_id_and_url(self) -> None`: Test delta detail shows ext_id with url.
-- `test_delta_details_with_ext_id_only(self) -> None`: Test delta detail shows ext_id without url.
+- `test_delta_details_with_ext_id_only(self) -> None`: Test delta detail shows ext_id without url. - type: ignore[invalid-argument-type]
 - `test_delta_details_without_ext_id_omits_line(self) -> None`: Test delta detail omits External line when no ext_id.
 - `test_json_includes_ext_fields(self) -> None`: Test JSON output includes ext_id and ext_url when present.
 - `test_json_omits_ext_fields_when_empty(self) -> None`: Test JSON output omits ext_id/ext_url when empty.

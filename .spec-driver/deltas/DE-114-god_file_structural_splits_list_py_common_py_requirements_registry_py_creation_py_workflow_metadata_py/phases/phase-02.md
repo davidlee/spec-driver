@@ -51,39 +51,39 @@ Split `changes/creation.py` (1,056 lines) into 6 files and `blocks/workflow_meta
 
 ## 7. Tasks & Progress
 
-| Status | ID   | Description                                              | Parallel? | Notes                                       |
-| ------ | ---- | -------------------------------------------------------- | --------- | ------------------------------------------- |
-| [x]    | 2.1  | Extract `_creation_utils.py`                             |           | 41 lines                                    |
-| [x]    | 2.2  | Extract `revision_creation.py`                           | [P]       | 98 lines                                    |
-| [x]    | 2.3  | Extract `delta_creation.py`                              | [P]       | 170 lines                                   |
-| [x]    | 2.4  | Extract `audit_creation.py`                              | [P]       | 102 lines                                   |
-| [x]    | 2.5  | Extract `phase_creation.py`                              |           | 497 lines — all phase helpers + create_phase |
-| [x]    | 2.6  | Slim `creation.py` with re-exports                       |           | 276 lines                                   |
-| [x]    | 2.7  | Lint + test after creation.py split                      |           | 4585 passed, ruff clean                     |
-| [x]    | 2.8  | Extract `state_schema.py`                                |           | 227 lines, includes `_artifact_block`       |
-| [x]    | 2.9  | Extract `handoff_schema.py`                              | [P]       | 301 lines                                   |
-| [x]    | 2.10 | Extract `review_index_schema.py`                         | [P]       | 261 lines                                   |
-| [x]    | 2.11 | Extract `review_findings_schema.py`                      | [P]       | 268 lines, includes finding chain + _round  |
-| [x]    | 2.12 | Extract `sessions_schema.py`                             | [P]       | 111 lines                                   |
-| [x]    | 2.13 | Extract `notes_bridge_schema.py`                         | [P]       | 69 lines                                    |
-| [x]    | 2.14 | Extract `phase_bridge_schema.py`                         | [P]       | 72 lines, includes `_placeholder_renderer`  |
-| [x]    | 2.15 | Slim `workflow_metadata.py` with re-exports + registration |         | 251 lines                                   |
-| [-]    | 2.16 | Extract phase tests to `phase_creation_test.py`          |           | Deferred — tests pass as-is                 |
-| [x]    | 2.17 | Lint + test after workflow_metadata split                |           | 4585 passed, ruff clean                     |
+| Status | ID   | Description                                                | Parallel? | Notes                                        |
+| ------ | ---- | ---------------------------------------------------------- | --------- | -------------------------------------------- |
+| [x]    | 2.1  | Extract `_creation_utils.py`                               |           | 41 lines                                     |
+| [x]    | 2.2  | Extract `revision_creation.py`                             | [P]       | 98 lines                                     |
+| [x]    | 2.3  | Extract `delta_creation.py`                                | [P]       | 170 lines                                    |
+| [x]    | 2.4  | Extract `audit_creation.py`                                | [P]       | 102 lines                                    |
+| [x]    | 2.5  | Extract `phase_creation.py`                                |           | 497 lines — all phase helpers + create_phase |
+| [x]    | 2.6  | Slim `creation.py` with re-exports                         |           | 276 lines                                    |
+| [x]    | 2.7  | Lint + test after creation.py split                        |           | 4585 passed, ruff clean                      |
+| [x]    | 2.8  | Extract `state_schema.py`                                  |           | 227 lines, includes `_artifact_block`        |
+| [x]    | 2.9  | Extract `handoff_schema.py`                                | [P]       | 301 lines                                    |
+| [x]    | 2.10 | Extract `review_index_schema.py`                           | [P]       | 261 lines                                    |
+| [x]    | 2.11 | Extract `review_findings_schema.py`                        | [P]       | 268 lines, includes finding chain + \_round  |
+| [x]    | 2.12 | Extract `sessions_schema.py`                               | [P]       | 111 lines                                    |
+| [x]    | 2.13 | Extract `notes_bridge_schema.py`                           | [P]       | 69 lines                                     |
+| [x]    | 2.14 | Extract `phase_bridge_schema.py`                           | [P]       | 72 lines, includes `_placeholder_renderer`   |
+| [x]    | 2.15 | Slim `workflow_metadata.py` with re-exports + registration |           | 251 lines                                    |
+| [-]    | 2.16 | Extract phase tests to `phase_creation_test.py`            |           | Deferred — tests pass as-is                  |
+| [x]    | 2.17 | Lint + test after workflow_metadata split                  |           | 4585 passed, ruff clean                      |
 
 ## 8. Risks & Mitigations
 
-| Risk                                                | Mitigation                                                     | Status    |
-| --------------------------------------------------- | -------------------------------------------------------------- | --------- |
-| Schema registration depends on import order         | Registration loop stays in slim file, imports schema constants | mitigated |
-| `_finding_disposition` chain shared across schemas   | Chain moves with review_index_schema (sole consumer of chain)  | mitigated |
+| Risk                                               | Mitigation                                                     | Status    |
+| -------------------------------------------------- | -------------------------------------------------------------- | --------- |
+| Schema registration depends on import order        | Registration loop stays in slim file, imports schema constants | mitigated |
+| `_finding_disposition` chain shared across schemas | Chain moves with review_index_schema (sole consumer of chain)  | mitigated |
 
 ## 9. Decisions & Outcomes
 
 - 2026-03-22 — Do creation.py first (simpler), then workflow_metadata.py
 - 2026-03-22 — Single-consumer helpers move with their schema (DEC-114-05)
 - 2026-03-22 — Finding chain (`_finding_disposition`, `_finding_item`, `_findings_list`, `_round_entry`) placed in `review_findings_schema.py` (sole consumer), not `review_index_schema.py` as DR-114 table suggested. DR-114's principle (DEC-114-05: single-consumer helpers move with their schema) takes precedence over the table.
-- 2026-03-22 — `delta_creation.py` uses deferred import of `_render_plan` from `creation.py` to avoid circular dependency (create_delta calls _render_plan which lives in the slim creation.py).
+- 2026-03-22 — `delta_creation.py` uses deferred import of `_render_plan` from `creation.py` to avoid circular dependency (create_delta calls \_render_plan which lives in the slim creation.py).
 - 2026-03-22 — Phase test split (2.16) deferred — test class doesn't split cleanly, tests pass as-is.
 
 ## 10. Wrap-up Checklist

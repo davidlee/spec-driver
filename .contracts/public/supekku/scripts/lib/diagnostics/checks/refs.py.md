@@ -11,4 +11,4 @@ into DiagnosticResult entries.
 
 ## Functions
 
-- `check_refs(ws) -> list[DiagnosticResult]`: Check cross-reference consistency by delegating to WorkspaceValidator.
+- `check_refs(ws) -> list[DiagnosticResult]`: Check cross-reference consistency by delegating to WorkspaceValidator. - type: ignore[arg-type]

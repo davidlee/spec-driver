@@ -14,8 +14,8 @@ workflow:
   active_role: implementer
   handoff_boundary: phase
 timestamps:
-  created: '2026-03-22T15:39:32+00:00'
-  updated: '2026-03-22T15:39:32+00:00'
+  created: "2026-03-22T15:39:32+00:00"
+  updated: "2026-03-22T15:39:32+00:00"
 plan:
   id: IP-124
   path: .spec-driver/deltas/DE-124-public_python_api_facade_for_programmatic_consumers/IP-124.md

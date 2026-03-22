@@ -4,6 +4,7 @@ Tests for BundleTree widget (VT-061-01).
 
 ## Functions
 
+- `_plain(label) -> str`: Extract plain text from a tree node label.
 - @pytest.fixture `bundle_dir(tmp_path) -> Path`: Create a realistic delta bundle directory.
 - @pytest.fixture `empty_bundle(tmp_path) -> Path`: Create an empty bundle directory.
 

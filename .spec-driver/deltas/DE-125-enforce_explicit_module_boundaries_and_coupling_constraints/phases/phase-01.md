@@ -120,7 +120,7 @@ must exist before broader file moves.
 - [x] IP-125 contains real phases, gates, and verification work
 - [x] First pilot migration targets named from the current import graph
 - [x] Verification additions scoped for implementation (`import-linter`,
-  test-layout reconciliation, targeted checks)
+      test-layout reconciliation, targeted checks)
 
 ## 5. Verification
 
@@ -143,23 +143,23 @@ must exist before broader file moves.
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-| --- | --- | --- | --- | --- |
-| [x] | 1.1 | Re-appraise DE-125 against repo reality | — | Found stale sequencing and template IP |
-| [x] | 1.2 | Rewrite DE-125 around the real thesis | — | Focus on domain-internal contracts |
-| [x] | 1.3 | Rewrite DR-125 with explicit domain ordering | — | Registry rule and mapping guidance added |
-| [x] | 1.4 | Replace template IP with executable phases | — | Added gates and verification |
-| [x] | 1.5 | Name first pilot migration targets | — | `relations.query` and `relations.manager`; policy backlinks as seam extraction |
-| [x] | 1.6 | Scope verification additions | — | `just lint-imports` plus targeted relations/governance tests |
-| [x] | 1.7 | Prepare Phase 2 sheet once 1.5 and 1.6 are stable | — | `spec-driver create phase` created `IP-125-P02` |
+| Status | ID  | Description                                       | Parallel? | Notes                                                                          |
+| ------ | --- | ------------------------------------------------- | --------- | ------------------------------------------------------------------------------ |
+| [x]    | 1.1 | Re-appraise DE-125 against repo reality           | —         | Found stale sequencing and template IP                                         |
+| [x]    | 1.2 | Rewrite DE-125 around the real thesis             | —         | Focus on domain-internal contracts                                             |
+| [x]    | 1.3 | Rewrite DR-125 with explicit domain ordering      | —         | Registry rule and mapping guidance added                                       |
+| [x]    | 1.4 | Replace template IP with executable phases        | —         | Added gates and verification                                                   |
+| [x]    | 1.5 | Name first pilot migration targets                | —         | `relations.query` and `relations.manager`; policy backlinks as seam extraction |
+| [x]    | 1.6 | Scope verification additions                      | —         | `just lint-imports` plus targeted relations/governance tests                   |
+| [x]    | 1.7 | Prepare Phase 2 sheet once 1.5 and 1.6 are stable | —         | `spec-driver create phase` created `IP-125-P02`                                |
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| --- | --- | --- |
-| Domain remains a free-form package | Keep explicit internal ordering and STOP on exceptions | open |
-| Policy, DR, and IP drift again | Treat doc reconciliation as a tracked phase with exit criteria | mitigated |
-| Pilot selection is driven by rename convenience | Require import-graph evidence before Phase 2 | open |
+| Risk                                            | Mitigation                                                     | Status    |
+| ----------------------------------------------- | -------------------------------------------------------------- | --------- |
+| Domain remains a free-form package              | Keep explicit internal ordering and STOP on exceptions         | open      |
+| Policy, DR, and IP drift again                  | Treat doc reconciliation as a tracked phase with exit criteria | mitigated |
+| Pilot selection is driven by rename convenience | Require import-graph evidence before Phase 2                   | open      |
 
 ## 9. Decisions & Outcomes
 

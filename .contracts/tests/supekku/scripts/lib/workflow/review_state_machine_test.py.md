@@ -10,15 +10,13 @@ approval guard + disposition constraints (VT-109-003), status derivation
 
 - `_disposition(action, authority) -> FindingDisposition`: Build a FindingDisposition for tests.
 - `_finding(finding_id, title, disposition) -> ReviewFinding`: Build a ReviewFinding for tests.
-- `_warm_index() -> dict`: Build a minimal valid review-index dict in WARM state. - ---------------------------------------------------------------------------
+- `_warm_index() -> dict`: Build a minimal valid review-index dict in WARM state.
 
 ## Classes
 
 ### ApprovalGuardTest
 
 can_approve() (DR-109 §3.3).
-
-_---------------------------------------------------------------------------_
 
 **Inherits from:** unittest.TestCase
 
@@ -59,8 +57,6 @@ derive_bootstrap_status() (DR-109 §3.2).
 
 BootstrapStatus enum values (DR-109 §3.2).
 
-_---------------------------------------------------------------------------_
-
 **Inherits from:** unittest.TestCase
 
 #### Methods
@@ -89,8 +85,6 @@ Validity matrix assertions (DR-109 §3.2).
 
 collect_blocking_findings() (DR-109 §3.7).
 
-_---------------------------------------------------------------------------_
-
 **Inherits from:** unittest.TestCase
 
 #### Methods
@@ -106,8 +100,6 @@ _---------------------------------------------------------------------------_
 ### FindingDispositionModelTest
 
 FindingDisposition Pydantic model.
-
-_---------------------------------------------------------------------------_
 
 **Inherits from:** unittest.TestCase
 
@@ -138,8 +130,6 @@ apply_review_transition() (DR-109 §3.3).
 
 ReviewStatus enum values (DR-109 §3.3).
 
-_---------------------------------------------------------------------------_
-
 **Inherits from:** unittest.TestCase
 
 #### Methods
@@ -162,8 +152,6 @@ ReviewFinding Pydantic model.
 ### StatusDerivationTest
 
 derive_finding_status() (DR-109 §3.4).
-
-_---------------------------------------------------------------------------_
 
 **Inherits from:** unittest.TestCase
 

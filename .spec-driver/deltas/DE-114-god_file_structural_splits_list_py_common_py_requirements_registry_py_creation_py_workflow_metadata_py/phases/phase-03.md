@@ -57,15 +57,15 @@ Split `supekku/scripts/lib/requirements/registry.py` (1,511 lines) into 5 focuse
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description                         | Parallel? | Notes |
-| ------ | --- | ----------------------------------- | --------- | ----- |
-| [x]    | 3.1 | Create `models.py`                  | [ ]       | 116 lines |
-| [x]    | 3.2 | Create `parser.py`                  | [ ]       | 286 lines |
-| [x]    | 3.3 | Create `sync.py`                    | [ ]       | 512 lines |
-| [x]    | 3.4 | Create `coverage.py`                | [ ]       | 214 lines |
-| [x]    | 3.5 | Slim `registry.py` + re-exports     | [ ]       | 447 lines |
+| Status | ID  | Description                         | Parallel? | Notes                                |
+| ------ | --- | ----------------------------------- | --------- | ------------------------------------ |
+| [x]    | 3.1 | Create `models.py`                  | [ ]       | 116 lines                            |
+| [x]    | 3.2 | Create `parser.py`                  | [ ]       | 286 lines                            |
+| [x]    | 3.3 | Create `sync.py`                    | [ ]       | 512 lines                            |
+| [x]    | 3.4 | Create `coverage.py`                | [ ]       | 214 lines                            |
+| [x]    | 3.5 | Slim `registry.py` + re-exports     | [ ]       | 447 lines                            |
 | [x]    | 3.6 | Split test files (5 files)          | [ ]       | models/parser/sync/coverage/registry |
-| [x]    | 3.7 | Lint + full test suite verification | [ ]       | 4,585 pass, 0 warnings |
+| [x]    | 3.7 | Lint + full test suite verification | [ ]       | 4,585 pass, 0 warnings               |
 
 ### Task Details
 
@@ -79,10 +79,10 @@ Split `supekku/scripts/lib/requirements/registry.py` (1,511 lines) into 5 focuse
 
 ## 8. Risks & Mitigations
 
-| Risk                                   | Mitigation                                    | Status |
-| -------------------------------------- | --------------------------------------------- | ------ |
-| Subtle semantic change in extraction   | 2,787 lines of tests; pure function sigs      | open   |
-| Circular imports between split modules | Acyclic graph by design; verify with grep     | open   |
+| Risk                                   | Mitigation                                | Status |
+| -------------------------------------- | ----------------------------------------- | ------ |
+| Subtle semantic change in extraction   | 2,787 lines of tests; pure function sigs  | open   |
+| Circular imports between split modules | Acyclic graph by design; verify with grep | open   |
 
 ## 9. Decisions & Outcomes
 

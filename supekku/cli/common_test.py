@@ -1036,3 +1036,144 @@ class TestResolveById:
     root = find_repo_root()
     matches = resolve_by_id("999", root)
     assert matches == []
+
+
+# ── CLI JSON Envelope Helpers (DE-108 P01) ─────────────────────
+
+
+class TestCliJsonEnvelope:
+  """Tests for cli_json_success, cli_json_error, emit_json_and_exit."""
+
+  def test_success_envelope_structure(self) -> None:
+    from supekku.cli.common import CLI_JSON_ENVELOPE_VERSION, cli_json_success
+
+    result = cli_json_success("review.prime", {"delta_id": "DE-108"})
+
+    assert result["version"] == CLI_JSON_ENVELOPE_VERSION
+    assert result["command"] == "review.prime"
+    assert result["status"] == "ok"
+    assert result["exit_code"] == 0
+    assert result["data"] == {"delta_id": "DE-108"}
+    assert "error" not in result
+
+  def test_error_envelope_structure(self) -> None:
+    from supekku.cli.common import (
+      EXIT_PRECONDITION,
+      cli_json_error,
+    )
+
+    result = cli_json_error(
+      "review.prime", EXIT_PRECONDITION, "precondition", "No workflow state"
+    )
+
+    assert result["version"] == 1
+    assert result["command"] == "review.prime"
+    assert result["status"] == "error"
+    assert result["exit_code"] == EXIT_PRECONDITION
+    assert result["error"]["kind"] == "precondition"
+    assert result["error"]["message"] == "No workflow state"
+    assert "data" not in result
+
+  def test_error_envelope_guard_violation(self) -> None:
+    from supekku.cli.common import EXIT_GUARD_VIOLATION, cli_json_error
+
+    result = cli_json_error(
+      "review.complete",
+      EXIT_GUARD_VIOLATION,
+      "guard_violation",
+      "Blocking findings remain",
+    )
+
+    assert result["exit_code"] == 3
+    assert result["error"]["kind"] == "guard_violation"
+
+  def test_error_envelope_unexpected(self) -> None:
+    from supekku.cli.common import EXIT_FAILURE, cli_json_error
+
+    result = cli_json_error(
+      "review.prime", EXIT_FAILURE, "unexpected", "Something broke"
+    )
+
+    assert result["exit_code"] == 1
+    assert result["error"]["kind"] == "unexpected"
+
+  def test_error_envelope_validation(self) -> None:
+    from supekku.cli.common import EXIT_PRECONDITION, cli_json_error
+
+    result = cli_json_error(
+      "review.complete", EXIT_PRECONDITION, "validation", "Schema mismatch"
+    )
+
+    assert result["error"]["kind"] == "validation"
+
+  def test_emit_json_and_exit_success(self, capsys: pytest.CaptureFixture) -> None:
+    import json
+
+    from click.exceptions import Exit as ClickExit
+
+    from supekku.cli.common import cli_json_success, emit_json_and_exit
+
+    payload = cli_json_success("review.teardown", {"removed": ["a.yaml"]})
+
+    with pytest.raises(ClickExit) as exc_info:
+      emit_json_and_exit(payload)
+
+    assert exc_info.value.args[0] == 0
+    captured = capsys.readouterr()
+    parsed = json.loads(captured.out)
+    assert parsed["status"] == "ok"
+    assert parsed["data"]["removed"] == ["a.yaml"]
+    assert captured.err == ""
+
+  def test_emit_json_and_exit_error(self, capsys: pytest.CaptureFixture) -> None:
+    import json
+
+    from click.exceptions import Exit as ClickExit
+
+    from supekku.cli.common import (
+      EXIT_PRECONDITION,
+      cli_json_error,
+      emit_json_and_exit,
+    )
+
+    payload = cli_json_error(
+      "review.prime", EXIT_PRECONDITION, "precondition", "Missing state"
+    )
+
+    with pytest.raises(ClickExit) as exc_info:
+      emit_json_and_exit(payload)
+
+    assert exc_info.value.args[0] == 2
+    captured = capsys.readouterr()
+    parsed = json.loads(captured.out)
+    assert parsed["status"] == "error"
+    assert parsed["exit_code"] == 2
+    assert captured.err == ""
+
+
+class TestExitCodeConstants:
+  """Verify exit code constants are correct and distinct."""
+
+  def test_values(self) -> None:
+    from supekku.cli.common import (
+      EXIT_FAILURE,
+      EXIT_GUARD_VIOLATION,
+      EXIT_PRECONDITION,
+      EXIT_SUCCESS,
+    )
+
+    assert EXIT_SUCCESS == 0
+    assert EXIT_FAILURE == 1
+    assert EXIT_PRECONDITION == 2
+    assert EXIT_GUARD_VIOLATION == 3
+
+  def test_distinct(self) -> None:
+    from supekku.cli.common import (
+      EXIT_FAILURE,
+      EXIT_GUARD_VIOLATION,
+      EXIT_PRECONDITION,
+      EXIT_SUCCESS,
+    )
+
+    codes = [EXIT_SUCCESS, EXIT_FAILURE, EXIT_PRECONDITION, EXIT_GUARD_VIOLATION]
+    assert len(set(codes)) == 4

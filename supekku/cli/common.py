@@ -23,7 +23,7 @@ import re
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, NoReturn
 
 import click
 import typer
@@ -33,6 +33,65 @@ from supekku.scripts.lib.core.paths import get_deltas_dir
 # Exit codes
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
+EXIT_PRECONDITION = 2
+EXIT_GUARD_VIOLATION = 3
+
+# JSON envelope version — increment when envelope shape changes (DE-108)
+CLI_JSON_ENVELOPE_VERSION = 1
+
+
+def cli_json_success(command: str, data: dict) -> dict:
+  """Build a success JSON envelope for structured CLI output.
+
+  Args:
+    command: Dotted command name (e.g. 'review.prime').
+    data: Command-specific payload.
+  """
+  return {
+    "version": CLI_JSON_ENVELOPE_VERSION,
+    "command": command,
+    "status": "ok",
+    "exit_code": EXIT_SUCCESS,
+    "data": data,
+  }
+
+
+def cli_json_error(
+  command: str,
+  exit_code: int,
+  kind: str,
+  message: str,
+) -> dict:
+  """Build an error JSON envelope for structured CLI output.
+
+  Args:
+    command: Dotted command name (e.g. 'review.prime').
+    exit_code: One of EXIT_FAILURE, EXIT_PRECONDITION, EXIT_GUARD_VIOLATION.
+    kind: Error category — 'precondition', 'guard_violation', 'validation',
+          or 'unexpected'.
+    message: Human-readable error description.
+  """
+  return {
+    "version": CLI_JSON_ENVELOPE_VERSION,
+    "command": command,
+    "status": "error",
+    "exit_code": exit_code,
+    "error": {
+      "kind": kind,
+      "message": message,
+    },
+  }
+
+
+def emit_json_and_exit(payload: dict) -> NoReturn:
+  """Print a JSON envelope to stdout and exit with the embedded exit code.
+
+  In JSON mode, this is the sole output path — nothing goes to stderr.
+  """
+  import json  # noqa: PLC0415
+
+  typer.echo(json.dumps(payload, indent=2))
+  raise typer.Exit(payload["exit_code"])
 
 
 class ContentType(str, enum.Enum):

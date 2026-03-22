@@ -113,6 +113,58 @@ deferred to Phase 3 proper.
 
 ---
 
+## Phase 3 — Implementation log
+
+### Deliverables
+
+- 4 disposition subcommands: `review finding resolve|defer|waive|supersede`
+- `review prime` sets `judgment_status: in_progress` via `apply_review_transition()`
+- `review complete --status approved` enforces `can_approve()` guard
+- `review complete` writes `judgment_status` to review-index
+- `--summary` wired into round metadata (`build_round_entry`/`append_round`/`build_findings`)
+- `summary` field added to round entry schema in `workflow_metadata.py`
+
+### Design choices
+
+- **Default authority**: All CLI disposition commands default to `authority: agent`.
+  `--authority user` overrides explicitly (waive command). This follows the model
+  where agents are the typical CLI invokers; human authority requires opt-in.
+- **Shared orchestration**: `_disposition_finding()` helper handles all 4 commands
+  (read → validate → update → write). Each command builds a disposition dict and
+  delegates. Keeps CLI thin (~160 lines for all disposition code).
+- **Finding not found**: Lists available IDs from all rounds for discoverability.
+- **Guard placement**: Guard runs before round append, so failed approval doesn't
+  create a spurious round entry.
+- **Judgment write**: Non-fatal if review-index doesn't exist (e.g. teardown already
+  ran). Findings and state are higher priority writes.
+
+### Gotcha: FindingDisposition.authority is required
+
+`FindingDisposition(BaseModel)` has `authority: DispositionAuthority` as a required
+field (not optional). Every disposition dict passed to `update_finding_disposition()`
+must include authority. Initial implementation missed this — Pydantic validation
+caught it at write time.
+
+### Commits
+
+- `1fa074fc` — feat(DE-109): Phase 3 implementation + 22 new tests
+
+### Verification
+
+`uv run python -m pytest supekku` — 4562 passed, 0 failures.
+`uv run ruff check` — clean on all changed files.
+`just pylint-files` — no new warnings (pre-existing only).
+
+### Phase 4 readiness
+
+Phase 3 is functionally complete. Phase 4 (integration/cleanup) remains:
+- Derive `workflow_metadata.py` validation lists from StrEnums (POL-002)
+- Refactor `staleness.py` to import BootstrapStatus from review_state_machine
+- End-to-end test: multi-round review with disposition and approval
+- `just check` green
+
+---
+
 ## New Agent Instructions
 
 ### Task card
@@ -124,14 +176,14 @@ deferred to Phase 3 proper.
 
 - Phase 1 (domain model) — **complete**. 59 tests.
 - Phase 2 (I/O layer) — **complete**. 44 tests + CLI/schema tests updated.
-- Phase 3 (CLI commands) — **next**. Phase sheet needs creation.
-- Phase 4 (integration/cleanup) — planned.
+- Phase 3 (CLI commands) — **complete**. 22 new tests (43 review tests total).
+- Phase 4 (integration/cleanup) — **next**. Phase sheet needs creation.
 
 ### Required reading
 
-1. `DE-109/DR-109.md` §4 — CLI UX for disposition and query commands
-2. `DE-109/IP-109.md` §5 Phase 3 — CLI commands scope
-3. `DE-109/phases/phase-01.md` and `phase-02.md` — completed work
+1. `DE-109/DR-109.md` — full design (§4 for CLI, §3 for domain model)
+2. `DE-109/IP-109.md` — phase overview and VT coverage
+3. `DE-109/phases/phase-01.md` through `phase-03.md` — completed work
 
 ### Key files
 
@@ -141,46 +193,30 @@ deferred to Phase 3 proper.
 - `supekku/cli/workflow.py` — CLI commands (Phase 3 target)
 - `supekku/cli/workflow_review_test.py` — CLI review tests
 
-### What Phase 3 must deliver (from IP-109)
+### What Phase 4 must deliver (from IP-109)
 
-1. **Disposition commands**: `review finding resolve|defer|waive|supersede`
-   - DR-109 §4.1 defines CLI shapes and constraints
-   - `update_finding_disposition()` and `find_finding()` in review_io.py are ready
-   - Each command: read findings → validate constraints → update in-place → write
-2. **Update `review prime`**: set judgment to `in_progress` via `apply_review_transition()`
-3. **Update `review complete`**: enforce `can_approve()` guard on `--status approved`
-4. **Write judgment transition to review-index** on complete
-
-### What was pulled ahead from Phase 3
-
-`review complete` already uses v2 `build_findings()`/`append_round()` (Phase 2
-compatibility fix). It does NOT yet:
-- Use `apply_review_transition()` for judgment
-- Enforce `can_approve()` guard
-- Write `judgment_status` to review-index
-- Handle `--summary` (currently ignored)
+1. Derive `workflow_metadata.py` validation lists from StrEnums (POL-002)
+2. Refactor `staleness.py`: import `BootstrapStatus` from `review_state_machine`, call `derive_bootstrap_status()`
+3. End-to-end test: multi-round review with disposition and approval (VT-109-009)
+4. `just check` green (lint + test)
 
 ### Loose ends
 
-- `summary` parameter in `review complete` is accepted but ignored in v2. Phase 3
-  should wire it into round metadata or remove it.
-- OQ-109-001 (WorkflowState duplication in workflow_metadata.py) — deferred to
-  Phase 4 if natural.
+- OQ-109-001 (WorkflowState duplication in workflow_metadata.py) — Phase 4 if natural.
 
 ### Commit state
 
-All `.spec-driver/` and code changes are committed. Worktree is clean except
-`.claude/settings.local.json`. Full suite green (4533 passed, 0 failures).
+All `.spec-driver/` and code changes committed. Full suite green (4562 passed).
 
 ### Relevant ADRs/policies
 
-- POL-002: no magic strings — disposition commands must use StrEnums
+- POL-002: no magic strings — disposition commands use StrEnums
 - ADR-009: standard registry API convention
 
 ### Verification
 
 ```
-just test          # 4533 passed
-just lint          # clean
-just pylint-report # check score
+uv run python -m pytest supekku  # 4562 passed
+uv run ruff check                # clean
+just pylint-files                # no new warnings
 ```

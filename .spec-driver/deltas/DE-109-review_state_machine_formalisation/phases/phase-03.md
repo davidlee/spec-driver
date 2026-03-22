@@ -31,18 +31,18 @@ Wire review state machine into CLI: disposition subcommands (`review finding res
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `review finding resolve` command works with `--resolved-at` option
-- [ ] `review finding defer` command works with `--rationale` (required) and `--backlog-ref`
-- [ ] `review finding waive` command works with `--rationale` (required) and `--authority`
-- [ ] `review finding supersede` command works with `--superseded-by` (required)
-- [ ] Finding not found → clear error with available IDs
-- [ ] `review prime` sets `judgment_status: in_progress` via `apply_review_transition()`
-- [ ] `review complete --status approved` enforces `can_approve()` guard
-- [ ] `review complete` writes `judgment_status` to review-index
-- [ ] `review complete --summary` wires summary into round metadata
-- [ ] VT-109-005: CLI guard enforcement tests passing
-- [ ] VT-109-008: Disposition command tests passing
-- [ ] Lint clean on all touched files
+- [x] `review finding resolve` command works with `--resolved-at` option
+- [x] `review finding defer` command works with `--rationale` (required) and `--backlog-ref`
+- [x] `review finding waive` command works with `--rationale` (required) and `--authority`
+- [x] `review finding supersede` command works with `--superseded-by` (required)
+- [x] Finding not found → clear error with available IDs
+- [x] `review prime` sets `judgment_status: in_progress` via `apply_review_transition()`
+- [x] `review complete --status approved` enforces `can_approve()` guard
+- [x] `review complete` writes `judgment_status` to review-index
+- [x] `review complete --summary` wires summary into round metadata
+- [x] VT-109-005: CLI guard enforcement tests passing
+- [x] VT-109-008: Disposition command tests passing
+- [x] Lint clean on all touched files
 
 ## 5. Verification
 
@@ -60,14 +60,14 @@ Wire review state machine into CLI: disposition subcommands (`review finding res
 
 | Status | ID | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 3.1 | Add `review finding` subcommand group with 4 disposition commands | | DR-109 §4.1 |
-| [ ] | 3.2 | Update `review prime` to set judgment via `apply_review_transition()` | [P] | DR-109 §4.3 |
-| [ ] | 3.3 | Update `review complete` to enforce `can_approve()` guard | | DR-109 §4.3 |
-| [ ] | 3.4 | Update `review complete` to write `judgment_status` to review-index | | DR-109 §4.3 |
-| [ ] | 3.5 | Wire `--summary` into round metadata | | Loose end from Phase 2 |
-| [ ] | 3.6 | Write disposition command tests (VT-109-008) | | DR-109 §5.3 |
-| [ ] | 3.7 | Write CLI guard enforcement tests (VT-109-005) | | DR-109 §5.4 |
-| [ ] | 3.8 | Lint clean | | ruff + pylint |
+| [x] | 3.1 | Add `review finding` subcommand group with 4 disposition commands | | DR-109 §4.1 |
+| [x] | 3.2 | Update `review prime` to set judgment via `apply_review_transition()` | [P] | DR-109 §4.3 |
+| [x] | 3.3 | Update `review complete` to enforce `can_approve()` guard | | DR-109 §4.3 |
+| [x] | 3.4 | Update `review complete` to write `judgment_status` to review-index | | DR-109 §4.3 |
+| [x] | 3.5 | Wire `--summary` into round metadata | | Loose end from Phase 2 |
+| [x] | 3.6 | Write disposition command tests (VT-109-008) | | DR-109 §5.3 |
+| [x] | 3.7 | Write CLI guard enforcement tests (VT-109-005) | | DR-109 §5.4 |
+| [x] | 3.8 | Lint clean | | ruff + pylint |
 
 ### Task Details
 

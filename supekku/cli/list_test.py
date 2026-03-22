@@ -1410,9 +1410,9 @@ class TestListMemoriesStale:
     mock_registry.iter.return_value = iter(records)
 
     with (
-      patch("supekku.cli.list.MemoryRegistry", return_value=mock_registry),
+      patch("supekku.cli.list.misc.MemoryRegistry", return_value=mock_registry),
       patch(
-        "supekku.cli.list.compute_batch_staleness",
+        "supekku.cli.list.misc.compute_batch_staleness",
         return_value=staleness,
       ),
     ):
@@ -1429,7 +1429,7 @@ class TestListMemoriesStale:
     mock_registry.iter.return_value = iter([])
 
     with patch(
-      "supekku.cli.list.MemoryRegistry",
+      "supekku.cli.list.misc.MemoryRegistry",
       return_value=mock_registry,
     ):
       result = runner.invoke(app, ["memories", "--stale"])

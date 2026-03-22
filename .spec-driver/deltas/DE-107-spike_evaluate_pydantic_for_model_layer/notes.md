@@ -24,6 +24,18 @@
 
 **Spec model deferred**: `Spec` (`specs/models.py`) is structurally different — frozen dataclass wrapping `FrontmatterValidationResult`, all attributes are `@property` accessors into `frontmatter.data`. Not the from_frontmatter/to_dict boilerplate pattern. Needs separate design thought. See phase-02 §10.
 
+### Phase 3 — Drift, diagnostics, sync, docs (done)
+
+- Drift: 3 frozen (`Source`, `Claim`, `DiscoveredBy`) + 2 mutable (`DriftEntry`, `DriftLedger`)
+- Diagnostics: 2 frozen (`DiagnosticResult`, `CategorySummary`)
+- Sync: 3 frozen (`SourceUnit`, `DocVariant`, `SourceDescriptor`) + 1 mutable (`SyncOutcome`)
+- Docs/python: `VariantSpec` (classmethods retained), `DocResult`
+- **Gotcha: `TYPE_CHECKING` guard on Path imports**. Pydantic needs runtime access to `Path` for field resolution. `from __future__ import annotations` defers annotation evaluation but `model_rebuild()` still needs the type available. Moved `Path` imports out of `TYPE_CHECKING` blocks.
+- **Gotcha: frozen mutation tests**. `@dataclass(frozen=True)` raises `AttributeError`; Pydantic `frozen=True` raises `ValidationError`. Updated 4 tests.
+- **Gotcha: positional construction**. Dataclasses accept positional args; Pydantic BaseModel requires keyword args. Updated ~20 test call sites across 8 files.
+- Net model file change: 0 lines (52 added, 52 removed — import swaps and config additions)
+- Commits: `7467e09` (models), `7813055` (tests)
+
 ### Observations
 
 1. **Conversion is mechanical for field-mapping models.** BacklogItem and Card needed zero test changes. MemoryRecord needed 7 (removing from_frontmatter calls). The pattern is proven and repeatable.
@@ -31,11 +43,10 @@
 3. **`extra="ignore"` is essential.** Frontmatter may contain unknown fields (e.g. `links` section fields not in the model). `extra="ignore"` silently absorbs these.
 4. **Pydantic + @staticmethod/@classmethod works.** No metaclass conflicts. Card.from_file() and helpers work unchanged.
 
-### Open Questions for Phase 3
+### Open Questions
 
-- **Spec model**: defer to Phase 3 or separate delta? The wrapper-around-FrontmatterValidationResult pattern doesn't map to the mechanical conversion recipe.
-- **Drift models**: `@dataclass(frozen=True)` → `ConfigDict(frozen=True)` — need to verify no mutation paths exist before converting.
-- **Phase 3 scope may need narrowing** given the Spec deferral. Original IP-107 Phase 3 included "remaining models" which assumed Spec was done in Phase 2.
+- **Spec model**: needs separate design thought or separate delta. Wrapper-around-FrontmatterValidationResult pattern doesn't map to mechanical conversion.
+- **IP-107 remaining scope**: frontmatter metadata updates and schema docs from original Phase 3 not yet addressed. May be out of scope for this spike delta.
 
 ### Phases Overview
 
@@ -43,7 +54,7 @@
 |---|---|---|
 | **P01** | `MemoryRecord` conversion | **Done** |
 | **P02** | `BacklogItem`, `Card` models | **Done** |
-| **P03** | Drift models, remaining, frontmatter metadata, schema docs | Planned |
+| **P03** | Drift, diagnostics, sync, docs models | **Done** |
 
 ### Coordination
 

@@ -6,9 +6,9 @@ artifact:
   path: .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer
   notes_path: .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/notes.md
 phase:
-  id: IP-107.PHASE-02
+  id: IP-107.PHASE-03
   status: implementing
-  path: .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/phases/phase-02.md
+  path: .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/phases/phase-03.md
 workflow:
   status: implementing
   active_role: implementer

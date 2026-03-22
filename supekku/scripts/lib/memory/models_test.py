@@ -177,23 +177,20 @@ class TestMemoryRecord(unittest.TestCase):
     self.assertEqual(d["path"], "")
 
   def test_from_frontmatter_minimal(self) -> None:
-    """from_frontmatter constructs record from minimal frontmatter dict."""
+    """Direct construction from frontmatter dict."""
     fm = {
       "id": "mem.fact.test",
       "name": "Test",
       "status": "active",
       "memory_type": "fact",
     }
-    record = MemoryRecord.from_frontmatter(
-      Path("/repo/memory/mem.fact.test.md"),
-      fm,
-    )
+    record = MemoryRecord(**fm, path="/repo/memory/mem.fact.test.md")
     self.assertEqual(record.id, "mem.fact.test")
     self.assertEqual(record.memory_type, "fact")
     self.assertEqual(record.path, "/repo/memory/mem.fact.test.md")
 
   def test_from_frontmatter_with_dates(self) -> None:
-    """from_frontmatter parses date strings and date objects."""
+    """Date strings and date objects are coerced correctly."""
     fm = {
       "id": "mem.fact.test",
       "name": "Test",
@@ -204,14 +201,14 @@ class TestMemoryRecord(unittest.TestCase):
       "verified": "2026-03-01",
       "review_by": "2026-06-01",
     }
-    record = MemoryRecord.from_frontmatter(Path("/repo/mem.fact.test.md"), fm)
+    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")
     self.assertEqual(record.created, date(2026, 3, 1))
     self.assertEqual(record.updated, date(2026, 3, 2))
     self.assertEqual(record.verified, date(2026, 3, 1))
     self.assertEqual(record.review_by, date(2026, 6, 1))
 
   def test_from_frontmatter_full(self) -> None:
-    """from_frontmatter handles all optional fields."""
+    """All optional fields are parsed correctly."""
     fm = {
       "id": "mem.signpost.auth.prereading",
       "name": "Auth Pre-Reading",
@@ -229,8 +226,7 @@ class TestMemoryRecord(unittest.TestCase):
       "visibility": ["pre", "on_demand"],
       "relations": [{"type": "relates_to", "target": "ADR-011"}],
     }
-    path = Path("/repo/mem.signpost.auth.prereading.md")
-    record = MemoryRecord.from_frontmatter(path, fm)
+    record = MemoryRecord(**fm, path="/repo/mem.signpost.auth.prereading.md")
     self.assertEqual(record.confidence, "high")
     self.assertEqual(record.requires_reading, ["ADR-011"])
     self.assertEqual(record.scope, {"globs": ["src/**"]})
@@ -238,7 +234,7 @@ class TestMemoryRecord(unittest.TestCase):
     self.assertEqual(record.visibility, ["pre", "on_demand"])
 
   def test_from_frontmatter_bad_date_ignored(self) -> None:
-    """from_frontmatter sets None for unparseable dates."""
+    """Unparseable dates coerce to None."""
     fm = {
       "id": "mem.fact.test",
       "name": "Test",
@@ -247,7 +243,7 @@ class TestMemoryRecord(unittest.TestCase):
       "created": "not-a-date",
       "verified": "March 2026",
     }
-    record = MemoryRecord.from_frontmatter(Path("/repo/mem.fact.test.md"), fm)
+    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")
     self.assertIsNone(record.created)
     self.assertIsNone(record.verified)
 
@@ -263,7 +259,7 @@ class TestMemoryRecord(unittest.TestCase):
     self.assertEqual(record.links, {})
 
   def test_from_frontmatter_with_links(self) -> None:
-    """from_frontmatter parses links object."""
+    """Links object is parsed correctly."""
     links = {
       "out": [
         {"id": "ADR-001", "path": "decisions/ADR-001.md", "kind": "adr"},
@@ -277,10 +273,7 @@ class TestMemoryRecord(unittest.TestCase):
       "memory_type": "fact",
       "links": links,
     }
-    record = MemoryRecord.from_frontmatter(
-      Path("/repo/mem.fact.test.md"),
-      fm,
-    )
+    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")
     self.assertEqual(record.links, links)
 
   def test_to_dict_with_links(self) -> None:
@@ -327,7 +320,7 @@ class TestMemoryRecordVerifiedSha(unittest.TestCase):
       "memory_type": "fact",
       "verified_sha": self.SAMPLE_SHA,
     }
-    record = MemoryRecord.from_frontmatter(Path("/repo/mem.fact.test.md"), fm)
+    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")
     self.assertEqual(record.verified_sha, self.SAMPLE_SHA)
 
   def test_from_frontmatter_without_verified_sha(self) -> None:
@@ -337,7 +330,7 @@ class TestMemoryRecordVerifiedSha(unittest.TestCase):
       "status": "active",
       "memory_type": "fact",
     }
-    record = MemoryRecord.from_frontmatter(Path("/repo/mem.fact.test.md"), fm)
+    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")
     self.assertIsNone(record.verified_sha)
 
   def test_to_dict_includes_verified_sha_when_present(self) -> None:

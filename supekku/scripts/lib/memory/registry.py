@@ -72,7 +72,7 @@ class MemoryRegistry:
     if not frontmatter.get("id"):
       frontmatter["id"] = path.stem
 
-    return MemoryRecord.from_frontmatter(path, frontmatter)
+    return MemoryRecord(**frontmatter, path=str(path))
 
   def collect_bodies(self) -> dict[str, str]:
     """Collect body text for all memory records.

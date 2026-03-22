@@ -2,50 +2,28 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
-
-def _parse_date(value: Any) -> date | None:
-  """Parse a date from string or date object.
-
-  Args:
-    value: Date string (YYYY-MM-DD), date object, or datetime object.
-
-  Returns:
-    Parsed date or None if unparseable.
-  """
-  if not value:
-    return None
-  if isinstance(value, date) and not isinstance(value, datetime):
-    return value
-  if isinstance(value, datetime):
-    return value.date()
-  if isinstance(value, str):
-    for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y/%m/%d"):
-      try:
-        return datetime.strptime(value, fmt).date()
-      except ValueError:
-        continue
-  return None
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
-@dataclass
-class MemoryRecord:
+class MemoryRecord(BaseModel):
   """A memory artifact record parsed from frontmatter.
 
   Required fields: id, name, status, memory_type, path.
   All other fields are optional with safe defaults.
   """
 
-  # Required
-  id: str
-  name: str
-  status: str
-  memory_type: str
-  path: str
+  model_config = ConfigDict(extra="ignore")
+
+  # Required (defaulted to empty string for permissive parsing)
+  id: str = ""
+  name: str = ""
+  status: str = ""
+  memory_type: str = ""
+  path: str = ""
 
   # Optional dates
   created: date | None = None
@@ -59,54 +37,37 @@ class MemoryRecord:
   summary: str = ""
 
   # Optional lists
-  tags: list[str] = field(default_factory=list)
-  owners: list[str] = field(default_factory=list)
-  requires_reading: list[str] = field(default_factory=list)
-  audience: list[str] = field(default_factory=list)
-  visibility: list[str] = field(default_factory=list)
-  relations: list[dict[str, Any]] = field(default_factory=list)
+  tags: list[str] = []
+  owners: list[str] = []
+  requires_reading: list[str] = []
+  audience: list[str] = []
+  visibility: list[str] = []
+  relations: list[dict[str, Any]] = []
 
   # Optional objects
-  scope: dict[str, Any] = field(default_factory=dict)
-  priority: dict[str, Any] = field(default_factory=dict)
-  provenance: dict[str, Any] = field(default_factory=dict)
-  links: dict[str, Any] = field(default_factory=dict)
+  scope: dict[str, Any] = {}
+  priority: dict[str, Any] = {}
+  provenance: dict[str, Any] = {}
+  links: dict[str, Any] = {}
 
+  @field_validator("created", "updated", "verified", "review_by", mode="before")
   @classmethod
-  def from_frontmatter(cls, path: Path, fm: dict[str, Any]) -> MemoryRecord:
-    """Construct a MemoryRecord from parsed frontmatter.
-
-    Args:
-      path: Filesystem path to the memory file.
-      fm: Parsed frontmatter dictionary.
-
-    Returns:
-      Populated MemoryRecord.
-    """
-    return cls(
-      id=fm.get("id", ""),
-      name=fm.get("name", ""),
-      status=fm.get("status", ""),
-      memory_type=fm.get("memory_type", ""),
-      path=str(path),
-      created=_parse_date(fm.get("created")),
-      updated=_parse_date(fm.get("updated")),
-      verified=_parse_date(fm.get("verified")),
-      verified_sha=fm.get("verified_sha"),
-      review_by=_parse_date(fm.get("review_by")),
-      confidence=fm.get("confidence"),
-      summary=fm.get("summary", ""),
-      tags=fm.get("tags", []),
-      owners=fm.get("owners", []),
-      requires_reading=fm.get("requires_reading", []),
-      audience=fm.get("audience", []),
-      visibility=fm.get("visibility", []),
-      relations=fm.get("relations", []),
-      scope=fm.get("scope", {}),
-      priority=fm.get("priority", {}),
-      provenance=fm.get("provenance", {}),
-      links=fm.get("links", {}),
-    )
+  def _coerce_date(cls, v: Any) -> date | None:
+    """Coerce date-like values permissively. Returns None on bad input."""
+    if v is None:
+      return None
+    if isinstance(v, date) and not isinstance(v, datetime):
+      return v
+    if isinstance(v, datetime):
+      return v.date()
+    if isinstance(v, str):
+      for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y/%m/%d"):
+        try:
+          return datetime.strptime(v, fmt).date()
+        except ValueError:
+          continue
+      return None
+    return None
 
   def to_dict(self, root: Path) -> dict[str, Any]:
     """Convert to dictionary for YAML serialization.
@@ -117,6 +78,7 @@ class MemoryRecord:
     Returns:
       Dictionary with non-empty fields only.
     """
+    # Always-include fields
     data: dict[str, Any] = {
       "id": self.id,
       "name": self.name,
@@ -131,7 +93,7 @@ class MemoryRecord:
       if val:
         data[date_field] = val.isoformat()
 
-    # Optional scalars
+    # Optional scalars — include only if truthy
     if self.verified_sha:
       data["verified_sha"] = self.verified_sha
     if self.confidence:

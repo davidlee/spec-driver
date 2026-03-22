@@ -3,7 +3,7 @@ id: IP-114-P01
 slug: "114-cli_layer_split_common_and_list-phase-01"
 name: "CLI layer: split common.py and list.py"
 created: "2026-03-22"
-updated: "2026-03-22"
+updated: "2026-03-23"
 status: completed
 kind: phase
 plan: IP-114

@@ -8,49 +8,50 @@
 
 ### Status
 
-Phase 01 (CLI layer) is **complete**. Phase 02 is next.
+Phase 01 (CLI layer) and Phase 02 (Lib: creation + workflow_metadata) are **complete**. Phase 03 is next.
 
 ### Required Reading
 
 1. **Delta**: `.spec-driver/deltas/DE-114-god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py/DE-114.md`
-2. **Design Revision**: `DR-114.md` (same directory) — 3 adversarial passes, zero blockers. §4d (creation split) and §4e (workflow_metadata split) are the active sections.
-3. **Implementation Plan**: `IP-114.md` (same directory) — 3 phases, P01 complete.
-4. **Phase 01 sheet**: `phases/phase-01.md` — done, for reference only.
+2. **Design Revision**: `DR-114.md` — §4c (registry split) is the active section for P03.
+3. **Implementation Plan**: `IP-114.md` — 3 phases, P01+P02 complete.
+4. **Phase 01 sheet**: `phases/phase-01.md` — done (CLI layer).
+5. **Phase 02 sheet**: `phases/phase-02.md` — done (creation + workflow_metadata).
 
-### What's Done (Phase 01)
+### What's Done
 
-- `cli/common.py` (1,124 lines) → `common.py` (316) + `artifacts.py` (651) + `ids.py` (104) + `io.py` (138). Re-exports in slim `common.py` for backward compat.
-- `cli/list.py` (3,195 lines) → `cli/list/` package with 10 files (48–527 lines each). Singular aliases restored in `__init__.py`.
-- `package_utils_test.py` updated (`cli` is now parent, `cli/list` is leaf).
+**Phase 01 — CLI layer:**
+- `cli/common.py` (1,124→316) + `artifacts.py` (651) + `ids.py` (104) + `io.py` (138). Re-exports in slim `common.py`.
+- `cli/list.py` (3,195→package) with 10 files (48–527 lines each).
+
+**Phase 02 — Lib layer:**
+- `changes/creation.py` (1,056→276) + `_creation_utils.py` (41) + `revision_creation.py` (98) + `delta_creation.py` (170) + `audit_creation.py` (102) + `phase_creation.py` (497).
+- `blocks/workflow_metadata.py` (1,485→251) + 7 schema files: `state_schema.py` (227), `handoff_schema.py` (301), `review_index_schema.py` (261), `review_findings_schema.py` (268), `sessions_schema.py` (111), `notes_bridge_schema.py` (69), `phase_bridge_schema.py` (72).
+- All re-exports in slim files for backward compatibility.
 - All 4,585 tests pass.
 
-### What's Next (Phase 02)
+### What's Next (Phase 03)
 
-Split `changes/creation.py` and `blocks/workflow_metadata.py`. Per DR-114:
+Split `requirements/registry.py` (1,511 lines → 5 files). This is the hardest split — standalone function extraction with `records` dict passed by reference. Per DR-114 §4c:
 
-**creation.py (1,056 lines → 6 files)**:
+**registry.py → 5 files:**
+- `models.py`: `RequirementRecord`, `SyncStats` (~120)
+- `parser.py`: `_records_from_content`, `_records_from_frontmatter`, etc. (~280)
+- `sync.py`: all `_apply_*`, `_upsert_record`, iteration helpers (~500)
+- `coverage.py`: `_apply_coverage_blocks`, `_check_coverage_drift`, etc. (~200)
+- `registry.py` (slim): `RequirementsRegistry` core (~350)
 
-- `_creation_utils.py`: shared helpers (~40 lines)
-- `revision_creation.py`: `create_revision` (~75)
-- `delta_creation.py`: `create_delta` (~140)
-- `audit_creation.py`: `create_audit` (~80)
-- `phase_creation.py`: all phase logic (~320)
-- `creation.py` (slim): `create_plan`, `_render_plan`, `create_requirement_breakout` + re-exports (~400)
-- 4 importers: `cli/create.py`, `creation_test.py`, 2 deferred in `core/events_test.py`
-- Test: extract phase tests to `phase_creation_test.py`
+**Import graph** (acyclic): registry→sync→parser→models, registry→coverage→models
 
-**workflow_metadata.py (1,485 lines → 8 files)**:
-
-- Move single-consumer helpers to their schema files (see DR-114 §4e table)
-- Only `_timestamps_block` stays in slim shared file (used by STATE + HANDOFF)
-- 4 importers in `workflow/` modules
-- Re-exports from slim `workflow_metadata.py`
+**Test split**: `registry_test.py` (2,787 lines, 17 classes) splits to mirror source.
 
 ### Key Decisions
 
 - **DEC-114-02**: Re-exports for zero-change migration. Follow-up backlog issue to remove them.
-- **DEC-114-05**: Single-consumer helpers move with their schema files, not into shared.
-- Phase ordering: P02 targets are independent of each other. Do either first.
+- **DEC-114-03**: Sync internals receive mutable `records` dict by reference — identical semantics.
+- **DEC-114-05**: Single-consumer helpers move with their schema files.
+- P02 deviation: Finding chain placed in `review_findings_schema.py` (sole consumer), not `review_index_schema.py` as DR table suggested.
+- P02: `delta_creation.py` uses deferred import of `_render_plan` to avoid circular dependency.
 
 ### Relevant Governance
 
@@ -58,21 +59,19 @@ Split `changes/creation.py` and `blocks/workflow_metadata.py`. Per DR-114:
 - STD-003: utility module placement rule
 - DE-116 (upcoming): registry protocol enforcement — P03 registry split must not obstruct
 
-### Key Files
+### Key Files (P03 targets)
 
-- `supekku/scripts/lib/changes/creation.py` (1,056 lines — split target)
-- `supekku/scripts/lib/changes/creation_test.py` (823 lines — partial split)
-- `supekku/scripts/lib/blocks/workflow_metadata.py` (1,485 lines — split target)
-- `supekku/cli/create.py` (importer of creation.py)
-- `supekku/scripts/lib/workflow/{review_io,handoff_io,state_io,bridge}.py` (importers of workflow_metadata)
+- `supekku/scripts/lib/requirements/registry.py` (1,511 lines — split target)
+- `supekku/scripts/lib/requirements/registry_test.py` (2,787 lines — split target)
 
 ### Worktree State
 
-Clean. All `.spec-driver` and code changes committed. Phase 01 sheet is complete but phase not yet formally closed via CLI (do that at start of next session or when creating P02 sheet).
+Clean. All changes committed.
 
 ### Advice
 
-- The creation.py split is straightforward — each `create_*` function is self-contained with shared utils.
-- The workflow_metadata split requires care with helper placement (see DR-114 §4e verified usage table).
-- After P02, P03 (requirements/registry.py) is the hard one — standalone function extraction with full call graph in DR-114 §4c.
-- Run `uv run spec-driver create phase "<name>" --plan IP-114` to create the P02 sheet.
+- The full call graph for registry.py is in DR-114 §4c — use it.
+- Extracted functions receive `records: dict[str, RequirementRecord]` by reference.
+- `sync()` stays as a class method that delegates to imported standalone functions.
+- The import graph is acyclic by design. Verify with a quick grep after splitting.
+- Run `uv run spec-driver create phase "<name>" --plan IP-114` to create the P03 sheet.

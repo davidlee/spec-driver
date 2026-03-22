@@ -32,7 +32,7 @@ Every registered block type must produce a YAML example.
 
 ### EnumIntrospectionTest
 
-Test cases for show schema enums.* commands.
+Test cases for show schema enums.\* commands.
 
 **Inherits from:** unittest.TestCase
 

@@ -29,7 +29,7 @@ In-memory representation of a specification artefact.
 - `to_dict(self, root) -> dict[Tuple[str, <BinOp>]]`: Convert to dictionary for JSON serialization.
 
 Args:
-    root: Repository root path for relativizing file paths
+root: Repository root path for relativizing file paths
 
 Returns:
-    Dictionary representation suitable for JSON serialization
+Dictionary representation suitable for JSON serialization

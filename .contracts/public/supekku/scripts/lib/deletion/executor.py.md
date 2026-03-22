@@ -19,25 +19,25 @@ registry updates, symlink cleanup, and cross-reference handling.
 - `delete_spec(self, spec_id) -> DeletionPlan`: Delete a spec with full cleanup.
 
 Args:
-    spec_id: Spec ID (e.g., "SPEC-001")
-    dry_run: If True, only validate and return plan without deleting
+spec_id: Spec ID (e.g., "SPEC-001")
+dry_run: If True, only validate and return plan without deleting
 
 Returns:
-    DeletionPlan describing what was (or would be) deleted
+DeletionPlan describing what was (or would be) deleted
 
 ### DeletionPlan
 
 Describes what would be deleted without executing.
 
 Attributes:
-    artifact_id: ID of the artifact to delete (e.g., "SPEC-001")
-    artifact_type: Type of artifact ("spec", "delta", "revision", "adr")
-    files_to_delete: List of file paths that would be deleted
-    symlinks_to_remove: List of symlink paths that would be removed
-    registry_updates: Registry files and entries to remove
-    cross_references: Other artifacts that reference this one
-    is_safe: Whether deletion is safe (no blocking issues)
-    warnings: List of warning messages
+artifact_id: ID of the artifact to delete (e.g., "SPEC-001")
+artifact_type: Type of artifact ("spec", "delta", "revision", "adr")
+files_to_delete: List of file paths that would be deleted
+symlinks_to_remove: List of symlink paths that would be removed
+registry_updates: Registry files and entries to remove
+cross_references: Other artifacts that reference this one
+is_safe: Whether deletion is safe (no blocking issues)
+warnings: List of warning messages
 
 #### Methods
 
@@ -59,13 +59,13 @@ symlinks, and validates that deletion is safe to proceed.
 - `validate_spec_deletion(self, spec_id) -> DeletionPlan`: Validate deletion of a spec.
 
 Args:
-    spec_id: Spec ID (e.g., "SPEC-001")
-    orphaned_specs: Set of spec IDs known to be orphaned (for context).
-                   If provided, cross-references from other orphaned specs
-                   will not block deletion.
+spec_id: Spec ID (e.g., "SPEC-001")
+orphaned_specs: Set of spec IDs known to be orphaned (for context).
+If provided, cross-references from other orphaned specs
+will not block deletion.
 
 Returns:
-    DeletionPlan describing what would be deleted
+DeletionPlan describing what would be deleted
 
 ### RegistryScanner
 
@@ -79,13 +79,13 @@ to find which artifacts reference a given spec.
 - `find_spec_references(self, spec_id) -> dict[Tuple[str, list[str]]]`: Find all artifacts that reference a spec.
 
 Args:
-    spec_id: Spec ID to search for (e.g., "SPEC-001")
+spec_id: Spec ID to search for (e.g., "SPEC-001")
 
 Returns:
-    Dictionary mapping artifact type to list of artifact IDs:
-    {
-      "requirements": ["SPEC-001.FR-001", "SPEC-001.NFR-002"],
-      "deltas": ["DE-005"],
-      "revisions": ["RE-003"],
-      "decisions": ["ADR-042"]
-    }
+Dictionary mapping artifact type to list of artifact IDs:
+{
+"requirements": ["SPEC-001.FR-001", "SPEC-001.NFR-002"],
+"deltas": ["DE-005"],
+"revisions": ["RE-003"],
+"decisions": ["ADR-042"]
+}

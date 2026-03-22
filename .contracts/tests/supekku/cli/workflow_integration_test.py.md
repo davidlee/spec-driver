@@ -14,7 +14,7 @@ Verifies the full workflow cycle and regression safety.
 
 Test block/unblock in a workflow cycle.
 
-**Inherits from:** _IntegrationTestBase
+**Inherits from:** \_IntegrationTestBase
 
 #### Methods
 
@@ -24,7 +24,7 @@ Test block/unblock in a workflow cycle.
 
 Test claim guard in realistic scenarios.
 
-**Inherits from:** _IntegrationTestBase
+**Inherits from:** \_IntegrationTestBase
 
 #### Methods
 
@@ -34,7 +34,7 @@ Test claim guard in realistic scenarios.
 
 VA-103-002: Existing deltas without workflow/ continue to work.
 
-**Inherits from:** _IntegrationTestBase
+**Inherits from:** \_IntegrationTestBase
 
 #### Methods
 
@@ -48,7 +48,7 @@ VA-103-001: Full workflow cycle per DR-102 §12.
 Cycle: start → implement → handoff → review → changes_requested →
 handoff → review → approve.
 
-**Inherits from:** _IntegrationTestBase
+**Inherits from:** \_IntegrationTestBase
 
 #### Methods
 
@@ -58,13 +58,13 @@ handoff → review → approve.
 
 Test phase complete with auto-handoff in a full cycle.
 
-**Inherits from:** _IntegrationTestBase
+**Inherits from:** \_IntegrationTestBase
 
 #### Methods
 
 - `test_phase_complete_auto_handoff(self) -> None`
 
-### _IntegrationTestBase
+### \_IntegrationTestBase
 
 Common setup for integration tests.
 

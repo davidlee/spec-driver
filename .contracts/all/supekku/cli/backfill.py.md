@@ -11,9 +11,10 @@ Backfill commands for replacing stub specs with fresh templates.
 - `_write_spec_with_frontmatter(spec_path, frontmatter, body) -> None`: Write spec file with frontmatter and body.
 
 Args:
-  spec_path: Path to spec file
-  frontmatter: Frontmatter dict to serialize as YAML
-  body: Body content (markdown)
+spec_path: Path to spec file
+frontmatter: Frontmatter dict to serialize as YAML
+body: Body content (markdown)
+
 - @app.command(spec) `backfill_spec(spec_id, force, root) -> None`: Replace stub spec body with template (preserving frontmatter).
 
 This command resets a stub spec to a clean template state, filling in

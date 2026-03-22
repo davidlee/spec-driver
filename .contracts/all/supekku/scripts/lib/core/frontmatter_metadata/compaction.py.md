@@ -17,20 +17,21 @@ and phase-01 §10.5 for compaction semantics.
 - `compact_frontmatter(data, metadata, mode) -> dict[Tuple[str, Any]]`: Remove default/derived fields from frontmatter data.
 
 Applies persistence semantics per field classification:
-  - canonical: always kept
-  - derived: omitted in compact mode
-  - optional: omitted when absent, None, or equal to default_value
-  - default-omit: omitted when equal to default_value
+
+- canonical: always kept
+- derived: omitted in compact mode
+- optional: omitted when absent, None, or equal to default_value
+- default-omit: omitted when equal to default_value
 
 Fields present in data but absent from metadata pass through unchanged.
 
 Args:
-  data: Frontmatter dict to compact.
-  metadata: BlockMetadata with field persistence annotations.
-  mode: "compact" (default) strips per rules; "full" preserves everything.
+data: Frontmatter dict to compact.
+metadata: BlockMetadata with field persistence annotations.
+mode: "compact" (default) strips per rules; "full" preserves everything.
 
 Returns:
-  New dict with omitted fields removed. Input is not mutated.
+New dict with omitted fields removed. Input is not mutated.
 
 Raises:
-  ValueError: If mode is not "compact" or "full".
+ValueError: If mode is not "compact" or "full".

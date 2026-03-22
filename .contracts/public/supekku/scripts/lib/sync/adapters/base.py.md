@@ -9,6 +9,7 @@ Abstract base class for language adapters.
 Abstract interface for language-specific source discovery and documentation.
 
 Each language adapter is responsible for:
+
 1. Discovering source units (packages, modules, files) for its language
 2. Describing how source units should be processed (slug, frontmatter, variants)
 3. Generating documentation variants with check mode support
@@ -21,53 +22,53 @@ Each language adapter is responsible for:
 - @abstractmethod `describe(self, unit) -> SourceDescriptor`: Describe how a source unit should be processed.
 
 Args:
-    unit: Source unit to describe
+unit: Source unit to describe
 
 Returns:
-    SourceDescriptor with slug parts, frontmatter defaults, and variants
+SourceDescriptor with slug parts, frontmatter defaults, and variants
+
 - @abstractmethod `discover_targets(self, repo_root, requested) -> list[SourceUnit]`: Discover source units for this language.
 
 Args:
-    repo_root: Root directory of the repository
-    requested: Optional list of specific identifiers to process
+repo_root: Root directory of the repository
+requested: Optional list of specific identifiers to process
 
 Returns:
-    List of SourceUnit objects representing discoverable targets
+List of SourceUnit objects representing discoverable targets
+
 - @abstractmethod `generate(self, unit) -> list[DocVariant]`: Generate documentation variants for a source unit.
 
 Adapters write each variant to the exact file path provided in
-variant_outputs.  The returned DocVariant.path MUST match the
+variant_outputs. The returned DocVariant.path MUST match the
 corresponding value from variant_outputs (centrally validated by
 the caller).
 
-Python exception: variant_outputs contains a single "_staging_dir"
-key whose value is a staging directory.  The adapter writes all
+Python exception: variant_outputs contains a single "\_staging_dir"
+key whose value is a staging directory. The adapter writes all
 output there; the caller distributes to canonical paths afterward.
 
 Args:
-    unit: Source unit to generate documentation for
-    variant_outputs: Per-variant canonical output file paths.
-        Keys are variant names (e.g. "public", "internal");
-        values are absolute file paths to write to.
-    check: If True, only check if docs would change (don't write files)
+unit: Source unit to generate documentation for
+variant_outputs: Per-variant canonical output file paths.
+Keys are variant names (e.g. "public", "internal");
+values are absolute file paths to write to.
+check: If True, only check if docs would change (don't write files)
 
 Returns:
-    List of DocVariant objects with generation results
+List of DocVariant objects with generation results
+
 - @abstractmethod `supports_identifier(self, identifier) -> bool`: Check if this adapter can handle the given identifier format.
 
 Args:
-    identifier: Source identifier to check
+identifier: Source identifier to check
 
 Returns:
-    True if this adapter can process the identifier
+True if this adapter can process the identifier
+
 - `validate_source_exists(self, unit) -> dict[Tuple[str, <BinOp>]]`: Validate that source exists and is git-tracked.
 
 Args:
-    unit: Source unit to validate
+unit: Source unit to validate
 
 Returns:
-    Dictionary with validation results:
-      - exists: Whether source (file or directory) exists on disk
-      - git_tracked: Whether source is tracked by git (None if can't determine)
-      - status: "valid", "missing", or "untracked"
-      - message: Human-readable status message
+Dictionary with validation results: - exists: Whether source (file or directory) exists on disk - git_tracked: Whether source is tracked by git (None if can't determine) - status: "valid", "missing", or "untracked" - message: Human-readable status message

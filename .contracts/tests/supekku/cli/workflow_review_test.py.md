@@ -14,7 +14,7 @@ Tests review prime, review complete, and review teardown.
 
 Tests for review finding disposition commands with --format json.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
@@ -25,7 +25,7 @@ Tests for review finding disposition commands with --format json.
 
 Tests for review finding list command.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
@@ -38,7 +38,7 @@ Tests for review finding list command.
 
 Tests for review complete --format json.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
@@ -51,7 +51,7 @@ Tests for review complete --format json.
 
 Test `spec-driver review complete`.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
@@ -68,7 +68,7 @@ Test `spec-driver review complete`.
 
 End-to-end: prime → complete(changes_requested) → resolve → re-prime → approve.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
@@ -78,7 +78,7 @@ End-to-end: prime → complete(changes_requested) → resolve → re-prime → a
 
 Test `spec-driver review finding defer`.
 
-**Inherits from:** _FindingTestBase
+**Inherits from:** \_FindingTestBase
 
 #### Methods
 
@@ -90,7 +90,7 @@ Test `spec-driver review finding defer`.
 
 Test `spec-driver review finding resolve`.
 
-**Inherits from:** _FindingTestBase
+**Inherits from:** \_FindingTestBase
 
 #### Methods
 
@@ -103,7 +103,7 @@ Test `spec-driver review finding resolve`.
 
 Test `spec-driver review finding supersede`.
 
-**Inherits from:** _FindingTestBase
+**Inherits from:** \_FindingTestBase
 
 #### Methods
 
@@ -114,7 +114,7 @@ Test `spec-driver review finding supersede`.
 
 Test `spec-driver review finding waive`.
 
-**Inherits from:** _FindingTestBase
+**Inherits from:** \_FindingTestBase
 
 #### Methods
 
@@ -127,7 +127,7 @@ Test `spec-driver review finding waive`.
 
 Test review complete --status approved enforces can_approve() guard.
 
-**Inherits from:** _FindingTestBase
+**Inherits from:** \_FindingTestBase
 
 #### Methods
 
@@ -141,7 +141,7 @@ Test review complete --status approved enforces can_approve() guard.
 
 Test judgment_status written to review-index.
 
-**Inherits from:** _FindingTestBase
+**Inherits from:** \_FindingTestBase
 
 #### Methods
 
@@ -152,7 +152,7 @@ Test judgment_status written to review-index.
 
 Tests for review prime --format json.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
@@ -165,7 +165,7 @@ Tests for review prime --format json.
 
 Test `spec-driver review prime`.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
@@ -181,7 +181,7 @@ Test `spec-driver review prime`.
 
 Test --summary wired into round metadata.
 
-**Inherits from:** _FindingTestBase
+**Inherits from:** \_FindingTestBase
 
 #### Methods
 
@@ -192,7 +192,7 @@ Test --summary wired into round metadata.
 
 Tests for review teardown --format json.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
@@ -203,7 +203,7 @@ Tests for review teardown --format json.
 
 Test `spec-driver review teardown`.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
@@ -216,7 +216,7 @@ Test `spec-driver review teardown`.
 
 Tests for workflow status --format json.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
@@ -228,25 +228,25 @@ Tests for workflow status --format json.
 
 Test write ordering per DR-102 §5.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
 - @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_review_complete_creates_findings_and_updates_state(self) -> None`
 - @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_review_prime_creates_both_files(self) -> None`
 
-### _FindingTestBase
+### \_FindingTestBase
 
 Base for tests needing findings with blocking/non-blocking items.
 
-**Inherits from:** _ReviewTestBase
+**Inherits from:** \_ReviewTestBase
 
 #### Methods
 
 - @staticmethod `_finding(finding_id, title, summary) -> dict`: Build a minimal finding dict that passes schema validation.
 - `_setup_review_with_findings(self, delta_id, blocking, non_blocking) -> Path`: Set up a delta in reviewing state with v2 findings.
 
-### _ReviewTestBase
+### \_ReviewTestBase
 
 Common setup for review tests.
 

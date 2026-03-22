@@ -17,6 +17,7 @@ deprecated statuses.
 Record representing a Standard with metadata.
 
 Standards differ from policies in status options:
+
 - draft: Work in progress
 - required: Must comply (like a policy)
 - default: Recommended unless justified otherwise
@@ -27,10 +28,10 @@ Standards differ from policies in status options:
 - `to_dict(self, root) -> dict[Tuple[str, Any]]`: Convert to dictionary for YAML serialization.
 
 Args:
-    root: Repository root path for relativizing file paths
+root: Repository root path for relativizing file paths
 
 Returns:
-    Dictionary representation suitable for YAML serialization
+Dictionary representation suitable for YAML serialization
 
 ### StandardRegistry
 
@@ -53,5 +54,6 @@ Per ADR-002, backlinks are computed at runtime from forward references,
 not stored in frontmatter.
 
 Args:
-    standards: Dictionary of StandardRecords to populate with backlinks
+standards: Dictionary of StandardRecords to populate with backlinks
+
 - `_parse_standard_file(self, standard_path) -> <BinOp>`: Parse an individual standard file into a StandardRecord.

@@ -8,16 +8,18 @@ Show commands for displaying detailed information about artifacts.
 
 ## Functions
 
-- `_gather_forward_refs(artifact) -> list[dict[Tuple[str, str]]]`: Gather forward references from *artifact* for ``--related`` JSON.
-- `_gather_reverse_refs(repo_root, entity_id, entity_kind) -> dict[Tuple[str, list[tuple[Tuple[str, str]]]]]`: Gather reverse references grouped by kind for ``--related``.
+- `_gather_forward_refs(artifact) -> list[dict[Tuple[str, str]]]`: Gather forward references from _artifact_ for `--related` JSON.
+- `_gather_reverse_refs(repo_root, entity_id, entity_kind) -> dict[Tuple[str, list[tuple[Tuple[str, str]]]]]`: Gather reverse references grouped by kind for `--related`.
 
-Loads only registries relevant to *entity_kind* per DEC-090-15.
+Loads only registries relevant to _entity_kind_ per DEC-090-15.
 
 Returns:
-  Dict mapping kind → [(id, name), ...] for each referencing artifact.
+Dict mapping kind → [(id, name), ...] for each referencing artifact.
+
 - `_infer_kind_from_id(target_id) -> str`: Infer artifact kind from a target ID prefix.
 
-Falls back to ``"unknown"`` if no prefix matches.
+Falls back to `"unknown"` if no prefix matches.
+
 - `_show_relations_json(artifact_id, graph, neighbourhood) -> None`: Format and print relations as JSON.
 - `_show_relations_text(artifact_id, graph, neighbourhood) -> None`: Format and print relations as text.
 - @app.command(adr) `show_adr(decision_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about a specific decision/ADR.
@@ -41,6 +43,7 @@ all artifacts that reference this ID (inverse), grouped by type.
 If the ID is not found as a node, still shows any inverse edges
 (other artifacts may reference a non-existent ID). Emits a warning
 if the ID itself is not a known artifact.
+
 - @app.command(requirement) `show_requirement(req_id, json_output, path_only, raw_output, related, content_type, root) -> None`: Show detailed information about a requirement. - noqa: PLR0913
 - @app.command(revision) `show_revision(revision_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about a revision.
 - @app.command(risk) `show_risk(risk_id, json_output, path_only, raw_output, content_type, root) -> None`: Show detailed information about a risk.

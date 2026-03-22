@@ -17,7 +17,7 @@ agent consumption and validation tooling integration.
 - `metadata_to_json_schema(metadata) -> dict[Tuple[str, Any]]`: Generate JSON Schema Draft 2020-12 from block metadata.
 
 Args:
-  metadata: Block metadata definition
+metadata: Block metadata definition
 
 Returns:
-  JSON Schema dictionary
+JSON Schema dictionary

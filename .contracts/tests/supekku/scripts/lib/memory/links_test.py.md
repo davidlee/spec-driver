@@ -97,7 +97,7 @@ parse_links extracts [[...]] tokens from body text.
 - `test_memory_shorthand_link(self) -> None`
 - `test_multiline_body(self) -> None`
 - `test_multiple_links(self) -> None`
-- `test_nested_brackets_not_supported(self) -> None`: Nested [[ inside ]] captures first close.
+- `test_nested_brackets_not_supported(self) -> None`: Nested [[inside]] captures first close.
 - `test_no_links(self) -> None`
 - `test_single_link(self) -> None`
 - `test_skips_double_backtick_inline(self) -> None`

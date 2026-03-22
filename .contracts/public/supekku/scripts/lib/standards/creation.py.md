@@ -7,40 +7,43 @@ Standard creation utilities.
 - `build_standard_frontmatter(standard_id, title, status, author, author_email) -> dict`: Build frontmatter dictionary for standard.
 
 Args:
-  standard_id: Standard identifier (e.g., "STD-001").
-  title: Human-readable title.
-  status: Status value (e.g., "draft", "required", "default", "deprecated").
-  author: Optional author name.
-  author_email: Optional author email.
+standard_id: Standard identifier (e.g., "STD-001").
+title: Human-readable title.
+status: Status value (e.g., "draft", "required", "default", "deprecated").
+author: Optional author name.
+author_email: Optional author email.
 
 Returns:
-  Dictionary containing standard frontmatter.
+Dictionary containing standard frontmatter.
+
 - `create_standard(registry, options) -> StandardCreationResult`: Create a new standard with the next available ID.
 
 Args:
-  registry: Standard registry for finding next ID and storing standard.
-  options: Standard creation options (title, status, author, etc.).
-  sync_registry: Whether to sync the registry after creation.
+registry: Standard registry for finding next ID and storing standard.
+options: Standard creation options (title, status, author, etc.).
+sync_registry: Whether to sync the registry after creation.
 
 Returns:
-  StandardCreationResult with ID, path, and filename.
+StandardCreationResult with ID, path, and filename.
 
 Raises:
-  StandardAlreadyExistsError: If standard file already exists at computed path.
+StandardAlreadyExistsError: If standard file already exists at computed path.
+
 - `create_title_slug(title) -> str`: Create URL-friendly slug from title.
 
 Args:
-  title: Human-readable title.
+title: Human-readable title.
 
 Returns:
-  Lowercase slug with hyphens.
+Lowercase slug with hyphens.
+
 - `generate_next_standard_id(registry) -> str`: Generate the next available standard ID.
 
 Args:
-  registry: Standard registry to scan for existing IDs.
+registry: Standard registry to scan for existing IDs.
 
 Returns:
-  Next available standard ID (e.g., "STD-001").
+Next available standard ID (e.g., "STD-001").
 
 ## Classes
 

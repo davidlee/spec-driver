@@ -5,6 +5,7 @@ Tests for deterministic contract generation (VT-002).
 Verification Target: PROD-005.FR-002 - Deterministic File Ordering
 
 Test Coverage:
+
 - Contract generation produces identical output across multiple runs
 - File ordering is deterministic within packages
 - Byte-identical output for same package state
@@ -22,6 +23,7 @@ Test that contract generation produces deterministic output.
 
 This is the core VT-002 test: run contract generation 10 times
 and verify byte-identical output.
+
 - `test_different_packages_have_different_output(self) -> None`: Sanity check: different packages should produce different contracts.
 - `test_file_discovery_order_is_sorted(self) -> None`: Test that VariantSpec.get_files() returns sorted results.
 

@@ -18,8 +18,9 @@ All other fields are optional with safe defaults.
 - `to_dict(self, root) -> dict[Tuple[str, Any]]`: Convert to dictionary for YAML serialization.
 
 Args:
-  root: Repository root for relativizing file paths.
+root: Repository root for relativizing file paths.
 
 Returns:
-  Dictionary with non-empty fields only.
+Dictionary with non-empty fields only.
+
 - @classmethod @field_validator(created, updated, verified, review_by, mode=before) `_coerce_date(cls, v) -> <BinOp>`: Coerce date-like values permissively. Returns None on bad input.

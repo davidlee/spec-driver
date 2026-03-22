@@ -17,6 +17,7 @@ Lifecycle constants use permissive validation with warnings (DEC-057-08 pattern)
 
 Returns True for known statuses, False for unknown. Logs a warning
 for unknown values (permissive validation per DEC-057-08).
+
 - `is_valid_ledger_status(status) -> bool`: Check whether a status is in the accepted ledger lifecycle set.
 
 ## Classes

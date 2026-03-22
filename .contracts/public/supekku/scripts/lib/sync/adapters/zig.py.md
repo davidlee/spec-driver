@@ -23,38 +23,41 @@ autodoc when available.
 - `describe(self, unit) -> SourceDescriptor`: Describe how a Zig package/module should be processed.
 
 Args:
-    unit: Zig source unit
+unit: Zig source unit
 
 Returns:
-    SourceDescriptor with Zig-specific metadata
+SourceDescriptor with Zig-specific metadata
+
 - `discover_targets(self, repo_root, requested) -> list[SourceUnit]`: Discover Zig packages and modules.
 
 Args:
-    repo_root: Root directory of the repository
-    requested: Optional list of specific paths to process
+repo_root: Root directory of the repository
+requested: Optional list of specific paths to process
 
 Returns:
-    List of SourceUnit objects for Zig packages/modules
+List of SourceUnit objects for Zig packages/modules
+
 - `generate(self, unit) -> list[DocVariant]`: Generate documentation for a Zig package/module using zigmarkdoc.
 
 Args:
-    unit: Zig source unit
-    variant_outputs: Per-variant canonical output file paths
-    check: If True, only check if docs would change
+unit: Zig source unit
+variant_outputs: Per-variant canonical output file paths
+check: If True, only check if docs would change
 
 Returns:
-    List of DocVariant objects with generation results
+List of DocVariant objects with generation results
 
 Raises:
-    ZigmarkdocNotAvailableError: If zigmarkdoc is not available
-    FileNotFoundError: If source path does not exist
+ZigmarkdocNotAvailableError: If zigmarkdoc is not available
+FileNotFoundError: If source path does not exist
+
 - `supports_identifier(self, identifier) -> bool`: Check if identifier looks like a Zig path.
 
 Args:
-    identifier: Identifier to check
+identifier: Identifier to check
 
 Returns:
-    True if identifier appears to be a Zig source path
+True if identifier appears to be a Zig source path
 
 ### ZigToolchainNotAvailableError
 

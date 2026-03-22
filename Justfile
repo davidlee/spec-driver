@@ -3,10 +3,10 @@ mod wub
 check: format lint test pylint-report
 
 test:
-  uv run pytest supekku
+  uv run python -m pytest supekku
 
 quickcheck: && lint
-  uv run pytest -qx
+  uv run python -m pytest -qx
 
 # ruff - must pass
 lint:

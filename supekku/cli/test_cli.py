@@ -996,7 +996,7 @@ class TestReverseRelationshipQueries:
   def test_list_deltas_implements_filters_correctly(self):
     """Test that --implements returns only deltas implementing specific requirement."""
     result = runner.invoke(
-      app, ["list", "deltas", "--implements", "PROD-010.FR-004", "--json"]
+      app, ["list", "deltas", "--implements", "PROD-010.FR-004", "--all", "--json"]
     )
 
     if result.exit_code == 0:

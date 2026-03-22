@@ -25,7 +25,11 @@ from supekku.cli.common import (
   matches_regexp,
 )
 from supekku.scripts.lib.cards import CardRegistry
-from supekku.scripts.lib.changes.lifecycle import VALID_STATUSES, normalize_status
+from supekku.scripts.lib.changes.lifecycle import (
+  STATUS_COMPLETED,
+  VALID_STATUSES,
+  normalize_status,
+)
 from supekku.scripts.lib.changes.registry import ChangeRegistry, discover_plans
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
 from supekku.scripts.lib.core.paths import get_tech_specs_dir
@@ -539,8 +543,18 @@ def list_deltas(
     ),
   ] = False,
   external: ExternalOption = False,
+  show_all: Annotated[
+    bool,
+    typer.Option(
+      "--all",
+      "-a",
+      help="Show all deltas, including completed ones (default: hide completed)",
+    ),
+  ] = False,
 ) -> None:
   """List deltas with optional filtering and status grouping.
+
+  By default, completed deltas are hidden. Use --all to show them.
 
   The --filter flag does substring matching (case-insensitive).
   The --regexp flag filters on ID, name, and slug fields.
@@ -552,7 +566,9 @@ def list_deltas(
   The --unaudited flag is sugar for --not-referenced-by audit -s completed.
 
   Examples:
-    list deltas -s draft,in-progress            # Multi-value status filter
+    list deltas                         # Shows active deltas (hides completed)
+    list deltas --all                   # Shows all deltas
+    list deltas -s draft,in-progress    # Multi-value status filter
     list deltas --implements PROD-010.FR-004     # Reverse relationship query
     list deltas --spec PROD-010                  # Deltas touching a spec
     list deltas --related-to IMPR-006            # Deltas referencing IMPR-006
@@ -616,17 +632,25 @@ def list_deltas(
       [normalize_status(s) for s in status_values] if status_values else []
     )
 
+    # Apply default status filter if no status is specified and --all is not set
+    # (Hide completed deltas by default)
+    default_hidden = {STATUS_COMPLETED} if not status and not show_all else set()
+
     # Apply filters
     filtered_artifacts = []
     for artifact in artifacts.values():
       # Check ID filter
       if delta_ids is not None and artifact.id not in delta_ids:
         continue
+
       # Check status filter (multi-value OR logic)
-      if (
-        status_normalized and normalize_status(artifact.status) not in status_normalized
-      ):
+      norm_status = normalize_status(artifact.status)
+      if status_normalized and norm_status not in status_normalized:
         continue
+
+      if norm_status in default_hidden:
+        continue
+
       # Check substring filter
       if substring:
         filter_lower = substring.lower()

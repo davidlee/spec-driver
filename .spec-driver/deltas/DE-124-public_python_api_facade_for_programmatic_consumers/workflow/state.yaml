@@ -7,7 +7,7 @@ artifact:
   notes_path: .spec-driver/deltas/DE-124-public_python_api_facade_for_programmatic_consumers/notes.md
 phase:
   id: IP-124.PHASE-01
-  status: in_progress
+  status: complete
   path: .spec-driver/deltas/DE-124-public_python_api_facade_for_programmatic_consumers/phases/phase-01.md
 workflow:
   status: implementing

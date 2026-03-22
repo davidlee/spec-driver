@@ -63,7 +63,9 @@ class TestGoAdapter(unittest.TestCase):
 
   def test_describe_go_package(self) -> None:
     """Test describe method generates correct metadata for Go packages."""
-    unit = SourceUnit("go", "internal/application/pipeline", self.repo_root)
+    unit = SourceUnit(
+      language="go", identifier="internal/application/pipeline", root=self.repo_root
+    )
     descriptor = self.adapter.describe(unit)
 
     # Check slug parts
@@ -97,7 +99,9 @@ class TestGoAdapter(unittest.TestCase):
 
   def test_describe_rejects_non_go_unit(self) -> None:
     """Test describe method rejects non-Go source units."""
-    unit = SourceUnit("python", "some/module.py", self.repo_root)
+    unit = SourceUnit(
+      language="python", identifier="some/module.py", root=self.repo_root
+    )
 
     with pytest.raises(ValueError) as context:
       self.adapter.describe(unit)
@@ -106,7 +110,9 @@ class TestGoAdapter(unittest.TestCase):
 
   def test_generate_rejects_non_go_unit(self) -> None:
     """Test generate method rejects non-Go source units."""
-    unit = SourceUnit("python", "some/module.py", self.repo_root)
+    unit = SourceUnit(
+      language="python", identifier="some/module.py", root=self.repo_root
+    )
     variant_outputs = {
       "public": Path("/test/output/public/interfaces.md"),
       "internal": Path("/test/output/internal/internals.md"),
@@ -139,7 +145,7 @@ class TestGoAdapter(unittest.TestCase):
     mock_subprocess.return_value = Mock(returncode=0, stdout="", stderr="")
     mock_read_text.return_value = "# Documentation content"
 
-    unit = SourceUnit("go", "internal/test", self.repo_root)
+    unit = SourceUnit(language="go", identifier="internal/test", root=self.repo_root)
     variant_outputs = {
       "public": Path("/test/output/public/internal/test/interfaces.md"),
       "internal": Path("/test/output/internal/internal/test/internals.md"),
@@ -179,7 +185,7 @@ class TestGoAdapter(unittest.TestCase):
     mock_exists.return_value = True
     mock_subprocess.return_value = Mock(returncode=0)
 
-    unit = SourceUnit("go", "internal/test", self.repo_root)
+    unit = SourceUnit(language="go", identifier="internal/test", root=self.repo_root)
     variant_outputs = {
       "public": Path("/test/output/public/internal/test/interfaces.md"),
       "internal": Path("/test/output/internal/internal/test/internals.md"),
@@ -225,7 +231,7 @@ class TestGoAdapter(unittest.TestCase):
     # Mock Go not being available
     mock_is_go.return_value = False
 
-    unit = SourceUnit("go", "internal/test", self.repo_root)
+    unit = SourceUnit(language="go", identifier="internal/test", root=self.repo_root)
     variant_outputs = {
       "public": Path("/test/output/public/interfaces.md"),
       "internal": Path("/test/output/internal/internals.md"),
@@ -278,7 +284,7 @@ class TestGoAdapter(unittest.TestCase):
 
     mock_which.side_effect = which_side_effect
 
-    unit = SourceUnit("go", "internal/test", self.repo_root)
+    unit = SourceUnit(language="go", identifier="internal/test", root=self.repo_root)
     variant_outputs = {
       "public": Path("/test/output/public/interfaces.md"),
       "internal": Path("/test/output/internal/internals.md"),
@@ -313,7 +319,7 @@ class TestGoAdapter(unittest.TestCase):
       stderr="invalid package",
     )
 
-    unit = SourceUnit("go", "bad/pkg", self.repo_root)
+    unit = SourceUnit(language="go", identifier="bad/pkg", root=self.repo_root)
     variant_outputs = {
       "public": Path("/test/output/public.md"),
       "internal": Path("/test/output/internal.md"),

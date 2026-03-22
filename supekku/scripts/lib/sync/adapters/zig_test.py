@@ -61,7 +61,7 @@ class TestZigAdapter(unittest.TestCase):
 
   def test_describe_zig_package(self) -> None:
     """Test describe method generates correct metadata for Zig packages."""
-    unit = SourceUnit("zig", "src/utils", self.repo_root)
+    unit = SourceUnit(language="zig", identifier="src/utils", root=self.repo_root)
     descriptor = self.adapter.describe(unit)
 
     # Check slug parts
@@ -93,7 +93,9 @@ class TestZigAdapter(unittest.TestCase):
 
   def test_describe_rejects_non_zig_unit(self) -> None:
     """Test describe method rejects non-Zig source units."""
-    unit = SourceUnit("python", "some/module.py", self.repo_root)
+    unit = SourceUnit(
+      language="python", identifier="some/module.py", root=self.repo_root
+    )
 
     with pytest.raises(ValueError) as context:
       self.adapter.describe(unit)
@@ -102,7 +104,9 @@ class TestZigAdapter(unittest.TestCase):
 
   def test_generate_rejects_non_zig_unit(self) -> None:
     """Test generate method rejects non-Zig source units."""
-    unit = SourceUnit("python", "some/module.py", self.repo_root)
+    unit = SourceUnit(
+      language="python", identifier="some/module.py", root=self.repo_root
+    )
     variant_outputs = {
       "public": Path("/test/output/public/src/test.zig.md"),
       "internal": Path("/test/output/internal/src/test.zig.md"),
@@ -138,7 +142,7 @@ class TestZigAdapter(unittest.TestCase):
     # Mock file content for hash calculation
     mock_read_text.return_value = "# Documentation content"
 
-    unit = SourceUnit("zig", "src/test.zig", self.repo_root)
+    unit = SourceUnit(language="zig", identifier="src/test.zig", root=self.repo_root)
     variant_outputs = {
       "public": Path("/test/output/public/src/test.zig.md"),
       "internal": Path("/test/output/internal/src/test.zig.md"),
@@ -175,7 +179,7 @@ class TestZigAdapter(unittest.TestCase):
     mock_is_file.return_value = True  # Source path is a file
     mock_subprocess.return_value = Mock(returncode=0)  # Check passes
 
-    unit = SourceUnit("zig", "src/test.zig", self.repo_root)
+    unit = SourceUnit(language="zig", identifier="src/test.zig", root=self.repo_root)
     variant_outputs = {
       "public": Path("/test/output/public/src/test.zig.md"),
       "internal": Path("/test/output/internal/src/test.zig.md"),
@@ -224,7 +228,7 @@ class TestZigAdapter(unittest.TestCase):
 
     mock_subprocess.side_effect = subprocess_side_effect
 
-    unit = SourceUnit("zig", "src/test.zig", self.repo_root)
+    unit = SourceUnit(language="zig", identifier="src/test.zig", root=self.repo_root)
     variant_outputs = {
       "public": Path("/test/output/public/src/test.zig.md"),
       "internal": Path("/test/output/internal/src/test.zig.md"),
@@ -260,7 +264,7 @@ class TestZigAdapter(unittest.TestCase):
     mock_subprocess.return_value = Mock(returncode=0, stdout="", stderr="")
     mock_read_text.return_value = "# Documentation content"
 
-    unit = SourceUnit("zig", "src/test.zig", self.repo_root)
+    unit = SourceUnit(language="zig", identifier="src/test.zig", root=self.repo_root)
     variant_outputs = {
       "public": Path("/test/output/public/src/test.zig.md"),
       "internal": Path("/test/output/internal/src/test.zig.md"),
@@ -280,7 +284,7 @@ class TestZigAdapter(unittest.TestCase):
     """Test generate raises error when zigmarkdoc is not available."""
     mock_is_zigmarkdoc.return_value = False
 
-    unit = SourceUnit("zig", "src/test.zig", self.repo_root)
+    unit = SourceUnit(language="zig", identifier="src/test.zig", root=self.repo_root)
     variant_outputs = {
       "public": Path("/test/output/public/src/test.zig.md"),
       "internal": Path("/test/output/internal/src/test.zig.md"),
@@ -303,7 +307,9 @@ class TestZigAdapter(unittest.TestCase):
     mock_is_zigmarkdoc.return_value = True
     mock_exists.return_value = False
 
-    unit = SourceUnit("zig", "src/nonexistent.zig", self.repo_root)
+    unit = SourceUnit(
+      language="zig", identifier="src/nonexistent.zig", root=self.repo_root
+    )
     variant_outputs = {
       "public": Path("/test/output/public/src/test.zig.md"),
       "internal": Path("/test/output/internal/src/test.zig.md"),

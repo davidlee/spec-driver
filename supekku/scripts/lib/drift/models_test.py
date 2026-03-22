@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from supekku.scripts.lib.drift.models import (
   ASSESSMENTS,
@@ -36,7 +37,7 @@ class TestSource:
 
   def test_frozen(self):
     s = Source(kind="prod", ref="PROD-012")
-    with pytest.raises(AttributeError):
+    with pytest.raises((AttributeError, ValidationError)):
       s.kind = "adr"  # type: ignore[misc]
 
 
@@ -55,7 +56,7 @@ class TestClaim:
 
   def test_frozen(self):
     c = Claim(kind="gap", text="missing")
-    with pytest.raises(AttributeError):
+    with pytest.raises((AttributeError, ValidationError)):
       c.text = "changed"  # type: ignore[misc]
 
 
@@ -73,7 +74,7 @@ class TestDiscoveredBy:
 
   def test_frozen(self):
     d = DiscoveredBy(kind="human")
-    with pytest.raises(AttributeError):
+    with pytest.raises((AttributeError, ValidationError)):
       d.kind = "agent"  # type: ignore[misc]
 
 

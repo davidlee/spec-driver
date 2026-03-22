@@ -62,7 +62,11 @@ class TestPythonAdapter(unittest.TestCase):
 
   def test_describe_python_module(self) -> None:
     """Test describe method generates correct metadata for Python modules."""
-    unit = SourceUnit("python", "supekku/scripts/lib/workspace.py", self.repo_root)
+    unit = SourceUnit(
+      language="python",
+      identifier="supekku/scripts/lib/workspace.py",
+      root=self.repo_root,
+    )
     descriptor = self.adapter.describe(unit)
 
     # Check slug parts
@@ -106,7 +110,9 @@ class TestPythonAdapter(unittest.TestCase):
 
   def test_describe_python_package_init(self) -> None:
     """Test describe method handles __init__.py files correctly."""
-    unit = SourceUnit("python", "supekku/scripts/__init__.py", self.repo_root)
+    unit = SourceUnit(
+      language="python", identifier="supekku/scripts/__init__.py", root=self.repo_root
+    )
     descriptor = self.adapter.describe(unit)
 
     # Check module name for package
@@ -119,7 +125,7 @@ class TestPythonAdapter(unittest.TestCase):
 
   def test_describe_rejects_non_python_unit(self) -> None:
     """Test describe method rejects non-Python source units."""
-    unit = SourceUnit("go", "internal/package", self.repo_root)
+    unit = SourceUnit(language="go", identifier="internal/package", root=self.repo_root)
 
     with pytest.raises(ValueError) as context:
       self.adapter.describe(unit)
@@ -128,7 +134,7 @@ class TestPythonAdapter(unittest.TestCase):
 
   def test_generate_rejects_non_python_unit(self) -> None:
     """Test generate method rejects non-Python source units."""
-    unit = SourceUnit("go", "internal/package", self.repo_root)
+    unit = SourceUnit(language="go", identifier="internal/package", root=self.repo_root)
     variant_outputs = {
       "_staging_dir": Path("/test/output/.staging/python/internal-package")
     }
@@ -143,7 +149,9 @@ class TestPythonAdapter(unittest.TestCase):
     """Test generate method handles missing files gracefully."""
     mock_exists.return_value = False
 
-    unit = SourceUnit("python", "missing/module.py", self.repo_root)
+    unit = SourceUnit(
+      language="python", identifier="missing/module.py", root=self.repo_root
+    )
     variant_outputs = {
       "_staging_dir": Path("/test/output/.staging/python/missing-module-py")
     }
@@ -185,7 +193,7 @@ class TestPythonAdapter(unittest.TestCase):
     ]
     mock_generate_docs.return_value = mock_results
 
-    unit = SourceUnit("python", "module.py", self.repo_root)
+    unit = SourceUnit(language="python", identifier="module.py", root=self.repo_root)
     variant_outputs = {"_staging_dir": staging_dir}
     variants = self.adapter.generate(unit, variant_outputs=variant_outputs)
 
@@ -223,7 +231,7 @@ class TestPythonAdapter(unittest.TestCase):
     ]
     mock_generate_docs.return_value = mock_results
 
-    unit = SourceUnit("python", "module.py", self.repo_root)
+    unit = SourceUnit(language="python", identifier="module.py", root=self.repo_root)
     variant_outputs = {"_staging_dir": staging_dir}
     self.adapter.generate(unit, variant_outputs=variant_outputs, check=True)
 
@@ -238,7 +246,7 @@ class TestPythonAdapter(unittest.TestCase):
     mock_exists.return_value = True
     mock_generate_docs.side_effect = Exception("Generation failed")
 
-    unit = SourceUnit("python", "module.py", self.repo_root)
+    unit = SourceUnit(language="python", identifier="module.py", root=self.repo_root)
     staging_dir = Path("/test/output/.staging/python/module-py")
     variant_outputs = {"_staging_dir": staging_dir}
     variants = self.adapter.generate(unit, variant_outputs=variant_outputs)

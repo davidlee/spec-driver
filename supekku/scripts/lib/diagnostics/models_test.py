@@ -43,7 +43,7 @@ class TestDiagnosticResult(unittest.TestCase):
     result = DiagnosticResult(
       category="deps", name="python", status="pass", message="OK"
     )
-    with self.assertRaises(AttributeError):
+    with self.assertRaises((AttributeError, Exception)):
       result.status = "fail"  # type: ignore[misc]
 
   def test_suggestion_defaults_to_none(self) -> None:

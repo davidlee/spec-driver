@@ -37,7 +37,9 @@ class TestTypescriptSyncWithMissingDependency(unittest.TestCase):
 
   def test_generate_returns_empty_when_ts_doc_extract_missing(self) -> None:
     """Sync skips TS units gracefully when ts-doc-extract is not installed."""
-    unit = SourceUnit("typescript", "src/index.ts", self.test_repo)
+    unit = SourceUnit(
+      language="typescript", identifier="src/index.ts", root=self.test_repo
+    )
     output_dir = Path("/tmp/test-ts-dep-contracts")
     variant_outputs = {
       "api": output_dir / "public" / "src" / "index.ts.md",
@@ -65,7 +67,9 @@ class TestTypescriptSyncWithMissingDependency(unittest.TestCase):
 
   def test_warning_includes_install_instructions(self) -> None:
     """Warning message includes actionable install instructions."""
-    unit = SourceUnit("typescript", "src/index.ts", self.test_repo)
+    unit = SourceUnit(
+      language="typescript", identifier="src/index.ts", root=self.test_repo
+    )
     variant_outputs = {
       "api": Path("/tmp/unused/api.md"),
       "internal": Path("/tmp/unused/internal.md"),
@@ -88,8 +92,12 @@ class TestTypescriptSyncWithMissingDependency(unittest.TestCase):
 
   def test_subsequent_units_skip_without_recheck(self) -> None:
     """Availability check is cached — second unit skips without re-checking."""
-    unit1 = SourceUnit("typescript", "src/index.ts", self.test_repo)
-    unit2 = SourceUnit("typescript", "src/index.ts", self.test_repo)
+    unit1 = SourceUnit(
+      language="typescript", identifier="src/index.ts", root=self.test_repo
+    )
+    unit2 = SourceUnit(
+      language="typescript", identifier="src/index.ts", root=self.test_repo
+    )
     variant_outputs = {
       "api": Path("/tmp/unused/api.md"),
       "internal": Path("/tmp/unused/internal.md"),

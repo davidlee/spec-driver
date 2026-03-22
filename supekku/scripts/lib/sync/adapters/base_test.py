@@ -57,7 +57,7 @@ class TestLanguageAdapterValidation(unittest.TestCase):
     test_file = self.repo_root / "test_module.py"
     test_file.write_text("# test")
 
-    unit = SourceUnit("test", "test_module.py", self.repo_root)
+    unit = SourceUnit(language="test", identifier="test_module.py", root=self.repo_root)
 
     # Mock git tracking
     with patch.object(
@@ -74,7 +74,7 @@ class TestLanguageAdapterValidation(unittest.TestCase):
 
   def test_validate_source_exists_file_missing(self) -> None:
     """Test validation when source file doesn't exist."""
-    unit = SourceUnit("test", "nonexistent.py", self.repo_root)
+    unit = SourceUnit(language="test", identifier="nonexistent.py", root=self.repo_root)
 
     result = self.adapter.validate_source_exists(unit)
 
@@ -89,7 +89,7 @@ class TestLanguageAdapterValidation(unittest.TestCase):
     test_file = self.repo_root / "untracked.py"
     test_file.write_text("# untracked")
 
-    unit = SourceUnit("test", "untracked.py", self.repo_root)
+    unit = SourceUnit(language="test", identifier="untracked.py", root=self.repo_root)
 
     # Mock git tracking - file not in tracked set
     other_file = Path("/other/file.py")
@@ -111,7 +111,7 @@ class TestLanguageAdapterValidation(unittest.TestCase):
     test_file = self.repo_root / "module.py"
     test_file.write_text("# module")
 
-    unit = SourceUnit("test", "module.py", self.repo_root)
+    unit = SourceUnit(language="test", identifier="module.py", root=self.repo_root)
 
     # Mock git not available (empty tracked files set)
     with patch.object(self.adapter, "_get_git_tracked_files", return_value=set()):
@@ -130,7 +130,9 @@ class TestLanguageAdapterValidation(unittest.TestCase):
     nested_file = nested_dir / "helper.py"
     nested_file.write_text("# helper")
 
-    unit = SourceUnit("test", "lib/utils/helper.py", self.repo_root)
+    unit = SourceUnit(
+      language="test", identifier="lib/utils/helper.py", root=self.repo_root
+    )
 
     # Mock git tracking
     with patch.object(
@@ -146,7 +148,7 @@ class TestLanguageAdapterValidation(unittest.TestCase):
 
   def test_validate_source_exists_cannot_determine_path(self) -> None:
     """Test validation when source path cannot be determined."""
-    unit = SourceUnit("test", "test.py", self.repo_root)
+    unit = SourceUnit(language="test", identifier="test.py", root=self.repo_root)
 
     # Override _get_source_path to return None
     with patch.object(self.adapter, "_get_source_path", return_value=None):
@@ -159,7 +161,7 @@ class TestLanguageAdapterValidation(unittest.TestCase):
 
   def test_get_source_path_default_implementation(self) -> None:
     """Test default _get_source_path implementation."""
-    unit = SourceUnit("test", "module.py", self.repo_root)
+    unit = SourceUnit(language="test", identifier="module.py", root=self.repo_root)
 
     path = self.adapter._get_source_path(unit)
 
@@ -167,7 +169,9 @@ class TestLanguageAdapterValidation(unittest.TestCase):
 
   def test_get_source_path_nested(self) -> None:
     """Test _get_source_path with nested identifier."""
-    unit = SourceUnit("test", "lib/utils/helper.py", self.repo_root)
+    unit = SourceUnit(
+      language="test", identifier="lib/utils/helper.py", root=self.repo_root
+    )
 
     path = self.adapter._get_source_path(unit)
 
@@ -338,14 +342,14 @@ class TestLanguageAdapterValidateUnitLanguage(unittest.TestCase):
 
   def test_validate_unit_language_matching(self) -> None:
     """Test validation passes for matching language."""
-    unit = SourceUnit("test", "module.py", self.repo_root)
+    unit = SourceUnit(language="test", identifier="module.py", root=self.repo_root)
 
     # Should not raise
     self.adapter._validate_unit_language(unit)
 
   def test_validate_unit_language_mismatched(self) -> None:
     """Test validation fails for mismatched language."""
-    unit = SourceUnit("python", "module.py", self.repo_root)
+    unit = SourceUnit(language="python", identifier="module.py", root=self.repo_root)
 
     with self.assertRaises(ValueError) as context:
       self.adapter._validate_unit_language(unit)

@@ -183,7 +183,9 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
 
   def test_describe_typescript_module_file(self) -> None:
     """Test describe method for TypeScript file."""
-    unit = SourceUnit("typescript", "src/db/client.ts", self.repo_root)
+    unit = SourceUnit(
+      language="typescript", identifier="src/db/client.ts", root=self.repo_root
+    )
     descriptor = self.adapter.describe(unit)
 
     # Check slug parts (extension removed)
@@ -216,7 +218,9 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
 
   def test_describe_typescript_module_directory(self) -> None:
     """Test describe method for TypeScript directory module."""
-    unit = SourceUnit("typescript", "src/components", self.repo_root)
+    unit = SourceUnit(
+      language="typescript", identifier="src/components", root=self.repo_root
+    )
     descriptor = self.adapter.describe(unit)
 
     # Check slug parts
@@ -501,7 +505,9 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
 
   def test_generate_requires_node_runtime(self) -> None:
     """Test generate raises error when Node.js not available."""
-    unit = SourceUnit("typescript", "src/index.ts", self.repo_root)
+    unit = SourceUnit(
+      language="typescript", identifier="src/index.ts", root=self.repo_root
+    )
     variant_outputs = {
       "api": Path("/test/output/public/src/index.ts.md"),
       "internal": Path("/test/output/internal/src/index.ts.md"),
@@ -515,7 +521,9 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
 
   def test_generate_validates_unit_language(self) -> None:
     """Test generate validates unit language."""
-    unit = SourceUnit("python", "src/module.py", self.repo_root)
+    unit = SourceUnit(
+      language="python", identifier="src/module.py", root=self.repo_root
+    )
     variant_outputs = {
       "api": Path("/test/output/public/src/module.py.md"),
       "internal": Path("/test/output/internal/src/module.py.md"),
@@ -558,7 +566,9 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
 
   def test_generate_skips_gracefully_when_ts_doc_extract_missing(self) -> None:
     """Test generate skips with warning when ts-doc-extract not available."""
-    unit = SourceUnit("typescript", "src/index.ts", self.repo_root)
+    unit = SourceUnit(
+      language="typescript", identifier="src/index.ts", root=self.repo_root
+    )
     variant_outputs = {
       "api": Path("/test/output/public/src/index.ts.md"),
       "internal": Path("/test/output/internal/src/index.ts.md"),
@@ -597,7 +607,7 @@ class TestTypeScriptAdapter(unittest.TestCase):  # pylint: disable=too-many-publ
     test_repo = Path("/tmp/test-dedup-repo")
     test_repo.mkdir(parents=True, exist_ok=True)
 
-    unit = SourceUnit("typescript", "src/index.ts", test_repo)
+    unit = SourceUnit(language="typescript", identifier="src/index.ts", root=test_repo)
     output_dir = Path("/tmp/test-contracts-output")
     api_output = output_dir / "public" / "src" / "index.ts.md"
     internal_output = output_dir / "internal" / "src" / "index.ts.md"

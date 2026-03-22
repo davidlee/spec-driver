@@ -109,8 +109,10 @@ class TestSpecSyncEngine(unittest.TestCase):
   def test_synchronize_all_languages(self) -> None:
     """Test synchronization across all languages."""
     # Setup mock source units
-    go_unit = SourceUnit("go", "internal/test", self.repo_root)
-    python_unit = SourceUnit("python", "module.py", self.repo_root)
+    go_unit = SourceUnit(language="go", identifier="internal/test", root=self.repo_root)
+    python_unit = SourceUnit(
+      language="python", identifier="module.py", root=self.repo_root
+    )
 
     # Setup mock adapter responses
     self.mock_go_adapter.discover_targets.return_value = [go_unit]
@@ -132,8 +134,12 @@ class TestSpecSyncEngine(unittest.TestCase):
     self.mock_python_adapter.describe.return_value = python_descriptor
 
     # Setup mock generate responses
-    go_variants = [DocVariant("public", Path("test.md"), "hash1", "created")]
-    python_variants = [DocVariant("api", Path("test.md"), "hash2", "created")]
+    go_variants = [
+      DocVariant(name="public", path=Path("test.md"), hash="hash1", status="created")
+    ]
+    python_variants = [
+      DocVariant(name="api", path=Path("test.md"), hash="hash2", status="created")
+    ]
 
     self.mock_go_adapter.generate.return_value = go_variants
     self.mock_python_adapter.generate.return_value = python_variants
@@ -161,7 +167,7 @@ class TestSpecSyncEngine(unittest.TestCase):
   def test_synchronize_specific_languages(self) -> None:
     """Test synchronization with specific language filter."""
     # Setup mock
-    go_unit = SourceUnit("go", "internal/test", self.repo_root)
+    go_unit = SourceUnit(language="go", identifier="internal/test", root=self.repo_root)
     self.mock_go_adapter.discover_targets.return_value = [go_unit]
     self.mock_go_adapter.describe.return_value = SourceDescriptor(
       slug_parts=["internal", "test"],
@@ -180,7 +186,7 @@ class TestSpecSyncEngine(unittest.TestCase):
   def test_synchronize_with_targets(self) -> None:
     """Test synchronization with specific targets."""
     # Setup mock
-    go_unit = SourceUnit("go", "internal/test", self.repo_root)
+    go_unit = SourceUnit(language="go", identifier="internal/test", root=self.repo_root)
     self.mock_go_adapter.discover_targets.return_value = [go_unit]
     self.mock_go_adapter.describe.return_value = SourceDescriptor(
       slug_parts=["internal", "test"],
@@ -206,7 +212,7 @@ class TestSpecSyncEngine(unittest.TestCase):
     self.mock_python_adapter.supports_identifier.return_value = False
 
     # Setup mock for processing
-    go_unit = SourceUnit("go", "internal/test", self.repo_root)
+    go_unit = SourceUnit(language="go", identifier="internal/test", root=self.repo_root)
     self.mock_go_adapter.discover_targets.return_value = [go_unit]
     self.mock_go_adapter.describe.return_value = SourceDescriptor(
       slug_parts=["internal", "test"],
@@ -228,7 +234,7 @@ class TestSpecSyncEngine(unittest.TestCase):
   def test_synchronize_check_mode(self) -> None:
     """Test synchronization in check mode."""
     # Setup mock
-    go_unit = SourceUnit("go", "internal/test", self.repo_root)
+    go_unit = SourceUnit(language="go", identifier="internal/test", root=self.repo_root)
     self.mock_go_adapter.discover_targets.return_value = [go_unit]
     self.mock_go_adapter.describe.return_value = SourceDescriptor(
       slug_parts=["internal", "test"],
@@ -280,7 +286,7 @@ class TestSpecSyncEngine(unittest.TestCase):
   def test_synchronize_handles_unit_processing_errors(self) -> None:
     """Test synchronization handles individual unit processing errors."""
     # Setup mock - only test Go to avoid Python warning
-    go_unit = SourceUnit("go", "internal/test", self.repo_root)
+    go_unit = SourceUnit(language="go", identifier="internal/test", root=self.repo_root)
     self.mock_go_adapter.discover_targets.return_value = [go_unit]
     self.mock_go_adapter.describe.side_effect = Exception("Description error")
 

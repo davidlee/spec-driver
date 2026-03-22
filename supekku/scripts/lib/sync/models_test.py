@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from .models import DocVariant, SourceDescriptor, SourceUnit, SyncOutcome
 
@@ -20,17 +21,17 @@ class TestSourceUnit(unittest.TestCase):
     assert unit.root == Path("/repo")
 
   def test_source_unit_immutable(self) -> None:
-    """Test SourceUnit is immutable (frozen dataclass)."""
-    unit = SourceUnit("go", "internal/foo", Path("/repo"))
+    """Test SourceUnit is immutable (frozen model)."""
+    unit = SourceUnit(language="go", identifier="internal/foo", root=Path("/repo"))
 
-    with pytest.raises(AttributeError):
+    with pytest.raises(ValidationError):
       unit.language = "python"  # type: ignore
 
   def test_source_unit_equality(self) -> None:
     """Test SourceUnit equality comparison."""
-    unit1 = SourceUnit("go", "internal/foo", Path("/repo"))
-    unit2 = SourceUnit("go", "internal/foo", Path("/repo"))
-    unit3 = SourceUnit("python", "internal/foo", Path("/repo"))
+    unit1 = SourceUnit(language="go", identifier="internal/foo", root=Path("/repo"))
+    unit2 = SourceUnit(language="go", identifier="internal/foo", root=Path("/repo"))
+    unit3 = SourceUnit(language="python", identifier="internal/foo", root=Path("/repo"))
 
     assert unit1 == unit2
     assert unit1 != unit3
@@ -54,16 +55,26 @@ class TestDocVariant(unittest.TestCase):
     assert variant.status == "created"
 
   def test_doc_variant_immutable(self) -> None:
-    """Test DocVariant is immutable (frozen dataclass)."""
-    variant = DocVariant("public", Path("test.md"), "hash", "created")
+    """Test DocVariant is immutable (frozen model)."""
+    variant = DocVariant(
+      name="public",
+      path=Path("test.md"),
+      hash="hash",
+      status="created",
+    )
 
-    with pytest.raises(AttributeError):
+    with pytest.raises(ValidationError):
       variant.name = "private"  # type: ignore
 
   def test_doc_variant_status_types(self) -> None:
     """Test DocVariant accepts valid status values."""
     for status in ["created", "changed", "unchanged"]:
-      variant = DocVariant("public", Path("test.md"), "hash", status)
+      variant = DocVariant(
+        name="public",
+        path=Path("test.md"),
+        hash="hash",
+        status=status,
+      )
       assert variant.status == status
 
 
@@ -72,7 +83,12 @@ class TestSourceDescriptor(unittest.TestCase):
 
   def test_source_descriptor_creation(self) -> None:
     """Test SourceDescriptor can be created with required fields."""
-    variant = DocVariant("public", Path("test.md"), "hash", "created")
+    variant = DocVariant(
+      name="public",
+      path=Path("test.md"),
+      hash="hash",
+      status="created",
+    )
     descriptor = SourceDescriptor(
       slug_parts=["internal", "foo"],
       default_frontmatter={"packages": ["internal/foo"]},
@@ -100,7 +116,7 @@ class TestSyncOutcome(unittest.TestCase):
 
   def test_sync_outcome_with_data(self) -> None:
     """Test SyncOutcome can store operation results."""
-    unit = SourceUnit("go", "internal/foo", Path("/repo"))
+    unit = SourceUnit(language="go", identifier="internal/foo", root=Path("/repo"))
     outcome = SyncOutcome(
       processed_units=[unit],
       created_specs={"go:internal/foo": "SPEC-001"},

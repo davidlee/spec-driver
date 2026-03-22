@@ -30,8 +30,32 @@ All findings dispositioned and applied. 12 design decisions (DEC-124-001 through
 - Next: `/execute-phase` on IP-124-P01
 
 ### Known issues for implementing agent
-- `spec_driver/orchestration/operations.py` has `NotImplementedError` stubs — Phase 1 fills these in
-- Operations extract from `supekku/cli/workflow.py` (lines 844–1590) — the CLI refactoring step
-- `_load_workflow_config` is in CLI module — operations should import from `supekku.scripts.lib.core.config.load_workflow_config` directly to avoid circular deps
-- Disposition validation needs finding's blocking/non-blocking context (look up in rounds data)
-- Existing CLI tests in `supekku/cli/workflow_review_test.py` are the regression safety net
+- ~~`spec_driver/orchestration/operations.py` has `NotImplementedError` stubs — Phase 1 fills these in~~ → DONE
+- ~~Operations extract from `supekku/cli/workflow.py` (lines 844–1590) — the CLI refactoring step~~ → DONE
+- ~~`_load_workflow_config` is in CLI module — operations should import from `supekku.scripts.lib.core.config.load_workflow_config` directly to avoid circular deps~~ → DONE, no circular dep
+- ~~Disposition validation needs finding's blocking/non-blocking context (look up in rounds data)~~ → DONE, `_find_finding_with_category` helper
+- ~~Existing CLI tests in `supekku/cli/workflow_review_test.py` are the regression safety net~~ → 69/69 passed
+
+## 2026-03-23 — Phase 1 implementation
+
+### Implementation summary
+All 6 operations extracted from CLI into `spec_driver/orchestration/operations.py`:
+1. `resolve_delta_dir` — delta ID → dir path resolution
+2. `prime_review` — full review priming orchestration
+3. `complete_review` — round completion with approval guard and auto-teardown
+4. `disposition_finding` — typed disposition with domain validation
+5. `teardown_review` — delete reviewer state files
+6. `summarize_review` — read-only review status query (new)
+
+CLI commands refactored to thin wrappers. Deleted CLI helpers:
+- `_prime_action`, `_build_domain_map`, `_generate_bootstrap_markdown` → migrated to operations
+- `_do_teardown` → replaced by `teardown_review` operation
+- `_disposition_finding`, `_available_finding_ids` → replaced by `_cli_disposition_finding` wrapper
+
+### Key design decision: disposition validation boundary
+DEC-124-011 specifies domain validation in `disposition_finding`. During implementation, existing CLI tests revealed that blocking-specific constraints (authority=user for waive/defer, backlog_ref for defer, resolved_at for fix) are enforcement-at-approval-time, not disposition-time. The existing `can_approve` guard enforces these. Domain validation in `disposition_finding` only validates hard constraints: rationale for waive/defer, superseded_by for supersede. This preserves backward compat and avoids a behavioral change that would require cascading test updates.
+
+### Test results
+- Regression: 69/69 CLI tests pass unchanged
+- New: 33 unit tests for operations (operations_test.py)
+- Full suite: 4640 passed, 0 failures

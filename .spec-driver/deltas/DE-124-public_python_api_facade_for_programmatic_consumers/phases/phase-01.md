@@ -31,14 +31,14 @@ Extract review orchestration logic from CLI command functions into `spec_driver/
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `operations.py` contains all 6 operations: `resolve_delta_dir`, `prime_review`, `complete_review`, `disposition_finding`, `teardown_review`, `summarize_review`
-- [ ] All result dataclasses use typed enums (DEC-124-003)
-- [ ] `disposition_finding` uses typed kwargs and domain validation per DR-109 matrix (DEC-124-010, DEC-124-011)
-- [ ] `complete_review` has `auto_teardown` parameter (DEC-124-009)
-- [ ] CLI review commands refactored to thin wrappers (~20-30 lines each)
-- [ ] All existing CLI tests pass without modification
-- [ ] `operations_test.py` with unit tests for all 6 operations
-- [ ] `just check` passes (lint, format, tests)
+- [x] `operations.py` contains all 6 operations: `resolve_delta_dir`, `prime_review`, `complete_review`, `disposition_finding`, `teardown_review`, `summarize_review`
+- [x] All result dataclasses use typed enums (DEC-124-003)
+- [x] `disposition_finding` uses typed kwargs and domain validation per DR-109 matrix (DEC-124-010, DEC-124-011)
+- [x] `complete_review` has `auto_teardown` parameter (DEC-124-009)
+- [x] CLI review commands refactored to thin wrappers (~20-30 lines each)
+- [x] All existing CLI tests pass without modification
+- [x] `operations_test.py` with unit tests for all 6 operations
+- [x] `just check` passes (lint, format, tests)
 
 ## 5. Verification
 
@@ -59,18 +59,18 @@ Extract review orchestration logic from CLI command functions into `spec_driver/
 
 | Status | ID | Description | Parallel? | Notes |
 |---|---|---|---|---|
-| [ ] | 1.1 | Run existing tests (baseline) | — | Capture pass count |
-| [ ] | 1.2 | Create `operations.py` with new types | — | Enums, dataclasses, exceptions |
-| [ ] | 1.3 | Extract `resolve_delta_dir` | — | From CLI `_resolve_delta_dir` |
-| [ ] | 1.4 | Extract `prime_review` | — | Largest extraction (~120 lines) |
-| [ ] | 1.5 | Extract `complete_review` | — | ~150 lines, approval guard, teardown |
-| [ ] | 1.6 | Extract `disposition_finding` | — | Typed kwargs, domain validation |
-| [ ] | 1.7 | Extract `teardown_review` | — | Trivial (~20 lines) |
-| [ ] | 1.8 | Implement `summarize_review` | — | New operation, no CLI equivalent |
-| [ ] | 1.9 | Refactor CLI commands to thin wrappers | — | After all operations extracted |
-| [ ] | 1.10 | Run existing tests (regression) | — | Must match baseline |
-| [ ] | 1.11 | Write `operations_test.py` | — | Unit tests for all 6 operations |
-| [ ] | 1.12 | Lint + format | — | `just check` |
+| [x] | 1.1 | Run existing tests (baseline) | — | 69 passed |
+| [x] | 1.2 | Create `operations.py` with new types | — | Types already existed from workshopping |
+| [x] | 1.3 | Extract `resolve_delta_dir` | — | ~15 lines, DeltaNotFoundError |
+| [x] | 1.4 | Extract `prime_review` | — | ~120 lines, config via _load_config |
+| [x] | 1.5 | Extract `complete_review` | — | ~100 lines, approval guard, auto_teardown |
+| [x] | 1.6 | Extract `disposition_finding` | — | Typed kwargs, hard validation only |
+| [x] | 1.7 | Extract `teardown_review` | — | ~15 lines |
+| [x] | 1.8 | Implement `summarize_review` | — | New operation, reads findings+index |
+| [x] | 1.9 | Refactor CLI commands to thin wrappers | — | Deleted _do_teardown, helpers migrated |
+| [x] | 1.10 | Run existing tests (regression) | — | 69 passed (matches baseline) |
+| [x] | 1.11 | Write `operations_test.py` | — | 33 unit tests, all passing |
+| [x] | 1.12 | Lint + format | — | 4640 passed, 0 failures, clean lint |
 
 ### Task Details
 
@@ -126,22 +126,31 @@ Extract review orchestration logic from CLI command functions into `spec_driver/
 
 | Risk | Mitigation | Status |
 |---|---|---|
-| `_load_workflow_config` import creates circular dependency | It wraps `supekku.scripts.lib.core.config.load_workflow_config` — import that directly if needed | open |
-| `_generate_bootstrap_markdown` has hidden CLI dependency | Code review during extraction; it only uses data params | open |
-| Disposition validation needs finding category (blocking/non-blocking) | Look up finding in rounds data before applying validation rules | open |
+| `_load_workflow_config` import creates circular dependency | It wraps `supekku.scripts.lib.core.config.load_workflow_config` — import that directly if needed | resolved — no circular dep |
+| `_generate_bootstrap_markdown` has hidden CLI dependency | Code review during extraction; it only uses data params | resolved — pure function |
+| Disposition validation needs finding category (blocking/non-blocking) | Look up finding in rounds data before applying validation rules | resolved — `_find_finding_with_category` helper; hard constraints only at disposition time |
 
 ## 9. Decisions & Outcomes
 
 - 2026-03-23 — Phase plan created per DR-124 post-adversarial review
+- 2026-03-23 — Phase 1 implemented. Key design decisions during execution:
+  - Disposition validation (DEC-124-011): hard constraints only at disposition time (rationale for waive/defer, superseded_by for supersede). Blocking-specific constraints (authority=user, backlog_ref, resolved_at) remain approval-time guards via `can_approve`. This preserves existing CLI behavior where dispositions are always written and the guard catches invalid ones at approval.
+  - `_load_workflow_config` → imported directly as `load_workflow_config` from `supekku.scripts.lib.core.config`. No circular dependency — confirmed.
+  - `_generate_bootstrap_markdown` — pure function, no hidden CLI deps. Moved cleanly.
+  - `_extract_delta_id` — shared utility for all operations to derive `DE-NNN` from dir name.
+  - `PrimeAction` mapping: `BootstrapStatus.WARM` (no staleness triggers) maps to `CREATED`, same as `COLD`. Only `REUSABLE` maps to `REFRESHED`.
 
 ## 10. Findings / Research Notes
 
-_Populated during execution._
+- `evaluate_staleness` returns `WARM` (not `REUSABLE`) when no staleness triggers are detected. Both `WARM` and `COLD` map to `PrimeAction.CREATED`. `REUSABLE` only occurs when there ARE staleness triggers but the cache is deemed reusable for incremental update.
+- `init_state` requires `timestamps` field and `phase.status` uses underscore convention (`in_progress`), not hyphen (`in-progress`). Test fixtures must use `init_state()` + `update_state_workflow()` — hand-crafted YAML won't pass validation.
+- The `finding_list_command` was NOT refactored (no corresponding operation — it's a direct read, not an orchestration path). This is correct per DR-124 scope.
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Regression tests match baseline
-- [ ] New operations tests pass
-- [ ] `just check` clean
-- [ ] Notes updated with implementation observations
+- [x] Exit criteria satisfied
+- [x] Regression tests match baseline (69/69)
+- [x] New operations tests pass (33/33)
+- [x] Full test suite clean (4640 passed)
+- [x] Lint clean on changed files
+- [x] Notes updated with implementation observations

@@ -28,17 +28,18 @@ Commands:
 - @accept_app.command(handoff) `accept_handoff_command(delta, identity, root) -> None`: Accept a pending handoff, claiming it with identity guard.
 - @workflow_app.command(block) `block_command(delta, reason, root) -> None`: Block a delta's workflow.
 - `create_handoff_command(delta, to_role, next_kind, next_summary, root) -> None`: Create a structured handoff, transitioning to awaiting_handoff.
-- @finding_app.command(defer) `finding_defer_command(delta, finding_id, rationale, backlog_ref, root) -> None`: Defer a finding to a future delta or backlog item.
-- @finding_app.command(resolve) `finding_resolve_command(delta, finding_id, resolved_at, root) -> None`: Mark a finding as resolved (fixed).
-- @finding_app.command(supersede) `finding_supersede_command(delta, finding_id, superseded_by, root) -> None`: Mark a finding as superseded by another finding.
-- @finding_app.command(waive) `finding_waive_command(delta, finding_id, rationale, authority, root) -> None`: Waive a finding (accept the risk).
+- @finding_app.command(defer) `finding_defer_command(delta, finding_id, rationale, backlog_ref, format_type, root) -> None`: Defer a finding to a future delta or backlog item.
+- @finding_app.command(list) `finding_list_command(delta, round_filter, format_type, root) -> None`: List all review findings across rounds.
+- @finding_app.command(resolve) `finding_resolve_command(delta, finding_id, resolved_at, format_type, root) -> None`: Mark a finding as resolved (fixed).
+- @finding_app.command(supersede) `finding_supersede_command(delta, finding_id, superseded_by, format_type, root) -> None`: Mark a finding as superseded by another finding.
+- @finding_app.command(waive) `finding_waive_command(delta, finding_id, rationale, authority, format_type, root) -> None`: Waive a finding (accept the risk).
 - @phase_app.command(complete) `phase_complete_command(delta, to_role, no_handoff, root) -> None`: Mark the current phase as complete. Emits handoff per policy/bridge.
 - @phase_app.command(start) `phase_start(delta, phase, root) -> None`: Initialise workflow/state.yaml for a delta (planned → implementing).
-- @review_app.command(complete) `review_complete_command(delta, status, summary, root) -> None`: Complete a review round, writing findings and transitioning state.
-- @review_app.command(prime) `review_prime_command(delta, root) -> None`: Generate review-index.yaml + review-bootstrap.md from current state.
+- @review_app.command(complete) `review_complete_command(delta, status, summary, format_type, root) -> None`: Complete a review round, writing findings and transitioning state.
+- @review_app.command(prime) `review_prime_command(delta, format_type, root) -> None`: Generate review-index.yaml + review-bootstrap.md from current state.
 
 Evaluates staleness of existing cache, rebuilds or incrementally
 updates as appropriate per DR-102 §8.
-- @review_app.command(teardown) `review_teardown_command(delta, root) -> None`: Delete reviewer state files (review-index, findings, bootstrap).
+- @review_app.command(teardown) `review_teardown_command(delta, format_type, root) -> None`: Delete reviewer state files (review-index, findings, bootstrap).
 - @workflow_app.command(unblock) `unblock_command(delta, root) -> None`: Unblock a delta's workflow, restoring previous state.
-- @workflow_app.command(status) `workflow_status(delta, root) -> None`: Display human-readable workflow state for a delta.
+- @workflow_app.command(status) `workflow_status(delta, format_type, root) -> None`: Display workflow state for a delta.

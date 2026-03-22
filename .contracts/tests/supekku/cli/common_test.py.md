@@ -43,6 +43,20 @@ ArtifactRef is a frozen dataclass holding resolved artifact info.
 - `test_frozen(self) -> None`
 - `test_inequality_different_id(self) -> None`
 
+### TestCliJsonEnvelope
+
+Tests for cli_json_success, cli_json_error, emit_json_and_exit.
+
+#### Methods
+
+- `test_emit_json_and_exit_error(self, capsys) -> None`
+- `test_emit_json_and_exit_success(self, capsys) -> None`
+- `test_error_envelope_guard_violation(self) -> None`
+- `test_error_envelope_structure(self) -> None`
+- `test_error_envelope_unexpected(self) -> None`
+- `test_error_envelope_validation(self) -> None`
+- `test_success_envelope_structure(self) -> None`
+
 ### TestEmitArtifactBodyOnly
 
 emit_artifact --body-only mode outputs body without frontmatter.
@@ -105,6 +119,15 @@ emit_artifact --raw mode reads the file content.
 #### Methods
 
 - `test_raw_reads_file(self, tmp_path, capsys) -> None`
+
+### TestExitCodeConstants
+
+Verify exit code constants are correct and distinct.
+
+#### Methods
+
+- `test_distinct(self) -> None`
+- `test_values(self) -> None`
 
 ### TestExtractYamlFrontmatter
 

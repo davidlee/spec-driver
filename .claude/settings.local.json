@@ -49,7 +49,11 @@
       "Bash(go list:*)",
       "WebFetch(domain:github.com)",
       "Read(//home/david/dev/vk/.claude/**)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(uv pip:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []

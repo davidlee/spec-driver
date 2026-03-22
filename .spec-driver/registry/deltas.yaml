@@ -12120,7 +12120,7 @@ deltas:
         status: in-progress
   DE-108:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Review CLI contract for structured machine consumption
     slug: review_cli_contract_for_structured_machine_consumption
     updated: '2026-03-22'
@@ -12173,11 +12173,11 @@ deltas:
       - plan: IP-108
         delta: DE-108
         phase: IP-108-P02
-        status: draft
+        status: completed
       - plan: IP-108
         delta: DE-108
         phase: IP-108-P03
-        status: in-progress
+        status: completed
   DE-109:
     kind: delta
     status: completed

@@ -23,9 +23,12 @@ Across all list commands, we use consistent flag patterns:
 ## Constants
 
 - `ARTIFACT_PREFIXES_PLAN` - Plan ID prefix for normalization
+- `CLI_JSON_ENVELOPE_VERSION` - JSON envelope version — increment when envelope shape changes (DE-108)
 - `CaseInsensitiveOption`
 - `ContentTypeOption`
 - `EXIT_FAILURE` - Exit codes
+- `EXIT_GUARD_VIOLATION`
+- `EXIT_PRECONDITION`
 - `EXIT_SUCCESS` - Exit codes
 - `ExternalOption`
 - `FormatOption` - Standardized list command options
@@ -65,6 +68,19 @@ PREFIX-NNN pattern, or None otherwise.
 - `_resolve_requirement(root, raw_id) -> ArtifactRef`
 - `_resolve_spec(root, raw_id) -> ArtifactRef`
 - `_resolve_standard(root, raw_id) -> ArtifactRef`
+- `cli_json_error(command, exit_code, kind, message) -> dict`: Build an error JSON envelope for structured CLI output.
+
+Args:
+  command: Dotted command name (e.g. 'review.prime').
+  exit_code: One of EXIT_FAILURE, EXIT_PRECONDITION, EXIT_GUARD_VIOLATION.
+  kind: Error category — 'precondition', 'guard_violation', 'validation',
+        or 'unexpected'.
+  message: Human-readable error description.
+- `cli_json_success(command, data) -> dict`: Build a success JSON envelope for structured CLI output.
+
+Args:
+  command: Dotted command name (e.g. 'review.prime').
+  data: Command-specific payload.
 - `emit_artifact(ref) -> None`: Dispatch artifact output by mode.
 
 Supports path, raw, body, json, content-type, or formatted output.
@@ -86,6 +102,9 @@ Args:
 
 Raises:
   typer.Exit: Always — EXIT_SUCCESS on success, EXIT_FAILURE on error.
+- `emit_json_and_exit(payload) -> NoReturn`: Print a JSON envelope to stdout and exit with the embedded exit code.
+
+In JSON mode, this is the sole output path — nothing goes to stderr.
 - `extract_yaml_frontmatter(path) -> str`: Extract raw YAML frontmatter block from a markdown file.
 
 Returns the YAML content between the opening and closing ``---`` fences,

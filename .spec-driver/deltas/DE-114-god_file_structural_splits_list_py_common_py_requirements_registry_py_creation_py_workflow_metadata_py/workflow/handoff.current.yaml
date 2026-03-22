@@ -6,7 +6,7 @@ artifact:
 transition:
   from_role: implementer
   to_role: implementer
-  status: pending
+  status: accepted
   boundary: phase
 phase:
   id: IP-114-P02

@@ -12,14 +12,14 @@ phase:
   id: IP-123.PHASE-01
   status: complete
 required_reading:
-- .spec-driver/deltas/DE-123-list_deltas_to_hide_completed_by_default_all_to_show_them/DE-123.md
-- .spec-driver/deltas/DE-123-list_deltas_to_hide_completed_by_default_all_to_show_them/IP-123.md
-- .spec-driver/deltas/DE-123-list_deltas_to_hide_completed_by_default_all_to_show_them/phases/phase-01.md
-- .spec-driver/deltas/DE-123-list_deltas_to_hide_completed_by_default_all_to_show_them/notes.md
+  - .spec-driver/deltas/DE-123-list_deltas_to_hide_completed_by_default_all_to_show_them/DE-123.md
+  - .spec-driver/deltas/DE-123-list_deltas_to_hide_completed_by_default_all_to_show_them/IP-123.md
+  - .spec-driver/deltas/DE-123-list_deltas_to_hide_completed_by_default_all_to_show_them/phases/phase-01.md
+  - .spec-driver/deltas/DE-123-list_deltas_to_hide_completed_by_default_all_to_show_them/notes.md
 next_activity:
   kind: implementation
 timestamps:
-  emitted_at: '2026-03-22T10:57:05+00:00'
+  emitted_at: "2026-03-22T10:57:05+00:00"
 git:
   head: 8d5dabbd
   branch: main

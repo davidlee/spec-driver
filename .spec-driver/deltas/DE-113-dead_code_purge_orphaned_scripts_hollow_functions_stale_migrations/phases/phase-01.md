@@ -52,19 +52,19 @@ Delete 19 orphaned files (15 scripts + 2 tests + 1 duplicate doc generator + 1 s
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [x] | 1.1 | Delete 15 orphaned scripts + backlog dir | [P] | 19 files removed |
-| [x] | 1.2 | Delete orphaned tests (`list_specs_test`, `list_changes_test`) | [P] | |
-| [x] | 1.3 | Delete `scripts/cli/ast_doc_generator.py` | [P] | |
-| [x] | 1.4 | Delete `migrate_stub_status.py` | [P] | |
-| [x] | 1.5 | Relocate `complete_delta` business logic to `completion.py` | | Hollow display fns deleted |
-| [x] | 1.6 | Update `cli/complete.py` import | | |
-| [x] | 1.7 | Move `complete_delta_test.py` to `lib/changes/` | | Patches updated |
-| [x] | 1.8 | Rename `registry_migration.py` → `registry_v2.py` | | |
-| [x] | 1.9 | Update 5 importers of `registry_migration` | | |
-| [x] | 1.10 | Clean stale TODO in `blocks/__init__.py` | [P] | |
-| [x] | 1.11 | Run tests + lint + grep verification | | See notes |
+| Status | ID   | Description                                                    | Parallel? | Notes                      |
+| ------ | ---- | -------------------------------------------------------------- | --------- | -------------------------- |
+| [x]    | 1.1  | Delete 15 orphaned scripts + backlog dir                       | [P]       | 19 files removed           |
+| [x]    | 1.2  | Delete orphaned tests (`list_specs_test`, `list_changes_test`) | [P]       |                            |
+| [x]    | 1.3  | Delete `scripts/cli/ast_doc_generator.py`                      | [P]       |                            |
+| [x]    | 1.4  | Delete `migrate_stub_status.py`                                | [P]       |                            |
+| [x]    | 1.5  | Relocate `complete_delta` business logic to `completion.py`    |           | Hollow display fns deleted |
+| [x]    | 1.6  | Update `cli/complete.py` import                                |           |                            |
+| [x]    | 1.7  | Move `complete_delta_test.py` to `lib/changes/`                |           | Patches updated            |
+| [x]    | 1.8  | Rename `registry_migration.py` → `registry_v2.py`              |           |                            |
+| [x]    | 1.9  | Update 5 importers of `registry_migration`                     |           |                            |
+| [x]    | 1.10 | Clean stale TODO in `blocks/__init__.py`                       | [P]       |                            |
+| [x]    | 1.11 | Run tests + lint + grep verification                           |           | See notes                  |
 
 ### Task Details
 
@@ -92,10 +92,10 @@ Delete 19 orphaned files (15 scripts + 2 tests + 1 duplicate doc generator + 1 s
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|------------|--------|
-| External caller of orphaned script | Verified pyproject.toml, Justfile, CI — none found | mitigated |
-| complete_delta relocation breaks CLI | Mechanical import update, test coverage | mitigated |
+| Risk                                 | Mitigation                                         | Status    |
+| ------------------------------------ | -------------------------------------------------- | --------- |
+| External caller of orphaned script   | Verified pyproject.toml, Justfile, CI — none found | mitigated |
+| complete_delta relocation breaks CLI | Mechanical import update, test coverage            | mitigated |
 
 ## 9. Decisions & Outcomes
 

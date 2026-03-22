@@ -15,8 +15,8 @@ workflow:
   handoff_boundary: phase
   next_role: implementer
 timestamps:
-  created: '2026-03-22T10:46:02+00:00'
-  updated: '2026-03-22T10:57:05+00:00'
+  created: "2026-03-22T10:46:02+00:00"
+  updated: "2026-03-22T10:57:05+00:00"
 plan:
   id: IP-123
   path: .spec-driver/deltas/DE-123-list_deltas_to_hide_completed_by_default_all_to_show_them/IP-123.md

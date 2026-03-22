@@ -52,25 +52,25 @@ Split `cli/common.py` (1,124 lines) into 4 files and `cli/list.py` (3,195 lines)
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [x] | 1.1 | Split `common.py` → `artifacts.py` | | Largest extraction (~550 lines) |
-| [x] | 1.2 | Split `common.py` → `ids.py` | [P] | ~70 lines |
-| [x] | 1.3 | Split `common.py` → `io.py` | [P] | ~150 lines |
-| [x] | 1.4 | Add re-exports to slim `common.py` | | Depends on 1.1–1.3 |
-| [x] | 1.5 | Lint + test after common.py split | | Gate before list.py |
-| [x] | 1.6 | Convert `list.py` → `list/__init__.py` | | Create package, define `app` |
-| [x] | 1.7 | Extract `list/specs.py` | [P] | ~340 lines |
-| [x] | 1.8 | Extract `list/deltas.py` | [P] | ~340 lines |
-| [x] | 1.9 | Extract `list/changes.py` | [P] | changes + plans, ~350 lines |
-| [x] | 1.10 | Extract `list/reviews.py` | [P] | revisions + audits, ~320 lines |
-| [x] | 1.11 | Extract `list/governance.py` | [P] | adrs + policies + standards, ~430 lines |
-| [x] | 1.12 | Extract `list/requirements.py` | [P] | ~310 lines |
-| [x] | 1.13 | Extract `list/backlog.py` | [P] | ~270 lines |
-| [x] | 1.14 | Extract `list/backlog_items.py` | [P] | drift + 4 item types, ~540 lines |
-| [x] | 1.15 | Extract `list/misc.py` | [P] | cards + memories + schemas, ~340 lines |
-| [x] | 1.16 | Wire `list/__init__.py` imports | | Import all sub-modules to register commands |
-| [x] | 1.17 | Lint + test after list.py split | | Final gate |
+| Status | ID   | Description                            | Parallel? | Notes                                       |
+| ------ | ---- | -------------------------------------- | --------- | ------------------------------------------- |
+| [x]    | 1.1  | Split `common.py` → `artifacts.py`     |           | Largest extraction (~550 lines)             |
+| [x]    | 1.2  | Split `common.py` → `ids.py`           | [P]       | ~70 lines                                   |
+| [x]    | 1.3  | Split `common.py` → `io.py`            | [P]       | ~150 lines                                  |
+| [x]    | 1.4  | Add re-exports to slim `common.py`     |           | Depends on 1.1–1.3                          |
+| [x]    | 1.5  | Lint + test after common.py split      |           | Gate before list.py                         |
+| [x]    | 1.6  | Convert `list.py` → `list/__init__.py` |           | Create package, define `app`                |
+| [x]    | 1.7  | Extract `list/specs.py`                | [P]       | ~340 lines                                  |
+| [x]    | 1.8  | Extract `list/deltas.py`               | [P]       | ~340 lines                                  |
+| [x]    | 1.9  | Extract `list/changes.py`              | [P]       | changes + plans, ~350 lines                 |
+| [x]    | 1.10 | Extract `list/reviews.py`              | [P]       | revisions + audits, ~320 lines              |
+| [x]    | 1.11 | Extract `list/governance.py`           | [P]       | adrs + policies + standards, ~430 lines     |
+| [x]    | 1.12 | Extract `list/requirements.py`         | [P]       | ~310 lines                                  |
+| [x]    | 1.13 | Extract `list/backlog.py`              | [P]       | ~270 lines                                  |
+| [x]    | 1.14 | Extract `list/backlog_items.py`        | [P]       | drift + 4 item types, ~540 lines            |
+| [x]    | 1.15 | Extract `list/misc.py`                 | [P]       | cards + memories + schemas, ~340 lines      |
+| [x]    | 1.16 | Wire `list/__init__.py` imports        |           | Import all sub-modules to register commands |
+| [x]    | 1.17 | Lint + test after list.py split        |           | Final gate                                  |
 
 ### Task Details
 
@@ -95,10 +95,10 @@ Split `cli/common.py` (1,124 lines) into 4 files and `cli/list.py` (3,195 lines)
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|------------|--------|
-| Circular import in list/ package | Standard Typer pattern; app defined before sub-module imports | mitigated |
-| common.py re-exports miss a symbol | grep verification in task 1.5 | mitigated |
+| Risk                               | Mitigation                                                    | Status    |
+| ---------------------------------- | ------------------------------------------------------------- | --------- |
+| Circular import in list/ package   | Standard Typer pattern; app defined before sub-module imports | mitigated |
+| common.py re-exports miss a symbol | grep verification in task 1.5                                 | mitigated |
 
 ## 9. Decisions & Outcomes
 

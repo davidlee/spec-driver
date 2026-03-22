@@ -29,6 +29,7 @@ Phase 01 (CLI layer) is **complete**. Phase 02 is next.
 Split `changes/creation.py` and `blocks/workflow_metadata.py`. Per DR-114:
 
 **creation.py (1,056 lines → 6 files)**:
+
 - `_creation_utils.py`: shared helpers (~40 lines)
 - `revision_creation.py`: `create_revision` (~75)
 - `delta_creation.py`: `create_delta` (~140)
@@ -39,6 +40,7 @@ Split `changes/creation.py` and `blocks/workflow_metadata.py`. Per DR-114:
 - Test: extract phase tests to `phase_creation_test.py`
 
 **workflow_metadata.py (1,485 lines → 8 files)**:
+
 - Move single-consumer helpers to their schema files (see DR-114 §4e table)
 - Only `_timestamps_block` stays in slim shared file (used by STATE + HANDOFF)
 - 4 importers in `workflow/` modules

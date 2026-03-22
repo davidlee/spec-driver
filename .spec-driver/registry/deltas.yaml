@@ -12861,7 +12861,7 @@ deltas:
           status: completed
   DE-113:
     kind: delta
-    status: draft
+    status: completed
     name: "Delta - Dead code purge: orphaned scripts, hollow functions, stale migrations"
     slug: dead_code_purge_orphaned_scripts_hollow_functions_stale_migrations
     updated: "2026-03-22"
@@ -12891,8 +12891,10 @@ deltas:
         phases:
           - id: IP-113-P01
       phases:
-        - id: IP-113-P01
+        - plan: IP-113
+          delta: DE-113
           phase: IP-113-P01
+          status: completed
   DE-114:
     kind: delta
     status: draft
@@ -13217,7 +13219,7 @@ deltas:
           phase: IP-122-P01
   DE-123:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - list deltas to hide completed by default; --all to show them
     slug: list_deltas_to_hide_completed_by_default_all_to_show_them
     updated: "2026-03-22"
@@ -13242,6 +13244,9 @@ deltas:
           dependencies: []
         phases:
           - id: IP-123-P01
+            name: Phase 1 - Implementation & Verification
       phases:
-        - id: IP-123-P01
+        - plan: IP-123
+          delta: DE-123
           phase: IP-123-P01
+          status: completed

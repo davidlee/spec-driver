@@ -25,9 +25,13 @@ for unknown values (permissive validation per DEC-057-08).
 
 What is conflicting or unclear — an assertion, observation, gap, or question.
 
+**Inherits from:** BaseModel
+
 ### DiscoveredBy
 
 Discovery origin for a drift entry.
+
+**Inherits from:** BaseModel
 
 ### DriftEntry
 
@@ -37,6 +41,8 @@ Fields follow IMPR-007 D1–D14 with typed substructures (DEC-065-06).
 Progressive strictness: only id, title, status, and entry_type are
 expected at minimum. All other fields default to empty.
 
+**Inherits from:** BaseModel
+
 ### DriftLedger
 
 A drift ledger — one file per scope of work.
@@ -44,6 +50,10 @@ A drift ledger — one file per scope of work.
 Contains frontmatter metadata plus parsed entries.
 See IMPR-007 D1 (ledger-as-file) and DEC-065-08 (body preserved).
 
+**Inherits from:** BaseModel
+
 ### Source
 
 Where drift appears — an artifact reference with optional context.
+
+**Inherits from:** BaseModel

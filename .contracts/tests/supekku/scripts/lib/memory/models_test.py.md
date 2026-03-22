@@ -12,11 +12,11 @@ Test MemoryRecord dataclass construction and serialization.
 
 #### Methods
 
-- `test_from_frontmatter_bad_date_ignored(self) -> None`: from_frontmatter sets None for unparseable dates.
-- `test_from_frontmatter_full(self) -> None`: from_frontmatter handles all optional fields.
-- `test_from_frontmatter_minimal(self) -> None`: from_frontmatter constructs record from minimal frontmatter dict.
-- `test_from_frontmatter_with_dates(self) -> None`: from_frontmatter parses date strings and date objects.
-- `test_from_frontmatter_with_links(self) -> None`: from_frontmatter parses links object.
+- `test_from_frontmatter_bad_date_ignored(self) -> None`: Unparseable dates coerce to None.
+- `test_from_frontmatter_full(self) -> None`: All optional fields are parsed correctly.
+- `test_from_frontmatter_minimal(self) -> None`: Direct construction from frontmatter dict.
+- `test_from_frontmatter_with_dates(self) -> None`: Date strings and date objects are coerced correctly.
+- `test_from_frontmatter_with_links(self) -> None`: Links object is parsed correctly.
 - `test_full_construction(self) -> None`: Construct with all fields populated.
 - `test_links_defaults_empty(self) -> None`: links field defaults to empty dict.
 - `test_minimal_construction(self) -> None`: Construct with only required fields.

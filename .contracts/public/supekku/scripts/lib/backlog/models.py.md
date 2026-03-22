@@ -22,6 +22,8 @@ for unknown values (permissive validation per DEC-057-08).
 
 Backlog item model representing issues, problems, improvements, and risks.
 
+**Inherits from:** BaseModel
+
 #### Methods
 
 - `to_dict(self) -> dict[Tuple[str, Any]]`: Serialize to dict with consistent relational fields.

@@ -4,7 +4,7 @@ slug: "109-review_state_machine_formalisation-phase-01"
 name: "Domain model — enums, Pydantic models, state machines, guards"
 created: "2026-03-22"
 updated: "2026-03-22"
-status: draft
+status: in_progress
 kind: phase
 plan: IP-109
 delta: DE-109

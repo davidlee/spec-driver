@@ -8,6 +8,8 @@ Card model for kanban board management.
 
 Card model representing a kanban card with T### ID.
 
+**Inherits from:** BaseModel
+
 #### Methods
 
 - @classmethod `from_file(cls, card_path) -> Card`: Parse card from markdown file.

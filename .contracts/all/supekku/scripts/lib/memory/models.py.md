@@ -2,16 +2,6 @@
 
 MemoryRecord model for memory artifacts.
 
-## Functions
-
-- `_parse_date(value) -> <BinOp>`: Parse a date from string or date object.
-
-Args:
-  value: Date string (YYYY-MM-DD), date object, or datetime object.
-
-Returns:
-  Parsed date or None if unparseable.
-
 ## Classes
 
 ### MemoryRecord
@@ -21,16 +11,10 @@ A memory artifact record parsed from frontmatter.
 Required fields: id, name, status, memory_type, path.
 All other fields are optional with safe defaults.
 
+**Inherits from:** BaseModel
+
 #### Methods
 
-- @classmethod `from_frontmatter(cls, path, fm) -> MemoryRecord`: Construct a MemoryRecord from parsed frontmatter.
-
-Args:
-  path: Filesystem path to the memory file.
-  fm: Parsed frontmatter dictionary.
-
-Returns:
-  Populated MemoryRecord.
 - `to_dict(self, root) -> dict[Tuple[str, Any]]`: Convert to dictionary for YAML serialization.
 
 Args:
@@ -38,3 +22,4 @@ Args:
 
 Returns:
   Dictionary with non-empty fields only.
+- @classmethod @field_validator(created, updated, verified, review_by, mode=before) `_coerce_date(cls, v) -> <BinOp>`: Coerce date-like values permissively. Returns None on bad input.

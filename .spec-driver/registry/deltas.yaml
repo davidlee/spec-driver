@@ -11971,9 +11971,9 @@ deltas:
         status: completed
   DE-107:
     kind: delta
-    status: draft
-    name: 'Delta - Spike: evaluate Pydantic for model layer'
-    slug: spike_evaluate_pydantic_for_model_layer
+    status: completed
+    name: Delta - Pydantic model layer migration
+    slug: pydantic_model_layer_migration
     updated: '2026-03-22'
     path: .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/DE-107.md
     applies_to:
@@ -11983,11 +11983,22 @@ deltas:
       - SPEC-159
       requirements: []
     relations:
-    - type: relates_to
+    - type: follows_from
       target: DE-106
       attributes:
-        description: DE-106 phase model conversion serves as the Pydantic spike prototype
-          (DEC-008 in DR-106)
+        description: DE-106 PhaseSheet proved Pydantic feasibility; this delta extends
+          the pattern to all model files
+    - type: subsumes
+      target: IMPR-024
+      attributes:
+        description: "Kind-aware frontmatter validation via Pydantic models \u2014\
+          \ delivered as part of this migration"
+    - type: coordinates_with
+      target: DE-109
+      attributes:
+        description: "DE-109 introduces FindingDisposition \u2014 should use Pydantic\
+          \ BaseModel, not @dataclass. Validator surface is independent (frontmatter\
+          \ vs workflow state)."
     plan:
       id: IP-107
       overview:
@@ -11996,7 +12007,8 @@ deltas:
         plan: IP-107
         delta: DE-107
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-107
         specs:
           primary:
           - SPEC-116
@@ -12008,6 +12020,290 @@ deltas:
           dependencies: []
         phases:
         - id: IP-107-P01
+          name: MemoryRecord conversion
+          objective: Convert MemoryRecord from @dataclass to Pydantic BaseModel. Replace
+            from_frontmatter(), to_dict(), _parse_date() with Pydantic construction
+            and serialization. Update registry. All existing tests passing.
+          entrance_criteria:
+          - DR-107 reviewed
+          - Existing memory model and registry tests passing
+          exit_criteria:
+          - MemoryRecord is a Pydantic BaseModel
+          - from_frontmatter() removed or reduced to thin wrapper
+          - to_dict() replaced with model_dump() or thin wrapper
+          - _parse_date() removed
+          - All existing memory tests passing
+          - Corpus validation against real .spec-driver/memory/ files
+          - Lint clean
+        - id: IP-107-P02
+          name: BacklogItem, SpecEntry, and card model conversion
+          objective: Convert BacklogItem, SpecEntry, and card models to Pydantic.
+            Update registries and consumers. Establish repeatable conversion pattern.
+          entrance_criteria:
+          - Phase 1 complete
+          - MemoryRecord conversion pattern established
+          exit_criteria:
+          - All 3 model files converted to Pydantic BaseModel
+          - Registry construction sites updated
+          - All existing tests passing
+          - Lint clean
+        - id: IP-107-P03
+          name: Drift models, remaining models, frontmatter metadata, schema docs
+          objective: Convert frozen drift models and remaining small models. Update
+            plan.py frontmatter metadata with plan/delta fields. Update schema documentation.
+            Wire kind-aware validation in validator.
+          entrance_criteria:
+          - Phase 2 complete
+          exit_criteria:
+          - Drift models converted with ConfigDict(frozen=True)
+          - Remaining small models converted (diagnostics, sync, docs/python)
+          - plan.py frontmatter metadata includes plan and delta fields
+          - Kind-aware frontmatter validation extended beyond phases
+          - All tests passing
+          - Lint clean
       phases:
-      - id: IP-107-P01
+      - plan: IP-107
+        delta: DE-107
+        objective: Convert MemoryRecord from @dataclass to Pydantic BaseModel. Replace
+          from_frontmatter(), to_dict(), _parse_date() with Pydantic construction
+          and serialization. Update registry. All existing tests passing.
+        entrance_criteria:
+        - DR-107 approved
+        - Existing memory model and registry tests passing
+        exit_criteria:
+        - MemoryRecord is a Pydantic BaseModel
+        - from_frontmatter() removed
+        - to_dict() replaced with model_dump-based thin wrapper
+        - _parse_date() removed
+        - All existing memory tests passing (26 model tests + registry tests)
+        - Corpus validation against real .spec-driver/memory/ files
+        - Lint clean
         phase: IP-107-P01
+        status: completed
+      - plan: IP-107
+        delta: DE-107
+        objective: "Convert BacklogItem and Card from @dataclass to Pydantic BaseModel.\
+          \ Update registry construction sites. All existing tests passing. Spec model\
+          \ deferred \u2014 structurally different (wrapper pattern, not field-mapping\
+          \ pattern)."
+        entrance_criteria:
+        - Phase 1 complete
+        - MemoryRecord conversion pattern established
+        exit_criteria:
+        - BacklogItem is a Pydantic BaseModel with ConfigDict(extra="ignore")
+        - Card is a Pydantic BaseModel
+        - BacklogItem registry construction updated to direct construction
+        - Card.from_file() retained as classmethod (file I/O factory, not frontmatter
+          mapping)
+        - All existing backlog tests passing (models + registry + priority)
+        - All existing card tests passing (registry)
+        - Lint clean
+        phase: IP-107-P02
+        status: in-progress
+      - plan: IP-107
+        delta: DE-107
+        objective: "Convert remaining @dataclass models to Pydantic BaseModel. Frozen\
+          \ dataclasses become ConfigDict(frozen=True). Spec model excluded (structurally\
+          \ different \u2014 wrapper pattern)."
+        entrance_criteria:
+        - Phase 2 complete
+        exit_criteria:
+        - Drift models converted (Source, Claim, DiscoveredBy frozen; DriftEntry,
+          DriftLedger mutable)
+        - Diagnostics models converted (DiagnosticResult, CategorySummary frozen)
+        - Sync models converted (SourceUnit, DocVariant, SourceDescriptor frozen;
+          SyncOutcome mutable)
+        - Doc/python models converted (VariantSpec, DocResult)
+        - All existing tests passing
+        - Lint clean
+        phase: IP-107-P03
+        status: in-progress
+  DE-108:
+    kind: delta
+    status: draft
+    name: Delta - Review CLI contract for structured machine consumption
+    slug: review_cli_contract_for_structured_machine_consumption
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-108-review_cli_contract_for_structured_machine_consumption/DE-108.md
+    applies_to:
+      specs:
+      - PROD-010
+      - PROD-011
+      requirements: []
+    relations:
+    - type: relates_to
+      target: autobahn:DE-001
+      attributes:
+        note: "autobahn OQ-001 \u2014 review CLI contract definition"
+    - type: extends
+      target: DE-102
+      attributes:
+        note: "review orchestration \u2014 human/agent CLI"
+    - type: extends
+      target: DE-103
+      attributes:
+        note: "workflow control plane \u2014 existing review commands"
+    plan:
+      id: IP-108
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-108
+        delta: DE-108
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-108-P01
+      phases:
+      - id: IP-108-P01
+        phase: IP-108-P01
+  DE-109:
+    kind: delta
+    status: in-progress
+    name: Delta - Review state machine formalisation
+    slug: review_state_machine_formalisation
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-109-review_state_machine_formalisation/DE-109.md
+    applies_to:
+      specs:
+      - PROD-011
+      requirements: []
+    relations:
+    - type: relates_to
+      target: autobahn:DE-001
+      attributes:
+        note: "autobahn OQ-003 \u2014 review state machine formal definition"
+    - type: extends
+      target: DE-102
+      attributes:
+        note: "DR-102 \xA73.3/\xA73.4 defined review lifecycle informally"
+    - type: extends
+      target: DE-103
+      attributes:
+        note: implemented review bootstrap/judgment lifecycle
+    - type: informed_by
+      target: DE-079
+      attributes:
+        note: "audit disposition model \u2014 prior art for finding disposition"
+    - type: coordinates_with
+      target: DE-107
+      attributes:
+        note: FindingDisposition should use Pydantic BaseModel per DE-107 migration
+          direction; StrEnums are independent
+    plan:
+      id: IP-109
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-109
+        delta: DE-109
+        revision_links:
+          aligns_with:
+          - DR-109
+        specs:
+          primary:
+          - PROD-011
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-109-P01
+        - id: IP-109-P02
+        - id: IP-109-P03
+        - id: IP-109-P04
+      phases:
+      - plan: IP-109
+        delta: DE-109
+        phase: IP-109-P01
+        status: in_progress
+      - id: IP-109-P02
+        phase: IP-109-P02
+      - id: IP-109-P03
+        phase: IP-109-P03
+      - id: IP-109-P04
+        phase: IP-109-P04
+  DE-110:
+    kind: delta
+    status: draft
+    name: Delta - Workflow schema export for cross-project contract testing
+    slug: workflow_schema_export_for_cross_project_contract_testing
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-110-workflow_schema_export_for_cross_project_contract_testing/DE-110.md
+    applies_to:
+      specs:
+      - PROD-012
+      requirements: []
+    relations:
+    - type: relates_to
+      target: autobahn:DE-001
+      attributes:
+        note: "autobahn OQ-002 \u2014 shared schema surface"
+    - type: relates_to
+      target: DE-107
+      attributes:
+        note: "pydantic spike \u2014 potential convergence point for typed schema\
+          \ export"
+    plan:
+      id: IP-110
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-110
+        delta: DE-110
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-110-P01
+      phases:
+      - id: IP-110-P01
+        phase: IP-110-P01
+  DE-111:
+    kind: delta
+    status: draft
+    name: Delta - Spec model Pydantic conversion and schema docs
+    slug: spec_model_pydantic_conversion_and_schema_docs
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-111-spec_model_pydantic_conversion_and_schema_docs/DE-111.md
+    applies_to:
+      specs:
+      - SPEC-116
+      requirements: []
+    relations:
+    - type: follows_from
+      target: DE-107
+      attributes:
+        description: Deferred items from DE-107 Pydantic migration
+    plan:
+      id: IP-111
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-111
+        delta: DE-111
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-116
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-111-P01
+      phases:
+      - id: IP-111-P01
+        phase: IP-111-P01

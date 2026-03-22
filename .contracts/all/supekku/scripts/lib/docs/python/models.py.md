@@ -8,6 +8,8 @@ Data models for Python documentation generation API.
 
 Result of documentation generation for a single file/variant combination.
 
+**Inherits from:** BaseModel
+
 #### Methods
 
 - @property `success(self) -> bool`: Whether generation was successful.
@@ -15,6 +17,8 @@ Result of documentation generation for a single file/variant combination.
 ### VariantSpec
 
 Specification for a documentation variant.
+
+**Inherits from:** BaseModel
 
 #### Methods
 

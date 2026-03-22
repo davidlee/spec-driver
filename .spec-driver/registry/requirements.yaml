@@ -6,7 +6,7 @@ requirements:
     - IMPR-001
     primary_spec: IMPR-001
     kind: functional
-    category: null
+    category: authentication
     status: pending
     tags: []
     introduced: null
@@ -24,7 +24,7 @@ requirements:
     - IMPR-001
     primary_spec: IMPR-001
     kind: non-functional
-    category: null
+    category: performance
     status: pending
     tags: []
     introduced: null
@@ -208,7 +208,7 @@ requirements:
     - ISSUE-020
     primary_spec: ISSUE-020
     kind: functional
-    category: null
+    category: PROD-010
     status: pending
     tags: []
     introduced: null

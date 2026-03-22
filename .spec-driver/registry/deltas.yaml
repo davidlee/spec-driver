@@ -12222,11 +12222,15 @@ deltas:
       - plan: IP-109
         delta: DE-109
         phase: IP-109-P01
-        status: in_progress
-      - id: IP-109-P02
+        status: in-progress
+      - plan: IP-109
+        delta: DE-109
         phase: IP-109-P02
-      - id: IP-109-P03
+        status: in-progress
+      - plan: IP-109
+        delta: DE-109
         phase: IP-109-P03
+        status: draft
       - id: IP-109-P04
         phase: IP-109-P04
   DE-110:
@@ -12319,3 +12323,99 @@ deltas:
         - Lint clean
         phase: IP-111-P01
         status: in-progress
+  DE-112:
+    kind: delta
+    status: completed
+    name: Delta - Kind-aware Pydantic validation and remaining dataclass cleanup
+    slug: kind_aware_pydantic_validation_and_remaining_dataclass_cleanup
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-112-kind_aware_pydantic_validation_and_remaining_dataclass_cleanup/DE-112.md
+    applies_to:
+      specs:
+      - SPEC-116
+      - SPEC-132
+      - SPEC-159
+      requirements: []
+    relations:
+    - type: follows_from
+      target: DE-107
+      attributes:
+        description: Uses Pydantic models created by DE-107 for validation
+    - type: follows_from
+      target: DE-111
+      attributes:
+        description: Extends PhaseSheet validation pattern to other artifact kinds
+    - type: resolves
+      target: IMPR-024
+      attributes:
+        description: Kind-aware frontmatter validation (partially addressed by DE-107,
+          completed here)
+    plan:
+      id: IP-112
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-112
+        delta: DE-112
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-116
+          - SPEC-132
+          - SPEC-159
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-112-P01
+        - id: IP-112-P02
+        - id: IP-112-P03
+      phases:
+      - plan: IP-112
+        delta: DE-112
+        objective: Convert FrontmatterValidationResult and Relation from @dataclass(frozen=True)
+          to Pydantic BaseModel(frozen=True). Update validate_frontmatter() call site.
+        entrance_criteria:
+        - DR-112 approved
+        - Existing core tests passing
+        exit_criteria:
+        - Both classes are Pydantic BaseModel with frozen=True
+        - validate_frontmatter() constructs FrontmatterValidationResult via Pydantic
+        - All existing tests passing
+        - Lint clean
+        phase: IP-112-P01
+        status: completed
+      - plan: IP-112
+        delta: DE-112
+        objective: Add _validate_memory_frontmatter, _validate_backlog_frontmatter,
+          _validate_drift_frontmatter methods to WorkspaceValidator. Wire into validate()
+          with top-level traversal methods.
+        entrance_criteria:
+        - Phase 1 complete
+        exit_criteria:
+        - Three new validation methods on WorkspaceValidator
+        - Three new traversal methods called from validate()
+        - spec-driver validate catches malformed memory/backlog/drift frontmatter
+        - New tests for kind-aware validation
+        - Existing validator tests pass
+        - Lint clean
+        phase: IP-112-P02
+        status: completed
+      - plan: IP-112
+        delta: DE-112
+        objective: Fix AUD-012 disposition vocabulary, legacy phase frontmatter gaps,
+          and IP-109 status format. Reduce validate output to real issues only.
+        entrance_criteria:
+        - Phase 2 complete (new validation wired in, so we can verify cleanup)
+        exit_criteria:
+        - AUD-012 findings use 'reconciled' instead of 'resolved' for aligned dispositions
+        - Legacy phase files have kind and status in frontmatter
+        - IP-109 phase status uses canonical format
+        - spec-driver validate error count drops to 0
+        - spec-driver validate warning count drops significantly (legacy audit-gate
+          warnings remain)
+        - Lint clean (for any touched .py files)
+        phase: IP-112-P03
+        status: completed

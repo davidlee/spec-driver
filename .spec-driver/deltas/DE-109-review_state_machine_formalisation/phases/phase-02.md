@@ -4,7 +4,7 @@ slug: "109-review_state_machine_formalisation-phase-02"
 name: "I/O layer — accumulative rounds, schema v2, judgment_status"
 created: "2026-03-22"
 updated: "2026-03-22"
-status: in_progress
+status: in-progress
 kind: phase
 plan: IP-109
 delta: DE-109

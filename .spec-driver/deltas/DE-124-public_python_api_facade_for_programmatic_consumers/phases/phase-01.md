@@ -1,10 +1,10 @@
 ---
 id: IP-124-P01
 slug: "124-public_python_api_facade_for_programmatic_consumers-phase-01"
-name: "Extract operations and refactor CLI"
+name: Extract operations and refactor CLI
 created: "2026-03-23"
 updated: "2026-03-23"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-124
 delta: DE-124

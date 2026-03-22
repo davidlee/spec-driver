@@ -861,30 +861,15 @@ def review_prime_command(
   Evaluates staleness of existing cache, rebuilds or incrementally
   updates as appropriate per DR-102 §8.
   """
-  from supekku.scripts.lib.core.git import (  # noqa: PLC0415
-    get_changed_files,
-    get_head_sha,
-    short_sha,
-  )
-  from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
-    ReviewIndexNotFoundError,
-    ReviewIndexValidationError,
-    bootstrap_path,
-    build_review_index,
-    read_review_index,
-    write_review_index,
+  from spec_driver.orchestration.operations import (  # noqa: PLC0415
+    prime_review,
   )
   from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
     BootstrapStatus,
   )
-  from supekku.scripts.lib.workflow.staleness import (  # noqa: PLC0415
-    check_domain_map_files_exist,
-    evaluate_staleness,
-  )
   from supekku.scripts.lib.workflow.state_io import (  # noqa: PLC0415
     StateNotFoundError,
     StateValidationError,
-    read_state,
   )
 
   json_mode = format_type == "json"
@@ -894,9 +879,8 @@ def review_prime_command(
   delta_dir = _resolve_delta_dir(delta, repo_root)
   delta_id = delta.upper()
 
-  # Read current state
   try:
-    state_data = read_state(delta_dir)
+    result = prime_review(delta_dir, repo_root)
   except StateNotFoundError as exc:
     msg = f"No workflow state for {delta_id}"
     if json_mode:
@@ -910,338 +894,26 @@ def review_prime_command(
     typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
 
-  phase_id = state_data.get("phase", {}).get("id", "unknown")
-  head_sha = get_head_sha(repo_root)
-  full_head = head_sha or "unknown"
-  git_head = short_sha(head_sha) if head_sha else "unknown"
-
-  config = _load_workflow_config(repo_root)
-  review_config = config.get("review", {})
-  bootstrap_config = review_config.get("bootstrap", {})
-  session_scope = review_config.get("session_scope")
-
-  # Check existing cache
-  existing_index = None
-  cache_status = BootstrapStatus.COLD
-
-  try:
-    existing_index = read_review_index(delta_dir)
-  except ReviewIndexNotFoundError:
-    pass  # Cold start
-  except ReviewIndexValidationError:
-    cache_status = BootstrapStatus.INVALID
-
-  if existing_index:
-    # Evaluate staleness
-    changed_files = None
-    cached_head = (
-      existing_index.get("staleness", {})
-      .get(
-        "cache_key",
-        {},
-      )
-      .get("head", "")
-    )
-    if cached_head and cached_head != full_head:
-      changed_files = get_changed_files(cached_head, "HEAD", repo_root)
-
-    # Check for deleted domain_map files
-    deleted = check_domain_map_files_exist(
-      existing_index.get("domain_map", []),
-      repo_root,
-    )
-    if deleted:
-      cache_status = BootstrapStatus.INVALID
-      if not json_mode:
-        typer.echo(f"  invalidated: {len(deleted)} domain_map files deleted")
-    else:
-      result = evaluate_staleness(
-        existing_index,
-        current_phase_id=phase_id,
-        current_head=full_head,
-        changed_files=changed_files,
-      )
-      cache_status = result.status
-      if result.triggers and not json_mode:
-        typer.echo(f"  staleness triggers: {', '.join(result.triggers)}")
-
-  # Build domain_map from delta bundle context
-  domain_map = _build_domain_map(delta_dir, repo_root, bootstrap_config)
-
-  # Carry forward optional sections from existing index when doing incremental update
-  invariants = None
-  risk_areas = None
-  review_focus = None
-  known_decisions = None
-
-  if cache_status == BootstrapStatus.REUSABLE and existing_index:
-    invariants = existing_index.get("invariants")
-    risk_areas = existing_index.get("risk_areas")
-    review_focus = existing_index.get("review_focus")
-    known_decisions = existing_index.get("known_decisions")
-
-  # Build review index
-  source_handoff = None
-  handoff_file = delta_dir / "workflow" / "handoff.current.yaml"
-  if handoff_file.exists():
-    source_handoff = "workflow/handoff.current.yaml"
-
-  # Set judgment to in_progress via review transition (DR-109 §4.3)
-  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
-    ReviewStatus,
-    ReviewTransitionCommand,
-    apply_review_transition,
-  )
-
-  judgment_status = apply_review_transition(
-    ReviewStatus.NOT_STARTED,
-    ReviewTransitionCommand.BEGIN_REVIEW,
-  )
-
-  index_data = build_review_index(
-    artifact_id=delta_id,
-    bootstrap_status=BootstrapStatus.WARM.value,
-    judgment_status=judgment_status.value,
-    phase_id=phase_id,
-    git_head=full_head,
-    domain_map=domain_map,
-    session_scope=session_scope,
-    source_handoff=source_handoff,
-    invariants=invariants,
-    risk_areas=risk_areas,
-    review_focus=review_focus,
-    known_decisions=known_decisions,
-  )
-
-  # Write order per DR-102 §5: 1. review-index, 2. bootstrap.md, 3. state
-  try:
-    idx_path = write_review_index(delta_dir, index_data)
-  except ReviewIndexValidationError as exc:
-    msg = f"Review index validation failed: {exc}"
-    if json_mode:
-      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "validation", msg))
-    typer.echo(msg, err=True)
-    raise typer.Exit(EXIT_FAILURE) from exc
-
-  # Generate bootstrap markdown
-  bootstrap_md = _generate_bootstrap_markdown(
-    delta_id=delta_id,
-    state_data=state_data,
-    index_data=index_data,
-    delta_dir=delta_dir,
-    repo_root=repo_root,
-    config=bootstrap_config,
-    cache_status=cache_status,
-  )
-  bp = bootstrap_path(delta_dir)
-  bp.parent.mkdir(parents=True, exist_ok=True)
-  bp.write_text(bootstrap_md, encoding="utf-8")
-
-  # Determine action (DEC-108-006)
-  action = _prime_action(cache_status)
-
-  # Determine review round
-  from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
-    next_round_number,
-  )
-
-  review_round = next_round_number(delta_dir)
-
   if json_mode:
     emit_json_and_exit(
       cli_json_success(
         cmd,
         {
-          "delta_id": delta_id,
-          "action": action,
+          "delta_id": result.delta_id,
+          "action": result.action.value,
           "bootstrap_status": BootstrapStatus.WARM.value,
-          "judgment_status": judgment_status.value,
-          "review_round": review_round,
-          "index_path": str(idx_path.relative_to(repo_root)),
-          "bootstrap_path": str(bp.relative_to(repo_root)),
+          "judgment_status": result.judgment_status.value,
+          "review_round": result.review_round,
+          "index_path": str(result.index_path.relative_to(repo_root)),
+          "bootstrap_path": str(result.bootstrap_path.relative_to(repo_root)),
         },
       )
     )
 
-  typer.echo(f"Review primed: {delta_id} ({action})")
-  typer.echo(f"  index: {idx_path}")
-  typer.echo(f"  bootstrap: {bp}")
+  typer.echo(f"Review primed: {result.delta_id} ({result.action.value})")
+  typer.echo(f"  index: {result.index_path}")
+  typer.echo(f"  bootstrap: {result.bootstrap_path}")
   raise typer.Exit(EXIT_SUCCESS)
-
-
-def _prime_action(cache_status: str) -> str:
-  """Map bootstrap cache status to a prime action label (DEC-108-006).
-
-  - created: first-ever prime (cold, no prior review-index)
-  - rebuilt: re-prime after teardown/invalid/stale
-  - refreshed: reusable cache with incremental update
-  """
-  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
-    BootstrapStatus,
-  )
-
-  if cache_status == BootstrapStatus.COLD:
-    return "created"
-  if cache_status in (BootstrapStatus.INVALID, BootstrapStatus.STALE):
-    return "rebuilt"
-  if cache_status == BootstrapStatus.REUSABLE:
-    return "refreshed"
-  return "created"
-
-
-def _build_domain_map(
-  delta_dir: Path,
-  repo_root: Path,
-  bootstrap_config: dict,
-) -> list[dict]:
-  """Build domain_map from delta bundle files.
-
-  Assembles areas from the delta's key files: DE, IP, phase sheets,
-  notes, and workflow artifacts.
-  """
-  areas: list[dict] = []
-
-  # Delta documentation area
-  doc_files: list[str] = []
-  for f in sorted(delta_dir.glob("*.md")):
-    doc_files.append(str(f.relative_to(repo_root)))
-  if doc_files:
-    areas.append(
-      {
-        "area": "delta_docs",
-        "purpose": "delta and plan documentation",
-        "files": doc_files,
-      }
-    )
-
-  # Phase sheets
-  phases_dir = delta_dir / "phases"
-  if phases_dir.is_dir():
-    phase_files = [
-      str(f.relative_to(repo_root)) for f in sorted(phases_dir.glob("*.md"))
-    ]
-    if phase_files:
-      areas.append(
-        {
-          "area": "phase_sheets",
-          "purpose": "per-phase execution records",
-          "files": phase_files,
-        }
-      )
-
-  # Workflow artifacts
-  wf_dir = delta_dir / "workflow"
-  if wf_dir.is_dir():
-    wf_files = [
-      str(f.relative_to(repo_root)) for f in sorted(wf_dir.iterdir()) if f.is_file()
-    ]
-    if wf_files:
-      areas.append(
-        {
-          "area": "workflow_state",
-          "purpose": "orchestration control plane files",
-          "files": wf_files,
-        }
-      )
-
-  # Ensure at least one area (schema requires min 1)
-  if not areas:
-    areas.append(
-      {
-        "area": "delta_root",
-        "purpose": "delta bundle",
-        "files": [str(delta_dir.relative_to(repo_root))],
-      }
-    )
-
-  return areas
-
-
-def _generate_bootstrap_markdown(
-  *,
-  delta_id: str,
-  state_data: dict,
-  index_data: dict,
-  delta_dir: Path,
-  repo_root: Path,
-  config: dict,
-  cache_status: str,
-) -> str:
-  """Generate review-bootstrap.md content."""
-  lines: list[str] = []
-  lines.append(f"# Review Bootstrap — {delta_id}")
-  lines.append("")
-  lines.append(f"**Cache status:** {cache_status} → warm")
-  lines.append(f"**Phase:** {state_data.get('phase', {}).get('id', '?')}")
-  lines.append(
-    f"**Workflow status:** {state_data.get('workflow', {}).get('status', '?')}",
-  )
-  lines.append("")
-
-  # Required reading
-  lines.append("## Required Reading")
-  lines.append("")
-  artifact = state_data.get("artifact", {})
-  plan = state_data.get("plan", {})
-  phase = state_data.get("phase", {})
-
-  if artifact.get("path"):
-    lines.append(f"- Delta: `{artifact['path']}/{delta_id}.md`")
-  if plan.get("path"):
-    lines.append(f"- Plan: `{plan['path']}`")
-  if phase.get("path"):
-    lines.append(f"- Active phase: `{phase['path']}`")
-  if artifact.get("notes_path"):
-    lines.append(f"- Notes: `{artifact['notes_path']}`")
-
-  # Domain map
-  lines.append("")
-  lines.append("## Domain Map")
-  lines.append("")
-  for entry in index_data.get("domain_map", []):
-    lines.append(f"### {entry['area']}")
-    lines.append(f"**Purpose:** {entry['purpose']}")
-    lines.append("")
-    for f in entry.get("files", []):
-      lines.append(f"- `{f}`")
-    lines.append("")
-
-  # Invariants
-  invariants = index_data.get("invariants", [])
-  if invariants:
-    lines.append("## Invariants")
-    lines.append("")
-    for inv in invariants:
-      lines.append(f"- **{inv['id']}**: {inv['summary']}")
-    lines.append("")
-
-  # Risk areas
-  risk_areas = index_data.get("risk_areas", [])
-  if risk_areas:
-    lines.append("## Risk Areas")
-    lines.append("")
-    for ra in risk_areas:
-      lines.append(f"- **{ra['id']}**: {ra['summary']}")
-    lines.append("")
-
-  # Review focus
-  review_focus = index_data.get("review_focus", [])
-  if review_focus:
-    lines.append("## Review Focus")
-    lines.append("")
-    for rf in review_focus:
-      lines.append(f"- {rf}")
-    lines.append("")
-
-  # Staleness info
-  cache_key = index_data.get("staleness", {}).get("cache_key", {})
-  lines.append("## Cache Key")
-  lines.append("")
-  lines.append(f"- Phase: `{cache_key.get('phase_id', '?')}`")
-  lines.append(f"- HEAD: `{cache_key.get('head', '?')}`")
-  lines.append("")
-
-  return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
@@ -1271,35 +943,22 @@ def review_complete_command(
   root: RootOption = None,
 ) -> None:
   """Complete a review round, writing findings and transitioning state."""
+  from spec_driver.orchestration.operations import (  # noqa: PLC0415
+    ReviewApprovalGuardError,
+    complete_review,
+  )
   from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
-    FindingsNotFoundError,
-    FindingsValidationError,
     FindingsVersionError,
-    ReviewIndexNotFoundError,
-    ReviewIndexValidationError,
-    append_round,
-    build_findings,
-    read_findings,
-    read_review_index,
-    write_findings,
-    write_review_index,
   )
   from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
-    can_approve,
-    collect_blocking_findings,
+    ReviewStatus,
   )
   from supekku.scripts.lib.workflow.state_io import (  # noqa: PLC0415
     StateNotFoundError,
     StateValidationError,
-    read_state,
-    update_state_workflow,
-    write_state,
   )
   from supekku.scripts.lib.workflow.state_machine import (  # noqa: PLC0415
-    TransitionCommand,
     TransitionError,
-    WorkflowState,
-    apply_transition,
   )
 
   json_mode = format_type == "json"
@@ -1316,9 +975,15 @@ def review_complete_command(
   delta_dir = _resolve_delta_dir(delta, repo_root)
   delta_id = delta.upper()
 
-  # Read state
+  review_status = ReviewStatus(status)
+
   try:
-    state_data = read_state(delta_dir)
+    result = complete_review(
+      delta_dir,
+      repo_root,
+      status=review_status,
+      summary=summary,
+    )
   except StateNotFoundError as exc:
     msg = f"No workflow state for {delta_id}"
     if json_mode:
@@ -1331,134 +996,61 @@ def review_complete_command(
       emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
     typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
-
-  # Validate workflow transition
-  current = WorkflowState(state_data["workflow"]["status"])
-  command = (
-    TransitionCommand.REVIEW_COMPLETE_APPROVED
-    if status == "approved"
-    else TransitionCommand.REVIEW_COMPLETE_CHANGES_REQUESTED
-  )
-
-  try:
-    result = apply_transition(current, command)
   except TransitionError as exc:
     msg = f"Cannot complete review: {exc}"
     if json_mode:
       emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
     typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
-
-  # Approval guard: check blocking findings (DR-109 §4.3)
-  if status == "approved":
-    try:
-      existing_findings = read_findings(delta_dir)
-      blocking = collect_blocking_findings(existing_findings.get("rounds", []))
-      allowed, reasons = can_approve(blocking)
-      if not allowed:
-        msg = "Cannot approve: " + "; ".join(reasons)
-        if json_mode:
-          emit_json_and_exit(
-            cli_json_error(
-              cmd,
-              EXIT_GUARD_VIOLATION,
-              "guard_violation",
-              msg,
-            )
-          )
-        typer.echo("Cannot approve: blocking findings remain:", err=True)
-        for reason in reasons:
-          typer.echo(f"  - {reason}", err=True)
-        raise typer.Exit(EXIT_FAILURE)
-    except FindingsNotFoundError:
-      pass  # No findings = no blocking findings = guard passes
-    except FindingsVersionError as exc:
-      msg = str(exc)
-      if json_mode:
-        emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
-      typer.echo(msg, err=True)
-      raise typer.Exit(EXIT_FAILURE) from exc
-
-  # Build or append round (v2 accumulative model, DR-109 §3.5)
-  reviewer_role = state_data["workflow"].get("active_role")
-  try:
-    findings_data = read_findings(delta_dir)
-    append_round(
-      findings_data,
-      status=status,
-      reviewer_role=reviewer_role,
-      summary=summary,
-    )
-  except (FindingsNotFoundError, FindingsVersionError):
-    findings_data = build_findings(
-      artifact_id=delta_id,
-      round_number=1,
-      status=status,
-      reviewer_role=reviewer_role,
-      summary=summary,
-    )
-
-  # Write order per DR-102 §5: 1. findings, 2. review-index, 3. state
-  try:
-    fp = write_findings(delta_dir, findings_data)
-  except FindingsValidationError as exc:
-    typer.echo(f"Findings validation failed: {exc}", err=True)
+  except ReviewApprovalGuardError as exc:
+    msg = str(exc)
+    if json_mode:
+      emit_json_and_exit(
+        cli_json_error(cmd, EXIT_GUARD_VIOLATION, "guard_violation", msg),
+      )
+    typer.echo("Cannot approve: blocking findings remain:", err=True)
+    for reason in exc.reasons:
+      typer.echo(f"  - {reason}", err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
-
-  # Write judgment_status to review-index (DR-109 §4.3)
-  try:
-    index_data = read_review_index(delta_dir)
-    index_data.setdefault("review", {})["judgment_status"] = status
-    write_review_index(delta_dir, index_data)
-  except ReviewIndexNotFoundError:
-    pass  # No review-index — skip judgment write
-  except ReviewIndexValidationError as exc:
-    typer.echo(f"Review index update failed: {exc}", err=True)
-    # Non-fatal — findings and state are more important
-
-  # Auto-teardown on approved if policy says so
-  config = _load_workflow_config(repo_root)
-  review_config = config.get("review", {})
-  teardown_on = review_config.get("teardown_on", ["approved", "abandoned"])
-  should_teardown = status == "approved" and "approved" in teardown_on
-
-  update_state_workflow(
-    state_data,
-    status=result.new_state.value,
-  )
-
-  try:
-    write_state(delta_dir, state_data)
-  except StateValidationError as exc:
-    typer.echo(f"State update failed: {exc}", err=True)
+  except FindingsVersionError as exc:
+    msg = str(exc)
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
-
-  current_round = findings_data["review"]["current_round"]
 
   if json_mode:
     emit_json_and_exit(
       cli_json_success(
         cmd,
         {
-          "delta_id": delta_id,
-          "round": current_round,
-          "outcome": status,
-          "previous_state": current.value,
+          "delta_id": result.delta_id,
+          "round": result.round_number,
+          "outcome": result.outcome.value,
+          "previous_state": result.previous_state.value,
           "new_state": result.new_state.value,
-          "findings_path": str(fp.relative_to(repo_root)),
-          "teardown": should_teardown,
+          "findings_path": str(result.findings_path.relative_to(repo_root)),
+          "teardown": result.teardown_performed,
         },
       )
     )
 
   typer.echo(
-    f"Review complete: {delta_id} round {current_round} → {status} "
-    f"({current.value} → {result.new_state.value})",
+    f"Review complete: {result.delta_id} round {result.round_number} "
+    f"→ {result.outcome.value} "
+    f"({result.previous_state.value} → {result.new_state.value})",
   )
-  typer.echo(f"  findings: {fp}")
+  typer.echo(f"  findings: {result.findings_path}")
 
-  if should_teardown:
-    _do_teardown(delta_dir, delta_id)
+  if result.teardown_performed:
+    if result.removed_files:
+      typer.echo(
+        f"Teardown: {result.delta_id} — deleted {', '.join(result.removed_files)}",
+      )
+    else:
+      typer.echo(
+        f"Teardown: {result.delta_id} — no reviewer state to delete",
+      )
 
   raise typer.Exit(EXIT_SUCCESS)
 
@@ -1478,6 +1070,10 @@ def review_teardown_command(
   root: RootOption = None,
 ) -> None:
   """Delete reviewer state files (review-index, findings, bootstrap)."""
+  from spec_driver.orchestration.operations import (  # noqa: PLC0415
+    teardown_review,
+  )
+
   json_mode = format_type == "json"
   cmd = "review.teardown"
 
@@ -1485,7 +1081,15 @@ def review_teardown_command(
   delta_dir = _resolve_delta_dir(delta, repo_root)
   delta_id = delta.upper()
 
-  removed = _do_teardown(delta_dir, delta_id, silent=json_mode)
+  result = teardown_review(delta_dir)
+
+  if not json_mode:
+    if result.removed:
+      typer.echo(
+        f"Teardown: {delta_id} — deleted {', '.join(result.removed)}",
+      )
+    else:
+      typer.echo(f"Teardown: {delta_id} — no reviewer state to delete")
 
   if json_mode:
     emit_json_and_exit(
@@ -1493,7 +1097,7 @@ def review_teardown_command(
         cmd,
         {
           "delta_id": delta_id,
-          "removed": removed,
+          "removed": result.removed,
         },
       )
     )
@@ -1512,47 +1116,55 @@ finding_app = typer.Typer(
 review_app.add_typer(finding_app, name="finding")
 
 
-def _available_finding_ids(data: dict) -> list[str]:
-  """Collect all finding IDs from all rounds for error messages."""
-  ids: list[str] = []
-  for round_data in data.get("rounds", []):
-    for category in ("blocking", "non_blocking"):
-      for f in round_data.get(category, []):
-        if f.get("id"):
-          ids.append(f["id"])
-  return ids
-
-
-def _disposition_finding(
+def _cli_disposition_finding(
   delta: str,
   finding_id: str,
-  disposition: dict,
-  root: Path | None,
   *,
+  action: str,
+  root: Path | None,
   json_mode: bool = False,
+  authority: str | None = None,
+  rationale: str | None = None,
+  backlog_ref: str | None = None,
+  resolved_at: str | None = None,
+  superseded_by: str | None = None,
 ) -> None:
-  """Shared orchestration for all disposition commands.
-
-  Reads findings, updates disposition in-place, writes back.
-  Exits non-zero if finding not found.
-  """
+  """Thin CLI wrapper for disposition_finding operation."""
+  from spec_driver.orchestration.operations import (  # noqa: PLC0415
+    DispositionValidationError,
+    FindingNotFoundError,
+    disposition_finding,
+  )
   from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
     FindingsNotFoundError,
-    FindingsValidationError,
     FindingsVersionError,
-    find_finding,
-    read_findings,
-    update_finding_disposition,
-    write_findings,
+  )
+  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
+    DispositionAuthority,
+    FindingDispositionAction,
   )
 
-  cmd = f"review.finding.{disposition['action']}"
+  cmd = f"review.finding.{action}"
   repo_root = find_repo_root(root)
   delta_dir = _resolve_delta_dir(delta, repo_root)
   delta_id = delta.upper()
 
+  disp_action = FindingDispositionAction(action)
+  disp_authority = (
+    DispositionAuthority(authority) if authority else DispositionAuthority.AGENT
+  )
+
   try:
-    data = read_findings(delta_dir)
+    result = disposition_finding(
+      delta_dir,
+      finding_id,
+      action=disp_action,
+      authority=disp_authority,
+      rationale=rationale,
+      backlog_ref=backlog_ref,
+      resolved_at=resolved_at,
+      superseded_by=superseded_by,
+    )
   except FindingsNotFoundError as exc:
     msg = f"No findings for {delta_id}"
     if json_mode:
@@ -1565,48 +1177,35 @@ def _disposition_finding(
       emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
     typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
-
-  # Capture previous status before disposition
-  previous_finding = find_finding(data, finding_id)
-  previous_status = previous_finding.status.value if previous_finding else "unknown"
-
-  if not update_finding_disposition(data, finding_id, disposition):
-    available = _available_finding_ids(data)
-    msg = f"Finding {finding_id} not found. Available: {', '.join(available)}"
+  except FindingNotFoundError as exc:
+    msg = str(exc)
     if json_mode:
       emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
     typer.echo(msg, err=True)
-    raise typer.Exit(EXIT_FAILURE)
-
-  try:
-    write_findings(delta_dir, data)
-  except FindingsValidationError as exc:
-    msg = f"Findings validation failed: {exc}"
+    raise typer.Exit(EXIT_FAILURE) from exc
+  except DispositionValidationError as exc:
+    msg = str(exc)
     if json_mode:
       emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "validation", msg))
     typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
-
-  # Get the new status after disposition
-  updated_finding = find_finding(data, finding_id)
-  new_status = updated_finding.status.value if updated_finding else "unknown"
 
   if json_mode:
     emit_json_and_exit(
       cli_json_success(
         cmd,
         {
-          "delta_id": delta_id,
-          "finding_id": finding_id,
-          "action": disposition["action"],
-          "previous_status": previous_status,
-          "new_status": new_status,
+          "delta_id": result.delta_id,
+          "finding_id": result.finding_id,
+          "action": result.action.value,
+          "previous_status": result.previous_status.value,
+          "new_status": result.new_status.value,
         },
       )
     )
 
   typer.echo(
-    f"Finding {finding_id}: {disposition['action']} (delta {delta_id})",
+    f"Finding {finding_id}: {action} (delta {delta_id})",
   )
   raise typer.Exit(EXIT_SUCCESS)
 
@@ -1626,19 +1225,13 @@ def finding_resolve_command(
   root: RootOption = None,
 ) -> None:
   """Mark a finding as resolved (fixed)."""
-  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
-    DispositionAuthority,
-    FindingDispositionAction,
-  )
-
-  disposition: dict = {
-    "action": FindingDispositionAction.FIX.value,
-    "authority": DispositionAuthority.AGENT.value,
-  }
-  if resolved_at:
-    disposition["resolved_at"] = resolved_at
-  _disposition_finding(
-    delta, finding_id, disposition, root, json_mode=format_type == "json"
+  _cli_disposition_finding(
+    delta,
+    finding_id,
+    action="fix",
+    root=root,
+    json_mode=format_type == "json",
+    resolved_at=resolved_at,
   )
 
 
@@ -1661,20 +1254,14 @@ def finding_defer_command(
   root: RootOption = None,
 ) -> None:
   """Defer a finding to a future delta or backlog item."""
-  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
-    DispositionAuthority,
-    FindingDispositionAction,
-  )
-
-  disposition: dict = {
-    "action": FindingDispositionAction.DEFER.value,
-    "authority": DispositionAuthority.AGENT.value,
-    "rationale": rationale,
-  }
-  if backlog_ref:
-    disposition["backlog_ref"] = backlog_ref
-  _disposition_finding(
-    delta, finding_id, disposition, root, json_mode=format_type == "json"
+  _cli_disposition_finding(
+    delta,
+    finding_id,
+    action="defer",
+    root=root,
+    json_mode=format_type == "json",
+    rationale=rationale,
+    backlog_ref=backlog_ref,
   )
 
 
@@ -1697,22 +1284,14 @@ def finding_waive_command(
   root: RootOption = None,
 ) -> None:
   """Waive a finding (accept the risk)."""
-  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
-    DispositionAuthority,
-    FindingDispositionAction,
-  )
-
-  disposition: dict = {
-    "action": FindingDispositionAction.WAIVE.value,
-    "authority": (
-      DispositionAuthority(authority).value
-      if authority
-      else DispositionAuthority.AGENT.value
-    ),
-    "rationale": rationale,
-  }
-  _disposition_finding(
-    delta, finding_id, disposition, root, json_mode=format_type == "json"
+  _cli_disposition_finding(
+    delta,
+    finding_id,
+    action="waive",
+    root=root,
+    json_mode=format_type == "json",
+    rationale=rationale,
+    authority=authority,
   )
 
 
@@ -1731,18 +1310,13 @@ def finding_supersede_command(
   root: RootOption = None,
 ) -> None:
   """Mark a finding as superseded by another finding."""
-  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
-    DispositionAuthority,
-    FindingDispositionAction,
-  )
-
-  disposition: dict = {
-    "action": FindingDispositionAction.SUPERSEDE.value,
-    "authority": DispositionAuthority.AGENT.value,
-    "superseded_by": superseded_by,
-  }
-  _disposition_finding(
-    delta, finding_id, disposition, root, json_mode=format_type == "json"
+  _cli_disposition_finding(
+    delta,
+    finding_id,
+    action="supersede",
+    root=root,
+    json_mode=format_type == "json",
+    superseded_by=superseded_by,
   )
 
 
@@ -2038,41 +1612,3 @@ def phase_complete_command(
     typer.echo(f"  file: {hp}")
 
   raise typer.Exit(EXIT_SUCCESS)
-
-
-# ---------------------------------------------------------------------------
-# Teardown helper
-# ---------------------------------------------------------------------------
-
-
-def _do_teardown(
-  delta_dir: Path,
-  delta_id: str,
-  *,
-  silent: bool = False,
-) -> list[str]:
-  """Delete reviewer state files. Returns list of deleted file names."""
-  from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
-    bootstrap_path,
-    findings_path,
-    index_path,
-  )
-
-  deleted: list[str] = []
-  for path_fn, name in [
-    (index_path, "review-index"),
-    (findings_path, "review-findings"),
-    (bootstrap_path, "review-bootstrap"),
-  ]:
-    p = path_fn(delta_dir)
-    if p.exists():
-      p.unlink()
-      deleted.append(name)
-
-  if not silent:
-    if deleted:
-      typer.echo(f"Teardown: {delta_id} — deleted {', '.join(deleted)}")
-    else:
-      typer.echo(f"Teardown: {delta_id} — no reviewer state to delete")
-
-  return deleted

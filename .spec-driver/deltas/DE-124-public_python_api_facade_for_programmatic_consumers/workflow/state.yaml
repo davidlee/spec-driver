@@ -1,0 +1,21 @@
+schema: supekku.workflow.state
+version: 1
+artifact:
+  id: DE-124
+  kind: delta
+  path: .spec-driver/deltas/DE-124-public_python_api_facade_for_programmatic_consumers
+  notes_path: .spec-driver/deltas/DE-124-public_python_api_facade_for_programmatic_consumers/notes.md
+phase:
+  id: IP-124.PHASE-01
+  status: in_progress
+  path: .spec-driver/deltas/DE-124-public_python_api_facade_for_programmatic_consumers/phases/phase-01.md
+workflow:
+  status: implementing
+  active_role: implementer
+  handoff_boundary: phase
+timestamps:
+  created: '2026-03-22T15:39:32+00:00'
+  updated: '2026-03-22T15:39:32+00:00'
+plan:
+  id: IP-124
+  path: .spec-driver/deltas/DE-124-public_python_api_facade_for_programmatic_consumers/IP-124.md

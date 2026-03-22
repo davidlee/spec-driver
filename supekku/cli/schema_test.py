@@ -158,10 +158,18 @@ class SchemaCommandsTest(unittest.TestCase):
       "delta.relationships",
       "plan.overview",
       "phase.overview",
+      "phase.tracking",
       "verification.coverage",
       "spec.relationships",
       "spec.capabilities",
       "revision.change",
+      "workflow.state",
+      "workflow.handoff",
+      "workflow.review-index",
+      "workflow.review-findings",
+      "workflow.sessions",
+      "workflow.notes-bridge",
+      "workflow.phase-bridge",
     ]
 
     for schema_name in expected_schemas:
@@ -269,6 +277,65 @@ class SchemaCommandsTest(unittest.TestCase):
     assert result.exit_code == 0
     assert "Available Block Schemas" in result.stdout
     assert "Available Frontmatter Schemas" not in result.stdout
+
+
+ALL_BLOCK_TYPES = [
+  "delta.relationships",
+  "plan.overview",
+  "phase.overview",
+  "phase.tracking",
+  "revision.change",
+  "verification.coverage",
+  "spec.relationships",
+  "spec.capabilities",
+  "workflow.state",
+  "workflow.handoff",
+  "workflow.review-index",
+  "workflow.review-findings",
+  "workflow.sessions",
+  "workflow.notes-bridge",
+  "workflow.phase-bridge",
+]
+
+
+class AllBlocksJsonSchemaTest(unittest.TestCase):
+  """Every registered block type must produce valid JSON Schema."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+
+  def test_all_blocks_json_schema(self) -> None:
+    for block_type in ALL_BLOCK_TYPES:
+      with self.subTest(block_type=block_type):
+        result = self.runner.invoke(
+          app,
+          ["show", "schema", block_type, "--format", "json-schema"],
+        )
+        assert result.exit_code == 0, (
+          f"json-schema failed for {block_type}: {result.stdout}"
+        )
+        assert f"JSON Schema: {block_type}" in result.stdout
+        assert '"$schema"' in result.stdout or "$schema" in result.stdout
+        assert '"properties"' in result.stdout or "properties" in result.stdout
+
+
+class AllBlocksYamlExampleTest(unittest.TestCase):
+  """Every registered block type must produce a YAML example."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+
+  def test_all_blocks_yaml_example(self) -> None:
+    for block_type in ALL_BLOCK_TYPES:
+      with self.subTest(block_type=block_type):
+        result = self.runner.invoke(
+          app,
+          ["show", "schema", block_type, "--format", "yaml-example"],
+        )
+        assert result.exit_code == 0, (
+          f"yaml-example failed for {block_type}: {result.stdout}"
+        )
+        assert f"Example: {block_type}" in result.stdout
 
 
 class EnumIntrospectionTest(unittest.TestCase):

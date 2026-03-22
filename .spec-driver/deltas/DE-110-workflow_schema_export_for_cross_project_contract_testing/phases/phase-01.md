@@ -29,11 +29,11 @@ Make `show schema <type> --format=json-schema` and `--format=yaml-example` work 
 
 ## 4. Exit Criteria / Done When
 
-- [ ] All 15 `show schema <type> --format=json-schema` produce valid JSON Schema
-- [ ] All 15 `show schema <type> --format=yaml-example` produce valid YAML
-- [ ] Hardcoded `metadata_registry` dict removed from `schema.py`
-- [ ] Tests pass, lint clean (ruff + pylint)
-- [ ] Worktree committed
+- [x] All 15 `show schema <type> --format=json-schema` produce valid JSON Schema
+- [x] All 15 `show schema <type> --format=yaml-example` produce valid YAML
+- [x] Hardcoded `metadata_registry` dict removed from `schema.py`
+- [x] Tests pass, lint clean (ruff + pylint)
+- [x] Worktree committed
 
 ## 5. Verification
 
@@ -51,15 +51,15 @@ Make `show schema <type> --format=json-schema` and `--format=yaml-example` work 
 
 | Status | ID  | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 1.1 | Add `metadata` field to `BlockSchema` | | DR §4.1 |
-| [ ] | 1.2 | Wire `metadata=` at 6 existing registration sites | [P] | DR §4.3 — delta.py, plan.py (×3), verification.py, revision.py |
-| [ ] | 1.3 | Wire `metadata=` in workflow registration loop | [P] | DR §4.3 — workflow_metadata.py |
-| [ ] | 1.4 | Create `spec_metadata.py` | [P] | DR §4.4 — BlockMetadata for spec.relationships + spec.capabilities |
-| [ ] | 1.5 | Wire `metadata=` at spec registration in relationships.py | | After 1.4 |
-| [ ] | 1.6 | Author 7 workflow examples | | DR §4.5 — roughly half the effort |
-| [ ] | 1.7 | Replace hardcoded dict in `schema.py` | | DR §4.2 — depends on 1.1–1.6 |
-| [ ] | 1.8 | Tests | | Parameterised over all 15 types |
-| [ ] | 1.9 | Lint + verify | | ruff, pylint, manual check |
+| [x] | 1.1 | Add `metadata` field to `BlockSchema` | | DR §4.1 |
+| [x] | 1.2 | Wire `metadata=` at 6 existing registration sites | [P] | DR §4.3 — delta.py, plan.py (×3), verification.py, revision.py |
+| [x] | 1.3 | Wire `metadata=` in workflow registration loop | [P] | DR §4.3 — workflow_metadata.py |
+| [x] | 1.4 | Create `spec_metadata.py` | [P] | DR §4.4 — BlockMetadata for spec.relationships + spec.capabilities |
+| [x] | 1.5 | Wire `metadata=` at spec registration in relationships.py | | After 1.4 |
+| [x] | 1.6 | Author 7 workflow examples | | DR §4.5 |
+| [x] | 1.7 | Replace hardcoded dict in `schema.py` | | DR §4.2 |
+| [x] | 1.8 | Tests | | 35/35 passed (2 new parameterised + 33 existing) |
+| [x] | 1.9 | Lint + verify | | ruff clean, pylint 9.92/10, 320 block tests pass |
 
 ### Task Details
 
@@ -107,7 +107,7 @@ Make `show schema <type> --format=json-schema` and `--format=yaml-example` work 
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Notes updated
 - [ ] Delta/IP updated

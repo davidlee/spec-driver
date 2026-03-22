@@ -65,7 +65,48 @@ were committed in prior session's `45485a35`.
 
 ### Rough edges / follow-ups
 
-- `just test` broken for all pydantic-dependent tests (system pytest lacks deps).
-  Not DE-109's problem but worth a backlog item if not already tracked.
+- `just test` fixed — now uses `uv run python -m pytest` (commit `ad04ab4c`).
 - `ConfigDict(extra="ignore")` is universal in this codebase. Not a gotcha,
   just confirmed convention — future Pydantic models should follow suit.
+
+## Phase 2 — Implementation log
+
+### Schema v2 changes
+
+- `REVIEW_FINDINGS_METADATA` → v2: `rounds` array replaces flat structure.
+  Per-round entries have `round`, `status`, `reviewer_role`, `completed_at`,
+  `session` (opaque), `blocking`, `non_blocking`.
+- `REVIEW_INDEX_METADATA` gains `judgment_status` (optional enum).
+- Added `_finding_disposition()` sub-schema and `_round_entry()` helper
+  to `workflow_metadata.py`.
+
+### Session metadata (OQ-109-002 resolved)
+
+`FieldMetadata` requires non-empty properties for object type. Session is
+opaque/freeform (DR-109 §3.6), so it's omitted from the schema — the validator
+doesn't reject unknown keys, so session data passes through unvalidated.
+This is the intended behavior.
+
+### CLI compatibility fix (pulled ahead from Phase 3)
+
+`review complete` updated to use v2 `build_findings()`/`append_round()` API.
+Without this, the CLI would crash on any review complete. Minimal fix:
+first round creates v2, subsequent rounds append. Summary/history feature
+deferred to Phase 3 proper.
+
+### Pre-existing test fixes
+
+10 failures fixed across 3 files:
+- `card_formatters_test.py` — positional args → keyword args (Pydantic migration)
+- `package_utils_test.py` — `workflow` added to `KNOWN_LEAF_PACKAGES`
+- `DL-047` drift ledger — YAML evidence strings with colons needed quoting
+
+### Commits
+
+- `91af7aae` — feat: phase 2 implementation
+- `1cae793a` — fix: 10 pre-existing test failures
+
+### Verification
+
+`uv run python -m pytest supekku` — 4533 passed, 0 failures.
+`uv run ruff check` — clean on all changed files.

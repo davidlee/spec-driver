@@ -30,17 +30,17 @@ serialisation with status re-derivation.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `REVIEW_FINDINGS_METADATA` updated to v2 schema (rounds array)
-- [ ] `REVIEW_INDEX_METADATA` gains `judgment_status` field
-- [ ] `build_review_index()` accepts `judgment_status` parameter
-- [ ] `build_findings_round()` creates v2 round entries
-- [ ] `append_round()` preserves prior rounds, appends new
-- [ ] `read_findings()` raises `FindingsVersionError` on v1
-- [ ] `next_round_number()` works with v2 rounds array
-- [ ] Finding status re-derived on read via `derive_finding_status()`
-- [ ] VT-109-004: Accumulative rounds tests passing
-- [ ] VA-109-001: Schema v1 rejection test passing
-- [ ] Lint clean on all touched files
+- [x] `REVIEW_FINDINGS_METADATA` updated to v2 schema (rounds array)
+- [x] `REVIEW_INDEX_METADATA` gains `judgment_status` field
+- [x] `build_review_index()` accepts `judgment_status` parameter
+- [x] `build_findings_round()` creates v2 round entries
+- [x] `append_round()` preserves prior rounds, appends new
+- [x] `read_findings()` raises `FindingsVersionError` on v1
+- [x] `next_round_number()` works with v2 rounds array
+- [x] Finding status re-derived on read via `derive_finding_status()`
+- [x] VT-109-004: Accumulative rounds tests passing
+- [x] VA-109-001: Schema v1 rejection test passing
+- [x] Lint clean on all touched files
 
 ## 5. Verification
 
@@ -52,13 +52,13 @@ serialisation with status re-derivation.
 
 | Status | ID | Description | Notes |
 |--------|-----|-------------|-------|
-| [ ] | 2.1 | Add `judgment_status` field to `REVIEW_INDEX_METADATA` | DR-109 §3.3 |
-| [ ] | 2.2 | Update `build_review_index()` to accept `judgment_status` | |
-| [ ] | 2.3 | Update `REVIEW_FINDINGS_METADATA` to v2 (rounds array) | DR-109 §3.5 |
-| [ ] | 2.4 | Add `FindingsVersionError`; `read_findings()` rejects v1 | DR-109 §3.5 |
-| [ ] | 2.5 | Implement `build_findings_round()` for v2 round entry | |
-| [ ] | 2.6 | Implement `append_round()` — accumulative write | |
-| [ ] | 2.7 | Update `next_round_number()` for v2 rounds array | |
-| [ ] | 2.8 | Finding status re-derivation on read | DR-109 §3.4 |
-| [ ] | 2.9 | Update tests for v2 model | VT-109-004, VA-109-001 |
-| [ ] | 2.10 | Lint clean | |
+| [x] | 2.1 | Add `judgment_status` field to `REVIEW_INDEX_METADATA` | DR-109 §3.3 |
+| [x] | 2.2 | Update `build_review_index()` to accept `judgment_status` | |
+| [x] | 2.3 | Update `REVIEW_FINDINGS_METADATA` to v2 (rounds array) | DR-109 §3.5. Disposition sub-schema added. |
+| [x] | 2.4 | Add `FindingsVersionError`; `read_findings()` rejects v1 | DR-109 §3.5 |
+| [x] | 2.5 | Implement `build_round_entry()` for v2 round entry | |
+| [x] | 2.6 | Implement `append_round()` — accumulative write | |
+| [x] | 2.7 | Update `next_round_number()` for v2 rounds array | |
+| [x] | 2.8 | Finding status re-derivation on read | DR-109 §3.4. Also added `update_finding_disposition()` and `find_finding()`. |
+| [x] | 2.9 | Update tests for v2 model | 44 review_io tests + 8 metadata tests + 21 CLI tests. |
+| [x] | 2.10 | Lint clean | ruff clean. Also fixed 10 pre-existing test failures across 3 files. |

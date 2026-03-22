@@ -1,110 +1,53 @@
 # Notes for DE-107
 
-## New Agent Instructions
+## Implementation Log
 
-### Task Card
+### Phase 1 — MemoryRecord (done)
 
-**DE-107** — Pydantic model layer migration.
+- Converted `models.py` from `@dataclass` → `BaseModel + ConfigDict(extra="ignore")`
+- Added `@field_validator("created", "updated", "verified", "review_by", mode="before")` for permissive date coercion (returns `None` on bad input)
+- Kept explicit `to_dict()` logic — `model_dump()` wrapper was more complex due to selective inclusion rules and date `.isoformat()` conversion
+- Removed `from_frontmatter()` classmethod; registry uses `MemoryRecord(**fm, path=str(path))`
+- Removed standalone `_parse_date()` function
+- 7 tests updated (from_frontmatter → direct construction), 262 tests passing
+- 63/63 corpus memory files validated
+- Commits: `dcf9a79` (code), `4067d15` (docs)
 
-Status: `draft`. DR-107 approved. IP-107 gates passed. Phase 1 sheet ready.
+### Phase 2 — BacklogItem + Card (done)
 
-### What To Do
+- Both models: `@dataclass` → `BaseModel + ConfigDict(extra="ignore")`
+- BacklogItem registry: no change needed — already uses kwargs construction
+- Card: `from_file()` classmethod and `@staticmethod` helpers retained — Pydantic supports both fine
+- Zero test changes needed — all 132 tests pass as-is
+- Net change: +4 lines (import swaps only)
+- Commits: `2e6cf16` (code), `7295b50` (docs)
 
-Invoke `/using-spec-driver` then `/execute-phase` for DE-107 Phase 1.
+**Spec model deferred**: `Spec` (`specs/models.py`) is structurally different — frozen dataclass wrapping `FrontmatterValidationResult`, all attributes are `@property` accessors into `frontmatter.data`. Not the from_frontmatter/to_dict boilerplate pattern. Needs separate design thought. See phase-02 §10.
 
-Read this file first — it has the full handoff including key files,
-Phase 1 scope, implementation notes, and gotchas.
+### Observations
 
-Phase 1: Convert `MemoryRecord` from `@dataclass` to Pydantic `BaseModel`.
-- Phase sheet: `phases/phase-01.md` — has detailed task breakdown and implementation notes
-- Reference implementation: `supekku/scripts/lib/changes/phase_model.py` (PhaseSheet from DE-106)
+1. **Conversion is mechanical for field-mapping models.** BacklogItem and Card needed zero test changes. MemoryRecord needed 7 (removing from_frontmatter calls). The pattern is proven and repeatable.
+2. **`to_dict()` stays explicit.** For models with selective inclusion rules (always-include core fields, truthy-gate optionals), explicit `to_dict()` is simpler than `model_dump()` wrappers. This is a consistent finding across both phases.
+3. **`extra="ignore"` is essential.** Frontmatter may contain unknown fields (e.g. `links` section fields not in the model). `extra="ignore"` silently absorbs these.
+4. **Pydantic + @staticmethod/@classmethod works.** No metaclass conflicts. Card.from_file() and helpers work unchanged.
 
-### Required Reading (in order)
+### Open Questions for Phase 3
 
-1. [notes.md](./notes.md) — this file
-2. [phases/phase-01.md](./phases/phase-01.md) — detailed task breakdown with implementation notes in §10
-3. [DR-107](./DR-107.md) — approved design revision (conversion pattern §3, resolved questions §5)
-4. [IP-107](./IP-107.md) — implementation plan with 3 phases
-5. [DE-107](./DE-107.md) — delta scope
-
-### Key Files
-
-| File | Role | Phase 1 action |
-|---|---|---|
-| `supekku/scripts/lib/memory/models.py` | MemoryRecord model (161 lines) | **Convert to Pydantic BaseModel** |
-| `supekku/scripts/lib/memory/registry.py` | Registry — constructs MemoryRecord at line 75 | **Update call site** |
-| `supekku/scripts/lib/memory/models_test.py` | 26 tests (368 lines) | **Behavioural parity gate** |
-| `supekku/scripts/lib/memory/registry_test.py` | Registry tests | **Must still pass** |
-| `supekku/scripts/lib/changes/phase_model.py` | PhaseSheet — reference Pydantic model | **Read for pattern** |
-
-### Conversion Recipe (from DR-107)
-
-```python
-# Before (@dataclass)
-@dataclass
-class MemoryRecord:
-    id: str
-    tags: list[str] = field(default_factory=list)
-    created: date | None = None
-
-    @classmethod
-    def from_frontmatter(cls, path, fm):
-        return cls(id=fm.get("id", ""), ...)
-
-    def to_dict(self, root):
-        data = {"id": self.id, ...}
-        return data
-
-# After (Pydantic)
-class MemoryRecord(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    id: str = ""
-    tags: list[str] = []
-    created: date | None = None
-
-    @field_validator("created", ..., mode="before")
-    @classmethod
-    def _coerce_date(cls, v): ...
-
-    def to_dict(self, root: Path) -> dict[str, Any]:
-        # thin wrapper over model_dump
-        ...
-```
-
-### Gotchas (read before implementing)
-
-1. **`summary` field**: `str = ""`. Current `to_dict()` skips if falsy. `model_dump(exclude_none=True)` won't exclude `""`. Handle in `to_dict()` wrapper.
-
-2. **Date coercion**: Pydantic v2 strict `date` type rejects strings. Use `@field_validator(mode="before")` to coerce. Must return `None` on bad input (test: `test_from_frontmatter_bad_date_ignored`).
-
-3. **`path` field**: Not from frontmatter. Set by registry caller: `MemoryRecord(**fm, path=str(path))`. Use `path: str = ""`.
-
-4. **Required fields aren't really required**: `id`, `name`, `status`, `memory_type` are "required" in the docstring but `from_frontmatter()` uses `fm.get("id", "")` — they default to empty string. Keep as `str = ""` in Pydantic.
-
-5. **`to_dict()` always-include fields**: `id`, `name`, `status`, `memory_type`, `path` are always in output even if empty. Other fields only included if truthy/non-empty.
-
-### Relevant Memories
-
-- `mem.pattern.phase.canonical-fields` — PhaseSheet pattern reference
-- `mem.pattern.phase.contract-vs-progress` — frontmatter vs markdown split
-
-### Relevant Doctrine
-
-- **POL-001**: maximise reuse, minimise sprawl (this delta's core motivation)
-- **ADR-010**: placement heuristic (frontmatter-first for stable contract fields)
-- **STD-002**: lint compliance
-
-### Coordination
-
-- **DE-109** (review state machine): `FindingDisposition` should use Pydantic BaseModel, not @dataclass. `coordinates_with` relation exists on both deltas. No ordering dependency — either can land first.
+- **Spec model**: defer to Phase 3 or separate delta? The wrapper-around-FrontmatterValidationResult pattern doesn't map to the mechanical conversion recipe.
+- **Drift models**: `@dataclass(frozen=True)` → `ConfigDict(frozen=True)` — need to verify no mutation paths exist before converting.
+- **Phase 3 scope may need narrowing** given the Spec deferral. Original IP-107 Phase 3 included "remaining models" which assumed Spec was done in Phase 2.
 
 ### Phases Overview
 
 | Phase | Scope | Status |
 |---|---|---|
 | **P01** | `MemoryRecord` conversion | **Done** |
-| **P02** | `BacklogItem`, `Card` models | **Done** (Spec deferred — see phase-02 §10) |
+| **P02** | `BacklogItem`, `Card` models | **Done** |
 | **P03** | Drift models, remaining, frontmatter metadata, schema docs | Planned |
+
+### Coordination
+
+- **DE-109** (review state machine): `FindingDisposition` should use Pydantic BaseModel, not @dataclass. `coordinates_with` relation exists on both deltas. No ordering dependency.
 
 ### Subsumes
 

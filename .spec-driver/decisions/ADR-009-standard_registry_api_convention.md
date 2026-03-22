@@ -3,7 +3,7 @@ id: ADR-009
 title: "ADR-009: standard registry API convention"
 status: accepted
 created: "2026-03-06"
-updated: "2026-03-06"
+updated: "2026-03-22"
 reviewed: "2026-03-06"
 owners: []
 supersedes: []
@@ -162,15 +162,21 @@ The shared contract is therefore:
 This allows IMPR-009 and future generic consumers to rely on filtering support
 existing everywhere without pretending every registry filters on identical fields.
 
-### 6. Protocol/ABC is deferred
+### 6. Protocol/ABC: deferred with revisit trigger
 
-We explicitly defer introducing a `typing.Protocol`, abstract base class, or
+We initially deferred introducing a `typing.Protocol`, abstract base class, or
 shared registry superclass.
 
-The converged registries demonstrate a workable convention, but the corpus is
+The converged registries demonstrate a workable convention, but the corpus was
 not yet consistent enough to justify freezing a formal abstraction. The ADR is
-the contract for now. A Protocol or ABC can be introduced later if, after
-normalisation, it clearly reduces duplication without forcing misleading commonality.
+the contract for now.
+
+**Revisit trigger (added 2026-03-22)**: Once ≥8 registries conform to this
+convention and their test suites verify the canonical surface, a
+`typing.Protocol` covering `find`, `collect`, `iter`, and `filter` MUST be
+proposed. Absence of a proposal at that point is a governance failure, not a
+deferred decision. As of DE-116 scoping, 10 registries exist and the trigger
+condition is met. DE-116 is the designated vehicle for this formalisation.
 
 ## Consequences
 

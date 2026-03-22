@@ -4,7 +4,7 @@ slug: "108-review_cli_contract_for_structured_machine_consumption-phase-01"
 name: "Foundation — exit codes and envelope helpers"
 created: "2026-03-22"
 updated: "2026-03-22"
-status: draft
+status: completed
 kind: phase
 plan: IP-108
 delta: DE-108
@@ -53,12 +53,12 @@ Add granular exit code constants and CLI-generic JSON envelope helpers to `supek
 
 | Status | ID | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 1.1 | Add `EXIT_PRECONDITION`, `EXIT_GUARD_VIOLATION` constants | | Near `EXIT_SUCCESS`/`EXIT_FAILURE` |
-| [ ] | 1.2 | Implement `cli_json_success()` | | Returns envelope dict |
-| [ ] | 1.3 | Implement `cli_json_error()` | | Returns error envelope dict |
-| [ ] | 1.4 | Implement `emit_json_and_exit()` | | Prints JSON, raises typer.Exit |
-| [ ] | 1.5 | Unit tests for 1.1–1.4 | | Envelope shape, exit code, valid JSON |
-| [ ] | 1.6 | Lint check | | STD-002 |
+| [x] | 1.1 | Add `EXIT_PRECONDITION`, `EXIT_GUARD_VIOLATION` constants | | Near `EXIT_SUCCESS`/`EXIT_FAILURE` |
+| [x] | 1.2 | Implement `cli_json_success()` | | Returns envelope dict |
+| [x] | 1.3 | Implement `cli_json_error()` | | Returns error envelope dict |
+| [x] | 1.4 | Implement `emit_json_and_exit()` | | Prints JSON, raises typer.Exit |
+| [x] | 1.5 | Unit tests for 1.1–1.4 | | 9 tests, all passing |
+| [x] | 1.6 | Lint check | | STD-002 — clean |
 
 ## 8. Risks & Mitigations
 
@@ -76,6 +76,6 @@ _To be filled during execution._
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Hand-off notes to Phase 02
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (118 tests passing in common_test.py)
+- [x] Hand-off notes to Phase 02: typer.Exit is click.exceptions.Exit (RuntimeError), use .args[0] for exit code. NoReturn type used for emit_json_and_exit.

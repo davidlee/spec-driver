@@ -6,9 +6,9 @@ artifact:
   path: .spec-driver/deltas/DE-108-review_cli_contract_for_structured_machine_consumption
   notes_path: .spec-driver/deltas/DE-108-review_cli_contract_for_structured_machine_consumption/notes.md
 phase:
-  id: IP-108.PHASE-01
+  id: IP-108.PHASE-02
   status: in_progress
-  path: .spec-driver/deltas/DE-108-review_cli_contract_for_structured_machine_consumption/phases/phase-01.md
+  path: .spec-driver/deltas/DE-108-review_cli_contract_for_structured_machine_consumption/phases/phase-02.md
 workflow:
   status: implementing
   active_role: implementer

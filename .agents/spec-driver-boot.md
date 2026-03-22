@@ -173,17 +173,21 @@ ADR-005	accepted	ADR-005: Memories and skills are the canonical guidance layer	2
 ADR-006	accepted	ADR-006: consolidate workspace directories under .spec-driver	2026-03-06
 ADR-007	accepted	ADR-007: contracts are derived observed corpus with dedicated canonical storage	2026-03-06
 ADR-008	accepted	ADR-008: normative lifecycle truth and observed evidence reconciliation	2026-03-06
-ADR-009	accepted	ADR-009: standard registry API convention	2026-03-06
+ADR-009	accepted	ADR-009: standard registry API convention	2026-03-22
 ADR-010	accepted	ADR-010: Default placement heuristic for structured artifact metadata	2026-03-22
+ADR-011	accepted	ADR-011: CLI registry access must route through Workspace	2026-03-22
 
 ## Required Policies
 
-POL-001	required	POL-001: maximise code reuse, minimise sprawl	2026-03-05
-POL-002	required	POL-002: Avoid magic strings and numbers	2026-03-05
+POL-001	required	POL-001: maximise code reuse, minimise sprawl	2026-03-22
+POL-002	required	POL-002: Avoid magic strings and numbers	2026-03-22
 
 ## Required Standards
 
-STD-002	required	STD-002: govern lint signal and prioritise pylint fixes	2026-03-07
+STD-001	required	STD-001: CLI implementation standard (Typer/Rich)	2026-03-22
+STD-002	required	STD-002: govern lint signal and prioritise pylint fixes	2026-03-22
+STD-003	required	STD-003: utility module placement rule	2026-03-22
+STD-004	required	STD-004: script lifecycle — orphan prevention	2026-03-22
 
 ## Memory
 

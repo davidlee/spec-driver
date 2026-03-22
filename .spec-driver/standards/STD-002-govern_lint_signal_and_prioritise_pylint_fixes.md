@@ -3,7 +3,7 @@ id: STD-002
 title: "STD-002: govern lint signal and prioritise pylint fixes"
 status: required
 created: "2026-03-07"
-updated: "2026-03-07"
+updated: "2026-03-22"
 reviewed: "2026-03-07"
 owners: []
 supersedes: []
@@ -38,6 +38,13 @@ count. As a default:
 - Treat test-only ergonomics warnings as lower priority. Test functions do not
   need docstrings when the test name is already clear, and tests may probe
   protected APIs when that is the most direct way to verify behavior.
+- **File size limits**: Production files exceeding 600 lines require a
+  module-level docstring explaining why the file is not split. Production files
+  exceeding 1000 lines are prohibited; a delta to split them is required before
+  further features are added to them. Test files may be 2× these limits. The
+  `too-many-lines` pylint message (C0302) should be configured with a limit of
+  1000 and treated as a required fix for new violations. Existing violations are
+  grandfathered but must not grow.
 - Do not narrow verification scope to changed files as a substitute for the
   repo-level lint gates. File-local lint runs are for diagnosis; `just pylint`
   remains the authoritative check.

@@ -3,7 +3,7 @@ id: POL-002
 title: "POL-002: Avoid magic strings and numbers"
 status: required
 created: "2026-03-05"
-updated: "2026-03-05"
+updated: "2026-03-22"
 reviewed: "2026-03-05"
 owners: []
 supersedes: []
@@ -29,6 +29,13 @@ intent is explicit and reuse is safe.
 Allowed literals are only those that are self-evident and purely local (e.g. `0`
 or `1` for indexing, `""` for empty string, `"\n"` for newline, or a single-use
 format string), and they must not encode domain semantics.
+
+**Mutable module-level state**: Mutable module-level variables must not serve as
+configuration, feature flags, or shared state. Module-level names may be:
+immutable constants (`frozenset`, `str`, `int`, compiled `re.Pattern`), type
+aliases, or `ClassVar` defaults. Mutable defaults, caches, or "global config"
+dicts at module scope are prohibited. Configuration must be passed as arguments
+or injected through `Workspace` or an equivalent context object.
 
 ## Rationale
 

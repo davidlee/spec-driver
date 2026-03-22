@@ -12272,7 +12272,7 @@ deltas:
         phase: IP-110-P01
   DE-111:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Spec model Pydantic conversion and schema docs
     slug: spec_model_pydantic_conversion_and_schema_docs
     updated: '2026-03-22'
@@ -12305,5 +12305,17 @@ deltas:
         phases:
         - id: IP-111-P01
       phases:
-      - id: IP-111-P01
+      - plan: IP-111
+        delta: DE-111
+        objective: Add plan and delta string fields to plan.py frontmatter metadata.
+          Update phase example. Verify schema output.
+        entrance_criteria:
+        - DR-111 approved
+        exit_criteria:
+        - plan.py has plan and delta fields
+        - Phase example includes plan and delta
+        - Schema command shows new fields
+        - Tests pass
+        - Lint clean
         phase: IP-111-P01
+        status: in-progress

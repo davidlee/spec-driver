@@ -1,19 +1,21 @@
 # Notes for DE-111
 
-## Context
+## Implementation Log
 
-Follow-on delta from DE-107. Scoped to capture three deferred items:
+### Phase 1 — Add plan/delta metadata fields (done)
 
-1. **Spec model conversion** — needs DR. Wrapper-around-FrontmatterValidationResult pattern doesn't fit the mechanical conversion recipe. Design decision required.
-2. **plan.py frontmatter metadata** — add plan/delta fields (DE-106 gap)
-3. **Schema docs** — update to reflect Pydantic models
+- Added `plan` and `delta` optional string fields to `PLAN_FRONTMATTER_METADATA` in `plan.py`
+- Updated phase example to include `plan: PLAN-042` and `delta: DE-042`
+- 823 core tests passing, lint clean
+- Schema output confirmed: `show schema frontmatter.plan` shows both fields
+- Commit: `54d3895`
 
-## Status
+### Design Decisions
 
-Draft. DR-111 not yet started. No implementation work done.
+- **DEC-111-001**: Spec model stays as `@dataclass(frozen=True)`. It's a facade over `FrontmatterValidationResult`, not a field-mapping model. Pydantic adds nothing.
+- **DEC-111-002**: plan.py metadata now declares plan/delta fields that phases carry since DE-106.
+- **DEC-111-003**: Schema docs item collapsed — auto-discovered from metadata modules, no separate work.
 
-## Key References
+### Audit
 
-- DE-107 notes: detailed gotchas and patterns from the migration
-- DE-107 phase-02 §10: Spec model deferral rationale
-- DR-107 §4: frontmatter metadata gap noted
+AUD-018 — 3 findings, all aligned. Ready for closure.

@@ -1,3 +1,8 @@
+---
+status: completed
+kind: phase
+---
+
 # Phase 1: Install `.claude/` settings & hooks
 
 ## Objective

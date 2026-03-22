@@ -1,3 +1,8 @@
+---
+status: completed
+kind: phase
+---
+
 ```yaml supekku:phase.overview@v1
 schema: supekku.phase.overview
 version: 1

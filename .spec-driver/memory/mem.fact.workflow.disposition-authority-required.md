@@ -4,14 +4,14 @@ name: FindingDisposition authority field is required
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-22'
-updated: '2026-03-22'
-verified: '2026-03-22'
+created: "2026-03-22"
+updated: "2026-03-22"
+verified: "2026-03-22"
 confidence: high
 tags:
-- workflow
-- sharp-edge
-- pydantic
+  - workflow
+  - sharp-edge
+  - pydantic
 summary: "FindingDisposition requires authority: DispositionAuthority — not optional. Every disposition dict must include it."
 scope:
   globs:

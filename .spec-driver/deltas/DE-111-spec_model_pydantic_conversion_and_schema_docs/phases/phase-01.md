@@ -22,9 +22,9 @@ exit_criteria:
 
 ## Tasks
 
-| Status | ID  | Description |
-| ------ | --- | ----------- |
+| Status | ID  | Description                                         |
+| ------ | --- | --------------------------------------------------- |
 | [ ]    | 1.1 | Add plan and delta FieldMetadata entries to plan.py |
-| [ ]    | 1.2 | Update phase example to include plan and delta |
-| [ ]    | 1.3 | Verify schema output |
-| [ ]    | 1.4 | Run tests and lint |
+| [ ]    | 1.2 | Update phase example to include plan and delta      |
+| [ ]    | 1.3 | Verify schema output                                |
+| [ ]    | 1.4 | Run tests and lint                                  |

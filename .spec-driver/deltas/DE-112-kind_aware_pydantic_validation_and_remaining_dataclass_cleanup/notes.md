@@ -24,14 +24,14 @@ Read this file first, then the phase sheets and DR.
 
 ### Key Files
 
-| File | Role | Phase action |
-|---|---|---|
-| `supekku/scripts/lib/core/frontmatter_schema.py` | FrontmatterValidationResult + Relation (frozen dataclasses) | **P01: Convert to Pydantic** |
-| `supekku/scripts/lib/validation/validator.py` | WorkspaceValidator — PhaseSheet validation pattern at lines 506-522 | **P02: Add 3 kind-aware validation methods** |
-| `supekku/scripts/lib/memory/models.py` | MemoryRecord (Pydantic, from DE-107) | **P02: Wire into validator** |
-| `supekku/scripts/lib/backlog/models.py` | BacklogItem (Pydantic, from DE-107) | **P02: Wire into validator** |
-| `supekku/scripts/lib/drift/models.py` | DriftLedger (Pydantic, from DE-107) | **P02: Wire into validator** |
-| `.spec-driver/audits/AUD-012-*/AUD-012.md` | 11 findings with wrong status vocabulary | **P03: Fix resolved→reconciled** |
+| File                                             | Role                                                                | Phase action                                 |
+| ------------------------------------------------ | ------------------------------------------------------------------- | -------------------------------------------- |
+| `supekku/scripts/lib/core/frontmatter_schema.py` | FrontmatterValidationResult + Relation (frozen dataclasses)         | **P01: Convert to Pydantic**                 |
+| `supekku/scripts/lib/validation/validator.py`    | WorkspaceValidator — PhaseSheet validation pattern at lines 506-522 | **P02: Add 3 kind-aware validation methods** |
+| `supekku/scripts/lib/memory/models.py`           | MemoryRecord (Pydantic, from DE-107)                                | **P02: Wire into validator**                 |
+| `supekku/scripts/lib/backlog/models.py`          | BacklogItem (Pydantic, from DE-107)                                 | **P02: Wire into validator**                 |
+| `supekku/scripts/lib/drift/models.py`            | DriftLedger (Pydantic, from DE-107)                                 | **P02: Wire into validator**                 |
+| `.spec-driver/audits/AUD-012-*/AUD-012.md`       | 11 findings with wrong status vocabulary                            | **P03: Fix resolved→reconciled**             |
 
 ### Relevant Memories
 
@@ -67,15 +67,16 @@ Read this file first, then the phase sheets and DR.
 
 ### Phases Overview
 
-| Phase | Scope | Status |
-|-------|-------|--------|
+| Phase   | Scope                                                      | Status      |
+| ------- | ---------------------------------------------------------- | ----------- |
 | **P01** | Convert FrontmatterValidationResult + Relation to Pydantic | ✅ Complete |
-| **P02** | Wire kind-aware validation into validator | ✅ Complete |
-| **P03** | Fix historical validation noise | ✅ Complete |
+| **P02** | Wire kind-aware validation into validator                  | ✅ Complete |
+| **P03** | Fix historical validation noise                            | ✅ Complete |
 
 ### Implementation Notes
 
 **Phase 1** — Mechanical conversion. Adversarial review found two issues not in the original DR:
+
 - `.dict()` method collision with Pydantic (DEC-112-004) — dropped, zero callers
 - `MappingProxyType` incompatible with Pydantic (DEC-112-005) — simplified to `dict[str, Any]`
 

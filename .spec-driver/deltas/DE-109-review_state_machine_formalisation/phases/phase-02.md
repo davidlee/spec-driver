@@ -50,15 +50,15 @@ serialisation with status re-derivation.
 
 ## 6. Tasks & Progress
 
-| Status | ID | Description | Notes |
-|--------|-----|-------------|-------|
-| [x] | 2.1 | Add `judgment_status` field to `REVIEW_INDEX_METADATA` | DR-109 §3.3 |
-| [x] | 2.2 | Update `build_review_index()` to accept `judgment_status` | |
-| [x] | 2.3 | Update `REVIEW_FINDINGS_METADATA` to v2 (rounds array) | DR-109 §3.5. Disposition sub-schema added. |
-| [x] | 2.4 | Add `FindingsVersionError`; `read_findings()` rejects v1 | DR-109 §3.5 |
-| [x] | 2.5 | Implement `build_round_entry()` for v2 round entry | |
-| [x] | 2.6 | Implement `append_round()` — accumulative write | |
-| [x] | 2.7 | Update `next_round_number()` for v2 rounds array | |
-| [x] | 2.8 | Finding status re-derivation on read | DR-109 §3.4. Also added `update_finding_disposition()` and `find_finding()`. |
-| [x] | 2.9 | Update tests for v2 model | 44 review_io tests + 8 metadata tests + 21 CLI tests. |
-| [x] | 2.10 | Lint clean | ruff clean. Also fixed 10 pre-existing test failures across 3 files. |
+| Status | ID   | Description                                               | Notes                                                                        |
+| ------ | ---- | --------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [x]    | 2.1  | Add `judgment_status` field to `REVIEW_INDEX_METADATA`    | DR-109 §3.3                                                                  |
+| [x]    | 2.2  | Update `build_review_index()` to accept `judgment_status` |                                                                              |
+| [x]    | 2.3  | Update `REVIEW_FINDINGS_METADATA` to v2 (rounds array)    | DR-109 §3.5. Disposition sub-schema added.                                   |
+| [x]    | 2.4  | Add `FindingsVersionError`; `read_findings()` rejects v1  | DR-109 §3.5                                                                  |
+| [x]    | 2.5  | Implement `build_round_entry()` for v2 round entry        |                                                                              |
+| [x]    | 2.6  | Implement `append_round()` — accumulative write           |                                                                              |
+| [x]    | 2.7  | Update `next_round_number()` for v2 rounds array          |                                                                              |
+| [x]    | 2.8  | Finding status re-derivation on read                      | DR-109 §3.4. Also added `update_finding_disposition()` and `find_finding()`. |
+| [x]    | 2.9  | Update tests for v2 model                                 | 44 review_io tests + 8 metadata tests + 21 CLI tests.                        |
+| [x]    | 2.10 | Lint clean                                                | ruff clean. Also fixed 10 pre-existing test failures across 3 files.         |

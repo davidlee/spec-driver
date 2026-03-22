@@ -4,15 +4,15 @@ name: Pydantic BaseModel migration gotchas
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-22'
-updated: '2026-03-22'
-verified: '2026-03-22'
+created: "2026-03-22"
+updated: "2026-03-22"
+verified: "2026-03-22"
 confidence: high
 tags:
-- pydantic
-- migration
-- models
-summary: 'Five gotchas when converting @dataclass to Pydantic BaseModel'
+  - pydantic
+  - migration
+  - models
+summary: "Five gotchas when converting @dataclass to Pydantic BaseModel"
 scope:
   globs:
     - "supekku/scripts/lib/*/models.py"

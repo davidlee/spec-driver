@@ -50,10 +50,10 @@
 
 ### Phases Overview
 
-| Phase | Scope | Status |
-|---|---|---|
-| **P01** | `MemoryRecord` conversion | **Done** |
-| **P02** | `BacklogItem`, `Card` models | **Done** |
+| Phase   | Scope                                 | Status   |
+| ------- | ------------------------------------- | -------- |
+| **P01** | `MemoryRecord` conversion             | **Done** |
+| **P02** | `BacklogItem`, `Card` models          | **Done** |
 | **P03** | Drift, diagnostics, sync, docs models | **Done** |
 
 ### Coordination

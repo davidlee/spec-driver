@@ -21,7 +21,7 @@ These are autobahn-side updates, not spec-driver action items.
 
 DR-109 §3.2 defined 8 valid bootstrap transitions. During implementation,
 idempotent self-transitions were needed for re-derivation scenarios:
-`cold→cold`, `stale→stale`, `invalid→invalid`. These are not *state changes*
+`cold→cold`, `stale→stale`, `invalid→invalid`. These are not _state changes_
 but repeated derivation producing the same result — the matrix assertion
 would otherwise false-positive on legitimate re-checks. Extended to 11 pairs.
 
@@ -97,6 +97,7 @@ deferred to Phase 3 proper.
 ### Pre-existing test fixes
 
 10 failures fixed across 3 files:
+
 - `card_formatters_test.py` — positional args → keyword args (Pydantic migration)
 - `package_utils_test.py` — `workflow` added to `KNOWN_LEAF_PACKAGES`
 - `DL-047` drift ledger — YAML evidence strings with colons needed quoting
@@ -158,6 +159,7 @@ caught it at write time.
 ### Phase 4 readiness
 
 Phase 3 is functionally complete. Phase 4 (integration/cleanup) remains:
+
 - Derive `workflow_metadata.py` validation lists from StrEnums (POL-002)
 - Refactor `staleness.py` to import BootstrapStatus from review_state_machine
 - End-to-end test: multi-round review with disposition and approval

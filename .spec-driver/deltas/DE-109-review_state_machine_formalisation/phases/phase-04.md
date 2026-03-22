@@ -56,13 +56,13 @@ Derive `workflow_metadata.py` validation lists from StrEnums (POL-002), refactor
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Notes |
-|--------|-----|-------------|-------|
-| [ ] | 4.1 | Derive workflow_metadata.py validation lists from StrEnums | POL-002 |
-| [ ] | 4.2 | Refactor staleness.py: import BootstrapStatus from review_state_machine | Remove plain class |
-| [ ] | 4.3 | Write VT-109-009 end-to-end test | DR-109 §5.4 |
-| [ ] | 4.4 | Lint + test green | `just check` |
-| [ ] | 4.5 | Update notes.md | Phase 4 log |
+| Status | ID  | Description                                                             | Notes              |
+| ------ | --- | ----------------------------------------------------------------------- | ------------------ |
+| [ ]    | 4.1 | Derive workflow_metadata.py validation lists from StrEnums              | POL-002            |
+| [ ]    | 4.2 | Refactor staleness.py: import BootstrapStatus from review_state_machine | Remove plain class |
+| [ ]    | 4.3 | Write VT-109-009 end-to-end test                                        | DR-109 §5.4        |
+| [ ]    | 4.4 | Lint + test green                                                       | `just check`       |
+| [ ]    | 4.5 | Update notes.md                                                         | Phase 4 log        |
 
 ### Task Details
 
@@ -74,7 +74,7 @@ Derive `workflow_metadata.py` validation lists from StrEnums (POL-002), refactor
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|------------|--------|
-| Circular import in workflow_metadata → review_state_machine | review_state_machine is a leaf module; dependency is safe | verified |
-| staleness.py callers break on StrEnum | StrEnum is str subclass; existing string comparisons still work | low risk |
+| Risk                                                        | Mitigation                                                      | Status   |
+| ----------------------------------------------------------- | --------------------------------------------------------------- | -------- |
+| Circular import in workflow_metadata → review_state_machine | review_state_machine is a leaf module; dependency is safe       | verified |
+| staleness.py callers break on StrEnum                       | StrEnum is str subclass; existing string comparisons still work | low risk |

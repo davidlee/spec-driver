@@ -61,15 +61,15 @@ Remove block scaffolding from new phase creation so phases author structured dat
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x]    | 2.1 | Remove block scaffolding from phase template | Removed `{{ phase_overview_block }}` and `{{ phase_tracking_block }}` |
-| [x]    | 2.2 | Stop emitting blocks in `create_phase()` | Removed block rendering calls and imports |
-| [x]    | 2.3 | Update/fix tests for block removal | 5 tests updated: assertions check frontmatter, not block content |
-| [x]    | 2.4 | Verify regex fallback in `_enrich_phase_data()` | 412 formatter tests pass; regex fallback handles new format |
-| [x]    | 2.5 | Verify `list_changes` reads frontmatter fields | Delegates to `load_change_artifact()` → `PhaseSheet` (Phase 1) |
-| [x]    | 2.6 | Suppress validator warning for new-format phases | Check `plan`+`delta` in frontmatter; 11 phase validator tests pass |
-| [x]    | 2.7 | End-to-end verification | 635 relevant tests pass, lint clean |
+| Status | ID  | Description                                      | Notes                                                                 |
+| ------ | --- | ------------------------------------------------ | --------------------------------------------------------------------- |
+| [x]    | 2.1 | Remove block scaffolding from phase template     | Removed `{{ phase_overview_block }}` and `{{ phase_tracking_block }}` |
+| [x]    | 2.2 | Stop emitting blocks in `create_phase()`         | Removed block rendering calls and imports                             |
+| [x]    | 2.3 | Update/fix tests for block removal               | 5 tests updated: assertions check frontmatter, not block content      |
+| [x]    | 2.4 | Verify regex fallback in `_enrich_phase_data()`  | 412 formatter tests pass; regex fallback handles new format           |
+| [x]    | 2.5 | Verify `list_changes` reads frontmatter fields   | Delegates to `load_change_artifact()` → `PhaseSheet` (Phase 1)        |
+| [x]    | 2.6 | Suppress validator warning for new-format phases | Check `plan`+`delta` in frontmatter; 11 phase validator tests pass    |
+| [x]    | 2.7 | End-to-end verification                          | 635 relevant tests pass, lint clean                                   |
 
 ### Task Details
 
@@ -97,10 +97,10 @@ Remove block scaffolding from new phase creation so phases author structured dat
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| ---- | ---------- | ------ |
-| Tests coupled to block content | Update assertions to match new format | open |
-| Regex fallback may have edge cases | Test with real phase content | open |
+| Risk                               | Mitigation                            | Status |
+| ---------------------------------- | ------------------------------------- | ------ |
+| Tests coupled to block content     | Update assertions to match new format | open   |
+| Regex fallback may have edge cases | Test with real phase content          | open   |
 
 ## 9. Decisions & Outcomes
 

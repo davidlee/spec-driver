@@ -69,13 +69,13 @@ Convert `BacklogItem` and `Card` from `@dataclass` to Pydantic `BaseModel`. This
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x]    | 2.1 | Convert BacklogItem to BaseModel | Done — BaseModel + ConfigDict(extra="ignore") |
-| [x]    | 2.2 | Update BacklogItem registry construction | No change needed — already uses kwargs |
-| [x]    | 2.3 | Convert Card to BaseModel | Done — from_file() + static methods retained |
-| [x]    | 2.4 | Run tests and fix assertions | 132 passed, no test changes needed |
-| [x]    | 2.5 | Lint and format | ruff check + ruff format clean |
+| Status | ID  | Description                              | Notes                                         |
+| ------ | --- | ---------------------------------------- | --------------------------------------------- |
+| [x]    | 2.1 | Convert BacklogItem to BaseModel         | Done — BaseModel + ConfigDict(extra="ignore") |
+| [x]    | 2.2 | Update BacklogItem registry construction | No change needed — already uses kwargs        |
+| [x]    | 2.3 | Convert Card to BaseModel                | Done — from_file() + static methods retained  |
+| [x]    | 2.4 | Run tests and fix assertions             | 132 passed, no test changes needed            |
+| [x]    | 2.5 | Lint and format                          | ruff check + ruff format clean                |
 
 ### Task Details
 
@@ -108,10 +108,10 @@ Convert `BacklogItem` and `Card` from `@dataclass` to Pydantic `BaseModel`. This
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| ---- | ---------- | ------ |
-| BacklogItem.frontmatter dict field semantics differ | to_dict() reads linked_deltas/related_requirements from frontmatter — kept field and logic | mitigated |
-| Card static methods conflict with Pydantic metaclass | Confirmed: no conflict. Pydantic supports @staticmethod and @classmethod. | mitigated |
+| Risk                                                 | Mitigation                                                                                 | Status    |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------ | --------- |
+| BacklogItem.frontmatter dict field semantics differ  | to_dict() reads linked_deltas/related_requirements from frontmatter — kept field and logic | mitigated |
+| Card static methods conflict with Pydantic metaclass | Confirmed: no conflict. Pydantic supports @staticmethod and @classmethod.                  | mitigated |
 
 ## 9. Decisions & Outcomes
 

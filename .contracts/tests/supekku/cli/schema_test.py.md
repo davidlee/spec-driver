@@ -2,7 +2,33 @@
 
 Tests for schema CLI commands (via show schema / list schemas).
 
+## Constants
+
+- `ALL_BLOCK_TYPES`
+
 ## Classes
+
+### AllBlocksJsonSchemaTest
+
+Every registered block type must produce valid JSON Schema.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `test_all_blocks_json_schema(self) -> None`
+
+### AllBlocksYamlExampleTest
+
+Every registered block type must produce a YAML example.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `test_all_blocks_yaml_example(self) -> None`
 
 ### EnumIntrospectionTest
 

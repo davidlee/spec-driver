@@ -12,14 +12,14 @@ phase:
   id: IP-110.PHASE-01
   status: complete
 required_reading:
-- .spec-driver/deltas/DE-110-workflow_schema_export_for_cross_project_contract_testing/DE-110.md
-- .spec-driver/deltas/DE-110-workflow_schema_export_for_cross_project_contract_testing/IP-110.md
-- .spec-driver/deltas/DE-110-workflow_schema_export_for_cross_project_contract_testing/phases/phase-01.md
-- .spec-driver/deltas/DE-110-workflow_schema_export_for_cross_project_contract_testing/notes.md
+  - .spec-driver/deltas/DE-110-workflow_schema_export_for_cross_project_contract_testing/DE-110.md
+  - .spec-driver/deltas/DE-110-workflow_schema_export_for_cross_project_contract_testing/IP-110.md
+  - .spec-driver/deltas/DE-110-workflow_schema_export_for_cross_project_contract_testing/phases/phase-01.md
+  - .spec-driver/deltas/DE-110-workflow_schema_export_for_cross_project_contract_testing/notes.md
 next_activity:
   kind: implementation
 timestamps:
-  emitted_at: '2026-03-22T10:21:38+00:00'
+  emitted_at: "2026-03-22T10:21:38+00:00"
 git:
   head: dc470a6d
   branch: main

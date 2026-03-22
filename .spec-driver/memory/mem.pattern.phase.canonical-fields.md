@@ -35,13 +35,13 @@ provenance:
 New-format phases carry five canonical fields in frontmatter (beyond base
 artifact fields like `id`, `status`, `kind`):
 
-| Field | Type | Required | Written by |
-|---|---|---|---|
-| `plan` | string | yes | `create_phase()` |
-| `delta` | string | yes | `create_phase()` |
-| `objective` | string | no | `create_phase()` from plan entry |
-| `entrance_criteria` | list[str] | no | `create_phase()` from plan entry |
-| `exit_criteria` | list[str] | no | `create_phase()` from plan entry |
+| Field               | Type      | Required | Written by                       |
+| ------------------- | --------- | -------- | -------------------------------- |
+| `plan`              | string    | yes      | `create_phase()`                 |
+| `delta`             | string    | yes      | `create_phase()`                 |
+| `objective`         | string    | no       | `create_phase()` from plan entry |
+| `entrance_criteria` | list[str] | no       | `create_phase()` from plan entry |
+| `exit_criteria`     | list[str] | no       | `create_phase()` from plan entry |
 
 ## Validation
 

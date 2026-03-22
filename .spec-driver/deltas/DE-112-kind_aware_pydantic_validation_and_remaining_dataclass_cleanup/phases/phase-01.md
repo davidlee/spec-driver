@@ -21,20 +21,20 @@ exit_criteria:
 
 ## Tasks
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x]    | 1.1 | Convert Relation to frozen BaseModel | field(default_factory=dict) → dict default; attributes now dict[str, Any] |
-| [x]    | 1.2 | Convert FrontmatterValidationResult to frozen BaseModel | tuple fields stay as tuple; data now dict[str, Any] |
-| [x]    | 1.3 | Drop dead `.dict()` method from FrontmatterValidationResult | Collides with Pydantic BaseModel.dict(); zero callers (DEC-112-004) |
-| [x]    | 1.4 | Simplify MappingProxyType away in validate_frontmatter() and _normalize_relations() | Plain dict passed (DEC-112-005) |
-| [x]    | 1.5 | Update imports (add BaseModel; remove dataclass/field if unused) | Removed dataclass, field, MappingProxyType |
-| [x]    | 1.6 | Run tests and lint | 4514 passed, 0 failed, lint clean |
+| Status | ID  | Description                                                                          | Notes                                                                     |
+| ------ | --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| [x]    | 1.1 | Convert Relation to frozen BaseModel                                                 | field(default_factory=dict) → dict default; attributes now dict[str, Any] |
+| [x]    | 1.2 | Convert FrontmatterValidationResult to frozen BaseModel                              | tuple fields stay as tuple; data now dict[str, Any]                       |
+| [x]    | 1.3 | Drop dead `.dict()` method from FrontmatterValidationResult                          | Collides with Pydantic BaseModel.dict(); zero callers (DEC-112-004)       |
+| [x]    | 1.4 | Simplify MappingProxyType away in validate_frontmatter() and \_normalize_relations() | Plain dict passed (DEC-112-005)                                           |
+| [x]    | 1.5 | Update imports (add BaseModel; remove dataclass/field if unused)                     | Removed dataclass, field, MappingProxyType                                |
+| [x]    | 1.6 | Run tests and lint                                                                   | 4514 passed, 0 failed, lint clean                                         |
 
 ### Notes
 
 - `Relation.type` shadows `type` builtin — Pydantic handles this fine
 - `FrontmatterValidationResult.data` → change from `Mapping[str, Any]` to `dict[str, Any]`; drop MappingProxyType wrapping in validate_frontmatter()
-- `Relation.attributes` → change from `Mapping[str, Any]` to `dict[str, Any]`; drop MappingProxyType wrapping in _normalize_relations()
+- `Relation.attributes` → change from `Mapping[str, Any]` to `dict[str, Any]`; drop MappingProxyType wrapping in \_normalize_relations()
 - `FrontmatterValidationResult.relations` is `tuple[Relation, ...]` — Pydantic handles nested frozen models
 - `.dict()` method is dead code (zero callers) — drop it; conflicts with Pydantic BaseModel.dict()
 - No frozen-mutation tests exist for these two classes — the gotcha from mem.gotcha.pydantic.migration is a phantom here

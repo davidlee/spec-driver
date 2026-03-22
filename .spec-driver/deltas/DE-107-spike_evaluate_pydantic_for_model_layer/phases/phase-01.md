@@ -66,16 +66,16 @@ Convert `MemoryRecord` from `@dataclass` to Pydantic `BaseModel`. This is the fi
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x]    | 1.1 | Convert MemoryRecord to BaseModel | Done — BaseModel + ConfigDict(extra="ignore") |
-| [x]    | 1.2 | Add date validator | Done — `@field_validator` mode="before", returns None on bad input |
-| [x]    | 1.3 | Reimplement to_dict(root) | Done — kept explicit logic (not model_dump), see §9 |
-| [x]    | 1.4 | Remove from_frontmatter() | Done — registry uses `MemoryRecord(**fm, path=str(path))` |
-| [x]    | 1.5 | Remove _parse_date() | Done — replaced by `_coerce_date` validator |
-| [x]    | 1.6 | Run tests and fix assertions | 262 passed — 7 tests updated (from_frontmatter → direct construction) |
-| [x]    | 1.7 | Corpus validation | 63/63 memory files parsed + serialized OK |
-| [x]    | 1.8 | Lint and format | ruff check + ruff format clean |
+| Status | ID  | Description                       | Notes                                                                 |
+| ------ | --- | --------------------------------- | --------------------------------------------------------------------- |
+| [x]    | 1.1 | Convert MemoryRecord to BaseModel | Done — BaseModel + ConfigDict(extra="ignore")                         |
+| [x]    | 1.2 | Add date validator                | Done — `@field_validator` mode="before", returns None on bad input    |
+| [x]    | 1.3 | Reimplement to_dict(root)         | Done — kept explicit logic (not model_dump), see §9                   |
+| [x]    | 1.4 | Remove from_frontmatter()         | Done — registry uses `MemoryRecord(**fm, path=str(path))`             |
+| [x]    | 1.5 | Remove \_parse_date()             | Done — replaced by `_coerce_date` validator                           |
+| [x]    | 1.6 | Run tests and fix assertions      | 262 passed — 7 tests updated (from_frontmatter → direct construction) |
+| [x]    | 1.7 | Corpus validation                 | 63/63 memory files parsed + serialized OK                             |
+| [x]    | 1.8 | Lint and format                   | ruff check + ruff format clean                                        |
 
 ### Task Details
 
@@ -105,15 +105,15 @@ Convert `MemoryRecord` from `@dataclass` to Pydantic `BaseModel`. This is the fi
   - `registry.py:75`: change `MemoryRecord.from_frontmatter(path, frontmatter)` to `MemoryRecord(**frontmatter, path=str(path))`
   - Frontmatter `id` fallback to `path.stem` happens at line 73 — keep that logic in registry
 
-- **1.5 Remove _parse_date()**
+- **1.5 Remove \_parse_date()**
   - Standalone function at module top. Remove after validator handles all cases.
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| ---- | ---------- | ------ |
-| `to_dict()` serialization mismatch | Compare output field-by-field with existing implementation | mitigated — kept explicit to_dict logic |
-| Bad date handling differs | Test `test_from_frontmatter_bad_date_ignored` — must still return None | mitigated — test passes |
+| Risk                                     | Mitigation                                                                         | Status                                   |
+| ---------------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------- |
+| `to_dict()` serialization mismatch       | Compare output field-by-field with existing implementation                         | mitigated — kept explicit to_dict logic  |
+| Bad date handling differs                | Test `test_from_frontmatter_bad_date_ignored` — must still return None             | mitigated — test passes                  |
 | `summary=""` vs `summary=None` semantics | Current: empty string default, to_dict skips if falsy. Watch model_dump behaviour. | mitigated — kept truthy check in to_dict |
 
 ## 9. Decisions & Outcomes

@@ -58,41 +58,41 @@ Add `--format json` to `workflow status` and the 4 existing `review finding` dis
 
 ### workflow status JSON
 
-| Status | ID | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [ ] | 3.1 | Add `FormatOption` to `workflow_status` command | [P] | Independent of 3.4-3.7 |
-| [ ] | 3.2 | JSON branch: read review-index + findings, derive bootstrap/judgment/summary/staleness | [P] | |
-| [ ] | 3.3 | Tests for workflow status JSON (with/without review state) | [P] | |
+| Status | ID  | Description                                                                            | Parallel? | Notes                  |
+| ------ | --- | -------------------------------------------------------------------------------------- | --------- | ---------------------- |
+| [ ]    | 3.1 | Add `FormatOption` to `workflow_status` command                                        | [P]       | Independent of 3.4-3.7 |
+| [ ]    | 3.2 | JSON branch: read review-index + findings, derive bootstrap/judgment/summary/staleness | [P]       |                        |
+| [ ]    | 3.3 | Tests for workflow status JSON (with/without review state)                             | [P]       |                        |
 
 ### review finding disposition JSON
 
-| Status | ID | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [ ] | 3.4 | Add `format` param to `_disposition_finding()` shared orchestration | | Affects all 4 commands |
-| [ ] | 3.5 | JSON success/error branches in `_disposition_finding()` | | Not-found → EXIT_PRECONDITION |
-| [ ] | 3.6 | Tests for disposition JSON (each action type, not-found) | | |
+| Status | ID  | Description                                                         | Parallel? | Notes                         |
+| ------ | --- | ------------------------------------------------------------------- | --------- | ----------------------------- |
+| [ ]    | 3.4 | Add `format` param to `_disposition_finding()` shared orchestration |           | Affects all 4 commands        |
+| [ ]    | 3.5 | JSON success/error branches in `_disposition_finding()`             |           | Not-found → EXIT_PRECONDITION |
+| [ ]    | 3.6 | Tests for disposition JSON (each action type, not-found)            |           |                               |
 
 ### review finding list (new)
 
-| Status | ID | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [ ] | 3.7 | Implement `review finding list` command | | DEC-108-005 |
-| [ ] | 3.8 | `--round N` optional filter | | |
-| [ ] | 3.9 | Tests for finding list (multi-round, --round filter, empty, JSON + human) | | |
+| Status | ID  | Description                                                               | Parallel? | Notes       |
+| ------ | --- | ------------------------------------------------------------------------- | --------- | ----------- |
+| [ ]    | 3.7 | Implement `review finding list` command                                   |           | DEC-108-005 |
+| [ ]    | 3.8 | `--round N` optional filter                                               |           |             |
+| [ ]    | 3.9 | Tests for finding list (multi-round, --round filter, empty, JSON + human) |           |             |
 
 ### Wrap-up
 
-| Status | ID | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [ ] | 3.10 | Lint check | | STD-002 |
-| [ ] | 3.11 | Full test suite pass | | All phases |
+| Status | ID   | Description          | Parallel? | Notes      |
+| ------ | ---- | -------------------- | --------- | ---------- |
+| [ ]    | 3.10 | Lint check           |           | STD-002    |
+| [ ]    | 3.11 | Full test suite pass |           | All phases |
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|------------|--------|
-| `_disposition_finding()` format param may need threading through all 4 callers | Single shared function — one change point | open |
-| Typer nested subgroup depth (review → finding → list) | Already works for resolve/defer/waive/supersede | mitigated |
+| Risk                                                                           | Mitigation                                      | Status    |
+| ------------------------------------------------------------------------------ | ----------------------------------------------- | --------- |
+| `_disposition_finding()` format param may need threading through all 4 callers | Single shared function — one change point       | open      |
+| Typer nested subgroup depth (review → finding → list)                          | Already works for resolve/defer/waive/supersede | mitigated |
 
 ## 9. Decisions & Outcomes
 

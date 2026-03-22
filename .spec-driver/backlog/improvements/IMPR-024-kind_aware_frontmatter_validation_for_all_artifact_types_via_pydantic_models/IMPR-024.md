@@ -24,6 +24,7 @@ kinds (delta, revision, audit, memory, spec) lack model-based validation.
 ## Proposed Solution
 
 Following DE-107's Pydantic go decision (via DE-106 phase model spike):
+
 1. Define Pydantic models for each artifact kind's frontmatter
 2. Wire kind-aware validation in `validate_frontmatter()` or the workspace validator
 3. Use `extra="ignore"` to maintain forward compatibility

@@ -12,14 +12,14 @@ phase:
   id: IP-109.PHASE-04
   status: complete
 required_reading:
-- .spec-driver/deltas/DE-109-review_state_machine_formalisation/DE-109.md
-- .spec-driver/deltas/DE-109-review_state_machine_formalisation/IP-109.md
-- .spec-driver/deltas/DE-109-review_state_machine_formalisation/phases/phase-04.md
-- .spec-driver/deltas/DE-109-review_state_machine_formalisation/notes.md
+  - .spec-driver/deltas/DE-109-review_state_machine_formalisation/DE-109.md
+  - .spec-driver/deltas/DE-109-review_state_machine_formalisation/IP-109.md
+  - .spec-driver/deltas/DE-109-review_state_machine_formalisation/phases/phase-04.md
+  - .spec-driver/deltas/DE-109-review_state_machine_formalisation/notes.md
 next_activity:
   kind: implementation
 timestamps:
-  emitted_at: '2026-03-22T08:17:18+00:00'
+  emitted_at: "2026-03-22T08:17:18+00:00"
 git:
   head: 6f3a914b
   branch: main

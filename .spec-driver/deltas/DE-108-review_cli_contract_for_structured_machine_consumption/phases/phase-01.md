@@ -51,20 +51,20 @@ Add granular exit code constants and CLI-generic JSON envelope helpers to `supek
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [x] | 1.1 | Add `EXIT_PRECONDITION`, `EXIT_GUARD_VIOLATION` constants | | Near `EXIT_SUCCESS`/`EXIT_FAILURE` |
-| [x] | 1.2 | Implement `cli_json_success()` | | Returns envelope dict |
-| [x] | 1.3 | Implement `cli_json_error()` | | Returns error envelope dict |
-| [x] | 1.4 | Implement `emit_json_and_exit()` | | Prints JSON, raises typer.Exit |
-| [x] | 1.5 | Unit tests for 1.1–1.4 | | 9 tests, all passing |
-| [x] | 1.6 | Lint check | | STD-002 — clean |
+| Status | ID  | Description                                               | Parallel? | Notes                              |
+| ------ | --- | --------------------------------------------------------- | --------- | ---------------------------------- |
+| [x]    | 1.1 | Add `EXIT_PRECONDITION`, `EXIT_GUARD_VIOLATION` constants |           | Near `EXIT_SUCCESS`/`EXIT_FAILURE` |
+| [x]    | 1.2 | Implement `cli_json_success()`                            |           | Returns envelope dict              |
+| [x]    | 1.3 | Implement `cli_json_error()`                              |           | Returns error envelope dict        |
+| [x]    | 1.4 | Implement `emit_json_and_exit()`                          |           | Prints JSON, raises typer.Exit     |
+| [x]    | 1.5 | Unit tests for 1.1–1.4                                    |           | 9 tests, all passing               |
+| [x]    | 1.6 | Lint check                                                |           | STD-002 — clean                    |
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|------------|--------|
-| Import cycle if common.py imports typer differently | `emit_json_and_exit` already in a module that imports typer | open |
+| Risk                                                | Mitigation                                                  | Status |
+| --------------------------------------------------- | ----------------------------------------------------------- | ------ |
+| Import cycle if common.py imports typer differently | `emit_json_and_exit` already in a module that imports typer | open   |
 
 ## 9. Decisions & Outcomes
 

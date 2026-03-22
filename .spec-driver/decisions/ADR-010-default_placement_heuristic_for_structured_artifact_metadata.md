@@ -58,6 +58,7 @@ artifact metadata:
 ### 1. Frontmatter (default for stable contract fields)
 
 Use when the field is:
+
 - **Consumed by tooling** (CLI, formatters, validators, artifact loading)
 - **Stable after authoring** (written once or rarely updated)
 - **Identity, lineage, or planning contract** (IDs, relationships, objectives, criteria)
@@ -68,6 +69,7 @@ Examples: `id`, `status`, `kind`, `plan`, `delta`, `objective`,
 ### 2. Code-fenced YAML blocks (schema-versioned, independent lifecycle)
 
 Use when the field:
+
 - **Has its own schema version** that may evolve independently
 - **Is consumed by a dedicated extractor** (not general frontmatter loading)
 - **Represents a self-contained data structure** (verification coverage, plan overview, relationship maps)
@@ -78,6 +80,7 @@ Examples: `supekku:verification.coverage@v1`, `supekku:plan.overview@v1`,
 ### 3. Markdown prose (volatile execution detail)
 
 Use when the field:
+
 - **Changes frequently during execution** (task status, progress notes)
 - **Is primarily human-authored and human-consumed**
 - **Does not need machine-readable structure** for current tooling

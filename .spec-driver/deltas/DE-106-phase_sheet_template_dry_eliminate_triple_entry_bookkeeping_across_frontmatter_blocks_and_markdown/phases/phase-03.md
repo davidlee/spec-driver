@@ -60,14 +60,14 @@ Complete governance, documentation, and validation work to close DE-106. Wire ph
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x]    | 3.1 | Wire phase frontmatter validation | PhaseSheet Pydantic validation in validator.py; 12 tests |
-| [x]    | 3.2 | Land placement heuristic ADR | ADR-010 — accepted |
-| [x]    | 3.3 | Audit and update skills | No block references found in any skills — already clean |
-| [x]    | 3.4 | Reconcile PROD-006 | FR-001, FR-005, capabilities, data contracts, verification notes updated |
-| [x]    | 3.5 | Create memories | 3 memories: contract-vs-progress, canonical-fields, frontmatter-block-precedence |
-| [x]    | 3.6 | Create follow-up backlog items | IMPR-023 (bulk migration), IMPR-024 (kind-aware validation) |
+| Status | ID  | Description                       | Notes                                                                            |
+| ------ | --- | --------------------------------- | -------------------------------------------------------------------------------- |
+| [x]    | 3.1 | Wire phase frontmatter validation | PhaseSheet Pydantic validation in validator.py; 12 tests                         |
+| [x]    | 3.2 | Land placement heuristic ADR      | ADR-010 — accepted                                                               |
+| [x]    | 3.3 | Audit and update skills           | No block references found in any skills — already clean                          |
+| [x]    | 3.4 | Reconcile PROD-006                | FR-001, FR-005, capabilities, data contracts, verification notes updated         |
+| [x]    | 3.5 | Create memories                   | 3 memories: contract-vs-progress, canonical-fields, frontmatter-block-precedence |
+| [x]    | 3.6 | Create follow-up backlog items    | IMPR-023 (bulk migration), IMPR-024 (kind-aware validation)                      |
 
 ## 9. Decisions & Outcomes
 

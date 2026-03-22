@@ -27,14 +27,14 @@ exit_criteria:
 
 ## Tasks
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x]    | 2.1 | Add _validate_memory_frontmatter + _validate_memory_files | Glob mem.*.md, construct MemoryRecord(**fm) |
-| [x]    | 2.2 | Add _validate_backlog_frontmatter + _validate_backlog_files | Glob per-kind subdirectory (issues/problems/improvements/risks) |
-| [x]    | 2.3 | Add _validate_drift_frontmatter + _validate_drift_files | Glob DL-*.md |
-| [x]    | 2.4 | Wire traversal methods into validate() | After phase status checks |
-| [x]    | 2.5 | Add tests for kind-aware validation | 7 tests: valid/malformed for each kind + missing-dirs |
-| [x]    | 2.6 | Run full validator tests and lint | 4521 passed, lint clean |
+| Status | ID  | Description                                                   | Notes                                                           |
+| ------ | --- | ------------------------------------------------------------- | --------------------------------------------------------------- |
+| [x]    | 2.1 | Add \_validate_memory_frontmatter + \_validate_memory_files   | Glob mem.\*.md, construct MemoryRecord(\*\*fm)                  |
+| [x]    | 2.2 | Add \_validate_backlog_frontmatter + \_validate_backlog_files | Glob per-kind subdirectory (issues/problems/improvements/risks) |
+| [x]    | 2.3 | Add \_validate_drift_frontmatter + \_validate_drift_files     | Glob DL-\*.md                                                   |
+| [x]    | 2.4 | Wire traversal methods into validate()                        | After phase status checks                                       |
+| [x]    | 2.5 | Add tests for kind-aware validation                           | 7 tests: valid/malformed for each kind + missing-dirs           |
+| [x]    | 2.6 | Run full validator tests and lint                             | 4521 passed, lint clean                                         |
 
 ### Design notes
 

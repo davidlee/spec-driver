@@ -24,21 +24,23 @@ exit_criteria:
 
 ## Tasks
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x]    | 3.1 | Fix AUD-012: status 'resolved' → 'reconciled' for aligned findings | 11 findings fixed |
-| [x]    | 3.2 | Fix legacy phase files: add missing kind/status frontmatter | DE-002 (3 files), DE-028, DE-031, DE-051 |
-| [n/a]  | 3.3 | Fix IP-109 phase status: 'in_progress' → 'in-progress' | Already canonical — no fix needed |
-| [x]    | 3.4 | Run spec-driver validate, confirm noise reduction | 11 errors → 0, 56 warnings → 43 |
+| Status | ID  | Description                                                        | Notes                                    |
+| ------ | --- | ------------------------------------------------------------------ | ---------------------------------------- |
+| [x]    | 3.1 | Fix AUD-012: status 'resolved' → 'reconciled' for aligned findings | 11 findings fixed                        |
+| [x]    | 3.2 | Fix legacy phase files: add missing kind/status frontmatter        | DE-002 (3 files), DE-028, DE-031, DE-051 |
+| [n/a]  | 3.3 | Fix IP-109 phase status: 'in_progress' → 'in-progress'             | Already canonical — no fix needed        |
+| [x]    | 3.4 | Run spec-driver validate, confirm noise reduction                  | 11 errors → 0, 56 warnings → 43          |
 
 ### Inventory
 
 **AUD-012** (11 errors):
+
 - F-001 through F-011: `disposition.status: resolved` should be `reconciled` for `kind: aligned`
 
 **Legacy phases** (~12 files, 5 deltas):
+
 - DE-002: phase-01, phase-02, phase-03 — missing status and kind
-- DE-004: phase-05-*, phase-06-* — missing status and kind
+- DE-004: phase-05-_, phase-06-_ — missing status and kind
 - DE-028: phase-01 — has status but missing kind
 - DE-031: phase-01 — missing status and kind
 - DE-051: phase-01 — has status but missing kind

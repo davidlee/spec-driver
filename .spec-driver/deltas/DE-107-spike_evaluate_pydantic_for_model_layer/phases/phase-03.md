@@ -31,14 +31,14 @@ Convert all remaining `@dataclass` models to Pydantic `BaseModel`. Frozen datacl
 
 ## 2. Tasks
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x]    | 3.1 | Convert drift models | Done — 3 frozen + 2 mutable |
-| [x]    | 3.2 | Convert diagnostics models | Done — 2 frozen |
-| [x]    | 3.3 | Convert sync models | Done — 3 frozen + 1 mutable. TYPE_CHECKING Path import fix needed. |
-| [x]    | 3.4 | Convert docs/python models | Done — VariantSpec classmethods work, TYPE_CHECKING Path fix |
-| [x]    | 3.5 | Run tests | 277/277 passing. ~24 tests updated (positional→kwargs, AttributeError→ValidationError) |
-| [x]    | 3.6 | Lint and format | ruff check + ruff format clean |
+| Status | ID  | Description                | Notes                                                                                  |
+| ------ | --- | -------------------------- | -------------------------------------------------------------------------------------- |
+| [x]    | 3.1 | Convert drift models       | Done — 3 frozen + 2 mutable                                                            |
+| [x]    | 3.2 | Convert diagnostics models | Done — 2 frozen                                                                        |
+| [x]    | 3.3 | Convert sync models        | Done — 3 frozen + 1 mutable. TYPE_CHECKING Path import fix needed.                     |
+| [x]    | 3.4 | Convert docs/python models | Done — VariantSpec classmethods work, TYPE_CHECKING Path fix                           |
+| [x]    | 3.5 | Run tests                  | 277/277 passing. ~24 tests updated (positional→kwargs, AttributeError→ValidationError) |
+| [x]    | 3.6 | Lint and format            | ruff check + ruff format clean                                                         |
 
 ### Notes
 

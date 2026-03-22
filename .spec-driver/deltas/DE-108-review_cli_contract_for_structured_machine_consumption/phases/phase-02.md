@@ -56,27 +56,27 @@ Add `--format json` to the three existing review commands. Each command produces
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [ ] | 2.1 | Add `FormatOption` param to `review_prime_command` | | |
-| [ ] | 2.2 | Implement JSON success branch for prime (action enum, full SHA, bootstrap/judgment status) | | DEC-108-002, DEC-108-006 |
-| [ ] | 2.3 | Implement JSON error branches for prime (precondition: no state, invalid state) | | DEC-108-010 pattern |
-| [ ] | 2.4 | Add `FormatOption` param to `review_complete_command` | | |
-| [ ] | 2.5 | Implement JSON success branch for complete (outcome enum, state transition, teardown) | | |
-| [ ] | 2.6 | Implement JSON error branches for complete (precondition + guard violation) | | Exit code 3 for approval guard |
-| [ ] | 2.7 | Add `FormatOption` param to `review_teardown_command` | | |
-| [ ] | 2.8 | Implement JSON success/error branches for teardown | | |
-| [ ] | 2.9 | Tests: JSON envelope validation for all 3 commands | | Success + error paths |
-| [ ] | 2.10 | Tests: human output regression | | Existing assertions unchanged |
-| [ ] | 2.11 | Tests: stderr silence in JSON mode | | |
-| [ ] | 2.12 | Lint check | | STD-002 |
+| Status | ID   | Description                                                                                | Parallel? | Notes                          |
+| ------ | ---- | ------------------------------------------------------------------------------------------ | --------- | ------------------------------ |
+| [ ]    | 2.1  | Add `FormatOption` param to `review_prime_command`                                         |           |                                |
+| [ ]    | 2.2  | Implement JSON success branch for prime (action enum, full SHA, bootstrap/judgment status) |           | DEC-108-002, DEC-108-006       |
+| [ ]    | 2.3  | Implement JSON error branches for prime (precondition: no state, invalid state)            |           | DEC-108-010 pattern            |
+| [ ]    | 2.4  | Add `FormatOption` param to `review_complete_command`                                      |           |                                |
+| [ ]    | 2.5  | Implement JSON success branch for complete (outcome enum, state transition, teardown)      |           |                                |
+| [ ]    | 2.6  | Implement JSON error branches for complete (precondition + guard violation)                |           | Exit code 3 for approval guard |
+| [ ]    | 2.7  | Add `FormatOption` param to `review_teardown_command`                                      |           |                                |
+| [ ]    | 2.8  | Implement JSON success/error branches for teardown                                         |           |                                |
+| [ ]    | 2.9  | Tests: JSON envelope validation for all 3 commands                                         |           | Success + error paths          |
+| [ ]    | 2.10 | Tests: human output regression                                                             |           | Existing assertions unchanged  |
+| [ ]    | 2.11 | Tests: stderr silence in JSON mode                                                         |           |                                |
+| [ ]    | 2.12 | Lint check                                                                                 |           | STD-002                        |
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|------------|--------|
-| Stderr leakage from Typer/Click internals in JSON mode | DEC-108-010: early format check, all errors routed through envelope | open |
-| `--format` conflicts with existing param names | Check Typer signature; review commands currently have no format param | open |
+| Risk                                                   | Mitigation                                                            | Status |
+| ------------------------------------------------------ | --------------------------------------------------------------------- | ------ |
+| Stderr leakage from Typer/Click internals in JSON mode | DEC-108-010: early format check, all errors routed through envelope   | open   |
+| `--format` conflicts with existing param names         | Check Typer signature; review commands currently have no format param | open   |
 
 ## 9. Decisions & Outcomes
 

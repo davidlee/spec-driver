@@ -49,17 +49,17 @@ Make `show schema <type> --format=json-schema` and `--format=yaml-example` work 
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [x] | 1.1 | Add `metadata` field to `BlockSchema` | | DR §4.1 |
-| [x] | 1.2 | Wire `metadata=` at 6 existing registration sites | [P] | DR §4.3 — delta.py, plan.py (×3), verification.py, revision.py |
-| [x] | 1.3 | Wire `metadata=` in workflow registration loop | [P] | DR §4.3 — workflow_metadata.py |
-| [x] | 1.4 | Create `spec_metadata.py` | [P] | DR §4.4 — BlockMetadata for spec.relationships + spec.capabilities |
-| [x] | 1.5 | Wire `metadata=` at spec registration in relationships.py | | After 1.4 |
-| [x] | 1.6 | Author 7 workflow examples | | DR §4.5 |
-| [x] | 1.7 | Replace hardcoded dict in `schema.py` | | DR §4.2 |
-| [x] | 1.8 | Tests | | 35/35 passed (2 new parameterised + 33 existing) |
-| [x] | 1.9 | Lint + verify | | ruff clean, pylint 9.92/10, 320 block tests pass |
+| Status | ID  | Description                                               | Parallel? | Notes                                                              |
+| ------ | --- | --------------------------------------------------------- | --------- | ------------------------------------------------------------------ |
+| [x]    | 1.1 | Add `metadata` field to `BlockSchema`                     |           | DR §4.1                                                            |
+| [x]    | 1.2 | Wire `metadata=` at 6 existing registration sites         | [P]       | DR §4.3 — delta.py, plan.py (×3), verification.py, revision.py     |
+| [x]    | 1.3 | Wire `metadata=` in workflow registration loop            | [P]       | DR §4.3 — workflow_metadata.py                                     |
+| [x]    | 1.4 | Create `spec_metadata.py`                                 | [P]       | DR §4.4 — BlockMetadata for spec.relationships + spec.capabilities |
+| [x]    | 1.5 | Wire `metadata=` at spec registration in relationships.py |           | After 1.4                                                          |
+| [x]    | 1.6 | Author 7 workflow examples                                |           | DR §4.5                                                            |
+| [x]    | 1.7 | Replace hardcoded dict in `schema.py`                     |           | DR §4.2                                                            |
+| [x]    | 1.8 | Tests                                                     |           | 35/35 passed (2 new parameterised + 33 existing)                   |
+| [x]    | 1.9 | Lint + verify                                             |           | ruff clean, pylint 9.92/10, 320 block tests pass                   |
 
 ### Task Details
 
@@ -97,9 +97,9 @@ Make `show schema <type> --format=json-schema` and `--format=yaml-example` work 
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|-----------|--------|
-| Workflow examples invalid | Validate each against its own BlockMetadata field definitions | Open |
+| Risk                      | Mitigation                                                    | Status |
+| ------------------------- | ------------------------------------------------------------- | ------ |
+| Workflow examples invalid | Validate each against its own BlockMetadata field definitions | Open   |
 
 ## 9. Decisions & Outcomes
 

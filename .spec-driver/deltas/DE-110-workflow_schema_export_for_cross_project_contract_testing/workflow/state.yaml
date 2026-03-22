@@ -15,8 +15,8 @@ workflow:
   handoff_boundary: phase
   next_role: implementer
 timestamps:
-  created: '2026-03-22T10:09:32+00:00'
-  updated: '2026-03-22T10:21:38+00:00'
+  created: "2026-03-22T10:09:32+00:00"
+  updated: "2026-03-22T10:21:38+00:00"
 plan:
   id: IP-110
   path: .spec-driver/deltas/DE-110-workflow_schema_export_for_cross_project_contract_testing/IP-110.md

@@ -15,8 +15,8 @@ workflow:
   handoff_boundary: phase
   next_role: implementer
 timestamps:
-  created: '2026-03-22T04:54:18+00:00'
-  updated: '2026-03-22T05:51:30+00:00'
+  created: "2026-03-22T04:54:18+00:00"
+  updated: "2026-03-22T05:51:30+00:00"
 plan:
   id: IP-107
   path: .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/IP-107.md

@@ -372,14 +372,14 @@ via fallback reading path.
 
 ```yaml
 # Frontmatter (canonical structured data)
-id: IP-XXX-PNN          # Auto-generated
-plan: IP-XXX             # From --plan flag
-delta: DE-XXX            # Looked up from plan
+id: IP-XXX-PNN # Auto-generated
+plan: IP-XXX # From --plan flag
+delta: DE-XXX # Looked up from plan
 objective: >-
   <Filled from plan or by developer>
-entrance_criteria:       # From plan entry
+entrance_criteria: # From plan entry
   - Criterion 1
-exit_criteria:           # From plan entry
+exit_criteria: # From plan entry
   - Criterion 1
 status: draft
 kind: phase

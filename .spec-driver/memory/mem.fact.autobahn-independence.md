@@ -4,15 +4,16 @@ name: spec-driver must not depend on autobahn
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-22'
-updated: '2026-03-22'
-verified: '2026-03-22'
+created: "2026-03-22"
+updated: "2026-03-22"
+verified: "2026-03-22"
 confidence: high
 tags:
-- architecture
-- autobahn
-- boundary
-summary: spec-driver must never depend on autobahn for basic functionality; the dependency
+  - architecture
+  - autobahn
+  - boundary
+summary:
+  spec-driver must never depend on autobahn for basic functionality; the dependency
   is strictly one-directional
 ---
 
@@ -24,6 +25,7 @@ The dependency between spec-driver and autobahn is strictly one-directional:
 - **spec-driver must never depend on autobahn** — all spec-driver functionality must work without autobahn installed, running, or present
 
 This means:
+
 - No imports from autobahn in spec-driver code
 - No runtime checks for autobahn presence
 - Extension points for autobahn (e.g., `session` metadata on review round records) must be optional and opaque — spec-driver carries them but doesn't interpret them

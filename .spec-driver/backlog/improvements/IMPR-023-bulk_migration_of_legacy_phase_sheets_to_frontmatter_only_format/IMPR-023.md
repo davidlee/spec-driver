@@ -24,6 +24,7 @@ redundant maintenance surface.
 ## Proposed Solution
 
 Write a migration script that:
+
 1. Reads each legacy phase file
 2. Extracts canonical fields from `phase.overview` block
 3. Populates frontmatter with `plan`, `delta`, `objective`, `entrance_criteria`, `exit_criteria`

@@ -12,14 +12,14 @@ phase:
   id: IP-107.PHASE-01
   status: complete
 required_reading:
-- .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/DE-107.md
-- .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/IP-107.md
-- .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/phases/phase-01.md
-- .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/notes.md
+  - .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/DE-107.md
+  - .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/IP-107.md
+  - .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/phases/phase-01.md
+  - .spec-driver/deltas/DE-107-spike_evaluate_pydantic_for_model_layer/notes.md
 next_activity:
   kind: implementation
 timestamps:
-  emitted_at: '2026-03-22T05:51:30+00:00'
+  emitted_at: "2026-03-22T05:51:30+00:00"
 git:
   head: 294a4aae
   branch: main

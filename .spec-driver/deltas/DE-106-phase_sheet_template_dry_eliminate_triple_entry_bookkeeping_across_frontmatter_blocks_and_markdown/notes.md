@@ -56,20 +56,20 @@ Status: `in-progress`. All 3 phases complete. Ready for audit and closure.
 
 ### Key Files (implementation surface)
 
-| File | Role | Phase 1 status |
-|---|---|---|
-| `supekku/scripts/lib/changes/phase_model.py` | **NEW** — PhaseSheet Pydantic model | ✅ Done |
-| `supekku/scripts/lib/changes/phase_model_test.py` | Model tests (9 tests incl. corpus) | ✅ Done |
-| `supekku/scripts/lib/changes/creation.py` | `create_phase()` — emits canonical frontmatter fields | ✅ Done |
-| `supekku/scripts/lib/changes/artifacts.py` | Phase loading — prefers frontmatter, falls back to blocks | ✅ Done |
-| `supekku/templates/phase.md` | Phase template — block scaffolding removed | ✅ Done (Phase 2) |
-| `supekku/scripts/lib/formatters/change_formatters.py` | `_enrich_phase_data()` — regex fallback verified | ✅ Done (Phase 2) |
-| `supekku/scripts/lib/validation/validator.py` | Phase validation — overview-block warning suppressed for new phases | ✅ Done (Phase 2) |
-| `supekku/scripts/lib/core/frontmatter_schema.py` | Frontmatter validation — **wire phase-specific validation (Phase 3)** | Pending |
-| `supekku/skills/execute-phase/SKILL.md` | Skill — **audit for block references (Phase 3)** | Pending |
-| `supekku/skills/plan-phases/SKILL.md` | Skill — **audit for block references (Phase 3)** | Pending |
-| `supekku/skills/update-delta-docs/SKILL.md` | Skill — **audit for block references (Phase 3)** | Pending |
-| `supekku/skills/notes/SKILL.md` | Skill — **audit for block references (Phase 3)** | Pending |
+| File                                                  | Role                                                                  | Phase 1 status    |
+| ----------------------------------------------------- | --------------------------------------------------------------------- | ----------------- |
+| `supekku/scripts/lib/changes/phase_model.py`          | **NEW** — PhaseSheet Pydantic model                                   | ✅ Done           |
+| `supekku/scripts/lib/changes/phase_model_test.py`     | Model tests (9 tests incl. corpus)                                    | ✅ Done           |
+| `supekku/scripts/lib/changes/creation.py`             | `create_phase()` — emits canonical frontmatter fields                 | ✅ Done           |
+| `supekku/scripts/lib/changes/artifacts.py`            | Phase loading — prefers frontmatter, falls back to blocks             | ✅ Done           |
+| `supekku/templates/phase.md`                          | Phase template — block scaffolding removed                            | ✅ Done (Phase 2) |
+| `supekku/scripts/lib/formatters/change_formatters.py` | `_enrich_phase_data()` — regex fallback verified                      | ✅ Done (Phase 2) |
+| `supekku/scripts/lib/validation/validator.py`         | Phase validation — overview-block warning suppressed for new phases   | ✅ Done (Phase 2) |
+| `supekku/scripts/lib/core/frontmatter_schema.py`      | Frontmatter validation — **wire phase-specific validation (Phase 3)** | Pending           |
+| `supekku/skills/execute-phase/SKILL.md`               | Skill — **audit for block references (Phase 3)**                      | Pending           |
+| `supekku/skills/plan-phases/SKILL.md`                 | Skill — **audit for block references (Phase 3)**                      | Pending           |
+| `supekku/skills/update-delta-docs/SKILL.md`           | Skill — **audit for block references (Phase 3)**                      | Pending           |
+| `supekku/skills/notes/SKILL.md`                       | Skill — **audit for block references (Phase 3)**                      | Pending           |
 
 ### Relevant Memories
 
@@ -133,14 +133,14 @@ Worktree is clean. All `.spec-driver/**` changes committed. No pending commits n
 
 These fields lose structured (YAML) representation. All are intentional per DR-106 DEC-005/DEC-006/DEC-007. If orchestration or tooling later needs any of these, it gets modeled as a deliberate feature with proper schema — not recovered by reinstating the blocks.
 
-| Field | Was in | Loss | Why acceptable |
-|---|---|---|---|
-| Task status (per-task `pending`/`in_progress`/`completed`/`blocked`) | `phase.tracking` | Per-task granularity; regex fallback gives aggregate `[x]`/`[ ]` counts only | Highest-volatility field; primary drift source. Display table already renders aggregates — richer data was maintained but never surfaced. |
-| Criteria progress (`completed: true/false` per criterion) | `phase.tracking` | Structured criterion-level completion | `_enrich_phase_data()` materializes this but no display surface reads it — dead code from a display perspective. |
-| Verification (test commands, evidence items) | `phase.overview` | Structured test-command and evidence lists | No requirement linkage — IP-level `verification.coverage` owns formal VT/VA/VH traceability. Phase verification is an ad-hoc checklist with no consumer or status model. |
-| Tasks (summary list) | `phase.overview` | Structured task list in YAML | Redundant with markdown §7 table + detail blocks that agents actually maintain. |
-| Risks (summary list) | `phase.overview` | Structured risk list in YAML | No machine consumer. No gate-checking value. Delta-level risks are the structured surface. |
-| Files (references, added, modified) | `phase.tracking` | Structured file-change tracking per task | Agent working notes with no consumer. |
+| Field                                                                | Was in           | Loss                                                                         | Why acceptable                                                                                                                                                           |
+| -------------------------------------------------------------------- | ---------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Task status (per-task `pending`/`in_progress`/`completed`/`blocked`) | `phase.tracking` | Per-task granularity; regex fallback gives aggregate `[x]`/`[ ]` counts only | Highest-volatility field; primary drift source. Display table already renders aggregates — richer data was maintained but never surfaced.                                |
+| Criteria progress (`completed: true/false` per criterion)            | `phase.tracking` | Structured criterion-level completion                                        | `_enrich_phase_data()` materializes this but no display surface reads it — dead code from a display perspective.                                                         |
+| Verification (test commands, evidence items)                         | `phase.overview` | Structured test-command and evidence lists                                   | No requirement linkage — IP-level `verification.coverage` owns formal VT/VA/VH traceability. Phase verification is an ad-hoc checklist with no consumer or status model. |
+| Tasks (summary list)                                                 | `phase.overview` | Structured task list in YAML                                                 | Redundant with markdown §7 table + detail blocks that agents actually maintain.                                                                                          |
+| Risks (summary list)                                                 | `phase.overview` | Structured risk list in YAML                                                 | No machine consumer. No gate-checking value. Delta-level risks are the structured surface.                                                                               |
+| Files (references, added, modified)                                  | `phase.tracking` | Structured file-change tracking per task                                     | Agent working notes with no consumer.                                                                                                                                    |
 
 ## Design Review Summary
 

@@ -14,8 +14,8 @@ workflow:
   active_role: implementer
   handoff_boundary: phase
 timestamps:
-  created: '2026-03-22T06:13:10+00:00'
-  updated: '2026-03-22T06:13:10+00:00'
+  created: "2026-03-22T06:13:10+00:00"
+  updated: "2026-03-22T06:13:10+00:00"
 plan:
   id: IP-111
   path: .spec-driver/deltas/DE-111-spec_model_pydantic_conversion_and_schema_docs/IP-111.md

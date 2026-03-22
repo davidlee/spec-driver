@@ -58,16 +58,16 @@ Wire review state machine into CLI: disposition subcommands (`review finding res
 
 ## 7. Tasks & Progress
 
-| Status | ID | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [x] | 3.1 | Add `review finding` subcommand group with 4 disposition commands | | DR-109 §4.1 |
-| [x] | 3.2 | Update `review prime` to set judgment via `apply_review_transition()` | [P] | DR-109 §4.3 |
-| [x] | 3.3 | Update `review complete` to enforce `can_approve()` guard | | DR-109 §4.3 |
-| [x] | 3.4 | Update `review complete` to write `judgment_status` to review-index | | DR-109 §4.3 |
-| [x] | 3.5 | Wire `--summary` into round metadata | | Loose end from Phase 2 |
-| [x] | 3.6 | Write disposition command tests (VT-109-008) | | DR-109 §5.3 |
-| [x] | 3.7 | Write CLI guard enforcement tests (VT-109-005) | | DR-109 §5.4 |
-| [x] | 3.8 | Lint clean | | ruff + pylint |
+| Status | ID  | Description                                                           | Parallel? | Notes                  |
+| ------ | --- | --------------------------------------------------------------------- | --------- | ---------------------- |
+| [x]    | 3.1 | Add `review finding` subcommand group with 4 disposition commands     |           | DR-109 §4.1            |
+| [x]    | 3.2 | Update `review prime` to set judgment via `apply_review_transition()` | [P]       | DR-109 §4.3            |
+| [x]    | 3.3 | Update `review complete` to enforce `can_approve()` guard             |           | DR-109 §4.3            |
+| [x]    | 3.4 | Update `review complete` to write `judgment_status` to review-index   |           | DR-109 §4.3            |
+| [x]    | 3.5 | Wire `--summary` into round metadata                                  |           | Loose end from Phase 2 |
+| [x]    | 3.6 | Write disposition command tests (VT-109-008)                          |           | DR-109 §5.3            |
+| [x]    | 3.7 | Write CLI guard enforcement tests (VT-109-005)                        |           | DR-109 §5.4            |
+| [x]    | 3.8 | Lint clean                                                            |           | ruff + pylint          |
 
 ### Task Details
 
@@ -85,7 +85,7 @@ Wire review state machine into CLI: disposition subcommands (`review finding res
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|------------|--------|
-| workflow.py review section grows too large | Extract disposition commands to separate module if needed | monitor |
-| summary parameter threading requires review_io changes | build_round_entry already accepts arbitrary kwargs via session; may need explicit summary field | check |
+| Risk                                                   | Mitigation                                                                                      | Status  |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- | ------- |
+| workflow.py review section grows too large             | Extract disposition commands to separate module if needed                                       | monitor |
+| summary parameter threading requires review_io changes | build_round_entry already accepts arbitrary kwargs via session; may need explicit summary field | check   |

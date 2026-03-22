@@ -4,24 +4,25 @@ name: StrEnum values require .value for PyYAML serialization
 kind: memory
 status: active
 memory_type: fact
-created: '2026-03-22'
-updated: '2026-03-22'
-verified: '2026-03-22'
+created: "2026-03-22"
+updated: "2026-03-22"
+verified: "2026-03-22"
 confidence: high
 tags:
-- yaml
-- sharp-edge
-- strenum
+  - yaml
+  - sharp-edge
+  - strenum
 scope:
   globs:
-  - "supekku/**/*.py"
+    - "supekku/**/*.py"
   commands:
-  - "yaml.dump"
-summary: PyYAML serializes StrEnum with Python-specific tags; use .value at yaml.dump
+    - "yaml.dump"
+summary:
+  PyYAML serializes StrEnum with Python-specific tags; use .value at yaml.dump
   boundaries
 provenance:
   sources:
-  - DE-109 Phase 4 — BootstrapStatus.WARM serialized as !!python/object/apply tag
+    - DE-109 Phase 4 — BootstrapStatus.WARM serialized as !!python/object/apply tag
 ---
 
 # StrEnum values require .value for PyYAML serialization

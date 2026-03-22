@@ -1293,5 +1293,220 @@ class ReviewTeardownJsonTest(_ReviewTestBase):
     assert data["data"]["removed"] == []
 
 
+class WorkflowStatusJsonTest(_ReviewTestBase):
+  """Tests for workflow status --format json."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_status_json_with_review(self, *_mocks) -> None:
+    """Status with primed review shows full review state."""
+    _create_delta_bundle(self.root)
+    self._start_phase()
+    self.runner.invoke(app, ["review", "prime", "DE-100"])
+
+    result = self.runner.invoke(
+      app, ["workflow", "status", "DE-100", "--format", "json"],
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert data["command"] == "workflow.status"
+    assert data["status"] == "ok"
+    payload = data["data"]
+    assert payload["delta_id"] == "DE-100"
+    assert payload["workflow_status"] == "implementing"
+    assert payload["bootstrap_status"] == "warm"
+    assert payload["judgment_status"] == "in_progress"
+    assert "findings_summary" in payload
+    assert "staleness" in payload
+
+  def test_status_json_no_state(self) -> None:
+    """No workflow state → precondition error."""
+    _create_delta_bundle(self.root)
+    result = self.runner.invoke(
+      app, ["workflow", "status", "DE-100", "--format", "json"],
+    )
+    assert result.exit_code == 2
+    data = json.loads(result.output)
+    assert data["error"]["kind"] == "precondition"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_status_json_no_review_index(self, *_mocks) -> None:
+    """Status without review → cold bootstrap, not_started judgment."""
+    _create_delta_bundle(self.root)
+    self._start_phase()
+    # Don't prime — no review state
+    result = self.runner.invoke(
+      app, ["workflow", "status", "DE-100", "--format", "json"],
+    )
+    assert result.exit_code == 0
+    payload = json.loads(result.output)["data"]
+    assert payload["bootstrap_status"] == "cold"
+    assert payload["judgment_status"] == "not_started"
+    assert payload["round"] == 0
+
+
+class FindingDispositionJsonTest(_ReviewTestBase):
+  """Tests for review finding disposition commands with --format json."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_resolve_json(self, *_mocks) -> None:
+    delta_dir = _create_delta_bundle(self.root)
+    self._start_phase()
+    self._create_handoff_and_accept_as_reviewer()
+
+    # Create findings with a blocking finding
+    from supekku.scripts.lib.workflow.review_io import build_findings, write_findings
+
+    findings = build_findings(
+      artifact_id="DE-100",
+      round_number=1,
+      status="changes_requested",
+      blocking=[{"id": "R1-001", "title": "Bug", "status": "open"}],
+    )
+    write_findings(delta_dir, findings)
+
+    result = self.runner.invoke(
+      app,
+      ["review", "finding", "resolve", "DE-100", "R1-001", "--format", "json"],
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert data["command"] == "review.finding.fix"
+    payload = data["data"]
+    assert payload["finding_id"] == "R1-001"
+    assert payload["action"] == "fix"
+    assert payload["previous_status"] == "open"
+    assert payload["new_status"] == "resolved"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_disposition_not_found_json(self, *_mocks) -> None:
+    delta_dir = _create_delta_bundle(self.root)
+    self._start_phase()
+    self._create_handoff_and_accept_as_reviewer()
+
+    from supekku.scripts.lib.workflow.review_io import build_findings, write_findings
+
+    findings = build_findings(
+      artifact_id="DE-100",
+      round_number=1,
+      status="changes_requested",
+      blocking=[{"id": "R1-001", "title": "Bug", "status": "open"}],
+    )
+    write_findings(delta_dir, findings)
+
+    result = self.runner.invoke(
+      app,
+      ["review", "finding", "resolve", "DE-100", "R1-999", "--format", "json"],
+    )
+    assert result.exit_code == 2
+    data = json.loads(result.output)
+    assert data["error"]["kind"] == "precondition"
+    assert "R1-999" in data["error"]["message"]
+
+
+class FindingListJsonTest(_ReviewTestBase):
+  """Tests for review finding list command."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_list_json_all_rounds(self, *_mocks) -> None:
+    delta_dir = _create_delta_bundle(self.root)
+    self._start_phase()
+    self._create_handoff_and_accept_as_reviewer()
+
+    from supekku.scripts.lib.workflow.review_io import build_findings, write_findings
+
+    findings = build_findings(
+      artifact_id="DE-100",
+      round_number=1,
+      status="changes_requested",
+      blocking=[{"id": "R1-001", "title": "Bug A", "status": "open"}],
+      non_blocking=[{"id": "R1-002", "title": "Nit B", "status": "open"}],
+    )
+    write_findings(delta_dir, findings)
+
+    result = self.runner.invoke(
+      app,
+      ["review", "finding", "list", "DE-100", "--format", "json"],
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert data["command"] == "review.finding.list"
+    findings_list = data["data"]["findings"]
+    assert len(findings_list) == 2
+    assert findings_list[0]["id"] == "R1-001"
+    assert findings_list[0]["round"] == 1
+    assert findings_list[0]["severity"] == "blocking"
+    assert findings_list[1]["severity"] == "non_blocking"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_list_json_round_filter(self, *_mocks) -> None:
+    delta_dir = _create_delta_bundle(self.root)
+    self._start_phase()
+    self._create_handoff_and_accept_as_reviewer()
+
+    from supekku.scripts.lib.workflow.review_io import (
+      append_round,
+      build_findings,
+      write_findings,
+    )
+
+    findings = build_findings(
+      artifact_id="DE-100",
+      round_number=1,
+      status="changes_requested",
+      blocking=[{"id": "R1-001", "title": "Bug A", "status": "open"}],
+    )
+    append_round(
+      findings,
+      status="changes_requested",
+      blocking=[{"id": "R2-001", "title": "Bug B", "status": "open"}],
+    )
+    write_findings(delta_dir, findings)
+
+    # Filter to round 2 only
+    result = self.runner.invoke(
+      app,
+      ["review", "finding", "list", "DE-100", "--round", "2", "--format", "json"],
+    )
+    assert result.exit_code == 0
+    findings_list = json.loads(result.output)["data"]["findings"]
+    assert len(findings_list) == 1
+    assert findings_list[0]["id"] == "R2-001"
+    assert findings_list[0]["round"] == 2
+
+  def test_list_json_no_findings(self) -> None:
+    _create_delta_bundle(self.root)
+    self._start_phase()
+    result = self.runner.invoke(
+      app,
+      ["review", "finding", "list", "DE-100", "--format", "json"],
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert data["data"]["findings"] == []
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_list_human_output(self, *_mocks) -> None:
+    delta_dir = _create_delta_bundle(self.root)
+    self._start_phase()
+    self._create_handoff_and_accept_as_reviewer()
+
+    from supekku.scripts.lib.workflow.review_io import build_findings, write_findings
+
+    findings = build_findings(
+      artifact_id="DE-100",
+      round_number=1,
+      status="changes_requested",
+      blocking=[{"id": "R1-001", "title": "Bug", "status": "open"}],
+    )
+    write_findings(delta_dir, findings)
+
+    result = self.runner.invoke(
+      app, ["review", "finding", "list", "DE-100"],
+    )
+    assert result.exit_code == 0
+    assert "R1-001" in result.output
+    assert "blocking" in result.output
+
+
 if __name__ == "__main__":
   unittest.main()

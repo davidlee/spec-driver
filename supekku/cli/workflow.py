@@ -249,31 +249,134 @@ def phase_start(
 @workflow_app.command("status")
 def workflow_status(
   delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  format_type: Annotated[
+    str,
+    typer.Option("--format", help="Output format: table or json"),
+  ] = "table",
   root: RootOption = None,
 ) -> None:
-  """Display human-readable workflow state for a delta."""
+  """Display workflow state for a delta."""
   from supekku.scripts.lib.workflow.state_io import (  # noqa: PLC0415
     StateNotFoundError,
     StateValidationError,
     read_state,
   )
 
+  json_mode = format_type == "json"
+  cmd = "workflow.status"
+
   repo_root = find_repo_root(root)
   delta_dir = _resolve_delta_dir(delta, repo_root)
+  delta_id = delta.upper()
 
   try:
     data = read_state(delta_dir)
   except StateNotFoundError as exc:
-    typer.echo(
-      f"No workflow state for {delta.upper()} (workflow/state.yaml not found)",
-    )
+    msg = f"No workflow state for {delta_id}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(f"{msg} (workflow/state.yaml not found)")
     raise typer.Exit(EXIT_SUCCESS) from exc
   except StateValidationError as exc:
-    typer.echo(f"Invalid workflow state: {exc}", err=True)
+    msg = f"Invalid workflow state: {exc}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
+
+  if json_mode:
+    payload = _build_status_json(data, delta_dir, delta_id, repo_root)
+    emit_json_and_exit(cli_json_success(cmd, payload))
 
   _render_status(data)
   raise typer.Exit(EXIT_SUCCESS)
+
+
+def _build_status_json(
+  data: dict,
+  delta_dir: Path,
+  delta_id: str,
+  repo_root: Path,
+) -> dict:
+  """Build JSON payload for workflow status (DE-108 §6.4)."""
+  from supekku.scripts.lib.core.git import get_head_sha  # noqa: PLC0415
+  from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
+    FindingsNotFoundError,
+    FindingsVersionError,
+    ReviewIndexNotFoundError,
+    ReviewIndexValidationError,
+    read_findings,
+    read_review_index,
+  )
+  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
+    BootstrapStatus,
+  )
+  from supekku.scripts.lib.workflow.staleness import evaluate_staleness  # noqa: PLC0415
+
+  wf = data.get("workflow", {})
+  phase = data.get("phase", {})
+
+  payload: dict = {
+    "delta_id": delta_id,
+    "workflow_status": wf.get("status", "unknown"),
+    "active_role": wf.get("active_role", "unknown"),
+  }
+
+  # Review state — bootstrap + judgment + findings summary + staleness
+  bootstrap_status = BootstrapStatus.COLD.value
+  judgment_status = "not_started"
+  review_round = 0
+  findings_summary = {"blocking": 0, "non_blocking": 0, "resolved": 0, "waived": 0}
+  staleness: dict = {"phase_id": phase.get("id", "unknown"), "head": "unknown", "triggers": []}
+
+  try:
+    index = read_review_index(delta_dir)
+    bootstrap_status = index.get("review", {}).get(
+      "bootstrap_status", BootstrapStatus.WARM.value,
+    )
+    judgment_status = index.get("review", {}).get("judgment_status", "not_started")
+
+    # Staleness inputs
+    cache_key = index.get("staleness", {}).get("cache_key", {})
+    head_sha = get_head_sha(repo_root) or "unknown"
+    staleness = {
+      "phase_id": cache_key.get("phase_id", "unknown"),
+      "head": cache_key.get("head", "unknown"),
+      "triggers": [],
+    }
+    # Evaluate staleness triggers
+    result = evaluate_staleness(
+      index,
+      current_phase_id=phase.get("id", "unknown"),
+      current_head=head_sha,
+    )
+    staleness["triggers"] = result.triggers
+
+  except (ReviewIndexNotFoundError, ReviewIndexValidationError):
+    pass  # No review index — cold state
+
+  try:
+    findings = read_findings(delta_dir)
+    review_round = findings.get("review", {}).get("current_round", 0)
+    for round_data in findings.get("rounds", []):
+      findings_summary["blocking"] += len(round_data.get("blocking", []))
+      findings_summary["non_blocking"] += len(round_data.get("non_blocking", []))
+      for finding in round_data.get("blocking", []) + round_data.get("non_blocking", []):
+        s = finding.get("status", "open")
+        if s == "resolved":
+          findings_summary["resolved"] += 1
+        elif s == "waived":
+          findings_summary["waived"] += 1
+  except (FindingsNotFoundError, FindingsVersionError):
+    pass  # No findings
+
+  payload["bootstrap_status"] = bootstrap_status
+  payload["judgment_status"] = judgment_status
+  payload["round"] = review_round
+  payload["findings_summary"] = findings_summary
+  payload["staleness"] = staleness
+
+  return payload
 
 
 def _render_status(data: dict) -> None:
@@ -1398,6 +1501,8 @@ def _disposition_finding(
   finding_id: str,
   disposition: dict,
   root: Path | None,
+  *,
+  json_mode: bool = False,
 ) -> None:
   """Shared orchestration for all disposition commands.
 
@@ -1408,40 +1513,69 @@ def _disposition_finding(
     FindingsNotFoundError,
     FindingsValidationError,
     FindingsVersionError,
+    find_finding,
     read_findings,
     update_finding_disposition,
     write_findings,
   )
 
+  cmd = f"review.finding.{disposition['action']}"
   repo_root = find_repo_root(root)
   delta_dir = _resolve_delta_dir(delta, repo_root)
+  delta_id = delta.upper()
 
   try:
     data = read_findings(delta_dir)
   except FindingsNotFoundError as exc:
-    typer.echo(f"No findings for {delta.upper()}", err=True)
+    msg = f"No findings for {delta_id}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
   except FindingsVersionError as exc:
-    typer.echo(str(exc), err=True)
+    msg = str(exc)
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Capture previous status before disposition
+  previous_finding = find_finding(data, finding_id)
+  previous_status = previous_finding.status.value if previous_finding else "unknown"
 
   if not update_finding_disposition(data, finding_id, disposition):
     available = _available_finding_ids(data)
-    typer.echo(
-      f"Finding {finding_id} not found. Available: {', '.join(available)}",
-      err=True,
-    )
+    msg = f"Finding {finding_id} not found. Available: {', '.join(available)}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE)
 
   try:
     write_findings(delta_dir, data)
   except FindingsValidationError as exc:
-    typer.echo(f"Findings validation failed: {exc}", err=True)
+    msg = f"Findings validation failed: {exc}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "validation", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Get the new status after disposition
+  updated_finding = find_finding(data, finding_id)
+  new_status = updated_finding.status.value if updated_finding else "unknown"
+
+  if json_mode:
+    emit_json_and_exit(cli_json_success(cmd, {
+      "delta_id": delta_id,
+      "finding_id": finding_id,
+      "action": disposition["action"],
+      "previous_status": previous_status,
+      "new_status": new_status,
+    }))
 
   typer.echo(
     f"Finding {finding_id}: {disposition['action']} "
-    f"(delta {delta.upper()})",
+    f"(delta {delta_id})",
   )
   raise typer.Exit(EXIT_SUCCESS)
 
@@ -1454,6 +1588,10 @@ def finding_resolve_command(
     str | None,
     typer.Option("--resolved-at", help="Commit SHA where fix landed"),
   ] = None,
+  format_type: Annotated[
+    str,
+    typer.Option("--format", help="Output format: table or json"),
+  ] = "table",
   root: RootOption = None,
 ) -> None:
   """Mark a finding as resolved (fixed)."""
@@ -1468,7 +1606,7 @@ def finding_resolve_command(
   }
   if resolved_at:
     disposition["resolved_at"] = resolved_at
-  _disposition_finding(delta, finding_id, disposition, root)
+  _disposition_finding(delta, finding_id, disposition, root, json_mode=format_type == "json")
 
 
 @finding_app.command("defer")
@@ -1483,6 +1621,10 @@ def finding_defer_command(
     str | None,
     typer.Option("--backlog-ref", help="Backlog item tracking this (e.g. ISSUE-042)"),
   ] = None,
+  format_type: Annotated[
+    str,
+    typer.Option("--format", help="Output format: table or json"),
+  ] = "table",
   root: RootOption = None,
 ) -> None:
   """Defer a finding to a future delta or backlog item."""
@@ -1498,7 +1640,7 @@ def finding_defer_command(
   }
   if backlog_ref:
     disposition["backlog_ref"] = backlog_ref
-  _disposition_finding(delta, finding_id, disposition, root)
+  _disposition_finding(delta, finding_id, disposition, root, json_mode=format_type == "json")
 
 
 @finding_app.command("waive")
@@ -1513,6 +1655,10 @@ def finding_waive_command(
     str | None,
     typer.Option("--authority", help="Who made the decision: user or agent"),
   ] = None,
+  format_type: Annotated[
+    str,
+    typer.Option("--format", help="Output format: table or json"),
+  ] = "table",
   root: RootOption = None,
 ) -> None:
   """Waive a finding (accept the risk)."""
@@ -1530,7 +1676,7 @@ def finding_waive_command(
     ),
     "rationale": rationale,
   }
-  _disposition_finding(delta, finding_id, disposition, root)
+  _disposition_finding(delta, finding_id, disposition, root, json_mode=format_type == "json")
 
 
 @finding_app.command("supersede")
@@ -1541,6 +1687,10 @@ def finding_supersede_command(
     str,
     typer.Option("--superseded-by", help="Finding ID that replaces this one"),
   ],
+  format_type: Annotated[
+    str,
+    typer.Option("--format", help="Output format: table or json"),
+  ] = "table",
   root: RootOption = None,
 ) -> None:
   """Mark a finding as superseded by another finding."""
@@ -1554,7 +1704,87 @@ def finding_supersede_command(
     "authority": DispositionAuthority.AGENT.value,
     "superseded_by": superseded_by,
   }
-  _disposition_finding(delta, finding_id, disposition, root)
+  _disposition_finding(delta, finding_id, disposition, root, json_mode=format_type == "json")
+
+
+@finding_app.command("list")
+def finding_list_command(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  round_filter: Annotated[
+    int | None,
+    typer.Option("--round", help="Filter to a specific round number"),
+  ] = None,
+  format_type: Annotated[
+    str,
+    typer.Option("--format", help="Output format: table or json"),
+  ] = "table",
+  root: RootOption = None,
+) -> None:
+  """List all review findings across rounds."""
+  from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
+    FindingsNotFoundError,
+    FindingsVersionError,
+    read_findings,
+  )
+
+  json_mode = format_type == "json"
+  cmd = "review.finding.list"
+
+  repo_root = find_repo_root(root)
+  delta_dir = _resolve_delta_dir(delta, repo_root)
+  delta_id = delta.upper()
+
+  try:
+    data = read_findings(delta_dir)
+  except FindingsNotFoundError as exc:
+    msg = f"No findings for {delta_id}"
+    if json_mode:
+      emit_json_and_exit(cli_json_success(cmd, {
+        "delta_id": delta_id,
+        "findings": [],
+      }))
+    typer.echo(msg)
+    raise typer.Exit(EXIT_SUCCESS) from exc
+  except FindingsVersionError as exc:
+    msg = str(exc)
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Collect findings with round and severity metadata
+  findings: list[dict] = []
+  for round_data in data.get("rounds", []):
+    round_num = round_data.get("round", 0)
+    if round_filter is not None and round_num != round_filter:
+      continue
+    for category in ("blocking", "non_blocking"):
+      for finding in round_data.get(category, []):
+        findings.append({
+          "id": finding.get("id", "?"),
+          "round": round_num,
+          "title": finding.get("title", ""),
+          "status": finding.get("status", "open"),
+          "severity": category,
+          "disposition": finding.get("disposition"),
+        })
+
+  if json_mode:
+    emit_json_and_exit(cli_json_success(cmd, {
+      "delta_id": delta_id,
+      "findings": findings,
+    }))
+
+  # Human output
+  if not findings:
+    typer.echo(f"No findings for {delta_id}")
+  else:
+    for f in findings:
+      disp = f" [{f['disposition']['action']}]" if f["disposition"] else ""
+      typer.echo(
+        f"  {f['id']} ({f['severity']}) {f['status']}{disp} — {f['title']}",
+      )
+  raise typer.Exit(EXIT_SUCCESS)
 
 
 # ---------------------------------------------------------------------------

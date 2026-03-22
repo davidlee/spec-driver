@@ -45,6 +45,8 @@
             jinja2
             pyyaml
             python-frontmatter
+            pydantic
+            ty
             textual
             tomlkit
             typer
@@ -65,6 +67,8 @@
           python3
           python3Packages.pylint
           python3Packages.pytest
+          python3Packages.pydantic
+          python3Packages.ty
           pyright
           ruff
 
@@ -76,31 +80,40 @@
           d2
         ];
 
+        # sibling repos to bind-mount (for editable deps / source inspection)
+        workspaceDeps = ["/home/david/dev/autobahn"];
+
         jailPkgs = lib.optionalAttrs isLinux {
           jailed-pi = jailLib.makeJailedPi {
             profile = "specDev";
             extraPkgs = projectPkgs;
+            inherit workspaceDeps;
           };
           jailed-pi-research = jailLib.makeJailedPi {
             name = "pi-research";
             profile = "research";
             extraPkgs = projectPkgs;
+            inherit workspaceDeps;
           };
           jailed-opencode = jailLib.makeJailedOpencode {
             profile = "specDev";
             extraPkgs = projectPkgs;
+            inherit workspaceDeps;
           };
           jailed-claude = jailLib.makeJailedClaude {
             profile = "specDev";
             extraPkgs = projectPkgs;
+            inherit workspaceDeps;
           };
           jailed-codex = jailLib.makeJailedCodex {
             profile = "specDev";
             extraPkgs = projectPkgs;
+            inherit workspaceDeps;
           };
           jailed-gemini = jailLib.makeJailedGemini {
             profile = "specDev";
             extraPkgs = projectPkgs;
+            inherit workspaceDeps;
           };
         };
       in {

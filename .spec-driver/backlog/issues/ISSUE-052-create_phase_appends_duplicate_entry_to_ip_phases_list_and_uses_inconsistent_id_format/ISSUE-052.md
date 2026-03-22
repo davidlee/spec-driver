@@ -3,7 +3,7 @@ id: ISSUE-052
 name: create phase appends duplicate entry to IP phases list and uses inconsistent ID format
 created: "2026-03-11"
 updated: "2026-03-11"
-status: open
+status: resolved
 kind: issue
 categories: []
 severity: p2

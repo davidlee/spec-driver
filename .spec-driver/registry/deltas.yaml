@@ -11747,11 +11747,11 @@ deltas:
         - "First mutation in validate \u2014 keep scope narrow per DEC-104-05"
   DE-105:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - create phase appends duplicate entry to IP phases list and uses
       inconsistent ID format
     slug: create_phase_appends_duplicate_entry_to_ip_phases_list_and_uses_inconsistent_id_format
-    updated: '2026-03-21'
+    updated: '2026-03-22'
     path: .spec-driver/deltas/DE-105-create_phase_appends_duplicate_entry_to_ip_phases_list_and_uses_inconsistent_id_format/DE-105.md
     applies_to:
       specs: []
@@ -12120,7 +12120,7 @@ deltas:
         status: in-progress
   DE-108:
     kind: delta
-    status: draft
+    status: in-progress
     name: Delta - Review CLI contract for structured machine consumption
     slug: review_cli_contract_for_structured_machine_consumption
     updated: '2026-03-22'
@@ -12151,21 +12151,36 @@ deltas:
         plan: IP-108
         delta: DE-108
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-108
         specs:
-          primary: []
+          primary:
+          - PROD-010
+          - PROD-011
           collaborators: []
         requirements:
           targets: []
           dependencies: []
         phases:
         - id: IP-108-P01
+        - id: IP-108-P02
+        - id: IP-108-P03
       phases:
-      - id: IP-108-P01
+      - plan: IP-108
+        delta: DE-108
         phase: IP-108-P01
+        status: completed
+      - plan: IP-108
+        delta: DE-108
+        phase: IP-108-P02
+        status: draft
+      - plan: IP-108
+        delta: DE-108
+        phase: IP-108-P03
+        status: in-progress
   DE-109:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Review state machine formalisation
     slug: review_state_machine_formalisation
     updated: '2026-03-22'
@@ -12231,8 +12246,10 @@ deltas:
         delta: DE-109
         phase: IP-109-P03
         status: draft
-      - id: IP-109-P04
+      - plan: IP-109
+        delta: DE-109
         phase: IP-109-P04
+        status: completed
   DE-110:
     kind: delta
     status: draft
@@ -12419,3 +12436,351 @@ deltas:
         - Lint clean (for any touched .py files)
         phase: IP-112-P03
         status: completed
+  DE-113:
+    kind: delta
+    status: draft
+    name: 'Delta - Dead code purge: orphaned scripts, hollow functions, stale migrations'
+    slug: dead_code_purge_orphaned_scripts_hollow_functions_stale_migrations
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-113-dead_code_purge_orphaned_scripts_hollow_functions_stale_migrations/DE-113.md
+    applies_to:
+      specs:
+      - SPEC-110
+      - SPEC-112
+      requirements: []
+    plan:
+      id: IP-113
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-113
+        delta: DE-113
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-110
+          - SPEC-112
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-113-P01
+      phases:
+      - id: IP-113-P01
+        phase: IP-113-P01
+  DE-114:
+    kind: delta
+    status: draft
+    name: 'Delta - God-file structural splits: list.py, common.py, requirements/registry.py,
+      creation.py, workflow_metadata.py'
+    slug: god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-114-god_file_structural_splits_list_py_common_py_requirements_registry_py_creation_py_workflow_metadata_py/DE-114.md
+    applies_to:
+      specs:
+      - SPEC-110
+      - SPEC-114
+      - SPEC-122
+      requirements: []
+    plan:
+      id: IP-114
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-114
+        delta: DE-114
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-110
+          - SPEC-114
+          - SPEC-122
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-114-P01
+      phases:
+      - id: IP-114-P01
+        phase: IP-114-P01
+  DE-115:
+    kind: delta
+    status: draft
+    name: 'Delta - Core utility extraction: parse_date, sequential IDs, title extraction,
+      atomic write, block patterns'
+    slug: core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns/DE-115.md
+    applies_to:
+      specs:
+      - SPEC-117
+      - SPEC-126
+      - SPEC-127
+      requirements: []
+    plan:
+      id: IP-115
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-115
+        delta: DE-115
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-117
+          - SPEC-126
+          - SPEC-127
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-115-P01
+      phases:
+      - id: IP-115-P01
+        phase: IP-115-P01
+  DE-116:
+    kind: delta
+    status: draft
+    name: Delta - Registry protocol enforcement and governance triplet consolidation
+      (ADR-009)
+    slug: registry_protocol_enforcement_and_governance_triplet_consolidation_adr_009
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-116-registry_protocol_enforcement_and_governance_triplet_consolidation_adr_009/DE-116.md
+    applies_to:
+      specs:
+      - SPEC-117
+      - SPEC-126
+      - SPEC-127
+      requirements: []
+    plan:
+      id: IP-116
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-116
+        delta: DE-116
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-117
+          - SPEC-126
+          - SPEC-127
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-116-P01
+      phases:
+      - id: IP-116-P01
+        phase: IP-116-P01
+  DE-117:
+    kind: delta
+    status: draft
+    name: 'Delta - CLI boilerplate reduction: format validation, json flag, error
+      handling, backlog factories'
+    slug: cli_boilerplate_reduction_format_validation_json_flag_error_handling_backlog_factories
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-117-cli_boilerplate_reduction_format_validation_json_flag_error_handling_backlog_factories/DE-117.md
+    applies_to:
+      specs:
+      - SPEC-110
+      requirements: []
+    plan:
+      id: IP-117
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-117
+        delta: DE-117
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-110
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-117-P01
+      phases:
+      - id: IP-117-P01
+        phase: IP-117-P01
+  DE-118:
+    kind: delta
+    status: draft
+    name: 'Delta - Block schema unification: retire hand-rolled validators, single
+      metadata-driven validation layer'
+    slug: block_schema_unification_retire_hand_rolled_validators_single_metadata_driven_validation_layer
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-118-block_schema_unification_retire_hand_rolled_validators_single_metadata_driven_validation_layer/DE-118.md
+    applies_to:
+      specs:
+      - SPEC-114
+      - SPEC-115
+      - SPEC-116
+      requirements: []
+    plan:
+      id: IP-118
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-118
+        delta: DE-118
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-114
+          - SPEC-115
+          - SPEC-116
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-118-P01
+      phases:
+      - id: IP-118-P01
+        phase: IP-118-P01
+  DE-119:
+    kind: delta
+    status: draft
+    name: Delta - Migrate WorkspaceValidator to diagnostics check architecture
+    slug: migrate_workspacevalidator_to_diagnostics_check_architecture
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-119-migrate_workspacevalidator_to_diagnostics_check_architecture/DE-119.md
+    applies_to:
+      specs:
+      - SPEC-125
+      - SPEC-158
+      requirements: []
+    plan:
+      id: IP-119
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-119
+        delta: DE-119
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-125
+          - SPEC-158
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-119-P01
+      phases:
+      - id: IP-119-P01
+        phase: IP-119-P01
+  DE-120:
+    kind: delta
+    status: draft
+    name: 'Delta - Workspace facade enforcement: route CLI registry access through
+      Workspace'
+    slug: workspace_facade_enforcement_route_cli_registry_access_through_workspace
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-120-workspace_facade_enforcement_route_cli_registry_access_through_workspace/DE-120.md
+    applies_to:
+      specs:
+      - SPEC-110
+      requirements: []
+    plan:
+      id: IP-120
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-120
+        delta: DE-120
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-110
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-120-P01
+      phases:
+      - id: IP-120-P01
+        phase: IP-120-P01
+  DE-121:
+    kind: delta
+    status: draft
+    name: 'Delta - Paths and config decoupling: replace mutable globals with value
+      objects'
+    slug: paths_and_config_decoupling_replace_mutable_globals_with_value_objects
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-121-paths_and_config_decoupling_replace_mutable_globals_with_value_objects/DE-121.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-121
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-121
+        delta: DE-121
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-121-P01
+      phases:
+      - id: IP-121-P01
+        phase: IP-121-P01
+  DE-122:
+    kind: delta
+    status: draft
+    name: 'Delta - Workflow and changes subsystem cleanup: dedup, fix broken engine,
+      extract domain logic'
+    slug: workflow_and_changes_subsystem_cleanup_dedup_fix_broken_engine_extract_domain_logic
+    updated: '2026-03-22'
+    path: .spec-driver/deltas/DE-122-workflow_and_changes_subsystem_cleanup_dedup_fix_broken_engine_extract_domain_logic/DE-122.md
+    applies_to:
+      specs:
+      - SPEC-124
+      - SPEC-161
+      requirements: []
+    plan:
+      id: IP-122
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-122
+        delta: DE-122
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-124
+          - SPEC-161
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-122-P01
+      phases:
+      - id: IP-122-P01
+        phase: IP-122-P01

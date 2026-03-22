@@ -81,7 +81,7 @@ affected_artifacts:
   - PROD-002
 evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
-  - 2026-03-05 adjudicated: reaffirm runtime truth — create delta does not auto-create phases. Phase creation is explicit. This is operational guidance, not architecture — RE on PROD-002, not a new ADR.
+  - "2026-03-05 adjudicated: reaffirm runtime truth — create delta does not auto-create phases. Phase creation is explicit. This is operational guidance, not architecture — RE on PROD-002, not a new ADR."
 ```
 
 PROD-011 was written specifically to reverse PROD-002's phase-01 auto-creation. PROD-002 was never revised. An agent reading PROD-002 in isolation will implement the wrong behavior.
@@ -220,7 +220,7 @@ affected_artifacts:
   - PROD-003
 evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
-  - 2026-03-05 adjudicated: ADR-002 wins. RE on PROD-003 to replace stored backlinks with registry-computed model.
+  - "2026-03-05 adjudicated: ADR-002 wins. RE on PROD-003 to replace stored backlinks with registry-computed model."
 ```
 
 PROD-003 was likely authored before ADR-002 was accepted and never reconciled. ADR-002 is correct and authoritative. PROD-003 needs revision to remove stored backlinks from data model and use computed backlinks via registry instead.
@@ -281,7 +281,7 @@ assessment: not_drift
 affected_artifacts: []
 evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
-  - 2026-03-05 dismissed: not drift. workflow.md is generated from workflow.toml by installer. Gap filed as ISSUE-040.
+  - "2026-03-05 dismissed: not drift. workflow.md is generated from workflow.toml by installer. Gap filed as ISSUE-040."
 ```
 
 Not a conflict — workflow.md is generated from workflow.toml as part of the installer script. workflow.toml is authoritative; workflow.md is a derived view. Minor gap: no way to regenerate workflow.md from config after post-install changes to workflow.toml. Filed as backlog issue.
@@ -690,7 +690,7 @@ affected_artifacts:
   - PROD-011
 evidence:
   - 2026-03-05 discovered during PROD spec cross-reference survey (VA-047-001)
-  - 2026-03-06 adjudicated: acknowledged gap. Backlog issue to track; no action until need is felt.
+  - "2026-03-06 adjudicated: acknowledged gap. Backlog issue to track; no action until need is felt."
 ```
 
 Real gap, but not felt yet — git is the practical reality. Catalogue as a backlog issue for future consideration if/when the need arises. No design work or ADR needed now.

@@ -68,9 +68,12 @@ class TestCardFormatters(unittest.TestCase):
   def test_format_card_list_table_aligned(self) -> None:
     """Format cards as aligned table."""
     cards = [
-      Card("T001", "First task", "backlog", Path("/k/b/T001.md"), "2026-02-01"),
-      Card("T002", "Second task", "doing", Path("/k/d/T002.md"), "2026-02-02"),
-      Card("T003", "Third task", "done", Path("/k/d/T003.md"), "2026-02-03"),
+      Card(id="T001", title="First task", lane="backlog",
+           path=Path("/k/b/T001.md"), created="2026-02-01"),
+      Card(id="T002", title="Second task", lane="doing",
+           path=Path("/k/d/T002.md"), created="2026-02-02"),
+      Card(id="T003", title="Third task", lane="done",
+           path=Path("/k/d/T003.md"), created="2026-02-03"),
     ]
 
     output = format_card_list_table(cards, format_type="table")
@@ -93,8 +96,10 @@ class TestCardFormatters(unittest.TestCase):
   def test_format_card_list_tsv(self) -> None:
     """Format cards as tab-separated values."""
     cards = [
-      Card("T001", "Task one", "backlog", Path("/k/b/T001.md"), "2026-02-01"),
-      Card("T002", "Task two", "doing", Path("/k/d/T002.md"), "2026-02-02"),
+      Card(id="T001", title="Task one", lane="backlog",
+           path=Path("/k/b/T001.md"), created="2026-02-01"),
+      Card(id="T002", title="Task two", lane="doing",
+           path=Path("/k/d/T002.md"), created="2026-02-02"),
     ]
 
     output = format_card_list_table(cards, format_type="tsv")
@@ -114,8 +119,10 @@ class TestCardFormatters(unittest.TestCase):
   def test_format_card_list_json_valid(self) -> None:
     """Format cards as valid JSON array."""
     cards = [
-      Card("T001", "Task one", "backlog", Path("/k/b/T001.md"), "2026-02-01"),
-      Card("T002", "Task two", None, Path("/other/T002.md"), None),
+      Card(id="T001", title="Task one", lane="backlog",
+           path=Path("/k/b/T001.md"), created="2026-02-01"),
+      Card(id="T002", title="Task two", lane=None,
+           path=Path("/other/T002.md"), created=None),
     ]
 
     output = format_card_list_json(cards)

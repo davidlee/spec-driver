@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from supekku.scripts.lib.backlog.registry import discover_backlog_items
 from supekku.scripts.lib.changes.audit_check import resolve_audit_gate
 from supekku.scripts.lib.changes.lifecycle import normalize_status
+from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.core.enums import get_enum_values
 from supekku.scripts.lib.core.frontmatter_metadata.audit import (
   AUDIT_MODE_CONFORMANCE,
@@ -21,6 +22,7 @@ from supekku.scripts.lib.core.spec_utils import load_markdown_file
 if TYPE_CHECKING:
   from collections.abc import Iterable
   from pathlib import Path
+  from typing import Any
 
   from .changes.artifacts import ChangeArtifact
   from .workspace import Workspace
@@ -491,13 +493,32 @@ class WorkspaceValidator:
     if fm.get("kind") != "phase":
       self._warning(artifact, "Missing or incorrect kind (expected 'phase')")
 
-    # Overview block check — new-format phases (DR-106) use frontmatter
-    # instead of phase.overview blocks; only warn for legacy phases
+    # New-format phases (DR-106): validate canonical frontmatter via Pydantic
     has_canonical_frontmatter = fm.get("plan") and fm.get("delta")
-    if not has_canonical_frontmatter:
+    if has_canonical_frontmatter:
+      self._validate_phase_frontmatter(fm, artifact)
+    else:
+      # Legacy: require overview block
       content = phase_file.read_text(encoding="utf-8")
       if "supekku:phase.overview" not in content:
         self._warning(artifact, "Missing phase.overview block")
+
+  def _validate_phase_frontmatter(
+    self,
+    fm: dict[str, Any],
+    artifact: str,
+  ) -> None:
+    """Validate canonical phase frontmatter fields via PhaseSheet model."""
+    try:
+      sheet = PhaseSheet(**fm)
+    except Exception:  # noqa: BLE001
+      self._warning(artifact, "Phase frontmatter failed Pydantic validation")
+      return
+
+    if not sheet.plan:
+      self._warning(artifact, "Phase frontmatter missing 'plan' field")
+    if not sheet.delta:
+      self._warning(artifact, "Phase frontmatter missing 'delta' field")
 
 
 def validate_workspace(

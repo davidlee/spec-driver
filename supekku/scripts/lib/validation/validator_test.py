@@ -1127,5 +1127,35 @@ class PhaseValidationTest(RepoTestCase):
     assert fm["status"] == "in-progress"
 
 
+  def test_new_format_phase_validates_via_pydantic(self) -> None:
+    """New-format phase with valid canonical fields passes validation."""
+    root = self._create_repo()
+    delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-200-test"
+    phases_dir = delta_dir / "phases"
+    phases_dir.mkdir(parents=True)
+
+    fm: dict[str, Any] = {
+      "id": "IP-200.PHASE-01",
+      "status": "draft",
+      "kind": "phase",
+      "plan": "IP-200",
+      "delta": "DE-200",
+      "objective": "Test objective",
+      "entrance_criteria": ["Prerequisite met"],
+      "exit_criteria": ["Tests passing"],
+    }
+    dump_markdown_file(phases_dir / "phase-01.md", fm, "# Phase 01\n")
+    dump_markdown_file(
+      delta_dir / "DE-200.md",
+      {"id": "DE-200", "status": "in-progress", "kind": "delta"},
+      "# DE-200\n",
+    )
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert len(phase_issues) == 0
+
+
 if __name__ == "__main__":
   unittest.main()

@@ -1044,7 +1044,18 @@ def create_phase(
     "updated": today,
     "status": STATUS_DRAFT,
     "kind": "phase",
+    # Canonical phase fields (DR-106 DEC-005)
+    "plan": plan_id,
+    "delta": delta_id,
   }
+
+  # Populate optional canonical fields from plan entry metadata
+  if phase_metadata.get("objective"):
+    phase_frontmatter["objective"] = phase_metadata["objective"]
+  if phase_metadata.get("entrance_criteria"):
+    phase_frontmatter["entrance_criteria"] = phase_metadata["entrance_criteria"]
+  if phase_metadata.get("exit_criteria"):
+    phase_frontmatter["exit_criteria"] = phase_metadata["exit_criteria"]
 
   dump_markdown_file(phase_path, phase_frontmatter, phase_body)
 

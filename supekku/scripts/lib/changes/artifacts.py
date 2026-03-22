@@ -13,6 +13,7 @@ from supekku.scripts.lib.blocks.plan import (
   extract_phase_overview,
   extract_plan_overview,
 )
+from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
 
@@ -176,16 +177,29 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
     if phases_dir.exists():
       for phase_file in sorted(phases_dir.glob("*.md")):
         try:
-          phase_block = extract_phase_overview(
-            phase_file.read_text(encoding="utf-8"),
-            source_path=phase_file,
-          )
-        except ValueError:
+          fm_data, _ = load_markdown_file(phase_file)
+        except (ValueError, OSError):
           continue
-        if not phase_block:
-          continue
-        phase_entry = phase_block.data.copy()
-        phase_entry.setdefault("phase", phase_entry.get("id"))
+
+        # Prefer frontmatter when canonical fields are present (DR-106)
+        sheet = PhaseSheet(**fm_data) if fm_data else PhaseSheet()
+        if sheet.has_canonical_fields():
+          phase_entry = sheet.to_phase_entry()
+          # Carry base frontmatter fields that downstream consumers expect
+          phase_entry.setdefault("phase", fm_data.get("id"))
+          phase_entry.setdefault("status", fm_data.get("status"))
+        else:
+          # Legacy fallback: extract from phase.overview block
+          try:
+            content = phase_file.read_text(encoding="utf-8")
+            phase_block = extract_phase_overview(content, source_path=phase_file)
+          except ValueError:
+            continue
+          if not phase_block:
+            continue
+          phase_entry = phase_block.data.copy()
+          phase_entry.setdefault("phase", phase_entry.get("id"))
+
         phases_data.append(phase_entry)
         phase_id = str(phase_entry.get("phase", ""))
         phase_lookup.pop(phase_id, None)

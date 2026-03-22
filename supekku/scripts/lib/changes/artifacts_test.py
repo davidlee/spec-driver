@@ -181,6 +181,176 @@ def test_plan_and_phase_overview_included(tmp_path: Path) -> None:
   assert artifact.plan["phases"][0].get("phase") == "IP-020.PHASE-01"
 
 
+def test_phase_loaded_from_frontmatter_when_canonical_fields_present(
+  tmp_path: Path,
+) -> None:
+  """DR-106: Phase data read from frontmatter when plan+delta present."""
+  delta_dir = tmp_path / "DE-040"
+  delta_dir.mkdir()
+  dump_markdown_file(
+    delta_dir / "DE-040.md",
+    {
+      "id": "DE-040",
+      "slug": "fm-phase",
+      "name": "Delta – FM Phase",
+      "created": "2024-01-01",
+      "updated": "2024-01-01",
+      "status": "draft",
+      "kind": "delta",
+      "relations": [],
+      "applies_to": {},
+    },
+    "# DE-040\n",
+  )
+
+  plan_body = (
+    "```yaml supekku:plan.overview@v1\n"
+    "schema: supekku.plan.overview\n"
+    "version: 1\n"
+    "plan: IP-040\n"
+    "delta: DE-040\n"
+    "phases:\n  - id: IP-040.PHASE-01\n"
+    "```\n\n# IP-040\n"
+  )
+  dump_markdown_file(
+    delta_dir / "IP-040.md",
+    {
+      "id": "IP-040",
+      "slug": "plan",
+      "name": "Plan",
+      "created": "2024-01-01",
+      "updated": "2024-01-01",
+      "status": "draft",
+      "kind": "plan",
+    },
+    plan_body,
+  )
+
+  phases_dir = delta_dir / "phases"
+  phases_dir.mkdir()
+  # New-format phase: canonical fields in frontmatter, no phase.overview block
+  dump_markdown_file(
+    phases_dir / "phase-01.md",
+    {
+      "id": "IP-040.PHASE-01",
+      "slug": "phase-01",
+      "name": "Phase 01",
+      "created": "2024-01-01",
+      "updated": "2024-01-01",
+      "status": "in-progress",
+      "kind": "phase",
+      "plan": "IP-040",
+      "delta": "DE-040",
+      "objective": "Test frontmatter-first loading",
+      "entrance_criteria": ["DR approved"],
+      "exit_criteria": ["Tests pass"],
+    },
+    "# Phase 01\n\nNo overview block here.\n",
+  )
+
+  artifact = load_change_artifact(delta_dir / "DE-040.md")
+  assert artifact
+  assert artifact.plan is not None
+  phases = artifact.plan["phases"]
+  assert len(phases) == 1
+  phase = phases[0]
+  assert phase["phase"] == "IP-040.PHASE-01"
+  assert phase["plan"] == "IP-040"
+  assert phase["delta"] == "DE-040"
+  assert phase["objective"] == "Test frontmatter-first loading"
+  assert phase["status"] == "in-progress"
+  assert phase["entrance_criteria"] == ["DR approved"]
+  assert phase["exit_criteria"] == ["Tests pass"]
+
+
+def test_phase_falls_back_to_block_when_no_canonical_frontmatter(
+  tmp_path: Path,
+) -> None:
+  """DR-106: Legacy phases without plan/delta in frontmatter use block fallback."""
+  delta_dir = tmp_path / "DE-041"
+  delta_dir.mkdir()
+  dump_markdown_file(
+    delta_dir / "DE-041.md",
+    {
+      "id": "DE-041",
+      "slug": "legacy-phase",
+      "name": "Delta – Legacy Phase",
+      "created": "2024-01-01",
+      "updated": "2024-01-01",
+      "status": "draft",
+      "kind": "delta",
+      "relations": [],
+      "applies_to": {},
+    },
+    "# DE-041\n",
+  )
+
+  plan_body = (
+    "```yaml supekku:plan.overview@v1\n"
+    "schema: supekku.plan.overview\n"
+    "version: 1\n"
+    "plan: IP-041\n"
+    "delta: DE-041\n"
+    "phases:\n  - id: IP-041.PHASE-01\n"
+    "```\n\n# IP-041\n"
+  )
+  dump_markdown_file(
+    delta_dir / "IP-041.md",
+    {
+      "id": "IP-041",
+      "slug": "plan",
+      "name": "Plan",
+      "created": "2024-01-01",
+      "updated": "2024-01-01",
+      "status": "draft",
+      "kind": "plan",
+    },
+    plan_body,
+  )
+
+  phases_dir = delta_dir / "phases"
+  phases_dir.mkdir()
+  # Legacy-format phase: no plan/delta in frontmatter, has phase.overview block
+  phase_body = (
+    "```yaml supekku:phase.overview@v1\n"
+    "schema: supekku.phase.overview\n"
+    "version: 1\n"
+    "phase: IP-041.PHASE-01\n"
+    "plan: IP-041\n"
+    "delta: DE-041\n"
+    "objective: >-\n  Legacy block objective.\n"
+    "entrance_criteria: []\n"
+    "exit_criteria: []\n"
+    "verification:\n  tests: []\n  evidence: []\n"
+    "tasks: []\n"
+    "risks: []\n"
+    "```\n\n# Phase 01\n"
+  )
+  dump_markdown_file(
+    phases_dir / "phase-01.md",
+    {
+      "id": "IP-041.PHASE-01",
+      "slug": "phase-01",
+      "name": "Phase 01",
+      "created": "2024-01-01",
+      "updated": "2024-01-01",
+      "status": "draft",
+      "kind": "phase",
+    },
+    phase_body,
+  )
+
+  artifact = load_change_artifact(delta_dir / "DE-041.md")
+  assert artifact
+  assert artifact.plan is not None
+  phases = artifact.plan["phases"]
+  assert len(phases) == 1
+  phase = phases[0]
+  assert phase["phase"] == "IP-041.PHASE-01"
+  assert phase["plan"] == "IP-041"
+  assert phase["objective"] == "Legacy block objective."
+
+
 def test_ext_id_and_ext_url_loaded_from_frontmatter(tmp_path: Path) -> None:
   """VT-067-001: ext_id and ext_url are loaded from frontmatter."""
   path = tmp_path / "DE-030.md"

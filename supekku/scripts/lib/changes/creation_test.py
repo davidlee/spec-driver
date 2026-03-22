@@ -710,6 +710,77 @@ class CreateChangeTest(unittest.TestCase):
     # Verify the injected content survived
     assert "https://example.com/users/update" in updated
 
+  def test_create_phase_frontmatter_contains_canonical_fields(self) -> None:
+    """DR-106: create_phase emits plan, delta, objective, criteria in frontmatter."""
+    root = self._make_repo()
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+    delta_id = delta_result.artifact_id
+
+    # Add phase entry with metadata to plan
+    plan_content = plan_path.read_text(encoding="utf-8")
+    replacement = dedent(f"""\
+      - id: {plan_id}.PHASE-01
+        name: Foundation Phase
+        objective: Build the foundation
+        entrance_criteria:
+        - Design approved
+        exit_criteria:
+        - Tests passing""")
+    updated_plan = plan_content.replace(f"  - id: {plan_id}-P01", replacement)
+    plan_path.write_text(updated_plan, encoding="utf-8")
+
+    result = create_phase("Foundation Phase", plan_id, repo_root=root)
+
+    # Parse frontmatter from the created phase
+    import frontmatter
+
+    post = frontmatter.load(str(result.phase_path))
+    fm = post.metadata
+
+    # Canonical fields must be in frontmatter (DR-106 DEC-005)
+    assert fm["plan"] == plan_id
+    assert fm["delta"] == delta_id
+    assert fm["objective"] == "Build the foundation"
+    assert fm["entrance_criteria"] == ["Design approved"]
+    assert fm["exit_criteria"] == ["Tests passing"]
+
+  def test_create_phase_frontmatter_omits_criteria_when_id_only(self) -> None:
+    """DR-106: ID-only plan entries emit plan/delta but no criteria."""
+    root = self._make_repo()
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+    delta_id = delta_result.artifact_id
+
+    result = create_phase("Simple Phase", plan_id, repo_root=root)
+
+    import frontmatter
+
+    post = frontmatter.load(str(result.phase_path))
+    fm = post.metadata
+
+    # plan and delta always present
+    assert fm["plan"] == plan_id
+    assert fm["delta"] == delta_id
+    # optional fields absent when plan entry has no metadata
+    assert "objective" not in fm
+    assert "entrance_criteria" not in fm
+    assert "exit_criteria" not in fm
+
   def test_create_audit(self) -> None:
     """Test creating an audit artifact with spec and prod refs."""
     root = self._make_repo()

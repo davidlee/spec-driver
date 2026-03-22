@@ -4,7 +4,7 @@ slug: "107-spike_evaluate_pydantic_for_model_layer-phase-01"
 name: Phase 01 — MemoryRecord conversion
 created: "2026-03-22"
 updated: "2026-03-22"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-107
 delta: DE-107

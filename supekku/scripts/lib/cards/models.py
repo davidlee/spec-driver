@@ -3,19 +3,21 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
 from pathlib import Path
 
+from pydantic import BaseModel, ConfigDict
 
-@dataclass
-class Card:
+
+class Card(BaseModel):
   """Card model representing a kanban card with T### ID."""
 
-  id: str
-  title: str
-  lane: str | None
-  path: Path
-  created: str | None
+  model_config = ConfigDict(extra="ignore")
+
+  id: str = ""
+  title: str = ""
+  lane: str | None = None
+  path: Path = Path()
+  created: str | None = None
 
   @classmethod
   def from_file(cls, card_path: Path) -> Card:

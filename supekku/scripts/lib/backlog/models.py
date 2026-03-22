@@ -7,9 +7,10 @@ Validation is permissive: unknown values are warned, not rejected.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+from pydantic import BaseModel, ConfigDict
 
 logger = logging.getLogger(__name__)
 
@@ -72,20 +73,21 @@ def is_valid_status(kind: str, status: str) -> bool:
   return False
 
 
-@dataclass
-class BacklogItem:
+class BacklogItem(BaseModel):
   """Backlog item model representing issues, problems, improvements, and risks."""
 
-  id: str
-  kind: str  # issue, problem, improvement, risk
-  status: str
-  title: str
-  path: Path
-  frontmatter: dict[str, Any] = field(default_factory=dict)
-  tags: list[str] = field(default_factory=list)
+  model_config = ConfigDict(extra="ignore")
+
+  id: str = ""
+  kind: str = ""  # issue, problem, improvement, risk
+  status: str = ""
+  title: str = ""
+  path: Path = Path()
+  frontmatter: dict[str, Any] = {}
+  tags: list[str] = []
   # Kind-specific optional fields
   severity: str = ""
-  categories: list[str] = field(default_factory=list)
+  categories: list[str] = []
   impact: str = ""
   likelihood: float = 0.0
   created: str = ""

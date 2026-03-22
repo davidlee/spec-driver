@@ -1,72 +1,102 @@
 # Notes for DE-106
 
-## Context Assembly Guide
+## New Agent Instructions
 
-Use this section first when reloading context for DE-106.
+### Task Card
 
-### Current Position
+**DE-106** — Phase sheet template DRY: eliminate triple-entry bookkeeping across frontmatter, blocks, and markdown.
 
-- `DE-106` is scoped for design work, not implementation.
-- The current recommended direction is:
-  - keep machine-readable phase metadata
-  - keep it once
-  - make frontmatter the long-term canonical summary surface
-  - keep markdown body for rich execution detail
-- The delta scope was intentionally widened to include completing metadata-driven frontmatter validation along the affected path, because the current weakness appears to be under-finished infrastructure rather than a reason to prefer body-embedded authoritative YAML.
-- An ADR is intended as part of this delta to record the placement rule for frontmatter vs code-fenced YAML vs markdown prose.
+Status: `in-progress`. Phase 1 complete. Phase 2 next.
 
-### Read These First
+### Required Reading (in order)
 
-- [DE-106](./DE-106.md)
-- [DR-106](./DR-106.md)
-- [IP-106](./IP-106.md)
-- [IMPR-022](../../backlog/improvements/IMPR-022-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown/IMPR-022.md)
-- [DE-004](../DE-004-phase-management-implementation/DE-004.md)
-- [DE-104](../DE-104-phase_status_lifecycle_enum_registration_frontmatter_sync_and_data_normalisation/DE-104.md)
+1. [notes.md](./notes.md) — this file
+2. [IP-106](./IP-106.md) — implementation plan with 3 phases, verification coverage
+3. [DR-106](./DR-106.md) — approved design revision (3 review passes, 14 findings integrated). **Start with §3a (field analysis) and §9 (rollout sequencing).**
+4. [Phase 01](./phases/phase-01.md) — completed phase, read §9 Decisions for Pydantic go decision
 
-### Key Code Surfaces
+### Related Documents
 
-- [phase template](/workspace/spec-driver/supekku/templates/phase.md)
-- [phase creation](/workspace/spec-driver/supekku/scripts/lib/changes/creation.py)
-- [delta/phase artifact loading](/workspace/spec-driver/supekku/scripts/lib/changes/artifacts.py)
-- [delta formatting](/workspace/spec-driver/supekku/scripts/lib/formatters/change_formatters.py)
-- [workspace validation](/workspace/spec-driver/supekku/scripts/lib/validation/validator.py)
-- [phase block parsing/validation](/workspace/spec-driver/supekku/scripts/lib/blocks/plan.py)
-- [phase/plan block metadata](/workspace/spec-driver/supekku/scripts/lib/blocks/plan_metadata.py)
-- [frontmatter validation](/workspace/spec-driver/supekku/scripts/lib/core/frontmatter_schema.py)
-- [frontmatter metadata registry](/workspace/spec-driver/supekku/scripts/lib/core/frontmatter_metadata/__init__.py)
-- [plan/phase/task frontmatter metadata](/workspace/spec-driver/supekku/scripts/lib/core/frontmatter_metadata/plan.py)
+- [DE-106](./DE-106.md) — delta scope
+- [IMPR-022](../../backlog/improvements/IMPR-022-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown/IMPR-022.md) — source backlog item
+- [DE-107](../DE-107-spike_evaluate_pydantic_for_model_layer/DE-107.md) — Pydantic spike (Phase 1 served as its feasibility test; go decision made)
+- [autobahn.md](/workspace/spec-driver/autobahn.md) — orchestration layer brief that informed field analysis
 
-### Important Findings Already Established
+### Key Files (implementation surface)
 
-- Current phase authority is split across `phase.overview`, `phase.tracking`, and markdown body.
-- Current runtime consumers mostly want compact summary data, not the full duplicated block content.
-- The repo already has richer frontmatter metadata definitions for `kind: phase`, but the normal frontmatter validation path still mostly enforces base fields.
-- This means the frontmatter path is under-enforced, not absent.
-- The practical recommendation is therefore to invest in frontmatter validation rather than treat current block-centric code as the target architecture.
+| File | Role | Phase 1 status |
+|---|---|---|
+| `supekku/scripts/lib/changes/phase_model.py` | **NEW** — PhaseSheet Pydantic model | ✅ Done |
+| `supekku/scripts/lib/changes/phase_model_test.py` | Model tests (9 tests incl. corpus) | ✅ Done |
+| `supekku/scripts/lib/changes/creation.py` | `create_phase()` — emits canonical frontmatter fields | ✅ Done |
+| `supekku/scripts/lib/changes/artifacts.py` | Phase loading — prefers frontmatter, falls back to blocks | ✅ Done |
+| `supekku/templates/phase.md` | Phase template — **needs block scaffolding removed (Phase 2)** | Pending |
+| `supekku/scripts/lib/formatters/change_formatters.py` | `_enrich_phase_data()` — **verify regex fallback after block removal (Phase 2)** | Pending |
+| `supekku/scripts/lib/validation/validator.py` | Phase validation — **remove overview-block warning for new phases (Phase 3)** | Pending |
+| `supekku/scripts/lib/core/frontmatter_schema.py` | Frontmatter validation — **wire phase-specific validation (Phase 3)** | Pending |
+| `supekku/skills/execute-phase/SKILL.md` | Skill — **audit for block references (Phase 3)** | Pending |
+| `supekku/skills/plan-phases/SKILL.md` | Skill — **audit for block references (Phase 3)** | Pending |
+| `supekku/skills/update-delta-docs/SKILL.md` | Skill — **audit for block references (Phase 3)** | Pending |
+| `supekku/skills/notes/SKILL.md` | Skill — **audit for block references (Phase 3)** | Pending |
 
-### Open Design Questions
+### Relevant Memories
 
-- Which fields belong in the canonical phase summary beyond `id`, lineage, `status`, and `objective`?
-- Should historical phases be bulk-migrated in DE-106 or supported via compatibility-first reads?
-- How far should frontmatter-validation completion go in this delta before additional work becomes a follow-on delta or backlog item?
-- Does spec reconciliation for PROD-006 land directly here, or via a revision-first step?
+- `mem.pattern.spec-driver.create-phase-convention` — phase creation ID handling
+- `mem.pattern.spec-driver.frontmatter-compaction` — FieldMetadata persistence annotations
+- `mem.concept.spec-driver.plan` — IP/phase structure and commands
 
-### Intended Deliverables
+### Relevant Doctrine
 
-- Updated DE/DR with approved design direction
-- implementation-ready plan only after the above design questions are narrowed
-- ADR defining:
-  - when metadata belongs in frontmatter
-  - when it belongs in code-fenced YAML
-  - when it should remain markdown prose
-- Explicit backlog items or follow-on deltas for any adjacent work discovered but kept out of scope
+- **ADR-004**: delta-first canonical loop; spec reconciliation after implementation
+- **ADR-009**: no speculative structure for future registries
+- **POL-001**: maximise reuse, minimise sprawl
+- **POL-002**: no magic strings
+- **STD-002**: lint compliance
 
-### Recommended Next Step
+### Key User Decisions
 
-DR-106 has passed internal and external adversarial review. All open questions resolved. Ready for approval and transition to `/plan-phases`.
+- **Pydantic go**: 37ms import, all legacy phases parse cleanly. PhaseSheet model is production-ready.
+- **Canonical field set (DEC-005)**: `plan`, `delta`, `objective`, `entrance_criteria`, `exit_criteria`. Verification, tasks, risks are markdown-only. See "Accepted Structured Data Losses" below.
+- **Contract vs progress (DEC-006)**: frontmatter = planning contract; markdown checkboxes = execution progress. Never conflate in structured data.
+- **Tracking block dropped (DEC-007)**: regex checkbox fallback handles task stats. Criteria enrichment is dead code (no display consumer).
+- **Compatibility (OQ-001)**: frontmatter wins, block fallback for legacy, never merge. No bulk migration.
+- **Spec reconciliation (OQ-003)**: PROD-006 updated within DE-106 after implementation, before closure. Bounded but semantic (not mechanical).
 
-### Accepted Structured Data Losses
+### What Phase 1 Delivered
+
+- `PhaseSheet` Pydantic model (`phase_model.py`)
+- `create_phase()` emits `plan`, `delta`, `objective`, `entrance_criteria`, `exit_criteria` in frontmatter
+- `artifacts.py` reads phase data from frontmatter first, falls back to `phase.overview` blocks
+- `show delta` works for both new-format and legacy phases
+- 13 new tests, 591 total passing, lint clean
+
+### Phase 2 Scope (next)
+
+**Template + formatter + remaining compatibility.** Per IP-106 and DR-106 §9:
+
+1. Update `supekku/templates/phase.md` — remove `{{ phase_overview_block }}` and `{{ phase_tracking_block }}` template variables. Template should emit frontmatter + markdown body only.
+2. Update `creation.py` — stop calling `render_phase_overview_block()` and `render_phase_tracking_block()`. The frontmatter population (done in Phase 1) replaces them.
+3. Verify `change_formatters.py` regex fallback works end-to-end after block removal.
+4. Verify `list_changes` reads canonical frontmatter fields.
+5. Update `validator.py` — suppress the "Missing phase.overview block" warning for new-format phases (those with `plan`+`delta` in frontmatter).
+
+### Phase 3 Scope (after Phase 2)
+
+Validation + ADR + skills + spec reconciliation + memories + backlog items.
+
+### Loose Ends / Watch Items
+
+- `create_phase()` still emits both blocks AND frontmatter (Phase 1 was additive). Phase 2 removes the block emission.
+- Phase 01's phase sheet itself has both blocks and frontmatter (written before the code change). This is fine — it's a legacy-format phase that works via the frontmatter path since we manually added canonical fields.
+- The existing `test_create_phase_copies_criteria_from_plan` test checks for block content in the phase body. It will need updating in Phase 2 when blocks are removed.
+
+### Commit State
+
+Worktree is clean. All `.spec-driver/**` changes committed. No pending commits needed.
+
+---
+
+## Accepted Structured Data Losses
 
 These fields lose structured (YAML) representation. All are intentional per DR-106 DEC-005/DEC-006/DEC-007. If orchestration or tooling later needs any of these, it gets modeled as a deliberate feature with proper schema — not recovered by reinstating the blocks.
 
@@ -79,12 +109,12 @@ These fields lose structured (YAML) representation. All are intentional per DR-1
 | Risks (summary list) | `phase.overview` | Structured risk list in YAML | No machine consumer. No gate-checking value. Delta-level risks are the structured surface. |
 | Files (references, added, modified) | `phase.tracking` | Structured file-change tracking per task | Agent working notes with no consumer. |
 
-### Design Review Summary
+## Design Review Summary
 
 - **OQ-001**: Compatibility now, opportunistic migration later
 - **OQ-002**: Canonical fields: `plan`, `delta`, `objective`, `entrance_criteria`, `exit_criteria`
 - **OQ-003**: Follow ADR-004 — spec reconciliation after implementation
-- **OQ-004**: Phase model is the Pydantic spike (DEC-008); fallback to inline validation if negative
+- **OQ-004**: Phase model is the Pydantic spike (DEC-008); go decision made
 - **Internal review**: 8 findings (R1-R8), all integrated
-- **External review**: 4 findings (E1-E4), all integrated — notably E1 (artifacts.py choke point) and E3 (spike must include creation→load round-trip)
+- **External review**: 6 findings (E1-E6), all integrated
 - **Doctrine outputs planned**: ADR (placement heuristic), 3 memories, 4 skill updates

@@ -4,24 +4,21 @@ slug: "106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_fr
 name: Phase 01 — Pydantic spike + creation/reader vertical slice
 created: "2026-03-22"
 updated: "2026-03-22"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-106
 delta: DE-106
-objective: >-
-  Define PhaseSheet Pydantic model for canonical phase frontmatter fields. Wire
-  minimal create_phase() → artifacts.py round-trip to validate the model against
-  real code paths. Go/no-go gates remaining phases.
+objective: Define PhaseSheet Pydantic model for canonical phase frontmatter fields. Wire minimal create_phase() → artifacts.py round-trip to validate the model against real code paths. Go/no-go gates remaining phases.
 entrance_criteria:
-  - "DR-106 approved"
-  - "Existing phase creation and display tests passing"
+  - DR-106 approved
+  - Existing phase creation and display tests passing
 exit_criteria:
-  - "PhaseSheet Pydantic model defined and tested (or fallback decision made)"
-  - "create_phase() emits plan/delta/objective/criteria in frontmatter"
-  - "artifacts.py reads phase data from frontmatter with block fallback"
-  - "show delta displays new-format phases correctly"
-  - "Legacy block-based phases still display without errors"
-  - "Go/no-go on Pydantic documented in DR-107/notes"
+  - PhaseSheet Pydantic model defined and tested (or fallback decision made)
+  - create_phase() emits plan/delta/objective/criteria in frontmatter
+  - artifacts.py reads phase data from frontmatter with block fallback
+  - show delta displays new-format phases correctly
+  - Legacy block-based phases still display without errors
+  - Go/no-go on Pydantic documented in DR-107/notes
 ---
 
 ```yaml supekku:phase.overview@v1

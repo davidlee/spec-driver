@@ -6,14 +6,13 @@ artifact:
   path: .spec-driver/deltas/DE-112-kind_aware_pydantic_validation_and_remaining_dataclass_cleanup
   notes_path: .spec-driver/deltas/DE-112-kind_aware_pydantic_validation_and_remaining_dataclass_cleanup/notes.md
 phase:
-  id: IP-112.PHASE-01
-  status: complete
-  path: .spec-driver/deltas/DE-112-kind_aware_pydantic_validation_and_remaining_dataclass_cleanup/phases/phase-01.md
+  id: IP-112.PHASE-02
+  status: in_progress
+  path: .spec-driver/deltas/DE-112-kind_aware_pydantic_validation_and_remaining_dataclass_cleanup/phases/phase-02.md
 workflow:
-  status: awaiting_handoff
+  status: implementing
   active_role: implementer
   handoff_boundary: phase
-  next_role: implementer
 timestamps:
   created: '2026-03-22T06:51:20+00:00'
   updated: '2026-03-22T06:54:59+00:00'

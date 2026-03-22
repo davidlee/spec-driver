@@ -1157,5 +1157,146 @@ class PhaseValidationTest(RepoTestCase):
     assert len(phase_issues) == 0
 
 
+class KindAwareValidationTest(RepoTestCase):
+  """Tests for kind-aware frontmatter validation (DE-112)."""
+
+  def _create_repo(self) -> Path:
+    root = super()._make_repo()
+    os.chdir(root)
+    return root
+
+  def test_valid_memory_no_warning(self) -> None:
+    """Well-formed memory file produces no validation warnings."""
+    root = self._create_repo()
+    mem_dir = root / SPEC_DRIVER_DIR / "memory"
+    mem_dir.mkdir(parents=True)
+    fm: dict[str, Any] = {
+      "id": "mem.test.example",
+      "name": "Test memory",
+      "status": "active",
+      "memory_type": "fact",
+      "created": "2026-03-20",
+      "updated": "2026-03-20",
+    }
+    dump_markdown_file(mem_dir / "mem.test.example.md", fm, "# Memory\n")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    mem_issues = [i for i in issues if "mem.test" in i.artifact]
+    assert len(mem_issues) == 0
+
+  def test_malformed_memory_warns(self) -> None:
+    """Memory file with wrong field type produces a warning."""
+    root = self._create_repo()
+    mem_dir = root / SPEC_DRIVER_DIR / "memory"
+    mem_dir.mkdir(parents=True)
+    fm: dict[str, Any] = {
+      "id": "mem.bad.type",
+      "name": "Bad memory",
+      "status": "active",
+      "memory_type": "fact",
+      "tags": "not-a-list",  # tags must be list[str]
+    }
+    dump_markdown_file(mem_dir / "mem.bad.type.md", fm, "# Memory\n")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    mem_issues = [
+      i for i in issues if "mem.bad.type" in i.artifact and "Memory" in i.message
+    ]
+    assert len(mem_issues) == 1
+    assert mem_issues[0].level == "warning"
+
+  def test_valid_backlog_no_warning(self) -> None:
+    """Well-formed backlog item produces no validation warnings."""
+    root = self._create_repo()
+    issues_dir = root / SPEC_DRIVER_DIR / BACKLOG_DIR / ISSUES_SUBDIR
+    issues_dir.mkdir(parents=True)
+    fm: dict[str, Any] = {
+      "id": "ISSUE-999",
+      "kind": "issue",
+      "status": "open",
+      "name": "Test issue",
+      "created": "2026-03-20",
+      "updated": "2026-03-20",
+    }
+    dump_markdown_file(issues_dir / "ISSUE-999.md", fm, "# Issue\n")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    backlog_issues = [
+      i for i in issues if "ISSUE-999" in i.artifact and "Backlog" in i.message
+    ]
+    assert len(backlog_issues) == 0
+
+  def test_malformed_backlog_warns(self) -> None:
+    """Backlog item with invalid likelihood type produces a warning."""
+    root = self._create_repo()
+    risks_dir = root / SPEC_DRIVER_DIR / BACKLOG_DIR / "risks"
+    risks_dir.mkdir(parents=True)
+    fm: dict[str, Any] = {
+      "id": "RISK-999",
+      "kind": "risk",
+      "status": "open",
+      "name": "Bad risk",
+      "likelihood": "not-a-number",
+    }
+    dump_markdown_file(risks_dir / "RISK-999.md", fm, "# Risk\n")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    backlog_issues = [
+      i for i in issues if "RISK-999" in i.artifact and "Backlog" in i.message
+    ]
+    assert len(backlog_issues) == 1
+    assert backlog_issues[0].level == "warning"
+
+  def test_valid_drift_no_warning(self) -> None:
+    """Well-formed drift ledger produces no validation warnings."""
+    root = self._create_repo()
+    drift_dir = root / SPEC_DRIVER_DIR / "drift"
+    drift_dir.mkdir(parents=True)
+    fm: dict[str, Any] = {
+      "id": "DL-999",
+      "name": "Test drift",
+      "status": "open",
+      "created": "2026-03-20",
+      "updated": "2026-03-20",
+    }
+    dump_markdown_file(drift_dir / "DL-999.md", fm, "# Drift\n")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    drift_issues = [
+      i for i in issues if "DL-999" in i.artifact and "Drift" in i.message
+    ]
+    assert len(drift_issues) == 0
+
+  def test_malformed_drift_warns(self) -> None:
+    """Drift ledger missing required 'name' field produces a warning."""
+    root = self._create_repo()
+    drift_dir = root / SPEC_DRIVER_DIR / "drift"
+    drift_dir.mkdir(parents=True)
+    # DriftLedger requires id and name (no defaults)
+    fm: dict[str, Any] = {
+      "id": "DL-BAD",
+    }
+    dump_markdown_file(drift_dir / "DL-BAD.md", fm, "# Drift\n")
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    drift_issues = [
+      i for i in issues if "DL-BAD" in i.artifact and "Drift" in i.message
+    ]
+    assert len(drift_issues) == 1
+    assert drift_issues[0].level == "warning"
+
+  def test_missing_directories_no_crash(self) -> None:
+    """Validation succeeds when memory/backlog/drift directories don't exist."""
+    root = self._create_repo()
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    kind_issues = [
+      i
+      for i in issues
+      if any(k in i.message for k in ("Memory", "Backlog", "Drift"))
+    ]
+    assert len(kind_issues) == 0
+
+
 if __name__ == "__main__":
   unittest.main()

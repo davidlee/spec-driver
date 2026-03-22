@@ -30,6 +30,9 @@ pylint-files *args:
 pylint-only *args:
   uv run pylint supekku --disable=all --extension-pkg-allow-list=pylint.extensions.mccabe --enable={{args}}
 
+ty:
+  uv run ty check
+
 # run before commits
 pre-commit: check format-markdown
 

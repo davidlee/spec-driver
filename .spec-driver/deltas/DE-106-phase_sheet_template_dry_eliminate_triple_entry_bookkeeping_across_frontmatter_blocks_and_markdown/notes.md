@@ -1,5 +1,21 @@
 # Notes for DE-106
 
+## Phase 3 Completion Summary
+
+Phase 3 delivered all exit criteria:
+
+1. **Validation wired**: PhaseSheet Pydantic model validates new-format phase frontmatter in `validator.py`
+2. **ADR-010 landed**: Default placement heuristic for structured artifact metadata (accepted)
+3. **Skills audited**: All 4 target skills already clean of block references — no updates needed
+4. **PROD-006 reconciled**: FR-001, FR-005, capabilities, data contracts, verification coverage updated
+5. **3 memories created**: `mem.pattern.phase.contract-vs-progress`, `mem.pattern.phase.canonical-fields`, `mem.pattern.phase.frontmatter-block-precedence`
+6. **2 backlog items captured**: IMPR-023 (bulk migration), IMPR-024 (kind-aware validation)
+7. **636 relevant tests passing**, lint clean
+
+All 3 phases complete. Delta ready for audit and closure.
+
+---
+
 ## Phase 2 Completion Summary
 
 Phase 2 delivered all 5 exit criteria:
@@ -22,7 +38,7 @@ Phase 2 delivered all 5 exit criteria:
 
 **DE-106** — Phase sheet template DRY: eliminate triple-entry bookkeeping across frontmatter, blocks, and markdown.
 
-Status: `in-progress`. Phases 1 and 2 complete. Phase 3 next.
+Status: `in-progress`. All 3 phases complete. Ready for audit and closure.
 
 ### Required Reading (in order)
 

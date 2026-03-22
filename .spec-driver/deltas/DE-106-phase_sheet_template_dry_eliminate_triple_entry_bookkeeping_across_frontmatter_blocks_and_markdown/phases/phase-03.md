@@ -4,7 +4,7 @@ slug: "106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_fr
 name: "Phase 03 — Validation + ADR + skills + spec reconciliation"
 created: "2026-03-22"
 updated: "2026-03-22"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-106
 delta: DE-106
@@ -44,13 +44,13 @@ Complete governance, documentation, and validation work to close DE-106. Wire ph
 
 ## 4. Exit Criteria / Done When
 
-- [ ] Phase frontmatter validated via Pydantic model
-- [ ] ADR landed (placement heuristic)
-- [ ] Skills updated (execute-phase, plan-phases, update-delta-docs, notes)
-- [ ] PROD-006 reconciled
-- [ ] Memories created (3)
-- [ ] Follow-up backlog items captured (2)
-- [ ] Lint clean, all tests passing
+- [x] Phase frontmatter validated via Pydantic model
+- [x] ADR landed (ADR-010 — placement heuristic)
+- [x] Skills audited — no block references found, already clean
+- [x] PROD-006 reconciled (FR-001, FR-005, capabilities, data contracts, verification)
+- [x] Memories created (3: contract-vs-progress, canonical-fields, frontmatter-block-precedence)
+- [x] Follow-up backlog items captured (IMPR-023, IMPR-024)
+- [x] Lint clean, 636 relevant tests passing
 
 ## 5. Verification
 
@@ -62,23 +62,26 @@ Complete governance, documentation, and validation work to close DE-106. Wire ph
 
 | Status | ID  | Description | Notes |
 | ------ | --- | ----------- | ----- |
-| [ ]    | 3.1 | Wire phase frontmatter validation | `frontmatter_schema.py` or validator |
-| [ ]    | 3.2 | Land placement heuristic ADR | DEC-004 from DR-106 |
-| [ ]    | 3.3 | Audit and update skills | 4 skills: execute-phase, plan-phases, update-delta-docs, notes |
-| [ ]    | 3.4 | Reconcile PROD-006 | Update requirements, capabilities, verification coverage |
-| [ ]    | 3.5 | Create memories | contract-vs-progress, canonical fields, frontmatter-block-precedence |
-| [ ]    | 3.6 | Create follow-up backlog items | bulk migration, broader kind-aware validation |
+| [x]    | 3.1 | Wire phase frontmatter validation | PhaseSheet Pydantic validation in validator.py; 12 tests |
+| [x]    | 3.2 | Land placement heuristic ADR | ADR-010 — accepted |
+| [x]    | 3.3 | Audit and update skills | No block references found in any skills — already clean |
+| [x]    | 3.4 | Reconcile PROD-006 | FR-001, FR-005, capabilities, data contracts, verification notes updated |
+| [x]    | 3.5 | Create memories | 3 memories: contract-vs-progress, canonical-fields, frontmatter-block-precedence |
+| [x]    | 3.6 | Create follow-up backlog items | IMPR-023 (bulk migration), IMPR-024 (kind-aware validation) |
 
 ## 9. Decisions & Outcomes
 
-_(populated during execution)_
+- `2026-03-22` — Skills already clean of block references; no updates needed (trivial satisfaction)
+- `2026-03-22` — ADR-010 scoped to placement heuristic only, not comprehensive artifact survey (per DR-106 DEC-004)
 
 ## 10. Findings / Research Notes
 
-_(populated during execution)_
+- All 4 skills (execute-phase, plan-phases, update-delta-docs, notes) had zero references to `phase.overview`, `phase.tracking`, or embedded blocks
+- `spec-driver validate` shows no new warnings from DE-106 changes; new-format phases correctly skip overview block check
+- Phase-03.md itself created block-free (verifies Phase 2 template change works end-to-end)
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated for audit/closure
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (test counts, validate output)
+- [x] Notes updated for audit/closure

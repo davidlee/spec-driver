@@ -4,7 +4,7 @@ slug: "109-review_state_machine_formalisation-phase-04"
 name: "Integration — workflow_metadata derivation, staleness refactor, end-to-end test"
 created: "2026-03-22"
 updated: "2026-03-22"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-109
 delta: DE-109

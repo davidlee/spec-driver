@@ -3,7 +3,7 @@ id: IMPR-024
 name: Kind-aware frontmatter validation for all artifact types via Pydantic models
 created: "2026-03-22"
 updated: "2026-03-22"
-status: idea
+status: subsumed
 kind: improvement
 relations:
   - type: follows_from

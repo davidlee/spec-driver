@@ -31,6 +31,7 @@ from supekku.scripts.lib.workflow.review_state_machine import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _warm_index(
   *,
   phase_id: str = "P01",
@@ -70,6 +71,7 @@ def _disposition(
 # VT-109-001: Bootstrap derivation + validity invariants
 # ---------------------------------------------------------------------------
 
+
 class BootstrapEnumTest(unittest.TestCase):
   """BootstrapStatus enum values (DR-109 §3.2)."""
 
@@ -89,9 +91,7 @@ class BootstrapDerivationTest(unittest.TestCase):
   """derive_bootstrap_status() (DR-109 §3.2)."""
 
   def test_no_index_returns_cold(self) -> None:
-    status = derive_bootstrap_status(
-      None, current_phase_id="P01", current_head="abc"
-    )
+    status = derive_bootstrap_status(None, current_phase_id="P01", current_head="abc")
     assert status == BootstrapStatus.COLD
 
   def test_current_index_returns_warm(self) -> None:
@@ -222,6 +222,7 @@ class BootstrapValidityMatrixTest(unittest.TestCase):
 # VT-109-002: Judgment transition table
 # ---------------------------------------------------------------------------
 
+
 class ReviewEnumTest(unittest.TestCase):
   """ReviewStatus enum values (DR-109 §3.3)."""
 
@@ -248,15 +249,11 @@ class JudgmentTransitionTest(unittest.TestCase):
     assert result == self._RS.APPROVED
 
   def test_in_progress_to_changes_requested(self) -> None:
-    result = apply_review_transition(
-      self._RS.IN_PROGRESS, self._RC.REQUEST_CHANGES
-    )
+    result = apply_review_transition(self._RS.IN_PROGRESS, self._RC.REQUEST_CHANGES)
     assert result == self._RS.CHANGES_REQUESTED
 
   def test_changes_requested_to_in_progress(self) -> None:
-    result = apply_review_transition(
-      self._RS.CHANGES_REQUESTED, self._RC.BEGIN_REVIEW
-    )
+    result = apply_review_transition(self._RS.CHANGES_REQUESTED, self._RC.BEGIN_REVIEW)
     assert result == self._RS.IN_PROGRESS
 
   def test_not_started_to_approved_rejected(self) -> None:
@@ -282,6 +279,7 @@ class JudgmentTransitionTest(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # VT-109-006: Status derivation from disposition action
 # ---------------------------------------------------------------------------
+
 
 class StatusDerivationTest(unittest.TestCase):
   """derive_finding_status() (DR-109 §3.4)."""
@@ -310,6 +308,7 @@ class StatusDerivationTest(unittest.TestCase):
 # VT-109-003: Approval guard + disposition constraints
 # ---------------------------------------------------------------------------
 
+
 class ApprovalGuardTest(unittest.TestCase):
   """can_approve() (DR-109 §3.3)."""
 
@@ -329,9 +328,7 @@ class ApprovalGuardTest(unittest.TestCase):
     assert allowed is True
 
   def test_fix_without_resolved_at_cannot_approve(self) -> None:
-    f = _finding(
-      disposition=_disposition(action=FindingDispositionAction.FIX)
-    )
+    f = _finding(disposition=_disposition(action=FindingDispositionAction.FIX))
     allowed, reasons = can_approve([f])
     assert allowed is False
     assert any("resolved_at" in r for r in reasons)
@@ -450,6 +447,7 @@ class ApprovalGuardTest(unittest.TestCase):
 # VT-109-007: Cross-round finding collection
 # ---------------------------------------------------------------------------
 
+
 class CrossRoundCollectionTest(unittest.TestCase):
   """collect_blocking_findings() (DR-109 §3.7)."""
 
@@ -562,6 +560,7 @@ class CrossRoundCollectionTest(unittest.TestCase):
 # ---------------------------------------------------------------------------
 # Model tests
 # ---------------------------------------------------------------------------
+
 
 class FindingDispositionModelTest(unittest.TestCase):
   """FindingDisposition Pydantic model."""

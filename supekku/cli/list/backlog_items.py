@@ -77,6 +77,7 @@ def list_drift(
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
+
 @app.command("issues")
 def list_issues(
   root: RootOption = None,
@@ -188,6 +189,7 @@ def list_issues(
     pager=pager,
     external=external,
   )
+
 
 @app.command("problems")
 def list_problems(
@@ -301,6 +303,7 @@ def list_problems(
     external=external,
   )
 
+
 @app.command("improvements")
 def list_improvements(
   root: RootOption = None,
@@ -413,6 +416,7 @@ def list_improvements(
     external=external,
   )
 
+
 @app.command("risks")
 def list_risks(
   root: RootOption = None,
@@ -524,4 +528,3 @@ def list_risks(
     pager=pager,
     external=external,
   )
-

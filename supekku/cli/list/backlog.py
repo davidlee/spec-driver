@@ -285,4 +285,3 @@ def list_backlog(
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
-

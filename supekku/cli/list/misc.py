@@ -134,6 +134,7 @@ def list_cards(
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
+
 @app.command("memories")
 def list_memories(  # noqa: PLR0913
   root: RootOption = None,
@@ -324,6 +325,7 @@ def _format_stale_memories(
   records_by_id = {r.id: r for r in records}
   return format_staleness_table(infos, records_by_id)
 
+
 @app.command("schemas")
 def list_schemas_cmd(
   schema_type: Annotated[
@@ -368,4 +370,3 @@ for plural, singular in _PLURAL_TO_SINGULAR.items():
 
 if __name__ == "__main__":  # pragma: no cover
   app()
-

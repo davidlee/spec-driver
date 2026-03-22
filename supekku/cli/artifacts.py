@@ -44,9 +44,7 @@ class ArtifactNotFoundError(Exception):
 class AmbiguousArtifactError(Exception):
   """Raised when multiple artifacts match a single-target lookup."""
 
-  def __init__(
-    self, artifact_type: str, artifact_id: str, paths: list[Path]
-  ) -> None:
+  def __init__(self, artifact_type: str, artifact_id: str, paths: list[Path]) -> None:
     self.artifact_type = artifact_type
     self.artifact_id = artifact_id
     self.paths = paths
@@ -248,8 +246,7 @@ def load_all_artifacts(root: Path, artifact_type: str) -> list[Any]:
 
     return list(RequirementsRegistry(root=root).iter())
   msg = (
-    f"Unknown artifact type for --referenced-by/--not-referenced-by:"
-    f" {artifact_type}"
+    f"Unknown artifact type for --referenced-by/--not-referenced-by: {artifact_type}"
   )
   raise typer.BadParameter(msg)
 
@@ -270,17 +267,13 @@ _ARTIFACT_RESOLVERS: dict[str, Any] = {
   "plan": _resolve_plan,
   "issue": lambda root, raw_id: _resolve_backlog(root, raw_id, "issue"),
   "problem": lambda root, raw_id: _resolve_backlog(root, raw_id, "problem"),
-  "improvement": lambda root, raw_id: _resolve_backlog(
-    root, raw_id, "improvement"
-  ),
+  "improvement": lambda root, raw_id: _resolve_backlog(root, raw_id, "improvement"),
   "risk": lambda root, raw_id: _resolve_backlog(root, raw_id, "risk"),
   "backlog": lambda root, raw_id: _resolve_backlog(root, raw_id, ""),
 }
 
 
-def resolve_artifact(
-  artifact_type: str, raw_id: str, root: Path
-) -> ArtifactRef:
+def resolve_artifact(artifact_type: str, raw_id: str, root: Path) -> ArtifactRef:
   """Resolve an artifact by type and ID, returning an ArtifactRef.
 
   Uses a dispatch table to delegate to type-specific resolvers. Each
@@ -309,9 +302,7 @@ def resolve_artifact(
 # --- ID inference ---
 
 
-def resolve_by_id(
-  raw_id: str, root: Path
-) -> list[tuple[str, ArtifactRef]]:
+def resolve_by_id(raw_id: str, root: Path) -> list[tuple[str, ArtifactRef]]:
   """Resolve artifact type from a bare ID (prefixed or numeric).
 
   Uses _build_artifact_index() from resolve.py for O(1) lookup across all
@@ -476,9 +467,7 @@ def _find_specs(root: Path, pattern: str) -> Iterator[ArtifactRef]:
       yield ArtifactRef(id=spec.id, path=spec.path, record=spec)
 
 
-def _find_changes(
-  root: Path, pattern: str, kind: str
-) -> Iterator[ArtifactRef]:
+def _find_changes(root: Path, pattern: str, kind: str) -> Iterator[ArtifactRef]:
   from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
 
   normalized = normalize_id(kind, pattern)
@@ -586,14 +575,10 @@ def _find_plans(root: Path, pattern: str) -> Iterator[ArtifactRef]:
           frontmatter, _ = load_markdown_file(plan_file)
         except Exception:  # noqa: BLE001
           continue
-        yield ArtifactRef(
-          id=plan_id, path=plan_file, record=frontmatter
-        )
+        yield ArtifactRef(id=plan_id, path=plan_file, record=frontmatter)
 
 
-def _find_backlog(
-  root: Path, pattern: str, kind: str
-) -> Iterator[ArtifactRef]:
+def _find_backlog(root: Path, pattern: str, kind: str) -> Iterator[ArtifactRef]:
   from supekku.scripts.lib.backlog.registry import BacklogRegistry  # noqa: PLC0415
 
   kind_filter = kind if kind != "all" else None

@@ -524,8 +524,13 @@ class ReviewFindingResolveTest(_FindingTestBase):
     result = self.runner.invoke(
       app,
       [
-        "review", "finding", "resolve", "DE-100", "R1-001",
-        "--resolved-at", "abc123",
+        "review",
+        "finding",
+        "resolve",
+        "DE-100",
+        "R1-001",
+        "--resolved-at",
+        "abc123",
       ],
     )
     assert result.exit_code == 0, result.output
@@ -583,8 +588,13 @@ class ReviewFindingResolveTest(_FindingTestBase):
     self.runner.invoke(
       app,
       [
-        "review", "finding", "defer", "DE-100", "R1-001",
-        "--rationale", "Later",
+        "review",
+        "finding",
+        "defer",
+        "DE-100",
+        "R1-001",
+        "--rationale",
+        "Later",
       ],
     )
     # Second disposition: resolve (overwrites)
@@ -613,8 +623,13 @@ class ReviewFindingDeferTest(_FindingTestBase):
     result = self.runner.invoke(
       app,
       [
-        "review", "finding", "defer", "DE-100", "R1-001",
-        "--rationale", "Not critical now",
+        "review",
+        "finding",
+        "defer",
+        "DE-100",
+        "R1-001",
+        "--rationale",
+        "Not critical now",
       ],
     )
     assert result.exit_code == 0, result.output
@@ -647,9 +662,15 @@ class ReviewFindingDeferTest(_FindingTestBase):
     result = self.runner.invoke(
       app,
       [
-        "review", "finding", "defer", "DE-100", "R1-001",
-        "--rationale", "Tracked in backlog",
-        "--backlog-ref", "ISSUE-042",
+        "review",
+        "finding",
+        "defer",
+        "DE-100",
+        "R1-001",
+        "--rationale",
+        "Tracked in backlog",
+        "--backlog-ref",
+        "ISSUE-042",
       ],
     )
     assert result.exit_code == 0, result.output
@@ -673,8 +694,13 @@ class ReviewFindingWaiveTest(_FindingTestBase):
     result = self.runner.invoke(
       app,
       [
-        "review", "finding", "waive", "DE-100", "R1-001",
-        "--rationale", "Acceptable risk",
+        "review",
+        "finding",
+        "waive",
+        "DE-100",
+        "R1-001",
+        "--rationale",
+        "Acceptable risk",
       ],
     )
     assert result.exit_code == 0, result.output
@@ -709,9 +735,15 @@ class ReviewFindingWaiveTest(_FindingTestBase):
     result = self.runner.invoke(
       app,
       [
-        "review", "finding", "waive", "DE-100", "R1-001",
-        "--rationale", "Acceptable",
-        "--authority", "agent",
+        "review",
+        "finding",
+        "waive",
+        "DE-100",
+        "R1-001",
+        "--rationale",
+        "Acceptable",
+        "--authority",
+        "agent",
       ],
     )
     # Command succeeds (writes disposition), but guard will catch it later
@@ -726,9 +758,15 @@ class ReviewFindingWaiveTest(_FindingTestBase):
     result = self.runner.invoke(
       app,
       [
-        "review", "finding", "waive", "DE-100", "R1-001",
-        "--rationale", "Accepted by user",
-        "--authority", "user",
+        "review",
+        "finding",
+        "waive",
+        "DE-100",
+        "R1-001",
+        "--rationale",
+        "Accepted by user",
+        "--authority",
+        "user",
       ],
     )
     assert result.exit_code == 0, result.output
@@ -755,8 +793,13 @@ class ReviewFindingSupersedeTest(_FindingTestBase):
     result = self.runner.invoke(
       app,
       [
-        "review", "finding", "supersede", "DE-100", "R1-001",
-        "--superseded-by", "R1-002",
+        "review",
+        "finding",
+        "supersede",
+        "DE-100",
+        "R1-001",
+        "--superseded-by",
+        "R1-002",
       ],
     )
     assert result.exit_code == 0, result.output
@@ -816,8 +859,13 @@ class ReviewGuardEnforcementTest(_FindingTestBase):
     self.runner.invoke(
       app,
       [
-        "review", "finding", "resolve", "DE-100", "R1-001",
-        "--resolved-at", "abc123",
+        "review",
+        "finding",
+        "resolve",
+        "DE-100",
+        "R1-001",
+        "--resolved-at",
+        "abc123",
       ],
     )
 
@@ -850,9 +898,15 @@ class ReviewGuardEnforcementTest(_FindingTestBase):
     self.runner.invoke(
       app,
       [
-        "review", "finding", "waive", "DE-100", "R1-001",
-        "--rationale", "Agent says ok",
-        "--authority", "agent",
+        "review",
+        "finding",
+        "waive",
+        "DE-100",
+        "R1-001",
+        "--rationale",
+        "Agent says ok",
+        "--authority",
+        "agent",
       ],
     )
 
@@ -872,9 +926,15 @@ class ReviewGuardEnforcementTest(_FindingTestBase):
     self.runner.invoke(
       app,
       [
-        "review", "finding", "waive", "DE-100", "R1-001",
-        "--rationale", "Accepted risk",
-        "--authority", "user",
+        "review",
+        "finding",
+        "waive",
+        "DE-100",
+        "R1-001",
+        "--rationale",
+        "Accepted risk",
+        "--authority",
+        "user",
       ],
     )
 
@@ -929,9 +989,13 @@ class ReviewSummaryTest(_FindingTestBase):
     result = self.runner.invoke(
       app,
       [
-        "review", "complete", "DE-100",
-        "--status", "changes_requested",
-        "--summary", "Needs work on error handling",
+        "review",
+        "complete",
+        "DE-100",
+        "--status",
+        "changes_requested",
+        "--summary",
+        "Needs work on error handling",
       ],
     )
     assert result.exit_code == 0, result.output
@@ -995,27 +1059,35 @@ class ReviewEndToEndTest(_ReviewTestBase):
       status="changes_requested",
       reviewer_role="reviewer",
       summary="Found a blocking issue",
-      blocking=[{
-        "id": "R1-001",
-        "title": "Security flaw",
-        "summary": "Input not sanitised",
-        "status": "open",
-      }],
-      non_blocking=[{
-        "id": "R1-002",
-        "title": "Style nit",
-        "summary": "Inconsistent naming",
-        "status": "open",
-      }],
+      blocking=[
+        {
+          "id": "R1-001",
+          "title": "Security flaw",
+          "summary": "Input not sanitised",
+          "status": "open",
+        }
+      ],
+      non_blocking=[
+        {
+          "id": "R1-002",
+          "title": "Style nit",
+          "summary": "Inconsistent naming",
+          "status": "open",
+        }
+      ],
     )
     write_findings(delta_dir, findings_data)
 
     result = self.runner.invoke(
       app,
       [
-        "review", "complete", "DE-100",
-        "--status", "changes_requested",
-        "--summary", "Blocking security issue",
+        "review",
+        "complete",
+        "DE-100",
+        "--status",
+        "changes_requested",
+        "--summary",
+        "Blocking security issue",
       ],
     )
     assert result.exit_code == 0, result.output
@@ -1054,16 +1126,19 @@ class ReviewEndToEndTest(_ReviewTestBase):
       app,
       ["review", "complete", "DE-100", "--status", "approved"],
     )
-    assert result.exit_code == 1, (
-      "Should fail: blocking finding R1-001 is still open"
-    )
+    assert result.exit_code == 1, "Should fail: blocking finding R1-001 is still open"
 
     # --- Resolve the blocking finding ---
     result = self.runner.invoke(
       app,
       [
-        "review", "finding", "resolve", "DE-100", "R1-001",
-        "--resolved-at", "b" * 8,
+        "review",
+        "finding",
+        "resolve",
+        "DE-100",
+        "R1-001",
+        "--resolved-at",
+        "b" * 8,
       ],
     )
     assert result.exit_code == 0, result.output
@@ -1115,7 +1190,8 @@ class ReviewPrimeJsonTest(_ReviewTestBase):
     _create_delta_bundle(self.root)
     self._start_phase()
     result = self.runner.invoke(
-      app, ["review", "prime", "DE-100", "--format", "json"],
+      app,
+      ["review", "prime", "DE-100", "--format", "json"],
     )
     assert result.exit_code == 0
     data = json.loads(result.output)
@@ -1138,7 +1214,8 @@ class ReviewPrimeJsonTest(_ReviewTestBase):
     delta_dir = _create_delta_bundle(self.root)
     self._start_phase()
     self.runner.invoke(
-      app, ["review", "prime", "DE-100", "--format", "json"],
+      app,
+      ["review", "prime", "DE-100", "--format", "json"],
     )
     index = yaml.safe_load(
       (delta_dir / "workflow" / "review-index.yaml").read_text(),
@@ -1150,7 +1227,8 @@ class ReviewPrimeJsonTest(_ReviewTestBase):
     _create_delta_bundle(self.root)
     # Don't start phase — no state.yaml
     result = self.runner.invoke(
-      app, ["review", "prime", "DE-100", "--format", "json"],
+      app,
+      ["review", "prime", "DE-100", "--format", "json"],
     )
     assert result.exit_code == 2
     data = json.loads(result.output)
@@ -1163,7 +1241,8 @@ class ReviewPrimeJsonTest(_ReviewTestBase):
     _create_delta_bundle(self.root)
     self._start_phase()
     result = self.runner.invoke(
-      app, ["review", "prime", "DE-100", "--format", "json"],
+      app,
+      ["review", "prime", "DE-100", "--format", "json"],
     )
     # CliRunner captures stderr separately if mix_stderr=False,
     # but by default mixes. The key check: output is valid JSON
@@ -1182,8 +1261,7 @@ class ReviewCompleteJsonTest(_ReviewTestBase):
     self._create_handoff_and_accept_as_reviewer()
     result = self.runner.invoke(
       app,
-      ["review", "complete", "DE-100", "-s", "changes_requested",
-       "--format", "json"],
+      ["review", "complete", "DE-100", "-s", "changes_requested", "--format", "json"],
     )
     assert result.exit_code == 0
     data = json.loads(result.output)
@@ -1271,7 +1349,8 @@ class ReviewTeardownJsonTest(_ReviewTestBase):
     self.runner.invoke(app, ["review", "prime", "DE-100"])
 
     result = self.runner.invoke(
-      app, ["review", "teardown", "DE-100", "--format", "json"],
+      app,
+      ["review", "teardown", "DE-100", "--format", "json"],
     )
     assert result.exit_code == 0
     data = json.loads(result.output)
@@ -1286,7 +1365,8 @@ class ReviewTeardownJsonTest(_ReviewTestBase):
     _create_delta_bundle(self.root)
     self._start_phase()
     result = self.runner.invoke(
-      app, ["review", "teardown", "DE-100", "--format", "json"],
+      app,
+      ["review", "teardown", "DE-100", "--format", "json"],
     )
     assert result.exit_code == 0
     data = json.loads(result.output)
@@ -1304,7 +1384,8 @@ class WorkflowStatusJsonTest(_ReviewTestBase):
     self.runner.invoke(app, ["review", "prime", "DE-100"])
 
     result = self.runner.invoke(
-      app, ["workflow", "status", "DE-100", "--format", "json"],
+      app,
+      ["workflow", "status", "DE-100", "--format", "json"],
     )
     assert result.exit_code == 0
     data = json.loads(result.output)
@@ -1322,7 +1403,8 @@ class WorkflowStatusJsonTest(_ReviewTestBase):
     """No workflow state → precondition error."""
     _create_delta_bundle(self.root)
     result = self.runner.invoke(
-      app, ["workflow", "status", "DE-100", "--format", "json"],
+      app,
+      ["workflow", "status", "DE-100", "--format", "json"],
     )
     assert result.exit_code == 2
     data = json.loads(result.output)
@@ -1335,7 +1417,8 @@ class WorkflowStatusJsonTest(_ReviewTestBase):
     self._start_phase()
     # Don't prime — no review state
     result = self.runner.invoke(
-      app, ["workflow", "status", "DE-100", "--format", "json"],
+      app,
+      ["workflow", "status", "DE-100", "--format", "json"],
     )
     assert result.exit_code == 0
     payload = json.loads(result.output)["data"]
@@ -1501,7 +1584,8 @@ class FindingListJsonTest(_ReviewTestBase):
     write_findings(delta_dir, findings)
 
     result = self.runner.invoke(
-      app, ["review", "finding", "list", "DE-100"],
+      app,
+      ["review", "finding", "list", "DE-100"],
     )
     assert result.exit_code == 0
     assert "R1-001" in result.output

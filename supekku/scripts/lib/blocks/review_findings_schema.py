@@ -88,8 +88,7 @@ def _finding_item() -> FieldMetadata:
         type="string",
         required=False,
         description=(
-          "Finding summary (required for open/superseded, "
-          "optional for resolved/waived)"
+          "Finding summary (required for open/superseded, optional for resolved/waived)"
         ),
       ),
       "status": FieldMetadata(

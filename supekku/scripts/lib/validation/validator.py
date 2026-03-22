@@ -171,14 +171,21 @@ class WorkspaceValidator:
     backlog_dir = get_backlog_dir(self.workspace.root)
     drift_dir = get_drift_dir(self.workspace.root)
     self._validate_kind_frontmatter(
-      MemoryRecord, "Memory", [memory_dir], glob="mem.*.md",
+      MemoryRecord,
+      "Memory",
+      [memory_dir],
+      glob="mem.*.md",
     )
     self._validate_kind_frontmatter(
-      BacklogItem, "Backlog",
+      BacklogItem,
+      "Backlog",
       [backlog_dir / d for d in ("issues", "problems", "improvements", "risks")],
     )
     self._validate_kind_frontmatter(
-      DriftLedger, "Drift", [drift_dir], glob="DL-*.md",
+      DriftLedger,
+      "Drift",
+      [drift_dir],
+      glob="DL-*.md",
     )
 
     return list(self.issues)

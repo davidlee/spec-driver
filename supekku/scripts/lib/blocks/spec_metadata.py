@@ -113,9 +113,7 @@ SPEC_RELATIONSHIPS_METADATA = BlockMetadata(
 SPEC_CAPABILITIES_METADATA = BlockMetadata(
   version=CAPABILITIES_VERSION,
   schema_id=CAPABILITIES_SCHEMA,
-  description=(
-    "Defines spec capabilities with responsibilities and success criteria"
-  ),
+  description=("Defines spec capabilities with responsibilities and success criteria"),
   fields={
     "schema": FieldMetadata(
       type="const",

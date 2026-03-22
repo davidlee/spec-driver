@@ -1126,7 +1126,6 @@ class PhaseValidationTest(RepoTestCase):
     fm, _ = load_markdown_file(phase_file)
     assert fm["status"] == "in-progress"
 
-
   def test_new_format_phase_validates_via_pydantic(self) -> None:
     """New-format phase with valid canonical fields passes validation."""
     root = self._create_repo()
@@ -1291,9 +1290,7 @@ class KindAwareValidationTest(RepoTestCase):
     ws = Workspace(root)
     issues = validate_workspace(ws)
     kind_issues = [
-      i
-      for i in issues
-      if any(k in i.message for k in ("Memory", "Backlog", "Drift"))
+      i for i in issues if any(k in i.message for k in ("Memory", "Backlog", "Drift"))
     ]
     assert len(kind_issues) == 0
 

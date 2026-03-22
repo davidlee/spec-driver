@@ -128,7 +128,7 @@ class TestNoEditorAvailable:
       mock_registry.find.return_value = mock_decision
       mock_registry_class.return_value = mock_registry
 
-      with patch("supekku.cli.common.get_editor", return_value=None):
+      with patch("supekku.cli.io.get_editor", return_value=None):
         result = runner.invoke(app, ["adr", "ADR-001"])
         assert result.exit_code == 1
         assert "editor" in result.output.lower()

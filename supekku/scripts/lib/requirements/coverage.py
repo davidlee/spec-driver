@@ -47,9 +47,7 @@ def _check_coverage_drift(
   if len(by_source) <= 1:
     return
 
-  statuses_by_source = {
-    source: set(statuses) for source, statuses in by_source.items()
-  }
+  statuses_by_source = {source: set(statuses) for source, statuses in by_source.items()}
 
   # Get unique status sets
   unique_status_sets = list({frozenset(s) for s in statuses_by_source.values()})

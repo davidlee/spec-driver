@@ -135,9 +135,7 @@ class WriteReviewIndexTest(unittest.TestCase):
       TemporaryDirectory() as tmp,
       self.assertRaises(ReviewIndexValidationError),
     ):
-      write_review_index(
-        Path(tmp), {"schema": "supekku.workflow.review-index"}
-      )
+      write_review_index(Path(tmp), {"schema": "supekku.workflow.review-index"})
 
   def test_atomic_no_temp_files(self) -> None:
     with TemporaryDirectory() as tmp:
@@ -297,9 +295,7 @@ class WriteFindingsV2Test(unittest.TestCase):
       TemporaryDirectory() as tmp,
       self.assertRaises(FindingsValidationError),
     ):
-      write_findings(
-        Path(tmp), {"schema": "supekku.workflow.review-findings"}
-      )
+      write_findings(Path(tmp), {"schema": "supekku.workflow.review-findings"})
 
   def test_atomic_no_temp_files(self) -> None:
     with TemporaryDirectory() as tmp:

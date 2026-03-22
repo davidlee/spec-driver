@@ -37,11 +37,11 @@ The `spec-driver` codebase must adhere to a strict, one-way layered architecture
     *   **Responsibility**: Entity registries, cross-artifact graph navigation, relation resolution, and in-memory artifact state management.
     *   **Constraint**: May import from `models` and `core`. Must **never** import workflow orchestration or presentation logic.
 
-4.  **Orchestration / Workflow (`spec_driver.workflow`)**
+4.  **Orchestration (`spec_driver.orchestration`)**
     *   **Responsibility**: High-level operations, state machines, transition logic, sync coordination, and multi-artifact validation passes.
     *   **Constraint**: Represents the "Public API" boundary. May import from all layers below. Must **not** import from the presentation layer.
 
-5.  **Presentation (`spec_driver.cli`, `spec_driver.tui`)**
+5.  **Presentation (`spec_driver.presentation.cli`, `spec_driver.presentation.tui`)**
     *   **Responsibility**: Argument parsing, formatting, terminal interaction, and user interface.
     *   **Constraint**: Must follow the "Skinny CLI" pattern. May import from any layer below. Must **never** contain domain logic or state transitions.
 
@@ -51,7 +51,12 @@ Without explicit boundaries, internal dependencies become cyclic and untraceable
 
 ## Scope
 
-Applies to all production Python code in the `spec-driver` repository. Existing legacy code in `supekku/` must be migrated to the `spec_driver/` package structure and aligned with these layers via DE-125.
+Applies to all production Python code in the `spec-driver` repository, including unit tests.
+
+*   **Unit Tests:** Must reside within the `spec_driver/` package alongside the code they test (e.g., `spec_driver/core/file_ops_test.py`) and are strictly bound by the identical layer constraints as their targets. For instance, a domain test may not import orchestration modules to set up its fixtures.
+*   **Integration Tests:** Must be located in a top-level `tests/integration/` directory outside the `spec_driver/` package. Because they sit outside the enforced package, they act as top-level consumers and are exempt from internal layer constraints.
+
+Existing legacy code in `supekku/` must be migrated to the `spec_driver/` package structure and aligned with these layers via DE-125.
 
 ## Verification
 

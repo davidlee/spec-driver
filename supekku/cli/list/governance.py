@@ -180,6 +180,7 @@ def list_adrs(
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 
+
 @app.command("policies")
 def list_policies(
   root: RootOption = None,
@@ -315,6 +316,7 @@ def list_policies(
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
+
 
 @app.command("standards")
 def list_standards(
@@ -452,4 +454,3 @@ def list_standards(
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
-

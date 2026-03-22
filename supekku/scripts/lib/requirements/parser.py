@@ -186,9 +186,7 @@ def _records_from_content(
       frontmatter_category = _frontmatter.get("category")
       final_category = inline_category or frontmatter_category
       tags = (
-        sorted(t.strip() for t in tags_raw.split(",") if t.strip())
-        if tags_raw
-        else []
+        sorted(t.strip() for t in tags_raw.split(",") if t.strip()) if tags_raw else []
       )
 
       yield RequirementRecord(

@@ -485,9 +485,7 @@ def _create_placeholder_record(
     primary_spec=spec_id,
     kind=kind,
     status=status,
-    introduced=str(introduced)
-    if isinstance(introduced, str) and introduced
-    else None,
+    introduced=str(introduced) if isinstance(introduced, str) and introduced else None,
     implemented_by=implemented_by,
     verified_by=verified_by,
     path=path,

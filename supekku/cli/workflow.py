@@ -327,12 +327,17 @@ def _build_status_json(
   judgment_status = "not_started"
   review_round = 0
   findings_summary = {"blocking": 0, "non_blocking": 0, "resolved": 0, "waived": 0}
-  staleness: dict = {"phase_id": phase.get("id", "unknown"), "head": "unknown", "triggers": []}
+  staleness: dict = {
+    "phase_id": phase.get("id", "unknown"),
+    "head": "unknown",
+    "triggers": [],
+  }
 
   try:
     index = read_review_index(delta_dir)
     bootstrap_status = index.get("review", {}).get(
-      "bootstrap_status", BootstrapStatus.WARM.value,
+      "bootstrap_status",
+      BootstrapStatus.WARM.value,
     )
     judgment_status = index.get("review", {}).get("judgment_status", "not_started")
 
@@ -361,7 +366,9 @@ def _build_status_json(
     for round_data in findings.get("rounds", []):
       findings_summary["blocking"] += len(round_data.get("blocking", []))
       findings_summary["non_blocking"] += len(round_data.get("non_blocking", []))
-      for finding in round_data.get("blocking", []) + round_data.get("non_blocking", []):
+      for finding in round_data.get("blocking", []) + round_data.get(
+        "non_blocking", []
+      ):
         s = finding.get("status", "open")
         if s == "resolved":
           findings_summary["resolved"] += 1
@@ -1041,15 +1048,20 @@ def review_prime_command(
   review_round = next_round_number(delta_dir)
 
   if json_mode:
-    emit_json_and_exit(cli_json_success(cmd, {
-      "delta_id": delta_id,
-      "action": action,
-      "bootstrap_status": BootstrapStatus.WARM.value,
-      "judgment_status": judgment_status.value,
-      "review_round": review_round,
-      "index_path": str(idx_path.relative_to(repo_root)),
-      "bootstrap_path": str(bp.relative_to(repo_root)),
-    }))
+    emit_json_and_exit(
+      cli_json_success(
+        cmd,
+        {
+          "delta_id": delta_id,
+          "action": action,
+          "bootstrap_status": BootstrapStatus.WARM.value,
+          "judgment_status": judgment_status.value,
+          "review_round": review_round,
+          "index_path": str(idx_path.relative_to(repo_root)),
+          "bootstrap_path": str(bp.relative_to(repo_root)),
+        },
+      )
+    )
 
   typer.echo(f"Review primed: {delta_id} ({action})")
   typer.echo(f"  index: {idx_path}")
@@ -1346,9 +1358,14 @@ def review_complete_command(
       if not allowed:
         msg = "Cannot approve: " + "; ".join(reasons)
         if json_mode:
-          emit_json_and_exit(cli_json_error(
-            cmd, EXIT_GUARD_VIOLATION, "guard_violation", msg,
-          ))
+          emit_json_and_exit(
+            cli_json_error(
+              cmd,
+              EXIT_GUARD_VIOLATION,
+              "guard_violation",
+              msg,
+            )
+          )
         typer.echo("Cannot approve: blocking findings remain:", err=True)
         for reason in reasons:
           typer.echo(f"  - {reason}", err=True)
@@ -1419,15 +1436,20 @@ def review_complete_command(
   current_round = findings_data["review"]["current_round"]
 
   if json_mode:
-    emit_json_and_exit(cli_json_success(cmd, {
-      "delta_id": delta_id,
-      "round": current_round,
-      "outcome": status,
-      "previous_state": current.value,
-      "new_state": result.new_state.value,
-      "findings_path": str(fp.relative_to(repo_root)),
-      "teardown": should_teardown,
-    }))
+    emit_json_and_exit(
+      cli_json_success(
+        cmd,
+        {
+          "delta_id": delta_id,
+          "round": current_round,
+          "outcome": status,
+          "previous_state": current.value,
+          "new_state": result.new_state.value,
+          "findings_path": str(fp.relative_to(repo_root)),
+          "teardown": should_teardown,
+        },
+      )
+    )
 
   typer.echo(
     f"Review complete: {delta_id} round {current_round} → {status} "
@@ -1466,10 +1488,15 @@ def review_teardown_command(
   removed = _do_teardown(delta_dir, delta_id, silent=json_mode)
 
   if json_mode:
-    emit_json_and_exit(cli_json_success(cmd, {
-      "delta_id": delta_id,
-      "removed": removed,
-    }))
+    emit_json_and_exit(
+      cli_json_success(
+        cmd,
+        {
+          "delta_id": delta_id,
+          "removed": removed,
+        },
+      )
+    )
 
   raise typer.Exit(EXIT_SUCCESS)
 
@@ -1565,17 +1592,21 @@ def _disposition_finding(
   new_status = updated_finding.status.value if updated_finding else "unknown"
 
   if json_mode:
-    emit_json_and_exit(cli_json_success(cmd, {
-      "delta_id": delta_id,
-      "finding_id": finding_id,
-      "action": disposition["action"],
-      "previous_status": previous_status,
-      "new_status": new_status,
-    }))
+    emit_json_and_exit(
+      cli_json_success(
+        cmd,
+        {
+          "delta_id": delta_id,
+          "finding_id": finding_id,
+          "action": disposition["action"],
+          "previous_status": previous_status,
+          "new_status": new_status,
+        },
+      )
+    )
 
   typer.echo(
-    f"Finding {finding_id}: {disposition['action']} "
-    f"(delta {delta_id})",
+    f"Finding {finding_id}: {disposition['action']} (delta {delta_id})",
   )
   raise typer.Exit(EXIT_SUCCESS)
 
@@ -1606,7 +1637,9 @@ def finding_resolve_command(
   }
   if resolved_at:
     disposition["resolved_at"] = resolved_at
-  _disposition_finding(delta, finding_id, disposition, root, json_mode=format_type == "json")
+  _disposition_finding(
+    delta, finding_id, disposition, root, json_mode=format_type == "json"
+  )
 
 
 @finding_app.command("defer")
@@ -1640,7 +1673,9 @@ def finding_defer_command(
   }
   if backlog_ref:
     disposition["backlog_ref"] = backlog_ref
-  _disposition_finding(delta, finding_id, disposition, root, json_mode=format_type == "json")
+  _disposition_finding(
+    delta, finding_id, disposition, root, json_mode=format_type == "json"
+  )
 
 
 @finding_app.command("waive")
@@ -1676,7 +1711,9 @@ def finding_waive_command(
     ),
     "rationale": rationale,
   }
-  _disposition_finding(delta, finding_id, disposition, root, json_mode=format_type == "json")
+  _disposition_finding(
+    delta, finding_id, disposition, root, json_mode=format_type == "json"
+  )
 
 
 @finding_app.command("supersede")
@@ -1704,7 +1741,9 @@ def finding_supersede_command(
     "authority": DispositionAuthority.AGENT.value,
     "superseded_by": superseded_by,
   }
-  _disposition_finding(delta, finding_id, disposition, root, json_mode=format_type == "json")
+  _disposition_finding(
+    delta, finding_id, disposition, root, json_mode=format_type == "json"
+  )
 
 
 @finding_app.command("list")
@@ -1739,10 +1778,15 @@ def finding_list_command(
   except FindingsNotFoundError as exc:
     msg = f"No findings for {delta_id}"
     if json_mode:
-      emit_json_and_exit(cli_json_success(cmd, {
-        "delta_id": delta_id,
-        "findings": [],
-      }))
+      emit_json_and_exit(
+        cli_json_success(
+          cmd,
+          {
+            "delta_id": delta_id,
+            "findings": [],
+          },
+        )
+      )
     typer.echo(msg)
     raise typer.Exit(EXIT_SUCCESS) from exc
   except FindingsVersionError as exc:
@@ -1760,20 +1804,27 @@ def finding_list_command(
       continue
     for category in ("blocking", "non_blocking"):
       for finding in round_data.get(category, []):
-        findings.append({
-          "id": finding.get("id", "?"),
-          "round": round_num,
-          "title": finding.get("title", ""),
-          "status": finding.get("status", "open"),
-          "severity": category,
-          "disposition": finding.get("disposition"),
-        })
+        findings.append(
+          {
+            "id": finding.get("id", "?"),
+            "round": round_num,
+            "title": finding.get("title", ""),
+            "status": finding.get("status", "open"),
+            "severity": category,
+            "disposition": finding.get("disposition"),
+          }
+        )
 
   if json_mode:
-    emit_json_and_exit(cli_json_success(cmd, {
-      "delta_id": delta_id,
-      "findings": findings,
-    }))
+    emit_json_and_exit(
+      cli_json_success(
+        cmd,
+        {
+          "delta_id": delta_id,
+          "findings": findings,
+        },
+      )
+    )
 
   # Human output
   if not findings:

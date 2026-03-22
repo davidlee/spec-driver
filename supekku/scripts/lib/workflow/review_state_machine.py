@@ -19,6 +19,7 @@ from pydantic import BaseModel, ConfigDict
 # Enums (DR-109 §3.2–§3.4)
 # ---------------------------------------------------------------------------
 
+
 class BootstrapStatus(StrEnum):
   """Bootstrap status values (DR-109 §3.2).
 
@@ -79,6 +80,7 @@ class ReviewTransitionCommand(StrEnum):
 # Pydantic models (DR-109 §3.4)
 # ---------------------------------------------------------------------------
 
+
 class FindingDisposition(BaseModel):
   """Structured disposition record for a review finding."""
 
@@ -113,16 +115,16 @@ class ReviewFinding(BaseModel):
 _BS = BootstrapStatus
 
 VALID_BOOTSTRAP_TRANSITIONS: set[tuple[BootstrapStatus, BootstrapStatus]] = {
-  (_BS.COLD, _BS.COLD),      # idempotent re-derivation (no index)
-  (_BS.COLD, _BS.WARM),      # prime: fresh build
-  (_BS.WARM, _BS.WARM),      # re-prime (idempotent) or no drift
-  (_BS.WARM, _BS.STALE),     # drift detected
-  (_BS.STALE, _BS.WARM),     # re-prime after staleness
-  (_BS.STALE, _BS.STALE),    # idempotent re-derivation (still stale)
+  (_BS.COLD, _BS.COLD),  # idempotent re-derivation (no index)
+  (_BS.COLD, _BS.WARM),  # prime: fresh build
+  (_BS.WARM, _BS.WARM),  # re-prime (idempotent) or no drift
+  (_BS.WARM, _BS.STALE),  # drift detected
+  (_BS.STALE, _BS.WARM),  # re-prime after staleness
+  (_BS.STALE, _BS.STALE),  # idempotent re-derivation (still stale)
   (_BS.STALE, _BS.INVALID),  # invalidation detected
-  (_BS.STALE, _BS.REUSABLE), # minor drift only
+  (_BS.STALE, _BS.REUSABLE),  # minor drift only
   (_BS.REUSABLE, _BS.WARM),  # prime: incremental update
-  (_BS.INVALID, _BS.WARM),   # prime: full rebuild
+  (_BS.INVALID, _BS.WARM),  # prime: full rebuild
   (_BS.INVALID, _BS.INVALID),  # idempotent re-derivation (still invalid)
 }
 
@@ -189,6 +191,7 @@ def derive_finding_status(
 # ---------------------------------------------------------------------------
 # Bootstrap derivation (DR-109 §3.2)
 # ---------------------------------------------------------------------------
+
 
 def derive_bootstrap_status(
   index: dict | None,
@@ -270,8 +273,7 @@ def _derive_from_index(
   # Check reusability (minor staleness only)
   severe = {"phase_boundary_crossing", "dependency_surface_expansion"}
   if not (severe & set(triggers)) and (
-    not changed_files
-    or set(changed_files).issubset(_extract_cached_files(index))
+    not changed_files or set(changed_files).issubset(_extract_cached_files(index))
   ):
     return BootstrapStatus.REUSABLE
 
@@ -289,6 +291,7 @@ def _extract_cached_files(index: dict) -> set[str]:
 # ---------------------------------------------------------------------------
 # Judgment transitions (DR-109 §3.3)
 # ---------------------------------------------------------------------------
+
 
 def apply_review_transition(
   current: ReviewStatus,
@@ -311,6 +314,7 @@ def apply_review_transition(
 # ---------------------------------------------------------------------------
 # Approval guard (DR-109 §3.3)
 # ---------------------------------------------------------------------------
+
 
 def can_approve(
   blocking_findings: list[ReviewFinding],
@@ -341,29 +345,19 @@ def _check_disposition(
   if d.action == FindingDispositionAction.FIX:
     if not d.resolved_at:
       reasons.append(
-        f"blocking finding {finding_id} marked fixed "
-        "without resolved_at sha"
+        f"blocking finding {finding_id} marked fixed without resolved_at sha"
       )
   elif d.action == FindingDispositionAction.WAIVE:
     if d.authority != DispositionAuthority.USER:
-      reasons.append(
-        f"blocking finding {finding_id} waived "
-        "without user authority"
-      )
+      reasons.append(f"blocking finding {finding_id} waived without user authority")
     if not d.rationale:
-      reasons.append(
-        f"blocking finding {finding_id} waived without rationale"
-      )
+      reasons.append(f"blocking finding {finding_id} waived without rationale")
   elif d.action == FindingDispositionAction.DEFER:
     if d.authority != DispositionAuthority.USER:
-      reasons.append(
-        f"blocking finding {finding_id} deferred "
-        "without user authority"
-      )
+      reasons.append(f"blocking finding {finding_id} deferred without user authority")
     if not d.backlog_ref:
       reasons.append(
-        f"blocking finding {finding_id} deferred "
-        "without backlog reference"
+        f"blocking finding {finding_id} deferred without backlog reference"
       )
   return reasons
 
@@ -371,6 +365,7 @@ def _check_disposition(
 # ---------------------------------------------------------------------------
 # Cross-round collection (DR-109 §3.7)
 # ---------------------------------------------------------------------------
+
 
 def collect_blocking_findings(
   rounds: list[dict],

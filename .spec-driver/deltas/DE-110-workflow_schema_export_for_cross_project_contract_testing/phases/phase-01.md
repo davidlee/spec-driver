@@ -4,7 +4,7 @@ slug: "110-workflow_schema_export_for_cross_project_contract_testing-phase-01"
 name: Wire metadata to BlockSchema and complete schema show coverage
 created: "2026-03-22"
 updated: "2026-03-22"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-110
 delta: DE-110

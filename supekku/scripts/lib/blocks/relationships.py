@@ -284,6 +284,10 @@ __all__ = [
 
 # Register schemas
 from .schema_registry import BlockSchema, register_block_schema  # noqa: E402
+from .spec_metadata import (  # noqa: E402
+  SPEC_CAPABILITIES_METADATA,
+  SPEC_RELATIONSHIPS_METADATA,
+)
 
 register_block_schema(
   "spec.relationships",
@@ -293,6 +297,7 @@ register_block_schema(
     version=RELATIONSHIPS_VERSION,
     renderer=render_spec_relationships_block,
     description="Defines spec relationships to requirements and other specs",
+    metadata=SPEC_RELATIONSHIPS_METADATA,
   ),
 )
 
@@ -304,5 +309,6 @@ register_block_schema(
     version=CAPABILITIES_VERSION,
     renderer=render_spec_capabilities_block,
     description="Defines spec capabilities with responsibilities and success criteria",
+    metadata=SPEC_CAPABILITIES_METADATA,
   ),
 )

@@ -1066,6 +1066,7 @@ __all__ = [
 
 
 # Register schema
+from .revision_metadata import REVISION_CHANGE_METADATA  # noqa: E402
 from .schema_registry import BlockSchema, register_block_schema  # noqa: E402
 
 register_block_schema(
@@ -1076,5 +1077,6 @@ register_block_schema(
     version=REVISION_BLOCK_VERSION,
     renderer=render_revision_change_block,
     description="Documents changes to specs and requirements in a revision",
+    metadata=REVISION_CHANGE_METADATA,
   ),
 )

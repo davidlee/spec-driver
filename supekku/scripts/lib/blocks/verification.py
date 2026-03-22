@@ -290,6 +290,7 @@ __all__ = [
 
 # Register schema
 from .schema_registry import BlockSchema, register_block_schema  # noqa: E402
+from .verification_metadata import VERIFICATION_COVERAGE_METADATA  # noqa: E402
 
 register_block_schema(
   "verification.coverage",
@@ -301,5 +302,6 @@ register_block_schema(
     description=(
       "Tracks verification artifacts (tests, analyses, histories) for requirements"
     ),
+    metadata=VERIFICATION_COVERAGE_METADATA,
   ),
 )

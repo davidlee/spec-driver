@@ -402,6 +402,36 @@ WORKFLOW_STATE_METADATA = BlockMetadata(
       }
     ),
   },
+  examples=[
+    {
+      "schema": STATE_SCHEMA,
+      "version": STATE_VERSION,
+      "artifact": {
+        "id": "DE-090",
+        "kind": "delta",
+        "path": ".spec-driver/deltas/DE-090-example",
+        "notes_path": ".spec-driver/deltas/DE-090-example/notes.md",
+      },
+      "plan": {
+        "id": "IP-090",
+        "path": ".spec-driver/deltas/DE-090-example/IP-090.md",
+      },
+      "phase": {
+        "id": "IP-090.PHASE-01",
+        "status": "in_progress",
+        "path": ".spec-driver/deltas/DE-090-example/phases/phase-01.md",
+      },
+      "workflow": {
+        "status": "implementing",
+        "active_role": "implementer",
+        "handoff_boundary": "phase",
+      },
+      "timestamps": {
+        "created": "2026-03-20T10:00:00+00:00",
+        "updated": "2026-03-20T12:30:00+00:00",
+      },
+    }
+  ],
 )
 
 
@@ -648,6 +678,48 @@ WORKFLOW_HANDOFF_METADATA = BlockMetadata(
       }
     ),
   },
+  examples=[
+    {
+      "schema": HANDOFF_SCHEMA,
+      "version": HANDOFF_VERSION,
+      "artifact": {"id": "DE-090", "kind": "delta"},
+      "transition": {
+        "from_role": "implementer",
+        "to_role": "reviewer",
+        "boundary": "phase",
+        "status": "pending",
+      },
+      "phase": {"id": "IP-090.PHASE-01", "status": "complete"},
+      "required_reading": [
+        ".spec-driver/deltas/DE-090-example/notes.md",
+        ".spec-driver/deltas/DE-090-example/phases/phase-01.md",
+      ],
+      "key_files": ["supekku/cli/show.py"],
+      "verification": {
+        "status": "pass",
+        "commands": ["uv run python -m pytest"],
+        "summary": "All tests pass",
+      },
+      "git": {
+        "head": "abc1234",
+        "branch": "main",
+        "worktree": {
+          "has_uncommitted_changes": False,
+          "has_staged_changes": False,
+        },
+      },
+      "open_items": [
+        {
+          "id": "OI-001",
+          "kind": "next_step",
+          "summary": "Review phase 01 output",
+          "blocking": False,
+        },
+      ],
+      "next_activity": {"kind": "review", "summary": "Review phase 01 changes"},
+      "timestamps": {"emitted_at": "2026-03-20T14:00:00+00:00"},
+    }
+  ],
 )
 
 
@@ -860,6 +932,47 @@ REVIEW_INDEX_METADATA = BlockMetadata(
       },
     ),
   },
+  examples=[
+    {
+      "schema": REVIEW_INDEX_SCHEMA,
+      "version": REVIEW_INDEX_VERSION,
+      "artifact": {"id": "DE-090", "kind": "delta"},
+      "review": {
+        "bootstrap_status": "warm",
+        "last_bootstrapped_at": "2026-03-20T14:00:00+00:00",
+        "judgment_status": "pending",
+        "source_handoff": "workflow/handoff.current.yaml",
+      },
+      "domain_map": [
+        {
+          "area": "CLI show commands",
+          "purpose": "Render artifact details to terminal",
+          "files": ["supekku/cli/show.py", "supekku/cli/schema.py"],
+        },
+      ],
+      "invariants": [
+        {
+          "id": "INV-001",
+          "summary": "show schema output must be valid JSON Schema Draft 2020-12",
+        },
+      ],
+      "risk_areas": [
+        {
+          "id": "RA-001",
+          "summary": "Hardcoded metadata lookup may miss new block types",
+          "files": ["supekku/cli/schema.py"],
+        },
+      ],
+      "review_focus": ["Schema completeness", "Example validity"],
+      "known_decisions": [
+        {"id": "DEC-110-001", "summary": "Attach metadata to BlockSchema"},
+      ],
+      "staleness": {
+        "cache_key": {"phase_id": "IP-090.PHASE-01", "head": "abc1234"},
+        "invalidation_triggers": ["New phase started", "DR revised"],
+      },
+    }
+  ],
 )
 
 
@@ -964,6 +1077,45 @@ REVIEW_FINDINGS_METADATA = BlockMetadata(
       items=_round_entry(),
     ),
   },
+  examples=[
+    {
+      "schema": REVIEW_FINDINGS_SCHEMA,
+      "version": REVIEW_FINDINGS_VERSION,
+      "artifact": {"id": "DE-090", "kind": "delta"},
+      "review": {"current_round": 1},
+      "rounds": [
+        {
+          "round": 1,
+          "status": "changes_requested",
+          "reviewer_role": "reviewer",
+          "completed_at": "2026-03-20T16:00:00+00:00",
+          "blocking": [
+            {
+              "id": "R1-001",
+              "title": "Missing error handling in schema lookup",
+              "summary": "Fallback path does not log the block type that failed.",
+              "status": "open",
+              "files": ["supekku/cli/schema.py"],
+            },
+          ],
+          "non_blocking": [
+            {
+              "id": "R1-002",
+              "title": "Typo in description field",
+              "summary": "Minor typo.",
+              "status": "resolved",
+              "disposition": {
+                "action": "fix",
+                "authority": "author",
+                "resolved_at": "def5678",
+                "timestamp": "2026-03-20T17:00:00+00:00",
+              },
+            },
+          ],
+        },
+      ],
+    }
+  ],
 )
 
 
@@ -1056,6 +1208,25 @@ WORKFLOW_SESSIONS_METADATA = BlockMetadata(
       },
     ),
   },
+  examples=[
+    {
+      "schema": SESSIONS_SCHEMA,
+      "version": SESSIONS_VERSION,
+      "artifact": {"id": "DE-090", "kind": "delta"},
+      "sessions": {
+        "implementer": {
+          "session_name": "pi-session-abc",
+          "status": "active",
+          "last_seen": "2026-03-20T14:30:00+00:00",
+        },
+        "reviewer": {
+          "session_name": None,
+          "status": "absent",
+          "last_seen": None,
+        },
+      },
+    }
+  ],
 )
 
 
@@ -1111,6 +1282,16 @@ NOTES_BRIDGE_METADATA = BlockMetadata(
       description="Relative path to review bootstrap doc",
     ),
   },
+  examples=[
+    {
+      "schema": NOTES_BRIDGE_SCHEMA,
+      "version": NOTES_BRIDGE_VERSION,
+      "artifact": "DE-090",
+      "workflow_state": "workflow/state.yaml",
+      "current_handoff": "workflow/handoff.current.yaml",
+      "review_index": "workflow/review-index.yaml",
+    }
+  ],
 )
 
 
@@ -1162,6 +1343,16 @@ PHASE_BRIDGE_METADATA = BlockMetadata(
       description="Relative path to current handoff file",
     ),
   },
+  examples=[
+    {
+      "schema": PHASE_BRIDGE_SCHEMA,
+      "version": PHASE_BRIDGE_VERSION,
+      "phase": "IP-090.PHASE-01",
+      "status": "complete",
+      "handoff_ready": True,
+      "review_required": False,
+    }
+  ],
 )
 
 
@@ -1239,6 +1430,7 @@ for _name, _marker, _ver, _desc, _meta in _WORKFLOW_SCHEMAS:
       version=_ver,
       renderer=_placeholder_renderer,
       description=_desc,
+      metadata=_meta,
     ),
   )
 

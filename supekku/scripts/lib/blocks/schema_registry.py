@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import inspect
 from collections.abc import Callable
-from dataclasses import dataclass
-from typing import Any
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+  from .metadata.schema import BlockMetadata
 
 
 @dataclass
@@ -17,6 +20,7 @@ class BlockSchema:
   version: int  # e.g., 1
   renderer: Callable[..., str]  # The rendering function
   description: str  # Human-readable description
+  metadata: BlockMetadata | None = field(default=None, repr=False)
 
   def get_parameters(self) -> dict[str, Any]:
     """Extract parameters from renderer function signature.

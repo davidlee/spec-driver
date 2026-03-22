@@ -691,7 +691,12 @@ __all__ = [
 
 
 # Register schemas
+from .plan_metadata import (  # noqa: E402
+  PHASE_OVERVIEW_METADATA,
+  PLAN_OVERVIEW_METADATA,
+)
 from .schema_registry import BlockSchema, register_block_schema  # noqa: E402
+from .tracking_metadata import PHASE_TRACKING_METADATA  # noqa: E402
 
 register_block_schema(
   "plan.overview",
@@ -701,6 +706,7 @@ register_block_schema(
     version=1,
     renderer=render_plan_overview_block,
     description="Defines implementation plan with phases, specs, and requirements",
+    metadata=PLAN_OVERVIEW_METADATA,
   ),
 )
 
@@ -712,6 +718,7 @@ register_block_schema(
     version=1,
     renderer=render_phase_overview_block,
     description="Defines a phase within a plan with objectives, criteria, and tasks",
+    metadata=PHASE_OVERVIEW_METADATA,
   ),
 )
 
@@ -725,5 +732,6 @@ register_block_schema(
     description=(
       "Tracks phase progress with structured entrance/exit criteria and tasks"
     ),
+    metadata=PHASE_TRACKING_METADATA,
   ),
 )

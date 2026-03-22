@@ -180,6 +180,7 @@ __all__ = [
 
 
 # Register schema
+from .delta_metadata import DELTA_RELATIONSHIPS_METADATA  # noqa: E402
 from .schema_registry import BlockSchema, register_block_schema  # noqa: E402
 
 register_block_schema(
@@ -192,5 +193,6 @@ register_block_schema(
     description=(
       "Tracks delta relationships to specs, requirements, phases, and revisions"
     ),
+    metadata=DELTA_RELATIONSHIPS_METADATA,
   ),
 )

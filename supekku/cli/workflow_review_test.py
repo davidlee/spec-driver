@@ -60,7 +60,12 @@ class _ReviewTestBase(unittest.TestCase):
     (self.root / ".git").mkdir()
     sd = self.root / SPEC_DRIVER_DIR
     sd.mkdir(parents=True, exist_ok=True)
-    (sd / "workflow.toml").write_text('ceremony = "pioneer"\n')
+    from supekku.scripts.lib.core.version import get_package_version
+
+    ver = get_package_version()
+    (sd / "workflow.toml").write_text(
+      f'ceremony = "pioneer"\nspec_driver_installed_version = "{ver}"\n',
+    )
     os.chdir(self.root)
 
   def tearDown(self) -> None:
@@ -165,7 +170,7 @@ class ReviewPrimeTest(_ReviewTestBase):
     data1 = yaml.safe_load(
       (delta_dir / "workflow" / "review-index.yaml").read_text(),
     )
-    assert data1["staleness"]["cache_key"]["head"] == "a" * 8
+    assert data1["staleness"]["cache_key"]["head"] == "a" * 40
 
     # Second prime with new HEAD
     with patch(
@@ -177,7 +182,7 @@ class ReviewPrimeTest(_ReviewTestBase):
     data2 = yaml.safe_load(
       (delta_dir / "workflow" / "review-index.yaml").read_text(),
     )
-    assert data2["staleness"]["cache_key"]["head"] == "b" * 8
+    assert data2["staleness"]["cache_key"]["head"] == "b" * 40
 
   @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
   def test_records_source_handoff(self, *_mocks) -> None:
@@ -1093,6 +1098,199 @@ class ReviewEndToEndTest(_ReviewTestBase):
 
     # Review-index should be torn down on approval
     assert not (delta_dir / "workflow" / "review-index.yaml").exists()
+
+
+# ---------------------------------------------------------------------------
+# JSON output tests (DE-108 P02)
+# ---------------------------------------------------------------------------
+
+import json
+
+
+class ReviewPrimeJsonTest(_ReviewTestBase):
+  """Tests for review prime --format json."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_prime_json_success(self, *_mocks) -> None:
+    _create_delta_bundle(self.root)
+    self._start_phase()
+    result = self.runner.invoke(
+      app, ["review", "prime", "DE-100", "--format", "json"],
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert data["version"] == 1
+    assert data["command"] == "review.prime"
+    assert data["status"] == "ok"
+    assert data["exit_code"] == 0
+    payload = data["data"]
+    assert payload["delta_id"] == "DE-100"
+    assert payload["action"] == "created"
+    assert payload["bootstrap_status"] == "warm"
+    assert payload["judgment_status"] == "in_progress"
+    assert payload["review_round"] == 1
+    assert "index_path" in payload
+    assert "bootstrap_path" in payload
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_prime_json_full_sha(self, *_mocks) -> None:
+    """JSON output uses full 40-char SHA (DEC-108-002)."""
+    delta_dir = _create_delta_bundle(self.root)
+    self._start_phase()
+    self.runner.invoke(
+      app, ["review", "prime", "DE-100", "--format", "json"],
+    )
+    index = yaml.safe_load(
+      (delta_dir / "workflow" / "review-index.yaml").read_text(),
+    )
+    assert index["staleness"]["cache_key"]["head"] == "a" * 40
+
+  def test_prime_json_precondition_no_state(self) -> None:
+    """No workflow state → exit 2, precondition error."""
+    _create_delta_bundle(self.root)
+    # Don't start phase — no state.yaml
+    result = self.runner.invoke(
+      app, ["review", "prime", "DE-100", "--format", "json"],
+    )
+    assert result.exit_code == 2
+    data = json.loads(result.output)
+    assert data["status"] == "error"
+    assert data["error"]["kind"] == "precondition"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_prime_json_no_stderr(self, *_mocks) -> None:
+    """JSON mode produces no stderr output."""
+    _create_delta_bundle(self.root)
+    self._start_phase()
+    result = self.runner.invoke(
+      app, ["review", "prime", "DE-100", "--format", "json"],
+    )
+    # CliRunner captures stderr separately if mix_stderr=False,
+    # but by default mixes. The key check: output is valid JSON
+    # (no interleaved text).
+    data = json.loads(result.output)
+    assert data["status"] == "ok"
+
+
+class ReviewCompleteJsonTest(_ReviewTestBase):
+  """Tests for review complete --format json."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_complete_json_changes_requested(self, *_mocks) -> None:
+    _create_delta_bundle(self.root)
+    self._start_phase()
+    self._create_handoff_and_accept_as_reviewer()
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "-s", "changes_requested",
+       "--format", "json"],
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert data["command"] == "review.complete"
+    assert data["status"] == "ok"
+    payload = data["data"]
+    assert payload["delta_id"] == "DE-100"
+    assert payload["outcome"] == "changes_requested"
+    assert payload["round"] == 1
+    assert "previous_state" in payload
+    assert "new_state" in payload
+    assert "findings_path" in payload
+    assert isinstance(payload["teardown"], bool)
+
+  def test_complete_json_precondition_no_state(self) -> None:
+    _create_delta_bundle(self.root)
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "-s", "approved", "--format", "json"],
+    )
+    assert result.exit_code == 2
+    data = json.loads(result.output)
+    assert data["error"]["kind"] == "precondition"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_complete_json_guard_violation(self, *_mocks) -> None:
+    """Approve with open blocking finding → exit 3, guard_violation."""
+    delta_dir = _create_delta_bundle(self.root)
+    self._start_phase()
+    self._create_handoff_and_accept_as_reviewer()
+
+    # Create findings with an open blocking finding
+    from supekku.scripts.lib.workflow.review_io import (
+      build_findings,
+      write_findings,
+    )
+
+    findings = build_findings(
+      artifact_id="DE-100",
+      round_number=1,
+      status="changes_requested",
+      blocking=[{"id": "R1-001", "title": "Bug", "status": "open"}],
+    )
+    write_findings(delta_dir, findings)
+
+    # First do changes_requested to get back to a state where we can try approve
+    self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "-s", "changes_requested"],
+    )
+
+    # Now start a new review cycle
+    self._create_handoff_and_accept_as_reviewer()
+
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "-s", "approved", "--format", "json"],
+    )
+    assert result.exit_code == 3
+    data = json.loads(result.output)
+    assert data["error"]["kind"] == "guard_violation"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_complete_json_invalid_status(self, *_mocks) -> None:
+    """Invalid status value → exit 2, precondition."""
+    _create_delta_bundle(self.root)
+    self._start_phase()
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "-s", "bogus", "--format", "json"],
+    )
+    assert result.exit_code == 2
+    data = json.loads(result.output)
+    assert data["error"]["kind"] == "precondition"
+
+
+class ReviewTeardownJsonTest(_ReviewTestBase):
+  """Tests for review teardown --format json."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_teardown_json_success(self, *_mocks) -> None:
+    _create_delta_bundle(self.root)
+    self._start_phase()
+    # Prime first to create review files
+    self.runner.invoke(app, ["review", "prime", "DE-100"])
+
+    result = self.runner.invoke(
+      app, ["review", "teardown", "DE-100", "--format", "json"],
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert data["command"] == "review.teardown"
+    assert data["status"] == "ok"
+    payload = data["data"]
+    assert payload["delta_id"] == "DE-100"
+    assert isinstance(payload["removed"], list)
+    assert len(payload["removed"]) > 0
+
+  def test_teardown_json_nothing_to_delete(self) -> None:
+    _create_delta_bundle(self.root)
+    self._start_phase()
+    result = self.runner.invoke(
+      app, ["review", "teardown", "DE-100", "--format", "json"],
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert data["data"]["removed"] == []
 
 
 if __name__ == "__main__":

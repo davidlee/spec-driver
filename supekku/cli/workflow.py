@@ -21,7 +21,16 @@ from typing import Annotated
 
 import typer
 
-from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
+from supekku.cli.common import (
+  EXIT_FAILURE,
+  EXIT_GUARD_VIOLATION,
+  EXIT_PRECONDITION,
+  EXIT_SUCCESS,
+  RootOption,
+  cli_json_error,
+  cli_json_success,
+  emit_json_and_exit,
+)
 from supekku.scripts.lib.core.repo import find_repo_root
 
 # ---------------------------------------------------------------------------
@@ -731,6 +740,10 @@ review_app = typer.Typer(help="Review lifecycle commands", no_args_is_help=True)
 @review_app.command("prime")
 def review_prime_command(
   delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  format_type: Annotated[
+    str,
+    typer.Option("--format", help="Output format: table or json"),
+  ] = "table",
   root: RootOption = None,
 ) -> None:
   """Generate review-index.yaml + review-bootstrap.md from current state.
@@ -764,6 +777,9 @@ def review_prime_command(
     read_state,
   )
 
+  json_mode = format_type == "json"
+  cmd = "review.prime"
+
   repo_root = find_repo_root(root)
   delta_dir = _resolve_delta_dir(delta, repo_root)
   delta_id = delta.upper()
@@ -772,14 +788,21 @@ def review_prime_command(
   try:
     state_data = read_state(delta_dir)
   except StateNotFoundError as exc:
-    typer.echo(f"No workflow state for {delta_id}", err=True)
+    msg = f"No workflow state for {delta_id}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
   except StateValidationError as exc:
-    typer.echo(f"Invalid workflow state: {exc}", err=True)
+    msg = f"Invalid workflow state: {exc}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
 
   phase_id = state_data.get("phase", {}).get("id", "unknown")
   head_sha = get_head_sha(repo_root)
+  full_head = head_sha or "unknown"
   git_head = short_sha(head_sha) if head_sha else "unknown"
 
   config = _load_workflow_config(repo_root)
@@ -809,7 +832,7 @@ def review_prime_command(
       )
       .get("head", "")
     )
-    if cached_head and cached_head != git_head:
+    if cached_head and cached_head != full_head:
       changed_files = get_changed_files(cached_head, "HEAD", repo_root)
 
     # Check for deleted domain_map files
@@ -819,16 +842,17 @@ def review_prime_command(
     )
     if deleted:
       cache_status = BootstrapStatus.INVALID
-      typer.echo(f"  invalidated: {len(deleted)} domain_map files deleted")
+      if not json_mode:
+        typer.echo(f"  invalidated: {len(deleted)} domain_map files deleted")
     else:
       result = evaluate_staleness(
         existing_index,
         current_phase_id=phase_id,
-        current_head=git_head,
+        current_head=full_head,
         changed_files=changed_files,
       )
       cache_status = result.status
-      if result.triggers:
+      if result.triggers and not json_mode:
         typer.echo(f"  staleness triggers: {', '.join(result.triggers)}")
 
   # Build domain_map from delta bundle context
@@ -869,7 +893,7 @@ def review_prime_command(
     bootstrap_status=BootstrapStatus.WARM.value,
     judgment_status=judgment_status.value,
     phase_id=phase_id,
-    git_head=git_head,
+    git_head=full_head,
     domain_map=domain_map,
     session_scope=session_scope,
     source_handoff=source_handoff,
@@ -883,7 +907,10 @@ def review_prime_command(
   try:
     idx_path = write_review_index(delta_dir, index_data)
   except ReviewIndexValidationError as exc:
-    typer.echo(f"Review index validation failed: {exc}", err=True)
+    msg = f"Review index validation failed: {exc}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "validation", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
 
   # Generate bootstrap markdown
@@ -900,23 +927,51 @@ def review_prime_command(
   bp.parent.mkdir(parents=True, exist_ok=True)
   bp.write_text(bootstrap_md, encoding="utf-8")
 
-  action = (
-    "rebuilt"
-    if cache_status
-    in (
-      BootstrapStatus.COLD,
-      BootstrapStatus.INVALID,
-      BootstrapStatus.STALE,
-    )
-    else "updated"
-    if cache_status == BootstrapStatus.REUSABLE
-    else "created"
+  # Determine action (DEC-108-006)
+  action = _prime_action(cache_status)
+
+  # Determine review round
+  from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
+    next_round_number,
   )
+
+  review_round = next_round_number(delta_dir)
+
+  if json_mode:
+    emit_json_and_exit(cli_json_success(cmd, {
+      "delta_id": delta_id,
+      "action": action,
+      "bootstrap_status": BootstrapStatus.WARM.value,
+      "judgment_status": judgment_status.value,
+      "review_round": review_round,
+      "index_path": str(idx_path.relative_to(repo_root)),
+      "bootstrap_path": str(bp.relative_to(repo_root)),
+    }))
 
   typer.echo(f"Review primed: {delta_id} ({action})")
   typer.echo(f"  index: {idx_path}")
   typer.echo(f"  bootstrap: {bp}")
   raise typer.Exit(EXIT_SUCCESS)
+
+
+def _prime_action(cache_status: str) -> str:
+  """Map bootstrap cache status to a prime action label (DEC-108-006).
+
+  - created: first-ever prime (cold, no prior review-index)
+  - rebuilt: re-prime after teardown/invalid/stale
+  - refreshed: reusable cache with incremental update
+  """
+  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
+    BootstrapStatus,
+  )
+
+  if cache_status == BootstrapStatus.COLD:
+    return "created"
+  if cache_status in (BootstrapStatus.INVALID, BootstrapStatus.STALE):
+    return "rebuilt"
+  if cache_status == BootstrapStatus.REUSABLE:
+    return "refreshed"
+  return "created"
 
 
 def _build_domain_map(
@@ -1094,6 +1149,10 @@ def review_complete_command(
     str | None,
     typer.Option("--summary", help="Round summary"),
   ] = None,
+  format_type: Annotated[
+    str,
+    typer.Option("--format", help="Output format: table or json"),
+  ] = "table",
   root: RootOption = None,
 ) -> None:
   """Complete a review round, writing findings and transitioning state."""
@@ -1128,11 +1187,14 @@ def review_complete_command(
     apply_transition,
   )
 
+  json_mode = format_type == "json"
+  cmd = "review.complete"
+
   if status not in ("changes_requested", "approved"):
-    typer.echo(
-      f"Invalid status: {status} (must be 'changes_requested' or 'approved')",
-      err=True,
-    )
+    msg = f"Invalid status: {status} (must be 'changes_requested' or 'approved')"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE)
 
   repo_root = find_repo_root(root)
@@ -1143,10 +1205,16 @@ def review_complete_command(
   try:
     state_data = read_state(delta_dir)
   except StateNotFoundError as exc:
-    typer.echo(f"No workflow state for {delta_id}", err=True)
+    msg = f"No workflow state for {delta_id}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
   except StateValidationError as exc:
-    typer.echo(f"Invalid workflow state: {exc}", err=True)
+    msg = f"Invalid workflow state: {exc}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
 
   # Validate workflow transition
@@ -1160,7 +1228,10 @@ def review_complete_command(
   try:
     result = apply_transition(current, command)
   except TransitionError as exc:
-    typer.echo(f"Cannot complete review: {exc}", err=True)
+    msg = f"Cannot complete review: {exc}"
+    if json_mode:
+      emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+    typer.echo(msg, err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
 
   # Approval guard: check blocking findings (DR-109 §4.3)
@@ -1170,6 +1241,11 @@ def review_complete_command(
       blocking = collect_blocking_findings(existing_findings.get("rounds", []))
       allowed, reasons = can_approve(blocking)
       if not allowed:
+        msg = "Cannot approve: " + "; ".join(reasons)
+        if json_mode:
+          emit_json_and_exit(cli_json_error(
+            cmd, EXIT_GUARD_VIOLATION, "guard_violation", msg,
+          ))
         typer.echo("Cannot approve: blocking findings remain:", err=True)
         for reason in reasons:
           typer.echo(f"  - {reason}", err=True)
@@ -1177,7 +1253,10 @@ def review_complete_command(
     except FindingsNotFoundError:
       pass  # No findings = no blocking findings = guard passes
     except FindingsVersionError as exc:
-      typer.echo(str(exc), err=True)
+      msg = str(exc)
+      if json_mode:
+        emit_json_and_exit(cli_json_error(cmd, EXIT_PRECONDITION, "precondition", msg))
+      typer.echo(msg, err=True)
       raise typer.Exit(EXIT_FAILURE) from exc
 
   # Build or append round (v2 accumulative model, DR-109 §3.5)
@@ -1235,6 +1314,18 @@ def review_complete_command(
     raise typer.Exit(EXIT_FAILURE) from exc
 
   current_round = findings_data["review"]["current_round"]
+
+  if json_mode:
+    emit_json_and_exit(cli_json_success(cmd, {
+      "delta_id": delta_id,
+      "round": current_round,
+      "outcome": status,
+      "previous_state": current.value,
+      "new_state": result.new_state.value,
+      "findings_path": str(fp.relative_to(repo_root)),
+      "teardown": should_teardown,
+    }))
+
   typer.echo(
     f"Review complete: {delta_id} round {current_round} → {status} "
     f"({current.value} → {result.new_state.value})",
@@ -1255,14 +1346,28 @@ def review_complete_command(
 @review_app.command("teardown")
 def review_teardown_command(
   delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  format_type: Annotated[
+    str,
+    typer.Option("--format", help="Output format: table or json"),
+  ] = "table",
   root: RootOption = None,
 ) -> None:
   """Delete reviewer state files (review-index, findings, bootstrap)."""
+  json_mode = format_type == "json"
+  cmd = "review.teardown"
+
   repo_root = find_repo_root(root)
   delta_dir = _resolve_delta_dir(delta, repo_root)
   delta_id = delta.upper()
 
-  _do_teardown(delta_dir, delta_id)
+  removed = _do_teardown(delta_dir, delta_id, silent=json_mode)
+
+  if json_mode:
+    emit_json_and_exit(cli_json_success(cmd, {
+      "delta_id": delta_id,
+      "removed": removed,
+    }))
+
   raise typer.Exit(EXIT_SUCCESS)
 
 
@@ -1659,8 +1764,13 @@ def phase_complete_command(
 # ---------------------------------------------------------------------------
 
 
-def _do_teardown(delta_dir: Path, delta_id: str) -> None:
-  """Delete reviewer state files."""
+def _do_teardown(
+  delta_dir: Path,
+  delta_id: str,
+  *,
+  silent: bool = False,
+) -> list[str]:
+  """Delete reviewer state files. Returns list of deleted file names."""
   from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
     bootstrap_path,
     findings_path,
@@ -1678,7 +1788,10 @@ def _do_teardown(delta_dir: Path, delta_id: str) -> None:
       p.unlink()
       deleted.append(name)
 
-  if deleted:
-    typer.echo(f"Teardown: {delta_id} — deleted {', '.join(deleted)}")
-  else:
-    typer.echo(f"Teardown: {delta_id} — no reviewer state to delete")
+  if not silent:
+    if deleted:
+      typer.echo(f"Teardown: {delta_id} — deleted {', '.join(deleted)}")
+    else:
+      typer.echo(f"Teardown: {delta_id} — no reviewer state to delete")
+
+  return deleted

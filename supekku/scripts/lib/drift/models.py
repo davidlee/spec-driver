@@ -9,9 +9,10 @@ Lifecycle constants use permissive validation with warnings (DEC-057-08 pattern)
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+from pydantic import BaseModel, ConfigDict
 
 logger = logging.getLogger(__name__)
 
@@ -93,8 +94,7 @@ def is_valid_ledger_status(status: str) -> bool:
 # -- Typed substructures (DEC-065-06) --
 
 
-@dataclass(frozen=True)
-class Source:
+class Source(BaseModel, frozen=True):
   """Where drift appears — an artifact reference with optional context."""
 
   kind: str  # spec, prod, adr, policy, doc, impl, contract, ...
@@ -102,8 +102,7 @@ class Source:
   note: str = ""
 
 
-@dataclass(frozen=True)
-class Claim:
+class Claim(BaseModel, frozen=True):
   """What is conflicting or unclear — an assertion, observation, gap, or question."""
 
   kind: str  # assertion, observation, gap, question
@@ -111,8 +110,7 @@ class Claim:
   label: str = ""  # optional: expected, observed, A, B, freeform
 
 
-@dataclass(frozen=True)
-class DiscoveredBy:
+class DiscoveredBy(BaseModel, frozen=True):
   """Discovery origin for a drift entry."""
 
   kind: str  # audit, survey, agent, human
@@ -122,14 +120,15 @@ class DiscoveredBy:
 # -- Entry and Ledger models --
 
 
-@dataclass
-class DriftEntry:
+class DriftEntry(BaseModel):
   """A single drift entry within a ledger.
 
   Fields follow IMPR-007 D1–D14 with typed substructures (DEC-065-06).
   Progressive strictness: only id, title, status, and entry_type are
   expected at minimum. All other fields default to empty.
   """
+
+  model_config = ConfigDict(extra="ignore")
 
   id: str  # "DL-047.001"
   title: str  # from heading after ID
@@ -138,33 +137,34 @@ class DriftEntry:
   severity: str = ""  # blocking, significant, cosmetic
   topic: str = ""  # lifecycle, taxonomy, contracts, ...
   owner: str = ""
-  sources: list[Source] = field(default_factory=list)
-  claims: list[Claim] = field(default_factory=list)
+  sources: list[Source] = []
+  claims: list[Claim] = []
   assessment: str = ""  # confirmed, disputed, not_drift, deferred
   resolution_path: str = ""  # ADR, RE, DE, editorial, no_change, backlog
   resolution_ref: str = ""  # ADR-008, DE-050, etc.
-  affected_artifacts: list[str] = field(default_factory=list)
+  affected_artifacts: list[str] = []
   discovered_by: DiscoveredBy | None = None
   analysis: str = ""  # freeform markdown outside YAML fence
-  evidence: list[str] = field(default_factory=list)
-  extra: dict[str, Any] = field(default_factory=dict)
+  evidence: list[str] = []
+  extra: dict[str, Any] = {}
 
 
-@dataclass
-class DriftLedger:
+class DriftLedger(BaseModel):
   """A drift ledger — one file per scope of work.
 
   Contains frontmatter metadata plus parsed entries.
   See IMPR-007 D1 (ledger-as-file) and DEC-065-08 (body preserved).
   """
 
+  model_config = ConfigDict(extra="ignore")
+
   id: str  # "DL-047"
   name: str
   status: str = "open"
-  path: Path = field(default_factory=Path)
+  path: Path = Path()
   created: str = ""
   updated: str = ""
   delta_ref: str = ""  # owning delta, if any
   body: str = ""  # freeform content before entries
-  frontmatter: dict[str, Any] = field(default_factory=dict)
-  entries: list[DriftEntry] = field(default_factory=list)
+  frontmatter: dict[str, Any] = {}
+  entries: list[DriftEntry] = []

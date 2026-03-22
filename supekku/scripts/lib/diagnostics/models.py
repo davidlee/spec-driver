@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Literal
+
+from pydantic import BaseModel
 
 Status = Literal["pass", "warn", "fail"]
 
@@ -20,8 +21,7 @@ def worst_status(statuses: list[Status]) -> Status:
   return max(statuses, key=lambda s: _SEVERITY_ORDER[s])
 
 
-@dataclass(frozen=True)
-class DiagnosticResult:
+class DiagnosticResult(BaseModel, frozen=True):
   """Single diagnostic finding within a category."""
 
   category: str
@@ -31,8 +31,7 @@ class DiagnosticResult:
   suggestion: str | None = None
 
 
-@dataclass(frozen=True)
-class CategorySummary:
+class CategorySummary(BaseModel, frozen=True):
   """Aggregated results for one check category."""
 
   category: str

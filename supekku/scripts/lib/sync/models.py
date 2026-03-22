@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal
+from pathlib import Path
+from typing import Any, Literal
 
-if TYPE_CHECKING:
-  from pathlib import Path
+from pydantic import BaseModel, ConfigDict
 
 
-@dataclass(frozen=True)
-class SourceUnit:
+class SourceUnit(BaseModel, frozen=True):
   """Canonical identifier for a language-specific source unit.
 
   Examples:
@@ -25,8 +23,7 @@ class SourceUnit:
   root: Path  # on-disk directory containing the source
 
 
-@dataclass(frozen=True)
-class DocVariant:
+class DocVariant(BaseModel, frozen=True):
   """Named documentation artifact produced per source unit.
 
   After generation, ``path`` MUST match the output path provided
@@ -48,8 +45,7 @@ class DocVariant:
   status: Literal["created", "changed", "unchanged"]
 
 
-@dataclass(frozen=True)
-class SourceDescriptor:
+class SourceDescriptor(BaseModel, frozen=True):
   """Metadata describing how a source unit should be processed."""
 
   slug_parts: list[str]  # parts for generating spec slug
@@ -57,12 +53,13 @@ class SourceDescriptor:
   variants: list[DocVariant]  # documentation variants produced
 
 
-@dataclass
-class SyncOutcome:
+class SyncOutcome(BaseModel):
   """Results from a specification synchronization operation."""
 
-  processed_units: list[SourceUnit] = field(default_factory=list)
-  created_specs: dict[str, str] = field(default_factory=dict)  # unit_key -> spec_id
-  skipped_units: list[str] = field(default_factory=list)  # reasons for skipping
-  warnings: list[str] = field(default_factory=list)
-  errors: list[str] = field(default_factory=list)
+  model_config = ConfigDict(extra="ignore")
+
+  processed_units: list[SourceUnit] = []
+  created_specs: dict[str, str] = {}  # unit_key -> spec_id
+  skipped_units: list[str] = []  # reasons for skipping
+  warnings: list[str] = []
+  errors: list[str] = []

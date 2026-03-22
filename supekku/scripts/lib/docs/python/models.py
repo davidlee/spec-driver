@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from pathlib import Path
 
-if TYPE_CHECKING:
-  from pathlib import Path
+from pydantic import BaseModel, ConfigDict
 
 
 class VariantType(Enum):
@@ -18,9 +16,10 @@ class VariantType(Enum):
   TESTS = "tests"
 
 
-@dataclass
-class VariantSpec:
+class VariantSpec(BaseModel):
   """Specification for a documentation variant."""
+
+  model_config = ConfigDict(extra="ignore")
 
   variant_type: VariantType
   include_private: bool = False
@@ -29,22 +28,27 @@ class VariantSpec:
   @classmethod
   def public(cls) -> VariantSpec:
     """Create PUBLIC variant spec."""
-    return cls(VariantType.PUBLIC, include_private=False, include_tests=False)
+    return cls(
+      variant_type=VariantType.PUBLIC,
+      include_private=False,
+      include_tests=False,
+    )
 
   @classmethod
   def all_symbols(cls) -> VariantSpec:
     """Create ALL variant spec."""
-    return cls(VariantType.ALL, include_private=True, include_tests=False)
+    return cls(variant_type=VariantType.ALL, include_private=True, include_tests=False)
 
   @classmethod
   def tests(cls) -> VariantSpec:
     """Create TESTS variant spec."""
-    return cls(VariantType.TESTS, include_private=True, include_tests=True)
+    return cls(variant_type=VariantType.TESTS, include_private=True, include_tests=True)
 
 
-@dataclass
-class DocResult:
+class DocResult(BaseModel):
   """Result of documentation generation for a single file/variant combination."""
+
+  model_config = ConfigDict(extra="ignore")
 
   variant: str
   path: Path

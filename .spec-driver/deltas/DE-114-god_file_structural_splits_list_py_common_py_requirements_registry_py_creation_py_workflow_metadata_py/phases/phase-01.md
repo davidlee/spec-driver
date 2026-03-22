@@ -29,13 +29,13 @@ Split `cli/common.py` (1,124 lines) into 4 files and `cli/list.py` (3,195 lines)
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `cli/common.py` ≤350 lines, re-exports all public symbols
-- [ ] `cli/artifacts.py`, `cli/ids.py`, `cli/io.py` exist with correct content
-- [ ] `cli/list/` package exists with 10 files, all ≤540 lines
-- [ ] `from supekku.cli.list import app` still works (backward compat)
-- [ ] `ruff check supekku` — zero new errors in changed files
-- [ ] `pytest supekku` — all tests pass (excluding pre-existing DE-123 failures)
-- [ ] `grep` confirms no stale imports of moved symbols
+- [x] `cli/common.py` ≤350 lines, re-exports all public symbols
+- [x] `cli/artifacts.py`, `cli/ids.py`, `cli/io.py` exist with correct content
+- [x] `cli/list/` package exists with 10 files, all ≤540 lines
+- [x] `from supekku.cli.list import app` still works (backward compat)
+- [x] `ruff check supekku` — zero new errors in changed files
+- [x] `pytest supekku` — all tests pass (excluding pre-existing DE-123 failures)
+- [x] `grep` confirms no stale imports of moved symbols
 
 ## 5. Verification
 
@@ -54,23 +54,23 @@ Split `cli/common.py` (1,124 lines) into 4 files and `cli/list.py` (3,195 lines)
 
 | Status | ID | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 1.1 | Split `common.py` → `artifacts.py` | | Largest extraction (~550 lines) |
-| [ ] | 1.2 | Split `common.py` → `ids.py` | [P] | ~70 lines |
-| [ ] | 1.3 | Split `common.py` → `io.py` | [P] | ~150 lines |
-| [ ] | 1.4 | Add re-exports to slim `common.py` | | Depends on 1.1–1.3 |
-| [ ] | 1.5 | Lint + test after common.py split | | Gate before list.py |
-| [ ] | 1.6 | Convert `list.py` → `list/__init__.py` | | Create package, define `app` |
-| [ ] | 1.7 | Extract `list/specs.py` | [P] | ~340 lines |
-| [ ] | 1.8 | Extract `list/deltas.py` | [P] | ~340 lines |
-| [ ] | 1.9 | Extract `list/changes.py` | [P] | changes + plans, ~350 lines |
-| [ ] | 1.10 | Extract `list/reviews.py` | [P] | revisions + audits, ~320 lines |
-| [ ] | 1.11 | Extract `list/governance.py` | [P] | adrs + policies + standards, ~430 lines |
-| [ ] | 1.12 | Extract `list/requirements.py` | [P] | ~310 lines |
-| [ ] | 1.13 | Extract `list/backlog.py` | [P] | ~270 lines |
-| [ ] | 1.14 | Extract `list/backlog_items.py` | [P] | drift + 4 item types, ~540 lines |
-| [ ] | 1.15 | Extract `list/misc.py` | [P] | cards + memories + schemas, ~340 lines |
-| [ ] | 1.16 | Wire `list/__init__.py` imports | | Import all sub-modules to register commands |
-| [ ] | 1.17 | Lint + test after list.py split | | Final gate |
+| [x] | 1.1 | Split `common.py` → `artifacts.py` | | Largest extraction (~550 lines) |
+| [x] | 1.2 | Split `common.py` → `ids.py` | [P] | ~70 lines |
+| [x] | 1.3 | Split `common.py` → `io.py` | [P] | ~150 lines |
+| [x] | 1.4 | Add re-exports to slim `common.py` | | Depends on 1.1–1.3 |
+| [x] | 1.5 | Lint + test after common.py split | | Gate before list.py |
+| [x] | 1.6 | Convert `list.py` → `list/__init__.py` | | Create package, define `app` |
+| [x] | 1.7 | Extract `list/specs.py` | [P] | ~340 lines |
+| [x] | 1.8 | Extract `list/deltas.py` | [P] | ~340 lines |
+| [x] | 1.9 | Extract `list/changes.py` | [P] | changes + plans, ~350 lines |
+| [x] | 1.10 | Extract `list/reviews.py` | [P] | revisions + audits, ~320 lines |
+| [x] | 1.11 | Extract `list/governance.py` | [P] | adrs + policies + standards, ~430 lines |
+| [x] | 1.12 | Extract `list/requirements.py` | [P] | ~310 lines |
+| [x] | 1.13 | Extract `list/backlog.py` | [P] | ~270 lines |
+| [x] | 1.14 | Extract `list/backlog_items.py` | [P] | drift + 4 item types, ~540 lines |
+| [x] | 1.15 | Extract `list/misc.py` | [P] | cards + memories + schemas, ~340 lines |
+| [x] | 1.16 | Wire `list/__init__.py` imports | | Import all sub-modules to register commands |
+| [x] | 1.17 | Lint + test after list.py split | | Final gate |
 
 ### Task Details
 
@@ -108,7 +108,7 @@ Split `cli/common.py` (1,124 lines) into 4 files and `cli/list.py` (3,195 lines)
 
 ## 10. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
+- [x] Exit criteria satisfied
+- [x] Verification evidence: 4585 passed, 0 failed
 - [ ] Phase 02 sheet created
 - [ ] Delta/plan updated

@@ -64,9 +64,14 @@ Use this section first when reloading context for DE-106.
 
 ### Recommended Next Step
 
-Continue design work in `DR-106`:
+DR-106 has passed internal and external adversarial review. All open questions resolved. Ready for approval and transition to `/plan-phases`.
 
-1. Narrow the canonical frontmatter field set for phases.
-2. Define the minimum frontmatter-validation hardening required for DE-106.
-3. Draft the ADR framing for metadata placement rules.
-4. Capture any overflow work as backlog/follow-up before moving to planning.
+### Design Review Summary
+
+- **OQ-001**: Compatibility now, opportunistic migration later
+- **OQ-002**: Canonical fields: `plan`, `delta`, `objective`, `entrance_criteria`, `exit_criteria`
+- **OQ-003**: Follow ADR-004 — spec reconciliation after implementation
+- **OQ-004**: Phase model is the Pydantic spike (DEC-008); fallback to inline validation if negative
+- **Internal review**: 8 findings (R1-R8), all integrated
+- **External review**: 4 findings (E1-E4), all integrated — notably E1 (artifacts.py choke point) and E3 (spike must include creation→load round-trip)
+- **Doctrine outputs planned**: ADR (placement heuristic), 3 memories, 4 skill updates

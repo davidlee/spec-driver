@@ -46,3 +46,37 @@ from supekku.cli.list import misc as _misc  # noqa: E402, F401
 from supekku.cli.list import requirements as _requirements  # noqa: E402, F401
 from supekku.cli.list import reviews as _reviews  # noqa: E402, F401
 from supekku.cli.list import specs as _specs  # noqa: E402, F401
+
+# ---------------------------------------------------------------------------
+# Singular command aliases (PROD-010 FR-016: forgiving input parsing)
+# ---------------------------------------------------------------------------
+_PLURAL_TO_SINGULAR = {
+  "specs": "spec",
+  "deltas": "delta",
+  "changes": "change",
+  "adrs": "adr",
+  "policies": "policy",
+  "standards": "standard",
+  "requirements": "requirement",
+  "revisions": "revision",
+  "audits": "audit",
+  "issues": "issue",
+  "problems": "problem",
+  "improvements": "improvement",
+  "risks": "risk",
+  "cards": "card",
+  "memories": "memory",
+  "plans": "plan",
+}
+
+# Collect registered command functions by name, then register singular aliases
+_registered = {cmd.name: cmd for cmd in app.registered_commands}
+for _plural, _singular in _PLURAL_TO_SINGULAR.items():
+  _cmd_info = _registered.get(_plural)
+  if _cmd_info and _cmd_info.callback:
+    app.command(_singular, hidden=True)(_cmd_info.callback)
+
+# schemas singular alias
+_schema_cmd = _registered.get("schemas")
+if _schema_cmd and _schema_cmd.callback:
+  app.command("schema", hidden=True)(_schema_cmd.callback)

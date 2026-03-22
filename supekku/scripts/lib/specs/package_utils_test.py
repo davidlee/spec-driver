@@ -25,7 +25,7 @@ from supekku.scripts.lib.specs.package_utils import (
 
 # Known leaf packages in supekku/ (as of 2026-02-20)
 KNOWN_LEAF_PACKAGES = {
-  "supekku/cli",
+  "supekku/cli/list",
 
   "supekku/scripts/cli",
   "supekku/scripts/lib/backlog",
@@ -200,10 +200,10 @@ class TestFindAllLeafPackages:
 
   def test_handles_single_leaf_package_tree(self) -> None:
     """Test discovery in a subtree with one leaf package."""
-    # supekku/cli is a leaf package with no children
-    result = find_all_leaf_packages(Path("supekku/cli"))
+    # supekku/cli/list is a leaf package with no children
+    result = find_all_leaf_packages(Path("supekku/cli/list"))
     assert len(result) == 1
-    assert result[0] == Path("supekku/cli")
+    assert result[0] == Path("supekku/cli/list")
 
   def test_handles_nonexistent_root(self) -> None:
     """Test that non-existent root returns empty list."""
@@ -228,9 +228,8 @@ class TestEdgeCases:
 
   def test_single_file_package_is_leaf(self) -> None:
     """Test that a package with only __init__.py is a leaf package."""
-    # supekku/cli only has __init__.py (no other Python files)
-    # It should still be a leaf package
-    assert is_leaf_package(Path("supekku/cli"))
+    # supekku/cli/list is a leaf package
+    assert is_leaf_package(Path("supekku/cli/list"))
 
   def test_deeply_nested_package(self) -> None:
     """Test handling of deeply nested packages."""
@@ -247,7 +246,7 @@ class TestEdgeCases:
 
   def test_relative_vs_absolute_paths(self) -> None:
     """Test that both relative and absolute paths work."""
-    relative = Path("supekku/cli")
+    relative = Path("supekku/cli/list")
     absolute = relative.absolute()
 
     assert is_leaf_package(relative)

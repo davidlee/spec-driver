@@ -26,5 +26,5 @@ Backlog item model representing issues, problems, improvements, and risks.
 
 - `to_dict(self) -> dict[Tuple[str, Any]]`: Serialize to dict with consistent relational fields.
 
-Always includes `linked_deltas` and `related_requirements` with `[]`
-defaults, ensuring JSON parity between `list` and `show` output.
+Always includes ``linked_deltas`` and ``related_requirements`` with ``[]``
+defaults, ensuring JSON parity between ``list`` and ``show`` output.

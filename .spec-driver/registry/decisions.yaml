@@ -181,7 +181,19 @@ decisions:
     title: 'ADR-010: Default placement heuristic for structured artifact metadata'
     status: accepted
     path: .spec-driver/decisions/ADR-010-default_placement_heuristic_for_structured_artifact_metadata.md
-    summary: ''
+    summary: Frontmatter is the default home for stable, machine-consumed artifact
+      metadata. Code-fenced YAML blocks are reserved for schema-versioned data with
+      independent lifecycle. Markdown prose carries volatile execution detail.
     created: '2026-03-22'
     updated: '2026-03-22'
     reviewed: '2026-03-22'
+    deltas:
+    - DE-106
+    related_decisions:
+    - ADR-002
+    - ADR-009
+    tags:
+    - architecture
+    - metadata
+    - frontmatter
+    - placement

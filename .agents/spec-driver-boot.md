@@ -175,6 +175,7 @@ ADR-006	accepted	ADR-006: consolidate workspace directories under .spec-driver	2
 ADR-007	accepted	ADR-007: contracts are derived observed corpus with dedicated canonical storage	2026-03-06
 ADR-008	accepted	ADR-008: normative lifecycle truth and observed evidence reconciliation	2026-03-06
 ADR-009	accepted	ADR-009: standard registry API convention	2026-03-06
+ADR-010	accepted	ADR-010: Default placement heuristic for structured artifact metadata	2026-03-22
 
 ## Required Policies
 

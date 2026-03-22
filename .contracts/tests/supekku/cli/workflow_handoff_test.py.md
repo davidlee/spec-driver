@@ -15,7 +15,7 @@ write ordering, and re-run safety.
 
 Test `spec-driver accept handoff`.
 
-**Inherits from:** \_HandoffTestBase
+**Inherits from:** _HandoffTestBase
 
 #### Methods
 
@@ -32,7 +32,7 @@ Test `spec-driver accept handoff`.
 
 Test `spec-driver create handoff`.
 
-**Inherits from:** \_HandoffTestBase
+**Inherits from:** _HandoffTestBase
 
 #### Methods
 
@@ -49,13 +49,13 @@ Test `spec-driver create handoff`.
 
 Test write ordering per DR-102 §5.
 
-**Inherits from:** \_HandoffTestBase
+**Inherits from:** _HandoffTestBase
 
 #### Methods
 
 - @patch(supekku.scripts.lib.core.git.get_branch, return_value=main) @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) @patch(supekku.scripts.lib.core.git.has_staged_changes, return_value=False) @patch(supekku.scripts.lib.core.git.has_uncommitted_changes, return_value=False) `test_handoff_written_before_state(self) -> None`: handoff.current.yaml must be written before state.yaml.
 
-### \_HandoffTestBase
+### _HandoffTestBase
 
 Common setup for handoff tests.
 

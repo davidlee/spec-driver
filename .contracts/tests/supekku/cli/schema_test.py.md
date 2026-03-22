@@ -6,7 +6,7 @@ Tests for schema CLI commands (via show schema / list schemas).
 
 ### EnumIntrospectionTest
 
-Test cases for show schema enums.\* commands.
+Test cases for show schema enums.* commands.
 
 **Inherits from:** unittest.TestCase
 

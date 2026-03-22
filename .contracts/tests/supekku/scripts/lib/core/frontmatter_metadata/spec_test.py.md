@@ -46,9 +46,8 @@ Test metadata validator for spec-specific fields.
 - `_validate_both(self, data) -> tuple[Tuple[<BinOp>, list[str]]]`: Run both validators and return (old_error, new_errors).
 
 Args:
-data: Frontmatter dictionary to validate
+  data: Frontmatter dictionary to validate
 
 Returns:
-
-- old_error: None if valid, error message if invalid
-- new_errors: List of error strings from new validator
+  - old_error: None if valid, error message if invalid
+  - new_errors: List of error strings from new validator

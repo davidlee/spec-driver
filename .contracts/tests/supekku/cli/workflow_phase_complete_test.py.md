@@ -9,8 +9,8 @@ Tests phase completion, auto-handoff emission, bridge block integration.
 - `_create_delta_bundle(root, delta_id, slug, plan_id, phases) -> Path`: Create a minimal delta bundle for testing.
 
 Args:
-phase_frontmatter: If True, generate phase files with proper frontmatter
-(status: draft) so update_frontmatter_status can operate on them.
+  phase_frontmatter: If True, generate phase files with proper frontmatter
+    (status: draft) so update_frontmatter_status can operate on them.
 
 ## Classes
 
@@ -18,7 +18,7 @@ phase_frontmatter: If True, generate phase files with proper frontmatter
 
 Test phase-bridge block integration with phase complete.
 
-**Inherits from:** \_PhaseCompleteTestBase
+**Inherits from:** _PhaseCompleteTestBase
 
 #### Methods
 
@@ -30,7 +30,7 @@ Test phase-bridge block integration with phase complete.
 
 Test basic phase complete behaviour.
 
-**Inherits from:** \_PhaseCompleteTestBase
+**Inherits from:** _PhaseCompleteTestBase
 
 #### Methods
 
@@ -44,7 +44,7 @@ Test basic phase complete behaviour.
 
 Test that phase complete updates phase sheet frontmatter (DE-104).
 
-**Inherits from:** \_PhaseCompleteTestBase
+**Inherits from:** _PhaseCompleteTestBase
 
 #### Methods
 
@@ -52,7 +52,7 @@ Test that phase complete updates phase sheet frontmatter (DE-104).
 - @patch(supekku.scripts.lib.core.git.get_branch, return_value=main) @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) @patch(supekku.scripts.lib.core.git.has_staged_changes, return_value=False) @patch(supekku.scripts.lib.core.git.has_uncommitted_changes, return_value=False) `test_phase_complete_updates_frontmatter_to_completed(self) -> None`: Phase complete writes 'completed' to phase sheet frontmatter (DEC-104-08).
 - @patch(supekku.scripts.lib.core.git.get_branch, return_value=main) @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) @patch(supekku.scripts.lib.core.git.has_staged_changes, return_value=False) @patch(supekku.scripts.lib.core.git.has_uncommitted_changes, return_value=False) `test_state_yaml_still_uses_complete(self) -> None`: state.yaml uses control-plane vocabulary ('complete'), not lifecycle.
 
-### \_PhaseCompleteTestBase
+### _PhaseCompleteTestBase
 
 Common setup.
 

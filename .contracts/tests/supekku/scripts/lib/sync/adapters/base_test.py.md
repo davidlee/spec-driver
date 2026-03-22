@@ -85,8 +85,8 @@ Test LanguageAdapter validation methods.
 
 - `setUp(self) -> None`: Set up test fixtures.
 - `tearDown(self) -> None`: Clean up test fixtures.
-- `test_get_source_path_default_implementation(self) -> None`: Test default \_get_source_path implementation.
-- `test_get_source_path_nested(self) -> None`: Test \_get_source_path with nested identifier.
+- `test_get_source_path_default_implementation(self) -> None`: Test default _get_source_path implementation.
+- `test_get_source_path_nested(self) -> None`: Test _get_source_path with nested identifier.
 - `test_validate_source_exists_cannot_determine_path(self) -> None`: Test validation when source path cannot be determined.
 - `test_validate_source_exists_file_exists_git_tracked(self) -> None`: Test validation when file exists and is git-tracked.
 - `test_validate_source_exists_file_exists_not_tracked(self) -> None`: Test validation when file exists but not git-tracked.

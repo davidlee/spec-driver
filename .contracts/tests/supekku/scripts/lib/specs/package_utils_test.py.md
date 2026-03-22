@@ -5,7 +5,6 @@ Tests for package detection utilities (VT-001).
 Verification Target: PROD-005.FR-001 - Leaf Python Package Identification
 
 Test Coverage:
-
 - Leaf package identification across real supekku/ structure
 - Non-leaf package detection (parent packages)
 - Non-package path validation
@@ -28,7 +27,7 @@ Test edge cases and boundary conditions.
 - `test_deeply_nested_package(self) -> None`: Test handling of deeply nested packages.
 - `test_package_with_test_only_files(self) -> None`: Test packages containing only test files are still leaf packages.
 - `test_relative_vs_absolute_paths(self) -> None`: Test that both relative and absolute paths work. - Covered by real package tests
-- `test_single_file_package_is_leaf(self) -> None`: Test that a package with only **init**.py is a leaf package.
+- `test_single_file_package_is_leaf(self) -> None`: Test that a package with only __init__.py is a leaf package.
 
 ### TestFindAllLeafPackages
 
@@ -52,7 +51,7 @@ Test find_package_for_file() function.
 - `test_handles_directory_input(self) -> None`: Test that directory paths work (returns the directory if it's a package).
 - `test_resolves_file_in_leaf_package(self) -> None`: Test resolution of file to its leaf package.
 - `test_resolves_file_in_nested_package(self) -> None`: Test resolution of file in deeply nested package.
-- `test_resolves_init_file_to_package(self) -> None`: Test that **init**.py resolves to its containing package.
+- `test_resolves_init_file_to_package(self) -> None`: Test that __init__.py resolves to its containing package.
 - `test_resolves_test_file_to_package(self) -> None`: Test resolution of test file to package.
 - `test_returns_none_for_file_outside_package(self) -> None`: Test that files outside packages return None.
 
@@ -74,7 +73,7 @@ Test is_leaf_package() function.
 
 - `test_identifies_all_known_leaf_packages(self) -> None`: Test that all 16 known leaf packages are correctly identified.
 - `test_rejects_files(self) -> None`: Test that file paths are rejected.
-- `test_rejects_non_package_directories(self) -> None`: Test that directories without **init**.py are rejected.
+- `test_rejects_non_package_directories(self) -> None`: Test that directories without __init__.py are rejected.
 - `test_rejects_nonexistent_paths(self) -> None`: Test that non-existent paths are rejected.
 - `test_rejects_parent_packages(self) -> None`: Test that parent packages are not identified as leaf packages.
 
@@ -86,6 +85,6 @@ Test validate_package_path() function.
 
 - `test_accepts_valid_leaf_package(self) -> None`: Test that valid leaf packages pass validation.
 - `test_accepts_valid_parent_package(self) -> None`: Test that parent packages also pass validation. - Should not raise
-- `test_raises_for_directory_without_init(self, tmp_path) -> None`: Test that directories without **init**.py raise ValueError.
+- `test_raises_for_directory_without_init(self, tmp_path) -> None`: Test that directories without __init__.py raise ValueError.
 - `test_raises_for_file_path(self) -> None`: Test that file paths raise ValueError.
 - `test_raises_for_nonexistent_path(self) -> None`: Test that non-existent paths raise FileNotFoundError. - Should not raise

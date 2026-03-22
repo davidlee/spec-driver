@@ -17,9 +17,9 @@ Test SpecIndexBuilder functionality.
 - `test_alias_symlinks_cleaned_on_rebuild(self) -> None`: Alias symlinks are idempotent across rebuilds.
 - `test_alias_symlinks_resolve_to_specs(self) -> None`: Alias symlinks resolve through to actual spec directories.
 - `test_initialization(self) -> None`: Test SpecIndexBuilder initialization.
-- `test_read_frontmatter_incomplete_delimiters(self) -> None`: Test \_read_frontmatter with incomplete frontmatter delimiters.
-- `test_read_frontmatter_no_frontmatter(self) -> None`: Test \_read_frontmatter with file without frontmatter.
-- `test_read_frontmatter_valid_yaml(self) -> None`: Test \_read_frontmatter with valid YAML.
+- `test_read_frontmatter_incomplete_delimiters(self) -> None`: Test _read_frontmatter with incomplete frontmatter delimiters.
+- `test_read_frontmatter_no_frontmatter(self) -> None`: Test _read_frontmatter with file without frontmatter.
+- `test_read_frontmatter_valid_yaml(self) -> None`: Test _read_frontmatter with valid YAML.
 - `test_rebuild_cleans_existing_symlinks(self) -> None`: Test rebuild cleans up existing symlinks before creating new ones.
 - `test_rebuild_cleans_taxonomy_views(self) -> None`: VT-030-004: taxonomy views are cleaned on rebuild.
 - `test_rebuild_creates_alias_symlinks(self) -> None`: Phase 3: convenience alias directory symlinks for ergonomic navigation.

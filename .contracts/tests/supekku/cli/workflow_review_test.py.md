@@ -14,7 +14,7 @@ Tests review prime, review complete, and review teardown.
 
 Test `spec-driver review complete`.
 
-**Inherits from:** \_ReviewTestBase
+**Inherits from:** _ReviewTestBase
 
 #### Methods
 
@@ -31,7 +31,7 @@ Test `spec-driver review complete`.
 
 Test `spec-driver review prime`.
 
-**Inherits from:** \_ReviewTestBase
+**Inherits from:** _ReviewTestBase
 
 #### Methods
 
@@ -47,7 +47,7 @@ Test `spec-driver review prime`.
 
 Test `spec-driver review teardown`.
 
-**Inherits from:** \_ReviewTestBase
+**Inherits from:** _ReviewTestBase
 
 #### Methods
 
@@ -60,14 +60,14 @@ Test `spec-driver review teardown`.
 
 Test write ordering per DR-102 §5.
 
-**Inherits from:** \_ReviewTestBase
+**Inherits from:** _ReviewTestBase
 
 #### Methods
 
 - @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_review_complete_creates_findings_and_updates_state(self) -> None`
 - @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_review_prime_creates_both_files(self) -> None`
 
-### \_ReviewTestBase
+### _ReviewTestBase
 
 Common setup for review tests.
 

@@ -3,7 +3,7 @@ id: IMPR-022
 name: "Phase sheet template DRY: eliminate triple-entry bookkeeping across frontmatter, blocks, and markdown"
 created: "2026-03-21"
 updated: "2026-03-21"
-status: idea
+status: done
 kind: improvement
 relations:
   - type: relates_to

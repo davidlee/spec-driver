@@ -1,0 +1,1 @@
+../ADR-010-default_placement_heuristic_for_structured_artifact_metadata.md

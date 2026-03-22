@@ -10,25 +10,23 @@ Formatters take Card objects and return formatted strings for display.
 - `format_card_details(card) -> str`: Format card as human-readable detail view.
 
 Args:
-card: Card instance to format
+  card: Card instance to format
 
 Returns:
-Formatted string with card details
-
+  Formatted string with card details
 - `format_card_list_json(cards) -> str`: Format cards as JSON array.
 
 Args:
-cards: Sequence of Card instances
+  cards: Sequence of Card instances
 
 Returns:
-JSON string
-
+  JSON string
 - `format_card_list_table(cards, format_type, truncate) -> str`: Format cards as table, JSON, or TSV.
 
 Args:
-cards: Sequence of Card instances
-format_type: Output format (table|json|tsv)
-truncate: If True, truncate long fields.
+  cards: Sequence of Card instances
+  format_type: Output format (table|json|tsv)
+  truncate: If True, truncate long fields.
 
 Returns:
-Formatted output string
+  Formatted output string

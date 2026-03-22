@@ -3,17 +3,17 @@
 Workflow orchestration CLI commands.
 
 Thin CLI layer for the workflow control plane (DR-102 §5).
-Delegates to domain logic in `supekku.scripts.lib.workflow`.
+Delegates to domain logic in ``supekku.scripts.lib.workflow``.
 
 Commands:
-phase start — initialise workflow/state.yaml (planned → implementing)
-workflow status — read and display human-readable workflow state
-block / unblock — transition to/from blocked
-create handoff — write handoff.current.yaml, transition to awaiting_handoff
-accept handoff — claim + transition to implementing/reviewing
-review prime — generate review-index.yaml + review-bootstrap.md
-review complete — write review-findings.yaml, transition state
-review teardown — delete reviewer state files
+  phase start  — initialise workflow/state.yaml (planned → implementing)
+  workflow status — read and display human-readable workflow state
+  block / unblock — transition to/from blocked
+  create handoff — write handoff.current.yaml, transition to awaiting_handoff
+  accept handoff — claim + transition to implementing/reviewing
+  review prime — generate review-index.yaml + review-bootstrap.md
+  review complete — write review-findings.yaml, transition state
+  review teardown — delete reviewer state files
 
 ## Constants
 
@@ -34,7 +34,6 @@ review teardown — delete reviewer state files
 
 Evaluates staleness of existing cache, rebuilds or incrementally
 updates as appropriate per DR-102 §8.
-
 - @review_app.command(teardown) `review_teardown_command(delta, root) -> None`: Delete reviewer state files (review-index, findings, bootstrap).
 - @workflow_app.command(unblock) `unblock_command(delta, root) -> None`: Unblock a delta's workflow, restoring previous state.
 - @workflow_app.command(status) `workflow_status(delta, root) -> None`: Display human-readable workflow state for a delta.

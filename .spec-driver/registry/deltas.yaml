@@ -12837,7 +12837,7 @@ deltas:
         status: completed
   DE-124:
     kind: delta
-    status: draft
+    status: completed
     name: Delta - Public Python API facade for programmatic consumers
     slug: public_python_api_facade_for_programmatic_consumers
     updated: '2026-03-23'
@@ -12887,7 +12887,7 @@ deltas:
       - plan: IP-124
         delta: DE-124
         phase: IP-124-P01
-        status: draft
+        status: completed
       - id: IP-124-P02
         phase: IP-124-P02
   DE-125:
@@ -12902,20 +12902,20 @@ deltas:
       requirements: []
     relations:
     - type: introduces
-      target: POL-003-module-boundaries
+      target: POL-003
       attributes:
-        description: New policy defining strict architectural layering and allowed
-          import graphs
-    - type: precedes
+        description: Defines the required architectural boundary policy that this
+          delta operationalises.
+    - type: relates_to
       target: DE-114
       attributes:
-        description: DE-114 (god-init problem) is a direct symptom of the coupling
-          this delta resolves
-    - type: precedes
+        description: DE-114 addressed concrete god-file symptoms that this delta now
+          reframes under explicit coupling rules.
+    - type: coordinates_with
       target: DE-124
       attributes:
-        description: Public Python API facade relies on the explicit boundaries established
-          here
+        description: DE-124 consumes the orchestration facade and should proceed in
+          parallel with boundary enforcement and migration pilots.
     plan:
       id: IP-125
       overview:
@@ -12923,6 +12923,44 @@ deltas:
         version: 1
         plan: IP-125
         delta: DE-125
+        revision_links:
+          aligns_with:
+          - DR-125
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-125-P01
+        - id: IP-125-P02
+      phases:
+      - plan: IP-125
+        delta: DE-125
+        phase: IP-125-P01
+        status: completed
+      - plan: IP-125
+        delta: DE-125
+        phase: IP-125-P02
+        status: draft
+  DE-126:
+    kind: delta
+    status: draft
+    name: Delta - Fix pyright typechecking errors (389 errors)
+    slug: fix_pyright_typechecking_errors_389_errors
+    updated: '2026-03-23'
+    path: .spec-driver/deltas/DE-126-fix_pyright_typechecking_errors_389_errors/DE-126.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-126
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-126
+        delta: DE-126
         revision_links:
           aligns_with: []
         specs:
@@ -12932,7 +12970,7 @@ deltas:
           targets: []
           dependencies: []
         phases:
-        - id: IP-125-P01
+        - id: IP-126-P01
       phases:
-      - id: IP-125-P01
-        phase: IP-125-P01
+      - id: IP-126-P01
+        phase: IP-126-P01

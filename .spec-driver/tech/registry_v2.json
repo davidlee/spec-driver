@@ -3,6 +3,7 @@
   "languages": {
     "python": {
       "supekku/cli": "SPEC-134",
+      "supekku/cli/list": "SPEC-162",
       "supekku/scripts/backlog": "SPEC-135",
       "supekku/scripts/cli": "SPEC-136",
       "supekku/scripts/lib/backlog": "SPEC-137",

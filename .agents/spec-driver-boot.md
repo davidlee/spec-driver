@@ -67,6 +67,7 @@ The term "card" in skills and workflows refers to whichever of these the project
 
 - **ADR** (`ADR-xxx`): Architecture Decision Record. Location: `.spec-driver/decisions/ADR-xxx-slug.md`.
   - **Contract**: Auto-generated API documentation. Location: `.contracts/`.
+
   ## Backlog
 
 - **Issue**: Actionable defect or gap. Location: `.spec-driver/backlog/issues/`.
@@ -181,6 +182,7 @@ ADR-011	accepted	ADR-011: CLI registry access must route through Workspace	2026-
 
 POL-001	required	POL-001: maximise code reuse, minimise sprawl	2026-03-22
 POL-002	required	POL-002: Avoid magic strings and numbers	2026-03-22
+POL-003	required	POL-003: explicit module boundaries and coupling constraints	2026-03-23
 
 ## Required Standards
 

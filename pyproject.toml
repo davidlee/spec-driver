@@ -103,6 +103,7 @@ dev = [
     "ruff>=0.14.0",
     "pylint>=4.0.2",
     "pylint-per-file-ignores>=3.1.0",
+    "import-linter>=2.11",
 ]
 
 [tool.pytest.ini_options]
@@ -234,3 +235,18 @@ max-public-methods = 20
 max-returns = 6
 max-statements = 50
 min-public-methods = 2
+
+[tool.importlinter]
+root_package = "spec_driver"
+
+[[tool.importlinter.contracts]]
+name = "Architectural Layers"
+type = "layers"
+layers = [
+    "spec_driver.presentation",
+    "spec_driver.workflow",
+    "spec_driver.domain",
+    "spec_driver.models",
+    "spec_driver.core",
+]
+

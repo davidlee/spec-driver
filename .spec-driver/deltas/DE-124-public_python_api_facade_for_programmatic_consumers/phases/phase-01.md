@@ -14,7 +14,7 @@ delta: DE-124
 
 ## 1. Objective
 
-Extract review orchestration logic from CLI command functions into `supekku/scripts/lib/workflow/operations.py`. Refactor CLI review commands to thin wrappers. Add unit tests for all operations. This is the high-risk phase — existing CLI behaviour must be preserved exactly.
+Extract review orchestration logic from CLI command functions into `spec_driver/orchestration/operations.py`. Refactor CLI review commands to thin wrappers. Add unit tests for all operations. This is the high-risk phase — existing CLI behaviour must be preserved exactly.
 
 ## 2. Links & References
 
@@ -44,8 +44,8 @@ Extract review orchestration logic from CLI command functions into `supekku/scri
 
 - Run existing tests first (baseline): `uv run pytest supekku/cli/workflow_review_test.py supekku/cli/workflow_integration_test.py -v`
 - Run after extraction (regression): same command, expect identical results
-- Run new tests: `uv run pytest supekku/scripts/lib/workflow/operations_test.py -v`
-- Lint: `uv run ruff check supekku/scripts/lib/workflow/operations.py supekku/cli/workflow.py`
+- Run new tests: `uv run pytest spec_driver/orchestration/operations_test.py -v`
+- Lint: `uv run ruff check spec_driver/orchestration/operations.py supekku/cli/workflow.py`
 - Full suite: `just check`
 
 ## 6. Assumptions & STOP Conditions
@@ -79,7 +79,7 @@ Extract review orchestration logic from CLI command functions into `supekku/scri
   - **Notes**: Record exact pass/fail count. This is the regression baseline.
 
 - **1.2 Create `operations.py` with new types**
-  - **Files**: `supekku/scripts/lib/workflow/operations.py`
+  - **Files**: `spec_driver/orchestration/operations.py`
   - **Design**: Define `PrimeAction` (StrEnum), `PrimeResult`, `CompleteResult`, `DispositionResult`, `TeardownResult`, `ReviewSummary` (dataclasses). Define `DeltaNotFoundError`, `ReviewApprovalGuardError`, `FindingNotFoundError`, `DispositionValidationError` exceptions. Per DR-124 §4.1, §4.3.
 
 - **1.3 Extract `resolve_delta_dir`**
@@ -116,7 +116,7 @@ Extract review orchestration logic from CLI command functions into `supekku/scri
   - **Testing**: Same command as 1.1. Must produce identical pass/fail count.
 
 - **1.11 Write `operations_test.py`**
-  - **Files**: `supekku/scripts/lib/workflow/operations_test.py`
+  - **Files**: `spec_driver/orchestration/operations_test.py`
   - **Testing**: Per IP-124 §6 key scenarios. Use temp dirs with fixture YAML data. Test each operation's happy path and error paths.
 
 - **1.12 Lint + format**

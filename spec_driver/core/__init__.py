@@ -1,4 +1,7 @@
-"""Core infrastructure layer for spec-driver. Foundational pure functions, I/O, Git wrappers."""
+"""Core infrastructure layer for spec-driver.
+
+Foundational pure functions, I/O, Git wrappers.
+"""
 
 from .file_ops import (
   FileChanges,

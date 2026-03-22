@@ -10,13 +10,13 @@ phase:
   status: complete
   path: .spec-driver/deltas/DE-106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown/phases/phase-01.md
 workflow:
-  status: implementing
+  status: awaiting_handoff
   active_role: implementer
   handoff_boundary: phase
-  claimed_by: unknown
+  next_role: implementer
 timestamps:
   created: '2026-03-22T01:55:21+00:00'
-  updated: '2026-03-22T02:05:25+00:00'
+  updated: '2026-03-22T02:13:02+00:00'
 plan:
   id: IP-106
   path: .spec-driver/deltas/DE-106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown/IP-106.md

@@ -1,12 +1,28 @@
 # Notes for DE-106
 
+## Phase 2 Completion Summary
+
+Phase 2 delivered all 5 exit criteria:
+
+1. **Template cleaned**: `phase.md` no longer contains `{{ phase_overview_block }}` or `{{ phase_tracking_block }}`
+2. **Creation cleaned**: `create_phase()` no longer calls block rendering functions; frontmatter is sole structured source
+3. **Regex fallback verified**: `_enrich_phase_data()` regex handles new-format phases (412 formatter tests pass)
+4. **list_changes verified**: delegates to `PhaseSheet` via `load_change_artifact()` (Phase 1 work)
+5. **Validator updated**: no warning for phases with `plan`+`delta` in frontmatter (11 phase validator tests pass)
+
+**Files changed**: `supekku/templates/phase.md`, `supekku/scripts/lib/changes/creation.py`, `supekku/scripts/lib/changes/creation_test.py`, `supekku/scripts/lib/validation/validator.py`, `supekku/scripts/lib/validation/validator_test.py`
+
+**Tests**: 635 relevant tests passing (31 creation, 412 formatter, 179 changes, 11 phase validation, + others). 1 pre-existing unrelated failure in `package_utils_test.py`.
+
+---
+
 ## New Agent Instructions
 
 ### Task Card
 
 **DE-106** — Phase sheet template DRY: eliminate triple-entry bookkeeping across frontmatter, blocks, and markdown.
 
-Status: `in-progress`. Phase 1 complete. Phase 2 next.
+Status: `in-progress`. Phases 1 and 2 complete. Phase 3 next.
 
 ### Required Reading (in order)
 
@@ -30,9 +46,9 @@ Status: `in-progress`. Phase 1 complete. Phase 2 next.
 | `supekku/scripts/lib/changes/phase_model_test.py` | Model tests (9 tests incl. corpus) | ✅ Done |
 | `supekku/scripts/lib/changes/creation.py` | `create_phase()` — emits canonical frontmatter fields | ✅ Done |
 | `supekku/scripts/lib/changes/artifacts.py` | Phase loading — prefers frontmatter, falls back to blocks | ✅ Done |
-| `supekku/templates/phase.md` | Phase template — **needs block scaffolding removed (Phase 2)** | Pending |
-| `supekku/scripts/lib/formatters/change_formatters.py` | `_enrich_phase_data()` — **verify regex fallback after block removal (Phase 2)** | Pending |
-| `supekku/scripts/lib/validation/validator.py` | Phase validation — **remove overview-block warning for new phases (Phase 3)** | Pending |
+| `supekku/templates/phase.md` | Phase template — block scaffolding removed | ✅ Done (Phase 2) |
+| `supekku/scripts/lib/formatters/change_formatters.py` | `_enrich_phase_data()` — regex fallback verified | ✅ Done (Phase 2) |
+| `supekku/scripts/lib/validation/validator.py` | Phase validation — overview-block warning suppressed for new phases | ✅ Done (Phase 2) |
 | `supekku/scripts/lib/core/frontmatter_schema.py` | Frontmatter validation — **wire phase-specific validation (Phase 3)** | Pending |
 | `supekku/skills/execute-phase/SKILL.md` | Skill — **audit for block references (Phase 3)** | Pending |
 | `supekku/skills/plan-phases/SKILL.md` | Skill — **audit for block references (Phase 3)** | Pending |
@@ -70,25 +86,26 @@ Status: `in-progress`. Phase 1 complete. Phase 2 next.
 - `show delta` works for both new-format and legacy phases
 - 13 new tests, 591 total passing, lint clean
 
-### Phase 2 Scope (next)
+### Phase 2 (complete)
 
-**Template + formatter + remaining compatibility.** Per IP-106 and DR-106 §9:
+All 5 deliverables done. See "Phase 2 Completion Summary" above.
 
-1. Update `supekku/templates/phase.md` — remove `{{ phase_overview_block }}` and `{{ phase_tracking_block }}` template variables. Template should emit frontmatter + markdown body only.
-2. Update `creation.py` — stop calling `render_phase_overview_block()` and `render_phase_tracking_block()`. The frontmatter population (done in Phase 1) replaces them.
-3. Verify `change_formatters.py` regex fallback works end-to-end after block removal.
-4. Verify `list_changes` reads canonical frontmatter fields.
-5. Update `validator.py` — suppress the "Missing phase.overview block" warning for new-format phases (those with `plan`+`delta` in frontmatter).
+### Phase 3 Scope (next)
 
-### Phase 3 Scope (after Phase 2)
+Validation + ADR + skills + spec reconciliation + memories + backlog items. Per IP-106:
 
-Validation + ADR + skills + spec reconciliation + memories + backlog items.
+1. Wire phase frontmatter validation via Pydantic model or inline fallback
+2. Land ADR (scoped to DE-106-derived placement heuristic)
+3. Audit and update skills: `execute-phase`, `plan-phases`, `update-delta-docs`, `notes`
+4. Reconcile PROD-006 requirements with new representation
+5. Create memories: contract-vs-progress, canonical fields, frontmatter-block-precedence
+6. Create follow-up backlog items: bulk migration, broader kind-aware validation
 
 ### Loose Ends / Watch Items
 
-- `create_phase()` still emits both blocks AND frontmatter (Phase 1 was additive). Phase 2 removes the block emission.
-- Phase 01's phase sheet itself has both blocks and frontmatter (written before the code change). This is fine — it's a legacy-format phase that works via the frontmatter path since we manually added canonical fields.
-- The existing `test_create_phase_copies_criteria_from_plan` test checks for block content in the phase body. It will need updating in Phase 2 when blocks are removed.
+- Phase 01 and 02 sheets themselves have embedded blocks (written before code changes). They work via the frontmatter path since canonical fields are present. This is the expected legacy compatibility behavior.
+- `render_phase_overview_block` and `render_phase_tracking_block` remain in `plan.py` — they're used by the legacy reading path (`extract_phase_tracking` in `_enrich_phase_data`) and `plan_render_test.py`. Not dead code yet.
+- Validator now only reads phase file content for legacy phases (optimization: skip file read when frontmatter has canonical fields).
 
 ### Commit State
 

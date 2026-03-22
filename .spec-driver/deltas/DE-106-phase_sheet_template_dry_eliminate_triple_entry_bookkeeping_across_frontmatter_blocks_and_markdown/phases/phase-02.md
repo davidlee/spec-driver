@@ -4,7 +4,7 @@ slug: "106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_fr
 name: "Phase 02 — Template + formatter + remaining compatibility"
 created: "2026-03-22"
 updated: "2026-03-22"
-status: draft
+status: completed
 kind: phase
 plan: IP-106
 delta: DE-106
@@ -42,11 +42,11 @@ Remove block scaffolding from new phase creation so phases author structured dat
 
 ## 4. Exit Criteria / Done When
 
-- [ ] New phases created without phase.overview or phase.tracking blocks
-- [ ] Phase template emits frontmatter + markdown body only
-- [ ] Formatter task completion stats work via regex fallback
-- [ ] list_changes reads canonical frontmatter fields
-- [ ] Validation updated: no warning for block-free new phases
+- [x] New phases created without phase.overview or phase.tracking blocks
+- [x] Phase template emits frontmatter + markdown body only
+- [x] Formatter task completion stats work via regex fallback
+- [x] list_changes reads canonical frontmatter fields
+- [x] Validation updated: no warning for block-free new phases
 
 ## 5. Verification
 
@@ -63,13 +63,13 @@ Remove block scaffolding from new phase creation so phases author structured dat
 
 | Status | ID  | Description | Notes |
 | ------ | --- | ----------- | ----- |
-| [ ]    | 2.1 | Remove block scaffolding from phase template | `supekku/templates/phase.md` |
-| [ ]    | 2.2 | Stop emitting blocks in `create_phase()` | `creation.py` — remove block rendering calls |
-| [ ]    | 2.3 | Update/fix tests for block removal | `test_create_phase_copies_criteria_from_plan` etc. |
-| [ ]    | 2.4 | Verify regex fallback in `_enrich_phase_data()` | `change_formatters.py` |
-| [ ]    | 2.5 | Verify `list_changes` reads frontmatter fields | `changes.py` or equivalent |
-| [ ]    | 2.6 | Suppress validator warning for new-format phases | `validator.py` |
-| [ ]    | 2.7 | End-to-end verification | `just check`, manual CLI tests |
+| [x]    | 2.1 | Remove block scaffolding from phase template | Removed `{{ phase_overview_block }}` and `{{ phase_tracking_block }}` |
+| [x]    | 2.2 | Stop emitting blocks in `create_phase()` | Removed block rendering calls and imports |
+| [x]    | 2.3 | Update/fix tests for block removal | 5 tests updated: assertions check frontmatter, not block content |
+| [x]    | 2.4 | Verify regex fallback in `_enrich_phase_data()` | 412 formatter tests pass; regex fallback handles new format |
+| [x]    | 2.5 | Verify `list_changes` reads frontmatter fields | Delegates to `load_change_artifact()` → `PhaseSheet` (Phase 1) |
+| [x]    | 2.6 | Suppress validator warning for new-format phases | Check `plan`+`delta` in frontmatter; 11 phase validator tests pass |
+| [x]    | 2.7 | End-to-end verification | 635 relevant tests pass, lint clean |
 
 ### Task Details
 
@@ -104,15 +104,19 @@ Remove block scaffolding from new phase creation so phases author structured dat
 
 ## 9. Decisions & Outcomes
 
-_(none yet)_
+- `2026-03-22` — Block render functions (`render_phase_overview_block`, `render_phase_tracking_block`) kept in `plan.py` for legacy reading; only creation-side removed.
+- `2026-03-22` — Validator uses `plan`+`delta` presence as the canonical frontmatter signal (matches `PhaseSheet.has_canonical_fields()`).
 
 ## 10. Findings / Research Notes
 
-_(populated during execution)_
+- `_enrich_phase_data()` regex fallback (`^- \[x\]` / `^- \[(x| )\]`) works for new-format phases out of the box — no changes needed.
+- `list_changes` delegates to `load_change_artifact()` which already uses `PhaseSheet` from Phase 1. No direct phase field access in `list.py`.
+- The pre-existing `test_finds_all_leaf_packages_in_supekku` failure is unrelated (hardcoded count doesn't match current repo state).
+- Phase-02.md itself was created by the old code (before this change) so it has blocks. Future phases will be block-free.
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (test counts in task table)
+- [x] Notes updated
 - [ ] Hand-off notes to Phase 3

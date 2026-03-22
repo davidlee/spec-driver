@@ -66,9 +66,9 @@ class CreateChangeTest(unittest.TestCase):
     )
 
     # Phase template (Jinja2, no frontmatter)
-    # Uses {{ phase_overview_block }} and {{ phase_tracking_block }} variables
+    # Frontmatter carries structured data; template is markdown body only
     (templates_dir / "phase.md").write_text(
-      "{{ phase_overview_block }}\n\n{{ phase_tracking_block }}\n",
+      "# Phase\n\n- **Delta**: {{ delta_id }}\n",
       encoding="utf-8",
     )
 
@@ -392,10 +392,12 @@ class CreateChangeTest(unittest.TestCase):
     assert "created" in frontmatter
     assert "updated" in frontmatter
 
-    # Check YAML block in body contains correct IDs
-    assert f"phase: {plan_id}-P01" in body
-    assert f"plan: {plan_id}" in body
-    assert f"delta: {delta_id}" in body
+    # Canonical fields in frontmatter, not blocks (DR-106)
+    assert frontmatter["plan"] == plan_id
+    assert frontmatter["delta"] == delta_id
+    # No embedded YAML blocks in new phases
+    assert "phase.overview" not in body
+    assert "phase.tracking" not in body
 
   def test_create_phase_updates_plan_metadata(self) -> None:
     """VT-PHASE-006: Test plan.overview phases array is updated."""
@@ -508,27 +510,15 @@ class CreateChangeTest(unittest.TestCase):
     # Verify phase file content
     phase_content = result.phase_path.read_text(encoding="utf-8")
 
-    # Check phase.overview block has criteria (may use YAML block scalars)
-    assert "Build the foundation" in phase_content
-    assert "entrance_criteria:" in phase_content
-    assert "Requirement 1 satisfied" in phase_content
-    assert "Design approved" in phase_content
-    assert "exit_criteria:" in phase_content
-    assert "Tests passing" in phase_content
-    assert "Code reviewed" in phase_content
+    # Verify frontmatter carries canonical fields (DR-106 DEC-005)
+    fm, _ = load_markdown_file(result.phase_path)
+    assert fm["objective"] == "Build the foundation"
+    assert fm["entrance_criteria"] == ["Requirement 1 satisfied", "Design approved"]
+    assert fm["exit_criteria"] == ["Tests passing", "Code reviewed"]
 
-    # Check phase.tracking block has criteria
-    assert "phase.tracking" in phase_content
-    has_entrance = (
-      'item: "Requirement 1 satisfied"' in phase_content
-      or 'item: "Design approved"' in phase_content
-    )
-    has_exit = (
-      'item: "Tests passing"' in phase_content
-      or 'item: "Code reviewed"' in phase_content
-    )
-    assert has_entrance
-    assert has_exit
+    # No embedded YAML blocks in new phases
+    assert "phase.overview" not in phase_content
+    assert "phase.tracking" not in phase_content
 
   def test_create_phase_id_only_format_graceful_fallback(self) -> None:
     """VT-CREATE-013-002: Test create_phase works with ID-only format."""
@@ -560,10 +550,10 @@ class CreateChangeTest(unittest.TestCase):
     # Create phase - should work without errors
     result = create_phase("Phase 01 - Minimal", plan_id, repo_root=root)
 
-    # Verify phase created successfully
+    # Verify phase created successfully with ID in frontmatter
     assert result.phase_path.exists()
-    phase_content = result.phase_path.read_text(encoding="utf-8")
-    assert f"phase: {plan_id}.PHASE-01" in phase_content
+    fm, _ = load_markdown_file(result.phase_path)
+    assert fm["id"] == f"{plan_id}.PHASE-01"
 
   def test_create_phase_hyphenated_manual_plan_entries_do_not_duplicate(self) -> None:
     """Regression: hand-authored `-P##` plans stay stable under create_phase."""
@@ -596,9 +586,9 @@ class CreateChangeTest(unittest.TestCase):
     result = create_phase("Foundation", plan_id, repo_root=root)
 
     assert result.phase_id == f"{plan_id}-P01"
-    phase_content = result.phase_path.read_text(encoding="utf-8")
-    assert f"phase: {plan_id}-P01" in phase_content
-    assert "Foundation" in phase_content
+    fm, _ = load_markdown_file(result.phase_path)
+    assert fm["id"] == f"{plan_id}-P01"
+    assert fm["objective"] == "Foundation"
 
     updated = plan_path.read_text(encoding="utf-8")
     assert updated.count(f"- id: {plan_id}-P01") == 1
@@ -632,11 +622,10 @@ class CreateChangeTest(unittest.TestCase):
     # Create phase
     result = create_phase("Partial Metadata Phase", plan_id, repo_root=root)
 
-    # Verify entrance criteria copied but no exit criteria
-    phase_content = result.phase_path.read_text(encoding="utf-8")
-    assert 'item: "Entry criterion only"' in phase_content
-    # phase.tracking should have entrance but empty exit
-    assert "entrance_criteria:" in phase_content
+    # Verify entrance criteria in frontmatter, no exit criteria
+    fm, _ = load_markdown_file(result.phase_path)
+    assert fm["entrance_criteria"] == ["Entry criterion only"]
+    assert "exit_criteria" not in fm
 
   def test_create_phase_empty_criteria_arrays_handled(self) -> None:
     """VT-CREATE-013-002: Test empty criteria arrays handled correctly."""

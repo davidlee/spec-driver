@@ -1056,11 +1056,39 @@ class PhaseValidationTest(RepoTestCase):
     assert any("Missing status" in i.message for i in phase_issues)
 
   def test_missing_overview_block_warns(self) -> None:
+    """Legacy phase without overview block gets a warning."""
     root = self._create_repo_with_phase(overview_block=False)
     ws = Workspace(root)
     issues = validate_workspace(ws)
     phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
     assert any("Missing phase.overview" in i.message for i in phase_issues)
+
+  def test_new_format_phase_no_overview_block_warning(self) -> None:
+    """New-format phase with canonical frontmatter needs no overview block."""
+    root = self._create_repo()
+    delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-200-test"
+    phases_dir = delta_dir / "phases"
+    phases_dir.mkdir(parents=True)
+
+    fm: dict[str, Any] = {
+      "id": "IP-200.PHASE-01",
+      "status": "draft",
+      "kind": "phase",
+      "plan": "IP-200",
+      "delta": "DE-200",
+      "objective": "Test objective",
+    }
+    dump_markdown_file(phases_dir / "phase-01.md", fm, "# Phase 01\n\nContent.\n")
+    dump_markdown_file(
+      delta_dir / "DE-200.md",
+      {"id": "DE-200", "status": "in-progress", "kind": "delta"},
+      "# DE-200\n",
+    )
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    phase_issues = [i for i in issues if "IP-200.PHASE-01" in i.artifact]
+    assert not any("Missing phase.overview" in i.message for i in phase_issues)
 
   def test_wrong_kind_warns(self) -> None:
     root = self._create_repo_with_phase(kind="plan")

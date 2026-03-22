@@ -1,7 +1,3 @@
-{{ phase_overview_block }}
-
-{{ phase_tracking_block }}
-
 # Phase N - <Name>
 
 ## 1. Objective

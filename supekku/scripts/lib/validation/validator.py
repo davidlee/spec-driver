@@ -491,10 +491,13 @@ class WorkspaceValidator:
     if fm.get("kind") != "phase":
       self._warning(artifact, "Missing or incorrect kind (expected 'phase')")
 
-    # Overview block check
-    content = phase_file.read_text(encoding="utf-8")
-    if "supekku:phase.overview" not in content:
-      self._warning(artifact, "Missing phase.overview block")
+    # Overview block check — new-format phases (DR-106) use frontmatter
+    # instead of phase.overview blocks; only warn for legacy phases
+    has_canonical_frontmatter = fm.get("plan") and fm.get("delta")
+    if not has_canonical_frontmatter:
+      content = phase_file.read_text(encoding="utf-8")
+      if "supekku:phase.overview" not in content:
+        self._warning(artifact, "Missing phase.overview block")
 
 
 def validate_workspace(

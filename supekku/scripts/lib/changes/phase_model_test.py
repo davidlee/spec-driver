@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import frontmatter
-import pytest
 
 from supekku.scripts.lib.changes.phase_model import PhaseSheet
 

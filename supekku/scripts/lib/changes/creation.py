@@ -16,8 +16,6 @@ from supekku.scripts.lib.blocks.delta import render_delta_relationships_block
 from supekku.scripts.lib.blocks.plan import (
   PLAN_MARKER,
   extract_plan_overview,
-  render_phase_overview_block,
-  render_phase_tracking_block,
   render_plan_overview_block,
 )
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
@@ -991,38 +989,7 @@ def create_phase(
   # Extract phase metadata from plan.overview if available
   phase_metadata = _extract_phase_metadata_from_plan(content, phase_id)
 
-  # Render phase overview block with metadata from IP (or defaults)
-  phase_overview_block = render_phase_overview_block(
-    phase_id,
-    plan_id,
-    delta_id,
-    objective=phase_metadata.get("objective"),
-    entrance_criteria=phase_metadata.get("entrance_criteria"),
-    exit_criteria=phase_metadata.get("exit_criteria"),
-  )
-
-  # Render phase tracking block with criteria from IP
-  # Convert criteria strings to tracking format {item, completed}
-  tracking_entrance = None
-  tracking_exit = None
-  if phase_metadata.get("entrance_criteria"):
-    tracking_entrance = [
-      {"item": criterion, "completed": False}
-      for criterion in phase_metadata["entrance_criteria"]
-    ]
-  if phase_metadata.get("exit_criteria"):
-    tracking_exit = [
-      {"item": criterion, "completed": False}
-      for criterion in phase_metadata["exit_criteria"]
-    ]
-
-  phase_tracking_block = render_phase_tracking_block(
-    phase_id,
-    entrance_criteria=tracking_entrance,
-    exit_criteria=tracking_exit,
-  )
-
-  # Load and render phase template
+  # Load and render phase template (frontmatter carries structured data; no blocks)
   phase_template_path = _get_template_path("phase.md", repo)
   phase_template_body = extract_template_body(phase_template_path)
   phase_template = Template(phase_template_body)
@@ -1030,8 +997,6 @@ def create_phase(
     phase_id=phase_id,
     plan_id=plan_id,
     delta_id=delta_id,
-    phase_overview_block=phase_overview_block,
-    phase_tracking_block=phase_tracking_block,
   )
 
   # Create phase file

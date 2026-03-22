@@ -66,6 +66,19 @@ Use this section first when reloading context for DE-106.
 
 DR-106 has passed internal and external adversarial review. All open questions resolved. Ready for approval and transition to `/plan-phases`.
 
+### Accepted Structured Data Losses
+
+These fields lose structured (YAML) representation. All are intentional per DR-106 DEC-005/DEC-006/DEC-007. If orchestration or tooling later needs any of these, it gets modeled as a deliberate feature with proper schema — not recovered by reinstating the blocks.
+
+| Field | Was in | Loss | Why acceptable |
+|---|---|---|---|
+| Task status (per-task `pending`/`in_progress`/`completed`/`blocked`) | `phase.tracking` | Per-task granularity; regex fallback gives aggregate `[x]`/`[ ]` counts only | Highest-volatility field; primary drift source. Display table already renders aggregates — richer data was maintained but never surfaced. |
+| Criteria progress (`completed: true/false` per criterion) | `phase.tracking` | Structured criterion-level completion | `_enrich_phase_data()` materializes this but no display surface reads it — dead code from a display perspective. |
+| Verification (test commands, evidence items) | `phase.overview` | Structured test-command and evidence lists | No requirement linkage — IP-level `verification.coverage` owns formal VT/VA/VH traceability. Phase verification is an ad-hoc checklist with no consumer or status model. |
+| Tasks (summary list) | `phase.overview` | Structured task list in YAML | Redundant with markdown §7 table + detail blocks that agents actually maintain. |
+| Risks (summary list) | `phase.overview` | Structured risk list in YAML | No machine consumer. No gate-checking value. Delta-level risks are the structured surface. |
+| Files (references, added, modified) | `phase.tracking` | Structured file-change tracking per task | Agent working notes with no consumer. |
+
 ### Design Review Summary
 
 - **OQ-001**: Compatibility now, opportunistic migration later

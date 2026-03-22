@@ -170,7 +170,7 @@ def sync(
 
   # Backward compat: existing registry entries imply opt-in
   if not spec_autocreate_enabled(root) and registry_path.exists():
-    from supekku.scripts.lib.registry_migration import RegistryV2
+    from supekku.scripts.lib.registry_v2 import RegistryV2
 
     registry = RegistryV2.from_file(registry_path)
     has_specs = any(registry.languages.values())

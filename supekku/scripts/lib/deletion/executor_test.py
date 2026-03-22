@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 import yaml
 
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, TECH_SPECS_SUBDIR
-from supekku.scripts.lib.registry_migration import RegistryV2
+from supekku.scripts.lib.registry_v2 import RegistryV2
 
 from .executor import (
   DeletionExecutor,

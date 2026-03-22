@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from supekku.scripts import complete_delta as complete_delta_module
+from supekku.scripts.lib.changes import completion as complete_delta_module
 
 
 class CompleteDeltaPromptBehaviorTest(unittest.TestCase):
@@ -122,7 +122,7 @@ class StrictModeEnforcementTest(unittest.TestCase):
         "Workspace",
       ) as mock_ws_cls,
       patch(
-        "supekku.scripts.complete_delta.load_workflow_config",
+        "supekku.scripts.lib.changes.completion.load_workflow_config",
         return_value=strict_config,
       ),
     ):
@@ -154,11 +154,11 @@ class StrictModeEnforcementTest(unittest.TestCase):
         "Workspace",
       ) as mock_ws_cls,
       patch(
-        "supekku.scripts.complete_delta.load_workflow_config",
+        "supekku.scripts.lib.changes.completion.load_workflow_config",
         return_value=strict_config,
       ),
       patch(
-        "supekku.scripts.complete_delta.is_coverage_enforcement_enabled",
+        "supekku.scripts.lib.changes.completion.is_coverage_enforcement_enabled",
         return_value=False,
       ),
       patch.object(
@@ -200,7 +200,7 @@ def test_bypass_flags_permitted_in_permissive_mode(flag_kwargs):
       "Workspace",
     ) as mock_ws_cls,
     patch(
-      "supekku.scripts.complete_delta.load_workflow_config",
+      "supekku.scripts.lib.changes.completion.load_workflow_config",
       return_value=permissive_config,
     ),
     patch.object(
@@ -209,15 +209,15 @@ def test_bypass_flags_permitted_in_permissive_mode(flag_kwargs):
       return_value=False,
     ),
     patch(
-      "supekku.scripts.complete_delta.is_coverage_enforcement_enabled",
+      "supekku.scripts.lib.changes.completion.is_coverage_enforcement_enabled",
       return_value=True,
     ),
     patch(
-      "supekku.scripts.complete_delta.check_coverage_completeness",
+      "supekku.scripts.lib.changes.completion.check_coverage_completeness",
       return_value=(True, []),
     ),
     patch(
-      "supekku.scripts.complete_delta.check_audit_completeness",
+      "supekku.scripts.lib.changes.completion.check_audit_completeness",
       return_value=MagicMock(
         is_complete=True,
         warning_findings=[],
@@ -225,7 +225,7 @@ def test_bypass_flags_permitted_in_permissive_mode(flag_kwargs):
       ),
     ),
     patch(
-      "supekku.scripts.complete_delta.update_frontmatter_status",
+      "supekku.scripts.lib.changes.completion.update_frontmatter_status",
       return_value=True,
     ),
   ):
@@ -267,7 +267,7 @@ class RevisionUpdateErrorOutputTest(unittest.TestCase):
         "Workspace",
       ) as mock_ws_cls,
       patch(
-        "supekku.scripts.complete_delta.load_workflow_config",
+        "supekku.scripts.lib.changes.completion.load_workflow_config",
         return_value=permissive_config,
       ),
       patch.object(
@@ -276,15 +276,15 @@ class RevisionUpdateErrorOutputTest(unittest.TestCase):
         return_value=False,
       ),
       patch(
-        "supekku.scripts.complete_delta.is_coverage_enforcement_enabled",
+        "supekku.scripts.lib.changes.completion.is_coverage_enforcement_enabled",
         return_value=True,
       ),
       patch(
-        "supekku.scripts.complete_delta.check_coverage_completeness",
+        "supekku.scripts.lib.changes.completion.check_coverage_completeness",
         return_value=(True, []),
       ),
       patch(
-        "supekku.scripts.complete_delta.find_requirement_sources",
+        "supekku.scripts.lib.changes.completion.find_requirement_sources",
         return_value={
           "SPEC-150.FR-001": MagicMock(
             revision_file=MagicMock(),
@@ -294,7 +294,7 @@ class RevisionUpdateErrorOutputTest(unittest.TestCase):
         },
       ),
       patch(
-        "supekku.scripts.complete_delta.update_requirement_lifecycle_status",
+        "supekku.scripts.lib.changes.completion.update_requirement_lifecycle_status",
         side_effect=complete_delta_module.RevisionUpdateError(error_message),
       ),
       patch("sys.stderr") as mock_stderr,
@@ -327,7 +327,7 @@ class DeltaNotFoundErrorOutputTest(unittest.TestCase):
         "Workspace",
       ) as mock_ws_cls,
       patch(
-        "supekku.scripts.complete_delta.load_workflow_config",
+        "supekku.scripts.lib.changes.completion.load_workflow_config",
         return_value=permissive_config,
       ),
       patch("sys.stderr") as mock_stderr,

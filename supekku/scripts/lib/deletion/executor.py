@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any
 import yaml
 
 from supekku.scripts.lib.core.paths import get_tech_specs_dir
-from supekku.scripts.lib.registry_migration import RegistryV2
+from supekku.scripts.lib.registry_v2 import RegistryV2
 from supekku.scripts.lib.specs.index import SpecIndexBuilder
 
 if TYPE_CHECKING:

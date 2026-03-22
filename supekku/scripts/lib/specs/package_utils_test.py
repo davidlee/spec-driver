@@ -26,7 +26,7 @@ from supekku.scripts.lib.specs.package_utils import (
 # Known leaf packages in supekku/ (as of 2026-02-20)
 KNOWN_LEAF_PACKAGES = {
   "supekku/cli",
-  "supekku/scripts/backlog",
+
   "supekku/scripts/cli",
   "supekku/scripts/lib/backlog",
   "supekku/scripts/lib/blocks/metadata",

@@ -1,0 +1,21 @@
+schema: supekku.workflow.state
+version: 1
+artifact:
+  id: DE-113
+  kind: delta
+  path: .spec-driver/deltas/DE-113-dead_code_purge_orphaned_scripts_hollow_functions_stale_migrations
+  notes_path: .spec-driver/deltas/DE-113-dead_code_purge_orphaned_scripts_hollow_functions_stale_migrations/notes.md
+phase:
+  id: IP-113.PHASE-01
+  status: in_progress
+  path: .spec-driver/deltas/DE-113-dead_code_purge_orphaned_scripts_hollow_functions_stale_migrations/phases/phase-01.md
+workflow:
+  status: implementing
+  active_role: implementer
+  handoff_boundary: phase
+timestamps:
+  created: '2026-03-22T10:47:52+00:00'
+  updated: '2026-03-22T10:47:52+00:00'
+plan:
+  id: IP-113
+  path: .spec-driver/deltas/DE-113-dead_code_purge_orphaned_scripts_hollow_functions_stale_migrations/IP-113.md

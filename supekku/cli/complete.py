@@ -7,7 +7,7 @@ from typing import Annotated
 import typer
 
 from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
-from supekku.scripts.complete_delta import complete_delta as complete_delta_impl
+from supekku.scripts.lib.changes.completion import complete_delta as complete_delta_impl
 from supekku.scripts.lib.changes.completion import (
   complete_revision as complete_revision_impl,
 )

@@ -2,7 +2,7 @@
 
 import unittest
 
-from .registry_migration import (
+from .registry_v2 import (
   LanguageDetector,
   RegistryV2,
 )

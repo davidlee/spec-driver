@@ -73,6 +73,7 @@ provenance:
 - **Auto-teardown**: `review complete --status approved` deletes reviewer state per `[review].teardown_on` policy.
 - **Phase-bridge**: Fenced YAML in phase sheets controls auto-handoff. `handoff_ready: false` suppresses.
 - **Feature-gated**: All commands require `workflow/state.yaml`. Continuation skill detects presence.
+- **Structured JSON output** (DE-108): All review commands, finding disposition commands, `workflow status`, and `review finding list` accept `--format json`. JSON output uses a versioned envelope (`version`, `command`, `status`, `exit_code`, `data`/`error`). Exit codes: 0=success, 1=unexpected, 2=precondition, 3=guard_violation. Full 40-char SHA in JSON; short SHA in human output. Envelope helpers in `supekku/cli/common.py`: `cli_json_success()`, `cli_json_error()`, `emit_json_and_exit()`.
 
 ## File Layout
 

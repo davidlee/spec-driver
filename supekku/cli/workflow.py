@@ -751,8 +751,10 @@ def review_prime_command(
     read_review_index,
     write_review_index,
   )
-  from supekku.scripts.lib.workflow.staleness import (  # noqa: PLC0415
+  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
     BootstrapStatus,
+  )
+  from supekku.scripts.lib.workflow.staleness import (  # noqa: PLC0415
     check_domain_map_files_exist,
     evaluate_staleness,
   )
@@ -864,7 +866,7 @@ def review_prime_command(
 
   index_data = build_review_index(
     artifact_id=delta_id,
-    bootstrap_status=BootstrapStatus.WARM,
+    bootstrap_status=BootstrapStatus.WARM.value,
     judgment_status=judgment_status.value,
     phase_id=phase_id,
     git_head=git_head,

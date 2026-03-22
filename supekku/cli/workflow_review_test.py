@@ -954,5 +954,146 @@ class ReviewSummaryTest(_FindingTestBase):
     assert "summary" not in latest_round
 
 
+# ---------------------------------------------------------------------------
+# VT-109-009: End-to-end multi-round review (DR-109 §5.4)
+# ---------------------------------------------------------------------------
+
+
+class ReviewEndToEndTest(_ReviewTestBase):
+  """End-to-end: prime → complete(changes_requested) → resolve → re-prime → approve."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_multi_round_with_disposition_and_approval(self, *_mocks) -> None:
+    """VT-109-009: Full multi-round review lifecycle."""
+    delta_dir = _create_delta_bundle(self.root)
+    self._start_phase()
+    self._create_handoff_and_accept_as_reviewer()
+
+    # --- Round 1: prime + complete with changes_requested ---
+    self.runner.invoke(app, ["review", "prime", "DE-100"])
+
+    # Verify judgment_status set to in_progress
+    idx = yaml.safe_load(
+      (delta_dir / "workflow" / "review-index.yaml").read_text(),
+    )
+    assert idx["review"]["judgment_status"] == "in_progress"
+
+    # Complete round 1 with a blocking finding
+    from supekku.scripts.lib.workflow.review_io import (
+      build_findings,
+      write_findings,
+    )
+
+    findings_data = build_findings(
+      artifact_id="DE-100",
+      round_number=1,
+      status="changes_requested",
+      reviewer_role="reviewer",
+      summary="Found a blocking issue",
+      blocking=[{
+        "id": "R1-001",
+        "title": "Security flaw",
+        "summary": "Input not sanitised",
+        "status": "open",
+      }],
+      non_blocking=[{
+        "id": "R1-002",
+        "title": "Style nit",
+        "summary": "Inconsistent naming",
+        "status": "open",
+      }],
+    )
+    write_findings(delta_dir, findings_data)
+
+    result = self.runner.invoke(
+      app,
+      [
+        "review", "complete", "DE-100",
+        "--status", "changes_requested",
+        "--summary", "Blocking security issue",
+      ],
+    )
+    assert result.exit_code == 0, result.output
+
+    # Verify round 1 recorded
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    assert len(findings["rounds"]) == 2  # initial + appended
+    assert findings["rounds"][-1]["status"] == "changes_requested"
+
+    # --- Attempt to approve with open blocking finding → fails ---
+    # Re-enter reviewing state for round 2
+    with (
+      patch("supekku.scripts.lib.core.git.get_head_sha", return_value="b" * 40),
+      patch("supekku.scripts.lib.core.git.get_branch", return_value="main"),
+      patch(
+        "supekku.scripts.lib.core.git.has_uncommitted_changes",
+        return_value=False,
+      ),
+      patch(
+        "supekku.scripts.lib.core.git.has_staged_changes",
+        return_value=False,
+      ),
+    ):
+      self.runner.invoke(
+        app,
+        ["create", "handoff", "DE-100", "--to", "reviewer"],
+      )
+    self.runner.invoke(
+      app,
+      ["accept", "handoff", "DE-100", "--identity", "reviewer-2"],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "--status", "approved"],
+    )
+    assert result.exit_code == 1, (
+      "Should fail: blocking finding R1-001 is still open"
+    )
+
+    # --- Resolve the blocking finding ---
+    result = self.runner.invoke(
+      app,
+      [
+        "review", "finding", "resolve", "DE-100", "R1-001",
+        "--resolved-at", "b" * 8,
+      ],
+    )
+    assert result.exit_code == 0, result.output
+
+    # Verify finding is now resolved
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    r1_blocking = findings["rounds"][0]["blocking"][0]
+    assert r1_blocking["status"] == "resolved"
+    assert r1_blocking["disposition"]["action"] == "fix"
+
+    # --- Round 2: re-prime + approve (guard passes) ---
+    with patch(
+      "supekku.scripts.lib.core.git.get_head_sha",
+      return_value="b" * 40,
+    ):
+      self.runner.invoke(app, ["review", "prime", "DE-100"])
+
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "--status", "approved"],
+    )
+    assert result.exit_code == 0, result.output
+    assert "approved" in result.output
+
+    # --- Verify final state ---
+    state = yaml.safe_load(
+      (delta_dir / "workflow" / "state.yaml").read_text(),
+    )
+    assert state["workflow"]["status"] == "approved"
+
+    # Review-index should be torn down on approval
+    assert not (delta_dir / "workflow" / "review-index.yaml").exists()
+
+
 if __name__ == "__main__":
   unittest.main()

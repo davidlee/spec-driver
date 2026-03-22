@@ -14,6 +14,13 @@ from supekku.scripts.lib.blocks.schema_registry import (
   BlockSchema,
   register_block_schema,
 )
+from supekku.scripts.lib.workflow.review_state_machine import (
+  BootstrapStatus,
+  DispositionAuthority,
+  FindingDispositionAction,
+  FindingStatus,
+  ReviewStatus,
+)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -72,24 +79,11 @@ NEXT_ACTIVITY_KIND_VALUES = [
   "operator_attention",
 ]
 OPEN_ITEM_KIND_VALUES = ["next_step", "blocker", "question", "risk"]
-BOOTSTRAP_STATUS_VALUES = [
-  "cold",
-  "warming",
-  "warm",
-  "stale",
-  "invalid",
-  "reusable",
-]
-REVIEW_STATUS_VALUES = [
-  "not_started",
-  "in_progress",
-  "changes_requested",
-  "approved",
-  "blocked",
-]
-FINDING_STATUS_VALUES = ["open", "resolved", "waived", "superseded"]
-FINDING_DISPOSITION_ACTION_VALUES = ["fix", "defer", "waive", "supersede"]
-DISPOSITION_AUTHORITY_VALUES = ["user", "agent"]
+BOOTSTRAP_STATUS_VALUES = [e.value for e in BootstrapStatus]
+REVIEW_STATUS_VALUES = [e.value for e in ReviewStatus]
+FINDING_STATUS_VALUES = [e.value for e in FindingStatus]
+FINDING_DISPOSITION_ACTION_VALUES = [e.value for e in FindingDispositionAction]
+DISPOSITION_AUTHORITY_VALUES = [e.value for e in DispositionAuthority]
 SESSION_STATUS_VALUES = ["active", "paused", "absent", "dead", "unknown"]
 REVIEW_SESSION_SCOPE_VALUES = ["artifact", "phase", "task"]
 HANDOFF_BOUNDARY_VALUES = ["phase", "task", "manual"]

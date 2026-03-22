@@ -6,8 +6,8 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from supekku.scripts.lib.workflow.review_state_machine import BootstrapStatus
 from supekku.scripts.lib.workflow.staleness import (
-  BootstrapStatus,
   check_domain_map_files_exist,
   evaluate_staleness,
 )

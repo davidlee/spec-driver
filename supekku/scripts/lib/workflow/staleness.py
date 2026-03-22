@@ -14,16 +14,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-
-class BootstrapStatus:
-  """Bootstrap status values per DR-102 §8."""
-
-  COLD = "cold"
-  WARMING = "warming"
-  WARM = "warm"
-  STALE = "stale"
-  INVALID = "invalid"
-  REUSABLE = "reusable"
+from supekku.scripts.lib.workflow.review_state_machine import BootstrapStatus
 
 
 @dataclass

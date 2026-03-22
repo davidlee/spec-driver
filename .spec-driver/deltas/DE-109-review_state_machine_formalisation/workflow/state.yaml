@@ -1,0 +1,21 @@
+schema: supekku.workflow.state
+version: 1
+artifact:
+  id: DE-109
+  kind: delta
+  path: .spec-driver/deltas/DE-109-review_state_machine_formalisation
+  notes_path: .spec-driver/deltas/DE-109-review_state_machine_formalisation/notes.md
+phase:
+  id: IP-109.PHASE-04
+  status: in_progress
+  path: .spec-driver/deltas/DE-109-review_state_machine_formalisation/phases/phase-04.md
+workflow:
+  status: implementing
+  active_role: implementer
+  handoff_boundary: phase
+timestamps:
+  created: '2026-03-22T08:02:43+00:00'
+  updated: '2026-03-22T08:02:43+00:00'
+plan:
+  id: IP-109
+  path: .spec-driver/deltas/DE-109-review_state_machine_formalisation/IP-109.md

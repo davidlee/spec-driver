@@ -165,6 +165,49 @@ Phase 3 is functionally complete. Phase 4 (integration/cleanup) remains:
 
 ---
 
+## Phase 4 — Implementation log
+
+### Deliverables
+
+- 5 validation lists in `workflow_metadata.py` derived from StrEnums (POL-002)
+- `staleness.py` BootstrapStatus plain class removed, imports StrEnum from `review_state_machine`
+- `staleness_test.py` and `cli/workflow.py` imports updated to canonical source
+- VT-109-009: end-to-end multi-round review test (44 review tests total)
+- BootstrapStatus YAML serialization fix in `cli/workflow.py`
+
+### StrEnum YAML serialization gotcha
+
+`BootstrapStatus.WARM` (a StrEnum) was passed to `build_review_index()` which
+feeds into `yaml.dump()`. PyYAML serializes StrEnum values with Python-specific
+tags (`!!python/object/apply:...`) instead of plain strings. Fix: use `.value`
+at the YAML serialization boundary. `judgment_status` already did this; only
+`bootstrap_status` was missing.
+
+### Removed stale enum values
+
+The derivation from StrEnums naturally drops `warming` (from BOOTSTRAP_STATUS_VALUES)
+and `blocked` (from REVIEW_STATUS_VALUES) — both were defined in the old plain lists
+but never used. DR-109 explicitly removed them. No test breakage from the removal.
+
+### OQ-109-001 disposition
+
+WorkflowState duplication in `workflow_metadata.py` (WORKFLOW_STATUS_VALUES is a
+plain list parallel to the StrEnum in `state_machine.py`) was not addressed — it's
+outside DE-109 scope and the parent workflow state machine is a separate module.
+Should be a follow-up task.
+
+### Verification
+
+`uv run python -m pytest supekku` — 4563 passed, 0 failures.
+`uv run ruff check` — clean on all changed files (7 pre-existing in unrelated files).
+`just pylint-files` — no new warnings (pre-existing only).
+
+### Commits
+
+- Uncommitted. All changes ready to commit.
+
+---
+
 ## New Agent Instructions
 
 ### Task card
@@ -177,7 +220,7 @@ Phase 3 is functionally complete. Phase 4 (integration/cleanup) remains:
 - Phase 1 (domain model) — **complete**. 59 tests.
 - Phase 2 (I/O layer) — **complete**. 44 tests + CLI/schema tests updated.
 - Phase 3 (CLI commands) — **complete**. 22 new tests (43 review tests total).
-- Phase 4 (integration/cleanup) — **next**. Phase sheet needs creation.
+- Phase 4 (integration/cleanup) — **complete**. 1 new e2e test (44 review tests total).
 
 ### Required reading
 

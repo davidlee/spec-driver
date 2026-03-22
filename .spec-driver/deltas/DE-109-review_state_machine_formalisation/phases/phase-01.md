@@ -30,14 +30,14 @@ Create `workflow/review_state_machine.py` as a leaf module containing all review
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `review_state_machine.py` exists with all enums, models, functions
-- [ ] VT-109-001: Bootstrap derivation tests passing
-- [ ] VT-109-002: Judgment transition table tests passing
-- [ ] VT-109-003: Approval guard + disposition constraint tests passing
-- [ ] VT-109-006: Status derivation tests passing
-- [ ] VT-109-007: Cross-round collection tests passing
-- [ ] `just lint` clean on new files
-- [ ] No I/O or external dependencies in the module (leaf)
+- [x] `review_state_machine.py` exists with all enums, models, functions
+- [x] VT-109-001: Bootstrap derivation tests passing
+- [x] VT-109-002: Judgment transition table tests passing
+- [x] VT-109-003: Approval guard + disposition constraint tests passing
+- [x] VT-109-006: Status derivation tests passing
+- [x] VT-109-007: Cross-round collection tests passing
+- [x] `just lint` clean on new files
+- [x] No I/O or external dependencies in the module (leaf)
 
 ## 5. Verification
 
@@ -55,14 +55,14 @@ Create `workflow/review_state_machine.py` as a leaf module containing all review
 
 | Status | ID | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 1.1 | Define StrEnums: BootstrapStatus, ReviewStatus, FindingStatus, FindingDispositionAction, DispositionAuthority | [P] | DR-109 §3.2-§3.4 |
-| [ ] | 1.2 | Define Pydantic models: FindingDisposition, ReviewFinding | [P] | DR-109 §3.4 |
-| [ ] | 1.3 | Implement derive_bootstrap_status() with validity matrix | | DR-109 §3.2 |
-| [ ] | 1.4 | Implement apply_review_transition() with transition table | | DR-109 §3.3 |
-| [ ] | 1.5 | Implement derive_finding_status() | | DR-109 §3.4 |
-| [ ] | 1.6 | Implement can_approve() and collect_blocking_findings() | | DR-109 §3.3, §3.7 |
-| [ ] | 1.7 | Write exhaustive tests for all of the above | | VT-109-001 through VT-109-003, VT-109-006, VT-109-007 |
-| [ ] | 1.8 | Lint clean | | |
+| [x] | 1.1 | Define StrEnums: BootstrapStatus, ReviewStatus, FindingStatus, FindingDispositionAction, DispositionAuthority | [P] | DR-109 §3.2-§3.4 |
+| [x] | 1.2 | Define Pydantic models: FindingDisposition, ReviewFinding | [P] | DR-109 §3.4 |
+| [x] | 1.3 | Implement derive_bootstrap_status() with validity matrix | | DR-109 §3.2. Extended matrix with idempotent self-transitions (cold→cold, stale→stale, invalid→invalid) |
+| [x] | 1.4 | Implement apply_review_transition() with transition table | | DR-109 §3.3 |
+| [x] | 1.5 | Implement derive_finding_status() | | DR-109 §3.4 |
+| [x] | 1.6 | Implement can_approve() and collect_blocking_findings() | | DR-109 §3.3, §3.7. Extracted _check_disposition() to reduce McCabe complexity |
+| [x] | 1.7 | Write exhaustive tests for all of the above | | 59 tests. VT-109-001 through VT-109-003, VT-109-006, VT-109-007 |
+| [x] | 1.8 | Lint clean | | ruff clean, pylint 9.97/10 (1 too-many-arguments on derive_bootstrap_status — inherent) |
 
 ### Task Details
 

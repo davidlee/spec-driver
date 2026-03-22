@@ -14,3 +14,29 @@ Coherence review identified 8 updates needed in autobahn's DR-001 when DE-109 la
 8. Bootstrap status: stored value is snapshot, not authority; true status requires derivation
 
 These are autobahn-side updates, not spec-driver action items.
+
+## Phase 1 — Implementation log
+
+### Validity matrix extension
+
+DR-109 §3.2 defined 8 valid bootstrap transitions. During implementation,
+idempotent self-transitions were needed for re-derivation scenarios:
+`cold→cold`, `stale→stale`, `invalid→invalid`. These are not *state changes*
+but repeated derivation producing the same result — the matrix assertion
+would otherwise false-positive on legitimate re-checks. Extended to 11 pairs.
+
+### can_approve() McCabe reduction
+
+Extracted `_check_disposition()` helper to bring McCabe from 11 to acceptable.
+`can_approve()` iterates findings and delegates per-action validation.
+
+### Test runner note
+
+`just test` uses system pytest which lacks pydantic in its path.
+`uv run python -m pytest` uses the venv and works correctly.
+
+### Pylint residual
+
+`too-many-arguments` on `derive_bootstrap_status` (6/5). All params are
+keyword-only and represent independent context inputs. A context dataclass
+would add a type with no reuse value — accepted.

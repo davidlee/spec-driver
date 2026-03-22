@@ -18,16 +18,22 @@ Commands:
 ## Constants
 
 - `accept_app`
+- `finding_app` - ---------------------------------------------------------------------------
 - `phase_app`
 - `review_app` - ---------------------------------------------------------------------------
 - `workflow_app` - ---------------------------------------------------------------------------
 
 ## Functions
 
+- `_available_finding_ids(data) -> list[str]`: Collect all finding IDs from all rounds for error messages.
 - `_build_domain_map(delta_dir, repo_root, bootstrap_config) -> list[dict]`: Build domain_map from delta bundle files.
 
 Assembles areas from the delta's key files: DE, IP, phase sheets,
 notes, and workflow artifacts.
+- `_disposition_finding(delta, finding_id, disposition, root) -> None`: Shared orchestration for all disposition commands.
+
+Reads findings, updates disposition in-place, writes back.
+Exits non-zero if finding not found.
 - `_do_teardown(delta_dir, delta_id) -> None`: Delete reviewer state files.
 - `_find_plan_and_phase(delta_dir) -> tuple[Tuple[<BinOp>, <BinOp>, <BinOp>, <BinOp>]]`: Discover plan ID, plan path, latest phase ID, and phase path in a delta bundle.
 
@@ -46,6 +52,10 @@ Raises:
 - @accept_app.command(handoff) `accept_handoff_command(delta, identity, root) -> None`: Accept a pending handoff, claiming it with identity guard.
 - @workflow_app.command(block) `block_command(delta, reason, root) -> None`: Block a delta's workflow.
 - `create_handoff_command(delta, to_role, next_kind, next_summary, root) -> None`: Create a structured handoff, transitioning to awaiting_handoff.
+- @finding_app.command(defer) `finding_defer_command(delta, finding_id, rationale, backlog_ref, root) -> None`: Defer a finding to a future delta or backlog item.
+- @finding_app.command(resolve) `finding_resolve_command(delta, finding_id, resolved_at, root) -> None`: Mark a finding as resolved (fixed).
+- @finding_app.command(supersede) `finding_supersede_command(delta, finding_id, superseded_by, root) -> None`: Mark a finding as superseded by another finding.
+- @finding_app.command(waive) `finding_waive_command(delta, finding_id, rationale, authority, root) -> None`: Waive a finding (accept the risk).
 - @phase_app.command(complete) `phase_complete_command(delta, to_role, no_handoff, root) -> None`: Mark the current phase as complete. Emits handoff per policy/bridge.
 - @phase_app.command(start) `phase_start(delta, phase, root) -> None`: Initialise workflow/state.yaml for a delta (planned → implementing).
 - @review_app.command(complete) `review_complete_command(delta, status, summary, root) -> None`: Complete a review round, writing findings and transitioning state.

@@ -18,6 +18,7 @@ Commands:
 ## Constants
 
 - `accept_app`
+- `finding_app` - ---------------------------------------------------------------------------
 - `phase_app`
 - `review_app` - ---------------------------------------------------------------------------
 - `workflow_app` - ---------------------------------------------------------------------------
@@ -27,6 +28,10 @@ Commands:
 - @accept_app.command(handoff) `accept_handoff_command(delta, identity, root) -> None`: Accept a pending handoff, claiming it with identity guard.
 - @workflow_app.command(block) `block_command(delta, reason, root) -> None`: Block a delta's workflow.
 - `create_handoff_command(delta, to_role, next_kind, next_summary, root) -> None`: Create a structured handoff, transitioning to awaiting_handoff.
+- @finding_app.command(defer) `finding_defer_command(delta, finding_id, rationale, backlog_ref, root) -> None`: Defer a finding to a future delta or backlog item.
+- @finding_app.command(resolve) `finding_resolve_command(delta, finding_id, resolved_at, root) -> None`: Mark a finding as resolved (fixed).
+- @finding_app.command(supersede) `finding_supersede_command(delta, finding_id, superseded_by, root) -> None`: Mark a finding as superseded by another finding.
+- @finding_app.command(waive) `finding_waive_command(delta, finding_id, rationale, authority, root) -> None`: Waive a finding (accept the risk).
 - @phase_app.command(complete) `phase_complete_command(delta, to_role, no_handoff, root) -> None`: Mark the current phase as complete. Emits handoff per policy/bridge.
 - @phase_app.command(start) `phase_start(delta, phase, root) -> None`: Initialise workflow/state.yaml for a delta (planned → implementing).
 - @review_app.command(complete) `review_complete_command(delta, status, summary, root) -> None`: Complete a review round, writing findings and transitioning state.

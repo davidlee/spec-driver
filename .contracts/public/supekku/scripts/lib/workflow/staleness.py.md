@@ -29,10 +29,6 @@ Returns:
 
 ## Classes
 
-### BootstrapStatus
-
-Bootstrap status values per DR-102 §8.
-
 ### StalenessResult
 
 Result of staleness evaluation.

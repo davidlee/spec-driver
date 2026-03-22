@@ -4,6 +4,23 @@ Tests for validator module.
 
 ## Classes
 
+### KindAwareValidationTest
+
+Tests for kind-aware frontmatter validation (DE-112).
+
+**Inherits from:** RepoTestCase
+
+#### Methods
+
+- `test_malformed_backlog_warns(self) -> None`: Backlog item with invalid likelihood type produces a warning.
+- `test_malformed_drift_warns(self) -> None`: Drift ledger missing required 'name' field produces a warning.
+- `test_malformed_memory_warns(self) -> None`: Memory file with wrong field type produces a warning.
+- `test_missing_directories_no_crash(self) -> None`: Validation succeeds when memory/backlog/drift directories don't exist.
+- `test_valid_backlog_no_warning(self) -> None`: Well-formed backlog item produces no validation warnings.
+- `test_valid_drift_no_warning(self) -> None`: Well-formed drift ledger produces no validation warnings.
+- `test_valid_memory_no_warning(self) -> None`: Well-formed memory file produces no validation warnings.
+- `_create_repo(self) -> Path`
+
 ### PhaseValidationTest
 
 Tests for phase status validation and --fix (DE-104).

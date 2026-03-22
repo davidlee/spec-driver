@@ -45,6 +45,11 @@ colliding finding IDs → warning.
 - `_validate_decision_status_compatibility(self, decisions) -> None`: Warn if active ADR references deprecated or superseded ADRs.
 
 Only applies in strict mode.
+- `_validate_kind_frontmatter(self, model_cls, label, directories, glob) -> None`: Validate frontmatter files against a Pydantic model.
+
+Walks *directories*, globs for *glob*, parses frontmatter, and
+attempts ``model_cls(**fm)``.  Failures emit a warning using *label*
+(e.g. "Memory", "Backlog", "Drift"). - -- Kind-aware frontmatter validation (DE-112) -------------------------
 - `_validate_phase_frontmatter(self, fm, artifact) -> None`: Validate canonical phase frontmatter fields via PhaseSheet model.
 - `_validate_phase_statuses(self) -> None`: Validate phase frontmatter statuses across all delta bundles. - -----------------------------------------------------------
 - `_validate_single_phase(self, phase_file, valid_statuses) -> None`: Validate a single phase file's frontmatter and structure.

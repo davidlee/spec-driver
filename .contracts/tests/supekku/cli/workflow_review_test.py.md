@@ -27,6 +27,90 @@ Test `spec-driver review complete`.
 - @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_transitions_to_changes_requested(self) -> None`
 - @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_with_summary(self) -> None`
 
+### ReviewEndToEndTest
+
+End-to-end: prime → complete(changes_requested) → resolve → re-prime → approve.
+
+**Inherits from:** _ReviewTestBase
+
+#### Methods
+
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_multi_round_with_disposition_and_approval(self) -> None`: VT-109-009: Full multi-round review lifecycle.
+
+### ReviewFindingDeferTest
+
+Test `spec-driver review finding defer`.
+
+**Inherits from:** _FindingTestBase
+
+#### Methods
+
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_defer_blocking_with_backlog_ref(self) -> None`
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_defer_with_rationale(self) -> None`
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_defer_without_rationale_fails(self) -> None`
+
+### ReviewFindingResolveTest
+
+Test `spec-driver review finding resolve`.
+
+**Inherits from:** _FindingTestBase
+
+#### Methods
+
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_finding_not_found_shows_available_ids(self) -> None`
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_overwrites_existing_disposition(self) -> None`: Re-dispositioning overwrites previous (latest wins).
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_resolve_blocking_finding(self) -> None`
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_resolve_non_blocking_without_resolved_at(self) -> None`: Non-blocking findings can be resolved without --resolved-at.
+
+### ReviewFindingSupersedeTest
+
+Test `spec-driver review finding supersede`.
+
+**Inherits from:** _FindingTestBase
+
+#### Methods
+
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_supersede_finding(self) -> None`
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_supersede_without_superseded_by_fails(self) -> None`
+
+### ReviewFindingWaiveTest
+
+Test `spec-driver review finding waive`.
+
+**Inherits from:** _FindingTestBase
+
+#### Methods
+
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_waive_blocking_requires_authority_user(self) -> None`: Waiving a blocking finding requires --authority user.
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_waive_with_authority_user(self) -> None`
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_waive_with_rationale(self) -> None`
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_waive_without_rationale_fails(self) -> None`
+
+### ReviewGuardEnforcementTest
+
+Test review complete --status approved enforces can_approve() guard.
+
+**Inherits from:** _FindingTestBase
+
+#### Methods
+
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_approve_allowed_with_user_waive(self) -> None`: User-waived blocking finding with rationale allows approval.
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_approve_blocked_by_agent_waive(self) -> None`: Agent-waived blocking finding still blocks approval.
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_approve_blocked_by_open_blocking_finding(self) -> None`: Cannot approve with undispositioned blocking findings.
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_approve_succeeds_after_resolving_blocking(self) -> None`: Approve succeeds when all blocking findings are resolved.
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_changes_requested_ignores_guard(self) -> None`: changes_requested does not require guard to pass.
+
+### ReviewJudgmentStatusTest
+
+Test judgment_status written to review-index.
+
+**Inherits from:** _FindingTestBase
+
+#### Methods
+
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_complete_writes_judgment_to_index(self) -> None`
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_prime_sets_judgment_in_progress(self) -> None`
+
 ### ReviewPrimeTest
 
 Test `spec-driver review prime`.
@@ -42,6 +126,17 @@ Test `spec-driver review prime`.
 - `test_fails_without_state(self) -> None`
 - @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_records_source_handoff(self) -> None`
 - @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_rerun_updates_cache_key(self) -> None`: Re-running review prime updates the cache key.
+
+### ReviewSummaryTest
+
+Test --summary wired into round metadata.
+
+**Inherits from:** _FindingTestBase
+
+#### Methods
+
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_no_summary_omits_key(self) -> None`
+- @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_summary_stored_in_round(self) -> None`
 
 ### ReviewTeardownTest
 
@@ -66,6 +161,17 @@ Test write ordering per DR-102 §5.
 
 - @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_review_complete_creates_findings_and_updates_state(self) -> None`
 - @patch(supekku.scripts.lib.core.git.get_head_sha, return_value=<BinOp>) `test_review_prime_creates_both_files(self) -> None`
+
+### _FindingTestBase
+
+Base for tests needing findings with blocking/non-blocking items.
+
+**Inherits from:** _ReviewTestBase
+
+#### Methods
+
+- @staticmethod `_finding(finding_id, title, summary) -> dict`: Build a minimal finding dict that passes schema validation.
+- `_setup_review_with_findings(self, delta_id, blocking, non_blocking) -> Path`: Set up a delta in reviewing state with v2 findings.
 
 ### _ReviewTestBase
 

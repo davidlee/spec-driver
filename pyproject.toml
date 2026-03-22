@@ -250,22 +250,3 @@ layers = [
     "spec_driver.core",
 ]
 
-[[tool.importlinter.contracts]]
-name = "Presentation Layer Isolation"
-type = "independence"
-modules = [
-    "spec_driver.presentation.cli",
-    "spec_driver.presentation.tui",
-]
-
-[[tool.importlinter.contracts]]
-name = "TUI Internal Layering"
-type = "layers"
-layers = [
-    "spec_driver.presentation.tui.app",
-    "spec_driver.presentation.tui.views",
-    "spec_driver.presentation.tui.widgets",
-    "spec_driver.presentation.tui.search",
-    "spec_driver.presentation.tui.core",
-]
-

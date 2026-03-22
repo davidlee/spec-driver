@@ -1,17 +1,14 @@
 ---
 id: IP-107-P01
 slug: "107-spike_evaluate_pydantic_for_model_layer-phase-01"
-name: "Phase 01 — MemoryRecord conversion"
+name: Phase 01 — MemoryRecord conversion
 created: "2026-03-22"
 updated: "2026-03-22"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-107
 delta: DE-107
-objective: >-
-  Convert MemoryRecord from @dataclass to Pydantic BaseModel. Replace
-  from_frontmatter(), to_dict(), _parse_date() with Pydantic construction
-  and serialization. Update registry. All existing tests passing.
+objective: "Convert MemoryRecord from @dataclass to Pydantic BaseModel. Replace from_frontmatter(), to_dict(), _parse_date() with Pydantic construction and serialization. Update registry. All existing tests passing."
 entrance_criteria:
   - DR-107 approved
   - Existing memory model and registry tests passing
@@ -45,15 +42,15 @@ Convert `MemoryRecord` from `@dataclass` to Pydantic `BaseModel`. This is the fi
 
 ## 4. Exit Criteria / Done When
 
-- [ ] MemoryRecord is a Pydantic BaseModel with `ConfigDict(extra="ignore")`
-- [ ] `from_frontmatter()` classmethod removed; registry calls `MemoryRecord(**fm, path=str(path))`
-- [ ] `to_dict(root)` reimplemented as thin wrapper over `model_dump()`
-- [ ] `_parse_date()` removed — Pydantic handles date coercion
-- [ ] Bad date handling: Pydantic validator that returns None on unparseable dates (not error)
-- [ ] All 26 model tests passing without modification (or minimal assertion updates)
-- [ ] Registry tests passing
-- [ ] Corpus validation: all `.spec-driver/memory/*.md` files parse through new model
-- [ ] Lint clean
+- [x] MemoryRecord is a Pydantic BaseModel with `ConfigDict(extra="ignore")`
+- [x] `from_frontmatter()` classmethod removed; registry calls `MemoryRecord(**fm, path=str(path))`
+- [x] `to_dict(root)` reimplemented as thin wrapper over `model_dump()`
+- [x] `_parse_date()` removed — Pydantic handles date coercion
+- [x] Bad date handling: Pydantic validator that returns None on unparseable dates (not error)
+- [x] All 26 model tests passing without modification (or minimal assertion updates)
+- [x] Registry tests passing
+- [x] Corpus validation: all `.spec-driver/memory/*.md` files parse through new model
+- [x] Lint clean
 
 ## 5. Verification
 
@@ -71,14 +68,14 @@ Convert `MemoryRecord` from `@dataclass` to Pydantic `BaseModel`. This is the fi
 
 | Status | ID  | Description | Notes |
 | ------ | --- | ----------- | ----- |
-| [ ]    | 1.1 | Convert MemoryRecord to BaseModel | Replace @dataclass, add ConfigDict |
-| [ ]    | 1.2 | Add date validator | `@field_validator` for date fields — coerce str/datetime/date, return None on failure |
-| [ ]    | 1.3 | Reimplement to_dict(root) | `model_dump(exclude_none=True)` + path relativization + date isoformat |
-| [ ]    | 1.4 | Remove from_frontmatter() | Update registry.py call site to direct construction |
-| [ ]    | 1.5 | Remove _parse_date() | Replaced by Pydantic validator |
-| [ ]    | 1.6 | Run tests and fix assertions | Behavioural parity — 26 model tests, registry tests |
-| [ ]    | 1.7 | Corpus validation | Parse all .spec-driver/memory/*.md files |
-| [ ]    | 1.8 | Lint and format | ruff check + ruff format |
+| [x]    | 1.1 | Convert MemoryRecord to BaseModel | Done — BaseModel + ConfigDict(extra="ignore") |
+| [x]    | 1.2 | Add date validator | Done — `@field_validator` mode="before", returns None on bad input |
+| [x]    | 1.3 | Reimplement to_dict(root) | Done — kept explicit logic (not model_dump), see §9 |
+| [x]    | 1.4 | Remove from_frontmatter() | Done — registry uses `MemoryRecord(**fm, path=str(path))` |
+| [x]    | 1.5 | Remove _parse_date() | Done — replaced by `_coerce_date` validator |
+| [x]    | 1.6 | Run tests and fix assertions | 262 passed — 7 tests updated (from_frontmatter → direct construction) |
+| [x]    | 1.7 | Corpus validation | 63/63 memory files parsed + serialized OK |
+| [x]    | 1.8 | Lint and format | ruff check + ruff format clean |
 
 ### Task Details
 
@@ -115,13 +112,14 @@ Convert `MemoryRecord` from `@dataclass` to Pydantic `BaseModel`. This is the fi
 
 | Risk | Mitigation | Status |
 | ---- | ---------- | ------ |
-| `to_dict()` serialization mismatch | Compare output field-by-field with existing implementation | open |
-| Bad date handling differs | Test `test_from_frontmatter_bad_date_ignored` — must still return None | open |
-| `summary=""` vs `summary=None` semantics | Current: empty string default, to_dict skips if falsy. Watch model_dump behaviour. | open |
+| `to_dict()` serialization mismatch | Compare output field-by-field with existing implementation | mitigated — kept explicit to_dict logic |
+| Bad date handling differs | Test `test_from_frontmatter_bad_date_ignored` — must still return None | mitigated — test passes |
+| `summary=""` vs `summary=None` semantics | Current: empty string default, to_dict skips if falsy. Watch model_dump behaviour. | mitigated — kept truthy check in to_dict |
 
 ## 9. Decisions & Outcomes
 
-_(populated during execution)_
+- **DEC-P01-001**: Kept explicit `to_dict()` logic rather than wrapping `model_dump()`. Rationale: the selective inclusion rules (always-include vs truthy-gated) and date `.isoformat()` conversion make a pure `model_dump` wrapper more complex than just keeping the clear explicit logic. The field list is identical to the dataclass version. No behavioural change.
+- **DEC-P01-002**: Named the validator `_coerce_date` (not `_parse_date`) to differentiate from the removed standalone function and signal its role as a Pydantic validator.
 
 ## 10. Findings / Research Notes
 
@@ -139,7 +137,7 @@ _(populated during execution)_
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Notes updated
 - [ ] Hand-off notes to Phase 2

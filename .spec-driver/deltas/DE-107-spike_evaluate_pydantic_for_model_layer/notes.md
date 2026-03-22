@@ -102,7 +102,7 @@ class MemoryRecord(BaseModel):
 
 | Phase | Scope | Status |
 |---|---|---|
-| **P01** | `MemoryRecord` conversion | Ready |
+| **P01** | `MemoryRecord` conversion | **Done** |
 | **P02** | `BacklogItem`, `SpecEntry`, card models | Planned |
 | **P03** | Drift models, remaining, frontmatter metadata, schema docs | Planned |
 

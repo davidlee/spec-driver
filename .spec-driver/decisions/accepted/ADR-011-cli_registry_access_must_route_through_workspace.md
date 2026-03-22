@@ -1,0 +1,1 @@
+../ADR-011-cli_registry_access_must_route_through_workspace.md

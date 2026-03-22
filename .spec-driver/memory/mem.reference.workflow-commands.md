@@ -28,6 +28,7 @@ scope:
     - review finding defer
     - review finding waive
     - review finding supersede
+    - review finding list
     - workflow status
     - block
     - unblock
@@ -37,6 +38,7 @@ provenance:
     - "[[DE-103]]"
     - "[[DR-109]]"
     - "[[DE-109]]"
+    - "[[DE-108]]"
 ---
 
 # Workflow orchestration CLI command reference
@@ -56,6 +58,7 @@ provenance:
 | `spec-driver review finding defer <delta> <id>`          | Defer finding (--rationale required, --backlog-ref optional)            | (finding status remains open)                                                         |
 | `spec-driver review finding waive <delta> <id>`          | Waive finding (--rationale required, --authority optional)              | (finding status → waived)                                                             |
 | `spec-driver review finding supersede <delta> <id>`      | Supersede finding (--superseded-by required)                            | (finding status → superseded)                                                         |
+| `spec-driver review finding list <delta>`                | List all findings across rounds (--round N filter)                      | (read-only)                                                                           |
 | `spec-driver workflow status <delta>`                    | Display state                                                          | (read-only)                                                                           |
 | `spec-driver block <delta>`                              | Block workflow                                                         | \* → blocked                                                                          |
 | `spec-driver unblock <delta>`                            | Restore previous state                                                 | blocked → (previous)                                                                  |

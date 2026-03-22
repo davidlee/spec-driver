@@ -18,6 +18,16 @@ PLAN_FRONTMATTER_METADATA = BlockMetadata(
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
     # Plan-specific fields (all optional, shared across plan/phase/task)
+    "plan": FieldMetadata(
+      type="string",
+      required=False,
+      description="Owning plan ID (e.g. IP-107). Written by create_phase.",
+    ),
+    "delta": FieldMetadata(
+      type="string",
+      required=False,
+      description="Owning delta ID (e.g. DE-107). Written by create_phase.",
+    ),
     "objective": FieldMetadata(
       type="string",
       required=False,
@@ -90,6 +100,8 @@ PLAN_FRONTMATTER_METADATA = BlockMetadata(
       "status": "in-progress",
       "created": "2024-08-01",
       "updated": "2025-01-15",
+      "plan": "PLAN-042",
+      "delta": "DE-042",
       "objective": "Implement core OAuth2 flows",
       "exit_criteria": ["Token generation working", "Refresh flow implemented"],
     },

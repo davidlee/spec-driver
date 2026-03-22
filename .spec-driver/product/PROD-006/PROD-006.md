@@ -3,7 +3,7 @@ id: PROD-006
 slug: phase-management
 name: Phase Management
 created: "2025-11-02"
-updated: "2025-11-02"
+updated: "2026-03-22"
 status: draft
 kind: prod
 aliases: []
@@ -48,8 +48,8 @@ capabilities:
   - id: phase-creation
     name: Phase Creation and Templating
     responsibilities:
-      - Generate phase documents from templates with correct frontmatter
-      - Auto-populate phase metadata (ID, plan, delta relationships)
+      - Generate phase documents from templates with correct canonical frontmatter
+      - Auto-populate phase metadata (ID, plan, delta, objective, criteria) in frontmatter
       - Support sequential phase numbering within plans
       - Provide consistent structure across phase documents
     requirements:
@@ -58,14 +58,14 @@ capabilities:
       - PROD-006.NF-001
     summary: >-
       Enables developers to create phase documents with correct metadata structure,
-      automated ID sequencing, and template-driven consistency. Reduces manual
-      toil and ensures phases are properly linked to their implementation plans
-      and parent deltas.
+      automated ID sequencing, and template-driven consistency. Structured data
+      lives in frontmatter only (DR-106 / ADR-010); markdown body carries
+      execution detail. No embedded YAML blocks in new phases.
     success_criteria:
       - Phase created with single command and minimal input
-      - Phase IDs follow convention (IP-XXX.PHASE-NN)
-      - Frontmatter schema validates successfully
-      - Template provides complete structure with examples
+      - Phase IDs follow convention (IP-XXX-PNN or IP-XXX.PHASE-NN)
+      - Canonical frontmatter fields validated via PhaseSheet Pydantic model
+      - Template provides complete markdown body structure with examples
 
   - id: phase-visibility
     name: Phase Visibility and Navigation
@@ -92,7 +92,8 @@ capabilities:
   - id: phase-metadata-validation
     name: Phase Metadata Validation
     responsibilities:
-      - Validate phase.overview schema structure
+      - Validate canonical phase frontmatter via PhaseSheet Pydantic model (new-format)
+      - Validate phase.overview block presence for legacy phases
       - Ensure phase-plan-delta relationships are consistent
       - Verify phase numbering is sequential
       - Detect orphaned or malformed phases
@@ -100,11 +101,13 @@ capabilities:
       - PROD-006.FR-005
       - PROD-006.NF-001
     summary: >-
-      Maintains metadata integrity through schema validation and relationship
-      checks. Prevents inconsistent phase structures that could break tooling
-      or create confusion about execution state.
+      Maintains metadata integrity through frontmatter validation (PhaseSheet
+      model for new-format phases) and legacy block checks. Prevents
+      inconsistent phase structures that could break tooling or create
+      confusion about execution state.
     success_criteria:
-      - Invalid phase.overview blocks rejected at sync time
+      - New-format phases validated via PhaseSheet Pydantic model
+      - Legacy phases checked for phase.overview block presence
       - Broken phase-plan-delta links detected and reported
       - Duplicate phase IDs flagged
       - Non-sequential phase numbering warned
@@ -119,7 +122,7 @@ entries:
     kind: VT
     requirement: PROD-006.FR-001
     status: verified
-    notes: Unit tests for phase creation - passing in creation_test.py
+    notes: Unit tests for phase creation - passing in creation_test.py. DE-106 updated to verify canonical frontmatter fields instead of block content.
 
   - artefact: VT-PHASE-002
     kind: VT
@@ -143,7 +146,7 @@ entries:
     kind: VT
     requirement: PROD-006.FR-005
     status: verified
-    notes: Schema validation tests for phase.overview - passing in blocks/ tests
+    notes: Schema validation via PhaseSheet Pydantic model for new-format phases; legacy phase.overview block check preserved. 12 phase validator tests passing (DE-106).
 
   - artefact: VT-PHASE-006
     kind: VT
@@ -155,7 +158,7 @@ entries:
     kind: VT
     requirement: PROD-006.FR-001
     status: verified
-    notes: Phase tracking block tests - passing in tracking_test.py (19 tests)
+    notes: Phase tracking block tests - passing in tracking_test.py (19 tests). Note per DE-106 DEC-007, new phases no longer emit tracking blocks; tests verify legacy compatibility only.
 
   - artefact: VA-PHASE-001
     kind: VA
@@ -283,8 +286,8 @@ THEN display shows:
 
 ### Functional Requirements
 
-- **FR-001**: System MUST create phase markdown files from template with valid `phase.overview` frontmatter block
-  _Verification_: VT-PHASE-001 - Create phase with various plan contexts, validate schema
+- **FR-001**: System MUST create phase markdown files from template with valid canonical frontmatter fields (`plan`, `delta`, `objective`, `entrance_criteria`, `exit_criteria`)
+  _Verification_: VT-PHASE-001 - Create phase with various plan contexts, validate frontmatter schema
 
 - **FR-002**: System MUST automatically determine next phase number by examining existing phases for the given plan
   _Verification_: VT-PHASE-002 - Create phases 01-03 sequentially, verify numbering
@@ -295,8 +298,8 @@ THEN display shows:
 - **FR-004**: System MUST auto-populate phase metadata including phase ID, plan ID, and delta ID from plan context
   _Verification_: VT-PHASE-004 - Verify frontmatter contains correct relationship IDs
 
-- **FR-005**: System MUST validate phase.overview schema during sync and report validation errors
-  _Verification_: VT-PHASE-005 - Test sync with malformed phase frontmatter
+- **FR-005**: System MUST validate phase frontmatter schema (via PhaseSheet Pydantic model for new-format phases, or phase.overview block for legacy phases) and report validation errors
+  _Verification_: VT-PHASE-005 - Test validation with both new-format and legacy phase frontmatter
 
 ### Non-Functional Requirements
 
@@ -363,17 +366,23 @@ File: change/deltas/DE-002-.../DE-002.md
 
 **Phase Document Structure** (`phases/phase-NN.md`):
 
+New phases use canonical frontmatter fields (DR-106 / ADR-010). No embedded
+YAML blocks. Legacy phases with `phase.overview` blocks remain compatible
+via fallback reading path.
+
 ```yaml
-schema: supekku.phase.overview
-version: 1
-phase: IP-XXX.PHASE-NN # Auto-generated
-plan: IP-XXX # From --plan flag
-delta: DE-XXX # Looked up from plan
-name: "Phase NN - <Name>" # From positional arg
+# Frontmatter (canonical structured data)
+id: IP-XXX-PNN          # Auto-generated
+plan: IP-XXX             # From --plan flag
+delta: DE-XXX            # Looked up from plan
 objective: >-
-  <Filled by developer>         # Template placeholder
-entrance_criteria: [] # Template placeholder
-exit_criteria: [] # Template placeholder
+  <Filled from plan or by developer>
+entrance_criteria:       # From plan entry
+  - Criterion 1
+exit_criteria:           # From plan entry
+  - Criterion 1
+status: draft
+kind: phase
 ```
 
 **Plan Frontmatter** (`IP-XXX.md`):
@@ -609,27 +618,33 @@ See `supekku:verification.coverage@v1` block above. All FR/NF requirements mappe
 
 ## Appendices
 
-### A. Phase.overview Schema Reference
+### A. Phase Frontmatter Schema Reference
 
-See `spec-driver schema show phase.overview` for complete schema.
+New phases use canonical frontmatter validated by `PhaseSheet` Pydantic model
+(DE-106). Legacy phases use `phase.overview` blocks via fallback path.
 
-**Required Fields**:
+**Canonical Frontmatter Fields** (new format, DR-106 DEC-005):
 
-- `schema`: "supekku.phase.overview"
-- `version`: 1
-- `phase`: Phase ID (e.g., "IP-002.PHASE-01")
-- `plan`: Plan ID (e.g., "IP-002")
-- `delta`: Delta ID (e.g., "DE-002")
+- `plan`: Plan ID (e.g., "IP-002") — required
+- `delta`: Delta ID (e.g., "DE-002") — required
+- `objective`: What this phase achieves — optional
+- `entrance_criteria`: Array of conditions for starting — optional
+- `exit_criteria`: Array of conditions for completion — optional
 
-**Optional Fields**:
+**Base Artifact Fields** (standard for all artifacts):
 
-- `name`: Human-readable phase name
-- `objective`: What this phase achieves
-- `entrance_criteria`: Array of criteria for starting
-- `exit_criteria`: Array of criteria for completion
-- `verification`: Object with tests[] and evidence[] arrays
-- `tasks`: Array of task descriptions
-- `risks`: Array of risk descriptions
+- `id`: Phase ID (e.g., "IP-002-P01")
+- `status`: Lifecycle status (draft/in-progress/completed/deferred)
+- `kind`: "phase"
+- `created`, `updated`: ISO dates
+
+**Legacy block schema**: See `spec-driver schema show phase.overview` for
+the `supekku:phase.overview@v1` block format used by pre-DE-106 phases.
+
+**Accepted fidelity reductions** (DE-106 DEC-005/DEC-006/DEC-007):
+Structured `verification`, `tasks`, `risks`, and per-criterion completion
+status are no longer carried in YAML. These live in markdown prose sections.
+See DE-106 notes.md "Accepted Structured Data Losses" for full rationale.
 
 ### B. Existing Phase Example
 
@@ -637,4 +652,4 @@ See `change/deltas/DE-002-.../phases/phase-01.md` for reference implementation c
 
 ### C. Related ADRs
 
-None yet. Future ADR may be needed if phase state machine becomes complex.
+- **ADR-010**: Default placement heuristic for structured artifact metadata (derived from DE-106 phase analysis)

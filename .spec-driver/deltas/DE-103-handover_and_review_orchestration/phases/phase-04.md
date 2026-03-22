@@ -103,26 +103,27 @@ commands with staleness/invalidation lifecycle per DR-102 §3.3, §3.4, §5, §8
 5. **Placeholder renderers** — Not needed for Phase 04. review commands write YAML directly via I/O modules, don't need block renderers.
 
 **Diff-base selection for review prime:**
+
 - New cache: use current HEAD (reviewer sees all files in the delta's touched areas)
 - Existing stale cache: diff from `staleness.cache_key.head` to current HEAD
 - This avoids merge-base complexity. The domain_map lists files the reviewer should know about, not a diff. For the initial implementation, `review prime` accepts explicit `--files` or assembles from state/handoff context. Full git-diff-based domain_map construction is a refinement that can be added incrementally.
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x]    | 4.1 | Review I/O module | 24 tests — read/write/build for review-index + review-findings |
-| [x]    | 4.2 | Staleness evaluator | 16 tests — evaluate bootstrap_status from cache_key |
-| [x]    | 4.3 | CLI: review prime | generates review-index.yaml + review-bootstrap.md |
-| [x]    | 4.4 | CLI: review complete | writes review-findings.yaml, transitions state |
-| [x]    | 4.5 | CLI: review teardown | deletes reviewer state files |
-| [x]    | 4.6 | Integration verification | 21 CLI tests cover full lifecycle |
+| Status | ID  | Description              | Notes                                                          |
+| ------ | --- | ------------------------ | -------------------------------------------------------------- |
+| [x]    | 4.1 | Review I/O module        | 24 tests — read/write/build for review-index + review-findings |
+| [x]    | 4.2 | Staleness evaluator      | 16 tests — evaluate bootstrap_status from cache_key            |
+| [x]    | 4.3 | CLI: review prime        | generates review-index.yaml + review-bootstrap.md              |
+| [x]    | 4.4 | CLI: review complete     | writes review-findings.yaml, transitions state                 |
+| [x]    | 4.5 | CLI: review teardown     | deletes reviewer state files                                   |
+| [x]    | 4.6 | Integration verification | 21 CLI tests cover full lifecycle                              |
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| ---- | ---------- | ------ |
-| review prime complexity | Split into small testable functions | active |
+| Risk                         | Mitigation                                    | Status |
+| ---------------------------- | --------------------------------------------- | ------ |
+| review prime complexity      | Split into small testable functions           | active |
 | Schema validation edge cases | Reuse existing validator; test boundary cases | active |
 
 ## 9. Decisions & Outcomes

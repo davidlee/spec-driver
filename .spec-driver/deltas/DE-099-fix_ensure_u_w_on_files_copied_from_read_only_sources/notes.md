@@ -10,7 +10,7 @@ permissions from read-only package stores.
 
 1. **`file_ops.py`**: Added `_ensure_writable()` helper, `copy_with_write_permission()`,
    and `copytree_with_write_permission()`. The copy helper chmod's the dest
-   *before* copy (handles re-install over broken state) and *after* copy
+   _before_ copy (handles re-install over broken state) and _after_ copy
    (handles read-only source).
 
 2. **`install.py`**: All 8 `shutil.copy` sites → `copy_with_write_permission`.

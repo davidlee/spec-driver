@@ -117,14 +117,14 @@ Register `phase.status` in the enum infrastructure, extend the canonical status 
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [x] | 1.1 | Register `phase.status` in `ENUM_REGISTRY` | [ ] | 1 line in enums.py |
-| [x] | 1.2 | Extend `CANONICAL_STATUS_MAP` | [P] | 3 entries: done, active, in_progress |
-| [x] | 1.3 | `phase_start` frontmatter update | [ ] | Frontmatter before state.yaml per DEC-104-08 |
-| [x] | 1.4 | `phase_complete` frontmatter + idempotency | [ ] | See deviation note re state.yaml vocabulary |
-| [x] | 1.5 | `create_phase` constant | [P] | STATUS_DRAFT import + usage |
-| [x] | 1.6 | Tests | [ ] | 77 pass, no new lint warnings |
+| Status | ID  | Description                                | Parallel? | Notes                                        |
+| ------ | --- | ------------------------------------------ | --------- | -------------------------------------------- |
+| [x]    | 1.1 | Register `phase.status` in `ENUM_REGISTRY` | [ ]       | 1 line in enums.py                           |
+| [x]    | 1.2 | Extend `CANONICAL_STATUS_MAP`              | [P]       | 3 entries: done, active, in_progress         |
+| [x]    | 1.3 | `phase_start` frontmatter update           | [ ]       | Frontmatter before state.yaml per DEC-104-08 |
+| [x]    | 1.4 | `phase_complete` frontmatter + idempotency | [ ]       | See deviation note re state.yaml vocabulary  |
+| [x]    | 1.5 | `create_phase` constant                    | [P]       | STATUS_DRAFT import + usage                  |
+| [x]    | 1.6 | Tests                                      | [ ]       | 77 pass, no new lint warnings                |
 
 ### Task Details
 
@@ -157,7 +157,7 @@ Register `phase.status` in the enum infrastructure, extend the canonical status 
     2. Change `state_data["phase"]["status"] = "complete"` → `state_data["phase"]["status"] = STATUS_COMPLETED`
     3. Change `already_complete = phase.get("status") == "complete"` → `already_complete = phase.get("status") in (STATUS_COMPLETED, STATUS_COMPLETE)`
     4. Change `phase_status="complete"` in `build_handoff()` call → `phase_status=STATUS_COMPLETED`
-    Import `STATUS_COMPLETED`, `STATUS_COMPLETE` from `changes.lifecycle`.
+       Import `STATUS_COMPLETED`, `STATUS_COMPLETE` from `changes.lifecycle`.
   - **Testing**: Extend `workflow_phase_complete_test.py` — assert frontmatter `status: completed`; assert state.yaml has `completed`; test idempotency (second call is no-op).
 
 - **1.5 `create_phase` constant**
@@ -171,10 +171,10 @@ Register `phase.status` in the enum infrastructure, extend the canonical status 
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|-----------|--------|
+| Risk                                                             | Mitigation                                   | Status   |
+| ---------------------------------------------------------------- | -------------------------------------------- | -------- |
 | `update_frontmatter_status` returns False on 10 historical files | Silent no-op; validate will warn in Phase 02 | Accepted |
-| Existing tests assume `"complete"` in state.yaml | Search and update assertions | Open |
+| Existing tests assume `"complete"` in state.yaml                 | Search and update assertions                 | Open     |
 
 ## 9. Decisions & Outcomes
 

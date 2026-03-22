@@ -27,17 +27,17 @@ Tests for check_lifecycle function.
 - @patch(supekku.scripts.lib.diagnostics.checks.lifecycle.load_workflow_config) `test_stale_delta_warns(self, mock_config) -> None`: An in-progress delta older than threshold should warn.
 - @patch(supekku.scripts.lib.diagnostics.checks.lifecycle.load_workflow_config) `test_unparseable_date_warns(self, mock_config) -> None`: Delta with unparseable updated date should warn.
 
-### _FakeDelta
+### \_FakeDelta
 
 Minimal delta stub for lifecycle checks.
 
-### _FakeRegistry
+### \_FakeRegistry
 
 #### Methods
 
 - `collect(self) -> dict`
 
-### _FakeWorkspace
+### \_FakeWorkspace
 
 #### Methods
 

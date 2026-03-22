@@ -91,7 +91,7 @@ disposition:
 ### Valid `status` × `kind` pairs
 
 | kind                | valid statuses          |
-|---------------------|------------------------|
+| ------------------- | ----------------------- |
 | `aligned`           | `reconciled`            |
 | `spec_patch`        | `pending`, `reconciled` |
 | `revision`          | `pending`, `reconciled` |
@@ -101,9 +101,9 @@ disposition:
 
 ### Valid `outcome` → `kind` mapping
 
-| outcome   | valid kinds                                                                    |
-|-----------|--------------------------------------------------------------------------------|
-| `aligned` | `aligned`                                                                      |
+| outcome   | valid kinds                                                                         |
+| --------- | ----------------------------------------------------------------------------------- |
+| `aligned` | `aligned`                                                                           |
 | `drift`   | `spec_patch`, `revision`, `follow_up_delta`, `follow_up_backlog`, `tolerated_drift` |
 | `risk`    | `spec_patch`, `revision`, `follow_up_delta`, `follow_up_backlog`, `tolerated_drift` |
 

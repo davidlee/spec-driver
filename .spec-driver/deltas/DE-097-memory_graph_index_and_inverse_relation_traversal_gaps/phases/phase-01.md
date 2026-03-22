@@ -101,14 +101,14 @@ Build the pure domain layer for cross-artifact reference graph operations. All f
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [ ] | 1.1 | ID normalizer: `normalize_artifact_id` + `NormalizationResult` | [P] | Independent of graph work |
-| [ ] | 1.2 | Data types: `GraphEdge`, `ReferenceGraph` | | Foundation for 1.3–1.5 |
-| [ ] | 1.3 | Graph builder: `_collect_all_artifacts` + `build_reference_graph` | | Depends on 1.2 |
-| [ ] | 1.4 | Query API: `query_forward`, `query_inverse`, `query_neighbourhood` | | Depends on 1.2 |
-| [ ] | 1.5 | `find_unresolved_references` | | Depends on 1.2 |
-| [ ] | 1.6 | Tests for 1.1–1.5 | | TDD — write with each task |
+| Status | ID  | Description                                                        | Parallel? | Notes                      |
+| ------ | --- | ------------------------------------------------------------------ | --------- | -------------------------- |
+| [ ]    | 1.1 | ID normalizer: `normalize_artifact_id` + `NormalizationResult`     | [P]       | Independent of graph work  |
+| [ ]    | 1.2 | Data types: `GraphEdge`, `ReferenceGraph`                          |           | Foundation for 1.3–1.5     |
+| [ ]    | 1.3 | Graph builder: `_collect_all_artifacts` + `build_reference_graph`  |           | Depends on 1.2             |
+| [ ]    | 1.4 | Query API: `query_forward`, `query_inverse`, `query_neighbourhood` |           | Depends on 1.2             |
+| [ ]    | 1.5 | `find_unresolved_references`                                       |           | Depends on 1.2             |
+| [ ]    | 1.6 | Tests for 1.1–1.5                                                  |           | TDD — write with each task |
 
 ### Task Details
 
@@ -135,8 +135,8 @@ Build the pure domain layer for cross-artifact reference graph operations. All f
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|-----------|--------|
+| Risk                                                                    | Mitigation                                                   | Status    |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------ | --------- |
 | Some registry `.collect()` returns may not support `collect_references` | Verified in DR; all models expose relevant attrs via getattr | mitigated |
 
 ## 9. Decisions & Outcomes

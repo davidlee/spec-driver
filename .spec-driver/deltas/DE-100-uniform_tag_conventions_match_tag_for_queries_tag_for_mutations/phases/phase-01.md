@@ -79,14 +79,14 @@ Add repeatable `--tag`/`-t` filtering (OR logic, ANDed with other filters) to al
 
 ## 5. Tasks & Progress
 
-| Status | ID  | Description | P? | Notes |
-|--------|-----|-------------|-----|-------|
-| [x] | 1.1 | Add `tags` to `PlanSummary` model; populate in `discover_plans()` | | Done |
-| [x] | 1.2 | Make `--tag` repeatable on `list adrs/policies/standards` | | Type → `list[str] \| None`; tag filtering moved inline |
-| [x] | 1.3 | Add `--tag` to `list backlog` + thread through `list issues/problems/improvements/risks` | | Done |
-| [x] | 1.4 | Add `--tag` to `list specs`, `list requirements` | [P] | Done |
-| [x] | 1.5 | Add `--tag` to `list deltas`, `list changes`, `list revisions`, `list audits`, `list plans` | [P] | Done |
-| [x] | 1.6 | Tests: repeatable OR, multi-tag, no-match, AND with --status/--filter | | 44 tests, all pass |
+| Status | ID  | Description                                                                                 | P?  | Notes                                                  |
+| ------ | --- | ------------------------------------------------------------------------------------------- | --- | ------------------------------------------------------ |
+| [x]    | 1.1 | Add `tags` to `PlanSummary` model; populate in `discover_plans()`                           |     | Done                                                   |
+| [x]    | 1.2 | Make `--tag` repeatable on `list adrs/policies/standards`                                   |     | Type → `list[str] \| None`; tag filtering moved inline |
+| [x]    | 1.3 | Add `--tag` to `list backlog` + thread through `list issues/problems/improvements/risks`    |     | Done                                                   |
+| [x]    | 1.4 | Add `--tag` to `list specs`, `list requirements`                                            | [P] | Done                                                   |
+| [x]    | 1.5 | Add `--tag` to `list deltas`, `list changes`, `list revisions`, `list audits`, `list plans` | [P] | Done                                                   |
+| [x]    | 1.6 | Tests: repeatable OR, multi-tag, no-match, AND with --status/--filter                       |     | 44 tests, all pass                                     |
 
 ### Task Details
 

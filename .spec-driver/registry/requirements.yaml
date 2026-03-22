@@ -3,7 +3,7 @@ requirements:
     label: FR-042
     title: User shall provide valid credentials
     specs:
-    - IMPR-001
+      - IMPR-001
     primary_spec: IMPR-001
     kind: functional
     category: authentication
@@ -21,7 +21,7 @@ requirements:
     label: NF-001
     title: System shall respond within 100ms
     specs:
-    - IMPR-001
+      - IMPR-001
     primary_spec: IMPR-001
     kind: non-functional
     category: performance
@@ -39,7 +39,7 @@ requirements:
     label: FR-013.001
     title: IP Schema Restoration
     specs:
-    - ISSUE-013
+      - ISSUE-013
     primary_spec: ISSUE-013
     kind: functional
     category: null
@@ -57,7 +57,7 @@ requirements:
     label: FR-013.002
     title: Phase Creation with Criteria Copy
     specs:
-    - ISSUE-013
+      - ISSUE-013
     primary_spec: ISSUE-013
     kind: functional
     category: null
@@ -75,7 +75,7 @@ requirements:
     label: FR-013.003
     title: Drift Detection Warning
     specs:
-    - ISSUE-013
+      - ISSUE-013
     primary_spec: ISSUE-013
     kind: functional
     category: null
@@ -93,7 +93,7 @@ requirements:
     label: NF-013.001
     title: Backward Compatibility
     specs:
-    - ISSUE-013
+      - ISSUE-013
     primary_spec: ISSUE-013
     kind: non-functional
     category: null
@@ -111,7 +111,7 @@ requirements:
     label: FR-016.001
     title: Sync Backlog Requirements
     specs:
-    - ISSUE-016
+      - ISSUE-016
     primary_spec: ISSUE-016
     kind: functional
     category: null
@@ -119,7 +119,7 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-076
+      - DE-076
     verified_by: []
     coverage_evidence: []
     coverage_entries: []
@@ -130,7 +130,7 @@ requirements:
     label: FR-016.002
     title: Filter Requirements by Source
     specs:
-    - ISSUE-016
+      - ISSUE-016
     primary_spec: ISSUE-016
     kind: functional
     category: null
@@ -138,7 +138,7 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-076
+      - DE-076
     verified_by: []
     coverage_evidence: []
     coverage_entries: []
@@ -149,7 +149,7 @@ requirements:
     label: FR-016.003
     title: Requirement Migration Command
     specs:
-    - ISSUE-016
+      - ISSUE-016
     primary_spec: ISSUE-016
     kind: functional
     category: null
@@ -167,7 +167,7 @@ requirements:
     label: FR-016.004
     title: Coverage Tracking for Backlog Requirements
     specs:
-    - ISSUE-016
+      - ISSUE-016
     primary_spec: ISSUE-016
     kind: functional
     category: null
@@ -175,7 +175,7 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-076
+      - DE-076
     verified_by: []
     coverage_evidence: []
     coverage_entries: []
@@ -186,7 +186,7 @@ requirements:
     label: NF-016.001
     title: Backward Compatibility
     specs:
-    - ISSUE-016
+      - ISSUE-016
     primary_spec: ISSUE-016
     kind: non-functional
     category: null
@@ -194,7 +194,7 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-076
+      - DE-076
     verified_by: []
     coverage_evidence: []
     coverage_entries: []
@@ -205,7 +205,7 @@ requirements:
     label: FR-015
     title: Per-file validation could validate SHA format
     specs:
-    - ISSUE-020
+      - ISSUE-020
     primary_spec: ISSUE-020
     kind: functional
     category: PROD-010
@@ -223,7 +223,7 @@ requirements:
     label: FR-001
     title: Claude Command Provides Complete Workflow
     specs:
-    - PROD-001
+      - PROD-001
     primary_spec: PROD-001
     kind: functional
     category: workflow
@@ -232,19 +232,19 @@ requirements:
     introduced: null
     implemented_by: []
     verified_by:
-    - AUD-001
+      - AUD-001
     coverage_evidence:
-    - VT-001
+      - VT-001
     coverage_entries:
-    - artefact: VT-001
-      status: planned
-      kind: VT
+      - artefact: VT-001
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-001/PROD-001.md
   PROD-001.FR-002:
     label: FR-002
     title: Agent Completes All YAML Blocks Without Manual Editing
     specs:
-    - PROD-001
+      - PROD-001
     primary_spec: PROD-001
     kind: functional
     category: automation
@@ -253,19 +253,19 @@ requirements:
     introduced: null
     implemented_by: []
     verified_by:
-    - AUD-001
+      - AUD-001
     coverage_evidence:
-    - VT-002
+      - VT-002
     coverage_entries:
-    - artefact: VT-002
-      status: planned
-      kind: VT
+      - artefact: VT-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-001/PROD-001.md
   PROD-001.FR-003:
     label: FR-003
     title: Clarification Questions Limited to Critical Decisions
     specs:
-    - PROD-001
+      - PROD-001
     primary_spec: PROD-001
     kind: functional
     category: ux
@@ -274,19 +274,19 @@ requirements:
     introduced: null
     implemented_by: []
     verified_by:
-    - AUD-001
+      - AUD-001
     coverage_evidence:
-    - VT-003
+      - VT-003
     coverage_entries:
-    - artefact: VT-003
-      status: planned
-      kind: VT
+      - artefact: VT-003
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-001/PROD-001.md
   PROD-001.FR-004:
     label: FR-004
     title: Spec Type Determines Section Content Adaptation
     specs:
-    - PROD-001
+      - PROD-001
     primary_spec: PROD-001
     kind: functional
     category: workflow
@@ -295,7 +295,7 @@ requirements:
     introduced: null
     implemented_by: []
     verified_by:
-    - AUD-001
+      - AUD-001
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-001/PROD-001.md
@@ -303,7 +303,7 @@ requirements:
     label: FR-005
     title: Validation Integrated Before Workflow Completion
     specs:
-    - PROD-001
+      - PROD-001
     primary_spec: PROD-001
     kind: functional
     category: validation
@@ -312,7 +312,7 @@ requirements:
     introduced: null
     implemented_by: []
     verified_by:
-    - AUD-001
+      - AUD-001
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-001/PROD-001.md
@@ -320,7 +320,7 @@ requirements:
     label: NF-001
     title: First-Time User Experience Requires Minimal Cognitive Load
     specs:
-    - PROD-001
+      - PROD-001
     primary_spec: PROD-001
     kind: non-functional
     category: ux
@@ -329,19 +329,19 @@ requirements:
     introduced: null
     implemented_by: []
     verified_by:
-    - AUD-001
+      - AUD-001
     coverage_evidence:
-    - VA-001
+      - VA-001
     coverage_entries:
-    - artefact: VA-001
-      status: planned
-      kind: VA
+      - artefact: VA-001
+        status: planned
+        kind: VA
     path: .spec-driver/product/PROD-001/PROD-001.md
   PROD-001.NF-002:
     label: NF-002
     title: Registry Sync Success Rate >95% on First Attempt
     specs:
-    - PROD-001
+      - PROD-001
     primary_spec: PROD-001
     kind: non-functional
     category: reliability
@@ -351,17 +351,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VA-002
+      - VA-002
     coverage_entries:
-    - artefact: VA-002
-      status: planned
-      kind: VA
+      - artefact: VA-002
+        status: planned
+        kind: VA
     path: .spec-driver/product/PROD-001/PROD-001.md
   PROD-002.FR-001:
     label: FR-001
     title: Agent Command Provides Complete Workflow Guidance
     specs:
-    - PROD-002
+      - PROD-002
     primary_spec: PROD-002
     kind: functional
     category: null
@@ -371,17 +371,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-001
+      - VT-001
     coverage_entries:
-    - artefact: VT-001
-      status: planned
-      kind: VT
+      - artefact: VT-001
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
   PROD-002.FR-002:
     label: FR-002
     title: Default Behavior Creates Complete Delta Bundle
     specs:
-    - PROD-002
+      - PROD-002
     primary_spec: PROD-002
     kind: functional
     category: null
@@ -391,17 +391,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-002
+      - VT-002
     coverage_entries:
-    - artefact: VT-002
-      status: planned
-      kind: VT
+      - artefact: VT-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
   PROD-002.FR-003:
     label: FR-003
     title: Users Can Provide Known Relationships Explicitly
     specs:
-    - PROD-002
+      - PROD-002
     primary_spec: PROD-002
     kind: functional
     category: null
@@ -411,17 +411,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-003
+      - VT-003
     coverage_entries:
-    - artefact: VT-003
-      status: planned
-      kind: VT
+      - artefact: VT-003
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
   PROD-002.FR-004:
     label: FR-004
     title: Agent Discovers and Suggests Additional Relationships
     specs:
-    - PROD-002
+      - PROD-002
     primary_spec: PROD-002
     kind: functional
     category: null
@@ -431,17 +431,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-004
+      - VT-004
     coverage_entries:
-    - artefact: VT-004
-      status: planned
-      kind: VT
+      - artefact: VT-004
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
   PROD-002.FR-005:
     label: FR-005
     title: Clear Error Messages Guide Users to Corrections
     specs:
-    - PROD-002
+      - PROD-002
     primary_spec: PROD-002
     kind: functional
     category: null
@@ -451,17 +451,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-005
+      - VT-005
     coverage_entries:
-    - artefact: VT-005
-      status: planned
-      kind: VT
+      - artefact: VT-005
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
   PROD-002.FR-006:
     label: FR-006
     title: Delta Creation Includes Design Revision Artifact
     specs:
-    - PROD-002
+      - PROD-002
     primary_spec: PROD-002
     kind: functional
     category: null
@@ -469,20 +469,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-013
+      - DE-013
     verified_by: []
     coverage_evidence:
-    - VT-006
+      - VT-006
     coverage_entries:
-    - artefact: VT-006
-      status: verified
-      kind: VT
+      - artefact: VT-006
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-002/PROD-002.md
   PROD-002.NF-001:
     label: NF-001
     title: First-Time Users Complete Delta Creation in Under 5 Minutes
     specs:
-    - PROD-002
+      - PROD-002
     primary_spec: PROD-002
     kind: non-functional
     category: null
@@ -492,17 +492,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VA-001
+      - VA-001
     coverage_entries:
-    - artefact: VA-001
-      status: planned
-      kind: VA
+      - artefact: VA-001
+        status: planned
+        kind: VA
     path: .spec-driver/product/PROD-002/PROD-002.md
   PROD-002.NF-002:
     label: NF-002
     title: Creation Success Rate Exceeds 95% on First Attempt
     specs:
-    - PROD-002
+      - PROD-002
     primary_spec: PROD-002
     kind: non-functional
     category: null
@@ -512,17 +512,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VA-002
+      - VA-002
     coverage_entries:
-    - artefact: VA-002
-      status: planned
-      kind: VA
+      - artefact: VA-002
+        status: planned
+        kind: VA
     path: .spec-driver/product/PROD-002/PROD-002.md
   PROD-003.FR-001:
     label: FR-001
     title: System MUST enable creation of policies with unique POL-XXX identifiers
     specs:
-    - PROD-003
+      - PROD-003
     primary_spec: PROD-003
     kind: functional
     category: null
@@ -530,20 +530,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-010
+      - DE-010
     verified_by: []
     coverage_evidence:
-    - VT-PROD-003-001
+      - VT-PROD-003-001
     coverage_entries:
-    - artefact: VT-PROD-003-001
-      status: verified
-      kind: VT
+      - artefact: VT-PROD-003-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
   PROD-003.FR-002:
     label: FR-002
-    title: 'System MUST support policy lifecycle statuses: draft, required, deprecated'
+    title: "System MUST support policy lifecycle statuses: draft, required, deprecated"
     specs:
-    - PROD-003
+      - PROD-003
     primary_spec: PROD-003
     kind: functional
     category: null
@@ -551,20 +551,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-010
+      - DE-010
     verified_by: []
     coverage_evidence:
-    - VT-PROD-003-002
+      - VT-PROD-003-002
     coverage_entries:
-    - artefact: VT-PROD-003-002
-      status: verified
-      kind: VT
+      - artefact: VT-PROD-003-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
   PROD-003.FR-003:
     label: FR-003
     title: System MUST enable creation of standards with unique STD-XXX identifiers
     specs:
-    - PROD-003
+      - PROD-003
     primary_spec: PROD-003
     kind: functional
     category: null
@@ -572,21 +572,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-010
+      - DE-010
     verified_by: []
     coverage_evidence:
-    - VT-PROD-003-003
+      - VT-PROD-003-003
     coverage_entries:
-    - artefact: VT-PROD-003-003
-      status: verified
-      kind: VT
+      - artefact: VT-PROD-003-003
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
   PROD-003.FR-004:
     label: FR-004
-    title: 'System MUST support standard statuses: draft, required, default, deprecated
+    title:
+      'System MUST support standard statuses: draft, required, default, deprecated
       (where "default" indicates recommended unless justified)'
     specs:
-    - PROD-003
+      - PROD-003
     primary_spec: PROD-003
     kind: functional
     category: null
@@ -594,21 +595,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-010
+      - DE-010
     verified_by: []
     coverage_evidence:
-    - VT-PROD-003-004
+      - VT-PROD-003-004
     coverage_entries:
-    - artefact: VT-PROD-003-004
-      status: verified
-      kind: VT
+      - artefact: VT-PROD-003-004
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
   PROD-003.FR-005:
     label: FR-005
-    title: System MUST provide CLI commands to list policies and standards with filtering
+    title:
+      System MUST provide CLI commands to list policies and standards with filtering
       (by status, tags, references)
     specs:
-    - PROD-003
+      - PROD-003
     primary_spec: PROD-003
     kind: functional
     category: null
@@ -616,21 +618,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-010
+      - DE-010
     verified_by: []
     coverage_evidence:
-    - VT-PROD-003-005
+      - VT-PROD-003-005
     coverage_entries:
-    - artefact: VT-PROD-003-005
-      status: verified
-      kind: VT
+      - artefact: VT-PROD-003-005
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
   PROD-003.FR-006:
     label: FR-006
-    title: System MUST provide CLI commands to display full policy/standard details
+    title:
+      System MUST provide CLI commands to display full policy/standard details
       including metadata and cross-references
     specs:
-    - PROD-003
+      - PROD-003
     primary_spec: PROD-003
     kind: functional
     category: null
@@ -638,21 +641,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-010
+      - DE-010
     verified_by: []
     coverage_evidence:
-    - VT-PROD-003-006
+      - VT-PROD-003-006
     coverage_entries:
-    - artefact: VT-PROD-003-006
-      status: verified
-      kind: VT
+      - artefact: VT-PROD-003-006
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
   PROD-003.FR-007:
     label: FR-007
-    title: System MUST support bidirectional cross-references between policies and
+    title:
+      System MUST support bidirectional cross-references between policies and
       standards (policies can reference standards and vice versa)
     specs:
-    - PROD-003
+      - PROD-003
     primary_spec: PROD-003
     kind: functional
     category: null
@@ -660,21 +664,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-010
+      - DE-010
     verified_by: []
     coverage_evidence:
-    - VT-PROD-003-007
+      - VT-PROD-003-007
     coverage_entries:
-    - artefact: VT-PROD-003-007
-      status: verified
-      kind: VT
+      - artefact: VT-PROD-003-007
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
   PROD-003.FR-008:
     label: FR-008
-    title: System MUST allow ADRs, specs, deltas, and other artifacts to reference
+    title:
+      System MUST allow ADRs, specs, deltas, and other artifacts to reference
       policies and standards via frontmatter fields
     specs:
-    - PROD-003
+      - PROD-003
     primary_spec: PROD-003
     kind: functional
     category: null
@@ -682,21 +687,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-010
+      - DE-010
     verified_by: []
     coverage_evidence:
-    - VT-PROD-003-008
+      - VT-PROD-003-008
     coverage_entries:
-    - artefact: VT-PROD-003-008
-      status: verified
-      kind: VT
+      - artefact: VT-PROD-003-008
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
   PROD-003.NF-001:
     label: NF-001
-    title: Policies and standards MUST use consistent template structure (Statement,
+    title:
+      Policies and standards MUST use consistent template structure (Statement,
       Rationale, Scope, Verification) for predictable authoring experience
     specs:
-    - PROD-003
+      - PROD-003
     primary_spec: PROD-003
     kind: non-functional
     category: null
@@ -704,21 +710,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-010
+      - DE-010
     verified_by: []
     coverage_evidence:
-    - VT-PROD-003-009
+      - VT-PROD-003-009
     coverage_entries:
-    - artefact: VT-PROD-003-009
-      status: verified
-      kind: VT
+      - artefact: VT-PROD-003-009
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-003/PROD-003.md
   PROD-003.NF-002:
     label: NF-002
-    title: CLI commands for policies/standards MUST follow existing spec-driver UX
+    title:
+      CLI commands for policies/standards MUST follow existing spec-driver UX
       patterns (argument structure, output formats, filtering semantics)
     specs:
-    - PROD-003
+      - PROD-003
     primary_spec: PROD-003
     kind: non-functional
     category: null
@@ -726,21 +733,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-010
+      - DE-010
     verified_by: []
     coverage_evidence:
-    - VA-PROD-003-001
+      - VA-PROD-003-001
     coverage_entries:
-    - artefact: VA-PROD-003-001
-      status: verified
-      kind: VA
+      - artefact: VA-PROD-003-001
+        status: verified
+        kind: VA
     path: .spec-driver/product/PROD-003/PROD-003.md
   PROD-004.FR-001:
     label: FR-001
-    title: System MUST validate frontmatter for all registered kinds using metadata
+    title:
+      System MUST validate frontmatter for all registered kinds using metadata
       definitions
     specs:
-    - PROD-004
+      - PROD-004
     primary_spec: PROD-004
     kind: functional
     category: null
@@ -750,17 +758,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-001
+      - VT-001
     coverage_entries:
-    - artefact: VT-001
-      status: planned
-      kind: VT
+      - artefact: VT-001
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-002:
     label: FR-002
     title: System MUST enforce kind-specific required fields and constraints
     specs:
-    - PROD-004
+      - PROD-004
     primary_spec: PROD-004
     kind: functional
     category: null
@@ -770,17 +778,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-002
+      - VT-002
     coverage_entries:
-    - artefact: VT-002
-      status: planned
-      kind: VT
+      - artefact: VT-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-003:
     label: FR-003
     title: System MUST generate JSON Schema from frontmatter metadata definitions
     specs:
-    - PROD-004
+      - PROD-004
     primary_spec: PROD-004
     kind: functional
     category: null
@@ -790,17 +798,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-003
+      - VT-003
     coverage_entries:
-    - artefact: VT-003
-      status: planned
-      kind: VT
+      - artefact: VT-003
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-004:
     label: FR-004
     title: CLI MUST support `schema show frontmatter.{kind}` commands for all kinds
     specs:
-    - PROD-004
+      - PROD-004
     primary_spec: PROD-004
     kind: functional
     category: null
@@ -808,20 +816,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-003
+      - DE-003
     verified_by: []
     coverage_evidence:
-    - VT-004
+      - VT-004
     coverage_entries:
-    - artefact: VT-004
-      status: verified
-      kind: VT
+      - artefact: VT-004
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-005:
     label: FR-005
     title: System MUST maintain backward compatibility during migration
     specs:
-    - PROD-004
+      - PROD-004
     primary_spec: PROD-004
     kind: functional
     category: null
@@ -831,17 +839,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-005
+      - VT-005
     coverage_entries:
-    - artefact: VT-005
-      status: planned
-      kind: VT
+      - artefact: VT-005
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-006:
     label: FR-006
     title: System MUST support gradual per-call-site opt-in migration
     specs:
-    - PROD-004
+      - PROD-004
     primary_spec: PROD-004
     kind: functional
     category: null
@@ -855,10 +863,11 @@ requirements:
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-007:
     label: FR-007
-    title: Metadata definitions MUST support canonical/derived field classification
+    title:
+      Metadata definitions MUST support canonical/derived field classification
       enabling compaction profiles
     specs:
-    - PROD-004
+      - PROD-004
     primary_spec: PROD-004
     kind: functional
     category: null
@@ -868,17 +877,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-007
+      - VT-007
     coverage_entries:
-    - artefact: VT-007
-      status: planned
-      kind: VT
+      - artefact: VT-007
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.NF-001:
     label: NF-001
     title: Validation behavior MUST match imperative validator (zero regressions)
     specs:
-    - PROD-004
+      - PROD-004
     primary_spec: PROD-004
     kind: non-functional
     category: null
@@ -888,17 +897,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-006
+      - VT-006
     coverage_entries:
-    - artefact: VT-006
-      status: planned
-      kind: VT
+      - artefact: VT-006
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.NF-002:
     label: NF-002
     title: JSON Schema generation MUST complete in <100ms per kind
     specs:
-    - PROD-004
+      - PROD-004
     primary_spec: PROD-004
     kind: non-functional
     category: null
@@ -914,7 +923,7 @@ requirements:
     label: NF-003
     title: Migration MUST not break existing code at any point
     specs:
-    - PROD-004
+      - PROD-004
     primary_spec: PROD-004
     kind: non-functional
     category: null
@@ -930,7 +939,7 @@ requirements:
     label: FR-001
     title: Leaf Python Package Identification
     specs:
-    - PROD-005
+      - PROD-005
     primary_spec: PROD-005
     kind: functional
     category: null
@@ -938,21 +947,21 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-002
+      - DE-002
     verified_by:
-    - AUD-002
+      - AUD-002
     coverage_evidence:
-    - VT-001
+      - VT-001
     coverage_entries:
-    - artefact: VT-001
-      status: verified
-      kind: VT
+      - artefact: VT-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-005.FR-002:
     label: FR-002
     title: Deterministic File Ordering Within Packages
     specs:
-    - PROD-005
+      - PROD-005
     primary_spec: PROD-005
     kind: functional
     category: null
@@ -960,20 +969,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-002
+      - DE-002
     verified_by: []
     coverage_evidence:
-    - VT-002
+      - VT-002
     coverage_entries:
-    - artefact: VT-002
-      status: verified
-      kind: VT
+      - artefact: VT-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-005.FR-003:
     label: FR-003
     title: Sync Operation Package Support
     specs:
-    - PROD-005
+      - PROD-005
     primary_spec: PROD-005
     kind: functional
     category: null
@@ -981,20 +990,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-002
+      - DE-002
     verified_by: []
     coverage_evidence:
-    - VT-003
+      - VT-003
     coverage_entries:
-    - artefact: VT-003
-      status: verified
-      kind: VT
+      - artefact: VT-003
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-005.FR-004:
     label: FR-004
     title: File-to-Package Resolution
     specs:
-    - PROD-005
+      - PROD-005
     primary_spec: PROD-005
     kind: functional
     category: null
@@ -1002,20 +1011,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-002
+      - DE-002
     verified_by: []
     coverage_evidence:
-    - VT-004
+      - VT-004
     coverage_entries:
-    - artefact: VT-004
-      status: verified
-      kind: VT
+      - artefact: VT-004
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-005.NF-001:
     label: NF-001
     title: Git Diff Stability
     specs:
-    - PROD-005
+      - PROD-005
     primary_spec: PROD-005
     kind: non-functional
     category: null
@@ -1025,17 +1034,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VA-001
+      - VA-001
     coverage_entries:
-    - artefact: VA-001
-      status: verified
-      kind: VA
+      - artefact: VA-001
+        status: verified
+        kind: VA
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-005.NF-002:
     label: NF-002
     title: Design Extensibility
     specs:
-    - PROD-005
+      - PROD-005
     primary_spec: PROD-005
     kind: non-functional
     category: null
@@ -1045,18 +1054,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VA-002
+      - VA-002
     coverage_entries:
-    - artefact: VA-002
-      status: verified
-      kind: VA
+      - artefact: VA-002
+        status: verified
+        kind: VA
     path: .spec-driver/product/PROD-005/PROD-005.md
   PROD-006.FR-001:
     label: FR-001
-    title: System MUST create phase markdown files from template with valid `phase.overview`
+    title:
+      System MUST create phase markdown files from template with valid `phase.overview`
       frontmatter block
     specs:
-    - PROD-006
+      - PROD-006
     primary_spec: PROD-006
     kind: functional
     category: null
@@ -1064,26 +1074,27 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-004
-    - DE-106
+      - DE-004
+      - DE-106
     verified_by: []
     coverage_evidence:
-    - VT-PHASE-001
-    - VT-PHASE-007
+      - VT-PHASE-001
+      - VT-PHASE-007
     coverage_entries:
-    - artefact: VT-PHASE-001
-      status: verified
-      kind: VT
-    - artefact: VT-PHASE-007
-      status: verified
-      kind: VT
+      - artefact: VT-PHASE-001
+        status: verified
+        kind: VT
+      - artefact: VT-PHASE-007
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
   PROD-006.FR-002:
     label: FR-002
-    title: System MUST automatically determine next phase number by examining existing
+    title:
+      System MUST automatically determine next phase number by examining existing
       phases for the given plan
     specs:
-    - PROD-006
+      - PROD-006
     primary_spec: PROD-006
     kind: functional
     category: null
@@ -1091,21 +1102,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-004
+      - DE-004
     verified_by: []
     coverage_evidence:
-    - VT-PHASE-002
+      - VT-PHASE-002
     coverage_entries:
-    - artefact: VT-PHASE-002
-      status: verified
-      kind: VT
+      - artefact: VT-PHASE-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
   PROD-006.FR-003:
     label: FR-003
-    title: System MUST enhance delta display to show plan ID, phase count, and phase
+    title:
+      System MUST enhance delta display to show plan ID, phase count, and phase
       summaries with objectives
     specs:
-    - PROD-006
+      - PROD-006
     primary_spec: PROD-006
     kind: functional
     category: null
@@ -1113,22 +1125,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-004
-    - DE-106
+      - DE-004
+      - DE-106
     verified_by: []
     coverage_evidence:
-    - VT-PHASE-003
+      - VT-PHASE-003
     coverage_entries:
-    - artefact: VT-PHASE-003
-      status: verified
-      kind: VT
+      - artefact: VT-PHASE-003
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
   PROD-006.FR-004:
     label: FR-004
-    title: System MUST auto-populate phase metadata including phase ID, plan ID, and
+    title:
+      System MUST auto-populate phase metadata including phase ID, plan ID, and
       delta ID from plan context
     specs:
-    - PROD-006
+      - PROD-006
     primary_spec: PROD-006
     kind: functional
     category: null
@@ -1136,26 +1149,27 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-004
-    - DE-106
+      - DE-004
+      - DE-106
     verified_by: []
     coverage_evidence:
-    - VT-PHASE-004
-    - VT-PHASE-006
+      - VT-PHASE-004
+      - VT-PHASE-006
     coverage_entries:
-    - artefact: VT-PHASE-004
-      status: verified
-      kind: VT
-    - artefact: VT-PHASE-006
-      status: verified
-      kind: VT
+      - artefact: VT-PHASE-004
+        status: verified
+        kind: VT
+      - artefact: VT-PHASE-006
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
   PROD-006.FR-005:
     label: FR-005
-    title: System MUST validate phase.overview schema during sync and report validation
+    title:
+      System MUST validate phase.overview schema during sync and report validation
       errors
     specs:
-    - PROD-006
+      - PROD-006
     primary_spec: PROD-006
     kind: functional
     category: null
@@ -1163,22 +1177,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-004
-    - DE-106
+      - DE-004
+      - DE-106
     verified_by: []
     coverage_evidence:
-    - VT-PHASE-005
+      - VT-PHASE-005
     coverage_entries:
-    - artefact: VT-PHASE-005
-      status: verified
-      kind: VT
+      - artefact: VT-PHASE-005
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-006/PROD-006.md
   PROD-006.NF-001:
     label: NF-001
-    title: Phase creation command MUST complete in <2 seconds for plans with up to
+    title:
+      Phase creation command MUST complete in <2 seconds for plans with up to
       20 existing phases
     specs:
-    - PROD-006
+      - PROD-006
     primary_spec: PROD-006
     kind: non-functional
     category: null
@@ -1186,21 +1201,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-004
+      - DE-004
     verified_by: []
     coverage_evidence:
-    - VA-PHASE-001
+      - VA-PHASE-001
     coverage_entries:
-    - artefact: VA-PHASE-001
-      status: verified
-      kind: VA
+      - artefact: VA-PHASE-001
+        status: verified
+        kind: VA
     path: .spec-driver/product/PROD-006/PROD-006.md
   PROD-006.NF-002:
     label: NF-002
-    title: Delta display MUST remain readable with up to 10 phases without truncation
+    title:
+      Delta display MUST remain readable with up to 10 phases without truncation
       loss of critical information
     specs:
-    - PROD-006
+      - PROD-006
     primary_spec: PROD-006
     kind: non-functional
     category: null
@@ -1208,21 +1224,21 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-004
-    - DE-106
+      - DE-004
+      - DE-106
     verified_by: []
     coverage_evidence:
-    - VA-PHASE-002
+      - VA-PHASE-002
     coverage_entries:
-    - artefact: VA-PHASE-002
-      status: verified
-      kind: VA
+      - artefact: VA-PHASE-002
+        status: verified
+        kind: VA
     path: .spec-driver/product/PROD-006/PROD-006.md
   PROD-007.FR-001:
     label: FR-001
     title: Users MUST be able to complete placeholder specs through guided agent workflow
     specs:
-    - PROD-007
+      - PROD-007
     primary_spec: PROD-007
     kind: functional
     category: null
@@ -1230,20 +1246,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-005
+      - DE-005
     verified_by: []
     coverage_evidence:
-    - VT-001
+      - VT-001
     coverage_entries:
-    - artefact: VT-001
-      status: planned
-      kind: VT
+      - artefact: VT-001
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-007/PROD-007.md
   PROD-007.FR-002:
     label: FR-002
     title: System MUST preserve manually-created spec content during completion
     specs:
-    - PROD-007
+      - PROD-007
     primary_spec: PROD-007
     kind: functional
     category: null
@@ -1251,20 +1267,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-005
+      - DE-005
     verified_by: []
     coverage_evidence:
-    - VT-002
+      - VT-002
     coverage_entries:
-    - artefact: VT-002
-      status: planned
-      kind: VT
+      - artefact: VT-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-007/PROD-007.md
   PROD-007.FR-003:
     label: FR-003
     title: Users MUST be able to complete multiple specs in batch mode
     specs:
-    - PROD-007
+      - PROD-007
     primary_spec: PROD-007
     kind: functional
     category: null
@@ -1272,20 +1288,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-005
+      - DE-005
     verified_by: []
     coverage_evidence:
-    - VT-003
+      - VT-003
     coverage_entries:
-    - artefact: VT-003
-      status: planned
-      kind: VT
+      - artefact: VT-003
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-007/PROD-007.md
   PROD-007.FR-004:
     label: FR-004
     title: Users MUST be able to choose automation level for batch operations
     specs:
-    - PROD-007
+      - PROD-007
     primary_spec: PROD-007
     kind: functional
     category: null
@@ -1293,7 +1309,7 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-005
+      - DE-005
     verified_by: []
     coverage_evidence: []
     coverage_entries: []
@@ -1302,7 +1318,7 @@ requirements:
     label: NF-001
     title: Batch operations MUST show clear progress and complete in reasonable time
     specs:
-    - PROD-007
+      - PROD-007
     primary_spec: PROD-007
     kind: non-functional
     category: null
@@ -1310,20 +1326,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-005
+      - DE-005
     verified_by: []
     coverage_evidence:
-    - VA-001
+      - VA-001
     coverage_entries:
-    - artefact: VA-001
-      status: planned
-      kind: VA
+      - artefact: VA-001
+        status: planned
+        kind: VA
     path: .spec-driver/product/PROD-007/PROD-007.md
   PROD-007.NF-002:
     label: NF-002
     title: Interactive mode MUST minimize user questions
     specs:
-    - PROD-007
+      - PROD-007
     primary_spec: PROD-007
     kind: non-functional
     category: null
@@ -1331,26 +1347,27 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-005
+      - DE-005
     verified_by: []
     coverage_evidence:
-    - VA-002
+      - VA-002
     coverage_entries:
-    - artefact: VA-002
-      status: planned
-      kind: VA
+      - artefact: VA-002
+        status: planned
+        kind: VA
     path: .spec-driver/product/PROD-007/PROD-007.md
   PROD-008.FR-001:
     label: FR-001
-    title: "The specs frontmatter and coverage block MUST be the authoritative record\
+    title:
+      "The specs frontmatter and coverage block MUST be the authoritative record\
       \ of each requirement\u2019s _normative_ lifecycle state and supporting evidence.\
       \ Evidence overlays from deltas, audits, and contracts record _observed_ truth\
       \ and may disagree with the spec \u2014 such disagreement is drift to be reconciled\
       \ explicitly, not a silent override (per ADR-008). The requirements registry\
       \ is a derived projection of this data, not itself an authoritative source."
     specs:
-    - PROD-008
-    - PROD-009
+      - PROD-008
+      - PROD-009
     primary_spec: PROD-008
     kind: functional
     category: null
@@ -1358,25 +1375,26 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-007
-    - DE-043
-    - DE-095
+      - DE-007
+      - DE-043
+      - DE-095
     verified_by: []
     coverage_evidence:
-    - VH-201
+      - VH-201
     coverage_entries:
-    - artefact: VH-201
-      status: verified
-      kind: VH
+      - artefact: VH-201
+        status: verified
+        kind: VH
     path: .spec-driver/product/PROD-008/PROD-008.md
   PROD-008.FR-002:
     label: FR-002
-    title: Every delta that changes requirement behaviour MUST provide an implementation
+    title:
+      Every delta that changes requirement behaviour MUST provide an implementation
       plan documenting planned VT/VA/VH artefacts and promote the final state back
       into the owning spec coverage block before completion.
     specs:
-    - PROD-008
-    - PROD-009
+      - PROD-008
+      - PROD-009
     primary_spec: PROD-008
     kind: functional
     category: null
@@ -1384,23 +1402,24 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-007
+      - DE-007
     verified_by: []
     coverage_evidence:
-    - VA-320
+      - VA-320
     coverage_entries:
-    - artefact: VA-320
-      status: verified
-      kind: VA
+      - artefact: VA-320
+        status: verified
+        kind: VA
     path: .spec-driver/product/PROD-008/PROD-008.md
   PROD-008.FR-003:
     label: FR-003
-    title: "Audits MUST surface observed behaviour against the spec coverage block\
+    title:
+      "Audits MUST surface observed behaviour against the spec coverage block\
       \ and raise drift through validation warnings until the spec is explicitly reconciled\
       \ or follow-up work is scheduled. Audit findings do not silently override spec\
       \ truth \u2014 they trigger explicit reconciliation (per ADR-008)."
     specs:
-    - PROD-008
+      - PROD-008
     primary_spec: PROD-008
     kind: functional
     category: null
@@ -1408,21 +1427,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-007
+      - DE-007
     verified_by: []
     coverage_evidence:
-    - VT-902
+      - VT-902
     coverage_entries:
-    - artefact: VT-902
-      status: verified
-      kind: VT
+      - artefact: VT-902
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-008/PROD-008.md
   PROD-008.NF-001:
     label: NF-001
-    title: Lifecycle updates MUST propagate through the registry within one sync cycle
+    title:
+      Lifecycle updates MUST propagate through the registry within one sync cycle
       (< 5 minutes) after a spec change.
     specs:
-    - PROD-008
+      - PROD-008
     primary_spec: PROD-008
     kind: non-functional
     category: null
@@ -1436,10 +1456,11 @@ requirements:
     path: .spec-driver/product/PROD-008/PROD-008.md
   PROD-008.NF-002:
     label: NF-002
-    title: Validation warnings about lifecycle drift MUST be actionable, surfacing
+    title:
+      Validation warnings about lifecycle drift MUST be actionable, surfacing
       responsible artefacts and suggested remediation steps.
     specs:
-    - PROD-008
+      - PROD-008
     primary_spec: PROD-008
     kind: non-functional
     category: null
@@ -1453,10 +1474,11 @@ requirements:
     path: .spec-driver/product/PROD-008/PROD-008.md
   PROD-009.FR-001:
     label: FR-001
-    title: Specs MUST allow authors to declare baseline lifecycle statuses (`planned`,
+    title:
+      Specs MUST allow authors to declare baseline lifecycle statuses (`planned`,
       `asserted`, `legacy_verified`, `deprecated`) directly in coverage entries.
     specs:
-    - PROD-009
+      - PROD-009
     primary_spec: PROD-009
     kind: functional
     category: null
@@ -1464,26 +1486,27 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-043
-    - DE-095
+      - DE-043
+      - DE-095
     verified_by: []
     coverage_evidence:
-    - VH-330
+      - VH-330
     coverage_entries:
-    - artefact: VH-330
-      status: verified
-      kind: VH
+      - artefact: VH-330
+        status: verified
+        kind: VH
     path: .spec-driver/product/PROD-009/PROD-009.md
   PROD-009.FR-002:
     label: FR-002
-    title: "The lifecycle engine MUST surface evidence from deltas and audits alongside\
+    title:
+      "The lifecycle engine MUST surface evidence from deltas and audits alongside\
       \ spec baseline statuses, presenting both normative and observed truth with\
       \ provenance. When normative and observed truth diverge, the system MUST raise\
       \ drift warnings for explicit human reconciliation rather than silently determining\
       \ an effective status by timestamp or artefact-kind precedence (per ADR-008\
       \ \xA73\u20134)."
     specs:
-    - PROD-009
+      - PROD-009
     primary_spec: PROD-009
     kind: functional
     category: null
@@ -1491,21 +1514,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-007
+      - DE-007
     verified_by: []
     coverage_evidence:
-    - VA-421
+      - VA-421
     coverage_entries:
-    - artefact: VA-421
-      status: verified
-      kind: VA
+      - artefact: VA-421
+        status: verified
+        kind: VA
     path: .spec-driver/product/PROD-009/PROD-009.md
   PROD-009.FR-003:
     label: FR-003
-    title: Validation MUST emit corrective warnings when overlays disagree and keep
+    title:
+      Validation MUST emit corrective warnings when overlays disagree and keep
       humans informed until a new delta or audit resolves the conflict.
     specs:
-    - PROD-009
+      - PROD-009
     primary_spec: PROD-009
     kind: functional
     category: null
@@ -1513,22 +1537,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-007
-    - DE-043
+      - DE-007
+      - DE-043
     verified_by: []
     coverage_evidence:
-    - VT-940
+      - VT-940
     coverage_entries:
-    - artefact: VT-940
-      status: verified
-      kind: VT
+      - artefact: VT-940
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-009/PROD-009.md
   PROD-009.NF-001:
     label: NF-001
-    title: Lifecycle projections MUST expose provenance (source artefact, timestamp,
+    title:
+      Lifecycle projections MUST expose provenance (source artefact, timestamp,
       actor) for the effective status.
     specs:
-    - PROD-009
+      - PROD-009
     primary_spec: PROD-009
     kind: non-functional
     category: null
@@ -1542,10 +1567,11 @@ requirements:
     path: .spec-driver/product/PROD-009/PROD-009.md
   PROD-009.NF-002:
     label: NF-002
-    title: Warning messages SHOULD be actionable within one hop (point to artefacts
+    title:
+      Warning messages SHOULD be actionable within one hop (point to artefacts
       and remediation) and default to warning severity rather than errors.
     specs:
-    - PROD-009
+      - PROD-009
     primary_spec: PROD-009
     kind: non-functional
     category: null
@@ -1561,7 +1587,7 @@ requirements:
     label: FR-001
     title: Standardize --json across list commands
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1569,20 +1595,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-009
+      - DE-009
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-JSON-001
+      - VT-PROD010-JSON-001
     coverage_entries:
-    - artefact: VT-PROD010-JSON-001
-      status: verified
-      kind: VT
+      - artefact: VT-PROD010-JSON-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-002:
     label: FR-002
     title: Add --json to show commands
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1590,20 +1616,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-009
+      - DE-009
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-JSON-002
+      - VT-PROD010-JSON-002
     coverage_entries:
-    - artefact: VT-PROD010-JSON-002
-      status: verified
-      kind: VT
+      - artefact: VT-PROD010-JSON-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-003:
     label: FR-003
     title: Add status filter to specs
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1611,20 +1637,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-009
+      - DE-009
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-FILTER-001
+      - VT-PROD010-FILTER-001
     coverage_entries:
-    - artefact: VT-PROD010-FILTER-001
-      status: verified
-      kind: VT
+      - artefact: VT-PROD010-FILTER-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-004:
     label: FR-004
     title: Multi-value filter support
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1632,20 +1658,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-011
+      - DE-011
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-FILTER-002
+      - VT-PROD010-FILTER-002
     coverage_entries:
-    - artefact: VT-PROD010-FILTER-002
-      status: verified
-      kind: VT
+      - artefact: VT-PROD010-FILTER-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-005:
     label: FR-005
     title: Reverse relationship queries
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1653,21 +1679,21 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-011
-    - DE-090
+      - DE-011
+      - DE-090
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-FILTER-003
+      - VT-PROD010-FILTER-003
     coverage_entries:
-    - artefact: VT-PROD010-FILTER-003
-      status: verified
-      kind: VT
+      - artefact: VT-PROD010-FILTER-003
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-006:
     label: FR-006
     title: Enum introspection
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1675,20 +1701,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-011
+      - DE-011
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-SCHEMA-001
+      - VT-PROD010-SCHEMA-001
     coverage_entries:
-    - artefact: VT-PROD010-SCHEMA-001
-      status: verified
-      kind: VT
+      - artefact: VT-PROD010-SCHEMA-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-007:
     label: FR-007
     title: Help text enhancement
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1696,20 +1722,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-011
+      - DE-011
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-SCHEMA-002
+      - VT-PROD010-SCHEMA-002
     coverage_entries:
-    - artefact: VT-PROD010-SCHEMA-002
-      status: verified
-      kind: VT
+      - artefact: VT-PROD010-SCHEMA-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-008:
     label: FR-008
     title: --machine-readable flag
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1719,17 +1745,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-MACHINE-001
+      - VT-PROD010-MACHINE-001
     coverage_entries:
-    - artefact: VT-PROD010-MACHINE-001
-      status: planned
-      kind: VT
+      - artefact: VT-PROD010-MACHINE-001
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-009:
     label: FR-009
     title: Pagination support
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1739,17 +1765,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-MACHINE-002
+      - VT-PROD010-MACHINE-002
     coverage_entries:
-    - artefact: VT-PROD010-MACHINE-002
-      status: planned
-      kind: VT
+      - artefact: VT-PROD010-MACHINE-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-010:
     label: FR-010
     title: Error message improvements
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1759,17 +1785,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-ERROR-001
+      - VT-PROD010-ERROR-001
     coverage_entries:
-    - artefact: VT-PROD010-ERROR-001
-      status: planned
-      kind: VT
+      - artefact: VT-PROD010-ERROR-001
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-011:
     label: FR-011
     title: CLI MUST provide kind-specific backlog list shortcuts (issues/problems/improvements/risks)
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1777,21 +1803,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-014
+      - DE-014
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-BACKLOG-001
+      - VT-PROD010-BACKLOG-001
     coverage_entries:
-    - artefact: VT-PROD010-BACKLOG-001
-      status: verified
-      kind: VT
+      - artefact: VT-PROD010-BACKLOG-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-012:
     label: FR-012
-    title: CLI MUST provide help command showing core concepts, workflows, and conventions
+    title:
+      CLI MUST provide help command showing core concepts, workflows, and conventions
       from markdown sources
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1801,18 +1828,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-HELP-001
+      - VT-PROD010-HELP-001
     coverage_entries:
-    - artefact: VT-PROD010-HELP-001
-      status: planned
-      kind: VT
+      - artefact: VT-PROD010-HELP-001
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-013:
     label: FR-013
-    title: Help system MUST distinguish between immutable (spec-driver core) and customizable
+    title:
+      Help system MUST distinguish between immutable (spec-driver core) and customizable
       (project-specific) documentation
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1822,18 +1850,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-HELP-002
+      - VT-PROD010-HELP-002
     coverage_entries:
-    - artefact: VT-PROD010-HELP-002
-      status: planned
-      kind: VT
+      - artefact: VT-PROD010-HELP-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-014:
     label: FR-014
-    title: CLI MUST support installing customizable help docs to project for user
+    title:
+      CLI MUST support installing customizable help docs to project for user
       modification
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1843,17 +1872,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-HELP-003
+      - VT-PROD010-HELP-003
     coverage_entries:
-    - artefact: VT-PROD010-HELP-003
-      status: planned
-      kind: VT
+      - artefact: VT-PROD010-HELP-003
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-015:
     label: FR-015
     title: CLI MUST support per-file validation of frontmatter and YAML blocks
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1863,17 +1892,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-VALIDATE-001
+      - VT-PROD010-VALIDATE-001
     coverage_entries:
-    - artefact: VT-PROD010-VALIDATE-001
-      status: planned
-      kind: VT
+      - artefact: VT-PROD010-VALIDATE-001
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-016:
     label: FR-016
-    title: 'CLI MUST accept intelligent variations of artifact IDs and keywords:'
+    title: "CLI MUST accept intelligent variations of artifact IDs and keywords:"
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1883,21 +1912,21 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-INPUT-001
-    - VT-PROD010-INPUT-002
+      - VT-PROD010-INPUT-001
+      - VT-PROD010-INPUT-002
     coverage_entries:
-    - artefact: VT-PROD010-INPUT-001
-      status: planned
-      kind: VT
-    - artefact: VT-PROD010-INPUT-002
-      status: planned
-      kind: VT
+      - artefact: VT-PROD010-INPUT-001
+        status: planned
+        kind: VT
+      - artefact: VT-PROD010-INPUT-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.FR-017:
     label: FR-017
-    title: 'CLI MUST provide edit command to open artifacts in $EDITOR:'
+    title: "CLI MUST provide edit command to open artifacts in $EDITOR:"
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: functional
     category: null
@@ -1907,21 +1936,21 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-PROD010-EDIT-001
-    - VT-PROD010-EDIT-002
+      - VT-PROD010-EDIT-001
+      - VT-PROD010-EDIT-002
     coverage_entries:
-    - artefact: VT-PROD010-EDIT-001
-      status: planned
-      kind: VT
-    - artefact: VT-PROD010-EDIT-002
-      status: planned
-      kind: VT
+      - artefact: VT-PROD010-EDIT-001
+        status: planned
+        kind: VT
+      - artefact: VT-PROD010-EDIT-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.NF-001:
     label: NF-001
     title: Token efficiency final validation
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: non-functional
     category: null
@@ -1931,17 +1960,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VA-PROD010-TOKEN-001
+      - VA-PROD010-TOKEN-001
     coverage_entries:
-    - artefact: VA-PROD010-TOKEN-001
-      status: planned
-      kind: VA
+      - artefact: VA-PROD010-TOKEN-001
+        status: planned
+        kind: VA
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.NF-002:
     label: NF-002
     title: Agent workflow validation
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: non-functional
     category: null
@@ -1951,17 +1980,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VH-PROD010-AGENT-001
+      - VH-PROD010-AGENT-001
     coverage_entries:
-    - artefact: VH-PROD010-AGENT-001
-      status: planned
-      kind: VH
+      - artefact: VH-PROD010-AGENT-001
+        status: planned
+        kind: VH
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-010.NF-003:
     label: NF-003
     title: Validate against UX research findings
     specs:
-    - PROD-010
+      - PROD-010
     primary_spec: PROD-010
     kind: non-functional
     category: null
@@ -1969,20 +1998,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-009
+      - DE-009
     verified_by: []
     coverage_evidence:
-    - VH-PROD010-UX-001
+      - VH-PROD010-UX-001
     coverage_entries:
-    - artefact: VH-PROD010-UX-001
-      status: verified
-      kind: VH
+      - artefact: VH-PROD010-UX-001
+        status: verified
+        kind: VH
     path: .spec-driver/product/PROD-010/PROD-010.md
   PROD-011.FR-001:
     label: FR-001
     title: Remove Phase-01 Auto-Creation**
     specs:
-    - PROD-011
+      - PROD-011
     primary_spec: PROD-011
     kind: functional
     category: null
@@ -1990,20 +2019,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-016
+      - DE-016
     verified_by: []
     coverage_evidence:
-    - VT-016-001
+      - VT-016-001
     coverage_entries:
-    - artefact: VT-016-001
-      status: verified
-      kind: VT
+      - artefact: VT-016-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
   PROD-011.FR-002:
     label: FR-002
     title: Enable Phase Creation When No Phases Exist**
     specs:
-    - PROD-011
+      - PROD-011
     primary_spec: PROD-011
     kind: functional
     category: null
@@ -2011,20 +2040,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-016
+      - DE-016
     verified_by: []
     coverage_evidence:
-    - VT-016-002
+      - VT-016-002
     coverage_entries:
-    - artefact: VT-016-002
-      status: verified
-      kind: VT
+      - artefact: VT-016-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
   PROD-011.FR-003:
     label: FR-003
     title: Hook Installation System**
     specs:
-    - PROD-011
+      - PROD-011
     primary_spec: PROD-011
     kind: functional
     category: null
@@ -2034,17 +2063,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-011-003
+      - VT-011-003
     coverage_entries:
-    - artefact: VT-011-003
-      status: planned
-      kind: VT
+      - artefact: VT-011-003
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
   PROD-011.FR-004:
     label: FR-004
     title: Default Workflow Hooks**
     specs:
-    - PROD-011
+      - PROD-011
     primary_spec: PROD-011
     kind: functional
     category: null
@@ -2054,17 +2083,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-011-004
+      - VT-011-004
     coverage_entries:
-    - artefact: VT-011-004
-      status: planned
-      kind: VT
+      - artefact: VT-011-004
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
   PROD-011.FR-005:
     label: FR-005
     title: IP Automation Metadata Schema**
     specs:
-    - PROD-011
+      - PROD-011
     primary_spec: PROD-011
     kind: functional
     category: null
@@ -2074,17 +2103,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-011-005
+      - VT-011-005
     coverage_entries:
-    - artefact: VT-011-005
-      status: planned
-      kind: VT
+      - artefact: VT-011-005
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
   PROD-011.FR-006:
     label: FR-006
     title: Constitution Integration in Commands**
     specs:
-    - PROD-011
+      - PROD-011
     primary_spec: PROD-011
     kind: functional
     category: null
@@ -2094,17 +2123,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-011-006
+      - VT-011-006
     coverage_entries:
-    - artefact: VT-011-006
-      status: planned
-      kind: VT
+      - artefact: VT-011-006
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
   PROD-011.FR-007:
     label: FR-007
     title: Constitution Validation Tooling**
     specs:
-    - PROD-011
+      - PROD-011
     primary_spec: PROD-011
     kind: functional
     category: null
@@ -2114,17 +2143,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-011-007
+      - VT-011-007
     coverage_entries:
-    - artefact: VT-011-007
-      status: planned
-      kind: VT
+      - artefact: VT-011-007
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
   PROD-011.FR-008:
     label: FR-008
     title: VCS Abstraction**
     specs:
-    - PROD-011
+      - PROD-011
     primary_spec: PROD-011
     kind: functional
     category: null
@@ -2134,17 +2163,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-011-008
+      - VT-011-008
     coverage_entries:
-    - artefact: VT-011-008
-      status: planned
-      kind: VT
+      - artefact: VT-011-008
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-011/PROD-011.md
   PROD-011.NF-001:
     label: NF-001
     title: High Workflow Adoption**
     specs:
-    - PROD-011
+      - PROD-011
     primary_spec: PROD-011
     kind: non-functional
     category: null
@@ -2154,17 +2183,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VH-011-001
+      - VH-011-001
     coverage_entries:
-    - artefact: VH-011-001
-      status: planned
-      kind: VH
+      - artefact: VH-011-001
+        status: planned
+        kind: VH
     path: .spec-driver/product/PROD-011/PROD-011.md
   PROD-011.NF-002:
     label: NF-002
     title: Improved Delta Quality**
     specs:
-    - PROD-011
+      - PROD-011
     primary_spec: PROD-011
     kind: non-functional
     category: null
@@ -2174,18 +2203,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VA-011-001
+      - VA-011-001
     coverage_entries:
-    - artefact: VA-011-001
-      status: planned
-      kind: VA
+      - artefact: VA-011-001
+        status: planned
+        kind: VA
     path: .spec-driver/product/PROD-011/PROD-011.md
   PROD-012.FR-001:
     label: FR-001
-    title: System MUST generate API contract documentation from Go, Python, and TypeScript
+    title:
+      System MUST generate API contract documentation from Go, Python, and TypeScript
       source code using AST parsing
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2195,18 +2225,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-001
+      - VT-001
     coverage_entries:
-    - artefact: VT-001
-      status: planned
-      kind: VT
+      - artefact: VT-001
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-002:
     label: FR-002
-    title: System MUST preserve all comments (package-level, function-level, inline)
+    title:
+      System MUST preserve all comments (package-level, function-level, inline)
       in generated contracts
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2220,10 +2251,11 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-003:
     label: FR-003
-    title: System MUST extract and represent complete type information including function
+    title:
+      System MUST extract and represent complete type information including function
       signatures, interfaces, type parameters, and optionality markers
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2237,10 +2269,11 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-004:
     label: FR-004
-    title: System MUST distinguish and separately document public vs private vs test
+    title:
+      System MUST distinguish and separately document public vs private vs test
       interfaces
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2254,11 +2287,12 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-005:
     label: FR-005
-    title: System MUST support auto-generating stub tech specs for uncovered code,
+    title:
+      System MUST support auto-generating stub tech specs for uncovered code,
       but spec auto-creation MUST be opt-in (persisted per-repo) rather than a first-run
       default.
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2266,39 +2300,40 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-028
-    - DE-035
+      - DE-028
+      - DE-035
     verified_by: []
     coverage_evidence:
-    - VT-SYNC-DEFAULTS-001
-    - VT-SYNC-DEFAULTS-002
-    - VT-SYNC-DEFAULTS-003
-    - VT-SYNC-DEFAULTS-004
-    - VT-SYNC-DEFAULTS-005
+      - VT-SYNC-DEFAULTS-001
+      - VT-SYNC-DEFAULTS-002
+      - VT-SYNC-DEFAULTS-003
+      - VT-SYNC-DEFAULTS-004
+      - VT-SYNC-DEFAULTS-005
     coverage_entries:
-    - artefact: VT-SYNC-DEFAULTS-001
-      status: verified
-      kind: VT
-    - artefact: VT-SYNC-DEFAULTS-002
-      status: verified
-      kind: VT
-    - artefact: VT-SYNC-DEFAULTS-003
-      status: verified
-      kind: VT
-    - artefact: VT-SYNC-DEFAULTS-004
-      status: verified
-      kind: VT
-    - artefact: VT-SYNC-DEFAULTS-005
-      status: verified
-      kind: VT
+      - artefact: VT-SYNC-DEFAULTS-001
+        status: verified
+        kind: VT
+      - artefact: VT-SYNC-DEFAULTS-002
+        status: verified
+        kind: VT
+      - artefact: VT-SYNC-DEFAULTS-003
+        status: verified
+        kind: VT
+      - artefact: VT-SYNC-DEFAULTS-004
+        status: verified
+        kind: VT
+      - artefact: VT-SYNC-DEFAULTS-005
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-006:
     label: FR-006
-    title: System MUST store the canonical generated contracts corpus under `.contracts/**`
+    title:
+      System MUST store the canonical generated contracts corpus under `.contracts/**`
       (mirror-of-source layout), with any legacy `specify/tech/SPEC-*/contracts/`
       paths treated as compatibility-only.
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2306,22 +2341,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-028
-    - DE-029
+      - DE-028
+      - DE-029
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACTS-ADAPTER-001
+      - VT-CONTRACTS-ADAPTER-001
     coverage_entries:
-    - artefact: VT-CONTRACTS-ADAPTER-001
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACTS-ADAPTER-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-007:
     label: FR-007
-    title: System MUST provide `--check` mode that reports code requiring spec coverage
+    title:
+      System MUST provide `--check` mode that reports code requiring spec coverage
       without modifying files
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2335,10 +2371,11 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-008:
     label: FR-008
-    title: System MUST provide `--prune` flag that removes stub specs only when manual
+    title:
+      System MUST provide `--prune` flag that removes stub specs only when manual
       specs exist covering same code
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2352,12 +2389,13 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-009:
     label: FR-009
-    title: "System MAY create derived navigation indexes organizing contracts by-language\
+    title:
+      "System MAY create derived navigation indexes organizing contracts by-language\
       \ and by-package. These are augmentation views over the canonical mirror-of-source\
       \ contracts corpus (`.contracts/`), not a competing canonical storage structure\
       \ (per ADR-007 \xA75\u20136)."
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2373,7 +2411,7 @@ requirements:
     label: FR-010
     title: System MUST support filtering contract output by visibility level (public/private/test)
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2387,10 +2425,11 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-011:
     label: FR-011
-    title: System MUST generate useful contracts from code without JSDoc, docstrings,
+    title:
+      System MUST generate useful contracts from code without JSDoc, docstrings,
       type hints, or special annotations
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2406,7 +2445,7 @@ requirements:
     label: FR-012
     title: System MUST operate with zero configuration to produce meaningful contracts
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2420,10 +2459,11 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-013:
     label: FR-013
-    title: System MUST record git SHA of last sync operation in tech spec frontmatter
+    title:
+      System MUST record git SHA of last sync operation in tech spec frontmatter
       (`git_shas.last_sync`) to enable drift detection
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2437,11 +2477,12 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-014:
     label: FR-014
-    title: System MUST support recording git SHA when spec is reviewed and verified
+    title:
+      System MUST support recording git SHA when spec is reviewed and verified
       as accurate (`git_shas.last_review`), enabling calculation of what code changes
       need to be accounted for
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2455,10 +2496,11 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-015:
     label: FR-015
-    title: System MUST map code to specs such that each piece of code belongs to exactly
+    title:
+      System MUST map code to specs such that each piece of code belongs to exactly
       one spec, with spec scope being cohesive and right-sized for the language
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2472,11 +2514,12 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-016:
     label: FR-016
-    title: Contract navigation structures (mirror-of-source corpus and optional derived
+    title:
+      Contract navigation structures (mirror-of-source corpus and optional derived
       indexes) MUST be intuitive, easy to navigate, and follow unsurprising conventions
       matching developer mental models
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2490,10 +2533,11 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-017:
     label: FR-017
-    title: System MUST provide tooling to find corresponding spec from code file and
+    title:
+      System MUST provide tooling to find corresponding spec from code file and
       vice-versa (bidirectional navigation)
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2507,10 +2551,11 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.FR-018:
     label: FR-018
-    title: System MUST provide tooling to navigate between code directories and spec
+    title:
+      System MUST provide tooling to navigate between code directories and spec
       directories
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: functional
     category: null
@@ -2524,10 +2569,11 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.NF-001:
     label: NF-001
-    title: 'Generated contracts MUST be deterministic: identical source code MUST
-      produce byte-identical contract output'
+    title:
+      "Generated contracts MUST be deterministic: identical source code MUST
+      produce byte-identical contract output"
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: non-functional
     category: null
@@ -2537,18 +2583,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-002
+      - VT-002
     coverage_entries:
-    - artefact: VT-002
-      status: planned
-      kind: VT
+      - artefact: VT-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.NF-002:
     label: NF-002
-    title: 'Contract generation MUST be idempotent: running `sync` multiple times
-      on unchanged code MUST produce no file modifications'
+    title:
+      "Contract generation MUST be idempotent: running `sync` multiple times
+      on unchanged code MUST produce no file modifications"
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: non-functional
     category: null
@@ -2564,7 +2611,7 @@ requirements:
     label: NF-003
     title: Covered by VA-001 (performance benchmarks)
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: non-functional
     category: null
@@ -2574,17 +2621,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VA-001
+      - VA-001
     coverage_entries:
-    - artefact: VA-001
-      status: planned
-      kind: VA
+      - artefact: VA-001
+        status: planned
+        kind: VA
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-012.NF-004:
     label: NF-004
     title: Covered by VT-006 (legacy compatibility)
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: non-functional
     category: null
@@ -2600,7 +2647,7 @@ requirements:
     label: NF-005
     title: Covered by VH-001 (human readability review)
     specs:
-    - PROD-012
+      - PROD-012
     primary_spec: PROD-012
     kind: non-functional
     category: null
@@ -2614,10 +2661,11 @@ requirements:
     path: .spec-driver/product/PROD-012/PROD-012.md
   PROD-013.FR-001:
     label: FR-001
-    title: All `show` subcommands MUST support `--path` flag that outputs only the
+    title:
+      All `show` subcommands MUST support `--path` flag that outputs only the
       file path
     specs:
-    - PROD-013
+      - PROD-013
     primary_spec: PROD-013
     kind: functional
     category: null
@@ -2625,21 +2673,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-022
+      - DE-022
     verified_by: []
     coverage_evidence:
-    - VT-001
+      - VT-001
     coverage_entries:
-    - artefact: VT-001
-      status: verified
-      kind: VT
+      - artefact: VT-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
   PROD-013.FR-002:
     label: FR-002
-    title: All `show` subcommands MUST support `--raw` flag that outputs raw file
+    title:
+      All `show` subcommands MUST support `--raw` flag that outputs raw file
       content
     specs:
-    - PROD-013
+      - PROD-013
     primary_spec: PROD-013
     kind: functional
     category: null
@@ -2647,21 +2696,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-024
+      - DE-024
     verified_by: []
     coverage_evidence:
-    - VT-002
+      - VT-002
     coverage_entries:
-    - artefact: VT-002
-      status: verified
-      kind: VT
+      - artefact: VT-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
   PROD-013.FR-003:
     label: FR-003
-    title: 'System MUST provide `view` command that opens artifact in `$PAGER` (fallback:
-      less, more)'
+    title:
+      "System MUST provide `view` command that opens artifact in `$PAGER` (fallback:
+      less, more)"
     specs:
-    - PROD-013
+      - PROD-013
     primary_spec: PROD-013
     kind: functional
     category: null
@@ -2669,21 +2719,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-023
+      - DE-023
     verified_by: []
     coverage_evidence:
-    - VT-003
+      - VT-003
     coverage_entries:
-    - artefact: VT-003
-      status: verified
-      kind: VT
+      - artefact: VT-003
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
   PROD-013.FR-004:
     label: FR-004
-    title: 'System MUST provide `edit` command that opens artifact in `$EDITOR` (fallback:
-      $VISUAL, vi)'
+    title:
+      "System MUST provide `edit` command that opens artifact in `$EDITOR` (fallback:
+      $VISUAL, vi)"
     specs:
-    - PROD-013
+      - PROD-013
     primary_spec: PROD-013
     kind: functional
     category: null
@@ -2691,22 +2742,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-023
-    - DE-068
+      - DE-023
+      - DE-068
     verified_by: []
     coverage_evidence:
-    - VT-004
+      - VT-004
     coverage_entries:
-    - artefact: VT-004
-      status: verified
-      kind: VT
+      - artefact: VT-004
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
   PROD-013.FR-005:
     label: FR-005
-    title: '`find` command MUST support all artifact types (spec, delta, adr, revision,
-      requirement, policy, standard), not just card'
+    title:
+      "`find` command MUST support all artifact types (spec, delta, adr, revision,
+      requirement, policy, standard), not just card"
     specs:
-    - PROD-013
+      - PROD-013
     primary_spec: PROD-013
     kind: functional
     category: null
@@ -2714,20 +2766,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-025
+      - DE-025
     verified_by: []
     coverage_evidence:
-    - VT-005
+      - VT-005
     coverage_entries:
-    - artefact: VT-005
-      status: verified
-      kind: VT
+      - artefact: VT-005
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
   PROD-013.FR-006:
     label: FR-006
     title: All `show` subcommands MUST support `--json` flag for structured output
     specs:
-    - PROD-013
+      - PROD-013
     primary_spec: PROD-013
     kind: functional
     category: null
@@ -2735,20 +2787,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-022
+      - DE-022
     verified_by: []
     coverage_evidence:
-    - VT-006
+      - VT-006
     coverage_entries:
-    - artefact: VT-006
-      status: verified
-      kind: VT
+      - artefact: VT-006
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
   PROD-013.FR-007:
     label: FR-007
-    title: '`--json` output MUST include `path` field for all artifacts'
+    title: "`--json` output MUST include `path` field for all artifacts"
     specs:
-    - PROD-013
+      - PROD-013
     primary_spec: PROD-013
     kind: functional
     category: null
@@ -2756,20 +2808,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-022
+      - DE-022
     verified_by: []
     coverage_evidence:
-    - VT-007
+      - VT-007
     coverage_entries:
-    - artefact: VT-007
-      status: verified
-      kind: VT
+      - artefact: VT-007
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-013/PROD-013.md
   PROD-013.NF-001:
     label: NF-001
     title: Path resolution MUST complete in <100ms for any artifact
     specs:
-    - PROD-013
+      - PROD-013
     primary_spec: PROD-013
     kind: non-functional
     category: null
@@ -2785,7 +2837,7 @@ requirements:
     label: NF-002
     title: CLI flag names MUST be consistent across all artifact types
     specs:
-    - PROD-013
+      - PROD-013
     primary_spec: PROD-013
     kind: non-functional
     category: null
@@ -2799,10 +2851,11 @@ requirements:
     path: .spec-driver/product/PROD-013/PROD-013.md
   PROD-014.FR-001:
     label: FR-001
-    title: System MUST generate a repo-root `.contracts/` directory as a deterministic,
+    title:
+      System MUST generate a repo-root `.contracts/` directory as a deterministic,
       rebuildable index of generated contracts.
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -2810,21 +2863,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-027
+      - DE-027
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACT-MIRROR-001
+      - VT-CONTRACT-MIRROR-001
     coverage_entries:
-    - artefact: VT-CONTRACT-MIRROR-001
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACT-MIRROR-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-002:
     label: FR-002
-    title: System MUST mirror repo-relative source paths inside `.contracts/<view>/...`
+    title:
+      System MUST mirror repo-relative source paths inside `.contracts/<view>/...`
       as the canonical navigation shape for contracts.
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -2832,21 +2886,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-027
+      - DE-027
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACT-MIRROR-002
+      - VT-CONTRACT-MIRROR-002
     coverage_entries:
-    - artefact: VT-CONTRACT-MIRROR-002
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACT-MIRROR-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-003:
     label: FR-003
-    title: 'For each supported language, the index builder MUST map registered source
-      units to mirror paths using language-appropriate rules:'
+    title:
+      "For each supported language, the index builder MUST map registered source
+      units to mirror paths using language-appropriate rules:"
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -2854,20 +2909,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-027
+      - DE-027
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACT-MIRROR-002
+      - VT-CONTRACT-MIRROR-002
     coverage_entries:
-    - artefact: VT-CONTRACT-MIRROR-002
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACT-MIRROR-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-004:
     label: FR-004
-    title: 'System MUST create idiom alias paths as symlinks:'
+    title: "System MUST create idiom alias paths as symlinks:"
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -2875,21 +2930,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-027
+      - DE-027
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACT-MIRROR-001
+      - VT-CONTRACT-MIRROR-001
     coverage_entries:
-    - artefact: VT-CONTRACT-MIRROR-001
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACT-MIRROR-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-005:
     label: FR-005
-    title: Rebuilding the mirror MUST remove stale entries and MUST only write within
+    title:
+      Rebuilding the mirror MUST remove stale entries and MUST only write within
       `.contracts/` (no changes elsewhere in the repo).
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -2897,22 +2953,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-027
+      - DE-027
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACT-MIRROR-003
+      - VT-CONTRACT-MIRROR-003
     coverage_entries:
-    - artefact: VT-CONTRACT-MIRROR-003
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACT-MIRROR-003
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-006:
     label: FR-006
-    title: Mirror generation MUST be driven by existing registry + existing contract
+    title:
+      Mirror generation MUST be driven by existing registry + existing contract
       outputs, without requiring code parsing or toolchain execution (beyond reading
       contract markdown for mapping when required).
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -2920,20 +2977,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-027
+      - DE-027
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACT-MIRROR-002
+      - VT-CONTRACT-MIRROR-002
     coverage_entries:
-    - artefact: VT-CONTRACT-MIRROR-002
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACT-MIRROR-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-007:
     label: FR-007
-    title: 'Mirror generation MUST handle missing/absent variants gracefully:'
+    title: "Mirror generation MUST handle missing/absent variants gracefully:"
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -2941,22 +2998,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-027
+      - DE-027
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACT-MIRROR-002
+      - VT-CONTRACT-MIRROR-002
     coverage_entries:
-    - artefact: VT-CONTRACT-MIRROR-002
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACT-MIRROR-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-008:
     label: FR-008
-    title: System MUST support generating and storing contract artefacts as real files
+    title:
+      System MUST support generating and storing contract artefacts as real files
       under `.contracts/<view>/...` using the mirror-of-source path mapping rules
       (FR-003).
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -2964,21 +3022,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-029
+      - DE-029
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACTS-STORAGE-001
+      - VT-CONTRACTS-STORAGE-001
     coverage_entries:
-    - artefact: VT-CONTRACTS-STORAGE-001
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACTS-STORAGE-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-009:
     label: FR-009
-    title: System MUST support generating contracts for explicit targets without requiring
+    title:
+      System MUST support generating contracts for explicit targets without requiring
       pre-existing specs or registry entries.
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -2988,18 +3047,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACTS-GEN-001
+      - VT-CONTRACTS-GEN-001
     coverage_entries:
-    - artefact: VT-CONTRACTS-GEN-001
-      status: planned
-      kind: VT
+      - artefact: VT-CONTRACTS-GEN-001
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-010:
     label: FR-010
-    title: "System SHOULD support generating contracts for \u201Call discoverable\
+    title:
+      "System SHOULD support generating contracts for \u201Call discoverable\
       \ targets\u201D of a language without first creating/specifying SPEC bundles."
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -3009,18 +3069,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACTS-GEN-002
+      - VT-CONTRACTS-GEN-002
     coverage_entries:
-    - artefact: VT-CONTRACTS-GEN-002
-      status: planned
-      kind: VT
+      - artefact: VT-CONTRACTS-GEN-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-011:
     label: FR-011
-    title: System SHOULD provide an explicit backwards-compatibility strategy for
+    title:
+      System SHOULD provide an explicit backwards-compatibility strategy for
       legacy access paths.
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -3028,22 +3089,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-029
+      - DE-029
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACTS-COMPAT-001
+      - VT-CONTRACTS-COMPAT-001
     coverage_entries:
-    - artefact: VT-CONTRACTS-COMPAT-001
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACTS-COMPAT-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.FR-012:
     label: FR-012
-    title: System MUST warn when contract artefacts exist but `.contracts/**` generation
+    title:
+      System MUST warn when contract artefacts exist but `.contracts/**` generation
       yields zero entries for their owning spec/source unit(s) (convention drift /
       mapper mismatch).
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: functional
     category: null
@@ -3051,21 +3113,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-029
+      - DE-029
     verified_by: []
     coverage_evidence:
-    - VT-CONTRACTS-DRIFT-001
+      - VT-CONTRACTS-DRIFT-001
     coverage_entries:
-    - artefact: VT-CONTRACTS-DRIFT-001
-      status: verified
-      kind: VT
+      - artefact: VT-CONTRACTS-DRIFT-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.NF-001:
     label: NF-001
-    title: 'Mirror rebuild MUST be fast enough for interactive use (target: <2s for
-      ~10k contract artefacts on a typical dev machine; linear in number of artefacts).'
+    title:
+      "Mirror rebuild MUST be fast enough for interactive use (target: <2s for
+      ~10k contract artefacts on a typical dev machine; linear in number of artefacts)."
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: non-functional
     category: null
@@ -3079,11 +3142,12 @@ requirements:
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-014.NF-002:
     label: NF-002
-    title: '`.contracts/` MUST be safe to `.gitignore` entirely without breaking core
+    title:
+      "`.contracts/` MUST be safe to `.gitignore` entirely without breaking core
       spec-driver operations. Contracts are derived/deterministic: ignoring `.contracts/`
-      means the corpus is ephemeral and must be regenerated on demand.'
+      means the corpus is ephemeral and must be regenerated on demand."
     specs:
-    - PROD-014
+      - PROD-014
     primary_spec: PROD-014
     kind: non-functional
     category: null
@@ -3097,10 +3161,11 @@ requirements:
     path: .spec-driver/product/PROD-014/PROD-014.md
   PROD-015.FR-001:
     label: FR-001
-    title: 'Tech specs MUST support explicit taxonomy via frontmatter fields: `category`
-      and `c4_level`.'
+    title:
+      "Tech specs MUST support explicit taxonomy via frontmatter fields: `category`
+      and `c4_level`."
     specs:
-    - PROD-015
+      - PROD-015
     primary_spec: PROD-015
     kind: functional
     category: null
@@ -3108,21 +3173,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-030
+      - DE-030
     verified_by: []
     coverage_evidence:
-    - VT-030-001
+      - VT-030-001
     coverage_entries:
-    - artefact: VT-030-001
-      status: verified
-      kind: VT
+      - artefact: VT-030-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
   PROD-015.FR-002:
     label: FR-002
-    title: 'Sync-created unit specs MUST default to `category: unit` and `c4_level:
-      code`.'
+    title:
+      "Sync-created unit specs MUST default to `category: unit` and `c4_level:
+      code`."
     specs:
-    - PROD-015
+      - PROD-015
     primary_spec: PROD-015
     kind: functional
     category: null
@@ -3130,21 +3196,21 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-030
-    - DE-035
+      - DE-030
+      - DE-035
     verified_by: []
     coverage_evidence:
-    - VT-030-002
+      - VT-030-002
     coverage_entries:
-    - artefact: VT-030-002
-      status: verified
-      kind: VT
+      - artefact: VT-030-002
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
   PROD-015.FR-003:
     label: FR-003
     title: The CLI MUST support filtering spec listings by `category` and `c4_level`.
     specs:
-    - PROD-015
+      - PROD-015
     primary_spec: PROD-015
     kind: functional
     category: null
@@ -3152,23 +3218,24 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-030
-    - DE-035
+      - DE-030
+      - DE-035
     verified_by: []
     coverage_evidence:
-    - VT-030-003
+      - VT-030-003
     coverage_entries:
-    - artefact: VT-030-003
-      status: verified
-      kind: VT
+      - artefact: VT-030-003
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
   PROD-015.FR-004:
     label: FR-004
-    title: "The system MUST provide deterministic filesystem \u201Cviews\u201D for\
+    title:
+      "The system MUST provide deterministic filesystem \u201Cviews\u201D for\
       \ navigation by `category` and `c4_level` (e.g. `specify/tech/by-category/assembly/\u2026\
       `)."
     specs:
-    - PROD-015
+      - PROD-015
     primary_spec: PROD-015
     kind: functional
     category: null
@@ -3176,23 +3243,24 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-030
-    - DE-035
+      - DE-030
+      - DE-035
     verified_by: []
     coverage_evidence:
-    - VT-030-004
+      - VT-030-004
     coverage_entries:
-    - artefact: VT-030-004
-      status: verified
-      kind: VT
+      - artefact: VT-030-004
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
   PROD-015.FR-005:
     label: FR-005
-    title: 'Validation MUST warn (not error) when a tech spec is missing taxonomy
+    title:
+      "Validation MUST warn (not error) when a tech spec is missing taxonomy
       fields or uses inconsistent combinations (e.g. `category: unit` with non-`code`
-      `c4_level`).'
+      `c4_level`)."
     specs:
-    - PROD-015
+      - PROD-015
     primary_spec: PROD-015
     kind: functional
     category: null
@@ -3200,22 +3268,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-030
-    - DE-035
+      - DE-030
+      - DE-035
     verified_by: []
     coverage_evidence:
-    - VT-030-005
+      - VT-030-005
     coverage_entries:
-    - artefact: VT-030-005
-      status: verified
-      kind: VT
+      - artefact: VT-030-005
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
   PROD-015.NF-001:
     label: NF-001
-    title: 'Taxonomy views and CLI filtering MUST remain fast enough for interactive
-      use (target: <2s on typical repos).'
+    title:
+      "Taxonomy views and CLI filtering MUST remain fast enough for interactive
+      use (target: <2s on typical repos)."
     specs:
-    - PROD-015
+      - PROD-015
     primary_spec: PROD-015
     kind: non-functional
     category: null
@@ -3223,21 +3292,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-030
+      - DE-030
     verified_by: []
     coverage_evidence:
-    - VA-001
+      - VA-001
     coverage_entries:
-    - artefact: VA-001
-      status: verified
-      kind: VA
+      - artefact: VA-001
+        status: verified
+        kind: VA
     path: .spec-driver/product/PROD-015/PROD-015.md
   PROD-015.NF-002:
     label: NF-002
-    title: 'Taxonomy adoption MUST be non-breaking: existing spec IDs, paths, and
-      registries remain valid.'
+    title:
+      "Taxonomy adoption MUST be non-breaking: existing spec IDs, paths, and
+      registries remain valid."
     specs:
-    - PROD-015
+      - PROD-015
     primary_spec: PROD-015
     kind: non-functional
     category: null
@@ -3245,21 +3315,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-030
+      - DE-030
     verified_by: []
     coverage_evidence:
-    - VT-030-006
+      - VT-030-006
     coverage_entries:
-    - artefact: VT-030-006
-      status: verified
-      kind: VT
+      - artefact: VT-030-006
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-015/PROD-015.md
   PROD-016.FR-001:
     label: FR-001
-    title: The repository MUST have a single workflow configuration file (TOML) readable
+    title:
+      The repository MUST have a single workflow configuration file (TOML) readable
       by both spec-driver and agents (e.g. `.spec-driver/workflow.toml`).
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: functional
     category: null
@@ -3267,22 +3338,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-031
-    - DE-051
+      - DE-031
+      - DE-051
     verified_by: []
     coverage_evidence:
-    - VT-016-001
+      - VT-016-001
     coverage_entries:
-    - artefact: VT-016-001
-      status: verified
-      kind: VT
+      - artefact: VT-016-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.FR-002:
     label: FR-002
-    title: 'The configuration MUST cover the majority of workflow shaping needs with
-      a minimal set of knobs (80/20), including:'
+    title:
+      "The configuration MUST cover the majority of workflow shaping needs with
+      a minimal set of knobs (80/20), including:"
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: functional
     category: null
@@ -3290,23 +3362,24 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-039
-    - DE-051
+      - DE-039
+      - DE-051
     verified_by: []
     coverage_evidence:
-    - VT-039-001
+      - VT-039-001
     coverage_entries:
-    - artefact: VT-039-001
-      status: verified
-      kind: VT
+      - artefact: VT-039-001
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.FR-003:
     label: FR-003
-    title: The system MUST provide an escape hatch for bespoke project instructions
+    title:
+      The system MUST provide an escape hatch for bespoke project instructions
       as a small plain-text doctrine note that is loaded at the right time (instead
       of exploding the config keyspace).
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: functional
     category: null
@@ -3320,11 +3393,12 @@ requirements:
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.FR-004:
     label: FR-004
-    title: The system MUST provide a configurator command/skill that interviews the
+    title:
+      The system MUST provide a configurator command/skill that interviews the
       user and recommends a configuration appropriate for their repo (legacy-biased
       defaults).
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: functional
     category: null
@@ -3334,18 +3408,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-016-002
+      - VT-016-002
     coverage_entries:
-    - artefact: VT-016-002
-      status: planned
-      kind: VT
+      - artefact: VT-016-002
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.FR-005:
     label: FR-005
-    title: 'The configurator MUST write/update config and install skills/guidance
-      deterministically and idempotently:'
+    title:
+      "The configurator MUST write/update config and install skills/guidance
+      deterministically and idempotently:"
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: functional
     category: null
@@ -3353,22 +3428,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-032
+      - DE-032
     verified_by: []
     coverage_evidence:
-    - VT-016-003
+      - VT-016-003
     coverage_entries:
-    - artefact: VT-016-003
-      status: planned
-      kind: VT
+      - artefact: VT-016-003
+        status: planned
+        kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.FR-006:
     label: FR-006
-    title: The system MUST generate a short prescriptive project agent bootstrap (~30
+    title:
+      The system MUST generate a short prescriptive project agent bootstrap (~30
       lines) that `@references` modular runsheets and is appropriate to the selected
       configuration.
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: functional
     category: null
@@ -3376,21 +3452,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-031
+      - DE-031
     verified_by: []
     coverage_evidence:
-    - VT-016-004
+      - VT-016-004
     coverage_entries:
-    - artefact: VT-016-004
-      status: verified
-      kind: VT
+      - artefact: VT-016-004
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.FR-007:
     label: FR-007
-    title: The system MUST provide customization hooks for projects to add local skills/guidance
+    title:
+      The system MUST provide customization hooks for projects to add local skills/guidance
       and policy without forking canonical content.
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: functional
     category: null
@@ -3404,10 +3481,11 @@ requirements:
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.FR-008:
     label: FR-008
-    title: 'The system MUST generate project-local, config-tailored guidance markdown
-      (installed/overwritten by the installer) for skills to reference, to:'
+    title:
+      "The system MUST generate project-local, config-tailored guidance markdown
+      (installed/overwritten by the installer) for skills to reference, to:"
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: functional
     category: null
@@ -3415,22 +3493,23 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-031
-    - DE-051
+      - DE-031
+      - DE-051
     verified_by: []
     coverage_evidence:
-    - VT-016-005
+      - VT-016-005
     coverage_entries:
-    - artefact: VT-016-005
-      status: verified
-      kind: VT
+      - artefact: VT-016-005
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.FR-009:
     label: FR-009
-    title: 'Workflow completion commands MUST be automation-safe in non-interactive
-      contexts:'
+    title:
+      "Workflow completion commands MUST be automation-safe in non-interactive
+      contexts:"
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: functional
     category: null
@@ -3438,21 +3517,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-039
+      - DE-039
     verified_by: []
     coverage_evidence:
-    - VT-016-006
+      - VT-016-006
     coverage_entries:
-    - artefact: VT-016-006
-      status: verified
-      kind: VT
+      - artefact: VT-016-006
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.FR-010:
     label: FR-010
-    title: The CLI MUST provide first-class create/complete command coverage for active
+    title:
+      The CLI MUST provide first-class create/complete command coverage for active
       change primitives (`delta`, `revision`, `audit`) with lifecycle-consistent semantics.
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: functional
     category: null
@@ -3460,21 +3540,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-039
+      - DE-039
     verified_by: []
     coverage_evidence:
-    - VT-016-007
+      - VT-016-007
     coverage_entries:
-    - artefact: VT-016-007
-      status: verified
-      kind: VT
+      - artefact: VT-016-007
+        status: verified
+        kind: VT
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.NF-001:
     label: NF-001
-    title: The configurator and installer MUST be safe to re-run and produce minimal
+    title:
+      The configurator and installer MUST be safe to re-run and produce minimal
       diffs (idempotent, deterministic).
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: non-functional
     category: null
@@ -3482,17 +3563,18 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-032
+      - DE-032
     verified_by: []
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.NF-002:
     label: NF-002
-    title: Skills/guidance MUST be provider-neutral at the core, with provider-specific
+    title:
+      Skills/guidance MUST be provider-neutral at the core, with provider-specific
       wrappers as thin adapters.
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: non-functional
     category: null
@@ -3500,17 +3582,18 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-032
+      - DE-032
     verified_by: []
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/product/PROD-016/PROD-016.md
   PROD-016.NF-003:
     label: NF-003
-    title: The default bootstrap MUST be token-cheap and route an agent to the right
+    title:
+      The default bootstrap MUST be token-cheap and route an agent to the right
       runsheet/skill without loading long overview docs.
     specs:
-    - PROD-016
+      - PROD-016
     primary_spec: PROD-016
     kind: non-functional
     category: null
@@ -3520,19 +3603,20 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VA-016-001
+      - VA-016-001
     coverage_entries:
-    - artefact: VA-016-001
-      status: planned
-      kind: VA
+      - artefact: VA-016-001
+        status: planned
+        kind: VA
     path: .spec-driver/product/PROD-016/PROD-016.md
   SPEC-110.FR-001:
     label: FR-001
-    title: CLI MUST provide single unified entry point (`spec-driver`) routing to
+    title:
+      CLI MUST provide single unified entry point (`spec-driver`) routing to
       all subcommand groups (list, show, create, sync, schema, backfill, complete,
       workspace)
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: functional
     category: cli
@@ -3542,22 +3626,23 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CLI-STRUCTURE-001
-    - VT-CLI-WORKSPACE-001
+      - VT-CLI-STRUCTURE-001
+      - VT-CLI-WORKSPACE-001
     coverage_entries:
-    - artefact: VT-CLI-STRUCTURE-001
-      status: verified
-      kind: VT
-    - artefact: VT-CLI-WORKSPACE-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-STRUCTURE-001
+        status: verified
+        kind: VT
+      - artefact: VT-CLI-WORKSPACE-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.FR-002:
     label: FR-002
-    title: List commands MUST delegate all data access to registries and all formatting
+    title:
+      List commands MUST delegate all data access to registries and all formatting
       to formatters (zero business logic in CLI)
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: functional
     category: architecture
@@ -3565,21 +3650,22 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-078
+      - DE-078
     verified_by: []
     coverage_evidence:
-    - VT-CLI-LIST-001
+      - VT-CLI-LIST-001
     coverage_entries:
-    - artefact: VT-CLI-LIST-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-LIST-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.FR-003:
     label: FR-003
-    title: "Backfill command MUST detect stub specs (status='stub' or \u226430 lines)\
+    title:
+      "Backfill command MUST detect stub specs (status='stub' or \u226430 lines)\
       \ and replace body with template while preserving frontmatter"
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: functional
     category: automation
@@ -3589,19 +3675,20 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CLI-BACKFILL-001
+      - VT-CLI-BACKFILL-001
     coverage_entries:
-    - artefact: VT-CLI-BACKFILL-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-BACKFILL-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.FR-004:
     label: FR-004
-    title: Sync command MUST delegate to sync adapters for multi-language code-to-spec
+    title:
+      Sync command MUST delegate to sync adapters for multi-language code-to-spec
       synchronization (Python, Go, TypeScript) and MUST support separate ADR registry
       synchronization via `--adr` flag
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: functional
     category: integration
@@ -3611,19 +3698,20 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CLI-SYNC-001
+      - VT-CLI-SYNC-001
     coverage_entries:
-    - artefact: VT-CLI-SYNC-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-SYNC-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.FR-005:
     label: FR-005
-    title: 'All list commands MUST support consistent flag patterns (--format, --json,
+    title:
+      "All list commands MUST support consistent flag patterns (--format, --json,
       --filter, --regexp, --case-insensitive, --root) and MUST apply regexp filtering
-      to artifact-specific fields:'
+      to artifact-specific fields:"
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: functional
     category: cli
@@ -3631,34 +3719,35 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-078
+      - DE-078
     verified_by: []
     coverage_evidence:
-    - VT-CLI-COMMON-001
-    - VT-CLI-FILTER-001
-    - VT-CLI-JSON-001
-    - VT-CLI-REGEXP-001
+      - VT-CLI-COMMON-001
+      - VT-CLI-FILTER-001
+      - VT-CLI-JSON-001
+      - VT-CLI-REGEXP-001
     coverage_entries:
-    - artefact: VT-CLI-FILTER-001
-      status: verified
-      kind: VT
-    - artefact: VT-CLI-COMMON-001
-      status: verified
-      kind: VT
-    - artefact: VT-CLI-REGEXP-001
-      status: verified
-      kind: VT
-    - artefact: VT-CLI-JSON-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-FILTER-001
+        status: verified
+        kind: VT
+      - artefact: VT-CLI-COMMON-001
+        status: verified
+        kind: VT
+      - artefact: VT-CLI-REGEXP-001
+        status: verified
+        kind: VT
+      - artefact: VT-CLI-JSON-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.FR-006:
     label: FR-006
-    title: 'All list commands MUST support output formats: table (default), json,
+    title:
+      "All list commands MUST support output formats: table (default), json,
       tsv; list specs command MUST additionally support --status/-s filter for filtering
-      by spec status (draft, active, deprecated, superseded)'
+      by spec status (draft, active, deprecated, superseded)"
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: functional
     category: cli
@@ -3666,30 +3755,31 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-078
+      - DE-078
     verified_by: []
     coverage_evidence:
-    - VT-CLI-FORMAT-001
-    - VT-CLI-JSON-SCHEMA-001
-    - VT-CLI-STATUS-FILTER-001
+      - VT-CLI-FORMAT-001
+      - VT-CLI-JSON-SCHEMA-001
+      - VT-CLI-STATUS-FILTER-001
     coverage_entries:
-    - artefact: VT-CLI-FORMAT-001
-      status: verified
-      kind: VT
-    - artefact: VT-CLI-STATUS-FILTER-001
-      status: verified
-      kind: VT
-    - artefact: VT-CLI-JSON-SCHEMA-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-FORMAT-001
+        status: verified
+        kind: VT
+      - artefact: VT-CLI-STATUS-FILTER-001
+        status: verified
+        kind: VT
+      - artefact: VT-CLI-JSON-SCHEMA-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.FR-007:
     label: FR-007
-    title: Schema commands MUST list block schemas and frontmatter schemas separately
+    title:
+      Schema commands MUST list block schemas and frontmatter schemas separately
       (via `schema list blocks|frontmatter|all`) and MUST display schema details in
       json-schema or yaml-example formats
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: functional
     category: documentation
@@ -3699,17 +3789,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CLI-SCHEMA-001
+      - VT-CLI-SCHEMA-001
     coverage_entries:
-    - artefact: VT-CLI-SCHEMA-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-SCHEMA-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.FR-008:
     label: FR-008
-    title: 'Create commands MUST support all artifact types using templates:'
+    title: "Create commands MUST support all artifact types using templates:"
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: functional
     category: cli
@@ -3719,19 +3809,20 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CLI-CREATE-001
+      - VT-CLI-CREATE-001
     coverage_entries:
-    - artefact: VT-CLI-CREATE-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-CREATE-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.FR-009:
     label: FR-009
-    title: Show commands MUST display detailed artifact information for all major
+    title:
+      Show commands MUST display detailed artifact information for all major
       types (specs, deltas, revisions, ADRs, requirements) and MUST include `show
       template` for displaying spec templates
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: functional
     category: cli
@@ -3741,22 +3832,23 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CLI-SHOW-001
-    - VT-CLI-SHOW-JSON-001
+      - VT-CLI-SHOW-001
+      - VT-CLI-SHOW-JSON-001
     coverage_entries:
-    - artefact: VT-CLI-SHOW-001
-      status: verified
-      kind: VT
-    - artefact: VT-CLI-SHOW-JSON-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-SHOW-001
+        status: verified
+        kind: VT
+      - artefact: VT-CLI-SHOW-JSON-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.FR-010:
     label: FR-010
-    title: Complete delta command MUST mark delta as completed AND update associated
+    title:
+      Complete delta command MUST mark delta as completed AND update associated
       requirement statuses to 'live' in revision source files
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: functional
     category: automation
@@ -3766,18 +3858,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CLI-COMPLETE-001
+      - VT-CLI-COMPLETE-001
     coverage_entries:
-    - artefact: VT-CLI-COMPLETE-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-COMPLETE-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.NF-001:
     label: NF-001
-    title: CLI commands MUST complete typical operations (list, show, create) in <2
+    title:
+      CLI commands MUST complete typical operations (list, show, create) in <2
       seconds on standard hardware
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: non-functional
     category: performance
@@ -3787,18 +3880,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CLI-INTEGRATION-001
+      - VT-CLI-INTEGRATION-001
     coverage_entries:
-    - artefact: VT-CLI-INTEGRATION-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-INTEGRATION-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-110.NF-002:
     label: NF-002
-    title: CLI modules MUST average <200 lines per file to maintain thin orchestration
+    title:
+      CLI modules MUST average <200 lines per file to maintain thin orchestration
       pattern
     specs:
-    - SPEC-110
+      - SPEC-110
     primary_spec: SPEC-110
     kind: non-functional
     category: architecture
@@ -3808,18 +3902,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-CLI-ERROR-001
+      - VT-CLI-ERROR-001
     coverage_entries:
-    - artefact: VT-CLI-ERROR-001
-      status: verified
-      kind: VT
+      - artefact: VT-CLI-ERROR-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-110/SPEC-110.md
   SPEC-112.FR-001:
     label: FR-001
-    title: CLI MUST accept a path argument (file or directory) and validate it exists
+    title:
+      CLI MUST accept a path argument (file or directory) and validate it exists
       before processing
     specs:
-    - SPEC-112
+      - SPEC-112
     primary_spec: SPEC-112
     kind: functional
     category: unit
@@ -3829,18 +3924,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-001
+      - VT-001
     coverage_entries:
-    - artefact: VT-001
-      status: planned
-      kind: VT
+      - artefact: VT-001
+        status: planned
+        kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
   SPEC-112.FR-002:
     label: FR-002
-    title: 'CLI MUST support `--type` argument with choices: `public` (default), `all`,
-      `tests` to control documentation variants'
+    title:
+      "CLI MUST support `--type` argument with choices: `public` (default), `all`,
+      `tests` to control documentation variants"
     specs:
-    - SPEC-112
+      - SPEC-112
     primary_spec: SPEC-112
     kind: functional
     category: unit
@@ -3850,18 +3946,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-002
+      - VT-002
     coverage_entries:
-    - artefact: VT-002
-      status: planned
-      kind: VT
+      - artefact: VT-002
+        status: planned
+        kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
   SPEC-112.FR-003:
     label: FR-003
-    title: CLI MUST exit with code 1 for invalid inputs (missing path, permission
+    title:
+      CLI MUST exit with code 1 for invalid inputs (missing path, permission
       errors, invalid arguments) and print clear error messages
     specs:
-    - SPEC-112
+      - SPEC-112
     primary_spec: SPEC-112
     kind: functional
     category: unit
@@ -3871,18 +3968,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-003
+      - VT-003
     coverage_entries:
-    - artefact: VT-003
-      status: planned
-      kind: VT
+      - artefact: VT-003
+        status: planned
+        kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
   SPEC-112.FR-004:
     label: FR-004
-    title: CLI MUST support `--check` mode that verifies documentation matches code
+    title:
+      CLI MUST support `--check` mode that verifies documentation matches code
       without writing files, exiting 0 if unchanged or 1 if changes detected
     specs:
-    - SPEC-112
+      - SPEC-112
     primary_spec: SPEC-112
     kind: functional
     category: unit
@@ -3892,18 +3990,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-004
+      - VT-004
     coverage_entries:
-    - artefact: VT-004
-      status: planned
-      kind: VT
+      - artefact: VT-004
+        status: planned
+        kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
   SPEC-112.FR-005:
     label: FR-005
-    title: "CLI MUST format results with status symbols: `+` (created), `~` (changed),\
+    title:
+      "CLI MUST format results with status symbols: `+` (created), `~` (changed),\
       \ `=` (unchanged), `\u2717` (error), with `\u2713`/`\u2717` in check mode"
     specs:
-    - SPEC-112
+      - SPEC-112
     primary_spec: SPEC-112
     kind: functional
     category: unit
@@ -3913,18 +4012,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-005
+      - VT-005
     coverage_entries:
-    - artefact: VT-005
-      status: planned
-      kind: VT
+      - artefact: VT-005
+        status: planned
+        kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
   SPEC-112.FR-006:
     label: FR-006
-    title: CLI MUST print summary statistics showing counts by status (created, changed,
+    title:
+      CLI MUST print summary statistics showing counts by status (created, changed,
       unchanged, errors) after processing multiple files
     specs:
-    - SPEC-112
+      - SPEC-112
     primary_spec: SPEC-112
     kind: functional
     category: unit
@@ -3934,18 +4034,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-006
+      - VT-006
     coverage_entries:
-    - artefact: VT-006
-      status: planned
-      kind: VT
+      - artefact: VT-006
+        status: planned
+        kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
   SPEC-112.FR-007:
     label: FR-007
-    title: CLI MUST maintain backward compatibility with original interface including
+    title:
+      CLI MUST maintain backward compatibility with original interface including
       all argument names, default values, and exit codes
     specs:
-    - SPEC-112
+      - SPEC-112
     primary_spec: SPEC-112
     kind: functional
     category: unit
@@ -3955,18 +4056,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-007
+      - VT-007
     coverage_entries:
-    - artefact: VT-007
-      status: planned
-      kind: VT
+      - artefact: VT-007
+        status: planned
+        kind: VT
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
   SPEC-112.NF-001:
     label: NF-001
-    title: "CLI MUST complete documentation generation for typical package (\u2264\
+    title:
+      "CLI MUST complete documentation generation for typical package (\u2264\
       100 files) in \u22645 seconds (wall time) on modern hardware"
     specs:
-    - SPEC-112
+      - SPEC-112
     primary_spec: SPEC-112
     kind: non-functional
     category: unit
@@ -3976,18 +4078,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VA-001
+      - VA-001
     coverage_entries:
-    - artefact: VA-001
-      status: planned
-      kind: VA
+      - artefact: VA-001
+        status: planned
+        kind: VA
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
   SPEC-112.NF-002:
     label: NF-002
-    title: CLI MUST preserve all original argument names, defaults, and behaviors
+    title:
+      CLI MUST preserve all original argument names, defaults, and behaviors
       to ensure zero-modification migration for existing scripts
     specs:
-    - SPEC-112
+      - SPEC-112
     primary_spec: SPEC-112
     kind: non-functional
     category: unit
@@ -3997,17 +4100,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VH-001
+      - VH-001
     coverage_entries:
-    - artefact: VH-001
-      status: planned
-      kind: VH
+      - artefact: VH-001
+        status: planned
+        kind: VH
     path: .spec-driver/tech/SPEC-112/SPEC-112.md
   SPEC-114.FR-001:
     label: FR-001
     title: Schema Definition API
     specs:
-    - SPEC-114
+      - SPEC-114
     primary_spec: SPEC-114
     kind: functional
     category: unit
@@ -4023,7 +4126,7 @@ requirements:
     label: FR-002
     title: Field Constraints
     specs:
-    - SPEC-114
+      - SPEC-114
     primary_spec: SPEC-114
     kind: functional
     category: unit
@@ -4039,7 +4142,7 @@ requirements:
     label: FR-003
     title: Runtime Validation
     specs:
-    - SPEC-114
+      - SPEC-114
     primary_spec: SPEC-114
     kind: functional
     category: unit
@@ -4055,7 +4158,7 @@ requirements:
     label: FR-004
     title: Validation Errors
     specs:
-    - SPEC-114
+      - SPEC-114
     primary_spec: SPEC-114
     kind: functional
     category: unit
@@ -4071,7 +4174,7 @@ requirements:
     label: FR-005
     title: JSON Schema Generation
     specs:
-    - SPEC-114
+      - SPEC-114
     primary_spec: SPEC-114
     kind: functional
     category: unit
@@ -4087,7 +4190,7 @@ requirements:
     label: FR-006
     title: Conditional Rules in JSON Schema
     specs:
-    - SPEC-114
+      - SPEC-114
     primary_spec: SPEC-114
     kind: functional
     category: unit
@@ -4103,7 +4206,7 @@ requirements:
     label: NF-001
     title: Immutability
     specs:
-    - SPEC-114
+      - SPEC-114
     primary_spec: SPEC-114
     kind: non-functional
     category: unit
@@ -4119,7 +4222,7 @@ requirements:
     label: NF-002
     title: Error Quality
     specs:
-    - SPEC-114
+      - SPEC-114
     primary_spec: SPEC-114
     kind: non-functional
     category: unit
@@ -4135,7 +4238,7 @@ requirements:
     label: NF-003
     title: Standards Compliance
     specs:
-    - SPEC-114
+      - SPEC-114
     primary_spec: SPEC-114
     kind: non-functional
     category: unit
@@ -4151,7 +4254,7 @@ requirements:
     label: NF-001
     title: Fast Metadata Lookup**
     specs:
-    - SPEC-116
+      - SPEC-116
     primary_spec: SPEC-116
     kind: non-functional
     category: unit
@@ -4167,7 +4270,7 @@ requirements:
     label: NF-002
     title: Clear Schema Definitions**
     specs:
-    - SPEC-116
+      - SPEC-116
     primary_spec: SPEC-116
     kind: non-functional
     category: unit
@@ -4183,7 +4286,7 @@ requirements:
     label: NF-003
     title: Validation Correctness**
     specs:
-    - SPEC-116
+      - SPEC-116
     primary_spec: SPEC-116
     kind: non-functional
     category: unit
@@ -4197,10 +4300,11 @@ requirements:
     path: .spec-driver/tech/SPEC-116/SPEC-116.md
   SPEC-122.FR-001:
     label: FR-001
-    title: Define RequirementRecord dataclass with uid, label, title, specs, primary_spec,
+    title:
+      Define RequirementRecord dataclass with uid, label, title, specs, primary_spec,
       kind, status, introduced, implemented_by, verified_by, path fields
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: functional
     category: unit
@@ -4210,18 +4314,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-REQ-RECORD-001
+      - VT-REQ-RECORD-001
     coverage_entries:
-    - artefact: VT-REQ-RECORD-001
-      status: verified
-      kind: VT
+      - artefact: VT-REQ-RECORD-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-002:
     label: FR-002
-    title: 'Support requirement status values: pending, in-progress, active, retired,
-      deprecated, superseded, deprecated, superseded'
+    title:
+      "Support requirement status values: pending, in-progress, active, retired,
+      deprecated, superseded, deprecated, superseded"
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: functional
     category: unit
@@ -4229,25 +4334,25 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-081
+      - DE-081
     verified_by: []
     coverage_evidence:
-    - VT-081-002
-    - VT-REQ-LIFECYCLE-001
+      - VT-081-002
+      - VT-REQ-LIFECYCLE-001
     coverage_entries:
-    - artefact: VT-REQ-LIFECYCLE-001
-      status: verified
-      kind: VT
-    - artefact: VT-081-002
-      status: verified
-      kind: VT
+      - artefact: VT-REQ-LIFECYCLE-001
+        status: verified
+        kind: VT
+      - artefact: VT-081-002
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-003:
     label: FR-003
     title: Load and save requirements registry at `.spec-driver/registry/requirements.yaml`
     specs:
-    - PROD-009
-    - SPEC-122
+      - PROD-009
+      - SPEC-122
     primary_spec: SPEC-122
     kind: functional
     category: unit
@@ -4261,10 +4366,11 @@ requirements:
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-004:
     label: FR-004
-    title: 'Extract requirements from spec markdown using pattern `- FR-NNN: Title`
-      (case-insensitive, bold/italic tolerant)'
+    title:
+      "Extract requirements from spec markdown using pattern `- FR-NNN: Title`
+      (case-insensitive, bold/italic tolerant)"
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: functional
     category: unit
@@ -4274,22 +4380,23 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-081-003
-    - VT-REQ-SYNC-001
+      - VT-081-003
+      - VT-REQ-SYNC-001
     coverage_entries:
-    - artefact: VT-REQ-SYNC-001
-      status: verified
-      kind: VT
-    - artefact: VT-081-003
-      status: verified
-      kind: VT
+      - artefact: VT-REQ-SYNC-001
+        status: verified
+        kind: VT
+      - artefact: VT-081-003
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-005:
     label: FR-005
-    title: Parse structured spec.relationships blocks for explicit requirement lists
+    title:
+      Parse structured spec.relationships blocks for explicit requirement lists
       (primary, collaborators)
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: functional
     category: unit
@@ -4303,10 +4410,11 @@ requirements:
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-006:
     label: FR-006
-    title: Process delta frontmatter applies_to.requirements and relationship blocks
+    title:
+      Process delta frontmatter applies_to.requirements and relationship blocks
       to link deltas to requirements
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: functional
     category: unit
@@ -4316,18 +4424,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-REQ-CHANGE-001
+      - VT-REQ-CHANGE-001
     coverage_entries:
-    - artefact: VT-REQ-CHANGE-001
-      status: verified
-      kind: VT
+      - artefact: VT-REQ-CHANGE-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-007:
     label: FR-007
-    title: Process revision blocks for requirement moves, introductions, and lifecycle
+    title:
+      Process revision blocks for requirement moves, introductions, and lifecycle
       updates
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: functional
     category: unit
@@ -4341,10 +4450,11 @@ requirements:
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-008:
     label: FR-008
-    title: Support move_requirement operation updating uid, specs, primary_spec, path,
+    title:
+      Support move_requirement operation updating uid, specs, primary_spec, path,
       and introduced fields
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: functional
     category: unit
@@ -4358,10 +4468,11 @@ requirements:
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-009:
     label: FR-009
-    title: 'Provide search API with filters: query, status, spec, implemented_by,
-      introduced_by, verified_by'
+    title:
+      "Provide search API with filters: query, status, spec, implemented_by,
+      introduced_by, verified_by"
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: functional
     category: unit
@@ -4371,17 +4482,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-REQ-SEARCH-001
+      - VT-REQ-SEARCH-001
     coverage_entries:
-    - artefact: VT-REQ-SEARCH-001
-      status: verified
-      kind: VT
+      - artefact: VT-REQ-SEARCH-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.NF-001:
     label: NF-001
     title: Registry file uses UTF-8 encoding and sorted YAML keys for diff stability
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: non-functional
     category: unit
@@ -4397,7 +4508,7 @@ requirements:
     label: NF-002
     title: Sync operations idempotent (re-running produces identical registry)
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: non-functional
     category: unit
@@ -4405,20 +4516,20 @@ requirements:
     tags: []
     introduced: null
     implemented_by:
-    - DE-081
+      - DE-081
     verified_by: []
     coverage_evidence:
-    - VT-081-001
+      - VT-081-001
     coverage_entries:
-    - artefact: VT-081-001
-      status: verified
-      kind: VT
+      - artefact: VT-081-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.NF-003:
     label: NF-003
     title: Search results sorted by UID for stable output
     specs:
-    - SPEC-122
+      - SPEC-122
     primary_spec: SPEC-122
     kind: non-functional
     category: unit
@@ -4432,10 +4543,11 @@ requirements:
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-124.FR-001:
     label: FR-001
-    title: LanguageAdapter base class MUST define abstract methods for `discover_targets()`,
+    title:
+      LanguageAdapter base class MUST define abstract methods for `discover_targets()`,
       `describe()`, `generate()`, and `supports_identifier()`
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: functional
     category: unit
@@ -4445,18 +4557,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-001
+      - VT-001
     coverage_entries:
-    - artefact: VT-001
-      status: verified
-      kind: VT
+      - artefact: VT-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-002:
     label: FR-002
-    title: LanguageAdapter MUST provide `validate_source_exists()` to check file/directory
+    title:
+      LanguageAdapter MUST provide `validate_source_exists()` to check file/directory
       existence and git tracking status
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: functional
     category: unit
@@ -4466,18 +4579,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-002
+      - VT-002
     coverage_entries:
-    - artefact: VT-002
-      status: verified
-      kind: VT
+      - artefact: VT-002
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-003:
     label: FR-003
-    title: PythonAdapter MUST discover Python modules using package structure and
+    title:
+      PythonAdapter MUST discover Python modules using package structure and
       `__init__.py` detection
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: functional
     category: unit
@@ -4487,18 +4601,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-003
+      - VT-003
     coverage_entries:
-    - artefact: VT-003
-      status: verified
-      kind: VT
+      - artefact: VT-003
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-004:
     label: FR-004
-    title: PythonAdapter MUST generate AST-based documentation preserving docstring
+    title:
+      PythonAdapter MUST generate AST-based documentation preserving docstring
       formatting (including indentation)
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: functional
     category: unit
@@ -4508,17 +4623,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-004
+      - VT-004
     coverage_entries:
-    - artefact: VT-004
-      status: verified
-      kind: VT
+      - artefact: VT-004
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-005:
     label: FR-005
     title: GoAdapter MUST discover Go packages using `go list` command
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: functional
     category: unit
@@ -4528,18 +4643,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-005
+      - VT-005
     coverage_entries:
-    - artefact: VT-005
-      status: verified
-      kind: VT
+      - artefact: VT-005
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-006:
     label: FR-006
-    title: GoAdapter MUST validate Go toolchain and gomarkdoc availability before
+    title:
+      GoAdapter MUST validate Go toolchain and gomarkdoc availability before
       generation
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: functional
     category: unit
@@ -4549,18 +4665,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-006
+      - VT-006
     coverage_entries:
-    - artefact: VT-006
-      status: verified
-      kind: VT
+      - artefact: VT-006
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-007:
     label: FR-007
-    title: TypeScriptAdapter MUST discover logical modules (directories with index.ts/js,
+    title:
+      TypeScriptAdapter MUST discover logical modules (directories with index.ts/js,
       standalone files, src/ subdirectories)
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: functional
     category: unit
@@ -4570,17 +4687,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-007
+      - VT-007
     coverage_entries:
-    - artefact: VT-007
-      status: verified
-      kind: VT
+      - artefact: VT-007
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-008:
     label: FR-008
     title: TypeScriptAdapter MUST extract AST using ts-morph via ts-doc-extract subprocess
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: functional
     category: unit
@@ -4590,17 +4707,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-008
+      - VT-008
     coverage_entries:
-    - artefact: VT-008
-      status: verified
-      kind: VT
+      - artefact: VT-008
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.FR-009:
     label: FR-009
     title: TypeScriptAdapter MUST detect and support npm, pnpm, and bun package managers
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: functional
     category: unit
@@ -4610,18 +4727,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-009
+      - VT-009
     coverage_entries:
-    - artefact: VT-009
-      status: verified
-      kind: VT
+      - artefact: VT-009
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.NF-001:
     label: NF-001
-    title: "All adapters MUST generate deterministic output (same input \u2192 same\
+    title:
+      "All adapters MUST generate deterministic output (same input \u2192 same\
       \ output)"
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: non-functional
     category: unit
@@ -4631,18 +4749,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-010
+      - VT-010
     coverage_entries:
-    - artefact: VT-010
-      status: verified
-      kind: VT
+      - artefact: VT-010
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.NF-002:
     label: NF-002
-    title: Adapters MUST fail gracefully with descriptive errors when required toolchains
+    title:
+      Adapters MUST fail gracefully with descriptive errors when required toolchains
       are unavailable
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: non-functional
     category: unit
@@ -4652,18 +4771,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-011
+      - VT-011
     coverage_entries:
-    - artefact: VT-011
-      status: verified
-      kind: VT
+      - artefact: VT-011
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-124.NF-003:
     label: NF-003
-    title: TypeScriptAdapter MUST support multiple package managers without requiring
+    title:
+      TypeScriptAdapter MUST support multiple package managers without requiring
       explicit configuration
     specs:
-    - SPEC-124
+      - SPEC-124
     primary_spec: SPEC-124
     kind: non-functional
     category: unit
@@ -4673,18 +4793,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-012
+      - VT-012
     coverage_entries:
-    - artefact: VT-012
-      status: verified
-      kind: VT
+      - artefact: VT-012
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-124/SPEC-124.md
   SPEC-125.FR-001:
     label: FR-001
-    title: Validator MUST validate all requirement lifecycle links (implemented*by,
+    title:
+      Validator MUST validate all requirement lifecycle links (implemented*by,
       introduced_by, verified_by) point to existing artifacts
     specs:
-    - SPEC-125
+      - SPEC-125
     primary_spec: SPEC-125
     kind: functional
     category: unit
@@ -4694,18 +4815,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-VALIDATOR-001
+      - VT-VALIDATOR-001
     coverage_entries:
-    - artefact: VT-VALIDATOR-001
-      status: verified
-      kind: VT
+      - artefact: VT-VALIDATOR-001
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
   SPEC-125.FR-002:
     label: FR-002
-    title: Validator MUST detect when change artifact relations reference non-existent
+    title:
+      Validator MUST detect when change artifact relations reference non-existent
       requirements
     specs:
-    - SPEC-125
+      - SPEC-125
     primary_spec: SPEC-125
     kind: functional
     category: unit
@@ -4715,18 +4837,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-VALIDATOR-002
+      - VT-VALIDATOR-002
     coverage_entries:
-    - artefact: VT-VALIDATOR-002
-      status: verified
-      kind: VT
+      - artefact: VT-VALIDATOR-002
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
   SPEC-125.FR-003:
     label: FR-003
-    title: Validator MUST validate change artifact `applies_to.requirements` fields
+    title:
+      Validator MUST validate change artifact `applies_to.requirements` fields
       reference existing requirements
     specs:
-    - SPEC-125
+      - SPEC-125
     primary_spec: SPEC-125
     kind: functional
     category: unit
@@ -4736,18 +4859,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-VALIDATOR-003
+      - VT-VALIDATOR-003
     coverage_entries:
-    - artefact: VT-VALIDATOR-003
-      status: verified
-      kind: VT
+      - artefact: VT-VALIDATOR-003
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
   SPEC-125.FR-004:
     label: FR-004
-    title: Validator MUST validate all ADR `related_decisions` references point to
+    title:
+      Validator MUST validate all ADR `related_decisions` references point to
       existing decision IDs
     specs:
-    - SPEC-125
+      - SPEC-125
     primary_spec: SPEC-125
     kind: functional
     category: unit
@@ -4757,18 +4881,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-VALIDATOR-004
+      - VT-VALIDATOR-004
     coverage_entries:
-    - artefact: VT-VALIDATOR-004
-      status: verified
-      kind: VT
+      - artefact: VT-VALIDATOR-004
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
   SPEC-125.FR-005:
     label: FR-005
-    title: Validator MUST warn (in strict mode) when active ADRs reference deprecated
+    title:
+      Validator MUST warn (in strict mode) when active ADRs reference deprecated
       or superseded ADRs
     specs:
-    - SPEC-125
+      - SPEC-125
     primary_spec: SPEC-125
     kind: functional
     category: unit
@@ -4778,18 +4903,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-VALIDATOR-005
+      - VT-VALIDATOR-005
     coverage_entries:
-    - artefact: VT-VALIDATOR-005
-      status: verified
-      kind: VT
+      - artefact: VT-VALIDATOR-005
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
   SPEC-125.FR-006:
     label: FR-006
-    title: Validator MUST return structured ValidationIssue objects with level, artifact,
+    title:
+      Validator MUST return structured ValidationIssue objects with level, artifact,
       and message
     specs:
-    - SPEC-125
+      - SPEC-125
     primary_spec: SPEC-125
     kind: functional
     category: unit
@@ -4799,18 +4925,19 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-VALIDATOR-006
+      - VT-VALIDATOR-006
     coverage_entries:
-    - artefact: VT-VALIDATOR-006
-      status: verified
-      kind: VT
+      - artefact: VT-VALIDATOR-006
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
   SPEC-125.NF-001:
     label: NF-001
-    title: Validator MUST complete full workspace validation in <5 seconds for typical
+    title:
+      Validator MUST complete full workspace validation in <5 seconds for typical
       workspace size (100 specs, 500 requirements, 50 changes, 30 ADRs)
     specs:
-    - SPEC-125
+      - SPEC-125
     primary_spec: SPEC-125
     kind: non-functional
     category: unit
@@ -4820,17 +4947,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-VALIDATOR-007
+      - VT-VALIDATOR-007
     coverage_entries:
-    - artefact: VT-VALIDATOR-007
-      status: verified
-      kind: VT
+      - artefact: VT-VALIDATOR-007
+        status: verified
+        kind: VT
     path: .spec-driver/tech/SPEC-125/SPEC-125.md
   SPEC-128.FR-001:
     label: FR-001
     title: Component MUST [specific technical capability]
     specs:
-    - SPEC-128
+      - SPEC-128
     primary_spec: SPEC-128
     kind: functional
     category: unit
@@ -4840,17 +4967,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-XXX
+      - VT-XXX
     coverage_entries:
-    - artefact: VT-XXX
-      status: planned
-      kind: VT
+      - artefact: VT-XXX
+        status: planned
+        kind: VT
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
   SPEC-128.FR-002:
     label: FR-002
     title: System MUST [integration or contract requirement]
     specs:
-    - SPEC-128
+      - SPEC-128
     primary_spec: SPEC-128
     kind: functional
     category: unit
@@ -4866,7 +4993,7 @@ requirements:
     label: FR-003
     title: Component MUST [data handling or state management]
     specs:
-    - SPEC-128
+      - SPEC-128
     primary_spec: SPEC-128
     kind: functional
     category: unit
@@ -4880,9 +5007,9 @@ requirements:
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
   SPEC-128.NF-001:
     label: NF-001
-    title: '[Performance constraint with specific metrics]'
+    title: "[Performance constraint with specific metrics]"
     specs:
-    - SPEC-128
+      - SPEC-128
     primary_spec: SPEC-128
     kind: non-functional
     category: unit
@@ -4896,9 +5023,9 @@ requirements:
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
   SPEC-128.NF-002:
     label: NF-002
-    title: '[Scalability or resource requirement]'
+    title: "[Scalability or resource requirement]"
     specs:
-    - SPEC-128
+      - SPEC-128
     primary_spec: SPEC-128
     kind: non-functional
     category: unit
@@ -4912,9 +5039,9 @@ requirements:
     path: .spec-driver/tech/SPEC-128/SPEC-128.md
   SPEC-128.NF-003:
     label: NF-003
-    title: '[Reliability or fault tolerance]'
+    title: "[Reliability or fault tolerance]"
     specs:
-    - SPEC-128
+      - SPEC-128
     primary_spec: SPEC-128
     kind: non-functional
     category: unit
@@ -4930,7 +5057,7 @@ requirements:
     label: FR-001
     title: Component MUST [specific technical capability]
     specs:
-    - SPEC-129
+      - SPEC-129
     primary_spec: SPEC-129
     kind: functional
     category: unit
@@ -4940,17 +5067,17 @@ requirements:
     implemented_by: []
     verified_by: []
     coverage_evidence:
-    - VT-XXX
+      - VT-XXX
     coverage_entries:
-    - artefact: VT-XXX
-      status: planned
-      kind: VT
+      - artefact: VT-XXX
+        status: planned
+        kind: VT
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
   SPEC-129.FR-002:
     label: FR-002
     title: System MUST [integration or contract requirement]
     specs:
-    - SPEC-129
+      - SPEC-129
     primary_spec: SPEC-129
     kind: functional
     category: unit
@@ -4966,7 +5093,7 @@ requirements:
     label: FR-003
     title: Component MUST [data handling or state management]
     specs:
-    - SPEC-129
+      - SPEC-129
     primary_spec: SPEC-129
     kind: functional
     category: unit
@@ -4980,9 +5107,9 @@ requirements:
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
   SPEC-129.NF-001:
     label: NF-001
-    title: '[Performance constraint with specific metrics]'
+    title: "[Performance constraint with specific metrics]"
     specs:
-    - SPEC-129
+      - SPEC-129
     primary_spec: SPEC-129
     kind: non-functional
     category: unit
@@ -4996,9 +5123,9 @@ requirements:
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
   SPEC-129.NF-002:
     label: NF-002
-    title: '[Scalability or resource requirement]'
+    title: "[Scalability or resource requirement]"
     specs:
-    - SPEC-129
+      - SPEC-129
     primary_spec: SPEC-129
     kind: non-functional
     category: unit
@@ -5012,9 +5139,9 @@ requirements:
     path: .spec-driver/tech/SPEC-129/SPEC-129.md
   SPEC-129.NF-003:
     label: NF-003
-    title: '[Reliability or fault tolerance]'
+    title: "[Reliability or fault tolerance]"
     specs:
-    - SPEC-129
+      - SPEC-129
     primary_spec: SPEC-129
     kind: non-functional
     category: unit

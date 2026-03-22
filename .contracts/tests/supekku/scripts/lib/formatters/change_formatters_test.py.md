@@ -127,7 +127,7 @@ Verifies PROD-006.FR-003: Enhanced delta display shows phases.
 
 ### TestFormatDeltaReverseLookups
 
-Tests for _format_delta_reverse_lookups (VT-090-P2-3).
+Tests for \_format_delta_reverse_lookups (VT-090-P2-3).
 
 **Inherits from:** unittest.TestCase
 

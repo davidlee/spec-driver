@@ -61,9 +61,9 @@ create memory records, clean up.
 
 ## 3. Tasks
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
+| Status | ID  | Description                 | Notes                                       |
+| ------ | --- | --------------------------- | ------------------------------------------- |
 | [x]    | 6.1 | End-to-end integration test | Full cycle + phase complete + block/unblock |
-| [x]    | 6.2 | Regression test | Existing deltas without workflow/ verified |
-| [x]    | 6.3 | Cleanup | Removed unused operations.py |
-| [x]    | 6.4 | Memory record | mem.reference.workflow-commands created |
+| [x]    | 6.2 | Regression test             | Existing deltas without workflow/ verified  |
+| [x]    | 6.3 | Cleanup                     | Removed unused operations.py                |
+| [x]    | 6.4 | Memory record               | mem.reference.workflow-commands created     |

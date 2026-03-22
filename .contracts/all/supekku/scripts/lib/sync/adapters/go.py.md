@@ -22,42 +22,46 @@ with other language adapters while maintaining full backward compatibility.
 - `describe(self, unit) -> SourceDescriptor`: Describe how a Go package should be processed.
 
 Args:
-    unit: Go package source unit
+unit: Go package source unit
 
 Returns:
-    SourceDescriptor with Go-specific metadata
+SourceDescriptor with Go-specific metadata
+
 - `discover_targets(self, repo_root, requested) -> list[SourceUnit]`: Discover Go packages using `go list`.
 
 Args:
-    repo_root: Root directory of the repository
-    requested: Optional list of specific package paths to process
+repo_root: Root directory of the repository
+requested: Optional list of specific package paths to process
 
 Returns:
-    List of SourceUnit objects for Go packages
+List of SourceUnit objects for Go packages
 
 Raises:
-    GoToolchainNotAvailableError: If Go toolchain is not available
+GoToolchainNotAvailableError: If Go toolchain is not available
+
 - `generate(self, unit) -> list[DocVariant]`: Generate documentation for a Go package using gomarkdoc.
 
 Args:
-    unit: Go package source unit
-    variant_outputs: Per-variant canonical output file paths
-    check: If True, only check if docs would change
+unit: Go package source unit
+variant_outputs: Per-variant canonical output file paths
+check: If True, only check if docs would change
 
 Returns:
-    List of DocVariant objects with generation results
+List of DocVariant objects with generation results
 
 Raises:
-    GoToolchainNotAvailableError: If Go toolchain is not available
-    GomarkdocNotAvailableError: If gomarkdoc is not available
+GoToolchainNotAvailableError: If Go toolchain is not available
+GomarkdocNotAvailableError: If gomarkdoc is not available
+
 - @staticmethod `is_gomarkdoc_available() -> bool`: Check if gomarkdoc is available in PATH.
 - `supports_identifier(self, identifier) -> bool`: Check if identifier looks like a Go package path.
 
 Args:
-    identifier: Identifier to check
+identifier: Identifier to check
 
 Returns:
-    True if identifier appears to be a Go package path
+True if identifier appears to be a Go package path
+
 - `_generate_variant(self) -> DocVariant`: Generate a single documentation variant via gomarkdoc.
 
 ### GoToolchainNotAvailableError

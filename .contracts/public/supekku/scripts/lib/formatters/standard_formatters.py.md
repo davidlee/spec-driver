@@ -10,24 +10,26 @@ Formatters take StandardRecord objects and return formatted strings for display.
 - `format_standard_details(standard) -> str`: Format standard details as multi-line string for display.
 
 Args:
-  standard: StandardRecord object to format
+standard: StandardRecord object to format
 
 Returns:
-  Formatted string with all standard details
+Formatted string with all standard details
+
 - `format_standard_list_json(standards) -> str`: Format standards as JSON array.
 
 Args:
-  standards: List of StandardRecord objects
+standards: List of StandardRecord objects
 
 Returns:
-  JSON string representation
+JSON string representation
+
 - `format_standard_list_table(standards, format_type, truncate) -> str`: Format standards as table, JSON, or TSV.
 
 Args:
-  standards: List of StandardRecord objects to format
-  format_type: Output format (table|json|tsv)
-  truncate: If True, truncate long fields (default: False, show full content)
-  show_external: If True, show ext_id column after ID
+standards: List of StandardRecord objects to format
+format_type: Output format (table|json|tsv)
+truncate: If True, truncate long fields (default: False, show full content)
+show_external: If True, show ext_id column after ID
 
 Returns:
-  Formatted string in requested format
+Formatted string in requested format

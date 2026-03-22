@@ -118,15 +118,15 @@ Add phase status validation to `validate` with a `--fix` flag for normalisation,
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [x] | 2.1 | `_validate_phase_statuses` + `_validate_single_phase` | [ ] | Core validation logic |
-| [x] | 2.2 | Wire `--fix` through CLI | [ ] | `--fix` on validate command |
-| [x] | 2.3 | Fix schema example | [P] | `active` → `in-progress` |
-| [x] | 2.4 | Update skills (5 files) | [P] | execute-phase, update-delta-docs, continuation, close-change, plan-phases |
-| [x] | 2.5 | Update memory records (2) | [P] | workflow-commands, status-enums |
-| [x] | 2.6 | Backfill via `validate --fix` | [ ] | 60 files normalised |
-| [x] | 2.7 | Final verification | [ ] | 3915+120 tests pass; lint clean |
+| Status | ID  | Description                                           | Parallel? | Notes                                                                     |
+| ------ | --- | ----------------------------------------------------- | --------- | ------------------------------------------------------------------------- |
+| [x]    | 2.1 | `_validate_phase_statuses` + `_validate_single_phase` | [ ]       | Core validation logic                                                     |
+| [x]    | 2.2 | Wire `--fix` through CLI                              | [ ]       | `--fix` on validate command                                               |
+| [x]    | 2.3 | Fix schema example                                    | [P]       | `active` → `in-progress`                                                  |
+| [x]    | 2.4 | Update skills (5 files)                               | [P]       | execute-phase, update-delta-docs, continuation, close-change, plan-phases |
+| [x]    | 2.5 | Update memory records (2)                             | [P]       | workflow-commands, status-enums                                           |
+| [x]    | 2.6 | Backfill via `validate --fix`                         | [ ]       | 60 files normalised                                                       |
+| [x]    | 2.7 | Final verification                                    | [ ]       | 3915+120 tests pass; lint clean                                           |
 
 ### Task Details
 
@@ -178,10 +178,10 @@ Add phase status validation to `validate` with a `--fix` flag for normalisation,
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|-----------|--------|
+| Risk                                            | Mitigation                                 | Status   |
+| ----------------------------------------------- | ------------------------------------------ | -------- |
 | `--fix` sets precedent for mutation in validate | Scoped narrowly per DEC-104-05; documented | Accepted |
-| Backfill commit touches ~120 files | Deterministic; reviewable diff; atomic | Accepted |
+| Backfill commit touches ~120 files              | Deterministic; reviewable diff; atomic     | Accepted |
 
 ## 11. Wrap-up Checklist
 

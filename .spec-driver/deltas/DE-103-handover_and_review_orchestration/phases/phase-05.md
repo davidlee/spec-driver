@@ -76,11 +76,11 @@ support for notes.md and phase sheets, and continuation skill refit.
 
 ## 5. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x]    | 5.1 | `phase complete` command | 8 CLI tests — auto-handoff per policy and bridge |
-| [x]    | 5.2 | Bridge block I/O | 13 tests — extract/render notes-bridge + phase-bridge |
-| [x]    | 5.3 | Continuation skill refit | skill updated to invoke CLI; feature-gated |
+| Status | ID  | Description              | Notes                                                 |
+| ------ | --- | ------------------------ | ----------------------------------------------------- |
+| [x]    | 5.1 | `phase complete` command | 8 CLI tests — auto-handoff per policy and bridge      |
+| [x]    | 5.2 | Bridge block I/O         | 13 tests — extract/render notes-bridge + phase-bridge |
+| [x]    | 5.3 | Continuation skill refit | skill updated to invoke CLI; feature-gated            |
 
 ## 6. Design Decisions
 

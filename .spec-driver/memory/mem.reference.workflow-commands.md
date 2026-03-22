@@ -4,13 +4,13 @@ name: Workflow orchestration CLI command reference
 kind: memory
 status: active
 memory_type: pattern
-created: '2026-03-21'
-updated: '2026-03-21'
-verified: '2026-03-21'
+created: "2026-03-21"
+updated: "2026-03-21"
+verified: "2026-03-21"
 confidence: high
 tags:
-- workflow
-- cli
+  - workflow
+  - cli
 summary: Quick reference for all workflow CLI commands, state transitions, and write ordering
 scope:
   globs:
@@ -37,18 +37,18 @@ provenance:
 
 ## Commands
 
-| Command | Effect | State transition |
-|---------|--------|------------------|
-| `spec-driver phase start <delta>` | Init `workflow/state.yaml`, update phase frontmatter to `in-progress` | planned → implementing |
-| `spec-driver phase complete <delta>` | Update phase frontmatter to `completed`, mark state.yaml, auto-handoff | (phase frontmatter → completed, state.yaml → complete, optionally → awaiting_handoff) |
-| `spec-driver create handoff <delta> --to <role>` | Write `handoff.current.yaml` | implementing/changes_requested → awaiting_handoff |
-| `spec-driver accept handoff <delta> [--identity <name>]` | Claim + transition | awaiting_handoff → implementing/reviewing |
-| `spec-driver review prime <delta>` | Generate `review-index.yaml` + `review-bootstrap.md` | (no state change) |
-| `spec-driver review complete <delta> --status <status>` | Write `review-findings.yaml` | reviewing → changes_requested/approved |
-| `spec-driver review teardown <delta>` | Delete reviewer state files | (no state change) |
-| `spec-driver workflow status <delta>` | Display state | (read-only) |
-| `spec-driver block <delta>` | Block workflow | * → blocked |
-| `spec-driver unblock <delta>` | Restore previous state | blocked → (previous) |
+| Command                                                  | Effect                                                                 | State transition                                                                      |
+| -------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `spec-driver phase start <delta>`                        | Init `workflow/state.yaml`, update phase frontmatter to `in-progress`  | planned → implementing                                                                |
+| `spec-driver phase complete <delta>`                     | Update phase frontmatter to `completed`, mark state.yaml, auto-handoff | (phase frontmatter → completed, state.yaml → complete, optionally → awaiting_handoff) |
+| `spec-driver create handoff <delta> --to <role>`         | Write `handoff.current.yaml`                                           | implementing/changes_requested → awaiting_handoff                                     |
+| `spec-driver accept handoff <delta> [--identity <name>]` | Claim + transition                                                     | awaiting_handoff → implementing/reviewing                                             |
+| `spec-driver review prime <delta>`                       | Generate `review-index.yaml` + `review-bootstrap.md`                   | (no state change)                                                                     |
+| `spec-driver review complete <delta> --status <status>`  | Write `review-findings.yaml`                                           | reviewing → changes_requested/approved                                                |
+| `spec-driver review teardown <delta>`                    | Delete reviewer state files                                            | (no state change)                                                                     |
+| `spec-driver workflow status <delta>`                    | Display state                                                          | (read-only)                                                                           |
+| `spec-driver block <delta>`                              | Block workflow                                                         | \* → blocked                                                                          |
+| `spec-driver unblock <delta>`                            | Restore previous state                                                 | blocked → (previous)                                                                  |
 
 ## Key Patterns
 

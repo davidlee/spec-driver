@@ -14,6 +14,7 @@ VT-073-03: resolve links --verbose/--path/--id.
 
 Creates .spec-driver dir so find_repo_root succeeds,
 and memory/ for mem files. Returns memory dir.
+
 - `_write_memory(mem_dir, mem_id, name, body, memory_type) -> None`: Write a minimal memory file to disk.
 
 ## Classes
@@ -32,7 +33,7 @@ Tests for build_artifact_index.
 
 ### TestMissingDetail
 
-_resolve_memory_links tracks missing targets per source file.
+\_resolve_memory_links tracks missing targets per source file.
 
 #### Methods
 
@@ -60,7 +61,7 @@ CLI --verbose flag reports missing targets with file locations.
 
 ### TestResolveMemoryLinks
 
-Tests for _resolve_memory_links.
+Tests for \_resolve_memory_links.
 
 #### Methods
 
@@ -74,7 +75,7 @@ Tests for _resolve_memory_links.
 
 ### TestScopePath
 
-_resolve_memory_links with scope_path resolves a single file.
+\_resolve_memory_links with scope_path resolves a single file.
 
 #### Methods
 

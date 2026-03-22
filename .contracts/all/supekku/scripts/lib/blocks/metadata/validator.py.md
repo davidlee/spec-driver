@@ -16,22 +16,23 @@ The validator produces path-aware error messages for developer-friendly output.
 Validates data against block metadata definition.
 
 Usage:
-  metadata = BlockMetadata(...)
-  validator = MetadataValidator(metadata)
-  errors = validator.validate(data)
-  if errors:
-    for error in errors:
-      print(error)
+metadata = BlockMetadata(...)
+validator = MetadataValidator(metadata)
+errors = validator.validate(data)
+if errors:
+for error in errors:
+print(error)
 
 #### Methods
 
 - `validate(self, data) -> list[ValidationError]`: Validate data against metadata.
 
 Args:
-  data: Parsed YAML data to validate
+data: Parsed YAML data to validate
 
 Returns:
-  List of validation errors (empty if valid)
+List of validation errors (empty if valid)
+
 - `__init__(self, metadata)`
 - `_get_nested_value(self, data, path) -> Any`: Get value from nested path (e.g., 'metadata.revision').
 - `_has_nested_value(self, data, path) -> bool`: Check if nested path exists.
@@ -44,10 +45,10 @@ Returns:
 Validation error with path context.
 
 Attributes:
-  path: Dot-notation path (e.g., "specs.primary[0]")
-  message: Human-readable error message
-  expected: Expected value/type (optional)
-  actual: Actual value found (optional)
+path: Dot-notation path (e.g., "specs.primary[0]")
+message: Human-readable error message
+expected: Expected value/type (optional)
+actual: Actual value found (optional)
 
 #### Methods
 

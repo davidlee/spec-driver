@@ -141,10 +141,10 @@ VT-081-003: Inline tag extraction from [tag1, tag2] syntax.
 
 ### TestIsRequirementLikeLine
 
-Test _is_requirement_like_line heuristic for false-positive suppression.
+Test \_is_requirement_like_line heuristic for false-positive suppression.
 
-The heuristic distinguishes lines that plausibly *define* a requirement
-(and may have a format problem) from lines that merely *reference* one.
+The heuristic distinguishes lines that plausibly _define_ a requirement
+(and may have a format problem) from lines that merely _reference_ one.
 
 **Inherits from:** unittest.TestCase
 
@@ -160,6 +160,7 @@ The heuristic distinguishes lines that plausibly *define* a requirement
 
 If 'per' appears, the whole line is treated as a cross-reference
 because the heuristic errs on the side of suppressing false positives. - -- Edge cases ---------------------------------------------------------
+
 - `test_multiple_parenthetical_refs(self) -> None`: Multiple IDs all inside parentheses — still a citation.
 - `test_nf_definition(self) -> None`: Non-functional requirement definition is requirement-like.
 - `test_no_requirement_id(self) -> None`: Line without any FR/NF ID at all.
@@ -173,12 +174,13 @@ because the heuristic errs on the side of suppressing false positives. - -- Edge
 
 Without a clear cross-reference signal (per/parenthetical), the
 heuristic conservatively flags this to catch misformatted definitions.
+
 - `test_qualified_bullet_definition(self) -> None`: Qualified ID (SPEC-100.FR-001) in bullet is requirement-like.
 - `test_whitespace_only(self) -> None`: Whitespace-only line is not requirement-like.
 
 ### TestRecordsFromContentCrossRefSuppression
 
-Integration test: _records_from_content does not warn on cross-references.
+Integration test: \_records_from_content does not warn on cross-references.
 
 **Inherits from:** unittest.TestCase
 
@@ -193,7 +195,7 @@ Integration test: _records_from_content does not warn on cross-references.
 
 Test that coverage_entries field is populated during registry sync.
 
-After _apply_coverage_blocks(), each RequirementRecord should have a
+After \_apply_coverage_blocks(), each RequirementRecord should have a
 coverage_entries field containing the structured verification data
 (artefact, kind, status) from coverage blocks.
 
@@ -213,7 +215,7 @@ coverage_entries field containing the structured verification data
 
 ### TestRequirementHeadingRegex
 
-VT-REGEX-076-001: _REQUIREMENT_HEADING regex matches dotted backlog format.
+VT-REGEX-076-001: \_REQUIREMENT_HEADING regex matches dotted backlog format.
 
 **Inherits from:** unittest.TestCase
 
@@ -323,7 +325,7 @@ VT-081-002: Terminal statuses not overwritten by coverage derivation.
 
 ### TestUpsertRecordProvenance
 
-VT-UPSERT-076-003: _upsert_record stamps source provenance.
+VT-UPSERT-076-003: \_upsert_record stamps source provenance.
 
 **Inherits from:** unittest.TestCase
 

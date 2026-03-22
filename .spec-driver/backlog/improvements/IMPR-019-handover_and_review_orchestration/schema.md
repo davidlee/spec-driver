@@ -1,13 +1,12 @@
-
 Below is a spec-driver-specific additive schema set in YAML/TOML terms.
 
 Design goals:
 
-* **no breaking changes** to existing DE/IP/phase schemas
-* prefer **new sibling artefacts** under a dedicated workflow directory
-* only add **small optional fenced YAML blocks** to existing markdown where there is clear value
-* keep event-driving state in **separate `.yaml` files** for easy file watching
-* separate **handover resilience** from **review bootstrap amortization**
+- **no breaking changes** to existing DE/IP/phase schemas
+- prefer **new sibling artefacts** under a dedicated workflow directory
+- only add **small optional fenced YAML blocks** to existing markdown where there is clear value
+- keep event-driving state in **separate `.yaml` files** for easy file watching
+- separate **handover resilience** from **review bootstrap amortization**
 
 This fits the existing pattern where DE/IP already carry frontmatter plus fenced YAML schema blocks, phase progress is tracked in markdown, `notes.md` is the human-facing handover surface, and the current continuation skill updates notes and emits the next-agent prompt. ([GitHub][1])
 
@@ -77,9 +76,9 @@ max_historical_rounds = 2
 
 ### Semantics
 
-* pure policy/config, not per-artifact state
-* safe to load once at CLI start
-* can later grow per-user/per-agent sections without changing artefact schemas
+- pure policy/config, not per-artifact state
+- safe to load once at CLI start
+- can later grow per-user/per-agent sections without changing artefact schemas
 
 ---
 
@@ -97,11 +96,11 @@ This is the minimal machine-readable current truth for an artefact.
 
 ### Purpose
 
-* current orchestration status
-* current role
-* current phase
-* pointers to latest related files
-* event-friendly summary for dashboards/watchers
+- current orchestration status
+- current role
+- current phase
+- pointers to latest related files
+- event-friendly summary for dashboards/watchers
 
 ### Proposed schema
 
@@ -144,20 +143,20 @@ timestamps:
 
 ### Required fields
 
-* `schema`
-* `version`
-* `artifact.id`
-* `artifact.kind`
-* `workflow.status`
-* `workflow.active_role`
-* `phase.id`
+- `schema`
+- `version`
+- `artifact.id`
+- `artifact.kind`
+- `workflow.status`
+- `workflow.active_role`
+- `phase.id`
 
 ### Allowed enums
 
-* `artifact.kind`: `delta | plan | revision | audit | task | other`
-* `phase.status`: `not_started | in_progress | blocked | complete | skipped`
-* `workflow.status`: `planned | implementing | awaiting_review | reviewing | changes_requested | approved | blocked | archived`
-* `workflow.active_role`: `architect | implementer | reviewer | operator | other`
+- `artifact.kind`: `delta | plan | revision | audit | task | other`
+- `phase.status`: `not_started | in_progress | blocked | complete | skipped`
+- `workflow.status`: `planned | implementing | awaiting_review | reviewing | changes_requested | approved | blocked | archived`
+- `workflow.active_role`: `architect | implementer | reviewer | operator | other`
 
 ### Notes
 
@@ -179,9 +178,9 @@ This is the durable phase-boundary transition payload.
 
 ### Purpose
 
-* resilient next-step state
-* deterministic input to continuation prompt rendering
-* trigger file for orchestration
+- resilient next-step state
+- deterministic input to continuation prompt rendering
+- trigger file for orchestration
 
 ### Proposed schema
 
@@ -249,21 +248,21 @@ timestamps:
 
 ### Required fields
 
-* `schema`
-* `version`
-* `artifact.id`
-* `transition.from_role`
-* `transition.to_role`
-* `phase.id`
-* `required_reading`
-* `next_activity.kind`
+- `schema`
+- `version`
+- `artifact.id`
+- `transition.from_role`
+- `transition.to_role`
+- `phase.id`
+- `required_reading`
+- `next_activity.kind`
 
 ### Allowed enums
 
-* `transition.boundary`: `phase | task | manual`
-* `transition.status`: `awaiting_review | changes_requested | ready_for_implementation | approved | blocked`
-* `verification.status`: `pass | fail | partial | not_run | unknown`
-* `next_activity.kind`: `implementation | review | architecture | verification | operator_attention`
+- `transition.boundary`: `phase | task | manual`
+- `transition.status`: `awaiting_review | changes_requested | ready_for_implementation | approved | blocked`
+- `verification.status`: `pass | fail | partial | not_run | unknown`
+- `next_activity.kind`: `implementation | review | architecture | verification | operator_attention`
 
 ### Notes
 
@@ -285,10 +284,10 @@ This is the reviewer bootstrap cache: what the reviewer has already learned and 
 
 ### Purpose
 
-* amortize review bootstrap cost
-* preserve domain map and invariants
-* survive session death
-* support recreation of reviewer from cache
+- amortize review bootstrap cost
+- preserve domain map and invariants
+- survive session death
+- support recreation of reviewer from cache
 
 ### Proposed schema
 
@@ -351,17 +350,17 @@ staleness:
 
 ### Required fields
 
-* `schema`
-* `version`
-* `artifact.id`
-* `review.bootstrap_status`
-* `domain_map`
-* `staleness.cache_key`
+- `schema`
+- `version`
+- `artifact.id`
+- `review.bootstrap_status`
+- `domain_map`
+- `staleness.cache_key`
 
 ### Allowed enums
 
-* `review.session_scope`: `artifact | phase | task`
-* `review.bootstrap_status`: `cold | warming | warm | stale`
+- `review.session_scope`: `artifact | phase | task`
+- `review.bootstrap_status`: `cold | warming | warm | stale`
 
 ### Notes
 
@@ -383,10 +382,10 @@ This is the stable issue ledger across review rounds.
 
 ### Purpose
 
-* track findings across rounds
-* avoid re-litigating fixed issues
-* let implementer respond against stable IDs
-* let reviewer session be resumed or recreated efficiently
+- track findings across rounds
+- avoid re-litigating fixed issues
+- let implementer respond against stable IDs
+- let reviewer session be resumed or recreated efficiently
 
 ### Proposed schema
 
@@ -441,16 +440,16 @@ timestamps:
 
 ### Required fields
 
-* `schema`
-* `version`
-* `artifact.id`
-* `review.round`
-* `review.status`
+- `schema`
+- `version`
+- `artifact.id`
+- `review.round`
+- `review.status`
 
 ### Allowed enums
 
-* `review.status`: `not_started | in_progress | changes_requested | approved | blocked`
-* finding `status`: `open | resolved | waived | superseded`
+- `review.status`: `not_started | in_progress | changes_requested | approved | blocked`
+- finding `status`: `open | resolved | waived | superseded`
 
 ### Notes
 
@@ -472,9 +471,9 @@ This is runtime state for tmux/jail orchestration.
 
 ### Purpose
 
-* map roles to live or paused sessions
-* support watchdog/reconciliation logic
-* keep ephemeral process metadata out of notes
+- map roles to live or paused sessions
+- support watchdog/reconciliation logic
+- keep ephemeral process metadata out of notes
 
 ### Proposed schema
 
@@ -508,7 +507,7 @@ sessions:
 
 ### Allowed enums
 
-* session `status`: `active | paused | absent | dead | unknown`
+- session `status`: `active | paused | absent | dead | unknown`
 
 ### Notes
 
@@ -526,9 +525,9 @@ This is intentionally not YAML-only.
 
 ### Purpose
 
-* human-readable reviewer briefing
-* compiled from DE/IP/phase/notes/handoff/review-index/review-findings
-* can be fed directly to a recreated reviewer session
+- human-readable reviewer briefing
+- compiled from DE/IP/phase/notes/handoff/review-index/review-findings
+- can be fed directly to a recreated reviewer session
 
 ### Recommended structure
 
@@ -536,21 +535,27 @@ This is intentionally not YAML-only.
 # Review Bootstrap for DE-090
 
 ## Current Scope
+
 ...
 
 ## Dependency Surface
+
 ...
 
 ## Invariants to Protect
+
 ...
 
 ## Open Findings
+
 ...
 
 ## Areas Not Yet Reviewed
+
 ...
 
 ## Current Diff / Commit Context
+
 ...
 ```
 
@@ -576,6 +581,7 @@ current_handoff: workflow/handoff.current.yaml
 review_index: workflow/review-index.yaml
 review_findings: workflow/review-findings.yaml
 review_bootstrap: workflow/review-bootstrap.md
+```
 ````
 
 ````
@@ -660,16 +666,16 @@ Your existing workflow values readable prose; only the machine-facing surfaces n
 
 These file changes are useful watch events:
 
-- `workflow/handoff.current.yaml` changed  
+- `workflow/handoff.current.yaml` changed
   -> resume/create next role session
 
-- `workflow/review-findings.yaml` changed  
+- `workflow/review-findings.yaml` changed
   -> implementer has actionable review output
 
-- `workflow/state.yaml` changed  
+- `workflow/state.yaml` changed
   -> dashboard/status refresh
 
-- `phases/*.md` phase bridge changed to `handoff_ready: true`  
+- `phases/*.md` phase bridge changed to `handoff_ready: true`
   -> emit new handoff
 
 This is why file separation is preferable for the control plane.
@@ -703,4 +709,3 @@ The next practical move is to codify the exact field-level constraints for these
 
 and then update continuation so it writes `workflow/handoff.current.yaml` plus the small `notes.md` bridge block.
 ```
-

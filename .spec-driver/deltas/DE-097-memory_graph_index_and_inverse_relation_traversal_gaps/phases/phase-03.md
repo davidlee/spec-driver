@@ -77,12 +77,12 @@ Confirm zero regressions, verify the `--truncate` rendering issue, run full suit
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-|--------|-----|-------------|-------|
-| [ ] | 3.1 | Run existing relation/link test suites | VT-097-existing |
-| [ ] | 3.2 | Verify `--truncate` rendering | VA-097-truncate |
-| [ ] | 3.3 | `just check` — full suite + lint | |
-| [ ] | 3.4 | Update notes.md, reconcile IP progress | |
+| Status | ID  | Description                            | Notes           |
+| ------ | --- | -------------------------------------- | --------------- |
+| [ ]    | 3.1 | Run existing relation/link test suites | VT-097-existing |
+| [ ]    | 3.2 | Verify `--truncate` rendering          | VA-097-truncate |
+| [ ]    | 3.3 | `just check` — full suite + lint       |                 |
+| [ ]    | 3.4 | Update notes.md, reconcile IP progress |                 |
 
 ## 11. Wrap-up Checklist
 

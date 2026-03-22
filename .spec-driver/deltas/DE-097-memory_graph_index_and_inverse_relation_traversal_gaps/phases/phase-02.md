@@ -84,11 +84,11 @@ Wire phase-1 domain layer into user-facing surfaces: `show relations <ID>` comma
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Parallel? | Notes |
-|--------|-----|-------------|-----------|-------|
-| [ ] | 2.1 | `show relations` command in `cli/show.py` | [P] | Independent of 2.2 |
-| [ ] | 2.2 | `_validate_unresolved_references` in `WorkspaceValidator` | [P] | Independent of 2.1 |
-| [ ] | 2.3 | Tests for 2.1–2.2 | | TDD with each task |
+| Status | ID  | Description                                               | Parallel? | Notes              |
+| ------ | --- | --------------------------------------------------------- | --------- | ------------------ |
+| [ ]    | 2.1 | `show relations` command in `cli/show.py`                 | [P]       | Independent of 2.2 |
+| [ ]    | 2.2 | `_validate_unresolved_references` in `WorkspaceValidator` | [P]       | Independent of 2.1 |
+| [ ]    | 2.3 | Tests for 2.1–2.2                                         |           | TDD with each task |
 
 ### Task Details
 
@@ -104,9 +104,9 @@ Wire phase-1 domain layer into user-facing surfaces: `show relations <ID>` comma
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|-----------|--------|
-| Graph build performance in validation (runs on every `doctor`) | Acceptable at current scale; monitor | open |
+| Risk                                                           | Mitigation                           | Status |
+| -------------------------------------------------------------- | ------------------------------------ | ------ |
+| Graph build performance in validation (runs on every `doctor`) | Acceptable at current scale; monitor | open   |
 
 ## 11. Wrap-up Checklist
 

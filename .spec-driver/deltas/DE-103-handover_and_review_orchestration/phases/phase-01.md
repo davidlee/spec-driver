@@ -93,20 +93,20 @@ so they appear in `spec-driver list schemas` and `spec-driver show schema`.
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-|--------|-----|-------------|-------|
-| [x] | T01 | Create `workflow_metadata.py` — 5 workflow schema definitions | state, handoff, review-index, review-findings, sessions |
-| [x] | T02 | Add bridge schema definitions | notes-bridge, phase-bridge |
-| [x] | T03 | Register all 7 schemas in block schema registry | Via `register_block_schema` at module level |
-| [x] | T04 | Add side-effect import in `cli/schema.py` | So schemas are registered when CLI lists them |
-| [x] | T05 | Write `workflow_metadata_test.py` | 68 tests — valid/invalid cases for all 7 schemas |
-| [x] | T06 | Lint and verify | ruff clean, 320 tests passing, `list schemas` verified |
+| Status | ID  | Description                                                   | Notes                                                   |
+| ------ | --- | ------------------------------------------------------------- | ------------------------------------------------------- |
+| [x]    | T01 | Create `workflow_metadata.py` — 5 workflow schema definitions | state, handoff, review-index, review-findings, sessions |
+| [x]    | T02 | Add bridge schema definitions                                 | notes-bridge, phase-bridge                              |
+| [x]    | T03 | Register all 7 schemas in block schema registry               | Via `register_block_schema` at module level             |
+| [x]    | T04 | Add side-effect import in `cli/schema.py`                     | So schemas are registered when CLI lists them           |
+| [x]    | T05 | Write `workflow_metadata_test.py`                             | 68 tests — valid/invalid cases for all 7 schemas        |
+| [x]    | T06 | Lint and verify                                               | ruff clean, 320 tests passing, `list schemas` verified  |
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|-----------|--------|
-| Nested record constraints (uniqueness) not expressible in FieldMetadata | Document gap; defer cross-field uniqueness to command-level validation | open |
+| Risk                                                                    | Mitigation                                                             | Status |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------ |
+| Nested record constraints (uniqueness) not expressible in FieldMetadata | Document gap; defer cross-field uniqueness to command-level validation | open   |
 
 ## 9. Decisions & Outcomes
 

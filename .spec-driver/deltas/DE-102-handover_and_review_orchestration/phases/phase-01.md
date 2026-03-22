@@ -92,15 +92,15 @@ close the delta.
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-| ------ | --- | ----------- | ----- |
-| [x] | 1.1 | Re-audit DR-102 against IMPR-019 evaluation criteria | 14 findings, all aligned |
-| [x] | 1.2 | Populate AUD-014 verification coverage and findings | 7 IMPR-019 criteria verified |
-| [x] | 1.3 | Reconcile DE-102 with final DR state | Updated summary, risks, notes |
-| [ ] | 1.4 | Close delta | `spec-driver complete delta DE-102` |
+| Status | ID  | Description                                          | Notes                               |
+| ------ | --- | ---------------------------------------------------- | ----------------------------------- |
+| [x]    | 1.1 | Re-audit DR-102 against IMPR-019 evaluation criteria | 14 findings, all aligned            |
+| [x]    | 1.2 | Populate AUD-014 verification coverage and findings  | 7 IMPR-019 criteria verified        |
+| [x]    | 1.3 | Reconcile DE-102 with final DR state                 | Updated summary, risks, notes       |
+| [ ]    | 1.4 | Close delta                                          | `spec-driver complete delta DE-102` |
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-| ---- | ---------- | ------ |
-| Audit surfaces new design issues | Consult user; new phase if material | open |
+| Risk                             | Mitigation                          | Status |
+| -------------------------------- | ----------------------------------- | ------ |
+| Audit surfaces new design issues | Consult user; new phase if material | open   |

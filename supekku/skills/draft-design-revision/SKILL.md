@@ -26,7 +26,7 @@ You MUST create a task for each of these items and complete them in order. Each 
 5. **Write Design Revision** — save to the delta's DR file and commit
 6. **Adversarial Review** — perform a hostile review of the design doc, probing for imprecision and flawed reasoning
 7. **Integrate Review Feedback** -- triage and respond to feedback; integrate into DR/DE; repeat until DR approved
-7. **Transition to planning** — invoke plan-phases skill to create implementation plan
+8. **Transition to planning** — invoke plan-phases skill to create implementation plan
 
 <Process State Machine>
   <state name="Explore context">
@@ -132,7 +132,7 @@ reflects your current shared understanding before proceeding.
 ### Adversarial review
 
 1. Once the DR feels coherent, perform an adversarial self-review before
-treating it as done:
+   treating it as done:
    - attack vague sections, hidden assumptions, weak verification, missing
      code-impact detail, and places where a short sample would remove ambiguity
    - attack missing, misread, or weakly applied ADR/policy/standard constraints
@@ -145,14 +145,14 @@ treating it as done:
 3. Integrate the feedback before offering next steps.
    - Occasionally this might require revisiting earlier steps.
 4. After integrating DR feedback, reconcile the owning `DE-XXX.md` so scope,
-risks, acceptance criteria, open questions, and follow-up direction still match
-the revised DR.
+   risks, acceptance criteria, open questions, and follow-up direction still match
+   the revised DR.
 5. After the internal adversarial pass is integrated, you MUST offer the user a
-choice:
+   choice:
    1. print a prompt for an external adversarial reviewer.
    2. initiate `/plan-phases` to create IP/phase sheets.
 6. Multiple passes of review & feedback may be required before acceptance. Do
-not presume approval until it is explicitly granted.
+   not presume approval until it is explicitly granted.
 
 If meaningful tradeoffs or uncertainty remain unresolved, stop and `/consult`.
 

@@ -12,6 +12,7 @@ instances and registered in the block schema registry:
 - **Bridge blocks (2):** `workflow.notes-bridge`, `workflow.phase-bridge`
 
 Files:
+
 - `supekku/scripts/lib/blocks/workflow_metadata.py` — schema definitions + registration
 - `supekku/scripts/lib/blocks/workflow_metadata_test.py` — 68 tests
 - `supekku/cli/schema.py` — side-effect import added
@@ -63,6 +64,7 @@ State machine, state I/O, and core CLI commands implemented:
   `DEFAULT_CONFIG` with correct defaults per DR-102 §9.
 
 Files:
+
 - `supekku/scripts/lib/workflow/state_machine.py` — state machine
 - `supekku/scripts/lib/workflow/state_io.py` — state I/O
 - `supekku/scripts/lib/workflow/operations.py` — domain operations (unused, kept for future skinny-CLI refactor)
@@ -108,6 +110,7 @@ Files:
   based on `to_role` from handoff payload.
 
 Files:
+
 - `supekku/scripts/lib/workflow/handoff_io.py` — handoff I/O + builder
 - `supekku/scripts/lib/workflow/handoff_io_test.py` — 14 tests
 - `supekku/scripts/lib/core/git.py` — new git helpers
@@ -149,6 +152,7 @@ Files:
 **Plan and execute Phase 04 — Review commands.**
 
 Phase 04 scope (from IP-103 §4):
+
 - `review prime` — generates `review-index.yaml` + `review-bootstrap.md` from current state
 - `review complete --status <status>` — writes `review-findings.yaml`; transitions to `changes_requested` or `approved`
 - `review teardown` — deletes reviewer state files
@@ -257,6 +261,7 @@ All three review CLI commands implemented per DR-102 §3.3, §3.4, §5, §8:
   review-bootstrap.md.
 
 Files:
+
 - `supekku/scripts/lib/workflow/review_io.py` — review I/O
 - `supekku/scripts/lib/workflow/review_io_test.py` — 24 tests
 - `supekku/scripts/lib/workflow/staleness.py` — staleness evaluator
@@ -326,6 +331,7 @@ Files:
   handoff preserved when no orchestration is active.
 
 Files:
+
 - `supekku/scripts/lib/workflow/bridge.py` — bridge extraction and rendering
 - `supekku/scripts/lib/workflow/bridge_test.py` — 13 tests
 - `supekku/cli/workflow.py` — `phase complete` command
@@ -368,6 +374,7 @@ Files:
 - **Cleanup**: Removed unused `operations.py`.
 
 Files:
+
 - `supekku/cli/workflow_integration_test.py` — 6 integration tests
 - `.spec-driver/memory/mem.reference.workflow-commands.md` — workflow reference
 

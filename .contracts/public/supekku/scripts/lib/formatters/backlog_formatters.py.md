@@ -10,24 +10,26 @@ Formatters take BacklogItem objects and return formatted strings for display.
 - `format_backlog_details(item) -> str`: Format single backlog item with full details.
 
 Args:
-  item: BacklogItem to format
+item: BacklogItem to format
 
 Returns:
-  Multi-line formatted string with all backlog item details
+Multi-line formatted string with all backlog item details
+
 - `format_backlog_list_json(items) -> str`: Format backlog items as JSON array.
 
 Args:
-  items: List of BacklogItem objects
+items: List of BacklogItem objects
 
 Returns:
-  JSON string with structure: {"items": [...]}
+JSON string with structure: {"items": [...]}
+
 - `format_backlog_list_table(items, format_type, truncate) -> str`: Format backlog items as table, JSON, or TSV.
 
 Args:
-  items: List of BacklogItem objects to format
-  format_type: Output format (table|json|tsv)
-  truncate: If True, truncate long fields (default: False, show full content)
-  show_external: If True, show ext_id column after ID
+items: List of BacklogItem objects to format
+format_type: Output format (table|json|tsv)
+truncate: If True, truncate long fields (default: False, show full content)
+show_external: If True, show ext_id column after ID
 
 Returns:
-  Formatted string in requested format
+Formatted string in requested format

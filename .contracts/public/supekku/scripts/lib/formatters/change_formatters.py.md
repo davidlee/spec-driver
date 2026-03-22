@@ -10,98 +10,109 @@ Formatters take ChangeArtifact objects and return formatted strings for display.
 - `format_audit_details(artifact, root) -> str`: Format audit details as multi-line string for display.
 
 Args:
-  artifact: ChangeArtifact to format (must be kind='audit')
-  root: Repository root for relative path calculation (optional)
+artifact: ChangeArtifact to format (must be kind='audit')
+root: Repository root for relative path calculation (optional)
 
 Returns:
-  Formatted string with all audit details
+Formatted string with all audit details
+
 - `format_change_list_item(artifact) -> str`: Format change artifact as basic list item: id, kind, status, name.
 
 Args:
-  artifact: Change artifact to format
+artifact: Change artifact to format
 
 Returns:
-  Tab-separated string: "{id}\t{kind}\t{status}\t{name}"
+Tab-separated string: "{id}\t{kind}\t{status}\t{name}"
+
 - `format_change_list_json(changes) -> str`: Format change artifacts as JSON array.
 
 Args:
-  changes: List of ChangeArtifact objects
+changes: List of ChangeArtifact objects
 
 Returns:
-  JSON string with structure: {"items": [...]}
+JSON string with structure: {"items": [...]}
+
 - `format_change_list_table(changes, format_type, truncate) -> str`: Format change artifacts as table, JSON, or TSV.
 
 Args:
-  changes: List of ChangeArtifact objects to format
-  format_type: Output format (table|json|tsv)
-  truncate: If True, truncate long fields to fit terminal width
-  show_external: If True, show ext_id column after ID
-  show_refs: If True, show refs column (count in table, pairs in TSV)
+changes: List of ChangeArtifact objects to format
+format_type: Output format (table|json|tsv)
+truncate: If True, truncate long fields to fit terminal width
+show_external: If True, show ext_id column after ID
+show_refs: If True, show refs column (count in table, pairs in TSV)
 
 Returns:
-  Formatted string in requested format
+Formatted string in requested format
+
 - `format_change_with_context(artifact) -> str`: Format change artifact with related specs, requirements, and phases.
 
 Provides detailed context including:
+
 - Basic info (id, kind, status, name)
 - Related specs
 - Requirements
 - Plan phases with objectives
 
 Args:
-  artifact: Change artifact to format
+artifact: Change artifact to format
 
 Returns:
-  Multi-line formatted string with indented context
+Multi-line formatted string with indented context
+
 - `format_delta_details(artifact, root) -> str`: Format delta details as multi-line string for display.
 
 Args:
-  artifact: ChangeArtifact to format
-  root: Repository root for relative path calculation (optional)
-  linked_audits: List of (id, name) for audits referencing this delta.
-  linked_revisions: List of (id, name) for revisions referencing this delta.
+artifact: ChangeArtifact to format
+root: Repository root for relative path calculation (optional)
+linked_audits: List of (id, name) for audits referencing this delta.
+linked_revisions: List of (id, name) for revisions referencing this delta.
 
 Returns:
-  Formatted string with all delta details
+Formatted string with all delta details
+
 - `format_delta_details_json(artifact, root) -> str`: Format delta details as JSON with all file paths included.
 
 Args:
-  artifact: ChangeArtifact to format
-  root: Repository root for relative path calculation (optional)
+artifact: ChangeArtifact to format
+root: Repository root for relative path calculation (optional)
 
 Returns:
-  JSON string with complete delta information including all paths
+JSON string with complete delta information including all paths
+
 - `format_phase_summary(phase, max_objective_len) -> str`: Format a single phase with truncated objective.
 
 Args:
-  phase: Phase dictionary with 'phase'/'id' and 'objective' fields
-  max_objective_len: Maximum length for objective before truncation
+phase: Phase dictionary with 'phase'/'id' and 'objective' fields
+max_objective_len: Maximum length for objective before truncation
 
 Returns:
-  Formatted string: "{phase_id}" or "{phase_id}: {objective}"
+Formatted string: "{phase_id}" or "{phase_id}: {objective}"
+
 - `format_plan_details(plan_data, root, path) -> str`: Format plan details as multi-line string for display.
 
 Args:
-  plan_data: Plan frontmatter dictionary.
-  root: Repository root for relative path calculation (optional).
-  path: Plan file path (optional).
+plan_data: Plan frontmatter dictionary.
+root: Repository root for relative path calculation (optional).
+path: Plan file path (optional).
 
 Returns:
-  Formatted string with plan details.
+Formatted string with plan details.
+
 - `format_plan_list_table(plans, format_type, truncate) -> str`: Format plans as table, JSON, or TSV.
 
 Args:
-  plans: Plan frontmatter dictionaries.
-  format_type: Output format (table|json|tsv).
-  truncate: If True, truncate long fields.
+plans: Plan frontmatter dictionaries.
+format_type: Output format (table|json|tsv).
+truncate: If True, truncate long fields.
 
 Returns:
-  Formatted string in requested format.
+Formatted string in requested format.
+
 - `format_revision_details(artifact, root) -> str`: Format revision details as multi-line string for display.
 
 Args:
-  artifact: ChangeArtifact to format (must be kind='revision')
-  root: Repository root for relative path calculation (optional)
+artifact: ChangeArtifact to format (must be kind='revision')
+root: Repository root for relative path calculation (optional)
 
 Returns:
-  Formatted string with all revision details
+Formatted string with all revision details

@@ -63,7 +63,7 @@ Posted when the status filter value changes.
 - `watch_current(self, value) -> None`
 - `__init__(self) -> None`
 
-### _SearchInput
+### \_SearchInput
 
 Search input that forwards navigation keys to the artifact table.
 

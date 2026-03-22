@@ -21,7 +21,7 @@ Test build_search_index end-to-end.
 
 ### TestExtractRelationTargets
 
-Test _extract_relation_targets.
+Test \_extract_relation_targets.
 
 #### Methods
 
@@ -32,7 +32,7 @@ Test _extract_relation_targets.
 
 ### TestExtractSearchableFields
 
-Test _extract_searchable_fields.
+Test \_extract_searchable_fields.
 
 #### Methods
 
@@ -46,8 +46,8 @@ Test _extract_searchable_fields.
 - `test_tags_produce_per_tag_entries(self)`
 - `test_whitespace_tags_stripped(self)`
 
-### _BadRecord
+### \_BadRecord
 
-### _FakeRecord
+### \_FakeRecord
 
 Minimal record for testing field extraction.

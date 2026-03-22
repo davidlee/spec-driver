@@ -99,15 +99,15 @@ handoff` claims the handoff with identity-based guard and transitions to
 
 ## 5. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-|--------|-----|-------------|-------|
-| [x] | T01 | Handoff I/O module | `handoff_io.py` — read/write/build with validation, atomic writes |
-| [x] | T02 | Create handoff domain logic | Payload assembly from state + git + paths in `workflow.py` |
-| [x] | T03 | CLI `create handoff` command | Under `create` group, delegates to `workflow.create_handoff_command` |
-| [x] | T04 | Accept handoff domain logic | Claim guard + transition in `workflow.py` |
-| [x] | T05 | CLI `accept handoff` command | Under `accept` group via `accept_app` |
-| [x] | T06 | Tests | 14 handoff I/O + 16 CLI = 30 tests |
-| [x] | T07 | Lint and verify | ruff clean, 96 total workflow tests pass |
+| Status | ID  | Description                  | Notes                                                                |
+| ------ | --- | ---------------------------- | -------------------------------------------------------------------- |
+| [x]    | T01 | Handoff I/O module           | `handoff_io.py` — read/write/build with validation, atomic writes    |
+| [x]    | T02 | Create handoff domain logic  | Payload assembly from state + git + paths in `workflow.py`           |
+| [x]    | T03 | CLI `create handoff` command | Under `create` group, delegates to `workflow.create_handoff_command` |
+| [x]    | T04 | Accept handoff domain logic  | Claim guard + transition in `workflow.py`                            |
+| [x]    | T05 | CLI `accept handoff` command | Under `accept` group via `accept_app`                                |
+| [x]    | T06 | Tests                        | 14 handoff I/O + 16 CLI = 30 tests                                   |
+| [x]    | T07 | Lint and verify              | ruff clean, 96 total workflow tests pass                             |
 
 ## 6. Decisions & Outcomes
 

@@ -19,6 +19,7 @@
 **state.yaml and handoff retain control-plane vocabulary** (`"complete"`, not `"completed"`). DR-104 §4.2 proposed normalising `state.yaml` and handoff payload to `STATUS_COMPLETED`, but the `PHASE_STATUS_VALUES` schema in `workflow_metadata.py` enforces `["not_started", "in_progress", "blocked", "complete", "skipped"]`. Writing `"completed"` breaks schema validation. The handoff schema uses the same vocabulary.
 
 This means:
+
 - Frontmatter (normative): `completed` ✓ (lifecycle vocabulary)
 - state.yaml (transient): `complete` (control-plane vocabulary, unchanged)
 - Handoff payload: `complete` (control-plane vocabulary, unchanged)

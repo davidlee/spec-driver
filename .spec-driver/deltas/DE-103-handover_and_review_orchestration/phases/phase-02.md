@@ -115,23 +115,23 @@ schema validation and workflow.toml config loader extensions.
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description | Notes |
-|--------|-----|-------------|-------|
-| [x] | T01 | Create `supekku/scripts/lib/workflow/` package — state machine | `state_machine.py` — 7 states, transition table, claim guard |
-| [x] | T02 | State.yaml reader/writer with validation | `state_io.py` — atomic writes, MetadataValidator, init/update helpers |
-| [x] | T03 | Extend `workflow.toml` config loader | Already done — `[workflow]` + `[review]` in DEFAULT_CONFIG + section comments |
-| [x] | T04 | CLI `phase start` command | `phase_app` group in `workflow.py`; auto-discovers plan/phase |
-| [x] | T05 | CLI `workflow status` command | `workflow_app` group; human-readable output |
-| [x] | T06 | CLI `block` / `unblock` commands | Top-level via main.py; previous-state preservation |
-| [x] | T07 | Tests | 25 state machine + 22 state I/O + 19 CLI = 66 tests |
-| [x] | T08 | Lint and verify | ruff clean, all tests pass |
+| Status | ID  | Description                                                    | Notes                                                                         |
+| ------ | --- | -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [x]    | T01 | Create `supekku/scripts/lib/workflow/` package — state machine | `state_machine.py` — 7 states, transition table, claim guard                  |
+| [x]    | T02 | State.yaml reader/writer with validation                       | `state_io.py` — atomic writes, MetadataValidator, init/update helpers         |
+| [x]    | T03 | Extend `workflow.toml` config loader                           | Already done — `[workflow]` + `[review]` in DEFAULT_CONFIG + section comments |
+| [x]    | T04 | CLI `phase start` command                                      | `phase_app` group in `workflow.py`; auto-discovers plan/phase                 |
+| [x]    | T05 | CLI `workflow status` command                                  | `workflow_app` group; human-readable output                                   |
+| [x]    | T06 | CLI `block` / `unblock` commands                               | Top-level via main.py; previous-state preservation                            |
+| [x]    | T07 | Tests                                                          | 25 state machine + 22 state I/O + 19 CLI = 66 tests                           |
+| [x]    | T08 | Lint and verify                                                | ruff clean, all tests pass                                                    |
 
 ## 8. Risks & Mitigations
 
-| Risk | Mitigation | Status |
-|------|-----------|--------|
-| CLI routing conflict with `create phase` | `phase start` is a separate Typer group from `create phase` | open |
-| MetadataValidator may not validate all state.yaml constraints | Command-level validation supplements schema validation | open |
+| Risk                                                          | Mitigation                                                  | Status |
+| ------------------------------------------------------------- | ----------------------------------------------------------- | ------ |
+| CLI routing conflict with `create phase`                      | `phase start` is a separate Typer group from `create phase` | open   |
+| MetadataValidator may not validate all state.yaml constraints | Command-level validation supplements schema validation      | open   |
 
 ## 9. Decisions & Outcomes
 

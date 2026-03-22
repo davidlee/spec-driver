@@ -15,32 +15,32 @@ Design a workflow/orchestration layer for spec-driver that reduces manual handov
 
 The intent is **not** to replace DE/IP/phases/notes with a new system. The intent is to add a small machine-readable control plane that allows the CLI to:
 
-* detect workflow state reliably
-* emit structured handovers at phase boundaries
-* support persistent reviewer sessions across multiple rounds
-* recover cleanly from agent/session death
-* amortize reviewer bootstrap effort rather than paying it repeatedly
-* remain flexible enough for different users, agents, and workflow preferences
+- detect workflow state reliably
+- emit structured handovers at phase boundaries
+- support persistent reviewer sessions across multiple rounds
+- recover cleanly from agent/session death
+- amortize reviewer bootstrap effort rather than paying it repeatedly
+- remain flexible enough for different users, agents, and workflow preferences
 
 ## Non-goals
 
 Do not design:
 
-* a general-purpose workflow engine unrelated to spec-driver artifacts
-* a transcript-centric agent memory system
-* a subagent framework that assumes fresh agents for every review round
-* a breaking redesign of DE/IP/phase schemas
-* a system that requires operators to abandon readable markdown artifacts
+- a general-purpose workflow engine unrelated to spec-driver artifacts
+- a transcript-centric agent memory system
+- a subagent framework that assumes fresh agents for every review round
+- a breaking redesign of DE/IP/phase schemas
+- a system that requires operators to abandon readable markdown artifacts
 
 ## Existing surfaces to preserve
 
 The design must respect the current workflow-facing artifacts and their roles:
 
-* `DE-*.md` as design/intent authority
-* `IP-*.md` as implementation/phase/verification authority
-* `phases/*.md` as per-phase execution records and natural handover boundaries
-* `notes.md` as human-readable execution narrative and onboarding surface
-* continuation skill behavior as the current transition mechanism to update notes and emit next-step guidance
+- `DE-*.md` as design/intent authority
+- `IP-*.md` as implementation/phase/verification authority
+- `phases/*.md` as per-phase execution records and natural handover boundaries
+- `notes.md` as human-readable execution narrative and onboarding surface
+- continuation skill behavior as the current transition mechanism to update notes and emit next-step guidance
 
 The new functionality should be **additive**, not substitutive.
 
@@ -54,10 +54,10 @@ This is the problem of making phase transitions and agent-to-agent continuation 
 
 Structured handoff solves:
 
-* operator copy-paste burden
-* deterministic next-agent priming
-* lifecycle automation
-* recovery from session loss
+- operator copy-paste burden
+- deterministic next-agent priming
+- lifecycle automation
+- recovery from session loss
 
 ### 2. Review bootstrap amortization
 
@@ -65,10 +65,10 @@ This is the problem of avoiding repeated expensive reviewer setup.
 
 Persistent reviewer support must solve:
 
-* reusing prior artifact understanding
-* preserving reviewed dependency surfaces
-* preserving invariants and prior findings
-* resuming productive review without cold-starting each round
+- reusing prior artifact understanding
+- preserving reviewed dependency surfaces
+- preserving invariants and prior findings
+- resuming productive review without cold-starting each round
 
 Structured handoff alone does **not** solve this second problem.
 
@@ -106,9 +106,9 @@ A live session is an optimization. Durable workflow/review state on disk is the 
 
 ### Preferred formats
 
-* YAML for workflow state and handoff artifacts
-* TOML for user/config policy in `.spec-driver/workflow.toml`
-* markdown with fenced YAML only where prose and machine-readable state need to coexist
+- YAML for workflow state and handoff artifacts
+- TOML for user/config policy in `.spec-driver/workflow.toml`
+- markdown with fenced YAML only where prose and machine-readable state need to coexist
 
 ### Preferred placement
 
@@ -116,11 +116,11 @@ Use a dedicated workflow directory inside the delta bundle for machine-facing ar
 
 Reasoning:
 
-* easier file watching
-* atomic file rewrites
-* easier schema validation
-* avoids brittle parsing of mutable markdown
-* clearer ownership boundaries
+- easier file watching
+- atomic file rewrites
+- easier schema validation
+- avoids brittle parsing of mutable markdown
+- clearer ownership boundaries
 
 ## Key invariants to preserve
 
@@ -170,11 +170,11 @@ New YAML files under `workflow/` provide machine-readable orchestration state.
 
 New spec-driver commands manage:
 
-* handoff emission
-* reviewer priming
-* reviewer resumption
-* approval/change-request transitions
-* session reconciliation/status
+- handoff emission
+- reviewer priming
+- reviewer resumption
+- approval/change-request transitions
+- session reconciliation/status
 
 ## Reviewer persistence model
 
@@ -188,9 +188,9 @@ A tmux/jail-backed reviewer session may remain alive across multiple rounds.
 
 Reviewer understanding must also be persisted in structured files so that:
 
-* reviewer sessions can be recreated
-* prior review work is not lost
-* the CLI can reason about review state without scraping transcripts
+- reviewer sessions can be recreated
+- prior review work is not lost
+- the CLI can reason about review state without scraping transcripts
 
 Tier 2 is the critical requirement.
 
@@ -231,18 +231,18 @@ Embedded YAML in markdown is better where the state exists mainly to help humans
 
 The expected design bias is:
 
-* separate files for operational state
-* embedded bridge blocks only where they improve usability
+- separate files for operational state
+- embedded bridge blocks only where they improve usability
 
 ### Reviewer warmth vs cache staleness
 
 A persistent reviewer is efficient only if its cached understanding remains valid.
 The design should include invalidation/reprime conditions such as:
 
-* major scope drift
-* dependency surface expansion
-* rebase or substantial code movement
-* phase boundary crossing into materially different territory
+- major scope drift
+- dependency surface expansion
+- rebase or substantial code movement
+- phase boundary crossing into materially different territory
 
 ### Strict schema vs operator flexibility
 
@@ -253,11 +253,11 @@ Human prose should remain flexible.
 
 The control plane should stay small, but it must contain enough state to support:
 
-* deterministic continuation
-* review continuity
-* recovery
-* status display
-* event-driven orchestration
+- deterministic continuation
+- review continuity
+- recovery
+- status display
+- event-driven orchestration
 
 ## Expected outputs from the local agent
 
@@ -267,40 +267,40 @@ The local agent should scope and design:
 
 Define and validate the new workflow artifacts, minimally:
 
-* workflow state
-* current handoff
-* review index / bootstrap cache
-* review findings
-* session map
+- workflow state
+- current handoff
+- review index / bootstrap cache
+- review findings
+- session map
 
 ### 2. CLI surface
 
 Propose command semantics for:
 
-* handoff emission
-* review priming
-* review resumption
-* review approval / request changes
-* workflow status
+- handoff emission
+- review priming
+- review resumption
+- review approval / request changes
+- workflow status
 
 ### 3. Continuation skill refit
 
 Describe how continuation should evolve from:
 
-* updating notes and printing a prompt
+- updating notes and printing a prompt
 
 to:
 
-* updating notes
-* writing structured handoff state
-* optionally rendering a continuation prompt from structured state
+- updating notes
+- writing structured handoff state
+- optionally rendering a continuation prompt from structured state
 
 ### 4. Optional bridge sections
 
 Propose any minimal fenced YAML bridge sections in:
 
-* `notes.md`
-* phase sheets
+- `notes.md`
+- phase sheets
 
 only where they add clear value.
 
@@ -308,10 +308,10 @@ only where they add clear value.
 
 Define when reviewer state is:
 
-* warm
-* stale
-* invalid
-* reusable
+- warm
+- stale
+- invalid
+- reusable
 
 ### 6. Migration/compatibility strategy
 
@@ -321,13 +321,13 @@ Explain how to introduce the new functionality without breaking existing workflo
 
 A good design should satisfy these tests:
 
-* Can a phase completion emit a structured handoff without requiring operator copy-paste?
-* Can the CLI resume the correct next role deterministically?
-* Can a reviewer be resumed for round 3 without reconstructing rounds 1 and 2 from transcripts?
-* Can a dead reviewer session be recreated without a true cold start?
-* Can status be inspected from a small set of predictable files?
-* Are DE/IP/phase schemas left largely untouched?
-* Does `notes.md` remain readable and useful?
+- Can a phase completion emit a structured handoff without requiring operator copy-paste?
+- Can the CLI resume the correct next role deterministically?
+- Can a reviewer be resumed for round 3 without reconstructing rounds 1 and 2 from transcripts?
+- Can a dead reviewer session be recreated without a true cold start?
+- Can status be inspected from a small set of predictable files?
+- Are DE/IP/phase schemas left largely untouched?
+- Does `notes.md` remain readable and useful?
 
 ## Implementation posture
 
@@ -335,20 +335,20 @@ The requested work is **scoping and design**, not a broad speculative redesign.
 
 The local agent should:
 
-* work from the current spec-driver artifact model
-* prefer the smallest viable additive design
-* identify where exact schema hooks belong
-* make explicit any assumptions about existing CLI/skill infrastructure
-* call out any places where continuation, notes structure, or phase conventions impose constraints
+- work from the current spec-driver artifact model
+- prefer the smallest viable additive design
+- identify where exact schema hooks belong
+- make explicit any assumptions about existing CLI/skill infrastructure
+- call out any places where continuation, notes structure, or phase conventions impose constraints
 
 ## Final design heuristic
 
 The system should feel like:
 
-* existing spec-driver workflow artifacts remain central
-* the CLI gains enough structured state to automate transitions
-* reviewer persistence becomes genuinely economical, not merely recoverable
-* the control plane is visible, inspectable, and easy to reason about
+- existing spec-driver workflow artifacts remain central
+- the CLI gains enough structured state to automate transitions
+- reviewer persistence becomes genuinely economical, not merely recoverable
+- the control plane is visible, inspectable, and easy to reason about
 
 It should **not** feel like a second workflow system bolted on beside the first.
 

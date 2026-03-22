@@ -1,178 +1,187 @@
 decisions:
   ADR-001:
     id: ADR-001
-    title: 'ADR-001: use spec-driver to build spec-driver'
+    title: "ADR-001: use spec-driver to build spec-driver"
     status: accepted
     path: .spec-driver/decisions/ADR-001-use-spec-driver-to-build-spec-driver.md
-    summary: ''
-    created: '2025-11-01'
-    updated: '2025-11-01'
-    reviewed: '2025-11-01'
+    summary: ""
+    created: "2025-11-01"
+    updated: "2025-11-01"
+    reviewed: "2025-11-01"
   ADR-002:
     id: ADR-002
-    title: 'ADR-002: Do not store backlinks in frontmatter'
+    title: "ADR-002: Do not store backlinks in frontmatter"
     status: accepted
     path: .spec-driver/decisions/ADR-002-do-not-store-backlinks-in-frontmatter.md
-    summary: Backlinks between artifacts must be computed at runtime from forward
+    summary:
+      Backlinks between artifacts must be computed at runtime from forward
       references, not stored in frontmatter, to prevent data consistency issues and
       maintain single source of truth.
-    created: '2025-11-02'
-    updated: '2025-11-02'
-    reviewed: '2025-11-02'
+    created: "2025-11-02"
+    updated: "2025-11-02"
+    reviewed: "2025-11-02"
     specs:
-    - PROD-003
+      - PROD-003
     related_decisions:
-    - ADR-001
+      - ADR-001
     tags:
-    - architecture
-    - data-model
-    - governance
+      - architecture
+      - data-model
+      - governance
   ADR-003:
     id: ADR-003
-    title: 'ADR-003: Separate unit and assembly specs'
+    title: "ADR-003: Separate unit and assembly specs"
     status: accepted
     path: .spec-driver/decisions/ADR-003-separate_unit_and_assembly_specs.md
-    summary: Introduce explicit separation between auto-generated unit specs (1:1
+    summary:
+      Introduce explicit separation between auto-generated unit specs (1:1
       with code units) and human-authored assembly specs (cross-unit), with a clear
       truth/precedence model.
-    created: '2026-02-20'
-    updated: '2026-02-21'
-    reviewed: '2026-02-21'
+    created: "2026-02-20"
+    updated: "2026-02-21"
+    reviewed: "2026-02-21"
   ADR-004:
     id: ADR-004
-    title: 'ADR-004: canonical core workflow loop'
+    title: "ADR-004: canonical core workflow loop"
     status: accepted
     path: .spec-driver/decisions/ADR-004-canonical_workflow_loop.md
-    summary: Define the single canonical spec-driver workflow loop, distinguish supported
+    summary:
+      Define the single canonical spec-driver workflow loop, distinguish supported
       variants from canon, and reject spec-first aspirational doctrine as the default
       for code-changing work.
-    created: '2026-03-06'
-    updated: '2026-03-06'
-    reviewed: '2026-03-06'
+    created: "2026-03-06"
+    updated: "2026-03-06"
+    reviewed: "2026-03-06"
     owners:
-    - david
+      - david
     specs:
-    - PROD-002
-    - PROD-008
-    - PROD-009
-    - PROD-011
-    - PROD-016
+      - PROD-002
+      - PROD-008
+      - PROD-009
+      - PROD-011
+      - PROD-016
     deltas:
-    - DE-047
+      - DE-047
     related_decisions:
-    - ADR-001
-    - ADR-003
+      - ADR-001
+      - ADR-003
     tags:
-    - workflow
-    - doctrine
-    - lifecycle
+      - workflow
+      - doctrine
+      - lifecycle
   ADR-005:
     id: ADR-005
-    title: 'ADR-005: Memories and skills are the canonical guidance layer'
+    title: "ADR-005: Memories and skills are the canonical guidance layer"
     status: accepted
     path: .spec-driver/decisions/ADR-005-memories_and_skills_are_the_canonical_guidance_layer.md
-    summary: Declare agent memories as the canonical conceptual guidance for spec-driver
+    summary:
+      Declare agent memories as the canonical conceptual guidance for spec-driver
       and skills as the canonical procedural guidance layer; reduce other documentation
       to minimal routing, reference, or derived views.
-    created: '2026-03-06'
-    updated: '2026-03-06'
-    reviewed: '2026-03-06'
+    created: "2026-03-06"
+    updated: "2026-03-06"
+    reviewed: "2026-03-06"
     owners:
-    - david
+      - david
     specs:
-    - PROD-016
+      - PROD-016
     deltas:
-    - DE-047
+      - DE-047
     related_decisions:
-    - ADR-004
+      - ADR-004
     tags:
-    - documentation
-    - memories
-    - skills
-    - doctrine
+      - documentation
+      - memories
+      - skills
+      - doctrine
   ADR-006:
     id: ADR-006
-    title: 'ADR-006: consolidate workspace directories under .spec-driver'
+    title: "ADR-006: consolidate workspace directories under .spec-driver"
     status: accepted
     path: .spec-driver/decisions/ADR-006-consolidate_workspace_directories_under_spec_driver.md
-    summary: Canonical spec-driver workspace directories move under .spec-driver/;
+    summary:
+      Canonical spec-driver workspace directories move under .spec-driver/;
       migration tooling and broad content reference cleanup are deferred, while legacy
       compatibility paths are treated as optional non-default views.
-    created: '2026-03-06'
-    updated: '2026-03-06'
-    reviewed: '2026-03-06'
+    created: "2026-03-06"
+    updated: "2026-03-06"
+    reviewed: "2026-03-06"
     related_decisions:
-    - ADR-001
-    - ADR-003
+      - ADR-001
+      - ADR-003
     tags:
-    - architecture
-    - workspace
-    - install
+      - architecture
+      - workspace
+      - install
   ADR-007:
     id: ADR-007
-    title: 'ADR-007: contracts are derived observed corpus with dedicated canonical
-      storage'
+    title:
+      "ADR-007: contracts are derived observed corpus with dedicated canonical
+      storage"
     status: accepted
     path: .spec-driver/decisions/ADR-007-contracts_are_derived_observed_corpus_with_dedicated_canonical_storage.md
-    summary: Contracts are derived observation artefacts, not competing intent; they
+    summary:
+      Contracts are derived observation artefacts, not competing intent; they
       belong in a dedicated canonical contracts corpus, while spec-bundle and index
       paths remain derived compatibility or navigation views.
-    created: '2026-03-06'
-    updated: '2026-03-06'
-    reviewed: '2026-03-06'
+    created: "2026-03-06"
+    updated: "2026-03-06"
+    reviewed: "2026-03-06"
     specs:
-    - PROD-005
-    - PROD-012
-    - PROD-014
+      - PROD-005
+      - PROD-012
+      - PROD-014
     deltas:
-    - DE-047
+      - DE-047
     related_decisions:
-    - ADR-003
-    - ADR-004
-    - ADR-006
+      - ADR-003
+      - ADR-004
+      - ADR-006
     tags:
-    - contracts
-    - architecture
-    - sync
+      - contracts
+      - architecture
+      - sync
   ADR-008:
     id: ADR-008
-    title: 'ADR-008: normative lifecycle truth and observed evidence reconciliation'
+    title: "ADR-008: normative lifecycle truth and observed evidence reconciliation"
     status: accepted
     path: .spec-driver/decisions/ADR-008-normative_lifecycle_truth_and_observed_evidence_reconciliation.md
-    summary: Specs own normative lifecycle truth; audits, deltas, and contracts contribute
+    summary:
+      Specs own normative lifecycle truth; audits, deltas, and contracts contribute
       observed evidence overlays; drift is reconciled explicitly rather than silently
       by timestamp precedence.
-    created: '2026-03-06'
-    updated: '2026-03-06'
-    reviewed: '2026-03-06'
+    created: "2026-03-06"
+    updated: "2026-03-06"
+    reviewed: "2026-03-06"
     specs:
-    - PROD-008
-    - PROD-009
+      - PROD-008
+      - PROD-009
     deltas:
-    - DE-047
+      - DE-047
     related_decisions:
-    - ADR-004
+      - ADR-004
     tags:
-    - lifecycle
-    - requirements
-    - architecture
+      - lifecycle
+      - requirements
+      - architecture
   ADR-009:
     id: ADR-009
-    title: 'ADR-009: standard registry API convention'
+    title: "ADR-009: standard registry API convention"
     status: accepted
     path: .spec-driver/decisions/ADR-009-standard_registry_api_convention.md
-    summary: 'Codify the canonical registry API surface from the converged registries:
+    summary:
+      "Codify the canonical registry API surface from the converged registries:
       find, collect, iter, domain-specific filter, and keyword-only root auto-discovery,
-      while deferring Protocol/ABC standardisation.'
-    created: '2026-03-06'
-    updated: '2026-03-06'
-    reviewed: '2026-03-06'
+      while deferring Protocol/ABC standardisation."
+    created: "2026-03-06"
+    updated: "2026-03-06"
+    reviewed: "2026-03-06"
     deltas:
-    - DE-050
+      - DE-050
     related_decisions:
-    - ADR-002
+      - ADR-002
     tags:
-    - architecture
-    - api
-    - registry
-    - conventions
+      - architecture
+      - api
+      - registry
+      - conventions

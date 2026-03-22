@@ -14,8 +14,8 @@ workflow:
   active_role: implementer
   handoff_boundary: phase
 timestamps:
-  created: '2026-03-21T01:01:06+00:00'
-  updated: '2026-03-21T01:01:19+00:00'
+  created: "2026-03-21T01:01:06+00:00"
+  updated: "2026-03-21T01:01:19+00:00"
 plan:
   id: IP-103
   path: .spec-driver/deltas/DE-103-handover_and_review_orchestration/IP-103.md

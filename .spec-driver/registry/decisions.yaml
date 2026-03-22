@@ -165,7 +165,7 @@ decisions:
       find, collect, iter, domain-specific filter, and keyword-only root auto-discovery,
       while deferring Protocol/ABC standardisation.'
     created: '2026-03-06'
-    updated: '2026-03-06'
+    updated: '2026-03-22'
     reviewed: '2026-03-06'
     deltas:
     - DE-050
@@ -197,3 +197,26 @@ decisions:
     - metadata
     - frontmatter
     - placement
+  ADR-011:
+    id: ADR-011
+    title: 'ADR-011: CLI registry access must route through Workspace'
+    status: accepted
+    path: .spec-driver/decisions/ADR-011-cli_registry_access_must_route_through_workspace.md
+    summary: CLI command implementations must acquire registries exclusively through
+      Workspace, not by direct import of registry classes.
+    created: '2026-03-22'
+    updated: '2026-03-22'
+    reviewed: '2026-03-22'
+    specs:
+    - SPEC-110
+    deltas:
+    - DE-120
+    related_decisions:
+    - ADR-009
+    related_policies:
+    - POL-001
+    tags:
+    - architecture
+    - cli
+    - registry
+    - coupling

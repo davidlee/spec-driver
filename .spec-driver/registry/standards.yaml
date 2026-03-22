@@ -1,22 +1,71 @@
 standards:
   STD-001:
     id: STD-001
-    title: "STD-001: use typer / rich for cli ux elements"
-    status: draft
+    title: 'STD-001: CLI implementation standard (Typer/Rich)'
+    status: required
     path: .spec-driver/standards/STD-001-use-typer-rich-for-cli-ux-elements.md
-    summary: ""
-    created: "2025-11-04"
-    updated: "2025-11-04"
-    reviewed: "2025-11-04"
+    summary: 'Canonical patterns for CLI command implementation: Workspace acquisition,
+      Typer/Rich usage, module size limits, error handling.'
+    created: '2025-11-04'
+    updated: '2026-03-22'
+    reviewed: '2026-03-22'
+    specs:
+    - SPEC-110
+    related_policies:
+    - POL-001
+    related_standards:
+    - STD-002
     tags:
-      - cli
-      - ui
+    - cli
+    - ui
+    - typer
+    - rich
   STD-002:
     id: STD-002
-    title: "STD-002: govern lint signal and prioritise pylint fixes"
-    status: draft
+    title: 'STD-002: govern lint signal and prioritise pylint fixes'
+    status: required
     path: .spec-driver/standards/STD-002-govern_lint_signal_and_prioritise_pylint_fixes.md
-    summary: ""
-    created: "2026-03-07"
-    updated: "2026-03-07"
-    reviewed: "2026-03-07"
+    summary: 'Keep pylint output decision-useful: do not excuse new warnings with
+      existing debt, prioritize high-signal message families, and treat test docstring
+      noise as low-priority.'
+    created: '2026-03-07'
+    updated: '2026-03-22'
+    reviewed: '2026-03-07'
+    specs:
+    - PROD-003
+    deltas:
+    - DE-058
+    tags:
+    - lint
+    - pylint
+    - quality
+    - maintenance
+  STD-003:
+    id: STD-003
+    title: 'STD-003: utility module placement rule'
+    status: required
+    path: .spec-driver/standards/STD-003-utility_module_placement_rule.md
+    summary: Extracted shared utilities go in core/ or the narrowest shared lib/ package.
+      Never in a registry or creation module.
+    created: '2026-03-22'
+    updated: '2026-03-22'
+    reviewed: '2026-03-22'
+    policies:
+    - POL-001
+    deltas:
+    - DE-115
+    related_policies:
+    - POL-001
+    tags:
+    - architecture
+    - code-organization
+    - utilities
+  STD-004:
+    id: STD-004
+    title: 'STD-004: Script lifecycle: orphan prevention'
+    status: draft
+    path: .spec-driver/standards/STD-004-script_lifecycle_orphan_prevention.md
+    summary: ''
+    created: '2026-03-22'
+    updated: '2026-03-22'
+    reviewed: '2026-03-22'

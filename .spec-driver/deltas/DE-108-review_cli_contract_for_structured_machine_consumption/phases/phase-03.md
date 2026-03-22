@@ -1,10 +1,10 @@
 ---
 id: IP-108-P03
 slug: "108-review_cli_contract_for_structured_machine_consumption-phase-03"
-name: "New commands + finding disposition JSON"
+name: New commands + finding disposition JSON
 created: "2026-03-22"
 updated: "2026-03-22"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-108
 delta: DE-108

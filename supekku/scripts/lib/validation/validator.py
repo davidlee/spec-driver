@@ -32,6 +32,8 @@ if TYPE_CHECKING:
   from pathlib import Path
   from typing import Any
 
+  from pydantic import BaseModel
+
   from .changes.artifacts import ChangeArtifact
   from .workspace import Workspace
 
@@ -165,9 +167,19 @@ class WorkspaceValidator:
     self._validate_phase_statuses()
 
     # Kind-aware frontmatter validation (DE-112)
-    self._validate_memory_files()
-    self._validate_backlog_files()
-    self._validate_drift_files()
+    memory_dir = get_memory_dir(self.workspace.root)
+    backlog_dir = get_backlog_dir(self.workspace.root)
+    drift_dir = get_drift_dir(self.workspace.root)
+    self._validate_kind_frontmatter(
+      MemoryRecord, "Memory", [memory_dir], glob="mem.*.md",
+    )
+    self._validate_kind_frontmatter(
+      BacklogItem, "Backlog",
+      [backlog_dir / d for d in ("issues", "problems", "improvements", "risks")],
+    )
+    self._validate_kind_frontmatter(
+      DriftLedger, "Drift", [drift_dir], glob="DL-*.md",
+    )
 
     return list(self.issues)
 
@@ -535,84 +547,37 @@ class WorkspaceValidator:
 
   # -- Kind-aware frontmatter validation (DE-112) -------------------------
 
-  def _validate_memory_frontmatter(
+  def _validate_kind_frontmatter(
     self,
-    fm: dict[str, Any],
-    artifact: str,
+    model_cls: type[BaseModel],
+    label: str,
+    directories: Iterable[Path],
+    glob: str = "*.md",
   ) -> None:
-    """Validate memory frontmatter via MemoryRecord model."""
-    try:
-      MemoryRecord(**fm)
-    except Exception:  # noqa: BLE001
-      self._warning(artifact, "Memory frontmatter failed Pydantic validation")
+    """Validate frontmatter files against a Pydantic model.
 
-  def _validate_backlog_frontmatter(
-    self,
-    fm: dict[str, Any],
-    artifact: str,
-  ) -> None:
-    """Validate backlog item frontmatter via BacklogItem model."""
-    try:
-      BacklogItem(**fm)
-    except Exception:  # noqa: BLE001
-      self._warning(artifact, "Backlog frontmatter failed Pydantic validation")
-
-  def _validate_drift_frontmatter(
-    self,
-    fm: dict[str, Any],
-    artifact: str,
-  ) -> None:
-    """Validate drift ledger frontmatter via DriftLedger model."""
-    try:
-      DriftLedger(**fm)
-    except Exception:  # noqa: BLE001
-      self._warning(artifact, "Drift frontmatter failed Pydantic validation")
-
-  def _validate_memory_files(self) -> None:
-    """Validate all memory file frontmatter."""
-    memory_dir = get_memory_dir(self.workspace.root)
-    if not memory_dir.exists():
-      return
-    for mem_file in sorted(memory_dir.glob("mem.*.md")):
-      try:
-        fm, _ = load_markdown_file(mem_file)
-      except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
-        self._warning(mem_file.name, "Could not parse frontmatter")
+    Walks *directories*, globs for *glob*, parses frontmatter, and
+    attempts ``model_cls(**fm)``.  Failures emit a warning using *label*
+    (e.g. "Memory", "Backlog", "Drift").
+    """
+    for directory in directories:
+      if not directory.is_dir():
         continue
-      if fm:
-        self._validate_memory_frontmatter(fm, fm.get("id", mem_file.name))
-
-  def _validate_backlog_files(self) -> None:
-    """Validate all backlog item frontmatter."""
-    backlog_dir = get_backlog_dir(self.workspace.root)
-    if not backlog_dir.exists():
-      return
-    for kind_dir_name in ("issues", "problems", "improvements", "risks"):
-      kind_dir = backlog_dir / kind_dir_name
-      if not kind_dir.is_dir():
-        continue
-      for item_file in sorted(kind_dir.glob("*.md")):
+      for md_file in sorted(directory.glob(glob)):
         try:
-          fm, _ = load_markdown_file(item_file)
+          fm, _ = load_markdown_file(md_file)
         except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
-          self._warning(item_file.name, "Could not parse frontmatter")
+          self._warning(md_file.name, "Could not parse frontmatter")
           continue
         if fm:
-          self._validate_backlog_frontmatter(fm, fm.get("id", item_file.name))
-
-  def _validate_drift_files(self) -> None:
-    """Validate all drift ledger frontmatter."""
-    drift_dir = get_drift_dir(self.workspace.root)
-    if not drift_dir.exists():
-      return
-    for drift_file in sorted(drift_dir.glob("DL-*.md")):
-      try:
-        fm, _ = load_markdown_file(drift_file)
-      except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
-        self._warning(drift_file.name, "Could not parse frontmatter")
-        continue
-      if fm:
-        self._validate_drift_frontmatter(fm, fm.get("id", drift_file.name))
+          artifact = fm.get("id", md_file.name)
+          try:
+            model_cls(**fm)
+          except Exception:  # noqa: BLE001
+            self._warning(
+              artifact,
+              f"{label} frontmatter failed Pydantic validation",
+            )
 
 
 def validate_workspace(

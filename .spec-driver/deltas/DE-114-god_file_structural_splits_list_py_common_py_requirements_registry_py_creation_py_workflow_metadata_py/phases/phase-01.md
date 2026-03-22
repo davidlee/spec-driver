@@ -4,7 +4,7 @@ slug: "114-cli_layer_split_common_and_list-phase-01"
 name: "CLI layer: split common.py and list.py"
 created: "2026-03-22"
 updated: "2026-03-22"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-114
 delta: DE-114

@@ -4,7 +4,7 @@ slug: "108-review_cli_contract_for_structured_machine_consumption-phase-02"
 name: "Existing commands — JSON output for prime, complete, teardown"
 created: "2026-03-22"
 updated: "2026-03-22"
-status: draft
+status: completed
 kind: phase
 plan: IP-108
 delta: DE-108

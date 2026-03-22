@@ -6,7 +6,7 @@
 
 **DE-107** — Pydantic model layer migration (repurposed from spike).
 
-Status: `draft`. DR-107 needs review before execution.
+Status: `draft`. DR-107 approved. IP-107 gates passed. Ready for Phase 1.
 
 ### Context
 
@@ -38,11 +38,12 @@ Repurposed to cover the actual migration of all model files to Pydantic.
 
 - `supekku/scripts/lib/changes/phase_model.py` — PhaseSheet (DE-106)
 
-### Open Questions (from DR-107)
+### Resolved Questions
 
-1. `to_dict(root)` path-relativization approach
-2. `dataclasses.fields()` / `asdict()` consumer check needed
-3. Import time verification with multiple models
+1. `to_dict(root)`: thin wrapper over `model_dump(exclude_none=True)` + path fixup (DEC-107-003)
+2. `dataclasses.fields()` / `asdict()`: zero usage in non-test code (DEC-107-005)
+3. Import time: 37ms shared import, negligible incremental cost
+4. `from_frontmatter()`: 1 call site per model in registry — remove classmethod, update call site (DEC-107-002)
 
 ### Subsumes
 

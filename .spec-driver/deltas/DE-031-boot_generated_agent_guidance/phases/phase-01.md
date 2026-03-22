@@ -1,6 +1,9 @@
 ---
+id: IP-031-P01
 status: completed
 kind: phase
+plan: IP-031
+delta: DE-031
 ---
 
 # Phase 1: Install `.claude/` settings & hooks

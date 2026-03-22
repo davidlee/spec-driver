@@ -34,8 +34,8 @@ if TYPE_CHECKING:
 
   from pydantic import BaseModel
 
-  from .changes.artifacts import ChangeArtifact
-  from .workspace import Workspace
+  from supekku.scripts.lib.changes.artifacts import ChangeArtifact
+  from supekku.scripts.lib.workspace import Workspace
 
 
 @dataclass(frozen=True)
@@ -467,6 +467,9 @@ class WorkspaceValidator:
     covered_slots = frozenset({"domain_field", "backlog_field"})
     for edge in find_unresolved_references(graph):
       if edge.source_slot in covered_slots:
+        continue
+      # Skip cross-project references (namespace:ID pattern)
+      if ":" in edge.target:
         continue
       emit(
         edge.source,

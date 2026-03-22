@@ -4,7 +4,7 @@ slug: "113-dead_code_purge_orphaned_scripts_hollow_functions_stale_migrations-ph
 name: "Purge orphaned scripts, relocate complete_delta, rename registry_migration"
 created: "2026-03-22"
 updated: "2026-03-22"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-113
 delta: DE-113

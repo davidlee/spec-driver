@@ -1,10 +1,10 @@
 ---
 id: IP-106-P01
 slug: "106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown-phase-01"
-name: "Phase 01 — Pydantic spike + creation/reader vertical slice"
+name: Phase 01 — Pydantic spike + creation/reader vertical slice
 created: "2026-03-22"
 updated: "2026-03-22"
-status: draft
+status: in-progress
 kind: phase
 ---
 

@@ -1,0 +1,21 @@
+schema: supekku.workflow.state
+version: 1
+artifact:
+  id: DE-106
+  kind: delta
+  path: .spec-driver/deltas/DE-106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown
+  notes_path: .spec-driver/deltas/DE-106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown/notes.md
+phase:
+  id: IP-106.PHASE-01
+  status: in_progress
+  path: .spec-driver/deltas/DE-106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown/phases/phase-01.md
+workflow:
+  status: implementing
+  active_role: implementer
+  handoff_boundary: phase
+timestamps:
+  created: '2026-03-22T01:55:21+00:00'
+  updated: '2026-03-22T01:55:21+00:00'
+plan:
+  id: IP-106
+  path: .spec-driver/deltas/DE-106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown/IP-106.md

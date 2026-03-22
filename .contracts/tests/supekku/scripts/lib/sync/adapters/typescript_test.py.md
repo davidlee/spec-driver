@@ -12,7 +12,7 @@ Tests for TypeScript/JavaScript language adapter.
 
 Test TypeScriptAdapter functionality.
 
-_pylint: disable=too-many-public-methods_
+*pylint: disable=too-many-public-methods*
 
 **Inherits from:** unittest.TestCase
 
@@ -22,14 +22,14 @@ _pylint: disable=too-many-public-methods_
 - `test_deduplicates_identical_variants(self) -> None`: Test that internal.md is removed when identical to api.md. - Should include install instructions
 - `test_describe_typescript_module_directory(self) -> None`: Test describe method for TypeScript directory module.
 - `test_describe_typescript_module_file(self) -> None`: Test describe method for TypeScript file.
-- `test_ensure_ts_doc_extract_available_caching(self) -> None`: Test \_ensure_ts_doc_extract_available caches result.
-- `test_ensure_ts_doc_extract_available_not_found(self) -> None`: Test \_ensure_ts_doc_extract_available when package not found. - Not called again
+- `test_ensure_ts_doc_extract_available_caching(self) -> None`: Test _ensure_ts_doc_extract_available caches result.
+- `test_ensure_ts_doc_extract_available_not_found(self) -> None`: Test _ensure_ts_doc_extract_available when package not found. - Not called again
 - `test_extract_ast_directory_no_index_raises_error(self) -> None`: Test AST extraction from directory without index file raises error.
 - `test_extract_ast_directory_with_index(self) -> None`: Test AST extraction from directory finds index.ts.
 - `test_extract_ast_invalid_json(self) -> None`: Test AST extraction handles invalid JSON output.
 - `test_extract_ast_subprocess_error(self) -> None`: Test AST extraction handles subprocess errors.
 - `test_extract_ast_success(self) -> None`: Test successful AST extraction.
-- `test_find_package_root_raises_when_not_found(self) -> None`: Test \_find_package_root raises error when no package.json found.
+- `test_find_package_root_raises_when_not_found(self) -> None`: Test _find_package_root raises error when no package.json found.
 - `test_find_package_root_success(self) -> None`: Test finding package.json in parent directory.
 - `test_generate_markdown_simple(self) -> None`: Test markdown generation from AST data.
 - `test_generate_markdown_with_class(self) -> None`: Test markdown generation with class.

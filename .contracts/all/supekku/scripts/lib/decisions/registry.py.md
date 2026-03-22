@@ -17,10 +17,10 @@ Record representing an Architecture Decision Record with metadata.
 - `to_dict(self, root) -> dict[Tuple[str, Any]]`: Convert to dictionary for YAML serialization.
 
 Args:
-root: Repository root path for relativizing file paths
+    root: Repository root path for relativizing file paths
 
 Returns:
-Dictionary representation suitable for YAML serialization
+    Dictionary representation suitable for YAML serialization
 
 ### DecisionRegistry
 
@@ -46,8 +46,7 @@ but this method is provided for future extensibility (e.g., specs or
 requirements referencing decisions).
 
 Args:
-decisions: Dictionary of DecisionRecords to populate with backlinks
-
+    decisions: Dictionary of DecisionRecords to populate with backlinks
 - `_cleanup_all_status_directories(self, decisions_dir) -> None`: Remove all symlinks from existing status directories.
 - `_parse_adr_file(self, adr_path) -> <BinOp>`: Parse an individual ADR file into a DecisionRecord.
 - `_rebuild_status_directory(self, status_dir, decisions) -> None`: Rebuild a single status directory with symlinks.

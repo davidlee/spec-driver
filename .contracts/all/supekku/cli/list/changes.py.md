@@ -8,7 +8,6 @@ List changes and plans commands.
 
 The --filter flag does substring matching (case-insensitive).
 The --regexp flag does pattern matching on ID, slug, and name fields.
-
 - @app.command(plans) `list_plans(root, status, substring, tag, regexp, case_insensitive, format_type, json_output, truncate) -> None`: List implementation plans with optional filtering.
 
 The --filter flag does substring matching (case-insensitive).

@@ -2,12 +2,12 @@
 
 Workflow state machine with explicit CLI-driven transitions.
 
-Implements the 7-state machine from DR-102 §4. All transitions are
+Implements the 7-state machine from DR-102 §4.  All transitions are
 triggered by explicit CLI commands — no implicit triggers.
 
 States:
-planned, implementing, awaiting_handoff, reviewing,
-changes_requested, approved, blocked.
+  planned, implementing, awaiting_handoff, reviewing,
+  changes_requested, approved, blocked.
 
 Design authority: DR-102 §4.
 
@@ -23,25 +23,24 @@ Design authority: DR-102 §4.
 - `apply_transition(current, command) -> TransitionResult`: Apply a transition command to the current state.
 
 Args:
-current: Current workflow state.
-command: Transition command to apply.
-to_role: Target role (required for ACCEPT_HANDOFF).
-previous_state: State before blocking (required for UNBLOCK).
+  current: Current workflow state.
+  command: Transition command to apply.
+  to_role: Target role (required for ACCEPT_HANDOFF).
+  previous_state: State before blocking (required for UNBLOCK).
 
 Returns:
-TransitionResult with previous and new states.
+  TransitionResult with previous and new states.
 
 Raises:
-TransitionError: If the transition is invalid.
-
+  TransitionError: If the transition is invalid.
 - `check_claim(current_claimant, requested_by) -> None`: Check the claim guard for handoff acceptance.
 
 Args:
-current_claimant: Current claimed_by value (None if unclaimed).
-requested_by: Identity requesting the claim.
+  current_claimant: Current claimed_by value (None if unclaimed).
+  requested_by: Identity requesting the claim.
 
 Raises:
-ClaimError: If claimed by a different identity.
+  ClaimError: If claimed by a different identity.
 
 No-op if unclaimed or same identity (idempotent).
 

@@ -22,7 +22,7 @@ VT-081-001: Coverage evidence is rebuilt fresh each sync.
 
 Test that coverage_entries field is populated during registry sync.
 
-After \_apply_coverage_blocks(), each RequirementRecord should have a
+After _apply_coverage_blocks(), each RequirementRecord should have a
 coverage_entries field containing the structured verification data
 (artefact, kind, status) from coverage blocks.
 

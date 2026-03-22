@@ -14,11 +14,11 @@ The --implemented-by flag filters to requirements a delta implements.
 Use --case-insensitive (-i) to make regexp and category filters case-insensitive.
 
 Examples:
-list requirements -k FR,NF # Multi-value kind filter
-list requirements --verified-by "VT-CLI-\*" # Glob pattern match
-list requirements --vstatus verified --json # Verification status filter
-list requirements --spec SPEC-110 --vkind VT # Combined filters
-list requirements --source-kind issue # Filter by source
-list requirements --implemented-by DE-090 # Requirements delta implements
-list requirements --unimplemented # Requirements without a delta
-list requirements --referenced-by delta # Requirements referenced by deltas
+  list requirements -k FR,NF                   # Multi-value kind filter
+  list requirements --verified-by "VT-CLI-*"   # Glob pattern match
+  list requirements --vstatus verified --json   # Verification status filter
+  list requirements --spec SPEC-110 --vkind VT  # Combined filters
+  list requirements --source-kind issue          # Filter by source
+  list requirements --implemented-by DE-090      # Requirements delta implements
+  list requirements --unimplemented              # Requirements without a delta
+  list requirements --referenced-by delta        # Requirements referenced by deltas

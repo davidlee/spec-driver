@@ -13,9 +13,9 @@ The --related-to flag searches all reference slots (relations, informed_by).
 The --relation flag filters by TYPE:TARGET in .relations only.
 
 Examples:
-list specs -k prod,tech # Multi-value kind filter
-list specs -s active --json # JSON output with status filter
-list specs --informed-by ADR-001 # Specs informed by an ADR
-list specs --related-to ADR-001 # Specs referencing ADR-001 in any slot
-list specs --relation implements:PROD-010 # By relation type and target
-list specs --refs # Include refs column
+  list specs -k prod,tech            # Multi-value kind filter
+  list specs -s active --json        # JSON output with status filter
+  list specs --informed-by ADR-001   # Specs informed by an ADR
+  list specs --related-to ADR-001    # Specs referencing ADR-001 in any slot
+  list specs --relation implements:PROD-010  # By relation type and target
+  list specs --refs                  # Include refs column

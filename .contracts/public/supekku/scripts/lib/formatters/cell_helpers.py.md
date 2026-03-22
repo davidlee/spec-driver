@@ -12,18 +12,17 @@ No Rich Table dependency — just string output.
 - `format_date_cell(value, missing, fmt) -> str`: Format a date for display.
 
 Args:
-value: Date to format. `None` returns the _missing_ sentinel.
-missing: Placeholder when _value_ is `None` (default: em dash).
-fmt: `strftime` format string (default: ISO date).
+  value: Date to format. ``None`` returns the *missing* sentinel.
+  missing: Placeholder when *value* is ``None`` (default: em dash).
+  fmt: ``strftime`` format string (default: ISO date).
 
 Returns:
-Formatted date string or _missing_ sentinel.
-
+  Formatted date string or *missing* sentinel.
 - `format_tags_cell(tags, style) -> str`: Format tags as a comma-separated Rich markup string.
 
 Args:
-tags: Tag values to format. Empty/None returns empty string.
-style: Rich style to apply (default: gold `#d79921`).
+  tags: Tag values to format. Empty/None returns empty string.
+  style: Rich style to apply (default: gold ``#d79921``).
 
 Returns:
-Styled string like `[#d79921]foo, bar[/#d79921]`, or `""` when empty.
+  Styled string like ``[#d79921]foo, bar[/#d79921]``, or ``""`` when empty.

@@ -89,7 +89,7 @@ VT-UPSERT-076-003 / VT-COMPAT-076-005: source fields.
 
 ### TestUpsertRecordProvenance
 
-VT-UPSERT-076-003: \_upsert_record stamps source provenance.
+VT-UPSERT-076-003: _upsert_record stamps source provenance.
 
 **Inherits from:** unittest.TestCase
 

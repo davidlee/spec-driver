@@ -13,29 +13,25 @@ Requirement extraction and parsing from spec content.
 
 ## Functions
 
-- `_is_requirement_like_line(line) -> bool`: Return True if _line_ plausibly attempts to define a requirement.
+- `_is_requirement_like_line(line) -> bool`: Return True if *line* plausibly attempts to define a requirement.
 
 A line is "requirement-like" if it contains an FR/NF-xxx ID and the
-ID is not purely a cross-reference. Cross-reference patterns:
-
+ID is not purely a cross-reference.  Cross-reference patterns:
 - "per FR-007" / "per PROD-004.FR-007"
 - All IDs on the line are inside parentheses
 
 Lines with no FR/NF ID at all return False.
-
 - `_load_breakout_metadata(spec_path) -> dict[Tuple[str, dict[Tuple[str, Any]]]]`: Load metadata from breakout requirement files under a spec.
 
-Scans `spec_path.parent / "requirements"` for `*.md` files and
-extracts `tags`, `ext_id`, and `ext_url` from their frontmatter.
+Scans ``spec_path.parent / "requirements"`` for ``*.md`` files and
+extracts ``tags``, ``ext_id``, and ``ext_url`` from their frontmatter.
 
 Returns:
-Mapping from qualified requirement ID (e.g. `SPEC-100.FR-010`)
-to a dict of metadata fields.
-
+  Mapping from qualified requirement ID (e.g. ``SPEC-100.FR-010``)
+  to a dict of metadata fields.
 - `_records_from_content(spec_id, _frontmatter, body, spec_path, repo_root) -> Iterator[RequirementRecord]`: Extract requirement records from spec body content.
 
 Logs warnings if requirement-like lines are found but not extracted.
-
 - `_records_from_frontmatter(spec_id, frontmatter, body, spec_path, repo_root) -> Iterator[RequirementRecord]`: Extract requirement records from spec frontmatter and body.
 - `_requirements_from_spec(spec_path, spec_id, repo_root) -> Iterator[RequirementRecord]`: Extract requirements from a spec file on disk.
 - `_validate_extraction(spec_registry, seen) -> None`: Validate extraction results and warn about potential issues.

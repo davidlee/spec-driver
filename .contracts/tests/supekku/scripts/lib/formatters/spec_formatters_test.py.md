@@ -18,7 +18,7 @@ Tests for format_package_list function.
 
 ### TestFormatRequirementsList
 
-Tests for \_format_requirements_list (VT-090-P2-2).
+Tests for _format_requirements_list (VT-090-P2-2).
 
 **Inherits from:** unittest.TestCase
 
@@ -31,7 +31,7 @@ Tests for \_format_requirements_list (VT-090-P2-2).
 
 ### TestFormatRequirementsSummary
 
-Tests for \_format_requirements_summary (VT-090-P0-2).
+Tests for _format_requirements_summary (VT-090-P0-2).
 
 **Inherits from:** unittest.TestCase
 
@@ -45,7 +45,7 @@ Tests for \_format_requirements_summary (VT-090-P0-2).
 
 ### TestFormatReverseLookupCounts
 
-Tests for \_format_reverse_lookup_counts (VT-090-P2-1).
+Tests for _format_reverse_lookup_counts (VT-090-P2-1).
 
 **Inherits from:** unittest.TestCase
 
@@ -98,7 +98,7 @@ Tests for format_spec_list_item function.
 
 ### TestFormatSpecRelations
 
-Tests for \_format_spec_relations (VT-090-P0-2).
+Tests for _format_spec_relations (VT-090-P0-2).
 
 **Inherits from:** unittest.TestCase
 

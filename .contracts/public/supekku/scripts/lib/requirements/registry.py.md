@@ -18,7 +18,6 @@ Registry for managing requirement records and lifecycle tracking.
 - `find_by_verified_by(self, artifact_pattern) -> list[RequirementRecord]`: Find requirements verified by specific artifact(s) using glob patterns.
 
 Searches both verified_by and coverage_evidence fields.
-
 - `iter(self) -> Iterator[RequirementRecord]`: Iterate over requirement records, optionally filtered by status.
 - `move_requirement(self, uid, new_spec_id) -> str`: Move requirement to different spec, returning new UID. - ------------------------------------------------------------------
 - `save(self) -> None`: Save requirements registry to YAML file.

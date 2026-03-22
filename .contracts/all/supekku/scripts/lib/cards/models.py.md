@@ -15,14 +15,13 @@ Card model representing a kanban card with T### ID.
 - @classmethod `from_file(cls, card_path) -> Card`: Parse card from markdown file.
 
 Args:
-card_path: Path to card markdown file
+  card_path: Path to card markdown file
 
 Returns:
-Card instance with parsed metadata
+  Card instance with parsed metadata
 
 Raises:
-ValueError: If ID cannot be parsed from filename
-
+  ValueError: If ID cannot be parsed from filename
 - `to_dict(self) -> dict`: Convert card to dictionary for JSON serialization.
 - @staticmethod `_detect_lane_from_path(card_path) -> <BinOp>`: Detect lane from path (kanban/doing/T123.md -> 'doing').
 - @staticmethod `_parse_created_from_content(content) -> <BinOp>`: Parse Created: YYYY-MM-DD date from content.

@@ -20,7 +20,7 @@ Requirement synchronization — change artifact relations and record upsert.
 - `_iter_spec_files(spec_dirs) -> Iterator[Path]`: Yield spec markdown files from spec directories.
 - `_resolve_spec_path(spec_id, spec_registry) -> str`: Resolve a spec ID to its relative file path.
 - `_sync_backlog_requirements(records, backlog_registry, repo_root, seen, stats) -> None`: Extract and upsert requirements from backlog items.
-- `_upsert_record(records, record, seen, stats, source_kind, source_type) -> None`: Merge-or-create a requirement record, tracking it in _seen_.
+- `_upsert_record(records, record, seen, stats, source_kind, source_type) -> None`: Merge-or-create a requirement record, tracking it in *seen*.
 
-If _source_kind_ or _source_type_ are provided they are stamped on the
+If *source_kind* or *source_type* are provided they are stamped on the
 record **after** merge so the freshly-extracted provenance wins.

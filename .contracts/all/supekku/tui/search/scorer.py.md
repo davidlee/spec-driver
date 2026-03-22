@@ -19,17 +19,15 @@ Design reference: DR-087 DEC-087-02.
 ## Functions
 
 - `_field_weight(field_name) -> float`: Return the scoring weight for a searchable field.
-- `_fuzzy_score(query, text) -> float`: Score _query_ against _text_ using linear subsequence matching.
+- `_fuzzy_score(query, text) -> float`: Score *query* against *text* using linear subsequence matching.
 
-Returns 0.0 if _query_ is not a subsequence of _text_.
+Returns 0.0 if *query* is not a subsequence of *text*.
 Otherwise returns a score based on match compactness, contiguity,
-and position. O(n) per candidate — no combinatorial explosion.
+and position.  O(n) per candidate — no combinatorial explosion.
+- `score_entry(entry, query) -> float`: Score a single :class:`SearchEntry` against *query*.
 
-- `score_entry(entry, query) -> float`: Score a single :class:`SearchEntry` against _query_.
-
-Returns `max(weight * fuzzy_score)` across all searchable fields
-and relation targets. Returns 0.0 when nothing matches.
-
+Returns ``max(weight * fuzzy_score)`` across all searchable fields
+and relation targets.  Returns 0.0 when nothing matches.
 - `search(query, index) -> list[SearchEntry]`: Score, filter, sort, and truncate search results.
 
-Returns up to _limit_ entries with score > 0, sorted by descending score.
+Returns up to *limit* entries with score > 0, sorted by descending score.

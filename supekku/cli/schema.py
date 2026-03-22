@@ -343,55 +343,22 @@ def _render_json_schema(block_type: str, schema) -> None:
     block_type: Block type identifier (e.g., 'verification.coverage')
     schema: BlockSchema instance to render
   """
-  # Map block types to their metadata definitions
-  metadata_registry = {
-    "verification.coverage": "supekku.scripts.lib.blocks.verification_metadata",
-    "delta.relationships": "supekku.scripts.lib.blocks.delta_metadata",
-    "plan.overview": "supekku.scripts.lib.blocks.plan_metadata",
-    "phase.overview": "supekku.scripts.lib.blocks.plan_metadata",
-    "phase.tracking": "supekku.scripts.lib.blocks.tracking_metadata",
-    "revision.change": "supekku.scripts.lib.blocks.revision_metadata",
-  }
-
-  if block_type not in metadata_registry:
+  if not schema.metadata:
     console.print(f"[yellow]JSON Schema not yet available for {block_type}[/yellow]")
     console.print("This block has not been migrated to metadata-driven validation yet.")
     console.print("Use --format=json for parameter info instead.")
     return
 
-  # Import and get metadata
-  try:
-    module_path = metadata_registry[block_type]
+  json_schema = metadata_to_json_schema(schema.metadata)
+  json_output = json.dumps(json_schema, indent=2)
+  syntax = Syntax(json_output, "json", theme="monokai")
+  console.print(
+    Panel(syntax, title=f"JSON Schema: {block_type}", expand=False),
+  )
 
-    # Import the module
-    import importlib
-
-    module = importlib.import_module(module_path)
-    metadata = getattr(module, f"{block_type.upper().replace('.', '_')}_METADATA")
-
-    # Generate JSON Schema
-    from supekku.scripts.lib.blocks.metadata import metadata_to_json_schema
-
-    json_schema = metadata_to_json_schema(metadata)
-
-    # Pretty print
-    json_output = json.dumps(json_schema, indent=2)
-    syntax = Syntax(json_output, "json", theme="monokai")
-    console.print(
-      Panel(syntax, title=f"JSON Schema: {block_type}", expand=False),
-    )
-
-    # Print helpful hint about yaml-example
-    console.print()
-    console.print(
-      "[dim]💡 Tip: See a complete YAML example with:[/dim]",
-    )
-    console.print(
-      f"[cyan]  schema show {block_type} --format=yaml-example[/cyan]",
-    )
-  except (ImportError, AttributeError) as e:
-    console.print(f"[red]Error loading metadata for {block_type}: {e}[/red]")
-    console.print("This may be a bug - please report it.")
+  console.print()
+  console.print("[dim]💡 Tip: See a complete YAML example with:[/dim]")
+  console.print(f"[cyan]  schema show {block_type} --format=yaml-example[/cyan]")
 
 
 def _generate_placeholder_value(  # pylint: disable=too-many-return-statements,too-complex
@@ -439,58 +406,34 @@ def _render_yaml_example(schema) -> None:
   Args:
     schema: BlockSchema instance to render
   """
-  # Map block types to their metadata definitions
-  metadata_registry = {
-    "verification.coverage": "supekku.scripts.lib.blocks.verification_metadata",
-    "delta.relationships": "supekku.scripts.lib.blocks.delta_metadata",
-    "plan.overview": "supekku.scripts.lib.blocks.plan_metadata",
-    "phase.overview": "supekku.scripts.lib.blocks.plan_metadata",
-    "phase.tracking": "supekku.scripts.lib.blocks.tracking_metadata",
-    "revision.change": "supekku.scripts.lib.blocks.revision_metadata",
-  }
+  # Prefer metadata examples when available
+  if schema.metadata and schema.metadata.examples:
+    import yaml as yaml_lib  # noqa: PLC0415
 
-  # Try to use metadata example first for migrated validators
-  if schema.name in metadata_registry:
-    try:
-      import importlib
+    example_data = schema.metadata.examples[0]
+    example_yaml = (
+      f"```yaml {schema.marker}\n"
+      f"{yaml_lib.dump(example_data, default_flow_style=False, sort_keys=False)}"
+      f"```"
+    )
+    syntax = Syntax(example_yaml, "yaml", theme="monokai")
+    console.print(
+      Panel(syntax, title=f"Example: {schema.name}", expand=False),
+    )
+    return
 
-      import yaml as yaml_lib
-
-      module_path = metadata_registry[schema.name]
-      module = importlib.import_module(module_path)
-      metadata = getattr(module, f"{schema.name.upper().replace('.', '_')}_METADATA")
-
-      if metadata.examples and len(metadata.examples) > 0:
-        example_data = metadata.examples[0]
-        example_yaml = (
-          f"```yaml {schema.marker}\n"
-          f"{yaml_lib.dump(example_data, default_flow_style=False, sort_keys=False)}"
-          f"```"
-        )
-        syntax = Syntax(example_yaml, "yaml", theme="monokai")
-        console.print(
-          Panel(syntax, title=f"Example: {schema.name}", expand=False),
-        )
-        return
-    except (ImportError, AttributeError, IndexError):
-      pass  # Fall through to renderer-based approach
-
-  # Fall back to renderer-based approach for non-migrated validators
+  # Fall back to renderer-based approach for blocks without metadata
   params = schema.get_parameters()
-
-  # Build minimal args to call renderer
   args = []
   kwargs = {}
 
   for param_name, param_info in params.items():
     if param_info["required"]:
-      # Provide placeholder values for required params
       param_type_str = str(param_info["type"])
       value = _generate_placeholder_value(param_name, param_type_str, schema.name)
       args.append(value)
 
   try:
-    # Call renderer with minimal required args
     if args:
       example_yaml = schema.renderer(*args, **kwargs)
     else:

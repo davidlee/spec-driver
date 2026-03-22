@@ -850,9 +850,22 @@ def review_prime_command(
   if handoff_file.exists():
     source_handoff = "workflow/handoff.current.yaml"
 
+  # Set judgment to in_progress via review transition (DR-109 §4.3)
+  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
+    ReviewStatus,
+    ReviewTransitionCommand,
+    apply_review_transition,
+  )
+
+  judgment_status = apply_review_transition(
+    ReviewStatus.NOT_STARTED,
+    ReviewTransitionCommand.BEGIN_REVIEW,
+  )
+
   index_data = build_review_index(
     artifact_id=delta_id,
     bootstrap_status=BootstrapStatus.WARM,
+    judgment_status=judgment_status.value,
     phase_id=phase_id,
     git_head=git_head,
     domain_map=domain_map,
@@ -1086,10 +1099,18 @@ def review_complete_command(
     FindingsNotFoundError,
     FindingsValidationError,
     FindingsVersionError,
+    ReviewIndexNotFoundError,
+    ReviewIndexValidationError,
     append_round,
     build_findings,
     read_findings,
+    read_review_index,
     write_findings,
+    write_review_index,
+  )
+  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
+    can_approve,
+    collect_blocking_findings,
   )
   from supekku.scripts.lib.workflow.state_io import (  # noqa: PLC0415
     StateNotFoundError,
@@ -1126,7 +1147,7 @@ def review_complete_command(
     typer.echo(f"Invalid workflow state: {exc}", err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
 
-  # Validate transition
+  # Validate workflow transition
   current = WorkflowState(state_data["workflow"]["status"])
   command = (
     TransitionCommand.REVIEW_COMPLETE_APPROVED
@@ -1140,6 +1161,23 @@ def review_complete_command(
     typer.echo(f"Cannot complete review: {exc}", err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
 
+  # Approval guard: check blocking findings (DR-109 §4.3)
+  if status == "approved":
+    try:
+      existing_findings = read_findings(delta_dir)
+      blocking = collect_blocking_findings(existing_findings.get("rounds", []))
+      allowed, reasons = can_approve(blocking)
+      if not allowed:
+        typer.echo("Cannot approve: blocking findings remain:", err=True)
+        for reason in reasons:
+          typer.echo(f"  - {reason}", err=True)
+        raise typer.Exit(EXIT_FAILURE)
+    except FindingsNotFoundError:
+      pass  # No findings = no blocking findings = guard passes
+    except FindingsVersionError as exc:
+      typer.echo(str(exc), err=True)
+      raise typer.Exit(EXIT_FAILURE) from exc
+
   # Build or append round (v2 accumulative model, DR-109 §3.5)
   reviewer_role = state_data["workflow"].get("active_role")
   try:
@@ -1148,6 +1186,7 @@ def review_complete_command(
       findings_data,
       status=status,
       reviewer_role=reviewer_role,
+      summary=summary,
     )
   except (FindingsNotFoundError, FindingsVersionError):
     findings_data = build_findings(
@@ -1155,14 +1194,26 @@ def review_complete_command(
       round_number=1,
       status=status,
       reviewer_role=reviewer_role,
+      summary=summary,
     )
 
-  # Write order per DR-102 §5: 1. findings, 2. state
+  # Write order per DR-102 §5: 1. findings, 2. review-index, 3. state
   try:
     fp = write_findings(delta_dir, findings_data)
   except FindingsValidationError as exc:
     typer.echo(f"Findings validation failed: {exc}", err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
+
+  # Write judgment_status to review-index (DR-109 §4.3)
+  try:
+    index_data = read_review_index(delta_dir)
+    index_data.setdefault("review", {})["judgment_status"] = status
+    write_review_index(delta_dir, index_data)
+  except ReviewIndexNotFoundError:
+    pass  # No review-index — skip judgment write
+  except ReviewIndexValidationError as exc:
+    typer.echo(f"Review index update failed: {exc}", err=True)
+    # Non-fatal — findings and state are more important
 
   # Auto-teardown on approved if policy says so
   config = _load_workflow_config(repo_root)
@@ -1211,6 +1262,192 @@ def review_teardown_command(
 
   _do_teardown(delta_dir, delta_id)
   raise typer.Exit(EXIT_SUCCESS)
+
+
+# ---------------------------------------------------------------------------
+# review finding — disposition subcommands (DR-109 §4.1)
+# ---------------------------------------------------------------------------
+
+finding_app = typer.Typer(
+  help="Disposition review findings",
+  no_args_is_help=True,
+)
+review_app.add_typer(finding_app, name="finding")
+
+
+def _available_finding_ids(data: dict) -> list[str]:
+  """Collect all finding IDs from all rounds for error messages."""
+  ids: list[str] = []
+  for round_data in data.get("rounds", []):
+    for category in ("blocking", "non_blocking"):
+      for f in round_data.get(category, []):
+        if f.get("id"):
+          ids.append(f["id"])
+  return ids
+
+
+def _disposition_finding(
+  delta: str,
+  finding_id: str,
+  disposition: dict,
+  root: Path | None,
+) -> None:
+  """Shared orchestration for all disposition commands.
+
+  Reads findings, updates disposition in-place, writes back.
+  Exits non-zero if finding not found.
+  """
+  from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
+    FindingsNotFoundError,
+    FindingsValidationError,
+    FindingsVersionError,
+    read_findings,
+    update_finding_disposition,
+    write_findings,
+  )
+
+  repo_root = find_repo_root(root)
+  delta_dir = _resolve_delta_dir(delta, repo_root)
+
+  try:
+    data = read_findings(delta_dir)
+  except FindingsNotFoundError as exc:
+    typer.echo(f"No findings for {delta.upper()}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+  except FindingsVersionError as exc:
+    typer.echo(str(exc), err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  if not update_finding_disposition(data, finding_id, disposition):
+    available = _available_finding_ids(data)
+    typer.echo(
+      f"Finding {finding_id} not found. Available: {', '.join(available)}",
+      err=True,
+    )
+    raise typer.Exit(EXIT_FAILURE)
+
+  try:
+    write_findings(delta_dir, data)
+  except FindingsValidationError as exc:
+    typer.echo(f"Findings validation failed: {exc}", err=True)
+    raise typer.Exit(EXIT_FAILURE) from exc
+
+  typer.echo(
+    f"Finding {finding_id}: {disposition['action']} "
+    f"(delta {delta.upper()})",
+  )
+  raise typer.Exit(EXIT_SUCCESS)
+
+
+@finding_app.command("resolve")
+def finding_resolve_command(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  finding_id: Annotated[str, typer.Argument(help="Finding ID (e.g. R1-001)")],
+  resolved_at: Annotated[
+    str | None,
+    typer.Option("--resolved-at", help="Commit SHA where fix landed"),
+  ] = None,
+  root: RootOption = None,
+) -> None:
+  """Mark a finding as resolved (fixed)."""
+  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
+    DispositionAuthority,
+    FindingDispositionAction,
+  )
+
+  disposition: dict = {
+    "action": FindingDispositionAction.FIX.value,
+    "authority": DispositionAuthority.AGENT.value,
+  }
+  if resolved_at:
+    disposition["resolved_at"] = resolved_at
+  _disposition_finding(delta, finding_id, disposition, root)
+
+
+@finding_app.command("defer")
+def finding_defer_command(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  finding_id: Annotated[str, typer.Argument(help="Finding ID (e.g. R1-001)")],
+  rationale: Annotated[
+    str,
+    typer.Option("--rationale", help="Why this finding is deferred"),
+  ],
+  backlog_ref: Annotated[
+    str | None,
+    typer.Option("--backlog-ref", help="Backlog item tracking this (e.g. ISSUE-042)"),
+  ] = None,
+  root: RootOption = None,
+) -> None:
+  """Defer a finding to a future delta or backlog item."""
+  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
+    DispositionAuthority,
+    FindingDispositionAction,
+  )
+
+  disposition: dict = {
+    "action": FindingDispositionAction.DEFER.value,
+    "authority": DispositionAuthority.AGENT.value,
+    "rationale": rationale,
+  }
+  if backlog_ref:
+    disposition["backlog_ref"] = backlog_ref
+  _disposition_finding(delta, finding_id, disposition, root)
+
+
+@finding_app.command("waive")
+def finding_waive_command(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  finding_id: Annotated[str, typer.Argument(help="Finding ID (e.g. R1-001)")],
+  rationale: Annotated[
+    str,
+    typer.Option("--rationale", help="Why this finding is waived"),
+  ],
+  authority: Annotated[
+    str | None,
+    typer.Option("--authority", help="Who made the decision: user or agent"),
+  ] = None,
+  root: RootOption = None,
+) -> None:
+  """Waive a finding (accept the risk)."""
+  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
+    DispositionAuthority,
+    FindingDispositionAction,
+  )
+
+  disposition: dict = {
+    "action": FindingDispositionAction.WAIVE.value,
+    "authority": (
+      DispositionAuthority(authority).value
+      if authority
+      else DispositionAuthority.AGENT.value
+    ),
+    "rationale": rationale,
+  }
+  _disposition_finding(delta, finding_id, disposition, root)
+
+
+@finding_app.command("supersede")
+def finding_supersede_command(
+  delta: Annotated[str, typer.Argument(help="Delta ID (e.g. DE-103)")],
+  finding_id: Annotated[str, typer.Argument(help="Finding ID (e.g. R1-001)")],
+  superseded_by: Annotated[
+    str,
+    typer.Option("--superseded-by", help="Finding ID that replaces this one"),
+  ],
+  root: RootOption = None,
+) -> None:
+  """Mark a finding as superseded by another finding."""
+  from supekku.scripts.lib.workflow.review_state_machine import (  # noqa: PLC0415
+    DispositionAuthority,
+    FindingDispositionAction,
+  )
+
+  disposition: dict = {
+    "action": FindingDispositionAction.SUPERSEDE.value,
+    "authority": DispositionAuthority.AGENT.value,
+    "superseded_by": superseded_by,
+  }
+  _disposition_finding(delta, finding_id, disposition, root)
 
 
 # ---------------------------------------------------------------------------

@@ -902,6 +902,11 @@ def _round_entry() -> FieldMetadata:
         required=False,
         description="Round completion timestamp (ISO 8601)",
       ),
+      "summary": FieldMetadata(
+        type="string",
+        required=False,
+        description="Round summary (free-text)",
+      ),
       # session: opaque dict, autobahn-owned (DR-109 §3.6).
       # Not validated by schema — passes through unvalidated.
       "blocking": _findings_list(),

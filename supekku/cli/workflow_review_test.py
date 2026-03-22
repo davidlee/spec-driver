@@ -462,5 +462,497 @@ class WriteOrderTest(_ReviewTestBase):
     assert state["workflow"]["status"] == "changes_requested"
 
 
+class _FindingTestBase(_ReviewTestBase):
+  """Base for tests needing findings with blocking/non-blocking items."""
+
+  @staticmethod
+  def _finding(
+    finding_id: str,
+    title: str,
+    summary: str = "",
+  ) -> dict:
+    """Build a minimal finding dict that passes schema validation."""
+    return {"id": finding_id, "title": title, "summary": summary, "status": "open"}
+
+  def _setup_review_with_findings(
+    self,
+    delta_id: str = "DE-100",
+    blocking: list[dict] | None = None,
+    non_blocking: list[dict] | None = None,
+  ) -> Path:
+    """Set up a delta in reviewing state with v2 findings."""
+    from supekku.scripts.lib.workflow.review_io import (
+      build_findings,
+      write_findings,
+    )
+
+    delta_dir = _create_delta_bundle(self.root, delta_id=delta_id)
+    self._start_phase(delta_id)
+    self._create_handoff_and_accept_as_reviewer(delta_id)
+
+    findings_data = build_findings(
+      artifact_id=delta_id.upper(),
+      round_number=1,
+      status="in_progress",
+      reviewer_role="reviewer",
+      blocking=blocking or [],
+      non_blocking=non_blocking or [],
+    )
+    write_findings(delta_dir, findings_data)
+    return delta_dir
+
+
+# ---------------------------------------------------------------------------
+# VT-109-008: Disposition command tests (DR-109 §5.3)
+# ---------------------------------------------------------------------------
+
+
+class ReviewFindingResolveTest(_FindingTestBase):
+  """Test `spec-driver review finding resolve`."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_resolve_blocking_finding(self, *_mocks) -> None:
+    delta_dir = self._setup_review_with_findings(
+      blocking=[self._finding("R1-001", "Bug", "A bug")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      [
+        "review", "finding", "resolve", "DE-100", "R1-001",
+        "--resolved-at", "abc123",
+      ],
+    )
+    assert result.exit_code == 0, result.output
+    assert "fix" in result.output.lower()
+
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    finding = findings["rounds"][0]["blocking"][0]
+    assert finding["disposition"]["action"] == "fix"
+    assert finding["disposition"]["resolved_at"] == "abc123"
+    assert finding["status"] == "resolved"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_resolve_non_blocking_without_resolved_at(self, *_mocks) -> None:
+    """Non-blocking findings can be resolved without --resolved-at."""
+    delta_dir = self._setup_review_with_findings(
+      non_blocking=[self._finding("R1-002", "Nit", "A nit")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "finding", "resolve", "DE-100", "R1-002"],
+    )
+    assert result.exit_code == 0, result.output
+
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    finding = findings["rounds"][0]["non_blocking"][0]
+    assert finding["disposition"]["action"] == "fix"
+    assert finding["status"] == "resolved"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_finding_not_found_shows_available_ids(self, *_mocks) -> None:
+    self._setup_review_with_findings(
+      blocking=[self._finding("R1-001", "Bug", "A bug")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "finding", "resolve", "DE-100", "R1-999"],
+    )
+    assert result.exit_code == 1
+    assert "R1-001" in result.output  # suggests available IDs
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_overwrites_existing_disposition(self, *_mocks) -> None:
+    """Re-dispositioning overwrites previous (latest wins)."""
+    delta_dir = self._setup_review_with_findings(
+      non_blocking=[self._finding("R1-001", "Nit", "A nit")],
+    )
+
+    # First disposition: defer
+    self.runner.invoke(
+      app,
+      [
+        "review", "finding", "defer", "DE-100", "R1-001",
+        "--rationale", "Later",
+      ],
+    )
+    # Second disposition: resolve (overwrites)
+    self.runner.invoke(
+      app,
+      ["review", "finding", "resolve", "DE-100", "R1-001"],
+    )
+
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    finding = findings["rounds"][0]["non_blocking"][0]
+    assert finding["disposition"]["action"] == "fix"
+    assert finding["status"] == "resolved"
+
+
+class ReviewFindingDeferTest(_FindingTestBase):
+  """Test `spec-driver review finding defer`."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_defer_with_rationale(self, *_mocks) -> None:
+    delta_dir = self._setup_review_with_findings(
+      non_blocking=[self._finding("R1-001", "Nit", "A nit")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      [
+        "review", "finding", "defer", "DE-100", "R1-001",
+        "--rationale", "Not critical now",
+      ],
+    )
+    assert result.exit_code == 0, result.output
+
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    finding = findings["rounds"][0]["non_blocking"][0]
+    assert finding["disposition"]["action"] == "defer"
+    assert finding["disposition"]["rationale"] == "Not critical now"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_defer_without_rationale_fails(self, *_mocks) -> None:
+    self._setup_review_with_findings(
+      non_blocking=[self._finding("R1-001", "Nit", "A nit")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "finding", "defer", "DE-100", "R1-001"],
+    )
+    assert result.exit_code != 0
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_defer_blocking_with_backlog_ref(self, *_mocks) -> None:
+    delta_dir = self._setup_review_with_findings(
+      blocking=[self._finding("R1-001", "Bug", "A bug")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      [
+        "review", "finding", "defer", "DE-100", "R1-001",
+        "--rationale", "Tracked in backlog",
+        "--backlog-ref", "ISSUE-042",
+      ],
+    )
+    assert result.exit_code == 0, result.output
+
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    finding = findings["rounds"][0]["blocking"][0]
+    assert finding["disposition"]["backlog_ref"] == "ISSUE-042"
+
+
+class ReviewFindingWaiveTest(_FindingTestBase):
+  """Test `spec-driver review finding waive`."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_waive_with_rationale(self, *_mocks) -> None:
+    delta_dir = self._setup_review_with_findings(
+      non_blocking=[self._finding("R1-001", "Nit", "A nit")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      [
+        "review", "finding", "waive", "DE-100", "R1-001",
+        "--rationale", "Acceptable risk",
+      ],
+    )
+    assert result.exit_code == 0, result.output
+
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    finding = findings["rounds"][0]["non_blocking"][0]
+    assert finding["disposition"]["action"] == "waive"
+    assert finding["disposition"]["rationale"] == "Acceptable risk"
+    assert finding["status"] == "waived"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_waive_without_rationale_fails(self, *_mocks) -> None:
+    self._setup_review_with_findings(
+      non_blocking=[self._finding("R1-001", "Nit", "A nit")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "finding", "waive", "DE-100", "R1-001"],
+    )
+    assert result.exit_code != 0
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_waive_blocking_requires_authority_user(self, *_mocks) -> None:
+    """Waiving a blocking finding requires --authority user."""
+    self._setup_review_with_findings(
+      blocking=[self._finding("R1-001", "Bug", "A bug")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      [
+        "review", "finding", "waive", "DE-100", "R1-001",
+        "--rationale", "Acceptable",
+        "--authority", "agent",
+      ],
+    )
+    # Command succeeds (writes disposition), but guard will catch it later
+    assert result.exit_code == 0, result.output
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_waive_with_authority_user(self, *_mocks) -> None:
+    delta_dir = self._setup_review_with_findings(
+      blocking=[self._finding("R1-001", "Bug", "A bug")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      [
+        "review", "finding", "waive", "DE-100", "R1-001",
+        "--rationale", "Accepted by user",
+        "--authority", "user",
+      ],
+    )
+    assert result.exit_code == 0, result.output
+
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    finding = findings["rounds"][0]["blocking"][0]
+    assert finding["disposition"]["authority"] == "user"
+
+
+class ReviewFindingSupersedeTest(_FindingTestBase):
+  """Test `spec-driver review finding supersede`."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_supersede_finding(self, *_mocks) -> None:
+    delta_dir = self._setup_review_with_findings(
+      non_blocking=[
+        self._finding("R1-001", "Old", "Old finding"),
+        self._finding("R1-002", "New", "New finding"),
+      ],
+    )
+
+    result = self.runner.invoke(
+      app,
+      [
+        "review", "finding", "supersede", "DE-100", "R1-001",
+        "--superseded-by", "R1-002",
+      ],
+    )
+    assert result.exit_code == 0, result.output
+
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    finding = findings["rounds"][0]["non_blocking"][0]
+    assert finding["disposition"]["action"] == "supersede"
+    assert finding["disposition"]["superseded_by"] == "R1-002"
+    assert finding["status"] == "superseded"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_supersede_without_superseded_by_fails(self, *_mocks) -> None:
+    self._setup_review_with_findings(
+      non_blocking=[self._finding("R1-001", "Old", "Old finding")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "finding", "supersede", "DE-100", "R1-001"],
+    )
+    assert result.exit_code != 0
+
+
+# ---------------------------------------------------------------------------
+# VT-109-005: CLI guard enforcement (DR-109 §5.4)
+# ---------------------------------------------------------------------------
+
+
+class ReviewGuardEnforcementTest(_FindingTestBase):
+  """Test review complete --status approved enforces can_approve() guard."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_approve_blocked_by_open_blocking_finding(self, *_mocks) -> None:
+    """Cannot approve with undispositioned blocking findings."""
+    self._setup_review_with_findings(
+      blocking=[self._finding("R1-001", "Bug", "A bug")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "--status", "approved"],
+    )
+    assert result.exit_code == 1
+    output = result.output.lower()
+    assert "cannot approve" in output or "blocking" in output
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_approve_succeeds_after_resolving_blocking(self, *_mocks) -> None:
+    """Approve succeeds when all blocking findings are resolved."""
+    self._setup_review_with_findings(
+      blocking=[self._finding("R1-001", "Bug", "A bug")],
+    )
+
+    # Resolve the blocking finding
+    self.runner.invoke(
+      app,
+      [
+        "review", "finding", "resolve", "DE-100", "R1-001",
+        "--resolved-at", "abc123",
+      ],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "--status", "approved"],
+    )
+    assert result.exit_code == 0, result.output
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_changes_requested_ignores_guard(self, *_mocks) -> None:
+    """changes_requested does not require guard to pass."""
+    self._setup_review_with_findings(
+      blocking=[self._finding("R1-001", "Bug", "A bug")],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "--status", "changes_requested"],
+    )
+    assert result.exit_code == 0, result.output
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_approve_blocked_by_agent_waive(self, *_mocks) -> None:
+    """Agent-waived blocking finding still blocks approval."""
+    self._setup_review_with_findings(
+      blocking=[self._finding("R1-001", "Bug", "A bug")],
+    )
+
+    self.runner.invoke(
+      app,
+      [
+        "review", "finding", "waive", "DE-100", "R1-001",
+        "--rationale", "Agent says ok",
+        "--authority", "agent",
+      ],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "--status", "approved"],
+    )
+    assert result.exit_code == 1
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_approve_allowed_with_user_waive(self, *_mocks) -> None:
+    """User-waived blocking finding with rationale allows approval."""
+    self._setup_review_with_findings(
+      blocking=[self._finding("R1-001", "Bug", "A bug")],
+    )
+
+    self.runner.invoke(
+      app,
+      [
+        "review", "finding", "waive", "DE-100", "R1-001",
+        "--rationale", "Accepted risk",
+        "--authority", "user",
+      ],
+    )
+
+    result = self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "--status", "approved"],
+    )
+    assert result.exit_code == 0, result.output
+
+
+class ReviewJudgmentStatusTest(_FindingTestBase):
+  """Test judgment_status written to review-index."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_prime_sets_judgment_in_progress(self, *_mocks) -> None:
+    delta_dir = _create_delta_bundle(self.root)
+    self._start_phase()
+
+    self.runner.invoke(app, ["review", "prime", "DE-100"])
+
+    data = yaml.safe_load(
+      (delta_dir / "workflow" / "review-index.yaml").read_text(),
+    )
+    assert data["review"]["judgment_status"] == "in_progress"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_complete_writes_judgment_to_index(self, *_mocks) -> None:
+    delta_dir = self._setup_review_with_findings()
+
+    # Prime first to create review-index
+    self.runner.invoke(app, ["review", "prime", "DE-100"])
+
+    self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "--status", "changes_requested"],
+    )
+
+    data = yaml.safe_load(
+      (delta_dir / "workflow" / "review-index.yaml").read_text(),
+    )
+    assert data["review"]["judgment_status"] == "changes_requested"
+
+
+class ReviewSummaryTest(_FindingTestBase):
+  """Test --summary wired into round metadata."""
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_summary_stored_in_round(self, *_mocks) -> None:
+    delta_dir = self._setup_review_with_findings()
+
+    # Use changes_requested to avoid auto-teardown
+    result = self.runner.invoke(
+      app,
+      [
+        "review", "complete", "DE-100",
+        "--status", "changes_requested",
+        "--summary", "Needs work on error handling",
+      ],
+    )
+    assert result.exit_code == 0, result.output
+
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    # Summary appears in the latest round
+    latest_round = findings["rounds"][-1]
+    assert latest_round["summary"] == "Needs work on error handling"
+
+  @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
+  def test_no_summary_omits_key(self, *_mocks) -> None:
+    delta_dir = self._setup_review_with_findings()
+
+    self.runner.invoke(
+      app,
+      ["review", "complete", "DE-100", "--status", "changes_requested"],
+    )
+
+    findings = yaml.safe_load(
+      (delta_dir / "workflow" / "review-findings.yaml").read_text(),
+    )
+    latest_round = findings["rounds"][-1]
+    assert "summary" not in latest_round
+
+
 if __name__ == "__main__":
   unittest.main()

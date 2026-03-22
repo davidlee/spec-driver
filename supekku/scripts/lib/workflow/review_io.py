@@ -318,6 +318,7 @@ def build_findings(
   round_number: int,
   status: str,
   reviewer_role: str | None = None,
+  summary: str | None = None,
   blocking: list[dict[str, Any]] | None = None,
   non_blocking: list[dict[str, Any]] | None = None,
   session: dict[str, Any] | None = None,
@@ -331,6 +332,7 @@ def build_findings(
     round_number=round_number,
     status=status,
     reviewer_role=reviewer_role,
+    summary=summary,
     blocking=blocking,
     non_blocking=non_blocking,
     session=session,
@@ -355,6 +357,7 @@ def build_round_entry(
   round_number: int,
   status: str,
   reviewer_role: str | None = None,
+  summary: str | None = None,
   blocking: list[dict[str, Any]] | None = None,
   non_blocking: list[dict[str, Any]] | None = None,
   session: dict[str, Any] | None = None,
@@ -367,6 +370,8 @@ def build_round_entry(
   }
   if reviewer_role:
     entry["reviewer_role"] = reviewer_role
+  if summary:
+    entry["summary"] = summary
   if session is not None:
     entry["session"] = session
   entry["blocking"] = blocking or []
@@ -379,6 +384,7 @@ def append_round(
   *,
   status: str,
   reviewer_role: str | None = None,
+  summary: str | None = None,
   blocking: list[dict[str, Any]] | None = None,
   non_blocking: list[dict[str, Any]] | None = None,
   session: dict[str, Any] | None = None,
@@ -393,6 +399,7 @@ def append_round(
     round_number=next_num,
     status=status,
     reviewer_role=reviewer_role,
+    summary=summary,
     blocking=blocking,
     non_blocking=non_blocking,
     session=session,

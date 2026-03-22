@@ -2,20 +2,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from .checks import CHECK_REGISTRY
-from .models import CategorySummary, worst_status
-
-if TYPE_CHECKING:
-  from supekku.scripts.lib.workspace import Workspace
+from .models import CategorySummary, DiagnosticWorkspace, worst_status
 
 # Exit codes mapped from worst overall status
 EXIT_CODES: dict[str, int] = {"pass": 0, "warn": 1, "fail": 2}
 
 
 def run_checks(
-  ws: Workspace, *, categories: list[str] | None = None
+  ws: DiagnosticWorkspace, *, categories: list[str] | None = None
 ) -> list[CategorySummary]:
   """Run diagnostic checks and return category summaries.
 

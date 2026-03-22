@@ -29,7 +29,7 @@ def _make_record(**overrides) -> MemoryRecord:
     "updated": date(2026, 2, 1),
   }
   defaults.update(overrides)
-  return MemoryRecord(**defaults)
+  return MemoryRecord(**defaults)  # type: ignore[invalid-argument-type]
 
 
 # --- format_memory_details ---

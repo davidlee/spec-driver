@@ -1364,7 +1364,7 @@ def _make_memory_record(
     "confidence": "medium",
   }
   defaults.update(kwargs)
-  return MemoryRecord(**defaults)
+  return MemoryRecord(**defaults)  # type: ignore[invalid-argument-type]
 
 
 class TestListMemoriesStale:

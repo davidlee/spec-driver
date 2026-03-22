@@ -13,7 +13,7 @@ import os
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -254,7 +254,8 @@ def build_review_index(
   if known_decisions:
     data["known_decisions"] = known_decisions
   if invalidation_triggers:
-    data["staleness"]["invalidation_triggers"] = invalidation_triggers
+    staleness = cast(dict[str, Any], data["staleness"])
+    staleness["invalidation_triggers"] = invalidation_triggers
 
   return data
 

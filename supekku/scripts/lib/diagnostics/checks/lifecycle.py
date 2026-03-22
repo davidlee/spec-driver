@@ -7,20 +7,16 @@ threshold.
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.core.config import load_workflow_config
-from supekku.scripts.lib.diagnostics.models import DiagnosticResult
-
-if TYPE_CHECKING:
-  from supekku.scripts.lib.workspace import Workspace
+from supekku.scripts.lib.diagnostics.models import DiagnosticResult, DiagnosticWorkspace
 
 CATEGORY = "lifecycle"
 
 DEFAULT_STALENESS_DAYS = 5
 
 
-def check_lifecycle(ws: Workspace) -> list[DiagnosticResult]:
+def check_lifecycle(ws: DiagnosticWorkspace) -> list[DiagnosticResult]:
   """Check for stale in-progress deltas."""
   config = load_workflow_config(ws.root)
   staleness_days = config.get("doctor", {}).get(

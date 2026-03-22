@@ -137,7 +137,8 @@ def write_preboot_file(repo_root: Path) -> Path:
   """Generate and write preboot context files.
 
   Writes to:
-    - ``.agents/spec-driver-boot.md`` — for Claude Code (via symlink into .claude/rules/)
+    - ``.agents/spec-driver-boot.md`` — for Claude Code
+      (via symlink into .claude/rules/)
     - ``.pi/APPEND_SYSTEM.md`` — for pi (auto-discovered, appended to system prompt)
 
   Both files receive identical content. Only writes if content has changed

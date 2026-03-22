@@ -788,7 +788,7 @@ def format_change_list_json(changes: Sequence[ChangeArtifact]) -> str:
   """
   items = []
   for change in changes:
-    item = {
+    item: dict[str, Any] = {
       "id": change.id,
       "kind": change.kind,
       "status": change.status,

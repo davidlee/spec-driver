@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 import yaml
 from jinja2 import Template
@@ -92,7 +93,7 @@ def build_adr_frontmatter(
     Dictionary containing ADR frontmatter.
   """
   today = date.today().isoformat()
-  frontmatter = {
+  frontmatter: dict[str, Any] = {
     "id": adr_id,
     "title": f"{adr_id}: {title}",
     "status": status,

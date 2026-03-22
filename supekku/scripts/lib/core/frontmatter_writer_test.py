@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+import yaml
 
 from .frontmatter_writer import (
   FieldUpdateResult,
@@ -95,8 +96,6 @@ class TestCompactDumper:
     assert "- type: implements" in out
 
   def test_idempotent(self) -> None:
-    import yaml
-
     data = {
       "id": "SPEC-100",
       "tags": ["auth", "security"],
@@ -171,7 +170,7 @@ class TestUpdateFrontmatter:
 
     with patch("supekku.scripts.lib.core.frontmatter_writer.date") as mock_date:
       mock_date.today.return_value = date(2026, 3, 14)
-      mock_date.side_effect = lambda *a, **kw: date(*a, **kw)
+      mock_date.side_effect = date
       update_frontmatter(f, lambda fm: None)
 
     fm, _ = load_markdown_file(f)
@@ -246,7 +245,7 @@ class TestUpdateFrontmatterStatus:
 
     with patch("supekku.scripts.lib.core.frontmatter_writer.date") as mock_date:
       mock_date.today.return_value = date(2026, 3, 8)
-      mock_date.side_effect = lambda *a, **kw: date(*a, **kw)
+      mock_date.side_effect = date
       update_frontmatter_status(f, "completed")
 
     fm, _ = load_markdown_file(f)
@@ -329,7 +328,6 @@ status: this should not change
 
     update_frontmatter_status(f, "active")
 
-    content = f.read_text(encoding="utf-8")
     fm, body = load_markdown_file(f)
     assert fm["status"] == "active"
     assert "status: this should not change" in body
@@ -426,7 +424,10 @@ class TestUpdateFrontmatterFields:
     assert fm["created"] == "2026-01-01"
 
   def test_does_not_modify_body_lines_matching_field_name(self, tmp_path: Path) -> None:
-    content = "---\nid: X\nstatus: active\nupdated: '2026-01-01'\n---\n\n# Title\n\nstatus: body line\n"
+    content = (
+      "---\nid: X\nstatus: active\nupdated: '2026-01-01'\n---\n"
+      "\n# Title\n\nstatus: body line\n"
+    )
     f = tmp_path / "test.md"
     f.write_text(content, encoding="utf-8")
 
@@ -558,7 +559,7 @@ class TestAddFrontmatterListItems:
 
     with patch("supekku.scripts.lib.core.frontmatter_writer.date") as mock_date:
       mock_date.today.return_value = date(2026, 6, 15)
-      mock_date.side_effect = lambda *a, **kw: date(*a, **kw)
+      mock_date.side_effect = date
       add_frontmatter_list_items(f, "tags", ["new"])
 
     fm, _ = load_markdown_file(f)

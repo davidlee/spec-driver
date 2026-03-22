@@ -17,6 +17,7 @@ from supekku.cli.common import (
   RootOption,
   TruncateOption,
   matches_regexp,
+  resolve_root,
 )
 from supekku.cli.list import app
 from supekku.scripts.lib.cards import CardRegistry
@@ -88,7 +89,7 @@ def list_cards(
     raise typer.Exit(EXIT_FAILURE)
 
   try:
-    registry = CardRegistry(root=root)
+    registry = CardRegistry(root=resolve_root(root))
 
     # Get cards, optionally filtered by lane
     if lane:

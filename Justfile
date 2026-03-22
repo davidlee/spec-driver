@@ -33,6 +33,12 @@ pylint-only *args:
 ty:
   uv run ty check
 
+lint-imports:
+  uvx import-linter
+
+validate:
+  uv run spec-driver validate
+
 # run before commits
 pre-commit: check format-markdown
 

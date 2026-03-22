@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
+from rich.text import Text
 from textual.widgets import DataTable
 
 from supekku.scripts.lib.core.artifact_view import (
@@ -18,6 +19,12 @@ from supekku.tui.browser import BrowserScreen
 from supekku.tui.widgets.bundle_tree import BundleTree
 from supekku.tui.widgets.preview_panel import PreviewPanel
 from supekku.tui.widgets.type_selector import TypeSelector
+
+
+def _plain(label: str | Text) -> str:
+  """Extract plain text from a tree node label."""
+  return label.plain if isinstance(label, Text) else label
+
 
 # --- Fixtures ---
 
@@ -265,7 +272,7 @@ class TestTreeVisibility:
       await pilot.pause()
 
       tree = app.screen.query_one("#bundle-tree", BundleTree)
-      leaf_names = [n.label.plain for n in tree.root.children if not n.children]
+      leaf_names = [(_plain(n.label)) for n in tree.root.children if not n.children]
       assert "DE-061.md" in leaf_names
       assert "DR-061.md" in leaf_names
 
@@ -448,5 +455,5 @@ class TestTreeRefresh:
       # Tree should have been repopulated with the new file
       new_count = len(tree.root.children)
       assert new_count > initial_count
-      leaf_names = [n.label.plain for n in tree.root.children if not n.children]
+      leaf_names = [(_plain(n.label)) for n in tree.root.children if not n.children]
       assert "notes.md" in leaf_names

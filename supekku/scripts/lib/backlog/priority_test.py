@@ -134,20 +134,35 @@ class PrioritySortTest(unittest.TestCase):
     """Create test backlog items."""
     self.items = [
       BacklogItem(
-        id="ISSUE-001", kind="issue", status="open", title="A", path="", severity="p2"
+        id="ISSUE-001",
+        kind="issue",
+        status="open",
+        title="A",
+        path=Path(),
+        severity="p2",
       ),
       BacklogItem(
-        id="ISSUE-002", kind="issue", status="open", title="B", path="", severity="p1"
+        id="ISSUE-002",
+        kind="issue",
+        status="open",
+        title="B",
+        path=Path(),
+        severity="p1",
       ),
       BacklogItem(
-        id="ISSUE-003", kind="issue", status="open", title="C", path="", severity="p3"
+        id="ISSUE-003",
+        kind="issue",
+        status="open",
+        title="C",
+        path=Path(),
+        severity="p3",
       ),
       BacklogItem(
         id="IMPR-001",
         kind="improvement",
         status="open",
         title="D",
-        path="",
+        path=Path(),
         severity="",
       ),
       BacklogItem(
@@ -155,7 +170,7 @@ class PrioritySortTest(unittest.TestCase):
         kind="improvement",
         status="open",
         title="E",
-        path="",
+        path=Path(),
         severity="p1",
       ),
     ]
@@ -189,13 +204,28 @@ class PrioritySortTest(unittest.TestCase):
     # Items with same severity
     items = [
       BacklogItem(
-        id="ISSUE-003", kind="issue", status="open", title="C", path="", severity="p2"
+        id="ISSUE-003",
+        kind="issue",
+        status="open",
+        title="C",
+        path=Path(),
+        severity="p2",
       ),
       BacklogItem(
-        id="ISSUE-001", kind="issue", status="open", title="A", path="", severity="p2"
+        id="ISSUE-001",
+        kind="issue",
+        status="open",
+        title="A",
+        path=Path(),
+        severity="p2",
       ),
       BacklogItem(
-        id="ISSUE-002", kind="issue", status="open", title="B", path="", severity="p2"
+        id="ISSUE-002",
+        kind="issue",
+        status="open",
+        title="B",
+        path=Path(),
+        severity="p2",
       ),
     ]
     ordering = []
@@ -246,13 +276,13 @@ class PrioritySortTest(unittest.TestCase):
     """Test that severity comparison handles case variations."""
     items = [
       BacklogItem(
-        id="A", kind="issue", status="open", title="", path="", severity="P2"
+        id="A", kind="issue", status="open", title="", path=Path(), severity="P2"
       ),
       BacklogItem(
-        id="B", kind="issue", status="open", title="", path="", severity="p1"
+        id="B", kind="issue", status="open", title="", path=Path(), severity="p1"
       ),
       BacklogItem(
-        id="C", kind="issue", status="open", title="", path="", severity="P3"
+        id="C", kind="issue", status="open", title="", path=Path(), severity="P3"
       ),
     ]
     sorted_items = sort_by_priority(items, [])

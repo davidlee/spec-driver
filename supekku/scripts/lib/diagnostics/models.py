@@ -2,9 +2,20 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from pathlib import Path
+from typing import Literal, Protocol
 
 from pydantic import BaseModel
+
+
+class DiagnosticWorkspace(Protocol):
+  """Minimal interface for diagnostic check functions.
+
+  Allows tests to pass lightweight fakes without importing Workspace.
+  """
+
+  root: Path
+
 
 Status = Literal["pass", "warn", "fail"]
 

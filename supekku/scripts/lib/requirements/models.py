@@ -85,8 +85,10 @@ class RequirementRecord:
     return d
 
   @classmethod
-  def from_dict(cls, uid: str, data: dict[str, object]) -> RequirementRecord:
+  def from_dict(cls, uid: str, data: dict[str, Any]) -> RequirementRecord:
     """Create requirement record from dictionary."""
+    cat = data.get("category")
+    intro = data.get("introduced")
     return cls(
       uid=uid,
       label=str(data.get("label", "")),
@@ -94,10 +96,10 @@ class RequirementRecord:
       specs=list(data.get("specs", [])),
       primary_spec=str(data.get("primary_spec", "")),
       kind=str(data.get("kind", "functional")),
-      category=data.get("category"),
+      category=str(cat) if cat is not None else None,
       status=str(data.get("status", STATUS_PENDING)),
       tags=list(data.get("tags", [])),
-      introduced=data.get("introduced"),
+      introduced=str(intro) if intro is not None else None,
       implemented_by=list(data.get("implemented_by", [])),
       verified_by=list(data.get("verified_by", [])),
       coverage_evidence=list(data.get("coverage_evidence", [])),

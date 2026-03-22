@@ -15,12 +15,10 @@ from supekku.scripts.lib.core.paths import (
   get_tech_specs_dir,
   get_templates_dir,
 )
-from supekku.scripts.lib.diagnostics.models import DiagnosticResult
+from supekku.scripts.lib.diagnostics.models import DiagnosticResult, DiagnosticWorkspace
 
 if TYPE_CHECKING:
   from pathlib import Path
-
-  from supekku.scripts.lib.workspace import Workspace
 
 CATEGORY = "structure"
 
@@ -36,7 +34,7 @@ _REQUIRED_DIRS: list[tuple[str, Callable[..., Path]]] = [
 ]
 
 
-def check_structure(ws: Workspace) -> list[DiagnosticResult]:
+def check_structure(ws: DiagnosticWorkspace) -> list[DiagnosticResult]:
   """Check workspace directory structure for expected directories and orphans."""
   results: list[DiagnosticResult] = []
   root = ws.root

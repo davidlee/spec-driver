@@ -119,7 +119,7 @@ class TestComputeBatchStaleness:
     )
     with patch("supekku.scripts.lib.memory.staleness.date") as mock_date:
       mock_date.today.return_value = date(2026, 3, 9)
-      mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+      mock_date.side_effect = date
       result = compute_batch_staleness([record], Path("/repo"))
 
     assert len(result) == 1
@@ -132,7 +132,7 @@ class TestComputeBatchStaleness:
     record = _make_record(updated=date(2026, 3, 5))
     with patch("supekku.scripts.lib.memory.staleness.date") as mock_date:
       mock_date.today.return_value = date(2026, 3, 9)
-      mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+      mock_date.side_effect = date
       result = compute_batch_staleness([record], Path("/repo"))
 
     assert result[0].days_since == 4
@@ -162,7 +162,7 @@ class TestComputeBatchStaleness:
       patch("supekku.scripts.lib.memory.staleness.date") as mock_date,
     ):
       mock_date.today.return_value = date(2026, 3, 9)
-      mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+      mock_date.side_effect = date
       result = compute_batch_staleness([record], Path("/repo"))
 
     assert len(result) == 1
@@ -177,7 +177,7 @@ class TestComputeBatchStaleness:
     )
     with patch("supekku.scripts.lib.memory.staleness.date") as mock_date:
       mock_date.today.return_value = date(2026, 3, 9)
-      mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+      mock_date.side_effect = date
       result = compute_batch_staleness([record], Path("/repo"))
 
     assert result[0].has_scope is True
@@ -199,7 +199,7 @@ class TestComputeBatchStaleness:
       patch("supekku.scripts.lib.memory.staleness.date") as mock_date,
     ):
       mock_date.today.return_value = date(2026, 3, 9)
-      mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+      mock_date.side_effect = date
       result = compute_batch_staleness([record], Path("/repo"))
 
     assert result[0].has_scope is True
@@ -221,7 +221,7 @@ class TestComputeBatchStaleness:
       patch("supekku.scripts.lib.memory.staleness.date") as mock_date,
     ):
       mock_date.today.return_value = date(2026, 3, 9)
-      mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+      mock_date.side_effect = date
       result = compute_batch_staleness([record], Path("/repo"))
 
     assert result[0].commits_since is None
@@ -256,7 +256,7 @@ class TestComputeBatchStaleness:
       patch("supekku.scripts.lib.memory.staleness.date") as mock_date,
     ):
       mock_date.today.return_value = date(2026, 3, 9)
-      mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+      mock_date.side_effect = date
       result = compute_batch_staleness([r1, r2], Path("/repo"))
 
     # Single git call
@@ -279,7 +279,7 @@ class TestComputeBatchStaleness:
       patch("supekku.scripts.lib.memory.staleness.date") as mock_date,
     ):
       mock_date.today.return_value = date(2026, 3, 9)
-      mock_date.side_effect = lambda *args, **kw: date(*args, **kw)
+      mock_date.side_effect = date
       result = compute_batch_staleness([r1, r2], Path("/repo"))
 
     mock_run.assert_not_called()

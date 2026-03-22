@@ -8,14 +8,11 @@ filtered item reordering.
 from __future__ import annotations
 
 import re
-from typing import TypeVar
 
 from .models import BacklogItem
 
-T = TypeVar("T")
 
-
-def build_partitions(
+def build_partitions[T](
   all_items: list[T], filtered_items: set[T]
 ) -> tuple[list[T], list[tuple[T, list[T]]]]:
   """Partition items into (shown, [unshown_followers]) pairs.
@@ -74,7 +71,7 @@ def build_partitions(
   return prefix, partitions
 
 
-def merge_ordering(
+def merge_ordering[T](
   prefix: list[T], partitions: list[tuple[T, list[T]]], new_filtered_order: list[T]
 ) -> list[T]:
   """Reorder partitions based on new filtered order, then flatten.

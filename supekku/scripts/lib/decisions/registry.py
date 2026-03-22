@@ -58,7 +58,7 @@ class DecisionRecord:
         Dictionary representation suitable for YAML serialization
 
     """
-    data = {
+    data: dict[str, Any] = {
       "id": self.id,
       "title": self.title,
       "status": self.status,

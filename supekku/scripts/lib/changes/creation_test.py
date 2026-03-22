@@ -8,6 +8,8 @@ import unittest
 from pathlib import Path
 from textwrap import dedent
 
+import frontmatter
+
 from supekku.scripts.lib.changes.creation import (
   ChangeArtifactCreated,
   PhaseCreationError,
@@ -729,8 +731,6 @@ class CreateChangeTest(unittest.TestCase):
     result = create_phase("Foundation Phase", plan_id, repo_root=root)
 
     # Parse frontmatter from the created phase
-    import frontmatter
-
     post = frontmatter.load(str(result.phase_path))
     fm = post.metadata
 
@@ -756,8 +756,6 @@ class CreateChangeTest(unittest.TestCase):
     delta_id = delta_result.artifact_id
 
     result = create_phase("Simple Phase", plan_id, repo_root=root)
-
-    import frontmatter
 
     post = frontmatter.load(str(result.phase_path))
     fm = post.metadata

@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 import yaml
 from jinja2 import Template
@@ -91,7 +92,7 @@ def build_standard_frontmatter(
     Dictionary containing standard frontmatter.
   """
   today = date.today().isoformat()
-  frontmatter = {
+  frontmatter: dict[str, Any] = {
     "id": standard_id,
     "title": f"{standard_id}: {title}",
     "status": status,

@@ -44,7 +44,7 @@ def _make_ledger(
     id=ledger_id,
     name=name,
     entries=entries or [],
-    **defaults,
+    **defaults,  # type: ignore[invalid-argument-type]
   )
 
 

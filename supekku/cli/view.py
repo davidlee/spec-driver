@@ -17,6 +17,7 @@ from supekku.cli.common import (
   render_file_paged,
   resolve_artifact,
   resolve_by_id,
+  resolve_root,
 )
 
 app = typer.Typer(
@@ -29,7 +30,7 @@ app = typer.Typer(
 def _view_artifact(
   artifact_type: str,
   raw_id: str,
-  root: Path,
+  root: Path | None,
   *,
   pager: bool = False,
 ) -> None:
@@ -230,7 +231,7 @@ def view_card(
   from supekku.scripts.lib.cards import CardRegistry  # noqa: PLC0415
 
   try:
-    registry = CardRegistry(root=root)
+    registry = CardRegistry(root=resolve_root(root))
     path = Path(registry.resolve_path(card_id, anywhere=anywhere))
     if pager:
       render_file_paged(path)

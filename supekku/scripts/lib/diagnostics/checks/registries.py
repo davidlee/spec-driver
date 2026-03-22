@@ -5,12 +5,7 @@ Verifies that all registries load without errors.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from supekku.scripts.lib.diagnostics.models import DiagnosticResult
-
-if TYPE_CHECKING:
-  from supekku.scripts.lib.workspace import Workspace
+from supekku.scripts.lib.diagnostics.models import DiagnosticResult, DiagnosticWorkspace
 
 CATEGORY = "registries"
 
@@ -26,7 +21,7 @@ _REGISTRIES: list[tuple[str, str]] = [
 ]
 
 
-def check_registries(ws: Workspace) -> list[DiagnosticResult]:
+def check_registries(ws: DiagnosticWorkspace) -> list[DiagnosticResult]:
   """Load all registries and report any that fail to collect."""
   results: list[DiagnosticResult] = []
 

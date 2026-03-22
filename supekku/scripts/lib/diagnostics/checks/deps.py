@@ -8,18 +8,14 @@ from __future__ import annotations
 
 import sys
 from shutil import which
-from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.core.npm_utils import is_npm_package_available
-from supekku.scripts.lib.diagnostics.models import DiagnosticResult
-
-if TYPE_CHECKING:
-  from supekku.scripts.lib.workspace import Workspace
+from supekku.scripts.lib.diagnostics.models import DiagnosticResult, DiagnosticWorkspace
 
 CATEGORY = "deps"
 
 
-def check_deps(ws: Workspace) -> list[DiagnosticResult]:
+def check_deps(ws: DiagnosticWorkspace) -> list[DiagnosticResult]:
   """Check availability of required and optional dependencies."""
   results: list[DiagnosticResult] = []
 
@@ -125,7 +121,7 @@ def _check_binary(name: str, label: str, install_hint: str) -> DiagnosticResult:
   )
 
 
-def _check_ts_doc_extract(ws: Workspace) -> DiagnosticResult:
+def _check_ts_doc_extract(ws: DiagnosticWorkspace) -> DiagnosticResult:
   if is_npm_package_available("ts-doc-extract", package_root=ws.root):
     return DiagnosticResult(
       category=CATEGORY,

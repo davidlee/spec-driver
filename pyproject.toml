@@ -56,7 +56,7 @@ path = "VERSION"
 pattern = "(?P<version>.+)"
 
 [tool.hatch.build.targets.wheel]
-packages = ["supekku"]
+packages = ["supekku", "spec_driver"]
 exclude = [
     "supekku/CLAUDE.md",
     ".direnv/",
@@ -76,7 +76,7 @@ exclude = [
 
 
 [tool.hatch.build.targets.sdist]
-packages = ["supekku"]
+packages = ["supekku", "spec_driver"]
 
 exclude = [
     "supekku/CLAUDE.md",
@@ -250,3 +250,9 @@ layers = [
     "spec_driver.core",
 ]
 
+
+[tool.ty.rules]
+unused-type-ignore-comment = "ignore"  # we use multiple type checkers
+
+[tool.ty.analysis]
+allowed-unresolved-imports = ["spec_sync.**"]

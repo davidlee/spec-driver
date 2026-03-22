@@ -7,7 +7,7 @@ Formatters take RequirementRecord objects and return formatted strings for displ
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
@@ -156,7 +156,7 @@ def format_requirement_list_json(requirements: Sequence[RequirementRecord]) -> s
   """
   items = []
   for req in requirements:
-    item = {
+    item: dict[str, Any] = {
       "uid": req.uid,
       "label": req.label,
       "title": req.title,

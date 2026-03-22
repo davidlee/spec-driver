@@ -6,13 +6,8 @@ into DiagnosticResult entries.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from supekku.scripts.lib.diagnostics.models import DiagnosticResult
+from supekku.scripts.lib.diagnostics.models import DiagnosticResult, DiagnosticWorkspace
 from supekku.scripts.lib.validation.validator import validate_workspace
-
-if TYPE_CHECKING:
-  from supekku.scripts.lib.workspace import Workspace
 
 CATEGORY = "refs"
 
@@ -23,7 +18,7 @@ _LEVEL_TO_STATUS = {
 }
 
 
-def check_refs(ws: Workspace) -> list[DiagnosticResult]:
+def check_refs(ws: DiagnosticWorkspace) -> list[DiagnosticResult]:  # type: ignore[arg-type]
   """Check cross-reference consistency by delegating to WorkspaceValidator."""
   try:
     issues = validate_workspace(ws)

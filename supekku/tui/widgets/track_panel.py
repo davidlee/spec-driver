@@ -92,7 +92,7 @@ class TrackPanel(DataTable):
       styled_text(status, status_style) if status_style else status,
       key=row_key,
     )
-    self.sort("time", key=lambda val: str(val), reverse=True)
+    self.sort("time", key=str, reverse=True)
 
     while self.row_count > DISPLAY_BUFFER_LIMIT:
       last_key = list(self.rows)[-1]

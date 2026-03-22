@@ -89,7 +89,7 @@ def emit_json_and_exit(payload: dict) -> NoReturn:
   raise typer.Exit(payload["exit_code"])
 
 
-class ContentType(str, enum.Enum):
+class ContentType(enum.StrEnum):
   """Unified output content-type selector for show commands."""
 
   markdown = "markdown"
@@ -123,6 +123,13 @@ def root_option_callback(value: Path | None) -> Path:
   if value is None:
     return Path.cwd()
   return value.resolve()
+
+
+def resolve_root(root: Path | None) -> Path:
+  """Narrow RootOption to Path (callback guarantees non-None at runtime)."""
+  if root is None:
+    return Path.cwd()
+  return root
 
 
 # Common option definitions for reuse

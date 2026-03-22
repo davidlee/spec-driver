@@ -306,7 +306,7 @@ def list_deltas(
 
     # Apply reverse reference filtering
     if referenced_by or not_referenced_by:
-      ref_type = referenced_by or not_referenced_by
+      ref_type = referenced_by or not_referenced_by or ""
       referrers = load_all_artifacts(root, ref_type)
       referenced, unreferenced = partition_by_reverse_references(
         filtered_artifacts,

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Iterable, Iterator, Mapping
+from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.blocks.delta import (
@@ -47,17 +48,17 @@ def _upsert_record(
   if existing is not None:
     merged = existing.merge(record)
     if source_kind:
-      merged = RequirementRecord(**{**merged.__dict__, "source_kind": source_kind})
+      merged = replace(merged, source_kind=source_kind)
     if source_type:
-      merged = RequirementRecord(**{**merged.__dict__, "source_type": source_type})
+      merged = replace(merged, source_type=source_type)
     if merged != existing:
       records[record.uid] = merged
       stats.updated += 1
   else:
     if source_kind:
-      record = RequirementRecord(**{**record.__dict__, "source_kind": source_kind})
+      record = replace(record, source_kind=source_kind)
     if source_type:
-      record = RequirementRecord(**{**record.__dict__, "source_type": source_type})
+      record = replace(record, source_type=source_type)
     records[record.uid] = record
     stats.created += 1
 

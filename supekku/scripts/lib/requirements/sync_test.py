@@ -45,7 +45,7 @@ class RequirementsRegistryTest(unittest.TestCase):
   def tearDown(self) -> None:
     os.chdir(self._cwd)
 
-  def _write_spec(self, root: Path, spec_id: str, body: str) -> None:
+  def _write_spec(self, root: Path, spec_id: str, body: str) -> Path:
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / f"{spec_id.lower()}-example"
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_path = spec_dir / f"{spec_id}.md"

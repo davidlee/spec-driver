@@ -14,10 +14,12 @@ from .structure import check_structure
 if TYPE_CHECKING:
   from collections.abc import Callable
 
-  from supekku.scripts.lib.diagnostics.models import DiagnosticResult
-  from supekku.scripts.lib.workspace import Workspace
+  from supekku.scripts.lib.diagnostics.models import (
+    DiagnosticResult,
+    DiagnosticWorkspace,
+  )
 
-  CheckFn = Callable[[Workspace], list[DiagnosticResult]]
+  CheckFn = Callable[[DiagnosticWorkspace], list[DiagnosticResult]]
 
 # Ordered registry of check categories.
 # Runner iterates this in order; --check filters by key.

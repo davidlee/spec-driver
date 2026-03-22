@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 import frontmatter
@@ -110,15 +111,13 @@ class TestPhaseSheetCorpus:
     for phase_file in phase_files:
       fm = frontmatter.load(str(phase_file))
       # Should never raise — extra='ignore' handles unknown fields
-      sheet = PhaseSheet(**fm.metadata)
+      sheet = PhaseSheet(**fm.metadata)  # type: ignore[invalid-argument-type]
       # Just verify it parsed without error; canonical fields may or may not exist
       assert isinstance(sheet, PhaseSheet), f"Failed to parse {phase_file}"
 
   def test_date_handling(self) -> None:
     """PyYAML auto-parses dates; Pydantic extra='ignore' handles them."""
     # Simulate what python-frontmatter gives us: dates as date objects
-    from datetime import date
-
     sheet = PhaseSheet(
       plan="IP-106",
       delta="DE-106",

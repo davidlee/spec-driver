@@ -8,7 +8,7 @@ from typing import Annotated
 
 import typer
 
-from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption
+from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, RootOption, resolve_root
 from supekku.cli.hints import print_schema_hints
 from supekku.scripts.lib.backlog.registry import create_backlog_entry
 from supekku.scripts.lib.cards import CardRegistry
@@ -771,7 +771,7 @@ def create_card(
 ) -> None:
   """Create a new kanban card with the next available ID."""
   try:
-    registry = CardRegistry(root=root)
+    registry = CardRegistry(root=resolve_root(root))
     card = registry.create_card(description, lane=lane)
 
     typer.echo(f"Created card: {card.id}")

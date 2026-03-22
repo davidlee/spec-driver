@@ -8,20 +8,16 @@ from __future__ import annotations
 
 import tomllib
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.core.paths import (
   get_spec_driver_root,
 )
-from supekku.scripts.lib.diagnostics.models import DiagnosticResult
-
-if TYPE_CHECKING:
-  from supekku.scripts.lib.workspace import Workspace
+from supekku.scripts.lib.diagnostics.models import DiagnosticResult, DiagnosticWorkspace
 
 CATEGORY = "config"
 
 
-def check_config(ws: Workspace) -> list[DiagnosticResult]:
+def check_config(ws: DiagnosticWorkspace) -> list[DiagnosticResult]:
   """Check configuration files and skills exposure."""
   results: list[DiagnosticResult] = []
   root = ws.root

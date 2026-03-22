@@ -184,7 +184,7 @@ class TestMemoryRecord(unittest.TestCase):
       "status": "active",
       "memory_type": "fact",
     }
-    record = MemoryRecord(**fm, path="/repo/memory/mem.fact.test.md")
+    record = MemoryRecord(**fm, path="/repo/memory/mem.fact.test.md")  # type: ignore[invalid-argument-type]
     self.assertEqual(record.id, "mem.fact.test")
     self.assertEqual(record.memory_type, "fact")
     self.assertEqual(record.path, "/repo/memory/mem.fact.test.md")
@@ -201,7 +201,7 @@ class TestMemoryRecord(unittest.TestCase):
       "verified": "2026-03-01",
       "review_by": "2026-06-01",
     }
-    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")
+    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")  # type: ignore[invalid-argument-type]
     self.assertEqual(record.created, date(2026, 3, 1))
     self.assertEqual(record.updated, date(2026, 3, 2))
     self.assertEqual(record.verified, date(2026, 3, 1))
@@ -226,7 +226,7 @@ class TestMemoryRecord(unittest.TestCase):
       "visibility": ["pre", "on_demand"],
       "relations": [{"type": "relates_to", "target": "ADR-011"}],
     }
-    record = MemoryRecord(**fm, path="/repo/mem.signpost.auth.prereading.md")
+    record = MemoryRecord(**fm, path="/repo/mem.signpost.auth.prereading.md")  # type: ignore[invalid-argument-type]
     self.assertEqual(record.confidence, "high")
     self.assertEqual(record.requires_reading, ["ADR-011"])
     self.assertEqual(record.scope, {"globs": ["src/**"]})
@@ -243,7 +243,7 @@ class TestMemoryRecord(unittest.TestCase):
       "created": "not-a-date",
       "verified": "March 2026",
     }
-    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")
+    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")  # type: ignore[invalid-argument-type]
     self.assertIsNone(record.created)
     self.assertIsNone(record.verified)
 
@@ -273,7 +273,7 @@ class TestMemoryRecord(unittest.TestCase):
       "memory_type": "fact",
       "links": links,
     }
-    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")
+    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")  # type: ignore[invalid-argument-type]
     self.assertEqual(record.links, links)
 
   def test_to_dict_with_links(self) -> None:
@@ -320,7 +320,7 @@ class TestMemoryRecordVerifiedSha(unittest.TestCase):
       "memory_type": "fact",
       "verified_sha": self.SAMPLE_SHA,
     }
-    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")
+    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")  # type: ignore[invalid-argument-type]
     self.assertEqual(record.verified_sha, self.SAMPLE_SHA)
 
   def test_from_frontmatter_without_verified_sha(self) -> None:
@@ -330,7 +330,7 @@ class TestMemoryRecordVerifiedSha(unittest.TestCase):
       "status": "active",
       "memory_type": "fact",
     }
-    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")
+    record = MemoryRecord(**fm, path="/repo/mem.fact.test.md")  # type: ignore[invalid-argument-type]
     self.assertIsNone(record.verified_sha)
 
   def test_to_dict_includes_verified_sha_when_present(self) -> None:

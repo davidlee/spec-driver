@@ -5,8 +5,14 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from rich.text import Text
 
 from supekku.tui.widgets.bundle_tree import BundleFileSelected, BundleTree
+
+
+def _plain(label: str | Text) -> str:
+  """Extract plain text from a tree node label."""
+  return label.plain if isinstance(label, Text) else label
 
 
 @pytest.fixture()
@@ -46,7 +52,7 @@ class TestBundleTreePopulation:
     assert len(children) > 0
 
     # Collect all leaf names
-    leaf_names = [n.label.plain for n in children if not n.children]
+    leaf_names = [_plain(n.label) for n in children if not n.children]
     assert "DE-061.md" in leaf_names
     assert "DR-061.md" in leaf_names
     assert "IP-061.md" in leaf_names
@@ -60,16 +66,16 @@ class TestBundleTreePopulation:
     dir_nodes = [n for n in tree.root.children if n.children]
     assert len(dir_nodes) == 1
     phases_node = dir_nodes[0]
-    assert phases_node.label.plain == "phases"
+    assert _plain(phases_node.label) == "phases"
 
-    phase_names = [n.label.plain for n in phases_node.children]
+    phase_names = [_plain(n.label) for n in phases_node.children]
     assert "phase-01.md" in phase_names
     assert "phase-02.md" in phase_names
 
   def test_sets_root_label_to_dir_name(self, bundle_dir: Path) -> None:
     tree = BundleTree(id="test-tree")
     tree.show_bundle(bundle_dir, bundle_dir / "DE-061.md")
-    assert tree.root.label.plain == bundle_dir.name
+    assert _plain(tree.root.label) == bundle_dir.name
 
   def test_empty_bundle(self, empty_bundle: Path) -> None:
     tree = BundleTree(id="test-tree")
@@ -92,7 +98,7 @@ class TestBundleTreeHiddenAndSymlinks:
     tree = BundleTree(id="test-tree")
     tree.show_bundle(bundle_dir, bundle_dir / "DE-061.md")
 
-    names = [n.label.plain for n in tree.root.children]
+    names = [_plain(n.label) for n in tree.root.children]
     assert ".hidden" not in names
 
   def test_skips_dotdirs(self, bundle_dir: Path) -> None:
@@ -103,7 +109,7 @@ class TestBundleTreeHiddenAndSymlinks:
     tree = BundleTree(id="test-tree")
     tree.show_bundle(bundle_dir, bundle_dir / "DE-061.md")
 
-    names = [n.label.plain for n in tree.root.children]
+    names = [_plain(n.label) for n in tree.root.children]
     assert ".secret" not in names
 
   def test_skips_symlinks(self, bundle_dir: Path) -> None:
@@ -114,7 +120,7 @@ class TestBundleTreeHiddenAndSymlinks:
     tree = BundleTree(id="test-tree")
     tree.show_bundle(bundle_dir, target)
 
-    names = [n.label.plain for n in tree.root.children]
+    names = [_plain(n.label) for n in tree.root.children]
     assert "link.md" not in names
 
   def test_skips_symlink_dirs(self, bundle_dir: Path) -> None:
@@ -125,7 +131,7 @@ class TestBundleTreeHiddenAndSymlinks:
     tree = BundleTree(id="test-tree")
     tree.show_bundle(bundle_dir, bundle_dir / "DE-061.md")
 
-    names = [n.label.plain for n in tree.root.children]
+    names = [_plain(n.label) for n in tree.root.children]
     assert "linked_phases" not in names
 
 
@@ -151,19 +157,19 @@ class TestBundleTreeDepthLimit:
 
     # Walk down: a -> b -> c (depth 3 reached, d should not appear)
     a_node = dir_nodes[0]
-    assert a_node.label.plain == "a"
+    assert _plain(a_node.label) == "a"
 
     b_nodes = [n for n in a_node.children if n.children]
     assert len(b_nodes) == 1
     b_node = b_nodes[0]
-    assert b_node.label.plain == "b"
+    assert _plain(b_node.label) == "b"
 
     c_nodes = [n for n in b_node.children if n.children]
     # c exists but d should not be populated (depth 3 = max)
     if c_nodes:
       c_node = c_nodes[0]
       # d should not appear as a child of c
-      d_nodes = [n for n in c_node.children if n.label.plain == "d"]
+      d_nodes = [n for n in c_node.children if _plain(n.label) == "d"]
       assert len(d_nodes) == 0
 
 
@@ -203,7 +209,7 @@ class TestBundleTreeSortOrder:
 
     file_nodes = [n for n in tree.root.children if not n.children]
     # Skip primary (first), rest should be alphabetical
-    rest = [n.label.plain.lower() for n in file_nodes[1:]]
+    rest = [_plain(n.label).lower() for n in file_nodes[1:]]
     assert rest == sorted(rest)
 
 

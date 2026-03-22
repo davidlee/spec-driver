@@ -332,7 +332,7 @@ class TestFormatListTable:
       "to_json": self._to_json,
     }
     defaults.update(kwargs)
-    return format_list_table(items, **defaults)
+    return format_list_table(items, **defaults)  # type: ignore[invalid-argument-type]
 
   def test_table_format_renders_columns_and_data(self):
     items = [self._make_item("T-001", "Alpha"), self._make_item("T-002", "Beta")]

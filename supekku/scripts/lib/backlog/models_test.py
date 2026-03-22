@@ -137,7 +137,7 @@ class BacklogItemToDictTest(unittest.TestCase):
       "path": Path(),
     }
     defaults.update(kwargs)
-    return BacklogItem(**defaults)
+    return BacklogItem(**defaults)  # type: ignore[invalid-argument-type]
 
   def test_always_includes_linked_deltas(self) -> None:
     item = self._make_item()

@@ -334,7 +334,7 @@ class TestSortKey(unittest.TestCase):
       _record(record_id="mem.fact.beta", priority={"severity": "high"}),
       _record(record_id="mem.concept.delta", priority={"severity": "low"}),
     ]
-    sorted_recs = sorted(records, key=lambda r: sort_key(r))
+    sorted_recs = sorted(records, key=sort_key)
     ids = [r.id for r in sorted_recs]
     self.assertEqual(
       ids,
@@ -359,7 +359,7 @@ class TestSortKey(unittest.TestCase):
         priority={"severity": "high", "weight": 10},
       ),
     ]
-    sorted_recs = sorted(records, key=lambda r: sort_key(r))
+    sorted_recs = sorted(records, key=sort_key)
     self.assertEqual(sorted_recs[0].id, "mem.fact.beta")
 
   def test_specificity_tiebreak(self) -> None:
@@ -410,7 +410,7 @@ class TestSortKey(unittest.TestCase):
       _record(record_id="mem.fact.alpha"),
       _record(record_id="mem.fact.beta"),
     ]
-    sorted_recs = sorted(records, key=lambda r: sort_key(r))
+    sorted_recs = sorted(records, key=sort_key)
     self.assertEqual(
       [r.id for r in sorted_recs],
       ["mem.fact.alpha", "mem.fact.beta", "mem.fact.gamma"],

@@ -79,20 +79,29 @@ class SpecTaxonomyTest(RepoTestCase):
     root = self._make_repo_with_specs()
     registry = SpecRegistry(root)
 
-    assert registry.get("SPEC-001").category == "unit"
-    assert registry.get("SPEC-002").category == "assembly"
+    spec1 = registry.get("SPEC-001")
+    spec2 = registry.get("SPEC-002")
+    assert spec1 is not None
+    assert spec2 is not None
+    assert spec1.category == "unit"
+    assert spec2.category == "assembly"
 
   def test_c4_level_property(self):
     root = self._make_repo_with_specs()
     registry = SpecRegistry(root)
 
-    assert registry.get("SPEC-001").c4_level == "code"
-    assert registry.get("SPEC-002").c4_level == "component"
+    spec1 = registry.get("SPEC-001")
+    spec2 = registry.get("SPEC-002")
+    assert spec1 is not None
+    assert spec2 is not None
+    assert spec1.c4_level == "code"
+    assert spec2.c4_level == "component"
 
   def test_missing_taxonomy_returns_empty_string(self):
     root = self._make_repo_with_specs()
     registry = SpecRegistry(root)
     bare = registry.get("SPEC-003")
+    assert bare is not None
 
     assert bare.category == ""
     assert bare.c4_level == ""
@@ -101,11 +110,15 @@ class SpecTaxonomyTest(RepoTestCase):
     root = self._make_repo_with_specs()
     registry = SpecRegistry(root)
 
-    unit_dict = registry.get("SPEC-001").to_dict(root)
+    spec1 = registry.get("SPEC-001")
+    spec2 = registry.get("SPEC-002")
+    assert spec1 is not None
+    assert spec2 is not None
+    unit_dict = spec1.to_dict(root)
     assert unit_dict["category"] == "unit"
     assert unit_dict["c4_level"] == "code"
 
-    asm_dict = registry.get("SPEC-002").to_dict(root)
+    asm_dict = spec2.to_dict(root)
     assert asm_dict["category"] == "assembly"
     assert asm_dict["c4_level"] == "component"
 
@@ -113,7 +126,9 @@ class SpecTaxonomyTest(RepoTestCase):
     root = self._make_repo_with_specs()
     registry = SpecRegistry(root)
 
-    bare_dict = registry.get("SPEC-003").to_dict(root)
+    spec3 = registry.get("SPEC-003")
+    assert spec3 is not None
+    bare_dict = spec3.to_dict(root)
     assert "category" not in bare_dict
     assert "c4_level" not in bare_dict
 
@@ -165,33 +180,40 @@ class SpecExternalRefTest(RepoTestCase):
   def test_ext_id_property(self):
     root = self._make_repo_with_external_spec()
     registry = SpecRegistry(root)
-    assert registry.get("SPEC-010").ext_id == "JIRA-1234"
+    spec = registry.get("SPEC-010")
+    assert spec is not None
+    assert spec.ext_id == "JIRA-1234"
 
   def test_ext_url_property(self):
     root = self._make_repo_with_external_spec()
     registry = SpecRegistry(root)
-    assert (
-      registry.get("SPEC-010").ext_url == "https://jira.example.com/browse/JIRA-1234"
-    )
+    spec = registry.get("SPEC-010")
+    assert spec is not None
+    assert spec.ext_url == "https://jira.example.com/browse/JIRA-1234"
 
   def test_missing_ext_fields_return_empty_string(self):
     root = self._make_repo_with_external_spec()
     registry = SpecRegistry(root)
     bare = registry.get("SPEC-011")
+    assert bare is not None
     assert bare.ext_id == ""
     assert bare.ext_url == ""
 
   def test_to_dict_includes_ext_fields_when_present(self):
     root = self._make_repo_with_external_spec()
     registry = SpecRegistry(root)
-    data = registry.get("SPEC-010").to_dict(root)
+    spec = registry.get("SPEC-010")
+    assert spec is not None
+    data = spec.to_dict(root)
     assert data["ext_id"] == "JIRA-1234"
     assert data["ext_url"] == "https://jira.example.com/browse/JIRA-1234"
 
   def test_to_dict_omits_ext_fields_when_absent(self):
     root = self._make_repo_with_external_spec()
     registry = SpecRegistry(root)
-    data = registry.get("SPEC-011").to_dict(root)
+    spec = registry.get("SPEC-011")
+    assert spec is not None
+    data = spec.to_dict(root)
     assert "ext_id" not in data
     assert "ext_url" not in data
 
@@ -248,6 +270,7 @@ class SpecRelationsTest(RepoTestCase):
     root = self._make_repo_with_relations_spec()
     registry = SpecRegistry(root)
     spec = registry.find("SPEC-020")
+    assert spec is not None
     rels = spec.relations
     assert len(rels) == 2
     assert rels[0]["type"] == "implements"
@@ -259,12 +282,14 @@ class SpecRelationsTest(RepoTestCase):
     root = self._make_repo_with_relations_spec()
     registry = SpecRegistry(root)
     spec = registry.find("SPEC-021")
+    assert spec is not None
     assert spec.relations == []
 
   def test_relations_are_dicts(self):
     root = self._make_repo_with_relations_spec()
     registry = SpecRegistry(root)
     spec = registry.find("SPEC-020")
+    assert spec is not None
     for rel in spec.relations:
       assert isinstance(rel, dict)
       assert "type" in rel
@@ -273,7 +298,9 @@ class SpecRelationsTest(RepoTestCase):
   def test_to_dict_includes_relations_when_present(self):
     root = self._make_repo_with_relations_spec()
     registry = SpecRegistry(root)
-    data = registry.find("SPEC-020").to_dict(root)
+    spec020 = registry.find("SPEC-020")
+    assert spec020 is not None
+    data = spec020.to_dict(root)
     assert "relations" in data
     assert len(data["relations"]) == 2
     assert data["relations"][0] == {"type": "implements", "target": "PROD-010"}
@@ -283,5 +310,7 @@ class SpecRelationsTest(RepoTestCase):
   def test_to_dict_omits_relations_when_absent(self):
     root = self._make_repo_with_relations_spec()
     registry = SpecRegistry(root)
-    data = registry.find("SPEC-021").to_dict(root)
+    spec021 = registry.find("SPEC-021")
+    assert spec021 is not None
+    data = spec021.to_dict(root)
     assert "relations" not in data

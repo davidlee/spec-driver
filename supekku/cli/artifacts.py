@@ -11,7 +11,7 @@ from typing import Any
 import typer
 
 # Re-export ContentType here since emit_artifact uses it
-from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, ContentType
+from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS, ContentType, resolve_root
 from supekku.cli.ids import (
   PREFIX_TO_TYPE,
   _normalize_plan_id,
@@ -191,14 +191,14 @@ def _resolve_backlog(root: Path, raw_id: str, kind: str) -> ArtifactRef:
   return ArtifactRef(id=item.id, path=item.path, record=item)
 
 
-def load_all_artifacts(root: Path, artifact_type: str) -> list[Any]:
+def load_all_artifacts(root: Path | None, artifact_type: str) -> list[Any]:
   """Load all artifacts of a given type for cross-registry queries.
 
   Used by ``--referenced-by`` / ``--not-referenced-by`` CLI flags to load
   referrer registries.  Uses lazy imports matching existing common.py patterns.
 
   Args:
-    root: Repository root path.
+    root: Repository root path (resolved to cwd if None).
     artifact_type: Artifact type key (e.g. 'audit', 'delta', 'spec').
 
   Returns:
@@ -207,6 +207,7 @@ def load_all_artifacts(root: Path, artifact_type: str) -> list[Any]:
   Raises:
     typer.BadParameter: If artifact_type is unknown.
   """
+  root = resolve_root(root)
   if artifact_type in ("delta", "revision", "audit"):
     from supekku.scripts.lib.changes.registry import ChangeRegistry  # noqa: PLC0415
 
@@ -273,7 +274,7 @@ _ARTIFACT_RESOLVERS: dict[str, Any] = {
 }
 
 
-def resolve_artifact(artifact_type: str, raw_id: str, root: Path) -> ArtifactRef:
+def resolve_artifact(artifact_type: str, raw_id: str, root: Path | None) -> ArtifactRef:
   """Resolve an artifact by type and ID, returning an ArtifactRef.
 
   Uses a dispatch table to delegate to type-specific resolvers. Each
@@ -292,17 +293,18 @@ def resolve_artifact(artifact_type: str, raw_id: str, root: Path) -> ArtifactRef
     ValueError: If artifact_type is not in the dispatch table.
 
   """
+  resolved_root = resolve_root(root)
   resolver = _ARTIFACT_RESOLVERS.get(artifact_type)
   if not resolver:
     msg = f"Unknown artifact type: {artifact_type}"
     raise ValueError(msg)
-  return resolver(root, raw_id)
+  return resolver(resolved_root, raw_id)
 
 
 # --- ID inference ---
 
 
-def resolve_by_id(raw_id: str, root: Path) -> list[tuple[str, ArtifactRef]]:
+def resolve_by_id(raw_id: str, root: Path | None) -> list[tuple[str, ArtifactRef]]:
   """Resolve artifact type from a bare ID (prefixed or numeric).
 
   Uses _build_artifact_index() from resolve.py for O(1) lookup across all
@@ -318,6 +320,7 @@ def resolve_by_id(raw_id: str, root: Path) -> list[tuple[str, ArtifactRef]]:
   """
   from supekku.cli.resolve import build_artifact_index  # noqa: PLC0415
 
+  root = resolve_root(root)
   index = build_artifact_index(root)
 
   # Prefixed ID: look up directly
@@ -610,7 +613,7 @@ _ARTIFACT_FINDERS: dict[str, Any] = {
 
 
 def find_artifacts(
-  artifact_type: str, pattern: str, root: Path
+  artifact_type: str, pattern: str, root: Path | None
 ) -> Iterator[ArtifactRef]:
   """Find all artifacts of a type matching a fnmatch pattern.
 
@@ -629,8 +632,9 @@ def find_artifacts(
     ValueError: If artifact_type is not in the dispatch table.
 
   """
+  resolved_root = resolve_root(root)
   finder = _ARTIFACT_FINDERS.get(artifact_type)
   if not finder:
     msg = f"Unknown artifact type: {artifact_type}"
     raise ValueError(msg)
-  yield from finder(root, pattern)
+  yield from finder(resolved_root, pattern)

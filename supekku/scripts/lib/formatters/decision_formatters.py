@@ -24,7 +24,7 @@ from supekku.scripts.lib.formatters.theme import get_adr_status_style
 if TYPE_CHECKING:
   from collections.abc import Sequence
 
-  from supekku.models.decision import Decision
+  from supekku.scripts.lib.decisions.registry import DecisionRecord as Decision
 
 
 def _format_basic_fields(decision: Decision) -> list[str]:

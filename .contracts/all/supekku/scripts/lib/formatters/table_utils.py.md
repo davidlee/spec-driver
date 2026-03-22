@@ -65,15 +65,15 @@ Args:
 items: Sequence of domain objects to render.
 columns: Column header names for the table.
 title: Table title.
-prepare_row: `(item) -> [cell, ...]` for rich-table rows (may include
+prepare*row: `(item) -> [cell, ...]` for rich-table rows (may include
 markup).
 prepare_tsv_row: `(item) -> [cell, ...]` for plain TSV rows (no markup).
 to_json: `(items) -> str` for JSON serialisation of the full list.
 format_type: Output format — `"table"` (default), `"json"`, or
 `"tsv"`.
-truncate: When _True_, truncate cell content to fit terminal width.
-column_widths: Optional `(terminal_width) -> {col_idx: width}` for
-custom width distribution. Only called when _truncate_ is True.
+truncate: When \_True*, truncate cell content to fit terminal width.
+column*widths: Optional `(terminal_width) -> {col_idx: width}` for
+custom width distribution. Only called when \_truncate* is True.
 Falls back to equal distribution via :func:`calculate_column_widths`.
 
 Returns:

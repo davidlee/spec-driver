@@ -21,6 +21,7 @@ from supekku.cli.common import (
   load_all_artifacts,
   resolve_artifact,
   resolve_by_id,
+  resolve_root,
 )
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.core.repo import find_repo_root
@@ -596,7 +597,7 @@ def show_card(
 ) -> None:
   """Show detailed information about a specific card."""
   try:
-    registry = CardRegistry(root=root)
+    registry = CardRegistry(root=resolve_root(root))
     card = registry.resolve_card(card_id, anywhere=anywhere)
     ref = ArtifactRef(id=card_id, path=card.path, record=card)
     emit_artifact(

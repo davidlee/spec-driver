@@ -168,7 +168,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     decisions_dir.mkdir(parents=True, exist_ok=True)
     adr_path = decisions_dir / f"{adr_id}-test.md"
 
-    frontmatter = {
+    frontmatter: dict[str, Any] = {
       "id": adr_id,
       "title": f"Test Decision {adr_id}",
       "status": status,

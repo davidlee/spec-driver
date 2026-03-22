@@ -183,7 +183,10 @@ class LanguageDetector:
     except ImportError:
       # Fall back to absolute import (when used as script)
       # pylint: disable=import-outside-toplevel
-      from spec_sync.adapters import GoAdapter, PythonAdapter  # noqa: PLC0415
+      from spec_sync.adapters import (  # type: ignore[unresolved-import]  # noqa: PLC0415
+        GoAdapter,
+        PythonAdapter,
+      )
 
     # Create adapters for detection (repo_root not needed for detection)
     temp_root = Path("/tmp")

@@ -15,6 +15,7 @@ from supekku.cli.common import (
   normalize_id,
   open_in_editor,
   resolve_artifact,
+  resolve_root,
 )
 from supekku.scripts.lib.cards import CardRegistry
 from supekku.scripts.lib.changes.registry import ChangeRegistry
@@ -275,7 +276,7 @@ def edit_adr(
       raise typer.Exit(EXIT_FAILURE)
 
     if status is not None:
-      _apply_status(normalized_id, decision.path, "adr", status)
+      _apply_status(normalized_id, Path(decision.path), "adr", status)
       return
     if tag or untag:
       _apply_tags(normalized_id, decision.path, tag, untag)
@@ -310,7 +311,7 @@ def edit_policy(
       raise typer.Exit(EXIT_FAILURE)
 
     if status is not None:
-      _apply_status(normalized_id, policy.path, "policy", status)
+      _apply_status(normalized_id, Path(policy.path), "policy", status)
       return
     if tag or untag:
       _apply_tags(normalized_id, policy.path, tag, untag)
@@ -345,7 +346,7 @@ def edit_standard(
       raise typer.Exit(EXIT_FAILURE)
 
     if status is not None:
-      _apply_status(normalized_id, standard.path, "standard", status)
+      _apply_status(normalized_id, Path(standard.path), "standard", status)
       return
     if tag or untag:
       _apply_tags(normalized_id, standard.path, tag, untag)
@@ -379,7 +380,7 @@ def edit_card(
 ) -> None:
   """Edit card in editor."""
   try:
-    registry = CardRegistry(root=root)
+    registry = CardRegistry(root=resolve_root(root))
     path = Path(registry.resolve_path(card_id, anywhere=anywhere))
 
     if status is not None:

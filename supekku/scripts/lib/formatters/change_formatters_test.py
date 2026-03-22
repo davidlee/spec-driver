@@ -670,7 +670,7 @@ class FormatAuditDetailsTest(unittest.TestCase):
       "relations": [],
     }
     defaults.update(overrides)
-    return ChangeArtifact(**defaults)
+    return ChangeArtifact(**defaults)  # type: ignore[invalid-argument-type]
 
   def test_basic_fields(self) -> None:
     result = format_audit_details(self._make_audit())
@@ -802,7 +802,7 @@ class TestChangeExternalFields(unittest.TestCase):
       "updated": None,
     }
     defaults.update(overrides)
-    return ChangeArtifact(**defaults)
+    return ChangeArtifact(**defaults)  # type: ignore[invalid-argument-type]
 
   def test_delta_details_with_ext_id_only(self) -> None:
     """Test delta detail shows ext_id without url."""

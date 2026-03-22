@@ -51,10 +51,12 @@ Read this file first, then the phase sheets and DR.
 ### Gotchas for Phase 1
 
 1. **`Relation.type` shadows `type` builtin** — Pydantic handles this fine, but note it.
-2. **`FrontmatterValidationResult.data` is `Mapping[str, Any]`** (immutable MappingProxyType) — Pydantic may need `arbitrary_types_allowed=True` in ConfigDict, or change to `dict[str, Any]`. Check whether `MappingProxyType` passes Pydantic's type validation.
+2. ~~**`FrontmatterValidationResult.data` is `Mapping[str, Any]`** (immutable MappingProxyType)~~ — **RESOLVED (DEC-112-005)**: Simplify to `dict[str, Any]`, drop MappingProxyType wrapping. Frozen model provides immutability.
 3. **`FrontmatterValidationResult.relations` is `tuple[Relation, ...]`** — Pydantic handles nested frozen models, but verify tuple construction works.
-4. **Tests checking frozen mutation** will need `ValidationError` instead of `AttributeError`.
-5. **`from __future__ import annotations`** — if present, check that `Mapping` and `MappingProxyType` resolve at runtime for Pydantic.
+4. ~~**Tests checking frozen mutation**~~ — **PHANTOM**: No frozen-mutation tests exist for Relation or FrontmatterValidationResult. No test updates needed.
+5. **`from __future__ import annotations`** — present but harmless; no TYPE_CHECKING-guarded field type imports.
+6. **NEW (DEC-112-004)**: `FrontmatterValidationResult.dict()` collides with Pydantic `BaseModel.dict()`. Zero callers — drop the method.
+7. **NEW (DEC-112-005)**: `Relation.attributes` also receives `MappingProxyType` — simplify to `dict[str, Any]` in `_normalize_relations()`.
 
 ### Gotchas for Phase 2
 

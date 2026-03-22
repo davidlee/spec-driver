@@ -1,19 +1,15 @@
 ---
 id: IP-112-P01
 slug: "112-kind_aware_pydantic_validation-phase-01"
-name: "Phase 01 — Convert FrontmatterValidationResult and Relation"
+name: Phase 01 — Convert FrontmatterValidationResult and Relation
 created: "2026-03-22"
 updated: "2026-03-22"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-112
 delta: DE-112
-objective: >-
-  Convert FrontmatterValidationResult and Relation from @dataclass(frozen=True)
-  to Pydantic BaseModel(frozen=True). Update validate_frontmatter() call site.
-entrance_criteria:
-  - DR-112 approved
-  - Existing core tests passing
+objective: Convert FrontmatterValidationResult and Relation from @dataclass(frozen=True) to Pydantic BaseModel(frozen=True). Update validate_frontmatter() call site.
+entrance_criteria: [DR-112 approved, Existing core tests passing]
 exit_criteria:
   - Both classes are Pydantic BaseModel with frozen=True
   - validate_frontmatter() constructs FrontmatterValidationResult via Pydantic
@@ -27,12 +23,12 @@ exit_criteria:
 
 | Status | ID  | Description | Notes |
 | ------ | --- | ----------- | ----- |
-| [ ]    | 1.1 | Convert Relation to frozen BaseModel | field(default_factory=dict) → dict default; change attributes to dict[str, Any] |
-| [ ]    | 1.2 | Convert FrontmatterValidationResult to frozen BaseModel | tuple fields stay as tuple; change data to dict[str, Any] |
-| [ ]    | 1.3 | Drop dead `.dict()` method from FrontmatterValidationResult | Collides with Pydantic BaseModel.dict(); zero callers (DEC-112-004) |
-| [ ]    | 1.4 | Simplify MappingProxyType away in validate_frontmatter() and _normalize_relations() | Pass plain dict instead of MappingProxyType (DEC-112-005) |
-| [ ]    | 1.5 | Update imports (add BaseModel; remove dataclass/field if unused) | TYPE_CHECKING not an issue — no Path fields |
-| [ ]    | 1.6 | Run tests and lint | Core tests + specs tests (Spec uses FrontmatterValidationResult) |
+| [x]    | 1.1 | Convert Relation to frozen BaseModel | field(default_factory=dict) → dict default; attributes now dict[str, Any] |
+| [x]    | 1.2 | Convert FrontmatterValidationResult to frozen BaseModel | tuple fields stay as tuple; data now dict[str, Any] |
+| [x]    | 1.3 | Drop dead `.dict()` method from FrontmatterValidationResult | Collides with Pydantic BaseModel.dict(); zero callers (DEC-112-004) |
+| [x]    | 1.4 | Simplify MappingProxyType away in validate_frontmatter() and _normalize_relations() | Plain dict passed (DEC-112-005) |
+| [x]    | 1.5 | Update imports (add BaseModel; remove dataclass/field if unused) | Removed dataclass, field, MappingProxyType |
+| [x]    | 1.6 | Run tests and lint | 4514 passed, 0 failed, lint clean |
 
 ### Notes
 

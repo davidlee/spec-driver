@@ -1,0 +1,28 @@
+schema: supekku.workflow.handoff
+version: 1
+artifact:
+  id: DE-112
+  kind: delta
+transition:
+  from_role: implementer
+  to_role: implementer
+  status: pending
+  boundary: phase
+phase:
+  id: IP-112.PHASE-01
+  status: complete
+required_reading:
+- .spec-driver/deltas/DE-112-kind_aware_pydantic_validation_and_remaining_dataclass_cleanup/DE-112.md
+- .spec-driver/deltas/DE-112-kind_aware_pydantic_validation_and_remaining_dataclass_cleanup/IP-112.md
+- .spec-driver/deltas/DE-112-kind_aware_pydantic_validation_and_remaining_dataclass_cleanup/phases/phase-01.md
+- .spec-driver/deltas/DE-112-kind_aware_pydantic_validation_and_remaining_dataclass_cleanup/notes.md
+next_activity:
+  kind: implementation
+timestamps:
+  emitted_at: '2026-03-22T06:54:59+00:00'
+git:
+  head: f7616bf4
+  branch: main
+  worktree:
+    has_uncommitted_changes: true
+    has_staged_changes: false

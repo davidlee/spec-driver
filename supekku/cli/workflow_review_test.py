@@ -222,8 +222,8 @@ class ReviewCompleteTest(_ReviewTestBase):
     findings_file = delta_dir / "workflow" / "review-findings.yaml"
     assert findings_file.exists()
     findings = yaml.safe_load(findings_file.read_text())
-    assert findings["review"]["round"] == 1
-    assert findings["review"]["status"] == "changes_requested"
+    assert findings["review"]["current_round"] == 1
+    assert findings["rounds"][0]["status"] == "changes_requested"
 
   @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
   def test_transitions_to_approved(self, *_mocks) -> None:
@@ -258,7 +258,7 @@ class ReviewCompleteTest(_ReviewTestBase):
     findings = yaml.safe_load(
       (delta_dir / "workflow" / "review-findings.yaml").read_text(),
     )
-    assert findings["review"]["round"] == 1
+    assert findings["review"]["current_round"] == 1
 
     # Cycle back: create handoff → accept → review complete again
     with (
@@ -286,7 +286,7 @@ class ReviewCompleteTest(_ReviewTestBase):
     findings = yaml.safe_load(
       (delta_dir / "workflow" / "review-findings.yaml").read_text(),
     )
-    assert findings["review"]["round"] == 2
+    assert findings["review"]["current_round"] == 2
 
   @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
   def test_records_reviewer_role(self, *_mocks) -> None:
@@ -302,7 +302,7 @@ class ReviewCompleteTest(_ReviewTestBase):
     findings = yaml.safe_load(
       (delta_dir / "workflow" / "review-findings.yaml").read_text(),
     )
-    assert findings["review"]["reviewer_role"] == "reviewer"
+    assert findings["rounds"][0]["reviewer_role"] == "reviewer"
 
   def test_rejects_invalid_status(self) -> None:
     _create_delta_bundle(self.root)
@@ -346,10 +346,13 @@ class ReviewCompleteTest(_ReviewTestBase):
     )
     assert result.exit_code == 0, result.output
 
+    # Summary feature deferred to Phase 3 (DE-109) — v2 accumulative
+    # model stores round-level data, not top-level history.
     findings = yaml.safe_load(
       (delta_dir / "workflow" / "review-findings.yaml").read_text(),
     )
-    assert findings["history"][0]["summary"] == "Needs revision"
+    assert findings["version"] == 2
+    assert findings["rounds"][0]["status"] == "changes_requested"
 
   @patch("supekku.scripts.lib.core.git.get_head_sha", return_value="a" * 40)
   def test_auto_teardown_on_approved(self, *_mocks) -> None:

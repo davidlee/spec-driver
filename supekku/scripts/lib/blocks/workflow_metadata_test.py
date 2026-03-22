@@ -403,27 +403,36 @@ class ReviewIndexTest(unittest.TestCase):
 
 
 class ReviewFindingsTest(unittest.TestCase):
-  """Tests for supekku.workflow.review-findings schema."""
+  """Tests for supekku.workflow.review-findings v2 schema."""
 
   def _minimal_valid(self):
     return {
       "schema": REVIEW_FINDINGS_SCHEMA,
       "version": REVIEW_FINDINGS_VERSION,
       "artifact": {"id": "DE-090", "kind": "delta"},
-      "review": {"round": 1, "status": "in_progress"},
-      "timestamps": {"updated": "2026-03-21T10:35:00Z"},
+      "review": {"current_round": 1},
+      "rounds": [
+        {
+          "round": 1,
+          "status": "in_progress",
+          "completed_at": "2026-03-21T10:35:00Z",
+          "blocking": [],
+          "non_blocking": [],
+        }
+      ],
     }
 
   def test_valid_minimal(self):
     errors = _validate(REVIEW_FINDINGS_METADATA, self._minimal_valid())
-    assert errors == [], errors
+    assert not errors, errors
 
   def test_valid_with_findings(self):
     data = self._minimal_valid()
-    data["review"]["round"] = 3
-    data["review"]["status"] = "changes_requested"
-    data["review"]["reviewer_role"] = "reviewer"
-    data["blocking"] = [
+    data["review"]["current_round"] = 3
+    data["rounds"][0]["round"] = 3
+    data["rounds"][0]["status"] = "changes_requested"
+    data["rounds"][0]["reviewer_role"] = "reviewer"
+    data["rounds"][0]["blocking"] = [
       {
         "id": "R3-001",
         "title": "Output regression",
@@ -433,7 +442,7 @@ class ReviewFindingsTest(unittest.TestCase):
         "related_invariants": ["INV-001"],
       }
     ]
-    data["non_blocking"] = [
+    data["rounds"][0]["non_blocking"] = [
       {
         "id": "R3-002",
         "title": "Add regression test",
@@ -441,37 +450,24 @@ class ReviewFindingsTest(unittest.TestCase):
         "status": "open",
       }
     ]
-    data["resolved"] = [
-      {
-        "id": "R2-001",
-        "title": "ID mismatch",
-        "status": "resolved",
-        "resolution_summary": "Switched to uid",
-      }
-    ]
-    data["waived"] = []
-    data["history"] = [
-      {"round": 1, "summary": "Initial review"},
-      {"round": 2, "summary": "Follow-up"},
-    ]
     errors = _validate(REVIEW_FINDINGS_METADATA, data)
-    assert errors == [], errors
+    assert not errors, errors
 
-  def test_missing_review_round(self):
+  def test_missing_current_round(self):
     data = self._minimal_valid()
-    del data["review"]["round"]
+    del data["review"]["current_round"]
     errors = _validate(REVIEW_FINDINGS_METADATA, data)
-    assert any("round" in e and "required" in e for e in errors)
+    assert any("current_round" in e and "required" in e for e in errors)
 
-  def test_invalid_review_status(self):
+  def test_invalid_round_status(self):
     data = self._minimal_valid()
-    data["review"]["status"] = "done"
+    data["rounds"][0]["status"] = "done"
     errors = _validate(REVIEW_FINDINGS_METADATA, data)
-    assert any("review.status" in e for e in errors)
+    assert any("status" in e for e in errors)
 
   def test_finding_requires_id_title_status(self):
     data = self._minimal_valid()
-    data["blocking"] = [{"summary": "something wrong"}]
+    data["rounds"][0]["blocking"] = [{"summary": "something wrong"}]
     errors = _validate(REVIEW_FINDINGS_METADATA, data)
     assert any("id" in e and "required" in e for e in errors)
     assert any("title" in e and "required" in e for e in errors)
@@ -479,7 +475,7 @@ class ReviewFindingsTest(unittest.TestCase):
 
   def test_invalid_finding_status(self):
     data = self._minimal_valid()
-    data["blocking"] = [
+    data["rounds"][0]["blocking"] = [
       {
         "id": "R1-001",
         "title": "Bug",
@@ -492,15 +488,15 @@ class ReviewFindingsTest(unittest.TestCase):
 
   def test_round_must_be_int(self):
     data = self._minimal_valid()
-    data["review"]["round"] = "three"
+    data["rounds"][0]["round"] = "three"
     errors = _validate(REVIEW_FINDINGS_METADATA, data)
     assert any("round" in e and "integer" in e for e in errors)
 
-  def test_history_entry_requires_round_summary(self):
+  def test_rounds_required(self):
     data = self._minimal_valid()
-    data["history"] = [{"round": 1}]
+    del data["rounds"]
     errors = _validate(REVIEW_FINDINGS_METADATA, data)
-    assert any("summary" in e and "required" in e for e in errors)
+    assert any("rounds" in e and "required" in e for e in errors)
 
 
 # ---------------------------------------------------------------------------

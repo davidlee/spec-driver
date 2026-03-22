@@ -33,8 +33,8 @@ REVIEW_INDEX_VERSION = 1
 REVIEW_INDEX_MARKER = "supekku:workflow.review-index@v1"
 
 REVIEW_FINDINGS_SCHEMA = "supekku.workflow.review-findings"
-REVIEW_FINDINGS_VERSION = 1
-REVIEW_FINDINGS_MARKER = "supekku:workflow.review-findings@v1"
+REVIEW_FINDINGS_VERSION = 2
+REVIEW_FINDINGS_MARKER = "supekku:workflow.review-findings@v2"
 
 SESSIONS_SCHEMA = "supekku.workflow.sessions"
 SESSIONS_VERSION = 1
@@ -88,6 +88,8 @@ REVIEW_STATUS_VALUES = [
   "blocked",
 ]
 FINDING_STATUS_VALUES = ["open", "resolved", "waived", "superseded"]
+FINDING_DISPOSITION_ACTION_VALUES = ["fix", "defer", "waive", "supersede"]
+DISPOSITION_AUTHORITY_VALUES = ["user", "agent"]
 SESSION_STATUS_VALUES = ["active", "paused", "absent", "dead", "unknown"]
 REVIEW_SESSION_SCOPE_VALUES = ["artifact", "phase", "task"]
 HANDOFF_BOUNDARY_VALUES = ["phase", "task", "manual"]
@@ -140,8 +142,61 @@ def _timestamps_block(fields: dict[str, FieldMetadata]) -> FieldMetadata:
   )
 
 
+def _finding_disposition() -> FieldMetadata:
+  """Disposition sub-schema for a review finding (DR-109 §3.4)."""
+  return FieldMetadata(
+    type="object",
+    required=False,
+    description="Finding disposition record",
+    properties={
+      "action": FieldMetadata(
+        type="enum",
+        required=True,
+        enum_values=FINDING_DISPOSITION_ACTION_VALUES,
+        description="Disposition action",
+      ),
+      "authority": FieldMetadata(
+        type="enum",
+        required=True,
+        enum_values=DISPOSITION_AUTHORITY_VALUES,
+        description="Who made the disposition decision",
+      ),
+      "actor_id": FieldMetadata(
+        type="string",
+        required=False,
+        description="Specific identity when needed",
+      ),
+      "rationale": FieldMetadata(
+        type="string",
+        required=False,
+        description="Required for waive, defer",
+      ),
+      "backlog_ref": FieldMetadata(
+        type="string",
+        required=False,
+        description="Backlog item ref (e.g. ISSUE-045), when action=defer",
+      ),
+      "resolved_at": FieldMetadata(
+        type="string",
+        required=False,
+        description="Git sha, when action=fix",
+      ),
+      "superseded_by": FieldMetadata(
+        type="string",
+        required=False,
+        description="Finding ID, when action=supersede",
+      ),
+      "timestamp": FieldMetadata(
+        type="string",
+        required=False,
+        description="ISO 8601 timestamp",
+      ),
+    },
+  )
+
+
 def _finding_item() -> FieldMetadata:
-  """Single review finding record (DR-102 §3.4)."""
+  """Single review finding record (DR-109 §3.4)."""
   return FieldMetadata(
     type="object",
     description="Review finding",
@@ -160,15 +215,17 @@ def _finding_item() -> FieldMetadata:
         type="string",
         required=False,
         description=(
-          "Finding summary (required for open/superseded, optional for resolved/waived)"
+          "Finding summary (required for open/superseded, "
+          "optional for resolved/waived)"
         ),
       ),
       "status": FieldMetadata(
         type="enum",
         required=True,
         enum_values=FINDING_STATUS_VALUES,
-        description="Finding status",
+        description="Finding status (derived from disposition)",
       ),
+      "disposition": _finding_disposition(),
       "files": FieldMetadata(
         type="array",
         required=False,
@@ -661,6 +718,12 @@ REVIEW_INDEX_METADATA = BlockMetadata(
           required=True,
           description="Last bootstrap timestamp (ISO 8601)",
         ),
+        "judgment_status": FieldMetadata(
+          type="enum",
+          required=False,
+          enum_values=REVIEW_STATUS_VALUES,
+          description="Review judgment status (DR-109 §3.3)",
+        ),
         "source_handoff": FieldMetadata(
           type="string",
           required=False,
@@ -807,13 +870,50 @@ REVIEW_INDEX_METADATA = BlockMetadata(
 
 
 # ---------------------------------------------------------------------------
-# 3.4  Review Findings — supekku:workflow.review-findings@v1
+# 3.4  Review Findings — supekku:workflow.review-findings@v2
 # ---------------------------------------------------------------------------
+
+
+def _round_entry() -> FieldMetadata:
+  """Single round entry in the accumulative rounds array (DR-109 §3.5)."""
+  return FieldMetadata(
+    type="object",
+    description="Review round entry",
+    properties={
+      "round": FieldMetadata(
+        type="int",
+        required=True,
+        description="Round number (monotonically increasing)",
+      ),
+      "status": FieldMetadata(
+        type="enum",
+        required=True,
+        enum_values=REVIEW_STATUS_VALUES,
+        description="Round outcome status",
+      ),
+      "reviewer_role": FieldMetadata(
+        type="enum",
+        required=False,
+        enum_values=ROLE_VALUES,
+        description="Role performing the review",
+      ),
+      "completed_at": FieldMetadata(
+        type="string",
+        required=False,
+        description="Round completion timestamp (ISO 8601)",
+      ),
+      # session: opaque dict, autobahn-owned (DR-109 §3.6).
+      # Not validated by schema — passes through unvalidated.
+      "blocking": _findings_list(),
+      "non_blocking": _findings_list(),
+    },
+  )
+
 
 REVIEW_FINDINGS_METADATA = BlockMetadata(
   version=REVIEW_FINDINGS_VERSION,
   schema_id=REVIEW_FINDINGS_SCHEMA,
-  description="Stable issue ledger across review rounds",
+  description="Accumulative issue ledger across review rounds (v2)",
   fields={
     "schema": FieldMetadata(
       type="const",
@@ -848,60 +948,21 @@ REVIEW_FINDINGS_METADATA = BlockMetadata(
     "review": FieldMetadata(
       type="object",
       required=True,
-      description="Review round state",
+      description="Review state",
       properties={
-        "round": FieldMetadata(
+        "current_round": FieldMetadata(
           type="int",
           required=True,
-          description="Review round number (monotonically increasing)",
-        ),
-        "status": FieldMetadata(
-          type="enum",
-          required=True,
-          enum_values=REVIEW_STATUS_VALUES,
-          description="Current review status",
-        ),
-        "reviewer_role": FieldMetadata(
-          type="enum",
-          required=False,
-          enum_values=ROLE_VALUES,
-          description="Role performing the review",
+          description="Latest round number",
         ),
       },
     ),
-    "blocking": _findings_list(),
-    "non_blocking": _findings_list(),
-    "resolved": _findings_list(),
-    "waived": _findings_list(),
-    "history": FieldMetadata(
+    "rounds": FieldMetadata(
       type="array",
-      required=False,
-      description="Round history summaries",
-      items=FieldMetadata(
-        type="object",
-        description="History entry",
-        properties={
-          "round": FieldMetadata(
-            type="int",
-            required=True,
-            description="Round number",
-          ),
-          "summary": FieldMetadata(
-            type="string",
-            required=True,
-            description="Round summary",
-          ),
-        },
-      ),
-    ),
-    "timestamps": _timestamps_block(
-      {
-        "updated": FieldMetadata(
-          type="string",
-          required=True,
-          description="Last update timestamp (ISO 8601)",
-        ),
-      }
+      required=True,
+      min_items=1,
+      description="Accumulative round entries (DR-109 §3.5)",
+      items=_round_entry(),
     ),
   },
 )
@@ -1187,6 +1248,8 @@ __all__ = [
   # Constants
   "ARTIFACT_KIND_VALUES",
   "BOOTSTRAP_STATUS_VALUES",
+  "DISPOSITION_AUTHORITY_VALUES",
+  "FINDING_DISPOSITION_ACTION_VALUES",
   "FINDING_STATUS_VALUES",
   "HANDOFF_BOUNDARY_VALUES",
   "HANDOFF_MARKER",

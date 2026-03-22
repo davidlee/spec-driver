@@ -1083,9 +1083,12 @@ def review_complete_command(
 ) -> None:
   """Complete a review round, writing findings and transitioning state."""
   from supekku.scripts.lib.workflow.review_io import (  # noqa: PLC0415
+    FindingsNotFoundError,
     FindingsValidationError,
+    FindingsVersionError,
+    append_round,
     build_findings,
-    next_round_number,
+    read_findings,
     write_findings,
   )
   from supekku.scripts.lib.workflow.state_io import (  # noqa: PLC0415
@@ -1137,21 +1140,22 @@ def review_complete_command(
     typer.echo(f"Cannot complete review: {exc}", err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
 
-  # Determine round number
-  round_num = next_round_number(delta_dir)
-
-  # Build history entry
-  history = None
-  if summary:
-    history = [{"round": round_num, "summary": summary}]
-
-  findings_data = build_findings(
-    artifact_id=delta_id,
-    round_number=round_num,
-    status=status,
-    reviewer_role=state_data["workflow"].get("active_role"),
-    history=history,
-  )
+  # Build or append round (v2 accumulative model, DR-109 §3.5)
+  reviewer_role = state_data["workflow"].get("active_role")
+  try:
+    findings_data = read_findings(delta_dir)
+    append_round(
+      findings_data,
+      status=status,
+      reviewer_role=reviewer_role,
+    )
+  except (FindingsNotFoundError, FindingsVersionError):
+    findings_data = build_findings(
+      artifact_id=delta_id,
+      round_number=1,
+      status=status,
+      reviewer_role=reviewer_role,
+    )
 
   # Write order per DR-102 §5: 1. findings, 2. state
   try:
@@ -1177,8 +1181,9 @@ def review_complete_command(
     typer.echo(f"State update failed: {exc}", err=True)
     raise typer.Exit(EXIT_FAILURE) from exc
 
+  current_round = findings_data["review"]["current_round"]
   typer.echo(
-    f"Review complete: {delta_id} round {round_num} → {status} "
+    f"Review complete: {delta_id} round {current_round} → {status} "
     f"({current.value} → {result.new_state.value})",
   )
   typer.echo(f"  findings: {fp}")

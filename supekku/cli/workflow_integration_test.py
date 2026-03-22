@@ -143,8 +143,8 @@ class FullWorkflowCycleTest(_IntegrationTestBase):
     findings = yaml.safe_load(
       (delta_dir / "workflow" / "review-findings.yaml").read_text(),
     )
-    assert findings["review"]["round"] == 1
-    assert findings["review"]["status"] == "changes_requested"
+    assert findings["review"]["current_round"] == 1
+    assert findings["rounds"][0]["status"] == "changes_requested"
 
     # 7. Handoff back to implementer
     out = self._run("create", "handoff", d, "--to", "implementer")

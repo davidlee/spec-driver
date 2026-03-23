@@ -3,8 +3,8 @@ id: IP-125-P02
 slug: "125-enforce_explicit_module_boundaries_and_coupling_constraints-phase-02"
 name: Verification and seam extraction
 created: "2026-03-23"
-updated: "2026-03-23"
-status: draft
+updated: "2026-03-24"
+status: completed
 kind: phase
 plan: IP-125
 delta: DE-125
@@ -70,26 +70,26 @@ entrance_criteria:
     completed: true
 exit_criteria:
   - item: "Domain Internal Layers contract drafted in pyproject.toml"
-    completed: false
+    completed: true
   - item: "First pilot move set is confirmed as relations-first"
-    completed: false
+    completed: true
   - item: "Policy backlink seam is specified outside PolicyRegistry"
-    completed: false
+    completed: true
   - item: "Targeted verification commands are attached to each seam"
-    completed: false
+    completed: true
 tasks:
   - id: "1"
     description: "Draft Domain Internal Layers import-linter contract"
-    status: pending
+    status: completed
   - id: "2"
     description: "Specify file-level target locations for relations pilots"
-    status: pending
+    status: completed
   - id: "3"
     description: "Define the policy backlink seam outside PolicyRegistry"
-    status: pending
+    status: completed
   - id: "4"
     description: "Confirm which requirements-registry responsibilities are deferred"
-    status: pending
+    status: completed
 ```
 
 # Phase 2 - Verification and seam extraction
@@ -121,10 +121,10 @@ Phase 3 can move code without smuggling the old lateral-coupling pattern into
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `pyproject.toml` has a draft `Domain Internal Layers` contract ready to land
-- [ ] Relations-first pilot move set is confirmed with target paths under `spec_driver/domain/relations/`
-- [ ] Policy backlink logic has an agreed extraction seam outside `PolicyRegistry`
-- [ ] Requirements-registry and validator work are explicitly deferred until those seams exist
+- [x] `pyproject.toml` has a draft `Domain Internal Layers` contract ready to land
+- [x] Relations-first pilot move set is confirmed with target paths under `spec_driver/domain/relations/`
+- [x] Policy backlink logic has an agreed extraction seam outside `PolicyRegistry`
+- [x] Requirements-registry and validator work are explicitly deferred until those seams exist
 
 ## 5. Verification
 
@@ -151,13 +151,13 @@ Phase 3 can move code without smuggling the old lateral-coupling pattern into
 
 ## 7. Tasks & Progress
 
-| Status | ID  | Description                                                   | Parallel? | Notes                                             |
-| ------ | --- | ------------------------------------------------------------- | --------- | ------------------------------------------------- |
-| [ ]    | 2.1 | Draft `Domain Internal Layers` contract in `pyproject.toml`   | —         | Use DR-125 ordering                               |
-| [ ]    | 2.2 | Specify exact target paths for relations pilots               | —         | `spec_driver/domain/relations/{query,manager}.py` |
-| [ ]    | 2.3 | Define policy backlink seam outside `PolicyRegistry`          | —         | Candidate: `domain/relations/backlinks.py`        |
-| [ ]    | 2.4 | Record deferred scope for requirements registry and validator | —         | Prevent premature moves                           |
-| [ ]    | 2.5 | Prepare Phase 3 sheet once 2.1-2.4 are stable                 | —         | Code-moving phase only after seam decisions       |
+| Status | ID  | Description                                                   | Parallel? | Notes                                                          |
+| ------ | --- | ------------------------------------------------------------- | --------- | -------------------------------------------------------------- |
+| [x]    | 2.1 | Draft `Domain Internal Layers` contract in `pyproject.toml`   | —         | Contract added, `import-linter lint` passes (2 kept, 0 broken) |
+| [x]    | 2.2 | Specify exact target paths for relations pilots               | —         | See §10 findings. All three relations modules confirmed clean  |
+| [x]    | 2.3 | Define policy backlink seam outside `PolicyRegistry`          | —         | Generic `build_backlinks()` in `domain/relations/backlinks.py` |
+| [x]    | 2.4 | Record deferred scope for requirements registry and validator | —         | See §10 findings — 6 sibling-registry imports in requirements  |
+| [x]    | 2.5 | Prepare Phase 3 sheet once 2.1-2.4 are stable                 | —         | IP-125-P03 created: relations move + backlink extraction       |
 
 ### Task Details
 
@@ -209,11 +209,86 @@ Phase 3 can move code without smuggling the old lateral-coupling pattern into
 
 ## 10. Findings / Research Notes
 
-- `requirements.registry` currently composes backlog/spec/change inputs and is not
-  a safe first move target.
-- `policies.registry` currently reaches into `DecisionRegistry` to compute backlinks.
-- `validator` behaves like a top consumer across multiple areas and should move only
-  after lower seams exist.
+### 2.1 — Domain Internal Layers contract
+
+Added to `pyproject.toml` as a second `import-linter` contract. The ordered layers
+match DR-125 §3.2:
+
+```
+validation > relations > registries > records > lifecycle
+```
+
+Package stubs (`__init__.py`) created under `spec_driver/domain/` for all five
+sub-areas so the contract is immediately enforceable.
+
+`uvx import-linter lint` → 2 kept, 0 broken.
+
+### 2.2 — Relations pilot import analysis
+
+All three relations modules depend only downward:
+
+| Module        | External imports                                    |
+| ------------- | --------------------------------------------------- |
+| `query.py`    | **none** — pure stdlib (protocols + dataclasses)    |
+| `manager.py`  | `core.frontmatter_schema.Relation`, `core.spec_utils` |
+| `graph.py`    | `core.artifact_ids`, `relations.query`              |
+
+No sibling-registry imports. These are the cleanest pilot targets for the first
+move into `spec_driver/domain/relations/`.
+
+Confirmed consumers outside relations:
+- `validation/validator.py` → `relations.graph` (lazy import)
+- `requirements/sync.py` → `relations.manager.list_relations`
+- `changes/artifacts.py` → `relations.manager.list_relations`
+- `formatters/*` → `relations.query` types
+
+All consumers import via fully-qualified paths, so re-export shims in the legacy
+location will suffice during migration.
+
+### 2.3 — Backlink seam specification
+
+**Current pattern**: Both `PolicyRegistry._build_backlinks()` and
+`StandardsRegistry._build_backlinks()` lazy-import sibling registries
+(`DecisionRegistry`, `PolicyRegistry`) to walk forward references and compute
+reverse maps. This is the exact lateral coupling DR-125 §5.2 identifies.
+
+**Extraction target**: `spec_driver/domain/relations/backlinks.py`
+
+**Proposed generic function**:
+
+```python
+def build_backlinks(
+    targets: dict[str, T],
+    sources: Iterable[tuple[str, Iterable[str]]],
+    category: str,
+    clear: bool = True,
+) -> None:
+```
+
+Where `targets` are the records receiving backlinks, `sources` yield
+`(source_id, referenced_target_ids)` pairs, and `category` is the backlink
+bucket name (e.g. `"decisions"`, `"policies"`).
+
+Each registry's `sync()` method would call this function instead of
+instantiating sibling registries directly. The **caller** (orchestration or sync
+command) is responsible for collecting source records and passing them in.
+
+This moves the cross-registry traversal into `domain.relations` and removes the
+lazy-import hack from both registries.
+
+### 2.4 — Deferred scope: requirements and validator
+
+**Requirements** (`requirements/registry.py`, `requirements/sync.py`,
+`requirements/parser.py`): 6 sibling-registry imports across the package
+(BacklogRegistry ×2, SpecRegistry ×4). The registry itself acts as a
+cross-artifact integration hub. Not a safe first-wave target.
+
+**Validator** (`validation/validator.py`): imports `relations.graph` (lazy).
+Architecturally it's a top consumer that coordinates across multiple areas.
+DR-125 places it at the top of the domain-internal order, which is correct, but
+moving it requires the lower seams to exist first.
+
+**Deferred until**: relations and backlink seams are landed and verified.
 
 ## 11. Wrap-up Checklist
 

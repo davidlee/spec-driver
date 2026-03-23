@@ -22,3 +22,25 @@
   repo's pre-existing warning baseline; no new DE-125-specific validation issues
   remain.
 - Work remains uncommitted.
+
+## 2026-03-24 — Phase 2 execution
+
+- **Task 2.1**: Added `Domain Internal Layers` contract to `pyproject.toml`.
+  Created package stubs for all five domain sub-areas (`lifecycle`, `records`,
+  `registries`, `relations`, `validation`). `uvx import-linter lint` → 2 kept,
+  0 broken.
+- **Task 2.2**: Confirmed all three relations modules (`query.py`, `manager.py`,
+  `graph.py`) have clean dependency profiles — only stdlib or `core.*` imports,
+  no sibling-registry coupling. Identified consumers that will need re-export
+  shims: `validation/validator.py`, `requirements/sync.py`, `changes/artifacts.py`,
+  `formatters/*`.
+- **Task 2.3**: Specified backlink seam: generic `build_backlinks()` function in
+  `spec_driver/domain/relations/backlinks.py`. Both `PolicyRegistry` and
+  `StandardsRegistry` exhibit the same pattern of lazy-importing sibling
+  registries for backlink computation. The generic helper accepts pre-collected
+  source data, eliminating the cross-registry import entirely.
+- **Task 2.4**: Requirements confirmed too coupled (6 sibling-registry imports
+  across registry, sync, parser). Validator is a top consumer. Both deferred
+  until relations and backlink seams are landed.
+- **Task 2.5**: Created Phase 3 sheet (IP-125-P03) for the actual code-moving
+  and backlink extraction work.

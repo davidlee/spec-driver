@@ -1,0 +1,28 @@
+schema: supekku.workflow.handoff
+version: 1
+artifact:
+  id: DE-125
+  kind: delta
+transition:
+  from_role: implementer
+  to_role: implementer
+  status: pending
+  boundary: phase
+phase:
+  id: IP-125.PHASE-02
+  status: complete
+required_reading:
+- .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/DE-125.md
+- .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/IP-125.md
+- .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/phases/phase-02.md
+- .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/notes.md
+next_activity:
+  kind: implementation
+timestamps:
+  emitted_at: '2026-03-23T20:25:34+00:00'
+git:
+  head: e236fb8d
+  branch: main
+  worktree:
+    has_uncommitted_changes: true
+    has_staged_changes: false

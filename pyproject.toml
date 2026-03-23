@@ -250,6 +250,17 @@ layers = [
     "spec_driver.core",
 ]
 
+[[tool.importlinter.contracts]]
+name = "Domain Internal Layers"
+type = "layers"
+layers = [
+    "spec_driver.domain.validation",
+    "spec_driver.domain.relations",
+    "spec_driver.domain.registries",
+    "spec_driver.domain.records",
+    "spec_driver.domain.lifecycle",
+]
+
 
 [tool.ty.rules]
 unused-type-ignore-comment = "ignore"  # we use multiple type checkers

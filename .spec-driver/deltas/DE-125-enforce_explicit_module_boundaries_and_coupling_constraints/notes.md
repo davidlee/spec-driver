@@ -121,6 +121,32 @@
 - `ac2ff223` — Phase 3 docs complete
 - All `.spec-driver` changes committed promptly alongside code per doctrine.
 
+## 2026-03-24 — Phase 4 execution
+
+- **Task 4.1** (mini-DR): Option A selected — Workspace passes pre-collected
+  sources down. See phase-04.md §10 for full analysis.
+- **Task 4.2**: Refactored `PolicyRegistry` and `StandardsRegistry` to accept
+  `decision_sources` / `policy_sources` kwargs. `None` means skip, never
+  fallback. `Workspace.sync_policies()` and `Workspace.sync_standards()` now
+  collect sibling records and pass them down. Lazy sibling-registry imports
+  eliminated from both registries.
+- **Task 4.3**: Graph collection seam documented. Target:
+  `spec_driver/orchestration/graph.py`. Two callers (`validator.py`,
+  `cli/show.py`). Move is a separate mechanical patch.
+- **Task 4.4**: 4 re-export shims inventoried with consumer counts (0, 10, 2, 2).
+  Retirement sequence defined: `__init__` → `manager` → `query` → `graph`.
+  Policy: shims must not gain new logic; new code imports canonical paths only.
+- **Task 4.5**: 3 legacy-core imports documented (`Relation`, `spec_utils`,
+  `artifact_ids`). Prerequisite is core migration — a separate delta since those
+  modules are shared infrastructure.
+- 4656 tests passed, 2 import-linter contracts kept, ruff clean.
+
+### Commits
+
+- `f2f5fcde` — Task 4.1 mini-DR
+- `8cf45921` — Phase 4 consistency tightening
+- `01b4cf2c` — Task 4.2 registry refactor
+
 ## 2026-03-24 — Post-pilot design reconciliation
 
 - Extended the delta with Phase 4 (`IP-125-P04`) instead of closing after the

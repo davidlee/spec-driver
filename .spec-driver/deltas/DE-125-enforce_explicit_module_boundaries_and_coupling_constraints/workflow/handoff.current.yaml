@@ -9,19 +9,19 @@ transition:
   status: pending
   boundary: phase
 phase:
-  id: IP-125.PHASE-03
+  id: IP-125.PHASE-04
   status: complete
 required_reading:
 - .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/DE-125.md
 - .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/IP-125.md
-- .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/phases/phase-03.md
+- .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/phases/phase-04.md
 - .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/notes.md
 next_activity:
   kind: implementation
 timestamps:
-  emitted_at: '2026-03-23T20:39:17+00:00'
+  emitted_at: '2026-03-23T21:45:17+00:00'
 git:
-  head: 7ca724c3
+  head: 01b4cf2c
   branch: main
   worktree:
     has_uncommitted_changes: true

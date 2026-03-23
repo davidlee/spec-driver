@@ -7,15 +7,16 @@ artifact:
   notes_path: .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/notes.md
 phase:
   id: IP-125.PHASE-04
-  status: in_progress
+  status: complete
   path: .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/phases/phase-04.md
 workflow:
-  status: implementing
+  status: awaiting_handoff
   active_role: implementer
   handoff_boundary: phase
+  next_role: implementer
 timestamps:
   created: '2026-03-23T21:38:42+00:00'
-  updated: '2026-03-23T21:38:42+00:00'
+  updated: '2026-03-23T21:45:17+00:00'
 plan:
   id: IP-125
   path: .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/IP-125.md

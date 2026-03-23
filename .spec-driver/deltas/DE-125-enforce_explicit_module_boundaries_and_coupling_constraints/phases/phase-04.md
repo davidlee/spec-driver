@@ -4,7 +4,7 @@ slug: "125-enforce_explicit_module_boundaries_and_coupling_constraints-phase-04"
 name: Orchestration ownership and shim retirement
 created: "2026-03-24"
 updated: "2026-03-24"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-125
 delta: DE-125
@@ -79,11 +79,11 @@ of vague future cleanup.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `Workspace.sync_policies()` and `Workspace.sync_standards()` collect sibling records and pass them as `decision_sources` / `policy_sources`
-- [ ] Registry backlink methods treat `None` as "skip backlink population" — no fallback to sibling instantiation
-- [ ] Workspace graph collection has an explicit orchestration home or a tracked owning seam (documented; move is a separate patch)
-- [ ] Shim retirement criteria are documented for legacy relations re-export modules
-- [ ] Legacy-core import retirement criteria are documented for migrated domain modules
+- [x] `Workspace.sync_policies()` and `Workspace.sync_standards()` collect sibling records and pass them as `decision_sources` / `policy_sources`
+- [x] Registry backlink methods treat `None` as "skip backlink population" — no fallback to sibling instantiation
+- [x] Workspace graph collection has an explicit orchestration home or a tracked owning seam (documented; move is a separate patch)
+- [x] Shim retirement criteria are documented for legacy relations re-export modules
+- [x] Legacy-core import retirement criteria are documented for migrated domain modules
 
 ## 5. Verification
 
@@ -109,10 +109,10 @@ of vague future cleanup.
 | Status | ID  | Description                                                       | Notes |
 | ------ | --- | ----------------------------------------------------------------- | ----- |
 | [x]    | 4.1 | Define the orchestration entrypoint for backlink source collection | Option A: Workspace passes source records down. See §10 mini-DR |
-| [ ]    | 4.2 | Refactor registry backlink methods to accept pre-collected sources | Remove sibling-registry instantiation from registries |
-| [ ]    | 4.3 | Re-home workspace graph collection or record the owning seam       | Finish the split started in Phase 3 |
-| [ ]    | 4.4 | Document shim retirement criteria                                  | Legacy `supekku/scripts/lib/relations/*` re-exports |
-| [ ]    | 4.5 | Document legacy-core import retirement criteria                    | `manager.py` and any other migrated domain modules |
+| [x]    | 4.2 | Refactor registry backlink methods to accept pre-collected sources | Done — lazy sibling imports eliminated. `01b4cf2c` |
+| [x]    | 4.3 | Re-home workspace graph collection or record the owning seam       | Seam documented: target is `spec_driver/orchestration/graph.py`. Move is a separate patch. |
+| [x]    | 4.4 | Document shim retirement criteria                                  | 4 shims inventoried with consumer counts and retirement sequence. See §10. |
+| [x]    | 4.5 | Document legacy-core import retirement criteria                    | 3 legacy-core imports documented. Prerequisite: core migration (separate delta). See §10. |
 
 ### Task Details
 
@@ -348,6 +348,112 @@ instead.
 #### Decision
 
 Proceed with **Option A** for task 4.2 implementation.
+
+### 4.3 Graph collection owning seam
+
+#### Current state
+
+Legacy `supekku/scripts/lib/relations/graph.py` retains four functions after the
+Phase 3 split:
+
+| Function | Responsibility | Layer |
+|----------|---------------|-------|
+| `build_reference_graph(workspace)` | Entry point — delegates to collectors | orchestration |
+| `_collect_all_artifacts(workspace)` | Composes workspace + standalone registries | orchestration |
+| `_collect_workspace_artifacts(workspace, out)` | Walks Workspace properties | orchestration |
+| `_collect_standalone_registry_artifacts(root, out)` | Instantiates Backlog/Memory/Drift registries | orchestration |
+
+Two callers: `supekku/scripts/lib/validation/validator.py` and `supekku/cli/show.py`.
+Both pass a `Workspace` instance.
+
+#### Target location
+
+`spec_driver/orchestration/graph.py` — workspace-dependent artifact collection
+belongs in orchestration because it composes multiple registries and the
+Workspace facade to produce a complete artifact set.
+
+The pure graph model (`GraphEdge`, `ReferenceGraph`,
+`build_reference_graph_from_artifacts`, query functions) already lives in
+`spec_driver/domain/relations/graph.py`.
+
+#### Scope
+
+**This phase**: document the seam and target. **Separate patch**: execute the
+move once orchestration has a clearer module structure (or as part of the next
+migration wave). The move is mechanical — the function signatures are already
+clean and the pure core is already extracted.
+
+### 4.4 Shim retirement criteria
+
+#### Shim inventory
+
+| Shim file | Re-exports from | Consumer count |
+|-----------|----------------|---------------|
+| `supekku/scripts/lib/relations/__init__.py` | `spec_driver.domain.relations.query` | 0 (no direct `__init__` consumers found) |
+| `supekku/scripts/lib/relations/query.py` | `spec_driver.domain.relations.query` | 10 sites (CLI, TUI, formatters, list commands) |
+| `supekku/scripts/lib/relations/manager.py` | `spec_driver.domain.relations.manager` | 2 sites (`requirements/sync.py`, `changes/artifacts.py`) |
+| `supekku/scripts/lib/relations/graph.py` | `spec_driver.domain.relations.graph` + workspace collection | 2 sites (`validator.py`, `cli/show.py`) |
+
+#### Retirement conditions
+
+A shim can be deleted when:
+
+1. **All consumers import from the canonical location** (`spec_driver.domain.relations.*`).
+2. **No test imports the shim path** — grep confirms zero references to the
+   legacy import path.
+3. **`import-linter lint` passes** after deletion.
+4. **Full test suite passes** after deletion.
+
+#### Retirement sequence
+
+1. **`__init__.py`** — can be retired first (no direct consumers beyond the
+   shim modules themselves).
+2. **`manager.py`** — only 2 consumers, both in `scripts/lib/` domain code that
+   will eventually migrate.
+3. **`query.py`** — 10 consumers across CLI, TUI, and formatters. Retire after
+   those layers are updated or migrated.
+4. **`graph.py`** — last, because it contains workspace collection functions
+   (task 4.3) that must move to orchestration first.
+
+#### Policy
+
+- Shims must not gain new logic. They are forwarding-only.
+- New code must import from `spec_driver.domain.relations.*`, never from shims.
+- Each shim file's docstring already states the canonical location.
+
+### 4.5 Legacy-core import retirement criteria
+
+#### Current legacy-core imports in domain modules
+
+| Domain module | Legacy import | Needed from core |
+|--------------|--------------|-----------------|
+| `spec_driver/domain/relations/manager.py` | `supekku.scripts.lib.core.frontmatter_schema.Relation` | Pydantic model |
+| `spec_driver/domain/relations/manager.py` | `supekku.scripts.lib.core.spec_utils.{dump,load}_markdown_file` | File I/O helpers |
+| `spec_driver/domain/relations/graph.py` | `supekku.scripts.lib.core.artifact_ids.normalize_artifact_id` | ID normalisation |
+
+#### Retirement conditions
+
+A legacy-core import can be replaced when:
+
+1. **The core module is available at `spec_driver.core.*`** — either moved or
+   re-exported.
+2. **The domain module's import is updated** to the new path.
+3. **`import-linter lint` passes** — confirms the layering is correct.
+4. **Tests pass** for the affected module.
+
+#### Prerequisite
+
+Core migration (moving `frontmatter_schema`, `spec_utils`, `artifact_ids` to
+`spec_driver.core`) is a prerequisite. This is a separate delta — these are
+shared infrastructure modules used across the entire codebase, not just by
+domain/relations.
+
+#### Policy
+
+- Domain modules may import from legacy core paths until core migrates.
+- This is tolerable because core is architecturally below domain — the
+  dependency direction is correct even though the package path is legacy.
+- New domain modules should prefer `spec_driver.core.*` when available.
 
 ## 11. Wrap-up Checklist
 

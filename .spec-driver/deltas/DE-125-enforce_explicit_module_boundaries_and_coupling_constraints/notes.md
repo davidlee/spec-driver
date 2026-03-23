@@ -44,3 +44,22 @@
   until relations and backlink seams are landed.
 - **Task 2.5**: Created Phase 3 sheet (IP-125-P03) for the actual code-moving
   and backlink extraction work.
+
+## 2026-03-24 — Phase 3 execution
+
+- Moved `query.py` (pure, no changes), `manager.py` (keeps legacy core imports),
+  and `graph.py` (split: pure graph model moved, workspace collection stays) to
+  `spec_driver/domain/relations/`.
+- Created re-export shims in `supekku/scripts/lib/relations/` — all consumers
+  unaffected.
+- Implemented `build_backlinks()` and `build_backlinks_multi()` in
+  `spec_driver/domain/relations/backlinks.py` with 11 tests.
+- Refactored `PolicyRegistry._build_backlinks` to use `build_backlinks()`.
+- Refactored `StandardsRegistry._build_backlinks` to use `build_backlinks_multi()`.
+- Key decision: `graph.py` split because workspace artifact collection is
+  orchestration-level, not domain relations. The pure graph model and query
+  functions moved; `build_reference_graph(workspace)` stays in legacy.
+- Registries still lazy-import sibling registries for data collection — the
+  backlink *computation* is generic but *source collection* remains a registry
+  concern until orchestration owns sync.
+- 4656 tests passed, 2 import-linter contracts kept, ruff clean.

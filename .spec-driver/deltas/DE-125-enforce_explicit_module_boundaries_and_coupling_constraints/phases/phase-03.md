@@ -28,8 +28,8 @@ exit_criteria:
   - relations/query.py, manager.py, graph.py live under spec_driver/domain/relations/
   - Re-export shims in supekku/scripts/lib/relations/ forward to new locations
   - build_backlinks() generic helper exists in spec_driver/domain/relations/backlinks.py
-  - PolicyRegistry._build_backlinks uses the new helper (no lazy sibling import)
-  - StandardsRegistry._build_backlinks uses the new helper (no lazy sibling import)
+  - PolicyRegistry._build_backlinks uses the new helper
+  - StandardsRegistry._build_backlinks uses the new helper
   - All existing tests pass without modification (or with minimal import updates)
   - import-linter lint passes (both contracts)
 verification:
@@ -73,7 +73,7 @@ files:
     - spec_driver/domain/relations/__init__.py
 entrance_criteria:
   - item: "Phase 2 completed with contract, pilot targets, and seam specification"
-    completed: false
+    completed: true
   - item: "Domain Internal Layers contract passing in import-linter"
     completed: true
   - item: "Domain subpackage stubs exist under spec_driver/domain/"
@@ -127,8 +127,8 @@ tasks:
 Execute the first code-moving pilot: relocate the three relations modules into
 `spec_driver/domain/relations/`, extract the duplicated backlink computation
 pattern into a generic helper in the same package, and refactor both
-`PolicyRegistry` and `StandardsRegistry` to use it instead of lazy-importing
-sibling registries.
+`PolicyRegistry` and `StandardsRegistry` to use it while leaving cross-registry
+data collection explicitly tracked as transition debt.
 
 ## 2. Links & References
 
@@ -147,17 +147,18 @@ sibling registries.
 
 - [x] Domain Internal Layers contract passing in import-linter
 - [x] Domain subpackage stubs exist under `spec_driver/domain/`
-- [ ] Phase 2 completed (pending phase-complete)
+- [x] Phase 2 completed
 
 ## 4. Exit Criteria / Done When
 
 - [x] `query.py`, `graph.py`, `manager.py` live under `spec_driver/domain/relations/`
 - [x] Re-export shims in `supekku/scripts/lib/relations/` forward to new locations
 - [x] `build_backlinks()` generic helper exists in `spec_driver/domain/relations/backlinks.py`
-- [x] `PolicyRegistry._build_backlinks` uses the new helper (no lazy sibling import)
-- [x] `StandardsRegistry._build_backlinks` uses the new helper (no lazy sibling import)
+- [x] `PolicyRegistry._build_backlinks` uses the new helper
+- [x] `StandardsRegistry._build_backlinks` uses the new helper
 - [x] All existing tests pass (4656 passed)
 - [x] `import-linter lint` passes (both contracts)
+- [x] Remaining sibling-registry collection is called out as follow-on debt, not target design
 
 ## 5. Verification
 
@@ -174,6 +175,9 @@ sibling registries.
   are lower-layer core utilities.
 - **Assumption**: re-export shims are sufficient to avoid a flag-day for all
   consumers.
+- **Assumption**: keeping cross-registry collection inside registries for one
+  pilot phase is acceptable if the debt is made explicit and handed to the next
+  phase.
 - **STOP**: If `manager.py` turns out to be generic frontmatter mutation
   infrastructure rather than domain relations logic, reclassify it to `core`
   before moving.
@@ -215,9 +219,10 @@ sibling registries.
 - **3.6–3.7 Registry refactoring**
   - Each registry's `_build_backlinks` becomes a thin wrapper that calls the
     generic helper with pre-collected source data.
-  - The **caller** (likely `sync()` or orchestration) is responsible for
-    collecting source records before passing them in, eliminating the need for
-    lazy sibling-registry imports inside the method.
+  - The target design is that an orchestration caller collects source records
+    before invoking the helper.
+  - This phase stopped short of that boundary move: registries still perform
+    sibling-registry collection and then hand pre-collected data to the helper.
 
 ## 8. Risks & Mitigations
 
@@ -238,7 +243,7 @@ sibling registries.
 - `2026-03-24` — `PolicyRegistry` still lazy-imports `DecisionRegistry` to collect
   source data. The backlink *computation* is now generic, but the *data collection*
   remains a registry concern until orchestration owns the sync workflow. This is
-  an acceptable intermediate state — the coupling is now explicit and narrow.
+  acceptable transition debt, not the target design.
 - `2026-03-24` — `StandardsRegistry` uses `build_backlinks_multi()` to handle two
   source categories (decisions + policies) in one call with a single clear pass.
 
@@ -247,7 +252,8 @@ sibling registries.
 - `query.py` moved cleanly with zero changes — it's pure stdlib.
 - `manager.py` still imports from `supekku.scripts.lib.core.*` because those core
   modules haven't migrated yet. This is fine — the domain package structure is
-  established even if some downward imports still use legacy paths.
+  established even if some downward imports still use legacy paths, but the
+  import shape remains debt until core migration lands.
 - `graph.py` split revealed that `_collect_all_artifacts` is really orchestration:
   it instantiates `BacklogRegistry`, `DriftLedgerRegistry`, `MemoryRegistry`, and
   walks `Workspace` properties. Moving that to `spec_driver.orchestration` is
@@ -256,10 +262,12 @@ sibling registries.
   categories. `build_backlinks_multi()` handles the multi-category case cleanly.
 - Re-export shims work transparently — all 4656 tests pass without any consumer
   changes.
+- The pilot proved the helper extraction pattern but also showed that the real
+  remaining seam is orchestration ownership of cross-registry source collection.
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
+- [x] Exit criteria satisfied
 - [ ] Verification evidence stored
 - [ ] Spec/Delta/Plan updated with lessons
-- [ ] Hand-off notes to next phase (if any)
+- [x] Hand-off notes to next phase (if any)

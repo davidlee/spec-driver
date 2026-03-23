@@ -120,3 +120,15 @@
 - `7ca724c3` — Phase 3: relations move + backlink extraction
 - `ac2ff223` — Phase 3 docs complete
 - All `.spec-driver` changes committed promptly alongside code per doctrine.
+
+## 2026-03-24 — Post-pilot design reconciliation
+
+- Extended the delta with Phase 4 (`IP-125-P04`) instead of closing after the
+  pilot.
+- Recorded the explicit boundary decision: orchestration owns cross-registry
+  source collection; `domain.relations` computes on pre-collected data; registries
+  remain local authorities.
+- Reconciled the docs so Phase 3 no longer overclaims that sibling-registry
+  imports were removed; the computation moved, but collection debt remains.
+- Marked re-export shims and legacy-core imports as transition debt that needs
+  retirement criteria before broader registry migration continues.

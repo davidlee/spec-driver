@@ -25,9 +25,9 @@ entrance_criteria:
   - Post-pilot architectural verdict recorded in DE-125 notes
   - Domain Internal Layers contract passing in import-linter
 exit_criteria:
-  - An orchestration entrypoint owns backlink source collection across registries
-  - Registries no longer instantiate sibling registries to collect backlink sources
-  - Workspace graph collection has an explicit orchestration home or tracked owning seam
+  - Workspace.sync_policies() and Workspace.sync_standards() pass decision_sources / policy_sources to registries
+  - Registry backlink methods treat None as skip — no fallback to sibling instantiation
+  - Workspace graph collection has a documented orchestration home or tracked owning seam (actual move is a separate patch)
   - Shim retirement criteria are documented for legacy relations re-exports
   - Legacy-core import retirement criteria are documented for migrated domain modules
 verification:
@@ -79,9 +79,9 @@ of vague future cleanup.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] An orchestration entrypoint owns backlink source collection across registries
-- [ ] Registry backlink methods consume pre-collected sources and stop instantiating sibling registries
-- [ ] Workspace graph collection has an explicit orchestration home or a tracked owning seam
+- [ ] `Workspace.sync_policies()` and `Workspace.sync_standards()` collect sibling records and pass them as `decision_sources` / `policy_sources`
+- [ ] Registry backlink methods treat `None` as "skip backlink population" — no fallback to sibling instantiation
+- [ ] Workspace graph collection has an explicit orchestration home or a tracked owning seam (documented; move is a separate patch)
 - [ ] Shim retirement criteria are documented for legacy relations re-export modules
 - [ ] Legacy-core import retirement criteria are documented for migrated domain modules
 
@@ -122,13 +122,23 @@ of vague future cleanup.
   - Keep registries as local authorities rather than workflow coordinators.
 
 - **4.2 Registry refactor**
-  - Change registry helper methods so they operate on supplied source records.
-  - Remove lazy sibling-registry imports from steady-state backlink flows.
+  - Orchestration entrypoints: `Workspace.sync_policies()` and
+    `Workspace.sync_standards()` collect sibling records and pass them down.
+  - `PolicyRegistry.sync(*, decision_sources=None)` and
+    `StandardsRegistry.sync(*, decision_sources=None, policy_sources=None)`
+    accept optional pre-collected source dicts.
+  - `_build_backlinks` becomes a pure function of its inputs — no lazy imports.
+  - Semantic rule: `None` means "skip backlink population", not "fall back to
+    sibling registry collection". Registries must never instantiate siblings.
+  - Remove lazy sibling-registry imports from both registries.
 
 - **4.3 Graph collection ownership**
   - Revisit the Phase 3 `graph.py` split.
   - Either move workspace-wide artifact collection under orchestration or make
     the remaining seam explicit so later migration does not guess.
+  - **Scope**: document the owning seam and target location in this phase; the
+    actual move is a separate patch (or follow-on phase) since graph collection
+    touches more registries than backlinks and needs its own verification.
 
 - **4.4–4.5 Debt retirement**
   - Record the conditions under which shims can be deleted.
@@ -147,11 +157,11 @@ of vague future cleanup.
 
 - `2026-03-24` — Phase 4 opened because the pilot proved the helper extraction
   pattern but left the composition boundary unresolved.
-- `2026-03-24` — **Task 4.1 decision: Option A.** Workspace passes pre-collected
-  source records to registry sync methods. Registries accept optional source data
-  and stop instantiating sibling registries. Rationale: Workspace already
-  orchestrates sync order; this makes the data dependency explicit with minimal
-  new abstraction. See §10 mini-DR for full analysis.
+- `2026-03-24` — **Task 4.1 decision: Option A.** `Workspace.sync_policies()` and
+  `Workspace.sync_standards()` pass `decision_sources` / `policy_sources` to
+  registry sync methods. `None` means skip backlink population, never fallback.
+  Rationale: Workspace already orchestrates sync order; this makes the data
+  dependency explicit with minimal new abstraction. See §10 mini-DR.
 
 ## 10. Findings / Research Notes
 
@@ -203,8 +213,10 @@ def sync_standards(self) -> None:
     )
 ```
 
-Registry `sync()` / `write()` accepts pre-collected source records instead of
+Registry `sync()` / `write()` accepts pre-collected source dicts instead of
 instantiating siblings. `_build_backlinks` becomes a pure function of its inputs.
+`None` means "skip backlink population" — registries must never fall back to
+sibling instantiation.
 
 - **Pro**: minimal change, Workspace already knows the sync order, registries
   become truly local.
@@ -279,36 +291,39 @@ Rationale:
 
 #### Interface sketch
 
+Canonical parameter name: `decision_sources` / `policy_sources` (matches the
+backlinks API which consumes source iterables).
+
 ```python
 # PolicyRegistry
 def _build_backlinks(
     self,
     policies: dict[str, PolicyRecord],
-    decision_records: dict[str, Any] | None = None,
+    decision_sources: dict[str, DecisionRecord] | None = None,
 ) -> None:
-    if decision_records is None:
-        return
+    if decision_sources is None:
+        return  # None = skip, not fallback
     build_backlinks(
         policies,
-        ((d.id, d.policies) for d in decision_records.values()),
+        ((d.id, d.policies) for d in decision_sources.values()),
         "decisions",
     )
 
-def write(self, path=None, *, decision_records=None) -> None:
+def write(self, path=None, *, decision_sources=None) -> None:
     policies = self.collect()
-    self._build_backlinks(policies, decision_records)
+    self._build_backlinks(policies, decision_sources)
     ...
 
-def sync(self, *, decision_records=None) -> None:
-    self.write(decision_records=decision_records)
+def sync(self, *, decision_sources=None) -> None:
+    self.write(decision_sources=decision_sources)
 
 # Workspace
 def sync_policies(self) -> None:
-    self.policies.sync(decision_records=self.decisions.collect())
+    self.policies.sync(decision_sources=self.decisions.collect())
 ```
 
-`StandardsRegistry` is analogous but accepts both `decision_records` and
-`policy_records`.
+`StandardsRegistry` is analogous but accepts both `decision_sources` and
+`policy_sources`.
 
 #### Impact on graph collection (task 4.3)
 

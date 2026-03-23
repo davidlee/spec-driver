@@ -205,5 +205,35 @@
 - `8cf45921` — Phase 4 consistency tightening
 - `01b4cf2c` — Task 4.2 registry refactor
 - `a400671b` — Phase 4 complete
+- `807a050f` — Final notes + core-misplaced-modules memory
 
 All `.spec-driver` changes committed promptly alongside code per doctrine.
+
+## 2026-03-24 — Closure decision
+
+DE-125 closes as a successful pilot. Its findings justify the next delta rather
+than stretching into a general migration umbrella.
+
+### Three rules for future migration deltas
+
+1. **Treat core/ as a classification problem before a migration problem.** Files
+   like `artifact_view.py` and `enums.py` make the outer layer contract look
+   valid while remaining false in practice. Reclassify first, move second.
+2. **Optimise for moves that reduce graph centrality, not module count.** 203
+   legacy modules exist. Target high-centrality coupling nodes, not leaf modules.
+3. **Use Workspace as the canonical orchestration root unless evidence says
+   otherwise.** Phase 4 proved it already owns sync ordering and cross-registry
+   composition.
+
+### Recommended next delta
+
+Scope a core/ audit delta: reclassify `artifact_view.py` (11 registry imports)
+and `enums.py` (5 cross-area imports) so that `spec_driver.core` can migrate
+honestly. This is the single highest-leverage prerequisite for all further
+migration work.
+
+### Memories captured at closure
+
+- `mem.pattern.architecture.domain-migration` — tactical migration recipe
+- `mem.fact.architecture.core-misplaced-modules` — core audit prerequisite
+- `mem.pattern.architecture.migration-principles` — strategic rules

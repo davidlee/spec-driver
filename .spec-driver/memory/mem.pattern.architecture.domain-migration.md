@@ -61,15 +61,23 @@ Verify: `uvx import-linter lint`
 - **Split modules that mix concerns.** `graph.py` had to be split — pure graph
   model moved to domain, workspace artifact collection stayed in legacy because
   it's orchestration-level glue. Check for mixed concerns before moving.
-- **Registries still lazy-import siblings for data collection.** Extracting
-  computation (e.g. `build_backlinks()`) is useful but doesn't eliminate the
-  import — someone still collects source data. The orchestration boundary
-  question (who composes cross-registry data?) remains open.
+- **Orchestration owns cross-registry composition.** Phase 4 resolved this:
+  `Workspace.sync_policies()` / `sync_standards()` pass `decision_sources` /
+  `policy_sources` down. Registries accept `None` = skip backlinks. Lazy
+  sibling-registry imports are eliminated.
 - **Re-export shims mask location issues.** New code added to the shim location
   instead of the canonical location is a real risk.
+
+## Coupling hotspots (migration priority order)
+
+1. `core/` — 38 cross-area imports; see [[mem.fact.architecture.core-misplaced-modules]]
+2. `changes/` — 31 cross-area imports; mixes lifecycle, completion, creation
+3. `formatters/` — 19 cross-area imports; presentation layer, defer until domain settles
+4. `requirements/` — 12 cross-area imports; defer until lower seams exist
 
 ## Related
 
 - [[DE-125]], [[DR-125]] — governing delta and design revision
 - [[POL-003]] — module boundary policy
 - [[ADR-009]] — registry API convention (single-property protocols)
+- [[mem.fact.architecture.core-misplaced-modules]] — core audit prerequisite

@@ -147,14 +147,63 @@
 - `8cf45921` — Phase 4 consistency tightening
 - `01b4cf2c` — Task 4.2 registry refactor
 
-## 2026-03-24 — Post-pilot design reconciliation
+## 2026-03-24 — Post-Phase 4 architectural reflection
 
-- Extended the delta with Phase 4 (`IP-125-P04`) instead of closing after the
-  pilot.
-- Recorded the explicit boundary decision: orchestration owns cross-registry
-  source collection; `domain.relations` computes on pre-collected data; registries
-  remain local authorities.
-- Reconciled the docs so Phase 3 no longer overclaims that sibling-registry
-  imports were removed; the computation moved, but collection debt remains.
-- Marked re-export shims and legacy-core imports as transition debt that needs
-  retirement criteria before broader registry migration continues.
+### Scale of remaining work
+
+- 203 non-test modules in `supekku/scripts/lib/`, 10 in `spec_driver/domain/`.
+- Moving modules one-by-one is not viable at this ratio. Next deltas should
+  target moves that unlock disproportionate value.
+
+### Highest-leverage next moves (ranked)
+
+1. **Audit `core/` for misplaced modules.**
+   - `core/artifact_view.py` imports 11 registries — it's an integration hub,
+     not core infrastructure.
+   - `core/enums.py` imports from `backlog`, `blocks`, `changes`, `decisions`,
+     `drift` — also not core.
+   - Together they account for 38 cross-area imports from `core/`. Until these
+     are reclassified, `spec_driver.core` (bottom of the outer layer contract)
+     can't migrate honestly.
+   - **Recommendation**: scope a delta to audit and reclassify `core/`.
+
+2. **Split `changes/lifecycle.py` into `domain.lifecycle`.**
+   - Small module, defines status constants and transitions. Natural first
+     inhabitant of `spec_driver.domain.lifecycle`.
+   - Would establish the lifecycle sub-area alongside the existing relations work.
+
+3. **Move `Workspace` to `spec_driver.orchestration`.**
+   - Already the composition root for all registries and sync ordering. DE-125
+     Phase 4 proved it owns cross-registry data flow.
+   - Would give the orchestration layer a real module beyond `operations.py`.
+
+4. **Do not touch `formatters/`, `requirements/`, `validation/` yet.**
+   - High-coupling consumers; depend on everything else moving first.
+
+### `changes/` coupling hotspot
+
+- 31 cross-area imports (largest in the codebase, excluding core).
+- Mixes lifecycle definitions (domain), completion workflows (orchestration),
+  registry operations (domain.registries), artifact creation (orchestration).
+- Decomposing `changes/` would unblock registry migration for the entire change
+  artifact family. But it's a 16-module split, not a quick extract.
+
+### Verification status
+
+- All 4656 tests pass.
+- Both import-linter contracts kept.
+- `spec-driver validate` passes.
+- ruff clean.
+
+### Commits (all phases)
+
+- `1a0d467b` — Phase 2: contract + seam specification
+- `7ca724c3` — Phase 3: relations move + backlink extraction
+- `ac2ff223` — Phase 3 docs complete
+- `10324cff` — Architectural verdict notes + domain migration memory
+- `f2f5fcde` — Task 4.1 mini-DR
+- `8cf45921` — Phase 4 consistency tightening
+- `01b4cf2c` — Task 4.2 registry refactor
+- `a400671b` — Phase 4 complete
+
+All `.spec-driver` changes committed promptly alongside code per doctrine.

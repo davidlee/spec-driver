@@ -121,9 +121,12 @@ class Workspace:
     return self._policies
 
   def sync_policies(self) -> None:
-    """Synchronize policy registry to YAML."""
-    registry = self.policies
-    registry.sync()
+    """Synchronize policy registry to YAML.
+
+    Passes pre-collected decision records so the registry can compute
+    backlinks without instantiating sibling registries.
+    """
+    self.policies.sync(decision_sources=self.decisions.collect())
 
   # Standards --------------------------------------------------
   @property
@@ -138,9 +141,15 @@ class Workspace:
     return self._standards
 
   def sync_standards(self) -> None:
-    """Synchronize standard registry to YAML."""
-    registry = self.standards
-    registry.sync()
+    """Synchronize standard registry to YAML.
+
+    Passes pre-collected decision and policy records so the registry can
+    compute backlinks without instantiating sibling registries.
+    """
+    self.standards.sync(
+      decision_sources=self.decisions.collect(),
+      policy_sources=self.policies.collect(),
+    )
 
   # Change registries ------------------------------------------
   @property

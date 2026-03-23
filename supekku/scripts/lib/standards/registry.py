@@ -223,15 +223,32 @@ class StandardRegistry:
 
     return None
 
-  def write(self, path: Path | None = None) -> None:
-    """Write registry to YAML file."""
+  def write(
+    self,
+    path: Path | None = None,
+    *,
+    decision_sources: dict[str, Any] | None = None,
+    policy_sources: dict[str, Any] | None = None,
+  ) -> None:
+    """Write registry to YAML file.
+
+    Args:
+        path: Output path. Defaults to ``self.output_path``.
+        decision_sources: Pre-collected decision records keyed by ID.
+        policy_sources: Pre-collected policy records keyed by ID.
+            When provided, backlinks are computed from these records.
+            ``None`` means skip that backlink category — registries never
+            fall back to sibling instantiation.
+    """
     if path is None:
       path = self.output_path
 
     standards = self.collect()
-
-    # Build backlinks from decisions and policies that reference standards
-    self._build_backlinks(standards)
+    self._build_backlinks(
+      standards,
+      decision_sources=decision_sources,
+      policy_sources=policy_sources,
+    )
 
     registry_data = {
       "standards": {
@@ -244,48 +261,61 @@ class StandardRegistry:
     text = yaml.safe_dump(registry_data, sort_keys=False)
     path.write_text(text, encoding="utf-8")
 
-  def _build_backlinks(self, standards: dict[str, StandardRecord]) -> None:
+  def _build_backlinks(
+    self,
+    standards: dict[str, StandardRecord],
+    *,
+    decision_sources: dict[str, Any] | None = None,
+    policy_sources: dict[str, Any] | None = None,
+  ) -> None:
     """Build backlinks from decisions and policies that reference standards.
 
     Per ADR-002, backlinks are computed at runtime from forward references,
     not stored in frontmatter.
 
     Args:
-        standards: Dictionary of StandardRecords to populate with backlinks
-
+        standards: Dictionary of StandardRecords to populate with backlinks.
+        decision_sources: Pre-collected decision records. ``None`` skips.
+        policy_sources: Pre-collected policy records. ``None`` skips.
     """
+    if decision_sources is None and policy_sources is None:
+      return
+
     from spec_driver.domain.relations.backlinks import (  # noqa: PLC0415
       build_backlinks_multi,
     )
-    from supekku.scripts.lib.decisions.registry import (  # noqa: PLC0415
-      DecisionRegistry,
+
+    groups: list[tuple[list[tuple[str, list[str]]], str]] = []
+    if decision_sources is not None:
+      groups.append((
+        [(d.id, d.standards) for d in decision_sources.values()],
+        "decisions",
+      ))
+    if policy_sources is not None:
+      groups.append((
+        [(p.id, p.standards) for p in policy_sources.values()],
+        "policies",
+      ))
+    build_backlinks_multi(standards, groups)
+
+  def sync(
+    self,
+    *,
+    decision_sources: dict[str, Any] | None = None,
+    policy_sources: dict[str, Any] | None = None,
+  ) -> None:
+    """Sync registry by collecting standards and writing to YAML.
+
+    Args:
+        decision_sources: Pre-collected decision records for backlink
+            computation. ``None`` skips.
+        policy_sources: Pre-collected policy records for backlink
+            computation. ``None`` skips.
+    """
+    self.write(
+      decision_sources=decision_sources,
+      policy_sources=policy_sources,
     )
-    from supekku.scripts.lib.policies.registry import (  # noqa: PLC0415
-      PolicyRegistry,
-    )
-
-    decision_sources: list[tuple[str, list[str]]] = []
-    try:
-      decisions = DecisionRegistry(root=self.root).collect()
-      decision_sources = [(d.id, d.standards) for d in decisions.values()]
-    except (FileNotFoundError, ValueError):
-      pass
-
-    policy_sources: list[tuple[str, list[str]]] = []
-    try:
-      policies = PolicyRegistry(root=self.root).collect()
-      policy_sources = [(p.id, p.standards) for p in policies.values()]
-    except (FileNotFoundError, ValueError):
-      pass
-
-    build_backlinks_multi(standards, [
-      (decision_sources, "decisions"),
-      (policy_sources, "policies"),
-    ])
-
-  def sync(self) -> None:
-    """Sync registry by collecting standards and writing to YAML."""
-    self.write()
 
   def iter(self, status: str | None = None) -> Iterator[StandardRecord]:
     """Iterate over standards, optionally filtered by status."""

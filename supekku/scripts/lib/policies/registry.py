@@ -214,15 +214,26 @@ class PolicyRegistry:
 
     return None
 
-  def write(self, path: Path | None = None) -> None:
-    """Write registry to YAML file."""
+  def write(
+    self,
+    path: Path | None = None,
+    *,
+    decision_sources: dict[str, Any] | None = None,
+  ) -> None:
+    """Write registry to YAML file.
+
+    Args:
+        path: Output path. Defaults to ``self.output_path``.
+        decision_sources: Pre-collected decision records keyed by ID.
+            When provided, backlinks are computed from these records.
+            ``None`` means skip backlink population — registries never
+            fall back to sibling instantiation.
+    """
     if path is None:
       path = self.output_path
 
     policies = self.collect()
-
-    # Build backlinks from decisions that reference policies
-    self._build_backlinks(policies)
+    self._build_backlinks(policies, decision_sources=decision_sources)
 
     registry_data = {
       "policies": {
@@ -235,36 +246,41 @@ class PolicyRegistry:
     text = yaml.safe_dump(registry_data, sort_keys=False)
     path.write_text(text, encoding="utf-8")
 
-  def _build_backlinks(self, policies: dict[str, PolicyRecord]) -> None:
+  def _build_backlinks(
+    self,
+    policies: dict[str, PolicyRecord],
+    *,
+    decision_sources: dict[str, Any] | None = None,
+  ) -> None:
     """Build backlinks from decisions that reference policies.
 
     Per ADR-002, backlinks are computed at runtime from forward references,
     not stored in frontmatter.
 
     Args:
-        policies: Dictionary of PolicyRecords to populate with backlinks
-
+        policies: Dictionary of PolicyRecords to populate with backlinks.
+        decision_sources: Pre-collected decision records. ``None`` means
+            skip backlink population entirely.
     """
+    if decision_sources is None:
+      return
+
     from spec_driver.domain.relations.backlinks import build_backlinks  # noqa: PLC0415
-    from supekku.scripts.lib.decisions.registry import (  # noqa: PLC0415
-      DecisionRegistry,
+
+    build_backlinks(
+      policies,
+      ((d.id, d.policies) for d in decision_sources.values()),
+      "decisions",
     )
 
-    try:
-      decisions = DecisionRegistry(root=self.root).collect()
-      build_backlinks(
-        policies,
-        ((d.id, d.policies) for d in decisions.values()),
-        "decisions",
-      )
-    except (FileNotFoundError, ValueError):
-      # Decisions directory might not exist yet — clear backlinks only
-      for policy in policies.values():
-        policy.backlinks = {}
+  def sync(self, *, decision_sources: dict[str, Any] | None = None) -> None:
+    """Sync registry by collecting policies and writing to YAML.
 
-  def sync(self) -> None:
-    """Sync registry by collecting policies and writing to YAML."""
-    self.write()
+    Args:
+        decision_sources: Pre-collected decision records for backlink
+            computation. ``None`` skips backlink population.
+    """
+    self.write(decision_sources=decision_sources)
 
   def iter(self, status: str | None = None) -> Iterator[PolicyRecord]:
     """Iterate over policies, optionally filtered by status."""

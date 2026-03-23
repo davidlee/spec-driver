@@ -1,10 +1,10 @@
 ---
 id: IP-125-P04
 slug: "125-enforce_explicit_module_boundaries_and_coupling_constraints-phase-04"
-name: "Orchestration ownership and shim retirement"
+name: Orchestration ownership and shim retirement
 created: "2026-03-24"
 updated: "2026-03-24"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-125
 delta: DE-125

@@ -63,3 +63,60 @@
   backlink *computation* is generic but *source collection* remains a registry
   concern until orchestration owns sync.
 - 4656 tests passed, 2 import-linter contracts kept, ruff clean.
+
+## 2026-03-24 — Architectural verdict (post-Phase 3)
+
+### What proved out
+
+- **Domain Internal Layers contract** is the most durable outcome. Machine-enforced
+  in CI, catches wrong-direction imports immediately.
+- **`query.py`** is the ideal domain module: pure stdlib, protocol-based, moved
+  verbatim. Validates that the layer model works when code is genuinely decoupled.
+- **`build_backlinks()`** is a real design improvement. Duplicated 30-line methods
+  replaced by 3-line calls to a generic, testable helper.
+
+### What's uncomfortable
+
+- **Registries still lazy-import sibling registries for data collection.**
+  `PolicyRegistry._build_backlinks` still does
+  `from supekku.scripts.lib.decisions.registry import DecisionRegistry`. We
+  extracted computation but not collection. The lateral coupling is narrower but
+  present.
+- **Domain imports legacy core.** `manager.py` and `graph.py` import from
+  `supekku.scripts.lib.core.*`. The contract says domain is above core, but the
+  actual import path goes upward into the legacy tree. Resolves when core migrates,
+  but architecturally backwards until then.
+- **`graph.py` had to be split** — unplanned. Workspace artifact collection is
+  orchestration glue, not domain. The split was correct but revealed the module
+  was doing two jobs.
+- **Re-export shims are debt.** 77 lines of forwarding code that must eventually
+  be removed, not maintained.
+
+### Open questions
+
+1. **Who owns backlink data collection?** Registries currently collect source
+   data from sibling registries, then pass it to the generic helper. Should
+   `sync()` stay on registries, or should orchestration compose registries and
+   pass cross-registry data down? This is the boundary question that blocks
+   further registry migration.
+2. **When does core migrate?** Domain modules importing legacy core paths is
+   tolerable but architecturally backwards. Core migration would make the
+   contract honest.
+3. **Should graph workspace collection move to orchestration now?** The 126-line
+   legacy `graph.py` is orchestration glue with no clear home.
+
+### Follow-up actions
+
+- The delta has completed its planned phases (P01–P03). Decide whether to close
+  it here or extend with phases for the orchestration boundary question.
+- Consider scoping the core migration as a separate delta — it's prerequisite
+  infrastructure, not domain-specific.
+- Re-export shims should be tracked for eventual removal (flag-day or gradual
+  consumer migration).
+
+### Commits
+
+- `1a0d467b` — Phase 2: contract + seam specification
+- `7ca724c3` — Phase 3: relations move + backlink extraction
+- `ac2ff223` — Phase 3 docs complete
+- All `.spec-driver` changes committed promptly alongside code per doctrine.

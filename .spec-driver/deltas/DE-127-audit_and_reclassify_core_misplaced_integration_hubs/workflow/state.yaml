@@ -1,0 +1,21 @@
+schema: supekku.workflow.state
+version: 1
+artifact:
+  id: DE-127
+  kind: delta
+  path: .spec-driver/deltas/DE-127-audit_and_reclassify_core_misplaced_integration_hubs
+  notes_path: .spec-driver/deltas/DE-127-audit_and_reclassify_core_misplaced_integration_hubs/notes.md
+phase:
+  id: IP-127.PHASE-01
+  status: in_progress
+  path: .spec-driver/deltas/DE-127-audit_and_reclassify_core_misplaced_integration_hubs/phases/phase-01.md
+workflow:
+  status: implementing
+  active_role: implementer
+  handoff_boundary: phase
+timestamps:
+  created: '2026-03-23T22:31:47+00:00'
+  updated: '2026-03-23T22:31:47+00:00'
+plan:
+  id: IP-127
+  path: .spec-driver/deltas/DE-127-audit_and_reclassify_core_misplaced_integration_hubs/IP-127.md

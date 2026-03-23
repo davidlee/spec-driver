@@ -1,10 +1,10 @@
 ---
 id: IP-127-P01
 slug: "127-audit_and_reclassify_core_misplaced_integration_hubs-phase-01"
-name: "Reclassify artifact_view and enums to orchestration"
+name: Reclassify artifact_view and enums to orchestration
 created: "2026-03-24"
 updated: "2026-03-24"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-127
 delta: DE-127

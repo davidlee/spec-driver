@@ -245,30 +245,22 @@ class PolicyRegistry:
         policies: Dictionary of PolicyRecords to populate with backlinks
 
     """
-    # Lazy import to avoid circular dependencies at module load time
+    from spec_driver.domain.relations.backlinks import build_backlinks  # noqa: PLC0415
     from supekku.scripts.lib.decisions.registry import (  # noqa: PLC0415
       DecisionRegistry,
     )
 
-    # Clear existing backlinks (fresh computation each sync per ADR-002)
-    for policy in policies.values():
-      policy.backlinks = {}
-
-    # Build backlinks from decisions
     try:
-      decision_registry = DecisionRegistry(root=self.root)
-      decisions = decision_registry.collect()
-
-      for decision in decisions.values():
-        # For each policy this decision references, add backlink
-        for policy_id in decision.policies:
-          if policy_id in policies:
-            policies[policy_id].backlinks.setdefault("decisions", []).append(
-              decision.id
-            )
+      decisions = DecisionRegistry(root=self.root).collect()
+      build_backlinks(
+        policies,
+        ((d.id, d.policies) for d in decisions.values()),
+        "decisions",
+      )
     except (FileNotFoundError, ValueError):
-      # Decisions directory might not exist yet
-      pass
+      # Decisions directory might not exist yet — clear backlinks only
+      for policy in policies.values():
+        policy.backlinks = {}
 
   def sync(self) -> None:
     """Sync registry by collecting policies and writing to YAML."""

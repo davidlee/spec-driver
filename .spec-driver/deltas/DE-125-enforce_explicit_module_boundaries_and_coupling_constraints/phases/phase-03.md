@@ -4,7 +4,7 @@ slug: "125-enforce_explicit_module_boundaries_and_coupling_constraints-phase-03"
 name: "Pilot migration: relations and backlink seam"
 created: "2026-03-24"
 updated: "2026-03-24"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-125
 delta: DE-125

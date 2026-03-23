@@ -1,11 +1,12 @@
-"""Relations domain - managing relationships between artifacts.
+"""Relations domain — re-export shim.
 
-This package handles artifact relationships, references, and queries.
+Canonical location: ``spec_driver.domain.relations``.
 """
 
 from __future__ import annotations
 
-from .query import (
+# ruff: noqa: F401
+from spec_driver.domain.relations.query import (
   ReferenceHit,
   RelationQueryable,
   collect_references,

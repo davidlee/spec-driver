@@ -4,7 +4,7 @@ slug: "127-audit_and_reclassify_core_misplaced_integration_hubs-phase-01"
 name: Reclassify artifact_view and enums to orchestration
 created: "2026-03-24"
 updated: "2026-03-24"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-127
 delta: DE-127
@@ -127,13 +127,13 @@ phase, `core/` is genuinely foundational with zero cross-area imports.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `artifact_view.py` lives in `spec_driver/orchestration/`
-- [ ] `enums.py` lives in `spec_driver/orchestration/`
-- [ ] Re-export shims in `supekku/scripts/lib/core/` for both modules
-- [ ] `core/` has zero cross-area imports (verified by script)
-- [ ] All tests pass
-- [ ] Both import-linter contracts pass
-- [ ] ruff clean
+- [x] `artifact_view.py` lives in `spec_driver/orchestration/`
+- [x] `enums.py` lives in `spec_driver/orchestration/`
+- [x] Re-export shims in `supekku/scripts/lib/core/` for both modules
+- [x] `core/` has zero cross-area imports (verified by script)
+- [x] All tests pass (4656 passed)
+- [x] Both import-linter contracts pass
+- [x] ruff clean
 
 ## 5. Verification
 
@@ -165,12 +165,12 @@ phase, `core/` is genuinely foundational with zero cross-area imports.
 
 | Status | ID  | Description | Notes |
 | ------ | --- | ----------- | ----- |
-| [ ]    | 1.1 | Move `artifact_view.py` to `spec_driver/orchestration/` | 456 lines, 10 registry imports |
-| [ ]    | 1.2 | Create re-export shim at `supekku/scripts/lib/core/artifact_view.py` | 7 TUI consumer sites |
-| [ ]    | 1.3 | Move `enums.py` to `spec_driver/orchestration/` | 111 lines, 11 lifecycle imports |
-| [ ]    | 1.4 | Create re-export shim at `supekku/scripts/lib/core/enums.py` | 3 consumer sites |
-| [ ]    | 1.5 | Verify core/ has zero cross-area imports | Run audit script |
-| [ ]    | 1.6 | Run full verification suite | Tests, contracts, lint |
+| [x]    | 1.1 | Move `artifact_view.py` to `spec_driver/orchestration/` | Verbatim copy, all registry imports already lazy |
+| [x]    | 1.2 | Create re-export shim at `supekku/scripts/lib/core/artifact_view.py` | Includes private names needed by tests |
+| [x]    | 1.3 | Move `enums.py` to `spec_driver/orchestration/` | Verbatim copy |
+| [x]    | 1.4 | Create re-export shim at `supekku/scripts/lib/core/enums.py` | 4 public names |
+| [x]    | 1.5 | Verify core/ has zero cross-area imports | PASS |
+| [x]    | 1.6 | Run full verification suite | 4656 passed, 2 contracts kept, ruff clean |
 
 ### Task Details
 
@@ -205,11 +205,24 @@ phase, `core/` is genuinely foundational with zero cross-area imports.
 
 ## 9. Decisions & Outcomes
 
-_(To be filled during execution)_
+- `2026-03-24` — Both modules moved as verbatim copies. `artifact_view.py`'s
+  registry imports were already lazy (inside functions), so no import-time
+  coupling change. No need to add either module to `spec_driver.orchestration.__init__`
+  — they're internal modules used by TUI/CLI, not public API.
+- `2026-03-24` — Shim for `artifact_view` needed to include private names
+  (`_REGISTRY_FACTORIES`, `_detect_bundle_dir`, etc.) because the test file
+  imports them directly. Acceptable — the shim is temporary.
 
 ## 10. Findings / Research Notes
 
-_(To be filled during execution)_
+- The move was cleaner than expected. Both modules have zero module-level
+  cross-area imports — `artifact_view.py` uses lazy imports inside factory
+  functions, `enums.py` imports leaf lifecycle constants (correct direction).
+- The 21 cross-area import count was at function-call time, not import time.
+  This means the architectural violation was real but not as structurally
+  embedded as it could have been.
+- `core/` now has zero cross-area imports. `spec_driver.core` migration is
+  unblocked.
 
 ## 11. Wrap-up Checklist
 

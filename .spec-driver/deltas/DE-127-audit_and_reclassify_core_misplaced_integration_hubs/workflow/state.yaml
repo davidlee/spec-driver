@@ -7,15 +7,16 @@ artifact:
   notes_path: .spec-driver/deltas/DE-127-audit_and_reclassify_core_misplaced_integration_hubs/notes.md
 phase:
   id: IP-127.PHASE-01
-  status: in_progress
+  status: complete
   path: .spec-driver/deltas/DE-127-audit_and_reclassify_core_misplaced_integration_hubs/phases/phase-01.md
 workflow:
-  status: implementing
+  status: awaiting_handoff
   active_role: implementer
   handoff_boundary: phase
+  next_role: implementer
 timestamps:
   created: '2026-03-23T22:31:47+00:00'
-  updated: '2026-03-23T22:31:47+00:00'
+  updated: '2026-03-23T22:37:05+00:00'
 plan:
   id: IP-127
   path: .spec-driver/deltas/DE-127-audit_and_reclassify_core_misplaced_integration_hubs/IP-127.md

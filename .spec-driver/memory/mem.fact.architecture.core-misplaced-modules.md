@@ -59,10 +59,11 @@ enforceable.
 
 ## Remaining core modules
 
-Most other `core/` modules (`paths.py`, `repo.py`, `spec_utils.py`,
-`frontmatter_schema.py`, `artifact_ids.py`, `config.py`) are genuinely
-foundational and can migrate to `spec_driver.core` once the two integration
-hubs are reclassified.
+DE-127 confirmed: all 22 remaining `core/` modules have zero cross-area imports
+and are genuinely foundational. They can migrate to `spec_driver.core` in a
+follow-on delta. Recommended order: pure leaf utilities first (zero internal
+deps), then frontmatter cluster (unblocks `domain/relations/` legacy-core
+imports), then workspace infra last (68 combined consumer sites).
 
 ## Related
 

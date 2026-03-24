@@ -12892,10 +12892,10 @@ deltas:
         phase: IP-124-P02
   DE-125:
     kind: delta
-    status: in-progress
+    status: completed
     name: Delta - Enforce explicit module boundaries and coupling constraints
     slug: enforce_explicit_module_boundaries_and_coupling_constraints
-    updated: '2026-03-23'
+    updated: '2026-03-24'
     path: .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/DE-125.md
     applies_to:
       specs: []
@@ -12935,6 +12935,8 @@ deltas:
         phases:
         - id: IP-125-P01
         - id: IP-125-P02
+        - id: IP-125-P03
+        - id: IP-125-P04
       phases:
       - plan: IP-125
         delta: DE-125
@@ -12943,7 +12945,15 @@ deltas:
       - plan: IP-125
         delta: DE-125
         phase: IP-125-P02
-        status: draft
+        status: completed
+      - plan: IP-125
+        delta: DE-125
+        phase: IP-125-P03
+        status: completed
+      - plan: IP-125
+        delta: DE-125
+        phase: IP-125-P04
+        status: completed
   DE-126:
     kind: delta
     status: completed
@@ -12974,3 +12984,47 @@ deltas:
       phases:
       - id: IP-126-P01
         phase: IP-126-P01
+  DE-127:
+    kind: delta
+    status: completed
+    name: Delta - Audit and reclassify core/ misplaced integration hubs
+    slug: audit_and_reclassify_core_misplaced_integration_hubs
+    updated: '2026-03-24'
+    path: .spec-driver/deltas/DE-127-audit_and_reclassify_core_misplaced_integration_hubs/DE-127.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: follows_from
+      target: DE-125
+      attributes:
+        description: DE-125 pilot identified core/ misplacement as the highest-leverage
+          migration prerequisite.
+    - type: operationalises
+      target: POL-003
+      attributes:
+        description: POL-003 requires explicit module boundaries; core/ currently
+          violates them.
+    plan:
+      id: IP-127
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-127
+        delta: DE-127
+        revision_links:
+          aligns_with:
+          - DR-127
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-127-P01
+      phases:
+      - plan: IP-127
+        delta: DE-127
+        phase: IP-127-P01
+        status: completed

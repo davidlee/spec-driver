@@ -56,10 +56,10 @@ delta id:
   glow $(spec-driver show delta {{id}} --path) --pager
 
 dr id:
-  glow $(fd DR-{{id}} change/deltas) --pager
+  glow $(fd DR-{{id}} .spec-driver/deltas) --pager
 
 plan id:
-  glow $(fd IP-{{id}} change/deltas) --pager
+  glow $(fd IP-{{id}} .spec-driver/deltas) --pager
 
 ## Publish
 ##

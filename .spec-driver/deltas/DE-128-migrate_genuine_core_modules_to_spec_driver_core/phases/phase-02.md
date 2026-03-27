@@ -24,7 +24,7 @@ entrance_criteria:
 exit_criteria:
   - paths, spec_utils, frontmatter_writer, events in spec_driver/core/
   - Internal imports use relative paths (e.g. from .repo import find_repo_root)
-  - domain/relations/ imports updated to spec_driver.core (legacy-core debt eliminated)
+  - domain/relations/ imports updated to spec_driver.core (domain legacy-core debt eliminated)
   - All tests pass
   - Both import-linter contracts pass
 verification:
@@ -75,6 +75,7 @@ After tier 1 lands, update:
 - [ ] 4 tier-1 modules in `spec_driver/core/` with relative internal imports
 - [ ] Re-export shims at legacy locations
 - [ ] Domain/relations imports updated to `spec_driver.core`
-- [ ] No `supekku.scripts.lib.core` imports remain in `spec_driver/domain/`
+- [ ] No `supekku.scripts.lib.core` imports in `spec_driver/domain/`
+- [ ] (Out of scope: `spec_driver/orchestration/` legacy-core imports — follow-on)
 - [ ] All tests pass
 - [ ] Both contracts pass

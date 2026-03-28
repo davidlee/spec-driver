@@ -59,6 +59,35 @@ _BARE_REQUIREMENT_ID = re.compile(
 )
 
 
+def _has_frontmatter_requirement_definitions(fm: Mapping[str, Any]) -> list[dict]:
+  """Return frontmatter entries that look like requirement definitions.
+
+  Detects a ``requirements:`` key whose value is a list of dicts containing
+  ``id`` or ``description`` keys — the pattern agents use when they
+  incorrectly define requirements in YAML frontmatter instead of body
+  bullets.  The ``spec.relationships`` block uses a structurally distinct
+  dict with ``primary``/``collaborators`` keys and is not matched.
+  """
+  raw = fm.get("requirements")
+  if not isinstance(raw, list):
+    return []
+  return [
+    entry
+    for entry in raw
+    if isinstance(entry, dict) and ("id" in entry or "description" in entry)
+  ]
+
+
+def count_requirement_like_lines(body: str) -> int:
+  """Count lines in *body* that plausibly define a requirement.
+
+  Public API for callers that need a quick sanity count without running
+  full extraction.  Uses the same heuristic as the parser's internal
+  diagnostics.
+  """
+  return sum(1 for line in body.splitlines() if _is_requirement_like_line(line))
+
+
 def _is_requirement_like_line(line: str) -> bool:
   """Return True if *line* plausibly attempts to define a requirement.
 
@@ -131,6 +160,18 @@ def _records_from_frontmatter(
   data = getattr(frontmatter, "data", frontmatter)
   mapping = dict(data) if isinstance(data, Mapping) else {}
   mapping.setdefault("id", spec_id)
+
+  # Warn if frontmatter contains requirement-definition-shaped entries
+  fm_defs = _has_frontmatter_requirement_definitions(mapping)
+  if fm_defs:
+    logger.info(
+      "Spec %s at %s: frontmatter contains a 'requirements:' array with %d "
+      "entries that will not be indexed. Requirements must be defined as body "
+      "bullets: '- **FR-001**: Title'.",
+      spec_id,
+      spec_path.name,
+      len(fm_defs),
+    )
   breakout_meta = _load_breakout_metadata(spec_path)
   for record in _records_from_content(
     spec_id,
@@ -166,8 +207,11 @@ def _records_from_content(
   except ValueError:
     path = spec_path.as_posix()
 
-  requirement_like_lines = []
+  requirement_like_lines: list[str] = []
   extracted_count = 0
+  # Track UIDs to detect collisions (e.g., compound IDs FR-012-01 and
+  # FR-012-02 both parsing as FR-012).
+  seen_uids: dict[str, str] = {}  # uid → first source line
 
   for line in body.splitlines():
     # Track lines that plausibly *define* a requirement for diagnostics.
@@ -181,6 +225,22 @@ def _records_from_content(
       prefix, number, category, tags_raw, title = match.groups()
       label = f"{prefix.upper()}-{number}"
       uid = f"{spec_id}.{label}"
+
+      # Collision detection — same UID extracted from multiple lines
+      if uid in seen_uids:
+        logger.info(
+          "Spec %s: duplicate requirement ID %s extracted from lines:\n"
+          "  First:  '%s'\n"
+          "  Second: '%s'\n"
+          "Compound IDs (FR-NNN-NNN) are not supported. "
+          "Use sequential IDs: FR-001, FR-002, ...",
+          spec_id,
+          label,
+          seen_uids[uid],
+          line.strip(),
+        )
+      else:
+        seen_uids[uid] = line.strip()
       kind = "functional" if label.startswith("FR-") else "non-functional"
       inline_category = category.strip() if category else None
       frontmatter_category = _frontmatter.get("category")
@@ -212,6 +272,19 @@ def _records_from_content(
       uid = f"{spec_id}.{label}"
       kind = "functional" if label.startswith("FR-") else "non-functional"
 
+      if uid in seen_uids:
+        logger.info(
+          "Spec %s: duplicate requirement ID %s extracted from lines:\n"
+          "  First:  '%s'\n"
+          "  Second: '%s'",
+          spec_id,
+          label,
+          seen_uids[uid],
+          line.strip(),
+        )
+      else:
+        seen_uids[uid] = line.strip()
+
       yield RequirementRecord(
         uid=uid,
         label=label,
@@ -223,16 +296,17 @@ def _records_from_content(
         path=path,
       )
 
-  # Warn if we found requirement-like lines but extracted none
-  if requirement_like_lines and extracted_count == 0:
+  # Warn if requirement-like lines exceed extracted count (was: == 0 only)
+  if requirement_like_lines and extracted_count < len(requirement_like_lines):
     logger.warning(
-      "Spec %s at %s: Found %d requirement-like lines but extracted 0. "
+      "Spec %s at %s: Found %d requirement-like lines but extracted %d. "
       "Expected format: '- **FR-001**: Title' or '- **SPEC-100.FR-001**: Title'. "
       "The label inside **bold** must be bare (no description). "
       "First unmatched line: %s",
       spec_id,
       spec_path.name,
       len(requirement_like_lines),
+      extracted_count,
       requirement_like_lines[0][:80],
     )
 

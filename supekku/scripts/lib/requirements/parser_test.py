@@ -17,8 +17,11 @@ from supekku.scripts.lib.core.paths import (
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file
 from supekku.scripts.lib.requirements.parser import (
   _REQUIREMENT_HEADING,
+  _has_frontmatter_requirement_definitions,
   _is_requirement_like_line,
   _records_from_content,
+  _records_from_frontmatter,
+  count_requirement_like_lines,
 )
 from supekku.scripts.lib.requirements.registry import (
   RequirementRecord,
@@ -357,8 +360,214 @@ class TestRecordsFromContentCrossRefSuppression(unittest.TestCase):
       )
 
 
-if __name__ == "__main__":
-  unittest.main()
+class TestHasFrontmatterRequirementDefinitions(unittest.TestCase):
+  """DE-129 §1.1: Detect requirement definitions in frontmatter."""
+
+  def test_list_of_dicts_with_id(self) -> None:
+    """Frontmatter with requirements as list of dicts with 'id' key."""
+    fm = {
+      "id": "SPEC-100",
+      "requirements": [
+        {"id": "FR-001", "description": "First", "status": "draft"},
+        {"id": "FR-002", "description": "Second", "status": "draft"},
+      ],
+    }
+    result = _has_frontmatter_requirement_definitions(fm)
+    assert len(result) == 2
+
+  def test_list_of_dicts_with_description_only(self) -> None:
+    """Frontmatter with requirements as list of dicts with 'description' only."""
+    fm = {
+      "requirements": [{"description": "Orphaned description"}],
+    }
+    result = _has_frontmatter_requirement_definitions(fm)
+    assert len(result) == 1
+
+  def test_relationships_block_dict(self) -> None:
+    """Relationships block uses a dict with primary/collaborators — not matched."""
+    fm = {
+      "requirements": {
+        "primary": ["SPEC-100.FR-001"],
+        "collaborators": ["SPEC-200.FR-002"],
+      },
+    }
+    result = _has_frontmatter_requirement_definitions(fm)
+    assert result == []
+
+  def test_no_requirements_key(self) -> None:
+    """Frontmatter without requirements key."""
+    fm = {"id": "SPEC-100", "status": "draft"}
+    result = _has_frontmatter_requirement_definitions(fm)
+    assert result == []
+
+  def test_requirements_is_string(self) -> None:
+    """Frontmatter with requirements as a string (unlikely but defensive)."""
+    fm = {"requirements": "some string"}
+    result = _has_frontmatter_requirement_definitions(fm)
+    assert result == []
+
+  def test_list_of_strings(self) -> None:
+    """Frontmatter with requirements as list of plain strings — not matched."""
+    fm = {"requirements": ["FR-001", "FR-002"]}
+    result = _has_frontmatter_requirement_definitions(fm)
+    assert result == []
+
+
+class TestFrontmatterDetectionLogging(unittest.TestCase):
+  """DE-129 §1.2: Frontmatter warning emitted during extraction."""
+
+  def _make_repo(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    return root
+
+  def test_warns_on_frontmatter_requirements(self) -> None:
+    """_records_from_frontmatter logs info when frontmatter has requirement defs."""
+    root = self._make_repo()
+    spec_path = root / "SPEC-100.md"
+    spec_path.write_text("# SPEC-100\n\n- **FR-001**: Body requirement\n")
+
+    fm = {
+      "id": "SPEC-100",
+      "requirements": [
+        {"id": "FR-001", "description": "In frontmatter"},
+      ],
+    }
+    body = "# SPEC-100\n\n- **FR-001**: Body requirement\n"
+
+    with self.assertLogs("supekku", level="INFO") as cm:
+      list(_records_from_frontmatter("SPEC-100", fm, body, spec_path, root))
+
+    assert any(
+      "frontmatter contains a 'requirements:' array" in msg for msg in cm.output
+    )
+
+  def test_no_warning_for_clean_spec(self) -> None:
+    """_records_from_frontmatter does not warn when no frontmatter requirements."""
+    root = self._make_repo()
+    spec_path = root / "SPEC-100.md"
+    body = "# SPEC-100\n\n- **FR-001**: Body requirement\n"
+    spec_path.write_text(body)
+
+    fm = {"id": "SPEC-100", "status": "draft"}
+
+    with self.assertLogs("supekku", level="INFO") as cm:
+      logging.getLogger("supekku").info("SENTINEL")
+      list(_records_from_frontmatter("SPEC-100", fm, body, spec_path, root))
+
+    assert not any(
+      "frontmatter contains a 'requirements:' array" in msg for msg in cm.output
+    )
+
+
+class TestCollisionDetection(unittest.TestCase):
+  """DE-129 §1.2: ID collision detection in _records_from_content."""
+
+  def _make_repo(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    return root
+
+  def test_compound_ids_produce_collision_warning(self) -> None:
+    """Two lines parsing to same UID emit collision diagnostic."""
+    root = self._make_repo()
+    spec_path = root / "SPEC-100.md"
+    # Both FR-012-01 and FR-012-02 parse as FR-012
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-012**: First requirement
+      - **FR-012**: Second with same ID
+    """)
+    spec_path.write_text(body)
+
+    with self.assertLogs("supekku", level="INFO") as cm:
+      list(_records_from_content("SPEC-100", {}, body, spec_path, root))
+
+    assert any("duplicate requirement ID FR-012" in msg for msg in cm.output)
+
+  def test_sequential_ids_no_collision(self) -> None:
+    """Normal sequential IDs produce no collision warning."""
+    root = self._make_repo()
+    spec_path = root / "SPEC-100.md"
+    body = textwrap.dedent("""\
+      ## Requirements
+      - **FR-001**: First requirement
+      - **FR-002**: Second requirement
+    """)
+    spec_path.write_text(body)
+
+    with self.assertLogs("supekku", level="INFO") as cm:
+      logging.getLogger("supekku").info("SENTINEL")
+      list(_records_from_content("SPEC-100", {}, body, spec_path, root))
+
+    assert not any("duplicate requirement ID" in msg for msg in cm.output)
+
+
+class TestMismatchThreshold(unittest.TestCase):
+  """DE-129 §1.2: Mismatch warning fires when extracted < requirement-like."""
+
+  def _make_repo(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    return root
+
+  def test_partial_extraction_warns(self) -> None:
+    """19 requirement-like lines but only 1 extracted → warning."""
+    root = self._make_repo()
+    spec_path = root / "SPEC-100.md"
+    # One valid extraction, many badly formatted lines
+    lines = ["- **FR-001**: Valid requirement"]
+    for i in range(2, 20):
+      lines.append(f"- FR-{i:03d} badly formatted requirement")
+    body = "\n".join(lines)
+    spec_path.write_text(body)
+
+    with self.assertLogs("supekku", level="WARNING") as cm:
+      list(_records_from_content("SPEC-100", {}, body, spec_path, root))
+
+    assert any("requirement-like lines but extracted" in msg for msg in cm.output)
+
+  def test_all_extracted_no_warning(self) -> None:
+    """3 requirement-like lines, 3 extracted → no warning."""
+    root = self._make_repo()
+    spec_path = root / "SPEC-100.md"
+    body = textwrap.dedent("""\
+      - **FR-001**: First
+      - **FR-002**: Second
+      - **FR-003**: Third
+    """)
+    spec_path.write_text(body)
+
+    with self.assertLogs("supekku", level="WARNING") as cm:
+      logging.getLogger("supekku").warning("SENTINEL")
+      list(_records_from_content("SPEC-100", {}, body, spec_path, root))
+
+    assert not any("requirement-like lines but extracted" in msg for msg in cm.output)
+
+
+class TestCountRequirementLikeLines(unittest.TestCase):
+  """DE-129: count_requirement_like_lines public API."""
+
+  def test_counts_definitions(self) -> None:
+    body = textwrap.dedent("""\
+      - **FR-001**: First requirement
+      - **FR-002**: Second requirement
+      Some prose about FR-003 (per PROD-001.FR-003)
+    """)
+    # Line 1 and 2 are requirement-like; line 3 is a cross-reference
+    assert count_requirement_like_lines(body) == 2
+
+  def test_empty_body(self) -> None:
+    assert count_requirement_like_lines("") == 0
+
+  def test_no_requirements(self) -> None:
+    assert count_requirement_like_lines("Just some prose\nNo requirements here") == 0
 
 
 if __name__ == "__main__":

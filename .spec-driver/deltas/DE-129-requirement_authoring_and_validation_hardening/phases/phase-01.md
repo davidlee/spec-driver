@@ -30,12 +30,12 @@ Add three diagnostic capabilities to the requirement parser: frontmatter require
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `_has_frontmatter_requirement_definitions()` implemented and tested
-- [ ] Collision detection via `seen_uids` tracking implemented and tested
-- [ ] Mismatch threshold changed from `== 0` to `<` and tested
-- [ ] `count_requirement_like_lines()` public API added and tested
-- [ ] All existing parser tests still pass
-- [ ] Lint clean (`just check` on parser files)
+- [x] `_has_frontmatter_requirement_definitions()` implemented and tested
+- [x] Collision detection via `seen_uids` tracking implemented and tested
+- [x] Mismatch threshold changed from `== 0` to `<` and tested
+- [x] `count_requirement_like_lines()` public API added and tested
+- [x] All existing parser tests still pass (30/30)
+- [x] Lint clean (ruff check + format)
 
 ## 5. Verification
 
@@ -52,13 +52,13 @@ Add three diagnostic capabilities to the requirement parser: frontmatter require
 
 | Status | ID  | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 1.1 | `_has_frontmatter_requirement_definitions()` helper | [P] | DR §1.1 |
-| [ ] | 1.2 | Wire frontmatter check into `_records_from_frontmatter()` | | After 1.1 |
-| [ ] | 1.3 | Collision tracking in `_records_from_content()` | [P] | DR §1.2 |
-| [ ] | 1.4 | Mismatch threshold: `== 0` → `<` | [P] | One-line change |
-| [ ] | 1.5 | `count_requirement_like_lines()` public API | [P] | DR §1.7 (retained for future use) |
-| [ ] | 1.6 | Unit tests for all new behaviour | | After 1.1–1.5 |
-| [ ] | 1.7 | Lint + existing test pass | | Final gate |
+| [x] | 1.1 | `_has_frontmatter_requirement_definitions()` helper | [P] | DR §1.1 |
+| [x] | 1.2 | Wire frontmatter check into `_records_from_frontmatter()` | | After 1.1 |
+| [x] | 1.3 | Collision tracking in `_records_from_content()` | [P] | DR §1.2 |
+| [x] | 1.4 | Mismatch threshold: `== 0` → `<` | [P] | One-line change |
+| [x] | 1.5 | `count_requirement_like_lines()` public API | [P] | DR §1.7 (retained for future use) |
+| [x] | 1.6 | Unit tests for all new behaviour | | 15 new tests, all passing |
+| [x] | 1.7 | Lint + existing test pass | | 45/45 pass, ruff clean |
 
 ### Task Details
 
@@ -99,11 +99,13 @@ Add three diagnostic capabilities to the requirement parser: frontmatter require
 
 ## 10. Findings / Research Notes
 
-(To be filled during implementation)
+- Collision detection: the generator still yields duplicate records (doesn't suppress them). This is correct — the caller's dict handles dedup via overwrite. The warning is purely diagnostic.
+- Mismatch threshold change: `extracted_count < len(requirement_like_lines)` naturally handles the old `== 0` case and also catches partial-extraction scenarios.
+- Frontmatter detection wired at `logger.info()` per DR §1.8 log-level discipline.
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
+- [x] Exit criteria satisfied
+- [x] Verification evidence: 45/45 tests pass, ruff clean
+- [x] Notes updated
 - [ ] Hand-off notes to phase 2

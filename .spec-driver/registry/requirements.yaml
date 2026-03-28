@@ -4257,7 +4257,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-129
-    verified_by: []
+    verified_by:
+    - AUD-024
     coverage_evidence: []
     coverage_entries: []
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
@@ -4275,7 +4276,8 @@ requirements:
     introduced: null
     implemented_by:
     - DE-129
-    verified_by: []
+    verified_by:
+    - AUD-024
     coverage_evidence:
     - VT-081-003
     - VT-REQ-SYNC-001
@@ -4410,7 +4412,8 @@ requirements:
     implemented_by:
     - DE-081
     - DE-129
-    verified_by: []
+    verified_by:
+    - AUD-024
     coverage_evidence:
     - VT-081-001
     coverage_entries:

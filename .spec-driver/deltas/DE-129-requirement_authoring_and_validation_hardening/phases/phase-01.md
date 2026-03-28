@@ -1,10 +1,10 @@
 ---
 id: IP-129-P01
 slug: "129-requirement_authoring_and_validation_hardening-phase-01"
-name: "IP-129 Phase 01 — Parser hardening"
+name: IP-129 Phase 01 — Parser hardening
 created: "2026-03-28"
 updated: "2026-03-28"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-129
 delta: DE-129

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import fnmatch
+import logging
 from collections.abc import Iterable, Iterator
 from typing import TYPE_CHECKING
 
@@ -41,6 +42,8 @@ if TYPE_CHECKING:
 
   from supekku.scripts.lib.backlog.registry import BacklogRegistry
   from supekku.scripts.lib.specs.registry import SpecRegistry
+
+logger = logging.getLogger(__name__)
 
 # Re-exports for backward compatibility
 __all__ = [
@@ -149,6 +152,13 @@ class RequirementsRegistry:
     seen: set[str] = set()
     yielded_ids: set[str] = set()
 
+    # Per-spec extracted UIDs for post-relation pruning (DR-129 §1.3).
+    # Distinct from ``seen`` which tracks *all* UIDs (including backlog-sourced)
+    # through ``_upsert_record``.  ``spec_extractions`` tracks only body-extracted
+    # UIDs per spec, used to identify orphaned registry entries after all
+    # relation/revision/coverage steps complete.
+    spec_extractions: dict[str, set[str]] = {}
+
     relationships_validator = RelationshipsBlockValidator()
 
     # Collect (spec_id, body) pairs for deferred relationship application.
@@ -163,11 +173,15 @@ class RequirementsRegistry:
             spec.body,
             spec.path,
             repo_root,
+            stats=stats,
           ),
         )
+        extracted_uids: set[str] = set()
         for record in records:
           _upsert_record(self.records, record, seen, stats)
+          extracted_uids.add(record.uid)
           yielded_ids.add(spec.id)
+        spec_extractions[spec.id] = extracted_uids
 
         deferred_relationships.append((spec.id, spec.body))
 
@@ -190,8 +204,10 @@ class RequirementsRegistry:
             body,
             spec_file,
             repo_root,
+            stats=stats,
           ),
         )
+        extracted_uids = set()
         for record in records:
           meta = breakout_meta.get(record.uid, {})
           if meta:
@@ -202,6 +218,8 @@ class RequirementsRegistry:
             if "ext_url" in meta:
               record.ext_url = meta["ext_url"]
           _upsert_record(self.records, record, seen, stats)
+          extracted_uids.add(record.uid)
+        spec_extractions[spec_id] = extracted_uids
 
         try:
           body = spec_file.read_text(encoding="utf-8")
@@ -279,6 +297,26 @@ class RequirementsRegistry:
         audit_files=audit_files,
       )
 
+    # -- Post-relation stale requirement pruning (DR-129 §1.3) -----------
+    # Runs after all extraction, relation, revision, and coverage steps so
+    # that revision moves (which update primary_spec) have already landed.
+    for spec_id, extracted_uids in spec_extractions.items():
+      orphans = [
+        uid
+        for uid, rec in self.records.items()
+        if rec.primary_spec == spec_id
+        and uid not in extracted_uids
+        and not rec.introduced  # protect revision-introduced requirements
+      ]
+      for uid in orphans:
+        del self.records[uid]
+        stats.pruned += 1
+        logger.info(
+          "Pruned stale requirement %s (absent from %s body)",
+          uid,
+          spec_id,
+        )
+
     # Clean specs list for records not seen this run
     for uid, record in list(self.records.items()):
       if uid not in seen:
@@ -301,6 +339,24 @@ class RequirementsRegistry:
     # Validation: warn about specs with no extracted requirements
     if spec_registry:
       _validate_extraction(spec_registry, seen)
+
+    # -- Summary line (DR-129 §1.8) ----------------------------------------
+    if stats.warnings or stats.pruned:
+      logger.warning(
+        "Sync complete: %d created, %d updated, %d pruned, %d warnings "
+        "(run with -v for details)",
+        stats.created,
+        stats.updated,
+        stats.pruned,
+        stats.warnings,
+      )
+    else:
+      logger.info(
+        "Sync complete: %d created, %d updated, %d pruned",
+        stats.created,
+        stats.updated,
+        stats.pruned,
+      )
 
     return stats
 

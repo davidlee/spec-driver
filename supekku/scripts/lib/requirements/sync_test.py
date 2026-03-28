@@ -1296,5 +1296,642 @@ class TestBreakoutFrontmatterSync(unittest.TestCase):
     assert record.tags == ["ci"]
 
 
+class TestSyncStatsFields(unittest.TestCase):
+  """DE-129 Phase 2: SyncStats has pruned and warnings fields."""
+
+  def test_defaults_to_zero(self) -> None:
+    stats = SyncStats()
+    assert stats.pruned == 0
+    assert stats.warnings == 0
+
+  def test_fields_are_mutable(self) -> None:
+    stats = SyncStats()
+    stats.pruned = 3
+    stats.warnings = 2
+    assert stats.pruned == 3
+    assert stats.warnings == 2
+
+
+class TestStaleRequirementPruning(unittest.TestCase):
+  """DE-129 Phase 2: Post-relation stale requirement pruning."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def _write_spec(self, root: Path, spec_id: str, body: str) -> Path:
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / f"{spec_id.lower()}-test"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    spec_path = spec_dir / f"{spec_id}.md"
+    frontmatter = {
+      "id": spec_id,
+      "slug": spec_id.lower(),
+      "name": f"Spec {spec_id}",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+    }
+    dump_markdown_file(spec_path, frontmatter, body)
+    return spec_path
+
+  def _make_repo(self, body: str = "") -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    if not body:
+      body = (
+        "# SPEC-001\n\n"
+        "- **FR-001**: First requirement\n"
+        "- **FR-002**: Second requirement\n"
+      )
+    self._write_spec(root, "SPEC-001", body)
+    os.chdir(root)
+    return root
+
+  def test_deleted_requirement_is_pruned(self) -> None:
+    """Requirement removed from spec body is pruned from registry."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+
+    # First sync — both requirements present
+    stats = registry.sync(spec_registry=spec_registry)
+    registry.save()
+    assert stats.created == 2
+    assert "SPEC-001.FR-001" in registry.records
+    assert "SPEC-001.FR-002" in registry.records
+
+    # Remove FR-002 from spec body
+    spec_path = (
+      root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test" / "SPEC-001.md"
+    )
+    dump_markdown_file(
+      spec_path,
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+      },
+      "# SPEC-001\n\n- **FR-001**: First requirement\n",
+    )
+
+    # Re-sync — FR-002 should be pruned
+    registry = RequirementsRegistry(registry_path)
+    spec_registry.reload()
+    stats = registry.sync(spec_registry=spec_registry)
+    registry.save()
+
+    assert stats.pruned == 1
+    assert "SPEC-001.FR-001" in registry.records
+    assert "SPEC-001.FR-002" not in registry.records
+
+  def test_revision_introduced_requirement_not_pruned(self) -> None:
+    """Requirements with `introduced` set are preserved even when absent from body."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+
+    # First sync
+    registry.sync(spec_registry=spec_registry)
+    registry.save()
+
+    # Manually set `introduced` on FR-002 (simulating revision block)
+    registry.records["SPEC-001.FR-002"].introduced = "RE-050"
+    registry.save()
+
+    # Remove FR-002 from spec body
+    spec_path = (
+      root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test" / "SPEC-001.md"
+    )
+    dump_markdown_file(
+      spec_path,
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+      },
+      "# SPEC-001\n\n- **FR-001**: First requirement\n",
+    )
+
+    # Re-sync — FR-002 should NOT be pruned (has introduced)
+    registry = RequirementsRegistry(registry_path)
+    spec_registry.reload()
+    stats = registry.sync(spec_registry=spec_registry)
+    registry.save()
+
+    assert stats.pruned == 0
+    assert "SPEC-001.FR-001" in registry.records
+    assert "SPEC-001.FR-002" in registry.records
+
+  def test_backlog_sourced_requirement_not_pruned(self) -> None:
+    """Backlog-sourced requirements are not pruned (primary_spec is backlog ID)."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    # Pre-populate a backlog-sourced requirement
+    registry.records["ISSUE-016.FR-016.001"] = RequirementRecord(
+      uid="ISSUE-016.FR-016.001",
+      label="FR-016.001",
+      title="Backlog requirement",
+      primary_spec="ISSUE-016",
+      source_type="backlog",
+    )
+    registry.save()
+
+    spec_registry = SpecRegistry(root)
+    registry.sync(spec_registry=spec_registry)
+    registry.save()
+
+    # Backlog requirement should survive — its primary_spec doesn't match any spec
+    assert "ISSUE-016.FR-016.001" in registry.records
+
+  def test_pruning_idempotent(self) -> None:
+    """Re-running sync after pruning produces no further changes (NF-002)."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+
+    # First sync
+    registry.sync(spec_registry=spec_registry)
+    registry.save()
+
+    # Remove FR-002
+    spec_path = (
+      root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test" / "SPEC-001.md"
+    )
+    dump_markdown_file(
+      spec_path,
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+      },
+      "# SPEC-001\n\n- **FR-001**: First requirement\n",
+    )
+
+    # First prune
+    registry = RequirementsRegistry(registry_path)
+    spec_registry.reload()
+    stats1 = registry.sync(spec_registry=spec_registry)
+    registry.save()
+    assert stats1.pruned == 1
+
+    # Second sync — should be idempotent
+    registry = RequirementsRegistry(registry_path)
+    spec_registry.reload()
+    stats2 = registry.sync(spec_registry=spec_registry)
+    registry.save()
+    assert stats2.pruned == 0
+    assert stats2.created == 0
+
+  def test_revision_moved_requirement_not_pruned_from_old_spec(self) -> None:
+    """Requirement moved by revision block is not pruned from old spec.
+
+    This is the critical test for ext. review F1: pruning runs after
+    revision blocks have updated primary_spec, so the moved requirement
+    no longer belongs to the source spec's pruning scope.
+    """
+    root = self._make_repo(
+      body="# SPEC-001\n\n- **FR-001**: First requirement\n",
+    )
+    self._write_spec(
+      root,
+      "SPEC-002",
+      "# SPEC-002\n\n- **FR-010**: Other requirement\n",
+    )
+
+    # Write a revision that moves SPEC-001.FR-001 → SPEC-002.FR-001
+    slug = "re-050-bundle"
+    bundle_dir = root / SPEC_DRIVER_DIR / REVISIONS_SUBDIR / slug
+    bundle_dir.mkdir(parents=True, exist_ok=True)
+    revision_path = bundle_dir / "RE-050.md"
+    block_yaml = textwrap.dedent("""\
+      schema: supekku.revision.change
+      version: 1
+      metadata:
+        revision: RE-050
+      specs: []
+      requirements:
+        - requirement_id: SPEC-002.FR-001
+          kind: functional
+          action: move
+          origin:
+            - kind: requirement
+              ref: SPEC-001.FR-001
+          destination:
+            spec: SPEC-002
+            requirement_id: SPEC-002.FR-001
+          lifecycle:
+            status: in-progress
+            introduced_by: RE-050
+    """)
+    dump_markdown_file(
+      revision_path,
+      {
+        "id": "RE-050",
+        "slug": "re-050",
+        "name": "RE-050",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "revision",
+      },
+      f"# RE-050\n\n```yaml supekku:revision.change@v1\n{block_yaml}```\n",
+    )
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+    registry.sync(
+      spec_registry=spec_registry,
+      revision_dirs=[root / SPEC_DRIVER_DIR / REVISIONS_SUBDIR],
+    )
+    registry.save()
+
+    # The moved requirement should exist under SPEC-002, not be pruned
+    assert "SPEC-002.FR-001" in registry.records
+    record = registry.records["SPEC-002.FR-001"]
+    assert record.primary_spec == "SPEC-002"
+    assert record.introduced == "RE-050"
+    # Original SPEC-001.FR-001 was renamed/moved, should not exist
+    assert "SPEC-001.FR-001" not in registry.records
+
+  def test_pruning_via_spec_dirs_path(self) -> None:
+    """Pruning works through the spec_dirs fallback extraction path."""
+    root = self._make_repo()
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+
+    # Sync via spec_dirs (no spec_registry)
+    spec_dirs = [root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR]
+    stats = registry.sync(spec_dirs=spec_dirs)
+    registry.save()
+    assert stats.created == 2
+
+    # Remove FR-002
+    spec_path = (
+      root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test" / "SPEC-001.md"
+    )
+    dump_markdown_file(
+      spec_path,
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+      },
+      "# SPEC-001\n\n- **FR-001**: First requirement\n",
+    )
+
+    # Re-sync via spec_dirs
+    registry = RequirementsRegistry(registry_path)
+    stats = registry.sync(spec_dirs=spec_dirs)
+    registry.save()
+
+    assert stats.pruned == 1
+    assert "SPEC-001.FR-001" in registry.records
+    assert "SPEC-001.FR-002" not in registry.records
+
+
+class TestPlaceholderRecordSourceType(unittest.TestCase):
+  """DE-129 Phase 2: _create_placeholder_record stamps source_type='revision'."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def test_placeholder_has_revision_source_type(self) -> None:
+    """Revision-created placeholder records have source_type='revision'."""
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+
+    # Create a minimal spec
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    dump_markdown_file(
+      spec_dir / "SPEC-001.md",
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+      },
+      "# SPEC-001\n",
+    )
+
+    # Revision that introduces a new requirement (not in spec body)
+    slug = "re-060-bundle"
+    bundle_dir = root / SPEC_DRIVER_DIR / REVISIONS_SUBDIR / slug
+    bundle_dir.mkdir(parents=True, exist_ok=True)
+    block_yaml = textwrap.dedent("""\
+      schema: supekku.revision.change
+      version: 1
+      metadata:
+        revision: RE-060
+      specs: []
+      requirements:
+        - requirement_id: SPEC-001.FR-099
+          kind: functional
+          action: introduce
+          destination:
+            spec: SPEC-001
+            requirement_id: SPEC-001.FR-099
+          lifecycle:
+            status: pending
+            introduced_by: RE-060
+    """)
+    dump_markdown_file(
+      bundle_dir / "RE-060.md",
+      {
+        "id": "RE-060",
+        "slug": "re-060",
+        "name": "RE-060",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "revision",
+      },
+      f"# RE-060\n\n```yaml supekku:revision.change@v1\n{block_yaml}```\n",
+    )
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+    registry.sync(
+      spec_registry=spec_registry,
+      revision_dirs=[root / SPEC_DRIVER_DIR / REVISIONS_SUBDIR],
+    )
+
+    record = registry.records["SPEC-001.FR-099"]
+    assert record.source_type == "revision"
+    assert record.introduced == "RE-060"
+
+
+class TestSyncSummaryLine(unittest.TestCase):
+  """DE-129 Phase 2: Sync summary line with log-level discipline."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def test_clean_sync_emits_info(self) -> None:
+    """When no warnings/pruning, summary is at info level."""
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    dump_markdown_file(
+      spec_dir / "SPEC-001.md",
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+      },
+      "# SPEC-001\n\n- **FR-001**: First requirement\n",
+    )
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+
+    import logging  # noqa: PLC0415
+
+    with self.assertLogs(
+      "supekku.scripts.lib.requirements.registry",
+      level=logging.INFO,
+    ) as cm:
+      stats = registry.sync(spec_registry=spec_registry)
+
+    assert stats.warnings == 0
+    assert stats.pruned == 0
+    # Summary should be at INFO, not WARNING
+    summary_logs = [r for r in cm.output if "Sync complete" in r]
+    assert len(summary_logs) == 1
+    assert summary_logs[0].startswith("INFO:")
+
+  def test_sync_with_warnings_emits_warning(self) -> None:
+    """When warnings exist, summary is at warning level."""
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+
+    # Spec with compound IDs that produce a collision warning
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    dump_markdown_file(
+      spec_dir / "SPEC-001.md",
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+      },
+      "# SPEC-001\n\n"
+      "- **FR-001**: First requirement\n"
+      "- **FR-001**: Duplicate requirement\n",
+    )
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+
+    import logging  # noqa: PLC0415
+
+    with self.assertLogs(
+      "supekku.scripts.lib.requirements",
+      level=logging.INFO,
+    ) as cm:
+      stats = registry.sync(spec_registry=spec_registry)
+
+    assert stats.warnings >= 1
+    summary_logs = [r for r in cm.output if "Sync complete" in r]
+    assert len(summary_logs) == 1
+    assert summary_logs[0].startswith("WARNING:")
+    assert "warnings" in summary_logs[0]
+
+  def test_sync_with_pruning_emits_warning(self) -> None:
+    """When pruning occurs, summary is at warning level."""
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    dump_markdown_file(
+      spec_dir / "SPEC-001.md",
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+      },
+      "# SPEC-001\n\n- **FR-001**: First\n- **FR-002**: Second\n",
+    )
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+
+    # First sync
+    registry.sync(spec_registry=spec_registry)
+    registry.save()
+
+    # Remove FR-002
+    dump_markdown_file(
+      spec_dir / "SPEC-001.md",
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+      },
+      "# SPEC-001\n\n- **FR-001**: First\n",
+    )
+
+    import logging  # noqa: PLC0415
+
+    registry = RequirementsRegistry(registry_path)
+    spec_registry.reload()
+    with self.assertLogs(
+      "supekku.scripts.lib.requirements.registry",
+      level=logging.INFO,
+    ) as cm:
+      stats = registry.sync(spec_registry=spec_registry)
+
+    assert stats.pruned == 1
+    summary_logs = [r for r in cm.output if "Sync complete" in r]
+    assert len(summary_logs) == 1
+    assert summary_logs[0].startswith("WARNING:")
+
+
+class TestWarningCounting(unittest.TestCase):
+  """DE-129 Phase 2: SyncStats.warnings incremented by parser diagnostics."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def test_collision_increments_warnings(self) -> None:
+    """Duplicate requirement ID increments stats.warnings."""
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    dump_markdown_file(
+      spec_dir / "SPEC-001.md",
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+      },
+      "# SPEC-001\n\n- **FR-001**: First\n- **FR-001**: Duplicate\n",
+    )
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+    stats = registry.sync(spec_registry=spec_registry)
+
+    assert stats.warnings >= 1
+
+  def test_frontmatter_definitions_increments_warnings(self) -> None:
+    """Frontmatter requirement definitions increment stats.warnings."""
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    os.chdir(root)
+
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    dump_markdown_file(
+      spec_dir / "SPEC-001.md",
+      {
+        "id": "SPEC-001",
+        "slug": "spec-001",
+        "name": "Spec SPEC-001",
+        "created": "2024-06-01",
+        "updated": "2024-06-01",
+        "status": "draft",
+        "kind": "spec",
+        "requirements": [
+          {"id": "FR-001", "description": "Ignored requirement"},
+        ],
+      },
+      "# SPEC-001\n\n- **FR-001**: Body requirement\n",
+    )
+
+    registry_path = get_registry_dir(root) / "requirements.yaml"
+    registry = RequirementsRegistry(registry_path)
+    spec_registry = SpecRegistry(root)
+    stats = registry.sync(spec_registry=spec_registry)
+
+    assert stats.warnings >= 1
+
+
 if __name__ == "__main__":
   unittest.main()

@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
 from .lifecycle import STATUS_PENDING
-from .models import RequirementRecord
+from .models import RequirementRecord, SyncStats
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -155,6 +155,7 @@ def _records_from_frontmatter(
   body: str,
   spec_path: Path,
   repo_root: Path,
+  stats: SyncStats | None = None,
 ) -> Iterator[RequirementRecord]:
   """Extract requirement records from spec frontmatter and body."""
   data = getattr(frontmatter, "data", frontmatter)
@@ -172,6 +173,8 @@ def _records_from_frontmatter(
       spec_path.name,
       len(fm_defs),
     )
+    if stats:
+      stats.warnings += 1
   breakout_meta = _load_breakout_metadata(spec_path)
   for record in _records_from_content(
     spec_id,
@@ -179,6 +182,7 @@ def _records_from_frontmatter(
     body,
     spec_path,
     repo_root,
+    stats=stats,
   ):
     meta = breakout_meta.get(record.uid, {})
     if meta:
@@ -197,6 +201,7 @@ def _records_from_content(
   body: str,
   spec_path: Path,
   repo_root: Path,
+  stats: SyncStats | None = None,
 ) -> Iterator[RequirementRecord]:
   """Extract requirement records from spec body content.
 
@@ -239,6 +244,8 @@ def _records_from_content(
           seen_uids[uid],
           line.strip(),
         )
+        if stats:
+          stats.warnings += 1
       else:
         seen_uids[uid] = line.strip()
       kind = "functional" if label.startswith("FR-") else "non-functional"
@@ -282,6 +289,8 @@ def _records_from_content(
           seen_uids[uid],
           line.strip(),
         )
+        if stats:
+          stats.warnings += 1
       else:
         seen_uids[uid] = line.strip()
 
@@ -298,6 +307,8 @@ def _records_from_content(
 
   # Warn if requirement-like lines exceed extracted count (was: == 0 only)
   if requirement_like_lines and extracted_count < len(requirement_like_lines):
+    if stats:
+      stats.warnings += 1
     logger.warning(
       "Spec %s at %s: Found %d requirement-like lines but extracted %d. "
       "Expected format: '- **FR-001**: Title' or '- **SPEC-100.FR-001**: Title'. "

@@ -287,15 +287,19 @@ class StandardRegistry:
 
     groups: list[tuple[list[tuple[str, list[str]]], str]] = []
     if decision_sources is not None:
-      groups.append((
-        [(d.id, d.standards) for d in decision_sources.values()],
-        "decisions",
-      ))
+      groups.append(
+        (
+          [(d.id, d.standards) for d in decision_sources.values()],
+          "decisions",
+        )
+      )
     if policy_sources is not None:
-      groups.append((
-        [(p.id, p.standards) for p in policy_sources.values()],
-        "policies",
-      ))
+      groups.append(
+        (
+          [(p.id, p.standards) for p in policy_sources.values()],
+          "policies",
+        )
+      )
     build_backlinks_multi(standards, groups)
 
   def sync(

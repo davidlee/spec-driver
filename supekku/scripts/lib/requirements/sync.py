@@ -490,6 +490,7 @@ def _create_placeholder_record(
     implemented_by=implemented_by,
     verified_by=verified_by,
     path=path,
+    source_type="revision",
   )
   records[uid] = record
   return record

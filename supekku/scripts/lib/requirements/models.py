@@ -116,3 +116,5 @@ class SyncStats:
 
   created: int = 0
   updated: int = 0
+  pruned: int = 0
+  warnings: int = 0

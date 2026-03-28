@@ -6,17 +6,17 @@ artifact:
   path: .spec-driver/deltas/DE-129-requirement_authoring_and_validation_hardening
   notes_path: .spec-driver/deltas/DE-129-requirement_authoring_and_validation_hardening/notes.md
 phase:
-  id: IP-129.PHASE-01
-  status: complete
-  path: .spec-driver/deltas/DE-129-requirement_authoring_and_validation_hardening/phases/phase-01.md
+  id: IP-129.PHASE-02
+  status: in-progress
+  path: .spec-driver/deltas/DE-129-requirement_authoring_and_validation_hardening/phases/phase-02.md
 workflow:
-  status: awaiting_handoff
+  status: implementing
   active_role: implementer
   handoff_boundary: phase
-  next_role: implementer
+  claimed_by: unknown
 timestamps:
   created: '2026-03-28T10:02:41+00:00'
-  updated: '2026-03-28T11:49:33+00:00'
+  updated: '2026-03-28T12:25:57+00:00'
 plan:
   id: IP-129
   path: .spec-driver/deltas/DE-129-requirement_authoring_and_validation_hardening/IP-129.md

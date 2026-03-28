@@ -1,10 +1,10 @@
 ---
 id: IP-129-P02
 slug: "129-requirement_authoring_and_validation_hardening-phase-02"
-name: "IP-129 Phase 02 — Sync pruning and summary"
+name: IP-129 Phase 02 — Sync pruning and summary
 created: "2026-03-28"
 updated: "2026-03-28"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-129
 delta: DE-129

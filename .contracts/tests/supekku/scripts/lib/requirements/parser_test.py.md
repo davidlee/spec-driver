@@ -4,6 +4,57 @@ Tests for requirement parsing and extraction.
 
 ## Classes
 
+### TestCollisionDetection
+
+DE-129 §1.2: ID collision detection in _records_from_content.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_compound_ids_produce_collision_warning(self) -> None`: Two lines parsing to same UID emit collision diagnostic.
+- `test_sequential_ids_no_collision(self) -> None`: Normal sequential IDs produce no collision warning.
+- `_make_repo(self) -> Path`
+
+### TestCountRequirementLikeLines
+
+DE-129: count_requirement_like_lines public API.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_counts_definitions(self) -> None`
+- `test_empty_body(self) -> None`
+- `test_no_requirements(self) -> None`
+
+### TestFrontmatterDetectionLogging
+
+DE-129 §1.2: Frontmatter warning emitted during extraction.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_no_warning_for_clean_spec(self) -> None`: _records_from_frontmatter does not warn when no frontmatter requirements.
+- `test_warns_on_frontmatter_requirements(self) -> None`: _records_from_frontmatter logs info when frontmatter has requirement defs.
+- `_make_repo(self) -> Path`
+
+### TestHasFrontmatterRequirementDefinitions
+
+DE-129 §1.1: Detect requirement definitions in frontmatter.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_list_of_dicts_with_description_only(self) -> None`: Frontmatter with requirements as list of dicts with 'description' only.
+- `test_list_of_dicts_with_id(self) -> None`: Frontmatter with requirements as list of dicts with 'id' key.
+- `test_list_of_strings(self) -> None`: Frontmatter with requirements as list of plain strings — not matched.
+- `test_no_requirements_key(self) -> None`: Frontmatter without requirements key.
+- `test_relationships_block_dict(self) -> None`: Relationships block uses a dict with primary/collaborators — not matched.
+- `test_requirements_is_string(self) -> None`: Frontmatter with requirements as a string (unlikely but defensive).
+
 ### TestInlineRequirementTags
 
 VT-081-003: Inline tag extraction from [tag1, tag2] syntax.
@@ -55,6 +106,18 @@ Without a clear cross-reference signal (per/parenthetical), the
 heuristic conservatively flags this to catch misformatted definitions.
 - `test_qualified_bullet_definition(self) -> None`: Qualified ID (SPEC-100.FR-001) in bullet is requirement-like.
 - `test_whitespace_only(self) -> None`: Whitespace-only line is not requirement-like.
+
+### TestMismatchThreshold
+
+DE-129 §1.2: Mismatch warning fires when extracted < requirement-like.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_all_extracted_no_warning(self) -> None`: 3 requirement-like lines, 3 extracted → no warning.
+- `test_partial_extraction_warns(self) -> None`: 19 requirement-like lines but only 1 extracted → warning.
+- `_make_repo(self) -> Path`
 
 ### TestRecordsFromContentCrossRefSuppression
 

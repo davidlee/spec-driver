@@ -4,8 +4,8 @@ name: Requirement Lifecycle Guidance
 kind: memory
 status: active
 memory_type: concept
-updated: "2026-03-18"
-verified: "2026-03-18"
+updated: "2026-03-28"
+verified: "2026-03-28"
 tags: [spec-driver, lifecycle, requirements, coverage]
 summary: "Agent-facing model for requirement lifecycle, coverage statuses, and traceability grounded in current implementation."
 scope:
@@ -77,6 +77,19 @@ The separator after the label/bold may be `:`, `-`, `–`, or `—`.
   `in-progress` with mixed coverage evidence; do not invent new statuses.
 - Requirement detail files under `requirements/` are supplemental only; lifecycle
   is driven by the spec markdown and coverage blocks.
+
+## Common Pitfalls
+
+1. **Frontmatter `requirements:` array**: Defining requirements as a YAML array
+   in spec frontmatter looks correct but is completely ignored by sync. The
+   registry parser reads body bullets only. Sync will warn if it detects this.
+
+2. **Compound IDs (`FR-012-01`)**: The parser captures `FR-012` and discards
+   the `-01` suffix. Multiple compound IDs collapse into one registry entry.
+   Use sequential IDs: `FR-001`, `FR-002`, etc.
+
+3. **Bare requirement IDs in `applies_to`**: `FR-013` is ambiguous when
+   multiple specs define it. Always qualify: `SPEC-012.FR-013`.
 
 ## Related
 

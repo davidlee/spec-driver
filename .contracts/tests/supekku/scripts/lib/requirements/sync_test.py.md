@@ -70,6 +70,18 @@ DE-095: Sync reads tags/ext_id/ext_url from breakout requirement files.
 - `_write_breakout(self, root, spec_id, req_id, frontmatter) -> None`
 - `_write_spec(self, root, spec_id, body) -> Path`
 
+### TestPlaceholderRecordSourceType
+
+DE-129 Phase 2: _create_placeholder_record stamps source_type='revision'.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_placeholder_has_revision_source_type(self) -> None`: Revision-created placeholder records have source_type='revision'.
+
 ### TestSourceKindFields
 
 VT-UPSERT-076-003 / VT-COMPAT-076-005: source fields.
@@ -87,6 +99,54 @@ VT-UPSERT-076-003 / VT-COMPAT-076-005: source fields.
 - `test_to_dict_includes_when_set(self) -> None`
 - `test_to_dict_omits_when_empty(self) -> None`
 
+### TestStaleRequirementPruning
+
+DE-129 Phase 2: Post-relation stale requirement pruning.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_backlog_sourced_requirement_not_pruned(self) -> None`: Backlog-sourced requirements are not pruned (primary_spec is backlog ID).
+- `test_deleted_requirement_is_pruned(self) -> None`: Requirement removed from spec body is pruned from registry.
+- `test_pruning_idempotent(self) -> None`: Re-running sync after pruning produces no further changes (NF-002).
+- `test_pruning_via_spec_dirs_path(self) -> None`: Pruning works through the spec_dirs fallback extraction path.
+- `test_revision_introduced_requirement_not_pruned(self) -> None`: Requirements with `introduced` set are preserved even when absent from body.
+- `test_revision_moved_requirement_not_pruned_from_old_spec(self) -> None`: Requirement moved by revision block is not pruned from old spec.
+
+This is the critical test for ext. review F1: pruning runs after
+revision blocks have updated primary_spec, so the moved requirement
+no longer belongs to the source spec's pruning scope.
+- `_make_repo(self, body) -> Path`
+- `_write_spec(self, root, spec_id, body) -> Path`
+
+### TestSyncStatsFields
+
+DE-129 Phase 2: SyncStats has pruned and warnings fields.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_defaults_to_zero(self) -> None`
+- `test_fields_are_mutable(self) -> None`
+
+### TestSyncSummaryLine
+
+DE-129 Phase 2: Sync summary line with log-level discipline.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_clean_sync_emits_info(self) -> None`: When no warnings/pruning, summary is at info level.
+- `test_sync_with_pruning_emits_warning(self) -> None`: When pruning occurs, summary is at warning level.
+- `test_sync_with_warnings_emits_warning(self) -> None`: When warnings exist, summary is at warning level.
+
 ### TestUpsertRecordProvenance
 
 VT-UPSERT-076-003: _upsert_record stamps source provenance.
@@ -99,3 +159,16 @@ VT-UPSERT-076-003: _upsert_record stamps source provenance.
 - `tearDown(self) -> None`
 - `test_upsert_stamps_source_kind_on_create(self) -> None`
 - `test_upsert_stamps_source_kind_on_merge(self) -> None`
+
+### TestWarningCounting
+
+DE-129 Phase 2: SyncStats.warnings incremented by parser diagnostics.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `setUp(self) -> None`
+- `tearDown(self) -> None`
+- `test_collision_increments_warnings(self) -> None`: Duplicate requirement ID increments stats.warnings.
+- `test_frontmatter_definitions_increments_warnings(self) -> None`: Frontmatter requirement definitions increment stats.warnings.

@@ -41,4 +41,18 @@ Registry for managing Standards.
 - @classmethod `load(cls, root) -> StandardRegistry`: Load existing registry from YAML file.
 - `parse_date(self, date_value) -> <BinOp>`: Parse date from various formats.
 - `sync(self) -> None`: Sync registry by collecting standards and writing to YAML.
+
+Args:
+    decision_sources: Pre-collected decision records for backlink
+        computation. ``None`` skips.
+    policy_sources: Pre-collected policy records for backlink
+        computation. ``None`` skips.
 - `write(self, path) -> None`: Write registry to YAML file.
+
+Args:
+    path: Output path. Defaults to ``self.output_path``.
+    decision_sources: Pre-collected decision records keyed by ID.
+    policy_sources: Pre-collected policy records keyed by ID.
+        When provided, backlinks are computed from these records.
+        ``None`` means skip that backlink category — registries never
+        fall back to sibling instantiation.

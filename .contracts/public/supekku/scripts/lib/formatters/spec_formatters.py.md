@@ -27,6 +27,7 @@ Args:
   audit_count: Number of audits referencing this spec
   requirements_list: Expanded requirements list (id, kind_label, title) when
     --requirements flag is used. When provided, replaces the count summary.
+  registry_empty_hint: When True and all counts are zero, show a sync hint.
 
 Returns:
   Formatted string with all spec details

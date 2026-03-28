@@ -202,6 +202,8 @@ def show_spec(  # noqa: PLR0913
       except (FileNotFoundError, ValueError):
         pass  # No change registry — counts stay at zero
 
+    total_req_count = fr_count + nf_count + other_req_count
+
     def _format(r):  # type: ignore[no-untyped-def]
       base = format_spec_details(
         r,
@@ -213,6 +215,7 @@ def show_spec(  # noqa: PLR0913
         revision_count=0 if related else revision_count,
         audit_count=0 if related else audit_count,
         requirements_list=requirements_list,
+        registry_empty_hint=total_req_count == 0,
       )
       if related:
         related_lines = format_related_section(reverse_refs)

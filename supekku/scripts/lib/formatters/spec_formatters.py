@@ -219,6 +219,8 @@ def _format_requirements_summary(
   fr_count: int,
   nf_count: int,
   other_count: int = 0,
+  *,
+  registry_empty_hint: bool = False,
 ) -> list[str]:
   """Format requirements count summary for spec details.
 
@@ -226,9 +228,12 @@ def _format_requirements_summary(
     fr_count: Number of functional requirements.
     nf_count: Number of non-functional requirements.
     other_count: Number of other requirements.
+    registry_empty_hint: When True and all counts are zero, display a hint
+      suggesting the user run ``spec-driver sync``.
 
   Returns:
-    Lines for the requirements summary, or empty if all counts are zero.
+    Lines for the requirements summary, or empty if all counts are zero
+    (unless registry_empty_hint is set).
   """
   parts: list[str] = []
   if fr_count:
@@ -237,7 +242,15 @@ def _format_requirements_summary(
     parts.append(f"{nf_count} NF")
   if other_count:
     parts.append(f"{other_count} other")
-  return ["", f"Requirements: {', '.join(parts)}"] if parts else []
+  if parts:
+    return ["", f"Requirements: {', '.join(parts)}"]
+  if registry_empty_hint:
+    return [
+      "",
+      "ℹ No requirements found in registry for this spec. Run "
+      "'spec-driver sync' if the spec defines requirements.",
+    ]
+  return []
 
 
 def _format_reverse_lookup_counts(
@@ -297,6 +310,7 @@ def format_spec_details(
   revision_count: int = 0,
   audit_count: int = 0,
   requirements_list: list[tuple[str, str, str]] | None = None,
+  registry_empty_hint: bool = False,
 ) -> str:
   """Format spec details as multi-line string for display.
 
@@ -311,6 +325,7 @@ def format_spec_details(
     audit_count: Number of audits referencing this spec
     requirements_list: Expanded requirements list (id, kind_label, title) when
       --requirements flag is used. When provided, replaces the count summary.
+    registry_empty_hint: When True and all counts are zero, show a sync hint.
 
   Returns:
     Formatted string with all spec details
@@ -318,7 +333,12 @@ def format_spec_details(
   if requirements_list is not None:
     req_section = _format_requirements_list(requirements_list)
   else:
-    req_section = _format_requirements_summary(fr_count, nf_count, other_req_count)
+    req_section = _format_requirements_summary(
+      fr_count,
+      nf_count,
+      other_req_count,
+      registry_empty_hint=registry_empty_hint,
+    )
 
   sections = [
     _format_basic_fields(spec),

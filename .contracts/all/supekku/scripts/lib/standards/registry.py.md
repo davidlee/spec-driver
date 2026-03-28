@@ -45,7 +45,21 @@ Registry for managing Standards.
 - @classmethod `load(cls, root) -> StandardRegistry`: Load existing registry from YAML file.
 - `parse_date(self, date_value) -> <BinOp>`: Parse date from various formats.
 - `sync(self) -> None`: Sync registry by collecting standards and writing to YAML.
+
+Args:
+    decision_sources: Pre-collected decision records for backlink
+        computation. ``None`` skips.
+    policy_sources: Pre-collected policy records for backlink
+        computation. ``None`` skips.
 - `write(self, path) -> None`: Write registry to YAML file.
+
+Args:
+    path: Output path. Defaults to ``self.output_path``.
+    decision_sources: Pre-collected decision records keyed by ID.
+    policy_sources: Pre-collected policy records keyed by ID.
+        When provided, backlinks are computed from these records.
+        ``None`` means skip that backlink category — registries never
+        fall back to sibling instantiation.
 - `__init__(self) -> None`
 - `_build_backlinks(self, standards) -> None`: Build backlinks from decisions and policies that reference standards.
 
@@ -53,5 +67,7 @@ Per ADR-002, backlinks are computed at runtime from forward references,
 not stored in frontmatter.
 
 Args:
-    standards: Dictionary of StandardRecords to populate with backlinks
+    standards: Dictionary of StandardRecords to populate with backlinks.
+    decision_sources: Pre-collected decision records. ``None`` skips.
+    policy_sources: Pre-collected policy records. ``None`` skips.
 - `_parse_standard_file(self, standard_path) -> <BinOp>`: Parse an individual standard file into a StandardRecord.

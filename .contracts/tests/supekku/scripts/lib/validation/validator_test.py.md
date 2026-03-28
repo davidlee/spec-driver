@@ -43,6 +43,54 @@ Tests for phase status validation and --fix (DE-104).
 - `test_wrong_kind_warns(self) -> None`
 - `_create_repo_with_phase(self) -> Path`
 
+### TestBareRequirementIdWarning
+
+DE-129 §1.4: Warn on bare requirement IDs in applies_to.
+
+**Inherits from:** WorkspaceValidatorTest
+
+#### Methods
+
+- `test_backlog_item_id_no_warning(self) -> None`: Backlog item IDs (ISSUE-050) are not requirement-shaped; no warning.
+- `test_bare_fr_id_warns(self) -> None`: Bare FR-013 in applies_to emits a warning.
+- `test_bare_nf_id_warns(self) -> None`: Bare NF-001 in applies_to also warns (not just FR).
+- `test_qualified_id_no_warning(self) -> None`: Fully qualified SPEC-401.FR-014 does not warn.
+
+### TestImplementsTargetKindCheck
+
+DE-129 §1.5: Specific warning when implements targets a spec.
+
+**Inherits from:** WorkspaceValidatorTest
+
+#### Methods
+
+- `test_implements_prod_id_warns(self) -> None`: implements -> PROD-042 also triggers the spec-shaped warning.
+- `test_implements_requirement_no_warning(self) -> None`: implements -> SPEC-012.FR-001 is normal; no warning.
+- `test_implements_spec_id_warns(self) -> None`: implements -> SPEC-012 emits specific warning, not generic error.
+
+### TestRevisionIntroducedInvariant
+
+DE-129 §1.6: Revision-created requirements must have introduced_by.
+
+**Inherits from:** WorkspaceValidatorTest
+
+#### Methods
+
+- `test_non_revision_source_type_no_warning(self) -> None`: source_type='' (body-extracted) with no introduced → no warning.
+- `test_revision_created_with_introduced_no_warning(self) -> None`: source_type=revision + introduced=RE-005 → no warning.
+- `test_revision_created_without_introduced_warns(self) -> None`: source_type=revision + introduced=None → warning.
+- `_write_requirements_yaml(self, root, records) -> None`: Write a requirements.yaml with given records.
+
+### TestShowZeroEntryHint
+
+DE-129 §1.7: Zero-entry hint in _format_requirements_summary.
+
+#### Methods
+
+- `test_nonzero_entries_no_hint(self) -> None`: When counts > 0, show normal summary regardless of hint flag.
+- `test_zero_entries_with_hint(self) -> None`: When all counts are 0 and hint is True, show sync suggestion.
+- `test_zero_entries_without_hint(self) -> None`: When all counts are 0 and hint is False, return empty.
+
 ### TestUnresolvedReferenceValidation
 
 VT-097-unresolved: unresolved frontmatter references detected.

@@ -4,6 +4,8 @@ Validation utilities for workspace and artifact consistency.
 
 ## Constants
 
+- `_BARE_REQUIREMENT_PATTERN` - Compiled patterns for requirement/spec ID shape detection (POL-002).
+- `_SPEC_ID_PATTERN` - Compiled patterns for requirement/spec ID shape detection (POL-002).
 - `__all__`
 
 ## Functions

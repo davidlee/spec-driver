@@ -33,4 +33,15 @@ Registry for managing Policies.
 - @classmethod `load(cls, root) -> PolicyRegistry`: Load existing registry from YAML file.
 - `parse_date(self, date_value) -> <BinOp>`: Parse date from various formats.
 - `sync(self) -> None`: Sync registry by collecting policies and writing to YAML.
+
+Args:
+    decision_sources: Pre-collected decision records for backlink
+        computation. ``None`` skips backlink population.
 - `write(self, path) -> None`: Write registry to YAML file.
+
+Args:
+    path: Output path. Defaults to ``self.output_path``.
+    decision_sources: Pre-collected decision records keyed by ID.
+        When provided, backlinks are computed from these records.
+        ``None`` means skip backlink population — registries never
+        fall back to sibling instantiation.

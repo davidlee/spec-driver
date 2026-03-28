@@ -1295,5 +1295,289 @@ class KindAwareValidationTest(RepoTestCase):
     assert len(kind_issues) == 0
 
 
+class TestBareRequirementIdWarning(WorkspaceValidatorTest):
+  """DE-129 §1.4: Warn on bare requirement IDs in applies_to."""
+
+  def test_bare_fr_id_warns(self) -> None:
+    """Bare FR-013 in applies_to emits a warning."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-400", "FR-013")
+    self._write_delta(root, "DE-400", "FR-013")
+
+    ws = Workspace(root)
+    ws.sync_requirements()
+    issues = validate_workspace(ws)
+    warnings = [
+      i for i in issues if i.level == "warning" and "not fully qualified" in i.message
+    ]
+    assert len(warnings) == 1
+    assert "FR-013" in warnings[0].message
+    assert "SPEC-XXX.FR-013" in warnings[0].message
+
+  def test_qualified_id_no_warning(self) -> None:
+    """Fully qualified SPEC-401.FR-014 does not warn."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-401", "FR-014")
+    self._write_delta(root, "DE-401", "SPEC-401.FR-014")
+
+    ws = Workspace(root)
+    ws.sync_requirements()
+    issues = validate_workspace(ws)
+    bare_warnings = [
+      i for i in issues if i.level == "warning" and "not fully qualified" in i.message
+    ]
+    assert len(bare_warnings) == 0
+
+  def test_backlog_item_id_no_warning(self) -> None:
+    """Backlog item IDs (ISSUE-050) are not requirement-shaped; no warning."""
+    root = self._create_repo()
+    self._write_backlog_item(root, "ISSUE-050")
+    self._write_delta(root, "DE-402", "ISSUE-050")
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    bare_warnings = [
+      i for i in issues if i.level == "warning" and "not fully qualified" in i.message
+    ]
+    assert len(bare_warnings) == 0
+
+  def test_bare_nf_id_warns(self) -> None:
+    """Bare NF-001 in applies_to also warns (not just FR)."""
+    root = self._create_repo()
+    # Write a spec with NF requirement
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "SPEC-403-sample"
+    spec_dir.mkdir(parents=True)
+    spec_path = spec_dir / "SPEC-403.md"
+    fm: dict[str, Any] = {
+      "id": "SPEC-403",
+      "slug": "sample",
+      "name": "Sample Spec",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "spec",
+      "category": "assembly",
+      "c4_level": "component",
+    }
+    dump_markdown_file(spec_path, fm, "# Spec\n- NF-001: Performance\n")
+    self._write_delta(root, "DE-403", "NF-001")
+
+    ws = Workspace(root)
+    ws.sync_requirements()
+    issues = validate_workspace(ws)
+    bare_warnings = [
+      i for i in issues if i.level == "warning" and "not fully qualified" in i.message
+    ]
+    assert len(bare_warnings) == 1
+    assert "NF-001" in bare_warnings[0].message
+
+
+class TestImplementsTargetKindCheck(WorkspaceValidatorTest):
+  """DE-129 §1.5: Specific warning when implements targets a spec."""
+
+  def test_implements_spec_id_warns(self) -> None:
+    """implements -> SPEC-012 emits specific warning, not generic error."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-012", "FR-001")
+    delta_path = self._write_delta(root, "DE-500", "SPEC-012.FR-001")
+    add_relation(delta_path, relation_type="implements", target="SPEC-012")
+
+    ws = Workspace(root)
+    ws.sync_requirements()
+    issues = validate_workspace(ws)
+    spec_warnings = [
+      i
+      for i in issues
+      if i.level == "warning" and "targets a spec, not a requirement" in i.message
+    ]
+    assert len(spec_warnings) == 1
+    assert "SPEC-012" in spec_warnings[0].message
+    assert "relates_to" in spec_warnings[0].message
+
+    # Should NOT also produce the generic "does not match" error for this target
+    generic_errors = [
+      i
+      for i in issues
+      if i.level == "error"
+      and "SPEC-012" in i.message
+      and "does not match" in i.message
+    ]
+    assert len(generic_errors) == 0
+
+  def test_implements_requirement_no_warning(self) -> None:
+    """implements -> SPEC-012.FR-001 is normal; no warning."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-013", "FR-001")
+    delta_path = self._write_delta(root, "DE-501", "SPEC-013.FR-001")
+    add_relation(delta_path, relation_type="implements", target="SPEC-013.FR-001")
+
+    ws = Workspace(root)
+    ws.sync_requirements()
+    issues = validate_workspace(ws)
+    spec_warnings = [
+      i for i in issues if i.level == "warning" and "targets a spec" in i.message
+    ]
+    assert len(spec_warnings) == 0
+
+  def test_implements_prod_id_warns(self) -> None:
+    """implements -> PROD-042 also triggers the spec-shaped warning."""
+    root = self._create_repo()
+    # Create a PROD spec
+    prod_dir = root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR / "PROD-042-sample"
+    prod_dir.mkdir(parents=True)
+    prod_path = prod_dir / "PROD-042.md"
+    fm: dict[str, Any] = {
+      "id": "PROD-042",
+      "slug": "sample",
+      "name": "Sample Prod",
+      "created": "2024-06-01",
+      "updated": "2024-06-01",
+      "status": "draft",
+      "kind": "product",
+    }
+    dump_markdown_file(prod_path, fm, "# Prod\n- FR-001: Feature\n")
+    delta_path = self._write_delta(root, "DE-502", "PROD-042.FR-001")
+    add_relation(delta_path, relation_type="implements", target="PROD-042")
+
+    ws = Workspace(root)
+    ws.sync_requirements()
+    issues = validate_workspace(ws)
+    spec_warnings = [
+      i for i in issues if i.level == "warning" and "targets a spec" in i.message
+    ]
+    assert len(spec_warnings) == 1
+
+
+class TestRevisionIntroducedInvariant(WorkspaceValidatorTest):
+  """DE-129 §1.6: Revision-created requirements must have introduced_by."""
+
+  def _write_requirements_yaml(
+    self,
+    root: Path,
+    records: dict[str, dict[str, Any]],
+  ) -> None:
+    """Write a requirements.yaml with given records."""
+    import yaml  # noqa: PLC0415
+
+    registry_dir = root / SPEC_DRIVER_DIR / "registry"
+    registry_dir.mkdir(parents=True, exist_ok=True)
+    yaml_path = registry_dir / "requirements.yaml"
+    yaml_path.write_text(
+      yaml.dump({"requirements": records}, default_flow_style=False),
+      encoding="utf-8",
+    )
+
+  def test_revision_created_with_introduced_no_warning(self) -> None:
+    """source_type=revision + introduced=RE-005 → no warning."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-600", "FR-001")
+    self._write_requirements_yaml(
+      root,
+      {
+        "SPEC-600.FR-001": {
+          "label": "FR-001",
+          "title": "Test",
+          "specs": ["SPEC-600"],
+          "primary_spec": "SPEC-600",
+          "kind": "functional",
+          "status": "pending",
+          "source_type": "revision",
+          "introduced": "RE-005",
+          "implemented_by": [],
+          "verified_by": [],
+          "coverage_evidence": [],
+          "coverage_entries": [],
+          "tags": [],
+        },
+      },
+    )
+    # Write a revision so introduced reference resolves
+    self._write_revision(root, "RE-005", "SPEC-600.FR-001")
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    revision_warnings = [i for i in issues if "revision-created" in i.message.lower()]
+    assert len(revision_warnings) == 0
+
+  def test_revision_created_without_introduced_warns(self) -> None:
+    """source_type=revision + introduced=None → warning."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-601", "FR-001")
+    self._write_requirements_yaml(
+      root,
+      {
+        "SPEC-601.FR-001": {
+          "label": "FR-001",
+          "title": "Test",
+          "specs": ["SPEC-601"],
+          "primary_spec": "SPEC-601",
+          "kind": "functional",
+          "status": "pending",
+          "source_type": "revision",
+          "introduced": None,
+          "implemented_by": [],
+          "verified_by": [],
+          "coverage_evidence": [],
+          "coverage_entries": [],
+          "tags": [],
+        },
+      },
+    )
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws)
+    revision_warnings = [i for i in issues if "revision-created" in i.message.lower()]
+    assert len(revision_warnings) == 1
+    assert "introduced_by" in revision_warnings[0].message
+
+  def test_non_revision_source_type_no_warning(self) -> None:
+    """source_type='' (body-extracted) with no introduced → no warning."""
+    root = self._create_repo()
+    self._write_spec(root, "SPEC-602", "FR-001")
+
+    ws = Workspace(root)
+    ws.sync_requirements()
+    issues = validate_workspace(ws)
+    revision_warnings = [i for i in issues if "revision-created" in i.message.lower()]
+    assert len(revision_warnings) == 0
+
+
+class TestShowZeroEntryHint:
+  """DE-129 §1.7: Zero-entry hint in _format_requirements_summary."""
+
+  def test_zero_entries_with_hint(self) -> None:
+    """When all counts are 0 and hint is True, show sync suggestion."""
+    from supekku.scripts.lib.formatters.spec_formatters import (  # noqa: PLC0415
+      _format_requirements_summary,
+    )
+
+    lines = _format_requirements_summary(0, 0, 0, registry_empty_hint=True)
+    assert len(lines) > 0
+    joined = " ".join(lines)
+    assert "No requirements found" in joined
+    assert "spec-driver sync" in joined
+
+  def test_zero_entries_without_hint(self) -> None:
+    """When all counts are 0 and hint is False, return empty."""
+    from supekku.scripts.lib.formatters.spec_formatters import (  # noqa: PLC0415
+      _format_requirements_summary,
+    )
+
+    lines = _format_requirements_summary(0, 0, 0, registry_empty_hint=False)
+    assert lines == []
+
+  def test_nonzero_entries_no_hint(self) -> None:
+    """When counts > 0, show normal summary regardless of hint flag."""
+    from supekku.scripts.lib.formatters.spec_formatters import (  # noqa: PLC0415
+      _format_requirements_summary,
+    )
+
+    lines = _format_requirements_summary(3, 1, 0, registry_empty_hint=True)
+    joined = " ".join(lines)
+    assert "3 FR" in joined
+    assert "1 NF" in joined
+    assert "No requirements found" not in joined
+
+
 if __name__ == "__main__":
   unittest.main()

@@ -5,6 +5,7 @@ Requirements management and processing utilities.
 ## Constants
 
 - `__all__` - Re-exports for backward compatibility
+- `logger`
 
 ## Classes
 

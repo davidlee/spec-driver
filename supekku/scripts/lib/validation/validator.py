@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
+
+# Compiled patterns for requirement/spec ID shape detection (POL-002).
+_BARE_REQUIREMENT_PATTERN = re.compile(r"^(?:FR|NF)-\d{3}$")
+_SPEC_ID_PATTERN = re.compile(r"^(?:SPEC|PROD)-\d{3}$")
 
 from supekku.scripts.lib.backlog.models import BacklogItem
 from supekku.scripts.lib.backlog.registry import discover_backlog_items
@@ -94,6 +99,14 @@ class WorkspaceValidator:
         self._error(
           req_id,
           f"Requirement introduced_by references missing revision {record.introduced}",
+        )
+      # §1.6: Revision-created requirements must have introduced_by
+      if record.source_type == "revision" and not record.introduced:
+        self._warning(
+          req_id,
+          "Requirement appears to be revision-created (source_type=revision) "
+          "but has no introduced_by field. This may cause incorrect pruning. "
+          "Check revision blocks.",
         )
       for audit_id in record.verified_by:
         if audit_id not in audit_ids:
@@ -206,6 +219,15 @@ class WorkspaceValidator:
         target = str(relation.get("target", ""))
         if rel_type != exp:
           continue
+        # §1.5: Specific guidance when implements targets a spec, not a requirement
+        if _SPEC_ID_PATTERN.match(target):
+          self._warning(
+            artifact.id,
+            f"Relation '{rel_type} -> {target}' targets a spec, not a requirement. "
+            f"'implements' is for requirements (e.g., {target}.FR-001). "
+            f"Use 'relates_to' for spec-level relations.",
+          )
+          continue
         if target not in requirement_ids:
           self._error(
             artifact.id,
@@ -214,6 +236,13 @@ class WorkspaceValidator:
       applies = artifact.applies_to.get("requirements", [])
       if applies:
         for req in applies:
+          # §1.4: Warn on bare requirement IDs (no spec prefix)
+          if _BARE_REQUIREMENT_PATTERN.match(req):
+            self._warning(
+              artifact.id,
+              f"applies_to requirement '{req}' is not fully qualified. "
+              f"Use 'SPEC-XXX.{req}' to avoid ambiguity.",
+            )
           if req not in applies_to_ids:
             self._error(
               artifact.id,

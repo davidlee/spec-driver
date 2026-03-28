@@ -24,9 +24,12 @@ Args:
   fr_count: Number of functional requirements.
   nf_count: Number of non-functional requirements.
   other_count: Number of other requirements.
+  registry_empty_hint: When True and all counts are zero, display a hint
+    suggesting the user run ``spec-driver sync``.
 
 Returns:
-  Lines for the requirements summary, or empty if all counts are zero.
+  Lines for the requirements summary, or empty if all counts are zero
+  (unless registry_empty_hint is set).
 - `_format_reverse_lookup_counts(delta_count, revision_count, audit_count) -> list[str]`: Format reverse lookup counts for spec details.
 
 Args:
@@ -58,6 +61,7 @@ Args:
   audit_count: Number of audits referencing this spec
   requirements_list: Expanded requirements list (id, kind_label, title) when
     --requirements flag is used. When provided, replaces the count summary.
+  registry_empty_hint: When True and all counts are zero, show a sync hint.
 
 Returns:
   Formatted string with all spec details

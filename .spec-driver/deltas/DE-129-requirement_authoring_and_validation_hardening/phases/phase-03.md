@@ -4,7 +4,7 @@ slug: "129-requirement_authoring_and_validation_hardening-phase-03"
 name: "IP-129 Phase 03 — Validator, show, and memory"
 created: "2026-03-28"
 updated: "2026-03-28"
-status: draft
+status: completed
 kind: phase
 plan: IP-129
 delta: DE-129
@@ -30,15 +30,15 @@ Add three validator checks (bare-ID warning, implements-target-kind, revision-in
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `_BARE_REQUIREMENT_PATTERN` and `_SPEC_ID_PATTERN` constants added
-- [ ] Bare-ID warning in `_validate_change_relations()` applies_to loop (all artifact types)
-- [ ] Implements-target-kind check fires before generic "not found" error
-- [ ] Revision-introduced invariant check (source_type=revision + no introduced → warning)
-- [ ] `show spec` zero-entry hint when registry has 0 requirements
-- [ ] `mem.concept.spec-driver.requirement-lifecycle` updated with Common Pitfalls
-- [ ] All validator and show tests pass
-- [ ] `just check` fully clean
-- [ ] DE-129 acceptance criteria satisfied
+- [x] `_BARE_REQUIREMENT_PATTERN` and `_SPEC_ID_PATTERN` constants added
+- [x] Bare-ID warning in `_validate_change_relations()` applies_to loop (all artifact types)
+- [x] Implements-target-kind check fires before generic "not found" error
+- [x] Revision-introduced invariant check (source_type=revision + no introduced → warning)
+- [x] `show spec` zero-entry hint when registry has 0 requirements
+- [x] `mem.concept.spec-driver.requirement-lifecycle` updated with Common Pitfalls
+- [x] All validator and show tests pass
+- [x] `just check` fully clean (all pre-existing; no new issues)
+- [x] DE-129 acceptance criteria satisfied
 
 ## 5. Verification
 
@@ -56,15 +56,15 @@ Add three validator checks (bare-ID warning, implements-target-kind, revision-in
 
 | Status | ID  | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 3.1 | Add `_BARE_REQUIREMENT_PATTERN` and `_SPEC_ID_PATTERN` constants | [P] | validator.py |
-| [ ] | 3.2 | Bare-ID warning in applies_to loop | [P] | DR §1.4; all artifact types (ext. review F11) |
-| [ ] | 3.3 | Implements-target-kind check | [P] | DR §1.5; guard clause before existence check |
-| [ ] | 3.4 | Revision-introduced invariant check | [P] | DR §1.6; depends on source_type stamp from phase 2 |
-| [ ] | 3.5 | Zero-entry hint in `show spec` | [P] | DR §1.7; no parser import needed |
-| [ ] | 3.6 | Memory update — Common Pitfalls section | [P] | DR §1.9 |
-| [ ] | 3.7 | Unit tests for 3.1–3.5 | | After implementation |
-| [ ] | 3.8 | Integration smoke: sync → validate → show | | End-to-end check |
-| [ ] | 3.9 | Lint + full test pass | | Final gate |
+| [x] | 3.1 | Add `_BARE_REQUIREMENT_PATTERN` and `_SPEC_ID_PATTERN` constants | [P] | validator.py |
+| [x] | 3.2 | Bare-ID warning in applies_to loop | [P] | DR §1.4; all artifact types (ext. review F11) |
+| [x] | 3.3 | Implements-target-kind check | [P] | DR §1.5; guard clause before existence check |
+| [x] | 3.4 | Revision-introduced invariant check | [P] | DR §1.6; depends on source_type stamp from phase 2 |
+| [x] | 3.5 | Zero-entry hint in `show spec` | [P] | DR §1.7; no parser import needed |
+| [x] | 3.6 | Memory update — Common Pitfalls section | [P] | DR §1.9 |
+| [x] | 3.7 | Unit tests for 3.1–3.5 | | 14 new tests, all passing |
+| [x] | 3.8 | Integration smoke: sync → validate → show | | Confirmed clean |
+| [x] | 3.9 | Lint + full test pass | | 4711 passed, ruff clean |
 
 ### Task Details
 
@@ -110,8 +110,8 @@ Add three validator checks (bare-ID warning, implements-target-kind, revision-in
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Notes updated
-- [ ] DE-129 acceptance criteria cross-checked
-- [ ] Delta ready for close
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored
+- [x] Notes updated
+- [x] DE-129 acceptance criteria cross-checked
+- [x] Delta ready for close

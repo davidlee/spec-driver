@@ -326,6 +326,31 @@ entries:
     notes: |
       registry_test.py::TestInlineRequirementTags
       Inline [tag] extraction, save/load round-trip, filter(tag=...) (DE-081)
+
+  - artefact: VT-129-001
+    kind: VT
+    requirement: SPEC-122.FR-003
+    status: verified
+    notes: |
+      sync_test.py::TestStalePruning
+      Pruning removes orphaned entries from registry; revision-introduced preserved;
+      idempotent save/load round-trip after pruning (DE-129)
+
+  - artefact: VA-129-001
+    kind: VA
+    requirement: SPEC-122.FR-004
+    status: verified
+    notes: |
+      parser_test.py: frontmatter detection, collision detection, mismatch threshold
+      sync_test.py: both extraction paths populate spec_extractions (DE-129)
+
+  - artefact: VA-129-002
+    kind: VA
+    requirement: SPEC-122.NF-002
+    status: verified
+    notes: |
+      sync_test.py::TestStalePruning — pruning is deterministic and idempotent;
+      re-running sync on pruned registry produces no further changes (DE-129)
 ```
 
 ## 1. Intent & Summary

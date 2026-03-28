@@ -13028,3 +13028,135 @@ deltas:
         delta: DE-127
         phase: IP-127-P01
         status: completed
+  DE-128:
+    kind: delta
+    status: draft
+    name: Delta - Migrate genuine core modules to spec_driver.core
+    slug: migrate_genuine_core_modules_to_spec_driver_core
+    updated: '2026-03-24'
+    path: .spec-driver/deltas/DE-128-migrate_genuine_core_modules_to_spec_driver_core/DE-128.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: follows_from
+      target: DE-127
+      attributes:
+        description: DE-127 confirmed all 22 remaining core/ modules are genuinely
+          foundational.
+    - type: follows_from
+      target: DE-125
+      attributes:
+        description: DE-125 established the migration pattern and import-linter contracts.
+    - type: operationalises
+      target: POL-003
+      attributes:
+        description: Makes the outer layer contract truthful by populating spec_driver.core.
+    plan:
+      id: IP-128
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-128
+        delta: DE-128
+        revision_links:
+          aligns_with:
+          - DR-128
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-128-P01
+        - id: IP-128-P02
+        - id: IP-128-P03
+        - id: IP-128-P04
+      phases:
+      - plan: IP-128
+        delta: DE-128
+        phase: IP-128-P01
+        status: draft
+      - plan: IP-128
+        delta: DE-128
+        phase: IP-128-P02
+        status: draft
+      - plan: IP-128
+        delta: DE-128
+        phase: IP-128-P03
+        status: draft
+      - plan: IP-128
+        delta: DE-128
+        phase: IP-128-P04
+        status: draft
+  DE-129:
+    kind: delta
+    status: completed
+    name: Delta - Requirement authoring and validation hardening
+    slug: requirement_authoring_and_validation_hardening
+    updated: '2026-03-29'
+    path: .spec-driver/deltas/DE-129-requirement_authoring_and_validation_hardening/DE-129.md
+    applies_to:
+      specs:
+      - SPEC-122
+      requirements:
+      - SPEC-122.FR-003
+      - SPEC-122.FR-004
+      - SPEC-122.NF-002
+    relations:
+    - type: relates_to
+      target: ISSUE-050
+      attributes:
+        annotation: "Tags on requirements \u2014 authoring-time validation context"
+    - type: relates_to
+      target: ISSUE-051
+      attributes:
+        annotation: "Stale requirement pruning \u2014 sync integrity"
+    - type: relates_to
+      target: IMPR-012
+      attributes:
+        annotation: "Silent ID deduplication \u2014 compound-ID misparsing is a variant"
+    - type: relates_to
+      target: PROB-002
+      attributes:
+        annotation: "Requirement lifecycle guidance drift \u2014 same class of failure\
+          \ recurred in client repos"
+    plan:
+      id: IP-129
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-129
+        delta: DE-129
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - SPEC-122
+          collaborators:
+          - SPEC-125
+          - SPEC-158
+        requirements:
+          targets:
+          - SPEC-122.FR-003
+          - SPEC-122.FR-004
+          - SPEC-122.NF-002
+          dependencies: []
+        phases:
+        - id: IP-129-P01
+        - id: IP-129-P02
+        - id: IP-129-P03
+      phases:
+      - plan: IP-129
+        delta: DE-129
+        phase: IP-129-P01
+        status: completed
+      - plan: IP-129
+        delta: DE-129
+        phase: IP-129-P02
+        status: completed
+      - plan: IP-129
+        delta: DE-129
+        phase: IP-129-P03
+        status: completed

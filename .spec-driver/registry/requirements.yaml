@@ -6,7 +6,7 @@ requirements:
     - IMPR-001
     primary_spec: IMPR-001
     kind: functional
-    category: authentication
+    category: null
     status: pending
     tags: []
     introduced: null
@@ -24,7 +24,7 @@ requirements:
     - IMPR-001
     primary_spec: IMPR-001
     kind: non-functional
-    category: performance
+    category: null
     status: pending
     tags: []
     introduced: null
@@ -208,7 +208,7 @@ requirements:
     - ISSUE-020
     primary_spec: ISSUE-020
     kind: functional
-    category: PROD-010
+    category: null
     status: pending
     tags: []
     introduced: null
@@ -4252,15 +4252,19 @@ requirements:
     primary_spec: SPEC-122
     kind: functional
     category: unit
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-129
     verified_by:
     - AUD-024
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VT-129-001
+    coverage_entries:
+    - artefact: VT-129-001
+      status: verified
+      kind: VT
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-004:
     label: FR-004
@@ -4279,6 +4283,7 @@ requirements:
     verified_by:
     - AUD-024
     coverage_evidence:
+    - VA-129-001
     - VT-081-003
     - VT-REQ-SYNC-001
     coverage_entries:
@@ -4288,6 +4293,9 @@ requirements:
     - artefact: VT-081-003
       status: verified
       kind: VT
+    - artefact: VA-129-001
+      status: verified
+      kind: VA
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.FR-005:
     label: FR-005
@@ -4415,11 +4423,15 @@ requirements:
     verified_by:
     - AUD-024
     coverage_evidence:
+    - VA-129-002
     - VT-081-001
     coverage_entries:
     - artefact: VT-081-001
       status: verified
       kind: VT
+    - artefact: VA-129-002
+      status: verified
+      kind: VA
     path: .spec-driver/tech/SPEC-122/SPEC-122.md
   SPEC-122.NF-003:
     label: NF-003

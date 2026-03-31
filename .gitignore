@@ -8,6 +8,7 @@ __pycache__/
 /.uv-cache
 # C extensions
 *.so
+.claude/settings.local.json
 
 # Distribution / packaging
 .Python

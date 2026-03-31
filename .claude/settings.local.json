@@ -53,7 +53,10 @@
       "Bash(uv pip:*)",
       "Bash(git log:*)",
       "Bash(git diff:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(find /home/david/dev/spec-driver -maxdepth 3 -type f \\\\\\(-name *.rb -o -name *homebrew* -o -name *brew* \\\\\\) ! -path ./.uv-cache/*)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/h/home-assistant.rb\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/Homebrew/homebrew-core/master/Formula/p/posting.rb\")"
     ],
     "deny": [],
     "ask": []

@@ -64,6 +64,7 @@ Add symlinks into `.spec-driver` subfolders if you want convenient access to the
 ### MacOS
 
 ```zsh
+brew update
 brew tap davidlee/spec-driver
 brew install spec-driver
 

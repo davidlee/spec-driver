@@ -1,57 +1,34 @@
 ---
 name: update-delta-docs
-description: Reconcile DE/IP/phase/DR execution artefacts during delta work. Use this when implementation changes structured execution state, not just notes.
+description: "Updates structured delta execution artefacts (DE, IP, phase sheets, DR) to reflect implementation progress. Use when task statuses, phase state, scope, risks, or verification evidence changed during execution — not for general note-taking (use /notes for that)."
 ---
 
-This skill is for structured delta execution documentation.
+Updates the structured artefacts that govern delta execution. Use `/notes` for compact implementation journaling; use this skill when execution changed the governing documents themselves.
 
-Do not use it as a replacement for `/notes`.
+## Triggers
 
-Use `/notes` for compact implementation journaling on the current card.
-Use `/update-delta-docs` when execution changed the structured artefacts that
-govern or describe the work.
+Use this skill when any of these became true during execution:
 
-Inputs:
+- Phase task statuses or checklist items changed.
+- IP phase state or active phase changed.
+- DE scope, risks, dependencies, or open questions changed.
+- DR target behavior or design rationale changed.
+- Verification state or evidence in execution artefacts changed.
 
-- `DE-XXX.md`
-- `IP-XXX.md`
-- Active phase sheet (`IP-XXX.PHASE-XX`)
-- `DR-XXX.md` when design, risks, or execution assumptions changed
-- `notes.md` for the companion execution log
+## Inputs
 
-Use this skill when any of the following became true:
+- `DE-XXX.md` — the delta definition.
+- `IP-XXX.md` — the implementation plan.
+- Active phase sheet (`IP-XXX.PHASE-XX`).
+- `DR-XXX.md` — when design assumptions changed.
+- `notes.md` — the companion execution log.
 
-- phase task/checklist/status state changed
-- IP phase state or active phase changed
-- DE scope, risks, dependencies, or open questions changed during execution
-- DR target behavior or design rationale changed during execution
-- verification state/evidence in execution artefacts changed
+## Process
 
-Process:
-
-1. Read the active `DE`, `IP`, and phase sheet together.
-2. Update the phase sheet first:
-   - task statuses
-   - entrance/exit criteria
-   - verification evidence
-   - decisions/findings from the current execution unit
-3. Update `IP-XXX.md` next:
-   - phase list/statuses
-   - active phase reference
-   - progress tracking where needed
-4. Update `DE-XXX.md` if execution changed scope, dependencies, risks, or tracked open questions.
-5. Update `DR-XXX.md` if execution changed design intent, tradeoffs, or code-impact assumptions.
-6. Ensure `notes.md` remains consistent with the structured artefacts, but do not duplicate every detail.
-7. If the required doc changes imply a broader design/workflow change than the active phase assumed, stop and `/consult`.
-
-Phase status reference (canonical values):
-
-- `draft`, `in-progress`, `completed`, `deferred`
-- Use `spec-driver phase start` / `spec-driver phase complete` for transitions.
-- Both frontmatter (normative) and `state.yaml` (transient) are updated by CLI.
-
-Outcomes:
-
-- Delta execution artefacts stay coherent while work is in progress.
-- Phase/IP/DE/DR state does not drift away from notes or implementation reality.
-- `/notes` remains a lightweight execution log rather than a hidden structured-doc workflow.
+1. **Read together**: load the active `DE`, `IP`, and phase sheet to understand current state.
+2. **Update phase sheet first**: task statuses, entrance/exit criteria, verification evidence, decisions from the current execution unit.
+3. **Update IP next**: phase list/statuses, active phase reference, progress tracking.
+4. **Update DE** if scope, dependencies, risks, or open questions changed.
+5. **Update DR** if design intent, tradeoffs, or code-impact assumptions changed.
+6. **Reconcile notes**: ensure `notes.md` stays consistent with structured artefacts without duplicating every detail.
+7. **Escalate if needed**: if the required changes imply a broader design/workflow shift than the active phase assumed, stop and run `/consult`.

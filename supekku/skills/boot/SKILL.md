@@ -11,7 +11,7 @@ checking for the "Spec-Driver Boot Context" heading. If you cannot find
 it, warn the user:
 
 > ⚠ Preboot context not found. Run `uv run spec-driver admin preboot`
-> and ensure `.claude/rules/spec-driver-boot.md` symlink exists.
+> and ensure `.agents/spec-driver-boot.md` symlink exists.
 
 When boot context has been observed — print:
 Δ ∴ ⊤

@@ -1,0 +1,14 @@
+---
+description: Spec-driver mandatory boot and routing for Cursor sessions
+alwaysApply: true
+---
+
+# Spec-driver bootstrap
+
+1. **Immediately** follow [`.agents/skills/boot/SKILL.md`](.agents/skills/boot/SKILL.md) (equivalent to Claude’s `/boot` and [`.spec-driver/agents/boot.md`](.spec-driver/agents/boot.md)).
+
+2. **Boot context**: If the “Spec-Driver Boot Context” heading is not in context, run `uv run spec-driver admin preboot` at the repo root, then read [`.agents/spec-driver-boot.md`](.agents/spec-driver-boot.md).
+
+3. **After boot**: Use [`.agents/skills/using-spec-driver/SKILL.md`](.agents/skills/using-spec-driver/SKILL.md) before substantive implementation (same intent as `/using-spec-driver`).
+
+Research priority (see root [`AGENTS.md`](AGENTS.md)): specs, `.contracts`, deltas (especially DR) as historical reference, backlog, finally code.

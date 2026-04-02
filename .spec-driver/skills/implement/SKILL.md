@@ -1,35 +1,23 @@
 ---
 name: implement
-description: implement a well-defined task or implementation plan
+description: "Executes a defined task or implementation plan by reading the governing card and design doc, coding against the plan, running tests, and recording notes. Use when a delta, card, or implementation plan is ready for coding and the design/planning phase is complete."
 ---
 
-`spec-driver find card $ARGUMENTS`
+## Workflow
 
-Read the card, design doc. (if you haven't already)
-
-run `/retrieving-memory` for the concrete files or subsystems you expect to
-touch before deep reading or editing; use `spec-driver list memories -p <path>`
-queries so glob-scoped memories can surface
-
-If there's an implementation plan, read it and
-
-- if it's already begun, you don't need /preflight
-
-NOTE: the design doc is canon; the plan is guidance. If they conflict meaningfully: /consult
-
-Workflow alignment reminders:
-
-- Default to delta-first execution flow for implementation work.
-- Treat revision-first as a concession path, not the default.
-- Treat ceremony mode as guidance posture; do not assume runtime enforcement from ceremony alone.
-- For delta close-out, follow `uv run spec-driver complete delta` prerequisites (especially coverage readiness).
-
-proceed with implementation.
-
-take /notes after each complete unit of work on the task card
-if a unit reveals a durable gotcha, workflow, or invariant, run
-`/capturing-memory` or `/maintaining-memory` before considering that unit done
-
-pay attention to doctrine, and to the decisions made in the plan. If you encounter unforeseen obstacles, /consult
-
-if running low on context: stop before you run out of context for /continuation
+1. **Load context**: find and read the governing card and design doc.
+   - `spec-driver find card $ARGUMENTS`
+   - Read the card, design doc, and implementation plan (if one exists).
+   - If the plan is already in progress, skip `/preflight`.
+2. **Retrieve memories**: run `/retrieving-memory` for files and subsystems you expect to touch.
+   - `spec-driver list memories -p <path>` to surface glob-scoped memories.
+3. **Check governance**: read `/doctrine` — verify the approach aligns with accepted ADRs, policies, and standards.
+4. **Implement**: code against the plan, following delta-first execution flow by default.
+   - The design doc is canon; the plan is guidance. If they conflict meaningfully, run `/consult`.
+   - Treat revision-first as a concession path, not the default.
+   - Treat ceremony mode as guidance posture, not runtime enforcement.
+5. **Record progress**: run `/notes` after each complete unit of work.
+   - If a unit reveals a durable gotcha, workflow, or invariant, run `/capturing-memory` or `/maintaining-memory` before considering that unit done.
+6. **Handle obstacles**: if you encounter unforeseen blockers, run `/consult`.
+7. **Close-out**: for delta completion, follow `uv run spec-driver complete delta` prerequisites (especially coverage readiness).
+8. **Context limits**: if running low on context, stop before exhaustion and run `/continuation`.

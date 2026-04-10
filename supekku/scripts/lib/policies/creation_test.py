@@ -7,36 +7,36 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from supekku.scripts.lib.core import slugify
 from supekku.scripts.lib.core.paths import POLICIES_SUBDIR, SPEC_DRIVER_DIR
 
 from .creation import (
   PolicyCreationOptions,
   build_policy_frontmatter,
   create_policy,
-  create_title_slug,
   generate_next_policy_id,
 )
 from .registry import PolicyRegistry
 
 
 class TestTitleSlug(unittest.TestCase):
-  """Tests for create_title_slug function."""
+  """Tests for slugify (previously create_title_slug passthrough)."""
 
   def test_simple_title(self) -> None:
     """Test slug creation from simple title."""
-    assert create_title_slug("Code must have tests") == "code_must_have_tests"
+    assert slugify("Code must have tests") == "code_must_have_tests"
 
   def test_with_special_chars(self) -> None:
     """Test slug creation with special characters."""
-    assert create_title_slug("Don't store PII!") == "don_t_store_pii"
+    assert slugify("Don't store PII!") == "don_t_store_pii"
 
   def test_multiple_spaces(self) -> None:
     """Test slug creation with multiple spaces."""
-    assert create_title_slug("Multiple   spaces   here") == "multiple_spaces_here"
+    assert slugify("Multiple   spaces   here") == "multiple_spaces_here"
 
   def test_leading_trailing_separators(self) -> None:
     """Test slug strips leading/trailing separators."""
-    assert create_title_slug("--test--") == "test"
+    assert slugify("--test--") == "test"
 
 
 class TestGenerateNextPolicyId(unittest.TestCase):

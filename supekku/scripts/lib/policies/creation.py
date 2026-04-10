@@ -61,17 +61,6 @@ def generate_next_policy_id(registry: PolicyRegistry) -> str:
   return f"POL-{next_id:03d}"
 
 
-def create_title_slug(title: str) -> str:
-  """Create URL-friendly slug from title.
-
-  Args:
-    title: Human-readable title.
-
-  Returns:
-    Lowercase slug with hyphens.
-  """
-  return slugify(title)
-
 
 def build_policy_frontmatter(
   policy_id: str,
@@ -151,7 +140,7 @@ def create_policy(
   record_artifact(policy_id)
 
   # Create filename
-  title_slug = create_title_slug(options.title)
+  title_slug = slugify(options.title)
   filename = f"{policy_id}-{title_slug}.md"
   policy_path = registry.directory / filename
 
@@ -198,7 +187,6 @@ __all__ = [
   "PolicyCreationResult",
   "PolicyAlreadyExistsError",
   "generate_next_policy_id",
-  "create_title_slug",
   "build_policy_frontmatter",
   "create_policy",
 ]

@@ -4,7 +4,7 @@ slug: "130-status_validation_errors_must_list_allowable_values-phase-01"
 name: IP-130 Phase 01 – patch status validation messages
 created: "2026-04-10"
 updated: "2026-04-10"
-status: draft
+status: completed
 kind: phase
 plan: IP-130
 delta: DE-130

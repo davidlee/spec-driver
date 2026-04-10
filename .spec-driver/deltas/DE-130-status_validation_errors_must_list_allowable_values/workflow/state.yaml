@@ -1,0 +1,22 @@
+schema: supekku.workflow.state
+version: 1
+artifact:
+  id: DE-130
+  kind: delta
+  path: .spec-driver/deltas/DE-130-status_validation_errors_must_list_allowable_values
+  notes_path: .spec-driver/deltas/DE-130-status_validation_errors_must_list_allowable_values/notes.md
+phase:
+  id: IP-130.PHASE-01
+  status: complete
+  path: .spec-driver/deltas/DE-130-status_validation_errors_must_list_allowable_values/phases/phase-01.md
+workflow:
+  status: awaiting_handoff
+  active_role: implementer
+  handoff_boundary: phase
+  next_role: implementer
+timestamps:
+  created: '2026-04-10T12:36:10+00:00'
+  updated: '2026-04-10T12:42:54+00:00'
+plan:
+  id: IP-130
+  path: .spec-driver/deltas/DE-130-status_validation_errors_must_list_allowable_values/IP-130.md

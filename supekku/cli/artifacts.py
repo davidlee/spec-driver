@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import fnmatch
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,6 +17,7 @@ from supekku.cli.ids import (
   _parse_prefix,
   normalize_id,
 )
+from supekku.scripts.lib.core.filters import matches_pattern
 from supekku.scripts.lib.core.paths import get_deltas_dir
 
 # --- Artifact resolution types ---
@@ -454,19 +454,12 @@ def emit_artifact(
 # --- Artifact finding (multi-match) ---
 
 
-def _matches_pattern(artifact_id: str, pattern: str) -> bool:
-  """Check if artifact ID matches fnmatch pattern (case-insensitive)."""
-  return fnmatch.fnmatch(artifact_id, pattern) or fnmatch.fnmatch(
-    artifact_id, pattern.upper()
-  )
-
-
 def _find_specs(root: Path, pattern: str) -> Iterator[ArtifactRef]:
   from supekku.scripts.lib.specs.registry import SpecRegistry  # noqa: PLC0415
 
   registry = SpecRegistry(root)
   for spec in registry.all_specs():
-    if _matches_pattern(spec.id, pattern):
+    if matches_pattern(spec.id, pattern):
       yield ArtifactRef(id=spec.id, path=spec.path, record=spec)
 
 
@@ -476,7 +469,7 @@ def _find_changes(root: Path, pattern: str, kind: str) -> Iterator[ArtifactRef]:
   normalized = normalize_id(kind, pattern)
   registry = ChangeRegistry(root=root, kind=kind)
   for art_id, art in registry.collect().items():
-    if _matches_pattern(art_id, normalized):
+    if matches_pattern(art_id, normalized):
       yield ArtifactRef(id=art_id, path=art.path, record=art)
 
 
@@ -488,7 +481,7 @@ def _find_decisions(root: Path, pattern: str) -> Iterator[ArtifactRef]:
   normalized = normalize_id("adr", pattern)
   registry = DecisionRegistry(root=root)
   for art_id, art in registry.collect().items():
-    if _matches_pattern(art_id, normalized):
+    if matches_pattern(art_id, normalized):
       yield ArtifactRef(id=art_id, path=Path(art.path), record=art)
 
 
@@ -498,7 +491,7 @@ def _find_policies(root: Path, pattern: str) -> Iterator[ArtifactRef]:
   normalized = normalize_id("policy", pattern)
   registry = PolicyRegistry(root=root)
   for art_id, art in registry.collect().items():
-    if _matches_pattern(art_id, normalized):
+    if matches_pattern(art_id, normalized):
       yield ArtifactRef(id=art_id, path=Path(art.path), record=art)
 
 
@@ -510,7 +503,7 @@ def _find_standards(root: Path, pattern: str) -> Iterator[ArtifactRef]:
   normalized = normalize_id("standard", pattern)
   registry = StandardRegistry(root=root)
   for art_id, art in registry.collect().items():
-    if _matches_pattern(art_id, normalized):
+    if matches_pattern(art_id, normalized):
       yield ArtifactRef(id=art_id, path=Path(art.path), record=art)
 
 
@@ -522,7 +515,7 @@ def _find_memories(root: Path, pattern: str) -> Iterator[ArtifactRef]:
     normalized = f"mem.{normalized}"
   registry = MemoryRegistry(root=root)
   for art_id, art in registry.collect().items():
-    if _matches_pattern(art_id, normalized):
+    if matches_pattern(art_id, normalized):
       yield ArtifactRef(id=art_id, path=Path(art.path), record=art)
 
 
@@ -534,7 +527,7 @@ def _find_drift_ledgers(root: Path, pattern: str) -> Iterator[ArtifactRef]:
   normalized = pattern.upper()
   registry = DriftLedgerRegistry(root=root)
   for ledger in registry.iter():
-    if _matches_pattern(ledger.id, normalized):
+    if matches_pattern(ledger.id, normalized):
       yield ArtifactRef(id=ledger.id, path=ledger.path, record=ledger)
 
 
@@ -554,7 +547,7 @@ def _find_requirements(root: Path, pattern: str) -> Iterator[ArtifactRef]:
   normalized = pattern.replace(":", ".")
   registry = RequirementsRegistry(root=root)
   for uid, record in registry.collect().items():
-    if _matches_pattern(uid, normalized):
+    if matches_pattern(uid, normalized):
       req_path = Path(record.path) if record.path else root
       yield ArtifactRef(id=uid, path=req_path, record=record)
 
@@ -573,7 +566,7 @@ def _find_plans(root: Path, pattern: str) -> Iterator[ArtifactRef]:
       continue
     for plan_file in sorted(delta_dir.glob("IP-*.md")):
       plan_id = plan_file.stem
-      if _matches_pattern(plan_id, normalized):
+      if matches_pattern(plan_id, normalized):
         try:
           frontmatter, _ = load_markdown_file(plan_file)
         except Exception:  # noqa: BLE001
@@ -587,7 +580,7 @@ def _find_backlog(root: Path, pattern: str, kind: str) -> Iterator[ArtifactRef]:
   kind_filter = kind if kind != "all" else None
   registry = BacklogRegistry(root=root)
   for item in registry.iter(kind=kind_filter):
-    if _matches_pattern(item.id, pattern):
+    if matches_pattern(item.id, pattern):
       yield ArtifactRef(id=item.id, path=item.path, record=item)
 
 

@@ -1,6 +1,28 @@
 """Tests for core filter utilities."""
 
-from supekku.scripts.lib.core.filters import parse_multi_value_filter
+from supekku.scripts.lib.core.filters import matches_pattern, parse_multi_value_filter
+
+
+class TestMatchesPattern:
+  """Tests for matches_pattern."""
+
+  def test_exact_match(self):
+    assert matches_pattern("SPEC-001", "SPEC-001")
+
+  def test_glob_wildcard(self):
+    assert matches_pattern("SPEC-042", "SPEC-*")
+
+  def test_no_match(self):
+    assert not matches_pattern("ADR-001", "SPEC-*")
+
+  def test_case_insensitive_lower_pattern(self):
+    assert matches_pattern("SPEC-001", "spec-*")
+
+  def test_single_char_glob(self):
+    assert matches_pattern("SPEC-001", "SPEC-0?1")
+
+  def test_no_match_partial(self):
+    assert not matches_pattern("SPEC-001-extra", "SPEC-001")
 
 
 class TestParseMultiValueFilter:

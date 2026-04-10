@@ -60,17 +60,6 @@ def generate_next_standard_id(registry: StandardRegistry) -> str:
   return f"STD-{next_id:03d}"
 
 
-def create_title_slug(title: str) -> str:
-  """Create URL-friendly slug from title.
-
-  Args:
-    title: Human-readable title.
-
-  Returns:
-    Lowercase slug with hyphens.
-  """
-  return slugify(title)
-
 
 def build_standard_frontmatter(
   standard_id: str,
@@ -149,7 +138,7 @@ def create_standard(
   standard_id = generate_next_standard_id(registry)
 
   # Create filename
-  title_slug = create_title_slug(options.title)
+  title_slug = slugify(options.title)
   filename = f"{standard_id}-{title_slug}.md"
   standard_path = registry.directory / filename
 
@@ -196,7 +185,6 @@ __all__ = [
   "StandardCreationResult",
   "StandardAlreadyExistsError",
   "generate_next_standard_id",
-  "create_title_slug",
   "build_standard_frontmatter",
   "create_standard",
 ]

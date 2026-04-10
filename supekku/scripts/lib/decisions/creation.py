@@ -61,17 +61,6 @@ def generate_next_adr_id(registry: DecisionRegistry) -> str:
   return f"ADR-{next_id:03d}"
 
 
-def create_title_slug(title: str) -> str:
-  """Create URL-friendly slug from title.
-
-  Args:
-    title: Human-readable title.
-
-  Returns:
-    Lowercase slug with hyphens.
-  """
-  return slugify(title)
-
 
 def build_adr_frontmatter(
   adr_id: str,
@@ -157,7 +146,7 @@ def create_adr(
   record_artifact(adr_id)
 
   # Create filename
-  title_slug = create_title_slug(options.title)
+  title_slug = slugify(options.title)
   filename = f"{adr_id}-{title_slug}.md"
   adr_path = registry.directory / filename
 

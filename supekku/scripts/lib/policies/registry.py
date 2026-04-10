@@ -8,12 +8,13 @@ from __future__ import annotations
 import re
 from collections.abc import Iterator
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from typing import Any
 
 import yaml
 
+from supekku.scripts.lib.core.dates import parse_date
 from supekku.scripts.lib.core.paths import get_policies_dir, get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
@@ -161,9 +162,9 @@ class PolicyRegistry:
         title = policy_path.stem.replace("-", " ").title()
 
     # Parse dates
-    created = self.parse_date(frontmatter.get("created"))
-    updated = self.parse_date(frontmatter.get("updated"))
-    reviewed = self.parse_date(frontmatter.get("reviewed"))
+    created = parse_date(frontmatter.get("created"))
+    updated = parse_date(frontmatter.get("updated"))
+    reviewed = parse_date(frontmatter.get("reviewed"))
 
     # Get status from frontmatter (required, draft, deprecated)
     status = frontmatter.get("status", "").lower()
@@ -192,27 +193,6 @@ class PolicyRegistry:
       ext_id=str(frontmatter.get("ext_id", "")),
       ext_url=str(frontmatter.get("ext_url", "")),
     )
-
-  def parse_date(self, date_value: Any) -> date | None:
-    """Parse date from various formats."""
-    if not date_value:
-      return None
-
-    if isinstance(date_value, date):
-      return date_value
-
-    if isinstance(date_value, datetime):
-      return date_value.date()
-
-    if isinstance(date_value, str):
-      # Try common date formats
-      for fmt in ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y/%m/%d"]:
-        try:
-          return datetime.strptime(date_value, fmt).date()
-        except ValueError:
-          continue
-
-    return None
 
   def write(
     self,

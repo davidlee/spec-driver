@@ -78,6 +78,31 @@ def append_unique(values: list[Any], item: Any) -> bool:
   return True
 
 
+def extract_h1_title(content: str, prefix: str = "") -> str:
+  """Extract the first H1 heading from markdown content.
+
+  Scans lines for the first that starts with ``# {prefix}`` (when a prefix is
+  given) or any ``# `` heading (when no prefix is given).  Returns the full
+  heading line (stripped) on match, or an empty string if none is found.
+
+  The H1 text includes the ``# `` sigil.  Callers that only need the bare
+  title text should strip it themselves.
+
+  Args:
+    content: Markdown body to scan.
+    prefix: Optional prefix that must follow the ``# `` sigil.
+
+  Returns:
+    The first matching H1 line (stripped), or ``""`` if not found.
+  """
+  search = f"# {prefix}" if prefix else "# "
+  for line in content.split("\n"):
+    stripped = line.strip()
+    if stripped.startswith(search):
+      return stripped
+  return ""
+
+
 def load_validated_markdown_file(
   path: Path | str,
   *,

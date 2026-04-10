@@ -12,7 +12,14 @@ import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from supekku.scripts.lib.blocks.plan import extract_phase_tracking
+import frontmatter
+from pydantic import ValidationError
+
+from supekku.scripts.lib.blocks.plan import (
+  extract_phase_overview,
+  extract_phase_tracking,
+)
+from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
   CHANGE_COLUMNS,
@@ -240,6 +247,56 @@ def _format_applies_to(artifact: ChangeArtifact) -> list[str]:
   return lines
 
 
+def _resolve_phase_objective_from_file_body(
+  phase_content: str,
+  *,
+  source_path: Path | None = None,
+) -> str | None:
+  """Structured objective from phase file body: frontmatter first, then phase.overview.
+
+  Display-time enrichment (DE-131 / DR-131): does not merge conflicting sources;
+  returns the first non-empty value per canonical precedence.
+  """
+  try:
+    post = frontmatter.loads(phase_content)
+  except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
+    # Corrupt phase markdown must not break show delta / list output.
+    return None
+  fm_data: dict[str, Any] = dict(post.metadata or {})
+  try:
+    sheet = PhaseSheet.model_validate(fm_data)
+  except ValidationError:
+    sheet = PhaseSheet()
+  if sheet.objective is not None and str(sheet.objective).strip():
+    return str(sheet.objective).strip()
+  try:
+    overview = extract_phase_overview(phase_content, source_path)
+  except ValueError:
+    overview = None
+  if overview:
+    raw = overview.data.get("objective")
+    if isinstance(raw, str) and raw.strip():
+      return raw.strip()
+  return None
+
+
+_PHASE_SEQ_FROM_ID = re.compile(r"(?:\.PHASE-|-P)(?P<num>\d{2})$")
+
+
+def _phase_sequence_digits_from_id(phase_id: str) -> str | None:
+  """Return two-digit sequence from phase id (hyphen or dotted spelling)."""
+  if not isinstance(phase_id, str):
+    return None
+  stripped = phase_id.strip()
+  match = _PHASE_SEQ_FROM_ID.search(stripped)
+  if match:
+    return match.group("num")
+  parts = stripped.split("-")
+  if parts and parts[-1].isdigit():
+    return parts[-1]
+  return None
+
+
 def _enrich_phase_data(
   phase: dict[str, Any],
   artifact: ChangeArtifact,
@@ -269,13 +326,7 @@ def _enrich_phase_data(
   if not phases_dir.exists():
     return enriched
 
-  # Extract numeric part from phase ID (e.g., "IP-005.PHASE-01" -> "01")
-  phase_num = None
-  if isinstance(phase_id, str):
-    parts = phase_id.split("-")
-    if parts:
-      phase_num = parts[-1]
-
+  phase_num = _phase_sequence_digits_from_id(str(phase_id))
   if not phase_num:
     return enriched
 
@@ -354,6 +405,15 @@ def _enrich_phase_data(
       if total > 0:
         enriched["tasks_completed"] = completed
         enriched["tasks_total"] = total
+
+    # DE-131 / DR-131: fill objective from disk when plan dict omits it
+    if not str(enriched.get("objective", "")).strip():
+      resolved = _resolve_phase_objective_from_file_body(
+        phase_content,
+        source_path=phase_file,
+      )
+      if resolved:
+        enriched["objective"] = resolved
   except (OSError, UnicodeDecodeError):
     pass
 

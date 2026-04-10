@@ -223,15 +223,19 @@ def _find_next_phase_number(phases_dir: Path) -> int:
 def _update_plan_overview_phases(
   plan_path: Path,
   phase_id: str,
+  *,
+  objective: str | None = None,
 ) -> None:
   """Update plan.overview block to include new phase entry.
 
-  Appends a minimal phase entry to the phases array in the plan.overview block.
-  Uses id-only format to minimize user conflict.
+  Appends a phase entry to the phases array in the plan.overview block.
+  Includes ``objective`` when provided so plan YAML stays aligned with phase
+  frontmatter (DE-131 / DR-131).
 
   Args:
     plan_path: Path to the plan markdown file.
     phase_id: Phase ID to add (e.g., "IP-002.PHASE-04").
+    objective: Optional phase objective copied from phase frontmatter.
 
   Raises:
     ValueError: If plan.overview block missing or malformed.
@@ -255,8 +259,11 @@ def _update_plan_overview_phases(
     msg = f"plan.overview phases is not a list in {plan_path}"
     raise ValueError(msg)
 
-  # Add phase with minimal metadata (id only) unless an equivalent phase exists.
-  phases.append({"id": phase_id})
+  # Add phase entry (id + optional objective) unless an equivalent phase exists.
+  entry: dict[str, object] = {"id": phase_id}
+  if objective is not None and str(objective).strip():
+    entry["objective"] = str(objective).strip()
+  phases.append(entry)
   for existing_phase in phases[:-1]:
     if not isinstance(existing_phase, dict):
       continue
@@ -480,7 +487,15 @@ def create_phase(
 
   # Update plan.overview block with new phase
   try:
-    _update_plan_overview_phases(plan_path, phase_id)
+    objective_for_plan = None
+    raw_obj = phase_frontmatter.get("objective")
+    if isinstance(raw_obj, str) and raw_obj.strip():
+      objective_for_plan = raw_obj.strip()
+    _update_plan_overview_phases(
+      plan_path,
+      phase_id,
+      objective=objective_for_plan,
+    )
   except (ValueError, OSError) as exc:
     # Phase file created successfully but metadata update failed
     # Log warning but don't fail phase creation

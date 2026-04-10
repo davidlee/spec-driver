@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import tempfile
 import unittest
 from pathlib import Path
+from textwrap import dedent
 
 from supekku.scripts.lib.changes.artifacts import ChangeArtifact
 from supekku.scripts.lib.core.paths import AUDITS_SUBDIR, DELTAS_SUBDIR, SPEC_DRIVER_DIR
@@ -652,6 +654,141 @@ class TestFormatDeltaPhasesVTPHASE003(unittest.TestCase):
     assert "PHASE-01" in result
     # Verify objective appears
     assert "Initial setup and configuration" in result
+
+
+class TestPhaseObjectiveEnrichmentDE131(unittest.TestCase):
+  """VT-131-enrich-*: objective from phase file when plan dict omits it (DE-131)."""
+
+  def _write_delta_bundle(
+    self,
+    root: Path,
+    *,
+    delta_id: str,
+    phase_body: str,
+  ) -> Path:
+    delta_dir = root / f"{delta_id}-slug"
+    delta_dir.mkdir(parents=True)
+    phases_dir = delta_dir / "phases"
+    phases_dir.mkdir()
+    (delta_dir / f"{delta_id}.md").write_text(
+      f"---\nid: {delta_id}\nkind: delta\n---\n\n",
+      encoding="utf-8",
+    )
+    (phases_dir / "phase-01.md").write_text(phase_body, encoding="utf-8")
+    return delta_dir / f"{delta_id}.md"
+
+  def test_objective_from_canonical_frontmatter(self) -> None:
+    """VT-131-enrich-fm: frontmatter objective surfaces when dict has none."""
+    with tempfile.TemporaryDirectory() as tmp:
+      root = Path(tmp)
+      body = dedent("""\
+        ---
+        id: IP-301-P01
+        plan: IP-301
+        delta: DE-301
+        kind: phase
+        objective: Objective from frontmatter
+        ---
+        # Phase
+        """)
+      delta_path = self._write_delta_bundle(
+        root,
+        delta_id="DE-301",
+        phase_body=body,
+      )
+      artifact = ChangeArtifact(
+        id="DE-301",
+        kind="delta",
+        status="draft",
+        name="T",
+        slug="slug",
+        path=delta_path,
+        updated=None,
+        plan={
+          "id": "IP-301",
+          "phases": [{"id": "IP-301-P01", "status": "draft"}],
+        },
+      )
+      result = format_delta_details(artifact, root=root)
+      assert "Objective from frontmatter" in result
+
+  def test_objective_from_phase_overview_block(self) -> None:
+    """VT-131-enrich-overview: legacy phase.overview objective when FM has none."""
+    with tempfile.TemporaryDirectory() as tmp:
+      root = Path(tmp)
+      body = dedent("""\
+        ---
+        id: IP-302-P01
+        kind: phase
+        ---
+        # Phase
+
+        ```yaml supekku:phase.overview@v1
+        schema: supekku.phase.overview
+        objective: Objective from overview block
+        ```
+        """)
+      delta_path = self._write_delta_bundle(
+        root,
+        delta_id="DE-302",
+        phase_body=body,
+      )
+      artifact = ChangeArtifact(
+        id="DE-302",
+        kind="delta",
+        status="draft",
+        name="T",
+        slug="slug",
+        path=delta_path,
+        updated=None,
+        plan={
+          "id": "IP-302",
+          "phases": [{"id": "IP-302-P01"}],
+        },
+      )
+      result = format_delta_details(artifact, root=root)
+      assert "Objective from overview block" in result
+
+  def test_plan_dict_objective_not_clobbered(self) -> None:
+    """VT-131-enrich-no-clobber: existing dict objective wins over file."""
+    with tempfile.TemporaryDirectory() as tmp:
+      root = Path(tmp)
+      body = dedent("""\
+        ---
+        id: IP-303-P01
+        plan: IP-303
+        delta: DE-303
+        kind: phase
+        objective: On disk only
+        ---
+        # Phase
+        """)
+      delta_path = self._write_delta_bundle(
+        root,
+        delta_id="DE-303",
+        phase_body=body,
+      )
+      artifact = ChangeArtifact(
+        id="DE-303",
+        kind="delta",
+        status="draft",
+        name="T",
+        slug="slug",
+        path=delta_path,
+        updated=None,
+        plan={
+          "id": "IP-303",
+          "phases": [
+            {
+              "id": "IP-303-P01",
+              "objective": "From plan dict",
+            },
+          ],
+        },
+      )
+      result = format_delta_details(artifact, root=root)
+      assert "From plan dict" in result
+      assert "On disk only" not in result
 
 
 class FormatAuditDetailsTest(unittest.TestCase):

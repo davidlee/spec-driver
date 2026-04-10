@@ -20,6 +20,7 @@ from supekku.scripts.lib.changes.creation import (
   create_requirement_breakout,
   create_revision,
 )
+from supekku.scripts.lib.changes.phase_creation import _update_plan_overview_phases
 from supekku.scripts.lib.core.paths import (
   AUDITS_SUBDIR,
   SPEC_DRIVER_DIR,
@@ -767,6 +768,29 @@ class CreateChangeTest(unittest.TestCase):
     assert "objective" not in fm
     assert "entrance_criteria" not in fm
     assert "exit_criteria" not in fm
+
+  def test_update_plan_overview_phases_appends_objective(self) -> None:
+    """VT-131-plan-append: plan.overview row includes objective when provided."""
+    root = self._make_repo()
+    delta_result = create_delta(
+      "Test Delta",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      repo_root=root,
+    )
+    plan_files = [p for p in delta_result.extras if p.name.startswith("IP-")]
+    plan_path = plan_files[0]
+    plan_id = plan_path.stem
+
+    _update_plan_overview_phases(
+      plan_path,
+      f"{plan_id}-P99",
+      objective="Row objective text",
+    )
+
+    plan_text = plan_path.read_text(encoding="utf-8")
+    assert "Row objective text" in plan_text
+    assert f"{plan_id}-P99" in plan_text
 
   def test_create_audit(self) -> None:
     """Test creating an audit artifact with spec and prod refs."""

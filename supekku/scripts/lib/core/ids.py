@@ -6,9 +6,7 @@ import re
 from collections.abc import Iterable
 
 
-def next_sequential_id(
-  names: Iterable[str], prefix: str, separator: str = "-"
-) -> str:
+def next_sequential_id(names: Iterable[str], prefix: str, separator: str = "-") -> str:
   """Determine the next sequential ID from existing names.
 
   Scans *names* for entries matching ``{prefix}{separator}{digits}``,
@@ -24,9 +22,7 @@ def next_sequential_id(
   Returns:
     Next available ID (e.g. ``"ADR-004"``).
   """
-  pattern = re.compile(
-    rf"{re.escape(prefix)}{re.escape(separator)}(\d+)"
-  )
+  pattern = re.compile(rf"{re.escape(prefix)}{re.escape(separator)}(\d+)")
   highest = 0
   for name in names:
     match = pattern.search(name)

@@ -115,9 +115,7 @@ class CardRegistry:
     Returns:
       Next card ID (e.g., "T001", "T042")
     """
-    return next_sequential_id(
-      [c.id for c in self.all_cards()], "T", separator=""
-    )
+    return next_sequential_id([c.id for c in self.all_cards()], "T", separator="")
 
   def create_card(self, description: str, lane: str = "backlog") -> Card:
     """Create a new card from template.

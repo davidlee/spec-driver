@@ -9,8 +9,6 @@ Design authority: DR-102 §3.1, §5.
 
 from __future__ import annotations
 
-import os
-import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -19,6 +17,7 @@ import yaml
 
 from supekku.scripts.lib.blocks.metadata.validator import MetadataValidator
 from supekku.scripts.lib.blocks.workflow_metadata import WORKFLOW_STATE_METADATA
+from supekku.scripts.lib.core.io import atomic_write
 from supekku.scripts.lib.workflow.state_machine import WorkflowState
 
 
@@ -105,31 +104,8 @@ def write_state(
     raise StateValidationError(errors)
 
   path = state_path(delta_dir, state_dir)
-  path.parent.mkdir(parents=True, exist_ok=True)
-
   content = yaml.dump(data, default_flow_style=False, sort_keys=False)
-
-  # Atomic write: temp file + rename (same dir for same-fs rename)
-  fd, tmp = tempfile.mkstemp(
-    dir=path.parent,
-    suffix=".tmp",
-    prefix="state_",
-  )
-  closed = False
-  try:
-    os.write(fd, content.encode("utf-8"))
-    os.close(fd)
-    closed = True
-    Path(tmp).replace(path)
-  except BaseException:
-    if not closed:
-      os.close(fd)
-    tmp_path = Path(tmp)
-    if tmp_path.exists():
-      tmp_path.unlink()
-    raise
-
-  return path
+  return atomic_write(path, content)
 
 
 def init_state(

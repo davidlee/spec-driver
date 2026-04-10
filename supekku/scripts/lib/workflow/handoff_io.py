@@ -9,8 +9,6 @@ Design authority: DR-102 §3.2, §5.
 
 from __future__ import annotations
 
-import os
-import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -21,6 +19,7 @@ from supekku.scripts.lib.blocks.metadata.validator import MetadataValidator
 from supekku.scripts.lib.blocks.workflow_metadata import (
   WORKFLOW_HANDOFF_METADATA,
 )
+from supekku.scripts.lib.core.io import atomic_write
 
 
 class HandoffValidationError(Exception):
@@ -94,30 +93,8 @@ def write_handoff(
     raise HandoffValidationError(errors)
 
   path = handoff_path(delta_dir, state_dir)
-  path.parent.mkdir(parents=True, exist_ok=True)
-
   content = yaml.dump(data, default_flow_style=False, sort_keys=False)
-
-  fd, tmp = tempfile.mkstemp(
-    dir=path.parent,
-    suffix=".tmp",
-    prefix="handoff_",
-  )
-  closed = False
-  try:
-    os.write(fd, content.encode("utf-8"))
-    os.close(fd)
-    closed = True
-    Path(tmp).replace(path)
-  except BaseException:
-    if not closed:
-      os.close(fd)
-    tmp_path = Path(tmp)
-    if tmp_path.exists():
-      tmp_path.unlink()
-    raise
-
-  return path
+  return atomic_write(path, content)
 
 
 def build_handoff(

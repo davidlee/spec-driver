@@ -12547,7 +12547,8 @@ deltas:
         plan: IP-115
         delta: DE-115
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-115
         specs:
           primary:
           - SPEC-117
@@ -12559,9 +12560,14 @@ deltas:
           dependencies: []
         phases:
         - id: IP-115-P01
+        - id: IP-115-P02
       phases:
-      - id: IP-115-P01
+      - plan: IP-115
+        delta: DE-115
         phase: IP-115-P01
+        status: draft
+      - id: IP-115-P02
+        phase: IP-115-P02
   DE-116:
     kind: delta
     status: draft
@@ -13159,4 +13165,37 @@ deltas:
       - plan: IP-129
         delta: DE-129
         phase: IP-129-P03
+        status: completed
+  DE-130:
+    kind: delta
+    status: completed
+    name: Delta - status validation errors must list allowable values
+    slug: status_validation_errors_must_list_allowable_values
+    updated: '2026-04-10'
+    path: .spec-driver/deltas/DE-130-status_validation_errors_must_list_allowable_values/DE-130.md
+    applies_to:
+      specs: []
+      requirements: []
+    plan:
+      id: IP-130
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-130
+        delta: DE-130
+        revision_links:
+          aligns_with:
+          - DR-130
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-130-P01
+      phases:
+      - plan: IP-130
+        delta: DE-130
+        phase: IP-130-P01
         status: completed

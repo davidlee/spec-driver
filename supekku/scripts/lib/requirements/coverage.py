@@ -144,7 +144,8 @@ def _extract_coverage_entries(
           print(
             f"WARNING: Coverage entry for {req_id} has unknown status "
             f"{status!r} in {source_file.name}; "
-            f"entry will not influence derived requirement status",
+            f"entry will not influence derived requirement status; "
+            f"valid: {sorted(VALID_COVERAGE_STATUSES)}",
             file=sys.stderr,
           )
         coverage_map[req_id].append(

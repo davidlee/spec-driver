@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from .yaml_utils import format_yaml_list
+from .yaml_utils import format_yaml_list, make_block_pattern
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -96,10 +95,7 @@ class RelationshipsBlockValidator:
     return errors
 
 
-_RELATIONSHIPS_PATTERN = re.compile(
-  r"```(?:yaml|yml)\s+" + re.escape(RELATIONSHIPS_MARKER) + r"\n(.*?)```",
-  re.DOTALL,
-)
+_RELATIONSHIPS_PATTERN = make_block_pattern(RELATIONSHIPS_MARKER)
 
 
 def extract_relationships(block: str) -> RelationshipsBlock | None:

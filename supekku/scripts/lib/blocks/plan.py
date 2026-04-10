@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from .yaml_utils import format_yaml_list
+from .yaml_utils import format_yaml_list, make_block_pattern
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -359,18 +358,9 @@ class PhaseTrackingValidator:
     return errors
 
 
-_PLAN_PATTERN = re.compile(
-  r"```(?:yaml|yml)\s+" + re.escape(PLAN_MARKER) + r"\n(.*?)```",
-  re.DOTALL,
-)
-_PHASE_PATTERN = re.compile(
-  r"```(?:yaml|yml)\s+" + re.escape(PHASE_MARKER) + r"\n(.*?)```",
-  re.DOTALL,
-)
-_TRACKING_PATTERN = re.compile(
-  r"```(?:yaml|yml)\s+" + re.escape(TRACKING_MARKER) + r"\n(.*?)```",
-  re.DOTALL,
-)
+_PLAN_PATTERN = make_block_pattern(PLAN_MARKER)
+_PHASE_PATTERN = make_block_pattern(PHASE_MARKER)
+_TRACKING_PATTERN = make_block_pattern(TRACKING_MARKER)
 
 
 def _format_yaml_error(

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import yaml
 
+from supekku.scripts.lib.blocks.yaml_utils import make_block_pattern
 from supekku.scripts.lib.core.artifact_ids import classify_artifact_id, is_kind
 
 if TYPE_CHECKING:
@@ -160,10 +160,7 @@ class VerificationCoverageValidator:
     return errors
 
 
-_COVERAGE_PATTERN = re.compile(
-  r"```(?:yaml|yml)\s+" + re.escape(COVERAGE_MARKER) + r"\n(.*?)```",
-  re.DOTALL,
-)
+_COVERAGE_PATTERN = make_block_pattern(COVERAGE_MARKER)
 
 
 def extract_coverage_blocks(text: str) -> list[VerificationCoverageBlock]:

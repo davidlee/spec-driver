@@ -4,7 +4,7 @@ slug: "115-core_utility_extraction_parse_date_sequential_ids_title_extraction_at
 name: "IP-115 Phase 01 — Utility extractions"
 created: "2026-04-10"
 updated: "2026-04-10"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-115
 delta: DE-115

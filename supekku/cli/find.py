@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import fnmatch
 from pathlib import Path
 from typing import Annotated
 
@@ -16,6 +15,7 @@ from supekku.cli.common import (
   normalize_id,
 )
 from supekku.scripts.lib.changes.registry import ChangeRegistry
+from supekku.scripts.lib.core.filters import matches_pattern
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.memory.registry import MemoryRegistry
 from supekku.scripts.lib.policies.registry import PolicyRegistry
@@ -24,12 +24,6 @@ from supekku.scripts.lib.standards.registry import StandardRegistry
 
 app = typer.Typer(help="Find artifacts by ID across the repository")
 
-
-def _matches_pattern(artifact_id: str, pattern: str) -> bool:
-  """Check if artifact ID matches pattern (case-insensitive)."""
-  return fnmatch.fnmatch(artifact_id, pattern) or fnmatch.fnmatch(
-    artifact_id, pattern.upper()
-  )
 
 
 @app.command("spec")
@@ -45,7 +39,7 @@ def find_spec(
   try:
     registry = SpecRegistry(root=root)
     for spec in registry.all_specs():
-      if _matches_pattern(spec.id, pattern):
+      if matches_pattern(spec.id, pattern):
         typer.echo(spec.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
@@ -68,7 +62,7 @@ def find_delta(
     normalized_pattern = normalize_id("delta", pattern)
     registry = ChangeRegistry(root=root, kind="delta")
     for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, normalized_pattern):
+      if matches_pattern(artifact_id, normalized_pattern):
         typer.echo(artifact.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
@@ -91,7 +85,7 @@ def find_adr(
     normalized_pattern = normalize_id("adr", pattern)
     registry = DecisionRegistry(root=root)
     for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, normalized_pattern):
+      if matches_pattern(artifact_id, normalized_pattern):
         typer.echo(artifact.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
@@ -134,7 +128,7 @@ def find_policy(
     normalized_pattern = normalize_id("policy", pattern)
     registry = PolicyRegistry(root=root)
     for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, normalized_pattern):
+      if matches_pattern(artifact_id, normalized_pattern):
         typer.echo(artifact.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
@@ -157,7 +151,7 @@ def find_standard(
     normalized_pattern = normalize_id("standard", pattern)
     registry = StandardRegistry(root=root)
     for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, normalized_pattern):
+      if matches_pattern(artifact_id, normalized_pattern):
         typer.echo(artifact.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
@@ -223,7 +217,7 @@ def find_memory(
 
     registry = MemoryRegistry(root=root)
     for artifact_id, artifact in registry.collect().items():
-      if _matches_pattern(artifact_id, normalized_pattern):
+      if matches_pattern(artifact_id, normalized_pattern):
         typer.echo(artifact.path)
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:

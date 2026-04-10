@@ -1,7 +1,7 @@
 ---
 id: IP-115-P02
 slug: "115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns-phase-02"
-name: "IP-115 Phase 02 — Sequential ID consolidation"
+name: IP-115 Phase 02 — Sequential ID consolidation
 created: "2026-04-10"
 updated: "2026-04-10"
 status: draft

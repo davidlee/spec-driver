@@ -108,7 +108,7 @@ dev = [
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra"
+addopts = "-ra --basetemp=/tmp/pytest-spec-driver"
 asyncio_mode = "auto"
 testpaths = [
     "supekku/cli",

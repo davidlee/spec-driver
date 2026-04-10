@@ -1,0 +1,21 @@
+schema: supekku.workflow.state
+version: 1
+artifact:
+  id: DE-115
+  kind: delta
+  path: .spec-driver/deltas/DE-115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns
+  notes_path: .spec-driver/deltas/DE-115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns/notes.md
+phase:
+  id: IP-115.PHASE-01
+  status: in_progress
+  path: .spec-driver/deltas/DE-115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns/phases/phase-01.md
+workflow:
+  status: implementing
+  active_role: implementer
+  handoff_boundary: phase
+timestamps:
+  created: '2026-04-10T12:54:48+00:00'
+  updated: '2026-04-10T12:54:48+00:00'
+plan:
+  id: IP-115
+  path: .spec-driver/deltas/DE-115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns/IP-115.md

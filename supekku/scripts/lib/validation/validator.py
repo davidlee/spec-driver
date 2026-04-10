@@ -551,7 +551,11 @@ class WorkspaceValidator:
         update_frontmatter_status(phase_file, canonical)
         self._info(artifact, f"Fixed phase status: '{status}' → '{canonical}'")
       else:
-        self._warning(artifact, f"Non-canonical phase status: '{status}'")
+        valid = sorted(valid_statuses)
+        self._warning(
+          artifact,
+          f"Non-canonical phase status: '{status}'; valid: {valid}",
+        )
 
     # Kind check
     if fm.get("kind") != "phase":

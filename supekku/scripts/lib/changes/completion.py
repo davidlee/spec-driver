@@ -362,7 +362,7 @@ def validate_delta_status(
   valid_statuses = {"draft", "in-progress"}
   if delta.status not in valid_statuses and not force and not dry_run:
     print(f"Warning: Delta {delta_id} has unexpected status '{delta.status}'")
-    print("Expected status: draft or in-progress")
+    print(f"Expected status: {', '.join(sorted(valid_statuses))}")
     if not prompt_yes_no(
       "Complete anyway?",
       default=False,

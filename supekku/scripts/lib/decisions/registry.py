@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import yaml
 
+from supekku.scripts.lib.core.dates import parse_date
 from supekku.scripts.lib.core.paths import get_decisions_dir, get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
@@ -170,10 +171,10 @@ class DecisionRegistry:
         title = adr_path.stem.replace("-", " ").title()
 
     # Parse dates
-    created = self.parse_date(frontmatter.get("created"))
-    decided = self.parse_date(frontmatter.get("decided"))
-    updated = self.parse_date(frontmatter.get("updated"))
-    reviewed = self.parse_date(frontmatter.get("reviewed"))
+    created = parse_date(frontmatter.get("created"))
+    decided = parse_date(frontmatter.get("decided"))
+    updated = parse_date(frontmatter.get("updated"))
+    reviewed = parse_date(frontmatter.get("reviewed"))
 
     # Determine status from frontmatter or directory location
     status = frontmatter.get("status", "").lower()
@@ -211,27 +212,6 @@ class DecisionRegistry:
       summary=frontmatter.get("summary", ""),
       path=str(adr_path),
     )
-
-  def parse_date(self, date_value: Any) -> date | None:
-    """Parse date from various formats."""
-    if not date_value:
-      return None
-
-    if isinstance(date_value, date):
-      return date_value
-
-    if isinstance(date_value, datetime):
-      return date_value.date()
-
-    if isinstance(date_value, str):
-      # Try common date formats
-      for fmt in ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%Y/%m/%d"]:
-        try:
-          return datetime.strptime(date_value, fmt).date()
-        except ValueError:
-          continue
-
-    return None
 
   def write(self, path: Path | None = None) -> None:
     """Write registry to YAML file."""

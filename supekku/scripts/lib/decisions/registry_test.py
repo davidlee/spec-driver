@@ -9,6 +9,7 @@ from pathlib import Path
 
 import yaml
 
+from supekku.scripts.lib.core.dates import parse_date
 from supekku.scripts.lib.core.paths import (
   DECISIONS_SUBDIR,
   SPEC_DRIVER_DIR,
@@ -371,22 +372,20 @@ status: draft
       assert drafts[0].id == "ADR-008"
 
   def test_parse_date_formats(self) -> None:
-    """Test parsing various date formats."""
-    registry = DecisionRegistry()
-
+    """Test parsing various date formats (via core.dates.parse_date)."""
     # Test valid formats
-    assert registry.parse_date("2024-01-01") == date(2024, 1, 1)
-    assert registry.parse_date("2024-01-01 10:30:00") == date(2024, 1, 1)
-    assert registry.parse_date("2024/01/01") == date(2024, 1, 1)
+    assert parse_date("2024-01-01") == date(2024, 1, 1)
+    assert parse_date("2024-01-01 10:30:00") == date(2024, 1, 1)
+    assert parse_date("2024/01/01") == date(2024, 1, 1)
 
     # Test invalid/empty values
-    assert registry.parse_date("") is None
-    assert registry.parse_date(None) is None
-    assert registry.parse_date("invalid") is None
+    assert parse_date("") is None
+    assert parse_date(None) is None
+    assert parse_date("invalid") is None
 
     # Test date objects
     test_date = date(2024, 1, 1)
-    assert registry.parse_date(test_date) == test_date
+    assert parse_date(test_date) == test_date
 
   def test_rebuild_status_symlinks_creates_directories(self) -> None:
     """Test that rebuild_status_symlinks creates status directories and symlinks."""

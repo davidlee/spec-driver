@@ -17,7 +17,7 @@ import yaml
 from supekku.scripts.lib.core.dates import parse_date
 from supekku.scripts.lib.core.paths import get_policies_dir, get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
-from supekku.scripts.lib.core.spec_utils import load_markdown_file
+from supekku.scripts.lib.core.spec_utils import extract_h1_title, load_markdown_file
 
 
 @dataclass
@@ -151,15 +151,11 @@ class PolicyRegistry:
     policy_id = frontmatter.get("id", file_id)
 
     # Extract title from content or frontmatter
-    title = frontmatter.get("title", "")
-    if not title:
-      # Try to extract from first H1 in content
-      for line in content.split("\n"):
-        if line.strip().startswith("# POL-"):
-          title = line.strip()
-          break
-      if not title:
-        title = policy_path.stem.replace("-", " ").title()
+    title = (
+      frontmatter.get("title", "")
+      or extract_h1_title(content, "POL-")
+      or policy_path.stem.replace("-", " ").title()
+    )
 
     # Parse dates
     created = parse_date(frontmatter.get("created"))

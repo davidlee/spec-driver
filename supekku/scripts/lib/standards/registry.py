@@ -19,7 +19,7 @@ import yaml
 from supekku.scripts.lib.core.dates import parse_date
 from supekku.scripts.lib.core.paths import get_registry_dir, get_standards_dir
 from supekku.scripts.lib.core.repo import find_repo_root
-from supekku.scripts.lib.core.spec_utils import load_markdown_file
+from supekku.scripts.lib.core.spec_utils import extract_h1_title, load_markdown_file
 
 
 @dataclass
@@ -160,15 +160,11 @@ class StandardRegistry:
     standard_id = frontmatter.get("id", file_id)
 
     # Extract title from content or frontmatter
-    title = frontmatter.get("title", "")
-    if not title:
-      # Try to extract from first H1 in content
-      for line in content.split("\n"):
-        if line.strip().startswith("# STD-"):
-          title = line.strip()
-          break
-      if not title:
-        title = standard_path.stem.replace("-", " ").title()
+    title = (
+      frontmatter.get("title", "")
+      or extract_h1_title(content, "STD-")
+      or standard_path.stem.replace("-", " ").title()
+    )
 
     # Parse dates
     created = parse_date(frontmatter.get("created"))

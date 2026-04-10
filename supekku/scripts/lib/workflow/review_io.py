@@ -9,8 +9,6 @@ Design authority: DR-102 §3.3, §3.4, §5, §8.
 
 from __future__ import annotations
 
-import os
-import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
@@ -22,6 +20,7 @@ from supekku.scripts.lib.blocks.workflow_metadata import (
   REVIEW_FINDINGS_METADATA,
   REVIEW_INDEX_METADATA,
 )
+from supekku.scripts.lib.core.io import atomic_write
 from supekku.scripts.lib.workflow.review_state_machine import (
   FindingDisposition,
   ReviewFinding,
@@ -125,30 +124,6 @@ def bootstrap_path(
 # ---------------------------------------------------------------------------
 
 
-def _atomic_write(path: Path, content: str) -> Path:
-  """Write content atomically via temp-file + rename."""
-  path.parent.mkdir(parents=True, exist_ok=True)
-  fd, tmp = tempfile.mkstemp(
-    dir=path.parent,
-    suffix=".tmp",
-    prefix=path.stem + "_",
-  )
-  closed = False
-  try:
-    os.write(fd, content.encode("utf-8"))
-    os.close(fd)
-    closed = True
-    Path(tmp).replace(path)
-  except BaseException:
-    if not closed:
-      os.close(fd)
-    tmp_path = Path(tmp)
-    if tmp_path.exists():
-      tmp_path.unlink()
-    raise
-  return path
-
-
 # ---------------------------------------------------------------------------
 # Review Index I/O
 # ---------------------------------------------------------------------------
@@ -190,7 +165,7 @@ def write_review_index(
     raise ReviewIndexValidationError(errors)
 
   content = yaml.dump(data, default_flow_style=False, sort_keys=False)
-  return _atomic_write(index_path(delta_dir, state_dir), content)
+  return atomic_write(index_path(delta_dir, state_dir), content)
 
 
 def build_review_index(
@@ -309,7 +284,7 @@ def write_findings(
     raise FindingsValidationError(errors)
 
   content = yaml.dump(data, default_flow_style=False, sort_keys=False)
-  return _atomic_write(findings_path(delta_dir, state_dir), content)
+  return atomic_write(findings_path(delta_dir, state_dir), content)
 
 
 def build_findings(

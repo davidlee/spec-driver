@@ -17,6 +17,7 @@ import yaml
 
 from supekku.scripts.lib.backlog.models import BacklogItem
 from supekku.scripts.lib.core import slugify
+from supekku.scripts.lib.core.ids import next_sequential_id
 from supekku.scripts.lib.core.paths import get_backlog_dir, get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
@@ -346,17 +347,7 @@ def next_identifier(entries: Iterable[Path], prefix: str) -> str:
   Returns:
     Next available identifier.
   """
-  highest = 0
-  pattern = re.compile(rf"{re.escape(prefix)}[-_](\d+)")
-  for entry in entries:
-    match = pattern.search(entry.name)
-    if not match:
-      continue
-    try:
-      highest = max(highest, int(match.group(1)))
-    except ValueError:
-      continue
-  return f"{prefix}-{highest + 1:03d}"
+  return next_sequential_id([e.name for e in entries], prefix)
 
 
 def create_backlog_entry(

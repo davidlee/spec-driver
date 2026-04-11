@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -13,6 +12,7 @@ from jinja2 import Template
 
 from supekku.scripts.lib.core import slugify
 from supekku.scripts.lib.core.events import record_artifact
+from supekku.scripts.lib.core.ids import next_sequential_id
 from supekku.scripts.lib.core.paths import get_templates_dir
 from supekku.scripts.lib.core.templates import extract_template_body
 from supekku.scripts.lib.policies.registry import PolicyRegistry
@@ -50,15 +50,7 @@ def generate_next_policy_id(registry: PolicyRegistry) -> str:
   Returns:
     Next available policy ID (e.g., "POL-001").
   """
-  policies = registry.collect()
-  max_id = 0
-  for policy_id in policies:
-    match = re.match(r"POL-(\d+)", policy_id)
-    if match:
-      max_id = max(max_id, int(match.group(1)))
-
-  next_id = max_id + 1
-  return f"POL-{next_id:03d}"
+  return next_sequential_id(registry.collect(), "POL")
 
 
 def build_policy_frontmatter(

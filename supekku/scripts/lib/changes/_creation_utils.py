@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from supekku.scripts.lib.core.ids import next_sequential_id
 from supekku.scripts.lib.core.paths import get_templates_dir
 
 
@@ -25,16 +25,8 @@ class ChangeArtifactCreated:
 
 
 def _next_identifier(base_dir: Path, prefix: str) -> str:
-  highest = 0
-  if base_dir.exists():
-    for entry in base_dir.iterdir():
-      match = re.search(rf"{prefix}-(\d{{3,}})", entry.name)
-      if match:
-        try:
-          highest = max(highest, int(match.group(1)))
-        except ValueError:
-          continue
-  return f"{prefix}-{highest + 1:03d}"
+  names = [e.name for e in base_dir.iterdir()] if base_dir.exists() else []
+  return next_sequential_id(names, prefix)
 
 
 def _ensure_directory(path: Path) -> None:

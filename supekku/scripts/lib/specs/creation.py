@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -18,6 +17,7 @@ from supekku.scripts.lib.blocks.relationships import (
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
 from supekku.scripts.lib.core import slugify
 from supekku.scripts.lib.core.events import record_artifact
+from supekku.scripts.lib.core.ids import next_sequential_id
 from supekku.scripts.lib.core.paths import (
   SPEC_DRIVER_DIR,
   get_product_specs_dir,
@@ -281,19 +281,10 @@ def determine_next_identifier(base_dir: Path, prefix: str) -> str:
   Returns:
     Next available identifier (e.g., "SPEC-042").
   """
-  highest = 0
-  if base_dir.exists():
-    for entry in base_dir.iterdir():
-      if not entry.is_dir():
-        continue
-      match = re.search(r"(\d{3,})", entry.name)
-      if not match:
-        continue
-      try:
-        highest = max(highest, int(match.group(1)))
-      except ValueError:
-        continue
-  return f"{prefix}-{highest + 1:03d}"
+  if not base_dir.exists():
+    return next_sequential_id([], prefix)
+  names = [e.name for e in base_dir.iterdir() if e.is_dir()]
+  return next_sequential_id(names, prefix)
 
 
 def extract_template_body(path: Path) -> str:

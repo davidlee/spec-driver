@@ -6,10 +6,10 @@ See DR-065 §10 for the creation template.
 
 from __future__ import annotations
 
-import re
 from datetime import date
 from pathlib import Path
 
+from supekku.scripts.lib.core.ids import next_sequential_id
 from supekku.scripts.lib.core.paths import get_drift_dir
 from supekku.scripts.lib.core.strings import slugify
 
@@ -56,12 +56,8 @@ def create_drift_ledger(
 
 def _next_ledger_id(drift_dir: Path) -> str:
   """Determine the next DL-NNN ID by scanning existing files."""
-  max_num = 0
-  pattern = re.compile(r"^DL-(\d+)")
-  for p in drift_dir.iterdir():
-    if m := pattern.match(p.name):
-      max_num = max(max_num, int(m.group(1)))
-  return f"DL-{max_num + 1:03d}"
+  names = [p.name for p in drift_dir.iterdir()]
+  return next_sequential_id(names, "DL")
 
 
 def _render_template(ledger_id: str, name: str, today: str, delta_ref: str) -> str:

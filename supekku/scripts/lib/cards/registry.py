@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 from supekku.scripts.lib.core import slugify
+from supekku.scripts.lib.core.ids import next_sequential_id
 from supekku.scripts.lib.core.templates import get_package_templates_dir
 
 from .models import Card
@@ -114,19 +115,9 @@ class CardRegistry:
     Returns:
       Next card ID (e.g., "T001", "T042")
     """
-    cards = self.all_cards()
-    if not cards:
-      return "T001"
-
-    # Extract numeric portion of IDs
-    max_num = 0
-    for card in cards:
-      match = re.match(r"^T(\d+)$", card.id)
-      if match:
-        num = int(match.group(1))
-        max_num = max(max_num, num)
-
-    return f"T{max_num + 1:03d}"
+    return next_sequential_id(
+      [c.id for c in self.all_cards()], "T", separator=""
+    )
 
   def create_card(self, description: str, lane: str = "backlog") -> Card:
     """Create a new card from template.

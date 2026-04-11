@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -12,6 +11,7 @@ import yaml
 from jinja2 import Template
 
 from supekku.scripts.lib.core import slugify
+from supekku.scripts.lib.core.ids import next_sequential_id
 from supekku.scripts.lib.core.paths import get_templates_dir
 from supekku.scripts.lib.core.templates import extract_template_body
 from supekku.scripts.lib.standards.registry import StandardRegistry
@@ -49,15 +49,7 @@ def generate_next_standard_id(registry: StandardRegistry) -> str:
   Returns:
     Next available standard ID (e.g., "STD-001").
   """
-  standards = registry.collect()
-  max_id = 0
-  for standard_id in standards:
-    match = re.match(r"STD-(\d+)", standard_id)
-    if match:
-      max_id = max(max_id, int(match.group(1)))
-
-  next_id = max_id + 1
-  return f"STD-{next_id:03d}"
+  return next_sequential_id(registry.collect(), "STD")
 
 
 def build_standard_frontmatter(

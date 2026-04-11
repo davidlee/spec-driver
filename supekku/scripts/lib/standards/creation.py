@@ -60,7 +60,6 @@ def generate_next_standard_id(registry: StandardRegistry) -> str:
   return f"STD-{next_id:03d}"
 
 
-
 def build_standard_frontmatter(
   standard_id: str,
   title: str,

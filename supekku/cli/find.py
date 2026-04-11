@@ -25,7 +25,6 @@ from supekku.scripts.lib.standards.registry import StandardRegistry
 app = typer.Typer(help="Find artifacts by ID across the repository")
 
 
-
 @app.command("spec")
 def find_spec(
   pattern: Annotated[str, typer.Argument(help="ID pattern (e.g., SPEC-*, PROD-01*)")],

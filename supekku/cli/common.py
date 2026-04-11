@@ -297,7 +297,6 @@ from supekku.cli.artifacts import (  # noqa: E402, F401
   AmbiguousArtifactError,
   ArtifactNotFoundError,
   ArtifactRef,
-  _matches_pattern,
   emit_artifact,
   extract_yaml_frontmatter,
   find_artifacts,
@@ -321,3 +320,4 @@ from supekku.cli.io import (  # noqa: E402, F401
   render_file,
   render_file_paged,
 )
+from supekku.scripts.lib.core.filters import matches_pattern  # noqa: E402, F401

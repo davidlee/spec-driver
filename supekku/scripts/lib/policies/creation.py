@@ -61,7 +61,6 @@ def generate_next_policy_id(registry: PolicyRegistry) -> str:
   return f"POL-{next_id:03d}"
 
 
-
 def build_policy_frontmatter(
   policy_id: str,
   title: str,

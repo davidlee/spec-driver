@@ -61,7 +61,6 @@ def generate_next_adr_id(registry: DecisionRegistry) -> str:
   return f"ADR-{next_id:03d}"
 
 
-
 def build_adr_frontmatter(
   adr_id: str,
   title: str,

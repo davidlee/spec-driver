@@ -51,7 +51,6 @@ def generate_next_standard_id(registry: StandardRegistry) -> str:
   """
   return next_sequential_id(registry.collect(), "STD")
 
-
 def build_standard_frontmatter(
   standard_id: str,
   title: str,

@@ -1,10 +1,10 @@
 ---
 id: IP-115-P01
 slug: "115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns-phase-01"
-name: "IP-115 Phase 01 — Utility extractions"
+name: IP-115 Phase 01 — Utility extractions
 created: "2026-04-10"
-updated: "2026-04-10"
-status: in-progress
+updated: "2026-04-11"
+status: completed
 kind: phase
 plan: IP-115
 delta: DE-115

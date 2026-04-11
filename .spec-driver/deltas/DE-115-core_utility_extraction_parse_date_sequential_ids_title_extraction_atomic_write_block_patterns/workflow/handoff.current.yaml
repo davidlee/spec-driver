@@ -1,0 +1,28 @@
+schema: supekku.workflow.handoff
+version: 1
+artifact:
+  id: DE-115
+  kind: delta
+transition:
+  from_role: implementer
+  to_role: implementer
+  status: pending
+  boundary: phase
+phase:
+  id: IP-115.PHASE-01
+  status: complete
+required_reading:
+- .spec-driver/deltas/DE-115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns/DE-115.md
+- .spec-driver/deltas/DE-115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns/IP-115.md
+- .spec-driver/deltas/DE-115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns/phases/phase-01.md
+- .spec-driver/deltas/DE-115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns/notes.md
+next_activity:
+  kind: implementation
+timestamps:
+  emitted_at: '2026-04-11T01:25:43+00:00'
+git:
+  head: 2280f39d
+  branch: main
+  worktree:
+    has_uncommitted_changes: true
+    has_staged_changes: false

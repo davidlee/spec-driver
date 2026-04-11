@@ -3,8 +3,8 @@ id: IP-115-P02
 slug: "115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns-phase-02"
 name: IP-115 Phase 02 — Sequential ID consolidation
 created: "2026-04-10"
-updated: "2026-04-10"
-status: draft
+updated: "2026-04-11"
+status: in-progress
 kind: phase
 plan: IP-115
 delta: DE-115
@@ -25,8 +25,8 @@ Consolidate 8 sequential ID generation functions into a single `next_sequential_
 
 ## 3. Entrance Criteria
 
-- [ ] P01 complete — all simple extractions done
-- [ ] `just check` passes
+- [x] P01 complete — all simple extractions done
+- [x] `just check` passes
 
 ## 4. Exit Criteria / Done When
 

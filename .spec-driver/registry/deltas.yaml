@@ -12527,11 +12527,11 @@ deltas:
         status: completed
   DE-115:
     kind: delta
-    status: draft
+    status: completed
     name: 'Delta - Core utility extraction: parse_date, sequential IDs, title extraction,
       atomic write, block patterns'
     slug: core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns
-    updated: '2026-03-22'
+    updated: '2026-04-11'
     path: .spec-driver/deltas/DE-115-core_utility_extraction_parse_date_sequential_ids_title_extraction_atomic_write_block_patterns/DE-115.md
     applies_to:
       specs:
@@ -12565,9 +12565,11 @@ deltas:
       - plan: IP-115
         delta: DE-115
         phase: IP-115-P01
-        status: draft
-      - id: IP-115-P02
+        status: completed
+      - plan: IP-115
+        delta: DE-115
         phase: IP-115-P02
+        status: completed
   DE-116:
     kind: delta
     status: draft
@@ -12625,7 +12627,8 @@ deltas:
         plan: IP-117
         delta: DE-117
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-117
         specs:
           primary:
           - SPEC-110
@@ -12635,9 +12638,12 @@ deltas:
           dependencies: []
         phases:
         - id: IP-117-P01
+        - id: IP-117-P02
       phases:
       - id: IP-117-P01
         phase: IP-117-P01
+      - id: IP-117-P02
+        phase: IP-117-P02
   DE-118:
     kind: delta
     status: draft
@@ -13199,3 +13205,39 @@ deltas:
         delta: DE-130
         phase: IP-130-P01
         status: completed
+  DE-131:
+    kind: delta
+    status: in-progress
+    name: "Delta - show delta phase table missing objective \u2014 enrich from phase\
+      \ file"
+    slug: show_delta_phase_table_missing_objective_enrich_from_phase_file
+    updated: '2026-04-10'
+    path: .spec-driver/deltas/DE-131-show_delta_phase_table_missing_objective_enrich_from_phase_file/DE-131.md
+    applies_to:
+      specs:
+      - PROD-006
+      requirements: []
+    plan:
+      id: IP-131
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-131
+        delta: DE-131
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-006
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-006.FR-003
+          dependencies: []
+        phases:
+        - id: IP-131-P01
+      phases:
+      - plan: IP-131
+        delta: DE-131
+        phase: IP-131-P01
+        status: in-progress

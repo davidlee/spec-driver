@@ -52,6 +52,7 @@ def generate_next_policy_id(registry: PolicyRegistry) -> str:
   """
   return next_sequential_id(registry.collect(), "POL")
 
+
 def build_policy_frontmatter(
   policy_id: str,
   title: str,

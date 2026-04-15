@@ -52,6 +52,7 @@ def generate_next_adr_id(registry: DecisionRegistry) -> str:
   """
   return next_sequential_id(registry.collect(), "ADR")
 
+
 def build_adr_frontmatter(
   adr_id: str,
   title: str,

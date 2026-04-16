@@ -42,21 +42,6 @@ Create a memory for durable findings:
 spec-driver create memory "<name>" --type <fact|pattern|gotcha> [--summary "..."] [--tag ...]
 ```
 
-### Phase sheet updates
-
-Phase sheets are markdown files with YAML frontmatter. Update task status
-by editing the task table directly (status column: `[ ]`, `[WIP]`, `[x]`,
-`[blocked]`).
-
-Append findings to the phase sheet's "Findings / Research Notes" section
-or to the delta's `notes.md`.
-
-### Finding your artefacts
-
-```
-spec-driver find card <delta-id>
-```
-
 ## Your boundaries
 
 You are a focused implementation worker. You operate within the scope
@@ -64,14 +49,17 @@ assigned by the dispatch orchestrator.
 
 **Do:**
 - Query and create memories
-- Update phase sheet task statuses and notes
-- Read governance files if the orchestrator's context mentions them
-- Flag anything that looks like a governance concern (ADR/policy/standard
-  territory) in your batch summary
+- Read governance files cited in the orchestrator's context to comply
+  with explicit constraints
+- Flag anything that looks like a governance concern in your batch summary
 
 **Do not:**
+- Commit changes — the orchestrator owns commits and merges
+- Update phase sheets, notes, or verification coverage — the orchestrator
+  owns all workflow artefact writes
 - Create or modify deltas, revisions, audits, or specs
 - Invoke `/boot`, `/using-spec-driver`, `/execute-phase`, or other
   ceremony skills
-- Make governance decisions — flag them, don't resolve them
+- Resolve governance ambiguity, choose between competing authorities,
+  or widen scope based on governance artefacts — flag these, don't act
 - Modify files outside your assigned scope without documenting why

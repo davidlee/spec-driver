@@ -35,11 +35,14 @@ For each task in the active phase sheet, determine:
 
 ### 2.1 Dependencies
 
-Build a dependency graph:
-- **Explicit**: `depends_on` fields in task descriptions
-- **Implicit**: File-scope overlap — tasks touching the same files/modules
-  must be sequential or in the same batch
+Build a dependency graph from what is explicitly stated:
+- **Explicit**: `depends_on` fields in task descriptions (when present)
+- **Stated file scope**: Tasks that name the same files/modules must be
+  sequential or in the same batch
 - **Phase ordering**: Phases execute in IP order unless explicitly independent
+
+When structured metadata is absent (no `depends_on`, no file lists), assume
+tasks are dependent. Parallelism requires positive evidence of disjointness.
 
 ### 2.2 Complexity signals
 
@@ -77,8 +80,16 @@ tokens of work capacity per worker):
 5. Maximum batch size = one full phase
 6. If a single task exceeds the budget estimate, it gets its own batch
 
-**Parallelism:** Batches with no dependencies between them can run in parallel.
-Batches with dependencies run sequentially.
+**Parallelism:** Default to sequential execution. Only parallelize batches when:
+- File-scope disjointness is explicit in the phase sheet or obvious from
+  named file paths in the task descriptions
+- No data dependencies exist between the batches
+- No ambiguity about task boundaries
+
+When structured metadata (`depends_on`, `touches`, `parallelizable`) is
+absent from the phase sheet, treat that as a reason to stay sequential,
+not a reason to guess. Parallelism is an optimisation applied with positive
+evidence, not a default.
 
 ## 4. Present dispatch plan
 
@@ -106,8 +117,17 @@ Before executing, present the plan to the user:
 Proceed? (adjust batches / model assignments / ordering if needed)
 ```
 
-Wait for user approval before dispatching. The user may adjust batches,
-model assignments, or ordering.
+**Auto-proceed** when the plan is straightforward:
+- Single batch (entire phase handled by one worker)
+- All batches sequential with sonnet (no parallelism, no opus escalation)
+
+**Require user approval** when the plan involves:
+- Multiple parallel workers (worktree isolation, merge risk)
+- Opus model escalation for any batch
+- Non-obvious reordering or batch splitting
+
+The user may adjust batches, model assignments, or ordering before
+approving.
 
 ## 5. Assemble per-batch context
 
@@ -117,21 +137,26 @@ point at files the worker would need to read.
 
 ### 5.1 Policy digest
 
-Read and extract from:
-- `CLAUDE.md` — lint commands, test commands, commit conventions, code standards
-- `.spec-driver/hooks/doctrine.md` — project conventions, commit policy
+Read and extract the project's verification commands and code standards from:
+- `CLAUDE.md` — verification commands, code standards, conventions
+- `.spec-driver/hooks/doctrine.md` — project conventions
+- `.spec-driver/workflow.toml` — verification hook configuration (if present)
+
+The verification command is **mandatory**. Every batch prompt must include
+the exact command(s) the worker should run to verify their work. Do not
+hard-code commands — read them from the project configuration.
 
 Condense into a compact block:
 
 ```
 ## Project Policy
-- Lint: `just lint` (ruff, zero warnings)
-- Test: `just test`
-- Format: `just format`
-- Full check: `just` (runs all)
-- Commit style: `type(scope): message` — e.g. `fix(DE-XXX): description`
+- Verification command: [exact command from project config]
 - Code standards: [extract key points from CLAUDE.md]
+- Workers do not commit. Leave changes in the worktree.
 ```
+
+If you cannot determine the verification command from the project config,
+ask the user before dispatching.
 
 ### 5.2 Design context
 
@@ -204,12 +229,15 @@ Each worker returns a structured summary (defined in dispatch-worker agent):
 - Tasks completed (with status)
 - AC evidence per task
 - Files changed
-- Test & lint results
+- Verification results
 - Blockers & deferred items
 - Governance concerns
+- Observations (rough spots, shortcuts, drift, decisions, guesses)
 - Memories created
 
-Aggregate these into a phase-level view.
+Aggregate these into a phase-level view. Pay particular attention to
+the Observations section — workers are instructed to report honestly
+about things that felt wrong or uncertain.
 
 ## 8. Review at phase boundary
 
@@ -247,7 +275,7 @@ After a batch passes review:
    git merge <worktree-branch> --no-edit
    ```
 3. If merge succeeds:
-   - Run `just` (full check: lint + test + format) on merged result
+   - Run the project's verification command on the merged result
    - If checks pass: merge is good
    - If checks fail: report failure to user, do not force
 4. If merge conflicts:
@@ -282,15 +310,28 @@ After all batches are processed:
 ### Governance concerns
 - [any flagged concerns from workers]
 
+### Observations (from workers)
+- [aggregated rough spots, shortcuts, drift, decisions — surface to user]
+
 ### Verification evidence
 - [aggregated AC evidence]
 ```
 
-### 10.2 Update artefacts
+### 10.2 Update artefacts (orchestrator-only)
 
-- Update phase sheet task statuses based on worker results
-- Append to delta notes via `/notes`
-- Update verification coverage block if evidence was gathered
+The orchestrator is the sole writer of workflow artefacts. Workers report
+structured results; the orchestrator translates them into artefact updates.
+
+After each batch completes:
+- Update phase sheet task statuses: `[x]` for completed, `[blocked]` for
+  blocked, `[ ]` for remaining. Update as batches complete, not only at
+  the end — the phase sheet should reflect reality as it progresses.
+
+After all batches in a phase:
+- Aggregate AC evidence into the IP's verification coverage block
+- Run `/notes` once with the aggregated summary (not per-batch)
+- Surface worker observations (rough spots, shortcuts, drift, decisions)
+  to the user — these may warrant action before proceeding
 - If phase exit criteria are met, indicate readiness for phase completion
 
 ### 10.3 Next steps

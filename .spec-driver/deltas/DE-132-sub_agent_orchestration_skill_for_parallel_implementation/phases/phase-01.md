@@ -32,7 +32,7 @@ tourist skill that give sub-agents spec-driver fluency without ceremony.
 ## 4. Exit Criteria / Done When
 
 - [ ] `.claude/agents/dispatch-worker.md` exists with valid frontmatter
-- [ ] `.spec-driver/skills/dispatch-worker/SKILL.md` exists, follows conventions
+- [ ] `.spec-driver/skills/sub-driver/SKILL.md` exists, follows conventions
 - [ ] Injected skill token budget verified (~6.5k for all 4 skills)
 - [ ] Agent definition loads without errors
 
@@ -57,7 +57,7 @@ tourist skill that give sub-agents spec-driver fluency without ceremony.
 | Status | ID  | Description | Notes |
 |--------|-----|-------------|-------|
 | [ ] | 1.1 | Write dispatch-worker agent definition | `.claude/agents/dispatch-worker.md` |
-| [ ] | 1.2 | Write dispatch-worker tourist skill | `.spec-driver/skills/dispatch-worker/SKILL.md` |
+| [ ] | 1.2 | Write sub-driver tourist skill | `.spec-driver/skills/sub-driver/SKILL.md` |
 | [ ] | 1.3 | Verify token budget | Estimate all 4 injected skills |
 
 ### Task Details
@@ -71,8 +71,8 @@ tourist skill that give sub-agents spec-driver fluency without ceremony.
     lint/test before reporting, structured return summary). Does NOT
     contain task-specific context — that comes from orchestrator prompt.
 
-- **1.2 Write dispatch-worker tourist skill**
-  - **Files**: `.spec-driver/skills/dispatch-worker/SKILL.md`
+- **1.2 Write sub-driver tourist skill**
+  - **Files**: `.spec-driver/skills/sub-driver/SKILL.md`
   - **Design**: DR-132 §3.6.4 — must contain:
     - Pointer to `.spec-driver/agents/exec.md` for invocation convention
     - Mini glossary: VT (verification test), VA (verification by agent),
@@ -84,7 +84,7 @@ tourist skill that give sub-agents spec-driver fluency without ceremony.
   - **Budget**: ~2k tokens target
 
 - **1.3 Verify token budget**
-  - Estimate combined token count of dispatch-worker skill +
+  - Estimate combined token count of sub-driver skill +
     retrieving-memory + capturing-memory + notes
   - Target: ~6.5k total. Warn if >8k.
 
@@ -92,7 +92,7 @@ tourist skill that give sub-agents spec-driver fluency without ceremony.
 
 | Risk | Mitigation | Status |
 |------|-----------|--------|
-| Tourist skill too large | Trim to essentials; glossary and exec.md pointer are compact | open |
+| sub-driver skill too large | Trim to essentials; glossary and exec.md pointer are compact | open |
 | skills: injection untested in this project | Test in P03; if broken, fall back to inline prompt | open |
 
 ## 9. Decisions & Outcomes

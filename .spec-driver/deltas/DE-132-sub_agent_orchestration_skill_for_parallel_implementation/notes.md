@@ -15,3 +15,17 @@ Commit: `feat(DE-132): dispatch-worker agent + sub-driver tourist skill (P01)`
 
 Ready for P02 (orchestrator skill — opus recommended).
 
+## P02 — Orchestrator skill
+
+### 2026-04-16 — P02 complete
+
+`/dispatch` SKILL.md written — 302 lines, 10-section orchestration flow.
+Covers all DR-132 sections: artefact reading, dependency analysis,
+token-budget batching, model routing, dispatch plan presentation, context
+assembly, parallel worker dispatch, phase boundary review, worktree merge,
+and result reporting.
+
+Commit: `feat(DE-132): /dispatch orchestrator skill (P02)`
+
+Ready for P03 (integration & verification — sonnet).
+

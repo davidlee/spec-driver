@@ -35,9 +35,9 @@ dispatches workers, collects results, reviews, and merges.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `.spec-driver/skills/dispatch/SKILL.md` exists, follows conventions
-- [ ] Skill covers all DR-132 §3.1–3.7 orchestration flow
-- [ ] Prompt construction template references dispatch-worker capabilities
+- [x] `.spec-driver/skills/dispatch/SKILL.md` exists, follows conventions
+- [x] Skill covers all DR-132 §3.1–3.7 orchestration flow
+- [x] Prompt construction template references dispatch-worker capabilities
 
 ## 5. Verification
 
@@ -57,7 +57,7 @@ dispatches workers, collects results, reviews, and merges.
 
 | Status | ID  | Description | Notes |
 |--------|-----|-------------|-------|
-| [ ] | 2.1 | Write dispatch SKILL.md | Full orchestration flow |
+| [x] | 2.1 | Write dispatch SKILL.md | 302 lines, covers DR §3.1–3.7 |
 
 ### Task Details
 
@@ -92,11 +92,19 @@ dispatches workers, collects results, reviews, and merges.
 
 ## 9. Decisions & Outcomes
 
-_(populated during execution)_
+- 2026-04-16 — Skill came in at 302 lines (under 400-line threshold).
+  Structured as 10 numbered sections matching the orchestration flow.
+  Policy digest in §5.1 uses concrete `just` commands from this project's
+  CLAUDE.md but the pattern is generic enough for other projects.
 
 ## 10. Findings / Research Notes
 
-_(populated during execution)_
+- The prompt construction template (§5) is the most complex section. It
+  requires the orchestrator to read and distil multiple source files. This
+  is inherent to the design — the orchestrator bears the context assembly
+  burden so workers don't have to.
+- The merge section (§9) is deliberately conservative: attempt merge, run
+  checks, escalate on failure. No automatic conflict resolution.
 
 ## 11. Wrap-up Checklist
 

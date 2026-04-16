@@ -31,10 +31,10 @@ tourist skill that give sub-agents spec-driver fluency without ceremony.
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `.claude/agents/dispatch-worker.md` exists with valid frontmatter
-- [ ] `.spec-driver/skills/sub-driver/SKILL.md` exists, follows conventions
-- [ ] Injected skill token budget verified (~6.5k for all 4 skills)
-- [ ] Agent definition loads without errors
+- [x] `.claude/agents/dispatch-worker.md` exists with valid frontmatter
+- [x] `.spec-driver/skills/sub-driver/SKILL.md` exists, follows conventions
+- [x] Injected skill token budget verified (~3k for all 4 skills)
+- [ ] Agent definition loads without errors (deferred to P03 integration)
 
 ## 5. Verification
 
@@ -56,9 +56,9 @@ tourist skill that give sub-agents spec-driver fluency without ceremony.
 
 | Status | ID  | Description | Notes |
 |--------|-----|-------------|-------|
-| [ ] | 1.1 | Write dispatch-worker agent definition | `.claude/agents/dispatch-worker.md` |
-| [ ] | 1.2 | Write sub-driver tourist skill | `.spec-driver/skills/sub-driver/SKILL.md` |
-| [ ] | 1.3 | Verify token budget | Estimate all 4 injected skills |
+| [x] | 1.1 | Write dispatch-worker agent definition | `.claude/agents/dispatch-worker.md` |
+| [x] | 1.2 | Write sub-driver tourist skill | `.spec-driver/skills/sub-driver/SKILL.md` |
+| [x] | 1.3 | Verify token budget | ~3k total (well under 6.5k target) |
 
 ### Task Details
 
@@ -97,11 +97,20 @@ tourist skill that give sub-agents spec-driver fluency without ceremony.
 
 ## 9. Decisions & Outcomes
 
-_(populated during execution)_
+- 2026-04-16 — Token budget came in at ~3k (vs 6.5k estimate). The earlier
+  estimate double-counted: skills are smaller than expected, and the chars/4
+  heuristic is conservative for structured markdown.
 
 ## 10. Findings / Research Notes
 
-_(populated during execution)_
+- Agent definition body is ~676 tokens. Completion protocol template in the
+  body adds structure but is worth the cost for consistent return summaries.
+- sub-driver skill is compact at ~600 tokens. The glossary + commands +
+  boundaries format works well. The `exec.md` pointer avoids duplicating
+  invocation convention.
+- capturing-memory is the largest injected skill at ~1.25k tokens. Most of
+  that is confidence calibration and scope metadata guidance — useful for
+  workers since they may discover genuine gotchas.
 
 ## 11. Wrap-up Checklist
 

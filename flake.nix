@@ -152,13 +152,19 @@
               graphviz
             ])
             ++ lib.optionals isLinux (lib.attrValues jailPkgs);
-
           commands = [
             {
               name = "sdr";
               help = "uv run spec-driver $@";
               command = ''
                 uv run spec-driver $@
+              '';
+            }
+            {
+              name = "jcl";
+              help = "jailed claude in YOLO mode";
+              command = ''
+                jailed-claude $@ --dangerously-skip-permissions
               '';
             }
           ];

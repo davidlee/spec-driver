@@ -29,3 +29,17 @@ Commit: `feat(DE-132): /dispatch orchestrator skill (P02)`
 
 Ready for P03 (integration & verification — sonnet).
 
+## P03 — Integration & verification
+
+### 2026-04-16 — Allowlist + sync
+
+- Added `dispatch` and `sub-driver` to skills.allowlist
+- Created symlinks in `.claude/skills/` → `.spec-driver/skills/`
+- Symlinks resolve correctly
+- Created IMPR-029 for per-skill agent target filtering (currently both
+  skills sync to `.agents/skills/` too — harmless but noisy)
+- Agent load test (`claude agents` / `/agents`) deferred to user — needs
+  session restart
+- VH tests (parallel dispatch, worktree isolation, model routing) deferred
+  to user — need a real or synthetic multi-phase IP
+

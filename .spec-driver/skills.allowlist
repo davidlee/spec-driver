@@ -6,6 +6,7 @@ capturing-memory
 close-change
 consult
 continuation
+dispatch
 doctrine
 draft-design-revision
 execute-phase
@@ -20,5 +21,6 @@ reviewing-memory
 scope-delta
 shape-revision
 spec-driver
+sub-driver
 update-delta-docs
 using-spec-driver

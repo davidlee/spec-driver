@@ -41,5 +41,20 @@ Ready for P03 (integration & verification — sonnet).
 - Agent load test (`claude agents` / `/agents`) deferred to user — needs
   session restart
 - VH tests (parallel dispatch, worktree isolation, model routing) deferred
-  to user — need a real or synthetic multi-phase IP
+  to first real use — synthetic exercise would prove mechanics but not
+  real-world usability
+
+### State at park
+
+Delta is in-progress, P03 is in-progress with integration tasks done and
+VH tests pending. To resume:
+
+1. Use `/dispatch` on a real multi-phase IP
+2. Record VH-001/002/003 evidence in this phase sheet
+3. Complete P03 → audit → close
+
+### Backlog created
+
+- IMPR-028: Phase sheet dispatch annotations for `/plan-phases`
+- IMPR-029: Per-skill agent target filtering
 

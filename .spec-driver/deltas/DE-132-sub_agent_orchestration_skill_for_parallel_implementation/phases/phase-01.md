@@ -114,6 +114,6 @@ tourist skill that give sub-agents spec-driver fluency without ceremony.
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Hand-off notes to P02
+- [x] Exit criteria satisfied (agent load deferred to P03 — file-level criteria met)
+- [x] Verification evidence stored (token budget in §9)
+- [x] Hand-off notes to P02 (in delta notes.md)

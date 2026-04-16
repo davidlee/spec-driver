@@ -108,6 +108,6 @@ dispatches workers, collects results, reviews, and merges.
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Hand-off notes to P03
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (DR coverage check in notes)
+- [x] Hand-off notes to P03 (in delta notes.md)

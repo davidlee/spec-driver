@@ -1,0 +1,21 @@
+schema: supekku.workflow.state
+version: 1
+artifact:
+  id: DE-132
+  kind: delta
+  path: .spec-driver/deltas/DE-132-sub_agent_orchestration_skill_for_parallel_implementation
+  notes_path: .spec-driver/deltas/DE-132-sub_agent_orchestration_skill_for_parallel_implementation/notes.md
+phase:
+  id: IP-132.PHASE-01
+  status: in_progress
+  path: .spec-driver/deltas/DE-132-sub_agent_orchestration_skill_for_parallel_implementation/phases/phase-01.md
+workflow:
+  status: implementing
+  active_role: implementer
+  handoff_boundary: phase
+timestamps:
+  created: '2026-04-16T08:46:39+00:00'
+  updated: '2026-04-16T08:46:39+00:00'
+plan:
+  id: IP-132
+  path: .spec-driver/deltas/DE-132-sub_agent_orchestration_skill_for_parallel_implementation/IP-132.md

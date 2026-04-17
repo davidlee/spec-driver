@@ -15,7 +15,7 @@ Inputs:
 Process:
 
 1. Pre-check:
-   - Phase/IP criteria complete; phase frontmatter statuses are `completed`
+   - Phase/IP criteria complete
    - Specs patched to match contracts + audit findings
    - Relevant verification coverage statuses updated (typically `verified` where required)
    - Inspect the delta for originating backlog entries; if any exist, decide what closure update each needs before the delta is completed

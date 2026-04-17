@@ -44,12 +44,6 @@ Process:
 6. Ensure `notes.md` remains consistent with the structured artefacts, but do not duplicate every detail.
 7. If the required doc changes imply a broader design/workflow change than the active phase assumed, stop and `/consult`.
 
-Phase status reference (canonical values):
-
-- `draft`, `in-progress`, `completed`, `deferred`
-- Use `spec-driver phase start` / `spec-driver phase complete` for transitions.
-- Both frontmatter (normative) and `state.yaml` (transient) are updated by CLI.
-
 Outcomes:
 
 - Delta execution artefacts stay coherent while work is in progress.

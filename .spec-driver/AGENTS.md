@@ -6,17 +6,15 @@
 When users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.
 
 How to use skills:
-
 - Check available skills in <available_skills> below
 - Skills are loaded via slash commands or agent tooling
 - Each skill contains detailed instructions for completing specific tasks
 
 Usage notes:
-
 - Only use skills listed in <available_skills> below
 - Do not invoke a skill that is already loaded in your context
 - Each skill invocation is stateless
-  </usage>
+</usage>
 
 <available_skills>
 
@@ -53,6 +51,12 @@ Usage notes:
 <skill>
 <name>continuation</name>
 <description>Write a prompt to help the next agent continue effectively.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>dispatch</name>
+<description>Orchestrate parallel implementation via sub-agents. Reads an IP's phase/task structure, analyses parallelism, batches tasks by token budget, routes to appropriate models (sonnet/opus), and dispatches workers in isolated worktrees. Use instead of /execute-phase when a phase has parallelizable work.</description>
 <location>project</location>
 </skill>
 
@@ -137,6 +141,12 @@ Usage notes:
 <skill>
 <name>spec-driver</name>
 <description>Use this skill any time work involves creating, listing, finding, showing, editing, completing, syncing, or otherwise interacting with spec-driver entities via the CLI. Trigger it whenever a user asks to create or inspect ADRs, specs, deltas, revisions, audits, memories, policies, standards, backlog items, or related workflow artefacts, especially if there is any temptation to guess IDs, paths, or command shapes.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>sub-driver</name>
+<description>Lightweight spec-driver fluency for dispatch workers. Provides the minimum vocabulary, commands, and boundaries needed to navigate a spec-driver project without full boot ceremony. Loaded via skills: frontmatter in dispatch-worker agent definition.</description>
 <location>project</location>
 </skill>
 

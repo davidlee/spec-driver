@@ -25,9 +25,6 @@ Process:
    - Success criteria and verification expectations
 4. Create the next phase:
    - `uv run spec-driver create phase "<phase name>" --plan IP-XXX`
-   - Always use the CLI — do not hand-craft phase sheets. The CLI generates
-     proper frontmatter, overview blocks, and tracking blocks. Hand-crafted
-     phases lack structural metadata that validation and tooling depend on.
 5. Update the new phase sheet with:
    - Task breakdown
    - Assumptions/constraints

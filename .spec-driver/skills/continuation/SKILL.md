@@ -40,9 +40,8 @@ uv run spec-driver create handoff <DELTA-ID> --to <role>
 Where `<role>` is the appropriate next role (e.g. `reviewer`, `implementer`,
 `architect`).
 
-If you are completing a phase, use `phase complete` instead — it updates the
-phase sheet frontmatter to `completed`, marks state.yaml, and emits a handoff
-automatically:
+If you are completing a phase, use `phase complete` instead — it marks the
+phase done and emits a handoff automatically:
 
 ```
 uv run spec-driver phase complete <DELTA-ID>

@@ -52,18 +52,6 @@ Process:
     and notes once more for missed memory-capture candidates.
 13. When exit criteria are met, hand off to `/audit-change` for verification and spec reconciliation.
 
-Phase status vocabulary (canonical values):
-
-- `draft` — initial state from `create phase`
-- `in-progress` — set by `spec-driver phase start <delta>`
-- `completed` — set by `spec-driver phase complete <delta>`
-- `deferred` — paused phase; no CLI command yet, hand-edit frontmatter
-
-Use CLI commands for phase lifecycle transitions — do not hand-edit phase
-frontmatter status except for `deferred` (no CLI command yet; see IMPR-021).
-Both frontmatter (normative) and `state.yaml` (transient) are updated by the
-CLI commands.
-
 Outcomes:
 
 - Phase objectives are implemented with traceable evidence.

@@ -1,12 +1,13 @@
 ---
 name: capturing-memory
 description: |
-  Invoke this skill whenever any of the following occurs during work: (1) you discover or confirm a durable fact, constraint, invariant, or “how we do X here” pattern; (2) you create a new workflow/checklist that will be reused; (3) you resolve a recurring confusion (“where is the source of truth?”); (4) you make a decision that is not an ADR/SPEC but would prevent rework; (5) you detect a sharp edge, footgun, or non-obvious dependency that future agents will hit; (6) you complete an implementation phase or are closing a delta
+  Invoke this skill whenever any of the following occurs during work: (1) you discover or confirm a durable fact, constraint, invariant, or “how we do X here” pattern; (2) you create a new workflow/checklist that will be reused; (3) you resolve a recurring confusion (“where is the source of truth?”); (4) you make a decision that is not an ADR/SPEC but would prevent rework; (5) you detect a sharp edge, footgun, or non-obvious dependency that future agents will hit.
   Do NOT rely on conversational context to persist. When the information would save ≥10 minutes for a future agent, write a memory record immediately.
 ---
 
-Before treating a phase, task, or delta as closed, scan the current notes,
-artefacts, and your recent experience for durable guidance worth preserving.
+Phase and delta wrap-up are mandatory prompts for this skill. Before treating a
+phase, task, or delta as wrapped, scan the current notes, phase sheet, audit
+findings, and any fresh gotchas for durable guidance worth preserving.
 
 Procedure:
 

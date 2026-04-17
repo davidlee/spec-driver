@@ -1,8 +1,9 @@
 ---
 name: dispatch
 description: >
-  Orchestrate parallel implementation via sub-agents. Reads an IP's phase/task
-  structure, analyses parallelism, batches tasks by token budget, routes to
+  Orchestrate parallel implementation via sub-agents. Drives an entire delta
+  to completion across all phases — planning, dispatching, merging, and
+  continuing automatically. Batches tasks by token budget, routes to
   appropriate models (sonnet/opus), and dispatches workers in isolated worktrees.
   Use instead of /execute-phase when a phase has parallelizable work.
 ---
@@ -12,6 +13,12 @@ You are the dispatch orchestrator for delta `$ARGUMENTS`.
 You coordinate implementation work by dispatching sub-agents. You run in
 the main agent context with full spec-driver access. Sub-agents are
 non-interactive workers in isolated worktrees.
+
+**Your goal is to drive the entire delta to completion** — not just one
+phase. After each phase completes, automatically proceed to the next phase
+(planning it if needed) until all phases are done or a hard blocker stops
+you. Only pause for: unresolved blockers, governance concerns requiring
+user decision, or explicit user instruction to stop.
 
 ## 1. Read artefacts
 
@@ -332,12 +339,33 @@ After all batches in a phase:
 - Run `/notes` once with the aggregated summary (not per-batch)
 - Surface worker observations (rough spots, shortcuts, drift, decisions)
   to the user — these may warrant action before proceeding
-- If phase exit criteria are met, indicate readiness for phase completion
+- If phase exit criteria are met, proceed to 10.3 (next phase)
 
-### 10.3 Next steps
+### 10.3 Continue to next phase
 
-Indicate to the user:
-- If phase is complete: ready for `spec-driver phase complete DE-XXX`
-  and then `/audit-change` or next phase
-- If blockers remain: what needs resolution before re-dispatch
-- If governance concerns surfaced: need user decision before proceeding
+**Default behaviour: keep going.** Do not stop at a phase boundary unless
+forced to.
+
+After a phase completes successfully:
+1. Run `spec-driver phase complete DE-XXX` to close the phase
+2. Check if the IP has a next phase sheet
+   - If yes: loop back to step 2 (Analyse tasks) for the next phase
+   - If no phase sheet exists: run `/plan-phases` to create it, then loop
+3. Continue until all phases are complete
+
+**Stop only when:**
+- Unresolved blockers prevent meaningful progress
+- A worker flagged a governance concern that requires user decision
+- The user explicitly asked to stop after a specific phase
+- All phases are complete — proceed to 10.4
+
+When stopping for blockers or governance, clearly state what is needed to
+resume and that you will continue once it is resolved.
+
+### 10.4 Delta completion
+
+When all phases are done:
+1. Run `/notes` with a full-delta summary
+2. Suggest `/audit-change` → `/close-change` to the user
+3. If audit and closure are straightforward and the user has not asked
+   to review first, offer to proceed immediately

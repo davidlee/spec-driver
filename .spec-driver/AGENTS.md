@@ -56,7 +56,7 @@ Usage notes:
 
 <skill>
 <name>dispatch</name>
-<description>Orchestrate parallel implementation via sub-agents. Reads an IP's phase/task structure, analyses parallelism, batches tasks by token budget, routes to appropriate models (sonnet/opus), and dispatches workers in isolated worktrees. Use instead of /execute-phase when a phase has parallelizable work.</description>
+<description>Orchestrate parallel implementation via sub-agents. Drives an entire delta to completion across all phases — planning, dispatching, merging, and continuing automatically. Batches tasks by token budget, routes to appropriate models (sonnet/opus), and dispatches workers in isolated worktrees. Use instead of /execute-phase when a phase has parallelizable work.</description>
 <location>project</location>
 </skill>
 

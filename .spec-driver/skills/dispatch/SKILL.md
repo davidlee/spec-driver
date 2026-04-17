@@ -98,6 +98,10 @@ absent from the phase sheet, treat that as a reason to stay sequential,
 not a reason to guess. Parallelism is an optimisation applied with positive
 evidence, not a default.
 
+**Isolation follows from this classification** — only safely parallel
+batches get `isolation="worktree"`; sequential and single-batch-phase
+batches run in the main tree (§6.1).
+
 ## 4. Present dispatch plan
 
 Before executing, present the plan to the user:
@@ -111,11 +115,12 @@ Before executing, present the plan to the user:
 |-------|-------|-------|-----------|-------------|
 | B1 | 1.1, 1.2 | sonnet | worktree | none |
 | B2 | 1.3 | opus | worktree | none |
-| B3 | 1.4, 1.5 | sonnet | worktree | B1, B2 |
+| B3 | 1.4, 1.5 | sonnet | **main** | B1, B2 |
 
 ### Parallel groups
 - Group 1 (parallel): B1, B2
-- Group 2 (sequential, after group 1): B3
+- Group 2 (sequential, after group 1): B3 — runs in main tree so it sees
+  B1/B2 commits; see §6.1
 
 ### Estimated context
 - Per-batch orchestrator prompt: ~Nk tokens
@@ -203,32 +208,60 @@ Estimate the total prompt size. If it exceeds ~15k tokens, consider:
 
 ## 6. Dispatch workers
 
-For each batch, spawn a dispatch-worker agent:
+### 6.1 Isolation selection
+
+Pick isolation by batch type. This is a rule, not a judgment call:
+
+| Batch type | `isolation` |
+|------------|-------------|
+| Parallel, verified file-scope disjoint | `"worktree"` |
+| Sequential, depends on prior batch output | omit (main tree) |
+| Single-batch phase | omit (main tree) |
+
+Sequential batches that depend on prior output MUST NOT use
+`isolation="worktree"` — the worktree forks from a git ref and cannot see
+uncommitted prior work. Independent-but-ordered batches may use worktree
+isolation; the "depends on" clause is what forbids it.
+
+**Timing.** A worktree forks from the main branch's HEAD at spawn time.
+Uncommitted main-tree changes are invisible to the worker. Therefore,
+any prior batch work that a worktree-isolated batch relies on must be
+committed before spawn. (Main-tree batches share the working tree and
+see uncommitted state directly.)
+
+**Branch-point check.** Before each worktree spawn, capture
+`git rev-parse HEAD`. After spawn, compare to `git -C <worktree> log -1
+--format=%H`. Mismatch → default is **re-dispatch**; the user must
+explicitly override to proceed. This catches orchestrator ordering
+errors (forgot to commit prior work). It does not catch Agent-tool
+internal staleness if the fork is stale in a way that doesn't change
+the ref — if the symptom recurs after this check passes, stop and
+escalate to the user.
+
+### 6.2 Spawn
 
 ```python
-# Parallel batches — dispatch simultaneously
 Agent(
     subagent_type="dispatch-worker",
     prompt=assembled_prompt,
-    isolation="worktree",    # for parallel batches
+    isolation="worktree",    # omit for sequential / single-batch; see §6.1
     model="sonnet",          # or "opus" per batch assignment
-    description="DE-XXX P0N batch N: brief description"
+    description="DE-XXX P0N batch N: brief description",
 )
-
-# Sequential batches — dispatch after dependencies complete
-# Wait for prior batch results before dispatching
 ```
 
-**Parallel execution:** Launch all independent batches in a single message
-with multiple Agent tool calls. This is how Claude Code runs agents in
-parallel.
+**Parallel group:** launch all independent batches in a single message
+with multiple Agent calls.
+**Sequential chain:** wait for the prior batch to return; if the next
+batch will be worktree-isolated, commit the main-tree work first.
 
-**Sequential execution:** Wait for dependent batches to complete. Include
-relevant results from prior batches in the next batch's prompt if tasks
-reference prior output.
+### 6.3 What workers return
 
-**Single-batch phases:** If the entire phase fits in one batch, dispatch
-without worktree isolation (no merge needed).
+Workers do not commit. Worktree workers leave changes in their worktree
+branch; main-tree workers leave changes in the main working tree. The
+orchestrator merges worktree branches (§9) and commits main-tree work
+between batches as needed (required only before spawning a later
+worktree-isolated batch; otherwise good hygiene).
 
 ## 7. Collect results
 
@@ -274,7 +307,13 @@ batches).
 
 ## 9. Merge worktree branches
 
-After a batch passes review:
+This step applies **only to worktree-isolated batches** (parallel batches
+with `isolation="worktree"`). Main-tree batches (sequential and
+single-batch-phase) have no branch to merge — their changes are already
+in the main working tree, and the orchestrator commits them directly
+after review (see §6.5).
+
+After a worktree-isolated batch passes review:
 
 1. Check the worktree branch for changes (Agent tool returns branch info)
 2. Attempt to merge the branch into the current branch:

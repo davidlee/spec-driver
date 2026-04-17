@@ -13,6 +13,7 @@ from supekku.scripts.install import (
   _classify_memory,
   _ensure_preboot_symlink,
   _find_memory_source,
+  _install_agents,
   _install_claude_config,
   _install_hooks,
   _install_memories,
@@ -1029,6 +1030,207 @@ class TestInitializeWorkspacePiConfig:
     initialize_workspace(tmp_path, dry_run=True)
 
     assert not (tmp_path / ".pi" / "extensions").exists()
+
+
+# --- Agent definition installation tests ---
+
+
+class TestInstallAgents:
+  """Tests for .claude/agents/ definition installation."""
+
+  def _make_agent_source(self, package_root: Path) -> None:
+    """Create package source files for agent definitions."""
+    agents_dir = package_root / "agents"
+    agents_dir.mkdir(parents=True)
+    (agents_dir / "dispatch-worker.md").write_text(
+      "---\nname: dispatch-worker\n---\nYou are a worker.",
+      encoding="utf-8",
+    )
+
+  def test_installs_agents(self, tmp_path: Path) -> None:
+    """Fresh install creates .claude/agents/ with agent definitions."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_agent_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_agents(pkg, target, dry_run=False)
+
+    agent = target / ".claude" / "agents" / "dispatch-worker.md"
+    assert agent.exists()
+    assert "dispatch-worker" in agent.read_text()
+
+  def test_overwrites_on_reinstall(self, tmp_path: Path) -> None:
+    """Agent definitions are overwritten (installer-owned)."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_agent_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_agents(pkg, target, dry_run=False)
+
+    # Modify installed file
+    agent = target / ".claude" / "agents" / "dispatch-worker.md"
+    agent.write_text("modified")
+
+    _install_agents(pkg, target, dry_run=False)
+
+    assert "dispatch-worker" in agent.read_text()
+
+  def test_skips_unchanged(self, tmp_path: Path, capsys) -> None:
+    """Unchanged files are not re-copied."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_agent_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_agents(pkg, target, dry_run=False)
+    capsys.readouterr()  # clear
+
+    _install_agents(pkg, target, dry_run=False)
+    captured = capsys.readouterr()
+    assert "up to date" in captured.out
+
+  def test_dry_run_does_not_write(self, tmp_path: Path, capsys) -> None:
+    """Dry-run reports without creating files."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_agent_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_agents(pkg, target, dry_run=True)
+
+    assert not (target / ".claude" / "agents").exists()
+
+    captured = capsys.readouterr()
+    assert "[DRY RUN]" in captured.out
+    assert "dispatch-worker.md" in captured.out
+
+  def test_creates_directories(self, tmp_path: Path) -> None:
+    """Creates .claude/agents/ if it doesn't exist."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_agent_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_agents(pkg, target, dry_run=False)
+
+    assert (target / ".claude" / "agents").is_dir()
+
+  def test_idempotent(self, tmp_path: Path) -> None:
+    """Repeated installs produce identical results."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_agent_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_agents(pkg, target, dry_run=False)
+    first = (target / ".claude" / "agents" / "dispatch-worker.md").read_text()
+
+    _install_agents(pkg, target, dry_run=False)
+    second = (target / ".claude" / "agents" / "dispatch-worker.md").read_text()
+
+    assert first == second
+
+  def test_skips_if_no_source_agents(self, tmp_path: Path) -> None:
+    """No-op when package has no agents/ directory."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_agents(pkg, target, dry_run=False)
+
+    assert not (target / ".claude" / "agents").exists()
+
+  def test_preserves_user_agents(self, tmp_path: Path) -> None:
+    """User-created agents not in package source are left untouched."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    self._make_agent_source(pkg)
+    target = tmp_path / "target"
+    target.mkdir()
+
+    # Pre-create a user agent
+    agents_dir = target / ".claude" / "agents"
+    agents_dir.mkdir(parents=True)
+    (agents_dir / "my-custom-agent.md").write_text("custom agent")
+
+    _install_agents(pkg, target, dry_run=False)
+
+    assert (agents_dir / "my-custom-agent.md").read_text() == "custom agent"
+    assert (agents_dir / "dispatch-worker.md").exists()
+
+  def test_reports_new_and_updated(self, tmp_path: Path, capsys) -> None:
+    """Reports counts of new and updated agents."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    agents_src = pkg / "agents"
+    agents_src.mkdir()
+    (agents_src / "agent-a.md").write_text("a")
+    (agents_src / "agent-b.md").write_text("b-new")
+
+    target = tmp_path / "target"
+    target.mkdir()
+    agents_dest = target / ".claude" / "agents"
+    agents_dest.mkdir(parents=True)
+    (agents_dest / "agent-b.md").write_text("b-old")
+
+    _install_agents(pkg, target, dry_run=False)
+
+    captured = capsys.readouterr()
+    assert "1 new" in captured.out
+    assert "1 updated" in captured.out
+
+  def test_only_copies_md_files(self, tmp_path: Path) -> None:
+    """Non-.md files in agents/ source are ignored."""
+    pkg = tmp_path / "pkg"
+    pkg.mkdir()
+    agents_src = pkg / "agents"
+    agents_src.mkdir()
+    (agents_src / "dispatch-worker.md").write_text("agent")
+    (agents_src / "__init__.py").write_text("")
+    (agents_src / "notes.txt").write_text("not an agent")
+
+    target = tmp_path / "target"
+    target.mkdir()
+
+    _install_agents(pkg, target, dry_run=False)
+
+    agents_dest = target / ".claude" / "agents"
+    assert (agents_dest / "dispatch-worker.md").exists()
+    assert not (agents_dest / "__init__.py").exists()
+    assert not (agents_dest / "notes.txt").exists()
+
+
+class TestInitializeWorkspaceAgents:
+  """Integration: initialize_workspace installs .claude/agents/ definitions."""
+
+  def test_installs_agent_definitions(self, tmp_path: Path) -> None:
+    """initialize_workspace copies agent definitions."""
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    agents_dir = tmp_path / ".claude" / "agents"
+    assert agents_dir.is_dir(), ".claude/agents/ not created"
+
+    # dispatch-worker should be installed from package source
+    assert (agents_dir / "dispatch-worker.md").is_file()
+
+  def test_dry_run_does_not_install_agents(self, tmp_path: Path) -> None:
+    """Dry-run does not create .claude/agents/ files from package source."""
+    initialize_workspace(tmp_path, dry_run=True)
+
+    agents_dir = tmp_path / ".claude" / "agents"
+    # agents dir may exist from other install steps, but dispatch-worker
+    # should not be installed
+    if agents_dir.exists():
+      assert not (agents_dir / "dispatch-worker.md").exists()
 
 
 # --- Gitignore entry for .pi/APPEND_SYSTEM.md ---

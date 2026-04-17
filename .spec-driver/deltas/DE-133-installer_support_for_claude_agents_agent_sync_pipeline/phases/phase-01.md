@@ -4,7 +4,7 @@ slug: "133-installer_support_for_claude_agents_agent_sync_pipeline-phase-01"
 name: IP-133 Phase 01 — Implement agent sync
 created: "2026-04-17"
 updated: "2026-04-17"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-133
 delta: DE-133

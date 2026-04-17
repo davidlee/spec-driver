@@ -536,6 +536,54 @@ def _install_pi_config(
     copy_with_write_permission(src, dest)
 
 
+def _install_agents(
+  package_root: Path, target_root: Path, *, dry_run: bool = False
+) -> None:
+  """Install agent definitions from package source to .claude/agents/.
+
+  Copies ``supekku/agents/*.md`` into ``.claude/agents/``.
+  Installer-owned: managed files are overwritten on every install.
+  User-created agents (not in package source) are left untouched.
+  """
+  agents_src = package_root / "agents"
+  if not agents_src.is_dir():
+    return
+
+  sources = sorted(f for f in agents_src.iterdir() if f.is_file() and f.suffix == ".md")
+  if not sources:
+    return
+
+  if dry_run:
+    print("\n[DRY RUN] Agents:")
+    for src in sources:
+      print(f"  + .claude/agents/{src.name}")
+    return
+
+  agents_dest = target_root / ".claude" / "agents"
+  agents_dest.mkdir(parents=True, exist_ok=True)
+
+  installed, updated = 0, 0
+  for src in sources:
+    dest = agents_dest / src.name
+    if dest.exists() and src.read_bytes() == dest.read_bytes():
+      continue
+    if dest.exists():
+      updated += 1
+    else:
+      installed += 1
+    copy_with_write_permission(src, dest)
+
+  if installed or updated:
+    parts = []
+    if installed:
+      parts.append(f"{installed} new")
+    if updated:
+      parts.append(f"{updated} updated")
+    print(f"Agents: {', '.join(parts)}")
+  else:
+    print("Agents: up to date")
+
+
 def _install_hooks(
   package_root: Path, target_root: Path, *, dry_run: bool = False
 ) -> None:
@@ -747,6 +795,9 @@ def initialize_workspace(
 
   # Install .claude/ settings and hooks (installer-owned, overwrite)
   _install_claude_config(package_root, target_root, dry_run=dry_run)
+
+  # Install .claude/agents/ definitions (installer-owned, overwrite)
+  _install_agents(package_root, target_root, dry_run=dry_run)
 
   # Install .pi/ extensions (installer-owned, overwrite)
   _install_pi_config(package_root, target_root, dry_run=dry_run)

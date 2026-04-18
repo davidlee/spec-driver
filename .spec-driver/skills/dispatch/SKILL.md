@@ -215,13 +215,16 @@ Pick isolation by batch type. This is a rule, not a judgment call:
 | Batch type | `isolation` |
 |------------|-------------|
 | Parallel, verified file-scope disjoint | `"worktree"` |
-| Sequential, depends on prior batch output | omit (main tree) |
+| Sequential, depends on prior batch or phase work | omit (main tree) |
 | Single-batch phase | omit (main tree) |
 
-Sequential batches that depend on prior output MUST NOT use
-`isolation="worktree"` — the worktree forks from a git ref and cannot see
-uncommitted prior work. Independent-but-ordered batches may use worktree
-isolation; the "depends on" clause is what forbids it.
+Sequential batches that depend on prior work MUST NOT use
+`isolation="worktree"` — regardless of whether that prior work is
+committed or in-flight. The worktree forks from a git ref at spawn
+time; even committed work can be missing from the fork if the Agent
+tool's branch point lags HEAD (the vk DE-105 failure mode).
+Independent-but-ordered batches may use worktree isolation; the
+"depends on" clause is what forbids it.
 
 **Timing.** A worktree forks from the main branch's HEAD at spawn time.
 Uncommitted main-tree changes are invisible to the worker. Therefore,

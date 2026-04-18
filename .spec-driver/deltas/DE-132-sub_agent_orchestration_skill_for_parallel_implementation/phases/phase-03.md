@@ -78,7 +78,7 @@ Wire skills into the install pipeline and verify end-to-end dispatch.
 | [ ] | 3.5 | VH-001: Parallel dispatch test | Deferred to first real use |
 | [ ] | 3.6 | VH-002: Worktree isolation test | Re-run post-amendment (§5) |
 | [ ] | 3.7 | VH-003: Model routing test | Deferred to first real use |
-| [ ] | 3.8 | VA-002: Isolation-rule literacy on revised SKILL.md | See §5 |
+| [x] | 3.8 | VA-002: Isolation-rule literacy on revised SKILL.md | Passed 2026-04-17; see §9 |
 
 ## 9. Decisions & Outcomes
 
@@ -91,6 +91,15 @@ Wire skills into the install pipeline and verify end-to-end dispatch.
   mode. DR-132 DEC-132-02 clarified (amendment log §9); SKILL.md §3/§6
   tightened; VA-002 added. VH-002 re-runs against clarified rules with
   concrete acceptance steps in §5.
+- 2026-04-17 — **VA-002 PASSED.** Sonnet agent given revised
+  `.spec-driver/skills/dispatch/SKILL.md` §3+§6 and the three test
+  questions from §5. All three answered correctly with §6.1 citations,
+  confidence=high, overall clarity rated "unambiguous". Agent flagged
+  one narrow-reading risk on the row label "depends on prior batch
+  output" — tightened the same session to "depends on prior batch or
+  phase work" with explicit note that the rule applies whether prior
+  work is committed or in-flight. Mirror in DR-132 §3.5 updated to
+  match. VH-002 still pending — requires live multi-phase dispatch.
 
 ## 11. Wrap-up Checklist
 

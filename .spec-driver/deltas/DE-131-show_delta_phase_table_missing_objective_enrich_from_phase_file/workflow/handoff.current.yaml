@@ -1,0 +1,28 @@
+schema: supekku.workflow.handoff
+version: 1
+artifact:
+  id: DE-131
+  kind: delta
+transition:
+  from_role: implementer
+  to_role: implementer
+  status: pending
+  boundary: phase
+phase:
+  id: IP-131.PHASE-01
+  status: complete
+required_reading:
+- .spec-driver/deltas/DE-131-show_delta_phase_table_missing_objective_enrich_from_phase_file/DE-131.md
+- .spec-driver/deltas/DE-131-show_delta_phase_table_missing_objective_enrich_from_phase_file/IP-131.md
+- .spec-driver/deltas/DE-131-show_delta_phase_table_missing_objective_enrich_from_phase_file/phases/phase-01.md
+- .spec-driver/deltas/DE-131-show_delta_phase_table_missing_objective_enrich_from_phase_file/notes.md
+next_activity:
+  kind: implementation
+timestamps:
+  emitted_at: '2026-04-18T06:28:20+00:00'
+git:
+  head: 02d7fea7
+  branch: main
+  worktree:
+    has_uncommitted_changes: true
+    has_staged_changes: true

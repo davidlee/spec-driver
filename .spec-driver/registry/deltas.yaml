@@ -13207,11 +13207,11 @@ deltas:
         status: completed
   DE-131:
     kind: delta
-    status: in-progress
+    status: completed
     name: "Delta - show delta phase table missing objective \u2014 enrich from phase\
       \ file"
     slug: show_delta_phase_table_missing_objective_enrich_from_phase_file
-    updated: '2026-04-10'
+    updated: '2026-04-18'
     path: .spec-driver/deltas/DE-131-show_delta_phase_table_missing_objective_enrich_from_phase_file/DE-131.md
     applies_to:
       specs:
@@ -13240,4 +13240,94 @@ deltas:
       - plan: IP-131
         delta: DE-131
         phase: IP-131-P01
+        status: completed
+  DE-132:
+    kind: delta
+    status: in-progress
+    name: Delta - Sub-agent orchestration skill for parallel implementation
+    slug: sub_agent_orchestration_skill_for_parallel_implementation
+    updated: '2026-04-17'
+    path: .spec-driver/deltas/DE-132-sub_agent_orchestration_skill_for_parallel_implementation/DE-132.md
+    applies_to:
+      specs:
+      - PROD-011
+      - PROD-016
+      requirements: []
+    relations:
+    - type: relates_to
+      target: PROD-011
+      attributes: {}
+    - type: relates_to
+      target: PROD-016
+      attributes: {}
+    plan:
+      id: IP-132
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-132
+        delta: DE-132
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-011
+          collaborators:
+          - PROD-016
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-132-P01
+        - id: IP-132-P02
+        - id: IP-132-P03
+      phases:
+      - plan: IP-132
+        delta: DE-132
+        phase: IP-132-P01
+        status: completed
+      - plan: IP-132
+        delta: DE-132
+        phase: IP-132-P02
+        status: completed
+      - plan: IP-132
+        delta: DE-132
+        phase: IP-132-P03
+        status: in-progress
+  DE-133:
+    kind: delta
+    status: in-progress
+    name: "Delta - Installer support for .claude/agents/ \u2014 agent sync pipeline"
+    slug: installer_support_for_claude_agents_agent_sync_pipeline
+    updated: '2026-04-17'
+    path: .spec-driver/deltas/DE-133-installer_support_for_claude_agents_agent_sync_pipeline/DE-133.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: relates_to
+      target: IMPR-031
+      attributes: {}
+    plan:
+      id: IP-133
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-133
+        delta: DE-133
+        revision_links:
+          aligns_with:
+          - DR-133
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-133-P01
+      phases:
+      - plan: IP-133
+        delta: DE-133
+        phase: IP-133-P01
         status: in-progress

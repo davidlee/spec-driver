@@ -3,8 +3,8 @@ id: IP-131-P01
 slug: "131-show_delta_phase_table_missing_objective_enrich_from_phase_file-phase-01"
 name: IP-131 Phase 01
 created: "2026-04-10"
-updated: "2026-04-10"
-status: in-progress
+updated: "2026-04-18"
+status: completed
 kind: phase
 plan: IP-131
 delta: DE-131
@@ -92,5 +92,5 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 - [x] Exit criteria satisfied (`just quickcheck` green)
 - [x] Verification evidence stored (IP coverage + notes)
-- [ ] Phase `completed` via `spec-driver phase complete` when user ready to close execution slice
-- [ ] Hand-off: `/audit-change` / complete delta when policy satisfied
+- [x] Phase `completed` via `spec-driver phase complete` when user ready to close execution slice
+- [x] Hand-off: `/audit-change` / complete delta when policy satisfied

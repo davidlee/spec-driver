@@ -3,15 +3,7 @@ name: execute-phase
 description: Mandatory execution skill for any delta/IP implementation phase. Use it before code changes, move the owning delta to in-progress, keep notes current, reconcile structured execution docs, and surface blockers early.
 ---
 
-This skill is mandatory for implementation work under a delta or implementation
-plan.
-
-Do not start coding, editing tests, or updating implementation docs for a
-delta/IP phase until you have entered through `/execute-phase`.
-
-If the delta still says `draft`, that is not harmless bookkeeping. Change it to
-`in-progress` before implementation continues so the lifecycle truth matches the
-actual state of work.
+If the delta still says `draft`, immediately change it to `in-progress` (`spec-driver edit delta DE-123 --status in-progress`).
 
 You are executing one phase of planned work.
 

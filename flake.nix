@@ -75,7 +75,7 @@
           nodejs_latest
 
           go
-          gomarkdoc
+          #gomarkdoc
 
           d2
         ];
@@ -145,7 +145,7 @@
 
               ## go
               go
-              gomarkdoc
+              #gomarkdoc
 
               ## diagrams
               d2

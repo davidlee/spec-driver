@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 try:
-  import yaml  # noqa: F401  # pylint: disable=unused-import
+  import yaml
 except ImportError as exc:
   msg = "PyYAML is required for spec tooling. Install with `pip install PyYAML`."
   raise SystemExit(
@@ -30,11 +30,28 @@ from .frontmatter_schema import (
 )
 
 
+class MarkdownLoadError(ValueError):
+  """Raised when a markdown file's frontmatter cannot be parsed."""
+
+
 def load_markdown_file(path: Path | str) -> tuple[dict[str, Any], str]:
-  """Load markdown file and extract frontmatter and content."""
+  """Load markdown file and extract frontmatter and content.
+
+  Raises:
+    MarkdownLoadError: if the file's YAML frontmatter cannot be parsed.
+      The original ``yaml.YAMLError`` is chained via ``__cause__``.
+  """
   path = Path(path)
   text = path.read_text(encoding="utf-8")
-  post = frontmatter.loads(text)
+  try:
+    post = frontmatter.loads(text)
+  except yaml.YAMLError as exc:
+    mark = getattr(exc, "problem_mark", None)
+    where = (
+      f" at line {mark.line + 1}, column {mark.column + 1}" if mark is not None else ""
+    )
+    detail = f"invalid YAML frontmatter in {path}{where}: {exc.__class__.__name__}"
+    raise MarkdownLoadError(detail) from exc
   frontmatter_data: dict[str, Any] = dict(post.metadata or {})
   body = post.content.lstrip("\n")
   if body and text.endswith("\n") and not body.endswith("\n"):

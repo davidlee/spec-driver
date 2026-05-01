@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from rich.console import Console
+
 from supekku.scripts.lib.blocks.delta import (
   DeltaRelationshipsValidator,
   extract_delta_relationships,
@@ -178,7 +180,10 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
       for phase_file in sorted(phases_dir.glob("*.md")):
         try:
           fm_data, _ = load_markdown_file(phase_file)
-        except (ValueError, OSError):
+        except (ValueError, OSError) as exc:
+          Console(stderr=True).print(
+            f"[yellow]WARNING:[/yellow] Skipping phase file: {exc}"
+          )
           continue
 
         # Prefer frontmatter when canonical fields are present (DR-106)

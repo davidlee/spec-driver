@@ -1086,6 +1086,112 @@ applies_to:
     assert "DE-100" not in result.stdout
 
 
+class ListDeltasMalformedFrontmatterTest(unittest.TestCase):
+  """VT-DR135-002: list deltas survives malformed YAML in a phase file (ISSUE-054)."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_well_formed_delta("DE-100", "Alpha feature")
+    self._create_delta_with_malformed_phase("DE-101", "Beta bugfix")
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_well_formed_delta(self, delta_id: str, name: str) -> None:
+    delta_dir = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
+    delta_dir.mkdir(parents=True, exist_ok=True)
+    (delta_dir / f"{delta_id}.md").write_text(
+      f"""---
+id: {delta_id}
+slug: {delta_id.lower()}_sample
+name: {name}
+created: '2026-03-01'
+updated: '2026-03-02'
+status: draft
+kind: delta
+applies_to:
+  specs: []
+  requirements: []
+---
+
+# {delta_id}
+""",
+      encoding="utf-8",
+    )
+
+  def _create_delta_with_malformed_phase(self, delta_id: str, name: str) -> None:
+    delta_dir = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / f"{delta_id}-sample"
+    phases_dir = delta_dir / "phases"
+    phases_dir.mkdir(parents=True, exist_ok=True)
+    (delta_dir / f"{delta_id}.md").write_text(
+      f"""---
+id: {delta_id}
+slug: {delta_id.lower()}_sample
+name: {name}
+created: '2026-03-01'
+updated: '2026-03-02'
+status: in-progress
+kind: delta
+applies_to:
+  specs: []
+  requirements: []
+---
+
+# {delta_id}
+""",
+      encoding="utf-8",
+    )
+    # A stray colon mid-value reproduces ISSUE-054's ScannerError.
+    (phases_dir / "phase-01.md").write_text(
+      """---
+id: IP-101-P01
+name: bad value: with: stray: colons
+kind: phase
+---
+
+# Phase 01
+""",
+      encoding="utf-8",
+    )
+
+  def _assert_no_python_traceback(self, result_text: str) -> None:
+    assert "Traceback" not in result_text
+    assert "ScannerError" not in result_text or "WARNING" in result_text
+    # The error class name may legitimately appear inside the friendly WARNING
+    # one-liner; it must not appear in a Rich traceback frame.
+    assert "── Traceback" not in result_text
+
+  def test_list_deltas_default_skips_bad_phase_with_friendly_warning(self) -> None:
+    result = self.runner.invoke(app, ["deltas", "--root", str(self.root)])
+    assert result.exit_code == 0, result.stderr
+    # Both deltas remain listed — the malformed phase does not poison its parent.
+    assert "DE-100" in result.stdout
+    assert "DE-101" in result.stdout
+    # Friendly diagnostic on stderr names the file and YAML location.
+    assert "WARNING" in result.stderr
+    assert "phase-01.md" in result.stderr
+    assert "invalid YAML frontmatter" in result.stderr
+    assert "line " in result.stderr
+    assert "column " in result.stderr
+    self._assert_no_python_traceback(result.stdout)
+
+  def test_list_deltas_json_keeps_stdout_clean(self) -> None:
+    result = self.runner.invoke(
+      app, ["deltas", "--root", str(self.root), "--json"]
+    )
+    assert result.exit_code == 0, result.stderr
+    # stdout must be valid JSON — Rich tracebacks or warnings would corrupt it.
+    parsed = yaml.safe_load(result.stdout)  # JSON is a YAML subset; parse is enough.
+    assert parsed is not None
+    # Friendly warning still goes to stderr.
+    assert "WARNING" in result.stderr
+    assert "phase-01.md" in result.stderr
+    self._assert_no_python_traceback(result.stdout)
+
+
 class ListDeltasRelationFilterTest(unittest.TestCase):
   """VT-085-002: --related-to, --relation, --refs on list deltas."""
 

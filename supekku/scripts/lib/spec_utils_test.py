@@ -8,9 +8,11 @@ import unittest
 from pathlib import Path
 
 import pytest
+import yaml
 
 from supekku.scripts.lib.core.frontmatter_schema import FrontmatterValidationError
 from supekku.scripts.lib.core.spec_utils import (
+  MarkdownLoadError,
   append_unique,
   dump_markdown_file,
   ensure_list_entry,
@@ -47,6 +49,38 @@ class SpecUtilsTestCase(unittest.TestCase):
 
     assert frontmatter == {"id": "SPEC-001", "name": "Example Spec", "kind": "spec"}
     assert body == "Body line\n---\nExtra body line\n"
+
+  def test_load_markdown_file_raises_friendly_error_on_malformed_yaml(self) -> None:
+    """VT-DR135-001: malformed YAML raises MarkdownLoadError with path + line/col."""
+    # Stray colon mid-value reproduces the ScannerError from ISSUE-054.
+    content = textwrap.dedent(
+      """
+            ---
+            id: SPEC-001
+            name: bad value: with: stray: colons
+            kind: spec
+            ---
+
+            Body
+            """,
+    ).lstrip("\n")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = Path(tmpdir) / "spec.md"
+      path.write_text(content, encoding="utf-8")
+
+      with pytest.raises(MarkdownLoadError) as excinfo:
+        load_markdown_file(path)
+
+    msg = str(excinfo.value)
+    assert "invalid YAML frontmatter" in msg
+    assert str(path) in msg
+    assert "line " in msg
+    assert "column " in msg
+    assert isinstance(excinfo.value.__cause__, yaml.YAMLError)
+    # MarkdownLoadError must remain a ValueError so existing call-site
+    # `except (ValueError, OSError)` clauses keep working.
+    assert isinstance(excinfo.value, ValueError)
 
   def test_dump_markdown_file_round_trip(self) -> None:
     """Test dump and reload round trip preserves content."""

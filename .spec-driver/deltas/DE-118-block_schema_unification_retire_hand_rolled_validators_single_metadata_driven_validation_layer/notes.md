@@ -1,1 +1,214 @@
 # Notes for DE-118
+
+## IP-118-P01 — Inventory & Baseline (2026-05-09)
+
+Pure discovery. No code changes. Outputs feed P02 mechanism work and P03 swap commits.
+
+Cross-references:
+- DR-118 §4 (Phase 2 ordering, ID-kwarg wrappers, pre-Phase-2 inventory tasks).
+- IP-118 §4 phase table.
+- `validate-baseline.txt` (sibling file).
+
+### TOC
+
+1. Validate baseline summary
+2. R7 pre-check: live `workflow.sessions` data
+3. Per-validator inventories
+   - 3.1 `RevisionBlockValidator`
+   - 3.2 `DeltaRelationshipsValidator`
+   - 3.3 `RelationshipsBlockValidator`
+   - 3.4 `VerificationCoverageValidator`
+   - 3.5 Plan trio: `PlanOverviewValidator`, `PhaseOverviewValidator`, `PhaseTrackingValidator`
+4. Findings that refine DR-118 §4
+5. P04 handover — OQ-NAMING-COLLISIONS sites
+6. Hand-off to IP-118-P02
+
+---
+
+## 1. Validate baseline summary
+
+Captured at `validate-baseline.txt` via `uv run spec-driver validate > … 2>&1`. Exit code 1.
+
+Content (8 audit-gate warnings + 2 lines of environment noise):
+
+- Lines 1–2: `Warning: spec-driver may need re-install (workflow.toml has 0.9.2, running 0.9.3).` — environment-version skew, not workflow-relevant. **Future commits may see these lines drift if `workflow.toml` is bumped or local install is refreshed; treat the install-skew lines as noise during diff.**
+- Lines 3–10: 8× `ValidationIssue(level='warning', message='Audit gate is required but no completed conformance audit found', artifact=DE-XXX)` for DE-135, DE-138, DE-140, DE-141, DE-139, DE-142, DE-137, DE-136. These match the audit-gate pattern documented in `mem.pattern.validation.warning-triage` (cause: `applies_to.requirements` populated, no conformance audit yet). Pre-existing state — DE-118 introduces none of them.
+
+Regression rule for P02–P04: every commit should produce an identical 8-warning baseline (modulo install-skew noise). Any new warning is a P02/P03 regression and must be diagnosed before the commit lands.
+
+## 2. R7 pre-check — `workflow.sessions` vs `_SESSION_ENTRY`
+
+**Outcome: vacuous.** No live `workflow.sessions` block instances exist anywhere in this repo.
+
+Method:
+
+```
+rg -l "supekku:workflow\.sessions"
+```
+
+Result: only `supekku/scripts/lib/blocks/sessions_schema.py` (the module that *defines* the schema/marker) and `supekku/scripts/lib/blocks/workflow_metadata.py` (re-export). **Zero consumer documents.**
+
+Also checked: `.spec-driver/run/sessions/` — directory does not exist. `.spec-driver/run/` contains only `events.jsonl` and `pylint`.
+
+Implication for P02/P03:
+
+- R7 risk (`_entry_shape` migration introducing new enforcement that breaks live data) is **not realisable in this repo** today. The migration cannot break what does not exist.
+- Acceptance criterion for P03 sessions swap: regression-test corpus must include synthetic blocks (positive + negative cases against `_SESSION_ENTRY`) since there is no live data to drive empirical coverage.
+- Drift implication: if/when consumer repos start emitting `workflow.sessions` blocks, the strict `additional_properties=_SESSION_ENTRY` semantics will apply at first contact. Worth noting in IMPR-035 (already covers `workflow.*` deferral generally) — no separate drift entry needed.
+
+`_SESSION_ENTRY` shape (`sessions_schema.py:13-39`):
+
+| Key            | Type   | Required | Notes                                            |
+| -------------- | ------ | -------- | ------------------------------------------------ |
+| `session_name` | string | yes      | "(string or null)" per docstring                 |
+| `sandbox`      | string | no       |                                                  |
+| `status`       | enum   | yes      | values from `SESSION_STATUS_VALUES`              |
+| `last_seen`    | string | yes      | ISO 8601 or null per docstring                   |
+
+Currently wired via the `_entry_shape` sentinel at `sessions_schema.py:88`. Phase 4 cleanup replaces the sentinel with `additional_properties=_SESSION_ENTRY` — a P04 task, not P02/P03.
+
+## 3. Per-validator inventories
+
+Methodology: ripgrep across `supekku/`, `.spec-driver/`, project root for class name, `__all__`, instantiation calls, type annotations, test fixtures. Cross-checked against DR-118 §4. Each completeness assertion: "no other instantiation site found across `supekku/` and project root."
+
+### 3.1 `RevisionBlockValidator`
+
+- **Class**: `supekku/scripts/lib/blocks/revision.py:362`. Constructor: implicit (no `__init__`). `validate(self, data: dict[str, Any]) -> list[ValidationMessage]` — note: takes a raw dict, not a parsed Block; no ID-equality kwarg.
+- **`__all__` / re-exports**:
+  - `blocks/revision.py:1059` (origin module).
+  - `changes/blocks/__init__.py:48` (import) and `:57` (re-export). Confirmed by DR-118 §3.
+- **External call sites** (instantiations only, excluding tests):
+  - `requirements/sync.py:15` (import) → `:211` (`validator = RevisionBlockValidator()` inside `_apply_revision_blocks`).
+  - `changes/updater.py:8` (import) → `:135` (`validator = RevisionBlockValidator()` inline).
+  - **Both invoke `validator.validate(data)` with a single positional arg.** No ID kwargs, no cross-block external state.
+- **Test-fixture sites**:
+  - `blocks/revision_test.py` — 3 instantiations (lines 56, 66, 88). Existing test suite for the hand-rolled validator.
+  - `blocks/revision_metadata_test.py` — 1 instantiation (line 40). **Parallel-test file already exists** — confirms the established pattern. P03 swap can keep the metadata-test file and delete `revision_test.py` after equivalence is proved.
+- **External-state coupling**: none. No parent-context ID checks. **Direct swap candidate.**
+- **Completeness assertion**: rg of `RevisionBlockValidator` across `supekku/` + project root matches the 5 production references above + 4 test references. No others.
+
+### 3.2 `DeltaRelationshipsValidator`
+
+- **Class**: `supekku/scripts/lib/blocks/delta.py:28`. Constructor: implicit. `validate(self, block: DeltaRelationshipsBlock, *, delta_id: str | None = None) -> list[str]`. ID-equality check at `delta.py:48-53`: errors when `data["delta"]` ≠ `delta_id`.
+- **`__all__` / re-exports**:
+  - `blocks/delta.py:171` (origin module).
+  - **No re-export** in `changes/blocks/__init__.py` for this name — Phase 3 cleanup of `__init__.py` does not need to remove a `DeltaRelationshipsValidator` line. (DR-118 §3 only listed `RevisionBlockValidator` for the re-export removal.)
+- **External call sites**:
+  - `changes/artifacts.py:11` (import) → `:122` — direct: `DeltaRelationshipsValidator().validate(block, delta_id=artifact_id)`. **Uses `delta_id` kwarg.**
+  - `requirements/registry.py:240` (lazy import inside method) → `:243` — `delta_validator = DeltaRelationshipsValidator()` then passed into `_apply_delta_relations(..., validator=delta_validator)` (`registry.py:248-251`).
+  - `requirements/sync.py:11` (import) → `:132` — **type annotation** in `_apply_delta_relations(..., *, validator: DeltaRelationshipsValidator)`. The actual `validate(...)` call is at `sync.py:171`: `validator.validate(block, delta_id=delta_id)`. **Uses `delta_id` kwarg.**
+  - DR-118 §3 missed the `requirements/sync.py:132` annotation. Negligible — annotation follows the instantiation site automatically — but the P03 swap commit message must enumerate the full set: `artifacts.py:122`, `registry.py:243`, `sync.py:11/132/171`.
+- **Test-fixture sites**:
+  - `blocks/delta_metadata_test.py:29` — 1 instantiation. **Parallel-test file already exists.**
+  - No `blocks/delta_test.py` for the hand-rolled class; the metadata-parallel test is the only test artifact. (`delta_render_test.py` is a renderer test, separate concern.)
+- **External-state coupling**: `delta_id` kwarg drives an ID-equality check that `MetadataValidator` cannot express. **Wrapper helper required** per DR-118 §4. Proposed signature: `validate_delta_relationships(block, *, delta_id: str | None = None) -> list[str]` — internally calls `MetadataValidator(DELTA_RELATIONSHIPS_METADATA, strict_unknown_keys=True).validate(block.data)` then layers the `delta_id` equality check (extracted from `delta.py:48-53`).
+- **Completeness assertion**: rg matches the 4 production sites above + 3 test references. No others.
+
+### 3.3 `RelationshipsBlockValidator`
+
+- **Class**: `supekku/scripts/lib/blocks/relationships.py:32`. Constructor: implicit. `validate(self, block: RelationshipsBlock, *, spec_id: str | None = None) -> list[str]`. ID-equality check at `relationships.py:54-58`: errors when `data["spec"]` ≠ `spec_id`.
+- **`__all__` / re-exports**:
+  - `blocks/relationships.py:273` (origin module).
+  - No re-export for the validator under `changes/blocks/__init__.py`. The module also exports unrelated `render_spec_capabilities_block` etc.
+  - `specs/__init__.py:21,40` re-exports `RELATIONSHIPS_MARKER as SPEC_RELATIONSHIPS_MARKER` (separate concern; see §5).
+- **External call sites**:
+  - `requirements/registry.py:12` (import) → `:162` — `relationships_validator = RelationshipsBlockValidator()` then passed into `_apply_spec_relationships(..., validator=relationships_validator)` (`registry.py:236`).
+  - `requirements/sync.py` — `_apply_spec_relationships` body at `:253` accepts `validator: Any` (note: typed as `Any`, **not** `RelationshipsBlockValidator`; this is asymmetric with the `DeltaRelationshipsValidator` annotation in the same file). Calls `validator.validate(block, spec_id=spec_id)` at `:273`. **Uses `spec_id` kwarg.**
+  - DR-118 §3 listed `requirements/registry.py:162` as the only external site, which is technically true — `sync.py` only consumes the validator second-hand via an `Any`-typed parameter.
+- **Test-fixture sites**:
+  - **No parallel `relationships_metadata_test.py` exists yet.** Gap from the established pattern. P03 commit for this validator must add the parallel-test corpus first (≥1 commit before swap, ideally same commit but separable for review hygiene).
+  - No standalone `blocks/relationships_test.py` either. Coverage of this validator in this repo is thin — likely mostly via integration through `requirements/registry.py` callers. **Risk**: P03 swap for this validator has the weakest unit-test safety net of the seven; lean harder on the snapshot-compare harness.
+- **External-state coupling**:
+  - `spec_id` kwarg → ID-equality check, same wrapper-helper pattern as DeltaRelationships (`validate_spec_relationships`).
+  - **DR-118 §3 also calls for a `validate_spec_capabilities` wrapper.** That phrasing is misleading: `spec.capabilities` (`relationships.py:303-312` `register_block_schema("spec.capabilities", …)`) is **already metadata-only** — there is no hand-rolled validator class for it. The "wrapper" for capabilities is just a convenience surface for callers who want a single import — `MetadataValidator(SPEC_CAPABILITIES_METADATA, strict_unknown_keys=True).validate(...)` is functionally complete on its own. Recommendation: P03 should ship `validate_spec_capabilities` as a thin alias for caller ergonomics, but it carries no ID-equality logic and has no hand-rolled validator to retire.
+- **Completeness assertion**: rg matches the 2 production sites above + 0 unit-test references. No others.
+
+### 3.4 `VerificationCoverageValidator`
+
+- **Class**: `supekku/scripts/lib/blocks/verification.py:43`. Constructor: implicit. `validate(self, block: VerificationCoverageBlock, ...)` — no ID kwargs (DR-118 §4 claim verified).
+- **`__all__` / re-exports**:
+  - `blocks/verification.py:281` (origin module). No re-export elsewhere.
+- **External call sites**: **NONE.** All 25 references in the rg matches are inside `blocks/verification_test.py` and `blocks/verification_metadata_test.py`.
+- **Test-fixture sites**:
+  - `blocks/verification_test.py` — 25 instantiations across many test cases. The existing hand-rolled-validator test surface.
+  - `blocks/verification_metadata_test.py` — 1 instantiation (line 29). Parallel-test file present.
+- **External-state coupling**: none. **Foundational confirmation: DR-118 §4 ordering principle holds.** This is the safest P03 swap candidate — no ID kwargs, no external sites, dense unit-test coverage. Should be Phase 2 swap commit #1 per DR-118 §4 ordering.
+- **Completeness assertion**: rg matches 1 class def + 1 `__all__` + 25 test references = 27 total. No production callers.
+
+### 3.5 Plan trio — `PlanOverviewValidator`, `PhaseOverviewValidator`, `PhaseTrackingValidator`
+
+All three live in `supekku/scripts/lib/blocks/plan.py`.
+
+- **Classes**:
+  - `PlanOverviewValidator` at `plan.py:52`. `validate(self, block: PlanOverviewBlock) -> list[str]`. No ID kwargs.
+  - `PhaseOverviewValidator` at `plan.py:166`. `validate(self, block: PhaseOverviewBlock) -> list[str]`. No ID kwargs.
+  - `PhaseTrackingValidator` at `plan.py:235`. `validate(self, block: PhaseTrackingBlock) -> list[str]`. No ID kwargs.
+- **`__all__` / re-exports**: All three at `plan.py:667-671`. No re-exports elsewhere.
+- **External call sites**: **NONE for all three.** All references confined to `plan.py` (definitions) + the test files below.
+- **Test-fixture sites**:
+  - `blocks/plan_metadata_test.py` — covers `PlanOverviewValidator` (line 36) and `PhaseOverviewValidator` (line 354). Parallel-test file exists for these two.
+  - `blocks/tracking_test.py` — covers `PhaseTrackingValidator` only. **No parallel `tracking_metadata_test.py` exists.** Gap analogous to `RelationshipsBlockValidator`. P03 swap commit for the plan trio must either add a parallel-test fixture for tracking (preferred) or extend `plan_metadata_test.py` to cover all three.
+- **External-state coupling**: none for any of the three. **All three are pure structural validators**; metadata-driven swap is direct.
+- **DR-118 §3 grouping**: "PlanOverviewValidator + PhaseOverviewValidator + PhaseTrackingValidator (single commit)" — verified appropriate. All three share `plan.py`, none has external state, all retire together cleanly.
+- **Completeness assertion**: rg matches the class defs + `__all__` entries + test references only. No production callers.
+
+## 4. Findings that refine DR-118 §4
+
+Issues raised in P01 that should feed P03 commit-message authoring (not blockers):
+
+1. **`DeltaRelationshipsValidator` external-site enumeration omits `requirements/sync.py:132` type annotation** (and the actual `validate(...)` call at `sync.py:171`, reached via the parameter). DR-118 §3 said "external sites in `changes/artifacts.py:122` and `requirements/registry.py:243`" — incomplete. The full set is: `artifacts.py:122`, `registry.py:243`, `sync.py:11/132/171`. The P03 swap must update all five.
+2. **`validate_spec_capabilities` wrapper is convenience, not retirement.** No hand-rolled `SpecCapabilitiesValidator` class exists. P03 should land the wrapper as ergonomics, but the commit message should not frame it as a validator retirement.
+3. **`tracking_metadata_test.py` and `relationships_metadata_test.py` are missing.** The established parallel-test pattern is partially honoured. P03 commits for the plan trio and `RelationshipsBlockValidator` need to add (or extend an existing file) the metadata-validator parallel coverage **before** the swap, not as part of the swap commit. Two-step locally; can be one PR.
+4. **`changes/blocks/__init__.py:48,57` only carries `RevisionBlockValidator`.** DR-118 §3 mentions "re-export at `changes/blocks/__init__.py:48,57` removed" — that's accurate for `RevisionBlockValidator` and only that. No other validator class is re-exported through this shim. P04 cleanup of `__init__.py` is therefore confined to the revision-validator removal + accompanying `__all__` entry.
+
+These refinements live here; DR-118 itself does not need an amend pass since none of them invalidate a design decision. DR-118 §4 ordering and §9 risks remain correct.
+
+## 5. P04 handover — OQ-NAMING-COLLISIONS sites
+
+Enumerated opportunistically during inventory. Not exhaustive — focused on the two names DR-118 §3 called out.
+
+### `RELATIONSHIPS_MARKER`
+
+- `blocks/delta.py:15` — `"supekku:delta.relationships@v1"`
+- `blocks/relationships.py:15` — `"supekku:spec.relationships@v1"`
+
+Both names exported via the originating module's `__all__`. Disambiguated only at re-export shims:
+
+- `changes/blocks/__init__.py:23,60` — `RELATIONSHIPS_MARKER as DELTA_RELATIONSHIPS_MARKER`.
+- `specs/__init__.py:21,40` — `RELATIONSHIPS_MARKER as SPEC_RELATIONSHIPS_MARKER`.
+
+**Footgun**: a future `from supekku.scripts.lib.blocks.delta import RELATIONSHIPS_MARKER` and `from supekku.scripts.lib.blocks.relationships import RELATIONSHIPS_MARKER` in the same module would silently alias one over the other. Today's call sites all go through the disambiguated re-exports, so it works — but the names themselves remain colliding. P04 fix: rename the originating constants to `DELTA_RELATIONSHIPS_MARKER` and `SPEC_RELATIONSHIPS_MARKER` in their source modules; drop the aliasing re-exports.
+
+### `VALID_STATUSES`
+
+Four definitions with three distinct semantics:
+
+- `changes/lifecycle.py:20` — `set[ChangeStatus]` (delta/audit/revision lifecycle).
+- `requirements/lifecycle.py:14` — `set[RequirementStatus]`.
+- `blocks/verification.py:24` — `{"planned", "in-progress", "verified", "failed", "blocked"}` (verification-coverage statuses, inline literal).
+- (Plus `blocks/verification_metadata.py:16` imports `VALID_STATUSES` from… presumably one of the above.)
+
+Existing disambiguation pattern (already in code):
+
+- `supekku/cli/schema_test.py:441-447` — `VALID_STATUSES as VER_STATUSES / CHANGE_STATUSES / REQ_STATUSES`.
+- `spec_driver/orchestration/enums.py:20-30` — same alias pattern.
+
+**Footgun**: same as `RELATIONSHIPS_MARKER` — the colliding name leaks into any naïve `from … import VALID_STATUSES`. P04 fix: rename source constants to `CHANGE_STATUSES`, `REQUIREMENT_STATUSES`, `VERIFICATION_STATUSES` in their origin modules; drop the alias-on-import workarounds. **Larger blast radius than the marker rename** — touch every cli/orchestration import.
+
+P04 phase planning will scope and sequence this. Recording sites here so phase-04.md does not have to re-enumerate.
+
+## 6. Hand-off to IP-118-P02
+
+Inventory complete. P02 may begin.
+
+Pre-P02 checklist (from this inventory):
+
+- [x] All 7 retiring validators located and signature-confirmed.
+- [x] External call-site set for each: zero (5 of 7) or fully enumerated (2 of 7 require wrapper helpers).
+- [x] Parallel-test file presence audited; **2 gaps recorded** (`tracking_metadata_test.py`, `relationships_metadata_test.py`) for P03 to address before swap.
+- [x] Validate baseline captured; regression rule documented.
+- [x] R7 pre-check resolved as vacuous; synthetic-corpus requirement noted for P03 sessions swap.
+- [x] OQ-NAMING-COLLISIONS sites enumerated for P04.
+- [x] Refinements to DR-118 §3 / §4 captured (none invalidate the design).
+
+P02 entry: `MetadataValidator.strict_unknown_keys` constructor flag, `FieldMetadata.additional_properties`, Optional `BlockSchema.renderer`, snapshot-compare harness. No retirements yet.

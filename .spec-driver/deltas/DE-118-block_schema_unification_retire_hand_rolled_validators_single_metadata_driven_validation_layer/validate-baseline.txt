@@ -1,0 +1,10 @@
+Warning: spec-driver may need re-install (workflow.toml has 0.9.2, running 0.9.3).
+  Run: spec-driver install
+Issue: ValidationIssue(level='warning', message='Audit gate is required but no completed conformance audit found', artifact='DE-135')
+Issue: ValidationIssue(level='warning', message='Audit gate is required but no completed conformance audit found', artifact='DE-138')
+Issue: ValidationIssue(level='warning', message='Audit gate is required but no completed conformance audit found', artifact='DE-140')
+Issue: ValidationIssue(level='warning', message='Audit gate is required but no completed conformance audit found', artifact='DE-141')
+Issue: ValidationIssue(level='warning', message='Audit gate is required but no completed conformance audit found', artifact='DE-139')
+Issue: ValidationIssue(level='warning', message='Audit gate is required but no completed conformance audit found', artifact='DE-142')
+Issue: ValidationIssue(level='warning', message='Audit gate is required but no completed conformance audit found', artifact='DE-137')
+Issue: ValidationIssue(level='warning', message='Audit gate is required but no completed conformance audit found', artifact='DE-136')

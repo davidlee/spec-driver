@@ -3,8 +3,8 @@ id: IP-136-P01
 slug: "136-metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004-phase-01"
 name: IP-136 Phase 01 — Program kickoff and child-delta scoping
 created: "2026-05-05"
-updated: "2026-05-05"
-status: draft
+updated: "2026-05-09"
+status: completed
 kind: phase
 plan: IP-136
 delta: DE-136
@@ -30,22 +30,22 @@ DE-118 already exists and is the first dependency for Phase 2. This phase does n
 - [x] DE-136 in `draft` with §§3–8 reviewed against external review feedback
 - [x] DR-136 in `draft`, external adversarial review integrated (DEC-017)
 - [x] IP-136 phase overview locked (this plan)
-- [ ] DE-136 transitioned to `in-progress` (per `/execute-phase` entrance)
+- [x] DE-136 transitioned to `in-progress` (per `/execute-phase` entrance) — 2026-05-09
 
 ## 4. Exit Criteria / Done When
 
-- [ ] Placement tables in DR-136 §§4, 6, 7, 8, 9, 10 reviewed against current artefact reality; any new structural inconsistencies surfaced as DR amendments rather than carried forward into child deltas
-- [ ] Child delta IDs assigned for the six remaining child deltas and drafted (frontmatter only — full DR/IP/phase work is the child delta's own concern):
-  - Cross-cutting infrastructure (Y/Z/X + `validate file` + `validate --kind` + skill tuning + `admin migrate` orchestrator)
-  - Delta per-artefact propagation
-  - Spec per-artefact propagation
-  - Requirements-in-spec block-ification
-  - Audit per-artefact propagation
-  - Revision per-artefact propagation + `REVISION_FRONTMATTER_METADATA`
-- [ ] Each opened child delta's frontmatter includes a `relates_to: DE-136` relation citing this umbrella; `applies_to` scoped to the kind it owns; `audit_gate` set per DR-136 §13
-- [ ] `notes.md` in this delta directory contains the child-delta map: child ID → DR-136 § anchor → owner section → entry phase
-- [ ] Sequence verified against DR-136 DEC-004 (DE-118 → cross-cutting → delta → spec → requirements-in-spec → audit → revision → close); any sequencing change recorded in DR-136 DEC log
-- [ ] No new design questions opened that block Phase 2 entry; substantive new design problems route to `/draft-design-revision` per skill guidance, not absorbed silently
+- [x] Placement tables in DR-136 §§4, 6, 7, 8, 9, 10 reviewed against current artefact reality; structural inconsistencies surfaced as scope-notes (F-A..F-F) carried into the relevant child deltas — no DR amendment required this phase
+- [x] Child delta IDs assigned for the six remaining child deltas and drafted (frontmatter + summary):
+  - DE-137 — Cross-cutting infrastructure
+  - DE-138 — Delta per-artefact propagation
+  - DE-139 — Spec per-artefact propagation (incl. PROD per F-A)
+  - DE-140 — Requirements-in-spec block-ification
+  - DE-141 — Audit per-artefact propagation
+  - DE-142 — Revision per-artefact propagation + `REVISION_FRONTMATTER_METADATA`
+- [x] Each opened child delta's frontmatter includes `relates_to: DE-136`; `applies_to` scoped to the kind it owns; full DR/IP/phase authoring deferred to child's own work
+- [x] `notes.md` child-delta map populated with assigned IDs, DR-136 § anchors, sequence positions, and inherited scope-notes
+- [x] Sequence verified against DR-136 DEC-004; no sequencing change required
+- [x] No new design questions opened that block Phase 2 entry; F-A..F-F surfaced as scope-notes carried by child deltas, not silently absorbed
 
 ## 5. Verification
 
@@ -74,16 +74,16 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Status | ID | Description | Parallel? | Notes |
 |---|---|---|---|---|
-| [ ] | 1.1 | Review placement tables in DR-136 §§4, 6, 7, 8, 9, 10 against current `.spec-driver/**` reality | [ ] | Sample 2–3 real artefacts per kind; surface drift as DR amendments via `/draft-design-revision` |
-| [ ] | 1.2 | Confirm DE-118 scope and frontmatter aligns with DR-136 §11 migration boundary | [ ] | Read-only check; any rework is a Phase 2 entrance task |
-| [ ] | 1.3 | Scope and open cross-cutting child delta | [P] | Per `/scope-delta`; cite DE-136; entry phase: Phase 2 |
-| [ ] | 1.4 | Scope and open delta per-artefact child delta | [P] | Per `/scope-delta`; cite DE-136; DR-136 §6 anchor |
-| [ ] | 1.5 | Scope and open spec per-artefact child delta | [P] | Per `/scope-delta`; cite DE-136; DR-136 §7 anchor |
-| [ ] | 1.6 | Scope and open requirements-in-spec child delta | [P] | Per `/scope-delta`; cite DE-136; DR-136 §8 anchor |
-| [ ] | 1.7 | Scope and open audit per-artefact child delta | [P] | Per `/scope-delta`; cite DE-136; DR-136 §9 anchor |
-| [ ] | 1.8 | Scope and open revision per-artefact child delta | [P] | Per `/scope-delta`; cite DE-136; DR-136 §10 anchor |
-| [ ] | 1.9 | Write `notes.md` child-delta map | [ ] | Child IDs → DR anchors → owner sections → entry phase; updates IP-136 §4 phase rows with assigned IDs |
-| [ ] | 1.10 | Reconfirm sequence (DEC-004) and exit criteria; transition Phase 1 to `completed` | [ ] | After 1.1–1.9; `validate --strict` baseline check |
+| [x] | 1.1 | Review placement tables in DR-136 §§4, 6, 7, 8, 9, 10 against current `.spec-driver/**` reality | [ ] | Findings F-A..F-D recorded in `notes.md`; routed to relevant child delta scope-notes; no DR amendment required |
+| [x] | 1.2 | Confirm DE-118 scope and frontmatter aligns with DR-136 §11 migration boundary | [ ] | DE-118 stays in scope; F-E (Phase 2 entrance check on `MetadataValidator` strict-mode parameterisation), F-F (`REVISION_CHANGE_METADATA` shared additively) recorded |
+| [x] | 1.3 | Scope and open cross-cutting child delta | [P] | DE-137 created; carries F-B and F-E |
+| [x] | 1.4 | Scope and open delta per-artefact child delta | [P] | DE-138 created; first per-artefact precedent |
+| [x] | 1.5 | Scope and open spec per-artefact child delta | [P] | DE-139 created; carries F-A (PROD coverage) |
+| [x] | 1.6 | Scope and open requirements-in-spec child delta | [P] | DE-140 created |
+| [x] | 1.7 | Scope and open audit per-artefact child delta | [P] | DE-141 created; carries F-C and F-D |
+| [x] | 1.8 | Scope and open revision per-artefact child delta | [P] | DE-142 created; last in DEC-004 sequence |
+| [x] | 1.9 | Write `notes.md` child-delta map | [ ] | Map populated; IP-136 §4 phase rows updated with child IDs |
+| [x] | 1.10 | Reconfirm sequence (DEC-004) and exit criteria; transition Phase 1 to `completed` | [ ] | Validate baseline clean (8 audit-gate warnings on drafts; no errors); sequence DEC-004 unchanged |
 
 ### Task Details
 
@@ -134,15 +134,21 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 - `2026-05-05` — Phase 1 is coordination-only; no code changes. Sequencing follows DR-136 DEC-004 (DE-118 → cross-cutting → delta → spec → requirements-in-spec → audit → revision → close).
 - `2026-05-05` — Six child deltas (one cross-cutting + five per-artefact). DE-118 is the seventh, already drafted. Further decomposition only on demonstrated blast-radius pressure.
+- `2026-05-09` — Placement-table review (F-A): PROD has separate `PROD_FRONTMATTER_METADATA` not addressed by DR-136 §7; resolved via Option B — DE-139 (spec child delta) authors a PROD placement sub-table in its own DR-139, not a DR-136 amendment. Decision aligns with town-planner ceremony bias toward keeping umbrella DR scoped.
+- `2026-05-09` — F-B (relations `nature` vs `annotation` corpus drift): folded into DE-137 deliverable Z (alias autocorrect). Cross-cutting concern, not per-artefact.
+- `2026-05-09` — F-C/F-D (audit clarifications): folded into DE-141 scope. `audit_window` stays optional; per-finding outcome enum lives in block schema (not FM).
+- `2026-05-09` — F-E (DE-118 strict-mode coordination) — Phase 2 entrance check; not Phase 1 rework.
+- `2026-05-09` — Six new child deltas opened: DE-137 (cross-cutting), DE-138 (delta), DE-139 (spec+PROD), DE-140 (reqs-in-spec), DE-141 (audit), DE-142 (revision). All `status: draft`, `relates_to: DE-136`, frontmatter+summary populated; full DR/IP/phase authoring is each child's own work.
 
 ## 10. Findings / Research Notes
 
-- TBD during execution.
+- F-A..F-F findings captured in `../notes.md` (umbrella delta directory); inherited scope-notes documented in each child delta's §3 "Scope & Objectives".
+- Validation baseline at phase wrap: only audit-gate warnings on the eight draft deltas in flight (DE-135 + DE-136 + DE-137..DE-142). No errors. Matches expectation.
 
 ## 11. Wrap-up Checklist
 
-- [ ] All exit criteria satisfied
-- [ ] `notes.md` child-delta map written and IP-136 §4 phase rows updated with child IDs
-- [ ] `uv run spec-driver validate --strict` baseline matches expectation (only audit-gate warnings on draft deltas)
-- [ ] Phase status transitioned to `completed`
-- [ ] Hand-off note for Phase 2: DE-118 ready to land first; cross-cutting delta drafted and ready to enter its own phase work
+- [x] All exit criteria satisfied
+- [x] `notes.md` child-delta map written and IP-136 §4 phase rows updated with child IDs
+- [x] `uv run spec-driver validate` baseline matches expectation (only audit-gate warnings on draft deltas)
+- [x] Phase status transitioned to `completed`
+- [x] Hand-off note for Phase 2: DE-118 lands first; DE-137 (cross-cutting) lands second; both are Phase 2 entry conditions per IP-136 §4. F-E is the explicit entrance check before DE-137 begins (read DE-118's MetadataValidator strict-mode posture; if rejection landed unconditional, restore strict flag in DE-137's deliverable Z).

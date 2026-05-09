@@ -67,18 +67,34 @@ DE-136 itself names PROD-004, PROD-006, PROD-010 in `applies_to.specs`; PROD-004
 
 None require immediate `/draft-design-revision` per the Phase 1 STOP gate. All four findings translate to scope-notes carried by the relevant child delta. F-A is the closest to a DR amendment trigger; the recommendation defers it to spec child delta authoring.
 
+## Phase 1 — DE-118 alignment with §11 boundary (Task 1.2)
+
+**Verdict: aligned.** DE-118 lives entirely in application code (`validation/`, `core/frontmatter_metadata/`, `blocks/`); does not introduce `migrations/` package code. DR-136 §11.1's boundary (migration steps may not import `validation/`) is not violated because DE-118 produces no migration steps.
+
+### Coordination notes (Phase 2 entrance, not Phase 1 rework)
+
+- **F-E (Phase 2 entrance task): `MetadataValidator` strict-mode parameterisation.** DE-118 Phase 1 lands "unknown-key rejection on `MetadataValidator`" as a hard rule. DR-136 §5.2 (cross-cutting deliverable Z) requires `MetadataValidator.validate(strict: bool=False)` — loaders pass `strict=False`, `validate` CLI passes `strict=True`. If DE-118 lands unknown-key rejection unconditionally, loaders against unmigrated legacy artefacts may fail before per-artefact migrations run. Phase 2 entrance task: confirm DE-118 lands rejection behind a strict flag (or a permissive default) compatible with DR-136 §5.2's tolerant-on-read mode. If DE-118 closes with unconditional rejection, the cross-cutting child delta must restore the strict flag before per-kind sweeps begin.
+
+- **F-F (coordination, not blocking): `REVISION_CHANGE_METADATA` ownership.** DE-118 Phase 2 introduces `REVISION_CHANGE_METADATA` as the vehicle for retiring `RevisionBlockValidator`. DR-136 §10.2 (revision child delta) further enriches the same schema with `action` enum + conditional rules. Treat as additive: revision child delta extends, does not redefine. No re-work required in DE-118.
+
+### Outcome
+
+DE-118 stays in scope as drafted. F-E surfaces as a Phase 2 entrance check; F-F is a downstream coordination handoff. Neither blocks Phase 1 progression.
+
 ## Phase 1 — Child delta map (Task 1.9)
 
-_Populated after tasks 1.3–1.8._
+| Child delta ID | Scope summary | DR-136 § anchor | Sequence position | Entry phase | Inherited scope-notes |
+|---|---|---|---|---|---|
+| **DE-118** | Block validator unification — single `MetadataValidator` layer | §11.1 boundary | 1 (existing draft) | Phase 2 | F-E (Phase 2 entrance check on strict-mode parameterisation), F-F (REVISION_CHANGE_METADATA shared additively with DE-142) |
+| **DE-137** | Cross-cutting infrastructure: Y/Z/X + `validate file` + `validate --kind` + skill tuning + `admin migrate` orchestrator + `workflow.toml` schema | §5 + §11 | 2 | Phase 2 | F-B (relations `nature`/`annotation` alias in deliverable Z), F-E (restore strict flag if DE-118 lands rejection unconditionally) |
+| **DE-138** | Delta-kind metadata propagation: blocks for `context_inputs`/`risk_register`, `applies_to` derivation, `list deltas` enrichment, `v02_delta_blocks.py` | §6 | 3 | Phase 3 | — (first per-artefact precedent; sets pattern siblings inherit) |
+| **DE-139** | Spec-kind metadata propagation: tech SPEC + PROD blocks, taxonomy strict, `list specs` enrichment, `v03_spec_blocks.py` | §7 + F-A PROD extension | 4 | Phase 3 | F-A (PROD placement sub-table authored in DR-139 — PROD coverage is delta's responsibility, not umbrella's) |
+| **DE-140** | Requirements-in-spec block-ification: retire regex parser via `supekku:spec.requirements@v1`, interactive `admin migrate-requirements`, `v04_spec_requirements.py` | §8 | 5 | Phase 3 | — |
+| **DE-141** | Audit-kind metadata propagation: `findings` → block, per-finding strict outcome enum, `list audits` enrichment, `v05_audit_findings.py` | §9 | 6 | Phase 3 | F-C (`audit_window` stays optional), F-D (per-finding outcome enum lives in block, not FM) |
+| **DE-142** | Revision-kind metadata propagation: NEW `REVISION_FRONTMATTER_METADATA`, `supekku:revision.change@v1` action enum + conditional rules, `applies_to` derivation, `v06_revision_metadata.py` | §10 | 7 | Phase 3 | — (last; benefits from four precedents; F-F coordination with DE-118 noted in DE-118's inheritance) |
 
-| Child delta ID | Scope summary | DR-136 § anchor | Sequence position | Entry phase |
-|---|---|---|---|---|
-| DE-118 | Block validator unification | §11.1 boundary | 1 (existing) | Phase 2 |
-| (TBD) | Cross-cutting infrastructure (Y/Z/X + validate file + validate --kind + skill tuning + admin migrate orchestrator) | §5 | 2 | Phase 2 |
-| (TBD) | Delta per-artefact propagation | §6 | 3 | Phase 3 |
-| (TBD) | Spec per-artefact propagation (incl. PROD per F-A) | §7 | 4 | Phase 3 |
-| (TBD) | Requirements-in-spec block-ification | §8 | 5 | Phase 3 |
-| (TBD) | Audit per-artefact propagation | §9 | 6 | Phase 3 |
-| (TBD) | Revision per-artefact propagation + REVISION_FRONTMATTER_METADATA | §10 | 7 | Phase 3 |
+**Sequence verified against DR-136 DEC-004**: DE-118 → DE-137 (cross-cutting) → DE-138 (delta) → DE-139 (spec, incl. PROD) → DE-140 (reqs-in-spec) → DE-141 (audit) → DE-142 (revision) → DE-136 close.
 
-Inherited scope-notes (F-A..F-D) propagated into each child delta on creation.
+**No deviation from DEC-004.** All seven child deltas drafted as `status: draft` with `relates_to: DE-136`; full DR/IP/phase authoring is each child's own work when it enters its assigned DE-136 phase.
+
+**Validation baseline (Phase 1 task 1.10 evidence)**: `uv run spec-driver validate` reports only audit-gate warnings on draft deltas (DE-135, DE-136, DE-137..DE-142). No new errors. Matches phase-sheet expectation.

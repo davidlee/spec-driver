@@ -960,5 +960,206 @@ class FieldMetadataPersistenceTest(unittest.TestCase):
     assert field.default_value is None
 
 
+class FieldMetadataPostInitObjectShapeTest(unittest.TestCase):
+  """Object-type accepts properties OR additional_properties (DE-118 DEC-004)."""
+
+  def test_object_with_properties_only(self):
+    """Object type with only properties constructs (existing behaviour)."""
+    field = FieldMetadata(
+      type="object",
+      properties={"x": FieldMetadata(type="string")},
+    )
+    assert field.properties is not None
+    assert field.additional_properties is None
+
+  def test_object_with_additional_properties_only(self):
+    """Object type with only additional_properties constructs (DEC-004)."""
+    field = FieldMetadata(
+      type="object",
+      additional_properties=FieldMetadata(type="string"),
+    )
+    assert field.properties is None
+    assert field.additional_properties is not None
+
+  def test_object_with_both(self):
+    """Object type with both properties and additional_properties constructs."""
+    field = FieldMetadata(
+      type="object",
+      properties={"known": FieldMetadata(type="string")},
+      additional_properties=FieldMetadata(type="int"),
+    )
+    assert field.properties is not None
+    assert field.additional_properties is not None
+
+  def test_object_with_neither_raises(self):
+    """Object type without properties or additional_properties raises ValueError."""
+    with self.assertRaises(ValueError):
+      FieldMetadata(type="object")
+
+
+class AdditionalPropertiesValidationTest(unittest.TestCase):
+  """`additional_properties` validates dynamic-key entries (DE-118 DEC-004)."""
+
+  def test_additional_properties_accepts_matching_shape(self):
+    """Dynamic keys validated against additional_properties shape."""
+    metadata = BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "sessions": FieldMetadata(
+          type="object",
+          required=True,
+          additional_properties=FieldMetadata(
+            type="object",
+            properties={"status": FieldMetadata(type="string", required=True)},
+          ),
+        ),
+      },
+    )
+    validator = MetadataValidator(metadata)
+    errors = validator.validate(
+      {"sessions": {"alice": {"status": "active"}, "bob": {"status": "idle"}}},
+    )
+    assert errors == []
+
+  def test_additional_properties_rejects_shape_mismatch(self):
+    """Dynamic-key value of wrong shape produces a path-aware error."""
+    metadata = BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "sessions": FieldMetadata(
+          type="object",
+          required=True,
+          additional_properties=FieldMetadata(
+            type="object",
+            properties={"status": FieldMetadata(type="string", required=True)},
+          ),
+        ),
+      },
+    )
+    validator = MetadataValidator(metadata)
+    errors = validator.validate({"sessions": {"alice": {"status": 42}}})
+    assert len(errors) == 1
+    assert errors[0].path == "sessions.alice.status"
+
+  def test_additional_properties_combined_with_properties(self):
+    """Declared properties take precedence; extras validated against additional."""
+    metadata = BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "data": FieldMetadata(
+          type="object",
+          required=True,
+          properties={"known": FieldMetadata(type="string", required=True)},
+          additional_properties=FieldMetadata(type="int"),
+        ),
+      },
+    )
+    validator = MetadataValidator(metadata)
+    errors = validator.validate({"data": {"known": "hello", "extra": 42}})
+    assert errors == []
+
+  def test_additional_properties_combined_rejects_wrong_extra_type(self):
+    """Extras of wrong type rejected by additional_properties shape."""
+    metadata = BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "data": FieldMetadata(
+          type="object",
+          required=True,
+          properties={"known": FieldMetadata(type="string", required=True)},
+          additional_properties=FieldMetadata(type="int"),
+        ),
+      },
+    )
+    validator = MetadataValidator(metadata)
+    errors = validator.validate({"data": {"known": "ok", "extra": "not-int"}})
+    assert len(errors) == 1
+    assert errors[0].path == "data.extra"
+
+  def test_empty_dynamic_map_passes_silently(self):
+    """Empty data with additional_properties passes (DEC-004 documented behaviour)."""
+    metadata = BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "sessions": FieldMetadata(
+          type="object",
+          required=True,
+          additional_properties=FieldMetadata(type="string"),
+        ),
+      },
+    )
+    validator = MetadataValidator(metadata)
+    errors = validator.validate({"sessions": {}})
+    assert errors == []
+
+
+class StrictUnknownKeysTest(unittest.TestCase):
+  """`strict_unknown_keys` flag rejects undeclared keys (DE-118 DEC-001)."""
+
+  def _metadata(self) -> BlockMetadata:
+    return BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "name": FieldMetadata(type="string", required=True),
+        "nested": FieldMetadata(
+          type="object",
+          properties={"inner": FieldMetadata(type="string", required=True)},
+        ),
+      },
+    )
+
+  def test_default_lax_accepts_extra_top_level_key(self):
+    """Default behaviour (lax) accepts unknown top-level keys."""
+    validator = MetadataValidator(self._metadata())
+    errors = validator.validate({"name": "x", "extra": 1})
+    assert errors == []
+
+  def test_strict_rejects_extra_top_level_key(self):
+    """strict_unknown_keys=True rejects unknown top-level keys."""
+    validator = MetadataValidator(self._metadata(), strict_unknown_keys=True)
+    errors = validator.validate({"name": "x", "extra": 1})
+    assert len(errors) == 1
+    assert errors[0].path == "extra"
+    assert "unknown" in errors[0].message.lower()
+
+  def test_strict_accepts_known_keys(self):
+    """strict_unknown_keys=True does not regress on valid documents."""
+    validator = MetadataValidator(self._metadata(), strict_unknown_keys=True)
+    errors = validator.validate({"name": "x", "nested": {"inner": "ok"}})
+    assert errors == []
+
+  def test_strict_rejects_extra_key_at_nested_depth(self):
+    """strict_unknown_keys propagates through nested object recursion."""
+    validator = MetadataValidator(self._metadata(), strict_unknown_keys=True)
+    errors = validator.validate(
+      {"name": "x", "nested": {"inner": "ok", "rogue": 1}},
+    )
+    assert len(errors) == 1
+    assert errors[0].path == "nested.rogue"
+
+  def test_strict_with_additional_properties_accepts_matching_extras(self):
+    """strict_unknown_keys does not double-reject keys covered by additional."""
+    metadata = BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "sessions": FieldMetadata(
+          type="object",
+          required=True,
+          additional_properties=FieldMetadata(type="string"),
+        ),
+      },
+    )
+    validator = MetadataValidator(metadata, strict_unknown_keys=True)
+    errors = validator.validate({"sessions": {"alice": "active", "bob": "idle"}})
+    assert errors == []
+
+
 if __name__ == "__main__":
   unittest.main()

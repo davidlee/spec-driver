@@ -20,7 +20,7 @@ class FieldMetadata:
     pattern: Regex pattern for string validation
     const_value: Fixed value for const type
     enum_values: Allowed values for enum type
-    properties: Nested field metadata for object type
+    properties: Nested field metadata for object type (declared keys)
     items: Item metadata for array type
     description: Human-readable field description
     min_items: Minimum array length (for array type)
@@ -30,6 +30,10 @@ class FieldMetadata:
       absent/default), default-omit (omit when equal to default_value).
     default_value: Value that signals "omit during compaction" for
       optional/default-omit fields (e.g. [] for empty arrays).
+    additional_properties: Shape applied to keys not in `properties`
+      (object type). Combines with `properties` for hybrid declared-plus-
+      dynamic objects, or stands alone for fully dynamic-key maps. Object
+      type requires `properties`, `additional_properties`, or both.
   """
 
   type: str
@@ -44,6 +48,7 @@ class FieldMetadata:
   max_items: int | None = None
   persistence: str = "canonical"
   default_value: Any = None
+  additional_properties: FieldMetadata | None = None
 
   _VALID_PERSISTENCE = frozenset(
     {
@@ -81,8 +86,12 @@ class FieldMetadata:
       msg = "enum type requires enum_values"
       raise ValueError(msg)
 
-    if self.type == "object" and not self.properties:
-      msg = "object type requires properties"
+    if (
+      self.type == "object"
+      and not self.properties
+      and self.additional_properties is None
+    ):
+      msg = "object type requires properties or additional_properties"
       raise ValueError(msg)
 
     if self.type == "array" and not self.items:

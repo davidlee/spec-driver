@@ -49,10 +49,17 @@ class MetadataValidator:
     if errors:
       for error in errors:
         print(error)
+
+  When ``strict_unknown_keys=True``, the validator rejects any data key
+  not declared in ``metadata.fields`` (top level) or in the ``properties``
+  of an object-typed field (nested), unless an ``additional_properties``
+  shape is declared on the enclosing field. The flag propagates through
+  recursion via the instance attribute.
   """
 
-  def __init__(self, metadata: BlockMetadata):
+  def __init__(self, metadata: BlockMetadata, *, strict_unknown_keys: bool = False):
     self.metadata = metadata
+    self.strict_unknown_keys = strict_unknown_keys
 
   def validate(self, data: dict[str, Any]) -> list[ValidationError]:
     """Validate data against metadata.
@@ -78,6 +85,14 @@ class MetadataValidator:
 
     # Validate structure and types
     errors.extend(self._validate_fields(data, self.metadata.fields, ""))
+
+    # Top-level unknown-key pass (DEC-001). BlockMetadata has no
+    # ``additional_properties`` of its own (DEC-004), so unknown top-level
+    # keys are rejected only when strict.
+    if self.strict_unknown_keys:
+      for key in data:
+        if key not in self.metadata.fields:
+          errors.append(ValidationError(path=key, message="unknown key"))
 
     # Validate conditional rules
     if self.metadata.conditional_rules:
@@ -182,18 +197,7 @@ class MetadataValidator:
         )
 
     elif field_meta.type == "object":
-      if not isinstance(value, dict):
-        errors.append(
-          ValidationError(
-            path=field_path,
-            message="must be an object",
-            expected="object",
-            actual=type(value).__name__,
-          )
-        )
-      elif field_meta.properties:
-        # Recursively validate nested object
-        errors.extend(self._validate_fields(value, field_meta.properties, field_path))
+      errors.extend(self._validate_object(value, field_meta, field_path))
 
     elif field_meta.type == "array":
       if not isinstance(value, list):
@@ -230,6 +234,40 @@ class MetadataValidator:
             item_path = f"{field_path}[{idx}]"
             errors.extend(self._validate_field(item, field_meta.items, item_path))
 
+    return errors
+
+  def _validate_object(
+    self, value: Any, field_meta: FieldMetadata, field_path: str
+  ) -> list[ValidationError]:
+    """Validate an object-typed field (declared + additional/strict pass)."""
+    if not isinstance(value, dict):
+      return [
+        ValidationError(
+          path=field_path,
+          message="must be an object",
+          expected="object",
+          actual=type(value).__name__,
+        )
+      ]
+
+    errors: list[ValidationError] = []
+    declared: set[str] = set()
+    if field_meta.properties:
+      errors.extend(self._validate_fields(value, field_meta.properties, field_path))
+      declared = set(field_meta.properties)
+
+    # DEC-004: unknown keys route to additional_properties when declared,
+    # are rejected under strict_unknown_keys, or silently accepted otherwise.
+    for key in value:
+      if key in declared:
+        continue
+      sub_path = f"{field_path}.{key}" if field_path else key
+      if field_meta.additional_properties is not None:
+        errors.extend(
+          self._validate_field(value[key], field_meta.additional_properties, sub_path)
+        )
+      elif self.strict_unknown_keys:
+        errors.append(ValidationError(path=sub_path, message="unknown key"))
     return errors
 
   def _validate_conditional_rules(self, data: dict[str, Any]) -> list[ValidationError]:

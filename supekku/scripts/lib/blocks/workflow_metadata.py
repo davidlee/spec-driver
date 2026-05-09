@@ -116,7 +116,6 @@ from supekku.scripts.lib.blocks.notes_bridge_schema import (  # noqa: E402, F401
 )
 from supekku.scripts.lib.blocks.phase_bridge_schema import (  # noqa: E402, F401
   PHASE_BRIDGE_METADATA,
-  _placeholder_renderer,
 )
 from supekku.scripts.lib.blocks.review_findings_schema import (  # noqa: E402, F401
   REVIEW_FINDINGS_METADATA,
@@ -194,8 +193,8 @@ for _name, _marker, _ver, _desc, _meta in _WORKFLOW_SCHEMAS:
       name=_name,
       marker=_marker,
       version=_ver,
-      renderer=_placeholder_renderer,
       description=_desc,
+      renderer=None,
       metadata=_meta,
     ),
   )

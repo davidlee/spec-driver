@@ -9,12 +9,6 @@ from supekku.scripts.lib.blocks.workflow_metadata import (
   PHASE_STATUS_VALUES,
 )
 
-
-def _placeholder_renderer(**kwargs: object) -> str:  # noqa: ARG001
-  """Placeholder renderer for workflow schemas (real renderers in Phase 02+)."""
-  return ""
-
-
 PHASE_BRIDGE_METADATA = BlockMetadata(
   version=PHASE_BRIDGE_VERSION,
   schema_id=PHASE_BRIDGE_SCHEMA,

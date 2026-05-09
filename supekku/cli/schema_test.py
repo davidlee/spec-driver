@@ -130,6 +130,20 @@ class SchemaCommandsTest(unittest.TestCase):
     assert result.exit_code == 0
     assert "```yaml" in result.stdout or "Example:" in result.stdout
 
+  def test_show_schema_yaml_example_renderless_workflow_schema(self) -> None:
+    """Validate-only workflow.* schema (renderer=None) prints a friendly message."""
+    result = self.runner.invoke(
+      app,
+      ["show", "schema", "workflow.state", "--format", "yaml-example"],
+    )
+
+    assert result.exit_code == 0
+    assert (
+      "No example available" in result.stdout
+      or "validate-only" in result.stdout
+      or "```yaml" in result.stdout
+    )
+
   def test_show_unknown_block_type(self) -> None:
     result = self.runner.invoke(
       app,

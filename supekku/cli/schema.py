@@ -423,6 +423,13 @@ def _render_yaml_example(schema) -> None:
     return
 
   # Fall back to renderer-based approach for blocks without metadata
+  if schema.renderer is None:
+    console.print(
+      "[yellow]No example available: this schema is validate-only "
+      "(no renderer registered).[/yellow]",
+    )
+    return
+
   params = schema.get_parameters()
   args = []
   kwargs = {}

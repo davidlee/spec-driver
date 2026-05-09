@@ -13,13 +13,19 @@ if TYPE_CHECKING:
 
 @dataclass
 class BlockSchema:
-  """Schema information for a YAML block type."""
+  """Schema information for a YAML block type.
+
+  ``renderer`` is optional (``None`` for validate-only schemas, e.g.
+  workflow.* blocks that are never code-generated). When ``None``,
+  ``get_parameters()`` returns an empty dict and example fallbacks should
+  short-circuit before invoking the renderer.
+  """
 
   name: str  # e.g., "delta.relationships"
   marker: str  # e.g., "supekku:delta.relationships@v1"
   version: int  # e.g., 1
-  renderer: Callable[..., str]  # The rendering function
   description: str  # Human-readable description
+  renderer: Callable[..., str] | None = None
   metadata: BlockMetadata | None = field(default=None, repr=False)
 
   def get_parameters(self) -> dict[str, Any]:
@@ -30,7 +36,11 @@ class BlockSchema:
         - 'required': bool - whether parameter is required
         - 'type': type annotation or 'Any'
         - 'default': default value or None
+
+      Returns ``{}`` when the schema has no renderer.
     """
+    if self.renderer is None:
+      return {}
     sig = inspect.signature(self.renderer)
     params = {}
     for name, param in sig.parameters.items():

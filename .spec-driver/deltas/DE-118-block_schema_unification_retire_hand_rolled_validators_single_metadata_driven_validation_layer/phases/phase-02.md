@@ -48,7 +48,7 @@ Concretely, P02 ships:
 - [ ] `MetadataValidator(metadata, strict_unknown_keys=True)` rejects unknown keys at every nested-object depth; `MetadataValidator(metadata)` (default) preserves loose behaviour bit-for-bit on the existing test corpus.
 - [ ] `BlockSchema(renderer=None)` constructs; `get_parameters()` returns `{}`; `cli/schema.py` renderer fallback emits "no example available" (or equivalent) when `renderer is None` and prints no traceback.
 - [ ] `_placeholder_renderer` deleted; 7 workflow.* schemas register with `renderer=None`; `phase_bridge_schema.py:13` no longer defines the function; `workflow_metadata.py:119` no longer imports it.
-- [ ] `snapshot_compare.py` exists at `supekku/scripts/lib/blocks/metadata/snapshot_compare.py`; runnable via `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .`; reports zero disagreements against this repo's `.spec-driver/` corpus (all hand-rolled validators still active, so dual-validation must agree).
+- [ ] `snapshot_compare.py` exists at `supekku/scripts/lib/blocks/metadata/snapshot_compare.py`; runnable via `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .`; harness output catalogued in `notes.md` under a P02 closure section. **Zero-disagreement gate moved to P02.5** per DR-118 §2 premise correction (six of seven hand-rolled validators are lax on extras; metadata declarations need fidelity widening before zero-disagreement is meaningful — that is P02.5 work, not P02 work). 18 malformed-YAML files logged separately as drift / backlog (informational only at P02 close).
 - [ ] New unit tests added for: `additional_properties` semantics (5+ cases per DR-118 §5), `strict_unknown_keys` semantics (3+ cases), nested-object propagation (1+ case), renderer-Optional path (2 cases), harness self-tests (5 cases per DR-118 §5).
 - [ ] `just check` passes (lint + tests).
 - [ ] `uv run spec-driver validate` produces baseline-identical output (8 audit-gate warnings, modulo install-skew noise).
@@ -84,7 +84,7 @@ Concretely, P02 ships:
 ### STOP when
 
 - Any pre-existing test fails with default `strict_unknown_keys=False` after the validator change. Indicates the algorithm has not preserved loose behaviour. Escalate via `/consult`; do not proceed.
-- The harness reports a disagreement against this repo's `.spec-driver/` corpus before any retirement has shipped — implies metadata declaration drifted from hand-rolled behaviour pre-DE-118. Investigate and decide before proceeding (may surface a Phase 3 task or require a DR-118 amendment).
+- ~~The harness reports a disagreement against this repo's `.spec-driver/` corpus before any retirement has shipped~~ — **TRIGGERED 2026-05-09**. Resolved via `/consult`: DR-118 §2 premise (uniform hand-rolled rejection) was wrong; six of seven hand-rolled validators are lax on extras. Resolution: insert IP-118-P02.5 (declaration fidelity) between P02 and P03; harness gate moves to P02.5 close. P02 closes with disagreements catalogued, not zero.
 - A workflow.* renderer call site is found outside `cli/schema.py:438,440` — DR-118 §7 DEC-005's "no observable behaviour change" assumption breaks. Escalate.
 - `additional_properties` validator integration touches `_validate_fields` instead of staying scoped to `_validate_field` — design assumption violated; confirm before proceeding.
 

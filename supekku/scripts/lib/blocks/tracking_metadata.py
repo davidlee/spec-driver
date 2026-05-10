@@ -39,6 +39,87 @@ PHASE_TRACKING_METADATA = BlockMetadata(
       required=True,
       description="Phase ID (e.g., IP-001.PHASE-01)",
     ),
+    "status": FieldMetadata(
+      type="string",
+      required=False,
+      description="Phase lifecycle status (planned, in_progress, completed, blocked)",
+    ),
+    "started": FieldMetadata(
+      type="string",
+      required=False,
+      description="ISO date when work on this phase started",
+    ),
+    "completed": FieldMetadata(
+      type="string",
+      required=False,
+      description="ISO date when phase work completed",
+    ),
+    "last_updated": FieldMetadata(
+      type="string",
+      required=False,
+      description="ISO date of most recent update",
+    ),
+    "tasks_completed": FieldMetadata(
+      type="int",
+      required=False,
+      description="Number of tasks completed",
+    ),
+    "tasks_total": FieldMetadata(
+      type="int",
+      required=False,
+      description="Total number of tasks",
+    ),
+    "tasks_done": FieldMetadata(
+      type="int",
+      required=False,
+      description="Number of tasks marked done (legacy alias for tasks_completed)",
+    ),
+    "tasks_blocked": FieldMetadata(
+      type="int",
+      required=False,
+      description="Number of tasks currently blocked",
+    ),
+    "notes": FieldMetadata(
+      type="string",
+      required=False,
+      description="Free-text notes for the phase as a whole",
+    ),
+    "progress": FieldMetadata(
+      type="array",
+      required=False,
+      description="Timestamped progress log entries",
+      items=FieldMetadata(
+        type="object",
+        description="Progress entry",
+        properties={
+          "timestamp": FieldMetadata(
+            type="string",
+            required=False,
+            description="ISO timestamp for the entry",
+          ),
+          "task": FieldMetadata(
+            type="string",
+            required=False,
+            description="Task ID this entry refers to",
+          ),
+          "status": FieldMetadata(
+            type="string",
+            required=False,
+            description="Status at this point in time",
+          ),
+          "note": FieldMetadata(
+            type="string",
+            required=False,
+            description="Free-text note for this progress entry (singular form)",
+          ),
+          "notes": FieldMetadata(
+            type="string",
+            required=False,
+            description="Free-text note for this progress entry (plural-form alias)",
+          ),
+        },
+      ),
+    ),
     "files": FieldMetadata(
       type="object",
       required=False,
@@ -76,6 +157,11 @@ PHASE_TRACKING_METADATA = BlockMetadata(
             required=True,
             description="Whether criterion is satisfied",
           ),
+          "notes": FieldMetadata(
+            type="string",
+            required=False,
+            description="Free-text notes for this criterion",
+          ),
         },
       ),
     ),
@@ -96,6 +182,11 @@ PHASE_TRACKING_METADATA = BlockMetadata(
             type="bool",
             required=True,
             description="Whether criterion is satisfied",
+          ),
+          "notes": FieldMetadata(
+            type="string",
+            required=False,
+            description="Free-text notes for this criterion",
           ),
         },
       ),
@@ -123,6 +214,11 @@ PHASE_TRACKING_METADATA = BlockMetadata(
             enum_values=["pending", "in_progress", "completed", "blocked"],
             required=True,
             description="Task status",
+          ),
+          "notes": FieldMetadata(
+            type="string",
+            required=False,
+            description="Free-text notes for this task",
           ),
           "files": FieldMetadata(
             type="object",

@@ -1179,9 +1179,7 @@ kind: phase
     self._assert_no_python_traceback(result.stdout)
 
   def test_list_deltas_json_keeps_stdout_clean(self) -> None:
-    result = self.runner.invoke(
-      app, ["deltas", "--root", str(self.root), "--json"]
-    )
+    result = self.runner.invoke(app, ["deltas", "--root", str(self.root), "--json"])
     assert result.exit_code == 0, result.stderr
     # stdout must be valid JSON — Rich tracebacks or warnings would corrupt it.
     parsed = yaml.safe_load(result.stdout)  # JSON is a YAML subset; parse is enough.

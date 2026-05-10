@@ -115,8 +115,24 @@ DELTA_RELATIONSHIPS_METADATA = BlockMetadata(
             required=True,
             description="Phase ID (e.g., IP-001.PHASE-01)",
           ),
+          "goal": FieldMetadata(
+            type="string",
+            required=False,
+            description="Free-text phase goal (legacy authoring; prefer plan.overview)",
+          ),
+          "status": FieldMetadata(
+            type="string",
+            required=False,
+            description="Phase status (legacy authoring; prefer plan.overview)",
+          ),
         },
       ),
+    ),
+    "backlog_items": FieldMetadata(
+      type="array",
+      required=False,
+      description="Backlog item IDs related to this delta",
+      items=FieldMetadata(type="string", description="Backlog item ID"),
     ),
   },
   examples=[

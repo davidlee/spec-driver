@@ -37,10 +37,10 @@ requirements:
 interactions:
   - type: aligns_with
     spec: PROD-008
-    summary: Lifecycle semantics build on the coverage contract defined in PROD-008.
+    description: Lifecycle semantics build on the coverage contract defined in PROD-008.
   - type: depends_on
     spec: SPEC-122
-    summary: Requires registry lifecycle infrastructure to project effective status.
+    description: Requires registry lifecycle infrastructure to project effective status.
 ```
 
 ```yaml supekku:spec.capabilities@v1

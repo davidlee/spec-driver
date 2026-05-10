@@ -82,6 +82,11 @@ SPEC_RELATIONSHIPS_METADATA = BlockMetadata(
             required=False,
             description="Free-text notes about the interaction",
           ),
+          "description": FieldMetadata(
+            type="string",
+            required=False,
+            description="Free-text description of the interaction",
+          ),
         },
       ),
     ),

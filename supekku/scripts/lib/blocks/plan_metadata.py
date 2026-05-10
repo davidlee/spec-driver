@@ -135,6 +135,21 @@ PLAN_OVERVIEW_METADATA = BlockMetadata(
             description="Criteria that must be met to complete phase",
             items=FieldMetadata(type="string", description="Exit criterion"),
           ),
+          "status": FieldMetadata(
+            type="string",
+            required=False,
+            description="Phase lifecycle status (e.g., planned, completed)",
+          ),
+          "completion_date": FieldMetadata(
+            type="string",
+            required=False,
+            description="ISO date string when phase completed",
+          ),
+          "notes": FieldMetadata(
+            type="string",
+            required=False,
+            description="Free-text notes for the phase",
+          ),
         },
       ),
     ),
@@ -214,6 +229,16 @@ PHASE_OVERVIEW_METADATA = BlockMetadata(
       type="string",
       required=True,
       description="Delta ID this phase implements (e.g., DE-001)",
+    ),
+    "name": FieldMetadata(
+      type="string",
+      required=False,
+      description="Human-readable phase name",
+    ),
+    "status": FieldMetadata(
+      type="string",
+      required=False,
+      description="Phase lifecycle status",
     ),
     "objective": FieldMetadata(
       type="string",

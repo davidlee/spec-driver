@@ -212,3 +212,82 @@ Pre-P02 checklist (from this inventory):
 - [x] Refinements to DR-118 §3 / §4 captured (none invalidate the design).
 
 P02 entry: `MetadataValidator.strict_unknown_keys` constructor flag, `FieldMetadata.additional_properties`, Optional `BlockSchema.renderer`, snapshot-compare harness. No retirements yet.
+
+---
+
+## IP-118-P02.5 — Declaration Fidelity (2026-05-09)
+
+P02 harness surfaced 39 verdict disagreements (post-revert of the in-flight `interactions[].description` patch) — all in the direction `hand-rolled: PASS, metadata: FAIL`. DR-118 §2's premise (uniform hand-rolled rejection) was wrong for six of seven validators. Resolution: widen the affected `BlockMetadata` declarations to match the observed lax contract.
+
+### Pre-P02.5 baseline (after revert)
+
+| Block type | Disagreements |
+| --- | --- |
+| phase.tracking | 12 |
+| spec.relationships | 10 |
+| plan.overview | 8 |
+| phase.overview | 7 |
+| delta.relationships | 2 |
+| **Total** | **39** |
+
+Note: original `/consult` summary listed 5 `spec.capabilities` and 4 `verification.coverage` disagreements. These were actually malformed-YAML cases counted under the same files; once the harness output is filtered to true `DISAGREEMENT` records, neither block type has a real fidelity gap. Harness output structure separates `DISAGREEMENT` (verdict mismatch) from `MALFORMED` (YAML parse failure).
+
+### Patches landed
+
+- **`spec_metadata.py` — SPEC_RELATIONSHIPS_METADATA**: added `interactions[].description` (covered the 10 spec.relationships disagreements; PROD-009's two `interactions[].summary` cases were renamed to `description` in the artefact rather than widening the declaration further — one-off authoring drift).
+- **`delta_metadata.py` — DELTA_RELATIONSHIPS_METADATA**: added top-level `backlog_items` (array of strings); added `phases[].goal` and `phases[].status` (legacy authoring fields surfaced in DE-007).
+- **`plan_metadata.py` — PLAN_OVERVIEW_METADATA**: added `phases[].status`, `phases[].completion_date`, `phases[].notes`.
+- **`plan_metadata.py` — PHASE_OVERVIEW_METADATA**: added top-level `name` and `status`.
+- **`tracking_metadata.py` — PHASE_TRACKING_METADATA**:
+  - Top-level: `status`, `started`, `completed`, `last_updated`, `tasks_completed` (int), `tasks_total` (int), `tasks_done` (int), `tasks_blocked` (int), `notes`, `progress` (array of timestamped objects with `timestamp`/`task`/`status`/`note`/`notes`).
+  - `entrance_criteria[].notes` and `exit_criteria[].notes` (added for symmetry; only `exit_criteria[].notes` surfaces in real corpus).
+  - `tasks[].notes`.
+  - `progress[].notes` (plural-form alias for `progress[].note`; both observed in real corpus).
+
+### Artefact patches
+
+- `PROD-009.md`: renamed two `interactions[].summary` to `interactions[].description` (one-off authoring; widening the declaration for one artefact would normalise an idiosyncrasy rather than the contract).
+
+### Lint debt cleared (P02-territory but surfaced now)
+
+- `snapshot_compare.py:175` — split long function signature.
+- `snapshot_compare.py:292` — replaced `Path(".")` with `Path()` (PTH201).
+- `plan_metadata.py:141`, `tracking_metadata.py:45`, `tracking_metadata.py:75` — shortened long descriptions.
+
+### Final gate
+
+- `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` → **0 disagreements**.
+- `uv run ruff check supekku` → all checks passed.
+- `uv run python -m pytest supekku` → 4807 passed, 4 skipped.
+- `uv run spec-driver validate` → 8 audit-gate warnings (baseline-identical).
+
+### Malformed-YAML files (informational, not gating)
+
+The harness flags 18 files where YAML parse fails inside a known block marker. These are pre-existing data-quality bugs (backticks/unquoted scalars in YAML), unrelated to validator drift. Harness `Report.ok` ignores them per DEC-007's "verdict equivalence" framing — they will continue to fail YAML parsing regardless of which validator path runs them.
+
+Files (block type in brackets):
+
+- `.spec-driver/deltas/DE-021-kanban-card-support/IP-021.md` [verification.coverage]
+- `.spec-driver/deltas/DE-030-unit_vs_assembly_spec_classification/IP-030.md` [verification.coverage]
+- `.spec-driver/deltas/DE-033-memory_records_schema_and_command_surface/phases/phase-03.md` [phase.overview]
+- `.spec-driver/deltas/DE-033-memory_records_schema_and_command_surface/phases/phase-08.md` [phase.overview]
+- `.spec-driver/deltas/DE-039-workflow_command_surface_completion_and_strict_mode_lock_in/phases/phase-02.md` [phase.overview]
+- `.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-10.md` [phase.overview]
+- `.spec-driver/deltas/DE-055-tighten_skill_routing_and_boot_time_workflow_guidance/phases/phase-11.md` [phase.overview]
+- `.spec-driver/deltas/DE-058-govern_pylint_signal_and_document_lint_standard/IP-058.md` [plan.overview]
+- `.spec-driver/deltas/DE-058-govern_pylint_signal_and_document_lint_standard/IP-058.md` [verification.coverage]
+- `.spec-driver/deltas/DE-064-spec_driver_doctor_workspace_health_diagnostics/phases/phase-01.md` [phase.overview]
+- `.spec-driver/deltas/DE-071-cli_verb_noun_taxonomy_consistency_pass/IP-071.md` [verification.coverage]
+- `.spec-driver/deltas/DE-072-remove_installer_backward_compat_symlinks/phases/phase-02.md` [phase.overview]
+- `.spec-driver/deltas/DE-090-cli_relational_navigation_filters_show_output_and_cross_entity_queries/phases/phase-04.md` [phase.overview]
+- `.spec-driver/product/PROD-002/PROD-002.md` [spec.capabilities]
+- `.spec-driver/product/PROD-003/PROD-003.md` [spec.capabilities]
+- `.spec-driver/product/PROD-014/PROD-014.md` [spec.capabilities]
+- `.spec-driver/product/PROD-015/PROD-015.md` [spec.capabilities]
+- `.spec-driver/tech/SPEC-122/SPEC-122.md` [spec.capabilities]
+
+Recommendation: file as a single backlog issue ("Fix malformed YAML in 18 spec-driver block instances surfaced by snapshot harness") for separate triage. Not blocking any DE-118 work; not consumer-visible (every consumer repo's harness run will catch its own equivalent set).
+
+### Hand-off to IP-118-P03
+
+P02.5 fidelity landed; harness green; baseline-clean. P03 may begin per DR-118 §4 ordering — VerificationCoverageValidator first (zero external call sites; densest unit-test coverage; safest first swap).

@@ -11,6 +11,12 @@ __pycache__/
 *.so
 .claude/settings.local.json
 
+
+.gemini
+.codex
+.cursor
+*.tmp
+
 # Distribution / packaging
 .Python
 build/

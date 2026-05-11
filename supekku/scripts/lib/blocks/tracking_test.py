@@ -1,4 +1,9 @@
-"""Tests for phase tracking block parsing and validation (VT-PHASE-007)."""
+"""Tests for phase tracking block extraction and parsing (VT-PHASE-007).
+
+Validator-equivalence coverage now lives in ``tracking_metadata_test.py``
+(see DE-118 IP-118-P03 C2 retirement). This file retains extraction and
+integration-shape tests that exercise the parser only.
+"""
 
 from __future__ import annotations
 
@@ -9,7 +14,6 @@ from .plan import (
   TRACKING_SCHEMA,
   TRACKING_VERSION,
   PhaseTrackingBlock,
-  PhaseTrackingValidator,
   extract_phase_tracking,
 )
 
@@ -108,163 +112,7 @@ def test_extract_phase_tracking_handles_malformed_yaml() -> None:
     extract_phase_tracking(content)
 
 
-# Validation tests
-
-
-def test_validator_accepts_valid_tracking_block() -> None:
-  """Test validator passes for valid tracking block."""
-  content = _wrap_block(SAMPLE_VALID_TRACKING)
-  block = extract_phase_tracking(content)
-  assert block is not None
-
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert errors == []
-
-
-def test_validator_requires_schema_and_version() -> None:
-  """Test validator enforces schema and version fields."""
-  missing_schema = """version: 1
-phase: IP-004.PHASE-05
-tasks: []
-"""
-  content = _wrap_block(missing_schema)
-  block = extract_phase_tracking(content)
-  assert block is not None
-
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert any("schema" in err for err in errors)
-
-
-def test_validator_requires_phase_id() -> None:
-  """Test validator requires phase ID field."""
-  missing_phase = f"""schema: {TRACKING_SCHEMA}
-version: {TRACKING_VERSION}
-tasks: []
-"""
-  content = _wrap_block(missing_phase)
-  block = extract_phase_tracking(content)
-  assert block is not None
-
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert any("phase id" in err.lower() for err in errors)
-
-
-def test_validator_checks_criteria_structure() -> None:
-  """Test validator enforces criteria structure (item + completed)."""
-  invalid_criteria = f"""schema: {TRACKING_SCHEMA}
-version: {TRACKING_VERSION}
-phase: IP-004.PHASE-05
-entrance_criteria:
-  - item: "Valid item"
-    completed: true
-  - item: "Missing completed field"
-  - completed: true
-    # missing item field
-"""
-  content = _wrap_block(invalid_criteria)
-  block = extract_phase_tracking(content)
-  assert block is not None
-
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert len(errors) >= 2
-  assert any("entrance_criteria[1]" in err and "completed" in err for err in errors)
-  assert any("entrance_criteria[2]" in err and "item" in err for err in errors)
-
-
-def test_validator_checks_task_structure() -> None:
-  """Test validator enforces task structure (id, description, status)."""
-  invalid_tasks = f"""schema: {TRACKING_SCHEMA}
-version: {TRACKING_VERSION}
-phase: IP-004.PHASE-05
-tasks:
-  - id: "1"
-    description: "Valid task"
-    status: pending
-  - id: "2"
-    description: "Missing status"
-  - id: "3"
-    status: completed
-    # missing description
-"""
-  content = _wrap_block(invalid_tasks)
-  block = extract_phase_tracking(content)
-  assert block is not None
-
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert len(errors) >= 2
-  assert any("tasks[1]" in err and "status" in err for err in errors)
-  assert any("tasks[2]" in err and "description" in err for err in errors)
-
-
-def test_validator_enforces_task_status_enum() -> None:
-  """Test validator rejects invalid task status values."""
-  invalid_status = f"""schema: {TRACKING_SCHEMA}
-version: {TRACKING_VERSION}
-phase: IP-004.PHASE-05
-tasks:
-  - id: "1"
-    description: "Task with invalid status"
-    status: invalid_value
-"""
-  content = _wrap_block(invalid_status)
-  block = extract_phase_tracking(content)
-  assert block is not None
-
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert len(errors) >= 1
-  assert any("tasks[0].status" in err and "one of:" in err for err in errors)
-
-
-def test_validator_accepts_all_valid_statuses() -> None:
-  """Test validator accepts all valid task status values."""
-  valid_statuses = f"""schema: {TRACKING_SCHEMA}
-version: {TRACKING_VERSION}
-phase: IP-004.PHASE-05
-tasks:
-  - id: "1"
-    description: "Pending task"
-    status: pending
-  - id: "2"
-    description: "In progress task"
-    status: in_progress
-  - id: "3"
-    description: "Completed task"
-    status: completed
-  - id: "4"
-    description: "Blocked task"
-    status: blocked
-"""
-  content = _wrap_block(valid_statuses)
-  block = extract_phase_tracking(content)
-  assert block is not None
-
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert errors == []
-
-
-def test_validator_allows_empty_optional_fields() -> None:
-  """Test validator accepts minimal tracking block with only required fields."""
-  minimal = f"""schema: {TRACKING_SCHEMA}
-version: {TRACKING_VERSION}
-phase: IP-004.PHASE-05
-"""
-  content = _wrap_block(minimal)
-  block = extract_phase_tracking(content)
-  assert block is not None
-
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert errors == []
-
-
-# Integration test for completion calculation
+# Completion calculation tests (integration shape)
 
 
 def test_task_completion_calculation() -> None:
@@ -299,11 +147,11 @@ def test_criteria_completion_calculation() -> None:
   assert exit_completed == 0
 
 
-# File path tracking tests
+# File path tracking — extraction-only coverage
 
 
-def test_validator_accepts_phase_files() -> None:
-  """Test validator accepts optional phase-level file references."""
+def test_extract_phase_tracking_parses_phase_files() -> None:
+  """Phase-level files dict is parsed into the data payload."""
   with_files = f"""schema: {TRACKING_SCHEMA}
 version: {TRACKING_VERSION}
 phase: IP-004.PHASE-05
@@ -318,19 +166,14 @@ files:
   block = extract_phase_tracking(content)
   assert block is not None
 
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert errors == []
-
-  # Verify data parsed correctly
   files = block.data.get("files")
   assert files is not None
   assert len(files["references"]) == 2
   assert len(files["context"]) == 1
 
 
-def test_validator_accepts_task_files() -> None:
-  """Test validator accepts optional task-level file tracking."""
+def test_extract_phase_tracking_parses_task_files() -> None:
+  """Task-level files dict is parsed into the data payload."""
   with_task_files = f"""schema: {TRACKING_SCHEMA}
 version: {TRACKING_VERSION}
 phase: IP-004.PHASE-05
@@ -352,11 +195,6 @@ tasks:
   block = extract_phase_tracking(content)
   assert block is not None
 
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert errors == []
-
-  # Verify data parsed correctly
   tasks = block.data.get("tasks", [])
   assert len(tasks) == 1
   task_files = tasks[0].get("files")
@@ -365,43 +203,3 @@ tasks:
   assert len(task_files["modified"]) == 2
   assert len(task_files["removed"]) == 0
   assert len(task_files["tests"]) == 1
-
-
-def test_validator_rejects_invalid_phase_files() -> None:
-  """Test validator rejects malformed phase files field."""
-  invalid_files = f"""schema: {TRACKING_SCHEMA}
-version: {TRACKING_VERSION}
-phase: IP-004.PHASE-05
-files:
-  references: "not-an-array"
-"""
-  content = _wrap_block(invalid_files)
-  block = extract_phase_tracking(content)
-  assert block is not None
-
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert len(errors) >= 1
-  assert any("files.references" in err and "array" in err for err in errors)
-
-
-def test_validator_rejects_invalid_task_files() -> None:
-  """Test validator rejects malformed task files field."""
-  invalid_task_files = f"""schema: {TRACKING_SCHEMA}
-version: {TRACKING_VERSION}
-phase: IP-004.PHASE-05
-tasks:
-  - id: "5.1"
-    description: "Task"
-    status: pending
-    files:
-      added: "not-an-array"
-"""
-  content = _wrap_block(invalid_task_files)
-  block = extract_phase_tracking(content)
-  assert block is not None
-
-  validator = PhaseTrackingValidator()
-  errors = validator.validate(block)
-  assert len(errors) >= 1
-  assert any("tasks[0].files.added" in err and "array" in err for err in errors)

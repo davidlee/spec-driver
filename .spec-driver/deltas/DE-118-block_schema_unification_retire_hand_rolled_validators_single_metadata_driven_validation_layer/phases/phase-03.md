@@ -114,7 +114,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | Status | ID  | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
 | [x]    | 3.1 | **C1** — Retire `VerificationCoverageValidator` | no (sequencing) | Smallest blast radius; densest unit-test coverage. Landed: no production loader existed; pure delete. |
-| [ ]    | 3.2 | **C2** — Retire plan trio (`PlanOverviewValidator`, `PhaseOverviewValidator`, `PhaseTrackingValidator`) in one commit | no (after C1) | Includes `tracking_metadata_test.py` decision (extend `plan_metadata_test.py` vs new file). |
+| [x]    | 3.2 | **C2** — Retire plan trio (`PlanOverviewValidator`, `PhaseOverviewValidator`, `PhaseTrackingValidator`) in one commit | no (after C1) | New `tracking_metadata_test.py` created (matches `<source>_metadata_test.py` convention). Landed: no production callers existed for any of the three; pure delete. |
 | [ ]    | 3.3 | **C3** — Retire `DeltaRelationshipsValidator`; introduce `validate_delta_relationships` wrapper | no (after C2) | 3 external call sites; `sync.py:132` annotation must be migrated alongside `:171` callsite. |
 | [ ]    | 3.4 | **C4** — Retire `RelationshipsBlockValidator`; introduce `validate_spec_relationships` + `validate_spec_capabilities` (ergonomic) wrappers | no (after C3) | Create `relationships_metadata_test.py` (or sibling) — currently absent. |
 | [ ]    | 3.5 | **C5** — Retire `RevisionBlockValidator` and `_disallow_extra_keys` helper | no (after C4) | Largest blast radius: 2 external sites + `__all__` re-export removal. |
@@ -184,6 +184,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 - `2026-05-10` — **Harness lifecycle deferred** to P04. After C5, `HAND_ROLLED_ADAPTERS` is empty but the module remains runnable; OQ-HARNESS-LIFECYCLE settles in P04 alongside OQ-NAMING-COLLISIONS and `REVISION_BLOCK_JSON_SCHEMA` deletion.
 - `2026-05-10` — **`notes.md §4 finding 1`** flagged: P03 C3 commit must enumerate `requirements/sync.py:11/132/171` (annotation + call site) in addition to the DR-118 §3 sites.
 - `2026-05-11` — **C1 landed**: discovered `VerificationCoverageValidator` had no production callers (only tests + harness). Retirement reduced to class delete + test trim + adapter prune. DR-118 §4's "loader swap" framing was vacuous for this block; future swap commits must not assume a loader exists. Recorded in notes.md and §10.
+- `2026-05-11` — **C2 landed**: same observation — plan trio (`PlanOverviewValidator`, `PhaseOverviewValidator`, `PhaseTrackingValidator`) had **zero production callers**, confirming the §10 generalisation. Retirement = class delete + test conversion + adapter prune. Test placement: created new `tracking_metadata_test.py` (mirrors `tracking_metadata.py`); converted `plan_metadata_test.py` in place (mirrors `plan_metadata.py`); trimmed `tracking_test.py` to extraction + integration coverage only. R11 (test-file split asymmetry) resolved by the `<source>_metadata_test.py` mirror rule.
 
 ## 10. Findings / Research Notes
 
@@ -191,6 +192,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 - After C5, `snapshot_compare.py` becomes a metadata-only health check (the `HAND_ROLLED_ADAPTERS` map is empty; the harness still scans the corpus and reports `blocks_metadata_only` count). This is intentional — leaves the diagnostic infrastructure intact for future schema work without forcing a P04 deletion choice now.
 - Per `notes.md §3.3`, no standalone `blocks/relationships_test.py` exists. The hand-rolled `RelationshipsBlockValidator` was historically tested only via integration through `requirements/registry.py` callers. C4's new `relationships_metadata_test.py` therefore *adds* test coverage rather than replacing it. Net P03 effect: tightened unit-test surface for the relationships block.
 - **C1 finding** (2026-05-11): some retiring validators are pure test-fixture artefacts in production (zero instantiations, only tests + harness). DR-118 §4's "loader swap" framing assumes a production caller exists for each. For C2–C5, verify production callers exist before assuming a swap site — for those without callers, the retirement is delete-only.
+- **C2 finding** (2026-05-11): the plan trio reinforced the C1 pattern — all three classes (`PlanOverview`, `PhaseOverview`, `PhaseTracking`) had zero production callers. **Two of the first two swap commits, four of the seven retiring validators, had no production callers.** The C3–C5 inventory should re-verify (`RevisionBlockValidator` and `DeltaRelationshipsValidator` are confirmed to have callers per P01 §3.1, §3.2), but the pattern is now: validate production-caller existence first, then choose between delete-only and loader-swap-plus-wrappers shapes.
 
 ## 11. Wrap-up Checklist
 

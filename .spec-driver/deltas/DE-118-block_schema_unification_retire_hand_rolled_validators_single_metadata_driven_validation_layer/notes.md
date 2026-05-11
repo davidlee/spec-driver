@@ -320,3 +320,31 @@ This is good news for the retirement: removing dead code with no production call
 **Refinement to phase-03.md**: C1 task detail described a loader swap. In practice, no production loader exists. Future P03 phase sheets / commit messages should not assume every retirement has a production loader to swap — some classes (this one, at least) are pure test-fixture artefacts at the production boundary.
 
 **Next**: C2 (plan trio: PlanOverview + PhaseOverview + PhaseTracking).
+
+### C2 — Plan trio retired
+
+**Discovery, reinforces C1**: all three classes (`PlanOverviewValidator`, `PhaseOverviewValidator`, `PhaseTrackingValidator`) had **zero production callers** — confirmed by ripgrep of `supekku/` excluding tests + the harness. P01 §3.5 said "no external production sites" for the trio; C2 verified the inference. Same shape as C1: pure delete + test conversion + adapter prune. No "loader swap" anywhere.
+
+**Test placement decision** (resolves phase-03 §11 R11 for the plan trio): created new `tracking_metadata_test.py`. Rationale:
+- `tracking_metadata.py` is a separate file from `plan_metadata.py`; the test-file mirror should follow source-file boundaries.
+- `plan_metadata_test.py` was 906 lines pre-C2; absorbing PhaseTracking corpus would push past 1000.
+- Matches C1's `verification_metadata_test.py` precedent (one metadata module ↔ one metadata test file).
+- **Rule for C3–C5**: `<source>_metadata_test.py` mirrors `<source>_metadata.py`. No "extend or new" question if both source files exist.
+
+**Patches landed:**
+
+- `plan.py`: deleted `PlanOverviewValidator` (`:52–163`), `PhaseOverviewValidator` (`:166–232`), `PhaseTrackingValidator` (`:235–358`); removed 3 entries from `__all__` (`:667/669/671` pre-edit). Net: -312 LOC. The three `BlockSchema` registrations at `plan.py:691/703/715` (now lines `:379/391/403`) remain — block validation flows through `MetadataValidator(BLOCK_SCHEMAS[…].metadata, strict_unknown_keys=True)` via the harness and any future caller; no production call site required wiring changes because none exists.
+- `plan_metadata_test.py`: converted in place from dual-validation to MetadataValidator-only with `strict_unknown_keys=True`. Split structure preserved (`PlanMetadataValidationTest` + `PhaseMetadataValidationTest` + `PlanPhasesMetadataTest` + `JSONSchemaGenerationTest`). Added new `StrictModeBehaviourTest` with 3 strict-mode tests (unknown top-level key for plan, unknown phase-entry key for plan, unknown top-level key for phase). DEC-007 header comment per C1 convention.
+- `tracking_metadata_test.py`: **new file**. 23 tests across 5 classes (`TopLevelValidationTest`, `CriteriaValidationTest`, `TasksValidationTest`, `FilesValidationTest`, `StrictModeBehaviourTest`). Mirrors the negative branches of the retired `PhaseTrackingValidator` plus C1-pattern strict-mode coverage.
+- `tracking_test.py`: trimmed from 408 to 195 LOC. Dropped all `PhaseTrackingValidator()` instantiations (12 of them) and their tests; retained 9 extraction + completion-calculation tests. File header reframes the file as extraction-only and points readers to `tracking_metadata_test.py` for validation coverage.
+- `snapshot_compare.py`: removed `PhaseOverviewBlock` / `PhaseOverviewValidator` / `PhaseTrackingBlock` / `PhaseTrackingValidator` / `PlanOverviewBlock` / `PlanOverviewValidator` imports; deleted `_adapt_plan_overview`, `_adapt_phase_overview`, `_adapt_phase_tracking`; removed `"plan.overview"`, `"phase.overview"`, `"phase.tracking"` entries from `HAND_ROLLED_ADAPTERS`. `HAND_ROLLED_ADAPTERS` now contains 3 entries: `revision.change`, `delta.relationships`, `spec.relationships`.
+
+**Gate evidence:**
+
+- `uv run ruff check supekku` — all checks passed (one E501 fixed mid-flight in `plan_metadata_test.py:255`).
+- `uv run python -m pytest supekku` — 4802 passed, 4 skipped (+16 from the 4786 C1 baseline: +52 in `plan_metadata_test.py` net of -48 dual-validation, +23 in new `tracking_metadata_test.py`, -10 in `tracking_test.py` trim).
+- `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` — OK (zero disagreements). 191 blocks dual-validated (was ~701 at C1 close), 686 metadata-only (was 176). 510 blocks shifted from dual-validated to metadata-only — the plan trio's footprint across `.spec-driver/`.
+- `uv run spec-driver validate` — 8 audit-gate warnings + 2 install-skew lines = baseline-identical.
+- `uv run python -m supekku.scripts.pylint_report` on touched files: score 9.90/10, 7 messages — all pre-existing on `plan.py` (3× `too-many-arguments` and 1× `too-complex` on render functions; 3× `wrong-import-position` for the schema registration pattern with `# noqa: E402`). Zero new pylint debt from C2.
+
+**Next**: C3 (DeltaRelationshipsValidator + `validate_delta_relationships` wrapper; first commit with actual external call sites — 3 of them, plus the `requirements/sync.py:132` annotation surfaced in P01 §4).

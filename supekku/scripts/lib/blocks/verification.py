@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any
 import yaml
 
 from supekku.scripts.lib.blocks.yaml_utils import make_block_pattern
-from supekku.scripts.lib.core.artifact_ids import classify_artifact_id, is_kind
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -28,9 +27,6 @@ VALID_STATUSES = {"planned", "in-progress", "verified", "failed", "blocked"}
 # import sites and should be preferred for new code.
 VALID_COVERAGE_STATUSES = VALID_STATUSES
 
-# Valid subject kinds for verification coverage blocks
-VALID_SUBJECT_KINDS = {"spec", "prod", "plan", "audit"}
-
 
 @dataclass(frozen=True)
 class VerificationCoverageBlock:
@@ -38,126 +34,6 @@ class VerificationCoverageBlock:
 
   raw_yaml: str
   data: dict[str, Any]
-
-
-class VerificationCoverageValidator:
-  """Validator for verification coverage blocks."""
-
-  def validate(
-    self,
-    block: VerificationCoverageBlock,
-    *,
-    subject_id: str | None = None,
-  ) -> list[str]:
-    """Validate coverage block against schema.
-
-    Args:
-      block: Parsed coverage block to validate.
-      subject_id: Optional expected subject ID to match against.
-
-    Returns:
-      List of error messages (empty if valid).
-    """
-    errors: list[str] = []
-    data = block.data
-
-    # Validate schema and version
-    if data.get("schema") != COVERAGE_SCHEMA:
-      errors.append(
-        f"coverage block must declare schema {COVERAGE_SCHEMA}",
-      )
-    if data.get("version") != COVERAGE_VERSION:
-      errors.append(f"coverage block must declare version {COVERAGE_VERSION}")
-
-    # Validate subject
-    subject_value = str(data.get("subject", ""))
-    if not subject_value:
-      errors.append("coverage block missing subject id")
-    elif classify_artifact_id(subject_value) not in VALID_SUBJECT_KINDS:
-      errors.append(
-        f"subject '{subject_value}' does not match expected pattern "
-        "(SPEC|PROD|IP|AUD)-###",
-      )
-    elif subject_id and subject_value != subject_id:
-      errors.append(
-        f"coverage block subject {subject_value} does not match expected {subject_id}",
-      )
-
-    # Validate entries
-    entries = data.get("entries")
-    if not entries:
-      errors.append("coverage block missing entries")
-    elif not isinstance(entries, list):
-      errors.append("entries must be a list")
-    else:
-      for idx, entry in enumerate(entries):
-        if not isinstance(entry, dict):
-          errors.append(f"entry[{idx}] must be an object")
-          continue
-
-        # Validate artefact ID
-        artefact = entry.get("artefact")
-        if not artefact:
-          errors.append(f"entry[{idx}] missing artefact")
-        elif not isinstance(artefact, str):
-          errors.append(f"entry[{idx}] artefact must be a string")
-        elif not is_kind(artefact, "verification"):
-          errors.append(
-            f"entry[{idx}] artefact '{artefact}' does not match pattern V[TAH]-###",
-          )
-
-        # Validate kind
-        kind = entry.get("kind")
-        if not kind:
-          errors.append(f"entry[{idx}] missing kind")
-        elif not isinstance(kind, str):
-          errors.append(f"entry[{idx}] kind must be a string")
-        elif kind not in VALID_KINDS:
-          errors.append(
-            f"entry[{idx}] kind '{kind}' must be one of: "
-            f"{', '.join(sorted(VALID_KINDS))}",
-          )
-
-        # Validate requirement ID
-        requirement = entry.get("requirement")
-        if not requirement:
-          errors.append(f"entry[{idx}] missing requirement")
-        elif not isinstance(requirement, str):
-          errors.append(f"entry[{idx}] requirement must be a string")
-        elif not is_kind(requirement, "requirement"):
-          errors.append(
-            f"entry[{idx}] requirement '{requirement}' does not match "
-            "pattern (SPEC|PROD)-###.(FR|NFR)-...",
-          )
-
-        # Validate phase (optional)
-        phase = entry.get("phase")
-        if phase is not None:
-          if not isinstance(phase, str):
-            errors.append(f"entry[{idx}] phase must be a string")
-          elif not is_kind(phase, "phase"):
-            errors.append(
-              f"entry[{idx}] phase '{phase}' does not match pattern IP-###.PHASE-##",
-            )
-
-        # Validate status
-        status = entry.get("status")
-        if not status:
-          errors.append(f"entry[{idx}] missing status")
-        elif not isinstance(status, str):
-          errors.append(f"entry[{idx}] status must be a string")
-        elif status not in VALID_STATUSES:
-          errors.append(
-            f"entry[{idx}] status '{status}' must be one of: "
-            f"{', '.join(sorted(VALID_STATUSES))}",
-          )
-
-        # Validate notes (optional)
-        notes = entry.get("notes")
-        if notes is not None and not isinstance(notes, str):
-          errors.append(f"entry[{idx}] notes must be a string")
-
-    return errors
 
 
 _COVERAGE_PATTERN = make_block_pattern(COVERAGE_MARKER)
@@ -278,7 +154,6 @@ __all__ = [
   "VALID_KINDS",
   "VALID_STATUSES",
   "VerificationCoverageBlock",
-  "VerificationCoverageValidator",
   "extract_coverage_blocks",
   "load_coverage_blocks",
   "render_verification_coverage_block",

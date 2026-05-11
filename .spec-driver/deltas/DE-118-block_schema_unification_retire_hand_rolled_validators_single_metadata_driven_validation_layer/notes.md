@@ -291,3 +291,32 @@ Recommendation: file as a single backlog issue ("Fix malformed YAML in 18 spec-d
 ### Hand-off to IP-118-P03
 
 P02.5 fidelity landed; harness green; baseline-clean. P03 may begin per DR-118 §4 ordering — VerificationCoverageValidator first (zero external call sites; densest unit-test coverage; safest first swap).
+
+---
+
+## IP-118-P03 — Per-block migration (2026-05-11)
+
+### C1 — VerificationCoverageValidator retired
+
+**Discovery refining P01 inventory**: `VerificationCoverageValidator` has *zero production callers*. Beyond "no external sites with ID kwargs" (P01 §3.4 conclusion), the class itself is never instantiated in production code — only by tests and the snapshot harness. Production consumers (`requirements/coverage.py`, `changes/coverage_check.py`) use `load_coverage_blocks` for extraction only; no validation invocation. C1 therefore reduced to: delete class, trim tests, prune harness adapter map. No "loader swap" needed (DR-118 §4's framing of "Loader uses MetadataValidator(...)" is vacuous for this block — there was no loader).
+
+This is good news for the retirement: removing dead code with no production callers carries zero behaviour-change risk. The `subject_id` kwarg in the retired signature was similarly unused by any production caller (only `verification_test.py`'s `test_validator_with_subject_id_*` exercised it).
+
+**Patches landed:**
+
+- `verification.py`: deleted `VerificationCoverageValidator` class (`:43–160`); dropped `classify_artifact_id` import; dropped `VALID_SUBJECT_KINDS` constant (only the class referenced it); removed `"VerificationCoverageValidator"` from `__all__`. Net: -120 LOC.
+- `verification_test.py`: rewrote to retain only 6 extraction/load tests; deleted 25 hand-rolled-validator tests. Net: -370 LOC.
+- `verification_metadata_test.py`: converted from dual-validation to MetadataValidator-only with `strict_unknown_keys=True`. Split into three classes (`TopLevelValidationTest`, `EntryValidationTest`, `StrictModeBehaviourTest`, `MetadataDescriptorTest`) to stay under `too-many-public-methods` threshold. Added two new strict-mode tests (unknown top-level key, unknown entry key) documenting the strict path. Header comment per DEC-007 limitation.
+- `snapshot_compare.py`: removed `VerificationCoverageBlock` / `VerificationCoverageValidator` imports; deleted `_adapt_verification_coverage`; removed `"verification.coverage"` entry from `HAND_ROLLED_ADAPTERS`. Added docstrings to `Disagreement.{hand_rolled_passed,metadata_passed,render}`, `MalformedBlock.render`, `_print_report`, `main` to clear pre-existing pylint debt on a file I touched.
+
+**Gate evidence:**
+
+- `uv run ruff check supekku` — all checks passed.
+- `uv run python -m pytest supekku` — 4786 passed, 4 skipped (was 4807 before C1; -21 reflects 25 deleted validator tests + 2 added strict-mode tests + 1 ported entry-not-object test, minus dual-validation overhead consolidation).
+- `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` — OK (zero disagreements). 701 blocks dual-validated (was ~877), 176 blocks now counted as `metadata-only` (the 176 verification.coverage instances previously dual-validated now run metadata-only — as designed).
+- `uv run spec-driver validate` — 8 audit-gate warnings + 2 install-skew lines = baseline-identical.
+- `pylint-files` on touched files: 2 messages remaining (both `wrong-import-position` in `verification.py:164,165`, a repo-wide `# noqa: E402` pattern for schema registration; outside C1 scope).
+
+**Refinement to phase-03.md**: C1 task detail described a loader swap. In practice, no production loader exists. Future P03 phase sheets / commit messages should not assume every retirement has a production loader to swap — some classes (this one, at least) are pure test-fixture artefacts at the production boundary.
+
+**Next**: C2 (plan trio: PlanOverview + PhaseOverview + PhaseTracking).

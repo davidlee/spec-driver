@@ -3,8 +3,8 @@ id: IP-118-P03
 slug: "118-block_schema_unification_retire_hand_rolled_validators_single_metadata_driven_validation_layer-phase-03"
 name: IP-118 Phase 03
 created: "2026-05-10"
-updated: "2026-05-10"
-status: draft
+updated: "2026-05-11"
+status: in-progress
 kind: phase
 plan: IP-118
 delta: DE-118
@@ -113,7 +113,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Status | ID  | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ]    | 3.1 | **C1** — Retire `VerificationCoverageValidator` | no (sequencing) | Smallest blast radius; densest unit-test coverage. |
+| [x]    | 3.1 | **C1** — Retire `VerificationCoverageValidator` | no (sequencing) | Smallest blast radius; densest unit-test coverage. Landed: no production loader existed; pure delete. |
 | [ ]    | 3.2 | **C2** — Retire plan trio (`PlanOverviewValidator`, `PhaseOverviewValidator`, `PhaseTrackingValidator`) in one commit | no (after C1) | Includes `tracking_metadata_test.py` decision (extend `plan_metadata_test.py` vs new file). |
 | [ ]    | 3.3 | **C3** — Retire `DeltaRelationshipsValidator`; introduce `validate_delta_relationships` wrapper | no (after C2) | 3 external call sites; `sync.py:132` annotation must be migrated alongside `:171` callsite. |
 | [ ]    | 3.4 | **C4** — Retire `RelationshipsBlockValidator`; introduce `validate_spec_relationships` + `validate_spec_capabilities` (ergonomic) wrappers | no (after C3) | Create `relationships_metadata_test.py` (or sibling) — currently absent. |
@@ -183,12 +183,14 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 - `2026-05-10` — **`validate_spec_capabilities` scope** decided as ergonomic helper, not retirement. `spec.capabilities` is already metadata-only (no hand-rolled validator class exists per P01 §3.3); the wrapper exists for API symmetry with `validate_spec_relationships`. Wrapper docstring explicitly notes the asymmetry (no ID-equality check; `spec_id` parameter accepted but unused).
 - `2026-05-10` — **Harness lifecycle deferred** to P04. After C5, `HAND_ROLLED_ADAPTERS` is empty but the module remains runnable; OQ-HARNESS-LIFECYCLE settles in P04 alongside OQ-NAMING-COLLISIONS and `REVISION_BLOCK_JSON_SCHEMA` deletion.
 - `2026-05-10` — **`notes.md §4 finding 1`** flagged: P03 C3 commit must enumerate `requirements/sync.py:11/132/171` (annotation + call site) in addition to the DR-118 §3 sites.
+- `2026-05-11` — **C1 landed**: discovered `VerificationCoverageValidator` had no production callers (only tests + harness). Retirement reduced to class delete + test trim + adapter prune. DR-118 §4's "loader swap" framing was vacuous for this block; future swap commits must not assume a loader exists. Recorded in notes.md and §10.
 
 ## 10. Findings / Research Notes
 
 - Wrapper helpers are placed alongside metadata declarations (e.g. `delta_metadata.py`, `spec_metadata.py`) — keeps `MetadataValidator` pure (block-only) and avoids a new module. POL-003 boundary respected.
 - After C5, `snapshot_compare.py` becomes a metadata-only health check (the `HAND_ROLLED_ADAPTERS` map is empty; the harness still scans the corpus and reports `blocks_metadata_only` count). This is intentional — leaves the diagnostic infrastructure intact for future schema work without forcing a P04 deletion choice now.
 - Per `notes.md §3.3`, no standalone `blocks/relationships_test.py` exists. The hand-rolled `RelationshipsBlockValidator` was historically tested only via integration through `requirements/registry.py` callers. C4's new `relationships_metadata_test.py` therefore *adds* test coverage rather than replacing it. Net P03 effect: tightened unit-test surface for the relationships block.
+- **C1 finding** (2026-05-11): some retiring validators are pure test-fixture artefacts in production (zero instantiations, only tests + harness). DR-118 §4's "loader swap" framing assumes a production caller exists for each. For C2–C5, verify production callers exist before assuming a swap site — for those without callers, the retirement is delete-only.
 
 ## 11. Wrap-up Checklist
 

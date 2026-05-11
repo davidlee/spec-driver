@@ -48,10 +48,6 @@ from supekku.scripts.lib.blocks.relationships import (
 )
 from supekku.scripts.lib.blocks.revision import RevisionBlockValidator
 from supekku.scripts.lib.blocks.schema_registry import BLOCK_SCHEMAS, BlockSchema
-from supekku.scripts.lib.blocks.verification import (
-  VerificationCoverageBlock,
-  VerificationCoverageValidator,
-)
 from supekku.scripts.lib.blocks.yaml_utils import make_block_pattern
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 
@@ -75,11 +71,6 @@ def _adapt_spec_relationships(data: dict[str, Any], fid: str | None) -> list[str
   return RelationshipsBlockValidator().validate(block, spec_id=fid)
 
 
-def _adapt_verification_coverage(data: dict[str, Any], _fid: str | None) -> list[str]:
-  block = VerificationCoverageBlock(raw_yaml="", data=data)
-  return VerificationCoverageValidator().validate(block)
-
-
 def _adapt_plan_overview(data: dict[str, Any], _fid: str | None) -> list[str]:
   block = PlanOverviewBlock(raw_yaml="", data=data)
   return PlanOverviewValidator().validate(block)
@@ -101,7 +92,6 @@ HAND_ROLLED_ADAPTERS: dict[str, HandRolledAdapter] = {
   "revision.change": _adapt_revision,
   "delta.relationships": _adapt_delta_relationships,
   "spec.relationships": _adapt_spec_relationships,
-  "verification.coverage": _adapt_verification_coverage,
   "plan.overview": _adapt_plan_overview,
   "phase.overview": _adapt_phase_overview,
   "phase.tracking": _adapt_phase_tracking,
@@ -119,13 +109,16 @@ class Disagreement:
 
   @property
   def hand_rolled_passed(self) -> bool:
+    """True when the hand-rolled validator accepted the block."""
     return not self.hand_rolled_errors
 
   @property
   def metadata_passed(self) -> bool:
+    """True when the metadata-driven validator accepted the block."""
     return not self.metadata_errors
 
   def render(self) -> str:
+    """Render the disagreement as a human-readable multi-line string."""
     lines = [
       f"DISAGREEMENT: {self.file} [{self.block_type}]",
       f"  hand-rolled: {'PASS' if self.hand_rolled_passed else 'FAIL'}",
@@ -147,6 +140,7 @@ class MalformedBlock:
   reason: str
 
   def render(self) -> str:
+    """Render the malformed-YAML record as a single-line diagnostic string."""
     return f"MALFORMED: {self.file} [{self.block_type}]: {self.reason}"
 
 
@@ -261,6 +255,7 @@ def run(root: Path) -> Report:
 
 
 def _print_report(report: Report) -> None:
+  """Print a corpus run summary to stdout."""
   print(
     f"snapshot-compare: scanned {report.files_scanned} files, "
     f"{report.blocks_dual_validated} dual-validated, "
@@ -280,6 +275,7 @@ def _print_report(report: Report) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+  """CLI entrypoint: parse ``--root``, run the harness, print the report."""
   parser = argparse.ArgumentParser(
     prog="snapshot_compare",
     description="DE-118 dual-validate harness for block validators.",

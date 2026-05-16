@@ -55,7 +55,6 @@ VERIFICATION_COVERAGE_METADATA = BlockMetadata(
       description="List of verification coverage entries",
       items=FieldMetadata(
         type="object",
-        required=True,
         description="A single verification coverage entry",
         properties={
           "artefact": FieldMetadata(

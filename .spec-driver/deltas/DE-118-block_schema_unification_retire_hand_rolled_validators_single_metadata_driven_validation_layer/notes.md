@@ -495,6 +495,16 @@ This is good news for the retirement: removing dead code with no production call
 - **Pylint on touched files**: 9.98/10, 1 message (`duplicate-code` flagging similarity between the pre-existing `examples=[...]` block in `sessions_schema.py:84-89` and the test's `_minimal_valid()` fixture; not introduced by 4.2 — both shapes pre-existed).
 - **Full test suite**: 4843 passed (4837 → 4843; +6 new tests), 4 skipped, 0 failures (150s).
 
+### 4.3 — Drop `FieldMetadata.required` from `items` definitions
+
+- **AST-based inventory** (`items=FieldMetadata(...)` calls where `required=` is a direct kwarg of the inner `FieldMetadata`, not a nested-property declaration): **1 production site**. `supekku/scripts/lib/blocks/verification_metadata.py:58` carried `items=FieldMetadata(type="object", required=True, ...)`. The outer array already enforces `min_items=1`; the inner `required=True` is the semantically vacuous declaration DR-118 §4 Phase 3 row 4 flags.
+- **17 other `items=FieldMetadata` matches with `required=` substring** (raw grep): all were `properties={"field": FieldMetadata(..., required=True, ...)}` declarations inside the items' object shape — legitimate per-property requireds, not items-level. AST traversal correctly distinguished them.
+- **Zero test-file sites**: AST sweep across `*_test.py` found no `items=FieldMetadata(required=...)` direct-kwarg patterns; no tests assert on items-level required semantics.
+- **Files touched**: `supekku/scripts/lib/blocks/verification_metadata.py` (1 line removed).
+- **Harness verification**: `scanned 1657 files, 0 dual-validated, 877 metadata-only, OK (zero disagreements).`
+- **`spec-driver validate`**: byte-identical to baseline.
+- **Full test suite**: 4843 passed, 4 skipped, 0 failures (149s).
+
 
 ## New Agent Instructions
 

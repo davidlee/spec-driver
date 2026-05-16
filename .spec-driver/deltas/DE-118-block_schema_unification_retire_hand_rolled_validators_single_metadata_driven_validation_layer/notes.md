@@ -459,16 +459,17 @@ This is good news for the retirement: removing dead code with no production call
 
 ### Task card
 - **Active delta**: DE-118 — Block schema unification: retire hand-rolled validators.
-- **Active phase**: IP-118-P03 — Per-block migration (5 commits total).
-- **Status**: C1, C2, C3, C4 landed; **C5 is next**, then 3.6 wrap-up. P04 follows P03.
+- **Active phase**: IP-118-P03 — Per-block migration. **C1, C2, C3, C4, C5 landed.** Only task 3.6 wrap-up remains before P03 closes.
+- **Status**: 5/5 swap commits in. `HAND_ROLLED_ADAPTERS` is now empty. Worktree is clean at commit `2c5b7073`.
 - **Card path**: `.spec-driver/deltas/DE-118-block_schema_unification_retire_hand_rolled_validators_single_metadata_driven_validation_layer/DE-118.md`
 - **Phase sheet**: `phases/phase-03.md` (same bundle)
 - **Notes (you are here)**: `notes.md` (same bundle)
 
-### Required reading (before C5 begins)
-1. `phases/phase-03.md` §3.5 (C5 task detail), §6 (STOP conditions), §9 (decision log — especially the kwarg-collapse pattern recorded at 2026-05-16).
-2. `DR-118.md` §4 (C5 swap site + `_disallow_extra_keys` retirement), §5 (the 4 `REVISION_BLOCK_JSON_SCHEMA` regex-bug cases — explicit DR-118 requirement, **must** land in `revision_metadata_test.py`).
-3. This `notes.md` — C3 (§"C3 — DeltaRelationshipsValidator retired") and C4 (§"C4 — RelationshipsBlockValidator retired") sections establish the wrapper-shape + kwarg-collapse pattern; C5 should mirror.
+### Required reading (before 3.6 + P04)
+1. `phases/phase-03.md` §3.6 task detail (harness lifecycle options a/b/c — default is **a** = keep with empty map), §4 exit criteria (the still-unticked checkboxes), §11 wrap-up checklist.
+2. This `notes.md` C5 section (immediately above) — pin the wrapper signature divergence + zero-kwarg-collapse finding; future P04 work touches the same files.
+3. `IP-118.md` §9 progress tracking — the IP-level ledger that must show "IP-118-P03 complete" before the delta can roll to P04.
+4. `DR-118.md` §4 (P04 cleanup catalogue), §5 (transitional invariants — what stays true after P03 close), §8 OQ-HARNESS-LIFECYCLE + OQ-NAMING-COLLISIONS (P04 settles both).
 
 ### Related docs
 - `DE-118.md` (delta charter)
@@ -476,48 +477,56 @@ This is good news for the retirement: removing dead code with no production call
 - `validate-baseline.txt` (8-warning audit-gate baseline — **not** updated per DR-118 §5)
 - Parent umbrella: `.spec-driver/deltas/DE-136-.../DE-136.md`, `IP-136.md` (DE-118 is Phase 2 foundation for DE-136)
 
-### Key files for C5
-- `supekku/scripts/lib/blocks/revision.py:362+` — `RevisionBlockValidator` class to delete.
-- `supekku/scripts/lib/blocks/revision.py:350` — `_disallow_extra_keys` module helper to delete.
-- `supekku/scripts/lib/blocks/revision.py:1055` — `REVISION_BLOCK_JSON_SCHEMA` **stays** at C5 (deletion is P04).
-- `supekku/scripts/lib/blocks/revision.py:1059` — `__all__` entry to remove (RevisionBlockValidator).
-- `supekku/scripts/lib/blocks/revision_metadata.py` — wrapper landing site (mirror of C3/C4 pattern).
-- `supekku/scripts/lib/blocks/revision_metadata_test.py` — extend with the 4 regex-bug cases.
-- `supekku/scripts/lib/changes/blocks/__init__.py:48,57` — re-exports to remove.
-- `supekku/scripts/lib/requirements/sync.py:211` — production call site (in `_apply_revision_blocks`); per the §10 C3/C4 finding, also consider hoisting any inner import.
-- `supekku/scripts/lib/changes/updater.py:135` — production call site.
-- `supekku/scripts/lib/blocks/metadata/snapshot_compare.py` — drop `RevisionBlockValidator` import + `_adapt_revision` + `"revision.change"` key (this empties `HAND_ROLLED_ADAPTERS` entirely — phase-03 §3.6 wrap-up handles the harness-lifecycle decision).
+### Key files for 3.6 wrap-up
+- `IP-118.md` — §9 (or whichever section tracks phase status) needs IP-118-P03 ticked complete.
+- `notes.md` (this file) — P03 closure block listing 5/5 commit hashes + final harness state line.
+- No code changes expected for 3.6. If 3.6 spills into harness decommission (option b/c), that becomes P04 work, not 3.6.
+
+### Key files for P04 (when 3.6 is closed and you scope P04)
+- `supekku/scripts/lib/blocks/revision.py:28` — `REVISION_BLOCK_JSON_SCHEMA` deletion (4 regex bugs go with it). `revision.py:481-489` `__all__` and any `metadata_to_json_schema`-based consumer test must rebase.
+- `supekku/scripts/lib/blocks/revision_metadata_test.py::test_metadata_generates_json_schema` — survives the JSON Schema deletion because it generates from metadata, not from the buggy literal. Keep.
+- `supekku/scripts/lib/blocks/revision_metadata_test.py` — the 4 `test_regex_bug_*` tests are P04 regression guards; they prove the metadata path accepts canonical RE-/DE-/AUD- ids the deleted JSON Schema would have rejected.
+- `supekku/scripts/lib/blocks/metadata/snapshot_compare.py` — empty `HAND_ROLLED_ADAPTERS`, harness still runnable. P04 decides keep/decommission/repurpose per phase-03 §3.6.
+- `_entry_shape` — find the workflow.sessions-era placeholder; P01 §2 confirmed zero live data, so deletion is safe.
+- OQ-NAMING-COLLISIONS — `RELATIONSHIPS_MARKER` and `VALID_STATUSES` from notes.md §5 are the documented rename sites.
 
 ### Relevant memories
-- None DE-118-specific exist (last memory search returned only project-wide concepts). The `<source>_metadata_test.py` mirror rule is recorded in phase-03 §9 (2026-05-11 entry), not memory — consider capturing it via `/capturing-memory` if it survives DE-118 close.
+- None DE-118-specific exist. Two patterns worth capturing via `/capturing-memory` once DE-118 closes:
+  1. `<source>_metadata_test.py` mirror rule (phase-03 §9, 2026-05-11) — the test-file-placement convention that resolved R11.
+  2. Block-class taxonomy: `DeltaRelationshipsBlock` and `RelationshipsBlock` cache parsed `.data`; `RevisionChangeBlock` parses on demand via `.parse()`. The former is wrappable by-block; the latter must be wrapped by-data. Future block introductions should default to cached-`.data` shape unless mutation-cycle semantics genuinely require parse-on-demand.
 
 ### Relevant doctrine
-- `POL-003` — explicit module boundaries. Wrappers live in `*_metadata.py`, **never** in a new module; do not introduce a `migrations/` import path through `validation/`.
-- `STD-001` — Typer/Rich CLI standard (not directly C5-relevant, but applies if migrations CLI sneaks in).
+- `POL-003` — explicit module boundaries. Wrappers live in `*_metadata.py`; no new modules introduced through P03.
 - `STD-003` — utility module placement; reinforces wrapper-alongside-metadata convention.
-- CLAUDE.md: "If you edit a file with pre-existing warnings - it is not an excuse to add more." C3/C4 both reduced pylint debt on touched files; C5 should not regress.
+- CLAUDE.md: "If you edit a file with pre-existing warnings - it is not an excuse to add more." C3/C4/C5 all reduced pylint debt; P04 should continue the trend (pre-existing `revision → revision_metadata` cyclic-import warning is a candidate to retire by collapsing module split or breaking the constant dependency).
 
 ### User instructions & decisions to honour
-- Commit policy: small, frequent commits of `.spec-driver/**` and code together when natural (per project doctrine). C3 + C4 each shipped one combined commit; C5 should follow.
+- Commit policy: small, frequent combined commits of `.spec-driver/**` + code per project doctrine. The original C5 prompt scoped a single commit; future 3.6/P04 work should follow the same shape.
 - Wrappers go **alongside** the metadata declaration, never in a new module (phase-03 §10).
-- Kwarg-threading collapse pattern (no `validator=` kwarg on `_apply_*` helpers) — confirmed working for C3 + C4; apply to C5 unless real state needs threading.
-- Inner imports for new wrappers — hoist to module-top where doing so doesn't introduce a cycle (C4 precedent).
-- `del unused_param  # comment` is the canonical idiom for "arg accepted for API symmetry but not used" (C4 precedent for `validate_spec_capabilities`).
-- Commit messages — see C3 / C4 for the format. Subject: `feat(DE-118): retire <Validator> + introduce <wrapper> (P03 C<N>)`. Body enumerates retired classes, migrated call sites, harness shrinkage, gate evidence.
+- The `del unused_param  # comment` idiom for "API symmetry, no semantic" is the C4 precedent. C5 declined to use it because there was no symmetry benefit — be precise about *when* to invoke the pattern in P04.
+- Commit message format (P03 lineage): `feat(DE-118): retire <X> + <Y> (P03 C<N>)` for swaps; `chore(DE-118): close IP-118-P03 …` for the wrap-up if you choose to split 3.6 into its own commit (per phase-03 §3.6 message hint).
+- Do **not** update `validate-baseline.txt`. DR-118 §5 marks it as the immutable regression target through DE-118 close.
 
 ### Incomplete work / loose ends
-- **C5** — `RevisionBlockValidator` + `_disallow_extra_keys`. Largest blast radius of the 5 swaps. After C5, `HAND_ROLLED_ADAPTERS` is empty.
-- **3.6 wrap-up** — `notes.md` P03 closure section, `IP-118.md §9` tick. Harness final state recorded.
-- **P04** — `REVISION_BLOCK_JSON_SCHEMA` deletion, `_entry_shape` replacement, OQ-NAMING-COLLISIONS rename, OQ-HARNESS-LIFECYCLE settlement (decide whether to keep `snapshot_compare.py` as no-op infrastructure, decommission it, or repurpose as a metadata-only smoke test).
-- **Phase-03 §6 imprecision** — the "no `spec` field at the data layer" phrasing about `spec.capabilities` is wrong; corrected in C4 notes. If/when the phase sheet is read by future agents, they should trust this note over §6's wording.
+- **3.6 wrap-up** — IP-118 §9 progress tick; harness final-state line in notes.md ("0 dual-validated, all metadata-only"); optional `chore(DE-118)` close commit. No code change.
+- **P04** — explicit catalogue per phase-03 §3.6 hand-off:
+  - `REVISION_BLOCK_JSON_SCHEMA` deletion (revision.py:28 + bundled 4 regex-bug pattern removal).
+  - `_entry_shape` replacement (P01 §2 confirmed vacuous — should be a clean delete).
+  - OQ-NAMING-COLLISIONS rename of `RELATIONSHIPS_MARKER` / `VALID_STATUSES` (see notes.md §5).
+  - OQ-HARNESS-LIFECYCLE settlement: keep `snapshot_compare.py` as empty-map smoke test (option a, default), decommission, or repurpose as metadata-only corpus check.
+- **Phase-03 §6 imprecision** — the "no `spec` field at the data layer" phrasing for `spec.capabilities` is wrong; corrected in C4 notes. Trust the note over §6's wording.
+- **`revision_metadata_test.py` size** — 41 tests, one `too-many-public-methods` (41/20) warning. Intentional per DEC-007 (flat parallel-corpus readability), but P04 may revisit if the class grows further.
 
 ### Commit-state guidance
-- Worktree is clean at C4 close (commit `0b1d6947`). Untracked `.vscode/` is the user's IDE config, not project-owned.
-- For C5, follow the C3/C4 cadence: one combined commit covering `.spec-driver/**` (notes + phase-03 ticks) and code. Conventional-commit message subject under 70 chars.
-- Do **not** update `validate-baseline.txt` — it is the unchanged regression target per DR-118 §5.
+- Worktree clean at C5 close (commit `2c5b7073`). Untracked `.vscode/` is the user's IDE config; `.claude/scheduled_tasks.lock` is harness state — neither project-owned.
+- 3.6 can ship as a small `.spec-driver/**`-only commit (notes + IP tick), or be bundled into the first P04 commit if a P04 task lands quickly. Per project doctrine, bias toward shipping the wrap-up sooner to keep the worktree clean.
+- Do **not** update `validate-baseline.txt`.
 
 ### Other advice for the next agent
-- Run the snapshot harness (`uv run python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .`) **before** the swap to confirm 0 disagreements on the C5 inputs. The pre-C5 harness should report ~26 dual-validated, ~851 metadata-only — C5 retires the last hand-rolled adapter, dropping dual-validation to 0 and shifting all remaining blocks to metadata-only.
-- `revision_metadata_test.py` already exists (not new like spec_metadata_test.py was). Extend in place; mirror the C3 pattern (wrapper tests added to the existing dual-assert helper, `WrapperTest` class for new wrapper-specific cases).
-- The 4 regex-bug cases per DR-118 §5: the legacy `REVISION_BLOCK_JSON_SCHEMA` over-rejects inputs matching `r"^RE-\d{3,}$"` (or similar). MetadataValidator correctly accepts. Tests must assert that the metadata path accepts inputs the legacy regex blocked — this is *intended drift* per the DEC-007 header convention.
-- After C5, the snapshot harness `HAND_ROLLED_ADAPTERS` is empty; decide at task 3.6 whether to keep, decommission, or repurpose. The default per phase-03 §10 is (a) keep with empty map.
+- The snapshot harness (`uv run python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .`) now reports `0 dual-validated`, all blocks metadata-only — exactly the post-C5 expectation. Re-running it during 3.6/P04 should produce the same shape; any drift is a regression.
+- If the IP-118 §9 tick spans multiple sub-tasks, prefer marking the phase complete only when notes.md closure is also in place (single coherent unit).
+- Wrapper API drift watch: three wrappers exist (`validate_delta_relationships`, `validate_spec_relationships`, `validate_spec_capabilities`) take blocks; `validate_revision_change` takes data. Document the divergence anywhere the wrappers are surveyed (e.g. a future memory record per the taxonomy note above).
+- The C5 commit log entry is the canonical message format for "swap landed without ID-equality kwarg-collapse" — useful when a future block type with a parse-on-demand shape arrives.
+
+### Pointer to the structured handoff
+- No `workflow/state.yaml` exists for this delta (checked at C5 close). The prose handoff above is canonical; `/continuation` did not need to call `spec-driver create handoff`.

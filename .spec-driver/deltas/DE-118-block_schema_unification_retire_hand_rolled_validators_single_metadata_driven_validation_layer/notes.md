@@ -544,6 +544,36 @@ This is good news for the retirement: removing dead code with no production call
 - **Harness**: `scanned 1657 files, 0 disagreements.` (unchanged.)
 - **Full test suite**: 4843 passed, 4 skipped.
 
+### 4.7 — Close-change preparation
+
+- **IMPR-035 audit gate (DEC-006)**:
+  - File exists at `.spec-driver/backlog/improvements/IMPR-035-workflow_blocks_enable_strict_unknown_keys_rejection_dec_006_deferral_from_de_118/IMPR-035.md`.
+  - Content beyond template stub: ✓ — full description of 7 affected `workflow.*` blocks, deferred mechanism options (3 choices for DE-137 to pick from), and concrete acceptance criteria (7 loaders strict + consumer migration story + rejection test).
+  - Receiver named: **DE-137** primary (line 32); **DE-136** fallback via DR-136 §11.3 (line 34); integrity guard at line 36 prevents `wontfix` closure while DE-137 open or DR-136 §11.3 unsatisfied.
+  - DE-118 §8 "Follow-ups & Tracking" cross-references IMPR-035 by ID with "Load-bearing record" framing (DE-118.md:120).
+  - Updated with a "First-contact strictness (DE-118 P04 4.2)" section noting the orthogonal per-entry strictness introduced by the `_entry_shape` → `additional_properties=_SESSION_ENTRY` swap, since `workflow.sessions` is one of the 7 affected schemas. `updated:` frontmatter bumped to 2026-05-17.
+- **IP-118 §9 progress tracking**: ticked "IP-118-P04 complete" + "All verification gates passed; ready for `/audit-change` → `/close-change`". OQ-HARNESS-LIFECYCLE marker flipped from open to settled with rationale.
+- **Hand-off**: `/audit-change` is the next workflow step; no further phases follow P04.
+
+## IP-118-P04 closure summary
+
+- **Commits (6/7 — task 4.6 included two parts in one commit)**:
+  - 4.1 `3c993c15` `feat(DE-118): delete REVISION_BLOCK_JSON_SCHEMA + 4 regex bugs (P04 4.1)`
+  - 4.2 `54cfe18f` `feat(DE-118): replace _entry_shape with additional_properties=_SESSION_ENTRY (P04 4.2)`
+  - 4.3 `0fa35fed` `feat(DE-118): drop FieldMetadata.required from items definitions (P04 4.3)`
+  - 4.4 `2138749c` `refactor(DE-118): rename RELATIONSHIPS_MARKER to disambiguate (P04 4.4)`
+  - 4.5 `11268918` `refactor(DE-118): rename VALID_STATUSES to disambiguate (P04 4.5)`
+  - 4.6 `36e23805` `chore(DE-118): __all__ cleanups + settle OQ-HARNESS-LIFECYCLE (P04 4.6)`
+  - 4.7 — this closure commit (notes.md + IP-118.md + IMPR-035 audit edits).
+- **Line-count delta across `supekku/` + `spec_driver/`**: 20 files changed, +123 / -342 (net -219 LOC, dominated by 4.1's 246-line `REVISION_BLOCK_JSON_SCHEMA` literal deletion).
+- **OQ resolutions**:
+  - OQ-NAMING-COLLISIONS — **resolved** (4.4 + 4.5). Both `RELATIONSHIPS_MARKER` and `VALID_STATUSES` disambiguated at source; all alias-on-import / alias-on-re-export workarounds retired (including `VALID_COVERAGE_STATUSES` in-module disambiguation alias).
+  - OQ-HARNESS-LIFECYCLE — **settled** (4.6, option (a) KEEP). STD-004 owner + re-run trigger documented in `snapshot_compare.py` module docstring.
+- **Harness final state (HEAD post-4.6 / pre-4.7-closure)**: `scanned 1657 files, 0 dual-validated, 877 metadata-only, 0 disagreements.` `HAND_ROLLED_ADAPTERS = {}`. The malformed-YAML noise (~18 instances per P02.5 §289) is pre-existing and unchanged.
+- **`uv run spec-driver validate` final state**: byte-identical to `validate-baseline.txt` (8 audit-gate warnings + 2 install-skew lines). Baseline remains the unchanged regression target through `/close-change` per DR-118 §5.
+- **Test suite delta**: 4837 → 4843 (+6 tests, all from 4.2 synthetic-corpus additions in `WorkflowSessionsTest`).
+- **Cyclic-import warning retired**: pre-existing `revision → revision_metadata` cycle eliminated in 4.1 by relocating `REVISION_BLOCK_SCHEMA_ID` + `REVISION_BLOCK_VERSION` to `revision_metadata.py` as their canonical declaration site.
+
 
 ## New Agent Instructions
 

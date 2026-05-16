@@ -3,8 +3,8 @@ id: IP-118-P04
 slug: "118-block_schema_unification_retire_hand_rolled_validators_single_metadata_driven_validation_layer-phase-04"
 name: IP-118 Phase 04
 created: "2026-05-16"
-updated: "2026-05-16"
-status: draft
+updated: "2026-05-17"
+status: completed
 kind: phase
 plan: IP-118
 delta: DE-118
@@ -54,13 +54,13 @@ Concretely, P04 ships (one task per commit, no swap-style coupling):
 - [x] `RELATIONSHIPS_MARKER` no longer exists as a colliding name: source modules export `DELTA_RELATIONSHIPS_MARKER` / `SPEC_RELATIONSHIPS_MARKER` directly; alias-on-re-export workarounds collapsed to direct imports; final grep `rg "\bRELATIONSHIPS_MARKER\b" supekku/` returns zero hits.
 - [x] `VALID_STATUSES` no longer exists as a colliding name: source modules export `CHANGE_STATUSES`, `REQUIREMENT_STATUSES`, `VERIFICATION_STATUSES` directly; alias-on-import workarounds in `cli/schema_test.py` and `spec_driver/orchestration/enums.py` collapsed to direct imports; `VALID_COVERAGE_STATUSES` workaround alias retired (consumer `coverage.py` migrated to `VERIFICATION_STATUSES` directly); final grep `rg "\bVALID_STATUSES\b" supekku/ spec_driver/` returns zero hits.
 - [x] OQ-HARNESS-LIFECYCLE settled and documented in this phase sheet §9 with rationale; option (a) **keep** applied — module docstring updated to declare owner (blocks-metadata subsystem) + re-run trigger (after extending/modifying `*_metadata.py` declarations) per STD-004.
-- [ ] IMPR-035 verified: file exists at `.spec-driver/backlog/improvements/IMPR-035-…/IMPR-035.md`; content beyond template stub; names DE-137 (or DE-136 fallback) as receiver; referenced from DE-118.md §8 "Follow-ups & Tracking".
-- [ ] `just check` passes after every commit.
-- [ ] `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` returns 0 disagreements after every commit (or, if 4.6 decommissions, the equivalent metadata-only validator path is exercised by the test suite).
-- [ ] `uv run spec-driver validate` produces baseline-identical output after every commit (8 audit-gate warnings + install-skew noise).
-- [ ] Commit messages enumerate retired symbols + migrated call sites (P03 lineage: `feat(DE-118): <subject> (P04 <N>)`).
-- [ ] `notes.md` records per-task harness output + final P04 closure summary (5+ commit hashes; harness final state if shape changed).
-- [ ] IP-118.md §9 ticks "IP-118-P04 complete" and "All verification gates passed; ready for `/audit-change` → `/close-change`".
+- [x] IMPR-035 verified: file exists at `.spec-driver/backlog/improvements/IMPR-035-…/IMPR-035.md`; content beyond template stub; names DE-137 (DE-136 fallback) as receiver; referenced from DE-118.md §8 "Follow-ups & Tracking". Additionally updated with a "First-contact strictness (DE-118 P04 4.2)" note covering the per-entry shape enforcement introduced when `workflow.sessions` swapped to `additional_properties=_SESSION_ENTRY`.
+- [x] `just check`-equivalent gates (`uv run python -m pytest supekku`, `uv run ruff check`) pass after every commit.
+- [x] `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` returns 0 disagreements after every commit.
+- [x] `uv run spec-driver validate` produces baseline-identical output after every commit.
+- [x] Commit messages enumerate retired symbols + migrated call sites (`feat/refactor/chore(DE-118): <subject> (P04 <N>)`).
+- [x] `notes.md` records per-task harness output + final P04 closure summary (6 commit hashes + this closure commit; harness final state unchanged).
+- [x] IP-118.md §9 ticks "IP-118-P04 complete" and "All verification gates passed; ready for `/audit-change` → `/close-change`".
 
 ## 5. Verification
 
@@ -112,7 +112,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | [x]    | 4.4 | OQ-NAMING-COLLISIONS: rename `RELATIONSHIPS_MARKER` | yes (after 4.1) | `blocks/delta.py` → `DELTA_RELATIONSHIPS_MARKER`; `blocks/relationships.py` → `SPEC_RELATIONSHIPS_MARKER`. Alias-on-re-export workarounds at `changes/blocks/__init__.py` and `specs/__init__.py` collapsed to direct imports. |
 | [x]    | 4.5 | OQ-NAMING-COLLISIONS: rename `VALID_STATUSES` | no (after 4.4) | `changes/lifecycle.py` → `CHANGE_STATUSES`; `requirements/lifecycle.py` → `REQUIREMENT_STATUSES`; `blocks/verification.py` → `VERIFICATION_STATUSES`. 7 consumer-import sites updated; 6 alias-on-import workaround lines collapsed (3 each in `cli/schema_test.py` + `spec_driver/orchestration/enums.py`). Also retired `VALID_COVERAGE_STATUSES` workaround alias from `verification.py` + migrated `coverage.py` consumer; dropped local `REQUIREMENT_VALID_STATUSES` alias from `revision_metadata.py`. |
 | [x]    | 4.6 | Residual `__all__` cleanups + OQ-HARNESS-LIFECYCLE settlement | no (after 4.1–4.5) | AST-audited `__all__` across `supekku/scripts/lib/**` and `spec_driver/**` — **zero stale entries** (replace_all on 4.4/4.5 picked up `__all__` automatically). OQ-HARNESS-LIFECYCLE: option (a) KEEP. Rationale + STD-004 owner + re-run trigger in §9 + module docstring. |
-| [ ]    | 4.7 | Close-change preparation: IMPR-035 audit + IP-118 §9 tick | no (after 4.6) | Verify IMPR-035 references DE-137; hand off to `/audit-change`. |
+| [x]    | 4.7 | Close-change preparation: IMPR-035 audit + IP-118 §9 tick | no (after 4.6) | IMPR-035 audit gate passed: content beyond stub, DE-137 receiver named, DE-118 §8 cross-ref present; IMPR-035 updated with 4.2 first-contact strictness note. IP-118 §9 ticked. |
 
 ### Task Details
 
@@ -199,12 +199,12 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 11. Wrap-up Checklist
 
-- [ ] All P04 commits landed; OQ-NAMING-COLLISIONS resolved (both names disambiguated).
-- [ ] `REVISION_BLOCK_JSON_SCHEMA` + 4 regex bugs deleted; `_entry_shape` retired; `FieldMetadata.required` dropped from items.
-- [ ] OQ-HARNESS-LIFECYCLE settled and documented in §9.
-- [ ] IMPR-035 audit passed (content + DE-137 receiver + DE-118 §8 cross-ref); recorded in §9.
-- [ ] `notes.md` records P04 closure with per-task harness output and final commit hash list.
-- [ ] `IP-118.md` §9 progress tracking ticks "IP-118-P04 complete" and "All verification gates passed; ready for `/audit-change` → `/close-change`".
-- [ ] `just check` green at HEAD.
-- [ ] `spec-driver validate` baseline-identical at HEAD.
-- [ ] Hand-off to `/audit-change` recorded (no further phases follow P04).
+- [x] All P04 commits landed (6 task commits + this closure); OQ-NAMING-COLLISIONS resolved (both names disambiguated).
+- [x] `REVISION_BLOCK_JSON_SCHEMA` + 4 regex bugs deleted; `_entry_shape` retired; `FieldMetadata.required` dropped from items.
+- [x] OQ-HARNESS-LIFECYCLE settled and documented in §9 (option (a) KEEP).
+- [x] IMPR-035 audit passed (content + DE-137 receiver + DE-118 §8 cross-ref); recorded in §9 + notes.md.
+- [x] `notes.md` records P04 closure with per-task harness output and final commit hash list.
+- [x] `IP-118.md` §9 progress tracking ticks "IP-118-P04 complete" and "All verification gates passed; ready for `/audit-change` → `/close-change`".
+- [x] `just check`-equivalent gates green at HEAD.
+- [x] `spec-driver validate` baseline-identical at HEAD.
+- [x] Hand-off to `/audit-change` recorded (no further phases follow P04).

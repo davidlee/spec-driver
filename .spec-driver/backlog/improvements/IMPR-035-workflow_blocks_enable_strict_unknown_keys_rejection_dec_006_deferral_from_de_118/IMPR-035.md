@@ -2,7 +2,7 @@
 id: IMPR-035
 name: "workflow.* blocks: enable strict_unknown_keys rejection (DEC-006 deferral from DE-118)"
 created: "2026-05-09"
-updated: "2026-05-09"
+updated: "2026-05-17"
 status: idea
 kind: improvement
 ---
@@ -56,6 +56,12 @@ Whichever shape DE-137 chooses, this IMPR is closed by:
 - [ ] All 7 workflow.* schemas reject unknown keys (or the equivalent semantics under whatever flag shape DE-137 lands).
 - [ ] Consumer-repo migration story documented (DR-136 §11.3 or successor).
 - [ ] This IMPR closed via reference from the receiving delta's close-change.
+
+## First-contact strictness (DE-118 P04 4.2)
+
+DE-118 P04 4.2 replaced the `_entry_shape` sentinel in `WORKFLOW_SESSIONS_METADATA` with `additional_properties=_SESSION_ENTRY` (per DR-118 DEC-004). This activates declarative per-entry validation on `workflow.sessions` blocks (one of the 7 workflow.* schemas above). The change is orthogonal to the DEC-006 unknown-key deferral — `strict_unknown_keys` remains `False` at the loader call site — but it *does* introduce new enforcement at the per-entry shape level: consumer repos emitting `workflow.sessions` blocks with missing required fields (`session_name`, `status`, `last_seen`) or out-of-enum `status` values will be rejected at first contact.
+
+R7 vacuous in DE-118's repo (zero live `.spec-driver/run/sessions/` data per P01 §2); first-contact strictness applies wherever consumer repos do emit `workflow.sessions` blocks. Treat this as a *complementary* constraint to the unknown-key deferral, not a substitute for it.
 
 ## Provenance
 

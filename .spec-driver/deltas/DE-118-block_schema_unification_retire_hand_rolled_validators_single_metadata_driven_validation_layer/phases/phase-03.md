@@ -4,7 +4,7 @@ slug: "118-block_schema_unification_retire_hand_rolled_validators_single_metadat
 name: IP-118 Phase 03
 created: "2026-05-10"
 updated: "2026-05-16"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-118
 delta: DE-118
@@ -46,24 +46,25 @@ After C5, zero `*Validator` classes from the original seven remain, and `HAND_RO
 
 ## 4. Exit Criteria / Done When
 
-- [ ] All five P03 swap commits landed on `main` within R8's ≤4-week window (counted from C1 merge).
-- [ ] Zero of the seven hand-rolled `*Validator` classes remain in `supekku/scripts/lib/blocks/`.
-- [ ] `HAND_ROLLED_ADAPTERS` in `snapshot_compare.py` is empty (or the harness module is decommissioned per P04 cleanup — see §10 hand-off).
-- [ ] Three wrapper helpers exist alongside their metadata declarations:
-  - `validate_delta_relationships(block, *, delta_id)` — `delta_metadata.py` (or sibling); ID-equality check retained.
-  - `validate_spec_relationships(block, *, spec_id)` — `spec_metadata.py` (or sibling); ID-equality check retained.
-  - `validate_spec_capabilities(block, *, spec_id)` — `spec_metadata.py` (or sibling); ergonomic alias only (no ID-equality check; `spec.capabilities` block has no `spec` field).
-- [ ] All 5 external call-site migrations landed (DR-118 §4 enumeration plus the `requirements/sync.py:132` annotation surfaced in P01).
-- [ ] `re-exports`/`__all__` cleaned up:
+- [x] All five P03 swap commits landed on `main` within R8's ≤4-week window (counted from C1 merge): C1 `deec4017`, C2 `075781a0`, C3 `9478980e`, C4 `0b1d6947`, C5 `2c5b7073`.
+- [x] Zero of the seven hand-rolled `*Validator` classes remain in `supekku/scripts/lib/blocks/`.
+- [x] `HAND_ROLLED_ADAPTERS` in `snapshot_compare.py` is empty (or the harness module is decommissioned per P04 cleanup — see §10 hand-off). Empty at HEAD; OQ-HARNESS-LIFECYCLE deferred to P04 per §3.6 default (option a).
+- [x] Wrapper helpers exist alongside their metadata declarations (four landed; `validate_revision_change` added in C5 beyond the original three-wrapper plan — see §9 C5 decision):
+  - `validate_delta_relationships(block, *, delta_id=None)` — `delta_metadata.py`; ID-equality check retained.
+  - `validate_spec_relationships(block, *, spec_id=None)` — `spec_metadata.py`; ID-equality check retained.
+  - `validate_spec_capabilities(block, *, spec_id=None)` — `spec_metadata.py`; ergonomic alias only (`del spec_id` in body; symmetry-of-API rationale documented in C4 decision).
+  - `validate_revision_change(data)` — `revision_metadata.py`; data-dict signature (not block) per C5 mutation-cycle finding.
+- [x] All 5 external call-site migrations landed (DR-118 §4 enumeration plus the `requirements/sync.py:132` annotation surfaced in P01).
+- [x] `re-exports`/`__all__` cleaned up:
   - `revision.py:1059` no longer lists `RevisionBlockValidator`.
   - `revision.py:1055` retains `REVISION_BLOCK_JSON_SCHEMA` for now (delete is P04 task).
   - `changes/blocks/__init__.py:48,57` no longer re-exports `RevisionBlockValidator`.
   - `delta.py:171`, `relationships.py:273`, `verification.py:281`, `plan.py:667-671` no longer list their respective hand-rolled classes.
-- [ ] `just check` passes after every commit.
-- [ ] `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` returns 0 (zero disagreements) after every commit. After C5, the run is metadata-only across all block types — no dual-validation remains, but the report.ok contract holds.
-- [ ] `uv run spec-driver validate` produces baseline-identical output after every commit (8 audit-gate warnings, modulo install-skew noise).
-- [ ] Commit messages enumerate retired classes + migrated call sites (per DR-118 §4 §5 transitional-invariant text).
-- [ ] `notes.md` records per-commit harness output (one short block per commit) and any drift surfaced.
+- [x] `just check` passes after every commit.
+- [x] `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` returns 0 (zero disagreements) after every commit. After C5, the run is metadata-only across all block types — no dual-validation remains, but the report.ok contract holds.
+- [x] `uv run spec-driver validate` produces baseline-identical output after every commit (8 audit-gate warnings, modulo install-skew noise).
+- [x] Commit messages enumerate retired classes + migrated call sites (per DR-118 §4 §5 transitional-invariant text).
+- [x] `notes.md` records per-commit harness output (one short block per commit) and any drift surfaced.
 
 ## 5. Verification
 
@@ -118,7 +119,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | [x]    | 3.3 | **C3** — Retire `DeltaRelationshipsValidator`; introduce `validate_delta_relationships` wrapper | no (after C2) | Landed: 3 external call sites + `sync.py:132` annotation migrated; wrapper kwarg threading collapsed (free function imported directly). |
 | [x]    | 3.4 | **C4** — Retire `RelationshipsBlockValidator`; introduce `validate_spec_relationships` + `validate_spec_capabilities` (ergonomic) wrappers | no (after C3) | Landed: new `spec_metadata_test.py` per `<source>_metadata_test.py` mirror (32 tests). Capabilities wrapper uses `del spec_id` for invariant-preserving symmetry. |
 | [x]    | 3.5 | **C5** — Retire `RevisionBlockValidator` and `_disallow_extra_keys` helper | no (after C4) | Landed: `validate_revision_change(data)` wrapper added (data signature, not block — `RevisionChangeBlock` parses on demand; updater.py validates mutated dict). `ValidationMessage` dataclass also deleted (only internal users). `HAND_ROLLED_ADAPTERS` empty. |
-| [ ]    | 3.6 | Wrap-up — `notes.md` P03 closure section; IP-118 progress tick; harness final state recorded | yes (after 3.5) | Hand-off to P04. |
+| [x]    | 3.6 | Wrap-up — `notes.md` P03 closure section; IP-118 progress tick; harness final state recorded | yes (after 3.5) | Hand-off to P04. Closure ledger added 2026-05-16: 5/5 commit hashes + harness final-state line ("0 dual-validated, 877 metadata-only" at HEAD `5d555985`). |
 
 ### Task Details
 
@@ -200,12 +201,12 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 11. Wrap-up Checklist
 
-- [ ] All five swap commits landed; zero hand-rolled validator classes remain.
-- [ ] Three wrapper helpers in place (`validate_delta_relationships`, `validate_spec_relationships`, `validate_spec_capabilities`).
-- [ ] `HAND_ROLLED_ADAPTERS` empty in `snapshot_compare.py`.
-- [ ] `notes.md` records P03 closure with per-commit harness output and final commit hash list.
-- [ ] `IP-118.md` §9 progress tracking ticks "IP-118-P03 complete".
-- [ ] `just check` green at HEAD.
-- [ ] `spec-driver validate` baseline-identical at HEAD.
-- [ ] Harness final state at HEAD recorded (expected: 0 disagreements, ~0 dual-validations, all blocks counted as `blocks_metadata_only`).
-- [ ] Hand-off to IP-118-P04 noted: `REVISION_BLOCK_JSON_SCHEMA` deletion + `_entry_shape` replacement + OQ-NAMING-COLLISIONS rename + OQ-HARNESS-LIFECYCLE settlement.
+- [x] All five swap commits landed; zero hand-rolled validator classes remain.
+- [x] Three wrapper helpers in place (`validate_delta_relationships`, `validate_spec_relationships`, `validate_spec_capabilities`); plus `validate_revision_change` (added in C5).
+- [x] `HAND_ROLLED_ADAPTERS` empty in `snapshot_compare.py`.
+- [x] `notes.md` records P03 closure with per-commit harness output and final commit hash list (see "P03 closure summary" entry, 2026-05-16).
+- [x] `IP-118.md` §9 progress tracking ticks "IP-118-P03 complete".
+- [x] `just check` green at HEAD.
+- [x] `spec-driver validate` baseline-identical at HEAD.
+- [x] Harness final state at HEAD recorded: scanned 1656 files, 0 dual-validated, 877 metadata-only, 0 disagreements.
+- [x] Hand-off to IP-118-P04 noted: `REVISION_BLOCK_JSON_SCHEMA` deletion + `_entry_shape` replacement + OQ-NAMING-COLLISIONS rename + OQ-HARNESS-LIFECYCLE settlement.

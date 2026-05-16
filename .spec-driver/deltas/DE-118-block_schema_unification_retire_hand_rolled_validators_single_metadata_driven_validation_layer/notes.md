@@ -455,6 +455,15 @@ This is good news for the retirement: removing dead code with no production call
 
 **P03 closure status:** 5/5 swap commits landed. `HAND_ROLLED_ADAPTERS` empty. All exit criteria from phase-03 §4 met. Hand-off to P04: `REVISION_BLOCK_JSON_SCHEMA` deletion + `_entry_shape` replacement + OQ-NAMING-COLLISIONS rename + OQ-HARNESS-LIFECYCLE settlement.
 
+### P03 closure summary (2026-05-16)
+
+- **Commits (5/5)**: C1 `deec4017` (VerificationCoverageValidator), C2 `075781a0` (plan trio: PlanOverview + PhaseOverview + PhaseTracking), C3 `9478980e` (DeltaRelationshipsValidator + `validate_delta_relationships` wrapper), C4 `0b1d6947` (RelationshipsBlockValidator + `validate_spec_relationships` + `validate_spec_capabilities` wrappers), C5 `2c5b7073` (RevisionBlockValidator + `_disallow_extra_keys` + `ValidationMessage` + `validate_revision_change(data)` wrapper). All within the R8 ≤4-week window (C1 → C5 same-day window: 2026-05-11 to 2026-05-16).
+- **Hand-rolled validator residue**: zero. `rg "class.+Validator" supekku/scripts/lib/blocks/` returns no matches for the seven retirees.
+- **Wrapper helpers (4 total)**: `validate_delta_relationships(block, *, delta_id=None)` in `delta_metadata.py`; `validate_spec_relationships(block, *, spec_id=None)` and `validate_spec_capabilities(block, *, spec_id=None)` (ergonomic-only; `del spec_id`) in `spec_metadata.py`; `validate_revision_change(data)` in `revision_metadata.py` (data signature divergence, intentional — see C5 finding).
+- **Harness final state (HEAD = `5d555985`)**: `uv run python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` → `scanned 1656 files, 0 dual-validated, 877 metadata-only.` → `snapshot-compare: OK (zero disagreements).` `HAND_ROLLED_ADAPTERS = {}`; the dual-validate harness is now a pure metadata-only smoke pass (option a per phase-03 §3.6 default). Malformed-YAML noise (18 instances) is pre-existing and tracked separately per P02.5 §289.
+- **`uv run spec-driver validate` final state**: 8 audit-gate warnings + 2 install-skew lines = baseline-identical against `validate-baseline.txt` (which remains the unchanged regression target through DE-118 close, per DR-118 §5).
+- **OQ-HARNESS-LIFECYCLE**: still open; settles in P04 alongside OQ-NAMING-COLLISIONS and `REVISION_BLOCK_JSON_SCHEMA` deletion. Default option (a) — keep `snapshot_compare.py` with empty `HAND_ROLLED_ADAPTERS` as runnable infrastructure — is what HEAD ships.
+
 ## New Agent Instructions
 
 ### Task card

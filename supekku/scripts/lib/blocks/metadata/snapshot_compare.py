@@ -1,10 +1,12 @@
-"""Dual-validate snapshot harness for DE-118 block-validator unification.
+"""Metadata-driven block-validation corpus smoke check.
 
 For each block instance in a `.spec-driver/` corpus, this harness invokes
-both the hand-rolled validator (where one still exists) and the
 ``MetadataValidator(metadata, strict_unknown_keys=True)`` driven by the
-block's metadata declaration. Disagreement at the verdict level
-(accept/reject) signals drift between the two paths.
+block's metadata declaration, plus any registered hand-rolled adapter
+(see ``HAND_ROLLED_ADAPTERS``). Disagreement at the verdict level
+(accept/reject) signals drift between the two paths; with the adapter
+map empty, the harness reduces to a metadata-only corpus pass that
+reports parse health and validator acceptance counts.
 
 CLI:
 
@@ -12,11 +14,20 @@ CLI:
 
 Exit code:
 
-    0 — every block agreed (or had no hand-rolled counterpart left).
+    0 — every block agreed (or had no hand-rolled counterpart).
     1 — at least one disagreement (or malformed-YAML failure).
 
-Lifecycle (DE-118 P02 P04 OQ-HARNESS-LIFECYCLE): manual run only as of
-P02; ownership / re-run trigger settled before delta closure.
+Owner: blocks-metadata subsystem (`supekku/scripts/lib/blocks/metadata/`).
+Re-run trigger (STD-004): invoke after extending or modifying any
+``*_metadata.py`` declaration to catch corpus drift before it lands in
+the test suite. Also useful as a one-shot diagnostic when investigating
+validator semantics against the live ``.spec-driver/`` corpus.
+
+History: originated in DE-118 P02 as the dual-validate harness pinning
+hand-rolled vs metadata-driven verdict parity during the P03 swap
+sequence. P03 retired all 7 hand-rolled validators; ``HAND_ROLLED_ADAPTERS``
+is empty at HEAD. OQ-HARNESS-LIFECYCLE settled in DE-118 P04 4.6 (option
+(a) keep — per phase-04 §9).
 """
 
 from __future__ import annotations
@@ -40,10 +51,10 @@ from .validator import MetadataValidator
 HandRolledAdapter = Callable[[dict[str, Any], str | None], list[str]]
 
 
-# Block types that still have a hand-rolled validator (DE-118 P02 baseline).
-# P03 swap commits delete the corresponding entry as each validator retires.
-# After P03 C5 this map is empty; harness lifecycle (keep/decommission/repurpose)
-# is settled in P04 per phase-03 §3.6.
+# Adapter map for hand-rolled validators. Empty at HEAD: DE-118 P03 retired
+# all 7 hand-rolled validators. Register a new adapter here only when
+# auditing a future hand-rolled vs metadata-driven divergence; the
+# metadata-only smoke path runs regardless of map contents.
 HAND_ROLLED_ADAPTERS: dict[str, HandRolledAdapter] = {}
 
 

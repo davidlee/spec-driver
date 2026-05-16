@@ -535,6 +535,15 @@ This is good news for the retirement: removing dead code with no production call
 - **`spec-driver validate`**: byte-identical to baseline.
 - **Full test suite**: 4843 passed, 4 skipped (149s).
 
+### 4.6 — Residual `__all__` cleanups + OQ-HARNESS-LIFECYCLE settlement
+
+- **`__all__` AST audit** across `supekku/scripts/lib/**` and `spec_driver/**`: zero stale entries. The 4.4 / 4.5 `replace_all` rename operations updated `__all__` lines atomically, so no follow-up cleanup commit was required.
+- **OQ-HARNESS-LIFECYCLE — option (a) KEEP.** `snapshot_compare.py` remains as runnable infrastructure with `HAND_ROLLED_ADAPTERS={}`. Decision rationale captured in phase-04 §9.
+- **Module hygiene updates**: docstring rewritten to declare owner (blocks-metadata subsystem) + re-run trigger (after extending/modifying `*_metadata.py` declarations) per STD-004; `HAND_ROLLED_ADAPTERS` comment updated to drop the P03/P04 transitional framing.
+- **Files touched**: `supekku/scripts/lib/blocks/metadata/snapshot_compare.py` (docstring + adapter-map comment only — no behaviour change).
+- **Harness**: `scanned 1657 files, 0 disagreements.` (unchanged.)
+- **Full test suite**: 4843 passed, 4 skipped.
+
 
 ## New Agent Instructions
 

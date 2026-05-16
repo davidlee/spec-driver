@@ -49,7 +49,7 @@ Concretely, P04 ships (one task per commit, no swap-style coupling):
 ## 4. Exit Criteria / Done When
 
 - [x] `REVISION_BLOCK_JSON_SCHEMA` deleted from `revision.py`; the 4 regex-bug patterns gone; `__all__` entry removed; `revision_metadata_test.py::test_metadata_generates_json_schema` continues to pass against the metadata-derived JSON schema (already shape-asserts; no rebase required).
-- [ ] `_entry_shape` sentinel removed from `sessions_schema.py:88`; replaced with `additional_properties=_SESSION_ENTRY`; synthetic-corpus tests cover positive + every negative branch against the entry shape.
+- [x] `_entry_shape` sentinel removed from `sessions_schema.py`; replaced with `additional_properties=_SESSION_ENTRY`; synthetic-corpus tests cover positive + every negative branch + nested-strictness + empty-map silent-pass.
 - [ ] `FieldMetadata.required` arg dropped at every `FieldMetadata(items=FieldMetadata(...))` site in `*_metadata.py` modules; no semantic change (verified by harness 0-disagreement re-run).
 - [ ] `RELATIONSHIPS_MARKER` no longer exists as a colliding name: source modules (`blocks/delta.py:15`, `blocks/relationships.py:15`) export `DELTA_RELATIONSHIPS_MARKER` / `SPEC_RELATIONSHIPS_MARKER` directly; alias-on-re-export workarounds at `changes/blocks/__init__.py:23,60` and `specs/__init__.py:21,40` removed.
 - [ ] `VALID_STATUSES` no longer exists as a colliding name: source modules export `CHANGE_STATUSES` (`changes/lifecycle.py:20`), `REQUIREMENT_STATUSES` (`requirements/lifecycle.py:14`), `VERIFICATION_STATUSES` (`blocks/verification.py:24`); alias-on-import workarounds at `cli/schema_test.py:441-447` and `spec_driver/orchestration/enums.py:20-30` removed; all consumer imports updated.
@@ -107,7 +107,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | Status | ID  | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
 | [x]    | 4.1 | Delete `REVISION_BLOCK_JSON_SCHEMA` + 4 regex bugs; optional: retire `revision → revision_metadata` cyclic-import | no (independent) | Touches `revision.py` + `revision_metadata.py`. Cyclic-import retirement APPLIED (no external consumers; net <10 LOC churn). Test `test_metadata_generates_json_schema` already shape-asserts on generated schema — no rebase needed. |
-| [ ]    | 4.2 | Replace `_entry_shape` sentinel with `additional_properties=_SESSION_ENTRY` | yes (after 4.1) | Touches `sessions_schema.py` + sibling test. R7 vacuous; synthetic corpus required. |
+| [x]    | 4.2 | Replace `_entry_shape` sentinel with `additional_properties=_SESSION_ENTRY` | yes (after 4.1) | Touches `sessions_schema.py` + `workflow_metadata_test.py::WorkflowSessionsTest` (existing co-location; no `sessions_metadata.py` so mirror-rule primary form doesn't apply). 6 synthetic-corpus tests added. |
 | [ ]    | 4.3 | Drop `FieldMetadata.required` from `items` definitions | yes (after 4.1) | Touches `*_metadata.py` modules with array-of-object shapes. Semantically meaningless on items. |
 | [ ]    | 4.4 | OQ-NAMING-COLLISIONS: rename `RELATIONSHIPS_MARKER` | yes (after 4.1) | Source modules `delta.py:15` + `relationships.py:15`; drop alias-on-re-exports at `changes/blocks/__init__.py:23,60` and `specs/__init__.py:21,40`. |
 | [ ]    | 4.5 | OQ-NAMING-COLLISIONS: rename `VALID_STATUSES` | no (after 4.4) | Larger blast radius (cli/orchestration imports). `CHANGE_STATUSES`, `REQUIREMENT_STATUSES`, `VERIFICATION_STATUSES` in source modules; drop alias-on-import workarounds. |
@@ -178,10 +178,10 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 9. Decisions & Outcomes
 
+- `2026-05-16` — **Test-file placement (4.2) — extend `workflow_metadata_test.py::WorkflowSessionsTest`.** The `<source>_metadata_test.py` mirror rule's primary form (`sessions_metadata_test.py`) is inapplicable — there is no `sessions_metadata.py`; the canonical declaration site is `sessions_schema.py`. The fallback (`sessions_schema_test.py`) would require migrating 4 existing `WorkflowSessionsTest` tests for no clear benefit. Extending the existing test class colocates with prior sessions tests and keeps the diff focused on the swap itself.
 - `2026-05-16` — **Cyclic-import retirement (4.1) — APPLIED.** External consumer-import surface for `REVISION_BLOCK_SCHEMA_ID` / `REVISION_BLOCK_VERSION` is zero (only `revision.py` and `revision_metadata.py` reference them). Moved both constants to `revision_metadata.py` as their canonical declaration site; `revision.py` imports them back via a one-way top-level import. The pre-existing deferred-bottom imports (`REVISION_CHANGE_METADATA`, `BlockSchema`, `register_block_schema`) were promoted to module-top alongside the constants — no more `noqa: E402` needed. Net LOC delta: ~5 lines added in `revision_metadata.py`, ~3 net removed in `revision.py` after factoring out the now-deleted `REQUIREMENT_VALID_STATUSES` import (it lived only inside the deleted literal). Well under the 50-LOC gate. Pylint on the two touched files improved from 3 messages to 1 (the lone remaining `too-many-locals` is in `render_revision_change_block`, pre-existing, unrelated).
 - `YYYY-MM-DD` — _(remaining pre-planned slots:)_
   - **OQ-HARNESS-LIFECYCLE settlement** at 4.6 — one of (a) keep / (b) decommission / (c) repurpose. Rationale captured here before committing.
-  - **`<source>_metadata_test.py` placement in 4.2** — `sessions_metadata_test.py` if a separate `sessions_metadata.py` module is the canonical declaration site, else `sessions_schema_test.py`.
 
 ## 10. Findings / Research Notes
 

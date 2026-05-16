@@ -73,20 +73,11 @@ WORKFLOW_SESSIONS_METADATA = BlockMetadata(
         ),
       },
     ),
-    # Sessions is a map of role_name → session_entry with dynamic keys.
-    # FieldMetadata requires non-empty properties for object type, so we
-    # model it as a sentinel object with a single documented example key.
-    # Command-level validation handles per-entry checks.
     "sessions": FieldMetadata(
       type="object",
       required=True,
       description=("Map of role name to session entry (at least one entry required)"),
-      properties={
-        # Sentinel — FieldMetadata requires non-empty properties
-        # for object type.  Real entries use dynamic role-name keys;
-        # command-level code validates per-entry shape.
-        "_entry_shape": _SESSION_ENTRY,
-      },
+      additional_properties=_SESSION_ENTRY,
     ),
   },
   examples=[

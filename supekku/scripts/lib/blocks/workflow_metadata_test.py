@@ -548,6 +548,50 @@ class WorkflowSessionsTest(unittest.TestCase):
     errors = _validate(WORKFLOW_SESSIONS_METADATA, data)
     assert any("artifact" in e and "required" in e for e in errors)
 
+  # Synthetic-corpus per-entry tests
+  # (DE-118 P04 4.2 — additional_properties=_SESSION_ENTRY).
+  # R7 vacuous in this repo (zero live `.spec-driver/run/sessions/` data
+  # at P01 §2); consumer repos emitting `workflow.sessions` blocks hit
+  # this enforcement at first contact.
+
+  def test_session_entry_missing_session_name(self):
+    data = self._minimal_valid()
+    del data["sessions"]["implementer"]["session_name"]
+    errors = _validate(WORKFLOW_SESSIONS_METADATA, data)
+    assert any("session_name" in e and "required" in e for e in errors), errors
+
+  def test_session_entry_missing_last_seen(self):
+    data = self._minimal_valid()
+    del data["sessions"]["implementer"]["last_seen"]
+    errors = _validate(WORKFLOW_SESSIONS_METADATA, data)
+    assert any("last_seen" in e and "required" in e for e in errors), errors
+
+  def test_session_entry_status_not_in_enum(self):
+    data = self._minimal_valid()
+    data["sessions"]["implementer"]["status"] = "bogus-status"
+    errors = _validate(WORKFLOW_SESSIONS_METADATA, data)
+    assert any("status" in e for e in errors), errors
+
+  def test_session_entry_sandbox_wrong_type(self):
+    data = self._minimal_valid()
+    data["sessions"]["implementer"]["sandbox"] = 42
+    errors = _validate(WORKFLOW_SESSIONS_METADATA, data)
+    assert any("sandbox" in e for e in errors), errors
+
+  def test_session_entry_unknown_key_rejected_under_strict(self):
+    data = self._minimal_valid()
+    data["sessions"]["implementer"]["unexpected_field"] = "x"
+    validator = MetadataValidator(WORKFLOW_SESSIONS_METADATA, strict_unknown_keys=True)
+    errors = [str(e) for e in validator.validate(data)]
+    assert any("unexpected_field" in e for e in errors), errors
+
+  def test_sessions_empty_map_silent_pass(self):
+    """Empty map passes per DEC-004 (no per-entry to validate)."""
+    data = self._minimal_valid()
+    data["sessions"] = {}
+    errors = _validate(WORKFLOW_SESSIONS_METADATA, data)
+    assert errors == [], errors
+
 
 # ---------------------------------------------------------------------------
 # 7.1  Notes Bridge

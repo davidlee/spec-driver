@@ -478,6 +478,23 @@ This is good news for the retirement: removing dead code with no production call
 - **Pylint on touched files**: 9.91/10, 1 message (`too-many-locals` at `revision.py:91` in `render_revision_change_block`, pre-existing). Cyclic-import warning gone.
 - **Full test suite**: 4837 passed, 4 skipped, 0 failures (149s).
 
+### 4.2 — Replace `_entry_shape` with `additional_properties=_SESSION_ENTRY`
+
+- **Files touched**: `supekku/scripts/lib/blocks/sessions_schema.py` (sentinel removed from `WORKFLOW_SESSIONS_METADATA.fields["sessions"]`; now `additional_properties=_SESSION_ENTRY` per DEC-004), `supekku/scripts/lib/blocks/workflow_metadata_test.py` (6 synthetic-corpus tests added to existing `WorkflowSessionsTest`).
+- **Test-file placement**: extended `workflow_metadata_test.py::WorkflowSessionsTest` instead of creating `sessions_schema_test.py`. The `<source>_metadata_test.py` mirror rule's primary form is inapplicable (no `sessions_metadata.py`); migrating existing 4 sessions tests purely for naming alignment is unjustified churn. Decision recorded in phase-04 §9.
+- **Synthetic-corpus tests** (6 total, all colocated in `WorkflowSessionsTest`):
+  1. `test_session_entry_missing_session_name` — required-field negative.
+  2. `test_session_entry_missing_last_seen` — required-field negative.
+  3. `test_session_entry_status_not_in_enum` — enum negative.
+  4. `test_session_entry_sandbox_wrong_type` — type-mismatch negative.
+  5. `test_session_entry_unknown_key_rejected_under_strict` — nested-strictness (rejection of `unexpected_field` under `strict_unknown_keys=True`).
+  6. `test_sessions_empty_map_silent_pass` — DEC-004 empty-map behaviour (no per-entry to validate).
+- **R7 framing**: vacuous in this repo (zero live `.spec-driver/run/sessions/` data per P01 §2). This swap is *new enforcement*, not equivalence — consumer repos emitting `workflow.sessions` blocks will hit per-entry validation at first contact. Tracked in IMPR-035 (the receiver record).
+- **Harness verification (post-edit)**: `snapshot_compare --root .` → `scanned 1657 files, 0 dual-validated, 877 metadata-only.` → `OK (zero disagreements).`
+- **`spec-driver validate`**: byte-identical to `validate-baseline.txt` (8 audit-gate warnings + 2 install-skew lines).
+- **Pylint on touched files**: 9.98/10, 1 message (`duplicate-code` flagging similarity between the pre-existing `examples=[...]` block in `sessions_schema.py:84-89` and the test's `_minimal_valid()` fixture; not introduced by 4.2 — both shapes pre-existed).
+- **Full test suite**: 4843 passed (4837 → 4843; +6 new tests), 4 skipped, 0 failures (150s).
+
 
 ## New Agent Instructions
 

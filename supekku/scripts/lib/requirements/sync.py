@@ -7,10 +7,8 @@ from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
-from supekku.scripts.lib.blocks.delta import (
-  DeltaRelationshipsValidator,
-  extract_delta_relationships,
-)
+from supekku.scripts.lib.blocks.delta import extract_delta_relationships
+from supekku.scripts.lib.blocks.delta_metadata import validate_delta_relationships
 from supekku.scripts.lib.blocks.revision import (
   RevisionBlockValidator,
   load_revision_blocks,
@@ -128,8 +126,6 @@ def _apply_delta_relations(
   records: dict[str, RequirementRecord],
   delta_dirs: Iterable[Path],
   _repo_root: Path,
-  *,
-  validator: DeltaRelationshipsValidator,
 ) -> None:
   """Apply delta relationship blocks to requirement records."""
   for file in _iter_change_files(delta_dirs, prefix="DE-"):
@@ -168,7 +164,7 @@ def _apply_delta_relations(
       block = extract_delta_relationships(file.read_text(encoding="utf-8"))
     except ValueError:
       block = None
-    if block and not validator.validate(block, delta_id=delta_id):
+    if block and not validate_delta_relationships(block, delta_id=delta_id):
       requirements = block.data.get("requirements") or {}
       implements = requirements.get("implements") or []
       for req in implements:

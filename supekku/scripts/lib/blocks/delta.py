@@ -25,68 +25,6 @@ class DeltaRelationshipsBlock:
   data: dict[str, Any]
 
 
-class DeltaRelationshipsValidator:
-  """Validator for delta relationships blocks."""
-
-  def validate(
-    self,
-    block: DeltaRelationshipsBlock,
-    *,
-    delta_id: str | None = None,
-  ) -> list[str]:
-    """Validate delta relationships block structure and content."""
-    errors: list[str] = []
-    data = block.data
-    if data.get("schema") != RELATIONSHIPS_SCHEMA:
-      errors.append(
-        "delta relationships block must declare schema supekku.delta.relationships",
-      )
-    if data.get("version") != RELATIONSHIPS_VERSION:
-      errors.append("delta relationships block must declare version 1")
-
-    delta_value = str(data.get("delta", ""))
-    if not delta_value:
-      errors.append("delta relationships block missing delta id")
-    elif delta_id and delta_value != delta_id:
-      errors.append(
-        f"delta relationships block id {delta_value} does not match "
-        f"expected {delta_id}",
-      )
-
-    specs = data.get("specs")
-    if specs is not None and not isinstance(specs, dict):
-      errors.append("delta relationships specs must be a mapping")
-    requirements = data.get("requirements")
-    if requirements is not None and not isinstance(requirements, dict):
-      errors.append("delta relationships requirements must be a mapping")
-
-    for section, _expected_type in ((specs, list), (requirements, list)):
-      if not isinstance(section, dict):
-        continue
-      for key, value in section.items():
-        if value is None:
-          continue
-        if not isinstance(value, list):
-          errors.append(f"{section}.{key} must be a list")
-          continue
-        for item in value:
-          if not isinstance(item, str):
-            errors.append(f"{section}.{key} entries must be strings")
-
-    phases = data.get("phases")
-    if phases is not None:
-      if not isinstance(phases, list):
-        errors.append("delta relationships phases must be a list")
-      else:
-        for entry in phases:
-          if not isinstance(entry, dict):
-            errors.append("phases entries must be objects")
-            continue
-          if "id" not in entry:
-            errors.append("phase entry missing id")
-    return errors
-
-
 _BLOCK_PATTERN = make_block_pattern(RELATIONSHIPS_MARKER)
 
 
@@ -168,7 +106,6 @@ def render_delta_relationships_block(
 __all__ = [
   "RELATIONSHIPS_MARKER",
   "DeltaRelationshipsBlock",
-  "DeltaRelationshipsValidator",
   "extract_delta_relationships",
   "load_delta_relationships",
   "render_delta_relationships_block",

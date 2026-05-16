@@ -7,10 +7,8 @@ from typing import TYPE_CHECKING, Any
 
 from rich.console import Console
 
-from supekku.scripts.lib.blocks.delta import (
-  DeltaRelationshipsValidator,
-  extract_delta_relationships,
-)
+from supekku.scripts.lib.blocks.delta import extract_delta_relationships
+from supekku.scripts.lib.blocks.delta_metadata import validate_delta_relationships
 from supekku.scripts.lib.blocks.plan import (
   extract_phase_overview,
   extract_plan_overview,
@@ -119,10 +117,7 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
       block = extract_delta_relationships(body)
     except ValueError:
       block = None
-    if block and not DeltaRelationshipsValidator().validate(
-      block,
-      delta_id=artifact_id,
-    ):
+    if block and not validate_delta_relationships(block, delta_id=artifact_id):
       specs = block.data.get("specs") or {}
       primary_specs = specs.get("primary") or []
       if primary_specs:

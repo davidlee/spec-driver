@@ -348,3 +348,38 @@ This is good news for the retirement: removing dead code with no production call
 - `uv run python -m supekku.scripts.pylint_report` on touched files: score 9.90/10, 7 messages — all pre-existing on `plan.py` (3× `too-many-arguments` and 1× `too-complex` on render functions; 3× `wrong-import-position` for the schema registration pattern with `# noqa: E402`). Zero new pylint debt from C2.
 
 **Next**: C3 (DeltaRelationshipsValidator + `validate_delta_relationships` wrapper; first commit with actual external call sites — 3 of them, plus the `requirements/sync.py:132` annotation surfaced in P01 §4).
+
+### C3 — `DeltaRelationshipsValidator` retired + first wrapper landed
+
+**First swap with actual production callers** (C1/C2 were delete-only). All three sites + the `requirements/sync.py:132` validator annotation migrated to the new `validate_delta_relationships(block, *, delta_id=None)` helper. Wrapper lives alongside `DELTA_RELATIONSHIPS_METADATA` in `delta_metadata.py` per phase-03 §10 ("alongside metadata declaration"), preserving the POL-003 boundary (`validation/` not touched).
+
+**Wrapper shape decisions:**
+
+- Module-scope singleton `_DELTA_RELATIONSHIPS_VALIDATOR = MetadataValidator(..., strict_unknown_keys=True)` — instantiated once per process, not per call. Mirrors the harness pattern.
+- Free function, not a class. Callers were already passing the validator as a kwarg to `_apply_delta_relations`; the kwarg evaporated and the helper is imported directly. `requirements/registry.py:239-243` lazy import + instantiation block removed entirely.
+- ID-equality check preserves the legacy `elif delta_id and delta_value != delta_id` truthy semantics (`delta_id=None` and `delta_id=""` both skip), and the exact mismatch error string format. "Missing delta id" path moves to metadata-driven required-field enforcement; callers only saw the truthy/falsy verdict, so the message-shape change is invisible at the call sites.
+
+**Patches landed:**
+
+- `delta.py`: deleted `DeltaRelationshipsValidator` (lines `:28-87`, 60 LOC); removed `"DeltaRelationshipsValidator"` from `__all__` (`:171` pre-edit).
+- `delta_metadata.py`: added `MetadataValidator` import; added `DeltaRelationshipsBlock` to existing `.delta` import; added module-scope strict validator; added `validate_delta_relationships(block, *, delta_id=None) -> list[str]`; exported in `__all__`.
+- `delta_metadata_test.py`: converted `_validate_both` to call the wrapper instead of the legacy class (variable rename `old_errors → wrapper_errors`); fixed the stale "doesn't support delta_id yet" comment on `test_delta_id_mismatch` (now asserts metadata-only validator returns `[]` when ID equality is purely a wrapper concern); added new `WrapperTest` class with 5 wrapper-specific cases (match accepts, `None`/empty skip, strict unknown keys, combined metadata+ID errors).
+- `changes/artifacts.py`: dropped class import, added wrapper import, swapped `DeltaRelationshipsValidator().validate(block, delta_id=...)` → `validate_delta_relationships(block, delta_id=...)` at `:122`.
+- `requirements/registry.py`: removed lazy-import + instantiation block at `:239-243`; `_apply_delta_relations` now called without `validator=` kwarg.
+- `requirements/sync.py`: top-of-file import migrated (class → wrapper); `_apply_delta_relations` kwarg `validator: DeltaRelationshipsValidator` removed entirely (the annotation cited in P01 §4 finding 1 is now obsolete, not migrated); body call site at `:171` (pre-edit) uses the wrapper directly.
+- `snapshot_compare.py`: dropped `DeltaRelationshipsBlock` / `DeltaRelationshipsValidator` imports; deleted `_adapt_delta_relationships`; removed `"delta.relationships"` from `HAND_ROLLED_ADAPTERS`. Map now contains 2 entries: `revision.change`, `spec.relationships`.
+
+**Gate evidence:**
+
+- `uv run ruff check supekku` — all checks passed (after 2 E501 fixes in test assertion messages; `validate_delta_relationships` body itself reformatted to a single-line f-string by `ruff format`).
+- `uv run python -m pytest supekku` — 4807 passed, 4 skipped (+5 from the C2 baseline of 4802: +5 in new `WrapperTest`).
+- `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` — OK (zero disagreements). 52 dual-validated (was 191), 825 metadata-only (was 686). 139 delta-relationships blocks shifted from dual to metadata-only.
+- `uv run spec-driver validate` — 8 audit-gate warnings + 2 install-skew lines = baseline-identical.
+- `uv run python -m supekku.scripts.pylint_report` on touched files: total 32 messages (was 42 pre-C3). Net −10 messages, all from the deleted validator class and the registry's lazy-import block. Zero new pylint debt from C3.
+
+**Findings refresh:**
+
+- The "wrapper signature is `(block, *, delta_id)`" pattern works cleanly; the kwarg-on-helper pattern (`_apply_delta_relations(..., validator=...)`) was unnecessary plumbing introduced by the per-validator class. C4 and C5 should drop their analogous validator-kwarg threading the same way unless other state needs propagating.
+- Per-call-site wrapper migrations are ~3 lines of diff each (import swap + call shape). No semantic surprises on this swap.
+
+**Next**: C4 (RelationshipsBlockValidator + spec relationships/capabilities wrappers; new `relationships_metadata_test.py` per the `<source>_metadata_test.py` mirror rule).

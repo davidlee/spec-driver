@@ -1,7 +1,10 @@
 """Dual-validation tests for delta relationships metadata.
 
-Tests that the new metadata-driven validator produces identical results
-to the existing DeltaRelationshipsValidator.
+Tests that the new metadata-driven validator and the wrapper helper
+produce results compatible with the legacy DeltaRelationshipsValidator
+behaviour. P03 C3 retires the legacy class; the parallel assertions
+remain here while DE-118 is open and are trimmed when the harness
+retires.
 """
 
 from __future__ import annotations
@@ -13,28 +16,27 @@ from supekku.scripts.lib.blocks.metadata import (
   metadata_to_json_schema,
 )
 
-from .delta import DeltaRelationshipsBlock, DeltaRelationshipsValidator
-from .delta_metadata import DELTA_RELATIONSHIPS_METADATA
+from .delta import DeltaRelationshipsBlock
+from .delta_metadata import (
+  DELTA_RELATIONSHIPS_METADATA,
+  validate_delta_relationships,
+)
 
 
 class DualValidationTest(unittest.TestCase):
-  """Test that metadata validator matches existing validator behavior."""
+  """Test that wrapper + metadata validator capture legacy behaviour."""
 
   def _validate_both(
     self, data: dict, *, delta_id: str | None = None
   ) -> tuple[list[str], list[str]]:
-    """Run both validators and return (old_errors, new_errors)."""
-    # Old validator
+    """Run wrapper and metadata validator; return (wrapper, metadata)."""
     block = DeltaRelationshipsBlock(raw_yaml="", data=data)
-    old_validator = DeltaRelationshipsValidator()
-    old_errors = old_validator.validate(block, delta_id=delta_id)
+    wrapper_errors = validate_delta_relationships(block, delta_id=delta_id)
 
-    # New metadata validator
     new_validator = MetadataValidator(DELTA_RELATIONSHIPS_METADATA)
-    new_validation_errors = new_validator.validate(data)
-    new_errors = [str(err) for err in new_validation_errors]
+    new_errors = [str(err) for err in new_validator.validate(data)]
 
-    return old_errors, new_errors
+    return wrapper_errors, new_errors
 
   def test_valid_minimal_block(self):
     """Both validators accept valid minimal block."""
@@ -44,8 +46,8 @@ class DualValidationTest(unittest.TestCase):
       "delta": "DE-001",
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert old_errors == []
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert wrapper_errors == []
     assert new_errors == []
 
   def test_valid_complete_block(self):
@@ -73,8 +75,8 @@ class DualValidationTest(unittest.TestCase):
       ],
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert old_errors == []
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert wrapper_errors == []
     assert new_errors == []
 
   def test_missing_schema_field(self):
@@ -84,8 +86,8 @@ class DualValidationTest(unittest.TestCase):
       "delta": "DE-001",
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("schema" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("schema" in err.lower() for err in wrapper_errors)
     assert any("schema" in err.lower() for err in new_errors)
 
   def test_wrong_schema_value(self):
@@ -96,8 +98,8 @@ class DualValidationTest(unittest.TestCase):
       "delta": "DE-001",
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("schema" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("schema" in err.lower() for err in wrapper_errors)
     assert any("schema" in err.lower() for err in new_errors)
 
   def test_wrong_version(self):
@@ -108,8 +110,8 @@ class DualValidationTest(unittest.TestCase):
       "delta": "DE-001",
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("version" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("version" in err.lower() for err in wrapper_errors)
     assert any("version" in err.lower() for err in new_errors)
 
   def test_missing_delta(self):
@@ -119,24 +121,24 @@ class DualValidationTest(unittest.TestCase):
       "version": 1,
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("delta" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("delta" in err.lower() for err in wrapper_errors)
     assert any("delta" in err.lower() for err in new_errors)
 
   def test_delta_id_mismatch(self):
-    """Both validators detect delta ID mismatch when expected ID provided."""
+    """Wrapper detects delta ID mismatch when expected ID provided."""
     data = {
       "schema": "supekku.delta.relationships",
       "version": 1,
       "delta": "DE-999",
     }
 
-    old_errors, new_errors = self._validate_both(data, delta_id="DE-001")
-    # Old validator checks for mismatch
+    wrapper_errors, new_errors = self._validate_both(data, delta_id="DE-001")
     assert any(
-      "de-999" in err.lower() and "de-001" in err.lower() for err in old_errors
+      "de-999" in err.lower() and "de-001" in err.lower() for err in wrapper_errors
     )
-    # New validator doesn't support delta_id parameter yet (that's OK for now)
+    # Metadata validator alone does not enforce caller ID equality.
+    assert new_errors == []
 
   def test_specs_not_object(self):
     """Both validators reject non-object specs."""
@@ -147,8 +149,8 @@ class DualValidationTest(unittest.TestCase):
       "specs": "not-object",
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("specs" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("specs" in err.lower() for err in wrapper_errors)
     assert any("specs" in err.lower() or "object" in err.lower() for err in new_errors)
 
   def test_requirements_not_object(self):
@@ -160,8 +162,8 @@ class DualValidationTest(unittest.TestCase):
       "requirements": "not-object",
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("requirements" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("requirements" in err.lower() for err in wrapper_errors)
     assert any(
       "requirements" in err.lower() or "object" in err.lower() for err in new_errors
     )
@@ -177,8 +179,8 @@ class DualValidationTest(unittest.TestCase):
       },
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("primary" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("primary" in err.lower() for err in wrapper_errors)
     assert any("primary" in err.lower() for err in new_errors)
 
   def test_specs_primary_non_string_items(self):
@@ -192,8 +194,8 @@ class DualValidationTest(unittest.TestCase):
       },
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("string" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("string" in err.lower() for err in wrapper_errors)
     assert any("string" in err.lower() for err in new_errors)
 
   def test_requirements_implements_not_array(self):
@@ -207,8 +209,8 @@ class DualValidationTest(unittest.TestCase):
       },
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("implements" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("implements" in err.lower() for err in wrapper_errors)
     assert any("implements" in err.lower() for err in new_errors)
 
   def test_phases_not_array(self):
@@ -220,8 +222,8 @@ class DualValidationTest(unittest.TestCase):
       "phases": "not-array",
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("phases" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("phases" in err.lower() for err in wrapper_errors)
     assert any("phases" in err.lower() or "array" in err.lower() for err in new_errors)
 
   def test_phases_entry_not_object(self):
@@ -233,8 +235,8 @@ class DualValidationTest(unittest.TestCase):
       "phases": ["not-object"],
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("object" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("object" in err.lower() for err in wrapper_errors)
     assert any("object" in err.lower() for err in new_errors)
 
   def test_phases_entry_missing_id(self):
@@ -248,8 +250,8 @@ class DualValidationTest(unittest.TestCase):
       ],
     }
 
-    old_errors, new_errors = self._validate_both(data)
-    assert any("id" in err.lower() for err in old_errors)
+    wrapper_errors, new_errors = self._validate_both(data)
+    assert any("id" in err.lower() for err in wrapper_errors)
     assert any("id" in err.lower() for err in new_errors)
 
   def test_all_specs_sections(self):
@@ -264,9 +266,9 @@ class DualValidationTest(unittest.TestCase):
         },
       }
 
-      old_errors, new_errors = self._validate_both(data)
-      assert old_errors == [], f"Old validator rejected valid specs.{section}"
-      assert new_errors == [], f"New validator rejected valid specs.{section}"
+      wrapper_errors, new_errors = self._validate_both(data)
+      assert wrapper_errors == [], f"Wrapper rejected valid specs.{section}"
+      assert new_errors == [], f"Metadata validator rejected valid specs.{section}"
 
   def test_all_requirements_sections(self):
     """Both validators accept all requirements sections."""
@@ -280,9 +282,9 @@ class DualValidationTest(unittest.TestCase):
         },
       }
 
-      old_errors, new_errors = self._validate_both(data)
-      assert old_errors == [], f"Old validator rejected valid requirements.{section}"
-      assert new_errors == [], f"New validator rejected valid requirements.{section}"
+      wrapper_errors, new_errors = self._validate_both(data)
+      assert wrapper_errors == [], f"Wrapper rejected valid requirements.{section}"
+      assert new_errors == [], f"Metadata rejected valid requirements.{section}"
 
   def test_all_revision_links_sections(self):
     """Both validators accept all revision_links sections."""
@@ -296,9 +298,75 @@ class DualValidationTest(unittest.TestCase):
         },
       }
 
-      old_errors, new_errors = self._validate_both(data)
-      assert old_errors == [], f"Old validator rejected valid revision_links.{section}"
-      assert new_errors == [], f"New validator rejected valid revision_links.{section}"
+      wrapper_errors, new_errors = self._validate_both(data)
+      assert wrapper_errors == [], f"Wrapper rejected valid revision_links.{section}"
+      assert new_errors == [], f"Metadata rejected valid revision_links.{section}"
+
+
+class WrapperTest(unittest.TestCase):
+  """Tests for the validate_delta_relationships wrapper helper."""
+
+  def _block(self, data: dict) -> DeltaRelationshipsBlock:
+    return DeltaRelationshipsBlock(raw_yaml="", data=data)
+
+  def test_delta_id_match_accepts(self):
+    """Wrapper accepts block whose delta value matches the expected id."""
+    block = self._block(
+      {
+        "schema": "supekku.delta.relationships",
+        "version": 1,
+        "delta": "DE-001",
+      }
+    )
+    assert validate_delta_relationships(block, delta_id="DE-001") == []
+
+  def test_delta_id_none_skips_id_check(self):
+    """When delta_id is None the wrapper does not enforce ID equality."""
+    block = self._block(
+      {
+        "schema": "supekku.delta.relationships",
+        "version": 1,
+        "delta": "DE-999",
+      }
+    )
+    assert validate_delta_relationships(block, delta_id=None) == []
+
+  def test_delta_id_empty_skips_id_check(self):
+    """Empty-string delta_id matches the legacy `elif delta_id` truthy gate."""
+    block = self._block(
+      {
+        "schema": "supekku.delta.relationships",
+        "version": 1,
+        "delta": "DE-999",
+      }
+    )
+    assert validate_delta_relationships(block, delta_id="") == []
+
+  def test_strict_unknown_keys_rejected(self):
+    """Wrapper enforces strict_unknown_keys via MetadataValidator."""
+    block = self._block(
+      {
+        "schema": "supekku.delta.relationships",
+        "version": 1,
+        "delta": "DE-001",
+        "unexpected_key": "value",
+      }
+    )
+    errors = validate_delta_relationships(block, delta_id="DE-001")
+    assert any("unexpected_key" in err for err in errors)
+
+  def test_combined_metadata_and_id_errors(self):
+    """Wrapper returns metadata errors AND id-mismatch when both apply."""
+    block = self._block(
+      {
+        "schema": "wrong.schema",
+        "version": 1,
+        "delta": "DE-999",
+      }
+    )
+    errors = validate_delta_relationships(block, delta_id="DE-001")
+    assert any("schema" in err.lower() for err in errors)
+    assert any("de-999" in err.lower() and "de-001" in err.lower() for err in errors)
 
 
 class MetadataOnlyTest(unittest.TestCase):

@@ -3,7 +3,7 @@ id: IP-118-P03
 slug: "118-block_schema_unification_retire_hand_rolled_validators_single_metadata_driven_validation_layer-phase-03"
 name: IP-118 Phase 03
 created: "2026-05-10"
-updated: "2026-05-11"
+updated: "2026-05-16"
 status: in-progress
 kind: phase
 plan: IP-118
@@ -115,7 +115,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | --- | --- | --- | --- | --- |
 | [x]    | 3.1 | **C1** — Retire `VerificationCoverageValidator` | no (sequencing) | Smallest blast radius; densest unit-test coverage. Landed: no production loader existed; pure delete. |
 | [x]    | 3.2 | **C2** — Retire plan trio (`PlanOverviewValidator`, `PhaseOverviewValidator`, `PhaseTrackingValidator`) in one commit | no (after C1) | New `tracking_metadata_test.py` created (matches `<source>_metadata_test.py` convention). Landed: no production callers existed for any of the three; pure delete. |
-| [ ]    | 3.3 | **C3** — Retire `DeltaRelationshipsValidator`; introduce `validate_delta_relationships` wrapper | no (after C2) | 3 external call sites; `sync.py:132` annotation must be migrated alongside `:171` callsite. |
+| [x]    | 3.3 | **C3** — Retire `DeltaRelationshipsValidator`; introduce `validate_delta_relationships` wrapper | no (after C2) | Landed: 3 external call sites + `sync.py:132` annotation migrated; wrapper kwarg threading collapsed (free function imported directly). |
 | [ ]    | 3.4 | **C4** — Retire `RelationshipsBlockValidator`; introduce `validate_spec_relationships` + `validate_spec_capabilities` (ergonomic) wrappers | no (after C3) | Create `relationships_metadata_test.py` (or sibling) — currently absent. |
 | [ ]    | 3.5 | **C5** — Retire `RevisionBlockValidator` and `_disallow_extra_keys` helper | no (after C4) | Largest blast radius: 2 external sites + `__all__` re-export removal. |
 | [ ]    | 3.6 | Wrap-up — `notes.md` P03 closure section; IP-118 progress tick; harness final state recorded | yes (after 3.5) | Hand-off to P04. |
@@ -185,6 +185,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 - `2026-05-10` — **`notes.md §4 finding 1`** flagged: P03 C3 commit must enumerate `requirements/sync.py:11/132/171` (annotation + call site) in addition to the DR-118 §3 sites.
 - `2026-05-11` — **C1 landed**: discovered `VerificationCoverageValidator` had no production callers (only tests + harness). Retirement reduced to class delete + test trim + adapter prune. DR-118 §4's "loader swap" framing was vacuous for this block; future swap commits must not assume a loader exists. Recorded in notes.md and §10.
 - `2026-05-11` — **C2 landed**: same observation — plan trio (`PlanOverviewValidator`, `PhaseOverviewValidator`, `PhaseTrackingValidator`) had **zero production callers**, confirming the §10 generalisation. Retirement = class delete + test conversion + adapter prune. Test placement: created new `tracking_metadata_test.py` (mirrors `tracking_metadata.py`); converted `plan_metadata_test.py` in place (mirrors `plan_metadata.py`); trimmed `tracking_test.py` to extraction + integration coverage only. R11 (test-file split asymmetry) resolved by the `<source>_metadata_test.py` mirror rule.
+- `2026-05-16` — **C3 landed**: first swap with real production callers (3 sites). Decided to drop the `validator=` kwarg threading on `_apply_delta_relations` rather than pass the wrapper as a callable — the kwarg only existed because the legacy class had to be instantiated somewhere; a module-scope wrapper makes the indirection useless. `requirements/registry.py:239-243` lazy import block deleted in the same move. Pattern propagates to C4/C5 unless real state needs threading.
 
 ## 10. Findings / Research Notes
 

@@ -30,10 +30,6 @@ from typing import Any
 
 import yaml
 
-from supekku.scripts.lib.blocks.delta import (
-  DeltaRelationshipsBlock,
-  DeltaRelationshipsValidator,
-)
 from supekku.scripts.lib.blocks.relationships import (
   RelationshipsBlock,
   RelationshipsBlockValidator,
@@ -53,11 +49,6 @@ def _adapt_revision(data: dict[str, Any], _fid: str | None) -> list[str]:
   return [str(e) for e in RevisionBlockValidator().validate(data)]
 
 
-def _adapt_delta_relationships(data: dict[str, Any], fid: str | None) -> list[str]:
-  block = DeltaRelationshipsBlock(raw_yaml="", data=data)
-  return DeltaRelationshipsValidator().validate(block, delta_id=fid)
-
-
 def _adapt_spec_relationships(data: dict[str, Any], fid: str | None) -> list[str]:
   block = RelationshipsBlock(raw_yaml="", data=data)
   return RelationshipsBlockValidator().validate(block, spec_id=fid)
@@ -67,7 +58,6 @@ def _adapt_spec_relationships(data: dict[str, Any], fid: str | None) -> list[str
 # P03 swap commits delete the corresponding entry as each validator retires.
 HAND_ROLLED_ADAPTERS: dict[str, HandRolledAdapter] = {
   "revision.change": _adapt_revision,
-  "delta.relationships": _adapt_delta_relationships,
   "spec.relationships": _adapt_spec_relationships,
 }
 

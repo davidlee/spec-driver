@@ -6,12 +6,17 @@ enabling metadata-driven validation and JSON Schema generation.
 
 from __future__ import annotations
 
-from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from supekku.scripts.lib.blocks.metadata import (
+  BlockMetadata,
+  FieldMetadata,
+  MetadataValidator,
+)
 
-# Reuse constants from delta.py
+# Reuse constants and block dataclass from delta.py
 from .delta import (
   RELATIONSHIPS_SCHEMA,
   RELATIONSHIPS_VERSION,
+  DeltaRelationshipsBlock,
 )
 
 # Metadata definition for delta relationships blocks
@@ -165,6 +170,33 @@ DELTA_RELATIONSHIPS_METADATA = BlockMetadata(
   ],
 )
 
+_DELTA_RELATIONSHIPS_VALIDATOR = MetadataValidator(
+  DELTA_RELATIONSHIPS_METADATA,
+  strict_unknown_keys=True,
+)
+
+
+def validate_delta_relationships(
+  block: DeltaRelationshipsBlock,
+  *,
+  delta_id: str | None = None,
+) -> list[str]:
+  """Validate a delta relationships block against its metadata declaration.
+
+  Returns the metadata-driven errors plus, when ``delta_id`` is provided,
+  an ID-equality check matching the legacy ``DeltaRelationshipsValidator``
+  message string (callers test truthiness of the returned list).
+  """
+  errors = [str(err) for err in _DELTA_RELATIONSHIPS_VALIDATOR.validate(block.data)]
+  delta_value = str(block.data.get("delta", ""))
+  if delta_id and delta_value and delta_value != delta_id:
+    errors.append(
+      f"delta relationships block id {delta_value} does not match expected {delta_id}",
+    )
+  return errors
+
+
 __all__ = [
   "DELTA_RELATIONSHIPS_METADATA",
+  "validate_delta_relationships",
 ]

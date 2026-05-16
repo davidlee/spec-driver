@@ -236,17 +236,11 @@ class RequirementsRegistry:
         validator=relationships_validator,
       )
 
-    from supekku.scripts.lib.blocks.delta import (  # noqa: PLC0415
-      DeltaRelationshipsValidator,
-    )
-
-    delta_validator = DeltaRelationshipsValidator()
     if delta_dirs:
       _apply_delta_relations(
         self.records,
         delta_dirs,
         repo_root,
-        validator=delta_validator,
       )
     if revision_dirs:
       _apply_revision_relations(self.records, revision_dirs)

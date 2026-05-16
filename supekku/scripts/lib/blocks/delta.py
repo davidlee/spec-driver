@@ -12,7 +12,7 @@ from .yaml_utils import format_yaml_list, make_block_pattern
 if TYPE_CHECKING:
   from pathlib import Path
 
-RELATIONSHIPS_MARKER = "supekku:delta.relationships@v1"
+DELTA_RELATIONSHIPS_MARKER = "supekku:delta.relationships@v1"
 RELATIONSHIPS_SCHEMA = "supekku.delta.relationships"
 RELATIONSHIPS_VERSION = 1
 
@@ -25,7 +25,7 @@ class DeltaRelationshipsBlock:
   data: dict[str, Any]
 
 
-_BLOCK_PATTERN = make_block_pattern(RELATIONSHIPS_MARKER)
+_BLOCK_PATTERN = make_block_pattern(DELTA_RELATIONSHIPS_MARKER)
 
 
 def extract_delta_relationships(text: str) -> DeltaRelationshipsBlock | None:
@@ -83,7 +83,7 @@ def render_delta_relationships_block(
     Formatted YAML code block as string.
   """
   lines = [
-    f"```yaml {RELATIONSHIPS_MARKER}",
+    f"```yaml {DELTA_RELATIONSHIPS_MARKER}",
     f"schema: {RELATIONSHIPS_SCHEMA}",
     f"version: {RELATIONSHIPS_VERSION}",
     f"delta: {delta_id}",
@@ -104,7 +104,7 @@ def render_delta_relationships_block(
 
 
 __all__ = [
-  "RELATIONSHIPS_MARKER",
+  "DELTA_RELATIONSHIPS_MARKER",
   "DeltaRelationshipsBlock",
   "extract_delta_relationships",
   "load_delta_relationships",
@@ -120,7 +120,7 @@ register_block_schema(
   "delta.relationships",
   BlockSchema(
     name="delta.relationships",
-    marker=RELATIONSHIPS_MARKER,
+    marker=DELTA_RELATIONSHIPS_MARKER,
     version=RELATIONSHIPS_VERSION,
     renderer=render_delta_relationships_block,
     description=(

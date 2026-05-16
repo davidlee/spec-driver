@@ -17,9 +17,7 @@ Domain logic that USES blocks stays here in specs/.
 from __future__ import annotations
 
 # Compatibility re-export for blocks
-from supekku.scripts.lib.blocks.relationships import (
-  RELATIONSHIPS_MARKER as SPEC_RELATIONSHIPS_MARKER,
-)
+from supekku.scripts.lib.blocks.relationships import SPEC_RELATIONSHIPS_MARKER
 from supekku.scripts.lib.blocks.relationships import (
   RelationshipsBlock as SpecRelationshipsBlock,
 )

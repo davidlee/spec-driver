@@ -12,7 +12,7 @@ from .yaml_utils import format_yaml_list, make_block_pattern
 if TYPE_CHECKING:
   from pathlib import Path
 
-RELATIONSHIPS_MARKER = "supekku:spec.relationships@v1"
+SPEC_RELATIONSHIPS_MARKER = "supekku:spec.relationships@v1"
 RELATIONSHIPS_SCHEMA = "supekku.spec.relationships"
 RELATIONSHIPS_VERSION = 1
 
@@ -29,7 +29,7 @@ class RelationshipsBlock:
   data: dict[str, Any]
 
 
-_RELATIONSHIPS_PATTERN = make_block_pattern(RELATIONSHIPS_MARKER)
+_RELATIONSHIPS_PATTERN = make_block_pattern(SPEC_RELATIONSHIPS_MARKER)
 
 
 def extract_relationships(block: str) -> RelationshipsBlock | None:
@@ -95,7 +95,7 @@ def render_spec_relationships_block(
     Formatted YAML code block as string.
   """
   lines = [
-    f"```yaml {RELATIONSHIPS_MARKER}",
+    f"```yaml {SPEC_RELATIONSHIPS_MARKER}",
     f"schema: {RELATIONSHIPS_SCHEMA}",
     f"version: {RELATIONSHIPS_VERSION}",
     f"spec: {spec_id}",
@@ -200,7 +200,7 @@ __all__ = [
   "CAPABILITIES_MARKER",
   "CAPABILITIES_SCHEMA",
   "CAPABILITIES_VERSION",
-  "RELATIONSHIPS_MARKER",
+  "SPEC_RELATIONSHIPS_MARKER",
   "RELATIONSHIPS_SCHEMA",
   "RELATIONSHIPS_VERSION",
   "RelationshipsBlock",
@@ -222,7 +222,7 @@ register_block_schema(
   "spec.relationships",
   BlockSchema(
     name="spec.relationships",
-    marker=RELATIONSHIPS_MARKER,
+    marker=SPEC_RELATIONSHIPS_MARKER,
     version=RELATIONSHIPS_VERSION,
     renderer=render_spec_relationships_block,
     description="Defines spec relationships to requirements and other specs",

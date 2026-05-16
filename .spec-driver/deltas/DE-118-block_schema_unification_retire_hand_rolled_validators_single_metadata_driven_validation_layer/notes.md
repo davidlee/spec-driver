@@ -505,6 +505,16 @@ This is good news for the retirement: removing dead code with no production call
 - **`spec-driver validate`**: byte-identical to baseline.
 - **Full test suite**: 4843 passed, 4 skipped, 0 failures (149s).
 
+### 4.4 — OQ-NAMING-COLLISIONS: rename `RELATIONSHIPS_MARKER`
+
+- **Sites confirmed via `rg "\bRELATIONSHIPS_MARKER\b" supekku/`** (matches notes §5; no widening): `blocks/delta.py` (5 occurrences) + `blocks/relationships.py` (5 occurrences) at the source; `changes/blocks/__init__.py:23` and `specs/__init__.py:21` at the alias-on-re-export.
+- **Renames**: `blocks/delta.py` → `DELTA_RELATIONSHIPS_MARKER` (all 5 sites via `replace_all`); `blocks/relationships.py` → `SPEC_RELATIONSHIPS_MARKER` (all 5 sites via `replace_all`). `__all__` entries updated automatically by replace_all.
+- **Alias-on-re-export collapsed**: `changes/blocks/__init__.py` merged the `RELATIONSHIPS_MARKER as DELTA_RELATIONSHIPS_MARKER` import into the adjacent block of direct imports (now `DELTA_RELATIONSHIPS_MARKER, DeltaRelationshipsBlock, extract_delta_relationships, load_delta_relationships`); `specs/__init__.py` similarly collapsed the alias to a direct import of `SPEC_RELATIONSHIPS_MARKER`.
+- **Final grep**: `rg "\bRELATIONSHIPS_MARKER\b" supekku/` returns **zero** hits. Both names disambiguated; OQ-NAMING-COLLISIONS half-resolved (4.5 settles `VALID_STATUSES`).
+- **Harness**: `scanned 1657 files, 0 disagreements.`
+- **`spec-driver validate`**: byte-identical to baseline.
+- **Full test suite**: 4843 passed, 4 skipped (149s).
+
 
 ## New Agent Instructions
 

@@ -20,9 +20,7 @@ New imports:
 from __future__ import annotations
 
 from supekku.scripts.lib.blocks.delta import (
-  RELATIONSHIPS_MARKER as DELTA_RELATIONSHIPS_MARKER,
-)
-from supekku.scripts.lib.blocks.delta import (
+  DELTA_RELATIONSHIPS_MARKER,
   DeltaRelationshipsBlock,
   extract_delta_relationships,
   load_delta_relationships,

@@ -4,10 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.blocks.revision import (
-  RevisionBlockValidator,
-  load_revision_blocks,
-)
+from supekku.scripts.lib.blocks.revision import load_revision_blocks
+from supekku.scripts.lib.blocks.revision_metadata import validate_revision_change
 from supekku.scripts.lib.requirements.lifecycle import VALID_STATUSES
 
 if TYPE_CHECKING:
@@ -132,18 +130,13 @@ def update_requirement_lifecycle_status(
     return False
 
   # Capture pre-existing validation errors before update
-  validator = RevisionBlockValidator()
-  pre_errors = {
-    f"{err.render_path()}: {err.message}" for err in validator.validate(data)
-  }
+  pre_errors = set(validate_revision_change(data))
 
   # Update status
   lifecycle["status"] = new_status
 
   # Validate: only reject if the update introduced NEW errors
-  post_errors = {
-    f"{err.render_path()}: {err.message}" for err in validator.validate(data)
-  }
+  post_errors = set(validate_revision_change(data))
   new_errors = post_errors - pre_errors
   if new_errors:
     raise RevisionUpdateError(

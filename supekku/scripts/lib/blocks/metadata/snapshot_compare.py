@@ -30,7 +30,6 @@ from typing import Any
 
 import yaml
 
-from supekku.scripts.lib.blocks.revision import RevisionBlockValidator
 from supekku.scripts.lib.blocks.schema_registry import BLOCK_SCHEMAS, BlockSchema
 from supekku.scripts.lib.blocks.yaml_utils import make_block_pattern
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
@@ -41,15 +40,11 @@ from .validator import MetadataValidator
 HandRolledAdapter = Callable[[dict[str, Any], str | None], list[str]]
 
 
-def _adapt_revision(data: dict[str, Any], _fid: str | None) -> list[str]:
-  return [str(e) for e in RevisionBlockValidator().validate(data)]
-
-
 # Block types that still have a hand-rolled validator (DE-118 P02 baseline).
 # P03 swap commits delete the corresponding entry as each validator retires.
-HAND_ROLLED_ADAPTERS: dict[str, HandRolledAdapter] = {
-  "revision.change": _adapt_revision,
-}
+# After P03 C5 this map is empty; harness lifecycle (keep/decommission/repurpose)
+# is settled in P04 per phase-03 §3.6.
+HAND_ROLLED_ADAPTERS: dict[str, HandRolledAdapter] = {}
 
 
 @dataclass

@@ -418,6 +418,43 @@ This is good news for the retirement: removing dead code with no production call
 
 **Next**: C5 (RevisionBlockValidator + `_disallow_extra_keys` helper retirement; 2 external sites + `changes/blocks/__init__.py:48,57` re-export removal; extends `revision_metadata_test.py` with the 4 regex-bug cases per DR-118 §5).
 
+### C5 — `RevisionBlockValidator` retired + harness adapter map empties (2026-05-16)
+
+**Wrapper shape — divergent.** Phase-03 §3.5 prescribed direct `MetadataValidator(REVISION_CHANGE_METADATA, strict_unknown_keys=True)` swaps at call sites, no wrapper. C5 added `validate_revision_change(data) -> list[str]` in `revision_metadata.py` anyway, for two reasons:
+
+- Two call sites benefit from a cached module-scope `MetadataValidator` instance (matches the C3/C4 `_DELTA_RELATIONSHIPS_VALIDATOR` / `_SPEC_RELATIONSHIPS_VALIDATOR` pattern).
+- Symmetry with the three sibling wrappers makes the wrapper-or-direct decision rule consistent across `delta_metadata`, `spec_metadata`, and `revision_metadata` modules.
+
+**Signature divergence — intentional.** Unlike the sibling wrappers (`validate_delta_relationships(block, ...)`, `validate_spec_relationships(block, ...)`), `validate_revision_change` accepts a **parsed `data` dict** rather than a `RevisionChangeBlock` instance. Reason: `RevisionChangeBlock` parses on demand via `.parse()` (no cached `.data` attribute) and `changes/updater.py` validates a mutable dict in place across an intervening status mutation — calling `.parse()` post-mutation would reset the mutation. Docstring documents the divergence and the caller pattern (`validate_revision_change(block.parse())`). No `revision_id` parameter — the legacy class never enforced ID equality, so adding the parameter would be the `validate_spec_capabilities` `del`-pattern footgun without the symmetry benefit (no caller passes the ID).
+
+**Patches landed:**
+
+- `revision.py`: deleted `RevisionBlockValidator` class (`:362-892`, 530 LOC), `_disallow_extra_keys` helper (`:350-359`), and `ValidationMessage` dataclass (`:258-281`); `__all__` trimmed; removed unused `is_kind` + `Sequence` imports; module docstring updated.
+- `revision_metadata.py`: added `MetadataValidator` import + `Any` typing import; introduced module-scope `_REVISION_CHANGE_VALIDATOR` + `validate_revision_change(data)`; `__all__` extended.
+- `revision_test.py`: trimmed three hand-rolled-validator tests (`test_validator_accepts_minimal_valid_payload`, `test_validator_flags_missing_destination_for_move`, `test_validator_flags_invalid_additional_specs`); kept extraction + YAML rewrite coverage. Schema-shape tests live in `revision_metadata_test.py`.
+- `revision_metadata_test.py`: full rewrite to wrapper + direct-validator dual assertion (was hand-rolled vs metadata). Three legacy "conditional-rule" tests (`test_requirement_origin_required_when_move`, `test_requirement_destination_required_when_introduce`, `test_requirement_destination_required_when_move`) dropped as intended DR-118 §5 drift — those allOf rules lived only in `REVISION_BLOCK_JSON_SCHEMA` (P04 deletion) and the retired class. Added `test_requirement_additional_specs_invalid_pattern` (ported from `revision_test.py`) and the 4 regex-bug regression tests per DR-118 §5 (canonical RE-/DE-/AUD- ids accepted in `metadata.revision`, `lifecycle.introduced_by`, `lifecycle.implemented_by`, `lifecycle.verified_by`). DEC-007 header note added. 41 tests, all green.
+- `requirements/sync.py`: dropped `RevisionBlockValidator` import; added `validate_revision_change` import; `_apply_revision_blocks` validator-construction line removed (was inside the helper, not threaded as a kwarg — kwarg-collapse footprint zero this round).
+- `changes/updater.py`: same import swap; pre/post-error diff now uses `set(validate_revision_change(data))` directly (the wrapper's `list[str]` return is set-keyable).
+- `changes/blocks/__init__.py`: `RevisionBlockValidator` re-export removed (`:48`, `:57`).
+- `snapshot_compare.py`: removed `RevisionBlockValidator` import and `_adapt_revision` adapter; `HAND_ROLLED_ADAPTERS` is now `{}` with a comment pointing at phase-03 §3.6 for the P04 lifecycle decision.
+
+**Gate evidence:**
+
+- `uv run ruff check supekku` — all checks passed.
+- `uv run python -m pytest supekku -q` — 4837 passed, 4 skipped (test count net -2 from C4: -3 dropped conditional-rule tests, +4 regex-bug tests, +1 additional_specs test from `revision_test.py`, -3 hand-rolled `revision_test.py` cases, plus convergence to MetadataOnly-only assertions; tally checked at 41 in `revision_metadata_test.py`).
+- `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` — OK (zero disagreements). 0 dual-validated (was 26 — `HAND_ROLLED_ADAPTERS` empty), all blocks counted under `blocks_metadata_only`. The harness now reports a pure metadata-only smoke pass, consistent with phase-03 §3.6 default (option a: keep, defer lifecycle to P04). Malformed-YAML noise (3 files) is pre-existing.
+- `uv run spec-driver validate` — 8 audit-gate warnings = baseline-identical (modulo install-skew lines).
+- `uv run python -m supekku.scripts.pylint_report` on the 7 touched files: net **−13 messages** (33 → 20), score 9.70 → 9.77. The bulk of the improvement comes from `revision.py` (16 → 3): retiring `RevisionBlockValidator` deletes three pre-existing `too-complex` methods (`_validate_requirement` at McCabe 43, `_validate_spec` at 20, `_check_root` at 11) plus their `too-many-branches` / `too-many-locals` companions. The pre-existing `revision → revision_metadata` cyclic-import warning persists (unchanged baseline; P04 will collapse REVISION_BLOCK_JSON_SCHEMA + the schema-registration hook). `revision_metadata_test.py` gains one `too-many-public-methods` (41/20) — was already over the 20 threshold at 36 in the C4 baseline; the +4 regex-bug + +1 additional_specs tests deepen it, but the class is intentionally flat for parallel-corpus readability per DEC-007.
+
+**Findings refresh:**
+
+- **Zero retired classes remain.** `rg "class.+Validator" supekku/scripts/lib/blocks/` returns nothing matching the seven hand-rolled retirees. `HAND_ROLLED_ADAPTERS` is `{}`. The dual-validate harness is now a metadata-only smoke test — phase-03 §3.6 default (option a) honoured; OQ-HARNESS-LIFECYCLE remains open for P04.
+- The kwarg-collapse pattern (C3/C4) did **not** generalise to C5 — `_apply_revision_blocks` constructs the validator inside the helper (not via a kwarg), so there was nothing to collapse. The wrapper still removed the construction-then-method-call indirection, but no signature changes propagated to callers.
+- DR-118 §2 regex-bug premise verified: the 4 `\\d` patterns in `REVISION_BLOCK_JSON_SCHEMA` (revision.py:43, :213, :217, :223) survived to P03 close because the hand-rolled validator used `is_kind` (a Python-level check) and no consumer evaluated the JSON Schema. The metadata declaration uses correctly escaped `\d` patterns; the 4 regex-bug regression tests pin the canonical-id acceptance so a P04 reintroduction of the double-backslash would fail unit tests before snapshot_compare even runs.
+- `RevisionChangeBlock` is the only one of the three retired-validator block dataclasses without a cached `.data` attribute (`DeltaRelationshipsBlock` and `RelationshipsBlock` both store parsed `data` post-extraction). Wrapping a block-with-parse-on-demand is *fundamentally different* from wrapping a block-with-cached-data: the former cannot be re-validated post-mutation through the wrapper, so the wrapper accepts data. Future block introductions should default to the cached-`.data` shape unless mutation-cycle semantics genuinely require otherwise.
+
+**P03 closure status:** 5/5 swap commits landed. `HAND_ROLLED_ADAPTERS` empty. All exit criteria from phase-03 §4 met. Hand-off to P04: `REVISION_BLOCK_JSON_SCHEMA` deletion + `_entry_shape` replacement + OQ-NAMING-COLLISIONS rename + OQ-HARNESS-LIFECYCLE settlement.
+
 ## New Agent Instructions
 
 ### Task card

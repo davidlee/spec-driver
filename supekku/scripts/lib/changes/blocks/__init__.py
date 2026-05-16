@@ -45,7 +45,6 @@ from supekku.scripts.lib.blocks.plan import (
 # Compatibility re-exports
 from supekku.scripts.lib.blocks.revision import (
   REVISION_BLOCK_MARKER,
-  RevisionBlockValidator,
   RevisionChangeBlock,
   extract_revision_blocks,
   load_revision_blocks,
@@ -54,7 +53,6 @@ from supekku.scripts.lib.blocks.revision import (
 __all__ = [
   "REVISION_BLOCK_MARKER",
   "RevisionChangeBlock",
-  "RevisionBlockValidator",
   "extract_revision_blocks",
   "load_revision_blocks",
   "DELTA_RELATIONSHIPS_MARKER",

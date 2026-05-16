@@ -10,10 +10,8 @@ from typing import TYPE_CHECKING, Any
 from supekku.scripts.lib.blocks.delta import extract_delta_relationships
 from supekku.scripts.lib.blocks.delta_metadata import validate_delta_relationships
 from supekku.scripts.lib.blocks.relationships import extract_relationships
-from supekku.scripts.lib.blocks.revision import (
-  RevisionBlockValidator,
-  load_revision_blocks,
-)
+from supekku.scripts.lib.blocks.revision import load_revision_blocks
+from supekku.scripts.lib.blocks.revision_metadata import validate_revision_change
 from supekku.scripts.lib.blocks.spec_metadata import validate_spec_relationships
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
@@ -206,7 +204,6 @@ def _apply_revision_blocks(
   stats: SyncStats,
 ) -> None:
   """Apply structured revision blocks to requirement records."""
-  validator = RevisionBlockValidator()
   for file in _iter_change_files(revision_dirs, prefix="RE-"):
     blocks = load_revision_blocks(file)
     for block in blocks:
@@ -214,7 +211,7 @@ def _apply_revision_blocks(
         data = block.parse()
       except ValueError:
         continue
-      if validator.validate(data):
+      if validate_revision_change(data):
         continue
       for requirement in data.get("requirements", []) or []:
         created, updated = _apply_revision_requirement(

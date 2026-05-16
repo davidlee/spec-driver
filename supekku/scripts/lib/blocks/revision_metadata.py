@@ -6,7 +6,13 @@ enabling metadata-driven validation and JSON Schema generation.
 
 from __future__ import annotations
 
-from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from typing import Any
+
+from supekku.scripts.lib.blocks.metadata import (
+  BlockMetadata,
+  FieldMetadata,
+  MetadataValidator,
+)
 
 # Import lifecycle statuses for requirement validation
 from supekku.scripts.lib.requirements.lifecycle import (
@@ -435,6 +441,29 @@ REVISION_CHANGE_METADATA = BlockMetadata(
   ],
 )
 
+_REVISION_CHANGE_VALIDATOR = MetadataValidator(
+  REVISION_CHANGE_METADATA,
+  strict_unknown_keys=True,
+)
+
+
+def validate_revision_change(data: dict[str, Any]) -> list[str]:
+  """Validate revision change block data against its metadata declaration.
+
+  Accepts a pre-parsed data dict rather than a ``RevisionChangeBlock``
+  instance: the block type parses on demand, and the call site in
+  ``changes/updater.py`` validates a mutable dict in place across an
+  intervening mutation. Callers holding a block should pass
+  ``block.parse()``.
+
+  Unlike sibling wrappers (``validate_delta_relationships``,
+  ``validate_spec_relationships``) no ID-equality check is layered on
+  top: the legacy ``RevisionBlockValidator`` did not enforce one.
+  """
+  return [str(err) for err in _REVISION_CHANGE_VALIDATOR.validate(data)]
+
+
 __all__ = [
   "REVISION_CHANGE_METADATA",
+  "validate_revision_change",
 ]

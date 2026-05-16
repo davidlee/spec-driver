@@ -30,10 +30,6 @@ from typing import Any
 
 import yaml
 
-from supekku.scripts.lib.blocks.relationships import (
-  RelationshipsBlock,
-  RelationshipsBlockValidator,
-)
 from supekku.scripts.lib.blocks.revision import RevisionBlockValidator
 from supekku.scripts.lib.blocks.schema_registry import BLOCK_SCHEMAS, BlockSchema
 from supekku.scripts.lib.blocks.yaml_utils import make_block_pattern
@@ -49,16 +45,10 @@ def _adapt_revision(data: dict[str, Any], _fid: str | None) -> list[str]:
   return [str(e) for e in RevisionBlockValidator().validate(data)]
 
 
-def _adapt_spec_relationships(data: dict[str, Any], fid: str | None) -> list[str]:
-  block = RelationshipsBlock(raw_yaml="", data=data)
-  return RelationshipsBlockValidator().validate(block, spec_id=fid)
-
-
 # Block types that still have a hand-rolled validator (DE-118 P02 baseline).
 # P03 swap commits delete the corresponding entry as each validator retires.
 HAND_ROLLED_ADAPTERS: dict[str, HandRolledAdapter] = {
   "revision.change": _adapt_revision,
-  "spec.relationships": _adapt_spec_relationships,
 }
 
 

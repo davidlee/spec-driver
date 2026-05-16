@@ -6,12 +6,17 @@ for the two spec block types registered in relationships.py.
 
 from __future__ import annotations
 
-from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from supekku.scripts.lib.blocks.metadata import (
+  BlockMetadata,
+  FieldMetadata,
+  MetadataValidator,
+)
 from supekku.scripts.lib.blocks.relationships import (
   CAPABILITIES_SCHEMA,
   CAPABILITIES_VERSION,
   RELATIONSHIPS_SCHEMA,
   RELATIONSHIPS_VERSION,
+  RelationshipsBlock,
 )
 
 # ---------------------------------------------------------------------------
@@ -207,7 +212,59 @@ SPEC_CAPABILITIES_METADATA = BlockMetadata(
   ],
 )
 
+_SPEC_RELATIONSHIPS_VALIDATOR = MetadataValidator(
+  SPEC_RELATIONSHIPS_METADATA,
+  strict_unknown_keys=True,
+)
+
+_SPEC_CAPABILITIES_VALIDATOR = MetadataValidator(
+  SPEC_CAPABILITIES_METADATA,
+  strict_unknown_keys=True,
+)
+
+
+def validate_spec_relationships(
+  block: RelationshipsBlock,
+  *,
+  spec_id: str | None = None,
+) -> list[str]:
+  """Validate a spec relationships block against its metadata declaration.
+
+  Returns the metadata-driven errors plus, when ``spec_id`` is provided,
+  an ID-equality check matching the legacy ``RelationshipsBlockValidator``
+  message string (callers test truthiness of the returned list).
+  """
+  errors = [str(err) for err in _SPEC_RELATIONSHIPS_VALIDATOR.validate(block.data)]
+  spec_value = str(block.data.get("spec", ""))
+  if spec_id and spec_value and spec_value != spec_id:
+    errors.append(
+      f"relationships block spec {spec_value} does not match expected {spec_id}",
+    )
+  return errors
+
+
+def validate_spec_capabilities(
+  block: RelationshipsBlock,
+  *,
+  spec_id: str | None = None,
+) -> list[str]:
+  """Validate a spec capabilities block against its metadata declaration.
+
+  Ergonomic counterpart to :func:`validate_spec_relationships`. The
+  ``spec_id`` parameter is accepted for API symmetry but is **not**
+  enforced — no legacy hand-rolled validator existed for this block, so
+  introducing an ID-equality check here would tighten validation beyond
+  the DE-118 invariant-preserving scope. The metadata declaration
+  already enforces the ``spec`` field's presence and string type via
+  :class:`MetadataValidator`.
+  """
+  del spec_id  # accepted for API symmetry; see docstring above.
+  return [str(err) for err in _SPEC_CAPABILITIES_VALIDATOR.validate(block.data)]
+
+
 __all__ = [
   "SPEC_CAPABILITIES_METADATA",
   "SPEC_RELATIONSHIPS_METADATA",
+  "validate_spec_capabilities",
+  "validate_spec_relationships",
 ]

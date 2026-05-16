@@ -9,10 +9,12 @@ from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.blocks.delta import extract_delta_relationships
 from supekku.scripts.lib.blocks.delta_metadata import validate_delta_relationships
+from supekku.scripts.lib.blocks.relationships import extract_relationships
 from supekku.scripts.lib.blocks.revision import (
   RevisionBlockValidator,
   load_revision_blocks,
 )
+from supekku.scripts.lib.blocks.spec_metadata import validate_spec_relationships
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
 
@@ -250,14 +252,8 @@ def _apply_spec_relationships(
   records: dict[str, RequirementRecord],
   spec_id: str,
   body: str,
-  *,
-  validator: Any,
 ) -> None:
   """Apply spec relationship blocks to requirement records."""
-  from supekku.scripts.lib.blocks.relationships import (  # noqa: PLC0415
-    extract_relationships,
-  )
-
   if not body:
     return
   try:
@@ -266,7 +262,7 @@ def _apply_spec_relationships(
     return
   if not block:
     return
-  if validator.validate(block, spec_id=spec_id):
+  if validate_spec_relationships(block, spec_id=spec_id):
     return
 
   data = block.data

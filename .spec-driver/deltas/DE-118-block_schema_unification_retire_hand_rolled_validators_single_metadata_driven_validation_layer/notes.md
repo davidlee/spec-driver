@@ -383,3 +383,37 @@ This is good news for the retirement: removing dead code with no production call
 - Per-call-site wrapper migrations are ~3 lines of diff each (import swap + call shape). No semantic surprises on this swap.
 
 **Next**: C4 (RelationshipsBlockValidator + spec relationships/capabilities wrappers; new `relationships_metadata_test.py` per the `<source>_metadata_test.py` mirror rule).
+
+### C4 — `RelationshipsBlockValidator` retired + spec wrappers landed
+
+**Two wrappers in one commit.** Per DR-118 §4 / phase-03 §3.4:
+
+- `validate_spec_relationships(block, *, spec_id=None)` — direct mirror of C3's `validate_delta_relationships`. ID-equality preserved with the exact legacy error string `"relationships block spec {spec_value} does not match expected {spec_id}"`.
+- `validate_spec_capabilities(block, *, spec_id=None)` — ergonomic. `spec_id` accepted for API symmetry and explicitly `del`'d in the body with a docstring note. Adding ID-equality here would tighten validation beyond the DE-118 invariant-preserving scope (no legacy `SpecCapabilitiesValidator` ever existed), so it remains caller-driven. The metadata declaration already enforces `spec` field presence + string type.
+
+**Test-file placement.** Phase-03 §3.4 named `relationships_metadata_test.py` as the new file; the C2 `<source>_metadata_test.py` mirror rule (resolved on 2026-05-11) makes `spec_metadata_test.py` the correct name. Wrapper code lives in `spec_metadata.py`, not `relationships.py`, so the mirror points there. 32 tests across 3 classes (`SpecRelationshipsWrapperTest` 18, `SpecCapabilitiesWrapperTest` 8, `MetadataOnlyTest` 5 + JSON-schema sanity case).
+
+**Patches landed:**
+
+- `relationships.py`: deleted `RelationshipsBlockValidator` (lines `:32-95`, 64 LOC); removed `"RelationshipsBlockValidator"` from `__all__`.
+- `spec_metadata.py`: added `MetadataValidator` to existing metadata import; added `RelationshipsBlock` to the `.relationships` import; added two module-scope strict validators; added `validate_spec_relationships` and `validate_spec_capabilities`; both exported.
+- `spec_metadata_test.py`: **new file** (35 tests including DEC-007 header note).
+- `requirements/registry.py`: dropped `RelationshipsBlockValidator` import (line `:12`); removed `relationships_validator = RelationshipsBlockValidator()` instantiation (was `:162`); `_apply_spec_relationships` called without `validator=` kwarg (was `:236`).
+- `requirements/sync.py`: hoisted `extract_relationships` + `validate_spec_relationships` to module-top imports (alongside the C3 delta-block imports); dropped the inner-import block in `_apply_spec_relationships`; removed `validator: Any` kwarg from the function signature. The `:132` annotation finding from P01 §4 is now historical — no validator instance exists to type.
+- `snapshot_compare.py`: dropped `RelationshipsBlock` / `RelationshipsBlockValidator` imports; deleted `_adapt_spec_relationships`; removed `"spec.relationships"` from `HAND_ROLLED_ADAPTERS`. Map now contains 1 entry: `revision.change`.
+
+**Gate evidence:**
+
+- `uv run ruff check supekku` — all checks passed (test file reformatted once by `ruff format`).
+- `uv run python -m pytest supekku` — 4839 passed, 4 skipped (+32 from C3 baseline of 4807: all in new `spec_metadata_test.py`).
+- `python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` — OK (zero disagreements). 26 dual-validated (was 52), 851 metadata-only (was 825). 26 spec.relationships blocks shifted off dual.
+- `uv run spec-driver validate` — 8 audit-gate warnings = baseline-identical.
+- `uv run python -m supekku.scripts.pylint_report` on touched files: net −4 messages (30 → 26). Notable: hoisting the spec_relationships imports to module-top removed the 2 `import-outside-toplevel` warnings in `_apply_spec_relationships` that would otherwise have been preserved; the `del spec_id` pattern resolved the `unused-argument` warning on the ergonomic wrapper without breaking the symmetry-of-API intent.
+
+**Findings refresh:**
+
+- The kwarg-threading collapse generalises: both C3 and C4 dropped `validator=` kwargs from their `_apply_*` helpers without losing any semantic. C5 (`RevisionBlockValidator`) likely follows the same shape — `_apply_revision_blocks` in `requirements/sync.py:203` accepts the validator as a positional construction, not a kwarg, so the migration profile differs slightly but the wrapper-import shape is the same.
+- Inner imports of `extract_relationships` + `validate_spec_relationships` were safe to hoist to module-top. The cyclic-import warning (1, pre-existing) is `relationships → spec_metadata` for the schema-registration import at `relationships.py:281`; it does not propagate through sync.py top imports.
+- Phase-03 §6 said "spec.capabilities block has no `spec` field at the data layer". The metadata declaration (`spec_metadata.py:135`) **does** declare a required `spec` field. The phase-sheet phrasing was imprecise — what it really meant was "no legacy ID-equality enforcement existed". The wrapper docstring records the actual reason (invariant preservation), not the imprecise data-layer claim.
+
+**Next**: C5 (RevisionBlockValidator + `_disallow_extra_keys` helper retirement; 2 external sites + `changes/blocks/__init__.py:48,57` re-export removal; extends `revision_metadata_test.py` with the 4 regex-bug cases per DR-118 §5).

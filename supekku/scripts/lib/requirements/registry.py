@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING
 
 import yaml
 
-from supekku.scripts.lib.blocks.relationships import RelationshipsBlockValidator
 from supekku.scripts.lib.core.repo import find_repo_root
 
 from .coverage import _apply_coverage_blocks
@@ -159,8 +158,6 @@ class RequirementsRegistry:
     # relation/revision/coverage steps complete.
     spec_extractions: dict[str, set[str]] = {}
 
-    relationships_validator = RelationshipsBlockValidator()
-
     # Collect (spec_id, body) pairs for deferred relationship application.
     deferred_relationships: list[tuple[str, str]] = []
 
@@ -229,12 +226,7 @@ class RequirementsRegistry:
 
     # Apply all relationship blocks now that every requirement exists.
     for spec_id, body in deferred_relationships:
-      _apply_spec_relationships(
-        self.records,
-        spec_id,
-        body,
-        validator=relationships_validator,
-      )
+      _apply_spec_relationships(self.records, spec_id, body)
 
     if delta_dirs:
       _apply_delta_relations(

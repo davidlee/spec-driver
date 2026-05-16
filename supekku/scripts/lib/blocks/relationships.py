@@ -29,72 +29,6 @@ class RelationshipsBlock:
   data: dict[str, Any]
 
 
-class RelationshipsBlockValidator:
-  """Validator for specification relationships blocks."""
-
-  def validate(
-    self,
-    block: RelationshipsBlock,
-    *,
-    spec_id: str | None = None,
-  ) -> list[str]:
-    """Validate relationships block against schema.
-
-    Args:
-      block: Parsed relationships block to validate.
-      spec_id: Optional expected spec ID to match against.
-
-    Returns:
-      List of error messages (empty if valid).
-    """
-    errors: list[str] = []
-    data = block.data
-    if data.get("schema") != RELATIONSHIPS_SCHEMA:
-      errors.append(
-        "relationships block must declare schema supekku.spec.relationships",
-      )
-    if data.get("version") != RELATIONSHIPS_VERSION:
-      errors.append("relationships block must declare version 1")
-
-    spec_value = str(data.get("spec", ""))
-    if not spec_value:
-      errors.append("relationships block missing spec id")
-    elif spec_id and spec_value != spec_id:
-      errors.append(
-        f"relationships block spec {spec_value} does not match expected {spec_id}",
-      )
-
-    requirements = data.get("requirements")
-    if not isinstance(requirements, dict):
-      errors.append("relationships requirements must be a mapping")
-    else:
-      for key in ("primary", "collaborators"):
-        value = requirements.get(key)
-        if value is None:
-          continue
-        if not isinstance(value, list):
-          errors.append(f"requirements.{key} must be a list")
-          continue
-        for item in value:
-          if not isinstance(item, str):
-            errors.append(f"requirements.{key} entries must be strings")
-
-    interactions = data.get("interactions")
-    if interactions is not None:
-      if not isinstance(interactions, list):
-        errors.append("interactions must be a list")
-      else:
-        for entry in interactions:
-          if not isinstance(entry, dict):
-            errors.append("interaction entries must be objects")
-            continue
-          if "type" not in entry:
-            errors.append("interaction missing type")
-          if "spec" not in entry:
-            errors.append("interaction missing spec")
-    return errors
-
-
 _RELATIONSHIPS_PATTERN = make_block_pattern(RELATIONSHIPS_MARKER)
 
 
@@ -270,7 +204,6 @@ __all__ = [
   "RELATIONSHIPS_SCHEMA",
   "RELATIONSHIPS_VERSION",
   "RelationshipsBlock",
-  "RelationshipsBlockValidator",
   "extract_relationships",
   "load_relationships_from_file",
   "render_spec_capabilities_block",

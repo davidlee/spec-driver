@@ -13,11 +13,7 @@ from supekku.scripts.lib.blocks.metadata import (
   FieldMetadata,
   MetadataValidator,
 )
-
-# Import lifecycle statuses for requirement validation
-from supekku.scripts.lib.requirements.lifecycle import (
-  VALID_STATUSES as REQUIREMENT_VALID_STATUSES,
-)
+from supekku.scripts.lib.requirements.lifecycle import REQUIREMENT_STATUSES
 
 REVISION_BLOCK_SCHEMA_ID = "supekku.revision.change"
 REVISION_BLOCK_VERSION = 1
@@ -283,7 +279,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
               "status": FieldMetadata(
                 type="enum",
                 required=False,
-                enum_values=sorted(REQUIREMENT_VALID_STATUSES),
+                enum_values=sorted(REQUIREMENT_STATUSES),
                 description="Current lifecycle status",
               ),
               "introduced_by": FieldMetadata(

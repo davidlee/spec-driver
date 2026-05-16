@@ -451,15 +451,9 @@ class EnumIntrospectionTest(unittest.TestCase):
     from supekku.scripts.lib.blocks.verification import (
       VALID_KINDS as VER_KINDS,
     )
-    from supekku.scripts.lib.blocks.verification import (
-      VALID_STATUSES as VER_STATUSES,
-    )
-    from supekku.scripts.lib.changes.lifecycle import (
-      VALID_STATUSES as CHANGE_STATUSES,
-    )
-    from supekku.scripts.lib.requirements.lifecycle import (
-      VALID_STATUSES as REQ_STATUSES,
-    )
+    from supekku.scripts.lib.blocks.verification import VERIFICATION_STATUSES
+    from supekku.scripts.lib.changes.lifecycle import CHANGE_STATUSES
+    from supekku.scripts.lib.requirements.lifecycle import REQUIREMENT_STATUSES
 
     result = self.runner.invoke(app, ["show", "schema", "enums.delta.status"])
     delta_values = set(json.loads(result.stdout))
@@ -467,11 +461,11 @@ class EnumIntrospectionTest(unittest.TestCase):
 
     result = self.runner.invoke(app, ["show", "schema", "enums.requirement.status"])
     req_values = set(json.loads(result.stdout))
-    assert req_values == REQ_STATUSES
+    assert req_values == REQUIREMENT_STATUSES
 
     result = self.runner.invoke(app, ["show", "schema", "enums.verification.status"])
     ver_status_values = set(json.loads(result.stdout))
-    assert ver_status_values == VER_STATUSES
+    assert ver_status_values == VERIFICATION_STATUSES
 
     result = self.runner.invoke(app, ["show", "schema", "enums.verification.kind"])
     ver_kind_values = set(json.loads(result.stdout))

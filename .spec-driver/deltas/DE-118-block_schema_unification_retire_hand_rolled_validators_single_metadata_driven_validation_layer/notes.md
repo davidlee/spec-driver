@@ -515,6 +515,26 @@ This is good news for the retirement: removing dead code with no production call
 - **`spec-driver validate`**: byte-identical to baseline.
 - **Full test suite**: 4843 passed, 4 skipped (149s).
 
+### 4.5 — OQ-NAMING-COLLISIONS: rename `VALID_STATUSES`
+
+- **Inventory** (`rg "\bVALID_STATUSES\b" supekku/`): 3 source modules + 9 direct consumer-import sites + 6 alias-on-import workaround lines across 2 files. Plus 1 in-module disambiguation alias (`VALID_COVERAGE_STATUSES = VALID_STATUSES` in `verification.py:25-28`) used by 1 consumer (`coverage.py`); retired alongside.
+- **Source renames** (each canonical declaration site, including `__all__` entry via `replace_all`):
+  - `supekku/scripts/lib/changes/lifecycle.py` → `CHANGE_STATUSES`
+  - `supekku/scripts/lib/requirements/lifecycle.py` → `REQUIREMENT_STATUSES`
+  - `supekku/scripts/lib/blocks/verification.py` → `VERIFICATION_STATUSES` (plus retired `VALID_COVERAGE_STATUSES` workaround alias + its `__all__` entry)
+- **Direct consumers migrated**:
+  - `changes/artifacts.py`, `cli/list/deltas.py` (changes/lifecycle → `CHANGE_STATUSES`)
+  - `requirements/registry.py`, `changes/updater.py`, `blocks/revision_metadata.py` (requirements/lifecycle → `REQUIREMENT_STATUSES`; also dropped the local `VALID_STATUSES as REQUIREMENT_VALID_STATUSES` alias in `revision_metadata.py`)
+  - `blocks/verification_metadata.py`, `requirements/coverage.py` (blocks/verification → `VERIFICATION_STATUSES`; the latter formerly imported `VALID_COVERAGE_STATUSES`)
+- **Alias-on-import workarounds collapsed**:
+  - `supekku/cli/schema_test.py:451-462` → 3 alias-as lines (`VALID_STATUSES as VER_STATUSES`, `… as CHANGE_STATUSES`, `… as REQ_STATUSES`) became direct imports of `VERIFICATION_STATUSES` / `CHANGE_STATUSES` / `REQUIREMENT_STATUSES`. Local references (`assert … == VER_STATUSES`, etc.) updated.
+  - `spec_driver/orchestration/enums.py:16-31` → same pattern across 3 paired imports; collapsed to direct imports.
+- **Final grep**: `rg "\bVALID_STATUSES\b|\bVALID_COVERAGE_STATUSES\b|\bREQUIREMENT_VALID_STATUSES\b" supekku/ spec_driver/` returns **zero** hits. OQ-NAMING-COLLISIONS now fully resolved (both names disambiguated; all workaround aliases retired).
+- **Ruff auto-fix**: 2 import-block reorderings applied (`cli/list/deltas.py`, `blocks/revision_metadata.py` — the latter's import block also tidied after dropping the `# Import lifecycle statuses…` comment + alias). Manual line-length fix at `changes/updater.py:50` (long error-message f-string broken across two lines).
+- **Harness**: `scanned 1657 files, 0 disagreements.`
+- **`spec-driver validate`**: byte-identical to baseline.
+- **Full test suite**: 4843 passed, 4 skipped (149s).
+
 
 ## New Agent Instructions
 

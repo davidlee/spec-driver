@@ -16,19 +16,13 @@ from supekku.scripts.lib.backlog.models import (
 from supekku.scripts.lib.blocks.verification import (
   VALID_KINDS as VERIFICATION_KINDS,
 )
-from supekku.scripts.lib.blocks.verification import (
-  VALID_STATUSES as VERIFICATION_STATUSES,
-)
-from supekku.scripts.lib.changes.lifecycle import (
-  VALID_STATUSES as CHANGE_STATUSES,
-)
+from supekku.scripts.lib.blocks.verification import VERIFICATION_STATUSES
+from supekku.scripts.lib.changes.lifecycle import CHANGE_STATUSES
 from supekku.scripts.lib.decisions.lifecycle import ADR_STATUSES
 from supekku.scripts.lib.drift.models import LEDGER_STATUSES
 from supekku.scripts.lib.memory.lifecycle import MEMORY_STATUSES
 from supekku.scripts.lib.policies.lifecycle import POLICY_STATUSES
-from supekku.scripts.lib.requirements.lifecycle import (
-  VALID_STATUSES as REQUIREMENT_STATUSES,
-)
+from supekku.scripts.lib.requirements.lifecycle import REQUIREMENT_STATUSES
 from supekku.scripts.lib.specs.lifecycle import SPEC_STATUSES
 from supekku.scripts.lib.standards.lifecycle import STANDARD_STATUSES
 

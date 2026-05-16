@@ -21,8 +21,8 @@ from supekku.cli.common import (
 )
 from supekku.cli.list import _parse_relation_filter, app
 from supekku.scripts.lib.changes.lifecycle import (
+  CHANGE_STATUSES,
   STATUS_COMPLETED,
-  VALID_STATUSES,
   normalize_status,
 )
 from supekku.scripts.lib.changes.registry import ChangeRegistry
@@ -52,7 +52,7 @@ def list_deltas(
     typer.Option(
       "--status",
       "-s",
-      help=f"Filter by status. Valid: {', '.join(sorted(VALID_STATUSES))}",
+      help=f"Filter by status. Valid: {', '.join(sorted(CHANGE_STATUSES))}",
     ),
   ] = None,
   implements: Annotated[

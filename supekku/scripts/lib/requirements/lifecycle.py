@@ -11,7 +11,7 @@ STATUS_RETIRED: RequirementStatus = "retired"
 STATUS_DEPRECATED: RequirementStatus = "deprecated"
 STATUS_SUPERSEDED: RequirementStatus = "superseded"
 
-VALID_STATUSES: set[RequirementStatus] = {
+REQUIREMENT_STATUSES: set[RequirementStatus] = {
   STATUS_PENDING,
   STATUS_IN_PROGRESS,
   STATUS_ACTIVE,
@@ -34,6 +34,6 @@ __all__ = [
   "STATUS_RETIRED",
   "STATUS_SUPERSEDED",
   "TERMINAL_STATUSES",
-  "VALID_STATUSES",
+  "REQUIREMENT_STATUSES",
   "RequirementStatus",
 ]

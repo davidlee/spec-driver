@@ -17,7 +17,7 @@ from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
 
-from .lifecycle import VALID_STATUSES, normalize_status
+from .lifecycle import CHANGE_STATUSES, normalize_status
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -93,9 +93,9 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
   status = normalize_status(raw_status) if raw_status else raw_status
 
   # Validate status against known values
-  if status and status not in VALID_STATUSES:
+  if status and status not in CHANGE_STATUSES:
     # Show only canonical statuses (exclude legacy aliases like 'complete')
-    canonical = sorted(s for s in VALID_STATUSES if normalize_status(s) == s)
+    canonical = sorted(s for s in CHANGE_STATUSES if normalize_status(s) == s)
     msg = (
       f"Invalid status '{raw_status}' in {path}. Valid statuses: {', '.join(canonical)}"
     )

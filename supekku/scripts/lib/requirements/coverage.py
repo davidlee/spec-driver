@@ -8,7 +8,7 @@ from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.blocks.verification import (
-  VALID_COVERAGE_STATUSES,
+  VERIFICATION_STATUSES,
   load_coverage_blocks,
 )
 
@@ -77,7 +77,7 @@ def _compute_status_from_coverage(
 ) -> RequirementStatus | None:
   """Compute requirement status from aggregated coverage entries.
 
-  Only entries with statuses in VALID_COVERAGE_STATUSES are considered.
+  Only entries with statuses in VERIFICATION_STATUSES are considered.
   Unknown statuses are silently ignored (warnings are emitted at the
   ingestion boundary in _apply_coverage_blocks).
 
@@ -94,7 +94,7 @@ def _compute_status_from_coverage(
     return None
 
   statuses = {
-    e.get("status") for e in entries if e.get("status") in VALID_COVERAGE_STATUSES
+    e.get("status") for e in entries if e.get("status") in VERIFICATION_STATUSES
   }
   if not statuses:
     return None
@@ -140,12 +140,12 @@ def _extract_coverage_entries(
         if not req_id:
           continue
         status = entry.get("status")
-        if status and status not in VALID_COVERAGE_STATUSES:
+        if status and status not in VERIFICATION_STATUSES:
           print(
             f"WARNING: Coverage entry for {req_id} has unknown status "
             f"{status!r} in {source_file.name}; "
             f"entry will not influence derived requirement status; "
-            f"valid: {sorted(VALID_COVERAGE_STATUSES)}",
+            f"valid: {sorted(VERIFICATION_STATUSES)}",
             file=sys.stderr,
           )
         coverage_map[req_id].append(

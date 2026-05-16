@@ -13,7 +13,7 @@ from .verification import (
   COVERAGE_SCHEMA,
   COVERAGE_VERSION,
   VALID_KINDS,
-  VALID_STATUSES,
+  VERIFICATION_STATUSES,
 )
 
 # Regex patterns for validation
@@ -84,7 +84,7 @@ VERIFICATION_COVERAGE_METADATA = BlockMetadata(
           "status": FieldMetadata(
             type="enum",
             required=True,
-            enum_values=sorted(VALID_STATUSES),
+            enum_values=sorted(VERIFICATION_STATUSES),
             description="Verification status",
           ),
           "notes": FieldMetadata(

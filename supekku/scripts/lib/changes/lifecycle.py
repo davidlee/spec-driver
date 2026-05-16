@@ -17,7 +17,7 @@ STATUS_DEFERRED: ChangeStatus = "deferred"
 # Legacy alias for backwards compatibility
 STATUS_COMPLETE: ChangeStatus = "complete"  # Maps to completed
 
-VALID_STATUSES: set[ChangeStatus] = {
+CHANGE_STATUSES: set[ChangeStatus] = {
   STATUS_DRAFT,
   STATUS_PENDING,
   STATUS_IN_PROGRESS,
@@ -54,7 +54,7 @@ __all__ = [
   "STATUS_DRAFT",
   "STATUS_IN_PROGRESS",
   "STATUS_PENDING",
-  "VALID_STATUSES",
+  "CHANGE_STATUSES",
   "ChangeStatus",
   "normalize_status",
 ]

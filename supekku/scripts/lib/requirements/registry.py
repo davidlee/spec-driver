@@ -13,7 +13,7 @@ from supekku.scripts.lib.core.repo import find_repo_root
 
 from .coverage import _apply_coverage_blocks
 from .lifecycle import (
-  VALID_STATUSES,
+  REQUIREMENT_STATUSES,
   RequirementStatus,
 )
 from .models import RequirementRecord, SyncStats
@@ -429,8 +429,8 @@ class RequirementsRegistry:
 
   def set_status(self, uid: str, status: RequirementStatus) -> None:
     """Set the status of a requirement."""
-    if status not in VALID_STATUSES:
-      msg = f"Invalid status {status!r}; must be one of {sorted(VALID_STATUSES)}"
+    if status not in REQUIREMENT_STATUSES:
+      msg = f"Invalid status {status!r}; must be one of {sorted(REQUIREMENT_STATUSES)}"
       raise ValueError(msg)
     try:
       record = self.records[uid]

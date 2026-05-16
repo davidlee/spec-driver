@@ -20,12 +20,7 @@ COVERAGE_VERSION = 1
 VALID_KINDS = {"VT", "VA", "VH"}
 
 # Valid verification statuses
-VALID_STATUSES = {"planned", "in-progress", "verified", "failed", "blocked"}
-
-# Disambiguated alias — three modules export VALID_STATUSES for different
-# domains (requirements, changes, coverage).  This name is unambiguous at
-# import sites and should be preferred for new code.
-VALID_COVERAGE_STATUSES = VALID_STATUSES
+VERIFICATION_STATUSES = {"planned", "in-progress", "verified", "failed", "blocked"}
 
 
 @dataclass(frozen=True)
@@ -150,9 +145,8 @@ __all__ = [
   "COVERAGE_MARKER",
   "COVERAGE_SCHEMA",
   "COVERAGE_VERSION",
-  "VALID_COVERAGE_STATUSES",
   "VALID_KINDS",
-  "VALID_STATUSES",
+  "VERIFICATION_STATUSES",
   "VerificationCoverageBlock",
   "extract_coverage_blocks",
   "load_coverage_blocks",

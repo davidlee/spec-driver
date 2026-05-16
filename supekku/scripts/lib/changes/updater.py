@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.blocks.revision import load_revision_blocks
 from supekku.scripts.lib.blocks.revision_metadata import validate_revision_change
-from supekku.scripts.lib.requirements.lifecycle import VALID_STATUSES
+from supekku.scripts.lib.requirements.lifecycle import REQUIREMENT_STATUSES
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -46,11 +46,12 @@ def update_requirement_lifecycle_status(
 
   """
   # Validate status value
-  if new_status not in VALID_STATUSES:
-    msg = f"Invalid status {new_status!r}; must be one of {sorted(VALID_STATUSES)}"
-    raise ValueError(
-      msg,
+  if new_status not in REQUIREMENT_STATUSES:
+    msg = (
+      f"Invalid status {new_status!r}; "
+      f"must be one of {sorted(REQUIREMENT_STATUSES)}"
     )
+    raise ValueError(msg)
 
   # Read file content
   try:

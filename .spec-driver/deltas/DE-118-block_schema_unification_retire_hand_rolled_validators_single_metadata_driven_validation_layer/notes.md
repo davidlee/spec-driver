@@ -465,6 +465,20 @@ This is good news for the retirement: removing dead code with no production call
 - **OQ-HARNESS-LIFECYCLE**: still open; settles in P04 alongside OQ-NAMING-COLLISIONS and `REVISION_BLOCK_JSON_SCHEMA` deletion. Default option (a) — keep `snapshot_compare.py` with empty `HAND_ROLLED_ADAPTERS` as runnable infrastructure — is what HEAD ships.
 
 
+## IP-118-P04 — Cleanup (2026-05-16)
+
+### 4.1 — Delete `REVISION_BLOCK_JSON_SCHEMA` + 4 regex bugs
+
+- **Pre-deletion grep** (`rg "REVISION_BLOCK_JSON_SCHEMA" supekku/ .spec-driver/`): only `revision.py:26` (definition) + `revision.py:482` (`__all__`) + test docstring/comment references (`revision_metadata_test.py:5,808`) + `.spec-driver/**` documentation references. Zero production consumers. Safe to delete.
+- **Files touched**: `supekku/scripts/lib/blocks/revision.py` (literal + `__all__` entry + dead `REQUIREMENT_VALID_STATUSES` import deleted; deferred bottom imports promoted to top after cycle removed), `supekku/scripts/lib/blocks/revision_metadata.py` (now owns `REVISION_BLOCK_SCHEMA_ID` + `REVISION_BLOCK_VERSION`; cycle import removed).
+- **Cyclic-import retirement APPLIED** (per phase-04 §9 decision). Net LOC delta well under the 50-LOC gate; canonical-declaration site for the two schema-identity constants moved to `revision_metadata.py` (better cohesion with the metadata declaration itself). `revision.py` now imports them via a single one-way top-level import. The pre-existing `# noqa: E402` markers on the bottom-deferred imports were removed.
+- **Test behaviour**: `revision_metadata_test.py::test_metadata_generates_json_schema` already shape-asserts on `metadata_to_json_schema(REVISION_CHANGE_METADATA)` output; no rebase needed. The 4 `test_regex_bug_*` regression tests (P03 C5) continue as canonical guards against re-introducing the `\\d` bug. 41/41 tests pass.
+- **Harness verification (post-edit)**: `uv run python -m supekku.scripts.lib.blocks.metadata.snapshot_compare --root .` → `scanned 1657 files, 0 dual-validated, 877 metadata-only.` → `snapshot-compare: OK (zero disagreements).` (1657 vs baseline 1656 = `.vscode/` untracked dir; not a regression.)
+- **`spec-driver validate`**: byte-identical to `validate-baseline.txt` (8 audit-gate warnings + 2 install-skew lines).
+- **Pylint on touched files**: 9.91/10, 1 message (`too-many-locals` at `revision.py:91` in `render_revision_change_block`, pre-existing). Cyclic-import warning gone.
+- **Full test suite**: 4837 passed, 4 skipped, 0 failures (149s).
+
+
 ## New Agent Instructions
 
 ### Task card

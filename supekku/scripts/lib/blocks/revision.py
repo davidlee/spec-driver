@@ -9,248 +9,17 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from supekku.scripts.lib.requirements.lifecycle import (
-  VALID_STATUSES as REQUIREMENT_VALID_STATUSES,
+from .revision_metadata import (
+  REVISION_BLOCK_SCHEMA_ID,
+  REVISION_BLOCK_VERSION,
+  REVISION_CHANGE_METADATA,
 )
+from .schema_registry import BlockSchema, register_block_schema
 
 if TYPE_CHECKING:
   from pathlib import Path
 
 REVISION_BLOCK_MARKER = "supekku:revision.change@v1"
-REVISION_BLOCK_SCHEMA_ID = "supekku.revision.change"
-REVISION_BLOCK_VERSION = 1
-
-# Public JSON schema definition for agent/tool consumption. The runtime validator
-# below mirrors this contract; we avoid making jsonschema a hard dependency but
-# keep the formal schema available for external tooling.
-REVISION_BLOCK_JSON_SCHEMA: dict[str, Any] = {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://vice.supekku.dev/schemas/revision-change@v1.json",
-  "title": "Supekku Revision Change Block",
-  "type": "object",
-  "required": ["schema", "version", "metadata", "specs", "requirements"],
-  "additionalProperties": False,
-  "properties": {
-    "schema": {"const": REVISION_BLOCK_SCHEMA_ID},
-    "version": {"const": REVISION_BLOCK_VERSION},
-    "metadata": {
-      "type": "object",
-      "required": ["revision"],
-      "additionalProperties": True,
-      "properties": {
-        "revision": {"type": "string", "pattern": r"^RE-\\d{3,}$"},
-        "prepared_by": {"type": "string"},
-        "generated_at": {"type": "string"},
-      },
-    },
-    "specs": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["spec_id", "action"],
-        "additionalProperties": False,
-        "properties": {
-          "spec_id": {
-            "type": "string",
-            "pattern": r"^SPEC-\d{3}(?:-[A-Z0-9]+)*$",
-          },
-          "action": {
-            "type": "string",
-            "enum": ["created", "updated", "retired"],
-          },
-          "summary": {"type": "string"},
-          "requirement_flow": {
-            "type": "object",
-            "additionalProperties": False,
-            "properties": {
-              "added": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "pattern": (
-                    r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\."
-                    r"(FR|NFR)-[A-Z0-9-]+$"
-                  ),
-                },
-              },
-              "removed": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "pattern": (
-                    r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\."
-                    r"(FR|NFR)-[A-Z0-9-]+$"
-                  ),
-                },
-              },
-              "moved_in": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "pattern": (
-                    r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\."
-                    r"(FR|NFR)-[A-Z0-9-]+$"
-                  ),
-                },
-              },
-              "moved_out": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "pattern": (
-                    r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\."
-                    r"(FR|NFR)-[A-Z0-9-]+$"
-                  ),
-                },
-              },
-            },
-          },
-          "section_changes": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": ["section", "change"],
-              "additionalProperties": False,
-              "properties": {
-                "section": {"type": "string"},
-                "change": {
-                  "type": "string",
-                  "enum": [
-                    "added",
-                    "removed",
-                    "modified",
-                    "renamed",
-                  ],
-                },
-                "before_path": {"type": "string"},
-                "after_path": {"type": "string"},
-                "notes": {"type": "string"},
-              },
-            },
-          },
-        },
-      },
-    },
-    "requirements": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["requirement_id", "kind", "action"],
-        "additionalProperties": False,
-        "properties": {
-          "requirement_id": {
-            "type": "string",
-            "pattern": r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\.(FR|NFR)-[A-Z0-9-]+$",
-          },
-          "kind": {
-            "type": "string",
-            "enum": ["functional", "non-functional"],
-          },
-          "action": {
-            "type": "string",
-            "enum": ["introduce", "modify", "move", "retire"],
-          },
-          "summary": {"type": "string"},
-          "origin": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": ["kind", "ref"],
-              "additionalProperties": False,
-              "properties": {
-                "kind": {
-                  "type": "string",
-                  "enum": [
-                    "spec",
-                    "requirement",
-                    "backlog",
-                    "external",
-                  ],
-                },
-                "ref": {"type": "string"},
-                "notes": {"type": "string"},
-              },
-            },
-          },
-          "destination": {
-            "type": "object",
-            "required": ["spec"],
-            "additionalProperties": False,
-            "properties": {
-              "spec": {
-                "type": "string",
-                "pattern": r"^SPEC-\d{3}(?:-[A-Z0-9]+)*$",
-              },
-              "requirement_id": {
-                "type": "string",
-                "pattern": (
-                  r"^SPEC-\d{3}(?:-[A-Z0-9]+)*\."
-                  r"(FR|NFR)-[A-Z0-9-]+$"
-                ),
-              },
-              "path": {"type": "string"},
-              "additional_specs": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "pattern": r"^SPEC-\d{3}(?:-[A-Z0-9]+)*$",
-                },
-              },
-            },
-          },
-          "lifecycle": {
-            "type": "object",
-            "additionalProperties": False,
-            "properties": {
-              "status": {
-                "type": "string",
-                "enum": sorted(REQUIREMENT_VALID_STATUSES),
-              },
-              "introduced_by": {
-                "type": "string",
-                "pattern": r"^RE-\\d{3,}$",
-              },
-              "implemented_by": {
-                "type": "array",
-                "items": {"type": "string", "pattern": r"^DE-\\d{3,}$"},
-              },
-              "verified_by": {
-                "type": "array",
-                "items": {
-                  "type": "string",
-                  "pattern": r"^AUD-\\d{3,}$",
-                },
-              },
-            },
-          },
-          "text_changes": {
-            "type": "object",
-            "additionalProperties": False,
-            "properties": {
-              "before_excerpt": {"type": "string"},
-              "after_excerpt": {"type": "string"},
-              "diff_ref": {"type": "string"},
-            },
-          },
-        },
-        "allOf": [
-          {
-            "if": {"properties": {"action": {"const": "move"}}},
-            "then": {"required": ["origin", "destination"]},
-          },
-          {
-            "if": {"properties": {"action": {"const": "introduce"}}},
-            "then": {"required": ["destination"]},
-          },
-          {
-            "if": {"properties": {"action": {"const": "modify"}}},
-            "then": {"required": ["destination"]},
-          },
-        ],
-      },
-    },
-  },
-}
 
 
 @dataclass
@@ -479,7 +248,6 @@ def render_revision_change_block(
 
 
 __all__ = [
-  "REVISION_BLOCK_JSON_SCHEMA",
   "REVISION_BLOCK_MARKER",
   "REVISION_BLOCK_SCHEMA_ID",
   "REVISION_BLOCK_VERSION",
@@ -489,10 +257,6 @@ __all__ = [
   "render_revision_change_block",
 ]
 
-
-# Register schema
-from .revision_metadata import REVISION_CHANGE_METADATA  # noqa: E402
-from .schema_registry import BlockSchema, register_block_schema  # noqa: E402
 
 register_block_schema(
   "revision.change",

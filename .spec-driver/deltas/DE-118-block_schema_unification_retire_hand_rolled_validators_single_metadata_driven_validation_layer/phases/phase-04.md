@@ -48,7 +48,7 @@ Concretely, P04 ships (one task per commit, no swap-style coupling):
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `REVISION_BLOCK_JSON_SCHEMA` deleted from `revision.py`; the 4 regex-bug patterns gone; `revision.py:1055` `__all__` entry removed; `revision_metadata_test.py::test_metadata_generates_json_schema` continues to pass against the metadata-derived JSON schema.
+- [x] `REVISION_BLOCK_JSON_SCHEMA` deleted from `revision.py`; the 4 regex-bug patterns gone; `__all__` entry removed; `revision_metadata_test.py::test_metadata_generates_json_schema` continues to pass against the metadata-derived JSON schema (already shape-asserts; no rebase required).
 - [ ] `_entry_shape` sentinel removed from `sessions_schema.py:88`; replaced with `additional_properties=_SESSION_ENTRY`; synthetic-corpus tests cover positive + every negative branch against the entry shape.
 - [ ] `FieldMetadata.required` arg dropped at every `FieldMetadata(items=FieldMetadata(...))` site in `*_metadata.py` modules; no semantic change (verified by harness 0-disagreement re-run).
 - [ ] `RELATIONSHIPS_MARKER` no longer exists as a colliding name: source modules (`blocks/delta.py:15`, `blocks/relationships.py:15`) export `DELTA_RELATIONSHIPS_MARKER` / `SPEC_RELATIONSHIPS_MARKER` directly; alias-on-re-export workarounds at `changes/blocks/__init__.py:23,60` and `specs/__init__.py:21,40` removed.
@@ -106,7 +106,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Status | ID  | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ]    | 4.1 | Delete `REVISION_BLOCK_JSON_SCHEMA` + 4 regex bugs; optional: retire `revision → revision_metadata` cyclic-import | no (independent) | Touches `revision.py` + `revision_metadata_test.py`. Optional cyclic-import retirement may extend to `revision_metadata.py` (move `REVISION_BLOCK_SCHEMA_ID` / `REVISION_BLOCK_VERSION`). |
+| [x]    | 4.1 | Delete `REVISION_BLOCK_JSON_SCHEMA` + 4 regex bugs; optional: retire `revision → revision_metadata` cyclic-import | no (independent) | Touches `revision.py` + `revision_metadata.py`. Cyclic-import retirement APPLIED (no external consumers; net <10 LOC churn). Test `test_metadata_generates_json_schema` already shape-asserts on generated schema — no rebase needed. |
 | [ ]    | 4.2 | Replace `_entry_shape` sentinel with `additional_properties=_SESSION_ENTRY` | yes (after 4.1) | Touches `sessions_schema.py` + sibling test. R7 vacuous; synthetic corpus required. |
 | [ ]    | 4.3 | Drop `FieldMetadata.required` from `items` definitions | yes (after 4.1) | Touches `*_metadata.py` modules with array-of-object shapes. Semantically meaningless on items. |
 | [ ]    | 4.4 | OQ-NAMING-COLLISIONS: rename `RELATIONSHIPS_MARKER` | yes (after 4.1) | Source modules `delta.py:15` + `relationships.py:15`; drop alias-on-re-exports at `changes/blocks/__init__.py:23,60` and `specs/__init__.py:21,40`. |
@@ -178,9 +178,9 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 9. Decisions & Outcomes
 
-- `YYYY-MM-DD` — _(P04 decisions appended at task entry; pre-planned slots:)_
+- `2026-05-16` — **Cyclic-import retirement (4.1) — APPLIED.** External consumer-import surface for `REVISION_BLOCK_SCHEMA_ID` / `REVISION_BLOCK_VERSION` is zero (only `revision.py` and `revision_metadata.py` reference them). Moved both constants to `revision_metadata.py` as their canonical declaration site; `revision.py` imports them back via a one-way top-level import. The pre-existing deferred-bottom imports (`REVISION_CHANGE_METADATA`, `BlockSchema`, `register_block_schema`) were promoted to module-top alongside the constants — no more `noqa: E402` needed. Net LOC delta: ~5 lines added in `revision_metadata.py`, ~3 net removed in `revision.py` after factoring out the now-deleted `REQUIREMENT_VALID_STATUSES` import (it lived only inside the deleted literal). Well under the 50-LOC gate. Pylint on the two touched files improved from 3 messages to 1 (the lone remaining `too-many-locals` is in `render_revision_change_block`, pre-existing, unrelated).
+- `YYYY-MM-DD` — _(remaining pre-planned slots:)_
   - **OQ-HARNESS-LIFECYCLE settlement** at 4.6 — one of (a) keep / (b) decommission / (c) repurpose. Rationale captured here before committing.
-  - **Cyclic-import retirement in 4.1** — apply or defer based on LOC delta and consumer-import surface.
   - **`<source>_metadata_test.py` placement in 4.2** — `sessions_metadata_test.py` if a separate `sessions_metadata.py` module is the canonical declaration site, else `sessions_schema_test.py`.
 
 ## 10. Findings / Research Notes

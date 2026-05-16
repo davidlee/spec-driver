@@ -19,11 +19,8 @@ from supekku.scripts.lib.requirements.lifecycle import (
   VALID_STATUSES as REQUIREMENT_VALID_STATUSES,
 )
 
-# Reuse constants from revision.py
-from .revision import (
-  REVISION_BLOCK_SCHEMA_ID,
-  REVISION_BLOCK_VERSION,
-)
+REVISION_BLOCK_SCHEMA_ID = "supekku.revision.change"
+REVISION_BLOCK_VERSION = 1
 
 # Metadata definition for revision change blocks
 REVISION_CHANGE_METADATA = BlockMetadata(

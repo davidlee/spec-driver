@@ -57,6 +57,21 @@ Reviewer agent ID: `a9da5e032c8ca4704` (general-purpose, opus model). Full findi
 
 ---
 
+## 2026-05-18 — DR-137 v3 written; third adversarial review pending
+
+Second-pass adversarial review returned ANOTHER REVIEW PASS — 3 BLOCK + 11 WARN + 11 INFO findings (F-24..F-48). User dispositioned all BLOCKS as A and accepted my F-30 design (BlockMetadata.field_aliases + FieldMetadata.aliases split).
+
+v2→v3 highlights:
+- **F-24** (BLOCK): `dump_markdown_file` ripple table rebuilt from actual `grep` of the tree. 11 create-path + 9 update-path + 1 bypass + ~12 tests ≈ 33 sites. Wrong path corrected (`spec_driver/domain/relations/manager.py` not `changes/relations/manager.py`). Real callers added: `backlog/registry.py`, `cli/resolve.py`, `cli/compact.py`, `sync_specs.py`, `scripts/normalise_frontmatter.py`. Comment-preservation algorithm in `_update` spelled out (frontmatter head re-read + lex trailing comments + re-emit).
+- **F-25** (BLOCK): import-linter contract prototyped against installed import-linter 2.11. Working diff: keep `root_package = "spec_driver"` (singular); add `include_external_packages = true`; enumerate forbidden modules explicitly (each `spec_driver.<layer>` + `supekku`); no `allow` field (which doesn't exist), no `ignore_imports` whitelist needed (frozen sidecars simply absent from the forbidden list). Prototype confirmed contract correctly catches both `spec_driver.core.X` and `supekku.*` imports from migration steps.
+- **F-30** (BLOCK): split alias mechanism. `BlockMetadata.field_aliases: Mapping[str, str]` for field-NAME (parse-time key rename); `FieldMetadata.aliases: Mapping[str, str]` for field-VALUE (post-dispatch value normalisation). `ValidationError.fix_kind ∈ {rename_key, rewrite_value}` for `--fix` dispatch. Diagnostics rewritten (`relations[0].annotation: field name 'annotation' is an alias for 'nature'`); per-kind matrix split into field_aliases (relations block) + per-FieldMetadata aliases (per-kind status); VT-CC-008 scoped to field-NAME; new VT-CC-030 for field-VALUE.
+
+WARN fixes inline (F-26..F-48): kind-validation at migrate-discovery (VT-CC-031); plan/phase/task sibling-folder dispatch (DEC-137-25); two-layer dispatch contract for `applies_to_kind` + `applies_to(path)` with default base class; uniform exit-code contract (VT-CC-032); `validate file` non-artefact handling; rewrite VT-CC-024 to test comment-map invariance (not byte-identical, which was impossible); VT-CC-019 covers mixed-state idempotency; lockfile liveness cross-platform (POSIX kill -0 + uuid for PID-reuse, Windows skips staleness); frozen-forever ≠ bug-frozen (DEC-137-26); REVISION + ADR minimal metadata added (DEC-137-28); workflow.toml unknown-kind warning (VT-CC-033); DEC-137-21 trade-off acknowledged for linkifier UX; F-42 first-regeneration commit-pairing note; OQ-137-03 filed for future JSON output mode.
+
+Decisions added: DEC-137-23..28. VTs added: VT-CC-030..033. OQ-137-03 filed.
+
+Reviewer's verdict was ANOTHER REVIEW PASS; goal of v3 is to reach ACCEPT or ACCEPT WITH EDITS on a third pass. If a fourth pass surfaces another BLOCK round, /consult is the next move.
+
 ## 2026-05-18 — DR-137 v2 written; second adversarial review pending
 
 DR-137 revised to v2. All 23 dispositions from the §"DR-137 v1 drafted" table applied. User-confirmed pause points before locking:

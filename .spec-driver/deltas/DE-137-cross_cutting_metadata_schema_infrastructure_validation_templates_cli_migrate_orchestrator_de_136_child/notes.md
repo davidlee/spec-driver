@@ -57,6 +57,35 @@ Reviewer agent ID: `a9da5e032c8ca4704` (general-purpose, opus model). Full findi
 
 ---
 
+## 2026-05-18 — DR-137 v2 written; second adversarial review pending
+
+DR-137 revised to v2. All 23 dispositions from the §"DR-137 v1 drafted" table applied. User-confirmed pause points before locking:
+- **F-1** resolved via option (a): split `dump_markdown_file` into `*_create(kind=)` (emit comments) and `*_update()` (preserve existing comments). Old function removed; every caller migrates explicitly. Ripple table at §5.1.
+- **F-11** resolved via option (a): drop bare-`validate` default-dispatch (reverses Q2 A1). Bare `spec-driver validate` prints help.
+
+F-15 difflib spike executed before locking: at cutoff=0.6, all canonical typos (`'complete'`, `'pendng'`, `'in_progres'`, `'defered'`, `'draaft'`) match expected canonical. Semantic alternatives (`'live'`, `'active'`, `'done'`, `'wip'`) don't match at any practical cutoff without sweeping in false positives. Conclusion: keep cutoff=0.6; semantic alternatives belong in `FieldMetadata.aliases`, not did-you-mean. Recorded as DEC-137-20.
+
+Other v1→v2 highlights:
+- New decisions: DEC-137-15..22 (F-1, F-4, F-11, F-5, F-20, F-15, F-7, F-21 resolutions).
+- New OQ-137-02 (re-export sunset target delta TBD).
+- §5.6 gained verbatim pyproject diff for F-2 import-linter contract (`root_packages` plural; explicit forbidden contract on `spec_driver.migrations`).
+- §5.6 gained `_helpers.py` (vendored bytes-level shared helpers, F-20) and `_folder.py` (parser, F-13).
+- §5.6 gained lockfile (F-21) and explicit mid-walk recovery procedure + VT-CC-023 (F-14).
+- Folder name shape: `v<M>_<m>_<p>_<NNN>_<slug>/` — valid Python identifier (F-13).
+- `MigrationStep.applies_to_kinds: tuple[str,...]` ⇒ `applies_to_kind: str` (singular). Multi-kind steps forbidden (F-4; DEC-137-16).
+- Strict-on-default trigger keyed to `.spec-driver/` workspace absence at install time, not workflow.toml presence (F-5).
+- §5.4 gained CLI vocabulary constants module (F-16; POL-002).
+- §5.5 gained anchor-comment markers around skill inserts (F-23) + VT-CC-027.
+- §10 Supersedes grew to 10 entries; §10.1 enumerates *live* document edits (DR-136 stays frozen, F-12).
+- Verification catalogue grew to VT-CC-001..029 + VA-CC-001 (VA-CC-002 retired in favour of VT-CC-026).
+- DE-137.md reconciled: §3 deliverables, §5 system touchpoints, §7 risks (ruamel.yaml → custom yaml_emit + 3 new risks for F-1/F-4/F-9), §8 open decisions resolved or refiled as OQ-137-02.
+
+Internal end-to-end review post-v2 caught one local inconsistency: §5.2 enum-violation example used `'live'` as did-you-mean input, contradicting DEC-137-20. Replaced with `'in_progres'` (typo example) and kept `'live'` as the "no did-you-mean candidate" example to document the spike result inline.
+
+**Final file count**: DR-137 ≈ 1207 lines (was 889). DE-137 unchanged shape but refreshed deliverable/risk/decisions wording.
+
+Ready for second adversarial-review pass.
+
 ## New Agent Instructions (2026-05-18)
 
 ### Task card

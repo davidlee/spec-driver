@@ -57,6 +57,25 @@ Reviewer agent ID: `a9da5e032c8ca4704` (general-purpose, opus model). Full findi
 
 ---
 
+## 2026-05-18 — DR-137 v3.1 — third-pass review accepted with edits
+
+Third adversarial pass returned **ACCEPT WITH EDITS** (13 findings F-49..F-61: 0 BLOCK, 4 WARN, 9 INFO). The two must-fix WARN findings (F-54 collision data-loss, F-58/F-61 missing §10 reconciliations) plus a small set of cheap edits applied as v3.1:
+
+- F-54: validator pseudo-code now refuses to silently merge when both alias and canonical keys present; emits `error`-severity diagnostic; `--fix` declines. New VT-CC-034.
+- F-58: new §10 reconciliation point 11 covering minimal REVISION/ADR metadata scope advance.
+- F-61: new §10 reconciliation point 12 covering the field_aliases/aliases alias-mechanism split (DEC-137-23).
+- F-49: corrected `creation.py:245` row in ripple table (`requirement`, not branched `design_revision/design_change`).
+- F-50: added explicit `BaseMigrationStep` concrete helper class to `_protocol.py` listing (Protocol can't carry default impls).
+- F-51: fixed dangling "see §10 reconciliation point 11" cross-reference in §5.2 matrix (now resolves correctly post-F-58).
+- F-52: corrected §10 point 2 DEC citation (DEC-137-13 was wrong; just F-13).
+- F-55: lockfile uuid rationale rewritten — it's a log-correlation anchor, not a PID-reuse mitigator.
+- F-59: DE-137 §7 risk row updated to match v3 VT-CC-024 wording (comment-map invariance, not byte-identical).
+- F-60: DE-137 §3 outcome 2 refreshed to describe the F-30 alias split.
+
+Findings declined for v3.1 (filed as paper cuts to land alongside IP-137 drafting per the reviewer's own guidance): F-53 asymmetric tolerated_field_aliases (rationale: field renames are rare and migration-paired, no real demand); F-56 narrowing of `complete` from CHANGE_STATUSES (already covered by tolerant-on-read; the matrix is explicit enough); F-57 lockfile content format constant (acceptable adjacency to lock acquire code).
+
+Verdict for v3.1: ready for `/plan-phases`. Reviewer's strengths note: "the import-linter prototype is genuinely verified ... the F-32 Typer exit code is mechanically correct ... the F-30 schema split is conceptually crisp ... the doc's adversarial-review process is working as designed."
+
 ## 2026-05-18 — DR-137 v3 written; third adversarial review pending
 
 Second-pass adversarial review returned ANOTHER REVIEW PASS — 3 BLOCK + 11 WARN + 11 INFO findings (F-24..F-48). User dispositioned all BLOCKS as A and accepted my F-30 design (BlockMetadata.field_aliases + FieldMetadata.aliases split).

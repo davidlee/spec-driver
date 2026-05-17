@@ -12646,11 +12646,11 @@ deltas:
         phase: IP-117-P02
   DE-118:
     kind: delta
-    status: draft
+    status: completed
     name: 'Delta - Block schema unification: retire hand-rolled validators, single
       metadata-driven validation layer'
     slug: block_schema_unification_retire_hand_rolled_validators_single_metadata_driven_validation_layer
-    updated: '2026-03-22'
+    updated: '2026-05-17'
     path: .spec-driver/deltas/DE-118-block_schema_unification_retire_hand_rolled_validators_single_metadata_driven_validation_layer/DE-118.md
     applies_to:
       specs:
@@ -12666,7 +12666,8 @@ deltas:
         plan: IP-118
         delta: DE-118
         revision_links:
-          aligns_with: []
+          aligns_with:
+          - DR-118
         specs:
           primary:
           - SPEC-114
@@ -12678,9 +12679,31 @@ deltas:
           dependencies: []
         phases:
         - id: IP-118-P01
+        - id: IP-118-P02
+        - id: IP-118-P02.5
+        - id: IP-118-P03
+        - id: IP-118-P04
       phases:
-      - id: IP-118-P01
+      - plan: IP-118
+        delta: DE-118
         phase: IP-118-P01
+        status: completed
+      - plan: IP-118
+        delta: DE-118
+        phase: IP-118-P02.5
+        status: completed
+      - plan: IP-118
+        delta: DE-118
+        phase: IP-118-P02
+        status: draft
+      - plan: IP-118
+        delta: DE-118
+        phase: IP-118-P03
+        status: completed
+      - plan: IP-118
+        delta: DE-118
+        phase: IP-118-P04
+        status: completed
   DE-119:
     kind: delta
     status: draft
@@ -13331,3 +13354,438 @@ deltas:
         delta: DE-133
         phase: IP-133-P01
         status: in-progress
+  DE-134:
+    kind: delta
+    status: draft
+    name: Delta - Subagent worktree base-ref alignment and compensation defences
+    slug: subagent_worktree_base_ref_alignment_and_compensation_defences
+    updated: '2026-04-26'
+    path: .spec-driver/deltas/DE-134-subagent_worktree_base_ref_alignment_and_compensation_defences/DE-134.md
+    applies_to:
+      specs: []
+      requirements: []
+    relations:
+    - type: relates_to
+      target: DE-132
+      attributes: {}
+    - type: relates_to
+      target: DE-133
+      attributes: {}
+    plan:
+      id: IP-134
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-134
+        delta: DE-134
+        revision_links:
+          aligns_with: []
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets: []
+          dependencies: []
+        phases:
+        - id: IP-134-P01
+      phases:
+      - id: IP-134-P01
+        phase: IP-134-P01
+  DE-135:
+    kind: delta
+    status: in-progress
+    name: Delta - list deltas dumps Rich traceback when a phase file has invalid YAML
+      frontmatter
+    slug: list_deltas_dumps_rich_traceback_when_a_phase_file_has_invalid_yaml_frontmatter
+    updated: '2026-05-01'
+    path: .spec-driver/deltas/DE-135-list_deltas_dumps_rich_traceback_when_a_phase_file_has_invalid_yaml_frontmatter/DE-135.md
+    applies_to:
+      specs: []
+      requirements:
+      - PROD-010.FR-010
+    relations:
+    - type: relates_to
+      target: ISSUE-054
+      attributes: {}
+    plan:
+      id: IP-135
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-135
+        delta: DE-135
+        revision_links:
+          aligns_with:
+          - DR-135
+        specs:
+          primary: []
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-010.FR-010
+          dependencies: []
+        phases:
+        - id: IP-135-P01
+          objective: Add MarkdownLoadError translation to load_markdown_file with
+            unit + integration coverage.
+      phases:
+      - plan: IP-135
+        delta: DE-135
+        objective: Add MarkdownLoadError translation to load_markdown_file with unit
+          + integration coverage.
+        phase: IP-135-P01
+        status: completed
+  DE-136:
+    kind: delta
+    status: in-progress
+    name: 'Delta - metadata schema consolidation program: propagate ADR-010 across
+      artefacts and close PROD-004'
+    slug: metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004
+    updated: '2026-05-09'
+    path: .spec-driver/deltas/DE-136-metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004/DE-136.md
+    applies_to:
+      specs:
+      - PROD-004
+      - PROD-006
+      - PROD-010
+      - SPEC-114
+      - SPEC-116
+      requirements:
+      - PROD-004.FR-001
+      - PROD-004.FR-002
+      - PROD-004.FR-003
+      - PROD-004.FR-005
+      - PROD-004.FR-006
+      - PROD-004.FR-007
+      - PROD-004.NF-001
+    relations:
+    - type: relates_to
+      target: ADR-010
+      attributes:
+        nature: Umbrella execution of the placement heuristic this ADR established
+    - type: relates_to
+      target: ADR-002
+      attributes:
+        nature: Inherits the forward-only-link constraint when reshaping relations
+    - type: relates_to
+      target: ADR-008
+      attributes:
+        nature: Lifecycle-truth doctrine governs how status fields surface across
+          artefacts
+    - type: relates_to
+      target: DE-106
+      attributes:
+        nature: "Phase-level precedent and source of the per-artefact analysis pattern\
+          \ (DR-106 \xA73a)"
+    - type: relates_to
+      target: DE-118
+      attributes:
+        nature: "First child of this program \u2014 block-validator unification"
+    - type: relates_to
+      target: DE-036
+      attributes:
+        nature: Compaction infrastructure landed; this program exercises it across
+          artefacts
+    - type: relates_to
+      target: DE-077
+      attributes:
+        nature: "Schema discoverability at create-time \u2014 to be extended to edit-time"
+    - type: relates_to
+      target: IMPR-024
+      attributes:
+        nature: Subsumes the kind-aware Pydantic-validation ask
+    - type: relates_to
+      target: ISSUE-054
+      attributes:
+        nature: Resolves invalid-YAML feedback latency
+    - type: relates_to
+      target: IMPR-023
+      attributes:
+        nature: "Adjacent \u2014 bulk migration of legacy phases; in scope only if\
+          \ explicitly bundled"
+    plan:
+      id: IP-136
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-136
+        delta: DE-136
+        revision_links:
+          aligns_with: []
+        specs:
+          primary:
+          - PROD-004
+          - SPEC-114
+          - SPEC-116
+          collaborators:
+          - PROD-006
+          - PROD-010
+          - PROD-002
+          - PROD-001
+        requirements:
+          targets:
+          - PROD-004.FR-001
+          - PROD-004.FR-002
+          - PROD-004.FR-003
+          - PROD-004.FR-005
+          - PROD-004.FR-006
+          - PROD-004.FR-007
+          - PROD-004.NF-001
+          dependencies: []
+        phases:
+        - id: IP-136-P01
+        - id: IP-136-P02
+        - id: IP-136-P03
+        - id: IP-136-P04
+      phases:
+      - plan: IP-136
+        delta: DE-136
+        phase: IP-136-P01
+        status: completed
+      - id: IP-136-P02
+        phase: IP-136-P02
+      - id: IP-136-P03
+        phase: IP-136-P03
+      - id: IP-136-P04
+        phase: IP-136-P04
+  DE-137:
+    kind: delta
+    status: draft
+    name: 'Delta - Cross-cutting metadata schema infrastructure: validation+templates+CLI+migrate
+      orchestrator (DE-136 child)'
+    slug: cross_cutting_metadata_schema_infrastructure_validation_templates_cli_migrate_orchestrator_de_136_child
+    updated: '2026-05-09'
+    path: .spec-driver/deltas/DE-137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli_migrate_orchestrator_de_136_child/DE-137.md
+    applies_to:
+      specs:
+      - PROD-004
+      - SPEC-114
+      - SPEC-116
+      - SPEC-125
+      requirements:
+      - PROD-004.FR-001
+      - PROD-004.FR-002
+      - PROD-004.FR-003
+      - PROD-004.FR-006
+    relations:
+    - type: relates_to
+      target: DE-136
+      attributes:
+        nature: "Umbrella program; this is the cross-cutting child establishing validation/template/CLI/migrate\
+          \ infrastructure (DR-136 \xA75)"
+    - type: relates_to
+      target: DE-118
+      attributes:
+        nature: "Foundational sibling \u2014 DE-118 unifies block validators; this\
+          \ delta consumes that single MetadataValidator layer"
+    - type: relates_to
+      target: ADR-010
+      attributes:
+        nature: Implements ADR-010 placement-heuristic mechanics shared across all
+          per-artefact child deltas
+    - type: relates_to
+      target: ISSUE-054
+      attributes:
+        nature: Authoring-time YAML-error feedback gap closes via `validate file <path>`
+          deliverable
+  DE-138:
+    kind: delta
+    status: draft
+    name: 'Delta - Delta artefact metadata propagation: blocks + applies_to derivation
+      + list enrichment (DE-136 child)'
+    slug: delta_artefact_metadata_propagation_blocks_applies_to_derivation_list_enrichment_de_136_child
+    updated: '2026-05-09'
+    path: .spec-driver/deltas/DE-138-delta_artefact_metadata_propagation_blocks_applies_to_derivation_list_enrichment_de_136_child/DE-138.md
+    applies_to:
+      specs:
+      - PROD-004
+      - SPEC-115
+      requirements:
+      - PROD-004.FR-001
+      - PROD-004.FR-002
+      - PROD-004.FR-007
+    relations:
+    - type: relates_to
+      target: DE-136
+      attributes:
+        nature: "Umbrella program; this child propagates ADR-010 placement heuristic\
+          \ to the delta artefact kind (DR-136 \xA76)"
+    - type: relates_to
+      target: DE-137
+      attributes:
+        nature: "Cross-cutting infrastructure sibling \u2014 provides MetadataValidator\
+          \ strict-mode, alias autocorrect, and admin migrate orchestrator this delta\
+          \ consumes"
+    - type: relates_to
+      target: DE-036
+      attributes:
+        nature: Frontmatter compaction infrastructure already landed; this delta is
+          the first program-internal exercise of it (PROD-004 FR-007)
+    - type: relates_to
+      target: ADR-010
+      attributes:
+        nature: Placement heuristic governing delta-kind field decisions
+  DE-139:
+    kind: delta
+    status: draft
+    name: 'Delta - Spec artefact metadata propagation: PROD+SPEC blocks, taxonomy
+      strict, list enrichment (DE-136 child)'
+    slug: spec_artefact_metadata_propagation_prod_spec_blocks_taxonomy_strict_list_enrichment_de_136_child
+    updated: '2026-05-09'
+    path: .spec-driver/deltas/DE-139-spec_artefact_metadata_propagation_prod_spec_blocks_taxonomy_strict_list_enrichment_de_136_child/DE-139.md
+    applies_to:
+      specs:
+      - PROD-004
+      - SPEC-114
+      - SPEC-116
+      requirements:
+      - PROD-004.FR-001
+      - PROD-004.FR-002
+      - PROD-004.FR-003
+    relations:
+    - type: relates_to
+      target: DE-136
+      attributes:
+        nature: "Umbrella program; this child propagates ADR-010 placement heuristic\
+          \ to spec artefacts (DR-136 \xA77) \u2014 covers BOTH tech SPEC and PROD\
+          \ per F-A scope-note"
+    - type: relates_to
+      target: DE-137
+      attributes:
+        nature: "Cross-cutting infrastructure sibling \u2014 provides MetadataValidator\
+          \ strict-mode, alias autocorrect, admin migrate orchestrator"
+    - type: relates_to
+      target: DE-138
+      attributes:
+        nature: "First per-artefact precedent \u2014 sweep procedure pattern inherited\
+          \ from delta-kind"
+    - type: relates_to
+      target: ADR-010
+      attributes:
+        nature: Placement heuristic
+    - type: relates_to
+      target: ADR-003
+      attributes:
+        nature: "Unit/assembly category distinction \u2014 strict enforcement here\
+          \ closes the gap"
+  DE-140:
+    kind: delta
+    status: draft
+    name: 'Delta - Requirements-in-spec block-ification: retire regex parser, structured
+      supekku.spec.requirements@v1 (DE-136 child)'
+    slug: requirements_in_spec_block_ification_retire_regex_parser_structured_supekku_spec_requirements_v1_de_136_child
+    updated: '2026-05-09'
+    path: .spec-driver/deltas/DE-140-requirements_in_spec_block_ification_retire_regex_parser_structured_supekku_spec_requirements_v1_de_136_child/DE-140.md
+    applies_to:
+      specs:
+      - PROD-004
+      - SPEC-114
+      requirements:
+      - PROD-004.FR-001
+      - PROD-004.FR-002
+    relations:
+    - type: relates_to
+      target: DE-136
+      attributes:
+        nature: "Umbrella program; this child block-ifies requirements-in-spec per\
+          \ DR-136 \xA78 \u2014 retires regex parser"
+    - type: relates_to
+      target: DE-137
+      attributes:
+        nature: Cross-cutting infrastructure provides MetadataValidator + admin migrate
+          orchestrator this delta dispatches into
+    - type: relates_to
+      target: DE-129
+      attributes:
+        nature: "Recent requirement authoring/validation hardening \u2014 provides\
+          \ context for parser shape and lifecycle enum semantics"
+    - type: relates_to
+      target: ADR-010
+      attributes:
+        nature: Placement heuristic
+  DE-141:
+    kind: delta
+    status: draft
+    name: 'Delta - Audit artefact metadata propagation: findings block, strict outcome
+      enum, list enrichment (DE-136 child)'
+    slug: audit_artefact_metadata_propagation_findings_block_strict_outcome_enum_list_enrichment_de_136_child
+    updated: '2026-05-09'
+    path: .spec-driver/deltas/DE-141-audit_artefact_metadata_propagation_findings_block_strict_outcome_enum_list_enrichment_de_136_child/DE-141.md
+    applies_to:
+      specs:
+      - PROD-004
+      - SPEC-114
+      requirements:
+      - PROD-004.FR-001
+      - PROD-004.FR-002
+    relations:
+    - type: relates_to
+      target: DE-136
+      attributes:
+        nature: "Umbrella program; this child propagates ADR-010 placement heuristic\
+          \ to audit artefacts (DR-136 \xA79)"
+    - type: relates_to
+      target: DE-137
+      attributes:
+        nature: Cross-cutting infrastructure provides MetadataValidator + admin migrate
+          orchestrator
+    - type: relates_to
+      target: DE-138
+      attributes:
+        nature: "Per-artefact precedent \u2014 sweep procedure pattern inherited"
+    - type: relates_to
+      target: ADR-010
+      attributes:
+        nature: Placement heuristic
+    - type: relates_to
+      target: ADR-008
+      attributes:
+        nature: Lifecycle-truth doctrine governs how audit findings reconcile with
+          status
+  DE-142:
+    kind: delta
+    status: draft
+    name: 'Delta - Revision artefact metadata propagation: REVISION_FRONTMATTER_METADATA
+      + change-block enrichment + applies_to derivation (DE-136 child)'
+    slug: revision_artefact_metadata_propagation_revision_frontmatter_metadata_change_block_enrichment_applies_to_derivation_de_136_child
+    updated: '2026-05-09'
+    path: .spec-driver/deltas/DE-142-revision_artefact_metadata_propagation_revision_frontmatter_metadata_change_block_enrichment_applies_to_derivation_de_136_child/DE-142.md
+    applies_to:
+      specs:
+      - PROD-004
+      - SPEC-114
+      - SPEC-116
+      requirements:
+      - PROD-004.FR-001
+      - PROD-004.FR-002
+    relations:
+    - type: relates_to
+      target: DE-136
+      attributes:
+        nature: "Umbrella program; this child propagates ADR-010 placement heuristic\
+          \ to revision artefacts (DR-136 \xA710) \u2014 last in DEC-004 sequence;\
+          \ benefits from four per-artefact precedents"
+    - type: relates_to
+      target: DE-137
+      attributes:
+        nature: Cross-cutting infrastructure provides MetadataValidator + admin migrate
+          orchestrator
+    - type: relates_to
+      target: DE-138
+      attributes:
+        nature: "Per-artefact precedent \u2014 revision brought to parity with delta\
+          \ shape and rigour"
+    - type: relates_to
+      target: DE-118
+      attributes:
+        nature: REVISION_CHANGE_METADATA introduced by DE-118; this delta enriches
+          schema (action enum + conditional rules)
+    - type: relates_to
+      target: ADR-010
+      attributes:
+        nature: Placement heuristic
+    - type: relates_to
+      target: ADR-008
+      attributes:
+        nature: "Lifecycle-truth doctrine \u2014 revision-change intent vs observed\
+          \ reconciliation"

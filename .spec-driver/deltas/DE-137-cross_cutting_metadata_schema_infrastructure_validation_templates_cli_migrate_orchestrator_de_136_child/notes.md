@@ -1,5 +1,58 @@
 # Notes for DE-137
 
+## 2026-05-18 — IP-137-P01 entry: pre-flight grep audit + DE-137 → in-progress
+
+### Pre-flight grep audit (task 1.1)
+
+`rg -n 'strict_unknown_keys|normalize_status|MetadataValidator\(' --type py` summary:
+
+**Definition site:**
+- `supekku/scripts/lib/blocks/metadata/validator.py:60` — `def __init__(self, metadata, *, strict_unknown_keys: bool = False)` — kwarg to retire (DEC-137-14).
+- internal usage at `validator.py:62, 92, 269`.
+
+**Live production sites passing `strict_unknown_keys=True` (= DE-118 retirement call sites, per `mem.pattern.spec-driver.metadata-validator-strictness`):**
+1. `supekku/scripts/lib/blocks/metadata/snapshot_compare.py:178` — `MetadataValidator(schema.metadata, strict_unknown_keys=True).validate(data)` (single inline construction).
+2. `supekku/scripts/lib/blocks/spec_metadata.py:215-217` — `_SPEC_RELATIONSHIPS_VALIDATOR`.
+3. `supekku/scripts/lib/blocks/spec_metadata.py:220-222` — `_SPEC_CAPABILITIES_VALIDATOR`.
+4. `supekku/scripts/lib/blocks/delta_metadata.py:173-175` — `_DELTA_RELATIONSHIPS_VALIDATOR`.
+5. `supekku/scripts/lib/blocks/revision_metadata.py:437-439` — `_REVISION_CHANGE_VALIDATOR`.
+
+These are the five module-scope validator singletons; each must migrate to `MetadataValidator(metadata)` + push `strict=True` into the `.validate(...)` call surface. Task 1.7 ripple is bounded.
+
+**Test sites passing `strict_unknown_keys=True`** (mechanical refactor, in scope of task 1.7):
+- `supekku/scripts/lib/blocks/metadata/test_engine.py:1125, 1133, 1139, 1159`
+- `supekku/scripts/lib/blocks/workflow_metadata_test.py:584`
+- `supekku/scripts/lib/blocks/revision_metadata_test.py:35`
+- `supekku/scripts/lib/blocks/plan_metadata_test.py:23, 29`
+- `supekku/scripts/lib/blocks/verification_metadata_test.py:23`
+- `supekku/scripts/lib/blocks/tracking_metadata_test.py:20`
+
+**`normalize_status` consumers** (task 1.10 caller migration to `normalize_field("delta","status",...)`):
+- `supekku/scripts/lib/changes/lifecycle.py:43, 59` — definition + `__all__`.
+- `supekku/scripts/lib/validation/validator.py:16, 549` — uses inside `validate_phase_status` codepath.
+- `supekku/scripts/lib/changes/artifacts.py:20, 93, 98` — `ChangeArtifact` constructor uses it on raw status; checks `CHANGE_STATUSES` membership.
+- `supekku/cli/list/deltas.py:26, 236, 251` — CLI filter normalisation.
+- `supekku/cli/list/specs.py:23, 260, 262` — CLI filter normalisation (spec list reuses change normaliser; this is a pre-existing coupling smell, but the migration is in scope and mechanical).
+
+**`normalize_status` test sites:**
+- `supekku/scripts/lib/changes/lifecycle_test.py:11, 16, 33, 36, 39, 40, 43` — cover canonical map + case/whitespace normalisation; must keep coverage for `normalize_field` (parity = VT-CC-013).
+
+### Important findings from the audit
+
+- **Case/whitespace handling in `normalize_status`**: `status.lower().strip()` runs before map lookup. The new `normalize_field` MUST preserve this (`DONE`, `  done  ` are observed legacy values). DR-137 §5.2 `normalize_field` pseudo-code doesn't explicitly include the `.lower().strip()` prefix — recording here so task 1.9 captures it.
+- **`STATUS_COMPLETE = "complete"`** is currently a member of `CHANGE_STATUSES` (= acceptance of legacy value at write-time). Under task 1.12 transition re-export `CHANGE_STATUSES = frozenset(DELTA_FRONTMATTER_METADATA.fields["status"].enum_values)`, `"complete"` will NOT be a canonical enum value — but DR-137 §5.2 matrix puts `complete → completed` in `delta.status` `FieldMetadata.aliases`. Need to audit `CHANGE_STATUSES`-membership callers (`changes/artifacts.py:98`) to confirm they still work; if any test depends on `"complete" in CHANGE_STATUSES`, it must accept the alias-aware contract instead. Recorded against task 1.12 risks.
+- **`spec-driver` CLI has no direct "delta status transition" command** — `phase start/complete` operates on workflow/state.yaml, not delta frontmatter. Delta lifecycle is edited in-frontmatter (this matches the project's prose-only handoff posture). Performed the `draft → in-progress` transition via `Edit` on `DE-137.md`.
+
+### Lifecycle transition
+
+- DE-118: verified `Status: completed` via `spec-driver show delta DE-118`.
+- DE-137: transitioned `status: draft` → `status: in-progress` in `DE-137.md`.
+- `spec-driver validate` post-transition: only the 8 pre-existing audit-gate warnings remain; no new validation errors.
+
+### `MetadataValidator(metadata)` (no kwarg) sites
+
+The grep also captured the broad pattern `MetadataValidator(metadata)` — these are the loose-mode validators that already construct without `strict_unknown_keys` and will keep working without code changes. No migration needed at these sites until the validator constructor signature drops the kwarg (after task 1.7); the refactor is fail-fast at any positional caller (none observed).
+
 ## 2026-05-18 — IP-137 + phase-01 drafted via /plan-phases
 
 `/plan-phases` ran against the accepted DR-137 v3.1 baseline. Outputs:

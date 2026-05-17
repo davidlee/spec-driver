@@ -1,5 +1,25 @@
 # Notes for DE-137
 
+## 2026-05-18 — IP-137 + phase-01 drafted via /plan-phases
+
+`/plan-phases` ran against the accepted DR-137 v3.1 baseline. Outputs:
+
+- **IP-137** (`IP-137.md`) — five-phase execution plan with the full VT-CC-001..034 + VA-CC-001 catalogue mapped to phases via `supekku:verification.coverage@v1`. Phase shape:
+  1. **IP-137-P01** — Schema & validation foundation (FieldMetadata.aliases / BlockMetadata.field_aliases / MetadataValidator strict-mode / ENUM_REGISTRY split / minimal REVISION+ADR metadata / normalize_field / closest_match)
+  2. **IP-137-P02** — Template infrastructure + `dump_markdown_file` split (~33 callers) + admin regenerate-templates / validate templates CLI + one-time regeneration commit (F-42)
+  3. **IP-137-P03** — `validate` Typer group + `schema enums` CLI + CLI vocabulary constants + ~8 live ripple sites + ISSUE-054 regression test
+  4. **IP-137-P04** — `admin migrate` framework (`_protocol`/`_helpers`/`_folder` + orchestrator + lockfile + watermark + import-linter `Migrations isolation` contract) + workflow.toml schema + install fresh-vs-upgrade trigger
+  5. **IP-137-P05** — Skill gates (5 files) + acceptance (`just check` + `lint-imports`) + PROD-004 coverage reconciliation + `complete delta DE-137`
+- **Phase sheet** (`phases/phase-01.md`) — IP-137-P01 fully fleshed: 15 numbered tasks with design / files / testing / observations per task; entrance + exit criteria gated; VT coverage per task documented; risk table populated.
+
+`spec-driver validate` post-write surfaces only the pre-existing 8 audit-gate warnings (unchanged baseline). No new validation errors.
+
+Two decisions recorded directly in phase-01 §9:
+- F-43 `DeprecationWarning` on re-export imports **deferred** to OQ-137-02 resolution (avoids noisy warnings during DE-138..142 implementation).
+- `drift` registry gap filed as a backlog `ISSUE-NNN` during task 1.11 rather than fixed inline (keeps Category-B surface frozen for DE-137).
+
+Ready for `/execute-phase` on IP-137-P01. Pre-flight task 1.1 (`grep -rn 'strict_unknown_keys|normalize_status|MetadataValidator\('` + DE-118 closure re-verify + DE-137 → `in-progress`) is the first action.
+
 ## 2026-05-18 — DR-137 v1 drafted; adversarial review returned ANOTHER REVIEW PASS
 
 DR-137 was drafted via `/draft-design-revision` (10 clarifying questions Q1–Q10 resolved with user; foundation locked; sections §1–§12 written). Adversarial review (Opus sub-agent) returned 23 findings: **5 BLOCK**, **11 WARN**, **5 INFO**. Verdict: another review pass required before `/plan-phases`.
@@ -120,63 +140,77 @@ Internal end-to-end review post-v2 caught one local inconsistency: §5.2 enum-vi
 
 Ready for second adversarial-review pass.
 
-## New Agent Instructions (2026-05-18)
+## New Agent Instructions (2026-05-18, refreshed post `/plan-phases`)
 
 ### Task card
 
 - **Delta**: DE-137 — Cross-cutting metadata schema infrastructure: validation+templates+CLI+migrate orchestrator (DE-136 child).
 - **Card path**: `.spec-driver/deltas/DE-137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli_migrate_orchestrator_de_136_child/`
-- **DR**: `DR-137.md` (drafted; v1 returned ANOTHER REVIEW PASS from adversarial review).
-- **Status**: DR-137 v1 written. v2 revision required before `/plan-phases` can run. No code touched.
+- **DR**: `DR-137.md` v3.1 — **ACCEPT WITH EDITS** verdict applied (third adversarial pass complete; ready for plan/execute).
+- **IP**: `IP-137.md` — five-phase plan drafted via `/plan-phases`; verification coverage block enumerates VT-CC-001..034 + VA-CC-001 mapped to phases.
+- **Active phase**: `phases/phase-01.md` — IP-137-P01 *Schema & validation foundation*, status `draft`, 15 tasks specified.
+- **Delta status**: `draft`. Next agent transitions to `in-progress` as task 1.1 of IP-137-P01.
 
 ### What's done
 
-- `/draft-design-revision` ran to completion through "Adversarial review" step.
-- 10 foundational design questions (Q1–Q10) resolved with user; foundation locked. See decisions DEC-137-01..DEC-137-14 in DR-137 frontmatter.
-- DR-137 v1 written and committed-ready to the file (uncommitted at session end).
-- Adversarial review (Opus sub-agent) produced 23 findings.
-- All 23 findings dispositioned in this notes.md (see disposition table above) — **all accepted (A)**, no rejections.
+- `/draft-design-revision` completed across 3 adversarial-review passes. DR-137 v1 → v2 → v3 → v3.1 (latest). All 61 review findings (F-1..F-61) dispositioned. Decisions DEC-137-01..28 locked. Open questions OQ-137-01..03 carried forward.
+- `/plan-phases` produced IP-137 (5 phases) + Phase 01 sheet (15 tasks).
+- `spec-driver validate` shows no new validation issues attributable to planning artefacts (only the pre-existing 8 audit-gate warnings).
 
 ### What's pending
 
-1. **Revise DR-137 → v2** by applying the 23 dispositions above. Estimated 60–90 min focused work. Order suggestion: BLOCK first (F-1, F-2, F-3, F-4, F-6), then WARN, then INFO.
-2. **Run a second adversarial-review pass** (same skill/process) on the revised DR.
-3. If second-pass verdict is **ACCEPT** or **ACCEPT WITH EDITS**: integrate any final fixes, then transition to `/plan-phases` per `/draft-design-revision` step 8.
-4. If second-pass verdict is **ANOTHER REVIEW PASS**: repeat the revise + review loop. If it loops > 2 more rounds without converging, `/consult` for a design-tension review.
+1. **Execute IP-137-P01** via `/execute-phase` against `phases/phase-01.md`. First task (1.1) is a read-only pre-flight grep audit + DE-137 lifecycle transition.
+2. After IP-137-P01 exit criteria met: create `phases/phase-02.md` (template infrastructure + `dump_markdown_file` split).
+3. After IP-137-P02 exit criteria met: create `phases/phase-03.md` (validate Typer group + schema enums CLI + ripple).
+4. After IP-137-P03 exit criteria met: create `phases/phase-04.md` (migrate framework + workflow.toml + import-linter).
+5. After IP-137-P04 exit criteria met: create `phases/phase-05.md` (skill gates + acceptance + closure).
+6. `/audit-change` → `/close-change` to finish.
 
 ### Required reading
 
-- **DR-137 v1** — `.spec-driver/deltas/DE-137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli_migrate_orchestrator_de_136_child/DR-137.md` (the document being revised).
-- **DE-137** — same folder, `DE-137.md` (the delta DR-137 implements).
-- **DR-136** — `.spec-driver/deltas/DE-136-metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004/DR-136.md` — canonical design reference; DR-137 §10 supersedes specific wording.
-- **This notes.md** — disposition table is authoritative for what changes in v2.
+- **DR-137** — `.spec-driver/deltas/DE-137-…/DR-137.md` (v3.1; the canonical design). Specifically §5 per-deliverable detail and §11 verification catalogue.
+- **DE-137** — same folder, `DE-137.md` (delta scope; deliverables enumerated).
+- **IP-137** — same folder, `IP-137.md` (phase map + verification coverage block).
+- **phases/phase-01.md** — concrete task list and exit gates for the next phase to execute.
+- **This notes.md** — adversarial-review disposition history (F-1..F-61) is the audit trail; current state at top of file.
 
 ### Related documents
 
-- **IP-136** — `.spec-driver/deltas/DE-136-…/IP-136.md` — umbrella program plan; DE-137 is phase 2 ("Foundations"). DE-137 must close (alongside DE-118) before per-artefact propagation (DE-138..142) begins.
-- **DE-118** — block validator unification; closed. DE-137 builds on `MetadataValidator.strict_unknown_keys` flag landed by DE-118 (verified opt-in default-off in `supekku/scripts/lib/blocks/metadata/validator.py:60`).
-- **DE-138..142** — sibling per-artefact deltas, all `draft` status; consume DE-137 infrastructure. Do NOT pre-draft their DRs.
+- **DR-136** — `.spec-driver/deltas/DE-136-metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004/DR-136.md` — canonical design reference; DR-137 §10 enumerates supersedes.
+- **IP-136** — same DE-136 folder — umbrella plan; DE-137 is Phase 2 ("Foundations"). DE-137 must close before per-artefact propagation (DE-138..142) begins.
+- **DE-118** — block-validator unification; closed. Provides the `MetadataValidator(strict_unknown_keys=False)` opt-in baseline. Verified at `supekku/scripts/lib/blocks/metadata/validator.py:60`.
+- **DE-138..142** — sibling per-artefact deltas, all `draft`. They consume DE-137 infrastructure. **Do NOT pre-draft their DRs.**
 
-### Key files (for revision and verification)
+### Key files (touchpoints for IP-137-P01)
 
-- **DR-137**: `.spec-driver/deltas/DE-137-…/DR-137.md` (target of revision).
-- **DE-137**: `.spec-driver/deltas/DE-137-…/DE-137.md` (may need small reconciliation after v2 — check §3 deliverables 6 references to `supekku/scripts/lib/migrations/` and update if F-2/F-3 changes the wording).
-- **`MetadataValidator`**: `supekku/scripts/lib/blocks/metadata/validator.py` — DE-118-landed strict-flag baseline.
-- **`FieldMetadata` / `BlockMetadata`**: `supekku/scripts/lib/blocks/metadata/schema.py` — DR-137 §5.2 extends.
-- **Current `validate` CLI**: `supekku/cli/workspace.py:65` — DR-137 §5.4 replaces with Typer group.
-- **`dump_markdown_file`**: `supekku/scripts/lib/core/spec_utils.py` — F-1 ripple (≥30 callers; enumerate).
-- **`ENUM_REGISTRY`**: `spec_driver/orchestration/enums.py` — DR-137 §5.2 converts to derived view (F-17: not all entries are artefact-kind; split needed).
-- **`pyproject.toml`**: F-2 / F-18 — need explicit `root_packages` plural + `forbidden` contract for migrations.
-- **`workflow.toml`** + **DEFAULT_CONFIG**: `supekku/scripts/lib/core/config.py:17` — F-5 trigger change (workspace-existence, not workflow.toml presence).
-- **Templates**: `supekku/templates/*.md` — F-22 body preservation note required.
-- **Skills**: `supekku/skills/<execute-phase,close-change,audit-change,notes,update-delta-docs>/SKILL.md` — F-23 anchor markers may help.
+- **Schema dataclasses**: `supekku/scripts/lib/blocks/metadata/schema.py` — `FieldMetadata` + `BlockMetadata` (tasks 1.3, 1.8).
+- **Validator**: `supekku/scripts/lib/blocks/metadata/validator.py:60` — `MetadataValidator` refactor target (tasks 1.6, 1.7).
+- **Validation entrypoint**: `supekku/scripts/lib/validation/validator.py` — primary caller surface for the `strict_unknown_keys` kwarg removal (task 1.7).
+- **Per-kind metadata**: `supekku/scripts/lib/core/frontmatter_metadata/` — populate aliases here (task 1.4); add `revision.py` + `adr.py` (task 1.5).
+- **Lifecycle constants**: `supekku/scripts/lib/changes/lifecycle.py` — `CHANGE_STATUSES`, `CANONICAL_STATUS_MAP`, `normalize_status` (tasks 1.9, 1.10, 1.12).
+- **`ENUM_REGISTRY`**: `spec_driver/orchestration/enums.py` — Category A/B split (task 1.11).
+- **NEW**: `spec_driver/core/string_utils.py` (task 1.2 — `closest_match`).
+- **NEW**: `supekku/scripts/lib/blocks/metadata/aliases.py` (task 1.9 — `normalize_field`).
+- **Tests under**: `tests/spec_driver/core/`, `tests/supekku/scripts/lib/blocks/metadata/`, `tests/supekku/scripts/lib/changes/`, `tests/spec_driver/orchestration/`.
+
+### Key files (later phases — for context only)
+
+- `supekku/scripts/lib/core/spec_utils.py` — `dump_markdown_file` split (IP-137-P02; ~33 ripple sites enumerated in DR-137 §5.1).
+- `spec_driver/core/yaml_emit.py` (NEW; IP-137-P02; ~60 LOC custom emitter, OQ-137-01).
+- `spec_driver/orchestration/templates.py` (NEW; IP-137-P02; `render_frontmatter_for_kind` shared).
+- `supekku/templates/*.md` (IP-137-P02; one-time regeneration after templates.py lands — F-42).
+- `supekku/cli/workspace.py:65` + new `spec_driver/presentation/cli/{validate,schema,admin}/` (IP-137-P03).
+- `spec_driver/migrations/{_protocol,_helpers,_folder}.py` (NEW; IP-137-P04; frozen sidecars).
+- `pyproject.toml` (IP-137-P04; import-linter `Migrations isolation` forbidden contract — verbatim diff in DR-137 §5.6).
+- `supekku/scripts/lib/core/config.py:17` + `DEFAULT_CONFIG` (IP-137-P04; workflow.toml schema additions).
+- `supekku/skills/<execute-phase,close-change,audit-change,notes,update-delta-docs>/SKILL.md` (IP-137-P05; verbatim text + anchor markers).
 
 ### Relevant memories
 
 Use `/retrieving-memory` for any unfamiliar concept. Likely useful:
 
 - `mem.signpost.spec-driver.overview` — orientation.
-- `mem.concept.spec-driver.delta`, `.spec-driver.revision`, `.spec-driver.plan` — entity primitives.
+- `mem.concept.spec-driver.delta`, `.spec-driver.plan`, `.spec-driver.revision` — entity primitives.
 - `mem.fact.spec-driver.status-enums` — status enum locations.
 - `mem.pattern.spec-driver.delta-completion` — closure gates.
 - `mem.pattern.validation.warning-triage` — `validate` warning categories.
@@ -187,37 +221,46 @@ All loaded into the boot context already:
 
 - **ADR-010** — placement heuristic (frontmatter / blocks / prose; never duplicate).
 - **ADR-011** — Workspace as canonical registry-access surface.
-- **POL-001** — single source of truth (load-bearing for F-6 fix).
-- **POL-002** — no magic strings/numbers (load-bearing for F-16 fix).
-- **POL-003** — five-layer architecture (load-bearing for F-2 layering question).
-- **STD-001** — Typer/Rich (relevant to F-11).
-- **STD-003** — utility module placement.
+- **POL-001** — single source of truth (load-bearing throughout DE-137; metadata is canonical for enums + aliases).
+- **POL-002** — no magic strings/numbers (load-bearing for IP-137-P03 CLI constants module).
+- **POL-003** — module boundaries (load-bearing for IP-137-P04 migrations isolation).
+- **STD-001** — Typer/Rich (IP-137-P03 validate/schema CLIs).
+- **STD-003** — utility module placement (yaml_emit, string_utils).
+- **STD-004** — script lifecycle (orphan prevention).
 
 ### Important user instructions / decisions
 
-- **Migrations are self-contained scripts** like database migrations — capture-of-the-day; minimal external deps; `_protocol.py` is the only shared file (user-stated, key constraint).
-- **Migrations naming uses spec-driver semver** for linearised sequence (user proposal).
-- **F-1 in disposition table**: user has not seen this finding yet. The fix may benefit from a quick confirm-with-user before implementation if the agent's chosen path (split into create vs update variants vs preserve-comments-on-save) is non-obvious.
-- **F-11 disposition** suggests dropping bare-`validate` dispatch. User originally approved A1 in Q2 conversation (named `validate workspace` peers with backwards-compatible bare `validate` dispatch). Dropping bare `validate` is a small UX regression on the path the user originally approved. **Confirm with user before locking** if reverting that decision — could go either way.
+- **Migrations are self-contained scripts** like database migrations — capture-of-the-day; minimal external deps; the three frozen sidecars (`_protocol`, `_helpers`, `_folder`) are the only shared surface (DEC-137-11 / DEC-137-19 / DEC-137-26).
+- **Multi-kind migration steps forbidden** (DEC-137-16). DE-138..142 cannot ship a single cross-kind step; cross-kind concerns split into ordered per-kind ordinals.
+- **Bare `spec-driver validate` prints help** (DEC-137-17). Reverses an earlier Q2 A1 leaning; user confirmed during v2 dispositions.
+- **`dump_markdown_file` split into `_create(..., kind=)` + `_update(...)`** (DEC-137-15); no shim. Every caller migrates explicitly.
+- **Fresh-install strict-mode trigger keyed to `.spec-driver/` workspace absence** (DEC-137-18), NOT `workflow.toml` presence.
+- **F-43 DeprecationWarning on transition re-exports deferred** to OQ-137-02 resolution — explicitly noted in phase-01 §9 to prevent noisy import-time warnings during DE-138..142 work.
+- **`drift` registry gap filed as backlog ISSUE during IP-137-P01 task 1.11**, not fixed inline. Same for `improvement` / `backlog` umbrella entries (Category B).
 
-### Unresolved tensions
+### Unresolved tensions / open questions
 
-- **F-4 multi-kind migrations**: disposition forbids them. This is a simplification, but means the upcoming per-artefact deltas DE-138..142 cannot ship a single migration touching two artefact kinds. If DR-136 §6–§10 anticipates any multi-kind migration, that's a contradiction worth surfacing. Spot-check at v2 revision time.
-- **F-9 re-export sunset**: needs a named delta as the sunset target. If no follow-up delta exists, propose one or weaken sunset to "next major spec-driver version."
+- **OQ-137-01** — Custom `yaml_emit` (~60 LOC, stdlib yaml only) vs ruamel.yaml. Gate: if implementation exceeds ~120 LOC or hits stdlib-yaml edge cases at IP-137-P02, swap to ruamel.
+- **OQ-137-02** — Sunset target delta for transition-window re-exports (`CHANGE_STATUSES`, etc.). Resolve at DE-136 umbrella close; downgrade to "next major spec-driver version" if no follow-up delta exists.
+- **OQ-137-03** — Structured JSON diagnostic output mode. Out of DE-137 scope; file follow-up at close if CI consumer demand surfaces.
+- No active design tensions awaiting resolution before code begins — DR-137 v3.1 ACCEPT WITH EDITS verdict cleared the bar.
 
 ### Commit-state guidance
 
-- **No code touched** yet. Only `.spec-driver/**` changes pending.
-- Modified files at session end: `.spec-driver/deltas/DE-137-…/DR-137.md`, `.spec-driver/deltas/DE-137-…/notes.md`.
-- **Recommend committing these now before v2 revision starts**, per project doctrine (frequent small commits of `.spec-driver/**`, keep worktree clean). Suggested message: `docs(DE-137): draft DR-137 + adversarial review dispositions`.
-- After v2 revision: separate commit `docs(DE-137): revise DR-137 v2 incorporating adversarial review fixes`.
-- After second-pass review acceptance: separate commit `docs(DE-137): finalise DR-137 (review accepted)`.
+- **No code touched yet**. Only `.spec-driver/**` changes pending from this session:
+  - `M  .spec-driver/deltas/DE-137-…/notes.md` (this update)
+  - `??  .spec-driver/deltas/DE-137-…/IP-137.md` (new — five-phase plan)
+  - `??  .spec-driver/deltas/DE-137-…/phases/phase-01.md` (new — IP-137-P01 sheet)
+- **Recommend committing these now before code work starts**, per project doctrine (frequent small `.spec-driver/**` commits; keep worktree clean). Suggested commit: `docs(DE-137): plan IP-137 + draft phase-01 sheet`.
+- During IP-137-P01 execution: commit pre-flight audit results to notes.md first, then code changes per task. The phase wrap-up commit goes out as `feat(DE-137): land metadata aliases + strict validator (IP-137-P01)`.
+- `.vscode/` is untracked at session start — not part of this delta; ignore.
 
 ### Other advice for next agent
 
-- The disposition table above is the authoritative work list. Don't re-derive findings; apply dispositions directly.
-- Keep DR-137 §10 (Supersedes) growing as v2 fixes generate new DR-136 reconciliations. Especially F-3, F-4 add fresh reconciliations.
-- When applying F-2 (pyproject diff), produce a real diff or at minimum a verbatim block — not prose ("we'll add a forbidden contract"). The reviewer flagged that for v1.
-- F-15 (difflib cutoff): the disposition says "spike with cutoff=0.4" — actually try it in Python before committing. The reviewer ran `SequenceMatcher.ratio('live', 'in-progress') = 0.4` — at cutoff=0.4 it passes. Verify in a REPL with the canonical examples before finalising.
-- After v2 is written, **read it back end-to-end** before spawning the second-pass reviewer — easy to miss a section.
+- **The phase sheet is authoritative.** Each task in `phases/phase-01.md` §7 has design / files / testing / observations spelled out. Follow it rather than re-deriving from DR-137 §5.2.
+- **Task 1.1 first.** The grep audit produces the authoritative list of `MetadataValidator(...)` and `normalize_status` consumers; tasks 1.6 / 1.7 / 1.9 / 1.10 depend on it. Don't skip.
+- **Capture pre-split `ENUM_REGISTRY` snapshot before task 1.11** — VT-CC-012 needs the equality assertion against the *prior* lambda outputs, not a freshly-computed reference.
+- **DE-137 status transition to `in-progress` is part of task 1.1**, not implicit. The `/execute-phase` skill should handle this; if it doesn't, run `uv run spec-driver` lifecycle command explicitly.
+- **`.spec-driver/` workspace persistence**: running `spec-driver` against this repo will warn about install version mismatch (`workflow.toml has 0.9.2, running 0.9.3`). Non-blocking but expected; do not "fix" by running `spec-driver install` mid-session unless the user authorises (would update workflow.toml shape).
+- If a phase's exit criteria can't be cleanly met (e.g. a VT genuinely fails on an unforeseen issue), `/consult` rather than relaxing the criteria.
 

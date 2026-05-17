@@ -31,13 +31,6 @@ Returns:
 
 Raises:
   PolicyAlreadyExistsError: If policy file already exists at computed path.
-- `create_title_slug(title) -> str`: Create URL-friendly slug from title.
-
-Args:
-  title: Human-readable title.
-
-Returns:
-  Lowercase slug with hyphens.
 - `generate_next_policy_id(registry) -> str`: Generate the next available policy ID.
 
 Args:

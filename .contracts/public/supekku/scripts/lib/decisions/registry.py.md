@@ -29,7 +29,6 @@ Registry for managing Architecture Decision Records.
 - `find(self, decision_id) -> <BinOp>`: Find a specific decision by ID.
 - `iter(self, status) -> Iterator[DecisionRecord]`: Iterate over decisions, optionally filtered by status.
 - @classmethod `load(cls, root) -> DecisionRegistry`: Load existing registry from YAML file.
-- `parse_date(self, date_value) -> <BinOp>`: Parse date from various formats.
 - `rebuild_status_symlinks(self) -> None`: Rebuild all status-based symlink directories.
 - `sync(self) -> None`: Sync registry by collecting decisions and writing to YAML. - If in future we need to show "referenced by" on decisions, add logic here.
 - `sync_with_symlinks(self) -> None`: Sync registry and rebuild symlinks in one operation.

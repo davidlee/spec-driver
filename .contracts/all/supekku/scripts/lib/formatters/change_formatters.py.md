@@ -5,6 +5,10 @@ Change artifact (delta/revision/audit) display formatters.
 Pure formatting functions with no business logic.
 Formatters take ChangeArtifact objects and return formatted strings for display.
 
+## Constants
+
+- `_PHASE_SEQ_FROM_ID`
+
 ## Functions
 
 - `_enrich_phase_data(phase, artifact, root) -> dict[Tuple[str, Any]]`: Enrich phase data with file path and task completion stats.
@@ -36,11 +40,16 @@ Returns:
 - `_format_plan_overview(artifact, root) -> list[str]`: Format plan overview section if present.
 - `_format_relations(artifact) -> list[str]`: Format relations section if present.
 - `_format_revision_basic_fields(artifact) -> list[str]`: Format basic revision artifact fields.
+- `_phase_sequence_digits_from_id(phase_id) -> <BinOp>`: Return two-digit sequence from phase id (hyphen or dotted spelling).
 - `_plan_list_to_json(plans) -> str`: Serialize plans to JSON.
 - `_prepare_change_row(change) -> list[str]`: Prepare a single change artifact row with styling.
 - `_prepare_change_tsv_row(change) -> list[str]`: Prepare a single change artifact as a plain TSV row.
 - `_prepare_plan_row(plan) -> list[str]`: Prepare a plan row with styling for rich table display.
 - `_prepare_plan_tsv_row(plan) -> list[str]`: Prepare a plan row for TSV output (no markup).
+- `_resolve_phase_objective_from_file_body(phase_content) -> <BinOp>`: Structured objective from phase file body: frontmatter first, then phase.overview.
+
+Display-time enrichment (DE-131 / DR-131): does not merge conflicting sources;
+returns the first non-empty value per canonical precedence.
 - `format_audit_details(artifact, root) -> str`: Format audit details as multi-line string for display.
 
 Args:

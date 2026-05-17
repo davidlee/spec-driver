@@ -19,6 +19,12 @@ Usage:
     for error in errors:
       print(error)
 
+When ``strict_unknown_keys=True``, the validator rejects any data key
+not declared in ``metadata.fields`` (top level) or in the ``properties``
+of an object-typed field (nested), unless an ``additional_properties``
+shape is declared on the enclosing field. The flag propagates through
+recursion via the instance attribute.
+
 #### Methods
 
 - `validate(self, data) -> list[ValidationError]`: Validate data against metadata.

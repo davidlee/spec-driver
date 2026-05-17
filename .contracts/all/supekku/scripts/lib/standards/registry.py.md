@@ -43,7 +43,6 @@ Registry for managing Standards.
 - `find(self, standard_id) -> <BinOp>`: Find a specific standard by ID.
 - `iter(self, status) -> Iterator[StandardRecord]`: Iterate over standards, optionally filtered by status.
 - @classmethod `load(cls, root) -> StandardRegistry`: Load existing registry from YAML file.
-- `parse_date(self, date_value) -> <BinOp>`: Parse date from various formats.
 - `sync(self) -> None`: Sync registry by collecting standards and writing to YAML.
 
 Args:

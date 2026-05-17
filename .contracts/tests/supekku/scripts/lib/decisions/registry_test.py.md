@@ -38,7 +38,7 @@ Tests for DecisionRegistry class.
 - `test_iter_with_status_filter(self) -> None`: Test iterating with status filter.
 - `test_multiple_adrs_same_status_grouping(self) -> None`: Test that multiple ADRs with same status are properly grouped.
 - `test_parse_adr_file_no_frontmatter(self) -> None`: Test parsing ADR file without frontmatter.
-- `test_parse_date_formats(self) -> None`: Test parsing various date formats.
+- `test_parse_date_formats(self) -> None`: Test parsing various date formats (via core.dates.parse_date).
 - `test_rebuild_status_directory_relative_paths(self) -> None`: Test _rebuild_status_directory creates relative symlinks. - But no symlinks
 - `test_rebuild_status_symlinks_cleans_existing(self) -> None`: Test that rebuild_status_symlinks cleans up existing symlinks.
 - `test_rebuild_status_symlinks_creates_directories(self) -> None`: Test that rebuild_status_symlinks creates status directories and symlinks.

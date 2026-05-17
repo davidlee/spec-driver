@@ -27,13 +27,6 @@ Returns:
 
 Raises:
   StandardAlreadyExistsError: If standard file already exists at computed path.
-- `create_title_slug(title) -> str`: Create URL-friendly slug from title.
-
-Args:
-  title: Human-readable title.
-
-Returns:
-  Lowercase slug with hyphens.
 - `generate_next_standard_id(registry) -> str`: Generate the next available standard ID.
 
 Args:

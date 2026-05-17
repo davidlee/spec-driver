@@ -13,6 +13,20 @@ Test coverage:
 
 ## Classes
 
+### AdditionalPropertiesValidationTest
+
+`additional_properties` validates dynamic-key entries (DE-118 DEC-004).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_additional_properties_accepts_matching_shape(self)`: Dynamic keys validated against additional_properties shape.
+- `test_additional_properties_combined_rejects_wrong_extra_type(self)`: Extras of wrong type rejected by additional_properties shape.
+- `test_additional_properties_combined_with_properties(self)`: Declared properties take precedence; extras validated against additional.
+- `test_additional_properties_rejects_shape_mismatch(self)`: Dynamic-key value of wrong shape produces a path-aware error.
+- `test_empty_dynamic_map_passes_silently(self)`: Empty data with additional_properties passes (DEC-004 documented behaviour).
+
 ### ArrayFieldValidationTest
 
 Test array field validation.
@@ -103,6 +117,19 @@ Test persistence and default_value fields on FieldMetadata.
 - `test_invalid_persistence_raises(self)`: Invalid persistence value raises ValueError.
 - `test_valid_persistence_values(self)`: All four persistence classifications are accepted.
 
+### FieldMetadataPostInitObjectShapeTest
+
+Object-type accepts properties OR additional_properties (DE-118 DEC-004).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_object_with_additional_properties_only(self)`: Object type with only additional_properties constructs (DEC-004).
+- `test_object_with_both(self)`: Object type with both properties and additional_properties constructs.
+- `test_object_with_neither_raises(self)`: Object type without properties or additional_properties raises ValueError.
+- `test_object_with_properties_only(self)`: Object type with only properties constructs (existing behaviour).
+
 ### IntFieldValidationTest
 
 Test integer field validation.
@@ -169,6 +196,21 @@ Test root-level validation.
 #### Methods
 
 - `test_root_must_be_object(self)`: Root data must be a mapping.
+
+### StrictUnknownKeysTest
+
+`strict_unknown_keys` flag rejects undeclared keys (DE-118 DEC-001).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_default_lax_accepts_extra_top_level_key(self)`: Default behaviour (lax) accepts unknown top-level keys.
+- `test_strict_accepts_known_keys(self)`: strict_unknown_keys=True does not regress on valid documents.
+- `test_strict_rejects_extra_key_at_nested_depth(self)`: strict_unknown_keys propagates through nested object recursion.
+- `test_strict_rejects_extra_top_level_key(self)`: strict_unknown_keys=True rejects unknown top-level keys.
+- `test_strict_with_additional_properties_accepts_matching_extras(self)`: strict_unknown_keys does not double-reject keys covered by additional.
+- `_metadata(self) -> BlockMetadata`
 
 ### StringFieldValidationTest
 

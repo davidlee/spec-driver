@@ -40,7 +40,7 @@ Tests for generate_next_policy_id function.
 
 ### TestTitleSlug
 
-Tests for create_title_slug function.
+Tests for slugify (previously create_title_slug passthrough).
 
 **Inherits from:** unittest.TestCase
 

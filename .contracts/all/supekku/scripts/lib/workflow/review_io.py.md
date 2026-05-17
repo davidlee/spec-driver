@@ -19,7 +19,6 @@ Design authority: DR-102 §3.3, §3.4, §5, §8.
 
 ## Functions
 
-- `_atomic_write(path, content) -> Path`: Write content atomically via temp-file + rename.
 - `_now_iso() -> str`: Current UTC timestamp in ISO 8601 format.
 - `_rederive_finding_statuses(data) -> None`: Re-derive finding statuses from dispositions on read.
 

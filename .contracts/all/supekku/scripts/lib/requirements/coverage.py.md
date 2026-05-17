@@ -21,7 +21,7 @@ Detects when the same requirement has conflicting coverage statuses
 across different artifacts (spec vs IP vs audit).
 - `_compute_status_from_coverage(entries) -> <BinOp>`: Compute requirement status from aggregated coverage entries.
 
-Only entries with statuses in VALID_COVERAGE_STATUSES are considered.
+Only entries with statuses in VERIFICATION_STATUSES are considered.
 Unknown statuses are silently ignored (warnings are emitted at the
 ingestion boundary in _apply_coverage_blocks).
 

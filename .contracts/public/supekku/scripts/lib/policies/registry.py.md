@@ -31,7 +31,6 @@ Registry for managing Policies.
 - `find(self, policy_id) -> <BinOp>`: Find a specific policy by ID.
 - `iter(self, status) -> Iterator[PolicyRecord]`: Iterate over policies, optionally filtered by status.
 - @classmethod `load(cls, root) -> PolicyRegistry`: Load existing registry from YAML file.
-- `parse_date(self, date_value) -> <BinOp>`: Parse date from various formats.
 - `sync(self) -> None`: Sync registry by collecting policies and writing to YAML.
 
 Args:

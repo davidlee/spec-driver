@@ -6,7 +6,7 @@ requirements:
     - IMPR-001
     primary_spec: IMPR-001
     kind: functional
-    category: null
+    category: authentication
     status: pending
     tags: []
     introduced: null
@@ -24,7 +24,7 @@ requirements:
     - IMPR-001
     primary_spec: IMPR-001
     kind: non-functional
-    category: null
+    category: performance
     status: pending
     tags: []
     introduced: null
@@ -208,7 +208,7 @@ requirements:
     - ISSUE-020
     primary_spec: ISSUE-020
     kind: functional
-    category: null
+    category: PROD-010
     status: pending
     tags: []
     introduced: null
@@ -747,7 +747,14 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-136
+    - DE-137
+    - DE-138
+    - DE-139
+    - DE-140
+    - DE-141
+    - DE-142
     verified_by: []
     coverage_evidence:
     - VT-001
@@ -767,7 +774,14 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-136
+    - DE-137
+    - DE-138
+    - DE-139
+    - DE-140
+    - DE-141
+    - DE-142
     verified_by: []
     coverage_evidence:
     - VT-002
@@ -787,7 +801,10 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-136
+    - DE-137
+    - DE-139
     verified_by: []
     coverage_evidence:
     - VT-003
@@ -828,7 +845,8 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-136
     verified_by: []
     coverage_evidence:
     - VT-005
@@ -848,7 +866,9 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-136
+    - DE-137
     verified_by: []
     coverage_evidence: []
     coverage_entries: []
@@ -865,7 +885,9 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-136
+    - DE-138
     verified_by: []
     coverage_evidence:
     - VT-007
@@ -885,7 +907,8 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-136
     verified_by: []
     coverage_evidence:
     - VT-006
@@ -1757,7 +1780,8 @@ requirements:
     status: pending
     tags: []
     introduced: null
-    implemented_by: []
+    implemented_by:
+    - DE-135
     verified_by: []
     coverage_evidence:
     - VT-PROD010-ERROR-001

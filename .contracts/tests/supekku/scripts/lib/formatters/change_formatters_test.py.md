@@ -166,3 +166,16 @@ Tests for format_revision_details function.
 - `test_minimal_revision(self) -> None`: Test formatting revision with minimal fields.
 - `test_revision_with_applies_to(self) -> None`: Test formatting revision with applies_to specs and requirements.
 - `test_revision_with_relations(self) -> None`: Test formatting revision with relations.
+
+### TestPhaseObjectiveEnrichmentDE131
+
+VT-131-enrich-*: objective from phase file when plan dict omits it (DE-131).
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_objective_from_canonical_frontmatter(self) -> None`: VT-131-enrich-fm: frontmatter objective surfaces when dict has none.
+- `test_objective_from_phase_overview_block(self) -> None`: VT-131-enrich-overview: legacy phase.overview objective when FM has none.
+- `test_plan_dict_objective_not_clobbered(self) -> None`: VT-131-enrich-no-clobber: existing dict objective wins over file.
+- `_write_delta_bundle(self, root) -> Path`

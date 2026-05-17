@@ -160,7 +160,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       },
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject non-array specs")
 
   def test_applies_to_empty_string_in_array(self) -> None:
@@ -178,7 +178,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       },
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in specs")
 
   def test_applies_to_not_object(self) -> None:
@@ -194,7 +194,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       "applies_to": ["SPEC-101"],  # Should be object
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject non-object applies_to")
 
   # context_inputs validation (5 tests)
@@ -245,7 +245,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       "context_inputs": [{"id": "RC-010"}],  # Missing type
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject missing type")
 
   def test_context_input_invalid_type(self) -> None:
@@ -261,7 +261,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       "context_inputs": [{"type": "unknown", "id": "TEST-001"}],
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid type")
 
   def test_context_input_missing_id(self) -> None:
@@ -277,7 +277,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       "context_inputs": [{"type": "research"}],  # Missing id
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject missing id")
 
   # risk_register validation (8 tests)
@@ -346,7 +346,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject missing required fields")
 
   def test_valid_risk_exposure_types(self) -> None:
@@ -393,7 +393,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid exposure")
 
   def test_valid_risk_likelihood_values(self) -> None:
@@ -440,7 +440,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid likelihood")
 
   def test_risk_invalid_impact(self) -> None:
@@ -464,7 +464,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid impact")
 
   # outcome_summary validation (2 tests)
@@ -498,7 +498,7 @@ class DeltaFrontmatterValidationTest(unittest.TestCase):
       "outcome_summary": ["Target state description"],  # Should be string
     }
     new_validator = MetadataValidator(DELTA_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject non-string outcome_summary")
 
 

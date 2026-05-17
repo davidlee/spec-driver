@@ -30,11 +30,10 @@ class RevisionChangeValidationTest(unittest.TestCase):
   def _validate_both(self, data: dict) -> tuple[list[str], list[str]]:
     """Run wrapper and metadata validator; return (wrapper, metadata)."""
     wrapper_errors = validate_revision_change(data)
-    direct_validator = MetadataValidator(
-      REVISION_CHANGE_METADATA,
-      strict_unknown_keys=True,
-    )
-    direct_errors = [str(err) for err in direct_validator.validate(data)]
+    direct_validator = MetadataValidator(REVISION_CHANGE_METADATA)
+    direct_errors = [
+      str(err) for err in direct_validator.validate(data, strict=True)
+    ]
     return wrapper_errors, direct_errors
 
   # Root level tests

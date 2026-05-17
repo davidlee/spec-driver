@@ -127,7 +127,7 @@ class PolicyFrontmatterValidationTest(unittest.TestCase):
       "reviewed": "2025/01/10",  # Wrong format
     }
     new_validator = MetadataValidator(POLICY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid date format")
 
   def test_invalid_supersedes_id_format(self) -> None:
@@ -143,7 +143,7 @@ class PolicyFrontmatterValidationTest(unittest.TestCase):
       "supersedes": ["POLICY-001"],  # Wrong format, should be POL-001
     }
     new_validator = MetadataValidator(POLICY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid policy ID format")
 
   def test_invalid_superseded_by_id_format(self) -> None:
@@ -159,7 +159,7 @@ class PolicyFrontmatterValidationTest(unittest.TestCase):
       "superseded_by": ["POL-1"],  # Missing leading zeros
     }
     new_validator = MetadataValidator(POLICY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid superseded_by ID format")
 
   def test_invalid_standards_id_format(self) -> None:
@@ -175,7 +175,7 @@ class PolicyFrontmatterValidationTest(unittest.TestCase):
       "standards": ["STANDARD-001"],  # Wrong format, should be STD-001
     }
     new_validator = MetadataValidator(POLICY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid standard ID format")
 
   def test_invalid_related_policies_id_format(self) -> None:
@@ -191,7 +191,7 @@ class PolicyFrontmatterValidationTest(unittest.TestCase):
       "related_policies": ["POL-1234"],  # Too many digits
     }
     new_validator = MetadataValidator(POLICY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject invalid related_policies ID format"
     )
@@ -209,7 +209,7 @@ class PolicyFrontmatterValidationTest(unittest.TestCase):
       "related_standards": ["STD-12"],  # Missing one digit
     }
     new_validator = MetadataValidator(POLICY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject invalid related_standards ID format"
     )
@@ -227,7 +227,7 @@ class PolicyFrontmatterValidationTest(unittest.TestCase):
       "supersedes": "POL-002",  # Should be array
     }
     new_validator = MetadataValidator(POLICY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject supersedes as non-array")
 
   def test_empty_string_in_specs_array(self) -> None:
@@ -243,7 +243,7 @@ class PolicyFrontmatterValidationTest(unittest.TestCase):
       "specs": ["SPEC-001", ""],  # Empty string
     }
     new_validator = MetadataValidator(POLICY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in specs")
 
   def test_empty_string_in_requirements_array(self) -> None:
@@ -259,7 +259,7 @@ class PolicyFrontmatterValidationTest(unittest.TestCase):
       "requirements": [""],
     }
     new_validator = MetadataValidator(POLICY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in requirements")
 
   def test_empty_string_in_deltas_array(self) -> None:
@@ -275,7 +275,7 @@ class PolicyFrontmatterValidationTest(unittest.TestCase):
       "deltas": ["DE-001", "", "DE-002"],
     }
     new_validator = MetadataValidator(POLICY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in deltas")
 
 

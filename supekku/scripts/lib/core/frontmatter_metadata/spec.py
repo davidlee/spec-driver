@@ -6,9 +6,14 @@ extending the base metadata with spec-specific fields.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from supekku.scripts.lib.specs.lifecycle import SPEC_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
+
+SPEC_STATUS_ENUM_VALUES: list[str] = sorted(SPEC_STATUSES)
 
 SPEC_FRONTMATTER_METADATA = BlockMetadata(
   version=1,
@@ -16,6 +21,13 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for specifications (kind: spec)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
+    # DE-137 IP-137-P01: status enum promotion; aliases reserved for DE-139.
+    "status": replace(
+      BASE_FRONTMATTER_METADATA.fields["status"],
+      type="enum",
+      pattern=None,
+      enum_values=SPEC_STATUS_ENUM_VALUES,
+    ),
     # Spec-specific fields (all optional)
     "category": FieldMetadata(
       type="string",

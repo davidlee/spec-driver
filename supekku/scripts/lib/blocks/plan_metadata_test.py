@@ -20,14 +20,14 @@ from .plan_metadata import PHASE_OVERVIEW_METADATA, PLAN_OVERVIEW_METADATA
 
 def _validate_plan(data: dict) -> list[str]:
   """Validate ``data`` against the plan.overview metadata in strict mode."""
-  validator = MetadataValidator(PLAN_OVERVIEW_METADATA, strict_unknown_keys=True)
-  return [str(err) for err in validator.validate(data)]
+  validator = MetadataValidator(PLAN_OVERVIEW_METADATA)
+  return [str(err) for err in validator.validate(data, strict=True)]
 
 
 def _validate_phase(data: dict) -> list[str]:
   """Validate ``data`` against the phase.overview metadata in strict mode."""
-  validator = MetadataValidator(PHASE_OVERVIEW_METADATA, strict_unknown_keys=True)
-  return [str(err) for err in validator.validate(data)]
+  validator = MetadataValidator(PHASE_OVERVIEW_METADATA)
+  return [str(err) for err in validator.validate(data, strict=True)]
 
 
 class PlanMetadataValidationTest(unittest.TestCase):

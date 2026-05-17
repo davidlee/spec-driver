@@ -6,9 +6,14 @@ extending the base metadata with requirement-specific fields.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from supekku.scripts.lib.requirements.lifecycle import REQUIREMENT_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
+
+REQUIREMENT_STATUS_ENUM_VALUES: list[str] = sorted(REQUIREMENT_STATUSES)
 
 REQUIREMENT_FRONTMATTER_METADATA = BlockMetadata(
   version=1,
@@ -16,6 +21,13 @@ REQUIREMENT_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for requirements (kind: requirement)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
+    # DE-137 IP-137-P01: status enum promotion; aliases reserved for DE-140.
+    "status": replace(
+      BASE_FRONTMATTER_METADATA.fields["status"],
+      type="enum",
+      pattern=None,
+      enum_values=REQUIREMENT_STATUS_ENUM_VALUES,
+    ),
     # Requirement-specific fields (all optional)
     "requirement_kind": FieldMetadata(
       type="enum",

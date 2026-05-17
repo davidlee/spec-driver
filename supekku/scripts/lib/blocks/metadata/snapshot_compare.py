@@ -175,7 +175,7 @@ def compare_block(
   hand_rolled_errors = adapter(data, frontmatter_id)
   metadata_errors = [
     str(e)
-    for e in MetadataValidator(schema.metadata, strict_unknown_keys=True).validate(data)
+    for e in MetadataValidator(schema.metadata).validate(data, strict=True)
   ]
   hand_rolled_passed = not hand_rolled_errors
   metadata_passed = not metadata_errors

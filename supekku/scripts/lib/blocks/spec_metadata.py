@@ -212,15 +212,9 @@ SPEC_CAPABILITIES_METADATA = BlockMetadata(
   ],
 )
 
-_SPEC_RELATIONSHIPS_VALIDATOR = MetadataValidator(
-  SPEC_RELATIONSHIPS_METADATA,
-  strict_unknown_keys=True,
-)
+_SPEC_RELATIONSHIPS_VALIDATOR = MetadataValidator(SPEC_RELATIONSHIPS_METADATA)
 
-_SPEC_CAPABILITIES_VALIDATOR = MetadataValidator(
-  SPEC_CAPABILITIES_METADATA,
-  strict_unknown_keys=True,
-)
+_SPEC_CAPABILITIES_VALIDATOR = MetadataValidator(SPEC_CAPABILITIES_METADATA)
 
 
 def validate_spec_relationships(
@@ -234,7 +228,10 @@ def validate_spec_relationships(
   an ID-equality check matching the legacy ``RelationshipsBlockValidator``
   message string (callers test truthiness of the returned list).
   """
-  errors = [str(err) for err in _SPEC_RELATIONSHIPS_VALIDATOR.validate(block.data)]
+  errors = [
+    str(err)
+    for err in _SPEC_RELATIONSHIPS_VALIDATOR.validate(block.data, strict=True)
+  ]
   spec_value = str(block.data.get("spec", ""))
   if spec_id and spec_value and spec_value != spec_id:
     errors.append(
@@ -259,7 +256,10 @@ def validate_spec_capabilities(
   :class:`MetadataValidator`.
   """
   del spec_id  # accepted for API symmetry; see docstring above.
-  return [str(err) for err in _SPEC_CAPABILITIES_VALIDATOR.validate(block.data)]
+  return [
+    str(err)
+    for err in _SPEC_CAPABILITIES_VALIDATOR.validate(block.data, strict=True)
+  ]
 
 
 __all__ = [

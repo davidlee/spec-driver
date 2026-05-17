@@ -131,7 +131,7 @@ class BaseFrontmatterDualValidationTest(unittest.TestCase):
 
     # New validator requires strings (by design - pre-processing needed)
     new_validator = MetadataValidator(BASE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "New validator requires string dates")
 
   def test_valid_empty_relations_array(self) -> None:
@@ -306,7 +306,7 @@ class BaseFrontmatterDualValidationTest(unittest.TestCase):
     # Old validator doesn't validate tags field
     # New validator does
     new_validator = MetadataValidator(BASE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "New validator should reject non-array tags")
 
   def test_relations_not_array(self) -> None:
@@ -352,7 +352,7 @@ class BaseFrontmatterDualValidationTest(unittest.TestCase):
     # Old validator doesn't validate kind enum
     # New validator does
     new_validator = MetadataValidator(BASE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "New validator should reject invalid kind")
 
   def test_invalid_lifecycle_value(self) -> None:
@@ -368,7 +368,7 @@ class BaseFrontmatterDualValidationTest(unittest.TestCase):
       "updated": "2025-01-15",
     }
     new_validator = MetadataValidator(BASE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "New validator should reject invalid lifecycle")
 
   def test_invalid_relation_type_value(self) -> None:
@@ -391,7 +391,7 @@ class BaseFrontmatterDualValidationTest(unittest.TestCase):
     # Old validator doesn't check relation type enum
     # New validator does
     new_validator = MetadataValidator(BASE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "New validator should reject invalid relation type"
     )
@@ -495,7 +495,7 @@ class BaseFrontmatterDualValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(BASE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "New validator should reject invalid relation type"
     )
@@ -598,7 +598,7 @@ class BaseFrontmatterDualValidationTest(unittest.TestCase):
     # Old validator doesn't validate tags field
     # New validator does
     new_validator = MetadataValidator(BASE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "New validator should reject empty strings in tags"
     )

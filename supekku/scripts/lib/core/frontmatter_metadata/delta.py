@@ -9,8 +9,20 @@ from __future__ import annotations
 from dataclasses import replace
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from supekku.scripts.lib.changes.lifecycle import CHANGE_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
+
+# Canonical change-artefact status enum (legacy alias "complete" excluded).
+DELTA_STATUS_ENUM_VALUES: list[str] = sorted(s for s in CHANGE_STATUSES if s != "complete")
+
+# Delta-status field-VALUE aliases (DR-137 §5.2 / DEC-137-23 — corpus matrix).
+DELTA_STATUS_ALIASES: dict[str, str] = {
+  "complete": "completed",
+  "active": "in-progress",
+  "done": "completed",
+  "in_progress": "in-progress",
+}
 
 # -- Audit gate constants (DEC-079-003, DEC-079-010) --
 
@@ -30,6 +42,14 @@ DELTA_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for deltas (kind: delta)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
+    # DE-137 IP-137-P01: status promoted to enum, with legacy aliases (F-30).
+    "status": replace(
+      BASE_FRONTMATTER_METADATA.fields["status"],
+      type="enum",
+      pattern=None,
+      enum_values=DELTA_STATUS_ENUM_VALUES,
+      aliases=DELTA_STATUS_ALIASES,
+    ),
     # Base field persistence overrides for delta compaction
     "lifecycle": replace(
       BASE_FRONTMATTER_METADATA.fields["lifecycle"],

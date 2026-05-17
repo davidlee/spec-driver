@@ -40,9 +40,9 @@ from .workflow_metadata import (
 
 
 def _validate(metadata, data):
-  """Run MetadataValidator and return error strings."""
+  """Run MetadataValidator (strict mode) and return error strings."""
   v = MetadataValidator(metadata)
-  return [str(e) for e in v.validate(data)]
+  return [str(e) for e in v.validate(data, strict=True)]
 
 
 # ---------------------------------------------------------------------------
@@ -581,8 +581,8 @@ class WorkflowSessionsTest(unittest.TestCase):
   def test_session_entry_unknown_key_rejected_under_strict(self):
     data = self._minimal_valid()
     data["sessions"]["implementer"]["unexpected_field"] = "x"
-    validator = MetadataValidator(WORKFLOW_SESSIONS_METADATA, strict_unknown_keys=True)
-    errors = [str(e) for e in validator.validate(data)]
+    validator = MetadataValidator(WORKFLOW_SESSIONS_METADATA)
+    errors = [str(e) for e in validator.validate(data, strict=True)]
     assert any("unexpected_field" in e for e in errors), errors
 
   def test_sessions_empty_map_silent_pass(self):

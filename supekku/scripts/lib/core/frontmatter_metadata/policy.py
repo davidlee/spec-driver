@@ -7,9 +7,14 @@ and lifecycle tracking.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from supekku.scripts.lib.policies.lifecycle import POLICY_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
+
+POLICY_STATUS_ENUM_VALUES: list[str] = sorted(POLICY_STATUSES)
 
 POLICY_FRONTMATTER_METADATA = BlockMetadata(
   version=1,
@@ -17,6 +22,13 @@ POLICY_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for policies (kind: policy)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
+    # DE-137 IP-137-P01: status enum promotion; aliases reserved.
+    "status": replace(
+      BASE_FRONTMATTER_METADATA.fields["status"],
+      type="enum",
+      pattern=None,
+      enum_values=POLICY_STATUS_ENUM_VALUES,
+    ),
     # Policy-specific fields (all optional)
     "reviewed": FieldMetadata(
       type="string",

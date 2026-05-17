@@ -116,6 +116,7 @@ testpaths = [
     "supekku/scripts",
     "supekku/scripts/lib",
     "supekku/tui",
+    "spec_driver",
 ]
 
 [tool.ruff]

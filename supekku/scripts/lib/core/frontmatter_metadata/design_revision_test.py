@@ -159,7 +159,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid source_context type")
 
   def test_source_context_missing_id(self) -> None:
@@ -177,7 +177,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject source_context missing id")
 
   def test_source_context_missing_type(self) -> None:
@@ -195,7 +195,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject source_context missing type")
 
   def test_code_impact_missing_path(self) -> None:
@@ -216,7 +216,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject code_impact missing path")
 
   def test_code_impact_missing_current_state(self) -> None:
@@ -237,7 +237,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject code_impact missing current_state"
     )
@@ -260,7 +260,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject code_impact missing target_state"
     )
@@ -280,7 +280,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject verification_alignment missing verification"
     )
@@ -300,7 +300,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject verification_alignment missing impact"
     )
@@ -320,7 +320,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject invalid verification_alignment impact"
     )
@@ -340,7 +340,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject design_decision missing id")
 
   def test_design_decision_missing_summary(self) -> None:
@@ -358,7 +358,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject design_decision missing summary")
 
   def test_open_question_missing_description(self) -> None:
@@ -376,7 +376,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject open_question missing description"
     )
@@ -396,7 +396,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject open_question missing owner")
 
   def test_open_question_missing_due(self) -> None:
@@ -414,7 +414,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject open_question missing due")
 
   def test_open_question_invalid_due_format(self) -> None:
@@ -436,7 +436,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject open_question with invalid due format"
     )
@@ -460,7 +460,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject code_impact with empty path")
 
   def test_empty_string_in_verification(self) -> None:
@@ -478,7 +478,7 @@ class DesignRevisionFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(DESIGN_REVISION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject verification_alignment with empty verification"
     )

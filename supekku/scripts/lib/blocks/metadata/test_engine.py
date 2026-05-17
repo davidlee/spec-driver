@@ -100,7 +100,23 @@ class EnumFieldValidationTest(unittest.TestCase):
     assert errors == []
 
   def test_enum_field_invalid(self):
-    """Enum field rejects values not in enum."""
+    """Enum field rejects values not in enum under strict (DEC-137-23)."""
+    metadata = BlockMetadata(
+      version=1,
+      schema_id="test.schema",
+      fields={
+        "status": FieldMetadata(
+          type="enum", required=True, enum_values=["planned", "active", "done"]
+        )
+      },
+    )
+    validator = MetadataValidator(metadata)
+    errors = validator.validate({"status": "invalid"}, strict=True)
+    assert len(errors) == 1
+    assert "must be one of allowed values" in errors[0].message
+
+  def test_enum_field_invalid_tolerant_default(self):
+    """Loader-default (strict=False) silently accepts unknown enum values."""
     metadata = BlockMetadata(
       version=1,
       schema_id="test.schema",
@@ -112,8 +128,7 @@ class EnumFieldValidationTest(unittest.TestCase):
     )
     validator = MetadataValidator(metadata)
     errors = validator.validate({"status": "invalid"})
-    assert len(errors) == 1
-    assert "must be one of allowed values" in errors[0].message
+    assert errors == []
 
 
 class ConstFieldValidationTest(unittest.TestCase):
@@ -1099,7 +1114,7 @@ class AdditionalPropertiesValidationTest(unittest.TestCase):
 
 
 class StrictUnknownKeysTest(unittest.TestCase):
-  """`strict_unknown_keys` flag rejects undeclared keys (DE-118 DEC-001)."""
+  """`strict=True` rejects undeclared keys (DE-118 DEC-001 / DE-137 DEC-137-14)."""
 
   def _metadata(self) -> BlockMetadata:
     return BlockMetadata(
@@ -1121,30 +1136,32 @@ class StrictUnknownKeysTest(unittest.TestCase):
     assert errors == []
 
   def test_strict_rejects_extra_top_level_key(self):
-    """strict_unknown_keys=True rejects unknown top-level keys."""
-    validator = MetadataValidator(self._metadata(), strict_unknown_keys=True)
-    errors = validator.validate({"name": "x", "extra": 1})
+    """strict=True rejects unknown top-level keys."""
+    validator = MetadataValidator(self._metadata())
+    errors = validator.validate({"name": "x", "extra": 1}, strict=True)
     assert len(errors) == 1
     assert errors[0].path == "extra"
     assert "unknown" in errors[0].message.lower()
 
   def test_strict_accepts_known_keys(self):
-    """strict_unknown_keys=True does not regress on valid documents."""
-    validator = MetadataValidator(self._metadata(), strict_unknown_keys=True)
-    errors = validator.validate({"name": "x", "nested": {"inner": "ok"}})
+    """strict=True does not regress on valid documents."""
+    validator = MetadataValidator(self._metadata())
+    errors = validator.validate(
+      {"name": "x", "nested": {"inner": "ok"}}, strict=True
+    )
     assert errors == []
 
   def test_strict_rejects_extra_key_at_nested_depth(self):
-    """strict_unknown_keys propagates through nested object recursion."""
-    validator = MetadataValidator(self._metadata(), strict_unknown_keys=True)
+    """strict=True propagates through nested object recursion."""
+    validator = MetadataValidator(self._metadata())
     errors = validator.validate(
-      {"name": "x", "nested": {"inner": "ok", "rogue": 1}},
+      {"name": "x", "nested": {"inner": "ok", "rogue": 1}}, strict=True
     )
     assert len(errors) == 1
     assert errors[0].path == "nested.rogue"
 
   def test_strict_with_additional_properties_accepts_matching_extras(self):
-    """strict_unknown_keys does not double-reject keys covered by additional."""
+    """strict=True does not double-reject keys covered by additional."""
     metadata = BlockMetadata(
       version=1,
       schema_id="test.schema",
@@ -1156,8 +1173,10 @@ class StrictUnknownKeysTest(unittest.TestCase):
         ),
       },
     )
-    validator = MetadataValidator(metadata, strict_unknown_keys=True)
-    errors = validator.validate({"sessions": {"alice": "active", "bob": "idle"}})
+    validator = MetadataValidator(metadata)
+    errors = validator.validate(
+      {"sessions": {"alice": "active", "bob": "idle"}}, strict=True
+    )
     assert errors == []
 
 

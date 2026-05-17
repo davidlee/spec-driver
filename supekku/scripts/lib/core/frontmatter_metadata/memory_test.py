@@ -180,7 +180,7 @@ class MemoryFrontmatterValidationTest(unittest.TestCase):
     """New validator rejects invalid memory_type."""
     data = _minimal_memory(memory_type="note")  # Not in enum
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid memory_type")
 
   def test_missing_memory_type(self) -> None:
@@ -188,56 +188,56 @@ class MemoryFrontmatterValidationTest(unittest.TestCase):
     data = _minimal_memory()
     del data["memory_type"]
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject missing memory_type")
 
   def test_invalid_confidence(self) -> None:
     """New validator rejects invalid confidence."""
     data = _minimal_memory(confidence="very_high")  # Not in enum
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid confidence")
 
   def test_invalid_verified_date_format(self) -> None:
     """New validator rejects invalid verified date format."""
     data = _minimal_memory(verified="2026/03/01")  # Wrong format
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid verified date format")
 
   def test_invalid_review_by_date_format(self) -> None:
     """New validator rejects invalid review_by date format."""
     data = _minimal_memory(review_by="March 2026")  # Wrong format
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid review_by date format")
 
   def test_invalid_severity(self) -> None:
     """New validator rejects invalid priority.severity."""
     data = _minimal_memory(priority={"severity": "urgent"})  # Not in enum
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid severity")
 
   def test_invalid_audience_value(self) -> None:
     """New validator rejects invalid audience enum value."""
     data = _minimal_memory(audience=["bot"])  # Not in enum
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid audience value")
 
   def test_invalid_visibility_value(self) -> None:
     """New validator rejects invalid visibility enum value."""
     data = _minimal_memory(visibility=["always"])  # Not in enum
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid visibility value")
 
   def test_empty_string_in_requires_reading(self) -> None:
     """New validator rejects empty strings in requires_reading."""
     data = _minimal_memory(requires_reading=["valid/path.md", ""])
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors,
       [],
@@ -248,21 +248,21 @@ class MemoryFrontmatterValidationTest(unittest.TestCase):
     """New validator rejects empty strings in scope.globs."""
     data = _minimal_memory(scope={"globs": ["src/**", ""]})
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in scope.globs")
 
   def test_empty_string_in_scope_paths(self) -> None:
     """New validator rejects empty strings in scope.paths."""
     data = _minimal_memory(scope={"paths": [""]})
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in scope.paths")
 
   def test_empty_string_in_scope_commands(self) -> None:
     """New validator rejects empty strings in scope.commands."""
     data = _minimal_memory(scope={"commands": [""]})
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors,
       [],
@@ -273,7 +273,7 @@ class MemoryFrontmatterValidationTest(unittest.TestCase):
     """New validator rejects requires_reading when not an array."""
     data = _minimal_memory(requires_reading="single/path.md")
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors,
       [],
@@ -284,7 +284,7 @@ class MemoryFrontmatterValidationTest(unittest.TestCase):
     """New validator rejects audience when not an array."""
     data = _minimal_memory(audience="human")
     new_validator = MetadataValidator(MEMORY_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject audience as non-array")
 
   # ── Links field tests ──────────────────────────────────────

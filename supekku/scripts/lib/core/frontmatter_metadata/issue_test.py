@@ -180,7 +180,7 @@ class IssueFrontmatterValidationTest(unittest.TestCase):
       "severity": "critical",  # Not in enum
     }
     new_validator = MetadataValidator(ISSUE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid severity")
 
   def test_invalid_impact(self) -> None:
@@ -196,7 +196,7 @@ class IssueFrontmatterValidationTest(unittest.TestCase):
       "impact": "business",  # Not in enum
     }
     new_validator = MetadataValidator(ISSUE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid impact")
 
   def test_empty_string_in_categories(self) -> None:
@@ -212,7 +212,7 @@ class IssueFrontmatterValidationTest(unittest.TestCase):
       "categories": ["regression", ""],
     }
     new_validator = MetadataValidator(ISSUE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in categories")
 
   def test_empty_string_in_problem_refs(self) -> None:
@@ -228,7 +228,7 @@ class IssueFrontmatterValidationTest(unittest.TestCase):
       "problem_refs": [""],
     }
     new_validator = MetadataValidator(ISSUE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in problem_refs")
 
   def test_empty_string_in_related_requirements(self) -> None:
@@ -244,7 +244,7 @@ class IssueFrontmatterValidationTest(unittest.TestCase):
       "related_requirements": ["SPEC-101.FR-01", ""],
     }
     new_validator = MetadataValidator(ISSUE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject empty string in related_requirements"
     )
@@ -262,7 +262,7 @@ class IssueFrontmatterValidationTest(unittest.TestCase):
       "affected_verifications": ["VT-210", ""],
     }
     new_validator = MetadataValidator(ISSUE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject empty string in affected_verifications"
     )
@@ -280,7 +280,7 @@ class IssueFrontmatterValidationTest(unittest.TestCase):
       "linked_deltas": [""],
     }
     new_validator = MetadataValidator(ISSUE_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in linked_deltas")
 
 

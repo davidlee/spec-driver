@@ -72,7 +72,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
       "name": "Content Binding Spec",
       "slug": "spec-content-binding",
       "kind": "spec",
-      "status": "approved",
+      "status": "active",
       "created": "2024-06-08",
       "updated": "2025-01-15",
       "c4_level": "container",
@@ -176,7 +176,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
     # Old validator doesn't validate c4_level
     # New validator does
     new_validator = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid c4_level")
 
   def test_valid_hypothesis_statuses(self) -> None:
@@ -219,7 +219,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid hypothesis status")
 
   # Nested object validation (8 tests)
@@ -265,7 +265,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject concern missing description")
 
   def test_valid_decisions_array(self) -> None:
@@ -311,7 +311,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject decision missing id")
 
   def test_valid_verification_strategy(self) -> None:
@@ -349,7 +349,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject verification missing description"
     )
@@ -481,7 +481,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject source missing language")
 
   def test_source_invalid_language(self) -> None:
@@ -503,7 +503,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid language")
 
   def test_source_missing_variants(self) -> None:
@@ -525,7 +525,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject source missing variants")
 
   def test_source_empty_variants_array(self) -> None:
@@ -547,7 +547,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty variants array")
 
   def test_variant_missing_required_fields(self) -> None:
@@ -574,7 +574,7 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(SPEC_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject variant missing path")
 
   # Array validation (4 tests)

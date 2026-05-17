@@ -178,7 +178,7 @@ class PlanFrontmatterValidationTest(unittest.TestCase):
       "entrance_criteria": ["Valid criterion", ""],
     }
     new_validator = MetadataValidator(PLAN_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject empty string in entrance_criteria"
     )
@@ -196,7 +196,7 @@ class PlanFrontmatterValidationTest(unittest.TestCase):
       "exit_criteria": [""],
     }
     new_validator = MetadataValidator(PLAN_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in exit_criteria")
 
 

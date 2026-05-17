@@ -21,8 +21,11 @@ from dataclasses import replace
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 from supekku.scripts.lib.core.git import SHA_HEX_PATTERN
+from supekku.scripts.lib.memory.lifecycle import MEMORY_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
+
+MEMORY_STATUS_ENUM_VALUES: list[str] = sorted(MEMORY_STATUSES)
 
 MEMORY_FRONTMATTER_METADATA = BlockMetadata(
   version=1,
@@ -30,6 +33,13 @@ MEMORY_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for memory records (kind: memory)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
+    # DE-137 IP-137-P01: status enum promotion; aliases reserved.
+    "status": replace(
+      BASE_FRONTMATTER_METADATA.fields["status"],
+      type="enum",
+      pattern=None,
+      enum_values=MEMORY_STATUS_ENUM_VALUES,
+    ),
     # Base field persistence overrides for memory compaction
     "lifecycle": replace(
       BASE_FRONTMATTER_METADATA.fields["lifecycle"],

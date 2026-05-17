@@ -170,10 +170,7 @@ DELTA_RELATIONSHIPS_METADATA = BlockMetadata(
   ],
 )
 
-_DELTA_RELATIONSHIPS_VALIDATOR = MetadataValidator(
-  DELTA_RELATIONSHIPS_METADATA,
-  strict_unknown_keys=True,
-)
+_DELTA_RELATIONSHIPS_VALIDATOR = MetadataValidator(DELTA_RELATIONSHIPS_METADATA)
 
 
 def validate_delta_relationships(
@@ -187,7 +184,10 @@ def validate_delta_relationships(
   an ID-equality check matching the legacy ``DeltaRelationshipsValidator``
   message string (callers test truthiness of the returned list).
   """
-  errors = [str(err) for err in _DELTA_RELATIONSHIPS_VALIDATOR.validate(block.data)]
+  errors = [
+    str(err)
+    for err in _DELTA_RELATIONSHIPS_VALIDATOR.validate(block.data, strict=True)
+  ]
   delta_value = str(block.data.get("delta", ""))
   if delta_id and delta_value and delta_value != delta_id:
     errors.append(

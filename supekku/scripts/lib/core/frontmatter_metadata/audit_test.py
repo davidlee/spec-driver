@@ -28,9 +28,9 @@ _BASE = {
 
 
 def _new_errors(data: dict) -> list[str]:
-  """Run metadata validator and return error strings."""
+  """Run metadata validator (strict mode) and return error strings."""
   validator = MetadataValidator(AUDIT_FRONTMATTER_METADATA)
-  return [str(e) for e in validator.validate(data)]
+  return [str(e) for e in validator.validate(data, strict=True)]
 
 
 class AuditFrontmatterValidationTest(unittest.TestCase):

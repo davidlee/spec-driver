@@ -6,9 +6,14 @@ extending the base metadata with issue-specific fields.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
+from supekku.scripts.lib.backlog.models import BACKLOG_BASE_STATUSES
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 
 from .base import BASE_FRONTMATTER_METADATA
+
+ISSUE_STATUS_ENUM_VALUES: list[str] = sorted(BACKLOG_BASE_STATUSES)
 
 ISSUE_FRONTMATTER_METADATA = BlockMetadata(
   version=1,
@@ -16,6 +21,13 @@ ISSUE_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for issues (kind: issue)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
+    # DE-137 IP-137-P01: status enum promotion; aliases reserved.
+    "status": replace(
+      BASE_FRONTMATTER_METADATA.fields["status"],
+      type="enum",
+      pattern=None,
+      enum_values=ISSUE_STATUS_ENUM_VALUES,
+    ),
     # Issue-specific fields (all optional)
     "categories": FieldMetadata(
       type="array",

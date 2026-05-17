@@ -46,7 +46,7 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
     }
@@ -59,7 +59,7 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "OAuth2 Authentication Flow Verification",
       "slug": "verification-oauth2-auth",
       "kind": "verification",
-      "status": "approved",
+      "status": "verified",
       "lifecycle": "verification",
       "created": "2024-08-15",
       "updated": "2025-01-15",
@@ -79,7 +79,7 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "verification_kind": "automated",
@@ -93,7 +93,7 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "verification_kind": "agent",
@@ -107,7 +107,7 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "verification_kind": "manual",
@@ -121,7 +121,7 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "covers": ["FR-102", "NF-020", "SPEC-100.FR-05"],
@@ -135,7 +135,7 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "covers": [],
@@ -149,7 +149,7 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "procedure": "Run test suite with assertions on expected behavior",
@@ -164,13 +164,13 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "verification_kind": "invalid",  # Not in enum
     }
     new_validator = MetadataValidator(VERIFICATION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid verification_kind")
 
   def test_covers_not_array(self) -> None:
@@ -180,13 +180,13 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "covers": "FR-102",  # Should be array
     }
     new_validator = MetadataValidator(VERIFICATION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject covers as non-array")
 
   def test_empty_string_in_covers_array(self) -> None:
@@ -196,13 +196,13 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "covers": ["FR-102", ""],  # Empty string
     }
     new_validator = MetadataValidator(VERIFICATION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in covers")
 
   def test_procedure_not_string(self) -> None:
@@ -212,13 +212,13 @@ class VerificationFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Verification",
       "slug": "test-verification",
       "kind": "verification",
-      "status": "draft",
+      "status": "planned",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "procedure": 123,  # Should be string
     }
     new_validator = MetadataValidator(VERIFICATION_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject procedure as non-string")
 
 

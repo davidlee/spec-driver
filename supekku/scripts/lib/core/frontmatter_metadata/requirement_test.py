@@ -46,7 +46,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
     }
@@ -59,7 +59,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "OAuth2 Token Refresh",
       "slug": "requirement-oauth2-refresh",
       "kind": "requirement",
-      "status": "approved",
+      "status": "active",
       "lifecycle": "implementation",
       "created": "2024-06-15",
       "updated": "2025-01-15",
@@ -84,7 +84,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "requirement_kind": "functional",
@@ -98,7 +98,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "requirement_kind": "non-functional",
@@ -112,7 +112,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "requirement_kind": "policy",
@@ -126,7 +126,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "requirement_kind": "standard",
@@ -140,7 +140,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "rfc2119_level": "must",
@@ -154,7 +154,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "rfc2119_level": "should",
@@ -168,7 +168,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "rfc2119_level": "may",
@@ -189,7 +189,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
           "name": "Test Requirement",
           "slug": "test-requirement",
           "kind": "requirement",
-          "status": "draft",
+          "status": "pending",
           "created": "2025-01-15",
           "updated": "2025-01-15",
           "value_driver": driver,
@@ -203,7 +203,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "acceptance_criteria": [
@@ -221,7 +221,7 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "acceptance_criteria": [],
@@ -237,13 +237,13 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "requirement_kind": "invalid",
     }
     new_validator = MetadataValidator(REQUIREMENT_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid requirement_kind")
 
   def test_invalid_rfc2119_level(self) -> None:
@@ -253,13 +253,13 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "rfc2119_level": "could",
     }
     new_validator = MetadataValidator(REQUIREMENT_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid rfc2119_level")
 
   def test_invalid_value_driver(self) -> None:
@@ -269,13 +269,13 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "value_driver": "profit",
     }
     new_validator = MetadataValidator(REQUIREMENT_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid value_driver")
 
   def test_empty_string_in_acceptance_criteria(self) -> None:
@@ -285,13 +285,13 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "acceptance_criteria": ["Valid criterion", ""],
     }
     new_validator = MetadataValidator(REQUIREMENT_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject empty string in acceptance_criteria"
     )
@@ -303,13 +303,13 @@ class RequirementFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Requirement",
       "slug": "test-requirement",
       "kind": "requirement",
-      "status": "draft",
+      "status": "pending",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "verification_refs": ["VT-210", ""],
     }
     new_validator = MetadataValidator(REQUIREMENT_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject empty string in verification_refs"
     )

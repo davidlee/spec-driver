@@ -148,7 +148,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid hypothesis status")
 
   def test_hypothesis_missing_id(self) -> None:
@@ -169,7 +169,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject hypothesis missing id")
 
   def test_hypothesis_missing_statement(self) -> None:
@@ -190,7 +190,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject hypothesis missing statement")
 
   def test_hypothesis_missing_status(self) -> None:
@@ -211,7 +211,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject hypothesis missing status")
 
   def test_decision_missing_id(self) -> None:
@@ -231,7 +231,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject decision missing id")
 
   def test_decision_missing_summary(self) -> None:
@@ -251,7 +251,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject decision missing summary")
 
   def test_product_requirement_missing_code(self) -> None:
@@ -271,7 +271,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject product requirement missing code"
     )
@@ -293,7 +293,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject product requirement missing statement"
     )
@@ -311,7 +311,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       "problems": ["PROB-001", ""],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in problems")
 
   def test_empty_string_in_guiding_principles_array(self) -> None:
@@ -327,7 +327,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       "guiding_principles": ["Valid principle", ""],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject empty string in guiding_principles"
     )
@@ -345,7 +345,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       "assumptions": ["Valid assumption", ""],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in assumptions")
 
   def test_verification_strategy_with_empty_research(self) -> None:
@@ -363,7 +363,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject empty research in verification_strategy"
     )
@@ -383,7 +383,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject empty metric in verification_strategy"
     )
@@ -427,7 +427,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject hypothesis with empty id")
 
   def test_hypothesis_with_empty_statement(self) -> None:
@@ -449,7 +449,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject hypothesis with empty statement")
 
   def test_decision_with_empty_id(self) -> None:
@@ -470,7 +470,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject decision with empty id")
 
   def test_decision_with_empty_summary(self) -> None:
@@ -491,7 +491,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject decision with empty summary")
 
   def test_product_requirement_with_empty_code(self) -> None:
@@ -512,7 +512,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject product requirement with empty code"
     )
@@ -535,7 +535,7 @@ class ProdFrontmatterValidationTest(unittest.TestCase):
       ],
     }
     new_validator = MetadataValidator(PROD_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject product requirement with empty statement"
     )

@@ -7,9 +7,22 @@ is used for all three kinds (plan, phase, task).
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 
 from .base import BASE_FRONTMATTER_METADATA
+from .delta import DELTA_STATUS_ENUM_VALUES
+
+# Plan/phase/task statuses share the change-artefact enum (delta is canonical).
+PLAN_STATUS_ENUM_VALUES: list[str] = DELTA_STATUS_ENUM_VALUES
+
+# Plan/phase/task status field-VALUE aliases (DR-137 §5.2 — shared schema).
+PLAN_STATUS_ALIASES: dict[str, str] = {
+  "active": "in-progress",
+  "done": "completed",
+  "in_progress": "in-progress",
+}
 
 PLAN_FRONTMATTER_METADATA = BlockMetadata(
   version=1,
@@ -17,6 +30,14 @@ PLAN_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for plans/phases/tasks (kind: plan|phase|task)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
+    # DE-137 IP-137-P01: status promoted to enum, with legacy aliases (F-30).
+    "status": replace(
+      BASE_FRONTMATTER_METADATA.fields["status"],
+      type="enum",
+      pattern=None,
+      enum_values=PLAN_STATUS_ENUM_VALUES,
+      aliases=PLAN_STATUS_ALIASES,
+    ),
     # Plan-specific fields (all optional, shared across plan/phase/task)
     "plan": FieldMetadata(
       type="string",

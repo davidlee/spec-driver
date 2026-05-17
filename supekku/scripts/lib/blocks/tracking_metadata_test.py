@@ -17,8 +17,8 @@ from .tracking_metadata import PHASE_TRACKING_METADATA
 
 def _validate(data: dict) -> list[str]:
   """Validate ``data`` against the phase.tracking metadata in strict mode."""
-  validator = MetadataValidator(PHASE_TRACKING_METADATA, strict_unknown_keys=True)
-  return [str(err) for err in validator.validate(data)]
+  validator = MetadataValidator(PHASE_TRACKING_METADATA)
+  return [str(err) for err in validator.validate(data, strict=True)]
 
 
 class TopLevelValidationTest(unittest.TestCase):

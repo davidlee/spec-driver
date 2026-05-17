@@ -6,9 +6,14 @@ extending the base metadata with verification-specific fields.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from supekku.scripts.lib.blocks.verification import VERIFICATION_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
+
+VERIFICATION_STATUS_ENUM_VALUES: list[str] = sorted(VERIFICATION_STATUSES)
 
 VERIFICATION_FRONTMATTER_METADATA = BlockMetadata(
   version=1,
@@ -16,6 +21,13 @@ VERIFICATION_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for verifications (kind: verification)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
+    # DE-137 IP-137-P01: status enum promotion; aliases reserved.
+    "status": replace(
+      BASE_FRONTMATTER_METADATA.fields["status"],
+      type="enum",
+      pattern=None,
+      enum_values=VERIFICATION_STATUS_ENUM_VALUES,
+    ),
     # Verification-specific fields (all optional)
     "verification_kind": FieldMetadata(
       type="enum",

@@ -434,10 +434,7 @@ REVISION_CHANGE_METADATA = BlockMetadata(
   ],
 )
 
-_REVISION_CHANGE_VALIDATOR = MetadataValidator(
-  REVISION_CHANGE_METADATA,
-  strict_unknown_keys=True,
-)
+_REVISION_CHANGE_VALIDATOR = MetadataValidator(REVISION_CHANGE_METADATA)
 
 
 def validate_revision_change(data: dict[str, Any]) -> list[str]:
@@ -453,7 +450,7 @@ def validate_revision_change(data: dict[str, Any]) -> list[str]:
   ``validate_spec_relationships``) no ID-equality check is layered on
   top: the legacy ``RevisionBlockValidator`` did not enforce one.
   """
-  return [str(err) for err in _REVISION_CHANGE_VALIDATOR.validate(data)]
+  return [str(err) for err in _REVISION_CHANGE_VALIDATOR.validate(data, strict=True)]
 
 
 __all__ = [

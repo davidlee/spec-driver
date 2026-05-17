@@ -196,7 +196,7 @@ class ProblemFrontmatterValidationTest(unittest.TestCase):
       "context": [{"type": "invalid", "id": "UX-023"}],  # Invalid type
     }
     new_validator = MetadataValidator(PROBLEM_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid context type")
 
   def test_context_missing_type(self) -> None:
@@ -212,7 +212,7 @@ class ProblemFrontmatterValidationTest(unittest.TestCase):
       "context": [{"id": "UX-023"}],  # Missing type
     }
     new_validator = MetadataValidator(PROBLEM_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject context missing type")
 
   def test_context_missing_id(self) -> None:
@@ -228,7 +228,7 @@ class ProblemFrontmatterValidationTest(unittest.TestCase):
       "context": [{"type": "research"}],  # Missing id
     }
     new_validator = MetadataValidator(PROBLEM_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject context missing id")
 
   def test_context_empty_id(self) -> None:
@@ -244,7 +244,7 @@ class ProblemFrontmatterValidationTest(unittest.TestCase):
       "context": [{"type": "research", "id": ""}],  # Empty id
     }
     new_validator = MetadataValidator(PROBLEM_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject context with empty id")
 
   def test_empty_string_in_success_criteria(self) -> None:
@@ -260,7 +260,7 @@ class ProblemFrontmatterValidationTest(unittest.TestCase):
       "success_criteria": ["Valid criterion", ""],  # Empty string
     }
     new_validator = MetadataValidator(PROBLEM_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject empty string in success_criteria"
     )
@@ -278,7 +278,7 @@ class ProblemFrontmatterValidationTest(unittest.TestCase):
       "related_requirements": [""],
     }
     new_validator = MetadataValidator(PROBLEM_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(
       new_errors, [], "Should reject empty string in related_requirements"
     )

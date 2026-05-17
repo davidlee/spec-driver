@@ -19,10 +19,8 @@ from .verification_metadata import VERIFICATION_COVERAGE_METADATA
 
 def _validate(data: dict) -> list[str]:
   """Validate ``data`` against the verification.coverage metadata in strict mode."""
-  validator = MetadataValidator(
-    VERIFICATION_COVERAGE_METADATA, strict_unknown_keys=True
-  )
-  return [str(err) for err in validator.validate(data)]
+  validator = MetadataValidator(VERIFICATION_COVERAGE_METADATA)
+  return [str(err) for err in validator.validate(data, strict=True)]
 
 
 class TopLevelValidationTest(unittest.TestCase):

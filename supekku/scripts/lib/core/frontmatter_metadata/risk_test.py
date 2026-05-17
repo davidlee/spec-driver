@@ -46,7 +46,7 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
     }
@@ -81,7 +81,7 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "risk_kind": "systemic",
@@ -95,7 +95,7 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "risk_kind": "operational",
@@ -109,7 +109,7 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "risk_kind": "delivery",
@@ -125,7 +125,7 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
           "name": "Test Risk",
           "slug": "test-risk",
           "kind": "risk",
-          "status": "identified",
+          "status": "open",
           "created": "2025-01-15",
           "updated": "2025-01-15",
           "likelihood": likelihood,
@@ -141,7 +141,7 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
           "name": "Test Risk",
           "slug": "test-risk",
           "kind": "risk",
-          "status": "identified",
+          "status": "open",
           "created": "2025-01-15",
           "updated": "2025-01-15",
           "impact": impact,
@@ -155,7 +155,7 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "origin": "ADR-012",
@@ -169,7 +169,7 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "controls": ["TS-015", "SPEC-201.FR-08"],
@@ -183,7 +183,7 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "controls": [],
@@ -198,13 +198,13 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "risk_kind": "invalid",  # Not in enum
     }
     new_validator = MetadataValidator(RISK_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid risk_kind")
 
   def test_invalid_likelihood(self) -> None:
@@ -214,13 +214,13 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "likelihood": "critical",  # Not in enum
     }
     new_validator = MetadataValidator(RISK_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid likelihood")
 
   def test_invalid_impact(self) -> None:
@@ -230,13 +230,13 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "impact": "severe",  # Not in enum
     }
     new_validator = MetadataValidator(RISK_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject invalid impact")
 
   def test_empty_origin_string(self) -> None:
@@ -246,13 +246,13 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "origin": "",  # Empty string
     }
     new_validator = MetadataValidator(RISK_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty origin string")
 
   def test_empty_string_in_controls(self) -> None:
@@ -262,13 +262,13 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "controls": ["TS-015", ""],  # Empty string
     }
     new_validator = MetadataValidator(RISK_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject empty string in controls")
 
   def test_controls_not_array(self) -> None:
@@ -278,13 +278,13 @@ class RiskFrontmatterValidationTest(unittest.TestCase):
       "name": "Test Risk",
       "slug": "test-risk",
       "kind": "risk",
-      "status": "identified",
+      "status": "open",
       "created": "2025-01-15",
       "updated": "2025-01-15",
       "controls": "TS-015",  # Should be array
     }
     new_validator = MetadataValidator(RISK_FRONTMATTER_METADATA)
-    new_errors = new_validator.validate(data)
+    new_errors = new_validator.validate(data, strict=True)
     self.assertNotEqual(new_errors, [], "Should reject controls as non-array")
 
 

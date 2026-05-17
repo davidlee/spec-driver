@@ -134,6 +134,9 @@ BASE_FRONTMATTER_METADATA = BlockMetadata(
       items=FieldMetadata(
         type="object",
         description="Relationship edge to another artifact",
+        # DE-137 IP-137-P01: field-NAME alias (DEC-137-05 / F-30); `annotation`
+        # is the legacy key for `nature`.
+        field_aliases={"annotation": "nature"},
         properties={
           "type": FieldMetadata(
             type="enum",

@@ -4,7 +4,7 @@ slug: "137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli
 name: IP-137 Phase 02 - Template infrastructure + emit split + first regeneration
 created: "2026-05-18"
 updated: "2026-05-18"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-137
 delta: DE-137
@@ -284,8 +284,8 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria (all bullets in §4) satisfied
-- [ ] Verification evidence stored in `notes.md` (VT pass status; `yaml_emit.py` LOC; pre/post grep of `dump_markdown_file` callers; template diff summary)
-- [ ] IP-137 §9 progress box for P02 checked
-- [ ] OQ-137-01 disposition recorded (keep stdlib emit or escalate to ruamel.yaml)
-- [ ] Hand-off note in `notes.md` summarising any new constraints for IP-137-P03 (e.g. `validate` Typer group skeleton location; comment-extraction limitations to be aware of when implementing `--fix` consumers)
+- [x] Exit criteria (all bullets in §4) satisfied
+- [x] Verification evidence stored in `notes.md` (VT pass status; `yaml_emit.py` LOC; pre/post grep of `dump_markdown_file` callers; template diff summary)
+- [x] IP-137 §9 progress box for P02 checked
+- [x] OQ-137-01 disposition recorded (keep stdlib emit; 95 code lines, well under ~120 gate)
+- [x] Hand-off note in `notes.md` summarising any new constraints for IP-137-P03 (validate-templates landed as hyphenated top-level; P03 promotes to `validate` group; comment-extraction MVP scope = single-line scalars only)

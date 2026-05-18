@@ -1,5 +1,117 @@
 # Notes for DE-137
 
+## 2026-05-18 — IP-137-P02 complete (template infrastructure + emit split + first regeneration)
+
+### Summary
+
+All 16 tasks of IP-137-P02 landed. Phase exits with full pytest green
+(5080 passed, 4 skipped — +98 net new tests vs P01 baseline), ruff clean,
+pylint score 9.69 (= baseline; no regression). Coverage of the 8
+IP-137-P02 VTs:
+
+| VT | Location | Status |
+|---|---|---|
+| VT-CC-001 (template enum-comment per kind) | `spec_driver/orchestration/templates_test.py::TestEnumCommentHints` (14 cases) | verified |
+| VT-CC-002 (regenerator idempotency) | `templates_test.py::test_idempotent_second_run_no_op` | verified |
+| VT-CC-003 (`validate templates` CI gate) | `templates_test.py::TestValidateTemplates` (3 cases) — landed early in P02 | verified |
+| VT-CC-004 (created artefact carries enum hints) | `supekku/scripts/lib/changes/creation_test.py::test_create_delta_emits_enum_comment_hints_in_frontmatter` | verified |
+| VT-CC-005 (yaml_emit primitives + containers) | `spec_driver/core/yaml_emit_test.py::TestEmitPrimitives` + `TestEmitContainers` (10 cases) | verified |
+| VT-CC-006 (yaml_emit deterministic) | `yaml_emit_test.py::TestDeterminism` (5 cases) | verified |
+| VT-CC-007 (malformed template fails loud) | `templates_test.py::test_malformed_template_raises` | verified |
+| VT-CC-024 (comment-map invariance) | `templates_test.py::TestCommentMapInvariance` (15 cases) | verified |
+
+### OQ-137-01 disposition
+
+`spec_driver/core/yaml_emit.py`: **95 code lines** (130 total with
+docstrings/blanks). Well under the ~120 LOC gate. Disposition: **keep
+stdlib path**; no ruamel.yaml swap needed. The `_FrontmatterDumper`
+absorbed the legacy `CompactDumper` so `dump_frontmatter_yaml`
+delegates to `emit_yaml_block` (POL-001 single emit surface).
+
+### Architecture wins
+
+1. **POL-001 enforced.** `render_frontmatter_for_kind` is the single
+   surface for enum-comment-hinted emit; both `regenerate_template`
+   (template path) and `dump_markdown_file_create` (artefact path) call
+   it. `dump_frontmatter_yaml` (legacy) delegates down to
+   `emit_yaml_block`. No parallel emit paths.
+2. **DEC-137-15 / F-1 honoured.** `dump_markdown_file` removed entirely
+   — no shim. All ~33 production + ~95 test callers explicitly use
+   `_create(..., kind=)` or `_update(...)`. Grep is empty for the
+   legacy name (code-level).
+3. **Template metadata drift caught early.** `audit.md` had legacy
+   inline frontmatter (`mode`, `delta_ref`, `spec_refs`, `findings`,
+   ...) not in the metadata schema. The one-time regeneration dropped
+   it — a clean win.
+4. **Reference-mode emit is conservative.** After polishing, only
+   required + explicitly placeholderable fields appear in the template
+   frontmatter. Optional canonical-persistence fields (ext_id/ext_url/
+   lifecycle) stay out of the template — they show up at create time
+   when callers supply concrete values.
+5. **Per-caller create/update intent now explicit.** During the
+   migration two design errors in the DR-137 §5.1 table surfaced and
+   were corrected:
+   - `cli/resolve.py:284` is an UPDATE (memory link rewrite of existing
+     file), not a CREATE.
+   - `sync_specs.py:140` is a CREATE (only writes when file doesn't
+     exist), not an UPDATE.
+
+### Pragmatic deviations from DR-137
+
+1. **DR raises `UnknownKindError` on unknown kind; P02 production
+   `dump_markdown_file_create` catches it and falls back to plain
+   `emit_yaml_block`.** Reason: `kind="guidance"` (spec testing
+   companion) and `kind="improvement"` (backlog kind) have no entries
+   in `FRONTMATTER_METADATA_REGISTRY`. Both are real, in-use kinds.
+   Hard-failing would block creation. Falling back loses enum hints but
+   keeps atomic-write. Tracking: ISSUE-055-ish backlog work to add
+   `improvement` + `guidance` metadata. The renderer itself still fails
+   loud on unknown kinds — only the create-path falls through.
+2. **`validate templates` shipped as hyphenated top-level
+   `validate-templates`** rather than `validate templates` subcommand.
+   Reason: the existing `spec-driver validate` is a top-level command
+   (workspace validation). Converting it to a Typer group breaks
+   current usage. P03 owns the group-conversion refactor; in P02 the
+   hyphenated form lands the functionality without breakage.
+
+### Hand-off note for IP-137-P03
+
+- **`validate` Typer group**: in P02 we shipped
+  `spec-driver validate-templates` as a top-level command (entrypoint
+  in `supekku/cli/validate.py::templates_cmd`). P03 should convert
+  `validate` from a single command (currently `workspace.validate`) to
+  a Typer group with subcommands `workspace` (current), `file` (new),
+  `templates` (move our `templates_cmd` into the group). Test refs at
+  `supekku/cli/test_cli.py:51,96,284` use `validate --help` and still
+  work under a group — minimal breakage expected.
+- **Comment extraction in `_update` is MVP scope: single-line scalars
+  only.** Multi-line/block-style scalar values are not annotated with
+  comments (the regex won't match). If P03's `--fix` rewrite path
+  encounters a multi-line value, it preserves the value but the
+  trailing comment (if any) is lost.
+- **`dump_markdown_file_create` falls back to plain emit on unknown
+  kinds** — see deviation #1 above. P03 `--fix` rewrites use `_update`
+  so this isn't a concern there, but anyone adding new create-path
+  callers should still pass `kind=` explicitly and prefer registering
+  the kind's metadata over relying on fallback.
+- **Active phase**: `phase-03.md` to be drafted at P03 entrance via
+  `/plan-phases`. Phase-02 wrap-up commit pending after this notes
+  update.
+
+### Commits on this run
+
+- b437bbf9 — docs(DE-137): scaffold IP-137-P02 sheet + plan reconciliation
+- 5df7ed81 — chore(DE-137): IP-137-P02 pre-flight audit + phase activation
+- 69d1d793 — feat(DE-137): spec_driver.core.yaml_emit (task 2.2)
+- 2b3c4ee6 — feat(DE-137): templates renderer + regenerator (tasks 2.3/2.4)
+- e987d758 — feat(DE-137): split dump_markdown_file (task 2.5)
+- 9b6ad61c — feat(DE-137): migrate production callers (tasks 2.6/2.7)
+- 555a7083 — feat(DE-137): migrate test callers + delete legacy alias (tasks 2.8/2.9)
+- d8406f5f — feat(DE-137): CLI wiring for templates (tasks 2.10/2.11/2.12)
+- 6c027db7 — chore(DE-137): regenerate templates (task 2.13)
+- c82f366b — test(DE-137): VT-CC-004 e2e enum-comment test (task 2.14)
+- (this commit) — wrap-up
+
 ## 2026-05-18 — IP-137-P02 entry: pre-flight `dump_markdown_file` audit + plan scaffold
 
 ### Plan-phases handoff

@@ -1,5 +1,95 @@
 # Notes for DE-137
 
+## 2026-05-18 — IP-137-P02 entry: pre-flight `dump_markdown_file` audit + plan scaffold
+
+### Plan-phases handoff
+
+- P01 closed cleanly; IP-137 status `draft` → `in-progress`; verification.coverage entries
+  for VT-CC-008/009/010/011/012/013/030/034 flipped to `verified`.
+- `phases/phase-02.md` drafted (16 tasks; VT-CC-001/002/003/004/005/006/007/024 in scope).
+- Active phase pointer flipped in IP-137 §5.
+- Baseline `pytest`: 4982 passed, 4 skipped (matches P01 exit). Ruff clean. Format clean.
+- Phase-02 status: draft → in-progress (this entry).
+
+### Pre-flight audit (task 2.1)
+
+`rg -n 'dump_markdown_file\b' --type py` reconciled against DR-137 §5.1 ripple table.
+
+**Production create-path (11 sites — all match DR table):**
+
+| File | Line | Kind |
+|---|---|---|
+| `supekku/scripts/lib/changes/delta_creation.py` | 105 | `delta` |
+| `supekku/scripts/lib/changes/delta_creation.py` | 141 | `phase` (phase-N sheet during delta scaffold; verify literal at edit time) |
+| `supekku/scripts/lib/changes/phase_creation.py` | 486 | `phase` |
+| `supekku/scripts/lib/changes/audit_creation.py` | 96 | `audit` |
+| `supekku/scripts/lib/changes/revision_creation.py` | 92 | `revision` |
+| `supekku/scripts/lib/changes/creation.py` | 95 | `plan` |
+| `supekku/scripts/lib/changes/creation.py` | 245 | `requirement` (caller already carries discriminator) |
+| `supekku/scripts/lib/specs/creation.py` | 169 | `spec` (PROD handled via kind arg) |
+| `supekku/scripts/lib/specs/creation.py` | 188 | `spec_tests` |
+| `supekku/cli/resolve.py` | 284 | `memory` |
+| `supekku/scripts/lib/backlog/registry.py` | 397 | caller-provided (`issue`/`improvement`/`risk`/`problem`) |
+
+**Production update-path (9 sites — all match DR table):**
+
+| File | Lines |
+|---|---|
+| `supekku/scripts/lib/core/frontmatter_writer.py` | 138, 176, 226 |
+| `spec_driver/domain/relations/manager.py` | 105, 142 |
+| `supekku/cli/compact.py` | 74 |
+| `supekku/scripts/sync_specs.py` | 140, 160, 184 |
+| `scripts/normalise_frontmatter.py` | 35 |
+
+**Test ripple (15 files, ~95 sites — DR §5.1 undercounted "~12 tests"):**
+
+| File | Sites | Predominant variant |
+|---|---|---|
+| `supekku/scripts/lib/relations/manager_test.py` | 1 | `_create` |
+| `supekku/scripts/lib/requirements/registry_test.py` | 2 | `_create` |
+| `supekku/scripts/lib/requirements/sync_test.py` | 24 | mixed; mostly `_create` fixture-builders |
+| `supekku/scripts/lib/requirements/parser_test.py` | 2 | `_create` |
+| `supekku/scripts/lib/requirements/coverage_test.py` | 5 | `_create` |
+| `supekku/scripts/lib/specs/registry_test.py` | 6 | `_create` |
+| `supekku/scripts/lib/specs/models_test.py` | 7 | `_create` |
+| `supekku/scripts/lib/changes/artifacts_test.py` | 12 | `_create` |
+| `supekku/scripts/lib/changes/registry_test.py` | 4 | `_create` |
+| `supekku/scripts/lib/changes/discover_plans_test.py` | 4 | `_create` |
+| `supekku/scripts/lib/validation/validator_test.py` | 29 | `_create` |
+| `supekku/scripts/lib/workspace_test.py` | 2 | `_create` |
+| `supekku/scripts/lib/spec_utils_test.py` | 2 | exercise both variants once split |
+| `supekku/cli/resolve_test.py` | 4 | `_create` |
+| `supekku/cli/sync_test.py` | 1 | `_create` |
+
+**Exported names:** `supekku/scripts/lib/__init__.py` re-exports `dump_markdown_file`
+(lines 24, 61). After split, replace with `dump_markdown_file_create` and
+`dump_markdown_file_update`.
+
+**Other findings:**
+
+- `dump_frontmatter_yaml` (CompactDumper) is the deterministic emit primitive
+  4982 tests depend on. Implication for task 2.2: `spec_driver/core/yaml_emit.py`
+  must produce byte-equivalent output to CompactDumper for the no-comments case
+  (or move CompactDumper-equivalent into yaml_emit and have `dump_frontmatter_yaml`
+  delegate to `emit_yaml_block`). Plan: implement CompactDumper-equivalent inside
+  `yaml_emit.py` as a private dumper class; LOC budget ~50 dumper + ~30 comment
+  layer + ~10 boilerplate = ~90 LOC (still under OQ-137-01 gate of ~120).
+  `dump_frontmatter_yaml` retained as a thin wrapper for callers that need the
+  no-comment path (`frontmatter_writer_test.py` exercises it directly).
+- No `dump_frontmatter_yaml` callers outside `spec_utils.py` (internal) and
+  `frontmatter_writer_test.py` — no extra migration surface.
+
+### Migration strategy
+
+- Order: 2.2 yaml_emit → 2.3 renderer → 2.5 split (now safe to break the wire)
+  → 2.6/2.7 production callers → 2.8 tests (the bulk) → 2.9 grep gate +
+  delete legacy fn → 2.10/2.11 CLI → 2.12 just target → 2.13 regen templates
+  → 2.14 e2e enum-comment test → 2.15/2.16 gate + wrap-up.
+- Test migration done with sed scripts where feasible (most calls follow a
+  `dump_markdown_file(path, frontmatter, body)` shape; the `kind` derivation is
+  almost always implicit from the surrounding fixture-builder's filename
+  pattern).
+
 ## 2026-05-18 — IP-137-P01 complete (schema & validation foundation)
 
 ### Summary

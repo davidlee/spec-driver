@@ -14,6 +14,7 @@ if sys.version_info < (3, 12):  # noqa: UP036 — defensive guard for broken ins
 import click
 import typer
 
+from spec_driver.presentation.cli.schema import app as schema_app
 from spec_driver.presentation.cli.validate import app as validate_app
 from supekku.cli import (
   admin,
@@ -125,6 +126,12 @@ app.add_typer(
   validate_app,
   name="validate",
   help="Validate workspace artefacts, individual files, or templates",
+)
+
+app.add_typer(
+  schema_app,
+  name="schema",
+  help="Inspect frontmatter metadata schemas (enums, aliases, fields)",
 )
 
 app.command(

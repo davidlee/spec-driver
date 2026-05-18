@@ -188,12 +188,17 @@ def _placeholder_value(kind: str, field_name: str, field: Any) -> Any:
 
 
 def _should_include_in_reference(field_name: str, field: Any, kind: str) -> bool:
-  """Decide whether *field_name* appears in placeholder-mode output."""
+  """Decide whether *field_name* appears in placeholder-mode output.
+
+  Conservative: only required fields plus those explicitly listed in
+  `TEMPLATE_PLACEHOLDERS[kind]`. Optional fields are omitted from the
+  reference template — they'll show up at create time when the caller
+  supplies a concrete value, and the validator catches missing required
+  fields at the strict layer.
+  """
   if field_name in TEMPLATE_PLACEHOLDERS.get(kind, {}):
     return True
-  if field.required:
-    return True
-  return field.persistence == "canonical"
+  return field.required
 
 
 def render_frontmatter_for_kind(

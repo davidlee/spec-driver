@@ -39,6 +39,9 @@ lint-imports:
 validate:
   uv run spec-driver validate
 
+validate-templates:
+  uv run spec-driver validate-templates
+
 # run before commits
 pre-commit: check format-markdown
 

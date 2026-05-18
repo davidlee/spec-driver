@@ -7,13 +7,18 @@ from typing import Annotated
 
 import typer
 
-from supekku.cli import backfill, compact, resolve
+from supekku.cli import backfill, compact, regenerate_templates, resolve
 
 app = typer.Typer(help="Workspace maintenance commands", no_args_is_help=True)
 
 app.add_typer(compact.app, name="compact", help="Compact artifact frontmatter")
 app.add_typer(resolve.app, name="resolve", help="Resolve cross-artifact references")
 app.add_typer(backfill.app, name="backfill", help="Backfill incomplete artifacts")
+app.add_typer(
+  regenerate_templates.app,
+  name="regenerate-templates",
+  help="Regenerate template frontmatter from metadata (IP-137-P02)",
+)
 
 
 @app.command()

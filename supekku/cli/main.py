@@ -22,6 +22,7 @@ from supekku.cli import (
   find,
   show,
   sync,
+  validate,
   view,
   workflow,
   workspace,
@@ -124,6 +125,11 @@ app.command(
   "validate",
   help="Validate workspace metadata and relationships",
 )(workspace.validate)
+
+app.command(
+  "validate-templates",
+  help="Validate template frontmatter against canonical metadata (IP-137-P02)",
+)(validate.templates_cmd)
 
 app.command(
   "doctor",

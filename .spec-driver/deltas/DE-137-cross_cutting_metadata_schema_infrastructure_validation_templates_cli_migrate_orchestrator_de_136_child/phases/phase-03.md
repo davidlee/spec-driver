@@ -4,7 +4,7 @@ slug: "137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli
 name: IP-137 Phase 03 - validate Typer group + schema enums CLI + ripple
 created: "2026-05-18"
 updated: "2026-05-18"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-137
 delta: DE-137
@@ -742,10 +742,10 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria (all bullets in §4) satisfied
-- [ ] Verification evidence stored in `notes.md` (VT pass status;
+- [x] Exit criteria (all bullets in §4) satisfied
+- [x] Verification evidence stored in `notes.md` (VT pass status;
   ripple before/after grep; CliRunner snippets; ISSUE-054
   disposition; DEC-137-21 examples)
-- [ ] IP-137 §9 progress box for P03 checked
-- [ ] Hand-off note in `notes.md` summarising any new constraints for
+- [x] IP-137 §9 progress box for P03 checked
+- [x] Hand-off note in `notes.md` summarising any new constraints for
   IP-137-P04 (migrations framework + workflow.toml + import-linter)

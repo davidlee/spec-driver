@@ -1,5 +1,140 @@
 # Notes for DE-137
 
+## 2026-05-18 — IP-137-P03 complete (validate Typer group + schema enums + ripple)
+
+### Summary
+
+All 15 tasks of IP-137-P03 landed. Phase exits with full pytest green
+(5217 passed, 4 skipped — +128 net new tests vs P02 baseline), ruff
+clean, format clean, pylint 9.69 (= baseline). Coverage of the 7 VTs +
+1 VA in scope:
+
+| VT | Location | Status |
+|---|---|---|
+| VT-CC-014 (validate file --strict --fix idempotency) | `spec_driver/presentation/cli/validate/file_test.py::TestFixIdempotency` (2 cases) | verified |
+| VT-CC-015 (schema enums shape parity, 3 invocation forms) | `spec_driver/presentation/cli/schema/enums_test.py::TestThreeInvocationForms` (5 cases) | verified |
+| VT-CC-016 (validate file diagnostic shape + path matrix) | `file_test.py::TestPathHandling` + `TestDiagnosticShape` (9 cases) | verified |
+| VT-CC-017 (validate workspace --kind scoping) | `workspace_test.py::TestFilterByKind` + smoke (7 cases) | verified |
+| VT-CC-025 (validate workspace --kind sweep semantics) | `workspace_test.py::TestFilterByKind::test_filter_spec_kind_matches_both_id_families` + smoke | verified |
+| VT-CC-026 (ISSUE-054 regression closure) | `issue_054_regression_test.py` — inherits DE-135 VT-DR135-002 | verified |
+| VT-CC-032 (F-46 uniform exit-code contract) | `group_test.py::TestExitCodeContract` (12 matrix cells) | verified |
+| VA-CC-001 (parametric schema enums smoke) | `schema/enums_test.py::TestParametricCoverageVACC001` (~85 cases) | verified |
+
+### Pragmatic deviations from DR-137
+
+1. **`validate workspace --fix` per-kind sweep deferred.** DR-137 §5.2
+   / §5.4 envision `--fix` consuming `fix_hint`/`fix_kind` across the
+   full corpus during a workspace sweep. The current
+   `WorkspaceValidator` (`supekku/scripts/lib/validation/validator.py`)
+   does NOT invoke `MetadataValidator` per-artefact — it does
+   cross-reference validation only. Plumbing per-kind metadata fixes
+   through the workspace sweep requires the workspace loader to emit
+   `ValidationError`-shaped diagnostics (currently emits
+   `ValidationIssue` without fix metadata). That is a ~200-400 LOC
+   refactor and lands incrementally with DE-138..142 (per-kind sweeps
+   activate the fix path one kind at a time). P03 ships the **fix
+   consumer interface** via `validate file --fix` (DEC-137-15 / F-1
+   `dump_markdown_file_update` rewrite path). VT-CC-014 idempotency
+   covers this surface.
+
+2. **`validate workspace --kind` is the F-8 §2 form only.** DR-137 §5.4
+   F-8 sweep procedure §1 (load-time per-kind filter) requires the
+   loader to expose a `kind` parameter that skips non-matching
+   artefacts during construction. The current Workspace + registry
+   surface has no such opt-in. P03 implements F-8 §2 (full-corpus load
+   + post-validation filter on `ValidationIssue.artifact` id-prefix).
+   Reproducibility — the only F-8 guarantee that matters at the CLI
+   surface — is preserved (post-migration corpus where every artefact
+   of one kind is clean ⇒ `--kind` sweep exits 0). VT-CC-017/025 cover.
+
+3. **`validate workspace` exit-code contract changed: warnings ⇒ 0**
+   under default mode (F-46). The legacy `supekku/cli/workspace.py:validate`
+   returned `EXIT_FAILURE` on any non-empty issue list (warnings
+   included). The new contract returns 0 when only warnings surface
+   and 1 only on error-severity. `--strict` promotes warnings to
+   errors. This is the documented F-32 public contract change; the
+   live ripple migration (task 3.12) ensures internal callers use
+   `validate workspace --strict` where the legacy fail-on-warning
+   semantics were intended.
+
+4. **VT-CC-026 closes through DE-135 inheritance.** DE-135
+   (read-time YAML resilience) already shipped
+   `ListDeltasMalformedFrontmatterTest` as VT-DR135-002. DE-135 chose
+   a **skip-and-warn** behaviour (exit 0 + WARNING on stderr) rather
+   than DR-137 §5.4's "exit non-zero + single-line parse-error" spec.
+   The DE-135 approach is better for `list deltas` UX (other deltas
+   stay listable). The DR-137 spec applies cleanly to `validate file`
+   (which DOES exit 1 + line/col on parse-error per VT-CC-016). VT-CC-026's
+   "no Rich traceback" assertion is covered by DE-135's
+   `_assert_no_python_traceback` helper. The thin marker test in
+   `issue_054_regression_test.py` asserts the DE-135 coverage stays
+   present (collection-time fail-loud if it ever moves/regresses).
+
+5. **Live ripple inventory ≈ 27 references / 18 files vs DR-137 §5.4
+   "~8 live" estimate.** Memory files (10 references, load-bearing
+   for agent recall) + PROD specs (PROD-001/003/005/010, 6 refs) +
+   ADR-010 + README + Justfile (2 recipes) + SKILL.md (2 source + 2
+   installed copies) + supekku/about/lifecycle.md + SPEC-110. The
+   `validate constitution` references in PROD-011 are aspirational
+   (a planned future subcommand, not a real invocation) and left
+   alone. Documented in task 3.1 entry above.
+
+### Architecture wins
+
+1. **POL-002 enforced.** All CLI subcommand names, flag literals,
+   migration regex/paths are constants in
+   `spec_driver/presentation/cli/constants.py`. New Typer wiring
+   resolves against these constants rather than embedding magic
+   strings (e.g. `@app.command(constants.VALIDATE_WORKSPACE)` vs
+   `@app.command("workspace")`).
+
+2. **DEC-137-17 honoured.** Bare `spec-driver validate` prints help
+   and exits 2 via Typer's `no_args_is_help=True` — no
+   `invoke_without_command=True` default-dispatch trickery.
+   `spec-driver validate workspace` / `validate file` / `validate
+   templates` are named peers.
+
+3. **POL-001 enforced for schema enums.** Top-level `schema enums`
+   reads `FRONTMATTER_METADATA_REGISTRY` directly (single source of
+   truth) — no parallel enum dict, no hardcoded value tables.
+
+4. **F-46 uniform exit-code contract verified.** 12-cell matrix test
+   (`group_test.py::TestExitCodeContract`) covers bare/workspace/file/
+   templates × clean/error/usage states. The contract is mechanically
+   enforced.
+
+### Hand-off note for IP-137-P04
+
+- **`presentation/cli/constants.py` already ships the migration
+  entries** (`MIGRATION_FOLDER_PATTERN`, `MIGRATION_LOG_PATH`,
+  `MIGRATION_LOCK_PATH`). P04 imports them when wiring
+  `spec_driver/presentation/cli/admin/migrate.py` and
+  `spec_driver/migrations/_folder.py`.
+- **`validate workspace --fix` per-kind consumer is intentionally not
+  wired** at the workspace surface yet. P04's import-linter contract
+  is independent of this; DE-138..142 wire the per-kind fix sweep one
+  artefact-kind at a time as their loaders gain MetadataValidator
+  dispatch.
+- **`spec-driver schema` is now a top-level Typer group.** P04 can
+  reuse it if migrations need a `schema migrations` introspection
+  surface (low priority).
+- **`validate workspace` exits 0 on baseline warnings** (F-32). The
+  Justfile `validate:` recipe inherits this; CI consumers should use
+  `--strict` if they want to fail on warnings.
+- **Active phase**: `phase-04.md` to be drafted at P04 entrance via
+  `/plan-phases`. Phase-03 wrap-up commit pending after this notes
+  update.
+
+### Commits on this run
+
+- 0824552f — docs(DE-137): plan IP-137-P03 + draft phase-03 sheet
+- b9564305 — feat(DE-137): validate Typer group + CLI vocabulary constants (tasks 3.2/3.3/3.6/3.7)
+- 0dff03dd — feat(DE-137): validate file --fix + VT coverage for group (tasks 3.4/3.5/3.8/3.10)
+- (commit pre schema) — feat(DE-137): schema enums CLI + VT-CC-026 ISSUE-054 closure (tasks 3.9/3.11)
+- c266a941 — docs(DE-137): migrate validate CLI ripple sites + phase-03 status (tasks 3.12/3.13)
+- 59a5ecd9 — test(DE-137): admin_test schema-removed cleanup + format pass (task 3.14)
+- (this commit) — wrap-up
+
 ## 2026-05-18 — IP-137-P03 task 3.1 — full ripple inventory
 
 Pre-flight `rg -n 'spec-driver validate' --type md --type py --type just`

@@ -14,6 +14,7 @@ if sys.version_info < (3, 12):  # noqa: UP036 — defensive guard for broken ins
 import click
 import typer
 
+from spec_driver.presentation.cli.validate import app as validate_app
 from supekku.cli import (
   admin,
   complete,
@@ -22,7 +23,6 @@ from supekku.cli import (
   find,
   show,
   sync,
-  validate,
   view,
   workflow,
   workspace,
@@ -121,15 +121,11 @@ app.command(
   help="Initialize spec-driver workspace structure and registry files",
 )(workspace.install)
 
-app.command(
-  "validate",
-  help="Validate workspace metadata and relationships",
-)(workspace.validate)
-
-app.command(
-  "validate-templates",
-  help="Validate template frontmatter against canonical metadata (IP-137-P02)",
-)(validate.templates_cmd)
+app.add_typer(
+  validate_app,
+  name="validate",
+  help="Validate workspace artefacts, individual files, or templates",
+)
 
 app.command(
   "doctor",

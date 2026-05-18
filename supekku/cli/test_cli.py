@@ -280,8 +280,8 @@ class TestCommonOptions:
     assert "--root" in result.stdout
 
   def test_root_option_in_validate(self):
-    """Test --root option is available."""
-    result = runner.invoke(app, ["validate", "--help"])
+    """Test --root option is available on ``validate workspace``."""
+    result = runner.invoke(app, ["validate", "workspace", "--help"])
     assert result.exit_code == 0
     assert "--root" in result.stdout
 

@@ -1,4 +1,9 @@
-"""Workspace-level commands: install, validate, and doctor."""
+"""Workspace-level commands: install and doctor.
+
+``validate`` moved to the ``spec_driver/presentation/cli/validate`` Typer
+group in IP-137-P03; see
+``spec_driver/presentation/cli/validate/workspace.py``.
+"""
 
 from __future__ import annotations
 
@@ -16,7 +21,6 @@ from supekku.scripts.lib.formatters.diagnostic_formatters import (
   format_doctor_json,
   format_doctor_text,
 )
-from supekku.scripts.lib.validation.validator import validate_workspace as validate_ws
 from supekku.scripts.lib.workspace import Workspace
 
 app = typer.Typer(help="Workspace management commands", no_args_is_help=True)
@@ -58,74 +62,6 @@ def install(
       typer.echo(f"Workspace initialized in {target_path.resolve()}")
     raise typer.Exit(EXIT_SUCCESS)
   except (FileNotFoundError, ValueError) as e:
-    typer.echo(f"Error: {e}", err=True)
-    raise typer.Exit(EXIT_FAILURE) from e
-
-
-@app.command("validate")
-def validate(
-  root: RootOption = None,
-  sync: Annotated[
-    bool,
-    typer.Option(
-      "--sync",
-      help="Synchronise registries before validation",
-    ),
-  ] = False,
-  strict: Annotated[
-    bool,
-    typer.Option(
-      "--strict",
-      help="Enable strict validation (warn about deprecated ADR references)",
-    ),
-  ] = False,
-  verbose: Annotated[
-    bool,
-    typer.Option(
-      "--verbose",
-      "-v",
-      help="Show info-level messages (planned verification artifacts, etc.)",
-    ),
-  ] = False,
-  fix: Annotated[
-    bool,
-    typer.Option(
-      "--fix",
-      help="Auto-fix safe normalisations (e.g. non-canonical phase statuses)",
-    ),
-  ] = False,
-) -> None:
-  """Validate workspace metadata and relationships.
-
-  Checks workspace integrity, validates cross-references between documents,
-  and reports any issues found.
-
-  By default, only errors and warnings are shown. Use --verbose to see
-  info-level messages about planned verification artifacts.
-
-  Use --fix to auto-repair known-safe normalisations (e.g. non-canonical
-  phase status values). Run without --fix first to preview findings.
-  """
-  try:
-    ws = Workspace(find_repo_root(root))
-
-    if sync:
-      ws.sync_all_registries()
-
-    issues = validate_ws(ws, strict=strict, fix=fix)
-
-    # Filter issues based on verbosity
-    if not verbose:
-      issues = [i for i in issues if i.level != "info"]
-
-    if not issues:
-      typer.echo("Workspace validation passed")
-      raise typer.Exit(EXIT_SUCCESS)
-
-    for issue in issues:
-      typer.echo(f"Issue: {issue}", err=True)
-    raise typer.Exit(EXIT_FAILURE)
-  except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
 

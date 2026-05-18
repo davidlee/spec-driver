@@ -21,7 +21,6 @@ from .core.paths import (
 )
 from .core.spec_utils import (
   append_unique,
-  dump_markdown_file,
   dump_markdown_file_create,
   dump_markdown_file_update,
   ensure_list_entry,
@@ -60,7 +59,6 @@ __all__ = [
   "append_unique",
   "create_backlog_entry",
   "create_spec",
-  "dump_markdown_file",
   "dump_markdown_file_create",
   "dump_markdown_file_update",
   "ensure_list_entry",

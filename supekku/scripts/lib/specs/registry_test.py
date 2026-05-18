@@ -12,7 +12,7 @@ from supekku.scripts.lib.core.paths import (
   SPEC_DRIVER_DIR,
   TECH_SPECS_SUBDIR,
 )
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.specs.models import Spec
 from supekku.scripts.lib.specs.package_utils import find_package_for_file
 from supekku.scripts.lib.specs.registry import SpecRegistry
@@ -41,7 +41,7 @@ class SpecRegistryTest(RepoTestCase):
       "kind": "spec",
       "packages": ["internal/sample"],
     }
-    dump_markdown_file(tech_spec, tech_frontmatter, "# Sample Tech\n")
+    dump_markdown_file_update(tech_spec, tech_frontmatter, "# Sample Tech\n")
 
     product_dir = root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR
     product_dir.mkdir(parents=True, exist_ok=True)
@@ -55,7 +55,7 @@ class SpecRegistryTest(RepoTestCase):
       "status": "draft",
       "kind": "prod",
     }
-    dump_markdown_file(product_spec, product_frontmatter, "# Sample Product\n")
+    dump_markdown_file_update(product_spec, product_frontmatter, "# Sample Product\n")
 
     os.chdir(root)
     return root
@@ -99,7 +99,7 @@ class SpecRegistryTest(RepoTestCase):
       "status": "draft",
       "kind": "spec",
     }
-    dump_markdown_file(new_spec, frontmatter, "# Extra\n")
+    dump_markdown_file_update(new_spec, frontmatter, "# Extra\n")
 
     registry.reload()
     assert registry.get("SPEC-002") is not None
@@ -204,7 +204,7 @@ class TestSpecRegistryReverseQueries(RepoTestCase):
       "kind": kind,
       "informed_by": adr_ids,
     }
-    dump_markdown_file(spec_path, frontmatter, f"# {spec_id}\n")
+    dump_markdown_file_update(spec_path, frontmatter, f"# {spec_id}\n")
 
   def test_find_by_informed_by_single_adr(self) -> None:
     """Test finding specs informed by a specific ADR."""
@@ -323,7 +323,7 @@ class TestSpecRegistryReverseQueries(RepoTestCase):
       "status": "draft",
       "kind": "spec",
     }
-    dump_markdown_file(spec_path, frontmatter, "# SPEC-003\n")
+    dump_markdown_file_update(spec_path, frontmatter, "# SPEC-003\n")
 
     registry = SpecRegistry(root)
 
@@ -381,7 +381,7 @@ class TestSpecRegistryStandardSurface(RepoTestCase):
       fm["category"] = category
     if tags:
       fm["tags"] = tags
-    dump_markdown_file(spec_dir / f"{spec_id}.md", fm, f"# {spec_id}\n")
+    dump_markdown_file_update(spec_dir / f"{spec_id}.md", fm, f"# {spec_id}\n")
 
   # -- find() ---------------------------------------------------------------
 

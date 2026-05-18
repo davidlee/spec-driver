@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.changes.artifacts import load_change_artifact
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -24,7 +24,7 @@ def _write_delta(tmp_path: Path, body: str) -> Path:
     "relations": [],
     "applies_to": {},
   }
-  dump_markdown_file(path, frontmatter, body)
+  dump_markdown_file_update(path, frontmatter, body)
   return path
 
 
@@ -96,7 +96,7 @@ def test_plan_and_phase_overview_included(tmp_path: Path) -> None:
     "phases: []\n"
     "```\n\n# DE-020\n"
   )
-  dump_markdown_file(
+  dump_markdown_file_update(
     delta_dir / "DE-020.md",
     {
       "id": "DE-020",
@@ -128,7 +128,7 @@ def test_plan_and_phase_overview_included(tmp_path: Path) -> None:
     "```\n"
     "\n# IP-020 – Example Plan\n"
   )
-  dump_markdown_file(
+  dump_markdown_file_update(
     delta_dir / "IP-020.md",
     {
       "id": "IP-020",
@@ -159,7 +159,7 @@ def test_plan_and_phase_overview_included(tmp_path: Path) -> None:
     "risks: []\n"
     "```\n\n# Phase 01\n"
   )
-  dump_markdown_file(
+  dump_markdown_file_update(
     phases_dir / "phase-01.md",
     {
       "id": "IP-020.PHASE-01",
@@ -187,7 +187,7 @@ def test_phase_loaded_from_frontmatter_when_canonical_fields_present(
   """DR-106: Phase data read from frontmatter when plan+delta present."""
   delta_dir = tmp_path / "DE-040"
   delta_dir.mkdir()
-  dump_markdown_file(
+  dump_markdown_file_update(
     delta_dir / "DE-040.md",
     {
       "id": "DE-040",
@@ -212,7 +212,7 @@ def test_phase_loaded_from_frontmatter_when_canonical_fields_present(
     "phases:\n  - id: IP-040.PHASE-01\n"
     "```\n\n# IP-040\n"
   )
-  dump_markdown_file(
+  dump_markdown_file_update(
     delta_dir / "IP-040.md",
     {
       "id": "IP-040",
@@ -229,7 +229,7 @@ def test_phase_loaded_from_frontmatter_when_canonical_fields_present(
   phases_dir = delta_dir / "phases"
   phases_dir.mkdir()
   # New-format phase: canonical fields in frontmatter, no phase.overview block
-  dump_markdown_file(
+  dump_markdown_file_update(
     phases_dir / "phase-01.md",
     {
       "id": "IP-040.PHASE-01",
@@ -269,7 +269,7 @@ def test_phase_falls_back_to_block_when_no_canonical_frontmatter(
   """DR-106: Legacy phases without plan/delta in frontmatter use block fallback."""
   delta_dir = tmp_path / "DE-041"
   delta_dir.mkdir()
-  dump_markdown_file(
+  dump_markdown_file_update(
     delta_dir / "DE-041.md",
     {
       "id": "DE-041",
@@ -294,7 +294,7 @@ def test_phase_falls_back_to_block_when_no_canonical_frontmatter(
     "phases:\n  - id: IP-041.PHASE-01\n"
     "```\n\n# IP-041\n"
   )
-  dump_markdown_file(
+  dump_markdown_file_update(
     delta_dir / "IP-041.md",
     {
       "id": "IP-041",
@@ -326,7 +326,7 @@ def test_phase_falls_back_to_block_when_no_canonical_frontmatter(
     "risks: []\n"
     "```\n\n# Phase 01\n"
   )
-  dump_markdown_file(
+  dump_markdown_file_update(
     phases_dir / "phase-01.md",
     {
       "id": "IP-041.PHASE-01",
@@ -354,7 +354,7 @@ def test_phase_falls_back_to_block_when_no_canonical_frontmatter(
 def test_ext_id_and_ext_url_loaded_from_frontmatter(tmp_path: Path) -> None:
   """VT-067-001: ext_id and ext_url are loaded from frontmatter."""
   path = tmp_path / "DE-030.md"
-  dump_markdown_file(
+  dump_markdown_file_update(
     path,
     {
       "id": "DE-030",
@@ -387,7 +387,7 @@ def test_ext_fields_default_to_empty_string(tmp_path: Path) -> None:
 def test_to_dict_includes_ext_fields_when_present(tmp_path: Path) -> None:
   """VT-067-001: to_dict includes ext_id/ext_url when populated."""
   path = tmp_path / "DE-031.md"
-  dump_markdown_file(
+  dump_markdown_file_update(
     path,
     {
       "id": "DE-031",

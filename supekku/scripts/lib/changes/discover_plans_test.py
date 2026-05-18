@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from supekku.scripts.lib.changes.registry import discover_plans
 from supekku.scripts.lib.core.paths import DELTAS_SUBDIR, SPEC_DRIVER_DIR
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.test_base import RepoTestCase
 
 if TYPE_CHECKING:
@@ -63,7 +63,7 @@ def _write_plan(
     "kind": "plan",
   }
   body = _plan_overview_block(plan_id, delta_id, phases)
-  dump_markdown_file(path, frontmatter, body)
+  dump_markdown_file_update(path, frontmatter, body)
   return path
 
 
@@ -165,7 +165,7 @@ class TestDiscoverPlans(RepoTestCase):
       "status": "draft",
       "kind": "plan",
     }
-    dump_markdown_file(path, frontmatter, "# No overview block\n")
+    dump_markdown_file_update(path, frontmatter, "# No overview block\n")
 
     result = discover_plans(root)
 
@@ -187,7 +187,7 @@ class TestDiscoverPlans(RepoTestCase):
       "status": "draft",
       "kind": "delta",
     }
-    dump_markdown_file(delta_dir / "DE-100.md", frontmatter, "# Delta\n")
+    dump_markdown_file_update(delta_dir / "DE-100.md", frontmatter, "# Delta\n")
     _write_plan(root, "DE-100", "IP-100")
 
     result = discover_plans(root)
@@ -235,7 +235,7 @@ class TestDiscoverPlans(RepoTestCase):
       "status": "draft",
       "kind": "plan",
     }
-    dump_markdown_file(path, frontmatter, bad_block)
+    dump_markdown_file_update(path, frontmatter, bad_block)
 
     # Also write a valid plan
     _write_plan(root, "DE-101", "IP-101")

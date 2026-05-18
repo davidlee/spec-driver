@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 
 from supekku.scripts.lib.core.paths import SPEC_DRIVER_DIR, TECH_SPECS_SUBDIR
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.specs.registry import SpecRegistry
 from supekku.scripts.lib.test_base import RepoTestCase
 
@@ -20,7 +20,7 @@ class SpecTaxonomyTest(RepoTestCase):
     # Unit spec with taxonomy fields
     unit_dir = tech_dir / "SPEC-001"
     unit_dir.mkdir(parents=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       unit_dir / "SPEC-001.md",
       {
         "id": "SPEC-001",
@@ -39,7 +39,7 @@ class SpecTaxonomyTest(RepoTestCase):
     # Assembly spec with taxonomy fields
     asm_dir = tech_dir / "SPEC-002"
     asm_dir.mkdir(parents=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       asm_dir / "SPEC-002.md",
       {
         "id": "SPEC-002",
@@ -58,7 +58,7 @@ class SpecTaxonomyTest(RepoTestCase):
     # Spec without taxonomy fields (unknown)
     bare_dir = tech_dir / "SPEC-003"
     bare_dir.mkdir(parents=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       bare_dir / "SPEC-003.md",
       {
         "id": "SPEC-003",
@@ -142,7 +142,7 @@ class SpecExternalRefTest(RepoTestCase):
 
     ext_dir = tech_dir / "SPEC-010"
     ext_dir.mkdir(parents=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       ext_dir / "SPEC-010.md",
       {
         "id": "SPEC-010",
@@ -160,7 +160,7 @@ class SpecExternalRefTest(RepoTestCase):
 
     bare_dir = tech_dir / "SPEC-011"
     bare_dir.mkdir(parents=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       bare_dir / "SPEC-011.md",
       {
         "id": "SPEC-011",
@@ -228,7 +228,7 @@ class SpecRelationsTest(RepoTestCase):
     # Spec with relations
     rel_dir = tech_dir / "SPEC-020"
     rel_dir.mkdir(parents=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       rel_dir / "SPEC-020.md",
       {
         "id": "SPEC-020",
@@ -249,7 +249,7 @@ class SpecRelationsTest(RepoTestCase):
     # Spec without relations
     bare_dir = tech_dir / "SPEC-021"
     bare_dir.mkdir(parents=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       bare_dir / "SPEC-021.md",
       {
         "id": "SPEC-021",

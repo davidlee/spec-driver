@@ -13,7 +13,7 @@ from supekku.scripts.lib.core.paths import (
   TECH_SPECS_SUBDIR,
   get_registry_dir,
 )
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.requirements.lifecycle import (
   STATUS_ACTIVE,
   STATUS_DEPRECATED,
@@ -65,7 +65,7 @@ class TestRequirementsRegistryReverseQueries(unittest.TestCase):
       "status": "draft",
       "kind": "spec",
     }
-    dump_markdown_file(spec_path, frontmatter, body)
+    dump_markdown_file_update(spec_path, frontmatter, body)
 
   def _create_registry_with_verification(self, root: Path) -> RequirementsRegistry:
     """Create requirements registry and manually add verification metadata."""
@@ -691,7 +691,7 @@ class TestTerminalStatusGuard(unittest.TestCase):
   def _write_spec(self, root: Path, spec_id: str, body: str) -> Path:
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / spec_id.lower()
     spec_dir.mkdir(parents=True, exist_ok=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / f"{spec_id}.md",
       {"id": spec_id, "status": "draft", "kind": "spec"},
       body,

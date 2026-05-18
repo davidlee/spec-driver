@@ -18,7 +18,10 @@ from supekku.scripts.lib.core.paths import (
   SPEC_DRIVER_DIR,
   TECH_SPECS_SUBDIR,
 )
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
+from supekku.scripts.lib.core.spec_utils import (
+  dump_markdown_file_update,
+  load_markdown_file,
+)
 from supekku.scripts.lib.relations.manager import add_relation
 from supekku.scripts.lib.test_base import RepoTestCase
 from supekku.scripts.lib.validation.validator import validate_workspace
@@ -51,7 +54,7 @@ class WorkspaceValidatorTest(RepoTestCase):
       "category": "assembly",
       "c4_level": "component",
     }
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_path,
       frontmatter,
       f"# Spec\n- {requirement_label}: Example requirement\n",
@@ -72,7 +75,7 @@ class WorkspaceValidatorTest(RepoTestCase):
       "relations": [],
       "applies_to": {"requirements": [requirement_uid]},
     }
-    dump_markdown_file(delta_path, frontmatter, f"# {delta_id}\n")
+    dump_markdown_file_update(delta_path, frontmatter, f"# {delta_id}\n")
     return delta_path
 
   def _write_revision(
@@ -94,7 +97,7 @@ class WorkspaceValidatorTest(RepoTestCase):
       "kind": "revision",
       "relations": [],
     }
-    dump_markdown_file(revision_path, frontmatter, f"# {revision_id}\n")
+    dump_markdown_file_update(revision_path, frontmatter, f"# {revision_id}\n")
     add_relation(revision_path, relation_type="introduces", target=requirement_uid)
     return revision_path
 
@@ -112,7 +115,7 @@ class WorkspaceValidatorTest(RepoTestCase):
       "kind": "audit",
       "relations": [],
     }
-    dump_markdown_file(audit_path, frontmatter, f"# {audit_id}\n")
+    dump_markdown_file_update(audit_path, frontmatter, f"# {audit_id}\n")
     add_relation(audit_path, relation_type="verifies", target=requirement_uid)
     return audit_path
 
@@ -183,7 +186,7 @@ class WorkspaceValidatorTest(RepoTestCase):
       f"## Context\nTest context.\n\n"
       f"## Decision\nTest decision.\n"
     )
-    dump_markdown_file(adr_path, frontmatter, content)
+    dump_markdown_file_update(adr_path, frontmatter, content)
     return adr_path
 
   def test_validator_checks_adr_reference_validation(self) -> None:
@@ -458,7 +461,7 @@ class WorkspaceValidatorTest(RepoTestCase):
       frontmatter["category"] = category
     if c4_level:
       frontmatter["c4_level"] = c4_level
-    dump_markdown_file(spec_path, frontmatter, f"# {spec_id}\n")
+    dump_markdown_file_update(spec_path, frontmatter, f"# {spec_id}\n")
 
   def _write_prod_spec(self, root: Path, spec_id: str) -> None:
     """Write a product spec (no taxonomy expected)."""
@@ -474,7 +477,7 @@ class WorkspaceValidatorTest(RepoTestCase):
       "status": "draft",
       "kind": "prod",
     }
-    dump_markdown_file(spec_path, frontmatter, f"# {spec_id}\n")
+    dump_markdown_file_update(spec_path, frontmatter, f"# {spec_id}\n")
 
   def test_taxonomy_warns_missing_category(self) -> None:
     """Tech spec without category emits a warning."""
@@ -577,7 +580,7 @@ class WorkspaceValidatorTest(RepoTestCase):
       "status": "open",
       "created": "2024-06-01",
     }
-    dump_markdown_file(md_path, frontmatter, f"# {item_id}\n")
+    dump_markdown_file_update(md_path, frontmatter, f"# {item_id}\n")
 
     sync_backlog_registry(root)
 
@@ -633,7 +636,7 @@ class WorkspaceValidatorTest(RepoTestCase):
       frontmatter["delta_ref"] = delta_ref
     if findings is not None:
       frontmatter["findings"] = findings
-    dump_markdown_file(audit_path, frontmatter, f"# {audit_id}\n")
+    dump_markdown_file_update(audit_path, frontmatter, f"# {audit_id}\n")
     return audit_path
 
   def test_audit_disposition_warns_missing_disposition(self) -> None:
@@ -749,7 +752,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     # Write a draft audit with an invalid disposition — should not trigger
     audit_dir = root / SPEC_DRIVER_DIR / AUDITS_SUBDIR / "AUD-105-sample"
     audit_dir.mkdir(parents=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       audit_dir / "AUD-105.md",
       {
         "id": "AUD-105",
@@ -820,7 +823,7 @@ class WorkspaceValidatorTest(RepoTestCase):
     delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-702-sample"
     delta_dir.mkdir(parents=True)
     delta_path = delta_dir / "DE-702.md"
-    dump_markdown_file(
+    dump_markdown_file_update(
       delta_path,
       {
         "id": "DE-702",
@@ -929,7 +932,7 @@ class TestUnresolvedReferenceValidation(RepoTestCase):
     # Create a delta with a relation to the target
     delta_dir = spec_dir / DELTAS_SUBDIR / "DE-001-test"
     delta_dir.mkdir(parents=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       delta_dir / "DE-001.md",
       {
         "id": "DE-001",
@@ -999,10 +1002,10 @@ class PhaseValidationTest(RepoTestCase):
         "\n```yaml supekku:phase.overview@v1\nschema: supekku.phase.overview\n```\n"
       )
 
-    dump_markdown_file(phases_dir / filename, fm, body)
+    dump_markdown_file_update(phases_dir / filename, fm, body)
 
     # Minimal delta file so workspace doesn't complain
-    dump_markdown_file(
+    dump_markdown_file_update(
       delta_dir / "DE-200.md",
       {"id": "DE-200", "status": "in-progress", "kind": "delta"},
       "# DE-200\n",
@@ -1078,8 +1081,10 @@ class PhaseValidationTest(RepoTestCase):
       "delta": "DE-200",
       "objective": "Test objective",
     }
-    dump_markdown_file(phases_dir / "phase-01.md", fm, "# Phase 01\n\nContent.\n")
-    dump_markdown_file(
+    dump_markdown_file_update(
+      phases_dir / "phase-01.md", fm, "# Phase 01\n\nContent.\n"
+    )
+    dump_markdown_file_update(
       delta_dir / "DE-200.md",
       {"id": "DE-200", "status": "in-progress", "kind": "delta"},
       "# DE-200\n",
@@ -1143,8 +1148,8 @@ class PhaseValidationTest(RepoTestCase):
       "entrance_criteria": ["Prerequisite met"],
       "exit_criteria": ["Tests passing"],
     }
-    dump_markdown_file(phases_dir / "phase-01.md", fm, "# Phase 01\n")
-    dump_markdown_file(
+    dump_markdown_file_update(phases_dir / "phase-01.md", fm, "# Phase 01\n")
+    dump_markdown_file_update(
       delta_dir / "DE-200.md",
       {"id": "DE-200", "status": "in-progress", "kind": "delta"},
       "# DE-200\n",
@@ -1177,7 +1182,7 @@ class KindAwareValidationTest(RepoTestCase):
       "created": "2026-03-20",
       "updated": "2026-03-20",
     }
-    dump_markdown_file(mem_dir / "mem.test.example.md", fm, "# Memory\n")
+    dump_markdown_file_update(mem_dir / "mem.test.example.md", fm, "# Memory\n")
     ws = Workspace(root)
     issues = validate_workspace(ws)
     mem_issues = [i for i in issues if "mem.test" in i.artifact]
@@ -1195,7 +1200,7 @@ class KindAwareValidationTest(RepoTestCase):
       "memory_type": "fact",
       "tags": "not-a-list",  # tags must be list[str]
     }
-    dump_markdown_file(mem_dir / "mem.bad.type.md", fm, "# Memory\n")
+    dump_markdown_file_update(mem_dir / "mem.bad.type.md", fm, "# Memory\n")
     ws = Workspace(root)
     issues = validate_workspace(ws)
     mem_issues = [
@@ -1217,7 +1222,7 @@ class KindAwareValidationTest(RepoTestCase):
       "created": "2026-03-20",
       "updated": "2026-03-20",
     }
-    dump_markdown_file(issues_dir / "ISSUE-999.md", fm, "# Issue\n")
+    dump_markdown_file_update(issues_dir / "ISSUE-999.md", fm, "# Issue\n")
     ws = Workspace(root)
     issues = validate_workspace(ws)
     backlog_issues = [
@@ -1237,7 +1242,7 @@ class KindAwareValidationTest(RepoTestCase):
       "name": "Bad risk",
       "likelihood": "not-a-number",
     }
-    dump_markdown_file(risks_dir / "RISK-999.md", fm, "# Risk\n")
+    dump_markdown_file_update(risks_dir / "RISK-999.md", fm, "# Risk\n")
     ws = Workspace(root)
     issues = validate_workspace(ws)
     backlog_issues = [
@@ -1258,7 +1263,7 @@ class KindAwareValidationTest(RepoTestCase):
       "created": "2026-03-20",
       "updated": "2026-03-20",
     }
-    dump_markdown_file(drift_dir / "DL-999.md", fm, "# Drift\n")
+    dump_markdown_file_update(drift_dir / "DL-999.md", fm, "# Drift\n")
     ws = Workspace(root)
     issues = validate_workspace(ws)
     drift_issues = [
@@ -1275,7 +1280,7 @@ class KindAwareValidationTest(RepoTestCase):
     fm: dict[str, Any] = {
       "id": "DL-BAD",
     }
-    dump_markdown_file(drift_dir / "DL-BAD.md", fm, "# Drift\n")
+    dump_markdown_file_update(drift_dir / "DL-BAD.md", fm, "# Drift\n")
     ws = Workspace(root)
     issues = validate_workspace(ws)
     drift_issues = [
@@ -1359,7 +1364,7 @@ class TestBareRequirementIdWarning(WorkspaceValidatorTest):
       "category": "assembly",
       "c4_level": "component",
     }
-    dump_markdown_file(spec_path, fm, "# Spec\n- NF-001: Performance\n")
+    dump_markdown_file_update(spec_path, fm, "# Spec\n- NF-001: Performance\n")
     self._write_delta(root, "DE-403", "NF-001")
 
     ws = Workspace(root)
@@ -1435,7 +1440,7 @@ class TestImplementsTargetKindCheck(WorkspaceValidatorTest):
       "status": "draft",
       "kind": "product",
     }
-    dump_markdown_file(prod_path, fm, "# Prod\n- FR-001: Feature\n")
+    dump_markdown_file_update(prod_path, fm, "# Prod\n- FR-001: Feature\n")
     delta_path = self._write_delta(root, "DE-502", "PROD-042.FR-001")
     add_relation(delta_path, relation_type="implements", target="PROD-042")
 

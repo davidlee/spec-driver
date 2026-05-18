@@ -15,7 +15,7 @@ from supekku.scripts.lib.core.paths import (
   TECH_SPECS_SUBDIR,
   get_registry_dir,
 )
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.requirements.lifecycle import STATUS_ACTIVE
 from supekku.scripts.lib.requirements.registry import (
   RequirementRecord,
@@ -124,7 +124,7 @@ class TestRequirementCoverageEntries(unittest.TestCase):
       "created": "2024-06-01",
       "updated": "2024-06-01",
     }
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_path,
       frontmatter,
       "# SPEC-001\n\n- FR-001: No coverage\n",
@@ -196,7 +196,7 @@ class TestRequirementCoverageEntries(unittest.TestCase):
       "created": "2024-06-01",
       "updated": "2024-06-01",
     }
-    dump_markdown_file(spec_path, frontmatter, body)
+    dump_markdown_file_update(spec_path, frontmatter, body)
 
     registry_path = get_registry_dir(root) / "requirements.yaml"
     registry = RequirementsRegistry(registry_path)
@@ -241,7 +241,7 @@ class TestCoverageReplacementSemantics(unittest.TestCase):
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / spec_id.lower()
     spec_dir.mkdir(parents=True, exist_ok=True)
     spec_file = spec_dir / f"{spec_id}.md"
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_file,
       {"id": spec_id, "status": "draft", "kind": "spec"},
       body,
@@ -296,7 +296,7 @@ class TestCoverageReplacementSemantics(unittest.TestCase):
       ```
     """)
     spec_file = specs_root / "spec-800" / "SPEC-800.md"
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_file,
       {"id": "SPEC-800", "status": "draft", "kind": "spec"},
       body_v2,
@@ -376,7 +376,7 @@ class TestCoverageReplacementSemantics(unittest.TestCase):
       - **FR-001**: Covered requirement
     """)
     spec_file = specs_root / "spec-820" / "SPEC-820.md"
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_file,
       {"id": "SPEC-820", "status": "draft", "kind": "spec"},
       body_without_coverage,

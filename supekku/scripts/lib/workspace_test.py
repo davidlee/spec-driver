@@ -17,7 +17,7 @@ from supekku.scripts.lib.core.paths import (
   TECH_SPECS_SUBDIR,
   get_registry_dir,
 )
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.test_base import RepoTestCase
 from supekku.scripts.lib.workspace import Workspace
@@ -47,7 +47,7 @@ class WorkspaceTest(RepoTestCase):
       "status": "draft",
       "kind": "spec",
     }
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_path,
       frontmatter,
       "# Spec\n- FR-200: Sample requirement\n",
@@ -82,7 +82,7 @@ class WorkspaceTest(RepoTestCase):
       "kind": "delta",
       "relations": [],
     }
-    dump_markdown_file(delta_path, frontmatter, "# Delta\n")
+    dump_markdown_file_update(delta_path, frontmatter, "# Delta\n")
 
     ws = Workspace(root)
     ws.sync_change_registries(kinds=["delta"])

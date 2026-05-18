@@ -6,7 +6,7 @@ import os
 import unittest
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.relations.manager import (
   add_relation,
   list_relations,
@@ -33,7 +33,7 @@ class RelationsTest(RepoTestCase):
       "status": "draft",
       "kind": "spec",
     }
-    dump_markdown_file(spec_path, frontmatter, "# Example\n")
+    dump_markdown_file_update(spec_path, frontmatter, "# Example\n")
     os.chdir(root)
     return spec_path
 

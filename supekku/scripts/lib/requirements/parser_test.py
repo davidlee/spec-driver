@@ -14,7 +14,7 @@ from supekku.scripts.lib.core.paths import (
   TECH_SPECS_SUBDIR,
   get_registry_dir,
 )
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.requirements.parser import (
   _REQUIREMENT_HEADING,
   _has_frontmatter_requirement_definitions,
@@ -74,7 +74,7 @@ class TestInlineRequirementTags(unittest.TestCase):
   def _write_spec(self, root: Path, spec_id: str, body: str) -> Path:
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / spec_id.lower()
     spec_dir.mkdir(parents=True, exist_ok=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / f"{spec_id}.md",
       {"id": spec_id, "status": "draft", "kind": "spec"},
       body,
@@ -338,7 +338,7 @@ class TestRecordsFromContentCrossRefSuppression(unittest.TestCase):
       "- Contractual properties (must match bough per SPEC-003.FR-006)\n"
       "- Some other thing (PROD-004.NF-001)\n"
     )
-    dump_markdown_file(spec_path, frontmatter, body)
+    dump_markdown_file_update(spec_path, frontmatter, body)
 
     with self.assertLogs("supekku", level="WARNING") as cm:
       # Add a dummy log to ensure assertLogs doesn't fail on no logs

@@ -12,7 +12,7 @@ from supekku.scripts.lib.core.paths import (
   SPEC_DRIVER_DIR,
   get_registry_dir,
 )
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.relations.manager import add_relation
 from supekku.scripts.lib.test_base import RepoTestCase
 
@@ -49,7 +49,7 @@ class ChangeRegistryTest(RepoTestCase):
       "relations": [],
       "applies_to": {"requirements": ["SPEC-010.FR-001"]},
     }
-    dump_markdown_file(path, frontmatter, f"# {artifact_id}\n")
+    dump_markdown_file_update(path, frontmatter, f"# {artifact_id}\n")
     if relations:
       for relation_type, target in relations:
         add_relation(path, relation_type=relation_type, target=target)
@@ -107,7 +107,7 @@ class TestChangeRegistryReverseQueries(RepoTestCase):
         "specs": [],
       },
     }
-    dump_markdown_file(path, frontmatter, f"# {delta_id}\n")
+    dump_markdown_file_update(path, frontmatter, f"# {delta_id}\n")
 
   def test_find_by_implements_single_requirement(self) -> None:
     """Test finding deltas that implement a specific requirement."""
@@ -247,7 +247,7 @@ class TestChangeRegistryReverseQueries(RepoTestCase):
       "kind": "delta",
       "applies_to": {"requirements": ["PROD-005.FR-001"], "specs": []},
     }
-    dump_markdown_file(path, frontmatter, "# DE-101\n")
+    dump_markdown_file_update(path, frontmatter, "# DE-101\n")
 
     self._write_delta_with_requirements(root, "DE-102", ["PROD-005.FR-001"])
 
@@ -292,7 +292,7 @@ class TestChangeRegistryStandardSurface(RepoTestCase):
       "kind": "delta",
       "applies_to": {"requirements": [], "specs": []},
     }
-    dump_markdown_file(path, frontmatter, f"# {delta_id}\n")
+    dump_markdown_file_update(path, frontmatter, f"# {delta_id}\n")
 
   # -- find() ---------------------------------------------------------------
 

@@ -19,7 +19,7 @@ from supekku.scripts.lib.core.paths import (
   TECH_SPECS_SUBDIR,
   get_registry_dir,
 )
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 from supekku.scripts.lib.relations.manager import add_relation
 from supekku.scripts.lib.requirements.coverage import _compute_status_from_coverage
 from supekku.scripts.lib.requirements.lifecycle import (
@@ -58,7 +58,7 @@ class RequirementsRegistryTest(unittest.TestCase):
       "status": "draft",
       "kind": "spec",
     }
-    dump_markdown_file(spec_path, frontmatter, body)
+    dump_markdown_file_update(spec_path, frontmatter, body)
     return spec_path
 
   def _make_repo(self) -> Path:
@@ -116,7 +116,7 @@ class RequirementsRegistryTest(unittest.TestCase):
       "kind": kind,
       "relations": [],
     }
-    dump_markdown_file(file_path, frontmatter, f"# {file_id}\n")
+    dump_markdown_file_update(file_path, frontmatter, f"# {file_id}\n")
     return file_path
 
   def test_sync_collects_change_relations(self) -> None:
@@ -327,7 +327,7 @@ interactions: []
       "```\n\n"
       "# DE-002 – Example\n"
     )
-    dump_markdown_file(delta_path, frontmatter, body)
+    dump_markdown_file_update(delta_path, frontmatter, body)
 
     registry_path = get_registry_dir(root) / "requirements.yaml"
     registry = RequirementsRegistry(registry_path)
@@ -361,7 +361,7 @@ interactions: []
       "kind": "revision",
     }
     body = f"# {revision_id}\n\n```yaml supekku:revision.change@v1\n{block_yaml}\n```\n"
-    dump_markdown_file(revision_path, frontmatter, body)
+    dump_markdown_file_update(revision_path, frontmatter, body)
     return revision_path
 
   def test_revision_block_moves_requirement_and_sets_collaborators(self) -> None:
@@ -789,7 +789,7 @@ requirements:
       "- **FR-001**: Requirement inherits frontmatter category\n"
       "- **FR-002**(auth): Inline category overrides frontmatter\n"
     )
-    dump_markdown_file(spec_path, frontmatter, body)
+    dump_markdown_file_update(spec_path, frontmatter, body)
 
     registry_path = get_registry_dir(root) / "requirements.yaml"
     registry = RequirementsRegistry(registry_path)
@@ -1068,7 +1068,7 @@ class TestBacklogRequirementSync(unittest.TestCase):
       "status": "open",
       "kind": kind,
     }
-    dump_markdown_file(item_path, frontmatter, body)
+    dump_markdown_file_update(item_path, frontmatter, body)
     return item_path
 
   def test_sync_discovers_backlog_requirements(self) -> None:
@@ -1147,7 +1147,7 @@ class TestBreakoutFrontmatterSync(unittest.TestCase):
   def _write_spec(self, root: Path, spec_id: str, body: str) -> Path:
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / spec_id.lower()
     spec_dir.mkdir(parents=True, exist_ok=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / f"{spec_id}.md",
       {"id": spec_id, "status": "draft", "kind": "spec"},
       body,
@@ -1170,7 +1170,7 @@ class TestBreakoutFrontmatterSync(unittest.TestCase):
       "kind": "requirement",
       **frontmatter,
     }
-    dump_markdown_file(req_dir / f"{req_id}.md", fm, f"# {req_id}\n")
+    dump_markdown_file_update(req_dir / f"{req_id}.md", fm, f"# {req_id}\n")
 
   def test_breakout_tags_merged_with_inline(self) -> None:
     """Frontmatter tags from breakout file merge with inline tags."""
@@ -1268,7 +1268,7 @@ class TestBreakoutFrontmatterSync(unittest.TestCase):
     # Write spec with full frontmatter for SpecRegistry
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-904"
     spec_dir.mkdir(parents=True, exist_ok=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / "SPEC-904.md",
       {
         "id": "SPEC-904",
@@ -1334,7 +1334,7 @@ class TestStaleRequirementPruning(unittest.TestCase):
       "status": "draft",
       "kind": "spec",
     }
-    dump_markdown_file(spec_path, frontmatter, body)
+    dump_markdown_file_update(spec_path, frontmatter, body)
     return spec_path
 
   def _make_repo(self, body: str = "") -> Path:
@@ -1370,7 +1370,7 @@ class TestStaleRequirementPruning(unittest.TestCase):
     spec_path = (
       root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test" / "SPEC-001.md"
     )
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_path,
       {
         "id": "SPEC-001",
@@ -1413,7 +1413,7 @@ class TestStaleRequirementPruning(unittest.TestCase):
     spec_path = (
       root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test" / "SPEC-001.md"
     )
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_path,
       {
         "id": "SPEC-001",
@@ -1475,7 +1475,7 @@ class TestStaleRequirementPruning(unittest.TestCase):
     spec_path = (
       root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test" / "SPEC-001.md"
     )
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_path,
       {
         "id": "SPEC-001",
@@ -1545,7 +1545,7 @@ class TestStaleRequirementPruning(unittest.TestCase):
             status: in-progress
             introduced_by: RE-050
     """)
-    dump_markdown_file(
+    dump_markdown_file_update(
       revision_path,
       {
         "id": "RE-050",
@@ -1592,7 +1592,7 @@ class TestStaleRequirementPruning(unittest.TestCase):
     spec_path = (
       root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test" / "SPEC-001.md"
     )
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_path,
       {
         "id": "SPEC-001",
@@ -1636,7 +1636,7 @@ class TestPlaceholderRecordSourceType(unittest.TestCase):
     # Create a minimal spec
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
     spec_dir.mkdir(parents=True, exist_ok=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / "SPEC-001.md",
       {
         "id": "SPEC-001",
@@ -1671,7 +1671,7 @@ class TestPlaceholderRecordSourceType(unittest.TestCase):
             status: pending
             introduced_by: RE-060
     """)
-    dump_markdown_file(
+    dump_markdown_file_update(
       bundle_dir / "RE-060.md",
       {
         "id": "RE-060",
@@ -1717,7 +1717,7 @@ class TestSyncSummaryLine(unittest.TestCase):
 
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
     spec_dir.mkdir(parents=True, exist_ok=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / "SPEC-001.md",
       {
         "id": "SPEC-001",
@@ -1761,7 +1761,7 @@ class TestSyncSummaryLine(unittest.TestCase):
     # Spec with compound IDs that produce a collision warning
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
     spec_dir.mkdir(parents=True, exist_ok=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / "SPEC-001.md",
       {
         "id": "SPEC-001",
@@ -1805,7 +1805,7 @@ class TestSyncSummaryLine(unittest.TestCase):
 
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
     spec_dir.mkdir(parents=True, exist_ok=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / "SPEC-001.md",
       {
         "id": "SPEC-001",
@@ -1828,7 +1828,7 @@ class TestSyncSummaryLine(unittest.TestCase):
     registry.save()
 
     # Remove FR-002
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / "SPEC-001.md",
       {
         "id": "SPEC-001",
@@ -1877,7 +1877,7 @@ class TestWarningCounting(unittest.TestCase):
 
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
     spec_dir.mkdir(parents=True, exist_ok=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / "SPEC-001.md",
       {
         "id": "SPEC-001",
@@ -1908,7 +1908,7 @@ class TestWarningCounting(unittest.TestCase):
 
     spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "spec-001-test"
     spec_dir.mkdir(parents=True, exist_ok=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       spec_dir / "SPEC-001.md",
       {
         "id": "SPEC-001",

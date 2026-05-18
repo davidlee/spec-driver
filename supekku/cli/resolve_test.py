@@ -17,7 +17,7 @@ from supekku.cli.resolve import (
 )
 from supekku.scripts.lib.core.paths import BACKLOG_DIR, MEMORY_DIR, SPEC_DRIVER_DIR
 from supekku.scripts.lib.core.spec_utils import (
-  dump_markdown_file,
+  dump_markdown_file_update,
   load_markdown_file,
 )
 
@@ -45,7 +45,7 @@ def _write_memory(
   memory_type: str = "fact",
 ) -> None:
   """Write a minimal memory file to disk."""
-  dump_markdown_file(
+  dump_markdown_file_update(
     mem_dir / f"{mem_id}.md",
     {
       "id": mem_id,
@@ -90,7 +90,7 @@ class TestBuildArtifactIndex:
     issues_dir = tmp_path / SPEC_DRIVER_DIR / BACKLOG_DIR / "issues"
     item_dir = issues_dir / "ISSUE-016-sync-reqs"
     item_dir.mkdir(parents=True)
-    dump_markdown_file(
+    dump_markdown_file_update(
       item_dir / "ISSUE-016.md",
       {"id": "ISSUE-016", "name": "Sync reqs", "kind": "issue", "status": "open"},
       "# Sync reqs\n",
@@ -115,7 +115,7 @@ class TestBuildArtifactIndex:
     ]:
       item_dir = sd / subdir / f"{prefix}-001-test"
       item_dir.mkdir(parents=True)
-      dump_markdown_file(
+      dump_markdown_file_update(
         item_dir / f"{prefix}-001.md",
         {"id": f"{prefix}-001", "name": "Test", "kind": kind_val, "status": "open"},
         "# Test\n",
@@ -249,7 +249,7 @@ class TestResolveMemoryLinks:
     """Links removed when body no longer contains them."""
     mem_dir = _init_repo(tmp_path)
 
-    dump_markdown_file(
+    dump_markdown_file_update(
       mem_dir / "mem.fact.test.md",
       {
         "id": "mem.fact.test",

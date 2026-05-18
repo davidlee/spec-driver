@@ -8,10 +8,8 @@ are the canonical write helpers (DEC-137-15 / F-1):
 - `_update` rewrites an existing artefact, preserving trailing `# ...`
   comments per top-level scalar key.
 
-The legacy `dump_markdown_file(path, fm, body)` survives temporarily as a
-thin alias of `_update` so the ~33 production + ~95 test ripple sites can
-migrate in batches; the alias is removed once `rg dump_markdown_file\\b`
-reports zero remaining callers (IP-137-P02 task 2.9).
+The legacy `dump_markdown_file(...)` entrypoint was removed in IP-137-P02
+task 2.9 (no shim — DEC-137-15 / F-1).
 """
 
 from __future__ import annotations
@@ -174,20 +172,6 @@ def dump_markdown_file_update(
   fm_yaml = emit_yaml_block(dict(frontmatter), comments=comments)
   combined = f"---\n{fm_yaml}\n---\n\n{_normalise_body(body)}"
   _atomic_write(path, combined)
-
-
-def dump_markdown_file(
-  path: Path | str,
-  frontmatter: dict[str, Any],
-  body: str,
-) -> None:
-  """DEPRECATED legacy alias of `dump_markdown_file_update`.
-
-  Retained temporarily during IP-137-P02 ripple migration. Removed at task 2.9
-  once `rg dump_markdown_file\\b` reports zero remaining callers
-  (DEC-137-15 / F-1; no permanent shim).
-  """
-  dump_markdown_file_update(path, frontmatter, body)
 
 
 def ensure_list_entry(frontmatter: dict[str, Any], key: str) -> list[Any]:

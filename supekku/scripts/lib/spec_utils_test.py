@@ -14,7 +14,6 @@ from supekku.scripts.lib.core.frontmatter_schema import FrontmatterValidationErr
 from supekku.scripts.lib.core.spec_utils import (
   MarkdownLoadError,
   append_unique,
-  dump_markdown_file,
   dump_markdown_file_create,
   dump_markdown_file_update,
   ensure_list_entry,
@@ -91,7 +90,7 @@ class SpecUtilsTestCase(unittest.TestCase):
 
     with tempfile.TemporaryDirectory() as tmpdir:
       path = Path(tmpdir) / "spec.md"
-      dump_markdown_file(path, frontmatter, body)
+      dump_markdown_file_update(path, frontmatter, body)
 
       reloaded_frontmatter, reloaded_body = load_markdown_file(path)
 
@@ -204,7 +203,7 @@ class SpecUtilsTestCase(unittest.TestCase):
 
     with tempfile.TemporaryDirectory() as tmpdir:
       path = Path(tmpdir) / "spec.md"
-      dump_markdown_file(path, frontmatter, body)
+      dump_markdown_file_update(path, frontmatter, body)
 
       result, loaded_body = load_validated_markdown_file(path)
 
@@ -276,15 +275,6 @@ class DumpCreateUpdateSplitTest(unittest.TestCase):
       dump_markdown_file_update(path, fm, "body\n")
       second = path.read_text(encoding="utf-8")
     assert first == second
-
-  def test_legacy_dump_delegates_to_update(self) -> None:
-    """Temporary back-compat alias must round-trip during ripple migration."""
-    fm = {"id": "DE-001", "kind": "delta"}
-    with tempfile.TemporaryDirectory() as tmpdir:
-      path = Path(tmpdir) / "x.md"
-      dump_markdown_file(path, fm, "body\n")
-      reloaded_fm, _ = load_markdown_file(path)
-    assert reloaded_fm == fm
 
 
 if __name__ == "__main__":

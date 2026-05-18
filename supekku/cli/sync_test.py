@@ -127,9 +127,9 @@ class SyncBacklogDryRunTest(unittest.TestCase):
     issues_dir = self.root / SPEC_DRIVER_DIR / BACKLOG_DIR / "issues"
     item_dir = issues_dir / "ISSUE-001-test"
     item_dir.mkdir(parents=True)
-    from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+    from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 
-    dump_markdown_file(
+    dump_markdown_file_update(
       item_dir / "ISSUE-001.md",
       {"id": "ISSUE-001", "name": "Test", "kind": "issue", "status": "open"},
       "# Test\n",

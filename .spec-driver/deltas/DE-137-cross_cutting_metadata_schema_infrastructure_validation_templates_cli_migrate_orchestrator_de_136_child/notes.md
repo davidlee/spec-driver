@@ -1,5 +1,51 @@
 # Notes for DE-137
 
+## 2026-05-18 — IP-137-P03 entry: phase-03 sheet drafted via `/plan-phases`
+
+### Plan-phases handoff
+
+- P02 closed cleanly (12 commits; 5080 pytest pass, ruff clean, pylint
+  9.69 baseline). DR-137 v3.1 still authoritative; no re-litigation
+  needed for §5.3 / §5.4 scope.
+- `phases/phase-03.md` drafted: 15 numbered tasks (3.1 pre-flight grep
+  audit ⇒ 3.15 wrap-up). Covers VT-CC-014, 015, 016, 017, 025, 026,
+  032 + VA-CC-001. Active phase pointer flipped in IP-137 §5.
+- Ripple inventory (from pre-flight reconnaissance during plan-phases):
+  - `supekku/about/lifecycle.md:118` — `validate --sync`
+  - `.spec-driver/product/PROD-010/PROD-010.md:1022` — `validate --strict`
+  - `.spec-driver/tech/SPEC-110/SPEC-110.md:439` — `validate --strict`
+  - `Justfile:39-40` — `validate:` recipe
+  - `Justfile:42-43` — `validate-templates:` recipe
+  - `supekku/skills/audit-change/SKILL.md:64` — bare `validate`
+  - `supekku/skills/close-change/SKILL.md:36` — bare `validate`
+  Seven live sites (matches DR-137 §5.4's "~8 live ripple" estimate;
+  frozen audit-trail files explicitly excluded). P05 verbatim skill
+  inserts are separate from this ripple — P03 only migrates the
+  pre-existing bare-form references.
+- Existing CLI shape relevant to P03:
+  - `supekku/cli/main.py:124-132` registers `validate` (calls
+    `workspace.validate`) and `validate-templates` (calls
+    `validate.templates_cmd`) as top-level commands. Both removed in
+    task 3.7; replaced with `validate` Typer group.
+  - `supekku/cli/schema.py` is a library module called by `show.py`
+    and `list/__init__.py`. The new top-level `schema` Typer group
+    (task 3.9) coexists — no clash, since the existing surface is
+    `show schema` / `list schema` (subcommands inside other groups,
+    not top-level).
+- DR-137 §5.4 verbatim text for the CLI vocabulary constants
+  (`VALIDATE`, `VALIDATE_WORKSPACE`, `VALIDATE_FILE`,
+  `VALIDATE_TEMPLATES`, `SCHEMA_ENUMS`, `ADMIN_MIGRATE`,
+  `ADMIN_REGENERATE_TEMPLATES`, `FLAG_STRICT`, `FLAG_NO_TOLERATED`,
+  `FLAG_FIX`, `FLAG_SYNC`, `FLAG_KIND`, `FLAG_DRY_RUN`,
+  `FLAG_CHECK`, `FLAG_LIST`, `MIGRATION_FOLDER_PATTERN`,
+  `MIGRATION_LOG_PATH`, `MIGRATION_LOCK_PATH`) lands in
+  `spec_driver/presentation/cli/constants.py` (task 3.2); the
+  migration entries are reserved imports for P04.
+- `spec-driver validate` post-write surfaces only the pre-existing 8
+  audit-gate warnings (unchanged baseline). No new validation errors.
+- Phase-03 status: `draft` — ready for `/execute-phase`. Pre-flight
+  task 3.1 (full ripple grep capture in notes) is the first action.
+
 ## 2026-05-18 — IP-137-P02 complete (template infrastructure + emit split + first regeneration)
 
 ### Summary

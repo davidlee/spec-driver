@@ -21,11 +21,16 @@ from dataclasses import replace
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 from supekku.scripts.lib.core.git import SHA_HEX_PATTERN
-from supekku.scripts.lib.memory.lifecycle import MEMORY_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
 
-MEMORY_STATUS_ENUM_VALUES: list[str] = sorted(MEMORY_STATUSES)
+MEMORY_STATUS_ENUM_VALUES: list[str] = [
+  "active",
+  "archived",
+  "draft",
+  "review",
+  "superseded",
+]
 
 MEMORY_FRONTMATTER_METADATA = BlockMetadata(
   version=1,

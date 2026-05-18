@@ -1146,9 +1146,7 @@ class StrictUnknownKeysTest(unittest.TestCase):
   def test_strict_accepts_known_keys(self):
     """strict=True does not regress on valid documents."""
     validator = MetadataValidator(self._metadata())
-    errors = validator.validate(
-      {"name": "x", "nested": {"inner": "ok"}}, strict=True
-    )
+    errors = validator.validate({"name": "x", "nested": {"inner": "ok"}}, strict=True)
     assert errors == []
 
   def test_strict_rejects_extra_key_at_nested_depth(self):

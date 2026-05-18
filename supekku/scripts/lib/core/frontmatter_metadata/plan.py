@@ -17,8 +17,13 @@ from .delta import DELTA_STATUS_ENUM_VALUES
 # Plan/phase/task statuses share the change-artefact enum (delta is canonical).
 PLAN_STATUS_ENUM_VALUES: list[str] = DELTA_STATUS_ENUM_VALUES
 
-# Plan/phase/task status field-VALUE aliases (DR-137 §5.2 — shared schema).
+# Plan/phase/task status field-VALUE aliases. DR-137 §5.2 matrix omits
+# `complete -> completed` here; in practice the legacy kind-agnostic
+# `normalize_status` aliased it for all change-artefact kinds, so DE-137
+# keeps that compatibility to avoid loader regressions on corpus files
+# carrying `status: complete`.
 PLAN_STATUS_ALIASES: dict[str, str] = {
+  "complete": "completed",
   "active": "in-progress",
   "done": "completed",
   "in_progress": "in-progress",

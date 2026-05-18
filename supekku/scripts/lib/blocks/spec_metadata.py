@@ -229,8 +229,7 @@ def validate_spec_relationships(
   message string (callers test truthiness of the returned list).
   """
   errors = [
-    str(err)
-    for err in _SPEC_RELATIONSHIPS_VALIDATOR.validate(block.data, strict=True)
+    str(err) for err in _SPEC_RELATIONSHIPS_VALIDATOR.validate(block.data, strict=True)
   ]
   spec_value = str(block.data.get("spec", ""))
   if spec_id and spec_value and spec_value != spec_id:
@@ -257,8 +256,7 @@ def validate_spec_capabilities(
   """
   del spec_id  # accepted for API symmetry; see docstring above.
   return [
-    str(err)
-    for err in _SPEC_CAPABILITIES_VALIDATOR.validate(block.data, strict=True)
+    str(err) for err in _SPEC_CAPABILITIES_VALIDATOR.validate(block.data, strict=True)
   ]
 
 

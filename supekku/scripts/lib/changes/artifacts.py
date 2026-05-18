@@ -9,6 +9,7 @@ from rich.console import Console
 
 from supekku.scripts.lib.blocks.delta import extract_delta_relationships
 from supekku.scripts.lib.blocks.delta_metadata import validate_delta_relationships
+from supekku.scripts.lib.blocks.metadata.aliases import normalize_field
 from supekku.scripts.lib.blocks.plan import (
   extract_phase_overview,
   extract_plan_overview,
@@ -17,7 +18,7 @@ from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.relations.manager import list_relations
 
-from .lifecycle import CHANGE_STATUSES, normalize_status
+from .lifecycle import CHANGE_STATUSES
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -90,12 +91,13 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
     return None
   kind = str(frontmatter.get("kind", "")).strip()
   raw_status = str(frontmatter.get("status", "")).strip()
-  status = normalize_status(raw_status) if raw_status else raw_status
+  status = normalize_field(kind, "status", raw_status) if raw_status else raw_status
 
-  # Validate status against known values
+  # Validate status against known values (CHANGE_STATUSES is the canonical set
+  # after DE-137; legacy aliases like 'complete' canonicalise via
+  # ``FieldMetadata.aliases`` in `normalize_field` above).
   if status and status not in CHANGE_STATUSES:
-    # Show only canonical statuses (exclude legacy aliases like 'complete')
-    canonical = sorted(s for s in CHANGE_STATUSES if normalize_status(s) == s)
+    canonical = sorted(CHANGE_STATUSES)
     msg = (
       f"Invalid status '{raw_status}' in {path}. Valid statuses: {', '.join(canonical)}"
     )

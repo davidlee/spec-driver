@@ -10,11 +10,10 @@ from __future__ import annotations
 from dataclasses import replace
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
-from supekku.scripts.lib.policies.lifecycle import POLICY_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
 
-POLICY_STATUS_ENUM_VALUES: list[str] = sorted(POLICY_STATUSES)
+POLICY_STATUS_ENUM_VALUES: list[str] = ["deprecated", "draft", "required"]
 
 POLICY_FRONTMATTER_METADATA = BlockMetadata(
   version=1,

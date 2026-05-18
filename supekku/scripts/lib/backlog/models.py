@@ -2,6 +2,11 @@
 
 Per-kind status sets define accepted lifecycle values (DEC-057-02, DEC-057-08).
 Validation is permissive: unknown values are warned, not rejected.
+
+OQ-137-02 sunset: ``BACKLOG_BASE_STATUSES`` and ``RISK_STATUSES`` are
+transition-window re-exports derived from
+``frontmatter_metadata/issue.ISSUE_STATUS_ENUM_VALUES`` and
+``frontmatter_metadata/risk.RISK_STATUS_ENUM_VALUES`` respectively.
 """
 
 from __future__ import annotations
@@ -12,27 +17,25 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
+from supekku.scripts.lib.core.frontmatter_metadata.issue import (
+  ISSUE_FRONTMATTER_METADATA,
+)
+from supekku.scripts.lib.core.frontmatter_metadata.risk import (
+  RISK_FRONTMATTER_METADATA,
+)
+
 logger = logging.getLogger(__name__)
 
 # -- Unified backlog lifecycle statuses (DEC-075-05, supersedes DEC-057-02) --
 
+# OQ-137-02 sunset: derived re-exports.
 BACKLOG_BASE_STATUSES: frozenset[str] = frozenset(
-  {
-    "open",
-    "triaged",
-    "in-progress",
-    "resolved",
-  }
+  ISSUE_FRONTMATTER_METADATA.fields["status"].enum_values or []
 )
-
-RISK_EXTRA_STATUSES: frozenset[str] = frozenset(
-  {
-    "accepted",
-    "expired",
-  }
+RISK_STATUSES: frozenset[str] = frozenset(
+  RISK_FRONTMATTER_METADATA.fields["status"].enum_values or []
 )
-
-RISK_STATUSES: frozenset[str] = BACKLOG_BASE_STATUSES | RISK_EXTRA_STATUSES
+RISK_EXTRA_STATUSES: frozenset[str] = RISK_STATUSES - BACKLOG_BASE_STATUSES
 
 # Per-kind lookup — all non-risk kinds share the base set.
 BACKLOG_STATUSES: dict[str, frozenset[str]] = {

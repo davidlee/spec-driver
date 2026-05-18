@@ -20,11 +20,8 @@ from supekku.cli.common import (
   matches_regexp,
 )
 from supekku.cli.list import _parse_relation_filter, app
-from supekku.scripts.lib.changes.lifecycle import (
-  CHANGE_STATUSES,
-  STATUS_COMPLETED,
-  normalize_status,
-)
+from supekku.scripts.lib.blocks.metadata.aliases import normalize_field
+from supekku.scripts.lib.changes.lifecycle import CHANGE_STATUSES, STATUS_COMPLETED
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
 from supekku.scripts.lib.formatters.change_formatters import (
@@ -233,7 +230,9 @@ def list_deltas(
     # Parse multi-value status filter
     status_values = parse_multi_value_filter(status)
     status_normalized = (
-      [normalize_status(s) for s in status_values] if status_values else []
+      [normalize_field("delta", "status", s) for s in status_values]
+      if status_values
+      else []
     )
 
     # Apply default status filter if no status is specified and --all is not set
@@ -248,7 +247,7 @@ def list_deltas(
         continue
 
       # Check status filter (multi-value OR logic)
-      norm_status = normalize_status(artifact.status)
+      norm_status = normalize_field("delta", "status", artifact.status)
       if status_normalized and norm_status not in status_normalized:
         continue
 

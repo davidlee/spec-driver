@@ -48,8 +48,7 @@ def update_requirement_lifecycle_status(
   # Validate status value
   if new_status not in REQUIREMENT_STATUSES:
     msg = (
-      f"Invalid status {new_status!r}; "
-      f"must be one of {sorted(REQUIREMENT_STATUSES)}"
+      f"Invalid status {new_status!r}; must be one of {sorted(REQUIREMENT_STATUSES)}"
     )
     raise ValueError(msg)
 

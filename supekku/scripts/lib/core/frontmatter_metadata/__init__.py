@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata
 
+from .adr import ADR_FRONTMATTER_METADATA
 from .audit import AUDIT_FRONTMATTER_METADATA
 from .base import BASE_FRONTMATTER_METADATA
 from .compaction import compact_frontmatter
@@ -21,6 +22,7 @@ from .policy import POLICY_FRONTMATTER_METADATA
 from .problem import PROBLEM_FRONTMATTER_METADATA
 from .prod import PROD_FRONTMATTER_METADATA
 from .requirement import REQUIREMENT_FRONTMATTER_METADATA
+from .revision import REVISION_FRONTMATTER_METADATA
 from .risk import RISK_FRONTMATTER_METADATA
 from .spec import SPEC_FRONTMATTER_METADATA
 from .standard import STANDARD_FRONTMATTER_METADATA
@@ -44,6 +46,11 @@ FRONTMATTER_METADATA_REGISTRY: dict[str, BlockMetadata] = {
   "plan": PLAN_FRONTMATTER_METADATA,
   "phase": PLAN_FRONTMATTER_METADATA,  # Shared schema
   "task": PLAN_FRONTMATTER_METADATA,  # Shared schema
+  # DE-137 IP-137-P01: minimal revision + adr metadata (status enum only).
+  # Full schemas land in DE-142 / future deltas; needed here so the derived
+  # ENUM_REGISTRY view covers revision.status / adr.status (DR-137 §5.2 / F-58).
+  "revision": REVISION_FRONTMATTER_METADATA,
+  "adr": ADR_FRONTMATTER_METADATA,
 }
 
 
@@ -62,6 +69,7 @@ def get_frontmatter_metadata(kind: str | None = None) -> BlockMetadata:
 
 
 __all__ = [
+  "ADR_FRONTMATTER_METADATA",
   "AUDIT_FRONTMATTER_METADATA",
   "BASE_FRONTMATTER_METADATA",
   "DELTA_FRONTMATTER_METADATA",
@@ -73,6 +81,7 @@ __all__ = [
   "PROBLEM_FRONTMATTER_METADATA",
   "PROD_FRONTMATTER_METADATA",
   "REQUIREMENT_FRONTMATTER_METADATA",
+  "REVISION_FRONTMATTER_METADATA",
   "RISK_FRONTMATTER_METADATA",
   "SPEC_FRONTMATTER_METADATA",
   "STANDARD_FRONTMATTER_METADATA",

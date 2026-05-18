@@ -19,8 +19,14 @@ COVERAGE_VERSION = 1
 # Valid verification artifact kinds
 VALID_KINDS = {"VT", "VA", "VH"}
 
-# Valid verification statuses
-VERIFICATION_STATUSES = {"planned", "in-progress", "verified", "failed", "blocked"}
+# OQ-137-02 sunset: derived re-export from per-kind metadata.
+from supekku.scripts.lib.core.frontmatter_metadata.verification import (  # noqa: E402
+  VERIFICATION_FRONTMATTER_METADATA,
+)
+
+VERIFICATION_STATUSES: frozenset[str] = frozenset(
+  VERIFICATION_FRONTMATTER_METADATA.fields["status"].enum_values or []
+)
 
 
 @dataclass(frozen=True)

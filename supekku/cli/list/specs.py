@@ -20,7 +20,7 @@ from supekku.cli.common import (
   matches_regexp,
 )
 from supekku.cli.list import _parse_relation_filter, app
-from supekku.scripts.lib.changes.lifecycle import normalize_status
+from supekku.scripts.lib.blocks.metadata.aliases import normalize_field
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
 from supekku.scripts.lib.core.paths import get_tech_specs_dir
 from supekku.scripts.lib.formatters.spec_formatters import (
@@ -257,9 +257,11 @@ def list_specs(
     # Apply status filter (multi-value OR logic)
     if status:
       status_values = parse_multi_value_filter(status)
-      status_normalized = [normalize_status(s) for s in status_values]
+      status_normalized = [normalize_field("spec", "status", s) for s in status_values]
       specs = [
-        spec for spec in specs if normalize_status(spec.status) in status_normalized
+        spec
+        for spec in specs
+        if normalize_field("spec", "status", spec.status) in status_normalized
       ]
 
     if filter_substring:

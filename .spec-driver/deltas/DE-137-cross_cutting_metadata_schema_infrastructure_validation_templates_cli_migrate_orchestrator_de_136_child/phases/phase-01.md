@@ -4,7 +4,7 @@ slug: "137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli
 name: IP-137 Phase 01 - Schema & validation foundation
 created: "2026-05-18"
 updated: "2026-05-18"
-status: draft
+status: completed
 kind: phase
 plan: IP-137
 delta: DE-137
@@ -96,21 +96,21 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Status | ID  | Description | Parallel? | Notes |
 | ------ | --- | --- | --- | --- |
-| [ ] | 1.1 | Pre-flight grep audit + DE-137 status transition | [ ] | Read-only; produces task-1.5/1.6 ripple list |
-| [ ] | 1.2 | `closest_match()` utility (`spec_driver/core/string_utils.py`) | [ ] | Standalone; can run before or alongside schema work |
-| [ ] | 1.3 | Extend schema dataclasses: `ToleratedAlias`, `FieldMetadata.aliases` + `.tolerated_aliases`, `BlockMetadata.field_aliases` | [ ] | Blocks 1.4–1.9 |
-| [ ] | 1.4 | Populate per-kind FieldMetadata.aliases matrix (delta/plan/phase/task status) + relations field_aliases | [P] | Per-kind file edits parallelisable post-1.3 |
-| [ ] | 1.5 | Add minimal `REVISION_FRONTMATTER_METADATA` + `ADR_FRONTMATTER_METADATA` (status-only) and wire into `FRONTMATTER_METADATA_REGISTRY` | [P] | Independent of 1.4 once 1.3 lands |
-| [ ] | 1.6 | Refactor `MetadataValidator`: retire `strict_unknown_keys` ctor kwarg; add `validate(*, strict, accept_tolerated)`; two-pass with F-54 collision branch | [ ] | Touches all current callers via 1.7 |
-| [ ] | 1.7 | Migrate `MetadataValidator(...)` call sites to drop `strict_unknown_keys=`; pass `strict=` to `.validate()` | [ ] | Mostly `validation/validator.py` + tests |
-| [ ] | 1.8 | Add `ValidationError.fix_hint` + `.fix_kind`; populate in 1.6 paths | [ ] | Coupled with 1.6 |
-| [ ] | 1.9 | Implement `normalize_field(kind, field, value)` in new `blocks/metadata/aliases.py`; retire `normalize_status()` | [ ] | Depends on 1.4 (alias data) |
-| [ ] | 1.10 | Migrate `CANONICAL_STATUS_MAP` data into `FieldMetadata.aliases`; remove the map from `changes/lifecycle.py` | [ ] | Depends on 1.4 + 1.9 |
-| [ ] | 1.11 | Split `ENUM_REGISTRY`: Category A becomes registry-walking `_kind_status(kind)`; Category B stays hardcoded | [ ] | Depends on 1.5 (revision/adr metadata present) |
-| [ ] | 1.12 | Convert lifecycle status constants to transition re-exports + sunset comment | [ ] | Depends on 1.4 |
-| [ ] | 1.13 | Author tests: VT-CC-008, 009, 010, 011, 012, 013, 030, 034 | [P] | Each VT can land alongside its production task |
-| [ ] | 1.14 | Run `just check`; reconcile lint + pylint ratchet | [ ] | Gate to exit |
-| [ ] | 1.15 | Update notes.md + IP-137 progress checkbox; commit `feat(DE-137): land metadata aliases + strict validator (IP-137-P01)` | [ ] | Exit task |
+| [x] | 1.1 | Pre-flight grep audit + DE-137 status transition | [ ] | Audit in notes.md 2026-05-18 entry |
+| [x] | 1.2 | `closest_match()` utility (`spec_driver/core/string_utils.py`) | [ ] | VT-CC-010 green (13 cases) |
+| [x] | 1.3 | Extend schema dataclasses: `ToleratedAlias`, `FieldMetadata.aliases` + `.tolerated_aliases`, `BlockMetadata.field_aliases` | [ ] | Plus `FieldMetadata.field_aliases` (DR-extension; see notes) |
+| [x] | 1.4 | Populate per-kind FieldMetadata.aliases matrix (delta/plan/phase/task status) + relations field_aliases | [P] | Extended to cover audit + revision (DR-extension; see notes) |
+| [x] | 1.5 | Add minimal `REVISION_FRONTMATTER_METADATA` + `ADR_FRONTMATTER_METADATA` (status-only) and wire into `FRONTMATTER_METADATA_REGISTRY` | [P] | Both wired |
+| [x] | 1.6 | Refactor `MetadataValidator`: retire `strict_unknown_keys` ctor kwarg; add `validate(*, strict, accept_tolerated)`; two-pass with F-54 collision branch | [ ] | Report-only design (no in-place mutation; see notes) |
+| [x] | 1.7 | Migrate `MetadataValidator(...)` call sites to drop `strict_unknown_keys=`; pass `strict=` to `.validate()` | [ ] | 5 production + 8 test sites |
+| [x] | 1.8 | Add `ValidationError.fix_hint` + `.fix_kind`; populate in 1.6 paths | [ ] | Plus `severity` field |
+| [x] | 1.9 | Implement `normalize_field(kind, field, value)` in new `blocks/metadata/aliases.py`; retire `normalize_status()` | [ ] | VT-CC-013 parity green (9 matrix cases + case/whitespace) |
+| [x] | 1.10 | Migrate `CANONICAL_STATUS_MAP` data into `FieldMetadata.aliases`; remove the map from `changes/lifecycle.py` | [ ] | Callers migrated to `normalize_field` |
+| [x] | 1.11 | Split `ENUM_REGISTRY`: Category A becomes registry-walking `_kind_status(kind)`; Category B stays hardcoded | [ ] | VT-CC-012 parity green (22 paths); ISSUE-055 filed for drift gap |
+| [x] | 1.12 | Convert lifecycle status constants to transition re-exports + sunset comment | [ ] | 8 modules: CHANGE/REQUIREMENT/SPEC/POLICY/STANDARD/MEMORY/BACKLOG_BASE+RISK/VERIFICATION/ADR |
+| [x] | 1.13 | Author tests: VT-CC-008, 009, 010, 011, 012, 013, 030, 034 | [P] | All 8 VTs covered; see §5 evidence |
+| [x] | 1.14 | Run `just check`; reconcile lint + pylint ratchet | [ ] | 4982 tests pass; ruff clean; pylint 9.69 (baseline 9.69; -8 messages) |
+| [x] | 1.15 | Update notes.md + IP-137 progress checkbox; commit `feat(DE-137): land metadata aliases + strict validator (IP-137-P01)` | [ ] | This task |
 
 ### Task Details
 
@@ -254,7 +254,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria (all bullets in §4) satisfied
-- [ ] Verification evidence stored in `notes.md` (VT pass status; ENUM_REGISTRY parity snapshot; grep audit output)
-- [ ] IP-137 §9 progress box for P01 checked
-- [ ] Hand-off note in `notes.md` summarising any new constraints for IP-137-P02 (e.g. confirmed yaml_emit dependency surface, FieldMetadata shape locked)
+- [x] Exit criteria (all bullets in §4) satisfied
+- [x] Verification evidence stored in `notes.md` (VT pass status; ENUM_REGISTRY parity snapshot; grep audit output)
+- [x] IP-137 §9 progress box for P01 checked
+- [x] Hand-off note in `notes.md` summarising any new constraints for IP-137-P02 (e.g. confirmed yaml_emit dependency surface, FieldMetadata shape locked)

@@ -12,8 +12,8 @@ _SPEC_ID_PATTERN = re.compile(r"^(?:SPEC|PROD)-\d{3}$")
 
 from supekku.scripts.lib.backlog.models import BacklogItem
 from supekku.scripts.lib.backlog.registry import discover_backlog_items
+from supekku.scripts.lib.blocks.metadata.aliases import normalize_field
 from supekku.scripts.lib.changes.audit_check import resolve_audit_gate
-from supekku.scripts.lib.changes.lifecycle import normalize_status
 from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.core.enums import get_enum_values
 from supekku.scripts.lib.core.frontmatter_metadata.audit import (
@@ -546,7 +546,7 @@ class WorkspaceValidator:
     if status is None:
       self._warning(artifact, "Missing status field in frontmatter")
     elif status not in valid_statuses:
-      canonical = normalize_status(status)
+      canonical = normalize_field("phase", "status", status)
       if self.fix and canonical in valid_statuses:
         update_frontmatter_status(phase_file, canonical)
         self._info(artifact, f"Fixed phase status: '{status}' → '{canonical}'")

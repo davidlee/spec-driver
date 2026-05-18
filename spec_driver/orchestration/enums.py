@@ -1,8 +1,19 @@
 """Enum registry for CLI introspection and status validation.
 
 Maps dotted enum paths (e.g. 'delta.status') to sorted lists of valid
-values. Sources are lifecycle constants where they exist; hardcoded
-values where no constant is defined.
+values.
+
+DE-137 IP-137-P01 splits the registry into two categories per DR-137 §5.2:
+
+* **Category A** — artefact-kind ``<kind>.status`` enums whose canonical
+  source is the per-kind ``FRONTMATTER_METADATA_REGISTRY[kind].fields['status']
+  .enum_values``. The ``_kind_status(kind)`` factory below walks the
+  registry at call time so additions/changes to per-kind metadata flow
+  through without a registry edit.
+* **Category B** — block-level discriminators and CLI-only enums whose
+  canonical source is not (yet) per-kind frontmatter. These stay
+  hardcoded as ``lambda`` providers; per-block-metadata homes for them
+  follow in DE-138..142 and successor deltas.
 """
 
 from __future__ import annotations
@@ -11,50 +22,60 @@ from collections.abc import Callable
 
 from supekku.scripts.lib.backlog.models import (
   BACKLOG_BASE_STATUSES,
-  RISK_STATUSES,
 )
 from supekku.scripts.lib.blocks.verification import (
   VALID_KINDS as VERIFICATION_KINDS,
 )
-from supekku.scripts.lib.blocks.verification import VERIFICATION_STATUSES
-from supekku.scripts.lib.changes.lifecycle import CHANGE_STATUSES
-from supekku.scripts.lib.decisions.lifecycle import ADR_STATUSES
+from supekku.scripts.lib.core.frontmatter_metadata import (
+  FRONTMATTER_METADATA_REGISTRY,
+)
 from supekku.scripts.lib.drift.models import LEDGER_STATUSES
-from supekku.scripts.lib.memory.lifecycle import MEMORY_STATUSES
-from supekku.scripts.lib.policies.lifecycle import POLICY_STATUSES
-from supekku.scripts.lib.requirements.lifecycle import REQUIREMENT_STATUSES
-from supekku.scripts.lib.specs.lifecycle import SPEC_STATUSES
-from supekku.scripts.lib.standards.lifecycle import STANDARD_STATUSES
+
+# Category A — sourced from FRONTMATTER_METADATA_REGISTRY at call time.
+_CATEGORY_A_KINDS: tuple[str, ...] = (
+  "delta",
+  "phase",
+  "revision",
+  "audit",
+  "requirement",
+  "verification",
+  "spec",
+  "policy",
+  "standard",
+  "memory",
+  "issue",
+  "problem",
+  "risk",
+  "adr",
+)
 
 
-def _change_statuses() -> list[str]:
-  return sorted(s for s in CHANGE_STATUSES if s != "complete")
+def _kind_status(kind: str) -> Callable[[], list[str]]:
+  """Provider that returns the sorted ``status`` enum_values for *kind*.
+
+  Returns ``[]`` if the kind has no metadata entry or its ``status``
+  field carries no ``enum_values`` — the empty list is the explicit
+  signal that the registry walk found nothing (rather than an exception).
+  """
+
+  def _provider() -> list[str]:
+    meta = FRONTMATTER_METADATA_REGISTRY.get(kind)
+    if meta is None or "status" not in meta.fields:
+      return []
+    enum_values = meta.fields["status"].enum_values or []
+    return sorted(enum_values)
+
+  return _provider
 
 
 ENUM_REGISTRY: dict[str, Callable[[], list[str]]] = {
-  # From lifecycle constants
-  "delta.status": _change_statuses,
-  "phase.status": _change_statuses,
-  "revision.status": _change_statuses,
-  "audit.status": _change_statuses,
-  "requirement.status": lambda: sorted(REQUIREMENT_STATUSES),
+  # Category A — derived from per-kind FRONTMATTER_METADATA_REGISTRY.
+  **{f"{kind}.status": _kind_status(kind) for kind in _CATEGORY_A_KINDS},
+  # Category B — block-level / CLI enums, hardcoded for now.
   "verification.kind": lambda: sorted(VERIFICATION_KINDS),
-  "verification.status": lambda: sorted(VERIFICATION_STATUSES),
-  # Backlog statuses — unified base with risk extensions (DEC-075-05)
   "backlog.status": lambda: sorted(BACKLOG_BASE_STATUSES),
-  "issue.status": lambda: sorted(BACKLOG_BASE_STATUSES),
-  "problem.status": lambda: sorted(BACKLOG_BASE_STATUSES),
   "improvement.status": lambda: sorted(BACKLOG_BASE_STATUSES),
-  "risk.status": lambda: sorted(RISK_STATUSES),
-  # Drift ledger statuses
   "drift.status": lambda: sorted(LEDGER_STATUSES),
-  # Governance artifact statuses (DE-075)
-  "spec.status": lambda: sorted(SPEC_STATUSES),
-  "adr.status": lambda: sorted(ADR_STATUSES),
-  "policy.status": lambda: sorted(POLICY_STATUSES),
-  "standard.status": lambda: sorted(STANDARD_STATUSES),
-  "memory.status": lambda: sorted(MEMORY_STATUSES),
-  # No lifecycle constants — stable conventions
   "command.format": lambda: ["json", "table", "tsv"],
   "requirement.kind": lambda: ["FR", "NF"],
   "spec.kind": lambda: ["prod", "tech"],

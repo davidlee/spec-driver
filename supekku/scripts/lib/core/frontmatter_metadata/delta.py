@@ -9,12 +9,19 @@ from __future__ import annotations
 from dataclasses import replace
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
-from supekku.scripts.lib.changes.lifecycle import CHANGE_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
 
-# Canonical change-artefact status enum (legacy alias "complete" excluded).
-DELTA_STATUS_ENUM_VALUES: list[str] = sorted(s for s in CHANGE_STATUSES if s != "complete")
+# Canonical change-artefact status enum. This is the source of truth after
+# DE-137; ``supekku/scripts/lib/changes/lifecycle.py`` re-exports the
+# frozenset from this list (OQ-137-02 sunset target).
+DELTA_STATUS_ENUM_VALUES: list[str] = [
+  "completed",
+  "deferred",
+  "draft",
+  "in-progress",
+  "pending",
+]
 
 # Delta-status field-VALUE aliases (DR-137 §5.2 / DEC-137-23 — corpus matrix).
 DELTA_STATUS_ALIASES: dict[str, str] = {

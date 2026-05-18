@@ -4,11 +4,11 @@ name: Canonical Status Enums
 kind: memory
 status: active
 memory_type: fact
-updated: "2026-03-03"
-verified: "2026-03-03"
+updated: "2026-05-18"
+verified: "2026-05-18"
 confidence: high
 tags: [spec-driver, lifecycle, status, sharp-edge]
-summary: "Authoritative status enums for requirements, change artifacts, and verification coverage, including tolerated legacy/non-canonical cases."
+summary: "Authoritative status enums for requirements, change artifacts, and verification coverage. After DE-137 IP-137-P01, the per-kind FieldMetadata is the source of truth; lifecycle constants are derived re-exports."
 priority:
   severity: high
   weight: 10
@@ -25,26 +25,41 @@ scope:
     - supekku/scripts/lib/requirements/registry.py
     - supekku/scripts/lib/changes/lifecycle.py
     - supekku/scripts/lib/blocks/verification.py
-    - supekku/scripts/lib/core/enums.py
+    - supekku/scripts/lib/blocks/metadata/aliases.py
+    - supekku/scripts/lib/core/frontmatter_metadata/
     - supekku/cli/workflow.py
+    - spec_driver/orchestration/enums.py
     - .spec-driver/deltas/*/phases/phase-*.md
 provenance:
   sources:
     - kind: code
-      note: Canonical requirement lifecycle constants
-      ref: supekku/scripts/lib/requirements/lifecycle.py
+      note: Per-kind status enum source of truth (FRONTMATTER_METADATA_REGISTRY)
+      ref: supekku/scripts/lib/core/frontmatter_metadata/__init__.py
     - kind: code
-      note: Revision lifecycle ingestion currently accepts raw status strings
-      ref: supekku/scripts/lib/requirements/registry.py
+      note: Read-time alias canonicalisation (normalize_field)
+      ref: supekku/scripts/lib/blocks/metadata/aliases.py
     - kind: code
-      note: Change artifact status constants and canonical mapping
+      note: Change artefact status constants (derived re-export)
       ref: supekku/scripts/lib/changes/lifecycle.py
     - kind: code
-      note: Verification coverage status constants
-      ref: supekku/scripts/lib/blocks/verification.py
+      note: Derived ENUM_REGISTRY (Category A walks FRONTMATTER_METADATA_REGISTRY)
+      ref: spec_driver/orchestration/enums.py
+    - kind: delta
+      note: DE-137 IP-137-P01 — DEC-137-14, DEC-137-23 (status enum unification)
+      ref: .spec-driver/deltas/DE-137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli_migrate_orchestrator_de_136_child/DR-137.md
 ---
 
 # Canonical Status Enums
+
+## Source of truth (post DE-137 IP-137-P01)
+
+Every artefact kind's `status` enum lives on its
+`FRONTMATTER_METADATA_REGISTRY[kind].fields["status"]` `FieldMetadata`.
+Legacy lifecycle constants (`CHANGE_STATUSES`, `REQUIREMENT_STATUSES`,
+`SPEC_STATUSES`, ...) are **derived re-exports** carrying the
+`OQ-137-02 sunset` comment; do not edit them directly. The named
+`STATUS_*` constants (e.g. `STATUS_COMPLETED = "completed"`) remain
+as convenience handles for callers that need individual references.
 
 ## Requirement Lifecycle (canonical)
 
@@ -52,6 +67,8 @@ provenance:
 - `in-progress`
 - `active`
 - `retired`
+- `deprecated`
+- `superseded`
 
 ## Change Artifact Lifecycle (canonical)
 
@@ -61,9 +78,11 @@ provenance:
 - `completed`
 - `deferred`
 
-Applies to: deltas, revisions, audits, **phases** (DE-104).
+Applies to: deltas, revisions, audits, plans, phases, tasks (DE-104).
 
-Legacy/observed aliases normalised by `normalize_status()`:
+Permanent aliases on every change-artefact kind's `FieldMetadata.aliases`
+(applied at read time via `normalize_field`; under strict mode the
+validator emits warnings with `fix_kind="rewrite_value"`):
 
 - `complete` → `completed`
 - `done` → `completed`
@@ -78,14 +97,25 @@ Legacy/observed aliases normalised by `normalize_status()`:
 - `failed`
 - `blocked`
 
-## Important Caveat
+## How to canonicalise a value at read time
 
-Revision lifecycle ingestion in requirements registry currently tolerates
-non-canonical status strings from payloads (it does not hard-validate against
-the canonical requirement enum on read).
+```python
+from supekku.scripts.lib.blocks.metadata.aliases import normalize_field
+canonical = normalize_field("delta", "status", raw_value)  # lower + strip + alias lookup
+```
 
-Follow-up strict-mode work should apply one shared status-policy validator to
-both write-time and read-time paths.
+`normalize_field` returns the lower-cased + whitespace-stripped input
+when the kind/field/value has no alias declared.
+
+## Important caveats
+
+- The `MetadataValidator` is **report-only**; it never mutates the
+  supplied data. Loaders that need canonical values at read time must
+  call `normalize_field` explicitly. `validate workspace --fix`
+  consumes `ValidationError.fix_hint` to rewrite source files.
+- Revision lifecycle ingestion in the requirements registry tolerates
+  non-canonical status strings from payloads; the strict-mode CLI
+  catches these via the `MetadataValidator(strict=True)` path.
 
 ## Non-Canonical Terms to Avoid
 

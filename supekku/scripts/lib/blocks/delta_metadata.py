@@ -185,8 +185,7 @@ def validate_delta_relationships(
   message string (callers test truthiness of the returned list).
   """
   errors = [
-    str(err)
-    for err in _DELTA_RELATIONSHIPS_VALIDATOR.validate(block.data, strict=True)
+    str(err) for err in _DELTA_RELATIONSHIPS_VALIDATOR.validate(block.data, strict=True)
   ]
   delta_value = str(block.data.get("delta", ""))
   if delta_id and delta_value and delta_value != delta_id:

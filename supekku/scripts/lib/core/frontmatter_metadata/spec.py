@@ -9,11 +9,16 @@ from __future__ import annotations
 from dataclasses import replace
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
-from supekku.scripts.lib.specs.lifecycle import SPEC_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
 
-SPEC_STATUS_ENUM_VALUES: list[str] = sorted(SPEC_STATUSES)
+SPEC_STATUS_ENUM_VALUES: list[str] = [
+  "active",
+  "archived",
+  "deprecated",
+  "draft",
+  "stub",
+]
 
 SPEC_FRONTMATTER_METADATA = BlockMetadata(
   version=1,

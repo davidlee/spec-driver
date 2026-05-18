@@ -12,10 +12,14 @@ from dataclasses import replace
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 
 from .base import BASE_FRONTMATTER_METADATA
-from .delta import DELTA_STATUS_ENUM_VALUES
+from .delta import DELTA_STATUS_ALIASES, DELTA_STATUS_ENUM_VALUES
 
-# Audits share the change-artefact status enum (DR-137 §5.2 — DE-141 reserves aliases).
+# Audits share the change-artefact status enum + alias set. DR-137 §5.2 marks
+# audit aliases "reserved for DE-141" — meaning DE-141 owns any *additional*
+# aliases the audit kind requires; the inherited change-status aliases are
+# kept here so legacy values continue to load tolerantly.
 AUDIT_STATUS_ENUM_VALUES: list[str] = DELTA_STATUS_ENUM_VALUES
+AUDIT_STATUS_ALIASES: dict[str, str] = DELTA_STATUS_ALIASES
 
 # -- Disposition constants (DEC-079-001, DEC-079-007) --
 
@@ -195,12 +199,13 @@ AUDIT_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for audits (kind: audit)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,
-    # DE-137 IP-137-P01: status enum promotion; aliases reserved for DE-141.
+    # DE-137 IP-137-P01: status enum promotion + change-status aliases.
     "status": replace(
       BASE_FRONTMATTER_METADATA.fields["status"],
       type="enum",
       pattern=None,
       enum_values=AUDIT_STATUS_ENUM_VALUES,
+      aliases=AUDIT_STATUS_ALIASES,
     ),
     # Audit-specific fields
     "mode": FieldMetadata(

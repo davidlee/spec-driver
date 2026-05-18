@@ -8,12 +8,13 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-from supekku.scripts.lib.backlog.models import BACKLOG_BASE_STATUSES
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 
 from .base import BASE_FRONTMATTER_METADATA
+from .issue import ISSUE_STATUS_ENUM_VALUES
 
-PROBLEM_STATUS_ENUM_VALUES: list[str] = sorted(BACKLOG_BASE_STATUSES)
+# Problems share the backlog-base status enum.
+PROBLEM_STATUS_ENUM_VALUES: list[str] = ISSUE_STATUS_ENUM_VALUES
 
 PROBLEM_FRONTMATTER_METADATA = BlockMetadata(
   version=1,

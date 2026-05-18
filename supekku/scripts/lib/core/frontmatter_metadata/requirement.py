@@ -9,11 +9,18 @@ from __future__ import annotations
 from dataclasses import replace
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
-from supekku.scripts.lib.requirements.lifecycle import REQUIREMENT_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
 
-REQUIREMENT_STATUS_ENUM_VALUES: list[str] = sorted(REQUIREMENT_STATUSES)
+# Canonical requirement-status enum (source of truth post DE-137).
+REQUIREMENT_STATUS_ENUM_VALUES: list[str] = [
+  "active",
+  "deprecated",
+  "in-progress",
+  "pending",
+  "retired",
+  "superseded",
+]
 
 REQUIREMENT_FRONTMATTER_METADATA = BlockMetadata(
   version=1,

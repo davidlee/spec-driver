@@ -9,11 +9,16 @@ from __future__ import annotations
 from dataclasses import replace
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
-from supekku.scripts.lib.blocks.verification import VERIFICATION_STATUSES
 
 from .base import BASE_FRONTMATTER_METADATA
 
-VERIFICATION_STATUS_ENUM_VALUES: list[str] = sorted(VERIFICATION_STATUSES)
+VERIFICATION_STATUS_ENUM_VALUES: list[str] = [
+  "blocked",
+  "failed",
+  "in-progress",
+  "planned",
+  "verified",
+]
 
 VERIFICATION_FRONTMATTER_METADATA = BlockMetadata(
   version=1,

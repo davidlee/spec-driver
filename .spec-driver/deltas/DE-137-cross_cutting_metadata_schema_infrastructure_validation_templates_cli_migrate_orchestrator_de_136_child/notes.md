@@ -1,5 +1,131 @@
 # Notes for DE-137
 
+## 2026-05-18 — IP-137-P01 complete (schema & validation foundation)
+
+### Summary
+
+All 15 tasks of IP-137-P01 landed; phase exits with `just check` clean
+(4982 tests pass, ruff zero, pylint 9.69 vs baseline 9.69 with 8 fewer
+messages — net improvement). Coverage of the 8 IP-137-P01 VTs:
+
+| VT | Location | Status |
+|---|---|---|
+| VT-CC-008 (field-NAME alias) | `validator_alias_test.py::test_field_name_alias_strict_emits_warning_with_rename_fix` + tolerant variant | pass |
+| VT-CC-009 (tolerated alias) | `validator_alias_test.py::test_tolerated_alias_*` (3 cases) | pass |
+| VT-CC-010 (did-you-mean) | `spec_driver/core/string_utils_test.py` (13 cases) | pass |
+| VT-CC-011 (unknown-key strict/tolerant) | `metadata/test_engine.py::StrictUnknownKeysTest` (5 cases) | pass |
+| VT-CC-012 (ENUM_REGISTRY parity) | `spec_driver/orchestration/enums_test.py` (24 cases incl. 21 parity + contract) | pass |
+| VT-CC-013 (normalize_field parity) | `blocks/metadata/aliases_test.py` (17 cases incl. 9 matrix parity) | pass |
+| VT-CC-030 (field-VALUE alias) | `validator_alias_test.py::test_field_value_alias_*` (2 cases) | pass |
+| VT-CC-034 (alias collision) | `validator_alias_test.py::test_field_name_alias_collision_is_error_severity` | pass |
+
+### DR-extensions adopted in P01 (decisions worth carrying forward)
+
+1. **`FieldMetadata.field_aliases` added alongside `BlockMetadata.field_aliases`.**
+   The DR-137 §5.2 design placed `field_aliases` only on `BlockMetadata`,
+   but the canonical relations-item schema is a nested
+   `FieldMetadata(type="object")`, not a standalone `BlockMetadata`. To
+   honour the design intent (field-NAME aliases on the container schema)
+   without promoting the relations-item to its own `BlockMetadata`,
+   `field_aliases` now exists on both classes with identical semantics.
+   The validator applies them at any object-typed schema layer.
+
+2. **Validator is report-only — no in-place mutation.**
+   DR-137 §5.2 pseudo-code shows `data[canonical_key] = data.pop(alias_key)`
+   inside the validator. P01 implements the validator as pure (it never
+   mutates the supplied data) and emits diagnostics with
+   `fix_hint`/`fix_kind` that `validate workspace --fix` consumes to
+   rewrite the source file. Loaders that want canonical values at read
+   time call `blocks.metadata.aliases.normalize_field` independently.
+   Trade-off: tolerant-read no longer auto-canonicalises in memory; the
+   read-time normaliser must be explicitly invoked. Benefit: simpler
+   semantics, easier reasoning about side effects, lower argument counts.
+
+3. **Audit + revision status aliases populated despite DR's "reserved"
+   marker.** The DR-137 §5.2 matrix marked audit/revision status aliases
+   as "reserved for DE-141/DE-142". P01 nonetheless populates them with
+   the same change-status alias set as delta. Reason: the legacy
+   kind-agnostic `normalize_status` aliased values like `"complete" →
+   "completed"` across all change-artefact kinds; the corpus contains
+   `status: complete` on real revisions/audits, so without aliases the
+   `ChangeArtifact` loader would regress. DE-141/142 retain authority
+   over any *additional* aliases their kinds require.
+
+4. **Per-kind status enum promotion extended beyond delta/plan.** P01
+   promotes the inherited base `status: string` to a kind-specific
+   `status: enum` on every Category A kind (audit, requirement,
+   verification, spec, policy, standard, memory, issue, problem, risk,
+   plus delta + plan). Without this the derived `_kind_status(kind)`
+   factory in `ENUM_REGISTRY` returns `[]` for those kinds and VT-CC-012
+   parity fails. Aliases stay empty on the non-delta/plan kinds (per
+   matrix). The relations-item nested object gets
+   `field_aliases={"annotation": "nature"}` in `base.py` so every kind
+   inherits it.
+
+5. **`pyproject.toml` testpaths extended to include `spec_driver`.**
+   Pre-existing gap: `tests/spec_driver/` and co-located
+   `spec_driver/**/*_test.py` files weren't discovered by `just test`.
+   P01 adds `spec_driver` to `testpaths` so the new VTs (string_utils,
+   enums) actually run under the project gate.
+
+### ENUM_REGISTRY pre/post-split parity snapshot
+
+Captured pre-split via `python -c "from spec_driver.orchestration.enums
+import ENUM_REGISTRY, list_enum_paths; ..."` immediately before
+refactoring `enums.py`. 22 paths × N values matched the post-split
+derived view exactly (asserted in `enums_test.PRE_SPLIT_SNAPSHOT`).
+
+### Hand-off note for IP-137-P02
+
+- `FieldMetadata` shape is locked: `aliases`, `tolerated_aliases`,
+  `field_aliases` all land; `ToleratedAlias` is a frozen dataclass with
+  `canonical / sunset_after / rationale`.
+- `MetadataValidator(metadata).validate(data, *, strict, accept_tolerated)`
+  is the new entrypoint. `validate(...).fix_hint` / `.fix_kind` is the
+  contract `--fix` consumes in IP-137-P03.
+- `dump_markdown_file` callers untouched in P01 (~33 sites pending in
+  P02 per DR-137 §5.1 F-1 ripple table).
+- `spec_driver/core/yaml_emit.py` does NOT exist yet — P02 introduces.
+- `normalize_field("delta", "status", value)` is available for any P02
+  helper that needs read-time alias canonicalisation.
+- OQ-137-01 (yaml_emit ≤ ~60 LOC vs ruamel.yaml swap) — re-evaluate at
+  P02 sign-off as planned.
+
+### Files touched by P01 (summary)
+
+- **New**: `spec_driver/core/string_utils.py`(+test),
+  `supekku/scripts/lib/blocks/metadata/aliases.py`(+test),
+  `supekku/scripts/lib/blocks/metadata/schema_test.py`,
+  `supekku/scripts/lib/blocks/metadata/validator_alias_test.py`,
+  `supekku/scripts/lib/core/frontmatter_metadata/revision.py`,
+  `supekku/scripts/lib/core/frontmatter_metadata/adr.py`,
+  `spec_driver/orchestration/enums_test.py`.
+- **Edited**: `supekku/scripts/lib/blocks/metadata/{schema,validator,snapshot_compare}.py`,
+  `supekku/scripts/lib/blocks/{spec,delta,revision}_metadata.py` + their
+  tests, every `frontmatter_metadata/<kind>.py` + tests,
+  `supekku/scripts/lib/changes/{lifecycle,artifacts}.py` (+tests),
+  `supekku/scripts/lib/requirements/lifecycle.py`,
+  `supekku/scripts/lib/specs/lifecycle.py`,
+  `supekku/scripts/lib/policies/lifecycle.py`,
+  `supekku/scripts/lib/standards/lifecycle.py`,
+  `supekku/scripts/lib/memory/lifecycle.py`,
+  `supekku/scripts/lib/decisions/lifecycle.py`,
+  `supekku/scripts/lib/backlog/models.py`,
+  `supekku/scripts/lib/blocks/verification.py`,
+  `supekku/scripts/lib/validation/validator.py`,
+  `supekku/cli/list/{deltas,specs}.py`,
+  `spec_driver/orchestration/enums.py`,
+  `pyproject.toml` (testpaths).
+- **Backlog**: ISSUE-055 (drift registry gap).
+
+### Lint / Test acceptance
+
+- `uv run ruff check supekku spec_driver` — clean.
+- `uv run ruff format supekku spec_driver` — clean.
+- `uv run python -m pytest` — 4982 passed, 4 skipped (no regressions).
+- `uv run python -m supekku.scripts.pylint_report` — 9.69/10 (baseline
+  9.69; 1590 messages vs baseline 1598).
+
 ## 2026-05-18 — IP-137-P01 entry: pre-flight grep audit + DE-137 → in-progress
 
 ### Pre-flight grep audit (task 1.1)

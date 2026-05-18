@@ -8,12 +8,20 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-from supekku.scripts.lib.backlog.models import RISK_STATUSES
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
 
 from .base import BASE_FRONTMATTER_METADATA
 
-RISK_STATUS_ENUM_VALUES: list[str] = sorted(RISK_STATUSES)
+# Risk extends the backlog-base statuses with two risk-specific terminal
+# values; this list is the source of truth for `backlog/models.RISK_STATUSES`.
+RISK_STATUS_ENUM_VALUES: list[str] = [
+  "accepted",
+  "expired",
+  "in-progress",
+  "open",
+  "resolved",
+  "triaged",
+]
 
 RISK_FRONTMATTER_METADATA = BlockMetadata(
   version=1,

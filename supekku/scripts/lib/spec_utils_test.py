@@ -15,6 +15,8 @@ from supekku.scripts.lib.core.spec_utils import (
   MarkdownLoadError,
   append_unique,
   dump_markdown_file,
+  dump_markdown_file_create,
+  dump_markdown_file_update,
   ensure_list_entry,
   load_markdown_file,
   load_validated_markdown_file,
@@ -208,6 +210,85 @@ class SpecUtilsTestCase(unittest.TestCase):
 
     assert result.slug == "load-validated"
     assert loaded_body == body
+
+
+class DumpCreateUpdateSplitTest(unittest.TestCase):
+  """IP-137-P02 task 2.5 — `_create` / `_update` semantics."""
+
+  def test_create_renders_enum_comment_hints(self) -> None:
+    fm = {
+      "id": "DE-001",
+      "name": "split test",
+      "slug": "split-test",
+      "kind": "delta",
+      "status": "draft",
+      "created": "2026-01-01",
+      "updated": "2026-01-01",
+    }
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = Path(tmpdir) / "DE-001.md"
+      dump_markdown_file_create(path, fm, "# body\n", kind="delta")
+      text = path.read_text(encoding="utf-8")
+    assert "status: draft  # one of:" in text
+    assert "# body" in text
+
+  def test_create_refuses_existing_path(self) -> None:
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = Path(tmpdir) / "DE-001.md"
+      path.write_text("existing", encoding="utf-8")
+      with pytest.raises(FileExistsError):
+        dump_markdown_file_create(
+          path, {"id": "DE-001"}, "body\n", kind="delta"
+        )
+
+  def test_update_preserves_existing_trailing_comments(self) -> None:
+    initial = (
+      "---\n"
+      "id: DE-001\n"
+      'status: draft  # one of: draft | completed\n'
+      "kind: delta\n"
+      "---\n\nbody\n"
+    )
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = Path(tmpdir) / "DE-001.md"
+      path.write_text(initial, encoding="utf-8")
+      dump_markdown_file_update(
+        path,
+        {"id": "DE-001", "status": "in-progress", "kind": "delta"},
+        "body\n",
+      )
+      text = path.read_text(encoding="utf-8")
+    assert "status: in-progress  # one of: draft | completed" in text
+
+  def test_update_no_comments_when_none_present(self) -> None:
+    initial = "---\nid: DE-001\nkind: delta\n---\n\nbody\n"
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = Path(tmpdir) / "DE-001.md"
+      path.write_text(initial, encoding="utf-8")
+      dump_markdown_file_update(
+        path, {"id": "DE-001", "kind": "delta"}, "body\n"
+      )
+      text = path.read_text(encoding="utf-8")
+    assert "#" not in text
+
+  def test_update_idempotent_round_trip(self) -> None:
+    fm = {"id": "DE-001", "kind": "delta", "status": "draft"}
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = Path(tmpdir) / "DE-001.md"
+      dump_markdown_file_create(path, fm, "body\n", kind="delta")
+      first = path.read_text(encoding="utf-8")
+      dump_markdown_file_update(path, fm, "body\n")
+      second = path.read_text(encoding="utf-8")
+    assert first == second
+
+  def test_legacy_dump_delegates_to_update(self) -> None:
+    """Temporary back-compat alias must round-trip during ripple migration."""
+    fm = {"id": "DE-001", "kind": "delta"}
+    with tempfile.TemporaryDirectory() as tmpdir:
+      path = Path(tmpdir) / "x.md"
+      dump_markdown_file(path, fm, "body\n")
+      reloaded_fm, _ = load_markdown_file(path)
+    assert reloaded_fm == fm
 
 
 if __name__ == "__main__":

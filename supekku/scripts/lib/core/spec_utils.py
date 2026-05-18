@@ -1,7 +1,23 @@
-"""Utilities for working with specification files and frontmatter."""
+"""Utilities for working with specification files and frontmatter.
+
+`dump_markdown_file_create(..., kind=)` and `dump_markdown_file_update(...)`
+are the canonical write helpers (DEC-137-15 / F-1):
+
+- `_create` builds frontmatter via `render_frontmatter_for_kind(kind, data=fm)`
+  so enum-comment hints appear inline. Errors if the path already exists.
+- `_update` rewrites an existing artefact, preserving trailing `# ...`
+  comments per top-level scalar key.
+
+The legacy `dump_markdown_file(path, fm, body)` survives temporarily as a
+thin alias of `_update` so the ~33 production + ~95 test ripple sites can
+migrate in batches; the alias is removed once `rg dump_markdown_file\\b`
+reports zero remaining callers (IP-137-P02 task 2.9).
+"""
 
 from __future__ import annotations
 
+import re
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -59,21 +75,110 @@ def load_markdown_file(path: Path | str) -> tuple[dict[str, Any], str]:
   return frontmatter_data, body
 
 
+def _normalise_body(body: str) -> str:
+  body = body.lstrip("\n")
+  if body and not body.endswith("\n"):
+    body = body + "\n"
+  return body
+
+
+def _atomic_write(path: Path, text: str) -> None:
+  tmp = path.with_suffix(path.suffix + ".tmp")
+  tmp.write_text(text, encoding="utf-8")
+  tmp.replace(path)
+
+
+_TRAILING_COMMENT_RE = re.compile(
+  r"^(?P<key>[A-Za-z_][\w-]*):\s+\S.*?\s+#\s*(?P<comment>.*?)\s*$",
+)
+
+
+def _extract_inline_comments(fm_text: str) -> dict[str, str]:
+  """Return `{top_level_key: comment_text}` for `key: value  # comment` lines.
+
+  Only top-level scalar lines participate. Container-opening lines (`key:`
+  followed by nothing on the same line, or `key: [item, ...]`) and comment-
+  only lines do not contribute to the map.
+  """
+  comments: dict[str, str] = {}
+  for line in fm_text.splitlines():
+    if not line or line.lstrip().startswith("#"):
+      continue
+    match = _TRAILING_COMMENT_RE.match(line)
+    if match:
+      comments[match.group("key")] = match.group("comment")
+  return comments
+
+
+def _read_existing_frontmatter_text(path: Path) -> str:
+  text = path.read_text(encoding="utf-8")
+  if not text.startswith("---"):
+    return ""
+  end_idx = text.find("\n---", 3)
+  if end_idx == -1:
+    return ""
+  return text[3:end_idx].lstrip("\n").rstrip()
+
+
+def dump_markdown_file_create(
+  path: Path | str,
+  frontmatter: Mapping[str, Any],
+  body: str,
+  *,
+  kind: str,
+) -> None:
+  """Write a NEW artefact at *path*, rendering frontmatter with enum hints.
+
+  Routes through `render_frontmatter_for_kind(kind, data=frontmatter)` so
+  enum-comment hints appear inline (POL-001). Errors if *path* already exists.
+  """
+  from spec_driver.orchestration.templates import (  # noqa: PLC0415
+    render_frontmatter_for_kind,
+  )
+
+  path = Path(path)
+  if path.exists():
+    msg = f"refusing to overwrite existing artefact: {path} (use _update)"
+    raise FileExistsError(msg)
+  fm_yaml = render_frontmatter_for_kind(kind, data=dict(frontmatter))
+  combined = f"---\n{fm_yaml}\n---\n\n{_normalise_body(body)}"
+  _atomic_write(path, combined)
+
+
+def dump_markdown_file_update(
+  path: Path | str,
+  frontmatter: Mapping[str, Any],
+  body: str,
+) -> None:
+  """Rewrite an EXISTING artefact at *path*, preserving inline frontmatter comments.
+
+  Reads the existing frontmatter region, lexes trailing `# ...` annotations per
+  top-level scalar key, and re-emits via `emit_yaml_block` with that preserved
+  map. Atomic (temp + rename). No kind awareness — comment hints come from the
+  existing file, not metadata.
+  """
+  from spec_driver.core.yaml_emit import emit_yaml_block  # noqa: PLC0415
+
+  path = Path(path)
+  existing_fm_text = _read_existing_frontmatter_text(path) if path.exists() else ""
+  comments = _extract_inline_comments(existing_fm_text) if existing_fm_text else {}
+  fm_yaml = emit_yaml_block(dict(frontmatter), comments=comments)
+  combined = f"---\n{fm_yaml}\n---\n\n{_normalise_body(body)}"
+  _atomic_write(path, combined)
+
+
 def dump_markdown_file(
   path: Path | str,
   frontmatter: dict[str, Any],
   body: str,
 ) -> None:
-  """Write frontmatter and content to a markdown file."""
-  from .frontmatter_writer import dump_frontmatter_yaml  # noqa: PLC0415
+  """DEPRECATED legacy alias of `dump_markdown_file_update`.
 
-  path = Path(path)
-  frontmatter_yaml = dump_frontmatter_yaml(frontmatter)
-  body = body.lstrip("\n")
-  if body and not body.endswith("\n"):
-    body = body + "\n"
-  combined = f"---\n{frontmatter_yaml}\n---\n\n{body}"
-  path.write_text(combined, encoding="utf-8")
+  Retained temporarily during IP-137-P02 ripple migration. Removed at task 2.9
+  once `rg dump_markdown_file\\b` reports zero remaining callers
+  (DEC-137-15 / F-1; no permanent shim).
+  """
+  dump_markdown_file_update(path, frontmatter, body)
 
 
 def ensure_list_entry(frontmatter: dict[str, Any], key: str) -> list[Any]:

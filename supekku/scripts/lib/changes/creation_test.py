@@ -177,6 +177,28 @@ class CreateChangeTest(unittest.TestCase):
     assert frontmatter.get("context_inputs") == []
     assert frontmatter.get("relations") == []
 
+  def test_create_delta_emits_enum_comment_hints_in_frontmatter(self) -> None:
+    """VT-CC-004: Created artefact carries inline enum-comment hints.
+
+    Proves the create-path routes through `render_frontmatter_for_kind`
+    (POL-001 single emit surface). A regression here means the create-
+    path silently lost the metadata-driven comment layer.
+    """
+    root = self._make_repo()
+    result = create_delta(
+      "enum hint check",
+      specs=["SPEC-100"],
+      repo_root=root,
+    )
+    text = result.primary_path.read_text(encoding="utf-8")
+    # Status field should carry the canonical-value enum comment from
+    # FieldMetadata.enum_values.
+    assert "status: draft  # one of:" in text
+    assert "completed" in text  # delta.status enum includes 'completed'
+    assert "in-progress" in text
+    # The kind field also carries an enum comment from the base schema.
+    assert "kind: delta  # one of:" in text
+
   def test_create_delta_without_plan_still_adds_design_revision(self) -> None:
     """Delta creation without plan still scaffolds a design revision."""
     root = self._make_repo()

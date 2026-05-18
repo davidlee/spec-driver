@@ -1,106 +1,35 @@
 """Canonical frontmatter writer with YAML round-trip formatting.
 
-Provides primitives for reading, mutating, and writing YAML frontmatter
-using a deterministic ``CompactDumper`` that produces idempotent output.
-Body content (including code-fenced YAML blocks) passes through untouched.
+Provides primitives for reading, mutating, and writing YAML frontmatter.
+Delegates emission to `spec_driver.core.yaml_emit.emit_yaml_block` so the
+no-comment emit path stays a single source of truth (POL-001). `CompactDumper`
+is re-exported as an alias of the canonical `_FrontmatterDumper`.
 """
 
 from __future__ import annotations
 
-import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 from typing import Any
 
-import yaml
-
+from spec_driver.core.yaml_emit import (
+  _FrontmatterDumper as CompactDumper,
+)
+from spec_driver.core.yaml_emit import emit_yaml_block
 from supekku.scripts.lib.core.spec_utils import (
   dump_markdown_file,
   load_markdown_file,
 )
 
-# ---------------------------------------------------------------------------
-# CompactDumper — canonical YAML formatting
-# ---------------------------------------------------------------------------
-
-# Maximum rendered width of the ``[a, b, c]`` portion for flow-style lists.
-# Kept well under prettier's 80-char print width to leave room for the key
-# name and any indent prefix on the same line.
-_FLOW_LIST_WIDTH_LIMIT = 60
-
-
-# Strings that YAML would single-quote in block or flow context.
-# We force double-quote to match prettier's convention.
-_NEEDS_QUOTING_RE = re.compile(
-  r"^$"  # empty string
-  r"|^\d{4}-\d{2}-\d{2}$"  # date-like
-  r"|^(true|false|yes|no|on|off|null|~)$"  # bool/null-like
-  r"|^[0-9]"  # starts with digit
-  r"|^[@`'\"]"  # YAML-reserved start chars
-  r"|[:#,\[\]{}]",  # special chars (block + flow indicators)
-  re.IGNORECASE,
-)
-
-
-class CompactDumper(yaml.SafeDumper):
-  """YAML dumper producing compact, prettier-compatible frontmatter.
-
-  - Short scalar lists render as flow-style ``[a, b, c]``.
-  - Long lists and lists containing dicts render as block-style.
-  - Sequences always indent under their parent key (no indentless).
-  - Date-like strings are double-quoted.
-  """
-
-  def increase_indent(  # noqa: D102
-    self,
-    flow: bool = False,
-    indentless: bool = False,  # noqa: ARG002
-  ) -> None:
-    # Never use indentless sequences — always indent under parent key.
-    # This matches prettier's YAML formatter behaviour.
-    return super().increase_indent(flow=flow, indentless=False)
-
-
-def _represent_str(dumper: CompactDumper, data: str) -> yaml.Node:
-  """Quote strings to match prettier convention.
-
-  Double-quote when quoting is needed, unless the string itself contains
-  double-quote characters — prettier prefers whichever quote style avoids
-  escaping.
-  """
-  if _NEEDS_QUOTING_RE.search(data):
-    style = "'" if '"' in data else '"'
-    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=style)
-  return dumper.represent_scalar("tag:yaml.org,2002:str", data)
-
-
-def _represent_list(dumper: CompactDumper, data: list) -> yaml.Node:
-  """Flow-style for short scalar lists, block-style otherwise."""
-  use_flow = (
-    all(isinstance(x, (str, int, float, bool)) for x in data)
-    and sum(len(str(x)) for x in data) + 2 * len(data) < _FLOW_LIST_WIDTH_LIMIT
-  )
-  return dumper.represent_sequence("tag:yaml.org,2002:seq", data, flow_style=use_flow)
-
-
-CompactDumper.add_representer(str, _represent_str)
-CompactDumper.add_representer(list, _represent_list)
-
 
 def dump_frontmatter_yaml(data: dict[str, Any]) -> str:
   """Render a frontmatter dict as canonical YAML text (no ``---`` markers).
 
-  Uses ``CompactDumper`` for deterministic, idempotent output.
+  Thin delegation to `emit_yaml_block` (no-comment path).
   """
-  return yaml.dump(
-    data,
-    Dumper=CompactDumper,
-    sort_keys=False,
-    allow_unicode=True,
-    width=10000,
-  ).strip()
+  return emit_yaml_block(data)
 
 
 # ---------------------------------------------------------------------------

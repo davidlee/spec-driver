@@ -61,7 +61,7 @@ Process:
 10. Run the repository reconciliation commands:
 
 - `uv run spec-driver sync`
-- `uv run spec-driver validate`
+- `uv run spec-driver validate workspace`
 
 11. Decide the handoff:
 

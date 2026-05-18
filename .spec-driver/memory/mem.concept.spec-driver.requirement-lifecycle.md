@@ -15,7 +15,7 @@ scope:
     - supekku/scripts/lib/requirements/lifecycle.py
     - supekku/scripts/lib/blocks/verification.py
     - supekku/scripts/lib/changes/lifecycle.py
-  commands: [uv run spec-driver sync, uv run spec-driver validate]
+  commands: [uv run spec-driver sync, uv run spec-driver validate workspace]
 provenance:
   sources:
     - kind: doc
@@ -65,7 +65,7 @@ The separator after the label/bold may be `:`, `-`, `–`, or `—`.
 1. Add requirement to spec + coverage entry `status: planned`.
 2. Create delta referencing the requirement.
 3. Update plan/spec coverage to `in-progress` then `verified` as work completes.
-4. Run `uv run spec-driver sync` and `uv run spec-driver validate`.
+4. Run `uv run spec-driver sync` and `uv run spec-driver validate workspace`.
 5. Use audits when needed; reconcile drift warnings.
 
 ## Edge Case Guidance

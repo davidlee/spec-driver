@@ -33,7 +33,7 @@ Process:
 5. Use `--force` only when explicitly justified; record reason and follow-up work.
 6. Post-check:
    - `uv run spec-driver sync`
-   - `uv run spec-driver validate`
+   - `uv run spec-driver validate workspace`
    - `uv run spec-driver show delta DE-XXX`
    - `uv run spec-driver list requirements --spec SPEC-XXX`
    - Revisit any originating backlog entries and update their status/notes/links so they reflect the completed delta

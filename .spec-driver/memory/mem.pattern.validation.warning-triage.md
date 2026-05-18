@@ -10,7 +10,7 @@ confidence: high
 tags:
 - validation
 - workflow
-summary: Repeatable procedure for investigating and burning down spec-driver validate warnings by category
+summary: Repeatable procedure for investigating and burning down spec-driver validate workspace warnings by category
 scope:
   commands: [validate]
   globs: [supekku/scripts/lib/validation/**]
@@ -20,7 +20,7 @@ scope:
 
 # validate warning triage pattern
 
-Run `uv run spec-driver validate` and categorise warnings. Common categories and fixes:
+Run `uv run spec-driver validate workspace` and categorise warnings. Common categories and fixes:
 
 ## Finding dispositions missing (AUD-xxx/FIND-xxx)
 
@@ -49,7 +49,7 @@ Run `uv run spec-driver validate` and categorise warnings. Common categories and
 
 ## General approach
 
-1. Run `uv run spec-driver validate 2>&1` and group by message pattern.
+1. Run `uv run spec-driver validate workspace 2>&1` and group by message pattern.
 2. Read `_validate_*` methods in `validator.py` to understand each check's logic.
 3. Prefer data fixes (frontmatter edits) over validator suppression.
 4. Run `uv run pytest supekku/scripts/lib/validation/ -x -q` after code changes.

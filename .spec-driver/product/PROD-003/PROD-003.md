@@ -576,7 +576,7 @@ policies:
 
 - **Duplicate ID**: Creation fails if POL-XXX or STD-XXX already exists (deterministic ID generation prevents collisions)
 - **Invalid status**: Validation rejects unknown status values (must be from allowed set)
-- **Broken references**: `spec-driver validate` flags references to non-existent policies/standards
+- **Broken references**: `spec-driver validate workspace` flags references to non-existent policies/standards
 - **Missing frontmatter**: Parser handles missing fields gracefully, warns on sync
 - **Circular supersession**: A supersedes B, B supersedes A (validation detects and flags)
 

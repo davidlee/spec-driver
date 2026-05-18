@@ -1019,7 +1019,7 @@ $ spec-driver list requirements --spec SPEC-110 --json
 $ spec-driver list deltas --implements SPEC-110 --json
 
 # Validate workspace integrity
-$ spec-driver validate --strict
+$ spec-driver validate workspace --strict
 ```
 
 **Example 3: Discovery Without Documentation**

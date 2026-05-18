@@ -1,5 +1,83 @@
 # Notes for DE-137
 
+## 2026-05-18 — IP-137-P03 task 3.1 — full ripple inventory
+
+Pre-flight `rg -n 'spec-driver validate' --type md --type py --type just`
+plus `rg -n 'spec-driver validate' /workspace/spec-driver/.spec-driver/`
+reveals the live ripple is materially wider than DR-137 §5.4's "~8 live"
+estimate.
+
+### Live ripple (needs migration to explicit subcommand form)
+
+**Repo-root + tooling:**
+- `README.md:198` — `spec-driver validate`
+- `Justfile:40` — `validate:` recipe ⇒ `validate workspace`
+- `Justfile:43` — `validate-templates:` recipe ⇒ `validate templates`
+
+**Source-tree docs:**
+- `supekku/about/lifecycle.md:118` — `validate --sync`
+
+**Skills (existing references; P05 adds verbatim inserts separately):**
+- `supekku/skills/close-change/SKILL.md:36` — `validate`
+- `supekku/skills/audit-change/SKILL.md:36`/`:64` — `validate`
+- `.spec-driver/skills/close-change/SKILL.md:36` — installed copy
+- `.spec-driver/skills/audit-change/SKILL.md:64` — installed copy
+
+**Specs (live; not historical):**
+- `.spec-driver/product/PROD-001/PROD-001.md:205,313,402` — `validate`
+- `.spec-driver/product/PROD-003/PROD-003.md:579` — `validate`
+- `.spec-driver/product/PROD-005/PROD-005.md:592` — `validate`
+- `.spec-driver/product/PROD-010/PROD-010.md:1022` — `validate --strict`
+- `.spec-driver/tech/SPEC-110/SPEC-110.md:439` — `validate --strict`
+
+**Decisions:**
+- `.spec-driver/decisions/ADR-010-…md:124` — `validate` (live ADR; reconciliation per ADR convention)
+
+**Memory (load-bearing; agents recall these):**
+- `mem.signpost.spec-driver.overview.md:16,67`
+- `mem.signpost.spec-driver.lifecycle-start.md:16`
+- `mem.signpost.spec-driver.ceremony.md:16`
+- `mem.concept.spec-driver.posture.md:16`
+- `mem.concept.spec-driver.requirement-lifecycle.md:18,68`
+- `mem.fact.spec-driver.status-enums.md:20`
+- `mem.pattern.spec-driver.delta-completion.md:109`
+- `mem.pattern.validation.warning-triage.md:13,23,52`
+
+### Frozen (skip — DR-137 §5.4 frozen-list policy)
+
+- All `.spec-driver/audits/AUD-*` (frozen audit-trail)
+- All `.spec-driver/revisions/RE-*` (frozen revision records; mention in
+  `RE-019` is past-tense run record)
+- `.spec-driver/deltas/DE-079-…` — completed delta phase sheets
+- `supekku/_claude.commands_old/*` — `_old` suffix; not used
+- All prior phase sheets / DRs in this delta + earlier deltas
+
+### Out-of-scope / aspirational (do NOT touch)
+
+- `.spec-driver/product/PROD-011/PROD-011.md:711,779,836,849` —
+  `spec-driver validate constitution` is a planned/future
+  subcommand-form referenced in PROD intent. Not a live invocation;
+  leaving until that subcommand actually ships (separate delta).
+
+### Divergence from DR-137 §5.4 (recorded as deviation)
+
+DR §5.4 estimated "~8 live ripple". Actual live count is ≈ 27 distinct
+line-level references across 18 files (incl. memory files + PROD/SPEC
+docs that DR §5.4 did not enumerate). Decision: migrate ALL live
+references in task 3.12 (memory + spec docs included). Rationale:
+
+1. Memory files are recalled by agents per `/retrieving-memory`;
+   stale `validate` examples teach agents the wrong shape.
+2. PROD/SPEC docs are live specifications consumed by readers;
+   leaving stale CLI invocations creates two competing CLI contracts.
+3. The migration is mechanical (find/replace bare `validate` ⇒
+   `validate workspace`) with no design ambiguity.
+
+This is an *enumeration delta* against the DR, not a design change.
+DR-137 §5.4 verdict (ACCEPT WITH EDITS) stands; the ripple list in §5.4
+was undercounted but the migration intent (bare ⇒ explicit subcommand)
+is unchanged.
+
 ## 2026-05-18 — IP-137-P03 entry: phase-03 sheet drafted via `/plan-phases`
 
 ### Plan-phases handoff

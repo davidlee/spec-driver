@@ -589,7 +589,7 @@ sources:
 3. Create package-level spec for each leaf package via `spec-driver create spec`
 4. Fill specs with package-level design (not file-by-file detail)
 5. Run `spec-driver sync` to rebuild registry
-6. Validate with `spec-driver validate`
+6. Validate with `spec-driver validate workspace`
 
 **Time Estimate**: 2-4 hours for cleanup + spec creation
 

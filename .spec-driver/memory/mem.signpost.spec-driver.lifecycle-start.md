@@ -13,7 +13,7 @@ scope:
     - supekku/about/lifecycle.md
     - supekku/scripts/lib/requirements/registry.py
     - supekku/scripts/lib/requirements/lifecycle.py
-  commands: [uv run spec-driver sync, uv run spec-driver validate]
+  commands: [uv run spec-driver sync, uv run spec-driver validate workspace]
 provenance:
   sources:
     - kind: doc

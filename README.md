@@ -195,7 +195,7 @@ spec-driver install
 spec-driver sync
 
 # check all registries
-spec-driver validate
+spec-driver validate workspace
 
 # health check
 spec-driver doctor

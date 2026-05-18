@@ -37,10 +37,10 @@ lint-imports:
   uvx import-linter
 
 validate:
-  uv run spec-driver validate
+  uv run spec-driver validate workspace
 
 validate-templates:
-  uv run spec-driver validate-templates
+  uv run spec-driver validate templates
 
 # run before commits
 pre-commit: check format-markdown

@@ -17,7 +17,7 @@ scope:
     - uv run spec-driver complete delta
     - complete delta
     - uv run spec-driver sync
-    - uv run spec-driver validate
+    - uv run spec-driver validate workspace
   paths:
     - supekku/scripts/complete_delta.py
     - supekku/scripts/lib/changes/coverage_check.py

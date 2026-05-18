@@ -202,7 +202,7 @@ Given Sarah has just installed spec-driver and wants to document a new feature
 6. Agent asks Sarah 2-3 focused questions about scope, users, success metrics
 7. Agent fills all sections systematically, documenting assumptions for gaps
 8. Agent validates: all YAML blocks complete, requirements traceable, no placeholders
-9. Agent runs `uv run spec-driver sync && uv run spec-driver validate`
+9. Agent runs `uv run spec-driver sync && uv run spec-driver validate workspace`
 10. Agent reports: "Created PROD-XXX at specify/product/PROD-XXX/PROD-XXX.md (validated)"
 
 Then Sarah can immediately start implementation or refine the spec
@@ -310,7 +310,7 @@ See capabilities YAML block above for complete capability definitions. Key behav
   _Verification_: Manual review of 20 product specs and 20 tech specs confirms appropriate content focus
 
 - **FR-005**(validation): Validation Integrated Before Workflow Completion
-  The workflow requires agents to run `spec-driver sync` and `spec-driver validate` commands before declaring spec creation complete, catching errors (invalid relationships, missing requirements, YAML syntax issues) before user moves to next task.
+  The workflow requires agents to run `spec-driver sync` and `spec-driver validate workspace` commands before declaring spec creation complete, catching errors (invalid relationships, missing requirements, YAML syntax issues) before user moves to next task.
   _Verification_: VT-002 - Confirm validation catches all common error types (tested via intentional error injection)
 
 ### Non-Functional Requirements
@@ -399,7 +399,7 @@ uv run spec-driver schema show <block-type>
 
 # Sync and validate
 uv run spec-driver sync    # Updates registries
-uv run spec-driver validate # Checks metadata consistency
+uv run spec-driver validate workspace # Checks metadata consistency
 ```
 
 **YAML Block Schemas** (see `spec-driver schema show` for details):

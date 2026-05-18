@@ -115,7 +115,7 @@ These labels are descriptive; tooling does not enforce the workflow shape.
 4. Complete delta: `uv run spec-driver complete delta DE-XXX`
 5. Sync/validate as needed:
    - `uv run spec-driver sync`
-   - `uv run spec-driver validate --sync`
+   - `uv run spec-driver validate workspace --sync`
 
 Notes:
 

@@ -106,7 +106,7 @@ Notes:
 
 ```bash
 uv run spec-driver sync                     # populates traceability arrays
-uv run spec-driver validate                 # checks structural integrity
+uv run spec-driver validate workspace       # checks structural integrity
 ```
 
 ## Verify

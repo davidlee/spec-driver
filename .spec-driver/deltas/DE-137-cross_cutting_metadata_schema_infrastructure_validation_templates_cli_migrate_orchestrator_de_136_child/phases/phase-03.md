@@ -4,7 +4,7 @@ slug: "137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli
 name: IP-137 Phase 03 - validate Typer group + schema enums CLI + ripple
 created: "2026-05-18"
 updated: "2026-05-18"
-status: draft
+status: in-progress
 kind: phase
 plan: IP-137
 delta: DE-137

@@ -13,7 +13,7 @@ priority:
   severity: high
   weight: 9
 scope:
-  commands: [uv run spec-driver validate]
+  commands: [uv run spec-driver validate workspace]
   paths:
     - .spec-driver/workflow.toml
     - supekku/scripts/lib/core/config.py

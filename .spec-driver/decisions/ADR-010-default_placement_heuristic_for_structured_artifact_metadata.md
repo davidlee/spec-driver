@@ -121,7 +121,7 @@ When a field could live in multiple locations:
 
 - Phase sheets (DE-106) serve as the reference implementation
 - New artifact kinds should cite this ADR when choosing field placement
-- `spec-driver validate` enforces the phase frontmatter schema via PhaseSheet
+- `spec-driver validate workspace` enforces the phase frontmatter schema via PhaseSheet
 
 ## References
 

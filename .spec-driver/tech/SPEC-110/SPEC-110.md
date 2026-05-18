@@ -436,7 +436,7 @@ entries:
 
   **Journey 7: CI Validates Workspace Integrity**
   1. **Given** a PR with spec/requirement/delta changes
-  2. **When** CI runs `spec-driver validate --strict`
+  2. **When** CI runs `spec-driver validate workspace --strict`
   3. **Then** CLI delegates to WorkspaceValidator
   4. **And** validates all cross-references (requirements ↔ deltas ↔ specs)
   5. **And** reports any broken references or inconsistencies

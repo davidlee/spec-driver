@@ -13,7 +13,7 @@ scope:
     - uv run spec-driver create delta
     - uv run spec-driver complete delta
     - uv run spec-driver sync
-    - uv run spec-driver validate
+    - uv run spec-driver validate workspace
 provenance:
   sources:
     - kind: memory
@@ -64,7 +64,7 @@ project’s ceremony mode and read the matching guidance:
 - `uv run spec-driver create phase --plan IP-XXX`
 - `uv run spec-driver complete delta DE-XXX`
 - `uv run spec-driver sync`
-- `uv run spec-driver validate`
+- `uv run spec-driver validate workspace`
 - `uv run spec-driver list requirements --spec SPEC-XXX`
 - `uv run spec-driver show delta DE-XXX` (bare numeric: `show delta 88`)
 - `uv run spec-driver edit delta DE-XXX --tag wip --untag stale`

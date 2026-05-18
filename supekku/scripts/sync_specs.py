@@ -35,7 +35,8 @@ from supekku.scripts.lib.contracts.mirror import (  # type: ignore
 )
 from supekku.scripts.lib.core.spec_utils import (  # type: ignore
   append_unique,
-  dump_markdown_file,
+  dump_markdown_file_create,
+  dump_markdown_file_update,
   ensure_list_entry,
   load_markdown_file,
 )
@@ -137,7 +138,7 @@ class MultiLanguageSpecManager:
       "and testing strategy.\n"
     )
 
-    dump_markdown_file(spec_file, frontmatter, body)
+    dump_markdown_file_create(spec_file, frontmatter, body, kind="spec")
     return spec_file
 
   def _update_registry(self, source_unit, spec_id: str) -> None:
@@ -157,7 +158,7 @@ class MultiLanguageSpecManager:
     if source_unit.language == "go":
       packages = ensure_list_entry(frontmatter, "packages")
       if append_unique(packages, source_unit.identifier):
-        dump_markdown_file(spec_file, frontmatter, body)
+        dump_markdown_file_update(spec_file, frontmatter, body)
 
     # Handle new sources field
     sources = ensure_list_entry(frontmatter, "sources")
@@ -181,7 +182,7 @@ class MultiLanguageSpecManager:
       if adapter:
         descriptor = adapter.describe(source_unit)
         sources.append(descriptor.default_frontmatter["sources"][0])
-        dump_markdown_file(spec_file, frontmatter, body)
+        dump_markdown_file_update(spec_file, frontmatter, body)
 
   def process_source_unit(
     self,

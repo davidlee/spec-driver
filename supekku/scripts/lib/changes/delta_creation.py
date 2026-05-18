@@ -17,7 +17,7 @@ from supekku.scripts.lib.changes._creation_utils import (
 )
 from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.core.paths import get_deltas_dir
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_create
 from supekku.scripts.lib.specs.creation import (
   extract_template_body,
   find_repository_root,
@@ -102,7 +102,7 @@ def create_delta(
   )
 
   delta_path = delta_dir / f"{delta_id}.md"
-  dump_markdown_file(delta_path, frontmatter, body)
+  dump_markdown_file_create(delta_path, frontmatter, body, kind="delta")
 
   extras: list[Path] = []
 
@@ -138,10 +138,11 @@ def create_delta(
     updated=today,
   )
   design_revision_path = delta_dir / f"{design_revision_id}.md"
-  dump_markdown_file(
+  dump_markdown_file_create(
     design_revision_path,
     design_revision_frontmatter,
     design_revision_body,
+    kind="design_revision",
   )
   extras.append(design_revision_path)
 

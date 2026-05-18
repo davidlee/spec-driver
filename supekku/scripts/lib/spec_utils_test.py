@@ -237,15 +237,13 @@ class DumpCreateUpdateSplitTest(unittest.TestCase):
       path = Path(tmpdir) / "DE-001.md"
       path.write_text("existing", encoding="utf-8")
       with pytest.raises(FileExistsError):
-        dump_markdown_file_create(
-          path, {"id": "DE-001"}, "body\n", kind="delta"
-        )
+        dump_markdown_file_create(path, {"id": "DE-001"}, "body\n", kind="delta")
 
   def test_update_preserves_existing_trailing_comments(self) -> None:
     initial = (
       "---\n"
       "id: DE-001\n"
-      'status: draft  # one of: draft | completed\n'
+      "status: draft  # one of: draft | completed\n"
       "kind: delta\n"
       "---\n\nbody\n"
     )
@@ -265,9 +263,7 @@ class DumpCreateUpdateSplitTest(unittest.TestCase):
     with tempfile.TemporaryDirectory() as tmpdir:
       path = Path(tmpdir) / "DE-001.md"
       path.write_text(initial, encoding="utf-8")
-      dump_markdown_file_update(
-        path, {"id": "DE-001", "kind": "delta"}, "body\n"
-      )
+      dump_markdown_file_update(path, {"id": "DE-001", "kind": "delta"}, "body\n")
       text = path.read_text(encoding="utf-8")
     assert "#" not in text
 

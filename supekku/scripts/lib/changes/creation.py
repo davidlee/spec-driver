@@ -15,7 +15,10 @@ from supekku.scripts.lib.changes._creation_utils import (
   _get_template_path,
 )
 from supekku.scripts.lib.core.paths import get_deltas_dir
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
+from supekku.scripts.lib.core.spec_utils import (
+  dump_markdown_file_create,
+  load_markdown_file,
+)
 from supekku.scripts.lib.specs.creation import (
   extract_template_body,
   find_repository_root,
@@ -92,7 +95,7 @@ def _render_plan(
     "aliases": [],
   }
   plan_path = delta_dir / f"{plan_id}.md"
-  dump_markdown_file(plan_path, plan_frontmatter, plan_body)
+  dump_markdown_file_create(plan_path, plan_frontmatter, plan_body, kind="plan")
   return plan_path
 
 
@@ -242,7 +245,7 @@ def create_requirement_breakout(
 > TODO
 """
 
-  dump_markdown_file(path, frontmatter, body)
+  dump_markdown_file_create(path, frontmatter, body, kind="requirement")
   return path
 
 

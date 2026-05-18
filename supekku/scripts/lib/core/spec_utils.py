@@ -130,9 +130,15 @@ def dump_markdown_file_create(
   """Write a NEW artefact at *path*, rendering frontmatter with enum hints.
 
   Routes through `render_frontmatter_for_kind(kind, data=frontmatter)` so
-  enum-comment hints appear inline (POL-001). Errors if *path* already exists.
+  enum-comment hints appear inline (POL-001). For kinds without a registered
+  metadata entry (e.g. spec testing companions, improvement backlog items)
+  falls through to plain `emit_yaml_block` — no hints, but still atomic and
+  consistent with the rest of the create path. Errors if *path* already
+  exists.
   """
+  from spec_driver.core.yaml_emit import emit_yaml_block  # noqa: PLC0415
   from spec_driver.orchestration.templates import (  # noqa: PLC0415
+    UnknownKindError,
     render_frontmatter_for_kind,
   )
 
@@ -140,7 +146,10 @@ def dump_markdown_file_create(
   if path.exists():
     msg = f"refusing to overwrite existing artefact: {path} (use _update)"
     raise FileExistsError(msg)
-  fm_yaml = render_frontmatter_for_kind(kind, data=dict(frontmatter))
+  try:
+    fm_yaml = render_frontmatter_for_kind(kind, data=dict(frontmatter))
+  except UnknownKindError:
+    fm_yaml = emit_yaml_block(dict(frontmatter))
   combined = f"---\n{fm_yaml}\n---\n\n{_normalise_body(body)}"
   _atomic_write(path, combined)
 

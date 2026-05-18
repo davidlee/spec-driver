@@ -20,7 +20,10 @@ from supekku.scripts.lib.core import slugify
 from supekku.scripts.lib.core.ids import next_sequential_id
 from supekku.scripts.lib.core.paths import get_backlog_dir, get_registry_dir
 from supekku.scripts.lib.core.repo import find_repo_root
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
+from supekku.scripts.lib.core.spec_utils import (
+  dump_markdown_file_create,
+  load_markdown_file,
+)
 
 if TYPE_CHECKING:
   from collections.abc import Iterable, Iterator, Mapping
@@ -394,7 +397,7 @@ def create_backlog_entry(
   body = f"# {name}\n\n"
 
   entry_path = entry_dir / f"{entry_id}.md"
-  dump_markdown_file(entry_path, frontmatter, body)
+  dump_markdown_file_create(entry_path, frontmatter, body, kind=kind)
   return entry_path
 
 

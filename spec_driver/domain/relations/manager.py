@@ -6,7 +6,10 @@ from collections.abc import Iterable, Mapping
 from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.core.frontmatter_schema import Relation
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
+from supekku.scripts.lib.core.spec_utils import (
+  dump_markdown_file_update,
+  load_markdown_file,
+)
 
 if TYPE_CHECKING:
   from pathlib import Path
@@ -102,7 +105,7 @@ def add_relation(
     if value is not None:
       new_relation[key] = value
   relations.append(new_relation)
-  dump_markdown_file(path, frontmatter, body)
+  dump_markdown_file_update(path, frontmatter, body)
   return True
 
 
@@ -139,7 +142,7 @@ def remove_relation(path: Path | str, *, relation_type: str, target: str) -> boo
   if len(relations) == initial_len:
     return False
 
-  dump_markdown_file(path, frontmatter, body)
+  dump_markdown_file_update(path, frontmatter, body)
   return True
 
 

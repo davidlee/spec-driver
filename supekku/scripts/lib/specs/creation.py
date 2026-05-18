@@ -24,7 +24,7 @@ from supekku.scripts.lib.core.paths import (
   get_tech_specs_dir,
   get_templates_dir,
 )
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_create
 from supekku.scripts.lib.core.templates import (
   extract_template_body as extract_template_body_fallback,
 )
@@ -166,7 +166,7 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
     kind=config.kind,
     created=today,
   )
-  dump_markdown_file(spec_path, frontmatter, spec_body)
+  dump_markdown_file_create(spec_path, frontmatter, spec_body, kind=config.kind)
 
   test_path: Path | None = None
   if (
@@ -185,7 +185,7 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
       kind="guidance",
       created=today,
     )
-    dump_markdown_file(test_path, test_frontmatter, test_body)
+    dump_markdown_file_create(test_path, test_frontmatter, test_body, kind="guidance")
 
   slug_dir = config.base_dir / "by-slug"
   slug_dir.mkdir(exist_ok=True)

@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from supekku.scripts.lib.core.spec_utils import (  # noqa: E402
-  dump_markdown_file,
+  dump_markdown_file_update,
   load_markdown_file,
 )
 
@@ -32,7 +32,7 @@ def normalise_file(path: Path) -> bool:
   if not fm:
     return False
 
-  dump_markdown_file(path, fm, body)
+  dump_markdown_file_update(path, fm, body)
   normalised = path.read_text(encoding="utf-8")
   return normalised != original
 

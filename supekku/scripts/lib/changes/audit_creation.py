@@ -16,7 +16,7 @@ from supekku.scripts.lib.changes._creation_utils import (
 )
 from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.core.paths import get_audits_dir
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_create
 from supekku.scripts.lib.specs.creation import (
   extract_template_body,
   find_repository_root,
@@ -93,7 +93,7 @@ def create_audit(
   )
 
   audit_path = audit_dir / f"{audit_id}.md"
-  dump_markdown_file(audit_path, frontmatter, body)
+  dump_markdown_file_create(audit_path, frontmatter, body, kind="audit")
   return ChangeArtifactCreated(
     artifact_id=audit_id,
     directory=audit_dir,

@@ -14,7 +14,10 @@ from supekku.scripts.lib.core.frontmatter_metadata import (
   get_frontmatter_metadata,
 )
 from supekku.scripts.lib.core.repo import find_repo_root
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
+from supekku.scripts.lib.core.spec_utils import (
+  dump_markdown_file_update,
+  load_markdown_file,
+)
 
 app = typer.Typer(help="Compact artifact frontmatter", no_args_is_help=True)
 
@@ -71,7 +74,7 @@ def compact_deltas(
     )
 
     if not dry_run:
-      dump_markdown_file(artifact.path, result, body)
+      dump_markdown_file_update(artifact.path, result, body)
 
   if compacted_count == 0:
     typer.echo("No deltas needed compaction.")

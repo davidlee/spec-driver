@@ -22,7 +22,7 @@ from supekku.scripts.lib.changes._creation_utils import (
 from supekku.scripts.lib.changes.lifecycle import STATUS_DRAFT
 from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.core.paths import get_deltas_dir
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_create
 from supekku.scripts.lib.specs.creation import (
   extract_template_body,
   find_repository_root,
@@ -483,7 +483,7 @@ def create_phase(
   if phase_metadata.get("exit_criteria"):
     phase_frontmatter["exit_criteria"] = phase_metadata["exit_criteria"]
 
-  dump_markdown_file(phase_path, phase_frontmatter, phase_body)
+  dump_markdown_file_create(phase_path, phase_frontmatter, phase_body, kind="phase")
 
   # Update plan.overview block with new phase
   try:

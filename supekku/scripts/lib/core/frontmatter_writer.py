@@ -19,7 +19,7 @@ from spec_driver.core.yaml_emit import (
 )
 from spec_driver.core.yaml_emit import emit_yaml_block
 from supekku.scripts.lib.core.spec_utils import (
-  dump_markdown_file,
+  dump_markdown_file_update,
   load_markdown_file,
 )
 
@@ -64,7 +64,7 @@ def update_frontmatter(
   frontmatter_data, body = load_markdown_file(path)
   mutator(frontmatter_data)
   frontmatter_data["updated"] = date.today().isoformat()
-  dump_markdown_file(path, frontmatter_data, body)
+  dump_markdown_file_update(path, frontmatter_data, body)
   return frontmatter_data
 
 
@@ -102,7 +102,7 @@ def update_frontmatter_status(path: Path, status: str) -> bool:
 
   frontmatter_data["status"] = status
   frontmatter_data["updated"] = date.today().isoformat()
-  dump_markdown_file(path, frontmatter_data, body)
+  dump_markdown_file_update(path, frontmatter_data, body)
   return True
 
 
@@ -152,7 +152,7 @@ def update_frontmatter_fields(
     frontmatter_data[key] = value
 
   frontmatter_data["updated"] = date.today().isoformat()
-  dump_markdown_file(path, frontmatter_data, body)
+  dump_markdown_file_update(path, frontmatter_data, body)
 
   updated_keys = set(updates.keys()) & existing_keys
   inserted_keys = set(updates.keys()) - existing_keys

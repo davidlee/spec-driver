@@ -12,7 +12,10 @@ from supekku.cli.common import EXIT_FAILURE, EXIT_SUCCESS
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.paths import get_memory_dir
 from supekku.scripts.lib.core.repo import find_repo_root
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file, load_markdown_file
+from supekku.scripts.lib.core.spec_utils import (
+  dump_markdown_file_update,
+  load_markdown_file,
+)
 from supekku.scripts.lib.decisions.registry import DecisionRegistry
 from supekku.scripts.lib.memory.links import links_to_frontmatter, resolve_all_links
 from supekku.scripts.lib.memory.registry import MemoryRegistry
@@ -281,7 +284,7 @@ def _resolve_single_memory(
       fm["links"] = links_data
     elif has_existing:
       del fm["links"]
-    dump_markdown_file(mem_file, fm, body)
+    dump_markdown_file_update(mem_file, fm, body)
 
 
 def _resolve_memory_links(

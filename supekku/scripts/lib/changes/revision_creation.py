@@ -16,7 +16,7 @@ from supekku.scripts.lib.changes._creation_utils import (
 )
 from supekku.scripts.lib.core.events import record_artifact
 from supekku.scripts.lib.core.paths import get_revisions_dir
-from supekku.scripts.lib.core.spec_utils import dump_markdown_file
+from supekku.scripts.lib.core.spec_utils import dump_markdown_file_create
 from supekku.scripts.lib.specs.creation import (
   extract_template_body,
   find_repository_root,
@@ -89,7 +89,7 @@ def create_revision(
   )
 
   revision_path = revision_dir / f"{revision_id}.md"
-  dump_markdown_file(revision_path, frontmatter, body)
+  dump_markdown_file_create(revision_path, frontmatter, body, kind="revision")
   return ChangeArtifactCreated(
     artifact_id=revision_id,
     directory=revision_dir,

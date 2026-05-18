@@ -117,9 +117,7 @@ def _format_diagnostic(path: Path, error: ValidationError) -> str:
   if error.fix_kind == "rewrite_value" and error.fix_hint:
     hint_line = f"\n  Did you mean: {error.fix_hint}"
   elif error.fix_kind == "rename_key" and error.fix_hint:
-    hint_line = (
-      "\n  Run `spec-driver validate workspace --fix` to canonicalise"
-    )
+    hint_line = "\n  Run `spec-driver validate workspace --fix` to canonicalise"
   return primary + hint_line
 
 

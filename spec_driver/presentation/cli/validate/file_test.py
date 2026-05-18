@@ -68,9 +68,7 @@ class TestPathHandling:
     assert result.exit_code == 2
     assert "binary" in (result.stderr or result.output).lower()
 
-  def test_no_frontmatter_exits_0_with_noop_message(
-    self, tmp_path: Path
-  ) -> None:
+  def test_no_frontmatter_exits_0_with_noop_message(self, tmp_path: Path) -> None:
     plain = _write(tmp_path / "notes.md", "Just prose, no frontmatter.\n")
     result = runner.invoke(app, ["file", str(plain)])
     assert result.exit_code == 0
@@ -231,9 +229,7 @@ body content
     after_second = aliased.read_text(encoding="utf-8")
     assert after_first == after_second  # byte-identical
 
-  def test_rename_key_alias_is_canonicalised_idempotently(
-    self, tmp_path: Path
-  ) -> None:
+  def test_rename_key_alias_is_canonicalised_idempotently(self, tmp_path: Path) -> None:
     # ``annotation`` is a permanent field-name alias for ``nature`` per
     # P01 relations BlockMetadata.field_aliases. This applies to the
     # relations-item nested schema; at the top-level frontmatter, the

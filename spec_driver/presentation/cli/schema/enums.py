@@ -36,11 +36,7 @@ console = Console()
 
 def _controlled_fields(metadata: BlockMetadata) -> dict[str, FieldMetadata]:
   """Return the kind's top-level fields whose ``enum_values`` is non-empty."""
-  return {
-    name: field
-    for name, field in metadata.fields.items()
-    if field.enum_values
-  }
+  return {name: field for name, field in metadata.fields.items() if field.enum_values}
 
 
 def _kinds_with_controlled_vocab() -> dict[str, dict[str, FieldMetadata]]:
@@ -82,9 +78,7 @@ def _list_kind(kind: str) -> int:
     field = controlled[field_name]
     canonical = ", ".join(str(v) for v in (field.enum_values or []))
     alias_count = len(field.aliases) if field.aliases else 0
-    tolerated_count = (
-      len(field.tolerated_aliases) if field.tolerated_aliases else 0
-    )
+    tolerated_count = len(field.tolerated_aliases) if field.tolerated_aliases else 0
     table.add_row(field_name, canonical, str(alias_count), str(tolerated_count))
   console.print(table)
   return EXIT_SUCCESS
@@ -104,9 +98,7 @@ def _show_field(kind: str, field_name: str) -> int:
     return EXIT_FAILURE
 
   console.print(f"[bold]{kind}.{field_name}[/bold]")
-  console.print(
-    f"  Canonical values: {', '.join(str(v) for v in field.enum_values)}"
-  )
+  console.print(f"  Canonical values: {', '.join(str(v) for v in field.enum_values)}")
 
   if field.aliases:
     console.print("  Permanent aliases:")

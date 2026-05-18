@@ -44,10 +44,6 @@ class OldCommandsRemovedTest(unittest.TestCase):
   def setUp(self) -> None:
     self.runner = CliRunner()
 
-  def test_schema_removed(self) -> None:
-    result = self.runner.invoke(app, ["schema", "--help"])
-    assert result.exit_code != 0
-
   def test_skills_removed(self) -> None:
     result = self.runner.invoke(app, ["skills", "--help"])
     assert result.exit_code != 0

@@ -13,11 +13,11 @@ from __future__ import annotations
 import pytest
 from typer.testing import CliRunner
 
-from supekku.cli.main import app
 from spec_driver.presentation.cli.schema.enums import (
   _controlled_fields,
   _kinds_with_controlled_vocab,
 )
+from supekku.cli.main import app
 from supekku.scripts.lib.core.frontmatter_metadata import (
   FRONTMATTER_METADATA_REGISTRY,
 )
@@ -82,14 +82,11 @@ def _parametrise_controlled_fields() -> list[tuple[str, str]]:
 class TestParametricCoverageVACC001:
   """VA-CC-001 — parametric smoke across every Category A controlled-vocab field."""
 
-  @pytest.mark.parametrize(
-    ("kind", "field"), _parametrise_controlled_fields()
-  )
+  @pytest.mark.parametrize(("kind", "field"), _parametrise_controlled_fields())
   def test_every_field_renders_cleanly(self, kind: str, field: str) -> None:
     result = runner.invoke(app, ["schema", "enums", f"{kind}.{field}"])
     assert result.exit_code == 0, (
-      f"{kind}.{field}: exit {result.exit_code}: {result.output} "
-      f"{result.stderr or ''}"
+      f"{kind}.{field}: exit {result.exit_code}: {result.output} {result.stderr or ''}"
     )
     assert f"{kind}.{field}" in result.output
     assert "Canonical values" in result.output

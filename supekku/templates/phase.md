@@ -1,3 +1,15 @@
+---
+id: "{{ phase_id }}"
+name: "{{ plan_id }} Phase {{ phase_number }}"
+slug: "{{ slug }}"
+kind: phase  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
+status: draft  # one of: completed | deferred | draft | in-progress | pending
+created: "{{ today }}"
+updated: "{{ today }}"
+plan: "{{ plan_id }}"
+delta: "{{ delta_id }}"
+---
+
 # Phase N - <Name>
 
 ## 1. Objective

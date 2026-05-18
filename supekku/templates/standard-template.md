@@ -1,3 +1,13 @@
+---
+id: "{{ standard_id }}"
+name: "{{ name }}"
+slug: "{{ slug }}"
+kind: standard  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
+status: draft  # one of: default | deprecated | draft | required
+created: "{{ today }}"
+updated: "{{ today }}"
+---
+
 # {{ standard_id }}: {{ title }}
 
 ## Statement

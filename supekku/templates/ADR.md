@@ -1,3 +1,13 @@
+---
+id: "{{ adr_id }}"
+name: "{{ name }}"
+slug: "{{ slug }}"
+kind: adr  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
+status: draft  # one of: accepted | deprecated | draft | proposed | rejected | revision-required | superseded
+created: "{{ today }}"
+updated: "{{ today }}"
+---
+
 # {{ adr_id }}: {{ title }}
 
 ## Context

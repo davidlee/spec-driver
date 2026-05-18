@@ -1,3 +1,13 @@
+---
+id: "{{ revision_id }}"
+name: "Revision - {{ name }}"
+slug: "{{ slug }}"
+kind: revision  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
+status: draft  # one of: completed | deferred | draft | in-progress | pending
+created: "{{ today }}"
+updated: "{{ today }}"
+---
+
 {{ revision_change_block }}
 
 ## 1. Context

@@ -1,32 +1,11 @@
 ---
-id: AUD-XXX
-kind: audit
-status: draft
-mode: conformance
-delta_ref: DE-XXX
-spec_refs:
-  - SPEC-101
-prod_refs:
-  - PROD-020
-code_scope:
-  - internal/content/**
-audit_window:
-  start: 2024-06-01
-  end: 2024-06-08
-summary: >-
-  Snapshot of how the inspected code aligns with referenced PROD/SPEC artefacts.
-findings:
-  - id: FIND-001
-    description: Content reconciler skips schema enforcement.
-    outcome: drift
-    disposition:
-      status: pending
-      kind: spec_patch
-      refs:
-        - kind: spec
-          ref: SPEC-101
-      drift_refs: []
-      rationale: ""
+id: "{{ audit_id }}"
+name: "Audit - {{ name }}"
+slug: "{{ slug }}"
+kind: audit  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
+status: draft  # one of: completed | deferred | draft | in-progress | pending
+created: "{{ today }}"
+updated: "{{ today }}"
 ---
 
 {{ audit_verification_block }}

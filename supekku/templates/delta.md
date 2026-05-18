@@ -1,3 +1,13 @@
+---
+id: "{{ delta_id }}"
+name: "Delta - {{ name }}"
+slug: "{{ slug }}"
+kind: delta  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
+status: draft  # one of: completed | deferred | draft | in-progress | pending
+created: "{{ today }}"
+updated: "{{ today }}"
+---
+
 # {{ delta_id }} – {{ name }}
 
 {{ delta_relationships_block }}

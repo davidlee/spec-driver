@@ -1,3 +1,13 @@
+---
+id: "{{ spec_id }}"
+name: "{{ name }}"
+slug: "{{ slug }}"
+kind: spec  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
+status: draft  # one of: active | archived | deprecated | draft | stub
+created: "{{ today }}"
+updated: "{{ today }}"
+---
+
 # {{ spec_id }} – {{ name }}
 
 {{ spec_relationships_block }}

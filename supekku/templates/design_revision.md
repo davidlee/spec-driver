@@ -1,3 +1,14 @@
+---
+id: "{{ design_revision_id }}"
+name: "Design Revision - {{ name }}"
+slug: "{{ slug }}"
+kind: design_revision  # one of: audit | delta | design_revision | issue | memory | phase | plan | policy | problem | prod | requirement | risk | spec | standard | task | verification
+status: draft
+created: "{{ today }}"
+updated: "{{ today }}"
+delta_ref: "{{ delta_id }}"
+---
+
 # {{ design_revision_id }} – {{ name }}
 
 ## 1. Executive Summary

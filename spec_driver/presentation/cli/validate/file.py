@@ -29,9 +29,14 @@ from supekku.scripts.lib.blocks.metadata.validator import (
   MetadataValidator,
   ValidationError,
 )
+from supekku.scripts.lib.core.config import (
+  get_strict_map,
+  load_workflow_config,
+)
 from supekku.scripts.lib.core.frontmatter_metadata import (
   FRONTMATTER_METADATA_REGISTRY,
 )
+from supekku.scripts.lib.core.repo import find_repo_root
 from supekku.scripts.lib.core.spec_utils import (
   dump_markdown_file_update,
   load_markdown_file,
@@ -252,10 +257,18 @@ def file_cmd(
     )
     raise typer.Exit(EXIT_FAILURE)
 
+  # F-48: per-kind strict default from workflow.toml; CLI --strict overrides.
+  try:
+    repo_root = find_repo_root(path.parent)
+    strict_map = get_strict_map(load_workflow_config(repo_root))
+  except (OSError, ValueError):
+    strict_map = {}
+  effective_strict = strict or strict_map.get(kind, False)
+
   validator = MetadataValidator(metadata)
   errors = validator.validate(
     frontmatter_data,
-    strict=strict,
+    strict=effective_strict,
     accept_tolerated=not no_tolerated_aliases,
   )
 
@@ -270,7 +283,7 @@ def file_cmd(
 
   has_error_severity = False
   for err in errors:
-    if strict and err.severity == "warning":
+    if effective_strict and err.severity == "warning":
       err = ValidationError(  # noqa: PLW2901
         path=err.path,
         message=err.message,

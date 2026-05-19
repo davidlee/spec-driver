@@ -244,3 +244,47 @@ body content
     assert second.exit_code == 0
     # Clean artefact → no rewrite happens, file stays identical
     assert artefact.read_text(encoding="utf-8") == original
+
+
+class TestF48DispatchPerKindStrict:
+  """F-48: validate file inherits per-kind strict default from workflow.toml."""
+
+  def _aliased_delta(self, repo_root: Path) -> Path:
+    art = repo_root / "DE-006.md"
+    art.write_text(
+      "---\n"
+      "id: DE-006\n"
+      "slug: x\n"
+      "name: x\n"
+      'created: "2026-05-18"\n'
+      'updated: "2026-05-18"\n'
+      "status: complete\n"  # alias for 'completed'
+      "kind: delta\n"
+      "---\n\nbody\n",
+      encoding="utf-8",
+    )
+    return art
+
+  def test_workflow_toml_strict_promotes_alias_warning(self, tmp_path: Path) -> None:
+    """[validation.strict] delta = true ⇒ alias warning ⇒ exit 1 without --strict."""
+    (tmp_path / ".spec-driver").mkdir()
+    (tmp_path / ".spec-driver" / "workflow.toml").write_text(
+      "[validation.strict]\ndelta = true\n",
+      encoding="utf-8",
+    )
+    art = self._aliased_delta(tmp_path)
+    res = runner.invoke(app, ["file", str(art)])
+    assert res.exit_code == 1, res.output + (res.stderr or "")
+
+  def test_workflow_toml_strict_false_keeps_warnings_warnings(
+    self, tmp_path: Path
+  ) -> None:
+    """Default tolerant: alias warning, exit 0."""
+    (tmp_path / ".spec-driver").mkdir()
+    (tmp_path / ".spec-driver" / "workflow.toml").write_text(
+      "[validation.strict]\ndelta = false\n",
+      encoding="utf-8",
+    )
+    art = self._aliased_delta(tmp_path)
+    res = runner.invoke(app, ["file", str(art)])
+    assert res.exit_code == 0, res.output + (res.stderr or "")

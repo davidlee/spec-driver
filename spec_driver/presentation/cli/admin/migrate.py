@@ -16,6 +16,7 @@ held (per DR-137 §9.3).
 from __future__ import annotations
 
 import importlib
+import importlib.util
 import os
 import sys
 import uuid
@@ -33,14 +34,6 @@ from spec_driver.migrations._folder import (
 )
 from spec_driver.migrations._protocol import MigrationStep, StepPreview, StepResult
 from spec_driver.presentation.cli import constants
-from supekku.cli.common import (
-  EXIT_FAILURE,
-  EXIT_PRECONDITION,
-  EXIT_SUCCESS,
-  RootOption,
-)
-from supekku.scripts.lib.core.config import load_workflow_config
-from supekku.scripts.lib.core.repo import find_repo_root
 
 # Path to the directory holding migration step packages. Resolved at
 # call time so tests can monkey-patch via ``importlib.import_module``.
@@ -93,8 +86,7 @@ def _discover_steps(migrations_dir: Path | None = None) -> list[_LoadedStep]:
     parsed = parse_migration_folder(child.name)
     if parsed is None:
       continue
-    module_name = f"{_MIGRATIONS_PACKAGE}.{parsed.name}.migration"
-    module = importlib.import_module(module_name)
+    module = _import_step_module(child, parsed.name)
     step = getattr(module, "step", None)
     if step is None or not isinstance(step, MigrationStep):
       raise RuntimeError(
@@ -106,12 +98,37 @@ def _discover_steps(migrations_dir: Path | None = None) -> list[_LoadedStep]:
   return loaded
 
 
+def _import_step_module(folder: Path, folder_name: str):
+  """Import ``<folder>/migration.py`` as an attribute-addressable module.
+
+  Always file-based via ``importlib.util.spec_from_file_location`` so
+  the orchestrator works uniformly for production steps and tmp_path
+  fixtures. Single-process invocation makes the import-cache benefit
+  marginal.
+  """
+  migration_file = folder / "migration.py"
+  if not migration_file.exists():
+    raise RuntimeError(
+      f"admin migrate: step folder {folder_name} is missing migration.py"
+    )
+  spec = importlib.util.spec_from_file_location(
+    f"_sd_migration.{folder_name}", migration_file
+  )
+  if spec is None or spec.loader is None:
+    raise RuntimeError(f"admin migrate: could not load step at {migration_file}")
+  module = importlib.util.module_from_spec(spec)
+  spec.loader.exec_module(module)
+  return module
+
+
 def _validate_step_kinds(loaded: list[_LoadedStep]) -> None:
   """F-26 / VT-CC-031: fail-fast on unregistered ``applies_to_kind``.
 
   Raises ``typer.Exit(EXIT_FAILURE)`` with the verbatim DR-137 §5.6
   diagnostic on mismatch. No step runs.
   """
+  from supekku.cli.common import EXIT_FAILURE  # noqa: PLC0415 — break import cycle
+
   known = _registered_kinds()
   for entry in loaded:
     kind = entry.step.applies_to_kind
@@ -133,6 +150,10 @@ def _validate_step_kinds(loaded: list[_LoadedStep]) -> None:
 
 
 def _read_last_applied(repo_root: Path) -> str | None:
+  from supekku.scripts.lib.core.config import (  # noqa: PLC0415
+    load_workflow_config,
+  )
+
   config = load_workflow_config(repo_root)
   value = config.get("migrations", {}).get("last_applied")
   if value in (None, ""):
@@ -345,7 +366,16 @@ def migrate(
       help="Artefact kind to sweep, or 'all'. Omit when using --check/--list.",
     ),
   ] = None,
-  root: RootOption = None,
+  root: Annotated[
+    Path | None,
+    typer.Option(
+      "--root",
+      help="Repository root (auto-detected if omitted)",
+      file_okay=False,
+      dir_okay=True,
+      exists=True,
+    ),
+  ] = None,
   check: Annotated[
     bool,
     typer.Option(
@@ -376,6 +406,13 @@ def migrate(
   ] = False,
 ) -> None:
   """Run the migration orchestrator. See DR-137 §5.6 for the full contract."""
+  from supekku.cli.common import (  # noqa: PLC0415 — break import cycle
+    EXIT_FAILURE,
+    EXIT_PRECONDITION,
+    EXIT_SUCCESS,
+  )
+  from supekku.scripts.lib.core.repo import find_repo_root  # noqa: PLC0415
+
   if check and list_:
     typer.echo("admin migrate: --check and --list are mutually exclusive", err=True)
     raise typer.Exit(EXIT_PRECONDITION)

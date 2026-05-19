@@ -376,12 +376,12 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | [x] | 4.6  | Install-time fresh-vs-upgrade trigger in `supekku/cli/install.py` + VT-CC-022 | [P] | Depends on 4.5 |
 | [x] | 4.7  | Ship `spec_driver/presentation/cli/admin/__init__.py` + `migrate.py` orchestrator (discovery + dispatch + kind-filter + log + watermark advance) | [ ] | Depends on 4.2/4.3/4.4 |
 | [x] | 4.8  | Wire `admin migrate` into `supekku/cli/admin.py` user-facing group | [ ] | Depends on 4.7 |
-| [ ] | 4.9  | Lockfile acquisition + PID-liveness diagnostic in orchestrator + VT-CC-029 | [ ] | Depends on 4.7; POSIX-only test branch |
-| [ ] | 4.10 | Kind validation at discovery (fail-fast on unknown applies_to_kind) + VT-CC-031 | [ ] | Depends on 4.7 |
-| [ ] | 4.11 | Per-step idempotency + atomicity (watermark advance only on full pass) + VT-CC-018/019/020/023 | [ ] | Depends on 4.7 |
-| [ ] | 4.12 | Loader → MetadataValidator per-kind strict dispatch (F-48); wire registry strict-map cache + propagate through `validate workspace` / `validate file` | [ ] | Depends on 4.1/4.5 |
+| [x] | 4.9  | Lockfile acquisition + PID-liveness diagnostic in orchestrator + VT-CC-029 | [ ] | Depends on 4.7; POSIX-only test branch |
+| [x] | 4.10 | Kind validation at discovery (fail-fast on unknown applies_to_kind) + VT-CC-031 | [ ] | Depends on 4.7 |
+| [x] | 4.11 | Per-step idempotency + atomicity (watermark advance only on full pass) + VT-CC-018/019/020/023 | [ ] | Depends on 4.7 |
+| [x] | 4.12 | Loader → MetadataValidator per-kind strict dispatch (F-48); wire registry strict-map cache + propagate through `validate workspace` / `validate file` | [ ] | Depends on 4.1/4.5 |
 | [ ] | 4.13 | `pyproject.toml` import-linter `Migrations isolation` contract (verbatim diff per DR-137 §5.6) + VT-CC-021 fixture step + subprocess test | [P] | Independent of orchestrator wire-up |
-| [ ] | 4.14 | `spec-driver admin migrate --check` smoke against this repo's empty inventory; confirm clean exit | [ ] | Phase smoke; depends on 4.7–4.12 |
+| [x] | 4.14 | `spec-driver admin migrate --check` smoke against this repo's empty inventory; confirm clean exit | [ ] | Phase smoke; depends on 4.7–4.12 |
 | [ ] | 4.15 | `just check` + `lint-imports`; reconcile lint + pylint ratchet | [ ] | Phase gate |
 | [ ] | 4.16 | Update `notes.md` + IP-137 progress + commit phase wrap-up | [ ] | `docs(DE-137): IP-137-P04 wrap-up` |
 

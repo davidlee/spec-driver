@@ -153,21 +153,6 @@ schema: supekku.verification.coverage
 version: 1
 subject: PROD-004
 entries:
-  - artefact: VT-001
-    kind: VT
-    requirement: PROD-004.FR-001
-    status: planned
-    notes: Comprehensive test suite covering all registered frontmatter kinds with valid/invalid cases
-  - artefact: VT-002
-    kind: VT
-    requirement: PROD-004.FR-002
-    status: planned
-    notes: Kind-specific validation tests ensuring unique field requirements enforced
-  - artefact: VT-003
-    kind: VT
-    requirement: PROD-004.FR-003
-    status: planned
-    notes: JSON Schema generation tests for all frontmatter kinds
   - artefact: VT-004
     kind: VT
     requirement: PROD-004.FR-004

@@ -7,6 +7,8 @@ from typing import Annotated
 
 import typer
 
+from spec_driver.presentation.cli import constants as cli_constants
+from spec_driver.presentation.cli.admin.migrate import migrate as migrate_cmd
 from supekku.cli import backfill, compact, regenerate_templates, resolve
 
 app = typer.Typer(help="Workspace maintenance commands", no_args_is_help=True)
@@ -19,6 +21,10 @@ app.add_typer(
   name="regenerate-templates",
   help="Regenerate template frontmatter from metadata (IP-137-P02)",
 )
+app.command(
+  cli_constants.ADMIN_MIGRATE,
+  help="Schema-version migration orchestrator (DE-137; DR-137 §5.6).",
+)(migrate_cmd)
 
 
 @app.command()

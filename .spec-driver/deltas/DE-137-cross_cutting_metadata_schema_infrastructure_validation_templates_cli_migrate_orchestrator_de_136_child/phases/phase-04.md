@@ -374,8 +374,8 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | [x] | 4.4  | Ship `spec_driver/migrations/_folder.py` (ParsedFolder + parse_migration_folder) + VT-CC-028 | [P] | Imports MIGRATION_FOLDER_PATTERN from constants.py |
 | [x] | 4.5  | Extend `supekku/scripts/lib/core/config.py::DEFAULT_CONFIG` with `[migrations]`, `[validation.strict]`, `[schema_version]` sections + VT-CC-033 unknown-kind warning | [P] | Independent of orchestrator |
 | [x] | 4.6  | Install-time fresh-vs-upgrade trigger in `supekku/cli/install.py` + VT-CC-022 | [P] | Depends on 4.5 |
-| [ ] | 4.7  | Ship `spec_driver/presentation/cli/admin/__init__.py` + `migrate.py` orchestrator (discovery + dispatch + kind-filter + log + watermark advance) | [ ] | Depends on 4.2/4.3/4.4 |
-| [ ] | 4.8  | Wire `admin migrate` into `supekku/cli/admin.py` user-facing group | [ ] | Depends on 4.7 |
+| [x] | 4.7  | Ship `spec_driver/presentation/cli/admin/__init__.py` + `migrate.py` orchestrator (discovery + dispatch + kind-filter + log + watermark advance) | [ ] | Depends on 4.2/4.3/4.4 |
+| [x] | 4.8  | Wire `admin migrate` into `supekku/cli/admin.py` user-facing group | [ ] | Depends on 4.7 |
 | [ ] | 4.9  | Lockfile acquisition + PID-liveness diagnostic in orchestrator + VT-CC-029 | [ ] | Depends on 4.7; POSIX-only test branch |
 | [ ] | 4.10 | Kind validation at discovery (fail-fast on unknown applies_to_kind) + VT-CC-031 | [ ] | Depends on 4.7 |
 | [ ] | 4.11 | Per-step idempotency + atomicity (watermark advance only on full pass) + VT-CC-018/019/020/023 | [ ] | Depends on 4.7 |

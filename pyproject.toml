@@ -240,6 +240,7 @@ min-public-methods = 2
 
 [tool.importlinter]
 root_package = "spec_driver"
+include_external_packages = true
 
 [[tool.importlinter.contracts]]
 name = "Architectural Layers"
@@ -261,6 +262,19 @@ layers = [
     "spec_driver.domain.registries",
     "spec_driver.domain.records",
     "spec_driver.domain.lifecycle",
+]
+
+[[tool.importlinter.contracts]]
+name = "Migrations isolation"
+type = "forbidden"
+source_modules = ["spec_driver.migrations"]
+forbidden_modules = [
+    "spec_driver.core",
+    "spec_driver.models",
+    "spec_driver.domain",
+    "spec_driver.orchestration",
+    "spec_driver.presentation",
+    "supekku",
 ]
 
 

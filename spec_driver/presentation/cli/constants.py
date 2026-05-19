@@ -10,7 +10,10 @@ Reference: DR-137 §5.4 "CLI vocabulary constants (F-16, POL-002)".
 
 from __future__ import annotations
 
-import re
+# Re-exported from the migrations subsystem so the CLI vocabulary stays
+# in sync with the canonical definition (Migrations isolation contract
+# forbids the reverse direction).
+from spec_driver.migrations._folder import MIGRATION_FOLDER_PATTERN
 
 # ---------------------------------------------------------------------------
 # Subcommand names
@@ -40,12 +43,9 @@ FLAG_CHECK = "--check"
 FLAG_LIST = "--list"
 
 # ---------------------------------------------------------------------------
-# Migration artefact paths and patterns (reserved for IP-137-P04)
+# Migration artefact paths and patterns (IP-137-P04)
+# MIGRATION_FOLDER_PATTERN re-exported above; log/lock paths owned here.
 # ---------------------------------------------------------------------------
-MIGRATION_FOLDER_PATTERN: re.Pattern[str] = re.compile(
-  r"^v(?P<major>\d+)_(?P<minor>\d+)_(?P<patch>\d+)"
-  r"_(?P<ordinal>\d+)_(?P<slug>[a-z0-9_]+)$"
-)
 MIGRATION_LOG_PATH = ".spec-driver/run/migrations/{timestamp}-{step}.md"
 MIGRATION_LOCK_PATH = ".spec-driver/run/migrations/.lock"
 

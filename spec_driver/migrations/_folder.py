@@ -7,11 +7,19 @@ package identifier (starts with letter; no dots/dashes). Sort key
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from packaging.version import Version
 
-from spec_driver.presentation.cli.constants import MIGRATION_FOLDER_PATTERN
+# Single source of truth for the migration folder name pattern. The
+# presentation-layer constants module re-exports this so CLI vocabulary
+# stays consistent without breaking the Migrations isolation contract
+# (migrations may not import from presentation).
+MIGRATION_FOLDER_PATTERN: re.Pattern[str] = re.compile(
+  r"^v(?P<major>\d+)_(?P<minor>\d+)_(?P<patch>\d+)"
+  r"_(?P<ordinal>\d+)_(?P<slug>[a-z0-9_]+)$"
+)
 
 
 @dataclass(frozen=True)

@@ -1,5 +1,144 @@
 # Notes for DE-137
 
+## 2026-05-19 — IP-137-P04 task 4.1 — pre-flight audit
+
+Baseline: `pytest` 5217 pass + 4 skip; `uvx import-linter lint` shows 2
+contracts KEPT (Architectural Layers, Domain Internal Layers).
+
+### F-48 MetadataValidator construction-site inventory
+
+**Frontmatter dispatch (in scope for F-48 per-kind strict_map):**
+
+- `spec_driver/presentation/cli/validate/file.py:255` — already
+  consumes `strict`/`accept_tolerated` from CLI flags. F-48 plumbing
+  in P04 task 4.12 wires a `get_strict_map(config)` default so the
+  CLI flag is the override, not the only source of truth.
+
+**Block validators (module-level metadata-block schemas; NOT
+frontmatter; out of F-48 scope):**
+
+- `supekku/scripts/lib/blocks/delta_metadata.py:173` —
+  `_DELTA_RELATIONSHIPS_VALIDATOR`
+- `supekku/scripts/lib/blocks/revision_metadata.py:437` —
+  `_REVISION_CHANGE_VALIDATOR`
+- `supekku/scripts/lib/blocks/spec_metadata.py:215,217` —
+  `_SPEC_RELATIONSHIPS_VALIDATOR`, `_SPEC_CAPABILITIES_VALIDATOR`
+- `supekku/scripts/lib/workflow/state_io.py:37` — `_VALIDATOR`
+- `supekku/scripts/lib/workflow/review_io.py:79,80` —
+  `_INDEX_VALIDATOR`, `_FINDINGS_VALIDATOR`
+- `supekku/scripts/lib/workflow/handoff_io.py:38` — `_VALIDATOR`
+- `supekku/scripts/lib/blocks/metadata/snapshot_compare.py:177` —
+  passes `strict=True` (CI gate).
+
+Rationale: these validate metadata BLOCKS embedded in markdown
+bodies (e.g. `delta.relationships`, `workflow.state`,
+`workflow.handoff`), not artefact frontmatter. They are not in the
+per-kind frontmatter strict_map dispatch path.
+
+**Workspace load path (intentional deferred):**
+
+`WorkspaceValidator` at `supekku/scripts/lib/validation/validator.py:55`
+performs cross-reference validation only — it does NOT construct
+`MetadataValidator` per artefact at load time. P03 notes deviation
+#1 documented this: per-kind frontmatter sweep through `validate
+workspace` is a ~200-400 LOC loader refactor deferred to
+DE-138..142 (per-artefact sibling deltas). P04 ships the F-48
+plumbing (strict_map cache + `validate file` integration) but does
+NOT extend the workspace load path itself.
+
+### Install entry-point reconnaissance (DEC-137-18)
+
+`supekku/scripts/install.py::initialize_workspace` (line 660) is
+the single install entry. workflow.toml creation happens at
+`line 759`: `if not workflow_toml.exists(): workflow_toml.write_text
+(generate_default_workflow_toml(exec_cmd))`. `.spec-driver/`
+directories are created at lines 694–721 via
+`full_path.mkdir(parents=True, exist_ok=True)` unconditionally.
+
+DEC-137-18 trigger is `.spec-driver/` workspace directory presence
+*at install time*. Implementation: snapshot
+`(target_root / SPEC_DRIVER_DIR).exists()` at function entry —
+BEFORE the mkdir loop — store as `_fresh_install` boolean. Pass
+into `generate_default_workflow_toml` (or a helper) so the
+`[validation.strict]` defaults branch.
+
+### Dependency check
+
+- `packaging>=23` (used by `_folder.py` `Version` sort key):
+  currently transitive via pytest only; need to add to `[project]
+  dependencies` explicitly during task 4.4.
+- `import-linter==2.11`: already a project dep; DR-137 §5.6
+  prototype output matches running version.
+
+### Existing import-linter config
+
+`pyproject.toml:240-263` carries `[tool.importlinter] root_package
+= "spec_driver"` plus two `layers` contracts (Architectural
+Layers, Domain Internal Layers). P04 task 4.13 inserts
+`include_external_packages = true` at the block top and adds the
+third `forbidden` contract per DR-137 §5.6 verbatim.
+
+## 2026-05-19 — IP-137-P04 entry: phase-04 sheet drafted via `/plan-phases`
+
+### Plan-phases handoff
+
+- P03 closed cleanly (commit `c91746d0`; 5217 pytest pass, ruff
+  clean, pylint 9.69 baseline). DR-137 v3.1 remains authoritative;
+  §5.6 (`admin migrate` orchestrator + `workflow.toml` + import-linter)
+  is the design source for P04. No re-litigation needed.
+- `phases/phase-04.md` drafted: 16 numbered tasks (4.1 pre-flight
+  `MetadataValidator(...)` construction-site audit ⇒ 4.16 wrap-up).
+  Covers VT-CC-018, 019, 020, 021, 022, 023, 028, 029, 031, 033.
+  Active phase pointer flipped in IP-137 §5.
+- Hand-off facts from P03 carried into P04:
+  - `spec_driver/presentation/cli/constants.py` already ships
+    `MIGRATION_FOLDER_PATTERN`, `MIGRATION_LOG_PATH`,
+    `MIGRATION_LOCK_PATH` — P04 imports.
+  - `spec-driver schema` is a top-level Typer group (available if
+    migrate needs a future introspection surface; low priority for
+    P04).
+  - `validate workspace --fix` per-kind sweep deferred to DE-138..142;
+    F-48 dispatch plumbing (this phase) is independent of that.
+  - `validate workspace` exits 0 on baseline warnings (F-32);
+    Justfile `validate:` recipe inherits this. P04 acceptance gate
+    runs `--strict` where fail-on-warning semantics needed.
+- Existing CLI shape relevant to P04:
+  - `supekku/cli/admin.py:12-19` — admin Typer group
+    (`no_args_is_help=True`); existing `regenerate-templates`
+    `add_typer` wire-up is the template for `migrate` registration.
+  - `supekku/scripts/lib/core/config.py::DEFAULT_CONFIG` — target
+    of `[migrations]`/`[validation.strict]`/`[schema_version]`
+    additions (task 4.5).
+  - `pyproject.toml` — `import-linter>=2.11` already a dep;
+    existing `[tool.importlinter]` block carries the Architectural
+    Layers contract; P04 adds the second `Migrations isolation`
+    contract per DR-137 §5.6 verbatim diff plus
+    `include_external_packages = true`.
+  - `spec_driver/migrations/` and `spec_driver/presentation/cli/admin/`
+    do NOT exist yet; P04 creates both as new top-level packages
+    under their respective trees.
+- DR-137 §5.6 verbatim wording carried into the phase sheet:
+  - `MigrationStep` Protocol shape (singular `applies_to_kind: str`;
+    `BaseMigrationStep` default `applies_to ⇒ True`).
+  - `_helpers.py` API (`split_frontmatter`, `atomic_write`,
+    `replace_in_frontmatter_block`); frozen-forever per F-20 / F-35.
+  - Discovery walk + dispatch loop semantics; lockfile content
+    (PID + ISO timestamp + uuid); watermark advance only after
+    full pass.
+  - DEC-137-18 install fresh-vs-upgrade trigger by `.spec-driver/`
+    workspace directory presence (NOT workflow.toml presence).
+  - F-48 loader dispatch through registry-cached `strict_map`.
+  - F-47 unknown-kind warning verbatim:
+    `workflow.toml [validation.strict]: unknown kind 'foo'; ignored`.
+  - Import-linter `Migrations isolation` contract verbatim
+    `source_modules` / `forbidden_modules` per DR-137 §5.6 diff.
+- Pre-flight audit (task 4.1) is the gate task before code lands;
+  protects against the "strict toggle inert" risk that lives at
+  every F-48 dispatch site.
+- Phase-04 status: `draft` — ready for `/execute-phase`. Task 4.1
+  (`MetadataValidator(...)` construction-site grep + install
+  entry-point reconnaissance) is the first action.
+
 ## 2026-05-18 — IP-137-P03 complete (validate Typer group + schema enums + ripple)
 
 ### Summary

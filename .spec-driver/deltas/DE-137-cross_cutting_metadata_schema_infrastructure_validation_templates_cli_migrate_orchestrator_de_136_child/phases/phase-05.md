@@ -4,7 +4,7 @@ slug: "137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli
 name: IP-137 Phase 05 - Skill gates + acceptance + closure
 created: "2026-05-19"
 updated: "2026-05-19"
-status: draft
+status: completed
 kind: phase
 plan: IP-137
 delta: DE-137
@@ -219,15 +219,15 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Status | ID  | Description | Parallel? | Notes |
 | ------ | --- | --- | --- | --- |
-| [ ] | 5.1 | Pre-flight: locate insertion targets in 5 SKILL.md files; confirm installed-copy parity baseline | [ ] | Reads only; documents drift in notes.md |
-| [ ] | 5.2 | Insert verbatim gate text + anchor markers into 5 `supekku/skills/<skill>/SKILL.md` files | [P] | One commit per skill, or one bundled |
-| [ ] | 5.3 | Sync installed copies (`spec-driver sync` or equivalent); verify `.spec-driver/skills/` reflects source | [ ] | Depends on 5.2 |
-| [ ] | 5.4 | Ship VT-CC-027 (`tests/supekku/skills/validate_gate_test.py`) | [P] | Parametrised; depends on 5.2 |
-| [ ] | 5.5 | Reconcile PROD-004 coverage blocks (FR-001/-002/-003/-006 → `verified` for DE-137 VTs) | [P] | Mirror IP-137 `verification.coverage`; independent of skill edits |
-| [ ] | 5.6 | Flip VT-CC-027 to `verified` in IP-137 `verification.coverage` after 5.4 passes | [ ] | Depends on 5.4 |
-| [ ] | 5.7 | Acceptance gate: `just check` + `uv run lint-imports` + `uv run spec-driver validate workspace` | [ ] | Depends on 5.2/5.3/5.4/5.5 |
-| [ ] | 5.8 | Close: `uv run spec-driver complete delta DE-137` (without `--force`) | [ ] | Depends on 5.7 |
-| [ ] | 5.9 | Phase + delta wrap-up: notes.md evidence; IP-137 §9 progress boxes; final commit | [ ] | `docs(DE-137): IP-137-P05 wrap-up` |
+| [x] | 5.1 | Pre-flight: locate insertion targets in 5 SKILL.md files; confirm installed-copy parity baseline | [ ] | notes.md 2026-05-19 task 5.1 entry |
+| [x] | 5.2 | Insert verbatim gate text + anchor markers into 5 `supekku/skills/<skill>/SKILL.md` files | [P] | commit e6b0bde2 |
+| [x] | 5.3 | Sync installed copies via `sync_skills(repo_root)`; parity verified | [ ] | bundled with 5.2 commit |
+| [x] | 5.4 | Ship VT-CC-027 (`supekku/scripts/lib/skills/validate_gate_test.py`) | [P] | 5/5 cases passing; commit e6b0bde2 |
+| [x] | 5.5 | Reconcile PROD-004 coverage blocks (FR-001/-002/-003/-006 → `verified` for DE-137 VTs); remove stale VT-001/-002/-003 stubs | [P] | commit 4906c163 + c85a16aa |
+| [x] | 5.6 | Flip VT-CC-027 to `verified` in IP-137 `verification.coverage` after 5.4 passes | [ ] | commit 4906c163 |
+| [x] | 5.7 | Acceptance gate: pytest + ruff + lint-imports + validate workspace | [ ] | All green; notes.md task 5.7 evidence |
+| [x] | 5.8 | Audit (AUD-026) + ISSUE-056 + close: `complete delta DE-137 --skip-sync` (no `--force`) | [ ] | RE-041 completion revision created; DE-137 status: completed |
+| [x] | 5.9 | Phase + delta wrap-up: notes.md evidence; IP-137 §9 progress boxes; final commit | [ ] | this commit |
 
 ### Task Details
 
@@ -476,17 +476,20 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria (all bullets in §4) satisfied.
-- [ ] Verification evidence stored in `notes.md` (VT-CC-027 pass
-  output; `just check` summary; `lint-imports` both KEPT;
-  `validate workspace` output; PROD-004 diff; `complete delta`
-  output).
-- [ ] IP-137 §9 progress boxes ticked: IP-137-P05; VT-CC-001..034
+- [x] Exit criteria (all bullets in §4) satisfied.
+- [x] Verification evidence stored in `notes.md` (VT-CC-027 pass
+  output; pytest/ruff/lint-imports/validate workspace summary;
+  PROD-004 diff via commits; `complete delta` output).
+- [x] IP-137 §9 progress boxes ticked: IP-137-P05; VT-CC-001..034
   + VA-CC-001 (final state); PROD-004 coverage reconciled;
   `complete delta DE-137` succeeded.
-- [ ] DE-137 frontmatter `status: completed` (set by CLI in 5.8).
-- [ ] OQ-137-02 + OQ-137-03 dispositioned (resolved or
-  follow-up filed).
-- [ ] Hand-off note in `notes.md` summarising what DE-138..142
+- [x] DE-137 frontmatter `status: completed` (set by CLI in 5.8).
+- [x] OQ-137-02 dispositioned (tolerated_drift via AUD-026
+  FIND-012; DR-137 §10 authoritative record).
+- [x] OQ-137-03 dispositioned (aligned via AUD-026 FIND-013;
+  deferral conditions held; no CI-consumer demand).
+- [x] FIND-010 filed as ISSUE-056 for post-closure attention.
+- [x] Hand-off note in `notes.md` summarising what DE-138..142
   inherit from DE-137 infrastructure (per-kind strict map, admin
-  migrate orchestrator, validate Typer group, skill gates).
+  migrate orchestrator, validate Typer group + --kind sweep,
+  schema enums CLI, skill validate-gates).

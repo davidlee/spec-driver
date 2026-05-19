@@ -744,7 +744,7 @@ requirements:
     primary_spec: PROD-004
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -757,10 +757,78 @@ requirements:
     - DE-142
     verified_by: []
     coverage_evidence:
-    - VT-001
+    - VT-CC-001
+    - VT-CC-002
+    - VT-CC-003
+    - VT-CC-004
+    - VT-CC-005
+    - VT-CC-006
+    - VT-CC-007
+    - VT-CC-018
+    - VT-CC-019
+    - VT-CC-020
+    - VT-CC-021
+    - VT-CC-022
+    - VT-CC-023
+    - VT-CC-024
+    - VT-CC-028
+    - VT-CC-029
+    - VT-CC-031
+    - VT-CC-033
     coverage_entries:
-    - artefact: VT-001
-      status: planned
+    - artefact: VT-CC-001
+      status: verified
+      kind: VT
+    - artefact: VT-CC-002
+      status: verified
+      kind: VT
+    - artefact: VT-CC-003
+      status: verified
+      kind: VT
+    - artefact: VT-CC-004
+      status: verified
+      kind: VT
+    - artefact: VT-CC-005
+      status: verified
+      kind: VT
+    - artefact: VT-CC-006
+      status: verified
+      kind: VT
+    - artefact: VT-CC-007
+      status: verified
+      kind: VT
+    - artefact: VT-CC-024
+      status: verified
+      kind: VT
+    - artefact: VT-CC-018
+      status: verified
+      kind: VT
+    - artefact: VT-CC-019
+      status: verified
+      kind: VT
+    - artefact: VT-CC-020
+      status: verified
+      kind: VT
+    - artefact: VT-CC-021
+      status: verified
+      kind: VT
+    - artefact: VT-CC-022
+      status: verified
+      kind: VT
+    - artefact: VT-CC-023
+      status: verified
+      kind: VT
+    - artefact: VT-CC-028
+      status: verified
+      kind: VT
+    - artefact: VT-CC-029
+      status: verified
+      kind: VT
+    - artefact: VT-CC-031
+      status: verified
+      kind: VT
+    - artefact: VT-CC-033
+      status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-002:
@@ -771,7 +839,7 @@ requirements:
     primary_spec: PROD-004
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -784,10 +852,50 @@ requirements:
     - DE-142
     verified_by: []
     coverage_evidence:
-    - VT-002
+    - VT-CC-008
+    - VT-CC-009
+    - VT-CC-010
+    - VT-CC-011
+    - VT-CC-012
+    - VT-CC-013
+    - VT-CC-014
+    - VT-CC-017
+    - VT-CC-025
+    - VT-CC-030
+    - VT-CC-034
     coverage_entries:
-    - artefact: VT-002
-      status: planned
+    - artefact: VT-CC-008
+      status: verified
+      kind: VT
+    - artefact: VT-CC-009
+      status: verified
+      kind: VT
+    - artefact: VT-CC-010
+      status: verified
+      kind: VT
+    - artefact: VT-CC-011
+      status: verified
+      kind: VT
+    - artefact: VT-CC-012
+      status: verified
+      kind: VT
+    - artefact: VT-CC-013
+      status: verified
+      kind: VT
+    - artefact: VT-CC-014
+      status: verified
+      kind: VT
+    - artefact: VT-CC-017
+      status: verified
+      kind: VT
+    - artefact: VT-CC-025
+      status: verified
+      kind: VT
+    - artefact: VT-CC-030
+      status: verified
+      kind: VT
+    - artefact: VT-CC-034
+      status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-003:
@@ -798,7 +906,7 @@ requirements:
     primary_spec: PROD-004
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
@@ -807,10 +915,22 @@ requirements:
     - DE-139
     verified_by: []
     coverage_evidence:
-    - VT-003
+    - VT-CC-016
+    - VT-CC-026
+    - VT-CC-027
+    - VT-CC-032
     coverage_entries:
-    - artefact: VT-003
-      status: planned
+    - artefact: VT-CC-016
+      status: verified
+      kind: VT
+    - artefact: VT-CC-026
+      status: verified
+      kind: VT
+    - artefact: VT-CC-027
+      status: verified
+      kind: VT
+    - artefact: VT-CC-032
+      status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-004:
@@ -863,15 +983,23 @@ requirements:
     primary_spec: PROD-004
     kind: functional
     category: null
-    status: pending
+    status: active
     tags: []
     introduced: null
     implemented_by:
     - DE-136
     - DE-137
     verified_by: []
-    coverage_evidence: []
-    coverage_entries: []
+    coverage_evidence:
+    - VA-CC-001
+    - VT-CC-015
+    coverage_entries:
+    - artefact: VT-CC-015
+      status: verified
+      kind: VT
+    - artefact: VA-CC-001
+      status: verified
+      kind: VA
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.FR-007:
     label: FR-007

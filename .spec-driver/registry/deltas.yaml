@@ -13550,11 +13550,11 @@ deltas:
         phase: IP-136-P04
   DE-137:
     kind: delta
-    status: draft
+    status: completed
     name: 'Delta - Cross-cutting metadata schema infrastructure: validation+templates+CLI+migrate
       orchestrator (DE-136 child)'
     slug: cross_cutting_metadata_schema_infrastructure_validation_templates_cli_migrate_orchestrator_de_136_child
-    updated: '2026-05-09'
+    updated: '2026-05-19'
     path: .spec-driver/deltas/DE-137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli_migrate_orchestrator_de_136_child/DE-137.md
     applies_to:
       specs:
@@ -13588,6 +13588,57 @@ deltas:
       attributes:
         nature: Authoring-time YAML-error feedback gap closes via `validate file <path>`
           deliverable
+    plan:
+      id: IP-137
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-137
+        delta: DE-137
+        revision_links:
+          aligns_with:
+          - DR-137
+        specs:
+          primary:
+          - PROD-004
+          - SPEC-114
+          - SPEC-116
+          - SPEC-125
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-004.FR-001
+          - PROD-004.FR-002
+          - PROD-004.FR-003
+          - PROD-004.FR-006
+          dependencies: []
+        phases:
+        - id: IP-137-P01
+        - id: IP-137-P02
+        - id: IP-137-P03
+        - id: IP-137-P04
+        - id: IP-137-P05
+      phases:
+      - plan: IP-137
+        delta: DE-137
+        phase: IP-137-P01
+        status: completed
+      - plan: IP-137
+        delta: DE-137
+        phase: IP-137-P02
+        status: completed
+      - plan: IP-137
+        delta: DE-137
+        phase: IP-137-P03
+        status: completed
+      - plan: IP-137
+        delta: DE-137
+        phase: IP-137-P04
+        status: completed
+      - plan: IP-137
+        delta: DE-137
+        phase: IP-137-P05
+        status: draft
   DE-138:
     kind: delta
     status: draft

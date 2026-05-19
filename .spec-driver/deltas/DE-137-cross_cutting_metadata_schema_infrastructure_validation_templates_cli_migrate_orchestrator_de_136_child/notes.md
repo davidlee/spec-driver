@@ -1,5 +1,123 @@
 # Notes for DE-137
 
+## 2026-05-19 — IP-137-P05 complete + DE-137 closed
+
+### Summary
+
+All 9 tasks of IP-137-P05 landed. Phase exits with full pytest green
+(5286 passed, 4 skipped; P04 baseline 5281 + 5 new VT-CC-027 cases),
+ruff clean, format clean, lint-imports 3/3 contracts KEPT, pylint
+10.00/10 on new file, `validate workspace` baseline-identical (8
+pre-existing audit-gate warnings; DE-137's self-cleared on AUD-026
+completion).
+
+DE-137 closed via `uv run spec-driver complete delta DE-137
+--skip-sync` without `--force`. CLI created RE-041
+(`.spec-driver/revisions/RE-041-delta_de_137_completion/`) as the
+completion revision. DE-137 frontmatter `status: completed`.
+
+| VT | Location | Status |
+|---|---|---|
+| VT-CC-027 (skill validate-gate marker regression) | `supekku/scripts/lib/skills/validate_gate_test.py` (5 parametric cases) | verified |
+
+### Acceptance gate (task 5.7)
+
+```
+uv run python -m pytest          → 5286 passed, 4 skipped, 32 warnings in 171.76s
+uv run ruff check supekku        → All checks passed!
+uv run ruff format supekku       → 467 files left unchanged
+uvx import-linter lint           → 3 contracts KEPT (Architectural Layers, Domain Internal Layers, Migrations isolation)
+uv run python -m supekku.scripts.pylint_report supekku/scripts/lib/skills/validate_gate_test.py
+                                 → Score: 10.00/10, 0 messages
+uv run spec-driver validate workspace → 8 audit-gate warnings (DE-135..142); baseline-identical to P03/P04
+```
+
+### Closure ceremony (task 5.8)
+
+```
+uv run spec-driver complete delta DE-137 --skip-sync
+  → ✓ Created completion revision: RE-041
+  → Delta DE-137 completed successfully
+```
+
+Coverage check passed after PROD-004 stub removal (FIND-006: VT-001/
+-002/-003 placeholders deleted; pre-DE-137 stubs superseded by
+DE-137 VT-CC-001..034 entries). Audit gate passed after AUD-026
+findings dispositioned (FIND-010 → ISSUE-056 follow_up_backlog;
+FIND-012 → tolerated_drift with DR-137 §10 rationale).
+
+### Architecture wins
+
+1. **VT-CC-027 anchor-marker design pays off.** Regex assertion is
+   structural (`<!-- validate-gate:<skill> begin --> .. end -->` +
+   command substring inside), not full-text. Future prose tweaks
+   inside the gate survive; structural removal does not.
+2. **Sync flow handles all three target dirs uniformly.**
+   `sync_skills(target_root)` propagates source edits to
+   `.spec-driver/skills/`, `.claude/skills/`, `.agents/skills/` in
+   one pass. The execute-phase preamble drift (pre-existing) was
+   resolved by the same call.
+3. **PROD-004 stub cleanup unblocks DE-138..142.** Removing the
+   bare VT-001/-002/-003 placeholders means sibling deltas can
+   append their own VT entries without the coverage check
+   ambiguity that blocked DE-137 close on first attempt.
+
+### Decisions during P05
+
+- **Skill source edits, not installed-copy edits.** Source of truth
+  per DR-137 §10 is `supekku/skills/`. Pre-existing execute-phase
+  preamble in installed copies (~10 lines absent from source) was
+  duplicative guidance; sync overwrite accepted. Documented as
+  FIND-009 in AUD-026.
+- **VT-001/-002/-003 stub removal (not status flip).** The
+  placeholders pointed at "comprehensive test suite covering all
+  registered frontmatter kinds" — broader than DE-137 scope.
+  Flipping them to `verified` would have been dishonest; per-kind
+  sweep verification is genuinely owed by DE-138..142. Removal
+  recognises supersession; sibling deltas will append their own
+  entries. Documented as FIND-006 in AUD-026.
+- **ISSUE-056 filed for FIND-010 (workflow.toml install-version
+  drift).** Cosmetic cross-workspace concern; resolution requires
+  install-side change (out of DE-137 code surface).
+- **OQ-137-02 dispositioned as tolerated_drift, not follow_up_delta.**
+  Sunset target is a future-versioning decision (next major version
+  cut). Tracked in DR-137 §10 as the authoritative record; AUD-026
+  FIND-012 captures the disposition.
+
+### Hand-off note
+
+DE-137 closed; sibling deltas DE-138..142 inherit a complete
+infrastructure surface:
+
+- **Per-kind strict_map.** `workflow.toml [validation.strict] <kind>
+  = true/false` flows through registry → MetadataValidator per-kind
+  dispatch (F-48). Sibling deltas wire each kind's strict flip
+  alongside their per-artefact sweep.
+- **`admin migrate <kind>` orchestrator.** Empty inventory today;
+  sibling deltas drop step folders under `spec_driver/migrations/
+  v0_10_0_NNN_*/` and the dispatch loop picks them up.
+- **`validate workspace --kind <kind> --strict` sweep semantics.**
+  Post-migration verification: zero warnings under the kind even
+  while other kinds remain unmigrated (VT-CC-025 covers).
+- **Skill validate-gates at lifecycle moments.** `execute-phase`,
+  `close-change`, `audit-change`, `notes`, `update-delta-docs` now
+  carry verbatim gate text + F-23 anchors. Sibling deltas inherit
+  the gate discipline without further skill edits.
+- **`schema enums [kind[.field]]` CLI.** Self-describing
+  controlled-vocab inspection across all Category-A fields.
+
+DE-138..142 may open their DRs whenever ready. Their DRs are NOT
+pre-drafted (per IP-137 §10) — each opens its own DR consuming
+DE-137 infrastructure.
+
+### Commits on this run
+
+- e6b0bde2 — feat(DE-137): skill validate-gates + VT-CC-027 (tasks 5.2/5.3/5.4)
+- 4906c163 — docs(DE-137): IP-137-P05 sheet + PROD-004 coverage + VT-CC-027 verify (tasks 5.1/5.5/5.6)
+- c85a16aa — docs(DE-137): AUD-026 conformance audit + PROD-004 stub removal
+- e5a163a2 — docs(DE-137): file ISSUE-056 + reconcile AUD-026 pending findings
+- (this commit) — wrap-up + DE-137 closure registry updates
+
 ## 2026-05-19 — IP-137-P05 start (task 5.1 reconnaissance)
 
 ### Workflow.toml version triage

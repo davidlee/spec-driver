@@ -42,6 +42,11 @@ Process:
    - `follow_up_delta` or `follow_up_backlog` when owned future work is the correct route
    - `tolerated_drift` only when posture allows explicit unresolved drift with rationale
    - do not leave closure-grade findings undispositioned
+
+<!-- validate-gate:audit-change begin -->
+Run `spec-driver validate file <audit.md>` to confirm finding/disposition matrix integrity before submission.
+<!-- validate-gate:audit-change end -->
+
 7. Route every non-aligned finding back into authoritative specs in this order:
    - choose `spec_patch` when the current owning spec is still the right authority surface and the fix stays inside that scope
    - choose `revision` when authority, requirement ownership, or cross-spec lineage must move, or when a simple patch would hide why the truth changed

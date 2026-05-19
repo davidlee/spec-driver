@@ -25,3 +25,7 @@ be concise, but record:
 If the note identifies a reusable fact/pattern/gotcha that would save a future
 agent meaningful time, run `/capturing-memory` or `/maintaining-memory` before
 you treat the task, phase, or delta as wrapped.
+
+<!-- validate-gate:notes begin -->
+Run `spec-driver validate file <touched-artefact>` if the note's edit modified frontmatter or block content.
+<!-- validate-gate:notes end -->

@@ -34,6 +34,8 @@ Read in order:
 3. `IP-XXX.md` — phase overview, verification coverage
 4. Active phase sheet(s) — task breakdown, exit criteria
 
+If the delta still says `draft`, immediately change it to `in-progress` (`spec-driver edit delta DE-123 --status in-progress`).
+
 If no phase sheet exists for the next phase, stop and run `/plan-phases`.
 
 ## 2. Analyse tasks

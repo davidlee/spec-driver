@@ -25,6 +25,10 @@ Process:
    - Apply the repo's commit policy from doctrine so `.spec-driver` workflow
      artefacts are committed in small, clean increments rather than silently
      accumulating while waiting for a perfect code/workflow split
+<!-- validate-gate:close-change begin -->
+Run `spec-driver validate workspace` over the workspace and `spec-driver sync` to refresh contracts/indices. Both must succeed (or have explicit drift entries) before close.
+<!-- validate-gate:close-change end -->
+
 2. Preview:
    - `uv run spec-driver complete delta DE-XXX --dry-run`
 3. Complete:

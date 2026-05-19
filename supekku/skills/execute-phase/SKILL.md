@@ -44,6 +44,10 @@ Process:
     and notes once more for missed memory-capture candidates.
 13. When exit criteria are met, hand off to `/audit-change` for verification and spec reconciliation.
 
+<!-- validate-gate:execute-phase begin -->
+Run `spec-driver validate file <phase-sheet.md>` before transitioning the phase to `completed`. Validation failures must be resolved or filed as drift before close.
+<!-- validate-gate:execute-phase end -->
+
 Outcomes:
 
 - Phase objectives are implemented with traceable evidence.

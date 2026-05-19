@@ -42,6 +42,11 @@ Process:
 4. Update `DE-XXX.md` if execution changed scope, dependencies, risks, or tracked open questions.
 5. Update `DR-XXX.md` if execution changed design intent, tradeoffs, or code-impact assumptions.
 6. Ensure `notes.md` remains consistent with the structured artefacts, but do not duplicate every detail.
+
+<!-- validate-gate:update-delta-docs begin -->
+Run `spec-driver validate file` against each updated artefact (delta, DR, IP, phase) to confirm metadata consistency.
+<!-- validate-gate:update-delta-docs end -->
+
 7. If the required doc changes imply a broader design/workflow change than the active phase assumed, stop and `/consult`.
 
 Outcomes:

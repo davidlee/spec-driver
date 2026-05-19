@@ -4,7 +4,7 @@ slug: "137-cross_cutting_metadata_schema_infrastructure_validation_templates_cli
 name: IP-137 Phase 04 - Migrate framework + workflow.toml schema + import-linter contract
 created: "2026-05-19"
 updated: "2026-05-19"
-status: draft
+status: completed
 kind: phase
 plan: IP-137
 delta: DE-137
@@ -382,8 +382,8 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | [x] | 4.12 | Loader → MetadataValidator per-kind strict dispatch (F-48); wire registry strict-map cache + propagate through `validate workspace` / `validate file` | [ ] | Depends on 4.1/4.5 |
 | [x] | 4.13 | `pyproject.toml` import-linter `Migrations isolation` contract (verbatim diff per DR-137 §5.6) + VT-CC-021 fixture step + subprocess test | [P] | Independent of orchestrator wire-up |
 | [x] | 4.14 | `spec-driver admin migrate --check` smoke against this repo's empty inventory; confirm clean exit | [ ] | Phase smoke; depends on 4.7–4.12 |
-| [ ] | 4.15 | `just check` + `lint-imports`; reconcile lint + pylint ratchet | [ ] | Phase gate |
-| [ ] | 4.16 | Update `notes.md` + IP-137 progress + commit phase wrap-up | [ ] | `docs(DE-137): IP-137-P04 wrap-up` |
+| [x] | 4.15 | `just check` + `lint-imports`; reconcile lint + pylint ratchet | [ ] | Phase gate |
+| [x] | 4.16 | Update `notes.md` + IP-137 progress + commit phase wrap-up | [ ] | `docs(DE-137): IP-137-P04 wrap-up` |
 
 ### Task Details
 
@@ -884,12 +884,12 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria (all bullets in §4) satisfied.
-- [ ] Verification evidence stored in `notes.md` (VT pass table;
+- [x] Exit criteria (all bullets in §4) satisfied.
+- [x] Verification evidence stored in `notes.md` (VT pass table;
   F-48 audit before/after; lint-imports output; admin migrate
   --check smoke; install workflow.toml diffs).
-- [ ] IP-137 §9 progress box for P04 checked.
-- [ ] Hand-off note in `notes.md` summarising any new constraints
+- [x] IP-137 §9 progress box for P04 checked.
+- [x] Hand-off note in `notes.md` summarising any new constraints
   for IP-137-P05 (skill gates: verbatim text + anchor markers per
   DR-137 §5.5 — `validate file` / `validate workspace` surfaces
   already shipped by P03).

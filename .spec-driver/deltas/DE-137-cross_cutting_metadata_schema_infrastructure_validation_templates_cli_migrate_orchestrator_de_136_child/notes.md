@@ -1,5 +1,135 @@
 # Notes for DE-137
 
+## 2026-05-19 — IP-137-P04 complete (migration framework + workflow.toml schema + import-linter)
+
+### Summary
+
+All 16 tasks of IP-137-P04 landed. Phase exits with full pytest green
+(5281 passed, 4 skipped — +64 net new tests vs P03 baseline 5217),
+ruff clean, format clean, pylint 9.69 (= baseline; `pylint-report`
+targets `supekku/` only — `spec_driver/` new modules score 9.37
+locally, no ratchet effect), and `uvx import-linter lint` reports 3
+contracts KEPT (Architectural Layers, Domain Internal Layers,
+Migrations isolation).
+
+| VT | Location | Status |
+|---|---|---|
+| VT-CC-018 (`admin migrate --check` lists pending) | `spec_driver/presentation/cli/admin/migrate_test.py::TestCheckList::test_check_lists_pending` | verified |
+| VT-CC-019 (idempotency: clean + mixed corpus) | `migrate_test.py::TestRunStep::test_idempotent_no_op_on_second_run` + `test_idempotent_mixed_corpus` | verified |
+| VT-CC-020 (atomicity: watermark unchanged on interrupted step) | `migrate_test.py::TestRunStep::test_mid_walk_recovery` | verified |
+| VT-CC-021 (import-linter Migrations isolation contract) | `spec_driver/migrations/importlinter_test.py` (2 cases — clean tree KEPT, planted violator BROKEN) | verified |
+| VT-CC-022 (install fresh-vs-upgrade) | `supekku/scripts/lib/install_test.py::TestFreshInstallStrictDefaults` (3 cases) | verified |
+| VT-CC-023 (mid-walk recovery) | `migrate_test.py::TestRunStep::test_mid_walk_recovery` | verified |
+| VT-CC-028 (parse_migration_folder) | `spec_driver/migrations/_folder_test.py::TestParseCanonical/TestParseNonMatching/TestSortKey` | verified |
+| VT-CC-029 (POSIX lockfile liveness) | `migrate_test.py::TestLockfile` (3 cases; POSIX-skipped on Windows) | verified |
+| VT-CC-031 (kind validation at discovery) | `migrate_test.py::TestKindValidation::test_bad_kind_exits` | verified |
+| VT-CC-033 (workflow.toml unknown-kind warning) | `supekku/scripts/lib/core/config_test.py::TestStrictKindValidation` (4) + `TestGetStrictMap` (3) | verified |
+
+### Architecture wins
+
+1. **POL-001 honoured via reverse re-export.** `MIGRATION_FOLDER_PATTERN`
+   canonical definition moved into `spec_driver/migrations/_folder.py`
+   (where it's used); `spec_driver/presentation/cli/constants.py` now
+   re-exports from `_folder.py`. The Migrations isolation contract
+   would forbid the reverse direction; this keeps a single source of
+   truth without compromising the contract.
+
+2. **F-48 minimum-viable dispatch shipped at `validate file`.**
+   `effective_strict = strict OR strict_map.get(kind, False)` —
+   CLI `--strict` flag remains an explicit override, but missing the
+   flag now inherits the per-kind toggle from `workflow.toml`. The
+   workspace per-kind sweep (full F-48) remains deferred to DE-138..142
+   per P03 deviation #1 — the strict_map cache + getter
+   (`supekku.scripts.lib.core.config.get_strict_map`) is in place
+   ready for those deltas.
+
+3. **Frozen sidecars shipped lean.** `_protocol.py` (~70 LOC),
+   `_helpers.py` (~110 LOC including docstring), `_folder.py`
+   (~55 LOC). All three carry the DEC-137-26 / F-20 / F-35
+   frozen-forever discipline in their module docstrings.
+
+4. **DEC-137-22 lockfile semantics implemented end-to-end.** Lockfile
+   content is PID + ISO timestamp + UUID per spec; POSIX path uses
+   `os.kill(pid, 0)` with ESRCH ⇒ stale (overwrite + info message),
+   EPERM ⇒ alive (raise), 0 ⇒ alive (raise); Windows path defers
+   liveness probing per DR-137 §9.3.
+
+5. **DEC-137-18 install message verbatim.** Fresh-vs-upgrade trigger
+   reads `.spec-driver/` directory presence at install entry (BEFORE
+   the unconditional mkdir loop), passes `include_strict_defaults`
+   through to `generate_default_workflow_toml`, and emits the verbatim
+   DR-137 §5.6 install message on stdout for fresh installs.
+
+### Pragmatic deviations from DR-137
+
+1. **`admin migrate` Typer command is registered directly on the
+   user-facing `supekku/cli/admin.py` group** rather than under an
+   inner `spec_driver.presentation.cli.admin` Typer group. Reason:
+   nested Typer groups would surface as `admin migrate migrate
+   --check` to the user. The orchestrator module still lives at
+   `spec_driver/presentation/cli/admin/migrate.py` per DR-137 §5.6
+   path, but exposes a plain function callback that
+   `supekku/cli/admin.py` registers via `app.command(name="migrate")(
+   migrate_cmd)`. Same pattern as P03's `validate` Typer group
+   wiring.
+
+2. **Step modules are imported via `importlib.util.spec_from_file_location`,
+   not by dotted package path.** Reason: enables tests to generate
+   fixture step modules under `tmp_path/` (out of the production
+   discovery walk) and have the orchestrator pick them up via
+   `_discover_steps(custom_migrations_dir)`. Production discovery
+   still walks `spec_driver/migrations/` and produces identical
+   results. Single-process invocation makes the import-cache benefit
+   of dotted paths marginal.
+
+3. **`packaging` declared as a direct dep** in `pyproject.toml`
+   `[project] dependencies` (was transitive via pytest only). Required
+   by `_folder.py::ParsedFolder.version: Version`.
+
+4. **F-48 workspace-load dispatch deferred to DE-138..142.** The
+   workspace loader still doesn't construct per-kind MetadataValidator
+   instances at load time (P03 notes deviation #1, ratified). The
+   strict_map cache + `validate file` integration shipped in P04 is
+   the F-48 *plumbing*; activating it for the workspace sweep is per-
+   artefact-delta work.
+
+5. **Migration step `applies_to_kind` deferred imports inside
+   `_validate_step_kinds` / `_read_last_applied` / `migrate`.**
+   Reason: `supekku.cli.admin` imports
+   `spec_driver.presentation.cli.admin.migrate.migrate`, which would
+   otherwise pull in `supekku.cli.common` at module load and create a
+   circular import. Function-scope imports break the cycle while
+   keeping the visible API clean.
+
+### Hand-off note for IP-137-P05
+
+- **`validate file` / `validate workspace` shipped end-to-end.**
+  P05's verbatim skill inserts (DR-137 §5.5) reference the
+  `<!-- validate-gate:<skill> begin/end -->` anchor markers around
+  invocation text — neither command nor flag surface needs changes
+  to land the gates.
+- **`admin migrate` is live with empty inventory.**
+  `uv run spec-driver admin migrate --check` exits 0 with
+  "no pending migrations." Sibling deltas DE-138..142 will populate
+  `spec_driver/migrations/v0_10_0_NNN_*/` step folders and trigger
+  the dispatch loop.
+- **`get_strict_map(config)` is available to per-artefact loaders.**
+  DE-138..142 wire workspace-load per-kind dispatch by passing the
+  strict_map into MetadataValidator constructions inside the loader
+  paths enumerated in this delta's task 4.1 audit.
+- **Active phase**: `phase-05.md` to be drafted at P05 entrance via
+  `/plan-phases`.
+
+### Commits on this run
+
+- 525c0d18 — chore(DE-137): IP-137-P04 phase sheet + pre-flight audit (task 4.1)
+- 30cf8e04 — feat(DE-137): migrations framework primitives (tasks 4.2/4.3/4.4)
+- 6aaddf2e — feat(DE-137): workflow.toml schema + install strict defaults (tasks 4.5/4.6)
+- 60c5735e — feat(DE-137): admin migrate orchestrator (tasks 4.7/4.8)
+- 8bd908fe — test(DE-137): migrate VTs + F-48 dispatch (tasks 4.9/4.10/4.11/4.12/4.14)
+- 5cf6a0c4 — feat(DE-137): Migrations isolation import-linter contract (task 4.13)
+- (this commit) — wrap-up
+
 ## 2026-05-19 — IP-137-P04 task 4.1 — pre-flight audit
 
 Baseline: `pytest` 5217 pass + 4 skip; `uvx import-linter lint` shows 2

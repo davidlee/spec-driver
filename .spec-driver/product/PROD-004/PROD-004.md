@@ -188,6 +188,181 @@ entries:
     requirement: PROD-004.FR-007
     status: planned
     notes: Compaction profile tests - canonical/derived classification, round-trip fidelity, default omission
+  - artefact: VT-CC-001
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: Template carries enum-comment string per kind; DE-137 IP-137-P02
+  - artefact: VT-CC-002
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: Template regenerator idempotency; DE-137 IP-137-P02
+  - artefact: VT-CC-003
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: validate templates CI gate; DE-137 IP-137-P02
+  - artefact: VT-CC-004
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: Created artefact carries inline enum-comment hints; DE-137 IP-137-P02
+  - artefact: VT-CC-005
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: yaml_emit primitive + container types; DE-137 IP-137-P02
+  - artefact: VT-CC-006
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: yaml_emit deterministic across runs; DE-137 IP-137-P02
+  - artefact: VT-CC-007
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: Malformed user template fails install loudly; DE-137 IP-137-P02
+  - artefact: VT-CC-024
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: Comment-map invariance across placeholder/concrete render modes; DE-137 IP-137-P02
+  - artefact: VT-CC-008
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: Field-NAME alias canonicalisation (relations.annotation→nature); DE-137 IP-137-P01
+  - artefact: VT-CC-009
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: Tolerated alias strict/no-tolerated branches; DE-137 IP-137-P01
+  - artefact: VT-CC-010
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: Did-you-mean canonical typos at cutoff 0.6; DE-137 IP-137-P01
+  - artefact: VT-CC-011
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: Unknown-key strict/tolerant branches; DE-137 IP-137-P01
+  - artefact: VT-CC-012
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: ENUM_REGISTRY parity post-split (Category A derived view); DE-137 IP-137-P01
+  - artefact: VT-CC-013
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: normalize_status / normalize_field parity over CANONICAL_STATUS_MAP; DE-137 IP-137-P01
+  - artefact: VT-CC-014
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: validate file --strict --fix idempotent; DE-137 IP-137-P03
+  - artefact: VT-CC-017
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: validate workspace --kind scoping via post-validation filter; DE-137 IP-137-P03
+  - artefact: VT-CC-025
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: validate workspace --kind sweep semantics (spec + delta id-family filtering); DE-137 IP-137-P03
+  - artefact: VT-CC-030
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: Field-VALUE alias canonicalisation (delta.status complete→completed); DE-137 IP-137-P01
+  - artefact: VT-CC-034
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: verified
+    notes: Field-NAME alias collision (both keys present ⇒ error, no merge); DE-137 IP-137-P01
+  - artefact: VT-CC-016
+    kind: VT
+    requirement: PROD-004.FR-003
+    status: verified
+    notes: validate file diagnostic shape (DEC-137-21) + path-handling matrix (F-41); DE-137 IP-137-P03
+  - artefact: VT-CC-026
+    kind: VT
+    requirement: PROD-004.FR-003
+    status: verified
+    notes: ISSUE-054 regression closure (skip-and-warn on malformed YAML; no Rich traceback); DE-137 IP-137-P03
+  - artefact: VT-CC-027
+    kind: VT
+    requirement: PROD-004.FR-003
+    status: verified
+    notes: Skill-gate anchor markers + verbatim text present in 5 skills; DE-137 IP-137-P05
+  - artefact: VT-CC-032
+    kind: VT
+    requirement: PROD-004.FR-003
+    status: verified
+    notes: F-46 uniform exit-code contract across validate workspace/file/templates (12 matrix cells); DE-137 IP-137-P03
+  - artefact: VT-CC-018
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: admin migrate --check lists pending; DE-137 IP-137-P04
+  - artefact: VT-CC-019
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: admin migrate idempotency (mixed corpus); DE-137 IP-137-P04
+  - artefact: VT-CC-020
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: admin migrate atomicity (watermark on interruption); DE-137 IP-137-P04
+  - artefact: VT-CC-021
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: import-linter migrations-isolation contract; DE-137 IP-137-P04
+  - artefact: VT-CC-022
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: install defaults (fresh vs upgrade) drive [validation.strict]; DE-137 IP-137-P04
+  - artefact: VT-CC-023
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: admin migrate mid-walk recovery; DE-137 IP-137-P04
+  - artefact: VT-CC-028
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: parse_migration_folder regex + invalid-name handling; DE-137 IP-137-P04
+  - artefact: VT-CC-029
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: admin migrate lockfile (POSIX liveness probe); DE-137 IP-137-P04
+  - artefact: VT-CC-031
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: migration kind validation at discovery; DE-137 IP-137-P04
+  - artefact: VT-CC-033
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: verified
+    notes: workflow.toml [validation.strict] unknown-kind warning; DE-137 IP-137-P04
+  - artefact: VT-CC-015
+    kind: VT
+    requirement: PROD-004.FR-006
+    status: verified
+    notes: schema enums emits canonical+aliases+tolerated; DE-137 IP-137-P03
+  - artefact: VA-CC-001
+    kind: VA
+    requirement: PROD-004.FR-006
+    status: verified
+    notes: Parametric schema enums smoke across every Category A controlled-vocab field (kind × field matrix, ~85 cases); DE-137 IP-137-P03
 ```
 
 ## 1. Intent & Summary

@@ -1,5 +1,67 @@
 # Notes for DE-137
 
+## 2026-05-19 — IP-137-P05 start (task 5.1 reconnaissance)
+
+### Workflow.toml version triage
+
+- `uv run spec-driver <cmd>` emits `Warning: spec-driver may need re-install
+  (workflow.toml has 0.9.2, running 0.9.7).` This is pre-existing drift
+  inherited from earlier in DE-137 (workflow.toml schema_version was set
+  at P04 task 4.5 but the running CLI version has rolled forward).
+- Triage: no observed behavioural divergence for `validate file` /
+  `validate workspace` / `admin migrate --check` surfaces exercised by
+  P05. Treat as cosmetic for the duration of this phase.
+- Action: task 5.3 may re-run `spec-driver install` to propagate skill
+  edits — that call will also bump the schema_version warning. Capture
+  the workflow.toml diff post-install in §10 / 5.9 wrap-up.
+
+### Installed-skill-copy parity (task 5.1)
+
+Source: `supekku/skills/<skill>/SKILL.md`.
+Installed targets: `.spec-driver/skills/<skill>/SKILL.md`,
+`.claude/skills/<skill>/SKILL.md`, `.agents/skills/<skill>/SKILL.md`.
+
+All installed copies are PLAIN FILES (not symlinks), contra DR-137 §10
+which describes them as symlinks. Pre-existing install-mechanism drift
+— not introduced by P05. Filed as observation; sync model still works
+via re-install copy semantics.
+
+Per-skill diff against source:
+
+| Skill | source vs installed | Divergence |
+|---|---|---|
+| `execute-phase` | DIFFER | Installed copies carry an additional preamble (`This skill is mandatory for implementation work…` + `Do not start coding…` + expanded draft-warning) absent from source. All three installed copies identical (md5 `fc56fa9475061a268d10c05dc2a5ea3e`); preamble is stale — no source generator located via `rg "Do not start coding"` across the tree. Treat as pre-existing drift; source is the truth per DR-137 §10. Re-install will overwrite installed with source, losing the augmented preamble. ACCEPTED (lost text is duplicative posture, not custom work). Filed as cleanup opportunity. |
+| `close-change` | IDENTICAL | No divergence. |
+| `audit-change` | IDENTICAL | No divergence. |
+| `notes` | IDENTICAL | No divergence. |
+| `update-delta-docs` | IDENTICAL | No divergence. |
+
+STOP condition check (phase sheet §6: "installed copy diverges by more
+than the new gate insertion"): triggered for `execute-phase` ONLY.
+Disposition: pre-existing drift, divergent content is duplicative
+guidance not user-custom, accept loss on re-install. Documenting
+decision rather than escalating to `/consult` — divergence does not
+constitute a real user edit at risk.
+
+### Insertion-target reconnaissance (task 5.1)
+
+DR-137 §5.5 targets vs current SKILL.md content:
+
+| Skill | DR-137 target text | Current SKILL.md equivalent | Insertion location chosen |
+|---|---|---|---|
+| `execute-phase` | After "Verify acceptance" / before "Mark phase complete" | No literal "Verify acceptance" or "Mark phase complete" headings; closest semantic boundary is between step 12 ("review touched subsystems once more for missed memory-capture candidates") and step 13 ("hand off to /audit-change for verification") | After numbered Process list, before `Outcomes:` heading — applies to ALL phase exits regardless of which numbered step the agent is on |
+| `close-change` | Before `complete delta` step | Step 2 is `--dry-run` preview, step 3 is `complete delta DE-XXX` | Between step 1 (Pre-check) and step 2 (Preview) — gate runs before any `complete delta` invocation |
+| `audit-change` | After populating findings disposition | Step 6 = "Disposition every finding explicitly"; step 7 = "Route every non-aligned finding…" | Between step 6 and step 7 — matches DR-137 target literally |
+| `notes` | After persisting note write | Body is a single instruction ("Update the card with implementation notes") followed by guidance list; closes with `/capturing-memory` conditional | Appended after the `/capturing-memory` paragraph as a final gate paragraph |
+| `update-delta-docs` | After reconciliation step | Reconciliation is steps 2-5 (phase → IP → DE → DR updates); step 6 = "Ensure notes.md remains consistent"; step 7 = `/consult` escalation | Inserted as new numbered step 7 between current step 6 (notes consistency) and `/consult` escalation (renumbered to 8) |
+
+Drift recorded: DR-137 §5.5 named insertion targets do not exist
+verbatim in current SKILL.md content for `execute-phase`. Chosen
+equivalents preserve the semantic intent (gate runs at phase exit,
+not mid-process). VT-CC-027 asserts anchor markers + command
+substring, NOT structural location, so the equivalence is sound under
+the regression contract.
+
 ## 2026-05-19 — IP-137-P04 complete (migration framework + workflow.toml schema + import-linter)
 
 ### Summary

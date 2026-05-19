@@ -673,6 +673,10 @@ def initialize_workspace(
   if not target_root.exists():
     sys.exit(1)
 
+  # DEC-137-18 / F-5: trigger is `.spec-driver/` workspace presence at
+  # install time. Snapshot BEFORE the mkdir loop below creates it.
+  is_fresh_install = not (target_root / SPEC_DRIVER_DIR).exists()
+
   # Detect legacy workspace (installed before DE-049 consolidation)
   _legacy_warning: str | None = None
   workflow_toml = target_root / SPEC_DRIVER_DIR / "workflow.toml"
@@ -762,9 +766,20 @@ def initialize_workspace(
       print(f'\n[DRY RUN] workflow.toml: exec = "{exec_cmd}"')
     else:
       workflow_toml.write_text(
-        generate_default_workflow_toml(exec_cmd),
+        generate_default_workflow_toml(
+          exec_cmd,
+          include_strict_defaults=is_fresh_install,
+        ),
         encoding="utf-8",
       )
+      if is_fresh_install:
+        # DEC-137-18 verbatim install message — F-5.
+        print(
+          "\nFresh workspace detected. "
+          "Strict per-kind validation enabled by default.\n"
+          "To opt out of strict mode for a kind: edit workflow.toml "
+          "[validation.strict] <kind> = false\n"
+        )
 
   # Stamp installed version (every install, not just first)
   _stamp_installed_version(workflow_toml, dry_run=dry_run)

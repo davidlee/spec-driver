@@ -96,6 +96,19 @@ DEFAULT_CONFIG: dict = {
     "improvements": "improvements",
     "risks": "risks",
   },
+  # DE-137 migration framework — DR-137 §5.6
+  "migrations": {
+    # None ⇒ pre-first-migration; orchestrator walks every migration.
+    "last_applied": None,
+  },
+  "validation": {
+    # Per-kind strict-mode toggle. Empty by default; install resolves
+    # fresh-vs-upgrade defaults at workflow.toml creation time per
+    # DEC-137-18 (workspace directory presence is the trigger).
+    "strict": {},
+  },
+  # Optional derived cache populated by `admin migrate`; not authoritative.
+  "schema_version": {},
 }
 
 
@@ -128,7 +141,9 @@ def load_workflow_config(repo_root: Path) -> dict:
     )
     return copy.deepcopy(DEFAULT_CONFIG)
 
-  return _merge_defaults(user_config)
+  merged = _merge_defaults(user_config)
+  _warn_unknown_strict_kinds(merged)
+  return merged
 
 
 def _migrate_legacy_keys(user_config: dict) -> dict:
@@ -183,6 +198,57 @@ def _merge_defaults(user_config: dict) -> dict:
 def is_strict_mode(config: dict) -> bool:
   """Return whether strict mode is enabled in the given config."""
   return config.get("strict_mode", False) is True
+
+
+def _registered_kinds() -> set[str]:
+  """Return the set of registered artefact kinds (deferred import).
+
+  Imported inside the function to avoid a circular dependency between
+  ``core.config`` and ``core.frontmatter_metadata`` at module load.
+  """
+  from .frontmatter_metadata import (  # noqa: PLC0415 — deferred to break cycle
+    FRONTMATTER_METADATA_REGISTRY,
+  )
+
+  return set(FRONTMATTER_METADATA_REGISTRY.keys())
+
+
+def _warn_unknown_strict_kinds(config: dict) -> None:
+  """Emit F-47 warning for unknown kinds in ``[validation.strict]``.
+
+  Per DR-137 §5.6: ``workflow.toml [validation.strict]: unknown kind
+  '<key>'; ignored``. Keys are NOT auto-corrected — they remain in the
+  in-memory config so the user sees the typo on next run.
+  """
+  strict_section = config.get("validation", {}).get("strict", {}) or {}
+  if not isinstance(strict_section, dict):
+    return
+  known = _registered_kinds()
+  for key in strict_section:
+    if key not in known:
+      warnings.warn(
+        f"workflow.toml [validation.strict]: unknown kind '{key}'; ignored",
+        UserWarning,
+        stacklevel=3,
+      )
+
+
+def get_strict_map(config: dict) -> dict[str, bool]:
+  """Return the per-kind strict-mode map from ``[validation.strict]``.
+
+  Unknown kinds are dropped from the returned map (and warned at
+  config load via ``_warn_unknown_strict_kinds``); non-bool values are
+  coerced via ``bool()``.
+
+  Used by F-48 dispatch: per-artefact loaders call
+  ``MetadataValidator.validate(data, strict=strict_map.get(kind,
+  False), accept_tolerated=True)``.
+  """
+  strict_section = config.get("validation", {}).get("strict", {}) or {}
+  if not isinstance(strict_section, dict):
+    return {}
+  known = _registered_kinds()
+  return {kind: bool(value) for kind, value in strict_section.items() if kind in known}
 
 
 def _dep_list_mentions(deps: list, name: str = "spec-driver") -> bool:
@@ -344,11 +410,28 @@ _SECTION_COMMENTS: dict[str, list[str]] = {
     "All paths are relative to .spec-driver/.  Change these if your",
     "project uses non-standard directory names.",
   ],
+  "migrations": [
+    "Schema-version migrations (DE-137).",
+    "last_applied: orchestrator watermark; advanced by `admin migrate`.",
+  ],
+  "validation": [
+    "Per-kind strict-mode toggle for metadata validation.",
+    "Empty by default. Fresh installs flip strict=true per kind.",
+    "Edit [validation.strict] <kind> = false to opt out for that kind.",
+  ],
+  "schema_version": [
+    "Optional derived cache; populated by `admin migrate`. Not authoritative.",
+  ],
 }
 
 
 def _toml_value(val: object) -> str:
   """Format a Python value as a TOML literal."""
+  if val is None:
+    # TOML has no null. Emit empty-string sentinel; the rendered line
+    # is always commented out in templates, so consumers who uncomment
+    # must supply a real value.
+    return '""'
   if isinstance(val, bool):
     return "true" if val else "false"
   if isinstance(val, str):
@@ -387,7 +470,27 @@ def _emit_section(lines: list[str], key: str, section: dict) -> None:
       lines.append(f"# {inner_key} = {_toml_value(inner_val)}")
 
 
-def generate_default_workflow_toml(exec_cmd: str = "uv run spec-driver") -> str:
+FRESH_INSTALL_STRICT_KINDS: tuple[str, ...] = (
+  "delta",
+  "spec",
+  "audit",
+  "revision",
+  "plan",
+)
+
+
+def _emit_strict_defaults(lines: list[str]) -> None:
+  """Emit an UNCOMMENTED ``[validation.strict]`` table for fresh installs."""
+  lines.append("[validation.strict]")
+  for kind in FRESH_INSTALL_STRICT_KINDS:
+    lines.append(f"{kind} = true")
+
+
+def generate_default_workflow_toml(
+  exec_cmd: str = "uv run spec-driver",
+  *,
+  include_strict_defaults: bool = False,
+) -> str:
   """Render DEFAULT_CONFIG as a richly-commented TOML template.
 
   Every option is commented out except ``[tool] exec`` which is set to the
@@ -396,6 +499,11 @@ def generate_default_workflow_toml(exec_cmd: str = "uv run spec-driver") -> str:
 
   Args:
     exec_cmd: The detected invocation command for spec-driver.
+    include_strict_defaults: When True (fresh-install branch per
+      DEC-137-18 / F-5), emit an UNCOMMENTED ``[validation.strict]``
+      table with strict=true for the canonical artefact kinds. When
+      False (upgrade branch), the section stays commented like every
+      other one.
 
   Returns:
     A string suitable for writing to ``.spec-driver/workflow.toml``.
@@ -413,6 +521,9 @@ def generate_default_workflow_toml(exec_cmd: str = "uv run spec-driver") -> str:
         # [tool] is uncommented — exec is install-specific
         lines.append(f"[{key}]")
         lines.append(f'exec = "{exec_cmd}"')
+      elif key == "validation" and include_strict_defaults:
+        # Fresh install — emit strict-on defaults uncommented.
+        _emit_strict_defaults(lines)
       else:
         _emit_section(lines, key, default_val)
     else:
@@ -425,8 +536,10 @@ def generate_default_workflow_toml(exec_cmd: str = "uv run spec-driver") -> str:
 
 __all__ = [
   "DEFAULT_CONFIG",
+  "FRESH_INSTALL_STRICT_KINDS",
   "detect_exec_command",
   "generate_default_workflow_toml",
+  "get_strict_map",
   "is_strict_mode",
   "load_workflow_config",
 ]

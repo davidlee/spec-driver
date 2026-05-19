@@ -1813,3 +1813,54 @@ class TestEnsurePrebootSymlink:
     assert link.is_symlink()
     expected_target = Path("..") / ".." / ".agents" / "spec-driver-boot.md"
     assert str(link.readlink()) == str(expected_target)
+
+
+class TestFreshInstallStrictDefaults:
+  """VT-CC-022: install fresh-vs-upgrade trigger (DEC-137-18 / F-5)."""
+
+  def test_fresh_install_emits_strict_defaults(
+    self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+  ) -> None:
+    """No `.spec-driver/` ⇒ post-install workflow.toml has strict-on per kind."""
+    initialize_workspace(tmp_path, auto_yes=True)
+    workflow_toml = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+    assert workflow_toml.exists()
+    content = workflow_toml.read_text(encoding="utf-8")
+    assert "[validation.strict]" in content
+    for kind in ("delta", "spec", "audit", "revision", "plan"):
+      assert f"{kind} = true" in content, f"missing strict default for {kind}"
+    out = capsys.readouterr().out
+    assert "Fresh workspace detected" in out
+
+  def test_upgrade_preserves_existing_workflow_toml(
+    self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+  ) -> None:
+    """Existing `.spec-driver/` (no [validation.strict]) ⇒ unchanged."""
+    sd = tmp_path / SPEC_DRIVER_DIR
+    sd.mkdir()
+    workflow_toml = sd / "workflow.toml"
+    pre_content = 'ceremony = "settler"\n\n[tool]\nexec = "uv run spec-driver"\n'
+    workflow_toml.write_text(pre_content, encoding="utf-8")
+
+    initialize_workspace(tmp_path, auto_yes=True)
+
+    content = workflow_toml.read_text(encoding="utf-8")
+    # workflow.toml present ⇒ stamp adds spec_driver_installed_version but
+    # body otherwise untouched; [validation.strict] is NOT auto-inserted.
+    assert "[validation.strict]" not in content
+    out = capsys.readouterr().out
+    assert "Fresh workspace detected" not in out
+
+  def test_fresh_install_workflow_toml_parses_as_toml(self, tmp_path: Path) -> None:
+    """Emitted strict-defaults section must parse as valid TOML."""
+    import tomllib  # noqa: PLC0415
+
+    initialize_workspace(tmp_path, auto_yes=True)
+    workflow_toml = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+    parsed = tomllib.loads(workflow_toml.read_text(encoding="utf-8"))
+    strict = parsed.get("validation", {}).get("strict", {})
+    assert strict.get("delta") is True
+    assert strict.get("spec") is True
+    assert strict.get("audit") is True
+    assert strict.get("revision") is True
+    assert strict.get("plan") is True

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import tomllib
+import warnings
 from pathlib import Path
 from unittest.mock import patch
 
@@ -13,6 +14,7 @@ from supekku.scripts.lib.core.config import (
   _is_project_dependency,
   detect_exec_command,
   generate_default_workflow_toml,
+  get_strict_map,
   is_strict_mode,
   load_workflow_config,
 )
@@ -506,3 +508,71 @@ class TestDetectExecCommand:
       patch("supekku.scripts.lib.core.config.which", return_value=None),
     ):
       assert detect_exec_command(tmp_path) == "spec-driver"
+
+
+class TestStrictKindValidation:
+  """F-47 / VT-CC-033: unknown kinds in [validation.strict] warn at load."""
+
+  def test_unknown_kind_emits_warning(self, tmp_path: Path) -> None:
+    """workflow.toml with foo=true (not a registered kind) ⇒ warning."""
+    toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+    toml_path.parent.mkdir(parents=True)
+    toml_path.write_text("[validation.strict]\nfoo = true\n", encoding="utf-8")
+    with pytest.warns(UserWarning, match="unknown kind .foo."):
+      load_workflow_config(tmp_path)
+
+  def test_unknown_key_preserved_in_memory_config(self, tmp_path: Path) -> None:
+    """No auto-correct — the typo persists so the user sees it next run."""
+    toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+    toml_path.parent.mkdir(parents=True)
+    toml_path.write_text("[validation.strict]\nfoo = true\n", encoding="utf-8")
+    with pytest.warns(UserWarning):
+      config = load_workflow_config(tmp_path)
+    assert config["validation"]["strict"].get("foo") is True
+
+  def test_known_kind_no_warning(self, tmp_path: Path) -> None:
+    """Valid kinds (delta, spec, ...) do not warn."""
+    toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+    toml_path.parent.mkdir(parents=True)
+    toml_path.write_text(
+      "[validation.strict]\ndelta = true\nspec = false\n",
+      encoding="utf-8",
+    )
+    with warnings.catch_warnings():
+      warnings.simplefilter("error", UserWarning)
+      config = load_workflow_config(tmp_path)
+    assert config["validation"]["strict"] == {"delta": True, "spec": False}
+
+  def test_mixed_warns_only_for_unknown(self, tmp_path: Path) -> None:
+    """Multiple unknown keys ⇒ multiple warnings; known keys silent."""
+    toml_path = tmp_path / SPEC_DRIVER_DIR / "workflow.toml"
+    toml_path.parent.mkdir(parents=True)
+    toml_path.write_text(
+      "[validation.strict]\ndelta = true\nfoo = true\nbar = false\n",
+      encoding="utf-8",
+    )
+    with pytest.warns(UserWarning) as captured:
+      load_workflow_config(tmp_path)
+    messages = [str(w.message) for w in captured]
+    assert any("foo" in m for m in messages)
+    assert any("bar" in m for m in messages)
+    assert not any("delta" in m for m in messages)
+
+
+class TestGetStrictMap:
+  """F-48 helper: get_strict_map filters unknown kinds; coerces bools."""
+
+  def test_returns_only_known_kinds(self) -> None:
+    config = {"validation": {"strict": {"delta": True, "spec": False, "foo": True}}}
+    out = get_strict_map(config)
+    assert "foo" not in out
+    assert out["delta"] is True
+    assert out["spec"] is False
+
+  def test_empty_config_returns_empty(self) -> None:
+    assert get_strict_map({}) == {}
+    assert get_strict_map({"validation": {}}) == {}
+    assert get_strict_map({"validation": {"strict": {}}}) == {}
+
+  def test_non_dict_strict_section_returns_empty(self) -> None:
+    assert get_strict_map({"validation": {"strict": "oops"}}) == {}

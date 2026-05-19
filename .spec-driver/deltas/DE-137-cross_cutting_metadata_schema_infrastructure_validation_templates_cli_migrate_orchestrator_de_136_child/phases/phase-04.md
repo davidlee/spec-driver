@@ -369,9 +369,9 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | Status | ID   | Description | Parallel? | Notes |
 | ------ | ---- | --- | --- | --- |
 | [x] | 4.1  | Pre-flight `MetadataValidator(...)` construction-site grep audit + loader/install entry-point reconnaissance | [ ] | Authoritative F-48 dispatch list |
-| [ ] | 4.2  | Ship `spec_driver/migrations/_protocol.py` (Protocol + BaseMigrationStep + StepPreview/StepResult) | [P] | Frozen-forever; ~40 LOC |
-| [ ] | 4.3  | Ship `spec_driver/migrations/_helpers.py` (split_frontmatter, atomic_write, replace_in_frontmatter_block) | [P] | Frozen-forever; bytes-only |
-| [ ] | 4.4  | Ship `spec_driver/migrations/_folder.py` (ParsedFolder + parse_migration_folder) + VT-CC-028 | [P] | Imports MIGRATION_FOLDER_PATTERN from constants.py |
+| [x] | 4.2  | Ship `spec_driver/migrations/_protocol.py` (Protocol + BaseMigrationStep + StepPreview/StepResult) | [P] | Frozen-forever; ~40 LOC |
+| [x] | 4.3  | Ship `spec_driver/migrations/_helpers.py` (split_frontmatter, atomic_write, replace_in_frontmatter_block) | [P] | Frozen-forever; bytes-only |
+| [x] | 4.4  | Ship `spec_driver/migrations/_folder.py` (ParsedFolder + parse_migration_folder) + VT-CC-028 | [P] | Imports MIGRATION_FOLDER_PATTERN from constants.py |
 | [ ] | 4.5  | Extend `supekku/scripts/lib/core/config.py::DEFAULT_CONFIG` with `[migrations]`, `[validation.strict]`, `[schema_version]` sections + VT-CC-033 unknown-kind warning | [P] | Independent of orchestrator |
 | [ ] | 4.6  | Install-time fresh-vs-upgrade trigger in `supekku/cli/install.py` + VT-CC-022 | [P] | Depends on 4.5 |
 | [ ] | 4.7  | Ship `spec_driver/presentation/cli/admin/__init__.py` + `migrate.py` orchestrator (discovery + dispatch + kind-filter + log + watermark advance) | [ ] | Depends on 4.2/4.3/4.4 |

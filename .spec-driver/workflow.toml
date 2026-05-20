@@ -93,3 +93,6 @@ exec = "uv run spec-driver"
 [sync]
 # spec_autocreate = true
 spec_autocreate = true
+
+[migrations]
+last_applied = "v0_10_0_001_delta_blocks"

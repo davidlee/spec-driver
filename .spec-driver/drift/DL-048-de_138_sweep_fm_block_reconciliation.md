@@ -22,7 +22,7 @@ Sweep commit anchor: `2afc0833` (post `de-138-pre-sweep` tag at `46976634`).
 
 ## Entries
 
-### DL-048.001 — DE-016 FM spec `PROD-011` absent from relationships block
+### DL-048.001: DE-016 FM spec PROD-011 absent from relationships block
 
 ```yaml
 target: DE-016
@@ -47,7 +47,7 @@ owner: unassigned
 status: open
 ```
 
-### DL-048.002 — DE-020 FM specs `[PROD-010, SPEC-110, SPEC-113]` + requirement `ISSUE-025` absent from block
+### DL-048.002: DE-020 FM specs PROD-010 SPEC-110 SPEC-113 + requirement ISSUE-025 absent from block
 
 ```yaml
 target: DE-020
@@ -75,7 +75,7 @@ owner: unassigned
 status: open
 ```
 
-### DL-048.004 — Body §7 risk narrative recovery anchor (137 deltas)
+### DL-048.004: Body section 7 risk narrative recovery anchor (137 deltas)
 
 ```yaml
 target: '*'  # 137 swept deltas, full list in p03-risk-recon-log.md §2.1
@@ -98,7 +98,7 @@ owner: unassigned
 status: open
 ```
 
-### DL-048.003 — DE-106 FM specs `[PROD-006, PROD-011]` + 5 PROD-006 requirements absent from block
+### DL-048.003: DE-106 FM specs PROD-006 PROD-011 + 5 PROD-006 requirements absent from block
 
 ```yaml
 target: DE-106

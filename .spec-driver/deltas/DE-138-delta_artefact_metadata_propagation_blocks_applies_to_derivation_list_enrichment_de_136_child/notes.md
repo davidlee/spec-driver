@@ -112,3 +112,35 @@
 - Preview against the in-repo corpus (141 deltas): would touch 141; drift kinds = body_renumber (118), body_risk_narrative (137), context_input_unmapped_type (3), fm_requirements_unmatched (2), fm_specs_unmatched (3). Zero errors. Ready for P03 sweep (separate phase — pre-sweep checkpoint commit required first).
 - `--dry-run` summary line `would touch 0` is a separate orchestrator UI bug (sums `results` which is empty under dry_run; should sum `previews`). Filed as a sibling issue; not blocking P02. Zero-mutation property holds.
 - Quality gates: ruff lint + format clean on touched files. Full test suite re-run in progress at notes-write time; result expected ~+38 tests vs P01 close (30 + 6 + 1 + 1).
+
+## 2026-05-20 — P03 close — Sweep + reconciliation
+
+- DR-138 §8 list-deltas enrichment landed in commit `46976634` (P03.1). New helpers + `format_delta_list_row` + `format_delta_list_table` + `format_delta_list_json` in `change_formatters.py`; `DELTA_COLUMNS` + `DELTA_TAGS_COLUMN` in `column_defs.py`; `ChangeArtifact.audit_gate` field + loader read; CLI `deltas.py` routes through new formatter with `--tags` opt-in; `_collect_audited_delta_ids` walks completed audits via FM `delta_ref` (DEC-138-13).
+- VT-DE138-LIST-001: 9 helper VTs in `change_formatters_test.py::TestDeltaListEnrichmentVTLIST001` + 8 CLI matrix VTs in `list_test.py::ListDeltasEnrichmentVTLIST001Test`. Both green pre-sweep + post-sweep.
+- Pre-sweep tag `de-138-pre-sweep` @ `46976634` — load-bearing recovery anchor for DR-138 §11.5B; must not be deleted until cleanup delta closes.
+- Sweep commit `2afc0833`: 141 deltas touched; `workflow.toml` gains `[migrations] last_applied = v0_10_0_001_delta_blocks` (bundled because reverting sweep must also revert orchestrator state).
+- Drift kinds (recovered post-sweep by replaying `_transform()` against pre-sweep tree; orchestrator `_write_log` does not surface drift detail from `StepResult.drift_entries: list[Path]` — orchestrator gap noted as P04+ improvement, out of DE-138 scope per DR-137 DEC-137-26 freeze):
+  - body_renumber (118) — disposition: auto_resolved.
+  - body_risk_narrative (137) — disposition: dl_filed (via VA-RISK-RECON-001).
+  - context_input_unmapped_type (3, all DE-006 plain-string entries) — disposition: accepted_noise (tolerated_alias `unknown` per §5.1).
+  - fm_requirements_unmatched (2) — DE-020 ISSUE-025, DE-106 5× PROD-006 reqs — disposition: dl_filed → DL-048.002/.003.
+  - fm_specs_unmatched (3) — DE-016 PROD-011, DE-020 PROD-010/SPEC-110/SPEC-113, DE-106 PROD-006/PROD-011 — disposition: dl_filed → DL-048.001/.002/.003.
+- Drift log commit `717fced5` (VA-DE138-DRIFT-001 closure): `p03-sweep-drift-log.md` (durable record) + DL-048 (4 persistent entries; owner unassigned; cleanup delta scope).
+- Reconciliation commit `6a7fe70b` (VA-DE138-RISK-RECON-001 closure): all 137 `body_risk_narrative` entries uniformly disposed as `file_dl` against pre-sweep tag. Per-delta narrative promotion into `risks[].mitigation` deferred to cleanup delta — rationale in `p03-risk-recon-log.md` §2:
+  - 115/137 swept deltas are `status: completed` — body §7 prose is historical record.
+  - For DE-118+-era deltas, body prose duplicates FM `risk_register` (which the sweep moved into the block).
+  - 1500+ risk entries × 137 deltas inverts DE-138 scope; selective `keep_into_mitigation` for the 22 active deltas is appropriate cleanup-delta work.
+  - Per-file recovery: `git show de-138-pre-sweep:<delta-path>`.
+- VT-DE138-COV-001 (`coverage_check_test.py::test_de138_self_bootstraps_via_derived_applies_to_vt_cov_001`): live DE-138 derives `applies_to.specs == [PROD-004, SPEC-115]` + `applies_to.requirements == [PROD-004.FR-001/-002/-007]` via the `supekku:delta.relationships@v1` block; `check_coverage_completeness` processes without erroring (the strict-vs-status check at P04 will assert PROD-004 FRs reach `verified` after umbrella audit per F-138-L).
+- Tolerant validate `validate workspace --kind delta`: exit 0, only pre-existing 7× audit-gate + 1× DR-030 warnings (identical baseline to P01 close).
+- Corpus-level idempotence: `admin migrate delta --check` post-sweep returns "no pending migrations" (orchestrator state); per-file `applies_to(path)` short-circuits cleanly because cut keys are absent.
+- PROD-004 coverage block flipped: 3 new entries (VT-DE138-LIST-001 → FR-001, VT-DE138-FLIP-001 → FR-002, VT-DE138-MIG-001 → FR-007) all `status: in-progress` (F-138-L lifecycle behaviour; umbrella audit at DE-136 P04 promotes to `verified`).
+- IP-138 verification coverage entries flipped `planned` → `verified` for VT-DE138-LIST-001, VT-DE138-COV-001, VA-DE138-RISK-RECON-001, VA-DE138-DRIFT-001.
+- DE-138.md §6 Verification Strategy populated with concrete coverage statements drawn from DR-138 §10.
+- Hand-off to P04: pre-flip checklist (DR-138 §11.2) status — tolerant validate clean, both VAs closed, three sweep commits in place + pre-sweep tag retained. Outstanding for P04 entrance:
+  - `--no-tolerated-aliases` wiring through `spec_driver/presentation/cli/validate/workspace.py` (DEC-138-14, F-138-23).
+  - VT-DE138-GATE-001 (tolerated_alias artefact fails gate under `--no-tolerated-aliases`).
+  - VT-DE138-FLIP-001 (post-flip workspace baseline strict clean).
+  - VH-DE138-FLIP-001 (operator attestation pre-flip).
+  - §9.5 follow-up audit tracking artefact filing (F-138-24).
+- Orchestrator drift-detail gap (P04+ improvement candidate, out of DE-138 scope): `StepResult.drift_entries: list[Path]` carries paths only; `_write_log` cannot surface kind/detail. Extending the Protocol surface would need a scope-delta given DR-137 DEC-137-26 freeze. Current workaround (replay `_transform()` against pre-sweep tree) is operator-driven, not pipeline-emitted — adequate for one-off DE-138 close but not durable for sibling per-artefact deltas.

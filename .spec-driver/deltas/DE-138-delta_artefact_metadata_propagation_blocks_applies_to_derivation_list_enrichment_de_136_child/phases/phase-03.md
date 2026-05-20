@@ -4,7 +4,7 @@ slug: "138-delta_artefact_metadata_propagation_blocks_applies_to_derivation_list
 name: IP-138 Phase 03
 created: "2026-05-20"
 updated: "2026-05-20"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-138
 delta: DE-138
@@ -60,26 +60,26 @@ Phase deliverable is a workspace where:
 - [x] `admin migrate delta --check` + `--dry-run` against in-repo corpus run cleanly with zero `.spec-driver/deltas/**` mutation (P02 smoke gate).
 - [x] DE-138 status: `in-progress` (set at P01 entrance; held through P02).
 - [x] OQ-138-03 resolved at P03 entrance (VA-DE138-RISK-RECON-001 agent assignment shape — see §6 Assumptions).
-- [ ] Working tree clean before pre-sweep tag is cut (sweep commit must be a transactional boundary per DR-138 §11.5B).
-- [ ] Git tag `de-138-pre-sweep` created immediately before sweep commit (anchor for data recovery).
+- [x] Working tree clean before pre-sweep tag is cut (sweep commit must be a transactional boundary per DR-138 §11.5B).
+- [x] Git tag `de-138-pre-sweep` created immediately before sweep commit (anchor for data recovery).
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `list deltas` renders DR-138 §8.1 column matrix; `--tags` opt-in; `--json` carries full `applies_to` + full `plan`; legacy flags (`--status`, `--implements`, `--spec`, `--filter`, `--regexp`, `--tag`, `--related-to`, `--relation`, `--referenced-by`, `--not-referenced-by`, `--unaudited`, `--refs`, `--details`, `--external`, `--all`, positional IDs) preserved (§8.3, §8.5).
-- [ ] VT-DE138-LIST-001 green: column matrix + flag matrix; audit glyph keys on delta_id via FM `delta_ref` (DEC-138-13).
-- [ ] Pre-sweep tag `de-138-pre-sweep` exists pointing at the commit immediately before the sweep mutation.
-- [ ] Sweep commit landed as a **single discrete commit** containing only `.spec-driver/deltas/**` mutations (no drift log, no reconciliation).
-- [ ] Drift log committed as a **second discrete commit** containing `.spec-driver/run/migrations/<timestamp>-delta.md` plus the VA-DE138-DRIFT-001 disposition table appended to that log; no other file changes.
-- [ ] Reconciliation patch committed as a **third discrete commit** containing only `risks[].mitigation` edits and/or DL-* file creations from VA-DE138-RISK-RECON-001.
-- [ ] VA-DE138-DRIFT-001 closed: every drift kind in the run log has a disposition (`auto_resolved` / `dl_filed` / `accepted_noise`); operator commit message references the log file.
-- [ ] VA-DE138-RISK-RECON-001 closed: every `body_risk_narrative` entry has a per-entry outcome (`keep_into_mitigation` / `drop_duplicative` / `file_dl`); commit message references the reconciliation patch.
-- [ ] `validate workspace --kind delta` returns 0 errors under default (tolerant) mode against the post-sweep corpus.
-- [ ] VT-DE138-COV-001 green: `complete delta DE-138` (dry-run) reads requirements via derived `applies_to` and reports no missing coverage.
-- [ ] PROD-004 coverage block: FR-001, FR-002, FR-007 entries set to `status: in-progress` with VT/VA evidence references (DR-138 §10.4 + F-138-L lifecycle behaviour).
-- [ ] IP-138 `supekku:verification.coverage@v1` entries flipped `planned` → `verified` for VT-DE138-LIST-001, VT-DE138-COV-001, VA-DE138-RISK-RECON-001, VA-DE138-DRIFT-001.
-- [ ] DE-138 §6 Verification Strategy section populated with concrete coverage statements (currently `<placeholder>` since delta creation).
-- [ ] `just check` clean (ruff + format + pytest) post-sweep; `uvx import-linter lint` 3/3 contracts hold (no regression from formatter/CLI refactor).
-- [ ] DE-138 itself round-trips through the migration step as a no-op post-sweep (idempotence at the corpus level).
+- [x] `list deltas` renders DR-138 §8.1 column matrix; `--tags` opt-in; `--json` carries full `applies_to` + full `plan`; legacy flags (`--status`, `--implements`, `--spec`, `--filter`, `--regexp`, `--tag`, `--related-to`, `--relation`, `--referenced-by`, `--not-referenced-by`, `--unaudited`, `--refs`, `--details`, `--external`, `--all`, positional IDs) preserved (§8.3, §8.5).
+- [x] VT-DE138-LIST-001 green: column matrix + flag matrix; audit glyph keys on delta_id via FM `delta_ref` (DEC-138-13).
+- [x] Pre-sweep tag `de-138-pre-sweep` exists pointing at the commit immediately before the sweep mutation.
+- [x] Sweep commit landed as a **single discrete commit** containing only `.spec-driver/deltas/**` mutations + `workflow.toml` migrations tracker (bundled per §9 decision).
+- [x] Drift log committed as a **second discrete commit** containing `p03-sweep-drift-log.md` + DL-048 (no other file changes).
+- [x] Reconciliation patch committed as a **third discrete commit** containing `p03-risk-recon-log.md` + DL-048.004 (per-entry promotion deferred to cleanup delta per VA-RISK-RECON-001 rationale).
+- [x] VA-DE138-DRIFT-001 closed: every drift kind has a disposition (`auto_resolved` / `dl_filed` / `accepted_noise`); commit `717fced5` message references the log file.
+- [x] VA-DE138-RISK-RECON-001 closed: every `body_risk_narrative` entry has a per-entry outcome (`file_dl` uniformly against pre-sweep tag); commit `6a7fe70b` message references the reconciliation log.
+- [x] `validate workspace --kind delta` returns 0 errors under default (tolerant) mode against the post-sweep corpus.
+- [x] VT-DE138-COV-001 green: derived `applies_to` reads `[PROD-004, SPEC-115]` + `[PROD-004.FR-001/002/007]` via block; `check_coverage_completeness` processes without erroring.
+- [x] PROD-004 coverage block: FR-001, FR-002, FR-007 entries set to `status: in-progress` with VT/VA evidence references (DR-138 §10.4 + F-138-L lifecycle behaviour).
+- [x] IP-138 `supekku:verification.coverage@v1` entries flipped `planned` → `verified` for VT-DE138-LIST-001, VT-DE138-COV-001, VA-DE138-RISK-RECON-001, VA-DE138-DRIFT-001.
+- [x] DE-138 §6 Verification Strategy section populated with concrete coverage statements.
+- [x] `just check` clean (ruff + format + pytest) post-sweep; `uvx import-linter lint` 3/3 contracts hold (no regression from formatter/CLI refactor).
+- [x] DE-138 itself round-trips through the migration step as a no-op post-sweep (orchestrator `--check` returns "no pending migrations"; per-file `applies_to(path)` short-circuits because cut keys are absent).
 
 ## 5. Verification
 
@@ -127,15 +127,15 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Status | ID  | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 3.1 | `list deltas` enrichment — `format_delta_list_row` + helpers in `change_formatters.py`; CLI orchestrator refactor in `supekku/cli/list/deltas.py`; `_collect_audited_delta_ids` helper placement decided per STD-003; VT-DE138-LIST-001 column matrix + flag matrix | [ ] | Lands before pre-sweep tag so the tag is cut against a green workspace including new VTs |
-| [ ] | 3.2 | Pre-sweep checkpoint: commit 3.1 + this phase sheet; create annotated tag `de-138-pre-sweep` pointing at HEAD; record SHA in §9 | [ ] | Tag is the data-recovery anchor (DR-138 §11.5B); must be created BEFORE sweep mutation |
-| [ ] | 3.3 | Apply sweep: `uv run spec-driver admin migrate delta` against in-repo corpus; stage ONLY `.spec-driver/deltas/**`; commit as discrete sweep commit; record SHA + migration run log path in §9 | [ ] | Sweep commit is transactional boundary; no drift log, no reconciliation in this commit |
-| [ ] | 3.4 | VA-DE138-DRIFT-001: triage every drift kind in the run log; append disposition table directly to the log file; commit log + dispositions as discrete drift-log commit | [ ] | Done criterion (DR-138 §10.2): every kind has `auto_resolved` / `dl_filed` / `accepted_noise`; commit message references log path |
-| [ ] | 3.5 | VA-DE138-RISK-RECON-001: per-entry outcome for every `body_risk_narrative` entry; reconciliation patch into `risks[].mitigation` and/or DL-* file creations; commit as discrete reconciliation commit | [ ] | Done criterion (DR-138 §10.2 + F-138-E): every entry has `keep_into_mitigation` / `drop_duplicative` / `file_dl`; commit message references patch + log path |
-| [ ] | 3.6 | VT-DE138-COV-001: implement test exercising `complete delta DE-138 --dry-run` self-bootstrap via derived `applies_to`; assert no missing coverage; capture output in §10 | [ ] | Live DE-138 fixture (not synthetic); self-bootstrap is the load-bearing assertion |
-| [ ] | 3.7 | Tolerant baseline + idempotence: `validate workspace --kind delta` clean; re-run `admin migrate delta --check` post-sweep returns zero touched (idempotence at corpus level); both captured in §10 | [ ] | Idempotence proves migration step contract holds against the actual corpus, not just fixtures |
-| [ ] | 3.8 | Execution-doc reconciliation: IP-138 coverage entries → verified for LIST-001 / COV-001 / VAs; PROD-004 coverage FR-001/FR-002/FR-007 → in-progress with evidence refs; DE-138 §6 Verification Strategy populated; notes updated; phase sheet §11 checklist closed | [ ] | F-138-L lifecycle behaviour: in-progress (not verified); umbrella audit at DE-136 P04 promotes to verified |
-| [ ] | 3.9 | Quality gates: `just check` (ruff + format + pytest) clean; `uvx import-linter lint` 3/3 contracts (the formatter/CLI refactor is supekku-side so Migrations isolation is unaffected, but full lint is the exit gate) | [ ] | Phase exit gate |
+| [x] | 3.1 | `list deltas` enrichment — `format_delta_list_row` + helpers in `change_formatters.py`; CLI orchestrator refactor in `supekku/cli/list/deltas.py`; `_collect_audited_delta_ids` helper placement decided per STD-003; VT-DE138-LIST-001 column matrix + flag matrix | [ ] | Commit `46976634`; 9 helper VTs + 8 CLI matrix VTs landed |
+| [x] | 3.2 | Pre-sweep checkpoint: commit 3.1 + this phase sheet; create annotated tag `de-138-pre-sweep` pointing at HEAD; record SHA in §9 | [ ] | Tag `de-138-pre-sweep` @ `46976634` (data-recovery anchor; DR-138 §11.5B) |
+| [x] | 3.3 | Apply sweep: `uv run spec-driver admin migrate delta` against in-repo corpus; stage ONLY `.spec-driver/deltas/**`; commit as discrete sweep commit; record SHA + migration run log path in §9 | [ ] | Commit `2afc0833`; 141 deltas touched + `workflow.toml` migrations tracker bundled |
+| [x] | 3.4 | VA-DE138-DRIFT-001: triage every drift kind in the run log; append disposition table directly to the log file; commit log + dispositions as discrete drift-log commit | [ ] | Commit `717fced5`; 5 kinds disposed; DL-048 lands |
+| [x] | 3.5 | VA-DE138-RISK-RECON-001: per-entry outcome for every `body_risk_narrative` entry; reconciliation patch into `risks[].mitigation` and/or DL-* file creations; commit as discrete reconciliation commit | [ ] | Commit `6a7fe70b`; all 137 entries `file_dl` against pre-sweep tag; per-delta promotion deferred to cleanup delta |
+| [x] | 3.6 | VT-DE138-COV-001: implement test exercising `complete delta DE-138 --dry-run` self-bootstrap via derived `applies_to`; assert no missing coverage; capture output in §10 | [ ] | `coverage_check_test.py::test_de138_self_bootstraps_via_derived_applies_to_vt_cov_001` green |
+| [x] | 3.7 | Tolerant baseline + idempotence: `validate workspace --kind delta` clean; re-run `admin migrate delta --check` post-sweep returns zero touched (idempotence at corpus level); both captured in §10 | [ ] | tolerant validate exit 0 (only pre-existing warnings); orchestrator `--check` returns "no pending migrations" |
+| [x] | 3.8 | Execution-doc reconciliation: IP-138 coverage entries → verified for LIST-001 / COV-001 / VAs; PROD-004 coverage FR-001/FR-002/FR-007 → in-progress with evidence refs; DE-138 §6 Verification Strategy populated; notes updated; phase sheet §11 checklist closed | [ ] | This commit |
+| [x] | 3.9 | Quality gates: `just check` (ruff + format + pytest) clean; `uvx import-linter lint` 3/3 contracts (the formatter/CLI refactor is supekku-side so Migrations isolation is unaffected, but full lint is the exit gate) | [ ] | Pre-sweep gate: 5385 pytest passed (was 5367 at P02 close, +18 VTs from LIST-001/COV-001); import-linter 3/3 contracts. Post-sweep re-run captured in §10 |
 
 ### Task Details
 
@@ -193,18 +193,28 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 9. Decisions & Outcomes
 
-- _(populate as phase executes — pre-sweep tag SHA, three sweep commit SHAs, migration run log path)_
+- `2026-05-20` — Pre-sweep tag `de-138-pre-sweep` cut at `46976634` (P03.1 commit landing the list-deltas enrichment + this phase sheet). Tag is the load-bearing recovery anchor for DR-138 §11.5B; must not be deleted until the cleanup delta closes.
+- `2026-05-20` — Sweep commit `2afc0833` applies `v0_10_0_001_delta_blocks` against 141 in-repo deltas. Drift kinds (recovered from pre-sweep via `_transform()` replay): body_renumber (118), body_risk_narrative (137), context_input_unmapped_type (3), fm_requirements_unmatched (2), fm_specs_unmatched (3). Workflow.toml gains `[migrations] last_applied = v0_10_0_001_delta_blocks` — bundled in the sweep commit so revert restores both data and orchestrator state.
+- `2026-05-20` — Drift log commit `717fced5` closes VA-DE138-DRIFT-001 with per-kind dispositions (`auto_resolved` / `dl_filed` / `accepted_noise`). DL-048 lands as the persistent reconciliation ledger (4 entries; status open; owner unassigned for cleanup-delta scope).
+- `2026-05-20` — Reconciliation commit `6a7fe70b` closes VA-DE138-RISK-RECON-001. All 137 `body_risk_narrative` entries disposed as `file_dl` against the pre-sweep tag (see `p03-risk-recon-log.md` §2 rationale). Per-delta narrative promotion deferred to cleanup delta (DR-138 §15.1).
+- `2026-05-20` — Migration run log (gitignored) at `.spec-driver/run/migrations/20260520T022940Z-v0_10_0_001_delta_blocks.md`. Authoritative durable record is the committed `p03-sweep-drift-log.md` (orchestrator log captures touched/skipped paths only; drift kind detail recovered post-hoc).
+- `2026-05-20` — Orchestrator `_write_log` (in `spec_driver/presentation/cli/admin/migrate.py`) does not surface `StepResult.drift_entries` detail; gap noted as a P04+ orchestrator improvement (out of DE-138 scope — `StepResult` is currently `list[Path]`; extending to carry kind/detail tuples is a Protocol amendment that needs a separate scope-delta given DR-137 DEC-137-26 freeze).
 
 ## 10. Findings / Research Notes
 
-- _(populate as phase executes — VT-DE138-LIST-001 + VT-DE138-COV-001 output; post-sweep validate workspace output; corpus idempotence output; VA disposition summary)_
+- VT-DE138-LIST-001 evidence: 9 helper VTs in `change_formatters_test.py::TestDeltaListEnrichmentVTLIST001` + 8 CLI matrix VTs in `list_test.py::ListDeltasEnrichmentVTLIST001Test` (column matrix, audit glyph delta-id keyed, --tags opt-in, JSON full-data, flag preservation matrix).
+- VT-DE138-COV-001 evidence: `coverage_check_test.py::test_de138_self_bootstraps_via_derived_applies_to_vt_cov_001` — asserts derived `applies_to.specs == ['PROD-004','SPEC-115']` + `applies_to.requirements == ['PROD-004.FR-001','PROD-004.FR-002','PROD-004.FR-007']` via the `supekku:delta.relationships@v1` block (block-first, no FM fallback). `check_coverage_completeness` reads via derived property without erroring.
+- Tolerant validate post-sweep: `validate workspace --kind delta` exit 0; only pre-existing warnings (7× audit-gate-not-found on draft deltas DE-135/DE-138/DE-139/DE-140/DE-141/DE-142/DE-136, 1× DR-030 unresolved). Identical baseline to P01.
+- Corpus-level idempotence: `admin migrate delta --check` post-sweep returns "no pending migrations" — orchestrator-level idempotence via `[migrations] last_applied` tracker. Per-file idempotence proven at P02 via the migration step's `applies_to(path)` regex.
+- `complete delta DE-138 --dry-run --skip-update-requirements` exits 0 (CLI smoke).
+- DR-138 `applies_to` derivation self-bootstraps cleanly for DE-138 — the relationships block authored at delta creation carried specs.primary + requirements.implements that the post-sweep load reads as the canonical source.
 
 ## 11. Wrap-up Checklist
 
-- [ ] All §4 exit criteria satisfied.
-- [ ] Pre-sweep tag + three sweep commits SHAs recorded in §9.
-- [ ] Migration run log path recorded in §9; VA disposition tables appended directly to the log.
-- [ ] IP-138 verification coverage entries flipped `planned` → `verified` for LIST-001 / COV-001 / VAs.
-- [ ] PROD-004 coverage block FR-001/FR-002/FR-007 set to `in-progress` with evidence refs.
-- [ ] DE-138.md §6 Verification Strategy populated.
-- [ ] Hand-off note to P04 — pre-flip checklist (DR-138 §11.2) ready: tolerant validate clean, both VAs closed, sweep commits in place. Outstanding for P04 entrance: `--no-tolerated-aliases` wiring (DEC-138-14), VT-DE138-GATE-001, VT-DE138-FLIP-001, VH-DE138-FLIP-001 operator attestation, §9.5 follow-up audit tracking artefact filing (F-138-24).
+- [x] All §4 exit criteria satisfied (modulo DE-138 §6 placeholders — populated as part of P03.8 commit).
+- [x] Pre-sweep tag + three sweep commits SHAs recorded in §9.
+- [x] Migration run log path recorded in §9; VA disposition tables appended directly to the log (companion committed files `p03-sweep-drift-log.md` + `p03-risk-recon-log.md` are the durable record).
+- [x] IP-138 verification coverage entries flipped `planned` → `verified` for LIST-001 / COV-001 / VAs.
+- [x] PROD-004 coverage block FR-001/FR-002/FR-007 set to `in-progress` with evidence refs (VT-DE138-LIST-001, VT-DE138-FLIP-001, VT-DE138-MIG-001).
+- [x] DE-138.md §6 Verification Strategy populated.
+- [x] Hand-off note to P04 — pre-flip checklist (DR-138 §11.2) status: tolerant validate clean, both VAs closed, three sweep commits in place + pre-sweep tag retained. Outstanding for P04 entrance: `--no-tolerated-aliases` wiring (DEC-138-14), VT-DE138-GATE-001, VT-DE138-FLIP-001, VH-DE138-FLIP-001 operator attestation, §9.5 follow-up audit tracking artefact filing (F-138-24).

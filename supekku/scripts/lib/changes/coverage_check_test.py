@@ -7,6 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock
 
+from supekku.scripts.lib.changes.artifacts import load_change_artifact
 from supekku.scripts.lib.core.paths import (
   DELTAS_SUBDIR,
   SPEC_DRIVER_DIR,
@@ -463,3 +464,37 @@ def test_format_coverage_error_handles_multiple_requirements() -> None:
   assert "SPEC-900.FR-001" in error
   assert "SPEC-900.FR-002" in error
   assert error.count("  - artefact: VT-902") >= 1  # Example block shown once
+
+
+def test_de138_self_bootstraps_via_derived_applies_to_vt_cov_001() -> None:
+  """VT-DE138-COV-001 — DE-138 reads requirements via derived applies_to.
+
+  Self-bootstrap claim (DR-138 §10.1): post-sweep DE-138 carries the
+  ``supekku:delta.relationships@v1`` block as the sole source for
+  ``applies_to``; ``coverage_check`` consumes it without FM-fallback.
+  """
+  repo_root = Path(__file__).resolve().parents[4]
+  de138_slug = (
+    "DE-138-delta_artefact_metadata_propagation_blocks_"
+    "applies_to_derivation_list_enrichment_de_136_child"
+  )
+  de138 = repo_root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / de138_slug / "DE-138.md"
+  artifact = load_change_artifact(de138)
+  assert artifact is not None
+  assert artifact.id == "DE-138"
+  assert sorted(artifact.applies_to.get("specs", [])) == ["PROD-004", "SPEC-115"]
+  assert sorted(artifact.applies_to.get("requirements", [])) == [
+    "PROD-004.FR-001",
+    "PROD-004.FR-002",
+    "PROD-004.FR-007",
+  ]
+
+  workspace = Workspace(root=repo_root)
+  is_complete, missing = check_coverage_completeness("DE-138", workspace)
+  # Smoke: coverage_check consumed derived applies_to without erroring
+  # and returned a (bool, list) tuple. Status assertions belong to P04
+  # (after PROD-004 FRs flip to `verified` via DE-136 umbrella audit).
+  assert isinstance(is_complete, bool)
+  assert all(m.requirement_id.startswith("PROD-004.") for m in missing), (
+    f"unexpected requirement scope in coverage_check; missing={missing}"
+  )

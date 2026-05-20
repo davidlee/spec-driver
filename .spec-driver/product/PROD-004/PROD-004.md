@@ -173,6 +173,21 @@ entries:
     requirement: PROD-004.FR-007
     status: planned
     notes: Compaction profile tests - canonical/derived classification, round-trip fidelity, default omission
+  - artefact: VT-DE138-LIST-001
+    kind: VT
+    requirement: PROD-004.FR-001
+    status: in-progress
+    notes: list deltas enrichment column matrix + flag preservation; DE-138 IP-138-P03 (umbrella audit DE-136 P04 promotes to verified)
+  - artefact: VT-DE138-FLIP-001
+    kind: VT
+    requirement: PROD-004.FR-002
+    status: in-progress
+    notes: Strict-on-validate enforced post-flip; DE-138 IP-138-P04 (P03 close marks in-progress per F-138-L)
+  - artefact: VT-DE138-MIG-001
+    kind: VT
+    requirement: PROD-004.FR-007
+    status: in-progress
+    notes: Migration step apply() over 7-fixture corpus + idempotence; first compaction-infra exercise; DE-138 IP-138-P02 (umbrella audit DE-136 P04 promotes to verified)
   - artefact: VT-CC-001
     kind: VT
     requirement: PROD-004.FR-001

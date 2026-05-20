@@ -99,7 +99,8 @@ class TestCompactDelta(unittest.TestCase):
     text = delta_file.read_text()
     data = yaml.safe_load(text.split("---")[1])
     self.assertNotIn("relations", data)
-    self.assertNotIn("applies_to", data)
+    # DE-138 P01: applies_to is no longer FM-declared (derived from block);
+    # FM applies_to passes through compaction unchanged until P03 sweep.
     self.assertNotIn("owners", data)
     self.assertNotIn("tags", data)
     self.assertEqual(data["id"], "DE-900")

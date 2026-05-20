@@ -279,7 +279,13 @@ class TestDeltaCompactionRoundTrip(unittest.TestCase):
     self.assertEqual(result, data)
 
   def test_empty_defaults_stripped(self) -> None:
-    """Empty-default fields (aliases, relations, applies_to) are removed."""
+    """Empty-default fields (relations) are removed.
+
+    DE-138 P01: applies_to is no longer FM-declared (derived from
+    delta.relationships@v1 block per DR-138 §6.1). FM `applies_to` keys on
+    unmigrated artefacts pass through compaction unchanged until the P03
+    sweep cuts them.
+    """
     data = {
       "id": "DE-002",
       "name": "Delta With Defaults",
@@ -290,16 +296,14 @@ class TestDeltaCompactionRoundTrip(unittest.TestCase):
       "updated": "2026-03-03",
       "aliases": [],
       "relations": [],
-      "applies_to": {"specs": [], "requirements": []},
     }
     result = compact_frontmatter(data, self.meta)
     self.assertNotIn("relations", result)
-    self.assertNotIn("applies_to", result)
     # aliases is not in delta metadata — passes through as unknown
     self.assertIn("aliases", result)
 
-  def test_populated_defaults_kept(self) -> None:
-    """Non-default values for default-omit fields are preserved."""
+  def test_populated_relations_kept(self) -> None:
+    """Non-default relations are preserved."""
     data = {
       "id": "DE-003",
       "name": "Delta With Content",
@@ -309,18 +313,17 @@ class TestDeltaCompactionRoundTrip(unittest.TestCase):
       "created": "2026-03-03",
       "updated": "2026-03-03",
       "relations": [{"type": "implements", "target": "SPEC-101"}],
-      "applies_to": {
-        "specs": ["SPEC-101"],
-        "prod": ["PROD-020"],
-        "requirements": ["SPEC-101.FR-01"],
-      },
     }
     result = compact_frontmatter(data, self.meta)
     self.assertEqual(result["relations"], data["relations"])
-    self.assertEqual(result["applies_to"], data["applies_to"])
 
   def test_optional_fields_stripped_when_empty(self) -> None:
-    """Optional fields (owners, tags, etc.) stripped when empty/default."""
+    """Optional fields (owners, tags, etc.) stripped when empty/default.
+
+    DE-138 P01: context_inputs / risk_register moved to dedicated blocks
+    (DR-138 §3.1). FM keys on unmigrated artefacts pass through unchanged
+    until the P03 sweep.
+    """
     data = {
       "id": "DE-004",
       "name": "Delta Optional",
@@ -332,11 +335,9 @@ class TestDeltaCompactionRoundTrip(unittest.TestCase):
       "owners": [],
       "auditers": [],
       "tags": [],
-      "context_inputs": [],
-      "risk_register": [],
     }
     result = compact_frontmatter(data, self.meta)
-    for field in ("owners", "auditers", "tags", "context_inputs", "risk_register"):
+    for field in ("owners", "auditers", "tags"):
       self.assertNotIn(field, result, f"{field} should be stripped")
 
   def test_optional_fields_kept_when_populated(self) -> None:
@@ -359,8 +360,13 @@ class TestDeltaCompactionRoundTrip(unittest.TestCase):
     self.assertEqual(result["tags"], ["core"])
     self.assertEqual(result["lifecycle"], "implementation")
 
-  def test_applies_to_with_prod_not_stripped(self) -> None:
-    """Known pitfall: applies_to with prod key != default, must be kept."""
+  def test_applies_to_fm_passes_through_unchanged(self) -> None:
+    """DE-138 P01: FM applies_to is no longer declared metadata; passes through.
+
+    Loader derives applies_to from the delta.relationships@v1 block
+    (DR-138 §6.1, DEC-138-10). Compactor ignores undeclared FM keys; the
+    P03 sweep cuts them once the block is canonical.
+    """
     data = {
       "id": "DE-006",
       "name": "Delta Prod",

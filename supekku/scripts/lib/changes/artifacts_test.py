@@ -4,11 +4,20 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from supekku.scripts.lib.changes.artifacts import load_change_artifact
+from supekku.scripts.lib.blocks.delta import DeltaRelationshipsBlock
+from supekku.scripts.lib.changes.artifacts import (
+  _derive_applies_to,
+  _derive_revision_link_relations,
+  load_change_artifact,
+)
 from supekku.scripts.lib.core.spec_utils import dump_markdown_file_update
 
 if TYPE_CHECKING:
   from pathlib import Path
+
+
+def _block(data: dict) -> DeltaRelationshipsBlock:
+  return DeltaRelationshipsBlock(raw_yaml="", data=data)
 
 
 def _write_delta(tmp_path: Path, body: str) -> Path:
@@ -70,8 +79,9 @@ phases:
   path = _write_delta(tmp_path, body)
   artifact = load_change_artifact(path)
   assert artifact
+  # DE-138 / DEC-138-11: applies_to unions specs.primary ∪ specs.collaborators.
   assert artifact.applies_to == {
-    "specs": ["SPEC-147"],
+    "specs": ["SPEC-002", "SPEC-147"],
     "requirements": ["SPEC-147.FR-001", "SPEC-147.FR-005"],
   }
   assert {r["type"] for r in artifact.relations} == {"introduces"}
@@ -417,3 +427,135 @@ def test_to_dict_omits_ext_fields_when_absent(tmp_path: Path) -> None:
   data = artifact.to_dict(tmp_path)
   assert "ext_id" not in data
   assert "ext_url" not in data
+
+
+# -- VT-DE138-DERIVE-001 — _derive_applies_to matrix (DR-138 §6.1, DEC-138-10) --
+
+
+def test_derive_applies_to_block_sole_source_when_block_present() -> None:
+  """Block present → block is sole source (FM silently shadowed even when populated)."""
+  block = _block(
+    {
+      "specs": {"primary": ["SPEC-100"]},
+      "requirements": {"implements": ["SPEC-100.FR-001"]},
+    }
+  )
+  fm = {"applies_to": {"specs": ["FM-ONLY-SPEC"], "requirements": ["FM-ONLY-REQ"]}}
+  result = _derive_applies_to(block, fm)
+  assert result == {"specs": ["SPEC-100"], "requirements": ["SPEC-100.FR-001"]}
+
+
+def test_derive_applies_to_falls_back_to_fm_when_block_absent() -> None:
+  """Block absent → FM-fallback (transition-window for unmigrated artefacts)."""
+  fm = {"applies_to": {"specs": ["SPEC-200"], "requirements": ["SPEC-200.FR-001"]}}
+  result = _derive_applies_to(None, fm)
+  assert result == {"specs": ["SPEC-200"], "requirements": ["SPEC-200.FR-001"]}
+
+
+def test_derive_applies_to_returns_empty_when_both_absent() -> None:
+  """Both block and FM absent → empty dict."""
+  assert _derive_applies_to(None, {}) == {}
+
+
+def test_derive_applies_to_empty_block_falls_through_to_fm() -> None:
+  """Block with no specs/reqs → FM-fallback (block payload treated as absent)."""
+  block = _block({})
+  fm = {"applies_to": {"specs": ["SPEC-300"]}}
+  result = _derive_applies_to(block, fm)
+  assert result == {"specs": ["SPEC-300"]}
+
+
+def test_derive_applies_to_fm_non_dict_returns_empty() -> None:
+  """FM applies_to that is not a dict → empty (guards against bad payloads)."""
+  assert _derive_applies_to(None, {"applies_to": "not-a-dict"}) == {}
+
+
+# -- VT-DE138-COLLAB-001 — union primary + collaborators (DR-138 §6.1, DEC-138-11) --
+
+
+def test_derive_applies_to_unions_primary_and_collaborators() -> None:
+  """Block with primary + collaborators → applies_to.specs is the sorted union."""
+  block = _block(
+    {
+      "specs": {
+        "primary": ["SPEC-100"],
+        "collaborators": ["SPEC-200", "SPEC-300"],
+      },
+    }
+  )
+  result = _derive_applies_to(block, {})
+  assert result == {
+    "specs": ["SPEC-100", "SPEC-200", "SPEC-300"],
+    "requirements": [],
+  }
+
+
+def test_derive_applies_to_collaborator_only_spec_appears() -> None:
+  """Collaborator-only spec (no primary) still surfaces in applies_to."""
+  block = _block({"specs": {"primary": [], "collaborators": ["SPEC-COL"]}})
+  result = _derive_applies_to(block, {})
+  assert result == {"specs": ["SPEC-COL"], "requirements": []}
+
+
+def test_derive_applies_to_unions_all_requirement_relations() -> None:
+  """All of requirements.{implements,updates,verifies} union into applies_to.requirements."""  # noqa: E501
+  block = _block(
+    {
+      "requirements": {
+        "implements": ["SPEC-100.FR-001"],
+        "updates": ["SPEC-100.FR-002"],
+        "verifies": ["SPEC-100.NFR-PERF"],
+      }
+    }
+  )
+  result = _derive_applies_to(block, {})
+  assert result == {
+    "specs": [],
+    "requirements": [
+      "SPEC-100.FR-001",
+      "SPEC-100.FR-002",
+      "SPEC-100.NFR-PERF",
+    ],
+  }
+
+
+# -- VT-DE138-RELLINK-001 — revision_links projection (DR-138 §6.1, F-138-16) --
+
+
+def test_derive_revision_link_relations_projects_introduces() -> None:
+  block = _block({"revision_links": {"introduces": ["RE-100", "RE-101"]}})
+  rels = _derive_revision_link_relations(block)
+  assert {"type": "introduces", "target": "RE-100"} in rels
+  assert {"type": "introduces", "target": "RE-101"} in rels
+
+
+def test_derive_revision_link_relations_projects_supersedes() -> None:
+  block = _block({"revision_links": {"supersedes": ["RE-200"]}})
+  rels = _derive_revision_link_relations(block)
+  assert rels == [{"type": "supersedes", "target": "RE-200"}]
+
+
+def test_derive_revision_link_relations_empty_when_block_absent() -> None:
+  assert _derive_revision_link_relations(None) == []
+
+
+def test_derive_revision_link_relations_empty_when_no_revision_links() -> None:
+  block = _block({})
+  assert _derive_revision_link_relations(block) == []
+
+
+def test_derive_revision_link_relations_preserves_both_kinds() -> None:
+  """ADR-002 backlinks observed — projection comes from authored block content only."""
+  block = _block(
+    {
+      "revision_links": {
+        "introduces": ["RE-100"],
+        "supersedes": ["RE-090"],
+      }
+    }
+  )
+  rels = _derive_revision_link_relations(block)
+  assert {(r["type"], r["target"]) for r in rels} == {
+    ("introduces", "RE-100"),
+    ("supersedes", "RE-090"),
+  }

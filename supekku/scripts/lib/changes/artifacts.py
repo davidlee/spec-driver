@@ -7,8 +7,10 @@ from typing import TYPE_CHECKING, Any
 
 from rich.console import Console
 
-from supekku.scripts.lib.blocks.delta import extract_delta_relationships
-from supekku.scripts.lib.blocks.delta_metadata import validate_delta_relationships
+from supekku.scripts.lib.blocks.delta import (
+  DeltaRelationshipsBlock,
+  extract_delta_relationships,
+)
 from supekku.scripts.lib.blocks.metadata.aliases import normalize_field
 from supekku.scripts.lib.blocks.plan import (
   extract_phase_overview,
@@ -22,6 +24,66 @@ from .lifecycle import CHANGE_STATUSES
 
 if TYPE_CHECKING:
   from pathlib import Path
+
+
+def _derive_applies_to(
+  block: DeltaRelationshipsBlock | None,
+  frontmatter: dict[str, Any],
+) -> dict[str, Any]:
+  """Synthesise ``applies_to`` from the relationships block (DR-138 §6.1).
+
+  Block-first when present (sole source — FM silently shadowed even if
+  populated). FM-fallback only when block absent (transition window for
+  unmigrated artefacts). Validator layer separately reports FM
+  ``applies_to`` as a strict-mode error post-flip (DEC-138-10).
+
+  Unions ``specs.primary ∪ specs.collaborators`` so collaborator-only
+  linkages remain visible to coverage gates (DEC-138-11).
+  """
+  if block is not None:
+    spec_groups = block.data.get("specs") or {}
+    specs = sorted(
+      {
+        str(s)
+        for key in ("primary", "collaborators")
+        for s in (spec_groups.get(key) or [])
+        if isinstance(s, str)
+      }
+    )
+    req_groups = block.data.get("requirements") or {}
+    reqs = sorted(
+      {
+        str(r)
+        for key in ("implements", "updates", "verifies")
+        for r in (req_groups.get(key) or [])
+        if isinstance(r, str)
+      }
+    )
+    if specs or reqs:
+      return {"specs": specs, "requirements": reqs}
+  fm = frontmatter.get("applies_to") or {}
+  return dict(fm) if isinstance(fm, dict) else {}
+
+
+def _derive_revision_link_relations(
+  block: DeltaRelationshipsBlock | None,
+) -> list[dict[str, str]]:
+  """Project ``revision_links.{introduces,supersedes}`` into relation entries.
+
+  Preserves the legacy projection as a discrete helper so deleting the
+  ``applies_to`` merge region does not collateral-drop the RE-* relation
+  projection (DR-138 §6.1, F-138-16). ADR-002 backlinks rule is observed
+  because the projection derives from authored block content, not from
+  foreign-artefact backlinks.
+  """
+  if block is None:
+    return []
+  revision_links = block.data.get("revision_links") or {}
+  relations: list[dict[str, str]] = []
+  for rel_type in ("introduces", "supersedes"):
+    for target in revision_links.get(rel_type) or []:
+      relations.append({"type": rel_type, "target": str(target)})
+  return relations
 
 
 @dataclass(frozen=True)
@@ -114,44 +176,13 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
   plan_payload: dict[str, Any] | None = None
 
   if kind == "delta":
-    block = None
+    block: DeltaRelationshipsBlock | None = None
     try:
       block = extract_delta_relationships(body)
     except ValueError:
       block = None
-    if block and not validate_delta_relationships(block, delta_id=artifact_id):
-      specs = block.data.get("specs") or {}
-      primary_specs = specs.get("primary") or []
-      if primary_specs:
-        existing = {
-          str(item)
-          for item in applies_to_mapping.get("specs", [])
-          if isinstance(item, str)
-        }
-        existing.update(str(item) for item in primary_specs if isinstance(item, str))
-        if existing:
-          applies_to_mapping["specs"] = sorted(existing)
-
-      reqs = block.data.get("requirements") or {}
-      requirement_ids = set()
-      for key in ("implements", "updates", "verifies"):
-        values = reqs.get(key) or []
-        for value in values:
-          if isinstance(value, str):
-            requirement_ids.add(value)
-      if requirement_ids:
-        existing_reqs = {
-          str(item)
-          for item in applies_to_mapping.get("requirements", [])
-          if isinstance(item, str)
-        }
-        existing_reqs.update(requirement_ids)
-        applies_to_mapping["requirements"] = sorted(existing_reqs)
-
-      revision_links = block.data.get("revision_links") or {}
-      for rel_type in ("introduces", "supersedes"):
-        for target in revision_links.get(rel_type) or []:
-          relations.append({"type": rel_type, "target": str(target)})
+    applies_to_mapping = _derive_applies_to(block, frontmatter)
+    relations.extend(_derive_revision_link_relations(block))
 
     plan_id = artifact_id.replace("DE", "IP")
     plan_path = path.parent / f"{plan_id}.md"

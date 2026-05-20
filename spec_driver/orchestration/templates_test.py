@@ -242,3 +242,45 @@ class TestValidateTemplates:
     (tmp_path / "supekku" / "templates").mkdir(parents=True)
     drifts = validate_templates(tmp_path, kinds=("delta",))
     assert drifts == []
+
+
+class TestDelta138TplVT:
+  """VT-DE138-TPL-001 — delta template FM omits DE-138 cut keys after regen."""
+
+  _CUT_KEYS = ("applies_to", "context_inputs", "risk_register", "outcome_summary")
+
+  def _regen_delta_template_in(self, root: Path) -> Path:
+    """Run regenerate_template('delta', ...) against a fresh fixture file."""
+    templates_dir = root / "supekku" / "templates"
+    templates_dir.mkdir(parents=True)
+    p = templates_dir / "delta.md"
+    p.write_text("# {{ delta_id }}\n\n{{ delta_relationships_block }}\n", "utf-8")
+    regenerate_template("delta", p)
+    return p
+
+  def test_cut_keys_absent_after_regen(self, tmp_path: Path) -> None:
+    """Regenerated FM omits the four DE-138 cut keys."""
+    p = self._regen_delta_template_in(tmp_path)
+    fm_block, _ = _split_frontmatter(p.read_text(encoding="utf-8"))
+    for key in self._CUT_KEYS:
+      assert f"{key}:" not in fm_block, f"cut key {key!r} still in regenerated FM"
+
+  def test_regen_idempotent_second_run(self, tmp_path: Path) -> None:
+    """Second regen produces no change — guards against template metadata regression."""
+    p = self._regen_delta_template_in(tmp_path)
+    first = p.read_text(encoding="utf-8")
+    assert regenerate_template("delta", p) is False
+    assert p.read_text(encoding="utf-8") == first
+
+  def test_validate_clean_after_regen(self, tmp_path: Path) -> None:
+    """Round-trip: regen → validate ⇒ no drift."""
+    self._regen_delta_template_in(tmp_path)
+    drifts = validate_templates(tmp_path, kinds=("delta",))
+    assert drifts == []
+
+  def test_enum_hints_preserved(self, tmp_path: Path) -> None:
+    """Regenerated FM carries inline enum-comment hints (DR-136 §5.1 Y)."""
+    p = self._regen_delta_template_in(tmp_path)
+    text = p.read_text(encoding="utf-8")
+    assert "status: draft  # one of:" in text
+    assert "kind: delta  # one of:" in text

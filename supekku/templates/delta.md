@@ -12,6 +12,10 @@ updated: "{{ today }}"
 
 {{ delta_relationships_block }}
 
+{{ delta_context_inputs_block }}
+
+{{ delta_risk_register_block }}
+
 ## 1. Summary & Context
 
 - **Product Spec(s)**: PROD-XXX – <link and summary>
@@ -50,18 +54,13 @@ updated: "{{ today }}"
 - **Planned Artefacts**: <VT/VA/VH IDs expected from implementation plan phases>
 - **Acceptance Criteria**: <Objective pass/fail gates before marking delta complete>
 
-## 7. Risks & Mitigations
-
-- **Risk**: <Description> – _Likelihood_: low|medium|high – _Impact_: low|medium|high – _Mitigation_: <Action>
-- **Risk**: …
-
-## 8. Follow-ups & Tracking
+## 7. Follow-ups & Tracking
 
 - **Future Phases / Deltas**: <What remains after this delta>
 - **Backlog Items**: ISSUE-XXX, PROB-YYY – <Short note>
 - **Open Decisions / Questions**: <Outstanding clarifications with owner + due date>
 
-## 9. Implementation Notes
+## 8. Implementation Notes
 
 - <Environment setup, scripts, commands, coordination notes>
 - <Links to design artefacts, diagrams, reference documentation>

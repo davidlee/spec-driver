@@ -8,7 +8,11 @@ from typing import TYPE_CHECKING
 
 from jinja2 import Template
 
-from supekku.scripts.lib.blocks.delta import render_delta_relationships_block
+from supekku.scripts.lib.blocks.delta import (
+  render_delta_context_inputs_block,
+  render_delta_relationships_block,
+  render_delta_risk_register_block,
+)
 from supekku.scripts.lib.changes._creation_utils import (
   ChangeArtifactCreated,
   _ensure_directory,
@@ -65,6 +69,10 @@ def create_delta(
   delta_dir = base_dir / f"{delta_id}-{slug}"
   _ensure_directory(delta_dir)
 
+  # DE-138 P01 (DR-138 §9.4): applies_to / context_inputs / risk_register /
+  # outcome_summary no longer live in FM. relationships block carries the
+  # applies_to source; context_inputs / risk_register render as dedicated
+  # blocks in the body.
   frontmatter = {
     "id": delta_id,
     "slug": slug,
@@ -75,11 +83,6 @@ def create_delta(
     "kind": "delta",
     "aliases": [],
     "relations": list(relations or []),
-    "context_inputs": list(context_inputs or []),
-    "applies_to": {
-      "specs": sorted(set(specs or [])),
-      "requirements": sorted(set(requirements or [])),
-    },
   }
 
   # Render YAML blocks
@@ -88,6 +91,10 @@ def create_delta(
     primary_specs=list(specs or []),
     implements_requirements=list(requirements or []),
   )
+  context_inputs_block = render_delta_context_inputs_block(
+    entries=list(context_inputs or [])
+  )
+  risk_register_block = render_delta_risk_register_block(risks=[])
 
   # Load template and render with Jinja2
   template_path = _get_template_path("delta.md", repo)
@@ -99,6 +106,8 @@ def create_delta(
     created=today,
     updated=today,
     delta_relationships_block=relationships_block,
+    delta_context_inputs_block=context_inputs_block,
+    delta_risk_register_block=risk_register_block,
   )
 
   delta_path = delta_dir / f"{delta_id}.md"

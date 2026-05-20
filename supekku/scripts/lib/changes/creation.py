@@ -142,7 +142,9 @@ def create_plan(
     msg = f"Plan {plan_id} already exists at {plan_path}"
     raise FileExistsError(msg)
 
-  # Read delta frontmatter for metadata
+  # Read delta frontmatter for metadata (DE-138 P01: applies_to is derived
+  # from the delta.relationships@v1 block via load_change_artifact —
+  # DR-138 §6.1).
   delta_file = delta_dir / f"{delta_id}.md"
   if not delta_file.exists():
     msg = f"Delta file not found: {delta_file}"
@@ -150,7 +152,14 @@ def create_plan(
   frontmatter, _ = load_markdown_file(delta_file)
   slug = frontmatter.get("slug", "plan")
   name = frontmatter.get("name", delta_id).removeprefix("Delta - ")
-  applies_to = frontmatter.get("applies_to", {})
+  # Local import avoids an artifacts.py cycle (mirrors _render_plan in
+  # delta_creation.py).
+  from supekku.scripts.lib.changes.artifacts import (  # noqa: PLC0415, I001
+    load_change_artifact,
+  )
+
+  artifact = load_change_artifact(delta_file)
+  applies_to = artifact.applies_to if artifact else {}
   specs = applies_to.get("specs")
   requirements = applies_to.get("requirements")
 

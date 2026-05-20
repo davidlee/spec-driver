@@ -49,9 +49,15 @@ class CreateChangeTest(unittest.TestCase):
     templates_dir.mkdir(parents=True, exist_ok=True)
 
     # Delta template (Jinja2, no frontmatter)
-    # Uses {{ delta_relationships_block }} variable for YAML block
+    # DE-138 P01 (DR-138 §9.3): relationships + context_inputs + risk_register
+    # blocks all live in the body.
     (templates_dir / "delta.md").write_text(
-      "# {{ delta_id }} – {{ name }}\n\n{{ delta_relationships_block }}\n",
+      (
+        "# {{ delta_id }} – {{ name }}\n\n"
+        "{{ delta_relationships_block }}\n\n"
+        "{{ delta_context_inputs_block }}\n\n"
+        "{{ delta_risk_register_block }}\n"
+      ),
       encoding="utf-8",
     )
 
@@ -150,7 +156,15 @@ class CreateChangeTest(unittest.TestCase):
     assert len(result.extras) == 3  # DR, IP, notes (not counting primary delta file)
 
   def test_create_delta_with_context_inputs_and_relations(self) -> None:
-    """VT-085-007: create_delta populates context_inputs and relations."""
+    """VT-085-007 + DE-138 P01: create_delta emits context_inputs block + relations.
+
+    DR-138 §9.4: context_inputs moves from FM to a dedicated
+    delta.context_inputs@v1 block in the body. Relations remain in FM.
+    """
+    from supekku.scripts.lib.blocks.delta import (  # noqa: PLC0415
+      extract_delta_context_inputs,
+    )
+
     root = self._make_repo()
     ctx = [{"type": "issue", "id": "IMPR-006"}]
     rels = [{"type": "relates_to", "target": "IMPR-006"}]
@@ -161,21 +175,38 @@ class CreateChangeTest(unittest.TestCase):
       relations=rels,
       repo_root=root,
     )
-    frontmatter, _ = load_markdown_file(result.primary_path)
-    assert frontmatter["context_inputs"] == ctx
+    frontmatter, body = load_markdown_file(result.primary_path)
+    assert "context_inputs" not in frontmatter
     assert frontmatter["relations"] == rels
+    block = extract_delta_context_inputs(body)
+    assert block is not None
+    assert block.data["entries"] == ctx
 
-  def test_create_delta_without_context_inputs_has_empty_list(self) -> None:
-    """VT-085-007: omitted context_inputs defaults to empty list."""
+  def test_create_delta_without_context_inputs_has_empty_block(self) -> None:
+    """DE-138 P01: omitted context_inputs renders empty block, no FM key."""
+    from supekku.scripts.lib.blocks.delta import (  # noqa: PLC0415
+      extract_delta_context_inputs,
+      extract_delta_risk_register,
+    )
+
     root = self._make_repo()
     result = create_delta(
       "Plain delta",
       specs=["SPEC-100"],
       repo_root=root,
     )
-    frontmatter, _ = load_markdown_file(result.primary_path)
-    assert frontmatter.get("context_inputs") == []
+    frontmatter, body = load_markdown_file(result.primary_path)
+    assert "context_inputs" not in frontmatter
+    assert "risk_register" not in frontmatter
+    assert "applies_to" not in frontmatter
+    assert "outcome_summary" not in frontmatter
     assert frontmatter.get("relations") == []
+    ctx_block = extract_delta_context_inputs(body)
+    assert ctx_block is not None
+    assert ctx_block.data["entries"] == []
+    risk_block = extract_delta_risk_register(body)
+    assert risk_block is not None
+    assert risk_block.data["risks"] == []
 
   def test_create_delta_emits_enum_comment_hints_in_frontmatter(self) -> None:
     """VT-CC-004: Created artefact carries inline enum-comment hints.

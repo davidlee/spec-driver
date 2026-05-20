@@ -10,14 +10,71 @@ from supekku.scripts.lib.blocks.metadata import (
   BlockMetadata,
   FieldMetadata,
   MetadataValidator,
+  ToleratedAlias,
 )
 
 # Reuse constants and block dataclass from delta.py
 from .delta import (
+  CONTEXT_INPUTS_SCHEMA,
+  CONTEXT_INPUTS_VERSION,
   RELATIONSHIPS_SCHEMA,
   RELATIONSHIPS_VERSION,
+  RISK_REGISTER_SCHEMA,
+  RISK_REGISTER_VERSION,
+  DeltaContextInputsBlock,
   DeltaRelationshipsBlock,
+  DeltaRiskRegisterBlock,
 )
+
+# -- delta.context_inputs@v1 (DR-138 §5.1) --
+
+CONTEXT_INPUTS_TYPE_ENUM: list[str] = [
+  "delta",
+  "revision",
+  "audit",
+  "phase",
+  "plan",
+  "spec",
+  "prod",
+  "adr",
+  "issue",
+  "problem",
+  "improvement",
+  "risk",
+  "memory",
+  "decision",
+  "policy",
+  "standard",
+  "document",
+  "code",
+  "research",
+]
+
+CONTEXT_INPUTS_TYPE_ALIASES: dict[str, str] = {
+  "reference": "document",
+  "brief": "document",
+  "external": "document",
+  "investigation": "research",
+}
+
+CONTEXT_INPUTS_TYPE_TOLERATED_ALIASES: dict[str, ToleratedAlias] = {
+  "unknown": ToleratedAlias(
+    canonical="document",
+    sunset_after="delta-sweep close",
+    rationale=(
+      "DR-138 §5.1 (F-138-B): migration emits 'unknown' for FM types that "
+      "fail alias map AND canonical enum; tolerated_alias normalises to "
+      "'document' at load while --no-tolerated-aliases flags artefacts for "
+      "human re-classification before sunset"
+    ),
+  ),
+}
+
+# Risk-entry enums (DR-138 §5.2)
+RISK_LIKELIHOOD_ENUM: list[str] = ["low", "medium", "high"]
+RISK_IMPACT_ENUM: list[str] = ["low", "medium", "high"]
+RISK_EXPOSURE_ENUM: list[str] = ["change", "delivery", "systemic"]
+RISK_STATUS_ENUM: list[str] = ["open", "planned", "mitigated", "accepted", "closed"]
 
 # Metadata definition for delta relationships blocks
 DELTA_RELATIONSHIPS_METADATA = BlockMetadata(
@@ -195,7 +252,219 @@ def validate_delta_relationships(
   return errors
 
 
+# -- delta.context_inputs@v1 (DR-138 §5.1) --
+
+DELTA_CONTEXT_INPUTS_METADATA = BlockMetadata(
+  version=CONTEXT_INPUTS_VERSION,
+  schema_id=CONTEXT_INPUTS_SCHEMA,
+  description=(
+    "Context inputs (research, decisions, prior artefacts) consumed by this delta"
+  ),
+  fields={
+    "schema": FieldMetadata(
+      type="const",
+      const_value=CONTEXT_INPUTS_SCHEMA,
+      required=True,
+      description=f"Schema identifier (must be '{CONTEXT_INPUTS_SCHEMA}')",
+    ),
+    "version": FieldMetadata(
+      type="const",
+      const_value=CONTEXT_INPUTS_VERSION,
+      required=True,
+      description=f"Schema version (must be {CONTEXT_INPUTS_VERSION})",
+    ),
+    "entries": FieldMetadata(
+      type="array",
+      required=True,
+      description="Context input entries (may be empty)",
+      items=FieldMetadata(
+        type="object",
+        description="A single context input entry",
+        properties={
+          "type": FieldMetadata(
+            type="enum",
+            required=True,
+            enum_values=CONTEXT_INPUTS_TYPE_ENUM,
+            aliases=CONTEXT_INPUTS_TYPE_ALIASES,
+            tolerated_aliases=CONTEXT_INPUTS_TYPE_TOLERATED_ALIASES,
+            description="Kind of context input",
+          ),
+          "id": FieldMetadata(
+            type="string",
+            required=True,
+            pattern=r".+",
+            description="Identifier for the referenced artefact",
+          ),
+          "summary": FieldMetadata(
+            type="string",
+            required=False,
+            description=(
+              "Optional short summary; emitters MUST omit the key when "
+              "absent (schema is non-nullable str; F-138-31)"
+            ),
+          ),
+        },
+        field_aliases={
+          "ref": "id",
+          "note": "summary",
+          "annotation": "summary",
+        },
+      ),
+    ),
+  },
+  examples=[
+    {
+      "schema": CONTEXT_INPUTS_SCHEMA,
+      "version": CONTEXT_INPUTS_VERSION,
+      "entries": [
+        {"type": "delta", "id": "DE-136", "summary": "Umbrella program"},
+        {"type": "adr", "id": "ADR-010", "summary": "Placement heuristic"},
+      ],
+    },
+  ],
+)
+
+_DELTA_CONTEXT_INPUTS_VALIDATOR = MetadataValidator(DELTA_CONTEXT_INPUTS_METADATA)
+
+
+def validate_delta_context_inputs(
+  block: DeltaContextInputsBlock,
+  *,
+  strict: bool = True,
+  accept_tolerated: bool = True,
+) -> list[str]:
+  """Validate a delta context_inputs block against its metadata declaration."""
+  return [
+    str(err)
+    for err in _DELTA_CONTEXT_INPUTS_VALIDATOR.validate(
+      block.data, strict=strict, accept_tolerated=accept_tolerated
+    )
+  ]
+
+
+# -- delta.risk_register@v1 (DR-138 §5.2) --
+
+DELTA_RISK_REGISTER_METADATA = BlockMetadata(
+  version=RISK_REGISTER_VERSION,
+  schema_id=RISK_REGISTER_SCHEMA,
+  description="Delta risk register — risks scoped to this delta's execution",
+  fields={
+    "schema": FieldMetadata(
+      type="const",
+      const_value=RISK_REGISTER_SCHEMA,
+      required=True,
+      description=f"Schema identifier (must be '{RISK_REGISTER_SCHEMA}')",
+    ),
+    "version": FieldMetadata(
+      type="const",
+      const_value=RISK_REGISTER_VERSION,
+      required=True,
+      description=f"Schema version (must be {RISK_REGISTER_VERSION})",
+    ),
+    "risks": FieldMetadata(
+      type="array",
+      required=True,
+      description="Risk entries (may be empty)",
+      items=FieldMetadata(
+        type="object",
+        description="A single risk entry",
+        properties={
+          "id": FieldMetadata(
+            type="string",
+            required=True,
+            pattern=r".+",
+            description="Risk identifier (convention: '<DE-id>.RISK-NN')",
+          ),
+          "title": FieldMetadata(
+            type="string",
+            required=True,
+            pattern=r".+",
+            description="Risk title / short statement",
+          ),
+          "likelihood": FieldMetadata(
+            type="enum",
+            required=True,
+            enum_values=RISK_LIKELIHOOD_ENUM,
+            description="Probability of occurrence",
+          ),
+          "impact": FieldMetadata(
+            type="enum",
+            required=True,
+            enum_values=RISK_IMPACT_ENUM,
+            description="Severity if it occurs",
+          ),
+          "exposure": FieldMetadata(
+            type="enum",
+            required=False,
+            enum_values=RISK_EXPOSURE_ENUM,
+            description="Type of exposure (change|delivery|systemic)",
+          ),
+          "mitigation": FieldMetadata(
+            type="string",
+            required=True,
+            description="Mitigation strategy",
+          ),
+          "status": FieldMetadata(
+            type="enum",
+            required=False,
+            enum_values=RISK_STATUS_ENUM,
+            default_value="open",
+            description="Risk status (default 'open' if absent)",
+          ),
+        },
+        field_aliases={"description": "title"},
+      ),
+    ),
+  },
+  examples=[
+    {
+      "schema": RISK_REGISTER_SCHEMA,
+      "version": RISK_REGISTER_VERSION,
+      "risks": [
+        {
+          "id": "DE-138.RISK-01",
+          "title": "Transition-window fallback dead code post-strict-flip",
+          "likelihood": "high",
+          "impact": "low",
+          "exposure": "systemic",
+          "mitigation": "Tracked for removal in follow-up cleanup delta",
+          "status": "open",
+        },
+      ],
+    },
+  ],
+)
+
+_DELTA_RISK_REGISTER_VALIDATOR = MetadataValidator(DELTA_RISK_REGISTER_METADATA)
+
+
+def validate_delta_risk_register(
+  block: DeltaRiskRegisterBlock,
+  *,
+  strict: bool = True,
+  accept_tolerated: bool = True,
+) -> list[str]:
+  """Validate a delta risk_register block against its metadata declaration."""
+  return [
+    str(err)
+    for err in _DELTA_RISK_REGISTER_VALIDATOR.validate(
+      block.data, strict=strict, accept_tolerated=accept_tolerated
+    )
+  ]
+
+
 __all__ = [
+  "CONTEXT_INPUTS_TYPE_ALIASES",
+  "CONTEXT_INPUTS_TYPE_ENUM",
+  "CONTEXT_INPUTS_TYPE_TOLERATED_ALIASES",
+  "DELTA_CONTEXT_INPUTS_METADATA",
   "DELTA_RELATIONSHIPS_METADATA",
+  "DELTA_RISK_REGISTER_METADATA",
+  "RISK_EXPOSURE_ENUM",
+  "RISK_IMPACT_ENUM",
+  "RISK_LIKELIHOOD_ENUM",
+  "RISK_STATUS_ENUM",
+  "validate_delta_context_inputs",
   "validate_delta_relationships",
+  "validate_delta_risk_register",
 ]

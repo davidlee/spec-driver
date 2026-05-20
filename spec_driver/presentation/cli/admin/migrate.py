@@ -117,6 +117,11 @@ def _import_step_module(folder: Path, folder_name: str):
   if spec is None or spec.loader is None:
     raise RuntimeError(f"admin migrate: could not load step at {migration_file}")
   module = importlib.util.module_from_spec(spec)
+  # Register before exec so dataclass annotation resolution can find the
+  # module via ``sys.modules[cls.__module__]`` (Python 3.13 requirement when
+  # a step defines its own ``@dataclass`` types under ``from __future__ import
+  # annotations``).
+  sys.modules[spec.name] = module
   spec.loader.exec_module(module)
   return module
 

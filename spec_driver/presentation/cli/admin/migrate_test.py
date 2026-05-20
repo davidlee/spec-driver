@@ -158,6 +158,42 @@ class TestDiscovery:
     with pytest.raises(RuntimeError, match="missing migration.py"):
       _discover_steps(migrations)
 
+  def test_loads_step_using_local_dataclass(self, tmp_path: Path) -> None:
+    """Regression: ``_import_step_module`` must register the imported module
+    in ``sys.modules`` so step bodies that use ``@dataclass`` under
+    ``from __future__ import annotations`` resolve their own ``__module__``.
+
+    Without the registration, Python 3.13 dataclass introspection raises
+    ``AttributeError: 'NoneType' object has no attribute '__dict__'`` on
+    every step that owns a ``@dataclass`` type — i.e. any non-trivial step
+    such as the v0_10_0_001_delta_blocks DE-138 implementation.
+    """
+    body = (
+      "from __future__ import annotations\n"
+      "from dataclasses import dataclass\n"
+      "from pathlib import Path\n"
+      "from spec_driver.migrations._protocol import "
+      "BaseMigrationStep, StepPreview, StepResult\n\n"
+      "@dataclass(frozen=True)\n"
+      "class _Local:\n"
+      "  value: int\n\n"
+      "class _Step(BaseMigrationStep):\n"
+      "  applies_to_kind = 'delta'\n"
+      "  description = 'dataclass regression'\n"
+      "  def applies_to(self, file_path: Path) -> bool:\n"
+      "    return False\n"
+      "  def preview(self, file_path: Path) -> StepPreview:\n"
+      "    return StepPreview(touched=[], skipped=[file_path], drift=[])\n"
+      "  def apply(self, file_path: Path) -> StepResult:\n"
+      "    return StepResult(touched=[], skipped=[file_path], drift_entries=[])\n\n"
+      "step = _Step()\n"
+    )
+    migrations = tmp_path / "migrations"
+    _write_fake_step(migrations, "v0_10_0_001_dataclass", body=body)
+    loaded = _discover_steps(migrations)
+    assert len(loaded) == 1
+    assert loaded[0].step.applies_to_kind == "delta"
+
 
 class TestKindValidation:
   """VT-CC-031: fail-fast on unregistered applies_to_kind."""

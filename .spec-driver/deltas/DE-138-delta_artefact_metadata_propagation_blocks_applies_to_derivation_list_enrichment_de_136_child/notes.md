@@ -144,3 +144,47 @@
   - VH-DE138-FLIP-001 (operator attestation pre-flip).
   - §9.5 follow-up audit tracking artefact filing (F-138-24).
 - Orchestrator drift-detail gap (P04+ improvement candidate, out of DE-138 scope): `StepResult.drift_entries: list[Path]` carries paths only; `_write_log` cannot surface kind/detail. Extending the Protocol surface would need a scope-delta given DR-137 DEC-137-26 freeze. Current workaround (replay `_transform()` against pre-sweep tree) is operator-driven, not pipeline-emitted — adequate for one-off DE-138 close but not durable for sibling per-artefact deltas.
+
+## 2026-05-20 — P04 partial — wiring + GATE/FLIP VTs landed; flip pending
+
+- Phase sheet `phases/phase-04.md` authored (commit `728267a1`) + amended with baseline carve-out (commit `4bc87694`) + tasks 4.2/4.3/4.7 ticked.
+- **4.1 pre-wiring strict baseline** — `validate workspace --kind delta --strict` exit 1: 7× audit-gate warnings (sibling drafts) + 1× error "References unresolved artifact 'DR-030' (via relation.introduces)" on DE-030. DR-030.md exists on disk but registry-resolution does not find it; filed as **ISSUE-057** (pre-existing baseline noise; not introduced by DE-138). DR-138 §11.2/§11.4/§10.5 amended to acknowledge this carve-out (post-flip gate tolerates `{7× audit-gate warnings + 1× DR-030 error}`; new errors beyond this fail the gate). /consult routed; user approved Option A.
+- **4.2 wiring** (commit `6c638eea`) — DEC-138-14 / F-138-23. Threaded `accept_tolerated` (= `not no_tolerated_aliases`) through:
+  - CLI: `spec_driver/presentation/cli/validate/workspace.py` — dropped `_ = no_tolerated_aliases` no-op.
+  - Validator entry: `supekku/scripts/lib/validation/validator.py::validate_workspace` + `WorkspaceValidator.__init__` accept `accept_tolerated: bool = True` kwarg.
+  - New method `WorkspaceValidator._validate_delta_blocks(delta_registry)` extracts context_inputs + risk_register blocks per delta, calls `DELTA_*_VALIDATOR.validate(block.data, strict=self.strict, accept_tolerated=self.accept_tolerated)`, dispatches each `ValidationError` at native severity via `_block_issue` helper (warning → `_warning`, error → `_error`).
+  - `supekku/scripts/lib/blocks/delta_metadata.py`: validator instances `DELTA_CONTEXT_INPUTS_VALIDATOR` + `DELTA_RISK_REGISTER_VALIDATOR` unprivatised; added to `__all__`.
+- **4.3 VT-DE138-GATE-001** green (commit `6c638eea`):
+  - CLI end-to-end: `spec_driver/presentation/cli/validate/workspace_test.py::TestWorkspaceCliSmoke::test_no_tolerated_aliases_promotes_de006_tolerated_to_errors` exercises live-repo DE-006 (carries 3× `context_inputs[].type=unknown`); default `--strict` produces warnings, `--strict --no-tolerated-aliases` promotes to errors.
+  - Validator-boundary: `validator_test.py::TestDeltaBlockTolerationGateVTDE138GATE001::*` (2 VTs) — synthetic fixtures DE-901/DE-902 isolate the per-kind path.
+- **4.7 VT-DE138-FLIP-001 row 2** green (commit `6c638eea`): synthetic fixture DE-903 with `context_inputs[{type: document, summary: missing id}]` surfaces as `error` under strict. Note: original §4 design pointed at a cut-FM-key fixture, but cut FM keys are caught at the kind-aware FM validator path, not the per-kind block path; the "is required" block-schema assertion is the more direct proof of strict-on-validate enforcement for delta block schemas.
+- **Post-wiring corpus state**: `validate workspace --kind delta --strict` now surfaces (in addition to the documented baseline) 3× `warning`-level tolerated_alias entries on DE-006 (`context_inputs[0..2].type: 'unknown' is a tolerated alias for 'document'`). These were always present in the corpus but only became visible after the wiring landed (previously the per-kind block validators were not invoked from the workspace path at all). Under `--no-tolerated-aliases` the 3 warnings become errors.
+- **Outstanding for P04 close** (in order):
+  1. **DE-006 tolerated-alias decision** — 3× `context_inputs[].type=unknown` entries surface as warnings under tolerant validate + errors under `--no-tolerated-aliases`. The DR-138 §11.4 post-flip gate is "`validate workspace --kind delta --strict --no-tolerated-aliases` returns 0 errors beyond the documented pre-existing baseline (audit-gate + DR-030)." DE-006 tolerated_alias entries were NOT part of the documented baseline at carve-out time — they were invisible. Two paths:
+     (a) Re-classify DE-006's 3 `type: unknown` entries to canonical `document` (operator manual edit; one delta touched; sets correct precedent for tolerated_alias sunset behaviour).
+     (b) Extend the §11.4 baseline carve-out a second time to include "+ DE-006 tolerated_alias warnings" — concedes that tolerated_alias surface is acceptable post-flip and shifts the burden to the tolerated_alias sunset trigger (DR-138 §5.1: "sunset trigger = delta-sweep close"; we are at delta-sweep close, so this concession would defeat the sunset's own purpose).
+     Recommendation: (a) is correct per DR-138 §5.1 sunset semantics; DE-006 is a known-fix-needed surface and the strict-flip gate is precisely the mechanism to force the fix.
+  2. **VH-DE138-FLIP-001 attestation** (4.4) — operator confirms pre-flip checklist (DR-138 §11.2) item-by-item before workflow.toml edit lands. Pre-flip checklist status as of handover:
+     - [x] P03 sweep applied; pre-sweep tag intact (`de-138-pre-sweep` @ `46976634`).
+     - [x] Sweep + drift log + reconciliation discrete commits (`2afc0833`, `717fced5`, `6a7fe70b`).
+     - [x] VA-DE138-RISK-RECON-001 + VA-DE138-DRIFT-001 closed.
+     - [x] `validate workspace --kind delta` tolerant clean (modulo baseline).
+     - [x] `validate workspace --kind delta --strict` clean modulo carve-out (commit `4bc87694`).
+     - [x] `--no-tolerated-aliases` wiring landed + VT-DE138-GATE-001 green (commit `6c638eea`).
+     - [ ] **DE-006 disposition decision** (above).
+     - [ ] Operator types attestation (form: "VH-DE138-FLIP-001 attested" or equivalent).
+  3. **4.5 flip** — append to `.spec-driver/workflow.toml`:
+     ```toml
+     [validation.strict]
+     delta = true
+
+     [schema_version]
+     delta = "0.10.0+001"
+     ```
+     Discrete commit (no other staged changes); message: `feat(DE-138): IP-138-P04 strict-flip — workflow.toml [validation.strict] delta=true + [schema_version] delta=0.10.0+001`.
+  4. **4.6 / 4.8 post-flip gates** — `validate workspace --kind delta --strict` (corpus baseline FLIP-001 row 1); `validate workspace --strict` (whole-corpus regression); `complete delta DE-138 --dry-run` (coverage gate); `list deltas` smoke.
+  5. **4.9 F-138-24 backlog issue** — `uv run spec-driver create issue "audit delta-vs-IP verification asymmetry"` (per DR-138 §9.5 + §15.1); populate body with audit shape + DE-136 P04 umbrella consumption point.
+  6. **4.10 execution-doc reconciliation** — IP-138 coverage entries → verified for GATE-001 (row 1 done, row 2 not in IP-138 yet but listed under FLIP-001 — confirm IP-138 row structure), FLIP-001 (both rows), VH-FLIP-001; IP-138 §9 progress tracking ticked; DE-138 frontmatter `updated:` refreshed; this notes file appended with full P04 close section.
+  7. **4.11 quality gates** — `just check` clean (note: `just` not on PATH in this environment; substitute `uv run python -m pytest supekku spec_driver && uv run ruff check supekku spec_driver && uv run ruff format --check supekku spec_driver && uvx import-linter lint`); final test count.
+- **Pytest state**: 5450 pass, 4 skipped (+64 vs P03's 5386 — established inheritance pattern of fixture-based test classes from `WorkspaceValidatorTest`).
+- **Commit chain since P03 close**: `728267a1` (P04 phase sheet) → `4bc87694` (ISSUE-057 baseline carve-out) → `6c638eea` (wiring + GATE/FLIP VTs). Pre-sweep tag `de-138-pre-sweep` remains intact at `46976634`.

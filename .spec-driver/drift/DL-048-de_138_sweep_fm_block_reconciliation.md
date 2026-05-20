@@ -75,6 +75,29 @@ owner: unassigned
 status: open
 ```
 
+### DL-048.004 — Body §7 risk narrative recovery anchor (137 deltas)
+
+```yaml
+target: '*'  # 137 swept deltas, full list in p03-risk-recon-log.md §2.1
+drift_kind: body_risk_narrative
+disposition: file_dl
+recovery_anchor: de-138-pre-sweep  # commit 46976634
+analysis: |
+  VA-DE138-RISK-RECON-001 disposed all 137 body_risk_narrative drift
+  entries as `file_dl` against the pre-sweep tag. Each delta's
+  pre-sweep §7 prose is recoverable verbatim via
+  `git show de-138-pre-sweep:<delta-path>`. Selective promotion into
+  `risk_register@v1` blocks is deferred to the cleanup delta
+  (DR-138 §15.1) for the 22 active deltas where in-flight signal is
+  load-bearing.
+recommendation: |
+  Retain pre-sweep tag until the cleanup delta closes. Cleanup-delta
+  scope = survey the 22 active deltas (in-progress + draft) and
+  promote body-prose risks where the signal is load-bearing.
+owner: unassigned
+status: open
+```
+
 ### DL-048.003 — DE-106 FM specs `[PROD-006, PROD-011]` + 5 PROD-006 requirements absent from block
 
 ```yaml

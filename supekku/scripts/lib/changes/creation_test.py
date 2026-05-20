@@ -208,6 +208,31 @@ class CreateChangeTest(unittest.TestCase):
     assert risk_block is not None
     assert risk_block.data["risks"] == []
 
+  def test_create_delta_apply_migration_step_is_noop(self) -> None:
+    """VT-DE138-CREATE-001: round-trip — create_delta output passes through the
+    v0_10_0_001_delta_blocks migration step as a no-op.
+
+    Proves the create-path emits the post-migration shape directly (no FM cut
+    keys present, both blocks emitted). The migration step's ``applies_to``
+    must return False; ``apply`` must return ``StepResult(touched=[])``.
+    """
+    from spec_driver.migrations.v0_10_0_001_delta_blocks import (  # noqa: PLC0415
+      step as migration_step,
+    )
+
+    root = self._make_repo()
+    result = create_delta(
+      "Round-trip check",
+      specs=["SPEC-100"],
+      requirements=["SPEC-100.FR-100"],
+      context_inputs=[{"type": "adr", "id": "ADR-010"}],
+      repo_root=root,
+    )
+    assert migration_step.applies_to(result.primary_path) is False
+    apply_result = migration_step.apply(result.primary_path)
+    assert apply_result.touched == []
+    assert apply_result.skipped == [result.primary_path]
+
   def test_create_delta_emits_enum_comment_hints_in_frontmatter(self) -> None:
     """VT-CC-004: Created artefact carries inline enum-comment hints.
 

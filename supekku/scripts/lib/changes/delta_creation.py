@@ -73,6 +73,10 @@ def create_delta(
   # outcome_summary no longer live in FM. relationships block carries the
   # applies_to source; context_inputs / risk_register render as dedicated
   # blocks in the body.
+  # DR-138 §7.2 + DR-136 §4: universal-cut keys (lifecycle / aliases /
+  # auditers / source) are not emitted at create time so the create-shape
+  # round-trips through the v0_10_0_001_delta_blocks migration step as a
+  # no-op (VT-DE138-CREATE-001).
   frontmatter = {
     "id": delta_id,
     "slug": slug,
@@ -81,7 +85,6 @@ def create_delta(
     "updated": today,
     "status": "draft",
     "kind": "delta",
-    "aliases": [],
     "relations": list(relations or []),
   }
 

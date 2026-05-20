@@ -4,7 +4,7 @@ slug: "138-delta_artefact_metadata_propagation_blocks_applies_to_derivation_list
 name: IP-138 Phase 02
 created: "2026-05-20"
 updated: "2026-05-20"
-status: draft
+status: completed
 kind: phase
 plan: IP-138
 delta: DE-138
@@ -42,25 +42,25 @@ Phase deliverable is a workspace where:
 
 ## 3. Entrance Criteria
 
-- [ ] IP-138-P01 closed (schemas + load-time synthesis landed; FM-fallback intact).
-- [ ] `just check` + `uvx import-linter lint` green on P01 head (baseline preserved).
-- [ ] DR-138 §7 stable (no pending adversarial finding that would shift step mechanics).
-- [ ] DE-138 status: `in-progress` (already set at P01 entrance).
+- [x] IP-138-P01 closed (schemas + load-time synthesis landed; FM-fallback intact).
+- [x] `just check` + `uvx import-linter lint` green on P01 head (baseline preserved).
+- [x] DR-138 §7 stable (no pending adversarial finding that would shift step mechanics).
+- [x] DE-138 status: `in-progress` (already set at P01 entrance).
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `spec_driver/migrations/v0_10_0_001_delta_blocks/` package exists with `__init__.py` (exports `STEP = DeltaBlocksStep()`) + `migration.py` (`DeltaBlocksStep(BaseMigrationStep)`).
-- [ ] `parse_migration_folder("v0_10_0_001_delta_blocks")` returns a `ParsedFolder` with `version=0.10.0`, `ordinal=1`, `slug="delta_blocks"`.
-- [ ] `DeltaBlocksStep` API: `applies_to_kind = "delta"`; `description` set; `applies_to(path)` uses head-of-file regex against DR-138 §7.2 cut set `{applies_to, context_inputs, risk_register, outcome_summary, lifecycle, aliases, auditers, source}` (F-138-17 + F-138-28); `preview(path)` + `apply(path)` implemented per §7.3.
-- [ ] `apply()` performs all 11 steps from §7.3 verbatim — split/cut universals/synthesise relationships block when FM `applies_to` non-empty + block absent (§7.3 step 3, F-138-27)/synthesise context_inputs block/synthesise risk_register block/move outcome_summary → body `## Outcome`/reconcile FM↔block specs+requirements (DEC-138-11)/remove FM keys/handle body §7 Risks (full content captured in drift)/renumber §§8-9 → §§7-8 (top-level only)/atomic-write via `_helpers.atomic_write`.
-- [ ] Frozen-local emitters present in package (`_render_context_inputs_block`, `_render_risk_register_block`, `_render_relationships_block`); no `supekku.*` import inside the package.
-- [ ] `uvx import-linter lint` clean (`Migrations isolation` contract holds).
-- [ ] Idempotence: re-running `apply()` against an already-migrated file is a no-op (returns `StepResult(touched=[], skipped=[path])`).
-- [ ] Partial-shape table (§7.4) handled — block matches FM (cut silently) / block disagrees with FM (keep block + `fm_block_disagreement` drift) / block absent + FM present (synthesise) / block absent + FM absent (no-op).
-- [ ] Drift log entries emitted per §7.5 with stable `kind:` field (`relationships_block_synthesised_from_fm`, `fm_specs_unmatched`, `fm_requirements_unmatched`, `fm_block_disagreement`, `body_risk_narrative`, `body_renumber`, `context_input_unmapped_type`, `risk_missing_likelihood`, `risk_missing_impact`, `outcome_overwrite_conflict`).
-- [ ] VTs green: VT-DE138-MIG-001 (apply over 5-7 fixture deltas + idempotence + byte-equality between supekku-side and migration-local emitters per DEC-138-12), VT-DE138-MIG-002 (preview = no writes; touched/skipped/drift lists match), VT-DE138-MIG-003 (FM↔block specs + requirements reconciliation drift entries), VT-DE138-RELSYNTH-001 (relationships-block synthesis), VT-DE138-BODY-001 (single-line / folded / literal scalar outcome insertion + §7 deletion + renumber), VT-DE138-CREATE-001 (`create delta` writes blocks + no FM cut keys, round-trip through `apply()` is a no-op).
-- [ ] `admin migrate delta --check` + `--dry-run` against in-repo workspace runs to completion writing **zero files**, surfaces preview drift summary; in-repo deltas still load (no regression vs P01 head).
-- [ ] `just check` clean.
+- [x] `spec_driver/migrations/v0_10_0_001_delta_blocks/` package exists with `__init__.py` + `_emitters.py` + `migration.py` (`DeltaBlocksStep(BaseMigrationStep)`). `step = DeltaBlocksStep()` defined at module level in `migration.py` because the orchestrator's loader does `getattr(module, "step", ...)` on the file directly (DR-138 §7.1 implicitly assumed package init; corrected during execution).
+- [x] `parse_migration_folder("v0_10_0_001_delta_blocks")` returns a `ParsedFolder` with `version=0.10.0`, `ordinal=1`, `slug="delta_blocks"`.
+- [x] `DeltaBlocksStep` API: `applies_to_kind = "delta"`; `description` set; `applies_to(path)` uses head-of-file regex against DR-138 §7.2 cut set `{applies_to, context_inputs, risk_register, outcome_summary, lifecycle, aliases, auditers, source}` (F-138-17 + F-138-28); `preview(path)` + `apply(path)` implemented per §7.3.
+- [x] `apply()` performs all 11 steps from §7.3 verbatim — split/cut universals/synthesise relationships block when FM `applies_to` non-empty + block absent (§7.3 step 3, F-138-27)/synthesise context_inputs block/synthesise risk_register block/move outcome_summary → body `## Outcome`/reconcile FM↔block specs+requirements (DEC-138-11)/remove FM keys/handle body §7 Risks (full content captured in drift)/renumber §§8-9 → §§7-8 (top-level only)/atomic-write via `_helpers.atomic_write`.
+- [x] Frozen-local emitters present in package (`render_context_inputs_block`, `render_risk_register_block`, `render_relationships_block` in `_emitters.py`); no `supekku.*` import inside the package.
+- [x] `uvx import-linter lint` clean (`Migrations isolation` contract holds).
+- [x] Idempotence: re-running `apply()` against an already-migrated file is a no-op (returns `StepResult(touched=[], skipped=[path])`). Parametrised VT covers all 7 fixture shapes.
+- [x] Partial-shape table (§7.4) handled — block matches FM (cut silently) / block disagrees with FM (keep block + `fm_block_disagreement` drift) / block absent + FM present (synthesise) / block absent + FM absent (no-op).
+- [x] Drift log entries emitted per §7.5 with stable `kind:` field (`relationships_block_synthesised_from_fm`, `fm_specs_unmatched`, `fm_requirements_unmatched`, `fm_block_disagreement`, `body_risk_narrative`, `body_renumber`, `context_input_unmapped_type`, `risk_missing_likelihood`, `risk_missing_impact`, `outcome_overwrite_conflict`).
+- [x] VTs green: VT-DE138-MIG-001 (apply over 7 fixture deltas + idempotence + byte-equality between supekku-side and migration-local emitters per DEC-138-12), VT-DE138-MIG-002 (preview = no writes; touched/skipped/drift lists match), VT-DE138-MIG-003 (FM↔block specs + requirements reconciliation drift entries), VT-DE138-RELSYNTH-001 (relationships-block synthesis), VT-DE138-BODY-001 (single-line / folded / literal scalar outcome insertion + §7 deletion + renumber), VT-DE138-CREATE-001 (`create delta` writes blocks + no FM cut keys, round-trip through `apply()` is a no-op).
+- [x] `admin migrate delta --check` + `--dry-run` against in-repo workspace runs to completion writing **zero files**, surfaces preview drift summary; in-repo deltas still load (no regression vs P01 head).
+- [x] `just check` clean.
 
 ## 5. Verification
 
@@ -109,16 +109,16 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 | Status | ID | Description | Parallel? | Notes |
 | --- | --- | --- | --- | --- |
-| [ ] | 2.1 | Scaffold package: `v0_10_0_001_delta_blocks/{__init__.py, migration.py}`; `STEP` export; smoke test that `parse_migration_folder` parses the folder + `MigrationStep` Protocol-check passes | [ ] | Bedrock; no logic yet |
-| [ ] | 2.2 | Fixture corpus under `spec_driver/migrations/v0_10_0_001_delta_blocks/_fixtures/` (or `tests/`) covering the 7 shapes in §5 | [P] | Independent of step impl; can be authored alongside 2.3-2.5 |
-| [ ] | 2.3 | Frozen-local emitters: `_render_relationships_block`, `_render_context_inputs_block`, `_render_risk_register_block`; byte-equality VT vs supekku-side helpers | [P] | DEC-138-12; emitters live in `migration.py` or sibling `_emitters.py` |
-| [ ] | 2.4 | `applies_to(file_path)` head-of-file regex per §7.2 (cut set: `applies_to`, `context_inputs`, `risk_register`, `outcome_summary`, `lifecycle`, `aliases`, `auditers`, `source`); unit test | [P] | Stateless; trivially parallelisable |
-| [ ] | 2.5 | Normalisation helpers: context_inputs entry normaliser (plain str → `{type: document, id}` with summary key omitted; `ref→id`, `note/annotation→summary`, alias map, `unknown` tolerated alias); risk_register entry normaliser (`description→title`, status default `open`, drift on missing likelihood/impact) | [P] | Pure functions; covered by 2.3 emitter tests + 2.6 apply test |
-| [ ] | 2.6 | `apply(file_path)` 11-step mechanics per §7.3 + idempotence short-circuit + partial-shape table (§7.4) + drift entry emission (§7.5) | [ ] | Depends on 2.1, 2.3-2.5; main impl unit |
-| [ ] | 2.7 | `preview(file_path)` — no writes; reuses apply mechanics with a write-suppressed branch (or duplicates the dry-run path); StepPreview populated | [ ] | After 2.6; share core via internal helper |
-| [ ] | 2.8 | `create delta` finalisation: `delta_creation.py` populated paths for CTX entries + relationships block; CREATE-001 VT (round-trip: `create delta` → `apply()` is no-op) | [ ] | Closes the P01 deferred test; verifies emitters interoperate |
-| [ ] | 2.9 | `admin migrate delta --check` + `--dry-run` smoke against in-repo workspace; assert zero-mutation (file mtimes preserved) | [ ] | Integration gate |
-| [ ] | 2.10 | `uvx import-linter lint` final pass; `just check` clean | [ ] | Phase exit |
+| [x] | 2.1 | Scaffold package: `v0_10_0_001_delta_blocks/{__init__.py, migration.py}`; module-level `step = DeltaBlocksStep()` per orchestrator loader contract | [ ] | Bedrock; orchestrator expects `module.step`, NOT `__init__.step` (DR-138 §7.1 corrected during exec) |
+| [x] | 2.2 | Fixture corpus inline in `migration_test.py` as constant strings (7 shapes per §5) | [P] | Inline fixtures keep the VT body self-contained |
+| [x] | 2.3 | Frozen-local emitters in `_emitters.py` (`render_relationships_block`, `render_context_inputs_block`, `render_risk_register_block`); byte-equality VT lives in `supekku/scripts/lib/blocks/migration_byte_equality_test.py` (supekku-side; contract is one-way) | [P] | DEC-138-12; 6 byte-equality VTs across empty + populated for each emitter |
+| [x] | 2.4 | `applies_to(file_path)` head-of-file regex per §7.2 (cut set: 4 delta-specific + `lifecycle/aliases/auditers/source`); 11 unit VTs cover each cut key + clean-target skip + `owners/summary` residue not triggering | [P] | F-138-17 + F-138-28 |
+| [x] | 2.5 | Normalisation helpers: `_normalise_context_input` (plain str → tolerated `unknown` with `id`; `ref→id`, `note/annotation→summary` with key omission on empty; type alias map; tolerated `unknown`); `_normalise_risk` (`description→title`, status default `open`, drift on missing likelihood/impact) | [P] | Pure functions; drift entries flow up to `apply()` |
+| [x] | 2.6 | `apply(file_path)` 11-step mechanics per §7.3 + idempotence short-circuit + partial-shape table (§7.4) + drift entry emission (§7.5) | [ ] | Main impl unit; broken into `_transform` + per-step private helpers |
+| [x] | 2.7 | `preview(file_path)` — no writes; shares mechanics with `apply` via the same `_transform` function | [ ] | Returns `StepPreview(touched, skipped, drift)` |
+| [x] | 2.8 | `create delta` finalisation: dropped hardcoded `aliases: []` from `delta_creation.py` FM dict; VT-DE138-CREATE-001 asserts round-trip is `applies_to=False` + `apply` no-op | [ ] | One-line FM dict edit unblocked round-trip |
+| [x] | 2.9 | `admin migrate delta --check` + `--dry-run` smoke against in-repo workspace; zero `.spec-driver/deltas/**` mutation observed; 141 deltas preview cleanly | [ ] | `--dry-run` summary line shows misleading "would touch 0" (orchestrator UI bug — sums empty results list under dry_run); zero-mutation property holds; sibling issue filed |
+| [x] | 2.10 | `uvx import-linter lint` final pass (3/3 contracts kept including Migrations isolation); `just check` proxy (ruff + format + full pytest) green: 5367 passed, 4 skipped (up from 5330 at P01 close — +37 tests landed) | [ ] | Phase exit gates clean |
 
 ### Task Details
 
@@ -174,8 +174,8 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 
 ## 11. Wrap-up Checklist
 
-- [ ] All §4 exit criteria satisfied.
-- [ ] VT evidence captured (test run logs + snapshot diffs + `--check`/`--dry-run` smoke output).
-- [ ] IP-138 verification.coverage entries flipped `planned` → `verified` for MIG-001/002/003, RELSYNTH-001, BODY-001, CREATE-001.
-- [ ] DR-138 / IP-138 amended if execution surfaced any DR refinement.
-- [ ] Hand-off note to P03 — pre-sweep checkpoint tag plan (`de-138-pre-sweep`); fixture-shape lessons fed back to DE-136 IP §5 (DEC-138-09 sibling precedent).
+- [x] All §4 exit criteria satisfied.
+- [x] VT evidence captured — test run logs (5367 passed); `--check`/`--dry-run` smoke output recorded in notes (zero-mutation across 141 deltas).
+- [x] IP-138 verification.coverage entries flipped `planned` → `verified` for MIG-001/002/003, RELSYNTH-001, BODY-001, CREATE-001.
+- [x] DR-138 / IP-138 amended where execution surfaced refinement — `step` lives in `migration.py` not `__init__.py` per orchestrator loader contract; orchestrator defect fixed in `migrate.py` (sys.modules registration); P02 task table corrected with exec-discovered placements.
+- [x] Hand-off note to P03 — pre-sweep checkpoint tag `de-138-pre-sweep` required before sweep; preview ran cleanly across in-repo corpus, drift kinds enumerated above; fixture-shape lessons (idempotence + collaborators union + relationships-synth) feed into DE-136 IP §5 sibling precedent (DEC-138-09).

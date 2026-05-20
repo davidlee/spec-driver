@@ -90,3 +90,25 @@
 - Both IP-138.md and phase-01.md validate clean.
 - DR-138 still `draft`; promotion to `accepted` (or operator sign-off) is a P01 entrance gate.
 - DR-138 + IP-138 + P01 sheet tell the same story; ready for `/execute-phase` once entrance gates are clean.
+
+## 2026-05-20 — P02 implementation — Migration step landed
+
+- Phase sheet `phases/phase-02.md` populated from DR-138 §7 + §code_impacts (10 tasks, exit gates pinned to import-linter contract + zero-mutation smoke).
+- Code landed:
+  - `spec_driver/migrations/v0_10_0_001_delta_blocks/__init__.py` — re-exports `step` + `DeltaBlocksStep`.
+  - `spec_driver/migrations/v0_10_0_001_delta_blocks/_emitters.py` — frozen-local emitters byte-equivalent to `supekku/scripts/lib/blocks/delta.py` render helpers (DEC-138-12). Local `_format_yaml_list` + `_normalise_entry` + `_render_block` mirror supekku-side patterns. No supekku imports.
+  - `spec_driver/migrations/v0_10_0_001_delta_blocks/migration.py` — `DeltaBlocksStep(BaseMigrationStep)` with `applies_to_kind = "delta"`. Implements the full DR-138 §7.3 11-step pipeline: cut universals (`lifecycle/aliases/auditers/source`) + cut 4 delta-specific keys, synthesise relationships/context_inputs/risk_register blocks from FM when absent (RELSYNTH-001, F-138-27), reconcile FM ↔ block specs/requirements (DEC-138-11), normalise per §5.3, insert `## Outcome` (single-line/folded/literal scalar fixtures), delete `## 7. Risks & Mitigations` section, renumber `## 8/9` → `## 7/8` top-level only (F-138-D), atomic write. `head-of-file` regex per §7.2 (cut set per F-138-28). Drift kinds exposed as module-level constants for VT assertions.
+  - `step = DeltaBlocksStep()` lives at the bottom of `migration.py` because the orchestrator's loader does `getattr(module, "step", ...)` on the module from `spec_from_file_location("_sd_migration.<name>", migration.py)` — `__init__.py` is not loaded by the orchestrator (DR-138 §7.1 implicitly assumed package loading; corrected here in execution).
+  - `supekku/scripts/lib/changes/delta_creation.py` — dropped the hardcoded `aliases: []` from the delta FM dict (universal-cut keys not emitted at create time) so newly-created deltas pass `applies_to(path) == False` and round-trip the migration step as no-op (VT-DE138-CREATE-001).
+- Orchestrator defect fixed in `spec_driver/presentation/cli/admin/migrate.py`:
+  - `_import_step_module` did not `sys.modules[spec.name] = module` before `exec_module(module)`. Python 3.13 dataclass introspection (`dataclasses._is_type`) needs the module registered in `sys.modules` to resolve `cls.__module__.__dict__`. Without the fix, ANY step that uses `@dataclass(frozen=True)` under `from __future__ import annotations` crashes with `AttributeError: 'NoneType' object has no attribute '__dict__'` at the first `@dataclass` decorator. Never surfaced in DE-137 because the fake-step fixtures only used plain classes; DE-138 is the first real step.
+  - 1-line fix per F-35 (bug-fix-allowed). Regression test added: `TestDiscovery::test_loads_step_using_local_dataclass`.
+- Test coverage:
+  - `migration_test.py` (in-package): 30 VTs covering applies_to regex, idempotence (clean target + parametrised over 7 fixtures), relationships-block synthesis (RELSYNTH-001), FM-block agreement/disagreement (MIG-003), collaborators union, context_inputs normalisation (CTX-001, CTX-002, F-138-31, F-138-32), risk_register normalisation (RISK-001), body §7 deletion + renumber + `## Outcome` insertion across single-line / folded / literal scalars (BODY-001), preview() zero-mutation (MIG-002), Protocol surface.
+  - `supekku/scripts/lib/blocks/migration_byte_equality_test.py` (supekku side, allowed): 6 byte-equality VTs across the three emitter pairs (empty + populated). Lives supekku-side because the contract is one-way — supekku may depend on migrations, migrations may not depend on supekku.
+  - `creation_test.py`: VT-DE138-CREATE-001 — `create delta` → migration `apply()` is no-op.
+  - `migrate_test.py`: 1 dataclass regression test for orchestrator.
+- Smoke gates: `uvx import-linter lint` 3/3 contracts kept (Migrations isolation intact); `admin migrate --list` + `admin migrate delta --check` + `admin migrate delta --dry-run` all succeed with zero file mutation on `.spec-driver/deltas/**`.
+- Preview against the in-repo corpus (141 deltas): would touch 141; drift kinds = body_renumber (118), body_risk_narrative (137), context_input_unmapped_type (3), fm_requirements_unmatched (2), fm_specs_unmatched (3). Zero errors. Ready for P03 sweep (separate phase — pre-sweep checkpoint commit required first).
+- `--dry-run` summary line `would touch 0` is a separate orchestrator UI bug (sums `results` which is empty under dry_run; should sum `previews`). Filed as a sibling issue; not blocking P02. Zero-mutation property holds.
+- Quality gates: ruff lint + format clean on touched files. Full test suite re-run in progress at notes-write time; result expected ~+38 tests vs P01 close (30 + 6 + 1 + 1).

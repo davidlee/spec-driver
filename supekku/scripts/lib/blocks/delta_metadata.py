@@ -324,7 +324,7 @@ DELTA_CONTEXT_INPUTS_METADATA = BlockMetadata(
   ],
 )
 
-_DELTA_CONTEXT_INPUTS_VALIDATOR = MetadataValidator(DELTA_CONTEXT_INPUTS_METADATA)
+DELTA_CONTEXT_INPUTS_VALIDATOR = MetadataValidator(DELTA_CONTEXT_INPUTS_METADATA)
 
 
 def validate_delta_context_inputs(
@@ -336,7 +336,7 @@ def validate_delta_context_inputs(
   """Validate a delta context_inputs block against its metadata declaration."""
   return [
     str(err)
-    for err in _DELTA_CONTEXT_INPUTS_VALIDATOR.validate(
+    for err in DELTA_CONTEXT_INPUTS_VALIDATOR.validate(
       block.data, strict=strict, accept_tolerated=accept_tolerated
     )
   ]
@@ -435,7 +435,7 @@ DELTA_RISK_REGISTER_METADATA = BlockMetadata(
   ],
 )
 
-_DELTA_RISK_REGISTER_VALIDATOR = MetadataValidator(DELTA_RISK_REGISTER_METADATA)
+DELTA_RISK_REGISTER_VALIDATOR = MetadataValidator(DELTA_RISK_REGISTER_METADATA)
 
 
 def validate_delta_risk_register(
@@ -447,7 +447,7 @@ def validate_delta_risk_register(
   """Validate a delta risk_register block against its metadata declaration."""
   return [
     str(err)
-    for err in _DELTA_RISK_REGISTER_VALIDATOR.validate(
+    for err in DELTA_RISK_REGISTER_VALIDATOR.validate(
       block.data, strict=strict, accept_tolerated=accept_tolerated
     )
   ]
@@ -458,8 +458,10 @@ __all__ = [
   "CONTEXT_INPUTS_TYPE_ENUM",
   "CONTEXT_INPUTS_TYPE_TOLERATED_ALIASES",
   "DELTA_CONTEXT_INPUTS_METADATA",
+  "DELTA_CONTEXT_INPUTS_VALIDATOR",
   "DELTA_RELATIONSHIPS_METADATA",
   "DELTA_RISK_REGISTER_METADATA",
+  "DELTA_RISK_REGISTER_VALIDATOR",
   "RISK_EXPOSURE_ENUM",
   "RISK_IMPACT_ENUM",
   "RISK_LIKELIHOOD_ENUM",

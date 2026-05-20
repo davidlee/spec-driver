@@ -1584,5 +1584,116 @@ class TestShowZeroEntryHint:
     assert "No requirements found" not in joined
 
 
+class TestDeltaBlockTolerationGateVTDE138GATE001(WorkspaceValidatorTest):
+  """VT-DE138-GATE-001 — ``--no-tolerated-aliases`` reaches per-kind validators.
+
+  Covers DEC-138-14 / F-138-23: a delta carrying ``context_inputs[].type=unknown``
+  (the tolerated alias for ``document``) emits 0 errors when
+  ``accept_tolerated=True`` (default) and ≥1 error when False. Proves the flag
+  is no longer silently dropped between the CLI and per-kind block validators.
+  """
+
+  def _write_delta_with_tolerated_context_input(
+    self, root: Path, delta_id: str
+  ) -> Path:
+    from supekku.scripts.lib.blocks.delta import (  # noqa: PLC0415
+      render_delta_context_inputs_block,
+    )
+
+    delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / f"{delta_id}-gate"
+    delta_dir.mkdir(parents=True)
+    delta_path = delta_dir / f"{delta_id}.md"
+    frontmatter = {
+      "id": delta_id,
+      "slug": delta_id.lower(),
+      "name": delta_id,
+      "created": "2026-05-20",
+      "updated": "2026-05-20",
+      "status": "draft",
+      "kind": "delta",
+      "relations": [],
+    }
+    body = (
+      f"# {delta_id}\n\n"
+      + render_delta_context_inputs_block(
+        entries=[{"type": "unknown", "id": "x.1", "summary": "tolerated alias"}],
+      )
+      + "\n"
+    )
+    dump_markdown_file_update(delta_path, frontmatter, body)
+    return delta_path
+
+  def test_tolerated_alias_emits_warning_under_default_accept(self) -> None:
+    """accept_tolerated=True (default) — tolerated alias produces warning, not error."""
+    root = self._create_repo()
+    self._write_delta_with_tolerated_context_input(root, "DE-901")
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws, strict=True)
+    block_issues = [i for i in issues if i.artifact == "DE-901"]
+    assert all(i.level == "warning" for i in block_issues), block_issues
+    assert any("tolerated alias" in i.message for i in block_issues), block_issues
+
+  def test_no_tolerated_aliases_promotes_to_error(self) -> None:
+    """accept_tolerated=False — tolerated alias produces error."""
+    root = self._create_repo()
+    self._write_delta_with_tolerated_context_input(root, "DE-902")
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws, strict=True, accept_tolerated=False)
+    errors = [
+      i for i in issues if i.artifact == "DE-902" and "tolerated alias" in i.message
+    ]
+    assert errors, [i for i in issues if i.artifact == "DE-902"]
+    assert all(i.level == "error" for i in errors)
+
+
+class TestDeltaBlockStrictEnforcementVTDE138FLIP001(WorkspaceValidatorTest):
+  """VT-DE138-FLIP-001 row 2 — strict-on-validate enforcement post-flip.
+
+  Covers PROD-004.FR-002: under ``--strict``, an entry violating the
+  ``delta.context_inputs@v1`` schema (e.g. missing required ``id``) surfaces as
+  an error from the workspace validator — proving the per-kind validator is
+  invoked, not bypassed.
+  """
+
+  def test_missing_required_field_in_context_inputs_errors_under_strict(
+    self,
+  ) -> None:
+    from supekku.scripts.lib.blocks.delta import (  # noqa: PLC0415
+      render_delta_context_inputs_block,
+    )
+
+    root = self._create_repo()
+    delta_dir = root / SPEC_DRIVER_DIR / DELTAS_SUBDIR / "DE-903-flip"
+    delta_dir.mkdir(parents=True)
+    delta_path = delta_dir / "DE-903.md"
+    frontmatter = {
+      "id": "DE-903",
+      "slug": "de-903",
+      "name": "DE-903",
+      "created": "2026-05-20",
+      "updated": "2026-05-20",
+      "status": "draft",
+      "kind": "delta",
+      "relations": [],
+    }
+    # Entry omits the required ``id`` field — schema rejects.
+    body = (
+      "# DE-903\n\n"
+      + render_delta_context_inputs_block(
+        entries=[{"type": "document", "summary": "missing id"}],
+      )
+      + "\n"
+    )
+    dump_markdown_file_update(delta_path, frontmatter, body)
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws, strict=True)
+    block_errors = [i for i in issues if i.artifact == "DE-903" and i.level == "error"]
+    assert block_errors, [i for i in issues if i.artifact == "DE-903"]
+    assert any("is required" in i.message for i in block_errors), block_errors
+
+
 if __name__ == "__main__":
   unittest.main()

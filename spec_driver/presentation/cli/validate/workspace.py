@@ -134,16 +134,15 @@ def workspace_cmd(  # noqa: PLR0913 — Typer demands one parameter per flag
     ws.sync_all_registries()
 
   try:
-    issues = validate_ws(ws, strict=strict, fix=fix)
+    issues = validate_ws(
+      ws,
+      strict=strict,
+      fix=fix,
+      accept_tolerated=not no_tolerated_aliases,
+    )
   except (FileNotFoundError, ValueError, KeyError) as e:
     typer.echo(f"Error: {e}", err=True)
     raise typer.Exit(EXIT_FAILURE) from e
-
-  # ``--no-tolerated-aliases`` is recognised here but does not yet alter
-  # the workspace-validator codepath. Per-kind validators consume it as
-  # DE-138..142 lands. Accept the flag silently so downstream callers do
-  # not break when DR-137 §5.4 ripple migrates to the explicit form.
-  _ = no_tolerated_aliases
 
   if kind is not None:
     issues = _filter_by_kind(issues, kind)

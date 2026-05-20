@@ -112,11 +112,40 @@ class TestWorkspaceCliSmoke:
       assert "DE-" in (result.stderr or "")
 
   def test_no_tolerated_aliases_flag_accepted(self) -> None:
-    # Flag is recognised at the CLI layer; downstream consumption lands
-    # incrementally with DE-138..142. Smoke: command exits without
-    # usage error.
+    # Flag is recognised at the CLI layer and threaded into per-kind
+    # delta block validators as of DE-138 P04 (DEC-138-14). Smoke: command
+    # exits without usage error.
     result = runner.invoke(app, ["workspace", "--no-tolerated-aliases"])
     assert result.exit_code in (0, 1)  # not 2
+
+  def test_no_tolerated_aliases_promotes_de006_tolerated_to_errors(self) -> None:
+    """VT-DE138-GATE-001 CLI end-to-end against live-repo DE-006.
+
+    DE-006 carries ``context_inputs[].type=unknown`` (the tolerated alias for
+    ``document``). Under ``--strict`` without ``--no-tolerated-aliases`` the
+    surface is a warning; with ``--no-tolerated-aliases`` it must promote to
+    an error — proving the CLI flag reaches the per-kind block validator
+    (DEC-138-14, F-138-23). Wiring under test: CLI → ``validate_workspace``
+    → ``WorkspaceValidator._validate_delta_blocks``.
+    """
+    without = runner.invoke(app, ["workspace", "--kind", "delta", "--strict"])
+    with_flag = runner.invoke(
+      app,
+      ["workspace", "--kind", "delta", "--strict", "--no-tolerated-aliases"],
+    )
+
+    without_de006_errors = [
+      line
+      for line in (without.stderr or "").splitlines()
+      if "DE-006" in line and "tolerated alias" in line and "level='error'" in line
+    ]
+    with_de006_errors = [
+      line
+      for line in (with_flag.stderr or "").splitlines()
+      if "DE-006" in line and "tolerated alias" in line and "level='error'" in line
+    ]
+    assert not without_de006_errors, without_de006_errors
+    assert with_de006_errors, with_flag.stderr
 
   def test_strict_flag_accepted(self) -> None:
     result = runner.invoke(app, ["workspace", "--strict"])

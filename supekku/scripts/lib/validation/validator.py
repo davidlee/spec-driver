@@ -12,6 +12,14 @@ _SPEC_ID_PATTERN = re.compile(r"^(?:SPEC|PROD)-\d{3}$")
 
 from supekku.scripts.lib.backlog.models import BacklogItem
 from supekku.scripts.lib.backlog.registry import discover_backlog_items
+from supekku.scripts.lib.blocks.delta import (
+  extract_delta_context_inputs,
+  extract_delta_risk_register,
+)
+from supekku.scripts.lib.blocks.delta_metadata import (
+  DELTA_CONTEXT_INPUTS_VALIDATOR,
+  DELTA_RISK_REGISTER_VALIDATOR,
+)
 from supekku.scripts.lib.blocks.metadata.aliases import normalize_field
 from supekku.scripts.lib.changes.audit_check import resolve_audit_gate
 from supekku.scripts.lib.changes.phase_model import PhaseSheet
@@ -61,11 +69,13 @@ class WorkspaceValidator:
     strict: bool = False,
     *,
     fix: bool = False,
+    accept_tolerated: bool = True,
   ) -> None:
     self.workspace = workspace
     self.issues: list[ValidationIssue] = []
     self.strict = strict
     self.fix = fix
+    self.accept_tolerated = accept_tolerated
 
   def validate(self) -> list[ValidationIssue]:
     """Validate workspace for missing references and inconsistencies."""
@@ -179,6 +189,9 @@ class WorkspaceValidator:
     # Phase status validation (DE-104)
     self._validate_phase_statuses()
 
+    # Delta block schema validation (DE-138 P04 — DEC-138-14)
+    self._validate_delta_blocks(delta_registry)
+
     # Kind-aware frontmatter validation (DE-112)
     memory_dir = get_memory_dir(self.workspace.root)
     backlog_dir = get_backlog_dir(self.workspace.root)
@@ -248,6 +261,57 @@ class WorkspaceValidator:
               artifact.id,
               f"applies_to requirement {req} not found",
             )
+
+  def _validate_delta_blocks(
+    self,
+    delta_registry: dict[str, ChangeArtifact],
+  ) -> None:
+    """Validate per-delta context_inputs and risk_register block schemas.
+
+    Tolerated alias entries become errors when ``self.accept_tolerated`` is
+    False (DEC-138-14, F-138-23). Diagnostics are dispatched at the severity
+    reported by the underlying ``MetadataValidator`` so warnings stay warnings
+    unless ``--strict`` promotes them at the exit-code layer.
+    """
+    for delta_id, artifact in delta_registry.items():
+      try:
+        _, body = load_markdown_file(artifact.path)
+      except (OSError, ValueError):
+        continue
+
+      try:
+        ctx_block = extract_delta_context_inputs(body)
+      except ValueError as exc:
+        self._error(delta_id, f"context_inputs block extraction failed: {exc}")
+        ctx_block = None
+      if ctx_block is not None:
+        for err in DELTA_CONTEXT_INPUTS_VALIDATOR.validate(
+          ctx_block.data,
+          strict=self.strict,
+          accept_tolerated=self.accept_tolerated,
+        ):
+          self._block_issue(delta_id, "context_inputs", err)
+
+      try:
+        risk_block = extract_delta_risk_register(body)
+      except ValueError as exc:
+        self._error(delta_id, f"risk_register block extraction failed: {exc}")
+        risk_block = None
+      if risk_block is not None:
+        for err in DELTA_RISK_REGISTER_VALIDATOR.validate(
+          risk_block.data,
+          strict=self.strict,
+          accept_tolerated=self.accept_tolerated,
+        ):
+          self._block_issue(delta_id, "risk_register", err)
+
+  def _block_issue(self, artifact: str, block_label: str, err: Any) -> None:
+    """Dispatch a block ValidationError into a ValidationIssue at its severity."""
+    message = f"{block_label}: {err}"
+    if err.severity == "warning":
+      self._warning(artifact, message)
+    else:
+      self._error(artifact, message)
 
   def _error(self, artifact: str, message: str) -> None:
     self.issues.append(
@@ -628,9 +692,12 @@ def validate_workspace(
   strict: bool = False,
   *,
   fix: bool = False,
+  accept_tolerated: bool = True,
 ) -> list[ValidationIssue]:
   """Validate the given workspace and return a list of validation issues."""
-  validator = WorkspaceValidator(workspace, strict=strict, fix=fix)
+  validator = WorkspaceValidator(
+    workspace, strict=strict, fix=fix, accept_tolerated=accept_tolerated
+  )
   return validator.validate()
 
 

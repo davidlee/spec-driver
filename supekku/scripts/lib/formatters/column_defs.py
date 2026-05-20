@@ -45,6 +45,20 @@ CHANGE_COLUMNS = [
   ColumnDef(label="Status", field="status"),
 ]
 
+# DR-138 §8.1 — enriched delta list view. ``Tags`` is opt-in via --tags
+# (§8.5 breaking-change disclosure); ``Audit Gate`` cell is rendered empty
+# for default (``auto``) but the column header is always present.
+DELTA_COLUMNS = [
+  ColumnDef(label="ID", field="id", style_key="change.id"),
+  ColumnDef(label="Name", field="name"),
+  ColumnDef(label="Status", field="status"),
+  ColumnDef(label="Specs", field="specs"),
+  ColumnDef(label="Audit Gate", field="audit_gate"),
+  ColumnDef(label="Audit", field="audit"),
+  ColumnDef(label="Phases", field="phases"),
+]
+DELTA_TAGS_COLUMN = ColumnDef(label="Tags", field="tags")
+
 PLAN_COLUMNS = [
   ColumnDef(label="ID", field="id", style_key="change.id"),
   ColumnDef(label="Status", field="status"),

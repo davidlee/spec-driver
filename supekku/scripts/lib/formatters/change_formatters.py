@@ -20,9 +20,12 @@ from supekku.scripts.lib.blocks.plan import (
   extract_phase_tracking,
 )
 from supekku.scripts.lib.changes.phase_model import PhaseSheet
+from supekku.scripts.lib.core.frontmatter_metadata.delta import AUDIT_GATE_AUTO
 from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
   CHANGE_COLUMNS,
+  DELTA_COLUMNS,
+  DELTA_TAGS_COLUMN,
   EXT_ID_COLUMN,
   PHASE_COLUMNS,
   PLAN_COLUMNS,
@@ -200,6 +203,171 @@ def format_change_list_table(
     prepare_row=_row,
     prepare_tsv_row=_tsv_row,
     to_json=format_change_list_json,
+    format_type=format_type,
+    truncate=truncate,
+  )
+
+
+_EMPTY_CELL = "–"
+
+
+def _format_specs_cell(applies_to: dict[str, Any]) -> str:
+  """Render DR-138 §8.1 Specs column: ``N (first-id)`` or em-dash if empty."""
+  specs = applies_to.get("specs", []) if applies_to else []
+  if not specs:
+    return _EMPTY_CELL
+  return f"{len(specs)} ({specs[0]})"
+
+
+def _format_audit_glyph(delta_id: str, audited_delta_ids: set[str]) -> str:
+  """Render DR-138 §8.1 Audit column. Glyph keys on delta_id (DEC-138-13)."""
+  return "✓" if delta_id in audited_delta_ids else _EMPTY_CELL
+
+
+def _format_phases_cell(plan: dict[str, Any] | None) -> str:
+  """Render DR-138 §8.1 Phases column: completed/total or em-dash if no plan."""
+  if not plan:
+    return _EMPTY_CELL
+  phases = plan.get("phases") or []
+  if not phases:
+    return _EMPTY_CELL
+  total = len(phases)
+  completed = sum(
+    1
+    for p in phases
+    if isinstance(p, dict) and str(p.get("status", "")).strip() == "completed"
+  )
+  return f"{completed}/{total}"
+
+
+def _format_audit_gate_cell(audit_gate: str | None) -> str:
+  """Render DR-138 §8.1 Audit Gate column. Empty when default (``auto``)."""
+  if not audit_gate or audit_gate == AUDIT_GATE_AUTO:
+    return ""
+  return audit_gate
+
+
+def format_delta_list_row(
+  artifact: ChangeArtifact,
+  *,
+  audited_delta_ids: set[str],
+  show_tags: bool = False,
+) -> dict[str, str]:
+  """Render one delta as a column-keyed cell dict (DR-138 §8.2).
+
+  Pure function — caller renders via Rich table, TSV, or JSON. POL-003
+  boundary: takes primitive input (no registry access); the CLI orchestrator
+  builds ``audited_delta_ids`` once per invocation.
+  """
+  row = {
+    "id": artifact.id,
+    "name": artifact.name,
+    "status": artifact.status,
+    "specs": _format_specs_cell(artifact.applies_to),
+    "audit_gate": _format_audit_gate_cell(artifact.audit_gate),
+    "audit": _format_audit_glyph(artifact.id, audited_delta_ids),
+    "phases": _format_phases_cell(artifact.plan),
+  }
+  if show_tags:
+    row["tags"] = format_tags_cell(artifact.tags)
+  return row
+
+
+def format_delta_list_json(
+  deltas: Sequence[ChangeArtifact],
+  *,
+  audited_delta_ids: set[str],
+) -> str:
+  """JSON output per DR-138 §8.4 — full ``applies_to`` + full ``plan``."""
+  items: list[dict[str, Any]] = []
+  for d in deltas:
+    item: dict[str, Any] = {
+      "id": d.id,
+      "kind": d.kind,
+      "status": d.status,
+      "name": d.name,
+      "slug": d.slug,
+      "path": d.path.as_posix(),
+      "applies_to": d.applies_to,
+      "plan": d.plan,
+      "audit_gate": d.audit_gate,
+      "audited": d.id in audited_delta_ids,
+      "tags": d.tags,
+    }
+    if d.relations:
+      item["relations"] = d.relations
+    if d.ext_id:
+      item["ext_id"] = d.ext_id
+    if d.ext_url:
+      item["ext_url"] = d.ext_url
+    items.append(item)
+  return format_as_json(items)
+
+
+def format_delta_list_table(
+  deltas: Sequence[ChangeArtifact],
+  *,
+  audited_delta_ids: set[str],
+  format_type: str = "table",
+  truncate: bool = False,
+  show_tags: bool = False,
+  show_external: bool = False,
+  show_refs: bool = False,
+) -> str:
+  """Render the enriched delta list per DR-138 §8.1–§8.4.
+
+  ``--external`` / ``--refs`` are preserved column flags (§8.3 flag
+  preservation); ``--tags`` is the new opt-in for the legacy Tags column
+  (§8.5).
+  """
+  col_defs = list(DELTA_COLUMNS)
+  if show_external:
+    col_defs.insert(1, EXT_ID_COLUMN)
+  if show_refs:
+    col_defs.append(REFS_COLUMN)
+  if show_tags:
+    col_defs.append(DELTA_TAGS_COLUMN)
+  fields = [c.field for c in col_defs]
+
+  def _table_row(d: ChangeArtifact) -> list[str]:
+    row = format_delta_list_row(
+      d, audited_delta_ids=audited_delta_ids, show_tags=show_tags
+    )
+    if show_external:
+      row["ext_id"] = d.ext_id
+    if show_refs:
+      row["refs"] = format_refs_count(collect_references(d))
+    cells: list[str] = []
+    for field_name in fields:
+      cell = row.get(field_name, "")
+      if field_name == "id":
+        cell = f"[change.id]{cell}[/change.id]"
+      elif field_name == "status":
+        style = get_change_status_style(d.status)
+        cell = f"[{style}]{cell}[/{style}]"
+      cells.append(cell)
+    return cells
+
+  def _tsv_row(d: ChangeArtifact) -> list[str]:
+    row = format_delta_list_row(
+      d, audited_delta_ids=audited_delta_ids, show_tags=show_tags
+    )
+    if show_external:
+      row["ext_id"] = d.ext_id
+    if show_refs:
+      row["refs"] = format_refs_tsv(collect_references(d))
+    return [row.get(field_name, "") for field_name in fields]
+
+  def _to_json(items: Sequence[ChangeArtifact]) -> str:
+    return format_delta_list_json(items, audited_delta_ids=audited_delta_ids)
+
+  return format_list_table(
+    deltas,
+    columns=column_labels(col_defs),
+    title="Deltas",
+    prepare_row=_table_row,
+    prepare_tsv_row=_tsv_row,
+    to_json=_to_json,
     format_type=format_type,
     truncate=truncate,
   )

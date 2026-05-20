@@ -24,15 +24,38 @@ from supekku.scripts.lib.blocks.metadata.aliases import normalize_field
 from supekku.scripts.lib.changes.lifecycle import CHANGE_STATUSES, STATUS_COMPLETED
 from supekku.scripts.lib.changes.registry import ChangeRegistry
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
+from supekku.scripts.lib.core.spec_utils import load_markdown_file
 from supekku.scripts.lib.formatters.change_formatters import (
-  format_change_list_table,
   format_change_with_context,
+  format_delta_list_table,
 )
 from supekku.scripts.lib.relations.query import (
   find_by_relation,
   find_related_to,
   partition_by_reverse_references,
 )
+
+
+def _collect_audited_delta_ids(root: str | None) -> set[str]:
+  """Set of DE-* ids covered by a completed audit (DR-138 §8.3, DEC-138-13).
+
+  Reads ``delta_ref`` directly from audit frontmatter — the audit-glyph keys
+  on the audited delta id, not the AUD-* id (F-138-19). When a future delta
+  surfaces ``delta_ref`` on ``ChangeArtifact``, this collapses to a generator.
+  """
+  audit_registry = ChangeRegistry(root=root, kind="audit")
+  out: set[str] = set()
+  for audit in audit_registry.collect().values():
+    if audit.status != STATUS_COMPLETED:
+      continue
+    try:
+      fm, _ = load_markdown_file(audit.path)
+    except (FileNotFoundError, ValueError, OSError):
+      continue
+    delta_ref = fm.get("delta_ref")
+    if delta_ref:
+      out.add(str(delta_ref).strip())
+  return out
 
 
 @app.command("deltas")
@@ -114,6 +137,13 @@ def list_deltas(
     typer.Option(
       "--refs",
       help="Include refs column (count in table, type:target in TSV)",
+    ),
+  ] = False,
+  show_tags: Annotated[
+    bool,
+    typer.Option(
+      "--tags",
+      help="Include the legacy Tags column (DR-138 §8.5 opt-in)",
     ),
   ] = False,
   tag: Annotated[
@@ -320,16 +350,20 @@ def list_deltas(
     filtered_artifacts.sort(key=lambda x: x.id)
 
     # Format and output
-    # For TSV with details, use old formatter; otherwise use new table formatter
+    # For TSV with details, use the context formatter; otherwise the enriched
+    # delta-specific formatter (DR-138 §8).
     if format_type == "tsv" and details:
       for artifact in filtered_artifacts:
         output = format_change_with_context(artifact)
         typer.echo(output)
     else:
-      output = format_change_list_table(
+      audited_delta_ids = _collect_audited_delta_ids(root)
+      output = format_delta_list_table(
         filtered_artifacts,
+        audited_delta_ids=audited_delta_ids,
         format_type=format_type,
         truncate=truncate,
+        show_tags=show_tags,
         show_external=external,
         show_refs=refs,
       )

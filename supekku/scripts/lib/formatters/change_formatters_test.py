@@ -11,13 +11,19 @@ from textwrap import dedent
 from supekku.scripts.lib.changes.artifacts import ChangeArtifact
 from supekku.scripts.lib.core.paths import AUDITS_SUBDIR, DELTAS_SUBDIR, SPEC_DRIVER_DIR
 from supekku.scripts.lib.formatters.change_formatters import (
+  _format_audit_gate_cell,
+  _format_audit_glyph,
   _format_delta_reverse_lookups,
+  _format_phases_cell,
+  _format_specs_cell,
   format_audit_details,
   format_change_list_item,
   format_change_list_json,
   format_change_list_table,
   format_change_with_context,
   format_delta_details,
+  format_delta_list_row,
+  format_delta_list_table,
   format_phase_summary,
   format_plan_details,
   format_plan_list_table,
@@ -1082,6 +1088,139 @@ class TestFormatDeltaReverseLookups(unittest.TestCase):
     )
     assert "Audit: AUD-003 — Conformance audit" in result
     assert "Revision: RE-037 — Completion" in result
+
+
+class TestDeltaListEnrichmentVTLIST001(unittest.TestCase):
+  """VT-DE138-LIST-001 — DR-138 §8 column matrix and helper coverage."""
+
+  def _delta(  # pylint: disable=too-many-arguments
+    self,
+    *,
+    delta_id: str = "DE-100",
+    name: str = "Sample",
+    status: str = "in-progress",
+    applies_to: dict | None = None,
+    plan: dict | None = None,
+    audit_gate: str | None = None,
+    tags: list[str] | None = None,
+  ) -> ChangeArtifact:
+    return ChangeArtifact(
+      id=delta_id,
+      kind="delta",
+      status=status,
+      name=name,
+      slug=delta_id.lower(),
+      path=Path(f"/tmp/{delta_id}.md"),
+      updated="2026-05-20",
+      applies_to=applies_to or {},
+      plan=plan,
+      audit_gate=audit_gate,
+      tags=tags or [],
+    )
+
+  def test_specs_cell_summarises_count_and_first_id(self) -> None:
+    assert _format_specs_cell({"specs": ["PROD-004", "SPEC-115"]}) == "2 (PROD-004)"
+    assert _format_specs_cell({"specs": []}) == "–"
+    assert _format_specs_cell({}) == "–"
+
+  def test_audit_glyph_keys_on_delta_id_not_audit_id(self) -> None:
+    audited = {"DE-100", "DE-150"}
+    assert _format_audit_glyph("DE-100", audited) == "✓"
+    assert _format_audit_glyph("DE-101", audited) == "–"
+    # AUD-* never matches; glyph is delta-keyed (DEC-138-13)
+    assert _format_audit_glyph("AUD-100", audited) == "–"
+
+  def test_phases_cell_counts_completed_over_total(self) -> None:
+    plan = {
+      "phases": [
+        {"id": "IP-100-P01", "status": "completed"},
+        {"id": "IP-100-P02", "status": "completed"},
+        {"id": "IP-100-P03", "status": "in-progress"},
+        {"id": "IP-100-P04", "status": "draft"},
+      ]
+    }
+    assert _format_phases_cell(plan) == "2/4"
+    assert _format_phases_cell({"phases": []}) == "–"
+    assert _format_phases_cell(None) == "–"
+
+  def test_audit_gate_cell_empty_for_default(self) -> None:
+
+    assert _format_audit_gate_cell(None) == ""
+    assert _format_audit_gate_cell("auto") == ""
+    assert _format_audit_gate_cell("exempt") == "exempt"
+    assert _format_audit_gate_cell("required") == "required"
+
+  def test_format_delta_list_row_returns_column_keyed_dict(self) -> None:
+    delta = self._delta(
+      delta_id="DE-138",
+      name="Delta metadata propagation",
+      status="in-progress",
+      applies_to={
+        "specs": ["PROD-004", "SPEC-115"],
+        "requirements": ["PROD-004.FR-001"],
+      },
+      plan={"phases": [{"status": "completed"}, {"status": "in-progress"}]},
+      audit_gate="exempt",
+      tags=["meta", "infra"],
+    )
+    row = format_delta_list_row(delta, audited_delta_ids={"DE-138"})
+    assert row == {
+      "id": "DE-138",
+      "name": "Delta metadata propagation",
+      "status": "in-progress",
+      "specs": "2 (PROD-004)",
+      "audit_gate": "exempt",
+      "audit": "✓",
+      "phases": "1/2",
+    }
+    assert "tags" not in row
+
+  def test_format_delta_list_row_includes_tags_opt_in(self) -> None:
+    delta = self._delta(tags=["infra", "meta"])
+    row = format_delta_list_row(delta, audited_delta_ids=set(), show_tags=True)
+    assert "tags" in row
+    assert "infra" in row["tags"]
+
+  def test_format_delta_list_table_default_columns(self) -> None:
+    deltas = [self._delta()]
+    out = format_delta_list_table(deltas, audited_delta_ids=set(), format_type="tsv")
+    header_keys = {"ID", "Name", "Status", "Specs", "Audit Gate", "Audit", "Phases"}
+    # TSV is data-only (no header), but row width matches DELTA_COLUMNS width.
+    row = out.strip().split("\t")
+    assert len(row) == len(header_keys)
+
+  def test_format_delta_list_table_tags_flag_appends_column(self) -> None:
+    deltas = [self._delta(tags=["meta"])]
+    without = format_delta_list_table(
+      deltas, audited_delta_ids=set(), format_type="tsv"
+    )
+    with_tags = format_delta_list_table(
+      deltas, audited_delta_ids=set(), format_type="tsv", show_tags=True
+    )
+    assert len(with_tags.strip().split("\t")) == len(without.strip().split("\t")) + 1
+    assert "meta" in with_tags
+
+  def test_format_delta_list_table_json_carries_full_data(self) -> None:
+    deltas = [
+      self._delta(
+        applies_to={"specs": ["PROD-004"], "requirements": ["PROD-004.FR-001"]},
+        plan={"phases": [{"id": "IP-100-P01", "status": "completed"}]},
+        audit_gate="exempt",
+        tags=["meta"],
+      )
+    ]
+    out = format_delta_list_table(
+      deltas, audited_delta_ids={"DE-100"}, format_type="json"
+    )
+    parsed = json.loads(out)["items"]
+    assert parsed[0]["applies_to"] == {
+      "specs": ["PROD-004"],
+      "requirements": ["PROD-004.FR-001"],
+    }
+    assert parsed[0]["plan"]["phases"][0]["id"] == "IP-100-P01"
+    assert parsed[0]["audit_gate"] == "exempt"
+    assert parsed[0]["audited"] is True
+    assert parsed[0]["tags"] == ["meta"]
 
 
 if __name__ == "__main__":

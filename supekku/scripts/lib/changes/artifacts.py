@@ -103,6 +103,7 @@ class ChangeArtifact:
   plan: dict[str, Any] | None = None
   ext_id: str = ""
   ext_url: str = ""
+  audit_gate: str | None = None
 
   def to_dict(self, repo_root: Path) -> dict[str, Any]:
     """Convert artifact to dictionary for registry serialization.
@@ -263,6 +264,9 @@ def load_change_artifact(path: Path) -> ChangeArtifact | None:
     plan=plan_payload,
     ext_id=str(frontmatter.get("ext_id", "")),
     ext_url=str(frontmatter.get("ext_url", "")),
+    audit_gate=(
+      str(frontmatter["audit_gate"]).strip() if frontmatter.get("audit_gate") else None
+    ),
   )
 
 

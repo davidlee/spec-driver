@@ -2347,5 +2347,230 @@ requirements:
     assert result.exit_code != 0
 
 
+class ListDeltasEnrichmentVTLIST001Test(unittest.TestCase):
+  """VT-DE138-LIST-001 — column matrix + flag preservation under DR-138 §8."""
+
+  def setUp(self) -> None:
+    self.runner = CliRunner()
+    self.tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.root = Path(self.tmpdir.name)
+    (self.root / ".git").mkdir()
+    self._create_deltas()
+    self._create_audit_for("DE-100")
+
+  def tearDown(self) -> None:
+    self.tmpdir.cleanup()
+
+  def _create_deltas(self) -> None:
+    base = self.root / SPEC_DRIVER_DIR / DELTAS_SUBDIR
+    # DE-100: audited, exempt audit_gate, 2 specs, 2 phases (1 completed)
+    self._write_delta(
+      base / "DE-100-alpha",
+      delta_id="DE-100",
+      name="Alpha feature",
+      status="in-progress",
+      audit_gate="exempt",
+      tags=["meta", "infra"],
+      specs=["PROD-004", "SPEC-115"],
+      phases=[("P01", "completed"), ("P02", "in-progress")],
+    )
+    # DE-101: no audit, default gate, no specs, no plan
+    self._write_delta(
+      base / "DE-101-beta",
+      delta_id="DE-101",
+      name="Beta bugfix",
+      status="in-progress",
+      specs=[],
+      phases=None,
+    )
+
+  def _write_delta(  # pylint: disable=too-many-arguments
+    self,
+    delta_dir: Path,
+    *,
+    delta_id: str,
+    name: str,
+    status: str,
+    specs: list[str],
+    phases: list[tuple[str, str]] | None,
+    audit_gate: str | None = None,
+    tags: list[str] | None = None,
+  ) -> None:
+    delta_dir.mkdir(parents=True, exist_ok=True)
+    gate_line = f"audit_gate: {audit_gate}\n" if audit_gate else ""
+    tags_line = "tags:\n" + "".join(f"  - {t}\n" for t in tags) if tags else ""
+    if specs:
+      specs_block = "  specs:\n" + "".join(f"    - {s}\n" for s in specs)
+    else:
+      specs_block = "  specs: []\n"
+    delta_md = (
+      f"---\n"
+      f"id: {delta_id}\n"
+      f"slug: {delta_id.lower()}_sample\n"
+      f"name: {name}\n"
+      f"created: '2026-03-01'\n"
+      f"updated: '2026-03-02'\n"
+      f"status: {status}\n"
+      f"kind: delta\n"
+      f"{gate_line}"
+      f"{tags_line}"
+      f"applies_to:\n"
+      f"{specs_block}"
+      f"  requirements: []\n"
+      f"---\n\n"
+      f"# {delta_id}\n"
+    )
+    (delta_dir / f"{delta_id}.md").write_text(delta_md, encoding="utf-8")
+
+    if phases:
+      plan_id = delta_id.replace("DE", "IP")
+      plan_md = (
+        f"---\n"
+        f"id: {plan_id}\n"
+        f"slug: {delta_id.lower()}_plan\n"
+        f"name: Plan for {delta_id}\n"
+        f"created: '2026-03-01'\n"
+        f"updated: '2026-03-02'\n"
+        f"status: in-progress\n"
+        f"kind: plan\n"
+        f"delta: {delta_id}\n"
+        f"---\n\n"
+        f"# {plan_id}\n"
+      )
+      (delta_dir / f"{plan_id}.md").write_text(plan_md, encoding="utf-8")
+      phases_dir = delta_dir / "phases"
+      phases_dir.mkdir(exist_ok=True)
+      for label, ph_status in phases:
+        phase_id = f"{plan_id}-{label}"
+        (phases_dir / f"phase-{label.lower()}.md").write_text(
+          f"---\n"
+          f"id: {phase_id}\n"
+          f"slug: {phase_id.lower()}\n"
+          f"name: {phase_id}\n"
+          f"created: '2026-03-01'\n"
+          f"updated: '2026-03-02'\n"
+          f"status: {ph_status}\n"
+          f"kind: phase\n"
+          f"plan: {plan_id}\n"
+          f"delta: {delta_id}\n"
+          f"---\n\n"
+          f"# {phase_id}\n",
+          encoding="utf-8",
+        )
+
+  def _create_audit_for(self, delta_id: str) -> None:
+    """Audit glyph keys on delta_id via FM delta_ref (DEC-138-13)."""
+    from supekku.scripts.lib.core.paths import AUDITS_SUBDIR
+
+    audits_dir = self.root / SPEC_DRIVER_DIR / AUDITS_SUBDIR
+    audits_dir.mkdir(parents=True, exist_ok=True)
+    aud_id = "AUD-001"
+    (audits_dir / f"{aud_id}.md").write_text(
+      f"---\n"
+      f"id: {aud_id}\n"
+      f"slug: aud_001\n"
+      f"name: Audit for {delta_id}\n"
+      f"created: '2026-03-01'\n"
+      f"updated: '2026-03-02'\n"
+      f"status: completed\n"
+      f"kind: audit\n"
+      f"delta_ref: {delta_id}\n"
+      f"---\n\n"
+      f"# {aud_id}\n",
+      encoding="utf-8",
+    )
+
+  def test_default_columns_present(self) -> None:
+    result = self.runner.invoke(app, ["deltas", "--root", str(self.root), "--all"])
+    assert result.exit_code == 0, result.stderr
+    out = result.stdout
+    for header in ("ID", "Name", "Status", "Specs", "Audit Gate", "Audit", "Phases"):
+      assert header in out, f"missing column {header}: {out}"
+    # DR-138 §8.5: Tags column not shown by default
+    assert "Tags" not in out
+
+  def test_specs_count_and_first_id(self) -> None:
+    result = self.runner.invoke(app, ["deltas", "--root", str(self.root), "--all"])
+    assert "2 (PROD-004)" in result.stdout
+
+  def test_audit_glyph_keys_on_delta_id(self) -> None:
+    result = self.runner.invoke(app, ["deltas", "--root", str(self.root), "--all"])
+    # ✓ on the audited DE-100 row; – on DE-101 row.
+    lines = [line for line in result.stdout.splitlines() if "DE-10" in line]
+    de100_line = next(line for line in lines if "DE-100" in line)
+    de101_line = next(line for line in lines if "DE-101" in line)
+    assert "✓" in de100_line
+    assert "✓" not in de101_line
+
+  def test_phases_completed_over_total(self) -> None:
+    result = self.runner.invoke(app, ["deltas", "--root", str(self.root), "--all"])
+    assert "1/2" in result.stdout
+
+  def test_audit_gate_empty_for_default(self) -> None:
+    # DE-101 has no audit_gate set; cell renders empty (not literal "auto").
+    result = self.runner.invoke(
+      app, ["deltas", "--root", str(self.root), "--all", "--format", "tsv"]
+    )
+    assert result.exit_code == 0, result.stderr
+    de101_line = next(
+      line for line in result.stdout.splitlines() if line.startswith("DE-101")
+    )
+    fields = de101_line.split("\t")
+    # ID Name Status Specs AuditGate Audit Phases
+    assert fields[4] == ""
+    # DE-100 explicit `exempt` value renders verbatim.
+    de100_line = next(
+      line for line in result.stdout.splitlines() if line.startswith("DE-100")
+    )
+    assert de100_line.split("\t")[4] == "exempt"
+
+  def test_tags_opt_in_flag(self) -> None:
+    without = self.runner.invoke(
+      app, ["deltas", "--root", str(self.root), "--all", "--format", "tsv"]
+    )
+    with_tags = self.runner.invoke(
+      app,
+      ["deltas", "--root", str(self.root), "--all", "--format", "tsv", "--tags"],
+    )
+    assert without.exit_code == 0
+    assert with_tags.exit_code == 0
+    assert "meta" not in without.stdout
+    assert "meta" in with_tags.stdout
+
+  def test_json_carries_full_applies_to_and_plan(self) -> None:
+    result = self.runner.invoke(
+      app, ["deltas", "--root", str(self.root), "--all", "--json"]
+    )
+    assert result.exit_code == 0, result.stderr
+    payload = yaml.safe_load(result.stdout)
+    by_id = {item["id"]: item for item in payload["items"]}
+    assert by_id["DE-100"]["applies_to"] == {
+      "specs": ["PROD-004", "SPEC-115"],
+      "requirements": [],
+    }
+    assert by_id["DE-100"]["audit_gate"] == "exempt"
+    assert by_id["DE-100"]["audited"] is True
+    assert by_id["DE-101"]["audited"] is False
+    # Full plan dict, not "N/M" summary
+    assert isinstance(by_id["DE-100"]["plan"]["phases"], list)
+    assert by_id["DE-100"]["plan"]["phases"]
+
+  def test_preserved_filter_flags(self) -> None:
+    """Smoke matrix — flags preserved per §8.3 (no removal)."""
+    matrix: list[list[str]] = [
+      ["deltas", "--root", str(self.root), "--all", "-f", "alpha"],
+      ["deltas", "--root", str(self.root), "--all", "-s", "in-progress"],
+      ["deltas", "--root", str(self.root), "--all", "--spec", "PROD-004"],
+      ["deltas", "--root", str(self.root), "--all", "--refs"],
+      ["deltas", "--root", str(self.root), "--all", "--external"],
+      ["deltas", "--root", str(self.root), "--all", "--truncate"],
+      ["deltas", "--root", str(self.root), "DE-100"],
+      ["deltas", "--root", str(self.root), "--all", "--unaudited"],
+    ]
+    for args in matrix:
+      result = self.runner.invoke(app, args)
+      assert result.exit_code == 0, f"args={args} stderr={result.stderr}"
+
+
 if __name__ == "__main__":
   unittest.main()

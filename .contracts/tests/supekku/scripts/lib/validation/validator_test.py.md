@@ -56,6 +56,38 @@ DE-129 §1.4: Warn on bare requirement IDs in applies_to.
 - `test_bare_nf_id_warns(self) -> None`: Bare NF-001 in applies_to also warns (not just FR).
 - `test_qualified_id_no_warning(self) -> None`: Fully qualified SPEC-401.FR-014 does not warn.
 
+### TestDeltaBlockStrictEnforcementVTDE138FLIP001
+
+VT-DE138-FLIP-001 row 2 — strict-on-validate enforcement post-flip.
+
+Covers PROD-004.FR-002: under ``--strict``, an entry violating the
+``delta.context_inputs@v1`` schema (e.g. missing required ``id``) surfaces as
+an error from the workspace validator — proving the per-kind validator is
+invoked, not bypassed.
+
+**Inherits from:** WorkspaceValidatorTest
+
+#### Methods
+
+- `test_missing_required_field_in_context_inputs_errors_under_strict(self) -> None`
+
+### TestDeltaBlockTolerationGateVTDE138GATE001
+
+VT-DE138-GATE-001 — ``--no-tolerated-aliases`` reaches per-kind validators.
+
+Covers DEC-138-14 / F-138-23: a delta carrying ``context_inputs[].type=unknown``
+(the tolerated alias for ``document``) emits 0 errors when
+``accept_tolerated=True`` (default) and ≥1 error when False. Proves the flag
+is no longer silently dropped between the CLI and per-kind block validators.
+
+**Inherits from:** WorkspaceValidatorTest
+
+#### Methods
+
+- `test_no_tolerated_aliases_promotes_to_error(self) -> None`: accept_tolerated=False — tolerated alias produces error.
+- `test_tolerated_alias_emits_warning_under_default_accept(self) -> None`: accept_tolerated=True (default) — tolerated alias produces warning, not error.
+- `_write_delta_with_tolerated_context_input(self, root, delta_id) -> Path`
+
 ### TestImplementsTargetKindCheck
 
 DE-129 §1.5: Specific warning when implements targets a spec.

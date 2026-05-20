@@ -14,6 +14,8 @@ Column order is display order.
 - `BACKLOG_COLUMNS`
 - `CARD_COLUMNS`
 - `CHANGE_COLUMNS`
+- `DELTA_COLUMNS` - for default (``auto``) but the column header is always present.
+- `DELTA_TAGS_COLUMN`
 - `DRIFT_COLUMNS`
 - `EXT_ID_COLUMN` - Shared optional columns (used with flags like --external, --packages)
 - `MEMORY_COLUMNS`

@@ -68,6 +68,25 @@ Tests for ext_id/ext_url support in change formatters (VT-067-002).
 - `test_tsv_show_external_inserts_ext_id(self) -> None`: Test TSV includes ext_id after ID when show_external=True.
 - `_make_delta(self) -> ChangeArtifact`
 
+### TestDeltaListEnrichmentVTLIST001
+
+VT-DE138-LIST-001 — DR-138 §8 column matrix and helper coverage.
+
+**Inherits from:** unittest.TestCase
+
+#### Methods
+
+- `test_audit_gate_cell_empty_for_default(self) -> None`
+- `test_audit_glyph_keys_on_delta_id_not_audit_id(self) -> None`
+- `test_format_delta_list_row_includes_tags_opt_in(self) -> None`
+- `test_format_delta_list_row_returns_column_keyed_dict(self) -> None`
+- `test_format_delta_list_table_default_columns(self) -> None`
+- `test_format_delta_list_table_json_carries_full_data(self) -> None`
+- `test_format_delta_list_table_tags_flag_appends_column(self) -> None`
+- `test_phases_cell_counts_completed_over_total(self) -> None`
+- `test_specs_cell_summarises_count_and_first_id(self) -> None`
+- `_delta(self) -> ChangeArtifact` - pylint: disable=too-many-arguments
+
 ### TestFormatChangeListItem
 
 Tests for format_change_list_item function.

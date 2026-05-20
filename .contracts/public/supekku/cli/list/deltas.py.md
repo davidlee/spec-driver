@@ -4,7 +4,7 @@ List deltas command.
 
 ## Functions
 
-- @app.command(deltas) `list_deltas(root, ids, status, implements, substring, spec_filter, related_to, relation, referenced_by, not_referenced_by, unaudited, refs, tag, regexp, case_insensitive, format_type, json_output, truncate, details, external, show_all) -> None`: List deltas with optional filtering and status grouping.
+- @app.command(deltas) `list_deltas(root, ids, status, implements, substring, spec_filter, related_to, relation, referenced_by, not_referenced_by, unaudited, refs, show_tags, tag, regexp, case_insensitive, format_type, json_output, truncate, details, external, show_all) -> None`: List deltas with optional filtering and status grouping.
 
 By default, completed deltas are hidden. Use --all to show them.
 

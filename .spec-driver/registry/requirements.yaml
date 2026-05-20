@@ -775,7 +775,11 @@ requirements:
     - VT-CC-029
     - VT-CC-031
     - VT-CC-033
+    - VT-DE138-LIST-001
     coverage_entries:
+    - artefact: VT-DE138-LIST-001
+      status: verified
+      kind: VT
     - artefact: VT-CC-001
       status: verified
       kind: VT
@@ -863,7 +867,11 @@ requirements:
     - VT-CC-025
     - VT-CC-030
     - VT-CC-034
+    - VT-DE138-FLIP-001
     coverage_entries:
+    - artefact: VT-DE138-FLIP-001
+      status: verified
+      kind: VT
     - artefact: VT-CC-008
       status: verified
       kind: VT
@@ -1010,7 +1018,7 @@ requirements:
     primary_spec: PROD-004
     kind: functional
     category: null
-    status: pending
+    status: in-progress
     tags: []
     introduced: null
     implemented_by:
@@ -1019,9 +1027,13 @@ requirements:
     verified_by: []
     coverage_evidence:
     - VT-007
+    - VT-DE138-MIG-001
     coverage_entries:
     - artefact: VT-007
       status: planned
+      kind: VT
+    - artefact: VT-DE138-MIG-001
+      status: verified
       kind: VT
     path: .spec-driver/product/PROD-004/PROD-004.md
   PROD-004.NF-001:

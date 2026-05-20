@@ -5,6 +5,11 @@ Backlog item models and status vocabulary.
 Per-kind status sets define accepted lifecycle values (DEC-057-02, DEC-057-08).
 Validation is permissive: unknown values are warned, not rejected.
 
+OQ-137-02 sunset: ``BACKLOG_BASE_STATUSES`` and ``RISK_STATUSES`` are
+transition-window re-exports derived from
+``frontmatter_metadata/issue.ISSUE_STATUS_ENUM_VALUES`` and
+``frontmatter_metadata/risk.RISK_STATUS_ENUM_VALUES`` respectively.
+
 ## Constants
 
 - `logger`

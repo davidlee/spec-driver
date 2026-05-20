@@ -24,6 +24,13 @@ Attributes:
   conditional_rules: Optional list of conditional validation rules
   description: Human-readable block description
   examples: Example blocks for documentation
+  field_aliases: Field-NAME alias map ``{alias_key: canonical_key}``.
+    Applied at parse time: when ``alias_key`` is present in the parsed
+    YAML the validator renames it to ``canonical_key`` before per-field
+    dispatch. Example (relations item BlockMetadata):
+    ``{"annotation": "nature"}``. Loaders apply silently when
+    ``strict=False``; under strict the rename emits a warning whose
+    ``--fix`` rewrites the source key.
 
 ### ConditionalRule
 
@@ -61,7 +68,33 @@ Attributes:
     (object type). Combines with `properties` for hybrid declared-plus-
     dynamic objects, or stands alone for fully dynamic-key maps. Object
     type requires `properties`, `additional_properties`, or both.
+  aliases: Permanent field-VALUE alias map ``{alias_value: canonical_value}``.
+    Applied after per-field dispatch. Same strict/--fix semantics as
+    ``BlockMetadata.field_aliases``, scoped to value rewrites. Example
+    (delta status FieldMetadata): ``{"complete": "completed"}``.
+  tolerated_aliases: Migration-window field-VALUE alias map. Accepted
+    under default strict; rejected under ``--no-tolerated-aliases``;
+    ``--fix`` ignores them (migrations rewrite during ``admin migrate``).
+  field_aliases: Field-NAME alias map for nested object schemas, mirroring
+    ``BlockMetadata.field_aliases``. Carried on object-typed FieldMetadata
+    so nested schemas (e.g. the relations item) can declare key renames at
+    their own layer rather than only at the top-level block.
 
 #### Methods
 
 - `__post_init__(self) -> None`: Validate field metadata consistency.
+
+### ToleratedAlias
+
+Time-bounded alias for a field VALUE.
+
+Tolerated aliases live in `FieldMetadata.tolerated_aliases`. They are
+accepted at read time so unmigrated payloads continue to load, but the
+``--no-tolerated-aliases`` strict mode rejects them, and ``--fix`` does
+not rewrite them (migration concern; rides through ``admin migrate``).
+
+Attributes:
+  canonical: Canonical value that this alias maps to.
+  sunset_after: Delta ID or semver (e.g. ``"DE-140"`` or ``"0.11.0"``)
+    after which the alias should be retired.
+  rationale: Short explanation of why the alias is tolerated.

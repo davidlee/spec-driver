@@ -26,6 +26,7 @@ Validates workspace consistency and artifact relationships.
 
 - `validate(self) -> list[ValidationIssue]`: Validate workspace for missing references and inconsistencies.
 - `__init__(self, workspace, strict) -> None`
+- `_block_issue(self, artifact, block_label, err) -> None`: Dispatch a block ValidationError into a ValidationIssue at its severity.
 - `_build_conformance_audit_index(self) -> dict[Tuple[str, list[tuple[Tuple[str, dict]]]]]`: Index completed conformance audits by delta_ref.
 - `_check_finding_id_collisions(self, delta_id, audits) -> None`: Warn if finding IDs collide across multi-audit union.
 - `_error(self, artifact, message) -> None`
@@ -47,6 +48,12 @@ colliding finding IDs → warning.
 - `_validate_decision_status_compatibility(self, decisions) -> None`: Warn if active ADR references deprecated or superseded ADRs.
 
 Only applies in strict mode.
+- `_validate_delta_blocks(self, delta_registry) -> None`: Validate per-delta context_inputs and risk_register block schemas.
+
+Tolerated alias entries become errors when ``self.accept_tolerated`` is
+False (DEC-138-14, F-138-23). Diagnostics are dispatched at the severity
+reported by the underlying ``MetadataValidator`` so warnings stay warnings
+unless ``--strict`` promotes them at the exit-code layer.
 - `_validate_kind_frontmatter(self, model_cls, label, directories, glob) -> None`: Validate frontmatter files against a Pydantic model.
 
 Walks *directories*, globs for *glob*, parses frontmatter, and

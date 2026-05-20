@@ -98,7 +98,8 @@ Test enum field validation.
 
 #### Methods
 
-- `test_enum_field_invalid(self)`: Enum field rejects values not in enum.
+- `test_enum_field_invalid(self)`: Enum field rejects values not in enum under strict (DEC-137-23).
+- `test_enum_field_invalid_tolerant_default(self)`: Loader-default (strict=False) silently accepts unknown enum values.
 - `test_enum_field_valid(self)`: Enum field accepts allowed values.
 
 ### FieldMetadataPersistenceTest
@@ -199,17 +200,17 @@ Test root-level validation.
 
 ### StrictUnknownKeysTest
 
-`strict_unknown_keys` flag rejects undeclared keys (DE-118 DEC-001).
+`strict=True` rejects undeclared keys (DE-118 DEC-001 / DE-137 DEC-137-14).
 
 **Inherits from:** unittest.TestCase
 
 #### Methods
 
 - `test_default_lax_accepts_extra_top_level_key(self)`: Default behaviour (lax) accepts unknown top-level keys.
-- `test_strict_accepts_known_keys(self)`: strict_unknown_keys=True does not regress on valid documents.
-- `test_strict_rejects_extra_key_at_nested_depth(self)`: strict_unknown_keys propagates through nested object recursion.
-- `test_strict_rejects_extra_top_level_key(self)`: strict_unknown_keys=True rejects unknown top-level keys.
-- `test_strict_with_additional_properties_accepts_matching_extras(self)`: strict_unknown_keys does not double-reject keys covered by additional.
+- `test_strict_accepts_known_keys(self)`: strict=True does not regress on valid documents.
+- `test_strict_rejects_extra_key_at_nested_depth(self)`: strict=True propagates through nested object recursion.
+- `test_strict_rejects_extra_top_level_key(self)`: strict=True rejects unknown top-level keys.
+- `test_strict_with_additional_properties_accepts_matching_extras(self)`: strict=True does not double-reject keys covered by additional.
 - `_metadata(self) -> BlockMetadata`
 
 ### StringFieldValidationTest

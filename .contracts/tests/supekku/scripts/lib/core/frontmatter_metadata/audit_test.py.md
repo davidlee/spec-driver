@@ -11,7 +11,7 @@ correctly, including the per-finding disposition contract (DEC-079-001).
 
 ## Functions
 
-- `_new_errors(data) -> list[str]`: Run metadata validator and return error strings.
+- `_new_errors(data) -> list[str]`: Run metadata validator (strict mode) and return error strings.
 
 ## Classes
 

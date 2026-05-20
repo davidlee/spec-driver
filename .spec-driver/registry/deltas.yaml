@@ -454,6 +454,8 @@ deltas:
     applies_to:
       specs:
       - PROD-007
+      - SPEC-110
+      - SPEC-112
       requirements:
       - PROD-007.FR-001
       - PROD-007.FR-002
@@ -526,9 +528,6 @@ deltas:
     slug: standardize-cli-json-output-support
     updated: '2025-11-02'
     path: .spec-driver/deltas/DE-006-standardize-cli-json-output-support/DE-006.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: resolves
       target: ISSUE-007
@@ -872,6 +871,7 @@ deltas:
     applies_to:
       specs:
       - SPEC-110
+      - SPEC-120
       requirements:
       - PROD-010.FR-001
       - PROD-010.FR-002
@@ -1402,6 +1402,7 @@ deltas:
     applies_to:
       specs:
       - SPEC-110
+      - SPEC-120
       requirements:
       - PROD-010.FR-004
       - PROD-010.FR-005
@@ -1958,8 +1959,7 @@ deltas:
     updated: '2026-03-23'
     path: .spec-driver/deltas/DE-016-remove-phase-01-auto-creation-and-enable-intelligent-phase-creation/DE-016.md
     applies_to:
-      specs:
-      - PROD-011
+      specs: []
       requirements:
       - PROD-011.FR-001
       - PROD-011.FR-002
@@ -2367,13 +2367,6 @@ deltas:
     slug: add-default-filtering-and-pagination-to-backlog-list-command
     updated: '2026-03-23'
     path: .spec-driver/deltas/DE-020-add-default-filtering-and-pagination-to-backlog-list-command/DE-020.md
-    applies_to:
-      specs:
-      - SPEC-113
-      - SPEC-110
-      - PROD-010
-      requirements:
-      - ISSUE-025
     plan:
       id: IP-020
       overview:
@@ -3004,6 +2997,8 @@ deltas:
     applies_to:
       specs:
       - PROD-014
+      - SPEC-110
+      - SPEC-123
       requirements:
       - PROD-014.FR-001
       - PROD-014.FR-002
@@ -3012,6 +3007,8 @@ deltas:
       - PROD-014.FR-005
       - PROD-014.FR-006
       - PROD-014.FR-007
+      - PROD-014.NF-001
+      - PROD-014.NF-002
     plan:
       id: IP-027
       overview:
@@ -3309,8 +3306,11 @@ deltas:
     path: .spec-driver/deltas/DE-030-unit_vs_assembly_spec_classification/DE-030.md
     applies_to:
       specs:
-      - PROD-015
       - ADR-003
+      - PROD-001
+      - PROD-012
+      - PROD-014
+      - PROD-015
       requirements:
       - PROD-015.FR-001
       - PROD-015.FR-002
@@ -3319,6 +3319,9 @@ deltas:
       - PROD-015.FR-005
       - PROD-015.NF-001
       - PROD-015.NF-002
+    relations:
+    - type: introduces
+      target: DR-030
     plan:
       id: IP-030
       overview:
@@ -3437,9 +3440,6 @@ deltas:
     slug: memory_records_schema_and_command_surface
     updated: '2026-03-02'
     path: .spec-driver/deltas/DE-033-memory_records_schema_and_command_surface/DE-033.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: RE-017
@@ -3778,6 +3778,9 @@ deltas:
       - PROD-015.FR-003
       - PROD-015.FR-004
       - PROD-015.FR-005
+    relations:
+    - type: introduces
+      target: RE-018
     plan:
       id: IP-035
       overview:
@@ -3816,6 +3819,9 @@ deltas:
     slug: frontmatter_metadata_compaction_and_canonicalization_controls
     updated: '2026-03-03'
     path: .spec-driver/deltas/DE-036-frontmatter_metadata_compaction_and_canonicalization_controls/DE-036.md
+    relations:
+    - type: introduces
+      target: RE-019
     plan:
       id: IP-036
       overview:
@@ -4425,9 +4431,6 @@ deltas:
     slug: separate_template_concerns_agents_artifacts_hooks
     updated: '2026-03-04'
     path: .spec-driver/deltas/DE-040-separate_template_concerns_agents_artifacts_hooks/DE-040.md
-    applies_to:
-      specs: []
-      requirements: []
   DE-041:
     kind: delta
     status: completed
@@ -4725,9 +4728,6 @@ deltas:
     slug: respect_target_project_direnv_environment_in_sync_adapters
     updated: '2026-03-04'
     path: .spec-driver/deltas/DE-042-respect_target_project_direnv_environment_in_sync_adapters/DE-042.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-042
       overview:
@@ -4869,9 +4869,6 @@ deltas:
     slug: centralize_hardcoded_workspace_directory_paths
     updated: '2026-03-05'
     path: .spec-driver/deltas/DE-044-centralize_hardcoded_workspace_directory_paths/DE-044.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-044
       overview:
@@ -5008,9 +5005,6 @@ deltas:
     slug: memory_graph_navigation_for_agent_discoverability
     updated: '2026-03-05'
     path: .spec-driver/deltas/DE-045-memory_graph_navigation_for_agent_discoverability/DE-045.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-045
       overview:
@@ -5372,9 +5366,6 @@ deltas:
     slug: configurable_workspace_directory_paths_via_workflow_toml
     updated: '2026-03-06'
     path: .spec-driver/deltas/DE-048-configurable_workspace_directory_paths_via_workflow_toml/DE-048.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: follows-from
       target: DE-044
@@ -5451,9 +5442,6 @@ deltas:
     slug: consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks
     updated: '2026-03-06'
     path: .spec-driver/deltas/DE-049-consolidate_workspace_directories_under_spec_driver_with_backward_compat_symlinks/DE-049.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: follows-from
       target: DE-048
@@ -5666,9 +5654,6 @@ deltas:
     slug: normalise_registry_api_surface_for_consistent_artifact_access
     updated: '2026-03-06'
     path: .spec-driver/deltas/DE-050-normalise_registry_api_surface_for_consistent_artifact_access/DE-050.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-050
       overview:
@@ -5823,9 +5808,6 @@ deltas:
     slug: event_infrastructure_jsonl_log_and_unix_domain_socket_emitter
     updated: '2026-03-07'
     path: .spec-driver/deltas/DE-052-event_infrastructure_jsonl_log_and_unix_domain_socket_emitter/DE-052.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: implements
       target: IMPR-009
@@ -5933,9 +5915,6 @@ deltas:
     slug: tui_artifact_browser_mvp_with_textual
     updated: '2026-03-07'
     path: .spec-driver/deltas/DE-053-tui_artifact_browser_mvp_with_textual/DE-053.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: implements
       target: IMPR-009
@@ -6118,9 +6097,6 @@ deltas:
     slug: tui_track_mode_real_time_agent_session_following
     updated: '2026-03-07'
     path: .spec-driver/deltas/DE-054-tui_track_mode_real_time_agent_session_following/DE-054.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: implements
       target: IMPR-009
@@ -6847,9 +6823,6 @@ deltas:
     slug: fix_validator_backlog_id_resolution_and_make_registry_syncs_always_on
     updated: '2026-03-07'
     path: .spec-driver/deltas/DE-056-fix_validator_backlog_id_resolution_and_make_registry_syncs_always_on/DE-056.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: implements
       target: ISSUE-016
@@ -6881,9 +6854,6 @@ deltas:
     slug: backlogregistry_class_normalisation
     updated: '2026-03-07'
     path: .spec-driver/deltas/DE-057-backlogregistry_class_normalisation/DE-057.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: follows-up
       target: DE-053
@@ -7087,9 +7057,6 @@ deltas:
     slug: tui_auto_follow_active_agent_session_on_startup
     updated: '2026-03-08'
     path: .spec-driver/deltas/DE-059-tui_auto_follow_active_agent_session_on_startup/DE-059.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: depends-on
       target: DE-054
@@ -7121,9 +7088,6 @@ deltas:
     slug: claude_code_tool_use_hooks_emit_spec_driver_artifact_events
     updated: '2026-03-08'
     path: .spec-driver/deltas/DE-060-claude_code_tool_use_hooks_emit_spec_driver_artifact_events/DE-060.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: depends-on
       target: DE-052
@@ -7191,9 +7155,6 @@ deltas:
     slug: tui_bundle_file_browser
     updated: '2026-03-08'
     path: .spec-driver/deltas/DE-061-tui_bundle_file_browser/DE-061.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: follows-up
       target: DE-053
@@ -7479,9 +7440,6 @@ deltas:
     slug: cli_interface_fixes_id_inference_list_truncation_bugs_flag_parsing
     updated: '2026-03-08'
     path: .spec-driver/deltas/DE-063-cli_interface_fixes_id_inference_list_truncation_bugs_flag_parsing/DE-063.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: addresses
       target: ISSUE-045
@@ -7597,9 +7555,6 @@ deltas:
     slug: spec_driver_doctor_workspace_health_diagnostics
     updated: '2026-03-08'
     path: .spec-driver/deltas/DE-064-spec_driver_doctor_workspace_health_diagnostics/DE-064.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: addresses
       target: ISSUE-022
@@ -7719,9 +7674,6 @@ deltas:
     slug: drift_ledger_primitive
     updated: '2026-03-08'
     path: .spec-driver/deltas/DE-065-drift_ledger_primitive/DE-065.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-065
       overview:
@@ -7872,9 +7824,6 @@ deltas:
     slug: tui_drift_ledger_integration
     updated: '2026-03-08'
     path: .spec-driver/deltas/DE-066-tui_drift_ledger_integration/DE-066.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: depends_on
       target: DE-065
@@ -8503,9 +8452,6 @@ deltas:
     slug: standardize_show_output_selectors
     updated: '2026-03-09'
     path: .spec-driver/deltas/DE-073-standardize_show_output_selectors/DE-073.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-073
       overview:
@@ -8624,9 +8570,6 @@ deltas:
     slug: add_severity_filter_to_backlog_list_commands
     updated: '2026-03-09'
     path: .spec-driver/deltas/DE-074-add_severity_filter_to_backlog_list_commands/DE-074.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-074
       overview:
@@ -8834,6 +8777,7 @@ deltas:
     applies_to:
       specs:
       - PROD-008
+      - SPEC-110
       - SPEC-122
       requirements:
       - ISSUE-016.FR-016.001
@@ -9097,8 +9041,8 @@ deltas:
     path: .spec-driver/deltas/DE-078-add_list_audits_cli_subcommand/DE-078.md
     applies_to:
       specs:
-      - SPEC-110
       - PROD-016
+      - SPEC-110
       requirements:
       - SPEC-110.FR-002
       - SPEC-110.FR-005
@@ -9404,9 +9348,6 @@ deltas:
     slug: rename_cards_docs_config_to_kanban_and_always_render_card_explanation
     updated: '2026-03-09'
     path: .spec-driver/deltas/DE-080-rename_cards_docs_config_to_kanban_and_always_render_card_explanation/DE-080.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-080
       overview:
@@ -9519,9 +9460,6 @@ deltas:
     slug: spec_driver_should_warn_and_suggest_install_when_workflow_toml_version_is_stale
     updated: '2026-03-09'
     path: .spec-driver/deltas/DE-082-spec_driver_should_warn_and_suggest_install_when_workflow_toml_version_is_stale/DE-082.md
-    applies_to:
-      specs: []
-      requirements: []
   DE-083:
     kind: delta
     status: completed
@@ -9941,6 +9879,7 @@ deltas:
     path: .spec-driver/deltas/DE-086-memory_verification_primitive_sha_stamped_attestation_for_staleness_tracking/DE-086.md
     applies_to:
       specs:
+      - SPEC-110
       - SPEC-116
       - SPEC-132
       requirements: []
@@ -10247,9 +10186,6 @@ deltas:
     slug: bare_numeric_ids_and_show_backlog_alias
     updated: '2026-03-12'
     path: .spec-driver/deltas/DE-088-show_view_commands_lack_id_inference_require_redundant_subcommand_and_full_prefix/DE-088.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: ISSUE-045
@@ -10281,9 +10217,6 @@ deltas:
     slug: no_separate_install_requirements_for_tui
     updated: '2026-03-10'
     path: .spec-driver/deltas/DE-089-no_separate_install_requirements_for_tui/DE-089.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: ISSUE-049
@@ -10706,9 +10639,6 @@ deltas:
     slug: jailed_coding_agent_harness_pi_subprocess_via_rpc_with_bubblewrap_sandboxing
     updated: '2026-03-14'
     path: .spec-driver/deltas/DE-092-jailed_coding_agent_harness_pi_subprocess_via_rpc_with_bubblewrap_sandboxing/DE-092.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: PROD-016
@@ -10742,9 +10672,6 @@ deltas:
     slug: pi_extension_preboot_hook_for_fresh_governance_context_on_startup_and_reload
     updated: '2026-03-15'
     path: .spec-driver/deltas/DE-093-pi_extension_preboot_hook_for_fresh_governance_context_on_startup_and_reload/DE-093.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: DE-092
@@ -10783,9 +10710,6 @@ deltas:
     slug: pi_extension_artifact_event_tracking_via_tool_result_hooks
     updated: '2026-03-14'
     path: .spec-driver/deltas/DE-094-pi_extension_artifact_event_tracking_via_tool_result_hooks/DE-094.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: DE-093
@@ -10935,9 +10859,6 @@ deltas:
     slug: memory_graph_index_and_inverse_relation_traversal_gaps
     updated: '2026-03-15'
     path: .spec-driver/deltas/DE-097-memory_graph_index_and_inverse_relation_traversal_gaps/DE-097.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: ISSUE-031
@@ -11091,9 +11012,6 @@ deltas:
     slug: improve_pi_skill_adherence_for_spec_driver_installed_skills
     updated: '2026-03-16'
     path: .spec-driver/deltas/DE-098-improve_pi_skill_adherence_for_spec_driver_installed_skills/DE-098.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-098
       overview:
@@ -11234,9 +11152,6 @@ deltas:
     slug: fix_requirement_extraction_false_positive_warnings_on_cross_references
     updated: '2026-03-19'
     path: .spec-driver/deltas/DE-101-fix_requirement_extraction_false_positive_warnings_on_cross_references/DE-101.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-101
       overview:
@@ -11753,9 +11668,6 @@ deltas:
     slug: create_phase_appends_duplicate_entry_to_ip_phases_list_and_uses_inconsistent_id_format
     updated: '2026-03-22'
     path: .spec-driver/deltas/DE-105-create_phase_appends_duplicate_entry_to_ip_phases_list_and_uses_inconsistent_id_format/DE-105.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: ISSUE-052
@@ -11811,16 +11723,6 @@ deltas:
     slug: phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown
     updated: '2026-03-22'
     path: .spec-driver/deltas/DE-106-phase_sheet_template_dry_eliminate_triple_entry_bookkeeping_across_frontmatter_blocks_and_markdown/DE-106.md
-    applies_to:
-      specs:
-      - PROD-006
-      - PROD-011
-      requirements:
-      - PROD-006.FR-001
-      - PROD-006.FR-003
-      - PROD-006.FR-004
-      - PROD-006.FR-005
-      - PROD-006.NF-002
     relations:
     - type: relates_to
       target: IMPR-022
@@ -12779,9 +12681,6 @@ deltas:
     slug: paths_and_config_decoupling_replace_mutable_globals_with_value_objects
     updated: '2026-03-22'
     path: .spec-driver/deltas/DE-121-paths_and_config_decoupling_replace_mutable_globals_with_value_objects/DE-121.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-121
       overview:
@@ -12844,9 +12743,6 @@ deltas:
     slug: list_deltas_to_hide_completed_by_default_all_to_show_them
     updated: '2026-03-22'
     path: .spec-driver/deltas/DE-123-list_deltas_to_hide_completed_by_default_all_to_show_them/DE-123.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-123
       overview:
@@ -12932,9 +12828,6 @@ deltas:
     slug: enforce_explicit_module_boundaries_and_coupling_constraints
     updated: '2026-03-24'
     path: .spec-driver/deltas/DE-125-enforce_explicit_module_boundaries_and_coupling_constraints/DE-125.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: introduces
       target: POL-003
@@ -12996,9 +12889,6 @@ deltas:
     slug: fix_pyright_typechecking_errors_389_errors
     updated: '2026-03-23'
     path: .spec-driver/deltas/DE-126-fix_pyright_typechecking_errors_389_errors/DE-126.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-126
       overview:
@@ -13026,9 +12916,6 @@ deltas:
     slug: audit_and_reclassify_core_misplaced_integration_hubs
     updated: '2026-03-24'
     path: .spec-driver/deltas/DE-127-audit_and_reclassify_core_misplaced_integration_hubs/DE-127.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: follows_from
       target: DE-125
@@ -13070,9 +12957,6 @@ deltas:
     slug: migrate_genuine_core_modules_to_spec_driver_core
     updated: '2026-03-24'
     path: .spec-driver/deltas/DE-128-migrate_genuine_core_modules_to_spec_driver_core/DE-128.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: follows_from
       target: DE-127
@@ -13135,6 +13019,8 @@ deltas:
     applies_to:
       specs:
       - SPEC-122
+      - SPEC-125
+      - SPEC-158
       requirements:
       - SPEC-122.FR-003
       - SPEC-122.FR-004
@@ -13202,9 +13088,6 @@ deltas:
     slug: status_validation_errors_must_list_allowable_values
     updated: '2026-04-10'
     path: .spec-driver/deltas/DE-130-status_validation_errors_must_list_allowable_values/DE-130.md
-    applies_to:
-      specs: []
-      requirements: []
     plan:
       id: IP-130
       overview:
@@ -13324,9 +13207,6 @@ deltas:
     slug: installer_support_for_claude_agents_agent_sync_pipeline
     updated: '2026-04-17'
     path: .spec-driver/deltas/DE-133-installer_support_for_claude_agents_agent_sync_pipeline/DE-133.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: IMPR-031
@@ -13361,9 +13241,6 @@ deltas:
     slug: subagent_worktree_base_ref_alignment_and_compensation_defences
     updated: '2026-04-26'
     path: .spec-driver/deltas/DE-134-subagent_worktree_base_ref_alignment_and_compensation_defences/DE-134.md
-    applies_to:
-      specs: []
-      requirements: []
     relations:
     - type: relates_to
       target: DE-132
@@ -13445,6 +13322,8 @@ deltas:
     path: .spec-driver/deltas/DE-136-metadata_schema_consolidation_program_propagate_adr_010_across_artefacts_and_close_prod_004/DE-136.md
     applies_to:
       specs:
+      - PROD-001
+      - PROD-002
       - PROD-004
       - PROD-006
       - PROD-010
@@ -13542,8 +13421,10 @@ deltas:
         delta: DE-136
         phase: IP-136-P01
         status: completed
-      - id: IP-136-P02
+      - plan: IP-136
+        delta: DE-136
         phase: IP-136-P02
+        status: completed
       - id: IP-136-P03
         phase: IP-136-P03
       - id: IP-136-P04
@@ -13638,14 +13519,14 @@ deltas:
       - plan: IP-137
         delta: DE-137
         phase: IP-137-P05
-        status: draft
+        status: completed
   DE-138:
     kind: delta
-    status: draft
+    status: completed
     name: 'Delta - Delta artefact metadata propagation: blocks + applies_to derivation
       + list enrichment (DE-136 child)'
     slug: delta_artefact_metadata_propagation_blocks_applies_to_derivation_list_enrichment_de_136_child
-    updated: '2026-05-09'
+    updated: '2026-05-21'
     path: .spec-driver/deltas/DE-138-delta_artefact_metadata_propagation_blocks_applies_to_derivation_list_enrichment_de_136_child/DE-138.md
     applies_to:
       specs:
@@ -13676,6 +13557,49 @@ deltas:
       target: ADR-010
       attributes:
         nature: Placement heuristic governing delta-kind field decisions
+    plan:
+      id: IP-138
+      overview:
+        schema: supekku.plan.overview
+        version: 1
+        plan: IP-138
+        delta: DE-138
+        revision_links:
+          aligns_with:
+          - DR-138
+        specs:
+          primary:
+          - PROD-004
+          - SPEC-115
+          collaborators: []
+        requirements:
+          targets:
+          - PROD-004.FR-001
+          - PROD-004.FR-002
+          - PROD-004.FR-007
+          dependencies: []
+        phases:
+        - id: IP-138-P01
+        - id: IP-138-P02
+        - id: IP-138-P03
+        - id: IP-138-P04
+      phases:
+      - plan: IP-138
+        delta: DE-138
+        phase: IP-138-P01
+        status: completed
+      - plan: IP-138
+        delta: DE-138
+        phase: IP-138-P02
+        status: completed
+      - plan: IP-138
+        delta: DE-138
+        phase: IP-138-P03
+        status: completed
+      - plan: IP-138
+        delta: DE-138
+        phase: IP-138-P04
+        status: completed
   DE-139:
     kind: delta
     status: draft

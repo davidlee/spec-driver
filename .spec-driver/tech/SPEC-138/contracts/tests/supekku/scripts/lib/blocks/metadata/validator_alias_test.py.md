@@ -1,0 +1,1 @@
+../../../../../../../../../../.contracts/tests/supekku/scripts/lib/blocks/metadata/validator_alias_test.py.md

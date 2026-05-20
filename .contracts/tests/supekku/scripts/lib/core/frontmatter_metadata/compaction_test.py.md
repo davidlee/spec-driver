@@ -43,11 +43,24 @@ Round-trip tests using real DELTA_FRONTMATTER_METADATA.
 #### Methods
 
 - `setUp(self) -> None`
-- `test_applies_to_with_prod_not_stripped(self) -> None`: Known pitfall: applies_to with prod key != default, must be kept.
-- `test_empty_defaults_stripped(self) -> None`: Empty-default fields (aliases, relations, applies_to) are removed.
+- `test_applies_to_fm_passes_through_unchanged(self) -> None`: DE-138 P01: FM applies_to is no longer declared metadata; passes through.
+
+Loader derives applies_to from the delta.relationships@v1 block
+(DR-138 §6.1, DEC-138-10). Compactor ignores undeclared FM keys; the
+P03 sweep cuts them once the block is canonical.
+- `test_empty_defaults_stripped(self) -> None`: Empty-default fields (relations) are removed.
+
+DE-138 P01: applies_to is no longer FM-declared (derived from
+delta.relationships@v1 block per DR-138 §6.1). FM `applies_to` keys on
+unmigrated artefacts pass through compaction unchanged until the P03
+sweep cuts them.
 - `test_full_mode_preserves_all_fields(self) -> None`: Full mode keeps everything, including empty defaults.
 - `test_minimal_delta_unchanged(self) -> None`: Minimal delta (canonical fields only) survives compaction.
 - `test_optional_fields_kept_when_populated(self) -> None`
 - `test_optional_fields_stripped_when_empty(self) -> None`: Optional fields (owners, tags, etc.) stripped when empty/default.
-- `test_populated_defaults_kept(self) -> None`: Non-default values for default-omit fields are preserved.
+
+DE-138 P01: context_inputs / risk_register moved to dedicated blocks
+(DR-138 §3.1). FM keys on unmigrated artefacts pass through unchanged
+until the P03 sweep.
+- `test_populated_relations_kept(self) -> None`: Non-default relations are preserved.
 - `test_round_trip_semantic_equivalence(self) -> None`: Compacted data + defaults reconstructs original semantics.

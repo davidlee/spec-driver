@@ -1,0 +1,1 @@
+../../../../../../../../../.contracts/tests/supekku/scripts/lib/skills/validate_gate_test.py.md

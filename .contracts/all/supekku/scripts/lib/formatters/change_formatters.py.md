@@ -7,6 +7,7 @@ Formatters take ChangeArtifact objects and return formatted strings for display.
 
 ## Constants
 
+- `_EMPTY_CELL`
 - `_PHASE_SEQ_FROM_ID`
 
 ## Functions
@@ -26,6 +27,8 @@ Returns:
 - `_format_affects(artifact) -> list[str]`: Format affects section for revisions (similar to applies_to for deltas).
 - `_format_applies_to(artifact) -> list[str]`: Format applies_to section if present.
 - `_format_audit_basic_fields(artifact) -> list[str]`: Format basic audit artifact fields.
+- `_format_audit_gate_cell(audit_gate) -> str`: Render DR-138 §8.1 Audit Gate column. Empty when default (``auto``).
+- `_format_audit_glyph(delta_id, audited_delta_ids) -> str`: Render DR-138 §8.1 Audit column. Glyph keys on delta_id (DEC-138-13).
 - `_format_change_basic_fields(artifact) -> list[str]`: Format basic change artifact fields.
 - `_format_delta_reverse_lookups(linked_audits, linked_revisions) -> list[str]`: Format reverse lookup section for delta details.
 
@@ -37,9 +40,11 @@ Returns:
   Lines for the reverse lookup section, or empty if none.
 - `_format_file_path_for_change(artifact, root) -> list[str]`: Format file path section for change artifact.
 - `_format_other_files(artifact, root) -> list[str]`: Format other files in delta bundle.
+- `_format_phases_cell(plan) -> str`: Render DR-138 §8.1 Phases column: completed/total or em-dash if no plan.
 - `_format_plan_overview(artifact, root) -> list[str]`: Format plan overview section if present.
 - `_format_relations(artifact) -> list[str]`: Format relations section if present.
 - `_format_revision_basic_fields(artifact) -> list[str]`: Format basic revision artifact fields.
+- `_format_specs_cell(applies_to) -> str`: Render DR-138 §8.1 Specs column: ``N (first-id)`` or em-dash if empty.
 - `_phase_sequence_digits_from_id(phase_id) -> <BinOp>`: Return two-digit sequence from phase id (hyphen or dotted spelling).
 - `_plan_list_to_json(plans) -> str`: Serialize plans to JSON.
 - `_prepare_change_row(change) -> list[str]`: Prepare a single change artifact row with styling.
@@ -114,6 +119,17 @@ Args:
 
 Returns:
   JSON string with complete delta information including all paths
+- `format_delta_list_json(deltas) -> str`: JSON output per DR-138 §8.4 — full ``applies_to`` + full ``plan``.
+- `format_delta_list_row(artifact) -> dict[Tuple[str, str]]`: Render one delta as a column-keyed cell dict (DR-138 §8.2).
+
+Pure function — caller renders via Rich table, TSV, or JSON. POL-003
+boundary: takes primitive input (no registry access); the CLI orchestrator
+builds ``audited_delta_ids`` once per invocation.
+- `format_delta_list_table(deltas) -> str`: Render the enriched delta list per DR-138 §8.1–§8.4.
+
+``--external`` / ``--refs`` are preserved column flags (§8.3 flag
+preservation); ``--tags`` is the new opt-in for the legacy Tags column
+(§8.5).
 - `format_phase_summary(phase, max_objective_len) -> str`: Format a single phase with truncated objective.
 
 Args:

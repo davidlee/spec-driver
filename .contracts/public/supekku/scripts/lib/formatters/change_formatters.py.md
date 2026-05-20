@@ -71,6 +71,17 @@ Args:
 
 Returns:
   JSON string with complete delta information including all paths
+- `format_delta_list_json(deltas) -> str`: JSON output per DR-138 §8.4 — full ``applies_to`` + full ``plan``.
+- `format_delta_list_row(artifact) -> dict[Tuple[str, str]]`: Render one delta as a column-keyed cell dict (DR-138 §8.2).
+
+Pure function — caller renders via Rich table, TSV, or JSON. POL-003
+boundary: takes primitive input (no registry access); the CLI orchestrator
+builds ``audited_delta_ids`` once per invocation.
+- `format_delta_list_table(deltas) -> str`: Render the enriched delta list per DR-138 §8.1–§8.4.
+
+``--external`` / ``--refs`` are preserved column flags (§8.3 flag
+preservation); ``--tags`` is the new opt-in for the legacy Tags column
+(§8.5).
 - `format_phase_summary(phase, max_objective_len) -> str`: Format a single phase with truncated objective.
 
 Args:

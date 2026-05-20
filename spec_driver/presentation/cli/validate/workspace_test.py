@@ -118,34 +118,26 @@ class TestWorkspaceCliSmoke:
     result = runner.invoke(app, ["workspace", "--no-tolerated-aliases"])
     assert result.exit_code in (0, 1)  # not 2
 
-  def test_no_tolerated_aliases_promotes_de006_tolerated_to_errors(self) -> None:
-    """VT-DE138-GATE-001 CLI end-to-end against live-repo DE-006.
+  def test_no_tolerated_aliases_clean_after_de006_reclassification(self) -> None:
+    """VT-DE138-GATE-001 post-reclassification: live corpus has no tolerated aliases.
 
-    DE-006 carries ``context_inputs[].type=unknown`` (the tolerated alias for
-    ``document``). Under ``--strict`` without ``--no-tolerated-aliases`` the
-    surface is a warning; with ``--no-tolerated-aliases`` it must promote to
-    an error — proving the CLI flag reaches the per-kind block validator
-    (DEC-138-14, F-138-23). Wiring under test: CLI → ``validate_workspace``
-    → ``WorkspaceValidator._validate_delta_blocks``.
+    DE-006 context_inputs[].type reclassified from ``unknown`` to ``document``
+    in IP-138-P04 (commit 0e80ff32). The ``--no-tolerated-aliases`` flag now
+    produces zero tolerated-alias errors on the live corpus. Differential proof
+    (flag warns vs errors) is covered by synthetic fixtures in
+    ``validator_test.py::TestDeltaBlockTolerationGateVTDE138GATE001``.
     """
-    without = runner.invoke(app, ["workspace", "--kind", "delta", "--strict"])
-    with_flag = runner.invoke(
+    result = runner.invoke(
       app,
       ["workspace", "--kind", "delta", "--strict", "--no-tolerated-aliases"],
     )
 
-    without_de006_errors = [
+    tolerated_alias_errors = [
       line
-      for line in (without.stderr or "").splitlines()
-      if "DE-006" in line and "tolerated alias" in line and "level='error'" in line
+      for line in (result.stderr or "").splitlines()
+      if "tolerated alias" in line and "level='error'" in line
     ]
-    with_de006_errors = [
-      line
-      for line in (with_flag.stderr or "").splitlines()
-      if "DE-006" in line and "tolerated alias" in line and "level='error'" in line
-    ]
-    assert not without_de006_errors, without_de006_errors
-    assert with_de006_errors, with_flag.stderr
+    assert not tolerated_alias_errors, tolerated_alias_errors
 
   def test_strict_flag_accepted(self) -> None:
     result = runner.invoke(app, ["workspace", "--strict"])

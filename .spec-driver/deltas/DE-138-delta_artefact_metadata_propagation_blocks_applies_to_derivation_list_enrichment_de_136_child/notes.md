@@ -188,3 +188,21 @@
   7. **4.11 quality gates** — `just check` clean (note: `just` not on PATH in this environment; substitute `uv run python -m pytest supekku spec_driver && uv run ruff check supekku spec_driver && uv run ruff format --check supekku spec_driver && uvx import-linter lint`); final test count.
 - **Pytest state**: 5450 pass, 4 skipped (+64 vs P03's 5386 — established inheritance pattern of fixture-based test classes from `WorkspaceValidatorTest`).
 - **Commit chain since P03 close**: `728267a1` (P04 phase sheet) → `4bc87694` (ISSUE-057 baseline carve-out) → `6c638eea` (wiring + GATE/FLIP VTs). Pre-sweep tag `de-138-pre-sweep` remains intact at `46976634`.
+
+## 2026-05-21 — P04 close — Strict-flip + post-flip gate
+
+- **DE-006 reclassification** (commit `0e80ff32`): 3× `context_inputs[].type=unknown` reclassified to canonical `document` per DR-138 §5.1 sunset semantics.
+- **VH-DE138-FLIP-001** attested 2026-05-20 by `david.lee` — pre-flip checklist (DR-138 §11.2) confirmed item-by-item.
+- **Workflow.toml flip** (commit `70f91414`): `[validation.strict] delta = true` + `[schema_version] delta = "0.10.0+001"` added as discrete commit.
+- **Post-flip gate** (verified 2026-05-21):
+  - `validate workspace --kind delta --strict`: 7× audit-gate warnings + 1× DR-030 error (ISSUE-057) — matches baseline.
+  - `validate workspace --kind delta --strict --no-tolerated-aliases`: same baseline — zero tolerated-alias errors (DE-006 fix effective).
+  - `validate workspace --strict` whole-corpus: no regression (same 8 baseline issues).
+  - `complete delta DE-138 --dry-run`: passes.
+  - `list deltas`: rows render correctly.
+- **F-138-24 backlog issue**: ISSUE-058 filed (commit `89e4f3a9`); owner DE-136 P04 umbrella audit; DR-138 §10.5 cross-referenced.
+- **CLI test fix**: `test_no_tolerated_aliases_promotes_de006_tolerated_to_errors` renamed to `test_no_tolerated_aliases_clean_after_de006_reclassification` — asserts zero tolerated-alias errors on live corpus post-reclassification. VT-DE138-GATE-001 differential proof remains in synthetic `validator_test.py::TestDeltaBlockTolerationGateVTDE138GATE001`.
+- **Quality gates**: 5450 pass, 4 skipped; ruff lint + format clean; import-linter 3/3 contracts.
+- **IP-138 verification coverage**: VT-DE138-GATE-001, VT-DE138-FLIP-001 (both rows), VH-DE138-FLIP-001 flipped `planned` → `verified`. All 22 entries now verified.
+- **Commit chain P04**: `728267a1` → `4bc87694` → `6c638eea` → `9ebc5c41` → `0e80ff32` → `70f91414` → `89e4f3a9` → this commit (reconciliation + test fix).
+- **Hand-off**: DE-138 ready for `/close-change` — `complete delta DE-138` without `--force`.

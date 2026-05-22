@@ -652,5 +652,90 @@ class SpecFrontmatterValidationTest(unittest.TestCase):
     self._assert_both_valid(data)
 
 
+# -- VT-DE139-TAXONOMY-001: category strict enum validation --
+# -- VT-DE139-TAXONOMY-002: c4_level tolerated unknown --
+
+
+class SpecTaxonomyStrictTest(unittest.TestCase):
+  """DE-139: category strict enum + c4_level tolerated unknown."""
+
+  BASE = {
+    "id": "SPEC-001",
+    "name": "Test Spec",
+    "slug": "test-spec",
+    "kind": "spec",
+    "status": "draft",
+    "created": "2025-01-15",
+    "updated": "2025-01-15",
+  }
+
+  def _validate(self, data: dict, *, strict: bool = True) -> list[str]:
+    v = MetadataValidator(SPEC_FRONTMATTER_METADATA)
+    return [
+      str(e) for e in v.validate(data, strict=strict)
+      if e.severity == "error"
+    ]
+
+  def test_category_unit_accepted(self):
+    data = {**self.BASE, "category": "unit"}
+    assert self._validate(data) == []
+
+  def test_category_assembly_accepted(self):
+    data = {**self.BASE, "category": "assembly"}
+    assert self._validate(data) == []
+
+  def test_category_invalid_rejected(self):
+    data = {**self.BASE, "category": "freeform"}
+    errors = self._validate(data)
+    assert len(errors) > 0
+
+  def test_category_unknown_tolerated(self):
+    """unknown accepted (0 errors); produces warning."""
+    v = MetadataValidator(SPEC_FRONTMATTER_METADATA)
+    data = {**self.BASE, "category": "unknown"}
+    issues = list(v.validate(data, strict=True))
+    errors = [i for i in issues if i.severity == "error"]
+    warnings = [i for i in issues if i.severity == "warning"]
+    assert errors == []
+    assert len(warnings) == 1
+    assert "tolerated" in warnings[0].message
+
+  def test_category_unknown_rejected_no_tolerated(self):
+    v = MetadataValidator(SPEC_FRONTMATTER_METADATA)
+    data = {**self.BASE, "category": "unknown"}
+    errors = [
+      str(e)
+      for e in v.validate(
+        data, strict=True, accept_tolerated=False
+      )
+    ]
+    assert len(errors) > 0
+
+  def test_c4_level_valid_values(self):
+    for val in ("system", "container", "component", "code", "interaction"):
+      data = {**self.BASE, "c4_level": val}
+      assert self._validate(data) == [], f"failed for {val}"
+
+  def test_c4_level_invalid_rejected(self):
+    data = {**self.BASE, "c4_level": "module"}
+    errors = self._validate(data)
+    assert len(errors) > 0
+
+  def test_c4_level_unknown_tolerated(self):
+    """unknown accepted (0 errors); produces warning."""
+    v = MetadataValidator(SPEC_FRONTMATTER_METADATA)
+    data = {**self.BASE, "c4_level": "unknown"}
+    issues = list(v.validate(data, strict=True))
+    errors = [i for i in issues if i.severity == "error"]
+    warnings = [i for i in issues if i.severity == "warning"]
+    assert errors == []
+    assert len(warnings) == 1
+    assert "tolerated" in warnings[0].message
+
+  def test_category_absent_accepted(self):
+    """Optional field — absent is fine."""
+    assert self._validate(dict(self.BASE)) == []
+
+
 if __name__ == "__main__":
   unittest.main()

@@ -24,32 +24,32 @@ Define 3 new block schemas (concerns, hypotheses, decisions), remove deprecated/
 
 ## 3. Exit Criteria
 
-- [ ] `supekku:spec.concerns@v1`, `supekku:spec.hypotheses@v1`, `supekku:spec.decisions@v1` block schemas defined with validators
-- [ ] Extract/render functions for each block
-- [ ] FM fields removed from spec.py: concerns, hypotheses, decisions, scope, verification_strategy, packages
-- [ ] FM fields removed from prod.py: hypotheses, decisions, scope, verification_strategy
-- [ ] SPEC category promoted to strict enum (unit|assembly) with tolerated unknown
-- [ ] SPEC c4_level adds tolerated unknown alias
-- [ ] VT-DE139-TAXONOMY-001, VT-DE139-TAXONOMY-002, VT-DE139-BLOCKS-001 passing
-- [ ] `just test` passing; `just lint` clean
+- [x] `supekku:spec.concerns@v1`, `supekku:spec.hypotheses@v1`, `supekku:spec.decisions@v1` block schemas defined with validators
+- [x] Extract/render functions for each block
+- [x] FM fields removed from spec.py: concerns, hypotheses, decisions, scope, verification_strategy, packages
+- [x] FM fields removed from prod.py: hypotheses, decisions, scope, verification_strategy
+- [x] SPEC category promoted to strict enum (unit|assembly) with tolerated unknown
+- [x] SPEC c4_level adds tolerated unknown alias
+- [x] VT-DE139-TAXONOMY-001, VT-DE139-TAXONOMY-002, VT-DE139-BLOCKS-001 passing
+- [x] `just test` passing; `just lint` clean
 
 ## 4. Tasks
 
 | Status | ID | Description | Notes |
 |---|---|---|---|
-| [ ] | 1.1 | Define SPEC_CONCERNS_METADATA block schema in spec_metadata.py | DR-139 §4.1 |
-| [ ] | 1.2 | Define SPEC_HYPOTHESES_METADATA block schema (shared SPEC+PROD) | DR-139 §4.2 |
-| [ ] | 1.3 | Define SPEC_DECISIONS_METADATA block schema (shared, rationale optional) | DR-139 §4.3 |
-| [ ] | 1.4 | Add extract/render functions for each new block | Mirror existing spec_relationships/capabilities pattern |
-| [ ] | 1.5 | Remove FM field declarations from spec.py (concerns/hypotheses/decisions/scope/verification_strategy/packages) | DR-139 §5.1 |
-| [ ] | 1.6 | Remove FM field declarations from prod.py (hypotheses/decisions/scope/verification_strategy) | DR-139 §5.3 |
-| [ ] | 1.7 | Promote SPEC category to strict enum with tolerated unknown | DR-139 §5.2; aliases + tolerated_aliases |
-| [ ] | 1.8 | Add tolerated unknown alias to SPEC c4_level | DR-139 §5.2 |
-| [ ] | 1.9 | Write VT-DE139-BLOCKS-001 tests (block schema validation) | Test accept/reject for each schema |
-| [ ] | 1.10 | Write VT-DE139-TAXONOMY-001 test (category strict) | |
-| [ ] | 1.11 | Write VT-DE139-TAXONOMY-002 test (c4_level tolerated unknown) | |
-| [ ] | 1.12 | Verify existing tests pass after FM removals | `just test` |
-| [ ] | 1.13 | Lint clean | `just lint` |
+| [x] | 1.1 | Define SPEC_CONCERNS_METADATA block schema in spec_metadata.py | DR-139 §4.1 |
+| [x] | 1.2 | Define SPEC_HYPOTHESES_METADATA block schema (shared SPEC+PROD) | DR-139 §4.2 |
+| [x] | 1.3 | Define SPEC_DECISIONS_METADATA block schema (shared, rationale optional) | DR-139 §4.3 |
+| [x] | 1.4 | Add extract/render functions for each new block | Mirror existing spec_relationships/capabilities pattern |
+| [x] | 1.5 | Remove FM field declarations from spec.py (concerns/hypotheses/decisions/scope/verification_strategy/packages) | DR-139 §5.1 |
+| [x] | 1.6 | Remove FM field declarations from prod.py (hypotheses/decisions/scope/verification_strategy) | DR-139 §5.3 |
+| [x] | 1.7 | Promote SPEC category to strict enum with tolerated unknown | DR-139 §5.2; aliases + tolerated_aliases |
+| [x] | 1.8 | Add tolerated unknown alias to SPEC c4_level | DR-139 §5.2 |
+| [x] | 1.9 | Write VT-DE139-BLOCKS-001 tests (block schema validation) | Test accept/reject for each schema |
+| [x] | 1.10 | Write VT-DE139-TAXONOMY-001 test (category strict) | |
+| [x] | 1.11 | Write VT-DE139-TAXONOMY-002 test (c4_level tolerated unknown) | |
+| [x] | 1.12 | Verify existing tests pass after FM removals | `just test` |
+| [x] | 1.13 | Lint clean | `just lint` |
 
 ## 5. Task Details
 
@@ -89,6 +89,10 @@ Remove field definitions from `SPEC_FRONTMATTER_METADATA.fields` and `PROD_FRONT
 - `just test` — no regressions
 - `just lint` — clean
 
+All passing: 5058 tests, 0 lint errors (2026-05-22).
+
 ## 7. Notes
 
-_(populated during execution)_
+- Constants (CONCERNS_SCHEMA etc.) defined in relationships.py to avoid circular imports with spec_metadata.py
+- tolerated_aliases requires ToleratedAlias objects, not plain strings (sharp edge from DE-137)
+- Validator emits tolerated-alias messages at warning severity, not error — tests filter by severity

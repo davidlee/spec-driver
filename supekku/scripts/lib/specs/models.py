@@ -22,14 +22,6 @@ class Spec:
   body: str
 
   @property
-  def packages(self) -> list[str]:
-    """Return list of package paths associated with this spec."""
-    packages = self.frontmatter.data.get("packages", [])
-    if isinstance(packages, Iterable) and not isinstance(packages, (str, bytes)):
-      return [str(item) for item in packages]
-    return []
-
-  @property
   def slug(self) -> str:
     """Return URL-friendly slug for this spec."""
     return str(self.frontmatter.data.get("slug", ""))
@@ -86,6 +78,14 @@ class Spec:
     return str(self.frontmatter.data.get("c4_level", ""))
 
   @property
+  def sources(self) -> list[dict[str, Any]]:
+    """Return list of source dicts from frontmatter."""
+    raw = self.frontmatter.data.get("sources", [])
+    if not isinstance(raw, list):
+      return []
+    return [dict(s) for s in raw if isinstance(s, Mapping)]
+
+  @property
   def ext_id(self) -> str:
     """Return external system identifier (e.g. 'JIRA-1234')."""
     return str(self.frontmatter.data.get("ext_id", ""))
@@ -113,10 +113,6 @@ class Spec:
       "status": self.status,
       "path": str(self.path.relative_to(root)) if root else str(self.path),
     }
-
-    # Add packages if present
-    if self.packages:
-      data["packages"] = self.packages
 
     # Add taxonomy fields if present
     if self.category:

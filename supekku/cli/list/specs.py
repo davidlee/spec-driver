@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -22,7 +21,6 @@ from supekku.cli.common import (
 from supekku.cli.list import _parse_relation_filter, app
 from supekku.scripts.lib.blocks.metadata.aliases import normalize_field
 from supekku.scripts.lib.core.filters import parse_multi_value_filter
-from supekku.scripts.lib.core.paths import get_tech_specs_dir
 from supekku.scripts.lib.formatters.spec_formatters import (
   format_spec_list_item,
   format_spec_list_table,
@@ -59,28 +57,6 @@ def list_specs(
       "--filter",
       "-f",
       help="Substring to match against spec ID, slug, or name (case-insensitive)",
-    ),
-  ] = None,
-  package_filter: Annotated[
-    str | None,
-    typer.Option(
-      "--package",
-      "-p",
-      help="Substring to match against declared package paths",
-    ),
-  ] = None,
-  package_path: Annotated[
-    str | None,
-    typer.Option(
-      "--package-path",
-      help="Exact package path to resolve via by-package index",
-    ),
-  ] = None,
-  for_path: Annotated[
-    str | None,
-    typer.Option(
-      "--for-path",
-      help="Filter specs whose packages include PATH",
     ),
   ] = None,
   category: Annotated[
@@ -158,11 +134,11 @@ def list_specs(
       help="Include relative file paths in the output (TSV format only)",
     ),
   ] = False,
-  packages: Annotated[
+  tags_column: Annotated[
     bool,
     typer.Option(
-      "--packages",
-      help="Include package list in the output",
+      "--tags",
+      help="Show tags column in list output (opt-in)",
     ),
   ] = False,
   external: ExternalOption = False,
@@ -204,42 +180,6 @@ def list_specs(
   try:
     registry = SpecRegistry(root)
     filter_substring = (substring or "").strip().lower()
-
-    spec_root = get_tech_specs_dir(registry.root)
-    package_index_root = spec_root / "by-package"
-
-    package_filters: list[str] = []
-    package_exact: set[str] = set()
-
-    if package_filter:
-      package_filters.append(package_filter.strip().lower())
-
-    def resolve_package_path(pkg_path: str) -> None:
-      node = package_index_root / Path(pkg_path) / "spec"
-      if node.exists():
-        try:
-          target = node.resolve()
-          package_exact.add(target.name)
-        except OSError:
-          pass
-
-    if package_path:
-      resolve_package_path(package_path.strip())
-
-    if for_path is not None:
-      raw_path = for_path
-      base = Path.cwd() if raw_path == "." else Path(raw_path)
-      if not base.is_absolute():
-        base = (Path.cwd() / base).resolve()
-      try:
-        relative = base.relative_to(package_index_root)
-        resolve_package_path(str(relative))
-      except ValueError:
-        try:
-          relative = base.relative_to(registry.root)
-          package_filters.append(relative.as_posix().lower())
-        except ValueError:
-          package_filters.append(base.as_posix().lower())
 
     # Apply reverse relationship query first (if specified)
     if informed_by:
@@ -288,20 +228,6 @@ def list_specs(
     if tag:
       specs = [s for s in specs if any(t in s.tags for t in tag)]
 
-    if package_exact:
-      specs = [spec for spec in specs if spec.id in package_exact]
-
-    if package_filters:
-      specs = [
-        spec
-        for spec in specs
-        if spec.packages
-        and any(
-          any(filter_value in pkg.lower() for pkg in spec.packages)
-          for filter_value in package_filters
-        )
-      ]
-
     # Filter by kind (multi-value OR logic)
     def normalise_kind(requested_kinds: list[str], spec_id: str) -> bool:
       if not requested_kinds:  # "all" or no filter
@@ -348,7 +274,6 @@ def list_specs(
         line = format_spec_list_item(
           spec,
           include_path=paths,
-          include_packages=packages,
           root=registry.root,
         )
         typer.echo(line)
@@ -357,9 +282,9 @@ def list_specs(
         specs,
         format_type=format_type,
         truncate=truncate,
-        include_packages=packages,
         show_external=external,
         show_refs=refs,
+        show_tags=tags_column,
       )
       typer.echo(output)
 

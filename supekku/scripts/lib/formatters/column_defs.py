@@ -26,9 +26,20 @@ class ColumnDef:
 SPEC_COLUMNS = [
   ColumnDef(label="ID", field="id", style_key="spec.id"),
   ColumnDef(label="Name", field="name"),
-  ColumnDef(label="Tags", field="tags"),
   ColumnDef(label="Status", field="status"),
+  ColumnDef(label="Category", field="category"),
+  ColumnDef(label="C4", field="c4_level"),
+  ColumnDef(label="Sources", field="sources"),
 ]
+SPEC_TAGS_COLUMN = ColumnDef(label="Tags", field="tags")
+
+C4_GLYPHS: dict[str, str] = {
+  "system": "S",
+  "container": "N",
+  "component": "C",
+  "code": "D",
+  "interaction": "I",
+}
 
 ADR_COLUMNS = [
   ColumnDef(label="ID", field="id", style_key="adr.id"),
@@ -133,9 +144,8 @@ PHASE_COLUMNS = [
   ColumnDef(label="Objective", field="objective"),
 ]
 
-# Shared optional columns (used with flags like --external, --packages)
+# Shared optional columns (used with flags like --external, --refs)
 EXT_ID_COLUMN = ColumnDef(label="ExtID", field="ext_id")
-PACKAGES_COLUMN = ColumnDef(label="Packages", field="packages")
 REFS_COLUMN = ColumnDef(label="Refs", field="refs")
 
 

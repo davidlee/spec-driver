@@ -12,31 +12,13 @@ from supekku.scripts.lib.formatters.spec_formatters import (
   _format_requirements_summary,
   _format_reverse_lookup_counts,
   _format_spec_relations,
-  format_package_list,
+  format_c4_glyph,
+  format_sources_cell,
   format_spec_details,
   format_spec_list_item,
   format_spec_list_json,
   format_spec_list_table,
 )
-
-
-class TestFormatPackageList(unittest.TestCase):
-  """Tests for format_package_list function."""
-
-  def test_empty_list(self) -> None:
-    """Test formatting empty package list."""
-    result = format_package_list([])
-    assert result == ""
-
-  def test_single_package(self) -> None:
-    """Test formatting single package."""
-    result = format_package_list(["internal/api"])
-    assert result == "internal/api"
-
-  def test_multiple_packages(self) -> None:
-    """Test formatting multiple packages."""
-    result = format_package_list(["internal/api", "internal/models", "pkg/utils"])
-    assert result == "internal/api,internal/models,pkg/utils"
 
 
 class TestFormatSpecListItem(unittest.TestCase):
@@ -46,14 +28,12 @@ class TestFormatSpecListItem(unittest.TestCase):
     self,
     spec_id: str = "SPEC-001",
     slug: str = "test-spec",
-    packages: list[str] | None = None,
     path: Path | None = None,
   ) -> Mock:
     """Create a mock Spec object."""
     spec = Mock()
     spec.id = spec_id
     spec.slug = slug
-    spec.packages = packages or []
     spec.path = path or Path("/tmp/specs/SPEC-001.md")
     spec.frontmatter.relations = ()
     return spec
@@ -89,41 +69,7 @@ class TestFormatSpecListItem(unittest.TestCase):
 
     result = format_spec_list_item(spec, include_path=True, root=root)
 
-    # Should use absolute path when relative_to fails
     assert result == "SPEC-001\t/other/location/SPEC-001.md"
-
-  def test_format_with_packages(self) -> None:
-    """Test format with package list."""
-    spec = self._create_mock_spec(packages=["internal/api", "internal/models"])
-
-    result = format_spec_list_item(spec, include_packages=True)
-
-    assert result == "SPEC-001\ttest-spec\tinternal/api,internal/models"
-
-  def test_format_with_empty_packages(self) -> None:
-    """Test format with empty package list."""
-    spec = self._create_mock_spec(packages=[])
-
-    result = format_spec_list_item(spec, include_packages=True)
-
-    assert result == "SPEC-001\ttest-spec\t"
-
-  def test_format_with_path_and_packages(self) -> None:
-    """Test format with both path and packages."""
-    spec = self._create_mock_spec(
-      path=Path("/repo/specify/tech/SPEC-001.md"),
-      packages=["internal/api"],
-    )
-    root = Path("/repo")
-
-    result = format_spec_list_item(
-      spec,
-      include_path=True,
-      include_packages=True,
-      root=root,
-    )
-
-    assert result == "SPEC-001\tspecify/tech/SPEC-001.md\tinternal/api"
 
   def test_product_spec(self) -> None:
     """Test formatting product spec."""
@@ -144,21 +90,16 @@ class TestFormatSpecListItem(unittest.TestCase):
       spec_id="SPEC-123",
       slug="complex-spec",
       path=Path("/repo/specify/tech/complex/SPEC-123.md"),
-      packages=["pkg/core", "pkg/utils", "internal/lib"],
     )
     root = Path("/repo")
 
     result = format_spec_list_item(
       spec,
       include_path=True,
-      include_packages=True,
       root=root,
     )
 
-    expected = (
-      "SPEC-123\tspecify/tech/complex/SPEC-123.md\tpkg/core,pkg/utils,internal/lib"
-    )
-    assert result == expected
+    assert result == "SPEC-123\tspecify/tech/complex/SPEC-123.md"
 
 
 class TestFormatSpecDetails(unittest.TestCase):
@@ -172,7 +113,6 @@ class TestFormatSpecDetails(unittest.TestCase):
     *,
     kind: str = "spec",
     status: str = "draft",
-    packages: list[str] | None = None,
     path: Path | None = None,
   ) -> Mock:
     """Create a mock Spec object with all fields."""
@@ -182,7 +122,6 @@ class TestFormatSpecDetails(unittest.TestCase):
     spec.slug = slug
     spec.kind = kind
     spec.status = status
-    spec.packages = packages or []
     spec.path = path or Path("/repo/specify/tech/SPEC-001/SPEC-001.md")
     spec.frontmatter.relations = ()
     return spec
@@ -198,25 +137,6 @@ class TestFormatSpecDetails(unittest.TestCase):
     assert "Slug: test-spec" in result
     assert "Kind: spec" in result
     assert "Status: draft" in result
-
-  def test_spec_with_packages(self) -> None:
-    """Test formatting spec with packages."""
-    spec = self._create_mock_spec(packages=["internal/api", "internal/models"])
-
-    result = format_spec_details(spec)
-
-    assert "Packages:" in result
-    assert "internal/api" in result
-    assert "internal/models" in result
-
-  def test_spec_without_packages(self) -> None:
-    """Test formatting spec with no packages."""
-    spec = self._create_mock_spec(packages=[])
-
-    result = format_spec_details(spec)
-
-    # Should not show Packages section when empty
-    assert "Packages:" not in result
 
   def test_spec_with_path(self) -> None:
     """Test formatting spec with file path."""
@@ -264,21 +184,17 @@ class TestFormatSpecDetails(unittest.TestCase):
       slug="complete-spec",
       kind="spec",
       status="active",
-      packages=["pkg/core", "pkg/utils", "internal/lib"],
       path=Path("/repo/specify/tech/SPEC-123/SPEC-123.md"),
     )
     root = Path("/repo")
 
     result = format_spec_details(spec, root=root)
 
-    # Verify all sections present
     assert "ID: SPEC-123" in result
     assert "Name: Complete Specification" in result
     assert "Slug: complete-spec" in result
     assert "Kind: spec" in result
     assert "Status: active" in result
-    assert "Packages:" in result
-    assert "pkg/core" in result
     assert "File: specify/tech/SPEC-123/SPEC-123.md" in result
 
   def test_spec_with_taxonomy_fields(self) -> None:
@@ -328,7 +244,6 @@ class TestSpecExternalFields(unittest.TestCase):
     status: str = "active",
     ext_id: str = "",
     ext_url: str = "",
-    packages: list[str] | None = None,
     tags: list[str] | None = None,
   ) -> Mock:
     spec = Mock()
@@ -339,10 +254,10 @@ class TestSpecExternalFields(unittest.TestCase):
     spec.status = status
     spec.ext_id = ext_id
     spec.ext_url = ext_url
-    spec.packages = packages or []
     spec.tags = tags or []
     spec.category = ""
     spec.c4_level = ""
+    spec.sources = []
     spec.path = Path(f"/repo/specify/tech/{spec_id}/{spec_id}.md")
     spec.frontmatter.relations = ()
     return spec
@@ -434,7 +349,6 @@ class TestFormatSpecRelations(unittest.TestCase):
     spec.slug = "test"
     spec.kind = "spec"
     spec.status = "active"
-    spec.packages = []
     spec.ext_id = ""
     spec.ext_url = ""
     spec.category = ""
@@ -537,7 +451,7 @@ class TestFormatReverseLookupCounts(unittest.TestCase):
     spec.slug = "cli-ux"
     spec.kind = "prod"
     spec.status = "draft"
-    spec.packages = []
+    spec.ext_id = ""
     spec.path = Path("/repo/specs/PROD-010.md")
     spec.frontmatter.relations = ()
     result = format_spec_details(spec, delta_count=5, revision_count=2, audit_count=1)
@@ -552,7 +466,7 @@ class TestFormatReverseLookupCounts(unittest.TestCase):
     spec.slug = "test"
     spec.kind = "spec"
     spec.status = "draft"
-    spec.packages = []
+    spec.ext_id = ""
     spec.path = Path("/repo/specs/SPEC-001.md")
     spec.frontmatter.relations = ()
     result = format_spec_details(spec)
@@ -590,7 +504,7 @@ class TestFormatRequirementsList(unittest.TestCase):
     spec.slug = "test"
     spec.kind = "spec"
     spec.status = "draft"
-    spec.packages = []
+    spec.ext_id = ""
     spec.path = Path("/repo/specs/SPEC-001.md")
     spec.frontmatter.relations = ()
     reqs = [("SPEC-001.FR-001", "FR", "Feature A")]
@@ -603,6 +517,153 @@ class TestFormatRequirementsList(unittest.TestCase):
     # Should show full list, not count summary
     assert "SPEC-001.FR-001  [FR]  Feature A" in result
     assert "Requirements: 1 FR" not in result
+
+
+# ── VT-DE139-LIST-001: enriched list columns ────────────────────
+
+
+class TestFormatC4Glyph(unittest.TestCase):
+  """VT-DE139-LIST-001: C4 glyph rendering."""
+
+  def test_known_levels(self) -> None:
+    assert format_c4_glyph("system") == "S"
+    assert format_c4_glyph("container") == "N"
+    assert format_c4_glyph("component") == "C"
+    assert format_c4_glyph("code") == "D"
+    assert format_c4_glyph("interaction") == "I"
+
+  def test_empty_returns_dash(self) -> None:
+    assert format_c4_glyph("") == "—"
+
+  def test_unknown_returns_dash(self) -> None:
+    assert format_c4_glyph("unknown") == "—"
+
+  def test_invalid_returns_dash(self) -> None:
+    assert format_c4_glyph("bogus") == "—"
+
+
+class TestFormatSourcesCell(unittest.TestCase):
+  """VT-DE139-LIST-001: sources column rendering."""
+
+  def test_empty_sources(self) -> None:
+    assert format_sources_cell([]) == "—"
+
+  def test_single_source(self) -> None:
+    sources = [{"language": "python", "identifier": "module.py"}]
+    assert format_sources_cell(sources) == "python"
+
+  def test_multiple_sources_same_lang(self) -> None:
+    sources = [
+      {"language": "python", "identifier": "a.py"},
+      {"language": "python", "identifier": "b.py"},
+    ]
+    assert format_sources_cell(sources) == "2 × python"
+
+  def test_multiple_sources_mixed_langs(self) -> None:
+    sources = [
+      {"language": "go", "identifier": "cmd"},
+      {"language": "python", "identifier": "lib.py"},
+    ]
+    assert format_sources_cell(sources) == "2 × go"
+
+  def test_sources_without_language(self) -> None:
+    sources = [{"identifier": "something"}]
+    assert format_sources_cell(sources) == "—"
+
+  def test_mixed_with_and_without_language(self) -> None:
+    sources = [
+      {"language": "go", "identifier": "cmd"},
+      {"identifier": "no-lang"},
+    ]
+    assert format_sources_cell(sources) == "2 × go"
+
+
+class TestEnrichedSpecListTable(unittest.TestCase):
+  """VT-DE139-LIST-001: enriched table output with Category, C4, Sources."""
+
+  def _make_spec(
+    self,
+    spec_id: str = "SPEC-001",
+    *,
+    category: str = "",
+    c4_level: str = "",
+    sources: list[dict] | None = None,
+    tags: list[str] | None = None,
+  ) -> Mock:
+    spec = Mock()
+    spec.id = spec_id
+    spec.name = f"Spec {spec_id}"
+    spec.slug = spec_id.lower()
+    spec.kind = "spec"
+    spec.status = "active"
+    spec.ext_id = ""
+    spec.ext_url = ""
+    spec.tags = tags or []
+    spec.category = category
+    spec.c4_level = c4_level
+    spec.sources = sources or []
+    spec.path = Path(f"/repo/{spec_id}.md")
+    spec.frontmatter.relations = ()
+    return spec
+
+  def test_table_has_enriched_columns(self) -> None:
+    spec = self._make_spec(category="assembly", c4_level="component")
+    result = format_spec_list_table([spec])
+    assert "Category" in result
+    assert "C4" in result
+    assert "Sources" in result
+    assert "assembly" in result
+    assert "C" in result  # component glyph
+
+  def test_table_missing_category_shows_dash(self) -> None:
+    spec = self._make_spec(category="")
+    result = format_spec_list_table([spec], format_type="tsv")
+    assert "—" in result
+
+  def test_table_missing_c4_shows_dash(self) -> None:
+    spec = self._make_spec(c4_level="")
+    result = format_spec_list_table([spec], format_type="tsv")
+    assert "—" in result
+
+  def test_table_sources_rendered(self) -> None:
+    spec = self._make_spec(
+      sources=[
+        {"language": "python", "identifier": "mod.py"},
+        {"language": "python", "identifier": "lib.py"},
+      ],
+    )
+    result = format_spec_list_table([spec], format_type="tsv")
+    assert "2 × python" in result
+
+  def test_table_no_sources_shows_dash(self) -> None:
+    spec = self._make_spec(sources=[])
+    result = format_spec_list_table([spec], format_type="tsv")
+    fields = result.strip().split("\t")
+    assert "—" in fields  # sources column
+
+  def test_tags_not_shown_by_default(self) -> None:
+    spec = self._make_spec(tags=["cli", "registry"])
+    result = format_spec_list_table([spec])
+    assert "Tags" not in result
+
+  def test_tags_shown_with_flag(self) -> None:
+    spec = self._make_spec(tags=["cli", "registry"])
+    result = format_spec_list_table([spec], show_tags=True)
+    assert "Tags" in result
+
+  def test_tsv_enriched_columns(self) -> None:
+    spec = self._make_spec(category="unit", c4_level="code")
+    result = format_spec_list_table([spec], format_type="tsv")
+    fields = result.strip().split("\t")
+    assert "unit" in fields
+    assert "D" in fields  # code glyph
+
+  def test_tsv_tags_opt_in(self) -> None:
+    spec = self._make_spec(tags=["cli"])
+    result_no_tags = format_spec_list_table([spec], format_type="tsv")
+    result_with_tags = format_spec_list_table([spec], format_type="tsv", show_tags=True)
+    assert "cli" not in result_no_tags
+    assert "cli" in result_with_tags
 
 
 if __name__ == "__main__":

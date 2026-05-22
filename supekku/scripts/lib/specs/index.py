@@ -14,7 +14,6 @@ class SpecIndexEntry:
 
   spec_id: str
   slug: str
-  packages: list[str]
   spec_path: Path
   tests_path: Path | None = None
 
@@ -25,7 +24,6 @@ class SpecIndexBuilder:
   def __init__(self, base_dir: Path) -> None:
     self.base_dir = base_dir
     self.slug_dir = base_dir / "by-slug"
-    self.package_dir = base_dir / "by-package"
     self.language_dir = base_dir / "by-language"
     self.category_dir = base_dir / "by-category"
     self.c4_level_dir = base_dir / "by-c4-level"
@@ -38,19 +36,6 @@ class SpecIndexBuilder:
           entry.unlink()
     else:
       self.slug_dir.mkdir()
-
-    if self.package_dir.exists():
-      for entry in self.package_dir.rglob("*"):
-        if entry.is_symlink() or entry.is_file():
-          entry.unlink()
-      for entry in sorted(
-        {p.parent for p in self.package_dir.glob("**/*") if p.is_dir()},
-        reverse=True,
-      ):
-        if entry != self.package_dir and not any(entry.iterdir()):
-          entry.rmdir()
-    else:
-      self.package_dir.mkdir()
 
     # Clean up by-language directory
     if self.language_dir.exists():
@@ -81,19 +66,6 @@ class SpecIndexBuilder:
         if target.exists() or target.is_symlink():
           target.unlink()
         target.symlink_to(Path("..") / entry.name)
-
-      packages = frontmatter.get("packages") or []
-      for package in packages:
-        pkg_path = self.package_dir / Path(package) / "spec"
-        pkg_path.parent.mkdir(parents=True, exist_ok=True)
-        if pkg_path.exists() or pkg_path.is_symlink():
-          pkg_path.unlink()
-        depth = len(Path(package).parts) + 1  # +1 for 'spec'
-        rel = Path("..")
-        for _ in range(depth - 1):
-          rel /= ".."
-        rel /= entry.name
-        pkg_path.symlink_to(rel)
 
       # Create by-language symlinks for sources
       sources = frontmatter.get("sources") or []

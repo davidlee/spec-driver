@@ -19,13 +19,11 @@ class TestSpecIndexEntry(unittest.TestCase):
     entry = SpecIndexEntry(
       spec_id="SPEC-001",
       slug="test-spec",
-      packages=["internal/test"],
       spec_path=Path("/test/SPEC-001/SPEC-001.md"),
     )
 
     assert entry.spec_id == "SPEC-001"
     assert entry.slug == "test-spec"
-    assert entry.packages == ["internal/test"]
     assert entry.spec_path == Path("/test/SPEC-001/SPEC-001.md")
     assert entry.tests_path is None
 
@@ -35,7 +33,6 @@ class TestSpecIndexEntry(unittest.TestCase):
     entry = SpecIndexEntry(
       spec_id="SPEC-001",
       slug="test-spec",
-      packages=["internal/test"],
       spec_path=Path("/test/SPEC-001/SPEC-001.md"),
       tests_path=tests_path,
     )
@@ -75,7 +72,6 @@ class TestSpecIndexBuilder(unittest.TestCase):
     """Test SpecIndexBuilder initialization."""
     assert self.builder.base_dir == self.base_dir
     assert self.builder.slug_dir == self.base_dir / "by-slug"
-    assert self.builder.package_dir == self.base_dir / "by-package"
     assert self.builder.language_dir == self.base_dir / "by-language"
     assert self.builder.category_dir == self.base_dir / "by-category"
     assert self.builder.c4_level_dir == self.base_dir / "by-c4-level"
@@ -85,7 +81,6 @@ class TestSpecIndexBuilder(unittest.TestCase):
     self.builder.rebuild()
 
     assert self.builder.slug_dir.exists()
-    assert self.builder.package_dir.exists()
     assert self.builder.language_dir.exists()
     assert self.builder.category_dir.exists()
     assert self.builder.c4_level_dir.exists()
@@ -105,33 +100,6 @@ class TestSpecIndexBuilder(unittest.TestCase):
     assert slug_link.exists()
     assert slug_link.is_symlink()
     assert slug_link.readlink() == Path("../SPEC-001")
-
-  def test_rebuild_with_package_symlinks(self) -> None:
-    """Test rebuild creates package-based symlinks."""
-    # Create a spec with packages
-    self._create_spec_with_frontmatter(
-      "SPEC-002",
-      {
-        "slug": "git-service",
-        "packages": ["internal/application/services/git", "cmd/git"],
-      },
-    )
-
-    self.builder.rebuild()
-
-    # Check package symlinks were created
-    git_service_link = (
-      self.builder.package_dir / "internal/application/services/git/spec"
-    )
-    cmd_git_link = self.builder.package_dir / "cmd/git/spec"
-
-    assert git_service_link.exists()
-    assert git_service_link.is_symlink()
-    assert git_service_link.readlink() == Path("../../../../../SPEC-002")
-
-    assert cmd_git_link.exists()
-    assert cmd_git_link.is_symlink()
-    assert cmd_git_link.readlink() == Path("../../../SPEC-002")
 
   def test_rebuild_with_language_symlinks_go(self) -> None:
     """Test rebuild creates by-language symlinks for Go sources."""
@@ -204,12 +172,10 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
   def test_rebuild_with_mixed_language_sources(self) -> None:
     """Test rebuild handles specs with multiple language sources."""
-    # Create a spec with both Go and Python sources
     self._create_spec_with_frontmatter(
       "SPEC-005",
       {
         "slug": "multi-lang-spec",
-        "packages": ["internal/multi"],  # Legacy Go packages
         "sources": [
           {
             "language": "go",
@@ -231,7 +197,6 @@ class TestSpecIndexBuilder(unittest.TestCase):
 
     self.builder.rebuild()
 
-    # Check both language symlinks were created
     go_link = self.builder.language_dir / "go/internal/multi/spec"
     python_link = self.builder.language_dir / "python/multi_module.py/spec"
 
@@ -242,11 +207,6 @@ class TestSpecIndexBuilder(unittest.TestCase):
     assert python_link.exists()
     assert python_link.is_symlink()
     assert python_link.readlink() == Path("../../../SPEC-005")
-
-    # Also check that package symlink was created (for backwards compatibility)
-    package_link = self.builder.package_dir / "internal/multi/spec"
-    assert package_link.exists()
-    assert package_link.is_symlink()
 
   def test_rebuild_skips_sources_without_language_or_identifier(self) -> None:
     """Test rebuild skips sources missing language or identifier."""

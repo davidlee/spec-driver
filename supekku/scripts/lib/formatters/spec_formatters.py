@@ -10,10 +10,11 @@ from typing import TYPE_CHECKING, Any
 
 from supekku.scripts.lib.formatters.cell_helpers import format_tags_cell
 from supekku.scripts.lib.formatters.column_defs import (
+  C4_GLYPHS,
   EXT_ID_COLUMN,
-  PACKAGES_COLUMN,
   REFS_COLUMN,
   SPEC_COLUMNS,
+  SPEC_TAGS_COLUMN,
   column_labels,
 )
 from supekku.scripts.lib.formatters.relation_formatters import (
@@ -34,23 +35,25 @@ if TYPE_CHECKING:
   from supekku.scripts.lib.specs.models import Spec
 
 
-def format_package_list(packages: list[str]) -> str:
-  """Format list of packages as comma-separated string.
+def format_c4_glyph(c4_level: str) -> str:
+  """Return single-character C4 glyph for a level, or '—' if unknown/empty."""
+  return C4_GLYPHS.get(c4_level, "—")
 
-  Args:
-    packages: List of package paths
 
-  Returns:
-    Comma-separated string of packages
-  """
-  return ",".join(packages)
+def format_sources_cell(sources: list[dict[str, Any]]) -> str:
+  """Format sources as 'count × first-lang', or '—' if none."""
+  if not sources:
+    return "—"
+  langs = [s.get("language", "") for s in sources if s.get("language")]
+  if not langs:
+    return "—"
+  return f"{len(sources)} × {langs[0]}" if len(sources) > 1 else langs[0]
 
 
 def format_spec_list_item(
   spec: Spec,
   *,
   include_path: bool = False,
-  include_packages: bool = False,
   root: Path | None = None,
 ) -> str:
   """Format spec as tab-separated list item with optional columns.
@@ -58,11 +61,10 @@ def format_spec_list_item(
   Args:
     spec: Specification object to format
     include_path: Include file path instead of slug (default: False)
-    include_packages: Include package list (default: False)
     root: Repository root for relative path calculation (required if include_path=True)
 
   Returns:
-    Tab-separated string: "{id}\\t{slug|path}[\\t{packages}]"
+    Tab-separated string: "{id}\\t{slug|path}"
   """
   line = spec.id
 
@@ -78,10 +80,6 @@ def format_spec_list_item(
   else:
     line += f"\t{spec.slug}"
 
-  if include_packages:
-    pkg_list = format_package_list(spec.packages)
-    line += f"\t{pkg_list}"
-
   return line
 
 
@@ -89,10 +87,10 @@ def format_spec_list_table(
   specs: Sequence[Spec],
   format_type: str = "table",
   truncate: bool = False,
-  include_packages: bool = False,
   *,
   show_external: bool = False,
   show_refs: bool = False,
+  show_tags: bool = False,
 ) -> str:
   """Format specs as table, JSON, or TSV.
 
@@ -100,9 +98,9 @@ def format_spec_list_table(
     specs: List of Spec objects to format
     format_type: Output format (table|json|tsv)
     truncate: If True, truncate long fields to fit terminal width
-    include_packages: Include package list in output
     show_external: If True, show ext_id column after ID
     show_refs: If True, show refs column (count in table, pairs in TSV)
+    show_tags: If True, show tags column (opt-in per DEC-139-09)
 
   Returns:
     Formatted string in requested format
@@ -110,8 +108,8 @@ def format_spec_list_table(
   col_defs = list(SPEC_COLUMNS)
   if show_external:
     col_defs.insert(1, EXT_ID_COLUMN)
-  if include_packages:
-    col_defs.append(PACKAGES_COLUMN)
+  if show_tags:
+    col_defs.insert(3, SPEC_TAGS_COLUMN)
   if show_refs:
     col_defs.append(REFS_COLUMN)
 
@@ -122,9 +120,15 @@ def format_spec_list_table(
     row = [styled_id]
     if show_external:
       row.append(spec.ext_id)
-    row.extend([spec.name, format_tags_cell(spec.tags), styled_status])
-    if include_packages:
-      row.append(format_package_list(spec.packages))
+    row.append(spec.name)
+    if show_tags:
+      row.append(format_tags_cell(spec.tags))
+    row.extend([
+      styled_status,
+      spec.category or "—",
+      format_c4_glyph(spec.c4_level),
+      format_sources_cell(spec.sources),
+    ])
     if show_refs:
       row.append(format_refs_count(collect_references(spec)))
     return row
@@ -133,9 +137,15 @@ def format_spec_list_table(
     row = [spec.id]
     if show_external:
       row.append(spec.ext_id)
-    row.extend([spec.name, spec.status])
-    if include_packages:
-      row.append(format_package_list(spec.packages))
+    row.append(spec.name)
+    if show_tags:
+      row.append(",".join(spec.tags))
+    row.extend([
+      spec.status,
+      spec.category or "—",
+      format_c4_glyph(spec.c4_level),
+      format_sources_cell(spec.sources),
+    ])
     if show_refs:
       row.append(format_refs_tsv(collect_references(spec)))
     return row
@@ -161,17 +171,6 @@ def _format_basic_fields(spec: Spec) -> list[str]:
     f"Kind: {spec.kind}",
     f"Status: {spec.status}",
   ]
-
-
-def _format_packages(spec: Spec) -> list[str]:
-  """Format packages section if packages exist."""
-  if not spec.packages:
-    return []
-
-  lines = ["", "Packages:"]
-  for package in spec.packages:
-    lines.append(f"  - {package}")
-  return lines
 
 
 def _format_taxonomy(spec: Spec) -> list[str]:
@@ -344,7 +343,6 @@ def format_spec_details(
     _format_basic_fields(spec),
     _format_taxonomy(spec),
     _format_external_refs(spec),
-    _format_packages(spec),
     _format_spec_relations(spec),
     req_section,
     _format_reverse_lookup_counts(delta_count, revision_count, audit_count),
@@ -374,7 +372,6 @@ def format_spec_list_json(specs: Sequence[Spec]) -> str:
       "kind": spec.kind,
       "status": spec.status,
       "path": spec.path.as_posix(),
-      "packages": spec.packages if spec.packages else [],
     }
     if spec.ext_id:
       item["ext_id"] = spec.ext_id

@@ -163,7 +163,7 @@ class TestListCommands:
     assert "List SPEC/PROD artifacts" in result.stdout
     assert "--kind" in result.stdout
     assert "--filter" in result.stdout
-    assert "--package" in result.stdout
+    assert "--category" in result.stdout
 
   def test_list_deltas_help(self):
     """Test list deltas command help."""

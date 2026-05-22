@@ -66,7 +66,8 @@ from .requirement_formatters import (
   format_requirement_list_table,
 )
 from .spec_formatters import (
-  format_package_list,
+  format_c4_glyph,
+  format_sources_cell,
   format_spec_list_item,
   format_spec_list_json,
   format_spec_list_table,
@@ -114,7 +115,6 @@ __all__ = [
   "format_drift_details",
   "format_drift_details_json",
   "format_drift_list_table",
-  "format_package_list",
   "format_phase_summary",
   "format_refs_count",
   "format_refs_tsv",
@@ -125,6 +125,8 @@ __all__ = [
   "format_requirement_details",
   "format_requirement_list_json",
   "format_requirement_list_table",
+  "format_c4_glyph",
+  "format_sources_cell",
   "format_spec_list_item",
   "format_spec_list_json",
   "format_spec_list_table",

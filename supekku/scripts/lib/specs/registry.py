@@ -112,10 +112,6 @@ class SpecRegistry:
     """Return all loaded specs."""
     return list(self._specs.values())
 
-  def find_by_package(self, package: str) -> list[Spec]:
-    """Find all specs that reference the given package."""
-    return [spec for spec in self._specs.values() if package in spec.packages]
-
   def find_by_informed_by(self, adr_id: str | None) -> list[Spec]:
     """Find specs informed by a specific ADR.
 

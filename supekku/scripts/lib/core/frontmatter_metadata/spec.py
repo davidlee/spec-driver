@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from supekku.scripts.lib.blocks.metadata import BlockMetadata, FieldMetadata
+from supekku.scripts.lib.blocks.metadata.schema import ToleratedAlias
 
 from .base import BASE_FRONTMATTER_METADATA
 
@@ -26,7 +27,8 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
   description="Frontmatter fields for specifications (kind: spec)",
   fields={
     **BASE_FRONTMATTER_METADATA.fields,  # Include all base fields
-    # DE-137 IP-137-P01: status enum promotion; aliases reserved for DE-139.
+    # DE-137 IP-137-P01: status enum promotion.
+    # DE-139: taxonomy strict; FM fields moved to blocks or cut.
     "status": replace(
       BASE_FRONTMATTER_METADATA.fields["status"],
       type="enum",
@@ -35,11 +37,19 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
     ),
     # Spec-specific fields (all optional)
     "category": FieldMetadata(
-      type="string",
+      type="enum",
       required=False,
+      enum_values=["unit", "assembly"],
+      tolerated_aliases={
+        "unknown": ToleratedAlias(
+          canonical="unknown",
+          sunset_after="DE-139 taxonomy reconciliation",
+          rationale=("Sweep assigns unknown; human reconciliation required"),
+        ),
+      },
       description=(
-        "Spec taxonomy category. Reserved values for tech specs: "
-        "'unit' (1:1 with a code unit) and 'assembly' (cross-unit). "
+        "Spec taxonomy category. "
+        "'unit' (1:1 with a code unit) or 'assembly' (cross-unit). "
         "See ADR-003."
       ),
     ),
@@ -47,35 +57,14 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
       type="enum",
       required=False,
       enum_values=["system", "container", "component", "code", "interaction"],
+      tolerated_aliases={
+        "unknown": ToleratedAlias(
+          canonical="unknown",
+          sunset_after="DE-139 taxonomy reconciliation",
+          rationale=("Sweep assigns unknown; human reconciliation required"),
+        ),
+      },
       description="C4 architecture granularity level",
-    ),
-    "scope": FieldMetadata(
-      type="string",
-      required=False,
-      description="Statement of boundaries and responsibilities",
-    ),
-    "concerns": FieldMetadata(
-      type="array",
-      required=False,
-      items=FieldMetadata(
-        type="object",
-        description="A concern this specification addresses",
-        properties={
-          "name": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="Concern identifier",
-          ),
-          "description": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="What this concern addresses",
-          ),
-        },
-      ),
-      description="Enduring problem spaces or quality dimensions",
     ),
     "responsibilities": FieldMetadata(
       type="array",
@@ -101,63 +90,6 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
       ),
       description="Beliefs that need validation",
     ),
-    "hypotheses": FieldMetadata(
-      type="array",
-      required=False,
-      items=FieldMetadata(
-        type="object",
-        description="A hypothesis to be validated",
-        properties={
-          "id": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="Hypothesis ID (e.g., SPEC-101.HYP-01)",
-          ),
-          "statement": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="The hypothesis statement",
-          ),
-          "status": FieldMetadata(
-            type="enum",
-            required=True,
-            enum_values=["proposed", "validated", "invalid"],
-            description="Validation status",
-          ),
-        },
-      ),
-      description="Hypotheses tracking belief evolution",
-    ),
-    "decisions": FieldMetadata(
-      type="array",
-      required=False,
-      items=FieldMetadata(
-        type="object",
-        description="An architectural or design decision",
-        properties={
-          "id": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="Decision ID (e.g., SPEC-101.DEC-01)",
-          ),
-          "summary": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="Short decision summary",
-          ),
-          "rationale": FieldMetadata(
-            type="string",
-            required=False,
-            description="Why this decision was made",
-          ),
-        },
-      ),
-      description="Key architectural or design decisions",
-    ),
     "constraints": FieldMetadata(
       type="array",
       required=False,
@@ -165,29 +97,6 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
         type="string", pattern=r".+", description="Constraint statement"
       ),
       description="Hard requirements or limitations",
-    ),
-    "verification_strategy": FieldMetadata(
-      type="array",
-      required=False,
-      items=FieldMetadata(
-        type="object",
-        description="Verification approach entry",
-        properties={
-          "type": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="Verification artifact ID (e.g., VT-210)",
-          ),
-          "description": FieldMetadata(
-            type="string",
-            required=True,
-            pattern=r".+",
-            description="What is being verified",
-          ),
-        },
-      ),
-      description="Strategy for verifying this specification",
     ),
     "sources": FieldMetadata(
       type="array",
@@ -241,12 +150,6 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
       ),
       description="Multi-language source code tracking",
     ),
-    "packages": FieldMetadata(
-      type="array",
-      required=False,
-      items=FieldMetadata(type="string", pattern=r".+", description="Package path"),
-      description="Legacy Go package tracking (deprecated, use sources instead)",
-    ),
   },
   examples=[
     # Minimal spec (base fields only)
@@ -273,37 +176,13 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
       "auditers": ["bob"],
       "summary": "Defines canonical content binding lifecycle and schema enforcement",
       "c4_level": "container",
-      "scope": "Maintain canonical content binding state and expose schema operations",
-      "concerns": [
-        {
-          "name": "content synchronisation",
-          "description": "Maintain canonical content binding state",
-        }
-      ],
       "responsibilities": [
         "canonical content binding lifecycle",
         "expose schema enforcement operations to other containers",
       ],
       "guiding_principles": ["Maintain block identity end-to-end"],
       "assumptions": ["Agents will reconcile markdown without manual edits"],
-      "hypotheses": [
-        {
-          "id": "SPEC-101.HYP-01",
-          "statement": "Rich diffing will reduce merge conflicts",
-          "status": "proposed",
-        }
-      ],
-      "decisions": [
-        {
-          "id": "SPEC-101.DEC-01",
-          "summary": "Adopt optimistic locking for schema updates",
-          "rationale": "Based on RC-010 findings",
-        }
-      ],
       "constraints": ["Must preserve block UUIDs during edits"],
-      "verification_strategy": [
-        {"type": "VT-210", "description": "End-to-end sync tests remain green"}
-      ],
       "sources": [
         {
           "language": "python",
@@ -326,7 +205,6 @@ SPEC_FRONTMATTER_METADATA = BlockMetadata(
           ],
         },
       ],
-      "packages": ["internal/application/services/git"],  # Legacy
       "relations": [
         {"type": "depends_on", "target": "SPEC-004"},
       ],

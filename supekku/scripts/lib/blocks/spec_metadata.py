@@ -1,7 +1,7 @@
-"""Metadata definitions for spec relationships and capabilities blocks.
+"""Metadata definitions for spec block types.
 
 Enables metadata-driven JSON Schema generation and yaml-example output
-for the two spec block types registered in relationships.py.
+for spec block types registered in relationships.py and beyond.
 """
 
 from __future__ import annotations
@@ -14,6 +14,15 @@ from supekku.scripts.lib.blocks.metadata import (
 from supekku.scripts.lib.blocks.relationships import (
   CAPABILITIES_SCHEMA,
   CAPABILITIES_VERSION,
+  CONCERNS_MARKER,
+  CONCERNS_SCHEMA,
+  CONCERNS_VERSION,
+  DECISIONS_MARKER,
+  DECISIONS_SCHEMA,
+  DECISIONS_VERSION,
+  HYPOTHESES_MARKER,
+  HYPOTHESES_SCHEMA,
+  HYPOTHESES_VERSION,
   RELATIONSHIPS_SCHEMA,
   RELATIONSHIPS_VERSION,
   RelationshipsBlock,
@@ -212,9 +221,230 @@ SPEC_CAPABILITIES_METADATA = BlockMetadata(
   ],
 )
 
+# ---------------------------------------------------------------------------
+# spec.concerns
+# ---------------------------------------------------------------------------
+
+SPEC_CONCERNS_METADATA = BlockMetadata(
+  version=CONCERNS_VERSION,
+  schema_id=CONCERNS_SCHEMA,
+  description="Concerns tracked against a spec",
+  fields={
+    "schema": FieldMetadata(
+      type="const",
+      const_value=CONCERNS_SCHEMA,
+      required=True,
+      description=f"Schema identifier (must be '{CONCERNS_SCHEMA}')",
+    ),
+    "version": FieldMetadata(
+      type="const",
+      const_value=CONCERNS_VERSION,
+      required=True,
+      description=f"Schema version (must be {CONCERNS_VERSION})",
+    ),
+    "spec": FieldMetadata(
+      type="string",
+      required=True,
+      description="Spec ID (e.g., SPEC-100 or PROD-004)",
+    ),
+    "concerns": FieldMetadata(
+      type="array",
+      required=True,
+      min_items=0,
+      description="List of concerns (may be empty)",
+      items=FieldMetadata(
+        type="object",
+        description="A single concern entry",
+        properties={
+          "name": FieldMetadata(
+            type="string",
+            required=True,
+            pattern=r".+",
+            description="Short name for the concern",
+          ),
+          "description": FieldMetadata(
+            type="string",
+            required=True,
+            pattern=r".+",
+            description="Description of the concern",
+          ),
+        },
+      ),
+    ),
+  },
+  examples=[
+    {
+      "schema": CONCERNS_SCHEMA,
+      "version": CONCERNS_VERSION,
+      "spec": "SPEC-100",
+      "concerns": [
+        {
+          "name": "Schema migration risk",
+          "description": "Changing block format may break existing artefacts",
+        },
+      ],
+    },
+  ],
+)
+
+# ---------------------------------------------------------------------------
+# spec.hypotheses
+# ---------------------------------------------------------------------------
+
+SPEC_HYPOTHESES_METADATA = BlockMetadata(
+  version=HYPOTHESES_VERSION,
+  schema_id=HYPOTHESES_SCHEMA,
+  description="Hypotheses tracked against a spec",
+  fields={
+    "schema": FieldMetadata(
+      type="const",
+      const_value=HYPOTHESES_SCHEMA,
+      required=True,
+      description=f"Schema identifier (must be '{HYPOTHESES_SCHEMA}')",
+    ),
+    "version": FieldMetadata(
+      type="const",
+      const_value=HYPOTHESES_VERSION,
+      required=True,
+      description=f"Schema version (must be {HYPOTHESES_VERSION})",
+    ),
+    "spec": FieldMetadata(
+      type="string",
+      required=True,
+      description="Spec ID (e.g., PROD-004)",
+    ),
+    "hypotheses": FieldMetadata(
+      type="array",
+      required=True,
+      min_items=0,
+      description="List of hypotheses (may be empty)",
+      items=FieldMetadata(
+        type="object",
+        description="A single hypothesis entry",
+        properties={
+          "id": FieldMetadata(
+            type="string",
+            required=True,
+            description="Hypothesis identifier",
+          ),
+          "statement": FieldMetadata(
+            type="string",
+            required=True,
+            description="The hypothesis statement",
+          ),
+          "status": FieldMetadata(
+            type="enum",
+            required=True,
+            enum_values=["proposed", "validated", "invalid"],
+            description="Hypothesis status",
+          ),
+        },
+      ),
+    ),
+  },
+  examples=[
+    {
+      "schema": HYPOTHESES_SCHEMA,
+      "version": HYPOTHESES_VERSION,
+      "spec": "PROD-004",
+      "hypotheses": [
+        {
+          "id": "H-001",
+          "statement": "Metadata-driven validation reduces hand-rolled code by 60%",
+          "status": "proposed",
+        },
+      ],
+    },
+  ],
+)
+
+# ---------------------------------------------------------------------------
+# spec.decisions
+# ---------------------------------------------------------------------------
+
+SPEC_DECISIONS_METADATA = BlockMetadata(
+  version=DECISIONS_VERSION,
+  schema_id=DECISIONS_SCHEMA,
+  description="Decisions tracked against a spec",
+  fields={
+    "schema": FieldMetadata(
+      type="const",
+      const_value=DECISIONS_SCHEMA,
+      required=True,
+      description=f"Schema identifier (must be '{DECISIONS_SCHEMA}')",
+    ),
+    "version": FieldMetadata(
+      type="const",
+      const_value=DECISIONS_VERSION,
+      required=True,
+      description=f"Schema version (must be {DECISIONS_VERSION})",
+    ),
+    "spec": FieldMetadata(
+      type="string",
+      required=True,
+      description="Spec ID (e.g., SPEC-116 or PROD-004)",
+    ),
+    "decisions": FieldMetadata(
+      type="array",
+      required=True,
+      min_items=0,
+      description="List of decisions (may be empty)",
+      items=FieldMetadata(
+        type="object",
+        description="A single decision entry",
+        properties={
+          "id": FieldMetadata(
+            type="string",
+            required=True,
+            description="Decision identifier",
+          ),
+          "summary": FieldMetadata(
+            type="string",
+            required=True,
+            description="Short summary of the decision",
+          ),
+          "rationale": FieldMetadata(
+            type="string",
+            required=False,
+            description="Rationale for the decision (optional for PROD compat)",
+          ),
+        },
+      ),
+    ),
+  },
+  examples=[
+    {
+      "schema": DECISIONS_SCHEMA,
+      "version": DECISIONS_VERSION,
+      "spec": "SPEC-116",
+      "decisions": [
+        {
+          "id": "D-001",
+          "summary": "Use BlockMetadata for all new spec block types",
+          "rationale": "Consistency with ADR-010 placement heuristic",
+        },
+      ],
+    },
+  ],
+)
+
+# ---------------------------------------------------------------------------
+# Validators
+# ---------------------------------------------------------------------------
+
 _SPEC_RELATIONSHIPS_VALIDATOR = MetadataValidator(SPEC_RELATIONSHIPS_METADATA)
 
 _SPEC_CAPABILITIES_VALIDATOR = MetadataValidator(SPEC_CAPABILITIES_METADATA)
+
+_SPEC_CONCERNS_VALIDATOR = MetadataValidator(SPEC_CONCERNS_METADATA)
+
+_SPEC_HYPOTHESES_VALIDATOR = MetadataValidator(SPEC_HYPOTHESES_METADATA)
+
+_SPEC_DECISIONS_VALIDATOR = MetadataValidator(SPEC_DECISIONS_METADATA)
+
+# ---------------------------------------------------------------------------
+# Validation functions
+# ---------------------------------------------------------------------------
 
 
 def validate_spec_relationships(
@@ -260,9 +490,69 @@ def validate_spec_capabilities(
   ]
 
 
+def validate_spec_concerns(
+  block: RelationshipsBlock,
+  *,
+  strict: bool = True,
+  accept_tolerated: bool = True,
+) -> list[str]:
+  """Validate a spec concerns block against its metadata declaration."""
+  return [
+    str(err)
+    for err in _SPEC_CONCERNS_VALIDATOR.validate(
+      block.data, strict=strict, accept_tolerated=accept_tolerated
+    )
+  ]
+
+
+def validate_spec_hypotheses(
+  block: RelationshipsBlock,
+  *,
+  strict: bool = True,
+  accept_tolerated: bool = True,
+) -> list[str]:
+  """Validate a spec hypotheses block against its metadata declaration."""
+  return [
+    str(err)
+    for err in _SPEC_HYPOTHESES_VALIDATOR.validate(
+      block.data, strict=strict, accept_tolerated=accept_tolerated
+    )
+  ]
+
+
+def validate_spec_decisions(
+  block: RelationshipsBlock,
+  *,
+  strict: bool = True,
+  accept_tolerated: bool = True,
+) -> list[str]:
+  """Validate a spec decisions block against its metadata declaration."""
+  return [
+    str(err)
+    for err in _SPEC_DECISIONS_VALIDATOR.validate(
+      block.data, strict=strict, accept_tolerated=accept_tolerated
+    )
+  ]
+
+
 __all__ = [
+  "CONCERNS_MARKER",
+  "CONCERNS_SCHEMA",
+  "CONCERNS_VERSION",
+  "DECISIONS_MARKER",
+  "DECISIONS_SCHEMA",
+  "DECISIONS_VERSION",
+  "HYPOTHESES_MARKER",
+  "HYPOTHESES_SCHEMA",
+  "HYPOTHESES_VERSION",
   "SPEC_CAPABILITIES_METADATA",
+  "SPEC_CONCERNS_METADATA",
+  "SPEC_DECISIONS_METADATA",
+  "SPEC_HYPOTHESES_METADATA",
   "SPEC_RELATIONSHIPS_METADATA",
   "validate_spec_capabilities",
+  "validate_spec_concerns",
+  "validate_spec_decisions",
+  "validate_spec_hypotheses",
   "validate_spec_relationships",
 ]

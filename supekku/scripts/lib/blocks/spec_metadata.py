@@ -436,11 +436,11 @@ _SPEC_RELATIONSHIPS_VALIDATOR = MetadataValidator(SPEC_RELATIONSHIPS_METADATA)
 
 _SPEC_CAPABILITIES_VALIDATOR = MetadataValidator(SPEC_CAPABILITIES_METADATA)
 
-_SPEC_CONCERNS_VALIDATOR = MetadataValidator(SPEC_CONCERNS_METADATA)
+SPEC_CONCERNS_VALIDATOR = MetadataValidator(SPEC_CONCERNS_METADATA)
 
-_SPEC_HYPOTHESES_VALIDATOR = MetadataValidator(SPEC_HYPOTHESES_METADATA)
+SPEC_HYPOTHESES_VALIDATOR = MetadataValidator(SPEC_HYPOTHESES_METADATA)
 
-_SPEC_DECISIONS_VALIDATOR = MetadataValidator(SPEC_DECISIONS_METADATA)
+SPEC_DECISIONS_VALIDATOR = MetadataValidator(SPEC_DECISIONS_METADATA)
 
 # ---------------------------------------------------------------------------
 # Validation functions
@@ -499,7 +499,7 @@ def validate_spec_concerns(
   """Validate a spec concerns block against its metadata declaration."""
   return [
     str(err)
-    for err in _SPEC_CONCERNS_VALIDATOR.validate(
+    for err in SPEC_CONCERNS_VALIDATOR.validate(
       block.data, strict=strict, accept_tolerated=accept_tolerated
     )
   ]
@@ -514,7 +514,7 @@ def validate_spec_hypotheses(
   """Validate a spec hypotheses block against its metadata declaration."""
   return [
     str(err)
-    for err in _SPEC_HYPOTHESES_VALIDATOR.validate(
+    for err in SPEC_HYPOTHESES_VALIDATOR.validate(
       block.data, strict=strict, accept_tolerated=accept_tolerated
     )
   ]
@@ -529,7 +529,7 @@ def validate_spec_decisions(
   """Validate a spec decisions block against its metadata declaration."""
   return [
     str(err)
-    for err in _SPEC_DECISIONS_VALIDATOR.validate(
+    for err in SPEC_DECISIONS_VALIDATOR.validate(
       block.data, strict=strict, accept_tolerated=accept_tolerated
     )
   ]
@@ -550,6 +550,9 @@ __all__ = [
   "SPEC_DECISIONS_METADATA",
   "SPEC_HYPOTHESES_METADATA",
   "SPEC_RELATIONSHIPS_METADATA",
+  "SPEC_CONCERNS_VALIDATOR",
+  "SPEC_DECISIONS_VALIDATOR",
+  "SPEC_HYPOTHESES_VALIDATOR",
   "validate_spec_capabilities",
   "validate_spec_concerns",
   "validate_spec_decisions",

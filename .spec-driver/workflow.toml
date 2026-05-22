@@ -16,9 +16,11 @@ spec_driver_installed_version = "0.9.7"
 # strict_mode = false
 [validation.strict]
 delta = true
+spec = true
 
 [schema_version]
 delta = "0.10.0+001"
+spec = "0.10.0+003"
 
 ## How to invoke spec-driver.  Detected automatically at install time.
 [tool]
@@ -100,4 +102,4 @@ exec = "uv run spec-driver"
 spec_autocreate = true
 
 [migrations]
-last_applied = "v0_10_0_001_delta_blocks"
+last_applied = "v0_10_0_003_prod_blocks"

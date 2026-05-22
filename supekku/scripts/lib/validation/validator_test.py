@@ -1695,5 +1695,55 @@ class TestDeltaBlockStrictEnforcementVTDE138FLIP001(WorkspaceValidatorTest):
     assert any("is required" in i.message for i in block_errors), block_errors
 
 
+class TestSpecBlockStrictEnforcementVTDE139FLIP001(WorkspaceValidatorTest):
+  """VT-DE139-FLIP-001 row 2 — strict-on-validate enforcement post-flip.
+
+  Covers PROD-004.FR-002: under ``--strict``, a spec concerns block missing
+  the required ``spec`` field surfaces as an error from the workspace
+  validator — proving the per-spec block validator is invoked.
+  """
+
+  def test_missing_required_field_in_concerns_errors_under_strict(self) -> None:
+    from supekku.scripts.lib.blocks.spec_metadata import (  # noqa: PLC0415
+      CONCERNS_MARKER,
+      CONCERNS_SCHEMA,
+      CONCERNS_VERSION,
+    )
+
+    root = self._create_repo()
+    spec_dir = root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR / "SPEC-903-flip"
+    spec_dir.mkdir(parents=True)
+    spec_path = spec_dir / "SPEC-903.md"
+    frontmatter = {
+      "id": "SPEC-903",
+      "slug": "flip-test",
+      "name": "SPEC-903",
+      "created": "2026-05-22",
+      "updated": "2026-05-22",
+      "status": "draft",
+      "kind": "spec",
+      "category": "assembly",
+      "c4_level": "component",
+    }
+    # Block omits the required ``spec`` field — schema rejects under strict.
+    block = (
+      f"```yaml {CONCERNS_MARKER}\n"
+      f"schema: {CONCERNS_SCHEMA}\n"
+      f"version: {CONCERNS_VERSION}\n"
+      "concerns: []\n"
+      "```"
+    )
+    body = f"# SPEC-903\n\n{block}\n"
+    dump_markdown_file_update(spec_path, frontmatter, body)
+
+    ws = Workspace(root)
+    issues = validate_workspace(ws, strict=True)
+    block_errors = [
+      i for i in issues if i.artifact == "SPEC-903" and i.level == "error"
+    ]
+    assert block_errors, [i for i in issues if i.artifact == "SPEC-903"]
+    assert any("is required" in i.message for i in block_errors), block_errors
+
+
 if __name__ == "__main__":
   unittest.main()

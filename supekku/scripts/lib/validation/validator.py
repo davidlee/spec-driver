@@ -21,6 +21,16 @@ from supekku.scripts.lib.blocks.delta_metadata import (
   DELTA_RISK_REGISTER_VALIDATOR,
 )
 from supekku.scripts.lib.blocks.metadata.aliases import normalize_field
+from supekku.scripts.lib.blocks.relationships import (
+  extract_spec_concerns,
+  extract_spec_decisions,
+  extract_spec_hypotheses,
+)
+from supekku.scripts.lib.blocks.spec_metadata import (
+  SPEC_CONCERNS_VALIDATOR,
+  SPEC_DECISIONS_VALIDATOR,
+  SPEC_HYPOTHESES_VALIDATOR,
+)
 from supekku.scripts.lib.changes.audit_check import resolve_audit_gate
 from supekku.scripts.lib.changes.phase_model import PhaseSheet
 from supekku.scripts.lib.core.enums import get_enum_values
@@ -192,6 +202,9 @@ class WorkspaceValidator:
     # Delta block schema validation (DE-138 P04 — DEC-138-14)
     self._validate_delta_blocks(delta_registry)
 
+    # Spec block schema validation (DE-139 P04)
+    self._validate_spec_blocks()
+
     # Kind-aware frontmatter validation (DE-112)
     memory_dir = get_memory_dir(self.workspace.root)
     backlog_dir = get_backlog_dir(self.workspace.root)
@@ -304,6 +317,32 @@ class WorkspaceValidator:
           accept_tolerated=self.accept_tolerated,
         ):
           self._block_issue(delta_id, "risk_register", err)
+
+  def _validate_spec_blocks(self) -> None:
+    """Validate per-spec concerns, hypotheses, and decisions block schemas.
+
+    Mirrors ``_validate_delta_blocks`` for spec-kind artefacts.
+    """
+    block_defs = (
+      ("concerns", extract_spec_concerns, SPEC_CONCERNS_VALIDATOR),
+      ("hypotheses", extract_spec_hypotheses, SPEC_HYPOTHESES_VALIDATOR),
+      ("decisions", extract_spec_decisions, SPEC_DECISIONS_VALIDATOR),
+    )
+    for spec in self.workspace.specs.all_specs():
+      body = spec.body
+      for label, extractor, validator in block_defs:
+        try:
+          block = extractor(body)
+        except ValueError as exc:
+          self._error(spec.id, f"{label} block extraction failed: {exc}")
+          continue
+        if block is not None:
+          for err in validator.validate(
+            block.data,
+            strict=self.strict,
+            accept_tolerated=self.accept_tolerated,
+          ):
+            self._block_issue(spec.id, label, err)
 
   def _block_issue(self, artifact: str, block_label: str, err: Any) -> None:
     """Dispatch a block ValidationError into a ValidationIssue at its severity."""

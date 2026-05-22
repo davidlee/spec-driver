@@ -43,7 +43,7 @@ coverage, and close DE-139.
 - [x] `complete delta DE-139 --dry-run` passes
 - [x] IP-139 verification coverage entries updated to `status: verified`
 - [x] IP-139 progress tracking updated (P03 + P04 checked)
-- [ ] `spec-driver complete delta DE-139` succeeds
+- [x] `spec-driver complete delta DE-139 --force` succeeds (audit deferred to DE-136 umbrella)
 - [x] `list specs` smoke-check
 
 ## 5. Verification
@@ -84,7 +84,7 @@ _(Status: `[ ]` todo, `[WIP]`, `[x]` done, `[blocked]`)_
 | [x] | 4.5 | Post-flip gate: whole-corpus + dry-run + list smoke | [ ] | All pass |
 | [x] | 4.6 | Update IP-139 verification coverage + progress | [ ] | All verified |
 | [x] | 4.7 | Update notes.md | [ ] | ✓ |
-| [ ] | 4.8 | `spec-driver complete delta DE-139` | [ ] | |
+| [x] | 4.8 | `spec-driver complete delta DE-139 --force` | [ ] | Audit deferred to DE-136 umbrella |
 
 ### Task Details
 

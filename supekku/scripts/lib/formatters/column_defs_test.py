@@ -112,7 +112,9 @@ class TestAllColumnSetsExist:
   def test_column_labels_match_existing_formatters(self):
     """Regression: labels must match what existing formatters use."""
     # These are the exact column lists from the formatters, verified by grep
-    assert column_labels(SPEC_COLUMNS) == ["ID", "Name", "Status", "Category", "C4", "Sources"]
+    assert column_labels(SPEC_COLUMNS) == [
+      "ID", "Name", "Status", "Category", "C4", "Sources",
+    ]
     assert column_labels(ADR_COLUMNS) == ["ID", "Title", "Tags", "Status", "Updated"]
     assert column_labels(CHANGE_COLUMNS) == ["ID", "Name", "Tags", "Status"]
     assert column_labels(BACKLOG_COLUMNS) == [

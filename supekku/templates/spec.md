@@ -16,6 +16,12 @@ updated: "{{ today }}"
 
 {{ spec_verification_block }}
 
+{{ spec_concerns_block }}
+
+{{ spec_hypotheses_block }}
+
+{{ spec_decisions_block }}
+
 ## 1. Intent & Summary
 
 {% if kind == 'prod' -%}

@@ -66,6 +66,9 @@ def backfill_spec(
       spec_relationships_block="{{ spec_relationships_block }}",
       spec_capabilities_block="{{ spec_capabilities_block }}",
       spec_verification_block="{{ spec_verification_block }}",
+      spec_concerns_block="{{ spec_concerns_block }}",
+      spec_hypotheses_block="{{ spec_hypotheses_block }}",
+      spec_decisions_block="{{ spec_decisions_block }}",
     )
 
     # Write spec: preserve frontmatter, replace body

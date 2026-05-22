@@ -17,6 +17,7 @@ from supekku.scripts.lib.core.paths import (
   get_templates_dir,
 )
 from supekku.scripts.lib.core.spec_utils import load_markdown_file
+from supekku.scripts.lib.core.templates import get_package_templates_dir
 from supekku.scripts.lib.specs.creation import (
   CreateSpecOptions,
   RepositoryRootNotFoundError,
@@ -194,6 +195,76 @@ class BuildFrontmatterTaxonomyTest(unittest.TestCase):
       assert frontmatter["category"] == "assembly"
     finally:
       os.chdir(saved)
+
+
+class TemplateBlockVariablesTest(unittest.TestCase):
+  """VT-DE139-TPL-001: template contains all block template variables."""
+
+  def test_spec_template_has_block_variables(self):
+    template_path = get_package_templates_dir() / "spec.md"
+    content = template_path.read_text(encoding="utf-8")
+
+    for var in (
+      "spec_relationships_block",
+      "spec_capabilities_block",
+      "spec_verification_block",
+      "spec_concerns_block",
+      "spec_hypotheses_block",
+      "spec_decisions_block",
+    ):
+      assert f"{{{{ {var} }}}}" in content, f"missing {var}"
+
+
+class CreateSpecBlocksTest(unittest.TestCase):
+  """VT-DE139-CREATE-001: created spec emits all block placeholders."""
+
+  def setUp(self) -> None:
+    self._cwd = Path.cwd()
+
+  def tearDown(self) -> None:
+    os.chdir(self._cwd)
+
+  def _setup_repo_with_blocks_template(self) -> Path:
+    tmpdir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
+    self.addCleanup(tmpdir.cleanup)
+    root = Path(tmpdir.name)
+    (root / ".git").mkdir()
+    templates = get_templates_dir(root)
+    templates.mkdir(parents=True)
+    (root / SPEC_DRIVER_DIR / TECH_SPECS_SUBDIR).mkdir(parents=True)
+    (root / SPEC_DRIVER_DIR / PRODUCT_SPECS_SUBDIR).mkdir(parents=True)
+    (templates / "spec.md").write_text(
+      "# {{ spec_id }} – {{ name }}\n\n"
+      "{{ spec_relationships_block }}\n\n"
+      "{{ spec_capabilities_block }}\n\n"
+      "{{ spec_verification_block }}\n\n"
+      "{{ spec_concerns_block }}\n\n"
+      "{{ spec_hypotheses_block }}\n\n"
+      "{{ spec_decisions_block }}\n\n"
+      "## 1. Intent\n\nBody.\n",
+      encoding="utf-8",
+    )
+    os.chdir(root)
+    return root
+
+  def test_created_spec_contains_all_blocks(self):
+    self._setup_repo_with_blocks_template()
+    result = create_spec("Widget Parser", CreateSpecOptions(spec_type="tech"))
+    content = result.spec_path.read_text(encoding="utf-8")
+
+    assert "supekku:spec.relationships@v1" in content
+    assert "supekku:spec.capabilities@v1" in content
+    assert "supekku:verification.coverage@v1" in content
+    assert "supekku:spec.concerns@v1" in content
+    assert "supekku:spec.hypotheses@v1" in content
+    assert "supekku:spec.decisions@v1" in content
+
+  def test_created_spec_has_no_packages(self):
+    self._setup_repo_with_blocks_template()
+    result = create_spec("Widget Parser", CreateSpecOptions(spec_type="tech"))
+    _, body = load_markdown_file(result.spec_path)
+    fm, _ = load_markdown_file(result.spec_path)
+    assert "packages" not in fm
 
 
 if __name__ == "__main__":

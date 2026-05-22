@@ -12,6 +12,9 @@ from jinja2 import Template
 
 from supekku.scripts.lib.blocks.relationships import (
   render_spec_capabilities_block,
+  render_spec_concerns_block,
+  render_spec_decisions_block,
+  render_spec_hypotheses_block,
   render_spec_relationships_block,
 )
 from supekku.scripts.lib.blocks.verification import render_verification_coverage_block
@@ -147,6 +150,9 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
       }
     ],
   )
+  spec_concerns_block = render_spec_concerns_block(next_id)
+  spec_hypotheses_block = render_spec_hypotheses_block(next_id)
+  spec_decisions_block = render_spec_decisions_block(next_id)
 
   # Render template
   template_body = extract_template_body(config.template_path)
@@ -158,6 +164,9 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
     spec_relationships_block=spec_relationships_block,
     spec_capabilities_block=spec_capabilities_block,
     spec_verification_block=spec_verification_block,
+    spec_concerns_block=spec_concerns_block,
+    spec_hypotheses_block=spec_hypotheses_block,
+    spec_decisions_block=spec_decisions_block,
   )
   frontmatter = build_frontmatter(
     spec_id=next_id,
@@ -193,16 +202,6 @@ def create_spec(spec_name: str, options: CreateSpecOptions) -> CreateSpecResult:
   if slug_target.exists() or slug_target.is_symlink():
     slug_target.unlink()
   slug_target.symlink_to(Path("..") / spec_dir.name)
-
-  package_dir = config.base_dir / "by-package"
-  package_dir.mkdir(exist_ok=True)
-  packages = frontmatter.get("packages") or []
-  for package in packages:
-    package_path = package_dir / Path(package) / "spec"
-    package_path.parent.mkdir(parents=True, exist_ok=True)
-    if package_path.exists() or package_path.is_symlink():
-      package_path.unlink()
-    package_path.symlink_to(Path("..") / ".." / spec_dir.name)
 
   return CreateSpecResult(
     spec_id=next_id,

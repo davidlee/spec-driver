@@ -4,7 +4,7 @@ slug: "140-requirements_in_spec_block_ification_retire_regex_parser_structured_s
 name: "IP-140 Phase 03 — Validation & Template"
 created: "2026-05-23"
 updated: "2026-05-23"
-status: in-progress
+status: completed
 kind: phase
 plan: IP-140
 delta: DE-140
@@ -33,15 +33,15 @@ Wire spec requirements block validation into WorkspaceValidator, update spec cre
 
 ## 4. Exit Criteria / Done When
 
-- [ ] `_validate_spec_requirements_blocks()` wired into WorkspaceValidator
-- [ ] Schema validation via `SPEC_REQUIREMENTS_VALIDATOR` with severity-preserving dispatch
-- [ ] Spec field cross-validated against artifact ID
-- [ ] Strict-mode: trimmed-empty description and blank acceptance_criteria items rejected
-- [ ] Spec creation emits empty requirements block (DEC-140-14)
-- [ ] Template includes `{{ spec_requirements_block }}` placeholder
-- [ ] All 6 VTs passing (VT-140-015, -016, -019, -020, -022, -030)
-- [ ] `just lint` clean on modified files
-- [ ] `just pylint-files` clean on modified files
+- [x] `_validate_spec_requirements_blocks()` wired into WorkspaceValidator
+- [x] Schema validation via `SPEC_REQUIREMENTS_VALIDATOR` with severity-preserving dispatch
+- [x] Spec field cross-validated against artifact ID
+- [x] Strict-mode: trimmed-empty description and blank acceptance_criteria items rejected
+- [x] Spec creation emits empty requirements block (DEC-140-14)
+- [x] Template includes `{{ spec_requirements_block }}` placeholder
+- [x] All 6 VTs passing (VT-140-015, -016, -019, -020, -022, -030)
+- [x] `just lint` clean on modified files
+- [x] `just pylint-files` clean on modified files
 
 ## 5. Verification
 
@@ -67,12 +67,12 @@ Commands: `just test`, `just lint`, `just pylint-files supekku/scripts/lib/valid
 
 | Status | ID | Description | Parallel? | Notes |
 |--------|-----|-------------|-----------|-------|
-| [ ] | 3.1 | Add `_validate_spec_requirements_blocks()` to WorkspaceValidator | | Core validation wiring |
-| [ ] | 3.2 | Update `creation.py` to emit empty requirements block | [P] | DEC-140-14 |
-| [ ] | 3.3 | Add `{{ spec_requirements_block }}` to template | [P] | After 3.2 |
-| [ ] | 3.4 | Write validation tests (VT-140-015, -016, -022) | | After 3.1 |
-| [ ] | 3.5 | Write creation/template tests (VT-140-019, -020, -030) | | After 3.2/3.3 |
-| [ ] | 3.6 | Lint pass on modified files | | After all |
+| [x] | 3.1 | Add `_validate_spec_requirements_blocks()` to WorkspaceValidator | | Core validation wiring |
+| [x] | 3.2 | Update `creation.py` to emit empty requirements block | [P] | DEC-140-14 |
+| [x] | 3.3 | Add `{{ spec_requirements_block }}` to template | [P] | After 3.2 |
+| [x] | 3.4 | Write validation tests (VT-140-015, -016, -022) | | 11 tests |
+| [x] | 3.5 | Write creation/template tests (VT-140-019, -020, -030) | | 3 tests |
+| [x] | 3.6 | Lint pass on modified files | | Ruff clean, pylint no new |
 
 ### Task Details
 
@@ -106,14 +106,16 @@ Commands: `just test`, `just lint`, `just pylint-files supekku/scripts/lib/valid
 
 ## 9. Decisions & Outcomes
 
-(populated during execution)
+- Used `SPEC_REQUIREMENTS_VALIDATOR.validate()` (raw validator) for severity-preserving dispatch, not `validate_spec_requirements()` wrapper (returns `list[str]`). Custom checks inline.
+- Strict-mode content checks in separate `_check_strict_content_requirements()` method for pylint complexity compliance.
 
 ## 10. Findings / Research Notes
 
-(populated during execution)
+- Duplicate ID and kind-prefix invariant checks are already handled by `SPEC_REQUIREMENTS_VALIDATOR` schema validation. No need to import private helpers from metadata module.
+- P05 strict-flip will add: missing block → error (currently None → skip).
 
 ## 11. Wrap-up Checklist
 
-- [ ] Exit criteria satisfied
-- [ ] Verification evidence stored
-- [ ] Hand-off notes to P04/P05
+- [x] Exit criteria satisfied
+- [x] Verification evidence stored (5172/5172 pass)
+- [x] Hand-off notes in notes.md

@@ -96,6 +96,33 @@ DE-140 implements `supekku:spec.requirements@v1` — structured YAML blocks repl
 - `mem.fact.yaml.strenum-serialization` — StrEnum .value at YAML boundaries
 - `mem.pattern.architecture.migration-principles` — migration isolation patterns from DE-125
 
+## P03 — Validation & Template
+
+### Done
+
+- **Task 3.1**: `_validate_spec_requirements_blocks()` in `validator.py` — schema validation via `SPEC_REQUIREMENTS_VALIDATOR` with severity-preserving `_block_issue()` dispatch, spec field cross-validation, strict-mode trimmed-empty/blank-item rejection.
+- **Task 3.2**: `creation.py` — `render_spec_requirements_block(next_id)` emits empty `requirements: []` block (DEC-140-14).
+- **Task 3.3**: `spec.md` template — `{{ spec_requirements_block }}` placeholder added in section 3.
+- **Tasks 3.4–3.5**: `validator_spec_requirements_test.py` — 11 tests covering VT-140-015, -016, -022. `creation_test.py` — 3 new tests covering VT-140-019, -020, -030.
+- **Task 3.6**: Ruff clean. Pylint: no new messages; fixed pre-existing `unused-variable` in creation_test.py.
+
+### Verification
+
+- 14 new tests passing. 5172/5172 total tests passing.
+- Ruff: zero warnings.
+- Pylint: no new messages from P03 changes.
+
+### Adaptations
+
+- WorkspaceValidator uses `SPEC_REQUIREMENTS_VALIDATOR.validate()` (raw validator) for severity-preserving dispatch via `_block_issue()`, plus inline checks for spec field cross-validation and strict-mode content rejection. Did NOT use `validate_spec_requirements()` wrapper because it returns `list[str]` (no severity) — would lose warning/error distinction. The custom checks (duplicate IDs, kind-prefix invariant) from the wrapper are already covered by the raw validator's schema checks.
+- Strict-mode content checks (`_check_strict_content_requirements`) separated into own method to keep `_validate_spec_requirements_blocks` complexity low.
+
+### Status
+
+- Committed: `625ce858`
+- Phase sheet + code committed together per doctrine.
+- Full regression: 5172 passed, 0 failures.
+
 ### Worktree State
 
 - Clean for DE-140. Only pre-existing `flake.nix` modification remains.
